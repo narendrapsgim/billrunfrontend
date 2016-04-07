@@ -1,0 +1,17 @@
+body {
+    background-color: #E1E1E1;
+}
+
+.navbar {
+    margin-bottom: 0px;
+}
+
+.contents {
+    background-color: white;
+    height: 100%;
+}
+
+.navigator {
+    background-color: white;
+    border-bottom: 1px solid #E1E1E1;
+}
