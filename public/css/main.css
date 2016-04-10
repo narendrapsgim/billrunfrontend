@@ -1,9 +1,19 @@
 body {
-    background-color: #E1E1E1;
+    background-color: #C0C0C0;
+}
+
+div.component.container {
+    width: 1385px!important;
+}
+
+.navbar-inverse {
+    background-color: #272A39!important;
 }
 
 .navbar {
     margin-bottom: 0px;
+    border-radius: 0!important;
+    height: 75px;
 }
 
 .contents {
@@ -11,7 +21,26 @@ body {
     height: 100%;
 }
 
+.navbar-brand {
+    padding: 8px 15px!important;
+}
+
 .navigator {
     background-color: white;
     border-bottom: 1px solid #E1E1E1;
+    height: 70px;
 }
+
+.navigator > a.active {
+    color: black!important;
+    background-color: #E3E8EB!important;
+}
+
+.navigator > a {
+    padding: 10px!important;
+    text-transform: none!important;
+    color: #859799!important;
+    fill: #859799!important;
+    height: 100%;
+    padding-top: 16px!important;
+};

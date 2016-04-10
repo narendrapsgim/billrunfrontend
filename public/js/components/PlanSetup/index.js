@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Multistep } from '../vendor/Multistep';
 import StepOne from './StepOne';
 import StepTwo from './StepTwo';
+import StepThree from './StepThree';
 
 export default class PlanSetup extends Component {
   constructor(props) {
@@ -10,8 +11,9 @@ export default class PlanSetup extends Component {
 
   render() {
     let steps = [
-      {name: "PlanSetup", component: <StepOne />},
-      {name: "Pricing", component: <StepTwo />}
+      {name: "Plan Setup", component: <StepOne />},
+      {name: "Pricing", component: <StepTwo />},
+      {name: "Add Discount or Coupon", component: <StepThree />}
     ];
 
     return (

@@ -7,10 +7,12 @@ export default class Topbar extends Component {
 
   render() {
     return (
-      <div className="navbar navbar-default navbar-inverse">
+      <div className="navbar navbar-inverse">
         <div className="container-fluid">
           <div className="navbar-header">
-            <a className="navbar-brand" href="#">BillRun!</a>
+            <a className="navbar-brand" href="#">
+              <img src="img/billrun-logo-tm.png" />
+            </a>
           </div>
           <div className="collapse navbar-collapse">
             <div className="navbar-header navbar-right">
