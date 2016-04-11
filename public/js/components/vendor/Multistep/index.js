@@ -63,7 +63,7 @@ const Multistep = React.createClass({
 
     return React.createElement(
       'div',
-      { className: 'container', onKeyDown: this.handleKeyDown },
+      { onKeyDown: this.handleKeyDown },
       React.createElement(
         'ol',
         { className: 'progtrckr' }, ' ',

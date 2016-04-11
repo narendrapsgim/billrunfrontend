@@ -2,27 +2,24 @@ body {
     background-color: #C0C0C0;
 }
 
-div.component.container {
-    width: 1385px!important;
+.navbar-inverse,
+.footer {
+    background-color: #272A39!important;
 }
 
-.navbar-inverse {
-    background-color: #272A39!important;
+.footer > .container > p {
+    color: white!important;
+    font-weight: bold;
 }
 
 .navbar {
     margin-bottom: 0px;
     border-radius: 0!important;
-    height: 75px;
 }
 
 .contents {
     background-color: white;
-    height: 100%;
-}
-
-.navbar-brand {
-    padding: 8px 15px!important;
+    padding: 20px;
 }
 
 .navigator {

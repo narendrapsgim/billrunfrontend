@@ -9,12 +9,15 @@ import Layers from 'material-ui/lib/svg-icons/maps/layers';
 import Receipt from 'material-ui/lib/svg-icons/action/receipt';
 import AccountCircle from 'material-ui/lib/svg-icons/action/account-circle';
 
+import Fields from '../../fields';
+
 export default class Navigator extends Component {
   constructor(props) {
     super(props);
   }
   
   render() {
+    console.log(Fields);
     let pages = [
       {label: "Dashboard", path: "/dashboard", icon: <Dashboard />},
       {label: "Plan Setup", path: "/plan-setup", icon: <SettingsInputComponent />},

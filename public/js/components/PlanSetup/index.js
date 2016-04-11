@@ -17,7 +17,8 @@ export default class PlanSetup extends Component {
     ];
 
     return (
-      <div className="container">
+      <div className="PlanSetup">
+        <h3>Billing Plan</h3>
         <Multistep steps={steps} />
       </div>
     );

@@ -11,7 +11,7 @@ export default class Topbar extends Component {
         <div className="container-fluid">
           <div className="navbar-header">
             <a className="navbar-brand" href="#">
-              <img src="img/billrun-logo-tm.png" />
+              {/*<img src="img/billrun-logo-tm.png" />*/}
             </a>
           </div>
           <div className="collapse navbar-collapse">
