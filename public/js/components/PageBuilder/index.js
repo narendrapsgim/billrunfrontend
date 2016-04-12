@@ -1,4 +1,6 @@
 import React, { Component, PropTypes } from 'react';
+import Tabs from 'material-ui/lib/tabs/tabs';
+import Tab from 'material-ui/lib/tabs/tab';
 import View from '../../view';
 import Field from './Field';
 import R from 'ramda';
@@ -39,11 +41,45 @@ class PageBuilder extends Component {
     );
   }
   
+  tabStyle() {
+    return {backgroundColor: "#272A39"};
+  }
+
+  inkBarStyle() {
+    return {backgroundColor: "#C0C0C0", height: "4px", bottom: "2px"};
+  }
+
   render() {
     let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
     if (!View.pages[pageName]) {
       return (<div></div>);
     }
+
+    if (View.pages[pageName].view_type === "tabs") {
+      let tabs = View.pages[pageName].tabs.map((tab, tab_key) => {
+        if (!tab.sections) {
+          return (
+            <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
+            </Tab>
+          );
+        }
+        let sectionsHTML = tab.sections.map((section, key) => {
+          return this.createSectionHTML(section, key);
+        });
+        return (
+          <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
+            {sectionsHTML}
+          </Tab>
+        );
+      });
+
+      return (
+        <Tabs inkBarStyle={this.inkBarStyle()}>
+          {tabs}
+        </Tabs>
+      );
+    };
+
     let { title, sections = [] } = View.pages[pageName];
     let sectionsHTML = sections.map((section, key) => {
       return this.createSectionHTML(section, key);
