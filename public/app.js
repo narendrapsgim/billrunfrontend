@@ -24915,9 +24915,9 @@
 
 	var _reactTapEventPlugin2 = _interopRequireDefault(_reactTapEventPlugin);
 
-	var _fields = __webpack_require__(363);
+	var _view = __webpack_require__(363);
 
-	var _fields2 = _interopRequireDefault(_fields);
+	var _view2 = _interopRequireDefault(_view);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25024,9 +25024,9 @@
 
 	var _accountCircle2 = _interopRequireDefault(_accountCircle);
 
-	var _fields = __webpack_require__(363);
+	var _view = __webpack_require__(363);
 
-	var _fields2 = _interopRequireDefault(_fields);
+	var _view2 = _interopRequireDefault(_view);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38334,7 +38334,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var Fields = {
+	var View = {
 	  pages: {
 	    dashboard: {
 	      title: "Dashboard",
@@ -38386,7 +38386,7 @@
 	  }
 	};
 
-	exports.default = Fields;
+	exports.default = View;
 
 /***/ },
 /* 364 */
@@ -38766,9 +38766,9 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _fields = __webpack_require__(363);
+	var _view = __webpack_require__(363);
 
-	var _fields2 = _interopRequireDefault(_fields);
+	var _view2 = _interopRequireDefault(_view);
 
 	var _Field = __webpack_require__(371);
 
@@ -38794,7 +38794,7 @@
 
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PageBuilder).call(this, props));
 
-	    _this.page_settings = _fields2.default.pages[props.route.page];
+	    _this.page_settings = _view2.default.pages[props.route.page];
 	    _this.createSectionHTML = _this.createSectionHTML.bind(_this);
 	    return _this;
 	  }
@@ -38839,10 +38839,13 @@
 	      var _this3 = this;
 
 	      var pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
-	      var _Fields$pages$pageNam = _fields2.default.pages[pageName];
-	      var title = _Fields$pages$pageNam.title;
-	      var _Fields$pages$pageNam2 = _Fields$pages$pageNam.sections;
-	      var sections = _Fields$pages$pageNam2 === undefined ? [] : _Fields$pages$pageNam2;
+	      if (!_view2.default.pages[pageName]) {
+	        return _react2.default.createElement('div', null);
+	      }
+	      var _View$pages$pageName = _view2.default.pages[pageName];
+	      var title = _View$pages$pageName.title;
+	      var _View$pages$pageName$ = _View$pages$pageName.sections;
+	      var sections = _View$pages$pageName$ === undefined ? [] : _View$pages$pageName$;
 
 	      var sectionsHTML = sections.map(function (section, key) {
 	        return _this3.createSectionHTML(section, key);

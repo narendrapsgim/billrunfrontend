@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from 'react';
-import Fields from '../../fields';
+import View from '../../view';
 import Field from './Field';
 import R from 'ramda';
 
 class PageBuilder extends Component {
   constructor(props) {
     super(props);
-    this.page_settings = Fields.pages[props.route.page];
+    this.page_settings = View.pages[props.route.page];
     this.createSectionHTML = this.createSectionHTML.bind(this);
   }
 
@@ -41,7 +41,10 @@ class PageBuilder extends Component {
   
   render() {
     let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
-    let { title, sections = [] } = Fields.pages[pageName];
+    if (!View.pages[pageName]) {
+      return (<div></div>);
+    }
+    let { title, sections = [] } = View.pages[pageName];
     let sectionsHTML = sections.map((section, key) => {
       return this.createSectionHTML(section, key);
     });

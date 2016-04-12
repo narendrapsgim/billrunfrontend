@@ -1,4 +1,4 @@
-const Fields = {
+const View = {
   pages: {
     dashboard: {
       title: "Dashboard",
@@ -72,4 +72,4 @@ const Fields = {
   }
 };
 
-export default Fields;
+export default View;
