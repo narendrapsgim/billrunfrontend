@@ -3,6 +3,7 @@ import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
 import View from '../../view';
 import Field from './Field';
+import Help from '../Help';
 import R from 'ramda';
 
 class PageBuilder extends Component {
@@ -10,6 +11,17 @@ class PageBuilder extends Component {
     super(props);
     this.page_settings = View.pages[props.route.page];
     this.createSectionHTML = this.createSectionHTML.bind(this);
+  }
+
+  sectionTitle(section) {
+    let tooltip;
+    if (section.description) {
+      tooltip = <Help contents={section.description} />;
+    }
+
+    return (
+      <h4>{section.title}{tooltip}</h4>
+    );
   }
 
   createSectionHTML(section, key) {
@@ -20,7 +32,7 @@ class PageBuilder extends Component {
       rechtml = section.sections.map((section, k) => {
         return this.createSectionHTML(section, k);
       });
-    }
+    } 
 
     if (section.fields) {
       fieldshtml = section.fields.map((field, k) => {
@@ -32,7 +44,7 @@ class PageBuilder extends Component {
 
     return (
       <div key={key}>
-        <h4>{section.title}</h4>
+        {this.sectionTitle(section)}
         {fieldshtml}
         <div className="row"></div>
         <hr/>

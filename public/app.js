@@ -25057,11 +25057,7 @@
 	          labelStyle: { textTransform: "none" },
 	          style: { "padding": "10px" },
 	          icon: page.icon,
-	          containerElement: _react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: page.path, activeClassName: 'active' },
-	            'Dashboard'
-	          ) });
+	          containerElement: _react2.default.createElement(_reactRouter.Link, { to: page.path, activeClassName: 'active' }) });
 	      });
 
 	      return _react2.default.createElement(
@@ -25076,6 +25072,7 @@
 	}(_react.Component);
 
 	exports.default = Navigator;
+	;
 
 /***/ },
 /* 220 */
@@ -38348,6 +38345,7 @@
 	        title: "Plan Settings",
 	        sections: [{
 	          title: "Basic Settings",
+	          description: "Basic settings of the plan",
 	          fields: [{ label: "Plan Name",
 	            mandatory: true,
 	            type: "text" }, { label: "Plan Description",
@@ -38367,6 +38365,7 @@
 	            size: 3 }]
 	        }, {
 	          title: "Plan Recurring",
+	          description: "Recurring charges of the plan",
 	          fields: [{ label: "Priodical Rate",
 	            type: "number",
 	            size: 2 }, { label: "Each",
@@ -38440,7 +38439,11 @@
 	          _react2.default.createElement(
 	            "div",
 	            { className: "navbar-header" },
-	            _react2.default.createElement("a", { className: "navbar-brand", href: "#" })
+	            _react2.default.createElement(
+	              "a",
+	              { className: "navbar-brand", href: "#" },
+	              _react2.default.createElement("img", { src: "img/billrun-logo-tm.png" })
+	            )
 	          ),
 	          _react2.default.createElement(
 	            "div",
@@ -38789,6 +38792,10 @@
 
 	var _Field2 = _interopRequireDefault(_Field);
 
+	var _Help = __webpack_require__(419);
+
+	var _Help2 = _interopRequireDefault(_Help);
+
 	var _ramda = __webpack_require__(418);
 
 	var _ramda2 = _interopRequireDefault(_ramda);
@@ -38815,6 +38822,21 @@
 	  }
 
 	  _createClass(PageBuilder, [{
+	    key: 'sectionTitle',
+	    value: function sectionTitle(section) {
+	      var tooltip = void 0;
+	      if (section.description) {
+	        tooltip = _react2.default.createElement(_Help2.default, { contents: section.description });
+	      }
+
+	      return _react2.default.createElement(
+	        'h4',
+	        null,
+	        section.title,
+	        tooltip
+	      );
+	    }
+	  }, {
 	    key: 'createSectionHTML',
 	    value: function createSectionHTML(section, key) {
 	      var _this2 = this;
@@ -38837,11 +38859,7 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { key: key },
-	        _react2.default.createElement(
-	          'h4',
-	          null,
-	          section.title
-	        ),
+	        this.sectionTitle(section),
 	        fieldshtml,
 	        _react2.default.createElement('div', { className: 'row' }),
 	        _react2.default.createElement('hr', null),
@@ -39599,20 +39617,18 @@
 	  }
 
 	  _createClass(Field, [{
-	    key: 'render',
-	    value: function render() {
-	      var _props$field = this.props.field;
-	      var _props$field$label = _props$field.label;
-	      var label = _props$field$label === undefined ? _react2.default.createElement('span', { dangerouslySetInnerHTML: { __html: '&zwnj;' } }) : _props$field$label;
-	      var type = _props$field.type;
-	      var dbkey = _props$field.dbkey;
-	      var _props$field$mandator = _props$field.mandatory;
-	      var mandatory = _props$field$mandator === undefined ? false : _props$field$mandator;
-	      var _props$field$size = _props$field.size;
-	      var size = _props$field$size === undefined ? 10 : _props$field$size;
+	    key: 'createInputTag',
+	    value: function createInputTag(field) {
+	      var _field$label = field.label;
+	      var label = _field$label === undefined ? _react2.default.createElement('span', { dangerouslySetInnerHTML: { __html: '&zwnj;' } }) : _field$label;
+	      var type = field.type;
+	      var dbkey = field.dbkey;
+	      var _field$mandatory = field.mandatory;
+	      var mandatory = _field$mandatory === undefined ? false : _field$mandatory;
+	      var _field$size = field.size;
+	      var size = _field$size === undefined ? 10 : _field$size;
 
 
-	      console.log(size);
 	      if (type === "select") {
 	        var options = this.props.field.options.map(function (op, key) {
 	          return _react2.default.createElement(
@@ -39670,6 +39686,11 @@
 	        ),
 	        _react2.default.createElement('input', { type: type, className: 'form-control', id: dbkey })
 	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return this.createInputTag(this.props.field);
 	    }
 	  }]);
 
@@ -56070,6 +56091,136 @@
 
 	}.call(this));
 
+
+/***/ },
+/* 419 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _helpOutline = __webpack_require__(420);
+
+	var _helpOutline2 = _interopRequireDefault(_helpOutline);
+
+	var _popover = __webpack_require__(404);
+
+	var _popover2 = _interopRequireDefault(_popover);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Help = function (_Component) {
+	  _inherits(Help, _Component);
+
+	  function Help(props) {
+	    _classCallCheck(this, Help);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Help).call(this, props));
+
+	    _this.handleTouchTap = _this.handleTouchTap.bind(_this);
+	    _this.handleRequestClose = _this.handleRequestClose.bind(_this);
+	    _this.state = { open: false };
+	    return _this;
+	  }
+
+	  _createClass(Help, [{
+	    key: 'handleTouchTap',
+	    value: function handleTouchTap(event) {
+	      this.setState({
+	        open: true,
+	        anchorEl: event.currentTarget
+	      });
+	    }
+	  }, {
+	    key: 'handleRequestClose',
+	    value: function handleRequestClose() {
+	      this.setState({
+	        open: false
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'span',
+	        null,
+	        _react2.default.createElement(_helpOutline2.default, {
+	          onTouchTap: this.handleTouchTap,
+	          style: { cursor: "pointer" } }),
+	        _react2.default.createElement(
+	          _popover2.default,
+	          {
+	            open: this.state.open,
+	            anchorEl: this.state.anchorEl,
+	            anchorOrigin: { horizontal: 'left', vertical: 'bottom' },
+	            targetOrigin: { horizontal: 'left', vertical: 'top' },
+	            onRequestClose: this.handleRequestClose,
+	            style: { padding: "10px" } },
+	          this.props.contents
+	        )
+	      );
+	    }
+	  }]);
+
+	  return Help;
+	}(_react.Component);
+
+	Help.propTypes = {
+	  contents: _react.PropTypes.string.isRequired
+	};
+
+	exports.default = Help;
+
+/***/ },
+/* 420 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _pure = __webpack_require__(301);
+
+	var _pure2 = _interopRequireDefault(_pure);
+
+	var _svgIcon = __webpack_require__(358);
+
+	var _svgIcon2 = _interopRequireDefault(_svgIcon);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var ActionHelpOutline = function ActionHelpOutline(props) {
+	  return _react2.default.createElement(
+	    _svgIcon2.default,
+	    props,
+	    _react2.default.createElement('path', { d: 'M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z' })
+	  );
+	};
+	ActionHelpOutline = (0, _pure2.default)(ActionHelpOutline);
+	ActionHelpOutline.displayName = 'ActionHelpOutline';
+
+	exports.default = ActionHelpOutline;
 
 /***/ }
 /******/ ]);

@@ -6,14 +6,13 @@ class Field extends Component {
     super(props);
   }
 
-  render() {
+  createInputTag(field) {
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
           type,
           dbkey,
           mandatory = false,
-          size = 10 } = this.props.field;
+          size = 10 } = field;
 
-    console.log(size);
     if (type === "select") {
       let options = this.props.field.options.map((op, key) => {
         return (
@@ -51,6 +50,10 @@ class Field extends Component {
         <input type={type} className="form-control" id={dbkey} />
       </div>
     );
+  }
+
+  render() {
+    return this.createInputTag(this.props.field);
   }
 };
 

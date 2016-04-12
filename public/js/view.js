@@ -14,6 +14,7 @@ const View = {
           sections: [
             {
               title: "Basic Settings",
+              description: "Basic settings of the plan",
               fields: [
                 { label: "Plan Name",
                   mandatory: true,
@@ -44,6 +45,7 @@ const View = {
             },
             {
               title: "Plan Recurring",
+              description: "Recurring charges of the plan",
               fields: [
                 { label: "Priodical Rate",
                   type: "number",

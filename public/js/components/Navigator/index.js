@@ -33,7 +33,7 @@ export default class Navigator extends Component {
                     labelStyle={{textTransform: "none"}}
                     style={{"padding": "10px"}}
                     icon={page.icon}
-                    containerElement={<Link to={page.path} activeClassName="active">Dashboard</Link>} />
+                    containerElement={<Link to={page.path} activeClassName="active"></Link>} />
 
       );
     });
@@ -44,4 +44,4 @@ export default class Navigator extends Component {
       </div>
     );
   }
-}
+};
