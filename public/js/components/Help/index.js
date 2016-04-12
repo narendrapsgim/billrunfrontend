@@ -13,22 +13,20 @@ class Help extends Component {
   handleTouchTap(event) {
     this.setState({
       open: true,
-      anchorEl: event.currentTarget,
+      anchorEl: event.currentTarget
     });
-  };
+  }
 
   handleRequestClose() {
-    this.setState({
-      open: false,
-    });
-  };
+    this.setState({ open: false });
+  }
 
   render() {
     return (
       <span>
         <HelpOutline
             onTouchTap={this.handleTouchTap}
-            style={{cursor: "pointer"}} />
+            style={{cursor: "pointer", fill: "#333"}} />
         <Popover
             open={this.state.open}
             anchorEl={this.state.anchorEl}

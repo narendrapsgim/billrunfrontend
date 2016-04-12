@@ -11,6 +11,13 @@ class PageBuilder extends Component {
     super(props);
     this.page_settings = View.pages[props.route.page];
     this.createSectionHTML = this.createSectionHTML.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.state = {};
+  }
+
+  handleInputChange(evt, data) {
+    if (!evt) return;
+    this.setState({[evt.target.id]: evt.target.value});
   }
 
   sectionTitle(section) {
@@ -20,7 +27,7 @@ class PageBuilder extends Component {
     }
 
     return (
-      <h4>{section.title}{tooltip}</h4>
+      <h4>{section.title}  {tooltip}</h4>
     );
   }
 
@@ -37,7 +44,7 @@ class PageBuilder extends Component {
     if (section.fields) {
       fieldshtml = section.fields.map((field, k) => {
         return (
-          <Field field={field} key={k}/>
+          <Field field={field} onChange={this.handleInputChange} key={k}/>
         );
       });
     }

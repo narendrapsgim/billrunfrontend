@@ -13,6 +13,8 @@ class Field extends Component {
           mandatory = false,
           size = 10 } = field;
 
+    let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
+
     if (type === "select") {
       let options = this.props.field.options.map((op, key) => {
         return (
@@ -22,8 +24,8 @@ class Field extends Component {
 
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={dbkey}>{ mandatory ? `*${label}` : label}</label>
-          <select className="form-control" id={dbkey}>
+          <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
+          <select className="form-control" id={html_id} onChange={this.props.onChange}>
             {options}
           </select>
         </div>
@@ -31,23 +33,23 @@ class Field extends Component {
     } else if (type === "textarea") {
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={dbkey}>{ mandatory ? `*${label}` : label}</label>
-          <textarea className="form-control" id={dbkey}></textarea>
+          <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
+          <textarea className="form-control" id={html_id} onChange={this.props.onChange}></textarea>
         </div>
       );
     } else if (type === "date") {
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={dbkey}>{label}</label>
-          <DatePicker hintText={dbkey} />
+          <label htmlFor={html_id}>{label}</label>
+          <DatePicker hintText={dbkey} id={html_id} onChange={this.props.onChange} />
         </div>
       );
     }
 
     return (
       <div className={`col-md-${size}`}>
-        <label htmlFor={dbkey}>{ mandatory ? `*${label}` : label}</label>
-        <input type={type} className="form-control" id={dbkey} />
+        <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
+        <input type={type} className="form-control" id={html_id} onChange={this.props.onChange} />
       </div>
     );
   }

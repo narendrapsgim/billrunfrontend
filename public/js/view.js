@@ -37,7 +37,8 @@ const View = {
                   ]},
                 { label: "Cycle",
                   type: "number",
-                  size: 2 },
+                  size: 2,
+                  dbkey: "trial-cycle" },
                 { label: "Plan Fee",
                   type: "number",
                   size: 3 }
@@ -60,7 +61,7 @@ const View = {
                   size: 2,
                   dbkey: "each_select" },
                 { label: "Cycle",
-                  dbkey: "cycle",
+                  dbkey: "recurring-cycle",
                   type: "number",
                   size: 1 },
                 { label: "Validity",
@@ -75,7 +76,7 @@ const View = {
           ]
         },
         {
-          title: "Yo people!"
+          title: "Add Item"
         },
         {
           title: "Whaddup!"

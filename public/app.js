@@ -38360,7 +38360,8 @@
 	            size: 3,
 	            options: [{ label: "Every Month", value: "every_month" }] }, { label: "Cycle",
 	            type: "number",
-	            size: 2 }, { label: "Plan Fee",
+	            size: 2,
+	            dbkey: "trial-cycle" }, { label: "Plan Fee",
 	            type: "number",
 	            size: 3 }]
 	        }, {
@@ -38374,7 +38375,7 @@
 	            options: [{ label: "Every Month", value: "every_month" }],
 	            size: 2,
 	            dbkey: "each_select" }, { label: "Cycle",
-	            dbkey: "cycle",
+	            dbkey: "recurring-cycle",
 	            type: "number",
 	            size: 1 }, { label: "Validity",
 	            type: "date",
@@ -38384,7 +38385,7 @@
 	            size: 3 }]
 	        }]
 	      }, {
-	        title: "Yo people!"
+	        title: "Add Item"
 	      }, {
 	        title: "Whaddup!"
 	      }]
@@ -38802,6 +38803,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -38818,10 +38821,18 @@
 
 	    _this.page_settings = _view2.default.pages[props.route.page];
 	    _this.createSectionHTML = _this.createSectionHTML.bind(_this);
+	    _this.handleInputChange = _this.handleInputChange.bind(_this);
+	    _this.state = {};
 	    return _this;
 	  }
 
 	  _createClass(PageBuilder, [{
+	    key: 'handleInputChange',
+	    value: function handleInputChange(evt, data) {
+	      if (!evt) return;
+	      this.setState(_defineProperty({}, evt.target.id, evt.target.value));
+	    }
+	  }, {
 	    key: 'sectionTitle',
 	    value: function sectionTitle(section) {
 	      var tooltip = void 0;
@@ -38833,6 +38844,7 @@
 	        'h4',
 	        null,
 	        section.title,
+	        '  ',
 	        tooltip
 	      );
 	    }
@@ -38852,7 +38864,7 @@
 
 	      if (section.fields) {
 	        fieldshtml = section.fields.map(function (field, k) {
-	          return _react2.default.createElement(_Field2.default, { field: field, key: k });
+	          return _react2.default.createElement(_Field2.default, { field: field, onChange: _this2.handleInputChange, key: k });
 	        });
 	      }
 
@@ -39629,6 +39641,8 @@
 	      var size = _field$size === undefined ? 10 : _field$size;
 
 
+	      var html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
+
 	      if (type === "select") {
 	        var options = this.props.field.options.map(function (op, key) {
 	          return _react2.default.createElement(
@@ -39643,12 +39657,12 @@
 	          { className: 'col-md-' + size },
 	          _react2.default.createElement(
 	            'label',
-	            { htmlFor: dbkey },
+	            { htmlFor: html_id },
 	            mandatory ? '*' + label : label
 	          ),
 	          _react2.default.createElement(
 	            'select',
-	            { className: 'form-control', id: dbkey },
+	            { className: 'form-control', id: html_id, onChange: this.props.onChange },
 	            options
 	          )
 	        );
@@ -39658,10 +39672,10 @@
 	          { className: 'col-md-' + size },
 	          _react2.default.createElement(
 	            'label',
-	            { htmlFor: dbkey },
+	            { htmlFor: html_id },
 	            mandatory ? '*' + label : label
 	          ),
-	          _react2.default.createElement('textarea', { className: 'form-control', id: dbkey })
+	          _react2.default.createElement('textarea', { className: 'form-control', id: html_id, onChange: this.props.onChange })
 	        );
 	      } else if (type === "date") {
 	        return _react2.default.createElement(
@@ -39669,10 +39683,10 @@
 	          { className: 'col-md-' + size },
 	          _react2.default.createElement(
 	            'label',
-	            { htmlFor: dbkey },
+	            { htmlFor: html_id },
 	            label
 	          ),
-	          _react2.default.createElement(_datePicker2.default, { hintText: dbkey })
+	          _react2.default.createElement(_datePicker2.default, { hintText: dbkey, id: html_id, onChange: this.props.onChange })
 	        );
 	      }
 
@@ -39681,10 +39695,10 @@
 	        { className: 'col-md-' + size },
 	        _react2.default.createElement(
 	          'label',
-	          { htmlFor: dbkey },
+	          { htmlFor: html_id },
 	          mandatory ? '*' + label : label
 	        ),
-	        _react2.default.createElement('input', { type: type, className: 'form-control', id: dbkey })
+	        _react2.default.createElement('input', { type: type, className: 'form-control', id: html_id, onChange: this.props.onChange })
 	      );
 	    }
 	  }, {
@@ -56149,9 +56163,7 @@
 	  }, {
 	    key: 'handleRequestClose',
 	    value: function handleRequestClose() {
-	      this.setState({
-	        open: false
-	      });
+	      this.setState({ open: false });
 	    }
 	  }, {
 	    key: 'render',
@@ -56161,7 +56173,7 @@
 	        null,
 	        _react2.default.createElement(_helpOutline2.default, {
 	          onTouchTap: this.handleTouchTap,
-	          style: { cursor: "pointer" } }),
+	          style: { cursor: "pointer", fill: "#333" } }),
 	        _react2.default.createElement(
 	          _popover2.default,
 	          {
