@@ -10,12 +10,6 @@ const View = {
       view_type: "tabs",
       tabs: [
         {
-          title: "Yo people!"
-        },
-        {
-          title: "Whaddup!"
-        },
-        {
           title: "Plan Settings",
           sections: [
             {
@@ -77,6 +71,12 @@ const View = {
               ]
             }
           ]
+        },
+        {
+          title: "Yo people!"
+        },
+        {
+          title: "Whaddup!"
         }
       ]
     }
