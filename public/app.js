@@ -24813,6 +24813,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	//import PageBuilder from './components/PageBuilder';
+
 	exports.default = function () {
 	  return _react2.default.createElement(
 	    _reactRouter.Route,
@@ -24822,6 +24824,17 @@
 	    _react2.default.createElement(_reactRouter.Route, { path: 'plan-setup', component: _PlanSetup2.default })
 	  );
 	};
+
+	// uncomment for WIP dyanmic page-builder
+	// export default () => {
+	//   return (
+	//     <Route path="/" component={App}>
+	//       <IndexRedirect to="/dashboard" />
+	//       <Route path="dashboard" component={PageBuilder} page="dashboard" />
+	//       <Route path="plan-setup" component={PageBuilder} page="plan_setup" />
+	//     </Route>
+	//   );
+	// }
 
 /***/ },
 /* 218 */
@@ -24852,6 +24865,10 @@
 	var _reactTapEventPlugin = __webpack_require__(364);
 
 	var _reactTapEventPlugin2 = _interopRequireDefault(_reactTapEventPlugin);
+
+	var _fields = __webpack_require__(362);
+
+	var _fields2 = _interopRequireDefault(_fields);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24982,8 +24999,8 @@
 	  _createClass(Navigator, [{
 	    key: 'render',
 	    value: function render() {
-	      console.log(_fields2.default);
 	      var pages = [{ label: "Dashboard", path: "/dashboard", icon: _react2.default.createElement(_dashboard2.default, null) }, { label: "Plan Setup", path: "/plan-setup", icon: _react2.default.createElement(_settingsInputComponent2.default, null) }, { label: "Plans & Items", path: '/plans-items', icon: _react2.default.createElement(_layers2.default, null) }, { label: "Pay Management", path: '/pay-management', icon: _react2.default.createElement(_receipt2.default, null) }, { label: "Subscribers", path: '/subscribers', icon: _react2.default.createElement(_accountCircle2.default, null) }];
+
 	      var buttons = pages.map(function (page, key) {
 	        return _react2.default.createElement(_flatButton2.default, { key: key,
 	          label: page.label,
@@ -24997,6 +25014,7 @@
 	            'Dashboard'
 	          ) });
 	      });
+
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'navigator' },
@@ -37573,11 +37591,28 @@
 	  value: true
 	});
 	var Fields = {
-	  pages: [{
-	    name: "Plan Setup",
-	    route: "/plan-setup",
-	    view_type: "tabs"
-	  }]
+	  pages: {
+	    dashboard: {
+	      title: "Dashboard",
+	      route: "/dashboard"
+	    },
+	    plan_setup: {
+	      title: "Plan Setup",
+	      route: "/plan-setup",
+	      view_type: "tabs",
+	      sections: [{
+	        title: "Basic Settings",
+	        fields: [{
+	          label: "Plan Name",
+	          mandatory: true,
+	          type: "text"
+	        }],
+	        sections: [{
+	          title: "Hi!"
+	        }]
+	      }]
+	    }
+	  }
 	};
 
 	exports.default = Fields;
