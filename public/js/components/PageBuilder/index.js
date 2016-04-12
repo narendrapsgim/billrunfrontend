@@ -10,28 +10,29 @@ class PageBuilder extends Component {
     this.createSectionHTML = this.createSectionHTML.bind(this);
   }
 
-  createSectionHTML(section) {
+  createSectionHTML(section, key) {
     let rechtml,
         fieldshtml;
 
     if (section.sections && !R.isEmpty(section.sections)) {
-      rechtml = section.sections.map((section, key) => {
-        return this.createSectionHTML(section);
+      rechtml = section.sections.map((section, k) => {
+        return this.createSectionHTML(section, k);
       });
     }
 
     if (section.fields) {
-      fieldshtml = section.fields.map((field, key) => {
+      fieldshtml = section.fields.map((field, k) => {
         return (
-          <Field field={field} />
+          <Field field={field} key={k}/>
         );
       });
     }
 
     return (
-      <div>
+      <div key={key}>
         <h4>{section.title}</h4>
         {fieldshtml}
+        <div className="row"></div>
         <hr/>
         {rechtml}
       </div>
@@ -39,9 +40,10 @@ class PageBuilder extends Component {
   }
   
   render() {
-    let { title, sections = [] } = this.page_settings;
+    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let { title, sections = [] } = Fields.pages[pageName];
     let sectionsHTML = sections.map((section, key) => {
-      return this.createSectionHTML(section);
+      return this.createSectionHTML(section, key);
     });
 
     return (

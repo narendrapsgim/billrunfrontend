@@ -7,8 +7,7 @@ export default () => {
   return (
     <Route path="/" component={App}>
       <IndexRedirect to="/dashboard" />
-      <Route path="dashboard" component={PageBuilder} page="dashboard" />
-      <Route path="plan-setup" component={PageBuilder} page="plan_setup" />
+      <Route path="/:page" component={PageBuilder} />
     </Route>
   );
 }

@@ -24881,8 +24881,7 @@
 	    _reactRouter.Route,
 	    { path: '/', component: _App2.default },
 	    _react2.default.createElement(_reactRouter.IndexRedirect, { to: '/dashboard' }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'dashboard', component: _PageBuilder2.default, page: 'dashboard' }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'plan-setup', component: _PageBuilder2.default, page: 'plan_setup' })
+	    _react2.default.createElement(_reactRouter.Route, { path: '/:page', component: _PageBuilder2.default })
 	  );
 	};
 
@@ -24966,7 +24965,7 @@
 	            _react2.default.createElement(
 	              'p',
 	              null,
-	              '(c)2016 Billrun All Right Reserved'
+	              '(c) 2016 Billrun All Right Reserved'
 	            )
 	          )
 	        )
@@ -38354,15 +38353,34 @@
 	          type: "textarea" }]
 	      }, {
 	        title: "Trial",
+	        display: "inline",
 	        fields: [{ label: "Transation",
 	          mandatory: true,
 	          type: "select",
+	          size: 3,
 	          options: [{ label: "Every Month", value: "every_month" }] }, { label: "Cycle",
-	          type: "number" }, { label: "Plan Fee",
-	          type: "number" }]
+	          type: "number",
+	          size: 2 }, { label: "Plan Fee",
+	          type: "number",
+	          size: 3 }]
 	      }, {
 	        title: "Plan Recurring",
-	        fields: []
+	        fields: [{ label: "Priodical Rate",
+	          type: "number",
+	          size: 2 }, { label: "Each",
+	          type: "number",
+	          size: 1 }, { type: "select",
+	          options: [{ label: "Every Month", value: "every_month" }],
+	          size: 2,
+	          dbkey: "each_select" }, { label: "Cycle",
+	          dbkey: "cycle",
+	          type: "number",
+	          size: 1 }, { label: "Validity",
+	          type: "date",
+	          dbkey: "from",
+	          size: 3 }, { type: "date",
+	          dbkey: "to",
+	          size: 3 }]
 	      }]
 	    }
 	  }
@@ -38752,11 +38770,11 @@
 
 	var _fields2 = _interopRequireDefault(_fields);
 
-	var _Field = __webpack_require__(372);
+	var _Field = __webpack_require__(371);
 
 	var _Field2 = _interopRequireDefault(_Field);
 
-	var _ramda = __webpack_require__(371);
+	var _ramda = __webpack_require__(372);
 
 	var _ramda2 = _interopRequireDefault(_ramda);
 
@@ -38783,33 +38801,34 @@
 
 	  _createClass(PageBuilder, [{
 	    key: 'createSectionHTML',
-	    value: function createSectionHTML(section) {
+	    value: function createSectionHTML(section, key) {
 	      var _this2 = this;
 
 	      var rechtml = void 0,
 	          fieldshtml = void 0;
 
 	      if (section.sections && !_ramda2.default.isEmpty(section.sections)) {
-	        rechtml = section.sections.map(function (section, key) {
-	          return _this2.createSectionHTML(section);
+	        rechtml = section.sections.map(function (section, k) {
+	          return _this2.createSectionHTML(section, k);
 	        });
 	      }
 
 	      if (section.fields) {
-	        fieldshtml = section.fields.map(function (field, key) {
-	          return _react2.default.createElement(_Field2.default, { field: field });
+	        fieldshtml = section.fields.map(function (field, k) {
+	          return _react2.default.createElement(_Field2.default, { field: field, key: k });
 	        });
 	      }
 
 	      return _react2.default.createElement(
 	        'div',
-	        null,
+	        { key: key },
 	        _react2.default.createElement(
 	          'h4',
 	          null,
 	          section.title
 	        ),
 	        fieldshtml,
+	        _react2.default.createElement('div', { className: 'row' }),
 	        _react2.default.createElement('hr', null),
 	        rechtml
 	      );
@@ -38819,13 +38838,14 @@
 	    value: function render() {
 	      var _this3 = this;
 
-	      var _page_settings = this.page_settings;
-	      var title = _page_settings.title;
-	      var _page_settings$sectio = _page_settings.sections;
-	      var sections = _page_settings$sectio === undefined ? [] : _page_settings$sectio;
+	      var pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+	      var _Fields$pages$pageNam = _fields2.default.pages[pageName];
+	      var title = _Fields$pages$pageNam.title;
+	      var _Fields$pages$pageNam2 = _Fields$pages$pageNam.sections;
+	      var sections = _Fields$pages$pageNam2 === undefined ? [] : _Fields$pages$pageNam2;
 
 	      var sectionsHTML = sections.map(function (section, key) {
-	        return _this3.createSectionHTML(section);
+	        return _this3.createSectionHTML(section, key);
 	      });
 
 	      return _react2.default.createElement(
@@ -38850,6 +38870,118 @@
 
 /***/ },
 /* 371 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Field = function (_Component) {
+	  _inherits(Field, _Component);
+
+	  function Field(props) {
+	    _classCallCheck(this, Field);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this, props));
+	  }
+
+	  _createClass(Field, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props$field = this.props.field;
+	      var _props$field$label = _props$field.label;
+	      var label = _props$field$label === undefined ? _react2.default.createElement('span', { dangerouslySetInnerHTML: { __html: '&zwnj;' } }) : _props$field$label;
+	      var type = _props$field.type;
+	      var dbkey = _props$field.dbkey;
+	      var _props$field$mandator = _props$field.mandatory;
+	      var mandatory = _props$field$mandator === undefined ? false : _props$field$mandator;
+	      var size = _props$field.size;
+
+
+	      if (type === "select") {
+	        var options = this.props.field.options.map(function (op, key) {
+	          return _react2.default.createElement(
+	            'option',
+	            { value: op.value, key: key },
+	            op.label
+	          );
+	        });
+
+	        return _react2.default.createElement(
+	          'div',
+	          { className: 'col-md-' + size },
+	          _react2.default.createElement(
+	            'label',
+	            { htmlFor: dbkey },
+	            mandatory ? '*' + label : label
+	          ),
+	          _react2.default.createElement(
+	            'select',
+	            { className: 'form-control', id: dbkey },
+	            options
+	          )
+	        );
+	      } else if (type === "textarea") {
+	        return _react2.default.createElement(
+	          'div',
+	          { className: 'col-md-' + size },
+	          _react2.default.createElement(
+	            'label',
+	            { htmlFor: dbkey },
+	            mandatory ? '*' + label : label
+	          ),
+	          _react2.default.createElement('textarea', { className: 'form-control', id: dbkey })
+	        );
+	      }
+
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'col-md-' + size },
+	        _react2.default.createElement(
+	          'label',
+	          { htmlFor: dbkey },
+	          mandatory ? '*' + label : label
+	        ),
+	        _react2.default.createElement('input', { type: type, className: 'form-control', id: dbkey })
+	      );
+	    }
+	  }]);
+
+	  return Field;
+	}(_react.Component);
+
+	;
+
+	Field.propTypes = {
+	  field: _react.PropTypes.shape({
+	    dbkey: function dbkey(props, propName, componentName) {
+	      if (!props[propName] && !props['label']) {
+	        return new Error("Must supply either 'dbkey' or 'label' in field");
+	      }
+	    }
+	  })
+	};
+
+	exports.default = Field;
+
+/***/ },
+/* 372 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//  Ramda v0.21.0
@@ -47637,93 +47769,6 @@
 
 	}.call(this));
 
-
-/***/ },
-/* 372 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Field = function (_Component) {
-	  _inherits(Field, _Component);
-
-	  function Field(props) {
-	    _classCallCheck(this, Field);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this, props));
-	  }
-
-	  _createClass(Field, [{
-	    key: "render",
-	    value: function render() {
-	      var _props$field = this.props.field;
-	      var label = _props$field.label;
-	      var type = _props$field.type;
-	      var _props$field$mandator = _props$field.mandatory;
-	      var mandatory = _props$field$mandator === undefined ? false : _props$field$mandator;
-
-
-	      if (type === "select") {
-	        var options = this.props.field.options.map(function (op, key) {
-	          return _react2.default.createElement(
-	            "option",
-	            { value: op.value, key: key },
-	            op.label
-	          );
-	        });
-
-	        return _react2.default.createElement(
-	          "div",
-	          { className: "form-group" },
-	          _react2.default.createElement(
-	            "label",
-	            { htmlFor: "" },
-	            mandatory ? "*" + label : label
-	          ),
-	          _react2.default.createElement(
-	            "select",
-	            { className: "form-control", id: "" },
-	            options
-	          )
-	        );
-	      }
-
-	      return _react2.default.createElement(
-	        "div",
-	        { className: "form-group" },
-	        _react2.default.createElement(
-	          "label",
-	          { htmlFor: "" },
-	          mandatory ? "*" + label : label
-	        ),
-	        _react2.default.createElement("input", { type: type, className: "form-control", id: "" })
-	      );
-	    }
-	  }]);
-
-	  return Field;
-	}(_react.Component);
-
-	exports.default = Field;
-	;
 
 /***/ }
 /******/ ]);

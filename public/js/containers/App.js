@@ -24,7 +24,7 @@ export default class App extends Component {
         <footer className="footer">
           <div className="container">
             <p>
-              (c)2016 Billrun All Right Reserved
+              (c) 2016 Billrun All Right Reserved
             </p>
           </div>
         </footer>

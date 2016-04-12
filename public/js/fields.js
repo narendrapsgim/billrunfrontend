@@ -22,22 +22,49 @@ const Fields = {
         },
         {
           title: "Trial",
+          display: "inline",
           fields: [
             { label: "Transation",
               mandatory: true,
               type: "select",
+              size: 3,
               options: [
                 { label: "Every Month", value: "every_month"}
               ]},
             { label: "Cycle",
-              type: "number" },
+              type: "number",
+              size: 2 },
             { label: "Plan Fee",
-              type: "number" }
+              type: "number",
+              size: 3 }
           ]
         },
         {
           title: "Plan Recurring",
           fields: [
+            { label: "Priodical Rate",
+              type: "number",
+              size: 2 },
+            { label: "Each",
+              type: "number",
+              size: 1 },
+            { type: "select",
+              options: [
+                { label: "Every Month", value: "every_month"}
+              ],
+              size: 2,
+              dbkey: "each_select" },
+            { label: "Cycle",
+              dbkey: "cycle",
+              type: "number",
+              size: 1 },
+            { label: "Validity",
+              type: "date",
+              dbkey: "from", 
+              size: 3 },
+            { type: "date",
+              dbkey: "to",
+              size: 3 }
           ]
         }
       ]
