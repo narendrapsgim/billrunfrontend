@@ -41,8 +41,15 @@ class PageBuilder extends Component {
     );
   }
   
-  render() {
+  tabStyle() {
+    return {backgroundColor: "#272A39"};
+  }
 
+  inkBarStyle() {
+    return {backgroundColor: "#C0C0C0", height: "4px", bottom: "2px"};
+  }
+
+  render() {
     let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
     if (!View.pages[pageName]) {
       return (<div></div>);
@@ -52,7 +59,7 @@ class PageBuilder extends Component {
       let tabs = View.pages[pageName].tabs.map((tab, tab_key) => {
         if (!tab.sections) {
           return (
-            <Tab key={tab_key} label={tab.title} style={{backgroundColor: "#272A39"}}>
+            <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
             </Tab>
           );
         }
@@ -60,14 +67,14 @@ class PageBuilder extends Component {
           return this.createSectionHTML(section, key);
         });
         return (
-          <Tab key={tab_key} label={tab.title} style={{backgroundColor: "#272A39"}}>
+          <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
             {sectionsHTML}
           </Tab>
         );
       });
 
       return (
-        <Tabs inkBarStyle={{backgroundColor: "#C0C0C0", height: "4px", bottom: "2px"}}>
+        <Tabs inkBarStyle={this.inkBarStyle()}>
           {tabs}
         </Tabs>
       );

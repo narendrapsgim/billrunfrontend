@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import DatePicker from 'material-ui/lib/date-picker/date-picker';
 
 class Field extends Component {
   constructor(props) {
@@ -10,8 +11,9 @@ class Field extends Component {
           type,
           dbkey,
           mandatory = false,
-          size } = this.props.field;
+          size = 10 } = this.props.field;
 
+    console.log(size);
     if (type === "select") {
       let options = this.props.field.options.map((op, key) => {
         return (
@@ -32,6 +34,13 @@ class Field extends Component {
         <div className={`col-md-${size}`}>
           <label htmlFor={dbkey}>{ mandatory ? `*${label}` : label}</label>
           <textarea className="form-control" id={dbkey}></textarea>
+        </div>
+      );
+    } else if (type === "date") {
+      return (
+        <div className={`col-md-${size}`}>
+          <label htmlFor={dbkey}>{label}</label>
+          <DatePicker hintText={dbkey} />
         </div>
       );
     }

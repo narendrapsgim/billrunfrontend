@@ -13,6 +13,9 @@ const View = {
           title: "Yo people!"
         },
         {
+          title: "Whaddup!"
+        },
+        {
           title: "Plan Settings",
           sections: [
             {
