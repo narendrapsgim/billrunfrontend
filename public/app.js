@@ -38822,13 +38822,27 @@
 	  }
 
 	  _createClass(PageBuilder, [{
+	    key: 'sectionTitle',
+	    value: function sectionTitle(section) {
+	      var tooltip = void 0;
+	      if (section.description) {
+	        tooltip = _react2.default.createElement(_Help2.default, { contents: section.description });
+	      }
+
+	      return _react2.default.createElement(
+	        'h4',
+	        null,
+	        section.title,
+	        tooltip
+	      );
+	    }
+	  }, {
 	    key: 'createSectionHTML',
 	    value: function createSectionHTML(section, key) {
 	      var _this2 = this;
 
 	      var rechtml = void 0,
-	          fieldshtml = void 0,
-	          tooltip = void 0;
+	          fieldshtml = void 0;
 
 	      if (section.sections && !_ramda2.default.isEmpty(section.sections)) {
 	        rechtml = section.sections.map(function (section, k) {
@@ -38842,19 +38856,10 @@
 	        });
 	      }
 
-	      if (section.description) {
-	        tooltip = _react2.default.createElement(_Help2.default, { contents: section.description });
-	      }
-
 	      return _react2.default.createElement(
 	        'div',
 	        { key: key },
-	        _react2.default.createElement(
-	          'h4',
-	          null,
-	          section.title,
-	          tooltip
-	        ),
+	        this.sectionTitle(section),
 	        fieldshtml,
 	        _react2.default.createElement('div', { className: 'row' }),
 	        _react2.default.createElement('hr', null),

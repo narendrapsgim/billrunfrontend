@@ -13,16 +13,26 @@ class PageBuilder extends Component {
     this.createSectionHTML = this.createSectionHTML.bind(this);
   }
 
+  sectionTitle(section) {
+    let tooltip;
+    if (section.description) {
+      tooltip = <Help contents={section.description} />;
+    }
+
+    return (
+      <h4>{section.title}{tooltip}</h4>
+    );
+  }
+
   createSectionHTML(section, key) {
     let rechtml,
-        fieldshtml,
-        tooltip;
+        fieldshtml;
 
     if (section.sections && !R.isEmpty(section.sections)) {
       rechtml = section.sections.map((section, k) => {
         return this.createSectionHTML(section, k);
       });
-    }
+    } 
 
     if (section.fields) {
       fieldshtml = section.fields.map((field, k) => {
@@ -32,13 +42,9 @@ class PageBuilder extends Component {
       });
     }
 
-    if (section.description) {
-      tooltip = <Help contents={section.description} />;
-    }
-
     return (
       <div key={key}>
-        <h4>{section.title}{tooltip}</h4>
+        {this.sectionTitle(section)}
         {fieldshtml}
         <div className="row"></div>
         <hr/>
