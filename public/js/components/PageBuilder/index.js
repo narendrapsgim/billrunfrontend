@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Fields from '../../fields';
+import Field from './Field';
 import R from 'ramda';
 
 class PageBuilder extends Component {
@@ -10,11 +11,35 @@ class PageBuilder extends Component {
   }
 
   createSectionHTML(section) {
+    let rechtml,
+        fieldshtml;
 
+    if (section.sections && !R.isEmpty(section.sections)) {
+      rechtml = section.sections.map((section, key) => {
+        return this.createSectionHTML(section);
+      });
+    }
+
+    if (section.fields) {
+      fieldshtml = section.fields.map((field, key) => {
+        return (
+          <Field field={field} />
+        );
+      });
+    }
+
+    return (
+      <div>
+        <h4>{section.title}</h4>
+        {fieldshtml}
+        <hr/>
+        {rechtml}
+      </div>
+    );
   }
   
   render() {
-    let { title, sections } = this.page_settings;
+    let { title, sections = [] } = this.page_settings;
     let sectionsHTML = sections.map((section, key) => {
       return this.createSectionHTML(section);
     });

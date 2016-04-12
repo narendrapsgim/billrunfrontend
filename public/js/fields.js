@@ -2,7 +2,7 @@ const Fields = {
   pages: {
     dashboard: {
       title: "Dashboard",
-      route: "/dashboard",
+      route: "/dashboard"
     },
     plan_setup: {
       title: "Plan Setup",
@@ -12,21 +12,37 @@ const Fields = {
         {
           title: "Basic Settings",
           fields: [
-            {
-              label: "Plan Name",
+            { label: "Plan Name",
               mandatory: true,
-              type: "text",
-            },
-          ],
-          sections: [
-            {
-              title: "Hi!"
-            }
+              type: "text" },
+            { label: "Plan Description",
+              mandatory: false,
+              type: "textarea" }
+          ]
+        },
+        {
+          title: "Trial",
+          fields: [
+            { label: "Transation",
+              mandatory: true,
+              type: "select",
+              options: [
+                { label: "Every Month", value: "every_month"}
+              ]},
+            { label: "Cycle",
+              type: "number" },
+            { label: "Plan Fee",
+              type: "number" }
+          ]
+        },
+        {
+          title: "Plan Recurring",
+          fields: [
           ]
         }
       ]
     }
   }
-}
+};
 
-export default Fields
+export default Fields;
