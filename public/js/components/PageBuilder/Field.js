@@ -13,7 +13,6 @@ class Field extends Component {
           mandatory = false,
           size = 10 } = this.props.field;
 
-    console.log(size);
     if (type === "select") {
       let options = this.props.field.options.map((op, key) => {
         return (

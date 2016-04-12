@@ -4,6 +4,7 @@
   "description": "Billrun as a Service",
   "main": "index.js",
   "scripts": {
+    "start": "./node_modules/webpack/bin/webpack.js --watch --colors",
     "test": "./node_modules/jest-cli/bin/jest.js"
   },
   "author": "BillRun",

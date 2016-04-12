@@ -39612,7 +39612,6 @@
 	      var size = _props$field$size === undefined ? 10 : _props$field$size;
 
 
-	      console.log(size);
 	      if (type === "select") {
 	        var options = this.props.field.options.map(function (op, key) {
 	          return _react2.default.createElement(
