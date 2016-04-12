@@ -3,6 +3,7 @@ import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
 import View from '../../view';
 import Field from './Field';
+import Help from '../Help';
 import R from 'ramda';
 
 class PageBuilder extends Component {
@@ -14,7 +15,8 @@ class PageBuilder extends Component {
 
   createSectionHTML(section, key) {
     let rechtml,
-        fieldshtml;
+        fieldshtml,
+        tooltip;
 
     if (section.sections && !R.isEmpty(section.sections)) {
       rechtml = section.sections.map((section, k) => {
@@ -30,9 +32,13 @@ class PageBuilder extends Component {
       });
     }
 
+    if (section.description) {
+      tooltip = <Help contents={section.description} />;
+    }
+
     return (
       <div key={key}>
-        <h4>{section.title}</h4>
+        <h4>{section.title}{tooltip}</h4>
         {fieldshtml}
         <div className="row"></div>
         <hr/>

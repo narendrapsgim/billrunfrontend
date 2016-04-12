@@ -1,22 +1,44 @@
 import React, { Component, PropTypes } from 'react';
 import HelpOutline from 'material-ui/lib/svg-icons/action/help-outline';
+import Popover from 'material-ui/lib/popover/popover';
 
 class Help extends Component {
   constructor(props) {
     super(props);
-    this.showHelpContents = this.showHelpContents.bind(this);
+    this.handleTouchTap = this.handleTouchTap.bind(this);
+    this.handleRequestClose = this.handleRequestClose.bind(this);
+    this.state = { open: false };
   }
 
-  showHelpContents() {
-    /* Show Tooltip */
-    console.log(this.props.contents);
-  }
-  
+  handleTouchTap(event) {
+    this.setState({
+      open: true,
+      anchorEl: event.currentTarget,
+    });
+  };
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  };
+
   render() {
     return (
-      <HelpOutline
-          onClick={this.showHelpContents}
-          style={{cursor: "pointer"}} />
+      <span>
+        <HelpOutline
+            onTouchTap={this.handleTouchTap}
+            style={{cursor: "pointer"}} />
+        <Popover
+            open={this.state.open}
+            anchorEl={this.state.anchorEl}
+            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+            targetOrigin={{horizontal: 'left', vertical: 'top'}}
+            onRequestClose={this.handleRequestClose}
+            style={{padding: "10px"}}>
+          {this.props.contents}
+        </Popover>
+      </span>
     );
   }
 }

@@ -17,6 +17,11 @@ body {
     border-radius: 0!important;
 }
 
+.navbar-brand {
+    padding: 0px;
+    padding-left: 30px;
+}
+
 .contents {
     background-color: white;
     padding: 20px;
@@ -42,6 +47,6 @@ body {
     padding-top: 16px!important;
 };
 
-.tab .active {
-    background-color: #272A39;
+.help-popover {
+    padding: 10px!important;
 }
