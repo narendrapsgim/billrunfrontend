@@ -3,6 +3,7 @@ import Navigator from '../components/Navigator';
 import Topbar from '../components/Topbar';
 import { routes } from '../routes';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import Fields from '../fields';
 
 export default class App extends Component {
   constructor(props) {

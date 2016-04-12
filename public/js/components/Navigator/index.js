@@ -17,7 +17,6 @@ export default class Navigator extends Component {
   }
   
   render() {
-    console.log(Fields);
     let pages = [
       {label: "Dashboard", path: "/dashboard", icon: <Dashboard />},
       {label: "Plan Setup", path: "/plan-setup", icon: <SettingsInputComponent />},
@@ -25,6 +24,7 @@ export default class Navigator extends Component {
       {label: "Pay Management", path: '/pay-management', icon: <Receipt />},
       {label: "Subscribers", path: '/subscribers', icon: <AccountCircle />}
     ];
+
     let buttons = pages.map((page, key) => {
       return (
         <FlatButton key={key}
@@ -37,6 +37,7 @@ export default class Navigator extends Component {
 
       );
     });
+
     return (
       <div className="navigator">
         {buttons}
