@@ -41943,6 +41943,8 @@
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _react = __webpack_require__(/*! react */ 1);
@@ -42076,8 +42078,14 @@
 	      if (this.action === "edit" && this.props && this.props.item) {
 	        var field_names = Object.keys(this.props.item);
 	        fieldshtml = field_names.map(function (field_name, k) {
-	          var type = _typeof(_this3.props.item[field_name]) === "object" ? "select" : _typeof(_this3.props.item[field_name]);
-	          return _react2.default.createElement(_Field2.default, { field: { dbkey: field_name, type: type }, value: _this3.props.item[field_name], onChange: _this3.onChange, key: k });
+	          var _ref = _typeof(_this3.props.item[field_name]) === "object" ? ["select", true] : [_typeof(_this3.props.item[field_name])];
+	
+	          var _ref2 = _slicedToArray(_ref, 2);
+	
+	          var type = _ref2[0];
+	          var multiselect = _ref2[1];
+	
+	          return _react2.default.createElement(_Field2.default, { field: { dbkey: field_name, type: type, multiselect: multiselect }, value: _this3.props.item[field_name], onChange: _this3.onChange, key: k });
 	        });
 	      }
 	
@@ -42869,6 +42877,8 @@
 	      var label = _field$label === undefined ? _react2.default.createElement('span', { dangerouslySetInnerHTML: { __html: '&zwnj;' } }) : _field$label;
 	      var type = field.type;
 	      var dbkey = field.dbkey;
+	      var _field$multiselect = field.multiselect;
+	      var multiselect = _field$multiselect === undefined ? false : _field$multiselect;
 	      var _field$mandatory = field.mandatory;
 	      var mandatory = _field$mandatory === undefined ? false : _field$mandatory;
 	      var _field$size = field.size;
@@ -42881,14 +42891,19 @@
 	
 	
 	      if (type === "select") {
-	        var options = this.props.field.options.map(function (op, key) {
-	          return _react2.default.createElement(
-	            'option',
-	            { value: op.value, key: key },
-	            op.label
-	          );
-	        });
-	
+	        var select_options = this.props.field.options;
+	        var options = void 0;
+	        if (!select_options) {
+	          options = [_react2.default.createElement('option', null)];
+	        } else {
+	          options = select_options.map(function (op, key) {
+	            return _react2.default.createElement(
+	              'option',
+	              { value: op.value, key: key },
+	              op.label
+	            );
+	          });
+	        }
 	        return _react2.default.createElement(
 	          'div',
 	          { className: 'col-md-' + size },
@@ -42899,7 +42914,7 @@
 	          ),
 	          _react2.default.createElement(
 	            'select',
-	            { className: 'form-control', id: html_id, value: value, onChange: onChange },
+	            { className: 'form-control', id: html_id, value: value, onChange: onChange, multiple: multiselect },
 	            options
 	          )
 	        );

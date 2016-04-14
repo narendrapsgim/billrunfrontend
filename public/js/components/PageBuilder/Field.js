@@ -10,22 +10,28 @@ class Field extends Component {
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
           type,
           dbkey,
+          multiselect = false,
           mandatory = false,
           size = 10 } = field;
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
     let { onChange, value } = this.props;
     
     if (type === "select") {
-      let options = this.props.field.options.map((op, key) => {
-        return (
-          <option value={op.value} key={key}>{op.label}</option>
-        );
-      });
-
+      let select_options = this.props.field.options;
+      let options;
+      if (!select_options) {
+        options = [<option></option>];
+      } else {
+        options = select_options.map((op, key) => {
+          return (
+            <option value={op.value} key={key}>{op.label}</option>
+          );
+        });
+      }
       return (
         <div className={`col-md-${size}`}>
           <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-          <select className="form-control" id={html_id} value={value} onChange={onChange}>
+          <select className="form-control" id={html_id} value={value} onChange={onChange} multiple={multiselect}>
             {options}
           </select>
         </div>

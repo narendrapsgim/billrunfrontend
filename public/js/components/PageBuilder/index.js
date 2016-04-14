@@ -78,11 +78,11 @@ class PageBuilder extends Component {
     if (this.action === "edit" && this.props && this.props.item) {
       let field_names = Object.keys(this.props.item);
       fieldshtml = field_names.map((field_name, k) => {
-        let type = typeof this.props.item[field_name] === "object" ?
-                   "select" :
-                   typeof this.props.item[field_name];
+        let [ type, multiselect ] = typeof this.props.item[field_name] === "object" ?
+                                    [ "select", true ] :
+                                    [ typeof this.props.item[field_name] ];
         return (
-          <Field field={{dbkey: field_name, type}} value={this.props.item[field_name]} onChange={this.onChange} key={k} />
+          <Field field={{ dbkey: field_name, type, multiselect }} value={this.props.item[field_name]} onChange={this.onChange} key={k} />
         );
       });
     }
