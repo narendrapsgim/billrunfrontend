@@ -8,6 +8,7 @@ export default () => {
     <Route path="/" component={App}>
       <IndexRedirect to="/dashboard" />
       <Route path="/:page" component={PageBuilder}  />
+      <Route path="/:page/:collection/:action/:entity_id" component={PageBuilder}  />
     </Route>
   );
 }

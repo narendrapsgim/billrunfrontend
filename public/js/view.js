@@ -2,11 +2,12 @@ const View = {
   pages: {
     dashboard: {
       title: "Dashboard",
-      route: "/dashboard"
+    },
+    plans: {
+      title: "Plans and Items",
     },
     plan_setup: {
       title: "Plan Setup",
-      route: "/plan-setup",
       view_type: "tabs",
       tabs: [
         {

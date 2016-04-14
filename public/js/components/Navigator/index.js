@@ -17,23 +17,23 @@ export default class Navigator extends Component {
   }
   
   render() {
-    let pages = [
-      {label: "Dashboard", path: "/dashboard", icon: <Dashboard />},
-      {label: "Plan Setup", path: "/plan-setup", icon: <SettingsInputComponent />},
-      {label: "Plans & Items", path: '/plans-items', icon: <Layers />},
-      {label: "Pay Management", path: '/pay-management', icon: <Receipt />},
-      {label: "Subscribers", path: '/subscribers', icon: <AccountCircle />}
-    ];
+    // let pages = [
+    //   {label: "Dashboard", path: "/dashboard", icon: <Dashboard />},
+    //   {label: "Plan Setup", path: "/plan-setup", icon: <SettingsInputComponent />},
+    //   {label: "Plans & Items", path: '/plans-items', icon: <Layers />},
+    //   {label: "Pay Management", path: '/pay-management', icon: <Receipt />},
+    //   {label: "Subscribers", path: '/subscribers', icon: <AccountCircle />}
+    // ];
 
-    let buttons = pages.map((page, key) => {
+    let buttons = Object.keys(View.pages).map((page, key) => {
+      let label = View.pages[page].title;
       return (
         <FlatButton key={key}
-                    label={page.label}
+                    label={label}
                     linkButton={true}
                     labelStyle={{textTransform: "none"}}
                     style={{"padding": "10px"}}
-                    icon={page.icon}
-                    containerElement={<Link to={page.path} activeClassName="active"></Link>} />
+                    containerElement={<Link to={`/${page}`} activeClassName="active"></Link>} />
 
       );
     });

@@ -6,15 +6,15 @@ class Field extends Component {
     super(props);
   }
 
-  createInputTag(field) {
+  createInputTag(field = {}) {
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
           type,
           dbkey,
           mandatory = false,
           size = 10 } = field;
-
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
-
+    let { onChange, value } = this.props;
+    
     if (type === "select") {
       let options = this.props.field.options.map((op, key) => {
         return (
@@ -25,7 +25,7 @@ class Field extends Component {
       return (
         <div className={`col-md-${size}`}>
           <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-          <select className="form-control" id={html_id} onChange={this.props.onChange}>
+          <select className="form-control" id={html_id} value={value} onChange={onChange}>
             {options}
           </select>
         </div>
@@ -34,14 +34,14 @@ class Field extends Component {
       return (
         <div className={`col-md-${size}`}>
           <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-          <textarea className="form-control" id={html_id} onChange={this.props.onChange}></textarea>
+          <textarea className="form-control" id={html_id} value={value} onChange={onChange}></textarea>
         </div>
       );
     } else if (type === "date") {
       return (
         <div className={`col-md-${size}`}>
           <label htmlFor={html_id}>{label}</label>
-          <DatePicker hintText={dbkey} id={html_id} onChange={this.props.onChange} />
+          <DatePicker hintText={dbkey} id={html_id} onChange={onChange} />
         </div>
       );
     }
@@ -49,7 +49,7 @@ class Field extends Component {
     return (
       <div className={`col-md-${size}`}>
         <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-        <input type={type} className="form-control" id={html_id} onChange={this.props.onChange} />
+        <input type={type} className="form-control" id={html_id} value={value} onChange={onChange} />
       </div>
     );
   }
@@ -66,7 +66,8 @@ Field.propTypes = {
         return new Error("Must supply either 'dbkey' or 'label' in field");
       } 
     }
-  })
+  }),
+  onChange: PropTypes.func.isRequired
 };
 
 export default Field;

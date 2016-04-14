@@ -1,6 +1,10 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { updateFieldValue, getCollectionEntity } from '../../actions';
+
 import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
+
 import View from '../../view';
 import Field from './Field';
 import Help from '../Help';
@@ -9,15 +13,26 @@ import R from 'ramda';
 class PageBuilder extends Component {
   constructor(props) {
     super(props);
-    this.page_settings = View.pages[props.route.page];
     this.createSectionHTML = this.createSectionHTML.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.state = {};
+    this.onChange = this.onChange.bind(this);
+    this.action = this.props.params.action;
   }
 
-  handleInputChange(evt, data) {
-    if (!evt) return;
-    this.setState({[evt.target.id]: evt.target.value});
+  componentDidMount() {
+    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let { collection, entity_id } = this.props.params;
+
+    if (collection && entity_id) {
+      let { dispatch } = this.props;
+      dispatch(getCollectionEntity(collection, entity_id, pageName));
+    }
+  }
+  
+  onChange(evt) {
+    let { dispatch } = this.props;
+    let [ id, value ] = [ evt.target.id, evt.target.value ];
+    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();    
+    dispatch(updateFieldValue(id, value, pageName));
   }
 
   sectionTitle(section) {
@@ -31,20 +46,62 @@ class PageBuilder extends Component {
     );
   }
 
+  createTabsHTML(tabs) {
+    let tabsHTML = tabs.map((tab, tab_key) => {
+      if (!tab.sections) {
+        return (
+          <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
+          </Tab>
+        );
+      }
+      let sectionsHTML = tab.sections.map((section, key) => {
+        return this.createSectionHTML(section, key);
+      });
+      return (
+        <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
+          {sectionsHTML}
+        </Tab>
+      );
+    });
+
+    return (
+      <Tabs inkBarStyle={this.inkBarStyle()}>
+        {tabsHTML}
+      </Tabs>
+    );
+  }
+  
   createSectionHTML(section, key) {
     let rechtml,
         fieldshtml;
 
-    if (section.sections && !R.isEmpty(section.sections)) {
-      rechtml = section.sections.map((section, k) => {
-        return this.createSectionHTML(section, k);
+    if (this.action === "edit" && this.props && this.props.item) {
+      let field_names = Object.keys(this.props.item);
+      fieldshtml = field_names.map((field_name, k) => {
+        let type = typeof this.props.item[field_name] === "object" ?
+                   "select" :
+                   typeof this.props.item[field_name];
+        return (
+          <Field field={{dbkey: field_name, type}} value={this.props.item[field_name]} onChange={this.onChange} key={k} />
+        );
       });
+    }
+    
+    if (section.sections && !R.isEmpty(section.sections)) {
+      rechtml =
+      <div>
+        {section.sections.map((section, k) => {
+           return this.createSectionHTML(section, k);
+         })}
+      </div>
     } 
 
     if (section.fields) {
       fieldshtml = section.fields.map((field, k) => {
+        let html_id = field.dbkey ? field.dbkey : field.label.toLowerCase().replace(/ /g, '_');
+        let value = (this.action === "edit") ? this.props.item[html_id] : this.props[html_id];
         return (
-          <Field field={field} onChange={this.handleInputChange} key={k}/>
+          <Field field={field} value={value} onChange={this.onChange} key={k}/>
         );
       });
     }
@@ -70,39 +127,19 @@ class PageBuilder extends Component {
 
   render() {
     let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let sectionsHTML;
+    
     if (!View.pages[pageName]) {
       return (<div></div>);
     }
 
-    if (View.pages[pageName].view_type === "tabs") {
-      let tabs = View.pages[pageName].tabs.map((tab, tab_key) => {
-        if (!tab.sections) {
-          return (
-            <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
-            </Tab>
-          );
-        }
-        let sectionsHTML = tab.sections.map((section, key) => {
-          return this.createSectionHTML(section, key);
-        });
-        return (
-          <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
-            {sectionsHTML}
-          </Tab>
-        );
-      });
-
-      return (
-        <Tabs inkBarStyle={this.inkBarStyle()}>
-          {tabs}
-        </Tabs>
-      );
-    };
-
     let { title, sections = [] } = View.pages[pageName];
-    let sectionsHTML = sections.map((section, key) => {
-      return this.createSectionHTML(section, key);
-    });
+
+    if (View.pages[pageName].view_type === "tabs") {
+      return this.createTabsHTML(View.pages[pageName].tabs);
+    } else {
+      sectionsHTML = this.createSectionHTML(sections);
+    }
 
     return (
       <div>
@@ -117,4 +154,9 @@ PageBuilder.propTypes = {
 
 };
 
-export default PageBuilder;
+function mapStateToProps(state, ownProps) {
+  let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
+  return (state[pageName]) ? state[pageName] : state;
+}
+
+export default connect(mapStateToProps)(PageBuilder);
