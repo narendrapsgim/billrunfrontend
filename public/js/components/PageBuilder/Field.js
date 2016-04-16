@@ -5,16 +5,16 @@ class Field extends Component {
   constructor(props) {
     super(props);
   }
-
+  
   createInputTag(field = {}) {
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
-          type,
+	  type,
           dbkey,
           multiselect = false,
           mandatory = false,
           size = 10 } = field;
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
-    let { onChange, value } = this.props;
+    let { value, onChange } = this.props;
     
     if (type === "select") {
       let select_options = this.props.field.options;
@@ -24,7 +24,7 @@ class Field extends Component {
       } else {
         options = select_options.map((op, key) => {
           return (
-            <option value={op.value} key={key}>{op.label}</option>
+            <option value={value} key={key}>{op.label}</option>
           );
         });
       }

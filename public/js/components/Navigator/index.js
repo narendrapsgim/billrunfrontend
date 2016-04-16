@@ -17,14 +17,6 @@ export default class Navigator extends Component {
   }
   
   render() {
-    // let pages = [
-    //   {label: "Dashboard", path: "/dashboard", icon: <Dashboard />},
-    //   {label: "Plan Setup", path: "/plan-setup", icon: <SettingsInputComponent />},
-    //   {label: "Plans & Items", path: '/plans-items', icon: <Layers />},
-    //   {label: "Pay Management", path: '/pay-management', icon: <Receipt />},
-    //   {label: "Subscribers", path: '/subscribers', icon: <AccountCircle />}
-    // ];
-
     let buttons = Object.keys(View.pages).map((page, key) => {
       let label = View.pages[page].title;
       return (

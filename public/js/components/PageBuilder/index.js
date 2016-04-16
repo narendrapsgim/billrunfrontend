@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { updateFieldValue, getCollectionEntity } from '../../actions';
+
+import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from '../../actions';
 
 import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
@@ -15,7 +16,13 @@ class PageBuilder extends Component {
     super(props);
     this.createSectionHTML = this.createSectionHTML.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.onSave = this.onSave.bind(this);
     this.action = this.props.params.action;
+  }
+
+  componentWillMount() {
+    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    this.props.dispatch(setInitialItem(pageName));
   }
 
   componentDidMount() {
@@ -33,6 +40,12 @@ class PageBuilder extends Component {
     let [ id, value ] = [ evt.target.id, evt.target.value ];
     let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();    
     dispatch(updateFieldValue(id, value, pageName));
+  }
+
+  onSave() {
+    let { dispatch } = this.props;
+    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();    
+    dispatch(saveForm(pageName));
   }
 
   sectionTitle(section) {
@@ -70,40 +83,40 @@ class PageBuilder extends Component {
       </Tabs>
     );
   }
-  
+
+  getFieldViewConfig(fields, dbkey) {
+    return R.find(R.propEq('dbkey', dbkey))(fields);
+  }
+
   createSectionHTML(section, key) {
     let rechtml,
         fieldshtml;
 
-    if (this.action === "edit" && this.props && this.props.item) {
-      let field_names = Object.keys(this.props.item);
-      fieldshtml = field_names.map((field_name, k) => {
-        let [ type, multiselect ] = typeof this.props.item[field_name] === "object" ?
-                                    [ "select", true ] :
-                                    [ typeof this.props.item[field_name] ];
-        return (
-          <Field field={{ dbkey: field_name, type, multiselect }} value={this.props.item[field_name]} onChange={this.onChange} key={k} />
-        );
-      });
-    }
-    
     if (section.sections && !R.isEmpty(section.sections)) {
       rechtml =
-      <div>
-        {section.sections.map((section, k) => {
-           return this.createSectionHTML(section, k);
-         })}
-      </div>
+	<div>
+            {section.sections.map((section, k) => {
+		 return this.createSectionHTML(section, k);
+             })}
+	</div>;
     } 
 
     if (section.fields) {
       fieldshtml = section.fields.map((field, k) => {
         let html_id = field.dbkey ? field.dbkey : field.label.toLowerCase().replace(/ /g, '_');
-        let value = (this.action === "edit") ? this.props.item[html_id] : this.props[html_id];
+        let value = this.props.item[html_id];
         return (
-          <Field field={field} value={value} onChange={this.onChange} key={k}/>
+          <Field field={field} value={value} onChange={this.onChange} key={k} />
         );
       });
+    } else {
+      let item_keys = Object.keys(this.props.item);
+      fieldshtml = item_keys.map((item_key, k) => {
+        let value = (this.action === "edit") ? this.props.item[item_key] : this.props[item_key];
+        return (
+          <Field field={{dbkey: item_key, label: item_key}} value={value} onChange={this.onChange} key={k}/>
+        );
+      }); 
     }
 
     return (
@@ -127,24 +140,36 @@ class PageBuilder extends Component {
 
   render() {
     let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    if (!this.props.item) return (<div></div>);
     let sectionsHTML;
-    
-    if (!View.pages[pageName]) {
+    let page_view = View.pages[pageName].views ? 
+      View.pages[pageName].views[this.action] :
+      View.pages[pageName];
+
+    if (!page_view) {
       return (<div></div>);
     }
 
-    let { title, sections = [] } = View.pages[pageName];
+    let { title, sections = [] } = page_view;
 
-    if (View.pages[pageName].view_type === "tabs") {
-      return this.createTabsHTML(View.pages[pageName].tabs);
+    if (page_view.view_type === "tabs") {
+      sectionsHTML = this.createTabsHTML(page_view.tabs);
     } else {
-      sectionsHTML = this.createSectionHTML(sections);
+      sectionsHTML = sections.map((section, key) => {
+	return this.createSectionHTML(section, key)
+      });
     }
 
     return (
       <div>
-        <h4>{title}</h4>
+        <h3>{title}</h3>
         {sectionsHTML}
+	<button
+	    className="btn btn-primary"
+	    type="submit"
+	    onClick={this.onSave}>
+	  Save
+	</button>
       </div>
     );
   }
