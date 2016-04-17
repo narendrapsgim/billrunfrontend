@@ -27388,7 +27388,7 @@
 	    "to": "2099-12-30T22:00:00Z",
 	    "operation": "set",
 	    "include": {
-	      "cost": [{
+	      "cost": {
 	        "value": -15,
 	        "period": {
 	          "unit": "month",
@@ -27396,7 +27396,7 @@
 	        },
 	        "pp_includes_name": "Monthly Bonus",
 	        "pp_includes_external_id": "9"
-	      }]
+	      }
 	    },
 	    "priority": 99999,
 	    "recurring": 1
@@ -42140,9 +42140,24 @@
 	      return _ramda2.default.find(_ramda2.default.propEq('dbkey', dbkey))(fields);
 	    }
 	  }, {
+	    key: 'createHTMLFromObject',
+	    value: function createHTMLFromObject(object) {
+	      var _this3 = this;
+	
+	      var object_keys = Object.keys(object);
+	      return object_keys.map(function (key, index) {
+	        if (Object.prototype.toString.call(object[key]) === "[object Object]") {
+	          return _this3.createHTMLFromObject(object[key]);
+	        }
+	        var label = key;
+	        var value = object[key];
+	        return _react2.default.createElement(_Field2.default, { field: { dbkey: key, label: label }, value: value, onChange: _this3.onChange, key: index });
+	      });
+	    }
+	  }, {
 	    key: 'createSectionHTML',
 	    value: function createSectionHTML(section, key) {
-	      var _this3 = this;
+	      var _this4 = this;
 	
 	      var rechtml = void 0,
 	          fieldshtml = void 0;
@@ -42152,7 +42167,7 @@
 	          'div',
 	          null,
 	          section.sections.map(function (section, k) {
-	            return _this3.createSectionHTML(section, k);
+	            return _this4.createSectionHTML(section, k);
 	          })
 	        );
 	      }
@@ -42160,14 +42175,21 @@
 	      if (section.fields) {
 	        fieldshtml = section.fields.map(function (field, k) {
 	          var html_id = field.dbkey ? field.dbkey : field.label.toLowerCase().replace(/ /g, '_');
-	          var value = _this3.props.item[html_id];
-	          return _react2.default.createElement(_Field2.default, { field: field, value: value, onChange: _this3.onChange, key: k });
+	          var value = _this4.props.item[html_id];
+	          return _react2.default.createElement(_Field2.default, { field: field, value: value, onChange: _this4.onChange, key: k });
 	        });
 	      } else {
 	        var item_keys = Object.keys(this.props.item);
 	        fieldshtml = item_keys.map(function (item_key, k) {
-	          var value = _this3.action === "edit" ? _this3.props.item[item_key] : _this3.props[item_key];
-	          return _react2.default.createElement(_Field2.default, { field: { dbkey: item_key, label: item_key }, value: value, onChange: _this3.onChange, key: k });
+	          if (Object.prototype.toString.call(_this4.props.item[item_key]) === "[object Object]") {
+	            return _react2.default.createElement(
+	              'div',
+	              null,
+	              _this4.createHTMLFromObject(_this4.props.item[item_key], item_key)
+	            );
+	          }
+	          var value = _this4.action === "edit" ? _this4.props.item[item_key] : _this4.props[item_key];
+	          return _react2.default.createElement(_Field2.default, { field: { dbkey: item_key, label: item_key }, value: value, onChange: _this4.onChange, key: k });
 	        });
 	      }
 	
@@ -42194,7 +42216,7 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this4 = this;
+	      var _this5 = this;
 	
 	      var pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
 	      if (!this.props.item) return _react2.default.createElement('div', null);
@@ -42214,7 +42236,7 @@
 	        sectionsHTML = this.createTabsHTML(page_view.tabs);
 	      } else {
 	        sectionsHTML = sections.map(function (section, key) {
-	          return _this4.createSectionHTML(section, key);
+	          return _this5.createSectionHTML(section, key);
 	        });
 	      }
 	
@@ -42959,7 +42981,7 @@
 	      var _field$mandatory = field.mandatory;
 	      var mandatory = _field$mandatory === undefined ? false : _field$mandatory;
 	      var _field$size = field.size;
-	      var size = _field$size === undefined ? 10 : _field$size;
+	      var size = _field$size === undefined ? 4 : _field$size;
 	
 	      var html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
 	      var _props = this.props;

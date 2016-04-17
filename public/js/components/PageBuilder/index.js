@@ -88,6 +88,20 @@ class PageBuilder extends Component {
     return R.find(R.propEq('dbkey', dbkey))(fields);
   }
 
+  createHTMLFromObject(object) {
+    let object_keys = Object.keys(object);
+    return object_keys.map((key, index) => {
+      if (Object.prototype.toString.call(object[key]) === "[object Object]") {
+        return this.createHTMLFromObject(object[key]);
+      }
+      let label = key;
+      let value = object[key];
+      return (
+        <Field field={{dbkey: key, label: label}} value={value} onChange={this.onChange} key={index} />
+      );
+    });
+  }
+  
   createSectionHTML(section, key) {
     let rechtml,
         fieldshtml;
@@ -112,6 +126,13 @@ class PageBuilder extends Component {
     } else {
       let item_keys = Object.keys(this.props.item);
       fieldshtml = item_keys.map((item_key, k) => {
+        if (Object.prototype.toString.call(this.props.item[item_key]) === "[object Object]") {
+          return (
+            <div>
+              {this.createHTMLFromObject(this.props.item[item_key], item_key)}
+            </div>
+          );
+        }
         let value = (this.action === "edit") ? this.props.item[item_key] : this.props[item_key];
         return (
           <Field field={{dbkey: item_key, label: item_key}} value={value} onChange={this.onChange} key={k}/>

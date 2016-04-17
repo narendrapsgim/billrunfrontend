@@ -48,17 +48,15 @@ function fetchItem(collection, item_id) {
 	"to" : "2099-12-30T22:00:00Z",
 	"operation" : "set",
 	"include" : {
-		"cost" : [
-			{
-				"value" : -15,
-				"period" : {
-					"unit" : "month",
-					"duration" : 1
+		"cost" : {
+		  "value" : -15,
+		  "period" : {
+				  "unit" : "month",
+				  "duration" : 1
 				},
-				"pp_includes_name" : "Monthly Bonus",
-				"pp_includes_external_id" : "9"
-			}
-		]
+		  "pp_includes_name" : "Monthly Bonus",
+		  "pp_includes_external_id" : "9"
+		}
 	},
 	"priority" : 99999,
 	"recurring" : 1

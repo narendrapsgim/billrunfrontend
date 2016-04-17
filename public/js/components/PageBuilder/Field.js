@@ -12,7 +12,7 @@ class Field extends Component {
           dbkey,
           multiselect = false,
           mandatory = false,
-          size = 10 } = field;
+          size = 4 } = field;
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
     let { value, onChange } = this.props;
     
