@@ -7,15 +7,15 @@ class Field extends Component {
   }
   
   createInputTag(field = {}) {
+    let { value, onChange, path } = this.props;
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
-	  type,
+	  type = (typeof value),
           dbkey,
           multiselect = false,
           mandatory = false,
           size = 4 } = field;
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
-    let { value, onChange } = this.props;
-    
+
     if (type === "select") {
       let select_options = this.props.field.options;
       let options;
@@ -31,7 +31,7 @@ class Field extends Component {
       return (
         <div className={`col-md-${size}`}>
           <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-          <select className="form-control" id={html_id} value={value} onChange={onChange} multiple={multiselect}>
+          <select className="form-control" id={html_id} value={value} data-path={path} onChange={onChange} multiple={multiselect}>
             {options}
           </select>
         </div>
@@ -40,14 +40,14 @@ class Field extends Component {
       return (
         <div className={`col-md-${size}`}>
           <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-          <textarea className="form-control" id={html_id} value={value} onChange={onChange}></textarea>
+          <textarea className="form-control" id={html_id} value={value} data-path={path} onChange={onChange}></textarea>
         </div>
       );
     } else if (type === "date") {
       return (
         <div className={`col-md-${size}`}>
           <label htmlFor={html_id}>{label}</label>
-          <DatePicker hintText={dbkey} id={html_id} onChange={onChange} />
+          <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={onChange} />
         </div>
       );
     }
@@ -55,7 +55,7 @@ class Field extends Component {
     return (
       <div className={`col-md-${size}`}>
         <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-        <input type={type} className="form-control" id={html_id} value={value} onChange={onChange} />
+        <input type={type} className="form-control" id={html_id} value={value} data-path={path} onChange={onChange} />
       </div>
     );
   }

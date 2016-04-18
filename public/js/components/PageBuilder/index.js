@@ -10,6 +10,7 @@ import View from '../../view';
 import Field from './Field';
 import Help from '../Help';
 import R from 'ramda';
+import _ from 'lodash';
 
 class PageBuilder extends Component {
   constructor(props) {
@@ -20,13 +21,17 @@ class PageBuilder extends Component {
     this.action = this.props.params.action;
   }
 
+  getPageName() {
+    return this.props.params.page.replace(/-/g, '_').toLowerCase();
+  }
+  
   componentWillMount() {
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let pageName = this.getPageName();
     this.props.dispatch(setInitialItem(pageName));
   }
 
   componentDidMount() {
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let pageName = this.getPageName();
     let { collection, entity_id } = this.props.params;
 
     if (collection && entity_id) {
@@ -37,17 +42,20 @@ class PageBuilder extends Component {
   
   onChange(evt) {
     let { dispatch } = this.props;
-    let [ id, value ] = [ evt.target.id, evt.target.value ];
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();    
-    dispatch(updateFieldValue(id, value, pageName));
+    let [ path, value ] = [ evt.target.dataset.path, evt.target.value ];
+    dispatch(updateFieldValue(path, value, this.getPageName()));
   }
 
   onSave() {
     let { dispatch } = this.props;
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();    
+    let pageName = this.getPageName();
     dispatch(saveForm(pageName));
   }
 
+  titlize(str) {
+    return _.capitalize(str.replace(/_/g, ' '));
+  }
+  
   sectionTitle(section) {
     let tooltip;
     if (section.description) {
@@ -88,21 +96,25 @@ class PageBuilder extends Component {
     return R.find(R.propEq('dbkey', dbkey))(fields);
   }
 
-  createHTMLFromObject(object) {
+  createHTMLFromObject(object, path) {
     let object_keys = Object.keys(object);
     return object_keys.map((key, index) => {
       if (Object.prototype.toString.call(object[key]) === "[object Object]") {
-        return this.createHTMLFromObject(object[key]);
+        return this.createHTMLFromObject(object[key], `${path}.${key}`);
+      } else if (Array.isArray(object[key])) {
+        return object[key].map((elm, elm_key) => {
+          return this.createHTMLFromObject(elm, `${path}.${key}[${elm_key}]`);
+        });
       }
-      let label = key;
+      let label = this.titlize(key);
       let value = object[key];
       return (
-        <Field field={{dbkey: key, label: label}} value={value} onChange={this.onChange} key={index} />
+        <Field field={{dbkey: key, label}} value={value} path={`${path}.${key}`} onChange={this.onChange} key={index} />
       );
     });
   }
-  
-  createSectionHTML(section, key) {
+
+  createSectionHTML(section, key, path = 'item') {
     let rechtml,
         fieldshtml;
 
@@ -117,10 +129,25 @@ class PageBuilder extends Component {
 
     if (section.fields) {
       fieldshtml = section.fields.map((field, k) => {
+        if (field.fields) {
+          return this.createSectionHTML(field, field.dbkey, `${path}.${field.dbkey}`);
+        }
+        if (Object.prototype.toString.call(_.result(this.props.item, path.replace('item.', ''))) === "[object Object]") {
+          return (
+            <div key={k}>
+              {this.createHTMLFromObject(_.result(this.props.item, path.replace('item.', '')), `${path}.${item_key}`)}
+            </div>
+          );
+        } else if (Array.isArray(_.result(this.props.item, path.replace('item.', '')))) {
+          return _.result(this.props.item, path.replace('item.', '')).map((elm, elm_key) => {
+            return this.createSectionHTML(elm, elm_key, `${path}[${elm_key}]`);
+          });
+        }
+
         let html_id = field.dbkey ? field.dbkey : field.label.toLowerCase().replace(/ /g, '_');
         let value = this.props.item[html_id];
         return (
-          <Field field={field} value={value} onChange={this.onChange} key={k} />
+          <Field field={field} path={`${path}.${field.dbkey}`} value={value} onChange={this.onChange} key={k} />
         );
       });
     } else {
@@ -128,14 +155,18 @@ class PageBuilder extends Component {
       fieldshtml = item_keys.map((item_key, k) => {
         if (Object.prototype.toString.call(this.props.item[item_key]) === "[object Object]") {
           return (
-            <div>
-              {this.createHTMLFromObject(this.props.item[item_key], item_key)}
+            <div key={k}>
+              {this.createHTMLFromObject(this.props.item[item_key], `${path}.${item_key}`)}
             </div>
           );
+        } else if (Array.isArray(this.props.item[item_key])) {
+          return this.props.item[item_key].map((elm, elm_key) => {
+            return this.createSectionHTML(elm, key, `${path}[${elm_key}]`);
+          });
         }
         let value = (this.action === "edit") ? this.props.item[item_key] : this.props[item_key];
         return (
-          <Field field={{dbkey: item_key, label: item_key}} value={value} onChange={this.onChange} key={k}/>
+          <Field field={{dbkey: item_key, label: this.titlize(item_key)}} path={`${path}.${item_key}`} value={value} onChange={this.onChange} key={k} />
         );
       }); 
     }
@@ -152,15 +183,15 @@ class PageBuilder extends Component {
   }
   
   tabStyle() {
-    return {backgroundColor: "#272A39"};
+    return { backgroundColor: "#272A39" };
   }
 
   inkBarStyle() {
-    return {backgroundColor: "#C0C0C0", height: "4px", bottom: "2px"};
+    return { backgroundColor: "#C0C0C0", height: "4px", bottom: "2px" };
   }
 
   render() {
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let pageName = this.getPageName();
     if (!this.props.item) return (<div></div>);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ? 

@@ -5,10 +5,19 @@ const plan_edit_view = {
     {
       title: "Test",
       display: "inline",
-      /* fields: [
-	 { label: "Name", dbkey: "name" },
-	 { label: "Include", dbkey: "include" }
-	 ] */
+      fields:
+      [
+        { dbkey: "name", label: "Name" },
+        { dbkey: "include", fields:
+          [
+            { dbkey: "cost", fields:
+              [
+                { dbkey: "value", label: "Value", type: "number" }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 };
