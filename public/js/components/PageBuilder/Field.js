@@ -5,25 +5,33 @@ class Field extends Component {
   constructor(props) {
     super(props);
   }
-
-  createInputTag(field) {
+  
+  createInputTag(field = {}) {
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
-          type,
+	  type,
           dbkey,
+          multiselect = false,
           mandatory = false,
-          size = 10 } = field;
-
+          size = 4 } = field;
+    let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
+    let { value, onChange } = this.props;
+    
     if (type === "select") {
-      let options = this.props.field.options.map((op, key) => {
-        return (
-          <option value={op.value} key={key}>{op.label}</option>
-        );
-      });
-
+      let select_options = this.props.field.options;
+      let options;
+      if (!select_options) {
+        options = [<option></option>];
+      } else {
+        options = select_options.map((op, key) => {
+          return (
+            <option value={value} key={key}>{op.label}</option>
+          );
+        });
+      }
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={dbkey}>{ mandatory ? `*${label}` : label}</label>
-          <select className="form-control" id={dbkey}>
+          <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
+          <select className="form-control" id={html_id} value={value} onChange={onChange} multiple={multiselect}>
             {options}
           </select>
         </div>
@@ -31,23 +39,23 @@ class Field extends Component {
     } else if (type === "textarea") {
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={dbkey}>{ mandatory ? `*${label}` : label}</label>
-          <textarea className="form-control" id={dbkey}></textarea>
+          <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
+          <textarea className="form-control" id={html_id} value={value} onChange={onChange}></textarea>
         </div>
       );
     } else if (type === "date") {
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={dbkey}>{label}</label>
-          <DatePicker hintText={dbkey} />
+          <label htmlFor={html_id}>{label}</label>
+          <DatePicker hintText={dbkey} id={html_id} onChange={onChange} />
         </div>
       );
     }
 
     return (
       <div className={`col-md-${size}`}>
-        <label htmlFor={dbkey}>{ mandatory ? `*${label}` : label}</label>
-        <input type={type} className="form-control" id={dbkey} />
+        <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
+        <input type={type} className="form-control" id={html_id} value={value} onChange={onChange} />
       </div>
     );
   }
@@ -64,7 +72,8 @@ Field.propTypes = {
         return new Error("Must supply either 'dbkey' or 'label' in field");
       } 
     }
-  })
+  }),
+  onChange: PropTypes.func.isRequired
 };
 
 export default Field;

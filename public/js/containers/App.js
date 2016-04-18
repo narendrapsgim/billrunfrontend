@@ -10,7 +10,7 @@ export default class App extends Component {
     super(props);
     injectTapEventPlugin();
   }
-
+  
   render() {
     return (
       <div className="App">
