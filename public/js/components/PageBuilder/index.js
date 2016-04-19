@@ -94,6 +94,20 @@ class PageBuilder extends Component {
     return R.find(R.propEq('dbkey', dbkey))(fields);
   }
 
+  createConfigFieldsFromItem(item) {
+    if (Array.isArray(item)) {
+      item = item[0];
+    }
+    let item_keys = Object.keys(item);
+    return item_keys.map(item_key => {
+      let value = item[item_key];
+      if (_.isObject(value)) {
+        return { dbkey: item_key, fields: this.createConfigFieldsFromItem(value) };
+      }
+      return { dbkey: item_key, label: this.titlize(item_key), size: 10 };
+    });
+  }
+  
   createFieldHTML(field, path, field_index) {
     if (!this.props.item) return (<div></div>);
     let value = _.result(this.props, path);
@@ -113,19 +127,19 @@ class PageBuilder extends Component {
   
   createSectionsHTML(sections = []) {
     let sectionsHTML = sections.map((section, section_idx) => {
-      if (section.fields) {
-        let fieldsHTML = section.fields.map((field, field_idx) => {
-          return this.createFieldHTML(field, `item.${field.dbkey}`);
-        });
-        return (
-          <div>
-            {this.sectionTitle(section)}
-            {fieldsHTML}
-            <div className="row"></div>
-            <hr/>
-          </div>
-        );
-      }
+      let fields = section.fields ? section.fields : this.createConfigFieldsFromItem(this.props.item);
+      console.log(JSON.stringify(fields));
+      let fieldsHTML = fields.map((field, field_idx) => {
+        return this.createFieldHTML(field, `item.${field.dbkey}`);
+      });
+      return (
+        <div>
+          {this.sectionTitle(section)}
+          {fieldsHTML}
+          <div className="row"></div>
+          <hr/>
+        </div>
+      );
     });
 
     return (
