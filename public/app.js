@@ -57578,7 +57578,7 @@
 	  sections: [{
 	    title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name" }, { dbkey: "include", fields: [{ dbkey: "cost", fields: [{ dbkey: "value", label: "Value", type: "number" }]
+	    fields: [{ dbkey: "name", label: "Name", size: 10 }, { dbkey: "include", fields: [{ dbkey: "cost", fields: [{ dbkey: "value", label: "Value", type: "number" }]
 	      }]
 	    }]
 	  }]
@@ -58105,7 +58105,7 @@
 	
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PageBuilder).call(this, props));
 	
-	    _this.createSectionHTML = _this.createSectionHTML.bind(_this);
+	    _this.createSectionsHTML = _this.createSectionsHTML.bind(_this);
 	    _this.onChange = _this.onChange.bind(_this);
 	    _this.onSave = _this.onSave.bind(_this);
 	    _this.action = _this.props.params.action;
@@ -58185,9 +58185,7 @@
 	        if (!tab.sections) {
 	          return _react2.default.createElement(_tab2.default, { key: tab_key, label: tab.title, style: _this2.tabStyle() });
 	        }
-	        var sectionsHTML = tab.sections.map(function (section, key) {
-	          return _this2.createSectionHTML(section, key);
-	        });
+	        var sectionsHTML = _this2.createSectionsHTML(tab.sections);
 	        return _react2.default.createElement(
 	          _tab2.default,
 	          { key: tab_key, label: tab.title, style: _this2.tabStyle() },
@@ -58207,92 +58205,51 @@
 	      return _ramda2.default.find(_ramda2.default.propEq('dbkey', dbkey))(fields);
 	    }
 	  }, {
-	    key: 'createHTMLFromObject',
-	    value: function createHTMLFromObject(object, path) {
+	    key: 'createFieldHTML',
+	    value: function createFieldHTML(field, path, field_index) {
 	      var _this3 = this;
 	
-	      var object_keys = Object.keys(object);
-	      return object_keys.map(function (key, index) {
-	        if (Object.prototype.toString.call(object[key]) === "[object Object]") {
-	          return _this3.createHTMLFromObject(object[key], path + '.' + key);
-	        } else if (Array.isArray(object[key])) {
-	          return object[key].map(function (elm, elm_key) {
-	            return _this3.createHTMLFromObject(elm, path + '.' + key + '[' + elm_key + ']');
-	          });
-	        }
-	        var label = _this3.titlize(key);
-	        var value = object[key];
-	        return _react2.default.createElement(_Field2.default, { field: { dbkey: key, label: label }, value: value, path: path + '.' + key, onChange: _this3.onChange, key: index });
-	      });
+	      if (!this.props.item) return _react2.default.createElement('div', null);
+	      var value = _lodash2.default.result(this.props, path);
+	      if (Array.isArray(value)) {
+	        return value.map(function (elm, idx) {
+	          return _this3.createFieldHTML(field, path + '[' + idx + ']', idx);
+	        });
+	      } else if (field.fields) {
+	        return field.fields.map(function (field, field_idx) {
+	          return _this3.createFieldHTML(field, path + '.' + field.dbkey, field_idx);
+	        });
+	      }
+	      return _react2.default.createElement(_Field2.default, { field: field, value: value, path: path, onChange: this.onChange, key: field_index });
 	    }
 	  }, {
-	    key: 'createSectionHTML',
-	    value: function createSectionHTML(section, key) {
+	    key: 'createSectionsHTML',
+	    value: function createSectionsHTML() {
 	      var _this4 = this;
 	
-	      var path = arguments.length <= 2 || arguments[2] === undefined ? 'item' : arguments[2];
+	      var sections = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 	
-	      var rechtml = void 0,
-	          fieldshtml = void 0;
-	
-	      if (section.sections && !_ramda2.default.isEmpty(section.sections)) {
-	        rechtml = _react2.default.createElement(
-	          'div',
-	          null,
-	          section.sections.map(function (section, k) {
-	            return _this4.createSectionHTML(section, k);
-	          })
-	        );
-	      }
-	
-	      if (section.fields) {
-	        fieldshtml = section.fields.map(function (field, k) {
-	          if (field.fields) {
-	            return _this4.createSectionHTML(field, field.dbkey, path + '.' + field.dbkey);
-	          }
-	          if (Object.prototype.toString.call(_lodash2.default.result(_this4.props.item, path.replace('item.', ''))) === "[object Object]") {
-	            return _react2.default.createElement(
-	              'div',
-	              { key: k },
-	              _this4.createHTMLFromObject(_lodash2.default.result(_this4.props.item, path.replace('item.', '')), path + '.' + item_key)
-	            );
-	          } else if (Array.isArray(_lodash2.default.result(_this4.props.item, path.replace('item.', '')))) {
-	            return _lodash2.default.result(_this4.props.item, path.replace('item.', '')).map(function (elm, elm_key) {
-	              return _this4.createSectionHTML(elm, elm_key, path + '[' + elm_key + ']');
-	            });
-	          }
-	
-	          var html_id = field.dbkey ? field.dbkey : field.label.toLowerCase().replace(/ /g, '_');
-	          var value = _this4.props.item[html_id];
-	          return _react2.default.createElement(_Field2.default, { field: field, path: path + '.' + field.dbkey, value: value, onChange: _this4.onChange, key: k });
-	        });
-	      } else {
-	        var item_keys = Object.keys(this.props.item);
-	        fieldshtml = item_keys.map(function (item_key, k) {
-	          if (Object.prototype.toString.call(_this4.props.item[item_key]) === "[object Object]") {
-	            return _react2.default.createElement(
-	              'div',
-	              { key: k },
-	              _this4.createHTMLFromObject(_this4.props.item[item_key], path + '.' + item_key)
-	            );
-	          } else if (Array.isArray(_this4.props.item[item_key])) {
-	            return _this4.props.item[item_key].map(function (elm, elm_key) {
-	              return _this4.createSectionHTML(elm, key, path + '[' + elm_key + ']');
-	            });
-	          }
-	          var value = _this4.action === "edit" ? _this4.props.item[item_key] : _this4.props[item_key];
-	          return _react2.default.createElement(_Field2.default, { field: { dbkey: item_key, label: _this4.titlize(item_key) }, path: path + '.' + item_key, value: value, onChange: _this4.onChange, key: k });
-	        });
-	      }
+	      var sectionsHTML = sections.map(function (section, section_idx) {
+	        if (section.fields) {
+	          var fieldsHTML = section.fields.map(function (field, field_idx) {
+	            return _this4.createFieldHTML(field, 'item.' + field.dbkey);
+	          });
+	          return _react2.default.createElement(
+	            'div',
+	            null,
+	            _this4.sectionTitle(section),
+	            fieldsHTML,
+	            _react2.default.createElement('div', { className: 'row' }),
+	            _react2.default.createElement('hr', null)
+	          );
+	        }
+	      });
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { key: key },
-	        this.sectionTitle(section),
-	        fieldshtml,
-	        _react2.default.createElement('div', { className: 'row' }),
-	        _react2.default.createElement('hr', null),
-	        rechtml
+	        null,
+	        sectionsHTML,
+	        _react2.default.createElement('div', { className: 'row' })
 	      );
 	    }
 	  }, {
@@ -58308,8 +58265,6 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this5 = this;
-	
 	      var pageName = this.getPageName();
 	      if (!this.props.item) return _react2.default.createElement('div', null);
 	      var sectionsHTML = void 0;
@@ -58327,9 +58282,7 @@
 	      if (page_view.view_type === "tabs") {
 	        sectionsHTML = this.createTabsHTML(page_view.tabs);
 	      } else {
-	        sectionsHTML = sections.map(function (section, key) {
-	          return _this5.createSectionHTML(section, key);
-	        });
+	        sectionsHTML = this.createSectionsHTML(page_view.sections);
 	      }
 	
 	      return _react2.default.createElement(

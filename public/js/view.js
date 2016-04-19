@@ -7,7 +7,7 @@ const plan_edit_view = {
       display: "inline",
       fields:
       [
-        { dbkey: "name", label: "Name" },
+        { dbkey: "name", label: "Name", size: 10 },
         { dbkey: "include", fields:
           [
             { dbkey: "cost", fields:
