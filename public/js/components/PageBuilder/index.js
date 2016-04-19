@@ -124,12 +124,11 @@ class PageBuilder extends Component {
   createSectionsHTML(sections = []) {
     let sectionsHTML = sections.map((section, section_idx) => {
       let fields = section.fields ? section.fields : this.createConfigFieldsFromItem(this.props.item);
-      console.log(JSON.stringify(fields));
       let fieldsHTML = fields.map((field, field_idx) => {
-        return this.createFieldHTML(field, `item.${field.dbkey}`);
+        return this.createFieldHTML(field, `item.${field.dbkey}`, field_idx);
       });
       return (
-        <div>
+        <div key={section_idx}>
           {this.sectionTitle(section)}
           {fieldsHTML}
           <div className="row"></div>

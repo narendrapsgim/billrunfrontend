@@ -58253,13 +58253,12 @@
 	
 	      var sectionsHTML = sections.map(function (section, section_idx) {
 	        var fields = section.fields ? section.fields : _this5.createConfigFieldsFromItem(_this5.props.item);
-	        console.log(JSON.stringify(fields));
 	        var fieldsHTML = fields.map(function (field, field_idx) {
-	          return _this5.createFieldHTML(field, 'item.' + field.dbkey);
+	          return _this5.createFieldHTML(field, 'item.' + field.dbkey, field_idx);
 	        });
 	        return _react2.default.createElement(
 	          'div',
-	          null,
+	          { key: section_idx },
 	          _this5.sectionTitle(section),
 	          fieldsHTML,
 	          _react2.default.createElement('div', { className: 'row' }),
