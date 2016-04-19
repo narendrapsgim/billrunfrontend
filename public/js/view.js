@@ -4,11 +4,20 @@ const plan_edit_view = {
   sections: [
     {
       title: "Test",
-      display: "inline",
-      /* fields: [
-	 { label: "Name", dbkey: "name" },
-	 { label: "Include", dbkey: "include" }
-	 ] */
+      display: "inline"
+      // fields:
+      // [
+      //   { dbkey: "name", label: "Name", size: 10 },
+      //   { dbkey: "include", fields:
+      //     [
+      //       { dbkey: "cost", fields:
+      //         [
+      //           { dbkey: "value", label: "Value", type: "number" }
+      //         ]
+      //       }
+      //     ]
+      //   }
+      // ]
     }
   ]
 };

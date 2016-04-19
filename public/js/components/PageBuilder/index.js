@@ -10,23 +10,28 @@ import View from '../../view';
 import Field from './Field';
 import Help from '../Help';
 import R from 'ramda';
+import _ from 'lodash';
 
 class PageBuilder extends Component {
   constructor(props) {
     super(props);
-    this.createSectionHTML = this.createSectionHTML.bind(this);
+    this.createSectionsHTML = this.createSectionsHTML.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSave = this.onSave.bind(this);
     this.action = this.props.params.action;
   }
 
+  getPageName() {
+    return this.props.params.page.replace(/-/g, '_').toLowerCase();
+  }
+  
   componentWillMount() {
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let pageName = this.getPageName();
     this.props.dispatch(setInitialItem(pageName));
   }
 
   componentDidMount() {
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let pageName = this.getPageName();
     let { collection, entity_id } = this.props.params;
 
     if (collection && entity_id) {
@@ -37,17 +42,20 @@ class PageBuilder extends Component {
   
   onChange(evt) {
     let { dispatch } = this.props;
-    let [ id, value ] = [ evt.target.id, evt.target.value ];
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();    
-    dispatch(updateFieldValue(id, value, pageName));
+    let [ path, value ] = [ evt.target.dataset.path, evt.target.value ];
+    dispatch(updateFieldValue(path, value, this.getPageName()));
   }
 
   onSave() {
     let { dispatch } = this.props;
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();    
+    let pageName = this.getPageName();
     dispatch(saveForm(pageName));
   }
 
+  titlize(str) {
+    return _.capitalize(str.replace(/_/g, ' '));
+  }
+  
   sectionTitle(section) {
     let tooltip;
     if (section.description) {
@@ -67,9 +75,7 @@ class PageBuilder extends Component {
           </Tab>
         );
       }
-      let sectionsHTML = tab.sections.map((section, key) => {
-        return this.createSectionHTML(section, key);
-      });
+      let sectionsHTML = this.createSectionsHTML(tab.sections);
       return (
         <Tab key={tab_key} label={tab.title} style={this.tabStyle()}>
           {sectionsHTML}
@@ -84,83 +90,71 @@ class PageBuilder extends Component {
     );
   }
 
-  getFieldViewConfig(fields, dbkey) {
-    return R.find(R.propEq('dbkey', dbkey))(fields);
-  }
-
-  createHTMLFromObject(object) {
-    let object_keys = Object.keys(object);
-    return object_keys.map((key, index) => {
-      if (Object.prototype.toString.call(object[key]) === "[object Object]") {
-        return this.createHTMLFromObject(object[key]);
+  createConfigFieldsFromItem(item) {
+    if (Array.isArray(item)) {
+      item = item[0];
+    }
+    let item_keys = Object.keys(item);
+    return item_keys.map(item_key => {
+      let value = item[item_key];
+      if (_.isObject(value)) {
+        return { dbkey: item_key, fields: this.createConfigFieldsFromItem(value) };
       }
-      let label = key;
-      let value = object[key];
-      return (
-        <Field field={{dbkey: key, label: label}} value={value} onChange={this.onChange} key={index} />
-      );
+      return { dbkey: item_key, label: this.titlize(item_key), size: 10 };
     });
   }
   
-  createSectionHTML(section, key) {
-    let rechtml,
-        fieldshtml;
-
-    if (section.sections && !R.isEmpty(section.sections)) {
-      rechtml =
-	<div>
-            {section.sections.map((section, k) => {
-		 return this.createSectionHTML(section, k);
-             })}
-	</div>;
-    } 
-
-    if (section.fields) {
-      fieldshtml = section.fields.map((field, k) => {
-        let html_id = field.dbkey ? field.dbkey : field.label.toLowerCase().replace(/ /g, '_');
-        let value = this.props.item[html_id];
-        return (
-          <Field field={field} value={value} onChange={this.onChange} key={k} />
-        );
+  createFieldHTML(field, path, field_index) {
+    if (!this.props.item) return (<div></div>);
+    let value = _.result(this.props, path);
+    if (Array.isArray(value)) {
+      return value.map((elm, idx) => {
+        return this.createFieldHTML(field, `${path}[${idx}]`, idx);
       });
-    } else {
-      let item_keys = Object.keys(this.props.item);
-      fieldshtml = item_keys.map((item_key, k) => {
-        if (Object.prototype.toString.call(this.props.item[item_key]) === "[object Object]") {
-          return (
-            <div>
-              {this.createHTMLFromObject(this.props.item[item_key], item_key)}
-            </div>
-          );
-        }
-        let value = (this.action === "edit") ? this.props.item[item_key] : this.props[item_key];
-        return (
-          <Field field={{dbkey: item_key, label: item_key}} value={value} onChange={this.onChange} key={k}/>
-        );
-      }); 
+    } else if (field.fields) {
+      return field.fields.map((field, field_idx) => {
+        return this.createFieldHTML(field, `${path}.${field.dbkey}`, field_idx);
+      });
     }
+    return (
+      <Field field={field} value={value} path={path} onChange={this.onChange} key={field_index} />
+    );
+  }
+  
+  createSectionsHTML(sections = []) {
+    let sectionsHTML = sections.map((section, section_idx) => {
+      let fields = section.fields ? section.fields : this.createConfigFieldsFromItem(this.props.item);
+      let fieldsHTML = fields.map((field, field_idx) => {
+        return this.createFieldHTML(field, `item.${field.dbkey}`, field_idx);
+      });
+      return (
+        <div key={section_idx}>
+          {this.sectionTitle(section)}
+          {fieldsHTML}
+          <div className="row"></div>
+          <hr/>
+        </div>
+      );
+    });
 
     return (
-      <div key={key}>
-        {this.sectionTitle(section)}
-        {fieldshtml}
+      <div>
+        {sectionsHTML}
         <div className="row"></div>
-        <hr/>
-        {rechtml}
       </div>
     );
   }
   
   tabStyle() {
-    return {backgroundColor: "#272A39"};
+    return { backgroundColor: "#272A39" };
   }
 
   inkBarStyle() {
-    return {backgroundColor: "#C0C0C0", height: "4px", bottom: "2px"};
+    return { backgroundColor: "#C0C0C0", height: "4px", bottom: "2px" };
   }
 
   render() {
-    let pageName = this.props.params.page.replace(/-/g, '_').toLowerCase();
+    let pageName = this.getPageName();
     if (!this.props.item) return (<div></div>);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ? 
@@ -176,9 +170,7 @@ class PageBuilder extends Component {
     if (page_view.view_type === "tabs") {
       sectionsHTML = this.createTabsHTML(page_view.tabs);
     } else {
-      sectionsHTML = sections.map((section, key) => {
-	return this.createSectionHTML(section, key)
-      });
+      sectionsHTML = this.createSectionsHTML(page_view.sections)
     }
 
     return (
