@@ -90,10 +90,6 @@ class PageBuilder extends Component {
     );
   }
 
-  getFieldViewConfig(fields, dbkey) {
-    return R.find(R.propEq('dbkey', dbkey))(fields);
-  }
-
   createConfigFieldsFromItem(item) {
     if (Array.isArray(item)) {
       item = item[0];

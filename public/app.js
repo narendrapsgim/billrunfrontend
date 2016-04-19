@@ -58210,11 +58210,6 @@
 	      );
 	    }
 	  }, {
-	    key: 'getFieldViewConfig',
-	    value: function getFieldViewConfig(fields, dbkey) {
-	      return _ramda2.default.find(_ramda2.default.propEq('dbkey', dbkey))(fields);
-	    }
-	  }, {
 	    key: 'createConfigFieldsFromItem',
 	    value: function createConfigFieldsFromItem(item) {
 	      var _this3 = this;
