@@ -111,10 +111,10 @@ class PageBuilder extends Component {
     if (!this.props.item || _.isEmpty(this.props.item)) return (<div></div>);
     if (path.endsWith(".*") && field.fields) {
       let recpath = path.replace('.*', '');
-      let keys = 
-        Object.keys(
-          _.result(this.props,
-                   recpath));
+      let keys =
+            Object.keys(
+              _.result(this.props,
+                       recpath));
       return keys.map((obj_key, obj_idx) => {
         return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
       });
@@ -181,8 +181,8 @@ class PageBuilder extends Component {
     if (!this.props.item) return (<div></div>);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ? 
-      View.pages[pageName].views[this.action] :
-      View.pages[pageName];
+                    View.pages[pageName].views[this.action] :
+                    View.pages[pageName];
 
     if (!page_view) {
       return (<div></div>);
