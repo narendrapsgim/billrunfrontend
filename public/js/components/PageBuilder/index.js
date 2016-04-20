@@ -53,7 +53,7 @@ class PageBuilder extends Component {
   }
 
   titlize(str) {
-    return _.capitalize(str.replace(/_/g, ' '));
+    return _.capitalize(str.replace(/_/g, ' ').toLowerCase());
   }
   
   sectionTitle(section) {
@@ -91,34 +91,58 @@ class PageBuilder extends Component {
   }
 
   createConfigFieldsFromItem(item) {
+    let from_array = false;
     if (Array.isArray(item)) {
       item = item[0];
+      from_array = true;
     }
+    if (!item) return;
     let item_keys = Object.keys(item);
     return item_keys.map(item_key => {
       let value = item[item_key];
       if (_.isObject(value)) {
         return { dbkey: item_key, fields: this.createConfigFieldsFromItem(value) };
       }
-      return { dbkey: item_key, label: this.titlize(item_key), size: 10 };
+      return { dbkey: item_key, label: this.titlize(item_key), size: (from_array ? 3 : 10) };
     });
   }
   
   createFieldHTML(field, path, field_index) {
-    if (!this.props.item) return (<div></div>);
+    if (!this.props.item || _.isEmpty(this.props.item)) return (<div></div>);
+    if (path.endsWith(".*") && field.fields) {
+      let recpath = path.replace('.*', '');
+      let keys =
+            Object.keys(
+              _.result(this.props,
+                       recpath));
+      return keys.map((obj_key, obj_idx) => {
+        return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
+      });
+    }
     let value = _.result(this.props, path);
-    if (Array.isArray(value)) {
+    if (Array.isArray(value) && _.isObject(value[0])) {
       return value.map((elm, idx) => {
         return this.createFieldHTML(field, `${path}[${idx}]`, idx);
       });
     } else if (field.fields) {
-      return field.fields.map((field, field_idx) => {
+      let ret = field.fields.map((field, field_idx) => {
         return this.createFieldHTML(field, `${path}.${field.dbkey}`, field_idx);
       });
+      let label = field.label ?
+                  field.label :
+                  this.titlize(_.last(path.split('.')));
+      return (
+        <div className="col-md-10">
+          <h4>{label}</h4>
+          <div>
+            {ret}
+          </div>
+        </div>
+      );
     }
     return (
       <Field field={field} value={value} path={path} onChange={this.onChange} key={field_index} />
-    );
+    ); 
   }
   
   createSectionsHTML(sections = []) {
@@ -131,7 +155,6 @@ class PageBuilder extends Component {
         <div key={section_idx}>
           {this.sectionTitle(section)}
           {fieldsHTML}
-          <div className="row"></div>
           <hr/>
         </div>
       );
@@ -158,15 +181,14 @@ class PageBuilder extends Component {
     if (!this.props.item) return (<div></div>);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ? 
-      View.pages[pageName].views[this.action] :
-      View.pages[pageName];
+                    View.pages[pageName].views[this.action] :
+                    View.pages[pageName];
 
     if (!page_view) {
       return (<div></div>);
     }
 
     let { title, sections = [] } = page_view;
-
     if (page_view.view_type === "tabs") {
       sectionsHTML = this.createTabsHTML(page_view.tabs);
     } else {
