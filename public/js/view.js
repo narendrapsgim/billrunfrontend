@@ -1,8 +1,8 @@
 const plans_list_view = {
-  title : "Plans",
+  title : "Plans and Items",
   view_type : "list",
   sections : [ {
-    title : "Test",
+    title : "",
     lists : [ {
       url : 'http://billrunmt.local/api/plans',
       fields : [

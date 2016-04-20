@@ -10,6 +10,8 @@ import TextField from 'material-ui/lib/text-field';
 import Toggle from 'material-ui/lib/toggle';
 import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import ContentAdd from 'material-ui/lib/svg-icons/content/add';
+import Divider from 'material-ui/lib/divider';
+import _ from 'lodash';
 import aja from 'aja';
 
 const styles = {
@@ -17,7 +19,11 @@ const styles = {
     margin : '10px',
   },
   table : {
-    'table-layout' : 'auto',
+    tableLayout : 'auto',
+  },
+  summaryTitle : {
+    display : 'inline',
+    marginRight : '20px'
   }
 };
 
@@ -28,6 +34,7 @@ export default class List extends React.Component {
     super(props);
     this.buttonClick = this.buttonClick.bind(this);
     this.getData = this.getData.bind(this);
+    this.filterData = _.debounce(this.filterData.bind(this),1000);
 
     this.state = {
       fixedHeader : true,
@@ -45,10 +52,17 @@ export default class List extends React.Component {
 
   buttonClick(e) { this.getData(); }
 
-  getData() {
+  filterData(e, value) { this.getData(value); }
+
+  getData(value) {
+    var url = this.props.settings.url;
+    if(value && value.length){
+      url += '?query={"invoice_label":{"$regex":"'+value+'", "$options" : "i" }}';
+    }
+    console.log(url);
     this.serverRequest = aja()
        .method('get')
-       .url(this.props.settings.url)
+       .url(url)
        .on('200',
            (response) => {
              this.setState({
@@ -111,6 +125,15 @@ export default class List extends React.Component {
 
     return (
       <div>
+        <Divider />
+        <div>
+          <h4 style={styles.summaryTitle}>Plans Summary</h4>
+          <TextField
+            hintText="Search"
+            floatingLabelText="Search"
+            onChange={this.filterData}
+          />
+        </div>
         <Table
           bodyStyle={{width: '-fit-content'}}
           height = { this.state.height }
