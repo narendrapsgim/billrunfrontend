@@ -1,3 +1,25 @@
+const plans_list_view = {
+  title : "Plans and Items",
+  view_type : "list",
+  sections : [ {
+    title : "",
+    lists : [ {
+      url : 'http://billrunmt.local/api/plans',
+      fields : [
+        {key : 'invoice_label', label : 'Label'},
+        {key : 'invoice_type', label : 'Type'},
+        {key : 'grouping', label : 'Grouping'},
+        {key : 'price', label : 'Price', type : 'price'},
+        {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
+        {key : 'key', label : 'Key'},
+      ],
+      defaultWidth : 50,
+      defaultMinWidth : 50,
+      defaultSort : 'type'
+    } ]
+  } ]
+};
+
 const plan_edit_view = {
   title: "Edit Plan",
   view_type: "sections",
@@ -109,21 +131,14 @@ const plan_setup_tabs = [
 ];
 
 const View = {
-  pages: {
-    dashboard: {
-      title: "Dashboard"
+  pages : {
+    dashboard : {title : "Dashboard"},
+    plans : {
+      title : "Plans and Items",
+      views : {edit : plan_edit_view, list : plans_list_view}
     },
-    plans: {
-      title: "Plans and Items",
-      views: {
-	edit: plan_edit_view
-      }
-    },
-    plan_setup: {
-      title: "Plan Setup",
-      view_type: "tabs",
-      tabs: plan_setup_tabs
-    }
+    plan_setup :
+        {title : "Plan Setup", view_type : "tabs", tabs : plan_setup_tabs}
   }
 };
 

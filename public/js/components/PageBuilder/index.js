@@ -9,6 +9,7 @@ import Tab from 'material-ui/lib/tabs/tab';
 
 import View from '../../view';
 import Field from './Field';
+import List from '../List';
 import Help from '../Help';
 import R from 'ramda';
 import _ from 'lodash';
@@ -150,16 +151,25 @@ class PageBuilder extends Component {
   
   createSectionsHTML(sections = []) {
     let sectionsHTML = sections.map((section, section_idx) => {
-      let fields = section.fields ? section.fields : this.createConfigFieldsFromItem(this.props.item);
-      let fieldsHTML = fields.map((field, field_idx) => {
-        return this.createFieldHTML(field, `item.${field.dbkey}`, field_idx);
-      });
+      let output;
+      if(section.fields) {
+        let fields = section.fields ? section.fields : this.createConfigFieldsFromItem(this.props.item);
+        output = fields.map((field, field_idx) => {
+          return this.createFieldHTML(field, `item.${field.dbkey}`, field_idx);
+        });
+      }
+
+      if(section.lists){
+        output = section.lists.map((list, idx) => {
+          return (
+            <List settings={list} key={idx}/>
+          );
+        });
+      }
       return (
-        <div key={section_idx} className="row">
-          <div>
-            {this.sectionTitle(section)}
-            {fieldsHTML}
-          </div>
+        <div key={section_idx}>
+          {this.sectionTitle(section)}
+          {output}
           <hr/>
         </div>
       );
@@ -215,6 +225,10 @@ class PageBuilder extends Component {
     );
   }
 }
+
+PageBuilder.propTypes = {
+
+};
 
 function mapStateToProps(state, ownProps) {
   let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
