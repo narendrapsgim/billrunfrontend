@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 
 import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from '../../actions';
 
@@ -108,9 +109,11 @@ class PageBuilder extends Component {
   }
   
   createFieldHTML(field, path, field_index) {
-    if (!this.props.item || _.isEmpty(this.props.item)) return (<div></div>);
+    if (this.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) return (<div></div>);
     if (path.endsWith(".*") && field.fields) {
       let recpath = path.replace('.*', '');
+      let res = _.result(this.props, recpath);
+      if (!res) return; (<div></div>);
       let keys =
             Object.keys(
               _.result(this.props,
@@ -132,7 +135,7 @@ class PageBuilder extends Component {
                   field.label :
                   this.titlize(_.last(path.split('.')));
       return (
-        <div className="col-md-10">
+        <div className="col-md-10" key={field_index}>
           <h4>{label}</h4>
           <div>
             {ret}
@@ -152,9 +155,11 @@ class PageBuilder extends Component {
         return this.createFieldHTML(field, `item.${field.dbkey}`, field_idx);
       });
       return (
-        <div key={section_idx}>
-          {this.sectionTitle(section)}
-          {fieldsHTML}
+        <div key={section_idx} className="row">
+          <div>
+            {this.sectionTitle(section)}
+            {fieldsHTML}
+          </div>
           <hr/>
         </div>
       );
@@ -178,7 +183,7 @@ class PageBuilder extends Component {
 
   render() {
     let pageName = this.getPageName();
-    if (!this.props.item) return (<div></div>);
+    if (this.action === 'edit' && !this.props.item) return (<div></div>);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ? 
                     View.pages[pageName].views[this.action] :
@@ -197,6 +202,7 @@ class PageBuilder extends Component {
 
     return (
       <div>
+        <Link to="plans/plans/edit/123">To Plan</Link>
         <h3>{title}</h3>
         {sectionsHTML}
 	<button
@@ -209,10 +215,6 @@ class PageBuilder extends Component {
     );
   }
 }
-
-PageBuilder.propTypes = {
-
-};
 
 function mapStateToProps(state, ownProps) {
   let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();

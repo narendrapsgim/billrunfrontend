@@ -27386,7 +27386,6 @@
 	}
 	
 	function fetchItem(collection, item_id) {
-	
 	  var item = { "name": "ACCS_INTERNET_EN_TRS_HAUT_DBIT", "technical_name": "Ultra Haut Debit", "key": "ACCS_INTERNET_EN_TRS_HAUT_DBIT", "provisioning": [""], "options": { "OPTION_FACTURE_PAPIER": { "name": "Option facture papier", "parameters": [], "vti_name": "Facture papier", "price": "8.33334", "invoice_type": "miscellaneous", "included": 0, "erp_account": "706121_DMOAMTM", "limited_access": 0, "display_order": 42, "vat_type": "mobile", "properties": "", "invoice_label": "Facture papier", "tech_name": null, "type": "commercial" }, "OPTION_FACTURE_PAPIER_PRO": { "name": "Option facture papier Pro", "parameters": [], "vti_name": "Facture papier gratuite Pro", "price": "0", "invoice_type": "miscellaneous", "included": 0, "erp_account": "706121_DMOAMTM", "limited_access": 0, "display_order": 42, "vat_type": "mobile", "properties": "", "invoice_label": "Facture papier", "tech_name": null, "type": "commercial" }, "TELEPHONIE_ILLIMITEE": { "name": "Telephonie Illimitee", "tech_name": "VOIP Number", "parameters": [], "vti_name": 'Téléphonie Illimitée', "excludes": ["VOIP_NUMBER"], "price": "0", "invoice_type": "voip", "included": 1, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "", "limited_access": 0, "display_order": 98, "vat_type": "voip", "properties": "", "invoice_label": 'Téléphonie Illimitée Monaco / France', "provisioning": { "POM_TAG": "IRNACC", "OBJECT_NAME": ["accessInternetVoips", "voipAccess"], "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "commercial" }, "APPELS_ILLIMITE_VOICE_DE_MONACO_VERS_MONACOFRANCE_FIXE_ET_MOBILE": { "name": "Appels illimite (voice) de Monaco vers Monaco\/France Fixe et Mobile", "parameters": [], "include": { "call": "UNLIMITED" }, "max_usage": { "call": "7200" }, "price": "0", "invoice_type": "voip", "included": 1, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "", "limited_access": 0, "display_order": 99, "vat_type": "voip", "properties": "", "invoice_label": "", "tech_name": null, "type": "commercial" }, "APPELS_ILLIMITES_VOIX_DE_MONACO_VERS_EUROPESUISSEANDORRE_FIXE_ET_MOBILE": { "name": "Appels illimites (voix) de Monaco vers Europe\/Suisse&Andorre Fixe et Mobile", "parameters": [], "vti_name": 'Téléphonie Illimitée Europe', "include": { "call": "UNLIMITED" }, "max_usage": { "call": "7200" }, "price": "12.5", "invoice_type": "voip", "grouping": 'Options Internet / Téléphonie illimitée', "included": 0, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "706102_DNTVOIP", "limited_access": 0, "display_order": 100, "vat_type": "voip", "properties": "", "invoice_label": 'Téléphonie Illimitée Europe', "tech_name": null, "type": "commercial" }, "LOCATION_TELEPHONE_BASIQUE": { "name": "Location Telephone Basique", "parameters": [], "vti_name": 'Location Téléphone Basique', "price": "1.5", "invoice_type": "voip", "grouping": 'Options Internet / Téléphonie illimitée', "included": 0, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "706231_DNTDVLT", "limited_access": 0, "display_order": 102, "vat_type": "voip", "properties": "", "invoice_label": 'Location Téléphone Basique', "tech_name": null, "type": "commercial" }, "LOCATION_TELEPHONE_CLASSIQUE": { "name": "Location Telephone Classique", "parameters": [], "vti_name": 'Location Téléphone Classique', "price": "2.41667", "invoice_type": "voip", "grouping": 'Options Internet / Téléphonie illimitée', "included": 0, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "706231_DNTDVLT", "limited_access": 0, "display_order": 103, "vat_type": "voip", "properties": "", "invoice_label": 'Location Téléphone Classique', "tech_name": null, "type": "commercial" }, "LOCATION_TELEPHONE_HAUT_DE_GAMME": { "name": "Location Telephone Haut de Gamme", "parameters": [], "vti_name": 'Location Téléphone Haut de Gamme', "price": "3.75", "invoice_type": "voip", "grouping": 'Options Internet / Téléphonie illimitée', "included": 0, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "706231_DNTDVLT", "limited_access": 0, "display_order": 104, "vat_type": "voip", "properties": "", "invoice_label": 'Location Téléphone Haut de Gamme', "tech_name": null, "type": "commercial" }, "ULTRA_HAUT_DEBIT_PRO": { "name": "Ultra Haut Debit Pro", "parameters": [], "vti_name": "Ultra Haut Debit Pro", "price": "18.31667", "invoice_type": "internet", "grouping": 'Options Internet / Téléphonie illimitée', "included": 0, "display_in": { "all": ["SUB"] }, "erp_account": "706102_DNTDSLR", "limited_access": 0, "display_order": 134, "vat_type": "internet", "properties": "", "invoice_label": "Ultra Haut Debit Pro", "tech_name": null, "type": "commercial" } }, "not_billable_options": { "BOX_DOCSIS": { "name": "Box Docsis", "tech_name": "Box Internet", "parameters": [], "vti_name": 'Box Ultra Haut Débit', "excludes": ["BOX_DOCSISTV", "BOX_INTERNET"], "price": "", "invoice_type": "internet", "included": 0, "default": 1, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "706142_DNTDSL9", "limited_access": 0, "display_order": 101, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "IEBOX", "OBJECT_NAME": ["accessInternetVoips", "cpeBox"], "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "INTERNET_ACCESS": { "name": "Internet Access", "tech_name": "Internet Access", "parameters": [], "price": "", "invoice_type": "internet", "included": 1, "erp_account": "", "limited_access": 0, "display_order": 107, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "IAXACC", "OBJECT_NAME": ["accessInternetVoips", "access"], "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "VERY_HIGH_SPEED_PREMIUM": { "name": "Very High speed Premium", "tech_name": "Very High speed Premium", "parameters": [], "price": "", "invoice_type": "internet", "included": 1, "erp_account": "", "limited_access": 0, "display_order": 108, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "IPXBASIC", "OBJECT_NAME": ["accessInternetVoips", "access"], "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "ADRESSE_IP_FIXE": { "name": "Adresse IP fixe", "tech_name": "Adresse IP fixe", "parameters": [], "price": "", "invoice_type": "internet", "included": 1, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "", "limited_access": 0, "display_order": 109, "vat_type": "internet", "properties": "", "invoice_label": "", "type": "technical" }, "5_EMAILS_1GO_BAL_ACCESS": { "name": "5 emails 1Go (BAL) access", "tech_name": "5 emails 1Go (BAL) access", "parameters": [], "vti_name": '5 Boîtes aux lettres GP', "price": "", "invoice_type": "internet", "included": 1, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "", "limited_access": 0, "display_order": 110, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "BPXACC", "OBJECT_NAME": ["accessInternetVoips", "mailAccess"], "ACTIONS": ["MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "1_WIFI_ACCESS": { "name": "1 Wi-Fi access", "tech_name": "1 Wi-Fi access", "parameters": [], "vti_name": 'Accès MC Nomade', "price": "", "invoice_type": "internet", "included": 1, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "", "limited_access": 0, "display_order": 111, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "WPXACC", "OBJECT_NAME": ["accessInternetVoips", "wifiAccess"], "ACTIONS": ["MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "SUSPENSION_CLIENT_VOIP_SERVICE": { "name": "Suspension client  Voip service", "tech_name": "Suspension client  Voip service", "parameters": [], "vti_name": "Suspension VoIP Origine Client", "price": "", "invoice_type": "voip", "included": 0, "erp_account": "", "limited_access": 0, "display_order": 112, "vat_type": "voip", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "IUNSUSP", "OBJECT_NAME": ["accessInternetVoips", "voipAccess"], "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "SUSPENSION_CLIENT_INTERNET_SERVICE": { "name": "Suspension client  Internet service", "tech_name": "Suspension client  Internet service", "parameters": [], "vti_name": "Suspension internet Origine Client", "price": "", "invoice_type": "internet", "included": 0, "erp_account": "", "limited_access": 0, "display_order": 113, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "IUXSUSP", "OBJECT_NAME": ["accessInternetVoips", "cpeBox"], "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "SUSPENSION_FOR_NONPAYMENT_VOIP_SERVICE": { "name": "Suspension for nonpayment Voip service", "tech_name": "Suspension for nonpayment Voip service", "parameters": [], "vti_name": "Suspension VoIP Non Paiement", "price": "", "invoice_type": "voip", "grouping": "Restriction", "included": 0, "display_in": { "all": ["EDIT"] }, "erp_account": "", "limited_access": 1, "display_order": 63, "vat_type": "voip", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "IUNRESTR", "OBJECT_NAME": ["accessInternetVoips", "voipAccess"], "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "SUSPENSION_FOR_NONPAYMENT_INTERNET_SERVICE": { "name": "Suspension for nonpayment  Internet service", "tech_name": "Suspension for nonpayment  Internet service", "parameters": [], "vti_name": "Suspension internet Non Paiement", "price": "", "invoice_type": "internet", "grouping": "Restriction", "included": 0, "display_in": { "all": ["EDIT"] }, "erp_account": "", "limited_access": 1, "display_order": 64, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "IUXRESTR", "OBJECT_NAME": ["accessInternetVoips", "cpeBox"], "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "VOICE_MAIL_ACCESS": { "name": "Voice Mail access", "tech_name": "Voice Mail access", "parameters": [], "price": "", "invoice_type": "voip", "included": 1, "erp_account": "", "limited_access": 0, "display_order": 116, "vat_type": "voip", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "VPXACC", "OBJECT_NAME": ["accessInternetVoips", "voipAccess", "mevoAccess"], "ACTIONS": ["MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "INSTALLATION_BY_CUSTOMER": { "name": "Installation by customer", "tech_name": "Installation by customer", "parameters": [], "vti_name": "Installation par le client", "price": "", "invoice_type": "miscellaneous", "included": 0, "erp_account": "", "limited_access": 0, "display_order": 117, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "CUXINSTALCLI", "OBJECT_NAME": "installationDate", "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "CHANGE_CONTRACTOR_REALLOCATION": { "name": "Change contractor reallocation", "tech_name": "Change contractor reallocation", "parameters": [], "vti_name": "Cession\/Reprise", "price": "", "invoice_type": "miscellaneous", "included": 0, "erp_account": "", "limited_access": 0, "display_order": 118, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "CUXCLICTRTRF", "OBJECT_NAME": "customer", "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "CUSTOMER": { "name": "Customer", "tech_name": "Customer", "parameters": [], "vti_name": 'Création client', "price": "", "invoice_type": "miscellaneous", "included": 0, "erp_account": "", "limited_access": 0, "display_order": 119, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "CPXCLI", "OBJECT_NAME": "customer", "ACTIONS": ["PURCHASE", "MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" }, "CONTROL_PARENTAL_LICENCE": { "name": "Control Parental licence", "tech_name": "Control Parental licence", "parameters": [], "vti_name": 'Contrôle parental', "price": "", "invoice_type": "internet", "included": 1, "display_in": { "all": ["SUB", "EDIT"] }, "erp_account": "", "limited_access": 0, "display_order": 129, "vat_type": "internet", "properties": "", "invoice_label": "", "provisioning": { "POM_TAG": "IRLICCP", "OBJECT_NAME": ["accessInternetVoips", "licenceAccess"], "ACTIONS": ["MIGRATION", "CANCEL"], "PARAMETERS": "", "GROUPING": "" }, "type": "technical" } }, "price": "41.58334", "erp_account": "706102_DNTDSLR", "display_order": "8", "vat_type": "internet", "forceCommitment": false, "invoice_label": 'Ultra Haut Débit', "invoice_type": "internet", "from": "2014-01-01T22:00:00+0000", "to": "2113-12-31T22:00:00+0000" };
 	  return function (dispatch) {
 	    (0, _aja2.default)().url('http://billrun/api/' + collection + '?query={id: ' + item_id + '}').on('success', function (resp) {
@@ -44372,6 +44371,7 @@
 	    { path: '/', component: _App2.default },
 	    _react2.default.createElement(_reactRouter.IndexRedirect, { to: '/dashboard' }),
 	    _react2.default.createElement(_reactRouter.Route, { path: '/:page/:collection/:action/:entity_id', component: _PageBuilder2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: '/:page/:collection/:action', component: _PageBuilder2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: '/:page', component: _PageBuilder2.default })
 	  );
 	};
@@ -57550,6 +57550,12 @@
 	    fields: [
 	    // { dbkey: "name", label: "Name", size: 10 },
 	    // { dbkey: "technical_name", label: "Technical Name", size: 10 },
+	    // { dbkey: "params", label: "Params",
+	    //   fields:
+	    //   [
+	    //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
+	    //   ]
+	    // },
 	    { dbkey: "options", label: "Options", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
 	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
 	      }]
@@ -57562,9 +57568,11 @@
 	  sections: [{
 	    title: "Basic Settings",
 	    description: "Basic settings of the plan",
-	    fields: [{ label: "Plan Name",
+	    fields: [{ dbkey: "name",
+	      label: "Plan Name",
 	      mandatory: true,
-	      type: "text" }, { label: "Plan Description",
+	      type: "text" }, { dbkey: "description",
+	      label: "Plan Description",
 	      mandatory: false,
 	      type: "textarea" }]
 	  }, {
@@ -58034,6 +58042,8 @@
 	
 	var _reactRedux = __webpack_require__(/*! react-redux */ 160);
 	
+	var _reactRouter = __webpack_require__(/*! react-router */ 184);
+	
 	var _actions = __webpack_require__(/*! ../../actions */ 243);
 	
 	var _tabs = __webpack_require__(/*! material-ui/lib/tabs/tabs */ 399);
@@ -58052,11 +58062,11 @@
 	
 	var _Field2 = _interopRequireDefault(_Field);
 	
-	var _Help = __webpack_require__(/*! ../Help */ 446);
+	var _Help = __webpack_require__(/*! ../Help */ 447);
 	
 	var _Help2 = _interopRequireDefault(_Help);
 	
-	var _ramda = __webpack_require__(/*! ramda */ 448);
+	var _ramda = __webpack_require__(/*! ramda */ 449);
 	
 	var _ramda2 = _interopRequireDefault(_ramda);
 	
@@ -58199,10 +58209,14 @@
 	    value: function createFieldHTML(field, path, field_index) {
 	      var _this4 = this;
 	
-	      if (!this.props.item || _lodash2.default.isEmpty(this.props.item)) return _react2.default.createElement('div', null);
+	      if (this.action === 'edit' && (!this.props.item || _lodash2.default.isEmpty(this.props.item))) return _react2.default.createElement('div', null);
 	      if (path.endsWith(".*") && field.fields) {
 	        var _ret = function () {
 	          var recpath = path.replace('.*', '');
+	          var res = _lodash2.default.result(_this4.props, recpath);
+	          if (!res) return {
+	              v: void 0
+	            };_react2.default.createElement('div', null);
 	          var keys = Object.keys(_lodash2.default.result(_this4.props, recpath));
 	          return {
 	            v: keys.map(function (obj_key, obj_idx) {
@@ -58225,7 +58239,7 @@
 	        var label = field.label ? field.label : this.titlize(_lodash2.default.last(path.split('.')));
 	        return _react2.default.createElement(
 	          'div',
-	          { className: 'col-md-10' },
+	          { className: 'col-md-10', key: field_index },
 	          _react2.default.createElement(
 	            'h4',
 	            null,
@@ -58254,9 +58268,13 @@
 	        });
 	        return _react2.default.createElement(
 	          'div',
-	          { key: section_idx },
-	          _this5.sectionTitle(section),
-	          fieldsHTML,
+	          { key: section_idx, className: 'row' },
+	          _react2.default.createElement(
+	            'div',
+	            null,
+	            _this5.sectionTitle(section),
+	            fieldsHTML
+	          ),
 	          _react2.default.createElement('hr', null)
 	        );
 	      });
@@ -58282,7 +58300,7 @@
 	    key: 'render',
 	    value: function render() {
 	      var pageName = this.getPageName();
-	      if (!this.props.item) return _react2.default.createElement('div', null);
+	      if (this.action === 'edit' && !this.props.item) return _react2.default.createElement('div', null);
 	      var sectionsHTML = void 0;
 	      var page_view = _view2.default.pages[pageName].views ? _view2.default.pages[pageName].views[this.action] : _view2.default.pages[pageName];
 	
@@ -58304,6 +58322,11 @@
 	        'div',
 	        null,
 	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: 'plans/plans/edit/123' },
+	          'To Plan'
+	        ),
+	        _react2.default.createElement(
 	          'h3',
 	          null,
 	          title
@@ -58323,8 +58346,6 @@
 	
 	  return PageBuilder;
 	}(_react.Component);
-	
-	PageBuilder.propTypes = {};
 	
 	function mapStateToProps(state, ownProps) {
 	  var pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
@@ -59101,6 +59122,28 @@
 	            label
 	          ),
 	          _react2.default.createElement(_datePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: onChange })
+	        );
+	      } else if (type === "array") {
+	        var _options = value.prefix.map(function (prefix, key) {
+	          return _react2.default.createElement(
+	            'option',
+	            { value: prefix, key: key },
+	            prefix
+	          );
+	        });
+	        return _react2.default.createElement(
+	          'div',
+	          { className: 'col-md-' + size },
+	          _react2.default.createElement(
+	            'label',
+	            { htmlFor: html_id },
+	            value.region
+	          ),
+	          _react2.default.createElement(
+	            'select',
+	            { className: 'form-control', tags: value.prefix, 'data-path': path, onChange: onChange, multiple: 'true' },
+	            _options
+	          )
 	        );
 	      }
 	
@@ -66853,7 +66896,8 @@
 	exports.default = TextFieldUnderline;
 
 /***/ },
-/* 446 */
+/* 446 */,
+/* 447 */
 /*!********************************************!*\
   !*** ./public/js/components/Help/index.js ***!
   \********************************************/
@@ -66871,7 +66915,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _helpOutline = __webpack_require__(/*! material-ui/lib/svg-icons/action/help-outline */ 447);
+	var _helpOutline = __webpack_require__(/*! material-ui/lib/svg-icons/action/help-outline */ 448);
 	
 	var _helpOutline2 = _interopRequireDefault(_helpOutline);
 	
@@ -66948,7 +66992,7 @@
 	exports.default = Help;
 
 /***/ },
-/* 447 */
+/* 448 */
 /*!************************************************************!*\
   !*** ./~/material-ui/lib/svg-icons/action/help-outline.js ***!
   \************************************************************/
@@ -66987,7 +67031,7 @@
 	exports.default = ActionHelpOutline;
 
 /***/ },
-/* 448 */
+/* 449 */
 /*!*******************************!*\
   !*** ./~/ramda/dist/ramda.js ***!
   \*******************************/
