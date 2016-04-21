@@ -31,6 +31,12 @@ const plan_edit_view = {
       [
         // { dbkey: "name", label: "Name", size: 10 },
         // { dbkey: "technical_name", label: "Technical Name", size: 10 },
+        // { dbkey: "params", label: "Params",
+        //   fields:
+        //   [
+        //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
+        //   ]
+        // },
         { dbkey: "options", label: "Options", fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
@@ -55,10 +61,12 @@ const plan_setup_tabs = [
         title: "Basic Settings",
         description: "Basic settings of the plan",
         fields: [
-          { label: "Plan Name",
+          { dbkey: "name",
+            label: "Plan Name",
             mandatory: true,
             type: "text" },
-          { label: "Plan Description",
+          { dbkey: "description",
+            label: "Plan Description",
             mandatory: false,
             type: "textarea" }
         ]
