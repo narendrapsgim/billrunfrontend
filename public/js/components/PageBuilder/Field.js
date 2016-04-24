@@ -50,6 +50,20 @@ class Field extends Component {
           <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={onChange} />
         </div>
       );
+    } else if (type === "array") {
+      let options = value.prefix.map((prefix, key) => {
+        return (
+          <option value={prefix} key={key}>{prefix}</option>
+        );
+      });
+      return (
+        <div className={`col-md-${size}`}>
+          <label htmlFor={html_id}>{value.region}</label>
+          <select className="form-control" tags={value.prefix} data-path={path} onChange={onChange} multiple="true">
+            {options}
+          </select>
+        </div>
+      );
     }
 
     return (
