@@ -29,7 +29,7 @@ const plan_edit_view = {
       display: "inline",
       fields:
       [
-        // { dbkey: "name", label: "Name", size: 10 },
+         { dbkey: "name", label: "Name", size: 10 },
         // { dbkey: "technical_name", label: "Technical Name", size: 10 },
         // { dbkey: "params", label: "Params",
         //   fields:
@@ -37,17 +37,17 @@ const plan_edit_view = {
         //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
         //   ]
         // },
-        { dbkey: "options", label: "Options", fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "name", label: "Name", type: "text" },
-                { dbkey: "price", label: "Price", type: "number" }
-              ]
-            }
-          ]
-        }
+        // { dbkey: "options", label: "Options", fields:
+        //   [
+        //     { dbkey: "*", collapsible: true, collapsed: true,
+        //       fields:
+        //       [
+        //         { dbkey: "name", label: "Name", type: "text" },
+        //         { dbkey: "price", label: "Price", type: "number" }
+        //       ]
+        //     }
+        //   ]
+        // }
       ]
     }
   ]

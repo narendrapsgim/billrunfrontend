@@ -143,7 +143,7 @@ class PageBuilder extends Component {
                   field.label :
                   this.titlize(_.last(path.split('.')));
       return (
-        <div className="col-md-10" key={field_index}>
+        <div className="col-md-10">
           <h4>{label}</h4>
           <div>
             {ret}
@@ -221,7 +221,7 @@ class PageBuilder extends Component {
 
     return (
       <div>
-        <Link to="plans/plans/edit/123">To Plan</Link>
+        {/*<Link to="plans/plans/edit/123">To Plan</Link>*/}
         <h3>{title}</h3>
         {sectionsHTML}
 	<button

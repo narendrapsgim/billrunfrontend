@@ -57565,22 +57565,28 @@
 	  sections: [{
 	    title: "Test",
 	    display: "inline",
-	    fields: [
-	    // { dbkey: "name", label: "Name", size: 10 },
-	    // { dbkey: "technical_name", label: "Technical Name", size: 10 },
-	    // { dbkey: "params", label: "Params",
-	    //   fields:
-	    //   [
-	    //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
-	    //   ]
-	    // },
-	    { dbkey: "options", label: "Options", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
-	      }]
-	    }]
+	    fields: [{ dbkey: "name", label: "Name", size: 10 }]
 	  }]
 	};
 	
+	// { dbkey: "technical_name", label: "Technical Name", size: 10 },
+	// { dbkey: "params", label: "Params",
+	//   fields:
+	//   [
+	//     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
+	//   ]
+	// },
+	// { dbkey: "options", label: "Options", fields:
+	//   [
+	//     { dbkey: "*", collapsible: true, collapsed: true,
+	//       fields:
+	//       [
+	//         { dbkey: "name", label: "Name", type: "text" },
+	//         { dbkey: "price", label: "Price", type: "number" }
+	//       ]
+	//     }
+	//   ]
+	// }
 	var plan_setup_tabs = [{
 	  title: "Plan Settings",
 	  sections: [{
@@ -58268,7 +58274,7 @@
 	        var label = field.label ? field.label : this.titlize(_lodash2.default.last(path.split('.')));
 	        return _react2.default.createElement(
 	          'div',
-	          { className: 'col-md-10', key: field_index },
+	          { className: 'col-md-10' },
 	          _react2.default.createElement(
 	            'h4',
 	            null,
@@ -58360,11 +58366,6 @@
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        _react2.default.createElement(
-	          _reactRouter.Link,
-	          { to: 'plans/plans/edit/123' },
-	          'To Plan'
-	        ),
 	        _react2.default.createElement(
 	          'h3',
 	          null,
