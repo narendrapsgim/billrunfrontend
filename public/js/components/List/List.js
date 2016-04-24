@@ -63,7 +63,14 @@ export default class List extends React.Component {
 
   buildSearchQuery(value, key){
     let query = '';
-    query = '?query={"' + key + '":{"$regex":"'+value+'", "$options" : "i" }}';
+    let filters = {};
+    
+    filters[key] = {
+      "$regex" : value,
+      "$options" : "i"
+    };
+
+    query = '?query=' +  JSON.stringify(filters);
     return query;
   }
 
