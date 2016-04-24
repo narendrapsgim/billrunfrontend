@@ -44370,9 +44370,7 @@
 	    _reactRouter.Route,
 	    { path: '/', component: _App2.default },
 	    _react2.default.createElement(_reactRouter.IndexRedirect, { to: '/dashboard' }),
-	    _react2.default.createElement(_reactRouter.Route, { path: '/:page/:collection/:action(/:entity_id)', component: _PageBuilder2.default, onLeave: function onLeave(e) {
-	        console.log('test', e);
-	      } }),
+	    _react2.default.createElement(_reactRouter.Route, { path: '/:page/:collection/:action(/:entity_id)', component: _PageBuilder2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: '/:page', component: _PageBuilder2.default })
 	  );
 	};
@@ -58100,7 +58098,13 @@
 	  function PageBuilder(props) {
 	    _classCallCheck(this, PageBuilder);
 	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(PageBuilder).call(this, props));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PageBuilder).call(this, props));
+	
+	    _this.createSectionsHTML = _this.createSectionsHTML.bind(_this);
+	    _this.onChange = _this.onChange.bind(_this);
+	    _this.onSave = _this.onSave.bind(_this);
+	    _this.action = _this.props.params.action;
+	    return _this;
 	  }
 	
 	  _createClass(PageBuilder, [{
@@ -58109,13 +58113,14 @@
 	      return this.props.params.page.replace(/-/g, '_').toLowerCase();
 	    }
 	  }, {
-	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(props) {
-	      this.createSectionsHTML = this.createSectionsHTML.bind(this);
-	      this.onChange = this.onChange.bind(this);
-	      this.onSave = this.onSave.bind(this);
-	      this.action = this.props.params.action;
-	
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      var pageName = this.getPageName();
+	      this.props.dispatch((0, _actions.setInitialItem)(pageName));
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
 	      /* componentDidMount */
 	      var pageName = this.getPageName();
 	      var _props$params = this.props.params;
@@ -58129,15 +58134,6 @@
 	        dispatch((0, _actions.getCollectionEntity)(collection, entity_id, pageName));
 	      }
 	    }
-	  }, {
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      var pageName = this.getPageName();
-	      this.props.dispatch((0, _actions.setInitialItem)(pageName));
-	    }
-	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {}
 	  }, {
 	    key: 'onChange',
 	    value: function onChange(evt) {
@@ -58294,8 +58290,7 @@
 	          'div',
 	          { key: section_idx },
 	          _this5.sectionTitle(section),
-	          output,
-	          _react2.default.createElement('hr', null)
+	          output
 	        );
 	      });
 	
