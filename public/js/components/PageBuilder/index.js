@@ -126,11 +126,7 @@ class PageBuilder extends Component {
       let recpath = path.replace('.*', '');
       let res = _.result(this.props, recpath);
       if (!res) return; (<div></div>);
-      let keys =
-            Object.keys(
-              _.result(this.props,
-                       recpath));
-      return keys.map((obj_key, obj_idx) => {
+      return Object.keys(res).map((obj_key, obj_idx) => {
         return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
       });
     }
@@ -147,7 +143,7 @@ class PageBuilder extends Component {
                   field.label :
                   this.titlize(_.last(path.split('.')));
       return (
-        <div className="col-md-10" key={field_index}>
+        <div className="col-md-10">
           <h4>{label}</h4>
           <div>
             {ret}
@@ -225,7 +221,7 @@ class PageBuilder extends Component {
 
     return (
       <div>
-        <Link to="plans/plans/edit/123">To Plan</Link>
+        {/*<Link to="plans/plans/edit/123">To Plan</Link>*/}
         <h3>{title}</h3>
         {sectionsHTML}
 	<button
