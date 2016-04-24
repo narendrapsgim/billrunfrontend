@@ -20,11 +20,11 @@ class PageBuilder extends Component {
     this.createSectionsHTML = this.createSectionsHTML.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSave = this.onSave.bind(this);
-    this.action = this.props.params.action;
+    this.state = {action: this.props.params.action};
   }
 
-  getPageName() {
-    return this.props.params.page.replace(/-/g, '_').toLowerCase();
+  getPageName(props = this.props) {
+    return props.params.page.replace(/-/g, '_').toLowerCase();
   }
   
   componentWillMount() {
@@ -32,8 +32,20 @@ class PageBuilder extends Component {
     this.props.dispatch(setInitialItem(pageName));
   }
 
+  componentWillReceiveProps(nextProps, nextState) {
+    if (nextProps.location.pathname !== this.props.location.pathname) {
+      let pageName = this.getPageName(nextProps);
+      let { collection, entity_id, action } = nextProps.params;
+      this.setState({collection, entity_id, pageName, action});
+
+      if (collection && entity_id) {
+        let { dispatch } = nextProps;
+        dispatch(getCollectionEntity(collection, entity_id, pageName));
+      }
+    }
+  }
+
   componentDidMount() {
-    /* componentDidMount */
     let pageName = this.getPageName();
     let { collection, entity_id } = this.props.params;
 
@@ -111,7 +123,7 @@ class PageBuilder extends Component {
   }
   
   createFieldHTML(field, path, field_index) {
-    if (this.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) return (<div></div>);
+    if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) return (<div></div>);
     if (path.endsWith(".*") && field.fields) {
       let recpath = path.replace('.*', '');
       let res = _.result(this.props, recpath);
@@ -192,11 +204,13 @@ class PageBuilder extends Component {
   }
 
   render() {
-    let pageName = this.getPageName();
-    if (this.action === 'edit' && !this.props.item) return (<div></div>);
+//    let pageName = this.getPageName();
+    let { collection, entity_id, pageName = this.getPageName(), action } = this.state;
+
+    if (action === 'edit' && !this.props.item) return (<div></div>);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ? 
-                    View.pages[pageName].views[this.action] :
+                    View.pages[pageName].views[action] :
                     View.pages[pageName];
 
     if (!page_view) {

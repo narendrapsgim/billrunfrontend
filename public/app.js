@@ -44353,6 +44353,10 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _reactDom = __webpack_require__(/*! react-dom */ 158);
+	
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+	
 	var _reactRouter = __webpack_require__(/*! react-router */ 184);
 	
 	var _App = __webpack_require__(/*! ./containers/App */ 248);
@@ -58103,14 +58107,16 @@
 	    _this.createSectionsHTML = _this.createSectionsHTML.bind(_this);
 	    _this.onChange = _this.onChange.bind(_this);
 	    _this.onSave = _this.onSave.bind(_this);
-	    _this.action = _this.props.params.action;
+	    _this.state = { action: _this.props.params.action };
 	    return _this;
 	  }
 	
 	  _createClass(PageBuilder, [{
 	    key: 'getPageName',
 	    value: function getPageName() {
-	      return this.props.params.page.replace(/-/g, '_').toLowerCase();
+	      var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+	
+	      return props.params.page.replace(/-/g, '_').toLowerCase();
 	    }
 	  }, {
 	    key: 'componentWillMount',
@@ -58119,9 +58125,27 @@
 	      this.props.dispatch((0, _actions.setInitialItem)(pageName));
 	    }
 	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps, nextState) {
+	      if (nextProps.location.pathname !== this.props.location.pathname) {
+	        var pageName = this.getPageName(nextProps);
+	        var _nextProps$params = nextProps.params;
+	        var collection = _nextProps$params.collection;
+	        var entity_id = _nextProps$params.entity_id;
+	        var action = _nextProps$params.action;
+	
+	        this.setState({ collection: collection, entity_id: entity_id, pageName: pageName, action: action });
+	
+	        if (collection && entity_id) {
+	          var dispatch = nextProps.dispatch;
+	
+	          dispatch((0, _actions.getCollectionEntity)(collection, entity_id, pageName));
+	        }
+	      }
+	    }
+	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      /* componentDidMount */
 	      var pageName = this.getPageName();
 	      var _props$params = this.props.params;
 	      var collection = _props$params.collection;
@@ -58220,7 +58244,7 @@
 	    value: function createFieldHTML(field, path, field_index) {
 	      var _this4 = this;
 	
-	      if (this.action === 'edit' && (!this.props.item || _lodash2.default.isEmpty(this.props.item))) return _react2.default.createElement('div', null);
+	      if (this.state.action === 'edit' && (!this.props.item || _lodash2.default.isEmpty(this.props.item))) return _react2.default.createElement('div', null);
 	      if (path.endsWith(".*") && field.fields) {
 	        var _ret = function () {
 	          var recpath = path.replace('.*', '');
@@ -58314,10 +58338,18 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var pageName = this.getPageName();
-	      if (this.action === 'edit' && !this.props.item) return _react2.default.createElement('div', null);
+	      //    let pageName = this.getPageName();
+	      var _state = this.state;
+	      var collection = _state.collection;
+	      var entity_id = _state.entity_id;
+	      var _state$pageName = _state.pageName;
+	      var pageName = _state$pageName === undefined ? this.getPageName() : _state$pageName;
+	      var action = _state.action;
+	
+	
+	      if (action === 'edit' && !this.props.item) return _react2.default.createElement('div', null);
 	      var sectionsHTML = void 0;
-	      var page_view = _view2.default.pages[pageName].views ? _view2.default.pages[pageName].views[this.action] : _view2.default.pages[pageName];
+	      var page_view = _view2.default.pages[pageName].views ? _view2.default.pages[pageName].views[action] : _view2.default.pages[pageName];
 	
 	      if (!page_view) {
 	        return _react2.default.createElement('div', null);
