@@ -58247,9 +58247,8 @@
 	          if (!res) return {
 	              v: void 0
 	            };_react2.default.createElement('div', null);
-	          var keys = Object.keys(_lodash2.default.result(_this4.props, recpath));
 	          return {
-	            v: keys.map(function (obj_key, obj_idx) {
+	            v: Object.keys(res).map(function (obj_key, obj_idx) {
 	              return _this4.createFieldHTML(field, recpath + '.' + obj_key, obj_idx);
 	            })
 	          };

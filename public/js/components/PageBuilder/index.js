@@ -126,11 +126,7 @@ class PageBuilder extends Component {
       let recpath = path.replace('.*', '');
       let res = _.result(this.props, recpath);
       if (!res) return; (<div></div>);
-      let keys =
-            Object.keys(
-              _.result(this.props,
-                       recpath));
-      return keys.map((obj_key, obj_idx) => {
+      return Object.keys(res).map((obj_key, obj_idx) => {
         return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
       });
     }
