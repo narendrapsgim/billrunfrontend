@@ -17,22 +17,19 @@ import _ from 'lodash';
 class PageBuilder extends Component {
   constructor(props) {
     super(props);
-    this.createSectionsHTML = this.createSectionsHTML.bind(this);
-    this.onChange = this.onChange.bind(this);
-    this.onSave = this.onSave.bind(this);
-    this.action = this.props.params.action;
   }
 
   getPageName() {
     return this.props.params.page.replace(/-/g, '_').toLowerCase();
   }
-  
-  componentWillMount() {
-    let pageName = this.getPageName();
-    this.props.dispatch(setInitialItem(pageName));
-  }
 
-  componentDidMount() {
+  componentWillReceiveProps(props) {
+    this.createSectionsHTML = this.createSectionsHTML.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onSave = this.onSave.bind(this);
+    this.action = this.props.params.action;
+
+    /* componentDidMount */
     let pageName = this.getPageName();
     let { collection, entity_id } = this.props.params;
 
@@ -40,6 +37,11 @@ class PageBuilder extends Component {
       let { dispatch } = this.props;
       dispatch(getCollectionEntity(collection, entity_id, pageName));
     }
+  }
+  
+  componentWillMount() {
+    let pageName = this.getPageName();
+    this.props.dispatch(setInitialItem(pageName));
   }
   
   onChange(evt) {

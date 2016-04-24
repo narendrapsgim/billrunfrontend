@@ -4,7 +4,7 @@ const plans_list_view = {
   sections : [ {
     title : "",
     lists : [ {
-      url : 'http://billrunmt.local/api/plans',
+      url : 'http://billrun/api/plans',
       fields : [
         {key : 'invoice_label', label : 'Label'},
         {key : 'invoice_type', label : 'Type'},
