@@ -23,7 +23,10 @@ const styles = {
   },
   summaryTitle : {
     display : 'inline',
-    marginRight : '20px'
+    marginRight : '10px'
+  },
+  filterInput : {
+    margin : '10px',
   }
 };
 
@@ -33,8 +36,8 @@ export default class List extends React.Component {
   constructor(props) {
     super(props);
     this.buttonClick = this.buttonClick.bind(this);
-    this.getData = this.getData.bind(this);
-    this.filterData = _.debounce(this.filterData.bind(this),1000);
+    this.getData = _.debounce(this.getData.bind(this),1000);
+    this.filterData = this.filterData.bind(this);
 
     this.state = {
       fixedHeader : true,
@@ -50,14 +53,24 @@ export default class List extends React.Component {
     };
   }
 
-  buttonClick(e) { this.getData(); }
+  buttonClick(e) {
+    console.log(e);
+  }
 
-  filterData(e, value) { this.getData(value); }
+  filterData(e, value) {
+    this.getData(this.buildSearchQuery(value, e.target.name));
+  }
 
-  getData(value) {
+  buildSearchQuery(value, key){
+    let query = '';
+    query = '?query={"' + key + '":{"$regex":"'+value+'", "$options" : "i" }}';
+    return query;
+  }
+
+  getData(query) {
     var url = this.props.settings.url;
-    if(value && value.length){
-      url += '?query={"invoice_label":{"$regex":"'+value+'", "$options" : "i" }}';
+    if(query && query.length){
+      url += query;
     }
     console.log(url);
     this.serverRequest = aja()
@@ -92,6 +105,14 @@ export default class List extends React.Component {
   }
 
   render() {
+
+    let filters = (
+        this.props.settings.fields.map((field, i) => {
+          if(field.filter && field.filter == true){
+            return <TextField style={styles.filterInput} ref={"listFilter_"+ i} key={i} name={field.key} hintText={"enter " + field.label + "..."} floatingLabelText={"Search by " + field.label} onChange={this.filterData} />
+          }
+        })
+    );
 
     let header = (
                   <TableHeader enableSelectAll = {this.state.enableSelectAll}>
@@ -128,11 +149,7 @@ export default class List extends React.Component {
         <Divider />
         <div>
           <h4 style={styles.summaryTitle}>Plans Summary</h4>
-          <TextField
-            hintText="Search"
-            floatingLabelText="Search"
-            onChange={this.filterData}
-          />
+          {filters}
         </div>
         <Table
           bodyStyle={{width: '-fit-content'}}

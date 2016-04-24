@@ -6,10 +6,10 @@ const plans_list_view = {
     lists : [ {
       url : 'http://billrunmt.local/api/plans',
       fields : [
-        {key : 'invoice_label', label : 'Label'},
+        {key : 'invoice_label', label : 'Label', filter : true},
         {key : 'invoice_type', label : 'Type'},
         {key : 'grouping', label : 'Grouping'},
-        {key : 'price', label : 'Price', type : 'price'},
+        {key : 'price', label : 'Price', type : 'price', filter : true},
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
         {key : 'key', label : 'Key'},
       ],
