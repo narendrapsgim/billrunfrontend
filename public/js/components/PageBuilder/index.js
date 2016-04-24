@@ -174,7 +174,7 @@ class PageBuilder extends Component {
         });
       }
       return (
-        <div key={section_idx}>
+        <div>
           {this.sectionTitle(section)}
           {output}
         </div>
@@ -198,9 +198,7 @@ class PageBuilder extends Component {
   }
 
   render() {
-    let { collection,
-          entity_id,
-          pageName = this.getPageName(),
+    let { pageName = this.getPageName(),
           action } = this.state;
     if (action === 'edit' && !this.props.item) return (<div></div>);
     let sectionsHTML;

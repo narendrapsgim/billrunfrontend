@@ -57563,30 +57563,22 @@
 	  title: "Edit Plan",
 	  view_type: "sections",
 	  sections: [{
-	    title: "Test",
+	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10 }]
+	    fields: [{ dbkey: "name", label: "Name", size: 10 }, { dbkey: "technical_name", label: "Technical Name", size: 10 },
+	    // { dbkey: "params", label: "Params",
+	    //   fields:
+	    //   [
+	    //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
+	    //   ]
+	    // },
+	    { dbkey: "options", label: "Options", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
+	      }]
+	    }]
 	  }]
 	};
 	
-	// { dbkey: "technical_name", label: "Technical Name", size: 10 },
-	// { dbkey: "params", label: "Params",
-	//   fields:
-	//   [
-	//     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
-	//   ]
-	// },
-	// { dbkey: "options", label: "Options", fields:
-	//   [
-	//     { dbkey: "*", collapsible: true, collapsed: true,
-	//       fields:
-	//       [
-	//         { dbkey: "name", label: "Name", type: "text" },
-	//         { dbkey: "price", label: "Price", type: "number" }
-	//       ]
-	//     }
-	//   ]
-	// }
 	var plan_setup_tabs = [{
 	  title: "Plan Settings",
 	  sections: [{
@@ -58312,7 +58304,7 @@
 	        }
 	        return _react2.default.createElement(
 	          'div',
-	          { key: section_idx },
+	          null,
 	          _this5.sectionTitle(section),
 	          output
 	        );
@@ -58339,8 +58331,6 @@
 	    key: 'render',
 	    value: function render() {
 	      var _state = this.state;
-	      var collection = _state.collection;
-	      var entity_id = _state.entity_id;
 	      var _state$pageName = _state.pageName;
 	      var pageName = _state$pageName === undefined ? this.getPageName() : _state$pageName;
 	      var action = _state.action;
