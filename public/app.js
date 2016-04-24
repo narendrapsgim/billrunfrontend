@@ -58125,38 +58125,33 @@
 	      this.props.dispatch((0, _actions.setInitialItem)(pageName));
 	    }
 	  }, {
+	    key: 'getCollectionItem',
+	    value: function getCollectionItem(props) {
+	      var pageName = this.getPageName(props);
+	      var _props$params = props.params;
+	      var collection = _props$params.collection;
+	      var entity_id = _props$params.entity_id;
+	      var action = _props$params.action;
+	
+	      this.setState({ collection: collection, entity_id: entity_id, pageName: pageName, action: action });
+	
+	      if (collection && entity_id) {
+	        var dispatch = props.dispatch;
+	
+	        dispatch((0, _actions.getCollectionEntity)(collection, entity_id, pageName));
+	      }
+	    }
+	  }, {
 	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(nextProps, nextState) {
+	    value: function componentWillReceiveProps(nextProps) {
 	      if (nextProps.location.pathname !== this.props.location.pathname) {
-	        var pageName = this.getPageName(nextProps);
-	        var _nextProps$params = nextProps.params;
-	        var collection = _nextProps$params.collection;
-	        var entity_id = _nextProps$params.entity_id;
-	        var action = _nextProps$params.action;
-	
-	        this.setState({ collection: collection, entity_id: entity_id, pageName: pageName, action: action });
-	
-	        if (collection && entity_id) {
-	          var dispatch = nextProps.dispatch;
-	
-	          dispatch((0, _actions.getCollectionEntity)(collection, entity_id, pageName));
-	        }
+	        this.getCollectionItem(nextProps);
 	      }
 	    }
 	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      var pageName = this.getPageName();
-	      var _props$params = this.props.params;
-	      var collection = _props$params.collection;
-	      var entity_id = _props$params.entity_id;
-	
-	
-	      if (collection && entity_id) {
-	        var dispatch = this.props.dispatch;
-	
-	        dispatch((0, _actions.getCollectionEntity)(collection, entity_id, pageName));
-	      }
+	      this.getCollectionItem(this.props);
 	    }
 	  }, {
 	    key: 'onChange',
@@ -58338,14 +58333,12 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      //    let pageName = this.getPageName();
 	      var _state = this.state;
 	      var collection = _state.collection;
 	      var entity_id = _state.entity_id;
 	      var _state$pageName = _state.pageName;
 	      var pageName = _state$pageName === undefined ? this.getPageName() : _state$pageName;
 	      var action = _state.action;
-	
 	
 	      if (action === 'edit' && !this.props.item) return _react2.default.createElement('div', null);
 	      var sectionsHTML = void 0;

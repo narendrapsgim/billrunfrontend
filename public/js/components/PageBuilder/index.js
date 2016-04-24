@@ -32,27 +32,25 @@ class PageBuilder extends Component {
     this.props.dispatch(setInitialItem(pageName));
   }
 
-  componentWillReceiveProps(nextProps, nextState) {
-    if (nextProps.location.pathname !== this.props.location.pathname) {
-      let pageName = this.getPageName(nextProps);
-      let { collection, entity_id, action } = nextProps.params;
-      this.setState({collection, entity_id, pageName, action});
+  getCollectionItem(props) {
+    let pageName = this.getPageName(props);
+    let { collection, entity_id, action } = props.params;
+    this.setState({collection, entity_id, pageName, action});
 
-      if (collection && entity_id) {
-        let { dispatch } = nextProps;
-        dispatch(getCollectionEntity(collection, entity_id, pageName));
-      }
+    if (collection && entity_id) {
+      let { dispatch } = props;
+      dispatch(getCollectionEntity(collection, entity_id, pageName));
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.location.pathname !== this.props.location.pathname) {
+      this.getCollectionItem(nextProps);
     }
   }
 
   componentDidMount() {
-    let pageName = this.getPageName();
-    let { collection, entity_id } = this.props.params;
-
-    if (collection && entity_id) {
-      let { dispatch } = this.props;
-      dispatch(getCollectionEntity(collection, entity_id, pageName));
-    }
+    this.getCollectionItem(this.props);
   }
   
   onChange(evt) {
@@ -204,9 +202,10 @@ class PageBuilder extends Component {
   }
 
   render() {
-//    let pageName = this.getPageName();
-    let { collection, entity_id, pageName = this.getPageName(), action } = this.state;
-
+    let { collection,
+          entity_id,
+          pageName = this.getPageName(),
+          action } = this.state;
     if (action === 'edit' && !this.props.item) return (<div></div>);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ? 
