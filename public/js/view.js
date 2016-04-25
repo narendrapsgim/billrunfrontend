@@ -20,6 +20,19 @@ const plans_list_view = {
   } ]
 };
 
+const plan_new_view = {
+  title: "New Plan",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { dbkey: "name", label: "Name", size: 10 }
+      ]
+    }
+  ]
+};
+
 const plan_edit_view = {
   title: "Edit Plan",
   view_type: "sections",
@@ -136,7 +149,11 @@ const View = {
     plans: {
       title: "Plans and Items",
       route: "plans/plans/list",
-      views: {edit: plan_edit_view, list: plans_list_view}
+      views: {
+        list: plans_list_view,
+        new: plan_new_view,
+        edit: plan_edit_view
+      }
     },
     plan_setup: {
       title: "Plan Setup",

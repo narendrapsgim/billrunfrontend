@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Table from 'material-ui/lib/table/table';
 import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
 import TableRow from 'material-ui/lib/table/table-row';
@@ -29,8 +29,7 @@ const styles = {
   }
 };
 
-export default class List extends React.Component {
-
+class List extends Component {
   constructor(props) {
     super(props);
     this.buttonClick = this.buttonClick.bind(this);
@@ -52,7 +51,10 @@ export default class List extends React.Component {
     };
   }
 
-  buttonClick(e) { this.getData(); }
+  buttonClick(e) {
+    //this.getData();
+    this.context.router.push("/plans/plans/new");
+  }
 
   filterData(e, value) { this.getData(value); }
 
@@ -165,3 +167,8 @@ export default class List extends React.Component {
     );
   }
 }
+
+List.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
+export default List;

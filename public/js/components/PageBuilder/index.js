@@ -30,8 +30,7 @@ class PageBuilder extends Component {
   }
   
   componentWillMount() {
-    let pageName = this.getPageName();
-    this.props.dispatch(setInitialItem(pageName));
+    this.createNewItem(this.props);
   }
 
   getCollectionItem(props) {
@@ -40,14 +39,24 @@ class PageBuilder extends Component {
     this.setState({collection, entity_id, pageName, action});
 
     if (collection && entity_id) {
-      let { dispatch } = props;
-      dispatch(getCollectionEntity(collection, entity_id, pageName));
+      props.dispatch(getCollectionEntity(collection, entity_id, pageName));
     }
   }
 
+  createNewItem(props) {
+    let pageName = this.getPageName(props);
+    let { collection, entity_id, action } = props.params;
+    this.setState({collection, entity_id, pageName, action});
+    this.props.dispatch(setInitialItem(pageName));
+  }
+  
   componentWillReceiveProps(nextProps) {
     if (nextProps.location.pathname !== this.props.location.pathname) {
-      this.getCollectionItem(nextProps);
+      if (nextProps.params.action === "edit") {
+        this.getCollectionItem(nextProps);
+      } else {
+        this.createNewItem(nextProps);
+      }
     }
   }
 
@@ -204,7 +213,7 @@ class PageBuilder extends Component {
   }
 
   actionButtons(action = this.state.action) {
-    if (action === "edit") {
+    if (action === "edit" || action === "new") {
       let style = {
         margin: "12px"
       };

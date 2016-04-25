@@ -57560,6 +57560,15 @@
 	  }]
 	};
 	
+	var plan_new_view = {
+	  title: "New Plan",
+	  view_type: "sections",
+	  sections: [{
+	    display: "inline",
+	    fields: [{ dbkey: "name", label: "Name", size: 10 }]
+	  }]
+	};
+	
 	var plan_edit_view = {
 	  title: "Edit Plan",
 	  view_type: "sections",
@@ -57637,7 +57646,11 @@
 	    plans: {
 	      title: "Plans and Items",
 	      route: "plans/plans/list",
-	      views: { edit: plan_edit_view, list: plans_list_view }
+	      views: {
+	        list: plans_list_view,
+	        new: plan_new_view,
+	        edit: plan_edit_view
+	      }
 	    },
 	    plan_setup: {
 	      title: "Plan Setup",
@@ -58130,8 +58143,7 @@
 	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      var pageName = this.getPageName();
-	      this.props.dispatch((0, _actions.setInitialItem)(pageName));
+	      this.createNewItem(this.props);
 	    }
 	  }, {
 	    key: 'getCollectionItem',
@@ -58145,16 +58157,30 @@
 	      this.setState({ collection: collection, entity_id: entity_id, pageName: pageName, action: action });
 	
 	      if (collection && entity_id) {
-	        var dispatch = props.dispatch;
-	
-	        dispatch((0, _actions.getCollectionEntity)(collection, entity_id, pageName));
+	        props.dispatch((0, _actions.getCollectionEntity)(collection, entity_id, pageName));
 	      }
+	    }
+	  }, {
+	    key: 'createNewItem',
+	    value: function createNewItem(props) {
+	      var pageName = this.getPageName(props);
+	      var _props$params2 = props.params;
+	      var collection = _props$params2.collection;
+	      var entity_id = _props$params2.entity_id;
+	      var action = _props$params2.action;
+	
+	      this.setState({ collection: collection, entity_id: entity_id, pageName: pageName, action: action });
+	      this.props.dispatch((0, _actions.setInitialItem)(pageName));
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
 	      if (nextProps.location.pathname !== this.props.location.pathname) {
-	        this.getCollectionItem(nextProps);
+	        if (nextProps.params.action === "edit") {
+	          this.getCollectionItem(nextProps);
+	        } else {
+	          this.createNewItem(nextProps);
+	        }
 	      }
 	    }
 	  }, {
@@ -58348,7 +58374,7 @@
 	    value: function actionButtons() {
 	      var action = arguments.length <= 0 || arguments[0] === undefined ? this.state.action : arguments[0];
 	
-	      if (action === "edit") {
+	      if (action === "edit" || action === "new") {
 	        var style = {
 	          margin: "12px"
 	        };
@@ -67081,8 +67107,8 @@
 	  }
 	};
 	
-	var List = function (_React$Component) {
-	  _inherits(List, _React$Component);
+	var List = function (_Component) {
+	  _inherits(List, _Component);
 	
 	  function List(props) {
 	    _classCallCheck(this, List);
@@ -67112,7 +67138,8 @@
 	  _createClass(List, [{
 	    key: 'buttonClick',
 	    value: function buttonClick(e) {
-	      this.getData();
+	      //this.getData();
+	      this.context.router.push("/plans/plans/new");
 	    }
 	  }, {
 	    key: 'filterData',
@@ -67274,8 +67301,11 @@
 	  }]);
 	
 	  return List;
-	}(_react2.default.Component);
+	}(_react.Component);
 	
+	List.contextTypes = {
+	  router: _react2.default.PropTypes.object.isRequired
+	};
 	exports.default = List;
 
 /***/ },
