@@ -64,9 +64,9 @@ class PageBuilder extends Component {
     this.getCollectionItem(this.props);
   }
   
-  onFieldChange(evt) {
+  onFieldChange(evt, index, value = evt.target.value) {
     let { dispatch } = this.props;
-    let [ path, value ] = [ evt.target.dataset.path, evt.target.value ];
+    let path = evt.target.dataset.path;
     dispatch(updateFieldValue(path, value, this.getPageName()));
   }
 

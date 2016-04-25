@@ -60,7 +60,7 @@ const plan_edit_view = {
               fields:
               [
                 { dbkey: "name", label: "Name", type: "text" },
-                { dbkey: "price", label: "Price", type: "number" }
+                { dbkey: "price", label: "Price", type: "number" },
               ]
             }
           ]
@@ -151,7 +151,7 @@ const View = {
   pages: {
     dashboard: {title: "Dashboard"},
     plans: {
-      title: "Plans and Items",
+      title: "Plans",
       route: "plans/plans/list",
       views: {
         list: plans_list_view,

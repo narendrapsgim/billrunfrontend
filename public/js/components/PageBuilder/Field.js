@@ -7,7 +7,16 @@ import MenuItem from 'material-ui/lib/menus/menu-item';
 class Field extends Component {
   constructor(props) {
     super(props);
+    /* this.getOptions = this.getOptions.bind(this); */
   }
+  /* 
+     getOptions(path) {
+     let arr = _.result(this.props, path);
+     if (!arr) return [];
+     return arr.map(elm => {
+     return {value: elm, label: elm};
+     });
+     } */
   
   createInputTag(field = {}) {
     let { value, onChange, path } = this.props;
@@ -16,7 +25,7 @@ class Field extends Component {
           dbkey,
           multiselect = false,
           mandatory = false,
-          size = 4 } = field;
+          size = 5 } = field;
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
     let inputLabel = mandatory ? `${label}*` : label;
 
@@ -28,7 +37,7 @@ class Field extends Component {
       } else {
         options = select_options.map((op, key) => {
           return (
-            <MenuItem value={op.value} key={key} primaryText={op.label} />
+            <MenuItem path={path} value={op.value} key={key} primaryText={op.label} />
           );
         });
       }
@@ -37,7 +46,7 @@ class Field extends Component {
           <SelectField
               value={value}
               id={html_id}
-              data-path={path}
+              
               onChange={onChange} 
               floatingLabelText={inputLabel}>
             {options}
@@ -64,6 +73,7 @@ class Field extends Component {
           <option value={prefix} key={key}>{prefix}</option>
         );
       });
+
       return (
         <div className={`col-md-${size}`}>
           <label htmlFor={html_id}>{value.region}</label>

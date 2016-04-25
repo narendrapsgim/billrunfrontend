@@ -57644,7 +57644,7 @@
 	  pages: {
 	    dashboard: { title: "Dashboard" },
 	    plans: {
-	      title: "Plans and Items",
+	      title: "Plans",
 	      route: "plans/plans/list",
 	      views: {
 	        list: plans_list_view,
@@ -58190,11 +58190,11 @@
 	    }
 	  }, {
 	    key: 'onFieldChange',
-	    value: function onFieldChange(evt) {
+	    value: function onFieldChange(evt, index) {
+	      var value = arguments.length <= 2 || arguments[2] === undefined ? evt.target.value : arguments[2];
 	      var dispatch = this.props.dispatch;
-	      var path = evt.target.dataset.path;
-	      var value = evt.target.value;
 	
+	      var path = evt.target.dataset.path;
 	      dispatch((0, _actions.updateFieldValue)(path, value, this.getPageName()));
 	    }
 	  }, {
@@ -59154,7 +59154,16 @@
 	    _classCallCheck(this, Field);
 	
 	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this, props));
+	    /* this.getOptions = this.getOptions.bind(this); */
 	  }
+	  /* 
+	     getOptions(path) {
+	     let arr = _.result(this.props, path);
+	     if (!arr) return [];
+	     return arr.map(elm => {
+	     return {value: elm, label: elm};
+	     });
+	     } */
 	
 	  _createClass(Field, [{
 	    key: 'createInputTag',
@@ -59174,7 +59183,7 @@
 	      var _field$mandatory = field.mandatory;
 	      var mandatory = _field$mandatory === undefined ? false : _field$mandatory;
 	      var _field$size = field.size;
-	      var size = _field$size === undefined ? 4 : _field$size;
+	      var size = _field$size === undefined ? 5 : _field$size;
 	
 	      var html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
 	      var inputLabel = mandatory ? label + '*' : label;
@@ -59186,7 +59195,7 @@
 	          options = [_react2.default.createElement('option', null)];
 	        } else {
 	          options = select_options.map(function (op, key) {
-	            return _react2.default.createElement(_menuItem2.default, { value: op.value, key: key, primaryText: op.label });
+	            return _react2.default.createElement(_menuItem2.default, { path: path, value: op.value, key: key, primaryText: op.label });
 	          });
 	        }
 	        return _react2.default.createElement(
@@ -59197,7 +59206,7 @@
 	            {
 	              value: value,
 	              id: html_id,
-	              'data-path': path,
+	
 	              onChange: onChange,
 	              floatingLabelText: inputLabel },
 	            options
@@ -59233,6 +59242,7 @@
 	            prefix
 	          );
 	        });
+	
 	        return _react2.default.createElement(
 	          'div',
 	          { className: 'col-md-' + size },
@@ -82901,6 +82911,7 @@
 	    var secondaryText = _props3.secondaryText;
 	    var secondaryTextLines = _props3.secondaryTextLines;
 	    var style = _props3.style;
+	    var path = _props3.path;
 	
 	    var other = _objectWithoutProperties(_props3, ['autoGenerateNestedIndicator', 'children', 'disabled', 'disableKeyboardFocus', 'innerDivStyle', 'insetChildren', 'leftAvatar', 'leftCheckbox', 'leftIcon', 'nestedItems', 'nestedLevel', 'nestedListStyle', 'onKeyboardFocus', 'onMouseLeave', 'onMouseEnter', 'onTouchStart', 'onTouchTap', 'rightAvatar', 'rightIcon', 'rightIconButton', 'rightToggle', 'primaryText', 'primaryTogglesNestedList', 'secondaryText', 'secondaryTextLines', 'style']);
 	
@@ -83111,7 +83122,7 @@
 	        }),
 	        _react2.default.createElement(
 	          'div',
-	          { style: this.state.muiTheme.prepareStyles((0, _simpleAssign2.default)(styles.innerDiv, innerDivStyle)) },
+	          { "data-path": path, style: this.state.muiTheme.prepareStyles((0, _simpleAssign2.default)(styles.innerDiv, innerDivStyle)) },
 	          contentChildren
 	        )
 	      ),
@@ -83121,6 +83132,7 @@
 	});
 	
 	exports.default = ListItem;
+
 
 /***/ },
 /* 482 */
