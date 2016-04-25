@@ -14,6 +14,8 @@ import Divider from 'material-ui/lib/divider';
 import _ from 'lodash';
 import aja from 'aja';
 
+import { Link, browserHistory } from 'react-router';
+
 const styles = {
   plusButton : {
     margin : '10px',
@@ -27,7 +29,6 @@ const styles = {
   }
 };
 
-
 export default class List extends React.Component {
 
   constructor(props) {
@@ -35,6 +36,7 @@ export default class List extends React.Component {
     this.buttonClick = this.buttonClick.bind(this);
     this.getData = this.getData.bind(this);
     this.filterData = _.debounce(this.filterData.bind(this),1000);
+    this.onClickRow = this.onClickRow.bind(this);
 
     this.state = {
       fixedHeader : true,
@@ -76,7 +78,7 @@ export default class List extends React.Component {
       this.getData()
   }
 
-  formatField(row, field){
+  formatField(row, field, i){
     let output = '';
     switch (field.type) {
       case 'boolean':
@@ -91,11 +93,16 @@ export default class List extends React.Component {
     return output;
   }
 
+  onClickRow(e) {
+    return browserHistory.push(`#/plans/plans/edit/${e.target.id}`);
+  }
+  
   render() {
 
     let header = (
                   <TableHeader enableSelectAll = {this.state.enableSelectAll}>
                     <TableRow>
+                      <TableHeaderColumn>#</TableHeaderColumn>
                       {this.props.settings.fields.map(function(field, i) {
                           return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
                       })}
@@ -105,8 +112,9 @@ export default class List extends React.Component {
 
     let rows = this.state.rows.map( (row, index) => (
               <TableRow key={index} selected={row.selected}>
+                <TableRowColumn><Link to={`/plans/plans/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>
                 { this.props.settings.fields.map((field, i) => {
-                  return <TableRowColumn key={i}>{this.formatField(row, field)}</TableRowColumn>
+                    return <TableRowColumn key={i}>{this.formatField(row, field, i)}</TableRowColumn>
                 })}
               </TableRow>
     ));

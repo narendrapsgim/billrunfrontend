@@ -1,11 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, browserHistory } from 'react-router';
 
 import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from '../../actions';
 
 import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
+import RaisedButton from 'material-ui/lib/raised-button';
 
 import View from '../../view';
 import Field from './Field';
@@ -20,6 +21,7 @@ class PageBuilder extends Component {
     this.createSectionsHTML = this.createSectionsHTML.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.actionButtons = this.actionButtons.bind(this);
     this.state = {action: this.props.params.action};
   }
 
@@ -63,6 +65,10 @@ class PageBuilder extends Component {
     let { dispatch } = this.props;
     let pageName = this.getPageName();
     dispatch(saveForm(pageName));
+  }
+
+  onCancel() {
+    browserHistory.goBack();
   }
 
   titlize(str) {
@@ -197,6 +203,29 @@ class PageBuilder extends Component {
     return { backgroundColor: "#C0C0C0", height: "4px", bottom: "2px" };
   }
 
+  actionButtons(action = this.state.action) {
+    if (action === "edit") {
+      let style = {
+        margin: "12px"
+      };
+      return (
+        <div className="action-buttons">
+          <RaisedButton
+              label="Save"
+              primary={true}
+              style={style}
+              onMouseUp={this.onSave}
+          />
+          <RaisedButton
+              label="Cancel"
+              style={style}
+              onMouseUp={this.onCancel}
+          />
+        </div>
+      );
+    }
+  }
+  
   render() {
     let { pageName = this.getPageName(),
           action } = this.state;
@@ -222,12 +251,7 @@ class PageBuilder extends Component {
         {/*<Link to="plans/plans/edit/123">To Plan</Link>*/}
         <h3>{title}</h3>
         {sectionsHTML}
-	<button
-	    className="btn btn-primary"
-	    type="submit"
-	    onClick={this.onSave}>
-	  Save
-	</button>
+        {this.actionButtons()}
       </div>
     );
   }
