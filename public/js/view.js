@@ -42,7 +42,7 @@ const plan_edit_view = {
       display: "inline",
       fields:
       [
-        { dbkey: "name", label: "Name", size: 10 },
+        { dbkey: "name", label: "Name", size: 10, mandatory: true },
         { dbkey: "technical_name", label: "Technical Name", size: 10 },
         // { dbkey: "params", label: "Params",
         //   fields:

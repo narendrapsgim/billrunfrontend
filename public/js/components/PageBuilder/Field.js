@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import DatePicker from 'material-ui/lib/date-picker/date-picker';
+import TextField from 'material-ui/lib/text-field';
 
 class Field extends Component {
   constructor(props) {
@@ -66,10 +67,15 @@ class Field extends Component {
       );
     }
 
+    let inputLabel = mandatory ? `${label}*` : label;
     return (
       <div className={`col-md-${size}`}>
-        <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-        <input type={type} className="form-control" id={html_id} value={value} data-path={path} onChange={onChange} />
+        <TextField value={value}
+                   data-path={path}
+                   onChange={onChange}
+                   id={html_id}
+                   floatingLabelText={inputLabel}
+        />
       </div>
     );
   }

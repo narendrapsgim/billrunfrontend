@@ -57575,7 +57575,7 @@
 	  sections: [{
 	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10 }, { dbkey: "technical_name", label: "Technical Name", size: 10 },
+	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 },
 	    // { dbkey: "params", label: "Params",
 	    //   fields:
 	    //   [
@@ -59127,6 +59127,10 @@
 	
 	var _datePicker2 = _interopRequireDefault(_datePicker);
 	
+	var _textField = __webpack_require__(/*! material-ui/lib/text-field */ 437);
+	
+	var _textField2 = _interopRequireDefault(_textField);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -59240,15 +59244,16 @@
 	        );
 	      }
 	
+	      var inputLabel = mandatory ? label + '*' : label;
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'col-md-' + size },
-	        _react2.default.createElement(
-	          'label',
-	          { htmlFor: html_id },
-	          mandatory ? '*' + label : label
-	        ),
-	        _react2.default.createElement('input', { type: type, className: 'form-control', id: html_id, value: value, 'data-path': path, onChange: onChange })
+	        _react2.default.createElement(_textField2.default, { value: value,
+	          'data-path': path,
+	          onChange: onChange,
+	          id: html_id,
+	          floatingLabelText: inputLabel
+	        })
 	      );
 	    }
 	  }, {
