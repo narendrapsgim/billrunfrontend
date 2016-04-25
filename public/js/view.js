@@ -1,3 +1,28 @@
+const lines_list_view = {
+  title : "Plans and Items",
+  view_type : "list",
+  sections : [ {
+    title : "",
+    lists : [ {
+      url : 'http://billrunmt.local/api/query',
+      fields : [
+        {key : 'aid', label : 'AID', filter : true}, // aid=5000000476
+        {key : 'sid', label : 'SID', filter : true},
+        {key : 'service_name', label : 'Service Name'},
+        {key : 'service_type', label : 'Service Type'},
+        {key : 'plan', label : 'plan'},
+        {key : 'type', label : 'Type'},
+      ],
+      pagination : {
+        itemsPerPage : 5,
+      },
+      defaults : {
+        tableHeight : '700px',
+      }
+    } ]
+  } ]
+};
+
 const plans_list_view = {
   title : "Plans and Items",
   view_type : "list",
@@ -13,9 +38,12 @@ const plans_list_view = {
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
         {key : 'key', label : 'Key'},
       ],
-      defaultWidth : 50,
-      defaultMinWidth : 50,
-      defaultSort : 'type'
+      pagination : {
+        itemsPerPage : 5,
+      },
+      defaults : {
+        tableHeight : '700px',
+      }
     } ]
   } ]
 };
