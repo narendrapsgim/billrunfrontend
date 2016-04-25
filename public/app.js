@@ -44353,6 +44353,10 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _reactDom = __webpack_require__(/*! react-dom */ 158);
+	
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+	
 	var _reactRouter = __webpack_require__(/*! react-router */ 184);
 	
 	var _App = __webpack_require__(/*! ./containers/App */ 248);
@@ -44370,8 +44374,7 @@
 	    _reactRouter.Route,
 	    { path: '/', component: _App2.default },
 	    _react2.default.createElement(_reactRouter.IndexRedirect, { to: '/dashboard' }),
-	    _react2.default.createElement(_reactRouter.Route, { path: '/:page/:collection/:action/:entity_id', component: _PageBuilder2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: '/:page/:collection/:action', component: _PageBuilder2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: '/:page/:collection/:action(/:entity_id)', component: _PageBuilder2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: '/:page', component: _PageBuilder2.default })
 	  );
 	};
@@ -57547,7 +57550,7 @@
 	  sections: [{
 	    title: "",
 	    lists: [{
-	      url: 'http://billrunmt.local/api/plans',
+	      url: 'http://billrun/api/plans',
 	      fields: [{ key: 'invoice_label', label: 'Label' }, { key: 'invoice_type', label: 'Type' }, { key: 'grouping', label: 'Grouping' }, { key: 'price', label: 'Price', type: 'price' }, { key: 'forceCommitment', label: 'Force Commitment', type: 'boolean' }, { key: 'key', label: 'Key' }],
 	      defaultWidth: 50,
 	      defaultMinWidth: 50,
@@ -57562,22 +57565,28 @@
 	  sections: [{
 	    title: "Test",
 	    display: "inline",
-	    fields: [
-	    // { dbkey: "name", label: "Name", size: 10 },
-	    // { dbkey: "technical_name", label: "Technical Name", size: 10 },
-	    // { dbkey: "params", label: "Params",
-	    //   fields:
-	    //   [
-	    //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
-	    //   ]
-	    // },
-	    { dbkey: "options", label: "Options", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
-	      }]
-	    }]
+	    fields: [{ dbkey: "name", label: "Name", size: 10 }]
 	  }]
 	};
 	
+	// { dbkey: "technical_name", label: "Technical Name", size: 10 },
+	// { dbkey: "params", label: "Params",
+	//   fields:
+	//   [
+	//     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
+	//   ]
+	// },
+	// { dbkey: "options", label: "Options", fields:
+	//   [
+	//     { dbkey: "*", collapsible: true, collapsed: true,
+	//       fields:
+	//       [
+	//         { dbkey: "name", label: "Name", type: "text" },
+	//         { dbkey: "price", label: "Price", type: "number" }
+	//       ]
+	//     }
+	//   ]
+	// }
 	var plan_setup_tabs = [{
 	  title: "Plan Settings",
 	  sections: [{
@@ -58104,14 +58113,16 @@
 	    _this.createSectionsHTML = _this.createSectionsHTML.bind(_this);
 	    _this.onChange = _this.onChange.bind(_this);
 	    _this.onSave = _this.onSave.bind(_this);
-	    _this.action = _this.props.params.action;
+	    _this.state = { action: _this.props.params.action };
 	    return _this;
 	  }
 	
 	  _createClass(PageBuilder, [{
 	    key: 'getPageName',
 	    value: function getPageName() {
-	      return this.props.params.page.replace(/-/g, '_').toLowerCase();
+	      var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+	
+	      return props.params.page.replace(/-/g, '_').toLowerCase();
 	    }
 	  }, {
 	    key: 'componentWillMount',
@@ -58120,19 +58131,33 @@
 	      this.props.dispatch((0, _actions.setInitialItem)(pageName));
 	    }
 	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      var pageName = this.getPageName();
-	      var _props$params = this.props.params;
+	    key: 'getCollectionItem',
+	    value: function getCollectionItem(props) {
+	      var pageName = this.getPageName(props);
+	      var _props$params = props.params;
 	      var collection = _props$params.collection;
 	      var entity_id = _props$params.entity_id;
+	      var action = _props$params.action;
 	
+	      this.setState({ collection: collection, entity_id: entity_id, pageName: pageName, action: action });
 	
 	      if (collection && entity_id) {
-	        var dispatch = this.props.dispatch;
+	        var dispatch = props.dispatch;
 	
 	        dispatch((0, _actions.getCollectionEntity)(collection, entity_id, pageName));
 	      }
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      if (nextProps.location.pathname !== this.props.location.pathname) {
+	        this.getCollectionItem(nextProps);
+	      }
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.getCollectionItem(this.props);
 	    }
 	  }, {
 	    key: 'onChange',
@@ -58220,7 +58245,7 @@
 	    value: function createFieldHTML(field, path, field_index) {
 	      var _this4 = this;
 	
-	      if (this.action === 'edit' && (!this.props.item || _lodash2.default.isEmpty(this.props.item))) return _react2.default.createElement('div', null);
+	      if (this.state.action === 'edit' && (!this.props.item || _lodash2.default.isEmpty(this.props.item))) return _react2.default.createElement('div', null);
 	      if (path.endsWith(".*") && field.fields) {
 	        var _ret = function () {
 	          var recpath = path.replace('.*', '');
@@ -58228,9 +58253,8 @@
 	          if (!res) return {
 	              v: void 0
 	            };_react2.default.createElement('div', null);
-	          var keys = Object.keys(_lodash2.default.result(_this4.props, recpath));
 	          return {
-	            v: keys.map(function (obj_key, obj_idx) {
+	            v: Object.keys(res).map(function (obj_key, obj_idx) {
 	              return _this4.createFieldHTML(field, recpath + '.' + obj_key, obj_idx);
 	            })
 	          };
@@ -58250,7 +58274,7 @@
 	        var label = field.label ? field.label : this.titlize(_lodash2.default.last(path.split('.')));
 	        return _react2.default.createElement(
 	          'div',
-	          { className: 'col-md-10', key: field_index },
+	          { className: 'col-md-10' },
 	          _react2.default.createElement(
 	            'h4',
 	            null,
@@ -58290,8 +58314,7 @@
 	          'div',
 	          { key: section_idx },
 	          _this5.sectionTitle(section),
-	          output,
-	          _react2.default.createElement('hr', null)
+	          output
 	        );
 	      });
 	
@@ -58315,10 +58338,16 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var pageName = this.getPageName();
-	      if (this.action === 'edit' && !this.props.item) return _react2.default.createElement('div', null);
+	      var _state = this.state;
+	      var collection = _state.collection;
+	      var entity_id = _state.entity_id;
+	      var _state$pageName = _state.pageName;
+	      var pageName = _state$pageName === undefined ? this.getPageName() : _state$pageName;
+	      var action = _state.action;
+	
+	      if (action === 'edit' && !this.props.item) return _react2.default.createElement('div', null);
 	      var sectionsHTML = void 0;
-	      var page_view = _view2.default.pages[pageName].views ? _view2.default.pages[pageName].views[this.action] : _view2.default.pages[pageName];
+	      var page_view = _view2.default.pages[pageName].views ? _view2.default.pages[pageName].views[action] : _view2.default.pages[pageName];
 	
 	      if (!page_view) {
 	        return _react2.default.createElement('div', null);
@@ -58337,11 +58366,6 @@
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        _react2.default.createElement(
-	          _reactRouter.Link,
-	          { to: 'plans/plans/edit/123' },
-	          'To Plan'
-	        ),
 	        _react2.default.createElement(
 	          'h3',
 	          null,

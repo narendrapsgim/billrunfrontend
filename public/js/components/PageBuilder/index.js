@@ -20,11 +20,11 @@ class PageBuilder extends Component {
     this.createSectionsHTML = this.createSectionsHTML.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSave = this.onSave.bind(this);
-    this.action = this.props.params.action;
+    this.state = {action: this.props.params.action};
   }
 
-  getPageName() {
-    return this.props.params.page.replace(/-/g, '_').toLowerCase();
+  getPageName(props = this.props) {
+    return props.params.page.replace(/-/g, '_').toLowerCase();
   }
   
   componentWillMount() {
@@ -32,14 +32,25 @@ class PageBuilder extends Component {
     this.props.dispatch(setInitialItem(pageName));
   }
 
-  componentDidMount() {
-    let pageName = this.getPageName();
-    let { collection, entity_id } = this.props.params;
+  getCollectionItem(props) {
+    let pageName = this.getPageName(props);
+    let { collection, entity_id, action } = props.params;
+    this.setState({collection, entity_id, pageName, action});
 
     if (collection && entity_id) {
-      let { dispatch } = this.props;
+      let { dispatch } = props;
       dispatch(getCollectionEntity(collection, entity_id, pageName));
     }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.location.pathname !== this.props.location.pathname) {
+      this.getCollectionItem(nextProps);
+    }
+  }
+
+  componentDidMount() {
+    this.getCollectionItem(this.props);
   }
   
   onChange(evt) {
@@ -110,16 +121,12 @@ class PageBuilder extends Component {
   }
   
   createFieldHTML(field, path, field_index) {
-    if (this.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) return (<div></div>);
+    if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) return (<div></div>);
     if (path.endsWith(".*") && field.fields) {
       let recpath = path.replace('.*', '');
       let res = _.result(this.props, recpath);
       if (!res) return; (<div></div>);
-      let keys =
-            Object.keys(
-              _.result(this.props,
-                       recpath));
-      return keys.map((obj_key, obj_idx) => {
+      return Object.keys(res).map((obj_key, obj_idx) => {
         return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
       });
     }
@@ -136,7 +143,7 @@ class PageBuilder extends Component {
                   field.label :
                   this.titlize(_.last(path.split('.')));
       return (
-        <div className="col-md-10" key={field_index}>
+        <div className="col-md-10">
           <h4>{label}</h4>
           <div>
             {ret}
@@ -170,7 +177,6 @@ class PageBuilder extends Component {
         <div key={section_idx}>
           {this.sectionTitle(section)}
           {output}
-          <hr/>
         </div>
       );
     });
@@ -192,11 +198,14 @@ class PageBuilder extends Component {
   }
 
   render() {
-    let pageName = this.getPageName();
-    if (this.action === 'edit' && !this.props.item) return (<div></div>);
+    let { collection,
+          entity_id,
+          pageName = this.getPageName(),
+          action } = this.state;
+    if (action === 'edit' && !this.props.item) return (<div></div>);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ? 
-                    View.pages[pageName].views[this.action] :
+                    View.pages[pageName].views[action] :
                     View.pages[pageName];
 
     if (!page_view) {
@@ -212,7 +221,7 @@ class PageBuilder extends Component {
 
     return (
       <div>
-        <Link to="plans/plans/edit/123">To Plan</Link>
+        {/*<Link to="plans/plans/edit/123">To Plan</Link>*/}
         <h3>{title}</h3>
         {sectionsHTML}
 	<button
