@@ -19,7 +19,7 @@ class PageBuilder extends Component {
   constructor(props) {
     super(props);
     this.createSectionsHTML = this.createSectionsHTML.bind(this);
-    this.onChange = this.onChange.bind(this);
+    this.onFieldChange = this.onFieldChange.bind(this);
     this.onSave = this.onSave.bind(this);
     this.actionButtons = this.actionButtons.bind(this);
     this.state = {action: this.props.params.action};
@@ -64,7 +64,7 @@ class PageBuilder extends Component {
     this.getCollectionItem(this.props);
   }
   
-  onChange(evt) {
+  onFieldChange(evt) {
     let { dispatch } = this.props;
     let [ path, value ] = [ evt.target.dataset.path, evt.target.value ];
     dispatch(updateFieldValue(path, value, this.getPageName()));
@@ -167,7 +167,7 @@ class PageBuilder extends Component {
       );
     }
     return (
-      <Field field={field} value={value} path={path} onChange={this.onChange} key={field_index} />
+      <Field field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
     ); 
   }
   

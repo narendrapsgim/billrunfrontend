@@ -27,7 +27,11 @@ const plan_new_view = {
     {
       display: "inline",
       fields: [
-        { dbkey: "name", label: "Name", size: 10 }
+        { dbkey: "name", label: "Name", size: 10, mandatory: true },
+        { dbkey: "test", label: "Test", size: 10, type: "select", options: [
+          { label: "Option 1", value: "option_1" },
+          { label: "Option 2", value: "option_2" }
+        ] }
       ]
     }
   ]
