@@ -1,5 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import DatePicker from 'material-ui/lib/date-picker/date-picker';
+import TextField from 'material-ui/lib/text-field';
+import SelectField from 'material-ui/lib/select-field';
+import MenuItem from 'material-ui/lib/menus/menu-item';
 
 class Field extends Component {
   constructor(props) {
@@ -15,6 +18,7 @@ class Field extends Component {
           mandatory = false,
           size = 4 } = field;
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
+    let inputLabel = mandatory ? `${label}*` : label;
 
     if (type === "select") {
       let select_options = this.props.field.options;
@@ -24,16 +28,20 @@ class Field extends Component {
       } else {
         options = select_options.map((op, key) => {
           return (
-            <option value={value} key={key}>{op.label}</option>
+            <MenuItem value={op.value} key={key} primaryText={op.label} />
           );
         });
       }
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-          <select className="form-control" id={html_id} value={value} data-path={path} onChange={onChange} multiple={multiselect}>
+          <SelectField
+              value={value}
+              id={html_id}
+              data-path={path}
+              onChange={onChange} 
+              floatingLabelText={inputLabel}>
             {options}
-          </select>
+          </SelectField>
         </div>
       );
     } else if (type === "textarea") {
@@ -68,8 +76,12 @@ class Field extends Component {
 
     return (
       <div className={`col-md-${size}`}>
-        <label htmlFor={html_id}>{ mandatory ? `*${label}` : label}</label>
-        <input type={type} className="form-control" id={html_id} value={value} data-path={path} onChange={onChange} />
+        <TextField value={value}
+                   data-path={path}
+                   onChange={onChange}
+                   id={html_id}
+                   floatingLabelText={inputLabel}
+        />
       </div>
     );
   }
