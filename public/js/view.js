@@ -1,5 +1,5 @@
 const plans_list_view = {
-  title: "Plans and Items",
+  title: "Plans",
   view_type: "list",
   sections: [ {
     title: "",
