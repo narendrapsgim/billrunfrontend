@@ -59936,6 +59936,9 @@
 	      };
 	      this.props.onChange(evt, 0, val);
 	    }
+	
+	    /** HACKITY HACK!! **/
+	
 	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {

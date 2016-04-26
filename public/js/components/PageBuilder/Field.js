@@ -19,6 +19,7 @@ class Field extends Component {
     this.props.onChange(evt, 0, val);
   }
 
+  /** HACKITY HACK!! **/
   componentDidMount() {
     if (this.props.field.type === "array") {
       let { path, field: { array: { items } } } = this.props;
