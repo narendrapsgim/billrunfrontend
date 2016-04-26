@@ -82,11 +82,10 @@ const plan_edit_view = {
       [
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
         { dbkey: "technical_name", label: "Technical Name", size: 10 },
-        { dbkey: "params", label: "Params", collapsible: true,
+        { dbkey: "params", label: "Params",
           fields:
           [
             { dbkey: "destination", label: "Destination", type: "array",
-              collapsible: true,
               array: {
                 title: "region",
                 items: "prefix"

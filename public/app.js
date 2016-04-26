@@ -57605,9 +57605,8 @@
 	  sections: [{
 	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 }, { dbkey: "params", label: "Params", collapsible: true,
+	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 }, { dbkey: "params", label: "Params",
 	      fields: [{ dbkey: "destination", label: "Destination", type: "array",
-	        collapsible: true,
 	        array: {
 	          title: "region",
 	          items: "prefix"
@@ -58233,8 +58232,8 @@
 	    }
 	  }, {
 	    key: 'onFieldChange',
-	    value: function onFieldChange(evt, index) {
-	      var value = arguments.length <= 2 || arguments[2] === undefined ? evt.target.value : arguments[2];
+	    value: function onFieldChange(evt, index, value) {
+	      if (!value && evt.target) value = evt.target.value;
 	      var dispatch = this.props.dispatch;
 	
 	      var path = evt.target.dataset.path;
@@ -59922,26 +59921,40 @@
 	  function Field(props) {
 	    _classCallCheck(this, Field);
 	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this, props));
-	    /* this.getOptions = this.getOptions.bind(this); */
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this, props));
+	
+	    _this.state = { path: "" };
+	    _this.onTagsChange = _this.onTagsChange.bind(_this);
+	    return _this;
 	  }
-	  /* 
-	     getOptions(path) {
-	     let arr = _.result(this.props, path);
-	     if (!arr) return [];
-	     return arr.map(elm => {
-	     return {value: elm, label: elm};
-	     });
-	     } */
 	
 	  _createClass(Field, [{
+	    key: 'onTagsChange',
+	    value: function onTagsChange(val) {
+	      var evt = {
+	        target: { dataset: { path: this.state.path } }
+	      };
+	      this.props.onChange(evt, 0, val);
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      if (this.props.field.type === "array") {
+	        var _props = this.props;
+	        var path = _props.path;
+	        var items = _props.field.array.items;
+	
+	        this.setState({ path: path + '.' + items });
+	      }
+	    }
+	  }, {
 	    key: 'createInputTag',
 	    value: function createInputTag() {
 	      var field = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	      var _props = this.props;
-	      var value = _props.value;
-	      var onChange = _props.onChange;
-	      var path = _props.path;
+	      var _props2 = this.props;
+	      var value = _props2.value;
+	      var onChange = _props2.onChange;
+	      var path = _props2.path;
 	      var _field$label = field.label;
 	      var label = _field$label === undefined ? _react2.default.createElement('span', { dangerouslySetInnerHTML: { __html: '&zwnj;' } }) : _field$label;
 	      var _field$type = field.type;
@@ -59992,22 +60005,6 @@
 	          _react2.default.createElement(_datePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: onChange })
 	        );
 	      } else if (type === "array") {
-	        /*
-	        let { title, items } = field.array;
-	        let options = value[items].map((item, key) => {
-	          return (
-	            <option value={item} key={key}>{item}</option>
-	          );
-	        });
-	         return (
-	          <div className={`col-md-${size}`}>
-	            <label htmlFor={html_id}>{value[title]}</label>
-	            <select className="form-control" value={value[items]} data-path={`${path}.${items}`} onChange={onChange} multiple="true">
-	              {options}
-	            </select>
-	          </div>
-	        );
-	         */
 	        var _field$array = field.array;
 	        var title = _field$array.title;
 	        var items = _field$array.items;
@@ -60020,7 +60017,7 @@
 	            { htmlFor: html_id },
 	            value[title]
 	          ),
-	          _react2.default.createElement(_reactTagsinput2.default, { value: value[items], onChange: onChange })
+	          _react2.default.createElement(_reactTagsinput2.default, { value: value[items], onChange: this.onTagsChange })
 	        );
 	      }
 	
