@@ -184,7 +184,10 @@ class PageBuilder extends Component {
       if(section.lists){
         output = section.lists.map((list, idx) => {
           return (
-            <List settings={list} key={idx}/>
+            <List settings={list}
+                  page={this.props.params.page}
+                  collection={this.props.params.collection}
+                  key={idx} />
           );
         });
       }

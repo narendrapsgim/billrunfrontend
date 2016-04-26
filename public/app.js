@@ -57555,6 +57555,7 @@
 	      fields: [{ key: 'invoice_label', label: 'Label' }, { key: 'invoice_type', label: 'Type' }, { key: 'grouping', label: 'Grouping' }, { key: 'price', label: 'Price', type: 'price' }, { key: 'forceCommitment', label: 'Force Commitment', type: 'boolean' }, { key: 'key', label: 'Key' }],
 	      defaultWidth: 50,
 	      defaultMinWidth: 50,
+	      defaultItems: 20,
 	      defaultSort: 'type'
 	    }]
 	  }]
@@ -57570,6 +57571,7 @@
 	      fields: [{ key: 'key', label: 'Key' }, { key: 'type', label: 'Type' }, { key: 'zone', label: 'Zone' }],
 	      defaultWidth: 50,
 	      defaultMinWidth: 50,
+	      defaultItems: 20,
 	      defaultSort: 'key'
 	    }]
 	  }]
@@ -57588,6 +57590,15 @@
 	   { label: "Option 1", value: "option_1" },
 	   { label: "Option 2", value: "option_2" }
 	   ] } */
+	var rates_new_view = {
+	  title: "New Rate",
+	  view_type: "sections",
+	  sections: [{
+	    display: "inline",
+	    fields: [{ dbkey: "key", label: "Key", size: 10, mandatory: true }]
+	  }]
+	};
+	
 	var plan_edit_view = {
 	  title: "Edit Plan",
 	  view_type: "sections",
@@ -57678,7 +57689,8 @@
 	      title: "Rates",
 	      route: "rates/rates/list",
 	      views: {
-	        list: rates_list_view
+	        list: rates_list_view,
+	        new: rates_new_view
 	      }
 	    },
 	    plans: {
@@ -58379,7 +58391,10 @@
 	
 	        if (section.lists) {
 	          output = section.lists.map(function (list, idx) {
-	            return _react2.default.createElement(_List2.default, { settings: list, key: idx });
+	            return _react2.default.createElement(_List2.default, { settings: list,
+	              page: _this5.props.params.page,
+	              collection: _this5.props.params.collection,
+	              key: idx });
 	          });
 	        }
 	        return _react2.default.createElement(
@@ -67208,8 +67223,11 @@
 	  }, {
 	    key: 'buttonClick',
 	    value: function buttonClick(e) {
-	      //this.getData();
-	      this.context.router.push("/plans/plans/new");
+	      var _props = this.props;
+	      var page = _props.page;
+	      var collection = _props.collection;
+	
+	      this.context.router.push('/' + page + '/' + collection + '/new');
 	    }
 	  }, {
 	    key: 'filterData',
@@ -67221,7 +67239,6 @@
 	    value: function getData(value) {
 	      var _this2 = this;
 	
-	      //    var url = this.props.settings.url;
 	      var url = this.state.settings.url;
 	      if (!url) return;
 	      if (value && value.length) {
@@ -67229,7 +67246,7 @@
 	      }
 	      this.serverRequest = (0, _aja2.default)().method('get').url(url).on('200', function (response) {
 	        _this2.setState({
-	          rows: response.details.slice(0, 20)
+	          rows: response.details.slice(0, _this2.state.settings.defaultItems)
 	        });
 	      }).go();
 	    }
@@ -67252,7 +67269,11 @@
 	  }, {
 	    key: 'onClickRow',
 	    value: function onClickRow(e) {
-	      return _reactRouter.browserHistory.push('#/plans/plans/edit/' + e.target.id);
+	      var _props2 = this.props;
+	      var page = _props2.page;
+	      var collection = _props2.collection;
+	
+	      return _reactRouter.browserHistory.push('#/' + page + '/' + collection + '/edit/' + e.target.id);
 	    }
 	  }, {
 	    key: 'render',

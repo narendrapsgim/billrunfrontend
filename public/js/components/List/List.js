@@ -64,14 +64,13 @@ class List extends Component {
   }
 
   buttonClick(e) {
-    //this.getData();
-    this.context.router.push("/plans/plans/new");
+    let { page, collection } = this.props;
+    this.context.router.push(`/${page}/${collection}/new`);
   }
 
   filterData(e, value) { this.getData(value); }
   
   getData(value) {
-    //    var url = this.props.settings.url;
     let url = this.state.settings.url;
     if (!url) return;
     if(value && value.length){
@@ -83,7 +82,7 @@ class List extends Component {
        .on('200',
            (response) => {
              this.setState({
-               rows : response.details.slice(0,20),
+               rows : response.details.slice(0, this.state.settings.defaultItems),
              });
            })
        .go();
@@ -105,7 +104,8 @@ class List extends Component {
   }
 
   onClickRow(e) {
-    return browserHistory.push(`#/plans/plans/edit/${e.target.id}`);
+    let { page, collection } = this.props;
+    return browserHistory.push(`#/${page}/${collection}/edit/${e.target.id}`);
   }
   
   render() {

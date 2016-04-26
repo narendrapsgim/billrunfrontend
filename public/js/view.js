@@ -15,6 +15,7 @@ const plans_list_view = {
       ],
       defaultWidth: 50,
       defaultMinWidth: 50,
+      defaultItems: 20,
       defaultSort: 'type'
     } ]
   } ]
@@ -34,11 +35,11 @@ const rates_list_view = {
       ],
       defaultWidth: 50,
       defaultMinWidth: 50,
+      defaultItems: 20,
       defaultSort: 'key'
     } ]
   } ]
 };
-
 
 const plan_new_view = {
   title: "New Plan",
@@ -52,6 +53,19 @@ const plan_new_view = {
            { label: "Option 1", value: "option_1" },
            { label: "Option 2", value: "option_2" }
            ] } */
+      ]
+    }
+  ]
+};
+
+const rates_new_view = {
+  title: "New Rate",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { dbkey: "key", label: "Key", size: 10, mandatory: true }
       ]
     }
   ]
@@ -179,7 +193,8 @@ const View = {
       title: "Rates",
       route: "rates/rates/list",
       views: {
-        list: rates_list_view
+        list: rates_list_view,
+        new: rates_new_view
       }
     },
     plans: {
