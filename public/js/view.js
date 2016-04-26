@@ -82,10 +82,11 @@ const plan_edit_view = {
       [
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
         { dbkey: "technical_name", label: "Technical Name", size: 10 },
-        { dbkey: "params", label: "Params",
+        { dbkey: "params", label: "Params", collapsible: true,
           fields:
           [
             { dbkey: "destination", label: "Destination", type: "array",
+              collapsible: true,
               array: {
                 title: "region",
                 items: "prefix"
@@ -93,7 +94,7 @@ const plan_edit_view = {
             }
           ]
         },
-        { dbkey: "options", label: "Options", fields:
+        { dbkey: "options", label: "Options", collapsible: true, fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:

@@ -39,7 +39,7 @@ export default class Collapsible extends Component {
     let style = this.innerDivStyle();
     let chevron = this.printChevron();
     return (
-      <div className="col-md-10">
+      <div className="col-md-10" style={{marginBottom: "10px"}}>
         <h4 onClick={this.toggleCollapse} style={{cursor: "pointer"}}>
           {chevron}
           {label}

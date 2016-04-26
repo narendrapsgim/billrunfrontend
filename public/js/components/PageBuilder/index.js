@@ -171,7 +171,7 @@ class PageBuilder extends Component {
         );
       }
       return (
-        <div className="col-md-10">
+        <div className="col-md-10" style={{marginBottom: "15px"}}>
           <h4>{label}</h4>
           <div>
             {content}

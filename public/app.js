@@ -57605,14 +57605,15 @@
 	  sections: [{
 	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 }, { dbkey: "params", label: "Params",
+	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 }, { dbkey: "params", label: "Params", collapsible: true,
 	      fields: [{ dbkey: "destination", label: "Destination", type: "array",
+	        collapsible: true,
 	        array: {
 	          title: "region",
 	          items: "prefix"
 	        }
 	      }]
-	    }, { dbkey: "options", label: "Options", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	    }, { dbkey: "options", label: "Options", collapsible: true, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
 	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
 	      }]
 	    }]
@@ -58366,7 +58367,7 @@
 	        }
 	        return _react2.default.createElement(
 	          'div',
-	          { className: 'col-md-10' },
+	          { className: 'col-md-10', style: { marginBottom: "15px" } },
 	          _react2.default.createElement(
 	            'h4',
 	            null,
@@ -74982,7 +74983,7 @@
 	      var chevron = this.printChevron();
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'col-md-10' },
+	        { className: 'col-md-10', style: { marginBottom: "10px" } },
 	        _react2.default.createElement(
 	          'h4',
 	          { onClick: this.toggleCollapse, style: { cursor: "pointer" } },
