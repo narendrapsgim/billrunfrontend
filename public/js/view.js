@@ -1,40 +1,42 @@
 const lines_list_view = {
-  title : "Plans and Items",
+  title : "Items",
   view_type : "list",
   sections : [ {
     title : "",
     lists : [ {
       url : 'http://billrunmt.local/api/query',
       fields : [
+        {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
         {key : 'aid', label : 'AID', filter : true}, // aid=5000000476
         {key : 'sid', label : 'SID', filter : true},
         {key : 'service_name', label : 'Service Name'},
         {key : 'service_type', label : 'Service Type'},
         {key : 'plan', label : 'plan'},
         {key : 'type', label : 'Type'},
+        {key : 'urt', label : 'URT',  type : 'urt'},
       ],
       pagination : {
         itemsPerPage : 5,
       },
       defaults : {
-        tableHeight : '700px',
+        tableHeight : '500px',
       }
     } ]
   } ]
 };
 
 const plans_list_view = {
-  title : "Plans and Items",
+  title : "Plans",
   view_type : "list",
   sections : [ {
     title : "",
     lists : [ {
-      url : 'http://billrun/api/plans',
+      url : 'http://billrunmt.local/api/plans',
       fields : [
-        {key : 'invoice_label', label : 'Label', filter : true},
+        {key : 'invoice_label', label : 'Label', filter : true, required : true , filterType : 'query'},
         {key : 'invoice_type', label : 'Type'},
         {key : 'grouping', label : 'Grouping'},
-        {key : 'price', label : 'Price', type : 'price', filter : true},
+        {key : 'price', label : 'Price', type : 'price', filter : true , filterType : 'query'},
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
         {key : 'key', label : 'Key'},
       ],
@@ -48,34 +50,51 @@ const plans_list_view = {
   } ]
 };
 
+const plan_new_view = {
+  title: "New Plan",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { dbkey: "name", label: "Name", size: 10, mandatory: true },
+        { dbkey: "test", label: "Test", size: 10, type: "select", options: [
+          { label: "Option 1", value: "option_1" },
+          { label: "Option 2", value: "option_2" }
+        ] }
+      ]
+    }
+  ]
+};
+
 const plan_edit_view = {
   title: "Edit Plan",
   view_type: "sections",
   sections: [
     {
-      title: "Test",
+      // title: "Test",
       display: "inline",
       fields:
       [
-         { dbkey: "name", label: "Name", size: 10 },
-        // { dbkey: "technical_name", label: "Technical Name", size: 10 },
+        { dbkey: "name", label: "Name", size: 10, mandatory: true },
+        { dbkey: "technical_name", label: "Technical Name", size: 10 },
         // { dbkey: "params", label: "Params",
         //   fields:
         //   [
         //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
         //   ]
         // },
-        // { dbkey: "options", label: "Options", fields:
-        //   [
-        //     { dbkey: "*", collapsible: true, collapsed: true,
-        //       fields:
-        //       [
-        //         { dbkey: "name", label: "Name", type: "text" },
-        //         { dbkey: "price", label: "Price", type: "number" }
-        //       ]
-        //     }
-        //   ]
-        // }
+        { dbkey: "options", label: "Options", fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "name", label: "Name", type: "text" },
+                { dbkey: "price", label: "Price", type: "number" }
+              ]
+            }
+          ]
+        }
       ]
     }
   ]
@@ -141,7 +160,7 @@ const plan_setup_tabs = [
             size: 1 },
           { label: "Validity",
             type: "date",
-            dbkey: "from", 
+            dbkey: "from",
             size: 3 },
           { type: "date",
             dbkey: "to",
@@ -159,14 +178,29 @@ const plan_setup_tabs = [
 ];
 
 const View = {
-  pages : {
-    dashboard : {title : "Dashboard"},
-    plans : {
-      title : "Plans and Items",
-      views : {edit : plan_edit_view, list : plans_list_view}
+  pages: {
+    dashboard: {title: "Dashboard"},
+    plans: {
+      title: "Plans and Items",
+      route: "plans/plans/list",
+      views: {
+        list: plans_list_view,
+        new: plan_new_view,
+        edit: plan_edit_view
+      }
     },
-    plan_setup :
-        {title : "Plan Setup", view_type : "tabs", tabs : plan_setup_tabs}
+    items: {
+      title: "Items",
+      route: "items/lines/list",
+      views: {
+        list: lines_list_view,
+      }
+    },
+    plan_setup: {
+      title: "Plan Setup",
+      view_type: "tabs",
+      tabs: plan_setup_tabs
+    }
   }
 };
 

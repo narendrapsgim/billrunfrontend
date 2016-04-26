@@ -19,13 +19,14 @@ export default class Navigator extends Component {
   render() {
     let buttons = Object.keys(View.pages).map((page, key) => {
       let label = View.pages[page].title;
+      let route = View.pages[page].route ? View.pages[page].route : page;
       return (
         <FlatButton key={key}
                     label={label}
                     linkButton={true}
                     labelStyle={{textTransform: "none"}}
                     style={{"padding": "10px"}}
-                    containerElement={<Link to={`/${page}`} activeClassName="active"></Link>} />
+                    containerElement={<Link to={`/${route}`} activeClassName="active"></Link>} />
 
       );
     });

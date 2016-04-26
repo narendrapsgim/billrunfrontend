@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Table from 'material-ui/lib/table/table';
 import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
 import TableRow from 'material-ui/lib/table/table-row';
@@ -11,12 +11,15 @@ import Toggle from 'material-ui/lib/toggle';
 import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import IconBack from 'material-ui/lib/svg-icons/navigation/arrow-back';
 import IconForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
+import ContentAdd from 'material-ui/lib/svg-icons/content/add';
 import Divider from 'material-ui/lib/divider';
 import Snackbar from 'material-ui/lib/snackbar';
 import IconButton from 'material-ui/lib/icon-button';
 import RaisedButton from 'material-ui/lib/raised-button';
 import _ from 'lodash';
 import aja from 'aja';
+
+import { Link, browserHistory } from 'react-router';
 
 const styles = {
   paginationButton : {
@@ -34,19 +37,22 @@ const styles = {
   },
   filterInput : {
     margin : '10px',
+  },
+  tableCell : {
+    textOverflow : 'clip',
   }
 };
 
-
-export default class List extends React.Component {
-
+class List extends Component {
   constructor(props) {
     super(props);
+    this.buttonClick = this.buttonClick.bind(this);
     this.paginationButton = this.paginationButton.bind(this);
     this.updateTableData = this.updateTableData.bind(this);
     this.getData = _.debounce(this.getData.bind(this),1000);
     this.filterData = this.filterData.bind(this);
     this.handleRequestClose = this.handleRequestClose.bind(this);
+    this.onClickRow = this.onClickRow.bind(this);
 
     this.state = {
       fixedHeader : true,
@@ -67,6 +73,19 @@ export default class List extends React.Component {
     };
   }
 
+  getFieldSettings(key){
+    var matchFields = this.props.settings.fields.filter((field,index) => {
+      if(field.key == key){
+        return field;
+      }
+    })
+    return (matchFields.length) ? matchFields[0] : false ;
+  }
+
+  buttonClick(e) {
+    //this.getData();
+    this.context.router.push("/plans/plans/new");
+  }
   updateTableData(){
     this.getData(this.buildSearchQuery());
   }
@@ -101,30 +120,38 @@ export default class List extends React.Component {
   buildSearchQuery(){
 
     //5000000429,5000000986
-    let query = '?';
+    let query = '';
     let filters = {};
 
     for ( const key in this.state.filters ) {
       if(this.state.filters[key].length){
-        query += key + "=" + this.state.filters[key];
+        let filterSetting = this.getFieldSettings(key);
+        if(filterSetting){
+          if(filterSetting.filterType && filterSetting.filterType == 'query' ){
+              filters[key] = {
+                "$regex" : this.state.filters[key],
+                "$options" : "i"
+              };
+          } else {
+            query += '&' + key + "=" + this.state.filters[key];
+          }
+        }
       }
     }
 
-    // switch (key) {
-    //   case 'name':
-    //   filters[key] = {
-    //     "$regex" : value,
-    //     "$options" : "i"
-    //   };
-    //   query = 'query=' +  JSON.stringify(filters);
-    //     break;
-    //   default: query = key + '=' + value;
-    // }
+    if(!_.isEmpty(filters)){
+      query += '&query=' +  JSON.stringify(filters);
+    }
 
     if(_.isObject(this.props.settings.pagination) && _.isInteger(this.props.settings.pagination.itemsPerPage ) && this.props.settings.pagination.itemsPerPage > -1){
       query += '&size=' + this.props.settings.pagination.itemsPerPage + '&page=' + parseInt(this.state.currentPage);
     }
 
+    if(query.startsWith('&')){
+      query = query.replace('&','?');
+    } else {
+      query = '?' + query;
+    }
     return query;
   }
 
@@ -156,13 +183,14 @@ export default class List extends React.Component {
   }
 
   handleError(data){
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error';
     this.setState({
       snackbarOpen: true,
-      snackbarMessage: data.desc,
+      snackbarMessage: errorMessage,
     });
   }
 
-  formatField(row, field){
+  formatField(row, field, i){
     let output = '';
     switch (field.type) {
       case 'boolean':
@@ -171,10 +199,20 @@ export default class List extends React.Component {
       case 'price':
         output = parseFloat(row[field.key]).toFixed(2).toString().replace(".", ",") + ' €';
         break;
+      case 'mongoid':
+        output = row[field.key].$id;
+        break;
+      case 'urt':
+        output = new Date(row[field.key].sec*1000).toLocaleString();
+        break;
       default:
         output = row[field.key];
     }
     return output;
+  }
+
+  onClickRow(e) {
+    return browserHistory.push(`#/plans/plans/edit/${e.target.id}`);
   }
 
   handleRequestClose(){
@@ -191,10 +229,10 @@ export default class List extends React.Component {
           if(field.filter && field.filter == true){
             return <TextField
               style={styles.filterInput}
-              ref={"listFilter_"+ i}
               key={i} name={field.key}
               hintText={"enter " + field.label + "..."}
               floatingLabelText={"Search by " + field.label}
+              errorText=""
               onChange={this.filterData} />
           }
         })
@@ -204,7 +242,9 @@ export default class List extends React.Component {
                   <TableHeader enableSelectAll = {this.state.enableSelectAll}>
                     <TableRow>
                       {this.props.settings.fields.map(function(field, i) {
+                        if( !(field.hidden  && field.hidden == true) ){
                           return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
+                        }
                       })}
                     </TableRow>
                   </TableHeader>
@@ -212,54 +252,23 @@ export default class List extends React.Component {
 
     let rows = this.state.rows.map( (row, index) => (
               <TableRow key={index} selected={row.selected}>
+                {/*}<TableRowColumn><Link to={`/plans/plans/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
                 { this.props.settings.fields.map((field, i) => {
-                  return <TableRowColumn key={i}>{this.formatField(row, field)}</TableRowColumn>
+                  if( !(field.hidden  && field.hidden == true) ){
+                    return <TableRowColumn style={styles.tableCell} key={i}>{this.formatField(row, field, i)}</TableRowColumn>
+                  }
                 })}
               </TableRow>
     ));
 
-    let pagination = '';
-    if (this.state.totalPages > 1){
-      let pagination = (
-        <TableRowColumn colSpan="3" style={{textAlign: 'center'}}>
-          <FloatingActionButton
-            value='back'
-            mini={false}
-            key={0}
-            style={styles.paginationArrow}
-            onMouseUp={this.paginationButton}>
-             <IconBack />
-          </FloatingActionButton>
-
-          {[...Array(this.setState.totalPages)].map((x, i) =>
-            <FloatingActionButton
-              onClick={this.paginationButton}
-              secondary={this.state.currentPage == (i+1)}
-              value={i+1}
-              mini={true}
-              key={i}
-              style={styles.paginationButton}>
-              {i+1}
-            </FloatingActionButton>
-          )}
-
-          <FloatingActionButton
-            value='forward'
-            mini={false}
-            key={11}
-            style={styles.paginationArrow}
-            onMouseUp={this.paginationButton}>
-             <IconForward />
-          </FloatingActionButton>
-        </TableRowColumn>
-    );
-  }
-
-
     let footer = (
                 <TableFooter>
                   <TableRow>
-                    {pagination}
+                    <TableRowColumn colSpan="3" style={{textAlign: 'center'}}>
+                      <FloatingActionButton style={styles.plusButton} onMouseUp={this.buttonClick}>
+                        <ContentAdd />
+                      </FloatingActionButton>
+                    </TableRowColumn>
                   </TableRow>
                 </TableFooter>
     );
@@ -274,6 +283,7 @@ export default class List extends React.Component {
         <Table
           bodyStyle={{width: '-fit-content'}}
           height = { this.state.height }
+          allRowsSelected = {false}
           fixedHeader = {this.state.fixedHeader}
           fixedFooter = { this.state.fixedFooter }
           selectable = { this.state.selectable }
@@ -302,3 +312,8 @@ export default class List extends React.Component {
     );
   }
 }
+
+List.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
+export default List;

@@ -1,11 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, browserHistory } from 'react-router';
 
 import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from '../../actions';
 
 import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
+import RaisedButton from 'material-ui/lib/raised-button';
 
 import View from '../../view';
 import Field from './Field';
@@ -18,8 +19,9 @@ class PageBuilder extends Component {
   constructor(props) {
     super(props);
     this.createSectionsHTML = this.createSectionsHTML.bind(this);
-    this.onChange = this.onChange.bind(this);
+    this.onFieldChange = this.onFieldChange.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.actionButtons = this.actionButtons.bind(this);
     this.state = {action: this.props.params.action};
   }
 
@@ -28,8 +30,7 @@ class PageBuilder extends Component {
   }
   
   componentWillMount() {
-    let pageName = this.getPageName();
-    this.props.dispatch(setInitialItem(pageName));
+    this.createNewItem(this.props);
   }
 
   getCollectionItem(props) {
@@ -38,14 +39,24 @@ class PageBuilder extends Component {
     this.setState({collection, entity_id, pageName, action});
 
     if (collection && entity_id) {
-      let { dispatch } = props;
-      dispatch(getCollectionEntity(collection, entity_id, pageName));
+      props.dispatch(getCollectionEntity(collection, entity_id, pageName));
     }
   }
 
+  createNewItem(props) {
+    let pageName = this.getPageName(props);
+    let { collection, entity_id, action } = props.params;
+    this.setState({collection, entity_id, pageName, action});
+    this.props.dispatch(setInitialItem(pageName));
+  }
+  
   componentWillReceiveProps(nextProps) {
     if (nextProps.location.pathname !== this.props.location.pathname) {
-      this.getCollectionItem(nextProps);
+      if (nextProps.params.action === "edit") {
+        this.getCollectionItem(nextProps);
+      } else {
+        this.createNewItem(nextProps);
+      }
     }
   }
 
@@ -53,7 +64,7 @@ class PageBuilder extends Component {
     this.getCollectionItem(this.props);
   }
   
-  onChange(evt) {
+  onFieldChange(evt) {
     let { dispatch } = this.props;
     let [ path, value ] = [ evt.target.dataset.path, evt.target.value ];
     dispatch(updateFieldValue(path, value, this.getPageName()));
@@ -63,6 +74,10 @@ class PageBuilder extends Component {
     let { dispatch } = this.props;
     let pageName = this.getPageName();
     dispatch(saveForm(pageName));
+  }
+
+  onCancel() {
+    browserHistory.goBack();
   }
 
   titlize(str) {
@@ -152,7 +167,7 @@ class PageBuilder extends Component {
       );
     }
     return (
-      <Field field={field} value={value} path={path} onChange={this.onChange} key={field_index} />
+      <Field field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
     ); 
   }
   
@@ -174,7 +189,7 @@ class PageBuilder extends Component {
         });
       }
       return (
-        <div key={section_idx}>
+        <div>
           {this.sectionTitle(section)}
           {output}
         </div>
@@ -197,10 +212,31 @@ class PageBuilder extends Component {
     return { backgroundColor: "#C0C0C0", height: "4px", bottom: "2px" };
   }
 
+  actionButtons(action = this.state.action) {
+    if (action === "edit" || action === "new") {
+      let style = {
+        margin: "12px"
+      };
+      return (
+        <div className="action-buttons">
+          <RaisedButton
+              label="Save"
+              primary={true}
+              style={style}
+              onMouseUp={this.onSave}
+          />
+          <RaisedButton
+              label="Cancel"
+              style={style}
+              onMouseUp={this.onCancel}
+          />
+        </div>
+      );
+    }
+  }
+  
   render() {
-    let { collection,
-          entity_id,
-          pageName = this.getPageName(),
+    let { pageName = this.getPageName(),
           action } = this.state;
     if (action === 'edit' && !this.props.item) return (<div></div>);
     let sectionsHTML;
@@ -224,12 +260,7 @@ class PageBuilder extends Component {
         {/*<Link to="plans/plans/edit/123">To Plan</Link>*/}
         <h3>{title}</h3>
         {sectionsHTML}
-	<button
-	    className="btn btn-primary"
-	    type="submit"
-	    onClick={this.onSave}>
-	  Save
-	</button>
+        {this.actionButtons()}
       </div>
     );
   }
