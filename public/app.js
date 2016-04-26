@@ -57560,6 +57560,21 @@
 	  }]
 	};
 	
+	var rates_list_view = {
+	  title: "Rates",
+	  view_type: "list",
+	  sections: [{
+	    title: "",
+	    lists: [{
+	      url: 'http://billrun/api/rates',
+	      fields: [{ key: 'key', label: 'Key' }, { key: 'type', label: 'Type' }, { key: 'zone', label: 'Zone' }],
+	      defaultWidth: 50,
+	      defaultMinWidth: 50,
+	      defaultSort: 'key'
+	    }]
+	  }]
+	};
+	
 	var plan_new_view = {
 	  title: "New Plan",
 	  view_type: "sections",
@@ -57659,6 +57674,13 @@
 	var View = {
 	  pages: {
 	    dashboard: { title: "Dashboard" },
+	    rates: {
+	      title: "Rates",
+	      route: "rates/rates/list",
+	      views: {
+	        list: rates_list_view
+	      }
+	    },
 	    plans: {
 	      title: "Plans",
 	      route: "plans/plans/list",
@@ -67161,12 +67183,29 @@
 	      enableSelectAll: true,
 	      deselectOnClickaway: false,
 	      height: '300px',
-	      rows: []
+	      rows: [],
+	      settings: {}
 	    };
 	    return _this;
 	  }
 	
 	  _createClass(List, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      var settings = this.props.settings;
+	
+	      this.setState({ settings: settings });
+	      this.getData();
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      var settings = nextProps.settings;
+	
+	      this.setState({ settings: settings });
+	      this.getData();
+	    }
+	  }, {
 	    key: 'buttonClick',
 	    value: function buttonClick(e) {
 	      //this.getData();
@@ -67182,21 +67221,17 @@
 	    value: function getData(value) {
 	      var _this2 = this;
 	
-	      var url = this.props.settings.url;
+	      //    var url = this.props.settings.url;
+	      var url = this.state.settings.url;
+	      if (!url) return;
 	      if (value && value.length) {
 	        url += '?query={"invoice_label":{"$regex":"' + value + '", "$options" : "i" }}';
 	      }
-	      console.log(url);
 	      this.serverRequest = (0, _aja2.default)().method('get').url(url).on('200', function (response) {
 	        _this2.setState({
-	          rows: response.details.slice()
+	          rows: response.details.slice(0, 20)
 	        });
 	      }).go();
-	    }
-	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      this.getData();
 	    }
 	  }, {
 	    key: 'formatField',
@@ -67224,18 +67259,15 @@
 	    value: function render() {
 	      var _this3 = this;
 	
+	      var settings = this.state.settings;
+	
 	      var header = _react2.default.createElement(
 	        _tableHeader2.default,
 	        { enableSelectAll: this.state.enableSelectAll },
 	        _react2.default.createElement(
 	          _tableRow2.default,
 	          null,
-	          _react2.default.createElement(
-	            _tableHeaderColumn2.default,
-	            null,
-	            '#'
-	          ),
-	          this.props.settings.fields.map(function (field, i) {
+	          settings.fields.map(function (field, i) {
 	            return _react2.default.createElement(
 	              _tableHeaderColumn2.default,
 	              { tooltip: field.label, key: i },
@@ -67249,16 +67281,7 @@
 	        return _react2.default.createElement(
 	          _tableRow2.default,
 	          { key: index, selected: row.selected },
-	          _react2.default.createElement(
-	            _tableRowColumn2.default,
-	            null,
-	            _react2.default.createElement(
-	              _reactRouter.Link,
-	              { to: '/plans/plans/edit/' + row._id.$id },
-	              index + 1
-	            )
-	          ),
-	          _this3.props.settings.fields.map(function (field, i) {
+	          settings.fields.map(function (field, i) {
 	            return _react2.default.createElement(
 	              _tableRowColumn2.default,
 	              { key: i },

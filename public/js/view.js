@@ -20,6 +20,26 @@ const plans_list_view = {
   } ]
 };
 
+const rates_list_view = {
+  title: "Rates",
+  view_type: "list",
+  sections: [ {
+    title: "",
+    lists: [ {
+      url: 'http://billrun/api/rates',
+      fields: [
+        {key: 'key', label: 'Key'},
+        {key: 'type', label: 'Type'},
+        {key: 'zone', label: 'Zone'}
+      ],
+      defaultWidth: 50,
+      defaultMinWidth: 50,
+      defaultSort: 'key'
+    } ]
+  } ]
+};
+
+
 const plan_new_view = {
   title: "New Plan",
   view_type: "sections",
@@ -155,6 +175,13 @@ const plan_setup_tabs = [
 const View = {
   pages: {
     dashboard: {title: "Dashboard"},
+    rates: {
+      title: "Rates",
+      route: "rates/rates/list",
+      views: {
+        list: rates_list_view
+      }
+    },
     plans: {
       title: "Plans",
       route: "plans/plans/list",
