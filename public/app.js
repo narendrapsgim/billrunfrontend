@@ -57565,30 +57565,46 @@
 	  view_type: "sections",
 	  sections: [{
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "test", label: "Test", size: 10, type: "select", options: [{ label: "Option 1", value: "option_1" }, { label: "Option 2", value: "option_2" }] }]
+	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }]
 	  }]
 	};
 	
+	/* { dbkey: "test", label: "Test", size: 10, type: "select", options: [
+	   { label: "Option 1", value: "option_1" },
+	   { label: "Option 2", value: "option_2" }
+	   ] } */
 	var plan_edit_view = {
 	  title: "Edit Plan",
 	  view_type: "sections",
 	  sections: [{
 	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 },
-	    // { dbkey: "params", label: "Params",
-	    //   fields:
-	    //   [
-	    //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
-	    //   ]
-	    // },
-	    { dbkey: "options", label: "Options", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
-	      }]
-	    }]
+	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 }]
 	  }]
 	};
 	
+	/* { dbkey: "params", label: "Params",
+	   fields:
+	   [
+	   { dbkey: "destination", label: "Destination", type: "array",
+	   array: {
+	   title: "region",
+	   items: "prefix"
+	   }
+	   }
+	   ]
+	   }, */
+	/* { dbkey: "options", label: "Options", fields:
+	   [
+	   { dbkey: "*", collapsible: true, collapsed: true,
+	   fields:
+	   [
+	   { dbkey: "name", label: "Name", type: "text" },
+	   { dbkey: "price", label: "Price", type: "number" },
+	   ]
+	   }
+	   ]
+	   } */
 	var plan_setup_tabs = [{
 	  title: "Plan Settings",
 	  sections: [{
@@ -59206,22 +59222,10 @@
 	            {
 	              value: value,
 	              id: html_id,
-	
 	              onChange: onChange,
 	              floatingLabelText: inputLabel },
 	            options
 	          )
-	        );
-	      } else if (type === "textarea") {
-	        return _react2.default.createElement(
-	          'div',
-	          { className: 'col-md-' + size },
-	          _react2.default.createElement(
-	            'label',
-	            { htmlFor: html_id },
-	            mandatory ? '*' + label : label
-	          ),
-	          _react2.default.createElement('textarea', { className: 'form-control', id: html_id, value: value, 'data-path': path, onChange: onChange })
 	        );
 	      } else if (type === "date") {
 	        return _react2.default.createElement(
@@ -59235,11 +59239,15 @@
 	          _react2.default.createElement(_datePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: onChange })
 	        );
 	      } else if (type === "array") {
-	        var _options = value.prefix.map(function (prefix, key) {
+	        var _field$array = field.array;
+	        var title = _field$array.title;
+	        var items = _field$array.items;
+	
+	        var _options = value[items].map(function (item, key) {
 	          return _react2.default.createElement(
 	            'option',
-	            { value: prefix, key: key },
-	            prefix
+	            { value: item, key: key },
+	            item
 	          );
 	        });
 	
@@ -59249,16 +59257,18 @@
 	          _react2.default.createElement(
 	            'label',
 	            { htmlFor: html_id },
-	            value.region
+	            value[title]
 	          ),
 	          _react2.default.createElement(
 	            'select',
-	            { className: 'form-control', tags: value.prefix, 'data-path': path, onChange: onChange, multiple: 'true' },
+	            { className: 'form-control', value: value[items], 'data-path': path + '.' + items, onChange: onChange, multiple: 'true' },
 	            _options
 	          )
 	        );
 	      }
 	
+	      var multiLine = type === "textarea" ? true : false;
+	      var rows = multiLine ? 2 : 1;
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'col-md-' + size },
@@ -59266,6 +59276,8 @@
 	          'data-path': path,
 	          onChange: onChange,
 	          id: html_id,
+	          multiLine: multiLine,
+	          rows: rows,
 	          floatingLabelText: inputLabel
 	        })
 	      );

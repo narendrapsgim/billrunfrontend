@@ -28,10 +28,10 @@ const plan_new_view = {
       display: "inline",
       fields: [
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
-        { dbkey: "test", label: "Test", size: 10, type: "select", options: [
-          { label: "Option 1", value: "option_1" },
-          { label: "Option 2", value: "option_2" }
-        ] }
+        /* { dbkey: "test", label: "Test", size: 10, type: "select", options: [
+           { label: "Option 1", value: "option_1" },
+           { label: "Option 2", value: "option_2" }
+           ] } */
       ]
     }
   ]
@@ -48,23 +48,28 @@ const plan_edit_view = {
       [
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
         { dbkey: "technical_name", label: "Technical Name", size: 10 },
-        // { dbkey: "params", label: "Params",
-        //   fields:
-        //   [
-        //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
-        //   ]
-        // },
-        { dbkey: "options", label: "Options", fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "name", label: "Name", type: "text" },
-                { dbkey: "price", label: "Price", type: "number" },
-              ]
-            }
-          ]
-        }
+        /* { dbkey: "params", label: "Params",
+           fields:
+           [
+           { dbkey: "destination", label: "Destination", type: "array",
+           array: {
+           title: "region",
+           items: "prefix"
+           }
+           }
+           ]
+           }, */
+        /* { dbkey: "options", label: "Options", fields:
+           [
+           { dbkey: "*", collapsible: true, collapsed: true,
+           fields:
+           [
+           { dbkey: "name", label: "Name", type: "text" },
+           { dbkey: "price", label: "Price", type: "number" },
+           ]
+           }
+           ]
+           } */
       ]
     }
   ]
