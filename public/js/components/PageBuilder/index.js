@@ -275,7 +275,6 @@ class PageBuilder extends Component {
 
     return (
       <div>
-        {/*<Link to="plans/plans/edit/123">To Plan</Link>*/}
         <h3>{title}</h3>
         {sectionsHTML}
         {this.actionButtons()}
