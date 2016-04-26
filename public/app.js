@@ -57546,7 +57546,7 @@
 	  value: true
 	});
 	var plans_list_view = {
-	  title: "Plans and Items",
+	  title: "Plans",
 	  view_type: "list",
 	  sections: [{
 	    title: "",
@@ -57555,7 +57555,24 @@
 	      fields: [{ key: 'invoice_label', label: 'Label' }, { key: 'invoice_type', label: 'Type' }, { key: 'grouping', label: 'Grouping' }, { key: 'price', label: 'Price', type: 'price' }, { key: 'forceCommitment', label: 'Force Commitment', type: 'boolean' }, { key: 'key', label: 'Key' }],
 	      defaultWidth: 50,
 	      defaultMinWidth: 50,
+	      defaultItems: 20,
 	      defaultSort: 'type'
+	    }]
+	  }]
+	};
+	
+	var rates_list_view = {
+	  title: "Rates",
+	  view_type: "list",
+	  sections: [{
+	    title: "",
+	    lists: [{
+	      url: 'http://billrun/api/rates',
+	      fields: [{ key: 'key', label: 'Key' }, { key: 'type', label: 'Type' }, { key: 'zone', label: 'Zone' }],
+	      defaultWidth: 50,
+	      defaultMinWidth: 50,
+	      defaultItems: 20,
+	      defaultSort: 'key'
 	    }]
 	  }]
 	};
@@ -57565,7 +57582,20 @@
 	  view_type: "sections",
 	  sections: [{
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "test", label: "Test", size: 10, type: "select", options: [{ label: "Option 1", value: "option_1" }, { label: "Option 2", value: "option_2" }] }]
+	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }]
+	  }]
+	};
+	
+	/* { dbkey: "test", label: "Test", size: 10, type: "select", options: [
+	   { label: "Option 1", value: "option_1" },
+	   { label: "Option 2", value: "option_2" }
+	   ] } */
+	var rates_new_view = {
+	  title: "New Rate",
+	  view_type: "sections",
+	  sections: [{
+	    display: "inline",
+	    fields: [{ dbkey: "key", label: "Key", size: 10, mandatory: true }]
 	  }]
 	};
 	
@@ -57575,20 +57605,32 @@
 	  sections: [{
 	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 },
-	    // { dbkey: "params", label: "Params",
-	    //   fields:
-	    //   [
-	    //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
-	    //   ]
-	    // },
-	    { dbkey: "options", label: "Options", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
-	      }]
-	    }]
+	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "technical_name", label: "Technical Name", size: 10 }]
 	  }]
 	};
 	
+	/* { dbkey: "params", label: "Params",
+	   fields:
+	   [
+	   { dbkey: "destination", label: "Destination", type: "array",
+	   array: {
+	   title: "region",
+	   items: "prefix"
+	   }
+	   }
+	   ]
+	   }, */
+	/* { dbkey: "options", label: "Options", fields:
+	   [
+	   { dbkey: "*", collapsible: true, collapsed: true,
+	   fields:
+	   [
+	   { dbkey: "name", label: "Name", type: "text" },
+	   { dbkey: "price", label: "Price", type: "number" },
+	   ]
+	   }
+	   ]
+	   } */
 	var plan_setup_tabs = [{
 	  title: "Plan Settings",
 	  sections: [{
@@ -57643,8 +57685,16 @@
 	var View = {
 	  pages: {
 	    dashboard: { title: "Dashboard" },
+	    rates: {
+	      title: "Rates",
+	      route: "rates/rates/list",
+	      views: {
+	        list: rates_list_view,
+	        new: rates_new_view
+	      }
+	    },
 	    plans: {
-	      title: "Plans and Items",
+	      title: "Plans",
 	      route: "plans/plans/list",
 	      views: {
 	        list: plans_list_view,
@@ -58190,11 +58240,11 @@
 	    }
 	  }, {
 	    key: 'onFieldChange',
-	    value: function onFieldChange(evt) {
+	    value: function onFieldChange(evt, index) {
+	      var value = arguments.length <= 2 || arguments[2] === undefined ? evt.target.value : arguments[2];
 	      var dispatch = this.props.dispatch;
-	      var path = evt.target.dataset.path;
-	      var value = evt.target.value;
 	
+	      var path = evt.target.dataset.path;
 	      dispatch((0, _actions.updateFieldValue)(path, value, this.getPageName()));
 	    }
 	  }, {
@@ -58341,7 +58391,10 @@
 	
 	        if (section.lists) {
 	          output = section.lists.map(function (list, idx) {
-	            return _react2.default.createElement(_List2.default, { settings: list, key: idx });
+	            return _react2.default.createElement(_List2.default, { settings: list,
+	              page: _this5.props.params.page,
+	              collection: _this5.props.params.collection,
+	              key: idx });
 	          });
 	        }
 	        return _react2.default.createElement(
@@ -59154,7 +59207,16 @@
 	    _classCallCheck(this, Field);
 	
 	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this, props));
+	    /* this.getOptions = this.getOptions.bind(this); */
 	  }
+	  /* 
+	     getOptions(path) {
+	     let arr = _.result(this.props, path);
+	     if (!arr) return [];
+	     return arr.map(elm => {
+	     return {value: elm, label: elm};
+	     });
+	     } */
 	
 	  _createClass(Field, [{
 	    key: 'createInputTag',
@@ -59174,7 +59236,7 @@
 	      var _field$mandatory = field.mandatory;
 	      var mandatory = _field$mandatory === undefined ? false : _field$mandatory;
 	      var _field$size = field.size;
-	      var size = _field$size === undefined ? 4 : _field$size;
+	      var size = _field$size === undefined ? 5 : _field$size;
 	
 	      var html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
 	      var inputLabel = mandatory ? label + '*' : label;
@@ -59186,7 +59248,7 @@
 	          options = [_react2.default.createElement('option', null)];
 	        } else {
 	          options = select_options.map(function (op, key) {
-	            return _react2.default.createElement(_menuItem2.default, { value: op.value, key: key, primaryText: op.label });
+	            return _react2.default.createElement(_menuItem2.default, { path: path, value: op.value, key: key, primaryText: op.label });
 	          });
 	        }
 	        return _react2.default.createElement(
@@ -59197,22 +59259,10 @@
 	            {
 	              value: value,
 	              id: html_id,
-	              'data-path': path,
 	              onChange: onChange,
 	              floatingLabelText: inputLabel },
 	            options
 	          )
-	        );
-	      } else if (type === "textarea") {
-	        return _react2.default.createElement(
-	          'div',
-	          { className: 'col-md-' + size },
-	          _react2.default.createElement(
-	            'label',
-	            { htmlFor: html_id },
-	            mandatory ? '*' + label : label
-	          ),
-	          _react2.default.createElement('textarea', { className: 'form-control', id: html_id, value: value, 'data-path': path, onChange: onChange })
 	        );
 	      } else if (type === "date") {
 	        return _react2.default.createElement(
@@ -59226,29 +59276,36 @@
 	          _react2.default.createElement(_datePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: onChange })
 	        );
 	      } else if (type === "array") {
-	        var _options = value.prefix.map(function (prefix, key) {
+	        var _field$array = field.array;
+	        var title = _field$array.title;
+	        var items = _field$array.items;
+	
+	        var _options = value[items].map(function (item, key) {
 	          return _react2.default.createElement(
 	            'option',
-	            { value: prefix, key: key },
-	            prefix
+	            { value: item, key: key },
+	            item
 	          );
 	        });
+	
 	        return _react2.default.createElement(
 	          'div',
 	          { className: 'col-md-' + size },
 	          _react2.default.createElement(
 	            'label',
 	            { htmlFor: html_id },
-	            value.region
+	            value[title]
 	          ),
 	          _react2.default.createElement(
 	            'select',
-	            { className: 'form-control', tags: value.prefix, 'data-path': path, onChange: onChange, multiple: 'true' },
+	            { className: 'form-control', value: value[items], 'data-path': path + '.' + items, onChange: onChange, multiple: 'true' },
 	            _options
 	          )
 	        );
 	      }
 	
+	      var multiLine = type === "textarea" ? true : false;
+	      var rows = multiLine ? 2 : 1;
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'col-md-' + size },
@@ -59256,6 +59313,8 @@
 	          'data-path': path,
 	          onChange: onChange,
 	          id: html_id,
+	          multiLine: multiLine,
+	          rows: rows,
 	          floatingLabelText: inputLabel
 	        })
 	      );
@@ -67139,16 +67198,36 @@
 	      enableSelectAll: true,
 	      deselectOnClickaway: false,
 	      height: '300px',
-	      rows: []
+	      rows: [],
+	      settings: {}
 	    };
 	    return _this;
 	  }
 	
 	  _createClass(List, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      var settings = this.props.settings;
+	
+	      this.setState({ settings: settings });
+	      this.getData();
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      var settings = nextProps.settings;
+	
+	      this.setState({ settings: settings });
+	      this.getData();
+	    }
+	  }, {
 	    key: 'buttonClick',
 	    value: function buttonClick(e) {
-	      //this.getData();
-	      this.context.router.push("/plans/plans/new");
+	      var _props = this.props;
+	      var page = _props.page;
+	      var collection = _props.collection;
+	
+	      this.context.router.push('/' + page + '/' + collection + '/new');
 	    }
 	  }, {
 	    key: 'filterData',
@@ -67160,21 +67239,16 @@
 	    value: function getData(value) {
 	      var _this2 = this;
 	
-	      var url = this.props.settings.url;
+	      var url = this.state.settings.url;
+	      if (!url) return;
 	      if (value && value.length) {
 	        url += '?query={"invoice_label":{"$regex":"' + value + '", "$options" : "i" }}';
 	      }
-	      console.log(url);
 	      this.serverRequest = (0, _aja2.default)().method('get').url(url).on('200', function (response) {
 	        _this2.setState({
-	          rows: response.details.slice()
+	          rows: response.details.slice(0, _this2.state.settings.defaultItems)
 	        });
 	      }).go();
-	    }
-	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      this.getData();
 	    }
 	  }, {
 	    key: 'formatField',
@@ -67195,12 +67269,18 @@
 	  }, {
 	    key: 'onClickRow',
 	    value: function onClickRow(e) {
-	      return _reactRouter.browserHistory.push('#/plans/plans/edit/' + e.target.id);
+	      var _props2 = this.props;
+	      var page = _props2.page;
+	      var collection = _props2.collection;
+	
+	      return _reactRouter.browserHistory.push('#/' + page + '/' + collection + '/edit/' + e.target.id);
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _this3 = this;
+	
+	      var settings = this.state.settings;
 	
 	      var header = _react2.default.createElement(
 	        _tableHeader2.default,
@@ -67208,12 +67288,7 @@
 	        _react2.default.createElement(
 	          _tableRow2.default,
 	          null,
-	          _react2.default.createElement(
-	            _tableHeaderColumn2.default,
-	            null,
-	            '#'
-	          ),
-	          this.props.settings.fields.map(function (field, i) {
+	          settings.fields.map(function (field, i) {
 	            return _react2.default.createElement(
 	              _tableHeaderColumn2.default,
 	              { tooltip: field.label, key: i },
@@ -67227,16 +67302,7 @@
 	        return _react2.default.createElement(
 	          _tableRow2.default,
 	          { key: index, selected: row.selected },
-	          _react2.default.createElement(
-	            _tableRowColumn2.default,
-	            null,
-	            _react2.default.createElement(
-	              _reactRouter.Link,
-	              { to: '/plans/plans/edit/' + row._id.$id },
-	              index + 1
-	            )
-	          ),
-	          _this3.props.settings.fields.map(function (field, i) {
+	          settings.fields.map(function (field, i) {
 	            return _react2.default.createElement(
 	              _tableRowColumn2.default,
 	              { key: i },
@@ -82901,6 +82967,7 @@
 	    var secondaryText = _props3.secondaryText;
 	    var secondaryTextLines = _props3.secondaryTextLines;
 	    var style = _props3.style;
+	    var path = _props3.path;
 	
 	    var other = _objectWithoutProperties(_props3, ['autoGenerateNestedIndicator', 'children', 'disabled', 'disableKeyboardFocus', 'innerDivStyle', 'insetChildren', 'leftAvatar', 'leftCheckbox', 'leftIcon', 'nestedItems', 'nestedLevel', 'nestedListStyle', 'onKeyboardFocus', 'onMouseLeave', 'onMouseEnter', 'onTouchStart', 'onTouchTap', 'rightAvatar', 'rightIcon', 'rightIconButton', 'rightToggle', 'primaryText', 'primaryTogglesNestedList', 'secondaryText', 'secondaryTextLines', 'style']);
 	
@@ -83111,7 +83178,7 @@
 	        }),
 	        _react2.default.createElement(
 	          'div',
-	          { style: this.state.muiTheme.prepareStyles((0, _simpleAssign2.default)(styles.innerDiv, innerDivStyle)) },
+	          { "data-path": path, style: this.state.muiTheme.prepareStyles((0, _simpleAssign2.default)(styles.innerDiv, innerDivStyle)) },
 	          contentChildren
 	        )
 	      ),
@@ -83121,6 +83188,7 @@
 	});
 	
 	exports.default = ListItem;
+
 
 /***/ },
 /* 482 */

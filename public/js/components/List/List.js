@@ -47,37 +47,45 @@ class List extends Component {
       enableSelectAll : true,
       deselectOnClickaway : false,
       height : '300px',
-      rows : []
+      rows : [],
+      settings: {}
     };
   }
 
+  componentWillMount() {
+    let { settings } = this.props;
+    this.setState({settings});
+    this.getData();
+  }
+  componentWillReceiveProps(nextProps) {
+    let { settings } = nextProps;
+    this.setState({settings});
+    this.getData();
+  }
+
   buttonClick(e) {
-    //this.getData();
-    this.context.router.push("/plans/plans/new");
+    let { page, collection } = this.props;
+    this.context.router.push(`/${page}/${collection}/new`);
   }
 
   filterData(e, value) { this.getData(value); }
-
+  
   getData(value) {
-    var url = this.props.settings.url;
+    let url = this.state.settings.url;
+    if (!url) return;
     if(value && value.length){
       url += '?query={"invoice_label":{"$regex":"'+value+'", "$options" : "i" }}';
     }
-    console.log(url);
     this.serverRequest = aja()
        .method('get')
        .url(url)
        .on('200',
            (response) => {
              this.setState({
-               rows : response.details.slice(),
+               rows : response.details.slice(0, this.state.settings.defaultItems),
              });
            })
        .go();
-  }
-
-  componentDidMount() {
-      this.getData()
   }
 
   formatField(row, field, i){
@@ -96,16 +104,17 @@ class List extends Component {
   }
 
   onClickRow(e) {
-    return browserHistory.push(`#/plans/plans/edit/${e.target.id}`);
+    let { page, collection } = this.props;
+    return browserHistory.push(`#/${page}/${collection}/edit/${e.target.id}`);
   }
   
   render() {
-
+    let { settings } = this.state;
     let header = (
                   <TableHeader enableSelectAll = {this.state.enableSelectAll}>
                     <TableRow>
-                      <TableHeaderColumn>#</TableHeaderColumn>
-                      {this.props.settings.fields.map(function(field, i) {
+                      {/*<TableHeaderColumn>#</TableHeaderColumn>*/}
+                      {settings.fields.map(function(field, i) {
                           return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
                       })}
                     </TableRow>
@@ -114,8 +123,8 @@ class List extends Component {
 
     let rows = this.state.rows.map( (row, index) => (
               <TableRow key={index} selected={row.selected}>
-                <TableRowColumn><Link to={`/plans/plans/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>
-                { this.props.settings.fields.map((field, i) => {
+                {/*<TableRowColumn><Link to={`/plans/plans/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
+                { settings.fields.map((field, i) => {
                     return <TableRowColumn key={i}>{this.formatField(row, field, i)}</TableRowColumn>
                 })}
               </TableRow>
