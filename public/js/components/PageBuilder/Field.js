@@ -3,6 +3,7 @@ import DatePicker from 'material-ui/lib/date-picker/date-picker';
 import TextField from 'material-ui/lib/text-field';
 import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
+import TagsInput from 'react-tagsinput';
 
 class Field extends Component {
   constructor(props) {
@@ -60,6 +61,7 @@ class Field extends Component {
         </div>
       );
     } else if (type === "array") {
+      /*
       let { title, items } = field.array;
       let options = value[items].map((item, key) => {
         return (
@@ -73,6 +75,14 @@ class Field extends Component {
           <select className="form-control" value={value[items]} data-path={`${path}.${items}`} onChange={onChange} multiple="true">
             {options}
           </select>
+        </div>
+      );
+       */
+      let { title, items } = field.array;
+      return (
+        <div className={`col-md-${size}`}>
+          <label htmlFor={html_id}>{value[title]}</label>        
+          <TagsInput value={value[items]} onChange={onChange} />
         </div>
       );
     }

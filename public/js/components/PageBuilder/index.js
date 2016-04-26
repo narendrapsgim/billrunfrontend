@@ -12,6 +12,8 @@ import View from '../../view';
 import Field from './Field';
 import List from '../List';
 import Help from '../Help';
+import Collapsible from './Collapsible';
+
 import R from 'ramda';
 import _ from 'lodash';
 
@@ -147,25 +149,37 @@ class PageBuilder extends Component {
     }
     let value = _.result(this.props, path);
     if (Array.isArray(value) && _.isObject(value[0])) {
-      return value.map((elm, idx) => {
-        return this.createFieldHTML(field, `${path}[${idx}]`, idx);
-      });
+      return (
+        <div className="col-md-10">
+          <h4>{field.label}</h4>
+          <div>
+            {value.map((elm, idx) => {
+               return this.createFieldHTML(field, `${path}[${idx}]`, idx)})}
+          </div>
+        </div>
+      );
     } else if (field.fields) {
-      let ret = field.fields.map((field, field_idx) => {
+      let content = field.fields.map((field, field_idx) => {
         return this.createFieldHTML(field, `${path}.${field.dbkey}`, field_idx);
       });
       let label = field.label ?
                   field.label :
                   this.titlize(_.last(path.split('.')));
+      if (field.collapsible) {
+        return (
+          <Collapsible collapsed={field.collapsed} label={label} content={content} />
+        );
+      }
       return (
         <div className="col-md-10">
           <h4>{label}</h4>
           <div>
-            {ret}
+            {content}
           </div>
         </div>
       );
     }
+
     return (
       <Field field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
     ); 
