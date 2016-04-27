@@ -189,14 +189,14 @@ const plan_setup_tabs = [
 const View = {
   pages: {
     dashboard: {title: "Dashboard"},
-    rates: {
-      title: "Rates",
-      route: "rates/rates/list",
-      views: {
-        list: rates_list_view,
-        new: rates_new_view
-      }
-    },
+    /* rates: {
+       title: "Rates",
+       route: "rates/rates/list",
+       views: {
+       list: rates_list_view,
+       new: rates_new_view
+       }
+       }, */
     plans: {
       title: "Plans",
       route: "plans/plans/list",

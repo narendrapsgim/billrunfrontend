@@ -110,6 +110,7 @@ class List extends Component {
   
   render() {
     let { settings } = this.state;
+    let { page, collection } = this.props;
     let header = (
                   <TableHeader enableSelectAll = {this.state.enableSelectAll}>
                     <TableRow>
@@ -123,7 +124,7 @@ class List extends Component {
 
     let rows = this.state.rows.map( (row, index) => (
               <TableRow key={index} selected={row.selected}>
-                {/*<TableRowColumn><Link to={`/plans/plans/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
+                {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
                 { settings.fields.map((field, i) => {
                     return <TableRowColumn key={i}>{this.formatField(row, field, i)}</TableRowColumn>
                 })}
