@@ -58183,11 +58183,6 @@
 	      return props.params.page.replace(/-/g, '_').toLowerCase();
 	    }
 	  }, {
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      this.createNewItem(this.props);
-	    }
-	  }, {
 	    key: 'getCollectionItem',
 	    value: function getCollectionItem(props) {
 	      var pageName = this.getPageName(props);
@@ -58203,8 +58198,8 @@
 	      }
 	    }
 	  }, {
-	    key: 'createNewItem',
-	    value: function createNewItem(props) {
+	    key: 'setInitialState',
+	    value: function setInitialState(props) {
 	      var pageName = this.getPageName(props);
 	      var _props$params2 = props.params;
 	      var collection = _props$params2.collection;
@@ -58221,7 +58216,7 @@
 	        if (nextProps.params.action === "edit") {
 	          this.getCollectionItem(nextProps);
 	        } else {
-	          this.createNewItem(nextProps);
+	          this.setInitialState(nextProps);
 	        }
 	      }
 	    }

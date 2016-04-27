@@ -31,10 +31,6 @@ class PageBuilder extends Component {
     return props.params.page.replace(/-/g, '_').toLowerCase();
   }
   
-  componentWillMount() {
-    this.createNewItem(this.props);
-  }
-
   getCollectionItem(props) {
     let pageName = this.getPageName(props);
     let { collection, entity_id, action } = props.params;
@@ -45,7 +41,7 @@ class PageBuilder extends Component {
     }
   }
 
-  createNewItem(props) {
+  setInitialState(props) {
     let pageName = this.getPageName(props);
     let { collection, entity_id, action } = props.params;
     this.setState({collection, entity_id, pageName, action});
@@ -57,7 +53,7 @@ class PageBuilder extends Component {
       if (nextProps.params.action === "edit") {
         this.getCollectionItem(nextProps);
       } else {
-        this.createNewItem(nextProps);
+        this.setInitialState(nextProps);
       }
     }
   }
