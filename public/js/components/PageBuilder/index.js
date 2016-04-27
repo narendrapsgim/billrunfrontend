@@ -31,6 +31,13 @@ class PageBuilder extends Component {
     return props.params.page.replace(/-/g, '_').toLowerCase();
   }
   
+  componentWillMount() {
+    this.setInitialState(this.props);
+  }
+  componentDidMount() {
+    this.getCollectionItem(this.props);
+  }
+
   getCollectionItem(props) {
     let pageName = this.getPageName(props);
     let { collection, entity_id, action } = props.params;
@@ -56,10 +63,6 @@ class PageBuilder extends Component {
         this.setInitialState(nextProps);
       }
     }
-  }
-
-  componentDidMount() {
-    this.getCollectionItem(this.props);
   }
   
   onFieldChange(evt, index, value) {
@@ -278,10 +281,6 @@ class PageBuilder extends Component {
     );
   }
 }
-
-PageBuilder.propTypes = {
-
-};
 
 function mapStateToProps(state, ownProps) {
   let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();

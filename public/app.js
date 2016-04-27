@@ -57673,14 +57673,14 @@
 	var View = {
 	  pages: {
 	    dashboard: { title: "Dashboard" },
-	    rates: {
-	      title: "Rates",
-	      route: "rates/rates/list",
-	      views: {
-	        list: rates_list_view,
-	        new: rates_new_view
-	      }
-	    },
+	    /* rates: {
+	       title: "Rates",
+	       route: "rates/rates/list",
+	       views: {
+	       list: rates_list_view,
+	       new: rates_new_view
+	       }
+	       }, */
 	    plans: {
 	      title: "Plans",
 	      route: "plans/plans/list",
@@ -58127,7 +58127,7 @@
 	
 	var _view2 = _interopRequireDefault(_view);
 	
-	var _Field = __webpack_require__(/*! ./Field */ 407);
+	var _Field = __webpack_require__(/*! ./Field */ 406);
 	
 	var _Field2 = _interopRequireDefault(_Field);
 	
@@ -58143,7 +58143,7 @@
 	
 	var _Collapsible2 = _interopRequireDefault(_Collapsible);
 	
-	var _ramda = __webpack_require__(/*! ramda */ 485);
+	var _ramda = __webpack_require__(/*! ramda */ 486);
 	
 	var _ramda2 = _interopRequireDefault(_ramda);
 	
@@ -58183,6 +58183,16 @@
 	      return props.params.page.replace(/-/g, '_').toLowerCase();
 	    }
 	  }, {
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      this.setInitialState(this.props);
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.getCollectionItem(this.props);
+	    }
+	  }, {
 	    key: 'getCollectionItem',
 	    value: function getCollectionItem(props) {
 	      var pageName = this.getPageName(props);
@@ -58219,11 +58229,6 @@
 	          this.setInitialState(nextProps);
 	        }
 	      }
-	    }
-	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      this.getCollectionItem(this.props);
 	    }
 	  }, {
 	    key: 'onFieldChange',
@@ -58494,8 +58499,6 @@
 	
 	  return PageBuilder;
 	}(_react.Component);
-	
-	PageBuilder.propTypes = {};
 	
 	function mapStateToProps(state, ownProps) {
 	  var pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
@@ -59824,45 +59827,6 @@
 
 /***/ },
 /* 406 */
-/*!*****************************************************************!*\
-  !*** ./~/material-ui/lib/svg-icons/navigation/chevron-right.js ***!
-  \*****************************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _pure = __webpack_require__(/*! recompose/pure */ 327);
-	
-	var _pure2 = _interopRequireDefault(_pure);
-	
-	var _svgIcon = __webpack_require__(/*! ../../svg-icon */ 386);
-	
-	var _svgIcon2 = _interopRequireDefault(_svgIcon);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var NavigationChevronRight = function NavigationChevronRight(props) {
-	  return _react2.default.createElement(
-	    _svgIcon2.default,
-	    props,
-	    _react2.default.createElement('path', { d: 'M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z' })
-	  );
-	};
-	NavigationChevronRight = (0, _pure2.default)(NavigationChevronRight);
-	NavigationChevronRight.displayName = 'NavigationChevronRight';
-	
-	exports.default = NavigationChevronRight;
-
-/***/ },
-/* 407 */
 /*!***************************************************!*\
   !*** ./public/js/components/PageBuilder/Field.js ***!
   \***************************************************/
@@ -59882,7 +59846,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _datePicker = __webpack_require__(/*! material-ui/lib/date-picker/date-picker */ 408);
+	var _datePicker = __webpack_require__(/*! material-ui/lib/date-picker/date-picker */ 407);
 	
 	var _datePicker2 = _interopRequireDefault(_datePicker);
 	
@@ -60060,7 +60024,7 @@
 	exports.default = Field;
 
 /***/ },
-/* 408 */
+/* 407 */
 /*!******************************************************!*\
   !*** ./~/material-ui/lib/date-picker/date-picker.js ***!
   \******************************************************/
@@ -60082,11 +60046,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 409);
+	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 408);
 	
 	var _dateTime2 = _interopRequireDefault(_dateTime);
 	
-	var _datePickerDialog = __webpack_require__(/*! ./date-picker-dialog */ 410);
+	var _datePickerDialog = __webpack_require__(/*! ./date-picker-dialog */ 409);
 	
 	var _datePickerDialog2 = _interopRequireDefault(_datePickerDialog);
 	
@@ -60456,7 +60420,7 @@
 	exports.default = DatePicker;
 
 /***/ },
-/* 409 */
+/* 408 */
 /*!**********************************************!*\
   !*** ./~/material-ui/lib/utils/date-time.js ***!
   \**********************************************/
@@ -60677,7 +60641,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 4)))
 
 /***/ },
-/* 410 */
+/* 409 */
 /*!*************************************************************!*\
   !*** ./~/material-ui/lib/date-picker/date-picker-dialog.js ***!
   \*************************************************************/
@@ -60695,7 +60659,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 411);
+	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 410);
 	
 	var _reactEventListener2 = _interopRequireDefault(_reactEventListener);
 	
@@ -60703,7 +60667,7 @@
 	
 	var _keycode2 = _interopRequireDefault(_keycode);
 	
-	var _calendar = __webpack_require__(/*! ./calendar */ 412);
+	var _calendar = __webpack_require__(/*! ./calendar */ 411);
 	
 	var _calendar2 = _interopRequireDefault(_calendar);
 	
@@ -60723,7 +60687,7 @@
 	
 	var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 	
-	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 409);
+	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 408);
 	
 	var _dateTime2 = _interopRequireDefault(_dateTime);
 	
@@ -60925,7 +60889,7 @@
 	exports.default = DatePickerDialog;
 
 /***/ },
-/* 411 */
+/* 410 */
 /*!*********************************************!*\
   !*** ./~/react-event-listener/lib/index.js ***!
   \*********************************************/
@@ -61029,7 +60993,7 @@
 	exports.default = EventListener;
 
 /***/ },
-/* 412 */
+/* 411 */
 /*!***************************************************!*\
   !*** ./~/material-ui/lib/date-picker/calendar.js ***!
   \***************************************************/
@@ -61045,11 +61009,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 411);
+	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 410);
 	
 	var _reactEventListener2 = _interopRequireDefault(_reactEventListener);
 	
-	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 409);
+	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 408);
 	
 	var _dateTime2 = _interopRequireDefault(_dateTime);
 	
@@ -61061,15 +61025,15 @@
 	
 	var _transitions2 = _interopRequireDefault(_transitions);
 	
-	var _calendarMonth = __webpack_require__(/*! ./calendar-month */ 413);
+	var _calendarMonth = __webpack_require__(/*! ./calendar-month */ 412);
 	
 	var _calendarMonth2 = _interopRequireDefault(_calendarMonth);
 	
-	var _calendarYear = __webpack_require__(/*! ./calendar-year */ 417);
+	var _calendarYear = __webpack_require__(/*! ./calendar-year */ 416);
 	
 	var _calendarYear2 = _interopRequireDefault(_calendarYear);
 	
-	var _calendarToolbar = __webpack_require__(/*! ./calendar-toolbar */ 419);
+	var _calendarToolbar = __webpack_require__(/*! ./calendar-toolbar */ 418);
 	
 	var _calendarToolbar2 = _interopRequireDefault(_calendarToolbar);
 	
@@ -61081,7 +61045,7 @@
 	
 	var _slideIn2 = _interopRequireDefault(_slideIn);
 	
-	var _clearfix = __webpack_require__(/*! ../clearfix */ 415);
+	var _clearfix = __webpack_require__(/*! ../clearfix */ 414);
 	
 	var _clearfix2 = _interopRequireDefault(_clearfix);
 	
@@ -61420,7 +61384,7 @@
 	exports.default = Calendar;
 
 /***/ },
-/* 413 */
+/* 412 */
 /*!*********************************************************!*\
   !*** ./~/material-ui/lib/date-picker/calendar-month.js ***!
   \*********************************************************/
@@ -61436,15 +61400,15 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 409);
+	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 408);
 	
 	var _dateTime2 = _interopRequireDefault(_dateTime);
 	
-	var _dayButton = __webpack_require__(/*! ./day-button */ 414);
+	var _dayButton = __webpack_require__(/*! ./day-button */ 413);
 	
 	var _dayButton2 = _interopRequireDefault(_dayButton);
 	
-	var _clearfix = __webpack_require__(/*! ../clearfix */ 415);
+	var _clearfix = __webpack_require__(/*! ../clearfix */ 414);
 	
 	var _clearfix2 = _interopRequireDefault(_clearfix);
 	
@@ -61534,7 +61498,7 @@
 	exports.default = CalendarMonth;
 
 /***/ },
-/* 414 */
+/* 413 */
 /*!*****************************************************!*\
   !*** ./~/material-ui/lib/date-picker/day-button.js ***!
   \*****************************************************/
@@ -61556,7 +61520,7 @@
 	
 	var _transitions2 = _interopRequireDefault(_transitions);
 	
-	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 409);
+	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 408);
 	
 	var _dateTime2 = _interopRequireDefault(_dateTime);
 	
@@ -61717,7 +61681,7 @@
 	exports.default = DayButton;
 
 /***/ },
-/* 415 */
+/* 414 */
 /*!***************************************!*\
   !*** ./~/material-ui/lib/clearfix.js ***!
   \***************************************/
@@ -61735,7 +61699,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _beforeAfterWrapper = __webpack_require__(/*! ./before-after-wrapper */ 416);
+	var _beforeAfterWrapper = __webpack_require__(/*! ./before-after-wrapper */ 415);
 	
 	var _beforeAfterWrapper2 = _interopRequireDefault(_beforeAfterWrapper);
 	
@@ -61786,7 +61750,7 @@
 	exports.default = ClearFix;
 
 /***/ },
-/* 416 */
+/* 415 */
 /*!***************************************************!*\
   !*** ./~/material-ui/lib/before-after-wrapper.js ***!
   \***************************************************/
@@ -61944,7 +61908,7 @@
 	exports.default = BeforeAfterWrapper;
 
 /***/ },
-/* 417 */
+/* 416 */
 /*!********************************************************!*\
   !*** ./~/material-ui/lib/date-picker/calendar-year.js ***!
   \********************************************************/
@@ -61966,11 +61930,11 @@
 	
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 	
-	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 409);
+	var _dateTime = __webpack_require__(/*! ../utils/date-time */ 408);
 	
 	var _dateTime2 = _interopRequireDefault(_dateTime);
 	
-	var _yearButton = __webpack_require__(/*! ./year-button */ 418);
+	var _yearButton = __webpack_require__(/*! ./year-button */ 417);
 	
 	var _yearButton2 = _interopRequireDefault(_yearButton);
 	
@@ -62082,7 +62046,7 @@
 	exports.default = CalendarYear;
 
 /***/ },
-/* 418 */
+/* 417 */
 /*!******************************************************!*\
   !*** ./~/material-ui/lib/date-picker/year-button.js ***!
   \******************************************************/
@@ -62239,7 +62203,7 @@
 	exports.default = YearButton;
 
 /***/ },
-/* 419 */
+/* 418 */
 /*!***********************************************************!*\
   !*** ./~/material-ui/lib/date-picker/calendar-toolbar.js ***!
   \***********************************************************/
@@ -62255,23 +62219,23 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _iconButton = __webpack_require__(/*! ../icon-button */ 420);
+	var _iconButton = __webpack_require__(/*! ../icon-button */ 419);
 	
 	var _iconButton2 = _interopRequireDefault(_iconButton);
 	
-	var _toolbar = __webpack_require__(/*! ../toolbar/toolbar */ 423);
+	var _toolbar = __webpack_require__(/*! ../toolbar/toolbar */ 422);
 	
 	var _toolbar2 = _interopRequireDefault(_toolbar);
 	
-	var _toolbarGroup = __webpack_require__(/*! ../toolbar/toolbar-group */ 424);
+	var _toolbarGroup = __webpack_require__(/*! ../toolbar/toolbar-group */ 423);
 	
 	var _toolbarGroup2 = _interopRequireDefault(_toolbarGroup);
 	
-	var _chevronLeft = __webpack_require__(/*! ../svg-icons/navigation/chevron-left */ 425);
+	var _chevronLeft = __webpack_require__(/*! ../svg-icons/navigation/chevron-left */ 424);
 	
 	var _chevronLeft2 = _interopRequireDefault(_chevronLeft);
 	
-	var _chevronRight = __webpack_require__(/*! ../svg-icons/navigation/chevron-right */ 406);
+	var _chevronRight = __webpack_require__(/*! ../svg-icons/navigation/chevron-right */ 425);
 	
 	var _chevronRight2 = _interopRequireDefault(_chevronRight);
 	
@@ -62426,7 +62390,7 @@
 	exports.default = CalendarToolbar;
 
 /***/ },
-/* 420 */
+/* 419 */
 /*!******************************************!*\
   !*** ./~/material-ui/lib/icon-button.js ***!
   \******************************************/
@@ -62460,11 +62424,11 @@
 	
 	var _enhancedButton2 = _interopRequireDefault(_enhancedButton);
 	
-	var _fontIcon = __webpack_require__(/*! ./font-icon */ 421);
+	var _fontIcon = __webpack_require__(/*! ./font-icon */ 420);
 	
 	var _fontIcon2 = _interopRequireDefault(_fontIcon);
 	
-	var _tooltip = __webpack_require__(/*! ./tooltip */ 422);
+	var _tooltip = __webpack_require__(/*! ./tooltip */ 421);
 	
 	var _tooltip2 = _interopRequireDefault(_tooltip);
 	
@@ -62768,7 +62732,7 @@
 	exports.default = IconButton;
 
 /***/ },
-/* 421 */
+/* 420 */
 /*!****************************************!*\
   !*** ./~/material-ui/lib/font-icon.js ***!
   \****************************************/
@@ -62927,7 +62891,7 @@
 	exports.default = FontIcon;
 
 /***/ },
-/* 422 */
+/* 421 */
 /*!**************************************!*\
   !*** ./~/material-ui/lib/tooltip.js ***!
   \**************************************/
@@ -63127,7 +63091,7 @@
 	exports.default = Tooltip;
 
 /***/ },
-/* 423 */
+/* 422 */
 /*!**********************************************!*\
   !*** ./~/material-ui/lib/toolbar/toolbar.js ***!
   \**********************************************/
@@ -63255,7 +63219,7 @@
 	exports.default = Toolbar;
 
 /***/ },
-/* 424 */
+/* 423 */
 /*!****************************************************!*\
   !*** ./~/material-ui/lib/toolbar/toolbar-group.js ***!
   \****************************************************/
@@ -63487,7 +63451,7 @@
 	exports.default = ToolbarGroup;
 
 /***/ },
-/* 425 */
+/* 424 */
 /*!****************************************************************!*\
   !*** ./~/material-ui/lib/svg-icons/navigation/chevron-left.js ***!
   \****************************************************************/
@@ -63524,6 +63488,45 @@
 	NavigationChevronLeft.displayName = 'NavigationChevronLeft';
 	
 	exports.default = NavigationChevronLeft;
+
+/***/ },
+/* 425 */
+/*!*****************************************************************!*\
+  !*** ./~/material-ui/lib/svg-icons/navigation/chevron-right.js ***!
+  \*****************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _pure = __webpack_require__(/*! recompose/pure */ 327);
+	
+	var _pure2 = _interopRequireDefault(_pure);
+	
+	var _svgIcon = __webpack_require__(/*! ../../svg-icon */ 386);
+	
+	var _svgIcon2 = _interopRequireDefault(_svgIcon);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var NavigationChevronRight = function NavigationChevronRight(props) {
+	  return _react2.default.createElement(
+	    _svgIcon2.default,
+	    props,
+	    _react2.default.createElement('path', { d: 'M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z' })
+	  );
+	};
+	NavigationChevronRight = (0, _pure2.default)(NavigationChevronRight);
+	NavigationChevronRight.displayName = 'NavigationChevronRight';
+	
+	exports.default = NavigationChevronRight;
 
 /***/ },
 /* 426 */
@@ -64043,7 +64046,7 @@
 	
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 	
-	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 411);
+	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 410);
 	
 	var _reactEventListener2 = _interopRequireDefault(_reactEventListener);
 	
@@ -65070,7 +65073,7 @@
 	
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 	
-	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 411);
+	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 410);
 	
 	var _reactEventListener2 = _interopRequireDefault(_reactEventListener);
 	
@@ -66990,7 +66993,7 @@
 	
 	var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
 	
-	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 411);
+	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 410);
 	
 	var _reactEventListener2 = _interopRequireDefault(_reactEventListener);
 	
@@ -67894,7 +67897,7 @@
 	
 	var _menu2 = _interopRequireDefault(_menu);
 	
-	var _clearfix = __webpack_require__(/*! ../clearfix */ 415);
+	var _clearfix = __webpack_require__(/*! ../clearfix */ 414);
 	
 	var _clearfix2 = _interopRequireDefault(_clearfix);
 	
@@ -69816,7 +69819,7 @@
 	
 	var _enhancedButton2 = _interopRequireDefault(_enhancedButton);
 	
-	var _iconButton = __webpack_require__(/*! ../icon-button */ 420);
+	var _iconButton = __webpack_require__(/*! ../icon-button */ 419);
 	
 	var _iconButton2 = _interopRequireDefault(_iconButton);
 	
@@ -71143,6 +71146,9 @@
 	      var _this3 = this;
 	
 	      var settings = this.state.settings;
+	      var _props3 = this.props;
+	      var page = _props3.page;
+	      var collection = _props3.collection;
 	
 	      var header = _react2.default.createElement(
 	        _tableHeader2.default,
@@ -71636,7 +71642,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _tooltip = __webpack_require__(/*! ../tooltip */ 422);
+	var _tooltip = __webpack_require__(/*! ../tooltip */ 421);
 	
 	var _tooltip2 = _interopRequireDefault(_tooltip);
 	
@@ -72612,7 +72618,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 411);
+	var _reactEventListener = __webpack_require__(/*! react-event-listener */ 410);
 	
 	var _reactEventListener2 = _interopRequireDefault(_reactEventListener);
 	
@@ -74267,7 +74273,7 @@
 	
 	var _enhancedButton2 = _interopRequireDefault(_enhancedButton);
 	
-	var _fontIcon = __webpack_require__(/*! ./font-icon */ 421);
+	var _fontIcon = __webpack_require__(/*! ./font-icon */ 420);
 	
 	var _fontIcon2 = _interopRequireDefault(_fontIcon);
 	
@@ -74909,11 +74915,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _chevronRight = __webpack_require__(/*! material-ui/lib/svg-icons/navigation/chevron-right */ 406);
+	var _chevronRight = __webpack_require__(/*! material-ui/lib/svg-icons/navigation/chevron-right */ 425);
 	
 	var _chevronRight2 = _interopRequireDefault(_chevronRight);
 	
-	var _keyboardArrowDown = __webpack_require__(/*! material-ui/lib/svg-icons/hardware/keyboard-arrow-down */ 486);
+	var _keyboardArrowDown = __webpack_require__(/*! material-ui/lib/svg-icons/hardware/keyboard-arrow-down */ 485);
 	
 	var _keyboardArrowDown2 = _interopRequireDefault(_keyboardArrowDown);
 	
@@ -75001,6 +75007,45 @@
 
 /***/ },
 /* 485 */
+/*!*********************************************************************!*\
+  !*** ./~/material-ui/lib/svg-icons/hardware/keyboard-arrow-down.js ***!
+  \*********************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _pure = __webpack_require__(/*! recompose/pure */ 327);
+	
+	var _pure2 = _interopRequireDefault(_pure);
+	
+	var _svgIcon = __webpack_require__(/*! ../../svg-icon */ 386);
+	
+	var _svgIcon2 = _interopRequireDefault(_svgIcon);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var HardwareKeyboardArrowDown = function HardwareKeyboardArrowDown(props) {
+	  return _react2.default.createElement(
+	    _svgIcon2.default,
+	    props,
+	    _react2.default.createElement('path', { d: 'M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z' })
+	  );
+	};
+	HardwareKeyboardArrowDown = (0, _pure2.default)(HardwareKeyboardArrowDown);
+	HardwareKeyboardArrowDown.displayName = 'HardwareKeyboardArrowDown';
+	
+	exports.default = HardwareKeyboardArrowDown;
+
+/***/ },
+/* 486 */
 /*!*******************************!*\
   !*** ./~/ramda/dist/ramda.js ***!
   \*******************************/
@@ -83791,45 +83836,6 @@
 	
 	}.call(this));
 
-
-/***/ },
-/* 486 */
-/*!*********************************************************************!*\
-  !*** ./~/material-ui/lib/svg-icons/hardware/keyboard-arrow-down.js ***!
-  \*********************************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _pure = __webpack_require__(/*! recompose/pure */ 327);
-	
-	var _pure2 = _interopRequireDefault(_pure);
-	
-	var _svgIcon = __webpack_require__(/*! ../../svg-icon */ 386);
-	
-	var _svgIcon2 = _interopRequireDefault(_svgIcon);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var HardwareKeyboardArrowDown = function HardwareKeyboardArrowDown(props) {
-	  return _react2.default.createElement(
-	    _svgIcon2.default,
-	    props,
-	    _react2.default.createElement('path', { d: 'M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z' })
-	  );
-	};
-	HardwareKeyboardArrowDown = (0, _pure2.default)(HardwareKeyboardArrowDown);
-	HardwareKeyboardArrowDown.displayName = 'HardwareKeyboardArrowDown';
-	
-	exports.default = HardwareKeyboardArrowDown;
 
 /***/ }
 /******/ ]);
