@@ -3,20 +3,29 @@ import DatePicker from 'material-ui/lib/date-picker/date-picker';
 import TextField from 'material-ui/lib/text-field';
 import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
+import TagsInput from 'react-tagsinput';
 
 class Field extends Component {
   constructor(props) {
     super(props);
-    /* this.getOptions = this.getOptions.bind(this); */
+    this.state = { path: "" };
+    this.onTagsChange = this.onTagsChange.bind(this);
   }
-  /* 
-     getOptions(path) {
-     let arr = _.result(this.props, path);
-     if (!arr) return [];
-     return arr.map(elm => {
-     return {value: elm, label: elm};
-     });
-     } */
+
+  onTagsChange(val) {
+    let evt = {
+      target: { dataset: { path: this.state.path } }
+    };
+    this.props.onChange(evt, 0, val);
+  }
+
+  /** HACKITY HACK!! **/
+  componentDidMount() {
+    if (this.props.field.type === "array") {
+      let { path, field: { array: { items } } } = this.props;
+      this.setState({path: `${path}.${items}`});
+    }
+  }
   
   createInputTag(field = {}) {
     let { value, onChange, path } = this.props;
@@ -61,18 +70,10 @@ class Field extends Component {
       );
     } else if (type === "array") {
       let { title, items } = field.array;
-      let options = value[items].map((item, key) => {
-        return (
-          <option value={item} key={key}>{item}</option>
-        );
-      });
-
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={html_id}>{value[title]}</label>
-          <select className="form-control" value={value[items]} data-path={`${path}.${items}`} onChange={onChange} multiple="true">
-            {options}
-          </select>
+          <label htmlFor={html_id}>{value[title]}</label>        
+          <TagsInput value={value[items]} onChange={this.onTagsChange} />
         </div>
       );
     }

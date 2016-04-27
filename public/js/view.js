@@ -82,28 +82,28 @@ const plan_edit_view = {
       [
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
         { dbkey: "technical_name", label: "Technical Name", size: 10 },
-        /* { dbkey: "params", label: "Params",
-           fields:
-           [
-           { dbkey: "destination", label: "Destination", type: "array",
-           array: {
-           title: "region",
-           items: "prefix"
-           }
-           }
-           ]
-           }, */
-        /* { dbkey: "options", label: "Options", fields:
-           [
-           { dbkey: "*", collapsible: true, collapsed: true,
-           fields:
-           [
-           { dbkey: "name", label: "Name", type: "text" },
-           { dbkey: "price", label: "Price", type: "number" },
-           ]
-           }
-           ]
-           } */
+        { dbkey: "params", label: "Params",
+          fields:
+          [
+            { dbkey: "destination", label: "Destination", type: "array",
+              array: {
+                title: "region",
+                items: "prefix"
+              }
+            }
+          ]
+        },
+        { dbkey: "options", label: "Options", collapsible: true, fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "name", label: "Name", type: "text" },
+                { dbkey: "price", label: "Price", type: "number" },
+              ]
+            }
+          ]
+        }
       ]
     }
   ]
