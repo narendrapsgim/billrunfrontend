@@ -27386,11 +27386,9 @@
 	}
 	
 	function fetchItem(collection, item_id) {
-	  console.log('http://billrun/api/' + collection + '?query={id: ' + item_id + '}');
 	  return function (dispatch) {
 	    (0, _aja2.default)().url('http://billrun/api/' + collection + '?query={id: ' + item_id + '}').on('success', function (resp) {
 	      dispatch(gotItem(resp.details[0], collection));
-	      //dispatch(gotItem(item, collection));
 	    }).go();
 	  };
 	}

@@ -37,13 +37,11 @@ function gotItem(item, page_name) {
 }
 
 function fetchItem(collection, item_id) {
-  console.log(`http://billrun/api/${collection}?query={id: ${item_id}}`);
   return dispatch => {
     aja()
       .url(`http://billrun/api/${collection}?query={id: ${item_id}}`)
       .on('success', resp => {
         dispatch(gotItem(resp.details[0], collection));
-        //dispatch(gotItem(item, collection));
       })
       .go();
   };
