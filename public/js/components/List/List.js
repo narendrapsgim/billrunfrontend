@@ -118,41 +118,40 @@ class List extends Component {
   }
 
   buildSearchQuery(){
-
     //5000000429,5000000986
-    let query = '';
-    let filters = {};
+    let queryString = '';
+    let queryArgs = {};
 
     for ( const key in this.state.filters ) {
       if(this.state.filters[key].length){
         let filterSetting = this.getFieldSettings(key);
         if(filterSetting){
           if(filterSetting.filterType && filterSetting.filterType == 'query' ){
-              filters[key] = {
+              queryArgs[key] = {
                 "$regex" : this.state.filters[key],
                 "$options" : "i"
               };
           } else {
-            query += '&' + key + "=" + this.state.filters[key];
+            queryString += '&' + key + "=" + this.state.filters[key];
           }
         }
       }
     }
 
-    if(!_.isEmpty(filters)){
-      query += '&query=' +  JSON.stringify(filters);
+    if(!_.isEmpty(queryArgs)){
+      queryString += '&query=' +  JSON.stringify(queryArgs);
     }
 
     if(_.isObject(this.props.settings.pagination) && _.isInteger(this.props.settings.pagination.itemsPerPage ) && this.props.settings.pagination.itemsPerPage > -1){
-      query += '&size=' + this.props.settings.pagination.itemsPerPage + '&page=' + parseInt(this.state.currentPage);
+      queryString += '&size=' + this.props.settings.pagination.itemsPerPage + '&page=' + parseInt(this.state.currentPage);
     }
 
-    if(query.startsWith('&')){
-      query = query.replace('&','?');
+    if(queryString.startsWith('&')){
+      queryString = queryString.replace('&','?');
     } else {
-      query = '?' + query;
+      queryString = '?' + queryString;
     }
-    return query;
+    return queryString;
   }
 
   getData(query) {
