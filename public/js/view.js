@@ -50,6 +50,26 @@ const plans_list_view = {
   } ]
 };
 
+const rates_list_view = {
+  title: "Rates",
+  view_type: "list",
+  sections: [ {
+    title: "",
+    lists: [ {
+      url: 'http://billrun/api/rates',
+      fields: [
+        {key: 'key', label: 'Key'},
+        {key: 'type', label: 'Type'},
+        {key: 'zone', label: 'Zone'}
+      ],
+      defaultWidth: 50,
+      defaultMinWidth: 50,
+      defaultItems: 20,
+      defaultSort: 'key'
+    } ]
+  } ]
+};
+
 const plan_new_view = {
   title: "New Plan",
   view_type: "sections",
@@ -58,10 +78,23 @@ const plan_new_view = {
       display: "inline",
       fields: [
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
-        { dbkey: "test", label: "Test", size: 10, type: "select", options: [
-          { label: "Option 1", value: "option_1" },
-          { label: "Option 2", value: "option_2" }
-        ] }
+        /* { dbkey: "test", label: "Test", size: 10, type: "select", options: [
+           { label: "Option 1", value: "option_1" },
+           { label: "Option 2", value: "option_2" }
+           ] } */
+      ]
+    }
+  ]
+};
+
+const rates_new_view = {
+  title: "New Rate",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { dbkey: "key", label: "Key", size: 10, mandatory: true }
       ]
     }
   ]
@@ -78,19 +111,24 @@ const plan_edit_view = {
       [
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
         { dbkey: "technical_name", label: "Technical Name", size: 10 },
-        // { dbkey: "params", label: "Params",
-        //   fields:
-        //   [
-        //     { dbkey: "destination", label: "Destination", type: "array", size: 10 }
-        //   ]
-        // },
-        { dbkey: "options", label: "Options", fields:
+        { dbkey: "params", label: "Params",
+          fields:
+          [
+            { dbkey: "destination", label: "Destination", type: "array",
+              array: {
+                title: "region",
+                items: "prefix"
+              }
+            }
+          ]
+        },
+        { dbkey: "options", label: "Options", collapsible: true, fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:
               [
                 { dbkey: "name", label: "Name", type: "text" },
-                { dbkey: "price", label: "Price", type: "number" }
+                { dbkey: "price", label: "Price", type: "number" },
               ]
             }
           ]
@@ -180,8 +218,16 @@ const plan_setup_tabs = [
 const View = {
   pages: {
     dashboard: {title: "Dashboard"},
+    /* rates: {
+       title: "Rates",
+       route: "rates/rates/list",
+       views: {
+       list: rates_list_view,
+       new: rates_new_view
+       }
+       }, */
     plans: {
-      title: "Plans and Items",
+      title: "Plans",
       route: "plans/plans/list",
       views: {
         list: plans_list_view,

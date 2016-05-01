@@ -69,8 +69,20 @@ class List extends Component {
       snackbarOpen : false,
       snackbarMessage : '',
       currentPage : 1,
-      totalPages : 1
+      totalPages : 1,
+      settings: {}
     };
+  }
+
+  componentWillMount() {
+    let { settings } = this.props;
+    this.setState({settings});
+    this.getData();
+  }
+  componentWillReceiveProps(nextProps) {
+    let { settings } = nextProps;
+    this.setState({settings});
+    this.getData();
   }
 
   getFieldSettings(key){
@@ -81,10 +93,9 @@ class List extends Component {
     })
     return (matchFields.length) ? matchFields[0] : false ;
   }
-
   buttonClick(e) {
-    //this.getData();
-    this.context.router.push("/plans/plans/new");
+    let { page, collection } = this.props;
+    this.context.router.push(`/${page}/${collection}/new`);
   }
   updateTableData(){
     this.getData(this.buildSearchQuery());
@@ -155,11 +166,11 @@ class List extends Component {
   }
 
   getData(query) {
-    var url = this.props.settings.url;
+    let url = this.state.settings.url;
+    if (!url) return;
     if(query && query.length){
       url += query;
     }
-    console.log(url);
     this.serverRequest = aja()
        .method('get')
        .url(url)
@@ -167,7 +178,7 @@ class List extends Component {
          (response) => {
            if(response && response.status){
              this.setState({
-               rows : response.details.slice(),
+               rows : response.details.slice(0, this.state.settings.defaultItems),
                totalPages : 10
              });
            } else {
@@ -175,10 +186,6 @@ class List extends Component {
            }
            })
        .go();
-  }
-
-  componentDidMount() {
-      this.getData()
   }
 
   handleError(data){
@@ -211,7 +218,8 @@ class List extends Component {
   }
 
   onClickRow(e) {
-    return browserHistory.push(`#/plans/plans/edit/${e.target.id}`);
+    let { page, collection } = this.props;
+    return browserHistory.push(`#/${page}/${collection}/edit/${e.target.id}`);
   }
 
   handleRequestClose(){
@@ -222,7 +230,8 @@ class List extends Component {
   };
 
   render() {
-
+    let { settings } = this.state;
+    let { page, collection } = this.props;
     let filters = (
         this.props.settings.fields.map((field, i) => {
           if(field.filter && field.filter == true){
@@ -240,6 +249,7 @@ class List extends Component {
     let header = (
                   <TableHeader enableSelectAll = {this.state.enableSelectAll}>
                     <TableRow>
+                      {/*<TableHeaderColumn>#</TableHeaderColumn>*/}
                       {this.props.settings.fields.map(function(field, i) {
                         if( !(field.hidden  && field.hidden == true) ){
                           return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
@@ -251,7 +261,7 @@ class List extends Component {
 
     let rows = this.state.rows.map( (row, index) => (
               <TableRow key={index} selected={row.selected}>
-                {/*}<TableRowColumn><Link to={`/plans/plans/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
+                {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
                 { this.props.settings.fields.map((field, i) => {
                   if( !(field.hidden  && field.hidden == true) ){
                     return <TableRowColumn style={styles.tableCell} key={i}>{this.formatField(row, field, i)}</TableRowColumn>

@@ -12,6 +12,8 @@ import View from '../../view';
 import Field from './Field';
 import List from '../List';
 import Help from '../Help';
+import Collapsible from './Collapsible';
+
 import R from 'ramda';
 import _ from 'lodash';
 
@@ -30,7 +32,10 @@ class PageBuilder extends Component {
   }
   
   componentWillMount() {
-    this.createNewItem(this.props);
+    this.setInitialState(this.props);
+  }
+  componentDidMount() {
+    this.getCollectionItem(this.props);
   }
 
   getCollectionItem(props) {
@@ -43,7 +48,7 @@ class PageBuilder extends Component {
     }
   }
 
-  createNewItem(props) {
+  setInitialState(props) {
     let pageName = this.getPageName(props);
     let { collection, entity_id, action } = props.params;
     this.setState({collection, entity_id, pageName, action});
@@ -55,18 +60,15 @@ class PageBuilder extends Component {
       if (nextProps.params.action === "edit") {
         this.getCollectionItem(nextProps);
       } else {
-        this.createNewItem(nextProps);
+        this.setInitialState(nextProps);
       }
     }
   }
-
-  componentDidMount() {
-    this.getCollectionItem(this.props);
-  }
   
-  onFieldChange(evt) {
+  onFieldChange(evt, index, value) {
+    if (!value && evt.target) value = evt.target.value
     let { dispatch } = this.props;
-    let [ path, value ] = [ evt.target.dataset.path, evt.target.value ];
+    let path = evt.target.dataset.path;
     dispatch(updateFieldValue(path, value, this.getPageName()));
   }
 
@@ -147,25 +149,37 @@ class PageBuilder extends Component {
     }
     let value = _.result(this.props, path);
     if (Array.isArray(value) && _.isObject(value[0])) {
-      return value.map((elm, idx) => {
-        return this.createFieldHTML(field, `${path}[${idx}]`, idx);
-      });
+      return (
+        <div className="col-md-10">
+          <h4>{field.label}</h4>
+          <div>
+            {value.map((elm, idx) => {
+               return this.createFieldHTML(field, `${path}[${idx}]`, idx)})}
+          </div>
+        </div>
+      );
     } else if (field.fields) {
-      let ret = field.fields.map((field, field_idx) => {
+      let content = field.fields.map((field, field_idx) => {
         return this.createFieldHTML(field, `${path}.${field.dbkey}`, field_idx);
       });
       let label = field.label ?
                   field.label :
                   this.titlize(_.last(path.split('.')));
+      if (field.collapsible) {
+        return (
+          <Collapsible collapsed={field.collapsed} label={label} content={content} />
+        );
+      }
       return (
-        <div className="col-md-10">
+        <div className="col-md-10" style={{marginBottom: "15px"}}>
           <h4>{label}</h4>
           <div>
-            {ret}
+            {content}
           </div>
         </div>
       );
     }
+
     return (
       <Field field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
     ); 
@@ -184,7 +198,10 @@ class PageBuilder extends Component {
       if(section.lists){
         output = section.lists.map((list, idx) => {
           return (
-            <List settings={list} key={idx}/>
+            <List settings={list}
+                  page={this.props.params.page}
+                  collection={this.props.params.collection}
+                  key={idx} />
           );
         });
       }
@@ -257,7 +274,6 @@ class PageBuilder extends Component {
 
     return (
       <div>
-        {/*<Link to="plans/plans/edit/123">To Plan</Link>*/}
         <h3>{title}</h3>
         {sectionsHTML}
         {this.actionButtons()}
@@ -265,10 +281,6 @@ class PageBuilder extends Component {
     );
   }
 }
-
-PageBuilder.propTypes = {
-
-};
 
 function mapStateToProps(state, ownProps) {
   let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
