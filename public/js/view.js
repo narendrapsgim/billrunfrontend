@@ -1,10 +1,12 @@
+import globalSetting from './globalSetting';
+
 const lines_list_view = {
   title : "Items",
   view_type : "list",
   sections : [ {
     title : "",
     lists : [ {
-      url : 'http://billrunmt.local/api/query',
+      url : globalSetting.serverUrl + '/api/query',
       fields : [
         {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
         {key : 'aid', label : 'AID', filter : true}, // aid=5000000476
@@ -31,7 +33,7 @@ const plans_list_view = {
   sections : [ {
     title : "",
     lists : [ {
-      url : 'http://billrunmt.local/api/plans',
+      url : globalSetting.serverUrl + '/api/plans',
       fields : [
         {key : 'invoice_label', label : 'Label', filter : true, required : true , filterType : 'query'},
         {key : 'invoice_type', label : 'Type'},
@@ -56,7 +58,7 @@ const rates_list_view = {
   sections: [ {
     title: "",
     lists: [ {
-      url: 'http://billrun/api/rates',
+      url: globalSetting.serverUrl + '/api/rates',
       fields: [
         {key: 'key', label: 'Key'},
         {key: 'type', label: 'Type'},
