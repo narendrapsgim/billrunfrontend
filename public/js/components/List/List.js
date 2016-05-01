@@ -174,22 +174,27 @@ class List extends Component {
     this.serverRequest = aja()
        .method('get')
        .url(url)
-       .on('200',
-         (response) => {
-           if(response && response.status){
-             this.setState({
-               rows : response.details.slice(0, this.state.settings.defaultItems),
-               totalPages : 10
-             });
-           } else {
-             this.handleError(response);
-           }
-           })
+       .on('success', (response) => {
+         if(response && response.status){
+          this.setState({
+             rows : response.details.slice(0, this.state.settings.defaultItems),
+             totalPages : 10
+           });
+         } else {
+           this.handleError(response);
+         }
+       })
+       .on('timeout', (response) => {
+          this.handleError(response);
+        })
+       .on('error', (response) => {
+          this.handleError(response);
+        })
        .go();
   }
 
   handleError(data){
-    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error';
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
     this.setState({
       snackbarOpen: true,
       snackbarMessage: errorMessage,
