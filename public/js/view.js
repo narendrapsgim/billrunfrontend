@@ -1,22 +1,53 @@
-const plans_list_view = {
-  title: "Plans",
-  view_type: "list",
-  sections: [ {
-    title: "",
-    lists: [ {
-      url: 'http://billrun/api/plans',
-      fields: [
-        {key: 'invoice_label', label: 'Label'},
-        {key: 'invoice_type', label: 'Type'},
-        {key: 'grouping', label: 'Grouping'},
-        {key: 'price', label: 'Price', type: 'price'},
-        {key: 'forceCommitment', label: 'Force Commitment', type: 'boolean'},
-        {key: 'key', label: 'Key'},
+import globalSetting from './globalSetting';
+
+const lines_list_view = {
+  title : "Items",
+  view_type : "list",
+  sections : [ {
+    title : "",
+    lists : [ {
+      url : globalSetting.serverUrl + '/api/query',
+      fields : [
+        {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
+        {key : 'aid', label : 'AID', filter : true}, // aid=5000000476
+        {key : 'sid', label : 'SID', filter : true},
+        {key : 'service_name', label : 'Service Name'},
+        {key : 'service_type', label : 'Service Type'},
+        {key : 'plan', label : 'plan'},
+        {key : 'type', label : 'Type'},
+        {key : 'urt', label : 'URT',  type : 'urt'},
       ],
-      defaultWidth: 50,
-      defaultMinWidth: 50,
-      defaultItems: 20,
-      defaultSort: 'type'
+      pagination : {
+        itemsPerPage : 5,
+      },
+      defaults : {
+        tableHeight : '500px',
+      }
+    } ]
+  } ]
+};
+
+const plans_list_view = {
+  title : "Plans",
+  view_type : "list",
+  sections : [ {
+    title : "",
+    lists : [ {
+      url : globalSetting.serverUrl + '/api/plans',
+      fields : [
+        {key : 'invoice_label', label : 'Label', filter : true, required : true , filterType : 'query'},
+        {key : 'invoice_type', label : 'Type'},
+        {key : 'grouping', label : 'Grouping'},
+        {key : 'price', label : 'Price', type : 'price', filter : true , filterType : 'query'},
+        {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
+        {key : 'key', label : 'Key'},
+      ],
+      pagination : {
+        itemsPerPage : 5,
+      },
+      defaults : {
+        tableHeight : '700px',
+      }
     } ]
   } ]
 };
@@ -27,7 +58,7 @@ const rates_list_view = {
   sections: [ {
     title: "",
     lists: [ {
-      url: 'http://billrun/api/rates',
+      url: globalSetting.serverUrl + '/api/rates',
       fields: [
         {key: 'key', label: 'Key'},
         {key: 'type', label: 'Type'},
@@ -169,7 +200,7 @@ const plan_setup_tabs = [
             size: 1 },
           { label: "Validity",
             type: "date",
-            dbkey: "from", 
+            dbkey: "from",
             size: 3 },
           { type: "date",
             dbkey: "to",
@@ -204,6 +235,13 @@ const View = {
         list: plans_list_view,
         new: plan_new_view,
         edit: plan_edit_view
+      }
+    },
+    items: {
+      title: "Items",
+      route: "items/lines/list",
+      views: {
+        list: lines_list_view,
       }
     },
     plan_setup: {
