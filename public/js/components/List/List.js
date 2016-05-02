@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Table from 'material-ui/lib/table/table';
 import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
 import TableRow from 'material-ui/lib/table/table-row';
@@ -12,34 +13,40 @@ import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import IconBack from 'material-ui/lib/svg-icons/navigation/arrow-back';
 import IconForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 import ContentAdd from 'material-ui/lib/svg-icons/content/add';
+import BackIcon from 'material-ui/lib/svg-icons/navigation/arrow-back';
+import ForwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 import Divider from 'material-ui/lib/divider';
 import Snackbar from 'material-ui/lib/snackbar';
 import IconButton from 'material-ui/lib/icon-button';
 import RaisedButton from 'material-ui/lib/raised-button';
 import _ from 'lodash';
 import aja from 'aja';
+import { getList } from '../../actions';
+import SelectField from 'material-ui/lib/select-field';
+import MenuItem from 'material-ui/lib/menus/menu-item';
 
 import { Link, browserHistory } from 'react-router';
 
 const styles = {
-  paginationButton : {
-    margin : '10px',
-  },
-  paginationArrow : {
-    margin : '5px',
+  pagination : {
+    paginationBar : {
+      margin : '10px',
+    },
+    paginationButton : {
+      margin : '10px',
+    },
   },
   table : {
     tableLayout : 'auto',
-  },
-  summaryTitle : {
-    display : 'inline',
-    marginRight : '10px'
   },
   filterInput : {
     margin : '10px',
   },
   tableCell : {
     textOverflow : 'clip',
+  },
+  addButton : {
+    margin : '10px'
   }
 };
 
@@ -47,11 +54,11 @@ class List extends Component {
   constructor(props) {
     super(props);
     this.buttonClick = this.buttonClick.bind(this);
-    this.paginationButton = this.paginationButton.bind(this);
     this.updateTableData = this.updateTableData.bind(this);
     this.getData = _.debounce(this.getData.bind(this),1000);
     this.filterData = this.filterData.bind(this);
     this.handleRequestClose = this.handleRequestClose.bind(this);
+    this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
 
     this.state = {
@@ -101,29 +108,12 @@ class List extends Component {
     this.getData(this.buildSearchQuery());
   }
 
-  paginationButton(e) {
-    console.log("e.currentTarget.value : ", e.currentTarget.value);
-    let page = this.state.currentPage;
-    let value = e.currentTarget.value;
-
-    if(_.isInteger(parseInt(value))){
-      page = parseInt(value);
-    } else if(value == 'back' && page > 0){
-      page --;
-    } else if(value == 'forward' && page < 9){
-      page++;
-    }
-
-    this.setState({
-      currentPage: page,
-    }, this.updateTableData);
-  }
-
   filterData(e, value) {
     let filters = Object.assign({}, this.state.filters);
     filters[e.target.name] = value;
     this.setState({
       filters : filters,
+      currentPage : 1
     }, this.updateTableData);
 
   }
@@ -133,11 +123,11 @@ class List extends Component {
     let queryString = '';
     let queryArgs = {};
 
-    for ( const key in this.state.filters ) {
+    for ( let key in this.state.filters ) {
       if(this.state.filters[key].length){
         let filterSetting = this.getFieldSettings(key);
         if(filterSetting){
-          if(filterSetting.filterType && filterSetting.filterType == 'query' ){
+          if(filterSetting.filter && filterSetting.filter.filterType && filterSetting.filter.filterType == 'query' ){
               queryArgs[key] = {
                 "$regex" : this.state.filters[key],
                 "$options" : "i"
@@ -174,22 +164,28 @@ class List extends Component {
     this.serverRequest = aja()
        .method('get')
        .url(url)
-       .on('200',
-         (response) => {
-           if(response && response.status){
-             this.setState({
-               rows : response.details.slice(0, this.state.settings.defaultItems),
-               totalPages : 10
-             });
-           } else {
-             this.handleError(response);
-           }
-           })
+       .on('success', (response) => {
+         if(response && response.status){
+           let demoPageNums = Math.floor(Math.random() * (10 - parseInt(this.state.currentPage) + 1)) + parseInt(this.state.currentPage);
+           this.setState({
+              totalPages :  demoPageNums, // TEMP only for demonstration, need API to get or calculate page numbers
+              rows : response.details.slice(0, this.state.settings.defaultItems),
+           });
+         } else {
+           this.handleError(response);
+         }
+       })
+       .on('timeout', (response) => {
+          this.handleError(response);
+        })
+       .on('error', (response) => {
+          this.handleError(response);
+        })
        .go();
   }
 
   handleError(data){
-    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error';
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
     this.setState({
       snackbarOpen: true,
       snackbarMessage: errorMessage,
@@ -209,7 +205,7 @@ class List extends Component {
         output = row[field.key].$id;
         break;
       case 'urt':
-        output = new Date(row[field.key].sec*1000).toLocaleString();
+        output = (row[field.key].sec) ? new Date(row[field.key].sec*1000).toLocaleString() : '';
         break;
       default:
         output = row[field.key];
@@ -220,6 +216,23 @@ class List extends Component {
   onClickRow(e) {
     let { page, collection } = this.props;
     return browserHistory.push(`#/${page}/${collection}/edit/${e.target.id}`);
+  }
+
+  onPagintionClick(e){
+    let page = this.state.currentPage;
+    let value = e.currentTarget.value;
+
+    if(_.isInteger(parseInt(value))){
+      page = parseInt(value);
+    } else if(value == 'back' && page > 1){
+      page --;
+    } else if(value == 'forward' && page < this.state.totalPages){
+      page++;
+    }
+
+    this.setState({
+      currentPage : page
+    }, this.updateTableData);
   }
 
   handleRequestClose(){
@@ -234,13 +247,14 @@ class List extends Component {
     let { page, collection } = this.props;
     let filters = (
         this.props.settings.fields.map((field, i) => {
-          if(field.filter && field.filter == true){
+          if(field.filter){
             return <TextField
               style={styles.filterInput}
               key={i} name={field.key}
               hintText={"enter " + field.label + "..."}
               floatingLabelText={"Search by " + field.label}
               errorText=""
+              defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
               onChange={this.filterData} />
           }
         })
@@ -260,21 +274,74 @@ class List extends Component {
     );
 
     let rows = this.state.rows.map( (row, index) => (
-              <TableRow key={index} selected={row.selected}>
-                {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
-                { this.props.settings.fields.map((field, i) => {
-                  if( !(field.hidden  && field.hidden == true) ){
-                    return <TableRowColumn style={styles.tableCell} key={i}>{this.formatField(row, field, i)}</TableRowColumn>
-                  }
-                })}
-              </TableRow>
+          <TableRow key={index} selected={row.selected}>
+            {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
+            { this.props.settings.fields.map((field, i) => {
+              if( !(field.hidden  && field.hidden == true) ){
+                return <TableRowColumn style={styles.tableCell} key={i}>{this.formatField(row, field, i)}</TableRowColumn>
+              }
+            })}
+          </TableRow>
     ));
+
+    const getPager = () => {
+      let pages = [];
+      if(this.state.totalPages > 1) {
+        pages.push(
+          <FloatingActionButton
+            key='back'
+            mini={true}
+            style={styles.pagination.paginationButton}
+            onClick={this.onPagintionClick}
+            value='back'
+            secondary={this.state.currentPage == i}
+          >
+          <BackIcon />
+          </FloatingActionButton>
+        );
+
+        for (var i = 1; i <= this.state.totalPages; i++) {
+          pages.push(
+            <FloatingActionButton
+              key={i}
+              mini={true}
+              style={styles.pagination.paginationButton}
+              onClick={this.onPagintionClick}
+              value={i}
+              secondary={this.state.currentPage == i}
+            >
+            {i}
+          </FloatingActionButton>)
+        }
+        pages.push(
+          <FloatingActionButton
+            key='forward'
+            mini={true}
+            style={styles.pagination.paginationButton}
+            onClick={this.onPagintionClick}
+            value='forward'
+            secondary={this.state.currentPage == i}
+          >
+          <ForwardIcon />
+          </FloatingActionButton>
+        );
+
+        return (
+          <div>
+            <div style={styles.pagination.paginationBar}>{pages}</div>
+            <Divider />
+          </div>
+        )
+      }
+      return ('');
+    }
 
     let footer = (
                 <TableFooter>
                   <TableRow>
                     <TableRowColumn colSpan="3" style={{textAlign: 'center'}}>
-                      <FloatingActionButton style={styles.plusButton} onMouseUp={this.buttonClick}>
+                      {getPager()}
+                      <FloatingActionButton style={styles.addButton} onMouseUp={this.buttonClick}>
                         <ContentAdd />
                       </FloatingActionButton>
                     </TableRowColumn>
@@ -286,18 +353,16 @@ class List extends Component {
       <div>
         <Divider />
         <div>
-          <h4 style={styles.summaryTitle}>Plans Summary</h4>
-          {filters}
+            {filters}
         </div>
         <Table
-          bodyStyle={{width: '-fit-content'}}
           height = { this.state.height }
           allRowsSelected = {false}
           fixedHeader = {this.state.fixedHeader}
           fixedFooter = { this.state.fixedFooter }
           selectable = { this.state.selectable }
           multiSelectable = { this.state.multiSelectable }
-          onRowSelection = {this._onRowSelection}
+          className="braasList"
         >
         {header}
         <TableBody

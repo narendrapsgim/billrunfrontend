@@ -96,3 +96,8 @@ body {
   padding: 5px;
   width: 80px;
 }
+
+.braasList > tbody > tr:nth-child(odd) > td,
+.braasList > tbody > tr:nth-child(odd) > th {
+    background-color: #BBDEFB!important;
+}

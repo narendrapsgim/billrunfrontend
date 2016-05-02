@@ -1,5 +1,5 @@
 const GlobalSetting = {
-  serverUrl : "http://billrun.local"
+  serverUrl : "http://billrunmt.local"
 }
 
 export default GlobalSetting;
