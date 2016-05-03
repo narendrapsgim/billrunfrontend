@@ -1,7 +1,13 @@
 body {
     background-color: #C0C0C0;
+    font-family: Roboto, sans-serif;
 }
 
+/* temp Overide bootstrap CSS*/
+label {
+    font-weight: normal;
+}
+/* temp Overide bootstrap CSS*/
 .navbar-inverse,
 .footer {
     background-color: #272A39!important;

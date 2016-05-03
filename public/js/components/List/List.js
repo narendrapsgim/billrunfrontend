@@ -1,33 +1,30 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Table from 'material-ui/lib/table/table';
-import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
-import TableRow from 'material-ui/lib/table/table-row';
 import TableHeader from 'material-ui/lib/table/table-header';
-import TableRowColumn from 'material-ui/lib/table/table-row-column';
+import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
 import TableBody from 'material-ui/lib/table/table-body';
+import TableRow from 'material-ui/lib/table/table-row';
+import TableRowColumn from 'material-ui/lib/table/table-row-column';
 import TableFooter from 'material-ui/lib/table/table-footer';
 import TextField from 'material-ui/lib/text-field';
-import Toggle from 'material-ui/lib/toggle';
 import FloatingActionButton from 'material-ui/lib/floating-action-button';
-import IconBack from 'material-ui/lib/svg-icons/navigation/arrow-back';
-import IconForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 import ContentAdd from 'material-ui/lib/svg-icons/content/add';
 import BackIcon from 'material-ui/lib/svg-icons/navigation/arrow-back';
 import ForwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 import Divider from 'material-ui/lib/divider';
 import Snackbar from 'material-ui/lib/snackbar';
-import IconButton from 'material-ui/lib/icon-button';
-import RaisedButton from 'material-ui/lib/raised-button';
+import LinearProgress from 'material-ui/lib/linear-progress';
+import Toolbar from 'material-ui/lib/toolbar/toolbar';
+import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
+
 import _ from 'lodash';
 import aja from 'aja';
-import { getList } from '../../actions';
-import SelectField from 'material-ui/lib/select-field';
-import MenuItem from 'material-ui/lib/menus/menu-item';
 
 import { Link, browserHistory } from 'react-router';
 
 const styles = {
+  noDataMessage : {textAlign: 'center', /*marginBottom: '-12px',*/ display: 'block'},
   pagination : {
     paginationBar : {
       margin : '10px',
@@ -69,14 +66,15 @@ class List extends Component {
     let filters = this._getFilterDefaultValues(props.settings.fields);
 
     this.state = {
-      height : props.settings.defaults.tableHeight || '300px',
+      height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
       filters : filters,
       snackbarOpen : false,
       snackbarMessage : '',
       currentPage : 1,
       totalPages : 1,
-      settings: {}
+      settings: props.settings,
+      loadingData : <LinearProgress mode="indeterminate"/>
     };
   }
 
@@ -146,6 +144,7 @@ class List extends Component {
     this.setState({
       snackbarOpen: true,
       snackbarMessage: errorMessage,
+      loadingData : ''
     });
   }
 
@@ -161,6 +160,9 @@ class List extends Component {
   }
 
   _updateTableData(){
+    this.setState({
+          loadingData : <LinearProgress mode="indeterminate"/>
+     });
     this._getData(this._buildSearchQuery());
   }
 
@@ -188,8 +190,8 @@ class List extends Component {
       queryString += '&query=' +  JSON.stringify(queryArgs);
     }
 
-    if(_.isObject(this.props.settings.pagination) && _.isInteger(this.props.settings.pagination.itemsPerPage ) && this.props.settings.pagination.itemsPerPage > -1){
-      queryString += '&size=' + this.props.settings.pagination.itemsPerPage + '&page=' + parseInt(this.state.currentPage);
+    if(_.isObject(this.state.settings.pagination) && _.isInteger(this.state.settings.pagination.itemsPerPage ) && this.state.settings.pagination.itemsPerPage > -1){
+      queryString += '&size=' + this.state.settings.pagination.itemsPerPage + '&page=' + parseInt(this.state.currentPage);
     }
 
     if(queryString.startsWith('&')){
@@ -212,9 +214,11 @@ class List extends Component {
        .on('success', (response) => {
          if(response && response.status){
            let demoPageNums = Math.floor(Math.random() * (10 - parseInt(this.state.currentPage) + 1)) + parseInt(this.state.currentPage);
+           let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 100)) : [];
            this.setState({
-              totalPages :  demoPageNums, // TEMP only for demonstration, need API to get or calculate page numbers
-              rows : response.details.slice(0, this.state.settings.defaultItems),
+              totalPages : (rows.length > 0) ? demoPageNums : 1, // TEMP only for demonstration, need API to get or calculate page numbers
+              rows : rows,
+              loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
            });
          } else {
            this.handleError(response);
@@ -282,7 +286,7 @@ class List extends Component {
     let { settings } = this.state;
     let { page, collection } = this.props;
     let filters = (
-      this.props.settings.fields.map((field, i) => {
+      this.state.settings.fields.map((field, i) => {
         if(field.filter){
           return <TextField
             style={styles.filterInput}
@@ -299,7 +303,7 @@ class List extends Component {
     let header = (
       <TableRow>
         {/*<TableHeaderColumn>#</TableHeaderColumn>*/}
-        {this.props.settings.fields.map(function(field, i) {
+        {this.state.settings.fields.map(function(field, i) {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
           }
@@ -310,7 +314,7 @@ class List extends Component {
     let rows = this.state.rows.map( (row, index) => (
       <TableRow key={index} selected={row.selected}>
         {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
-        { this.props.settings.fields.map((field, i) => {
+        { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
           }
@@ -320,7 +324,7 @@ class List extends Component {
 
     const getPager = () => {
       let pages = [];
-      if(this.state.totalPages > 1) {
+      if(this.state.settings.pagination && this.state.totalPages > 1) {
         pages.push(
           <FloatingActionButton
             key='back'
@@ -393,13 +397,16 @@ class List extends Component {
         <div>
             {filters}
         </div>
+        <div>
+            {this.state.loadingData}
+        </div>
         <Table
           height = { this.state.height }
           allRowsSelected = {false}
           fixedHeader = {true}
           fixedFooter = { true }
-          selectable = { true }
-          multiSelectable = { true }
+          selectable = { this.state.rows.length > 0 }
+          multiSelectable = { this.state.rows.length > 0 }
           className="braasList"
         >
           <TableHeader enableSelectAll = { true }>
