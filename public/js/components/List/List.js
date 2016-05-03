@@ -15,6 +15,8 @@ import ForwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 import Divider from 'material-ui/lib/divider';
 import Snackbar from 'material-ui/lib/snackbar';
 import LinearProgress from 'material-ui/lib/linear-progress';
+import Toolbar from 'material-ui/lib/toolbar/toolbar';
+import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
 
 import _ from 'lodash';
 import aja from 'aja';
@@ -22,6 +24,7 @@ import aja from 'aja';
 import { Link, browserHistory } from 'react-router';
 
 const styles = {
+  noDataMessage : {textAlign: 'center', /*marginBottom: '-12px',*/ display: 'block'},
   pagination : {
     paginationBar : {
       margin : '10px',
@@ -157,6 +160,9 @@ class List extends Component {
   }
 
   _updateTableData(){
+    this.setState({
+          loadingData : <LinearProgress mode="indeterminate"/>
+     });
     this._getData(this._buildSearchQuery());
   }
 
@@ -197,10 +203,6 @@ class List extends Component {
   }
 
   _getData(query) {
-    this.setState({
-          loadingData : <LinearProgress mode="indeterminate"/>
-     });
-    console.log('show Loader');
     let url = this.state.settings.url;
     if (!url) return;
     if(query && query.length){
@@ -212,10 +214,11 @@ class List extends Component {
        .on('success', (response) => {
          if(response && response.status){
            let demoPageNums = Math.floor(Math.random() * (10 - parseInt(this.state.currentPage) + 1)) + parseInt(this.state.currentPage);
+           let rows = (response.details) ? response.details : [];
            this.setState({
-              totalPages :  demoPageNums, // TEMP only for demonstration, need API to get or calculate page numbers
-              rows : response.details.slice(0, this.state.settings.defaultItems),
-              loadingData : ''
+              totalPages : (rows.length > 0) ? demoPageNums : 1, // TEMP only for demonstration, need API to get or calculate page numbers
+              rows : rows,
+              loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
            });
          } else {
            this.handleError(response);
@@ -393,6 +396,9 @@ class List extends Component {
         <Divider />
         <div>
             {filters}
+        </div>
+        <div>
+            {this.state.loadingData}
         </div>
         <Table
           height = { this.state.height }

@@ -42,11 +42,8 @@ const plans_list_view = {
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
         {key : 'key', label : 'Key'},
       ],
-      pagination : {
-        itemsPerPage : 5,
-      },
       defaults : {
-        tableHeight : '700px',
+        tableHeight : '500px',
       }
     } ]
   } ]
