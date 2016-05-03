@@ -45,7 +45,7 @@ const styles = {
   tableCell : {
     textOverflow : 'clip',
   },
-  addButton : {
+  createNewButton : {
     margin : '10px'
   }
 };
@@ -63,11 +63,15 @@ class List extends Component {
     this.onClickCreateNewItem = this.onClickCreateNewItem.bind(this);
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
+    this.onChangeFilter = this.onChangeFilter.bind(this);
+
+    //Assign filter default value if exist
+    let filters = this._getFilterDefaultValues(props.settings.fields);
 
     this.state = {
       height : props.settings.defaults.tableHeight || '300px',
       rows : [],
-      filters : {},
+      filters : filters,
       snackbarOpen : false,
       snackbarMessage : '',
       currentPage : 1,
@@ -78,18 +82,24 @@ class List extends Component {
 
   componentWillMount() {
     let { settings } = this.props;
-    this.setState({settings});
-    this._getData();
+    this.setState({settings}, this._updateTableData);
   }
 
   componentWillReceiveProps(nextProps) {
     let { settings } = nextProps;
-    this.setState({settings});
-    this._getData();
+    let filters = this._getFilterDefaultValues(settings.fields);
+    this.setState({
+      rows : [],
+      filters : filters,
+      currentPage : 1,
+      totalPages : 1,
+      settings
+    }, this._updateTableData);
+
   }
 
   /* ON Actions */
-  
+
   onClickCreateNewItem(e) {
     let { page, collection } = this.props;
     this.context.router.push(`/${page}/${collection}/new`);
@@ -117,6 +127,11 @@ class List extends Component {
     }, this._updateTableData);
   }
 
+  onChangeFilter(e, value){
+    let key = e.target.name;
+    this._filterData(key, value);
+  }
+
   /* Handlers */
 
   handleCloseSnackbar(){
@@ -136,18 +151,17 @@ class List extends Component {
 
   /* Helpers */
 
-  _updateTableData(){
-    this._getData(this._buildSearchQuery());
-  }
-
-  _filterData(e, value) {
+  _filterData(key, value) {
     let filters = Object.assign({}, this.state.filters);
-    filters[e.target.name] = value;
+    filters[key] = value;
     this.setState({
       filters : filters,
       currentPage : 1
     }, this._updateTableData);
+  }
 
+  _updateTableData(){
+    this._getData(this._buildSearchQuery());
   }
 
   _buildSearchQuery(){
@@ -243,6 +257,18 @@ class List extends Component {
     return _.uniq([...visiblePgaes, ...more, ...less]);
   }
 
+  _getFilterDefaultValues(fields){
+    let filters = {};
+    fields.map((field, i) => {
+      if(field.filter){
+        if(field.filter.defaultValue && field.filter.defaultValue.length > 0){
+          filters[field.key] = field.filter.defaultValue;
+        }
+      }
+    });
+    return filters;
+  }
+
   _getFieldSettings(key){
     var matchFields = this.props.settings.fields.filter((field,index) => {
       if(field.key == key){
@@ -265,7 +291,7 @@ class List extends Component {
             floatingLabelText={"Search by " + field.label}
             errorText=""
             defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
-            onChange={this._filterData} />
+            onChange={this.onChangeFilter} />
         }
       })
     );
@@ -308,7 +334,6 @@ class List extends Component {
           </FloatingActionButton>
         );
         let pagesToDisplay = this._setVisiblePages(this.state.totalPages, this.state.currentPage);
-        console.log(pagesToDisplay);
         for (var i = 1; i <= this.state.totalPages; i++) {
           if(pagesToDisplay.includes(i)){
             pages.push(
@@ -355,7 +380,7 @@ class List extends Component {
       <TableRow>
         <TableRowColumn colSpan="3" style={{textAlign: 'center'}}>
           {getPager()}
-          <FloatingActionButton style={styles.createNewClick} onMouseUp={this.createNewClick}>
+          <FloatingActionButton style={styles.createNewButton} onMouseUp={this.onClickCreateNewItem}>
             <ContentAdd />
           </FloatingActionButton>
         </TableRowColumn>
