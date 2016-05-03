@@ -1,7 +1,7 @@
 import globalSetting from './globalSetting';
 
 const lines_list_view = {
-  title : "Items",
+  title : "Lines",
   view_type : "list",
   sections : [ {
     title : "",
@@ -58,13 +58,10 @@ const rates_list_view = {
       url: globalSetting.serverUrl + '/api/rates',
       fields: [
         {key: 'key', label: 'Key'},
+        {key: '_id', label: 'ID'},
         {key: 'type', label: 'Type'},
         {key: 'zone', label: 'Zone'}
       ],
-      defaultWidth: 50,
-      defaultMinWidth: 50,
-      defaultItems: 20,
-      defaultSort: 'key'
     } ]
   } ]
 };
@@ -217,14 +214,14 @@ const plan_setup_tabs = [
 const View = {
   pages: {
     dashboard: {title: "Dashboard"},
-    /* rates: {
+    rates: {
        title: "Rates",
        route: "rates/rates/list",
        views: {
        list: rates_list_view,
        new: rates_new_view
        }
-       }, */
+       },
     plans: {
       title: "Plans",
       route: "plans/plans/list",
@@ -234,9 +231,9 @@ const View = {
         edit: plan_edit_view
       }
     },
-    items: {
-      title: "Items",
-      route: "items/lines/list",
+    lines: {
+      title: "Lines",
+      route: "lines/lines/list",
       views: {
         list: lines_list_view,
       }

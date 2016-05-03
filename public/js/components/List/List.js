@@ -66,7 +66,7 @@ class List extends Component {
     let filters = this._getFilterDefaultValues(props.settings.fields);
 
     this.state = {
-      height : props.settings.defaults.tableHeight || '300px',
+      height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
       filters : filters,
       snackbarOpen : false,
@@ -214,7 +214,7 @@ class List extends Component {
        .on('success', (response) => {
          if(response && response.status){
            let demoPageNums = Math.floor(Math.random() * (10 - parseInt(this.state.currentPage) + 1)) + parseInt(this.state.currentPage);
-           let rows = (response.details) ? response.details : [];
+           let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 100)) : [];
            this.setState({
               totalPages : (rows.length > 0) ? demoPageNums : 1, // TEMP only for demonstration, need API to get or calculate page numbers
               rows : rows,
