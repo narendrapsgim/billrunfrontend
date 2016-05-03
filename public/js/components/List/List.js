@@ -53,23 +53,18 @@ const styles = {
 class List extends Component {
   constructor(props) {
     super(props);
-    this.buttonClick = this.buttonClick.bind(this);
-    this.updateTableData = this.updateTableData.bind(this);
-    this.getData = _.debounce(this.getData.bind(this),1000);
-    this.filterData = this.filterData.bind(this);
-    this.handleRequestClose = this.handleRequestClose.bind(this);
+    //Helpers
+    this._updateTableData = this._updateTableData.bind(this);
+    this._getData = _.debounce(this._getData.bind(this),1000);
+    this._filterData = this._filterData.bind(this);
+    //Handlers
+    this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
+    //Actions
+    this.onClickCreateNewItem = this.onClickCreateNewItem.bind(this);
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
 
     this.state = {
-      fixedHeader : true,
-      fixedFooter : true,
-      stripedRows : true,
-      showRowHover : true,
-      selectable : true,
-      multiSelectable : true,
-      enableSelectAll : true,
-      deselectOnClickaway : false,
       height : props.settings.defaults.tableHeight || '300px',
       rows : [],
       filters : {},
@@ -84,48 +79,84 @@ class List extends Component {
   componentWillMount() {
     let { settings } = this.props;
     this.setState({settings});
-    this.getData();
+    this._getData();
   }
+
   componentWillReceiveProps(nextProps) {
     let { settings } = nextProps;
     this.setState({settings});
-    this.getData();
+    this._getData();
   }
 
-  getFieldSettings(key){
-    var matchFields = this.props.settings.fields.filter((field,index) => {
-      if(field.key == key){
-        return field;
-      }
-    })
-    return (matchFields.length) ? matchFields[0] : false ;
-  }
-  buttonClick(e) {
+  /* ON Actions */
+  
+  onClickCreateNewItem(e) {
     let { page, collection } = this.props;
     this.context.router.push(`/${page}/${collection}/new`);
   }
-  updateTableData(){
-    this.getData(this.buildSearchQuery());
+
+  onClickRow(e) {
+    let { page, collection } = this.props;
+    return browserHistory.push(`#/${page}/${collection}/edit/${e.target.id}`);
   }
 
-  filterData(e, value) {
+  onPagintionClick(e){
+    let page = this.state.currentPage;
+    let value = e.currentTarget.value;
+
+    if(_.isInteger(parseInt(value))){
+      page = parseInt(value);
+    } else if(value == 'back' && page > 1){
+      page --;
+    } else if(value == 'forward' && page < this.state.totalPages){
+      page++;
+    }
+
+    this.setState({
+      currentPage : page
+    }, this._updateTableData);
+  }
+
+  /* Handlers */
+
+  handleCloseSnackbar(){
+    this.setState({
+      snackbarOpen: false,
+      snackbarMessage: '',
+    });
+  };
+
+  handleError(data){
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
+    this.setState({
+      snackbarOpen: true,
+      snackbarMessage: errorMessage,
+    });
+  }
+
+  /* Helpers */
+
+  _updateTableData(){
+    this._getData(this._buildSearchQuery());
+  }
+
+  _filterData(e, value) {
     let filters = Object.assign({}, this.state.filters);
     filters[e.target.name] = value;
     this.setState({
       filters : filters,
       currentPage : 1
-    }, this.updateTableData);
+    }, this._updateTableData);
 
   }
 
-  buildSearchQuery(){
-    //5000000429,5000000986
+  _buildSearchQuery(){
     let queryString = '';
     let queryArgs = {};
 
     for ( let key in this.state.filters ) {
       if(this.state.filters[key].length){
-        let filterSetting = this.getFieldSettings(key);
+        let filterSetting = this._getFieldSettings(key);
         if(filterSetting){
           if(filterSetting.filter && filterSetting.filter.filterType && filterSetting.filter.filterType == 'query' ){
               queryArgs[key] = {
@@ -155,7 +186,7 @@ class List extends Component {
     return queryString;
   }
 
-  getData(query) {
+  _getData(query) {
     let url = this.state.settings.url;
     if (!url) return;
     if(query && query.length){
@@ -184,15 +215,7 @@ class List extends Component {
        .go();
   }
 
-  handleError(data){
-    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
-    this.setState({
-      snackbarOpen: true,
-      snackbarMessage: errorMessage,
-    });
-  }
-
-  formatField(row, field, i){
+  _formatField(row, field, i){
     let output = '';
     switch (field.type) {
       case 'boolean':
@@ -213,75 +236,60 @@ class List extends Component {
     return output;
   }
 
-  onClickRow(e) {
-    let { page, collection } = this.props;
-    return browserHistory.push(`#/${page}/${collection}/edit/${e.target.id}`);
+  _setVisiblePages(totalPages, currentPage){
+    let visiblePgaes = [1,currentPage,totalPages]; // always show first current and last
+    let more = _.range(parseInt(currentPage), parseInt(currentPage)+3); // show 2 item after
+    let less = _.range(parseInt(currentPage), Math.max(parseInt(currentPage)-3,0) , -1);  // show 2 item before
+    return _.uniq([...visiblePgaes, ...more, ...less]);
   }
 
-  onPagintionClick(e){
-    let page = this.state.currentPage;
-    let value = e.currentTarget.value;
-
-    if(_.isInteger(parseInt(value))){
-      page = parseInt(value);
-    } else if(value == 'back' && page > 1){
-      page --;
-    } else if(value == 'forward' && page < this.state.totalPages){
-      page++;
-    }
-
-    this.setState({
-      currentPage : page
-    }, this.updateTableData);
+  _getFieldSettings(key){
+    var matchFields = this.props.settings.fields.filter((field,index) => {
+      if(field.key == key){
+        return field;
+      }
+    })
+    return (matchFields.length) ? matchFields[0] : false ;
   }
-
-  handleRequestClose(){
-    this.setState({
-      snackbarOpen: false,
-      snackbarMessage: '',
-    });
-  };
 
   render() {
     let { settings } = this.state;
     let { page, collection } = this.props;
     let filters = (
-        this.props.settings.fields.map((field, i) => {
-          if(field.filter){
-            return <TextField
-              style={styles.filterInput}
-              key={i} name={field.key}
-              hintText={"enter " + field.label + "..."}
-              floatingLabelText={"Search by " + field.label}
-              errorText=""
-              defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
-              onChange={this.filterData} />
-          }
-        })
+      this.props.settings.fields.map((field, i) => {
+        if(field.filter){
+          return <TextField
+            style={styles.filterInput}
+            key={i} name={field.key}
+            hintText={"enter " + field.label + "..."}
+            floatingLabelText={"Search by " + field.label}
+            errorText=""
+            defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
+            onChange={this._filterData} />
+        }
+      })
     );
 
     let header = (
-                  <TableHeader enableSelectAll = {this.state.enableSelectAll}>
-                    <TableRow>
-                      {/*<TableHeaderColumn>#</TableHeaderColumn>*/}
-                      {this.props.settings.fields.map(function(field, i) {
-                        if( !(field.hidden  && field.hidden == true) ){
-                          return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
-                        }
-                      })}
-                    </TableRow>
-                  </TableHeader>
+      <TableRow>
+        {/*<TableHeaderColumn>#</TableHeaderColumn>*/}
+        {this.props.settings.fields.map(function(field, i) {
+          if( !(field.hidden  && field.hidden == true) ){
+            return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
+          }
+        })}
+      </TableRow>
     );
 
     let rows = this.state.rows.map( (row, index) => (
-          <TableRow key={index} selected={row.selected}>
-            {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
-            { this.props.settings.fields.map((field, i) => {
-              if( !(field.hidden  && field.hidden == true) ){
-                return <TableRowColumn style={styles.tableCell} key={i}>{this.formatField(row, field, i)}</TableRowColumn>
-              }
-            })}
-          </TableRow>
+      <TableRow key={index} selected={row.selected}>
+        {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
+        { this.props.settings.fields.map((field, i) => {
+          if( !(field.hidden  && field.hidden == true) ){
+            return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
+          }
+        })}
+      </TableRow>
     ));
 
     const getPager = () => {
@@ -294,24 +302,31 @@ class List extends Component {
             style={styles.pagination.paginationButton}
             onClick={this.onPagintionClick}
             value='back'
-            secondary={this.state.currentPage == i}
+            secondary={false}
           >
           <BackIcon />
           </FloatingActionButton>
         );
-
+        let pagesToDisplay = this._setVisiblePages(this.state.totalPages, this.state.currentPage);
+        console.log(pagesToDisplay);
         for (var i = 1; i <= this.state.totalPages; i++) {
-          pages.push(
-            <FloatingActionButton
-              key={i}
-              mini={true}
-              style={styles.pagination.paginationButton}
-              onClick={this.onPagintionClick}
-              value={i}
-              secondary={this.state.currentPage == i}
-            >
-            {i}
-          </FloatingActionButton>)
+          if(pagesToDisplay.includes(i)){
+            pages.push(
+              <FloatingActionButton
+                key={i}
+                mini={true}
+                style={styles.pagination.paginationButton}
+                onClick={this.onPagintionClick}
+                value={i}
+                secondary={this.state.currentPage == i}
+              >
+              {i}
+            </FloatingActionButton>)
+          } else {
+            if(pages[pages.length-1] !== "..."){
+              pages.push('...');
+            }
+          }
         }
         pages.push(
           <FloatingActionButton
@@ -320,7 +335,7 @@ class List extends Component {
             style={styles.pagination.paginationButton}
             onClick={this.onPagintionClick}
             value='forward'
-            secondary={this.state.currentPage == i}
+            secondary={false}
           >
           <ForwardIcon />
           </FloatingActionButton>
@@ -337,16 +352,14 @@ class List extends Component {
     }
 
     let footer = (
-                <TableFooter>
-                  <TableRow>
-                    <TableRowColumn colSpan="3" style={{textAlign: 'center'}}>
-                      {getPager()}
-                      <FloatingActionButton style={styles.addButton} onMouseUp={this.buttonClick}>
-                        <ContentAdd />
-                      </FloatingActionButton>
-                    </TableRowColumn>
-                  </TableRow>
-                </TableFooter>
+      <TableRow>
+        <TableRowColumn colSpan="3" style={{textAlign: 'center'}}>
+          {getPager()}
+          <FloatingActionButton style={styles.createNewClick} onMouseUp={this.createNewClick}>
+            <ContentAdd />
+          </FloatingActionButton>
+        </TableRowColumn>
+      </TableRow>
     );
 
     return (
@@ -358,28 +371,33 @@ class List extends Component {
         <Table
           height = { this.state.height }
           allRowsSelected = {false}
-          fixedHeader = {this.state.fixedHeader}
-          fixedFooter = { this.state.fixedFooter }
-          selectable = { this.state.selectable }
-          multiSelectable = { this.state.multiSelectable }
+          fixedHeader = {true}
+          fixedFooter = { true }
+          selectable = { true }
+          multiSelectable = { true }
           className="braasList"
         >
-        {header}
-        <TableBody
-          deselectOnClickaway = { this.state.deselectOnClickaway }
-          showRowHover = { this.state.showRowHover }
-          stripedRows = {this.state.stripedRows}
-        >
-          {rows}
-        </TableBody>
-          {footer}
+          <TableHeader enableSelectAll = { true }>
+            {header}
+          </TableHeader>
+
+          <TableBody
+            deselectOnClickaway = { false }
+            showRowHover = { true }
+            stripedRows = { true }
+          >
+            {rows}
+          </TableBody>
+          <TableFooter>
+            {footer}
+          </TableFooter>
         </Table>
 
         <Snackbar
           open={this.state.snackbarOpen}
           message={this.state.snackbarMessage}
           autoHideDuration={4000}
-          onRequestClose={this.handleRequestClose}
+          onRequestClose={this.handleCloseSnackbar}
         />
 
       </div>
@@ -390,4 +408,11 @@ class List extends Component {
 List.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
-export default List;
+
+function mapStateToProps(state) {
+  return {
+    list: state.list
+  };
+}
+
+export default connect(mapStateToProps)(List);
