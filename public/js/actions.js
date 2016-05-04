@@ -1,4 +1,5 @@
 import aja from 'aja';
+import globalSetting from './globalSetting';
 
 export const UPDATE_FIELD_VALUE = 'UPDATE_FIELD_VALUE';
 export const GOT_ITEM = 'GOT_COLLECTION_ITEMS';
@@ -39,7 +40,7 @@ function gotItem(item, page_name) {
 function fetchItem(collection, item_id) {
   return dispatch => {
     aja()
-      .url(`http://billrun/api/${collection}?query={id: ${item_id}}`)
+      .url(`${globalSetting.serverUrl}/api/${collection}?query={"_id":["${item_id}"]}`)
       .on('success', resp => {
         dispatch(gotItem(resp.details[0], collection));
       })
