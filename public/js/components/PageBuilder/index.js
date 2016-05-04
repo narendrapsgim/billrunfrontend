@@ -67,7 +67,11 @@ class PageBuilder extends Component {
   }
 
   onFieldChange(evt, index, value) {
-    if (!value && evt.target) value = evt.target.value
+    if(evt.target.type == "checkbox") {
+      value = evt.target.checked;
+    } else {
+      if (!value && evt.target) value = evt.target.value
+    }
     let { dispatch } = this.props;
     let path = evt.target.dataset.path;
     dispatch(updateFieldValue(path, value, this.getPageName()));

@@ -132,7 +132,7 @@ const plan_edit_view = {
             }
           ]
         },
-        { dbkey: "forceCommitment", label: "Force Commitment", size: 10 , type: "checkbox", value : true},
+        { dbkey: "forceCommitment", label: "Force Commitment", size: 10 , type: "checkbox"},
       ]
     }
   ]

@@ -83,12 +83,13 @@ class Field extends Component {
         </div>
       );
     } else if (type === "checkbox") {
-      let value = this.props.field.value;
       return (
         <Checkbox
+          data-path={path}
           label={inputLabel}
           style={{ marginBottom: '16px', paddingLeft: '15px'}}
           defaultChecked={value}
+          onCheck={onChange}
         />
       );
     }
