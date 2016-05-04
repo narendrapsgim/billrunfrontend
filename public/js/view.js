@@ -40,7 +40,6 @@ const plans_list_view = {
         {key : 'grouping', label : 'Grouping'},
         {key : 'price', label : 'Price', type : 'price', filter : { filterType : 'query'}},
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
-        {key : 'key', label : 'Key'},
       ],
       defaults : {
         tableHeight : '500px',
@@ -105,22 +104,15 @@ const plan_edit_view = {
       display: "inline",
       fields:
       [
+        { dbkey: "invoice_label", label: "Invoice label", size: 10 },
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
-        { dbkey: "technical_name", label: "Technical Name", size: 10 },
-        { dbkey: "params", label: "Params",
-          fields:
+        { dbkey: "key", label: "Key", size: 10 },
+        { dbkey: "price", label: "Price", size: 10 , type: "number" },
+        { dbkey: "display_order", label: "Display Order", size: 10 },
+        { dbkey: "invoice_type", label: "Invoice Type", size: 10 },
+        { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields:
           [
-            { dbkey: "destination", label: "Destination", type: "array",
-              array: {
-                title: "region",
-                items: "prefix"
-              }
-            }
-          ]
-        },
-        { dbkey: "options", label: "Options", collapsible: true, fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
+            { dbkey: "*", collapsible: false, collapsed: true,
               fields:
               [
                 { dbkey: "name", label: "Name", type: "text" },
@@ -128,7 +120,19 @@ const plan_edit_view = {
               ]
             }
           ]
-        }
+        },
+        { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true,fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "name", label: "Name", type: "text" },
+                { dbkey: "display_order", label: "Display Order", type: "number" },
+              ]
+            }
+          ]
+        },
+        { dbkey: "forceCommitment", label: "Force Commitment", size: 10 , type: "checkbox"},
       ]
     }
   ]

@@ -7,6 +7,7 @@ import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from 
 import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
 import RaisedButton from 'material-ui/lib/raised-button';
+import Divider from 'material-ui/lib/divider';
 
 import View from '../../view';
 import Field from './Field';
@@ -30,7 +31,7 @@ class PageBuilder extends Component {
   getPageName(props = this.props) {
     return props.params.page.replace(/-/g, '_').toLowerCase();
   }
-  
+
   componentWillMount() {
     this.setInitialState(this.props);
   }
@@ -54,7 +55,7 @@ class PageBuilder extends Component {
     this.setState({collection, entity_id, pageName, action});
     this.props.dispatch(setInitialItem(pageName));
   }
-  
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.location.pathname !== this.props.location.pathname) {
       if (nextProps.params.action === "edit") {
@@ -64,9 +65,13 @@ class PageBuilder extends Component {
       }
     }
   }
-  
+
   onFieldChange(evt, index, value) {
-    if (!value && evt.target) value = evt.target.value
+    if(evt.target.type == "checkbox") {
+      value = evt.target.checked;
+    } else {
+      if (!value && evt.target) value = evt.target.value
+    }
     let { dispatch } = this.props;
     let path = evt.target.dataset.path;
     dispatch(updateFieldValue(path, value, this.getPageName()));
@@ -85,7 +90,7 @@ class PageBuilder extends Component {
   titlize(str) {
     return _.capitalize(str.replace(/_/g, ' ').toLowerCase());
   }
-  
+
   sectionTitle(section) {
     let tooltip;
     if (section.description) {
@@ -136,7 +141,7 @@ class PageBuilder extends Component {
       return { dbkey: item_key, label: this.titlize(item_key), size: (from_array ? 3 : 10) };
     });
   }
-  
+
   createFieldHTML(field, path, field_index) {
     if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) return (<div></div>);
     if (path.endsWith(".*") && field.fields) {
@@ -182,9 +187,9 @@ class PageBuilder extends Component {
 
     return (
       <Field field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
-    ); 
+    );
   }
-  
+
   createSectionsHTML(sections = []) {
     let sectionsHTML = sections.map((section, section_idx) => {
       let output;
@@ -220,7 +225,7 @@ class PageBuilder extends Component {
       </div>
     );
   }
-  
+
   tabStyle() {
     return { backgroundColor: "#272A39" };
   }
@@ -251,13 +256,13 @@ class PageBuilder extends Component {
       );
     }
   }
-  
+
   render() {
     let { pageName = this.getPageName(),
           action } = this.state;
     if (action === 'edit' && !this.props.item) return (<div></div>);
     let sectionsHTML;
-    let page_view = View.pages[pageName].views ? 
+    let page_view = View.pages[pageName].views ?
                     View.pages[pageName].views[action] :
                     View.pages[pageName];
 
@@ -276,6 +281,7 @@ class PageBuilder extends Component {
       <div>
         <h3>{title}</h3>
         {sectionsHTML}
+        <Divider />
         {this.actionButtons()}
       </div>
     );
