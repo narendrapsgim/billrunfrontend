@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import DatePicker from 'material-ui/lib/date-picker/date-picker';
 import TextField from 'material-ui/lib/text-field';
 import SelectField from 'material-ui/lib/select-field';
+import Checkbox from 'material-ui/lib/checkbox';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import TagsInput from 'react-tagsinput';
 
@@ -26,9 +27,14 @@ class Field extends Component {
       this.setState({path: `${path}.${items}`});
     }
   }
-  
+
   createInputTag(field = {}) {
     let { value, onChange, path } = this.props;
+
+    if (value == 'undefined'){
+      return (<div></div>);
+    }
+
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
 	  type = (typeof value),
           dbkey,
@@ -55,7 +61,7 @@ class Field extends Component {
           <SelectField
               value={value}
               id={html_id}
-              onChange={onChange} 
+              onChange={onChange}
               floatingLabelText={inputLabel}>
             {options}
           </SelectField>
@@ -72,9 +78,18 @@ class Field extends Component {
       let { title, items } = field.array;
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={html_id}>{value[title]}</label>        
+          <label htmlFor={html_id}>{value[title]}</label>
           <TagsInput value={value[items]} onChange={this.onTagsChange} />
         </div>
+      );
+    } else if (type === "checkbox") {
+      let value = this.props.field.value;
+      return (
+        <Checkbox
+          label={inputLabel}
+          style={{ marginBottom: '16px', paddingLeft: '15px'}}
+          defaultChecked={value}
+        />
       );
     }
 
@@ -104,7 +119,7 @@ Field.propTypes = {
     dbkey: (props, propName, componentName) => {
       if (!props[propName] && !props['label']) {
         return new Error("Must supply either 'dbkey' or 'label' in field");
-      } 
+      }
     }
   }),
   onChange: PropTypes.func.isRequired
