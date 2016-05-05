@@ -11,6 +11,8 @@ import TextField from 'material-ui/lib/text-field';
 import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import ContentAdd from 'material-ui/lib/svg-icons/content/add';
 import BackIcon from 'material-ui/lib/svg-icons/navigation/arrow-back';
+import DownwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-drop-down';
+import UpwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-drop-up';
 import ForwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 import Divider from 'material-ui/lib/divider';
 import Snackbar from 'material-ui/lib/snackbar';
@@ -47,6 +49,44 @@ const styles = {
   }
 };
 
+
+const SortTypes = {
+  ASC: 1,
+  DESC: -1,
+};
+
+/**
+  * Wrapper for table header TH because material-ui table doesn't support onClick event on table header
+  */
+class SortableTableHeaderColumn extends Component {
+  constructor(props) {
+    super(props);
+    this._onClick = this._onClick.bind(this);
+    this.state = {
+      label : props.data.label,
+      sort : props.sort || '',
+    }
+  }
+
+  _onClick(event){
+    event.stopPropagation();
+    if (this.props.onClick){
+      this.props.onClick(event, this.props.data, this.props.sort)
+    };
+  };
+
+  render() {
+    let style = { verticalAlign: 'middle' } ;
+    let sort = ' ';
+    if(this.props.sort == SortTypes.ASC) {
+      sort = <DownwardIcon style={style}/>;
+    } else if (this.props.sort == SortTypes.DESC){
+      sort = <UpwardIcon style={style}/>;
+    }
+    return (<div style={{cursor: 'pointer'}} onClick={ this._onClick }>{sort} {this.state.label}</div>);
+  }
+}
+
 class List extends Component {
   constructor(props) {
     super(props);
@@ -54,6 +94,7 @@ class List extends Component {
     this._updateTableData = this._updateTableData.bind(this);
     this._getData = _.debounce(this._getData.bind(this),1000);
     this._filterData = this._filterData.bind(this);
+    this._sortData = this._sortData.bind(this);
     //Handlers
     this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     //Actions
@@ -69,6 +110,8 @@ class List extends Component {
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
+      sortField : '',
+      sortType : '',
       filters : filters,
       snackbarOpen : false,
       snackbarMessage : '',
@@ -136,8 +179,12 @@ class List extends Component {
     this._filterData(key, value);
   }
 
-  onClickTableHeader(e, value, c){
-    console.log(e, value, c);
+  onClickTableHeader(e, value, sort){
+    let newSort = SortTypes.ASC; //default
+    if (this.state.sortField == value.key) {
+      newSort = (this.state.sortType === SortTypes.ASC) ? SortTypes.DESC : SortTypes.ASC ;
+    }
+    this._sortData(value.key, newSort);
   }
 
   /* Handlers */
@@ -159,6 +206,13 @@ class List extends Component {
   }
 
   /* Helpers */
+  _sortData(key, value) {
+    this.setState({
+      sortField : key,
+      sortType : value,
+      currentPage : 1
+    }, this._updateTableData);
+  }
 
   _filterData(key, value) {
     let filters = Object.assign({}, this.state.filters);
@@ -202,6 +256,11 @@ class List extends Component {
 
     if(_.isObject(this.state.settings.pagination) && _.isInteger(this.state.settings.pagination.itemsPerPage ) && this.state.settings.pagination.itemsPerPage > -1){
       queryString += '&size=' + this.state.settings.pagination.itemsPerPage + '&page=' + parseInt(this.state.currentPage);
+    }
+
+    if(!_.isEmpty(this.state.sortField)){
+      let sortType = (this.state.sortType) ? this.state.sortType : SortTypes.ASC ;
+      queryString += '&sort=' +  JSON.stringify({ [this.state.sortField] : sortType });
     }
 
     if(queryString.startsWith('&')){
@@ -315,7 +374,7 @@ class List extends Component {
         {<TableHeaderColumn style={{ width: 5}}>#</TableHeaderColumn>}
         {this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
-            return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
+            return <TableHeaderColumn key={i}><SortableTableHeaderColumn data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
           }
         })}
       </TableRow>

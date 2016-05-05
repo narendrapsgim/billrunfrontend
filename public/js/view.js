@@ -82,6 +82,7 @@ const plans_list_view = {
         {key : 'grouping', label : 'Grouping'},
         {key : 'price', label : 'Price', type : 'price', filter : { filterType : 'query'}},
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
+        {key : 'from', label : 'From',  type : 'urt'},
       ],
       onItemClick : 'edit',
       defaults : {
