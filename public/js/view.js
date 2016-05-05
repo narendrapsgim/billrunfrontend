@@ -121,13 +121,14 @@ const plan_edit_view = {
             }
           ]
         },
-        { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true,fields:
+        { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true, size: 18  ,  fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:
               [
-                { dbkey: "name", label: "Name", type: "text" },
-                { dbkey: "display_order", label: "Display Order", type: "number" },
+                { dbkey: "name", label: "Name", type: "text"},
+                { dbkey: "display_order", label: "Display Order", type: "number"},
+                { dbkey: "included", label: "Included", type: "toggle"},
               ]
             }
           ]

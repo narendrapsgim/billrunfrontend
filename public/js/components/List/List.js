@@ -61,6 +61,7 @@ class List extends Component {
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
+    this.onClickTableHeader = this.onClickTableHeader.bind(this);
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
@@ -128,6 +129,10 @@ class List extends Component {
   onChangeFilter(e, value){
     let key = e.target.name;
     this._filterData(key, value);
+  }
+
+  onClickTableHeader(e, value, c){
+    console.log(e, value, c);
   }
 
   /* Handlers */
@@ -302,21 +307,21 @@ class List extends Component {
 
     let header = (
       <TableRow>
-        {/*<TableHeaderColumn>#</TableHeaderColumn>*/}
-        {this.state.settings.fields.map(function(field, i) {
+        {<TableHeaderColumn>#</TableHeaderColumn>}
+        {this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
-            return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
+            return <TableHeaderColumn tooltip={ field.label } onCellClick={(val)=>{console.log(val)}} key={i}>{field.label}</TableHeaderColumn>
           }
         })}
       </TableRow>
     );
 
     let rows = this.state.rows.map( (row, index) => (
-      <TableRow key={index} selected={row.selected}>
-        {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
+      <TableRow key={index} selected={row.selected} onCellClick={(val)=>{console.log(val)}} >
+        {<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>}
         { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
-            return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
+            return <TableRowColumn onCellClick={(val)=>{console.log(val)}} style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
           }
         })}
       </TableRow>

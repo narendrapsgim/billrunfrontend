@@ -281,7 +281,6 @@ class PageBuilder extends Component {
       <div>
         <h3>{title}</h3>
         {sectionsHTML}
-        <Divider />
         {this.actionButtons()}
       </div>
     );

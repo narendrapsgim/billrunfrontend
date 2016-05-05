@@ -3,6 +3,7 @@ import DatePicker from 'material-ui/lib/date-picker/date-picker';
 import TextField from 'material-ui/lib/text-field';
 import SelectField from 'material-ui/lib/select-field';
 import Checkbox from 'material-ui/lib/checkbox';
+import Toggle from 'material-ui/lib/toggle';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import TagsInput from 'react-tagsinput';
 
@@ -84,13 +85,26 @@ class Field extends Component {
       );
     } else if (type === "checkbox") {
       return (
-        <Checkbox
-          data-path={path}
-          label={inputLabel}
-          style={{ marginBottom: '16px', paddingLeft: '15px'}}
-          defaultChecked={value}
-          onCheck={onChange}
-        />
+        <div className={`col-md-${size}`}>
+          <Checkbox
+            data-path={path}
+            label={inputLabel}
+            style={{ marginBottom: '16px', paddingLeft: '15px'}}
+            defaultChecked={value}
+            onCheck={onChange}
+          />
+        </div>
+      );
+    } else if (type === "toggle") {
+      return (
+        <div className={`col-md-${size}`}>
+          <Toggle
+            label={inputLabel}
+            data-path={path}
+            defaultToggled={value}
+            onToggle={onChange}
+          />
+        </div>
       );
     }
 
