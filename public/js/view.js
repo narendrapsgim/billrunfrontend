@@ -27,25 +27,16 @@ const lines_list_view = {
   } ]
 };
 
-const plans_list_view = {
-  title : "Plans",
-  view_type : "list",
-  sections : [ {
-    title : "",
-    lists : [ {
-      url : globalSetting.serverUrl + '/api/plans',
-      fields : [
-        {key : 'invoice_label', label : 'Label', filter : {filterType : 'query'}},
-        {key : 'invoice_type', label : 'Type'},
-        {key : 'grouping', label : 'Grouping'},
-        {key : 'price', label : 'Price', type : 'price', filter : { filterType : 'query'}},
-        {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
-      ],
-      defaults : {
-        tableHeight : '500px',
-      }
-    } ]
-  } ]
+const lines_edit_view = {
+  title: "Edit Line",
+  view_type: "sections",
+  sections: [
+    {
+      // title: "Test",
+      display: "inline",
+      fields: []
+    }
+  ]
 };
 
 const rates_list_view = {
@@ -65,7 +56,42 @@ const rates_list_view = {
   } ]
 };
 
-const plan_new_view = {
+const rates_new_view = {
+  title: "New Rate",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { dbkey: "key", label: "Key", size: 10, mandatory: true }
+      ]
+    }
+  ]
+};
+
+const plans_list_view = {
+  title : "Plans",
+  view_type : "list",
+  sections : [ {
+    title : "",
+    lists : [ {
+      url : globalSetting.serverUrl + '/api/plans',
+      fields : [
+        {key : 'invoice_label', label : 'Label', filter : {filterType : 'query'}},
+        {key : 'invoice_type', label : 'Type'},
+        {key : 'grouping', label : 'Grouping'},
+        {key : 'price', label : 'Price', type : 'price', filter : { filterType : 'query'}},
+        {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
+      ],
+      onItemClick : 'edit',
+      defaults : {
+        tableHeight : '500px',
+      }
+    } ]
+  } ]
+};
+
+const plans_new_view = {
   title: "New Plan",
   view_type: "sections",
   sections: [
@@ -82,20 +108,7 @@ const plan_new_view = {
   ]
 };
 
-const rates_new_view = {
-  title: "New Rate",
-  view_type: "sections",
-  sections: [
-    {
-      display: "inline",
-      fields: [
-        { dbkey: "key", label: "Key", size: 10, mandatory: true }
-      ]
-    }
-  ]
-};
-
-const plan_edit_view = {
+const plans_edit_view = {
   title: "Edit Plan",
   view_type: "sections",
   sections: [
@@ -121,13 +134,13 @@ const plan_edit_view = {
             }
           ]
         },
-        { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true,fields:
+        { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true, size: 18  ,  fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:
               [
-                { dbkey: "name", label: "Name", type: "text" },
-                { dbkey: "display_order", label: "Display Order", type: "number" },
+                { dbkey: "name", label: "Name", type: "text"},
+                { dbkey: "display_order", label: "Display Order", type: "number"},
               ]
             }
           ]
@@ -218,21 +231,21 @@ const plan_setup_tabs = [
 const View = {
   pages: {
     dashboard: {title: "Dashboard"},
-    rates: {
-       title: "Rates",
-       route: "rates/rates/list",
-       views: {
-       list: rates_list_view,
-       new: rates_new_view
-       }
-       },
+      rates: {
+        title: "Rates",
+        route: "rates/rates/list",
+      views: {
+        list: rates_list_view,
+        new: rates_new_view
+      }
+    },
     plans: {
       title: "Plans",
       route: "plans/plans/list",
       views: {
         list: plans_list_view,
-        new: plan_new_view,
-        edit: plan_edit_view
+        new: plans_new_view,
+        edit: plans_edit_view
       }
     },
     lines: {
@@ -240,6 +253,7 @@ const View = {
       route: "lines/lines/list",
       views: {
         list: lines_list_view,
+        edit: lines_edit_view
       }
     },
     plan_setup: {

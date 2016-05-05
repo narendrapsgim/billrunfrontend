@@ -61,6 +61,7 @@ class List extends Component {
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
+    this.onClickTableHeader = this.onClickTableHeader.bind(this);
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
@@ -103,9 +104,14 @@ class List extends Component {
     this.context.router.push(`/${page}/${collection}/new`);
   }
 
-  onClickRow(e) {
+  onClickRow(row, column, e) {
     let { page, collection } = this.props;
-    return browserHistory.push(`#/${page}/${collection}/edit/${e.target.id}`);
+    let rawData = this.state.rows[row];
+    if(column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick){
+      let id = rawData._id.$id;
+      let url = `/${page}/${collection}/${this.state.settings.onItemClick}/${id}`;
+      this.context.router.push(url);
+    }
   }
 
   onPagintionClick(e){
@@ -128,6 +134,10 @@ class List extends Component {
   onChangeFilter(e, value){
     let key = e.target.name;
     this._filterData(key, value);
+  }
+
+  onClickTableHeader(e, value, c){
+    console.log(e, value, c);
   }
 
   /* Handlers */
@@ -302,8 +312,8 @@ class List extends Component {
 
     let header = (
       <TableRow>
-        {/*<TableHeaderColumn>#</TableHeaderColumn>*/}
-        {this.state.settings.fields.map(function(field, i) {
+        {<TableHeaderColumn style={{ width: 5}}>#</TableHeaderColumn>}
+        {this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableHeaderColumn tooltip={ field.label } key={i}>{field.label}</TableHeaderColumn>
           }
@@ -313,7 +323,7 @@ class List extends Component {
 
     let rows = this.state.rows.map( (row, index) => (
       <TableRow key={index} selected={row.selected}>
-        {/*<TableRowColumn><Link to={`/${page}/${collection}/edit/${row._id.$id}`}>{index + 1}</Link></TableRowColumn>*/}
+        {<TableRowColumn style={{ width: 5}}>{index + 1}</TableRowColumn>}
         { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
@@ -408,6 +418,7 @@ class List extends Component {
           selectable = { this.state.rows.length > 0 }
           multiSelectable = { this.state.rows.length > 0 }
           className="braasList"
+          onCellClick={this.onClickRow}
         >
           <TableHeader enableSelectAll = { true }>
             {header}
