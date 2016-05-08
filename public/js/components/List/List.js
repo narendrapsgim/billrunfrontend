@@ -383,7 +383,11 @@ class List extends Component {
         {<TableHeaderColumn style={{ width: 5}}>#</TableHeaderColumn>}
         {this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
-            return <TableHeaderColumn key={i}><SortableTableHeaderColumn data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
+            if(field.sortable  && field.sortable == true){
+              return <TableHeaderColumn key={i}><SortableTableHeaderColumn data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
+            } else {
+              return <TableHeaderColumn key={i}>{field.label}</TableHeaderColumn>
+            }
           }
         })}
       </TableRow>
