@@ -132,6 +132,8 @@ class List extends Component {
     let filters = this._getFilterDefaultValues(settings.fields);
     this.setState({
       rows : [],
+      sortField : '',
+      sortType : '',
       filters : filters,
       currentPage : 1,
       totalPages : 1,
