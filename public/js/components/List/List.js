@@ -208,6 +208,13 @@ class List extends Component {
   }
 
   /* Helpers */
+  _setPagesAmount(itemsCount, itemPerPage){
+    if(parseInt(itemsCount) > 0 && parseInt(itemPerPage) > 0){
+      return  Math.ceil(itemsCount / itemPerPage);
+    }
+    return 1;
+  }
+
   _sortData(key, value) {
     this.setState({
       sortField : key,
@@ -268,7 +275,7 @@ class List extends Component {
     if(queryString.startsWith('&')){
       queryString = queryString.replace('&','?');
     } else {
-      queryString = '?' + queryString;
+      queryString = (queryString.length) ? '?' + queryString : '';
     }
     return queryString;
   }
@@ -284,10 +291,10 @@ class List extends Component {
        .url(url)
        .on('success', (response) => {
          if(response && response.status){
-           let demoPageNums = Math.floor(Math.random() * (10 - parseInt(this.state.currentPage) + 1)) + parseInt(this.state.currentPage);
            let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 100)) : [];
+           let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
            this.setState({
-              totalPages : (rows.length > 0) ? demoPageNums : 1, // TEMP only for demonstration, need API to get or calculate page numbers
+              totalPages : this._setPagesAmount(response.count, itemsPerPage),
               rows : rows,
               loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
            });
