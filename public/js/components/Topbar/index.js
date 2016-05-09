@@ -16,8 +16,8 @@ export default class Topbar extends Component {
   render() {
     return (
       <Toolbar className="topbar">
-        <ToolbarGroup firstChild={true}>
-          <a className="navbar-brand" href="#">
+        <ToolbarGroup>
+          <a href="#">
             {<img src="img/billrun-logo-tm.png" />}
           </a>
         </ToolbarGroup>
@@ -25,8 +25,8 @@ export default class Topbar extends Component {
           <ToolbarSeparator style={{backgroundColor:indigo50}}/>
           <Avatar
             src="https://avatars.githubusercontent.com/u/1040582?v=3"
-            size={50}
-            style={{margin:'0 10px'}}
+            size={40}
+            style={{margin:'8px 10px 0 20px'}}
           />
         <ToolbarTitle style={{color:indigo50, paddingRight: 0}} text="Ofer Cohen" />
           <IconMenu style={{marginTop:'5px'}}
