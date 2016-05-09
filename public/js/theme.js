@@ -18,12 +18,6 @@ const theme = {
     borderColor: grey300,
     pickerHeaderColor: blue500,
   },
-  toolbar: {
-    color: indigo50,
-    separatorColor : indigo50,
-    backgroundColor : grey900,
-    height: 70,
-  }
 };
 
 export default theme;

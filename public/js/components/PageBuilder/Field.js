@@ -43,7 +43,7 @@ class Field extends Component {
           mandatory = false,
           size = 5 } = field;
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
-    let inputLabel = mandatory ? `${label}*` : label;
+    let inputLabel = mandatory ? <span>label <span className="required">*</span></span> : label;
 
     if (type === "select") {
       let select_options = this.props.field.options;
@@ -89,7 +89,7 @@ class Field extends Component {
           <Checkbox
             data-path={path}
             label={inputLabel}
-            style={{ marginBottom: '16px', paddingLeft: '15px'}}
+            style={{ marginBottom: '16px', marginLeft: '-10px'}}
             defaultChecked={value}
             onCheck={onChange}
           />

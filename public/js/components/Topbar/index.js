@@ -5,7 +5,7 @@ import IconButton from 'material-ui/IconButton';
 import NavigationExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import MenuItem from 'material-ui/MenuItem';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
-import {indigo50} from 'material-ui/styles/colors';
+import {indigo50,grey900} from 'material-ui/styles/colors';
 
 
 export default class Topbar extends Component {
@@ -15,7 +15,7 @@ export default class Topbar extends Component {
 
   render() {
     return (
-      <Toolbar className="topbar">
+      <Toolbar className="topbar" style={{height: 70,backgroundColor : grey900}}>
         <ToolbarGroup>
           <a href="#">
             {<img src="img/billrun-logo-tm.png" />}

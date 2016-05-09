@@ -1,6 +1,7 @@
 body {
     background-color: #C0C0C0;
     font-family: Roboto, sans-serif;
+    padding-bottom: 70px;
 }
 
 /* temp Overide bootstrap CSS*/
@@ -11,6 +12,9 @@ label {
       box-sizing: content-box;
 }
 /* temp Overide bootstrap CSS*/
+.required{
+  color: red!important;
+}
 .footer {
     background-color: #272A39!important;
     padding: 20px 0;
@@ -21,6 +25,10 @@ label {
 }
 .topbar{
   padding:5px 20px!important;
+}
+.main-content{
+  height: 100%;
+  background-color: white;
 }
 .contents {
     background-color: white;

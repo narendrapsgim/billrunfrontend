@@ -8,7 +8,6 @@ const lines_list_view = {
     lists : [ {
       url : globalSetting.serverUrl + '/api/query',
       fields : [
-        {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
         {key : 'aid', label : 'AID', filter : { defaultValue : '5000000429,5000000986,5000000476'}}, // aid=5000000476
         {key : 'sid', label : 'SID', filter : {}},
         {key : 'service_name', label : 'Service Name'},
