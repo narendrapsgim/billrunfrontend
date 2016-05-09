@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
 
+const arrowStyle = {
+  marginLeft: '-10px',
+  paddingTop: '10px'
+}
+
 export default class Collapsible extends Component {
   constructor(props) {
     super(props);
@@ -30,8 +35,8 @@ export default class Collapsible extends Component {
   }
 
   printChevron() {
-    if (this.state.collapsed) return ( <ChevronRight style={{paddingTop: "10px"}} /> );
-    return ( <KeyboardArrowDown style={{paddingTop: "10px"}} /> );
+    if (this.state.collapsed) return ( <ChevronRight style={arrowStyle} /> );
+    return ( <KeyboardArrowDown style={arrowStyle} /> );
   }
 
   render() {
@@ -42,7 +47,7 @@ export default class Collapsible extends Component {
       <div className="col-md-10" style={{marginBottom: "10px"}}>
         <h4 onClick={this.toggleCollapse} style={{cursor: "pointer"}}>
           {chevron}
-          {label}
+          <span style={{verticalAlign: 'bottom'}}>{label}</span>
         </h4>
         <div style={style}>
           {content}

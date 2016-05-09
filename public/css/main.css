@@ -1,6 +1,7 @@
 body {
     background-color: #C0C0C0;
     font-family: Roboto, sans-serif;
+    padding-bottom: 70px;
 }
 
 /* temp Overide bootstrap CSS*/
@@ -11,27 +12,24 @@ label {
       box-sizing: content-box;
 }
 /* temp Overide bootstrap CSS*/
-.navbar-inverse,
+.required{
+  color: red!important;
+}
 .footer {
     background-color: #272A39!important;
     padding: 20px 0;
 }
-
 .footer > .container > p {
     color: white!important;
     font-weight: bold;
 }
-
-.navbar {
-    margin-bottom: 0px;
-    border-radius: 0!important;
+.topbar{
+  padding:5px 20px!important;
 }
-
-.navbar-brand {
-    padding: 0px;
-    padding-left: 30px;
+.main-content{
+  height: 100%;
+  background-color: white;
 }
-
 .contents {
     background-color: white;
     padding: 20px;
@@ -47,24 +45,9 @@ label {
 .navigator button {
   height: 70px!important;
 }
-/*
-.navigator > a.active {
-    color: black!important;
-    background-color: #E3E8EB!important;
-}*/
-/*.navigator > a {
-    padding: 10px!important;
-    text-transform: none!important;
-    color: #859799!important;
-    fill: #859799!important;
-    height: 100%;
-    padding-top: 16px!important;
-};*/
-
 .help-popover {
     padding: 10px!important;
 }
-
 
 .react-tagsinput {
   background-color: #fff;
@@ -109,9 +92,4 @@ label {
   outline: none;
   padding: 5px;
   width: 80px;
-}
-
-.braasList > tbody > tr:nth-child(odd) > td,
-.braasList > tbody > tr:nth-child(odd) > th {
-    background-color: #BBDEFB!important;
 }

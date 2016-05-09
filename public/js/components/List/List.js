@@ -290,7 +290,7 @@ class List extends Component {
        .url(url)
        .on('success', (response) => {
          if(response && response.status){
-           let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 100)) : [];
+           let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 50)) : [];
            let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
            this.setState({
               totalPages : this._setPagesAmount(response.count, itemsPerPage),
@@ -414,6 +414,7 @@ class List extends Component {
             onClick={this.onPagintionClick}
             value='back'
             secondary={false}
+            disabled={this.state.currentPage == 1}
           >
           <BackIcon />
           </FloatingActionButton>
@@ -428,9 +429,9 @@ class List extends Component {
                 style={styles.pagination.paginationButton}
                 onClick={this.onPagintionClick}
                 value={i}
-                secondary={this.state.currentPage == i}
+                disabled={this.state.currentPage == i}
               >
-              {i}
+              <spam>{i}</spam>
             </FloatingActionButton>)
           } else {
             if(pages[pages.length-1] !== "..."){
@@ -446,6 +447,7 @@ class List extends Component {
             onClick={this.onPagintionClick}
             value='forward'
             secondary={false}
+            disabled={this.state.currentPage == this.state.totalPages}
           >
           <ForwardIcon />
           </FloatingActionButton>
@@ -454,7 +456,6 @@ class List extends Component {
         return (
           <div>
             <div style={styles.pagination.paginationBar}>{pages}</div>
-            <Divider />
           </div>
         )
       }
@@ -463,8 +464,9 @@ class List extends Component {
 
     let footer = (
       <TableRow>
-        <TableRowColumn colSpan="3" style={{textAlign: 'center'}}>
+        <TableRowColumn colSpan={this.props.settings.fields.length} style={{textAlign: 'center'}}>
           {getPager()}
+          <Divider />
           <FloatingActionButton style={styles.createNewButton} onMouseUp={this.onClickCreateNewItem}>
             <ContentAdd />
           </FloatingActionButton>
