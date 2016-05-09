@@ -116,6 +116,7 @@ class Field extends Component {
                    data-path={path}
                    onChange={onChange}
                    id={html_id}
+                   fullWidth={true}
                    multiLine={multiLine}
                    rows={rows}
                    floatingLabelText={inputLabel}
