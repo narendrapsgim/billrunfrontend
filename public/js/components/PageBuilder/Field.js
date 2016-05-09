@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import DatePicker from 'material-ui/lib/date-picker/date-picker';
-import TextField from 'material-ui/lib/text-field';
-import SelectField from 'material-ui/lib/select-field';
-import Checkbox from 'material-ui/lib/checkbox';
-import Toggle from 'material-ui/lib/toggle';
-import MenuItem from 'material-ui/lib/menus/menu-item';
+import DatePicker from 'material-ui/DatePicker';
+import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import Checkbox from 'material-ui/Checkbox';
+import Toggle from 'material-ui/Toggle';
+import MenuItem from 'material-ui/MenuItem';
 import TagsInput from 'react-tagsinput';
 
 class Field extends Component {

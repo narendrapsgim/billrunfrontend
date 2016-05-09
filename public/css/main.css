@@ -7,10 +7,14 @@ body {
 label {
     font-weight: normal;
 }
+* {
+      box-sizing: content-box;
+}
 /* temp Overide bootstrap CSS*/
 .navbar-inverse,
 .footer {
     background-color: #272A39!important;
+    padding: 20px 0;
 }
 
 .footer > .container > p {
@@ -35,23 +39,27 @@ label {
 
 .navigator {
     background-color: white;
-    border-bottom: 1px solid #E1E1E1;
     height: 70px;
 }
-
+.navigator a.active button {
+    background: #E3E8EB!important;
+}
+.navigator button {
+  height: 70px!important;
+}
+/*
 .navigator > a.active {
     color: black!important;
     background-color: #E3E8EB!important;
-}
-
-.navigator > a {
+}*/
+/*.navigator > a {
     padding: 10px!important;
     text-transform: none!important;
     color: #859799!important;
     fill: #859799!important;
     height: 100%;
     padding-top: 16px!important;
-};
+};*/
 
 .help-popover {
     padding: 10px!important;

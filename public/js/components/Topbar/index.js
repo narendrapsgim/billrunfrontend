@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Avatar from 'material-ui/Avatar';
 
 export default class Topbar extends Component {
   constructor(props) {
@@ -16,7 +17,12 @@ export default class Topbar extends Component {
           </div>
           <div className="collapse navbar-collapse">
             <div className="navbar-header navbar-right">
-              <a className="navbar-brand" href="#">User Name (Avatar)</a>
+                <a className="navbar-brand" href="#">
+                  <Avatar
+                    src="https://avatars.githubusercontent.com/u/1040582?v=3"
+                    size={50}
+                  />User Name
+                </a>
             </div>
           </div>
         </div>
