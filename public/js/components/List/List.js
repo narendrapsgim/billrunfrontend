@@ -414,6 +414,7 @@ class List extends Component {
             onClick={this.onPagintionClick}
             value='back'
             secondary={false}
+            disabled={this.state.currentPage == 1}
           >
           <BackIcon />
           </FloatingActionButton>
@@ -428,9 +429,9 @@ class List extends Component {
                 style={styles.pagination.paginationButton}
                 onClick={this.onPagintionClick}
                 value={i}
-                secondary={this.state.currentPage == i}
+                disabled={this.state.currentPage == i}
               >
-              {i}
+              <spam>{i}</spam>
             </FloatingActionButton>)
           } else {
             if(pages[pages.length-1] !== "..."){
@@ -446,6 +447,7 @@ class List extends Component {
             onClick={this.onPagintionClick}
             value='forward'
             secondary={false}
+            disabled={this.state.currentPage == this.state.totalPages}
           >
           <ForwardIcon />
           </FloatingActionButton>
