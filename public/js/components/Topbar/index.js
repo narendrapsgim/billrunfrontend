@@ -22,13 +22,13 @@ export default class Topbar extends Component {
           </a>
         </ToolbarGroup>
         <ToolbarGroup>
-          <ToolbarSeparator style={{backgroundColor:indigo50}}/>
+          <ToolbarSeparator style={{top: '13px'}}/>
           <Avatar
             src="https://avatars.githubusercontent.com/u/1040582?v=3"
             size={40}
             style={{margin:'8px 10px 0 20px'}}
           />
-        <ToolbarTitle style={{color:indigo50, paddingRight: 0}} text="Ofer Cohen" />
+        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text="Ofer Cohen" />
           <IconMenu style={{marginTop:'5px'}}
             iconButtonElement={
               <IconButton touch={true}>
