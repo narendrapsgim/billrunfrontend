@@ -11,27 +11,19 @@ label {
       box-sizing: content-box;
 }
 /* temp Overide bootstrap CSS*/
-.navbar-inverse,
 .footer {
     background-color: #272A39!important;
     padding: 20px 0;
 }
-
 .footer > .container > p {
     color: white!important;
     font-weight: bold;
 }
-
-.navbar {
-    margin-bottom: 0px;
-    border-radius: 0!important;
+.topbar{
+  background-color:#272A39!important;
+  padding:10px!important;
+  height: auto!important;
 }
-
-.navbar-brand {
-    padding: 0px;
-    padding-left: 30px;
-}
-
 .contents {
     background-color: white;
     padding: 20px;
@@ -47,24 +39,9 @@ label {
 .navigator button {
   height: 70px!important;
 }
-/*
-.navigator > a.active {
-    color: black!important;
-    background-color: #E3E8EB!important;
-}*/
-/*.navigator > a {
-    padding: 10px!important;
-    text-transform: none!important;
-    color: #859799!important;
-    fill: #859799!important;
-    height: 100%;
-    padding-top: 16px!important;
-};*/
-
 .help-popover {
     padding: 10px!important;
 }
-
 
 .react-tagsinput {
   background-color: #fff;
