@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import ChevronRight from 'material-ui/lib/svg-icons/navigation/chevron-right';
-import KeyboardArrowDown from 'material-ui/lib/svg-icons/hardware/keyboard-arrow-down';
+import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
+import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
 
 export default class Collapsible extends Component {
   constructor(props) {
@@ -33,7 +33,7 @@ export default class Collapsible extends Component {
     if (this.state.collapsed) return ( <ChevronRight style={{paddingTop: "10px"}} /> );
     return ( <KeyboardArrowDown style={{paddingTop: "10px"}} /> );
   }
-  
+
   render() {
     let { label, content } = this.props;
     let style = this.innerDivStyle();

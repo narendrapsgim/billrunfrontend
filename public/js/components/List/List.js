@@ -1,24 +1,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Table from 'material-ui/lib/table/table';
-import TableHeader from 'material-ui/lib/table/table-header';
-import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
-import TableBody from 'material-ui/lib/table/table-body';
-import TableRow from 'material-ui/lib/table/table-row';
-import TableRowColumn from 'material-ui/lib/table/table-row-column';
-import TableFooter from 'material-ui/lib/table/table-footer';
-import TextField from 'material-ui/lib/text-field';
-import FloatingActionButton from 'material-ui/lib/floating-action-button';
-import ContentAdd from 'material-ui/lib/svg-icons/content/add';
-import BackIcon from 'material-ui/lib/svg-icons/navigation/arrow-back';
-import DownwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-drop-down';
-import UpwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-drop-up';
-import ForwardIcon from 'material-ui/lib/svg-icons/navigation/arrow-forward';
-import Divider from 'material-ui/lib/divider';
-import Snackbar from 'material-ui/lib/snackbar';
-import LinearProgress from 'material-ui/lib/linear-progress';
-import Toolbar from 'material-ui/lib/toolbar/toolbar';
-import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
+import {Table} from 'material-ui/Table';
+import TableHeader from 'material-ui/Table/TableHeader';
+import TableHeaderColumn from 'material-ui/Table/TableHeaderColumn';
+import TableBody from 'material-ui/Table/TableBody';
+import TableRow from 'material-ui/Table/TableRow';
+import TableRowColumn from 'material-ui/Table/TableRowColumn';
+import TableFooter from 'material-ui/Table/TableFooter';
+import TextField from 'material-ui/TextField';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import BackIcon from 'material-ui/svg-icons/navigation/arrow-back';
+import DownwardIcon from 'material-ui/svg-icons/navigation/arrow-drop-down';
+import UpwardIcon from 'material-ui/svg-icons/navigation/arrow-drop-up';
+import ForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
+import Divider from 'material-ui/Divider';
+import Snackbar from 'material-ui/Snackbar';
+import LinearProgress from 'material-ui/LinearProgress';
+import {Toolbar, ToolbarTitle} from 'material-ui/Toolbar';
 
 import _ from 'lodash';
 import aja from 'aja';
@@ -132,6 +131,8 @@ class List extends Component {
     let filters = this._getFilterDefaultValues(settings.fields);
     this.setState({
       rows : [],
+      sortField : '',
+      sortType : '',
       filters : filters,
       currentPage : 1,
       totalPages : 1,
@@ -206,6 +207,13 @@ class List extends Component {
   }
 
   /* Helpers */
+  _setPagesAmount(itemsCount, itemPerPage){
+    if(parseInt(itemsCount) > 0 && parseInt(itemPerPage) > 0){
+      return  Math.ceil(itemsCount / itemPerPage);
+    }
+    return 1;
+  }
+
   _sortData(key, value) {
     this.setState({
       sortField : key,
@@ -266,7 +274,7 @@ class List extends Component {
     if(queryString.startsWith('&')){
       queryString = queryString.replace('&','?');
     } else {
-      queryString = '?' + queryString;
+      queryString = (queryString.length) ? '?' + queryString : '';
     }
     return queryString;
   }
@@ -282,10 +290,10 @@ class List extends Component {
        .url(url)
        .on('success', (response) => {
          if(response && response.status){
-           let demoPageNums = Math.floor(Math.random() * (10 - parseInt(this.state.currentPage) + 1)) + parseInt(this.state.currentPage);
            let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 100)) : [];
+           let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
            this.setState({
-              totalPages : (rows.length > 0) ? demoPageNums : 1, // TEMP only for demonstration, need API to get or calculate page numbers
+              totalPages : this._setPagesAmount(response.count, itemsPerPage),
               rows : rows,
               loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
            });
@@ -374,7 +382,11 @@ class List extends Component {
         {<TableHeaderColumn style={{ width: 5}}>#</TableHeaderColumn>}
         {this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
-            return <TableHeaderColumn key={i}><SortableTableHeaderColumn data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
+            if(field.sortable  && field.sortable == true){
+              return <TableHeaderColumn key={i}><SortableTableHeaderColumn data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
+            } else {
+              return <TableHeaderColumn key={i}>{field.label}</TableHeaderColumn>
+            }
           }
         })}
       </TableRow>

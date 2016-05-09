@@ -4,10 +4,9 @@ import { Link, browserHistory } from 'react-router';
 
 import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from '../../actions';
 
-import Tabs from 'material-ui/lib/tabs/tabs';
-import Tab from 'material-ui/lib/tabs/tab';
-import RaisedButton from 'material-ui/lib/raised-button';
-import Divider from 'material-ui/lib/divider';
+import {Tabs, Tab} from 'material-ui/Tabs';
+import RaisedButton from 'material-ui/RaisedButton';
+import Divider from 'material-ui/Divider';
 
 import View from '../../view';
 import Field from './Field';
@@ -143,7 +142,9 @@ class PageBuilder extends Component {
   }
 
   createFieldHTML(field, path, field_index) {
-    if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) return (<div></div>);
+    if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) {
+      return (<div key={field_index}></div>);
+    }
     if (path.endsWith(".*") && field.fields) {
       let recpath = path.replace('.*', '');
       let res = _.result(this.props, recpath);
@@ -155,7 +156,7 @@ class PageBuilder extends Component {
     let value = _.result(this.props, path);
     if (Array.isArray(value) && _.isObject(value[0])) {
       return (
-        <div className="col-md-10">
+        <div className="col-md-10" key={field_index}>
           <h4>{field.label}</h4>
           <div>
             {value.map((elm, idx) => {
@@ -172,7 +173,7 @@ class PageBuilder extends Component {
                   this.titlize(_.last(path.split('.')));
       if (field.collapsible) {
         return (
-          <Collapsible collapsed={field.collapsed} label={label} content={content} />
+          <Collapsible collapsed={field.collapsed} label={label} content={content} key={"block_collapsible_" + field_index}/>
         );
       }
       return (
@@ -211,7 +212,7 @@ class PageBuilder extends Component {
         });
       }
       return (
-        <div>
+        <div key={"section_" + section_idx}>
           {this.sectionTitle(section)}
           {output}
         </div>

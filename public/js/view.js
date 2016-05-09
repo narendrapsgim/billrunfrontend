@@ -9,13 +9,13 @@ const lines_list_view = {
       url : globalSetting.serverUrl + '/api/query',
       fields : [
         {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
-        {key : 'aid', label : 'AID', filter : { defaultValue : '5000000429,5000000986'}}, // aid=5000000476
+        {key : 'aid', label : 'AID', filter : { defaultValue : '5000000429,5000000986,5000000476'}}, // aid=5000000476
         {key : 'sid', label : 'SID', filter : {}},
         {key : 'service_name', label : 'Service Name'},
         {key : 'service_type', label : 'Service Type'},
         {key : 'plan', label : 'plan'},
         {key : 'type', label : 'Type'},
-        {key : 'urt', label : 'URT',  type : 'urt'},
+        {key : 'urt', label : 'URT',  type : 'urt', sortable : true},
       ],
       pagination : {
         itemsPerPage : 10,
@@ -77,12 +77,12 @@ const plans_list_view = {
     lists : [ {
       url : globalSetting.serverUrl + '/api/plans',
       fields : [
-        {key : 'invoice_label', label : 'Label', filter : {filterType : 'query'}},
+        {key : 'invoice_label', label : 'Label', filter : {filterType : 'query'}, sortable : true},
         {key : 'invoice_type', label : 'Type'},
         {key : 'grouping', label : 'Grouping'},
-        {key : 'price', label : 'Price', type : 'price', filter : { filterType : 'query'}},
+        {key : 'price', label : 'Price', type : 'price', filter : { filterType : 'query'}, sortable : true},
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
-        {key : 'from', label : 'From',  type : 'urt'},
+        {key : 'from', label : 'From',  type : 'urt', sortable : true},
       ],
       onItemClick : 'edit',
       defaults : {

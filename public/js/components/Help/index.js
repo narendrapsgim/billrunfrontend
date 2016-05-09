@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import HelpOutline from 'material-ui/lib/svg-icons/action/help-outline';
-import Popover from 'material-ui/lib/popover/popover';
+import HelpOutline from 'material-ui/svg-icons/action/help-outline';
+import Popover from 'material-ui/Popover';
 
 class Help extends Component {
   constructor(props) {
