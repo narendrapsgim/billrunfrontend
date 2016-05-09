@@ -20,9 +20,7 @@ label {
     font-weight: bold;
 }
 .topbar{
-  background-color:#272A39!important;
   padding:5px 20px!important;
-  height: auto!important;
 }
 .contents {
     background-color: white;
@@ -86,9 +84,4 @@ label {
   outline: none;
   padding: 5px;
   width: 80px;
-}
-
-.braasList > tbody > tr:nth-child(odd) > td,
-.braasList > tbody > tr:nth-child(odd) > th {
-    background-color: #BBDEFB!important;
 }
