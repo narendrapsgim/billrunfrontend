@@ -12,7 +12,7 @@ import View from '../../view';
 import Field from './Field';
 import List from '../List';
 import Help from '../Help';
-import Collapsible from './Collapsible';
+import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 
 import R from 'ramda';
 import _ from 'lodash';
@@ -173,7 +173,10 @@ class PageBuilder extends Component {
                   this.titlize(_.last(path.split('.')));
       if (field.collapsible) {
         return (
-          <Collapsible collapsed={field.collapsed} label={label} content={content} key={"block_collapsible_" + field_index}/>
+          <Card className="col-md-10" style={{margin: "10px auto 10px 15px"}} key={"block_collapsible_" + field_index}>
+            <CardHeader title={label} actAsExpander={true} showExpandableButton={true}/>
+            <CardText expandable={true} children={content}/>
+          </Card>
         );
       }
       return (
@@ -210,6 +213,9 @@ class PageBuilder extends Component {
                   key={idx} />
           );
         });
+      }
+      if(section.html){
+        output = <div dangerouslySetInnerHTML={{__html: section.html}}></div>;
       }
       return (
         <div key={"section_" + section_idx}>
@@ -274,6 +280,8 @@ class PageBuilder extends Component {
     let { title, sections = [] } = page_view;
     if (page_view.view_type === "tabs") {
       sectionsHTML = this.createTabsHTML(page_view.tabs);
+    } else if(page_view.view_type === "html") {
+      sectionsHTML = this.createSectionsHTML(page_view.html.sections)
     } else {
       sectionsHTML = this.createSectionsHTML(page_view.sections)
     }

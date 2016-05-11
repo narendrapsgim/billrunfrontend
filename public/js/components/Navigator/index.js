@@ -17,7 +17,7 @@ export default class Navigator extends Component {
 
   render() {
     let buttons = Object.keys(View.pages).map((page, key) => {
-      let label = View.pages[page].title;
+      let label = View.pages[page].menu_title || View.pages[page].title;
       let route = View.pages[page].route ? View.pages[page].route : page;
       return (
               <Link key={key} to={route} activeClassName='active'>
