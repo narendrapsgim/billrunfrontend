@@ -1,11 +1,25 @@
 import globalSetting from './globalSetting';
+import {red500, blue500} from 'material-ui/styles/colors';
 
+const dashboard_html = {
+  title : "",
+  view_type : "",
+  sections : [ {
+    html :  `<div class="jumbotron hero-unit">
+          		<h1>BillRun!</h1>
+          		<p>The powerful Billing system.</p>
+          		<p><a href="http://billrun.net" target="_blank" class="btn btn-primary btn-large">Learn more »</a></p>
+    	       </div>`
+  } ]
+}
 const lines_list_view = {
-  title : "Lines",
-  view_type : "list",
+  title : "",
+  view_type : "",
   sections : [ {
     title : "",
+    description: "",
     lists : [ {
+      title : "Lines",
       url : globalSetting.serverUrl + '/api/query',
       fields : [
         {key : 'aid', label : 'AID', filter : { defaultValue : '5000000429,5000000986,5000000476'}}, // aid=5000000476
@@ -69,13 +83,15 @@ const rates_new_view = {
 };
 
 const plans_list_view = {
-  title : "Plans",
+  title : "",
   view_type : "list",
   sections : [ {
     title : "",
     lists : [ {
+      title : "Plans",
       url : globalSetting.serverUrl + '/api/plans',
       fields : [
+        {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
         {key : 'invoice_label', label : 'Label', filter : {filterType : 'query'}, sortable : true},
         {key : 'invoice_type', label : 'Type', sortable : true},
         {key : 'grouping', label : 'Grouping', filter : {filterType : 'query'}},
@@ -84,6 +100,12 @@ const plans_list_view = {
         {key : 'from', label : 'From',  type : 'urt', sortable : true, filter : {filterType : 'query'}},
       ],
       onItemClick : 'edit',
+      controllers : {
+        duplicate : { label: 'Duplicate',callback:'onClickCloneItem'},
+        new : { label: 'New'},
+        edit : { label: 'Edit'},
+        delete : { label: 'Dalate', color: red500  },
+      },
       defaults : {
         tableHeight : '500px',
       }
@@ -125,7 +147,7 @@ const plans_edit_view = {
         { dbkey: "invoice_type", label: "Invoice Type", size: 10 },
         { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields:
           [
-            { dbkey: "*", collapsible: false, collapsed: true,
+            { dbkey: "*", collapsible: true, collapsed: false,
               fields:
               [
                 { dbkey: "name", label: "Name", type: "text" },
@@ -230,17 +252,21 @@ const plan_setup_tabs = [
 
 const View = {
   pages: {
-    dashboard: {title: "Dashboard"},
-      rates: {
-        title: "Rates",
-        route: "rates/rates/list",
+    dashboard: {
+      menu_title: "Dashboard",
+      view_type: "html",
+      html : dashboard_html
+    },
+    rates: {
+      menu_title: "Rates",
+      route: "rates/rates/list",
       views: {
         list: rates_list_view,
         new: rates_new_view
       }
     },
     plans: {
-      title: "Plans",
+      menu_title: "Plans",
       route: "plans/plans/list",
       views: {
         list: plans_list_view,
@@ -249,18 +275,19 @@ const View = {
       }
     },
     lines: {
-      title: "Lines",
+      menu_title: "Lines",
       route: "lines/lines/list",
       views: {
         list: lines_list_view,
         edit: lines_edit_view
       }
     },
-    plan_setup: {
-      title: "Plan Setup",
-      view_type: "tabs",
-      tabs: plan_setup_tabs
-    }
+    // plan_setup: {
+    //   title: "Plan Setup",
+    //   menu_title: "Plan Setup",
+    //   view_type: "tabs",
+    //   tabs: plan_setup_tabs
+    // }
   }
 };
 

@@ -9,9 +9,28 @@ label {
     font-weight: normal;
 }
 * {
-      box-sizing: content-box;
+    box-sizing: content-box;
+}
+.container{
+  padding-right: 0;
+  padding-left: 0;
 }
 /* temp Overide bootstrap CSS*/
+
+[class^="muidocs-icon-"], [class*=" muidocs-icon-"] {
+	font-family: 'material-ui-icons';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
 .required{
   color: red!important;
 }
@@ -27,7 +46,7 @@ label {
   padding:5px 20px!important;
 }
 .main-content{
-  height: 100%;
+  min-height: 100%;
   background-color: white;
 }
 .contents {

@@ -89,7 +89,7 @@ class Field extends Component {
           <Checkbox
             data-path={path}
             label={inputLabel}
-            style={{ marginBottom: '16px', marginLeft: '-10px'}}
+            style={{ marginBottom: '16px', marginLeft: '-2px', marginTop: '5px'}}
             defaultChecked={value}
             onCheck={onChange}
           />
