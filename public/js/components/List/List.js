@@ -9,6 +9,7 @@ import TableRowColumn from 'material-ui/Table/TableRowColumn';
 import TableFooter from 'material-ui/Table/TableFooter';
 import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import BackIcon from 'material-ui/svg-icons/navigation/arrow-back';
 import DownwardIcon from 'material-ui/svg-icons/navigation/arrow-drop-down';
@@ -17,7 +18,8 @@ import ForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
 import Divider from 'material-ui/Divider';
 import Snackbar from 'material-ui/Snackbar';
 import LinearProgress from 'material-ui/LinearProgress';
-import {Toolbar, ToolbarTitle} from 'material-ui/Toolbar';
+import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
+import {blue500} from 'material-ui/styles/colors';
 
 import _ from 'lodash';
 import aja from 'aja';
@@ -25,6 +27,8 @@ import aja from 'aja';
 import { Link, browserHistory } from 'react-router';
 
 const styles = {
+  listTopBar : {backgroundColor:'white'},
+  listActions : {margin:'5px'},
   noDataMessage : {textAlign: 'center', /*marginBottom: '-12px',*/ display: 'block'},
   pagination : {
     paginationBar : {
@@ -97,11 +101,16 @@ class List extends Component {
     //Handlers
     this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     //Actions
-    this.onClickCreateNewItem = this.onClickCreateNewItem.bind(this);
+    this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
     this.onClickTableHeader = this.onClickTableHeader.bind(this);
+
+    this.onClickCloneItem = this.onClickCloneItem.bind(this);
+    this.onClickNewItem = this.onClickNewItem.bind(this);
+    this.onClickEditItem = this.onClickEditItem.bind(this);
+    this.onClickDeleteItem = this.onClickDeleteItem.bind(this);
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
@@ -142,8 +151,11 @@ class List extends Component {
   }
 
   /* ON Actions */
+  onClickCloneItem(e) { console.log('Clone Item - ', e);}
+  onClickEditItem(e) { console.log('Edit Item - ', e);}
+  onClickDeleteItem(e) { console.log('Delete Item - ', e);}
 
-  onClickCreateNewItem(e) {
+  onClickNewItem(e) {
     let { page, collection } = this.props;
     this.context.router.push(`/${page}/${collection}/new`);
   }
@@ -403,6 +415,30 @@ class List extends Component {
       </TableRow>
     ));
 
+    const getActions = () => {
+      let actions = [];
+
+      if(this.state.settings.controllers && !_.isEmpty(this.state.settings.controllers)) {
+
+        Object.keys(this.state.settings.controllers).map((name, key) => {
+          let controller = this.state.settings.controllers[name];
+          let callback = (controller.callback) ?  controller.callback : 'onClick' +  _.capitalize(name) + 'Item';
+          actions.push(
+            <RaisedButton
+              key={"action_" + controller.label}
+              backgroundColor={controller.color || blue500}
+              onTouchTap={this[callback]}
+              label={controller.label}
+              style={styles.listActions}
+            />
+          );
+        });
+
+        return (<div>{actions}</div>);
+      }
+      return ('');
+    }
+
     const getPager = () => {
       let pages = [];
       if(this.state.settings.pagination && this.state.totalPages > 1) {
@@ -466,16 +502,21 @@ class List extends Component {
       <TableRow>
         <TableRowColumn colSpan={this.props.settings.fields.length} style={{textAlign: 'center'}}>
           {getPager()}
-          <Divider />
-          <FloatingActionButton style={styles.createNewButton} onMouseUp={this.onClickCreateNewItem}>
-            <ContentAdd />
-          </FloatingActionButton>
         </TableRowColumn>
       </TableRow>
     );
 
     return (
       <div>
+        <Toolbar style={styles.listTopBar}>
+           <ToolbarGroup>
+             <ToolbarTitle text={this.props.settings.title} />
+           </ToolbarGroup>
+           <ToolbarGroup>
+             {getActions()}
+           </ToolbarGroup>
+         </Toolbar>
+
         <Divider />
         <div>
             {filters}
