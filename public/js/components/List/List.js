@@ -270,6 +270,10 @@ class List extends Component {
       }
     }
 
+    var filters = {};
+    this.state.settings.fields.map((field, i) => { filters[field.key]=1});
+    queryString += '&filter=' +  JSON.stringify(filters);
+
     if(!_.isEmpty(queryArgs)){
       queryString += '&query=' +  JSON.stringify(queryArgs);
     }

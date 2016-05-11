@@ -91,6 +91,7 @@ const plans_list_view = {
       title : "Plans",
       url : globalSetting.serverUrl + '/api/plans',
       fields : [
+        {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
         {key : 'invoice_label', label : 'Label', filter : {filterType : 'query'}, sortable : true},
         {key : 'invoice_type', label : 'Type', sortable : true},
         {key : 'grouping', label : 'Grouping', filter : {filterType : 'query'}},
