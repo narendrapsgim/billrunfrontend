@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import globalSetting from '../../globalSetting';
 import {Table} from 'material-ui/Table';
 import TableHeader from 'material-ui/Table/TableHeader';
 import TableHeaderColumn from 'material-ui/Table/TableHeaderColumn';
@@ -106,6 +107,7 @@ class List extends Component {
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
     this.onClickTableHeader = this.onClickTableHeader.bind(this);
+    this._onRowSelection = this._onRowSelection.bind(this);
 
     this.onClickCloneItem = this.onClickCloneItem.bind(this);
     this.onClickNewItem = this.onClickNewItem.bind(this);
@@ -118,6 +120,7 @@ class List extends Component {
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
+      selectedRows : [],
       sortField : '',
       sortType : '',
       filters : filters,
@@ -140,6 +143,7 @@ class List extends Component {
     let filters = this._getFilterDefaultValues(settings.fields);
     this.setState({
       rows : [],
+      selectedRows : [],
       sortField : '',
       sortType : '',
       filters : filters,
@@ -155,6 +159,26 @@ class List extends Component {
   onClickEditItem(e) { console.log('Edit Item - ', e);}
   onClickDeleteItem(e) { console.log('Delete Item - ', e);}
 
+  _onRowSelection(selectedRows) {
+      let newSelectedRows = [1,0];
+      switch (selectedRows) {
+        case 'none': newSelectedRows = [];
+          break;
+        case 'all': newSelectedRows = _.range(0, 0 + this.state.rows.length)
+          break;
+
+          default: newSelectedRows = selectedRows.slice();
+          break;
+
+      }
+      // setTimeout is HACK to fix ui checked last iten when toggling select all to none
+      setTimeout(() => {
+          this.setState({
+              selectedRows : newSelectedRows
+          })
+       }, 100);
+  }
+
   onClickNewItem(e) {
     let { page, collection } = this.props;
     this.context.router.push(`/${page}/${collection}/new`);
@@ -163,8 +187,8 @@ class List extends Component {
   onClickRow(row, column, e) {
     let { page, collection } = this.props;
     let rawData = this.state.rows[row];
-    if(column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick){
-      let id = rawData._id.$id;
+    if(column !== -1 && rawData && rawData._id && (rawData._id.$id || rawData._id) && this.state.settings.onItemClick){
+      let id = rawData._id.$id || rawData._id;
       let url = `/${page}/${collection}/${this.state.settings.onItemClick}/${id}`;
       this.context.router.push(url);
     }
@@ -287,6 +311,14 @@ class List extends Component {
       queryString += '&sort=' +  JSON.stringify({ [this.state.sortField] : sortType });
     }
 
+    if(globalSetting.serverApiDebug && globalSetting.serverApiDebug == true){
+        queryString += '&XDEBUG_SESSION_START=netbeans-xdebug';
+    }
+
+    if(this.props.collection == "rates"){
+        queryString += '&flattenRate=true'
+    }
+
     if(queryString.startsWith('&')){
       queryString = queryString.replace('&','?');
     } else {
@@ -358,6 +390,9 @@ class List extends Component {
     let filters = {};
     fields.map((field, i) => {
       if(field.filter){
+        if(field.filter.system){
+          filters[field.key] = field.filter.system;
+        }
         if(field.filter.defaultValue && field.filter.defaultValue.length > 0){
           filters[field.key] = field.filter.defaultValue;
         }
@@ -380,7 +415,7 @@ class List extends Component {
     let { page, collection } = this.props;
     let filters = (
       this.state.settings.fields.map((field, i) => {
-        if(field.filter){
+        if(field.filter && !field.filter.system){
           return <TextField
             style={styles.filterInput}
             key={i} name={field.key}
@@ -408,8 +443,9 @@ class List extends Component {
       </TableRow>
     );
 
-    let rows = this.state.rows.map( (row, index) => (
-      <TableRow key={index} selected={row.selected}>
+    let rows = this.state.rows.map( (row, index) => {
+      return (
+      <TableRow key={index} selected={this.state.selectedRows.includes(index)}>
         {<TableRowColumn style={{ width: 5}}>{index + 1}</TableRowColumn>}
         { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
@@ -417,7 +453,7 @@ class List extends Component {
           }
         })}
       </TableRow>
-    ));
+    )});
 
     const getActions = () => {
       let actions = [];
@@ -434,6 +470,7 @@ class List extends Component {
               onTouchTap={this[callback]}
               label={controller.label}
               style={styles.listActions}
+              disabled={this.state.selectedRows < 1}
             />
           );
         });
@@ -537,6 +574,7 @@ class List extends Component {
           multiSelectable = { this.state.rows.length > 0 }
           className="braasList"
           onCellClick={this.onClickRow}
+          onRowSelection={this._onRowSelection}
         >
           <TableHeader enableSelectAll = { true }>
             {header}

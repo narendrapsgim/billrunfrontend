@@ -44,7 +44,7 @@ class PageBuilder extends Component {
     this.setState({collection, entity_id, pageName, action});
 
     if (collection && entity_id) {
-      props.dispatch(getCollectionEntity(collection, entity_id, pageName));
+      props.dispatch(getCollectionEntity(entity_id, collection, pageName));
     }
   }
 
@@ -154,9 +154,10 @@ class PageBuilder extends Component {
       });
     }
     let value = _.result(this.props, path);
+    let size = field.size || 10;
     if (Array.isArray(value) && _.isObject(value[0])) {
       return (
-        <div className="col-md-10" key={field_index}>
+        <div className={"col-md-" + size} key={field_index}>
           <h4>{field.label}</h4>
           <div>
             {value.map((elm, idx) => {
@@ -173,14 +174,14 @@ class PageBuilder extends Component {
                   this.titlize(_.last(path.split('.')));
       if (field.collapsible) {
         return (
-          <Card className="col-md-10" style={{margin: "10px auto 10px 15px"}} key={"block_collapsible_" + field_index}>
+          <Card className={"col-md-" + size} style={{margin: "10px auto 10px 15px"}} key={"block_collapsible_" + field_index}>
             <CardHeader title={label} actAsExpander={true} showExpandableButton={true}/>
             <CardText expandable={true} children={content}/>
           </Card>
         );
       }
       return (
-        <div className="col-md-10" style={{marginBottom: "15px"}}>
+        <div className={"col-md-" + size} style={{marginBottom: "15px"}}>
           <h4>{label}</h4>
           <div>
             {content}
