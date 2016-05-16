@@ -12,7 +12,7 @@ import View from '../../view';
 import Field from './Field';
 import List from '../List';
 import Help from '../Help';
-import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
+import FieldsContainer from '../PageBuilder/FieldsContainer';
 
 import R from 'ramda';
 import _ from 'lodash';
@@ -172,13 +172,8 @@ class PageBuilder extends Component {
       let label = field.label ?
                   field.label :
                   this.titlize(_.last(path.split('.')));
-      if (field.collapsible) {
-        return (
-          <Card className={"col-md-" + size} style={{margin: "10px auto 10px 15px"}} key={"block_collapsible_" + field_index}>
-            <CardHeader title={label} actAsExpander={true} showExpandableButton={true}/>
-            <CardText expandable={true} children={content}/>
-          </Card>
-        );
+      if (typeof field.collapsible !== 'undefined') {
+        return (<FieldsContainer size={size} label={label} content={content} index={field_index} collapsible={field.collapsible} expanded={field.collapsed}/>);
       }
       return (
         <div className={"col-md-" + size} style={{marginBottom: "15px"}}>
