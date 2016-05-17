@@ -321,6 +321,82 @@ const rates_discount_list_view = {
   } ]
 };
 
+const rates_charge_edit_view = {
+  title: "Edit Charge",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { dbkey: "name", label: "Name", size: 10 },
+        { dbkey: "tech_name", label: "Tech Name", size: 10 },
+        { dbkey: "vti_name", label: "VTI Name", size: 10 },
+        { dbkey: "reason", label: "Reason", size: 10 },
+        { dbkey: "key", label: "Key", size: 10 },
+        { dbkey: "type", label: "Type", size: 10 },
+
+        { dbkey: "domains",  label: "Domains", size: 10, collapsible: true, collapsed: true  ,
+          fields: [
+            { dbkey: "optional", label: "Optional", type: "array", size: 10},
+          ]
+        },
+
+        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true  , fields:
+          [
+            { dbkey: "*", size : 12, collapsible: false,
+              fields:
+              [
+                  { dbkey: "service_name", label: "Service Name", type: "text", size: 10},
+              ]
+            },
+          ]
+        },
+
+
+        { dbkey: "rates",  label: "Rates", size: 10, collapsible: true, collapsed: true  , fields:
+          [
+            { dbkey: "*", size : 12, collapsible: false,
+              fields:
+              [
+                { dbkey: "rate", label: 'Rate', size : 12, collapsible: true,
+                  fields:
+                  [
+                    { dbkey: "price", label: "Price", type: "text", size: 3},
+                    { dbkey: "interval", label: "Interval", type: "text", size: 3},
+                    { dbkey: "to", label: "To", type: "text", size: 3},
+                    { dbkey: "ceil", label: "Ceil", type: "toggle", size: 3},
+                  ]
+                },
+                { dbkey: "unit", label: "Unit", size: 10 },
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+const rates_charge_list_view = {
+  title: "Charge",
+  view_type: "list",
+  sections: [ {
+    title: "",
+    lists: [ {
+      url: globalSetting.serverUrl + '/api/rates',
+      fields: [
+        {key: 'tech_name', label: 'Name'},
+        {key: 'key', label: 'Key', filter : {filterType : 'query'}},
+        {key: '_id', label: 'ID'},
+        // {key: 'rate_type', label: 'Rate Type'},
+        // {key: 'end_publication', label: 'End Publication'},
+        {key: 'type', label: 'Type', filter :  {filterType : 'query', system : 'charge'}},
+      ],
+      onItemClick : 'edit',
+    } ]
+  } ]
+};
+
 
 const plan_setup_tabs = [
   {
@@ -429,6 +505,14 @@ const View = {
       views: {
         list: rates_discount_list_view,
         edit: rates_discount_edit_view
+      }
+    },
+    rates_charge: {
+      menu_title: "Charges",
+      route: "rates_charge/rates/list",
+      views: {
+        list: rates_charge_list_view,
+        edit: rates_charge_edit_view
       }
     },
 

@@ -1,6 +1,6 @@
 const GlobalSetting = {
   serverUrl : "http://billrunmt.local",
-  serverApiDebug : false,
+  serverApiDebug : true,
 }
 
 export default GlobalSetting;

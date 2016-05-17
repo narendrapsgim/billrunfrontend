@@ -32,7 +32,6 @@ export default class FieldsContainer extends Component {
         <Card
           className={"col-md-" + (this.props.size || 10)}
           style={style.card}
-          key={"block_collapsible_" + this.props.index}
           expanded={this.state.expanded}
           onExpandChange={this.handleExpandChange}
         >

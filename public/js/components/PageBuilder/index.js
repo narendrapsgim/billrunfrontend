@@ -143,7 +143,7 @@ class PageBuilder extends Component {
 
   createFieldHTML(field, path, field_index) {
     if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) {
-      return (<div key={field_index}></div>);
+      return (null);
     }
     if (path.endsWith(".*") && field.fields) {
       let recpath = path.replace('.*', '');
@@ -156,13 +156,12 @@ class PageBuilder extends Component {
     let value = _.result(this.props, path);
     let size = field.size || 10;
     if (Array.isArray(value) && _.isObject(value[0])) {
+      let fieldsHTML = value.map((elm, idx) => {
+         return this.createFieldHTML(field, `${path}[${idx}]`,idx)
+       });
       return (
         <div className={"col-md-" + size} key={field_index}>
-          <h4>{field.label}</h4>
-          <div>
-            {value.map((elm, idx) => {
-               return this.createFieldHTML(field, `${path}[${idx}]`, idx)})}
-          </div>
+          {fieldsHTML}
         </div>
       );
     } else if (field.fields) {
@@ -173,7 +172,7 @@ class PageBuilder extends Component {
                   field.label :
                   this.titlize(_.last(path.split('.')));
       if (typeof field.collapsible !== 'undefined') {
-        return (<FieldsContainer size={size} label={label} content={content} index={field_index} collapsible={field.collapsible} expanded={field.collapsed}/>);
+        return (<FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed}/>);
       }
       return (
         <div className={"col-md-" + size} style={{marginBottom: "15px"}}>
