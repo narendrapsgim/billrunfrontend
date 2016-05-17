@@ -29,27 +29,32 @@ export function updateFieldValue(path, field_value, page_name) {
   };
 }
 
-function gotItem(item, page_name) {
+function gotItem(item, collection, page_name) {
   return {
     type: GOT_ITEM,
     item,
-    page_name
+    page_name,
+    collection
   };
 }
 
-function fetchItem(collection, item_id) {
+function fetchItem(item_id, collection, page_name) {
   return dispatch => {
+    let queryString = `/api/${collection}?query={"_id":["${item_id}"]}`;
+    if(globalSetting.serverApiDebug && globalSetting.serverApiDebug == true){
+        queryString += '&XDEBUG_SESSION_START=netbeans-xdebug';
+    }
     aja()
-      .url(`${globalSetting.serverUrl}/api/${collection}?query={"_id":["${item_id}"]}`)
+      .url(globalSetting.serverUrl + queryString)
       .on('success', resp => {
-        dispatch(gotItem(resp.details[0], collection));
+        dispatch(gotItem(resp.details[0], collection, page_name));
       })
       .go();
   };
 }
 
-export function getCollectionEntity(collection, entity_id) {
+export function getCollectionEntity(entity_id, collection, page_name) {
   return dispatch => {
-    return dispatch(fetchItem(collection, entity_id));
+    return dispatch(fetchItem(entity_id, collection, page_name));
   };
 }

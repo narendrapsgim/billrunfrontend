@@ -5,7 +5,7 @@ import SelectField from 'material-ui/SelectField';
 import Checkbox from 'material-ui/Checkbox';
 import Toggle from 'material-ui/Toggle';
 import MenuItem from 'material-ui/MenuItem';
-import TagsInput from 'react-tagsinput';
+import Chips from '../Chips';
 
 class Field extends Component {
   constructor(props) {
@@ -14,19 +14,11 @@ class Field extends Component {
     this.onTagsChange = this.onTagsChange.bind(this);
   }
 
-  onTagsChange(val) {
+  onTagsChange(val, path) {
     let evt = {
-      target: { dataset: { path: this.state.path } }
+      target: { dataset: { path: path } }
     };
     this.props.onChange(evt, 0, val);
-  }
-
-  /** HACKITY HACK!! **/
-  componentDidMount() {
-    if (this.props.field.type === "array") {
-      let { path, field: { array: { items } } } = this.props;
-      this.setState({path: `${path}.${items}`});
-    }
   }
 
   createInputTag(field = {}) {
@@ -76,11 +68,9 @@ class Field extends Component {
         </div>
       );
     } else if (type === "array") {
-      let { title, items } = field.array;
       return (
         <div className={`col-md-${size}`}>
-          <label htmlFor={html_id}>{value[title]}</label>
-          <TagsInput value={value[items]} onChange={this.onTagsChange} />
+          <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path}/>
         </div>
       );
     } else if (type === "checkbox") {
