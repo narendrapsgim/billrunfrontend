@@ -12,7 +12,7 @@ import View from '../../view';
 import Field from './Field';
 import List from '../List';
 import Help from '../Help';
-import FieldsContainer from '../PageBuilder/FieldsContainer';
+import FieldsContainer from '../FieldsContainer';
 
 import R from 'ramda';
 import _ from 'lodash';
@@ -143,12 +143,14 @@ class PageBuilder extends Component {
 
   createFieldHTML(field, path, field_index) {
     if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) {
-      return (null);
+      return null;
     }
     if (path.endsWith(".*") && field.fields) {
       let recpath = path.replace('.*', '');
       let res = _.result(this.props, recpath);
-      if (!res) return; (<div></div>);
+      if (!res){
+        return null;
+      };
       return Object.keys(res).map((obj_key, obj_idx) => {
         return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
       });
