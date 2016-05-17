@@ -210,7 +210,7 @@ class PageBuilder extends Component {
         });
       }
       if(section.html){
-        output = <div dangerouslySetInnerHTML={{__html: section.html}}></div>;
+        output = <section.html/>;
       }
       return (
         <div key={"section_" + section_idx}>

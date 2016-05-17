@@ -1,15 +1,20 @@
 import globalSetting from './globalSetting';
 import {red500, blue500} from 'material-ui/styles/colors';
+import ImportExport from './components/HtmlPages/ImportExport';
+import Dashboard from './components/HtmlPages/Dashboard';
 
 const dashboard_html = {
   title : "",
   view_type : "",
   sections : [ {
-    html :  `<div class="jumbotron hero-unit">
-          		<h1>BillRun!</h1>
-          		<p>The powerful Billing system.</p>
-          		<p><a href="http://billrun.net" target="_blank" class="btn btn-primary btn-large">Learn more »</a></p>
-    	       </div>`
+    html : Dashboard
+  } ]
+}
+const import_export_html = {
+  title : "",
+  view_type : "",
+  sections : [ {
+    html : ImportExport
   } ]
 }
 const lines_list_view = {
@@ -26,7 +31,7 @@ const lines_list_view = {
         {key : 'sid', label : 'SID', filter : {}},
         {key : 'service_name', label : 'Service Name'},
         {key : 'service_type', label : 'Service Type'},
-        {key : 'plan', label : 'plan'},
+        {key : 'plan', label : 'plan',  filter : {}},
         {key : 'type', label : 'Type'},
         {key : 'urt', label : 'URT',  type : 'urt', sortable : true},
       ],
@@ -67,6 +72,15 @@ const rates_list_view = {
         {key: 'zone', label: 'Zone'},
         {key: 'rates', label: 'rates'}
       ],
+      controllers : {
+        // duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
+        // new : { label: 'New'},
+        // closeAndNew : { label: 'Close and New'},
+        // edit : { label: 'Edit'},
+        // delete : { label: 'Delete', color: red500  },
+        export : { label: 'Export', color: red500  },
+        import : { label: 'Import', color: red500  },
+      },
       onItemClick : 'edit',
     } ]
   } ]
@@ -124,10 +138,11 @@ const plans_list_view = {
       ],
       onItemClick : 'edit',
       controllers : {
-        duplicate : { label: 'Duplicate',callback:'onClickCloneItem'},
-        new : { label: 'New'},
-        edit : { label: 'Edit'},
-        delete : { label: 'Dalate', color: red500  },
+        duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
+        // new : { label: 'New'},
+        closeAndNew : { label: 'Close and New'},
+        // edit : { label: 'Edit'},
+        // delete : { label: 'Delete', color: red500  },
       },
       defaults : {
         tableHeight : '500px',
@@ -483,7 +498,7 @@ const View = {
       html : dashboard_html
     },
     rates: {
-      menu_title: "Rates VAT",
+      menu_title: "VAT",
       route: "rates/rates/list",
       views: {
         list: rates_list_view,
@@ -532,6 +547,11 @@ const View = {
         list: lines_list_view,
         edit: lines_edit_view
       }
+    },
+    import_export_html: {
+      menu_title: "Import/Export",
+      view_type: "html",
+      html : import_export_html
     },
     // plan_setup: {
     //   title: "Plan Setup",
