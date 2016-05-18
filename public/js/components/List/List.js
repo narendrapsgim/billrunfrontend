@@ -24,6 +24,7 @@ import {blue500} from 'material-ui/styles/colors';
 
 import _ from 'lodash';
 import aja from 'aja';
+import moment from 'moment';
 
 import { Link, browserHistory } from 'react-router';
 
@@ -47,6 +48,9 @@ const styles = {
   },
   tableCell : {
     textOverflow : 'clip',
+    whiteSpace: 'normal',
+    paddingLeft: '10px',
+    paddingRight: '10px',
   },
   createNewButton : {
     margin : '10px'
@@ -371,7 +375,7 @@ class List extends Component {
         output = row[field.key].$id;
         break;
       case 'urt':
-        output = (row[field.key].sec) ? new Date(row[field.key].sec*1000).toLocaleString() : '';
+        output = (row[field.key].sec) ? (moment(row[field.key].sec*1000).format(globalSetting.datetimeFormat)) : '';
         break;
       default:
         output = row[field.key];
@@ -434,9 +438,9 @@ class List extends Component {
         {this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             if(field.sortable  && field.sortable == true){
-              return <TableHeaderColumn key={i}><SortableTableHeaderColumn data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
+              return <TableHeaderColumn key={i}><SortableTableHeaderColumn style={styles.tableCell} data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
             } else {
-              return <TableHeaderColumn key={i}>{field.label}</TableHeaderColumn>
+              return <TableHeaderColumn key={i} style={styles.tableCell}>{field.label}</TableHeaderColumn>
             }
           }
         })}
