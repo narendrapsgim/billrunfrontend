@@ -191,10 +191,11 @@ class List extends Component {
   onClickRow(row, column, e) {
     let { page, collection } = this.props;
     let rawData = this.state.rows[row];
-    if(column !== -1 && rawData && rawData._id && (rawData._id.$id || rawData._id) && this.state.settings.onItemClick){
-      let id = rawData._id.$id || rawData._id;
+    if(column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick){
+      let id = rawData._id.$id;
       let url = `/${page}/${collection}/${this.state.settings.onItemClick}/${id}`;
       this.context.router.push(url);
+      e.stopPropagation();
     }
   }
 
@@ -286,21 +287,17 @@ class List extends Component {
       if(this.state.filters[key].length){
         let filterSetting = this._getFieldSettings(key);
         if(filterSetting){
-          if(filterSetting.filter && filterSetting.filter.filterType && filterSetting.filter.filterType == 'query' ){
-              queryArgs[key] = {
-                "$regex" : this.state.filters[key],
-                "$options" : "i"
-              };
-          } else {
-            queryString += '&' + key + "=" + this.state.filters[key];
-          }
+          queryArgs[key] = {
+            "$regex" : this.state.filters[key],
+            "$options" : "i"
+          };
         }
       }
     }
 
     var filters = {};
     this.state.settings.fields.map((field, i) => { filters[field.key]=1});
-    queryString += '&filter=' +  JSON.stringify(filters);
+    queryString += '&project=' +  JSON.stringify(filters);
 
     if(!_.isEmpty(queryArgs)){
       queryString += '&query=' +  JSON.stringify(queryArgs);
@@ -319,15 +316,10 @@ class List extends Component {
         queryString += '&XDEBUG_SESSION_START=netbeans-xdebug';
     }
 
-    if(this.props.collection == "rates"){
-        queryString += '&flattenRate=true'
-    }
+    // if(this.props.collection == "rates"){
+    //     queryString += '&flattenRate=true'
+    // }
 
-    if(queryString.startsWith('&')){
-      queryString = queryString.replace('&','?');
-    } else {
-      queryString = (queryString.length) ? '?' + queryString : '';
-    }
     return queryString;
   }
 
@@ -342,7 +334,8 @@ class List extends Component {
        .url(url)
        .on('success', (response) => {
          if(response && response.status){
-           let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 50)) : [];
+           let rows = _.values(response.details);
+           rows = rows.slice(0, Math.min(rows.length, 50));
            let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
            this.setState({
               totalPages : this._setPagesAmount(response.count, itemsPerPage),

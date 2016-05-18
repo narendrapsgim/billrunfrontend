@@ -40,14 +40,15 @@ function gotItem(item, collection, page_name) {
 
 function fetchItem(item_id, collection, page_name) {
   return dispatch => {
-    let queryString = `/api/${collection}?query={"_id":["${item_id}"]}`;
+    let queryString = `/api/find?collection=${collection}&query={"_id":{"$in" : ["${item_id}"]}}`;
     if(globalSetting.serverApiDebug && globalSetting.serverApiDebug == true){
         queryString += '&XDEBUG_SESSION_START=netbeans-xdebug';
     }
     aja()
       .url(globalSetting.serverUrl + queryString)
-      .on('success', resp => {
-        dispatch(gotItem(resp.details[0], collection, page_name));
+      .on('success', response => {
+        let item = _.values(response.details).shift();
+        dispatch(gotItem(item, collection, page_name));
       })
       .go();
   };
