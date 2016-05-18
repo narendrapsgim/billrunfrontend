@@ -25,7 +25,7 @@ class Field extends Component {
     let { value, onChange, path } = this.props;
 
     if (value == 'undefined'){
-      return (<div></div>);
+      return null;
     }
 
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
