@@ -1,6 +1,7 @@
 const GlobalSetting = {
   serverUrl : "http://billrunmt.local",
-  serverApiDebug : true,
+  serverApiDebug : false,
+  serverApiDebugQueryString : 'XDEBUG_SESSION_START=netbeans-xdebug',
   datetimeFormat : "DD/MM/YYYY HH:MM"
 }
 

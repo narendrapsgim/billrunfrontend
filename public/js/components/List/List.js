@@ -313,12 +313,8 @@ class List extends Component {
     }
 
     if(globalSetting.serverApiDebug && globalSetting.serverApiDebug == true){
-        queryString += '&XDEBUG_SESSION_START=netbeans-xdebug';
+        queryString += '&' + globalSetting.serverApiDebugQueryString;
     }
-
-    // if(this.props.collection == "rates"){
-    //     queryString += '&flattenRate=true'
-    // }
 
     return queryString;
   }

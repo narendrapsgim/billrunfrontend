@@ -96,11 +96,11 @@ const rates_product_list_view = {
       title: "Products",
       url: globalSetting.serverUrl + '/api/find?collection=rates',
       fields: [
-        {key: 'key', label: 'Key', filter : {}},
         {key: '_id', label: 'ID', type:"mongoid", hidden : true},
-        {key: 'rate_type', label: 'Rate Type'},
-        {key: 'type', label: 'Type', filter :  {system : 'product'}},
-        {key: 'zone', label: 'Zone'},
+        {key: 'type', label: 'Type', filter :  {system : 'product'}, hidden : true},
+        {key: 'key', label: 'Key', filter : {}},
+        {key: 'brand', label: 'Brand', filter : {}},
+        {key: 'model', label: 'Model', filter : {}},
         // {key: 'rates', label: 'rates'}
       ],
       onItemClick : 'edit',
@@ -131,7 +131,7 @@ const plans_list_view = {
       url : globalSetting.serverUrl + '/api/find?collection=plans',
       fields : [
         {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
-        {key : 'invoice_label', label : 'Label', filter : {}, sortable : true},
+        {key : 'technical_name', label : 'Label', filter : {}, sortable : true},
         {key : 'invoice_type', label : 'Type', sortable : true},
         {key : 'grouping', label : 'Grouping', filter : {}},
         {key : 'price', label : 'Price', type : 'price', sortable : true},
@@ -179,7 +179,7 @@ const plans_edit_view = {
       display: "inline",
       fields:
       [
-        { dbkey: "invoice_label", label: "Invoice label", size: 10 },
+        { dbkey: "technical_name", label: "Technical label", size: 10 },
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
         { dbkey: "key", label: "Key", size: 10 },
         { dbkey: "price", label: "Price", size: 10 , type: "number" },
