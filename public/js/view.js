@@ -69,6 +69,31 @@ const rates_list_view = {
         {key: 'key', label: 'Key', filter : {}},
         {key: '_id', label: 'ID', type:"mongoid", hidden : true},
         {key: 'rate_type', label: 'Rate Type'},
+        {key: 'type', label: 'Type', filter :  {system:'regular'}},
+        {key: 'zone', label: 'Zone'},
+        // {key: 'rates', label: 'rates'}
+      ],
+      controllers : {
+        duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
+        closeAndNew : { label: 'Close and New'},
+        delete : { label: 'Delete', color: red500  },
+      },
+      onItemClick : 'edit',
+    } ]
+  } ]
+};
+const rates_vat_list_view = {
+  title: "",
+  view_type: "list",
+  sections: [ {
+    title: "",
+    lists: [ {
+      title: "VAT",
+      url: globalSetting.serverUrl + '/api/find?collection=rates',
+      fields: [
+        {key: 'key', label: 'Key', filter : {}},
+        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
+        {key: 'rate_type', label: 'Rate Type'},
         {key: 'type', label: 'Type', filter :  {system:'vat'}},
         {key: 'zone', label: 'Zone'},
         // {key: 'rates', label: 'rates'}
@@ -214,6 +239,47 @@ const plans_edit_view = {
 };
 
 const rates_edit_view = {
+  title: "Edit Rate",
+  view_type: "sections",
+  sections: [
+    {
+      // title: "Test",
+      display: "inline",
+      fields:
+      [
+        { dbkey: "key", label: "Key", size: 10 },
+        { dbkey: "type", label: "Type", size: 10 },
+        { dbkey: "country", label: "Country", type:'array' },
+        { dbkey: "alpha3", label: "Alpha3", type:'array' },
+        { dbkey: "zone", label: "zone"},
+        { dbkey: "zone_grouping", label: "Zone Grouping" },
+        { dbkey: "to", label: "To", type:'date'},
+        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "access", label: "Access", type: "text"},
+                { dbkey: "currency", label: "Currency", type: "text"},
+                { dbkey: "unit", label: "Unit", type: "text"},
+                { dbkey: "erp_account", label: "ERP Account", type: "text"},
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
+                  [
+                        { dbkey: "interval", label: "Interval", type: "text"},
+                        { dbkey: "to", label: "To", type: "text"},
+                        { dbkey: "price", label: "Price ", type: "text"},
+                  ]
+                },
+              ]
+            }
+          ]
+        },
+      ]
+    }
+  ]
+};
+
+const rates_vat_edit_view = {
   title: "Edit Rate",
   view_type: "sections",
   sections: [
@@ -502,12 +568,21 @@ const View = {
       html : dashboard_html
     },
     rates: {
-      menu_title: "VAT",
+      menu_title: "Rate",
       route: "rates/rates/list",
       views: {
         list: rates_list_view,
         new: rates_new_view,
         edit: rates_edit_view
+      }
+    },
+    rates_vat: {
+      menu_title: "VAT",
+      route: "rates_vat/rates/list",
+      views: {
+        list: rates_vat_list_view,
+        new: rates_new_view,
+        edit: rates_vat_edit_view
       }
     },
     rates_product: {
