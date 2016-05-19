@@ -169,9 +169,27 @@ class PageBuilder extends Component {
         </div>
       );
     } else if (field.fields) {
-      let content = field.fields.map((subfield, field_idx) => {
+      let cont_fields = field.fields.map((subfield, field_idx) => {
         return this.createFieldHTML(subfield, `${path}.${subfield.dbkey}`, field_idx);
       });
+      let onClickNew = function (path) {
+        let p = prompt("Please insert new type");
+        this.props.dispatch(updateFieldValue(`${path}.${p}`, [], this.getPageName()));
+      };
+      let crudActionBtns = (field.crud && field.crud[0] === '1') ? (
+        <span>
+          <FloatingActionButton mini={true} onClick={onClickNew.bind(this, path)}>
+            <ContentAdd />
+          </FloatingActionButton>
+          <br/><br/>
+        </span>
+      ) : (null);
+      let content = (
+        <div>
+          {crudActionBtns}
+          {cont_fields}
+        </div>
+      );
       let label = field.label ?
                   field.label :
                   this.titlize(_.last(path.split('.')));

@@ -224,9 +224,10 @@ const rates_edit_view = {
       [
         { dbkey: "key", label: "Key", size: 10 },
         { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
+        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, crud: '1110',
+          fields:
           [
-            { dbkey: "*", collapsible: true, collapsed: true,
+            { dbkey: "*", collapsible: true, collapsed: true, crud: '0111',
               fields:
               [
                 { dbkey: "base_account", label: "Base Account", type: "text"},

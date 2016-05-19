@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 
 const style = {
   card : {
@@ -19,6 +21,7 @@ export default class FieldsContainer extends Component {
   handleExpandChange(expanded) {
     this.setState({expanded: expanded});
   };
+  
   render() {
     if(!this.props.collapsible){
       return (
@@ -30,12 +33,12 @@ export default class FieldsContainer extends Component {
     } else {
       return (
         <Card
-          className={"col-md-" + (this.props.size || 10)}
-          style={style.card}
-          expanded={this.state.expanded}
-          onExpandChange={this.handleExpandChange}
+            className={"col-md-" + (this.props.size || 10)}
+            style={style.card}
+            expanded={this.state.expanded}
+            onExpandChange={this.handleExpandChange}
         >
-          <CardHeader title={this.props.label} actAsExpander={true} showExpandableButton={true}/>
+          <CardHeader title={this.props.label} actAsExpander={true} showExpandableButton={true} />
           <CardText expandable={true} children={this.props.content}/>
         </Card>
       );
