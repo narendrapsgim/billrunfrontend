@@ -7,6 +7,8 @@ import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from 
 import {Tabs, Tab} from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import View from '../../view';
 import Field from './Field';
@@ -174,7 +176,9 @@ class PageBuilder extends Component {
                   field.label :
                   this.titlize(_.last(path.split('.')));
       if (typeof field.collapsible !== 'undefined') {
-        return (<FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed}/>);
+        return (
+          <FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} />
+        );
       }
       return (
         <div className={"col-md-" + size} style={{marginBottom: "15px"}}>

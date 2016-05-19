@@ -339,6 +339,9 @@ class List extends Component {
        .on('success', (response) => {
          if(response && response.status){
            let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 50)) : [];
+           rows.map(row => {
+             row._id = "571ef62b9144dbb2de3ee4ee";
+           });
            let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
            this.setState({
               totalPages : this._setPagesAmount(response.count, itemsPerPage),

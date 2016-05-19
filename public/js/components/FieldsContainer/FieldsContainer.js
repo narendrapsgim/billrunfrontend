@@ -22,10 +22,10 @@ export default class FieldsContainer extends Component {
   render() {
     if(!this.props.collapsible){
       return (
-          <Card className={"col-md-" + (this.props.size || 10)} style={style.card} key={"block_collapsible_" + this.props.index}>
-            <CardHeader title={this.props.label}/>
-            <CardText expandable={false} children={this.props.content}/>
-          </Card>
+        <Card className={"col-md-" + (this.props.size || 10)} style={style.card} key={"block_collapsible_" + this.props.index}>
+          <CardHeader title={this.props.label}/>
+          <CardText expandable={false} children={this.props.content}/>
+        </Card>
       );
     } else {
       return (

@@ -1,5 +1,5 @@
 const GlobalSetting = {
-  serverUrl : "http://billrunmt.local",
+  serverUrl : "http://billrun",
   serverApiDebug : true,
 }
 

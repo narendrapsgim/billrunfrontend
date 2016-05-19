@@ -70,7 +70,7 @@ const rates_list_view = {
         {key: 'rate_type', label: 'Rate Type'},
         {key: 'type', label: 'Type', filter :  {filterType : 'query', system:'vat'}},
         {key: 'zone', label: 'Zone'},
-        {key: 'rates', label: 'rates'}
+//        {key: 'rates', label: 'rates'}
       ],
       controllers : {
         // duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
@@ -230,7 +230,7 @@ const rates_edit_view = {
                 { dbkey: "base_account", label: "Base Account", type: "text"},
                 { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text"},
                 { dbkey: "vat_account", label: "VAT Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true,  fields:
                   [
                         { dbkey: "interval", label: "Interval", type: "text"},
                         { dbkey: "percent", label: "Percent", type: "text"},
