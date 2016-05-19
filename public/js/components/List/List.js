@@ -24,6 +24,7 @@ import {blue500} from 'material-ui/styles/colors';
 
 import _ from 'lodash';
 import aja from 'aja';
+import moment from 'moment';
 
 import { Link, browserHistory } from 'react-router';
 
@@ -47,6 +48,9 @@ const styles = {
   },
   tableCell : {
     textOverflow : 'clip',
+    whiteSpace: 'normal',
+    paddingLeft: '10px',
+    paddingRight: '10px',
   },
   createNewButton : {
     margin : '10px'
@@ -187,10 +191,11 @@ class List extends Component {
   onClickRow(row, column, e) {
     let { page, collection } = this.props;
     let rawData = this.state.rows[row];
-    if(column !== -1 && rawData && rawData._id && (rawData._id.$id || rawData._id) && this.state.settings.onItemClick){
-      let id = rawData._id.$id || rawData._id;
+    if(column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick){
+      let id = rawData._id.$id;
       let url = `/${page}/${collection}/${this.state.settings.onItemClick}/${id}`;
       this.context.router.push(url);
+      e.stopPropagation();
     }
   }
 
@@ -282,21 +287,17 @@ class List extends Component {
       if(this.state.filters[key].length){
         let filterSetting = this._getFieldSettings(key);
         if(filterSetting){
-          if(filterSetting.filter && filterSetting.filter.filterType && filterSetting.filter.filterType == 'query' ){
-              queryArgs[key] = {
-                "$regex" : this.state.filters[key],
-                "$options" : "i"
-              };
-          } else {
-            queryString += '&' + key + "=" + this.state.filters[key];
-          }
+          queryArgs[key] = {
+            "$regex" : this.state.filters[key],
+            "$options" : "i"
+          };
         }
       }
     }
 
     var filters = {};
     this.state.settings.fields.map((field, i) => { filters[field.key]=1});
-    queryString += '&filter=' +  JSON.stringify(filters);
+    queryString += '&project=' +  JSON.stringify(filters);
 
     if(!_.isEmpty(queryArgs)){
       queryString += '&query=' +  JSON.stringify(queryArgs);
@@ -315,15 +316,10 @@ class List extends Component {
         queryString += '&XDEBUG_SESSION_START=netbeans-xdebug';
     }
 
-    if(this.props.collection == "rates"){
-        queryString += '&flattenRate=true'
-    }
+    // if(this.props.collection == "rates"){
+    //     queryString += '&flattenRate=true'
+    // }
 
-    if(queryString.startsWith('&')){
-      queryString = queryString.replace('&','?');
-    } else {
-      queryString = (queryString.length) ? '?' + queryString : '';
-    }
     return queryString;
   }
 
@@ -338,10 +334,8 @@ class List extends Component {
        .url(url)
        .on('success', (response) => {
          if(response && response.status){
-           let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 50)) : [];
-           rows.map(row => {
-             row._id = "571ef62b9144dbb2de3ee4ee";
-           });
+           let rows = _.values(response.details);
+           rows = rows.slice(0, Math.min(rows.length, 50));
            let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
            this.setState({
               totalPages : this._setPagesAmount(response.count, itemsPerPage),
@@ -374,7 +368,7 @@ class List extends Component {
         output = row[field.key].$id;
         break;
       case 'urt':
-        output = (row[field.key].sec) ? new Date(row[field.key].sec*1000).toLocaleString() : '';
+        output = (row[field.key].sec) ? (moment(row[field.key].sec*1000).format(globalSetting.datetimeFormat)) : '';
         break;
       default:
         output = row[field.key];
@@ -437,9 +431,9 @@ class List extends Component {
         {this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             if(field.sortable  && field.sortable == true){
-              return <TableHeaderColumn key={i}><SortableTableHeaderColumn data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
+              return <TableHeaderColumn key={i}><SortableTableHeaderColumn style={styles.tableCell} data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
             } else {
-              return <TableHeaderColumn key={i}>{field.label}</TableHeaderColumn>
+              return <TableHeaderColumn key={i} style={styles.tableCell}>{field.label}</TableHeaderColumn>
             }
           }
         })}

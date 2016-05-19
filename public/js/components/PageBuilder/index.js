@@ -169,8 +169,8 @@ class PageBuilder extends Component {
         </div>
       );
     } else if (field.fields) {
-      let content = field.fields.map((field, field_idx) => {
-        return this.createFieldHTML(field, `${path}.${field.dbkey}`, field_idx);
+      let content = field.fields.map((subfield, field_idx) => {
+        return this.createFieldHTML(subfield, `${path}.${subfield.dbkey}`, field_idx);
       });
       let label = field.label ?
                   field.label :

@@ -25,9 +25,9 @@ const lines_list_view = {
     description: "",
     lists : [ {
       title : "Lines",
-      url : globalSetting.serverUrl + '/api/query',
+      url : globalSetting.serverUrl + '/api/find?collection=lines',
       fields : [
-        {key : 'aid', label : 'AID', filter : { defaultValue : '5000000429,5000000986,5000000476'}}, // aid=5000000476
+        {key : 'aid', label : 'AID', filter : { defaultValue : ''}},
         {key : 'sid', label : 'SID', filter : {}},
         {key : 'service_name', label : 'Service Name'},
         {key : 'service_type', label : 'Service Type'},
@@ -58,19 +58,20 @@ const lines_edit_view = {
 };
 
 const rates_list_view = {
-  title: "Rates",
+  title: "",
   view_type: "list",
   sections: [ {
     title: "",
     lists: [ {
-      url: globalSetting.serverUrl + '/api/rates',
+      title: "VAT",
+      url: globalSetting.serverUrl + '/api/find?collection=rates',
       fields: [
-        {key: 'key', label: 'Key', filter : {filterType : 'query'}},
-        {key: '_id', label: 'ID'},
+        {key: 'key', label: 'Key', filter : {}},
+        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
         {key: 'rate_type', label: 'Rate Type'},
-        {key: 'type', label: 'Type', filter :  {filterType : 'query', system:'vat'}},
+        {key: 'type', label: 'Type', filter :  {system:'vat'}},
         {key: 'zone', label: 'Zone'},
-//        {key: 'rates', label: 'rates'}
+        // {key: 'rates', label: 'rates'}
       ],
       controllers : {
         // duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
@@ -87,19 +88,20 @@ const rates_list_view = {
 };
 
 const rates_product_list_view = {
-  title: "Products",
+  title: "",
   view_type: "list",
   sections: [ {
     title: "",
     lists: [ {
-      url: globalSetting.serverUrl + '/api/rates',
+      title: "Products",
+      url: globalSetting.serverUrl + '/api/find?collection=rates',
       fields: [
-        {key: 'key', label: 'Key', filter : {filterType : 'query'}},
-        {key: '_id', label: 'ID'},
+        {key: 'key', label: 'Key', filter : {}},
+        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
         {key: 'rate_type', label: 'Rate Type'},
-        {key: 'type', label: 'Type', filter :  {filterType : 'query', system : 'product'}},
+        {key: 'type', label: 'Type', filter :  {system : 'product'}},
         {key: 'zone', label: 'Zone'},
-        {key: 'rates', label: 'rates'}
+        // {key: 'rates', label: 'rates'}
       ],
       onItemClick : 'edit',
     } ]
@@ -126,15 +128,15 @@ const plans_list_view = {
     title : "",
     lists : [ {
       title : "Plans",
-      url : globalSetting.serverUrl + '/api/plans',
+      url : globalSetting.serverUrl + '/api/find?collection=plans',
       fields : [
         {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
-        {key : 'invoice_label', label : 'Label', filter : {filterType : 'query'}, sortable : true},
+        {key : 'invoice_label', label : 'Label', filter : {}, sortable : true},
         {key : 'invoice_type', label : 'Type', sortable : true},
-        {key : 'grouping', label : 'Grouping', filter : {filterType : 'query'}},
+        {key : 'grouping', label : 'Grouping', filter : {}},
         {key : 'price', label : 'Price', type : 'price', sortable : true},
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
-        {key : 'from', label : 'From',  type : 'urt', sortable : true, filter : {filterType : 'query'}},
+        {key : 'from', label : 'From',  type : 'urt', sortable : true, filter : {}},
       ],
       onItemClick : 'edit',
       controllers : {
@@ -230,7 +232,7 @@ const rates_edit_view = {
                 { dbkey: "base_account", label: "Base Account", type: "text"},
                 { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text"},
                 { dbkey: "vat_account", label: "VAT Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true,  fields:
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
                   [
                         { dbkey: "interval", label: "Interval", type: "text"},
                         { dbkey: "percent", label: "Percent", type: "text"},
@@ -317,19 +319,20 @@ const rates_discount_edit_view = {
 };
 
 const rates_discount_list_view = {
-  title: "Discounts",
+  title: "",
   view_type: "list",
   sections: [ {
     title: "",
     lists: [ {
-      url: globalSetting.serverUrl + '/api/rates',
+      title: "Discounts",
+      url: globalSetting.serverUrl + '/api/find?collection=rates',
       fields: [
-        {key: 'key', label: 'Key', filter : {filterType : 'query'}},
-        {key: '_id', label: 'ID'},
+        {key: 'key', label: 'Key', filter : {}},
+        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
         {key: 'rate_type', label: 'Rate Type'},
-        {key: 'type', label: 'Type', filter :  {filterType : 'query', system : 'discount'}},
+        {key: 'type', label: 'Type', filter :  {system : 'discount'}},
         {key: 'zone', label: 'Zone'},
-        {key: 'rates', label: 'rates'}
+        // {key: 'rates', label: 'rates'}
       ],
       onItemClick : 'edit',
     } ]
@@ -393,19 +396,20 @@ const rates_charge_edit_view = {
 };
 
 const rates_charge_list_view = {
-  title: "Charge",
+  title: "",
   view_type: "list",
   sections: [ {
     title: "",
     lists: [ {
-      url: globalSetting.serverUrl + '/api/rates',
+      title: "Charge",
+      url: globalSetting.serverUrl + '/api/find?collection=rates',
       fields: [
         {key: 'tech_name', label: 'Name'},
-        {key: 'key', label: 'Key', filter : {filterType : 'query'}},
-        {key: '_id', label: 'ID'},
+        {key: 'key', label: 'Key', filter : {}},
+        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
         // {key: 'rate_type', label: 'Rate Type'},
         // {key: 'end_publication', label: 'End Publication'},
-        {key: 'type', label: 'Type', filter :  {filterType : 'query', system : 'charge'}},
+        {key: 'type', label: 'Type', filter :  {system : 'charge'}},
       ],
       onItemClick : 'edit',
     } ]
