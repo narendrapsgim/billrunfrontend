@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link, browserHistory } from 'react-router';
 
-import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from '../../actions';
+import { updateFieldValue, getCollectionEntity, saveCollectionEntity, setInitialItem } from '../../actions';
 
 import {Tabs, Tab} from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -35,7 +35,16 @@ class PageBuilder extends Component {
     this.setInitialState(this.props);
   }
   componentDidMount() {
-    this.getCollectionItem(this.props);
+    switch (this.props.params.action) {
+      case 'edit':
+        this.getCollectionItem(this.props);
+        break;
+      case 'list':
+        // get list data
+        break;
+      default:
+
+    }
   }
 
   getCollectionItem(props) {
@@ -79,7 +88,7 @@ class PageBuilder extends Component {
   onSave() {
     let { dispatch } = this.props;
     let pageName = this.getPageName();
-    dispatch(saveForm(pageName));
+    dispatch(saveCollectionEntity(this.props.item, this.props.params.collection, pageName, this.context.router));
   }
 
   onCancel() {
@@ -294,9 +303,15 @@ class PageBuilder extends Component {
   }
 }
 
+PageBuilder.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
+
+
 function mapStateToProps(state, ownProps) {
   let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
   return (state[pageName]) ? state[pageName] : state;
 }
+
 
 export default connect(mapStateToProps)(PageBuilder);
