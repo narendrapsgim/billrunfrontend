@@ -1,5 +1,7 @@
 import { UPDATE_FIELD_VALUE, GOT_ITEM, SAVE_FORM, SET_INITIAL_ITEM, REMOVE_FIELD } from './actions';
+import globalSetting from './globalSetting';
 import _ from 'lodash';
+import aja from 'aja';
 
 export default function rootReducer(state = {}, action) {
   let item, path;
@@ -36,9 +38,6 @@ export default function rootReducer(state = {}, action) {
                                         state[action.page_name],
 					{item: action.item}
 				       )});
-  case SAVE_FORM:
-    console.log("Sending AJAX with item: ", state[action.page_name].item);
-    return state;
   default:
     return state;
   }

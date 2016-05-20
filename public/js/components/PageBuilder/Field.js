@@ -5,13 +5,21 @@ import SelectField from 'material-ui/SelectField';
 import Checkbox from 'material-ui/Checkbox';
 import Toggle from 'material-ui/Toggle';
 import MenuItem from 'material-ui/MenuItem';
+import moment from 'moment';
+
 import Chips from '../Chips';
+import globalSetting from '../../globalSetting';
 
 class Field extends Component {
   constructor(props) {
     super(props);
     this.state = { path: "" };
     this.onTagsChange = this.onTagsChange.bind(this);
+    this.formatDate = this.formatDate.bind(this);
+  }
+
+  formatDate(date){
+    return (moment(date).format(globalSetting.dateFormat)) ;
   }
 
   onTagsChange(val, path) {
@@ -61,10 +69,11 @@ class Field extends Component {
         </div>
       );
     } else if (type === "date") {
+      let date = (value.sec) ? new Date(value.sec*1000) : '' ;
       return (
         <div>
           <label htmlFor={html_id}>{label}</label>
-          <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={onChange} />
+          <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={onChange} defaultDate={date} formatDate={this.formatDate}/>
         </div>
       );
     } else if (type === "array") {

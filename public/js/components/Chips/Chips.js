@@ -19,7 +19,7 @@ const styles = {
     pointerEvents: 'auto',
     color: theme.palette.accent3Color,
     transformOrigin: 'left top 0px',
-    margin: '0 0 0 10px',
+    margin: '0px',
   },
   labelFocus: {
     position: 'absolute',
@@ -31,7 +31,7 @@ const styles = {
     transformOrigin: 'left top',
     pointerEvents: 'auto',
     color: theme.palette.primary1Color,
-    margin: '0 0 0 10px',
+    margin: '0px',
   },
   input: {
     marginLeft: '5px',
@@ -127,7 +127,7 @@ export default class Chips extends Component {
             onFocus={this.onInputFocus}
             onKeyPress={this.onKeyPress}
             onChange={this.onInputChange}
-            hintText="Add new"
+            hintText={"Add new " + label.toLowerCase()  }
             style={styles.input}
           />
       </div>
