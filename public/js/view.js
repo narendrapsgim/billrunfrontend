@@ -233,7 +233,7 @@ const rates_edit_view = {
                 { dbkey: "base_account", label: "Base Account", type: "text"},
                 { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text"},
                 { dbkey: "vat_account", label: "VAT Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, fields:
                   [
                         { dbkey: "interval", label: "Interval", type: "text"},
                         { dbkey: "percent", label: "Percent", type: "text"},

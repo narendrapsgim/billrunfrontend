@@ -50,7 +50,7 @@ class Field extends Component {
         });
       }
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <SelectField
               value={value}
               id={html_id}
@@ -62,20 +62,20 @@ class Field extends Component {
       );
     } else if (type === "date") {
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <label htmlFor={html_id}>{label}</label>
           <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={onChange} />
         </div>
       );
     } else if (type === "array") {
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path}/>
         </div>
       );
     } else if (type === "checkbox") {
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <Checkbox
             data-path={path}
             label={inputLabel}
@@ -87,7 +87,7 @@ class Field extends Component {
       );
     } else if (type === "toggle") {
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <Toggle
             label={inputLabel}
             data-path={path}
@@ -101,17 +101,15 @@ class Field extends Component {
     let multiLine = type === "textarea" ? true : false;
     let rows = multiLine ? 2 : 1;
     return (
-      <div className={`col-md-${size}`}>
-        <TextField value={value}
-                   data-path={path}
-                   onChange={onChange}
-                   id={html_id}
-                   fullWidth={true}
-                   multiLine={multiLine}
-                   rows={rows}
-                   floatingLabelText={inputLabel}
-        />
-      </div>
+      <TextField value={value}
+                 data-path={path}
+                 onChange={onChange}
+                 id={html_id}
+                 fullWidth={true}
+                 multiLine={multiLine}
+                 rows={rows}
+                 floatingLabelText={inputLabel}
+      />
     );
   }
 

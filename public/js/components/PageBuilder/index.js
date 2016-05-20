@@ -2,13 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link, browserHistory } from 'react-router';
 
-import { updateFieldValue, getCollectionEntity, saveForm, setInitialItem } from '../../actions';
+import { updateFieldValue, removeField, getCollectionEntity, saveForm, setInitialItem } from '../../actions';
 
 import {Tabs, Tab} from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import View from '../../view';
 import Field from './Field';
@@ -142,7 +140,7 @@ class PageBuilder extends Component {
       return { dbkey: item_key, label: this.titlize(item_key), size: (from_array ? 3 : 10) };
     });
   }
-
+  
   createFieldHTML(field, path, field_index) {
     if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) {
       return null;
@@ -164,42 +162,24 @@ class PageBuilder extends Component {
          return this.createFieldHTML(field, `${path}[${idx}]`,idx)
        });
       return (
-        <div className={"col-md-" + size} key={field_index}>
+        <div key={field_index}>
           {fieldsHTML}
         </div>
       );
     } else if (field.fields) {
-      let cont_fields = field.fields.map((subfield, field_idx) => {
+      let content = field.fields.map((subfield, field_idx) => {
         return this.createFieldHTML(subfield, `${path}.${subfield.dbkey}`, field_idx);
       });
-      let onClickNew = function (path) {
-        let p = prompt("Please insert new type");
-        this.props.dispatch(updateFieldValue(`${path}.${p}`, [], this.getPageName()));
-      };
-      let crudActionBtns = (field.crud && field.crud[0] === '1') ? (
-        <span>
-          <FloatingActionButton mini={true} onClick={onClickNew.bind(this, path)}>
-            <ContentAdd />
-          </FloatingActionButton>
-          <br/><br/>
-        </span>
-      ) : (null);
-      let content = (
-        <div>
-          {crudActionBtns}
-          {cont_fields}
-        </div>
-      );
       let label = field.label ?
                   field.label :
                   this.titlize(_.last(path.split('.')));
       if (typeof field.collapsible !== 'undefined') {
         return (
-          <FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} />
+          <FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} crud={field.crud} path={path} dispatch={this.props.dispatch} pageName={this.getPageName()} />
         );
       }
       return (
-        <div className={"col-md-" + size} style={{marginBottom: "15px"}}>
+        <div style={{marginBottom: "15px"}}>
           <h4>{label}</h4>
           <div>
             {content}
