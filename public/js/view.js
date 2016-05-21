@@ -263,7 +263,7 @@ const rates_edit_view = {
                 { dbkey: "currency", label: "Currency", type: "text", inline: true},
                 { dbkey: "unit", label: "Unit", type: "text"},
                 { dbkey: "erp_account", label: "ERP Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, crud: "1111", fields:
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, crud: "1110", fields:
                   [
                     { dbkey: "interval", label: "Interval", type: "text", inline: true },
                     { dbkey: "to", label: "To", type: "text", inline: true },

@@ -49377,7 +49377,7 @@
 	    // title: "Test",
 	    display: "inline",
 	    fields: [{ dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "country", label: "Country", type: 'array' }, { dbkey: "alpha3", label: "Alpha3", type: 'array' }, { dbkey: "zone", label: "zone" }, { dbkey: "zone_grouping", label: "Zone Grouping" }, { dbkey: "to", label: "To", type: 'date' }, { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, crud: "1110", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "access", label: "Access", type: "text", inline: true }, { dbkey: "currency", label: "Currency", type: "text", inline: true }, { dbkey: "unit", label: "Unit", type: "text" }, { dbkey: "erp_account", label: "ERP Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, crud: "1111", fields: [{ dbkey: "interval", label: "Interval", type: "text", inline: true }, { dbkey: "to", label: "To", type: "text", inline: true }, { dbkey: "price", label: "Price ", type: "text", inline: true }]
+	        fields: [{ dbkey: "access", label: "Access", type: "text", inline: true }, { dbkey: "currency", label: "Currency", type: "text", inline: true }, { dbkey: "unit", label: "Unit", type: "text" }, { dbkey: "erp_account", label: "ERP Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, crud: "1110", fields: [{ dbkey: "interval", label: "Interval", type: "text", inline: true }, { dbkey: "to", label: "To", type: "text", inline: true }, { dbkey: "price", label: "Price ", type: "text", inline: true }]
 	        }]
 	      }]
 	    }]
@@ -49933,13 +49933,13 @@
 	
 	var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
 	
-	var _fileDownload = __webpack_require__(/*! material-ui/svg-icons/file/file-download */ 312);
+	var _cloudDownload = __webpack_require__(/*! material-ui/svg-icons/file/cloud-download */ 312);
 	
-	var _fileDownload2 = _interopRequireDefault(_fileDownload);
+	var _cloudDownload2 = _interopRequireDefault(_cloudDownload);
 	
-	var _fileUpload = __webpack_require__(/*! material-ui/svg-icons/file/file-upload */ 313);
+	var _cloudUpload = __webpack_require__(/*! material-ui/svg-icons/file/cloud-upload */ 313);
 	
-	var _fileUpload2 = _interopRequireDefault(_fileUpload);
+	var _cloudUpload2 = _interopRequireDefault(_cloudUpload);
 	
 	var _Divider = __webpack_require__(/*! material-ui/Divider */ 314);
 	
@@ -49982,10 +49982,28 @@
 	  function ImportExport(props) {
 	    _classCallCheck(this, ImportExport);
 	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ImportExport).call(this, props));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ImportExport).call(this, props));
+	
+	    _this.onImportClick = _this.onImportClick.bind(_this);
+	    _this.onExportClick = _this.onExportClick.bind(_this);
+	    return _this;
 	  }
 	
 	  _createClass(ImportExport, [{
+	    key: 'onImportClick',
+	    value: function onImportClick(e) {
+	      var form = this.refs['importForm'];
+	      if (e.target.files.length) {
+	        console.log("form to submit: ", form);
+	        console.log("File to upload : ", e.target.files[0]);
+	      }
+	    }
+	  }, {
+	    key: 'onExportClick',
+	    value: function onExportClick(e) {
+	      console.log("Export, e : ", e);
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(
@@ -49994,7 +50012,7 @@
 	        _react2.default.createElement(
 	          'h3',
 	          null,
-	          'Import / Export Rates'
+	          'Import / Export'
 	        ),
 	        _react2.default.createElement(
 	          _Paper2.default,
@@ -50002,21 +50020,26 @@
 	          _react2.default.createElement(
 	            _RaisedButton2.default,
 	            {
-	              label: 'Import Rates',
-	              labelPosition: 'after',
+	              label: 'Import',
+	              labelPosition: 'before',
 	              primary: true,
 	              style: styles.button,
-	              icon: _react2.default.createElement(_fileUpload2.default, null)
+	              icon: _react2.default.createElement(_cloudUpload2.default, null)
 	            },
-	            _react2.default.createElement('input', { type: 'file', style: styles.exampleImageInput })
+	            _react2.default.createElement(
+	              'form',
+	              { ref: 'importForm', encType: 'multipart/form-data', action: 'http://billrunmt.local/', method: 'POST' },
+	              _react2.default.createElement('input', { type: 'file', style: styles.exampleImageInput, onChange: this.onImportClick })
+	            )
 	          ),
 	          _react2.default.createElement(_Divider2.default, null),
 	          _react2.default.createElement(_RaisedButton2.default, {
-	            label: 'Export Rates',
-	            labelPosition: 'after',
+	            label: 'Export',
+	            labelPosition: 'before',
 	            primary: true,
-	            icon: _react2.default.createElement(_fileDownload2.default, null),
-	            style: styles.button
+	            icon: _react2.default.createElement(_cloudDownload2.default, null),
+	            style: styles.button,
+	            onClick: this.onExportClick
 	          })
 	        )
 	      );
@@ -50731,9 +50754,9 @@
 
 /***/ },
 /* 312 */
-/*!*******************************************************!*\
-  !*** ./~/material-ui/svg-icons/file/file-download.js ***!
-  \*******************************************************/
+/*!********************************************************!*\
+  !*** ./~/material-ui/svg-icons/file/cloud-download.js ***!
+  \********************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50756,23 +50779,23 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var FileFileDownload = function FileFileDownload(props) {
+	var FileCloudDownload = function FileCloudDownload(props) {
 	  return _react2.default.createElement(
 	    _SvgIcon2.default,
 	    props,
-	    _react2.default.createElement('path', { d: 'M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z' })
+	    _react2.default.createElement('path', { d: 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z' })
 	  );
 	};
-	FileFileDownload = (0, _pure2.default)(FileFileDownload);
-	FileFileDownload.displayName = 'FileFileDownload';
+	FileCloudDownload = (0, _pure2.default)(FileCloudDownload);
+	FileCloudDownload.displayName = 'FileCloudDownload';
 	
-	exports.default = FileFileDownload;
+	exports.default = FileCloudDownload;
 
 /***/ },
 /* 313 */
-/*!*****************************************************!*\
-  !*** ./~/material-ui/svg-icons/file/file-upload.js ***!
-  \*****************************************************/
+/*!******************************************************!*\
+  !*** ./~/material-ui/svg-icons/file/cloud-upload.js ***!
+  \******************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50795,17 +50818,17 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var FileFileUpload = function FileFileUpload(props) {
+	var FileCloudUpload = function FileCloudUpload(props) {
 	  return _react2.default.createElement(
 	    _SvgIcon2.default,
 	    props,
-	    _react2.default.createElement('path', { d: 'M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z' })
+	    _react2.default.createElement('path', { d: 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z' })
 	  );
 	};
-	FileFileUpload = (0, _pure2.default)(FileFileUpload);
-	FileFileUpload.displayName = 'FileFileUpload';
+	FileCloudUpload = (0, _pure2.default)(FileCloudUpload);
+	FileCloudUpload.displayName = 'FileCloudUpload';
 	
-	exports.default = FileFileUpload;
+	exports.default = FileCloudUpload;
 
 /***/ },
 /* 314 */
