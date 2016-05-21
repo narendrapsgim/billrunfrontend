@@ -41,6 +41,7 @@ class Field extends Component {
           dbkey,
           multiselect = false,
           mandatory = false,
+          inline = false,
           size = 5 } = field;
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
     let inputLabel = mandatory ? <span>label <span className="required">*</span></span> : label;
@@ -114,7 +115,7 @@ class Field extends Component {
                  data-path={path}
                  onChange={onChange}
                  id={html_id}
-                 fullWidth={true}
+                 fullWidth={!inline}
                  multiLine={multiLine}
                  rows={rows}
                  floatingLabelText={inputLabel}

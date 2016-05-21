@@ -28040,6 +28040,18 @@
 	      return Object.assign({}, state, _defineProperty({}, action.page_name, Object.assign({}, state[action.page_name], {
 	        item: item
 	      })));
+	    case _actions.NEW_FIELD:
+	      item = _lodash2.default.cloneDeep(state[action.page_name].item);
+	      path = action.path.replace('item.', '');
+	      if (action.field_type === "object") {
+	        _lodash2.default.set(item, path, {});
+	      } else if (action.field_type === "array") {
+	        var r = _lodash2.default.result(item, path);
+	        r.push({});
+	      }
+	      return Object.assign({}, state, _defineProperty({}, action.page_name, Object.assign({}, state[action.page_name], {
+	        item: item
+	      })));
 	    case _actions.REMOVE_FIELD:
 	      item = _lodash2.default.cloneDeep(state[action.page_name].item);
 	      path = action.path.replace('item.', '');
@@ -28066,9 +28078,10 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.REMOVE_FIELD = exports.SET_INITIAL_ITEM = exports.SAVE_FORM = exports.GOT_ITEM = exports.UPDATE_FIELD_VALUE = undefined;
+	exports.REMOVE_FIELD = exports.NEW_FIELD = exports.SET_INITIAL_ITEM = exports.SAVE_FORM = exports.GOT_ITEM = exports.UPDATE_FIELD_VALUE = undefined;
 	exports.setInitialItem = setInitialItem;
 	exports.updateFieldValue = updateFieldValue;
+	exports.newField = newField;
 	exports.removeField = removeField;
 	exports.getCollectionEntity = getCollectionEntity;
 	exports.saveCollectionEntity = saveCollectionEntity;
@@ -28087,6 +28100,7 @@
 	var GOT_ITEM = exports.GOT_ITEM = 'GOT_COLLECTION_ITEMS';
 	var SAVE_FORM = exports.SAVE_FORM = 'SAVE_FORM';
 	var SET_INITIAL_ITEM = exports.SET_INITIAL_ITEM = 'SET_INITIAL_ITEM';
+	var NEW_FIELD = exports.NEW_FIELD = 'NEW_FIELD';
 	var REMOVE_FIELD = exports.REMOVE_FIELD = 'REMOVE_FIELD';
 	
 	function setInitialItem(page_name) {
@@ -28101,6 +28115,15 @@
 	    type: UPDATE_FIELD_VALUE,
 	    path: path,
 	    field_value: field_value,
+	    page_name: page_name
+	  };
+	}
+	
+	function newField(path, field_type, page_name) {
+	  return {
+	    type: NEW_FIELD,
+	    path: path,
+	    field_type: field_type,
 	    page_name: page_name
 	  };
 	}
@@ -49337,7 +49360,7 @@
 	  sections: [{
 	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "technical_name", label: "Technical label", size: 10 }, { dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "price", label: "Price", size: 10, type: "number" }, { dbkey: "display_order", label: "Display Order", size: 10 }, { dbkey: "invoice_type", label: "Invoice Type", size: 10 }, { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	    fields: [{ dbkey: "technical_name", label: "Technical label", size: 10 }, { dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "price", label: "Price", size: 10, type: "number" }, { dbkey: "display_order", label: "Display Order", size: 10 }, { dbkey: "invoice_type", label: "Invoice Type", size: 10 }, { dbkey: "options", label: "Options", collapsible: true, collapsed: true, crud: "1110", fields: [{ dbkey: "*", collapsible: true, collapsed: true, crud: "0111",
 	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
 	      }]
 	    }, { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true, size: 10, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
@@ -49353,8 +49376,8 @@
 	  sections: [{
 	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "country", label: "Country", type: 'array' }, { dbkey: "alpha3", label: "Alpha3", type: 'array' }, { dbkey: "zone", label: "zone" }, { dbkey: "zone_grouping", label: "Zone Grouping" }, { dbkey: "to", label: "To", type: 'date' }, { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "access", label: "Access", type: "text" }, { dbkey: "currency", label: "Currency", type: "text" }, { dbkey: "unit", label: "Unit", type: "text" }, { dbkey: "erp_account", label: "ERP Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, fields: [{ dbkey: "interval", label: "Interval", type: "text" }, { dbkey: "to", label: "To", type: "text" }, { dbkey: "price", label: "Price ", type: "text" }]
+	    fields: [{ dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "country", label: "Country", type: 'array' }, { dbkey: "alpha3", label: "Alpha3", type: 'array' }, { dbkey: "zone", label: "zone" }, { dbkey: "zone_grouping", label: "Zone Grouping" }, { dbkey: "to", label: "To", type: 'date' }, { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, crud: "1110", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	        fields: [{ dbkey: "access", label: "Access", type: "text", inline: true }, { dbkey: "currency", label: "Currency", type: "text", inline: true }, { dbkey: "unit", label: "Unit", type: "text" }, { dbkey: "erp_account", label: "ERP Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, crud: "1111", fields: [{ dbkey: "interval", label: "Interval", type: "text", inline: true }, { dbkey: "to", label: "To", type: "text", inline: true }, { dbkey: "price", label: "Price ", type: "text", inline: true }]
 	        }]
 	      }]
 	    }]
@@ -66809,6 +66832,8 @@
 	      var multiselect = _field$multiselect === undefined ? false : _field$multiselect;
 	      var _field$mandatory = field.mandatory;
 	      var mandatory = _field$mandatory === undefined ? false : _field$mandatory;
+	      var _field$inline = field.inline;
+	      var inline = _field$inline === undefined ? false : _field$inline;
 	      var _field$size = field.size;
 	      var size = _field$size === undefined ? 5 : _field$size;
 	
@@ -66896,7 +66921,7 @@
 	        'data-path': path,
 	        onChange: onChange,
 	        id: html_id,
-	        fullWidth: true,
+	        fullWidth: !inline,
 	        multiLine: multiLine,
 	        rows: rows,
 	        floatingLabelText: inputLabel
@@ -92845,12 +92870,23 @@
 	    }
 	  }, {
 	    key: 'crudActionButtons',
-	    value: function crudActionButtons(crud, path, expandable) {
+	    value: function crudActionButtons() {
 	      var _this2 = this;
 	
+	      var _props = this.props;
+	      var crud = _props.crud;
+	      var path = _props.path;
+	
 	      var onClickNew = function onClickNew(path) {
-	        var p = prompt("Please insert new type");
-	        _this2.props.dispatch((0, _actions.updateFieldValue)(path + '.' + p, {}, _this2.props.pageName));
+	        var type = path.match(/(\d])$/) ? "array" : "object";
+	        var new_path = path;
+	        if (type === "object") {
+	          var p = prompt("Please insert new type");
+	          new_path += '.' + p;
+	        } else if (type === "array") {
+	          new_path = new_path.slice(0, -3);
+	        }
+	        _this2.props.dispatch((0, _actions.newField)(new_path, type, _this2.props.pageName));
 	      };
 	      var onClickRemove = function onClickRemove(path) {
 	        var c = confirm("Are you sure you want to delete?");
@@ -92871,7 +92907,7 @@
 	      ) : null;
 	      var crudActionBtns = crud ? _react2.default.createElement(
 	        _Card.CardActions,
-	        { expandable: expandable },
+	        { expandable: true },
 	        addButton,
 	        removeButton
 	      ) : null;
@@ -92897,7 +92933,7 @@
 	          },
 	          _react2.default.createElement(_Card.CardHeader, { title: this.props.label, actAsExpander: true, showExpandableButton: true }),
 	          _react2.default.createElement(_Card.CardText, { expandable: true, children: this.props.content }),
-	          this.crudActionButtons(this.props.crud, this.props.path, this.props.collapsible)
+	          this.crudActionButtons()
 	        );
 	      }
 	    }

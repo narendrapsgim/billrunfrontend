@@ -4,7 +4,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import FlatButton from 'material-ui/FlatButton';
-import { updateFieldValue, removeField } from '../../actions';
+import { updateFieldValue, newField, removeField } from '../../actions';
 
 const style = {
   card : {
@@ -25,10 +25,18 @@ export default class FieldsContainer extends Component {
     this.setState({expanded: expanded});
   };
   
-  crudActionButtons(crud, path, expandable) {
+  crudActionButtons() {
+    let { crud, path } = this.props;
     let onClickNew = (path) => {
-      let p = prompt("Please insert new type");
-      this.props.dispatch(updateFieldValue(`${path}.${p}`, {}, this.props.pageName));
+      let type = (path.match(/(\d])$/) ? "array" : "object");
+      let new_path = path;
+      if (type === "object") {
+        let p = prompt("Please insert new type");
+        new_path += `.${p}`;
+      } else if (type === "array") {
+        new_path = new_path.slice(0, -3);
+      }
+      this.props.dispatch(newField(new_path, type, this.props.pageName));
     };
     let onClickRemove = (path) => {
       let c = confirm("Are you sure you want to delete?");
@@ -48,7 +56,7 @@ export default class FieldsContainer extends Component {
       </FloatingActionButton>
     ) : (null);
     let crudActionBtns = crud ? (
-      <CardActions expandable={expandable}>
+      <CardActions expandable={true}>
         {addButton}
         {removeButton}
       </CardActions>
@@ -73,7 +81,7 @@ export default class FieldsContainer extends Component {
         >
           <CardHeader title={this.props.label} actAsExpander={true} showExpandableButton={true} />
           <CardText expandable={true} children={this.props.content}/>
-          {this.crudActionButtons(this.props.crud, this.props.path, this.props.collapsible)}
+          {this.crudActionButtons()}
         </Card>
       );
     }

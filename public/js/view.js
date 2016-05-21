@@ -210,9 +210,9 @@ const plans_edit_view = {
         { dbkey: "price", label: "Price", size: 10 , type: "number" },
         { dbkey: "display_order", label: "Display Order", size: 10 },
         { dbkey: "invoice_type", label: "Invoice Type", size: 10 },
-        { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields:
+        { dbkey: "options", label: "Options", collapsible: true, collapsed: true, crud: "1110", fields:
           [
-            { dbkey: "*", collapsible: true, collapsed: true,
+            { dbkey: "*", collapsible: true, collapsed: true, crud: "0111",
               fields:
               [
                 { dbkey: "name", label: "Name", type: "text" },
@@ -254,20 +254,20 @@ const rates_edit_view = {
         { dbkey: "zone", label: "zone"},
         { dbkey: "zone_grouping", label: "Zone Grouping" },
         { dbkey: "to", label: "To", type:'date'},
-        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
+        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, crud: "1110",  fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:
               [
-                { dbkey: "access", label: "Access", type: "text"},
-                { dbkey: "currency", label: "Currency", type: "text"},
+                { dbkey: "access", label: "Access", type: "text", inline: true},
+                { dbkey: "currency", label: "Currency", type: "text", inline: true},
                 { dbkey: "unit", label: "Unit", type: "text"},
                 { dbkey: "erp_account", label: "ERP Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, crud: "1111", fields:
                   [
-                        { dbkey: "interval", label: "Interval", type: "text"},
-                        { dbkey: "to", label: "To", type: "text"},
-                        { dbkey: "price", label: "Price ", type: "text"},
+                    { dbkey: "interval", label: "Interval", type: "text", inline: true },
+                    { dbkey: "to", label: "To", type: "text", inline: true },
+                    { dbkey: "price", label: "Price ", type: "text", inline: true },
                   ]
                 },
               ]
