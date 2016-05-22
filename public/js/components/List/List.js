@@ -20,6 +20,8 @@ import Divider from 'material-ui/Divider';
 import Snackbar from 'material-ui/Snackbar';
 import LinearProgress from 'material-ui/LinearProgress';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
 import {blue500} from 'material-ui/styles/colors';
 
 import _ from 'lodash';
@@ -103,6 +105,8 @@ class List extends Component {
     this._getData = _.debounce(this._getData.bind(this),1000);
     this._filterData = this._filterData.bind(this);
     this._sortData = this._sortData.bind(this);
+    this._parseResults = this._parseResults.bind(this);
+    this.showSnackbar = this.showSnackbar.bind(this);
     //Handlers
     this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     //Actions
@@ -124,7 +128,6 @@ class List extends Component {
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
-      selectedRows : [],
       sortField : '',
       sortType : '',
       filters : filters,
@@ -147,7 +150,6 @@ class List extends Component {
     let filters = this._getFilterDefaultValues(settings.fields);
     this.setState({
       rows : [],
-      selectedRows : [],
       sortField : '',
       sortType : '',
       filters : filters,
@@ -164,23 +166,25 @@ class List extends Component {
   onClickDeleteItem(e) { console.log('Delete Item - ', e);}
 
   _onRowSelection(selectedRows) {
-      let newSelectedRows = [1,0];
-      switch (selectedRows) {
-        case 'none': newSelectedRows = [];
-          break;
-        case 'all': newSelectedRows = _.range(0, 0 + this.state.rows.length)
-          break;
+    // console.log(this.refs.listBoby.state.selectedRows);
 
-          default: newSelectedRows = selectedRows.slice();
-          break;
-
-      }
+      // let newSelectedRows = [1,0];
+      // switch (selectedRows) {
+      //   case 'none': newSelectedRows = [];
+      //     break;
+      //   case 'all': newSelectedRows = _.range(0, 0 + this.state.rows.length)
+      //     break;
+      //
+      //     default: newSelectedRows = selectedRows.slice();
+      //     break;
+      //
+      // }
       // setTimeout is HACK to fix ui checked last iten when toggling select all to none
-      setTimeout(() => {
-          this.setState({
-              selectedRows : newSelectedRows
-          })
-       }, 100);
+      // setTimeout(() => {
+      //   this.setState({
+      //       selectedRows : this.refs.listBoby.state.selectedRows
+      //   });
+      //  }, 1000);
   }
 
   onClickNewItem(e) {
@@ -238,16 +242,21 @@ class List extends Component {
     });
   };
 
-  handleError(data){
-    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
+  showSnackbar(message){
     this.setState({
       snackbarOpen: true,
-      snackbarMessage: errorMessage,
+      snackbarMessage: message,
+    });
+  };
+
+  handleError(data){
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
+    this.showSnackbar(errorMessage);
+    this.setState({
       loadingData : ''
     });
   }
 
-  /* Helpers */
   _setPagesAmount(itemsCount, itemPerPage){
     if(parseInt(itemsCount) > 0 && parseInt(itemPerPage) > 0){
       return  Math.ceil(itemsCount / itemPerPage);
@@ -296,7 +305,11 @@ class List extends Component {
     }
 
     var filters = {};
-    this.state.settings.fields.map((field, i) => { filters[field.key]=1});
+    if(this.state.settings.project){
+      this.state.settings.project.map((field, i) => { filters[field]=1});
+    } else {
+      this.state.settings.fields.map((field, i) => { filters[field.key]=1});
+    }
     queryString += '&project=' +  JSON.stringify(filters);
 
     if(!_.isEmpty(queryArgs)){
@@ -319,6 +332,32 @@ class List extends Component {
     return queryString;
   }
 
+  _parseResults(collection, response){
+    let rows = [];
+    if(collection == 'rates'){
+      for(let rates in response.details){
+      let baseRateData =  Object.assign({}, response.details[rates]);
+        if(baseRateData.hasOwnProperty('rates')){
+          let rateRates = Object.assign({}, baseRateData['rates']);
+          delete baseRateData['rates']
+          for(let rate in rateRates){
+            let newRate = Object.assign({}, baseRateData, rateRates[rate], {usaget:rate});
+            rows.push(newRate);
+          }
+        } else {
+          rows.push(baseRateData);
+        }
+      }
+    } else {
+      rows = _.values(response.details);
+    }
+    if(rows.length > globalSetting.list.maxItems){
+      this.showSnackbar('Too many rows, please update selected filter');
+    }
+    rows = rows.slice(0, Math.min(rows.length, globalSetting.list.maxItems));
+    return rows;
+  }
+
   _getData(query) {
     let url = this.state.settings.url;
     if (!url) return;
@@ -330,11 +369,10 @@ class List extends Component {
        .url(url)
        .on('success', (response) => {
          if(response && response.status){
-           let rows = _.values(response.details);
-           rows = rows.slice(0, Math.min(rows.length, 50));
+           let rows = this._parseResults(this.props.collection, response);
            let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
            this.setState({
-              totalPages : this._setPagesAmount(response.count, itemsPerPage),
+              totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
               rows : rows,
               loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
            });
@@ -353,21 +391,38 @@ class List extends Component {
 
   _formatField(row, field, i){
     let output = '';
+    let value = _.result(row, field.key);
     switch (field.type) {
       case 'boolean':
-        output = row[field.key] ? 'Yes' : 'No' ;
+        output = value ? 'Yes' : 'No' ;
         break;
       case 'price':
-        output = parseFloat(row[field.key]).toFixed(2).toString().replace(".", ",") + ' €';
+          let price = parseFloat(value);
+          output = ( price) ? price.toFixed(2).toString().replace(".", ",") : '0';
+          output += ' ' + globalSetting.currency;
         break;
       case 'mongoid':
-        output = row[field.key].$id;
+        output = value.$id;
         break;
       case 'urt':
-        output = (row[field.key].sec) ? (moment(row[field.key].sec*1000).format(globalSetting.datetimeFormat)) : '';
+        output = (value.sec) ? (moment(value.sec*1000).format(globalSetting.datetimeFormat)) : '';
+        break;
+      case 'timestamp':
+        output = (value) ? (moment(value*1000).format(globalSetting.datetimeFormat)) : '';
+        break;
+      case 'interval':
+        switch (row.usaget) {
+          case 'forwarded_call':
+          case 'call':
+            output =  moment(0).second(value).format('mm:ss');
+            break;
+          case 'data': output = Math.ceil(value / 1024) + " KB";
+            break;
+          default: output = value;
+        }
         break;
       default:
-        output = row[field.key];
+        output = (typeof value === "undefined") ? "-" : value;
     }
     return output;
   }
@@ -402,6 +457,7 @@ class List extends Component {
     })
     return (matchFields.length) ? matchFields[0] : false ;
   }
+  /* ~Helpers */
 
   render() {
     let { settings } = this.state;
@@ -438,7 +494,7 @@ class List extends Component {
 
     let rows = this.state.rows.map( (row, index) => {
       return (
-      <TableRow key={index} selected={this.state.selectedRows.includes(index)}>
+      <TableRow key={index}>
         {<TableRowColumn style={{ width: 5}}>{index + 1}</TableRowColumn>}
         { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
@@ -463,7 +519,7 @@ class List extends Component {
               onTouchTap={this[callback]}
               label={controller.label}
               style={styles.listActions}
-              disabled={this.state.selectedRows < 1}
+              disabled={false}
             />
           );
         });
@@ -574,9 +630,11 @@ class List extends Component {
           </TableHeader>
 
           <TableBody
+            preScanRows = { false }
             deselectOnClickaway = { false }
             showRowHover = { true }
             stripedRows = { true }
+            ref="listBoby"
           >
             {rows}
           </TableBody>
@@ -585,7 +643,21 @@ class List extends Component {
           </TableFooter>
         </Table>
 
-        <Snackbar
+
+          {/*<Dialog
+           actions={<FlatButton
+                      label="Ok"
+                      primary={true}
+                      onTouchTap={this.handleCloseSnackbar}
+                    />}
+           modal={false}
+           open={this.state.snackbarOpen}
+           onRequestClose={this.handleCloseSnackbar}
+         >
+         {this.state.snackbarMessage}
+        </Dialog>*/}
+      <Snackbar
+          color='red'
           open={this.state.snackbarOpen}
           message={this.state.snackbarMessage}
           autoHideDuration={4000}
