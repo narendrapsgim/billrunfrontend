@@ -66,17 +66,26 @@ const rates_list_view = {
       title: "VAT",
       url: globalSetting.serverUrl + '/api/find?collection=rates',
       fields: [
-        {key: 'key', label: 'Key', filter : {}},
-        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
-        {key: 'rate_type', label: 'Rate Type'},
-        {key: 'type', label: 'Type', filter :  {system:'regular'}},
-        {key: 'zone', label: 'Zone'},
-        // {key: 'rates', label: 'rates'}
+        {key: 'type', label: 'Type', filter :  {system:'regular'}, hidden : true},
+        {key: 'params.destination.prefix', label: 'Prefix', filter :  {}, hidden : true},
+        {key: 'params.destination.region', label: 'Region', filter :  {}, hidden : true},
+        {key: 'key', label: 'Key', filter : {}, sortable : true},
+        {key: 'usaget', label: 'Type', sortable : true},
+        {key: 'rate[0].price', label: 'Price'},
+        {key: 'rate[0].interval', label: 'Interval', type:'interval'},
+        {key: 'access', label: 'Access'},
+        {key: 'from', label: 'From', type:"urt", sortable : true},
+        {key: 'to', label: 'To', type:"urt", sortable : true},
+        {key: '_id', label: 'ID', type:"mongoid", sortable : true},
       ],
+      project: [ 'key', '_id', 'type', 'rates','from' ,'to'],
       controllers : {
         duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
         closeAndNew : { label: 'Close and New'},
         delete : { label: 'Delete', color: red500  },
+      },
+      pagination : {
+        itemsPerPage : 10,
       },
       onItemClick : 'edit',
     } ]
@@ -106,6 +115,9 @@ const rates_vat_list_view = {
         // delete : { label: 'Delete', color: red500  },
         export : { label: 'Export', color: red500  },
         import : { label: 'Import', color: red500  },
+      },
+      pagination : {
+        itemsPerPage : 10,
       },
       onItemClick : 'edit',
     } ]
@@ -270,6 +282,19 @@ const rates_edit_view = {
                         { dbkey: "price", label: "Price ", type: "text"},
                   ]
                 },
+              ]
+            }
+          ]
+        },
+        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true ,fields:
+          [
+            { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
+            { dbkey: "source_types", label : 'Source Types', type: 'array'},
+            { dbkey: "destination", label:" ", collapsible: false, size : 11,
+              fields:
+              [
+                { dbkey: "region", label: "Region", type: "text"},
+                { dbkey: "prefix", label: "Prefix", type: "array"},
               ]
             }
           ]
