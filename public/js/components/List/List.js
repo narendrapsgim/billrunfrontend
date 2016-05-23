@@ -304,10 +304,23 @@ class List extends Component {
       if(this.state.filters[key].length){
         let filterSetting = this._getFieldSettings(key);
         if(filterSetting){
-          queryArgs[key] = {
-            "$regex" : this.state.filters[key],
-            "$options" : "i"
-          };
+          if(filterSetting.filter.wildcard && filterSetting.filter.wildcard.length > 0){
+            queryArgs['$or'] = [];
+            filterSetting.filter.wildcard.map((replacment, i) => {
+              let wildcardkey =  key.replace("*", replacment);
+              queryArgs['$or'].push(
+                {[wildcardkey] : {
+                "$regex" : this.state.filters[key],
+                "$options" : "i"
+                }}
+              );
+            });
+          } else {
+            queryArgs[key] = {
+              "$regex" : this.state.filters[key],
+              "$options" : "i"
+            };
+          }
         }
       }
     }
@@ -505,7 +518,7 @@ class List extends Component {
     let rows = this.state.rows.map( (row, index) => {
       return (
       <TableRow key={index}>
-        {<TableRowColumn style={{ width: 5}}>{index + 1 + ((this.state.currentPage-1) * this.state.settings.pagination.itemsPerPage)}</TableRowColumn>}
+        {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * this.state.settings.pagination.itemsPerPage) : 0)}</TableRowColumn>}
         { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
