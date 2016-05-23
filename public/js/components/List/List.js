@@ -30,6 +30,14 @@ import moment from 'moment';
 
 import { Link, browserHistory } from 'react-router';
 
+const errorMessages = {
+  serverApiTimeout : 'Server timeout, please try again leter.',
+  serverApiNetworkError : 'Server error, please try again leter.',
+  serverApiDefaultError : 'Error loading data, try again later..',
+  tooManyRows : 'Too many rows, please update selected filter',
+  noData : 'No Data',
+}
+
 const styles = {
   listTopBar : {backgroundColor:'white'},
   listActions : {margin:'5px'},
@@ -250,7 +258,7 @@ class List extends Component {
   };
 
   handleError(data){
-    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : errorMessages.serverApiDefaultError ;
     this.showSnackbar(errorMessage);
     this.setState({
       loadingData : ''
@@ -352,7 +360,7 @@ class List extends Component {
       rows = _.values(response.details);
     }
     if(rows.length > globalSetting.list.maxItems){
-      this.showSnackbar('Too many rows, please update selected filter');
+      this.showSnackbar(errorMessages.tooManyRows);
     }
     rows = rows.slice(0, Math.min(rows.length, globalSetting.list.maxItems));
     return rows;
@@ -374,16 +382,18 @@ class List extends Component {
            this.setState({
               totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
               rows : rows,
-              loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
+              loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text={errorMessages.noData} /></Toolbar>),
            });
          } else {
            this.handleError(response);
          }
        })
        .on('timeout', (response) => {
+         response['desc'] = errorMessages.serverApiTimeout;
           this.handleError(response);
         })
        .on('error', (response) => {
+         response['desc'] = errorMessages.serverApiNetworkError;
           this.handleError(response);
         })
        .go();
@@ -495,7 +505,7 @@ class List extends Component {
     let rows = this.state.rows.map( (row, index) => {
       return (
       <TableRow key={index}>
-        {<TableRowColumn style={{ width: 5}}>{index + 1}</TableRowColumn>}
+        {<TableRowColumn style={{ width: 5}}>{index + 1 + ((this.state.currentPage-1) * this.state.settings.pagination.itemsPerPage)}</TableRowColumn>}
         { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
@@ -644,7 +654,7 @@ class List extends Component {
         </Table>
 
 
-          {/*<Dialog
+          <Dialog
            actions={<FlatButton
                       label="Ok"
                       primary={true}
@@ -655,14 +665,14 @@ class List extends Component {
            onRequestClose={this.handleCloseSnackbar}
          >
          {this.state.snackbarMessage}
-        </Dialog>*/}
-      <Snackbar
+        </Dialog>
+      {/*<Snackbar
           color='red'
           open={this.state.snackbarOpen}
           message={this.state.snackbarMessage}
           autoHideDuration={4000}
           onRequestClose={this.handleCloseSnackbar}
-        />
+        />*/}
 
       </div>
     );
