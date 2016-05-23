@@ -10,6 +10,7 @@ const dashboard_html = {
     html : Dashboard
   } ]
 }
+
 const import_export_html = {
   title : "",
   view_type : "",
@@ -17,6 +18,86 @@ const import_export_html = {
     html : ImportExport
   } ]
 }
+
+const plan_setup_tabs = [
+  {
+    title: "Plan Settings",
+    sections: [
+      {
+        title: "Basic Settings",
+        description: "Basic settings of the plan",
+        fields: [
+          { dbkey: "name",
+            label: "Plan Name",
+            mandatory: true,
+            type: "text" },
+          { dbkey: "description",
+            label: "Plan Description",
+            mandatory: false,
+            type: "textarea" }
+        ]
+      },
+      {
+        title: "Trial",
+        display: "inline",
+        fields: [
+          { label: "Transation",
+            mandatory: true,
+            type: "select",
+            size: 3,
+            options: [
+              { label: "Every Month", value: "every_month"}
+            ]},
+          { label: "Cycle",
+            type: "number",
+            size: 2,
+            dbkey: "trial-cycle" },
+          { label: "Plan Fee",
+            type: "number",
+            size: 3 }
+        ]
+      },
+      {
+        title: "Plan Recurring",
+        description: "Recurring charges of the plan",
+        fields: [
+          { label: "Priodical Rate",
+            type: "number",
+            size: 2 },
+          { label: "Each",
+            type: "number",
+            size: 1 },
+          { type: "select",
+            options: [
+              { label: "Every Month", value: "every_month"}
+            ],
+            size: 2,
+            dbkey: "each_select" },
+          { label: "Cycle",
+            dbkey: "recurring-cycle",
+            type: "number",
+            size: 1 },
+          { label: "Validity",
+            type: "date",
+            dbkey: "from",
+            size: 3 },
+          { type: "date",
+            dbkey: "to",
+            size: 3 }
+        ]
+      }
+    ]
+  },
+  {
+    title: "Add Item"
+  },
+  {
+    title: "Whaddup!"
+  }
+];
+
+//////////////// LINES ////////////////////////////
+
 const lines_list_view = {
   title : "",
   view_type : "",
@@ -57,6 +138,8 @@ const lines_edit_view = {
   ]
 };
 
+/////////////////// RATES /////////////////////////
+
 const rates_list_view = {
   title: "",
   view_type: "list",
@@ -91,6 +174,76 @@ const rates_list_view = {
     } ]
   } ]
 };
+
+const rates_new_view = {
+  title: "New Rate",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { dbkey: "key", label: "Key", size: 10, mandatory: true }
+      ]
+    }
+  ]
+};
+
+const rates_edit_view = {
+  title: "Edit Rate",
+  view_type: "sections",
+  sections: [
+    {
+      // title: "Test",
+      display: "inline",
+      fields:
+      [
+        { dbkey: "key", label: "Key", size: 10 },
+        { dbkey: "type", label: "Type", size: 10 },
+        { dbkey: "country", label: "Country", type:'array' },
+        { dbkey: "alpha3", label: "Alpha3", type:'array' },
+        { dbkey: "zone", label: "zone"},
+        { dbkey: "zone_grouping", label: "Zone Grouping" },
+        { dbkey: "to", label: "To", type:'date'},
+        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "access", label: "Access", type: "text"},
+                { dbkey: "currency", label: "Currency", type: "text"},
+                { dbkey: "unit", label: "Unit", type: "text"},
+                { dbkey: "erp_account", label: "ERP Account", type: "text"},
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
+                  [
+                        { dbkey: "interval", label: "Interval", type: "text"},
+                        { dbkey: "to", label: "To", type: "text"},
+                        { dbkey: "price", label: "Price ", type: "text"},
+                  ]
+                },
+              ]
+            }
+          ]
+        },
+        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true ,fields:
+          [
+            { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
+            { dbkey: "source_types", label : 'Source Types', type: 'array'},
+            { dbkey: "destination", label:" ", collapsible: false, size : 11,
+              fields:
+              [
+                { dbkey: "region", label: "Region", type: "text"},
+                { dbkey: "prefix", label: "Prefix", type: "array"},
+              ]
+            }
+          ]
+        },
+      ]
+    }
+  ]
+};
+
+/////////////////// VAT /////////////////////////
+
 const rates_vat_list_view = {
   title: "",
   view_type: "list",
@@ -124,6 +277,43 @@ const rates_vat_list_view = {
   } ]
 };
 
+const rates_vat_edit_view = {
+  title: "Edit Rate",
+  view_type: "sections",
+  sections: [
+    {
+      // title: "Test",
+      display: "inline",
+      fields:
+      [
+        { dbkey: "key", label: "Key", size: 10 },
+        { dbkey: "type", label: "Type", size: 10 },
+        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "base_account", label: "Base Account", type: "text"},
+                { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text"},
+                { dbkey: "vat_account", label: "VAT Account", type: "text"},
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
+                  [
+                        { dbkey: "interval", label: "Interval", type: "text"},
+                        { dbkey: "percent", label: "Percent", type: "text"},
+                        { dbkey: "to", label: "To", type: "text"},
+                  ]
+                },
+              ]
+            }
+          ]
+        },
+      ]
+    }
+  ]
+};
+
+/////////////////// PRODUCT /////////////////////////
+
 const rates_product_list_view = {
   title: "",
   view_type: "list",
@@ -145,18 +335,50 @@ const rates_product_list_view = {
   } ]
 };
 
-const rates_new_view = {
-  title: "New Rate",
+const rates_product_edit_view = {
+  title: "Edit Product",
   view_type: "sections",
   sections: [
     {
       display: "inline",
-      fields: [
-        { dbkey: "key", label: "Key", size: 10, mandatory: true }
+      fields:
+      [
+        { dbkey: "brand", label: "Brand", size: 10 },
+        { dbkey: "model", label: "Model", size: 10 },
+        { dbkey: "key", label: "Key", size: 10 },
+        { dbkey: "ax_code", label: "AX Code", size: 10 },
+        { dbkey: "inventory_id", label: "Inventory ID", size: 10 },
+        { dbkey: "type", label: "Type", size: 10 },
+        { dbkey: "rates",  label: "Rates", size: 10, collapsible: false, fields:
+          [
+            { dbkey: "general", label : 'General' ,collapsible: true, collapsed: true, size : 12,
+              fields:
+              [
+                  { dbkey: "price", label: "Price", type: "text"},
+                  { dbkey: "price_level", label: "Price Level", type: "text"},
+              ]
+            },
+            { dbkey: "subscription", collapsible: true, collapsed: true, size : 12,
+              fields:
+              [
+                { dbkey: "*", size : 12, collapsible: false,
+                  fields:
+                  [
+                    { dbkey: "price", label: "Price", type: "text"},
+                    { dbkey: "price_level", label: "Price Level", type: "text"},
+                  ]
+                }
+              ]
+            }
+          ]
+        },
       ]
     }
   ]
 };
+
+
+/////////////////// PLANS /////////////////////////
 
 const plans_list_view = {
   title : "",
@@ -250,136 +472,7 @@ const plans_edit_view = {
   ]
 };
 
-const rates_edit_view = {
-  title: "Edit Rate",
-  view_type: "sections",
-  sections: [
-    {
-      // title: "Test",
-      display: "inline",
-      fields:
-      [
-        { dbkey: "key", label: "Key", size: 10 },
-        { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "country", label: "Country", type:'array' },
-        { dbkey: "alpha3", label: "Alpha3", type:'array' },
-        { dbkey: "zone", label: "zone"},
-        { dbkey: "zone_grouping", label: "Zone Grouping" },
-        { dbkey: "to", label: "To", type:'date'},
-        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "access", label: "Access", type: "text"},
-                { dbkey: "currency", label: "Currency", type: "text"},
-                { dbkey: "unit", label: "Unit", type: "text"},
-                { dbkey: "erp_account", label: "ERP Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
-                  [
-                        { dbkey: "interval", label: "Interval", type: "text"},
-                        { dbkey: "to", label: "To", type: "text"},
-                        { dbkey: "price", label: "Price ", type: "text"},
-                  ]
-                },
-              ]
-            }
-          ]
-        },
-        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true ,fields:
-          [
-            { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
-            { dbkey: "source_types", label : 'Source Types', type: 'array'},
-            { dbkey: "destination", label:" ", collapsible: false, size : 11,
-              fields:
-              [
-                { dbkey: "region", label: "Region", type: "text"},
-                { dbkey: "prefix", label: "Prefix", type: "array"},
-              ]
-            }
-          ]
-        },
-      ]
-    }
-  ]
-};
-
-const rates_vat_edit_view = {
-  title: "Edit Rate",
-  view_type: "sections",
-  sections: [
-    {
-      // title: "Test",
-      display: "inline",
-      fields:
-      [
-        { dbkey: "key", label: "Key", size: 10 },
-        { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "base_account", label: "Base Account", type: "text"},
-                { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text"},
-                { dbkey: "vat_account", label: "VAT Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
-                  [
-                        { dbkey: "interval", label: "Interval", type: "text"},
-                        { dbkey: "percent", label: "Percent", type: "text"},
-                        { dbkey: "to", label: "To", type: "text"},
-                  ]
-                },
-              ]
-            }
-          ]
-        },
-      ]
-    }
-  ]
-};
-
-const rates_product_edit_view = {
-  title: "Edit Product",
-  view_type: "sections",
-  sections: [
-    {
-      display: "inline",
-      fields:
-      [
-        { dbkey: "brand", label: "Brand", size: 10 },
-        { dbkey: "model", label: "Model", size: 10 },
-        { dbkey: "key", label: "Key", size: 10 },
-        { dbkey: "ax_code", label: "AX Code", size: 10 },
-        { dbkey: "inventory_id", label: "Inventory ID", size: 10 },
-        { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "rates",  label: "Rates", size: 10, collapsible: false, fields:
-          [
-            { dbkey: "general", label : 'General' ,collapsible: true, collapsed: true, size : 12,
-              fields:
-              [
-                  { dbkey: "price", label: "Price", type: "text"},
-                  { dbkey: "price_level", label: "Price Level", type: "text"},
-              ]
-            },
-            { dbkey: "subscription", collapsible: true, collapsed: true, size : 12,
-              fields:
-              [
-                { dbkey: "*", size : 12, collapsible: false,
-                  fields:
-                  [
-                    { dbkey: "price", label: "Price", type: "text"},
-                    { dbkey: "price_level", label: "Price Level", type: "text"},
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-      ]
-    }
-  ]
-};
+/////////////////// DISCOUNTS /////////////////////////
 
 const rates_discount_edit_view = {
   title: "Edit Discount",
@@ -429,6 +522,8 @@ const rates_discount_list_view = {
     } ]
   } ]
 };
+
+/////////////////// CHANRGE /////////////////////////
 
 const rates_charge_edit_view = {
   title: "Edit Charge",
@@ -507,83 +602,7 @@ const rates_charge_list_view = {
   } ]
 };
 
-
-const plan_setup_tabs = [
-  {
-    title: "Plan Settings",
-    sections: [
-      {
-        title: "Basic Settings",
-        description: "Basic settings of the plan",
-        fields: [
-          { dbkey: "name",
-            label: "Plan Name",
-            mandatory: true,
-            type: "text" },
-          { dbkey: "description",
-            label: "Plan Description",
-            mandatory: false,
-            type: "textarea" }
-        ]
-      },
-      {
-        title: "Trial",
-        display: "inline",
-        fields: [
-          { label: "Transation",
-            mandatory: true,
-            type: "select",
-            size: 3,
-            options: [
-              { label: "Every Month", value: "every_month"}
-            ]},
-          { label: "Cycle",
-            type: "number",
-            size: 2,
-            dbkey: "trial-cycle" },
-          { label: "Plan Fee",
-            type: "number",
-            size: 3 }
-        ]
-      },
-      {
-        title: "Plan Recurring",
-        description: "Recurring charges of the plan",
-        fields: [
-          { label: "Priodical Rate",
-            type: "number",
-            size: 2 },
-          { label: "Each",
-            type: "number",
-            size: 1 },
-          { type: "select",
-            options: [
-              { label: "Every Month", value: "every_month"}
-            ],
-            size: 2,
-            dbkey: "each_select" },
-          { label: "Cycle",
-            dbkey: "recurring-cycle",
-            type: "number",
-            size: 1 },
-          { label: "Validity",
-            type: "date",
-            dbkey: "from",
-            size: 3 },
-          { type: "date",
-            dbkey: "to",
-            size: 3 }
-        ]
-      }
-    ]
-  },
-  {
-    title: "Add Item"
-  },
-  {
-    title: "Whaddup!"
-  }
-];
+/////////////////// LAYOUT /////////////////////////
 
 const View = {
   pages: {
