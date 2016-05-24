@@ -222,9 +222,9 @@ const plans_edit_view = {
         { dbkey: "price", label: "Price", size: 10 , type: "number" },
         { dbkey: "display_order", label: "Display Order", size: 10 },
         { dbkey: "invoice_type", label: "Invoice Type", size: 10 },
-        { dbkey: "options", label: "Options", collapsible: true, collapsed: true, crud: "1110", fields:
+        { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields:
           [
-            { dbkey: "*", collapsible: true, collapsed: true, crud: "0111",
+            { dbkey: "*", collapsible: true, collapsed: true,
               fields:
               [
                 { dbkey: "name", label: "Name", type: "text" },
@@ -266,7 +266,7 @@ const rates_edit_view = {
         { dbkey: "zone", label: "zone"},
         { dbkey: "zone_grouping", label: "Zone Grouping" },
         { dbkey: "to", label: "To", type:'date'},
-        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, crud: "1110",  fields:
+        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:
@@ -275,7 +275,7 @@ const rates_edit_view = {
                 { dbkey: "currency", label: "Currency", type: "text", inline: true},
                 { dbkey: "unit", label: "Unit", type: "text"},
                 { dbkey: "erp_account", label: "ERP Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, crud: "1110", fields:
+                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, fields:
                   [
                     { dbkey: "interval", label: "Interval", type: "text", inline: true },
                     { dbkey: "to", label: "To", type: "text", inline: true },

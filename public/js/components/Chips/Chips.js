@@ -128,7 +128,7 @@ export default class Chips extends Component {
                                          />);
     return (
       <div style={styles.wrapper}>
-        <label for="newChips">{label}</label>
+        <label for="newChips"><u>{label}</u></label>
         {chips}
         {textfield}
       </div>
