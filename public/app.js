@@ -29091,8 +29091,7 @@
 	  value: true
 	});
 	var GlobalSetting = {
-	  serverUrl: "http://10.162.20.86",
-	  //  serverUrl: "http://billrun",
+	  serverUrl: "http://billrun",
 	  serverApiDebug: false,
 	  serverApiDebugQueryString: 'XDEBUG_SESSION_START=netbeans-xdebug',
 	  datetimeFormat: "DD/MM/YYYY HH:MM",
@@ -29298,7 +29297,7 @@
 	  sections: [{
 	    // title: "Test",
 	    display: "inline",
-	    fields: [{ dbkey: "technical_name", label: "Technical label", size: 10 }, { dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "price", label: "Price", size: 10, type: "number" }, { dbkey: "display_order", label: "Display Order", size: 10 }, { dbkey: "invoice_type", label: "Invoice Type", size: 10 }, { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	    fields: [{ dbkey: "technical_name", label: "Technical label", size: 10 }, { dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "price", label: "Price", size: 10, type: "number" }, { dbkey: "display_order", label: "Display Order", size: 10 }, { dbkey: "invoice_type", label: "Invoice Type", size: 10 }, { dbkey: "options", label: "Options", collapsible: true, collapsed: true, crud: "1110", fields: [{ dbkey: "*", collapsible: true, collapsed: true, crud: "0111",
 	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
 	      }]
 	    }, { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true, size: 10, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
@@ -29315,7 +29314,7 @@
 	    // title: "Test",
 	    display: "inline",
 	    fields: [{ dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "country", label: "Country", type: 'array' }, { dbkey: "alpha3", label: "Alpha3", type: 'array' }, { dbkey: "zone", label: "zone" }, { dbkey: "zone_grouping", label: "Zone Grouping" }, { dbkey: "to", label: "To", type: 'date' }, { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, crud: "1110", fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "access", label: "Access", type: "text", inline: true }, { dbkey: "currency", label: "Currency", type: "text", inline: true }, { dbkey: "unit", label: "Unit", type: "text" }, { dbkey: "erp_account", label: "ERP Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, fields: [{ dbkey: "interval", label: "Interval", type: "text", inline: true }, { dbkey: "to", label: "To", type: "text", inline: true }, { dbkey: "price", label: "Price ", type: "text", inline: true }]
+	        fields: [{ dbkey: "access", label: "Access", type: "text", inline: true }, { dbkey: "currency", label: "Currency", type: "text", inline: true }, { dbkey: "unit", label: "Unit", type: "text" }, { dbkey: "erp_account", label: "ERP Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, crud: "1110", fields: [{ dbkey: "interval", label: "Interval", type: "text", inline: true }, { dbkey: "to", label: "To", type: "text", inline: true }, { dbkey: "price", label: "Price ", type: "text", inline: true }]
 	        }]
 	      }]
 	    }, { dbkey: "params", label: "Params", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "customer_segment", label: 'Customer Segment', type: 'array' }, { dbkey: "source_types", label: 'Source Types', type: 'array' }, { dbkey: "destination", label: " ", collapsible: false, size: 11,
@@ -29982,7 +29981,7 @@
 	                "old": "Inactive rates not imported",
 	                "updated_and_closed": "Updated, But closed before the configured end date due to existing future rate",
 	                "irregular": "Irregular rates that weren't imported" };
-	              var output = "Success!<br/>";
+	              var output = "";
 	              _jquery2.default.each(resp.keys, function (key, value) {
 	                if (value.length) {
 	                  output += "<div class='imported-reason imported-reason" + key + "'><span class='imported-reason-title'>" + reasons[key] + "</span>: <span class='imported-keys'>" + value.join(", ") + "</span></div>";
@@ -30065,7 +30064,7 @@
 	        _react2.default.createElement(
 	          _Dialog2.default,
 	          {
-	            title: 'Dialog With Actions',
+	            title: 'Import Successful!',
 	            actions: modal_actions,
 	            modal: false,
 	            open: this.state.import_modal_open,

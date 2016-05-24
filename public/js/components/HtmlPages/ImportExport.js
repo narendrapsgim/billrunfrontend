@@ -65,7 +65,7 @@ export default class ImportExport extends Component {
 		         "old": "Inactive rates not imported", 
 		         "updated_and_closed" : "Updated, But closed before the configured end date due to existing future rate",
 		         "irregular" : "Irregular rates that weren't imported"};
-	  let output = "Success!<br/>";
+	  let output = "";
 	  $.each(resp.keys, (key, value) => {
 	    if (value.length) {
 	      output += "<div class='imported-reason imported-reason"+key+"'><span class='imported-reason-title'>" + reasons[key] + "</span>: <span class='imported-keys'>" + value.join(", ") + "</span></div>";
@@ -134,7 +134,7 @@ export default class ImportExport extends Component {
           />
         </Paper>
         <Dialog
-            title="Dialog With Actions"
+            title="Import Successful!"
             actions={modal_actions}
             modal={false}
             open={this.state.import_modal_open}
