@@ -37,6 +37,8 @@ class PageBuilder extends Component {
   componentDidMount() {
     switch (this.props.params.action) {
       case 'edit':
+      case 'close_and_new':
+      case 'clone':
         this.getCollectionItem(this.props);
         break;
       case 'list':
@@ -66,7 +68,7 @@ class PageBuilder extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.location.pathname !== this.props.location.pathname) {
-      if (nextProps.params.action === "edit") {
+      if (nextProps.params.action === "edit" || nextProps.params.action == "clone" || nextProps.params.action == "close_and_new") {
         this.getCollectionItem(nextProps);
       } else {
         this.setInitialState(nextProps);
@@ -85,10 +87,19 @@ class PageBuilder extends Component {
     dispatch(updateFieldValue(path, value, this.getPageName()));
   }
 
-  onSave() {
+  onSave(e) {
+    let action = e.currentTarget.dataset.action;
+    let actionType = action; //close_and_new / duplicate / update / new
+    switch (action) {
+      case 'edit': actionType = 'update';
+        break;
+      case 'clone': actionType = 'duplicate';
+        break;
+    }
+
     let { dispatch } = this.props;
     let pageName = this.getPageName();
-    dispatch(saveCollectionEntity(this.props.item, this.props.params.collection, pageName, this.context.router));
+    dispatch(saveCollectionEntity(this.props.item, this.props.params.collection, pageName, this.context.router, actionType));
   }
 
   onCancel() {
@@ -151,7 +162,7 @@ class PageBuilder extends Component {
   }
 
   createFieldHTML(field, path, field_index) {
-    if (this.state.action === 'edit' && (!this.props.item || _.isEmpty(this.props.item))) {
+    if ((this.state.action === 'edit' || this.state.action === 'clone' || this.state.action === 'close_and_new') && (!this.props.item || _.isEmpty(this.props.item))) {
       return null;
     }
     if (path.endsWith(".*") && field.fields) {
@@ -248,7 +259,7 @@ class PageBuilder extends Component {
   }
 
   actionButtons(action = this.state.action) {
-    if (action === "edit" || action === "new") {
+    if (action === "edit" || action === "new" || action === "clone" || action === "close_and_new") {
       let style = {
         margin: "12px"
       };
@@ -259,6 +270,7 @@ class PageBuilder extends Component {
               primary={true}
               style={style}
               onMouseUp={this.onSave}
+              data-action={action}
           />
           <RaisedButton
               label="Cancel"
@@ -273,14 +285,14 @@ class PageBuilder extends Component {
   render() {
     let { pageName = this.getPageName(),
           action } = this.state;
-    if (action === 'edit' && !this.props.item) return (<div></div>);
+    if ((action === 'edit' || action === 'clone' ||  action === 'close_and_new') && !this.props.item) return (null);
     let sectionsHTML;
     let page_view = View.pages[pageName].views ?
                     View.pages[pageName].views[action] :
                     View.pages[pageName];
 
     if (!page_view) {
-      return (<div></div>);
+      return (null);
     }
 
     let { title, sections = [] } = page_view;
