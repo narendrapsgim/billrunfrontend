@@ -146,7 +146,7 @@ const rates_list_view = {
   sections: [ {
     title: "",
     lists: [ {
-      title: "VAT",
+      title: "Rates",
       url: globalSetting.serverUrl + '/api/find?collection=rates',
       fields: [
         {key: 'type', label: 'Type', filter:  {system:'regular'}, hidden: true},
@@ -174,27 +174,15 @@ const rates_list_view = {
       controllers : {
         duplicate : { label: 'Duplicate', callback: 'onClickCloneItem'},
         closeAndNew : { label: 'Close and New'},
-        delete : { label: 'Delete', color: red500  },
+        //delete : { label: 'Delete', color: red500  },
       },
       pagination : {
-        itemsPerPage : 10,
+        itemsPerPage : 20,
       },
       onItemClick : 'edit',
+      defaults : {tableHeight : '450px'}
     } ]
   } ]
-};
-
-const rates_new_view = {
-  title: "New Rate",
-  view_type: "sections",
-  sections: [
-    {
-      display: "inline",
-      fields: [
-        { dbkey: "key", label: "Key", size: 10, mandatory: true }
-      ]
-    }
-  ]
 };
 
 const rates_edit_view = {
@@ -250,6 +238,10 @@ const rates_edit_view = {
     }
   ]
 };
+
+const rates_new_view = Object.assign({}, rates_edit_view, {title: "New Rate"});
+
+const rates_clone_view = Object.assign({}, rates_edit_view, {title: "Clone Rate"});
 
 /////////////////// VAT /////////////////////////
 
@@ -421,23 +413,6 @@ const plans_list_view = {
   } ]
 };
 
-const plans_new_view = {
-  title: "New Plan",
-  view_type: "sections",
-  sections: [
-    {
-      display: "inline",
-      fields: [
-        { dbkey: "name", label: "Name", size: 10, mandatory: true },
-        /* { dbkey: "test", label: "Test", size: 10, type: "select", options: [
-           { label: "Option 1", value: "option_1" },
-           { label: "Option 2", value: "option_2" }
-           ] } */
-      ]
-    }
-  ]
-};
-
 const plans_edit_view = {
   title: "Edit Plan",
   view_type: "sections",
@@ -453,6 +428,8 @@ const plans_edit_view = {
         { dbkey: "price", label: "Price", size: 10 , type: "number" },
         { dbkey: "display_order", label: "Display Order", size: 10 },
         { dbkey: "invoice_type", label: "Invoice Type", size: 10 },
+        { dbkey: "from", label: "From", type: "date", size: 5 },
+        { dbkey: "to", label: "To", type: "date", size: 5 },
         { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
@@ -480,6 +457,12 @@ const plans_edit_view = {
     }
   ]
 };
+
+const plans_new_view = Object.assign({}, plans_edit_view, {title: "New Plan"});
+
+const plans_clone_view = Object.assign({}, plans_edit_view, {title: "Clone Plan"});
+
+const plans_close_and_new_view = Object.assign({}, plans_edit_view, {title: "Close And New Plan"});
 
 /////////////////// DISCOUNTS /////////////////////////
 
@@ -621,11 +604,12 @@ const View = {
       html : dashboard_html
     },
     rates: {
-      menu_title: "Rate",
+      menu_title: "Rates",
       route: "rates/rates/list",
       views: {
         list: rates_list_view,
         new: rates_new_view,
+        clone: rates_clone_view,
         edit: rates_edit_view
       }
     },
@@ -669,6 +653,8 @@ const View = {
       views: {
         list: plans_list_view,
         new: plans_new_view,
+        clone: plans_clone_view,
+        close_and_new: plans_close_and_new_view,
         edit: plans_edit_view
       }
     },

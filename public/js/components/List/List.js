@@ -36,6 +36,9 @@ const errorMessages = {
   serverApiDefaultError : 'Error loading data, try again later..',
   tooManyRows : 'Too many rows, please update selected filter',
   noData : 'No Data',
+  selectionActionAtLeastOne : 'Please select at least one item.',
+  selectionActionOnlyOne : 'Please select only one item.',
+  selectionActionatNoItems : 'No item selected.'
 }
 
 const styles = {
@@ -66,7 +69,6 @@ const styles = {
     margin : '10px'
   }
 };
-
 
 const SortTypes = {
   ASC: 1,
@@ -117,8 +119,8 @@ class List extends Component {
     this.showSnackbar = this.showSnackbar.bind(this);
     //Handlers
     this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
+    this.validateAlLeastOneSelectedRow = this.validateAlLeastOneSelectedRow.bind(this);
     //Actions
-    this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
@@ -129,6 +131,7 @@ class List extends Component {
     this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onClickEditItem = this.onClickEditItem.bind(this);
     this.onClickDeleteItem = this.onClickDeleteItem.bind(this);
+    this.onClickCloseandnewItem = this.onClickCloseandnewItem.bind(this);
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
@@ -168,10 +171,50 @@ class List extends Component {
 
   }
 
+  validateAlLeastOneSelectedRow(){
+    if(!_.isUndefined(this.refs.listBoby.state.selectedRows)) {
+      if (this.refs.listBoby.state.selectedRows.length == 1) {
+        let selectedRowNum = _.head(this.refs.listBoby.state.selectedRows);
+        let selectedItemId = this.state.rows[selectedRowNum];
+        return this.state.rows[selectedRowNum]
+      } else if(this.refs.listBoby.state.selectedRows.length > 1){
+        this.showSnackbar(errorMessages.selectionActionOnlyOne);
+        return this.refs.listBoby.state.selectedRows.length;
+      } else {
+        let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
+        this.showSnackbar(message);
+        return false;
+      }
+    }
+    return false;
+  }
   /* ON Actions */
-  onClickCloneItem(e) { console.log('Clone Item - ', e);}
+  onClickCloneItem(e) {
+    let item =  this.validateAlLeastOneSelectedRow();
+    if(item){
+      let { page, collection } = this.props;
+      let url = `/${page}/${collection}/clone/${item._id['$id']}`;
+      this.context.router.push(url);
+    }
+  }
+
+  onClickCloseandnewItem(e) {
+    let item =  this.validateAlLeastOneSelectedRow();
+    if(item){
+      let { page, collection } = this.props;
+      let url = `/${page}/${collection}/close_and_new/${item._id['$id']}`;
+      this.context.router.push(url);
+    }
+  }
+
   onClickEditItem(e) { console.log('Edit Item - ', e);}
   onClickDeleteItem(e) { console.log('Delete Item - ', e);}
+
+  onClickNewItem(e) {
+    let { page, collection } = this.props;
+    this.context.router.push(`/${page}/${collection}/new`);
+  }
+
 
   _onRowSelection(selectedRows) {
     // console.log(this.refs.listBoby.state.selectedRows);
@@ -193,11 +236,6 @@ class List extends Component {
       //       selectedRows : this.refs.listBoby.state.selectedRows
       //   });
       //  }, 1000);
-  }
-
-  onClickNewItem(e) {
-    let { page, collection } = this.props;
-    this.context.router.push(`/${page}/${collection}/new`);
   }
 
   onClickRow(row, column, e) {
@@ -677,7 +715,7 @@ class List extends Component {
            open={this.state.snackbarOpen}
            onRequestClose={this.handleCloseSnackbar}
          >
-         {this.state.snackbarMessage}
+         <div>{this.state.snackbarMessage}</div>
         </Dialog>
       {/*<Snackbar
           color='red'

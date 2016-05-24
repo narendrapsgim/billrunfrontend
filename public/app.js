@@ -29091,7 +29091,8 @@
 	  value: true
 	});
 	var GlobalSetting = {
-	  serverUrl: "http://billrun",
+	  // serverUrl : "http://10.162.20.191:1337", // Roman
+	  serverUrl: "http://10.162.20.86", // Eran
 	  serverApiDebug: false,
 	  serverApiDebugQueryString: 'XDEBUG_SESSION_START=netbeans-xdebug',
 	  datetimeFormat: "DD/MM/YYYY HH:MM",
@@ -29141,280 +29142,12 @@
 	    html: _Dashboard2.default
 	  }]
 	};
+	
 	var import_export_html = {
 	  title: "",
 	  view_type: "",
 	  sections: [{
 	    html: _ImportExport2.default
-	  }]
-	};
-	var lines_list_view = {
-	  title: "",
-	  view_type: "",
-	  sections: [{
-	    title: "",
-	    description: "",
-	    lists: [{
-	      title: "Lines",
-	      url: _globalSetting2.default.serverUrl + '/api/find?collection=lines',
-	      fields: [{ key: 'aid', label: 'AID', filter: { defaultValue: '' } }, { key: 'sid', label: 'SID', filter: {} }, { key: 'service_name', label: 'Service Name' }, { key: 'service_type', label: 'Service Type' }, { key: 'plan', label: 'plan', filter: {} }, { key: 'type', label: 'Type' }, { key: 'urt', label: 'URT', type: 'urt', sortable: true }],
-	      pagination: {
-	        itemsPerPage: 10
-	      },
-	      defaults: {
-	        tableHeight: '500px'
-	      }
-	    }]
-	  }]
-	};
-	
-	var lines_edit_view = {
-	  title: "Edit Line",
-	  view_type: "sections",
-	  sections: [{
-	    // title: "Test",
-	    display: "inline",
-	    fields: []
-	  }]
-	};
-	
-	var rates_list_view = {
-	  title: "",
-	  view_type: "list",
-	  sections: [{
-	    title: "",
-	    lists: [{
-	      title: "VAT",
-	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
-	      fields: [{ key: 'type', label: 'Type', filter: { system: 'regular' }, hidden: true }, { key: 'params.destination.prefix', label: 'Prefix', filter: {}, hidden: true }, { key: 'params.destination.region', label: 'Region', filter: {}, hidden: true }, { key: 'key', label: 'Key', filter: {}, sortable: true }, { key: 'usaget', label: 'Type', sortable: true }, { key: 'rate[0].price', label: 'Price' }, { key: 'rate[0].interval', label: 'Interval', type: 'interval' }, { key: 'access', label: 'Access' }, { key: 'from', label: 'From', type: "urt", sortable: true }, { key: 'to', label: 'To', type: "urt", sortable: true }, { key: '_id', label: 'ID', type: "mongoid", sortable: true }],
-	      project: ['key', '_id', 'type', 'rates', 'from', 'to'],
-	      controllers: {
-	        duplicate: { label: 'Duplicate', callback: 'onClickCloneItem' },
-	        closeAndNew: { label: 'Close and New' },
-	        delete: { label: 'Delete', color: _colors.red500 }
-	      },
-	      pagination: {
-	        itemsPerPage: 10
-	      },
-	      onItemClick: 'edit'
-	    }]
-	  }]
-	};
-	var rates_vat_list_view = {
-	  title: "",
-	  view_type: "list",
-	  sections: [{
-	    title: "",
-	    lists: [{
-	      title: "VAT",
-	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
-	      fields: [{ key: 'key', label: 'Key', filter: {} }, { key: '_id', label: 'ID', type: "mongoid", hidden: true }, { key: 'rate_type', label: 'Rate Type' }, { key: 'type', label: 'Type', filter: { system: 'vat' } }, { key: 'zone', label: 'Zone' }],
-	
-	      // {key: 'rates', label: 'rates'}
-	      controllers: {
-	        // duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
-	        // new : { label: 'New'},
-	        // closeAndNew : { label: 'Close and New'},
-	        // edit : { label: 'Edit'},
-	        // delete : { label: 'Delete', color: red500  },
-	        export: { label: 'Export', color: _colors.red500 },
-	        import: { label: 'Import', color: _colors.red500 }
-	      },
-	      pagination: {
-	        itemsPerPage: 10
-	      },
-	      onItemClick: 'edit'
-	    }]
-	  }]
-	};
-	
-	var rates_product_list_view = {
-	  title: "",
-	  view_type: "list",
-	  sections: [{
-	    title: "",
-	    lists: [{
-	      title: "Products",
-	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
-	      fields: [{ key: '_id', label: 'ID', type: "mongoid", hidden: true }, { key: 'type', label: 'Type', filter: { system: 'product' }, hidden: true }, { key: 'key', label: 'Key', filter: {} }, { key: 'brand', label: 'Brand', filter: {} }, { key: 'model', label: 'Model', filter: {} }],
-	
-	      // {key: 'rates', label: 'rates'}
-	      onItemClick: 'edit'
-	    }]
-	  }]
-	};
-	
-	var rates_new_view = {
-	  title: "New Rate",
-	  view_type: "sections",
-	  sections: [{
-	    display: "inline",
-	    fields: [{ dbkey: "key", label: "Key", size: 10, mandatory: true }]
-	  }]
-	};
-	
-	var plans_list_view = {
-	  title: "",
-	  view_type: "list",
-	  sections: [{
-	    title: "",
-	    lists: [{
-	      title: "Plans",
-	      url: _globalSetting2.default.serverUrl + '/api/find?collection=plans',
-	      fields: [{ key: '_id', label: 'ID', type: 'mongoid', hidden: true }, // aid=5000000476
-	      { key: 'technical_name', label: 'Label', filter: {}, sortable: true }, { key: 'invoice_type', label: 'Type', sortable: true }, { key: 'grouping', label: 'Grouping', filter: {} }, { key: 'price', label: 'Price', type: 'price', sortable: true }, { key: 'forceCommitment', label: 'Force Commitment', type: 'boolean' }, { key: 'from', label: 'From', type: 'urt', sortable: true, filter: {} }],
-	      onItemClick: 'edit',
-	      controllers: {
-	        duplicate: { label: 'Duplicate', callback: 'onClickCloneItem' },
-	        // new : { label: 'New'},
-	        closeAndNew: { label: 'Close and New' }
-	      },
-	      // edit : { label: 'Edit'},
-	      // delete : { label: 'Delete', color: red500  },
-	      defaults: {
-	        tableHeight: '500px'
-	      }
-	    }]
-	  }]
-	};
-	
-	var plans_new_view = {
-	  title: "New Plan",
-	  view_type: "sections",
-	  sections: [{
-	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10, mandatory: true }]
-	  }]
-	};
-	
-	/* { dbkey: "test", label: "Test", size: 10, type: "select", options: [
-	   { label: "Option 1", value: "option_1" },
-	   { label: "Option 2", value: "option_2" }
-	   ] } */
-	var plans_edit_view = {
-	  title: "Edit Plan",
-	  view_type: "sections",
-	  sections: [{
-	    // title: "Test",
-	    display: "inline",
-	    fields: [{ dbkey: "technical_name", label: "Technical label", size: 10 }, { dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "price", label: "Price", size: 10, type: "number" }, { dbkey: "display_order", label: "Display Order", size: 10 }, { dbkey: "invoice_type", label: "Invoice Type", size: 10 }, { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
-	      }]
-	    }, { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true, size: 10, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "display_order", label: "Display Order", type: "number" }]
-	      }]
-	    }, { dbkey: "forceCommitment", label: "Force Commitment", size: 10, type: "checkbox" }]
-	  }]
-	};
-	
-	var rates_edit_view = {
-	  title: "Edit Rate",
-	  view_type: "sections",
-	  sections: [{
-	    // title: "Test",
-	    display: "inline",
-	    fields: [{ dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "country", label: "Country", type: 'array' }, { dbkey: "alpha3", label: "Alpha3", type: 'array' }, { dbkey: "zone", label: "zone" }, { dbkey: "zone_grouping", label: "Zone Grouping" }, { dbkey: "to", label: "To", type: 'date' }, { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "access", label: "Access", type: "text", inline: true }, { dbkey: "currency", label: "Currency", type: "text", inline: true }, { dbkey: "unit", label: "Unit", type: "text" }, { dbkey: "erp_account", label: "ERP Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, fields: [{ dbkey: "interval", label: "Interval", type: "text", inline: true }, { dbkey: "to", label: "To", type: "text", inline: true }, { dbkey: "price", label: "Price ", type: "text", inline: true }]
-	        }]
-	      }]
-	    }, { dbkey: "params", label: "Params", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "customer_segment", label: 'Customer Segment', type: 'array' }, { dbkey: "source_types", label: 'Source Types', type: 'array' }, { dbkey: "destination", label: " ", collapsible: false, size: 11,
-	        fields: [{ dbkey: "region", label: "Region", type: "text" }, { dbkey: "prefix", label: "Prefix", type: "array" }]
-	      }]
-	    }]
-	  }]
-	};
-	
-	var rates_vat_edit_view = {
-	  title: "Edit Rate",
-	  view_type: "sections",
-	  sections: [{
-	    // title: "Test",
-	    display: "inline",
-	    fields: [{ dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
-	        fields: [{ dbkey: "base_account", label: "Base Account", type: "text" }, { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text" }, { dbkey: "vat_account", label: "VAT Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, fields: [{ dbkey: "interval", label: "Interval", type: "text" }, { dbkey: "percent", label: "Percent", type: "text" }, { dbkey: "to", label: "To", type: "text" }]
-	        }]
-	      }]
-	    }]
-	  }]
-	};
-	
-	var rates_product_edit_view = {
-	  title: "Edit Product",
-	  view_type: "sections",
-	  sections: [{
-	    display: "inline",
-	    fields: [{ dbkey: "brand", label: "Brand", size: 10 }, { dbkey: "model", label: "Model", size: 10 }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "ax_code", label: "AX Code", size: 10 }, { dbkey: "inventory_id", label: "Inventory ID", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "rates", label: "Rates", size: 10, collapsible: false, fields: [{ dbkey: "general", label: 'General', collapsible: true, collapsed: true, size: 12,
-	        fields: [{ dbkey: "price", label: "Price", type: "text" }, { dbkey: "price_level", label: "Price Level", type: "text" }]
-	      }, { dbkey: "subscription", collapsible: true, collapsed: true, size: 12,
-	        fields: [{ dbkey: "*", size: 12, collapsible: false,
-	          fields: [{ dbkey: "price", label: "Price", type: "text" }, { dbkey: "price_level", label: "Price Level", type: "text" }]
-	        }]
-	      }]
-	    }]
-	  }]
-	};
-	
-	var rates_discount_edit_view = {
-	  title: "Edit Discount",
-	  view_type: "sections",
-	  sections: [{
-	    display: "inline",
-	    fields: [{ dbkey: "vti_name", label: "VTI Name", size: 10 }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "rates", label: "Rates", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "*", size: 12, collapsible: false,
-	        fields: [{ dbkey: "units", label: "Unit", type: "text", size: 3 }, { dbkey: "value", label: "Value", type: "text", size: 3 }, { dbkey: "ceil", label: "Ceil", type: "toggle", size: 3 }]
-	      }]
-	    }]
-	  }]
-	};
-	
-	var rates_discount_list_view = {
-	  title: "",
-	  view_type: "list",
-	  sections: [{
-	    title: "",
-	    lists: [{
-	      title: "Discounts",
-	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
-	      fields: [{ key: 'key', label: 'Key', filter: {} }, { key: '_id', label: 'ID', type: "mongoid", hidden: true }, { key: 'rate_type', label: 'Rate Type' }, { key: 'type', label: 'Type', filter: { system: 'discount' } }, { key: 'zone', label: 'Zone' }],
-	
-	      // {key: 'rates', label: 'rates'}
-	      onItemClick: 'edit'
-	    }]
-	  }]
-	};
-	
-	var rates_charge_edit_view = {
-	  title: "Edit Charge",
-	  view_type: "sections",
-	  sections: [{
-	    display: "inline",
-	    fields: [{ dbkey: "name", label: "Name", size: 10 }, { dbkey: "tech_name", label: "Tech Name", size: 10 }, { dbkey: "vti_name", label: "VTI Name", size: 10 }, { dbkey: "reason", label: "Reason", size: 10 }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "domains", label: "Domains", size: 10, collapsible: true, collapsed: true,
-	      fields: [{ dbkey: "optional", label: "Optional", type: "array", size: 10 }]
-	    }, { dbkey: "params", label: "Params", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "*", size: 12, collapsible: false,
-	        fields: [{ dbkey: "service_name", label: "Service Name", type: "text", size: 10 }]
-	      }]
-	    }, { dbkey: "rates", label: "Rates", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "*", size: 12, collapsible: false,
-	        fields: [{ dbkey: "rate", label: 'Rate', size: 12, collapsible: true,
-	          fields: [{ dbkey: "price", label: "Price", type: "text", size: 3 }, { dbkey: "interval", label: "Interval", type: "text", size: 3 }, { dbkey: "to", label: "To", type: "text", size: 3 }, { dbkey: "ceil", label: "Ceil", type: "toggle", size: 3 }]
-	        }, { dbkey: "unit", label: "Unit", size: 10 }]
-	      }]
-	    }]
-	  }]
-	};
-	
-	var rates_charge_list_view = {
-	  title: "",
-	  view_type: "list",
-	  sections: [{
-	    title: "",
-	    lists: [{
-	      title: "Charge",
-	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
-	      fields: [{ key: 'tech_name', label: 'Name' }, { key: 'key', label: 'Key', filter: {} }, { key: '_id', label: 'ID', type: "mongoid", hidden: true },
-	      // {key: 'rate_type', label: 'Rate Type'},
-	      // {key: 'end_publication', label: 'End Publication'},
-	      { key: 'type', label: 'Type', filter: { system: 'charge' } }],
-	      onItemClick: 'edit'
-	    }]
 	  }]
 	};
 	
@@ -29469,6 +29202,282 @@
 	  title: "Whaddup!"
 	}];
 	
+	//////////////// LINES ////////////////////////////
+	
+	var lines_list_view = {
+	  title: "",
+	  view_type: "",
+	  sections: [{
+	    title: "",
+	    description: "",
+	    lists: [{
+	      title: "Lines",
+	      url: _globalSetting2.default.serverUrl + '/api/find?collection=lines',
+	      fields: [{ key: 'aid', label: 'AID', filter: { defaultValue: '' } }, { key: 'sid', label: 'SID', filter: {} }, { key: 'service_name', label: 'Service Name' }, { key: 'service_type', label: 'Service Type' }, { key: 'plan', label: 'plan', filter: {} }, { key: 'type', label: 'Type' }, { key: 'urt', label: 'URT', type: 'urt', sortable: true }],
+	      pagination: {
+	        itemsPerPage: 10
+	      },
+	      defaults: {
+	        tableHeight: '500px'
+	      }
+	    }]
+	  }]
+	};
+	
+	var lines_edit_view = {
+	  title: "Edit Line",
+	  view_type: "sections",
+	  sections: [{
+	    // title: "Test",
+	    display: "inline",
+	    fields: []
+	  }]
+	};
+	
+	/////////////////// RATES /////////////////////////
+	
+	var rates_list_view = {
+	  title: "",
+	  view_type: "list",
+	  sections: [{
+	    title: "",
+	    lists: [{
+	      title: "Rates",
+	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
+	      fields: [{ key: 'type', label: 'Type', filter: { system: 'regular' }, hidden: true }, { key: 'params.destination.prefix', label: 'Prefix', filter: {}, hidden: true }, { key: 'params.destination.region', label: 'Region', filter: {}, hidden: true }, { key: 'key', label: 'Key', filter: {}, sortable: true }, { key: 'country', label: 'Country', filter: {}, hidden: true }, { key: 'params.source_types', label: 'Source Types', filter: {}, hidden: true }, { key: 'params.source_networks', label: 'Source Networks', filter: {}, hidden: true }, { key: 'rates.*.erp_account', label: 'ERP Account', filter: { wildcard: ['call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'] }, hidden: true }, { key: 'rates.*.groups', label: 'Groups', filter: { wildcard: ['call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'] }, hidden: true }, { key: 'usaget', label: 'Type', sortable: true }, { key: 'rate[0].price', label: 'Price' }, { key: 'rate[0].interval', label: 'Interval', type: 'interval' }, { key: 'access', label: 'Access' }, { key: 'from', label: 'From', type: "urt", sortable: true }, { key: 'to', label: 'To', type: "urt", sortable: true }, { key: '_id', label: 'ID', type: "mongoid", sortable: true }],
+	      project: ['key', '_id', 'type', 'rates', 'from', 'to'],
+	      controllers: {
+	        duplicate: { label: 'Duplicate', callback: 'onClickCloneItem' },
+	        closeAndNew: { label: 'Close and New' }
+	      },
+	      //delete : { label: 'Delete', color: red500  },
+	      pagination: {
+	        itemsPerPage: 20
+	      },
+	      onItemClick: 'edit',
+	      defaults: { tableHeight: '450px' }
+	    }]
+	  }]
+	};
+	
+	var rates_edit_view = {
+	  title: "Edit Rate",
+	  view_type: "sections",
+	  sections: [{
+	    // title: "Test",
+	    display: "inline",
+	    fields: [{ dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "country", label: "Country", type: 'array' }, { dbkey: "alpha3", label: "Alpha3", type: 'array' }, { dbkey: "zone", label: "zone" }, { dbkey: "zone_grouping", label: "Zone Grouping" }, { dbkey: "to", label: "To", type: 'date' }, { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	        fields: [{ dbkey: "access", label: "Access", type: "text" }, { dbkey: "currency", label: "Currency", type: "text" }, { dbkey: "unit", label: "Unit", type: "text" }, { dbkey: "erp_account", label: "ERP Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, fields: [{ dbkey: "interval", label: "Interval", type: "text" }, { dbkey: "to", label: "To", type: "text" }, { dbkey: "price", label: "Price ", type: "text" }]
+	        }]
+	      }]
+	    }, { dbkey: "params", label: "Params", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "customer_segment", label: 'Customer Segment', type: 'array' }, { dbkey: "source_types", label: 'Source Types', type: 'array' }, { dbkey: "destination", label: " ", collapsible: false, size: 11,
+	        fields: [{ dbkey: "region", label: "Region", type: "text" }, { dbkey: "prefix", label: "Prefix", type: "array" }]
+	      }]
+	    }]
+	  }]
+	};
+	
+	var rates_new_view = Object.assign({}, rates_edit_view, { title: "New Rate" });
+	
+	var rates_clone_view = Object.assign({}, rates_edit_view, { title: "Clone Rate" });
+	
+	/////////////////// VAT /////////////////////////
+	
+	var rates_vat_list_view = {
+	  title: "",
+	  view_type: "list",
+	  sections: [{
+	    title: "",
+	    lists: [{
+	      title: "VAT",
+	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
+	      fields: [{ key: 'key', label: 'Key', filter: {} }, { key: '_id', label: 'ID', type: "mongoid", hidden: true }, { key: 'rate_type', label: 'Rate Type' }, { key: 'type', label: 'Type', filter: { system: 'vat' } }, { key: 'zone', label: 'Zone' }],
+	
+	      // {key: 'rates', label: 'rates'}
+	      controllers: {
+	        // duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
+	        // new : { label: 'New'},
+	        // closeAndNew : { label: 'Close and New'},
+	        // edit : { label: 'Edit'},
+	        // delete : { label: 'Delete', color: red500  },
+	        export: { label: 'Export', color: _colors.red500 },
+	        import: { label: 'Import', color: _colors.red500 }
+	      },
+	      pagination: {
+	        itemsPerPage: 10
+	      },
+	      onItemClick: 'edit'
+	    }]
+	  }]
+	};
+	
+	var rates_vat_edit_view = {
+	  title: "Edit Rate",
+	  view_type: "sections",
+	  sections: [{
+	    // title: "Test",
+	    display: "inline",
+	    fields: [{ dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "rates", label: "Types", collapsible: true, collapsed: false, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	        fields: [{ dbkey: "base_account", label: "Base Account", type: "text" }, { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text" }, { dbkey: "vat_account", label: "VAT Account", type: "text" }, { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true, fields: [{ dbkey: "interval", label: "Interval", type: "text" }, { dbkey: "percent", label: "Percent", type: "text" }, { dbkey: "to", label: "To", type: "text" }]
+	        }]
+	      }]
+	    }]
+	  }]
+	};
+	
+	/////////////////// PRODUCT /////////////////////////
+	
+	var rates_product_list_view = {
+	  title: "",
+	  view_type: "list",
+	  sections: [{
+	    title: "",
+	    lists: [{
+	      title: "Products",
+	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
+	      fields: [{ key: '_id', label: 'ID', type: "mongoid", hidden: true }, { key: 'type', label: 'Type', filter: { system: 'product' }, hidden: true }, { key: 'key', label: 'Key', filter: {} }, { key: 'brand', label: 'Brand', filter: {} }, { key: 'model', label: 'Model', filter: {} }],
+	
+	      // {key: 'rates', label: 'rates'}
+	      onItemClick: 'edit'
+	    }]
+	  }]
+	};
+	
+	var rates_product_edit_view = {
+	  title: "Edit Product",
+	  view_type: "sections",
+	  sections: [{
+	    display: "inline",
+	    fields: [{ dbkey: "brand", label: "Brand", size: 10 }, { dbkey: "model", label: "Model", size: 10 }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "ax_code", label: "AX Code", size: 10 }, { dbkey: "inventory_id", label: "Inventory ID", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "rates", label: "Rates", size: 10, collapsible: false, fields: [{ dbkey: "general", label: 'General', collapsible: true, collapsed: true, size: 12,
+	        fields: [{ dbkey: "price", label: "Price", type: "text" }, { dbkey: "price_level", label: "Price Level", type: "text" }]
+	      }, { dbkey: "subscription", collapsible: true, collapsed: true, size: 12,
+	        fields: [{ dbkey: "*", size: 12, collapsible: false,
+	          fields: [{ dbkey: "price", label: "Price", type: "text" }, { dbkey: "price_level", label: "Price Level", type: "text" }]
+	        }]
+	      }]
+	    }]
+	  }]
+	};
+	
+	/////////////////// PLANS /////////////////////////
+	
+	var plans_list_view = {
+	  title: "",
+	  view_type: "list",
+	  sections: [{
+	    title: "",
+	    lists: [{
+	      title: "Plans",
+	      url: _globalSetting2.default.serverUrl + '/api/find?collection=plans',
+	      fields: [{ key: '_id', label: 'ID', type: 'mongoid', hidden: true }, // aid=5000000476
+	      { key: 'technical_name', label: 'Label', filter: {}, sortable: true }, { key: 'invoice_type', label: 'Type', sortable: true }, { key: 'grouping', label: 'Grouping', filter: {} }, { key: 'price', label: 'Price', type: 'price', filter: {}, sortable: true }, { key: 'forceCommitment', label: 'Force Commitment', type: 'boolean' }, { key: 'from', label: 'From', type: 'urt', sortable: true, filter: {} }],
+	      onItemClick: 'edit',
+	      controllers: {
+	        duplicate: { label: 'Duplicate', callback: 'onClickCloneItem' },
+	        // new : { label: 'New'},
+	        closeAndNew: { label: 'Close and New' }
+	      },
+	      // edit : { label: 'Edit'},
+	      // delete : { label: 'Delete', color: red500  },
+	      defaults: {
+	        tableHeight: '500px'
+	      }
+	    }]
+	  }]
+	};
+	
+	var plans_edit_view = {
+	  title: "Edit Plan",
+	  view_type: "sections",
+	  sections: [{
+	    // title: "Test",
+	    display: "inline",
+	    fields: [{ dbkey: "technical_name", label: "Technical label", size: 10 }, { dbkey: "name", label: "Name", size: 10, mandatory: true }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "price", label: "Price", size: 10, type: "number" }, { dbkey: "display_order", label: "Display Order", size: 10 }, { dbkey: "invoice_type", label: "Invoice Type", size: 10 }, { dbkey: "from", label: "From", type: "date", size: 5 }, { dbkey: "to", label: "To", type: "date", size: 5 }, { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "price", label: "Price", type: "number" }]
+	      }]
+	    }, { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true, size: 10, fields: [{ dbkey: "*", collapsible: true, collapsed: true,
+	        fields: [{ dbkey: "name", label: "Name", type: "text" }, { dbkey: "display_order", label: "Display Order", type: "number" }]
+	      }]
+	    }, { dbkey: "forceCommitment", label: "Force Commitment", size: 10, type: "checkbox" }]
+	  }]
+	};
+	
+	var plans_new_view = Object.assign({}, plans_edit_view, { title: "New Plan" });
+	
+	var plans_clone_view = Object.assign({}, plans_edit_view, { title: "Clone Plan" });
+	
+	var plans_close_and_new_view = Object.assign({}, plans_edit_view, { title: "Close And New Plan" });
+	
+	/////////////////// DISCOUNTS /////////////////////////
+	
+	var rates_discount_edit_view = {
+	  title: "Edit Discount",
+	  view_type: "sections",
+	  sections: [{
+	    display: "inline",
+	    fields: [{ dbkey: "vti_name", label: "VTI Name", size: 10 }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "rates", label: "Rates", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "*", size: 12, collapsible: false,
+	        fields: [{ dbkey: "units", label: "Unit", type: "text", size: 3 }, { dbkey: "value", label: "Value", type: "text", size: 3 }, { dbkey: "ceil", label: "Ceil", type: "toggle", size: 3 }]
+	      }]
+	    }]
+	  }]
+	};
+	
+	var rates_discount_list_view = {
+	  title: "",
+	  view_type: "list",
+	  sections: [{
+	    title: "",
+	    lists: [{
+	      title: "Discounts",
+	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
+	      fields: [{ key: 'key', label: 'Key', filter: {} }, { key: '_id', label: 'ID', type: "mongoid", hidden: true }, { key: 'rate_type', label: 'Rate Type' }, { key: 'type', label: 'Type', filter: { system: 'discount' } }, { key: 'zone', label: 'Zone' }],
+	
+	      // {key: 'rates', label: 'rates'}
+	      onItemClick: 'edit'
+	    }]
+	  }]
+	};
+	
+	/////////////////// CHANRGE /////////////////////////
+	
+	var rates_charge_edit_view = {
+	  title: "Edit Charge",
+	  view_type: "sections",
+	  sections: [{
+	    display: "inline",
+	    fields: [{ dbkey: "name", label: "Name", size: 10 }, { dbkey: "tech_name", label: "Tech Name", size: 10 }, { dbkey: "vti_name", label: "VTI Name", size: 10 }, { dbkey: "reason", label: "Reason", size: 10 }, { dbkey: "key", label: "Key", size: 10 }, { dbkey: "type", label: "Type", size: 10 }, { dbkey: "domains", label: "Domains", size: 10, collapsible: true, collapsed: true,
+	      fields: [{ dbkey: "optional", label: "Optional", type: "array", size: 10 }]
+	    }, { dbkey: "params", label: "Params", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "*", size: 12, collapsible: false,
+	        fields: [{ dbkey: "service_name", label: "Service Name", type: "text", size: 10 }]
+	      }]
+	    }, { dbkey: "rates", label: "Rates", size: 10, collapsible: true, collapsed: true, fields: [{ dbkey: "*", size: 12, collapsible: false,
+	        fields: [{ dbkey: "rate", label: 'Rate', size: 12, collapsible: true,
+	          fields: [{ dbkey: "price", label: "Price", type: "text", size: 3 }, { dbkey: "interval", label: "Interval", type: "text", size: 3 }, { dbkey: "to", label: "To", type: "text", size: 3 }, { dbkey: "ceil", label: "Ceil", type: "toggle", size: 3 }]
+	        }, { dbkey: "unit", label: "Unit", size: 10 }]
+	      }]
+	    }]
+	  }]
+	};
+	
+	var rates_charge_list_view = {
+	  title: "",
+	  view_type: "list",
+	  sections: [{
+	    title: "",
+	    lists: [{
+	      title: "Charge",
+	      url: _globalSetting2.default.serverUrl + '/api/find?collection=rates',
+	      fields: [{ key: 'tech_name', label: 'Name' }, { key: 'key', label: 'Key', filter: {} }, { key: '_id', label: 'ID', type: "mongoid", hidden: true },
+	      // {key: 'rate_type', label: 'Rate Type'},
+	      // {key: 'end_publication', label: 'End Publication'},
+	      { key: 'type', label: 'Type', filter: { system: 'charge' } }],
+	      onItemClick: 'edit'
+	    }]
+	  }]
+	};
+	
+	/////////////////// LAYOUT /////////////////////////
+	
 	var View = {
 	  pages: {
 	    dashboard: {
@@ -29477,11 +29486,12 @@
 	      html: dashboard_html
 	    },
 	    rates: {
-	      menu_title: "Rate",
+	      menu_title: "Rates",
 	      route: "rates/rates/list",
 	      views: {
 	        list: rates_list_view,
 	        new: rates_new_view,
+	        clone: rates_clone_view,
 	        edit: rates_edit_view
 	      }
 	    },
@@ -29525,6 +29535,8 @@
 	      views: {
 	        list: plans_list_view,
 	        new: plans_new_view,
+	        clone: plans_clone_view,
+	        close_and_new: plans_close_and_new_view,
 	        edit: plans_edit_view
 	      }
 	    },
@@ -76490,6 +76502,8 @@
 	    value: function componentDidMount() {
 	      switch (this.props.params.action) {
 	        case 'edit':
+	        case 'close_and_new':
+	        case 'clone':
 	          this.getCollectionItem(this.props);
 	          break;
 	        case 'list':
@@ -76530,7 +76544,7 @@
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
 	      if (nextProps.location.pathname !== this.props.location.pathname) {
-	        if (nextProps.params.action === "edit") {
+	        if (nextProps.params.action === "edit" || nextProps.params.action == "clone" || nextProps.params.action == "close_and_new") {
 	          this.getCollectionItem(nextProps);
 	        } else {
 	          this.setInitialState(nextProps);
@@ -76552,11 +76566,22 @@
 	    }
 	  }, {
 	    key: 'onSave',
-	    value: function onSave() {
+	    value: function onSave(e) {
+	      var action = e.currentTarget.dataset.action;
+	      var actionType = action; //close_and_new / duplicate / update / new
+	      switch (action) {
+	        case 'edit':
+	          actionType = 'update';
+	          break;
+	        case 'clone':
+	          actionType = 'duplicate';
+	          break;
+	      }
+	
 	      var dispatch = this.props.dispatch;
 	
 	      var pageName = this.getPageName();
-	      dispatch((0, _actions.saveCollectionEntity)(this.props.item, this.props.params.collection, pageName, this.context.router));
+	      dispatch((0, _actions.saveCollectionEntity)(this.props.item, this.props.params.collection, pageName, this.context.router, actionType));
 	    }
 	  }, {
 	    key: 'onCancel',
@@ -76632,7 +76657,7 @@
 	    value: function createFieldHTML(field, path, field_index) {
 	      var _this4 = this;
 	
-	      if (this.state.action === 'edit' && (!this.props.item || _lodash2.default.isEmpty(this.props.item))) {
+	      if ((this.state.action === 'edit' || this.state.action === 'clone' || this.state.action === 'close_and_new') && (!this.props.item || _lodash2.default.isEmpty(this.props.item))) {
 	        return null;
 	      }
 	      if (path.endsWith(".*") && field.fields) {
@@ -76747,7 +76772,7 @@
 	    value: function actionButtons() {
 	      var action = arguments.length <= 0 || arguments[0] === undefined ? this.state.action : arguments[0];
 	
-	      if (action === "edit" || action === "new") {
+	      if (action === "edit" || action === "new" || action === "clone" || action === "close_and_new") {
 	        var style = {
 	          margin: "12px"
 	        };
@@ -76758,7 +76783,8 @@
 	            label: 'Save',
 	            primary: true,
 	            style: style,
-	            onMouseUp: this.onSave
+	            onMouseUp: this.onSave,
+	            'data-action': action
 	          }),
 	          _react2.default.createElement(_RaisedButton2.default, {
 	            label: 'Cancel',
@@ -76776,12 +76802,12 @@
 	      var pageName = _state$pageName === undefined ? this.getPageName() : _state$pageName;
 	      var action = _state.action;
 	
-	      if (action === 'edit' && !this.props.item) return _react2.default.createElement('div', null);
+	      if ((action === 'edit' || action === 'clone' || action === 'close_and_new') && !this.props.item) return null;
 	      var sectionsHTML = void 0;
 	      var page_view = _view2.default.pages[pageName].views ? _view2.default.pages[pageName].views[action] : _view2.default.pages[pageName];
 	
 	      if (!page_view) {
-	        return _react2.default.createElement('div', null);
+	        return null;
 	      }
 	
 	      var title = page_view.title;
@@ -77596,6 +77622,7 @@
 	
 	    _this.state = { path: "" };
 	    _this.onTagsChange = _this.onTagsChange.bind(_this);
+	    _this.onDateChange = _this.onDateChange.bind(_this);
 	    _this.formatDate = _this.formatDate.bind(_this);
 	    return _this;
 	  }
@@ -77612,6 +77639,15 @@
 	        target: { dataset: { path: path } }
 	      };
 	      this.props.onChange(evt, 0, val);
+	    }
+	  }, {
+	    key: 'onDateChange',
+	    value: function onDateChange(path, nullEvent, val) {
+	      var value = val.toISOString();
+	      var evt = {
+	        target: { dataset: { path: path } }
+	      };
+	      this.props.onChange(evt, 0, value);
 	    }
 	  }, {
 	    key: 'createInputTag',
@@ -77650,7 +77686,8 @@
 	      var inputLabel = mandatory ? _react2.default.createElement(
 	        'span',
 	        null,
-	        'label ',
+	        label,
+	        ' ',
 	        _react2.default.createElement(
 	          'span',
 	          { className: 'required' },
@@ -77684,7 +77721,12 @@
 	          )
 	        );
 	      } else if (type === "date") {
-	        var date = value.sec ? new Date(value.sec * 1000) : '';
+	        var datePicker = null;
+	        if (value && value.sec) {
+	          datePicker = _react2.default.createElement(_DatePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: this.onDateChange.bind(null, path), defaultDate: new Date(value.sec * 1000), formatDate: this.formatDate, disabled: disabled });
+	        } else {
+	          datePicker = _react2.default.createElement(_DatePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: this.onDateChange.bind(null, path), formatDate: this.formatDate, disabled: disabled });
+	        }
 	        return _react2.default.createElement(
 	          'div',
 	          null,
@@ -77693,7 +77735,7 @@
 	            { htmlFor: html_id },
 	            label
 	          ),
-	          _react2.default.createElement(_DatePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: onChange, defaultDate: date, formatDate: this.formatDate, disabled: disabled })
+	          datePicker
 	        );
 	      } else if (type === "array") {
 	        return _react2.default.createElement(
@@ -77729,16 +77771,20 @@
 	
 	      var multiLine = type === "textarea" ? true : false;
 	      var rows = multiLine ? 2 : 1;
-	      return _react2.default.createElement(_TextField2.default, { value: value,
-	        'data-path': path,
-	        onChange: onChange,
-	        id: html_id,
-	        fullWidth: !inline,
-	        multiLine: multiLine,
-	        rows: rows,
-	        disabled: disabled,
-	        floatingLabelText: inputLabel
-	      });
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(_TextField2.default, { value: value,
+	          'data-path': path,
+	          onChange: onChange,
+	          id: html_id,
+	          fullWidth: true,
+	          multiLine: multiLine,
+	          rows: rows,
+	          disabled: disabled,
+	          floatingLabelText: inputLabel
+	        })
+	      );
 	    }
 	  }, {
 	    key: 'render',
@@ -98580,6 +98626,17 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var errorMessages = {
+	  serverApiTimeout: 'Server timeout, please try again leter.',
+	  serverApiNetworkError: 'Server error, please try again leter.',
+	  serverApiDefaultError: 'Error loading data, try again later..',
+	  tooManyRows: 'Too many rows, please update selected filter',
+	  noData: 'No Data',
+	  selectionActionAtLeastOne: 'Please select at least one item.',
+	  selectionActionOnlyOne: 'Please select only one item.',
+	  selectionActionatNoItems: 'No item selected.'
+	};
+	
 	var styles = {
 	  listTopBar: { backgroundColor: 'white' },
 	  listActions: { margin: '5px' },
@@ -98683,8 +98740,8 @@
 	    _this2.showSnackbar = _this2.showSnackbar.bind(_this2);
 	    //Handlers
 	    _this2.handleCloseSnackbar = _this2.handleCloseSnackbar.bind(_this2);
+	    _this2.validateAlLeastOneSelectedRow = _this2.validateAlLeastOneSelectedRow.bind(_this2);
 	    //Actions
-	    _this2.onClickNewItem = _this2.onClickNewItem.bind(_this2);
 	    _this2.onPagintionClick = _this2.onPagintionClick.bind(_this2);
 	    _this2.onClickRow = _this2.onClickRow.bind(_this2);
 	    _this2.onChangeFilter = _this2.onChangeFilter.bind(_this2);
@@ -98695,6 +98752,7 @@
 	    _this2.onClickNewItem = _this2.onClickNewItem.bind(_this2);
 	    _this2.onClickEditItem = _this2.onClickEditItem.bind(_this2);
 	    _this2.onClickDeleteItem = _this2.onClickDeleteItem.bind(_this2);
+	    _this2.onClickCloseandnewItem = _this2.onClickCloseandnewItem.bind(_this2);
 	
 	    //Assign filter default value if exist
 	    var filters = _this2._getFilterDefaultValues(props.settings.fields);
@@ -98738,13 +98796,52 @@
 	        settings: settings
 	      }, this._updateTableData);
 	    }
-	
+	  }, {
+	    key: 'validateAlLeastOneSelectedRow',
+	    value: function validateAlLeastOneSelectedRow() {
+	      if (!_lodash2.default.isUndefined(this.refs.listBoby.state.selectedRows)) {
+	        if (this.refs.listBoby.state.selectedRows.length == 1) {
+	          var selectedRowNum = _lodash2.default.head(this.refs.listBoby.state.selectedRows);
+	          var selectedItemId = this.state.rows[selectedRowNum];
+	          return this.state.rows[selectedRowNum];
+	        } else if (this.refs.listBoby.state.selectedRows.length > 1) {
+	          this.showSnackbar(errorMessages.selectionActionOnlyOne);
+	          return this.refs.listBoby.state.selectedRows.length;
+	        } else {
+	          var message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
+	          this.showSnackbar(message);
+	          return false;
+	        }
+	      }
+	      return false;
+	    }
 	    /* ON Actions */
 	
 	  }, {
 	    key: 'onClickCloneItem',
 	    value: function onClickCloneItem(e) {
-	      console.log('Clone Item - ', e);
+	      var item = this.validateAlLeastOneSelectedRow();
+	      if (item) {
+	        var _props = this.props;
+	        var page = _props.page;
+	        var collection = _props.collection;
+	
+	        var url = '/' + page + '/' + collection + '/clone/' + item._id['$id'];
+	        this.context.router.push(url);
+	      }
+	    }
+	  }, {
+	    key: 'onClickCloseandnewItem',
+	    value: function onClickCloseandnewItem(e) {
+	      var item = this.validateAlLeastOneSelectedRow();
+	      if (item) {
+	        var _props2 = this.props;
+	        var page = _props2.page;
+	        var collection = _props2.collection;
+	
+	        var url = '/' + page + '/' + collection + '/close_and_new/' + item._id['$id'];
+	        this.context.router.push(url);
+	      }
 	    }
 	  }, {
 	    key: 'onClickEditItem',
@@ -98755,6 +98852,15 @@
 	    key: 'onClickDeleteItem',
 	    value: function onClickDeleteItem(e) {
 	      console.log('Delete Item - ', e);
+	    }
+	  }, {
+	    key: 'onClickNewItem',
+	    value: function onClickNewItem(e) {
+	      var _props3 = this.props;
+	      var page = _props3.page;
+	      var collection = _props3.collection;
+	
+	      this.context.router.push('/' + page + '/' + collection + '/new');
 	    }
 	  }, {
 	    key: '_onRowSelection',
@@ -98780,20 +98886,11 @@
 	      //  }, 1000);
 	    }
 	  }, {
-	    key: 'onClickNewItem',
-	    value: function onClickNewItem(e) {
-	      var _props = this.props;
-	      var page = _props.page;
-	      var collection = _props.collection;
-	
-	      this.context.router.push('/' + page + '/' + collection + '/new');
-	    }
-	  }, {
 	    key: 'onClickRow',
 	    value: function onClickRow(row, column, e) {
-	      var _props2 = this.props;
-	      var page = _props2.page;
-	      var collection = _props2.collection;
+	      var _props4 = this.props;
+	      var page = _props4.page;
+	      var collection = _props4.collection;
 	
 	      var rawData = this.state.rows[row];
 	      if (column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick) {
@@ -98858,7 +98955,7 @@
 	  }, {
 	    key: 'handleError',
 	    value: function handleError(data) {
-	      var errorMessage = data && data.desc && data.desc.length ? data.desc : 'Error loading data, try again later..';
+	      var errorMessage = data && data.desc && data.desc.length ? data.desc : errorMessages.serverApiDefaultError;
 	      this.showSnackbar(errorMessage);
 	      this.setState({
 	        loadingData: ''
@@ -98902,19 +98999,36 @@
 	  }, {
 	    key: '_buildSearchQuery',
 	    value: function _buildSearchQuery() {
+	      var _this3 = this;
+	
 	      var queryString = '';
 	      var queryArgs = {};
 	
-	      for (var key in this.state.filters) {
-	        if (this.state.filters[key].length) {
-	          var filterSetting = this._getFieldSettings(key);
+	      var _loop = function _loop(key) {
+	        if (_this3.state.filters[key].length) {
+	          var filterSetting = _this3._getFieldSettings(key);
 	          if (filterSetting) {
-	            queryArgs[key] = {
-	              "$regex": this.state.filters[key],
-	              "$options": "i"
-	            };
+	            if (filterSetting.filter.wildcard && filterSetting.filter.wildcard.length > 0) {
+	              queryArgs['$or'] = [];
+	              filterSetting.filter.wildcard.map(function (replacment, i) {
+	                var wildcardkey = key.replace("*", replacment);
+	                queryArgs['$or'].push(_defineProperty({}, wildcardkey, {
+	                  "$regex": _this3.state.filters[key],
+	                  "$options": "i"
+	                }));
+	              });
+	            } else {
+	              queryArgs[key] = {
+	                "$regex": _this3.state.filters[key],
+	                "$options": "i"
+	              };
+	            }
 	          }
 	        }
+	      };
+	
+	      for (var key in this.state.filters) {
+	        _loop(key);
 	      }
 	
 	      var filters = {};
@@ -98970,7 +99084,7 @@
 	        rows = _lodash2.default.values(response.details);
 	      }
 	      if (rows.length > _globalSetting2.default.list.maxItems) {
-	        this.showSnackbar('Too many rows, please update selected filter');
+	        this.showSnackbar(errorMessages.tooManyRows);
 	      }
 	      rows = rows.slice(0, Math.min(rows.length, _globalSetting2.default.list.maxItems));
 	      return rows;
@@ -98978,7 +99092,7 @@
 	  }, {
 	    key: '_getData',
 	    value: function _getData(query) {
-	      var _this3 = this;
+	      var _this4 = this;
 	
 	      var url = this.state.settings.url;
 	      if (!url) return;
@@ -98987,25 +99101,27 @@
 	      }
 	      this.serverRequest = (0, _aja2.default)().method('get').url(url).on('success', function (response) {
 	        if (response && response.status) {
-	          var rows = _this3._parseResults(_this3.props.collection, response);
-	          var itemsPerPage = _this3.state.settings.pagination && _this3.state.settings.pagination.itemsPerPage ? _this3.state.settings.pagination.itemsPerPage : '';
-	          _this3.setState({
-	            totalPages: _this3._setPagesAmount(response.count || 100, itemsPerPage),
+	          var rows = _this4._parseResults(_this4.props.collection, response);
+	          var itemsPerPage = _this4.state.settings.pagination && _this4.state.settings.pagination.itemsPerPage ? _this4.state.settings.pagination.itemsPerPage : '';
+	          _this4.setState({
+	            totalPages: _this4._setPagesAmount(response.count || 100, itemsPerPage),
 	            rows: rows,
 	            loadingData: rows.length > 0 ? '' : _react2.default.createElement(
 	              _Toolbar.Toolbar,
 	              { style: styles.noDataMessage },
 	              ' ',
-	              _react2.default.createElement(_Toolbar.ToolbarTitle, { text: 'No Data' })
+	              _react2.default.createElement(_Toolbar.ToolbarTitle, { text: errorMessages.noData })
 	            )
 	          });
 	        } else {
-	          _this3.handleError(response);
+	          _this4.handleError(response);
 	        }
 	      }).on('timeout', function (response) {
-	        _this3.handleError(response);
+	        response['desc'] = errorMessages.serverApiTimeout;
+	        _this4.handleError(response);
 	      }).on('error', function (response) {
-	        _this3.handleError(response);
+	        response['desc'] = errorMessages.serverApiNetworkError;
+	        _this4.handleError(response);
 	      }).go();
 	    }
 	  }, {
@@ -99088,12 +99204,12 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this4 = this;
+	      var _this5 = this;
 	
 	      var settings = this.state.settings;
-	      var _props3 = this.props;
-	      var page = _props3.page;
-	      var collection = _props3.collection;
+	      var _props5 = this.props;
+	      var page = _props5.page;
+	      var collection = _props5.collection;
 	
 	      var filters = this.state.settings.fields.map(function (field, i) {
 	        if (field.filter && !field.filter.system) {
@@ -99104,7 +99220,7 @@
 	            floatingLabelText: "Search by " + field.label,
 	            errorText: '',
 	            defaultValue: field.filter.defaultValue ? field.filter.defaultValue : '',
-	            onChange: _this4.onChangeFilter });
+	            onChange: _this5.onChangeFilter });
 	        }
 	      });
 	
@@ -99122,7 +99238,7 @@
 	              return _react2.default.createElement(
 	                _TableHeaderColumn2.default,
 	                { key: i },
-	                _react2.default.createElement(SortableTableHeaderColumn, { style: styles.tableCell, data: field, sort: _this4.state.sortField == field.key ? _this4.state.sortType : '', onClick: _this4.onClickTableHeader })
+	                _react2.default.createElement(SortableTableHeaderColumn, { style: styles.tableCell, data: field, sort: _this5.state.sortField == field.key ? _this5.state.sortType : '', onClick: _this5.onClickTableHeader })
 	              );
 	            } else {
 	              return _react2.default.createElement(
@@ -99142,14 +99258,14 @@
 	          _react2.default.createElement(
 	            _TableRowColumn2.default,
 	            { style: { width: 5 } },
-	            index + 1
+	            index + 1 + (_this5.state.currentPage > 1 ? (_this5.state.currentPage - 1) * _this5.state.settings.pagination.itemsPerPage : 0)
 	          ),
-	          _this4.state.settings.fields.map(function (field, i) {
+	          _this5.state.settings.fields.map(function (field, i) {
 	            if (!(field.hidden && field.hidden == true)) {
 	              return _react2.default.createElement(
 	                _TableRowColumn2.default,
 	                { style: styles.tableCell, key: i },
-	                _this4._formatField(row, field, i)
+	                _this5._formatField(row, field, i)
 	              );
 	            }
 	          })
@@ -99159,15 +99275,15 @@
 	      var getActions = function getActions() {
 	        var actions = [];
 	
-	        if (_this4.state.settings.controllers && !_lodash2.default.isEmpty(_this4.state.settings.controllers)) {
+	        if (_this5.state.settings.controllers && !_lodash2.default.isEmpty(_this5.state.settings.controllers)) {
 	
-	          Object.keys(_this4.state.settings.controllers).map(function (name, key) {
-	            var controller = _this4.state.settings.controllers[name];
+	          Object.keys(_this5.state.settings.controllers).map(function (name, key) {
+	            var controller = _this5.state.settings.controllers[name];
 	            var callback = controller.callback ? controller.callback : 'onClick' + _lodash2.default.capitalize(name) + 'Item';
 	            actions.push(_react2.default.createElement(_RaisedButton2.default, {
 	              key: "action_" + controller.label,
 	              backgroundColor: controller.color || _colors.blue500,
-	              onTouchTap: _this4[callback],
+	              onTouchTap: _this5[callback],
 	              label: controller.label,
 	              style: styles.listActions,
 	              disabled: false
@@ -99185,22 +99301,22 @@
 	
 	      var getPager = function getPager() {
 	        var pages = [];
-	        if (_this4.state.settings.pagination && _this4.state.totalPages > 1) {
+	        if (_this5.state.settings.pagination && _this5.state.totalPages > 1) {
 	          pages.push(_react2.default.createElement(
 	            _FloatingActionButton2.default,
 	            {
 	              key: 'back',
 	              mini: true,
 	              style: styles.pagination.paginationButton,
-	              onClick: _this4.onPagintionClick,
+	              onClick: _this5.onPagintionClick,
 	              value: 'back',
 	              secondary: false,
-	              disabled: _this4.state.currentPage == 1
+	              disabled: _this5.state.currentPage == 1
 	            },
 	            _react2.default.createElement(_arrowBack2.default, null)
 	          ));
-	          var pagesToDisplay = _this4._setVisiblePages(_this4.state.totalPages, _this4.state.currentPage);
-	          for (var i = 1; i <= _this4.state.totalPages; i++) {
+	          var pagesToDisplay = _this5._setVisiblePages(_this5.state.totalPages, _this5.state.currentPage);
+	          for (var i = 1; i <= _this5.state.totalPages; i++) {
 	            if (pagesToDisplay.includes(i)) {
 	              pages.push(_react2.default.createElement(
 	                _FloatingActionButton2.default,
@@ -99208,9 +99324,9 @@
 	                  key: i,
 	                  mini: true,
 	                  style: styles.pagination.paginationButton,
-	                  onClick: _this4.onPagintionClick,
+	                  onClick: _this5.onPagintionClick,
 	                  value: i,
-	                  disabled: _this4.state.currentPage == i
+	                  disabled: _this5.state.currentPage == i
 	                },
 	                _react2.default.createElement(
 	                  'spam',
@@ -99230,10 +99346,10 @@
 	              key: 'forward',
 	              mini: true,
 	              style: styles.pagination.paginationButton,
-	              onClick: _this4.onPagintionClick,
+	              onClick: _this5.onPagintionClick,
 	              value: 'forward',
 	              secondary: false,
-	              disabled: _this4.state.currentPage == _this4.state.totalPages
+	              disabled: _this5.state.currentPage == _this5.state.totalPages
 	            },
 	            _react2.default.createElement(_arrowForward2.default, null)
 	          ));
@@ -99324,13 +99440,24 @@
 	            footer
 	          )
 	        ),
-	        _react2.default.createElement(_Snackbar2.default, {
-	          color: 'red',
-	          open: this.state.snackbarOpen,
-	          message: this.state.snackbarMessage,
-	          autoHideDuration: 4000,
-	          onRequestClose: this.handleCloseSnackbar
-	        })
+	        _react2.default.createElement(
+	          _Dialog2.default,
+	          {
+	            actions: _react2.default.createElement(_FlatButton2.default, {
+	              label: 'Ok',
+	              primary: true,
+	              onTouchTap: this.handleCloseSnackbar
+	            }),
+	            modal: false,
+	            open: this.state.snackbarOpen,
+	            onRequestClose: this.handleCloseSnackbar
+	          },
+	          _react2.default.createElement(
+	            'div',
+	            null,
+	            this.state.snackbarMessage
+	          )
+	        )
 	      );
 	    }
 	  }]);
