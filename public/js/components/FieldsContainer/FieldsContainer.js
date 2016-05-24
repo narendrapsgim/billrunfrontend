@@ -31,7 +31,7 @@ export default class FieldsContainer extends Component {
       let type = (path.match(/(\d])$/) ? "array" : "object");
       let new_path = path;
       if (type === "object") {
-        let p = prompt("Please insert new type");
+        let p = prompt("Please insert name");
         new_path += `.${p}`;
       } else if (type === "array") {
         new_path = new_path.slice(0, -3);
