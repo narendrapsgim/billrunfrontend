@@ -7,6 +7,7 @@ const styles = {
   wrapper: {
     paddingTop: '40px',
     paddingBottom: '10px',
+    position: 'relative'
   },
   label: {
     position: 'absolute',
@@ -128,7 +129,7 @@ export default class Chips extends Component {
                                          />);
     return (
       <div style={styles.wrapper}>
-        <label for="newChips"><u>{label}</u></label>
+         <label for="newChips" style={this.state.inFocus ? styles.labelFocus : styles.label}>{label}</label>
         {chips}
         {textfield}
       </div>
