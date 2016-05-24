@@ -42,7 +42,11 @@ class Field extends Component {
           multiselect = false,
           mandatory = false,
           inline = false,
+          crud = "0110",
           size = 5 } = field;
+
+    if (crud[1] === "0") return (null);
+    let disabled = crud[2] === "0";
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
     let inputLabel = mandatory ? <span>label <span className="required">*</span></span> : label;
 
@@ -64,7 +68,9 @@ class Field extends Component {
               value={value}
               id={html_id}
               onChange={onChange}
-              floatingLabelText={inputLabel}>
+              floatingLabelText={inputLabel}
+              disabled={disabled}
+          >
             {options}
           </SelectField>
         </div>
@@ -74,24 +80,25 @@ class Field extends Component {
       return (
         <div>
           <label htmlFor={html_id}>{label}</label>
-          <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={onChange} defaultDate={date} formatDate={this.formatDate}/>
+          <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={onChange} defaultDate={date} formatDate={this.formatDate} disabled={disabled} />
         </div>
       );
     } else if (type === "array") {
       return (
         <div>
-          <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path}/>
+          <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path} disabled={disabled} />
         </div>
       );
     } else if (type === "checkbox") {
       return (
         <div>
           <Checkbox
-            data-path={path}
-            label={inputLabel}
-            style={{ marginBottom: '16px', marginLeft: '-2px', marginTop: '5px'}}
-            defaultChecked={value}
-            onCheck={onChange}
+              data-path={path}
+              label={inputLabel}
+              style={{ marginBottom: '16px', marginLeft: '-2px', marginTop: '5px'}}
+              defaultChecked={value}
+              disabled={disabled}
+              onCheck={onChange}
           />
         </div>
       );
@@ -118,6 +125,7 @@ class Field extends Component {
                  fullWidth={!inline}
                  multiLine={multiLine}
                  rows={rows}
+                 disabled={disabled}
                  floatingLabelText={inputLabel}
       />
     );

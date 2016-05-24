@@ -77638,9 +77638,14 @@
 	      var mandatory = _field$mandatory === undefined ? false : _field$mandatory;
 	      var _field$inline = field.inline;
 	      var inline = _field$inline === undefined ? false : _field$inline;
+	      var _field$crud = field.crud;
+	      var crud = _field$crud === undefined ? "0110" : _field$crud;
 	      var _field$size = field.size;
 	      var size = _field$size === undefined ? 5 : _field$size;
 	
+	
+	      if (crud[1] === "0") return null;
+	      var disabled = crud[2] === "0";
 	      var html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
 	      var inputLabel = mandatory ? _react2.default.createElement(
 	        'span',
@@ -77672,7 +77677,9 @@
 	              value: value,
 	              id: html_id,
 	              onChange: onChange,
-	              floatingLabelText: inputLabel },
+	              floatingLabelText: inputLabel,
+	              disabled: disabled
+	            },
 	            options
 	          )
 	        );
@@ -77686,13 +77693,13 @@
 	            { htmlFor: html_id },
 	            label
 	          ),
-	          _react2.default.createElement(_DatePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: onChange, defaultDate: date, formatDate: this.formatDate })
+	          _react2.default.createElement(_DatePicker2.default, { hintText: dbkey, id: html_id, 'data-path': path, onChange: onChange, defaultDate: date, formatDate: this.formatDate, disabled: disabled })
 	        );
 	      } else if (type === "array") {
 	        return _react2.default.createElement(
 	          'div',
 	          null,
-	          _react2.default.createElement(_Chips2.default, { items: value, onChange: this.onTagsChange, label: label, 'data-path': path })
+	          _react2.default.createElement(_Chips2.default, { items: value, onChange: this.onTagsChange, label: label, 'data-path': path, disabled: disabled })
 	        );
 	      } else if (type === "checkbox") {
 	        return _react2.default.createElement(
@@ -77703,6 +77710,7 @@
 	            label: inputLabel,
 	            style: { marginBottom: '16px', marginLeft: '-2px', marginTop: '5px' },
 	            defaultChecked: value,
+	            disabled: disabled,
 	            onCheck: onChange
 	          })
 	        );
@@ -77728,6 +77736,7 @@
 	        fullWidth: !inline,
 	        multiLine: multiLine,
 	        rows: rows,
+	        disabled: disabled,
 	        floatingLabelText: inputLabel
 	      });
 	    }
@@ -98172,30 +98181,33 @@
 	    value: function render() {
 	      var _this2 = this;
 	
-	      var label = this.props.label;
+	      var _props = this.props;
+	      var label = _props.label;
+	      var disabled = _props.disabled;
 	
 	      var chips = this.state.items.map(function (item, index) {
-	        return _react2.default.createElement(_Chip2.default, { value: item, index: index, onRemoveClick: _this2.onRremoveItem, key: index });
+	        return _react2.default.createElement(_Chip2.default, { value: item, index: index, onRemoveClick: _this2.onRremoveItem, key: index, allowRemove: !disabled });
+	      });
+	      var textfield = disabled ? null : _react2.default.createElement(_TextField2.default, {
+	        name: 'newChips',
+	        value: this.state.inputValue,
+	        onBlur: this.onInputBlur,
+	        onFocus: this.onInputFocus,
+	        onKeyPress: this.onKeyPress,
+	        onChange: this.onInputChange,
+	        hintText: "Add new " + label.toLowerCase(),
+	        style: styles.input
 	      });
 	      return _react2.default.createElement(
 	        'div',
 	        { style: styles.wrapper },
 	        _react2.default.createElement(
 	          'label',
-	          { 'for': 'newChips', style: this.state.inFocus ? styles.labelFocus : styles.label },
+	          { 'for': 'newChips' },
 	          label
 	        ),
 	        chips,
-	        _react2.default.createElement(_TextField2.default, {
-	          name: 'newChips',
-	          value: this.state.inputValue,
-	          onBlur: this.onInputBlur,
-	          onFocus: this.onInputFocus,
-	          onKeyPress: this.onKeyPress,
-	          onChange: this.onInputChange,
-	          hintText: "Add new " + label.toLowerCase(),
-	          style: styles.input
-	        })
+	        textfield
 	      );
 	    }
 	  }]);
