@@ -87,9 +87,9 @@ class Field extends Component {
     } else if (type === "date") {
       let datePicker = null;
       if (value && value.sec) {
-        datePicker = <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} defaultDate={new Date(value.sec*1000)} formatDate={this.formatDate} disabled={disabled} />
+        datePicker = <DatePicker autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} defaultDate={new Date(value.sec*1000)} formatDate={this.formatDate} disabled={disabled} />
       } else {
-        datePicker = <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} formatDate={this.formatDate} disabled={disabled} />
+        datePicker = <DatePicker autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} formatDate={this.formatDate} disabled={disabled} />
       }
       return (
         <div>
