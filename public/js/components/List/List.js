@@ -20,6 +20,8 @@ import Divider from 'material-ui/Divider';
 import Snackbar from 'material-ui/Snackbar';
 import LinearProgress from 'material-ui/LinearProgress';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
 import {blue500} from 'material-ui/styles/colors';
 
 import _ from 'lodash';
@@ -27,6 +29,17 @@ import aja from 'aja';
 import moment from 'moment';
 
 import { Link, browserHistory } from 'react-router';
+
+const errorMessages = {
+  serverApiTimeout : 'Server timeout, please try again leter.',
+  serverApiNetworkError : 'Server error, please try again leter.',
+  serverApiDefaultError : 'Error loading data, try again later..',
+  tooManyRows : 'Too many rows, please update selected filter',
+  noData : 'No Data',
+  selectionActionAtLeastOne : 'Please select at least one item.',
+  selectionActionOnlyOne : 'Please select only one item.',
+  selectionActionatNoItems : 'No item selected.'
+}
 
 const styles = {
   listTopBar : {backgroundColor:'white'},
@@ -56,7 +69,6 @@ const styles = {
     margin : '10px'
   }
 };
-
 
 const SortTypes = {
   ASC: 1,
@@ -103,10 +115,12 @@ class List extends Component {
     this._getData = _.debounce(this._getData.bind(this),1000);
     this._filterData = this._filterData.bind(this);
     this._sortData = this._sortData.bind(this);
+    this._parseResults = this._parseResults.bind(this);
+    this.showSnackbar = this.showSnackbar.bind(this);
     //Handlers
     this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
+    this.validateAlLeastOneSelectedRow = this.validateAlLeastOneSelectedRow.bind(this);
     //Actions
-    this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
@@ -117,6 +131,7 @@ class List extends Component {
     this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onClickEditItem = this.onClickEditItem.bind(this);
     this.onClickDeleteItem = this.onClickDeleteItem.bind(this);
+    this.onClickCloseandnewItem = this.onClickCloseandnewItem.bind(this);
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
@@ -124,7 +139,6 @@ class List extends Component {
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
-      selectedRows : [],
       sortField : '',
       sortType : '',
       filters : filters,
@@ -147,7 +161,6 @@ class List extends Component {
     let filters = this._getFilterDefaultValues(settings.fields);
     this.setState({
       rows : [],
-      selectedRows : [],
       sortField : '',
       sortType : '',
       filters : filters,
@@ -158,43 +171,81 @@ class List extends Component {
 
   }
 
+  validateAlLeastOneSelectedRow(){
+    if(!_.isUndefined(this.refs.listBoby.state.selectedRows)) {
+      if (this.refs.listBoby.state.selectedRows.length == 1) {
+        let selectedRowNum = _.head(this.refs.listBoby.state.selectedRows);
+        let selectedItemId = this.state.rows[selectedRowNum];
+        return this.state.rows[selectedRowNum]
+      } else if(this.refs.listBoby.state.selectedRows.length > 1){
+        this.showSnackbar(errorMessages.selectionActionOnlyOne);
+        return this.refs.listBoby.state.selectedRows.length;
+      } else {
+        let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
+        this.showSnackbar(message);
+        return false;
+      }
+    }
+    return false;
+  }
   /* ON Actions */
-  onClickCloneItem(e) { console.log('Clone Item - ', e);}
+  onClickCloneItem(e) {
+    let item =  this.validateAlLeastOneSelectedRow();
+    if(item){
+      let { page, collection } = this.props;
+      let url = `/${page}/${collection}/clone/${item._id['$id']}`;
+      this.context.router.push(url);
+    }
+  }
+
+  onClickCloseandnewItem(e) {
+    let item =  this.validateAlLeastOneSelectedRow();
+    if(item){
+      let { page, collection } = this.props;
+      let url = `/${page}/${collection}/close_and_new/${item._id['$id']}`;
+      this.context.router.push(url);
+    }
+  }
+
   onClickEditItem(e) { console.log('Edit Item - ', e);}
   onClickDeleteItem(e) { console.log('Delete Item - ', e);}
-
-  _onRowSelection(selectedRows) {
-      let newSelectedRows = [1,0];
-      switch (selectedRows) {
-        case 'none': newSelectedRows = [];
-          break;
-        case 'all': newSelectedRows = _.range(0, 0 + this.state.rows.length)
-          break;
-
-          default: newSelectedRows = selectedRows.slice();
-          break;
-
-      }
-      // setTimeout is HACK to fix ui checked last iten when toggling select all to none
-      setTimeout(() => {
-          this.setState({
-              selectedRows : newSelectedRows
-          })
-       }, 100);
-  }
 
   onClickNewItem(e) {
     let { page, collection } = this.props;
     this.context.router.push(`/${page}/${collection}/new`);
   }
 
+
+  _onRowSelection(selectedRows) {
+    // console.log(this.refs.listBoby.state.selectedRows);
+
+      // let newSelectedRows = [1,0];
+      // switch (selectedRows) {
+      //   case 'none': newSelectedRows = [];
+      //     break;
+      //   case 'all': newSelectedRows = _.range(0, 0 + this.state.rows.length)
+      //     break;
+      //
+      //     default: newSelectedRows = selectedRows.slice();
+      //     break;
+      //
+      // }
+      // setTimeout is HACK to fix ui checked last iten when toggling select all to none
+      // setTimeout(() => {
+      //   this.setState({
+      //       selectedRows : this.refs.listBoby.state.selectedRows
+      //   });
+      //  }, 1000);
+  }
+
   onClickRow(row, column, e) {
     let { page, collection } = this.props;
     let rawData = this.state.rows[row];
-    if(column !== -1 && rawData && rawData._id && (rawData._id.$id || rawData._id) && this.state.settings.onItemClick){
-      let id = rawData._id.$id || rawData._id;
+    if(column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick){
+      let id = rawData._id.$id;
       let url = `/${page}/${collection}/${this.state.settings.onItemClick}/${id}`;
       this.context.router.push(url);
+      e.stopPropagation();
     }
   }
 
@@ -237,16 +288,21 @@ class List extends Component {
     });
   };
 
-  handleError(data){
-    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
+  showSnackbar(message){
     this.setState({
       snackbarOpen: true,
-      snackbarMessage: errorMessage,
+      snackbarMessage: message,
+    });
+  };
+
+  handleError(data){
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : errorMessages.serverApiDefaultError ;
+    this.showSnackbar(errorMessage);
+    this.setState({
       loadingData : ''
     });
   }
 
-  /* Helpers */
   _setPagesAmount(itemsCount, itemPerPage){
     if(parseInt(itemsCount) > 0 && parseInt(itemPerPage) > 0){
       return  Math.ceil(itemsCount / itemPerPage);
@@ -286,21 +342,34 @@ class List extends Component {
       if(this.state.filters[key].length){
         let filterSetting = this._getFieldSettings(key);
         if(filterSetting){
-          if(filterSetting.filter && filterSetting.filter.filterType && filterSetting.filter.filterType == 'query' ){
-              queryArgs[key] = {
+          if(filterSetting.filter.wildcard && filterSetting.filter.wildcard.length > 0){
+            queryArgs['$or'] = [];
+            filterSetting.filter.wildcard.map((replacment, i) => {
+              let wildcardkey =  key.replace("*", replacment);
+              queryArgs['$or'].push(
+                {[wildcardkey] : {
                 "$regex" : this.state.filters[key],
                 "$options" : "i"
-              };
+                }}
+              );
+            });
           } else {
-            queryString += '&' + key + "=" + this.state.filters[key];
+            queryArgs[key] = {
+              "$regex" : this.state.filters[key],
+              "$options" : "i"
+            };
           }
         }
       }
     }
 
     var filters = {};
-    this.state.settings.fields.map((field, i) => { filters[field.key]=1});
-    queryString += '&filter=' +  JSON.stringify(filters);
+    if(this.state.settings.project){
+      this.state.settings.project.map((field, i) => { filters[field]=1});
+    } else {
+      this.state.settings.fields.map((field, i) => { filters[field.key]=1});
+    }
+    queryString += '&project=' +  JSON.stringify(filters);
 
     if(!_.isEmpty(queryArgs)){
       queryString += '&query=' +  JSON.stringify(queryArgs);
@@ -316,19 +385,36 @@ class List extends Component {
     }
 
     if(globalSetting.serverApiDebug && globalSetting.serverApiDebug == true){
-        queryString += '&XDEBUG_SESSION_START=netbeans-xdebug';
+        queryString += '&' + globalSetting.serverApiDebugQueryString;
     }
 
-    if(this.props.collection == "rates"){
-        queryString += '&flattenRate=true'
-    }
-
-    if(queryString.startsWith('&')){
-      queryString = queryString.replace('&','?');
-    } else {
-      queryString = (queryString.length) ? '?' + queryString : '';
-    }
     return queryString;
+  }
+
+  _parseResults(collection, response){
+    let rows = [];
+    if(collection == 'rates'){
+      for(let rates in response.details){
+      let baseRateData =  Object.assign({}, response.details[rates]);
+        if(baseRateData.hasOwnProperty('rates')){
+          let rateRates = Object.assign({}, baseRateData['rates']);
+          delete baseRateData['rates']
+          for(let rate in rateRates){
+            let newRate = Object.assign({}, baseRateData, rateRates[rate], {usaget:rate});
+            rows.push(newRate);
+          }
+        } else {
+          rows.push(baseRateData);
+        }
+      }
+    } else {
+      rows = _.values(response.details);
+    }
+    if(rows.length > globalSetting.list.maxItems){
+      this.showSnackbar(errorMessages.tooManyRows);
+    }
+    rows = rows.slice(0, Math.min(rows.length, globalSetting.list.maxItems));
+    return rows;
   }
 
   _getData(query) {
@@ -342,21 +428,23 @@ class List extends Component {
        .url(url)
        .on('success', (response) => {
          if(response && response.status){
-           let rows = (response.details) ? response.details.slice(0, Math.min(response.details.length, 50)) : [];
+           let rows = this._parseResults(this.props.collection, response);
            let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
            this.setState({
-              totalPages : this._setPagesAmount(response.count, itemsPerPage),
+              totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
               rows : rows,
-              loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
+              loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text={errorMessages.noData} /></Toolbar>),
            });
          } else {
            this.handleError(response);
          }
        })
        .on('timeout', (response) => {
+         response['desc'] = errorMessages.serverApiTimeout;
           this.handleError(response);
         })
        .on('error', (response) => {
+         response['desc'] = errorMessages.serverApiNetworkError;
           this.handleError(response);
         })
        .go();
@@ -364,21 +452,38 @@ class List extends Component {
 
   _formatField(row, field, i){
     let output = '';
+    let value = _.result(row, field.key);
     switch (field.type) {
       case 'boolean':
-        output = row[field.key] ? 'Yes' : 'No' ;
+        output = value ? 'Yes' : 'No' ;
         break;
       case 'price':
-        output = parseFloat(row[field.key]).toFixed(2).toString().replace(".", ",") + ' €';
+          let price = parseFloat(value);
+          output = ( price) ? price.toFixed(2).toString().replace(".", ",") : '0';
+          output += ' ' + globalSetting.currency;
         break;
       case 'mongoid':
-        output = row[field.key].$id;
+        output = value.$id;
         break;
       case 'urt':
-        output = (row[field.key].sec) ? (moment(row[field.key].sec*1000).format(globalSetting.datetimeFormat)) : '';
+        output = (value.sec) ? (moment(value.sec*1000).format(globalSetting.datetimeFormat)) : '';
+        break;
+      case 'timestamp':
+        output = (value) ? (moment(value*1000).format(globalSetting.datetimeFormat)) : '';
+        break;
+      case 'interval':
+        switch (row.usaget) {
+          case 'forwarded_call':
+          case 'call':
+            output =  moment(0).second(value).format('mm:ss');
+            break;
+          case 'data': output = Math.ceil(value / 1024) + " KB";
+            break;
+          default: output = value;
+        }
         break;
       default:
-        output = row[field.key];
+        output = (typeof value === "undefined") ? "-" : value;
     }
     return output;
   }
@@ -413,6 +518,7 @@ class List extends Component {
     })
     return (matchFields.length) ? matchFields[0] : false ;
   }
+  /* ~Helpers */
 
   render() {
     let { settings } = this.state;
@@ -449,8 +555,8 @@ class List extends Component {
 
     let rows = this.state.rows.map( (row, index) => {
       return (
-      <TableRow key={index} selected={this.state.selectedRows.includes(index)}>
-        {<TableRowColumn style={{ width: 5}}>{index + 1}</TableRowColumn>}
+      <TableRow key={index}>
+        {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * this.state.settings.pagination.itemsPerPage) : 0)}</TableRowColumn>}
         { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
@@ -474,7 +580,7 @@ class List extends Component {
               onTouchTap={this[callback]}
               label={controller.label}
               style={styles.listActions}
-              disabled={this.state.selectedRows < 1}
+              disabled={false}
             />
           );
         });
@@ -585,9 +691,11 @@ class List extends Component {
           </TableHeader>
 
           <TableBody
+            preScanRows = { false }
             deselectOnClickaway = { false }
             showRowHover = { true }
             stripedRows = { true }
+            ref="listBoby"
           >
             {rows}
           </TableBody>
@@ -596,12 +704,26 @@ class List extends Component {
           </TableFooter>
         </Table>
 
-        <Snackbar
+
+          <Dialog
+           actions={<FlatButton
+                      label="Ok"
+                      primary={true}
+                      onTouchTap={this.handleCloseSnackbar}
+                    />}
+           modal={false}
+           open={this.state.snackbarOpen}
+           onRequestClose={this.handleCloseSnackbar}
+         >
+         <div>{this.state.snackbarMessage}</div>
+        </Dialog>
+      {/*<Snackbar
+          color='red'
           open={this.state.snackbarOpen}
           message={this.state.snackbarMessage}
           autoHideDuration={4000}
           onRequestClose={this.handleCloseSnackbar}
-        />
+        />*/}
 
       </div>
     );

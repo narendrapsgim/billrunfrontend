@@ -112,3 +112,7 @@ label {
   padding: 5px;
   width: 80px;
 }
+
+.imported-reason-title {
+    font-weight: bold;
+}

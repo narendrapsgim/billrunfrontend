@@ -5,13 +5,22 @@ import SelectField from 'material-ui/SelectField';
 import Checkbox from 'material-ui/Checkbox';
 import Toggle from 'material-ui/Toggle';
 import MenuItem from 'material-ui/MenuItem';
+import moment from 'moment';
+
 import Chips from '../Chips';
+import globalSetting from '../../globalSetting';
 
 class Field extends Component {
   constructor(props) {
     super(props);
     this.state = { path: "" };
     this.onTagsChange = this.onTagsChange.bind(this);
+    this.onDateChange = this.onDateChange.bind(this);
+    this.formatDate = this.formatDate.bind(this);
+  }
+
+  formatDate(date){
+    return (moment(date).format(globalSetting.dateFormat)) ;
   }
 
   onTagsChange(val, path) {
@@ -19,6 +28,14 @@ class Field extends Component {
       target: { dataset: { path: path } }
     };
     this.props.onChange(evt, 0, val);
+  }
+
+  onDateChange(path, nullEvent, val) {
+    let value = val.toISOString()
+    let evt = {
+      target: { dataset: { path: path } }
+    };
+    this.props.onChange(evt, 0, value);
   }
 
   createInputTag(field = {}) {
@@ -33,9 +50,14 @@ class Field extends Component {
           dbkey,
           multiselect = false,
           mandatory = false,
+          inline = false,
+          crud = "0110",
           size = 5 } = field;
+
+    if (crud[1] === "0") return (null);
+    let disabled = crud[2] === "0";
     let html_id = dbkey ? dbkey : label.toLowerCase().replace(/ /g, '_');
-    let inputLabel = mandatory ? <span>label <span className="required">*</span></span> : label;
+    let inputLabel = mandatory ? <span>{label} <span className="required">*</span></span> : label;
 
     if (type === "select") {
       let select_options = this.props.field.options;
@@ -50,44 +72,53 @@ class Field extends Component {
         });
       }
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <SelectField
               value={value}
               id={html_id}
               onChange={onChange}
-              floatingLabelText={inputLabel}>
+              floatingLabelText={inputLabel}
+              disabled={disabled}
+          >
             {options}
           </SelectField>
         </div>
       );
     } else if (type === "date") {
+      let datePicker = null;
+      if (value && value.sec) {
+        datePicker = <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} defaultDate={new Date(value.sec*1000)} formatDate={this.formatDate} disabled={disabled} />
+      } else {
+        datePicker = <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} formatDate={this.formatDate} disabled={disabled} />
+      }
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <label htmlFor={html_id}>{label}</label>
-          <DatePicker hintText={dbkey} id={html_id} data-path={path} onChange={onChange} />
+          {datePicker}
         </div>
       );
     } else if (type === "array") {
       return (
-        <div className={`col-md-${size}`}>
-          <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path}/>
+        <div>
+          <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path} disabled={disabled} />
         </div>
       );
     } else if (type === "checkbox") {
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <Checkbox
-            data-path={path}
-            label={inputLabel}
-            style={{ marginBottom: '16px', marginLeft: '-2px', marginTop: '5px'}}
-            defaultChecked={value}
-            onCheck={onChange}
+              data-path={path}
+              label={inputLabel}
+              style={{ marginBottom: '16px', marginLeft: '-2px', marginTop: '5px'}}
+              defaultChecked={value}
+              disabled={disabled}
+              onCheck={onChange}
           />
         </div>
       );
     } else if (type === "toggle") {
       return (
-        <div className={`col-md-${size}`}>
+        <div>
           <Toggle
             label={inputLabel}
             data-path={path}
@@ -101,7 +132,7 @@ class Field extends Component {
     let multiLine = type === "textarea" ? true : false;
     let rows = multiLine ? 2 : 1;
     return (
-      <div className={`col-md-${size}`}>
+      <div>
         <TextField value={value}
                    data-path={path}
                    onChange={onChange}
@@ -109,6 +140,7 @@ class Field extends Component {
                    fullWidth={true}
                    multiLine={multiLine}
                    rows={rows}
+                   disabled={disabled}
                    floatingLabelText={inputLabel}
         />
       </div>

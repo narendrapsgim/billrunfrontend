@@ -19,7 +19,7 @@ const styles = {
     pointerEvents: 'auto',
     color: theme.palette.accent3Color,
     transformOrigin: 'left top 0px',
-    margin: '0 0 0 10px',
+    margin: '0px',
   },
   labelFocus: {
     position: 'absolute',
@@ -31,7 +31,7 @@ const styles = {
     transformOrigin: 'left top',
     pointerEvents: 'auto',
     color: theme.palette.primary1Color,
-    margin: '0 0 0 10px',
+    margin: '0px',
   },
   input: {
     marginLeft: '5px',
@@ -112,24 +112,25 @@ export default class Chips extends Component {
   }
 
   render() {
-    const {label} = this.props;
+    const {label, disabled} = this.props;
     let chips = this.state.items.map((item, index) =>
-      <Chip value={item} index={index} onRemoveClick={this.onRremoveItem} key={index}/>
+      <Chip value={item} index={index} onRemoveClick={this.onRremoveItem} key={index} allowRemove={!disabled} />
     );
+    let textfield = disabled ? (null) : (<TextField
+                                             name="newChips"
+                                             value={this.state.inputValue}
+                                             onBlur={this.onInputBlur}
+                                             onFocus={this.onInputFocus}
+                                             onKeyPress={this.onKeyPress}
+                                             onChange={this.onInputChange}
+                                             hintText={"Add new " + label.toLowerCase()  }
+                                             style={styles.input}
+                                         />);
     return (
       <div style={styles.wrapper}>
-      <label for="newChips" style={this.state.inFocus ? styles.labelFocus : styles.label}>{label}</label>
-          {chips}
-          <TextField
-            name="newChips"
-            value={this.state.inputValue}
-            onBlur={this.onInputBlur}
-            onFocus={this.onInputFocus}
-            onKeyPress={this.onKeyPress}
-            onChange={this.onInputChange}
-            hintText="Add new"
-            style={styles.input}
-          />
+        <label for="newChips"><u>{label}</u></label>
+        {chips}
+        {textfield}
       </div>
     );
   }
