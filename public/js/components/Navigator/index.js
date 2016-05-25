@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'react-router'
 import FlatButton from 'material-ui/FlatButton';
 import activeComponent from 'react-router-active-component';
@@ -16,15 +17,18 @@ export default class Navigator extends Component {
   }
 
   render() {
-    let buttons = Object.keys(View.pages).map((page, key) => {
-      let label = View.pages[page].menu_title || View.pages[page].title;
-      let route = View.pages[page].route ? View.pages[page].route : page;
-      return (
+    let buttons = null;
+    if(this.props.auth){
+      buttons = Object.keys(View.pages).map((page, key) => {
+        let label = View.pages[page].menu_title || View.pages[page].title;
+        let route = View.pages[page].route ? View.pages[page].route : page;
+        return (
               <Link key={key} to={route} activeClassName='active'>
                 <FlatButton label={label} labelStyle={{textTransform: "none"}}/>
               </Link>
-      )
-    });
+        )
+      });
+    }
 
     return (
       <div className="navigator">
@@ -33,3 +37,11 @@ export default class Navigator extends Component {
     );
   }
 };
+
+function mapStateToProps(state) {
+  return {
+    auth: state.users.auth
+  };
+}
+
+export default connect(mapStateToProps)(Navigator);

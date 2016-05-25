@@ -32,6 +32,7 @@
     "webpack-hot-middleware": "^2.10.0"
   },
   "dependencies": {
+    "axios": "^0.11.1",
     "express": "^4.13.4",
     "jquery": "^2.2.4",
     "moment": "^2.13.0",
