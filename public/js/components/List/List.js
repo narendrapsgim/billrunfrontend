@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import globalSetting from '../../globalSetting';
+//import globalSetting from '../../globalSetting';
 import {Table} from 'material-ui/Table';
 import TableHeader from 'material-ui/Table/TableHeader';
 import TableHeaderColumn from 'material-ui/Table/TableHeaderColumn';
@@ -120,7 +120,7 @@ class List extends Component {
     this.showSnackbar = this.showSnackbar.bind(this);
     //Handlers
     this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
-    this.validateAlLeastOneSelectedRow = this.validateAlLeastOneSelectedRow.bind(this);
+    this.validateAtLeastOneSelectedRow = this.validateAtLeastOneSelectedRow.bind(this);
     //Actions
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
@@ -132,6 +132,7 @@ class List extends Component {
     this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onClickEditItem = this.onClickEditItem.bind(this);
     this.onClickDeleteItem = this.onClickDeleteItem.bind(this);
+    this.onAcceptRemoveItems = this.onAcceptRemoveItems.bind(this);
     this.onClickCloseandnewItem = this.onClickCloseandnewItem.bind(this);
 
     //Assign filter default value if exist
@@ -172,7 +173,7 @@ class List extends Component {
 
   }
 
-  validateAlLeastOneSelectedRow(){
+  validateAtLeastOneSelectedRow(){
     if(!_.isUndefined(this.refs.listBoby.state.selectedRows)) {
       if (this.refs.listBoby.state.selectedRows.length == 1) {
         let selectedRowNum = _.head(this.refs.listBoby.state.selectedRows);
@@ -191,7 +192,7 @@ class List extends Component {
   }
   /* ON Actions */
   onClickCloneItem(e) {
-    let item =  this.validateAlLeastOneSelectedRow();
+    let item =  this.validateAtLeastOneSelectedRow();
     if(item){
       let { page, collection } = this.props;
       let url = `/${page}/${collection}/clone/${item._id['$id']}`;
@@ -200,7 +201,7 @@ class List extends Component {
   }
 
   onClickCloseandnewItem(e) {
-    let item =  this.validateAlLeastOneSelectedRow();
+    let item = this.validateAtLeastOneSelectedRow();
     if(item){
       let { page, collection } = this.props;
       let url = `/${page}/${collection}/close_and_new/${item._id['$id']}`;
@@ -209,7 +210,38 @@ class List extends Component {
   }
 
   onClickEditItem(e) { console.log('Edit Item - ', e);}
-  onClickDeleteItem(e) { console.log('Delete Item - ', e);}
+
+  onClickDeleteItem(e) {
+    if (this.refs.listBoby.state.selectedRows.length) {
+      this.setState({modalTitle: "Remove Items"});
+      this.setState({modalMessage: "Are you sure you want to remove selected items?"});
+      this.setState({modalOpen: true});
+    } else {
+      let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
+      this.showSnackbar(message);
+    }
+  }
+  onAcceptRemoveItems() {
+    this.setState({modalOpen: false});
+    let selectedRowNums = this.refs.listBoby.state.selectedRows;
+    if (selectedRowNums.length) {
+      let item_ids = _.reduce(selectedRowNums, (acc, idx) => {
+        acc.push(this.state.rows[idx]._id['$id']);
+        return acc;
+      }, []);
+      let data = {
+        ids: item_ids
+      };
+      aja()
+        .method('POST')
+        .url(`${globalSetting.serverUrl}/admin/remove`)
+        .on('success', resp => {
+          /* TODO rerender list withtout removed items on sucess */
+          this._updateTableData();
+        })
+        .go();
+    }
+  }
 
   onClickNewItem(e) {
     let { page, collection } = this.props;
@@ -658,6 +690,22 @@ class List extends Component {
       </TableRow>
     );
 
+    let closeModal = () => {
+      this.setState({modalOpen: false});
+    }
+    const modalActions = [
+      <FlatButton
+          label="Cancel"
+          primary={true}
+          onTouchTap={closeModal}
+      />,
+      <FlatButton
+          label="Accept"
+          primary={true}
+          onTouchTap={this.onAcceptRemoveItems}
+      />
+    ];
+    
     return (
       <div>
         <Toolbar style={styles.listTopBar}>
@@ -717,7 +765,15 @@ class List extends Component {
            onRequestClose={this.handleCloseSnackbar}
          >
          <div>{this.state.snackbarMessage}</div>
-        </Dialog>
+          </Dialog>
+          <Dialog
+              title={this.state.modalTitle}
+              actions={modalActions}
+              modal={true}
+              open={this.state.modalOpen}
+          >
+            <div>{this.state.modalMessage}</div>
+          </Dialog>
       {/*<Snackbar
           color='red'
           open={this.state.snackbarOpen}

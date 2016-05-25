@@ -1,4 +1,4 @@
-import globalSetting from './globalSetting';
+//import globalSetting from './globalSetting';
 import {red500, blue500} from 'material-ui/styles/colors';
 import ImportExport from './components/HtmlPages/ImportExport';
 import Dashboard from './components/HtmlPages/Dashboard';
@@ -174,7 +174,7 @@ const rates_list_view = {
       controllers : {
         duplicate : { label: 'Duplicate', callback: 'onClickCloneItem'},
         closeAndNew : { label: 'Close and New'},
-        //delete : { label: 'Delete', color: red500  },
+        delete : { label: 'Delete', color: red500  },
       },
       pagination : {
         itemsPerPage : 20,

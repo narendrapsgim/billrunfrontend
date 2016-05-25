@@ -1,4 +1,4 @@
-const GlobalSetting = {
+var globalSetting = {
   // serverUrl : "http://10.162.20.191:1337", // Roman
   serverUrl : "http://10.162.20.86", // Eran
   serverApiDebug : false,
@@ -11,5 +11,3 @@ const GlobalSetting = {
     maxItems : 50
   }
 }
-
-export default GlobalSetting;
