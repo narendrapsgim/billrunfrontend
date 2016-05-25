@@ -26,6 +26,7 @@ import Aggregate from '../Aggregate/Aggregate';
 import _ from 'lodash';
 import aja from 'aja';
 import $ from 'jquery';
+import DatePicker from 'material-ui/DatePicker';
 import moment from 'moment';
 
 import { Link, browserHistory } from 'react-router';
@@ -617,7 +618,7 @@ class List extends Component {
             defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
             onChange={this.onChangeFilter} />;
           if(field.type == 'urt') {
-            ret =  <DatePicker hintText={"enter " + field.label + "..."} container="inline" mode="landscape"
+            ret =  <DatePicker  style={styles.filterInput} hintText={"Enter " + field.label + "..."} container="inline" mode="landscape"
                                 floatingLabelText={"Search by " + field.label} style={styles.filterInput}
                                 key={i} name={field.key}  defaultDate={(field.filter.defaultValue) ? new Date(field.filter.defaultValue) : null}
                                 onChange={this.onChangeFilterDate.bind(null, field.key)} autoOk={true}
@@ -763,7 +764,7 @@ class List extends Component {
           onTouchTap={this.onAcceptRemoveItems}
       />
     ];
-    
+
     return (
       <div>
         <Toolbar style={styles.listTopBar}>
