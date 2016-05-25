@@ -1,5 +1,5 @@
 import aja from 'aja';
-import globalSetting from './globalSetting';
+//import globalSetting from './globalSetting';
 
 export const UPDATE_FIELD_VALUE = 'UPDATE_FIELD_VALUE';
 export const GOT_ITEM = 'GOT_COLLECTION_ITEMS';

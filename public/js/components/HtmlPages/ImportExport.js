@@ -8,7 +8,7 @@ import Paper from 'material-ui/Paper';
 import Dialog from 'material-ui/Dialog';
 
 import aja from 'aja';
-import globalSetting from '../../globalSetting';
+//import globalSetting from '../../globalSetting';
 import $ from 'jquery';
 
 const styles = {
