@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Avatar from 'material-ui/Avatar';
 import IconMenu from 'material-ui/IconMenu';
 import IconButton from 'material-ui/IconButton';
@@ -9,8 +10,14 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import {indigo50,grey900, blue500} from 'material-ui/styles/colors';
+import axios from 'axios';
 
-export default class Topbar extends Component {
+let axiosInstance = axios.create({
+  withCredentials: true,
+  baseURL: globalSetting.serverUrl
+});
+
+class Topbar extends Component {
   constructor(props) {
     super(props);
 
@@ -21,30 +28,63 @@ export default class Topbar extends Component {
     this.renderLoginForm = this.renderLoginForm.bind(this);
     this.setUserName = this.setUserName.bind(this);
 
+    axiosInstance.get('/api/auth').then(
+      response => {
+        if(response.data && response.data.status){
+          props.dispatch({type:'login'});
+        }
+        this.setState({
+          showLoginForm : false,
+          userName : response.data.details.user || this.state.userName,
+        });
+      }
+    );
+
     this.state = {
-      showLogin: props.showLogin,
       showLoginForm : false,
       userName : props.userName,
+      errorMessage : ''
     };
   }
 
   setUserName(e,value){
-    this.setState({
-      userName : value
-    });
+    // this.setState({
+    //   userName : value
+    // });
   }
 
   clickLogin(){
-    this.setState({
-      showLogin: false,
-      showLoginForm:false
-    });
+    let username = this.refs.username.input.value;
+    let password = this.refs.password.input.value;
+    axiosInstance.get(`/api/auth?username=${username}&password=${password}`).then(
+      response => {
+        if(response.data && response.data.status){
+          let { dispatch } = this.props;
+          dispatch({type:'login'});
+
+          this.setState({
+            showLoginForm:false,
+            errorMessage : '',
+            userName : response.data.details.user || this.state.userName
+          });
+        } else {
+          this.setState({
+            errorMessage : 'Error, please try again'
+          });
+        }
+      }
+    );
   }
 
   clickLogout(){
-    this.setState({
-      showLogin: true
-    });
+    axiosInstance.get('/api/auth?action=logout').then(
+      response => {
+        if(response.data && response.data.status){
+          let { dispatch } = this.props;
+          dispatch({type:'logout'});
+        }
+      }
+    );
   }
 
   handleOpen(){
@@ -52,7 +92,7 @@ export default class Topbar extends Component {
   }
 
   handleClose() {
-    this.setState({showLoginForm: false});
+    this.setState({showLoginForm: false, errorMessage : ''});
   }
 
   renderLoginButton(){
@@ -87,9 +127,10 @@ export default class Topbar extends Component {
           open={this.state.showLoginForm}
           onRequestClose={this.handleClose}
         >
-          <TextField hintText="Enter user name or mail" floatingLabelText="User name" onChange={this.setUserName} />
+          <TextField hintText="Enter user name or mail" floatingLabelText="User name" ref="username" onChange={this.setUserName} />
           <br />
-          <TextField hintText="Password" floatingLabelText="Password" type="password" />
+          <TextField hintText="Password" floatingLabelText="Password" type="password" ref="password"/>
+          <p style={{color:'red'}}>{this.state.errorMessage}</p>
         </Dialog>
       </div>
     );
@@ -132,7 +173,7 @@ export default class Topbar extends Component {
             {<img src="img/billrun-logo-tm.png" />}
           </a>
         </ToolbarGroup>
-          { this.state.showLogin ? this.renderLoginButton() : this.rendeUserMenu() }
+          { !this.props.auth ? this.renderLoginButton() : this.rendeUserMenu() }
       </Toolbar>
       {this.renderLoginForm()}
     </div>
@@ -141,6 +182,13 @@ export default class Topbar extends Component {
 }
 
 Topbar.defaultProps = {
-  showLogin: true,
   userName:'Anonymous'
 };
+
+function mapStateToProps(state) {
+  return {
+    auth: state.users.auth
+  };
+}
+
+export default connect(mapStateToProps)(Topbar);

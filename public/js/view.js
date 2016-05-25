@@ -200,6 +200,7 @@ const rates_edit_view = {
         { dbkey: "alpha3", label: "Alpha3", type:'array' },
         { dbkey: "zone", label: "zone"},
         { dbkey: "zone_grouping", label: "Zone Grouping" },
+        { dbkey: "from", label: "From", type:'date'},
         { dbkey: "to", label: "To", type:'date'},
         { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
           [
