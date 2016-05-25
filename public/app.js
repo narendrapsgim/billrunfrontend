@@ -28023,8 +28023,6 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	//import globalSetting from './globalSetting';
-	
 	
 	function rootReducer() {
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -28093,8 +28091,6 @@
 	var _aja2 = _interopRequireDefault(_aja);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	//import globalSetting from './globalSetting';
 	
 	var UPDATE_FIELD_VALUE = exports.UPDATE_FIELD_VALUE = 'UPDATE_FIELD_VALUE';
 	var GOT_ITEM = exports.GOT_ITEM = 'GOT_COLLECTION_ITEMS';
@@ -29105,8 +29101,7 @@
 	  sections: [{
 	    html: _Dashboard2.default
 	  }]
-	}; //import globalSetting from './globalSetting';
-	
+	};
 	
 	var import_export_html = {
 	  title: "",
@@ -29889,8 +29884,6 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	//import globalSetting from '../../globalSetting';
-	
 	
 	var styles = {
 	  button: {
@@ -29976,7 +29969,7 @@
 	      var serverUrl = _globalSetting.serverUrl;
 	
 	      _jquery2.default.ajax({
-	        url: "http://10.162.20.86/admin/exportrates",
+	        url: globalSetting.serverUrl + '/admin/exportrates',
 	        type: "GET",
 	        dataType: "jsonp"
 	      }).done(function (resp) {});
@@ -78856,8 +78849,6 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	//import globalSetting from '../../globalSetting';
-	
 	var Field = function (_Component) {
 	  _inherits(Field, _Component);
 	
@@ -98684,6 +98675,10 @@
 	
 	var _aja2 = _interopRequireDefault(_aja);
 	
+	var _jquery = __webpack_require__(/*! jquery */ 310);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
 	var _moment = __webpack_require__(/*! moment */ 492);
 	
 	var _moment2 = _interopRequireDefault(_moment);
@@ -98701,8 +98696,6 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	//import globalSetting from '../../globalSetting';
-	
 	
 	var errorMessages = {
 	  serverApiTimeout: 'Server timeout, please try again leter.',
@@ -98934,6 +98927,8 @@
 	        this.setState({ modalTitle: "Remove Items" });
 	        this.setState({ modalMessage: "Are you sure you want to remove selected items?" });
 	        this.setState({ modalOpen: true });
+	        /* HACK! */
+	        this.setState({ selectedRow: this.refs.listBoby.state.selectedRows });
 	      } else {
 	        var message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
 	        this.showSnackbar(message);
@@ -98945,19 +98940,26 @@
 	      var _this3 = this;
 	
 	      this.setState({ modalOpen: false });
-	      var selectedRowNums = this.refs.listBoby.state.selectedRows;
+	      var selectedRowNums = this.state.selectedRow;
 	      if (selectedRowNums.length) {
 	        var item_ids = _lodash2.default.reduce(selectedRowNums, function (acc, idx) {
 	          acc.push(_this3.state.rows[idx]._id['$id']);
 	          return acc;
 	        }, []);
 	        var data = {
-	          ids: item_ids
+	          ids: JSON.stringify(item_ids),
+	          coll: this.props.collection,
+	          type: "remove"
 	        };
-	        (0, _aja2.default)().method('POST').url(globalSetting.serverUrl + '/admin/remove').on('success', function (resp) {
+	        _jquery2.default.ajax({
+	          type: 'POST',
+	          url: globalSetting.serverUrl + '/admin/remove',
+	          data: data,
+	          dataType: 'jsonp'
+	        }).always(function (resp) {
 	          /* TODO rerender list withtout removed items on sucess */
 	          _this3._updateTableData();
-	        }).go();
+	        });
 	      }
 	    }
 	  }, {
