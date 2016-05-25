@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import globalSetting from '../../globalSetting';
+//import globalSetting from '../../globalSetting';
 import {Table} from 'material-ui/Table';
 import TableHeader from 'material-ui/Table/TableHeader';
 import TableHeaderColumn from 'material-ui/Table/TableHeaderColumn';

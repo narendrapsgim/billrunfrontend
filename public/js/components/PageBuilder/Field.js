@@ -8,7 +8,7 @@ import MenuItem from 'material-ui/MenuItem';
 import moment from 'moment';
 
 import Chips from '../Chips';
-import globalSetting from '../../globalSetting';
+//import globalSetting from '../../globalSetting';
 
 class Field extends Component {
   constructor(props) {
