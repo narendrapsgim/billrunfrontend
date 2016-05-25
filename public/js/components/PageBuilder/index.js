@@ -324,7 +324,7 @@ PageBuilder.contextTypes = {
 
 function mapStateToProps(state, ownProps) {
   let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
-  return (state[pageName]) ? state[pageName] : state;
+  return (state.pages[pageName]) ? state.pages[pageName] : state.pages;
 }
 
 export default connect(mapStateToProps)(PageBuilder);

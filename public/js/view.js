@@ -243,6 +243,8 @@ const rates_new_view = Object.assign({}, rates_edit_view, {title: "New Rate"});
 
 const rates_clone_view = Object.assign({}, rates_edit_view, {title: "Clone Rate"});
 
+const rates_close_and_new_view = Object.assign({}, rates_edit_view, {title: "Close and Create New Rate"});
+
 /////////////////// VAT /////////////////////////
 
 const rates_vat_list_view = {
@@ -610,6 +612,7 @@ const View = {
         list: rates_list_view,
         new: rates_new_view,
         clone: rates_clone_view,
+        close_and_new: rates_close_and_new_view,
         edit: rates_edit_view
       }
     },
