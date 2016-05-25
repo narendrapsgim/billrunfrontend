@@ -174,7 +174,7 @@ const rates_list_view = {
       controllers : {
         duplicate : { label: 'Duplicate', callback: 'onClickCloneItem'},
         closeAndNew : { label: 'Close and New'},
-        //delete : { label: 'Delete', color: red500  },
+        delete : { label: 'Delete', color: red500  },
       },
       pagination : {
         itemsPerPage : 20,
