@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-//import globalSetting from '../../globalSetting';
 import {Table} from 'material-ui/Table';
 import TableHeader from 'material-ui/Table/TableHeader';
 import TableHeaderColumn from 'material-ui/Table/TableHeaderColumn';
@@ -26,6 +25,7 @@ import {blue500} from 'material-ui/styles/colors';
 
 import _ from 'lodash';
 import aja from 'aja';
+import $ from 'jquery';
 import moment from 'moment';
 
 import { Link, browserHistory } from 'react-router';
@@ -216,6 +216,8 @@ class List extends Component {
       this.setState({modalTitle: "Remove Items"});
       this.setState({modalMessage: "Are you sure you want to remove selected items?"});
       this.setState({modalOpen: true});
+      /* HACK! */
+      this.setState({selectedRow: this.refs.listBoby.state.selectedRows});
     } else {
       let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
       this.showSnackbar(message);
@@ -223,23 +225,26 @@ class List extends Component {
   }
   onAcceptRemoveItems() {
     this.setState({modalOpen: false});
-    let selectedRowNums = this.refs.listBoby.state.selectedRows;
+    let selectedRowNums = this.state.selectedRow;
     if (selectedRowNums.length) {
       let item_ids = _.reduce(selectedRowNums, (acc, idx) => {
         acc.push(this.state.rows[idx]._id['$id']);
         return acc;
       }, []);
       let data = {
-        ids: item_ids
+        ids: JSON.stringify(item_ids),
+        coll: this.props.collection,
+        type: "remove"
       };
-      aja()
-        .method('POST')
-        .url(`${globalSetting.serverUrl}/admin/remove`)
-        .on('success', resp => {
-          /* TODO rerender list withtout removed items on sucess */
-          this._updateTableData();
-        })
-        .go();
+      $.ajax({
+        type: 'POST',
+        url: `${globalSetting.serverUrl}/admin/remove`,
+        data: data,
+        dataType: 'jsonp'
+      }).always(resp => {
+        /* TODO rerender list withtout removed items on sucess */
+        this._updateTableData();
+      });
     }
   }
 
