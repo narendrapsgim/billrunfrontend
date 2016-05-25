@@ -8,7 +8,6 @@ import Paper from 'material-ui/Paper';
 import Dialog from 'material-ui/Dialog';
 
 import aja from 'aja';
-//import globalSetting from '../../globalSetting';
 import $ from 'jquery';
 
 const styles = {
@@ -81,7 +80,7 @@ export default class ImportExport extends Component {
   onExportClick(e){
     let { serverUrl } = globalSetting;
     $.ajax({
-      url: "http://10.162.20.86/admin/exportrates",
+      url: `${globalSetting.serverUrl}/admin/exportrates`,
       type: "GET",
       dataType: "jsonp"
     }).done(resp => {

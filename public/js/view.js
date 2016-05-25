@@ -1,4 +1,3 @@
-//import globalSetting from './globalSetting';
 import {red500, blue500} from 'material-ui/styles/colors';
 import ImportExport from './components/HtmlPages/ImportExport';
 import Dashboard from './components/HtmlPages/Dashboard';

@@ -1,6 +1,5 @@
 import { UPDATE_FIELD_VALUE, GOT_ITEM, SAVE_FORM, SET_INITIAL_ITEM, NEW_FIELD, REMOVE_FIELD } from '../actions';
 import View from '../view.js';
-//import globalSetting from '../globalSetting';
 import _ from 'lodash';
 import aja from 'aja';
 
