@@ -5,9 +5,10 @@ const GlobalSetting = {
   datetimeFormat : "DD/MM/YYYY HH:MM",
   dateFormat : "DD/MM/YYYY",
   timeFormat : "HH:MM",
+  apiDateTimeFormat : "YYYY/MM/DD HH:mm:ss",
   currency : ' €',
   list : {
-    maxItems : 50
+    maxItems : 100
   }
 }
 

@@ -23,10 +23,12 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import {blue500} from 'material-ui/styles/colors';
-
+import Aggregate from '../Aggregate/Aggregate';
 import _ from 'lodash';
 import aja from 'aja';
 import moment from 'moment';
+import DatePicker from 'material-ui/DatePicker';
+
 
 import { Link, browserHistory } from 'react-router';
 
@@ -114,6 +116,7 @@ class List extends Component {
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
+    this.onChangeFilterDate = this.onChangeFilterDate.bind(this);
     this.onClickTableHeader = this.onClickTableHeader.bind(this);
     this._onRowSelection = this._onRowSelection.bind(this);
 
@@ -121,6 +124,9 @@ class List extends Component {
     this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onClickEditItem = this.onClickEditItem.bind(this);
     this.onClickDeleteItem = this.onClickDeleteItem.bind(this);
+    this.formatDate = this.formatDate.bind(this);
+
+    this._onAggregate = this._onAggregate.bind(this);
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
@@ -225,6 +231,14 @@ class List extends Component {
     this._filterData(key, value);
   }
 
+  onChangeFilterDate(key ,nullEvent, value) {
+    this._filterData(key, value);
+  }
+
+  formatDate(date){
+    return (moment(date).format(globalSetting.dateFormat)) ;
+  }
+
   onClickTableHeader(e, value, sort){
     let newSort = SortTypes.ASC; //default
     if (this.state.sortField == value.key) {
@@ -293,13 +307,31 @@ class List extends Component {
     let queryArgs = {};
 
     for ( let key in this.state.filters ) {
-      if(this.state.filters[key].length){
+      if(this.state.filters[key]){
         let filterSetting = this._getFieldSettings(key);
         if(filterSetting){
-          queryArgs[key] = {
-            "$regex" : this.state.filters[key],
-            "$options" : "i"
-          };
+          if(filterSetting['filter'] && filterSetting['filter']['query']) {
+            console.log(queryArgs,filterSetting['filter']['valuePath']);
+            let self = this;
+              queryArgs = function rec(qArgs,path ) {
+                console.log(qArgs,path);
+                  if(path == null ) {
+                     return self.state.filters[key];
+                  }
+                  for(let i in path) {
+                    if(!qArgs[i]) {
+                      qArgs[i] = {};
+                    }
+                    qArgs[i] = rec( queryArgs[i],path[i] );
+                  }
+                  return qArgs;
+              }(queryArgs,filterSetting['filter']['valuePath']);
+          } else {
+            queryArgs[key] = {
+              "$regex" : this.state.filters[key],
+              "$options" : "i"
+            };
+        }
         }
       }
     }
@@ -459,20 +491,50 @@ class List extends Component {
   }
   /* ~Helpers */
 
+
+ _onAggregate(response) {
+   let rows = this._parseResults(this.props.collection, response);
+   let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
+   this.setState({
+      totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
+      rows : rows,
+      loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
+   });
+ }
+
   render() {
     let { settings } = this.state;
     let { page, collection } = this.props;
+    let aggregate = (<div />);
+    if(this.state.settings.aggregate) {
+      aggregate = (<Aggregate fields={this.state.settings.aggregate.fields}
+                              methods={this.state.settings.aggregate.methods}
+                              groupBy={this.state.settings.aggregate.groupBy}
+                              url='http://billrun/api/queryaggregate'
+                              onDataChange={this._onAggregate} />);
+    }
     let filters = (
       this.state.settings.fields.map((field, i) => {
         if(field.filter && !field.filter.system){
-          return <TextField
+          let ret =
+
+           <TextField
             style={styles.filterInput}
             key={i} name={field.key}
             hintText={"enter " + field.label + "..."}
             floatingLabelText={"Search by " + field.label}
             errorText=""
             defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
-            onChange={this.onChangeFilter} />
+            onChange={this.onChangeFilter} />;
+          if(field.type == 'urt') {
+            ret =  <DatePicker hintText={"enter " + field.label + "..."} container="inline" mode="landscape"
+                                floatingLabelText={"Search by " + field.label} style={styles.filterInput}
+                                key={i} name={field.key}  defaultDate={(field.filter.defaultValue) ? new Date(field.filter.defaultValue) : null}
+                                onChange={this.onChangeFilterDate.bind(null, field.key)} autoOk={true}
+                                formatDate={this.formatDate}/>
+
+          }
+          return ret;
         }
       })
     );

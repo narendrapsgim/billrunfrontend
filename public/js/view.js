@@ -2,6 +2,7 @@ import globalSetting from './globalSetting';
 import {red500, blue500} from 'material-ui/styles/colors';
 import ImportExport from './components/HtmlPages/ImportExport';
 import Dashboard from './components/HtmlPages/Dashboard';
+import moment from 'moment';
 
 const dashboard_html = {
   title : "",
@@ -26,6 +27,18 @@ const lines_list_view = {
     lists : [ {
       title : "Lines",
       url : globalSetting.serverUrl + '/api/find?collection=lines',
+      aggregate: {
+        groupBy : [
+                  {label : "SID" , key : "sid"},
+                  {label : "AID" , key : "aid"},
+                  ],
+         fields : [
+                    {label : "Usage" , key : "usagev"},
+                    {label : "price" , key : "aprice"},
+                    {label : "Market price" , key : "apr"},
+                  ],
+        methods : [ {label : "Sum" , key : "$sum"}]
+      },
       fields : [
         {key : 'aid', label : 'AID', filter : { defaultValue : ''}},
         {key : 'sid', label : 'SID', filter : {}},
@@ -33,7 +46,9 @@ const lines_list_view = {
         {key : 'service_type', label : 'Service Type'},
         {key : 'plan', label : 'plan',  filter : {}},
         {key : 'type', label : 'Type'},
-        {key : 'urt', label : 'URT',  type : 'urt', sortable : true},
+        {key : 'urt', label : 'URT',  type : 'urt', sortable : true },
+        {key : 'urt2', label : 'From',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().subtract(2, 'months')), query:{'urt':{'$gt':1}} ,valuePath:{'urt':{'$gt': null}}  }, hidden : true},
+        {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
       ],
       pagination : {
         itemsPerPage : 10,
@@ -74,8 +89,9 @@ const rates_list_view = {
         {key: 'rate[0].price', label: 'Price'},
         {key: 'rate[0].interval', label: 'Interval', type:'interval'},
         {key: 'access', label: 'Access'},
-        {key: 'from', label: 'From', type:"urt", sortable : true},
-        {key: 'to', label: 'To', type:"urt", sortable : true},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
+        {key: 'from', label: 'From', type:"urt", sortable : true, },
+        {key: 'to', label: 'To', type:"urt", sortable : true, },
         {key: '_id', label: 'ID', type:"mongoid", sortable : true},
       ],
       project: [ 'key', '_id', 'type', 'rates','from' ,'to'],
@@ -105,6 +121,7 @@ const rates_vat_list_view = {
         {key: 'rate_type', label: 'Rate Type'},
         {key: 'type', label: 'Type', filter :  {system:'vat'}},
         {key: 'zone', label: 'Zone'},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
         // {key: 'rates', label: 'rates'}
       ],
       controllers : {
@@ -138,6 +155,7 @@ const rates_product_list_view = {
         {key: 'key', label: 'Key', filter : {}},
         {key: 'brand', label: 'Brand', filter : {}},
         {key: 'model', label: 'Model', filter : {}},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
         // {key: 'rates', label: 'rates'}
       ],
       onItemClick : 'edit',
@@ -174,6 +192,7 @@ const plans_list_view = {
         {key : 'price', label : 'Price', type : 'price', sortable : true},
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
         {key : 'from', label : 'From',  type : 'urt', sortable : true, filter : {}},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
       ],
       onItemClick : 'edit',
       controllers : {
@@ -423,6 +442,7 @@ const rates_discount_list_view = {
         {key: 'rate_type', label: 'Rate Type'},
         {key: 'type', label: 'Type', filter :  {system : 'discount'}},
         {key: 'zone', label: 'Zone'},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
         // {key: 'rates', label: 'rates'}
       ],
       onItemClick : 'edit',
@@ -501,6 +521,7 @@ const rates_charge_list_view = {
         // {key: 'rate_type', label: 'Rate Type'},
         // {key: 'end_publication', label: 'End Publication'},
         {key: 'type', label: 'Type', filter :  {system : 'charge'}},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
       ],
       onItemClick : 'edit',
     } ]
