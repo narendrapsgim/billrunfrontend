@@ -1,10 +1,11 @@
 import aja from 'aja';
-import globalSetting from './globalSetting';
 
 export const UPDATE_FIELD_VALUE = 'UPDATE_FIELD_VALUE';
 export const GOT_ITEM = 'GOT_COLLECTION_ITEMS';
 export const SAVE_FORM = 'SAVE_FORM';
 export const SET_INITIAL_ITEM = 'SET_INITIAL_ITEM';
+export const NEW_FIELD = 'NEW_FIELD';
+export const REMOVE_FIELD = 'REMOVE_FIELD';
 
 export function setInitialItem(page_name) {
   return {
@@ -18,6 +19,23 @@ export function updateFieldValue(path, field_value, page_name) {
     type: UPDATE_FIELD_VALUE,
     path,
     field_value,
+    page_name
+  };
+}
+
+export function newField(path, field_type, page_name) {
+  return {
+    type: NEW_FIELD,
+    path,
+    field_type,
+    page_name
+  };
+}
+
+export function removeField(path, page_name) {
+  return {
+    type: REMOVE_FIELD,
+    path,
     page_name
   };
 }

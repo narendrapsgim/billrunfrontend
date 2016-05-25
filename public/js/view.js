@@ -1,4 +1,3 @@
-import globalSetting from './globalSetting';
 import {red500, blue500} from 'material-ui/styles/colors';
 import ImportExport from './components/HtmlPages/ImportExport';
 import Dashboard from './components/HtmlPages/Dashboard';
@@ -11,6 +10,7 @@ const dashboard_html = {
     html : Dashboard
   } ]
 }
+
 const import_export_html = {
   title : "",
   view_type : "",
@@ -18,6 +18,86 @@ const import_export_html = {
     html : ImportExport
   } ]
 }
+
+const plan_setup_tabs = [
+  {
+    title: "Plan Settings",
+    sections: [
+      {
+        title: "Basic Settings",
+        description: "Basic settings of the plan",
+        fields: [
+          { dbkey: "name",
+            label: "Plan Name",
+            mandatory: true,
+            type: "text" },
+          { dbkey: "description",
+            label: "Plan Description",
+            mandatory: false,
+            type: "textarea" }
+        ]
+      },
+      {
+        title: "Trial",
+        display: "inline",
+        fields: [
+          { label: "Transation",
+            mandatory: true,
+            type: "select",
+            size: 3,
+            options: [
+              { label: "Every Month", value: "every_month"}
+            ]},
+          { label: "Cycle",
+            type: "number",
+            size: 2,
+            dbkey: "trial-cycle" },
+          { label: "Plan Fee",
+            type: "number",
+            size: 3 }
+        ]
+      },
+      {
+        title: "Plan Recurring",
+        description: "Recurring charges of the plan",
+        fields: [
+          { label: "Priodical Rate",
+            type: "number",
+            size: 2 },
+          { label: "Each",
+            type: "number",
+            size: 1 },
+          { type: "select",
+            options: [
+              { label: "Every Month", value: "every_month"}
+            ],
+            size: 2,
+            dbkey: "each_select" },
+          { label: "Cycle",
+            dbkey: "recurring-cycle",
+            type: "number",
+            size: 1 },
+          { label: "Validity",
+            type: "date",
+            dbkey: "from",
+            size: 3 },
+          { type: "date",
+            dbkey: "to",
+            size: 3 }
+        ]
+      }
+    ]
+  },
+  {
+    title: "Add Item"
+  },
+  {
+    title: "Whaddup!"
+  }
+];
+
+//////////////// LINES ////////////////////////////
+
 const lines_list_view = {
   title : "",
   view_type : "",
@@ -46,7 +126,7 @@ const lines_list_view = {
         {key : 'service_type', label : 'Service Type'},
         {key : 'plan', label : 'plan',  filter : {}},
         {key : 'type', label : 'Type'},
-        {key : 'urt', label : 'URT',  type : 'urt', sortable : true },
+        {key : 'urt', label : 'URT',  type : 'urt', sortable : true},
         {key : 'urt2', label : 'From',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().subtract(2, 'months')), query:{'urt':{'$gt':1}} ,valuePath:{'urt':{'$gt': null}}  }, hidden : true},
         {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
       ],
@@ -72,19 +152,30 @@ const lines_edit_view = {
   ]
 };
 
+/////////////////// RATES /////////////////////////
+
 const rates_list_view = {
   title: "",
   view_type: "list",
   sections: [ {
     title: "",
     lists: [ {
-      title: "VAT",
+      title: "Rates",
       url: globalSetting.serverUrl + '/api/find?collection=rates',
       fields: [
         {key: 'type', label: 'Type', filter :  {system:'regular'}, hidden : true},
         {key: 'params.destination.prefix', label: 'Prefix', filter :  {}, hidden : true},
         {key: 'params.destination.region', label: 'Region', filter :  {}, hidden : true},
         {key: 'key', label: 'Key', filter : {}, sortable : true},
+        {key: 'country', label: 'Country', filter :  {}, hidden: true},
+        {key: 'params.source_types', label: 'Source Types', filter:  {}, hidden: true},
+        {key: 'params.source_networks', label: 'Source Networks', filter:  {}, hidden: true},
+        {key: 'rates.*.erp_account', label: 'ERP Account', filter: { wildcard: [
+            'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
+          ]}, hidden: true},
+        {key: 'rates.*.groups', label: 'Groups', filter: { wildcard: [
+            'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
+          ]}, hidden: true},
         {key: 'usaget', label: 'Type', sortable : true},
         {key: 'rate[0].price', label: 'Price'},
         {key: 'rate[0].interval', label: 'Interval', type:'interval'},
@@ -101,172 +192,12 @@ const rates_list_view = {
         delete : { label: 'Delete', color: red500  },
       },
       pagination : {
-        itemsPerPage : 10,
+        itemsPerPage : 20,
       },
       onItemClick : 'edit',
+      defaults : {tableHeight : '450px'}
     } ]
   } ]
-};
-const rates_vat_list_view = {
-  title: "",
-  view_type: "list",
-  sections: [ {
-    title: "",
-    lists: [ {
-      title: "VAT",
-      url: globalSetting.serverUrl + '/api/find?collection=rates',
-      fields: [
-        {key: 'key', label: 'Key', filter : {}},
-        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
-        {key: 'rate_type', label: 'Rate Type'},
-        {key: 'type', label: 'Type', filter :  {system:'vat'}},
-        {key: 'zone', label: 'Zone'},
-        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
-        // {key: 'rates', label: 'rates'}
-      ],
-      controllers : {
-        // duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
-        // new : { label: 'New'},
-        // closeAndNew : { label: 'Close and New'},
-        // edit : { label: 'Edit'},
-        // delete : { label: 'Delete', color: red500  },
-        export : { label: 'Export', color: red500  },
-        import : { label: 'Import', color: red500  },
-      },
-      pagination : {
-        itemsPerPage : 10,
-      },
-      onItemClick : 'edit',
-    } ]
-  } ]
-};
-
-const rates_product_list_view = {
-  title: "",
-  view_type: "list",
-  sections: [ {
-    title: "",
-    lists: [ {
-      title: "Products",
-      url: globalSetting.serverUrl + '/api/find?collection=rates',
-      fields: [
-        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
-        {key: 'type', label: 'Type', filter :  {system : 'product'}, hidden : true},
-        {key: 'key', label: 'Key', filter : {}},
-        {key: 'brand', label: 'Brand', filter : {}},
-        {key: 'model', label: 'Model', filter : {}},
-        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
-        // {key: 'rates', label: 'rates'}
-      ],
-      onItemClick : 'edit',
-    } ]
-  } ]
-};
-
-const rates_new_view = {
-  title: "New Rate",
-  view_type: "sections",
-  sections: [
-    {
-      display: "inline",
-      fields: [
-        { dbkey: "key", label: "Key", size: 10, mandatory: true }
-      ]
-    }
-  ]
-};
-
-const plans_list_view = {
-  title : "",
-  view_type : "list",
-  sections : [ {
-    title : "",
-    lists : [ {
-      title : "Plans",
-      url : globalSetting.serverUrl + '/api/find?collection=plans',
-      fields : [
-        {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
-        {key : 'technical_name', label : 'Label', filter : {}, sortable : true},
-        {key : 'invoice_type', label : 'Type', sortable : true},
-        {key : 'grouping', label : 'Grouping', filter : {}},
-        {key : 'price', label : 'Price', type : 'price', sortable : true},
-        {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
-        {key : 'from', label : 'From',  type : 'urt', sortable : true, filter : {}},
-        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
-      ],
-      onItemClick : 'edit',
-      controllers : {
-        duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
-        // new : { label: 'New'},
-        closeAndNew : { label: 'Close and New'},
-        // edit : { label: 'Edit'},
-        // delete : { label: 'Delete', color: red500  },
-      },
-      defaults : {
-        tableHeight : '500px',
-      }
-    } ]
-  } ]
-};
-
-const plans_new_view = {
-  title: "New Plan",
-  view_type: "sections",
-  sections: [
-    {
-      display: "inline",
-      fields: [
-        { dbkey: "name", label: "Name", size: 10, mandatory: true },
-        /* { dbkey: "test", label: "Test", size: 10, type: "select", options: [
-           { label: "Option 1", value: "option_1" },
-           { label: "Option 2", value: "option_2" }
-           ] } */
-      ]
-    }
-  ]
-};
-
-const plans_edit_view = {
-  title: "Edit Plan",
-  view_type: "sections",
-  sections: [
-    {
-      // title: "Test",
-      display: "inline",
-      fields:
-      [
-        { dbkey: "technical_name", label: "Technical label", size: 10 },
-        { dbkey: "name", label: "Name", size: 10, mandatory: true },
-        { dbkey: "key", label: "Key", size: 10 },
-        { dbkey: "price", label: "Price", size: 10 , type: "number" },
-        { dbkey: "display_order", label: "Display Order", size: 10 },
-        { dbkey: "invoice_type", label: "Invoice Type", size: 10 },
-        { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "name", label: "Name", type: "text" },
-                { dbkey: "price", label: "Price", type: "number" },
-              ]
-            }
-          ]
-        },
-        { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true, size: 10  ,  fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "name", label: "Name", type: "text"},
-                { dbkey: "display_order", label: "Display Order", type: "number"},
-              ]
-            }
-          ]
-        },
-        { dbkey: "forceCommitment", label: "Force Commitment", size: 10 , type: "checkbox"},
-      ]
-    }
-  ]
 };
 
 const rates_edit_view = {
@@ -284,6 +215,7 @@ const rates_edit_view = {
         { dbkey: "alpha3", label: "Alpha3", type:'array' },
         { dbkey: "zone", label: "zone"},
         { dbkey: "zone_grouping", label: "Zone Grouping" },
+        { dbkey: "from", label: "From", type:'date'},
         { dbkey: "to", label: "To", type:'date'},
         { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
           [
@@ -323,6 +255,48 @@ const rates_edit_view = {
   ]
 };
 
+const rates_new_view = Object.assign({}, rates_edit_view, {title: "New Rate"});
+
+const rates_clone_view = Object.assign({}, rates_edit_view, {title: "Clone Rate"});
+
+const rates_close_and_new_view = Object.assign({}, rates_edit_view, {title: "Close and Create New Rate"});
+
+/////////////////// VAT /////////////////////////
+
+const rates_vat_list_view = {
+  title: "",
+  view_type: "list",
+  sections: [ {
+    title: "",
+    lists: [ {
+      title: "VAT",
+      url: globalSetting.serverUrl + '/api/find?collection=rates',
+      fields: [
+        {key: 'key', label: 'Key', filter : {}},
+        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
+        {key: 'rate_type', label: 'Rate Type'},
+        {key: 'type', label: 'Type', filter :  {system:'vat'}},
+        {key: 'zone', label: 'Zone'},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
+        // {key: 'rates', label: 'rates'}
+      ],
+      controllers : {
+        // duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
+        // new : { label: 'New'},
+        // closeAndNew : { label: 'Close and New'},
+        // edit : { label: 'Edit'},
+        // delete : { label: 'Delete', color: red500  },
+        export : { label: 'Export', color: red500  },
+        import : { label: 'Import', color: red500  },
+      },
+      pagination : {
+        itemsPerPage : 10,
+      },
+      onItemClick : 'edit',
+    } ]
+  } ]
+};
+
 const rates_vat_edit_view = {
   title: "Edit Rate",
   view_type: "sections",
@@ -356,6 +330,30 @@ const rates_vat_edit_view = {
       ]
     }
   ]
+};
+
+/////////////////// PRODUCT /////////////////////////
+
+const rates_product_list_view = {
+  title: "",
+  view_type: "list",
+  sections: [ {
+    title: "",
+    lists: [ {
+      title: "Products",
+      url: globalSetting.serverUrl + '/api/find?collection=rates',
+      fields: [
+        {key: '_id', label: 'ID', type:"mongoid", hidden : true},
+        {key: 'type', label: 'Type', filter :  {system : 'product'}, hidden : true},
+        {key: 'key', label: 'Key', filter : {}},
+        {key: 'brand', label: 'Brand', filter : {}},
+        {key: 'model', label: 'Model', filter : {}},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
+        // {key: 'rates', label: 'rates'}
+      ],
+      onItemClick : 'edit',
+    } ]
+  } ]
 };
 
 const rates_product_edit_view = {
@@ -399,6 +397,95 @@ const rates_product_edit_view = {
     }
   ]
 };
+
+
+/////////////////// PLANS /////////////////////////
+
+const plans_list_view = {
+  title : "",
+  view_type : "list",
+  sections : [ {
+    title : "",
+    lists : [ {
+      title : "Plans",
+      url : globalSetting.serverUrl + '/api/find?collection=plans',
+      fields : [
+        {key : '_id', label : 'ID', type : 'mongoid', hidden : true}, // aid=5000000476
+        {key : 'technical_name', label : 'Label', filter : {}, sortable : true},
+        {key : 'invoice_type', label : 'Type', sortable : true},
+        {key : 'grouping', label : 'Grouping', filter : {}},
+        {key : 'price', label : 'Price', type : 'price', filter : {}, sortable : true},
+        {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
+        {key : 'from', label : 'From',  type : 'urt', sortable : true, filter : {}},
+        {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
+      ],
+      onItemClick : 'edit',
+      controllers : {
+        duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
+        // new : { label: 'New'},
+        closeAndNew : { label: 'Close and New'},
+        // edit : { label: 'Edit'},
+        // delete : { label: 'Delete', color: red500  },
+      },
+      defaults : {
+        tableHeight : '500px',
+      }
+    } ]
+  } ]
+};
+
+const plans_edit_view = {
+  title: "Edit Plan",
+  view_type: "sections",
+  sections: [
+    {
+      // title: "Test",
+      display: "inline",
+      fields:
+      [
+        { dbkey: "technical_name", label: "Technical label", size: 10 },
+        { dbkey: "name", label: "Name", size: 10, mandatory: true },
+        { dbkey: "key", label: "Key", size: 10 },
+        { dbkey: "price", label: "Price", size: 10 , type: "number" },
+        { dbkey: "display_order", label: "Display Order", size: 10 },
+        { dbkey: "invoice_type", label: "Invoice Type", size: 10 },
+        { dbkey: "from", label: "From", type: "date", size: 5 },
+        { dbkey: "to", label: "To", type: "date", size: 5 },
+        { dbkey: "options", label: "Options", collapsible: true, collapsed: true, fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "name", label: "Name", type: "text" },
+                { dbkey: "price", label: "Price", type: "number" },
+              ]
+            }
+          ]
+        },
+        { dbkey: "not_billable_options", label: "Options (not billable)", collapsible: true, collapsed: true, size: 10  ,  fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "name", label: "Name", type: "text"},
+                { dbkey: "display_order", label: "Display Order", type: "number"},
+              ]
+            }
+          ]
+        },
+        { dbkey: "forceCommitment", label: "Force Commitment", size: 10 , type: "checkbox"},
+      ]
+    }
+  ]
+};
+
+const plans_new_view = Object.assign({}, plans_edit_view, {title: "New Plan"});
+
+const plans_clone_view = Object.assign({}, plans_edit_view, {title: "Clone Plan"});
+
+const plans_close_and_new_view = Object.assign({}, plans_edit_view, {title: "Close And New Plan"});
+
+/////////////////// DISCOUNTS /////////////////////////
 
 const rates_discount_edit_view = {
   title: "Edit Discount",
@@ -449,6 +536,8 @@ const rates_discount_list_view = {
     } ]
   } ]
 };
+
+/////////////////// CHANRGE /////////////////////////
 
 const rates_charge_edit_view = {
   title: "Edit Charge",
@@ -528,83 +617,7 @@ const rates_charge_list_view = {
   } ]
 };
 
-
-const plan_setup_tabs = [
-  {
-    title: "Plan Settings",
-    sections: [
-      {
-        title: "Basic Settings",
-        description: "Basic settings of the plan",
-        fields: [
-          { dbkey: "name",
-            label: "Plan Name",
-            mandatory: true,
-            type: "text" },
-          { dbkey: "description",
-            label: "Plan Description",
-            mandatory: false,
-            type: "textarea" }
-        ]
-      },
-      {
-        title: "Trial",
-        display: "inline",
-        fields: [
-          { label: "Transation",
-            mandatory: true,
-            type: "select",
-            size: 3,
-            options: [
-              { label: "Every Month", value: "every_month"}
-            ]},
-          { label: "Cycle",
-            type: "number",
-            size: 2,
-            dbkey: "trial-cycle" },
-          { label: "Plan Fee",
-            type: "number",
-            size: 3 }
-        ]
-      },
-      {
-        title: "Plan Recurring",
-        description: "Recurring charges of the plan",
-        fields: [
-          { label: "Priodical Rate",
-            type: "number",
-            size: 2 },
-          { label: "Each",
-            type: "number",
-            size: 1 },
-          { type: "select",
-            options: [
-              { label: "Every Month", value: "every_month"}
-            ],
-            size: 2,
-            dbkey: "each_select" },
-          { label: "Cycle",
-            dbkey: "recurring-cycle",
-            type: "number",
-            size: 1 },
-          { label: "Validity",
-            type: "date",
-            dbkey: "from",
-            size: 3 },
-          { type: "date",
-            dbkey: "to",
-            size: 3 }
-        ]
-      }
-    ]
-  },
-  {
-    title: "Add Item"
-  },
-  {
-    title: "Whaddup!"
-  }
-];
+/////////////////// LAYOUT /////////////////////////
 
 const View = {
   pages: {
@@ -614,11 +627,13 @@ const View = {
       html : dashboard_html
     },
     rates: {
-      menu_title: "Rate",
+      menu_title: "Rates",
       route: "rates/rates/list",
       views: {
         list: rates_list_view,
         new: rates_new_view,
+        clone: rates_clone_view,
+        close_and_new: rates_close_and_new_view,
         edit: rates_edit_view
       }
     },
@@ -662,6 +677,8 @@ const View = {
       views: {
         list: plans_list_view,
         new: plans_new_view,
+        clone: plans_clone_view,
+        close_and_new: plans_close_and_new_view,
         edit: plans_edit_view
       }
     },

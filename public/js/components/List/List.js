@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import globalSetting from '../../globalSetting';
 import {Table} from 'material-ui/Table';
 import TableHeader from 'material-ui/Table/TableHeader';
 import TableHeaderColumn from 'material-ui/Table/TableHeaderColumn';
@@ -26,11 +25,21 @@ import {blue500} from 'material-ui/styles/colors';
 import Aggregate from '../Aggregate/Aggregate';
 import _ from 'lodash';
 import aja from 'aja';
+import $ from 'jquery';
 import moment from 'moment';
-import DatePicker from 'material-ui/DatePicker';
-
 
 import { Link, browserHistory } from 'react-router';
+
+const errorMessages = {
+  serverApiTimeout : 'Server timeout, please try again leter.',
+  serverApiNetworkError : 'Server error, please try again leter.',
+  serverApiDefaultError : 'Error loading data, try again later..',
+  tooManyRows : 'Too many rows, please update selected filter',
+  noData : 'No Data',
+  selectionActionAtLeastOne : 'Please select at least one item.',
+  selectionActionOnlyOne : 'Please select only one item.',
+  selectionActionatNoItems : 'No item selected.'
+}
 
 const styles = {
   listTopBar : {backgroundColor:'white'},
@@ -52,6 +61,7 @@ const styles = {
   },
   tableCell : {
     textOverflow : 'clip',
+    wordWrap: 'break-word',
     whiteSpace: 'normal',
     paddingLeft: '10px',
     paddingRight: '10px',
@@ -60,7 +70,6 @@ const styles = {
     margin : '10px'
   }
 };
-
 
 const SortTypes = {
   ASC: 1,
@@ -111,8 +120,8 @@ class List extends Component {
     this.showSnackbar = this.showSnackbar.bind(this);
     //Handlers
     this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
+    this.validateAtLeastOneSelectedRow = this.validateAtLeastOneSelectedRow.bind(this);
     //Actions
-    this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
@@ -124,9 +133,8 @@ class List extends Component {
     this.onClickNewItem = this.onClickNewItem.bind(this);
     this.onClickEditItem = this.onClickEditItem.bind(this);
     this.onClickDeleteItem = this.onClickDeleteItem.bind(this);
-    this.formatDate = this.formatDate.bind(this);
-
-    this._onAggregate = this._onAggregate.bind(this);
+    this.onAcceptRemoveItems = this.onAcceptRemoveItems.bind(this);
+    this.onClickCloseandnewItem = this.onClickCloseandnewItem.bind(this);
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
@@ -166,10 +174,86 @@ class List extends Component {
 
   }
 
+  validateAtLeastOneSelectedRow(){
+    if(!_.isUndefined(this.refs.listBoby.state.selectedRows)) {
+      if (this.refs.listBoby.state.selectedRows.length == 1) {
+        let selectedRowNum = _.head(this.refs.listBoby.state.selectedRows);
+        let selectedItemId = this.state.rows[selectedRowNum];
+        return this.state.rows[selectedRowNum]
+      } else if(this.refs.listBoby.state.selectedRows.length > 1){
+        this.showSnackbar(errorMessages.selectionActionOnlyOne);
+        return this.refs.listBoby.state.selectedRows.length;
+      } else {
+        let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
+        this.showSnackbar(message);
+        return false;
+      }
+    }
+    return false;
+  }
   /* ON Actions */
-  onClickCloneItem(e) { console.log('Clone Item - ', e);}
+  onClickCloneItem(e) {
+    let item =  this.validateAtLeastOneSelectedRow();
+    if(item){
+      let { page, collection } = this.props;
+      let url = `/${page}/${collection}/clone/${item._id['$id']}`;
+      this.context.router.push(url);
+    }
+  }
+
+  onClickCloseandnewItem(e) {
+    let item = this.validateAtLeastOneSelectedRow();
+    if(item){
+      let { page, collection } = this.props;
+      let url = `/${page}/${collection}/close_and_new/${item._id['$id']}`;
+      this.context.router.push(url);
+    }
+  }
+
   onClickEditItem(e) { console.log('Edit Item - ', e);}
-  onClickDeleteItem(e) { console.log('Delete Item - ', e);}
+
+  onClickDeleteItem(e) {
+    if (this.refs.listBoby.state.selectedRows.length) {
+      this.setState({modalTitle: "Remove Items"});
+      this.setState({modalMessage: "Are you sure you want to remove selected items?"});
+      this.setState({modalOpen: true});
+      /* HACK! */
+      this.setState({selectedRow: this.refs.listBoby.state.selectedRows});
+    } else {
+      let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
+      this.showSnackbar(message);
+    }
+  }
+  onAcceptRemoveItems() {
+    this.setState({modalOpen: false});
+    let selectedRowNums = this.state.selectedRow;
+    if (selectedRowNums.length) {
+      let item_ids = _.reduce(selectedRowNums, (acc, idx) => {
+        acc.push(this.state.rows[idx]._id['$id']);
+        return acc;
+      }, []);
+      let data = {
+        ids: JSON.stringify(item_ids),
+        coll: this.props.collection,
+        type: "remove"
+      };
+      $.ajax({
+        type: 'POST',
+        url: `${globalSetting.serverUrl}/admin/remove`,
+        data: data,
+        dataType: 'jsonp'
+      }).always(resp => {
+        /* TODO rerender list withtout removed items on sucess */
+        this._updateTableData();
+      });
+    }
+  }
+
+  onClickNewItem(e) {
+    let { page, collection } = this.props;
+    this.context.router.push(`/${page}/${collection}/new`);
+  }
+
 
   _onRowSelection(selectedRows) {
     // console.log(this.refs.listBoby.state.selectedRows);
@@ -191,11 +275,6 @@ class List extends Component {
       //       selectedRows : this.refs.listBoby.state.selectedRows
       //   });
       //  }, 1000);
-  }
-
-  onClickNewItem(e) {
-    let { page, collection } = this.props;
-    this.context.router.push(`/${page}/${collection}/new`);
   }
 
   onClickRow(row, column, e) {
@@ -264,7 +343,7 @@ class List extends Component {
   };
 
   handleError(data){
-    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : 'Error loading data, try again later..';
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : errorMessages.serverApiDefaultError ;
     this.showSnackbar(errorMessage);
     this.setState({
       loadingData : ''
@@ -310,11 +389,20 @@ class List extends Component {
       if(this.state.filters[key]){
         let filterSetting = this._getFieldSettings(key);
         if(filterSetting){
-          if(filterSetting['filter'] && filterSetting['filter']['query']) {
-            console.log(queryArgs,filterSetting['filter']['valuePath']);
+          if(filterSetting.filter.wildcard && filterSetting.filter.wildcard.length > 0){
+            queryArgs['$or'] = [];
+            filterSetting.filter.wildcard.map((replacment, i) => {
+              let wildcardkey =  key.replace("*", replacment);
+              queryArgs['$or'].push(
+                {[wildcardkey] : {
+                "$regex" : this.state.filters[key],
+                "$options" : "i"
+                }}
+              );
+            });
+          } else if(filterSetting['filter'] && filterSetting['filter']['query']) {
             let self = this;
               queryArgs = function rec(qArgs,path ) {
-                console.log(qArgs,path);
                   if(path == null ) {
                      return self.state.filters[key];
                   }
@@ -327,13 +415,13 @@ class List extends Component {
                   return qArgs;
               }(queryArgs,filterSetting['filter']['valuePath']);
           } else {
-            queryArgs[key] = {
-              "$regex" : this.state.filters[key],
-              "$options" : "i"
-            };
-        }
+          queryArgs[key] = {
+            "$regex" : this.state.filters[key],
+            "$options" : "i"
+          };
         }
       }
+    }
     }
 
     var filters = {};
@@ -384,7 +472,7 @@ class List extends Component {
       rows = _.values(response.details);
     }
     if(rows.length > globalSetting.list.maxItems){
-      this.showSnackbar('Too many rows, please update selected filter');
+      this.showSnackbar(errorMessages.tooManyRows);
     }
     rows = rows.slice(0, Math.min(rows.length, globalSetting.list.maxItems));
     return rows;
@@ -406,16 +494,18 @@ class List extends Component {
            this.setState({
               totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
               rows : rows,
-              loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
+              loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text={errorMessages.noData} /></Toolbar>),
            });
          } else {
            this.handleError(response);
          }
        })
        .on('timeout', (response) => {
+         response['desc'] = errorMessages.serverApiTimeout;
           this.handleError(response);
         })
        .on('error', (response) => {
+         response['desc'] = errorMessages.serverApiNetworkError;
           this.handleError(response);
         })
        .go();
@@ -557,7 +647,7 @@ class List extends Component {
     let rows = this.state.rows.map( (row, index) => {
       return (
       <TableRow key={index}>
-        {<TableRowColumn style={{ width: 5}}>{index + 1}</TableRowColumn>}
+        {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * this.state.settings.pagination.itemsPerPage) : 0)}</TableRowColumn>}
         { this.state.settings.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
@@ -658,6 +748,22 @@ class List extends Component {
       </TableRow>
     );
 
+    let closeModal = () => {
+      this.setState({modalOpen: false});
+    }
+    const modalActions = [
+      <FlatButton
+          label="Cancel"
+          primary={true}
+          onTouchTap={closeModal}
+      />,
+      <FlatButton
+          label="Accept"
+          primary={true}
+          onTouchTap={this.onAcceptRemoveItems}
+      />
+    ];
+    
     return (
       <div>
         <Toolbar style={styles.listTopBar}>
@@ -706,7 +812,7 @@ class List extends Component {
         </Table>
 
 
-          {/*<Dialog
+          <Dialog
            actions={<FlatButton
                       label="Ok"
                       primary={true}
@@ -716,15 +822,23 @@ class List extends Component {
            open={this.state.snackbarOpen}
            onRequestClose={this.handleCloseSnackbar}
          >
-         {this.state.snackbarMessage}
-        </Dialog>*/}
-      <Snackbar
+         <div>{this.state.snackbarMessage}</div>
+          </Dialog>
+          <Dialog
+              title={this.state.modalTitle}
+              actions={modalActions}
+              modal={true}
+              open={this.state.modalOpen}
+          >
+            <div>{this.state.modalMessage}</div>
+          </Dialog>
+      {/*<Snackbar
           color='red'
           open={this.state.snackbarOpen}
           message={this.state.snackbarMessage}
           autoHideDuration={4000}
           onRequestClose={this.handleCloseSnackbar}
-        />
+        />*/}
 
       </div>
     );
@@ -737,7 +851,7 @@ List.contextTypes = {
 
 function mapStateToProps(state) {
   return {
-    list: state.list
+    list: state.pages.list
   };
 }
 

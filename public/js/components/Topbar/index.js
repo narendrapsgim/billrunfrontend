@@ -1,46 +1,194 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Avatar from 'material-ui/Avatar';
 import IconMenu from 'material-ui/IconMenu';
 import IconButton from 'material-ui/IconButton';
 import NavigationExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import MenuItem from 'material-ui/MenuItem';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
-import {indigo50,grey900} from 'material-ui/styles/colors';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
+import {indigo50,grey900, blue500} from 'material-ui/styles/colors';
+import axios from 'axios';
 
+let axiosInstance = axios.create({
+  withCredentials: true,
+  baseURL: globalSetting.serverUrl
+});
 
-export default class Topbar extends Component {
+class Topbar extends Component {
   constructor(props) {
     super(props);
+
+    this.clickLogin = this.clickLogin.bind(this);
+    this.clickLogout = this.clickLogout.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.renderLoginForm = this.renderLoginForm.bind(this);
+    this.setUserName = this.setUserName.bind(this);
+
+    axiosInstance.get('/api/auth').then(
+      response => {
+        if(response.data && response.data.status){
+          props.dispatch({type:'login'});
+        }
+        this.setState({
+          showLoginForm : false,
+          userName : response.data.details.user || this.state.userName,
+        });
+      }
+    );
+
+    this.state = {
+      showLoginForm : false,
+      userName : props.userName,
+      errorMessage : ''
+    };
+  }
+
+  setUserName(e,value){
+    // this.setState({
+    //   userName : value
+    // });
+  }
+
+  clickLogin(){
+    let username = this.refs.username.input.value;
+    let password = this.refs.password.input.value;
+    axiosInstance.get(`/api/auth?username=${username}&password=${password}`).then(
+      response => {
+        if(response.data && response.data.status){
+          let { dispatch } = this.props;
+          dispatch({type:'login'});
+
+          this.setState({
+            showLoginForm:false,
+            errorMessage : '',
+            userName : response.data.details.user || this.state.userName
+          });
+        } else {
+          this.setState({
+            errorMessage : 'Error, please try again'
+          });
+        }
+      }
+    );
+  }
+
+  clickLogout(){
+    axiosInstance.get('/api/auth?action=logout').then(
+      response => {
+        if(response.data && response.data.status){
+          let { dispatch } = this.props;
+          dispatch({type:'logout'});
+        }
+      }
+    );
+  }
+
+  handleOpen(){
+    this.setState({showLoginForm: true});
+  }
+
+  handleClose() {
+    this.setState({showLoginForm: false, errorMessage : ''});
+  }
+
+  renderLoginButton(){
+    return (
+      <ToolbarGroup>
+        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text="Login" onClick={this.handleOpen} />
+      </ToolbarGroup>
+    )
+  }
+
+  renderLoginForm(){
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        keyboardFocused={true}
+        onTouchTap={this.handleClose}
+        />,
+      <FlatButton
+        label="Login"
+        primary={true}
+        keyboardFocused={true}
+        onTouchTap={this.clickLogin}
+        />,
+    ];
+    return(
+    <div>
+        <Dialog
+          title="Login"
+          actions={actions}
+          modal={false}
+          open={this.state.showLoginForm}
+          onRequestClose={this.handleClose}
+        >
+          <TextField hintText="Enter user name or mail" floatingLabelText="User name" ref="username" onChange={this.setUserName} />
+          <br />
+          <TextField hintText="Password" floatingLabelText="Password" type="password" ref="password"/>
+          <p style={{color:'red'}}>{this.state.errorMessage}</p>
+        </Dialog>
+      </div>
+    );
+  }
+
+  rendeUserMenu(){
+    return (
+      <ToolbarGroup>
+        <ToolbarSeparator style={{top: '13px'}}/>
+        <Avatar
+          color={blue500}
+          backgroundColor={indigo50}
+          size={40}
+          style={{margin:'8px 10px 0 20px'}}
+        >
+        {this.state.userName[0]}
+      </Avatar>
+      <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text={this.state.userName} />
+        <IconMenu style={{marginTop:'5px'}}
+          iconButtonElement={
+            <IconButton touch={true}>
+              <NavigationExpandMoreIcon color={indigo50} />
+            </IconButton>
+          }
+        >
+          <MenuItem primaryText="Profile" />
+          <MenuItem primaryText="Settings" />
+          <MenuItem primaryText="Logout" onClick={this.clickLogout} />
+        </IconMenu>
+      </ToolbarGroup>
+    );
   }
 
   render() {
     return (
+      <div>
       <Toolbar className="topbar" style={{height: 70,backgroundColor : grey900}}>
         <ToolbarGroup>
           <a href="#">
             {<img src="img/billrun-logo-tm.png" />}
           </a>
         </ToolbarGroup>
-        <ToolbarGroup>
-          <ToolbarSeparator style={{top: '13px'}}/>
-          <Avatar
-            src="https://avatars.githubusercontent.com/u/1040582?v=3"
-            size={40}
-            style={{margin:'8px 10px 0 20px'}}
-          />
-        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text="Ofer Cohen" />
-          <IconMenu style={{marginTop:'5px'}}
-            iconButtonElement={
-              <IconButton touch={true}>
-                <NavigationExpandMoreIcon color={indigo50} />
-              </IconButton>
-            }
-          >
-            <MenuItem primaryText="Profile" />
-            <MenuItem primaryText="Settings" />
-          </IconMenu>
-        </ToolbarGroup>
+          { !this.props.auth ? this.renderLoginButton() : this.rendeUserMenu() }
       </Toolbar>
+      {this.renderLoginForm()}
+    </div>
     );
   }
 }
+
+Topbar.defaultProps = {
+  userName:'Anonymous'
+};
+
+function mapStateToProps(state) {
+  return {
+    auth: state.users.auth
+  };
+}
+
+export default connect(mapStateToProps)(Topbar);

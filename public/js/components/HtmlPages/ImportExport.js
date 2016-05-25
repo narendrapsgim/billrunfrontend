@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import DownloadIcon from 'material-ui/svg-icons/file/cloud-download';
 import UploadIcon from 'material-ui/svg-icons/file/cloud-upload';
 import Divider from 'material-ui/Divider';
 import Paper from 'material-ui/Paper';
+import Dialog from 'material-ui/Dialog';
+
+import aja from 'aja';
+import $ from 'jquery';
 
 const styles = {
   button: {
@@ -30,21 +35,77 @@ export default class ImportExport extends Component {
     super(props);
     this.onImportClick = this.onImportClick.bind(this);
     this.onExportClick = this.onExportClick.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.state = {import_modal_open: false, modal_message: ""};
   }
 
   onImportClick(e){
     let form = this.refs['importForm'];
     if(e.target.files.length){
-      console.log("form to submit: ", form);
-      console.log("File to upload : ", e.target.files[0]);
+      var data = new FormData();
+      $.each(e.target.files, (key, value) => {
+        data.append(key, value);
+      });
+      $.ajax({
+	url: `${globalSetting.serverUrl}/api/importpriceslist`,
+	type: "POST",
+	data: data,
+	dataType: 'json',
+	processData: false, // Don't process the files
+	contentType: false // Set content type to false as jQuery will tell the server its a query string request
+      }).done(resp => {
+        if (resp.status == "1") {
+	  let reasons = {	"updated": "Updated",
+		         "new": "Newly created rates",
+		         "future": "Rates that were not imported due to an existing future rate", 
+		         "missing_category": "Rates that were not updated because they miss category",
+		         "not_changed" : "Rates that were not updated because they allready the same in the DB",
+		         "old": "Inactive rates not imported", 
+		         "updated_and_closed" : "Updated, But closed before the configured end date due to existing future rate",
+		         "irregular" : "Irregular rates that weren't imported"};
+	  let output = "";
+	  $.each(resp.keys, (key, value) => {
+	    if (value.length) {
+	      output += "<div class='imported-reason imported-reason"+key+"'><span class='imported-reason-title'>" + reasons[key] + "</span>: <span class='imported-keys'>" + value.join(", ") + "</span></div>";
+	    }
+	  });
+          this.setState({modal_message: output});
+          this.setState({import_modal_open: true});
+        }        
+      });      
     }
   }
 
   onExportClick(e){
-    console.log("Export, e : ", e);
+    let { serverUrl } = globalSetting;
+    $.ajax({
+      url: `${globalSetting.serverUrl}/admin/exportrates`,
+      type: "GET",
+      dataType: "jsonp"
+    }).done(resp => {
+    });
   }
 
+
+  handleOpen() {
+    this.setState({import_modal_open: true});
+  };
+
+  handleClose() {
+    this.setState({import_modal_open: false});
+  };
+  
   render() {
+    const modal_actions = [
+      <FlatButton
+        label="Okay"
+        primary={true}
+        keyboardFocused={true}
+        onTouchTap={this.handleClose}
+      />,
+    ];
+    
     return (
       <div className="jumbotron hero-unit">
         <h3>Import / Export</h3>
@@ -56,8 +117,8 @@ export default class ImportExport extends Component {
             style={styles.button}
             icon={<UploadIcon />}
           >
-          <form ref="importForm" encType="multipart/form-data" action="http://billrunmt.local/" method="POST">
-            <input type="file" style={styles.exampleImageInput} onChange={this.onImportClick}/>
+          <form ref="importForm" encType="multipart/form-data" action={globalSetting.serverUrl} method="POST">
+            <input type="file" style={styles.exampleImageInput} onChange={this.onImportClick} multiple="multiple" />
           </form>
           </RaisedButton>
 
@@ -71,6 +132,16 @@ export default class ImportExport extends Component {
             onClick={this.onExportClick}
           />
         </Paper>
+        <Dialog
+            title="Import Successful!"
+            actions={modal_actions}
+            modal={false}
+            open={this.state.import_modal_open}
+            onRequestClose={this.handleClose}
+            autoScrollBodyContent={true}
+        >
+          <div dangerouslySetInnerHTML={{__html: this.state.modal_message}}></div>
+        </Dialog>         
      </div>
     );
   }

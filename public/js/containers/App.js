@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Navigator from '../components/Navigator';
 import Topbar from '../components/Topbar';
 import { routes } from '../routes';
@@ -8,6 +9,8 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Divider from 'material-ui/Divider';
 import View from '../view';
 import BraasTheme from '../theme';
+import LoginPage from '../components/HtmlPages/login';
+import axios from 'axios';
 
 export default class App extends Component {
   constructor(props) {
@@ -15,18 +18,34 @@ export default class App extends Component {
     injectTapEventPlugin();
   }
 
+  renderAppContent(){
+    if(this.props.auth){
+      return (
+        <div className="component container main-content">
+          <Navigator />
+          <Divider />
+          <div className="contents">
+            {this.props.children}
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="component container main-content">
+          <div className="contents">
+            <LoginPage />
+          </div>
+        </div>
+        );
+    }
+  }
+
   render() {
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>
         <div className="App">
           <Topbar />
-          <div className="component container main-content">
-            <Navigator />
-            <Divider />
-            <div className="contents">
-              {this.props.children}
-            </div>
-          </div>
+          {this.renderAppContent()}
           <footer className="footer navbar-fixed-bottom">
             <div className="container">
               <p>
@@ -39,3 +58,11 @@ export default class App extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    auth: state.users.auth
+  };
+}
+
+export default connect(mapStateToProps)(App);
