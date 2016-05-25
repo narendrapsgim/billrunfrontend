@@ -1,9 +1,9 @@
-import { UPDATE_FIELD_VALUE, GOT_ITEM, SAVE_FORM, SET_INITIAL_ITEM, NEW_FIELD, REMOVE_FIELD } from './actions';
-import View from './view.js';
+import { UPDATE_FIELD_VALUE, GOT_ITEM, SAVE_FORM, SET_INITIAL_ITEM, NEW_FIELD, REMOVE_FIELD } from '../actions';
+import View from '../view.js';
 import _ from 'lodash';
 import aja from 'aja';
 
-export default function rootReducer(state = {}, action) {
+export default function pages(state = {}, action) {
   let item, path;
   switch (action.type) {
   case SET_INITIAL_ITEM:

@@ -61,6 +61,7 @@ const styles = {
   },
   tableCell : {
     textOverflow : 'clip',
+    wordWrap: 'break-word',
     whiteSpace: 'normal',
     paddingLeft: '10px',
     paddingRight: '10px',
@@ -797,7 +798,7 @@ List.contextTypes = {
 
 function mapStateToProps(state) {
   return {
-    list: state.list
+    list: state.pages.list
   };
 }
 
