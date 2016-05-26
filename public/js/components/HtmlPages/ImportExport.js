@@ -79,12 +79,7 @@ export default class ImportExport extends Component {
 
   onExportClick(e){
     let { serverUrl } = globalSetting;
-    $.ajax({
-      url: `${globalSetting.serverUrl}/admin/exportrates`,
-      type: "GET",
-      dataType: "jsonp"
-    }).done(resp => {
-    });
+    document.getElementById('my_iframe').src = `${globalSetting.serverUrl}/admin/exportplans`;
   }
 
 
@@ -109,6 +104,7 @@ export default class ImportExport extends Component {
     return (
       <div className="jumbotron hero-unit">
         <h3>Import / Export</h3>
+        <iframe id="my_iframe" style={{display: "none"}}></iframe>
         <Paper zDepth={1} style={styles.content}>
           <RaisedButton
             label="Import"

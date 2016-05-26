@@ -30039,11 +30039,7 @@
 	      var _globalSetting = globalSetting;
 	      var serverUrl = _globalSetting.serverUrl;
 	
-	      _jquery2.default.ajax({
-	        url: globalSetting.serverUrl + '/admin/exportrates',
-	        type: "GET",
-	        dataType: "jsonp"
-	      }).done(function (resp) {});
+	      document.getElementById('my_iframe').src = globalSetting.serverUrl + '/admin/exportplans';
 	    }
 	  }, {
 	    key: 'handleOpen',
@@ -30073,6 +30069,7 @@
 	          null,
 	          'Import / Export'
 	        ),
+	        _react2.default.createElement('iframe', { id: 'my_iframe', style: { display: "none" } }),
 	        _react2.default.createElement(
 	          _Paper2.default,
 	          { zDepth: 1, style: styles.content },
