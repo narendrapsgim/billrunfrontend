@@ -286,8 +286,6 @@ const rates_vat_list_view = {
         // closeAndNew : { label: 'Close and New'},
         // edit : { label: 'Edit'},
         // delete : { label: 'Delete', color: red500  },
-        export : { label: 'Export', color: red500  },
-        import : { label: 'Import', color: red500  },
       },
       pagination : {
         itemsPerPage : 10,
