@@ -599,10 +599,12 @@ class List extends Component {
     let { page, collection } = this.props;
     let aggregate = (null);
     if(this.state.settings.aggregate) {
+      console.log(this.state.filter);
       aggregate = (<Aggregate fields={this.state.settings.aggregate.fields}
                               methods={this.state.settings.aggregate.methods}
                               groupBy={this.state.settings.aggregate.groupBy}
-                              url={`${globalSetting.serverUrl}/api/queryaggregate`}
+                              filters={this.state.filters}
+                              url='http://billrun/api/queryaggregate'
                               onDataChange={this._onAggregate} />);
     }
     let filters = (
