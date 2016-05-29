@@ -11,6 +11,8 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 import {indigo50,grey900, blue500} from 'material-ui/styles/colors';
+import * as actions from '../../actions'
+
 import axios from 'axios';
 
 let axiosInstance = axios.create({
@@ -31,41 +33,26 @@ class Topbar extends Component {
 
     this.state = {
       showLoginForm : false,
-      errorMessage : ''
     };
   }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.auth){
+      this.setState({
+        showLoginForm: false,
+      });
+    }
+}
+
 
   clickLogin(){
     let username = this.refs.username.input.value;
     let password = this.refs.password.input.value;
-    axiosInstance.get(`/api/auth?username=${username}&password=${password}`).then(
-      response => {
-        if(response.data && response.data.status){
-          let { dispatch } = this.props;
-          dispatch({type:'login', data: response.data.details});
-
-          this.setState({
-            showLoginForm:false,
-            errorMessage : '',
-          });
-        } else {
-          this.setState({
-            errorMessage : 'Incorrect user or password, please try again.'
-          });
-        }
-      }
-    );
+    this.props.userDoLogin({username, password});
   }
 
   clickLogout(){
-    axiosInstance.get('/api/auth?action=logout').then(
-      response => {
-        if(response.data && response.data.status){
-          let { dispatch } = this.props;
-          dispatch({type:'logout'});
-        }
-      }
-    );
+    this.props.userDoLogout();
   }
 
   handleOpen(){
@@ -73,7 +60,7 @@ class Topbar extends Component {
   }
 
   handleClose() {
-    this.setState({showLoginForm: false, errorMessage : ''});
+    this.setState({showLoginForm: false});
   }
 
   renderLoginButton(){
@@ -85,9 +72,9 @@ class Topbar extends Component {
   }
 
   renderErrorMessage(){
-    if(this.state.errorMessage.length){
+    if(!_.isEmpty(this.props.errorMessage)){
       return (
-        <p style={{color:'red'}}>{this.state.errorMessage}</p>
+        <p style={{color:'red'}}>{this.props.errorMessage}</p>
       );
     } else {
       return null;
@@ -180,8 +167,10 @@ Topbar.defaultProps = {
 function mapStateToProps(state) {
   return {
     auth: state.users.auth,
-    userName : state.users.name
+    userName : state.users.name,
+    errorMessage : state.users.errorMessage,
+    hack : state.users.hack
   };
 }
 
-export default connect(mapStateToProps)(Topbar);
+export default connect(mapStateToProps, actions)(Topbar);

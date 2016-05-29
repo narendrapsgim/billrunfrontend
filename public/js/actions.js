@@ -8,6 +8,7 @@ export const NEW_FIELD = 'NEW_FIELD';
 export const REMOVE_FIELD = 'REMOVE_FIELD';
 export const LOGIN = 'login';
 export const LOGOUT = 'logout';
+export const CHECK_LOGIN = 'checkLogin';
 
 import axios from 'axios';
 
@@ -115,10 +116,30 @@ export function saveCollectionEntity(item, collection, page_name, router) {
   };
 }
 
-export function checkLogin(){
+export function userCheckLogin(){
   let request = axiosInstance.get('/api/auth');
+  return {
+    type: CHECK_LOGIN,
+    data: request
+  }
+}
+
+export function userDoLogin({username, password}){
+  let url = `/api/auth?username=${username}&password=${password}`;
+  let request = axiosInstance.get(url);
   return {
     type: LOGIN,
     data: request
+  }
+}
+
+export function userDoLogout(){
+  return dispatch => {
+    console.log("userDoLogout action args : ", arguments);
+    let request = axiosInstance.get('/api/auth?action=logout').then(
+      response => {
+        dispatch({type: LOGOUT});
+      }
+    );
   }
 }

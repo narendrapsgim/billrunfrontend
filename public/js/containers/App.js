@@ -21,7 +21,7 @@ export default class App extends Component {
   }
 
   componentWillMount() {
-    this.props.checkLogin();
+    this.props.userCheckLogin();
   }
 
 
