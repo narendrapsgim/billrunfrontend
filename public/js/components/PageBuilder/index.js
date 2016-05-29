@@ -14,7 +14,6 @@ import List from '../List';
 import Help from '../Help';
 import FieldsContainer from '../FieldsContainer';
 
-import R from 'ramda';
 import _ from 'lodash';
 
 class PageBuilder extends Component {
