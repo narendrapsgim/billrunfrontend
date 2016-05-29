@@ -32,7 +32,8 @@ class Topbar extends Component {
     this.renderErrorMessage = this.renderErrorMessage.bind(this);
 
     this.state = {
-      showLoginForm : false,
+      showLoginForm: false,
+      errorMessage: ''
     };
   }
 
@@ -42,8 +43,11 @@ class Topbar extends Component {
         showLoginForm: false,
       });
     }
+    this.setState({
+      errorMessage: nextProps.errorMessage,
+    });
   }
-  
+
   clickLogin(){
     let username = this.refs.username.input.value;
     let password = this.refs.password.input.value;
@@ -59,7 +63,7 @@ class Topbar extends Component {
   }
 
   handleClose() {
-    this.setState({showLoginForm: false});
+    this.setState({showLoginForm: false, errorMessage:''});
   }
 
   renderLoginButton(){
@@ -71,9 +75,9 @@ class Topbar extends Component {
   }
 
   renderErrorMessage(){
-    if(!_.isEmpty(this.props.errorMessage)){
+    if(!_.isEmpty(this.state.errorMessage)){
       return (
-        <p style={{color:'red'}}>{this.props.errorMessage}</p>
+        <p style={{color:'red'}}>{this.state.errorMessage}</p>
       );
     } else {
       return null;
@@ -168,7 +172,6 @@ function mapStateToProps(state) {
     auth: state.users.auth,
     userName : state.users.name,
     errorMessage : state.users.errorMessage,
-    hack : state.users.hack
   };
 }
 
