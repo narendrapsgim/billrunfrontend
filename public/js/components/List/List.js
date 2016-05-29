@@ -129,6 +129,7 @@ class List extends Component {
     this.onChangeFilterDate = this.onChangeFilterDate.bind(this);
     this.onClickTableHeader = this.onClickTableHeader.bind(this);
     this._onRowSelection = this._onRowSelection.bind(this);
+    this._onAggregate = this._onAggregate.bind(this);
 
     this.onClickCloneItem = this.onClickCloneItem.bind(this);
     this.onClickNewItem = this.onClickNewItem.bind(this);
@@ -596,12 +597,12 @@ class List extends Component {
   render() {
     let { settings } = this.state;
     let { page, collection } = this.props;
-    let aggregate = (<div />);
+    let aggregate = (null);
     if(this.state.settings.aggregate) {
       aggregate = (<Aggregate fields={this.state.settings.aggregate.fields}
                               methods={this.state.settings.aggregate.methods}
                               groupBy={this.state.settings.aggregate.groupBy}
-                              url='http://billrun/api/queryaggregate'
+                              url={`${globalSetting.serverUrl}/api/queryaggregate`}
                               onDataChange={this._onAggregate} />);
     }
     let filters = (
@@ -779,6 +780,9 @@ class List extends Component {
         <Divider />
         <div>
             {filters}
+        </div>
+        <div>
+          {aggregate}
         </div>
         <div>
             {this.state.loadingData}
