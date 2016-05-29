@@ -23,6 +23,7 @@ class PageBuilder extends Component {
     this.onFieldChange = this.onFieldChange.bind(this);
     this.onSave = this.onSave.bind(this);
     this.actionButtons = this.actionButtons.bind(this);
+    this.renderErrorMessage = this.renderErrorMessage.bind(this);
     this.state = {action: this.props.params.action};
   }
 
@@ -98,7 +99,7 @@ class PageBuilder extends Component {
 
     let { dispatch } = this.props;
     let pageName = this.getPageName();
-    dispatch(saveCollectionEntity(this.props.item, this.props.params.collection, pageName, this.context.router, actionType));
+    dispatch(saveCollectionEntity(this.props.item, this.props.params.collection, pageName, actionType));
   }
 
   onCancel() {
@@ -259,6 +260,12 @@ class PageBuilder extends Component {
     return { backgroundColor: "#C0C0C0", height: "4px", bottom: "2px" };
   }
 
+  renderErrorMessage(error = this.props.errorMessage) {
+    if(!_.isEmpty(error)){
+      return <p style={{color:'red'}}>{error}</p>
+    }
+  }
+
   actionButtons(action = this.state.action) {
     if (action === "edit" || action === "new" || action === "clone" || action === "close_and_new") {
       let style = {
@@ -310,6 +317,7 @@ class PageBuilder extends Component {
         <h3>{title}</h3>
         {sectionsHTML}
         <Divider style={{ marginTop: '10px'}}/>
+        {this.renderErrorMessage()}
         {this.actionButtons()}
       </div>
     );
