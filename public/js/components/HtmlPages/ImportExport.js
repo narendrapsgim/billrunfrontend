@@ -6,6 +6,8 @@ import UploadIcon from 'material-ui/svg-icons/file/cloud-upload';
 import Divider from 'material-ui/Divider';
 import Paper from 'material-ui/Paper';
 import Dialog from 'material-ui/Dialog';
+import DatePicker from 'material-ui/DatePicker';
+import moment from 'moment';
 
 import aja from 'aja';
 import $ from 'jquery';
@@ -37,6 +39,8 @@ export default class ImportExport extends Component {
     this.onExportClick = this.onExportClick.bind(this);
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.onChangeFilterDate = this.onChangeFilterDate.bind(this);
+
     this.state = {import_modal_open: false, modal_message: ""};
   }
 
@@ -58,10 +62,10 @@ export default class ImportExport extends Component {
         if (resp.status == "1") {
 	  let reasons = {	"updated": "Updated",
 		         "new": "Newly created rates",
-		         "future": "Rates that were not imported due to an existing future rate", 
+		         "future": "Rates that were not imported due to an existing future rate",
 		         "missing_category": "Rates that were not updated because they miss category",
 		         "not_changed" : "Rates that were not updated because they allready the same in the DB",
-		         "old": "Inactive rates not imported", 
+		         "old": "Inactive rates not imported",
 		         "updated_and_closed" : "Updated, But closed before the configured end date due to existing future rate",
 		         "irregular" : "Irregular rates that weren't imported"};
 	  let output = "";
@@ -72,14 +76,23 @@ export default class ImportExport extends Component {
 	  });
           this.setState({modal_message: output});
           this.setState({import_modal_open: true});
-        }        
-      });      
+        }
+      });
     }
   }
 
   onExportClick(e){
     let { serverUrl } = globalSetting;
-    document.getElementById('my_iframe').src = `${globalSetting.serverUrl}/admin/exportplans`;
+    let activeDate = moment(this.exportDate).format("YYYY/MM/DD HH:mm:ss");
+    document.getElementById('my_iframe').src = `${globalSetting.serverUrl}/admin/exportplans?export_time=${activeDate}`;
+  }
+
+  onChangeFilterDate(key ,nullEvent, value) {
+    this.exportDate = value;
+  }
+
+  formatDate(date){
+    return (moment(date).format(globalSetting.dateFormat)) ;
   }
 
 
@@ -90,7 +103,7 @@ export default class ImportExport extends Component {
   handleClose() {
     this.setState({import_modal_open: false});
   };
-  
+
   render() {
     const modal_actions = [
       <FlatButton
@@ -100,7 +113,7 @@ export default class ImportExport extends Component {
         onTouchTap={this.handleClose}
       />,
     ];
-    
+
     return (
       <div className="jumbotron hero-unit">
         <h3>Import / Export</h3>
@@ -119,6 +132,10 @@ export default class ImportExport extends Component {
           </RaisedButton>
 
            <Divider />
+           <DatePicker hintText={"Enter export active"} container="inline" mode="landscape"
+                               floatingLabelText={"Select export active"} key="export_active_date" name="export_active_date"  defaultDate={new Date()}
+                               onChange={this.onChangeFilterDate.bind(null, "export_active_date")} autoOk={true}
+                               formatDate={this.formatDate} />
           <RaisedButton
             label="Export"
             labelPosition="before"
@@ -137,7 +154,7 @@ export default class ImportExport extends Component {
             autoScrollBodyContent={true}
         >
           <div dangerouslySetInnerHTML={{__html: this.state.modal_message}}></div>
-        </Dialog>         
+        </Dialog>
      </div>
     );
   }
