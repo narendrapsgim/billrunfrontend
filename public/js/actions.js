@@ -6,6 +6,15 @@ export const SAVE_FORM = 'SAVE_FORM';
 export const SET_INITIAL_ITEM = 'SET_INITIAL_ITEM';
 export const NEW_FIELD = 'NEW_FIELD';
 export const REMOVE_FIELD = 'REMOVE_FIELD';
+export const LOGIN = 'login';
+export const LOGOUT = 'logout';
+
+import axios from 'axios';
+
+let axiosInstance = axios.create({
+  withCredentials: true,
+  baseURL: globalSetting.serverUrl
+});
 
 export function setInitialItem(page_name) {
   return {
@@ -104,4 +113,12 @@ export function saveCollectionEntity(item, collection, page_name, router) {
   return dispatch => {
     return dispatch(updateItem(item, collection, page_name, router));
   };
+}
+
+export function checkLogin(){
+  let request = axiosInstance.get('/api/auth');
+  return {
+    type: LOGIN,
+    data: request
+  }
 }

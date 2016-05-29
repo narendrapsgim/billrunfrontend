@@ -32,7 +32,7 @@ class PageBuilder extends Component {
   }
 
   componentWillMount() {
-    this.setInitialState(this.props);
+    // this.setInitialState(this.props);
   }
   componentDidMount() {
     switch (this.props.params.action) {

@@ -1,12 +1,20 @@
 import {red500, blue500} from 'material-ui/styles/colors';
 import ImportExport from './components/HtmlPages/ImportExport';
 import Dashboard from './components/HtmlPages/Dashboard';
+import LoginPage from './components/HtmlPages/login';
 
 const dashboard_html = {
   title : "",
   view_type : "",
   sections : [ {
     html : Dashboard
+  } ]
+}
+const login_html = {
+  title : "",
+  view_type : "",
+  sections : [ {
+    html : LoginPage
   } ]
 }
 
@@ -601,11 +609,13 @@ const rates_charge_list_view = {
 const View = {
   pages: {
     dashboard: {
+      permission : ["guest","read"],
       menu_title: "Dashboard",
       view_type: "html",
       html : dashboard_html
     },
     rates: {
+      permission : ["read"],
       menu_title: "Rates",
       route: "rates/rates/list",
       views: {
@@ -617,6 +627,7 @@ const View = {
       }
     },
     rates_vat: {
+      permission : ["read"],
       menu_title: "VAT",
       route: "rates_vat/rates/list",
       views: {
@@ -626,6 +637,7 @@ const View = {
       }
     },
     rates_product: {
+      permission : ["read"],
       menu_title: "Products",
       route: "rates_product/rates/list",
       views: {
@@ -634,6 +646,7 @@ const View = {
       }
     },
     rates_discount: {
+      permission : ["read"],
       menu_title: "Discounts",
       route: "rates_discount/rates/list",
       views: {
@@ -642,6 +655,7 @@ const View = {
       }
     },
     rates_charge: {
+      permission : ["read"],
       menu_title: "Charges",
       route: "rates_charge/rates/list",
       views: {
@@ -651,6 +665,7 @@ const View = {
     },
 
     plans: {
+      permission : ["read"],
       menu_title: "Plans",
       route: "plans/plans/list",
       views: {
@@ -662,6 +677,7 @@ const View = {
       }
     },
     lines: {
+      permission : ["read"],
       menu_title: "Lines",
       route: "lines/lines/list",
       views: {
@@ -670,9 +686,16 @@ const View = {
       }
     },
     import_export_html: {
+      permission: ["admin"],
       menu_title: "Import/Export",
       view_type: "html",
       html : import_export_html
+    },
+    login: {
+      permission : ["guest"],
+      menu_title: "Login",
+      view_type: "html",
+      html : login_html
     },
     // plan_setup: {
     //   title: "Plan Setup",
