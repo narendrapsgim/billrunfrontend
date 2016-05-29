@@ -414,7 +414,7 @@ const plans_list_view = {
         {key : 'grouping', label : 'Grouping', filter : {}},
         {key : 'price', label : 'Price', type : 'price', filter : {}, sortable : true},
         {key : 'forceCommitment', label : 'Force Commitment', type : 'boolean'},
-        {key : 'from', label : 'From',  type : 'urt', sortable : true, filter : {}},
+        {key : 'from', label : 'From',  type : 'urt', sortable : true },
         {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
       ],
       onItemClick : 'edit',
