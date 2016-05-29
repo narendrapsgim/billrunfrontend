@@ -13,6 +13,7 @@ import Field from './Field';
 import List from '../List';
 import Help from '../Help';
 import FieldsContainer from '../FieldsContainer';
+import Auth from '../../components/HtmlPages/Auth';
 
 import _ from 'lodash';
 
@@ -291,6 +292,7 @@ class PageBuilder extends Component {
   }
 
   render() {
+
     let { pageName = this.getPageName(),
           action } = this.state;
     if ((action === 'edit' || action === 'clone' ||  action === 'close_and_new') && !this.props.item) return (null);
@@ -298,6 +300,11 @@ class PageBuilder extends Component {
     let page_view = View.pages[pageName].views ?
                     View.pages[pageName].views[action] :
                     View.pages[pageName];
+
+    // Check page permission
+    if(_.intersection(View.pages[pageName].permission, this.props.user.roles).length == 0){
+      return (<Auth />);
+    }
 
     if (!page_view) {
       return (null);
@@ -330,8 +337,11 @@ PageBuilder.contextTypes = {
 
 
 function mapStateToProps(state, ownProps) {
-  let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
-  return (state.pages[pageName]) ? state.pages[pageName] : state.pages;
+  return {
+    item:  (state.pages && state.pages.page && state.pages.page.item) ?  state.pages.page.item : null,
+    errorMessage: (state.pages && state.pages.page && state.pages.page.errorMessage) ?  state.pages.page.errorMessage : null,
+    user: state.users
+  }
 }
 
 export default connect(mapStateToProps)(PageBuilder);

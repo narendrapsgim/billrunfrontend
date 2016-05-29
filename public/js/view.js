@@ -2,20 +2,12 @@ import {red500, blue500} from 'material-ui/styles/colors';
 import ImportExport from './components/HtmlPages/ImportExport';
 import Dashboard from './components/HtmlPages/Dashboard';
 import moment from 'moment';
-import LoginPage from './components/HtmlPages/login';
 
 const dashboard_html = {
   title : "",
   view_type : "",
   sections : [ {
     html : Dashboard
-  } ]
-}
-const login_html = {
-  title : "",
-  view_type : "",
-  sections : [ {
-    html : LoginPage
   } ]
 }
 
@@ -709,12 +701,6 @@ const View = {
       menu_title: "Import/Export",
       view_type: "html",
       html : import_export_html
-    },
-    login: {
-      permission : ["guest"],
-      menu_title: "Login",
-      view_type: "html",
-      html : login_html
     },
     // plan_setup: {
     //   title: "Plan Setup",
