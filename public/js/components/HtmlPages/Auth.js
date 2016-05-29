@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class Login extends Component {
+export default class Auth extends Component {
   constructor(props) {
     super(props);
   }
@@ -8,7 +8,7 @@ export default class Login extends Component {
   render() {
     return (
       <div>
-    		<h1>Please Login</h1>
+    		<h3>You don't have permission to access this page</h3>
        </div>
     );
   }

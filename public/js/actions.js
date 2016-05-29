@@ -1,5 +1,3 @@
-import aja from 'aja';
-
 export const UPDATE_FIELD_VALUE = 'UPDATE_FIELD_VALUE';
 export const GOT_ITEM = 'GOT_COLLECTION_ITEMS';
 export const SAVE_FORM = 'SAVE_FORM';
@@ -71,19 +69,15 @@ function saveItemError(item, collection, page_name) {
 }
 
 function fetchItem(item_id, collection, page_name) {
+  let itemFetchUrl = `/api/find?collection=${collection}&query={"_id":{"$in" : ["${item_id}"]}}`;
   return dispatch => {
-    let queryString = `/api/find?collection=${collection}&query={"_id":{"$in" : ["${item_id}"]}}`;
-    if(globalSetting.serverApiDebug && globalSetting.serverApiDebug == true){
-        queryString += '&' + globalSetting.serverApiDebugQueryString;
-    }
-    aja()
-      .url(globalSetting.serverUrl + queryString)
-      .on('success', response => {
-        let item = _.values(response.details).shift();
+    let request = axiosInstance.get(itemFetchUrl).then(
+      response => {
+        let item = _.values(response.data.details).shift();
         dispatch(gotItem(item, collection, page_name));
-      })
-      .go();
-  };
+      }
+    );
+  }
 }
 
 export function getCollectionEntity(entity_id, collection, page_name) {

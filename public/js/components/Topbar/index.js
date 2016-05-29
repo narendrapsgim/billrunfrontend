@@ -42,9 +42,8 @@ class Topbar extends Component {
         showLoginForm: false,
       });
     }
-}
-
-
+  }
+  
   clickLogin(){
     let username = this.refs.username.input.value;
     let password = this.refs.password.input.value;

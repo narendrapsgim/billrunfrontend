@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { Route, Link, IndexRedirect } from 'react-router';
 import App from './containers/App';
 import PageBuilder from './components/PageBuilder';
-import loginPage from './components/HtmlPages/login';
 
 export default () => {
   return (

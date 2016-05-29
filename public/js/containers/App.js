@@ -10,7 +10,6 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Divider from 'material-ui/Divider';
 import View from '../view';
 import BraasTheme from '../theme';
-import LoginPage from '../components/HtmlPages/login';
 import axios from 'axios';
 import * as actions from '../actions'
 
