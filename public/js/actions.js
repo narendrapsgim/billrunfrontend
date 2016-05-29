@@ -9,6 +9,7 @@ export const REMOVE_FIELD = 'REMOVE_FIELD';
 export const LOGIN = 'login';
 export const LOGOUT = 'logout';
 export const CHECK_LOGIN = 'checkLogin';
+export const SAVE_ITEM_ERROR = 'SAVE_ITEM_ERROR';
 
 import axios from 'axios';
 
@@ -59,33 +60,14 @@ function gotItem(item, collection, page_name) {
   };
 }
 
-function updateItem(item, collection, page_name, router){
-  return dispatch => {
-    let queryString = '/admin/save';
-    if(globalSetting.serverApiDebug && globalSetting.serverApiDebug == true){
-        queryString += '?' + globalSetting.serverApiDebugQueryString;
-    }
-
-    let entity = Object.assign({}, item);
-    let id = entity._id['$id'];
-    delete entity['_id'];
-    delete entity['from'];
-    delete entity['name'];
-    let data = {
-      id : id,
-      coll : collection,
-      type : 'update',
-      data : JSON.stringify(entity)
-    }
-
-    aja()
-      .url(globalSetting.serverUrl + queryString)
-      .method('POST')
-      .data(data)
-      .on('success', response => {
-        router.push(`${page_name}/${collection}/edit/${id}`);
-      }).go()
-  }
+function saveItemError(item, collection, page_name) {
+  return {
+    type: SAVE_ITEM_ERROR,
+    errorMessage : 'Error, please try again.',
+    item,
+    page_name,
+    collection
+  };
 }
 
 function fetchItem(item_id, collection, page_name) {
@@ -110,10 +92,32 @@ export function getCollectionEntity(entity_id, collection, page_name) {
   };
 }
 
-export function saveCollectionEntity(item, collection, page_name, router) {
+export function saveCollectionEntity(item, collection, page_name, action) {
+  let saveUrl = '/admin/save';
+  let entity = Object.assign({}, item);
+  let id = entity._id['$id'];
+
+  delete entity['_id'];
+  delete entity['from'];
+  delete entity['name'];
+
+  var formData = new FormData();
+  formData.append("id", id);
+  formData.append("coll", collection);
+  formData.append("type", action);
+  formData.append("data", JSON.stringify(entity));
+
   return dispatch => {
-    return dispatch(updateItem(item, collection, page_name, router));
-  };
+    let request = axiosInstance.post(saveUrl, formData).then(
+      response => {
+        if(response.data){
+          dispatch(fetchItem(id, collection, page_name));
+        } else {
+          dispatch(saveItemError(item, collection, page_name));
+        }
+      }
+    );
+  }
 }
 
 export function userCheckLogin(){
