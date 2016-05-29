@@ -16,19 +16,25 @@ export default class Navigator extends Component {
     super(props);
   }
 
+  isMenuItemVisible(neddedPpermission) {
+    return  _.intersection(neddedPpermission, this.props.users.roles).length > 0;
+  }
+
   render() {
-    let buttons = null;
-    if(this.props.auth){
-      buttons = Object.keys(View.pages).map((page, key) => {
+
+    let buttons = Object.keys(View.pages).map((page, key) => {
         let label = View.pages[page].menu_title || View.pages[page].title;
         let route = View.pages[page].route ? View.pages[page].route : page;
-        return (
-              <Link key={key} to={route} activeClassName='active'>
-                <FlatButton label={label} labelStyle={{textTransform: "none"}}/>
-              </Link>
-        )
+        if(this.isMenuItemVisible( View.pages[page].permission , label)){
+            return (
+                <Link key={key} to={route} activeClassName='active'>
+                  <FlatButton label={label} labelStyle={{textTransform: "none"}}/>
+                </Link>
+            )
+        } else {
+          return null;
+        }
       });
-    }
 
     return (
       <div className="navigator">
@@ -40,7 +46,8 @@ export default class Navigator extends Component {
 
 function mapStateToProps(state) {
   return {
-    auth: state.users.auth
+    users: state.users,
+    pages: state.pages
   };
 }
 

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link, browserHistory } from 'react-router';
 import { connect } from 'react-redux';
 import Navigator from '../components/Navigator';
 import Topbar from '../components/Topbar';
@@ -11,6 +12,7 @@ import View from '../view';
 import BraasTheme from '../theme';
 import LoginPage from '../components/HtmlPages/login';
 import axios from 'axios';
+import * as actions from '../actions'
 
 export default class App extends Component {
   constructor(props) {
@@ -18,34 +20,24 @@ export default class App extends Component {
     injectTapEventPlugin();
   }
 
-  renderAppContent(){
-    if(this.props.auth){
-      return (
-        <div className="component container main-content">
-          <Navigator />
-          <Divider />
-          <div className="contents">
-            {this.props.children}
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div className="component container main-content">
-          <div className="contents">
-            <LoginPage />
-          </div>
-        </div>
-        );
-    }
+  componentWillMount() {
+    this.props.userCheckLogin();
   }
+
+
 
   render() {
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>
         <div className="App">
           <Topbar />
-          {this.renderAppContent()}
+            <div className="component container main-content">
+              <Navigator />
+              <Divider />
+              <div className="contents">
+                {this.props.children}
+              </div>
+            </div>
           <footer className="footer navbar-fixed-bottom">
             <div className="container">
               <p>
@@ -59,10 +51,15 @@ export default class App extends Component {
   }
 }
 
+App.contextTypes = {
+  router: React.PropTypes.object
+};
+
 function mapStateToProps(state) {
   return {
-    auth: state.users.auth
+    users: state.users,
+    pages: state.pages
   };
 }
 
-export default connect(mapStateToProps)(App);
+export default connect(mapStateToProps, actions)(App);

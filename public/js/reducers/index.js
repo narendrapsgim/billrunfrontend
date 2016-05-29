@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import users from './users'
+import users from './userReducer'
 import pages from './pages'
 
 

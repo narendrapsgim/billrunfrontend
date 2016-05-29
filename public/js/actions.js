@@ -6,6 +6,16 @@ export const SAVE_FORM = 'SAVE_FORM';
 export const SET_INITIAL_ITEM = 'SET_INITIAL_ITEM';
 export const NEW_FIELD = 'NEW_FIELD';
 export const REMOVE_FIELD = 'REMOVE_FIELD';
+export const LOGIN = 'login';
+export const LOGOUT = 'logout';
+export const CHECK_LOGIN = 'checkLogin';
+
+import axios from 'axios';
+
+let axiosInstance = axios.create({
+  withCredentials: true,
+  baseURL: globalSetting.serverUrl
+});
 
 export function setInitialItem(page_name) {
   return {
@@ -73,7 +83,7 @@ function updateItem(item, collection, page_name, router){
       .method('POST')
       .data(data)
       .on('success', response => {
-        router.push(`${page_name}/${collection}/edit/${tmp}`);
+        router.push(`${page_name}/${collection}/edit/${id}`);
       }).go()
   }
 }
@@ -104,4 +114,33 @@ export function saveCollectionEntity(item, collection, page_name, router) {
   return dispatch => {
     return dispatch(updateItem(item, collection, page_name, router));
   };
+}
+
+export function userCheckLogin(){
+  let checkLoginUrl = '/api/auth';
+  let request = axiosInstance.get(checkLoginUrl);
+  return {
+    type: CHECK_LOGIN,
+    data: request
+  }
+}
+
+export function userDoLogin({username, password}){
+  let loginUrl = `/api/auth?username=${username}&password=${password}`;
+  let request = axiosInstance.get(loginUrl);
+  return {
+    type: LOGIN,
+    data: request
+  }
+}
+
+export function userDoLogout(){
+  let logoutUrl = '/api/auth?action=logout';
+  return dispatch => {
+    let request = axiosInstance.get(logoutUrl).then(
+      response => {
+        dispatch({type: LOGOUT});
+      }
+    );
+  }
 }

@@ -9,7 +9,10 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import Divider from 'material-ui/Divider';
 import {indigo50,grey900, blue500} from 'material-ui/styles/colors';
+import * as actions from '../../actions'
+
 import axios from 'axios';
 
 let axiosInstance = axios.create({
@@ -26,65 +29,30 @@ class Topbar extends Component {
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.renderLoginForm = this.renderLoginForm.bind(this);
-    this.setUserName = this.setUserName.bind(this);
-
-    axiosInstance.get('/api/auth').then(
-      response => {
-        if(response.data && response.data.status){
-          props.dispatch({type:'login'});
-        }
-        this.setState({
-          showLoginForm : false,
-          userName : response.data.details.user || this.state.userName,
-        });
-      }
-    );
+    this.renderErrorMessage = this.renderErrorMessage.bind(this);
 
     this.state = {
       showLoginForm : false,
-      userName : props.userName,
-      errorMessage : ''
     };
   }
 
-  setUserName(e,value){
-    // this.setState({
-    //   userName : value
-    // });
-  }
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.auth){
+      this.setState({
+        showLoginForm: false,
+      });
+    }
+}
+
 
   clickLogin(){
     let username = this.refs.username.input.value;
     let password = this.refs.password.input.value;
-    axiosInstance.get(`/api/auth?username=${username}&password=${password}`).then(
-      response => {
-        if(response.data && response.data.status){
-          let { dispatch } = this.props;
-          dispatch({type:'login'});
-
-          this.setState({
-            showLoginForm:false,
-            errorMessage : '',
-            userName : response.data.details.user || this.state.userName
-          });
-        } else {
-          this.setState({
-            errorMessage : 'Error, please try again'
-          });
-        }
-      }
-    );
+    this.props.userDoLogin({username, password});
   }
 
   clickLogout(){
-    axiosInstance.get('/api/auth?action=logout').then(
-      response => {
-        if(response.data && response.data.status){
-          let { dispatch } = this.props;
-          dispatch({type:'logout'});
-        }
-      }
-    );
+    this.props.userDoLogout();
   }
 
   handleOpen(){
@@ -92,7 +60,7 @@ class Topbar extends Component {
   }
 
   handleClose() {
-    this.setState({showLoginForm: false, errorMessage : ''});
+    this.setState({showLoginForm: false});
   }
 
   renderLoginButton(){
@@ -101,6 +69,16 @@ class Topbar extends Component {
         <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text="Login" onClick={this.handleOpen} />
       </ToolbarGroup>
     )
+  }
+
+  renderErrorMessage(){
+    if(!_.isEmpty(this.props.errorMessage)){
+      return (
+        <p style={{color:'red'}}>{this.props.errorMessage}</p>
+      );
+    } else {
+      return null;
+    }
   }
 
   renderLoginForm(){
@@ -119,20 +97,21 @@ class Topbar extends Component {
         />,
     ];
     return(
-    <div>
-        <Dialog
-          title="Login"
-          actions={actions}
-          modal={false}
-          open={this.state.showLoginForm}
-          onRequestClose={this.handleClose}
-        >
-          <TextField hintText="Enter user name or mail" floatingLabelText="User name" ref="username" onChange={this.setUserName} />
+      <Dialog
+        title="Login"
+        actions={actions}
+        modal={false}
+        open={this.state.showLoginForm}
+        onRequestClose={this.handleClose}
+      >
+        <div style={{margin: '0 25px 25px 25px'}}>
+          {this.renderErrorMessage()}
+          <TextField hintText="Enter user name or mail" floatingLabelText="User name" ref="username" />
           <br />
-          <TextField hintText="Password" floatingLabelText="Password" type="password" ref="password"/>
-          <p style={{color:'red'}}>{this.state.errorMessage}</p>
-        </Dialog>
-      </div>
+          <TextField hintText="Password" floatingLabelText="Password" type="password" ref="password" />
+        </div>
+        <Divider />
+      </Dialog>
     );
   }
 
@@ -146,9 +125,9 @@ class Topbar extends Component {
           size={40}
           style={{margin:'8px 10px 0 20px'}}
         >
-        {this.state.userName[0]}
+        {this.props.userName[0]}
       </Avatar>
-      <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text={this.state.userName} />
+      <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text={this.props.userName} />
         <IconMenu style={{marginTop:'5px'}}
           iconButtonElement={
             <IconButton touch={true}>
@@ -187,8 +166,11 @@ Topbar.defaultProps = {
 
 function mapStateToProps(state) {
   return {
-    auth: state.users.auth
+    auth: state.users.auth,
+    userName : state.users.name,
+    errorMessage : state.users.errorMessage,
+    hack : state.users.hack
   };
 }
 
-export default connect(mapStateToProps)(Topbar);
+export default connect(mapStateToProps, actions)(Topbar);

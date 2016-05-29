@@ -147,6 +147,7 @@ class List extends Component {
       sortType : '',
       filters : filters,
       snackbarOpen : false,
+      modalOpen : false,
       snackbarMessage : '',
       currentPage : 1,
       totalPages : 1,
@@ -829,7 +830,7 @@ class List extends Component {
               title={this.state.modalTitle}
               actions={modalActions}
               modal={true}
-              open={this.state.modalOpen}
+              open={this.state.modalOpen || false}
           >
             <div>{this.state.modalMessage}</div>
           </Dialog>
