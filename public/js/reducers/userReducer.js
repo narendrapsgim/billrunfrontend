@@ -30,7 +30,7 @@ export default function users(state = {}, action) {
         name: '',
         errorMessage: 'Incorrect user or password, please try again.'
       };
-      return Object.assign({}, defaultSate, state, newState);
+      return Object.assign({}, defaultSate, state, newState, {hack:new Date()} ); // hack - to always send new PROPS
     }
     default: return state;
   }

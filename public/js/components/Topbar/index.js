@@ -103,7 +103,7 @@ class Topbar extends Component {
       <Dialog
         title="Login"
         actions={actions}
-        modal={false}
+        modal={true}
         open={this.state.showLoginForm}
         onRequestClose={this.handleClose}
       >
@@ -172,6 +172,7 @@ function mapStateToProps(state) {
     auth: state.users.auth,
     userName : state.users.name,
     errorMessage : state.users.errorMessage,
+    hack : state.users.hack
   };
 }
 
