@@ -83,7 +83,7 @@ function updateItem(item, collection, page_name, router){
       .method('POST')
       .data(data)
       .on('success', response => {
-        router.push(`${page_name}/${collection}/edit/${tmp}`);
+        router.push(`${page_name}/${collection}/edit/${id}`);
       }).go()
   }
 }
@@ -117,7 +117,8 @@ export function saveCollectionEntity(item, collection, page_name, router) {
 }
 
 export function userCheckLogin(){
-  let request = axiosInstance.get('/api/auth');
+  let checkLoginUrl = '/api/auth';
+  let request = axiosInstance.get(checkLoginUrl);
   return {
     type: CHECK_LOGIN,
     data: request
@@ -125,8 +126,8 @@ export function userCheckLogin(){
 }
 
 export function userDoLogin({username, password}){
-  let url = `/api/auth?username=${username}&password=${password}`;
-  let request = axiosInstance.get(url);
+  let loginUrl = `/api/auth?username=${username}&password=${password}`;
+  let request = axiosInstance.get(loginUrl);
   return {
     type: LOGIN,
     data: request
@@ -134,9 +135,9 @@ export function userDoLogin({username, password}){
 }
 
 export function userDoLogout(){
+  let logoutUrl = '/api/auth?action=logout';
   return dispatch => {
-    console.log("userDoLogout action args : ", arguments);
-    let request = axiosInstance.get('/api/auth?action=logout').then(
+    let request = axiosInstance.get(logoutUrl).then(
       response => {
         dispatch({type: LOGOUT});
       }
