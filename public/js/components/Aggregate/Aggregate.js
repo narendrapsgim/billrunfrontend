@@ -12,7 +12,6 @@ export default class Aggregate extends React.Component {
     this.groupBy= props.groupBy;
     this.fields= props.fields;
     this.methods= props.methods;
-    this.apiUrl = props.url;
     this.filters = props.filters;
     this.onDataChange = props.onDataChange;
 
@@ -35,9 +34,8 @@ export default class Aggregate extends React.Component {
   }
   
   onAggregate(event) {
-    let url = this.apiUrl;
     let callback = this.onDataChange;
-    if (!url) return;
+    let url = `${globalSetting.serverUrl}/api/queryaggregate`;
 
     let filterKeys = _.keys(this.props.filters);
     let filterStr  = _.reduce(filterKeys, (acc, key) => {
@@ -53,7 +51,6 @@ export default class Aggregate extends React.Component {
       .url(url)
       .on('success', (response) => {
         if(response && response.status){
-          console.log(response);
           if(callback) {
             callback(response);
           }
@@ -83,6 +80,7 @@ export default class Aggregate extends React.Component {
           { this.methods.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
         <RaisedButton label="Aggregate"  onClick={this.onAggregate} />
+        <RaisedButton label="Clear" onClick={this.props.onClear} />
       </div>
     );
   }
