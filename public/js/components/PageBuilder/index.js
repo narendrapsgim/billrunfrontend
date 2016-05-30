@@ -13,7 +13,7 @@ import Field from './Field';
 import List from '../List';
 import Help from '../Help';
 import FieldsContainer from '../FieldsContainer';
-import Auth from '../../components/HtmlPages/Auth';
+import Auth from './Auth';
 
 import _ from 'lodash';
 

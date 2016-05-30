@@ -12,7 +12,7 @@ import View from '../view';
 import BraasTheme from '../theme';
 import axios from 'axios';
 import * as actions from '../actions'
-import LoginPopup from '../components/HtmlPages/LoginPopup';
+import LoginPopup from '../components/Authorization/LoginPopup';
 
 export default class App extends Component {
   constructor(props) {
