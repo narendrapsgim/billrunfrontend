@@ -303,7 +303,7 @@ class PageBuilder extends Component {
 
     // Check page permission
     if(_.intersection(View.pages[pageName].permission, this.props.user.roles).length == 0){
-      return (<Auth />);
+      return (<Auth pagePermission = {View.pages[pageName].permission} userRoles = {this.props.user.roles} auth={this.props.user.auth}/>);
     }
 
     if (!page_view) {

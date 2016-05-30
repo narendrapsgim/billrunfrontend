@@ -1,22 +1,25 @@
-import {
-  blue500, blue50, indigo500, indigo50,
-  blue700, grey400, indigoA200, grey100, grey500, darkBlack, grey300, fullBlack, white, grey900
-} from 'material-ui/styles/colors';
-
+import * as Colors from 'material-ui/styles/colors';
+import * as ColorManipulator from 'material-ui/utils/colorManipulator';
+import * as Spacing from 'material-ui/styles/spacing';
 
 const theme = {
+  spacing: Spacing,
+  fontFamily: 'Roboto, sans-serif',
   palette: {
-    primary1Color: blue500,
-    primary2Color: blue700,
-    primary3Color: grey400,
-    accent1Color: indigoA200,
-    accent2Color: grey100,
-    accent3Color: grey500,
-    textColor: darkBlack,
-    alternateTextColor: white,
-    canvasColor: white,
-    borderColor: grey300,
-    pickerHeaderColor: blue500,
+    primary1Color: Colors.blue500,
+    primary2Color: Colors.blue700,
+    primary3Color: Colors.grey400,
+    accent1Color: Colors.redA200,
+    accent2Color: Colors.grey100,
+    accent3Color: Colors.grey500,
+    textColor: Colors.darkBlack,
+    alternateTextColor: Colors.white,
+    canvasColor: Colors.white,
+    borderColor: Colors.grey300,
+    disabledColor: ColorManipulator.fade(Colors.darkBlack, 0.3),
+    pickerHeaderColor: Colors.cyan500,
+    clockCircleColor: ColorManipulator.fade(Colors.darkBlack, 0.07),
+    shadowColor: Colors.fullBlack,
   },
 };
 

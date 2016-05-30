@@ -12,6 +12,7 @@ import View from '../view';
 import BraasTheme from '../theme';
 import axios from 'axios';
 import * as actions from '../actions'
+import LoginPopup from '../components/HtmlPages/LoginPopup';
 
 export default class App extends Component {
   constructor(props) {
@@ -22,8 +23,6 @@ export default class App extends Component {
   componentWillMount() {
     this.props.userCheckLogin();
   }
-
-
 
   render() {
     return (
@@ -44,6 +43,7 @@ export default class App extends Component {
               </p>
             </div>
           </footer>
+          <LoginPopup />
         </div>
       </MuiThemeProvider>
     );
