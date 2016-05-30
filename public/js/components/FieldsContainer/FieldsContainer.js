@@ -28,13 +28,13 @@ export default class FieldsContainer extends Component {
   crudActionButtons() {
     let { crud, path } = this.props;
     let onClickNew = (path) => {
-      let type = (path.match(/(\d])$/) ? "array" : "object");
+      let type;
+      if (this.props.fieldType) type = this.props.fieldType;
+      else type = (path.match(/(\d])$/) ? "array" : "object");
       let new_path = path;
       if (type === "object") {
         let p = prompt("Please insert name");
         new_path += `.${p}`;
-      } else if (type === "array") {
-        new_path = new_path.slice(0, -3);
       }
       this.props.dispatch(newField(new_path, type, this.props.pageName));
     };
