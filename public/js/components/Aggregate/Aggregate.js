@@ -70,13 +70,13 @@ export default class Aggregate extends React.Component {
   render() {
     return (
       <div>
-        <SelectField value={this.state.on} onChange={this.aggregateOnChanged}>
+        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged}>
           { this.groupBy.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField value={this.state.to} onChange={this.aggregateToChanged}>
+        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged}>
           { this.fields.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField value={this.state.method} onChange={this.aggregateMethodChanged}>
+        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged}>
           { this.methods.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
         <RaisedButton label="Aggregate"  onClick={this.onAggregate} />

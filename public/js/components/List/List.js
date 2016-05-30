@@ -591,19 +591,16 @@ class List extends Component {
    let rows = this._parseResults(this.props.collection, response);
    let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
 
-   let fields = this.state.settings.fields;
-   if (rows && rows[0]) {
-     let aggregate_settings = this.state.settings.aggregate;
-     fields = _.reduce(_.keys(rows[0]), (acc, key) => {
-       let groupByFound = _.find(aggregate_settings.groupBy, def => { return def.key === key; });
-       if (groupByFound) { acc.push(groupByFound); return acc; }
-       let fieldsFound = _.find(aggregate_settings.fields, def => { return def.key === key; });
-       if (fieldsFound) { acc.push(fieldsFound); return acc; }
-       let methodsFound = _.find(aggregate_settings.methods, def => { return def.key === key; });
-       if (methodsFound) { acc.push(methodsFound); return acc; }       
-       return acc;
-     }, []);
-   }
+   let aggregate_settings = this.state.settings.aggregate;
+   let fields = _.reduce(_.keys(rows[0]), (acc, key) => {
+     let groupByFound = _.find(aggregate_settings.groupBy, def => { return def.key === key; });
+     if (groupByFound) { acc.push(groupByFound); return acc; }
+     let fieldsFound = _.find(aggregate_settings.fields, def => { return def.key === key; });
+     if (fieldsFound) { acc.push(fieldsFound); return acc; }
+     let methodsFound = _.find(aggregate_settings.methods, def => { return def.key === key; });
+     if (methodsFound) { acc.push(methodsFound); return acc; }       
+     return acc;
+   }, []);
 
    this.setState({
      fields: fields,
