@@ -3,6 +3,8 @@ import View from '../view.js';
 import _ from 'lodash';
 import aja from 'aja';
 
+
+
 export default function pages(state = {}, action) {
   let item, path;
   switch (action.type) {
@@ -34,6 +36,12 @@ export default function pages(state = {}, action) {
       _.set(item, path, {});
     } else if (action.field_type === "array") {
       let r = _.result(item, path)
+      if (!r) {
+        _.set(item, path, []);
+        r = _.result(item, path);
+      } else {
+        r = _.result(item, path.slice(0, -3));
+      }
       r.push({});
     }
     return Object.assign(

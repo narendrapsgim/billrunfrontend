@@ -217,7 +217,7 @@ const rates_edit_view = {
         { dbkey: "zone_grouping", label: "Zone Grouping" },
         { dbkey: "from", label: "From", type:'date'},
         { dbkey: "to", label: "To", type:'date'},
-        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
+        { dbkey: "rates", crud: '1110', label: "Types", collapsible: true, collapsed: false ,  fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:
@@ -226,7 +226,7 @@ const rates_edit_view = {
                 { dbkey: "currency", label: "Currency", type: "text"},
                 { dbkey: "unit", label: "Unit", type: "text"},
                 { dbkey: "erp_account", label: "ERP Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
+                { dbkey: "rate", crud: '1110', fieldType: "array", label: "Rates", collapsible: true, collapsed: true ,  fields:
                   [
                         { dbkey: "interval", label: "Interval", type: "text"},
                         { dbkey: "to", label: "To", type: "text"},
