@@ -7,6 +7,8 @@ export const REMOVE_FIELD = 'REMOVE_FIELD';
 export const LOGIN = 'login';
 export const LOGOUT = 'logout';
 export const CHECK_LOGIN = 'checkLogin';
+export const OPEN_LOGIN_FORM = 'openLoginPopup';
+export const CLOSE_LOGIN_FORM = 'closeLoginPopup';
 export const SAVE_ITEM_ERROR = 'SAVE_ITEM_ERROR';
 
 import axios from 'axios';
@@ -112,6 +114,14 @@ export function saveCollectionEntity(item, collection, page_name, action) {
       }
     );
   }
+}
+
+export function openLoginPopup(){
+  return { type: OPEN_LOGIN_FORM }
+}
+
+export function closeLoginPopup(){
+  return { type: CLOSE_LOGIN_FORM }
 }
 
 export function userCheckLogin(){

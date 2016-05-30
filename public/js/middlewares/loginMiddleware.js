@@ -1,3 +1,5 @@
+import {closeLoginPopup} from '../actions';
+
 export default function({dispatch}){
   return next => action => {
     if( (action.type == "login" || action.type == "checkLogin" ) && typeof action.data.then === 'function'){
@@ -8,11 +10,12 @@ export default function({dispatch}){
         if(action.type == "login"){
           if(response.data && response.data.status){
             newAction = Object.assign(newAction, {type : 'login'});
+            dispatch(closeLoginPopup());
           } else {
             newAction = Object.assign(newAction, {type : 'loginError'});
           }
         }
-        //if check if user already logdedin 
+        //if check if user already logdedin
         else if(action.type == "checkLogin") {
           if(response.data && response.data.status){
              newAction = Object.assign(newAction, {type : 'login'});
