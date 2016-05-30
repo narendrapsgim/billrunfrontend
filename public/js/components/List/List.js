@@ -129,6 +129,8 @@ class List extends Component {
     this.onChangeFilterDate = this.onChangeFilterDate.bind(this);
     this.onClickTableHeader = this.onClickTableHeader.bind(this);
     this._onRowSelection = this._onRowSelection.bind(this);
+    this._onAggregate = this._onAggregate.bind(this);
+    this._onClearAggregate = this._onClearAggregate.bind(this);
 
     this.onClickCloneItem = this.onClickCloneItem.bind(this);
     this.onClickNewItem = this.onClickNewItem.bind(this);
@@ -152,6 +154,7 @@ class List extends Component {
       currentPage : 1,
       totalPages : 1,
       settings: props.settings,
+      fields: props.settings.fields,
       loadingData : <LinearProgress mode="indeterminate"/>
     };
   }
@@ -430,7 +433,7 @@ class List extends Component {
     if(this.state.settings.project){
       this.state.settings.project.map((field, i) => { filters[field]=1});
     } else {
-      this.state.settings.fields.map((field, i) => { filters[field.key]=1});
+      this.state.fields.map((field, i) => { filters[field.key]=1});
     }
     queryString += '&project=' +  JSON.stringify(filters);
 
@@ -587,26 +590,49 @@ class List extends Component {
  _onAggregate(response) {
    let rows = this._parseResults(this.props.collection, response);
    let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
+
+   let fields = this.state.settings.fields;
+   if (rows && rows[0]) {
+     let aggregate_settings = this.state.settings.aggregate;
+     fields = _.reduce(_.keys(rows[0]), (acc, key) => {
+       let groupByFound = _.find(aggregate_settings.groupBy, def => { return def.key === key; });
+       if (groupByFound) { acc.push(groupByFound); return acc; }
+       let fieldsFound = _.find(aggregate_settings.fields, def => { return def.key === key; });
+       if (fieldsFound) { acc.push(fieldsFound); return acc; }
+       let methodsFound = _.find(aggregate_settings.methods, def => { return def.key === key; });
+       if (methodsFound) { acc.push(methodsFound); return acc; }       
+       return acc;
+     }, []);
+   }
+
    this.setState({
-      totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
-      rows : rows,
-      loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
+     fields: fields,
+     totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
+     rows : rows,
+     loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
    });
  }
 
+  _onClearAggregate() {
+    let { settings } = this.props;
+    let { fields } = settings;
+    this.setState({settings, fields, filters: {}, rows: []}, this._updateTableData);
+  }
+  
   render() {
     let { settings } = this.state;
     let { page, collection } = this.props;
-    let aggregate = (<div />);
+    let aggregate = (null);
     if(this.state.settings.aggregate) {
       aggregate = (<Aggregate fields={this.state.settings.aggregate.fields}
                               methods={this.state.settings.aggregate.methods}
                               groupBy={this.state.settings.aggregate.groupBy}
-                              url='http://billrun/api/queryaggregate'
+                              filters={this.state.filters}
+                              onClear={this._onClearAggregate}
                               onDataChange={this._onAggregate} />);
     }
     let filters = (
-      this.state.settings.fields.map((field, i) => {
+      this.state.fields.map((field, i) => {
         if(field.filter && !field.filter.system){
           let ret =
 
@@ -619,8 +645,8 @@ class List extends Component {
             defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
             onChange={this.onChangeFilter} />;
           if(field.type == 'urt') {
-            ret =  <DatePicker  style={styles.filterInput} hintText={"Enter " + field.label + "..."} container="inline" mode="landscape"
-                                floatingLabelText={"Search by " + field.label} style={styles.filterInput}
+            ret =  <DatePicker  hintText={"Enter " + field.label + "..."} container="inline" mode="landscape"
+                                floatingLabelText={"Search by " + field.label} style={ {display: "inline-block"} }
                                 key={i} name={field.key}  defaultDate={(field.filter.defaultValue) ? new Date(field.filter.defaultValue) : null}
                                 onChange={this.onChangeFilterDate.bind(null, field.key)} autoOk={true}
                                 formatDate={this.formatDate}/>
@@ -634,7 +660,7 @@ class List extends Component {
     let header = (
       <TableRow>
         {<TableHeaderColumn style={{ width: 5}}>#</TableHeaderColumn>}
-        {this.state.settings.fields.map((field, i) => {
+        {this.state.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             if(field.sortable  && field.sortable == true){
               return <TableHeaderColumn key={i}><SortableTableHeaderColumn style={styles.tableCell} data={field} sort={(this.state.sortField == field.key) ? this.state.sortType : ''} onClick={this.onClickTableHeader} /></TableHeaderColumn>
@@ -650,7 +676,7 @@ class List extends Component {
       return (
       <TableRow key={index}>
         {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * this.state.settings.pagination.itemsPerPage) : 0)}</TableRowColumn>}
-        { this.state.settings.fields.map((field, i) => {
+        { this.state.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
           }
@@ -780,6 +806,9 @@ class List extends Component {
         <Divider />
         <div>
             {filters}
+        </div>
+        <div>
+          {aggregate}
         </div>
         <div>
             {this.state.loadingData}
