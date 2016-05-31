@@ -142,7 +142,7 @@ class List extends Component {
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
-    this.props.showLoader();
+    this.props.showProgressBar();
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
@@ -355,7 +355,7 @@ class List extends Component {
     this.setState({
       loadingData : ''
     });
-    this.props.hideLoader();
+    this.props.hideProgressBar();
   }
 
   _setPagesAmount(itemsCount, itemPerPage){
@@ -383,7 +383,7 @@ class List extends Component {
   }
 
   _updateTableData(){
-    this.props.showLoader();
+    this.props.showProgressBar();
     this.setState({
           loadingData : ''
      });
@@ -508,7 +508,7 @@ class List extends Component {
          } else {
            this.handleError(response);
          }
-         this.props.hideLoader();
+         this.props.hideProgressBar();
        })
        .on('timeout', (response) => {
          response['desc'] = errorMessages.serverApiTimeout;
@@ -603,7 +603,7 @@ class List extends Component {
      let fieldsFound = _.find(aggregate_settings.fields, def => { return def.key === key; });
      if (fieldsFound) { acc.push(fieldsFound); return acc; }
      let methodsFound = _.find(aggregate_settings.methods, def => { return def.key === key; });
-     if (methodsFound) { acc.push(methodsFound); return acc; }       
+     if (methodsFound) { acc.push(methodsFound); return acc; }
      return acc;
    }, []);
 
