@@ -13,6 +13,7 @@ import BraasTheme from '../theme';
 import axios from 'axios';
 import * as actions from '../actions'
 import LoginPopup from '../components/Authorization/LoginPopup';
+import StatusBar from '../components/StatusBar/StatusBar';
 
 export default class App extends Component {
   constructor(props) {
@@ -31,6 +32,7 @@ export default class App extends Component {
           <Topbar />
             <div className="component container main-content">
               <Navigator />
+              <StatusBar />
               <Divider />
               <div className="contents">
                 {this.props.children}

@@ -28,6 +28,7 @@ import aja from 'aja';
 import $ from 'jquery';
 import DatePicker from 'material-ui/DatePicker';
 import moment from 'moment';
+import * as actions from '../../actions'
 
 import { Link, browserHistory } from 'react-router';
 
@@ -141,7 +142,7 @@ class List extends Component {
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
-
+    this.props.showLoader();
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
@@ -155,7 +156,7 @@ class List extends Component {
       totalPages : 1,
       settings: props.settings,
       fields: props.settings.fields,
-      loadingData : <LinearProgress mode="indeterminate"/>
+      loadingData : ''
     };
   }
 
@@ -353,6 +354,7 @@ class List extends Component {
     this.setState({
       loadingData : ''
     });
+    this.props.hideLoader();
   }
 
   _setPagesAmount(itemsCount, itemPerPage){
@@ -380,8 +382,9 @@ class List extends Component {
   }
 
   _updateTableData(){
+    this.props.showLoader();
     this.setState({
-          loadingData : <LinearProgress mode="indeterminate"/>
+          loadingData : ''
      });
     this._getData(this._buildSearchQuery());
   }
@@ -504,6 +507,7 @@ class List extends Component {
          } else {
            this.handleError(response);
          }
+         this.props.hideLoader();
        })
        .on('timeout', (response) => {
          response['desc'] = errorMessages.serverApiTimeout;
@@ -600,7 +604,7 @@ class List extends Component {
        let fieldsFound = _.find(aggregate_settings.fields, def => { return def.key === key; });
        if (fieldsFound) { acc.push(fieldsFound); return acc; }
        let methodsFound = _.find(aggregate_settings.methods, def => { return def.key === key; });
-       if (methodsFound) { acc.push(methodsFound); return acc; }       
+       if (methodsFound) { acc.push(methodsFound); return acc; }
        return acc;
      }, []);
    }
@@ -618,7 +622,7 @@ class List extends Component {
     let { fields } = settings;
     this.setState({settings, fields, filters: {}, rows: []}, this._updateTableData);
   }
-  
+
   render() {
     let { settings } = this.state;
     let { page, collection } = this.props;
@@ -886,4 +890,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(List);
+export default connect(mapStateToProps, actions)(List);

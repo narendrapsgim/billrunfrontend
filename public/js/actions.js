@@ -10,6 +10,10 @@ export const CHECK_LOGIN = 'checkLogin';
 export const OPEN_LOGIN_FORM = 'openLoginPopup';
 export const CLOSE_LOGIN_FORM = 'closeLoginPopup';
 export const SAVE_ITEM_ERROR = 'SAVE_ITEM_ERROR';
+export const SHOW_LOADER = 'SHOW_LOADER';
+export const HIDE_LOADER = 'HIDE_LOADER';
+export const SHOW_MESSAGE = 'SHOW_MESSAGE';
+export const HIDE_MESSAGE = 'HIDE_MESSAGE';
 
 import axios from 'axios';
 
@@ -60,23 +64,21 @@ function gotItem(item, collection, page_name) {
   };
 }
 
-function saveItemError(item, collection, page_name) {
-  return {
-    type: SAVE_ITEM_ERROR,
-    errorMessage : 'Error, please try again.',
-    item,
-    page_name,
-    collection
-  };
-}
-
 function fetchItem(item_id, collection, page_name) {
   let itemFetchUrl = `/api/find?collection=${collection}&query={"_id":{"$in" : ["${item_id}"]}}`;
   return dispatch => {
+    dispatch(showLoader());
     let request = axiosInstance.get(itemFetchUrl).then(
       response => {
         let item = _.values(response.data.details).shift();
         dispatch(gotItem(item, collection, page_name));
+        dispatch(hideLoader());
+      }
+    ).catch(
+      error => {
+          console.log(error);
+          dispatch(showStatusMessage(error.message || 'Error, please try again', 'error'));
+          dispatch(hideLoader());
       }
     );
   }
@@ -109,7 +111,7 @@ export function saveCollectionEntity(item, collection, page_name, action) {
         if(response.data){
           dispatch(fetchItem(id, collection, page_name));
         } else {
-          dispatch(saveItemError(item, collection, page_name));
+          dispatch(showStatusMessage('Error, please try again', 'error'));
         }
       }
     );
@@ -122,6 +124,22 @@ export function openLoginPopup(){
 
 export function closeLoginPopup(){
   return { type: CLOSE_LOGIN_FORM }
+}
+
+export function showLoader(){
+  return { type: SHOW_LOADER }
+}
+
+export function hideLoader(){
+  return { type: HIDE_LOADER }
+}
+
+export function showStatusMessage(message, messageType){
+  return { type: SHOW_MESSAGE, message, messageType }
+}
+
+export function hideStatusMessage(){
+  return { type: HIDE_MESSAGE}
 }
 
 export function userCheckLogin(){

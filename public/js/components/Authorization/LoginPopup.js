@@ -13,18 +13,15 @@ export default class LoginPopup extends Component {
     super(props);
     this.clickLogin = this.clickLogin.bind(this);
     this.handleClose = this.handleClose.bind(this);
-    this.renderErrorMessage = this.renderErrorMessage.bind(this);
 
     this.state = {
       showLoginForm: false,
-      errorMessage: ''
     };
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       showLoginForm: nextProps.auth ? false : nextProps.displayPopup,
-      errorMessage: nextProps.auth ? '': nextProps.errorMessage,
     });
   }
 
@@ -36,16 +33,6 @@ export default class LoginPopup extends Component {
     let username = this.refs.username.input.value;
     let password = this.refs.password.input.value;
     this.props.userDoLogin({username, password});
-  }
-
-  renderErrorMessage(){
-    if(!_.isEmpty(this.state.errorMessage)){
-      return (
-        <p style={{color:'red'}}>{this.state.errorMessage}</p>
-      );
-    } else {
-      return <p></p>;
-    }
   }
 
   getFormActions(){
@@ -67,7 +54,6 @@ export default class LoginPopup extends Component {
   renderLoginForm(){
     return(
       <div style={{margin: '0 25px 25px 25px'}}>
-        {this.renderErrorMessage()}
         <TextField hintText="Enter user name or mail" floatingLabelText="User name" ref="username" />
         <br />
         <TextField hintText="Password" floatingLabelText="Password" type="password" ref="password" />
@@ -95,15 +81,7 @@ function mapStateToProps(state) {
   return {
     auth: state.users.auth,
     displayPopup: state.login.displayPopup,
-    errorMessage: state.login.errorMessage,
   };
 }
-
-LoginPopup.defaultProps = {
-  login: {
-    displayPopup: true,
-    errorMessage: ""
-  }
-};
 
 export default connect(mapStateToProps, actions)(LoginPopup);

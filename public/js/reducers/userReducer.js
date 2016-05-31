@@ -1,7 +1,7 @@
 
 export default function users(state = {}, action) {
 
-  let defaultState = Object.assign({}, {auth: false, roles:['guest'], errorMessage:''});
+  let defaultState = Object.assign({}, {auth: false, roles:['guest']});
 
   switch (action.type) {
 
@@ -13,7 +13,7 @@ export default function users(state = {}, action) {
       };
       return Object.assign({}, defaultState, state, newState);
     }
-    
+
     case 'logout': {
       let newState =  {
         auth:false,
