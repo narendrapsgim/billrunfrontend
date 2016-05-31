@@ -1,8 +1,5 @@
 import * as actions from '../actions';
-import View from '../view.js';
 import _ from 'lodash';
-import aja from 'aja';
-
 
 
 export default function pages(state = {}, action) {

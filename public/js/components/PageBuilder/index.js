@@ -8,7 +8,7 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 
-import View from '../../view';
+import View from '../../views';
 import Field from './Field';
 import List from '../List';
 import Help from '../Help';
