@@ -3,15 +3,17 @@ import { connect } from 'react-redux';
 import LinearProgress from 'material-ui/LinearProgress';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import Snackbar from 'material-ui/Snackbar';
+import * as Colors from 'material-ui/styles/colors'
 
 import * as actions from '../../actions';
 import _ from 'lodash';
 
 const styles = {
-  success : {backgroundColor:'green'},
-  info: {backgroundColor:'blue'},
-  warning: {backgroundColor:'yellow'},
-  error: {backgroundColor:'red'}
+  success : {backgroundColor: Colors.green300},
+  info: {backgroundColor: Colors.blue300},
+  warning: {backgroundColor: Colors.amber300},
+  error: {backgroundColor: Colors.red300},
+  wrapper : {marginBottom: '70px'}
 
 }
 class Loader extends Component {
@@ -46,9 +48,10 @@ class Loader extends Component {
       <Snackbar
         open={!_.isEmpty(this.state.message)}
         message={this.state.message}
-        autoHideDuration={4000}
+        autoHideDuration={globalSetting.statusMessageDisplayTimeout}
         onRequestClose={this.handleRequestClose}
         bodyStyle={styles[this.state.messageType]}
+        style={styles.wrapper}
       />
     );
   }
