@@ -172,6 +172,7 @@ class List extends Component {
       rows : [],
       sortField : '',
       sortType : '',
+      fields: settings.fields,
       filters : filters,
       currentPage : 1,
       totalPages : 1,
