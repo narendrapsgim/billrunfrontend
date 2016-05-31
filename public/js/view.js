@@ -1,6 +1,8 @@
 import {red500, blue500} from 'material-ui/styles/colors';
 import ImportExport from './components/HtmlPages/ImportExport';
 import Dashboard from './components/HtmlPages/Dashboard';
+import ConfigurationPage from './components/HtmlPages/Configuration.js';
+import OperationsPage from './components/HtmlPages/Operations.js';
 import moment from 'moment';
 
 const dashboard_html = {
@@ -18,6 +20,22 @@ const import_export_html = {
     html : ImportExport
   } ]
 }
+
+const configuration_html = {
+  title: "",
+  view_type: "",
+  sections: [
+    { html: ConfigurationPage }
+  ]
+}
+
+const operations_html = {
+  title: "",
+  view_type: "",
+  sections: [
+    { html: OperationsPage }
+  ]
+};
 
 const plan_setup_tabs = [
   {
@@ -615,6 +633,41 @@ const rates_charge_list_view = {
   } ]
 };
 
+//////////////////// USERS /////////////////////////
+const users_list_view = {
+  title: "",
+  view_type: "list",
+  sections: [ {
+    title: "",
+    lists: [ {
+      title: "Users",
+      url: globalSetting.serverUrl + '/admin/users',
+      fields: [
+        { key: 'username', label: "Username" },
+        { key: 'roles', label: "Roles" }
+      ],
+      controllers: {
+        new: { label: "New" },
+        delete: { label: "Delete", color: red500 }
+      },
+      onItemClick: 'edit'
+    } ]
+  } ]
+};
+
+const users_edit_view = {
+  title: "Edit User",
+  view_type: "sections",
+  sections: [
+    {
+      fields: [
+        { dbkey: "username", label: "Username" },
+        { dbkey: "roles", label: "Roles" }
+      ]
+    }
+  ]
+};
+
 /////////////////// LAYOUT /////////////////////////
 
 const View = {
@@ -702,6 +755,28 @@ const View = {
       view_type: "html",
       html : import_export_html
     },
+    configuration: {
+      permission: ["admin"],
+      menu_title: "Config",
+      view_type: "html",
+      html: configuration_html
+    },
+    users: {
+      permission: ["admin"],
+      menu_title: "Users",
+      route: "users/users/list",
+      views: {
+        list: users_list_view,
+        // new: new_user_view,
+        // edit: edit_user_view
+      }
+    },
+    operations: {
+      permission: ["admin"],
+      menu_title: "Operations",
+      view_type: "html",
+      html: operations_html
+    }
     // plan_setup: {
     //   title: "Plan Setup",
     //   menu_title: "Plan Setup",

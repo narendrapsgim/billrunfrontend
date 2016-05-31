@@ -149,7 +149,6 @@ class List extends Component {
       sortType : '',
       filters : filters,
       snackbarOpen : false,
-      modalOpen : false,
       snackbarMessage : '',
       currentPage : 1,
       totalPages : 1,
@@ -642,8 +641,8 @@ class List extends Component {
             defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
             onChange={this.onChangeFilter} />;
           if(field.type == 'urt') {
-            ret =  <DatePicker  hintText={"Enter " + field.label + "..."} container="inline" mode="landscape"
-                                floatingLabelText={"Search by " + field.label} style={ {display: "inline-block"} }
+            ret =  <DatePicker  style={styles.filterInput} hintText={"Enter " + field.label + "..."} container="inline" mode="landscape"
+                                floatingLabelText={"Search by " + field.label} style={styles.filterInput}
                                 key={i} name={field.key}  defaultDate={(field.filter.defaultValue) ? new Date(field.filter.defaultValue) : null}
                                 onChange={this.onChangeFilterDate.bind(null, field.key)} autoOk={true}
                                 formatDate={this.formatDate}/>
@@ -856,7 +855,7 @@ class List extends Component {
               title={this.state.modalTitle}
               actions={modalActions}
               modal={true}
-              open={this.state.modalOpen || false}
+              open={this.state.modalOpen}
           >
             <div>{this.state.modalMessage}</div>
           </Dialog>

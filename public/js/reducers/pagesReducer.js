@@ -3,8 +3,6 @@ import View from '../view.js';
 import _ from 'lodash';
 import aja from 'aja';
 
-
-
 export default function pages(state = {}, action) {
   let item, path;
   switch (action.type) {

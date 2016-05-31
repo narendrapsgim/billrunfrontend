@@ -34,6 +34,19 @@ export function updateFieldValue(path, field_value, page_name) {
   };
 }
 
+export function saveConfig(options) {
+  let saveUrl = `${globalSetting.serverUrl}/admin/configsave`;
+  return dispatch => {
+    let request = axiosInstance.post(saveUrl, options).then(
+      response => {
+        /* if(response.data){
+           dispatch(fetchItem(id, collection, page_name));
+           } */
+      }
+    );
+  }
+}
+
 export function newField(path, field_type, page_name) {
   return {
     type: NEW_FIELD,
