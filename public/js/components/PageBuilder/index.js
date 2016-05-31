@@ -195,7 +195,7 @@ class PageBuilder extends Component {
                   this.titlize(_.last(path.split('.')));
       if (typeof field.collapsible !== 'undefined') {
         return (
-          <FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} crud={field.crud} path={path} dispatch={this.props.dispatch} pageName={this.getPageName()} />
+          <FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} crud={field.crud} fieldType={field.fieldType} path={path} dispatch={this.props.dispatch} pageName={this.getPageName()} />
         );
       }
       return (
