@@ -142,7 +142,6 @@ class List extends Component {
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
-    this.props.showProgressBar();
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
@@ -504,11 +503,10 @@ class List extends Component {
               totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
               rows : rows,
               loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text={errorMessages.noData} /></Toolbar>),
-           });
+           }, this.props.hideProgressBar);
          } else {
            this.handleError(response);
          }
-         this.props.hideProgressBar();
        })
        .on('timeout', (response) => {
          response['desc'] = errorMessages.serverApiTimeout;
