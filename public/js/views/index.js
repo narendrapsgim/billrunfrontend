@@ -94,6 +94,7 @@ const View = {
       html : ImportExportHtml
     },
     // plan_setup: {
+    //   permission : ["guest","read"],
     //   title: "Plan Setup",
     //   menu_title: "Plan Setup",
     //   view_type: "tabs",

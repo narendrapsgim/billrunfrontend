@@ -20,9 +20,18 @@ export default class LoginPopup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      showLoginForm: nextProps.auth ? false : nextProps.displayPopup,
-    });
+    // Hide popup after sucess login complete
+    if(this.props.auth === false && nextProps.auth == true){
+      this.setState({
+        showLoginForm: false,
+      });
+    }
+    // change popup display state if action require to change display state
+    else if(typeof nextProps.displayPopup !== 'undefined' && nextProps.displayPopup !== this.state.showLoginForm){
+      this.setState({
+        showLoginForm: nextProps.displayPopup,
+      });
+    }
   }
 
   handleClose() {
