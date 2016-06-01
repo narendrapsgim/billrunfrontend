@@ -111,6 +111,7 @@ const rates_close_and_new_view = Object.assign({}, rates_edit_view, {title: "Clo
 
 
 const RatesView = {
+  rates_edit_view,
   rates_list_view,
   rates_new_view,
   rates_clone_view,

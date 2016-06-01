@@ -2,7 +2,7 @@ import * as actions from '../actions';
 import _ from 'lodash';
 
 
-export default function pages(state = {}, action) {
+export default function (state = {}, action) {
   let item, path;
   switch (action.type) {
   case actions.SET_INITIAL_ITEM:
