@@ -16,7 +16,7 @@ const styles = {
   wrapper : {marginBottom: '70px'}
 
 }
-class Loader extends Component {
+class StatusBar extends Component {
   constructor(props) {
     super(props);
     this.renderLoader = this.renderLoader.bind(this);
@@ -56,8 +56,10 @@ class Loader extends Component {
     );
   }
 
-  handleRequestClose(){
-    this.props.hideStatusMessage();
+  handleRequestClose(reason){
+    if(reason !== 'clickaway'){
+      this.props.hideStatusMessage();
+    }
   };
 
   render() {
@@ -78,4 +80,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, actions)(Loader);
+export default connect(mapStateToProps, actions)(StatusBar);

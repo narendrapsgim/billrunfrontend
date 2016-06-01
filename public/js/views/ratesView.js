@@ -37,6 +37,7 @@ const rates_list_view = {
       controllers : {
         duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
         closeAndNew : { label: 'Close and New'},
+        edit : { label: 'Edit' },
         delete : { label: 'Delete', color: Colors.red500  },
       },
       pagination : {
@@ -103,6 +104,8 @@ const rates_edit_view = {
   ]
 };
 
+const rates_edit_multiple_view = Object.assign({}, rates_edit_view, {title: "Edit Rates"});
+
 const rates_new_view = Object.assign({}, rates_edit_view, {title: "New Rate"});
 
 const rates_clone_view = Object.assign({}, rates_edit_view, {title: "Clone Rate"});
@@ -112,6 +115,7 @@ const rates_close_and_new_view = Object.assign({}, rates_edit_view, {title: "Clo
 
 const RatesView = {
   rates_edit_view,
+  rates_edit_multiple_view,
   rates_list_view,
   rates_new_view,
   rates_clone_view,

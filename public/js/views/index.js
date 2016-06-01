@@ -27,7 +27,8 @@ const View = {
         new: RatesView.rates_new_view,
         clone: RatesView.rates_clone_view,
         close_and_new: RatesView.rates_close_and_new_view,
-        edit: RatesView.rates_edit_view
+        edit: RatesView.rates_edit_view,
+        edit_multiple: RatesView.rates_edit_multiple_view
       }
     },
     rates_vat: {
