@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import RaisedButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import * as actions from '../../actions'
 
 
@@ -34,12 +34,7 @@ export default class Auth extends Component {
       message = [
         <h3 key="0">Please login.</h3>,
         <br key="1"/>,
-        <RaisedButton
-          key="2"
-          label="Login"
-          primary={true}
-          onTouchTap={this.handleOpenLogin}
-        />,
+        <RaisedButton key="2" label="Login" onClick={this.handleOpenLogin} />,
       ];
     } else if(authorized && permissionDenied){
       message = <h3 style={{color:'red'}}>You don't have permission to access this page</h3>;

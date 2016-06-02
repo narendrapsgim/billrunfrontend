@@ -1,20 +1,16 @@
 import * as actions from '../actions';
-import View from '../view.js';
 import _ from 'lodash';
-import aja from 'aja';
 
-export default function pages(state = {}, action) {
+
+export default function (state = {}, action) {
   let item, path;
   switch (action.type) {
   case actions.SET_INITIAL_ITEM:
     return Object.assign(
       {},
       state,
-      {page: Object.assign({},
-				{item: {}},
-        {errorMessage: action.errorMessage}
-       )}
-     );
+      {page: Object.assign({}, {item: {}} )}
+    );
   case actions.UPDATE_FIELD_VALUE:
     item = _.cloneDeep(state.page.item);
     path = action.path.replace('item.', '');
@@ -22,10 +18,7 @@ export default function pages(state = {}, action) {
     return Object.assign(
       {},
       state,
-      {page: Object.assign({},
-        {item: item},
-        {errorMessage: action.errorMessage}
-      )}
+      {page: Object.assign({}, {item: item} )}
     );
   case actions.NEW_FIELD:
     item = _.cloneDeep(state.page.item);
@@ -45,10 +38,7 @@ export default function pages(state = {}, action) {
     return Object.assign(
       {},
       state,
-      {page: Object.assign({},
-        {item: item},
-        {errorMessage: action.errorMessage}
-      )}
+      {page: Object.assign({}, {item: item} )}
     );
   case actions.REMOVE_FIELD:
     item = _.cloneDeep(state.page.item);
@@ -56,26 +46,17 @@ export default function pages(state = {}, action) {
     _.unset(item, path);
     return Object.assign({},
       state,
-      {page: Object.assign({},
-        {item: item},
-        {errorMessage: action.errorMessage}
-      )}
+      {page: Object.assign({}, {item: item} )}
     );
   case actions.GOT_ITEM:
     return Object.assign({},
       state,
-      {page: Object.assign({},
-        {item: action.item},
-        {errorMessage: action.errorMessage}
-       )}
+      {page: Object.assign({}, {item: action.item} )}
    );
   case actions.SAVE_ITEM_ERROR:
     return Object.assign({},
       state,
-      {page: Object.assign({},
-				{item: action.item},
-        {errorMessage: action.errorMessage}
-       )}
+      {page: Object.assign({}, {item: action.item} )}
    );
   default:
     return state;

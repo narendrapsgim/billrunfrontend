@@ -1,34 +1,16 @@
 
-export default function login(state = {}, action) {
-
-  let defaultState = Object.assign({}, { errorMessage:'', displayPopup:false});
+export default function (state = {}, action) {
 
   switch (action.type) {
 
-    case 'openLoginPopup': {
-      let newState =  {
-        errorMessage: '',
-        displayPopup:true,
-      };
-      return Object.assign({}, defaultState, state, newState);
-    }
+    case 'openLoginPopup':
+      return Object.assign({}, state, { displayPopup: true });
 
-    case 'closeLoginPopup': {
-      let newState =  {
-        errorMessage: '',
-        displayPopup:false,
-      };
-      return Object.assign({}, defaultState, state, newState);
-    }
+    case 'closeLoginPopup':
+      return Object.assign({}, state, { displayPopup: false });
 
-    case 'loginError': {
-      let newState =  {
-        errorMessage: 'Incorrect user or password, please try again.'
-      };
-      return Object.assign({}, defaultState, state, newState );
-    }
-
-    default: return  Object.assign({},defaultState, state);
+    default:
+      return state;
   }
 
 }

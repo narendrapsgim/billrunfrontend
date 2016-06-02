@@ -3,7 +3,8 @@ import aja from 'aja';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
 
 export default class Aggregate extends React.Component {
 
@@ -15,14 +16,14 @@ export default class Aggregate extends React.Component {
     this.filters = props.filters;
     this.onDataChange = props.onDataChange;
 
-    this.state = { on : false, to: false , method: false };
+    this.state = { on : false, to: false , method: false, popupOpen: false, popupMessage: '' };
 
     this.aggregateOnChanged = this.aggregateOnChanged.bind(this);
     this.aggregateToChanged = this.aggregateToChanged.bind(this);
     this.aggregateMethodChanged = this.aggregateMethodChanged.bind(this);
     this.onAggregate = this.onAggregate.bind(this);
     this.handleError = this.handleError.bind(this);
-
+    this.handleClosePopup = this.handleClosePopup.bind(this);
   }
 
   aggregateOnChanged  (event, index, value) { this.setState({on:value}); };
@@ -30,7 +31,11 @@ export default class Aggregate extends React.Component {
   aggregateMethodChanged (event, index, value) { this.setState({method:value}); };
 
   handleError(resp) {
-    console.log("ERROR", resp);
+    this.setState({popupMessage: resp.desc, popupOpen: true});
+  }
+
+  handleClosePopup() {
+    this.setState({popupOpen: false});
   }
   
   onAggregate(event) {
@@ -81,6 +86,18 @@ export default class Aggregate extends React.Component {
         </SelectField>
         <RaisedButton label="Aggregate"  onClick={this.onAggregate} />
         <RaisedButton label="Clear" onClick={this.props.onClear} />
+        <Dialog
+            actions={<FlatButton
+                      label="Ok"
+                      primary={true}
+                      onTouchTap={this.handleClosePopup}
+                                 />}
+            modal={false}
+            open={this.state.popupOpen}
+            onRequestClose={this.handleClosePopup}
+        >
+          <div>{this.state.popupMessage}</div>
+        </Dialog>        
       </div>
     );
   }

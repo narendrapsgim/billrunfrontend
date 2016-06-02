@@ -9,7 +9,7 @@ import Dashboard from 'material-ui/svg-icons/action/dashboard';
 import Layers from 'material-ui/svg-icons/maps/layers';
 import Receipt from 'material-ui/svg-icons/action/receipt';
 import AccountCircle from 'material-ui/svg-icons/action/account-circle';
-import View from '../../view';
+import View from '../../views';
 
 export default class Navigator extends Component {
   constructor(props) {

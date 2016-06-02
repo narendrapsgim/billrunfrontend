@@ -8,11 +8,11 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Divider from 'material-ui/Divider';
-import View from '../view';
 import BraasTheme from '../theme';
 import axios from 'axios';
 import * as actions from '../actions'
-import LoginPopup from '../components/HtmlPages/LoginPopup';
+import LoginPopup from '../components/Authorization/LoginPopup';
+import StatusBar from '../components/StatusBar/StatusBar';
 
 export default class App extends Component {
   constructor(props) {
@@ -31,6 +31,7 @@ export default class App extends Component {
           <Topbar />
             <div className="component container main-content">
               <Navigator />
+              <StatusBar />
               <Divider />
               <div className="contents">
                 {this.props.children}

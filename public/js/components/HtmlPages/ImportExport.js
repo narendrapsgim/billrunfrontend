@@ -132,8 +132,8 @@ export default class ImportExport extends Component {
           </RaisedButton>
 
            <Divider />
-           <DatePicker hintText={"Enter export active"} container="inline" mode="landscape"
-                               floatingLabelText={"Select export active"} key="export_active_date" name="export_active_date"  defaultDate={new Date()}
+           <DatePicker hintText={"Enter active date"} container="inline" mode="landscape"
+                               floatingLabelText={"Select active export date"} key="Select active export date" name="export_active_date"  defaultDate={new Date()}
                                onChange={this.onChangeFilterDate.bind(null, "export_active_date")} autoOk={true}
                                formatDate={this.formatDate} />
           <RaisedButton

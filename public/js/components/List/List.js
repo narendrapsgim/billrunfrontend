@@ -28,6 +28,7 @@ import aja from 'aja';
 import $ from 'jquery';
 import DatePicker from 'material-ui/DatePicker';
 import moment from 'moment';
+import * as actions from '../../actions'
 
 import { Link, browserHistory } from 'react-router';
 
@@ -118,10 +119,9 @@ class List extends Component {
     this._filterData = this._filterData.bind(this);
     this._sortData = this._sortData.bind(this);
     this._parseResults = this._parseResults.bind(this);
-    this.showSnackbar = this.showSnackbar.bind(this);
     //Handlers
-    this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
-    this.validateAtLeastOneSelectedRow = this.validateAtLeastOneSelectedRow.bind(this);
+    this.validateOnlyOneRowIsSelected = this.validateOnlyOneRowIsSelected.bind(this);
+    this.validateAlLeastOneRowIsSelected = this.validateAlLeastOneRowIsSelected.bind(this);
     //Actions
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
@@ -141,20 +141,17 @@ class List extends Component {
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
-
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
       sortField : '',
       sortType : '',
       filters : filters,
-      snackbarOpen : false,
-      snackbarMessage : '',
       currentPage : 1,
       totalPages : 1,
       settings: props.settings,
       fields: props.settings.fields,
-      loadingData : <LinearProgress mode="indeterminate"/>
+      loadingData : ''
     };
   }
 
@@ -170,6 +167,7 @@ class List extends Component {
       rows : [],
       sortField : '',
       sortType : '',
+      fields: settings.fields,
       filters : filters,
       currentPage : 1,
       totalPages : 1,
@@ -178,56 +176,80 @@ class List extends Component {
 
   }
 
-  validateAtLeastOneSelectedRow(){
+  validateOnlyOneRowIsSelected(){
     if(!_.isUndefined(this.refs.listBoby.state.selectedRows)) {
       if (this.refs.listBoby.state.selectedRows.length == 1) {
         let selectedRowNum = _.head(this.refs.listBoby.state.selectedRows);
         let selectedItemId = this.state.rows[selectedRowNum];
-        return this.state.rows[selectedRowNum]
+        return this.state.rows[selectedRowNum]._id['$id']
       } else if(this.refs.listBoby.state.selectedRows.length > 1){
-        this.showSnackbar(errorMessages.selectionActionOnlyOne);
-        return this.refs.listBoby.state.selectedRows.length;
+        this.props.showStatusMessage(errorMessages.selectionActionOnlyOne, 'error');
       } else {
-        let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
-        this.showSnackbar(message);
-        return false;
+        let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionOnlyOne;
+        this.props.showStatusMessage(message, 'error');
       }
     }
-    return false;
+    return null;
   }
+
+  validateAlLeastOneRowIsSelected(){
+    if(!_.isUndefined(this.refs.listBoby.state.selectedRows)) {
+      if (this.refs.listBoby.state.selectedRows.length > 0) {
+        let selectedRowIds = this.refs.listBoby.state.selectedRows.map(
+          (selectedRowNum, i) => {
+            return this.state.rows[selectedRowNum]._id['$id'];
+          }
+        );
+        return selectedRowIds
+      } else {
+        let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
+        this.props.showStatusMessage(message, 'error');
+      }
+    }
+    return null;
+  }
+
   /* ON Actions */
+
   onClickCloneItem(e) {
-    let item =  this.validateAtLeastOneSelectedRow();
-    if(item){
+    let itemId =  this.validateOnlyOneRowIsSelected();
+    if(itemId){
       let { page, collection } = this.props;
-      let url = `/${page}/${collection}/clone/${item._id['$id']}`;
+      let url = `/${page}/${collection}/clone/${itemId}`;
       this.context.router.push(url);
     }
   }
 
   onClickCloseandnewItem(e) {
-    let item = this.validateAtLeastOneSelectedRow();
-    if(item){
+    let itemId = this.validateOnlyOneRowIsSelected();
+    if(itemId){
       let { page, collection } = this.props;
-      let url = `/${page}/${collection}/close_and_new/${item._id['$id']}`;
+      let url = `/${page}/${collection}/close_and_new/${itemId}`;
       this.context.router.push(url);
     }
   }
 
-  onClickEditItem(e) { console.log('Edit Item - ', e);}
-
-  onClickDeleteItem(e) {
-    if (this.refs.listBoby.state.selectedRows.length) {
-      this.setState({modalTitle: "Remove Items"});
-      this.setState({modalMessage: "Are you sure you want to remove selected items?"});
-      this.setState({modalOpen: true});
-      /* HACK! */
-      this.setState({selectedRow: this.refs.listBoby.state.selectedRows});
-    } else {
-      let message = errorMessages.selectionActionatNoItems + ' ' + errorMessages.selectionActionAtLeastOne;
-      this.showSnackbar(message);
+  onClickEditItem(e) {
+    let itemsIds = this.validateAlLeastOneRowIsSelected();
+    if(itemsIds){
+      let { page, collection } = this.props;
+      let url = `/${page}/${collection}/edit_multiple/${_.join(itemsIds, ',')}`;
+      this.context.router.push(url);
     }
   }
+
+  onClickDeleteItem(e) {
+    if (this.validateAlLeastOneRowIsSelected()) {
+      this.setState({
+        modalTitle: "Remove Items",
+        modalMessage: "Are you sure you want to remove selected items?",
+        modalOpen: true
+      });
+      /* HACK! */
+      this.setState({selectedRow: this.refs.listBoby.state.selectedRows});
+    }
+  }
+
   onAcceptRemoveItems() {
     this.setState({modalOpen: false});
     let selectedRowNums = this.state.selectedRow;
@@ -332,26 +354,13 @@ class List extends Component {
 
   /* Handlers */
 
-  handleCloseSnackbar(){
-    this.setState({
-      snackbarOpen: false,
-      snackbarMessage: '',
-    });
-  };
-
-  showSnackbar(message){
-    this.setState({
-      snackbarOpen: true,
-      snackbarMessage: message,
-    });
-  };
-
   handleError(data){
-    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : errorMessages.serverApiDefaultError ;
-    this.showSnackbar(errorMessage);
     this.setState({
       loadingData : ''
     });
+    let errorMessage = (data && data.desc && data.desc.length) ? data.desc : errorMessages.serverApiDefaultError ;
+    this.props.showStatusMessage(errorMessage, 'error');
+    this.props.hideProgressBar();
   }
 
   _setPagesAmount(itemsCount, itemPerPage){
@@ -379,8 +388,9 @@ class List extends Component {
   }
 
   _updateTableData(){
+    this.props.showProgressBar();
     this.setState({
-          loadingData : <LinearProgress mode="indeterminate"/>
+          loadingData : ''
      });
     this._getData(this._buildSearchQuery());
   }
@@ -418,6 +428,8 @@ class List extends Component {
                   }
                   return qArgs;
               }(queryArgs,filterSetting['filter']['valuePath']);
+          } else if(filterSetting.type == 'number') {
+            queryArgs[key] = parseFloat(this.state.filters[key]);
           } else {
           queryArgs[key] = {
             "$regex" : this.state.filters[key],
@@ -476,7 +488,7 @@ class List extends Component {
       rows = _.values(response.details);
     }
     if(rows.length > globalSetting.list.maxItems){
-      this.showSnackbar(errorMessages.tooManyRows);
+      this.props.showStatusMessage(errorMessages.tooManyRows, 'info');
     }
     rows = rows.slice(0, Math.min(rows.length, globalSetting.list.maxItems));
     return rows;
@@ -499,7 +511,7 @@ class List extends Component {
               totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
               rows : rows,
               loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text={errorMessages.noData} /></Toolbar>),
-           });
+           }, this.props.hideProgressBar);
          } else {
            this.handleError(response);
          }
@@ -597,7 +609,7 @@ class List extends Component {
      let fieldsFound = _.find(aggregate_settings.fields, def => { return def.key === key; });
      if (fieldsFound) { acc.push(fieldsFound); return acc; }
      let methodsFound = _.find(aggregate_settings.methods, def => { return def.key === key; });
-     if (methodsFound) { acc.push(methodsFound); return acc; }       
+     if (methodsFound) { acc.push(methodsFound); return acc; }
      return acc;
    }, []);
 
@@ -614,7 +626,7 @@ class List extends Component {
     let { fields } = settings;
     this.setState({settings, fields, filters: {}, rows: []}, this._updateTableData);
   }
-  
+
   render() {
     let { settings } = this.state;
     let { page, collection } = this.props;
@@ -633,7 +645,7 @@ class List extends Component {
           let ret =
 
            <TextField
-            style={styles.filterInput}
+              style={styles.filterInput}
             key={i} name={field.key}
             hintText={"enter " + field.label + "..."}
             floatingLabelText={"Search by " + field.label}
@@ -641,8 +653,8 @@ class List extends Component {
             defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
             onChange={this.onChangeFilter} />;
           if(field.type == 'urt') {
-            ret =  <DatePicker  style={styles.filterInput} hintText={"Enter " + field.label + "..."} container="inline" mode="landscape"
-                                floatingLabelText={"Search by " + field.label} style={styles.filterInput}
+            ret =  <DatePicker  hintText={"Enter " + field.label + "..."} container="inline" mode="landscape"
+                                floatingLabelText={"Search by " + field.label} style={ {display: "inline-block"} }
                                 key={i} name={field.key}  defaultDate={(field.filter.defaultValue) ? new Date(field.filter.defaultValue) : null}
                                 onChange={this.onChangeFilterDate.bind(null, field.key)} autoOk={true}
                                 formatDate={this.formatDate}/>
@@ -837,36 +849,14 @@ class List extends Component {
             {footer}
           </TableFooter>
         </Table>
-
-
-          <Dialog
-           actions={<FlatButton
-                      label="Ok"
-                      primary={true}
-                      onTouchTap={this.handleCloseSnackbar}
-                    />}
-           modal={false}
-           open={this.state.snackbarOpen}
-           onRequestClose={this.handleCloseSnackbar}
-         >
-         <div>{this.state.snackbarMessage}</div>
-          </Dialog>
           <Dialog
               title={this.state.modalTitle}
               actions={modalActions}
               modal={true}
-              open={this.state.modalOpen}
+              open={this.state.modalOpen || false}
           >
             <div>{this.state.modalMessage}</div>
           </Dialog>
-      {/*<Snackbar
-          color='red'
-          open={this.state.snackbarOpen}
-          message={this.state.snackbarMessage}
-          autoHideDuration={4000}
-          onRequestClose={this.handleCloseSnackbar}
-        />*/}
-
       </div>
     );
   }
@@ -882,4 +872,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(List);
+export default connect(mapStateToProps, actions)(List);
