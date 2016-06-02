@@ -641,7 +641,7 @@ const users_list_view = {
     title: "",
     lists: [ {
       title: "Users",
-      url: globalSetting.serverUrl + '/admin/users',
+      url: globalSetting.serverUrl + '/api/find?collection=users',
       fields: [
         { key: 'username', label: "Username" },
         { key: 'roles', label: "Roles" }
@@ -662,6 +662,20 @@ const users_edit_view = {
     {
       fields: [
         { dbkey: "username", label: "Username" },
+        { dbkey: "roles", label: "Roles" }
+      ]
+    }
+  ]
+};
+
+const users_new_view = {
+  title: "New User",
+  view_type: "sections",
+  sections: [
+    {
+      fields: [
+        { dbkey: "username", label: "Username" },
+        { dbkey: "password", label: "Password" },
         { dbkey: "roles", label: "Roles" }
       ]
     }
@@ -767,7 +781,8 @@ const View = {
       route: "users/users/list",
       views: {
         list: users_list_view,
-        edit: users_edit_view
+        edit: users_edit_view,
+        new: users_new_view
       }
     },
     operations: {

@@ -5,6 +5,8 @@ import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 
+import $ from 'jquery';
+
 const styles = {
   button: {
     margin: 12,
@@ -31,6 +33,11 @@ export default class OperationsPage extends Component {
     this.onCloseResetSubscription = this.onCloseResetSubscription.bind(this);
     this.onOpenRecreateInvoices = this.onOpenRecreateInvoices.bind(this);
     this.onCloseRecreateInvoices = this.onCloseRecreateInvoices.bind(this);
+    this.onResetSubscriptions = this.onResetSubscriptions.bind(this);
+    this.onRecreateInvoices = this.onRecreateInvoices.bind(this);
+    this.onSelectFile = this.onSelectFile.bind(this);
+    this.onChangeSID = this.onChangeSID.bind(this);
+    this.onChangeAccountIds = this.onChangeAccountIds.bind(this);
 
     this.state = {
       reset_sub_open: false,
@@ -42,15 +49,73 @@ export default class OperationsPage extends Component {
     this.setState({reset_sub_open: true});
   }
   onCloseResetSubscription() {
-    this.setState({reset_sub_open: false});
+    this.setState({reset_sub_open: false, files: null});
   }
 
   onOpenRecreateInvoices() {
     this.setState({recreate_open: true});
   }
   onCloseRecreateInvoices() {
-    this.setState({recreate_open: false});
+    this.setState({recreate_open: false, files: null});
   }  
+
+  onResetSubscriptions() {
+    let data = new FormData();
+    if(this.state.files){
+      $.each(this.state.files, (key, value) => {
+        data.append(key, value);
+      });
+    } else {
+      data.append('sid', this.state.sid);
+    }
+    $.ajax({
+      url: `${globalSetting.serverUrl}/api/resetlines`,
+      type: "POST",
+      data: data,
+      dataType: 'json',
+      processData: false, // Don't process the files
+      contentType: false // Set content type to false as jQuery will tell the server its a query string request
+    }).done(resp => {
+      if (resp.status) {
+        // Success!
+      }
+    });
+  }
+
+  onRecreateInvoices() {
+    let data = new FormData();
+    if(this.state.files){
+      $.each(this.state.files, (key, value) => {
+        data.append('account_id', value);
+      });
+    } else {
+      data.append('account_id', this.state.account_id);
+    }
+    $.ajax({
+      url: `${globalSetting.serverUrl}/api/recreateinvoices`,
+      type: "POST",
+      data: data,
+      dataType: 'json',
+      processData: false, // Don't process the files
+      contentType: false // Set content type to false as jQuery will tell the server its a query string request
+    }).done(resp => {
+      if (resp.status) {
+        // Success!
+      }
+    });
+  }
+  
+  onSelectFile(e) {
+    this.setState({files: e.target.files});
+  }
+
+  onChangeSID(e, value) {
+    this.setState({sid: value});
+  }
+
+  onChangeAccountIds(e, value) {
+    this.setState({account_id: value});
+  }
 
   render() {
     const resetSubscriptionActions = [
@@ -89,16 +154,14 @@ export default class OperationsPage extends Component {
           <div>
             <TextField
                 hintText="Enter SID"
-                floatingLabelText="Enter SID" 
-                onChange={this.handleSIDChange}
+                floatingLabelText="Enter SID"
+                onChange={this.onChangeSID}
             />
             <RaisedButton
                 label="Or select file"
                 primary={true}
             >
-              <form ref="importForm" encType="multipart/form-data" action={globalSetting.serverUrl} method="POST">
-                <input type="file" style={styles.exampleImageInput} multiple="multiple" />
-              </form>
+              <input onChange={this.onSelectFile} type="file" style={styles.exampleImageInput} />
             </RaisedButton>
           </div>
         </Dialog>
@@ -110,7 +173,17 @@ export default class OperationsPage extends Component {
             onRequestClose={this.onCloseRecreateInvoices}
             modal={false} >
           <div>
-            Tesgt
+            <TextField
+                hintText="Enter account ids"
+                floatingLabelText="Enter account ids"
+                onChange={this.onChangeAccountIds}
+            />
+            <RaisedButton
+                label="Or select file"
+                primary={true}
+            >
+              <input onChange={this.onSelectFile} type="file" style={styles.exampleImageInput} />
+            </RaisedButton>
           </div>
         </Dialog>
 
@@ -118,11 +191,12 @@ export default class OperationsPage extends Component {
           <RaisedButton
               label="Reset Subscriptions"
               primary={true}
+              style={styles.button}
               onClick={this.onOpenResetSubscription}
           />
-          <br/>
           <RaisedButton
               label="Recreate Invoices"
+              style={styles.button}
               primary={true}
               onClick={this.onOpenRecreateInvoices}
           />
