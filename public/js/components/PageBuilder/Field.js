@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import DatePicker from 'material-ui/DatePicker';
 import TextField from 'material-ui/TextField';
+import * as Colors from 'material-ui/styles/colors'
 import SelectField from 'material-ui/SelectField';
 import Checkbox from 'material-ui/Checkbox';
 import Toggle from 'material-ui/Toggle';
@@ -30,7 +31,7 @@ class Field extends Component {
   }
 
   onDateChange(path, nullEvent, val) {
-    let value = val.toISOString()
+    let value = moment(val).format("YYYY-MM-DDTHH:mm:ss") + ".000Z";
     let evt = {
       target: { dataset: { path: path } }
     };
@@ -43,6 +44,15 @@ class Field extends Component {
     if (value == 'undefined'){
       return null;
     }
+
+    let errorText = '';
+    let errorStyle = {};
+    if(value == 'mixed' || (_.isArray(value) && _.head(value) == 'mixed' )){
+      value = _.isArray(value) ? [] : "";
+      errorText = 'This field contain mixed data';
+      errorStyle = { color: Colors.orange500 };
+    }
+
 
     let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
 	  type = (typeof value),
@@ -99,7 +109,7 @@ class Field extends Component {
     } else if (type === "array") {
       return (
         <div>
-          <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path} disabled={disabled} />
+          <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path} disabled={disabled} errorText={errorText} errorStyle={errorStyle}/>
         </div>
       );
     } else if (type === "checkbox") {
@@ -139,6 +149,8 @@ class Field extends Component {
                    fullWidth={true}
                    multiLine={multiLine}
                    rows={rows}
+                   errorText={errorText}
+                   errorStyle={errorStyle}
                    disabled={disabled}
                    floatingLabelText={inputLabel}
         />

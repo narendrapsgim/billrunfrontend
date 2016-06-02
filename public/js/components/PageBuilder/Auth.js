@@ -39,7 +39,7 @@ export default class Auth extends Component {
     } else if(authorized && permissionDenied){
       message = <h3 style={{color:'red'}}>You don't have permission to access this page</h3>;
     } else {
-      message = <h3>"Authorization Error"</h3>;
+      message = <h3>Authorization Error</h3>;
     }
     return message;
   }
