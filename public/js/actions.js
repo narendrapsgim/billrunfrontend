@@ -153,7 +153,6 @@ export function saveCollectionEntity(item, collection, page_name, action) {
 
   let id = (!_.isEmpty(entity._id) ? entity._id['$id'] : null);
 
-  let id = '';
   if(action === 'bulk_update'){
     id = entity['ids'];
     delete entity['ids'];
