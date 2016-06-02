@@ -423,6 +423,8 @@ class List extends Component {
                   }
                   return qArgs;
               }(queryArgs,filterSetting['filter']['valuePath']);
+          } else if(filterSetting.type == 'number') {
+            queryArgs[key] = parseFloat(this.state.filters[key]);
           } else {
           queryArgs[key] = {
             "$regex" : this.state.filters[key],
@@ -639,7 +641,7 @@ class List extends Component {
           let ret =
 
            <TextField
-            style={styles.filterInput}
+              style={styles.filterInput}
             key={i} name={field.key}
             hintText={"enter " + field.label + "..."}
             floatingLabelText={"Search by " + field.label}
