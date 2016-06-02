@@ -1,5 +1,6 @@
 export const UPDATE_FIELD_VALUE = 'UPDATE_FIELD_VALUE';
 export const GOT_ITEM = 'GOT_COLLECTION_ITEMS';
+export const GOT_ITEMS = 'GOT_ITEMS';
 export const SAVE_FORM = 'SAVE_FORM';
 export const SET_INITIAL_ITEM = 'SET_INITIAL_ITEM';
 export const NEW_FIELD = 'NEW_FIELD';
@@ -64,6 +65,15 @@ function gotItem(item, collection, page_name) {
   };
 }
 
+function gotItems(items, collection, page_name) {
+  return {
+    type: GOT_ITEMS,
+    items,
+    page_name,
+    collection
+  };
+}
+
 function fetchItem(item_id, collection, page_name) {
   let itemFetchUrl = `/api/find?collection=${collection}&query={"_id":{"$in" : ["${item_id}"]}}`;
   return dispatch => {
@@ -84,20 +94,58 @@ function fetchItem(item_id, collection, page_name) {
   }
 }
 
+function combineItem(items){
+  let combineItem = [..._.values(items)];
+  return combineItem;
+}
+
+function fetchItems(item_ids, collection, page_name) {
+  item_ids = item_ids.replace(new RegExp(',', 'g'), '","');
+  let itemFetchUrl = `/api/find?collection=${collection}&query={"_id":{"$in" : ["${item_ids}"]}}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.get(itemFetchUrl).then(
+      response => {
+        let combinedItem = combineItem(response.data.details);
+        dispatch(gotItems(combinedItem, collection, page_name));
+        dispatch(hideProgressBar());
+      }
+    ).catch(
+      error => {
+          console.log(error);
+          dispatch(showStatusMessage(error.message || 'Error, please try again', 'error'));
+          dispatch(hideProgressBar());
+      }
+    );
+  }
+}
+
 export function getCollectionEntity(entity_id, collection, page_name) {
   return dispatch => {
     return dispatch(fetchItem(entity_id, collection, page_name));
   };
 }
 
+export function getCollectionEntites(entity_ids, collection, page_name) {
+  return dispatch => {
+    return dispatch(fetchItems(entity_ids, collection, page_name));
+  };
+}
+
 export function saveCollectionEntity(item, collection, page_name, action) {
   let saveUrl = '/admin/save';
   let entity = Object.assign({}, item);
-  let id = entity._id['$id'];
 
-  delete entity['_id'];
-  delete entity['from'];
-  delete entity['name'];
+  let id = '';
+  if(action === 'bulk_update'){
+    id = entity['ids'];
+    delete entity['ids'];
+  } else {
+    id = entity._id['$id'];
+    delete entity['_id'];
+    delete entity['from'];
+    delete entity['name'];
+  }
 
   var formData = new FormData();
   formData.append("id", id);

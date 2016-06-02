@@ -113,7 +113,7 @@ export default class Chips extends Component {
   }
 
   render() {
-    const {label, disabled} = this.props;
+    const {label, disabled, errorText, errorStyle} = this.props;
     let chips = this.state.items.map((item, index) =>
       <Chip value={item} index={index} onRemoveClick={this.onRremoveItem} key={index} allowRemove={!disabled} />
     );
@@ -125,6 +125,8 @@ export default class Chips extends Component {
                                              onKeyPress={this.onKeyPress}
                                              onChange={this.onInputChange}
                                              hintText={"Add new " + label.toLowerCase()  }
+                                             errorText={errorText}
+                                             errorStyle={errorStyle}
                                              style={styles.input}
                                          />);
     return (
@@ -142,4 +144,6 @@ Chips.defaultProps = {
   items: [],
   label: 'Chips',
   'data-path' : '',
+  errorText:'',
+  errorStyle:{}
 };
