@@ -767,8 +767,7 @@ const View = {
       route: "users/users/list",
       views: {
         list: users_list_view,
-        // new: new_user_view,
-        // edit: edit_user_view
+        edit: users_edit_view
       }
     },
     operations: {

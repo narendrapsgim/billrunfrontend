@@ -19,7 +19,7 @@ class ConfigurationPage extends Component {
   }
 
   onToggle(name) {
-    let value = this.refs[name].getValue();
+    let value = !this.refs[name].state.switched;
     this.setState({[name]: value});
   }
 

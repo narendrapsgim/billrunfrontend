@@ -3,6 +3,7 @@ import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
 
 const styles = {
   button: {
@@ -28,7 +29,7 @@ export default class OperationsPage extends Component {
     super(props);
     this.onOpenResetSubscription = this.onOpenResetSubscription.bind(this);
     this.onCloseResetSubscription = this.onCloseResetSubscription.bind(this);
-    this.onOpenRecreateInvoices = this.onCloseResetSubscription.bind(this);
+    this.onOpenRecreateInvoices = this.onOpenRecreateInvoices.bind(this);
     this.onCloseRecreateInvoices = this.onCloseRecreateInvoices.bind(this);
 
     this.state = {
@@ -45,7 +46,6 @@ export default class OperationsPage extends Component {
   }
 
   onOpenRecreateInvoices() {
-    console.log('test');
     this.setState({recreate_open: true});
   }
   onCloseRecreateInvoices() {
@@ -55,27 +55,27 @@ export default class OperationsPage extends Component {
   render() {
     const resetSubscriptionActions = [
       <FlatButton
-          label="Reset"
-          primary={true}
-          onClick={this.onResetSubscriptions}
-      />,
-      <FlatButton
           label="Cancel"
           secondary={true}
           onClick={this.onCloseResetSubscription}
       />,      
+      <FlatButton
+          label="Reset"
+          primary={true}
+          onClick={this.onResetSubscriptions}
+      />
     ];
     const recreateInvoiceActions = [
-      <FlatButton
-          label="Recreate"
-          primary={true}
-          onClick={this.onRecreateInvoices}
-      />,
       <FlatButton
           label="Cancel"
           secondary={true}
           onClick={this.onCloseRecreateInvoices}
       />,
+      <FlatButton
+          label="Recreate"
+          primary={true}
+          onClick={this.onRecreateInvoices}
+      />
     ];
 
     return (
@@ -87,7 +87,19 @@ export default class OperationsPage extends Component {
             onRequestClose={this.onCloseResetSubscription}
             modal={false} >
           <div>
-            Test
+            <TextField
+                hintText="Enter SID"
+                floatingLabelText="Enter SID" 
+                onChange={this.handleSIDChange}
+            />
+            <RaisedButton
+                label="Or select file"
+                primary={true}
+            >
+              <form ref="importForm" encType="multipart/form-data" action={globalSetting.serverUrl} method="POST">
+                <input type="file" style={styles.exampleImageInput} multiple="multiple" />
+              </form>
+            </RaisedButton>
           </div>
         </Dialog>
 
