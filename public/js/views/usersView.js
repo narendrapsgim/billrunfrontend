@@ -28,7 +28,7 @@ const users_edit_view = {
     {
       fields: [
         { dbkey: "username", label: "Username" },
-        { dbkey: "roles", label: "Roles" }
+        { dbkey: "roles", label: "Roles", type: "array" }
       ]
     }
   ]
