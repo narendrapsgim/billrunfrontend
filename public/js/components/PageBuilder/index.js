@@ -34,15 +34,15 @@ class PageBuilder extends Component {
     return props.params.page.replace(/-/g, '_').toLowerCase();
   }
 
-  componentWillMount() {
-    // this.setInitialState(this.props);
-  }
   componentDidMount() {
     switch (this.props.params.action) {
       case 'edit':
       case 'close_and_new':
       case 'clone':
         this.getCollectionItem(this.props);
+        break;
+      case 'new':
+        this.setInitialState(this.props);
         break;
       case 'edit_multiple':
         this.getCollectionItems(this.props);
@@ -119,6 +119,8 @@ class PageBuilder extends Component {
         Object.assign(item, {ids:bulkIds})
         break;
       case 'clone': actionType = 'duplicate';
+        break;
+      case 'new': actionType = 'new';
         break;
     }
 

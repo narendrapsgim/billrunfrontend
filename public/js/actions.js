@@ -39,6 +39,21 @@ export function updateFieldValue(path, field_value, page_name) {
   };
 }
 
+export function saveConfig(options) {
+  let saveUrl = '/admin/configsave';
+  let form = new FormData();
+  form.append("data", JSON.stringify(options));
+  return dispatch => {
+    let request = axiosInstance.post(saveUrl, form).then(
+      response => {
+        /* if(response.data){
+           dispatch(fetchItem(id, collection, page_name));
+           } */
+      }
+    );
+  }
+}
+
 export function newField(path, field_type, page_name) {
   return {
     type: NEW_FIELD,
@@ -136,19 +151,20 @@ export function saveCollectionEntity(item, collection, page_name, action) {
   let saveUrl = '/admin/save';
   let entity = Object.assign({}, item);
 
+  let id = (!_.isEmpty(entity._id) ? entity._id['$id'] : null);
+
   let id = '';
   if(action === 'bulk_update'){
     id = entity['ids'];
     delete entity['ids'];
   } else {
-    id = entity._id['$id'];
     delete entity['_id'];
     delete entity['from'];
     delete entity['name'];
   }
 
   var formData = new FormData();
-  formData.append("id", id);
+  if (id) formData.append("id", id);
   formData.append("coll", collection);
   formData.append("type", action);
   formData.append("data", JSON.stringify(entity));
