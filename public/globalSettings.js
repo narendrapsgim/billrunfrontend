@@ -10,5 +10,6 @@ var globalSetting = {
   currency : ' €',
   list : {
     maxItems : 100
-  }
+  },
+  statusMessageDisplayTimeout:5000
 }

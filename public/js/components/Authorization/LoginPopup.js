@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 import Dialog from 'material-ui/Dialog';
@@ -20,16 +20,27 @@ export default class LoginPopup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      showLoginForm: nextProps.auth ? false : nextProps.displayPopup,
-    });
+    // Hide popup after sucess login complete
+    if(this.props.auth === false && nextProps.auth == true){
+      this.setState({
+        showLoginForm: false,
+      });
+    }
+    // change popup display state if action require to change display state
+    else if(typeof nextProps.displayPopup !== 'undefined' && nextProps.displayPopup !== this.state.showLoginForm){
+      this.setState({
+        showLoginForm: nextProps.displayPopup,
+      });
+    }
   }
 
   handleClose() {
     this.props.closeLoginPopup();
   }
 
-  clickLogin(){
+  clickLogin(e){
+    e.preventDefault();
+    e.stopPropagation();
     let username = this.refs.username.input.value;
     let password = this.refs.password.input.value;
     this.props.userDoLogin({username, password});
@@ -37,27 +48,32 @@ export default class LoginPopup extends Component {
 
   getFormActions(){
     const actions = [
-      <FlatButton
-        label="Cancel"
-        secondary={true}
-        onTouchTap={this.handleClose}
-      />,
-      <FlatButton
-        label="Login"
-        primary={true}
-        onTouchTap={this.clickLogin}
-      />,
+      <div><Divider style={{marginBottom:'10px'}}/></div>,
+      <div>
+        <RaisedButton
+          label="Cancel"
+          secondary={true}
+          onTouchTap={this.handleClose}
+        />
+        <RaisedButton
+          label="Login"
+          style={{margin:'0 10px'}}
+          primary={true}
+          onTouchTap={this.clickLogin}
+        />
+      </div>
     ];
     return actions;
   }
 
   renderLoginForm(){
     return(
-      <div style={{margin: '0 25px 25px 25px'}}>
-        <TextField hintText="Enter user name or mail" floatingLabelText="User name" ref="username" />
+      <form style={{margin: '0 25px 25px 25px'}} onSubmit={this.clickLogin}>
+        <TextField autoFocus hintText="Enter user" floatingLabelText="User name" ref="username" />
         <br />
         <TextField hintText="Password" floatingLabelText="Password" type="password" ref="password" />
-      </div>
+        <input type="submit" style={{visibility: 'hidden'}}/>
+      </form>
     );
   }
 
@@ -71,7 +87,6 @@ export default class LoginPopup extends Component {
         onRequestClose={this.handleClose}
       >
         {this.renderLoginForm()}
-        <Divider />
       </Dialog>
     );
   }
