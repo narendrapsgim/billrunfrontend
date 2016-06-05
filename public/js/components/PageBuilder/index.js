@@ -189,24 +189,37 @@ class PageBuilder extends Component {
   }
 
   getCombineValue(items, item, path, field){
+    //If this value already was changed, return new value
     if(_.has({item}, path)){
-      return _.result({item}, path)
+      return _.result({item}, path);
     }
-    let value = _.reduce(items, function(prevValue, item, key) {
+    //return combined value from all items
+    let value = _.reduce(items, (prevValue, item, key) => {
       let value = _.result({item}, path);
 
+      //first cicle retun value as is
       if(key === 0){
         return value;
-      } else if(typeof field.type !== 'undefined' && field.type === "array"){
-        return _.isEqual(prevValue, value) ? value : ['mixed'];
-      } else if (_.isObject(value) || Array.isArray(value) && _.isObject(value[0])){
-        return value;
-      } else if(prevValue === 'mixed'){
+      }
+      //alre mixed
+      else if(prevValue === 'mixed'){
         return 'mixed';
-      } else if(_.isEqual(prevValue, value)){
+      }
+      //array
+      else if(typeof field.type !== 'undefined' && field.type === "array"){
+        return _.isEqual(prevValue, value) ? value : 'mixed';
+      }
+      //date
+      else if(typeof field.type !== 'undefined' && field.type === "date"){
+        return _.isEqual(prevValue.sec, value.sec) ? value : 'mixed';
+      }
+      //other objet or array of objects
+      else if (_.isObject(value) || Array.isArray(value) && _.isObject(value[0])){
+        //console.log("Object or Array of objects : ", path, value, "Field type : ", field.type);
         return value;
-      } else {
-        return 'mixed';
+      }
+      else {
+        return _.isEqual(prevValue, value) ? value : 'mixed';
       }
     }, null);
 
@@ -223,7 +236,7 @@ class PageBuilder extends Component {
     }
     if (path.endsWith(".*") && field.fields) {
       let recpath = path.replace('.*', '');
-      let res = _.result(this.props, recpath);
+      let res =  !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, recpath, field) : _.result(this.props, recpath);
       if (!res){
         return null;
       };

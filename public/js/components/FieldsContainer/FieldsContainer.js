@@ -8,7 +8,7 @@ import { updateFieldValue, newField, removeField } from '../../actions';
 
 const style = {
   card : {
-    margin: "10px auto 10px 15px"
+    margin: "20px 0"
   }
 }
 

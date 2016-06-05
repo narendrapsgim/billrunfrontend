@@ -47,8 +47,8 @@ class Field extends Component {
 
     let errorText = '';
     let errorStyle = {};
-    if(value == 'mixed' || (_.isArray(value) && _.head(value) == 'mixed' )){
-      value = _.isArray(value) ? [] : "";
+    if(value == 'mixed') {
+      value = null;
       errorText = 'This field contain mixed data';
       errorStyle = { color: Colors.orange500 };
     }
@@ -96,9 +96,9 @@ class Field extends Component {
     } else if (type === "date") {
       let datePicker = null;
       if (value && value.sec) {
-        datePicker = <DatePicker floatingLabelText={label} autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} defaultDate={new Date(value.sec*1000)} formatDate={this.formatDate} disabled={disabled} />
+        datePicker = <DatePicker errorText={errorText} errorStyle={errorStyle} floatingLabelText={label} autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} defaultDate={new Date(value.sec*1000)} formatDate={this.formatDate} disabled={disabled} />
       } else {
-        datePicker = <DatePicker floatingLabelText={label} autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} formatDate={this.formatDate} disabled={disabled} />
+        datePicker = <DatePicker errorText={errorText} errorStyle={errorStyle} floatingLabelText={label} autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} formatDate={this.formatDate} disabled={disabled} />
       }
       return (
         <div>
@@ -139,6 +139,7 @@ class Field extends Component {
 
     let multiLine = type === "textarea" ? true : false;
     let rows = multiLine ? 2 : 1;
+    value = (typeof value === undefined || value === null) ? '' : value;
     return (
       <div>
         <TextField value={value}

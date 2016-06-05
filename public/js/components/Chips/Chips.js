@@ -51,7 +51,7 @@ export default class Chips extends Component {
     this.onKeyPress = this.onKeyPress.bind(this);
 
     this.state = {
-      items: this.props.items,
+      items: this.props.items || [],
       inputValue: '',
       inFocus: false
     };
