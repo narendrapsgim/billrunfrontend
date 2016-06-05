@@ -37,7 +37,7 @@ export default class Aggregate extends React.Component {
   handleClosePopup() {
     this.setState({popupOpen: false});
   }
-  
+
   onAggregate(event) {
     let callback = this.onDataChange;
     let url = `${globalSetting.serverUrl}/api/queryaggregate`;
@@ -75,17 +75,20 @@ export default class Aggregate extends React.Component {
   render() {
     return (
       <div>
-        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged}>
+        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged} style={{ margin : '10px' }} >
           { this.groupBy.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged}>
+        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged} style={{ margin : '10px' }} >
           { this.fields.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged}>
+        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged} style={{ margin : '10px' }}>
           { this.methods.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <RaisedButton label="Aggregate"  onClick={this.onAggregate} />
-        <RaisedButton label="Clear" onClick={this.props.onClear} />
+        <div style={{ margin : '10px' , display: 'inline-block' }} >
+          <RaisedButton label="Aggregate"  onClick={this.onAggregate} />
+          <RaisedButton label="Clear" onClick={this.props.onClear} />
+        </div>
+
         <Dialog
             actions={<FlatButton
                       label="Ok"
@@ -97,7 +100,7 @@ export default class Aggregate extends React.Component {
             onRequestClose={this.handleClosePopup}
         >
           <div>{this.state.popupMessage}</div>
-        </Dialog>        
+        </Dialog>
       </div>
     );
   }
