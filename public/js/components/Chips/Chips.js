@@ -34,9 +34,7 @@ const styles = {
     color: theme.palette.primary1Color,
     margin: '0px',
   },
-  input: {
-    marginLeft: '5px',
-  }
+  input: {}
 }
 
 export default class Chips extends Component {

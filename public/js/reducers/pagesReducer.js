@@ -38,7 +38,7 @@ export default function (state = {}, action) {
     return Object.assign(
       {},
       state,
-      {page: Object.assign({}, {item: item} )}
+      {page: Object.assign({}, state.page, {item: item} )}
     );
   case actions.REMOVE_FIELD:
     item = _.cloneDeep(state.page.item);

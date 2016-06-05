@@ -24,7 +24,7 @@ export default class FieldsContainer extends Component {
   handleExpandChange(expanded) {
     this.setState({expanded: expanded});
   };
-  
+
   crudActionButtons() {
     let { crud, path } = this.props;
     let onClickNew = (path) => {
@@ -34,7 +34,11 @@ export default class FieldsContainer extends Component {
       let new_path = path;
       if (type === "object") {
         let p = prompt("Please insert name");
-        new_path += `.${p}`;
+        if (p != null && p.length > 0) {
+          new_path += `.${p}`;
+        } else {
+          return;
+        }
       }
       this.props.dispatch(newField(new_path, type, this.props.pageName));
     };
