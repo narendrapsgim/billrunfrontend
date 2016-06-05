@@ -14,11 +14,11 @@ export default function (state = {}, action) {
   case actions.UPDATE_FIELD_VALUE:
     item = _.cloneDeep(state.page.item);
     path = action.path.replace('item.', '');
-    _.set(item, path, action.field_value);
+    _.setWith(item, path, action.field_value);
     return Object.assign(
       {},
       state,
-      {page: Object.assign({}, {item: item} )}
+      {page: Object.assign({}, state.page, {item: item} )}
     );
   case actions.NEW_FIELD:
     item = _.cloneDeep(state.page.item);
@@ -52,6 +52,11 @@ export default function (state = {}, action) {
     return Object.assign({},
       state,
       {page: Object.assign({}, {item: action.item} )}
+   );
+  case actions.GOT_ITEMS:
+    return Object.assign({},
+      state,
+      {page: Object.assign({}, {items: action.items}, {item:{}} )}
    );
   case actions.SAVE_ITEM_ERROR:
     return Object.assign({},

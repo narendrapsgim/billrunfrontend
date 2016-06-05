@@ -8,7 +8,9 @@ import PlansView from './plansView';
 import ImportExportHtml from './importExportView';
 import PlanSetupView from './planSetupView';
 import DashboardViewHtml from './dashboardView';
-
+import UsersView from './usersView';
+import ConfigurationView from './configurationView';
+import OperationsView from './operationsView';
 
 const View = {
   pages: {
@@ -94,6 +96,28 @@ const View = {
       view_type: "html",
       html : ImportExportHtml
     },
+    configuration: {
+      permission: ["admin"],
+      menu_title: "Config",
+      view_type: "html",
+      html: ConfigurationView
+    },
+    users: {
+      permission: ["admin"],
+      menu_title: "Users",
+      route: "users/users/list",
+      views: {
+        list: UsersView.users_list_view,
+        edit: UsersView.users_edit_view,
+        new: UsersView.users_new_view
+      }
+    },
+    operations: {
+      permission: ["admin"],
+      menu_title: "Operations",
+      view_type: "html",
+      html: OperationsView
+    }
     // plan_setup: {
     //   permission : ["guest","read"],
     //   title: "Plan Setup",
