@@ -39,7 +39,9 @@ const View = {
       route: "rates_vat/rates/list",
       views: {
         list: VatsView.rates_vat_list_view,
-        edit: VatsView.rates_vat_edit_view
+        edit: VatsView.rates_vat_edit_view,
+        close_and_new: VatsView.rates_vat_close_and_new_view,
+        clone: VatsView.rates_vat_duplicate_view
       }
     },
     rates_product: {
@@ -57,7 +59,9 @@ const View = {
       route: "rates_discount/rates/list",
       views: {
         list: DiscountsView.rates_discount_list_view,
-        edit: DiscountsView.rates_discount_edit_view
+        edit: DiscountsView.rates_discount_edit_view,
+        close_and_new: DiscountsView.rates_discount_close_and_new_view,
+        clone: DiscountsView.rates_discount_clone_view
       }
     },
     rates_charge: {

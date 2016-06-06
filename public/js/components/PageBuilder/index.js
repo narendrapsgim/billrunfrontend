@@ -234,7 +234,7 @@ class PageBuilder extends Component {
     ) {
       return null;
     }
-    if (path.endsWith(".*") && field.fields) {
+    if (path.endsWith(".*")) {
       let recpath = path.replace('.*', '');
       let res =  !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, recpath, field) : _.result(this.props, recpath);
       if (!res){
