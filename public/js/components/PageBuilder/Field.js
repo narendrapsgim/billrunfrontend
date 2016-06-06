@@ -54,8 +54,9 @@ class Field extends Component {
     }
 
 
-    let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
-	  type = (typeof value),
+//    let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
+    let { label = "",
+          type = (typeof value),
           dbkey,
           multiselect = false,
           mandatory = false,

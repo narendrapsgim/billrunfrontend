@@ -46,6 +46,7 @@ const plans_edit_view = {
         { dbkey: "technical_name", label: "Technical label", size: 10 },
         { dbkey: "name", label: "Name", size: 10, mandatory: true },
         { dbkey: "key", label: "Key", size: 10 },
+        { dbkey: "provisioning", label: "Provisioning", type: "array" },
         { dbkey: "price", label: "Price", size: 10 , type: "number" },
         { dbkey: "display_order", label: "Display Order", size: 10 },
         { dbkey: "invoice_type", label: "Invoice Type", size: 10 },
@@ -57,7 +58,34 @@ const plans_edit_view = {
               fields:
               [
                 { dbkey: "name", label: "Name", type: "text" },
+                { dbkey: "tech_name", label: "Technical Name", type: "text" },
+                { dbkey: "parameters", label: "Parameters", type: "array" },
+                { dbkey: "vti_name", label: "VTI Name", type: "text" },
+                { dbkey: "excludes", type: "array" },
+                { dbkey: "depends", type: "array" },
                 { dbkey: "price", label: "Price", type: "number" },
+                { dbkey: "invoice_type", label: "Invoice type", type: "text" },
+                { dbkey: "grouping", label: "Grouping" },
+                { dbkey: "included", label: "Included", type: "number" },
+                { dbkey: "display_in", label: "Display In", fields: [
+                  { dbkey: "all", label: "All", type: "array" }
+                ]},
+                { dbkey: "erp_account", label: "ERP Account" },
+                { dbkey: "limited_access", label: "Limited Access", type: "number" },
+                { dbkey: "display_order", label: "Display Order", type: "number" },
+                { dbkey: "vat_type", label: "VAT Type" },
+                { dbkey: "properties", label: "Properties", fields: [
+                  { dbkey: "volume", label: "Volume", type: "number" }
+                ]},
+                { dbkey: "invoice_label", label: "Invoice Label" },
+                { dbkey: "provisioning", label: "Provisioning", fields: [
+                  { dbkey: "POM_TAG", label: "POM Tag", type: "array" },
+                  { dbkey: "OBJECT_NAME", label: "Object Name", type: "array" },
+                  { dbkey: "ACTIONS", label: "Actions", type: "array" },
+                  { dbkey: "PARAMETERS", label: "Parameters", type: "array" },
+                  { dbkey: "GROUPING", label: "Grouping", type: "array" }
+                ]},
+                { dbkey: "type", label: "Type" }
               ]
             }
           ]
@@ -67,13 +95,61 @@ const plans_edit_view = {
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:
               [
-                { dbkey: "name", label: "Name", type: "text"},
-                { dbkey: "display_order", label: "Display Order", type: "number"},
+                { dbkey: "name", label: "Name", type: "text" },
+                { dbkey: "tech_name", label: "Technical Name", type: "text" },
+                { dbkey: "parameters", label: "Parameters", type: "array" },
+                { dbkey: "vti_name", label: "VTI Name", type: "text" },
+                { dbkey: "excludes", type: "array" },
+                { dbkey: "depends", type: "array" },
+                { dbkey: "price", label: "Price", type: "number" },
+                { dbkey: "invoice_type", label: "Invoice type", type: "text" },
+                { dbkey: "grouping", label: "Grouping" },
+                { dbkey: "included", label: "Included", type: "number" },
+                { dbkey: "display_in", label: "Display In", fields: [
+                  { dbkey: "all", label: "All", type: "array" }
+                ]},
+                { dbkey: "erp_account", label: "ERP Account" },
+                { dbkey: "limited_access", label: "Limited Access", type: "number" },
+                { dbkey: "display_order", label: "Display Order", type: "number" },
+                { dbkey: "vat_type", label: "VAT Type" },
+                { dbkey: "properties", label: "Properties", fields: [
+                  { dbkey: "volume", label: "Volume", type: "number" }
+                ]},
+                { dbkey: "invoice_label", label: "Invoice Label" },
+                { dbkey: "provisioning", label: "Provisioning", fields: [
+                  { dbkey: "POM_TAG", label: "POM Tag", type: "array" },
+                  { dbkey: "OBJECT_NAME", label: "Object Name", type: "array" },
+                  { dbkey: "ACTIONS", label: "Actions", type: "array" },
+                  { dbkey: "PARAMETERS", label: "Parameters", type: "array" },
+                  { dbkey: "GROUPING", label: "Grouping", type: "array" }
+                ]},
+                { dbkey: "type", label: "Type" }
               ]
             }
           ]
         },
+        { dbkey: "commitment", label: "Commitment", collapsible: true, collapsed: true, fields: [
+          { dbkey: "price", label: "Price" },
+          { dbkey: "duration", label: "Duration" },
+          { dbkey: "interval", label: "Interval" }
+        ]},
+        { dbkey: "erp_account", label: "ERP Account" },
+        { dbkey: "grouping", label: "Grouping" },
+        { dbkey: "vat_type", label: "VAT Type" },
         { dbkey: "forceCommitment", label: "Force Commitment", size: 10 , type: "checkbox"},
+        { dbkey: "invoice_label", label: "Invoice Label" },
+        { dbkey: "invoice_type", label: "Invoice Type" },
+        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true ,fields:
+          [
+            { dbkey: "destination", label:" ", collapsible: false, size : 11,
+              fields:
+              [
+                { dbkey: "region", label: "Region", type: "text"},
+                { dbkey: "prefix", label: "Prefix", type: "array"},
+              ]
+            }
+          ]
+        }
       ]
     }
   ]
