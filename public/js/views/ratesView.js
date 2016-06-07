@@ -89,6 +89,8 @@ const rates_edit_view = {
         { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true ,fields:
           [
             { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
+            { dbkey: "source_networks", label : 'Source Networks', type: 'array'},
+            { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
             { dbkey: "source_types", label : 'Source Types', type: 'array'},
             { dbkey: "destination", label:" ", collapsible: false, size : 11,
               fields:
@@ -104,14 +106,52 @@ const rates_edit_view = {
   ]
 };
 
-const rates_edit_multiple_view = Object.assign({}, rates_edit_view, {title: "Edit Rates"});
+const rates_edit_multiple_view = {
+  title: "Edit Rates",
+  view_type: "sections",
+  sections: [
+    {
+      // title: "Test",
+      display: "inline",
+      fields:
+      [
+        { dbkey: "type", label: "Type", size: 10 },
+        { dbkey: "country", label: "Country", type:'array' },
+        { dbkey: "alpha3", label: "Alpha3", type:'array' },
+        { dbkey: "zone", label: "zone"},
+        { dbkey: "zone_grouping", label: "Zone Grouping" },
+        { dbkey: "from", label: "From", type:'date'},
+        { dbkey: "to", label: "To", type:'date'},
+        { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields:
+          [
+            { dbkey: "*", collapsible: true, collapsed: true,
+              fields:
+              [
+                { dbkey: "access", label: "Access", type: "text"},
+                { dbkey: "currency", label: "Currency", type: "text"},
+                { dbkey: "unit", label: "Unit", type: "text"},
+                { dbkey: "erp_account", label: "ERP Account", type: "text"},
+              ]
+            }
+          ]
+        },
+        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true ,fields:
+          [
+            { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
+            { dbkey: "source_networks", label : 'Source Networks', type: 'array'},
+            { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
+            { dbkey: "source_types", label : 'Source Types', type: 'array'},
+          ]
+        },
+      ]
+    }
+  ]};
 
 const rates_new_view = Object.assign({}, rates_edit_view, {title: "New Rate"});
 
 const rates_clone_view = Object.assign({}, rates_edit_view, {title: "Clone Rate"});
 
 const rates_close_and_new_view = Object.assign({}, rates_edit_view, {title: "Close and Create New Rate"});
-
 
 const RatesView = {
   rates_edit_view,
@@ -120,5 +160,6 @@ const RatesView = {
   rates_new_view,
   rates_clone_view,
   rates_close_and_new_view
-}
+};
+
 export default RatesView;
