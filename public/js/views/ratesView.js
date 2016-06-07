@@ -66,7 +66,7 @@ const rates_edit_view = {
         { dbkey: "zone_grouping", label: "Zone Grouping" },
         { dbkey: "from", label: "From", type:'date'},
         { dbkey: "to", label: "To", type:'date'},
-        { dbkey: "rates", crud: '1110', label: "Types", collapsible: true, collapsed: false ,  fields:
+        { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields:
           [
             { dbkey: "*", collapsible: true, collapsed: true,
               fields:

@@ -34,9 +34,7 @@ const styles = {
     color: theme.palette.primary1Color,
     margin: '0px',
   },
-  input: {
-    marginLeft: '5px',
-  }
+  input: {}
 }
 
 export default class Chips extends Component {
@@ -52,8 +50,13 @@ export default class Chips extends Component {
     this.onInputBlur = this.onInputBlur.bind(this);
     this.onKeyPress = this.onKeyPress.bind(this);
 
+    let items = this.props.items || [];
+    if (!_.isEmpty(this.props.items) && !_.isArray(this.props.items)){
+        items = [this.props.items]
+    }
+
     this.state = {
-      items: (_.isArray(this.props.items) ? this.props.items : [this.props.items]),
+      items: items,
       inputValue: '',
       inFocus: false
     };
