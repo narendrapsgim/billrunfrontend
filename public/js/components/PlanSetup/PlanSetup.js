@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+
+import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties } from '../../actions';
 
 import {
   Step,
@@ -7,7 +10,6 @@ import {
 } from 'material-ui/Stepper';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
-
 import TextField   from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import AutoComplete from 'material-ui/AutoComplete';
@@ -16,8 +18,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import { Card, CardHeader, CardText } from 'material-ui/Card';
-
-import BasicPlanSettings from '../BasicPlanSettings';
+import DatePicker from 'material-ui/DatePicker';
 
 class PlanSetup extends Component {
   constructor(props) {
@@ -28,13 +29,7 @@ class PlanSetup extends Component {
 
     this.state = {
       stepIndex: 0,
-      finished: 0,
-      product_properties: [{
-        ProductType:'',
-        FlatRate:'',
-        PerUnit:'',
-        Type:''
-      }]
+      finished: 0
     };
 
     this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
@@ -42,33 +37,34 @@ class PlanSetup extends Component {
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
   }
 
-  onChangeFieldValue(e, idx, value) {
-    let { id } = e.target;
-    this.setState({[id]: value});
+  onChangeFieldValue(section, e, value) {
+    let id = e.target.id;
+    this.props.dispatch(updatePlanField(section, id, value));
+  }
+  
+  onChangeSelectFieldValue(section, id, e, sidx, value) {
+    this.props.dispatch(updatePlanField(section, id, value));
   }
 
+  onChangeDateFieldValue(section, id, e, value) {
+    this.props.dispatch(updatePlanField(section, id, value));
+  }
+  
   /** ITEM **/
   onChangeItemFieldValue(id, idx, e, val) {
-    let p = this.state.product_properties;
-    p[idx][id] = val;
-    this.setState({product_properties: p});
+    this.props.dispatch(updateProductPropertiesField(id, idx, val));
+  }
+
+  onChangeItemSelectFieldValue(id, idx, e, sidx, val) {
+    this.props.dispatch(updateProductPropertiesField(id, idx, val));
   }
 
   onAddProductProperties() {
-    let p = this.state.product_properties;
-    p.push({
-      ProductType:0,
-      FlatRate:'',
-      PerUnit:'',
-      Type:''      
-    })
-    this.setState({product_properties: p});
+    this.props.dispatch(addProductProperties());
   }
 
   onRemoveProductProperties(idx) {
-    let p = this.state.product_properties;
-    p.splice(idx, 1);
-    this.setState({product_properties: p});
+    this.props.dispatch(removeProductProperties(idx));
   }
   /** **/
   
@@ -93,15 +89,137 @@ class PlanSetup extends Component {
   };
   
   render() {
-    let { stepIndex, product_properties } = this.state;
-
+    let { basic_settings, product_properties } = this.props;
+    let { stepIndex } = this.state;
 
     let product_type_options = ["Metered", "Tiered"].map((type, key) => {
-      return (<MenuItem value={key} primaryText={type} key={key} />)
+      return (<MenuItem value={type} primaryText={type} key={key} />)
+    });
+
+    let transaction_options = ["Every Month", "Every Week"].map((op, key) => {
+      return (<MenuItem value={op} primaryText={op} key={key} />);
+    });
+
+    let each_period_options = ["Month", "Day"].map((op, key) => {
+      return (<MenuItem value={op} primaryText={op} key={key} />);
     });
     
-    this.steps = [
-      (<BasicPlanSettings onChange={this.onChangeFieldValue} />),
+    const steps = [
+      (<div className="BasicPlanSettings">
+        <div className="BasicSettings">
+          <h4>Basic Settings</h4>
+          <div className="row">
+            <div className="col-xs-6">
+              <div className="box">
+                <TextField id="PlanName"
+                           value={basic_settings.PlanName}
+                           onChange={this.onChangeFieldValue.bind(this, "basic_settings")}
+                           floatingLabelText="Plan Name"
+                />
+              </div>
+            </div>
+            <div className="col-xs-4" >
+              <div className="box">
+                <TextField id="PlanCode"
+                           value={basic_settings.PlanCode}
+                           onChange={this.onChangeFieldValue.bind(this, "basic_settings")}
+                           floatingLabelText="Plan Code"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-xs-12">
+              <div className="box">
+                <TextField id="PlanDescription"
+                           value={basic_settings.PlanDescription}
+                           onChange={this.onChangeFieldValue.bind(this, "basic_settings")}
+                           floatingLabelText="Plan Description"
+                           multiLine={true}
+                           rows={3}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="Trial">
+          <h4>Trial</h4>
+          <div className="row">
+            <div className="box">
+              <SelectField
+                  value={basic_settings.TrialTransaction}
+                  id="TrialTransaction"
+                  floatingLabelText="*Transaction"
+                  onChange={this.onChangeSelectFieldValue.bind(this, "basic_settings", "TrialTransaction")}>
+                { transaction_options }
+              </SelectField>
+            </div>
+          </div>
+        </div>
+        <div className="PlanRecurring">
+          <h4>Plan Recurring</h4>
+          <div className="row">
+            <div className="col-xs-3">
+              <div className="box">
+                <TextField id="PeriodicalRate"
+                           value={basic_settings.PeriodicalRate}
+                           onChange={this.onChangeFieldValue.bind(this, "basic_settings")}
+                           floatingLabelText="Periodical Rate"
+                />
+              </div>
+            </div>
+            <div className="col-xs-3">
+              <div className="box">
+                <TextField id="Each"
+                           value={basic_settings.Each}
+                           onChange={this.onChangeFieldValue.bind(this, "basic_settings")}
+                           floatingLabelText="Each"
+                           type="number"
+                />
+              </div>
+            </div>
+            <div className="col-xs-3">
+              <div className="box">
+                <SelectField id="EachPeriod"
+                             value={basic_settings.EachPeriod}
+                             onChange={this.onChangeSelectFieldValue.bind(this, "basic_settings", "EachPeriod")}
+                >
+                  { each_period_options }
+                </SelectField>
+              </div>
+            </div>
+            <div className="col-xs-3">
+              <div className="box">
+                <TextField id="Cycle"
+                           value={basic_settings.Cycle}
+                           onChange={this.onChangeFieldValue.bind(this, "basic_settings")}
+                           floatingLabelText="Cycle"
+                           type="number"
+                />
+              </div>
+            </div>
+            <div className="col-xs-3">
+              <div className="box">
+                <DatePicker id="From"
+                            hintText="From"
+                            value={basic_settings.From}
+                            onChange={this.onChangeDateFieldValue.bind(this, "basic_settings", "From")}
+                />
+              </div>
+            </div>
+            <div className="col-xs-3">
+              <div className="box">
+                <DatePicker id="To"
+                            hintText="To"
+                            value={basic_settings.To}
+                            onChange={this.onChangeDateFieldValue.bind(this, "basic_settings", "To")}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>),
+      
       (<div className="AddItem">
         <h4>Add Item</h4>
         <div className="row">
@@ -110,7 +228,7 @@ class PlanSetup extends Component {
             </div>
           </div>
         </div>
-        { this.state.product_properties.map((prop, key) => {
+        { product_properties.map((prop, key) => {
             return (
               <div className="row" key={key}>
                 <div className="col-xs-2">
@@ -119,7 +237,7 @@ class PlanSetup extends Component {
                         id="ProductType"
                         floatingLabelText="Product Type"
                         style={{width: "150px"}}
-                        onChange={this.onChangeItemFieldValue.bind(this, "ProductType", key)}
+                        onChange={this.onChangeItemSelectFieldValue.bind(this, "ProductType", key)}
                         value={prop["ProductType"]}
                     >
                       {product_type_options}
@@ -181,10 +299,11 @@ class PlanSetup extends Component {
               </div>
       </div>
       ),
+      
       (<div><h4>Add Discounts</h4></div>)
     ];    
 
-    let currentStepContents = this.steps[stepIndex];
+    let currentStepContents = steps[stepIndex];
 
     return (
       <div className="PlanSetup">
@@ -222,4 +341,8 @@ class PlanSetup extends Component {
   }
 }
 
-export default PlanSetup;
+function mapStateToProps(state, props) {
+  return state.plan || {};
+}  
+
+export default connect(mapStateToProps)(PlanSetup);

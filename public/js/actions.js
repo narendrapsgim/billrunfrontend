@@ -15,6 +15,10 @@ export const SHOW_PROGRESS_BAR = 'SHOW_PROGRESS_BAR';
 export const HIDE_PROGRESS_BAR = 'HIDE_PROGRESS_BAR';
 export const SHOW_STATUS_MESSAGE = 'SHOW_STATUS_MESSAGE';
 export const HIDE_STATUS_MESSAGE = 'HIDE_STATUS_MESSAGE';
+export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
+export const UPDATE_PRODUCT_PROPERTIES_VALUE = 'UPDATE_PRODUCT_PROPERTIES_VALUE';
+export const ADD_PRODUCT_PROPERTIES = 'ADD_PRODUCT_PROPERTIES';
+export const REMOVE_PRODUCT_PROPERTIES = 'REMOVE_PRODUCT_PROPERTIES';
 
 import axios from 'axios';
 
@@ -231,5 +235,36 @@ export function userDoLogout(){
         dispatch({type: LOGOUT});
       }
     );
+  }
+}
+
+export function updatePlanField(section, field_name, field_value) {
+  return {
+    type: UPDATE_PLAN_FIELD_VALUE,
+    section,
+    field_name,
+    field_value
+  };
+}
+
+export function updateProductPropertiesField(field_name, field_idx, field_value) {
+  return {
+    type: UPDATE_PRODUCT_PROPERTIES_VALUE,
+    field_name,
+    field_idx,
+    field_value
+  }
+}
+
+export function addProductProperties() {
+  return {
+    type: ADD_PRODUCT_PROPERTIES    
+  }
+}
+
+export function removeProductProperties(idx) {
+  return {
+    type: REMOVE_PRODUCT_PROPERTIES,
+    idx
   }
 }
