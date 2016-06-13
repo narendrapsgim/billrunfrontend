@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties } from '../../actions';
+import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan } from '../../actions';
 
 import {
   Step,
@@ -37,6 +37,13 @@ class PlanSetup extends Component {
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
   }
 
+  componentWillMount() {
+    let { plan_id } = this.props.params;
+    if (plan_id) {
+      this.props.dispatch(getPlan(plan_id));
+    }
+  }
+  
   onChangeFieldValue(section, e, value) {
     let id = e.target.id;
     this.props.dispatch(updatePlanField(section, id, value));

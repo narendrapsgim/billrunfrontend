@@ -45,26 +45,50 @@ export default function (state = {}, action) {
                                  .slice(0, action.idx)
                                  .concat(state.product_properties.slice(action.idx + 1))
       });
-  default:
-    return {
-      basic_settings: {
-        PlanName: '',
-        PlanCode: '',
-        PlanDescription: '',
-        TrialTransaction: '',
-        PeriodicalRate: '',
-        Each: '',
-        EachPeriod: "Month",
-        Cycle: '',
-        From: '',
-        To: ''
-      },
-      product_properties: [{
-        ProductType:'',
-        FlatRate:'',
-        PerUnit:'',
-        Type:''
-      }]
-    };
+    case actions.GET_PLAN:
+      return {
+        basic_settings: {
+          PlanName: 'Test',
+          PlanCode: '123',
+          PlanDescription: 'A plan description',
+          TrialTransaction: '',
+          PeriodicalRate: '',
+          Each: '',
+          EachPeriod: "Month",
+          Cycle: '',
+          From: '',
+          To: ''
+        },
+        product_properties: [{
+          ProductType:'',
+          FlatRate:'',
+          PerUnit:'',
+          Type:''
+        }]
+      };        
+    default:
+      if (!_.isEmpty(state)) {
+        return state;
+      }
+      return {
+        basic_settings: {
+          PlanName: '',
+          PlanCode: '',
+          PlanDescription: '',
+          TrialTransaction: '',
+          PeriodicalRate: '',
+          Each: '',
+          EachPeriod: "Month",
+          Cycle: '',
+          From: '',
+          To: ''
+        },
+        product_properties: [{
+          ProductType:'',
+          FlatRate:'',
+          PerUnit:'',
+          Type:''
+        }]
+      };
   }
 }

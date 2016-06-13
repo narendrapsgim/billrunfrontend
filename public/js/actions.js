@@ -19,6 +19,7 @@ export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
 export const UPDATE_PRODUCT_PROPERTIES_VALUE = 'UPDATE_PRODUCT_PROPERTIES_VALUE';
 export const ADD_PRODUCT_PROPERTIES = 'ADD_PRODUCT_PROPERTIES';
 export const REMOVE_PRODUCT_PROPERTIES = 'REMOVE_PRODUCT_PROPERTIES';
+export const GET_PLAN = 'GET_PLAN';
 
 import axios from 'axios';
 
@@ -266,5 +267,12 @@ export function removeProductProperties(idx) {
   return {
     type: REMOVE_PRODUCT_PROPERTIES,
     idx
+  }
+}
+
+export function getPlan(plan_id) {
+  return {
+    type: GET_PLAN,
+    plan_id
   }
 }
