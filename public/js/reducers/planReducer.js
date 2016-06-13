@@ -17,7 +17,8 @@ export default function (state = {}, action) {
         [action.field_name]: action.field_value
       })
     });
-  case actions.UPDATE_PRODUCT_PROPERTIES_VALUE:
+
+    case actions.UPDATE_PRODUCT_PROPERTIES_VALUE:
     let { field_idx, field_name, field_value } = action;
     let s = state.product_properties.map((prop, idx) => {
       if (idx !== field_idx) return prop;
@@ -29,6 +30,7 @@ export default function (state = {}, action) {
     return Object.assign({}, state, {
       product_properties: s
     });
+
     case actions.ADD_PRODUCT_PROPERTIES:
       let new_props = {
         ProductType:0,
@@ -39,12 +41,14 @@ export default function (state = {}, action) {
       return Object.assign({}, state, {
         product_properties: [...state.product_properties, new_props]
       });
+
     case actions.REMOVE_PRODUCT_PROPERTIES:
       return Object.assign({}, state, {
         product_properties: state.product_properties
                                  .slice(0, action.idx)
                                  .concat(state.product_properties.slice(action.idx + 1))
       });
+
     case actions.GET_PLAN:
       return {
         basic_settings: {
@@ -65,7 +69,29 @@ export default function (state = {}, action) {
           PerUnit:'',
           Type:''
         }]
-      };        
+      };
+
+    case actions.CLEAR_PLAN:
+      return {
+        basic_settings: {
+          PlanName: '',
+          PlanCode: '',
+          PlanDescription: '',
+          TrialTransaction: '',
+          PeriodicalRate: '',
+          Each: '',
+          EachPeriod: "Month",
+          Cycle: '',
+          From: '',
+          To: ''
+        },
+        product_properties: [{
+          ProductType:'',
+          FlatRate:'',
+          PerUnit:'',
+          Type:''
+        }]
+      };
     default:
       if (!_.isEmpty(state)) {
         return state;

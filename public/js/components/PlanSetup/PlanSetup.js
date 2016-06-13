@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan } from '../../actions';
+import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan, clearPlan } from '../../actions';
 
 import {
   Step,
@@ -43,6 +43,10 @@ class PlanSetup extends Component {
       this.props.dispatch(getPlan(plan_id));
     }
   }
+
+  componentWillUnmount() {
+    this.props.dispatch(clearPlan());
+  }
   
   onChangeFieldValue(section, e, value) {
     let id = e.target.id;
@@ -57,7 +61,7 @@ class PlanSetup extends Component {
     this.props.dispatch(updatePlanField(section, id, value));
   }
   
-  /** ITEM **/
+  /** PRODUCT **/
   onChangeItemFieldValue(id, idx, e, val) {
     this.props.dispatch(updateProductPropertiesField(id, idx, val));
   }
@@ -330,7 +334,7 @@ class PlanSetup extends Component {
             { currentStepContents }
           </CardText>
         </Card>
-        <div style={{marginTop: 12}}>
+        <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
               label="Back"
               disabled={stepIndex === 0}
