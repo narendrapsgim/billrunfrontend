@@ -1,6 +1,29 @@
 import * as actions from '../actions';
 import _ from 'lodash';
 
+const defaultState = {
+  basic_settings: {
+    PlanName: '',
+    PlanCode: '',
+    PlanDescription: '',
+    TrialTransaction: '',
+    PlanFee: '',
+    Cycle: '',
+    PeriodicalRate: '',
+    Each: '',
+    EachPeriod: "Month",
+    Cycle: '',
+    From: '',
+    To: ''
+  },
+  product_properties: [{
+    ProductType:'',
+    FlatRate:'',
+    PerUnit:'',
+    Type:''
+  }]
+};
+
 export default function (state = {}, action) {
   switch (action.type) {
   case actions.UPDATE_PLAN_FIELD_VALUE:
@@ -56,6 +79,8 @@ export default function (state = {}, action) {
           PlanCode: '123',
           PlanDescription: 'A plan description',
           TrialTransaction: '',
+          PlanFee: '',
+          Cycle: '',
           PeriodicalRate: '',
           Each: '',
           EachPeriod: "Month",
@@ -72,26 +97,7 @@ export default function (state = {}, action) {
       };
 
     case actions.CLEAR_PLAN:
-      return {
-        basic_settings: {
-          PlanName: '',
-          PlanCode: '',
-          PlanDescription: '',
-          TrialTransaction: '',
-          PeriodicalRate: '',
-          Each: '',
-          EachPeriod: "Month",
-          Cycle: '',
-          From: '',
-          To: ''
-        },
-        product_properties: [{
-          ProductType:'',
-          FlatRate:'',
-          PerUnit:'',
-          Type:''
-        }]
-      };
+      return defaultState;
 
     case actions.GET_PRODUCT:
       return {
@@ -107,25 +113,6 @@ export default function (state = {}, action) {
       if (!_.isEmpty(state)) {
         return state;
       }
-      return {
-        basic_settings: {
-          PlanName: '',
-          PlanCode: '',
-          PlanDescription: '',
-          TrialTransaction: '',
-          PeriodicalRate: '',
-          Each: '',
-          EachPeriod: "Month",
-          Cycle: '',
-          From: '',
-          To: ''
-        },
-        product_properties: [{
-          ProductType:'',
-          FlatRate:'',
-          PerUnit:'',
-          Type:''
-        }]
-      };
+      return defaultState;
   }
 }
