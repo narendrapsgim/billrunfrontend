@@ -7,7 +7,7 @@ export default class PlansList extends Component {
   constructor(props) {
     super(props);
 
-    this.onClickRow = this.onClickRow.bind(this);
+    this.onClickCell = this.onClickCell.bind(this);
 
     this.state = {
       dataList: [
@@ -45,7 +45,7 @@ export default class PlansList extends Component {
     };
   }
 
-  onClickRow(cell_idx, col_idx, e) {
+  onClickCell(cell_idx, col_idx, e) {
     let selected = this.state.dataList[cell_idx];
     this.context.router.push(`plan_setup/${selected._id.$id}`);
   }
@@ -54,7 +54,7 @@ export default class PlansList extends Component {
     let {dataList} = this.state;
 
     return (
-      <Table onCellClick={this.onClickRow}>
+      <Table onCellClick={this.onClickCell}>
         <TableHeader>
           <TableRow>
             <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>

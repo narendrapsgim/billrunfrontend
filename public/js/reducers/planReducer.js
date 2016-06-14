@@ -92,6 +92,17 @@ export default function (state = {}, action) {
           Type:''
         }]
       };
+
+    case actions.GET_PRODUCT:
+      return {
+        product_properties: [{
+          ProductType:'Abc',
+          FlatRate:'123',
+          PerUnit:'1',
+          Type:'a'
+        }]
+      };
+
     default:
       if (!_.isEmpty(state)) {
         return state;
