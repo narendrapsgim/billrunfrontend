@@ -96,10 +96,10 @@ export default function (state = {}, action) {
     case actions.GET_PRODUCT:
       return {
         product_properties: [{
-          ProductType:'Abc',
+          ProductType:'Metered',
           FlatRate:'123',
           PerUnit:'1',
-          Type:'a'
+          Type:'Metered'
         }]
       };
 

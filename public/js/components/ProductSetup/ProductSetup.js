@@ -14,6 +14,7 @@ class ProductSetup extends Component {
   constructor(props) {
     super(props);
 
+    this.onAddProductProperties = this.onAddProductProperties.bind(this);
     this.state = {
     };
   }
