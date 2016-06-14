@@ -86,13 +86,19 @@ class Product extends Component {
                     />
                   </div>
                 </div>
-                <div className="col-xs-2">
-                  <div className="box">
-                    <FloatingActionButton mini={true} secondary={true} style={{margin: "20px"}} onMouseUp={onRemoveProductProperties.bind(this, key)}>
-                      <ContentRemove />
-                    </FloatingActionButton>              
-                  </div>
-                </div>
+                {(() => {  /* only show remove button if there is more than one interval */
+                   if (product_properties.length > 1) {
+                     return (
+                       <div className="col-xs-2">
+                         <div className="box">
+                           <FloatingActionButton mini={true} secondary={true} style={{margin: "20px"}} onMouseUp={onRemoveProductProperties.bind(this, key)}>
+                             <ContentRemove />
+                           </FloatingActionButton>              
+                         </div>
+                       </div>
+                     )
+                   }
+                 })()}
               </div>
             );
           }) }
