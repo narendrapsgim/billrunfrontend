@@ -89,9 +89,9 @@ class Plan extends Component {
             </div>
             <div className="col-xs-3">
               <div className="box">
-                <TextField id="Cycle"
+                <TextField id="TrialCycle"
                            type="number"
-                           value={basic_settings.Cycle}
+                           value={basic_settings.TrialCycle}
                            onChange={onChangeFieldValue.bind(this, "basic_settings")}
                            floatingLabelText="Cycle"
                 />
