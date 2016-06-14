@@ -100,6 +100,8 @@ class PlanSetup extends Component {
   };
   
   render() {
+    /** TODO: Abstract away all the rendering from this component, make it a 'smart' component so that rendering can be reused. */
+
     let { basic_settings, product_properties } = this.props;
     let { stepIndex } = this.state;
 

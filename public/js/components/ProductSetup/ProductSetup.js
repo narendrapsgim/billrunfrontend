@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { browserHistory } from 'react-router';
 
 import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, clearPlan } from '../../actions';
 
@@ -9,14 +10,16 @@ import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 
 class ProductSetup extends Component {
   constructor(props) {
     super(props);
 
     this.onAddProductProperties = this.onAddProductProperties.bind(this);
-    this.state = {
-    };
+    this.onSave = this.onSave.bind(this);
+    this.onCancel = this.onCancel.bind(this);
   }
 
   componentWillMount() {
@@ -45,6 +48,14 @@ class ProductSetup extends Component {
   onRemoveProductProperties(idx) {
     this.props.dispatch(removeProductProperties(idx));
   }  
+
+  onSave() {
+    console.log("on save");
+  }
+
+  onCancel() {
+    browserHistory.goBack();
+  }
 
   render() {
     let product_type_options = ["Metered", "Tiered"].map((type, key) => {
@@ -131,6 +142,18 @@ class ProductSetup extends Component {
                   <ContentAdd />
                 </FloatingActionButton>
               </div>
+            </div>
+            <div style={{marginTop: 12, float: "right"}}>
+              <FlatButton
+                  label="Cancel"
+                  onTouchTap={this.onCancel}
+                  style={{marginRight: 12}}
+              />
+              <RaisedButton
+                  label="Save" 
+                  primary={true}
+                  onTouchTap={this.onSave}
+              />
             </div>
     </div>
     );
