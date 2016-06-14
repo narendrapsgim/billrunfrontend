@@ -232,7 +232,7 @@ class PlanSetup extends Component {
       </div>),
       
       (<div className="AddItem">
-        <h4>Add Item</h4>
+        <h4>Add Product</h4>
         <div className="row">
           <div className="col-md-6">
             <div className="box">
@@ -323,7 +323,7 @@ class PlanSetup extends Component {
             <StepLabel>Plan Settings</StepLabel>
           </Step>
           <Step>
-            <StepLabel>Add Item</StepLabel>
+            <StepLabel>Add Product</StepLabel>
           </Step>
           <Step>
             <StepLabel>Add Discount or Coupon</StepLabel>
