@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan, clearPlan } from '../../actions';
+import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan, clearPlan, savePlan } from '../../actions';
 
 import {
   Step,
@@ -31,6 +31,7 @@ class PlanSetup extends Component {
     this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
     this.onAddProductProperties = this.onAddProductProperties.bind(this);
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
+    this.save = this.save.bind(this);
   }
 
   componentWillMount() {
@@ -74,11 +75,15 @@ class PlanSetup extends Component {
     this.props.dispatch(removeProductProperties(idx));
   }
   /** **/
+
+  save() {
+    this.props.dispatch(savePlan());
+  }
   
   handleNext() {
     const {stepIndex} = this.state;
     if (this.state.finished) {
-      console.log('save now');
+      this.save();
       return;
     }
     let finished = (stepIndex + 1) >= 2;

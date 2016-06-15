@@ -12,9 +12,9 @@ import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 import View from '../../views';
 
 let routes = [
-  {to: "/plans", label: "Plans"},
-  {to: "/plan_setup", label: "Plan Setup"},
-  {to: "/products", label: "Products"}
+  {to: "plans", label: "Plans"},
+  {to: "plan_setup", label: "Plan Setup"},
+  {to: "products", label: "Products"}
 ];
 
 export default class Navigator extends Component {

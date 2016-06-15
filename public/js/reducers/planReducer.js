@@ -109,6 +109,10 @@ export default function (state = {}, action) {
         }]
       };
 
+    case actions.SAVE_PLAN:
+      console.log('saving plan', state);
+      return state;
+      
     default:
       if (!_.isEmpty(state)) {
         return state;

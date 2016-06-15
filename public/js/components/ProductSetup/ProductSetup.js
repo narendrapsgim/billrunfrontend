@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, clearPlan } from '../../actions';
+import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, clearPlan, savePlan } from '../../actions';
 
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import Product from './Product';
 
 class ProductSetup extends Component {
@@ -43,7 +45,7 @@ class ProductSetup extends Component {
   }  
 
   onSave() {
-    console.log("on save");
+    this.props.dispatch(savePlan());
   }
 
   onCancel() {
@@ -51,7 +53,23 @@ class ProductSetup extends Component {
   }
 
   render() {
-    return (<Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />);
+    return (
+      <div className="ProductSetup">
+        <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />
+        <div style={{marginTop: 12, float: "right"}}>
+          <FlatButton
+              label="Cancel"
+              onTouchTap={this.onCancel}
+              style={{marginRight: 12}}
+          />
+          <RaisedButton
+              label='Save'
+              primary={true}
+              onTouchTap={this.onSave}
+          />
+        </div>
+      </div>
+    );
   }
 }
 

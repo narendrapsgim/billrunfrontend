@@ -31,6 +31,12 @@ class Product extends Component {
         <div className="row">
           <div className="col-md-6">
             <div className="box">
+              <TextField
+                  id="ProductName"
+                  floatingLabelText="Product Name"
+                  onChange={onChangeItemFieldValue.bind(this, "ProductName")}
+                  fullWidth={true}
+              />
             </div>
           </div>
         </div>

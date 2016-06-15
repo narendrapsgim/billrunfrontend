@@ -124,6 +124,7 @@ class Plan extends Component {
             <div className="col-xs-3">
               <div className="box">
                 <SelectField id="EachPeriod"
+                             style={{height: "72px"}}
                              value={basic_settings.EachPeriod}
                              onChange={onChangeSelectFieldValue.bind(this, "basic_settings", "EachPeriod")}
                 >
@@ -148,6 +149,7 @@ class Plan extends Component {
                 <DatePicker id="From"
                             hintText="From"
                             value={basic_settings.From}
+                            textFieldStyle={{height: "72px"}}
                             onChange={onChangeDateFieldValue.bind(this, "basic_settings", "From")}
                 />
               </div>
@@ -156,6 +158,7 @@ class Plan extends Component {
               <div className="box">
                 <DatePicker id="To"
                             hintText="To"
+                            textFieldStyle={{height: "72px"}}
                             value={basic_settings.To}
                             onChange={onChangeDateFieldValue.bind(this, "basic_settings", "To")}
                 />

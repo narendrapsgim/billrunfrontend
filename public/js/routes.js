@@ -13,10 +13,10 @@ export default () => {
   return (
     <Route path="/" component={App}>
       <IndexRedirect to="/dashboard" component={PageBuilder} />
-      <Route path="/plan_setup(/:plan_id)" component={PlanSetup} />
-      <Route path="/plans" component={PlansList} />
-      <Route path="/products" component={ProductsList} />
-      <Route path="/product_setup(/:product_id)" component={ProductSetup} />
+      <Route name="plan_setup" path="/plan_setup(/:plan_id)" component={PlanSetup} />
+      <Route name="plans" path="/plans" component={PlansList} />
+      <Route name="products" path="/products" component={ProductsList} />
+      <Route name="product_setup" path="/product_setup(/:product_id)" component={ProductSetup} />
       <Route path="/:page/:collection/:action(/:entity_id)" component={PageBuilder} />
       <Route path="/:page" component={PageBuilder} />
     </Route>
