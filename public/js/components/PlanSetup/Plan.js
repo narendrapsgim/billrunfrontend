@@ -17,13 +17,13 @@ class Plan extends Component {
       onChangeSelectFieldValue,
       onChangeDateFieldValue } = this.props;
 
-    let transaction_options = ["Every Month", "Every Week"].map((op, key) => {
-      return (<MenuItem value={op} primaryText={op} key={key} />);
-    });
+    let transaction_options = ["Every Month", "Every Week"].map((op, key) => (
+      <MenuItem value={op} primaryText={op} key={key} />
+    ));
 
-    let each_period_options = ["Month", "Day"].map((op, key) => {
-      return (<MenuItem value={op} primaryText={op} key={key} />);
-    });
+    let each_period_options = ["Month", "Day"].map((op, key) => (
+      <MenuItem value={op} primaryText={op} key={key} />
+    ));
     
     return (
       <div className="BasicPlanSettings">

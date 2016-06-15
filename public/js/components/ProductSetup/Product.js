@@ -14,9 +14,9 @@ class Product extends Component {
   }
   
   render() {
-    let product_type_options = ["Metered", "Tiered"].map((type, key) => {
-      return (<MenuItem value={type} primaryText={type} key={key} />)
-    });
+    let product_type_options = ["Metered", "Tiered"].map((type, key) => (
+      <MenuItem value={type} primaryText={type} key={key} />
+    ));
 
 
     let { product_properties,
