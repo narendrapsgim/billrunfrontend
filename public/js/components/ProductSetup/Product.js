@@ -23,7 +23,7 @@ class Product extends Component {
           onChangeItemFieldValue,
           onAddProductProperties,
           onRemoveProductProperties } = this.props;
-    console.log(product_properties);
+
     return (
       <div className="AddItem">
         <h4>Add Product</h4>
