@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import ContentRemove from 'material-ui/svg-icons/content/remove';
+import FlatButton from 'material-ui/FlatButton';
+import { updateFieldValue, newField, removeField } from '../../actions';
 
 const style = {
   card : {
@@ -19,24 +24,64 @@ export default class FieldsContainer extends Component {
   handleExpandChange(expanded) {
     this.setState({expanded: expanded});
   };
+  
+  crudActionButtons() {
+    let { crud, path } = this.props;
+    let onClickNew = (path) => {
+      let type;
+      if (this.props.fieldType) type = this.props.fieldType;
+      else type = (path.match(/(\d])$/) ? "array" : "object");
+      let new_path = path;
+      if (type === "object") {
+        let p = prompt("Please insert name");
+        new_path += `.${p}`;
+      }
+      this.props.dispatch(newField(new_path, type, this.props.pageName));
+    };
+    let onClickRemove = (path) => {
+      let c = confirm("Are you sure you want to delete?");
+      if (c) {
+        this.props.dispatch(removeField(path, this.props.pageName));
+      }
+    };
+
+    let addButton = (crud && crud[0] === '1') ? (
+      <FloatingActionButton mini={true} onClick={onClickNew.bind(this, path)}>
+        <ContentAdd />
+      </FloatingActionButton>
+    ) : (null);
+    let removeButton = (crud && crud[3] === '1') ? (
+      <FloatingActionButton mini={true} secondary={true} onClick={onClickRemove.bind(this, path)}>
+        <ContentRemove />
+      </FloatingActionButton>
+    ) : (null);
+    let crudActionBtns = crud ? (
+      <CardActions expandable={true}>
+        {addButton}
+        {removeButton}
+      </CardActions>
+    ) : (null);
+    return crudActionBtns;
+  }
+
   render() {
     if(!this.props.collapsible){
       return (
-          <Card className={"col-md-" + (this.props.size || 10)} style={style.card} key={"block_collapsible_" + this.props.index}>
-            <CardHeader title={this.props.label}/>
-            <CardText expandable={false} children={this.props.content}/>
-          </Card>
+        <Card style={style.card} key={"block_collapsible_" + this.props.index}>
+          <CardHeader title={this.props.label}/>
+          <CardText expandable={false} children={this.props.content}/>
+        </Card>
       );
     } else {
       return (
         <Card
-          className={"col-md-" + (this.props.size || 10)}
-          style={style.card}
-          expanded={this.state.expanded}
-          onExpandChange={this.handleExpandChange}
+            style={style.card}
+            expanded={this.state.expanded}
+            onExpandChange={this.handleExpandChange}
         >
-          <CardHeader title={this.props.label} actAsExpander={true} showExpandableButton={true}/>
+          <CardHeader title={this.props.label} actAsExpander={true} showExpandableButton={true} />
           <CardText expandable={true} children={this.props.content}/>
+          {this.crudActionButtons()}
         </Card>
       );
     }

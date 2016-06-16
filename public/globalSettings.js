@@ -1,4 +1,4 @@
-const GlobalSetting = {
+var globalSetting = {
   // serverUrl : "http://10.162.20.191:1337", // Roman
   serverUrl : "http://10.162.20.86", // Eran
   serverApiDebug : false,
@@ -6,10 +6,10 @@ const GlobalSetting = {
   datetimeFormat : "DD/MM/YYYY HH:MM",
   dateFormat : "DD/MM/YYYY",
   timeFormat : "HH:MM",
+  apiDateTimeFormat : "YYYY/MM/DD HH:mm:ss",
   currency : ' €',
   list : {
-    maxItems : 50
-  }
+    maxItems : 100
+  },
+  statusMessageDisplayTimeout:5000
 }
-
-export default GlobalSetting;

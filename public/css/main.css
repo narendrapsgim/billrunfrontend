@@ -1,7 +1,6 @@
 body {
     background-color: #C0C0C0;
     font-family: Roboto, sans-serif;
-    padding-bottom: 70px;
 }
 
 /* temp Overide bootstrap CSS*/
@@ -111,4 +110,8 @@ label {
   outline: none;
   padding: 5px;
   width: 80px;
+}
+
+.imported-reason-title {
+    font-weight: bold;
 }

@@ -7,6 +7,7 @@ const styles = {
   wrapper: {
     paddingTop: '40px',
     paddingBottom: '10px',
+    position: 'relative'
   },
   label: {
     position: 'absolute',
@@ -112,24 +113,27 @@ export default class Chips extends Component {
   }
 
   render() {
-    const {label} = this.props;
+    const {label, disabled, errorText, errorStyle} = this.props;
     let chips = this.state.items.map((item, index) =>
-      <Chip value={item} index={index} onRemoveClick={this.onRremoveItem} key={index}/>
+      <Chip value={item} index={index} onRemoveClick={this.onRremoveItem} key={index} allowRemove={!disabled} />
     );
+    let textfield = disabled ? (null) : (<TextField
+                                             name="newChips"
+                                             value={this.state.inputValue}
+                                             onBlur={this.onInputBlur}
+                                             onFocus={this.onInputFocus}
+                                             onKeyPress={this.onKeyPress}
+                                             onChange={this.onInputChange}
+                                             hintText={"Add new " + label.toLowerCase()  }
+                                             errorText={errorText}
+                                             errorStyle={errorStyle}
+                                             style={styles.input}
+                                         />);
     return (
       <div style={styles.wrapper}>
-      <label for="newChips" style={this.state.inFocus ? styles.labelFocus : styles.label}>{label}</label>
-          {chips}
-          <TextField
-            name="newChips"
-            value={this.state.inputValue}
-            onBlur={this.onInputBlur}
-            onFocus={this.onInputFocus}
-            onKeyPress={this.onKeyPress}
-            onChange={this.onInputChange}
-            hintText={"Add new " + label.toLowerCase()  }
-            style={styles.input}
-          />
+         <label for="newChips" style={this.state.inFocus ? styles.labelFocus : styles.label}>{label}</label>
+        {chips}
+        {textfield}
       </div>
     );
   }
@@ -140,4 +144,6 @@ Chips.defaultProps = {
   items: [],
   label: 'Chips',
   'data-path' : '',
+  errorText:'',
+  errorStyle:{}
 };

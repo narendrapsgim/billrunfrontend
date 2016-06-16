@@ -2,38 +2,38 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link, browserHistory } from 'react-router';
 
-import { updateFieldValue, getCollectionEntity, saveCollectionEntity, setInitialItem } from '../../actions';
+import { updateFieldValue, getCollectionEntity, getCollectionEntites, saveCollectionEntity, setInitialItem } from '../../actions';
 
 import {Tabs, Tab} from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 
-import View from '../../view';
+import View from '../../views';
 import Field from './Field';
 import List from '../List';
 import Help from '../Help';
 import FieldsContainer from '../FieldsContainer';
+import Auth from './Auth';
 
-import R from 'ramda';
 import _ from 'lodash';
 
 class PageBuilder extends Component {
   constructor(props) {
     super(props);
     this.createSectionsHTML = this.createSectionsHTML.bind(this);
+    this.actionButtons = this.actionButtons.bind(this);
     this.onFieldChange = this.onFieldChange.bind(this);
     this.onSave = this.onSave.bind(this);
-    this.actionButtons = this.actionButtons.bind(this);
-    this.state = {action: this.props.params.action};
+
+    this.state = {
+      action: props.params.action
+    };
   }
 
   getPageName(props = this.props) {
     return props.params.page.replace(/-/g, '_').toLowerCase();
   }
 
-  componentWillMount() {
-    this.setInitialState(this.props);
-  }
   componentDidMount() {
     switch (this.props.params.action) {
       case 'edit':
@@ -41,11 +41,27 @@ class PageBuilder extends Component {
       case 'clone':
         this.getCollectionItem(this.props);
         break;
+      case 'new':
+        this.setInitialState(this.props);
+        break;
+      case 'edit_multiple':
+        this.getCollectionItems(this.props);
+        break;
       case 'list':
         // get list data
         break;
       default:
 
+    }
+  }
+
+  getCollectionItems(props) {
+    let pageName = this.getPageName(props);
+    let { collection, entity_id, action } = props.params;
+    this.setState({collection, entity_id, pageName, action});
+
+    if (collection && entity_id) {
+      props.dispatch(getCollectionEntites(entity_id, collection, pageName));
     }
   }
 
@@ -70,6 +86,8 @@ class PageBuilder extends Component {
     if (nextProps.location.pathname !== this.props.location.pathname) {
       if (nextProps.params.action === "edit" || nextProps.params.action == "clone" || nextProps.params.action == "close_and_new") {
         this.getCollectionItem(nextProps);
+      } else if(nextProps.params.action == "edit_multiple"){
+        this.getCollectionItems(nextProps);
       } else {
         this.setInitialState(nextProps);
       }
@@ -84,22 +102,31 @@ class PageBuilder extends Component {
     }
     let { dispatch } = this.props;
     let path = evt.target.dataset.path;
+
     dispatch(updateFieldValue(path, value, this.getPageName()));
   }
 
   onSave(e) {
     let action = e.currentTarget.dataset.action;
     let actionType = action; //close_and_new / duplicate / update / new
+    let { item } = this.props;
     switch (action) {
       case 'edit': actionType = 'update';
         break;
+      case 'edit_multiple':
+        actionType = 'bulk_update';
+        let bulkIds = this.props.items.map(item => item['_id']['$id']);
+        Object.assign(item, {ids:bulkIds})
+        break;
       case 'clone': actionType = 'duplicate';
+        break;
+      case 'new': actionType = 'new';
         break;
     }
 
     let { dispatch } = this.props;
     let pageName = this.getPageName();
-    dispatch(saveCollectionEntity(this.props.item, this.props.params.collection, pageName, this.context.router, actionType));
+    dispatch(saveCollectionEntity(item, this.props.params.collection, pageName, actionType));
   }
 
   onCancel() {
@@ -161,8 +188,37 @@ class PageBuilder extends Component {
     });
   }
 
+  getCombineValue(items, item, path, field){
+    if(_.has({item}, path)){
+      return _.result({item}, path)
+    }
+    let value = _.reduce(items, function(prevValue, item, key) {
+      let value = _.result({item}, path);
+
+      if(key === 0){
+        return value;
+      } else if(typeof field.type !== 'undefined' && field.type === "array"){
+        return _.isEqual(prevValue, value) ? value : ['mixed'];
+      } else if (_.isObject(value) || Array.isArray(value) && _.isObject(value[0])){
+        return value;
+      } else if(prevValue === 'mixed'){
+        return 'mixed';
+      } else if(_.isEqual(prevValue, value)){
+        return value;
+      } else {
+        return 'mixed';
+      }
+    }, null);
+
+    return value;
+  }
+
   createFieldHTML(field, path, field_index) {
-    if ((this.state.action === 'edit' || this.state.action === 'clone' || this.state.action === 'close_and_new') && (!this.props.item || _.isEmpty(this.props.item))) {
+    if (
+      ((this.state.action === 'edit' || this.state.action === 'clone' || this.state.action === 'close_and_new') && (!this.props.item || _.isEmpty(this.props.item)))
+      ||
+      ( (this.state.action === 'edit_multiple') &&  (!this.props.items || _.isEmpty(this.props.items)))
+    ) {
       return null;
     }
     if (path.endsWith(".*") && field.fields) {
@@ -175,14 +231,14 @@ class PageBuilder extends Component {
         return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
       });
     }
-    let value = _.result(this.props, path);
+    let value = !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, path, field) : _.result(this.props, path);
     let size = field.size || 10;
     if (Array.isArray(value) && _.isObject(value[0])) {
       let fieldsHTML = value.map((elm, idx) => {
          return this.createFieldHTML(field, `${path}[${idx}]`,idx)
        });
       return (
-        <div className={"col-md-" + size} key={field_index}>
+        <div key={field_index}>
           {fieldsHTML}
         </div>
       );
@@ -194,10 +250,12 @@ class PageBuilder extends Component {
                   field.label :
                   this.titlize(_.last(path.split('.')));
       if (typeof field.collapsible !== 'undefined') {
-        return (<FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed}/>);
+        return (
+          <FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} crud={field.crud} fieldType={field.fieldType} path={path} dispatch={this.props.dispatch} pageName={this.getPageName()} />
+        );
       }
       return (
-        <div className={"col-md-" + size} style={{marginBottom: "15px"}}>
+        <div style={{marginBottom: "15px"}}>
           <h4>{label}</h4>
           <div>
             {content}
@@ -259,7 +317,7 @@ class PageBuilder extends Component {
   }
 
   actionButtons(action = this.state.action) {
-    if (action === "edit" || action === "new" || action === "clone" || action === "close_and_new") {
+    if (action === "edit" || action === "new" || action === "clone" || action === "close_and_new" || action === "edit_multiple") {
       let style = {
         margin: "12px"
       };
@@ -283,6 +341,7 @@ class PageBuilder extends Component {
   }
 
   render() {
+
     let { pageName = this.getPageName(),
           action } = this.state;
     if ((action === 'edit' || action === 'clone' ||  action === 'close_and_new') && !this.props.item) return (null);
@@ -290,6 +349,11 @@ class PageBuilder extends Component {
     let page_view = View.pages[pageName].views ?
                     View.pages[pageName].views[action] :
                     View.pages[pageName];
+
+    // Check page permission
+    if(_.intersection(View.pages[pageName].permission, this.props.user.roles).length == 0){
+      return (<Auth pagePermission = {View.pages[pageName].permission} userRoles = {this.props.user.roles} auth={this.props.user.auth}/>);
+    }
 
     if (!page_view) {
       return (null);
@@ -321,9 +385,11 @@ PageBuilder.contextTypes = {
 
 
 function mapStateToProps(state, ownProps) {
-  let pageName = ownProps.params.page.replace(/-/g, '_').toLowerCase();
-  return (state[pageName]) ? state[pageName] : state;
+  return {
+    item:  (state.pages && state.pages.page && state.pages.page.item) ?  state.pages.page.item : null,
+    items:  (state.pages && state.pages.page && state.pages.page.items) ?  state.pages.page.items : null,
+    user: state.users
+  }
 }
-
 
 export default connect(mapStateToProps)(PageBuilder);

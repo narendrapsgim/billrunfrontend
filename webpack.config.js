@@ -7,7 +7,7 @@ var env = process.env.MIX_ENV || 'dev';
 var isProduction = (env === 'prod');
 
 var plugins = [
-//  new ExtractTextPlugin('app.css'),
+  new ExtractTextPlugin('app.css'),
 ];
 
 // This is necessary to get the sass @import's working
@@ -35,17 +35,9 @@ module.exports = {
         exclude: /(node_modules|bower_components)/,
         loader: 'babel',
         query: {
-          presets: ['es2015', 'react']
+          presets: ['es2015', 'react', 'stage-2']
         }
       },
-      // {
-      //   test: /\.scss$/,
-      //   loader: ExtractTextPlugin.extract(
-      //     'style',
-      //     'css' + '!sass?outputStyle=expanded&' + stylePathResolves
-      //   ),
-      // }
-      {test: /\.css$/, loader: "style-loader!css-loader"}
     ]
   },
 
