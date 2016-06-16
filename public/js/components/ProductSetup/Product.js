@@ -15,85 +15,57 @@ class Product extends Component {
   
   render() {
     let product_type_options = ["Metered", "Tiered"].map((type, key) => (
-      <MenuItem value={type} primaryText={type} key={key} />
+      <option value={type} key={key}>{type}</option>
     ));
 
 
     let { product_properties,
-          onChangeItemSelectFieldValue,
           onChangeItemFieldValue,
           onAddProductProperties,
           onRemoveProductProperties } = this.props;
-
+    console.log(product_properties);
     return (
       <div className="AddItem">
         <h4>Add Product</h4>
         <div className="row">
-          <div className="col-md-6">
-            <div className="box">
-              <TextField
-                  id="ProductName"
-                  floatingLabelText="Product Name"
-                  onChange={onChangeItemFieldValue.bind(this, "ProductName")}
-                  fullWidth={true}
-              />
-            </div>
+          <div className="col-md-4">
+            <label for="ProductName">Product Name</label>
+            <input type="text" className="form-control" id="ProductName" onChange={onChangeItemFieldValue.bind(this, "ProductName", -1)} />
           </div>
         </div>
-        { product_properties.map((prop, key) => {
+        { product_properties.properties.map((prop, key) => {
             return (
               <div className="row" key={key}>
-                <div className="col-xs-2">
-                  <div className="box">
-                    <SelectField
-                        id="ProductType"
-                        floatingLabelText="Product Type"
-                        style={{width: "150px"}}
-                        onChange={onChangeItemSelectFieldValue.bind(this, "ProductType", key)}
-                        value={prop["ProductType"]}
-                    >
-                      {product_type_options}
-                    </SelectField>
-                  </div>
+                <div className="col-md-2">
+                  <label for="ProductType">Product Type</label>
+                  <select
+                      id="ProductType"
+                      className="form-control"
+                      onChange={onChangeItemFieldValue.bind(this, "ProductType", key)}
+                      value={prop["ProductType"]}>
+                    {product_type_options}
+                  </select>
                 </div>
-                <div className="col-xs-2">
-                  <div className="box">
-                    <TextField
-                        id="FlatRate"
-                        floatingLabelText="Flat Rate"
-                        type="number"
-                        onChange={onChangeItemFieldValue.bind(this, "FlatRate", key)}
-                        value={prop["FlatRate"]}
-                        style={{width: "150px"}}
-                    />
-                  </div>
+                <div className="col-md-1">
+                  <label for="FlatRate">Flat Rate</label>
+                  <input type="number"
+                         className="form-control"
+                         id="FlatRate"
+                         onChange={onChangeItemFieldValue.bind(this, "FlatRate", key)}
+                         value={prop["FlatRate"]}
+                  />
                 </div>
-                <div className="col-xs-2">
-                  <div className="box">
-                    <TextField
-                        id="PerUnit"
-                        floatingLabelText="Per Unit"
-                        type="number"
-                        style={{width: "150px"}}
-                        onChange={onChangeItemFieldValue.bind(this, "PerUnit", key)}
-                        value={prop["PerUnit"]}
-                    />
-                  </div>
-                </div>
-                <div className="col-xs-2">
-                  <div className="box">
-                    <TextField
-                        id="Type"
-                        floatingLabelText="Type"
-                        type="text"
-                        style={{width: "150px"}}
-                        onChange={onChangeItemFieldValue.bind(this, "Type", key)}
-                        value={prop["Type"]}
-                    />
-                  </div>
+                <div className="col-md-1">
+                  <label for="PerUnit">Unit</label>
+                  <input type="text"
+                         className="form-control"
+                         id="PerUnit"
+                         onChange={onChangeItemFieldValue.bind(this, "PerUnit", key)}
+                         value={prop["PerUnit"]}
+                  />
                 </div>
                 {(() => {  /* only show remove button if there is more than one interval */
-                   if (product_properties.length > 1) {
+                   if (product_properties.properties.length > 1) {
                      return (
                        <div className="col-xs-2">
                          <div className="box">

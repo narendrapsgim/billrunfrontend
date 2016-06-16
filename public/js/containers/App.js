@@ -29,7 +29,7 @@ export default class App extends Component {
       <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>
         <div className="App">
           <Topbar />
-            <div className="component container main-content">
+            <div className="container-fluid main-content">
               <Navigator />
               <StatusBar />
               <Divider />
@@ -38,7 +38,7 @@ export default class App extends Component {
               </div>
             </div>
           <footer className="footer navbar-fixed-bottom">
-            <div className="container">
+            <div className="container-fluid">
               <p>
                 (c) 2016 Billrun All Right Reserved
               </p>

@@ -45,12 +45,8 @@ class PlanSetup extends Component {
     this.props.dispatch(clearPlan());
   }
   
-  onChangeFieldValue(section, e, value) {
-    let id = e.target.id;
-    this.props.dispatch(updatePlanField(section, id, value));
-  }
-  
-  onChangeSelectFieldValue(section, id, e, sidx, value) {
+  onChangeFieldValue(section, e) {
+    let {value, id } = e.target;
     this.props.dispatch(updatePlanField(section, id, value));
   }
 
@@ -59,11 +55,8 @@ class PlanSetup extends Component {
   }
   
   /** PRODUCT **/
-  onChangeItemFieldValue(id, idx, e, val) {
-    this.props.dispatch(updateProductPropertiesField(id, idx, val));
-  }
-
-  onChangeItemSelectFieldValue(id, idx, e, sidx, val) {
+  onChangeItemFieldValue(id, idx, e) {
+    let val = e.target.value;
     this.props.dispatch(updateProductPropertiesField(id, idx, val));
   }
 
@@ -86,7 +79,7 @@ class PlanSetup extends Component {
       this.save();
       return;
     }
-    let finished = (stepIndex + 1) >= 2;
+    let finished = (stepIndex + 1) === 1;
     this.setState({
       stepIndex: stepIndex + 1,
       finished: finished,
@@ -105,9 +98,8 @@ class PlanSetup extends Component {
     let { stepIndex } = this.state;
     
     const steps = [
-      (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeSelectFieldValue={this.onChangeSelectFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} />),
-      (<Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />),
-      (<div><h4>Add Discounts</h4></div>)
+      (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} />),
+      (<Product onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />)
     ];    
 
     let currentStepContents = steps[stepIndex];
@@ -121,15 +113,10 @@ class PlanSetup extends Component {
           <Step>
             <StepLabel>Add Product</StepLabel>
           </Step>
-          <Step>
-            <StepLabel>Add Discount or Coupon</StepLabel>
-          </Step>
         </Stepper>
-        <Card>
-          <CardText>
-            { currentStepContents }
-          </CardText>
-        </Card>
+        <div className="contents">
+          { currentStepContents }
+        </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
               label="Back"
@@ -138,7 +125,7 @@ class PlanSetup extends Component {
               style={{marginRight: 12}}
           />
           <RaisedButton
-              label={stepIndex === 2 ? 'Save' : 'Next'}
+              label={stepIndex === 1 ? 'Save' : 'Next'}
               primary={true}
               onTouchTap={this.handleNext}
           />
