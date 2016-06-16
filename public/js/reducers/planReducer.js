@@ -26,6 +26,63 @@ const defaultState = {
   }
 };
 
+function buildPlanFromState(state) {
+  let { basic_settings, product_properties } = state;
+  let from = new Date();
+  let to = new Date();
+  let trial_to = new Date();
+  switch (basic_settings.EachPeriod) {
+  case "Month":
+    to = to.setMonth(to.getMonth() + parseInt(basic_settings.Cycle, 10));
+    if (basic_settings.TrialCycle) {
+      trial_to = trial_to.setMonth(trial_to.getMonth() + parseInt(basic_settings.TrialCycle, 10));
+    }
+    break;
+  case "Day":
+    to = to.setDate(to.getDate() + parseInt(basic_settings.Cycle, 10));
+    if (basic_settings.TrialCycle) {
+      trial_to = trial_to.setDate(trial_to.getDate() + parseInt(basic_settings.TrialCycle, 10));
+    }
+    break;
+  }
+  return {
+    name: basic_settings.PlanName,
+    price: [
+      {price: basic_settings.TrialPrice,
+       duration: {
+         from: from,
+         to: trial_to
+       }
+      },
+      {price: basic_settings.PeriodicalRate,
+       duration: {
+         from: from,
+         to: to
+       }
+      }
+    ],
+    recurring: {
+      duration: basic_settings.Cycle,
+      unit: basic_settings.EachPeriod
+    }
+  };
+}
+
+function buildRateFromState(state) {
+  let { basic_settings, product_properties } = state;
+  let rates  = _.reduce(product_properties.properties, (res, val, key) => {
+    (res[val.PerUnit]) ?
+      res[val.PerUnit]["BASE"] = {rate: {}} :
+      res[val.PerUnit] = {BASE: {rate: {price: val.FlatRate}}};
+    if (basic_settings) res[val.PerUnit][basic_settings.PlanName] = {rate: {price: val.FlatRate}};
+    return res;
+  }, {});
+  return {
+    key: product_properties.ProductName,
+    rates
+  };
+}
+
 export default function (state = {}, action) {
   switch (action.type) {
   case actions.UPDATE_PLAN_FIELD_VALUE:
@@ -131,7 +188,9 @@ export default function (state = {}, action) {
       };
 
     case actions.SAVE_PLAN:
-      console.log('saving plan', state);
+      let plan = buildPlanFromState(state);
+      let rate = buildRateFromState(state);
+      console.log("saving plan & rate", plan, rate);
       return state;
       
     default:
