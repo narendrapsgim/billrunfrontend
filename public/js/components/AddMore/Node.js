@@ -17,12 +17,14 @@ export default class Node extends React.Component {
   }
 
   render() {
+    let { item, index } = this.props;
+    item = React.cloneElement(item, {index:index});
     return (
       <li style={this.styles.childWrapper}>
         <div style={this.styles.itemWrapper}>
-          {this.props.item}
+          {item}
         </div>
-        <BtnRemove onRemoveClick={this.props.onRemoveClick} index={this.props.index}/>
+        <BtnRemove onRemoveClick={this.props.onRemoveClick} index={index}/>
       </li>
     );
   }

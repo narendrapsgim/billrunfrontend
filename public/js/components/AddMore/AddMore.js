@@ -17,6 +17,10 @@ export default class AddMore extends React.Component {
   removeItem(index) {
     this.setState({
       nodes: this.state.nodes.filter((node, nodeIndex) => index !== nodeIndex)
+    }, () => {
+      if(typeof this.props.removeItem === 'function')(
+        this.props.removeItem(index)
+      )
     });
   }
 
