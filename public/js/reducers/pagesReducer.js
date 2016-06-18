@@ -26,7 +26,7 @@ export default function (state = {}, action) {
     if (action.field_type === "object") {
       _.set(item, path, {});
     } else if (action.field_type === "array") {
-      let r = _.result(item, path)
+      let r = _.result(item, path);
       if (!r) {
         _.set(item, path, []);
         r = _.result(item, path);

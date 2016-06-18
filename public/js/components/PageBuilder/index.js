@@ -194,11 +194,11 @@ class PageBuilder extends Component {
       return _.result({item}, path);
     }
     //return combined value from all items
-    let value = _.reduce(items, (prevValue, item, key) => {
-      let value = _.result({item}, path);
+    let value = items.reduce( (prevValue, currentValue, index) => {
+      let value = _.result({item:currentValue}, path);
 
-      //first cicle retun value as is
-      if(key === 0){
+      //first cycle retun value as is
+      if(index === 0){
         return value;
       }
       //alre mixed
@@ -244,36 +244,28 @@ class PageBuilder extends Component {
         return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
       });
     }
+
     let value = !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, path, field) : _.result(this.props, path);
     let size = field.size || 10;
+    let label = field.label !== void 0 ?
+                field.label :
+                this.titlize(_.last(path.split('.')));
+
+    //print only fields that item has
+    if(typeof value === 'undefined'){
+      return null;
+    }
+
     if (Array.isArray(value) && _.isObject(value[0])) {
-      let fieldsHTML = value.map((elm, idx) => {
+      return value.map((elm, idx) => {
          return this.createFieldHTML(field, `${path}[${idx}]`,idx)
        });
-      return (
-        <div key={field_index}>
-          {fieldsHTML}
-        </div>
-      );
     } else if (field.fields) {
-      let content = field.fields.map((subfield, field_idx) => {
+      let subfields = field.fields.map((subfield, field_idx) => {
         return this.createFieldHTML(subfield, `${path}.${subfield.dbkey}`, field_idx);
       });
-      let label = field.label ?
-                  field.label :
-                  this.titlize(_.last(path.split('.')));
-      if (typeof field.collapsible !== 'undefined') {
-        return (
-          <FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} crud={field.crud} fieldType={field.fieldType} path={path} dispatch={this.props.dispatch} pageName={this.getPageName()} />
-        );
-      }
       return (
-        <div style={{marginBottom: "15px"}}>
-          <h4>{label}</h4>
-          <div>
-            {content}
-          </div>
-        </div>
+        <FieldsContainer size={size} label={label} content={subfields} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} crud={field.crud} fieldType={field.fieldType} path={path} dispatch={this.props.dispatch} pageName={this.getPageName()} />
       );
     }
 

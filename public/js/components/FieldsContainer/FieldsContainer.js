@@ -69,11 +69,23 @@ export default class FieldsContainer extends Component {
   }
 
   render() {
-    if(!this.props.collapsible){
+    let {content, label, index} = this.props;
+
+    if(typeof this.props.collapsible === 'undefined'){
+      return (
+        <div key={"block_collapsible_" + this.props.index} style={{marginBottom: "15px"}}>
+          {label.length > 0 && <h4>{label}</h4>}
+          <div>
+            {content}
+          </div>
+        </div>
+      );
+    }
+    else if(!this.props.collapsible){
       return (
         <Card style={style.card} key={"block_collapsible_" + this.props.index}>
-          <CardHeader title={this.props.label}/>
-          <CardText expandable={false} children={this.props.content}/>
+          {label.length > 0 && <CardHeader title={label}/>}
+          <CardText expandable={false} children={content}/>
         </Card>
       );
     } else {
@@ -83,8 +95,8 @@ export default class FieldsContainer extends Component {
             expanded={this.state.expanded}
             onExpandChange={this.handleExpandChange}
         >
-          <CardHeader title={this.props.label} actAsExpander={true} showExpandableButton={true} />
-          <CardText expandable={true} children={this.props.content}/>
+          <CardHeader title={label} actAsExpander={true} showExpandableButton={true} />
+          <CardText expandable={true} children={content}/>
           {this.crudActionButtons()}
         </Card>
       );
