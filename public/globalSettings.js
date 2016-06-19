@@ -1,6 +1,6 @@
 var globalSetting = {
-  // serverUrl : "http://10.162.20.191:1337", // Roman
-  serverUrl : "http://10.162.20.86", // Eran
+  serverUrl : "http://10.162.20.191:1337", // Roman
+  // serverUrl : "http://10.162.20.86", // Eran
   serverApiDebug : false,
   serverApiDebugQueryString : 'XDEBUG_SESSION_START=netbeans-xdebug',
   datetimeFormat : "DD/MM/YYYY HH:MM",
@@ -12,4 +12,4 @@ var globalSetting = {
     maxItems : 100
   },
   statusMessageDisplayTimeout:5000
-}
+};

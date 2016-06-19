@@ -26,7 +26,7 @@ export default function (state = {}, action) {
     if (action.field_type === "object") {
       _.set(item, path, {});
     } else if (action.field_type === "array") {
-      let r = _.result(item, path)
+      let r = _.result(item, path);
       if (!r) {
         _.set(item, path, []);
         r = _.result(item, path);
@@ -38,7 +38,7 @@ export default function (state = {}, action) {
     return Object.assign(
       {},
       state,
-      {page: Object.assign({}, {item: item} )}
+      {page: Object.assign({}, state.page, {item: item} )}
     );
   case actions.REMOVE_FIELD:
     item = _.cloneDeep(state.page.item);
@@ -46,7 +46,7 @@ export default function (state = {}, action) {
     _.unset(item, path);
     return Object.assign({},
       state,
-      {page: Object.assign({}, {item: item} )}
+      {page: Object.assign({}, state.page, {item: item} )}
     );
   case actions.GOT_ITEM:
     return Object.assign({},

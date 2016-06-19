@@ -56,6 +56,8 @@ export default class Chip extends React.Component {
   constructor(props) {
     super(props);
 
+    this._handleClick = this._handleClick.bind(this);
+
     this.state = {
       hover: false,
     };
@@ -67,7 +69,7 @@ export default class Chip extends React.Component {
         style={styles.iconStyle}
         color={this.state.hover ? styles.iconColorHover : styles.iconColor}
         size={20}
-        onClick={this._handleClick.bind(this)}
+        onClick={this._handleClick}
         value={index}
       />
     );

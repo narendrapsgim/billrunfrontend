@@ -8,7 +8,7 @@ import { updateFieldValue, newField, removeField } from '../../actions';
 
 const style = {
   card : {
-    margin: "10px auto 10px 15px"
+    margin: "20px 0"
   }
 }
 
@@ -24,7 +24,7 @@ export default class FieldsContainer extends Component {
   handleExpandChange(expanded) {
     this.setState({expanded: expanded});
   };
-  
+
   crudActionButtons() {
     let { crud, path } = this.props;
     let onClickNew = (path) => {
@@ -34,7 +34,11 @@ export default class FieldsContainer extends Component {
       let new_path = path;
       if (type === "object") {
         let p = prompt("Please insert name");
-        new_path += `.${p}`;
+        if (p != null && p.length > 0) {
+          new_path += `.${p}`;
+        } else {
+          return;
+        }
       }
       this.props.dispatch(newField(new_path, type, this.props.pageName));
     };
@@ -65,11 +69,23 @@ export default class FieldsContainer extends Component {
   }
 
   render() {
-    if(!this.props.collapsible){
+    let {content, label, index} = this.props;
+
+    if(typeof this.props.collapsible === 'undefined'){
+      return (
+        <div key={"block_collapsible_" + this.props.index} style={{marginBottom: "15px"}}>
+          {label.length > 0 && <h4>{label}</h4>}
+          <div>
+            {content}
+          </div>
+        </div>
+      );
+    }
+    else if(!this.props.collapsible){
       return (
         <Card style={style.card} key={"block_collapsible_" + this.props.index}>
-          <CardHeader title={this.props.label}/>
-          <CardText expandable={false} children={this.props.content}/>
+          {label.length > 0 && <CardHeader title={label}/>}
+          <CardText expandable={false} children={content}/>
         </Card>
       );
     } else {
@@ -79,8 +95,8 @@ export default class FieldsContainer extends Component {
             expanded={this.state.expanded}
             onExpandChange={this.handleExpandChange}
         >
-          <CardHeader title={this.props.label} actAsExpander={true} showExpandableButton={true} />
-          <CardText expandable={true} children={this.props.content}/>
+          <CardHeader title={label} actAsExpander={true} showExpandableButton={true} />
+          <CardText expandable={true} children={content}/>
           {this.crudActionButtons()}
         </Card>
       );
