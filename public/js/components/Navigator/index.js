@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'react-router'
 import FlatButton from 'material-ui/FlatButton';
 import activeComponent from 'react-router-active-component';
@@ -12,10 +11,10 @@ import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 import View from '../../views';
 
 let routes = [
-  {to: "dashboard", label: "Dashboard"},
-  {to: "plans", label: "Plans"},
-  {to: "plan_setup", label: "Plan Setup"},
-  {to: "products", label: "Products"}
+  {to: "/dashboard", label: "Dashboard"},
+  {to: "/plans", label: "Plans"},
+  {to: "/plan_setup", label: "Plan Setup"},
+  {to: "/products", label: "Products"}
 ];
 
 export default class Navigator extends Component {

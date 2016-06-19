@@ -36,7 +36,7 @@ export default class App extends Component {
                 {this.props.children}
               </div>
             </div>
-          <footer className="footer navbar-fixed-bottom">
+          <footer className="footer">
             <div className="container-fluid">
               <p>
                 (c) 2016 Billrun All Right Reserved
