@@ -55,14 +55,14 @@ export default class PlansList extends Component {
 
     return (
       <Table onCellClick={this.onClickCell}>
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false} fixedHeader={true}>
+        <TableHeader displaySelectAll={true} fixedHeader={true}>
           <TableRow>
             <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
             <TableHeaderColumn tooltip="Technical Name">Technical Name</TableHeaderColumn>
             <TableHeaderColumn tooltip="Invoice Label">Invoice Label</TableHeaderColumn>
           </TableRow>
         </TableHeader>
-        <TableBody displayRowCheckbox={false}>
+        <TableBody>
           {dataList.map((row, index) => (
              <TableRow key={index}>
                <TableRowColumn>{row.name}</TableRowColumn>

@@ -105,7 +105,8 @@ class PlanSetup extends Component {
     let currentStepContents = steps[stepIndex];
 
     return (
-      <div className="PlanSetup">
+      <div className="PlanSetup container">
+        <h3>Billing Plan</h3>
         <Stepper activeStep={stepIndex}>
           <Step>
             <StepLabel>Plan Settings</StepLabel>
@@ -114,7 +115,7 @@ class PlanSetup extends Component {
             <StepLabel>Add Product</StepLabel>
           </Step>
         </Stepper>
-        <div className="contents">
+        <div className="contents" style={{border: "2px solid #C0C0C0"}}>
           { currentStepContents }
         </div>
         <div style={{marginTop: 12, float: "right"}}>

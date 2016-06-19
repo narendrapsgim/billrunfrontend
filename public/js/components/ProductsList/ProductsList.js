@@ -26,12 +26,12 @@ export default class ProductsList extends Component {
 
     return (
       <Table onCellClick={this.onClickCell}>
-        <TableHeader displaySelectAll={false}>
+        <TableHeader displaySelectAll={true}>
           <TableRow>
             <TableHeaderColumn tooltip="Key">Key</TableHeaderColumn>
           </TableRow>
         </TableHeader>
-        <TableBody displayRowCheckbox={false}>
+        <TableBody>
           {dataList.map((row, index) => (
              <TableRow key={index}>
                <TableRowColumn>{row.key}</TableRowColumn>

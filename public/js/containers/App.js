@@ -29,10 +29,9 @@ export default class App extends Component {
       <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>
         <div className="App">
           <Topbar />
+          <Navigator />
             <div className="container-fluid main-content">
-              <Navigator />
               <StatusBar />
-              <Divider />
               <div className="contents">
                 {this.props.children}
               </div>

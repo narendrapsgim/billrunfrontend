@@ -44,7 +44,7 @@ export default class Navigator extends Component {
 
     let buttons = routes.map((route, key) => (
       <Link to={route.to} key={key} activeClassName='active'>
-        <FlatButton label={route.label} labelStyle={{textTransform: "none"}} />
+        <FlatButton label={route.label} labelStyle={{textTransform: "none"}} style={{width: "240px"}} />
       </Link>
     ));
 
@@ -57,6 +57,7 @@ export default class Navigator extends Component {
 };
 
 function mapStateToProps(state) {
+  console.log(state);
   return {
     users: state.users,
     pages: state.pages

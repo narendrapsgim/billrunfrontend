@@ -80,8 +80,8 @@ class Product extends Component {
               </div>
             );
           }) }
-              <div className="col-xs-1">
-                <div className="box">
+              <div className="row">
+                <div className="col-xs-1">
                   <FloatingActionButton mini={true} style={{margin: "20px"}} onMouseUp={onAddProductProperties}>
                     <ContentAdd />
                   </FloatingActionButton>

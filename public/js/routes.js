@@ -8,11 +8,13 @@ import PlanSetup from './components/PlanSetup';
 import PlansList from './components/PlansList';
 import ProductsList from './components/ProductsList';
 import ProductSetup from './components/ProductSetup';
+import Dashboard from './components/Dashboard';
 
 export default () => {
   return (
     <Route path="/" component={App}>
       <IndexRedirect to="/dashboard" component={PageBuilder} />
+      <Route name="dashboard" path="/dashboard" component={Dashboard} />
       <Route name="plan_setup" path="/plan_setup(/:plan_id)" component={PlanSetup} />
       <Route name="plans" path="/plans" component={PlansList} />
       <Route name="products" path="/products" component={ProductsList} />
