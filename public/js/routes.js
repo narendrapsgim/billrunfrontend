@@ -15,7 +15,7 @@ export default () => {
     <Route path="/" component={App}>
       <IndexRedirect to="/dashboard" component={PageBuilder} />
       <Route name="dashboard" path="/dashboard" component={Dashboard} />
-      <Route name="plan_setup" path="/plan_setup(/:plan_id)" component={PlanSetup} />
+      <Route name="plan_setup" path="/plan_setup" component={PlanSetup} />
       <Route name="plans" path="/plans" component={PlansList} />
       <Route name="products" path="/products" component={ProductsList} />
       <Route name="product_setup" path="/product_setup(/:product_id)" component={ProductSetup} />

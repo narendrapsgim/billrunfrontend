@@ -35,7 +35,7 @@ class PlanSetup extends Component {
   }
 
   componentWillMount() {
-    let { plan_id } = this.props.params;
+    let { plan_id } = this.props.location.query;
     if (plan_id) {
       this.props.dispatch(getPlan(plan_id));
     }

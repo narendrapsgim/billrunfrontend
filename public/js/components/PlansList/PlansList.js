@@ -47,7 +47,10 @@ export default class PlansList extends Component {
 
   onClickCell(cell_idx, col_idx, e) {
     let selected = this.state.dataList[cell_idx];
-    this.context.router.push(`plan_setup/${selected._id.$id}`);
+    this.context.router.push({
+      pathname: 'plan_setup',
+      query: {plan_id: selected._id.$id}
+    });
   }
   
   render() {
