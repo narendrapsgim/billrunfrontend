@@ -70,7 +70,7 @@ class Field extends Component {
           mandatory = false,
           inline = false,
           crud = "0110",
-          size = 5 } = field;
+        } = field;
 
     if (crud[1] === "0") return (null);
     let disabled = crud[2] === "0";
@@ -90,59 +90,55 @@ class Field extends Component {
         });
       }
       return (
-        <div>
-          <SelectField
-              value={value}
-              id={html_id}
-              onChange={this.onSelectChange.bind(null, path)}
-              floatingLabelText={inputLabel}
-              disabled={disabled}
-          >
-            {options}
-          </SelectField>
-        </div>
+        <SelectField  value={value}
+                      id={html_id}
+                      onChange={this.onSelectChange.bind(null, path)}
+                      floatingLabelText={inputLabel}
+                      disabled={disabled}
+                      fullWidth={true}
+        >
+          {options}
+        </SelectField>
       );
     } else if (type === "date") {
       let datePicker = null;
       if (value && value.sec) {
-        datePicker = <DatePicker errorText={errorText} errorStyle={errorStyle} floatingLabelText={label} autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} defaultDate={new Date(value.sec*1000)} formatDate={this.formatDate} disabled={disabled} />
+        datePicker = <DatePicker fullWidth={true} errorText={errorText} errorStyle={errorStyle} floatingLabelText={label} autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} defaultDate={new Date(value.sec*1000)} formatDate={this.formatDate} disabled={disabled} />
       } else {
-        datePicker = <DatePicker errorText={errorText} errorStyle={errorStyle} floatingLabelText={label} autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} formatDate={this.formatDate} disabled={disabled} />
+        datePicker = <DatePicker fullWidth={true} errorText={errorText} errorStyle={errorStyle} floatingLabelText={label} autoOk={true} hintText={dbkey} id={html_id} data-path={path} onChange={this.onDateChange.bind(null, path)} formatDate={this.formatDate} disabled={disabled} />
       }
-      return (
-        <div>
-          {datePicker}
-        </div>
-      );
+      return datePicker;
     } else if (type === "array") {
       return (
-        <div>
-          <Chips items={value} onChange={this.onTagsChange} label={label} data-path={path} disabled={disabled} errorText={errorText} errorStyle={errorStyle}/>
-        </div>
+          <Chips  items={value}
+                  onChange={this.onTagsChange}
+                  label={label}
+                  data-path={path}
+                  disabled={disabled}
+                  errorText={errorText}
+                  errorStyle={errorStyle}
+          />
       );
     } else if (type === "checkbox") {
       return (
-        <div>
-          <Checkbox
-              data-path={path}
-              label={inputLabel}
-              style={{ marginBottom: '16px', marginLeft: '-2px', marginTop: '5px'}}
-              defaultChecked={value}
-              disabled={disabled}
-              onCheck={onChange}
-          />
-        </div>
+        <Checkbox data-path={path}
+                  label={inputLabel}
+                  defaultChecked={value}
+                  disabled={disabled}
+                  onCheck={onChange}
+                  fullWidth={true}
+                  style={{ height: '40px', marginLeft: '-2px', marginTop: '30px' }}
+        />
       );
     } else if (type === "toggle") {
       return (
-        <div>
-          <Toggle
-            label={inputLabel}
-            data-path={path}
-            defaultToggled={value}
-            onToggle={onChange}
-          />
-        </div>
+        <Toggle label={inputLabel}
+                data-path={path}
+                defaultToggled={value}
+                onToggle={onChange}
+                fullWidth={true}
+                style={{height: '30px', marginTop: '30px'}}
+        />
       );
     }
 
@@ -150,25 +146,24 @@ class Field extends Component {
     let rows = multiLine ? 2 : 1;
     value = (typeof value === undefined || value === null) ? '' : value;
     return (
-      <div>
-        <TextField value={value}
-                   data-path={path}
-                   onChange={onChange}
-                   id={html_id}
-                   fullWidth={true}
-                   multiLine={multiLine}
-                   rows={rows}
-                   errorText={errorText}
-                   errorStyle={errorStyle}
-                   disabled={disabled}
-                   floatingLabelText={inputLabel}
-        />
-      </div>
+      <TextField value={value}
+                 data-path={path}
+                 onChange={onChange}
+                 id={html_id}
+                 fullWidth={true}
+                 multiLine={multiLine}
+                 rows={rows}
+                 errorText={errorText}
+                 errorStyle={errorStyle}
+                 disabled={disabled}
+                 floatingLabelText={inputLabel}
+      />
     );
   }
 
   render() {
-    return this.createInputTag(this.props.field);
+    const {size = 12} = this.props;
+    return <div className={`col-md-${size}`}>{this.createInputTag(this.props.field)}</div>;
   }
 };
 
