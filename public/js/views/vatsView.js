@@ -1,6 +1,38 @@
 import moment from 'moment';
 import * as Colors from 'material-ui/styles/colors';
 
+const params_fields = [
+  { dbkey: "*", collapsible: true, collapsed: true, fields: [
+    { dbkey: "*", collapsible: true, collapsed: true, fields: [
+      { dbkey: "rules", label: "", collapsible: false, fields: [
+        { row: [
+          { dbkey: "alpha3", label: "Alpha3", size: 3 },
+          { dbkey: "customer_segment", label: "Customer Segment", size: 3 },
+          { dbkey: "category", label: "Category", size: 3 },
+          { dbkey: "interco", label: "Interconnect", size: 3},
+        ]},
+      ]}
+    ]}
+  ]}
+];
+
+const rates_fields = [
+  { dbkey: "*", collapsible: true, collapsed: true, fields: [
+    { row: [
+      { dbkey: "base_account", label: "Base Account", size: 4},
+      { dbkey: "fae_vat_account", label: "Fae VAT Account", size: 4},
+      { dbkey: "vat_account", label: "VAT Account", size: 4},
+    ]},
+    { dbkey: "rate", label: "", collapsible: false, fields: [
+      { row: [
+        { dbkey: "percent", label: "Percent", size: 4},
+        { dbkey: "interval", label: "Interval", size: 4},
+        { dbkey: "to", label: "To", size: 4},
+      ]},
+    ]},
+  ]}
+];
+
 const rates_vat_list_view = {
   title: "",
   view_type: "list",
@@ -20,7 +52,7 @@ const rates_vat_list_view = {
         duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
         closeAndNew : { label: 'Close and New'},
         edit : { label: 'Edit' },
-        delete : { label: 'Delete', color: Colors.red500  },        
+        delete : { label: 'Delete', color: Colors.red500  },
       },
       pagination : {
         itemsPerPage : 10,
@@ -35,123 +67,85 @@ const rates_vat_edit_view = {
   view_type: "sections",
   sections: [
     {
-      // title: "Test",
       display: "inline",
-      fields:
-      [
-        { dbkey: "key", label: "Key", size: 10 },
-        { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "params", label: "Params", collapsible: true, collapsed: false, fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "*", collapsible: true, collapsed: true,
-                  fields:
-                  [
-                    { dbkey: "rules", label: "Rules", fields:
-                      [
-                        { dbkey: "alpha3", label: "Alpha3" },
-                        { dbkey: "interco", label: "Interconnect" },
-                        { dbkey: "category", label: "Category" },
-                        { dbkey: "customer_segment", label: "Customer Segment" }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "base_account", label: "Base Account", type: "text"},
-                { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text"},
-                { dbkey: "vat_account", label: "VAT Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
-                  [
-                        { dbkey: "interval", label: "Interval", type: "text"},
-                        { dbkey: "percent", label: "Percent", type: "text"},
-                        { dbkey: "to", label: "To", type: "text"},
-                  ]
-                },
-              ]
-            }
-          ]
-        },
+      fields: [
+        { row: [
+          { dbkey: "key", label: "Key", crud: '0100'},
+          { dbkey: "_id[$id]", label: "ID", crud: '0100'},
+          { dbkey: "type", label: "Type"},
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type: 'date', crud: '0100', size: 6},
+          { dbkey: "to", label: "To", type: 'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "params", label: "Params", collapsible: true, collapsed: false, fields: params_fields},
+        ]},
+        { row: [
+          { dbkey: "rates", label: "Rates", collapsible: true, collapsed: false, fields: rates_fields},
+        ]},
       ]
     }
   ]
 };
-
 
 const rates_vat_close_and_new_view = {
   title: "Close and new Rate",
   view_type: "sections",
   sections: [
     {
-      // title: "Test",
       display: "inline",
-      fields:
-      [
-        { dbkey: "key", label: "Key", crud: "0010", size: 10 },
-        { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "params", label: "Params", collapsible: true, collapsed: false, fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "*", collapsible: true, collapsed: true,
-                  fields:
-                  [
-                    { dbkey: "rules", label: "Rules", fields:
-                      [
-                        { dbkey: "alpha3", label: "Alpha3" },
-                        { dbkey: "interco", label: "Interconnect" },
-                        { dbkey: "category", label: "Category" },
-                        { dbkey: "customer_segment", label: "Customer Segment" }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        { dbkey: "rates", label: "Types", collapsible: true, collapsed: false ,  fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "base_account", label: "Base Account", type: "text"},
-                { dbkey: "fae_vat_account", label: "Fae VAT Account", type: "text"},
-                { dbkey: "vat_account", label: "VAT Account", type: "text"},
-                { dbkey: "rate", label: "Rates", collapsible: true, collapsed: true ,  fields:
-                  [
-                        { dbkey: "interval", label: "Interval", type: "text"},
-                        { dbkey: "percent", label: "Percent", type: "text"},
-                        { dbkey: "to", label: "To", type: "text"},
-                  ]
-                },
-              ]
-            }
-          ]
-        },
+      fields: [
+        { row: [
+          { dbkey: "key", label: "Key", crud: '0100'},
+          { dbkey: "type", label: "Type"},
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type: 'date', size: 6},
+          { dbkey: "to", label: "To", type: 'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "params", label: "Params", collapsible: true, collapsed: false, fields: params_fields},
+        ]},
+        { row: [
+          { dbkey: "rates", label: "Rates", collapsible: true, collapsed: false, fields: rates_fields},
+        ]},
       ]
     }
   ]
 };
 
-const rates_vat_duplicate_view = Object.assign({}, rates_vat_edit_view, {title: "Duplicate"});
+const rates_vat_duplicate_view = {
+  title: "Duplicate Vat",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { row: [
+          { dbkey: "key", label: "Key"},
+          { dbkey: "type", label: "Type"},
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type: 'date', size: 6},
+          { dbkey: "to", label: "To", type: 'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "params", label: "Params", collapsible: true, collapsed: false, fields: params_fields},
+        ]},
+        { row: [
+          { dbkey: "rates", label: "Rates", collapsible: true, collapsed: false, fields: rates_fields},
+        ]},
+      ]
+    }
+  ]
+};
 
 const VatsView = {
   rates_vat_list_view,
   rates_vat_edit_view,
   rates_vat_close_and_new_view,
   rates_vat_duplicate_view
-}
+};
 
 export default VatsView;

@@ -1,6 +1,42 @@
 import moment from 'moment';
 import * as Colors from 'material-ui/styles/colors';
 
+const ratess_field = [
+  { dbkey: "*", collapsible: true, collapsed: true, fields: [
+      { row: [
+        { dbkey: "access", label: "Access", type: "text", size: 4},
+        { dbkey: "currency", label: "Currency", type: "text", size: 4},
+        { dbkey: "unit", label: "Unit", type: "text", size: 4},
+      ]},
+      { row: [
+        { dbkey: "erp_account", label: "ERP Account", type: "text"},
+      ]},
+      { row: [
+        { dbkey: "rate", crud: '1110', fieldType: "array", label: "", collapsible: false, fields: [
+          { row: [
+            { dbkey: "price", label: "Price ", type: "text", size: 4},
+            { dbkey: "interval", label: "Interval", type: "text", size: 4},
+            { dbkey: "to", label: "To", type: "text", size: 4},
+          ]},
+        ]},
+      ]},
+  ]}
+];
+
+const params_field = [
+  { row: [
+    { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
+    { dbkey: "source_networks", label : 'Source Networks', type: 'array'},
+    { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
+    { dbkey: "source_types", label : 'Source Types', type: 'array'},
+  ]},
+  { dbkey: "destination", label:"", collapsible: false, fields: [
+    { row: [
+      { dbkey: "region", label: "Region", type: "text", size: 3},
+      { dbkey: "prefix", label: "Prefix", type: "array", size: 6},
+    ]},
+  ]}
+];
 
 const rates_list_view = {
   title: "",
@@ -54,102 +90,99 @@ const rates_edit_view = {
   view_type: "sections",
   sections: [
     {
-      // title: "Test",
       display: "inline",
-      fields:
-      [
-        { dbkey: "key", label: "Key", size: 10 },
-        { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "country", label: "Country", type:'array' },
-        { dbkey: "alpha3", label: "Alpha3", type:'array' },
-        { dbkey: "zone", label: "zone"},
-        { dbkey: "zone_grouping", label: "Zone Grouping" },
-        { dbkey: "from", label: "From", type:'date'},
-        { dbkey: "to", label: "To", type:'date'},
-        { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "access", label: "Access", type: "text"},
-                { dbkey: "currency", label: "Currency", type: "text"},
-                { dbkey: "unit", label: "Unit", type: "text"},
-                { dbkey: "erp_account", label: "ERP Account", type: "text"},
-                { dbkey: "rate", crud: '1110', fieldType: "array", label: "Rates", collapsible: true, collapsed: true ,  fields:
-                  [
-                        { dbkey: "interval", label: "Interval", type: "text"},
-                        { dbkey: "to", label: "To", type: "text"},
-                        { dbkey: "price", label: "Price ", type: "text"},
-                  ]
-                },
-              ]
-            }
-          ]
-        },
-        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true ,fields:
-          [
-            { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
-            { dbkey: "source_networks", label : 'Source Networks', type: 'array'},
-            { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
-            { dbkey: "source_types", label : 'Source Types', type: 'array'},
-            { dbkey: "destination", label:" ", collapsible: false, size : 11,
-              fields:
-              [
-                { dbkey: "region", label: "Region", type: "text"},
-                { dbkey: "prefix", label: "Prefix", type: "array"},
-              ]
-            }
-          ]
-        },
+      fields: [
+        { row: [
+          { dbkey: "key", label: "Key", crud: '0100'},
+          { dbkey: "_id[$id]", label: "ID", crud: '0100'},
+          { dbkey: "type", label: "Type"},
+          { dbkey: "country", label: "Country", type:'array' },
+          { dbkey: "alpha3", label: "Alpha3", type:'array' },
+        ]},
+        { row: [
+          { dbkey: "zone", label: "zone", size: 6},
+          { dbkey: "zone_grouping", label: "Zone Grouping", size: 6 },
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type:'date', size: 6 , crud: '0100'},
+        { dbkey: "to", label: "To", type:'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields: ratess_field },
+        ]},
+        { row: [
+          { dbkey: "params",  label: "Params", collapsible: true, collapsed: true ,fields: params_field },
+        ]},
       ]
     }
   ]
 };
 
-const rates_edit_multiple_view = {
-  title: "Edit Rates",
+const rates_edit_multiple_view = Object.assign({}, rates_edit_view, {title: "Edit Rates"});
+
+const rates_clone_view = {
+  title: "Clone Rate",
   view_type: "sections",
   sections: [
     {
-      // title: "Test",
       display: "inline",
-      fields:
-      [
-        { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "country", label: "Country", type:'array' },
-        { dbkey: "alpha3", label: "Alpha3", type:'array' },
-        { dbkey: "zone", label: "zone"},
-        { dbkey: "zone_grouping", label: "Zone Grouping" },
-        { dbkey: "from", label: "From", type:'date'},
-        { dbkey: "to", label: "To", type:'date'},
-        { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields:
-          [
-            { dbkey: "*", collapsible: true, collapsed: true,
-              fields:
-              [
-                { dbkey: "access", label: "Access", type: "text"},
-                { dbkey: "currency", label: "Currency", type: "text"},
-                { dbkey: "unit", label: "Unit", type: "text"},
-                { dbkey: "erp_account", label: "ERP Account", type: "text"},
-              ]
-            }
-          ]
-        },
-        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true ,fields:
-          [
-            { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
-            { dbkey: "source_networks", label : 'Source Networks', type: 'array'},
-            { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
-            { dbkey: "source_types", label : 'Source Types', type: 'array'},
-          ]
-        },
+      fields: [
+        { row: [
+          { dbkey: "key", label: "Key"},
+          { dbkey: "type", label: "Type"},
+          { dbkey: "country", label: "Country", type:'array' },
+          { dbkey: "alpha3", label: "Alpha3", type:'array' },
+        ]},
+        { row: [
+          { dbkey: "zone", label: "zone", size: 6},
+          { dbkey: "zone_grouping", label: "Zone Grouping", size: 6 },
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type:'date', size: 6},
+        { dbkey: "to", label: "To", type:'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: ratess_field },
+        ]},
+        { row: [
+          { dbkey: "params",  label: "Params", collapsible: true, collapsed: true, fields: params_field },
+        ]},
       ]
     }
-  ]};
+  ]
+};
 
-const rates_clone_view = Object.assign({}, rates_edit_view, {title: "Clone Rate"});
-
-const rates_close_and_new_view = Object.assign({}, rates_edit_view, {title: "Close and Create New Rate"});
+const rates_close_and_new_view = {
+  title: "Close and Create New Rate",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { row: [
+          { dbkey: "key", label: "Key", crud: '0100'},
+          { dbkey: "type", label: "Type"},
+          { dbkey: "country", label: "Country", type:'array' },
+          { dbkey: "alpha3", label: "Alpha3", type:'array' },
+        ]},
+        { row: [
+          { dbkey: "zone", label: "zone", size: 6},
+          { dbkey: "zone_grouping", label: "Zone Grouping", size: 6 },
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type:'date', size: 6},
+        { dbkey: "to", label: "To", type:'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: ratess_field },
+        ]},
+        { row: [
+          { dbkey: "params", crud: '1111', label: "Params", collapsible: true, collapsed: true, fields: params_field },
+        ]},
+      ]
+    }
+  ]
+};
 
 const RatesView = {
   rates_edit_view,

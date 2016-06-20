@@ -7,9 +7,7 @@ import FlatButton from 'material-ui/FlatButton';
 import { updateFieldValue, newField, removeField } from '../../actions';
 
 const style = {
-  card : {
-    margin: "20px 0"
-  }
+  card : { margin: "10px 0" }
 }
 
 export default class FieldsContainer extends Component {
@@ -90,11 +88,7 @@ export default class FieldsContainer extends Component {
       );
     } else {
       return (
-        <Card
-            style={style.card}
-            expanded={this.state.expanded}
-            onExpandChange={this.handleExpandChange}
-        >
+        <Card style={style.card} expanded={this.state.expanded} onExpandChange={this.handleExpandChange}>
           <CardHeader title={label} actAsExpander={true} showExpandableButton={true} />
           <CardText expandable={true} children={content}/>
           {this.crudActionButtons()}
