@@ -15,6 +15,7 @@ class Field extends Component {
     super(props);
     this.state = { path: "" };
     this.onTagsChange = this.onTagsChange.bind(this);
+    this.onSelectChange = this.onSelectChange.bind(this);
     this.onDateChange = this.onDateChange.bind(this);
     this.formatDate = this.formatDate.bind(this);
   }
@@ -36,6 +37,13 @@ class Field extends Component {
       target: { dataset: { path: path } }
     };
     this.props.onChange(evt, 0, value);
+  }
+
+  onSelectChange(path, e, index, value) {
+    let evt = {
+      target: { dataset: { path: path } }
+    };
+    this.props.onChange(evt, index, value);
   }
 
   createInputTag(field = {}) {
@@ -86,7 +94,7 @@ class Field extends Component {
           <SelectField
               value={value}
               id={html_id}
-              onChange={onChange}
+              onChange={this.onSelectChange.bind(null, path)}
               floatingLabelText={inputLabel}
               disabled={disabled}
           >
