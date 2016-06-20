@@ -29,7 +29,7 @@ import $ from 'jquery';
 import DatePicker from 'material-ui/DatePicker';
 import moment from 'moment';
 import * as actions from '../../actions';
-import ListFilters from './ListFilters'
+import ListFilters from './ListFilters';
 
 import { Link, browserHistory } from 'react-router';
 

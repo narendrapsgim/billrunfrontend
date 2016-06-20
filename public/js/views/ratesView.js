@@ -147,8 +147,6 @@ const rates_edit_multiple_view = {
     }
   ]};
 
-const rates_new_view = Object.assign({}, rates_edit_view, {title: "New Rate"});
-
 const rates_clone_view = Object.assign({}, rates_edit_view, {title: "Clone Rate"});
 
 const rates_close_and_new_view = Object.assign({}, rates_edit_view, {title: "Close and Create New Rate"});
@@ -157,7 +155,6 @@ const RatesView = {
   rates_edit_view,
   rates_edit_multiple_view,
   rates_list_view,
-  rates_new_view,
   rates_clone_view,
   rates_close_and_new_view
 };

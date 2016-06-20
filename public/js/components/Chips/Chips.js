@@ -39,7 +39,7 @@ const styles = {
     margin: '0px',
     fontSize: '85%'
   },
-  input: {},
+  input: {marginLeft: '10px'},
   select: {verticalAlign: 'bottom'},
   chipsWrapper: {
     display: 'inline-block',

@@ -26,7 +26,6 @@ const View = {
       route: "rates/rates/list",
       views: {
         list: RatesView.rates_list_view,
-        new: RatesView.rates_new_view,
         clone: RatesView.rates_clone_view,
         close_and_new: RatesView.rates_close_and_new_view,
         edit: RatesView.rates_edit_view,
@@ -80,7 +79,6 @@ const View = {
       route: "plans/plans/list",
       views: {
         list: PlansView.plans_list_view,
-        new: PlansView.plans_new_view,
         clone: PlansView.plans_clone_view,
         close_and_new: PlansView.plans_close_and_new_view,
         edit: PlansView.plans_edit_view
