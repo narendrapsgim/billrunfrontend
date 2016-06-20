@@ -79,6 +79,6 @@ const rates_product_edit_view = {
 const ProductsView = {
   rates_product_edit_view,
   rates_product_list_view,
-}
+};
 
 export default ProductsView;
