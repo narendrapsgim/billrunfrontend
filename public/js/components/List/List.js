@@ -613,7 +613,7 @@ class List extends Component {
         if(field.filter.system){
           filters[field.key] = field.filter.system;
         }
-        if(field.filter.defaultValue && field.filter.defaultValue.length > 0){
+        if(field.filter.defaultValue && typeof field.filter.defaultValue !== "undefined"){
           filters[field.key] = field.filter.defaultValue;
         }
       }
