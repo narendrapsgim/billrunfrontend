@@ -8,50 +8,54 @@ const rates_charge_edit_view = {
     {
       display: "inline",
       fields: [
-        { dbkey: "name", label: "Name", size: 10 },
-        { dbkey: "tech_name", label: "Tech Name", size: 10 },
-        { dbkey: "vti_name", label: "VTI Name", size: 10 },
-        { dbkey: "reason", label: "Reason", size: 10 },
-        { dbkey: "key", label: "Key", size: 10 },
-        { dbkey: "type", label: "Type", size: 10 },
-
-        { dbkey: "domains",  label: "Domains", size: 10, collapsible: true, collapsed: true  ,
-          fields: [
-            { dbkey: "optional", label: "Optional", type: "array", size: 10},
-          ]
-        },
-
-        { dbkey: "params",  label: "Params", size: 10, collapsible: true, collapsed: true  , fields:
-          [
-            { dbkey: "*", size : 12, collapsible: false,
-              fields:
-              [
-                  { dbkey: "service_name", label: "Service Name", type: "text", size: 10},
-              ]
-            },
-          ]
-        },
-
-
-        { dbkey: "rates",  label: "Rates", size: 10, collapsible: true, collapsed: true  , fields:
-          [
-            { dbkey: "*", size : 12, collapsible: false,
-              fields:
-              [
-                { dbkey: "rate", label: 'Rate', size : 12, collapsible: true,
-                  fields:
-                  [
-                    { dbkey: "price", label: "Price", type: "text", size: 3},
-                    { dbkey: "interval", label: "Interval", type: "text", size: 3},
-                    { dbkey: "to", label: "To", type: "text", size: 3},
-                    { dbkey: "ceil", label: "Ceil", type: "toggle", size: 3},
-                  ]
-                },
-                { dbkey: "unit", label: "Unit", size: 10 },
-              ]
-            }
-          ]
-        }
+        { row: [
+          { dbkey: "key", label: "Key", crud: '0100'},
+          { dbkey: "_id[$id]", label: "ID", crud: '0100'},
+          { dbkey: "name", label: "Name"},
+          { dbkey: "tech_name", label: "Tech Name"},
+          { dbkey: "vti_name", label: "VTI Name"},
+          { dbkey: "reason", label: "Reason"},
+          { dbkey: "erp_account", label: "ERP Account"},
+        ]},
+        { row: [
+          { dbkey: "type", label: "Type", size: 4},
+          { dbkey: "vat_type", label: "VAT Type", size: 4},
+          { dbkey: "level", label: "Level", size: 4},
+        ]},
+        { row: [
+          { dbkey: "end_publication", label: "End Publication", type: "date", size: 4},
+          { dbkey: "from", label: "From", type: "date", size: 4},
+          { dbkey: "to", label: "To", type: "date", size: 4},
+        ]},
+        { row: [
+          { dbkey: "domains",  label: "Domains", collapsible: true, collapsed: true, fields: [
+            { dbkey: "optional", label: "Optional", type: "array"},
+          ]},
+        ]},
+        { row: [
+          { dbkey: "params",  label: "Params", collapsible: true, collapsed: true  , fields: [
+            { dbkey: "*", collapsible: false, fields: [
+              { dbkey: "service_name", label: "Service Name"},
+            ]},
+          ]},
+        ]},
+        { row: [
+          { dbkey: "rates",  label: "Rates", collapsible: true, collapsed: true  , fields: [
+            { dbkey: "*", collapsible: false, fields: [
+              { row: [
+                { dbkey: "unit", label: "Unit" },
+              ]},
+              { row: [
+                { dbkey: "rate", label: 'Rate', collapsible: true, fields: [
+                  { dbkey: "ceil", label: "Ceil", type: "checkbox", size: 3},
+                  { dbkey: "price", label: "Price", type: "text", size: 3},
+                  { dbkey: "interval", label: "Interval", type: "text", size: 3},
+                  { dbkey: "to", label: "To", type: "text", size: 3},
+                ]},
+              ]},
+            ]}
+          ]}
+        ]},
       ]
     }
   ]
