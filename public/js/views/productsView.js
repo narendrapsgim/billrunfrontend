@@ -1,6 +1,22 @@
 import moment from 'moment';
 import * as Colors from 'material-ui/styles/colors';
 
+const rates_field = [
+  { dbkey: "general", label : 'General' ,collapsible: true, collapsed: true, fields: [
+    { row: [
+      { dbkey: "price", label: "Price", type: "text", size: 6 },
+      { dbkey: "price_level", label: "Price Level", type: "text", size: 6 },
+    ]},
+  ]},
+  { dbkey: "subscription", collapsible: true, collapsed: true, fields: [
+    { dbkey: "*", collapsible: false, fields: [
+      { row: [
+        { dbkey: "price", label: "Price", size: 6 },
+        { dbkey: "price_level", label: "Price Level", size: 6 },
+      ]}
+    ]}
+  ]}
+];
 
 const rates_product_list_view = {
   title: "",
@@ -30,39 +46,30 @@ const rates_product_edit_view = {
   sections: [
     {
       display: "inline",
-      fields:
-      [
-        { dbkey: "brand", label: "Brand", size: 10 },
-        { dbkey: "model", label: "Model", size: 10 },
-        { dbkey: "key", label: "Key", size: 10 },
-        { dbkey: "ax_code", label: "AX Code", size: 10 },
-        { dbkey: "inventory_id", label: "Inventory ID", size: 10 },
-        { dbkey: "type", label: "Type", size: 10 },
-        { dbkey: "rates",  label: "Rates", size: 10, collapsible: false, fields:
-          [
-            { dbkey: "general", label : 'General' ,collapsible: true, collapsed: true, size : 12,
-              fields:
-              [
-                  { dbkey: "price", label: "Price", type: "text"},
-                  { dbkey: "price_level", label: "Price Level", type: "text"},
-              ]
-            },
-            { dbkey: "subscription", collapsible: true, collapsed: true, size : 12,
-              fields:
-              [
-                { dbkey: "*", size : 12, collapsible: false,
-                  fields:
-                  [
-                    { dbkey: "price", label: "Price", type: "text"},
-                    { dbkey: "price_level", label: "Price Level", type: "text"},
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-      ]
-    }
+      fields: [
+        { row: [
+          { dbkey: "_id[$id]", label: "ID", crud: '0100', size: 6 },
+          { dbkey: "type", label: "Type",crud: '0100', size: 6 },
+        ]},
+        { row: [
+          { dbkey: "key", label: "Key", crud: '0100'},
+        ]},
+        { row: [
+          { dbkey: "brand", label: "Brand", size: 6 },
+          { dbkey: "model", label: "Model", size: 6 },
+        ]},
+        { row: [
+          { dbkey: "ax_code", label: "AX Code", size: 6 },
+          { dbkey: "inventory_id", label: "Inventory ID", size: 6 },
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type: 'date', size: 6},
+          { dbkey: "to", label: "To", type: 'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "rates",  label: "Rates", collapsible: false, fields: rates_field },
+        ]},
+      ]}
   ]
 };
 
