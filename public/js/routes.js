@@ -9,6 +9,8 @@ import PlansList from './components/PlansList';
 import ProductsList from './components/ProductsList';
 import ProductSetup from './components/ProductSetup';
 import Dashboard from './components/Dashboard';
+import SubscribersList from './components/SubscribersList';
+import SubscriberEdit from './components/Subscriber/SubscriberEdit';
 
 export default () => {
   return (
@@ -19,6 +21,8 @@ export default () => {
       <Route name="plans" path="/plans" component={PlansList} />
       <Route name="products" path="/products" component={ProductsList} />
       <Route name="product_setup" path="/product_setup(/:product_id)" component={ProductSetup} />
+      <Route name="subscribers_list" path="/subscribers_list" component={SubscribersList} />
+      <Route name="subscriber" path="/subscriber" component={SubscriberEdit} />
       <Route path="/:page/:collection/:action(/:entity_id)" component={PageBuilder} />
       <Route path="/:page" component={PageBuilder} />
     </Route>

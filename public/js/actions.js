@@ -23,6 +23,7 @@ export const GET_PLAN = 'GET_PLAN';
 export const CLEAR_PLAN = 'CLEAR_PLAN';
 export const GET_PRODUCT = 'GET_PRODUCT';
 export const SAVE_PLAN = 'SAVE_PLAN';
+export const GOT_CUSTOMER = 'GOT_CUSTOMER';
 
 import axios from 'axios';
 
@@ -152,6 +153,50 @@ export function getCollectionEntity(entity_id, collection, page_name) {
 export function getCollectionEntites(entity_ids, collection, page_name) {
   return dispatch => {
     return dispatch(fetchItems(entity_ids, collection, page_name));
+  };
+}
+
+function gotCustomer(customer) {
+  return {
+    type: GOT_CUSTOMER,
+    customer
+  }
+}
+
+function fetchCustomer(customer_id) {
+  /** TODO: REMOVE **/
+  let customer = {
+    first_name: "Lewis",
+    last_name: "Nitzberg",
+    aid: 123123,
+    subs: [
+      {
+        sid: 321321,
+        plan: "Fish o' the month"
+      }
+    ]
+  };
+
+  let fetchUrl = `/api/find?collection=customers&query={"_id": {"$in": ["${customer_id}"]}}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.get(fetchUrl).then(
+      response => {
+        dispatch(gotCustomer(customer));
+        dispatch(hideProgressBar());
+        //dispatch(gotSubscriber(response.data.details));
+      }
+    ).catch(error => {
+      /** TODO: Remove and error handle **/
+      dispatch(gotCustomer(customer));
+      dispatch(hideProgressBar());
+    });
+  };
+}
+
+export function getCustomer(customer_id) {
+  return dispatch => {
+    return dispatch(fetchCustomer(customer_id));
   };
 }
 

@@ -25,11 +25,11 @@ class Plan extends Component {
     ));
     
     return (
-      <div className="Plan">
+      <div className="BasicPlanSettings">
         <div className="BasicSettings">
           <h4>Basic Settings</h4>
-          <form class="form-inline">
-            <div class="form-group">
+          <form className="form-inline">
+            <div className="form-group">
               <div className="row">
                 <div className="col-md-4">
                   <label for="PlanName">Plan Name</label>
@@ -63,7 +63,7 @@ class Plan extends Component {
             <div className="PlanRecurring">
               <h4>Plan Recurring</h4>
               <div className="row">
-                <div className="col-xs-2">
+                <div className="col-xs-1">
                   <label for="PeriodicalRate">Periodical Rate</label>
                   <input type="text" id="PeriodicalRate" className="form-control" value={basic_settings.PeriodicalRate} onChange={onChangeFieldValue.bind(this, "basic_settings")} />
                 </div>

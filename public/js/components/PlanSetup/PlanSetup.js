@@ -94,7 +94,6 @@ class PlanSetup extends Component {
   };
   
   render() {
-    let { basic_settings, product_properties } = this.props;
     let { stepIndex } = this.state;
     
     const steps = [

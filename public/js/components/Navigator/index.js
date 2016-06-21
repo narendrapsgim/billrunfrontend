@@ -14,7 +14,8 @@ let routes = [
   {to: "/dashboard", label: "Dashboard"},
   {to: "/plans", label: "Plans"},
   {to: "/plan_setup", label: "Plan Setup"},
-  {to: "/products", label: "Products"}
+  {to: "/products", label: "Products"},
+  {to: "/subscribers_list", label: "Subscribers"}
 ];
 
 export default class Navigator extends Component {
