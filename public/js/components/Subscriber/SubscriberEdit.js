@@ -18,7 +18,7 @@ class SubscriberEdit extends Component {
     }
   }
   
-  onChangeFieldValue(section, e) {
+  onChangeFieldValue(e) {
     let { value, id } = e.target;
     this.props.dispatch(updateCustomerField(id, value));
   }

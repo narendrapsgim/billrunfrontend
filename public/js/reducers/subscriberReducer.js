@@ -7,7 +7,7 @@ export default function (state = Immutable.Map(), action) {
   case actions.GOT_CUSTOMER:
     return Immutable.fromJS(action.customer);
   case actions.UPDATE_SUBSCRIBER_FIELD:
-    return state.setIn(field_id, value);
+    return state.set(field_id, value);
   default:
     return state;
   }
