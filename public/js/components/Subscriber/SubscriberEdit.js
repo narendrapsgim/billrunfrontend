@@ -19,8 +19,8 @@ class SubscriberEdit extends Component {
   }
   
   onChangeFieldValue(section, e) {
-    let {value, id } = e.target;
-    this.props.dispatch(updatePlanpField(section, id, value));
+    let { value, id } = e.target;
+    this.props.dispatch(updateSubscriberField(id, value));
   }
 
   render() {

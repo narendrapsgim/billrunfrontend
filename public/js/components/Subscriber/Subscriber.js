@@ -27,7 +27,9 @@ class Subscriber extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return state.subscriber || {};
+  if (state.subscriber)
+    return {subscriber: state.subscriber}
+  return {};
 }
 
 export default connect(mapStateToProps)(Subscriber);
