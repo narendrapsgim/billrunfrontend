@@ -1,5 +1,5 @@
 body {
-    background-color: #C0C0C0;
+    /*    background-color: #C0C0C0;*/
     font-family: Roboto, sans-serif;
 }
 
@@ -14,7 +14,11 @@ label {
   padding-right: 0;
   padding-left: 0;
 }
+
 /* temp Overide bootstrap CSS*/
+.bordered-container {
+    border: 2px solid #C0C0C0;
+}
 
 [class^="muidocs-icon-"], [class*=" muidocs-icon-"] {
 	font-family: 'material-ui-icons';
@@ -54,14 +58,17 @@ label {
 }
 
 .navigator {
-    background-color: white;
+    background-color: #01BFA5;
+    color: #014A3F;
     height: 70px;
 }
 .navigator a.active button {
-    background: #E3E8EB!important;
+    background: #007666!important;
+    color: white!important;
 }
 .navigator button {
-  height: 70px!important;
+    height: 70px!important;
+    color: #014A41!important;
 }
 .help-popover {
     padding: 10px!important;

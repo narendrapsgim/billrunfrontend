@@ -144,32 +144,8 @@ export default function (state = {}, action) {
         })
       });
 
-    case actions.GET_PLAN:
-      return {
-        basic_settings: {
-          PlanName: 'Test',
-          PlanCode: '123',
-          PlanDescription: 'A plan description',
-          TrialTransaction: '',
-          PlanFee: '',
-          TrialCycle: '',
-          PeriodicalRate: '',
-          Each: '',
-          EachPeriod: "Month",
-          Cycle: '',
-          From: '',
-          To: ''
-        },
-        product_properties: {
-          ProductName: '',
-          properties: [{
-            ProductType:'',
-            FlatRate:'',
-            PerUnit:'',
-            Type:''
-          }]
-        }
-      };
+    case actions.GOT_PLAN:
+      return action.plan;
 
     case actions.CLEAR_PLAN:
       return defaultState;

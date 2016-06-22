@@ -20,9 +20,12 @@ export const UPDATE_PRODUCT_PROPERTIES_VALUE = 'UPDATE_PRODUCT_PROPERTIES_VALUE'
 export const ADD_PRODUCT_PROPERTIES = 'ADD_PRODUCT_PROPERTIES';
 export const REMOVE_PRODUCT_PROPERTIES = 'REMOVE_PRODUCT_PROPERTIES';
 export const GET_PLAN = 'GET_PLAN';
+export const GOT_PLAN = 'GOT_PLAN';
 export const CLEAR_PLAN = 'CLEAR_PLAN';
 export const GET_PRODUCT = 'GET_PRODUCT';
 export const SAVE_PLAN = 'SAVE_PLAN';
+export const GOT_CUSTOMER = 'GOT_CUSTOMER';
+export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
 
 import axios from 'axios';
 
@@ -155,6 +158,65 @@ export function getCollectionEntites(entity_ids, collection, page_name) {
   };
 }
 
+function gotCustomer(customer) {
+  return {
+    type: GOT_CUSTOMER,
+    customer
+  }
+}
+
+function fetchCustomer(customer_id) {
+  /** TODO: REMOVE **/
+  let customer = {
+    first_name: "Lewis",
+    last_name: "Nitzberg",
+    aid: 123123,
+    subs: [
+      {
+        sid: 321321,
+        plan: "Fish o' the month"
+      }
+    ]
+  };
+
+  let convert = (customer) => {
+    return {
+      FirstName: customer.first_name,
+      LastName: customer.last_name,
+    }
+  };
+  
+  let fetchUrl = `/api/find?collection=customers&query={"_id": {"$in": ["${customer_id}"]}}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.get(fetchUrl).then(
+      response => {
+        dispatch(gotCustomer(convert(customer)));
+        dispatch(hideProgressBar());
+        //dispatch(gotSubscriber(response.data.details));
+      }
+    ).catch(error => {
+      /** TODO: Remove and error handle **/
+      dispatch(gotCustomer(convert(customer)));
+      dispatch(hideProgressBar());
+    });
+  };
+}
+
+export function getCustomer(customer_id) {
+  return dispatch => {
+    return dispatch(fetchCustomer(customer_id));
+  };
+}
+
+export function updateCustomerField(field_id, value) {
+  return {
+    type: UPDATE_SUBSCRIBER_FIELD,
+    field_id,
+    value
+  };
+}
+
 export function saveCollectionEntity(item, collection, page_name, action) {
   let saveUrl = '/admin/save';
   let entity = Object.assign({}, item);
@@ -273,11 +335,61 @@ export function removeProductProperties(idx) {
   }
 }
 
-export function getPlan(plan_id) {
+function gotPlan(plan) {
   return {
-    type: GET_PLAN,
-    plan_id
-  }
+    type: GOT_PLAN,
+    plan
+  };
+}
+
+function fetchPlan(plan_id) {
+  let plan = {
+    basic_settings: {
+      PlanName: 'Test',
+      PlanCode: '123',
+      PlanDescription: 'A plan description',
+      TrialTransaction: '',
+      PlanFee: '',
+      TrialCycle: '',
+      PeriodicalRate: '',
+      Each: '',
+      EachPeriod: "Month",
+      Cycle: '',
+      From: '',
+      To: ''
+    },
+    product_properties: {
+      ProductName: '',
+      properties: [{
+        ProductType:'',
+        FlatRate:'',
+        PerUnit:'',
+        Type:''
+      }]
+    }
+  };
+
+  let fetchUrl = `/api/find?collection=plans&query={"_id": {"$in": ["${plan_id}"]}}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.get(fetchUrl).then(
+      response => {
+        dispatch(gotPlan(plan));
+        dispatch(hideProgressBar());
+        //dispatch(gotSubscriber(response.data.details));
+      }
+    ).catch(error => {
+      /** TODO: Remove and error handle **/
+      dispatch(gotPlan(plan));
+      dispatch(hideProgressBar());
+    });
+  };
+}
+
+export function getPlan(plan_id) {
+  return dispatch => {
+    return dispatch(fetchPlan(plan_id));
+  };
 }
 
 export function clearPlan() {

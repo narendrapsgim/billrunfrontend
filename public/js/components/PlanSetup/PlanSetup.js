@@ -35,7 +35,7 @@ class PlanSetup extends Component {
   }
 
   componentWillMount() {
-    let { plan_id } = this.props.params;
+    let { plan_id } = this.props.location.query;
     if (plan_id) {
       this.props.dispatch(getPlan(plan_id));
     }
@@ -43,6 +43,10 @@ class PlanSetup extends Component {
 
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
+  }
+  
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState.stepIndex !== this.state.stepIndex; 
   }
   
   onChangeFieldValue(section, e) {
@@ -94,18 +98,18 @@ class PlanSetup extends Component {
   };
   
   render() {
-    let { basic_settings, product_properties } = this.props;
     let { stepIndex } = this.state;
     
     const steps = [
       (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} />),
       (<Product onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />)
-    ];    
+    ];
 
     let currentStepContents = steps[stepIndex];
 
     return (
-      <div className="PlanSetup">
+      <div className="PlanSetup container">
+        <h3>Billing Plan</h3>
         <Stepper activeStep={stepIndex}>
           <Step>
             <StepLabel>Plan Settings</StepLabel>
@@ -114,7 +118,7 @@ class PlanSetup extends Component {
             <StepLabel>Add Product</StepLabel>
           </Step>
         </Stepper>
-        <div className="contents">
+        <div className="contents bordered-container">
           { currentStepContents }
         </div>
         <div style={{marginTop: 12, float: "right"}}>

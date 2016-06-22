@@ -47,7 +47,10 @@ export default class PlansList extends Component {
 
   onClickCell(cell_idx, col_idx, e) {
     let selected = this.state.dataList[cell_idx];
-    this.context.router.push(`plan_setup/${selected._id.$id}`);
+    this.context.router.push({
+      pathname: 'plan_setup',
+      query: {plan_id: selected._id.$id}
+    });
   }
   
   render() {
@@ -55,14 +58,14 @@ export default class PlansList extends Component {
 
     return (
       <Table onCellClick={this.onClickCell}>
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false} fixedHeader={true}>
+        <TableHeader displaySelectAll={true} fixedHeader={true}>
           <TableRow>
             <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
             <TableHeaderColumn tooltip="Technical Name">Technical Name</TableHeaderColumn>
             <TableHeaderColumn tooltip="Invoice Label">Invoice Label</TableHeaderColumn>
           </TableRow>
         </TableHeader>
-        <TableBody displayRowCheckbox={false}>
+        <TableBody>
           {dataList.map((row, index) => (
              <TableRow key={index}>
                <TableRowColumn>{row.name}</TableRowColumn>
