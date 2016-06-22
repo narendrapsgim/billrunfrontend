@@ -24,6 +24,7 @@ export const CLEAR_PLAN = 'CLEAR_PLAN';
 export const GET_PRODUCT = 'GET_PRODUCT';
 export const SAVE_PLAN = 'SAVE_PLAN';
 export const GOT_CUSTOMER = 'GOT_CUSTOMER';
+export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
 
 import axios from 'axios';
 
@@ -177,18 +178,25 @@ function fetchCustomer(customer_id) {
     ]
   };
 
+  let convert = (customer) => {
+    return {
+      FirstName: customer.first_name,
+      LastName: customer.last_name,
+    }
+  };
+  
   let fetchUrl = `/api/find?collection=customers&query={"_id": {"$in": ["${customer_id}"]}}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
       response => {
-        dispatch(gotCustomer(customer));
+        dispatch(gotCustomer(convert(customer)));
         dispatch(hideProgressBar());
         //dispatch(gotSubscriber(response.data.details));
       }
     ).catch(error => {
       /** TODO: Remove and error handle **/
-      dispatch(gotCustomer(customer));
+      dispatch(gotCustomer(convert(customer)));
       dispatch(hideProgressBar());
     });
   };
@@ -197,6 +205,14 @@ function fetchCustomer(customer_id) {
 export function getCustomer(customer_id) {
   return dispatch => {
     return dispatch(fetchCustomer(customer_id));
+  };
+}
+
+export function updateCustomerField(field_id, value) {
+  return {
+    type: UPDATE_SUBSCRIBER_FIELD,
+    field_id,
+    value
   };
 }
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { getCustomer } from '../../actions';
+import { getCustomer, updateCustomerField } from '../../actions';
 import Subscriber from './Subscriber';
 
 class SubscriberEdit extends Component {
@@ -20,7 +20,7 @@ class SubscriberEdit extends Component {
   
   onChangeFieldValue(section, e) {
     let { value, id } = e.target;
-    this.props.dispatch(updateSubscriberField(id, value));
+    this.props.dispatch(updateCustomerField(id, value));
   }
 
   render() {
@@ -36,7 +36,7 @@ class SubscriberEdit extends Component {
 }
 
 function mapStateToProps(state) {
-  return state.subscriber || {};
+  return state;
 }
 
 export default connect(mapStateToProps)(SubscriberEdit);

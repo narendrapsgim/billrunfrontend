@@ -14,11 +14,11 @@ class Subscriber extends Component {
         <div className="row">
           <div className="col-md-2">
             <label for="FirstName">First Name</label>
-            <input type="text" id="FirstName" className="form-control" value={subscriber.FirstName} onChange={onChangeFieldValue.bind(this, "subscriber")} />
+            <input type="text" id="FirstName" className="form-control" value={subscriber.get('FirstName')} onChange={onChangeFieldValue.bind(this, "subscriber")} />
           </div>
           <div className="col-md-2">
             <label for="LastName">Last Name</label>
-            <input type="text" id="LastName" className="form-control" value={subscriber.LastName} onChange={onChangeFieldValue.bind(this, "subscriber")} />
+            <input type="text" id="LastName" className="form-control" value={subscriber.get('LastName')} onChange={onChangeFieldValue.bind(this, "subscriber")} />
           </div>
         </div>
       </div>
@@ -27,9 +27,7 @@ class Subscriber extends Component {
 }
 
 function mapStateToProps(state, props) {
-  if (state.subscriber)
-    return {subscriber: state.subscriber}
-  return {};
+  return state;
 }
 
 export default connect(mapStateToProps)(Subscriber);
