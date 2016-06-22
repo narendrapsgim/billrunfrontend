@@ -45,6 +45,10 @@ class PlanSetup extends Component {
     this.props.dispatch(clearPlan());
   }
   
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState.stepIndex !== this.state.stepIndex; 
+  }
+  
   onChangeFieldValue(section, e) {
     let {value, id } = e.target;
     this.props.dispatch(updatePlanField(section, id, value));
@@ -99,7 +103,7 @@ class PlanSetup extends Component {
     const steps = [
       (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} />),
       (<Product onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />)
-    ];    
+    ];
 
     let currentStepContents = steps[stepIndex];
 
@@ -114,7 +118,7 @@ class PlanSetup extends Component {
             <StepLabel>Add Product</StepLabel>
           </Step>
         </Stepper>
-        <div className="contents" style={{border: "2px solid #C0C0C0"}}>
+        <div className="contents bordered-container">
           { currentStepContents }
         </div>
         <div style={{marginTop: 12, float: "right"}}>

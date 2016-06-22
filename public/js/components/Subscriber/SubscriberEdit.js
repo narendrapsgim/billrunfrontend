@@ -27,7 +27,7 @@ class SubscriberEdit extends Component {
     return (
       <div className="SubscriberEdit container">
         <h3>Subscriber</h3>
-        <div className="contents" style={{border: "2px solid #C0C0C0"}}>
+        <div className="contents bordered-container">
           <Subscriber onChangeFieldValue={this.onChangeFieldValue} />
         </div>
       </div>

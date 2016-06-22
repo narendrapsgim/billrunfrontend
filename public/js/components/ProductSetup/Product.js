@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import TextField from 'material-ui/TextField';
+import Field from '../Field';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import ContentAdd from 'material-ui/svg-icons/content/add';
@@ -25,8 +23,7 @@ class Product extends Component {
           onRemoveProductProperties } = this.props;
 
     return (
-      <div className="AddItem">
-        <h4>Add Product</h4>
+      <div className="AddProduct">
         <div className="row">
           <div className="col-md-4">
             <label for="ProductName">Product Name</label>
@@ -48,9 +45,7 @@ class Product extends Component {
                 </div>
                 <div className="col-md-1">
                   <label for="FlatRate">Flat Rate</label>
-                  <input type="number"
-                         className="form-control"
-                         id="FlatRate"
+                  <Field id="FlatRate"
                          onChange={onChangeItemFieldValue.bind(this, "FlatRate", key)}
                          value={prop["FlatRate"]}
                   />

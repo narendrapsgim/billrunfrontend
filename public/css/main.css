@@ -14,7 +14,11 @@ label {
   padding-right: 0;
   padding-left: 0;
 }
+
 /* temp Overide bootstrap CSS*/
+.bordered-container {
+    border: 2px solid #C0C0C0;
+}
 
 [class^="muidocs-icon-"], [class*=" muidocs-icon-"] {
 	font-family: 'material-ui-icons';

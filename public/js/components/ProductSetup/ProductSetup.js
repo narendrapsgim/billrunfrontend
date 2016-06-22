@@ -55,7 +55,10 @@ class ProductSetup extends Component {
   render() {
     return (
       <div className="ProductSetup container">
-        <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />
+        <h3>Product</h3>
+        <div className="contents bordered-container">
+          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />
+        </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
               label="Cancel"
