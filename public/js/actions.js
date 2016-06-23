@@ -26,6 +26,7 @@ export const GET_PRODUCT = 'GET_PRODUCT';
 export const SAVE_PLAN = 'SAVE_PLAN';
 export const GOT_CUSTOMER = 'GOT_CUSTOMER';
 export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
+export const SAVE_SUBSCRIBER = 'SAVE_SUBSCRIBER';
 
 import axios from 'axios';
 
@@ -155,6 +156,12 @@ export function getCollectionEntity(entity_id, collection, page_name) {
 export function getCollectionEntites(entity_ids, collection, page_name) {
   return dispatch => {
     return dispatch(fetchItems(entity_ids, collection, page_name));
+  };
+}
+
+export function saveSubscriber() {
+  return {
+    type: SAVE_SUBSCRIBER
   };
 }
 

@@ -8,6 +8,10 @@ export default function (state = Immutable.Map(), action) {
     return Immutable.fromJS(action.customer);
   case actions.UPDATE_SUBSCRIBER_FIELD:
     return state.set(field_id, value);
+  case actions.SAVE_SUBSCRIBER:
+    let sub = state.toJS();
+    console.log('saving customer', sub);
+    return state;
   default:
     return state;
   }
