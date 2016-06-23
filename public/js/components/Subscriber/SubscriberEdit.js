@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { getCustomer, updateCustomerField, saveSubscriber } from '../../actions';
+import { getCustomer, updateCustomerField, saveSubscriber } from '../../actions/customerActions';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Subscriber from './Subscriber';

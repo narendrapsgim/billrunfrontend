@@ -1,14 +1,16 @@
-import * as actions from '../actions';
+import { GOT_CUSTOMER,
+         UPDATE_SUBSCRIBER_FIELD,
+         SAVE_SUBSCRIBER } from '../actions/customerActions';
 import Immutable from 'immutable';
 
 export default function (state = Immutable.Map(), action) {
   let { field_id, value } = action;
   switch (action.type) {
-  case actions.GOT_CUSTOMER:
+  case GOT_CUSTOMER:
     return Immutable.fromJS(action.customer);
-  case actions.UPDATE_SUBSCRIBER_FIELD:
+  case UPDATE_SUBSCRIBER_FIELD:
     return state.set(field_id, value);
-  case actions.SAVE_SUBSCRIBER:
+  case SAVE_SUBSCRIBER:
     let sub = state.toJS();
     console.log('saving customer', sub);
     return state;
