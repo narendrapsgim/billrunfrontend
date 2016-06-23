@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, clearPlan, savePlan } from '../../actions';
+import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, clearPlan, savePlan } from '../../actions/planActions';
 
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';

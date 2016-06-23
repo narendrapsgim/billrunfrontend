@@ -1,4 +1,4 @@
-import * as actions from '../actions';
+import * as actions from '../actions/planActions';
 import _ from 'lodash';
 
 const defaultState = {

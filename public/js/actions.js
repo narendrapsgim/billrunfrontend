@@ -11,24 +11,14 @@ export const CHECK_LOGIN = 'checkLogin';
 export const OPEN_LOGIN_FORM = 'openLoginPopup';
 export const CLOSE_LOGIN_FORM = 'closeLoginPopup';
 export const SAVE_ITEM_ERROR = 'SAVE_ITEM_ERROR';
-export const SHOW_PROGRESS_BAR = 'SHOW_PROGRESS_BAR';
-export const HIDE_PROGRESS_BAR = 'HIDE_PROGRESS_BAR';
 export const SHOW_STATUS_MESSAGE = 'SHOW_STATUS_MESSAGE';
 export const HIDE_STATUS_MESSAGE = 'HIDE_STATUS_MESSAGE';
-export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
-export const UPDATE_PRODUCT_PROPERTIES_VALUE = 'UPDATE_PRODUCT_PROPERTIES_VALUE';
-export const ADD_PRODUCT_PROPERTIES = 'ADD_PRODUCT_PROPERTIES';
-export const REMOVE_PRODUCT_PROPERTIES = 'REMOVE_PRODUCT_PROPERTIES';
-export const GET_PLAN = 'GET_PLAN';
-export const GOT_PLAN = 'GOT_PLAN';
-export const CLEAR_PLAN = 'CLEAR_PLAN';
-export const GET_PRODUCT = 'GET_PRODUCT';
-export const SAVE_PLAN = 'SAVE_PLAN';
 export const GOT_CUSTOMER = 'GOT_CUSTOMER';
 export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
 export const SAVE_SUBSCRIBER = 'SAVE_SUBSCRIBER';
 
 import axios from 'axios';
+import { showProgressBar, hideProgressBar } from './actions/progressbarActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -266,14 +256,6 @@ export function closeLoginPopup(){
   return { type: CLOSE_LOGIN_FORM }
 }
 
-export function showProgressBar(){
-  return { type: SHOW_PROGRESS_BAR }
-}
-
-export function hideProgressBar(){
-  return { type: HIDE_PROGRESS_BAR }
-}
-
 export function showStatusMessage(message, messageType){
   return { type: SHOW_STATUS_MESSAGE, message, messageType }
 }
@@ -309,111 +291,4 @@ export function userDoLogout(){
       }
     );
   }
-}
-
-export function updatePlanField(section, field_name, field_value) {
-  return {
-    type: UPDATE_PLAN_FIELD_VALUE,
-    section,
-    field_name,
-    field_value
-  };
-}
-
-export function updateProductPropertiesField(field_name, field_idx, field_value) {
-  return {
-    type: UPDATE_PRODUCT_PROPERTIES_VALUE,
-    field_name,
-    field_idx,
-    field_value
-  }
-}
-
-export function addProductProperties() {
-  return {
-    type: ADD_PRODUCT_PROPERTIES    
-  }
-}
-
-export function removeProductProperties(idx) {
-  return {
-    type: REMOVE_PRODUCT_PROPERTIES,
-    idx
-  }
-}
-
-function gotPlan(plan) {
-  return {
-    type: GOT_PLAN,
-    plan
-  };
-}
-
-function fetchPlan(plan_id) {
-  let plan = {
-    basic_settings: {
-      PlanName: 'Test',
-      PlanCode: '123',
-      PlanDescription: 'A plan description',
-      TrialTransaction: '',
-      PlanFee: '',
-      TrialCycle: '',
-      PeriodicalRate: '',
-      Each: '',
-      EachPeriod: "Month",
-      Cycle: '',
-      From: '',
-      To: ''
-    },
-    product_properties: {
-      ProductName: '',
-      properties: [{
-        ProductType:'',
-        FlatRate:'',
-        PerUnit:'',
-        Type:''
-      }]
-    }
-  };
-
-  let fetchUrl = `/api/find?collection=plans&query={"_id": {"$in": ["${plan_id}"]}}`;
-  return (dispatch) => {
-    dispatch(showProgressBar());
-    let request = axiosInstance.get(fetchUrl).then(
-      response => {
-        dispatch(gotPlan(plan));
-        dispatch(hideProgressBar());
-        //dispatch(gotSubscriber(response.data.details));
-      }
-    ).catch(error => {
-      /** TODO: Remove and error handle **/
-      dispatch(gotPlan(plan));
-      dispatch(hideProgressBar());
-    });
-  };
-}
-
-export function getPlan(plan_id) {
-  return dispatch => {
-    return dispatch(fetchPlan(plan_id));
-  };
-}
-
-export function clearPlan() {
-  return {
-    type: CLEAR_PLAN
-  };
-}
-
-export function getProduct(product_id) {
-  return {
-    type: GET_PRODUCT,
-    product_id
-  };
-}
-
-export function savePlan() {
-  return {
-    type: SAVE_PLAN
-  };
 }
