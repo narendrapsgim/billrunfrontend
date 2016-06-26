@@ -46,6 +46,7 @@ class PlanSetup extends Component {
   }
   
   shouldComponentUpdate(nextProps, nextState) {
+    /* Only re-render the component when switching steps in the stepper */
     return nextState.stepIndex !== this.state.stepIndex; 
   }
   

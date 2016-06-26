@@ -32,7 +32,8 @@ function fetchCustomer(customer_id) {
     subs: [
       {
         sid: 321321,
-        plan: "Fish o' the month"
+        plan: "Fish o' the month",
+        plan_id: '123abc3'
       }
     ]
   };
@@ -41,6 +42,7 @@ function fetchCustomer(customer_id) {
     return {
       FirstName: customer.first_name,
       LastName: customer.last_name,
+      subs: customer.subs
     }
   };
   
