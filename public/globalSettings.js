@@ -7,7 +7,7 @@ var globalSetting = {
   dateFormat : "DD/MM/YYYY",
   timeFormat : "HH:MM",
   apiDateTimeFormat : "YYYY/MM/DD HH:mm:ss",
-  currency : ' €',
+  currency : '$',
   list : {
     maxItems : 100
   },
