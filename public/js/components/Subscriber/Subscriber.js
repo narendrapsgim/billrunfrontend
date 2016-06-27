@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
+import Immutable from 'immutable';
 
 import Field from '../Field';
 
@@ -10,18 +11,23 @@ class Subscriber extends Component {
   }
 
   render() {
-    let { subscriber, onChangeFieldValue } = this.props;
-
-    let subscriptions_html = !subscriber.get('subs') ?
-                             [] :
-                             subscriber.get('subs').map((sub, key) => (
+    let { items, onChangeFieldValue, onUnsubscribe } = this.props;
+    let subscriber = items.find(obj => { return obj.get('type') === "account"; }) || Immutable.Map();
+    let subscriptions = items.reduce((r, obj, k) => {
+      if (obj.get('type') !== "account")
+        return r.push(obj);
+      return r;
+    }, Immutable.List());
+    
+    let subscriptions_html = subscriptions.map((sub, key) => (
                                <div className="row" key={key}>
                                  <div className="col-md-2">
-                                   <label>
-                                     <Link to={`/plan_setup?plan_id=${sub.get('plan_id')}`}>
-                                       { sub.get('plan') }
-                                     </Link>
-                                   </label>
+                                   <Link to={`/plan_setup?plan_id=${sub.get('plan_ref')}`}>
+                                     { sub.get('plan') }
+                                   </Link>
+                                 </div>
+                                 <div className="col-md-1">
+                                   <a style={{cursor: "pointer"}} onClick={onUnsubscribe.bind(this, sub.get('sid'))}>(unsubscribe)</a>
                                  </div>
                                </div>
                              ));
@@ -30,18 +36,18 @@ class Subscriber extends Component {
       <div className="Subscriber">
         <div className="row">
           <div className="col-md-2">
-            <label for="FirstName">First Name</label>
-            <Field id="FirstName" className="form-control" value={subscriber.get('FirstName')} onChange={onChangeFieldValue} />
+            <label for="first_name">First Name</label>
+            <Field id="first_name" className="form-control" value={subscriber.get('first_name')} onChange={onChangeFieldValue} />
           </div>
           <div className="col-md-2">
-            <label for="LastName">Last Name</label>
-            <Field id="LastName" className="form-control" value={subscriber.get('LastName')} onChange={onChangeFieldValue} />
+            <label for="last_name">Last Name</label>
+            <Field id="last_name" className="form-control" value={subscriber.get('last_name')} onChange={onChangeFieldValue} />
           </div>
         </div>
         <div className="row">
           <div className="col-md-10">
             <label for="Address">Address</label>
-            <Field id="Address" coll="Subscriber" className="form-control" value={subscriber.get('Address')} onChange={onChangeFieldValue} />
+            <Field id="address" coll="Subscriber" className="form-control" value={subscriber.get('address')} onChange={onChangeFieldValue} />
           </div>
         </div>
         <hr/>
@@ -55,7 +61,7 @@ class Subscriber extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return state;
+  return {items: state.subscriber};
 }
 
 export default connect(mapStateToProps)(Subscriber);

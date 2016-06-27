@@ -15,7 +15,8 @@ let routes = [
   {to: "/plans", label: "Plans"},
   {to: "/plan_setup", label: "Plan Setup"},
   {to: "/products", label: "Products"},
-  {to: "/subscribers_list", label: "Subscribers"}
+  {to: "/subscribers_list", label: "Subscribers"},
+  {to: "/usage", label: "Usage"}
 ];
 
 export default class Navigator extends Component {
@@ -30,7 +31,7 @@ export default class Navigator extends Component {
   render() {
     let buttons = routes.map((route, key) => (
       <Link to={route.to} key={key} activeClassName='active'>
-        <FlatButton label={route.label} labelStyle={{textTransform: "none"}} style={{width: "240px"}} />
+        <FlatButton label={route.label} labelStyle={{textTransform: "none"}} style={{minWidth: "180px", maxWidth: "240px"}} />
       </Link>
     ));
 

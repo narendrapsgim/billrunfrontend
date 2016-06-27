@@ -3,7 +3,7 @@ import { GOT_CUSTOMER,
          SAVE_SUBSCRIBER } from '../actions/customerActions';
 import Immutable from 'immutable';
 
-export default function (state = Immutable.Map(), action) {
+export default function (state = Immutable.List(), action) {
   let { field_id, value } = action;
   switch (action.type) {
   case GOT_CUSTOMER:

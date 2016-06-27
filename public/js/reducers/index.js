@@ -5,6 +5,7 @@ import pages from './pagesReducer'
 import login from './loginReducer'
 import plan  from './planReducer'
 import subscriber from './subscriberReducer'
+import usages from './usagesReducer'
 
 export default combineReducers({
   statusBar,
@@ -12,5 +13,6 @@ export default combineReducers({
   pages,
   login,
   plan,
-  subscriber
+  subscriber,
+  usages
 });

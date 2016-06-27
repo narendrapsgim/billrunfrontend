@@ -25,39 +25,40 @@ function gotCustomer(customer) {
 
 function fetchCustomer(customer_id) {
   /** TODO: REMOVE **/
-  let customer = {
-    first_name: "Lewis",
-    last_name: "Nitzberg",
-    aid: 123123,
-    subs: [
-      {
-        sid: 321321,
-        plan: "Fish o' the month",
-        plan_id: '123abc3'
-      }
-    ]
-  };
-
-  let convert = (customer) => {
-    return {
-      FirstName: customer.first_name,
-      LastName: customer.last_name,
-      subs: customer.subs
+  let customer = [
+    {
+      first_name: "Lewis",
+      last_name: "Nitzberg",
+      aid: 123123,
+      address: "1516 Lilac lane, Mountain View, CA",
+      type: "account"
+    },
+    {
+      plan: "Fish o' the Month",
+      plan_ref: "123eab",
+      aid: 123123,
+      sid: 111111
+    },
+    {
+      plan: "Steak o' the Month",
+      plan_ref: "422eaa",
+      aid: 123123,
+      sid: 222222
     }
-  };
+  ];
   
-  let fetchUrl = `/api/find?collection=customers&query={"_id": {"$in": ["${customer_id}"]}}`;
+  let fetchUrl = `/api/find?collection=customers&query={"aid": {"$in": ["${customer_id}"]}}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
       response => {
-        dispatch(gotCustomer(convert(customer)));
+        dispatch(gotCustomer(customer));
         dispatch(hideProgressBar());
         //dispatch(gotSubscriber(response.data.details));
       }
     ).catch(error => {
       /** TODO: Remove and error handle **/
-      dispatch(gotCustomer(convert(customer)));
+      dispatch(gotCustomer(customer));
       dispatch(hideProgressBar());
     });
   };

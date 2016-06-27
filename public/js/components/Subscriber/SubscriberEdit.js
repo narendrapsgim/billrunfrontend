@@ -14,6 +14,7 @@ class SubscriberEdit extends Component {
     this.onChangeFieldValue = this.onChangeFieldValue.bind(this);
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
+    this.onUnsubscribe = this.onUnsubscribe.bind(this);
   }
 
   componentWillMount() {
@@ -28,7 +29,11 @@ class SubscriberEdit extends Component {
     this.props.dispatch(updateCustomerField(id, value));
   }
 
-
+  onUnsubscribe(sid) {
+    let r = confirm("Unsubscribe from plan?");
+    if (r) console.log(`unsubscribe from plan ${sid}`);
+  }
+  
   onSave() {
     this.props.dispatch(saveSubscriber());
   }
@@ -42,7 +47,7 @@ class SubscriberEdit extends Component {
       <div className="SubscriberEdit container">
         <h3>Subscriber</h3>
         <div className="contents bordered-container">
-          <Subscriber onChangeFieldValue={this.onChangeFieldValue} />
+          <Subscriber onChangeFieldValue={this.onChangeFieldValue} onUnsubscribe={this.onUnsubscribe} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton

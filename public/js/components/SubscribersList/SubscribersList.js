@@ -11,6 +11,7 @@ export default class SubscribersList extends Component {
           _id: {
             "$id": "123abc4"
           },
+          aid: 123123,
           first_name: "Lewis",
           last_name: "Nitzberg",
           plan: "Fish o' the Month"
@@ -24,7 +25,7 @@ export default class SubscribersList extends Component {
     let selected = this.state.dataList[cell_idx];
     this.context.router.push({
       pathname: 'subscriber',
-      query: {subscriber_id: selected._id.$id}
+      query: {subscriber_id: selected.aid}
     });
   }
   
