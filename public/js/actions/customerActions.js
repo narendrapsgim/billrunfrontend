@@ -49,7 +49,7 @@ function fetchCustomers() {
 
 
 function fetchCustomer(customer_id) {
-  let fetchUrl = `/api/find?collection=subscribers&query={"aid": {"$in": ["${customer_id}"]}}`;
+  let fetchUrl = `/api/find?collection=subscribers&query={"_id": {"$in": ["${customer_id}"]}}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
