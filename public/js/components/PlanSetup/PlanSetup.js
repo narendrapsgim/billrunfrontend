@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan, clearPlan, savePlan } from '../../actions';
+import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan, clearPlan, savePlan } from '../../actions/planActions';
 
 import {
   Step,
@@ -46,6 +46,7 @@ class PlanSetup extends Component {
   }
   
   shouldComponentUpdate(nextProps, nextState) {
+    /* Only re-render the component when switching steps in the stepper */
     return nextState.stepIndex !== this.state.stepIndex; 
   }
   

@@ -1,28 +1,28 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { getProducts } from '../../actions/productsActions';
+
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 
-export default class ProductsList extends Component {
+class ProductsList extends Component {
   constructor(props) {
     super(props);
 
     this.onClickCell = this.onClickCell.bind(this);
-    
-    this.state = {
-      dataList: [
-        {key: "UNRATED", "_id" : {"$id": "57557eec36b4dc66eb54a580"}},
-        {key: "NUMEROS_SPECIAUX_T33_FIX", "_id" : {"$id": "57557eec36b4dc66eb54a580"}},
-        {key: "FIX_GP_FRANCE_FIX", "_id" : {"$id": "57557eec36b4dc66eb54a580"}}
-      ]
-    };
   }
 
+  componentWillMount() {
+    this.props.dispatch(getProducts());
+  }
+  
   onClickCell(cell_idx, col_idx, e) {
-    let selected = this.state.dataList[cell_idx];
-    this.context.router.push(`product_setup/${selected._id.$id}`);
+    let { products } = this.props;
+    let id = products.valueSeq().get(cell_idx).getIn(['_id', '$id']);;
+    this.context.router.push(`product_setup/${id}`);
   }
   
   render() {
-    let { dataList } = this.state;
+    let { products } = this.props;
 
     return (
       <Table onCellClick={this.onClickCell}>
@@ -32,9 +32,9 @@ export default class ProductsList extends Component {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {dataList.map((row, index) => (
+          {products.map((row, index) => (
              <TableRow key={index}>
-               <TableRowColumn>{row.key}</TableRowColumn>
+               <TableRowColumn>{row.get('key')}</TableRowColumn>
              </TableRow>
            ))}
         </TableBody>
@@ -46,3 +46,9 @@ export default class ProductsList extends Component {
 ProductsList.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
+
+function mapStateToProps(state, props) {
+  return state;
+}
+
+export default connect(mapStateToProps)(ProductsList);

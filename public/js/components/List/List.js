@@ -161,6 +161,7 @@ class List extends Component {
       fields: props.settings.fields,
       loadingData : ''
     };
+    console.log(this.state.settings);
   }
 
   componentWillMount() {

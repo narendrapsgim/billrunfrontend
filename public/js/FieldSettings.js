@@ -3,7 +3,10 @@ const FieldSettings = {
   FlatRate: 'price',
   To: 'date',
   From: 'date',
-  PeriodicalRate: 'price'
+  PeriodicalRate: 'price',
+  Subscriber: {
+    Address: 'address'
+  }
 };
 
 export default FieldSettings;

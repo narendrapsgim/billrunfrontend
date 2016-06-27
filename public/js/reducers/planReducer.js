@@ -1,5 +1,6 @@
-import * as actions from '../actions';
+import * as actions from '../actions/planActions';
 import _ from 'lodash';
+import Immutable from 'immutable';
 
 const defaultState = {
   basic_settings: {
@@ -143,25 +144,15 @@ export default function (state = {}, action) {
             .concat(state.product_properties.properties.slice(action.idx + 1))
         })
       });
-
+    
     case actions.GOT_PLAN:
       return action.plan;
 
     case actions.CLEAR_PLAN:
       return defaultState;
 
-    case actions.GET_PRODUCT:
-      return {
-        product_properties: {
-          ProductName: 'Product',
-          properties: [{
-            ProductType:'Metered',
-            FlatRate:'123',
-            PerUnit:'1',
-            Type:'Metered'
-          }]
-        }
-      };
+    case actions.GOT_PRODUCT:
+      return action.product;
 
     case actions.SAVE_PLAN:
       let plan = buildPlanFromState(state);

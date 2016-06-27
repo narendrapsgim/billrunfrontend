@@ -1,13 +1,13 @@
 import * as actions from '../actions';
+import { SHOW_PROGRESS_BAR, HIDE_PROGRESS_BAR } from '../actions/progressbarActions';
 
 export default function (state = {}, action) {
-
   switch (action.type) {
 
-    case actions.SHOW_PROGRESS_BAR:
+    case SHOW_PROGRESS_BAR:
       return Object.assign({}, state, {loading:true});
 
-    case actions.HIDE_PROGRESS_BAR:
+    case HIDE_PROGRESS_BAR:
       return Object.assign({}, state, {loading:false});
 
     case actions.SHOW_STATUS_MESSAGE:

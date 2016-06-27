@@ -10,7 +10,7 @@ export default class Price extends Component {
 
     return (
       <div className="input-group">
-        <div className="input-group-addon">$</div>
+        <div className="input-group-addon">{globalSetting.currency}</div>
         <input type="number" id={id} className="form-control" value={value} onChange={onChange} />
       </div>      
     );
