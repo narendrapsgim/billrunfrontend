@@ -1,4 +1,4 @@
-export const GOT_USAGES = 'GOT_USAGES';
+export const GOT_PRODUCTS = 'GOT_PRODUCTS';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -8,20 +8,20 @@ let axiosInstance = axios.create({
   baseURL: globalSetting.serverUrl
 });
 
-function gotUsages(usages) {
+function gotProducts(products) {
   return {
-    type: GOT_USAGES,
-    usages
+    type: GOT_PRODUCTS,
+    products
   };
 }
 
-function fetchUsages() {
-  let fetchUrl = `/api/find?collection=lines`;
+function fetchProducts() {
+  let fetchUrl = `/api/find?collection=rates`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
       resp => {
-        dispatch(gotUsages(resp.data.details));
+        dispatch(gotProducts(resp.data.details));
         dispatch(hideProgressBar());
       }
     ).catch(error => {
@@ -30,8 +30,8 @@ function fetchUsages() {
   };
 }
 
-export function getUsages() {
+export function getProducts() {
   return dispatch => {
-    return dispatch(fetchUsages());
-  }
+    return dispatch(fetchProducts());
+  };
 }

@@ -1,4 +1,5 @@
 export const GOT_CUSTOMER = 'GOT_CUSTOMER';
+export const GOT_CUSTOMERS = 'GOT_CUSTOMERS';
 export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
 export const SAVE_SUBSCRIBER = 'SAVE_SUBSCRIBER';
 
@@ -16,6 +17,14 @@ export function saveSubscriber() {
   };
 }
 
+
+function gotCustomers(customers) {
+  return {
+    type: GOT_CUSTOMERS,
+    customers
+  }
+}
+
 function gotCustomer(customer) {
   return {
     type: GOT_CUSTOMER,
@@ -23,31 +32,24 @@ function gotCustomer(customer) {
   }
 }
 
+function fetchCustomers() {  
+  let fetchUrl = `/api/find?collection=subscribers&query={"type": "account"}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.get(fetchUrl).then(
+      resp => {
+        dispatch(gotCustomers(resp.data.details));
+        dispatch(hideProgressBar());
+      }
+    ).catch(error => {
+      dispatch(hideProgressBar());
+    });
+  };
+}
+
+
 function fetchCustomer(customer_id) {
-  /** TODO: REMOVE **/
-  let customer = [
-    {
-      first_name: "Lewis",
-      last_name: "Nitzberg",
-      aid: 123123,
-      address: "1516 Lilac lane, Mountain View, CA",
-      type: "account"
-    },
-    {
-      plan: "Fish o' the Month",
-      plan_ref: "123eab",
-      aid: 123123,
-      sid: 111111
-    },
-    {
-      plan: "Steak o' the Month",
-      plan_ref: "422eaa",
-      aid: 123123,
-      sid: 222222
-    }
-  ];
-  
-  let fetchUrl = `/api/find?collection=customers&query={"aid": {"$in": ["${customer_id}"]}}`;
+  let fetchUrl = `/api/find?collection=subscribers&query={"aid": {"$in": ["${customer_id}"]}}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -57,10 +59,15 @@ function fetchCustomer(customer_id) {
         //dispatch(gotSubscriber(response.data.details));
       }
     ).catch(error => {
-      /** TODO: Remove and error handle **/
-      dispatch(gotCustomer(customer));
       dispatch(hideProgressBar());
     });
+  };
+}
+
+
+export function getCustomers() {
+  return dispatch => {
+    return dispatch(fetchCustomers());
   };
 }
 

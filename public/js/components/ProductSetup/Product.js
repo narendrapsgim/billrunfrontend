@@ -16,18 +16,18 @@ class Product extends Component {
       <option value={type} key={key}>{type}</option>
     ));
 
-
     let { product_properties,
           onChangeItemFieldValue,
           onAddProductProperties,
           onRemoveProductProperties } = this.props;
+    console.log(product_properties);
 
     return (
       <div className="AddProduct">
         <div className="row">
           <div className="col-md-4">
             <label for="ProductName">Product Name</label>
-            <input type="text" className="form-control" id="ProductName" onChange={onChangeItemFieldValue.bind(this, "ProductName", -1)} />
+            <input type="text" className="form-control" id="ProductName" onChange={onChangeItemFieldValue.bind(this, "ProductName", -1)} value={product_properties.ProductName} />
           </div>
         </div>
         { product_properties.properties.map((prop, key) => {

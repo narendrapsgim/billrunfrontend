@@ -12,6 +12,8 @@ import Dashboard from './components/Dashboard';
 import SubscribersList from './components/SubscribersList';
 import SubscriberEdit from './components/Subscriber/SubscriberEdit';
 import UsageList from './components/UsageList';
+import Log from './components/Log';
+import Settings from './components/Settings';
 
 export default () => {
   return (
@@ -25,6 +27,8 @@ export default () => {
       <Route name="subscribers_list" path="/subscribers_list" component={SubscribersList} />
       <Route name="subscriber" path="/subscriber" component={SubscriberEdit} />
       <Route name="usage" path="/usage" component={UsageList} />
+      <Route name="log" path="/log" component={Log} />
+      <Route name="settings" path="/settings" component={Settings} />
       <Route path="/:page/:collection/:action(/:entity_id)" component={PageBuilder} />
       <Route path="/:page" component={PageBuilder} />
     </Route>

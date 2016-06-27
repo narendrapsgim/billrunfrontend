@@ -1,36 +1,32 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody } from 'material-ui/Table';
 
-export default class SubscribersList extends Component {
+import { getCustomers } from '../../actions/customerActions';
+
+class SubscribersList extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      dataList: [
-        {
-          _id: {
-            "$id": "123abc4"
-          },
-          aid: 123123,
-          first_name: "Lewis",
-          last_name: "Nitzberg",
-          plan: "Fish o' the Month"
-        }
-      ]
-    };
+
     this.onClickCell = this.onClickCell.bind(this);
   }
 
+  componentWillMount() {
+    this.props.dispatch(getCustomers());
+  }
+  
   onClickCell(cell_idx, col_idx, e) {
-    let selected = this.state.dataList[cell_idx];
+    let { subscriber } = this.props;
+    let id = subscriber.valueSeq().get(cell_idx).getIn(['_id', '$id']);;
     this.context.router.push({
       pathname: 'subscriber',
-      query: {subscriber_id: selected.aid}
+      query: {subscriber_id: id}
     });
   }
   
   render() {
-    let dataList = this.state.dataList;
+    let { subscriber } = this.props;
 
     return (
       <Table onCellClick={this.onClickCell}>
@@ -42,11 +38,11 @@ export default class SubscribersList extends Component {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {dataList.map((row, index) => (
+          {subscriber.map((row, index) => (
              <TableRow key={index}>
-               <TableRowColumn>{row.first_name}</TableRowColumn>
-               <TableRowColumn>{row.last_name}</TableRowColumn>
-               <TableRowColumn>{row.plan}</TableRowColumn>
+               <TableRowColumn>{row.get('first_name')}</TableRowColumn>
+               <TableRowColumn>{row.get('last_name')}</TableRowColumn>
+               <TableRowColumn>{row.get('plan')}</TableRowColumn>
              </TableRow>
           ))}
         </TableBody>
@@ -58,3 +54,9 @@ export default class SubscribersList extends Component {
 SubscribersList.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
+
+function mapStateToProps(state, props) {
+  return state;
+}
+
+export default connect(mapStateToProps)(SubscribersList);

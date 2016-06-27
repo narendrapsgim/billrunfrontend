@@ -4,6 +4,7 @@ export const ADD_PRODUCT_PROPERTIES = 'ADD_PRODUCT_PROPERTIES';
 export const REMOVE_PRODUCT_PROPERTIES = 'REMOVE_PRODUCT_PROPERTIES';
 export const GET_PLAN = 'GET_PLAN';
 export const GOT_PLAN = 'GOT_PLAN';
+export const GOT_PRODUCT = 'GOT_PRODUCT';
 export const CLEAR_PLAN = 'CLEAR_PLAN';
 export const GET_PRODUCT = 'GET_PRODUCT';
 export const SAVE_PLAN = 'SAVE_PLAN';
@@ -55,48 +56,30 @@ function gotPlan(plan) {
 }
 
 function fetchPlan(plan_id) {
-  let plan = {
-    basic_settings: {
-      PlanName: 'Test',
-      PlanCode: '123',
-      PlanDescription: 'A plan description',
-      TrialTransaction: '',
-      PlanFee: '',
-      TrialCycle: '',
-      PeriodicalRate: '',
-      Each: '',
-      EachPeriod: "Month",
-      Cycle: '',
-      From: '',
-      To: ''
-    },
-    product_properties: {
-      ProductName: '',
-      properties: [{
-        ProductType:'',
-        FlatRate:'',
-        PerUnit:'',
-        Type:''
-      }]
-    }
+  const convert = (plan) => {
+    return {
+      basic_settings: {
+        PlanName: plan.name
+      }
+    };
   };
 
   let fetchUrl = `/api/find?collection=plans&query={"_id": {"$in": ["${plan_id}"]}}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
-      response => {
-        dispatch(gotPlan(plan));
+      resp => {
+        let p = _.values(resp.data.details)[0];
+        dispatch(gotPlan(convert(p)));
         dispatch(hideProgressBar());
-        //dispatch(gotSubscriber(response.data.details));
       }
     ).catch(error => {
-      /** TODO: Remove and error handle **/
-      dispatch(gotPlan(plan));
+      console.log(error);
       dispatch(hideProgressBar());
     });
   };
 }
+
 
 export function getPlan(plan_id) {
   return dispatch => {
@@ -110,10 +93,42 @@ export function clearPlan() {
   };
 }
 
-export function getProduct(product_id) {
+function gotProduct(product) {
   return {
-    type: GET_PRODUCT,
-    product_id
+    type: GOT_PRODUCT,
+    product
+  }
+}
+
+function fetchProduct(product_id) {
+  const convert = (product) => {
+    return {
+      product_properties: {
+        ProductName: product.key,
+        properties: []
+      }
+    };
+  };
+
+  let fetchUrl = `/api/find?collection=rates&query={"_id": {"$in": ["${product_id}"]}}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.get(fetchUrl).then(
+      resp => {
+        let p = _.values(resp.data.details)[0];
+        dispatch(gotProduct(convert(p)));
+        dispatch(hideProgressBar());
+      }
+    ).catch(error => {
+      console.log(error);
+      dispatch(hideProgressBar());
+    });
+  };
+}
+
+export function getProduct(product_id) {
+  return dispatch => {
+    return dispatch(fetchProduct(product_id));
   };
 }
 

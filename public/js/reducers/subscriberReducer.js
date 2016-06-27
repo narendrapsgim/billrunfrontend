@@ -1,4 +1,5 @@
 import { GOT_CUSTOMER,
+         GOT_CUSTOMERS,
          UPDATE_SUBSCRIBER_FIELD,
          SAVE_SUBSCRIBER } from '../actions/customerActions';
 import Immutable from 'immutable';
@@ -6,6 +7,8 @@ import Immutable from 'immutable';
 export default function (state = Immutable.List(), action) {
   let { field_id, value } = action;
   switch (action.type) {
+  case GOT_CUSTOMERS:
+    return Immutable.fromJS(action.customers).toList();
   case GOT_CUSTOMER:
     return Immutable.fromJS(action.customer);
   case UPDATE_SUBSCRIBER_FIELD:

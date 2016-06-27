@@ -40,7 +40,7 @@ export default class Pager extends Component {
               key='back'
               mini={true}
               style={styles.pagination.paginationButton}
-              onClick={onPagintionClick}
+              onClick={onPaginationClick}
               value='back'
               secondary={false}
               disabled={currentPage == 1}
@@ -56,7 +56,7 @@ export default class Pager extends Component {
                   key={i}
                   mini={true}
                   style={styles.pagination.paginationButton}
-                  onClick={onPagintionClick}
+                  onClick={onPaginationClick}
                   value={i}
                   disabled={currentPage == i}
               >
@@ -73,7 +73,7 @@ export default class Pager extends Component {
               key='forward'
               mini={true}
               style={styles.pagination.paginationButton}
-              onClick={onPagintionClick}
+              onClick={onPaginationClick}
               value='forward'
               secondary={false}
               disabled={currentPage == totalPages}
