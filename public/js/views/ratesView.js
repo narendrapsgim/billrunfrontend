@@ -12,6 +12,9 @@ const ratess_field = [
         { dbkey: "erp_account", label: "ERP Account", type: "text"},
       ]},
       { row: [
+        { dbkey: "groups", label : 'Groups', type: 'array'},
+      ]},
+      { row: [
         { dbkey: "rate", crud: '1110', fieldType: "array", label: "", collapsible: false, fields: [
           { row: [
             { dbkey: "price", label: "Price ", type: "text", size: 4},
