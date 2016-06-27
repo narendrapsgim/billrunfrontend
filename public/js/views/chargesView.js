@@ -86,6 +86,6 @@ const rates_charge_list_view = {
 const ChargesView = {
   rates_charge_edit_view,
   rates_charge_list_view
-}
+};
 
 export default ChargesView;

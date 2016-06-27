@@ -51,7 +51,7 @@ export function saveConfig(options) {
            } */
       }
     );
-  }
+  };
 }
 
 export function newField(path, field_type, page_name) {
@@ -106,11 +106,52 @@ function fetchItem(item_id, collection, page_name) {
           dispatch(hideProgressBar());
       }
     );
-  }
+  };
 }
 
+function combineArray(key, items, path){
+  let dictionary = {};
+  let combinedArray = [];
+  //Create dictionary with all unique regions
+  for ( const i in items ) {
+    let dists = _.result(items[i], path);
+    if(dists && _.isArray(dists)){
+      for ( const j in dists ) {
+        let id = items[i]._id['$id'];
+        let keyName = dists[j][key];
+        let itemDist = { id: [id], prefix: dists[j].prefix};
+        if(!_.has(dictionary, keyName)){
+          dictionary[keyName] = [];
+          // mapping[keyName] = dists[j]
+        }
+        dictionary[keyName].push(itemDist);
+      }
+    }
+  }
+  //filter not exist regions and compare prefixes
+  for ( const uniqueKey in dictionary ) {
+    if(dictionary[uniqueKey].length == items.length){
+      let prefix = dictionary[uniqueKey].reduce((prevValue, currentValue, index) => {
+        if (index === 0) { return currentValue.prefix; }
+        return (typeof prevValue !== 'undefined' && _.isEqual(prevValue, currentValue.prefix)) ? currentValue.prefix : 'mixed';
+      }, null);
+      // combinedArray.push({ [key] : uniqueKey, prefix });
+      combinedArray.push({ prefix });
+    }
+  }
+
+  return combinedArray;
+}
+
+
 function combineItem(items){
-  let combineItem = [..._.values(items)];
+  let itemsArray = _.values(items);
+  let path = 'params.destination';
+  if(_.has(itemsArray[0], path)){
+    let dist = combineArray('region', itemsArray, path);
+    itemsArray = itemsArray.map((item, index) => Object.assign( item, {params: Object.assign(item.params, {destination:dist})} ) );
+  }
+  let combineItem = [...itemsArray];
   return combineItem;
 }
 
@@ -132,7 +173,7 @@ function fetchItems(item_ids, collection, page_name) {
           dispatch(hideProgressBar());
       }
     );
-  }
+  };
 }
 
 export function getCollectionEntity(entity_id, collection, page_name) {
@@ -178,31 +219,31 @@ export function saveCollectionEntity(item, collection, page_name, action) {
         }
       }
     );
-  }
+  };
 }
 
 export function openLoginPopup(){
-  return { type: OPEN_LOGIN_FORM }
+  return { type: OPEN_LOGIN_FORM };
 }
 
 export function closeLoginPopup(){
-  return { type: CLOSE_LOGIN_FORM }
+  return { type: CLOSE_LOGIN_FORM };
 }
 
 export function showProgressBar(){
-  return { type: SHOW_PROGRESS_BAR }
+  return { type: SHOW_PROGRESS_BAR };
 }
 
 export function hideProgressBar(){
-  return { type: HIDE_PROGRESS_BAR }
+  return { type: HIDE_PROGRESS_BAR };
 }
 
 export function showStatusMessage(message, messageType){
-  return { type: SHOW_STATUS_MESSAGE, message, messageType }
+  return { type: SHOW_STATUS_MESSAGE, message, messageType };
 }
 
 export function hideStatusMessage(){
-  return { type: HIDE_STATUS_MESSAGE}
+  return { type: HIDE_STATUS_MESSAGE};
 }
 
 export function userCheckLogin(){
@@ -211,7 +252,7 @@ export function userCheckLogin(){
   return {
     type: CHECK_LOGIN,
     data: request
-  }
+  };
 }
 
 export function userDoLogin({username, password}){
@@ -220,7 +261,7 @@ export function userDoLogin({username, password}){
   return {
     type: LOGIN,
     data: request
-  }
+  };
 }
 
 export function userDoLogout(){
@@ -231,5 +272,5 @@ export function userDoLogout(){
         dispatch({type: LOGOUT});
       }
     );
-  }
+  };
 }

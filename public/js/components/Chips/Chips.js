@@ -21,7 +21,7 @@ const styles = {
     transform: 'scale(1) translate3d(0, 0, 0)',
     transformOrigin: 'left top',
     pointerEvents: 'auto',
-    color: theme.palette.accent3Color,
+    // color: theme.palette.accent3Color,
     transformOrigin: 'left top 0px',
     margin: '0px',
     fontSize: '85%'
@@ -35,7 +35,7 @@ const styles = {
     transform: 'scale(1) translate3d(0, 0, 0)',
     transformOrigin: 'left top',
     pointerEvents: 'auto',
-    color: theme.palette.primary1Color,
+    // color: theme.palette.primary1Color,
     margin: '0px',
     fontSize: '85%'
   },

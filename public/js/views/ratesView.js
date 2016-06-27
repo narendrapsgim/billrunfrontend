@@ -17,7 +17,7 @@ const ratess_field = [
             { dbkey: "price", label: "Price ", type: "text", size: 4},
             { dbkey: "interval", label: "Interval", type: "text", size: 4},
             { dbkey: "to", label: "To", type: "text", size: 4},
-          ]},
+          ], label: ""},
         ]},
       ]},
   ]}
@@ -34,6 +34,21 @@ const params_field = [
     { row: [
       { dbkey: "region", label: "Region", type: "text", size: 3},
       { dbkey: "prefix", label: "Prefix", type: "array", size: 6},
+    ]},
+  ]}
+];
+
+const params_field_bulk_edit = [
+  { row: [
+    { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
+    { dbkey: "source_networks", label : 'Source Networks', type: 'array'},
+    { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
+    { dbkey: "source_types", label : 'Source Types', type: 'array'},
+  ]},
+  { dbkey: "destination", label:"Prefix", collapsible: false, key:'region', fields: [
+    { row: [
+      { dbkey: "region", label: "Region", type: "text", size: 3},
+      { dbkey: "prefix", label: {dbkey: "region"}, type: "array", size: 6},
     ]},
   ]}
 ];
@@ -118,8 +133,36 @@ const rates_edit_view = {
   ]
 };
 
-const rates_edit_multiple_view = Object.assign({}, rates_edit_view, {title: "Edit Rates"});
-
+const rates_edit_multiple_view = {
+  title: "Edit Rates",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { row: [
+          { dbkey: "type", label: "Type"},
+          { dbkey: "country", label: "Country", type:'array' },
+          { dbkey: "alpha3", label: "Alpha3", type:'array' },
+        ]},
+        { row: [
+          { dbkey: "zone", label: "zone", size: 6},
+          { dbkey: "zone_grouping", label: "Zone Grouping", size: 6 },
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type:'date', size: 6 , crud: '0100'},
+          { dbkey: "to", label: "To", type:'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields: ratess_field },
+        ]},
+        { row: [
+          { dbkey: "params",  label: "Params", collapsible: true, collapsed: true ,fields: params_field_bulk_edit },
+        ]},
+      ]
+    }
+  ]
+};
 const rates_clone_view = {
   title: "Clone Rate",
   view_type: "sections",

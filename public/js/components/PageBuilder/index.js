@@ -190,7 +190,7 @@ class PageBuilder extends Component {
 
   getCombineValue(items, item, path, field){
     //If this value already was changed, return new value
-    if(_.has({item}, path)){
+    if(typeof field.fields === 'undefined' && _.has({item}, path)){
       return _.result({item}, path);
     }
     //return combined value from all items
@@ -226,7 +226,7 @@ class PageBuilder extends Component {
     return value;
   }
 
-  createFieldHTML(field, path, field_index) {
+  createFieldHTML(field, path, field_index, source = null) {
     if (
       ((this.state.action === 'edit' || this.state.action === 'clone' || this.state.action === 'close_and_new') && (!this.props.item || _.isEmpty(this.props.item)))
       ||
@@ -252,9 +252,14 @@ class PageBuilder extends Component {
 
     let value = !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, path, field) : _.result(this.props, path);
     let size = field.size || 12;
-    let label = field.label !== void 0 ?
-                field.label :
-                this.titlize(_.last(path.split('.')));
+
+    let label = field.label;
+    if(typeof field.label === 'undefined'){
+      label = this.titlize(_.last(path.split('.')));
+    } else if (_.isObject(field.label) && _.has(field.label,'dbkey')){
+      label = _.result({item:this.props.items[0]}, path.replace(field.dbkey, field.label.dbkey));
+    }
+    // console.log(field.dbkey, ', Label : ' ,label);
 
     //print only fields that item has
     if(typeof value === 'undefined'){
@@ -292,7 +297,7 @@ class PageBuilder extends Component {
     }
 
     return (
-      <Field size={size} field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
+      <Field size={size} field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} label={label}/>
     );
   }
 
@@ -423,8 +428,8 @@ PageBuilder.contextTypes = {
 
 function mapStateToProps(state, ownProps) {
   return {
-    item:  (state.pages && state.pages.page && state.pages.page.item) ?  state.pages.page.item : null,
-    items:  (state.pages && state.pages.page && state.pages.page.items) ?  state.pages.page.items : null,
+    item: (state.pages && state.pages.page && state.pages.page.item) ?  state.pages.page.item : null,
+    items: (state.pages && state.pages.page && state.pages.page.items) ?  state.pages.page.items : null,
     user: state.users
   }
 }

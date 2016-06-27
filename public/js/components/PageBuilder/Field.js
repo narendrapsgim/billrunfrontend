@@ -47,7 +47,7 @@ class Field extends Component {
   }
 
   createInputTag(field = {}) {
-    let { value, onChange, path } = this.props;
+    let { value, onChange, path, label } = this.props;
 
     if (value == 'undefined'){
       return null;
@@ -62,9 +62,7 @@ class Field extends Component {
     }
 
 
-//    let { label = <span dangerouslySetInnerHTML={{__html: '&zwnj;'}}></span>,
-    let { label = "",
-          type = (typeof value),
+    let { type = (typeof value),
           dbkey,
           multiselect = false,
           mandatory = false,
