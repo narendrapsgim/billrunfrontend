@@ -3,6 +3,7 @@ import VatsView from './vatsView';
 import DiscountsView from './discountsView';
 import ProductsView from './productsView';
 import LinesView from './linesView';
+import LogsView from './logsView';
 import ChargesView from './chargesView';
 import PlansView from './plansView';
 import ImportExportHtml from './importExportView';
@@ -90,6 +91,15 @@ const View = {
       route: "lines/lines/list",
       views: {
         list: LinesView.lines_list_view,
+      }
+    },
+    logs: {
+      permission : ["read"],
+      menu_title: "Log",
+      route: "logs/log/list",
+      views: {
+        list: LogsView.logs_list_view,
+        edit: LogsView.logs_edit_view,
       }
     },
     import_export_html: {

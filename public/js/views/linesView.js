@@ -39,14 +39,17 @@ const lines_list_view = {
         {key : 'plan', label : 'plan'},
         {key : 'type', label : 'Type'},
         {key : 'urt', label : 'URT',  type : 'urt', sortable : true},
-        {key : 'urt2', label : 'From',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().subtract(2, 'months')), query:{'urt':{'$gt':1}} ,valuePath:{'urt':{'$gt': null}}  }, hidden : true},
-        {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
         {key : 'usaget', label : 'Usage', type:'select', filter : {
           options: [
             { value: "Flat", key: "flat"},
             { value: "Conditional Discount", key: "conditional_discount"},
             { value: "Option", key: "option"},
-            { value: "Credit", key: "credit"}
+            { value: "Credit", key: "credit"},
+            { value: "Call", key: "call"},
+            { value: "Incoming Call", key: "incoming_call"},
+            { value: "SMS", key: "sms"},
+            { value: "MMS", key: "sms"},
+            { value: "Data", key: "data"},
           ]}, hidden : true},
         {key : 'billrun', label : 'Billrun', type:'multiselect', filter : {
           options:
@@ -58,6 +61,8 @@ const lines_list_view = {
               return {key: y + m, value: y + "/" + m};
             }),
            query:{'billrun':{'$in':1}} ,valuePath:{'billrun':{'$in': null}}}, hidden : true},
+           {key : 'urt2', label : 'From',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().subtract(2, 'months')), query:{'urt':{'$gt':1}} ,valuePath:{'urt':{'$gt': null}}  }, hidden : true},
+           {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
       ],
       pagination : {
         itemsPerPage : 10,
