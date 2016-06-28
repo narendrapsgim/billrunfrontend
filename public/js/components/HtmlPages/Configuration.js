@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { saveConfig } from '../../actions';
+import $ from 'jquery';
+import axios from 'axios';
 
 import Toggle from 'material-ui/Toggle';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -17,7 +19,19 @@ class ConfigurationPage extends Component {
       calculate: true
     };
   }
-
+  
+  componentWillMount() {
+    let url = `/admin/config`;
+    let axiosInstance = axios.create({
+      withCredentials: true,
+      baseURL: globalSetting.serverUrl
+    });
+    axiosInstance.get(url).then(response => {
+      let { calculate, process, receive } = response.data;
+      this.setState({calculate, process, receive});
+    });
+  }
+  
   onToggle(name) {
     let value = !this.refs[name].state.switched;
     this.setState({[name]: value});
