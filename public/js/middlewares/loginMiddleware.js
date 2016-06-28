@@ -31,9 +31,9 @@ export default function({dispatch}){
         error => { // The request was made, but the server responded with a status code that falls out of the range of 2xx
           console.log("Login API errror : ", error);
           if (error instanceof Error) {
-            dispatch(showStatusMessage(error.message, 'error'))
+            dispatch(showStatusMessage(error.message, 'error'));
           } else {
-            dispatch(showStatusMessage('An error occured, please try again later ...', 'error'))
+            dispatch(showStatusMessage('An error occured, please try again later ...', 'error'));
           }
         }
       );

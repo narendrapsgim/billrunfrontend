@@ -8,13 +8,6 @@ body {
 label {
     font-weight: normal;
 }
-* {
-    box-sizing: content-box;
-}
-.container{
-  padding-right: 0;
-  padding-left: 0;
-}
 /* temp Overide bootstrap CSS*/
 
 [class^="muidocs-icon-"], [class*=" muidocs-icon-"] {

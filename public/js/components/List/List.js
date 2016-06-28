@@ -28,7 +28,8 @@ import aja from 'aja';
 import $ from 'jquery';
 import DatePicker from 'material-ui/DatePicker';
 import moment from 'moment';
-import * as actions from '../../actions'
+import * as actions from '../../actions';
+import ListFilters from './ListFilters';
 
 import { Link, browserHistory } from 'react-router';
 
@@ -60,6 +61,10 @@ const styles = {
   },
   filterInput : {
     margin : '10px',
+  },
+  filterDatePicker: {
+    margin : '10px',
+    display: 'inline-block'
   },
   tableCell : {
     textOverflow : 'clip',
@@ -115,7 +120,7 @@ class List extends Component {
     super(props);
     //Helpers
     this._updateTableData = this._updateTableData.bind(this);
-    this._getData = _.debounce(this._getData.bind(this),1000);
+    this._getData = _.debounce(this._getData.bind(this), 2000);
     this._filterData = this._filterData.bind(this);
     this._sortData = this._sortData.bind(this);
     this._parseResults = this._parseResults.bind(this);
@@ -126,6 +131,8 @@ class List extends Component {
     this.onPagintionClick = this.onPagintionClick.bind(this);
     this.onClickRow = this.onClickRow.bind(this);
     this.onChangeFilter = this.onChangeFilter.bind(this);
+    this.onChangeAdvFilter = _.debounce(this.onChangeAdvFilter.bind(this), 2000);
+    this.onRemoveAdvFilter = this.onRemoveAdvFilter.bind(this);
     this.onChangeFilterDate = this.onChangeFilterDate.bind(this);
     this.onClickTableHeader = this.onClickTableHeader.bind(this);
     this._onRowSelection = this._onRowSelection.bind(this);
@@ -146,7 +153,8 @@ class List extends Component {
       rows : [],
       sortField : '',
       sortType : '',
-      filters : filters,
+      filters: filters,
+      advFilters: [],
       currentPage : 1,
       totalPages : 1,
       settings: props.settings,
@@ -168,7 +176,8 @@ class List extends Component {
       sortField : '',
       sortType : '',
       fields: settings.fields,
-      filters : filters,
+      filters: filters,
+      advFilters: [],
       currentPage : 1,
       totalPages : 1,
       settings
@@ -331,6 +340,22 @@ class List extends Component {
     }, this._updateTableData);
   }
 
+  onChangeAdvFilter(filter){
+    let existingAdvFilters = this.state.advFilters || [];
+    existingAdvFilters[filter.index] = {op: filter.op, field: filter.field, value: filter.value}
+    this.setState({
+      advFilters: existingAdvFilters,
+      currentPage: 1
+    }, this._updateTableData);
+  }
+
+  onRemoveAdvFilter(index){
+    this.setState({
+      advFilters: this.state.advFilters.filter((advFilter, i) => index !== i),
+      currentPage: 1
+    }, this._updateTableData);
+  }
+
   onChangeFilter(e, value){
     let key = e.target.name;
     this._filterData(key, value);
@@ -382,8 +407,8 @@ class List extends Component {
     let filters = Object.assign({}, this.state.filters);
     filters[key] = value;
     this.setState({
-      filters : filters,
-      currentPage : 1
+      filters: filters,
+      currentPage: 1
     }, this._updateTableData);
   }
 
@@ -431,14 +456,23 @@ class List extends Component {
           } else if(filterSetting.type == 'number') {
             queryArgs[key] = parseFloat(this.state.filters[key]);
           } else {
-          queryArgs[key] = {
-            "$regex" : this.state.filters[key],
-            "$options" : "i"
-          };
+            queryArgs[key] = {
+              "$regex" : this.state.filters[key],
+              "$options" : "i"
+            };
+          }
         }
       }
     }
-    }
+
+    this.state.advFilters.map( (advFilter, index) => {
+        let value = advFilter.value;
+        if(advFilter.op == '$in'){
+          value = [value];
+        }
+        queryArgs[advFilter.field] = {[advFilter.op]: value};
+      }
+    );
 
     var filters = {};
     if(this.state.settings.project){
@@ -579,7 +613,7 @@ class List extends Component {
         if(field.filter.system){
           filters[field.key] = field.filter.system;
         }
-        if(field.filter.defaultValue && field.filter.defaultValue.length > 0){
+        if(field.filter.defaultValue && typeof field.filter.defaultValue !== "undefined"){
           filters[field.key] = field.filter.defaultValue;
         }
       }
@@ -624,7 +658,7 @@ class List extends Component {
   _onClearAggregate() {
     let { settings } = this.props;
     let { fields } = settings;
-    this.setState({settings, fields, filters: {}, rows: []}, this._updateTableData);
+    this.setState({settings, fields, filters: {}, advFilters: [], rows: []}, this._updateTableData);
   }
 
   render() {
@@ -639,31 +673,6 @@ class List extends Component {
                               onClear={this._onClearAggregate}
                               onDataChange={this._onAggregate} />);
     }
-    let filters = (
-      this.state.fields.map((field, i) => {
-        if(field.filter && !field.filter.system){
-          let ret =
-
-           <TextField
-              style={styles.filterInput}
-            key={i} name={field.key}
-            hintText={"enter " + field.label + "..."}
-            floatingLabelText={"Search by " + field.label}
-            errorText=""
-            defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
-            onChange={this.onChangeFilter} />;
-          if(field.type == 'urt') {
-            ret =  <DatePicker  hintText={"Enter " + field.label + "..."} container="inline" mode="landscape"
-                                floatingLabelText={"Search by " + field.label} style={ {display: "inline-block"} }
-                                key={i} name={field.key}  defaultDate={(field.filter.defaultValue) ? new Date(field.filter.defaultValue) : null}
-                                onChange={this.onChangeFilterDate.bind(null, field.key)} autoOk={true}
-                                formatDate={this.formatDate}/>
-
-          }
-          return ret;
-        }
-      })
-    );
 
     let header = (
       <TableRow>
@@ -799,7 +808,6 @@ class List extends Component {
           onTouchTap={this.onAcceptRemoveItems}
       />
     ];
-
     return (
       <div>
         <Toolbar style={styles.listTopBar}>
@@ -813,8 +821,17 @@ class List extends Component {
 
         <Divider />
         <div>
-            {filters}
+          <ListFilters
+            fields={this.state.fields}
+            advancedFilter={this.props.settings.advancedFilter}
+            onChangeFilter={this.onChangeFilter}
+            onChangeFilterDate={this.onChangeFilterDate}
+            formatDate={this.formatDate}
+            onChangeAdvFilter={this.onChangeAdvFilter}
+            onRemoveAdvFilter={this.onRemoveAdvFilter}
+            />
         </div>
+        <Divider />
         <div>
           {aggregate}
         </div>

@@ -194,11 +194,11 @@ class PageBuilder extends Component {
       return _.result({item}, path);
     }
     //return combined value from all items
-    let value = _.reduce(items, (prevValue, item, key) => {
-      let value = _.result({item}, path);
+    let value = items.reduce( (prevValue, currentValue, index) => {
+      let value = _.result({item:currentValue}, path);
 
-      //first cicle retun value as is
-      if(key === 0){
+      //first cycle retun value as is
+      if(index === 0){
         return value;
       }
       //alre mixed
@@ -234,6 +234,11 @@ class PageBuilder extends Component {
     ) {
       return null;
     }
+
+    if(typeof field.row !== 'undefined'){
+      return this.createRowHTML(field.row, path, field_index);
+    }
+
     if (path.endsWith(".*")) {
       let recpath = path.replace('.*', '');
       let res =  !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, recpath, field) : _.result(this.props, recpath);
@@ -244,42 +249,60 @@ class PageBuilder extends Component {
         return this.createFieldHTML(field, `${recpath}.${obj_key}`, obj_idx);
       });
     }
+
     let value = !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, path, field) : _.result(this.props, path);
-    let size = field.size || 10;
+    let size = field.size || 12;
+    let label = field.label !== void 0 ?
+                field.label :
+                this.titlize(_.last(path.split('.')));
+
+    //print only fields that item has
+    if(typeof value === 'undefined'){
+      return null;
+    }
+
     if (Array.isArray(value) && _.isObject(value[0])) {
-      let fieldsHTML = value.map((elm, idx) => {
+      return value.map((elm, idx) => {
          return this.createFieldHTML(field, `${path}[${idx}]`,idx)
        });
-      return (
-        <div key={field_index}>
-          {fieldsHTML}
-        </div>
-      );
     } else if (field.fields) {
-      let content = field.fields.map((subfield, field_idx) => {
-        return this.createFieldHTML(subfield, `${path}.${subfield.dbkey}`, field_idx);
+      let subfields = field.fields.map((subfield, field_idx) => {
+        if(typeof subfield.row !== 'undefined') {
+          return this.createRowHTML(subfield.row, path, field_idx);
+        } else {
+          return this.createFieldHTML(subfield, `${path}.${subfield.dbkey}`, field_idx);
+        }
       });
-      let label = field.label ?
-                  field.label :
-                  this.titlize(_.last(path.split('.')));
-      if (typeof field.collapsible !== 'undefined') {
-        return (
-          <FieldsContainer size={size} label={label} content={content} key={field_index} collapsible={field.collapsible} expanded={field.collapsed} crud={field.crud} fieldType={field.fieldType} path={path} dispatch={this.props.dispatch} pageName={this.getPageName()} />
-        );
-      }
+      subfields.push(<div key={field.fields.length++} style={{clear: 'both'}}></div>);
       return (
-        <div style={{marginBottom: "15px"}}>
-          <h4>{label}</h4>
-          <div>
-            {content}
-          </div>
+        <div className={'col-md-' + size} key={field_index}>
+          <FieldsContainer
+            path={path}
+            label={label}
+            content={subfields}
+            crud={field.crud}
+            expanded={field.collapsed}
+            fieldType={field.fieldType}
+            pageName={this.getPageName()}
+            dispatch={this.props.dispatch}
+            collapsible={field.collapsible}
+          />
         </div>
       );
     }
 
     return (
-      <Field field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
+      <Field size={size} field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
     );
+  }
+
+  createRowHTML(row, path, row_idx){
+    let output = row.map((field, field_idx) => {
+      let newPath = (typeof field.dbkey !== 'undefined' ) ?  path + '.' + field.dbkey : path ;
+      return this.createFieldHTML(field, newPath, field_idx);
+    });
+    output.push(<div key={row.length++} style={{clear: 'both'}}></div>);
+    return (<div key={row_idx} className="row">{output}</div>);
   }
 
   createSectionsHTML(sections = []) {
@@ -288,7 +311,11 @@ class PageBuilder extends Component {
       if(section.fields) {
         let fields = section.fields ? section.fields : this.createConfigFieldsFromItem(this.props.item);
         output = fields.map((field, field_idx) => {
-          return this.createFieldHTML(field, `item.${field.dbkey}`, field_idx);
+          if(field.row){
+            return this.createFieldHTML(field, `item`, field_idx);
+          } else {
+            return this.createFieldHTML(field, `item.${field.dbkey}`, field_idx);
+          }
         });
       }
 
@@ -314,10 +341,7 @@ class PageBuilder extends Component {
     });
 
     return (
-      <div>
-        {sectionsHTML}
-        <div className="row"></div>
-      </div>
+      <div className="container-fluid">{sectionsHTML}</div>
     );
   }
 
