@@ -2,6 +2,13 @@ import moment from 'moment';
 import * as Colors from 'material-ui/styles/colors';
 import ops from '../components/AdvancedFilter/filterOperations';
 
+const billrun_dates = Array.from(Array(12), (x, z) => {
+  let d = new Date();
+  d.setMonth(d.getMonth() - z);
+  let m = (("0" + (d.getMonth() + 1)).slice(-2));
+  let y =  d.getFullYear();
+  return {key: y + m, value: y + "/" + m};
+});
 
 const lines_list_view = {
   title : "",
@@ -51,18 +58,9 @@ const lines_list_view = {
             { value: "MMS", key: "sms"},
             { value: "Data", key: "data"},
           ]}, hidden : true},
-        {key : 'billrun', label : 'Billrun', type:'multiselect', filter : {
-          options:
-            Array.from(Array(12), (x, z) => {
-              let d = new Date();
-              d.setMonth(d.getMonth() - z);
-              let m = (("0" + (d.getMonth() + 1)).slice(-2));
-              let y =  d.getFullYear();
-              return {key: y + m, value: y + "/" + m};
-            }),
-           query:{'billrun':{'$in':1}} ,valuePath:{'billrun':{'$in': null}}}, hidden : true},
-           {key : 'urt2', label : 'From',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().subtract(2, 'months')), query:{'urt':{'$gt':1}} ,valuePath:{'urt':{'$gt': null}}  }, hidden : true},
-           {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
+        {key : 'billrun', label : 'Billrun', type:'multiselect', filter : { options: billrun_dates, query:{'billrun':{'$in':1}} ,valuePath:{'billrun':{'$in': null}}}, hidden : true},
+        {key : 'urt2', label : 'From',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().subtract(2, 'months')), query:{'urt':{'$gt':1}} ,valuePath:{'urt':{'$gt': null}}  }, hidden : true},
+        {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
       ],
       pagination : {
         itemsPerPage : 10,
