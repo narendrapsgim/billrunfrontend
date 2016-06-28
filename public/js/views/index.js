@@ -93,10 +93,10 @@ const View = {
         list: LinesView.lines_list_view,
       }
     },
-    lines: {
+    logs: {
       permission : ["read"],
       menu_title: "Log",
-      route: "lines/log/list",
+      route: "logs/log/list",
       views: {
         list: LogsView.logs_list_view,
         edit: LogsView.logs_edit_view,
