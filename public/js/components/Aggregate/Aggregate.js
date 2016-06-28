@@ -75,13 +75,13 @@ export default class Aggregate extends React.Component {
   render() {
     return (
       <div>
-        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged} style={{ margin : '10px' }} >
+        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged} style={{ margin : '10px',height:'40px' }} >
           { this.groupBy.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged} style={{ margin : '10px' }} >
+        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged} style={{ margin : '10px',height:'40px'}} >
           { this.fields.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged} style={{ margin : '10px' }}>
+        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged} style={{ margin : '10px',height:'40px' }}>
           { this.methods.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
         <div style={{ margin : '10px' , display: 'inline-block' }} >
