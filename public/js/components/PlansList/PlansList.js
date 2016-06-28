@@ -11,7 +11,7 @@ class PlansList extends Component {
     this.onClickCell = this.onClickCell.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.dispatch(getPlans());
   }
   

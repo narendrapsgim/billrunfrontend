@@ -17,6 +17,7 @@ let routes = [
   {to: "/products", label: "Products"},
   {to: "/subscribers_list", label: "Subscribers"},
   {to: "/usage", label: "Usage"},
+  {to: "/invoices", label: "Invoices"},
   {to: "/log", label: "Log"},
   {to: "/settings", label: "Settings"}
 ];

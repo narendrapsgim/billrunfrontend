@@ -14,6 +14,7 @@ import SubscriberEdit from './components/Subscriber/SubscriberEdit';
 import UsageList from './components/UsageList';
 import Log from './components/Log';
 import Settings from './components/Settings';
+import Invoices from './components/Invoices';
 
 export default () => {
   return (
@@ -29,6 +30,7 @@ export default () => {
       <Route name="usage" path="/usage" component={UsageList} />
       <Route name="log" path="/log" component={Log} />
       <Route name="settings" path="/settings" component={Settings} />
+      <Route name="invoices" path="/invoices" component={Invoices} />
       <Route path="/:page/:collection/:action(/:entity_id)" component={PageBuilder} />
       <Route path="/:page" component={PageBuilder} />
     </Route>

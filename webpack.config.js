@@ -38,6 +38,7 @@ module.exports = {
           presets: ['es2015', 'react', 'stage-2']
         }
       },
+      {include: /\.json$/, loaders: ["json-loader"]}
     ]
   },
 
