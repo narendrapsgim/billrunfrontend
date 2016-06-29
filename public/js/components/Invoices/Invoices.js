@@ -1,16 +1,28 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import $ from 'jquery';
 import { getInvoices } from '../../actions/invoicesActions';
 
 import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody } from 'material-ui/Table';
+import FileDownload from 'material-ui/svg-icons/file/file-download';
+
 
 class Invoices extends Component {
   constructor(props) {
     super(props);
+
+    this.downloadInvoice = this.downloadInvoice.bind(this);
   }
 
   componentWillMount() {
     this.props.dispatch(getInvoices());
+  }
+
+  downloadInvoice(aid, billrun_key, invoice_id) {
+    let url = `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrun_key}&iid=${invoice_id}`;
+    var form = $('<form></form>').attr('action', url).attr('method', 'post');
+    form.append($("<input></input>").attr('type', 'hidden').attr('name', 'a').attr('value', 'a'));
+    form.appendTo('body').submit().remove();
   }
   
   render() {
@@ -29,6 +41,7 @@ class Invoices extends Component {
             <TableHeaderColumn tooltip="Amount">Amount</TableHeaderColumn>
             <TableHeaderColumn tooltip="Status">Status</TableHeaderColumn>
             <TableHeaderColumn tooltip="Account ID">Account ID</TableHeaderColumn>
+            <TableHeaderColumn tooltip="Download">Download</TableHeaderColumn>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -47,6 +60,11 @@ class Invoices extends Component {
                </TableRowColumn>
                <TableRowColumn>
                  {row.get('aid')}
+               </TableRowColumn>
+               <TableRowColumn>
+                 <a onClick={this.downloadInvoice.bind(this, row.get('aid'), row.get('billrun_key'), row.get('invoice_id'))} className="clickable">
+                   <FileDownload />
+                 </a>
                </TableRowColumn>
              </TableRow>
            ))}

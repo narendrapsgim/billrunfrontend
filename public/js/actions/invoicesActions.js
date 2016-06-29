@@ -19,9 +19,9 @@ function fetchInvoices() {
   let dummy_invoices = [
     {
       "_id" : {"$id": "5753d7f22e28c35a0cc42d77"},
-      "aid" : 56124,
-      "billrun_key" : "201603",
-      "invoice_id" : 7098,
+      "aid" : 5000007442,
+      "billrun_key" : "201607",
+      "invoice_id" : 1307,
       "type" : "inv",
       "bill_unit" : "12",
       "due_date" : "2016-05-23",

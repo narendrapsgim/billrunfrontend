@@ -122,3 +122,7 @@ label {
 .imported-reason-title {
     font-weight: bold;
 }
+
+.clickable {
+    cursor: pointer;
+}

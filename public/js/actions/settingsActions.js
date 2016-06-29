@@ -23,6 +23,9 @@ function fetchSettings() {
       time_format: "",
       time_zone: "Asia/Jerusalem"
     },
+    currency_tax: {
+      currency: "€"
+    },
     collection: {
       invoice_overdue: "Within a week",
       invoice_overdue_email: "Test",

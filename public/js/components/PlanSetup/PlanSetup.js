@@ -100,9 +100,9 @@ class PlanSetup extends Component {
   
   render() {
     let { stepIndex } = this.state;
-    
+
     const steps = [
-      (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} />),
+      (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} basicSettings={this.props} />),
       (<Product onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />)
     ];
 
