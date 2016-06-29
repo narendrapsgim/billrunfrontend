@@ -111,12 +111,14 @@ const View = {
     configuration: {
       permission: ["admin"],
       menu_title: "Config",
+      menu_type: "user",
       view_type: "html",
       html: ConfigurationView
     },
     users: {
       permission: ["admin"],
       menu_title: "Users",
+      menu_type: "user",
       route: "users/users/list",
       views: {
         list: UsersView.users_list_view,
@@ -127,6 +129,7 @@ const View = {
     operations: {
       permission: ["admin"],
       menu_title: "Operations",
+      menu_type: "user",
       view_type: "html",
       html: OperationsView
     }
