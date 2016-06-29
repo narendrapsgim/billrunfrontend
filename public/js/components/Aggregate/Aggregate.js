@@ -10,6 +10,11 @@ export default class Aggregate extends React.Component {
 
   constructor(props) {
     super(props);
+    this.styles = {
+      input: { margin: '5px', height: '40px' },
+      button: { margin: '5px'},
+      actions: { margin: '10px', height: '40px', display: 'inline-block' }
+    }
     this.groupBy= props.groupBy;
     this.fields= props.fields;
     this.methods= props.methods;
@@ -75,18 +80,18 @@ export default class Aggregate extends React.Component {
   render() {
     return (
       <div>
-        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged} style={{ margin : '10px',height:'40px' }} >
+        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged} style={this.styles.input} >
           { this.groupBy.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged} style={{ margin : '10px',height:'40px'}} >
+        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged} style={this.styles.input} >
           { this.fields.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged} style={{ margin : '10px',height:'40px' }}>
+        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged} style={this.styles.input}>
           { this.methods.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <div style={{ margin : '10px' , display: 'inline-block' }} >
-          <RaisedButton label="Aggregate"  onClick={this.onAggregate} />
-          <RaisedButton label="Clear" onClick={this.props.onClear} />
+        <div style={this.styles.actions} >
+          <RaisedButton label="Aggregate"  onClick={this.onAggregate} style={this.styles.button}/>
+          <RaisedButton label="Clear" onClick={this.props.onClear} style={this.styles.button}/>
         </div>
 
         <Dialog

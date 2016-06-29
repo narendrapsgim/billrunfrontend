@@ -7,6 +7,7 @@ import Chips from '../Chips';
 import AddMore from '../AddMore';
 import AdvancedFilter from '../AdvancedFilter';
 import FieldsContainer from '../FieldsContainer';
+import Aggregate from '../Aggregate/Aggregate';
 
 const styles = {
   filterInput : {
@@ -117,7 +118,22 @@ export default class ListFilters extends React.Component {
     if(advancedFilter){
       let advFilter = <AdvancedFilter fields={advancedFilter} onFilterChanged={this.onAdvFilterChange}/>;
       let addMore = <AddMore item={advFilter} removeItem={this.onAdvFilterRemove}/>
-      return <FieldsContainer size="10" label="Advenced Filter" content={addMore} collapsible={false} />
+      return <FieldsContainer size="12" label="Advenced Filter" content={addMore} collapsible={true} collapsibleType={'css'} expanded={true}/>
+    }
+  }
+
+  renderAggregate(){
+    let { aggregate } = this.props;
+    if(aggregate) {
+      let aggregateFilter = <Aggregate
+                              fields={this.props.aggregate.fields}
+                              methods={this.props.aggregate.methods}
+                              groupBy={this.props.aggregate.groupBy}
+                              filters={this.props.filters}
+                              onClear={this.props.onClearAggregate}
+                              onDataChange={this.props.onChangeAggregate}
+                            />;
+      return <FieldsContainer size="12" label="Aggregate" content={aggregateFilter} collapsible={true} collapsibleType={'css'} expanded={true}/>
     }
   }
 
@@ -126,6 +142,7 @@ export default class ListFilters extends React.Component {
       <div>
         {this.renderFilterFields()}
         {this.renderAdvancedFilter()}
+        {this.renderAggregate()}
       </div>
     )
   }

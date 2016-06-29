@@ -7,7 +7,9 @@ import FlatButton from 'material-ui/FlatButton';
 import { updateFieldValue, newField, removeField } from '../../actions';
 
 const style = {
-  card : { margin: "10px 0" }
+  card : { margin: "10px 0" },
+  cardTextCollapsed: {display:'none'},
+  cardTextExpanded: {display:'block'}
 }
 
 export default class FieldsContainer extends Component {
@@ -75,6 +77,7 @@ export default class FieldsContainer extends Component {
           {label.length > 0 && <h4>{label}</h4>}
           <div>
             {content}
+            {this.crudActionButtons()}
           </div>
         </div>
       );
@@ -84,8 +87,17 @@ export default class FieldsContainer extends Component {
         <Card style={style.card} key={"block_collapsible_" + this.props.index}>
           {label.length > 0 && <CardHeader title={label}/>}
           <CardText expandable={false} children={content}/>
+          {this.crudActionButtons()}
         </Card>
       );
+    } else if(this.props.collapsibleTyle === 'css'){
+        return (
+          <Card style={style.card} onExpandChange={this.handleExpandChange} initiallyExpanded={this.state.expanded}>
+            <CardHeader title={label} actAsExpander={true} showExpandableButton={true} />
+            <CardText style={this.state.expanded ? style.cardTextExpanded : style.cardTextCollapsed} children={content}/>
+            {this.crudActionButtons()}
+          </Card>
+    );
     } else {
       return (
         <Card style={style.card} expanded={this.state.expanded} onExpandChange={this.handleExpandChange}>

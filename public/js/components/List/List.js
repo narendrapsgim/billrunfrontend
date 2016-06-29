@@ -22,7 +22,6 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import {blue500} from 'material-ui/styles/colors';
-import Aggregate from '../Aggregate/Aggregate';
 import _ from 'lodash';
 import aja from 'aja';
 import $ from 'jquery';
@@ -441,6 +440,7 @@ class List extends Component {
             });
           } else if(filterSetting['filter'] && filterSetting['filter']['query']) {
             let self = this;
+            if(!_.isEmpty(this.state.filters[key])){
               queryArgs = function rec(qArgs,path ) {
                   if(path == null ) {
                      return self.state.filters[key];
@@ -453,6 +453,7 @@ class List extends Component {
                   }
                   return qArgs;
               }(queryArgs,filterSetting['filter']['valuePath']);
+            }
           } else if(filterSetting.type == 'number') {
             queryArgs[key] = parseFloat(this.state.filters[key]);
           } else {
@@ -570,17 +571,17 @@ class List extends Component {
         break;
       case 'price':
           let price = parseFloat(value);
-          output = ( price) ? price.toFixed(2).toString().replace(".", ",") : '0';
+          output = (price) ? price.toFixed(2).toString().replace(".", ",") : '0';
           output += ' ' + globalSetting.currency;
         break;
       case 'mongoid':
         output = value.$id;
         break;
       case 'urt':
-        output = (value.sec) ? (moment(value.sec*1000).format(globalSetting.datetimeFormat)) : '';
+        output = (value.sec) ? (moment(value.sec * 1000).format(globalSetting.datetimeFormat)) : '';
         break;
       case 'timestamp':
-        output = (value) ? (moment(value*1000).format(globalSetting.datetimeFormat)) : '';
+        output = (value) ? (moment(value * 1000).format(globalSetting.datetimeFormat)) : '';
         break;
       case 'interval':
         switch (row.usaget) {
@@ -647,10 +648,12 @@ class List extends Component {
      return acc;
    }, []);
 
+   let settings = Object.assign({}, this.state.settings, {advancedFilter:null});//remove advenced filters in aggrigate mode
    this.setState({
      fields: fields,
      totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
      rows : rows,
+     settings,
      loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
    });
  }
@@ -664,16 +667,6 @@ class List extends Component {
   render() {
     let { settings } = this.state;
     let { page, collection } = this.props;
-    let aggregate = (null);
-    if(this.state.settings.aggregate) {
-      aggregate = (<Aggregate fields={this.state.settings.aggregate.fields}
-                              methods={this.state.settings.aggregate.methods}
-                              groupBy={this.state.settings.aggregate.groupBy}
-                              filters={this.state.filters}
-                              onClear={this._onClearAggregate}
-                              onDataChange={this._onAggregate} />);
-    }
-
     let header = (
       <TableRow>
         {<TableHeaderColumn style={{ width: 5}}>#</TableHeaderColumn>}
@@ -823,17 +816,17 @@ class List extends Component {
         <div>
           <ListFilters
             fields={this.state.fields}
-            advancedFilter={this.props.settings.advancedFilter}
+            filters={this.state.filters}
+            aggregate={this.state.settings.aggregate}
+            advancedFilter={this.state.settings.advancedFilter}
+            formatDate={this.formatDate}
             onChangeFilter={this.onChangeFilter}
             onChangeFilterDate={this.onChangeFilterDate}
-            formatDate={this.formatDate}
             onChangeAdvFilter={this.onChangeAdvFilter}
             onRemoveAdvFilter={this.onRemoveAdvFilter}
+            onClearAggregate={this._onClearAggregate}
+            onChangeAggregate={this._onAggregate}
             />
-        </div>
-        <Divider />
-        <div>
-          {aggregate}
         </div>
         <div>
             {this.state.loadingData}
