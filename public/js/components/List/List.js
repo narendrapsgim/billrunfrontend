@@ -419,6 +419,27 @@ class List extends Component {
     this._getData(this._buildSearchQuery());
   }
 
+  _isFilterParamEmpty(data) {
+    if(typeof(data) == 'number' || typeof(data) == 'boolean') {
+      return false;
+    }
+    if(typeof(data) == 'undefined' || data === null) {
+      return true;
+    }
+    if(typeof(data.length) != 'undefined') {
+      return data.length == 0;
+    }
+    if(data instanceof Date){
+      return false;
+    }
+    for(var i in data) {
+      if(data.hasOwnProperty(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   _buildSearchQuery(){
     let queryString = '';
     let queryArgs = {};
@@ -440,7 +461,7 @@ class List extends Component {
             });
           } else if(filterSetting['filter'] && filterSetting['filter']['query']) {
             let self = this;
-            if(!_.isEmpty(this.state.filters[key])){
+            if(!this._isFilterParamEmpty(this.state.filters[key])){
               queryArgs = function rec(qArgs,path ) {
                   if(path == null ) {
                      return self.state.filters[key];
