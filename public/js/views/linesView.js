@@ -48,6 +48,7 @@ const lines_list_view = {
         {key : 'urt', label : 'URT',  type : 'urt', sortable : true},
         {key : 'usaget', label : 'Usage', type:'select', filter : {
           options: [
+            { value: "-", key: ""},
             { value: "Flat", key: "flat"},
             { value: "Conditional Discount", key: "conditional_discount"},
             { value: "Option", key: "option"},
