@@ -147,6 +147,8 @@ class List extends Component {
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
+    let storedFilters = this._getFilterStoredValues(props.page, props.settings.fields);
+    Object.assign(filters, storedFilters);
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
@@ -170,6 +172,8 @@ class List extends Component {
   componentWillReceiveProps(nextProps) {
     let { settings } = nextProps;
     let filters = this._getFilterDefaultValues(settings.fields);
+    let storedFilters = this._getFilterStoredValues(nextProps.page, settings.fields);
+    Object.assign(filters, storedFilters);
     this.setState({
       rows : [],
       sortField : '',
@@ -403,6 +407,9 @@ class List extends Component {
   }
 
   _filterData(key, value) {
+    //Store Input value
+    localStorage.setItem(this.props.page + "-" + key, value);
+
     let filters = Object.assign({}, this.state.filters);
     filters[key] = value;
     this.setState({
@@ -643,6 +650,28 @@ class List extends Component {
     return filters;
   }
 
+  _getFilterStoredValues(pageKey, fields){
+    let filters = {};
+    fields.map((field, i) => {
+      if(field.filter){
+        if(typeof field.filter.system === 'undefined'){
+          let filterKey = pageKey + "-" + field.key;
+          let filterVal = localStorage.getItem(filterKey);
+          if(filterVal && filterVal.length > 0){
+            if(field.type == 'multiselect') {
+              filterVal = filterVal.split(",");
+            }
+            if(field.type == 'urt') {
+              filterVal = new Date(filterVal);
+            }
+            filters[field.key] = filterVal;
+          }
+        }
+      }
+    });
+    return filters;
+  }
+
   _getFieldSettings(key){
     var matchFields = this.props.settings.fields.filter((field,index) => {
       if(field.key == key){
@@ -836,6 +865,7 @@ class List extends Component {
         <Divider />
         <div>
           <ListFilters
+            page={this.props.page}
             fields={this.state.fields}
             filters={this.state.filters}
             aggregate={this.state.settings.aggregate}

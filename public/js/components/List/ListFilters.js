@@ -62,10 +62,13 @@ export default class ListFilters extends React.Component {
     let filters = [];
     this.props.fields.forEach((field, i) => {
       if(field.filter && !field.filter.system){
+        let filterKey = this.props.page + "-" + field.key;
+        let filterVal = localStorage.getItem(filterKey);
+        let defVal = (filterVal !== null) ? filterVal : field.filter.defaultValue;
         if(field.type == 'urt') {
           filters.push(<DatePicker
-                  key={i} name={field.key}
-                  defaultDate={(field.filter.defaultValue) ? new Date(field.filter.defaultValue) : null}
+                  key={this.props.page + "-" + i} name={field.key}
+                  defaultDate={(defVal) ? new Date(defVal) : null}
                   hintText={"Enter " + field.label + "..."}
                   floatingLabelText={"Search by " + field.label}
                   container="inline" mode="landscape" style={styles.filterDatePicker}
@@ -74,16 +77,17 @@ export default class ListFilters extends React.Component {
                 />);
         } else if(field.type == 'multiselect'){
           filters.push(<Chips
-                  key={i} name={field.key} style={{wrapper:styles.filterChips}}
+                  items={(defVal) ? defVal.split(",") : []}
+                  key={this.props.page + "-" + i} name={field.key} style={{wrapper:styles.filterChips}}
                   options={field.filter.options}
                   onChange={this.onChangeFilterMultiselect.bind(null, field.key)}
                   label={field.label} inputType='select'
                 />);
         } else if(field.type == 'select'){
-          let val = typeof field.filter.defaultValue !== 'undefined' ? field.filter.defaultValue : null;
+          let val = typeof filterVal !== 'undefined' ? filterVal : null;
           val = typeof this.state[field.key] !== 'undefined' ? this.state[field.key] : val;
           filters.push(<SelectField
-                    key={i} name={field.key} style={styles.filterSelect}
+                    key={this.props.page + "-" + i} name={field.key} style={styles.filterSelect}
                     value={val}
                     onChange={this.onChangeFilterSelectField.bind(null, field.key)}
                     floatingLabelText={field.label}
@@ -93,11 +97,11 @@ export default class ListFilters extends React.Component {
         } else {
           filters.push(<TextField
                    style={styles.filterInput}
-                   key={i} name={field.key}
+                   key={this.props.page + "-" + i} name={field.key}
                    hintText={"enter " + field.label + "..."}
                    floatingLabelText={"Search by " + field.label}
                    errorText=""
-                   defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
+                   defaultValue={(defVal) ? defVal : ''}
                    onChange={this.props.onChangeFilter}
                  />);
          }
