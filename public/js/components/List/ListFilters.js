@@ -2,6 +2,7 @@ import React from 'react';
 import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import SelectField from 'material-ui/SelectField';
+import RaisedButton from 'material-ui/RaisedButton';
 import MenuItem from 'material-ui/MenuItem';
 import Chips from '../Chips';
 import AddMore from '../AddMore';
@@ -30,15 +31,23 @@ export default class ListFilters extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { };
+    this.state = { progress : props.progress};
 
     this.renderFilterFields = this.renderFilterFields.bind(this);
     this.renderAdvancedFilter = this.renderAdvancedFilter.bind(this);
+    this.renderAction = this.renderAction.bind(this);
+
     this.onChangeFilterMultiselect = this.onChangeFilterMultiselect.bind(this);
     this.onChangeFilterSelectField = this.onChangeFilterSelectField.bind(this);
-
     this.onAdvFilterChange = this.onAdvFilterChange.bind(this);
     this.onAdvFilterRemove = this.onAdvFilterRemove.bind(this);
+    this.onFilterApplyClick = this.onFilterApplyClick.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      progress: nextProps.progress
+    });
   }
 
   onChangeFilterMultiselect(name, value) {
@@ -110,6 +119,10 @@ export default class ListFilters extends React.Component {
     return filters;
   }
 
+  onFilterApplyClick(){
+    this.props.filterApply();
+  }
+
   onAdvFilterChange(filter){
     this.props.onChangeAdvFilter(filter);
   }
@@ -136,8 +149,28 @@ export default class ListFilters extends React.Component {
                               filters={this.props.filters}
                               onClear={this.props.onClearAggregate}
                               onDataChange={this.props.onChangeAggregate}
+                              buildSearchQueryArg={this.props.buildSearchQueryArg}
                             />;
       return <FieldsContainer size="12" label="Aggregate" content={aggregateFilter} collapsible={true} collapsibleType={'css'} expanded={true}/>
+    }
+  }
+
+  renderAction(){
+    let { advancedFilter } = this.props;
+    let filters = false;
+    this.props.fields.forEach((field, i) => {
+      if(field.filter && !field.filter.system){
+        filters = true;
+      }
+    });
+    if (advancedFilter || filters) {
+      return (
+        <div class='row'>
+          <div class="col-md-12">
+            <RaisedButton style={{display:'block', }} fullWidth={false} label={this.state.progress ? "Please Wait While Filtering...." : "Apply Filter"} disabled={this.state.progress ? true : false} primary={true} onClick={this.onFilterApplyClick} />
+          </div>
+        </div>
+      );
     }
   }
 
@@ -146,6 +179,7 @@ export default class ListFilters extends React.Component {
       <div>
         {this.renderFilterFields()}
         {this.renderAdvancedFilter()}
+        {this.renderAction()}
         {this.renderAggregate()}
       </div>
     )

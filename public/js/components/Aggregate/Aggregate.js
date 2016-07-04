@@ -46,16 +46,8 @@ export default class Aggregate extends React.Component {
   onAggregate(event) {
     let callback = this.onDataChange;
     let url = `${globalSetting.serverUrl}/api/queryaggregate`;
-
-    let filterKeys = _.keys(this.props.filters);
-    let filterStr  = _.reduce(filterKeys, (acc, key) => {
-      if (_.isEmpty(this.props.filters[key])) return acc;
-      acc.push(`"${key}":${this.props.filters[key]}`);
-      return acc;
-    }, []);
-
-    url += `?query={${filterStr.join(',')}}&groupby={"${this.state.on}":"$${this.state.on}"}&aggregate={"${this.state.to}":{"${this.state.method}":"$${this.state.to}"}}`;
-
+    let filterStr = this.props.buildSearchQueryArg();
+    url += `?query=${JSON.stringify(filterStr)}&groupby={"${this.state.on}":"$${this.state.on}"}&aggregate={"${this.state.to}":{"${this.state.method}":"$${this.state.to}"}}`;
     this.serverRequest = aja()
       .method('get')
       .url(url)

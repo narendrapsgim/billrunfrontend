@@ -46,7 +46,8 @@ const errorMessages = {
 const styles = {
   listTopBar : {backgroundColor:'white'},
   listActions : {margin:'5px'},
-  noDataMessage : {textAlign: 'center', /*marginBottom: '-12px',*/ display: 'block'},
+  listActionsLabel : {color:'#fff'},
+  noDataMessage : {textAlign: 'center', /*marginBottom: '-12px',*/ marginTop: '5px', display: 'block'},
   pagination : {
     paginationBar : {
       margin : '10px',
@@ -123,6 +124,7 @@ class List extends Component {
     this._filterData = this._filterData.bind(this);
     this._sortData = this._sortData.bind(this);
     this._parseResults = this._parseResults.bind(this);
+    this._buildSearchQueryArg = this._buildSearchQueryArg.bind(this);
     //Handlers
     this.validateOnlyOneRowIsSelected = this.validateOnlyOneRowIsSelected.bind(this);
     this.validateAlLeastOneRowIsSelected = this.validateAlLeastOneRowIsSelected.bind(this);
@@ -160,7 +162,8 @@ class List extends Component {
       totalPages : 1,
       settings: props.settings,
       fields: props.settings.fields,
-      loadingData : ''
+      loadingData : '',
+      progress: false
     };
   }
 
@@ -384,7 +387,8 @@ class List extends Component {
 
   handleError(data){
     this.setState({
-      loadingData : ''
+      loadingData : '',
+      progress : false
     });
     let errorMessage = (data && data.desc && data.desc.length) ? data.desc : errorMessages.serverApiDefaultError ;
     this.props.showStatusMessage(errorMessage, 'error');
@@ -415,13 +419,14 @@ class List extends Component {
     this.setState({
       filters: filters,
       currentPage: 1
-    }, this._updateTableData);
+    });
   }
 
   _updateTableData(){
     this.props.showProgressBar();
     this.setState({
-          loadingData : ''
+          loadingData : '',
+          progress: true
      });
     this._getData(this._buildSearchQuery());
   }
@@ -447,8 +452,7 @@ class List extends Component {
     return true;
   }
 
-  _buildSearchQuery(){
-    let queryString = '';
+  _buildSearchQueryArg(){
     let queryArgs = {};
 
     for ( let key in this.state.filters ) {
@@ -502,6 +506,13 @@ class List extends Component {
         queryArgs[advFilter.field] = {[advFilter.op]: value};
       }
     );
+
+    return queryArgs;
+  }
+
+  _buildSearchQuery(){
+    let queryString = '';
+    let queryArgs = this._buildSearchQueryArg();
 
     var filters = {};
     if(this.state.settings.project){
@@ -573,6 +584,7 @@ class List extends Component {
            this.setState({
               totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
               rows : rows,
+              progress : false,
               loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text={errorMessages.noData} /></Toolbar>),
            }, this.props.hideProgressBar);
          } else {
@@ -711,7 +723,10 @@ class List extends Component {
   _onClearAggregate() {
     let { settings } = this.props;
     let { fields } = settings;
-    this.setState({settings, fields, filters: {}, advFilters: [], rows: []}, this._updateTableData);
+
+    let storedFilters = this._getFilterStoredValues(this.props.page, this.props.settings.fields);
+
+    this.setState({settings, fields, filters: storedFilters, advFilters: [], rows: []}, this._updateTableData);
   }
 
   render() {
@@ -759,6 +774,7 @@ class List extends Component {
               onTouchTap={this[callback]}
               label={controller.label}
               style={styles.listActions}
+              labelStyle={styles.listActionsLabel}
               disabled={false}
             />
           );
@@ -866,11 +882,14 @@ class List extends Component {
         <div>
           <ListFilters
             page={this.props.page}
+            progress={this.state.progress}
+            filterApply={this._updateTableData}
             fields={this.state.fields}
             filters={this.state.filters}
             aggregate={this.state.settings.aggregate}
             advancedFilter={this.state.settings.advancedFilter}
             formatDate={this.formatDate}
+            buildSearchQueryArg={this._buildSearchQueryArg}
             onChangeFilter={this.onChangeFilter}
             onChangeFilterDate={this.onChangeFilterDate}
             onChangeAdvFilter={this.onChangeAdvFilter}
