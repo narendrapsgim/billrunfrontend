@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import ReactPaginate from 'react-paginate';
 
 import { getPlans } from '../../actions/plansActions';
 
@@ -9,6 +10,12 @@ class PlansList extends Component {
     super(props);
 
     this.onClickCell = this.onClickCell.bind(this);
+    this.handlePageClick = this.handlePageClick.bind(this);
+
+    this.state = {
+      page: 1,
+      size: 10
+    };
   }
 
   componentDidMount() {
@@ -24,9 +31,23 @@ class PlansList extends Component {
     });
   }
   
+  buildQuery() {
+    return {
+      page: this.state.page,
+      size: this.state.size
+    };
+  }  
+  
+  handlePageClick(data) {
+    let page = data.selected + 1;
+    this.setState({page}, () => {
+      this.props.dispatch(getPlans(this.buildQuery()))
+    });
+  }
+
   render() {
     let { plans } = this.props;
-
+    
     let rows = plans.map((row, index) => (
       <TableRow key={index}>
         <TableRowColumn>{row.get('name')}</TableRowColumn>
@@ -47,6 +68,22 @@ class PlansList extends Component {
         <TableBody>
           { rows }
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableRowColumn style={{textAlign: 'center'}}>
+              <ReactPaginate previousLabel={"previous"}
+                             nextLabel={"next"}
+                             breakLabel={<a>...</a>}
+                             pageNum={this.state.page + 5}
+                             marginPagesDisplayed={2}
+                             pageRangeDisplayed={5}
+                             clickCallback={this.handlePageClick}
+                             containerClassName={"pagination"}
+                             subContainerClassName={"pages pagination"}
+                             activeClassName={"active"} />
+            </TableRowColumn>
+          </TableRow>
+        </TableFooter>
       </Table>
     );
   }

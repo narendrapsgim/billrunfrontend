@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, clearPlan, savePlan } from '../../actions/planActions';
+import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, saveProduct } from '../../actions/productActions';
 
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -23,12 +23,8 @@ class ProductSetup extends Component {
       this.props.dispatch(getProduct(product_id));
     }
   }
-
-  componentWillUnmount() {
-    this.props.dispatch(clearPlan());
-  }
   
-  onChangeItemFieldValue(id, idx, e, val) {
+  onChangeItemFieldValue(id, idx, e, val = e.target.value) {
     this.props.dispatch(updateProductPropertiesField(id, idx, val));
   }
 
@@ -45,7 +41,7 @@ class ProductSetup extends Component {
   }  
 
   onSave() {
-    this.props.dispatch(savePlan());
+    this.props.dispatch(saveProduct());
   }
 
   onCancel() {
@@ -77,6 +73,6 @@ class ProductSetup extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return state.plan || {};
+  return state.product || {};
 }
 export default connect(mapStateToProps)(ProductSetup);

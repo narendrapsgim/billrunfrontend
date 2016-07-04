@@ -15,8 +15,8 @@ function gotUsages(usages) {
   };
 }
 
-function fetchUsages() {
-  let fetchUrl = `/api/find?collection=lines`;
+function fetchUsages(query) {
+  let fetchUrl = `/api/find?collection=lines&size=${query.size}&page=${query.page}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -30,8 +30,8 @@ function fetchUsages() {
   };
 }
 
-export function getUsages() {
+export function getUsages(query = {page: 1, size: 10}) {
   return dispatch => {
-    return dispatch(fetchUsages());
+    return dispatch(fetchUsages(query));
   }
 }

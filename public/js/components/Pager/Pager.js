@@ -43,8 +43,7 @@ export default class Pager extends Component {
               onClick={onPaginationClick}
               value='back'
               secondary={false}
-              disabled={currentPage == 1}
-          >
+              disabled={currentPage == 1}>
             <BackIcon />
           </FloatingActionButton>
         );
@@ -58,8 +57,7 @@ export default class Pager extends Component {
                   style={styles.pagination.paginationButton}
                   onClick={onPaginationClick}
                   value={i}
-                  disabled={currentPage == i}
-              >
+                  disabled={currentPage == i}>
                 <spam>{i}</spam>
               </FloatingActionButton>)
           } else {
@@ -76,8 +74,7 @@ export default class Pager extends Component {
               onClick={onPaginationClick}
               value='forward'
               secondary={false}
-              disabled={currentPage == totalPages}
-          >
+              disabled={currentPage == totalPages}>
             <ForwardIcon />
           </FloatingActionButton>
         );

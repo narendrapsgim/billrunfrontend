@@ -20,47 +20,49 @@ class Product extends Component {
           onChangeItemFieldValue,
           onAddProductProperties,
           onRemoveProductProperties } = this.props;
-    console.log(product_properties);
 
     return (
       <div className="AddProduct">
         <div className="row">
           <div className="col-md-4">
-            <label for="ProductName">Product Name</label>
-            <input type="text" className="form-control" id="ProductName" onChange={onChangeItemFieldValue.bind(this, "ProductName", -1)} value={product_properties.ProductName} />
+            <label for="key">Product Name</label>
+            <input type="text" className="form-control" id="key" onChange={onChangeItemFieldValue.bind(this, "key", -1)} value={product_properties.key} />
           </div>
         </div>
-        { product_properties.properties.map((prop, key) => {
-            return (
+        { product_properties.rates.map((rate, key) => (
               <div className="row" key={key}>
-                <div className="col-md-2">
-                  <label for="ProductType">Product Type</label>
-                  <select
-                      id="ProductType"
-                      className="form-control"
-                      onChange={onChangeItemFieldValue.bind(this, "ProductType", key)}
-                      value={prop["ProductType"]}>
-                    {product_type_options}
-                  </select>
-                </div>
                 <div className="col-md-1">
-                  <label for="FlatRate">Flat Rate</label>
-                  <Field id="FlatRate"
-                         onChange={onChangeItemFieldValue.bind(this, "FlatRate", key)}
-                         value={prop["FlatRate"]}
+                  <label for="from">From</label>
+                  <Field id="from"
+                         coll="Product"
+                         onChange={onChangeItemFieldValue.bind(this, "from", key)}
+                         value={product_properties.rates[key].from}
                   />
                 </div>
                 <div className="col-md-1">
-                  <label for="PerUnit">Unit</label>
-                  <input type="text"
-                         className="form-control"
-                         id="PerUnit"
-                         onChange={onChangeItemFieldValue.bind(this, "PerUnit", key)}
-                         value={prop["PerUnit"]}
+                  <label for="to">To</label>
+                  <Field id="to"
+                         coll="Product"
+                         onChange={onChangeItemFieldValue.bind(this, "to", key)}
+                         value={product_properties.rates[key].to}
+                  />
+                </div>
+                <div className="col-md-1">
+                  <label for="interval">Interval</label>
+                  <Field id="interval"
+                         onChange={onChangeItemFieldValue.bind(this, "interval", key)}
+                         value={product_properties.rates[key].interval}
+                  />
+                </div>
+                <div className="col-md-1">
+                  <label for="price">Price</label>
+                  <Field id="price"
+                         onChange={onChangeItemFieldValue.bind(this, "price", key)}
+                         value={product_properties.rates[key].price}
                   />
                 </div>
                 {(() => {  /* only show remove button if there is more than one interval */
-                   if (product_properties.properties.length > 1) {
+                   if (product_properties.rates.length > 1) {
                      return (
                        <div className="col-md-2">
                          <FloatingActionButton mini={true} secondary={true} style={{marginTop: "30px", marginLeft: "15px"}} onMouseUp={onRemoveProductProperties.bind(this, key)}>
@@ -71,8 +73,7 @@ class Product extends Component {
                    }
                  })()}
               </div>
-            );
-          }) }
+          )) }
               <div className="row">
                 <div className="col-xs-1">
                   <FloatingActionButton mini={true} style={{margin: "20px"}} onMouseUp={onAddProductProperties}>
@@ -86,7 +87,7 @@ class Product extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return state.plan || {};
+  return {product_properties: state.product};
 }
 
 export default connect(mapStateToProps)(Product);

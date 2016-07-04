@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import FieldSettings from '../../FieldSettings';
 
+import Number from '../FieldTypes/Number';
 import Price from '../FieldTypes/Price';
 import Date  from '../FieldTypes/Date';
 import Address from '../FieldTypes/Address';
@@ -28,6 +29,8 @@ export default class Field extends Component {
     let fieldType = this.getFieldType(id, coll);
 
     switch(fieldType) {
+      case 'number':
+        return (<Number onChange={onChange} id={id} value={value} />);
       case 'price':
         return (<Price onChange={onChange} id={id} value={value} />);
       case 'date':

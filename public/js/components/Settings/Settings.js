@@ -10,6 +10,8 @@ import DateTime from './DateTime';
 import Collections from './Collections';
 import CurrencyTax from './CurrencyTax';
 
+import InputProcessor from '../InputProcessor';
+
 const styles = {
   inkBar: {
     backgroundColor: "#0091FA",
@@ -39,6 +41,7 @@ class Settings extends Component {
 
   onChangeCollection(e) {
     let { id, value } = e.target;
+    console.log(id, value);
     this.props.dispatch(updateSetting(['collection', id], value));
   }
 
@@ -69,6 +72,9 @@ class Settings extends Component {
         </Tab>
         <Tab title="Collections" eventKey={4}>
           <Collections onChange={this.onChangeCollection} data={collection} />
+        </Tab>
+        <Tab title="Input Processor" eventKey={5}>
+          <InputProcessor />
         </Tab>
       </Tabs>
     );

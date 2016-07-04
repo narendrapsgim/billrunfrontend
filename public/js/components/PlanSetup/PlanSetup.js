@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { updatePlanField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan, clearPlan, savePlan } from '../../actions/planActions';
+import { updatePlanField, updatePlanRecurringPriceField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan, clearPlan, savePlan, addTariff } from '../../actions/planActions';
 
 import {
   Step,
@@ -28,10 +28,13 @@ class PlanSetup extends Component {
       finished: 0
     };
 
+    this.onAddTariff = this.onAddTariff.bind(this);
+    this.onChangeRecurringPriceFieldValue = this.onChangeRecurringPriceFieldValue.bind(this);    
     this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
     this.onAddProductProperties = this.onAddProductProperties.bind(this);
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
-    this.save = this.save.bind(this);
+    this.onChangeRecurringPriceCheckFieldValue = this.onChangeRecurringPriceCheckFieldValue.bind(this);
+    this.handleSave = this.handleSave.bind(this);
   }
 
   componentWillMount() {
@@ -55,6 +58,19 @@ class PlanSetup extends Component {
     this.props.dispatch(updatePlanField(section, id, value));
   }
 
+  onChangeRecurringPriceFieldValue(id, idx, e, val) {
+    let value = val ? val : e.target.value;
+    this.props.dispatch(updatePlanRecurringPriceField(id, idx, value));
+  }
+  
+  onChangeRecurringPriceCheckFieldValue(id, idx, e) {
+    this.props.dispatch(updatePlanRecurringPriceField(id, idx, e.target.checked));
+  }
+
+  onAddTariff() {
+    this.props.dispatch(addTariff());
+  }
+  
   onChangeDateFieldValue(section, id, e, value) {
     this.props.dispatch(updatePlanField(section, id, value));
   }
@@ -74,7 +90,7 @@ class PlanSetup extends Component {
   }
   /** **/
 
-  save() {
+  handleSave() {
     this.props.dispatch(savePlan());
   }
   
@@ -102,7 +118,7 @@ class PlanSetup extends Component {
     let { stepIndex } = this.state;
 
     const steps = [
-      (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} basicSettings={this.props} />),
+      (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} basicSettings={this.props} />),
       (<Product onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />)
     ];
 
@@ -111,32 +127,51 @@ class PlanSetup extends Component {
     return (
       <div className="PlanSetup container">
         <h3>Billing Plan</h3>
-        <Stepper activeStep={stepIndex}>
-          <Step>
-            <StepLabel>Plan Settings</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Add Product</StepLabel>
-          </Step>
-        </Stepper>
         <div className="contents bordered-container">
-          { currentStepContents }
+          { steps[0] }
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
-              label="Back"
-              disabled={stepIndex === 0}
-              onTouchTap={this.handlePrev}
-              style={{marginRight: 12}}
-          />
+              label="Cancel"
+              onTouchTap={this.handleBack}
+              style={{marginRight: 12}} />
           <RaisedButton
-              label={stepIndex === 1 ? 'Save' : 'Next'}
+              label="Save"
               primary={true}
-              onTouchTap={this.handleNext}
-          />
+              onTouchTap={this.handleSave} />
         </div>
       </div>
     );
+    /* 
+       return (
+       <div className="PlanSetup container">
+       <h3>Billing Plan</h3>
+       <Stepper activeStep={stepIndex}>
+       <Step>
+       <StepLabel>Plan Settings</StepLabel>
+       </Step>
+       <Step>
+       <StepLabel>Add Product</StepLabel>
+       </Step>
+       </Stepper>
+       <div className="contents bordered-container">
+       { currentStepContents }
+       </div>
+       <div style={{marginTop: 12, float: "right"}}>
+       <FlatButton
+       label="Back"
+       disabled={stepIndex === 0}
+       onTouchTap={this.handlePrev}
+       style={{marginRight: 12}}
+       />
+       <RaisedButton
+       label={stepIndex === 1 ? 'Save' : 'Next'}
+       primary={true}
+       onTouchTap={this.handleNext}
+       />
+       </div>
+       </div>
+       ); */
   }
 }
 

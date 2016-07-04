@@ -8,9 +8,11 @@ import plans  from './plansReducer'
 import subscriber from './subscriberReducer'
 import usages from './usagesReducer'
 import log from './logReducer'
+import product from './productReducer';
 import products from './productsReducer'
 import settings from './settingsReducer';
 import invoices from './invoicesReducer';
+import inputProcessor from './inputProcessorReducer';
 
 export default combineReducers({
   statusBar,
@@ -23,6 +25,8 @@ export default combineReducers({
   usages,
   log,
   products,
+  product,
   settings,
-  invoices
+  invoices,
+  inputProcessor
 });

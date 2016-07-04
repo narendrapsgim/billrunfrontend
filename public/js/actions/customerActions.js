@@ -26,9 +26,11 @@ function gotCustomers(customers) {
 }
 
 function gotCustomer(customer) {
+  let settings = getSubscriberSettings();
   return {
     type: GOT_CUSTOMER,
-    customer
+    customer,
+    settings
   }
 }
 
@@ -53,10 +55,10 @@ function fetchCustomer(customer_id) {
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
-      response => {
+      resp => {
+        let customer = _.values(resp.data.details);
         dispatch(gotCustomer(customer));
         dispatch(hideProgressBar());
-        //dispatch(gotSubscriber(response.data.details));
       }
     ).catch(error => {
       dispatch(hideProgressBar());
@@ -75,6 +77,49 @@ export function getCustomer(customer_id) {
   return dispatch => {
     return dispatch(fetchCustomer(customer_id));
   };
+}
+
+function getSubscriberSettings() {
+  let settings = {
+    subscriber: {
+      "fields" : [
+        {
+          "field_name" : "sid",
+          "generated" : true,
+          "unique" : true,
+          "editable" : false
+        },
+        {
+          "field_name" : "aid",
+          "mandatory" : true,
+          "editable" : false
+        },
+        {
+          "field_name" : "name"
+        },
+        {
+          "field_name" : "imsi2",
+          "mandatory" : false,
+          "editable" : true
+        }
+      ]
+    },
+    account: {
+      "fields" : [
+        {
+          "field_name" : "aid",
+          "generated" : true,
+          "unique" : true,
+          "editable" : false
+        },
+        {
+          "field_name" : "address",
+          "mandatory" : true
+        }
+      ]
+    }
+  };
+  return settings;
 }
 
 export function updateCustomerField(field_id, value) {

@@ -18,7 +18,7 @@ export default class DateTime extends Component {
     let time_zone_options = moment.tz.names().map((zone, key) => (
       <option value={zone} key={key}>{zone}</option>
     ));
-    
+
     return (
       <div className="DateTimeSettings contents" style={{border: "1px solid #C0C0C0", padding: "45px"}}>
         <div className="row">
