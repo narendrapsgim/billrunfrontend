@@ -9,6 +9,7 @@ import AddMore from '../AddMore';
 import AdvancedFilter from '../AdvancedFilter';
 import FieldsContainer from '../FieldsContainer';
 import Aggregate from '../Aggregate/Aggregate';
+import theme from '../../theme'
 
 const styles = {
   filterInput : {
@@ -167,7 +168,14 @@ export default class ListFilters extends React.Component {
       return (
         <div className='row'>
           <div className="col-md-12">
-            <RaisedButton style={{display:'block', }} fullWidth={false} label={this.state.progress ? "Please Wait While Filtering...." : "Apply Filter"} disabled={this.state.progress ? true : false} primary={true} onClick={this.onFilterApplyClick} />
+            <RaisedButton
+              style={{display:'block'}}
+              backgroundColor={theme.palette.primary1Color}
+              labelStyle={{color:'#fff'}}
+              fullWidth={false}
+              label={this.state.progress ? "Please Wait While Filtering...." : "Apply Filter"}
+              disabled={this.state.progress ? true : false}
+              onClick={this.onFilterApplyClick} />
           </div>
         </div>
       );

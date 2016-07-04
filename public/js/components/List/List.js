@@ -21,7 +21,7 @@ import LinearProgress from 'material-ui/LinearProgress';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import {blue500} from 'material-ui/styles/colors';
+import theme from '../../theme'
 import _ from 'lodash';
 import aja from 'aja';
 import $ from 'jquery';
@@ -770,7 +770,7 @@ class List extends Component {
           actions.push(
             <RaisedButton
               key={"action_" + controller.label}
-              backgroundColor={controller.color || blue500}
+              backgroundColor={controller.color || theme.palette.primary1Color}
               onTouchTap={this[callback]}
               label={controller.label}
               style={styles.listActions}
