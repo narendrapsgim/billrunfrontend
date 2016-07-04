@@ -165,8 +165,8 @@ export default class ListFilters extends React.Component {
     });
     if (advancedFilter || filters) {
       return (
-        <div class='row'>
-          <div class="col-md-12">
+        <div className='row'>
+          <div className="col-md-12">
             <RaisedButton style={{display:'block', }} fullWidth={false} label={this.state.progress ? "Please Wait While Filtering...." : "Apply Filter"} disabled={this.state.progress ? true : false} primary={true} onClick={this.onFilterApplyClick} />
           </div>
         </div>
