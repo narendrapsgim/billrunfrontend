@@ -32,6 +32,7 @@ class CalculatorMapping extends Component {
             <select id="src_key" className="form-control" onChange={onSetCustomerMapping} value={settings.getIn(['customer_identification_fields', 0, 'src_key'])} defaultValue="-1">
               { available_fields }
             </select>
+            <p className="help-block">&nbsp;</p>
           </div>
         </div>
         <div className="row">

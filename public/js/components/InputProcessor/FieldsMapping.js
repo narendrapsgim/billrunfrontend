@@ -78,35 +78,31 @@ class FieldsMapping extends Component {
         </div>
         <div className="row" style={{marginLeft: "26px"}}>
           <div className="col-md-6 col-md-offset-3">
-            <Table striped bordered condensed hover>
-              <thead>
-                <tr>
-                  <th>Value</th>
-                  <th>Unit Type</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  settings.getIn(['processor', 'usaget_mapping']).map((usage_t, key) => (
-                    <tr key={key}>
-                      <td>{usage_t.get('pattern')}</td>
-                      <td>{usage_t.get('usaget')}</td>
-                      <td></td>
-                    </tr>
-                  ))
-                }
-                    <tr>
-                      <td><input className="form-control" onChange={this.onChangePattern} value={this.state.pattern} /></td>
-                      <td><input className="form-control" onChange={this.onChangeUsaget} value={this.state.usaget} /></td>
-                      <td>
-                        <FloatingActionButton mini={true} onMouseUp={this.addUsagetMapping}>
-                          <ContentAdd />
-                        </FloatingActionButton>
-                      </td>
-                    </tr>
-              </tbody>
-            </Table>
+            <div className="row">
+              <div className="col-md-2">
+                <strong className="text-uppercase">Value</strong>
+              </div>
+              <div className="col-md-2">
+                <strong className="text-uppercase">Unit Type</strong>
+              </div>
+            </div>
+            {
+              settings.getIn(['processor', 'usaget_mapping']).map((usage_t, key) => (
+                <div className="row" key={key}>
+                  <div className="col-md-2">{usage_t.get('pattern')}</div>
+                  <div className="col-md-2">{usage_t.get('usaget')}</div>
+                </div>
+              ))
+            }
+                <div className="row">
+                  <div className="col-md-2"><input className="form-control" onChange={this.onChangePattern} value={this.state.pattern} /></div>
+                  <div className="col-md-2"><input className="form-control" onChange={this.onChangeUsaget} value={this.state.usaget} /></div>
+                  <div className="col-md-2">
+                    <FloatingActionButton mini={true} onMouseUp={this.addUsagetMapping}>
+                      <ContentAdd />
+                    </FloatingActionButton>
+                  </div>
+                </div>
           </div>
         </div>
       </div>
