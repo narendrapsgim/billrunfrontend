@@ -15,10 +15,13 @@ class ProductSetup extends Component {
     this.onAddProductProperties = this.onAddProductProperties.bind(this);
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
+    this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
+    this.onChangeItemSelectFieldValue = this.onChangeItemSelectFieldValue.bind(this);
+    this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
   }
 
   componentWillMount() {
-    let { product_id } = this.props.params;
+    let { product_id } = this.props.location.query;
     if (product_id) {
       this.props.dispatch(getProduct(product_id));
     }
@@ -53,7 +56,7 @@ class ProductSetup extends Component {
       <div className="ProductSetup container">
         <h3>Product</h3>
         <div className="contents bordered-container">
-          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />
+          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} productSettings={this.props.product} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
@@ -73,6 +76,6 @@ class ProductSetup extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return state.product || {};
+  return { product: state.product };
 }
 export default connect(mapStateToProps)(ProductSetup);

@@ -1,7 +1,6 @@
 import * as actions from '../actions/planActions';
 import _ from 'lodash';
 import moment from 'moment';
-import Immutable from 'immutable';
 
 const defaultState = {
   basic_settings: {
@@ -84,14 +83,14 @@ function buildPlanFromState(state) {
   };
 }
 
-export default function (state = {}, action) {
+export default function (state = defaultState, action) {
   switch (action.type) {
     case actions.UPDATE_PLAN_FIELD_VALUE:
       if (_.isUndefined(state[action.section])) {
         return Object.assign({}, state, {
-          [action.section]: {
+          basic_settings: Object.assign({}, state.basic_settings, {
             [action.field_name]: action.field_value
-          }
+          })
         });
       }
 
@@ -140,18 +139,12 @@ export default function (state = {}, action) {
     case actions.GOT_PLAN:
       return action.plan;
 
-    case actions.CLEAR_PLAN:
-      return defaultState;
-
     case actions.SAVE_PLAN:
       let plan = buildPlanFromState(state);
       console.log("saving plan", plan);
       return state;
       
     default:
-      if (!_.isEmpty(state)) {
-        return state;
-      }
-      return defaultState;
+      return state;
   }
 }

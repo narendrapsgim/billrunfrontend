@@ -8,13 +8,13 @@ import DatePicker from 'material-ui/DatePicker';
 
 import Field from '../Field';
 
-class Plan extends Component {
+export default class Plan extends Component {
   constructor(props) {
     super(props);
   }
   
   render() {
-    let { basic_settings,
+    let { basicSettings,
           onChangeFieldValue,
           onChangeRecurringPriceFieldValue,
           onChangeRecurringPriceCheckFieldValue,
@@ -37,27 +37,27 @@ class Plan extends Component {
           <div className="row">
             <div className="col-md-4">
               <label for="PlanName">Plan Name</label>
-              <Field id="PlanName" onChange={onChangeFieldValue.bind(this, "basic_settings")} value={basic_settings.PlanName} />
+              <Field id="PlanName" onChange={onChangeFieldValue.bind(this, "basicSettings")} value={basicSettings.PlanName} />
             </div>
             <div className="col-md-3" >
               <label for="PlanCode">Plan Code</label>
-              <Field  id="PlanCode" value={basic_settings.PlanCode} onChange={onChangeFieldValue.bind(this, "basic_settings")} />
+              <Field  id="PlanCode" value={basicSettings.PlanCode} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
           </div>
           <div className="row">
             <div className="col-md-7">
               <label for="PlanDescription">Plan Description</label>
-              <textarea id="PlanDescription" className="form-control" value={basic_settings.PlanDescription} onChange={onChangeFieldValue.bind(this, "basic_settings")} />
+              <textarea id="PlanDescription" className="form-control" value={basicSettings.PlanDescription} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
           </div>
           <div className="row">
             <div className="col-xs-1">
               <label for="Each">Each</label>
-              <input type="number" id="Each" className="form-control" value={basic_settings.Each} onChange={onChangeFieldValue.bind(this, "basic_settings")} />
+              <input type="number" id="Each" className="form-control" value={basicSettings.Each} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
             <div className="col-xs-1">
               <label for="EachPeriod">&nbsp;</label>
-              <select id="EachPeriod" className="form-control" value={basic_settings.EachPeriod} onChange={onChangeFieldValue.bind(this, "basic_settings")}>
+              <select id="EachPeriod" className="form-control" value={basicSettings.EachPeriod} onChange={onChangeFieldValue.bind(this, "basicSettings")}>
                 { each_period_options }
               </select>
             </div>
@@ -68,17 +68,17 @@ class Plan extends Component {
           <div className="row">
             <div className="col-xs-1">
               <label for="TrialPrice">Price</label>
-              <Field id="TrialPrice" onChange={onChangeFieldValue.bind(this, "basic_settings")} value={basic_settings.TrialPrice} />
+              <Field id="TrialPrice" onChange={onChangeFieldValue.bind(this, "basicSettings")} value={basicSettings.TrialPrice} />
             </div>
             <div className="col-xs-1">
               <label for="TrialCycle">Billing Cycles</label>
-              <input type="number"  id="TrialCycle" className="form-control" value={basic_settings.TrialCycle} onChange={onChangeFieldValue.bind(this, "basic_settings")} />
+              <input type="number"  id="TrialCycle" className="form-control" value={basicSettings.TrialCycle} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
           </div>
         </div>
         <div className="PlanRecurring">
           <h4>Plan Recurring</h4>
-          { basic_settings.recurring_prices.map((price, key) => (
+          { basicSettings.recurring_prices.map((price, key) => (
               <div className="row" key={key}>
                 <div className="col-xs-1">
                   <label for="PeriodicalRate">Tariff</label>
@@ -89,7 +89,7 @@ class Plan extends Component {
                   <input type="number" id="Cycle" className="form-control" min="0" value={price.Cycle} onChange={onChangeRecurringPriceFieldValue.bind(this, "Cycle", key)} disabled={price.EndOfDays} />
                 </div>
                 {(() => {  /* only show "end of days" toggle for last price */
-                   if (key === (basic_settings.recurring_prices.length - 1)) {
+                   if (key === (basicSettings.recurring_prices.length - 1)) {
                      return (
                        <div className="col-xs-3">
                          <div className="checkbox">
@@ -118,10 +118,3 @@ class Plan extends Component {
     );
   }
 }
-
-
-function mapStateToProps(state, props) {
-  return state.plan || {};
-}
-
-export default connect(mapStateToProps)(Plan);

@@ -20,10 +20,10 @@ const defaultState = {
   key: '',
   rates: [
     {
-      from: 0,
-      to: 0,
-      interval: 0,
-      price: 0
+      from: undefined,
+      to: undefined,
+      interval: undefined,
+      price: undefined
     }
   ]
 };
@@ -32,7 +32,6 @@ export default function (state = defaultState, action) {
   switch (action.type) {
     case UPDATE_PRODUCT_PROPERTIES_VALUE:
       let { field_idx, field_name, field_value } = action;
-      console.log(field_idx, field_name, field_value);
       if (field_idx === -1) {
         return Object.assign({}, state, {
           [field_name]: field_value
@@ -51,10 +50,10 @@ export default function (state = defaultState, action) {
 
     case ADD_PRODUCT_PROPERTIES:
       let new_rate = {
-        from: 0,
-        to: 0,
-        interval: 0,
-        price: 0
+        from: undefined,
+        to: undefined,
+        interval: undefined,
+        price: undefined
       };
       return Object.assign({}, state, {
         rates: [...state.rates, new_rate]

@@ -1,19 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { updatePlanField, updatePlanRecurringPriceField, updateProductPropertiesField, addProductProperties, removeProductProperties, getPlan, clearPlan, savePlan, addTariff } from '../../actions/planActions';
+import { updatePlanField, updatePlanRecurringPriceField, getPlan, clearPlan, savePlan, addTariff } from '../../actions/planActions';
 
-import {
-  Step,
-  Stepper,
-  StepLabel,
-} from 'material-ui/Stepper';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
-import { Card, CardHeader, CardText } from 'material-ui/Card';
 
-import Product from '../ProductSetup/Product';
 import Plan from './Plan';
 
 class PlanSetup extends Component {
@@ -42,15 +35,6 @@ class PlanSetup extends Component {
     if (plan_id) {
       this.props.dispatch(getPlan(plan_id));
     }
-  }
-
-  componentWillUnmount() {
-    this.props.dispatch(clearPlan());
-  }
-  
-  shouldComponentUpdate(nextProps, nextState) {
-    /* Only re-render the component when switching steps in the stepper */
-    return nextState.stepIndex !== this.state.stepIndex; 
   }
   
   onChangeFieldValue(section, e) {
@@ -115,20 +99,11 @@ class PlanSetup extends Component {
   };
   
   render() {
-    let { stepIndex } = this.state;
-
-    const steps = [
-      (<Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} basicSettings={this.props} />),
-      (<Product onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />)
-    ];
-
-    let currentStepContents = steps[stepIndex];
-
     return (
       <div className="PlanSetup container">
         <h3>Billing Plan</h3>
         <div className="contents bordered-container">
-          { steps[0] }
+          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} basicSettings={this.props.basic_settings} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
@@ -142,41 +117,11 @@ class PlanSetup extends Component {
         </div>
       </div>
     );
-    /* 
-       return (
-       <div className="PlanSetup container">
-       <h3>Billing Plan</h3>
-       <Stepper activeStep={stepIndex}>
-       <Step>
-       <StepLabel>Plan Settings</StepLabel>
-       </Step>
-       <Step>
-       <StepLabel>Add Product</StepLabel>
-       </Step>
-       </Stepper>
-       <div className="contents bordered-container">
-       { currentStepContents }
-       </div>
-       <div style={{marginTop: 12, float: "right"}}>
-       <FlatButton
-       label="Back"
-       disabled={stepIndex === 0}
-       onTouchTap={this.handlePrev}
-       style={{marginRight: 12}}
-       />
-       <RaisedButton
-       label={stepIndex === 1 ? 'Save' : 'Next'}
-       primary={true}
-       onTouchTap={this.handleNext}
-       />
-       </div>
-       </div>
-       ); */
   }
 }
 
 function mapStateToProps(state, props) {
-  return state.plan || {};
+  return state.plan;
 }  
 
 export default connect(mapStateToProps)(PlanSetup);

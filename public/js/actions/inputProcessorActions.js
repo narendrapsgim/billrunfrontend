@@ -58,3 +58,7 @@ export function setRatingField(usaget, rate_key, value) {
     value
   };
 }
+
+export function saveInputProcessorSettings(state) {
+  console.log(state.toJS());
+}

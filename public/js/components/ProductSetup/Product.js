@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 
 import Field from '../Field';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
-class Product extends Component {
+export default class Product extends Component {
   constructor(props) {
     super(props);
   }
@@ -16,7 +15,7 @@ class Product extends Component {
       <option value={type} key={key}>{type}</option>
     ));
 
-    let { product_properties,
+    let { productSettings,
           onChangeItemFieldValue,
           onAddProductProperties,
           onRemoveProductProperties } = this.props;
@@ -26,17 +25,21 @@ class Product extends Component {
         <div className="row">
           <div className="col-md-4">
             <label for="key">Product Name</label>
-            <input type="text" className="form-control" id="key" onChange={onChangeItemFieldValue.bind(this, "key", -1)} value={product_properties.key} />
+            <Field id="key"
+                   coll="Product"
+                   onChange={onChangeItemFieldValue.bind(this, "key", -1)}
+                   value={productSettings.key}
+            />
           </div>
         </div>
-        { product_properties.rates.map((rate, key) => (
+        { productSettings.rates.map((rate, key) => (
               <div className="row" key={key}>
                 <div className="col-md-1">
                   <label for="from">From</label>
                   <Field id="from"
                          coll="Product"
                          onChange={onChangeItemFieldValue.bind(this, "from", key)}
-                         value={product_properties.rates[key].from}
+                         value={productSettings.rates[key].from}
                   />
                 </div>
                 <div className="col-md-1">
@@ -44,25 +47,25 @@ class Product extends Component {
                   <Field id="to"
                          coll="Product"
                          onChange={onChangeItemFieldValue.bind(this, "to", key)}
-                         value={product_properties.rates[key].to}
+                         value={productSettings.rates[key].to}
                   />
                 </div>
                 <div className="col-md-1">
                   <label for="interval">Interval</label>
                   <Field id="interval"
                          onChange={onChangeItemFieldValue.bind(this, "interval", key)}
-                         value={product_properties.rates[key].interval}
+                         value={productSettings.rates[key].interval}
                   />
                 </div>
                 <div className="col-md-1">
                   <label for="price">Price</label>
                   <Field id="price"
                          onChange={onChangeItemFieldValue.bind(this, "price", key)}
-                         value={product_properties.rates[key].price}
+                         value={productSettings.rates[key].price}
                   />
                 </div>
                 {(() => {  /* only show remove button if there is more than one interval */
-                   if (product_properties.rates.length > 1) {
+                   if (productSettings.rates.length > 1) {
                      return (
                        <div className="col-md-2">
                          <FloatingActionButton mini={true} secondary={true} style={{marginTop: "30px", marginLeft: "15px"}} onMouseUp={onRemoveProductProperties.bind(this, key)}>
@@ -85,9 +88,3 @@ class Product extends Component {
     );
   }
 }
-
-function mapStateToProps(state, props) {
-  return {product_properties: state.product};
-}
-
-export default connect(mapStateToProps)(Product);

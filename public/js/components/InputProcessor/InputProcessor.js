@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField } from '../../actions/inputProcessorActions';
+import { setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -84,6 +84,10 @@ class InputProcessor extends Component {
   onSetRating(e) {
     const { dataset: {usaget, rate_key}, value } = e.target;
     this.props.dispatch(setRatingField(usaget, rate_key, value));
+  }
+
+  save() {
+    this.props.dispatch(saveInputProcessorSettings(this.props.settings));
   }
   
   handleNext() {

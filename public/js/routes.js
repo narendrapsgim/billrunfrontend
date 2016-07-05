@@ -24,7 +24,7 @@ export default () => {
       <Route name="plan_setup" path="/plan_setup" component={PlanSetup} />
       <Route name="plans" path="/plans" component={PlansList} />
       <Route name="products" path="/products" component={ProductsList} />
-      <Route name="product_setup" path="/product_setup(/:product_id)" component={ProductSetup} />
+      <Route name="product_setup" path="/product_setup" component={ProductSetup} />
       <Route name="subscribers_list" path="/subscribers_list" component={SubscribersList} />
       <Route name="subscriber" path="/subscriber" component={SubscriberEdit} />
       <Route name="usage" path="/usage" component={UsageList} />

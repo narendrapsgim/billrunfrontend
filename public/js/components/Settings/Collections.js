@@ -80,7 +80,7 @@ export default class Collections extends Component {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            
+            <textarea class="form-control" onChange={this.handleEmailChange}></textarea>
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={this.onCancel} bsStyle="danger">Cancel</Button>
