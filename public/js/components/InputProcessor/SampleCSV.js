@@ -33,7 +33,14 @@ class SampleCSV extends Component {
             <label for="delimiter">Delimiter</label>
           </div>
           <div className="col-md-3">
-            <input id="delimiter" className="form-control" type="text" onChange={onChangeDelimiter} value={settings.get('delimiter')} />
+            <input id="delimiter"
+                   className="form-control"
+                   type="text"
+                   maxLength="1"
+                   style={{width: 5}}
+                   onChange={onChangeDelimiter}
+                   value={settings.get('delimiter')} />
+            <p className="help-block">Delimiter used in CSV file</p>
           </div>
         </div>
         <div className="row">
@@ -41,7 +48,7 @@ class SampleCSV extends Component {
             <label for="sample_csv">Select Sample CSV</label>
           </div>
           <div className="col-md-3">
-            <input className="form-control" type="file" id="sample_csv" onChange={onSelectSampleCSV} />
+            <input type="file" id="sample_csv" onChange={onSelectSampleCSV} />
           </div>
         </div>
         <h4>Fields</h4>

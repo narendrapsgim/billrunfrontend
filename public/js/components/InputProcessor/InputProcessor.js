@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping } from '../../actions/inputProcessorActions';
+import { setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField } from '../../actions/inputProcessorActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -83,13 +83,13 @@ class InputProcessor extends Component {
 
   onSetRating(e) {
     const { dataset: {usaget, rate_key}, value } = e.target;
-    console.log(usaget, rate_key, value);
+    this.props.dispatch(setRatingField(usaget, rate_key, value));
   }
   
   handleNext() {
     const { stepIndex } = this.state;
     if (this.state.finished) {
-      // this.save();
+      this.save();
       return;
     }
     const totalSteps = 2; // TODO: don't hardcode
@@ -138,7 +138,7 @@ class InputProcessor extends Component {
               disabled={this.stepIndex === 0}
               style={{marginRight: 12}} />
           <RaisedButton
-              label={stepIndex === steps.length ? "Finish" : "Next"}
+              label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}
               primary={true}
               onTouchTap={this.handleNext} />
         </div>

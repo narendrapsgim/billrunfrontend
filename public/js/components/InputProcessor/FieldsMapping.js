@@ -51,6 +51,7 @@ class FieldsMapping extends Component {
             <select id="time" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'time'])} defaultValue="-1">
               { available_fields }
             </select>
+            <p className="help-block">Time of record creation</p>
           </div>
         </div>
         <div className="row">
@@ -61,6 +62,7 @@ class FieldsMapping extends Component {
             <select id="volume_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'volume_field'])} defaultValue="-1">
               { available_fields }
             </select>
+            <p className="help-block">Amount calculated</p>
           </div>
         </div>
         <div className="row">
@@ -71,6 +73,7 @@ class FieldsMapping extends Component {
             <select id="src_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'src_field'])} defaultValue="-1">
               { available_fields }
             </select>
+            <p className="help-block">Types of usages and units used for measuring usage</p>
           </div>
         </div>
         <div className="row" style={{marginLeft: "26px"}}>

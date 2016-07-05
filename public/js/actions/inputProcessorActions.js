@@ -4,6 +4,7 @@ export const SET_FIELD_MAPPING = 'SET_FIELD_MAPPING';
 export const ADD_CSV_FIELD = 'ADD_CSV_FIELD';
 export const ADD_USAGET_MAPPING = 'ADD_USAGET_MAPPING';
 export const SET_CUSTOMER_MAPPING = 'SET_CUSTOMER_MAPPING';
+export const SET_RATING_FIELD = 'SET_RATING_FIELD';
 
 export function setDelimiter(delimiter) {
   return {
@@ -45,6 +46,15 @@ export function setCustomerMapping(field, value) {
   return {
     type: SET_CUSETOMER_MAPPING,
     field,
+    value
+  };
+}
+
+export function setRatingField(usaget, rate_key, value) {
+  return {
+    type: SET_RATING_FIELD,
+    usaget,
+    rate_key,
     value
   };
 }

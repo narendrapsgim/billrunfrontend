@@ -1,6 +1,12 @@
 import Immutable from 'immutable';
 
-import { SET_FIELDS, SET_DELIMITER, SET_FIELD_MAPPING, ADD_CSV_FIELD, ADD_USAGET_MAPPING, SET_CUSETOMER_MAPPING } from '../actions/inputProcessorActions';
+import { SET_FIELDS,
+         SET_DELIMITER,
+         SET_FIELD_MAPPING,
+         ADD_CSV_FIELD,
+         ADD_USAGET_MAPPING,
+         SET_CUSETOMER_MAPPING,
+         SET_RATING_FIELD } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   delimiter: '',
@@ -43,7 +49,7 @@ export default function (state = defaultState, action) {
 //      const src_field = state.getIn(['processor', 'src_field']);
       if (!src_field) return state;
 
-      const { pattern, usaget } = action.mapping;
+      var { pattern, usaget } = action.mapping;
       const new_map = Immutable.fromJS({
         //src_field,
         //pattern: `/^${pattern}$/`,
@@ -51,11 +57,20 @@ export default function (state = defaultState, action) {
         usaget
       });
       /* TODO: SET SRC_FIELD AND PATTERN REGEX WHEN SAVING AND SANITIZING!! */
-      return state.setIn(['processor', 'usaget_mapping'], usaget_mapping.push(new_map));
+      return state.setIn(['processor', 'usaget_mapping'], usaget_mapping.push(new_map)).setIn(['rate_calculators', usaget], Immutable.List());
 
     case SET_CUSETOMER_MAPPING:
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 
+    case SET_RATING_FIELD:
+      var { rate_key, value, usaget } = action;
+      let new_rating = Immutable.fromJS({
+        type: value,
+        rate_key,
+        line_key: "name"
+      });
+      return state.setIn(['rate_calculators', usaget, 0], new_rating);
+      
     default:
       return state;
   }

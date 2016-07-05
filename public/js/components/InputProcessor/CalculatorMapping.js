@@ -43,17 +43,22 @@ class CalculatorMapping extends Component {
             </select>
           </div>
         </div>
+        <div className="row">
+          <div className="col-md-3">
+            <h4>Rate by</h4>
+          </div>
+        </div>
         {
           available_usagetypes.map((usaget, key) => (
             <div key={key}>
               <div className="row">
                 <div className="col-md-3">
-                  <h4>{usaget}</h4>
+                  <label>{usaget}</label>
                 </div>
-              </div>
-              <div className="row">
-                <div className="col-md-3">
+                <div className="col-md-2">
                   <input type="radio" name={`${usaget}-type`} value="match" data-usaget={usaget} data-rate_key="key" onChange={onSetRating} />By rate key
+                </div>
+                <div className="col-md-2">
                   <input type="radio" name={`${usaget}-type`} value="longestPrefix" data-usaget={usaget} data-rate_key="params.prefix" onChange={onSetRating} />By longest prefix
                 </div>
               </div>
