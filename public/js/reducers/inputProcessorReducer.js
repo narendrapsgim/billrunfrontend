@@ -60,6 +60,7 @@ export default function (state = defaultState, action) {
       return state.setIn(['processor', 'usaget_mapping'], usaget_mapping.push(new_map)).setIn(['rate_calculators', usaget], Immutable.List());
 
     case SET_CUSETOMER_MAPPING:
+      console.log(field, mapping);
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 
     case SET_RATING_FIELD:

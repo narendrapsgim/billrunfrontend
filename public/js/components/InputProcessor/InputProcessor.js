@@ -20,6 +20,7 @@ class InputProcessor extends Component {
     super(props);
 
     this.onSetCalculatorMapping = this.onSetCalculatorMapping.bind(this);
+    this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
@@ -115,7 +116,7 @@ class InputProcessor extends Component {
     const steps = [
       (<SampleCSV onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} />),
-      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} />)
+      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} />)
     ];
 
     return (
