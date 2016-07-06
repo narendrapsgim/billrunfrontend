@@ -48,7 +48,7 @@ class FieldsMapping extends Component {
             <label>Time</label>
           </div>
           <div className="col-md-3">
-            <select id="time" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'time'])} defaultValue="-1">
+            <select id="date_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'date_field'])} defaultValue="-1">
               { available_fields }
             </select>
             <p className="help-block">Time of record creation</p>

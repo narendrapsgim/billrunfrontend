@@ -1,6 +1,7 @@
 import Immutable from 'immutable';
 
-import { SET_FIELDS,
+import { GOT_PROCESSOR_SETTINGS,
+         SET_FIELDS,
          SET_DELIMITER,
          SET_FIELD_MAPPING,
          ADD_CSV_FIELD,
@@ -33,6 +34,10 @@ let defaultState = Immutable.fromJS({
 export default function (state = defaultState, action) {
   const { field, mapping } = action;
   switch (action.type) {
+    case GOT_PROCESSOR_SETTINGS:
+      console.log(action.settings);
+      return Immutable.fromJS(action.settings);
+
     case SET_DELIMITER:
       return state.set('delimiter', action.delimiter);
 

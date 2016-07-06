@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { getProcessorSettings, setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -37,6 +37,10 @@ class InputProcessor extends Component {
     };
   }
 
+  componentWillMount() {
+    this.props.dispatch(getProcessorSettings());
+  }
+  
   shouldComponentUpdate(nextProps, nextState) {
     return nextState.stepIndex !== this.state.stepIndex;
   }

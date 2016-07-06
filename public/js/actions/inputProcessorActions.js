@@ -7,6 +7,7 @@ export const SET_CUSTOMER_MAPPING = 'SET_CUSTOMER_MAPPING';
 export const SET_RATING_FIELD = 'SET_RATING_FIELD';
 export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
+export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -15,6 +16,50 @@ let axiosInstance = axios.create({
   withCredentials: true,
   baseURL: globalSetting.serverUrl
 });
+
+function gotProcessorSettings(settings) {
+  return {
+    type: GOT_PROCESSOR_SETTINGS,
+    settings
+  };
+}
+
+function fetchProcessorSettings() {
+  const convert = (settings) => {
+    const { parser, processor,
+            customer_identification_fields,
+            rate_calculators,
+            receiver } = settings;
+
+    return {
+      delimiter: parser.separator,
+      fields: parser.structure,
+      customer_identification_fields,
+      processor,
+      rate_calculators,
+      receiver
+    };
+  };
+
+  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"csv_separated"}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.get(fetchUrl).then(
+      resp => {
+        dispatch(gotProcessorSettings(convert(resp.data.details)));
+        dispatch(hideProgressBar());
+      }
+    ).catch(error => {
+      dispatch(hideProgressBar());
+    });
+  };
+}
+
+export function getProcessorSettings() {
+  return (dispatch) => {
+    return dispatch(fetchProcessorSettings());
+  };
+}
 
 export function setDelimiter(delimiter) {
   return {
@@ -92,7 +137,7 @@ export function saveInputProcessorSettings(state) {
     },
     "processor": {
       "type": "Usage",
-      "date_field": processor.get('time'),
+      "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
       "usaget_mapping": processor.get('usaget_mapping').map(usaget => {
         return {
