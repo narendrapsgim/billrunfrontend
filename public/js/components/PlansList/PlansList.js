@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import ReactPaginate from 'react-paginate';
+import Filter from '../Filter';
 
 import { getPlans } from '../../actions/plansActions';
 
@@ -11,10 +12,12 @@ class PlansList extends Component {
 
     this.onClickCell = this.onClickCell.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
+    this.onFilter = this.onFilter.bind(this);
 
     this.state = {
       page: 1,
-      size: 10
+      size: 10,
+      filter: ""
     };
   }
 
@@ -32,10 +35,8 @@ class PlansList extends Component {
   }
   
   buildQuery() {
-    return {
-      page: this.state.page,
-      size: this.state.size
-    };
+    const { page, size, filter } = this.state;
+    return { page, size, filter };
   }  
   
   handlePageClick(data) {
@@ -45,6 +46,12 @@ class PlansList extends Component {
     });
   }
 
+  onFilter(filter) {
+    this.setState({filter}, () => {
+      this.props.dispatch(getPlans(this.buildQuery()))
+    });
+  }
+  
   render() {
     let { plans } = this.props;
     
@@ -55,36 +62,45 @@ class PlansList extends Component {
         <TableRowColumn>{row.get('invoice_label')}</TableRowColumn>
       </TableRow>
     ));
-    
+
+    const fields = [
+      {id: "name", placeholder: "Name"},
+      {id: "technical_name", placeholder: "Technical Name"},
+      {id: "invoice_label", placeholder: "Invoice Label"}
+    ];
+
     return (
-      <Table onCellClick={this.onClickCell}>
-        <TableHeader displaySelectAll={true} fixedHeader={true}>
-          <TableRow>
-            <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Technical Name">Technical Name</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Invoice Label">Invoice Label</TableHeaderColumn>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          { rows }
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableRowColumn style={{textAlign: 'center'}}>
-              <ReactPaginate previousLabel={"previous"}
-                             nextLabel={"next"}
-                             breakLabel={<a>...</a>}
-                             pageNum={this.state.page + 5}
-                             marginPagesDisplayed={2}
-                             pageRangeDisplayed={5}
-                             clickCallback={this.handlePageClick}
-                             containerClassName={"pagination"}
-                             subContainerClassName={"pages pagination"}
-                             activeClassName={"active"} />
-            </TableRowColumn>
-          </TableRow>
-        </TableFooter>
-      </Table>
+      <div className="PlansList">
+        <Filter fields={fields} onFilter={this.onFilter} />
+        <Table onCellClick={this.onClickCell}>
+          <TableHeader displaySelectAll={true} fixedHeader={true}>
+            <TableRow>
+              <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
+              <TableHeaderColumn tooltip="Technical Name">Technical Name</TableHeaderColumn>
+              <TableHeaderColumn tooltip="Invoice Label">Invoice Label</TableHeaderColumn>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            { rows }
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableRowColumn style={{textAlign: 'center'}}>
+                <ReactPaginate previousLabel={"previous"}
+                               nextLabel={"next"}
+                               breakLabel={<a>...</a>}
+                               pageNum={this.state.page + 5}
+                               marginPagesDisplayed={2}
+                               pageRangeDisplayed={5}
+                               clickCallback={this.handlePageClick}
+                               containerClassName={"pagination"}
+                               subContainerClassName={"pages pagination"}
+                               activeClassName={"active"} />
+              </TableRowColumn>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </div>
     );
   }
 }

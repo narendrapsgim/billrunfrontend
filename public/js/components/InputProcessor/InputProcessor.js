@@ -156,7 +156,7 @@ class InputProcessor extends Component {
           <FlatButton
               label="Back"
               onTouchTap={this.handlePrev}
-              disabled={this.stepIndex === 0}
+              disabled={stepIndex === 0}
               style={{marginRight: 12}} />
           <RaisedButton
               label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}

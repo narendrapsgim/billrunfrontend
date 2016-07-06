@@ -16,7 +16,7 @@ function gotPlans(plans) {
 }
 
 function fetchPlans(query) {
-  let fetchUrl = `/api/find?collection=plans&size=${query.size}&page=${query.page}`;
+  let fetchUrl = `/api/find?collection=plans&size=${query.size}&page=${query.page}&query=${query.filter}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -30,7 +30,7 @@ function fetchPlans(query) {
   };
 }
 
-export function getPlans(query = {page: 1, size: 10}) {
+export function getPlans(query = {page: 1, size: 10, filter: ""}) {
   return dispatch => {
     return dispatch(fetchPlans(query));
   };

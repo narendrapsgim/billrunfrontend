@@ -4,6 +4,7 @@ import moment from 'moment';
 
 import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody, TableFooter } from 'material-ui/Table';
 import ReactPaginate from 'react-paginate';
+import Filter from '../Filter';
 
 import { getUsages } from '../../actions/usageActions';
 import { showProgressBar, hideProgressBar } from '../../actions/progressbarActions.js';
@@ -14,10 +15,12 @@ class UsageList extends Component {
 
     this.buildQuery = this.buildQuery.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
+    this.onFilter = this.onFilter.bind(this);
     
     this.state = {
       page: 1,
-      size: 10
+      size: 10,
+      filter: ""
     };
   }
 
@@ -26,10 +29,8 @@ class UsageList extends Component {
   }
 
   buildQuery() {
-    return {
-      page: this.state.page,
-      size: this.state.size
-    };
+    const { page, size, filter } = this.state;
+    return { page, size, filter };
   }
 
   handlePageClick(data) {
@@ -39,11 +40,23 @@ class UsageList extends Component {
     });
   }
 
+  onFilter(filter) {
+    this.setState({filter}, () => {
+      this.props.dispatch(getUsages(this.buildQuery()))
+    });
+  }
+  
   render() {
     let { usages } = this.props;
 
+    const fields = [
+      {id: "aid", placeholder: "Account", type: "number"},
+      {id: "plan", placeholder: "Plan"}
+    ];
+    
     return (
-      <div>
+      <div className="UsagesList">
+        <Filter fields={fields} onFilter={this.onFilter} />
         <Table fixedHeader={true}
                fixedFooter={true}
                selectable={false}
