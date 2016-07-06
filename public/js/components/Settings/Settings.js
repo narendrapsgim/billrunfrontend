@@ -41,7 +41,6 @@ class Settings extends Component {
 
   onChangeCollection(e) {
     let { id, value } = e.target;
-    console.log(id, value);
     this.props.dispatch(updateSetting(['collection', id], value));
   }
 

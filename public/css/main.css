@@ -4,9 +4,9 @@ body {
 }
 
 /* temp Overide bootstrap CSS*/
-label {
-    font-weight: normal;
-}
+/* label { */
+/*     font-weight: normal; */
+/* } */
 * {
     box-sizing: content-box;
 }

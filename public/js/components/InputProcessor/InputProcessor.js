@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
 import CalculatorMapping from './CalculatorMapping';
+import Receiver from './Receiver';
 
 import {
   Step,
@@ -21,6 +22,7 @@ class InputProcessor extends Component {
 
     this.onSetCalculatorMapping = this.onSetCalculatorMapping.bind(this);
     this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
+    this.onSetReceiverField = this.onSetReceiverField.bind(this);
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
@@ -87,6 +89,11 @@ class InputProcessor extends Component {
     this.props.dispatch(setRatingField(usaget, rate_key, value));
   }
 
+  onSetReceiverField(e) {
+    const { id, value } = e.target;
+    this.props.dispatch(setReceiverField(id, value));
+  }
+  
   save() {
     this.props.dispatch(saveInputProcessorSettings(this.props.settings));
   }
@@ -97,7 +104,7 @@ class InputProcessor extends Component {
       this.save();
       return;
     }
-    const totalSteps = 2; // TODO: don't hardcode
+    const totalSteps = 3; // TODO: don't hardcode
     let finished = (stepIndex + 1) === totalSteps;
     this.setState({
       stepIndex: stepIndex + 1,
@@ -112,11 +119,13 @@ class InputProcessor extends Component {
   
   render() {
     let { stepIndex } = this.state;
+    const { settings } = this.props;
 
     const steps = [
       (<SampleCSV onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} />),
-      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} />)
+      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} />),
+      (<Receiver onSetReceiverField={this.onSetReceiverField} settings={settings.get('receiver')} />)
     ];
 
     return (
@@ -131,6 +140,9 @@ class InputProcessor extends Component {
           </Step>
           <Step>
             <StepLabel>Calculator Mapping</StepLabel>
+          </Step>
+          <Step>
+            <StepLabel>Receiver</StepLabel>
           </Step>
         </Stepper>
         <div className="contents bordered-container">

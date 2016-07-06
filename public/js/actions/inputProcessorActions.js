@@ -6,6 +6,7 @@ export const ADD_USAGET_MAPPING = 'ADD_USAGET_MAPPING';
 export const SET_CUSTOMER_MAPPING = 'SET_CUSTOMER_MAPPING';
 export const SET_RATING_FIELD = 'SET_RATING_FIELD';
 export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
+export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -68,10 +69,19 @@ export function setRatingField(usaget, rate_key, value) {
   };
 }
 
+export function setReceiverField(field, mapping) {
+  return {
+    type: SET_RECEIVER_FIELD,
+    field,
+    mapping
+  };
+}
+
 export function saveInputProcessorSettings(state) {
   const processor = state.get('processor'),
         customer_identification_fields = state.get('customer_identification_fields'),
-        rate_calculators = state.get('rate_calculators');
+        rate_calculators = state.get('rate_calculators'),
+        receiver = state.get('receiver');
 
   let settings = {
     "file_type": "csv_separated",
@@ -93,7 +103,8 @@ export function saveInputProcessorSettings(state) {
       })
     },
     "customer_identification_fields": customer_identification_fields.toJS(),
-    "rate_calculators": rate_calculators.toJS()
+    "rate_calculators": rate_calculators.toJS(),
+    "receiver": receiver.toJS()
   };
 
   let setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settings)}`;

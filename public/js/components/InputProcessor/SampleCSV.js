@@ -55,7 +55,7 @@ class SampleCSV extends Component {
         {settings.get('fields').map((field, key) => (
            <div className="row" key={key}>
              <div className="col-md-3">
-               <label>{field}</label>
+               {field}
              </div>
            </div>
          ))}

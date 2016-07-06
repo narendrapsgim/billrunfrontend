@@ -6,7 +6,8 @@ import { SET_FIELDS,
          ADD_CSV_FIELD,
          ADD_USAGET_MAPPING,
          SET_CUSETOMER_MAPPING,
-         SET_RATING_FIELD } from '../actions/inputProcessorActions';
+         SET_RATING_FIELD,
+         SET_RECEIVER_FIELD } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   delimiter: '',
@@ -25,7 +26,8 @@ let defaultState = Immutable.fromJS({
       clear_regex: "//"
     }
   ],
-  rate_calculators: {}
+  rate_calculators: {},
+  receiver: {}
 });
 
 export default function (state = defaultState, action) {
@@ -70,6 +72,9 @@ export default function (state = defaultState, action) {
         line_key: "name"
       });
       return state.setIn(['rate_calculators', usaget, 0], new_rating);
+
+    case SET_RECEIVER_FIELD:
+      return state.setIn(['receiver', field], mapping);
       
     default:
       return state;
