@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import RaisedButton from 'material-ui/RaisedButton';
 
 export default class Filter extends Component {
   constructor(props) {
@@ -64,7 +65,7 @@ export default class Filter extends Component {
         <div className="row">
           { inputs }
           <div className="col-md-1">
-            <button className="btn btn-primary" type="submit" onClick={this.onClickFilterBtn}>Filter</button>
+            <RaisedButton primary={true} label="Filter" onMouseUp={this.onClickFilterBtn} style={{marginTop: 5}} />
           </div>
         </div>
       </div>

@@ -16,7 +16,7 @@ function gotProducts(products) {
 }
 
 function fetchProducts(query) {
-  let fetchUrl = `/api/find?collection=rates&size=${query.size}&page=${query.page}`;
+  let fetchUrl = `/api/find?collection=rates&size=${query.size}&page=${query.page}&query=${query.filter}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -30,7 +30,7 @@ function fetchProducts(query) {
   };
 }
 
-export function getProducts(query = {page: 1, size: 10}) {
+export function getProducts(query = {page: 1, size: 10, filter: ""}) {
   return dispatch => {
     return dispatch(fetchProducts(query));
   };

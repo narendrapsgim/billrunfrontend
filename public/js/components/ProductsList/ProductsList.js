@@ -5,6 +5,7 @@ import { getProducts } from '../../actions/productsActions';
 import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import ReactPaginate from 'react-paginate';
 import RaisedButton from 'material-ui/RaisedButton';
+import Filter from '../Filter';
 
 class ProductsList extends Component {
   constructor(props) {
@@ -13,10 +14,12 @@ class ProductsList extends Component {
     this.onClickCell = this.onClickCell.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onNewProduct = this.onNewProduct.bind(this);
+    this.onFilter = this.onFilter.bind(this);
 
     this.state = {
       page: 1,
-      size: 10
+      size: 10,
+      filter: ""
     };
   }
 
@@ -34,10 +37,8 @@ class ProductsList extends Component {
   }
 
   buildQuery() {
-    return {
-      page: this.state.page,
-      size: this.state.size
-    };
+    const { page, size, filter } = this.state;
+    return { page, size, filter };
   }  
   
   handlePageClick(data) {
@@ -50,9 +51,18 @@ class ProductsList extends Component {
   onNewProduct() {
     this.context.router.push(`product_setup`);
   }
+
+  onFilter(filter) {
+    this.setState({filter}, () => {
+      this.props.dispatch(getProducts(this.buildQuery()))
+    });
+  }
   
   render() {
     let { products } = this.props;
+    const fields = [
+      {id: "key", placeholder: "Name"}
+    ];
 
     return (
       <div className="ProductsList">
@@ -64,6 +74,7 @@ class ProductsList extends Component {
             <RaisedButton primary={true} label="New" onMouseUp={this.onNewProduct} />
           </div>
         </div>
+        <Filter onFilter={this.onFilter} fields={fields} />
         <Table onCellClick={this.onClickCell}>
           <TableHeader displaySelectAll={true}>
             <TableRow>
