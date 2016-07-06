@@ -29,7 +29,11 @@ class CalculatorMapping extends Component {
             <label>Customer field</label>
           </div>
           <div className="col-md-3">
-            <select id="src_key" className="form-control" onChange={onSetCustomerMapping} value={settings.getIn(['customer_identification_fields', 0, 'src_key'])} defaultValue="-1">
+            <select id="src_key"
+                    className="form-control"
+                    onChange={onSetCustomerMapping}
+                    value={settings.getIn(['customer_identification_fields', 0, 'src_key'])}
+                    defaultValue="-1">
               { available_fields }
             </select>
             <p className="help-block">&nbsp;</p>
@@ -39,7 +43,11 @@ class CalculatorMapping extends Component {
           <div className="col-md-3">
           </div>
           <div className="col-md-3">
-            <select id="target_key" className="form-control" onChange={onSetCustomerMapping} value={settings.getIn(['customer_identification_fields', 0, 'target_key'])} defaultValue="-1">
+            <select id="target_key"
+                    className="form-control"
+                    onChange={onSetCustomerMapping}
+                    value={settings.getIn(['customer_identification_fields', 0, 'target_key'])}
+                    defaultValue="-1">
               { available_target_fields }
             </select>
           </div>
@@ -57,10 +65,20 @@ class CalculatorMapping extends Component {
                   <label>{usaget}</label>
                 </div>
                 <div className="col-md-2">
-                  <input type="radio" name={`${usaget}-type`} value="match" data-usaget={usaget} data-rate_key="key" onChange={onSetRating} />By rate key
+                  <input type="radio"
+                         name={`${usaget}-type`}
+                         value="match"
+                         data-usaget={usaget}
+                         data-rate_key="key"
+                         onChange={onSetRating} />By rate key
                 </div>
                 <div className="col-md-2">
-                  <input type="radio" name={`${usaget}-type`} value="longestPrefix" data-usaget={usaget} data-rate_key="params.prefix" onChange={onSetRating} />By longest prefix
+                  <input type="radio"
+                         name={`${usaget}-type`}
+                         value="longestPrefix"
+                         data-usaget={usaget}
+                         data-rate_key="params.prefix"
+                         onChange={onSetRating} />By longest prefix
                 </div>
               </div>
             </div>

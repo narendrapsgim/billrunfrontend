@@ -69,7 +69,10 @@ export function setRatingField(usaget, rate_key, value) {
 }
 
 export function saveInputProcessorSettings(state) {
-  const { processor, customer_identification_fields, rate_calculators } = state.toJS();
+  const processor = state.get('processor'),
+        customer_identification_fields = state.get('customer_identification_fields'),
+        rate_calculators = state.get('rate_calculators');
+
   let settings = {
     "file_type": "csv_separated",
     "parser": {
@@ -79,18 +82,18 @@ export function saveInputProcessorSettings(state) {
     },
     "processor": {
       "type": "Usage",
-      "date_field": processor.time,
-      "volume_field": processor.volume_field,
-      "usaget_mapping": processor.usaget_mapping.map(usaget => {
+      "date_field": processor.get('time'),
+      "volume_field": processor.get('volume_field'),
+      "usaget_mapping": processor.get('usaget_mapping').map(usaget => {
         return {
-          "src_field": processor.src_field,
-          "pattern": `/^${usaget.pattern}$/`,
-          "usaget": usaget.usaget
+          "src_field": processor.get('src_field'),
+          "pattern": `/^${usaget.get('pattern')}$/`,
+          "usaget": usaget.get('usaget')
         }
       })
     },
-    "customer_identification_fields": customer_identification_fields,
-    "rate_calculators": rate_calculators
+    "customer_identification_fields": customer_identification_fields.toJS(),
+    "rate_calculators": rate_calculators.toJS()
   };
 
   let setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settings)}`;
