@@ -2,12 +2,14 @@ import React from 'react';
 import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import SelectField from 'material-ui/SelectField';
+import RaisedButton from 'material-ui/RaisedButton';
 import MenuItem from 'material-ui/MenuItem';
 import Chips from '../Chips';
 import AddMore from '../AddMore';
 import AdvancedFilter from '../AdvancedFilter';
 import FieldsContainer from '../FieldsContainer';
 import Aggregate from '../Aggregate/Aggregate';
+import theme from '../../theme'
 
 const styles = {
   filterInput : {
@@ -30,15 +32,23 @@ export default class ListFilters extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { };
+    this.state = { progress : props.progress};
 
     this.renderFilterFields = this.renderFilterFields.bind(this);
     this.renderAdvancedFilter = this.renderAdvancedFilter.bind(this);
+    this.renderAction = this.renderAction.bind(this);
+
     this.onChangeFilterMultiselect = this.onChangeFilterMultiselect.bind(this);
     this.onChangeFilterSelectField = this.onChangeFilterSelectField.bind(this);
-
     this.onAdvFilterChange = this.onAdvFilterChange.bind(this);
     this.onAdvFilterRemove = this.onAdvFilterRemove.bind(this);
+    this.onFilterApplyClick = this.onFilterApplyClick.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      progress: nextProps.progress
+    });
   }
 
   onChangeFilterMultiselect(name, value) {
@@ -62,10 +72,13 @@ export default class ListFilters extends React.Component {
     let filters = [];
     this.props.fields.forEach((field, i) => {
       if(field.filter && !field.filter.system){
+        let filterKey = this.props.page + "-" + field.key;
+        let filterVal = localStorage.getItem(filterKey);
+        let defVal = (filterVal !== null) ? filterVal : field.filter.defaultValue;
         if(field.type == 'urt') {
           filters.push(<DatePicker
-                  key={i} name={field.key}
-                  defaultDate={(field.filter.defaultValue) ? new Date(field.filter.defaultValue) : null}
+                  key={this.props.page + "-" + i} name={field.key}
+                  defaultDate={(defVal) ? new Date(defVal) : null}
                   hintText={"Enter " + field.label + "..."}
                   floatingLabelText={"Search by " + field.label}
                   container="inline" mode="landscape" style={styles.filterDatePicker}
@@ -74,16 +87,17 @@ export default class ListFilters extends React.Component {
                 />);
         } else if(field.type == 'multiselect'){
           filters.push(<Chips
-                  key={i} name={field.key} style={{wrapper:styles.filterChips}}
+                  items={(defVal) ? defVal.split(",") : []}
+                  key={this.props.page + "-" + i} name={field.key} style={{wrapper:styles.filterChips}}
                   options={field.filter.options}
                   onChange={this.onChangeFilterMultiselect.bind(null, field.key)}
                   label={field.label} inputType='select'
                 />);
         } else if(field.type == 'select'){
-          let val = typeof field.filter.defaultValue !== 'undefined' ? field.filter.defaultValue : null;
+          let val = typeof filterVal !== 'undefined' ? filterVal : null;
           val = typeof this.state[field.key] !== 'undefined' ? this.state[field.key] : val;
           filters.push(<SelectField
-                    key={i} name={field.key} style={styles.filterSelect}
+                    key={this.props.page + "-" + i} name={field.key} style={styles.filterSelect}
                     value={val}
                     onChange={this.onChangeFilterSelectField.bind(null, field.key)}
                     floatingLabelText={field.label}
@@ -93,17 +107,21 @@ export default class ListFilters extends React.Component {
         } else {
           filters.push(<TextField
                    style={styles.filterInput}
-                   key={i} name={field.key}
+                   key={this.props.page + "-" + i} name={field.key}
                    hintText={"enter " + field.label + "..."}
                    floatingLabelText={"Search by " + field.label}
                    errorText=""
-                   defaultValue={(field.filter.defaultValue) ? field.filter.defaultValue : ''}
+                   defaultValue={(defVal) ? defVal : ''}
                    onChange={this.props.onChangeFilter}
                  />);
          }
       }
     });
     return filters;
+  }
+
+  onFilterApplyClick(){
+    this.props.filterApply();
   }
 
   onAdvFilterChange(filter){
@@ -132,8 +150,35 @@ export default class ListFilters extends React.Component {
                               filters={this.props.filters}
                               onClear={this.props.onClearAggregate}
                               onDataChange={this.props.onChangeAggregate}
+                              buildSearchQueryArg={this.props.buildSearchQueryArg}
                             />;
       return <FieldsContainer size="12" label="Aggregate" content={aggregateFilter} collapsible={true} collapsibleType={'css'} expanded={true}/>
+    }
+  }
+
+  renderAction(){
+    let { advancedFilter } = this.props;
+    let filters = false;
+    this.props.fields.forEach((field, i) => {
+      if(field.filter && !field.filter.system){
+        filters = true;
+      }
+    });
+    if (advancedFilter || filters) {
+      return (
+        <div className='row'>
+          <div className="col-md-12">
+            <RaisedButton
+              style={{display:'block'}}
+              backgroundColor={theme.palette.primary1Color}
+              labelStyle={{color:'#fff'}}
+              fullWidth={false}
+              label={this.state.progress ? "Please Wait While Filtering...." : "Apply Filter"}
+              disabled={this.state.progress ? true : false}
+              onClick={this.onFilterApplyClick} />
+          </div>
+        </div>
+      );
     }
   }
 
@@ -142,6 +187,7 @@ export default class ListFilters extends React.Component {
       <div>
         {this.renderFilterFields()}
         {this.renderAdvancedFilter()}
+        {this.renderAction()}
         {this.renderAggregate()}
       </div>
     )

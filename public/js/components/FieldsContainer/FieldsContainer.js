@@ -90,7 +90,7 @@ export default class FieldsContainer extends Component {
           {this.crudActionButtons()}
         </Card>
       );
-    } else if(this.props.collapsibleTyle === 'css'){
+    } else if(this.props.collapsibleType === 'css'){
         return (
           <Card style={style.card} onExpandChange={this.handleExpandChange} initiallyExpanded={this.state.expanded}>
             <CardHeader title={label} actAsExpander={true} showExpandableButton={true} />

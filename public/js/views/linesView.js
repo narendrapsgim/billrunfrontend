@@ -48,6 +48,7 @@ const lines_list_view = {
         {key : 'urt', label : 'URT',  type : 'urt', sortable : true},
         {key : 'usaget', label : 'Usage', type:'select', filter : {
           options: [
+            { value: "-", key: ""},
             { value: "Flat", key: "flat"},
             { value: "Conditional Discount", key: "conditional_discount"},
             { value: "Option", key: "option"},
@@ -87,12 +88,12 @@ const lines_list_view = {
           value: "Credit type",
           operators: [ops.in, ops.regex, ops.ne, ops.lt, ops.lte, ops.gt, ops.gte]
         }, {
-          key: 'File',
-          value: "file",
+          key: 'file',
+          value: "File",
           operators: [ops.in, ops.regex, ops.ne, ops.lt, ops.lte, ops.gt, ops.gte]
         }, {
-          key: 'Imsi',
-          value: "imsi",
+          key: 'imsi',
+          value: "IMSI",
           operators: [ops.in, ops.regex, ops.ne, ops.lt, ops.lte, ops.gt, ops.gte]
         }, {
           key: 'in_circuit_group',

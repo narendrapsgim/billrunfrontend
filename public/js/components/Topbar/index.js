@@ -33,7 +33,7 @@ class Topbar extends Component {
   renderLoginButton(){
     return (
       <ToolbarGroup>
-        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text="Login" onClick={this.handleOpen} />
+        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px', cursor: 'pointer'}} text="Login" onClick={this.handleOpen} />
       </ToolbarGroup>
     )
   }

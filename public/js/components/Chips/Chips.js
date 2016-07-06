@@ -108,8 +108,8 @@ export default class Chips extends Component {
     }
   }
 
-  onRremoveItem(e){
-    this.removeItem(e.currentTarget.value);
+  onRremoveItem(index){
+    this.removeItem(index);
   }
 
   onKeyPress(e){
