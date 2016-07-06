@@ -34,8 +34,16 @@ function fetchProcessorSettings() {
     return {
       delimiter: parser.separator,
       fields: parser.structure,
+      processor: Object.assign({}, processor, {
+        usaget_mapping: processor.usaget_mapping.map(usaget => {
+          return {
+            usaget: usaget.usaget,
+            pattern: usaget.pattern.replace("/^", "").replace("$/", "")
+          }
+        }),
+        src_field: processor.usaget_mapping[0].src_field
+      }),
       customer_identification_fields,
-      processor,
       rate_calculators,
       receiver
     };
@@ -50,6 +58,7 @@ function fetchProcessorSettings() {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
+      console.log(error);
       dispatch(hideProgressBar());
     });
   };

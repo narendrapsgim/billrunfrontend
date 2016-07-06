@@ -35,7 +35,6 @@ export default function (state = defaultState, action) {
   const { field, mapping } = action;
   switch (action.type) {
     case GOT_PROCESSOR_SETTINGS:
-      console.log(action.settings);
       return Immutable.fromJS(action.settings);
 
     case SET_DELIMITER:
