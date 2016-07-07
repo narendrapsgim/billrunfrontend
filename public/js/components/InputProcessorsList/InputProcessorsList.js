@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 
-import { getInputProcessors } from '../../actions/inputProcessorActions';
+import { getInputProcessors, setInputProcessor } from '../../actions/inputProcessorActions';
 
 class InputProcessorsList extends Component {
   constructor(props) {
@@ -17,8 +17,9 @@ class InputProcessorsList extends Component {
   }
   
   onClickCell(cell_idx, col_idx, e) {
-    const selected = this.props.list.valueSeq().get(cell_idx);
-    this.props.dispatch(setInputProcessor(selected));
+    const selected = this.props.list.valueSeq().get(cell_idx).get('file_type');
+    console.log(selected);
+    this.props.onSelectInputProcessor(selected);
   }
   
   render() {

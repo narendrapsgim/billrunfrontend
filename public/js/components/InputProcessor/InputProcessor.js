@@ -38,7 +38,8 @@ class InputProcessor extends Component {
   }
 
   componentWillMount() {
-    this.props.dispatch(getProcessorSettings());
+    const { dispatch, fileType } = this.props;
+    dispatch(getProcessorSettings(fileType));
   }
   
   shouldComponentUpdate(nextProps, nextState) {
@@ -118,7 +119,9 @@ class InputProcessor extends Component {
 
   handlePrev() {
     const { stepIndex } = this.state;
-    if (stepIndex > 0) this.setState({stepIndex: stepIndex - 1, finished: 0});
+    if (stepIndex > 0) return this.setState({stepIndex: stepIndex - 1, finished: 0});
+    let r = confirm("are you sure you want to stop editing input processor?");
+    if (r) this.props.onCancel();
   }
   
   render() {
@@ -154,9 +157,8 @@ class InputProcessor extends Component {
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
-              label="Back"
+              label={stepIndex === 0 ? "Cancel" : "Back"}
               onTouchTap={this.handlePrev}
-              disabled={stepIndex === 0}
               style={{marginRight: 12}} />
           <RaisedButton
               label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}

@@ -25,7 +25,7 @@ function gotProcessorSettings(settings) {
   };
 }
 
-function fetchProcessorSettings() {
+function fetchProcessorSettings(file_type) {
   const convert = (settings) => {
     const { parser, processor,
             customer_identification_fields,
@@ -50,7 +50,7 @@ function fetchProcessorSettings() {
     };
   };
 
-  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"csv_separated"}`;
+  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"${file_type}"}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -65,9 +65,9 @@ function fetchProcessorSettings() {
   };
 }
 
-export function getProcessorSettings() {
+export function getProcessorSettings(file_type) {
   return (dispatch) => {
-    return dispatch(fetchProcessorSettings());
+    return dispatch(fetchProcessorSettings(file_type));
   };
 }
 
@@ -174,13 +174,6 @@ export function saveInputProcessorSettings(state) {
       dispatch(hideProgressBar());
     });
   };  
-}
-
-export function setInputProcessor(input_processor) {
-  return {
-    type: SET_INPUT_PROCESSOR,
-    input_processor
-  };
 }
 
 function gotInputProcessors(input_processors) {

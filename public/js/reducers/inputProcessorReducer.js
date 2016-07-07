@@ -35,9 +35,6 @@ let defaultState = Immutable.fromJS({
 export default function (state = defaultState, action) {
   const { field, mapping } = action;
   switch (action.type) {
-    case SET_INPUT_PROCESSOR:
-      return Immutable.fromJS(action.input_processor);
-
     case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
 

@@ -1,5 +1,7 @@
 import Immutable from 'immutable';
 
+import { GOT_STUFF } from '../actions/dashboardActions';
+
 const defaultState = Immutable.fromJS([]);
 
 export default function (state = defaultState, action) {
