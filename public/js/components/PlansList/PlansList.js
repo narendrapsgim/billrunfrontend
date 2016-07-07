@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import ReactPaginate from 'react-paginate';
 import Filter from '../Filter';
+import Field from '../Field';
 
 import { getPlans } from '../../actions/plansActions';
 
@@ -27,18 +28,18 @@ class PlansList extends Component {
   
   onClickCell(cell_idx, col_idx, e) {
     let { plans } = this.props;
-    let id = plans.valueSeq().get(cell_idx).getIn(['_id', '$id']);;
+    let id = plans.valueSeq().get(cell_idx).getIn(['_id', '$id']);
     this.context.router.push({
       pathname: 'plan_setup',
       query: {plan_id: id}
     });
   }
-  
+
   buildQuery() {
     const { page, size, filter } = this.state;
     return { page, size, filter };
-  }  
-  
+  }
+
   handlePageClick(data) {
     let page = data.selected + 1;
     this.setState({page}, () => {
@@ -54,20 +55,26 @@ class PlansList extends Component {
   
   render() {
     let { plans } = this.props;
-    
-    let rows = plans.map((row, index) => (
-      <TableRow key={index}>
-        <TableRowColumn>{row.get('name')}</TableRowColumn>
-        <TableRowColumn>{row.get('technical_name')}</TableRowColumn>
-        <TableRowColumn>{row.get('invoice_label')}</TableRowColumn>
-      </TableRow>
-    ));
 
     const fields = [
       {id: "name", placeholder: "Name"},
-      {id: "technical_name", placeholder: "Technical Name"},
-      {id: "invoice_label", placeholder: "Invoice Label"}
+      {id: "description", placeholder: "Description"},
+      {id: "price", placeholder: "Price"}
     ];
+
+    const table_header = fields.map((field, idx) => (
+      <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
+    ));
+    
+    const rows = plans.map((row, key) => (
+      <TableRow key={key}>
+        {fields.map((field, idx) => (
+           <TableRowColumn key={idx}>
+             <Field id={field.id} value={row.get(field.id)} coll="Plans" editable={false} />
+           </TableRowColumn>
+         ))}
+      </TableRow>
+    ));
 
     return (
       <div className="PlansList">
@@ -75,9 +82,7 @@ class PlansList extends Component {
         <Table onCellClick={this.onClickCell}>
           <TableHeader displaySelectAll={true} fixedHeader={true}>
             <TableRow>
-              <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Technical Name">Technical Name</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Invoice Label">Invoice Label</TableHeaderColumn>
+              { table_header }
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -26,7 +26,7 @@ class CalculatorMapping extends Component {
       <div className="CalculatorMapping">
         <div className="row">
           <div className="col-md-3">
-            <label>Customer field</label>
+            <label>Customer identification</label>
           </div>
           <div className="col-md-3">
             <select id="src_key"
@@ -36,7 +36,7 @@ class CalculatorMapping extends Component {
                     defaultValue="-1">
               { available_fields }
             </select>
-            <p className="help-block">&nbsp;</p>
+            <p className="help-block">Map customer identification field in record to Billrun field</p>
           </div>
         </div>
         <div className="row">
@@ -64,7 +64,17 @@ class CalculatorMapping extends Component {
                 <div className="col-md-3">
                   <label>{usaget}</label>
                 </div>
-                <div className="col-md-2">
+                {/* <div className="col-md-2">
+                <select id="line_key"
+                className="form-control"
+                data-usaget={usaget}
+                onChange={onSetRating}
+                value={settings.getIn(['rate_calculators', usaget, 'line_key'])}
+                defaultValue="-1">
+                { available_fields }
+                </select>
+                </div> */}
+                <div className="col-md-1">
                   <input type="radio"
                          name={`${usaget}-type`}
                          value="match"
@@ -72,7 +82,7 @@ class CalculatorMapping extends Component {
                          data-rate_key="key"
                          onChange={onSetRating} />By rate key
                 </div>
-                <div className="col-md-2">
+                <div className="col-md-1">
                   <input type="radio"
                          name={`${usaget}-type`}
                          value="longestPrefix"

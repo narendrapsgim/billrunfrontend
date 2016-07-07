@@ -32,6 +32,16 @@ export default class Product extends Component {
             />
           </div>
         </div>
+        <div className="row">
+          <div className="col-md-4">
+            <label for="description">Description</label>
+            <Field id="description"
+                   coll="Product"
+                   onChange={onChangeItemFieldValue.bind(this, "description", -1)}
+                   value={productSettings.description}
+            />
+          </div>
+        </div>
         { productSettings.rates.map((rate, key) => (
               <div className="row" key={key}>
                 <div className="col-md-1">

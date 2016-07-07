@@ -6,6 +6,7 @@ import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow,
 import ReactPaginate from 'react-paginate';
 import RaisedButton from 'material-ui/RaisedButton';
 import Filter from '../Filter';
+import Field from '../Field';
 
 class ProductsList extends Component {
   constructor(props) {
@@ -59,10 +60,23 @@ class ProductsList extends Component {
   }
   
   render() {
-    let { products } = this.props;
+    const { products } = this.props;
     const fields = [
-      {id: "key", placeholder: "Name"}
+      {id: "key", placeholder: "Name"},
     ];
+
+    const table_header = fields.map((field, idx) => (
+      <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
+    ));
+    const rows = products.map((row, key) => (
+      <TableRow key={key}>
+        {fields.map((field, idx) => (
+          <TableRowColumn key={idx}>
+            <Field id={field.id} value={row.get(field.id)} coll="Product" editable={false} />
+          </TableRowColumn>
+        ))}
+      </TableRow>
+    ));
 
     return (
       <div className="ProductsList">
@@ -78,15 +92,11 @@ class ProductsList extends Component {
         <Table onCellClick={this.onClickCell}>
           <TableHeader displaySelectAll={true}>
             <TableRow>
-              <TableHeaderColumn tooltip="Key">Key</TableHeaderColumn>
+              { table_header }
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((row, index) => (
-               <TableRow key={index}>
-                 <TableRowColumn>{row.get('key')}</TableRowColumn>
-               </TableRow>
-             ))}
+            { rows }
           </TableBody>
           <TableFooter>
             <TableRow>

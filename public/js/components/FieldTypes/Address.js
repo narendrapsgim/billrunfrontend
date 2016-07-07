@@ -6,10 +6,11 @@ export default class Address extends Component {
   }
 
   render() {
-    let { onChange, id, value } = this.props;
+    let { onChange, id, value, editable } = this.props;
+    const input = editable ? (<input type="text" className="form-control" id={id} value={value} onChange={onChange} />) : (<span>{value}</span>);
 
     return (
-      <input type="text" className="form-control" id={id} value={value} onChange={onChange} />
+      <div>{input}</div>
     );
   }
 }

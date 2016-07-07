@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { browserHistory } from 'react-router';
 
 import { updatePlanField, updatePlanRecurringPriceField, getPlan, clearPlan, savePlan, addTariff } from '../../actions/planActions';
 
@@ -14,12 +15,7 @@ class PlanSetup extends Component {
     super(props);
     this.onChangeFieldValue = this.onChangeFieldValue.bind(this);
     this.handleNext = this.handleNext.bind(this);
-    this.handlePrev = this.handlePrev.bind(this);
-
-    this.state = {
-      stepIndex: 0,
-      finished: 0
-    };
+    this.handleBack = this.handleBack.bind(this);
 
     this.onAddTariff = this.onAddTariff.bind(this);
     this.onChangeRecurringPriceFieldValue = this.onChangeRecurringPriceFieldValue.bind(this);    
@@ -28,6 +24,11 @@ class PlanSetup extends Component {
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
     this.onChangeRecurringPriceCheckFieldValue = this.onChangeRecurringPriceCheckFieldValue.bind(this);
     this.handleSave = this.handleSave.bind(this);
+
+    this.state = {
+      stepIndex: 0,
+      finished: 0
+    };
   }
 
   componentWillMount() {
@@ -89,14 +90,11 @@ class PlanSetup extends Component {
       stepIndex: stepIndex + 1,
       finished: finished,
     });
-  };
+  }
 
-  handlePrev() {
-    const {stepIndex} = this.state;
-    if (stepIndex > 0) {
-      this.setState({stepIndex: stepIndex - 1, finished: 0});
-    }
-  };
+  handleBack() {
+    browserHistory.goBack();
+  }
   
   render() {
     return (

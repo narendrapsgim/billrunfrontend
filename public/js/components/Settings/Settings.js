@@ -10,6 +10,7 @@ import DateTime from './DateTime';
 import Collections from './Collections';
 import CurrencyTax from './CurrencyTax';
 
+import InputProcessorsList from '../InputProcessorsList';
 import InputProcessor from '../InputProcessor';
 
 const styles = {
@@ -73,7 +74,7 @@ class Settings extends Component {
           <Collections onChange={this.onChangeCollection} data={collection} />
         </Tab>
         <Tab title="Input Processor" eventKey={5}>
-          <InputProcessor />
+          <InputProcessorsList />
         </Tab>
       </Tabs>
     );

@@ -6,10 +6,13 @@ export default class Number extends Component {
   }
 
   render() {
-    let { onChange, id, value } = this.props;
-
+    let { onChange, id, value, editable } = this.props;
+    const input = editable ?
+                  (<input type="number" id={id} className="form-control" value={value} onChange={onChange} />) :
+                  (<span>{parseFloat(value, 10)}</span>);
+    
     return (
-      <input type="number" id={id} className="form-control" value={value} onChange={onChange} />
+      <div>{ input }</div>
     );
   }
 }

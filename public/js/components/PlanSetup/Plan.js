@@ -26,7 +26,8 @@ export default class Plan extends Component {
       <option value={op} key={key}>{op}</option>
     ));
 
-    let each_period_options = ["Week", "Month", "Year"].map((op, key) => (
+    /* TODO: Put into separate config file */
+    let each_period_options = ["Week", "Month", "Quarter", "Year"].map((op, key) => (
       <option value={op} key={key}>{op}</option>
     ));
 

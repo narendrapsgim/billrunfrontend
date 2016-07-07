@@ -9,13 +9,16 @@ export default class Filter extends Component {
     this.onClickFilterBtn = this.onClickFilterBtn.bind(this);
     this.buildQueryString = this.buildQueryString.bind(this);
     this.filterCond = this.filterCond.bind(this);
+    this.onClickClear = this.onClickClear.bind(this);
 
-    this.state = {};
+    this.state = {
+      filters: {},
+    };
   }
   
   onChangeFilterField(e) {
     const { id, value } = e.target;
-    this.setState({[id]: value});
+    this.setState({filters: {...this.state.filters, [id]: value}});
   }
 
   filterCond(field, value) {
@@ -31,7 +34,7 @@ export default class Filter extends Component {
   }
   
   buildQueryString() {
-    const filterObj = _.reduce(this.state, (acc, value, field) => {
+    const filterObj = _.reduce(this.state.filters, (acc, value, field) => {
       if (!value) {
         return _.omit(acc, field);
       }
@@ -48,6 +51,11 @@ export default class Filter extends Component {
     onFilter(filter);
   }
 
+  onClickClear() {
+    this.setState({filters: {}},
+                  () => { this.onClickFilterBtn() });
+  }
+
   render() {
     const { fields = [] } = this.props;
     const inputs = fields.map((field, key) => (
@@ -56,6 +64,7 @@ export default class Filter extends Component {
                type={field.type || "text"}
                placeholder={field.placeholder}
                onChange={this.onChangeFilterField}
+               value={this.state.filters[field.id] || ''}
                className="form-control" />
       </div>
     ));
@@ -66,6 +75,9 @@ export default class Filter extends Component {
           { inputs }
           <div className="col-md-1">
             <RaisedButton primary={true} label="Filter" onMouseUp={this.onClickFilterBtn} style={{marginTop: 5}} />
+          </div>
+          <div className="col-md-1">
+            <RaisedButton label="Clear" onMouseUp={this.onClickClear} style={{marginTop: 5}} />
           </div>
         </div>
       </div>

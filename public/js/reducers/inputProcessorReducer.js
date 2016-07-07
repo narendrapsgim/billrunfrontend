@@ -8,7 +8,8 @@ import { GOT_PROCESSOR_SETTINGS,
          ADD_USAGET_MAPPING,
          SET_CUSETOMER_MAPPING,
          SET_RATING_FIELD,
-         SET_RECEIVER_FIELD } from '../actions/inputProcessorActions';
+         SET_RECEIVER_FIELD,
+         GOT_INPUT_PROCESSORS } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   delimiter: '',
@@ -34,6 +35,9 @@ let defaultState = Immutable.fromJS({
 export default function (state = defaultState, action) {
   const { field, mapping } = action;
   switch (action.type) {
+    case SET_INPUT_PROCESSOR:
+      return Immutable.fromJS(action.input_processor);
+
     case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
 

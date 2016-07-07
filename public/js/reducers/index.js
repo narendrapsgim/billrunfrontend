@@ -13,6 +13,7 @@ import products from './productsReducer'
 import settings from './settingsReducer';
 import invoices from './invoicesReducer';
 import inputProcessor from './inputProcessorReducer';
+import inputProcessors from './inputProcessorsReducer';
 
 export default combineReducers({
   statusBar,
@@ -28,5 +29,6 @@ export default combineReducers({
   product,
   settings,
   invoices,
-  inputProcessor
+  inputProcessor,
+  inputProcessors
 });

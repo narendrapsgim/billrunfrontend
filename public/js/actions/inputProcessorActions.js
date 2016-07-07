@@ -8,6 +8,7 @@ export const SET_RATING_FIELD = 'SET_RATING_FIELD';
 export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
+export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -175,3 +176,39 @@ export function saveInputProcessorSettings(state) {
   };  
 }
 
+export function setInputProcessor(input_processor) {
+  return {
+    type: SET_INPUT_PROCESSOR,
+    input_processor
+  };
+}
+
+function gotInputProcessors(input_processors) {
+  return {
+    type: GOT_INPUT_PROCESSORS,
+    input_processors
+  };
+}
+
+function fetchInputProcessors() {
+
+  let setUrl = `/api/settings?category=file_types&data={}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.post(setUrl).then(
+      resp => {
+        dispatch(gotInputProcessors(resp.data.details));
+        dispatch(hideProgressBar());
+      }
+    ).catch(error => {
+      console.log(error);
+      dispatch(hideProgressBar());
+    });
+  };
+}
+
+export function getInputProcessors() {
+  return (dispatch) => {
+    return dispatch(fetchInputProcessors());
+  };
+}

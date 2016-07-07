@@ -18,6 +18,7 @@ function buildRateFromState(state) {
 
 const defaultState = {
   key: '',
+  description: '',
   rates: [
     {
       from: undefined,
