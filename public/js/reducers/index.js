@@ -14,6 +14,7 @@ import settings from './settingsReducer';
 import invoices from './invoicesReducer';
 import inputProcessor from './inputProcessorReducer';
 import inputProcessors from './inputProcessorsReducer';
+import dashboard from './dashboardReducer';
 
 export default combineReducers({
   statusBar,
@@ -30,5 +31,6 @@ export default combineReducers({
   settings,
   invoices,
   inputProcessor,
-  inputProcessors
+  inputProcessors,
+  dashboard
 });
