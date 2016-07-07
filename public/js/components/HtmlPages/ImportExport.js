@@ -45,6 +45,7 @@ export default class ImportExport extends Component {
   }
 
   onImportClick(e){
+    let debugParam = globalSetting.serverApiDebug ? '?'+globalSetting.serverApiDebugQueryString : '';
     let form = this.refs['importForm'];
     if(e.target.files.length){
       var data = new FormData();
@@ -52,7 +53,7 @@ export default class ImportExport extends Component {
         data.append(key, value);
       });
       $.ajax({
-	url: `${globalSetting.serverUrl}/api/importpriceslist`,
+	url: `${globalSetting.serverUrl}/api/importpriceslist${debugParam}`,
 	type: "POST",
 	data: data,
 	dataType: 'json',
@@ -82,9 +83,10 @@ export default class ImportExport extends Component {
   }
 
   onExportClick(e){
+    let debugParam = globalSetting.serverApiDebug ? '&'+globalSetting.serverApiDebugQueryString : '';
     let { serverUrl } = globalSetting;
     let activeDate = moment(this.exportDate).format("YYYY/MM/DD HH:mm:ss");
-    document.getElementById('my_iframe').src = `${globalSetting.serverUrl}/admin/exportplans?export_time=${activeDate}`;
+    document.getElementById('my_iframe').src = `${globalSetting.serverUrl}/admin/exportplans?export_time=${activeDate}${debugParam}`;
   }
 
   onChangeFilterDate(key ,nullEvent, value) {
