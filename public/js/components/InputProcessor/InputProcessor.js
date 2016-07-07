@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { getProcessorSettings, setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { getProcessorSettings, setName, setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -26,6 +26,7 @@ class InputProcessor extends Component {
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
+    this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
     this.onAddField = this.onAddField.bind(this);
     this.handleNext = this.handleNext.bind(this);
@@ -44,6 +45,10 @@ class InputProcessor extends Component {
   
   shouldComponentUpdate(nextProps, nextState) {
     return nextState.stepIndex !== this.state.stepIndex;
+  }
+
+  onChangeName(e) {
+    this.props.dispatch(setName(e.target.value));
   }
   
   onChangeDelimiter(e) {
@@ -129,7 +134,7 @@ class InputProcessor extends Component {
     const { settings } = this.props;
 
     const steps = [
-      (<SampleCSV onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} />),
+      (<SampleCSV onChangeName={this.onChangeName} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} settings={settings.get('receiver')} />)

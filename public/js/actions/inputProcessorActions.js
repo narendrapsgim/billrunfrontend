@@ -1,3 +1,4 @@
+export const SET_NAME = 'SET_NAME';
 export const SET_DELIMITER = 'SET_DELIMITER';
 export const SET_FIELDS = 'SET_HEADERS';
 export const SET_FIELD_MAPPING = 'SET_FIELD_MAPPING';
@@ -33,6 +34,7 @@ function fetchProcessorSettings(file_type) {
             receiver } = settings;
 
     return {
+      file_type: settings.file_type,
       delimiter: parser.separator,
       fields: parser.structure,
       processor: Object.assign({}, processor, {
@@ -68,6 +70,13 @@ function fetchProcessorSettings(file_type) {
 export function getProcessorSettings(file_type) {
   return (dispatch) => {
     return dispatch(fetchProcessorSettings(file_type));
+  };
+}
+
+export function setName(file_type) {
+  return {
+    type: SET_NAME,
+    file_type
   };
 }
 
@@ -139,7 +148,7 @@ export function saveInputProcessorSettings(state) {
         receiver = state.get('receiver');
 
   let settings = {
-    "file_type": "csv_separated",
+    "file_type": state.get('file_type'),
     "parser": {
       "type": "separator",
       "separator": state.get('delimiter'),

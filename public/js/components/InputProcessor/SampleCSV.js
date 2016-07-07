@@ -22,12 +22,22 @@ class SampleCSV extends Component {
   
   render() {
     let { settings,
+          onChangeName,
           onChangeDelimiter,
           onSelectSampleCSV,
           onAddField } = this.props;
-
+    console.log(settings.toJS());
+ 
     return (
       <div className="InputProcessor">
+        <div className="row">
+          <div className="col-md-3">
+            <label for="file_type">Name</label>
+          </div>
+          <div className="col-md-3">
+            <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
+          </div>
+        </div>
         <div className="row">
           <div className="col-md-3">
             <label for="delimiter">Delimiter</label>
