@@ -10,13 +10,14 @@ import Receipt from 'material-ui/svg-icons/action/receipt';
 import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 import View from '../../views';
 
-let routes = [
+const routes = [
   {to: "/dashboard", label: "Dashboard"},
   {to: "/plans", label: "Plans"},
   {to: "/plan_setup", label: "Plan Setup"},
   {to: "/products", label: "Products"},
   {to: "/subscribers_list", label: "Subscribers"},
   {to: "/usage", label: "Usage"},
+  {to: "/invoices", label: "Invoices"},
   {to: "/log", label: "Log"},
   {to: "/settings", label: "Settings"}
 ];

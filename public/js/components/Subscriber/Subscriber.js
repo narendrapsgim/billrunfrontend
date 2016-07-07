@@ -11,14 +11,16 @@ class Subscriber extends Component {
   }
 
   render() {
-    let { items, onChangeFieldValue, onUnsubscribe } = this.props;
-    let subscriber = items.find(obj => { return obj.get('type') === "account"; }) || Immutable.Map();
+    let { items, settings, onChangeFieldValue, onUnsubscribe } = this.props;
+    let account = items.find((obj) => {
+      return obj.get('type') === "account";
+    });
     let subscriptions = items.reduce((r, obj, k) => {
       if (obj.get('type') !== "account")
         return r.push(obj);
       return r;
     }, Immutable.List());
-    
+
     let subscriptions_html = subscriptions.map((sub, key) => (
                                <div className="row" key={key}>
                                  <div className="col-md-2">
@@ -31,25 +33,19 @@ class Subscriber extends Component {
                                  </div>
                                </div>
                              ));
+
+    let fields = settings.getIn(['account', 'fields']).map((field, key) => (
+      <div className="row" key={key}>
+        <div className="col-md-3">
+          <label>{field.get('field_name')}</label>
+          <input disabled={!field.get('editable')} id={field.get('field_name')} className="form-control" required={field.get('mandatory')} value={account.get(field.get('field_name'))}/>
+        </div>
+      </div>
+    ));
     
     return (
       <div className="Subscriber">
-        <div className="row">
-          <div className="col-md-2">
-            <label for="first_name">First Name</label>
-            <Field id="first_name" className="form-control" value={subscriber.get('first_name')} onChange={onChangeFieldValue} />
-          </div>
-          <div className="col-md-2">
-            <label for="last_name">Last Name</label>
-            <Field id="last_name" className="form-control" value={subscriber.get('last_name')} onChange={onChangeFieldValue} />
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-10">
-            <label for="Address">Address</label>
-            <Field id="address" coll="Subscriber" className="form-control" value={subscriber.get('address')} onChange={onChangeFieldValue} />
-          </div>
-        </div>
+        { fields }
         <hr/>
         <div>
           <h4>Subscriptions</h4>
@@ -61,7 +57,8 @@ class Subscriber extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return {items: state.subscriber};
+  return {items: state.subscriber.get('customer'),
+          settings: state.subscriber.get('settings')};
 }
 
 export default connect(mapStateToProps)(Subscriber);

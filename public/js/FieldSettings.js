@@ -1,11 +1,17 @@
 const FieldSettings = {
-  TrialPrice: 'price',
-  FlatRate: 'price',
-  To: 'date',
-  From: 'date',
-  PeriodicalRate: 'price',
-  Subscriber: {
-    Address: 'address'
+  trialprice: 'price',
+  flatrate: 'price',
+  price: 'price',
+  to: 'date',
+  from: 'date',
+  periodicalrate: 'price',
+  description: 'textarea',
+  subscriber: {
+    address: 'address'
+  },
+  product: {
+    from: 'number',
+    to: 'number'
   }
 };
 

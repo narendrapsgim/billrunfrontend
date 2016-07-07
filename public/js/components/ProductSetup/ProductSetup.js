@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, clearPlan, savePlan } from '../../actions/planActions';
+import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, saveProduct } from '../../actions/productActions';
 
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -15,20 +15,19 @@ class ProductSetup extends Component {
     this.onAddProductProperties = this.onAddProductProperties.bind(this);
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
+    this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
+    this.onChangeItemSelectFieldValue = this.onChangeItemSelectFieldValue.bind(this);
+    this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
   }
 
   componentWillMount() {
-    let { product_id } = this.props.params;
+    let { product_id } = this.props.location.query;
     if (product_id) {
       this.props.dispatch(getProduct(product_id));
     }
   }
-
-  componentWillUnmount() {
-    this.props.dispatch(clearPlan());
-  }
   
-  onChangeItemFieldValue(id, idx, e, val) {
+  onChangeItemFieldValue(id, idx, e, val = e.target.value) {
     this.props.dispatch(updateProductPropertiesField(id, idx, val));
   }
 
@@ -45,7 +44,7 @@ class ProductSetup extends Component {
   }  
 
   onSave() {
-    this.props.dispatch(savePlan());
+    this.props.dispatch(saveProduct());
   }
 
   onCancel() {
@@ -57,7 +56,7 @@ class ProductSetup extends Component {
       <div className="ProductSetup container">
         <h3>Product</h3>
         <div className="contents bordered-container">
-          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} />
+          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} productSettings={this.props.product} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
@@ -77,6 +76,6 @@ class ProductSetup extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return state.plan || {};
+  return { product: state.product };
 }
 export default connect(mapStateToProps)(ProductSetup);

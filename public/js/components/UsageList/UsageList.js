@@ -3,9 +3,8 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 
 import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody, TableFooter } from 'material-ui/Table';
-import Pager from '../Pager';
-
-import List from '../List';
+import ReactPaginate from 'react-paginate';
+import Filter from '../Filter';
 
 import { getUsages } from '../../actions/usageActions';
 import { showProgressBar, hideProgressBar } from '../../actions/progressbarActions.js';
@@ -14,95 +13,90 @@ class UsageList extends Component {
   constructor(props) {
     super(props);
 
-    this.onPaginationClick = this.onPaginationClick.bind(this);
+    this.buildQuery = this.buildQuery.bind(this);
+    this.handlePageClick = this.handlePageClick.bind(this);
+    this.onFilter = this.onFilter.bind(this);
     
     this.state = {
-      currentPage: 1
+      page: 1,
+      size: 10,
+      filter: ""
     };
   }
 
-  componentWillMount() {
-    this.props.dispatch(getUsages());
+  componentDidMount() {
+    this.props.dispatch(getUsages(this.buildQuery()));
   }
 
-  onPaginationClick(e) {
-    let page = this.state.currentPage;
-    let value = e.currentTarget.value;
+  buildQuery() {
+    const { page, size, filter } = this.state;
+    return { page, size, filter };
+  }
 
-    if(_.isInteger(parseInt(value))){
-      page = parseInt(value);
-    } else if(value == 'back' && page > 1){
-      page --;
-    } else if(value == 'forward' && page < this.state.totalPages){
-      page++;
-    }
-
-    this.props.dispatch(getUsages(page));
-    this.setState({
-      currentPage: page
+  handlePageClick(data) {
+    let page = data.selected + 1;
+    this.setState({page}, () => {
+      this.props.dispatch(getUsages(this.buildQuery()))
     });
   }
-  /* 
-     render() {
-     let { usages } = this.props;
-     let { currentPage } = this.state;
 
-     return (
-     <div>
-     <Table fixedHeader={true}
-     fixedFooter={true}
-     selectable={false}
-     height={'500px'}>
-     <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
-     <TableRow>
-     <TableHeaderColumn tooltip="Account">Account</TableHeaderColumn>
-     <TableHeaderColumn tooltip="Subscription">Subscription</TableHeaderColumn>
-     <TableHeaderColumn tooltip="Plan">Plan</TableHeaderColumn>
-     <TableHeaderColumn tooltip="Charge">Charge</TableHeaderColumn>
-     </TableRow>
-     </TableHeader>
-     <TableBody displayRowCheckbox={false} stripedRows={true}>
-     {usages.valueSeq().map((row, index) => (
-     <TableRow key={index}>
-     <TableRowColumn>{row.get('aid')}</TableRowColumn>
-     <TableRowColumn>{row.get('sid')}</TableRowColumn>
-     <TableRowColumn>{row.get('plan')}</TableRowColumn>
-     <TableRowColumn>{row.get('aprice')}</TableRowColumn>
-     </TableRow>
-     ))}
-     </TableBody>
-     <TableFooter>
-     <TableRow>
-     <TableRowColumn style={{textAlign: 'center'}}>
-     <Pager totalPages={usages.size} currentPage={currentPage} onPaginationClick={this.onPaginationClick} />
-     </TableRowColumn>
-     </TableRow>
-     </TableFooter>
-     </Table>
-     </div>
-     );
-     } */
-
+  onFilter(filter) {
+    this.setState({filter}, () => {
+      this.props.dispatch(getUsages(this.buildQuery()))
+    });
+  }
+  
   render() {
-    let settings = {
-      url: globalSetting.serverUrl + "/api/find?collection=plans",
-      fields : [
-        {key: '_id', label: 'ID', type: 'mongoid', hidden: true},
-        {key: 'technical_name', label: 'Label', filter: {}, sortable: true},
-        {key: 'invoice_type', label: 'Type', sortable: true},
-        {key: 'grouping', label: 'Grouping', filter: {}},
-        {key: 'price', label: 'Price', type: 'price', filter: {}, sortable: true},
-        {key: 'forceCommitment', label: 'Force Commitment', type: 'boolean'},
-        {key: 'from', label: 'From',  type: 'urt', sortable: true },
-        {key: 'date', label: 'Date', type:'urt' ,filter:  { defaultValue: (moment()), query:{'from': {'$lte':1}, 'to': {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to': {'$gt': null} } } , hidden: true}
-      ],
-      pagination: {itemsPerPage: 10}
-    };
+    let { usages } = this.props;
+
+    const fields = [
+      {id: "aid", placeholder: "Account", type: "number"},
+      {id: "plan", placeholder: "Plan"}
+    ];
+    
     return (
-      <List settings={settings}
-            page={1}
-            showProgressBar={showProgressBar}
-            collection="plans" />
+      <div className="UsagesList">
+        <Filter fields={fields} onFilter={this.onFilter} />
+        <Table fixedHeader={true}
+               fixedFooter={true}
+               selectable={false}
+               height={'500px'}>
+          <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+            <TableRow>
+              <TableHeaderColumn tooltip="Account">Account</TableHeaderColumn>
+              <TableHeaderColumn tooltip="Subscription">Subscription</TableHeaderColumn>
+              <TableHeaderColumn tooltip="Plan">Plan</TableHeaderColumn>
+              <TableHeaderColumn tooltip="Charge">Charge</TableHeaderColumn>
+            </TableRow>
+          </TableHeader>
+          <TableBody displayRowCheckbox={false} stripedRows={true}>
+            {usages.valueSeq().map((row, index) => (
+               <TableRow key={index}>
+                 <TableRowColumn>{row.get('aid')}</TableRowColumn>
+                 <TableRowColumn>{row.get('sid')}</TableRowColumn>
+                 <TableRowColumn>{row.get('plan')}</TableRowColumn>
+                 <TableRowColumn>{row.get('aprice')}</TableRowColumn>
+               </TableRow>
+             ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableRowColumn style={{textAlign: 'center'}}>
+                <ReactPaginate previousLabel={"previous"}
+                               nextLabel={"next"}
+                               breakLabel={<a>...</a>}
+                               pageNum={this.state.page + 5}
+                               marginPagesDisplayed={2}
+                               pageRangeDisplayed={5}
+                               clickCallback={this.handlePageClick}
+                               containerClassName={"pagination"}
+                               subContainerClassName={"pages pagination"}
+                               activeClassName={"active"} />
+              </TableRowColumn>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </div>
     );
   }
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import DatePicker from 'material-ui/DatePicker';
+import moment from 'moment';
 
 export default class Date extends Component {
   constructor(props) {
@@ -7,16 +8,18 @@ export default class Date extends Component {
   }
 
   render() {
-    let { id, onChange, value } = this.props;
+    let { id, onChange, value, editable } = this.props;
 
+    const input = editable ? ( <DatePicker id={id}
+                                           fullWidth={true}                            
+                                           hintText={id}
+                                           textFieldStyle={{height: "72px"}}
+                                           value={value}
+                                           onChange={onChange}
+                               />) : (<span>{moment(value).format(globalSetting.datetimeFormat)}</span>);
+    
     return (
-      <DatePicker id={id}
-                  fullWidth={true}                            
-                  hintText={id}
-                  textFieldStyle={{height: "72px"}}
-                  value={value}
-                  onChange={onChange}
-      />
+      <div>{ input }</div>
     );
   }
 }

@@ -1,8 +1,17 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { getSettings, updateSetting } from '../../actions/settingsActions';
+import Immutable from 'immutable';
 
-import {Tabs, Tab} from 'material-ui/Tabs';
+import Tabs from 'react-bootstrap/lib/Tabs';
+import Tab from 'react-bootstrap/lib/Tab';
 
+import DateTime from './DateTime';
 import Collections from './Collections';
+import CurrencyTax from './CurrencyTax';
+
+import InputProcessorsList from '../InputProcessorsList';
+import InputProcessor from '../InputProcessor';
 
 const styles = {
   inkBar: {
@@ -18,31 +27,62 @@ const styles = {
   }
 };
 
-export default class Settings extends Component {
+class Settings extends Component {
   constructor(props) {
     super(props);
 
-    this.handleChange = this.handleChange.bind(this);
-    
-    this.state = {
-      current: "Collections"
-    };
+    this.onChangeCollection = this.onChangeCollection.bind(this);
+    this.onChangeDatetime = this.onChangeDatetime.bind(this);
+    this.onChangeCurrencyTax = this.onChangeCurrencyTax.bind(this);
   }
 
-  handleChange(value) {
-    this.setState({current: value});
+  componentWillMount() {
+    this.props.dispatch(getSettings());
+  }
+
+  onChangeCollection(e) {
+    let { id, value } = e.target;
+    this.props.dispatch(updateSetting(['collection', id], value));
+  }
+
+  onChangeDatetime(e) {
+    let { id, value } = e.target;
+    this.props.dispatch(updateSetting(['datetime', id], value));
+  }
+
+  onChangeCurrencyTax(e) {
+    let { id, value } = e.target;
+    this.props.dispatch(updateSetting(['currency_tax', id], value));
   }
   
   render() {
+    let { settings } = this.props;
+    let collection = settings.get('collection') || Immutable.Map();
+    let datetime = settings.get('datetime') || Immutable.Map();
+    let currency_tax = settings.get('currency_tax') || Immutable.Map();
+
     return (
-      <Tabs value={this.state.current}
-            onChange={this.handleChange}
-            inkBarStyle={styles.inkBar}
-            tabItemContainerStyle={styles.tabItem}>
-        <Tab label="Collections" value="Collections" style={styles.tab}>
-          <Collections />
+      <Tabs defaultActiveKey={1} animation={false} id="SettingsTab">
+        <Tab title="Date, Time, and Zone" eventKey={1}>
+          <DateTime onChange={this.onChangeDatetime} data={datetime} />
+        </Tab>
+        <Tab title="Payment Gateways" eventKey={2}>Payment Gateways</Tab>
+        <Tab title="Currency and tax" eventKey={3}>
+          <CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />
+        </Tab>
+        <Tab title="Collections" eventKey={4}>
+          <Collections onChange={this.onChangeCollection} data={collection} />
+        </Tab>
+        <Tab title="Input Processor" eventKey={5}>
+          <InputProcessorsList />
         </Tab>
       </Tabs>
     );
   }
 }
+
+function mapStateToProps(state, props) {
+  return {settings: state.settings};
+}
+
+export default connect(mapStateToProps)(Settings);

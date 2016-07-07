@@ -29,6 +29,7 @@ module.exports = {
   },
 
   module: {
+    noParse: /node_modules\/quill\/dist/,
     loaders: [
       {
         test: /\.jsx?$/,
@@ -38,6 +39,7 @@ module.exports = {
           presets: ['es2015', 'react', 'stage-2']
         }
       },
+      {include: /\.json$/, loaders: ["json-loader"]}
     ]
   },
 
