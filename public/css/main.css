@@ -57,19 +57,20 @@ body {
     padding: 20px;
 }
 
-.navigator {
-    background-color: #01BFA5;
-    color: #014A3F;
-    height: 70px;
-}
-.navigator a.active button {
-    background: #007666!important;
-    color: white!important;
-}
-.navigator button {
-    height: 70px!important;
-    color: #014A41!important;
-}
+/* .navigator { */
+/*     background-color: #01BFA5; */
+/*     color: #014A3F; */
+/*     height: 70px; */
+/* } */
+/* .navigator a.active button { */
+/*     background: #007666!important; */
+/*     color: white!important; */
+/* } */
+/* .navigator button { */
+/*     height: 70px!important; */
+/*     color: #014A41!important; */
+/* } */
+
 .help-popover {
     padding: 10px!important;
 }

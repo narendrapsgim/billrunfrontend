@@ -8,10 +8,11 @@ export default class Collections extends Component {
   constructor(props) {
     super(props);
 
+    this.handleEmailChange = this.handleEmailChange.bind(this);
     this.onClickEditEmail = this.onClickEditEmail.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
+    this.onSave = this.onSave.bind(this);
 
     this.state = {
       showModal: false,
@@ -34,6 +35,7 @@ export default class Collections extends Component {
   }
 
   onSave() {
+    this.props.onSaveEmail(this.state.email, this.state.which);
     this.setState({showModal: false});
   }
 
@@ -76,10 +78,10 @@ export default class Collections extends Component {
           </div>
           <div className="row" style={{marginTop: "12px"}}>
             <div className="col-md-3">
-              <button type="button" className="btn btn-primary" onClick={this.onClickEditEmail.bind('first')}>Edit Email</button>
+              <button type="button" className="btn btn-primary" onClick={this.onClickEditEmail.bind(this, 'first')}>Edit Email</button>
             </div>
             <div className="col-md-3">
-              <button type="button" className="btn btn-primary" onClick={this.onClickEditEmail.bind('last')}>Edit Email</button>
+              <button type="button" className="btn btn-primary" onClick={this.onClickEditEmail.bind(this, 'last')}>Edit Email</button>
             </div>
           </div>
         </div>

@@ -26,7 +26,6 @@ class SampleCSV extends Component {
           onChangeDelimiter,
           onSelectSampleCSV,
           onAddField } = this.props;
-    console.log(settings.toJS());
  
     return (
       <div className="InputProcessor">

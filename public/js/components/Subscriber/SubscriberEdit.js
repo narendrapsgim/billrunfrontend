@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { getCustomer, updateCustomerField, saveSubscriber } from '../../actions/customerActions';
+import { getCustomer, updateCustomerField, saveSubscriber, getSubscriberSettings } from '../../actions/customerActions';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Subscriber from './Subscriber';
@@ -18,9 +18,10 @@ class SubscriberEdit extends Component {
   }
 
   componentWillMount() {
-    let { subscriber_id } = this.props.location.query;
-    if (subscriber_id) {
-      this.props.dispatch(getCustomer(subscriber_id));
+    let { aid } = this.props.location.query;
+    if (aid) {
+      this.props.dispatch(getCustomer(aid));
+      this.props.dispatch(getSubscriberSettings());
     }
   }
   

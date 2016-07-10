@@ -20,6 +20,7 @@ class InputProcessor extends Component {
   constructor(props) {
     super(props);
 
+    this.onSetReceiverCheckboxField = this.onSetReceiverCheckboxField.bind(this);
     this.onSetCalculatorMapping = this.onSetCalculatorMapping.bind(this);
     this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
     this.onSetReceiverField = this.onSetReceiverField.bind(this);
@@ -104,6 +105,11 @@ class InputProcessor extends Component {
     this.props.dispatch(setReceiverField(id, value));
   }
   
+  onSetReceiverCheckboxField(e) {
+    const { id, checked } = e.target;
+    this.props.dispatch(setReceiverField(id, checked));
+  }
+  
   save() {
     this.props.dispatch(saveInputProcessorSettings(this.props.settings));
   }
@@ -137,7 +143,7 @@ class InputProcessor extends Component {
       (<SampleCSV onChangeName={this.onChangeName} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} />),
-      (<Receiver onSetReceiverField={this.onSetReceiverField} settings={settings.get('receiver')} />)
+      (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
 
     return (

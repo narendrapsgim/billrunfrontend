@@ -12,6 +12,7 @@ class Subscriber extends Component {
 
   render() {
     let { items, settings, onChangeFieldValue, onUnsubscribe } = this.props;
+    if (!items) return (<div></div>);
     let account = items.find((obj) => {
       return obj.get('type') === "account";
     });
@@ -34,14 +35,17 @@ class Subscriber extends Component {
                                </div>
                              ));
 
-    let fields = settings.getIn(['account', 'fields']).map((field, key) => (
-      <div className="row" key={key}>
-        <div className="col-md-3">
-          <label>{field.get('field_name')}</label>
-          <input disabled={!field.get('editable')} id={field.get('field_name')} className="form-control" required={field.get('mandatory')} value={account.get(field.get('field_name'))}/>
+    console.log(settings.toJS());
+    let fields = settings.getIn(['account', 'fields']).map((field, key) => {
+      return (
+        <div className="row" key={key}>
+          <div className="col-md-3">
+            <label>{field.get('field_name')}</label>
+            <input disabled={!field.get('editable')} id={field.get('field_name')} className="form-control" required={field.get('mandatory')} value={account.get(field.get('field_name'))}/>
+          </div>
         </div>
-      </div>
-    ));
+      );
+    });
     
     return (
       <div className="Subscriber">

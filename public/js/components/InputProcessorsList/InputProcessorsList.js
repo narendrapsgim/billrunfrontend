@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import { getInputProcessors, setInputProcessor } from '../../actions/inputProcessorActions';
 
@@ -10,6 +12,7 @@ class InputProcessorsList extends Component {
     super(props);
 
     this.onClickCell = this.onClickCell.bind(this);
+    this.onClickNew = this.onClickNew.bind(this);
   }
 
   componentWillMount() {
@@ -18,10 +21,13 @@ class InputProcessorsList extends Component {
   
   onClickCell(cell_idx, col_idx, e) {
     const selected = this.props.list.valueSeq().get(cell_idx).get('file_type');
-    console.log(selected);
     this.props.onSelectInputProcessor(selected);
   }
   
+  onClickNew() {
+    this.props.onSelectInputProcessor({selected: {}});
+  }
+
   render() {
     const table_header = (
       <TableHeaderColumn tooltip="File Type">File Type</TableHeaderColumn>      
@@ -47,6 +53,13 @@ class InputProcessorsList extends Component {
             { rows }
           </TableBody>
         </Table>
+        <div className="row">
+          <div className="col-xs-3">
+            <FloatingActionButton mini={true} style={{margin: "20px"}} onMouseUp={this.onClickNew}>
+              <ContentAdd />
+            </FloatingActionButton>
+          </div>
+        </div>
       </div>
     );
   }

@@ -43,6 +43,11 @@ class PlanSetup extends Component {
     this.props.dispatch(updatePlanField(section, id, value));
   }
 
+  onChangeFieldCheckValue(section, e) {
+    const { checked, id } = e.target;
+    this.props.dispatch(updatePlanField(section, id, checked));
+  }
+  
   onChangeRecurringPriceFieldValue(id, idx, e, val) {
     let value = val ? val : e.target.value;
     this.props.dispatch(updatePlanRecurringPriceField(id, idx, value));

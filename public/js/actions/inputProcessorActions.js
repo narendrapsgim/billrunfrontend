@@ -33,6 +33,8 @@ function fetchProcessorSettings(file_type) {
             rate_calculators,
             receiver } = settings;
 
+    const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
+
     return {
       file_type: settings.file_type,
       delimiter: parser.separator,
@@ -48,7 +50,7 @@ function fetchProcessorSettings(file_type) {
       }),
       customer_identification_fields,
       rate_calculators,
-      receiver
+      receiver: connections
     };
   };
 
@@ -168,7 +170,12 @@ export function saveInputProcessorSettings(state) {
     },
     "customer_identification_fields": customer_identification_fields.toJS(),
     "rate_calculators": rate_calculators.toJS(),
-    "receiver": receiver.toJS()
+    "receiver": {
+      "type": "ftp",
+      "connections": [
+        receiver.toJS()
+      ]
+    }
   };
 
   let setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settings)}`;
@@ -212,5 +219,11 @@ function fetchInputProcessors() {
 export function getInputProcessors() {
   return (dispatch) => {
     return dispatch(fetchInputProcessors());
+  };
+}
+
+export function newInputProcessor() {
+  return {
+    type: 'NEW_PROCESSOR'    
   };
 }

@@ -64,6 +64,20 @@ export default class Plan extends Component {
             </div>
           </div>
         </div>
+        <div className="row">
+          <div className="col-xs-1">
+            <div className="checkbox">
+              <label>
+                <input type="checkbox"
+                       defaultValue={basicSettings.upfront}
+                       checked={basicSettings.upfront}
+                       id="upfront"
+                       onChange={onChangeFieldCheckValue.bind(this, "basicSettings")} />
+                Upfront charge
+              </label>
+            </div>
+          </div>
+        </div>
         <div className="Trial">
           <h4>Trial</h4>
           <div className="row">

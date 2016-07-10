@@ -1,7 +1,8 @@
 import { GOT_CUSTOMER,
          GOT_CUSTOMERS,
          UPDATE_SUBSCRIBER_FIELD,
-         SAVE_SUBSCRIBER } from '../actions/customerActions';
+         SAVE_SUBSCRIBER,
+         GOT_SUBSCRIBER_SETTINGS } from '../actions/customerActions';
 import Immutable from 'immutable';
 
 const defaultState = {
@@ -21,6 +22,9 @@ export default function (state = Immutable.fromJS(defaultState), action) {
   switch (action.type) {
   case GOT_CUSTOMERS:
     return Immutable.fromJS(action.customers).toList();
+
+  case GOT_SUBSCRIBER_SETTINGS:
+    return state.set('settings', Immutable.fromJS(action.settings));
 
   case GOT_CUSTOMER:
     let { customer, settings } = action;

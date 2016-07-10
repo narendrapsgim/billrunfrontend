@@ -36,6 +36,7 @@ class Settings extends Component {
     this.onChangeCurrencyTax = this.onChangeCurrencyTax.bind(this);
     this.onSelectInputProcessor = this.onSelectInputProcessor.bind(this);
     this.onCancelInputProcessorEdit = this.onCancelInputProcessorEdit.bind(this);
+    this.onSaveEmail = this.onSaveEmail.bind(this);
 
     this.state = {
       processor_selected: false
@@ -68,6 +69,10 @@ class Settings extends Component {
   onCancelInputProcessorEdit() {
     this.setState({processor_selected: false});
   }
+
+  onSaveEmail(email, which) {
+    this.props.dispatch(updateSetting(['collection', `invoice_overdue_${which}_email`], email));
+  }
   
   render() {
     let { settings } = this.props;
@@ -87,7 +92,7 @@ class Settings extends Component {
           <CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />
         </Tab>
         <Tab title="Collections" eventKey={4}>
-          <Collections onChange={this.onChangeCollection} data={collection} />
+          <Collections onChange={this.onChangeCollection} data={collection} onSaveEmail={this.onSaveEmail} />
         </Tab>
         <Tab title="Input Processor" eventKey={5}>
           { inputProcessorView }

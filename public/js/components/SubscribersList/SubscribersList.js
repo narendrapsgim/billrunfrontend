@@ -18,15 +18,15 @@ class SubscribersList extends Component {
   
   onClickCell(cell_idx, col_idx, e) {
     let { subscriber } = this.props;
-    let id = subscriber.valueSeq().get(cell_idx).getIn(['_id', '$id']);;
+    let aid = subscriber.valueSeq().get(cell_idx).get('aid');
     this.context.router.push({
       pathname: 'subscriber',
-      query: {subscriber_id: id}
+      query: {aid}
     });
   }
   
   render() {
-    let { subscriber } = this.props;
+    const { subscriber } = this.props;
 
     return (
       <Table onCellClick={this.onClickCell}>
