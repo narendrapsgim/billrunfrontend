@@ -3,6 +3,7 @@ export const GOT_CUSTOMERS = 'GOT_CUSTOMERS';
 export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
 export const SAVE_SUBSCRIBER = 'SAVE_SUBSCRIBER';
 export const GOT_SUBSCRIBER_SETTINGS = 'GOT_SUBSCRIBER_SETTINGS';
+export const GET_NEW_CUSTOMER = 'GET_NEW_CUSTOMER';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -12,9 +13,10 @@ let axiosInstance = axios.create({
   baseURL: globalSetting.serverUrl
 });
 
-export function saveSubscriber() {
+export function saveSubscriber(newCustomer = false) {
   return {
-    type: SAVE_SUBSCRIBER
+    type: SAVE_SUBSCRIBER,
+    newCustomer
   };
 }
 
@@ -112,5 +114,11 @@ export function updateCustomerField(field_id, value) {
     type: UPDATE_SUBSCRIBER_FIELD,
     field_id,
     value
+  };
+}
+
+export function getNewCustomer() {
+  return {
+    type: GET_NEW_CUSTOMER
   };
 }

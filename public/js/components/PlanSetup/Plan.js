@@ -20,6 +20,7 @@ export default class Plan extends Component {
           onChangeRecurringPriceCheckFieldValue,
           onCheckEndOfDays,
           onChangeDateFieldValue,
+          onChangeFieldCheckValue,
           onAddTariff } = this.props;
 
     let transaction_options = ["Every Month", "Every Week"].map((op, key) => (

@@ -20,6 +20,10 @@ export default class Product extends Component {
           onAddProductProperties,
           onRemoveProductProperties } = this.props;
 
+    const available_units =[(<option disabled value="-1" key={-1}>Select Unit</option>),
+                            ...["sms", "call"].map((unit, key) => (
+                              <option value={unit} key={key}>{unit}</option>
+                            ))];
     return (
       <div className="AddProduct">
         <div className="row">
@@ -30,6 +34,13 @@ export default class Product extends Component {
                    onChange={onChangeItemFieldValue.bind(this, "key", -1)}
                    value={productSettings.key}
             />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-3">
+            <select id="unit" className="form-control" onChange={onChangeItemFieldValue} value={productSettings.unit} defaultValue="-1">
+              { available_units }
+            </select>
           </div>
         </div>
         <div className="row">

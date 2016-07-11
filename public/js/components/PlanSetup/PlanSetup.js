@@ -23,6 +23,7 @@ class PlanSetup extends Component {
     this.onAddProductProperties = this.onAddProductProperties.bind(this);
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
     this.onChangeRecurringPriceCheckFieldValue = this.onChangeRecurringPriceCheckFieldValue.bind(this);
+    this.onChangeFieldCheckValue = this.onChangeFieldCheckValue.bind(this);
     this.handleSave = this.handleSave.bind(this);
 
     this.state = {
@@ -106,7 +107,7 @@ class PlanSetup extends Component {
       <div className="PlanSetup container">
         <h3>Billing Plan</h3>
         <div className="contents bordered-container">
-          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} basicSettings={this.props.basic_settings} />
+          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} onChangeFieldCheckValue={this.onChangeFieldCheckValue} basicSettings={this.props.basic_settings} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton

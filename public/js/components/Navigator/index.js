@@ -3,6 +3,7 @@ import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'reac
 import FlatButton from 'material-ui/FlatButton';
 import activeComponent from 'react-router-active-component';
 
+import { LinkContainer } from 'react-router-bootstrap';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import NavDropdown from 'react-bootstrap/lib/NavDropdown';
 import Navbar from 'react-bootstrap/lib/Navbar';
@@ -17,22 +18,23 @@ import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 import View from '../../views';
 
 const routes = [
-  {to: "#/dashboard", label: "Dashboard"},
+  {to: "/dashboard", label: "Dashboard"},
   {label: "Plan", routes: [
-    {to: "#/plans", label: "Plans"},
-    {to: "#/plan_setup", label: "Plan Setup"}
+    {to: "/plans", label: "Plans"},
+    {to: "/plan_setup", label: "Plan Setup"}
   ]},
   {label: "Product", routes: [
-    {to: "#/products", label: "Products"},
-    {to: "#/product_setup", label: "Product Setup"}
+    {to: "/products", label: "Products"},
+    {to: "/product_setup", label: "Product Setup"}
   ]},
   {label: "Subscriber", routes: [
-    {to: "#/subscribers_list", label: "Subscribers"},
-    {to: "#/usage", label: "Usage"},
+    {to: "/subscribers_list", label: "Subscribers"},
+    {to: "/subscriber", label: "Subscriber Setup"},
+    {to: "/usage", label: "Usage"},
   ]},
-  {to: "#/invoices", label: "Invoices"},
-  {to: "#/log", label: "Log"},
-  {to: "#/settings", label: "Settings"}
+  {to: "/invoices", label: "Invoices"},
+  {to: "/log", label: "Log"},
+  {to: "/settings", label: "Settings"}
 ];
 
 export default class Navigator extends Component {
@@ -49,11 +51,7 @@ export default class Navigator extends Component {
 
   handleDropDownMenu(e, i, v) {
     this.setState({ddMenuItem: v});
-  }
-  
-  isMenuItemVisible(neddedPpermission) {
-    return  _.intersection(neddedPpermission, this.props.users.roles).length > 0;
-  }
+  }  
 
   createMenuItem(routes, k) {
     const eventKey = (pk, ek) => {
@@ -69,10 +67,13 @@ export default class Navigator extends Component {
           </NavDropdown>
         );
       }
+
       return (
-        <MenuItem key={key} href={route.to} eventKey={eventKey(k, key + 1)}>
-          {route.label}
-        </MenuItem>
+        <LinkContainer to={route.to} activeClassName="active" key={key}>
+          <NavItem eventKey={eventKey(k, key + 1)}>
+            {route.label}
+          </NavItem>
+        </LinkContainer>
       );
     });
   }
