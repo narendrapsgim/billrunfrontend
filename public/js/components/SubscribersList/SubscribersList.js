@@ -27,6 +27,13 @@ class SubscribersList extends Component {
   
   render() {
     const { subscriber } = this.props;
+    const rows = subscriber.map((row, index) => (
+      <TableRow key={index}>
+        <TableRowColumn>{row.get('first_name')}</TableRowColumn>
+        <TableRowColumn>{row.get('last_name')}</TableRowColumn>
+        <TableRowColumn>{row.get('plan')}</TableRowColumn>
+      </TableRow>
+    ));
 
     return (
       <Table onCellClick={this.onClickCell}>
@@ -38,13 +45,7 @@ class SubscribersList extends Component {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {subscriber.map((row, index) => (
-             <TableRow key={index}>
-               <TableRowColumn>{row.get('first_name')}</TableRowColumn>
-               <TableRowColumn>{row.get('last_name')}</TableRowColumn>
-               <TableRowColumn>{row.get('plan')}</TableRowColumn>
-             </TableRow>
-          ))}
+          { rows }
         </TableBody>
       </Table>
     );
@@ -56,7 +57,7 @@ SubscribersList.contextTypes = {
 };
 
 function mapStateToProps(state, props) {
-  return state;
+  return {subscriber: state.subscriber};
 }
 
 export default connect(mapStateToProps)(SubscribersList);

@@ -13,6 +13,7 @@ let axiosInstance = axios.create({
 });
 
 export function updateProductPropertiesField(field_name, field_idx, field_value) {
+  console.log(field_name, field_idx, field_value);
   return {
     type: UPDATE_PRODUCT_PROPERTIES_VALUE,
     field_name,

@@ -7,7 +7,7 @@ import { UPDATE_PRODUCT_PROPERTIES_VALUE,
 function buildRateFromState(state) {
   let { rates } = state;
   let r  = _.reduce(rates, (res, val, key) => {
-    res["BASE"] = {rate: {...val}};
+    res[state.unit] = {BASE: {rate: {...val}}};
     return res;
   }, {});
   return {

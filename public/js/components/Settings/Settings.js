@@ -87,7 +87,7 @@ class Settings extends Component {
         <Tab title="Date, Time, and Zone" eventKey={1}>
           <DateTime onChange={this.onChangeDatetime} data={datetime} />
         </Tab>
-        <Tab title="Payment Gateways" eventKey={2}>Payment Gateways</Tab>
+        {/* <Tab title="Payment Gateways" eventKey={2}>Payment Gateways</Tab> */}
         <Tab title="Currency and tax" eventKey={3}>
           <CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />
         </Tab>

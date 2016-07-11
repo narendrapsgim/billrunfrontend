@@ -31,8 +31,8 @@ class ProductSetup extends Component {
     this.props.dispatch(updateProductPropertiesField(id, idx, val));
   }
 
-  onChangeItemSelectFieldValue(id, idx, e, sidx, val) {
-    this.props.dispatch(updateProductPropertiesField(id, idx, val));
+  onChangeItemSelectFieldValue(id, idx, e) {
+    this.props.dispatch(updateProductPropertiesField(id, idx, e.target.value));
   }
 
   onAddProductProperties() {

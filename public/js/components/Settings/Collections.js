@@ -55,7 +55,7 @@ export default class Collections extends Component {
     let { onChange, data } = this.props;
 
     return (
-      <div className="CollectionSettings contents" style={{border: "1px solid #C0C0C0", padding: "45px"}}>
+      <div className="CollectionSettings bordered-container" style={{padding: "45px"}}>
         <div className="InvoiceOverdue">
           <div className="row">
             <div className="col-md-4">

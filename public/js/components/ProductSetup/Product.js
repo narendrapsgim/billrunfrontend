@@ -18,6 +18,7 @@ export default class Product extends Component {
     let { productSettings,
           onChangeItemFieldValue,
           onAddProductProperties,
+          onChangeItemSelectFieldValue,
           onRemoveProductProperties } = this.props;
 
     const available_units =[(<option disabled value="-1" key={-1}>Select Unit</option>),
@@ -38,7 +39,7 @@ export default class Product extends Component {
         </div>
         <div className="row">
           <div className="col-md-3">
-            <select id="unit" className="form-control" onChange={onChangeItemFieldValue} value={productSettings.unit} defaultValue="-1">
+            <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={productSettings.unit} defaultValue="-1">
               { available_units }
             </select>
           </div>

@@ -17,6 +17,7 @@ body {
 
 /* temp Overide bootstrap CSS*/
 .bordered-container {
+    background-color: white!important;
     border: 2px solid #C0C0C0;
 }
 
@@ -50,30 +51,25 @@ body {
 }
 .main-content{
   min-height: 100%;
-  background-color: white;
+  background-color: #F4F4F4;
 }
 .contents {
-    background-color: white;
+    background-color: #F4F4F4;
     padding: 20px;
 }
 
-/* .navigator { */
-/*     background-color: #01BFA5; */
-/*     color: #014A3F; */
-/*     height: 70px; */
-/* } */
-/* .navigator a.active button { */
-/*     background: #007666!important; */
-/*     color: white!important; */
-/* } */
-/* .navigator button { */
-/*     height: 70px!important; */
-/*     color: #014A41!important; */
-/* } */
-
-.nav > li {
-    width: 165px!important;
-    text-align: center!important;
+.navigator {
+    background-color: #01BFA5;
+    color: #014A3F;
+    height: 70px;
+}
+.navigator a.active button {
+    background: #007666!important;
+    color: white!important;
+}
+.navigator button {
+    height: 70px!important;
+    color: #014A41!important;
 }
 
 .help-popover {
