@@ -40,7 +40,7 @@ class PlanSetup extends Component {
   }
   
   onChangeFieldValue(section, e) {
-    let { value, id } = e.target;
+    const { value, id } = e.target;
     this.props.dispatch(updatePlanField(section, id, value));
   }
 
