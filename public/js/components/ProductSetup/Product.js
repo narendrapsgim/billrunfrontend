@@ -11,15 +11,25 @@ export default class Product extends Component {
   }
   
   render() {
-    let product_type_options = ["Metered", "Tiered"].map((type, key) => (
+    const product_type_options = ["Metered", "Tiered"].map((type, key) => (
       <option value={type} key={key}>{type}</option>
     ));
 
-    let { productSettings,
-          onChangeItemFieldValue,
-          onAddProductProperties,
-          onRemoveProductProperties } = this.props;
+    const { productSettings,
+            onChangeItemFieldValue,
+            onAddProductProperties,
+            onChangeItemSelectFieldValue,
+            onRemoveProductProperties,
+            processors } = this.props;
 
+    const units = _.flatten(processors.map(processor => {
+      return processor.get('rate_calculators').keySeq().map(unit => { return unit; });
+    }).toJS());
+
+    const available_units =[(<option disabled value="-1" key={-1}>Select Unit</option>),
+                            ...units.map((unit, key) => (
+                              <option value={unit} key={key}>{unit}</option>
+                            ))];
     return (
       <div className="AddProduct">
         <div className="row">
@@ -30,6 +40,14 @@ export default class Product extends Component {
                    onChange={onChangeItemFieldValue.bind(this, "key", -1)}
                    value={productSettings.key}
             />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-3">
+            <label for="unit">Unit</label>
+            <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={productSettings.unit} defaultValue="-1">
+              { available_units }
+            </select>
           </div>
         </div>
         <div className="row">

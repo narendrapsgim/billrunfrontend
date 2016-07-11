@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
+import _ from 'lodash';
 
 export default class Filter extends Component {
   constructor(props) {
     super(props);
 
     this.onChangeFilterField = this.onChangeFilterField.bind(this);
-    this.onClickFilterBtn = this.onClickFilterBtn.bind(this);
+    this.onClickFilterBtn = _.debounce(this.onClickFilterBtn.bind(this), 700);
     this.buildQueryString = this.buildQueryString.bind(this);
     this.filterCond = this.filterCond.bind(this);
     this.onClickClear = this.onClickClear.bind(this);
@@ -18,7 +19,7 @@ export default class Filter extends Component {
   
   onChangeFilterField(e) {
     const { id, value } = e.target;
-    this.setState({filters: {...this.state.filters, [id]: value}});
+    this.setState({filters: {...this.state.filters, [id]: value}}, () => { this.onClickFilterBtn() });
   }
 
   filterCond(field, value) {
@@ -59,7 +60,7 @@ export default class Filter extends Component {
   render() {
     const { fields = [] } = this.props;
     const inputs = fields.map((field, key) => (
-      <div className="col-md-1" key={key}>
+      <div className="col-md-2" key={key}>
         <input id={field.id}
                type={field.type || "text"}
                placeholder={field.placeholder}
@@ -71,15 +72,13 @@ export default class Filter extends Component {
 
     return (
       <div className="Filter">
-        <div className="row">
           { inputs }
-          <div className="col-md-1">
-            <RaisedButton primary={true} label="Filter" onMouseUp={this.onClickFilterBtn} style={{marginTop: 5}} />
+          {/* <div className="col-md-1">
+          <RaisedButton primary={true} label="Filter" onMouseUp={this.onClickFilterBtn} style={{marginTop: 5}} />
           </div>
           <div className="col-md-1">
-            <RaisedButton label="Clear" onMouseUp={this.onClickClear} style={{marginTop: 5}} />
-          </div>
-        </div>
+          <RaisedButton label="Clear" onMouseUp={this.onClickClear} style={{marginTop: 5}} />
+          </div> */}
       </div>
     );
   }

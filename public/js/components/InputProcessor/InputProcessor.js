@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { getProcessorSettings, setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { getProcessorSettings, setName, setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -20,12 +20,14 @@ class InputProcessor extends Component {
   constructor(props) {
     super(props);
 
+    this.onSetReceiverCheckboxField = this.onSetReceiverCheckboxField.bind(this);
     this.onSetCalculatorMapping = this.onSetCalculatorMapping.bind(this);
     this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
     this.onSetReceiverField = this.onSetReceiverField.bind(this);
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
+    this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
     this.onAddField = this.onAddField.bind(this);
     this.handleNext = this.handleNext.bind(this);
@@ -37,12 +39,17 @@ class InputProcessor extends Component {
     };
   }
 
-  componentWillMount() {
-    this.props.dispatch(getProcessorSettings());
+  componentDidMount() {
+    const { dispatch, fileType } = this.props;
+    dispatch(getProcessorSettings(fileType));
   }
   
   shouldComponentUpdate(nextProps, nextState) {
     return nextState.stepIndex !== this.state.stepIndex;
+  }
+
+  onChangeName(e) {
+    this.props.dispatch(setName(e.target.value));
   }
   
   onChangeDelimiter(e) {
@@ -98,6 +105,11 @@ class InputProcessor extends Component {
     this.props.dispatch(setReceiverField(id, value));
   }
   
+  onSetReceiverCheckboxField(e) {
+    const { id, checked } = e.target;
+    this.props.dispatch(setReceiverField(id, checked));
+  }
+  
   save() {
     this.props.dispatch(saveInputProcessorSettings(this.props.settings));
   }
@@ -118,7 +130,9 @@ class InputProcessor extends Component {
 
   handlePrev() {
     const { stepIndex } = this.state;
-    if (stepIndex > 0) this.setState({stepIndex: stepIndex - 1, finished: 0});
+    if (stepIndex > 0) return this.setState({stepIndex: stepIndex - 1, finished: 0});
+    let r = confirm("are you sure you want to stop editing input processor?");
+    if (r) this.props.onCancel();
   }
   
   render() {
@@ -126,10 +140,10 @@ class InputProcessor extends Component {
     const { settings } = this.props;
 
     const steps = [
-      (<SampleCSV onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} />),
+      (<SampleCSV onChangeName={this.onChangeName} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} />),
-      (<Receiver onSetReceiverField={this.onSetReceiverField} settings={settings.get('receiver')} />)
+      (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
 
     return (
@@ -154,9 +168,8 @@ class InputProcessor extends Component {
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
-              label="Back"
+              label={stepIndex === 0 ? "Cancel" : "Back"}
               onTouchTap={this.handlePrev}
-              disabled={stepIndex === 0}
               style={{marginRight: 12}} />
           <RaisedButton
               label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}

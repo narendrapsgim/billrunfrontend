@@ -20,6 +20,7 @@ export default class Plan extends Component {
           onChangeRecurringPriceCheckFieldValue,
           onCheckEndOfDays,
           onChangeDateFieldValue,
+          onChangeFieldCheckValue,
           onAddTariff } = this.props;
 
     let transaction_options = ["Every Month", "Every Week"].map((op, key) => (
@@ -61,6 +62,20 @@ export default class Plan extends Component {
               <select id="EachPeriod" className="form-control" value={basicSettings.EachPeriod} onChange={onChangeFieldValue.bind(this, "basicSettings")}>
                 { each_period_options }
               </select>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs-2">
+            <div className="checkbox">
+              <label>
+                <input type="checkbox"
+                       defaultValue={basicSettings.upfront}
+                       checked={basicSettings.upfront}
+                       id="upfront"
+                       onChange={onChangeFieldCheckValue.bind(this, "basicSettings")} />
+                Upfront charge
+              </label>
             </div>
           </div>
         </div>

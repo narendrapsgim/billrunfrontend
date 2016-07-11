@@ -23,6 +23,7 @@ class PlanSetup extends Component {
     this.onAddProductProperties = this.onAddProductProperties.bind(this);
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
     this.onChangeRecurringPriceCheckFieldValue = this.onChangeRecurringPriceCheckFieldValue.bind(this);
+    this.onChangeFieldCheckValue = this.onChangeFieldCheckValue.bind(this);
     this.handleSave = this.handleSave.bind(this);
 
     this.state = {
@@ -39,10 +40,15 @@ class PlanSetup extends Component {
   }
   
   onChangeFieldValue(section, e) {
-    let {value, id } = e.target;
+    const { value, id } = e.target;
     this.props.dispatch(updatePlanField(section, id, value));
   }
 
+  onChangeFieldCheckValue(section, e) {
+    const { checked, id } = e.target;
+    this.props.dispatch(updatePlanField(section, id, checked));
+  }
+  
   onChangeRecurringPriceFieldValue(id, idx, e, val) {
     let value = val ? val : e.target.value;
     this.props.dispatch(updatePlanRecurringPriceField(id, idx, value));
@@ -101,7 +107,7 @@ class PlanSetup extends Component {
       <div className="PlanSetup container">
         <h3>Billing Plan</h3>
         <div className="contents bordered-container">
-          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} basicSettings={this.props.basic_settings} />
+          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} onChangeFieldCheckValue={this.onChangeFieldCheckValue} basicSettings={this.props.basic_settings} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton

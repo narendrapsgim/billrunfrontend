@@ -81,15 +81,16 @@ class ProductsList extends Component {
     return (
       <div className="ProductsList">
         <div className="row">
-          <div style={{float: "left"}}>
-            <h4>Products</h4>
+          <div className="col-md-5">
+            <Filter onFilter={this.onFilter} fields={fields} />
           </div>
-          <div style={{float: "right"}}>
-            <RaisedButton primary={true} label="New" onMouseUp={this.onNewProduct} />
+          <div className="col-md-5">
+            <div style={{float: "right"}}>
+              <RaisedButton primary={true} label="New" onMouseUp={this.onNewProduct} />
+            </div>
           </div>
         </div>
-        <Filter onFilter={this.onFilter} fields={fields} />
-        <Table onCellClick={this.onClickCell}>
+        <Table onCellClick={this.onClickCell} style={{marginTop: 10}}>
           <TableHeader displaySelectAll={true}>
             <TableRow>
               { table_header }

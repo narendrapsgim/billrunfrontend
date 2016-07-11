@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import RaisedButton from 'material-ui/RaisedButton';
 import ReactPaginate from 'react-paginate';
 import Filter from '../Filter';
 import Field from '../Field';
@@ -14,6 +15,7 @@ class PlansList extends Component {
     this.onClickCell = this.onClickCell.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onFilter = this.onFilter.bind(this);
+    this.onNewPlan = this.onNewPlan.bind(this);
 
     this.state = {
       page: 1,
@@ -52,6 +54,10 @@ class PlansList extends Component {
       this.props.dispatch(getPlans(this.buildQuery()))
     });
   }
+
+  onNewPlan() {
+    this.context.router.push('plan_setup');
+  }
   
   render() {
     let { plans } = this.props;
@@ -78,8 +84,17 @@ class PlansList extends Component {
 
     return (
       <div className="PlansList">
-        <Filter fields={fields} onFilter={this.onFilter} />
-        <Table onCellClick={this.onClickCell}>
+        <div className="row">
+          <div className="col-md-5">
+            <Filter fields={fields} onFilter={this.onFilter} />
+          </div>
+          <div className="col-md-5">
+            <div style={{float: "right"}}>
+              <RaisedButton primary={true} label="New" onMouseUp={this.onNewPlan} />
+            </div>
+          </div>
+        </div>
+        <Table onCellClick={this.onClickCell} style={{marginTop: 10}}>
           <TableHeader displaySelectAll={true} fixedHeader={true}>
             <TableRow>
               { table_header }

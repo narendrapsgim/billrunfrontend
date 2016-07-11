@@ -1,3 +1,4 @@
+export const SET_NAME = 'SET_NAME';
 export const SET_DELIMITER = 'SET_DELIMITER';
 export const SET_FIELDS = 'SET_HEADERS';
 export const SET_FIELD_MAPPING = 'SET_FIELD_MAPPING';
@@ -25,14 +26,17 @@ function gotProcessorSettings(settings) {
   };
 }
 
-function fetchProcessorSettings() {
+function fetchProcessorSettings(file_type) {
   const convert = (settings) => {
     const { parser, processor,
             customer_identification_fields,
             rate_calculators,
             receiver } = settings;
 
+    const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
+
     return {
+      file_type: settings.file_type,
       delimiter: parser.separator,
       fields: parser.structure,
       processor: Object.assign({}, processor, {
@@ -46,11 +50,11 @@ function fetchProcessorSettings() {
       }),
       customer_identification_fields,
       rate_calculators,
-      receiver
+      receiver: connections
     };
   };
 
-  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"csv_separated"}`;
+  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"${file_type}"}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -65,9 +69,16 @@ function fetchProcessorSettings() {
   };
 }
 
-export function getProcessorSettings() {
+export function getProcessorSettings(file_type) {
   return (dispatch) => {
-    return dispatch(fetchProcessorSettings());
+    return dispatch(fetchProcessorSettings(file_type));
+  };
+}
+
+export function setName(file_type) {
+  return {
+    type: SET_NAME,
+    file_type
   };
 }
 
@@ -139,7 +150,7 @@ export function saveInputProcessorSettings(state) {
         receiver = state.get('receiver');
 
   let settings = {
-    "file_type": "csv_separated",
+    "file_type": state.get('file_type'),
     "parser": {
       "type": "separator",
       "separator": state.get('delimiter'),
@@ -159,7 +170,12 @@ export function saveInputProcessorSettings(state) {
     },
     "customer_identification_fields": customer_identification_fields.toJS(),
     "rate_calculators": rate_calculators.toJS(),
-    "receiver": receiver.toJS()
+    "receiver": {
+      "type": "ftp",
+      "connections": [
+        receiver.toJS()
+      ]
+    }
   };
 
   let setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settings)}`;
@@ -174,13 +190,6 @@ export function saveInputProcessorSettings(state) {
       dispatch(hideProgressBar());
     });
   };  
-}
-
-export function setInputProcessor(input_processor) {
-  return {
-    type: SET_INPUT_PROCESSOR,
-    input_processor
-  };
 }
 
 function gotInputProcessors(input_processors) {
@@ -210,5 +219,11 @@ function fetchInputProcessors() {
 export function getInputProcessors() {
   return (dispatch) => {
     return dispatch(fetchInputProcessors());
+  };
+}
+
+export function newInputProcessor() {
+  return {
+    type: 'NEW_PROCESSOR'    
   };
 }

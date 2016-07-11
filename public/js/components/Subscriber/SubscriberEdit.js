@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { getCustomer, updateCustomerField, saveSubscriber } from '../../actions/customerActions';
+import { getCustomer, getNewCustomer, updateCustomerField, saveSubscriber, getSubscriberSettings } from '../../actions/customerActions';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Subscriber from './Subscriber';
@@ -15,13 +15,22 @@ class SubscriberEdit extends Component {
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.onUnsubscribe = this.onUnsubscribe.bind(this);
+
+    this.state = {
+      newCustomer: false
+    };
   }
 
   componentWillMount() {
-    let { subscriber_id } = this.props.location.query;
-    if (subscriber_id) {
-      this.props.dispatch(getCustomer(subscriber_id));
+    const { aid } = this.props.location.query;
+    if (aid) {
+      this.setState({newCustomer: false});
+      this.props.dispatch(getCustomer(aid));
+    } else {
+      this.setState({newCustomer: true});
+      this.props.dispatch(getNewCustomer());
     }
+    this.props.dispatch(getSubscriberSettings());
   }
   
   onChangeFieldValue(e) {
@@ -35,7 +44,7 @@ class SubscriberEdit extends Component {
   }
   
   onSave() {
-    this.props.dispatch(saveSubscriber());
+    this.props.dispatch(saveSubscriber(this.state.newCustomer));
   }
 
   onCancel() {
@@ -47,7 +56,7 @@ class SubscriberEdit extends Component {
       <div className="SubscriberEdit container">
         <h3>Subscriber</h3>
         <div className="contents bordered-container">
-          <Subscriber onChangeFieldValue={this.onChangeFieldValue} onUnsubscribe={this.onUnsubscribe} />
+          <Subscriber onChangeFieldValue={this.onChangeFieldValue} onUnsubscribe={this.onUnsubscribe} newCustomer={this.state.newCustomer} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton

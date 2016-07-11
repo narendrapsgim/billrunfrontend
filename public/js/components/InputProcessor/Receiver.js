@@ -7,7 +7,8 @@ export default class Receiver extends Component {
 
   render() {
     const { settings,
-            onSetReceiverField } = this.props;
+            onSetReceiverField,
+            onSetReceiverCheckboxField } = this.props;
 
     const period_options = [{min: 1, label: "1 Minute"},
                             {min: 15, label: "15 Minutes"},
@@ -23,6 +24,12 @@ export default class Receiver extends Component {
       <div className="ReceiverSettings">
         <h4>FTP</h4>
         <form className="form-horizontal">
+          <div className="form-group">
+            <label for="name" className="col-md-2 control-label">Name</label>
+            <div className="col-md-4">
+              <input className="form-control" id="name" onChange={onSetReceiverField} value={settings.get('name')}/>
+            </div>
+          </div>
           <div className="form-group">
             <label for="host" className="col-md-2 control-label">Host</label>
             <div className="col-md-4">
@@ -42,9 +49,9 @@ export default class Receiver extends Component {
             </div>
           </div>
           <div className="form-group">
-            <label for="path" className="col-md-2 control-label">Path</label>
+            <label for="remote_direcotry" className="col-md-2 control-label">Direcotry</label>
             <div className="col-md-4">
-              <input className="form-control" id="path" onChange={onSetReceiverField} value={settings.get('path')}/>
+              <input className="form-control" id="remote_direcotry" onChange={onSetReceiverField} value={settings.get('remote_direcotry')}/>
             </div>
           </div>                    
           <div className="form-group">
@@ -61,6 +68,18 @@ export default class Receiver extends Component {
               </select>
             </div>
           </div>                    
+          <div className="form-group">
+            <label for="delete_received" className="col-md-2 control-label">Delete on retrieve</label>
+            <div className="col-md-4">
+              <input type="checkbox" id="delete_received" onChange={onSetReceiverCheckboxField} defaultChecked={settings.get('delete_received')} value="1" />
+            </div>
+          </div>
+          <div className="form-group">
+            <label for="passive" className="col-md-2 control-label">Passive</label>
+            <div className="col-md-4">
+              <input type="checkbox" id="passive" onChange={onSetReceiverCheckboxField} defaultChecked={settings.get('passive')} value="1" />
+            </div>
+          </div>
         </form>
       </div>
     );
