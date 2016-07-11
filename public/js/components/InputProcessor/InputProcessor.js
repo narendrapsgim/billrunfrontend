@@ -39,7 +39,7 @@ class InputProcessor extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { dispatch, fileType } = this.props;
     dispatch(getProcessorSettings(fileType));
   }

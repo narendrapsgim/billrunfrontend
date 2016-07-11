@@ -42,7 +42,7 @@ class InputProcessorsList extends Component {
     ));
 
     return (
-      <div className="InputProcessorsList">
+      <div className="InputProcessorsList bordered-container">
         <Table onCellClick={this.onClickCell}>
           <TableHeader displaySelectAll={true} fixedHeader={true}>
             <TableRow>

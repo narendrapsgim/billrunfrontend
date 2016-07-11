@@ -66,7 +66,7 @@ export default class Plan extends Component {
           </div>
         </div>
         <div className="row">
-          <div className="col-xs-1">
+          <div className="col-xs-2">
             <div className="checkbox">
               <label>
                 <input type="checkbox"
