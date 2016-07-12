@@ -16,11 +16,13 @@ class PlansList extends Component {
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onFilter = this.onFilter.bind(this);
     this.onNewPlan = this.onNewPlan.bind(this);
+    this.onChangeSort = this.onChangeSort.bind(this);
 
     this.state = {
       page: 1,
       size: 10,
-      filter: ""
+      filter: "",
+      sort: ""
     };
   }
 
@@ -38,8 +40,8 @@ class PlansList extends Component {
   }
 
   buildQuery() {
-    const { page, size, filter } = this.state;
-    return { page, size, filter };
+    const { page, size, filter, sort } = this.state;
+    return { page, size, filter, sort };
   }
 
   handlePageClick(data) {
@@ -58,6 +60,13 @@ class PlansList extends Component {
   onNewPlan() {
     this.context.router.push('plan_setup');
   }
+
+  onChangeSort(e) {
+    const { value } = e.target;
+    this.setState({sort: value}, () => {
+      this.props.dispatch(getPlans(this.buildQuery()))
+    });
+  }
   
   render() {
     let { plans } = this.props;
@@ -68,6 +77,11 @@ class PlansList extends Component {
       {id: "price", placeholder: "Price"}
     ];
 
+    const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),
+                         ...fields.map((field, idx) => (
+                           <option value={field.id} key={idx}>{field.placeholder}</option>
+                         ))];
+    
     const table_header = fields.map((field, idx) => (
       <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
     ));
@@ -87,6 +101,9 @@ class PlansList extends Component {
         <div className="row">
           <div className="col-md-5">
             <Filter fields={fields} onFilter={this.onFilter} />
+            {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
+            { sort_fields }
+            </select> */}
           </div>
           <div className="col-md-5">
             <div style={{float: "right"}}>

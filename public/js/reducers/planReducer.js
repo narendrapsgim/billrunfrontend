@@ -143,6 +143,9 @@ export default function (state = defaultState, action) {
       let plan = buildPlanFromState(state);
       console.log("saving plan", plan);
       return state;
+
+    case actions.CLEAR_PLAN:
+      return defaultState;
       
     default:
       return state;

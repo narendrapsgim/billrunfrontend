@@ -12,6 +12,7 @@ import { SET_NAME,
          SET_RATING_FIELD,
          SET_RECEIVER_FIELD,
          SET_FIELD_WIDTH,
+         CLEAR_INPUT_PROCESSOR,
          GOT_INPUT_PROCESSORS } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
@@ -94,7 +95,8 @@ export default function (state = defaultState, action) {
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
       
+    case CLEAR_INPUT_PROCESSOR:
     default:
-      return state;
+      return defaultState;
   }
 }

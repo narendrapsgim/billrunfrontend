@@ -3,7 +3,8 @@ import { GOT_CUSTOMER,
          UPDATE_SUBSCRIBER_FIELD,
          SAVE_SUBSCRIBER,
          GOT_SUBSCRIBER_SETTINGS,
-         GET_NEW_CUSTOMER } from '../actions/customerActions';
+         GET_NEW_CUSTOMER,
+         CLEAR_CUSTOMER } from '../actions/customerActions';
 import Immutable from 'immutable';
 
 const defaultState = Immutable.fromJS({
@@ -41,6 +42,7 @@ export default function (state = defaultState, action) {
     return state;
     
   case GET_NEW_CUSTOMER:
+  case CLEAR_CUSTOMER:
     return defaultState;
 
   default:

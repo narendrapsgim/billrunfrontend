@@ -3,6 +3,7 @@ export const ADD_PRODUCT_PROPERTIES = 'ADD_PRODUCT_PROPERTIES';
 export const REMOVE_PRODUCT_PROPERTIES = 'REMOVE_PRODUCT_PROPERTIES';
 export const GOT_PRODUCT = 'GOT_PRODUCT';
 export const SAVE_PRODUCT = 'SAVE_PRODUCT';
+export const CLEAR_PRODUCT = 'CLEAR_PRODUCT';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -82,5 +83,11 @@ export function getProduct(product_id) {
 export function saveProduct() {
   return {
     type: SAVE_PRODUCT
+  };
+}
+
+export function clearProduct() {
+  return {
+    type: CLEAR_PRODUCT
   };
 }

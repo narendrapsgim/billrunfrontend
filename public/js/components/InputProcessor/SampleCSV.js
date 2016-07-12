@@ -36,9 +36,10 @@ class SampleCSV extends Component {
                              {field}
                            </div>
                            <div className="col-md-3">
-                             <input type="text"
+                             <input type="number"
                                     className="form-control"
                                     data-field={field}
+                                    style={{width: 50}}
                                     onChange={onSetFieldWidth}
                                     value={settings.getIn(['field_widths', field])} />
                            </div>

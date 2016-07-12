@@ -12,6 +12,7 @@ export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
 export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
+export const CLEAR_INPUT_PROCESSOR = 'CLEAR_INPUT_PROCESSOR';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -243,5 +244,11 @@ export function getInputProcessors() {
 export function newInputProcessor() {
   return {
     type: 'NEW_PROCESSOR'    
+  };
+}
+
+export function clearInputProcessor() {
+  return {
+    type: CLEAR_INPUT_PROCESSOR
   };
 }

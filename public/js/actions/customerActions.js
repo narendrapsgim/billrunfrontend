@@ -4,6 +4,7 @@ export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
 export const SAVE_SUBSCRIBER = 'SAVE_SUBSCRIBER';
 export const GOT_SUBSCRIBER_SETTINGS = 'GOT_SUBSCRIBER_SETTINGS';
 export const GET_NEW_CUSTOMER = 'GET_NEW_CUSTOMER';
+export const CLEAR_CUSTOMER = 'CLEAR_CUSTOMER';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -121,4 +122,10 @@ export function getNewCustomer() {
   return {
     type: GET_NEW_CUSTOMER
   };
+}
+
+export function clearCustomer() {
+  return {
+    type: CLEAR_CUSTOMER
+  }
 }

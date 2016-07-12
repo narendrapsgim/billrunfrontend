@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { getCustomer, getNewCustomer, updateCustomerField, saveSubscriber, getSubscriberSettings } from '../../actions/customerActions';
+import { getCustomer, clearCustomer, getNewCustomer, updateCustomerField, saveSubscriber, getSubscriberSettings } from '../../actions/customerActions';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Subscriber from './Subscriber';
@@ -31,6 +31,10 @@ class SubscriberEdit extends Component {
       this.props.dispatch(getNewCustomer());
     }
     this.props.dispatch(getSubscriberSettings());
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(clearCustomer());
   }
   
   onChangeFieldValue(e) {

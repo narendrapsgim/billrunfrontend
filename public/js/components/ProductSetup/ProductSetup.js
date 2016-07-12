@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, saveProduct } from '../../actions/productActions';
+import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
 import { getInputProcessors } from '../../actions/inputProcessorActions';
 
 import FlatButton from 'material-ui/FlatButton';
@@ -27,6 +27,10 @@ class ProductSetup extends Component {
       this.props.dispatch(getProduct(product_id));
     }
     this.props.dispatch(getInputProcessors());
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(clearProduct());
   }
   
   onChangeItemFieldValue(id, idx, e, val = e.target.value) {

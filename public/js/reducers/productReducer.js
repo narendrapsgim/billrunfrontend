@@ -2,7 +2,8 @@ import { UPDATE_PRODUCT_PROPERTIES_VALUE,
          ADD_PRODUCT_PROPERTIES,
          REMOVE_PRODUCT_PROPERTIES,
          GOT_PRODUCT,
-         SAVE_PRODUCT } from '../actions/productActions';
+         SAVE_PRODUCT,
+         CLEAR_PRODUCT } from '../actions/productActions';
 
 function buildRateFromState(state) {
   let { rates } = state;
@@ -75,6 +76,9 @@ export default function (state = defaultState, action) {
       console.log("saving product ", rate);
       return state;
 
+    case CLEAR_PRODUCT:
+      return defaultState;
+      
     default:
       return state;
   }

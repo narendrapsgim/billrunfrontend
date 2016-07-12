@@ -16,6 +16,7 @@ class UsageList extends Component {
     this.buildQuery = this.buildQuery.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onFilter = this.onFilter.bind(this);
+    this.onChangeSort = this.onChangeSort.bind(this);
     
     this.state = {
       page: 1,
@@ -46,6 +47,13 @@ class UsageList extends Component {
     });
   }
   
+  onChangeSort(e) {
+    const { value } = e.target;
+    this.setState({sort: value}, () => {
+      this.props.dispatch(getUsages(this.buildQuery()))
+    });
+  }
+
   render() {
     let { usages } = this.props;
 
@@ -53,12 +61,20 @@ class UsageList extends Component {
       {id: "aid", placeholder: "Account", type: "number"},
       {id: "plan", placeholder: "Plan"}
     ];
-    
+
+    const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),
+                         ...fields.map((field, idx) => (
+                           <option value={field.id} key={idx}>{field.placeholder}</option>
+                         ))];
+
     return (
       <div className="UsagesList">
         <div className="row">
           <div className="col-md-5">
             <Filter fields={fields} onFilter={this.onFilter} />
+            {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
+            { sort_fields }
+            </select> */}
           </div>
         </div>
         <Table fixedHeader={true}

@@ -38,6 +38,10 @@ class PlanSetup extends Component {
       this.props.dispatch(getPlan(plan_id));
     }
   }
+
+  componentWillUnmount() {
+    this.props.dispatch(clearPlan());
+  }
   
   onChangeFieldValue(section, e) {
     const { value, id } = e.target;

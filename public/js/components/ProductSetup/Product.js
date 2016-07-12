@@ -22,9 +22,9 @@ export default class Product extends Component {
             onRemoveProductProperties,
             processors } = this.props;
 
-    const units = _.flatten(processors.map(processor => {
+    const units = _.uniq(_.flatten(processors.map(processor => {
       return processor.get('rate_calculators').keySeq().map(unit => { return unit; });
-    }).toJS());
+    }).toJS()));
 
     const available_units =[(<option disabled value="-1" key={-1}>Select Unit</option>),
                             ...units.map((unit, key) => (
