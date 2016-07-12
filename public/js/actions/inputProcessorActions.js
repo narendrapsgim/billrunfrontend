@@ -1,4 +1,5 @@
 export const SET_NAME = 'SET_NAME';
+export const SET_DELIMITER_TYPE = 'SET_DELIMITER_TYPE';
 export const SET_DELIMITER = 'SET_DELIMITER';
 export const SET_FIELDS = 'SET_HEADERS';
 export const SET_FIELD_MAPPING = 'SET_FIELD_MAPPING';
@@ -10,6 +11,7 @@ export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
+export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -37,6 +39,7 @@ function fetchProcessorSettings(file_type) {
 
     return {
       file_type: settings.file_type,
+      delimiter_type: parser.type,
       delimiter: parser.separator,
       fields: parser.structure,
       processor: Object.assign({}, processor, {
@@ -82,6 +85,13 @@ export function setName(file_type) {
   };
 }
 
+export function setDelimiterType(delimiter_type) {
+  return {
+    type: SET_DELIMITER_TYPE,
+    delimiter_type
+  };
+}
+
 export function setDelimiter(delimiter) {
   return {
     type: SET_DELIMITER,
@@ -93,6 +103,14 @@ export function setFields(fields) {
   return {
     type: SET_FIELDS,
     fields
+  };
+}
+
+export function setFieldWidth(field, width) {
+  return {
+    type: SET_FIELD_WIDTH,
+    field,
+    width
   };
 }
 
@@ -152,9 +170,9 @@ export function saveInputProcessorSettings(state) {
   let settings = {
     "file_type": state.get('file_type'),
     "parser": {
-      "type": "separator",
+      "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
-      "structure": state.get('fields')
+      "structure": state.get('delimiter_type') === "fixed" ? state.get('field_widths') : state.get('fields')
     },
     "processor": {
       "type": "Usage",

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { getProcessorSettings, setName, setDelimiter, setFields, setFieldMapping, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -24,9 +24,11 @@ class InputProcessor extends Component {
     this.onSetCalculatorMapping = this.onSetCalculatorMapping.bind(this);
     this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
     this.onSetReceiverField = this.onSetReceiverField.bind(this);
+    this.onSetDelimiterType = this.onSetDelimiterType.bind(this);
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
+    this.onSetFieldWidth = this.onSetFieldWidth.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
     this.onAddField = this.onAddField.bind(this);
@@ -51,6 +53,10 @@ class InputProcessor extends Component {
   onChangeName(e) {
     this.props.dispatch(setName(e.target.value));
   }
+
+  onSetDelimiterType(e) {
+    this.props.dispatch(setDelimiterType(e.target.value));
+  }
   
   onChangeDelimiter(e) {
     this.props.dispatch(setDelimiter(e.target.value));
@@ -59,6 +65,7 @@ class InputProcessor extends Component {
   onSelectSampleCSV(e) {
     let file = e.target.files[0];
     let reader = new FileReader();
+    if (!this.props.settings.get('delimiter')) return;
     reader.onloadend = (evt => {
       if (evt.target.readyState == FileReader.DONE) {
         /* Only need first line */
@@ -81,6 +88,11 @@ class InputProcessor extends Component {
     this.props.dispatch(setFieldMapping(field, mapping));
   }
 
+  onSetFieldWidth(e) {
+    const { value, dataset: {field} } = e.target;
+    this.props.dispatch(setFieldWidth(field, value));
+  }
+  
   onSetCalculatorMapping(e) {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setCalculatorMapping(field, mapping));
@@ -140,7 +152,7 @@ class InputProcessor extends Component {
     const { settings } = this.props;
 
     const steps = [
-      (<SampleCSV onChangeName={this.onChangeName} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} />),
+      (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
