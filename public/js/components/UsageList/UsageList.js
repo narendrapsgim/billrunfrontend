@@ -56,10 +56,15 @@ class UsageList extends Component {
     
     return (
       <div className="UsagesList">
-        <Filter fields={fields} onFilter={this.onFilter} />
+        <div className="row">
+          <div className="col-md-5">
+            <Filter fields={fields} onFilter={this.onFilter} />
+          </div>
+        </div>
         <Table fixedHeader={true}
                fixedFooter={true}
                selectable={false}
+               style={{marginTop: 10}}
                height={'500px'}>
           <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>

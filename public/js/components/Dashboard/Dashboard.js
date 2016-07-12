@@ -10,7 +10,6 @@ class Dashboard extends Component {
     const { stuff } = this.props;
     return (
       <div className="Dashboard">
-        { stuff.get('first_report') }
       </div>
     );
   }
