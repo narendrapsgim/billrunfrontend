@@ -36,8 +36,10 @@ function gotCustomer(customer) {
   }
 }
 
-function fetchCustomers() {  
-  let fetchUrl = `/api/find?collection=subscribers&query={"type": "account"}`;
+function fetchCustomers(query) {
+  let q = JSON.parse(query.filter);
+  q.type = 'account';
+  let fetchUrl = `/api/find?collection=subscribers&query=${JSON.stringify(q)}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -69,9 +71,9 @@ function fetchCustomer(aid) {
 }
 
 
-export function getCustomers() {
+export function getCustomers(query = {filter: JSON.stringify({})}) {
   return dispatch => {
-    return dispatch(fetchCustomers());
+    return dispatch(fetchCustomers(query));
   };
 }
 

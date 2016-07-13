@@ -98,7 +98,7 @@ class PlansList extends Component {
 
     return (
       <div className="PlansList">
-        <div className="row">
+        <div className="row" style={{marginBottom: 10}}>
           <div className="col-md-5">
             <Filter fields={fields} onFilter={this.onFilter} />
             {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
@@ -111,7 +111,7 @@ class PlansList extends Component {
             </div>
           </div>
         </div>
-        <Table onCellClick={this.onClickCell} style={{marginTop: 10}}>
+        <Table onCellClick={this.onClickCell}>
           <TableHeader displaySelectAll={true} fixedHeader={true}>
             <TableRow>
               { table_header }

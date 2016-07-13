@@ -34,15 +34,15 @@ class UsageList extends Component {
     return { page, size, filter };
   }
 
-  handlePageClick(data) {
-    let page = data.selected + 1;
-    this.setState({page}, () => {
+  onFilter(filter) {
+    this.setState({filter}, () => {
       this.props.dispatch(getUsages(this.buildQuery()))
     });
   }
 
-  onFilter(filter) {
-    this.setState({filter}, () => {
+  handlePageClick(data) {
+    let page = data.selected + 1;
+    this.setState({page}, () => {
       this.props.dispatch(getUsages(this.buildQuery()))
     });
   }
@@ -69,7 +69,7 @@ class UsageList extends Component {
 
     return (
       <div className="UsagesList">
-        <div className="row">
+        <div className="row" style={{marginBottom: 10}}>
           <div className="col-md-5">
             <Filter fields={fields} onFilter={this.onFilter} />
             {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
@@ -80,7 +80,6 @@ class UsageList extends Component {
         <Table fixedHeader={true}
                fixedFooter={true}
                selectable={false}
-               style={{marginTop: 10}}
                height={'500px'}>
           <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>

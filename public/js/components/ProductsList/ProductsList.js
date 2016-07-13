@@ -80,7 +80,7 @@ class ProductsList extends Component {
 
     return (
       <div className="ProductsList">
-        <div className="row">
+        <div className="row" style={{marginBottom: 10}}>
           <div className="col-md-5">
             <Filter onFilter={this.onFilter} fields={fields} />
           </div>
@@ -90,7 +90,7 @@ class ProductsList extends Component {
             </div>
           </div>
         </div>
-        <Table onCellClick={this.onClickCell} style={{marginTop: 10}}>
+        <Table onCellClick={this.onClickCell}>
           <TableHeader displaySelectAll={true}>
             <TableRow>
               { table_header }
