@@ -30,8 +30,8 @@ export default class App extends Component {
         <div className="App">
           <Topbar />
           <Navigator />
+          <StatusBar />
             <div className="container-fluid main-content">
-              <StatusBar />
               <div className="contents">
                 {this.props.children}
               </div>

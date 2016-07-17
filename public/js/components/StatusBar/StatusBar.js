@@ -40,7 +40,7 @@ class StatusBar extends Component {
 
   renderLoader(){
     return(
-      <LinearProgress mode="indeterminate"/>
+      <LinearProgress mode="indeterminate" color="red"/>
     );
   }
   renderMessage(){
