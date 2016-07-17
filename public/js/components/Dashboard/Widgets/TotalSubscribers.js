@@ -90,7 +90,6 @@ class TotalSubscribers extends Component {
   }
 
   prepareChartData(chartData) {
-    console.log(chartData);
     let monthsNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     let today = new Date();
     let monthsToShow = Array.from(Array(6), (v, k) => new Date(today.setMonth(today.getMonth() - 1)).getMonth() + 2).reverse();

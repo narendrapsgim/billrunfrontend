@@ -2,11 +2,7 @@ export const GOT_DATA = 'GOT_DATA';
 export const GOT_DATA_ERROR = 'GOT_DATA_ERROR';
 
 import { showProgressBar, hideProgressBar } from './progressbarActions';
-import {getChartData, getSubscribersData, delay, getMultipleData} from '../Api';
-
-window.testApi = getSubscribersData;
-window.testMultipleData = getMultipleData;
-window.testDelay = delay;
+import { apiBillRun } from '../Api';
 
 function gotData(data) {
   return {
@@ -27,8 +23,7 @@ function gotDataError(data) {
 function fetchData(query) {
   return (dispatch) => {
     dispatch(showProgressBar());
-    // getChartData(query).then(
-    getMultipleData(query).then(
+    apiBillRun(query).then(
       responce => {
         // console.log(responce);
         dispatch(gotData(responce));

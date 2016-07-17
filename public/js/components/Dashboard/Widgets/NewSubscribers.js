@@ -6,6 +6,15 @@ import PlaceHolderWidget from '../Widgets/PlaceHolder';
 
 
 class NewSubscribers extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      width: props.width || 350,
+      height: props.height || 400
+    }
+  }
+
   componentDidMount() {
     this.props.dispatch(getData({type: 'newSubscribers', queries: this.prepereAgrigateQuery()}));
   }
@@ -53,9 +62,7 @@ class NewSubscribers extends Component {
     // console.log('TotalSubscribers componentWillReceiveProps : ', nextProps);
   }
 
-  prepareChartData() {
-    const {chartData} = this.props;
-
+  prepareChartData(chartData) {
     let monthsNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     let today = new Date();
     let monthsToShow = Array.from(Array(6), (v, k) => new Date(today.setMonth(today.getMonth() - 1)).getMonth() + 2).reverse();
@@ -106,22 +113,20 @@ class NewSubscribers extends Component {
     return owerideOptions;
   }
 
-  renderContent(){
-    const { width = 350, height = 400, chartData } = this.props;
-
+  renderContent(chartData){
     switch (chartData) {
       case undefined: return <PlaceHolderWidget/>;
       case null: return null;
-      default: return <LineChart width={width} height={height} data={this.prepareChartData()} options={this.overrideChartOptions()}/>;
+      default: return <LineChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
     }
   }
 
   render() {
-    const { width = 350, height = 400 } = this.props;
+    const { chartData } = this.props;
 
     return (
-      <div style={{ display: 'inline-block', margin: '20px', width: width, height: height }}>
-        {this.renderContent()}
+      <div style={{ display: 'inline-block', margin: '20px', width: this.state.width, height: this.state.height }}>
+        {this.renderContent(chartData)}
       </div>
     );
   }
