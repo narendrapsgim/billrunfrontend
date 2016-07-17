@@ -25,6 +25,7 @@ class PlanSetup extends Component {
     this.onChangeRecurringPriceCheckFieldValue = this.onChangeRecurringPriceCheckFieldValue.bind(this);
     this.onChangeFieldCheckValue = this.onChangeFieldCheckValue.bind(this);
     this.handleSave = this.handleSave.bind(this);
+    this.onChangeDateFieldValue = this.onChangeDateFieldValue.bind(this);
 
     this.state = {
       stepIndex: 0,
@@ -66,7 +67,7 @@ class PlanSetup extends Component {
     this.props.dispatch(addTariff());
   }
   
-  onChangeDateFieldValue(section, id, e, value) {
+  onChangeDateFieldValue(section, id, value) {
     this.props.dispatch(updatePlanField(section, id, value));
   }
   
@@ -86,7 +87,9 @@ class PlanSetup extends Component {
   /** **/
 
   handleSave() {
-    this.props.dispatch(savePlan());
+    const { action } = this.props.location.query;
+    this.props.dispatch(savePlan(this.props, action));
+    browserHistory.goBack();
   }
   
   handleNext() {

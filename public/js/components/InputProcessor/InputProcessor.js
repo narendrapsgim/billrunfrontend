@@ -162,7 +162,7 @@ class InputProcessor extends Component {
     ];
 
     return (
-      <div className="InputProcessor container">
+      <div className="InputProcessor">
         <h3>Input Processor</h3>
         <Stepper activeStep={stepIndex}>
           <Step>

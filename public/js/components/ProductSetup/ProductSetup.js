@@ -50,7 +50,9 @@ class ProductSetup extends Component {
   }  
 
   onSave() {
-    this.props.dispatch(saveProduct());
+    const { action } = this.props.location.query;
+    this.props.dispatch(saveProduct(this.props, action));
+    browserHistory.goBack();
   }
 
   onCancel() {

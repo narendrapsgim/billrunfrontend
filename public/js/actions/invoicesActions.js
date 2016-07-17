@@ -57,7 +57,7 @@ function fetchInvoices() {
       "invoice_id" : 7097,
       "type" : "inv",
       "bill_unit" : "12",
-      "due_date" : "2016-05-23",
+      "due_date" : "2017-05-23",
       "due" : 100,
       "due_before_vat" : 124.777777778376,
       "customer_status" : "open",

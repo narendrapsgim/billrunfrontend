@@ -61,6 +61,7 @@ class SampleCSV extends Component {
           </div>
           <div className="col-md-3">
             <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
+            <p className="help-block">&nbsp;</p>
           </div>
         </div>
         <div className="row">
@@ -85,6 +86,7 @@ class SampleCSV extends Component {
             </div>
             <div className="col-md-3" style={{marginTop: 10}}>
               <input type="radio" name="delimiter-type" value="fixed" onChange={onSetDelimiterType} />Fixed width
+              <p className="help-block">&nbsp;</p>
             </div>
           </div>
         </div>

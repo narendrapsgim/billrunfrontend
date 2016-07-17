@@ -58,7 +58,8 @@ class UsageList extends Component {
     let { usages } = this.props;
 
     const fields = [
-      {id: "aid", placeholder: "Account", type: "number"},
+      {id: "aid", placeholder: "Customer", type: "number"},
+      {id: "sid", placeholder: "Subscription", type: "number"},
       {id: "plan", placeholder: "Plan"}
     ];
 
@@ -67,26 +68,25 @@ class UsageList extends Component {
                            <option value={field.id} key={idx}>{field.placeholder}</option>
                          ))];
 
+    const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
     return (
       <div className="UsagesList">
         <div className="row" style={{marginBottom: 10}}>
           <div className="col-md-5">
-            <Filter fields={fields} onFilter={this.onFilter} />
+            <Filter fields={fields} onFilter={this.onFilter} base={base} />
             {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
             { sort_fields }
             </select> */}
           </div>
         </div>
-        <Table fixedHeader={true}
-               fixedFooter={true}
-               selectable={false}
+        <Table selectable={false}
                height={'500px'}>
           <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
-              <TableHeaderColumn tooltip="Account">Account</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Subscription">Subscription</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Plan">Plan</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Charge">Charge</TableHeaderColumn>
+              <TableHeaderColumn>Customer</TableHeaderColumn>
+              <TableHeaderColumn>Subscription</TableHeaderColumn>
+              <TableHeaderColumn>Plan</TableHeaderColumn>
+              <TableHeaderColumn>Charge</TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody displayRowCheckbox={false} stripedRows={true}>

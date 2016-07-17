@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody } from 'material-ui/Table';
 import Filter from '../Filter';
 import Field from '../Field';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import { getCustomers } from '../../actions/customerActions';
 
@@ -14,6 +15,7 @@ class SubscribersList extends Component {
     this.onClickCell = this.onClickCell.bind(this);
     this.buildQuery = this.buildQuery.bind(this);
     this.onFilter = this.onFilter.bind(this);
+    this.onNewSubscriber = this.onNewSubscriber.bind(this);
 
     this.state = {
       filter: ""
@@ -29,7 +31,10 @@ class SubscribersList extends Component {
     let aid = subscriber.valueSeq().get(cell_idx).get('aid');
     this.context.router.push({
       pathname: 'subscriber',
-      query: {aid}
+      query: {
+        aid,
+        action: "update"
+      }
     });
   }
 
@@ -43,12 +48,19 @@ class SubscribersList extends Component {
       this.props.dispatch(getCustomers(this.buildQuery()))
     });
   }
+
+  onNewSubscriber() {
+    this.context.router.push({
+      pathname: "subscriber",
+      query: {action: "new"}
+    });
+  }
   
   render() {
     const { subscriber } = this.props;
 
     const fields = [
-      {id: "first_name", placeholder: "First Name"}
+      {id: "name", placeholder: "Name"}
     ];
 
     const table_header = fields.map((field, idx) => (
@@ -70,6 +82,11 @@ class SubscribersList extends Component {
         <div className="row" style={{marginBottom: 10}}>
           <div className="col-md-5">
             <Filter fields={fields} onFilter={this.onFilter} />
+          </div>
+          <div className="col-md-5">
+            <div style={{float: "right"}}>
+              <RaisedButton primary={true} label="New" onMouseUp={this.onNewSubscriber} />
+            </div>
           </div>
         </div>
         <Table onCellClick={this.onClickCell}>

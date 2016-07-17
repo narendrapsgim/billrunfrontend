@@ -219,8 +219,7 @@ function gotInputProcessors(input_processors) {
 }
 
 function fetchInputProcessors() {
-
-  let setUrl = `/api/settings?category=file_types&data={}`;
+  let setUrl = '/api/settings?category=file_types&data={}';
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(

@@ -5,29 +5,15 @@ import { UPDATE_PRODUCT_PROPERTIES_VALUE,
          SAVE_PRODUCT,
          CLEAR_PRODUCT } from '../actions/productActions';
 
-function buildRateFromState(state) {
-  let { rates } = state;
-  let r  = _.reduce(rates, (res, val, key) => {
-    res[state.unit] = {BASE: {rate: {...val}}};
-    return res;
-  }, {});
-  return {
-    key: state.key,
-    rates: r
-  };
-}
+import moment from 'moment';
 
 const defaultState = {
   key: '',
   description: '',
-  rates: [
-    {
-      from: undefined,
-      to: undefined,
-      interval: undefined,
-      price: undefined
-    }
-  ]
+  unit_price: '',
+  from: moment().unix() * 1000,
+  to: moment().add(1, 'years').unix() * 1000,
+  rates: []
 };
 
 export default function (state = defaultState, action) {
@@ -70,11 +56,6 @@ export default function (state = defaultState, action) {
 
     case GOT_PRODUCT:
       return action.product;
-
-    case SAVE_PRODUCT:
-      let rate = buildRateFromState(state);
-      console.log("saving product ", rate);
-      return state;
 
     case CLEAR_PRODUCT:
       return defaultState;

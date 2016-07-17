@@ -4,6 +4,7 @@ import Field from '../Field';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import DateTimeField from 'react-bootstrap-datetimepicker';
 
 export default class Product extends Component {
   constructor(props) {
@@ -33,31 +34,60 @@ export default class Product extends Component {
     return (
       <div className="AddProduct">
         <div className="row">
-          <div className="col-md-4">
-            <label for="key">Product Name</label>
+          <div className="col-md-3">
+            <label for="key">Name</label>
             <Field id="key"
                    coll="Product"
                    onChange={onChangeItemFieldValue.bind(this, "key", -1)}
                    value={productSettings.key}
             />
           </div>
-        </div>
-        <div className="row">
           <div className="col-md-3">
-            <label for="unit">Unit</label>
-            <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={productSettings.unit} defaultValue="-1">
-              { available_units }
-            </select>
+            <label for="key">Code</label>
+            <Field id="code"
+                   coll="Product"
+                   onChange={onChangeItemFieldValue.bind(this, "code", -1)}
+                   value={productSettings.code}
+            />
           </div>
         </div>
         <div className="row">
-          <div className="col-md-4">
+          <div className="col-md-6">
             <label for="description">Description</label>
             <Field id="description"
                    coll="Product"
                    onChange={onChangeItemFieldValue.bind(this, "description", -1)}
                    value={productSettings.description}
             />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-3">
+            <label for="unit">Unit Type</label>
+            <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={productSettings.unit} defaultValue="-1">
+              { available_units }
+            </select>
+          </div>
+          <div className="col-md-2">
+            <label for="unit_price">Unit Price</label>
+            <Field id="unit_price"
+                   onChange={onChangeItemFieldValue.bind(this, "unit_price", -1)}
+                   value={productSettings.unit_price} />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-2">
+            <label>Valid From</label>
+            <DateTimeField id="from" value={productSettings.from}  onChange={onChangeItemFieldValue.bind(this, "from")} />
+          </div>
+          <div className="col-md-2">
+            <label>To</label>
+            <DateTimeField id="to"   value={productSettings.to}    onChange={onChangeItemFieldValue.bind(this, "to")} />
+          </div>
+        </div>        
+        <div className="row">
+          <div className="col-xs-1">
+            <button className="btn btn-primary" style={{marginTop: 10}} onClick={onAddProductProperties}>Add Charges</button>
           </div>
         </div>
         { productSettings.rates.map((rate, key) => (
@@ -92,8 +122,8 @@ export default class Product extends Component {
                          value={productSettings.rates[key].price}
                   />
                 </div>
-                {(() => {  /* only show remove button if there is more than one interval */
-                   if (productSettings.rates.length > 1) {
+                {(() => {  /* only show remove button if there is more than one interval and only for the last one */
+                   if (productSettings.rates.length > 1 && key === (productSettings.rates.length - 1)) {
                      return (
                        <div className="col-md-2">
                          <FloatingActionButton mini={true} secondary={true} style={{marginTop: "30px", marginLeft: "15px"}} onMouseUp={onRemoveProductProperties.bind(this, key)}>
@@ -105,13 +135,6 @@ export default class Product extends Component {
                  })()}
               </div>
           )) }
-              <div className="row">
-                <div className="col-xs-1">
-                  <FloatingActionButton mini={true} style={{margin: "20px"}} onMouseUp={onAddProductProperties}>
-                    <ContentAdd />
-                  </FloatingActionButton>
-                </div>
-              </div>
       </div>
     );
   }

@@ -18,7 +18,7 @@ class ProductsList extends Component {
     this.onFilter = this.onFilter.bind(this);
 
     this.state = {
-      page: 1,
+      page: 0,
       size: 10,
       filter: ""
     };
@@ -33,7 +33,10 @@ class ProductsList extends Component {
     let id = products.valueSeq().get(cell_idx).getIn(['_id', '$id']);;
     this.context.router.push({
       pathname: 'product_setup',
-      query: {product_id: id}
+      query: {
+        product_id: id,
+        action: 'update'
+      }
     });
   }
 
@@ -50,7 +53,12 @@ class ProductsList extends Component {
   }
 
   onNewProduct() {
-    this.context.router.push(`product_setup`);
+    this.context.router.push({
+      pathname: `product_setup`,
+      query: {
+        action: 'new'
+      }
+    });
   }
 
   onFilter(filter) {

@@ -25,15 +25,12 @@ export default function (state = defaultState, action) {
   case GOT_CUSTOMERS:
     return Immutable.fromJS(action.customers).toList();
 
-  case GOT_SUBSCRIBER_SETTINGS:
-    return state.set('settings', Immutable.fromJS(action.settings));
-
   case GOT_CUSTOMER:
-    let { customer, settings } = action;
-    return Immutable.fromJS({customer, settings});
+    let { customer } = action;
+    return Immutable.fromJS({customer});
 
   case UPDATE_SUBSCRIBER_FIELD:
-    return state.set(field_id, value);
+    return state.setIn(['customer', field_id], value);
 
   case SAVE_SUBSCRIBER:
     const sub = state.toJS();
@@ -42,6 +39,11 @@ export default function (state = defaultState, action) {
     return state;
     
   case GET_NEW_CUSTOMER:
+    if (action.aid) {
+      return Immutable.fromJS({customer: {aid: action.aid}});
+    }
+    return Immutable.fromJS({customer: {}});
+
   case CLEAR_CUSTOMER:
     return defaultState;
 

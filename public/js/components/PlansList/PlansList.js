@@ -19,7 +19,7 @@ class PlansList extends Component {
     this.onChangeSort = this.onChangeSort.bind(this);
 
     this.state = {
-      page: 1,
+      page: 0,
       size: 10,
       filter: "",
       sort: ""
@@ -35,7 +35,10 @@ class PlansList extends Component {
     let id = plans.valueSeq().get(cell_idx).getIn(['_id', '$id']);
     this.context.router.push({
       pathname: 'plan_setup',
-      query: {plan_id: id}
+      query: {
+        plan_id: id,
+        action: 'update'
+      }
     });
   }
 
@@ -58,7 +61,12 @@ class PlansList extends Component {
   }
 
   onNewPlan() {
-    this.context.router.push('plan_setup');
+    this.context.router.push({
+      pathname: 'plan_setup',
+      query: {
+        action: 'new'
+      }
+    });
   }
 
   onChangeSort(e) {
@@ -74,7 +82,6 @@ class PlansList extends Component {
     const fields = [
       {id: "name", placeholder: "Name"},
       {id: "description", placeholder: "Description"},
-      {id: "price", placeholder: "Price"}
     ];
 
     const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),

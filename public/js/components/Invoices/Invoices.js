@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import $ from 'jquery';
 import { getInvoices } from '../../actions/invoicesActions';
+import moment from 'moment';
 
 import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody } from 'material-ui/Table';
 import FileDownload from 'material-ui/svg-icons/file/file-download';
@@ -33,15 +34,15 @@ class Invoices extends Component {
 
     return (
       <Table onCellClick={this.onClickCell}>
-        <TableHeader displaySelectAll={true} fixedHeader={true}>
+        <TableHeader displaySelectAll={true}>
           <TableRow>
-            <TableHeaderColumn tooltip="Invoice ID">Invoice ID</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Date">Date</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Due Date">Due Date</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Amount">Amount</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Status">Status</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Account ID">Account ID</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Download">Download</TableHeaderColumn>
+            <TableHeaderColumn>Invoice ID</TableHeaderColumn>
+            <TableHeaderColumn>Date</TableHeaderColumn>
+            <TableHeaderColumn>Due Date</TableHeaderColumn>
+            <TableHeaderColumn>Amount</TableHeaderColumn>
+            <TableHeaderColumn>Status</TableHeaderColumn>
+            <TableHeaderColumn>Customer ID</TableHeaderColumn>
+            <TableHeaderColumn>Download</TableHeaderColumn>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -55,6 +56,8 @@ class Invoices extends Component {
                  {(() => {
                     if (row.get('paid_by'))
                       return (<span style={{color: "green"}}>Paid</span>);
+                    else if (moment(row.get('due_date')).isAfter(moment()))
+                      return (<span style={{color: "yellow"}}>Due</span>);
                     return (<span style={{color: "red"}}>Not Paid</span>);
                   })()}
                </TableRowColumn>
