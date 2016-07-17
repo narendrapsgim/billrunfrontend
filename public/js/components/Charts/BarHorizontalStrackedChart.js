@@ -3,7 +3,7 @@ import {HorizontalBar} from 'react-chartjs';
 import {palitra} from './helpers';
 
 
-export default class BarHorizontalWidget extends React.Component {
+export default class BarHorizontalStrackedChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -25,13 +25,18 @@ export default class BarHorizontalWidget extends React.Component {
       tooltips: {
         mode: 'single'
       },
-      elements: {
-        rectangle: {
-          borderWidth: 2,
-          borderColor: 'rgb(0, 255, 0)',
-          borderSkipped: 'left'
-        }
-      },
+      scales: {
+        xAxes: [
+          {
+            stacked: true
+          }
+        ],
+        yAxes: [
+          {
+            stacked: true
+          }
+        ]
+      }
     };
     return Object.assign(defaultOptions, options);
   }
@@ -54,6 +59,7 @@ export default class BarHorizontalWidget extends React.Component {
 
   render() {
     const {width, height, data, options} = this.props;
-    return (<HorizontalBar data={this.prepareData(data)} options={this.getOptions(data, options)} type={'horizontalBar'} width={width} height={height}/>);
+    if (!data || !data.x) return null;
+    return ( <HorizontalBar data={this.prepareData(data)} options={this.getOptions(data, options)} type={'horizontalBar'} width={width} height={height}/> );
   }
 }

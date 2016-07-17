@@ -3,7 +3,7 @@ import {Line} from 'react-chartjs';
 import {palitra, trend} from './helpers';
 
 
-export default class LineWidget extends React.Component {
+export default class LineChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -68,7 +68,7 @@ export default class LineWidget extends React.Component {
             //     labelString: 'Value'
             // },
             ticks: {
-                beginAtZero:true,
+              beginAtZero: false,
             // suggestedMin: -10,
             // suggestedMax: 250,
             }
@@ -105,6 +105,7 @@ export default class LineWidget extends React.Component {
 
   render() {
     const {width, height, data, options} = this.props;
+    if (!data || !data.x || !data.y) return null;
     return (<Line data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
   }
 }

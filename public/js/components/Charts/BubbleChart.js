@@ -4,7 +4,7 @@ import {palitra} from './helpers';
 
 
 
-export default class BubbleWidget extends React.Component {
+export default class BubbleChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -49,6 +49,7 @@ export default class BubbleWidget extends React.Component {
 
   render() {
     const {width, height, data, options} = this.props;
+    if (!data || !data.x || !data.y || !data.z) return null;
     return (<Bubble data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
   }
 }

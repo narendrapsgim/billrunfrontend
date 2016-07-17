@@ -1,9 +1,9 @@
 import React from 'react';
-import {Bar} from 'react-chartjs';
-import {palitra} from './helpers';
+import {Line} from 'react-chartjs';
+import {palitra, hexToRgba} from './helpers';
 
 
-export default class BarStackedWidget extends React.Component {
+export default class LineAreaStackedChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -14,15 +14,16 @@ export default class BarStackedWidget extends React.Component {
       responsive: true,
       title: {
         display: (typeof data.title !== 'undefined'),
-        text: data.title
+        text: data.title,
       },
       legend: {
-        position: 'bottom'
-      },
-      hover: {
-        mode: 'label'
+        display: (data.x.length > 1),
+        position: 'bottom',
       },
       tooltips: {
+        mode: 'label'
+      },
+      hover: {
         mode: 'label'
       },
       scales: {
@@ -35,8 +36,8 @@ export default class BarStackedWidget extends React.Component {
           {
             stacked: true
           }
-        ]
-      }
+        ],
+      },
     };
     return Object.assign(defaultOptions, options);
   }
@@ -47,18 +48,22 @@ export default class BarStackedWidget extends React.Component {
     chartData.datasets = data.x.map((x, i) => ({
       label: x.label,
       data: x.values,
+      fill: true,
+      lineTension:0.2,
       borderWidth: 1,
-      backgroundColor: palitra([i]),
       borderColor: palitra([i]),
-      hoverBorderWidth: 1,
-      hoverBackgroundColor: palitra([i], 'light'),
-      hoverBorderColor: palitra([i], 'dark'),
+      backgroundColor: hexToRgba((palitra([i])), 1),
+      pointBackgroundColor: 'white',
+      pointBorderColor: palitra([i]),
+      pointHoverBorderColor: 'white',
+      pointHoverBackgroundColor: palitra([i], 'dark')
     }));
     return chartData;
   }
 
   render() {
     const {width, height, data, options} = this.props;
-    return (<Bar data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
+    if (!data || !data.x || !data.y) return null;
+    return (<Line data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
   }
 }

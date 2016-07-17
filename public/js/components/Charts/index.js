@@ -1,18 +1,18 @@
 
-export {default as LineWidget} from './LineWidget';
-export {default as LineAreaWidget} from './LineAreaWidget';
-export {default as LineAreaStackedWidget} from './LineAreaStackedWidget';
+export {default as LineChart} from './LineChart';
+export {default as LineAreaChart} from './LineAreaChart';
+export {default as LineAreaStackedChart} from './LineAreaStackedChart';
 
-export {default as BarWidget} from './BarWidget';
-export {default as BarStackedWidget} from './BarStackedWidget';
-export {default as BarHorizontalWidget} from './BarHorizontalWidget';
-export {default as BarHorizontalStrackedWidget} from './BarHorizontalStrackedWidget';
+export {default as BarChart} from './BarChart';
+export {default as BarStackedChart} from './BarStackedChart';
+export {default as BarHorizontalChart} from './BarHorizontalChart';
+export {default as BarHorizontalStrackedChart} from './BarHorizontalStrackedChart';
 
-export {default as PieWidget} from './PieWidget';
-export {default as DoughnutWidget} from './DoughnutWidget';
-export {default as PolarAreaWidget} from './PolarAreaWidget';
+export {default as PieChart} from './PieChart';
+export {default as DoughnutChart} from './DoughnutChart';
+export {default as PolarAreaChart} from './PolarAreaChart';
 
-export {default as BubbleWidget} from './BubbleWidget';
+export {default as BubbleChart} from './BubbleChart';
 
 
 // npm install --save react-chartjs@"git+https://github.com/jhudson8/react-chartjs/#chartjs-v2"

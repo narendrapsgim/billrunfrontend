@@ -3,7 +3,7 @@ import {Line} from 'react-chartjs';
 import {palitra, hexToRgba, trend} from './helpers';
 
 
-export default class LineAreaWidget extends React.Component {
+export default class LineAreaChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -62,6 +62,7 @@ export default class LineAreaWidget extends React.Component {
 
   render() {
     const {width, height, data, options} = this.props;
+    if (!data || !data.x || !data.y) return null;
     return (<Line data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
   }
 }

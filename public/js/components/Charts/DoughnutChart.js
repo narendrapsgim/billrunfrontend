@@ -1,11 +1,14 @@
 import React from 'react';
-import {PolarArea} from 'react-chartjs';
+import {Doughnut} from 'react-chartjs';
 import {palitra} from './helpers';
-export default class PolarAreaWidget extends React.Component {
+
+
+export default class DoughnutChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
+
   getOptions(data, options = {}) {
     let defaultOptions = {
       responsive: true,
@@ -17,12 +20,6 @@ export default class PolarAreaWidget extends React.Component {
         display: (data.values.length > 1),
         position: 'right',
         boxWidth: 20
-      },
-      scale: {
-        ticks: {
-          beginAtZero: true
-        },
-        reverse: false
       },
     };
     return Object.assign(defaultOptions, options);
@@ -45,6 +42,7 @@ export default class PolarAreaWidget extends React.Component {
 
   render() {
     const {width, height, data, options} = this.props;
-    return (<PolarArea data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
+    if (!data || !data.values) return null;
+    return (<Doughnut data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
   }
 }

@@ -3,7 +3,7 @@ import {Pie} from 'react-chartjs';
 import {palitra} from './helpers';
 
 
-export default class PieWidget extends React.Component {
+export default class PieChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -41,6 +41,7 @@ export default class PieWidget extends React.Component {
   }
   render() {
     const {width, height, data, options} = this.props;
+    if (!data || !data.values) return null;
     return (<Pie data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
   }
 }
