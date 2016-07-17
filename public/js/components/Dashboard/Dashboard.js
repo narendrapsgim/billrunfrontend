@@ -17,6 +17,8 @@ import { getData } from '../../actions/dashboardActions';
 import TotalSubscribersWidget from './Widgets/TotalSubscribers'
 import NewSubscribersWidget from './Widgets/NewSubscribers'
 import ChurningSubscribersWidget from './Widgets/ChurningSubscribers'
+import ReveneWidget from './Widgets/Revene'
+import RevenueAvgPerSubscriberWidget from './Widgets/RevenueAvgPerSubscriber'
 
 class Dashboard extends Component {
 
@@ -71,6 +73,8 @@ class Dashboard extends Component {
           <TotalSubscribersWidget />
           <NewSubscribersWidget />
           <ChurningSubscribersWidget />
+          <ReveneWidget />
+          <RevenueAvgPerSubscriberWidget />
         </div>
       </div>
     );

@@ -1,22 +1,22 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {LineChart} from '../../Charts';
+import {LineAreaChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
 
 
-class NewSubscribers extends Component {
+class Revene extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      width: props.width || 350,
+      width: props.width || 545,
       height: props.height || 400
     }
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'newSubscribers', queries: this.prepereAgrigateQuery()}));
+    this.props.dispatch(getData({type: 'revene', queries: this.prepereAgrigateQuery()}));
   }
 
   prepereAgrigateQuery() {
@@ -28,29 +28,31 @@ class NewSubscribers extends Component {
     tempDate.setUTCDate(1);
     let dDate = new Date(tempDate.setUTCMonth(tempDate.getUTCMonth()-5));
 
+
+
     var matchActiveSibscribersAfterDDate = {
-      "$match": { "type": "subscriber", "creation_time": { "$gte": dDate }, "to": { "$gte": today } }
+      "$match": {"confirmation_time": {"$gte": dDate, "$lte": today}, "type": "rec"}
     };
-    var groupBySID = {
-      "$group": { "_id": "$sid", "creation_time": { "$first": "$creation_time" } }
+    var groupByAID = {
+      "$group": { "_id": "$aid", "date": { "$first": "$confirmation_time" }, "due":{"$sum":"$due"} }
     };
     var groupByCreated = {
-      "$group": { "_id": { "year": { "$year": "$creation_time" }, "month": { "$month": "$creation_time" } }, "count": { "$sum": 1 } }
+      "$group": { "_id": { "year": { "$year": "$date" }, "month": { "$month": "$date" } }, "due": { "$sum": "$due" } }
     };
     var projectDate = {
-      "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "count": "$count" }
+      "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "due": "$due" }
     };
     var sortByYearMonth = {
       "$sort": { "year": 1, "month": 1 }
     };
 
     var newSubscribersRequest = {
-      name: 'new_subscribers',
+      name: 'revenue',
       request: {
         api: "aggregate",
         params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify([matchActiveSibscribersAfterDDate, groupBySID, groupByCreated, projectDate, sortByYearMonth]) }
+          { collection: "bills" },
+          { pipelines: JSON.stringify([matchActiveSibscribersAfterDDate, groupByAID, groupByCreated, projectDate, sortByYearMonth]) }
         ]
       }
     };
@@ -68,15 +70,15 @@ class NewSubscribers extends Component {
     let monthsToShow = Array.from(Array(6), (v, k) => new Date(today.setMonth(today.getMonth() - 1)).getMonth() + 2).reverse();
 
     var formatedData = {
-      title: 'New Subscribers',
-      x: [ { label : 'Subsctibers', values : [] } ],
+      title: 'Revenue',
+      x: [ { label : 'Revenue', values : [] } ],
       y: []
     };
 
     chartData.forEach((dataset, i) => {
       if(typeof formatedData.x[i] == 'undefined'){
         formatedData.x[i] = {
-          label : 'New Accounts',
+          label : '',
           values : []
         }
       }
@@ -88,7 +90,7 @@ class NewSubscribers extends Component {
 
         let month = monthsNames[monthNumber-1];
         if(point.length > 0 ){
-          formatedData.x[i].values.push(point[0].count);
+          formatedData.x[i].values.push(point[0].due);
         } else {
           formatedData.x[i].values.push(0);
         }
@@ -122,7 +124,7 @@ class NewSubscribers extends Component {
     switch (chartData) {
       case undefined: return <PlaceHolderWidget/>;
       case null: return null;
-      default: return <LineChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
+      default: return <LineAreaChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
     }
   }
 
@@ -138,7 +140,7 @@ class NewSubscribers extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return {chartData: state.dashboard.newSubscribers};
+  return {chartData: state.dashboard.revene};
 }
 
-export default connect(mapStateToProps)(NewSubscribers);
+export default connect(mapStateToProps)(Revene);

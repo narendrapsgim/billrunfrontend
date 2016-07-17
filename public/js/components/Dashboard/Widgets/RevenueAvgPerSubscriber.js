@@ -1,22 +1,22 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {LineChart} from '../../Charts';
+import {LineAreaChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
 
 
-class TotalSubscribers extends Component {
+class RevenueAvgPerSubscriber extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      width: props.width || 350,
+      width: props.width || 545,
       height: props.height || 400
     }
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'totalSubscribers', queries: this.prepereAgrigateQuery()}));
+    this.props.dispatch(getData({type: 'revenueAvgPerSubscriber', queries: this.prepereAgrigateQuery()}));
   }
 
   prepereAgrigateQuery() {
@@ -27,6 +27,35 @@ class TotalSubscribers extends Component {
     var tempDate = new Date(today);
     tempDate.setUTCDate(1);
     let dDate = new Date(tempDate.setUTCMonth(tempDate.getUTCMonth()-5));
+
+
+
+    var matchActiveSibscribersAfterDDate = {
+      "$match": {"confirmation_time": {"$gte": dDate, "$lte": today}, "type": "rec"}
+    };
+    var groupByAID = {
+      "$group": { "_id": "$aid", "date": { "$first": "$confirmation_time" }, "due":{"$sum":"$due"} }
+    };
+    var groupByCreated = {
+      "$group": { "_id": { "year": { "$year": "$date" }, "month": { "$month": "$date" } }, "due": { "$sum": "$due" } }
+    };
+    var projectDate = {
+      "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "due": "$due" }
+    };
+    var sortByYearMonth = {
+      "$sort": { "year": 1, "month": 1 }
+    };
+
+    var newRevenueRequest = {
+      name: 'revenue',
+      request: {
+        api: "aggregate",
+        params: [
+          { collection: "bills" },
+          { pipelines: JSON.stringify([matchActiveSibscribersAfterDDate, groupByAID, groupByCreated, projectDate, sortByYearMonth]) }
+        ]
+      }
+    };
 
     var matchActiveSibscribersAfterDDate = {
       "$match": { "type": "subscriber", "creation_time": { "$gte": dDate }, "to": { "$gte": today } }
@@ -44,7 +73,7 @@ class TotalSubscribers extends Component {
       "$sort": { "year": 1, "month": 1 }
     };
 
-    var queryUrl = {
+    var newSubscribers = {
       name: 'new_subscribers',
       request: {
         api: "aggregate",
@@ -71,7 +100,7 @@ class TotalSubscribers extends Component {
       "$project" : {"count":1, "_id":0}
     };
 
-    var queryUrlTotal = {
+    var totalSubscribers = {
       name: 'total_subscribers',
       request: {
         api: "aggregate",
@@ -82,11 +111,11 @@ class TotalSubscribers extends Component {
       }
     };
 
-    return [queryUrl, queryUrlTotal];
+    return [newRevenueRequest, totalSubscribers, newSubscribers];
   }
 
   componentWillReceiveProps(nextProps) {
-    //console.log('TotalSubscribers componentWillReceiveProps : ', nextProps);
+    // console.log('TotalSubscribers componentWillReceiveProps : ', nextProps);
   }
 
   prepareChartData(chartData) {
@@ -94,14 +123,16 @@ class TotalSubscribers extends Component {
     let today = new Date();
     let monthsToShow = Array.from(Array(6), (v, k) => new Date(today.setMonth(today.getMonth() - 1)).getMonth() + 2).reverse();
 
-    let total = 0
+    let total = 0;
+    let revenues = [];
+    let newSubscribers = [];
     let formatedData = {
-      title: 'Total Subscribers',
+      title: 'Revenue Avg. per Subscriber',
       x: [ { label : 'Subsctibers', values : [] } ],
       y: []
     };
 
-    chartData.forEach((dataset, i) => {
+    chartData.forEach((dataset) => {
       if(dataset.name == 'total_subscribers') {
         if(dataset.data[0] && dataset.data[0].count){
           total = dataset.data[0].count;
@@ -109,23 +140,46 @@ class TotalSubscribers extends Component {
       }
     });
 
-    chartData.forEach((dataset, i) => {
+    chartData.forEach((dataset) => {
       if(dataset.name == 'new_subscribers') {
-
-        monthsToShow.forEach((monthNumber, k) => {
-
-          var point = dataset.data.filter((node, i) => {
-            return (monthNumber  == node.month)
-          });
-
-          let month = monthsNames[monthNumber-1];
-          if(point.length > 0 ){
-            total += point[0].count;
-          }
-          formatedData.x[i].values.push(total);
-          formatedData.y.push( month );
-        })
+        if(dataset.data){
+          newSubscribers = dataset.data;
+        }
       }
+    });
+    chartData.forEach((dataset) => {
+      if(dataset.name == 'revenue') {
+        if(dataset.data){
+          revenues = dataset.data;
+        }
+      }
+    });
+
+    monthsToShow.forEach((monthNumber, k) => {
+
+      var revenue = revenues.filter((node, revenue_index) => {
+        return (monthNumber  == node.month)
+      });
+
+      var newSubscriber = newSubscribers.filter((node, newSubscriber_index) => {
+        return (monthNumber  == node.month)
+      });
+
+
+      let month = monthsNames[monthNumber-1];
+
+      if(newSubscriber.length > 0 ){
+        total += newSubscriber[0].count;
+      }
+
+      let rev = 0;
+      if(revenue.length > 0 ){
+        rev = revenue[0].due / total;
+        rev = Math.round(rev);
+      }
+
+      formatedData.x[0].values.push(rev);
+      formatedData.y.push( month );
     });
 
     return formatedData;
@@ -154,7 +208,7 @@ class TotalSubscribers extends Component {
     switch (chartData) {
       case undefined: return <PlaceHolderWidget/>;
       case null: return null;
-      default: return <LineChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
+      default: return <LineAreaChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
     }
   }
 
@@ -170,7 +224,7 @@ class TotalSubscribers extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return {chartData: state.dashboard.totalSubscribers};
+  return {chartData: state.dashboard.revenueAvgPerSubscriber};
 }
 
-export default connect(mapStateToProps)(TotalSubscribers);
+export default connect(mapStateToProps)(RevenueAvgPerSubscriber);

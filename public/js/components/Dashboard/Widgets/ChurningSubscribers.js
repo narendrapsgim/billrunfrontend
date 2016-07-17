@@ -21,11 +21,11 @@ class ChurningSubscribers extends Component {
 
   prepereAgrigateQuery() {
     let today = new Date();
-    today.setUTCDate(1);
     today.setUTCHours(0);
     today.setUTCMinutes(0);
     today.setUTCSeconds(0);
     var tempDate = new Date(today);
+    tempDate.setUTCDate(1);
     let dDate = new Date(tempDate.setUTCMonth(tempDate.getUTCMonth()-5));
 
     var matchActiveSibscribers = {
