@@ -30,7 +30,7 @@ export default function (state = defaultState, action) {
     return Immutable.fromJS({customer});
 
   case UPDATE_SUBSCRIBER_FIELD:
-    return state.setIn(['customer', field_id], value);
+    return state.setIn(['customer', action.idx, field_id], value);
 
   case SAVE_SUBSCRIBER:
     const sub = state.toJS();

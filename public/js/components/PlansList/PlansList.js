@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import RaisedButton from 'material-ui/RaisedButton';
-import ReactPaginate from 'react-paginate';
 import Filter from '../Filter';
 import Field from '../Field';
+import Pager from '../Pager';
 
 import { getPlans } from '../../actions/plansActions';
 
@@ -47,8 +47,7 @@ class PlansList extends Component {
     return { page, size, filter, sort };
   }
 
-  handlePageClick(data) {
-    let page = data.selected + 1;
+  handlePageClick(page) {
     this.setState({page}, () => {
       this.props.dispatch(getPlans(this.buildQuery()))
     });
@@ -103,6 +102,8 @@ class PlansList extends Component {
       </TableRow>
     ));
 
+    let prevClass = "previous" + (this.state.page > 0 ? '' : ' disabled') ;
+    
     return (
       <div className="PlansList">
         <div className="row" style={{marginBottom: 10}}>
@@ -130,16 +131,7 @@ class PlansList extends Component {
           <TableFooter>
             <TableRow>
               <TableRowColumn style={{textAlign: 'center'}}>
-                <ReactPaginate previousLabel={"previous"}
-                               nextLabel={"next"}
-                               breakLabel={<a>...</a>}
-                               pageNum={this.state.page + 5}
-                               marginPagesDisplayed={2}
-                               pageRangeDisplayed={5}
-                               clickCallback={this.handlePageClick}
-                               containerClassName={"pagination"}
-                               subContainerClassName={"pages pagination"}
-                               activeClassName={"active"} />
+                <Pager onClick={this.handlePageClick} />
               </TableRowColumn>
             </TableRow>
           </TableFooter>

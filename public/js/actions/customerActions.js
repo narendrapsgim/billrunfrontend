@@ -23,11 +23,14 @@ function savedCustomer() {
 export function saveSubscriber(action, data) {
   let saveUrl = '/admin/save';
 
+  const account = data.find(obj => {
+    return obj.get('type') === "account";
+  });
   var formData = new FormData();
-  if (action !== 'new') formData.append('id', data.get('id'));
+  if (action !== 'new') formData.append('id', account.getIn(['_id', '$id']));
   formData.append("coll", 'subscribers');
   formData.append("type", action);
-  formData.append("data", JSON.stringify(data.toJS()));
+  formData.append("data", JSON.stringify(account.toJS()));
 
   return (dispatch) => {
     dispatch(showProgressBar());
@@ -109,9 +112,10 @@ export function getCustomer(customer_id) {
   };
 }
 
-export function updateCustomerField(field_id, value) {
+export function updateCustomerField(idx, field_id, value) {
   return {
     type: UPDATE_SUBSCRIBER_FIELD,
+    idx,
     field_id,
     value
   };

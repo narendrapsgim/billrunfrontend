@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Field from '../Field';
 import { connect } from 'react-redux';
 import { getPlans } from '../../actions/plansActions';
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 
 class New extends Component {
   constructor(props) {
@@ -13,7 +15,7 @@ class New extends Component {
   }
   
   render() {
-    const { settings, onChange, plans, entity } = this.props;
+    const { settings, onChange, plans, entity, onSave, onCancel } = this.props;
     if (!settings) return (<div></div>);
 
     const available_plans = [(<option value="-1" disabled>Choose Plan</option>),
@@ -51,6 +53,20 @@ class New extends Component {
             <select id="plan" className="form-control" defaultValue="-1" onChange={onChange}>
               { available_plans }
             </select>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-3" style={{marginTop: 15}}>
+            <RaisedButton
+                label={'Save'}
+                primary={true}
+                onTouchTap={onSave}
+            />
+            <FlatButton
+                label="Cancel"
+                onTouchTap={onCancel}
+                style={{marginRight: 12}}
+            />
           </div>
         </div>
       </div>

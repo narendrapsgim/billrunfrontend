@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getProducts } from '../../actions/productsActions';
 
 import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import ReactPaginate from 'react-paginate';
+import Pager from '../Pager';
 import RaisedButton from 'material-ui/RaisedButton';
 import Filter from '../Filter';
 import Field from '../Field';
@@ -45,8 +45,7 @@ class ProductsList extends Component {
     return { page, size, filter };
   }  
   
-  handlePageClick(data) {
-    let page = data.selected + 1;
+  handlePageClick(page) {
     this.setState({page}, () => {
       this.props.dispatch(getProducts(this.buildQuery()))
     });
@@ -110,16 +109,7 @@ class ProductsList extends Component {
           <TableFooter>
             <TableRow>
               <TableRowColumn style={{textAlign: 'center'}}>
-                <ReactPaginate previousLabel={"previous"}
-                               nextLabel={"next"}
-                               breakLabel={<a>...</a>}
-                               pageNum={this.state.page + 5}
-                               marginPagesDisplayed={2}
-                               pageRangeDisplayed={5}
-                               clickCallback={this.handlePageClick}
-                               containerClassName={"pagination"}
-                               subContainerClassName={"pages pagination"}
-                               activeClassName={"active"} />
+                <Pager onClick={this.handlePageClick} />
               </TableRowColumn>
             </TableRow>
           </TableFooter>
