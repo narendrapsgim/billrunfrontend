@@ -4,6 +4,7 @@ export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
 export const SAVE_SUBSCRIBER = 'SAVE_SUBSCRIBER';
 export const GOT_SUBSCRIBER_SETTINGS = 'GOT_SUBSCRIBER_SETTINGS';
 export const GET_NEW_CUSTOMER = 'GET_NEW_CUSTOMER';
+export const CLEAR_CUSTOMER = 'CLEAR_CUSTOMER';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -13,11 +14,40 @@ let axiosInstance = axios.create({
   baseURL: globalSetting.serverUrl
 });
 
-export function saveSubscriber(newCustomer = false) {
+function savedCustomer() {
   return {
-    type: SAVE_SUBSCRIBER,
-    newCustomer
+    type: 'test'
   };
+}
+
+export function saveSubscriber(action, data) {
+  let saveUrl = '/admin/save';
+
+  const account = data.find(obj => {
+    return obj.get('type') === "account";
+  });
+  var formData = new FormData();
+  if (action !== 'new') formData.append('id', account.getIn(['_id', '$id']));
+  formData.append("coll", 'subscribers');
+  formData.append("type", action);
+  formData.append("data", JSON.stringify(account.toJS()));
+
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.post(saveUrl, formData).then(
+      resp => {
+        dispatch(savedCustomer());
+        dispatch(hideProgressBar());
+      }
+    ).catch(error => {
+      console.log(error);
+      dispatch(hideProgressBar());
+    });
+  };    
+  /* return {
+     type: SAVE_SUBSCRIBER,
+     newCustomer
+     }; */
 }
 
 
@@ -35,8 +65,10 @@ function gotCustomer(customer) {
   }
 }
 
-function fetchCustomers() {  
-  let fetchUrl = `/api/find?collection=subscribers&query={"type": "account"}`;
+function fetchCustomers(query) {
+  let q = JSON.parse(query.filter);
+  q.type = 'account';
+  let fetchUrl = `/api/find?collection=subscribers&query=${JSON.stringify(q)}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -68,9 +100,9 @@ function fetchCustomer(aid) {
 }
 
 
-export function getCustomers() {
+export function getCustomers(query = {filter: JSON.stringify({})}) {
   return dispatch => {
-    return dispatch(fetchCustomers());
+    return dispatch(fetchCustomers(query));
   };
 }
 
@@ -80,45 +112,24 @@ export function getCustomer(customer_id) {
   };
 }
 
-function gotSubscriberSettings(settings) {
-  return {
-    type: GOT_SUBSCRIBER_SETTINGS,
-    settings
-  };
-}
-
-function fetchSubscriberSettings() {
-  let fetchUrl = `/api/settings?category=subscribers&data={}`;
-  return (dispatch) => {
-    dispatch(showProgressBar());
-    let request = axiosInstance.get(fetchUrl).then(
-      resp => {
-        dispatch(gotSubscriberSettings(resp.data.details));
-        dispatch(hideProgressBar());
-      }
-    ).catch(error => {
-      console.log(error);
-      dispatch(hideProgressBar());
-    });
-  };  
-}
-
-export function getSubscriberSettings() {
-  return dispatch => {
-    return dispatch(fetchSubscriberSettings());
-  };
-}
-
-export function updateCustomerField(field_id, value) {
+export function updateCustomerField(idx, field_id, value) {
   return {
     type: UPDATE_SUBSCRIBER_FIELD,
+    idx,
     field_id,
     value
   };
 }
 
-export function getNewCustomer() {
+export function getNewCustomer(aid = false) {
   return {
-    type: GET_NEW_CUSTOMER
+    type: GET_NEW_CUSTOMER,
+    aid
   };
+}
+
+export function clearCustomer() {
+  return {
+    type: CLEAR_CUSTOMER
+  }
 }

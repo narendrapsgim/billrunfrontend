@@ -16,6 +16,12 @@ export default class Filter extends Component {
       filters: {},
     };
   }
+
+  componentWillMount() {
+    if (this.props.base) {
+      this.setState({filters: this.props.base}, () => { this.onClickFilterBtn() });
+    }
+  }
   
   onChangeFilterField(e) {
     const { id, value } = e.target;
@@ -49,6 +55,7 @@ export default class Filter extends Component {
   onClickFilterBtn() {
     const { onFilter } = this.props;
     const filter = this.buildQueryString();
+    console.log(filter);
     onFilter(filter);
   }
 

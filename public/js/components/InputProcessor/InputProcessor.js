@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -144,7 +144,10 @@ class InputProcessor extends Component {
     const { stepIndex } = this.state;
     if (stepIndex > 0) return this.setState({stepIndex: stepIndex - 1, finished: 0});
     let r = confirm("are you sure you want to stop editing input processor?");
-    if (r) this.props.onCancel();
+    if (r) {
+      this.props.dispatch(clearInputProcessor());
+      this.props.onCancel();
+    }
   }
   
   render() {
@@ -159,7 +162,7 @@ class InputProcessor extends Component {
     ];
 
     return (
-      <div className="InputProcessor container">
+      <div className="InputProcessor">
         <h3>Input Processor</h3>
         <Stepper activeStep={stepIndex}>
           <Step>

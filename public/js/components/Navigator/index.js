@@ -16,7 +16,7 @@ const routes = [
   {to: "/dashboard", label: "Dashboard"},
   {to: "/plans", label: "Plans"},  
   {to: "/products", label: "Products"},
-  {to: "/subscribers_list", label: "Subscribers"},
+  {to: "/subscribers_list", label: "Customers"},
   {to: "/usage", label: "Usage"},
   {to: "/invoices", label: "Invoices"},
   {to: "/log", label: "Log"},
@@ -31,13 +31,15 @@ export default class Navigator extends Component {
   render() {
     let buttons = routes.map((route, key) => (
       <Link to={route.to} key={key} activeClassName='active'>
-        <FlatButton label={route.label} labelStyle={{textTransform: "none"}} style={{minWidth: "180px", maxWidth: "240px"}} />
+        <FlatButton label={route.label} labelStyle={{textTransform: "none"}} style={{maxWidth: "240px"}} />
       </Link>
     ));
 
     return (
       <div className="navigator">
-        {buttons}
+        <center>
+          {buttons}
+        </center>
       </div>
     );
   }

@@ -16,6 +16,7 @@ class UsageList extends Component {
     this.buildQuery = this.buildQuery.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onFilter = this.onFilter.bind(this);
+    this.onChangeSort = this.onChangeSort.bind(this);
     
     this.state = {
       page: 1,
@@ -33,45 +34,59 @@ class UsageList extends Component {
     return { page, size, filter };
   }
 
+  onFilter(filter) {
+    this.setState({filter}, () => {
+      this.props.dispatch(getUsages(this.buildQuery()))
+    });
+  }
+
   handlePageClick(data) {
     let page = data.selected + 1;
     this.setState({page}, () => {
       this.props.dispatch(getUsages(this.buildQuery()))
     });
   }
-
-  onFilter(filter) {
-    this.setState({filter}, () => {
+  
+  onChangeSort(e) {
+    const { value } = e.target;
+    this.setState({sort: value}, () => {
       this.props.dispatch(getUsages(this.buildQuery()))
     });
   }
-  
+
   render() {
     let { usages } = this.props;
 
     const fields = [
-      {id: "aid", placeholder: "Account", type: "number"},
+      {id: "aid", placeholder: "Customer", type: "number"},
+      {id: "sid", placeholder: "Subscription", type: "number"},
       {id: "plan", placeholder: "Plan"}
     ];
-    
+
+    const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),
+                         ...fields.map((field, idx) => (
+                           <option value={field.id} key={idx}>{field.placeholder}</option>
+                         ))];
+
+    const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
     return (
       <div className="UsagesList">
-        <div className="row">
+        <div className="row" style={{marginBottom: 10}}>
           <div className="col-md-5">
-            <Filter fields={fields} onFilter={this.onFilter} />
+            <Filter fields={fields} onFilter={this.onFilter} base={base} />
+            {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
+            { sort_fields }
+            </select> */}
           </div>
         </div>
-        <Table fixedHeader={true}
-               fixedFooter={true}
-               selectable={false}
-               style={{marginTop: 10}}
+        <Table selectable={false}
                height={'500px'}>
           <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
-              <TableHeaderColumn tooltip="Account">Account</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Subscription">Subscription</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Plan">Plan</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Charge">Charge</TableHeaderColumn>
+              <TableHeaderColumn>Customer</TableHeaderColumn>
+              <TableHeaderColumn>Subscription</TableHeaderColumn>
+              <TableHeaderColumn>Plan</TableHeaderColumn>
+              <TableHeaderColumn>Charge</TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody displayRowCheckbox={false} stripedRows={true}>
