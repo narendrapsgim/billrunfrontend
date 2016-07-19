@@ -4,7 +4,7 @@ import moment from 'moment';
 import {LineAreaChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {getMonthName, getMonthsToDisplay} from '../Widgets/helper';
+import {getMonthName, getMonthsToDisplay, chartOptionCurrencyAxesLabel, chartOptionCurrencyTooltipLabel} from '../Widgets/helper';
 
 
 class Revene extends Component {
@@ -78,12 +78,21 @@ class Revene extends Component {
       legend: {
         display: false
       },
+      tooltips: {
+          enabled: true,
+          mode: 'single',
+          callbacks: {
+            title: function (tooltipItem, data) { return null; },
+            label: chartOptionCurrencyTooltipLabel
+          }
+      },
       scales: {
         yAxes: [
           {
             display: true,
             ticks: {
-              beginAtZero: false
+              beginAtZero: false,
+              callback: chartOptionCurrencyAxesLabel
             }
           }
         ]

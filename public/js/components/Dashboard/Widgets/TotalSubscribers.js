@@ -84,7 +84,7 @@ class TotalSubscribers extends Component {
     };
 
     let totalSubscribersDataset = chartData.find((dataset, i) => dataset.name == "total_subscribers");
-    if(totalSubscribersDataset){
+    if(totalSubscribersDataset && totalSubscribersDataset.data && totalSubscribersDataset.data[0]){
       total = totalSubscribersDataset.data[0].count;
     }
 

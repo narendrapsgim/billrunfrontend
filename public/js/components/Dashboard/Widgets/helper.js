@@ -36,6 +36,28 @@ export function getToDate(to = new Date()){
   return to;
 }
 
+
+export function chartOptionCurrencyAxesLabel(value, index, values) {
+  if(value == 0 ){
+    return 0;
+  } else if (value > 1000) {
+    return (value/1000) + "K" + globalSetting.currency;
+  } else {
+    return value + globalSetting.currency;
+  }
+}
+
+export function chartOptionCurrencyTooltipLabel(tooltipItems, data) {
+  var value = tooltipItems.yLabel;
+  if(value == 0 ){
+    return 0;
+  } else if (value > 1000) {
+    return (value/1000) + "K" + globalSetting.currency;
+  } else {
+    return value + globalSetting.currency;
+  }
+}
+
 export function drawDataOnPie() {
     var self = this.chart.config;
     var ctx = this.chart.ctx;
@@ -94,7 +116,8 @@ export function drawDataOnPie() {
         dx = centerx + lradius * Math.cos(langle),
         dy = centery + lradius * Math.sin(langle),
         val = Math.round(dataset.data[idx] / total * 100);
-        ctx.fillText(dataset.data[idx] + " (" + val + '%)', dx, dy);
+        var suffix = (typeof chart.config.options.valueSuffix !== 'undefined') ? chart.config.options.valueSuffix : '';
+        ctx.fillText(dataset.data[idx] + suffix + " (" + val + '%)', dx, dy);
         ctx.fillText(chart.config.data.labels[idx], dx, dy+15);
       }
       ctx.restore();

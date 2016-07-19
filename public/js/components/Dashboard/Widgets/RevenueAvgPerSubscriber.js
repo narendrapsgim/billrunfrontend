@@ -4,7 +4,7 @@ import moment from 'moment';
 import {LineAreaChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {getMonthName, getMonthsToDisplay} from '../Widgets/helper';
+import {getMonthName, getMonthsToDisplay, chartOptionCurrencyAxesLabel, chartOptionCurrencyTooltipLabel} from '../Widgets/helper';
 
 
 class RevenueAvgPerSubscriber extends Component {
@@ -100,7 +100,7 @@ class RevenueAvgPerSubscriber extends Component {
     let total = 0;
     let formatedData = {
       title: 'Revenue Avg. per Subscriber',
-      x: [ { label : 'Subsctibers', values : [] } ],
+      x: [ { label : 'Avg. Revenue', values : [] } ],
       y: []
     };
 
@@ -131,12 +131,21 @@ class RevenueAvgPerSubscriber extends Component {
       legend: {
         display: false
       },
+      tooltips: {
+          enabled: true,
+          mode: 'single',
+          callbacks: {
+            title: function (tooltipItem, data) { return null; },
+            label: chartOptionCurrencyTooltipLabel
+          }
+      },
       scales: {
         yAxes: [
           {
             display: true,
             ticks: {
-              beginAtZero: false
+              beginAtZero: false,
+              callback: chartOptionCurrencyAxesLabel
             }
           }
         ]
