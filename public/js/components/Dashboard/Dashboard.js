@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CircularProgress from 'material-ui/CircularProgress';
+import DashboardIcon from 'material-ui/svg-icons/action/dashboard'
 import moment from 'moment';
 import { getData } from '../../actions/dashboardActions';
 import TotalSubscribersWidget from './Widgets/TotalSubscribers'
@@ -10,6 +11,8 @@ import ReveneWidget from './Widgets/Revene'
 import RevenueAvgPerSubscriberWidget from './Widgets/RevenueAvgPerSubscriber'
 import SubsPerPlanWidget from './Widgets/SubsPerPlan'
 import SubsPerPlanCurrentMonthWidget from './Widgets/SubsPerPlanCurrentMonth'
+import RevenuePerPlanWidget from './Widgets/RevenuePerPlan'
+import RevenuePerPlanCurrentMonthWidget from './Widgets/RevenuePerPlanCurrentMonth'
 import {getFromDate, getToDate} from './Widgets/helper';
 
 class Dashboard extends Component {
@@ -39,8 +42,8 @@ class Dashboard extends Component {
       <div className="dashboard" >
         <div className="container" style={this.styles.dashboardHeaderContainer}>
           <div className="header" style={this.styles.dashboardHeader}>
-            <h3 style={this.styles.dashboardHeaderTitle}>Dashboard</h3>
-              <h5 style={this.styles.dashboardHeaderDates}>{moment(fromDate).format(globalSetting.dateFormat)} - {moment(toDate).format(globalSetting.dateFormat)}</h5>
+            <h3 style={this.styles.dashboardHeaderTitle}><DashboardIcon color={'white'} style={{verticalAlign: 'top', marginRight: '10px'}}/>Dashboard</h3>
+            <h5 style={this.styles.dashboardHeaderDates}>{moment(fromDate).format(globalSetting.dateFormat)} - {moment(toDate).format(globalSetting.dateFormat)}</h5>
           </div>
         </div>
         <div className="container" >
@@ -51,6 +54,8 @@ class Dashboard extends Component {
           <ChurningSubscribersWidget fromDate={fromDate} toDate={toDate}/>
           <SubsPerPlanWidget fromDate={fromDate} toDate={toDate}/>
           <SubsPerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate}/>
+          <RevenuePerPlanWidget fromDate={fromDate} toDate={toDate}/>
+          <RevenuePerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate}/>
         </div>
       </div>
     );
