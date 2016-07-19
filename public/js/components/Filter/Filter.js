@@ -55,7 +55,6 @@ export default class Filter extends Component {
   onClickFilterBtn() {
     const { onFilter } = this.props;
     const filter = this.buildQueryString();
-    console.log(filter);
     onFilter(filter);
   }
 

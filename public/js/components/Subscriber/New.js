@@ -18,7 +18,7 @@ class New extends Component {
     const { settings, onChange, plans, entity, onSave, onCancel } = this.props;
     if (!settings) return (<div></div>);
 
-    const available_plans = [(<option value="-1" disabled>Choose Plan</option>),
+    const available_plans = [(<option value="-1" disabled key={-1}>Choose Plan</option>),
       ...plans.map((plan, key) => (
         <option value={plan.get('name')} key={key}>{plan.get('name')}</option>
       ))

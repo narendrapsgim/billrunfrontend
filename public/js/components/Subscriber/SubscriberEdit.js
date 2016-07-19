@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 import Tabs from 'react-bootstrap/lib/Tabs';
 import Tab from 'react-bootstrap/lib/Tab';
 
-import { getCustomer, clearCustomer, getNewCustomer, updateCustomerField, saveSubscriber, getSubscriberSettings } from '../../actions/customerActions';
+import { getCustomer, clearCustomer, getNewCustomer, updateAccountField, updateCustomerField, saveSubscriber, getSubscriberSettings } from '../../actions/customerActions';
 import { getSettings } from '../../actions/settingsActions';
 
 import New from './New';
@@ -17,6 +17,7 @@ class SubscriberEdit extends Component {
   constructor(props) {
     super(props);
 
+    this.onChangeAccountFieldValue = this.onChangeAccountFieldValue.bind(this);
     this.onChangeFieldValue = this.onChangeFieldValue.bind(this);
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
@@ -44,10 +45,15 @@ class SubscriberEdit extends Component {
   componentWillUnmount() {
     this.props.dispatch(clearCustomer());
   }
+
+  onChangeFieldValue(e) {
+    const { value, id } = e.target;
+    this.props.dispatch(updateCustomerField(id, value));
+  }
   
-  onChangeFieldValue(idx, e) {
+  onChangeAccountFieldValue(idx, e) {
     let { value, id } = e.target;
-    this.props.dispatch(updateCustomerField(idx, id, value));
+    this.props.dispatch(updateAccountField(idx, id, value));
   }
 
   onUnsubscribe(sid) {
@@ -82,7 +88,7 @@ class SubscriberEdit extends Component {
   render() {
     const { items, settings } = this.props;
     const { newCustomer, aid } = this.state;
-    const view = this.state.newCustomer ? (<New entity={items} aid={aid} settings={settings} onChange={this.onChangeFieldValue} onSave={this.onSave} onCancel={this.onCancel} />) : (<Edit items={items} settings={settings} onChange={this.onChangeFieldValue} onClickNewSubscription={this.onClickNewSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
+    const view = this.state.newCustomer ? (<New entity={items} aid={aid} settings={settings} onChange={this.onChangeFieldValue} onSave={this.onSave} onCancel={this.onCancel} />) : (<Edit items={items} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
 
     return (
       <div className="SubscriberEdit container">

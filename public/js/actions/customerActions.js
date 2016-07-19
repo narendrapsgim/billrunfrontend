@@ -1,6 +1,7 @@
 export const GOT_CUSTOMER = 'GOT_CUSTOMER';
 export const GOT_CUSTOMERS = 'GOT_CUSTOMERS';
-export const UPDATE_SUBSCRIBER_FIELD = 'UPDATE_SUBSCRIBER_FIELD';
+export const UPDATE_ACCOUNT_FIELD = 'UPDATE_ACCOUNT_FIELD';
+export const UPDATE_CUSTOMER_FIELD = 'UPDATE_CUSTOMER_FIELD';
 export const SAVE_SUBSCRIBER = 'SAVE_SUBSCRIBER';
 export const GOT_SUBSCRIBER_SETTINGS = 'GOT_SUBSCRIBER_SETTINGS';
 export const GET_NEW_CUSTOMER = 'GET_NEW_CUSTOMER';
@@ -112,9 +113,17 @@ export function getCustomer(customer_id) {
   };
 }
 
-export function updateCustomerField(idx, field_id, value) {
+export function updateCustomerField(field_id, value) {
   return {
-    type: UPDATE_SUBSCRIBER_FIELD,
+    type: UPDATE_CUSTOMER_FIELD,
+    field_id,
+    value
+  };
+}
+
+export function updateAccountField(idx, field_id, value) {
+  return {
+    type: UPDATE_ACCOUNT_FIELD,
     idx,
     field_id,
     value
