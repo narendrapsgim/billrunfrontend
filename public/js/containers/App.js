@@ -38,7 +38,7 @@ export default class App extends Component {
             </div>
           <footer className="footer">
             <div className="container-fluid">
-              <p>
+              <p style={{color: "white"}}>
                 (c) 2016 Billrun All Right Reserved
               </p>
             </div>

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'react-router'
 import FlatButton from 'material-ui/FlatButton';
 import activeComponent from 'react-router-active-component';
+import DropDownMenu from 'material-ui/DropDownMenu';
+import MenuItem from 'material-ui/MenuItem';
 
 import SettingsInputComponent from 'material-ui/svg-icons/action/settings-input-component';
 import Dashboard from 'material-ui/svg-icons/action/dashboard';
@@ -12,10 +14,9 @@ import View from '../../views';
 
 const routes = [
   {to: "/dashboard", label: "Dashboard"},
-  {to: "/plans", label: "Plans"},
-  {to: "/plan_setup", label: "Plan Setup"},
+  {to: "/plans", label: "Plans"},  
   {to: "/products", label: "Products"},
-  {to: "/subscribers_list", label: "Subscribers"},
+  {to: "/subscribers_list", label: "Customers"},
   {to: "/usage", label: "Usage"},
   {to: "/invoices", label: "Invoices"},
   {to: "/log", label: "Log"},
@@ -27,20 +28,18 @@ export default class Navigator extends Component {
     super(props);
   }
 
-  isMenuItemVisible(neddedPpermission) {
-    return  _.intersection(neddedPpermission, this.props.users.roles).length > 0;
-  }
-
   render() {
     let buttons = routes.map((route, key) => (
       <Link to={route.to} key={key} activeClassName='active'>
-        <FlatButton label={route.label} labelStyle={{textTransform: "none"}} style={{minWidth: "180px", maxWidth: "240px"}} />
+        <FlatButton label={route.label} labelStyle={{textTransform: "none"}} style={{maxWidth: "240px"}} />
       </Link>
     ));
 
     return (
       <div className="navigator">
-        {buttons}
+        <center>
+          {buttons}
+        </center>
       </div>
     );
   }

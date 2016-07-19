@@ -1,3 +1,5 @@
+export const SET_NAME = 'SET_NAME';
+export const SET_DELIMITER_TYPE = 'SET_DELIMITER_TYPE';
 export const SET_DELIMITER = 'SET_DELIMITER';
 export const SET_FIELDS = 'SET_HEADERS';
 export const SET_FIELD_MAPPING = 'SET_FIELD_MAPPING';
@@ -9,6 +11,8 @@ export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
+export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
+export const CLEAR_INPUT_PROCESSOR = 'CLEAR_INPUT_PROCESSOR';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -25,14 +29,18 @@ function gotProcessorSettings(settings) {
   };
 }
 
-function fetchProcessorSettings() {
+function fetchProcessorSettings(file_type) {
   const convert = (settings) => {
     const { parser, processor,
             customer_identification_fields,
             rate_calculators,
             receiver } = settings;
 
+    const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
+
     return {
+      file_type: settings.file_type,
+      delimiter_type: parser.type,
       delimiter: parser.separator,
       fields: parser.structure,
       processor: Object.assign({}, processor, {
@@ -46,11 +54,11 @@ function fetchProcessorSettings() {
       }),
       customer_identification_fields,
       rate_calculators,
-      receiver
+      receiver: connections
     };
   };
 
-  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"csv_separated"}`;
+  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"${file_type}"}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -65,9 +73,23 @@ function fetchProcessorSettings() {
   };
 }
 
-export function getProcessorSettings() {
+export function getProcessorSettings(file_type) {
   return (dispatch) => {
-    return dispatch(fetchProcessorSettings());
+    return dispatch(fetchProcessorSettings(file_type));
+  };
+}
+
+export function setName(file_type) {
+  return {
+    type: SET_NAME,
+    file_type
+  };
+}
+
+export function setDelimiterType(delimiter_type) {
+  return {
+    type: SET_DELIMITER_TYPE,
+    delimiter_type
   };
 }
 
@@ -82,6 +104,14 @@ export function setFields(fields) {
   return {
     type: SET_FIELDS,
     fields
+  };
+}
+
+export function setFieldWidth(field, width) {
+  return {
+    type: SET_FIELD_WIDTH,
+    field,
+    width
   };
 }
 
@@ -139,11 +169,11 @@ export function saveInputProcessorSettings(state) {
         receiver = state.get('receiver');
 
   let settings = {
-    "file_type": "csv_separated",
+    "file_type": state.get('file_type'),
     "parser": {
-      "type": "separator",
+      "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
-      "structure": state.get('fields')
+      "structure": state.get('delimiter_type') === "fixed" ? state.get('field_widths') : state.get('fields')
     },
     "processor": {
       "type": "Usage",
@@ -159,7 +189,12 @@ export function saveInputProcessorSettings(state) {
     },
     "customer_identification_fields": customer_identification_fields.toJS(),
     "rate_calculators": rate_calculators.toJS(),
-    "receiver": receiver.toJS()
+    "receiver": {
+      "type": "ftp",
+      "connections": [
+        receiver.toJS()
+      ]
+    }
   };
 
   let setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settings)}`;
@@ -176,13 +211,6 @@ export function saveInputProcessorSettings(state) {
   };  
 }
 
-export function setInputProcessor(input_processor) {
-  return {
-    type: SET_INPUT_PROCESSOR,
-    input_processor
-  };
-}
-
 function gotInputProcessors(input_processors) {
   return {
     type: GOT_INPUT_PROCESSORS,
@@ -191,8 +219,7 @@ function gotInputProcessors(input_processors) {
 }
 
 function fetchInputProcessors() {
-
-  let setUrl = `/api/settings?category=file_types&data={}`;
+  let setUrl = '/api/settings?category=file_types&data={}';
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(
@@ -210,5 +237,17 @@ function fetchInputProcessors() {
 export function getInputProcessors() {
   return (dispatch) => {
     return dispatch(fetchInputProcessors());
+  };
+}
+
+export function newInputProcessor() {
+  return {
+    type: 'NEW_PROCESSOR'    
+  };
+}
+
+export function clearInputProcessor() {
+  return {
+    type: CLEAR_INPUT_PROCESSOR
   };
 }

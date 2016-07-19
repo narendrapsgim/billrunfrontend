@@ -11,6 +11,8 @@ const defaultState = {
     TrialPrice: '',
     Each: '',
     EachPeriod: "Month",
+    from: moment().unix() * 1000,
+    to: moment().add(1, 'years').unix() * 1000,
     recurring_prices: [
       {
         Cycle: '',
@@ -22,66 +24,6 @@ const defaultState = {
     To: ''
   }
 };
-
-function getToDate(settings, from, cycle) {
-  let amt = settings.EachPeriod.toLowerCase() + 's';
-  let each = parseInt(settings.Each, 10);
-  if (!cycle) {
-    return moment(from).add(100, "years").format();
-  }
-
-  return moment(from).add(parseInt(cycle, 10) * each, amt).format();
-}
-
-function buildPlanFromState(state) {
-  let { basic_settings } = state;
-  let prices = [];
-
-  let { TrialPrice, TrialCycle } = basic_settings;
-  if (TrialPrice && TrialCycle) {
-    let trial_from = moment().format();
-    let trial = {
-      price: parseInt(TrialPrice, 10),
-      duration: {
-        from: trial_from,
-        to: getToDate(basic_settings, trial_from, TrialCycle)
-      }
-    };
-    prices.push(trial);
-  }
-  
-  let p = _.reduce(basic_settings.recurring_prices, (acc, price, idx) => {
-    if (!price.PeriodicalRate) return acc;
-
-    let from = moment().format();
-    let to = moment();
-
-    if (acc.length && acc.length > idx) {
-      from = moment(acc[idx]['duration']['to']).format();
-    } else if (idx > 0) {
-      from = moment(acc[idx - 1]['duration']['to']).format();
-    }
-    to = getToDate(basic_settings, from, price.Cycle);
-
-    acc.push({
-      price: parseInt(price.PeriodicalRate, 10),
-      duration: {
-        from,
-        to
-      }
-    });
-    return acc;
-  }, prices);
-
-  return {
-    name: basic_settings.PlanName,
-    price: prices,
-    recurring: {
-      duration: parseInt(basic_settings.Cycle, 10),
-      unit: basic_settings.EachPeriod.toLowerCase()
-    }
-  };
-}
 
 export default function (state = defaultState, action) {
   switch (action.type) {
@@ -139,10 +81,8 @@ export default function (state = defaultState, action) {
     case actions.GOT_PLAN:
       return action.plan;
 
-    case actions.SAVE_PLAN:
-      let plan = buildPlanFromState(state);
-      console.log("saving plan", plan);
-      return state;
+    case actions.CLEAR_PLAN:
+      return defaultState;
       
     default:
       return state;

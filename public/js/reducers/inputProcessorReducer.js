@@ -1,6 +1,8 @@
 import Immutable from 'immutable';
 
-import { GOT_PROCESSOR_SETTINGS,
+import { SET_NAME,
+         SET_DELIMITER_TYPE,
+         GOT_PROCESSOR_SETTINGS,
          SET_FIELDS,
          SET_DELIMITER,
          SET_FIELD_MAPPING,
@@ -9,11 +11,14 @@ import { GOT_PROCESSOR_SETTINGS,
          SET_CUSETOMER_MAPPING,
          SET_RATING_FIELD,
          SET_RECEIVER_FIELD,
+         SET_FIELD_WIDTH,
+         CLEAR_INPUT_PROCESSOR,
          GOT_INPUT_PROCESSORS } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   delimiter: '',
   fields: [],
+  field_widths: {},
   processor: {
     usaget_mapping: []
   },
@@ -33,20 +38,26 @@ let defaultState = Immutable.fromJS({
 });
 
 export default function (state = defaultState, action) {
-  const { field, mapping } = action;
+  const { field, mapping, width } = action;
   switch (action.type) {
-    case SET_INPUT_PROCESSOR:
-      return Immutable.fromJS(action.input_processor);
-
     case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
+      
+    case SET_NAME:
+      return state.set('file_type', action.file_type);
 
+    case SET_DELIMITER_TYPE:
+      return state.set('delimiter_type', action.delimiter_type);
+      
     case SET_DELIMITER:
       return state.set('delimiter', action.delimiter);
 
     case  SET_FIELDS:
       return state.set('fields', Immutable.fromJS(action.fields));
 
+    case SET_FIELD_WIDTH:
+      return state.setIn(['field_widths', field], parseInt(width, 10));
+      
     case SET_FIELD_MAPPING:
       return state.setIn(['processor', field], mapping);
 
@@ -84,7 +95,8 @@ export default function (state = defaultState, action) {
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
       
+    case CLEAR_INPUT_PROCESSOR:
     default:
-      return state;
+      return defaultState;
   }
 }

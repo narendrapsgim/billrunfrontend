@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Toggle from 'material-ui/Toggle';
-import DatePicker from 'material-ui/DatePicker';
+import DateTimeField from 'react-bootstrap-datetimepicker';
 
 import Field from '../Field';
 
@@ -20,14 +20,16 @@ export default class Plan extends Component {
           onChangeRecurringPriceCheckFieldValue,
           onCheckEndOfDays,
           onChangeDateFieldValue,
+          onChangeFieldCheckValue,
           onAddTariff } = this.props;
 
+    console.log(basicSettings);
     let transaction_options = ["Every Month", "Every Week"].map((op, key) => (
       <option value={op} key={key}>{op}</option>
     ));
 
     /* TODO: Put into separate config file */
-    let each_period_options = ["Week", "Month", "Quarter", "Year"].map((op, key) => (
+    let each_period_options = ["Week", "Month", "Year"].map((op, key) => (
       <option value={op} key={key}>{op}</option>
     ));
 
@@ -37,81 +39,80 @@ export default class Plan extends Component {
           <h4>Basic Settings</h4>
           <div className="row">
             <div className="col-md-4">
-              <label for="PlanName">Plan Name</label>
+              <label for="PlanName">Name</label>
               <Field id="PlanName" onChange={onChangeFieldValue.bind(this, "basicSettings")} value={basicSettings.PlanName} />
             </div>
             <div className="col-md-3" >
-              <label for="PlanCode">Plan Code</label>
+              <label for="PlanCode">Code</label>
               <Field  id="PlanCode" value={basicSettings.PlanCode} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
           </div>
           <div className="row">
             <div className="col-md-7">
-              <label for="PlanDescription">Plan Description</label>
+              <label for="PlanDescription">Description</label>
               <textarea id="PlanDescription" className="form-control" value={basicSettings.PlanDescription} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
           </div>
           <div className="row">
-            <div className="col-xs-1">
-              <label for="Each">Each</label>
+            <div className="col-md-2">
+              <label for="Each">Billing Frequency</label>
               <input type="number" id="Each" className="form-control" value={basicSettings.Each} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
-            <div className="col-xs-1">
+            <div className="col-md-1">
               <label for="EachPeriod">&nbsp;</label>
               <select id="EachPeriod" className="form-control" value={basicSettings.EachPeriod} onChange={onChangeFieldValue.bind(this, "basicSettings")}>
                 { each_period_options }
               </select>
             </div>
+            <div className="col-md-2">
+              <label>Charging Mode</label>
+              <select id="ChargingMode" className="form-control" value={basicSettings.ChargingMode} onChange={onChangeFieldValue.bind(this, "basicSettings")}>
+                <option value="upfront">Upfront</option>
+                <option value="arrears">Arrears</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div className="Trial">
-          <h4>Trial</h4>
+        <div className="row">
+          <div className="col-md-2">
+            <label>Valid From</label>
+            <DateTimeField id="from" value={basicSettings.from}  onChange={onChangeDateFieldValue.bind(this, "basicSettings", "from")} />
+          </div>
+          <div className="col-md-2">
+            <label>To</label>
+            <DateTimeField id="to"   value={basicSettings.to}    onChange={onChangeDateFieldValue.bind(this, "basicSettings", "to")} />
+          </div>
+        </div>
+        <div className="Trial" style={{marginTop: 20}}>
+          <h4>Trial Period</h4>
           <div className="row">
-            <div className="col-xs-1">
+            <div className="col-md-2">
+              <label for="TrialCycle">Number of Cycles</label>
+              <input type="number" id="TrialCycle" className="form-control" value={basicSettings.TrialCycle} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
+            </div>
+            <div className="col-md-1">
               <label for="TrialPrice">Price</label>
               <Field id="TrialPrice" onChange={onChangeFieldValue.bind(this, "basicSettings")} value={basicSettings.TrialPrice} />
             </div>
-            <div className="col-xs-1">
-              <label for="TrialCycle">Billing Cycles</label>
-              <input type="number"  id="TrialCycle" className="form-control" value={basicSettings.TrialCycle} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
-            </div>
           </div>
         </div>
-        <div className="PlanRecurring">
-          <h4>Plan Recurring</h4>
+        <div className="PlanRecurring" style={{marginTop: 20}}>
+          <h4>Recurring Charges</h4>
           { basicSettings.recurring_prices.map((price, key) => (
               <div className="row" key={key}>
+                <div className="col-md-2">
+                  <label for="Cycle">Number of Cycles</label>
+                  <input type="number" id="Cycle" className="form-control" min="0" value={price.Cycle} onChange={onChangeRecurringPriceFieldValue.bind(this, "Cycle", key)} />
+                </div>
                 <div className="col-xs-1">
-                  <label for="PeriodicalRate">Tariff</label>
+                  <label for="PeriodicalRate">Price</label>
                   <Field id="PeriodicalRate" onChange={onChangeRecurringPriceFieldValue.bind(this, "PeriodicalRate", key)} value={price.PeriodicalRate} />
                 </div>
-                <div className="col-xs-1">
-                  <label for="Cycle"># of Cycles</label>
-                  <input type="number" id="Cycle" className="form-control" min="0" value={price.Cycle} onChange={onChangeRecurringPriceFieldValue.bind(this, "Cycle", key)} disabled={price.EndOfDays} />
-                </div>
-                {(() => {  /* only show "end of days" toggle for last price */
-                   if (key === (basicSettings.recurring_prices.length - 1)) {
-                     return (
-                       <div className="col-xs-3">
-                         <div className="checkbox">
-                           <label>
-                             <input type="checkbox"
-                                    defaultValue={price.EndOfDays}
-                                    checked={price.EndOfDays}
-                                    id="EndOfDays"
-                                    onChange={onChangeRecurringPriceCheckFieldValue.bind(this, "EndOfDays", key)} />
-                             Till the End of Days
-                           </label>
-                         </div>
-                       </div>
-                     )}})()}
               </div>
           ))}
           <div className="row">
             <div className="col-xs-3">
-              <FloatingActionButton mini={true} style={{margin: "20px"}} onMouseUp={onAddTariff}>
-                <ContentAdd />
-              </FloatingActionButton>
+              <button className="btn btn-primary" onClick={onAddTariff} style={{marginTop: 10}}>Add Charges</button>
             </div>
           </div>
         </div>

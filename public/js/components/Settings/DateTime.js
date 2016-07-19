@@ -20,7 +20,7 @@ export default class DateTime extends Component {
     ));
 
     return (
-      <div className="DateTimeSettings contents" style={{border: "1px solid #C0C0C0", padding: "45px"}}>
+      <div className="DateTimeSettings bordered-container" style={{padding: "45px"}}>
         <div className="row">
           <div className="col-md-2">
             <label for="date_format">Date Format</label>

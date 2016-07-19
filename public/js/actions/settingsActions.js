@@ -5,8 +5,7 @@ import { showProgressBar, hideProgressBar } from './progressbarActions';
 import axios from 'axios';
 
 let axiosInstance = axios.create({
-  withCredentials: true,
-  baseUrl: globalSetting.serverUrl
+  withCredentials: true
 });
 
 function gotSettings(settings) {
@@ -16,7 +15,7 @@ function gotSettings(settings) {
   };
 }
 
-function fetchSettings() {
+function fetchSettings(category) {
   const dummy_settings = {
     datetime: {
       date_format: "",
@@ -32,7 +31,7 @@ function fetchSettings() {
     }
   };
   
-  let fetchUrl = `/api/find?collection=settings`;
+  let fetchUrl = `${globalSetting.serverUrl}/api/settings?category=${category}&data={}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -41,16 +40,15 @@ function fetchSettings() {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      /* TODO: REMOVE */
-      dispatch(gotSettings(dummy_settings));
+      /* TODO */
       dispatch(hideProgressBar());
     });
   };
 }
 
-export function getSettings() {
-  return dispatch => {
-    return dispatch(fetchSettings());
+export function getSettings(category="") {
+  return (dispatch) => {
+    return dispatch(fetchSettings(category));
   };
 }
 

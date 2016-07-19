@@ -2,10 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { getCustomer, updateCustomerField, saveSubscriber } from '../../actions/customerActions';
+import Tabs from 'react-bootstrap/lib/Tabs';
+import Tab from 'react-bootstrap/lib/Tab';
+
+import { getCustomer, clearCustomer, getNewCustomer, updateCustomerField, saveSubscriber, getSubscriberSettings } from '../../actions/customerActions';
+import { getSettings } from '../../actions/settingsActions';
+
+import New from './New';
+import Edit from './Edit';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
-import Subscriber from './Subscriber';
 
 class SubscriberEdit extends Component {
   constructor(props) {
@@ -15,18 +21,33 @@ class SubscriberEdit extends Component {
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.onUnsubscribe = this.onUnsubscribe.bind(this);
+    this.onClickNewSubscription = this.onClickNewSubscription.bind(this);
+
+    this.state = {
+      newCustomer: false
+    };
   }
 
   componentWillMount() {
-    let { subscriber_id } = this.props.location.query;
-    if (subscriber_id) {
-      this.props.dispatch(getCustomer(subscriber_id));
+    const { aid } = this.props.location.query;
+    if (aid) {
+      this.setState({newCustomer: false});
+      this.props.dispatch(getCustomer(aid));
+      
+    } else {
+      this.setState({newCustomer: true});
+      this.props.dispatch(getNewCustomer());
     }
+    this.props.dispatch(getSettings('subscribers'));
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(clearCustomer());
   }
   
-  onChangeFieldValue(e) {
+  onChangeFieldValue(idx, e) {
     let { value, id } = e.target;
-    this.props.dispatch(updateCustomerField(id, value));
+    this.props.dispatch(updateCustomerField(idx, id, value));
   }
 
   onUnsubscribe(sid) {
@@ -35,31 +56,39 @@ class SubscriberEdit extends Component {
   }
   
   onSave() {
-    this.props.dispatch(saveSubscriber());
+    const action = this.state.newCustomer ? "new" : this.props.location.query.action;
+    this.props.dispatch(saveSubscriber(action, this.props.items));
+    if (this.state.aid) {
+      this.props.dispatch(getCustomer(this.state.aid));
+      this.setState({newCustomer: false});
+    }
   }
 
   onCancel() {
+    const { aid, newCustomer } = this.state;
+    if (aid && newCustomer) {
+      this.props.dispatch(getCustomer(aid));
+      this.setState({newCustomer: false});
+      return;
+    }
     browserHistory.goBack();
   }
-  
+
+  onClickNewSubscription(aid) {
+    this.setState({aid, newCustomer: true});
+    this.props.dispatch(getNewCustomer(aid));
+  }
+    
   render() {
+    const { items, settings } = this.props;
+    const { newCustomer, aid } = this.state;
+    const view = this.state.newCustomer ? (<New entity={items} aid={aid} settings={settings} onChange={this.onChangeFieldValue} onSave={this.onSave} onCancel={this.onCancel} />) : (<Edit items={items} settings={settings} onChange={this.onChangeFieldValue} onClickNewSubscription={this.onClickNewSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
+
     return (
       <div className="SubscriberEdit container">
-        <h3>Subscriber</h3>
+        <h3>Customer</h3>
         <div className="contents bordered-container">
-          <Subscriber onChangeFieldValue={this.onChangeFieldValue} onUnsubscribe={this.onUnsubscribe} />
-        </div>
-        <div style={{marginTop: 12, float: "right"}}>
-          <FlatButton
-              label="Cancel"
-              onTouchTap={this.onCancel}
-              style={{marginRight: 12}}
-          />
-          <RaisedButton
-              label={'Save'}
-              primary={true}
-              onTouchTap={this.onSave}
-          />
+          { view }
         </div>
       </div>
     );
@@ -67,7 +96,8 @@ class SubscriberEdit extends Component {
 }
 
 function mapStateToProps(state) {
-  return state;
+  return {items: state.subscriber.get('customer'),
+          settings: state.settings};
 }
 
 export default connect(mapStateToProps)(SubscriberEdit);

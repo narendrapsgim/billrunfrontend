@@ -13,8 +13,8 @@ export default class CurrencyTax extends Component {
     ));
 
     return (
-      <div className="CurrencyTaxSettings contents"
-           style={{border: "1px solid #C0C0C0", padding: "45px"}}>
+      <div className="CurrencyTaxSettings bordered-container"
+           style={{padding: "45px"}}>
         <div className="Currency">
           <div className="row">
             <div className="col-md-1">

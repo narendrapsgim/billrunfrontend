@@ -30,7 +30,7 @@ function fetchProducts(query) {
   };
 }
 
-export function getProducts(query = {page: 1, size: 10, filter: ""}) {
+export function getProducts(query = {page: 0, size: 10, filter: ""}) {
   return dispatch => {
     return dispatch(fetchProducts(query));
   };

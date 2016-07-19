@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getProducts } from '../../actions/productsActions';
 
 import {Table, TableBody, TableHeader, TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import ReactPaginate from 'react-paginate';
+import Pager from '../Pager';
 import RaisedButton from 'material-ui/RaisedButton';
 import Filter from '../Filter';
 import Field from '../Field';
@@ -18,7 +18,7 @@ class ProductsList extends Component {
     this.onFilter = this.onFilter.bind(this);
 
     this.state = {
-      page: 1,
+      page: 0,
       size: 10,
       filter: ""
     };
@@ -33,7 +33,10 @@ class ProductsList extends Component {
     let id = products.valueSeq().get(cell_idx).getIn(['_id', '$id']);;
     this.context.router.push({
       pathname: 'product_setup',
-      query: {product_id: id}
+      query: {
+        product_id: id,
+        action: 'update'
+      }
     });
   }
 
@@ -42,15 +45,19 @@ class ProductsList extends Component {
     return { page, size, filter };
   }  
   
-  handlePageClick(data) {
-    let page = data.selected + 1;
+  handlePageClick(page) {
     this.setState({page}, () => {
       this.props.dispatch(getProducts(this.buildQuery()))
     });
   }
 
   onNewProduct() {
-    this.context.router.push(`product_setup`);
+    this.context.router.push({
+      pathname: `product_setup`,
+      query: {
+        action: 'new'
+      }
+    });
   }
 
   onFilter(filter) {
@@ -80,15 +87,16 @@ class ProductsList extends Component {
 
     return (
       <div className="ProductsList">
-        <div className="row">
-          <div style={{float: "left"}}>
-            <h4>Products</h4>
+        <div className="row" style={{marginBottom: 10}}>
+          <div className="col-md-5">
+            <Filter onFilter={this.onFilter} fields={fields} />
           </div>
-          <div style={{float: "right"}}>
-            <RaisedButton primary={true} label="New" onMouseUp={this.onNewProduct} />
+          <div className="col-md-5">
+            <div style={{float: "right"}}>
+              <RaisedButton primary={true} label="New" onMouseUp={this.onNewProduct} />
+            </div>
           </div>
         </div>
-        <Filter onFilter={this.onFilter} fields={fields} />
         <Table onCellClick={this.onClickCell}>
           <TableHeader displaySelectAll={true}>
             <TableRow>
@@ -101,16 +109,7 @@ class ProductsList extends Component {
           <TableFooter>
             <TableRow>
               <TableRowColumn style={{textAlign: 'center'}}>
-                <ReactPaginate previousLabel={"previous"}
-                               nextLabel={"next"}
-                               breakLabel={<a>...</a>}
-                               pageNum={this.state.page + 5}
-                               marginPagesDisplayed={2}
-                               pageRangeDisplayed={5}
-                               clickCallback={this.handlePageClick}
-                               containerClassName={"pagination"}
-                               subContainerClassName={"pages pagination"}
-                               activeClassName={"active"} />
+                <Pager onClick={this.handlePageClick} />
               </TableRowColumn>
             </TableRow>
           </TableFooter>
