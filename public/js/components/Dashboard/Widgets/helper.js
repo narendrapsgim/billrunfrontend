@@ -19,7 +19,7 @@ export function getFromDate(before, type, from = new Date()){
   from.setUTCMinutes(0);
   from.setUTCSeconds(0);
   var tempDate = new Date(from);
-  // tempDate.setUTCDate(1);
+  tempDate.setUTCDate(1); // calc from beginning on tyhe month
   let dDate = from;
   switch (type) {
     case 'years':   return new Date(tempDate.setUTCFullYear(tempDate.getUTCFullYear() - before));
