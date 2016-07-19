@@ -13,7 +13,7 @@ const styles = {
   info: {backgroundColor: Colors.blue300},
   warning: {backgroundColor: Colors.amber300},
   error: {backgroundColor: Colors.red300},
-  wrapper : {marginBottom: '70px'}
+  wrapper : {}
 
 }
 class StatusBar extends Component {
