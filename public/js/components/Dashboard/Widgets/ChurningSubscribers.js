@@ -104,7 +104,7 @@ class ChurningSubscribers extends Component {
     const { chartData } = this.props;
 
     return (
-      <div style={{ display: 'inline-block', margin: '20px', width: this.state.width, height: this.state.height }}>
+      <div style={{ display: 'inline-block', margin: '10px', padding: '10px', width: this.state.width, height: this.state.height, backgroundColor: 'white' }}>
         {this.renderContent(chartData)}
       </div>
     );

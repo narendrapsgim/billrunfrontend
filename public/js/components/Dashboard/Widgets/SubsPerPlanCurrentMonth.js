@@ -54,7 +54,7 @@ class SubsPerPlanCurrentMonth extends Component {
   prepareChartData(chartData) {
     const {toDate} = this.props;
     var formatedData = {
-      title: 'Subscribers per Plan  from 1 to '+toDate.getUTCDate() + " / " + getMonthName(toDate.getUTCMonth()+1),
+      title: 'Subscribers per Plan ' +  getMonthName(toDate.getUTCMonth()+1) + ", " + '01 to ' + ("0" + toDate.getUTCDate()).slice(-2),
       labels: [],
       values: []
     };
@@ -96,7 +96,7 @@ class SubsPerPlanCurrentMonth extends Component {
     const { chartData } = this.props;
 
     return (
-      <div style={{ display: 'inline-block', margin: '20px', width: this.state.width, height: this.state.height }}>
+      <div style={{ display: 'inline-block', margin: '10px', padding: '10px', width: this.state.width, height: this.state.height, backgroundColor: 'white' }}>
         {this.renderContent(chartData)}
       </div>
     );

@@ -32,7 +32,7 @@ class Dashboard extends Component {
   };
 
   render() {
-    let fromDate = getFromDate(6, 'months');
+    let fromDate = getFromDate(5, 'months');
     let toDate = getToDate();
 
     return (

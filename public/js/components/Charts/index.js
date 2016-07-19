@@ -15,7 +15,7 @@ export {default as PolarAreaChart} from './PolarAreaChart';
 export {default as BubbleChart} from './BubbleChart';
 
 
-// npm install --save react-chartjs@"git+https://github.com/jhudson8/react-chartjs/#chartjs-v2"
+// npm install --save react-chartjs@"git+https://github.com/jhudson8/react-chartjs/#chartjs-v2" (not this)
 // npm install --save react-chartjs@"git+https://github.com/jhudson8/react-chartjs/tree/chartjs-v2"
 // npm install chart.js --save
 // manually appay patch from : https://github.com/jhudson8/react-chartjs/pull/122/files
