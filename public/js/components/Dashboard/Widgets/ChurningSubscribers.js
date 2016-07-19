@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import moment from 'moment';
 import {LineChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
+import {getMonthName, getMonthsToDisplay} from '../Widgets/helper';
 
 
 class ChurningSubscribers extends Component {
@@ -20,55 +22,38 @@ class ChurningSubscribers extends Component {
   }
 
   prepereAgrigateQuery() {
-    let today = new Date();
-    today.setUTCHours(0);
-    today.setUTCMinutes(0);
-    today.setUTCSeconds(0);
-    var tempDate = new Date(today);
-    tempDate.setUTCDate(1);
-    let dDate = new Date(tempDate.setUTCMonth(tempDate.getUTCMonth()-5));
+    const {fromDate, toDate} = this.props;
 
-    var matchActiveSibscribers = {
-      "$match": { "type": "subscriber", "to": { "$lte": today, "$gte": dDate} }
-    };
-    var groupBySID = {
+    var churningSubscribersQuery = [{
+      "$match": { "type": "subscriber", "to": { "$lte": toDate, "$gte": fromDate} }
+    },{
       "$group": { "_id": "$sid", "to": { "$last": "$to" } }
-    };
-    var groupByCreated = {
-      "$group": {
-        "_id": { "year": { "$year": "$to" }, "month": { "$month": "$to" } },
-        "count": { "$sum": 1 }
-      }
-    };
-    var projectDate = {
+    },{
+      "$group": { "_id": { "year": { "$year": "$to" }, "month": { "$month": "$to" } }, "count": { "$sum": 1 } }
+    },{
       "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "count": "$count" }
-    };
-    var sortByYearMonth = {
+    },{
       "$sort": { "year": 1, "month": 1 }
-    };
+    }];
 
-    var queryUrl = {
-      name: 'churningSubscribers',
+    var queries = [{
+      name: 'churning_subscribers',
       request: {
         api: "aggregate",
         params: [
           { collection: "subscribers" },
-          { pipelines: JSON.stringify([matchActiveSibscribers, groupBySID, groupByCreated, projectDate, sortByYearMonth]) }
+          { pipelines: JSON.stringify(churningSubscribersQuery) }
         ]
       }
-    };
+    }];
 
-    return [queryUrl];
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // console.log('TotalSubscribers componentWillReceiveProps : ', nextProps);
+    return queries;
   }
 
   prepareChartData(chartData) {
-    let monthsNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    let today = new Date();
-    let monthsToShow = Array.from(Array(6), (v, k) => new Date(today.setMonth(today.getMonth() - 1)).getMonth() + 2).reverse();
+    const {fromDate, toDate} = this.props;
+    let monthes = parseInt(moment(toDate).diff(moment(fromDate), 'months', true)) + 1;
+    let monthsToDisplay = getMonthsToDisplay(monthes);
 
     var formatedData = {
       title: 'Churning Subscribers',
@@ -76,22 +61,13 @@ class ChurningSubscribers extends Component {
       y: []
     };
 
-    chartData.forEach((dataset, i) => {
-
-      monthsToShow.forEach((monthNumber, k) => {
-
-        var point = dataset.data.filter((node, i) => {
-          return (monthNumber  == node.month)
-        });
-
-        let month = monthsNames[monthNumber-1];
-        if(point.length > 0 ){
-          formatedData.x[i].values.push(point[0].count);
-        } else {
-          formatedData.x[i].values.push(0);
-        }
-        formatedData.y.push( month );
-      })
+    let churningSubscribersDataset = chartData.find((dataset, i) => dataset.name == "churning_subscribers");
+    //TODO - fix check YEAR
+    monthsToDisplay.forEach((monthNumber, k) => {
+      var point = churningSubscribersDataset.data.find((node, i) => monthNumber == node.month );
+      let data = (point) ? point.count : 0 ;
+      formatedData.x[0].values.push(data);
+      formatedData.y.push( getMonthName(monthNumber) );
     });
 
     return formatedData;
@@ -107,7 +83,7 @@ class ChurningSubscribers extends Component {
           {
             display: true,
             ticks: {
-              beginAtZero: false
+              beginAtZero: true,
             }
           }
         ]

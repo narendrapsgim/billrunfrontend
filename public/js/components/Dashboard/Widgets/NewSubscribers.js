@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import moment from 'moment';
 import {LineChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
+import {getMonthName, getMonthsToDisplay} from '../Widgets/helper';
 
 
 class NewSubscribers extends Component {
@@ -20,52 +22,38 @@ class NewSubscribers extends Component {
   }
 
   prepereAgrigateQuery() {
-    let today = new Date();
-    today.setUTCHours(0);
-    today.setUTCMinutes(0);
-    today.setUTCSeconds(0);
-    var tempDate = new Date(today);
-    tempDate.setUTCDate(1);
-    let dDate = new Date(tempDate.setUTCMonth(tempDate.getUTCMonth()-5));
+    const {fromDate, toDate} = this.props;
 
-    var matchActiveSibscribersAfterDDate = {
-      "$match": { "type": "subscriber", "creation_time": { "$gte": dDate }, "to": { "$gte": today } }
-    };
-    var groupBySID = {
+    var newSubscribersQuery = [{
+      "$match": { "type": "subscriber", "creation_time": { "$gte": fromDate }, "to": { "$gte": toDate } }
+    },{
       "$group": { "_id": "$sid", "creation_time": { "$first": "$creation_time" } }
-    };
-    var groupByCreated = {
+    },{
       "$group": { "_id": { "year": { "$year": "$creation_time" }, "month": { "$month": "$creation_time" } }, "count": { "$sum": 1 } }
-    };
-    var projectDate = {
+    },{
       "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "count": "$count" }
-    };
-    var sortByYearMonth = {
+    },{
       "$sort": { "year": 1, "month": 1 }
-    };
+    }];
 
-    var newSubscribersRequest = {
+    var queries = [{
       name: 'new_subscribers',
       request: {
         api: "aggregate",
         params: [
           { collection: "subscribers" },
-          { pipelines: JSON.stringify([matchActiveSibscribersAfterDDate, groupBySID, groupByCreated, projectDate, sortByYearMonth]) }
+          { pipelines: JSON.stringify(newSubscribersQuery) }
         ]
       }
-    };
+    }];
 
-    return [newSubscribersRequest];
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // console.log('TotalSubscribers componentWillReceiveProps : ', nextProps);
+    return queries;
   }
 
   prepareChartData(chartData) {
-    let monthsNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    let today = new Date();
-    let monthsToShow = Array.from(Array(6), (v, k) => new Date(today.setMonth(today.getMonth() - 1)).getMonth() + 2).reverse();
+    const {fromDate, toDate} = this.props;
+    let monthes = parseInt(moment(toDate).diff(moment(fromDate), 'months', true)) + 1;
+    let monthsToDisplay = getMonthsToDisplay(monthes);
 
     var formatedData = {
       title: 'New Subscribers',
@@ -73,27 +61,13 @@ class NewSubscribers extends Component {
       y: []
     };
 
-    chartData.forEach((dataset, i) => {
-      if(typeof formatedData.x[i] == 'undefined'){
-        formatedData.x[i] = {
-          label : 'New Accounts',
-          values : []
-        }
-      }
-      monthsToShow.forEach((monthNumber, k) => {
-
-        var point = dataset.data.filter((node, i) => {
-          return (monthNumber  == node.month)
-        });
-
-        let month = monthsNames[monthNumber-1];
-        if(point.length > 0 ){
-          formatedData.x[i].values.push(point[0].count);
-        } else {
-          formatedData.x[i].values.push(0);
-        }
-        formatedData.y.push( month );
-      })
+    let newSubscribersDataset = chartData.find((dataset, i) => dataset.name == "new_subscribers");
+    //TODO - fix check YEAR
+    monthsToDisplay.forEach((monthNumber, k) => {
+      var point = newSubscribersDataset.data.find((node, i) => monthNumber == node.month );
+      let data = (point) ? point.count : 0 ;
+      formatedData.x[0].values.push(data);
+      formatedData.y.push( getMonthName(monthNumber) );
     });
 
     return formatedData;

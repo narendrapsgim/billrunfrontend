@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import moment from 'moment';
 import {LineAreaChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
+import {getMonthName, getMonthsToDisplay} from '../Widgets/helper';
 
 
 class Revene extends Component {
@@ -20,54 +22,38 @@ class Revene extends Component {
   }
 
   prepereAgrigateQuery() {
-    let today = new Date();
-    today.setUTCHours(0);
-    today.setUTCMinutes(0);
-    today.setUTCSeconds(0);
-    var tempDate = new Date(today);
-    tempDate.setUTCDate(1);
-    let dDate = new Date(tempDate.setUTCMonth(tempDate.getUTCMonth()-5));
+    const {fromDate, toDate} = this.props;
 
-
-
-    var matchActiveSibscribersAfterDDate = {
-      "$match": {"confirmation_time": {"$gte": dDate, "$lte": today}, "type": "rec"}
-    };
-    var groupByAID = {
+    var revenueQuery = [{
+      "$match": {"confirmation_time": {"$gte": fromDate, "$lte": toDate}, "type": "rec"}
+    },{
       "$group": { "_id": "$aid", "date": { "$first": "$confirmation_time" }, "due":{"$sum":"$due"} }
-    };
-    var groupByCreated = {
+    },{
       "$group": { "_id": { "year": { "$year": "$date" }, "month": { "$month": "$date" } }, "due": { "$sum": "$due" } }
-    };
-    var projectDate = {
+    },{
       "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "due": "$due" }
-    };
-    var sortByYearMonth = {
+    },{
       "$sort": { "year": 1, "month": 1 }
-    };
+    }];
 
-    var newSubscribersRequest = {
+    var queries = [{
       name: 'revenue',
       request: {
         api: "aggregate",
         params: [
           { collection: "bills" },
-          { pipelines: JSON.stringify([matchActiveSibscribersAfterDDate, groupByAID, groupByCreated, projectDate, sortByYearMonth]) }
+          { pipelines: JSON.stringify(revenueQuery) }
         ]
       }
-    };
+    }];
 
-    return [newSubscribersRequest];
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // console.log('TotalSubscribers componentWillReceiveProps : ', nextProps);
+    return queries;
   }
 
   prepareChartData(chartData) {
-    let monthsNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    let today = new Date();
-    let monthsToShow = Array.from(Array(6), (v, k) => new Date(today.setMonth(today.getMonth() - 1)).getMonth() + 2).reverse();
+    const {fromDate, toDate} = this.props;
+    let monthes = parseInt(moment(toDate).diff(moment(fromDate), 'months', true)) + 1;
+    let monthsToDisplay = getMonthsToDisplay(monthes);
 
     var formatedData = {
       title: 'Revenue',
@@ -75,27 +61,13 @@ class Revene extends Component {
       y: []
     };
 
-    chartData.forEach((dataset, i) => {
-      if(typeof formatedData.x[i] == 'undefined'){
-        formatedData.x[i] = {
-          label : '',
-          values : []
-        }
-      }
-      monthsToShow.forEach((monthNumber, k) => {
-
-        var point = dataset.data.filter((node, i) => {
-          return (monthNumber  == node.month)
-        });
-
-        let month = monthsNames[monthNumber-1];
-        if(point.length > 0 ){
-          formatedData.x[i].values.push(point[0].due);
-        } else {
-          formatedData.x[i].values.push(0);
-        }
-        formatedData.y.push( month );
-      })
+    let dataset = chartData.find((dataset, i) => dataset.name == "revenue");
+    //TODO - fix check YEAR
+    monthsToDisplay.forEach((monthNumber, k) => {
+      var point = dataset.data.find((node, i) => monthNumber == node.month );
+      let data = (point) ? point.due : 0 ;
+      formatedData.x[0].values.push(data);
+      formatedData.y.push( getMonthName(monthNumber) );
     });
 
     return formatedData;
