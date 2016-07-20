@@ -8,6 +8,8 @@ export const GET_NEW_CUSTOMER = 'GET_NEW_CUSTOMER';
 export const CLEAR_CUSTOMER = 'CLEAR_CUSTOMER';
 
 import axios from 'axios';
+import Immutable from 'immutable';
+import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 
 let axiosInstance = axios.create({
@@ -22,20 +24,22 @@ function savedCustomer() {
 }
 
 export function saveSubscriber(action, data) {
-  let saveUrl = '/admin/save';
+  let saveUrl;
 
-  const account = data.find(obj => {
-    return obj.get('type') === "account";
-  });
-  var formData = new FormData();
-  if (action !== 'new') formData.append('id', account.getIn(['_id', '$id']));
-  formData.append("coll", 'subscribers');
-  formData.append("type", action);
-  formData.append("data", JSON.stringify(account.toJS()));
+  if (Immutable.List.isList(data)) {
+    const account = data.find(obj => {
+      return obj.get('type') === "account";
+    });
+    saveUrl = `/api/subscribers?method=update&type=account&query={"aid": ${account.get('aid')}}&update=${JSON.stringify(account.toJS())}`;
+  } else if (data.get('aid')) {
+    saveUrl = `/api/subscribers?method=create&type=subscriber&subscriber=${JSON.stringify(data.toJS())}`;
+  } else {
+    saveUrl = `/api/subscribers?method=create&type=account&subscriber=${JSON.stringify(data.toJS())}`;
+  }
 
   return (dispatch) => {
     dispatch(showProgressBar());
-    let request = axiosInstance.post(saveUrl, formData).then(
+    let request = axiosInstance.post(saveUrl).then(
       resp => {
         dispatch(savedCustomer());
         dispatch(hideProgressBar());
@@ -67,9 +71,12 @@ function gotCustomer(customer) {
 }
 
 function fetchCustomers(query) {
-  let q = JSON.parse(query.filter);
-  q.type = 'account';
-  let fetchUrl = `/api/find?collection=subscribers&query=${JSON.stringify(q)}`;
+  let sort = query.sort ? `&sort={"${query.sort}":1}` : '';
+  let size = query.size ? `&size=${query.size}` : '';
+  let page = query.page ? `&page=${query.page}` : '';
+  let q = query.filter ? `&query=${query.filter}` : '';
+  let fetchUrl = `/api/find?collection=subscribers&${size}${sort}${page}${q}`;
+
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -101,7 +108,7 @@ function fetchCustomer(aid) {
 }
 
 
-export function getCustomers(query = {filter: JSON.stringify({})}) {
+export function getCustomers(query = {page: 0, size: 10, filter: "", sort: ""}) {
   return dispatch => {
     return dispatch(fetchCustomers(query));
   };

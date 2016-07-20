@@ -31,6 +31,7 @@ class SubscriberEdit extends Component {
 
   componentWillMount() {
     const { aid } = this.props.location.query;
+    this.props.dispatch(getSettings('subscribers'));
     if (aid) {
       this.setState({newCustomer: false});
       this.props.dispatch(getCustomer(aid));
@@ -39,13 +40,16 @@ class SubscriberEdit extends Component {
       this.setState({newCustomer: true});
       this.props.dispatch(getNewCustomer());
     }
-    this.props.dispatch(getSettings('subscribers'));
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearCustomer());
   }
 
+  onChangeTypeaheadFieldValue(id, val) {
+    this.props.dispatch(updateCustomerField(id, val[0].name));
+  }
+  
   onChangeFieldValue(e) {
     const { value, id } = e.target;
     this.props.dispatch(updateCustomerField(id, value));
@@ -88,7 +92,7 @@ class SubscriberEdit extends Component {
   render() {
     const { items, settings } = this.props;
     const { newCustomer, aid } = this.state;
-    const view = this.state.newCustomer ? (<New entity={items} aid={aid} settings={settings} onChange={this.onChangeFieldValue} onSave={this.onSave} onCancel={this.onCancel} />) : (<Edit items={items} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
+    const view = this.state.newCustomer ? (<New entity={items} aid={aid} settings={settings} onChange={this.onChangeFieldValue} onChangeTypeaheadField={this.onChangeTypeaheadFieldValue} onSave={this.onSave} onCancel={this.onCancel} />) : (<Edit items={items} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
 
     return (
       <div className="SubscriberEdit container">

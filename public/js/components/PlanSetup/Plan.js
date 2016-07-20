@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Toggle from 'material-ui/Toggle';
-import DateTimeField from 'react-bootstrap-datetimepicker';
+import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
 
 import Field from '../Field';
 
@@ -23,7 +23,6 @@ export default class Plan extends Component {
           onChangeFieldCheckValue,
           onAddTariff } = this.props;
 
-    console.log(basicSettings);
     let transaction_options = ["Every Month", "Every Week"].map((op, key) => (
       <option value={op} key={key}>{op}</option>
     ));

@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { getPlans } from '../../actions/plansActions';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import Typeahead from 'react-bootstrap-typeahead';
+import Immutable from 'immutable';
 
 class New extends Component {
   constructor(props) {
@@ -15,14 +17,15 @@ class New extends Component {
   }
   
   render() {
-    const { settings, onChange, plans, entity, onSave, onCancel } = this.props;
-    if (!settings) return (<div></div>);
+    const { settings, onChange, plans, aid, onSave, onCancel, onChangeTypeaheadField } = this.props;
+    if (!settings || settings.size === 0) return (<div></div>);
 
-    const available_plans = [(<option value="-1" disabled key={-1}>Choose Plan</option>),
-      ...plans.map((plan, key) => (
-        <option value={plan.get('name')} key={key}>{plan.get('name')}</option>
-      ))
-    ];
+    const available_plans = plans.map((plan, key) => {
+      return Immutable.fromJS({
+        id: plan.get('name'),
+        name: plan.get('name')
+      });
+    }).toJS();
 
     const fieldSettings = settings.getIn(['account', 'fields'])
                                   .filter(field => {
@@ -46,15 +49,21 @@ class New extends Component {
 
     return (
       <div>
-        { fields }
-        <div className="row">
-          <div className="col-md-3">
-            <label>Plan</label>
-            <select id="plan" className="form-control" defaultValue="-1" onChange={onChange}>
-              { available_plans }
-            </select>
-          </div>
-        </div>
+      { fields }
+      {(() => {
+        if (aid) {
+          return (
+            <div className="row">
+              <div className="col-md-3">
+                <label>Plan</label>
+                <Typeahead options={available_plans}
+                           labelKey="name"
+                           maxHeight={150}
+                           onChange={onChangeTypeaheadField.bind(this, "plan")} />
+              </div>
+            </div>
+          );
+        }})()}
         <div className="row">
           <div className="col-md-3" style={{marginTop: 15}}>
             <RaisedButton

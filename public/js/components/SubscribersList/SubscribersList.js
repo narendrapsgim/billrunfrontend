@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody } from 'material-ui/Table';
+import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody, TableFooter } from 'material-ui/Table';
 import Filter from '../Filter';
 import Field from '../Field';
 import RaisedButton from 'material-ui/RaisedButton';
+import Pager from '../Pager';
 
 import { getCustomers } from '../../actions/customerActions';
 
@@ -16,16 +17,15 @@ class SubscribersList extends Component {
     this.buildQuery = this.buildQuery.bind(this);
     this.onFilter = this.onFilter.bind(this);
     this.onNewSubscriber = this.onNewSubscriber.bind(this);
+    this.handlePageClick = this.handlePageClick.bind(this);
 
     this.state = {
+      page: 0,
+      size: 10,
       filter: ""
     };
   }
 
-  componentWillMount() {
-    this.props.dispatch(getCustomers());
-  }
-  
   onClickCell(cell_idx, col_idx, e) {
     let { subscriber } = this.props;
     let aid = subscriber.valueSeq().get(cell_idx).get('aid');
@@ -41,6 +41,12 @@ class SubscribersList extends Component {
   buildQuery() {
     const { page, size, filter } = this.state;
     return { page, size, filter };
+  }
+
+  handlePageClick(page) {
+    this.setState({page}, () => {
+      this.props.dispatch(getCustomers(this.buildQuery()))
+    });
   }
 
   onFilter(filter) {
@@ -81,7 +87,7 @@ class SubscribersList extends Component {
       <div className="SubscribersList">
         <div className="row" style={{marginBottom: 10}}>
           <div className="col-md-5">
-            <Filter fields={fields} onFilter={this.onFilter} />
+            <Filter fields={fields} onFilter={this.onFilter} base={{type: "account"}} />
           </div>
           <div className="col-md-5">
             <div style={{float: "right"}}>
@@ -98,6 +104,13 @@ class SubscribersList extends Component {
           <TableBody>
             { rows }
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableRowColumn style={{textAlign: 'center'}}>
+                <Pager onClick={this.handlePageClick} />
+              </TableRowColumn>
+            </TableRow>
+          </TableFooter>
         </Table>
       </div>
     );

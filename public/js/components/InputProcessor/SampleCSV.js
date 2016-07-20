@@ -98,7 +98,25 @@ class SampleCSV extends Component {
             <input type="file" id="sample_csv" onChange={onSelectSampleCSV} disabled={!settings.get('delimiter_type')} />
           </div>
         </div>
-        <h4>Fields</h4>
+        {(() => {
+           if (settings.get('fields').size > 0) {
+             return (
+               <div className="row">
+                 <div className="col-md-3">
+                   <label>Field</label>
+                 </div>
+                 {(() => {             
+                    if (settings.get('delimiter_type') === "fixed") {
+                      return (
+                        <div className="col-md-3">
+                          <label>Width</label>
+                        </div>
+                      );
+                    }
+                  })()}
+               </div>
+             );
+           }})()}
         { fieldsHTML }
         <div className="row">
           <div className="col-md-3">

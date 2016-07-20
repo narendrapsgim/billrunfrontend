@@ -120,7 +120,6 @@ function gotPlan(plan) {
 function fetchPlan(plan_id) {
   const convert = (plan) => {
     let Trial = {TrialPrice: undefined, TrialCycle: undefined};
-    console.log(plan);
     if (plan.price[0].trial) {
       Trial.TrialPrice = parseFloat(plan.price[0].price);
       Trial.TrialCycle = parseInt(plan.price[0].Cycle, 10);

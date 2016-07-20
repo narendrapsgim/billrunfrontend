@@ -31,6 +31,7 @@ export default class Filter extends Component {
   filterCond(field, value) {
     const { fields } = this.props;
     let found = _.find(fields, (f) => { return f.id === field; });
+    if (!found) return {"$regex": value, "$options": "i"};
     switch (found.type) {
       case "number":
         return parseInt(value, 10);

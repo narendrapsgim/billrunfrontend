@@ -4,7 +4,7 @@ import Field from '../Field';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import ContentAdd from 'material-ui/svg-icons/content/add';
-import DateTimeField from 'react-bootstrap-datetimepicker';
+import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
 
 export default class Product extends Component {
   constructor(props) {
