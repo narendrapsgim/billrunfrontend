@@ -1,6 +1,6 @@
 import React from 'react';
 import {Pie} from 'react-chartjs';
-import {palitra} from './helpers';
+import {palitra, hexToRgba} from './helpers';
 
 
 export default class PieChart extends React.Component {
@@ -31,9 +31,11 @@ export default class PieChart extends React.Component {
       datasets: [
         {
           data: data.values,
-          backgroundColor: data.values.map((x, i) => palitra([i])),
-          hoverBackgroundColor: data.values.map((x, i) => palitra([i], 'light')),
+          backgroundColor: data.values.map((x, i) => hexToRgba(palitra([i]),0.8)),
           borderWidth: 1,
+          hoverBackgroundColor: data.values.map((x, i) => palitra([i], 'dark')),
+          hoverBorderColor: data.values.map((x, i) => palitra([i], 'dark')),
+          hoverBorderWidth:	3,
         }
       ],
     };
