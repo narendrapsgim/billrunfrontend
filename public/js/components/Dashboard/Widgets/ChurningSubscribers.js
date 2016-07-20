@@ -96,7 +96,6 @@ class ChurningSubscribers extends Component {
   }
 
   renderContent(chartData){
-    console.log(chartData);
     switch (chartData) {
       case undefined: return <PlaceHolderWidget/>;
       case null: return 'OK';

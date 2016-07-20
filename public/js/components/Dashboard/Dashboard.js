@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CircularProgress from 'material-ui/CircularProgress';
-import DashboardIcon from 'material-ui/svg-icons/action/dashboard'
+import FontIcon from 'material-ui/FontIcon';
 import moment from 'moment';
 import { getData } from '../../actions/dashboardActions';
 import TotalSubscribersWidget from './Widgets/TotalSubscribers'
@@ -42,8 +42,13 @@ class Dashboard extends Component {
       <div className="dashboard" >
         <div className="container" style={this.styles.dashboardHeaderContainer}>
           <div className="header" style={this.styles.dashboardHeader}>
-            <h3 style={this.styles.dashboardHeaderTitle}><DashboardIcon color={'white'} style={{verticalAlign: 'top', marginRight: '10px'}}/>Dashboard</h3>
-            <h5 style={this.styles.dashboardHeaderDates}>{moment(fromDate).format(globalSetting.dateFormat)} - {moment(toDate).format(globalSetting.dateFormat)}</h5>
+            <h3 style={this.styles.dashboardHeaderTitle}>
+              <FontIcon className="material-icons" color={'white'} style={{verticalAlign: 'top', marginRight: '10px'}}>dashboard</FontIcon>
+              Dashboard
+            </h3>
+            <h5 style={this.styles.dashboardHeaderDates}>
+              <FontIcon className="material-icons" color={'white'} style={{verticalAlign: 'bottom', marginRight: '10px'}}>date_range</FontIcon>
+              {moment(fromDate).format(globalSetting.dateFormat)} - {moment(toDate).format(globalSetting.dateFormat)}</h5>
           </div>
         </div>
         <div className="container" >
