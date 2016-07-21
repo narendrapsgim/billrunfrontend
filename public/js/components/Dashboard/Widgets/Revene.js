@@ -62,6 +62,9 @@ class Revene extends Component {
     };
 
     let dataset = chartData.find((dataset, i) => dataset.name == "revenue");
+    if(!dataset.data || dataset.data.length == 0){
+      return null;
+    }
     //TODO - fix check YEAR
     monthsToDisplay.forEach((monthNumber, k) => {
       var point = dataset.data.find((node, i) => monthNumber == node.month );

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {PieChart} from '../../Charts';
+import {DoughnutChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
 import {drawDataOnPie, getMonthName} from '../Widgets/helper';
@@ -79,7 +79,8 @@ class SubsPerPlanCurrentMonth extends Component {
       },
       animation: {
         onProgress: drawDataOnPie,
-      }
+      },
+      cutoutPercentage: 20,
     };
     return owerideOptions;
   }
@@ -88,7 +89,7 @@ class SubsPerPlanCurrentMonth extends Component {
     switch (chartData) {
       case undefined: return <PlaceHolderWidget/>;
       case null: return null;
-      default: return <PieChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
+      default: return <DoughnutChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
     }
   }
 

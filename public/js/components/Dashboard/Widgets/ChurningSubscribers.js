@@ -62,6 +62,9 @@ class ChurningSubscribers extends Component {
     };
 
     let churningSubscribersDataset = chartData.find((dataset, i) => dataset.name == "churning_subscribers");
+    if(!churningSubscribersDataset.data || churningSubscribersDataset.data.length == 0){
+      return null;
+    }
     //TODO - fix check YEAR
     monthsToDisplay.forEach((monthNumber, k) => {
       var point = churningSubscribersDataset.data.find((node, i) => monthNumber == node.month );
@@ -95,7 +98,7 @@ class ChurningSubscribers extends Component {
   renderContent(chartData){
     switch (chartData) {
       case undefined: return <PlaceHolderWidget/>;
-      case null: return null;
+      case null: return 'OK';
       default: return <LineChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
     }
   }
