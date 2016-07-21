@@ -1,10 +1,7 @@
-export const GOT_CUSTOMER = 'GOT_CUSTOMER';
 export const GOT_CUSTOMERS = 'GOT_CUSTOMERS';
-export const UPDATE_ACCOUNT_FIELD = 'UPDATE_ACCOUNT_FIELD';
 export const UPDATE_CUSTOMER_FIELD = 'UPDATE_CUSTOMER_FIELD';
 export const SAVE_SUBSCRIBER = 'SAVE_SUBSCRIBER';
 export const GOT_SUBSCRIBER_SETTINGS = 'GOT_SUBSCRIBER_SETTINGS';
-export const GET_NEW_CUSTOMER = 'GET_NEW_CUSTOMER';
 export const CLEAR_CUSTOMER = 'CLEAR_CUSTOMER';
 
 import axios from 'axios';
@@ -63,13 +60,6 @@ function gotCustomers(customers) {
   }
 }
 
-function gotCustomer(customer) {
-  return {
-    type: GOT_CUSTOMER,
-    customer
-  }
-}
-
 function fetchCustomers(query) {
   let sort = query.sort ? `&sort={"${query.sort}":1}` : '';
   let size = query.size ? `&size=${query.size}` : '';
@@ -90,57 +80,9 @@ function fetchCustomers(query) {
   };
 }
 
-
-function fetchCustomer(aid) {
-  let fetchUrl = `/api/find?collection=subscribers&query={"aid": ${aid}}`;
-  return (dispatch) => {
-    dispatch(showProgressBar());
-    let request = axiosInstance.get(fetchUrl).then(
-      resp => {
-        let customer = _.values(resp.data.details);
-        dispatch(gotCustomer(customer));
-        dispatch(hideProgressBar());
-      }
-    ).catch(error => {
-      dispatch(hideProgressBar());
-    });
-  };
-}
-
-
 export function getCustomers(query = {page: 0, size: 10, filter: "", sort: ""}) {
   return dispatch => {
     return dispatch(fetchCustomers(query));
-  };
-}
-
-export function getCustomer(customer_id) {
-  return dispatch => {
-    return dispatch(fetchCustomer(customer_id));
-  };
-}
-
-export function updateCustomerField(field_id, value) {
-  return {
-    type: UPDATE_CUSTOMER_FIELD,
-    field_id,
-    value
-  };
-}
-
-export function updateAccountField(idx, field_id, value) {
-  return {
-    type: UPDATE_ACCOUNT_FIELD,
-    idx,
-    field_id,
-    value
-  };
-}
-
-export function getNewCustomer(aid = false) {
-  return {
-    type: GET_NEW_CUSTOMER,
-    aid
   };
 }
 

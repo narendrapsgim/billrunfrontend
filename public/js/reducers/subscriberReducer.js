@@ -1,24 +1,12 @@
 import { GOT_CUSTOMER,
          GOT_CUSTOMERS,
          UPDATE_CUSTOMER_FIELD,
-         UPDATE_ACCOUNT_FIELD,
          SAVE_SUBSCRIBER,
          GOT_SUBSCRIBER_SETTINGS,
          GET_NEW_CUSTOMER,
          CLEAR_CUSTOMER } from '../actions/customerActions';
 import Immutable from 'immutable';
 
-// const defaultState = Immutable.fromJS({
-//   customer: [],
-//   settings: {
-//     account: {
-//       fields: []
-//     },
-//     subscriber: {
-//       fields: []
-//     }
-//   }
-// });
 const defaultState = Immutable.fromJS([]);
 
 export default function (state = defaultState, action) {
@@ -33,9 +21,6 @@ export default function (state = defaultState, action) {
 
   case UPDATE_CUSTOMER_FIELD:
     return state.setIn(['customer', field_id], value);
-
-  case UPDATE_ACCOUNT_FIELD:
-    return state.setIn(['customer', action.idx, field_id], value);
 
   case SAVE_SUBSCRIBER:
     const sub = state.toJS();
