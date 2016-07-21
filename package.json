@@ -48,6 +48,7 @@
     "moment": "^2.13.0",
     "react": "^15.2.1",
     "react-chartjs": "git+https://github.com/jhudson8/react-chartjs/#chartjs-v2",
+    "react-datamaps": "^0.1.1",
     "react-dom": "^15.2.1",
     "react-redux": "^4.4.5",
     "react-router": "^2.4.0",
