@@ -52,24 +52,23 @@ class MapSubscribers extends Component {
     if(!dataset.data || dataset.data.length == 0){
       return null;
     }
-    let notFoundCountries = [];
     let min = dataset.data[0].count;
     let max = dataset.data[dataset.data.length-1].count;
     let babbleScale = d3.scale.linear().domain([min,max]).range([0,10]);
-    let formatedData = dataset.data.map((node, j) => {
+
+    let formatedData = [];
+    dataset.data.forEach((node, j) => {
       let ISOcode = getCountryKeyByCountryName(node.country);
-      if(!ISOcode){
-        notFoundCountries.push(node.country)
-      }
-      return {
-        name: node.country,
-        centered: ISOcode,
-        count: node.count,
-        radius: babbleScale(node.count),
-        fillKey: 'point',
+      if(ISOcode){
+        formatedData.push({
+          name: node.country,
+          centered: ISOcode,
+          count: node.count,
+          radius: babbleScale(node.count),
+          fillKey: 'point',
+        });
       }
     });
-    console.log("notFoundCountries", notFoundCountries);
     return formatedData;
   }
 
@@ -77,14 +76,15 @@ class MapSubscribers extends Component {
     let owerideOptions = {
       fills: {'point': '#EA4379', defaultFill: '#485A65' },
       responsive: true,
-      geographyConfig: {popupOnHover: false, highlightOnHover: false, borderColor: '#485A65' },
+      geographyConfig: {popupOnHover: false, highlightOnHover: false, borderColor: '#485A65', highlightFillColor: '#485A65',highlightBorderColor: '#485A65' },
       scope: "world",
       projection: 'mercator',
       bubblesConfig: {
         borderWidth: 0,
         fillOpacity: 1,
+        highlightFillOpacity: 1,
         popupOnHover: true,
-        highlightFillColor: '#EA4379',
+        highlightFillColor: '#01BFA5',
         highlightBorderWidth: 0,
         popupTemplate: function(geography, data) {
           return '<div class="hoverinfo"><span style="color:#1596FA"><strong>' + data.name + '</strong></span>' + " " + '<span>' + data.count + '</span></div>';
@@ -92,6 +92,18 @@ class MapSubscribers extends Component {
       }
     };
     return owerideOptions;
+  }
+
+  renderLegend(chartData){
+    return (
+      <div>
+        <svg height="20" width="20"><circle cx="10" cy="10" r="5" fill="#EA4379" /></svg>
+        <span style={{color:'white', verticalAlign: 'bottom'}}>Subscribers</span>
+      </div>
+    );
+  }
+  renderTitle(chartData){
+    return (<div style={{color:'white'}}>Demographic Distribution</div>);
   }
 
   renderContent(chartData){
@@ -109,6 +121,10 @@ class MapSubscribers extends Component {
     return (
       <div style={{ width:1130, height:650, margin: '10px', padding: '10px', backgroundColor: '#2B2E3C' }}>
           {this.renderContent(chartData)}
+          <div style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
+            {this.renderTitle(chartData)}
+            {this.renderLegend(chartData)}
+          </div>
       </div>
     );
   }
