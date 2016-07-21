@@ -72,6 +72,10 @@ body {
     color: #014A41!important;
 }
 
+ul.pagination > li {
+    cursor: pointer;
+}
+
 .help-popover {
     padding: 10px!important;
 }

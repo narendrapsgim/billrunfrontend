@@ -15,35 +15,21 @@ export default class Edit extends Component {
   constructor(props) {
     super(props);
   }
-
+  
   titlize(str) {
     return _.capitalize(str.replace(/_/g, ' '));
   }
   
   render() {
-    const { items,
+    const { subscribers,
+            account,
             settings,
             onChange,
             onClickNewSubscription,
             onSave,
             onCancel } = this.props;
-    if (!items || !Immutable.List.isList(items) || !settings) return (<div></div>);
 
-    const account = items.find(obj => {
-      return obj.get('type') === "account";
-    });
-    if (!account) return (<div></div>);
-    let account_idx = items.findIndex(obj => {
-      return obj.get('type') === "account";
-    });
-
-    const subscriptions = items.reduce((r, obj, k) => {
-      if (obj.get('type') !== "account")
-        return r.push(obj);
-      return r;
-    }, Immutable.List());
-
-    let subscriptions_html = subscriptions.map((sub, key) => {
+    let subscriptionsHTML = subscribers.map((sub, key) => {
       return (
         <TableRow key={key}>
           {settings.getIn(['subscriber', 'fields']).map((field, k) => {
@@ -63,28 +49,30 @@ export default class Edit extends Component {
       );
     });
 
+    const fieldsHTML = settings.getIn(['account', 'fields']).map((field, key) => {
+      if (field.get('display') === false) return (null);
+      return (
+        <div className="col-md-3" key={key}>
+          <label>{_.capitalize(field.get('field_name'))}</label>
+          <Field id={field.get('field_name')}
+                 value={account.get(field.get('field_name'))}
+                 editable={field.get('editable')}
+                 onChange={onChange} />
+        </div>
+      );
+    });
+    
     let fields = (
       <div className="row">
-        {settings.getIn(['account', 'fields']).map((field, key) => {
-           if (field.get('display') === false) return (null);
-           return (
-             <div className="col-md-3" key={key}>
-               <label>{_.capitalize(field.get('field_name'))}</label>
-               <Field id={field.get('field_name')}
-                      value={account.get(field.get('field_name'))}
-                      editable={field.get('editable')}
-                      onChange={onChange.bind(this, account_idx)} />
-             </div>
-           );
-         })}
-             <div className="col-md-1">
-               <label>&zwnj;</label>
-               <div>
-                 <Link to={`/usage?base=${JSON.stringify({aid: account.get('aid')})}`}>
-                   <button className="btn">See usage</button>
-                 </Link>
-               </div>
-             </div>
+        { fieldsHTML }
+        <div className="col-md-1">
+          <label>&zwnj;</label>
+          <div>
+            <Link to={`/usage?base=${JSON.stringify({aid: account.get('aid')})}`}>
+              <button className="btn">See usage</button>
+            </Link>
+          </div>
+        </div>
       </div>
     );
     
@@ -134,11 +122,11 @@ export default class Edit extends Component {
                 </TableRow>
               </TableHeader>
               <TableBody displayRowCheckbox={false} stripedRows={true}>
-                { subscriptions_html }
+                { subscriptionsHTML }
               </TableBody>
             </Table>
           </div>
-        </Tab>
+          </Tab>
       </Tabs>
     );    
   }
