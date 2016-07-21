@@ -98,7 +98,7 @@ class ChurningSubscribers extends Component {
   renderContent(chartData){
     switch (chartData) {
       case undefined: return <PlaceHolderWidget/>;
-      case null: return 'OK';
+      case null: return null;
       default: return <LineChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
     }
   }
