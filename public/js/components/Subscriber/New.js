@@ -5,6 +5,7 @@ import { getPlans } from '../../actions/plansActions';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Typeahead from 'react-bootstrap-typeahead';
+import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
 import Immutable from 'immutable';
 
 class New extends Component {
@@ -17,7 +18,7 @@ class New extends Component {
   }
   
   render() {
-    const { settings, onChange, plans, aid, onSave, onCancel, onChangeTypeaheadField } = this.props;
+    const { settings, onChange, plans, aid, onSave, onCancel, onChangeTypeaheadField, onChangeDateFieldValue } = this.props;
     if (!settings || settings.size === 0) return (<div></div>);
 
     const available_plans = plans.map((plan, key) => {
@@ -49,19 +50,31 @@ class New extends Component {
 
     return (
       <div>
-      { fields }
-      {(() => {
-        if (aid) {
-          return (
-            <div className="row">
-              <div className="col-md-3">
-                <label>Plan</label>
-                <Typeahead options={available_plans}
-                           labelKey="name"
-                           maxHeight={150}
-                           onChange={onChangeTypeaheadField.bind(this, "plan")} />
-              </div>
-            </div>
+        { fields }
+        {(() => {
+           if (aid) {
+             return (
+               <div>
+                 <div className="row">
+                   <div className="col-md-3">
+                     <label>Plan</label>
+                     <Typeahead options={available_plans}
+                                labelKey="name"
+                                maxHeight={150}
+                                onChange={onChangeTypeaheadField.bind(this, "plan")} />
+                   </div>
+                 </div>
+                 <div className="row">
+                   <div className="col-md-2">
+                     <label>Valid From</label>
+                     <DateTimeField id="from" onChange={onChangeDateFieldValue.bind(this, "from")} />
+                   </div>
+                   <div className="col-md-2">
+                     <label>To</label>
+                     <DateTimeField id="to"   onChange={onChangeDateFieldValue.bind(this, "to")} />
+                   </div>
+                 </div>
+               </div>
           );
         }})()}
         <div className="row">
