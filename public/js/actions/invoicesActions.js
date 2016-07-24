@@ -94,7 +94,7 @@ function fetchInvoices(query) {
   };
 }
 
-export function getInvoices(query = {page: 1, size: 10, filter: ""}) {
+export function getInvoices(query = {page: 1, size: 10, filter: JSON.stringify({})}) {
   return dispatch => {
     return dispatch(fetchInvoices(query));
   };
