@@ -78,7 +78,7 @@ function fetchInvoices(query) {
       "source" : "cycle"
     }
   ];
-  let fetchUrl = `/api/bill?action=query_bills&size=${query.size}${sort}&page=${query.page}&query=${query.filter}`;  
+  let fetchUrl = `/api/bill?action=query_bills&size=${query.size}&page=${query.page}&query=${query.filter}`;  
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
