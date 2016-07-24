@@ -13,12 +13,30 @@ class Invoices extends Component {
     super(props);
 
     this.downloadInvoice = this.downloadInvoice.bind(this);
+    this.handlePageClick = this.handlePageClick.bind(this);
+
+    this.state = {
+      page: 1,
+      size: 10,
+      filter: ""
+    };
   }
 
   componentWillMount() {
     this.props.dispatch(getInvoices());
   }
 
+  buildQuery() {
+    const { page, size, filter } = this.state;
+    return { page, size, filter };
+  }
+  
+  handlePageClick(page) {
+    this.setState({page}, () => {
+      this.props.dispatch(getInvoices(this.buildQuery()))
+    });
+  }
+  
   downloadInvoice(aid, billrun_key, invoice_id) {
     let url = `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrun_key}&iid=${invoice_id}`;
     var form = $('<form></form>').attr('action', url).attr('method', 'post');

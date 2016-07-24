@@ -5,7 +5,7 @@ import axios from 'axios';
 
 let axiosInstance = axios.create({
   withCredentials: true,
-  baseUrl: globalSetting.serverUrl
+  baseURL: globalSetting.serverUrl
 });
 
 function gotInvoices(invoices) {
@@ -15,7 +15,7 @@ function gotInvoices(invoices) {
   };
 }
 
-function fetchInvoices() {
+function fetchInvoices(query) {
   let dummy_invoices = [
     {
       "_id" : {"$id": "5753d7f22e28c35a0cc42d77"},
@@ -78,8 +78,7 @@ function fetchInvoices() {
       "source" : "cycle"
     }
   ];
-  
-  let fetchUrl = `/api/bill?action=query_bills_invoices&query={}`
+  let fetchUrl = `/api/bill?action=query_bills_invoices&size=${query.size}&page=${query.page}&query=${query.filter}`;  
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
@@ -95,8 +94,8 @@ function fetchInvoices() {
   };
 }
 
-export function getInvoices() {
+export function getInvoices(query = {page: 1, size: 10, filter: JSON.stringify({})}) {
   return dispatch => {
-    return dispatch(fetchInvoices());
+    return dispatch(fetchInvoices(query));
   };
 }

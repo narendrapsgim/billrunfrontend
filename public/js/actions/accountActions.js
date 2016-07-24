@@ -6,7 +6,7 @@ import { showProgressBar, hideProgressBar } from './progressbarActions';
 
 const axiosInstance = axios.create({
   withCredentials: true,
-  baseUrl: globalSetting.serverUrl
+  baseURL: globalSetting.serverUrl
 });
 
 export function updateAccountField(field_id, value) {
@@ -25,7 +25,7 @@ function gotAccount(account) {
 }
 
 function fetchAccount(aid) {
-  const fetchUrl = `http://billrun/api/subscribers?method=query&query={"aid":${aid}, "type":"account"}`;
+  const fetchUrl = `/api/subscribers?method=query&query={"aid":${aid}, "type":"account"}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
