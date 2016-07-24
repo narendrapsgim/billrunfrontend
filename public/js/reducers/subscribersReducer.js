@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import moment from 'moment';
 
 import { GOT_SUBSCRIBERS,
          GET_NEW_SUBSCRIBER,
@@ -15,8 +16,12 @@ export default function (state = defaultState, action) {
       return state.set('subscribers', Immutable.fromJS(action.subscribers));
 
     case GET_NEW_SUBSCRIBER:
-      if (action.aid) return state.set('subscriber', Immutable.fromJS({aid: action.aid}));
-      return state.set('subscriber', Immutable.fromJS({}));
+      const newsub = Immutable.fromJS({
+        from: moment().format('x'),
+        to: moment().add(1, 'years').format('x')
+      });
+      if (action.aid) return state.set('subscriber', newsub.set('aid', action.aid));
+      return state.set('subscriber', newsub);
 
     case UPDATE_SUBSCRIBER_FIELD:
       return state.setIn(['subscriber', action.field_id], action.value);

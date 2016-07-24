@@ -6,6 +6,7 @@ import Filter from '../Filter';
 import Field from '../Field';
 import Pager from '../Pager';
 
+import { permissions } from '../../permissions';
 import { getPlans } from '../../actions/plansActions';
 
 class PlansList extends Component {
@@ -87,7 +88,7 @@ class PlansList extends Component {
                          ...fields.map((field, idx) => (
                            <option value={field.id} key={idx}>{field.placeholder}</option>
                          ))];
-    
+
     const table_header = fields.map((field, idx) => (
       <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
     ));

@@ -23,21 +23,21 @@ export default class DateTime extends Component {
       <div className="DateTimeSettings bordered-container" style={{padding: "45px"}}>
         <div className="row">
           <div className="col-md-2">
-            <label for="date_format">Date Format</label>
+            <label htmlFor="date_format">Date Format</label>
             <select id="date_format" value={data.get('date_format')}
                     onChange={onChange} className="form-control">
               { date_format_options }
             </select>
           </div>
           <div className="col-md-2 col-md-offset-2">
-            <label for="time_format">Time Format</label>
+            <label htmlFor="time_format">Time Format</label>
             <select id="time_format" value={data.get('time_format')}
                     onChange={onChange} className="form-control">
               { time_format_options }
             </select>
           </div>
           <div className="col-md-2 col-md-offset-2">
-            <label for="time_zone">Time Zone</label>
+            <label htmlFor="time_zone">Time Zone</label>
             <select id="time_zone" value={data.get('time_zone')}
                     onChange={onChange} className="form-control">
               { time_zone_options }

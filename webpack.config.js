@@ -2,12 +2,16 @@ var webpack = require('webpack');
 var path = require('path');
 //var css = require('css!./file.css');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var env = process.env.MIX_ENV || 'dev';
 var isProduction = (env === 'prod');
 
 var plugins = [
   new ExtractTextPlugin('app.css'),
+  // new HtmlWebpackPlugin({
+  //   hash: true
+  // })
 ];
 
 // This is necessary to get the sass @import's working

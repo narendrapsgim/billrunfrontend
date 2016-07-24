@@ -38,27 +38,27 @@ export default class Plan extends Component {
           <h4>Basic Settings</h4>
           <div className="row">
             <div className="col-md-4">
-              <label for="PlanName">Name</label>
+              <label htmlFor="PlanName">Name</label>
               <Field id="PlanName" onChange={onChangeFieldValue.bind(this, "basicSettings")} value={basicSettings.PlanName} />
             </div>
             <div className="col-md-3" >
-              <label for="PlanCode">Code</label>
+              <label htmlFor="PlanCode">Code</label>
               <Field  id="PlanCode" value={basicSettings.PlanCode} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
           </div>
           <div className="row">
             <div className="col-md-7">
-              <label for="PlanDescription">Description</label>
+              <label htmlFor="PlanDescription">Description</label>
               <textarea id="PlanDescription" className="form-control" value={basicSettings.PlanDescription} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
           </div>
           <div className="row">
             <div className="col-md-2">
-              <label for="Each">Billing Frequency</label>
+              <label htmlFor="Each">Billing Frequency</label>
               <input type="number" id="Each" className="form-control" value={basicSettings.Each} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
             <div className="col-md-1">
-              <label for="EachPeriod">&nbsp;</label>
+              <label htmlFor="EachPeriod">&nbsp;</label>
               <select id="EachPeriod" className="form-control" value={basicSettings.EachPeriod} onChange={onChangeFieldValue.bind(this, "basicSettings")}>
                 { each_period_options }
               </select>
@@ -86,11 +86,11 @@ export default class Plan extends Component {
           <h4>Trial Period</h4>
           <div className="row">
             <div className="col-md-2">
-              <label for="TrialCycle">Number of Cycles</label>
+              <label htmlFor="TrialCycle">Number of Cycles</label>
               <input type="number" id="TrialCycle" className="form-control" value={basicSettings.TrialCycle} onChange={onChangeFieldValue.bind(this, "basicSettings")} />
             </div>
             <div className="col-md-1">
-              <label for="TrialPrice">Price</label>
+              <label htmlFor="TrialPrice">Price</label>
               <Field id="TrialPrice" onChange={onChangeFieldValue.bind(this, "basicSettings")} value={basicSettings.TrialPrice} />
             </div>
           </div>
@@ -100,11 +100,11 @@ export default class Plan extends Component {
           { basicSettings.recurring_prices.map((price, key) => (
               <div className="row" key={key}>
                 <div className="col-md-2">
-                  <label for="Cycle">Number of Cycles</label>
+                  <label htmlFor="Cycle">Number of Cycles</label>
                   <input type="number" id="Cycle" className="form-control" min="0" value={price.Cycle} onChange={onChangeRecurringPriceFieldValue.bind(this, "Cycle", key)} />
                 </div>
                 <div className="col-xs-1">
-                  <label for="PeriodicalRate">Price</label>
+                  <label htmlFor="PeriodicalRate">Price</label>
                   <Field id="PeriodicalRate" onChange={onChangeRecurringPriceFieldValue.bind(this, "PeriodicalRate", key)} value={price.PeriodicalRate} />
                 </div>
               </div>

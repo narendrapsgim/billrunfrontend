@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import Tabs from 'react-bootstrap/lib/Tabs';
-import Tab from 'react-bootstrap/lib/Tab';
-
 import { getAccount, updateAccountField } from '../../actions/accountActions';
 import { getSubscribers, getNewSubscriber, updateSubscriberField } from '../../actions/subscribersActions';
 import { clearCustomer, saveSubscriber } from '../../actions/customerActions';

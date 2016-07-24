@@ -64,13 +64,13 @@ export default class Collections extends Component {
           </div>
           <div className="row">
             <div className="col-md-1">
-              <label for="InvoiceOverdue">1st Warning Email</label>
+              <label htmlFor="InvoiceOverdue">1st Warning Email</label>
               <select className="form-control" id="first_invoice_overdue" value={data.get('first_invoice_overdue')} onChange={onChange}>
                 { invoice_overdue_options }
               </select>
             </div>
             <div className="col-md-1 col-md-offset-2">
-              <label for="InvoiceOverdue">Last Warning Email</label>
+              <label htmlFor="InvoiceOverdue">Last Warning Email</label>
               <select className="form-control" id="last_invoice_overdue" value={data.get('last_invoice_overdue')} onChange={onChange}>
                 { invoice_overdue_options }
               </select>

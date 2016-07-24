@@ -57,7 +57,7 @@ class SampleCSV extends Component {
       <div className="InputProcessor">
         <div className="row">
           <div className="col-md-3">
-            <label for="file_type">Name</label>
+            <label htmlFor="file_type">Name</label>
           </div>
           <div className="col-md-3">
             <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
@@ -66,7 +66,7 @@ class SampleCSV extends Component {
         </div>
         <div className="row">
           <div className="col-md-3">
-            <label for="delimiter">Delimiter</label>
+            <label htmlFor="delimiter">Delimiter</label>
           </div>
           <div className="col-md-6">
             <div className="col-md-3" style={{paddingLeft: 0}}>
@@ -92,7 +92,7 @@ class SampleCSV extends Component {
         </div>
         <div className="row">
           <div className="col-md-3">
-            <label for="sample_csv">Select Sample CSV</label>
+            <label htmlFor="sample_csv">Select Sample CSV</label>
           </div>
           <div className="col-md-3">
             <input type="file" id="sample_csv" onChange={onSelectSampleCSV} disabled={!settings.get('delimiter_type')} />
