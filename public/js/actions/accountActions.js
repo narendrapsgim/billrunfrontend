@@ -25,7 +25,7 @@ function gotAccount(account) {
 }
 
 function fetchAccount(aid) {
-  const fetchUrl = `http://billrun/api/subscribers?method=query&query={"aid":${aid}, "type":"account"}`;
+  const fetchUrl = `${globalSetting.serverUrl}/api/subscribers?method=query&query={"aid":${aid}, "type":"account"}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
