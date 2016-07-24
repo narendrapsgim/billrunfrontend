@@ -79,7 +79,6 @@ function fetchInvoices(query) {
     }
   ];
   let fetchUrl = `/api/bill?action=query_bills&size=${query.size}${sort}&page=${query.page}&query=${query.filter}`;  
-  let fetchUrl = `/api/bill?action=query_bills_invoices&query={}`
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
