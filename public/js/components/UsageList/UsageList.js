@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 
 import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody, TableFooter } from 'material-ui/Table';
-import ReactPaginate from 'react-paginate';
+import Page from '../Pager';
 import Filter from '../Filter';
 
 import { getUsages } from '../../actions/usageActions';
@@ -40,8 +40,7 @@ class UsageList extends Component {
     });
   }
 
-  handlePageClick(data) {
-    let page = data.selected + 1;
+  handlePageClick(page) {
     this.setState({page}, () => {
       this.props.dispatch(getUsages(this.buildQuery()))
     });
@@ -102,16 +101,7 @@ class UsageList extends Component {
           <TableFooter>
             <TableRow>
               <TableRowColumn style={{textAlign: 'center'}}>
-                <ReactPaginate previousLabel={"previous"}
-                               nextLabel={"next"}
-                               breakLabel={<a>...</a>}
-                               pageNum={this.state.page + 5}
-                               marginPagesDisplayed={2}
-                               pageRangeDisplayed={5}
-                               clickCallback={this.handlePageClick}
-                               containerClassName={"pagination"}
-                               subContainerClassName={"pages pagination"}
-                               activeClassName={"active"} />
+                <Pager onClick={this.handlePageClick} />
               </TableRowColumn>
             </TableRow>
           </TableFooter>

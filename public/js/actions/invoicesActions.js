@@ -15,7 +15,7 @@ function gotInvoices(invoices) {
   };
 }
 
-function fetchInvoices() {
+function fetchInvoices(query) {
   let dummy_invoices = [
     {
       "_id" : {"$id": "5753d7f22e28c35a0cc42d77"},
@@ -78,7 +78,7 @@ function fetchInvoices() {
       "source" : "cycle"
     }
   ];
-  
+  let fetchUrl = `/api/bill?action=query_bills&size=${query.size}${sort}&page=${query.page}&query=${query.filter}`;  
   let fetchUrl = `/api/bill?action=query_bills_invoices&query={}`
   return (dispatch) => {
     dispatch(showProgressBar());
@@ -95,7 +95,7 @@ function fetchInvoices() {
   };
 }
 
-export function getInvoices() {
+export function getInvoices(query = {page: 1, size: 10, filter: ""}) {
   return dispatch => {
     return dispatch(fetchInvoices());
   };
