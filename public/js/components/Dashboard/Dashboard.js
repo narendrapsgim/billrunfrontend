@@ -21,9 +21,11 @@ class Dashboard extends Component {
 
   constructor(props) {
     super(props);
+    let today = new Date();
+    let fromDate = new Date(moment(today).add(-5,'months').startOf('month').startOf('hour').startOf('minute').startOf('second'));
     this.state = {
-      fromDate: getFromDate(5, 'months'),
-      toDate: getToDate(),
+      fromDate: fromDate,
+      toDate: today,
     }
     this.styles = this.getStyles();
   }

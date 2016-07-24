@@ -4,7 +4,7 @@ import moment from 'moment';
 import {LineAreaChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {getMonthName, getMonthsToDisplay, chartOptionCurrencyAxesLabel, chartOptionCurrencyTooltipLabel} from '../Widgets/helper';
+import {getMonthName, getYearsToDisplay, chartOptionCurrencyAxesLabel, chartOptionCurrencyTooltipLabel} from '../Widgets/helper';
 
 
 class RevenueAvgPerSubscriber extends Component {
@@ -94,8 +94,8 @@ class RevenueAvgPerSubscriber extends Component {
 
   prepareChartData(chartData) {
     const {fromDate, toDate} = this.props;
-    let monthes = parseInt(moment(toDate).diff(moment(fromDate), 'months', true)) + 1;
-    let monthsToDisplay = getMonthsToDisplay(monthes);
+    let yearsToDisplay = getYearsToDisplay(fromDate, toDate);
+    let multipleYears = Object.keys(yearsToDisplay).length > 1;
 
     let total = 0;
     let formatedData = {
@@ -115,16 +115,20 @@ class RevenueAvgPerSubscriber extends Component {
       return null;
     }
 
-    monthsToDisplay.forEach((monthNumber, k) => {
-      let revenue = revenueDataset.data.find((node, revenue_index) => monthNumber  == node.month);
-      let newSubscriber = newSubscribersDataset.data.find((node, newSubscriber_index) => monthNumber  == node.month );
-
-      total += (newSubscriber) ? newSubscriber.count : 0 ;
-      let avarage = (revenue) ? Math.round(revenue.due / total) : 0;
-
-      formatedData.x[0].values.push(avarage);
-      formatedData.y.push( getMonthName(monthNumber) );
-    });
+    for (var year in yearsToDisplay) {
+      yearsToDisplay[year].forEach((month, k) => {
+        let revenue = revenueDataset.data.find((node, revenue_index) => { return (month == node.month && year == node.year)} );
+        let newSubscriber = newSubscribersDataset.data.find((node, newSubscriber_index) => { return (month == node.month && year == node.year)} );
+        total += (newSubscriber) ? newSubscriber.count : 0 ;
+        let avarage = (revenue) ? Math.round(revenue.due / total) : 0;
+        formatedData.x[0].values.push(avarage);
+        let label = getMonthName(month);
+        if (multipleYears){
+          label += ', ' + year;
+        }
+        formatedData.y.push(label);
+      });
+    }
 
     return formatedData;
   }

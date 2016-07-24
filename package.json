@@ -53,6 +53,7 @@
     "react-redux": "^4.4.5",
     "react-router": "^2.4.0",
     "redux": "^3.3.1",
-    "redux-thunk": "^2.0.1"
+    "redux-thunk": "^2.0.1",
+    "twix": "^1.1.0"
   }
 }

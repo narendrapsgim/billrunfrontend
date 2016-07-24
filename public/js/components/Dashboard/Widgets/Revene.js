@@ -4,7 +4,7 @@ import moment from 'moment';
 import {LineAreaChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {getMonthName, getMonthsToDisplay, chartOptionCurrencyAxesLabel, chartOptionCurrencyTooltipLabel} from '../Widgets/helper';
+import {getMonthName, getYearsToDisplay, chartOptionCurrencyAxesLabel, chartOptionCurrencyTooltipLabel} from '../Widgets/helper';
 
 
 class Revene extends Component {
@@ -52,8 +52,8 @@ class Revene extends Component {
 
   prepareChartData(chartData) {
     const {fromDate, toDate} = this.props;
-    let monthes = parseInt(moment(toDate).diff(moment(fromDate), 'months', true)) + 1;
-    let monthsToDisplay = getMonthsToDisplay(monthes);
+    let yearsToDisplay = getYearsToDisplay(fromDate, toDate);
+    let multipleYears = Object.keys(yearsToDisplay).length > 1;
 
     var formatedData = {
       title: 'Revenue',
@@ -65,14 +65,18 @@ class Revene extends Component {
     if(!dataset.data || dataset.data.length == 0){
       return null;
     }
-    //TODO - fix check YEAR
-    monthsToDisplay.forEach((monthNumber, k) => {
-      var point = dataset.data.find((node, i) => monthNumber == node.month );
-      let data = (point) ? point.due : 0 ;
-      formatedData.x[0].values.push(data);
-      formatedData.y.push( getMonthName(monthNumber) );
-    });
-
+    for (var year in yearsToDisplay) {
+      yearsToDisplay[year].forEach((month, k) => {
+        var point = dataset.data.find((node, i) => { return (month == node.month && year == node.year)} );
+        let data = (point) ? point.due : 0 ;
+        formatedData.x[0].values.push(data);
+        let label = getMonthName(month);
+        if (multipleYears){
+          label += ', ' + year;
+        }
+        formatedData.y.push(label);
+      });
+    }
     return formatedData;
   }
 

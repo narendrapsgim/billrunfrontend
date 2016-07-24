@@ -1,3 +1,6 @@
+import moment from 'moment';
+import twix from 'twix';
+
 var countries = {
   "AFG": "Afghanistan",
   "AGO": "Angola",
@@ -183,19 +186,24 @@ export function getCountryKeyByCountryName(name) {
   return null;
 }
 
-export function getMonthName(intex){
+export function getMonthName(index){
   let names =  ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  return names[(intex-1) % 11 ]
+  return names[ (index-1) % 12 ]
 }
 
-export function getMonthsToDisplay(count, fromDate = new Date()){
-  let monthsToShow = Array.from(Array(count), (v, k) => {
-        let date = new Date(fromDate);
-        date = new Date(date.setMonth(date.getMonth() - k));
-        let monthNumber = new Date(date.setMonth(date.getMonth() + 1)).getMonth();
-        return monthNumber ? monthNumber : 12;
-      }).reverse();
-  return monthsToShow;
+export function getYearsToDisplay(dateFrom, dateTo){
+  var datesToDisplay = {};
+  var dateDiffIter = moment.twix(dateFrom, moment(dateTo).add(1,'months')).iterateInner("months");
+  while (dateDiffIter.hasNext()) {
+    let next = dateDiffIter.next();
+    let year = next.format('Y')
+    let month = next.format('M');
+    if(!datesToDisplay.hasOwnProperty(year)){
+      datesToDisplay[year] = [];
+    }
+    datesToDisplay[year].push(month);
+  }
+  return datesToDisplay;
 }
 
 export function getFromDate(before, type, from = new Date()){
