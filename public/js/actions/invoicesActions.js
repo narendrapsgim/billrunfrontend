@@ -5,7 +5,7 @@ import axios from 'axios';
 
 let axiosInstance = axios.create({
   withCredentials: true,
-  baseUrl: globalSetting.serverUrl
+  baseURL: globalSetting.serverUrl
 });
 
 function gotInvoices(invoices) {
@@ -96,6 +96,6 @@ function fetchInvoices(query) {
 
 export function getInvoices(query = {page: 1, size: 10, filter: ""}) {
   return dispatch => {
-    return dispatch(fetchInvoices());
+    return dispatch(fetchInvoices(query));
   };
 }
