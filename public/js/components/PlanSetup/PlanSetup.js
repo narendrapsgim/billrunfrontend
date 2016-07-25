@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+
 import { updatePlanField, updatePlanRecurringPriceField, getPlan, clearPlan, savePlan, addTariff } from '../../actions/planActions';
 
 import Plan from './Plan';
@@ -113,15 +116,16 @@ class PlanSetup extends Component {
           <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} onChangeFieldCheckValue={this.onChangeFieldCheckValue} basicSettings={this.props.basic_settings} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
-          <button onClick={this.handleBack}
-                  className="btn btn-primary"
-                  style={{marginRight: 12}}>
-            Save
-          </button>
-          <button className="btn btn-danger"
-                  onClick={this.handleSave}>
-            Cancel
-          </button>
+          <FlatButton
+              label="Cancel"
+              onTouchTap={this.handleBack}
+              style={{marginRight: 12}}
+          />
+          <RaisedButton
+              label='Save'
+              primary={true}
+              onTouchTap={this.handleSave}
+          />          
         </div>
       </div>
     );
