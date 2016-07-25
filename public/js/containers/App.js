@@ -55,10 +55,7 @@ App.contextTypes = {
 };
 
 function mapStateToProps(state) {
-  return {
-    users: state.users,
-    pages: state.pages
-  };
+  return state;
 }
 
 export default connect(mapStateToProps, actions)(App);
