@@ -28,7 +28,7 @@ export default function (ComposedComponent) {
           <RaisedButton key="2" label="Login" onClick={this.handleOpenLogin} />
         </div>);
       }
-      if (users.get('roles').toSet().intersect(Immutable.fromJS(["admin"])).size > 0) {
+      if (users.get('roles').includes("admin")) {
         return (<ComposedComponent {...this.props} />);
       }
       const page_name = _.last(this.props.location.pathname.split('/'));
