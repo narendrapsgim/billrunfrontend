@@ -4,7 +4,7 @@ import moment from 'moment';
 import {LineChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {getMonthName, getMonthsToDisplay} from '../Widgets/helper';
+import {getMonthName, getYearsToDisplay} from '../Widgets/helper';
 
 
 class TotalSubscribers extends Component {
@@ -73,8 +73,8 @@ class TotalSubscribers extends Component {
 
   prepareChartData(chartData) {
     const {fromDate, toDate} = this.props;
-    let monthes = parseInt(moment(toDate).diff(moment(fromDate), 'months', true)) + 1;
-    let monthsToDisplay = getMonthsToDisplay(monthes);
+    let yearsToDisplay = getYearsToDisplay(fromDate, toDate);
+    let multipleYears = Object.keys(yearsToDisplay).length > 1;
 
     let total = 0;
     let formatedData = {
@@ -92,13 +92,20 @@ class TotalSubscribers extends Component {
     if(!newSubscribersDataset.data || newSubscribersDataset.data.length == 0){
       return null;
     }
-    //TODO - fix check YEAR
-    monthsToDisplay.forEach((monthNumber, k) => {
-      var point = newSubscribersDataset.data.find((node, i) => monthNumber == node.month );
-      total += (point) ? point.count : 0 ;
-      formatedData.x[0].values.push(total);
-      formatedData.y.push( getMonthName(monthNumber) );
-    });
+
+    for (var year in yearsToDisplay) {
+      yearsToDisplay[year].forEach((month, k) => {
+        var point = newSubscribersDataset.data.find((node, i) => { return (month == node.month && year == node.year)} );
+        total += (point) ? point.count : 0 ;
+        formatedData.x[0].values.push(total);
+        let label = getMonthName(month);
+        if (multipleYears){
+          label += ', ' + year;
+        }
+        formatedData.y.push(label);
+      });
+    }
+
 
     return formatedData;
   }

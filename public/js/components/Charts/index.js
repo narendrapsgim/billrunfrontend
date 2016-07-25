@@ -14,6 +14,8 @@ export {default as PolarAreaChart} from './PolarAreaChart';
 
 export {default as BubbleChart} from './BubbleChart';
 
+export {default as MapChart} from './MapChart';
+
 
 // npm install --save react-chartjs@"git+https://github.com/jhudson8/react-chartjs/#chartjs-v2"
 // npm install chart.js --save
