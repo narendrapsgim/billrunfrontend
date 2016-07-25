@@ -39,7 +39,7 @@ class Topbar extends Component {
   renderLoginButton(){
     return (
       <ToolbarGroup>
-        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text="Login" onClick={this.handleOpen} />
+        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text="Login" onClick={this.handleOpen} className="cursor-pointer"/>
       </ToolbarGroup>
     )
   }
@@ -48,7 +48,7 @@ class Topbar extends Component {
     return (
       <ToolbarGroup>
         <ToolbarSeparator style={{top: '13px'}}/>
-        <Avatar
+        <Avatar className="cursor-default"
           color={blue500}
           backgroundColor={indigo50}
           size={40}
@@ -56,7 +56,7 @@ class Topbar extends Component {
         >
         {this.props.userName[0]}
       </Avatar>
-      <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text={this.props.userName} />
+      <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text={this.props.userName} className="cursor-default"/>
         <IconMenu style={{marginTop:'5px'}}
           iconButtonElement={
             <IconButton touch={true}>

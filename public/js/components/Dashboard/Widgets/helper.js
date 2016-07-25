@@ -50,7 +50,7 @@ export function chartOptionCurrencyAxesLabel(value, index, values) {
 export function chartOptionCurrencyTooltipLabel(tooltipItems, data) {
   var value = tooltipItems.yLabel;
   if(value == 0 ){
-    return 0;
+    return "0";
   } else if (value > 1000) {
     return (value/1000) + "K" + globalSetting.currency;
   } else {

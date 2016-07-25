@@ -89,6 +89,9 @@ class TotalSubscribers extends Component {
     }
 
     let newSubscribersDataset = chartData.find((dataset, i) => dataset.name == "new_subscribers");
+    if(!newSubscribersDataset.data || newSubscribersDataset.data.length == 0){
+      return null;
+    }
     //TODO - fix check YEAR
     monthsToDisplay.forEach((monthNumber, k) => {
       var point = newSubscribersDataset.data.find((node, i) => monthNumber == node.month );

@@ -111,6 +111,9 @@ class RevenueAvgPerSubscriber extends Component {
 
     let newSubscribersDataset = chartData.find((dataset, i) => dataset.name == "new_subscribers");
     let revenueDataset = chartData.find((dataset, i) => dataset.name == "revenue");
+    if(!revenueDataset.data || revenueDataset.data.length == 0 || !newSubscribersDataset.data || newSubscribersDataset.data.length == 0 ){
+      return null;
+    }
 
     monthsToDisplay.forEach((monthNumber, k) => {
       let revenue = revenueDataset.data.find((node, revenue_index) => monthNumber  == node.month);

@@ -62,7 +62,7 @@ class NewSubscribers extends Component {
     };
 
     let newSubscribersDataset = chartData.find((dataset, i) => dataset.name == "new_subscribers");
-    if(!newSubscribersDataset.data){
+    if(!newSubscribersDataset.data || newSubscribersDataset.data.length == 0){
       return null;
     }
     //TODO - fix check YEAR
