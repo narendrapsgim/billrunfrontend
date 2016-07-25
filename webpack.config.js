@@ -9,9 +9,11 @@ var isProduction = (env === 'prod');
 
 var plugins = [
   new ExtractTextPlugin('app.css'),
-  // new HtmlWebpackPlugin({
-  //   hash: true
-  // })
+  new HtmlWebpackPlugin({
+    hash: true,
+    template: 'index.tmpl.html',
+    inject: true
+  })
 ];
 
 // This is necessary to get the sass @import's working
