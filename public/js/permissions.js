@@ -5,7 +5,17 @@ export const permissions = Immutable.fromJS({
     view: ["read"]
   },
   plan_setup: {
-    view: ["read", "write"],
-    save: ["write"]
-  }
+    view: ["read"],
+    save: ["write"],
+    update: ["write"]
+  },
+  products: {
+    view: ["read"]
+  },
+  product_setup: {
+    update: ["write"]
+  },
+  subscribers: {
+    view: ["read"]
+  },
 });

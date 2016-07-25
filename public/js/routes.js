@@ -27,7 +27,7 @@ export default () => {
       <Route name="plans" path="/plans" component={RequireAuth(PlansList)} />
       <Route name="products" path="/products" component={RequireAuth(ProductsList)} />
       <Route name="product_setup" path="/product_setup" component={RequireAuth(ProductSetup)} />
-      <Route name="subscribers_list" path="/subscribers_list" component={RequireAuth(SubscribersList)} />
+      <Route name="subscribers" path="/subscribers" component={RequireAuth(SubscribersList)} />
       <Route name="subscriber" path="/subscriber" component={RequireAuth(SubscriberEdit)} />
       <Route name="usage" path="/usage" component={RequireAuth(UsageList)} />
       <Route name="log" path="/log" component={RequireAuth(Log)} />
