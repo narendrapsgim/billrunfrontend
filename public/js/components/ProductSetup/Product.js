@@ -35,7 +35,7 @@ export default class Product extends Component {
       <div className="AddProduct">
         <div className="row">
           <div className="col-md-3">
-            <label for="key">Name</label>
+            <label htmlFor="key">Name</label>
             <Field id="key"
                    coll="Product"
                    onChange={onChangeItemFieldValue.bind(this, "key", -1)}
@@ -43,7 +43,7 @@ export default class Product extends Component {
             />
           </div>
           <div className="col-md-3">
-            <label for="key">Code</label>
+            <label htmlFor="key">Code</label>
             <Field id="code"
                    coll="Product"
                    onChange={onChangeItemFieldValue.bind(this, "code", -1)}
@@ -53,7 +53,7 @@ export default class Product extends Component {
         </div>
         <div className="row">
           <div className="col-md-6">
-            <label for="description">Description</label>
+            <label htmlFor="description">Description</label>
             <Field id="description"
                    coll="Product"
                    onChange={onChangeItemFieldValue.bind(this, "description", -1)}
@@ -63,17 +63,17 @@ export default class Product extends Component {
         </div>
         <div className="row">
           <div className="col-md-3">
-            <label for="unit">Unit Type</label>
+            <label htmlFor="unit">Unit Type</label>
             <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={productSettings.unit} defaultValue="-1">
               { available_units }
             </select>
           </div>
-          <div className="col-md-2">
-            <label for="unit_price">Unit Price</label>
-            <Field id="unit_price"
-                   onChange={onChangeItemFieldValue.bind(this, "unit_price", -1)}
-                   value={productSettings.unit_price} />
-          </div>
+          {/* <div className="col-md-2">
+          <label htmlFor="unit_price">Unit Price</label>
+          <Field id="unit_price"
+          onChange={onChangeItemFieldValue.bind(this, "unit_price", -1)}
+          value={productSettings.unit_price} />
+          </div> */}
         </div>
         <div className="row">
           <div className="col-md-2">
@@ -93,7 +93,7 @@ export default class Product extends Component {
         { productSettings.rates.map((rate, key) => (
               <div className="row" key={key}>
                 <div className="col-md-1">
-                  <label for="from">From</label>
+                  <label htmlFor="from">From</label>
                   <Field id="from"
                          coll="Product"
                          onChange={onChangeItemFieldValue.bind(this, "from", key)}
@@ -101,7 +101,7 @@ export default class Product extends Component {
                   />
                 </div>
                 <div className="col-md-1">
-                  <label for="to">To</label>
+                  <label htmlFor="to">To</label>
                   <Field id="to"
                          coll="Product"
                          onChange={onChangeItemFieldValue.bind(this, "to", key)}
@@ -109,21 +109,21 @@ export default class Product extends Component {
                   />
                 </div>
                 <div className="col-md-1">
-                  <label for="interval">Interval</label>
+                  <label htmlFor="interval">Interval</label>
                   <Field id="interval"
                          onChange={onChangeItemFieldValue.bind(this, "interval", key)}
                          value={productSettings.rates[key].interval}
                   />
                 </div>
                 <div className="col-md-1">
-                  <label for="price">Price</label>
+                  <label htmlFor="price">Price</label>
                   <Field id="price"
                          onChange={onChangeItemFieldValue.bind(this, "price", key)}
                          value={productSettings.rates[key].price}
                   />
                 </div>
                 {(() => {  /* only show remove button if there is more than one interval and only for the last one */
-                   if (productSettings.rates.length > 1 && key === (productSettings.rates.length - 1)) {
+                   if (productSettings.rates.length > 0 && key === (productSettings.rates.length - 1)) {
                      return (
                        <div className="col-md-2">
                          <FloatingActionButton mini={true} secondary={true} style={{marginTop: "30px", marginLeft: "15px"}} onMouseUp={onRemoveProductProperties.bind(this, key)}>

@@ -10,13 +10,12 @@ import Dashboard from 'material-ui/svg-icons/action/dashboard';
 import Layers from 'material-ui/svg-icons/maps/layers';
 import Receipt from 'material-ui/svg-icons/action/receipt';
 import AccountCircle from 'material-ui/svg-icons/action/account-circle';
-import View from '../../views';
 
 const routes = [
   {to: "/dashboard", label: "Dashboard"},
   {to: "/plans", label: "Plans"},  
   {to: "/products", label: "Products"},
-  {to: "/subscribers_list", label: "Customers"},
+  {to: "/subscribers", label: "Customers"},
   {to: "/usage", label: "Usage"},
   {to: "/invoices", label: "Invoices"},
   {to: "/log", label: "Log"},

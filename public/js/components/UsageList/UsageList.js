@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 
 import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody, TableFooter } from 'material-ui/Table';
-import Page from '../Pager';
+import Pager from '../Pager';
 import Filter from '../Filter';
 
 import { getUsages } from '../../actions/usageActions';
@@ -73,9 +73,6 @@ class UsageList extends Component {
         <div className="row" style={{marginBottom: 10}}>
           <div className="col-md-5">
             <Filter fields={fields} onFilter={this.onFilter} base={base} />
-            {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
-            { sort_fields }
-            </select> */}
           </div>
         </div>
         <Table selectable={false}

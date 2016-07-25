@@ -94,8 +94,8 @@ Topbar.defaultProps = {
 
 function mapStateToProps(state) {
   return {
-    auth: state.users.auth,
-    userName : state.users.name,
+    auth: state.users.get('auth'),
+    userName : state.users.get('name'),
   };
 }
 

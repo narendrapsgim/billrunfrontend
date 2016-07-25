@@ -3,7 +3,7 @@ import { GOT_CUSTOMER,
          UPDATE_CUSTOMER_FIELD,
          SAVE_SUBSCRIBER,
          GOT_SUBSCRIBER_SETTINGS,
-         GET_NEW_CUSTOMER,
+         GET_NEW_SUBSCRIBER,
          CLEAR_CUSTOMER } from '../actions/customerActions';
 import Immutable from 'immutable';
 
@@ -27,12 +27,6 @@ export default function (state = defaultState, action) {
     const { newCustomer } = action;
     console.log('saving customer, newCustomer? ', newCustomer, sub);
     return state;
-    
-  case GET_NEW_CUSTOMER:
-    if (action.aid) {
-      return Immutable.fromJS({customer: {aid: action.aid}});
-    }
-    return Immutable.fromJS({customer: {}});
 
   case CLEAR_CUSTOMER:
     return defaultState;

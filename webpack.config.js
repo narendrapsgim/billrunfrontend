@@ -2,12 +2,19 @@ var webpack = require('webpack');
 var path = require('path');
 //var css = require('css!./file.css');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var env = process.env.MIX_ENV || 'dev';
 var isProduction = (env === 'prod');
 
 var plugins = [
   new ExtractTextPlugin('app.css'),
+  new webpack.optimize.OccurenceOrderPlugin(),
+  new HtmlWebpackPlugin({
+    hash: true,
+    template: 'index.tmpl.html',
+    inject: true
+  })
 ];
 
 // This is necessary to get the sass @import's working
@@ -17,7 +24,18 @@ var stylePathResolves = (
 );
 
 if (isProduction) {
-  plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}));
+  plugins.push(new webpack.optimize.DedupePlugin());
+  plugins.push(new webpack.optimize.UglifyJsPlugin({
+    minimize: true,
+    sourceMap: false,
+    output: {
+      comments: false
+    },
+    compress: {
+      drop_console: true,
+      warnings: false
+    }
+  }));
 }
 
 module.exports = {

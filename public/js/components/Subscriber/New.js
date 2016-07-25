@@ -18,7 +18,15 @@ class New extends Component {
   }
   
   render() {
-    const { settings, onChange, plans, aid, onSave, onCancel, onChangeTypeaheadField, onChangeDateFieldValue } = this.props;
+    const { settings,
+            onChange,
+            plans,
+            aid,
+            entity,
+            onSave,
+            onCancel,
+            onChangeTypeaheadField,
+            onChangeDateFieldValue } = this.props;
     if (!settings || settings.size === 0) return (<div></div>);
 
     const available_plans = plans.map((plan, key) => {
@@ -67,11 +75,11 @@ class New extends Component {
                  <div className="row">
                    <div className="col-md-2">
                      <label>Valid From</label>
-                     <DateTimeField id="from" onChange={onChangeDateFieldValue.bind(this, "from")} />
+                     <DateTimeField id="from" dateTime={entity.get('from')} onChange={onChangeDateFieldValue.bind(this, "from")} />
                    </div>
                    <div className="col-md-2">
                      <label>To</label>
-                     <DateTimeField id="to"   onChange={onChangeDateFieldValue.bind(this, "to")} />
+                     <DateTimeField id="to" dateTime={entity.get('to')} onChange={onChangeDateFieldValue.bind(this, "to")} />
                    </div>
                  </div>
                </div>

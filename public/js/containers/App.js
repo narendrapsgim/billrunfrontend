@@ -25,11 +25,19 @@ export default class App extends Component {
   }
 
   render() {
+    const { users } = this.props;
+
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>
         <div className="App">
           <Topbar />
-          <Navigator />
+          {(() => {
+             if (users.get('auth'))
+               return (
+                 <Navigator />
+               );
+           })()
+          }
           <StatusBar />
             <div className="container-fluid main-content">
               <div className="contents">
@@ -55,10 +63,7 @@ App.contextTypes = {
 };
 
 function mapStateToProps(state) {
-  return {
-    users: state.users,
-    pages: state.pages
-  };
+  return { users: state.users };
 }
 
 export default connect(mapStateToProps, actions)(App);

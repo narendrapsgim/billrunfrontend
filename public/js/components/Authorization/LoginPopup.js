@@ -94,7 +94,7 @@ export default class LoginPopup extends Component {
 
 function mapStateToProps(state) {
   return {
-    auth: state.users.auth,
+    auth: state.users.get('auth'),
     displayPopup: state.login.displayPopup,
   };
 }

@@ -6,6 +6,7 @@ export const SAVE_PRODUCT = 'SAVE_PRODUCT';
 export const CLEAR_PRODUCT = 'CLEAR_PRODUCT';
 
 import axios from 'axios';
+import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 
 let axiosInstance = axios.create({

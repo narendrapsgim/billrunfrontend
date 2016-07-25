@@ -18,7 +18,7 @@ export default class CurrencyTax extends Component {
         <div className="Currency">
           <div className="row">
             <div className="col-md-1">
-              <label for="currency">Currency</label>
+              <label htmlFor="currency">Currency</label>
               <select className="form-control"
                       id="currency"
                       value={data.get('currency')}
