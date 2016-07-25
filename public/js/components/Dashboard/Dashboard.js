@@ -4,22 +4,29 @@ import CircularProgress from 'material-ui/CircularProgress';
 import FontIcon from 'material-ui/FontIcon';
 import moment from 'moment';
 import { getData } from '../../actions/dashboardActions';
-import TotalSubscribersWidget from './Widgets/TotalSubscribers'
-import NewSubscribersWidget from './Widgets/NewSubscribers'
-import ChurningSubscribersWidget from './Widgets/ChurningSubscribers'
-import ReveneWidget from './Widgets/Revene'
-import RevenueAvgPerSubscriberWidget from './Widgets/RevenueAvgPerSubscriber'
-import SubsPerPlanWidget from './Widgets/SubsPerPlan'
-import SubsPerPlanCurrentMonthWidget from './Widgets/SubsPerPlanCurrentMonth'
-import RevenuePerPlanWidget from './Widgets/RevenuePerPlan'
-import RevenuePerPlanCurrentMonthWidget from './Widgets/RevenuePerPlanCurrentMonth'
+import TotalSubscribersWidget from './Widgets/TotalSubscribers';
+import NewSubscribersWidget from './Widgets/NewSubscribers';
+import ChurningSubscribersWidget from './Widgets/ChurningSubscribers';
+import ReveneWidget from './Widgets/Revene';
+import RevenueAvgPerSubscriberWidget from './Widgets/RevenueAvgPerSubscriber';
+import SubsPerPlanWidget from './Widgets/SubsPerPlan';
+import SubsPerPlanCurrentMonthWidget from './Widgets/SubsPerPlanCurrentMonth';
+import RevenuePerPlanWidget from './Widgets/RevenuePerPlan';
+import RevenuePerPlanCurrentMonthWidget from './Widgets/RevenuePerPlanCurrentMonth';
+import MapSubscribersWidget from './Widgets/MapSubscribers';
 import {getFromDate, getToDate} from './Widgets/helper';
+
 
 class Dashboard extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {}
+    let today = new Date();
+    let fromDate = new Date(moment(today).add(-5,'months').startOf('month').startOf('hour').startOf('minute').startOf('second'));
+    this.state = {
+      fromDate: fromDate,
+      toDate: today,
+    }
     this.styles = this.getStyles();
   }
 
@@ -35,8 +42,7 @@ class Dashboard extends Component {
   };
 
   render() {
-    let fromDate = getFromDate(5, 'months');
-    let toDate = getToDate();
+    const {fromDate, toDate} = this.state;
 
     return (
       <div className="dashboard" >
@@ -52,6 +58,7 @@ class Dashboard extends Component {
           </div>
         </div>
         <div className="container" >
+          <MapSubscribersWidget fromDate={fromDate} toDate={toDate}/>
           <ReveneWidget fromDate={fromDate} toDate={toDate}/>
           <RevenueAvgPerSubscriberWidget fromDate={fromDate} toDate={toDate}/>
           <TotalSubscribersWidget fromDate={fromDate} toDate={toDate}/>

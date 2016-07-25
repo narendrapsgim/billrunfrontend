@@ -4,7 +4,7 @@ import moment from 'moment';
 import {LineChart} from '../../Charts';
 import {getData} from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {getMonthName, getMonthsToDisplay} from '../Widgets/helper';
+import {getMonthName, getYearsToDisplay} from '../Widgets/helper';
 
 
 class ChurningSubscribers extends Component {
@@ -52,8 +52,8 @@ class ChurningSubscribers extends Component {
 
   prepareChartData(chartData) {
     const {fromDate, toDate} = this.props;
-    let monthes = parseInt(moment(toDate).diff(moment(fromDate), 'months', true)) + 1;
-    let monthsToDisplay = getMonthsToDisplay(monthes);
+    let yearsToDisplay = getYearsToDisplay(fromDate, toDate);
+    let multipleYears = Object.keys(yearsToDisplay).length > 1;
 
     var formatedData = {
       title: 'Churning Subscribers',
@@ -61,18 +61,22 @@ class ChurningSubscribers extends Component {
       y: []
     };
 
-    let churningSubscribersDataset = chartData.find((dataset, i) => dataset.name == "churning_subscribers");
-    if(!churningSubscribersDataset.data || churningSubscribersDataset.data.length == 0){
+    let dataset = chartData.find((dataset, i) => dataset.name == "churning_subscribers");
+    if(!dataset.data || dataset.data.length == 0){
       return null;
     }
-    //TODO - fix check YEAR
-    monthsToDisplay.forEach((monthNumber, k) => {
-      var point = churningSubscribersDataset.data.find((node, i) => monthNumber == node.month );
-      let data = (point) ? point.count : 0 ;
-      formatedData.x[0].values.push(data);
-      formatedData.y.push( getMonthName(monthNumber) );
-    });
-
+    for (var year in yearsToDisplay) {
+      yearsToDisplay[year].forEach((month, k) => {
+        var point = dataset.data.find((node, i) => { return (month == node.month && year == node.year)} );
+        let data = (point) ? point.count : 0 ;
+        formatedData.x[0].values.push(data);
+        let label = getMonthName(month);
+        if (multipleYears){
+          label += ', ' + year;
+        }
+        formatedData.y.push(label);
+      });
+    }
     return formatedData;
   }
 
@@ -98,7 +102,7 @@ class ChurningSubscribers extends Component {
   renderContent(chartData){
     switch (chartData) {
       case undefined: return <PlaceHolderWidget/>;
-      case null: return 'OK';
+      case null: return null;
       default: return <LineChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
     }
   }
