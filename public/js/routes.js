@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Route, Link, IndexRedirect } from 'react-router';
 import App from './containers/App';
-import PageBuilder from './components/PageBuilder';
 
 import RequireAuth from './containers/Authentication';
 
@@ -21,7 +20,7 @@ import Invoices from './components/Invoices';
 export default () => {
   return (
     <Route path="/" component={App}>
-      <IndexRedirect to="/dashboard" component={PageBuilder} />
+      <IndexRedirect to="/dashboard" component={RequireAuth(Dashboard)} />
       <Route name="dashboard" path="/dashboard" component={RequireAuth(Dashboard)} />
       <Route name="plan_setup" path="/plan_setup" component={RequireAuth(PlanSetup)} />
       <Route name="plans" path="/plans" component={RequireAuth(PlansList)} />

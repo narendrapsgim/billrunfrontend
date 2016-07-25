@@ -14,17 +14,6 @@ var plugins = [
     hash: true,
     template: 'index.tmpl.html',
     inject: true
-  }),
-  new webpack.optimize.DedupePlugin(),
-  new webpack.optimize.UglifyJsPlugin({
-    minimize: true,
-    output: {
-      comments: false
-    },
-    compress: {
-      drop_console: true,
-      warnings: false
-    }
   })
 ];
 
@@ -34,9 +23,20 @@ var stylePathResolves = (
     'includePaths[]=' + path.resolve('./node_modules')
 );
 
-// if (isProduction) {
-//   plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}));
-// }
+if (isProduction) {
+  plugins.push(new webpack.optimize.DedupePlugin());
+  plugins.push(new webpack.optimize.UglifyJsPlugin({
+    minimize: true,
+    sourceMap: false,
+    output: {
+      comments: false
+    },
+    compress: {
+      drop_console: true,
+      warnings: false
+    }
+  }));
+}
 
 module.exports = {
   entry: './public/js/index.js',
