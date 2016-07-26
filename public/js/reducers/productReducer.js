@@ -6,56 +6,39 @@ import { UPDATE_PRODUCT_PROPERTIES_VALUE,
          CLEAR_PRODUCT } from '../actions/productActions';
 
 import moment from 'moment';
+import Immutable from 'immutable';
 
-const defaultState = {
+const defaultState = Immutable.fromJS({
   key: '',
   description: '',
   unit_price: '',
   from: moment().unix() * 1000,
   to: moment().add(1, 'years').unix() * 1000,
   rates: []
-};
+});
 
 export default function (state = defaultState, action) {
+  const { field_idx, field_name, field_value } = action;
   switch (action.type) {
     case UPDATE_PRODUCT_PROPERTIES_VALUE:
-      let { field_idx, field_name, field_value } = action;
-      if (field_idx === -1) {
-        return Object.assign({}, state, {
-          [field_name]: field_value
-        });
-      }
-      let s = state.rates.map((prop, idx) => {
-        if (idx !== field_idx) return prop;
-        return {
-          ...prop,
-          [field_name]: field_value
-        };
-      });
-      return Object.assign({}, state, {
-        rates: s
-      });
+      if (field_idx === -1)
+        return state.set(field_name, field_value);
+      return state.setIn(['rates', field_idx, field_name], field_value);
 
     case ADD_PRODUCT_PROPERTIES:
-      let new_rate = {
+      let new_rate = Immutable.fromJS({
         from: undefined,
         to: undefined,
         interval: undefined,
         price: undefined
-      };
-      return Object.assign({}, state, {
-        rates: [...state.rates, new_rate]
       });
+      return state.update('rates', list => list.push(new_rate));
 
     case REMOVE_PRODUCT_PROPERTIES:
-      return Object.assign({}, state, {
-        rates: state.rates
-                         .slice(0, action.idx)
-                         .concat(state.rates.slice(action.idx + 1))
-      });
+      return state.update('rates', list => list.delete(action.idx));
 
     case GOT_PRODUCT:
-      return action.product;
+      return Immutable.fromJS(action.product);
 
     case CLEAR_PRODUCT:
       return defaultState;

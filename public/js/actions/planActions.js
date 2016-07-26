@@ -27,7 +27,7 @@ function getToDate(settings, from, cycle) {
 }
 
 function buildPlanFromState(state) {
-  let { basic_settings } = state;
+  let basic_settings = state.toJS();
   let prices = [];
 
   let { TrialPrice, TrialCycle } = basic_settings;
@@ -86,10 +86,9 @@ function buildPlanFromState(state) {
   };
 }
 
-export function updatePlanField(section, field_name, field_value) {
+export function updatePlanField(field_name, field_value) {
   return {
     type: UPDATE_PLAN_FIELD_VALUE,
-    section,
     field_name,
     field_value
   };
@@ -134,19 +133,17 @@ function fetchPlan(plan_id) {
       return acc;
     }, []);
     return {
-      basic_settings: {
-        id: plan._id.$id,
-        PlanDescription: plan.PlanDescription,
-        PlanCode: plan.PlanCode,
-        PlanName: plan.name,
-        to: moment(plan.to).unix() * 1000,
-        from: moment(plan.from).unix() * 1000,
-        EachPeriod: _.capitalize(plan.recurring.unit),
-        ChargingMode: plan.charging_mode,
-        Each: plan.recurring.duration,
+      id: plan._id.$id,
+      PlanDescription: plan.PlanDescription,
+      PlanCode: plan.PlanCode,
+      PlanName: plan.name,
+      to: moment(plan.to).unix() * 1000,
+      from: moment(plan.from).unix() * 1000,
+      EachPeriod: _.capitalize(plan.recurring.unit),
+      ChargingMode: plan.charging_mode,
+      Each: plan.recurring.duration,
         ...Trial,
-        recurring_prices
-      }
+      recurring_prices
     };
   };
 

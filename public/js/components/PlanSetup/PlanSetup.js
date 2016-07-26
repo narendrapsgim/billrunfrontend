@@ -17,8 +17,6 @@ class PlanSetup extends Component {
 
     this.onAddTariff = this.onAddTariff.bind(this);
     this.onChangeRecurringPriceFieldValue = this.onChangeRecurringPriceFieldValue.bind(this);    
-    this.onChangeRecurringPriceCheckFieldValue = this.onChangeRecurringPriceCheckFieldValue.bind(this);
-    this.onChangeFieldCheckValue = this.onChangeFieldCheckValue.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.onChangeDateFieldValue = this.onChangeDateFieldValue.bind(this);
 
@@ -39,36 +37,34 @@ class PlanSetup extends Component {
     this.props.dispatch(clearPlan());
   }
   
-  onChangeFieldValue(section, e) {
-    const { value, id } = e.target;
-    this.props.dispatch(updatePlanField(section, id, value));
-  }
-
-  onChangeFieldCheckValue(section, e) {
-    const { checked, id } = e.target;
-    this.props.dispatch(updatePlanField(section, id, checked));
+  onChangeFieldValue(e) {
+    const { value, id, checked, type } = e.target;
+    const { dispatch } = this.props;
+    type === "checkbox" ?
+                         dispatch(updatePlanField(id, checked)) :
+                         dispatch(updatePlanField(id, value));
   }
   
   onChangeRecurringPriceFieldValue(id, idx, e, val) {
     let value = val ? val : e.target.value;
-    this.props.dispatch(updatePlanRecurringPriceField(id, idx, value));
+    const { checked, type } = e.target;
+    const { dispatch } = this.props;
+    type === "checkbox" ?
+                         dispatch(updatePlanRecurringPriceField(id, idx, checked)) :
+                         dispatch(updatePlanRecurringPriceField(id, idx, value));
   }
   
-  onChangeRecurringPriceCheckFieldValue(id, idx, e) {
-    this.props.dispatch(updatePlanRecurringPriceField(id, idx, e.target.checked));
-  }
-
   onAddTariff() {
     this.props.dispatch(addTariff());
   }
   
-  onChangeDateFieldValue(section, id, value) {
-    this.props.dispatch(updatePlanField(section, id, value));
+  onChangeDateFieldValue(id, value) {
+    this.props.dispatch(updatePlanField(id, value));
   }
 
   handleSave() {
     const { action } = this.props.location.query;
-    this.props.dispatch(savePlan(this.props, action));
+    this.props.dispatch(savePlan(this.props.plan, action));
     browserHistory.goBack();
   }
   
@@ -81,7 +77,7 @@ class PlanSetup extends Component {
       <div className="PlanSetup container">
         <h3>Billing Plan</h3>
         <div className="contents bordered-container">
-          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onChangeRecurringPriceCheckFieldValue={this.onChangeRecurringPriceCheckFieldValue} onChangeFieldCheckValue={this.onChangeFieldCheckValue} basicSettings={this.props.basic_settings} />
+          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} plan={this.props.plan} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
@@ -101,7 +97,7 @@ class PlanSetup extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return state.plan;
+  return  { plan: state.plan };
 }  
 
 export default connect(mapStateToProps)(PlanSetup);
