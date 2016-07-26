@@ -13,14 +13,10 @@ class PlanSetup extends Component {
   constructor(props) {
     super(props);
     this.onChangeFieldValue = this.onChangeFieldValue.bind(this);
-    this.handleNext = this.handleNext.bind(this);
     this.handleBack = this.handleBack.bind(this);
 
     this.onAddTariff = this.onAddTariff.bind(this);
     this.onChangeRecurringPriceFieldValue = this.onChangeRecurringPriceFieldValue.bind(this);    
-    this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
-    this.onAddProductProperties = this.onAddProductProperties.bind(this);
-    this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
     this.onChangeRecurringPriceCheckFieldValue = this.onChangeRecurringPriceCheckFieldValue.bind(this);
     this.onChangeFieldCheckValue = this.onChangeFieldCheckValue.bind(this);
     this.handleSave = this.handleSave.bind(this);
@@ -69,21 +65,6 @@ class PlanSetup extends Component {
   onChangeDateFieldValue(section, id, value) {
     this.props.dispatch(updatePlanField(section, id, value));
   }
-  
-  /** PRODUCT **/
-  onChangeItemFieldValue(id, idx, e) {
-    let val = e.target.value;
-    this.props.dispatch(updateProductPropertiesField(id, idx, val));
-  }
-
-  onAddProductProperties() {
-    this.props.dispatch(addProductProperties());
-  }
-
-  onRemoveProductProperties(idx) {
-    this.props.dispatch(removeProductProperties(idx));
-  }
-  /** **/
 
   handleSave() {
     const { action } = this.props.location.query;
@@ -91,19 +72,6 @@ class PlanSetup extends Component {
     browserHistory.goBack();
   }
   
-  handleNext() {
-    const {stepIndex} = this.state;
-    if (this.state.finished) {
-      this.save();
-      return;
-    }
-    let finished = (stepIndex + 1) === 1;
-    this.setState({
-      stepIndex: stepIndex + 1,
-      finished: finished,
-    });
-  }
-
   handleBack() {
     browserHistory.goBack();
   }
