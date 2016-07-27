@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-class CalculatorMapping extends Component {
+export default class CalculatorMapping extends Component {
   constructor(props) {
     super(props);
   }
@@ -98,9 +98,3 @@ class CalculatorMapping extends Component {
     );
   }
 }
-
-function mapStateToProps(state, props) {
-  return {settings: state.inputProcessor};
-}
-
-export default connect(mapStateToProps)(CalculatorMapping);

@@ -29,8 +29,8 @@ function buildRateFromState(state) {
   return {
     key: product.key,
     id: product.id,
-    from: moment(product.from).unix() * 1000,
-    to: moment(product.to).unix() * 1000,
+    from: moment(product.from).unix(),
+    to: moment(product.to).unix(),
     unit_price: product.unit_price,
     description: product.description,
     rates: r

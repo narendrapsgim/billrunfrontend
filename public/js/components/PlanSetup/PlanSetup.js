@@ -89,7 +89,7 @@ class PlanSetup extends Component {
               label='Save'
               primary={true}
               onTouchTap={this.handleSave}
-          />          
+          />
         </div>
       </div>
     );

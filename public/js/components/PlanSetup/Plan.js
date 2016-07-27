@@ -25,7 +25,6 @@ export default class Plan extends Component {
       <option value={op} key={key}>{op}</option>
     ));
 
-    console.log(plan.get('from'), plan.get('to'));
     return (
       <div className="BasicPlanSettings">
         <div className="BasicSettings">
@@ -33,7 +32,7 @@ export default class Plan extends Component {
           <div className="row">
             <div className="col-md-4">
               <label htmlFor="PlanName">Name</label>
-              <Field id="PlanName" onChange={onChangeFieldValue} value={plan.get('PlanName')} />
+              <Field id="PlanName" onChange={onChangeFieldValue} value={plan.get('PlanName')} required={true} />
             </div>
             <div className="col-md-3" >
               <label htmlFor="PlanCode">Code</label>

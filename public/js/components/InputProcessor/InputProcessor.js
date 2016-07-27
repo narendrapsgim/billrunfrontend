@@ -41,13 +41,9 @@ class InputProcessor extends Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const { dispatch, fileType } = this.props;
     dispatch(getProcessorSettings(fileType));
-  }
-  
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextState.stepIndex !== this.state.stepIndex;
   }
 
   onChangeName(e) {
@@ -57,11 +53,11 @@ class InputProcessor extends Component {
   onSetDelimiterType(e) {
     this.props.dispatch(setDelimiterType(e.target.value));
   }
-  
+
   onChangeDelimiter(e) {
     this.props.dispatch(setDelimiter(e.target.value));
   }
-  
+
   onSelectSampleCSV(e) {
     let file = e.target.files[0];
     let reader = new FileReader();
@@ -82,7 +78,7 @@ class InputProcessor extends Component {
   onAddField(val, e) {
     this.props.dispatch(addCSVField(val));
   }
-  
+
   onSetFieldMapping(e) {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setFieldMapping(field, mapping));
@@ -155,9 +151,9 @@ class InputProcessor extends Component {
     const { settings } = this.props;
 
     const steps = [
-      (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} />),
-      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} />),
+      (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} settings={settings} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} settings={settings} />),
+      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
 
@@ -197,7 +193,7 @@ class InputProcessor extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return {settings: state.inputProcessor};
+  return { settings: state.inputProcessor };
 }
 
 export default connect(mapStateToProps)(InputProcessor);

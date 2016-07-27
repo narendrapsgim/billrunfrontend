@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-
+/* import { connect } from 'react-redux';
+ */
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
-class SampleCSV extends Component {
+export default class SampleCSV extends Component {
   constructor(props) {
     super(props);
 
@@ -132,9 +132,9 @@ class SampleCSV extends Component {
     );
   }
 }
+/* 
+   function mapStateToProps(state, props) {
+   return {settings: state.inputProcessor};
+   }
 
-function mapStateToProps(state, props) {
-  return {settings: state.inputProcessor};
-}
-
-export default connect(mapStateToProps)(SampleCSV);
+   export default connect(mapStateToProps)(SampleCSV); */

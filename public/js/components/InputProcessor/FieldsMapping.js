@@ -5,7 +5,7 @@ import { Table } from 'react-bootstrap/lib';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
-class FieldsMapping extends Component {
+export default class FieldsMapping extends Component {
   constructor(props) {
     super (props);
 
@@ -109,9 +109,3 @@ class FieldsMapping extends Component {
     );
   }
 }
-
-function mapStateToProps(state, props) {
-  return {settings: state.inputProcessor};
-}
-
-export default connect(mapStateToProps)(FieldsMapping);
