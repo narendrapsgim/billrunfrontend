@@ -192,7 +192,7 @@ export default class Chips extends Component {
     let wrapperStyle = (typeof style !== 'undefined' && typeof style.wrapper !== 'undefined' ) ? Object.assign({}, styles.wrapper, style.wrapper) : styles.wrapper ;
     return (
       <div style={wrapperStyle}>
-        <label for="newChips" style={this.state.inFocus ? styles.labelFocus : styles.label}>{label}</label>
+        <label htmlFor="newChips" style={this.state.inFocus ? styles.labelFocus : styles.label}>{label}</label>
         <div style={styles.chipsWrapper}>{this.getChips()}</div>
         {disabled ? (null) : this.getInputByType()}
       </div>
