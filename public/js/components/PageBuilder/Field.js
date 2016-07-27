@@ -177,3 +177,115 @@ Field.propTypes = {
 };
 
 export default Field;
+
+
+
+window.isArrayOfObjects = function(element){
+  var result = Array.isArray(element);
+  if(!result) return false;
+
+  result = element.length > 0;
+  if(!result) return false;
+
+  result = Object.prototype.toString.call(element[0]) === "[object Object]";
+  if(!result) return false;
+  return true;
+}
+
+window.parsePrefix = function(items, block, key = '', parent = {}){
+  var html = "<div class='prefix'>";
+  // console.log("key: ", key);
+  // console.log("parent: ", parent);
+  // console.log("block: ", block);
+  var all = items.map((item, i) => _.get(item, key));
+  var intersected = _.intersectionBy(...all, 'region');
+  intersected.forEach( (value) => {
+    html +=  value.region + ":" + '<input type="text" name="lname" value="' + value.prefix.join() + '"><br>';
+  });
+  html += "</div>";
+  return html;
+}
+
+window.parseValue = function(items, block, key = '', parent = {}){
+
+  //console.log("parent : ", parent ," key: ", key);
+
+  var dbkey  = (key.length) ? key + "." + block.dbkey : block.dbkey;
+  var values = items.map( (item, i) => {
+    var val = _.get(item, dbkey, '');
+    if(_.isArray(val)){
+      val = val.join();
+    } else if(typeof val.sec !== 'undefined'){
+      val = new Date(val.sec * 1000);
+    }
+    return val;
+  });
+  var mergedValue = values.reduce( (prevValue, currentValue, index) => {
+    return (prevValue == currentValue) ? currentValue : 'mixed';
+  })
+  return  block.label + ":" + '<input type="text" name="lname" value="' + mergedValue + '"><br>';
+}
+
+window.parseRaw = function(items, block, key ='', parent = {}){
+  var html = "<div class='raw'>";
+  if(parent.type == 'prefix'){
+    html += parsePrefix(items, block.row, key, parent);
+  } else {
+    block.row.map((row, i) => {
+       html += parseData(items, row, key, parent);
+    });
+  }
+  html += "</div>";
+  return html;
+}
+
+window.parseFields = function(items, block, key ='', parent={}){
+  var html = '';
+  block.fields.forEach((field, i) => {
+    if(typeof block.dbkey !== 'undefined'){
+      if(block.dbkey == "*"){
+        var values = items.map( (item, i) => _.get(item, key, '') );
+        var valuesKeys = values.map( (value, i) => Object.keys(value) );
+        var intersectKeys = _.intersection(...valuesKeys);
+        intersectKeys.forEach((objectKey, i) => {
+          var dbkey = key + "." + objectKey;
+          html += parseData(items, field, dbkey);
+        });
+      } else {
+        if(parent.type == 'prefix'){
+            console.log("key: ", key);
+            console.log("parent: ", parent);
+        }
+        var dbkey = (key.length) ? key + "." +  block.dbkey : block.dbkey;
+        var values = items.map( (item, i) => {return _.get(item, dbkey, '')} );
+        var allValues = _.merge(...values);
+        if(isArrayOfObjects(allValues) && !(block.type && block.type == 'prefix')){
+          console.log("parent: ", block);
+
+          html += "<ul>";
+          allValues.forEach((val, i) => {
+            var k = dbkey + '[' + i +']';
+            html += "<li>" + parseData(items, field, k, block) + "</li>";
+          });
+          html += "</ul>";
+        } else {
+          html += parseData(items, field, dbkey, block);
+        }
+      }
+    } else {
+        html += parseData(items, field, key, block);
+    }
+  });
+  return html;
+}
+window.parseData = function(items, block, key ='', parent = {}){
+  var html = '';
+  if(block.hasOwnProperty('fields')){
+    html += parseFields(items, block, key, parent)
+  } else if (block.hasOwnProperty('row')){
+    html += parseRaw(items, block, key, parent);
+  } else {
+    html += parseValue(items, block, key, parent);
+  }
+  return html;
+}

@@ -392,6 +392,11 @@ class PageBuilder extends Component {
                     View.pages[pageName].views[action] :
                     View.pages[pageName];
 
+
+    //temp for development
+    window.v = View.pages[pageName].views[action];
+
+
     // Check page permission
     if(_.intersection(View.pages[pageName].permission, this.props.user.roles).length == 0){
       return (<Auth pagePermission = {View.pages[pageName].permission} userRoles = {this.props.user.roles} auth={this.props.user.auth}/>);

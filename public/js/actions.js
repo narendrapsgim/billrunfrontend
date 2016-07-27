@@ -145,6 +145,11 @@ function combineArray(key, items, path){
 
 
 function combineItem(items){
+
+  //temp for development
+  return _.values(items);
+
+
   let itemsArray = _.values(items);
   let path = 'params.destination';
   if(_.has(itemsArray[0], path)){
@@ -163,6 +168,11 @@ function fetchItems(item_ids, collection, page_name) {
     let request = axiosInstance.get(itemFetchUrl).then(
       response => {
         let combinedItem = combineItem(response.data.details);
+
+        //temp for development
+        window.roman = combinedItem;
+
+
         dispatch(gotItems(combinedItem, collection, page_name));
         dispatch(hideProgressBar());
       }

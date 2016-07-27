@@ -45,10 +45,10 @@ const params_field_bulk_edit = [
     { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
     { dbkey: "source_types", label : 'Source Types', type: 'array'},
   ]},
-  { dbkey: "destination", label:"Prefix", collapsible: false, key:'region', fields: [
+  { dbkey: "destination", label:"Prefix", collapsible: false, type:'prefix', key:'region', fields: [
     { row: [
       { dbkey: "region", label: "Region", type: "text", size: 3},
-      { dbkey: "prefix", label: {dbkey: "region"}, type: "array", size: 6},
+      { dbkey: "prefix", label: "Prefix", type: "array", size: 6},
     ]},
   ]}
 ];
@@ -120,7 +120,7 @@ const rates_edit_view = {
         ]},
         { row: [
           { dbkey: "from", label: "From", type:'date', size: 6 , crud: '0100'},
-        { dbkey: "to", label: "To", type:'date', size: 6},
+          { dbkey: "to", label: "To", type:'date', size: 6},
         ]},
         { row: [
           { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields: ratess_field },
