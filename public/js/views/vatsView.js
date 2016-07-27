@@ -54,9 +54,6 @@ const rates_vat_list_view = {
         // edit : { label: 'Edit' },
         delete : { label: 'Delete', color: Colors.red500  },
       },
-      pagination : {
-        itemsPerPage : 10,
-      },
       onItemClick : 'edit',
     } ]
   } ]
