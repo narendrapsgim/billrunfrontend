@@ -17,6 +17,7 @@ import inputProcessors from './inputProcessorsReducer';
 import dashboard from './dashboardReducer';
 import account from './accountReducer';
 import subscribers from './subscribersReducer';
+import paymentDetails from './paymentDetailsReducer';
 
 export default combineReducers({
   statusBar,
@@ -36,5 +37,6 @@ export default combineReducers({
   inputProcessors,
   dashboard,
   account,
-  subscribers
+  subscribers,
+  paymentDetails
 });
