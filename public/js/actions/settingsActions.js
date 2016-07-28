@@ -16,21 +16,6 @@ function gotSettings(settings) {
 }
 
 function fetchSettings(category) {
-  const dummy_settings = {
-    datetime: {
-      date_format: "",
-      time_format: "",
-      time_zone: "Asia/Jerusalem"
-    },
-    currency_tax: {
-      currency: "€"
-    },
-    collection: {
-      invoice_overdue: "Within a week",
-      invoice_overdue_email: "Test",
-    }
-  };
-  
   let fetchUrl = `${globalSetting.serverUrl}/api/settings?category=${category}&data={}`;
   return (dispatch) => {
     dispatch(showProgressBar());

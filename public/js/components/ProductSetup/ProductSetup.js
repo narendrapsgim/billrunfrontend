@@ -51,7 +51,7 @@ class ProductSetup extends Component {
 
   onSave() {
     const { action } = this.props.location.query;
-    this.props.dispatch(saveProduct(this.props, action));
+    this.props.dispatch(saveProduct(this.props.product, action));
     browserHistory.goBack();
   }
 
@@ -64,7 +64,7 @@ class ProductSetup extends Component {
       <div className="ProductSetup container">
         <h3>Product</h3>
         <div className="contents bordered-container">
-          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} productSettings={this.props.product} processors={this.props.inputProcessors} />
+          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} product={this.props.product} processors={this.props.inputProcessors} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton

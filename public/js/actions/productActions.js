@@ -7,6 +7,7 @@ export const CLEAR_PRODUCT = 'CLEAR_PRODUCT';
 
 import axios from 'axios';
 import moment from 'moment';
+import Immutable from 'immutable';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 
 let axiosInstance = axios.create({
@@ -16,7 +17,8 @@ let axiosInstance = axios.create({
 
 
 function buildRateFromState(state) {
-  let { product, product: {rates} } = state;
+  const product = state.toJS();
+  const { rates } = product;
   let r = {
     [product.unit]: {
       BASE: {
@@ -27,8 +29,8 @@ function buildRateFromState(state) {
   return {
     key: product.key,
     id: product.id,
-    from: moment(product.from).unix() * 1000,
-    to: moment(product.to).unix() * 1000,
+    from: moment(product.from).unix(),
+    to: moment(product.to).unix(),
     unit_price: product.unit_price,
     description: product.description,
     rates: r

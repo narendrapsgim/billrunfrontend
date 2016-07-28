@@ -13,7 +13,7 @@ export default function (ComposedComponent) {
     constructor(props) {
       super(props);
       this.handleOpenLogin = this.handleOpenLogin.bind(this);
-    }    
+    }
     
     handleOpenLogin(){
       this.props.openLoginPopup();
@@ -21,7 +21,7 @@ export default function (ComposedComponent) {
 
     render() {
       const { users } = this.props;
-      if (!users.get('auth')) {
+      if (!users || !users.get('roles') || !users.get('auth')) {
         return (<div  style={{textAlign:'center'}}>
           <h3 key="0">Please login.</h3>
           <br key="1"/>

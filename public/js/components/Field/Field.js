@@ -30,6 +30,7 @@ export default class Field extends Component {
           id,
           value,
           coll,
+          required = false,
           editable = true } = this.props;
     let fieldType = this.getFieldType(id, coll);
 
@@ -45,7 +46,7 @@ export default class Field extends Component {
       case 'textarea':
         return (<TextArea onChange={onChange} id={id} value={value} editable={editable} />);
       default:
-        return (<Text onChange={onChange} id={id} value={value} editable={editable} />);
+        return (<Text onChange={onChange} id={id} value={value} editable={editable} required={required}/>);
     }
   }
   
