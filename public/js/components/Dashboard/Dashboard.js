@@ -52,9 +52,10 @@ class Dashboard extends Component {
               <FontIcon className="material-icons" color={'white'} style={{verticalAlign: 'top', marginRight: '10px'}}>dashboard</FontIcon>
               Dashboard
             </h3>
-            <h5 style={this.styles.dashboardHeaderDates} className="cursor-default">
+            {/*<h5 style={this.styles.dashboardHeaderDates} className="cursor-default">
               <FontIcon className="material-icons" color={'white'} style={{verticalAlign: 'bottom', marginRight: '10px'}}>date_range</FontIcon>
-              {moment(fromDate).format(globalSetting.dateFormat)} - {moment(toDate).format(globalSetting.dateFormat)}</h5>
+              {moment(fromDate).format(globalSetting.dateFormat)} - {moment(toDate).format(globalSetting.dateFormat)}
+            </h5>*/}
           </div>
         </div>
         <div className="container" >
