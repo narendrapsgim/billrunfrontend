@@ -45,7 +45,7 @@ class New extends Component {
     const fields = fieldSettings.map((field, key) => {
       if (field.get('display') === false || field.get('editable') === false) return (null);
       return (
-        <div className="row" key={key}>
+        <div className="form-group" key={key}>
           <div className="col-md-3">
             <label>{_.capitalize(field.get('field_name'))}</label>
             <Field id={field.get('field_name')}
@@ -57,13 +57,13 @@ class New extends Component {
     });
 
     return (
-      <div>
+      <form className="form-horizontal">
         { fields }
         {(() => {
            if (aid) {
              return (
                <div>
-                 <div className="row">
+                 <div className="form-group">
                    <div className="col-md-3">
                      <label>Plan</label>
                      <Typeahead options={available_plans}
@@ -72,7 +72,7 @@ class New extends Component {
                                 onChange={onChangeTypeaheadField.bind(this, "plan")} />
                    </div>
                  </div>
-                 <div className="row">
+                 <div className="form-group">
                    <div className="col-md-2">
                      <label>Valid From</label>
                      <DateTimeField id="from" dateTime={entity.get('from')} onChange={onChangeDateFieldValue.bind(this, "from")} />
@@ -85,7 +85,7 @@ class New extends Component {
                </div>
           );
         }})()}
-        <div className="row">
+        <div className="form-group">
           <div className="col-md-3" style={{marginTop: 15}}>
             <RaisedButton
                 label={'Save'}
@@ -99,7 +99,7 @@ class New extends Component {
             />
           </div>
         </div>
-      </div>
+      </form>
     );
   }
 }

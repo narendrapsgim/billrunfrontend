@@ -29,8 +29,8 @@ export default class Product extends Component {
                               <option value={unit} key={key}>{unit}</option>
                             ))];
     return (
-      <div className="AddProduct">
-        <div className="row">
+      <form className="form-horizontal AddProduct">
+        <div className="form-group">
           <div className="col-md-3">
             <label htmlFor="key">Name</label>
             <Field id="key"
@@ -48,7 +48,7 @@ export default class Product extends Component {
             />
           </div>
         </div>
-        <div className="row">
+        <div className="form-group">
           <div className="col-md-6">
             <label htmlFor="description">Description</label>
             <Field id="description"
@@ -58,7 +58,7 @@ export default class Product extends Component {
             />
           </div>
         </div>
-        <div className="row">
+        <div className="form-group">
           <div className="col-md-3">
             <label htmlFor="unit">Unit Type</label>
             <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={product.get('unit')} defaultValue="-1">
@@ -66,7 +66,7 @@ export default class Product extends Component {
             </select>
           </div>
         </div>
-        <div className="row">
+        <div className="form-group">
           <div className="col-md-2">
             <label>Valid From</label>
             <DateTimeField id="from" value={product.get('from')}  onChange={onChangeItemFieldValue.bind(this, "from")} />
@@ -76,13 +76,13 @@ export default class Product extends Component {
             <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
           </div>
         </div>        
-        <div className="row">
+        <div className="form-group">
           <div className="col-xs-1">
             <button className="btn btn-primary" style={{marginTop: 10}} onClick={onAddProductProperties}>Add Charges</button>
           </div>
         </div>
         { product.get('rates').map((rate, key) => (
-              <div className="row" key={key}>
+              <div className="form-group" key={key}>
                 <div className="col-md-1">
                   <label htmlFor="from">From</label>
                   <Field id="from"
@@ -126,7 +126,7 @@ export default class Product extends Component {
                  })()}
               </div>
           )) }
-      </div>
+      </form>
     );
   }
 }

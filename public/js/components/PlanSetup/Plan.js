@@ -26,10 +26,10 @@ export default class Plan extends Component {
     ));
 
     return (
-      <div className="BasicPlanSettings">
+      <form className="form-horizontal BasicPlanSettings">
         <div className="BasicSettings">
           <h4>Basic Settings</h4>
-          <div className="row">
+          <div className="form-group">
             <div className="col-md-4">
               <label htmlFor="PlanName">Name</label>
               <Field id="PlanName" onChange={onChangeFieldValue} value={plan.get('PlanName')} required={true} />
@@ -39,13 +39,13 @@ export default class Plan extends Component {
               <Field  id="PlanCode" value={plan.get('PlanCode')} onChange={onChangeFieldValue} />
             </div>
           </div>
-          <div className="row">
+          <div className="form-group">
             <div className="col-md-7">
               <label htmlFor="PlanDescription">Description</label>
               <textarea id="PlanDescription" className="form-control" value={plan.get('PlanDescription')} onChange={onChangeFieldValue} />
             </div>
           </div>
-          <div className="row">
+          <div className="form-group">
             <div className="col-md-2">
               <label htmlFor="Each">Billing Frequency</label>
               <input type="number" id="Each" className="form-control" value={plan.get('Each')} onChange={onChangeFieldValue} />
@@ -65,7 +65,7 @@ export default class Plan extends Component {
             </div>
           </div>
         </div>
-        <div className="row">
+        <div className="form-group">
           <div className="col-md-2">
             <label>Valid From</label>
             <DateTimeField id="from" value={plan.get('from')}  onChange={onChangeDateFieldValue.bind(this, "from")} />
@@ -77,7 +77,7 @@ export default class Plan extends Component {
         </div>
         <div className="Trial" style={{marginTop: 20}}>
           <h4>Trial Period</h4>
-          <div className="row">
+          <div className="form-group">
             <div className="col-md-2">
               <label htmlFor="TrialCycle">Number of Cycles</label>
               <input type="number" id="TrialCycle" className="form-control" value={plan.get('TrialCycle')} onChange={onChangeFieldValue} />
@@ -91,7 +91,7 @@ export default class Plan extends Component {
         <div className="PlanRecurring" style={{marginTop: 20}}>
           <h4>Recurring Charges</h4>
           { plan.get('recurring_prices').map((price, key) => (
-              <div className="row" key={key}>
+              <div className="form-group" key={key}>
                 <div className="col-md-2">
                   <label htmlFor="Cycle">Number of Cycles</label>
                   <input type="number" id="Cycle" className="form-control" min="0" value={price.get('Cycle')} onChange={onChangeRecurringPriceFieldValue.bind(this, "Cycle", key)} />
@@ -102,13 +102,13 @@ export default class Plan extends Component {
                 </div>
               </div>
           ))}
-          <div className="row">
+          <div className="form-group">
             <div className="col-xs-3">
               <button className="btn btn-primary" onClick={onAddTariff} style={{marginTop: 10}}>Add Charges</button>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     );
   }
 }
