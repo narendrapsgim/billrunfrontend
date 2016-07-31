@@ -232,7 +232,7 @@ export function getToDate(to = new Date()){
 export function chartOptionCurrencyAxesLabel(value, index, values) {
   if(value == 0 ){
     return 0;
-  } else if (value > 1000) {
+  } else if (value >= 1000) {
     return (value/1000) + "K" + globalSetting.currency;
   } else {
     return value + globalSetting.currency;
@@ -243,7 +243,7 @@ export function chartOptionCurrencyTooltipLabel(tooltipItems, data) {
   var value = tooltipItems.yLabel;
   if(value == 0 ){
     return "0";
-  } else if (value > 1000) {
+  } else if (value >= 1000) {
     return (value/1000) + "K" + globalSetting.currency;
   } else {
     return value + globalSetting.currency;
