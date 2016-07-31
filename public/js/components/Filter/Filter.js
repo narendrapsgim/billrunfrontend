@@ -67,7 +67,7 @@ export default class Filter extends Component {
   render() {
     const { fields = [] } = this.props;
     const inputs = fields.map((field, key) => (
-      <div className="col-xs-2" key={key}>
+      <div className="col-xs-3" key={key}>
         <input id={field.id}
                type={field.type || "text"}
                placeholder={field.placeholder}
