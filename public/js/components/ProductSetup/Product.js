@@ -31,7 +31,7 @@ export default class Product extends Component {
     return (
       <form className="form-horizontal AddProduct">
         <div className="form-group">
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <label htmlFor="key">Name</label>
             <Field id="key"
                    coll="Product"
@@ -39,7 +39,7 @@ export default class Product extends Component {
                    value={product.get('key')}
             />
           </div>
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <label htmlFor="key">Code</label>
             <Field id="code"
                    coll="Product"
@@ -49,7 +49,7 @@ export default class Product extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-md-6">
+          <div className="col-xs-6">
             <label htmlFor="description">Description</label>
             <Field id="description"
                    coll="Product"
@@ -59,7 +59,7 @@ export default class Product extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <label htmlFor="unit">Unit Type</label>
             <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={product.get('unit')} defaultValue="-1">
               { available_units }
@@ -67,11 +67,11 @@ export default class Product extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-md-2">
+          <div className="col-xs-2">
             <label>Valid From</label>
             <DateTimeField id="from" value={product.get('from')}  onChange={onChangeItemFieldValue.bind(this, "from")} />
           </div>
-          <div className="col-md-2">
+          <div className="col-xs-2">
             <label>To</label>
             <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
           </div>
@@ -83,7 +83,7 @@ export default class Product extends Component {
         </div>
         { product.get('rates').map((rate, key) => (
               <div className="form-group" key={key}>
-                <div className="col-md-1">
+                <div className="col-xs-1">
                   <label htmlFor="from">From</label>
                   <Field id="from"
                          coll="Product"
@@ -91,7 +91,7 @@ export default class Product extends Component {
                          value={rate.get('from')}
                   />
                 </div>
-                <div className="col-md-1">
+                <div className="col-xs-1">
                   <label htmlFor="to">To</label>
                   <Field id="to"
                          coll="Product"
@@ -99,14 +99,14 @@ export default class Product extends Component {
                          value={rate.get('to')}
                   />
                 </div>
-                <div className="col-md-1">
+                <div className="col-xs-1">
                   <label htmlFor="interval">Interval</label>
                   <Field id="interval"
                          onChange={onChangeItemFieldValue.bind(this, "interval", key)}
                          value={rate.get('interval')}
                   />
                 </div>
-                <div className="col-md-1">
+                <div className="col-xs-1">
                   <label htmlFor="price">Price</label>
                   <Field id="price"
                          onChange={onChangeItemFieldValue.bind(this, "price", key)}
@@ -116,7 +116,7 @@ export default class Product extends Component {
                 {(() => {  /* only show remove button if there is more than one interval and only for the last one */
                    if (product.get('rates').size > 0 && key === (product.get('rates').size - 1)) {
                      return (
-                       <div className="col-md-2">
+                       <div className="col-xs-2">
                          <button className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveProductProperties.bind(this, key)}>
                            Remove Interval
                          </button>

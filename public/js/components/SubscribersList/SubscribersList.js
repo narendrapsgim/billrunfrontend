@@ -86,10 +86,10 @@ class SubscribersList extends Component {
     return (
       <div className="SubscribersList">
         <div className="row" style={{marginBottom: 10}}>
-          <div className="col-md-5">
+          <div className="col-xs-5">
             <Filter fields={fields} onFilter={this.onFilter} base={{type: "account"}} />
           </div>
-          <div className="col-md-5">
+          <div className="col-xs-5">
             <div style={{float: "right"}}>
               <RaisedButton primary={true} label="New" onMouseUp={this.onNewSubscriber} />
             </div>

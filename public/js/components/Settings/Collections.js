@@ -58,18 +58,18 @@ export default class Collections extends Component {
       <div className="CollectionSettings bordered-container" style={{padding: "45px"}}>
         <div className="InvoiceOverdue">
           <div className="row">
-            <div className="col-md-4">
+            <div className="col-xs-4">
               <strong>Invoice Overdue</strong>
             </div>
           </div>
           <div className="row">
-            <div className="col-md-1">
+            <div className="col-xs-1">
               <label htmlFor="InvoiceOverdue">1st Warning Email</label>
               <select className="form-control" id="first_invoice_overdue" value={data.get('first_invoice_overdue')} onChange={onChange}>
                 { invoice_overdue_options }
               </select>
             </div>
-            <div className="col-md-1 col-md-offset-2">
+            <div className="col-xs-1 col-xs-offset-2">
               <label htmlFor="InvoiceOverdue">Last Warning Email</label>
               <select className="form-control" id="last_invoice_overdue" value={data.get('last_invoice_overdue')} onChange={onChange}>
                 { invoice_overdue_options }
@@ -77,10 +77,10 @@ export default class Collections extends Component {
             </div>
           </div>
           <div className="row" style={{marginTop: "12px"}}>
-            <div className="col-md-3">
+            <div className="col-xs-3">
               <button type="button" className="btn btn-primary" onClick={this.onClickEditEmail.bind(this, 'first')}>Edit Email</button>
             </div>
-            <div className="col-md-3">
+            <div className="col-xs-3">
               <button type="button" className="btn btn-primary" onClick={this.onClickEditEmail.bind(this, 'last')}>Edit Email</button>
             </div>
           </div>

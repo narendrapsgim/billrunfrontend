@@ -88,10 +88,10 @@ class ProductsList extends Component {
     return (
       <div className="ProductsList">
         <div className="row" style={{marginBottom: 10}}>
-          <div className="col-md-5">
+          <div className="col-xs-5">
             <Filter onFilter={this.onFilter} fields={fields} />
           </div>
-          <div className="col-md-5">
+          <div className="col-xs-5">
             <div style={{float: "right"}}>
               <RaisedButton primary={true} label="New" onMouseUp={this.onNewProduct} />
             </div>

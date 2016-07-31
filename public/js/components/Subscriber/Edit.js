@@ -52,7 +52,7 @@ export default class Edit extends Component {
     const fieldsHTML = settings.getIn(['account', 'fields']).map((field, key) => {
       if (field.get('display') === false) return (null);
       return (
-        <div className="col-md-3" key={key}>
+        <div className="col-xs-3" key={key}>
           <label>{_.capitalize(field.get('field_name'))}</label>
           <Field id={field.get('field_name')}
                  value={account.get(field.get('field_name'))}
@@ -63,9 +63,9 @@ export default class Edit extends Component {
     });
     
     let fields = (
-      <div className="row">
+      <div className="form-group">
         { fieldsHTML }
-        <div className="col-md-1">
+        <div className="col-xs-1">
           <label>&zwnj;</label>
           <div>
             <Link to={`/usage?base=${JSON.stringify({aid: account.get('aid')})}`}>
@@ -79,28 +79,29 @@ export default class Edit extends Component {
     return (
       <Tabs defaultActiveKey={1} animation={false} id="CustomerEditSettings">
         <Tab title="Customer Details" eventKey={1}>
-          <div style={{margin: 10}}>
+          <form className="form-horizontal" style={{margin: 10}}>
             { fields }
-            <div className="row">
-              <div className="col-md-3" style={{marginTop: 15}}>
+            <div className="form-group">
+              <div className="col-xs-1">
                 <RaisedButton
                     label={'Save'}
                     primary={true}
                     onTouchTap={onSave}
                 />
+              </div>
+              <div className="col-xs-1">
                 <FlatButton
                     label="Cancel"
                     onTouchTap={onCancel}
-                    style={{marginRight: 12}}
                 />
               </div>
             </div>
-          </div>
+          </form>
         </Tab>
         <Tab title="Subscriptions" eventKey={2}>
           <div style={{margin: 10}}>
-            <div className="row">
-              <div className="col-md-11">
+            <div className="form-group">
+              <div className="col-xs-11">
                 <div className="pull-right">
                   <button className="btn btn-primary" onClick={onClickNewSubscription.bind(this, account.get('aid'))}>Add Subscription</button>
                 </div>
