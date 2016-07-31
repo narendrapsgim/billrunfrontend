@@ -108,13 +108,13 @@ class PlansList extends Component {
     return (
       <div className="PlansList">
         <div className="row" style={{marginBottom: 10}}>
-          <div className="col-md-5">
+          <div className="col-xs-5">
             <Filter fields={fields} onFilter={this.onFilter} />
             {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
             { sort_fields }
             </select> */}
           </div>
-          <div className="col-md-5">
+          <div className="col-xs-5">
             <div style={{float: "right"}}>
               <RaisedButton primary={true} label="New" onMouseUp={this.onNewPlan} />
             </div>

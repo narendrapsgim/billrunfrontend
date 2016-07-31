@@ -67,7 +67,7 @@ export default class Filter extends Component {
   render() {
     const { fields = [] } = this.props;
     const inputs = fields.map((field, key) => (
-      <div className="col-md-2" key={key}>
+      <div className="col-xs-2" key={key}>
         <input id={field.id}
                type={field.type || "text"}
                placeholder={field.placeholder}
@@ -80,10 +80,10 @@ export default class Filter extends Component {
     return (
       <div className="Filter">
           { inputs }
-          {/* <div className="col-md-1">
+          {/* <div className="col-xs-1">
           <RaisedButton primary={true} label="Filter" onMouseUp={this.onClickFilterBtn} style={{marginTop: 5}} />
           </div>
-          <div className="col-md-1">
+          <div className="col-xs-1">
           <RaisedButton label="Clear" onMouseUp={this.onClickClear} style={{marginTop: 5}} />
           </div> */}
       </div>

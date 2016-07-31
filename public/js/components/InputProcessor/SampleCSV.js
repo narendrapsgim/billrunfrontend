@@ -32,10 +32,10 @@ export default class SampleCSV extends Component {
     const fieldsHTML = settings.get('delimiter_type') === "fixed" ?
                        settings.get('fields').map((field, key) => (
                          <div className="row" key={key}>
-                           <div className="col-md-3">
+                           <div className="col-xs-3">
                              {field}
                            </div>
-                           <div className="col-md-3">
+                           <div className="col-xs-3">
                              <input type="number"
                                     className="form-control"
                                     data-field={field}
@@ -47,7 +47,7 @@ export default class SampleCSV extends Component {
                        )) :
                        settings.get('fields').map((field, key) => (
                          <div className="row" key={key}>
-                           <div className="col-md-3">
+                           <div className="col-xs-3">
                              {field}
                            </div>
                          </div>
@@ -56,20 +56,20 @@ export default class SampleCSV extends Component {
     return (
       <div className="InputProcessor">
         <div className="row">
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <label htmlFor="file_type">Name</label>
           </div>
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
             <p className="help-block">&nbsp;</p>
           </div>
         </div>
         <div className="row">
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <label htmlFor="delimiter">Delimiter</label>
           </div>
-          <div className="col-md-6">
-            <div className="col-md-3" style={{paddingLeft: 0}}>
+          <div className="col-xs-6">
+            <div className="col-xs-3" style={{paddingLeft: 0}}>
               <div className="input-group">
                 <div className="input-group-addon">
                   <input type="radio" name="delimiter-type" value="delimiter" onChange={onSetDelimiterType} />By delimiter
@@ -84,17 +84,17 @@ export default class SampleCSV extends Component {
                        value={settings.get('delimiter')} />
               </div>
             </div>
-            <div className="col-md-3" style={{marginTop: 10}}>
+            <div className="col-xs-3" style={{marginTop: 10}}>
               <input type="radio" name="delimiter-type" value="fixed" onChange={onSetDelimiterType} />Fixed width
               <p className="help-block">&nbsp;</p>
             </div>
           </div>
         </div>
         <div className="row">
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <label htmlFor="sample_csv">Select Sample CSV</label>
           </div>
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <input type="file" id="sample_csv" onChange={onSelectSampleCSV} disabled={!settings.get('delimiter_type')} />
           </div>
         </div>
@@ -102,13 +102,13 @@ export default class SampleCSV extends Component {
            if (settings.get('fields').size > 0) {
              return (
                <div className="row">
-                 <div className="col-md-3">
+                 <div className="col-xs-3">
                    <label>Field</label>
                  </div>
                  {(() => {             
                     if (settings.get('delimiter_type') === "fixed") {
                       return (
-                        <div className="col-md-3">
+                        <div className="col-xs-3">
                           <label>Width</label>
                         </div>
                       );
@@ -119,10 +119,10 @@ export default class SampleCSV extends Component {
            }})()}
         { fieldsHTML }
         <div className="row">
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <input className="form-control" value={this.state.newField} onChange={(e) => { this.setState({newField: e.target.value}) } } placeholder="Add additional field"/>
           </div>
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <FloatingActionButton mini={true} onMouseUp={this.addField}>
               <ContentAdd />
             </FloatingActionButton>               
