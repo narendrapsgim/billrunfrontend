@@ -6,6 +6,7 @@ export const GOT_PLAN = 'GOT_PLAN';
 export const CLEAR_PLAN = 'CLEAR_PLAN';
 export const GET_PRODUCT = 'GET_PRODUCT';
 export const SAVE_PLAN = 'SAVE_PLAN';
+export const REMOVE_RECURRING_PRICE = 'REMOVE_RECURRING_PRICE';
 
 import axios from 'axios';
 import moment from 'moment';
@@ -106,6 +107,13 @@ export function updatePlanRecurringPriceField(field_name, field_idx, field_value
 export function addTariff() {
   return {
     type: ADD_TARIFF
+  };
+}
+
+export function removeRecurringPrice(idx) {
+  return {
+    type: REMOVE_RECURRING_PRICE,
+    idx
   };
 }
 

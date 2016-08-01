@@ -16,6 +16,7 @@ export default class Plan extends Component {
           onChangeRecurringPriceFieldValue,
           onCheckEndOfDays,
           onChangeDateFieldValue,
+          onRemoveRecurringPrice,
           onAddTariff } = this.props;
 
     let transaction_options = ["Every Month", "Every Week"].map((op, key) => (
@@ -102,6 +103,17 @@ export default class Plan extends Component {
                   <label htmlFor="PeriodicalRate">Price</label>
                   <Field id="PeriodicalRate" onChange={onChangeRecurringPriceFieldValue.bind(this, "PeriodicalRate", key)} value={price.get('PeriodicalRate')} />
                 </div>
+                {(() => {  /* only show remove button if there is more than one interval and only for the last one */
+                   if (plan.get('recurring_prices').size > 0 && key === (plan.get('recurring_prices').size - 1)) {
+                     return (
+                       <div className="col-xs-2">
+                         <button className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveRecurringPrice.bind(this, key)}>
+                           Remove Interval
+                         </button>
+                       </div>
+                     )
+                   }
+                 })()}                
               </div>
           ))}
           <div className="form-group">

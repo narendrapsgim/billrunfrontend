@@ -40,7 +40,7 @@ export default class Product extends Component {
             />
           </div>
           <div className="col-xs-3">
-            <label htmlFor="key">Code</label>
+            <label htmlFor="code">Code</label>
             <Field id="code"
                    coll="Product"
                    onChange={onChangeItemFieldValue.bind(this, "code", -1)}
@@ -67,6 +67,15 @@ export default class Product extends Component {
           </div>
         </div>
         <div className="form-group">
+          <div className="col-xs-3">
+            <div className="checkbox">
+              <label>
+                <input type="checkbox" id="vatable" onChange={onChangeItemFieldValue.bind(this, "vatable", -1)} />VATable
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="form-group">
           <div className="col-xs-2">
             <label>Valid From</label>
             <DateTimeField id="from" value={product.get('from')}  onChange={onChangeItemFieldValue.bind(this, "from")} />
@@ -84,31 +93,31 @@ export default class Product extends Component {
         { product.get('rates').map((rate, key) => (
               <div className="form-group" key={key}>
                 <div className="col-xs-1">
-                  <label htmlFor="from">From</label>
-                  <Field id="from"
+                  <label htmlFor={`from-${key}`}>From</label>
+                  <Field id={`from-${key}`}
                          coll="Product"
                          onChange={onChangeItemFieldValue.bind(this, "from", key)}
                          value={rate.get('from')}
                   />
                 </div>
                 <div className="col-xs-1">
-                  <label htmlFor="to">To</label>
-                  <Field id="to"
+                  <label htmlFor={`to-${key}`}>To</label>
+                  <Field id={`to-${key}`}
                          coll="Product"
                          onChange={onChangeItemFieldValue.bind(this, "to", key)}
                          value={rate.get('to')}
                   />
                 </div>
                 <div className="col-xs-1">
-                  <label htmlFor="interval">Interval</label>
-                  <Field id="interval"
+                  <label htmlFor={`interval-${key}`}>Interval</label>
+                  <Field id={`interval-${key}`}
                          onChange={onChangeItemFieldValue.bind(this, "interval", key)}
                          value={rate.get('interval')}
                   />
                 </div>
                 <div className="col-xs-1">
-                  <label htmlFor="price">Price</label>
-                  <Field id="price"
+                  <label htmlFor={`price-${key}`}>Price</label>
+                  <Field id={`price-${key}`}
                          onChange={onChangeItemFieldValue.bind(this, "price", key)}
                          value={rate.get('price')}
                   />

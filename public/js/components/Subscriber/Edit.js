@@ -127,7 +127,7 @@ export default class Edit extends Component {
               </TableBody>
             </Table>
           </div>
-          </Tab>
+        </Tab>
       </Tabs>
     );    
   }
