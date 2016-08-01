@@ -30,12 +30,14 @@ export function setInitialItem(page_name) {
   };
 }
 
-export function updateFieldValue(path, field_value, page_name) {
+export function updateFieldValue(path, field_value, page_name, action = null, mapper = null) {
   return {
     type: UPDATE_FIELD_VALUE,
     path,
     field_value,
-    page_name
+    page_name,
+    action: action,
+    fieldsMap: mapper
   };
 }
 
@@ -145,19 +147,7 @@ function combineArray(key, items, path){
 
 
 function combineItem(items){
-
-  //temp for development
   return _.values(items);
-
-
-  let itemsArray = _.values(items);
-  let path = 'params.destination';
-  if(_.has(itemsArray[0], path)){
-    let dist = combineArray('region', itemsArray, path);
-    itemsArray = itemsArray.map((item, index) => Object.assign( item, {params: Object.assign(item.params, {destination:dist})} ) );
-  }
-  let combineItem = [...itemsArray];
-  return combineItem;
 }
 
 function fetchItems(item_ids, collection, page_name) {
@@ -168,11 +158,6 @@ function fetchItems(item_ids, collection, page_name) {
     let request = axiosInstance.get(itemFetchUrl).then(
       response => {
         let combinedItem = combineItem(response.data.details);
-
-        //temp for development
-        window.roman = combinedItem;
-
-
         dispatch(gotItems(combinedItem, collection, page_name));
         dispatch(hideProgressBar());
       }
@@ -198,20 +183,15 @@ export function getCollectionEntites(entity_ids, collection, page_name) {
   };
 }
 
-export function saveCollectionEntity(item, collection, page_name, action) {
+export function saveCollectionEntity(item, collection, page_name, action, bulk = false) {
   let saveUrl = '/admin/save';
   let entity = Object.assign({}, item);
 
   let id = (!_.isEmpty(entity._id) ? entity._id['$id'] : null);
 
-  if(action === 'bulk_update'){
-    id = entity['ids'];
-    delete entity['ids'];
-  } else {
-    delete entity['_id'];
-    delete entity['from'];
-    delete entity['name'];
-  }
+  delete entity['_id'];
+  delete entity['from'];
+  delete entity['name'];
 
   var formData = new FormData();
   if (id) formData.append("id", id);
@@ -222,8 +202,10 @@ export function saveCollectionEntity(item, collection, page_name, action) {
   return dispatch => {
     let request = axiosInstance.post(saveUrl, formData).then(
       response => {
-        if(response.data){
+        if(response.data && !bulk){
           dispatch(fetchItem(id, collection, page_name));
+        } else if(response.data && bulk){
+          dispatch(showStatusMessage('Item ID : ' + id + ' success updated', 'success'));
         } else {
           dispatch(showStatusMessage('Error, please try again', 'error'));
         }

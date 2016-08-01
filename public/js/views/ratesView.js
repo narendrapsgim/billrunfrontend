@@ -1,7 +1,7 @@
 import moment from 'moment';
 import * as Colors from 'material-ui/styles/colors';
 
-const ratess_field = [
+const rates_field = [
   { dbkey: "*", collapsible: true, collapsed: true, fields: [
       { row: [
         { dbkey: "access", label: "Access", type: "text", size: 4},
@@ -12,7 +12,7 @@ const ratess_field = [
         { dbkey: "erp_account", label: "ERP Account", type: "text"},
       ]},
       { row: [
-        { dbkey: "rate", crud: '1110', fieldType: "array", label: "", collapsible: false, fields: [
+        { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
           { row: [
             { dbkey: "price", label: "Price ", type: "text", size: 4},
             { dbkey: "interval", label: "Interval", type: "text", size: 4},
@@ -45,10 +45,10 @@ const params_field_bulk_edit = [
     { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
     { dbkey: "source_types", label : 'Source Types', type: 'array'},
   ]},
-  { dbkey: "destination", label:"Prefix", collapsible: false, type:'prefix', key:'region', fields: [
+  { dbkey: "destination", label:"Destinations", collapsible: false, size: 12, type:'objectsArray', key:'region', fields: [
     { row: [
-      { dbkey: "region", label: "Region", type: "text", size: 3},
-      { dbkey: "prefix", label: "Prefix", type: "array", size: 6},
+      { dbkey: "region", label: "Region", type: "text", size: 3, crud: '0100',},
+      { dbkey: "prefix", label: "Prefix", type: "array", size: 9},
     ]},
   ]}
 ];
@@ -123,7 +123,7 @@ const rates_edit_view = {
           { dbkey: "to", label: "To", type:'date', size: 6},
         ]},
         { row: [
-          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields: ratess_field },
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields: rates_field },
         ]},
         { row: [
           { dbkey: "params",  label: "Params", collapsible: true, collapsed: true ,fields: params_field },
@@ -154,7 +154,7 @@ const rates_edit_multiple_view = {
           { dbkey: "to", label: "To", type:'date', size: 6},
         ]},
         { row: [
-          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields: ratess_field },
+          { dbkey: "rates", label: "Rates", collapsible: true, collapsed: false, fields: rates_field },
         ]},
         { row: [
           { dbkey: "params",  label: "Params", collapsible: true, collapsed: true ,fields: params_field_bulk_edit },
@@ -185,7 +185,7 @@ const rates_clone_view = {
         { dbkey: "to", label: "To", type:'date', size: 6},
         ]},
         { row: [
-          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: ratess_field },
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: rates_field },
         ]},
         { row: [
           { dbkey: "params",  label: "Params", collapsible: true, collapsed: true, fields: params_field },
@@ -217,7 +217,7 @@ const rates_close_and_new_view = {
         { dbkey: "to", label: "To", type:'date', size: 6},
         ]},
         { row: [
-          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: ratess_field },
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: rates_field },
         ]},
         { row: [
           { dbkey: "params", crud: '1111', label: "Params", collapsible: true, collapsed: true, fields: params_field },
