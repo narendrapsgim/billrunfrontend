@@ -18,6 +18,7 @@ import ForwardIcon from 'material-ui/svg-icons/navigation/arrow-forward';
 import Divider from 'material-ui/Divider';
 import Snackbar from 'material-ui/Snackbar';
 import LinearProgress from 'material-ui/LinearProgress';
+import RefreshIndicator from 'material-ui/RefreshIndicator';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -395,11 +396,15 @@ class List extends Component {
     this.props.hideProgressBar();
   }
 
-  _setPagesAmount(itemsCount, itemPerPage){
-    if(parseInt(itemsCount) > 0 && parseInt(itemPerPage) > 0){
-      return  Math.ceil(itemsCount / itemPerPage);
+  _calcPagesAmount(itemsCount, itemPerPage){
+    let currentAmount = this.state.totalPages;
+    if(this.state.currentPage < this.state.totalPages){
+      return currentAmount;
     }
-    return 1;
+    if(parseInt(itemsCount) > 0 && parseInt(itemPerPage) == parseInt(itemsCount)){
+      currentAmount++;
+    }
+    return currentAmount;
   }
 
   _sortData(key, value) {
@@ -526,9 +531,8 @@ class List extends Component {
       queryString += '&query=' +  JSON.stringify(queryArgs);
     }
 
-    if(_.isObject(this.state.settings.pagination) && _.isInteger(this.state.settings.pagination.itemsPerPage ) && this.state.settings.pagination.itemsPerPage > -1){
-      queryString += '&size=' + this.state.settings.pagination.itemsPerPage + '&page=' + parseInt(this.state.currentPage);
-    }
+    let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : globalSetting.list.maxItems;
+    queryString += '&size=' + itemsPerPage + '&page=' + parseInt(this.state.currentPage);
 
     if(!_.isEmpty(this.state.sortField)){
       let sortType = (this.state.sortType) ? this.state.sortType : SortTypes.ASC ;
@@ -561,10 +565,10 @@ class List extends Component {
     } else {
       rows = _.values(response.details);
     }
-    if(rows.length > globalSetting.list.maxItems){
-      this.props.showStatusMessage(errorMessages.tooManyRows, 'info');
-    }
-    rows = rows.slice(0, Math.min(rows.length, globalSetting.list.maxItems));
+    // if(rows.length > globalSetting.list.maxItems){
+    //   this.props.showStatusMessage(errorMessages.tooManyRows, 'info');
+    // }
+    // rows = rows.slice(0, Math.min(rows.length, globalSetting.list.maxItems));
     return rows;
   }
 
@@ -580,9 +584,9 @@ class List extends Component {
        .on('success', (response) => {
          if(response && response.status){
            let rows = this._parseResults(this.props.collection, response);
-           let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
+           let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : globalSetting.list.maxItems;
            this.setState({
-              totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
+              totalPages : this._calcPagesAmount(Object.keys(response.details).length, itemsPerPage),
               rows : rows,
               progress : false,
               loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text={errorMessages.noData} /></Toolbar>),
@@ -697,7 +701,7 @@ class List extends Component {
 
  _onAggregate(response) {
    let rows = this._parseResults(this.props.collection, response);
-   let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : '';
+   let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : globalSetting.list.maxItems;
 
    let aggregate_settings = this.state.settings.aggregate;
    let fields = _.reduce(_.keys(rows[0]), (acc, key) => {
@@ -713,7 +717,7 @@ class List extends Component {
    let settings = Object.assign({}, this.state.settings, {advancedFilter:null});//remove advenced filters in aggrigate mode
    this.setState({
      fields: fields,
-     totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
+     totalPages : 1,
      rows : rows,
      settings,
      loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
@@ -748,9 +752,10 @@ class List extends Component {
     );
 
     let rows = this.state.rows.map( (row, index) => {
+      let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : globalSetting.list.maxItems;
       return (
       <TableRow key={index}>
-        {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * this.state.settings.pagination.itemsPerPage) : 0)}</TableRowColumn>}
+        {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * itemsPerPage) : 0)}</TableRowColumn>}
         { this.state.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
             return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
@@ -787,53 +792,68 @@ class List extends Component {
 
     const getPager = () => {
       let pages = [];
-      if(this.state.settings.pagination && this.state.totalPages > 1) {
-        pages.push(
-          <FloatingActionButton
-            key='back'
-            mini={true}
-            style={styles.pagination.paginationButton}
-            onClick={this.onPagintionClick}
-            value='back'
-            secondary={false}
-            disabled={this.state.currentPage == 1}
-          >
-          <BackIcon />
-          </FloatingActionButton>
+      let dots = <svg width="25px" height="10px">
+        <line x1="3" x2="24" y1="5" y2="5" stroke={theme.palette.primary1Color} strokeWidth="5" strokeLinecap="round" strokeDasharray="1, 8"></line>
+      </svg>;
+      if(this.state.totalPages > 1) {
+        if(this.state.progress){
+          pages.push(
+            <RefreshIndicator key='loading'
+              style={{position: 'relative', margin: '0 auto'}}
+              size={30} left={0} top={0} status="loading"
+            />
         );
-        let pagesToDisplay = this._setVisiblePages(this.state.totalPages, this.state.currentPage);
-        for (var i = 1; i <= this.state.totalPages; i++) {
-          if(pagesToDisplay.includes(i)){
-            pages.push(
-              <FloatingActionButton
-                key={i}
-                mini={true}
-                style={styles.pagination.paginationButton}
-                onClick={this.onPagintionClick}
-                value={i}
-                disabled={this.state.currentPage == i}
-              >
-              <spam>{i}</spam>
-            </FloatingActionButton>)
-          } else {
-            if(pages[pages.length-1] !== "..."){
-              pages.push('...');
+        } else {
+          pages.push(
+            <FloatingActionButton
+              key='back'
+              mini={true}
+              style={styles.pagination.paginationButton}
+              onClick={this.onPagintionClick}
+              value='back'
+              secondary={false}
+              disabled={this.state.currentPage == 1}
+            >
+            <BackIcon />
+            </FloatingActionButton>
+          );
+          let pagesToDisplay = this._setVisiblePages(this.state.totalPages, this.state.currentPage);
+          for (var i = 1; i <= this.state.totalPages; i++) {
+            if(pagesToDisplay.includes(i)){
+              pages.push(
+                <FloatingActionButton
+                  key={i}
+                  mini={true}
+                  style={styles.pagination.paginationButton}
+                  onClick={this.onPagintionClick}
+                  value={i}
+                  disabled={this.state.currentPage == i}
+                >
+                <spam>{i}</spam>
+              </FloatingActionButton>)
+            } else {
+              if( !pages[pages.length-1].key.startsWith("placeholder")){
+                pages.push(<span key={"placeholder_" + i}>{dots}</span>);
+              }
             }
           }
+          if(this.state.totalPages > 1 && this.state.currentPage < this.state.totalPages) {
+            pages.push(<span key='not-last'>{dots}</span>);
+          }
+          pages.push(
+            <FloatingActionButton
+              key='forward'
+              mini={true}
+              style={styles.pagination.paginationButton}
+              onClick={this.onPagintionClick}
+              value='forward'
+              secondary={false}
+              disabled={this.state.currentPage == this.state.totalPages}
+            >
+            <ForwardIcon />
+            </FloatingActionButton>
+          );
         }
-        pages.push(
-          <FloatingActionButton
-            key='forward'
-            mini={true}
-            style={styles.pagination.paginationButton}
-            onClick={this.onPagintionClick}
-            value='forward'
-            secondary={false}
-            disabled={this.state.currentPage == this.state.totalPages}
-          >
-          <ForwardIcon />
-          </FloatingActionButton>
-        );
 
         return (
           <div>
@@ -841,7 +861,7 @@ class List extends Component {
           </div>
         )
       }
-      return ('');
+      return (null);
     }
 
     let footer = (

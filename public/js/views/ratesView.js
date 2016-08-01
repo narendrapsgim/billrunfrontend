@@ -79,9 +79,6 @@ const rates_list_view = {
         // edit : { label: 'Edit' },
         delete : { label: 'Delete', color: Colors.red500  },
       },
-      pagination : {
-        itemsPerPage : 20,
-      },
       onItemClick : 'edit',
       defaults : {tableHeight : '450px'}
     } ]
