@@ -36,7 +36,6 @@ class PageBuilder extends Component {
     this.parseData = this.parseData.bind(this);
 
     this.mapper = {};
-    // window.mapper = this.mapper;
 
     this.state = {
       action: props.params.action
@@ -61,14 +60,9 @@ class PageBuilder extends Component {
   }
 
   isArrayOfObjects(element){
-    var result = Array.isArray(element);
-    if(!result) return false;
-
-    result = element.length > 0;
-    if(!result) return false;
-
-    result = Object.prototype.toString.call(element[0]) === "[object Object]";
-    if(!result) return false;
+    if(!Array.isArray(element)) return false;
+    if(!(element.length > 0)) return false;
+    if(Object.prototype.toString.call(element[0]) !== "[object Object]") return false;
     return true;
   }
 
@@ -228,19 +222,6 @@ class PageBuilder extends Component {
     }
     return false;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   getPageName(props = this.props) {
     return props.params.page.replace(/-/g, '_').toLowerCase();

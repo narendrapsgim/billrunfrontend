@@ -248,7 +248,8 @@ class List extends Component {
     let itemsIds = this.validateAlLeastOneRowIsSelected();
     if(itemsIds){
       let { page, collection } = this.props;
-      let url = `/${page}/${collection}/edit_multiple/${_.join(itemsIds, ',')}`;
+      let url = `/${page}/${collection}/`;
+      url += (itemsIds.length == 1) ? `edit/${itemsIds.pop()}` : `edit_multiple/${_.join(itemsIds, ',')}`;
       this.context.router.push(url);
     }
   }
