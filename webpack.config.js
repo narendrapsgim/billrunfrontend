@@ -24,8 +24,8 @@ module.exports = {
   entry: './public/js/index.js',
 
   output: {
-    path: require("path").resolve('./public'),
-    filename: 'app.js'
+    path: require("path").resolve('./public/dist'),
+    filename: 'bundle.js'
   },
 
   module: {
@@ -45,7 +45,8 @@ module.exports = {
       //     'css' + '!sass?outputStyle=expanded&' + stylePathResolves
       //   ),
       // }
-      {test: /\.css$/, loader: "style-loader!css-loader"}
+      {test: /\.css$/, loader: "style-loader!css-loader"},
+      {test: /\.csv$/, loader: 'dsv-loader' } //will load all .csv files with dsv-loader by default
     ]
   },
 

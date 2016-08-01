@@ -12,6 +12,9 @@ const rates_field = [
         { dbkey: "erp_account", label: "ERP Account", type: "text"},
       ]},
       { row: [
+        { dbkey: "groups", label : 'Groups', type: 'array'},
+      ]},
+      { row: [
         { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
           { row: [
             { dbkey: "price", label: "Price ", type: "text", size: 4},
@@ -88,7 +91,7 @@ const rates_list_view = {
       controllers : {
         duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
         closeAndNew : { label: 'Close and New'},
-        edit : { label: 'Edit' },
+        // edit : { label: 'Edit' },
         delete : { label: 'Delete', color: Colors.red500  },
       },
       pagination : {

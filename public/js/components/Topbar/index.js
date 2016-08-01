@@ -8,17 +8,11 @@ import MenuItem from 'material-ui/MenuItem';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
-import Divider from 'material-ui/Divider';
+import {Link} from 'react-router'
+
 import {indigo50,grey900, blue500} from 'material-ui/styles/colors';
 import * as actions from '../../actions'
-
-import axios from 'axios';
-
-let axiosInstance = axios.create({
-  withCredentials: true,
-  baseURL: globalSetting.serverUrl
-});
+import View from '../../views';
 
 class Topbar extends Component {
   constructor(props) {
@@ -39,9 +33,30 @@ class Topbar extends Component {
   renderLoginButton(){
     return (
       <ToolbarGroup>
-        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px'}} text="Login" onClick={this.handleOpen} />
+        <ToolbarTitle style={{color:indigo50, paddingRight: 0, lineHeight: '57px', cursor: 'pointer'}} text="Login" onClick={this.handleOpen} />
       </ToolbarGroup>
     )
+  }
+
+  isMenuItemVisible(neededPermissions) {
+    return  _.intersection(neededPermissions, this.props.userRoles).length > 0;
+  }
+
+  renderUserMenuItems(){
+    let buttons = Object.keys(View.pages).map((page, key) => {
+        if((typeof View.pages[page].menu_type !== 'undefined' && View.pages[page].menu_type === 'user') && this.isMenuItemVisible( View.pages[page].permission)){
+          let route = View.pages[page].route ? View.pages[page].route : page;
+          let label = View.pages[page].menu_title || View.pages[page].title;
+          return (
+            <Link key={key} to={route} activeClassName='active' style={{textDecoration: 'none'}}>
+              <MenuItem primaryText={label} />
+            </Link>
+          )
+        } else {
+          return null;
+        }
+      });
+      return buttons;
   }
 
   renderUserMenu(){
@@ -64,8 +79,7 @@ class Topbar extends Component {
             </IconButton>
           }
         >
-          <MenuItem primaryText="Profile" />
-          <MenuItem primaryText="Settings" />
+          {this.renderUserMenuItems()}
           <MenuItem primaryText="Logout" onClick={this.clickLogout} />
         </IconMenu>
       </ToolbarGroup>
@@ -94,6 +108,7 @@ Topbar.defaultProps = {
 
 function mapStateToProps(state) {
   return {
+    userRoles: state.users.roles,
     auth: state.users.auth,
     userName : state.users.name,
   };

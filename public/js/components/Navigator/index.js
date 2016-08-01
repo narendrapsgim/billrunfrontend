@@ -16,8 +16,8 @@ export default class Navigator extends Component {
     super(props);
   }
 
-  isMenuItemVisible(neddedPpermission) {
-    return  _.intersection(neddedPpermission, this.props.users.roles).length > 0;
+  isMenuItemVisible(neededPermissions) {
+    return  _.intersection(neededPermissions, this.props.users.roles).length > 0;
   }
 
   render() {
@@ -25,7 +25,7 @@ export default class Navigator extends Component {
     let buttons = Object.keys(View.pages).map((page, key) => {
         let label = View.pages[page].menu_title || View.pages[page].title;
         let route = View.pages[page].route ? View.pages[page].route : page;
-        if(this.isMenuItemVisible( View.pages[page].permission , label)){
+        if((typeof View.pages[page].menu_type === 'undefined' || View.pages[page].menu_type === 'main') && this.isMenuItemVisible( View.pages[page].permission)){
             return (
                 <Link key={key} to={route} activeClassName='active'>
                   <FlatButton label={label} labelStyle={{textTransform: "none"}}/>

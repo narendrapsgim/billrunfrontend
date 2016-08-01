@@ -21,8 +21,7 @@ import LinearProgress from 'material-ui/LinearProgress';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import {blue500} from 'material-ui/styles/colors';
-import Aggregate from '../Aggregate/Aggregate';
+import theme from '../../theme'
 import _ from 'lodash';
 import aja from 'aja';
 import $ from 'jquery';
@@ -47,7 +46,8 @@ const errorMessages = {
 const styles = {
   listTopBar : {backgroundColor:'white'},
   listActions : {margin:'5px'},
-  noDataMessage : {textAlign: 'center', /*marginBottom: '-12px',*/ display: 'block'},
+  listActionsLabel : {color:'#fff'},
+  noDataMessage : {textAlign: 'center', /*marginBottom: '-12px',*/ marginTop: '5px', display: 'block'},
   pagination : {
     paginationBar : {
       margin : '10px',
@@ -124,6 +124,7 @@ class List extends Component {
     this._filterData = this._filterData.bind(this);
     this._sortData = this._sortData.bind(this);
     this._parseResults = this._parseResults.bind(this);
+    this._buildSearchQueryArg = this._buildSearchQueryArg.bind(this);
     //Handlers
     this.validateOnlyOneRowIsSelected = this.validateOnlyOneRowIsSelected.bind(this);
     this.validateAlLeastOneRowIsSelected = this.validateAlLeastOneRowIsSelected.bind(this);
@@ -148,6 +149,8 @@ class List extends Component {
 
     //Assign filter default value if exist
     let filters = this._getFilterDefaultValues(props.settings.fields);
+    let storedFilters = this._getFilterStoredValues(props.page, props.settings.fields);
+    Object.assign(filters, storedFilters);
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
@@ -159,7 +162,8 @@ class List extends Component {
       totalPages : 1,
       settings: props.settings,
       fields: props.settings.fields,
-      loadingData : ''
+      loadingData : '',
+      progress: false
     };
   }
 
@@ -171,6 +175,8 @@ class List extends Component {
   componentWillReceiveProps(nextProps) {
     let { settings } = nextProps;
     let filters = this._getFilterDefaultValues(settings.fields);
+    let storedFilters = this._getFilterStoredValues(nextProps.page, settings.fields);
+    Object.assign(filters, storedFilters);
     this.setState({
       rows : [],
       sortField : '',
@@ -381,7 +387,8 @@ class List extends Component {
 
   handleError(data){
     this.setState({
-      loadingData : ''
+      loadingData : '',
+      progress : false
     });
     let errorMessage = (data && data.desc && data.desc.length) ? data.desc : errorMessages.serverApiDefaultError ;
     this.props.showStatusMessage(errorMessage, 'error');
@@ -404,24 +411,48 @@ class List extends Component {
   }
 
   _filterData(key, value) {
+    //Store Input value
+    localStorage.setItem(this.props.page + "-" + key, value);
+
     let filters = Object.assign({}, this.state.filters);
     filters[key] = value;
     this.setState({
       filters: filters,
       currentPage: 1
-    }, this._updateTableData);
+    });
   }
 
   _updateTableData(){
     this.props.showProgressBar();
     this.setState({
-          loadingData : ''
+          loadingData : '',
+          progress: true
      });
     this._getData(this._buildSearchQuery());
   }
 
-  _buildSearchQuery(){
-    let queryString = '';
+  _isFilterParamEmpty(data) {
+    if(typeof(data) == 'number' || typeof(data) == 'boolean') {
+      return false;
+    }
+    if(typeof(data) == 'undefined' || data === null) {
+      return true;
+    }
+    if(typeof(data.length) != 'undefined') {
+      return data.length == 0;
+    }
+    if(data instanceof Date){
+      return false;
+    }
+    for(var i in data) {
+      if(data.hasOwnProperty(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  _buildSearchQueryArg(){
     let queryArgs = {};
 
     for ( let key in this.state.filters ) {
@@ -441,6 +472,7 @@ class List extends Component {
             });
           } else if(filterSetting['filter'] && filterSetting['filter']['query']) {
             let self = this;
+            if(!this._isFilterParamEmpty(this.state.filters[key])){
               queryArgs = function rec(qArgs,path ) {
                   if(path == null ) {
                      return self.state.filters[key];
@@ -453,6 +485,7 @@ class List extends Component {
                   }
                   return qArgs;
               }(queryArgs,filterSetting['filter']['valuePath']);
+            }
           } else if(filterSetting.type == 'number') {
             queryArgs[key] = parseFloat(this.state.filters[key]);
           } else {
@@ -473,6 +506,13 @@ class List extends Component {
         queryArgs[advFilter.field] = {[advFilter.op]: value};
       }
     );
+
+    return queryArgs;
+  }
+
+  _buildSearchQuery(){
+    let queryString = '';
+    let queryArgs = this._buildSearchQueryArg();
 
     var filters = {};
     if(this.state.settings.project){
@@ -544,6 +584,7 @@ class List extends Component {
            this.setState({
               totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
               rows : rows,
+              progress : false,
               loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text={errorMessages.noData} /></Toolbar>),
            }, this.props.hideProgressBar);
          } else {
@@ -570,17 +611,17 @@ class List extends Component {
         break;
       case 'price':
           let price = parseFloat(value);
-          output = ( price) ? price.toFixed(2).toString().replace(".", ",") : '0';
+          output = (price) ? price.toFixed(2).toString().replace(".", ",") : '0';
           output += ' ' + globalSetting.currency;
         break;
       case 'mongoid':
         output = value.$id;
         break;
       case 'urt':
-        output = (value.sec) ? (moment(value.sec*1000).format(globalSetting.datetimeFormat)) : '';
+        output = (value.sec) ? (moment(value.sec * 1000).format(globalSetting.datetimeFormat)) : '';
         break;
       case 'timestamp':
-        output = (value) ? (moment(value*1000).format(globalSetting.datetimeFormat)) : '';
+        output = (value) ? (moment(value * 1000).format(globalSetting.datetimeFormat)) : '';
         break;
       case 'interval':
         switch (row.usaget) {
@@ -621,6 +662,28 @@ class List extends Component {
     return filters;
   }
 
+  _getFilterStoredValues(pageKey, fields){
+    let filters = {};
+    fields.map((field, i) => {
+      if(field.filter){
+        if(typeof field.filter.system === 'undefined'){
+          let filterKey = pageKey + "-" + field.key;
+          let filterVal = localStorage.getItem(filterKey);
+          if(filterVal && filterVal.length > 0){
+            if(field.type == 'multiselect') {
+              filterVal = filterVal.split(",");
+            }
+            if(field.type == 'urt') {
+              filterVal = new Date(filterVal);
+            }
+            filters[field.key] = filterVal;
+          }
+        }
+      }
+    });
+    return filters;
+  }
+
   _getFieldSettings(key){
     var matchFields = this.props.settings.fields.filter((field,index) => {
       if(field.key == key){
@@ -647,10 +710,12 @@ class List extends Component {
      return acc;
    }, []);
 
+   let settings = Object.assign({}, this.state.settings, {advancedFilter:null});//remove advenced filters in aggrigate mode
    this.setState({
      fields: fields,
      totalPages : this._setPagesAmount((response.count || 100), itemsPerPage),
      rows : rows,
+     settings,
      loadingData : (rows.length > 0) ? '' : (<Toolbar style={styles.noDataMessage}> <ToolbarTitle text="No Data" /></Toolbar>),
    });
  }
@@ -658,22 +723,15 @@ class List extends Component {
   _onClearAggregate() {
     let { settings } = this.props;
     let { fields } = settings;
-    this.setState({settings, fields, filters: {}, advFilters: [], rows: []}, this._updateTableData);
+
+    let storedFilters = this._getFilterStoredValues(this.props.page, this.props.settings.fields);
+
+    this.setState({settings, fields, filters: storedFilters, advFilters: [], rows: []}, this._updateTableData);
   }
 
   render() {
     let { settings } = this.state;
     let { page, collection } = this.props;
-    let aggregate = (null);
-    if(this.state.settings.aggregate) {
-      aggregate = (<Aggregate fields={this.state.settings.aggregate.fields}
-                              methods={this.state.settings.aggregate.methods}
-                              groupBy={this.state.settings.aggregate.groupBy}
-                              filters={this.state.filters}
-                              onClear={this._onClearAggregate}
-                              onDataChange={this._onAggregate} />);
-    }
-
     let header = (
       <TableRow>
         {<TableHeaderColumn style={{ width: 5}}>#</TableHeaderColumn>}
@@ -712,10 +770,11 @@ class List extends Component {
           actions.push(
             <RaisedButton
               key={"action_" + controller.label}
-              backgroundColor={controller.color || blue500}
+              backgroundColor={controller.color || theme.palette.primary1Color}
               onTouchTap={this[callback]}
               label={controller.label}
               style={styles.listActions}
+              labelStyle={styles.listActionsLabel}
               disabled={false}
             />
           );
@@ -822,18 +881,22 @@ class List extends Component {
         <Divider />
         <div>
           <ListFilters
+            page={this.props.page}
+            progress={this.state.progress}
+            filterApply={this._updateTableData}
             fields={this.state.fields}
-            advancedFilter={this.props.settings.advancedFilter}
+            filters={this.state.filters}
+            aggregate={this.state.settings.aggregate}
+            advancedFilter={this.state.settings.advancedFilter}
+            formatDate={this.formatDate}
+            buildSearchQueryArg={this._buildSearchQueryArg}
             onChangeFilter={this.onChangeFilter}
             onChangeFilterDate={this.onChangeFilterDate}
-            formatDate={this.formatDate}
             onChangeAdvFilter={this.onChangeAdvFilter}
             onRemoveAdvFilter={this.onRemoveAdvFilter}
+            onClearAggregate={this._onClearAggregate}
+            onChangeAggregate={this._onAggregate}
             />
-        </div>
-        <Divider />
-        <div>
-          {aggregate}
         </div>
         <div>
             {this.state.loadingData}

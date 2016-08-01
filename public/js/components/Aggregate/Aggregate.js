@@ -10,6 +10,11 @@ export default class Aggregate extends React.Component {
 
   constructor(props) {
     super(props);
+    this.styles = {
+      input: { margin: '5px', height: '40px' },
+      button: { margin: '5px'},
+      actions: { margin: '10px', height: '40px', display: 'inline-block' }
+    }
     this.groupBy= props.groupBy;
     this.fields= props.fields;
     this.methods= props.methods;
@@ -37,20 +42,12 @@ export default class Aggregate extends React.Component {
   handleClosePopup() {
     this.setState({popupOpen: false});
   }
-  
+
   onAggregate(event) {
     let callback = this.onDataChange;
     let url = `${globalSetting.serverUrl}/api/queryaggregate`;
-
-    let filterKeys = _.keys(this.props.filters);
-    let filterStr  = _.reduce(filterKeys, (acc, key) => {
-      if (_.isEmpty(this.props.filters[key])) return acc;
-      acc.push(`"${key}":${this.props.filters[key]}`);
-      return acc;
-    }, []);
-
-    url += `?query={${filterStr.join(',')}}&groupby={"${this.state.on}":"$${this.state.on}"}&aggregate={"${this.state.to}":{"${this.state.method}":"$${this.state.to}"}}`;
-
+    let filterStr = this.props.buildSearchQueryArg();
+    url += `?query=${JSON.stringify(filterStr)}&groupby={"${this.state.on}":"$${this.state.on}"}&aggregate={"${this.state.to}":{"${this.state.method}":"$${this.state.to}"}}`;
     this.serverRequest = aja()
       .method('get')
       .url(url)
@@ -75,17 +72,20 @@ export default class Aggregate extends React.Component {
   render() {
     return (
       <div>
-        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged}>
+        <SelectField floatingLabelText="Group By" value={this.state.on} onChange={this.aggregateOnChanged} style={this.styles.input} >
           { this.groupBy.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged}>
+        <SelectField floatingLabelText="Field" value={this.state.to} onChange={this.aggregateToChanged} style={this.styles.input} >
           { this.fields.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged}>
+        <SelectField floatingLabelText="Method" value={this.state.method} onChange={this.aggregateMethodChanged} style={this.styles.input}>
           { this.methods.map((field,i) =>  { return ( <MenuItem value={field.key} key={field.key} primaryText={field.label} />); }) }
         </SelectField>
-        <RaisedButton label="Aggregate"  onClick={this.onAggregate} />
-        <RaisedButton label="Clear" onClick={this.props.onClear} />
+        <div style={this.styles.actions} >
+          <RaisedButton label="Aggregate"  onClick={this.onAggregate} style={this.styles.button}/>
+          <RaisedButton label="Clear" onClick={this.props.onClear} style={this.styles.button}/>
+        </div>
+
         <Dialog
             actions={<FlatButton
                       label="Ok"
@@ -97,7 +97,7 @@ export default class Aggregate extends React.Component {
             onRequestClose={this.handleClosePopup}
         >
           <div>{this.state.popupMessage}</div>
-        </Dialog>        
+        </Dialog>
       </div>
     );
   }

@@ -3,6 +3,7 @@ import VatsView from './vatsView';
 import DiscountsView from './discountsView';
 import ProductsView from './productsView';
 import LinesView from './linesView';
+import LogsView from './logsView';
 import ChargesView from './chargesView';
 import PlansView from './plansView';
 import ImportExportHtml from './importExportView';
@@ -92,6 +93,15 @@ const View = {
         list: LinesView.lines_list_view,
       }
     },
+    logs: {
+      permission : ["read"],
+      menu_title: "Log",
+      route: "logs/log/list",
+      views: {
+        list: LogsView.logs_list_view,
+        edit: LogsView.logs_edit_view,
+      }
+    },
     import_export_html: {
       permission: ["admin"],
       menu_title: "Import/Export",
@@ -101,12 +111,14 @@ const View = {
     configuration: {
       permission: ["admin"],
       menu_title: "Config",
+      menu_type: "user",
       view_type: "html",
       html: ConfigurationView
     },
     users: {
       permission: ["admin"],
       menu_title: "Users",
+      menu_type: "user",
       route: "users/users/list",
       views: {
         list: UsersView.users_list_view,
@@ -117,6 +129,7 @@ const View = {
     operations: {
       permission: ["admin"],
       menu_title: "Operations",
+      menu_type: "user",
       view_type: "html",
       html: OperationsView
     }
