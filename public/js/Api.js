@@ -20,7 +20,7 @@ export function apiBillRun(request) {
 //send Http request
 export function sendHttpRequest(query) {
   //Create Api URL
-  let url = globalSetting.serverUrl + "/api/" + query.request.api + buildQueryParamsString(query.request.params);
+  let url = globalSetting.serverUrl + "/api/" + query.request.api + buildQueryStringParams(query.request.params);
 
   let response = { name: query.name, data: {} };
 
@@ -63,12 +63,20 @@ export function delay(sec = 2, success = true, mock = { 'success': true }) {
 }
 
 //help function to bulind query params string
-function buildQueryParamsString(params){
-  let queryParams = params.reduce((previousValue, currentValue, currentIndex) => {
-    let key = Object.keys(currentValue)[0];
-    let prev = (currentIndex == 0) ? previousValue : previousValue + "&";
-    return prev + key + "=" + currentValue[key]
-  }, "?");
+function buildQueryStringParams(params){
+  let queryParams = '';
+  if(Array.isArray(params) && params.length > 0){
+    queryParams = params.reduce((previousValue, currentValue, currentIndex) => {
+      let key = Object.keys(currentValue)[0];
+      let prev = (currentIndex == 0) ? previousValue : previousValue + '&';
+      return prev + key + '=' + currentValue[key];
+    }, '?');
+  }
+	//Set server debug flag if it enabled in config file
+  if(globalSetting.serverApiDebug === true){
+    queryParams += (queryParams.length > 0) ? '&' : '?';
+    queryParams += globalSetting.serverApiDebugQueryString;
+  }
   return queryParams;
 }
 
