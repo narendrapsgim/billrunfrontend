@@ -17,7 +17,7 @@ export default class CurrencyTax extends Component {
            style={{padding: "45px"}}>
         <div className="Currency">
           <div className="row">
-            <div className="col-md-1">
+            <div className="col-xs-1">
               <label htmlFor="currency">Currency</label>
               <select className="form-control"
                       id="currency"

@@ -54,7 +54,8 @@ class PlanSetup extends Component {
                          dispatch(updatePlanRecurringPriceField(id, idx, value));
   }
   
-  onAddTariff() {
+  onAddTariff(e) {
+    e.preventDefault();
     this.props.dispatch(addTariff());
   }
   

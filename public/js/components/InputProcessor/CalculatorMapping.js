@@ -25,10 +25,10 @@ export default class CalculatorMapping extends Component {
     return (
       <div className="CalculatorMapping">
         <div className="row">
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <label>Customer identification</label>
           </div>
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <select id="src_key"
                     className="form-control"
                     onChange={onSetCustomerMapping}
@@ -40,9 +40,9 @@ export default class CalculatorMapping extends Component {
           </div>
         </div>
         <div className="row">
-          <div className="col-md-3">
+          <div className="col-xs-3">
           </div>
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <select id="target_key"
                     className="form-control"
                     onChange={onSetCustomerMapping}
@@ -53,7 +53,7 @@ export default class CalculatorMapping extends Component {
           </div>
         </div>
         <div className="row">
-          <div className="col-md-3">
+          <div className="col-xs-3">
             <h4>Rate by</h4>
           </div>
         </div>
@@ -61,10 +61,10 @@ export default class CalculatorMapping extends Component {
           available_usagetypes.map((usaget, key) => (
             <div key={key}>
               <div className="row">
-                <div className="col-md-3">
+                <div className="col-xs-3">
                   <label>{usaget}</label>
                 </div>
-                {/* <div className="col-md-2">
+                {/* <div className="col-xs-2">
                 <select id="line_key"
                 className="form-control"
                 data-usaget={usaget}
@@ -74,7 +74,7 @@ export default class CalculatorMapping extends Component {
                 { available_fields }
                 </select>
                 </div> */}
-                <div className="col-md-1">
+                <div className="col-xs-1">
                   <input type="radio"
                          name={`${usaget}-type`}
                          value="match"
@@ -82,7 +82,7 @@ export default class CalculatorMapping extends Component {
                          data-rate_key="key"
                          onChange={onSetRating} />By rate key
                 </div>
-                <div className="col-md-1">
+                <div className="col-xs-1">
                   <input type="radio"
                          name={`${usaget}-type`}
                          value="longestPrefix"

@@ -45,8 +45,8 @@ class New extends Component {
     const fields = fieldSettings.map((field, key) => {
       if (field.get('display') === false || field.get('editable') === false) return (null);
       return (
-        <div className="row" key={key}>
-          <div className="col-md-3">
+        <div className="form-group" key={key}>
+          <div className="col-xs-3">
             <label>{_.capitalize(field.get('field_name'))}</label>
             <Field id={field.get('field_name')}
                    onChange={onChange}
@@ -57,14 +57,14 @@ class New extends Component {
     });
 
     return (
-      <div>
+      <form className="form-horizontal">
         { fields }
         {(() => {
            if (aid) {
              return (
                <div>
-                 <div className="row">
-                   <div className="col-md-3">
+                 <div className="form-group">
+                   <div className="col-xs-3">
                      <label>Plan</label>
                      <Typeahead options={available_plans}
                                 labelKey="name"
@@ -72,12 +72,12 @@ class New extends Component {
                                 onChange={onChangeTypeaheadField.bind(this, "plan")} />
                    </div>
                  </div>
-                 <div className="row">
-                   <div className="col-md-2">
+                 <div className="form-group">
+                   <div className="col-xs-2">
                      <label>Valid From</label>
                      <DateTimeField id="from" dateTime={entity.get('from')} onChange={onChangeDateFieldValue.bind(this, "from")} />
                    </div>
-                   <div className="col-md-2">
+                   <div className="col-xs-2">
                      <label>To</label>
                      <DateTimeField id="to" dateTime={entity.get('to')} onChange={onChangeDateFieldValue.bind(this, "to")} />
                    </div>
@@ -85,21 +85,22 @@ class New extends Component {
                </div>
           );
         }})()}
-        <div className="row">
-          <div className="col-md-3" style={{marginTop: 15}}>
+        <div className="form-group">
+          <div className="col-xs-1">
             <RaisedButton
                 label={'Save'}
                 primary={true}
                 onTouchTap={onSave}
             />
+          </div>
+          <div className="col-xs-1">
             <FlatButton
                 label="Cancel"
                 onTouchTap={onCancel}
-                style={{marginRight: 12}}
             />
           </div>
         </div>
-      </div>
+      </form>
     );
   }
 }

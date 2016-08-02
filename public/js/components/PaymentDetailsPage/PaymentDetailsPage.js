@@ -73,8 +73,8 @@ class PaymentDetailsPage extends Component {
       );
     });
 
-    return (
-      <div>
+     return (
+      <div className="container">
         <div className="panel panel-primary">
           <div className="panel-heading">
             <h4>Account Information</h4>
@@ -99,7 +99,7 @@ class PaymentDetailsPage extends Component {
             </div>
           </div>
         </div>
-        <div className="pull-right">
+        <div className="pull-left">
           <button className="btn btn-primary" onClick={this.onSubmit}>Submit</button>
         </div>
       </div>
