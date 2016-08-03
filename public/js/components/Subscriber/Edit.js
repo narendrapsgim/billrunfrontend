@@ -29,7 +29,7 @@ export default class Edit extends Component {
             onSave,
             onCancel } = this.props;
 
-    let subscriptionsHTML = subscribers.map((sub, key) => {
+    const subscriptionsHTML = subscribers.map((sub, key) => {
       return (
         <TableRow key={key}>
           {settings.getIn(['subscriber', 'fields']).map((field, k) => {
@@ -49,6 +49,41 @@ export default class Edit extends Component {
       );
     });
 
+    const subscribersView = (
+      <div style={{margin: 10}}>
+        <div className="row">
+          <div className="col-xs-11">
+            <div className="pull-right">
+              <button className="btn btn-primary" onClick={onClickNewSubscription.bind(this, account.get('aid'))}>Add Subscription</button>
+            </div>
+            <div className="pull-left">
+              <h4>Subscriptions</h4>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs-11">
+            <Table selectable={false}>
+              <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+                <TableRow>
+                  {settings.getIn(['subscriber', 'fields']).map((field, key) => {
+                     if (field.get('display') === false) return (null);
+                     return (
+                       <TableRowColumn key={key}>{this.titlize(field.get('field_name'))}</TableRowColumn>
+                     );
+                   })}
+                       <TableRowColumn></TableRowColumn>
+                </TableRow>
+              </TableHeader>
+              <TableBody displayRowCheckbox={false} stripedRows={true}>
+                { subscriptionsHTML }
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </div>
+    );
+    
     const fieldsHTML = settings.getIn(['account', 'fields']).map((field, key) => {
       if (field.get('display') === false) return (null);
       return (
@@ -99,35 +134,8 @@ export default class Edit extends Component {
           </form>
         </Tab>
         <Tab title="Subscriptions" eventKey={2}>
-          <div style={{margin: 10}}>
-            <div className="form-group">
-              <div className="col-xs-11">
-                <div className="pull-right">
-                  <button className="btn btn-primary" onClick={onClickNewSubscription.bind(this, account.get('aid'))}>Add Subscription</button>
-                </div>
-                <div className="pull-left">
-                  <h4>Subscriptions</h4>
-                </div>
-              </div>
-            </div>
-            <Table selectable={false}>
-              <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
-                <TableRow>
-                  {settings.getIn(['subscriber', 'fields']).map((field, key) => {
-                     if (field.get('display') === false) return (null);
-                     return (
-                       <TableRowColumn key={key}>{this.titlize(field.get('field_name'))}</TableRowColumn>
-                     );
-                   })}
-                       <TableRowColumn></TableRowColumn>
-                </TableRow>
-              </TableHeader>
-              <TableBody displayRowCheckbox={false} stripedRows={true}>
-                { subscriptionsHTML }
-              </TableBody>
-            </Table>
-          </div>
-          </Tab>
+          { subscribersView }
+        </Tab>
       </Tabs>
     );    
   }

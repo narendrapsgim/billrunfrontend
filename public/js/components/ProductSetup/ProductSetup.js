@@ -33,8 +33,12 @@ class ProductSetup extends Component {
     this.props.dispatch(clearProduct());
   }
   
-  onChangeItemFieldValue(id, idx, e, val = e.target.value) {
-    this.props.dispatch(updateProductPropertiesField(id, idx, val));
+  onChangeItemFieldValue(id, idx, e) {
+    const { value, type, checked } = e.target;
+    const { dispatch } = this.props;
+    type === "checkbox" ?
+                         dispatch(updateProductPropertiesField(id, idx, checked)) :
+                         dispatch(updateProductPropertiesField(id, idx, value));
   }
 
   onChangeItemSelectFieldValue(id, idx, e) {

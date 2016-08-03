@@ -39,8 +39,8 @@ export default class Product extends Component {
                    value={product.get('key')}
             />
           </div>
-          <div className="col-xs-3">
-            <label htmlFor="key">Code</label>
+          <div className="col-xs-2">
+            <label htmlFor="code">Code</label>
             <Field id="code"
                    coll="Product"
                    onChange={onChangeItemFieldValue.bind(this, "code", -1)}
@@ -49,7 +49,7 @@ export default class Product extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-xs-6">
+          <div className="col-xs-5">
             <label htmlFor="description">Description</label>
             <Field id="description"
                    coll="Product"
@@ -67,48 +67,58 @@ export default class Product extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-xs-3">
+            <div className="checkbox">
+              <label>
+                <input type="checkbox" id="vatable" onChange={onChangeItemFieldValue.bind(this, "vatable", -1)} />VATable
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="form-group">
+          <div className="col-xs-3">
             <label>Valid From</label>
             <DateTimeField id="from" value={product.get('from')}  onChange={onChangeItemFieldValue.bind(this, "from")} />
           </div>
-          <div className="col-xs-2">
+          <div className="col-xs-3">
             <label>To</label>
             <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
           </div>
         </div>        
         <div className="form-group">
           <div className="col-xs-1">
-            <button className="btn btn-primary" style={{marginTop: 10}} onClick={onAddProductProperties}>Add Charges</button>
+            <a className="btn btn-primary" style={{marginTop: 10}} onClick={onAddProductProperties}>Add Charges</a>
           </div>
         </div>
         { product.get('rates').map((rate, key) => (
               <div className="form-group" key={key}>
                 <div className="col-xs-1">
-                  <label htmlFor="from">From</label>
-                  <Field id="from"
+                  <label htmlFor={`from-${key}`}>From</label>
+                  <Field id={`from-${key}`}
                          coll="Product"
                          onChange={onChangeItemFieldValue.bind(this, "from", key)}
                          value={rate.get('from')}
                   />
                 </div>
                 <div className="col-xs-1">
-                  <label htmlFor="to">To</label>
-                  <Field id="to"
+                  <label htmlFor={`to-${key}`}>To</label>
+                  <Field id={`to-${key}`}
                          coll="Product"
                          onChange={onChangeItemFieldValue.bind(this, "to", key)}
                          value={rate.get('to')}
                   />
                 </div>
                 <div className="col-xs-1">
-                  <label htmlFor="interval">Interval</label>
-                  <Field id="interval"
+                  <label htmlFor={`interval-${key}`}>Interval</label>
+                  <Field id={`interval-${key}`}
                          onChange={onChangeItemFieldValue.bind(this, "interval", key)}
                          value={rate.get('interval')}
                   />
                 </div>
-                <div className="col-xs-1">
-                  <label htmlFor="price">Price</label>
-                  <Field id="price"
+                <div className="col-xs-2">
+                  <label htmlFor={`price-${key}`}>Price</label>
+                  <Field id={`price-${key}`}
+                         fieldType="price"
                          onChange={onChangeItemFieldValue.bind(this, "price", key)}
                          value={rate.get('price')}
                   />
@@ -117,9 +127,9 @@ export default class Product extends Component {
                    if (product.get('rates').size > 0 && key === (product.get('rates').size - 1)) {
                      return (
                        <div className="col-xs-2">
-                         <button className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveProductProperties.bind(this, key)}>
+                         <a className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveProductProperties.bind(this, key)}>
                            Remove Interval
-                         </button>
+                         </a>
                        </div>
                      )
                    }

@@ -30,9 +30,9 @@ export default class Field extends Component {
           id,
           value,
           coll,
+          fieldType = this.getFieldType(id, coll),
           required = false,
           editable = true } = this.props;
-    let fieldType = this.getFieldType(id, coll);
 
     switch(fieldType) {
       case 'number':
