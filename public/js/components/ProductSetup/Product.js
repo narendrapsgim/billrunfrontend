@@ -39,7 +39,7 @@ export default class Product extends Component {
                    value={product.get('key')}
             />
           </div>
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <label htmlFor="code">Code</label>
             <Field id="code"
                    coll="Product"
@@ -49,7 +49,7 @@ export default class Product extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-xs-6">
+          <div className="col-xs-5">
             <label htmlFor="description">Description</label>
             <Field id="description"
                    coll="Product"
@@ -76,11 +76,11 @@ export default class Product extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-xs-3">
             <label>Valid From</label>
             <DateTimeField id="from" value={product.get('from')}  onChange={onChangeItemFieldValue.bind(this, "from")} />
           </div>
-          <div className="col-xs-2">
+          <div className="col-xs-3">
             <label>To</label>
             <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
           </div>
@@ -115,9 +115,10 @@ export default class Product extends Component {
                          value={rate.get('interval')}
                   />
                 </div>
-                <div className="col-xs-1">
+                <div className="col-xs-2">
                   <label htmlFor={`price-${key}`}>Price</label>
                   <Field id={`price-${key}`}
+                         fieldType="price"
                          onChange={onChangeItemFieldValue.bind(this, "price", key)}
                          value={rate.get('price')}
                   />

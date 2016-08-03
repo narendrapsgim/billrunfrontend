@@ -33,7 +33,7 @@ export default class Plan extends Component {
         <div className="BasicSettings">
           <h4>Basic Settings</h4>
           <div className="form-group">
-            <div className="col-xs-4">
+            <div className="col-xs-3">
               <label htmlFor="PlanName">Name</label><Help contents={PlanDescription.name} />
               <Field id="PlanName" onChange={onChangeFieldValue} value={plan.get('PlanName')} required={true} />
             </div>
@@ -43,7 +43,7 @@ export default class Plan extends Component {
             </div>
           </div>
           <div className="form-group">
-            <div className="col-xs-4">
+            <div className="col-xs-5">
               <label htmlFor="PlanDescription">Description</label>
               <textarea id="PlanDescription" className="form-control" value={plan.get('PlanDescription')} onChange={onChangeFieldValue} />
             </div>
@@ -53,7 +53,7 @@ export default class Plan extends Component {
               <label htmlFor="Each">Frequency</label>
               <input type="number" id="Each" className="form-control" value={plan.get('Each')} onChange={onChangeFieldValue} />
             </div>
-            <div className="col-xs-1">
+            <div className="col-xs-2">
               <label htmlFor="EachPeriod">&nbsp;</label>
               <select id="EachPeriod" className="form-control" value={plan.get('EachPeriod')} onChange={onChangeFieldValue}>
                 { each_period_options }
@@ -81,11 +81,11 @@ export default class Plan extends Component {
         <div className="Trial" style={{marginTop: 20}}>
           <h4>Trial Period</h4>
           <div className="form-group">
-            <div className="col-xs-2">
-              <label htmlFor="TrialCycle">Number of Cycles</label>
+            <div className="col-xs-1">
+              <label htmlFor="TrialCycle">Cycles</label>
               <input type="number" id="TrialCycle" className="form-control" value={plan.get('TrialCycle')} onChange={onChangeFieldValue} />
             </div>
-            <div className="col-xs-1">
+            <div className="col-xs-2">
               <label htmlFor="TrialPrice">Price</label>
               <Field id="TrialPrice" onChange={onChangeFieldValue} value={plan.get('TrialPrice')} />
             </div>
@@ -95,11 +95,11 @@ export default class Plan extends Component {
           <h4>Recurring Charges</h4>
           { plan.get('recurring_prices').map((price, key) => (
               <div className="form-group" key={key}>
-                <div className="col-xs-2">
-                  <label htmlFor="Cycle">Number of Cycles</label>
+                <div className="col-xs-1">
+                  <label htmlFor="Cycle">Cycles</label>
                   <input type="number" id="Cycle" className="form-control" min="0" value={price.get('Cycle')} onChange={onChangeRecurringPriceFieldValue.bind(this, "Cycle", key)} />
                 </div>
-                <div className="col-xs-1">
+                <div className="col-xs-2">
                   <label htmlFor="PeriodicalRate">Price</label>
                   <Field id="PeriodicalRate" onChange={onChangeRecurringPriceFieldValue.bind(this, "PeriodicalRate", key)} value={price.get('PeriodicalRate')} />
                 </div>
@@ -107,9 +107,12 @@ export default class Plan extends Component {
                    if (plan.get('recurring_prices').size > 1 && key === (plan.get('recurring_prices').size - 1)) {
                      return (
                        <div className="col-xs-2">
-                         <a className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveRecurringPrice.bind(this, key)}>
-                           Remove Interval
-                         </a>
+                         <label>&zwnj;</label>
+                         <div>
+                           <a className="btn btn-danger" onClick={onRemoveRecurringPrice.bind(this, key)}>
+                             Remove Interval
+                           </a>
+                         </div>
                        </div>
                      )
                    }
