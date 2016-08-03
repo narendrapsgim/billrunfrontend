@@ -66,7 +66,9 @@ class SubscribersList extends Component {
     const { subscriber } = this.props;
 
     const fields = [
-      {id: "name", placeholder: "Name"}
+      {id: "name", placeholder: "Name"},
+      {id: "address", placeholder: "Address"},
+      {id: "email", placeholder: "Email"}
     ];
 
     const table_header = fields.map((field, idx) => (

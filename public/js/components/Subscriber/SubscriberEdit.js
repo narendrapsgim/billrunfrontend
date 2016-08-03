@@ -92,8 +92,7 @@ class SubscriberEdit extends Component {
   }
 
   onClickNewSubscription(aid) {
-    this.setState({aid, newCustomer: true});
-    this.props.dispatch(getNewSubscriber(aid));
+    window.location = `${globalSetting.serverUrl}/paypage?aid=${aid}&return_url=${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}`;
   }
     
   render() {

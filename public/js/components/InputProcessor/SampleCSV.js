@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-/* import { connect } from 'react-redux';
- */
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 
 export default class SampleCSV extends Component {
   constructor(props) {
@@ -79,7 +75,7 @@ export default class SampleCSV extends Component {
                        type="text"
                        maxLength="1"
                        disabled={settings.get('delimiter_type') !== "delimiter"}
-                       style={{width: 5}}
+                       style={{width: 30}}
                        onChange={onChangeDelimiter}
                        value={settings.get('delimiter')} />
               </div>
@@ -120,12 +116,10 @@ export default class SampleCSV extends Component {
         { fieldsHTML }
         <div className="row">
           <div className="col-xs-3">
-            <input className="form-control" value={this.state.newField} onChange={(e) => { this.setState({newField: e.target.value}) } } placeholder="Add additional field"/>
+            <input className="form-control" value={this.state.newField} onChange={(e) => { this.setState({newField: e.target.value}) } } placeholder="Field Name"/>
           </div>
           <div className="col-xs-3">
-            <FloatingActionButton mini={true} onMouseUp={this.addField}>
-              <ContentAdd />
-            </FloatingActionButton>               
+            <a onClick={this.addField} className="btn btn-primary">Add Field</a>
           </div>
         </div>
       </div>

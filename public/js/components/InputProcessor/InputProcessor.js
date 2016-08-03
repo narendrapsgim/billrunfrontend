@@ -25,6 +25,7 @@ class InputProcessor extends Component {
     this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
     this.onSetReceiverField = this.onSetReceiverField.bind(this);
     this.onSetDelimiterType = this.onSetDelimiterType.bind(this);
+    this.onAddUsagetMapping = this.onAddUsagetMapping.bind(this);
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);

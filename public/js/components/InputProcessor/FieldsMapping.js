@@ -76,7 +76,7 @@ export default class FieldsMapping extends Component {
             <p className="help-block">Types of usages and units used for measuring usage</p>
           </div>
         </div>
-        <div className="row" style={{marginLeft: "26px"}}>
+        <div className="row">
           <div className="col-xs-6 col-xs-offset-3">
             <div className="row">
               <div className="col-xs-2">

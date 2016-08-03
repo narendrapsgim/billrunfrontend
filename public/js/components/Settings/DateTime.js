@@ -29,14 +29,14 @@ export default class DateTime extends Component {
               { date_format_options }
             </select>
           </div>
-          <div className="col-xs-2 col-xs-offset-2">
+          <div className="col-xs-2">
             <label htmlFor="time_format">Time Format</label>
             <select id="time_format" value={data.get('time_format')}
                     onChange={onChange} className="form-control">
               { time_format_options }
             </select>
           </div>
-          <div className="col-xs-2 col-xs-offset-2">
+          <div className="col-xs-2">
             <label htmlFor="time_zone">Time Zone</label>
             <select id="time_zone" value={data.get('time_zone')}
                     onChange={onChange} className="form-control">

@@ -44,3 +44,31 @@ export function updateSetting(name, value) {
     value
   };
 }
+
+function savedSettings() {
+  return {
+    type: 'saved_settings'
+  };
+}
+
+function saveSettingsToDB(settings) {
+  let setUrl = `/api/settings?category=business_shit&action=set&data=${JSON.stringify(settings.toJS())}`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.post(setUrl).then(
+      resp => {
+        dispatch(hideProgressBar());
+      }
+    ).catch(error => {
+      console.log(error);
+      dispatch(hideProgressBar());
+    });
+  };  
+  
+}
+
+export function saveSettings(settings) {
+  return dispatch => {
+    return dispatch(saveSettingsToDB(settings));
+  };  
+}

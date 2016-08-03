@@ -8,6 +8,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Filter from '../Filter';
 import Field from '../Field';
 
+import moment from 'moment';
+
 class ProductsList extends Component {
   constructor(props) {
     super(props);
@@ -65,23 +67,46 @@ class ProductsList extends Component {
       this.props.dispatch(getProducts(this.buildQuery()))
     });
   }
-  
+
+  getProductUnitType(product) {
+    return Object.keys(product.get('rates').toJS())[0];
+  }
+
   render() {
     const { products } = this.props;
     const fields = [
       {id: "key", placeholder: "Name"},
     ];
 
-    const table_header = fields.map((field, idx) => (
-      <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
-    ));
+    const table_header = [
+      (<TableHeaderColumn>Name</TableHeaderColumn>),
+      (<TableHeaderColumn>Code</TableHeaderColumn>),
+      (<TableHeaderColumn>Description</TableHeaderColumn>),
+      (<TableHeaderColumn>Unit Type</TableHeaderColumn>),
+      (<TableHeaderColumn>From</TableHeaderColumn>),
+      (<TableHeaderColumn>To</TableHeaderColumn>)
+    ];
+
     const rows = products.map((row, key) => (
       <TableRow key={key}>
-        {fields.map((field, idx) => (
-          <TableRowColumn key={idx}>
-            <Field id={field.id} value={row.get(field.id)} coll="Product" editable={false} />
-          </TableRowColumn>
-        ))}
+        <TableRowColumn>
+          <Field value={row.get("key")} coll="Product" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={row.get("code")} coll="Product" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={row.get("description")} coll="Product" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={this.getProductUnitType(row)} coll="Product" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={moment(parseInt(row.getIn(["from", "sec"]), 10)).format()} coll="Product" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={moment(parseInt(row.getIn(["to", "sec"]), 10)).format()} coll="Product" editable={false} />
+        </TableRowColumn>
       </TableRow>
     ));
 

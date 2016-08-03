@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 
-import { updatePlanField, updatePlanRecurringPriceField, getPlan, clearPlan, savePlan, addTariff } from '../../actions/planActions';
+import { updatePlanField, updatePlanRecurringPriceField, getPlan, clearPlan, savePlan, addTariff, removeRecurringPrice } from '../../actions/planActions';
 
 import Plan from './Plan';
 
@@ -19,7 +19,8 @@ class PlanSetup extends Component {
     this.onChangeRecurringPriceFieldValue = this.onChangeRecurringPriceFieldValue.bind(this);    
     this.handleSave = this.handleSave.bind(this);
     this.onChangeDateFieldValue = this.onChangeDateFieldValue.bind(this);
-
+    this.onRemoveRecurringPrice = this.onRemoveRecurringPrice.bind(this);
+    
     this.state = {
       stepIndex: 0,
       finished: 0
@@ -58,6 +59,10 @@ class PlanSetup extends Component {
     e.preventDefault();
     this.props.dispatch(addTariff());
   }
+
+  onRemoveRecurringPrice(idx, e) {
+    this.props.dispatch(removeRecurringPrice(idx));
+  }
   
   onChangeDateFieldValue(id, value) {
     this.props.dispatch(updatePlanField(id, value));
@@ -78,7 +83,7 @@ class PlanSetup extends Component {
       <div className="PlanSetup container">
         <h3>Billing Plan</h3>
         <div className="contents bordered-container">
-          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} plan={this.props.plan} />
+          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} plan={this.props.plan} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton

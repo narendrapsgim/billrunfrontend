@@ -10,8 +10,8 @@ const defaultState = Immutable.fromJS({
   TrialPrice: '',
   Each: '',
   EachPeriod: "Month",
-  from: moment().unix() * 1000,
-  to: moment().add(1, 'years').unix() * 1000,
+  /* from: moment().unix() * 1000,
+     to: moment().add(1, 'years').unix() * 1000, */
   recurring_prices: [
     {
       Cycle: '',
@@ -42,7 +42,10 @@ export default function (state = defaultState, action) {
       return state
                   .setIn(['recurring_prices', s, 'EndOfDays'], false)
                   .update('recurring_prices', list => list.push(new_tariff));
-      
+
+    case actions.REMOVE_RECURRING_PRICE:
+      return state.update('recurring_prices', list => list.delete(action.idx));
+    
     case actions.GOT_PLAN:
       return Immutable.fromJS(action.plan);
 
