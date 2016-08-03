@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import { getInputProcessors, setInputProcessor } from '../../actions/inputProcessorActions';
 
@@ -55,9 +53,7 @@ class InputProcessorsList extends Component {
         </Table>
         <div className="row">
           <div className="col-xs-3">
-            <FloatingActionButton mini={true} style={{margin: "20px"}} onMouseUp={this.onClickNew}>
-              <ContentAdd />
-            </FloatingActionButton>
+            <a className="btn btn-primary" onClick={this.onClickNew} style={{margin: 15}}>Create New</a>
           </div>
         </div>
       </div>
