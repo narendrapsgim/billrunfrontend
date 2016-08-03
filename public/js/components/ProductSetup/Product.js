@@ -85,57 +85,57 @@ export default class Product extends Component {
             <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
           </div>
         </div>        
-        <div className="form-group">
-          <div className="col-xs-1">
-            <a className="btn btn-primary" style={{marginTop: 10}} onClick={onAddProductProperties}>Add Charges</a>
-          </div>
-        </div>
         { product.get('rates').map((rate, key) => (
-              <div className="form-group" key={key}>
-                <div className="col-xs-1">
-                  <label htmlFor={`from-${key}`}>From</label>
-                  <Field id={`from-${key}`}
-                         coll="Product"
-                         onChange={onChangeItemFieldValue.bind(this, "from", key)}
-                         value={rate.get('from')}
-                  />
-                </div>
-                <div className="col-xs-1">
-                  <label htmlFor={`to-${key}`}>To</label>
-                  <Field id={`to-${key}`}
-                         coll="Product"
-                         onChange={onChangeItemFieldValue.bind(this, "to", key)}
-                         value={rate.get('to')}
-                  />
-                </div>
-                <div className="col-xs-1">
-                  <label htmlFor={`interval-${key}`}>Interval</label>
-                  <Field id={`interval-${key}`}
-                         onChange={onChangeItemFieldValue.bind(this, "interval", key)}
-                         value={rate.get('interval')}
-                  />
-                </div>
-                <div className="col-xs-2">
-                  <label htmlFor={`price-${key}`}>Price</label>
-                  <Field id={`price-${key}`}
-                         fieldType="price"
-                         onChange={onChangeItemFieldValue.bind(this, "price", key)}
-                         value={rate.get('price')}
-                  />
-                </div>
-                {(() => {  /* only show remove button if there is more than one interval and only for the last one */
-                   if (product.get('rates').size > 0 && key === (product.get('rates').size - 1)) {
-                     return (
-                       <div className="col-xs-2">
-                         <a className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveProductProperties.bind(this, key)}>
-                           Remove Interval
-                         </a>
-                       </div>
-                     )
-                   }
-                 })()}
+            <div className="form-group" key={key}>
+              <div className="col-xs-1">
+                <label htmlFor={`from-${key}`}>From</label>
+                <Field id={`from-${key}`}
+                       coll="Product"
+                       onChange={onChangeItemFieldValue.bind(this, "from", key)}
+                       value={rate.get('from')}
+                />
               </div>
+              <div className="col-xs-1">
+                <label htmlFor={`to-${key}`}>To</label>
+                <Field id={`to-${key}`}
+                       coll="Product"
+                       onChange={onChangeItemFieldValue.bind(this, "to", key)}
+                       value={rate.get('to')}
+                />
+              </div>
+              <div className="col-xs-1">
+                <label htmlFor={`interval-${key}`}>Interval</label>
+                <Field id={`interval-${key}`}
+                       onChange={onChangeItemFieldValue.bind(this, "interval", key)}
+                       value={rate.get('interval')}
+                />
+              </div>
+              <div className="col-xs-2">
+                <label htmlFor={`price-${key}`}>Price</label>
+                <Field id={`price-${key}`}
+                       fieldType="price"
+                       onChange={onChangeItemFieldValue.bind(this, "price", key)}
+                       value={rate.get('price')}
+                />
+              </div>
+              {(() => {  /* only show remove button if there is more than one interval and only for the last one */
+                 if (product.get('rates').size > 0 && key === (product.get('rates').size - 1)) {
+                   return (
+                     <div className="col-xs-2">
+                       <a className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveProductProperties.bind(this, key)}>
+                         Remove Interval
+                       </a>
+                     </div>
+                   )
+                 }
+               })()}
+            </div>
           )) }
+            <div className="form-group">
+              <div className="col-xs-1">
+                <a className="btn btn-primary" style={{marginTop: 10}} onClick={onAddProductProperties}>Add Charges</a>
+              </div>
+            </div>
       </form>
     );
   }
