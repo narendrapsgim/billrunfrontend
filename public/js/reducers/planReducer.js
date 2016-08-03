@@ -10,8 +10,8 @@ const defaultState = Immutable.fromJS({
   TrialPrice: '',
   Each: '',
   EachPeriod: "Month",
-  from: moment().unix() * 1000,
-  to: moment().add(1, 'years').unix() * 1000,
+  /* from: moment().unix() * 1000,
+     to: moment().add(1, 'years').unix() * 1000, */
   recurring_prices: [
     {
       Cycle: '',

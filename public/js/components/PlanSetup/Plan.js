@@ -37,20 +37,20 @@ export default class Plan extends Component {
               <label htmlFor="PlanName">Name</label><Help contents={PlanDescription.name} />
               <Field id="PlanName" onChange={onChangeFieldValue} value={plan.get('PlanName')} required={true} />
             </div>
-            <div className="col-xs-3" >
+            <div className="col-xs-2" >
               <label htmlFor="PlanCode">Code</label>
               <Field  id="PlanCode" value={plan.get('PlanCode')} onChange={onChangeFieldValue} />
             </div>
           </div>
           <div className="form-group">
-            <div className="col-xs-7">
+            <div className="col-xs-4">
               <label htmlFor="PlanDescription">Description</label>
               <textarea id="PlanDescription" className="form-control" value={plan.get('PlanDescription')} onChange={onChangeFieldValue} />
             </div>
           </div>
           <div className="form-group">
-            <div className="col-xs-2">
-              <label htmlFor="Each">Billing Frequency</label>
+            <div className="col-xs-1">
+              <label htmlFor="Each">Frequency</label>
               <input type="number" id="Each" className="form-control" value={plan.get('Each')} onChange={onChangeFieldValue} />
             </div>
             <div className="col-xs-1">
@@ -68,16 +68,16 @@ export default class Plan extends Component {
             </div>
           </div>
         </div>
-        <div className="form-group">
-          <div className="col-xs-2">
-            <label>Valid From</label>
-            <DateTimeField id="from" value={plan.get('from')}  onChange={onChangeDateFieldValue.bind(this, "from")} />
-          </div>
-          <div className="col-xs-2">
-            <label>To</label>
-            <DateTimeField id="to"   value={plan.get('to')}    onChange={onChangeDateFieldValue.bind(this, "to")} />
-          </div>
+        {/* <div className="form-group">
+        <div className="col-xs-2">
+        <label>Valid From</label>
+        <DateTimeField id="from" value={plan.get('from')}  onChange={onChangeDateFieldValue.bind(this, "from")} />
         </div>
+        <div className="col-xs-2">
+        <label>To</label>
+        <DateTimeField id="to"   value={plan.get('to')}    onChange={onChangeDateFieldValue.bind(this, "to")} />
+        </div>
+        </div> */}
         <div className="Trial" style={{marginTop: 20}}>
           <h4>Trial Period</h4>
           <div className="form-group">
@@ -104,21 +104,21 @@ export default class Plan extends Component {
                   <Field id="PeriodicalRate" onChange={onChangeRecurringPriceFieldValue.bind(this, "PeriodicalRate", key)} value={price.get('PeriodicalRate')} />
                 </div>
                 {(() => {  /* only show remove button if there is more than one interval and only for the last one */
-                   if (plan.get('recurring_prices').size > 0 && key === (plan.get('recurring_prices').size - 1)) {
+                   if (plan.get('recurring_prices').size > 1 && key === (plan.get('recurring_prices').size - 1)) {
                      return (
                        <div className="col-xs-2">
-                         <button className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveRecurringPrice.bind(this, key)}>
+                         <a className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveRecurringPrice.bind(this, key)}>
                            Remove Interval
-                         </button>
+                         </a>
                        </div>
                      )
                    }
-                 })()}                
+                 })()}
               </div>
           ))}
           <div className="form-group">
             <div className="col-xs-3">
-              <button className="btn btn-primary" onClick={onAddTariff} style={{marginTop: 10}}>Add Charges</button>
+              <a className="btn btn-primary" onClick={onAddTariff} style={{marginTop: 10}}>Add Charges</a>
             </div>
           </div>
         </div>

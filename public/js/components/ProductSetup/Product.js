@@ -87,7 +87,7 @@ export default class Product extends Component {
         </div>        
         <div className="form-group">
           <div className="col-xs-1">
-            <button className="btn btn-primary" style={{marginTop: 10}} onClick={onAddProductProperties}>Add Charges</button>
+            <a className="btn btn-primary" style={{marginTop: 10}} onClick={onAddProductProperties}>Add Charges</a>
           </div>
         </div>
         { product.get('rates').map((rate, key) => (
@@ -126,9 +126,9 @@ export default class Product extends Component {
                    if (product.get('rates').size > 0 && key === (product.get('rates').size - 1)) {
                      return (
                        <div className="col-xs-2">
-                         <button className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveProductProperties.bind(this, key)}>
+                         <a className="btn btn-danger" style={{marginTop: "30px", marginLeft: "15px"}} onClick={onRemoveProductProperties.bind(this, key)}>
                            Remove Interval
-                         </button>
+                         </a>
                        </div>
                      )
                    }

@@ -75,31 +75,81 @@ class PlansList extends Component {
       this.props.dispatch(getPlans(this.buildQuery()))
     });
   }
+
+  planTrial(plan) {
+    if (plan.getIn(['price', 0, 'trial'])) {
+      return plan.getIn(['price', 0, 'duration', 'TrialCycle']) + " " + plan.getIn(['recurring', 'unit']);
+    }
+    return '';
+  }
+
+  planCharges(plan) {
+    let sub = plan.getIn(['price', 0, 'trial']) ? 1 : 0;
+    let cycles = plan.get('price').size - sub;
+    return cycles + ' cycles';
+  }
+
+  planBillingFrequency(plan) {
+    return plan.getIn(['recurring', 'duration']) + " " + plan.getIn(['recurring', 'unit']);
+  }
   
   render() {
     let { plans } = this.props;
 
     const fields = [
       {id: "name", placeholder: "Name"},
-      {id: "description", placeholder: "Description"},
+      {id: "PlanCode", placeholder: "Code"},
+    ];
+    /* 
+       const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),
+       ...fields.map((field, idx) => (
+       <option value={field.id} key={idx}>{field.placeholder}</option>
+       ))];
+
+       const table_header = fields.map((field, idx) => (
+       <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
+       ));
+       
+       const rows = plans.map((row, key) => (
+       <TableRow key={key}>
+       {fields.map((field, idx) => (
+       <TableRowColumn key={idx}>
+       <Field id={field.id} value={row.get(field.id)} coll="Plans" editable={false} />
+       </TableRowColumn>
+       ))}
+       </TableRow>
+       ));
+     */
+
+    const table_header = [
+      (<TableHeaderColumn>Name</TableHeaderColumn>),
+      (<TableHeaderColumn>Code</TableHeaderColumn>),
+      (<TableHeaderColumn>Trial</TableHeaderColumn>),
+      (<TableHeaderColumn>Recurring Charges</TableHeaderColumn>),
+      (<TableHeaderColumn>Billing Frequency</TableHeaderColumn>),
+      (<TableHeaderColumn>Charging Mode</TableHeaderColumn>)
     ];
 
-    const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),
-                         ...fields.map((field, idx) => (
-                           <option value={field.id} key={idx}>{field.placeholder}</option>
-                         ))];
-
-    const table_header = fields.map((field, idx) => (
-      <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
-    ));
-    
-    const rows = plans.map((row, key) => (
-      <TableRow key={key}>
-        {fields.map((field, idx) => (
-           <TableRowColumn key={idx}>
-             <Field id={field.id} value={row.get(field.id)} coll="Plans" editable={false} />
-           </TableRowColumn>
-         ))}
+    const rows = plans.map((plan, plan_key) => (
+      <TableRow key={plan_key}>
+        <TableRowColumn>
+          <Field value={plan.get('name')} coll="Plans" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={plan.get('code')} coll="Plans" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={this.planTrial(plan)} coll="Plans" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={this.planCharges(plan)} coll="Plans" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={this.planBillingFrequency(plan)} coll="Plans" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={plan.get('charging_mode')} coll="Plans" editable={false} />
+        </TableRowColumn>
       </TableRow>
     ));
 
