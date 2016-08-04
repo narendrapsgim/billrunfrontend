@@ -12,14 +12,30 @@ export default function (state = {}, action) {
       {page: Object.assign({}, {item: {}} )}
     );
   case actions.UPDATE_FIELD_VALUE:
-    item = _.cloneDeep(state.page.item);
-    path = action.path.replace('item.', '');
-    _.setWith(item, path, action.field_value);
-    return Object.assign(
-      {},
-      state,
-      {page: Object.assign({}, state.page, {item: item} )}
-    );
+    //Edit multiple items
+    if(action.action == "edit_multiple"){
+      let items = _.cloneDeep(state.page.items);
+      items.forEach( (item) => {
+        let item_path = action.fieldsMap[action.path][item._id['$id']];
+        _.setWith(item, item_path, action.field_value);
+      });
+      return Object.assign(
+        {},
+        state,
+        {page: Object.assign({}, state.page, {items: items} )}
+      );
+    }
+    //Edit single items
+    else {
+      item = _.cloneDeep(state.page.item);
+      path = action.path.replace('item.', '');
+      _.setWith(item, path, action.field_value);
+      return Object.assign(
+        {},
+        state,
+        {page: Object.assign({}, state.page, {item: item} )}
+      );
+    }
   case actions.NEW_FIELD:
     item = _.cloneDeep(state.page.item);
     path = action.path.replace('item.', '');

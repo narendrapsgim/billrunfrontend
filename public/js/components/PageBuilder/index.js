@@ -25,9 +25,202 @@ class PageBuilder extends Component {
     this.onFieldChange = this.onFieldChange.bind(this);
     this.onSave = this.onSave.bind(this);
 
+    this.isFieldExistInAllItems = this.isFieldExistInAllItems.bind(this);
+    this.setItemMapper = this.setItemMapper.bind(this);
+    this.setItemsMapper = this.setItemsMapper.bind(this);
+    this.isArrayOfObjects = this.isArrayOfObjects.bind(this);
+    this.parseObjectsArray = this.parseObjectsArray.bind(this);
+    this.parseValue = this.parseValue.bind(this);
+    this.parseRaw = this.parseRaw.bind(this);
+    this.parseFields = this.parseFields.bind(this);
+    this.parseData = this.parseData.bind(this);
+
+    this.mapper = {};
+
     this.state = {
       action: props.params.action
     };
+  }
+
+
+
+
+  setItemMapper(item, key, itemKey){
+    let id = item._id['$id'];
+    if(typeof this.mapper[key] === 'undefined'){
+      this.mapper[key] = {};
+    }
+    this.mapper[key][id] = itemKey;
+  }
+
+  setItemsMapper(items, key){
+    items.forEach( (item) => {
+      this.setItemMapper(item, key, key);
+    });
+  }
+
+  isArrayOfObjects(element){
+    if(!Array.isArray(element)) return false;
+    if(!(element.length > 0)) return false;
+    if(Object.prototype.toString.call(element[0]) !== "[object Object]") return false;
+    return true;
+  }
+
+  parseObjectsArray (items, blocks, key = '', parent = {}){
+    let html = [];
+    if(parent.key == "region"){
+      //Create Mapper
+      var all = items.map((item, i) => _.get(item, key).map( (node) => node[parent.key]));
+      var intersected = _.intersection(...all);
+      var mapper = {};
+      items.forEach( (item) => {
+          var indexes = intersected.map((intersect) => _.get(item, key).findIndex( (node) => node[parent.key] == intersect));
+          mapper[item._id['$id']] = indexes;
+      });
+      //loop through all commom values
+      for (var i = 0; i < intersected.length; i++) {
+        let blockFields = [];
+        blocks.forEach( (block) => {
+          let reducedValue = items.reduce( (prevValues, item, index) => {
+            //build item key by mapper
+            let arrayKey = key + "[" + mapper[item._id['$id']][i] + "]." + block.dbkey;
+            //set mapper
+            this.setItemMapper(item, key + "[" + i +"]." + block.dbkey, arrayKey);
+            //Compare values
+            if(index == 0) return _.get(item, arrayKey);
+            let values = _.get(item, arrayKey);
+            if(Array.isArray(values)){
+              values.sort();
+            };
+            let equal = _.isEqual(values, prevValues);
+            return equal ? values : ['multipleValues'];
+          }, null);
+          blockFields.push(<Field size={block.size} field={block} value={reducedValue} path={key + "[" + i +"]." + block.dbkey} onChange={this.onFieldChange} key={key + block.dbkey + "[" + i +"][value]"} label={block.label}/>);
+        });
+        blockFields.push( <div style={{clear: 'both'}}  key={key + "[" + i +"]" + "[clear-both]"}></div>);
+        let container = (
+          <div className={'col-md-' + parent.size} key={key + parent.dbkey + "[" + i +"][blok]"}>
+              <FieldsContainer
+                path={key + parent.dbkey + "[" + i +"]"}
+                label={''}
+                content={blockFields}
+                crud={parent.crud}
+                expanded={parent.collapsed}
+                fieldType={parent.fieldType}
+                pageName={this.getPageName()}
+                dispatch={this.props.dispatch}
+                collapsible={parent.collapsible}
+              />
+          </div>);
+        html.push(container);
+      }
+    } else {
+      var itemsKeys = items.map( (item) => Object.keys(_.get(item, key)));
+      _.intersection(...itemsKeys).forEach( (index) => {
+          let newKey = key + "[" + index + "]";
+          blocks.forEach( (block) => {
+            html.push(this.parseData(items, block, newKey, parent));
+          });
+      });
+    }
+    return html;
+  }
+
+  parseValue(items, block, key = '', parent = {}){
+    //build current key
+    var dbkey  = (key.length) ? key + "." + block.dbkey : block.dbkey;
+    //set key in mapper object
+    this.setItemsMapper(items, dbkey);
+    //Create marged value from all items
+    let mergedValue = items.map(
+      (item, i) => _.get(item, dbkey, '')
+    ).reduce(
+      (prev, current, i) => _.isEqual(prev,current) ? current : 'multipleValues'
+    );
+    if(this.isFieldExistInAllItems(items, block, key)){
+      return (<Field size={block.size} field={block} value={mergedValue} path={dbkey} onChange={this.onFieldChange} key={dbkey} label={block.label}/>);
+    }
+  }
+
+  parseRaw(items, block, key ='', parent = {}){
+    var html = [];
+    if(parent.type == 'objectsArray' /*isArrayOfObjects(block)*/){
+      html.push(this.parseObjectsArray(items, block.row, key, parent));
+    } else {
+      block.row.map((row, i) => {
+         html.push(this.parseData(items, row, key, parent));
+      });
+    }
+    return <div className="row">{html}</div>;
+  }
+
+  parseFields(items, block, key ='', parent={}){
+    var html = [];
+    var label = null;
+    block.fields.forEach((field, i) => {
+      if(typeof block.dbkey !== 'undefined'){
+        if(block.dbkey == "*"){
+          var valuesKeys = items.map(
+            (item, i) => _.get(item, key, '')
+          ).map(
+            (value, i) => Object.keys(value)
+          );
+          _.intersection(...valuesKeys).forEach((objectKey, i) => {
+            var dbkey = key + "." + objectKey;
+            label = this.titlize(objectKey);
+            html.push(this.parseData(items, field, dbkey, block));
+          });
+        } else {
+          var dbkey = (key.length) ? key + "." +  block.dbkey : block.dbkey;
+          html.push(this.parseData(items, field, dbkey, block));
+        }
+      } else {
+        html.push(this.parseData(items, field, key, block));
+      }
+    });
+    html.push(<div style={{clear: 'both'}} key={key + block.dbkey + "[clear-both]"}></div>);
+
+    let reactKey = (key ? key + "." : 'section.') + (block.dbkey ? block.dbkey + "." :  '');
+    let size = block.size || 12;
+    let container = (
+      <div className={'col-md-' + size} key={reactKey + "[block]"}>
+        <FieldsContainer
+          path={reactKey}
+          label={label || block.label || parent.label || ''}
+          content={html}
+          crud={block.crud}
+          expanded={block.collapsed}
+          fieldType={block.fieldType}
+          pageName={this.getPageName()}
+          dispatch={this.props.dispatch}
+          collapsible={block.collapsible}
+        />
+      </div>);
+    return container;
+  }
+
+  parseData(items, block, key ='', parent = {}){
+    var html = [];
+    if(block.hasOwnProperty('fields')){
+      html.push(this.parseFields(items, block, key, parent));
+    } else if (block.hasOwnProperty('row')){
+      html.push(this.parseRaw(items, block, key, parent));
+    } else {
+        html.push(this.parseValue(items, block, key, parent));
+    }
+    return html;
+  }
+
+  isFieldExistInAllItems(items, block, key){
+    //return false for fields that not exist in all items (display only commom fields)
+    let itemsKeys = items.map( (item, i) => {
+      let vals = (key.length > 0) ? _.get(item, key) : item;
+      return Object.keys(vals);
+    });
+    if(_.intersection(...itemsKeys).includes(block.dbkey)){
+      return true
+    }
+    return false;
   }
 
   getPageName(props = this.props) {
@@ -103,30 +296,31 @@ class PageBuilder extends Component {
     let { dispatch } = this.props;
     let path = evt.target.dataset.path;
 
-    dispatch(updateFieldValue(path, value, this.getPageName()));
+    dispatch(updateFieldValue(path, value, this.getPageName(), this.state.action, this.mapper));
   }
 
   onSave(e) {
+    let { item, dispatch } = this.props;
+    let pageName = this.getPageName();
     let action = e.currentTarget.dataset.action;
     let actionType = action; //close_and_new / duplicate / update / new
-    let { item } = this.props;
     switch (action) {
-      case 'edit': actionType = 'update';
-        break;
       case 'edit_multiple':
-        actionType = 'bulk_update';
-        let bulkIds = this.props.items.map(item => item['_id']['$id']);
-        Object.assign(item, {ids:bulkIds})
+      case 'edit':
+          actionType = 'update';
         break;
       case 'clone': actionType = 'duplicate';
         break;
       case 'new': actionType = 'new';
         break;
     }
-
-    let { dispatch } = this.props;
-    let pageName = this.getPageName();
-    dispatch(saveCollectionEntity(item, this.props.params.collection, pageName, actionType));
+    if(action == 'edit_multiple'){
+      this.props.items.forEach( (item) => {
+        dispatch(saveCollectionEntity(item, this.props.params.collection, pageName, actionType, true));
+      });
+    } else {
+      dispatch(saveCollectionEntity(item, this.props.params.collection, pageName, actionType));
+    }
   }
 
   onCancel() {
@@ -188,50 +382,8 @@ class PageBuilder extends Component {
     });
   }
 
-  getCombineValue(items, item, path, field){
-    //If this value already was changed, return new value
-    if(_.has({item}, path)){
-      return _.result({item}, path);
-    }
-    //return combined value from all items
-    let value = items.reduce( (prevValue, currentValue, index) => {
-      let value = _.result({item:currentValue}, path);
-
-      //first cycle retun value as is
-      if(index === 0){
-        return value;
-      }
-      //alre mixed
-      else if(prevValue === 'mixed'){
-        return 'mixed';
-      }
-      //array
-      else if(typeof field.type !== 'undefined' && field.type === "array"){
-        return _.isEqual(prevValue, value) ? value : 'mixed';
-      }
-      //date
-      else if(typeof field.type !== 'undefined' && field.type === "date"){
-        return _.isEqual(prevValue.sec, value.sec) ? value : 'mixed';
-      }
-      //other objet or array of objects
-      else if (_.isObject(value) || Array.isArray(value) && _.isObject(value[0])){
-        //console.log("Object or Array of objects : ", path, value, "Field type : ", field.type);
-        return value;
-      }
-      else {
-        return _.isEqual(prevValue, value) ? value : 'mixed';
-      }
-    }, null);
-
-    return value;
-  }
-
-  createFieldHTML(field, path, field_index) {
-    if (
-      ((this.state.action === 'edit' || this.state.action === 'clone' || this.state.action === 'close_and_new') && (!this.props.item || _.isEmpty(this.props.item)))
-      ||
-      ( (this.state.action === 'edit_multiple') &&  (!this.props.items || _.isEmpty(this.props.items)))
-    ) {
+  createFieldHTML(field, path, field_index, source = null) {
+    if ((this.state.action === 'edit' || this.state.action === 'clone' || this.state.action === 'close_and_new') && (!this.props.item || _.isEmpty(this.props.item))) {
       return null;
     }
 
@@ -241,7 +393,7 @@ class PageBuilder extends Component {
 
     if (path.endsWith(".*")) {
       let recpath = path.replace('.*', '');
-      let res =  !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, recpath, field) : _.result(this.props, recpath);
+      let res = _.result(this.props, recpath);
       if (!res){
         return null;
       };
@@ -250,13 +402,17 @@ class PageBuilder extends Component {
       });
     }
 
-    let value = !_.isEmpty(this.props.items) ? this.getCombineValue(this.props.items, this.props.item, path, field) : _.result(this.props, path);
+    let value = _.result(this.props, path);
     let size = field.size || 12;
-    let label = field.label !== void 0 ?
-                field.label :
-                this.titlize(_.last(path.split('.')));
 
-    //print only fields that item has
+    let label = field.label;
+    if(typeof field.label === 'undefined'){
+      label = this.titlize(_.last(path.split('.')));
+    } else if (_.isObject(field.label) && _.has(field.label,'dbkey')){
+      label = _.result({item:this.props.items[0]}, path.replace(field.dbkey, field.label.dbkey));
+    }
+
+    //print only fields that exist in item
     if(typeof value === 'undefined'){
       return null;
     }
@@ -292,7 +448,7 @@ class PageBuilder extends Component {
     }
 
     return (
-      <Field size={size} field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} />
+      <Field size={size} field={field} value={value} path={path} onChange={this.onFieldChange} key={field_index} label={label}/>
     );
   }
 
@@ -308,7 +464,9 @@ class PageBuilder extends Component {
   createSectionsHTML(sections = []) {
     let sectionsHTML = sections.map((section, section_idx) => {
       let output;
-      if(section.fields) {
+      if(this.state.action == 'edit_multiple'){
+        output = this.props.items ? this.parseData(this.props.items, section) : null;
+      } else if(section.fields) {
         let fields = section.fields ? section.fields : this.createConfigFieldsFromItem(this.props.item);
         output = fields.map((field, field_idx) => {
           if(field.row){
@@ -423,8 +581,8 @@ PageBuilder.contextTypes = {
 
 function mapStateToProps(state, ownProps) {
   return {
-    item:  (state.pages && state.pages.page && state.pages.page.item) ?  state.pages.page.item : null,
-    items:  (state.pages && state.pages.page && state.pages.page.items) ?  state.pages.page.items : null,
+    item: (state.pages && state.pages.page && state.pages.page.item) ?  state.pages.page.item : null,
+    items: (state.pages && state.pages.page && state.pages.page.items) ?  state.pages.page.items : null,
     user: state.users
   }
 }

@@ -3,6 +3,14 @@ import * as ColorManipulator from 'material-ui/utils/colorManipulator';
 import * as Spacing from 'material-ui/styles/spacing';
 
 const theme = {
+  toolBar: {
+   display: '-webkit-flex',
+   display: 'flex',
+ },
+  appBar: {
+    display: '-webkit-flex',
+    // display: 'flex',
+  },
   spacing: Spacing,
   fontFamily: 'Roboto, sans-serif',
   palette: {
