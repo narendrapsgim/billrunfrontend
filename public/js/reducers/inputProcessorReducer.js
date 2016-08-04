@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import _ from 'lodash';
 
 import { SET_NAME,
          SET_DELIMITER_TYPE,
@@ -40,7 +41,7 @@ let defaultState = Immutable.fromJS({
 export default function (state = defaultState, action) {
   const { field, mapping, width } = action;
   switch (action.type) {
-  case GOT_PROCESSOR_SETTINGS:
+    case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
       
     case SET_NAME:
@@ -53,6 +54,7 @@ export default function (state = defaultState, action) {
       return state.set('delimiter', action.delimiter);
 
     case  SET_FIELDS:
+      if (state.get('fields').size > 0) return state.update('fields', list => list.concat2(action.fields));
       return state.set('fields', Immutable.fromJS(action.fields));
 
     case SET_FIELD_WIDTH:
@@ -62,7 +64,9 @@ export default function (state = defaultState, action) {
       return state.setIn(['processor', field], mapping);
 
     case ADD_CSV_FIELD:
+      if (!action.field || _.isEmpty(action.field.replace(/ /g, ''))) return state;
       const fields = state.get('fields');
+      if (fields.includes(action.field)) return state;
       return state.set('fields', fields.push(action.field));
 
     case ADD_USAGET_MAPPING:

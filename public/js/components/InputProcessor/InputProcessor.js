@@ -7,6 +7,7 @@ import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
 import CalculatorMapping from './CalculatorMapping';
 import Receiver from './Receiver';
+import _ from 'lodash';
 
 import {
   Step,
