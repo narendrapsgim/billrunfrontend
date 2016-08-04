@@ -6,10 +6,11 @@ const params_fields = [
     { dbkey: "*", collapsible: true, collapsed: true, fields: [
       { dbkey: "rules", label: "", collapsible: false, fields: [
         { row: [
-          { dbkey: "alpha3", label: "Alpha3", size: 3 },
+          { dbkey: "alpha3", label: "Alpha3", size: 2 },
           { dbkey: "customer_segment", label: "Customer Segment", size: 3 },
           { dbkey: "category", label: "Category", size: 3 },
-          { dbkey: "interco", label: "Interconnect", size: 3},
+          { dbkey: "interco", label: "Interconnect", size: 2},
+          { dbkey: "tax_exempt", label: "Tax Exempt", size: 2 },
         ]},
       ]}
     ]}
@@ -53,9 +54,6 @@ const rates_vat_list_view = {
         closeAndNew : { label: 'Close and New'},
         // edit : { label: 'Edit' },
         delete : { label: 'Delete', color: Colors.red500  },
-      },
-      pagination : {
-        itemsPerPage : 10,
       },
       onItemClick : 'edit',
     } ]

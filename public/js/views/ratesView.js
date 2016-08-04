@@ -1,7 +1,7 @@
 import moment from 'moment';
 import * as Colors from 'material-ui/styles/colors';
 
-const ratess_field = [
+const rates_field = [
   { dbkey: "*", collapsible: true, collapsed: true, fields: [
       { row: [
         { dbkey: "access", label: "Access", type: "text", size: 4},
@@ -15,12 +15,12 @@ const ratess_field = [
         { dbkey: "groups", label : 'Groups', type: 'array'},
       ]},
       { row: [
-        { dbkey: "rate", crud: '1110', fieldType: "array", label: "", collapsible: false, fields: [
+        { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
           { row: [
             { dbkey: "price", label: "Price ", type: "text", size: 4},
             { dbkey: "interval", label: "Interval", type: "text", size: 4},
             { dbkey: "to", label: "To", type: "text", size: 4},
-          ]},
+          ], label: ""},
         ]},
       ]},
   ]}
@@ -37,6 +37,21 @@ const params_field = [
     { row: [
       { dbkey: "region", label: "Region", type: "text", size: 3},
       { dbkey: "prefix", label: "Prefix", type: "array", size: 6},
+    ]},
+  ]}
+];
+
+const params_field_bulk_edit = [
+  { row: [
+    { dbkey: "customer_segment", label : 'Customer Segment', type: 'array'},
+    { dbkey: "source_networks", label : 'Source Networks', type: 'array'},
+    { dbkey: "source_prefixes", label : 'Source Prefixes', type: 'array'},
+    { dbkey: "source_types", label : 'Source Types', type: 'array'},
+  ]},
+  { dbkey: "destination", label:"Destinations", collapsible: false, size: 12, type:'objectsArray', key:'region', fields: [
+    { row: [
+      { dbkey: "region", label: "Region", type: "text", size: 3, crud: '0100',},
+      { dbkey: "prefix", label: "Prefix", type: "array", size: 9},
     ]},
   ]}
 ];
@@ -76,11 +91,8 @@ const rates_list_view = {
       controllers : {
         duplicate : { label: 'Duplicate', callback:'onClickCloneItem'},
         closeAndNew : { label: 'Close and New'},
-        // edit : { label: 'Edit' },
+        edit : { label: 'Edit' },
         delete : { label: 'Delete', color: Colors.red500  },
-      },
-      pagination : {
-        itemsPerPage : 20,
       },
       onItemClick : 'edit',
       defaults : {tableHeight : '450px'}
@@ -108,10 +120,10 @@ const rates_edit_view = {
         ]},
         { row: [
           { dbkey: "from", label: "From", type:'date', size: 6 , crud: '0100'},
-        { dbkey: "to", label: "To", type:'date', size: 6},
+          { dbkey: "to", label: "To", type:'date', size: 6},
         ]},
         { row: [
-          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields: ratess_field },
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false ,  fields: rates_field },
         ]},
         { row: [
           { dbkey: "params",  label: "Params", collapsible: true, collapsed: true ,fields: params_field },
@@ -121,8 +133,36 @@ const rates_edit_view = {
   ]
 };
 
-const rates_edit_multiple_view = Object.assign({}, rates_edit_view, {title: "Edit Rates"});
-
+const rates_edit_multiple_view = {
+  title: "Edit Rates",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { row: [
+          { dbkey: "type", label: "Type"},
+          { dbkey: "country", label: "Country", type:'array' },
+          { dbkey: "alpha3", label: "Alpha3", type:'array' },
+        ]},
+        { row: [
+          { dbkey: "zone", label: "zone", size: 6},
+          { dbkey: "zone_grouping", label: "Zone Grouping", size: 6 },
+        ]},
+        { row: [
+          { dbkey: "from", label: "From", type:'date', size: 6 , crud: '0100'},
+          { dbkey: "to", label: "To", type:'date', size: 6},
+        ]},
+        { row: [
+          { dbkey: "rates", label: "Rates", collapsible: true, collapsed: false, fields: rates_field },
+        ]},
+        { row: [
+          { dbkey: "params",  label: "Params", collapsible: true, collapsed: true ,fields: params_field_bulk_edit },
+        ]},
+      ]
+    }
+  ]
+};
 const rates_clone_view = {
   title: "Clone Rate",
   view_type: "sections",
@@ -145,7 +185,7 @@ const rates_clone_view = {
         { dbkey: "to", label: "To", type:'date', size: 6},
         ]},
         { row: [
-          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: ratess_field },
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: rates_field },
         ]},
         { row: [
           { dbkey: "params",  label: "Params", collapsible: true, collapsed: true, fields: params_field },
@@ -177,7 +217,7 @@ const rates_close_and_new_view = {
         { dbkey: "to", label: "To", type:'date', size: 6},
         ]},
         { row: [
-          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: ratess_field },
+          { dbkey: "rates", crud: '1111', label: "Types", collapsible: true, collapsed: false, fields: rates_field },
         ]},
         { row: [
           { dbkey: "params", crud: '1111', label: "Params", collapsible: true, collapsed: true, fields: params_field },
