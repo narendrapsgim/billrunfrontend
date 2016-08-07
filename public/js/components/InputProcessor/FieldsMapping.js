@@ -42,43 +42,46 @@ export default class FieldsMapping extends Component {
                               ))];
 
     return (
-      <div className="FieldsMapping">
-        <div className="row">
-          <div className="col-xs-3">
+      <form className="form-horizontal FieldsMapping">
+        <div className="form-group">
+          <div className="col-xs-2">
             <label>Time</label>
           </div>
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <select id="date_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'date_field'])} defaultValue="-1">
               { available_fields }
             </select>
             <p className="help-block">Time of record creation</p>
           </div>
         </div>
-        <div className="row">
-          <div className="col-xs-3">
+        <div className="form-group">
+          <div className="col-xs-2">
             <label>Volume</label>
           </div>
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <select id="volume_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'volume_field'])} defaultValue="-1">
               { available_fields }
             </select>
             <p className="help-block">Amount calculated</p>
           </div>
         </div>
-        <div className="row">
-          <div className="col-xs-3">
+        <div className="form-group">
+          <div className="col-xs-2">
             <label>Usage types</label>
           </div>
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <select id="src_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'src_field'])} defaultValue="-1">
               { available_fields }
             </select>
             <p className="help-block">Types of usages and units used for measuring usage</p>
           </div>
         </div>
-        <div className="row">
-          <div className="col-xs-6 col-xs-offset-3">
-            <div className="row">
+        <div className="form-group">
+          <div className="col-xs-2">
+            <label>Usage type mappings</label>
+          </div>
+          <div className="col-xs-6">
+            <div className="form-group">
               <div className="col-xs-2">
                 <strong className="text-uppercase">Value</strong>
               </div>
@@ -88,13 +91,13 @@ export default class FieldsMapping extends Component {
             </div>
             {
               settings.getIn(['processor', 'usaget_mapping']).map((usage_t, key) => (
-                <div className="row" key={key}>
+                <div className="form-group" key={key}>
                   <div className="col-xs-2">{usage_t.get('pattern')}</div>
                   <div className="col-xs-2">{usage_t.get('usaget')}</div>
                 </div>
               ))
             }
-                <div className="row">
+                <div className="form-group">
                   <div className="col-xs-2"><input className="form-control" onChange={this.onChangePattern} value={this.state.pattern} /></div>
                   <div className="col-xs-2"><input className="form-control" onChange={this.onChangeUsaget} value={this.state.usaget} /></div>
                   <div className="col-xs-2">
@@ -105,7 +108,7 @@ export default class FieldsMapping extends Component {
                 </div>
           </div>
         </div>
-      </div>
+      </form>
     );
   }
 }

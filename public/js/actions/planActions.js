@@ -11,6 +11,7 @@ export const REMOVE_RECURRING_PRICE = 'REMOVE_RECURRING_PRICE';
 import axios from 'axios';
 import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { validate, invalidForm } from './validatorActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -214,6 +215,12 @@ function savePlanToDB(plan, action) {
 };
 
 export function savePlan(plan, action) {
+  // const validations = validate(plan, 'plan_setup');
+  // if (!validations.get('valid')) {
+  //   return dispatch => {
+  //     return dispatch(invalidForm(validations));
+  //   };
+  // }
   const conv = buildPlanFromState(plan);
   return dispatch => {
     return dispatch(savePlanToDB(conv, action));

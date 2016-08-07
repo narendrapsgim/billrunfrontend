@@ -27,9 +27,11 @@ export default class CurrencyTax extends Component {
                   { currency_options }
                 </select>
               </div>
+            </div>
+            <div className="row">
               <div className="col-xs-1">
-                <label htmlFor="tax">Tax</label>
-                <input type="number" id="tax" onChange={onChange} value={data.get('tax')} className="form-control" />
+                <label htmlFor="vat">VAT</label>
+                <input type="number" id="vat" onChange={onChange} value={data.get('vat')} className="form-control" />
               </div>
             </div>
           </div>

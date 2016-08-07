@@ -25,10 +25,10 @@ export default class CalculatorMapping extends Component {
     return (
       <div className="CalculatorMapping">
         <div className="row">
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <label>Customer identification</label>
           </div>
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <select id="src_key"
                     className="form-control"
                     onChange={onSetCustomerMapping}
@@ -40,9 +40,9 @@ export default class CalculatorMapping extends Component {
           </div>
         </div>
         <div className="row">
-          <div className="col-xs-3">
+          <div className="col-xs-2">
           </div>
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <select id="target_key"
                     className="form-control"
                     onChange={onSetCustomerMapping}
@@ -53,7 +53,7 @@ export default class CalculatorMapping extends Component {
           </div>
         </div>
         <div className="row">
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <h4>Rate by</h4>
           </div>
         </div>
@@ -61,7 +61,7 @@ export default class CalculatorMapping extends Component {
           available_usagetypes.map((usaget, key) => (
             <div key={key}>
               <div className="row">
-                <div className="col-xs-3">
+                <div className="col-xs-2">
                   <label>{usaget}</label>
                 </div>
                 {/* <div className="col-xs-2">

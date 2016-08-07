@@ -12,6 +12,7 @@ export default class Plan extends Component {
   
   render() {
     let { plan,
+          validator,
           onChangeFieldValue,
           onChangeRecurringPriceFieldValue,
           onCheckEndOfDays,
