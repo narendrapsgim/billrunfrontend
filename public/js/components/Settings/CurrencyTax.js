@@ -13,29 +13,30 @@ export default class CurrencyTax extends Component {
     ));
 
     return (
-      <div className="CurrencyTaxSettings">
-        <div className="bordered-container"
-             style={{padding: "45px"}}>
-          <div className="Currency">
-            <div className="row">
-              <div className="col-xs-1">
-                <label htmlFor="currency">Currency</label>
-                <select className="form-control"
-                        id="currency"
-                        value={data.get('currency')}
-                        onChange={onChange}>
-                  { currency_options }
-                </select>
-              </div>
+      <div className="bordered-container"
+           style={{padding: "45px"}}>
+        <form className="form-horizontal CurrencyTaxSettings">
+          <div className="form-group">
+            <div className="col-xs-1">
+              <label htmlFor="currency">Currency</label>
+              <select className="form-control"
+                      id="currency"
+                      value={data.get('currency')}
+                      onChange={onChange}>
+                { currency_options }
+              </select>
             </div>
-            <div className="row">
-              <div className="col-xs-1">
-                <label htmlFor="vat">VAT</label>
-                <input type="number" id="vat" onChange={onChange} value={data.get('vat')} className="form-control" />
+          </div>
+          <div className="form-group">
+            <div className="col-xs-1">
+              <label htmlFor="vat">VAT</label>
+              <div className="input-group">
+                <input id="vat" type="number" onChange={onChange} value={data.get('vat')} className="form-control" />
+                <span className="input-group-addon">%</span>
               </div>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     );
   }
