@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
+import Immutable from 'immutable';
 
 import { updateProductPropertiesField, updateProductPrefixes, addProductProperties, removeProductProperties, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
 import { getSettings } from '../../actions/settingsActions';
@@ -57,7 +58,7 @@ class ProductSetup extends Component {
   }  
 
   onChangePrefix(val) {
-    this.props.dispatch((updateProductPrefixes(val)));
+    this.props.dispatch((updateProductPrefixes(Immutable.fromJS(val))));
   }
 
   onSelectUnit(val) {

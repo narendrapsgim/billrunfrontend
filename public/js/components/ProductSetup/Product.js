@@ -80,6 +80,7 @@ export default class Product extends Component {
                 id="unit"
                 options={available_units}
                 allowCreate={true}
+                value={product.get('unit')}
                 onChange={onSelectUnit}
             />
           </div>

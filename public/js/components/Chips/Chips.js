@@ -80,14 +80,14 @@ export default class Chips extends Component {
   }
 
   onChipsChange(){
-    this.props.onChange(this.state.items, this.props['data-path']);
+    this.props.onChange(this.state.items);
   }
 
   addItem(){
     let value = this.state.inputValue;
     if(value.length > 0){
       this.setState({
-        items: [...this.state.items, value],
+        items: [...this.props.items, value],
         inputValue : '',
       }, this.onChipsChange);
     }
@@ -177,14 +177,13 @@ export default class Chips extends Component {
    );
  }
 
- getChips(){
-   const {disabled, style} = this.props;
-   console.log(this.state.items);
-   let chips = this.state.items.map((item, index) =>
-     <Chip value={item} index={index} onRemoveClick={this.onRremoveItem} key={index} allowRemove={!disabled} />
-   );
-   return chips;
- }
+  getChips(){
+    const {disabled, style, items} = this.props;
+    let chips = items.map((item, index) =>
+      <Chip value={item} index={index} onRemoveClick={this.onRremoveItem} key={index} allowRemove={!disabled} />
+    );
+    return chips;
+  }
 
   render() {
     const {label, disabled, style} = this.props;
@@ -197,12 +196,3 @@ export default class Chips extends Component {
     );
   }
 }
-
-Chips.defaultProps = {
-  onChange: () => {},
-  items: [],
-  label: 'Chips',
-  'data-path' : '',
-  errorText:'',
-  errorStyle:{}
-};
