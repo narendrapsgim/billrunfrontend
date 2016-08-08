@@ -1,11 +1,20 @@
 import React, { Component } from 'react';
+import Immutable from 'immutable';
 
 import Field from '../Field';
 import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
+import Chips from '../Chips';
 
 export default class Product extends Component {
   constructor(props) {
     super(props);
+  }
+
+  productPrefixes() {
+    const { product } = this.props;
+    return product.getIn(['params', 'prefix']) ?
+           product.getIn(['params', 'prefix']).toJS() :
+           [];
   }
   
   render() {
@@ -18,6 +27,7 @@ export default class Product extends Component {
             onAddProductProperties,
             onChangeItemSelectFieldValue,
             onRemoveProductProperties,
+            onChangePrefix,
             processors } = this.props;
 
     const units = _.uniq(_.flatten(processors.map(processor => {
@@ -84,7 +94,13 @@ export default class Product extends Component {
             <label>To</label>
             <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
           </div>
-        </div>        
+        </div>
+        <div className="form-group">
+          <div className="col-xs-3">
+            <label>Prefixes</label>
+            <Chips items={this.productPrefixes()} onChange={onChangePrefix} />
+          </div>
+        </div>
         { product.get('rates').map((rate, key) => (
             <div className="form-group" key={key}>
               <div className="col-xs-1">

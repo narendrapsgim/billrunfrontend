@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { updateProductPropertiesField, addProductProperties, removeProductProperties, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
+import { updateProductPropertiesField, updateProductPrefixes, addProductProperties, removeProductProperties, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
 import { getInputProcessors } from '../../actions/inputProcessorActions';
 
 import FlatButton from 'material-ui/FlatButton';
@@ -19,6 +19,7 @@ class ProductSetup extends Component {
     this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
     this.onChangeItemSelectFieldValue = this.onChangeItemSelectFieldValue.bind(this);
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
+    this.onChangePrefix = this.onChangePrefix.bind(this);
   }
 
   componentWillMount() {
@@ -53,6 +54,10 @@ class ProductSetup extends Component {
     this.props.dispatch(removeProductProperties(idx));
   }  
 
+  onChangePrefix(val) {
+    this.props.dispatch((updateProductPrefixes(val)));
+  }
+  
   onSave() {
     const { action } = this.props.location.query;
     this.props.dispatch(saveProduct(this.props.product, action));
@@ -68,7 +73,7 @@ class ProductSetup extends Component {
       <div className="ProductSetup container">
         <h3>Product</h3>
         <div className="contents bordered-container">
-          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} product={this.props.product} processors={this.props.inputProcessors} />
+          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} onChangePrefix={this.onChangePrefix} product={this.props.product} processors={this.props.inputProcessors} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
