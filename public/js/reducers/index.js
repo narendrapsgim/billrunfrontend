@@ -18,6 +18,7 @@ import dashboard from './dashboardReducer';
 import account from './accountReducer';
 import subscribers from './subscribersReducer';
 import paymentDetails from './paymentDetailsReducer';
+import planProducts from './planProductsReducer';
 
 export default combineReducers({
   statusBar,
@@ -38,5 +39,6 @@ export default combineReducers({
   dashboard,
   account,
   subscribers,
-  paymentDetails
+  paymentDetails,
+  planProducts
 });

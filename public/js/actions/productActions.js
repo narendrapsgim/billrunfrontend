@@ -48,7 +48,7 @@ export function updateProductPropertiesField(field_name, field_idx, field_value)
 
 export function addProductProperties() {
   return {
-    type: ADD_PRODUCT_PROPERTIES    
+    type: ADD_PRODUCT_PROPERTIES
   }
 }
 
@@ -67,25 +67,6 @@ function gotProduct(product) {
 }
 
 function fetchProduct(product_id) {
-  const convert = (product) => {
-    let unit = _.keys(product.rates)[0];
-    return {
-      key: product.key,
-      id: product._id.$id,
-      unit,
-      unit_price: product.unit_price,
-      description: product.description,
-      rates: product.rates[unit].BASE.rate.map(rate => {
-        return {
-          price: parseInt(rate.price, 10),
-          to: parseInt(rate.to, 10),
-          interval: parseInt(rate.interval, 10),
-          from: rate.from ? parseInt(rate.from, 10) : rate.from
-        }
-      })
-    };
-  };
-
   let fetchUrl = `/api/find?collection=rates&query={"_id": {"$in": ["${product_id}"]}}`;
   return (dispatch) => {
     dispatch(showProgressBar());
@@ -149,3 +130,26 @@ export function clearProduct() {
     type: CLEAR_PRODUCT
   };
 }
+
+
+export function convert(product, plan = 'BASE'){
+  let unit = _.keys(product.rates)[0];
+  return {
+    key: product.key,
+    id: product._id.$id,
+    from: product.from,
+    to: product.to,
+    code: product.code,
+    unit,
+    unit_price: product.unit_price,
+    description: product.description,
+    rates: product.rates[unit][plan].rate.map(rate => {
+      return {
+        price: parseInt(rate.price, 10),
+        to: parseInt(rate.to, 10),
+        interval: parseInt(rate.interval, 10),
+        from: rate.from ? parseInt(rate.from, 10) : rate.from
+      }
+    })
+  };
+};
