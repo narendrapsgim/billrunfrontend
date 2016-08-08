@@ -2,16 +2,17 @@
 export function apiBillRun(request) {
   //Create Prommisses array from queries
   let requests = [];
+  let response = (request.type) ? { type: request.type } : {};
   for(var i = 0; i < request.queries.length; i++) {
     requests.push(sendHttpRequest(request.queries[i]));
   }
   //Send All prommisses
   var promise = new Promise((resolve, reject) => {
     Promise.all(requests).then(
-      success   => { resolve({ type: request.type, data: success }); },
-      error     => { reject({ type: request.type, error: error }); }
+      success   => { resolve( Object.assign(response, {data: success}) ) },
+      error     => { reject( Object.assign(response, {error: error}) ) }
     ).catch(
-      message   => { reject({ type: request.type, error: message }); }
+      message   => { reject(Object.assign(response, {error: message}) ) }
     );
   });
   return promise;
@@ -22,10 +23,10 @@ export function sendHttpRequest(query) {
   //Create Api URL
   let url = globalSetting.serverUrl + "/api/" + query.request.api + buildQueryStringParams(query.request.params);
 
-  let response = { name: query.name, data: {} };
-
+  let response = (query.name) ? { name: query.name , data: {} } : { data: {} };
+  let requestOptions = { credentials: 'include' };
   let promise = new Promise((resolve, reject) => {
-    fetch(url).then(
+    fetch(url, requestOptions).then(
       success => {
       if(success.ok) {
         success.json().then(
@@ -68,7 +69,7 @@ function buildQueryStringParams(params){
   if(Array.isArray(params) && params.length > 0){
     queryParams = params.reduce((previousValue, currentValue, currentIndex) => {
       let key = Object.keys(currentValue)[0];
-      let prev = (currentIndex == 0) ? previousValue : previousValue + '&';
+      let prev = (currentIndex === 0) ? previousValue : previousValue + '&';
       return prev + key + '=' + currentValue[key];
     }, '?');
   }
