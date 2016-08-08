@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, mapUsaget } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 
 import SampleCSV from './SampleCSV';
@@ -31,6 +31,7 @@ class InputProcessor extends Component {
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
+    this.addUsagetMapping = this.addUsagetMapping.bind(this);
     this.onSetFieldWidth = this.onSetFieldWidth.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
@@ -99,7 +100,7 @@ class InputProcessor extends Component {
   }
 
   onAddUsagetMapping(val, e) {
-    this.props.dispatch(addUsagetMapping(val));
+    this.props.dispatch(mapUsaget(val));
   }
 
   onSetCustomerMapping(e) {
@@ -120,6 +121,10 @@ class InputProcessor extends Component {
   onSetReceiverCheckboxField(e) {
     const { id, checked } = e.target;
     this.props.dispatch(setReceiverField(id, checked));
+  }
+
+  addUsagetMapping(val) {
+    this.props.dispatch(addUsagetMapping(val));
   }
   
   save() {
@@ -156,7 +161,7 @@ class InputProcessor extends Component {
 
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} settings={settings} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} settings={settings} unitTypes={unit_types} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} settings={settings} unitTypes={unit_types} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];

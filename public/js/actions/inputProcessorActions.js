@@ -13,6 +13,7 @@ export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
 export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
 export const CLEAR_INPUT_PROCESSOR = 'CLEAR_INPUT_PROCESSOR';
+export const MAP_USAGET = 'MAP_USAGET';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -133,6 +134,13 @@ export function addCSVField(field) {
 export function addUsagetMapping(mapping) {
   return {
     type: ADD_USAGET_MAPPING,
+    mapping
+  };
+}
+
+export function mapUsaget(mapping) {
+  return {
+    type: MAP_USAGET,
     mapping
   };
 }

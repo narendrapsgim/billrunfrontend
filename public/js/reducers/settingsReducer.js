@@ -29,7 +29,6 @@ export default function (state = defaultState, action) {
       usaget
     });
     /* TODO: SET SRC_FIELD AND PATTERN REGEX WHEN SAVING AND SANITIZING!! */
-    console.log(state.set('unit_types', usaget_mapping.push(new_map));
     return state.set('unit_types', usaget_mapping.push(new_map));
 
   case GOT_SETTINGS:

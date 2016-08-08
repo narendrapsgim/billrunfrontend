@@ -9,6 +9,7 @@ import { SET_NAME,
          SET_FIELD_MAPPING,
          ADD_CSV_FIELD,
          ADD_USAGET_MAPPING,
+         MAP_USAGET,
          SET_CUSETOMER_MAPPING,
          SET_RATING_FIELD,
          SET_RECEIVER_FIELD,
@@ -69,6 +70,15 @@ export default function (state = defaultState, action) {
       if (fields.includes(action.field)) return state;
       return state.set('fields', fields.push(action.field));
 
+    case MAP_USAGET:
+      const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
+      const { pattern, usaget } = action.mapping;
+      const new_map = Immutable.fromJS({
+        pattern,
+        usaget
+      });
+      return state.updateIn(['processor', 'usaget_mapping'], list => list.push(new_map) );
+    
     case SET_CUSETOMER_MAPPING:
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 

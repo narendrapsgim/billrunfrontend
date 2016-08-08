@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { Table } from 'react-bootstrap/lib';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import Select from 'react-select';
 
 export default class FieldsMapping extends Component {
   constructor(props) {
@@ -12,6 +14,7 @@ export default class FieldsMapping extends Component {
     this.onChangePattern = this.onChangePattern.bind(this);
     this.onChangeUsaget  = this.onChangeUsaget.bind(this);
     this.addUsagetMapping = this.addUsagetMapping.bind(this);
+    this.onChangeUsaget = this.onChangeUsaget.bind(this);
 
     this.state = {
       pattern: "",
@@ -23,8 +26,18 @@ export default class FieldsMapping extends Component {
     this.setState({pattern: e.target.value});    
   }
 
-  onChangeUsaget(e) {
-    this.setState({usaget: e.target.value});
+  onChangeUsaget(val) {
+    const { unitTypes } = this.props;
+    const found = unitTypes.find(obj => {
+      return obj.get('usaget') === val;
+    });
+    if (!found) {
+      this.props.addUsagetMapping({
+        usaget: val,
+        pattern: `/${val}/`
+      });
+    }
+    this.setState({usaget: val});
   }
 
   addUsagetMapping(e) {
@@ -41,6 +54,9 @@ export default class FieldsMapping extends Component {
                               ...settings.get('fields').map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
                               ))];
+    const available_units = unitTypes.map((unit, key) => {
+      return {value: unit.get('usaget'), label: unit.get('usaget')};
+    }).toJS();
 
     return (
       <form className="form-horizontal FieldsMapping">
@@ -91,7 +107,7 @@ export default class FieldsMapping extends Component {
               </div>
             </div>
             {
-              unitTypes.map((usage_t, key) => (
+              settings.getIn(['processor', 'usaget_mapping']).map((usage_t, key) => (
                 <div className="form-group" key={key}>
                   <div className="col-xs-2">{usage_t.get('pattern')}</div>
                   <div className="col-xs-2">{usage_t.get('usaget')}</div>
@@ -99,8 +115,18 @@ export default class FieldsMapping extends Component {
               ))
             }
                 <div className="form-group">
-                  <div className="col-xs-2"><input className="form-control" onChange={this.onChangePattern} value={this.state.pattern} /></div>
-                  <div className="col-xs-2"><input className="form-control" onChange={this.onChangeUsaget} value={this.state.usaget} /></div>
+                  <div className="col-xs-2">
+                    <input className="form-control" onChange={this.onChangePattern} value={this.state.pattern} />
+                  </div>
+                  <div className="col-xs-2">
+                    <Select
+                        id="unit"
+                        options={available_units}
+                        allowCreate={true}
+                        value={this.state.usaget}
+                        onChange={this.onChangeUsaget}
+                    />
+                  </div>
                   <div className="col-xs-2">
                     <FloatingActionButton mini={true} onMouseUp={this.addUsagetMapping}>
                       <ContentAdd />
