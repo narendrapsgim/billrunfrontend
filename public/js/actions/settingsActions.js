@@ -8,20 +8,29 @@ let axiosInstance = axios.create({
   withCredentials: true
 });
 
-function gotSettings(settings) {
+function gotSettings(category, settings) {
   return {
     type: GOT_SETTINGS,
+    category,
     settings
   };
 }
 
 function fetchSettings(category) {
+  const dummy = {
+    "unit_types": [
+      {usaget: "kg"},
+      {usaget: "miles"}
+    ]
+  };
+
   let fetchUrl = `${globalSetting.serverUrl}/api/settings?category=${category}&data={}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.get(fetchUrl).then(
       resp => {
-        dispatch(gotSettings(resp.data.details));
+        //dispatch(gotSettings(resp.data.details));
+        dispatch(gotSettings(category, dummy[category]));
         dispatch(hideProgressBar());
       }
     ).catch(error => {

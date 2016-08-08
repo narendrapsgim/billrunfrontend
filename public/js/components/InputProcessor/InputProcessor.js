@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { getSettings } from '../../actions/settingsActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -46,6 +47,7 @@ class InputProcessor extends Component {
   componentWillMount() {
     const { dispatch, fileType } = this.props;
     dispatch(getProcessorSettings(fileType));
+    dispatch(getSettings("unit_types"));
   }
 
   onChangeName(e) {
@@ -150,11 +152,11 @@ class InputProcessor extends Component {
   
   render() {
     let { stepIndex } = this.state;
-    const { settings } = this.props;
+    const { settings, unit_types } = this.props;
 
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} settings={settings} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} settings={settings} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} settings={settings} unitTypes={unit_types} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
@@ -195,7 +197,8 @@ class InputProcessor extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return { settings: state.inputProcessor };
+  return { settings: state.inputProcessor,
+           unit_types: state.settings.get('unit_types') };
 }
 
 export default connect(mapStateToProps)(InputProcessor);

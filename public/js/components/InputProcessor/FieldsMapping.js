@@ -35,6 +35,7 @@ export default class FieldsMapping extends Component {
 
   render() {
     const { settings,
+            unitTypes,
             onSetFieldMapping } = this.props;
     const available_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
                               ...settings.get('fields').map((field, key) => (
@@ -90,7 +91,7 @@ export default class FieldsMapping extends Component {
               </div>
             </div>
             {
-              settings.getIn(['processor', 'usaget_mapping']).map((usage_t, key) => (
+              unitTypes.map((usage_t, key) => (
                 <div className="form-group" key={key}>
                   <div className="col-xs-2">{usage_t.get('pattern')}</div>
                   <div className="col-xs-2">{usage_t.get('usaget')}</div>

@@ -69,21 +69,6 @@ export default function (state = defaultState, action) {
       if (fields.includes(action.field)) return state;
       return state.set('fields', fields.push(action.field));
 
-    case ADD_USAGET_MAPPING:
-      const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
-//      const src_field = state.getIn(['processor', 'src_field']);
-      if (!src_field) return state;
-
-      var { pattern, usaget } = action.mapping;
-      const new_map = Immutable.fromJS({
-        //src_field,
-        //pattern: `/^${pattern}$/`,
-        pattern,
-        usaget
-      });
-      /* TODO: SET SRC_FIELD AND PATTERN REGEX WHEN SAVING AND SANITIZING!! */
-      return state.setIn(['processor', 'usaget_mapping'], usaget_mapping.push(new_map)).setIn(['rate_calculators', usaget], Immutable.List());
-
     case SET_CUSETOMER_MAPPING:
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 
