@@ -47,7 +47,8 @@ class InputProcessor extends Component {
 
   componentWillMount() {
     const { dispatch, fileType } = this.props;
-    dispatch(getProcessorSettings(fileType));
+    if (fileType === true) dispatch(getProcessorSettings());
+    else dispatch(getProcessorSettings(fileType));
     dispatch(getSettings("unit_types"));
   }
 

@@ -18,6 +18,7 @@ import dashboard from './dashboardReducer';
 import account from './accountReducer';
 import subscribers from './subscribersReducer';
 import validator from './validatorReducer';
+import modal from './modalReducer';
 
 export default combineReducers({
   statusBar,
@@ -38,5 +39,6 @@ export default combineReducers({
   dashboard,
   account,
   subscribers,
-  validator
+  validator,
+  modal
 });

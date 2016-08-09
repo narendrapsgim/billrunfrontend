@@ -12,6 +12,7 @@ import axios from 'axios';
 import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { validate, invalidForm } from './validatorActions';
+import { showModal } from './modalActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -76,14 +77,14 @@ function buildPlanFromState(state) {
     id: basic_settings.id,
     name: basic_settings.PlanName,
     price: prices,
-    // from: moment(parseInt(basic_settings.from)).format(),
-    // to: moment(parseInt(basic_settings.to)).format(),
+    from: moment().format(),
+    to: moment().add(100, 'years').format(),
     PlanDescription: basic_settings.PlanDescription,
     PlanCode: basic_settings.PlanCode,
-    charging_mode: basic_settings.ChargingMode,
-    recurring: {
-      duration: parseInt(basic_settings.Each, 10),
-      unit: basic_settings.EachPeriod.toLowerCase()
+    upfront: basic_settings.ChargingMode === "upfront",
+    recurrence: {
+      unit: 1,//parseInt(basic_settings.Each, 10),
+      periodicity: basic_settings.EachPeriod.toLowerCase()
     }
   };
 }
@@ -148,9 +149,9 @@ function fetchPlan(plan_id) {
       PlanName: plan.name,
       to: moment(plan.to).unix() * 1000,
       from: moment(plan.from).unix() * 1000,
-      EachPeriod: _.capitalize(plan.recurring.unit),
-      ChargingMode: plan.charging_mode,
-      Each: plan.recurring.duration,
+      EachPeriod: _.capitalize(plan.recurrence.unit),
+      ChargingMode: (plan.upfront ? "upfront" : "arrears"),
+      Each: plan.recurrence.duration,
         ...Trial,
       recurring_prices
     };
@@ -166,7 +167,7 @@ function fetchPlan(plan_id) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
@@ -208,7 +209,7 @@ function savePlanToDB(plan, action) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };  

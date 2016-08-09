@@ -20,12 +20,8 @@ export default class Plan extends Component {
           onRemoveRecurringPrice,
           onAddTariff } = this.props;
 
-    let transaction_options = ["Every Month", "Every Week"].map((op, key) => (
-      <option value={op} key={key}>{op}</option>
-    ));
-
     /* TODO: Put into separate config file */
-    let each_period_options = ["Week", "Month", "Year"].map((op, key) => (
+    let each_period_options = ["Month", "Year"].map((op, key) => (
       <option value={op} key={key}>{op}</option>
     ));
 

@@ -17,6 +17,7 @@ export const MAP_USAGET = 'MAP_USAGET';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { showModal } from './modalActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -32,6 +33,24 @@ function gotProcessorSettings(settings) {
 
 function fetchProcessorSettings(file_type) {
   const convert = (settings) => {
+    if (!settings)
+      return {
+        file_type: '',
+        delimiter_type: '',
+        delimiter: '',
+        fields: [],
+        processor: {
+          usaget_mapping: [],
+          src_field: ''
+        },
+        customer_identification_fields: [],
+        rate_calculators: [],
+        receiver: {
+          type: "ftp",
+          connections: []
+        }
+      };
+    
     const { parser, processor,
             customer_identification_fields,
             rate_calculators,
@@ -68,7 +87,7 @@ function fetchProcessorSettings(file_type) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
@@ -213,7 +232,7 @@ export function saveInputProcessorSettings(state) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };  
@@ -236,7 +255,7 @@ function fetchInputProcessors() {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };

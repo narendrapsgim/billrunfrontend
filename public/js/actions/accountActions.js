@@ -35,6 +35,7 @@ function fetchAccount(aid) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };  

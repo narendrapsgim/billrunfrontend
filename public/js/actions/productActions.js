@@ -10,6 +10,7 @@ import axios from 'axios';
 import moment from 'moment';
 import Immutable from 'immutable';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { showModal } from './modalActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -20,19 +21,25 @@ let axiosInstance = axios.create({
 function buildRateFromState(state) {
   const product = state.toJS();
   const { rates, params } = product;
-  console.log(params);
   let r = {
     [product.unit]: {
       BASE: {
-        rate: rates
+        rate: rates.map(rate => {
+          return {
+            from: parseInt(rate.from, 10),
+            to: parseInt(rate.to, 10),
+            price: parseInt(rate.price, 10),
+            interval: parseInt(rate.interval, 10)
+          }
+        })
       }
     }
   }
   return {
     key: product.key,
     id: product.id,
-    from: moment(product.from).unix(),
-    to: moment(product.to).unix(),
+    from: moment(product.from).format(),
+    to: moment(product.to).format(),
     unit_price: product.unit_price,
     description: product.description,
     params: params,
@@ -107,7 +114,7 @@ function fetchProduct(product_id) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
@@ -142,13 +149,15 @@ function saveRateToDB(rate, action) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
 }
 
 export function saveProduct(rate, action) {
+  if (!rate.get('unit'))
+    return dispatch(showModal(error.data.message, "Error!"));
   const conv = buildRateFromState(rate);
   return dispatch => {
     return dispatch(saveRateToDB(conv, action));

@@ -3,15 +3,7 @@ import { UPDATE_SETTING,
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
 import Immutable from 'immutable';
 
-const defaultState = Immutable.fromJS({
-  account: {
-    fields: []
-  },
-  subscriber: {
-    fields: []
-  },
-  unit_types: []
-});
+const defaultState = Immutable.fromJS({});
 
 export default function (state = defaultState, action) {
   let { name, value, category, settings } = action;
