@@ -119,9 +119,9 @@ class MapSubscribers extends Component {
   render() {
     const { chartData } = this.props;
     return (
-      <div style={{ width:1130, height:650, margin: '10px', padding: '10px', backgroundColor: '#2B2E3C' }}>
+      <div style={{ width:1150, height:660, margin: '0 10', padding: '0', backgroundColor: '#2B2E3C' }}>
           {this.renderContent(chartData)}
-          <div style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
+          <div style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', marginTop: '-20', padding: '10 20'}}>
             {this.renderTitle(chartData)}
             {this.renderLegend(chartData)}
           </div>
