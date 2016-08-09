@@ -10,8 +10,9 @@ const defaultState = Immutable.fromJS({
   TrialPrice: '',
   Each: '',
   EachPeriod: "Month",
-  /* from: moment().unix() * 1000,
-     to: moment().add(1, 'years').unix() * 1000, */
+  ChargingMode: "upfront",
+  from: moment().unix() * 1000,
+  to: moment().add(10, 'years').unix() * 1000,
   recurring_prices: [
     {
       Cycle: '',
@@ -48,7 +49,7 @@ export default function (state = defaultState, action) {
     
     case actions.GOT_PLAN:
       return Immutable.fromJS(action.plan);
-
+      
     case actions.CLEAR_PLAN:
       return defaultState;
       

@@ -17,7 +17,8 @@ import inputProcessors from './inputProcessorsReducer';
 import dashboard from './dashboardReducer';
 import account from './accountReducer';
 import subscribers from './subscribersReducer';
-import paymentDetails from './paymentDetailsReducer';
+import validator from './validatorReducer';
+import modal from './modalReducer';
 import planProducts from './planProductsReducer';
 
 export default combineReducers({
@@ -39,6 +40,7 @@ export default combineReducers({
   dashboard,
   account,
   subscribers,
-  paymentDetails,
+  validator,
+  modal,
   planProducts
 });

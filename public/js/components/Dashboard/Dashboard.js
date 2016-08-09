@@ -60,15 +60,15 @@ class Dashboard extends Component {
         </div>
         <div className="container" >
           <MapSubscribersWidget fromDate={fromDate} toDate={toDate}/>
-          <ReveneWidget fromDate={fromDate} toDate={toDate}/>
-          <RevenueAvgPerSubscriberWidget fromDate={fromDate} toDate={toDate}/>
-          <TotalSubscribersWidget fromDate={fromDate} toDate={toDate}/>
-          <NewSubscribersWidget fromDate={fromDate} toDate={toDate}/>
-          <ChurningSubscribersWidget fromDate={fromDate} toDate={toDate}/>
-          <SubsPerPlanWidget fromDate={fromDate} toDate={toDate}/>
-          <SubsPerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate}/>
-          <RevenuePerPlanWidget fromDate={fromDate} toDate={toDate}/>
-          <RevenuePerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate}/>
+          <ReveneWidget fromDate={fromDate} toDate={toDate} width={565}/>
+          <RevenueAvgPerSubscriberWidget fromDate={fromDate} toDate={toDate} width={565}/>
+          <TotalSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
+          <NewSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
+          <ChurningSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
+          <SubsPerPlanWidget fromDate={fromDate} toDate={toDate} width={565}/>
+          <SubsPerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565}/>
+          <RevenuePerPlanWidget fromDate={fromDate} toDate={toDate} width={565}/>
+          <RevenuePerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565}/>
         </div>
       </div>
     );

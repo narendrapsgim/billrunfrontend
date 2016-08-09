@@ -13,6 +13,9 @@ import axios from 'axios';
 import * as actions from '../actions'
 import LoginPopup from '../components/Authorization/LoginPopup';
 import StatusBar from '../components/StatusBar/StatusBar';
+import Modal from 'react-bootstrap/lib/Modal';
+import Button from 'react-bootstrap/lib/Button';
+import { hideModal } from '../actions/modalActions';
 
 export default class App extends Component {
   constructor(props) {
@@ -21,15 +24,44 @@ export default class App extends Component {
   }
 
   componentWillMount() {
-    this.props.userCheckLogin();
+    this.props.dispatch(actions.userCheckLogin());
   }
 
   render() {
-    const { users } = this.props;
+    const { users, modal, dispatch } = this.props;
 
+    const onClose = () => {
+      dispatch(hideModal());
+    };
+    
+    const ModalInstance = React.createClass({
+      render() {
+        const { onClose } = this.props;
+        return (
+          <div className="static-modal">
+            <Modal show={this.props.show}>
+              <Modal.Header>
+                <Modal.Title>{this.props.title}</Modal.Title>
+              </Modal.Header>
+
+              <Modal.Body>
+                {this.props.message}
+              </Modal.Body>
+
+              <Modal.Footer>
+                <Button onClick={onClose}>Close</Button>
+              </Modal.Footer>
+
+            </Modal>
+          </div>
+        );
+      }
+    });
+    
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>
         <div className="App">
+          <ModalInstance show={modal.get('show')} message={modal.get('message')} title={modal.get('title')} onClose={onClose} />
           <Topbar />
           {(() => {
              if (users.get('auth'))
@@ -63,7 +95,8 @@ App.contextTypes = {
 };
 
 function mapStateToProps(state) {
-  return { users: state.users };
+  return { users: state.users,
+           modal: state.modal };
 }
 
-export default connect(mapStateToProps, actions)(App);
+export default connect(mapStateToProps)(App);

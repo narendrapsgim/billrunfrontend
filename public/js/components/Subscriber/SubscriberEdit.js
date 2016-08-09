@@ -71,7 +71,7 @@ class SubscriberEdit extends Component {
 
   onSave() {
     const action = this.state.newCustomer ? "new" : this.props.location.query.action;
-    this.props.dispatch(saveSubscriber(action, this.props.subscriber));
+    this.props.dispatch(saveSubscriber(action, this.props.account));
     if (this.state.aid) {
        this.props.dispatch(getAccount(this.state.aid));
        this.props.dispatch(getSubscribers(this.state.aid));
@@ -92,7 +92,7 @@ class SubscriberEdit extends Component {
   }
 
   onClickNewSubscription(aid) {
-    window.location = `${globalSetting.serverUrl}/paypage?aid=${aid}&return_url=${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}`;
+    window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url=${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}`;
   }
     
   render() {
@@ -116,7 +116,7 @@ function mapStateToProps(state) {
     account: state.account,
     subscribers: state.subscribers.get('subscribers'),
     subscriber: state.subscribers.get('subscriber'),
-    settings: state.settings
+    settings: state.settings.get('subscribers')
   };
 }
 

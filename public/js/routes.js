@@ -16,7 +16,6 @@ import UsageList from './components/UsageList';
 import Log from './components/Log';
 import Settings from './components/Settings';
 import Invoices from './components/Invoices';
-import PaymentDetailsPage from './components/PaymentDetailsPage';
 
 export default () => {
   return (
@@ -33,7 +32,6 @@ export default () => {
       <Route name="log" path="/log" component={RequireAuth(Log)} />
       <Route name="settings" path="/settings" component={RequireAuth(Settings)} />
       <Route name="invoices" path="/invoices" component={RequireAuth(Invoices)} />
-      <Route name="payment_details" path="/payment_details" component={RequireAuth(PaymentDetailsPage)} />
     </Route>
   );
 }

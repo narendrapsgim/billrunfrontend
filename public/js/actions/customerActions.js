@@ -8,6 +8,7 @@ import axios from 'axios';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { showModal } from './modalActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -23,13 +24,8 @@ function savedCustomer() {
 export function saveSubscriber(action, data) {
   let saveUrl;
 
-  if (Immutable.List.isList(data)) {
-    const account = data.find(obj => {
-      return obj.get('type') === "account";
-    });
-    saveUrl = `/api/subscribers?method=update&type=account&query={"aid": ${account.get('aid')}}&update=${JSON.stringify(account.toJS())}`;
-  } else if (data.get('aid')) {
-    saveUrl = `/api/subscribers?method=create&type=subscriber&subscriber=${JSON.stringify(data.toJS())}`;
+  if (data.get('aid')) {
+    saveUrl = `/api/subscribers?method=update&type=account&query={"aid": ${data.get('aid')}}&update=${JSON.stringify(data.toJS())}`;
   } else {
     saveUrl = `/api/subscribers?method=create&type=account&subscriber=${JSON.stringify(data.toJS())}`;
   }
@@ -42,7 +38,7 @@ export function saveSubscriber(action, data) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };    
@@ -75,6 +71,7 @@ function fetchCustomers(query) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };

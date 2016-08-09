@@ -80,7 +80,7 @@ class PlanSetup extends Component {
   handleSave() {
     const { action } = this.props.location.query;
     this.props.dispatch(savePlan(this.props.plan, action));
-    browserHistory.goBack();
+    //browserHistory.goBack();
   }
 
   handleSaveRtes() {
@@ -92,26 +92,29 @@ class PlanSetup extends Component {
   }
   
   render() {
+    const { plan, validator } = this.props;
     return (
-      <div className="PlanSetup container">
-        <Tabs defaultActiveKey={2} animation={false} id="SettingsTab" onSelect={this.onSelectTab}>
+      <Tabs defaultActiveKey={2} animation={false} id="SettingsTab" onSelect={this.onSelectTab}>
           <Tab title="Billing Plan" eventKey={1}>
-            <div className="contents bordered-container">
-              <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} plan={this.props.plan} />
-            </div>
-            <div style={{marginTop: 12, float: "right"}}>
-              <FlatButton
-                  label="Cancel"
-                  onTouchTap={this.handleBack}
-                  style={{marginRight: 12}}
-              />
-              <RaisedButton
-                  label='Save'
-                  primary={true}
-                  onTouchTap={this.handleSave}
-              />
-            </div>
-          </Tab>
+      <div className="PlanSetup container">
+        <h3>Billing Plan</h3>
+        <div className="contents bordered-container">
+          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} validator={validator} plan={plan} />
+        </div>
+        <div style={{marginTop: 12, float: "right"}}>
+          <FlatButton
+              label="Cancel"
+              onTouchTap={this.handleBack}
+              style={{marginRight: 12}}
+          />
+          <RaisedButton
+              label='Save'
+              primary={true}
+              onTouchTap={this.handleSave}
+          />
+        </div>
+      </div>
+         </Tab>
           <Tab title="Override Product Price" eventKey={2}>
             <div className="contents bordered-container">
               <PlanProductsTab processors={this.props.inputProcessors} planName={this.props.plan.get('PlanName')}/>
@@ -130,13 +133,15 @@ class PlanSetup extends Component {
             </div>
           </Tab>
         </Tabs>
-      </div>
     );
   }
 }
 
 function mapStateToProps(state, props) {
-  return  { plan: state.plan,  inputProcessors: state.inputProcessors };
+  return  {
+    plan: state.plan,
+    validator: state.validator
+  };
 }  
 
 export default connect(mapStateToProps)(PlanSetup);
