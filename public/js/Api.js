@@ -64,7 +64,7 @@ export function delay(sec = 2, success = true, mock = { 'success': true }) {
 }
 
 //help function to bulind query params string
-function buildQueryStringParams(params){
+function buildQueryParamsString(params){
   let queryParams = '';
   if(Array.isArray(params) && params.length > 0){
     queryParams = params.reduce((previousValue, currentValue, currentIndex) => {
