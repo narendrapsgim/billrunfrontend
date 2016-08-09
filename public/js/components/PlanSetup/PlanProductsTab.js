@@ -20,7 +20,7 @@ export default class PlanProductsTab extends Component {
             <div style={{flex: '1 0 0'}}></div>
             <div style={{flex: '5 0 0'}}>
               <PlanProductsSelect/>
-              <PlanProductsList units={units} planName={planName} />
+              <PlanProductsList units={units} />
             </div>
             <div style={{flex: '1 0 0'}}></div>
           </div>

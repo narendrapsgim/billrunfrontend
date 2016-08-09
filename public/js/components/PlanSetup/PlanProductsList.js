@@ -1,67 +1,85 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
-import Select from 'react-select';
-import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
-import Immutable from 'immutable';
-import moment from 'moment';
 
-
-import {getExistPlanProducts, removePlanProduct, undoRemovePlanProduct} from '../../actions/planProductsActions';
 import Field from '../Field';
 import Help from '../Help';
 import { PlanDescription } from '../../FieldDescriptions';
 import ProductPricePlanOverride from '../ProductSetup/ProductPricePlanOverride';
-
-//TODO: move to single place // Be sure to include styles at some point, probably during your bootstrapping
-// import 'react-select/dist/react-select.css';
+import {
+  getExistPlanProducts,
+  removePlanProduct,
+  undoRemovePlanProduct,
+  planProductsRateRemove,
+  planProductsRateAdd,
+  planProductsRateUpdate,
+  planProductsClear } from '../../actions/planProductsActions';
 
 export default class PlanProductsList extends Component {
+
   constructor(props) {
     super(props);
     this.renderContent = this.renderContent.bind(this);
-    this.onRemoveProduct = this.onRemoveProduct.bind(this);
-    this.onUndoRemoveProduct = this.onUndoRemoveProduct.bind(this);
-    // this.optionRenderer = this.optionRenderer.bind(this);
+    this.onProductRemove = this.onProductRemove.bind(this);
+    this.onProductUndoRemove = this.onProductUndoRemove.bind(this);
+    this.onProductRemoveRate = this.onProductRemoveRate.bind(this);
+    this.onProductEditRate = this.onProductEditRate.bind(this);
+    this.onProductAddRate = this.onProductAddRate.bind(this);
+
     this.state = {};
   }
 
   componentWillMount() {
-    let {units, planName} = this.props;
-    this.props.dispatch(getExistPlanProducts(units, planName));
+    let { units } = this.props;
+    this.props.dispatch(getExistPlanProducts(units));
   }
 
-
-
-  componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps : ', nextProps);
+  componentWillUnmount() {
+    this.props.dispatch(planProductsClear());
   }
 
-  onRemoveProduct(key){
-    let {planName} = this.props;
+  onProductRemove(key){
     if(key){
-      this.props.dispatch(removePlanProduct(key, planName));
+      this.props.dispatch(removePlanProduct(key));
     }
   }
-
-  onUndoRemoveProduct(key){
+  onProductUndoRemove(key){
     if(key){
       this.props.dispatch(undoRemovePlanProduct(key));
     }
   }
+  onProductRemoveRate(key, idx){
+    if(key && typeof idx !== 'undefined'){
+      this.props.dispatch(planProductsRateRemove(key, idx));
+    }
+  }
+  onProductEditRate(key, id, idx, value) {
+    if(key && typeof id !== 'undefined' && typeof idx !== 'undefined'){
+      this.props.dispatch(planProductsRateUpdate(key, id, idx, value));
+    }
+  }
+  onProductAddRate(key) {
+    if(key){
+      this.props.dispatch(planProductsRateAdd(key));
+    }
+  }
+
 
   renderContent(){
     const {planProducts} = this.props;
-
-    console.log("Should run only once PlanProductsListrenderContent", planProducts.size);
-
     let content = null;
     if(planProducts.size){
       content = [];
       this.props.planProducts.forEach( (prod, i) => content.push(
         <div key={prod.get('id')}>
           <hr/>
-          <ProductPricePlanOverride item={prod} onRemoveProduct={this.onRemoveProduct} onUndoRemoveProduct={this.onUndoRemoveProduct}/>
+          <ProductPricePlanOverride item={prod}
+            onProductRemove={this.onProductRemove}
+            onProductUndoRemove={this.onProductUndoRemove}
+            onProductRemoveRate={this.onProductRemoveRate}
+            onProductEditRate={this.onProductEditRate}
+            onProductAddRate={this.onProductAddRate}
+          />
         </div>
       ));
     } else {
@@ -83,7 +101,6 @@ export default class PlanProductsList extends Component {
       </div>
     );
   }
-
 
 }
 

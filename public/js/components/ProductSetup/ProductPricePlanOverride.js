@@ -1,64 +1,49 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Immutable from 'immutable';
 import moment from 'moment';
-
+import Immutable from 'immutable';
 import FontIcon from 'material-ui/FontIcon';
-
-import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
-import Field from '../Field';
-import Help from '../Help';
-import { PlanDescription } from '../../FieldDescriptions';
 import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
 import Tooltip from 'react-bootstrap/lib/Tooltip';
-
-import {
-  // updateProductPropertiesField,
-  // addProductProperties,
-  // removeProductProperties,
-  planProductsRateRemove,
-  planProductsRateAdd,
-  planProductsRateUpdate
-} from '../../actions/planProductsActions';
-
+import Field from '../Field';
 
 export default class ProductPricePlanOverride extends Component {
   constructor(props) {
     super(props);
-    this.onAddProductProperties = this.onAddProductProperties.bind(this);
-    this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
-    this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
-    this.onRemoveProduct = this.onRemoveProduct.bind(this);
-    this.onUndoRemoveProduct = this.onUndoRemoveProduct.bind(this);
-
-    // //temp for DEV
-    // window.Immutable = Immutable;
-    // window.moment = moment;
-
+    this.onProductRemove = this.onProductRemove.bind(this);
+    this.onProductUndoRemove = this.onProductUndoRemove.bind(this);
+    this.onProductAddRate = this.onProductAddRate.bind(this);
+    this.onProductEditRate = this.onProductEditRate.bind(this);
+    this.onProductRemoveRate = this.onProductRemoveRate.bind(this);
 
     this.state = { };
   }
 
-  onAddProductProperties(itemKey) {
-    this.props.dispatch(planProductsRateAdd(itemKey));
+  componentWillReceiveProps(nextProps){
+    let { item } = nextProps;
+    if(item.get('rates').size < 1){
+      this.onProductAddRate(item.get('key'));
+    }
+  }
+  shouldComponentUpdate(nextProps, nextState){
+    return !Immutable.is(this.props.item, nextProps.item);
   }
 
-  onChangeItemFieldValue(id, idx, itemKey, e) {
+  onProductAddRate(itemKey) {
+    this.props.onProductAddRate(itemKey);
+  }
+  onProductEditRate(id, idx, itemKey, e) {
     const { value } = e.target;
-    const { dispatch } = this.props;
-    dispatch(planProductsRateUpdate(itemKey, id, idx, value));
+    this.props.onProductEditRate(itemKey, id, idx, value);
   }
-
-  onRemoveProductProperties(idx, itemKey) {
-    this.props.dispatch(planProductsRateRemove(itemKey, idx));
+  onProductRemoveRate(idx, itemKey) {
+    this.props.onProductRemoveRate(itemKey, idx);
   }
-  onRemoveProduct(key) {
-    // console.log("onRemoveProduct", arguments);
-    this.props.onRemoveProduct(key);
+  onProductRemove(key) {
+    this.props.onProductRemove(key);
   }
-  onUndoRemoveProduct(key) {
-    // console.log("onRemoveProduct", arguments);
-    this.props.onUndoRemoveProduct(key);
+  onProductUndoRemove(key) {
+    this.props.onProductUndoRemove(key);
   }
 
   tooltip(content){
@@ -67,23 +52,19 @@ export default class ProductPricePlanOverride extends Component {
 
   render() {
     let { item } = this.props;
-    console.log("render iteam :", item.toJS());
-    let isRemoved = (item.get('removed')) == true ? true :false;
+    let isRemoved = (item.get('removed') === true ) ? true : false;
     let itemKey = item.get('key');
-    if(item.get('rates').size < 1){
-      this.props.dispatch(planProductsRateAdd(itemKey));
-    }
 
     return (
       <div style={{display: 'flex'}}>
         <div style={{flex: '1 0 0', margin: '20px 40px auto', textAlign: 'right'}}>
           {(isRemoved) ?
             <OverlayTrigger placement="bottom" overlay={this.tooltip("Undo Remove Rate")}>
-              <FontIcon onClick={this.onUndoRemoveProduct.bind(this, itemKey)} className="material-icons" style={{cursor: "pointer", color: 'green', fontSize: '32px'}}>undo</FontIcon>
+              <FontIcon onClick={this.onProductUndoRemove.bind(this, itemKey)} className="material-icons" style={{cursor: "pointer", color: 'green', fontSize: '32px'}}>undo</FontIcon>
             </OverlayTrigger>
             :
             <OverlayTrigger placement="bottom" overlay={this.tooltip("Remove Rate")}>
-              <FontIcon onClick={this.onRemoveProduct.bind(this, itemKey)} className="material-icons" style={{cursor: "pointer", color: '#D9534F', fontSize: '32px'}}>delete</FontIcon>
+              <FontIcon onClick={this.onProductRemove.bind(this, itemKey)} className="material-icons" style={{cursor: "pointer", color: '#D9534F', fontSize: '32px'}}>delete_forever</FontIcon>
             </OverlayTrigger>
           }
         </div>
@@ -105,7 +86,7 @@ export default class ProductPricePlanOverride extends Component {
                       <label htmlFor={`from-${key}`}>From</label>
                       <Field id={`from-${key}`}
                              coll="Product"
-                             onChange={this.onChangeItemFieldValue.bind(this, "from", key, itemKey)}
+                             onChange={this.onProductEditRate.bind(this, "from", key, itemKey)}
                              value={rate.get('from')}
                       />
                     </div>
@@ -113,14 +94,14 @@ export default class ProductPricePlanOverride extends Component {
                       <label htmlFor={`to-${key}`}>To</label>
                       <Field id={`to-${key}`}
                              coll="Product"
-                             onChange={this.onChangeItemFieldValue.bind(this, "to", key, itemKey)}
+                             onChange={this.onProductEditRate.bind(this, "to", key, itemKey)}
                              value={rate.get('to')}
                       />
                     </div>
                     <div className="col-xs-2">
                       <label htmlFor={`interval-${key}`}>Interval</label>
                       <Field id={`interval-${key}`}
-                             onChange={this.onChangeItemFieldValue.bind(this, "interval", key, itemKey)}
+                             onChange={this.onProductEditRate.bind(this, "interval", key, itemKey)}
                              value={rate.get('interval')}
                       />
                     </div>
@@ -128,25 +109,25 @@ export default class ProductPricePlanOverride extends Component {
                       <label htmlFor={`price-${key}`}>Price</label>
                       <Field id={`price-${key}`}
                              fieldType="price"
-                             onChange={this.onChangeItemFieldValue.bind(this, "price", key, itemKey)}
+                             onChange={this.onProductEditRate.bind(this, "price", key, itemKey)}
                              value={rate.get('price')}
                       />
                     </div>
                     <div className="col-xs-2">
-                      {(() => {  /* only show remove button if there is more than one interval and only for the last one */
-                         if (item.get('rates').size > 0 && key === (item.get('rates').size - 1)) {
-                           return (
-                             <OverlayTrigger placement="top" overlay={this.tooltip("Remove interval")}>
-                               <FontIcon onClick={this.onRemoveProductProperties.bind(this, key, itemKey)} className="material-icons" style={{cursor: "pointer", color: '#D9534F', fontSize: '24px', paddingRight: '3px', marginTop: '30px'}}>remove_circle_outline</FontIcon>
-                             </OverlayTrigger>
-                           );
-                         }
-                       })()}
                       {(() => {  /* only show plus button if there is the last one */
                          if (key === (item.get('rates').size - 1)) {
                            return (
                              <OverlayTrigger placement="top" overlay={this.tooltip("Add interval")}>
-                               <FontIcon onClick={this.onAddProductProperties.bind(this, itemKey)} className="material-icons" style={{cursor: "pointer", color: 'green', fontSize: '24px'}}>add_circle_outline</FontIcon>
+                               <FontIcon onClick={this.onProductAddRate.bind(this, itemKey)} className="material-icons" style={{cursor: "pointer", color: 'green', fontSize: '24px', paddingRight: '3px', marginTop: '30px'}}>add_circle_outline</FontIcon>
+                             </OverlayTrigger>
+                           );
+                         }
+                       })()}
+                      {(() => {  /* only show remove button if there is more than one interval and only for the last one */
+                         if (item.get('rates').size > 0 && key === (item.get('rates').size - 1) && key > 0) {
+                           return (
+                             <OverlayTrigger placement="top" overlay={this.tooltip("Remove interval")}>
+                               <FontIcon onClick={this.onProductRemoveRate.bind(this, key, itemKey)} className="material-icons" style={{cursor: "pointer", color: '#D9534F', fontSize: '24px'}}>remove_circle_outline</FontIcon>
                              </OverlayTrigger>
                            );
                          }
@@ -161,8 +142,3 @@ export default class ProductPricePlanOverride extends Component {
     );
   }
 }
-
-function mapStateToProps(state, props) {
-  return { product: state.product };
-}
-export default connect(mapStateToProps)(ProductPricePlanOverride);

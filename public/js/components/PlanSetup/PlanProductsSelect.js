@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import FontIcon from 'material-ui/FontIcon';
 import Select from 'react-select';
-import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
-import Immutable from 'immutable';
 import moment from 'moment';
 
 
@@ -12,11 +9,8 @@ import {getProductByKey} from '../../actions/planProductsActions';
 import Field from '../Field';
 import Help from '../Help';
 import { PlanDescription } from '../../FieldDescriptions';
-import { apiBillRun, delay} from '../../Api';
-import ProductPricePlanOverride from '../ProductSetup/ProductPricePlanOverride';
+import { apiBillRun } from '../../Api';
 
-//TODO: move to single place // Be sure to include styles at some point, probably during your bootstrapping
-// import 'react-select/dist/react-select.css';
 
 export default class PlanProductsSelect extends Component {
   constructor(props) {
@@ -31,7 +25,6 @@ export default class PlanProductsSelect extends Component {
 
   onSelectNewProductChange (option) {
     if(option){
-      console.log("new Produc selected : ", option._id['$id']);
       this.props.dispatch(getProductByKey(option.key));
     }
   }
@@ -88,12 +81,6 @@ export default class PlanProductsSelect extends Component {
       </div>
     );
   }
-
-
 }
 
-function mapStateToProps(state, props) {
-  return  { };
-}
-
-export default connect(mapStateToProps)(PlanProductsSelect);
+export default connect()(PlanProductsSelect);
