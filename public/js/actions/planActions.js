@@ -65,10 +65,8 @@ function buildPlanFromState(state) {
     acc.push({
       price: parseInt(price.PeriodicalRate, 10),
       Cycle: price.Cycle,
-      duration: {
-        from,
-        to
-      }
+      from,
+      to
     });
     return acc;
   }, prices);
@@ -149,9 +147,9 @@ function fetchPlan(plan_id) {
       PlanName: plan.name,
       to: moment(plan.to).unix() * 1000,
       from: moment(plan.from).unix() * 1000,
-      EachPeriod: _.capitalize(plan.recurrence.unit),
+      EachPeriod: _.capitalize(plan.recurrence.periodicity),
       ChargingMode: (plan.upfront ? "upfront" : "arrears"),
-      Each: plan.recurrence.duration,
+      Each: plan.recurrence.unit,
         ...Trial,
       recurring_prices
     };

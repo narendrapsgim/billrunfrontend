@@ -10,7 +10,7 @@ const defaultState = Immutable.fromJS({
   TrialPrice: '',
   Each: '',
   EachPeriod: "Month",
-  charging_mode: "upfront",
+  ChargingMode: "upfront",
   from: moment().unix() * 1000,
   to: moment().add(10, 'years').unix() * 1000,
   recurring_prices: [
