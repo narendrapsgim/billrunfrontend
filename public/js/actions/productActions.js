@@ -157,7 +157,9 @@ function saveRateToDB(rate, action) {
 
 export function saveProduct(rate, action) {
   if (!rate.get('unit'))
-    return dispatch(showModal(error.data.message, "Error!"));
+    return dispatch => {
+      return dispatch(showModal("Must specify a unit type!", "Error!"));
+    };
   const conv = buildRateFromState(rate);
   return dispatch => {
     return dispatch(saveRateToDB(conv, action));

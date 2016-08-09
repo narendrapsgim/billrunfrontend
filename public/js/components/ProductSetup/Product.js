@@ -36,9 +36,9 @@ export default class Product extends Component {
        ...unitTypes.map((unit, key) => (
        <option value={unit.get('usaget')} key={key}>{unit.get('usaget')}</option>
        ))]; */
-    const available_units = unitTypes.map((unit, key) => {
+    const available_units = unitTypes ? unitTypes.map((unit, key) => {
       return {value: unit.get('usaget'), label: unit.get('usaget')};
-    }).toJS();
+    }).toJS() : [];
 
     return (
       <form className="form-horizontal AddProduct">
