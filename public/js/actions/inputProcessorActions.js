@@ -13,9 +13,11 @@ export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
 export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
 export const CLEAR_INPUT_PROCESSOR = 'CLEAR_INPUT_PROCESSOR';
+export const MAP_USAGET = 'MAP_USAGET';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { showModal } from './modalActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -31,6 +33,24 @@ function gotProcessorSettings(settings) {
 
 function fetchProcessorSettings(file_type) {
   const convert = (settings) => {
+    if (!settings)
+      return {
+        file_type: '',
+        delimiter_type: '',
+        delimiter: '',
+        fields: [],
+        processor: {
+          usaget_mapping: [],
+          src_field: ''
+        },
+        customer_identification_fields: [],
+        rate_calculators: {},
+        receiver: {
+          type: "ftp",
+          connections: []
+        }
+      };
+    
     const { parser, processor,
             customer_identification_fields,
             rate_calculators,
@@ -67,7 +87,7 @@ function fetchProcessorSettings(file_type) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
@@ -137,6 +157,13 @@ export function addUsagetMapping(mapping) {
   };
 }
 
+export function mapUsaget(mapping) {
+  return {
+    type: MAP_USAGET,
+    mapping
+  };
+}
+
 export function setCustomerMapping(field, mapping) {
   return {
     type: SET_CUSETOMER_MAPPING,
@@ -202,10 +229,12 @@ export function saveInputProcessorSettings(state) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(
       resp => {
+        if (!resp.data.status)
+          dispatch(showModal(resp.data.desc, "Error!"));
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };  
@@ -228,7 +257,7 @@ function fetchInputProcessors() {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };

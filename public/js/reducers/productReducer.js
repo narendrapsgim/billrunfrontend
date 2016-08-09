@@ -1,4 +1,5 @@
 import { UPDATE_PRODUCT_PROPERTIES_VALUE,
+         UPDATE_PRODUCT_PREFIXES,
          ADD_PRODUCT_PROPERTIES,
          REMOVE_PRODUCT_PROPERTIES,
          GOT_PRODUCT,
@@ -25,6 +26,9 @@ export default function (state = defaultState, action) {
         return state.set(field_name, field_value);
       return state.setIn(['rates', field_idx, field_name], field_value);
 
+    case UPDATE_PRODUCT_PREFIXES:
+      return state.setIn(['params', 'prefix'], field_value);
+      
     case ADD_PRODUCT_PROPERTIES:
       let new_rate = Immutable.fromJS({
         from: undefined,

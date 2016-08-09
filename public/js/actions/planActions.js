@@ -11,6 +11,8 @@ export const REMOVE_RECURRING_PRICE = 'REMOVE_RECURRING_PRICE';
 import axios from 'axios';
 import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { validate, invalidForm } from './validatorActions';
+import { showModal } from './modalActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -63,10 +65,8 @@ function buildPlanFromState(state) {
     acc.push({
       price: parseInt(price.PeriodicalRate, 10),
       Cycle: price.Cycle,
-      duration: {
-        from,
-        to
-      }
+      from,
+      to
     });
     return acc;
   }, prices);
@@ -75,14 +75,14 @@ function buildPlanFromState(state) {
     id: basic_settings.id,
     name: basic_settings.PlanName,
     price: prices,
-    // from: moment(parseInt(basic_settings.from)).format(),
-    // to: moment(parseInt(basic_settings.to)).format(),
+    from: moment().format(),
+    to: moment().add(100, 'years').format(),
     PlanDescription: basic_settings.PlanDescription,
     PlanCode: basic_settings.PlanCode,
-    charging_mode: basic_settings.ChargingMode,
-    recurring: {
-      duration: parseInt(basic_settings.Each, 10),
-      unit: basic_settings.EachPeriod.toLowerCase()
+    upfront: basic_settings.ChargingMode === "upfront",
+    recurrence: {
+      unit: 1,//parseInt(basic_settings.Each, 10),
+      periodicity: basic_settings.EachPeriod.toLowerCase()
     }
   };
 }
@@ -147,9 +147,9 @@ function fetchPlan(plan_id) {
       PlanName: plan.name,
       to: moment(plan.to).unix() * 1000,
       from: moment(plan.from).unix() * 1000,
-      EachPeriod: _.capitalize(plan.recurring.unit),
-      ChargingMode: plan.charging_mode,
-      Each: plan.recurring.duration,
+      EachPeriod: _.capitalize(plan.recurrence.periodicity),
+      ChargingMode: (plan.upfront ? "upfront" : "arrears"),
+      Each: plan.recurrence.unit,
         ...Trial,
       recurring_prices
     };
@@ -166,6 +166,8 @@ function fetchPlan(plan_id) {
       }
     ).catch(error => {
       console.log(error);
+      if (error.data)
+        dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
@@ -192,11 +194,14 @@ function savedPlan() {
 
 function savePlanToDB(plan, action) {
   let saveUrl = '/admin/save';
+  let type = action !== 'new' ? "close_and_new" : action;
 
   var formData = new FormData();
-  if (action !== 'new') formData.append('id', plan.id);
+  if (action !== 'new') {
+    formData.append('id', plan.id);
+  }
   formData.append("coll", 'plans');
-  formData.append("type", action);
+  formData.append("type", type);
   formData.append("data", JSON.stringify(plan));
 
   return (dispatch) => {
@@ -207,13 +212,19 @@ function savePlanToDB(plan, action) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };  
 };
 
 export function savePlan(plan, action) {
+  // const validations = validate(plan, 'plan_setup');
+  // if (!validations.get('valid')) {
+  //   return dispatch => {
+  //     return dispatch(invalidForm(validations));
+  //   };
+  // }
   const conv = buildPlanFromState(plan);
   return dispatch => {
     return dispatch(savePlanToDB(conv, action));

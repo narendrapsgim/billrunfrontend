@@ -1,15 +1,30 @@
 import FieldValidations from '../FieldValidations';
 
-export default function validator(entity, page) {
-  return entity.map((value, name) => {
+export const INVALID_FORM = 'INVALID_FORM';
+
+export function validate(entity, page) {
+  let valid = true;
+  const valid_form = entity.map((value, name) => {
     let validation = FieldValidations.getIn([page, name]);
     if (!validation) return true;
-    let valid = true;
     return validation.map((v, type) => {
-      return eval(`${type}_validator(value, v)`);
+      let field_valid = eval(`${type}_validator(value, v)`);
+      valid &= field_valid;
+      return field_valid;
     });
   });
+  return valid_form.set('valid', valid);
 }
+
+export function invalidForm(validations) {
+  return {
+    type: INVALID_FORM,
+    validations
+  };
+}
+
+
+/** VALIDATORS **/
 
 function mandatory_validator(value, def) {
   if (!def) return true;

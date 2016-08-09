@@ -71,7 +71,7 @@ class PlanSetup extends Component {
   handleSave() {
     const { action } = this.props.location.query;
     this.props.dispatch(savePlan(this.props.plan, action));
-    browserHistory.goBack();
+    //browserHistory.goBack();
   }
   
   handleBack() {
@@ -79,11 +79,12 @@ class PlanSetup extends Component {
   }
   
   render() {
+    const { plan, validator } = this.props;
     return (
       <div className="PlanSetup container">
         <h3>Billing Plan</h3>
         <div className="contents bordered-container">
-          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} plan={this.props.plan} />
+          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} validator={validator} plan={plan} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
@@ -103,7 +104,10 @@ class PlanSetup extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return  { plan: state.plan };
+  return  {
+    plan: state.plan,
+    validator: state.validator
+  };
 }  
 
 export default connect(mapStateToProps)(PlanSetup);

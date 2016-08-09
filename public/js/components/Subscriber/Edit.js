@@ -28,6 +28,7 @@ export default class Edit extends Component {
             onClickNewSubscription,
             onSave,
             onCancel } = this.props;
+    if (!settings) return (null);
 
     const subscriptionsHTML = subscribers.map((sub, key) => {
       return (
@@ -83,7 +84,7 @@ export default class Edit extends Component {
         </div>
       </div>
     );
-    
+
     const fieldsHTML = settings.getIn(['account', 'fields']).map((field, key) => {
       if (field.get('display') === false) return (null);
       return (

@@ -23,7 +23,7 @@ class InputProcessorsList extends Component {
   }
   
   onClickNew() {
-    this.props.onSelectInputProcessor({selected: {}});
+    this.props.onSelectInputProcessor(true);
   }
 
   render() {

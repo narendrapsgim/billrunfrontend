@@ -1,4 +1,5 @@
 export const UPDATE_PRODUCT_PROPERTIES_VALUE = 'UPDATE_PRODUCT_PROPERTIES_VALUE';
+export const UPDATE_PRODUCT_PREFIXES = 'UPDATE_PRODUCT_PREFIXES';
 export const ADD_PRODUCT_PROPERTIES = 'ADD_PRODUCT_PROPERTIES';
 export const REMOVE_PRODUCT_PROPERTIES = 'REMOVE_PRODUCT_PROPERTIES';
 export const GOT_PRODUCT = 'GOT_PRODUCT';
@@ -9,6 +10,7 @@ import axios from 'axios';
 import moment from 'moment';
 import Immutable from 'immutable';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { showModal } from './modalActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -18,21 +20,29 @@ let axiosInstance = axios.create({
 
 function buildRateFromState(state) {
   const product = state.toJS();
-  const { rates } = product;
+  const { rates, params } = product;
   let r = {
     [product.unit]: {
       BASE: {
-        rate: rates
+        rate: rates.map(rate => {
+          return {
+            from: parseInt(rate.from, 10),
+            to: parseInt(rate.to, 10),
+            price: parseInt(rate.price, 10),
+            interval: parseInt(rate.interval, 10)
+          }
+        })
       }
     }
   }
   return {
     key: product.key,
     id: product.id,
-    from: moment(product.from).unix(),
-    to: moment(product.to).unix(),
+    from: moment(product.from).format(),
+    to: moment(product.to).format(),
     unit_price: product.unit_price,
     description: product.description,
+    params: params,
     rates: r
   };
 }
@@ -44,6 +54,13 @@ export function updateProductPropertiesField(field_name, field_idx, field_value)
     field_idx,
     field_value
   }
+}
+
+export function updateProductPrefixes(field_value) {
+  return {
+    type: UPDATE_PRODUCT_PREFIXES,
+    field_value
+  };
 }
 
 export function addProductProperties() {
@@ -75,6 +92,7 @@ function fetchProduct(product_id) {
       unit,
       unit_price: product.unit_price,
       description: product.description,
+      params: product.params,
       rates: product.rates[unit].BASE.rate.map(rate => {
         return {
           price: parseInt(rate.price, 10),
@@ -96,7 +114,7 @@ function fetchProduct(product_id) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
@@ -131,13 +149,17 @@ function saveRateToDB(rate, action) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      console.log(error);
+      dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
 }
 
 export function saveProduct(rate, action) {
+  if (!rate.get('unit'))
+    return dispatch => {
+      return dispatch(showModal("Must specify a unit type!", "Error!"));
+    };
   const conv = buildRateFromState(rate);
   return dispatch => {
     return dispatch(saveRateToDB(conv, action));

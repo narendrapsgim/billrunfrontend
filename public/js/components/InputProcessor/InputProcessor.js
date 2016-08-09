@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings } from '../../actions/inputProcessorActions';
+import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, mapUsaget } from '../../actions/inputProcessorActions';
+import { getSettings } from '../../actions/settingsActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -30,6 +31,7 @@ class InputProcessor extends Component {
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
+    this.addUsagetMapping = this.addUsagetMapping.bind(this);
     this.onSetFieldWidth = this.onSetFieldWidth.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
@@ -45,7 +47,9 @@ class InputProcessor extends Component {
 
   componentWillMount() {
     const { dispatch, fileType } = this.props;
-    dispatch(getProcessorSettings(fileType));
+    if (fileType === true) dispatch(getProcessorSettings());
+    else dispatch(getProcessorSettings(fileType));
+    dispatch(getSettings("unit_types"));
   }
 
   onChangeName(e) {
@@ -97,7 +101,7 @@ class InputProcessor extends Component {
   }
 
   onAddUsagetMapping(val, e) {
-    this.props.dispatch(addUsagetMapping(val));
+    this.props.dispatch(mapUsaget(val));
   }
 
   onSetCustomerMapping(e) {
@@ -118,6 +122,10 @@ class InputProcessor extends Component {
   onSetReceiverCheckboxField(e) {
     const { id, checked } = e.target;
     this.props.dispatch(setReceiverField(id, checked));
+  }
+
+  addUsagetMapping(val) {
+    this.props.dispatch(addUsagetMapping(val));
   }
   
   save() {
@@ -150,11 +158,11 @@ class InputProcessor extends Component {
   
   render() {
     let { stepIndex } = this.state;
-    const { settings } = this.props;
+    const { settings, unit_types } = this.props;
 
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} settings={settings} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} settings={settings} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} settings={settings} unitTypes={unit_types} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
@@ -195,7 +203,8 @@ class InputProcessor extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return { settings: state.inputProcessor };
+  return { settings: state.inputProcessor,
+           unit_types: state.settings.get('unit_types') };
 }
 
 export default connect(mapStateToProps)(InputProcessor);

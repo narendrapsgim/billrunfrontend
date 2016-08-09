@@ -1,33 +1,45 @@
 import React, { Component } from 'react';
+import Immutable from 'immutable';
 
 import Field from '../Field';
 import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
+import Chips from '../Chips';
+import Select from 'react-select';
 
 export default class Product extends Component {
   constructor(props) {
     super(props);
   }
+
+  productPrefixes() {
+    const { product } = this.props;
+    return product.getIn(['params', 'prefix']) ?
+           product.getIn(['params', 'prefix']).toJS() :
+           [];
+  }
   
   render() {
-    const product_type_options = ["Metered", "Tiered"].map((type, key) => (
-      <option value={type} key={key}>{type}</option>
-    ));
-
     const { product,
             onChangeItemFieldValue,
             onAddProductProperties,
             onChangeItemSelectFieldValue,
             onRemoveProductProperties,
-            processors } = this.props;
+            onChangePrefix,
+            onSelectUnit,
+            unitTypes } = this.props;
+    /* 
+       const units = _.uniq(_.flatten(processors.map(processor => {
+       return processor.get('rate_calculators').keySeq().map(unit => { return unit; });
+       }).toJS()));
+     */
+    /* const available_units =[(<option disabled value="-1" key={-1}>Select Unit</option>),
+       ...unitTypes.map((unit, key) => (
+       <option value={unit.get('usaget')} key={key}>{unit.get('usaget')}</option>
+       ))]; */
+    const available_units = unitTypes ? unitTypes.map((unit, key) => {
+      return {value: unit.get('usaget'), label: unit.get('usaget')};
+    }).toJS() : [];
 
-    const units = _.uniq(_.flatten(processors.map(processor => {
-      return processor.get('rate_calculators').keySeq().map(unit => { return unit; });
-    }).toJS()));
-
-    const available_units =[(<option disabled value="-1" key={-1}>Select Unit</option>),
-                            ...units.map((unit, key) => (
-                              <option value={unit} key={key}>{unit}</option>
-                            ))];
     return (
       <form className="form-horizontal AddProduct">
         <div className="form-group">
@@ -61,9 +73,16 @@ export default class Product extends Component {
         <div className="form-group">
           <div className="col-xs-3">
             <label htmlFor="unit">Unit Type</label>
-            <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={product.get('unit')} defaultValue="-1">
-              { available_units }
-            </select>
+            {/* <select id="unit" className="form-control" onChange={onChangeItemSelectFieldValue.bind(this, "unit", -1)} value={product.get('unit')} defaultValue="-1">
+            { available_units }
+            </select> */}
+            <Select
+                id="unit"
+                options={available_units}
+                allowCreate={true}
+                value={product.get('unit')}
+                onChange={onSelectUnit}
+            />
           </div>
         </div>
         <div className="form-group">
@@ -84,7 +103,13 @@ export default class Product extends Component {
             <label>To</label>
             <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
           </div>
-        </div>        
+        </div>
+        <div className="form-group">
+          <div className="col-xs-3">
+            <label>Prefixes</label>
+            <Chips items={this.productPrefixes()} onChange={onChangePrefix} />
+          </div>
+        </div>
         { product.get('rates').map((rate, key) => (
             <div className="form-group" key={key}>
               <div className="col-xs-1">
