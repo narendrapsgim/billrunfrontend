@@ -165,7 +165,9 @@ function fetchPlan(plan_id) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
+      console.log(error);
+      if (error.data)
+        dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
   };
@@ -192,11 +194,14 @@ function savedPlan() {
 
 function savePlanToDB(plan, action) {
   let saveUrl = '/admin/save';
+  let type = action !== 'new' ? "close_and_new" : action;
 
   var formData = new FormData();
-  if (action !== 'new') formData.append('id', plan.id);
+  if (action !== 'new') {
+    formData.append('id', plan.id);
+  }
   formData.append("coll", 'plans');
-  formData.append("type", action);
+  formData.append("type", type);
   formData.append("data", JSON.stringify(plan));
 
   return (dispatch) => {

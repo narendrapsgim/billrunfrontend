@@ -44,7 +44,7 @@ function fetchProcessorSettings(file_type) {
           src_field: ''
         },
         customer_identification_fields: [],
-        rate_calculators: [],
+        rate_calculators: {},
         receiver: {
           type: "ftp",
           connections: []
@@ -229,6 +229,8 @@ export function saveInputProcessorSettings(state) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(
       resp => {
+        if (!resp.data.status)
+          dispatch(showModal(resp.data.desc, "Error!"));
         dispatch(hideProgressBar());
       }
     ).catch(error => {

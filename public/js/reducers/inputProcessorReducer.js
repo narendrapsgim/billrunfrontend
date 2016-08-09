@@ -77,7 +77,7 @@ export default function (state = defaultState, action) {
         pattern,
         usaget
       });
-      return state.updateIn(['processor', 'usaget_mapping'], list => list.push(new_map) );
+      return state.updateIn(['processor', 'usaget_mapping'], list => list.push(new_map) ).setIn(['rate_calculators', usaget], Immutable.List());
     
     case SET_CUSETOMER_MAPPING:
       return state.setIn(['customer_identification_fields', 0, field], mapping);
@@ -87,7 +87,7 @@ export default function (state = defaultState, action) {
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: "name"
+        line_key: state.getIn(['processor', 'src_field'])
       });
       return state.setIn(['rate_calculators', usaget, 0], new_rating);
 
