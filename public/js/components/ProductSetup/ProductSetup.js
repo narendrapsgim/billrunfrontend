@@ -19,6 +19,7 @@ class ProductSetup extends Component {
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
+    this.onChangeDateFieldValue = this.onChangeDateFieldValue.bind(this);
     this.onChangeItemSelectFieldValue = this.onChangeItemSelectFieldValue.bind(this);
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
     this.onChangePrefix = this.onChangePrefix.bind(this);
@@ -30,7 +31,7 @@ class ProductSetup extends Component {
     if (product_id) {
       this.props.dispatch(getProduct(product_id));
     }
-    this.props.dispatch(getSettings("unit_types"));
+    this.props.dispatch(getSettings("usage_types"));
   }
 
   componentWillUnmount() {
@@ -45,6 +46,11 @@ class ProductSetup extends Component {
                          dispatch(updateProductPropertiesField(id, idx, value));
   }
 
+  onChangeDateFieldValue(id, val) {
+    const { dispatch } = this.props;
+    dispatch(updateProductPropertiesField(id, -1, val));
+  }
+  
   onChangeItemSelectFieldValue(id, idx, e) {
     this.props.dispatch(updateProductPropertiesField(id, idx, e.target.value));
   }
@@ -62,15 +68,12 @@ class ProductSetup extends Component {
   }
 
   onSelectUnit(val) {
-    const { unit_types } = this.props;
-    const found = unit_types.find(obj => {
-      return obj.get('usaget') === val;
+    const { usage_types } = this.props;
+    const found = usage_types.find(usaget => {
+      return usaget === val;
     });
     if (!found) {
-      this.props.dispatch(addUsagetMapping({
-        usaget: val,
-        pattern: `/${val}/`
-      }));
+      this.props.dispatch(addUsagetMapping(val));
     }
     this.props.dispatch(updateProductPropertiesField("unit", -1, val));
   }
@@ -86,12 +89,12 @@ class ProductSetup extends Component {
   }
 
   render() {
-    const { unit_types } = this.props;
+    const { usage_types } = this.props;
     return (
       <div className="ProductSetup container">
         <h3>Product</h3>
         <div className="contents bordered-container">
-          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} onChangePrefix={this.onChangePrefix} product={this.props.product} onSelectUnit={this.onSelectUnit} unitTypes={unit_types} />
+          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} onChangePrefix={this.onChangePrefix} product={this.props.product} onSelectUnit={this.onSelectUnit} usageTypes={usage_types} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
@@ -111,6 +114,6 @@ class ProductSetup extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return { product: state.product, unit_types: state.settings.get('unit_types') };
+  return { product: state.product, usage_types: state.settings.get('usage_types') };
 }
 export default connect(mapStateToProps)(ProductSetup);

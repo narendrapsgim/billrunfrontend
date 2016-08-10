@@ -38,6 +38,7 @@ class InputProcessor extends Component {
     this.onAddField = this.onAddField.bind(this);
     this.handleNext = this.handleNext.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
 
     this.state = {
       stepIndex: 0,
@@ -49,7 +50,7 @@ class InputProcessor extends Component {
     const { dispatch, fileType } = this.props;
     if (fileType === true) dispatch(getProcessorSettings());
     else dispatch(getProcessorSettings(fileType));
-    dispatch(getSettings("unit_types"));
+    dispatch(getSettings("usage_types"));
   }
 
   onChangeName(e) {
@@ -155,14 +156,22 @@ class InputProcessor extends Component {
       this.props.onCancel();
     }
   }
-  
+
+  handleCancel() {
+    let r = confirm("are you sure you want to stop editing input processor?");
+    if (r) {
+      this.props.dispatch(clearInputProcessor());
+      this.props.onCancel();
+    }   
+  }
+
   render() {
     let { stepIndex } = this.state;
-    const { settings, unit_types } = this.props;
+    const { settings, usage_types } = this.props;
 
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} settings={settings} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} settings={settings} unitTypes={unit_types} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} settings={settings} usageTypes={usage_types} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
@@ -188,14 +197,26 @@ class InputProcessor extends Component {
           { steps[stepIndex] }
         </div>
         <div style={{marginTop: 12, float: "right"}}>
+          {(() => {
+             if (stepIndex > 0) {
+               return (
+                 <FlatButton
+                     label="Back"
+                     onTouchTap={this.handlePrev}
+                     style={{marginRight: 12}} />
+               );
+             }
+           })()}                 
+                 <RaisedButton
+                     label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}
+                     primary={true}
+                     onTouchTap={this.handleNext} />
+        </div>
+        <div style={{marginTop: 12, float: "left"}}>
           <FlatButton
-              label={stepIndex === 0 ? "Cancel" : "Back"}
-              onTouchTap={this.handlePrev}
-              style={{marginRight: 12}} />
-          <RaisedButton
-              label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}
-              primary={true}
-              onTouchTap={this.handleNext} />
+              label="cancel"
+              onTouchTap={this.handleCancel}
+              style={{marginRight: 12}} />          
         </div>
       </div>
     );
@@ -204,7 +225,7 @@ class InputProcessor extends Component {
 
 function mapStateToProps(state, props) {
   return { settings: state.inputProcessor,
-           unit_types: state.settings.get('unit_types') };
+           usage_types: state.settings.get('usage_types') };
 }
 
 export default connect(mapStateToProps)(InputProcessor);

@@ -1,7 +1,9 @@
 export const GOT_ACCOUNT = 'GOT_ACCOUNT';
 export const UPDATE_ACCOUNT_FIELD = 'UPDATE_ACCOUNT_FIELD';
+export const GET_NEW_ACCOUNT = 'GET_NEW_ACCOUNT';
 
 import axios from 'axios';
+import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 
 const axiosInstance = axios.create({
@@ -24,6 +26,12 @@ function gotAccount(account) {
   };
 }
 
+function getNewAccount() {
+  return {
+    type: GET_NEW_ACCOUNT
+  };
+}
+
 function fetchAccount(aid) {
   const fetchUrl = `/api/subscribers?method=query&query={"aid":${aid}, "type":"account"}`;
   return (dispatch) => {
@@ -42,6 +50,11 @@ function fetchAccount(aid) {
 }
 
 export function getAccount(aid) {
+  if (!aid) {
+    return dispatch => {
+      return dispatch(getNewAccount());
+    };
+  }
   return dispatch => {
     return dispatch(fetchAccount(aid));
   };

@@ -5,6 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Filter from '../Filter';
 import Field from '../Field';
 import Pager from '../Pager';
+import moment from 'moment';
 
 import { permissions } from '../../permissions';
 import { getPlans } from '../../actions/plansActions';
@@ -28,7 +29,7 @@ class PlansList extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getPlans());
+    //this.props.dispatch(getPlans());
   }
   
   onClickCell(cell_idx, col_idx, e) {
@@ -78,7 +79,7 @@ class PlansList extends Component {
 
   planTrial(plan) {
     if (plan.getIn(['price', 0, 'trial'])) {
-      return plan.getIn(['price', 0, 'duration', 'TrialCycle']) + " " + plan.getIn(['recurring', 'unit']);
+      return plan.getIn(['price', 0, 'TrialCycle']) + " " + plan.getIn(['recurrence', 'periodicity']);
     }
     return '';
   }
@@ -90,7 +91,11 @@ class PlansList extends Component {
   }
 
   planBillingFrequency(plan) {
-    return plan.getIn(['recurring', 'duration']) + " " + plan.getIn(['recurring', 'unit']);
+    return plan.getIn(['recurrence', 'unit']) + " " + plan.getIn(['recurrence', 'periodicity']);
+  }
+
+  planChargingMode(plan) {
+    return plan.get('upfront') ? "Upfront" : "Arrears";
   }
   
   render() {
@@ -99,6 +104,7 @@ class PlansList extends Component {
     const fields = [
       {id: "name", placeholder: "Name"},
       {id: "PlanCode", placeholder: "Code"},
+      {id: "to", display: false, type: "datetime"}
     ];
     /* 
        const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),
@@ -124,6 +130,7 @@ class PlansList extends Component {
     const table_header = [
       (<TableHeaderColumn>Name</TableHeaderColumn>),
       (<TableHeaderColumn>Code</TableHeaderColumn>),
+      (<TableHeaderColumn>Description</TableHeaderColumn>),
       (<TableHeaderColumn>Trial</TableHeaderColumn>),
       (<TableHeaderColumn>Recurring Charges</TableHeaderColumn>),
       (<TableHeaderColumn>Billing Frequency</TableHeaderColumn>),
@@ -136,7 +143,10 @@ class PlansList extends Component {
           <Field value={plan.get('name')} coll="Plans" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
-          <Field value={plan.get('code')} coll="Plans" editable={false} />
+          <Field value={plan.get('PlanCode')} coll="Plans" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={plan.get('PlanDescription')} coll="Plans" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
           <Field value={this.planTrial(plan)} coll="Plans" editable={false} />
@@ -148,7 +158,7 @@ class PlansList extends Component {
           <Field value={this.planBillingFrequency(plan)} coll="Plans" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
-          <Field value={plan.get('charging_mode')} coll="Plans" editable={false} />
+          <Field value={this.planChargingMode(plan)} coll="Plans" editable={false} />
         </TableRowColumn>
       </TableRow>
     ));
@@ -159,7 +169,7 @@ class PlansList extends Component {
       <div className="PlansList">
         <div className="row" style={{marginBottom: 10}}>
           <div className="col-xs-5">
-            <Filter fields={fields} onFilter={this.onFilter} />
+            <Filter fields={fields} onFilter={this.onFilter} base={{"to": {"$gt": moment().toISOString()}}} />
             {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
             { sort_fields }
             </select> */}

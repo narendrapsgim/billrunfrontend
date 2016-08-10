@@ -20,13 +20,6 @@ export function updateSubscriberField(field_id, value) {
   };
 }
 
-export function getNewSubscriber(aid = false) {
-  return {
-    type: GET_NEW_SUBSCRIBER,
-    aid
-  };
-}
-
 function gotSubscribers(subscribers) {
   return {
     type: GOT_SUBSCRIBERS,

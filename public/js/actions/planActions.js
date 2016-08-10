@@ -13,6 +13,7 @@ import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { validate, invalidForm } from './validatorActions';
 import { showModal } from './modalActions';
+import { showStatusMessage } from '../actions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -40,11 +41,9 @@ function buildPlanFromState(state) {
       trial: true,
       price: parseInt(TrialPrice, 10),
       Cycle: TrialCycle,
-      duration: {
-        TrialCycle,
-        from: trial_from,
-        to: getToDate(basic_settings, trial_from, TrialCycle)
-      }
+      TrialCycle,
+      from: trial_from,
+      to: getToDate(basic_settings, trial_from, TrialCycle)
     };
     prices.push(trial);
   }
@@ -55,10 +54,11 @@ function buildPlanFromState(state) {
     let from = moment().format();
     let to = moment();
 
+    console.log(acc[idx]);
     if (acc.length && acc.length > idx) {
-      from = moment(acc[idx]['duration']['to']).format();
+      from = moment(acc[idx]['to']).format();
     } else if (idx > 0) {
-      from = moment(acc[idx - 1]['duration']['to']).format();
+      from = moment(acc[idx - 1]['to']).format();
     }
     to = getToDate(basic_settings, from, price.Cycle);
 
@@ -186,12 +186,6 @@ export function clearPlan() {
   };
 }
 
-function savedPlan() {
-  return {
-    type: 'test'
-  };
-}
-
 function savePlanToDB(plan, action) {
   let saveUrl = '/admin/save';
   let type = action !== 'new' ? "close_and_new" : action;
@@ -208,7 +202,7 @@ function savePlanToDB(plan, action) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(saveUrl, formData).then(
       resp => {
-        dispatch(savedPlan());
+        dispatch(showStatusMessage("Saved plan sucessfully!", 'success'));
         dispatch(hideProgressBar());
       }
     ).catch(error => {
