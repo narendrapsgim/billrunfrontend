@@ -13,6 +13,12 @@ import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
 import { showStatusMessage } from '../actions';
 
+let axiosInstance = axios.create({
+  withCredentials: true,
+  baseURL: globalSetting.serverUrl
+});
+
+
 function buildRateFromState(state) {
   const product = state.toJS();
   const { rates, params } = product;
