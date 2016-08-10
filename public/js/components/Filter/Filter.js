@@ -66,18 +66,29 @@ export default class Filter extends Component {
                   () => { this.onClickFilterBtn() });
   }
 
+  getFieldValue(field) {
+    switch(field.type) {
+      case "text":
+      default:
+        return this.state.filters[field.id] || '';
+    }
+  }
+  
   render() {
     const { fields = [] } = this.props;
-    const inputs = fields.map((field, key) => (
-      <div className="col-xs-3" key={key}>
-        <input id={field.id}
-               type={field.type || "text"}
-               placeholder={field.placeholder}
-               onChange={this.onChangeFilterField}
-               value={this.state.filters[field.id] || ''}
-               className="form-control" />
-      </div>
-    ));
+    const inputs = fields.map((field, key) => {
+      if (field.display !== undefined && field.display === false) return (null);
+      return (
+        <div className="col-xs-3" key={key}>
+          <input id={field.id}
+                 type={field.type || "text"}
+                 placeholder={field.placeholder}
+                 onChange={this.onChangeFilterField}
+                 value={this.getFieldValue(field)}
+                 className="form-control" />
+        </div>
+      );
+    });
 
     return (
       <div className="Filter">

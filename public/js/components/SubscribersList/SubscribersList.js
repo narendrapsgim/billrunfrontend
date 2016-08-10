@@ -70,7 +70,7 @@ class SubscribersList extends Component {
       {id: "name", placeholder: "Name"},
       {id: "address", placeholder: "Address"},
       {id: "email", placeholder: "Email"},
-      {id: "to", display: false, type: "datetime"}
+      {id: "to", placeholder: "To", display: false, type: "datetime"}
     ];
 
     const table_header = fields.map((field, idx) => (
