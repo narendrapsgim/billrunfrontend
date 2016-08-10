@@ -35,6 +35,8 @@ export default class Filter extends Component {
     switch (found.type) {
       case "number":
         return parseInt(value, 10);
+      case "datetime":
+        return value;
       case "text":
       default:
         return {"$regex": value, "$options": "i"};
