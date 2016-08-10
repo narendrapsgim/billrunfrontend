@@ -5,6 +5,7 @@ import Field from '../Field';
 import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
 import Chips from '../Chips';
 import Select from 'react-select';
+import moment from 'moment';
 
 export default class Product extends Component {
   constructor(props) {
@@ -21,12 +22,14 @@ export default class Product extends Component {
   render() {
     const { product,
             onChangeItemFieldValue,
+            onChangeDateFieldValue,
             onAddProductProperties,
             onChangeItemSelectFieldValue,
             onRemoveProductProperties,
             onChangePrefix,
             onSelectUnit,
             unitTypes } = this.props;
+
     /* 
        const units = _.uniq(_.flatten(processors.map(processor => {
        return processor.get('rate_calculators').keySeq().map(unit => { return unit; });
@@ -97,11 +100,11 @@ export default class Product extends Component {
         <div className="form-group">
           <div className="col-xs-3">
             <label>Valid From</label>
-            <DateTimeField id="from" value={product.get('from')}  onChange={onChangeItemFieldValue.bind(this, "from")} />
+            <DateTimeField id="from" dateTime={product.get('from')} format="" onChange={onChangeDateFieldValue.bind(this, "from")} />
           </div>
           <div className="col-xs-3">
             <label>To</label>
-            <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
+            <DateTimeField id="to" dateTime={product.get('to')} format="" onChange={onChangeDateFieldValue.bind(this, "to")} />
           </div>
         </div>
         <div className="form-group">

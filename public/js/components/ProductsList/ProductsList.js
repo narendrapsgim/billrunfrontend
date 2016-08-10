@@ -27,7 +27,7 @@ class ProductsList extends Component {
   }
 
   componentWillMount() {
-    this.props.dispatch(getProducts());
+    //this.props.dispatch(getProducts());
   }
   
   onClickCell(cell_idx, col_idx, e) {
@@ -76,6 +76,7 @@ class ProductsList extends Component {
     const { products } = this.props;
     const fields = [
       {id: "key", placeholder: "Name"},
+      {id: "to", display: false, type: "datetime"}
     ];
 
     const table_header = [
@@ -102,10 +103,10 @@ class ProductsList extends Component {
           <Field value={this.getProductUnitType(row)} coll="Product" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
-          <Field value={moment(parseInt(row.getIn(["from", "sec"]), 10)).format()} coll="Product" editable={false} />
+          <Field value={moment(parseInt(row.getIn(["from", "sec"]), 10) * 1000).format()} coll="Product" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
-          <Field value={moment(parseInt(row.getIn(["to", "sec"]), 10)).format()} coll="Product" editable={false} />
+          <Field value={moment(parseInt(row.getIn(["to", "sec"]), 10) * 1000).format()} coll="Product" editable={false} />
         </TableRowColumn>
       </TableRow>
     ));
@@ -114,7 +115,7 @@ class ProductsList extends Component {
       <div className="ProductsList">
         <div className="row" style={{marginBottom: 10}}>
           <div className="col-xs-5">
-            <Filter onFilter={this.onFilter} fields={fields} />
+            <Filter onFilter={this.onFilter} fields={fields} base={{"to": {"$gt": moment().toISOString()}}} />
           </div>
           <div className="col-xs-5">
             <div style={{float: "right"}}>

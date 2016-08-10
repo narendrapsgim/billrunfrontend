@@ -5,6 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Filter from '../Filter';
 import Field from '../Field';
 import Pager from '../Pager';
+import moment from 'moment';
 
 import { permissions } from '../../permissions';
 import { getPlans } from '../../actions/plansActions';
@@ -28,7 +29,7 @@ class PlansList extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getPlans());
+    //this.props.dispatch(getPlans());
   }
   
   onClickCell(cell_idx, col_idx, e) {
@@ -103,6 +104,7 @@ class PlansList extends Component {
     const fields = [
       {id: "name", placeholder: "Name"},
       {id: "PlanCode", placeholder: "Code"},
+      {id: "to", display: false, type: "datetime"}
     ];
     /* 
        const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),
@@ -167,7 +169,7 @@ class PlansList extends Component {
       <div className="PlansList">
         <div className="row" style={{marginBottom: 10}}>
           <div className="col-xs-5">
-            <Filter fields={fields} onFilter={this.onFilter} />
+            <Filter fields={fields} onFilter={this.onFilter} base={{"to": {"$gt": moment().toISOString()}}} />
             {/* <select className="form-control" onChange={this.onChangeSort} defaultValue="-1">
             { sort_fields }
             </select> */}

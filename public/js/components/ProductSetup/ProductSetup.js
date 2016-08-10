@@ -19,6 +19,7 @@ class ProductSetup extends Component {
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.onChangeItemFieldValue = this.onChangeItemFieldValue.bind(this);
+    this.onChangeDateFieldValue = this.onChangeDateFieldValue.bind(this);
     this.onChangeItemSelectFieldValue = this.onChangeItemSelectFieldValue.bind(this);
     this.onRemoveProductProperties = this.onRemoveProductProperties.bind(this);
     this.onChangePrefix = this.onChangePrefix.bind(this);
@@ -45,6 +46,11 @@ class ProductSetup extends Component {
                          dispatch(updateProductPropertiesField(id, idx, value));
   }
 
+  onChangeDateFieldValue(id, val) {
+    const { dispatch } = this.props;
+    dispatch(updateProductPropertiesField(id, -1, val));
+  }
+  
   onChangeItemSelectFieldValue(id, idx, e) {
     this.props.dispatch(updateProductPropertiesField(id, idx, e.target.value));
   }
@@ -91,7 +97,7 @@ class ProductSetup extends Component {
       <div className="ProductSetup container">
         <h3>Product</h3>
         <div className="contents bordered-container">
-          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} onChangePrefix={this.onChangePrefix} product={this.props.product} onSelectUnit={this.onSelectUnit} unitTypes={unit_types} />
+          <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} onChangePrefix={this.onChangePrefix} product={this.props.product} onSelectUnit={this.onSelectUnit} unitTypes={unit_types} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
           <FlatButton
