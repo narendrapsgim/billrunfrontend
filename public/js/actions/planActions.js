@@ -41,11 +41,9 @@ function buildPlanFromState(state) {
       trial: true,
       price: parseInt(TrialPrice, 10),
       Cycle: TrialCycle,
-      duration: {
-        TrialCycle,
-        from: trial_from,
-        to: getToDate(basic_settings, trial_from, TrialCycle)
-      }
+      TrialCycle,
+      from: trial_from,
+      to: getToDate(basic_settings, trial_from, TrialCycle)
     };
     prices.push(trial);
   }
@@ -56,10 +54,11 @@ function buildPlanFromState(state) {
     let from = moment().format();
     let to = moment();
 
+    console.log(acc[idx]);
     if (acc.length && acc.length > idx) {
-      from = moment(acc[idx]['duration']['to']).format();
+      from = moment(acc[idx]['to']).format();
     } else if (idx > 0) {
-      from = moment(acc[idx - 1]['duration']['to']).format();
+      from = moment(acc[idx - 1]['to']).format();
     }
     to = getToDate(basic_settings, from, price.Cycle);
 

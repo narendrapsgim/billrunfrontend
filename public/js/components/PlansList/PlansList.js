@@ -78,7 +78,7 @@ class PlansList extends Component {
 
   planTrial(plan) {
     if (plan.getIn(['price', 0, 'trial'])) {
-      return plan.getIn(['price', 0, 'duration', 'TrialCycle']) + " " + plan.getIn(['recurring', 'unit']);
+      return plan.getIn(['price', 0, 'TrialCycle']) + " " + plan.getIn(['recurrence', 'periodicity']);
     }
     return '';
   }
@@ -90,7 +90,11 @@ class PlansList extends Component {
   }
 
   planBillingFrequency(plan) {
-    return plan.getIn(['recurring', 'duration']) + " " + plan.getIn(['recurring', 'unit']);
+    return plan.getIn(['recurrence', 'unit']) + " " + plan.getIn(['recurrence', 'periodicity']);
+  }
+
+  planChargingMode(plan) {
+    return plan.get('upfront') ? "Upfront" : "Arrears";
   }
   
   render() {
@@ -124,6 +128,7 @@ class PlansList extends Component {
     const table_header = [
       (<TableHeaderColumn>Name</TableHeaderColumn>),
       (<TableHeaderColumn>Code</TableHeaderColumn>),
+      (<TableHeaderColumn>Description</TableHeaderColumn>),
       (<TableHeaderColumn>Trial</TableHeaderColumn>),
       (<TableHeaderColumn>Recurring Charges</TableHeaderColumn>),
       (<TableHeaderColumn>Billing Frequency</TableHeaderColumn>),
@@ -136,7 +141,10 @@ class PlansList extends Component {
           <Field value={plan.get('name')} coll="Plans" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
-          <Field value={plan.get('code')} coll="Plans" editable={false} />
+          <Field value={plan.get('PlanCode')} coll="Plans" editable={false} />
+        </TableRowColumn>
+        <TableRowColumn>
+          <Field value={plan.get('PlanDescription')} coll="Plans" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
           <Field value={this.planTrial(plan)} coll="Plans" editable={false} />
@@ -148,7 +156,7 @@ class PlansList extends Component {
           <Field value={this.planBillingFrequency(plan)} coll="Plans" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
-          <Field value={plan.get('charging_mode')} coll="Plans" editable={false} />
+          <Field value={this.planChargingMode(plan)} coll="Plans" editable={false} />
         </TableRowColumn>
       </TableRow>
     ));

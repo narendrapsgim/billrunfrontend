@@ -38,7 +38,7 @@ class SubscriberEdit extends Component {
       this.props.dispatch(getSubscribers(aid));
     } else {
       this.setState({newCustomer: true});
-      this.props.dispatch(getNewSubscriber());
+      this.props.dispatch(getAccount());
     }
   }
 
@@ -76,9 +76,9 @@ class SubscriberEdit extends Component {
        this.props.dispatch(getAccount(this.state.aid));
        this.props.dispatch(getSubscribers(this.state.aid));
        this.setState({newCustomer: false});
-    } else {
-      browserHistory.goBack();
-    }
+    }//  else {
+    //   browserHistory.goBack();
+    // }
   }
 
   onCancel() {
@@ -98,7 +98,7 @@ class SubscriberEdit extends Component {
   render() {
     const { account, subscribers, subscriber, settings } = this.props;
     const { newCustomer, aid } = this.state;
-    const view = this.state.newCustomer ? (<New entity={subscriber} aid={aid} settings={settings} onChange={this.onChangeFieldValue} onChangeTypeaheadField={this.onChangeTypeaheadFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onSave={this.onSave} onCancel={this.onCancel} />) : (<Edit account={account} subscribers={subscribers} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
+    const view = (<Edit account={account} subscribers={subscribers} newCustomer={newCustomer} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
 
     return (
       <div className="SubscriberEdit container">
