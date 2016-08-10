@@ -18,6 +18,7 @@ export const MAP_USAGET = 'MAP_USAGET';
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
+import { showStatusMessage } from '../actions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -229,8 +230,11 @@ export function saveInputProcessorSettings(state) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(
       resp => {
-        if (!resp.data.status)
+        if (!resp.data.status) {
           dispatch(showModal(resp.data.desc, "Error!"));
+        } else {
+          dispatch(showStatusMessage("Saved input processor sucessfully!", 'success'));
+        }
         dispatch(hideProgressBar());
       }
     ).catch(error => {
