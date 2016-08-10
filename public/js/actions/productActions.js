@@ -11,12 +11,7 @@ import moment from 'moment';
 import Immutable from 'immutable';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
-
-let axiosInstance = axios.create({
-  withCredentials: true,
-  baseURL: globalSetting.serverUrl
-});
-
+import { showStatusMessage } from '../actions';
 
 function buildRateFromState(state) {
   const product = state.toJS();
@@ -126,12 +121,6 @@ export function getProduct(product_id) {
   };
 }
 
-function savedRate() {
-  return {
-    type: 'test'
-  };
-}
-
 function saveRateToDB(rate, action) {
   let saveUrl = '/admin/save';
 
@@ -145,7 +134,7 @@ function saveRateToDB(rate, action) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(saveUrl, formData).then(
       resp => {
-        dispatch(savedRate());
+        dispatch(showStatusMessage("Saved product sucessfully!", 'success'));
         dispatch(hideProgressBar());
       }
     ).catch(error => {

@@ -13,6 +13,7 @@ import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { validate, invalidForm } from './validatorActions';
 import { showModal } from './modalActions';
+import { showStatusMessage } from '../actions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -186,12 +187,6 @@ export function clearPlan() {
   };
 }
 
-function savedPlan() {
-  return {
-    type: 'test'
-  };
-}
-
 function savePlanToDB(plan, action) {
   let saveUrl = '/admin/save';
   let type = action !== 'new' ? "close_and_new" : action;
@@ -208,7 +203,7 @@ function savePlanToDB(plan, action) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(saveUrl, formData).then(
       resp => {
-        dispatch(savedPlan());
+        dispatch(showStatusMessage("Saved plan sucessfully!", 'success'));
         dispatch(hideProgressBar());
       }
     ).catch(error => {
