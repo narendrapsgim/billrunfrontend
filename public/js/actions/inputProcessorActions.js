@@ -151,10 +151,27 @@ export function addCSVField(field) {
   };
 }
 
-export function addUsagetMapping(mapping) {
-  return {
-    type: ADD_USAGET_MAPPING,
-    mapping
+export function addUsagetMapping(usaget) {
+  let setUrl = `/api/settings?category=usage_types&action=set&data=[${JSON.stringify(usaget)}]`;
+  return (dispatch) => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.post(setUrl).then(
+      resp => {
+        if (!resp.data.status) {
+          dispatch(showModal(resp.data.desc, "Error!"));
+        } else {
+          //dispatch(showStatusMessage("Saved usaget sucessfully!", 'success'));
+          return {
+            type: ADD_USAGET_MAPPING,
+            usaget
+          };
+        }
+        dispatch(hideProgressBar());
+      }
+    ).catch(error => {
+      dispatch(showModal(error.data.message, "Error!"));
+      dispatch(hideProgressBar());
+    });
   };
 }
 

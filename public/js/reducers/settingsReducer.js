@@ -13,15 +13,7 @@ export default function (state = defaultState, action) {
 
   case ADD_USAGET_MAPPING:
     const usaget_mapping = state.get('unit_types');
-    const { pattern, usaget } = action.mapping;
-    const new_map = Immutable.fromJS({
-      //src_field,
-      //pattern: `/^${pattern}$/`,
-      pattern,
-      usaget
-    });
-    /* TODO: SET SRC_FIELD AND PATTERN REGEX WHEN SAVING AND SANITIZING!! */
-    return state.set('unit_types', usaget_mapping.push(new_map));
+    return state.update('usage_types', list => list.push(action.usaget));
 
   case GOT_SETTINGS:
     return state.set(category, Immutable.fromJS(settings));

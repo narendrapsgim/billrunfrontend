@@ -28,7 +28,7 @@ export default class Product extends Component {
             onRemoveProductProperties,
             onChangePrefix,
             onSelectUnit,
-            unitTypes } = this.props;
+            usageTypes } = this.props;
 
     /* 
        const units = _.uniq(_.flatten(processors.map(processor => {
@@ -36,11 +36,11 @@ export default class Product extends Component {
        }).toJS()));
      */
     /* const available_units =[(<option disabled value="-1" key={-1}>Select Unit</option>),
-       ...unitTypes.map((unit, key) => (
+       ...usageTypes.map((unit, key) => (
        <option value={unit.get('usaget')} key={key}>{unit.get('usaget')}</option>
        ))]; */
-    const available_units = unitTypes ? unitTypes.map((unit, key) => {
-      return {value: unit.get('usaget'), label: unit.get('usaget')};
+    const available_units = usageTypes ? usageTypes.map((usaget, key) => {
+      return {value: usaget, label: usaget};
     }).toJS() : [];
 
     return (

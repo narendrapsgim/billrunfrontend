@@ -50,7 +50,7 @@ class InputProcessor extends Component {
     const { dispatch, fileType } = this.props;
     if (fileType === true) dispatch(getProcessorSettings());
     else dispatch(getProcessorSettings(fileType));
-    dispatch(getSettings("unit_types"));
+    dispatch(getSettings("usage_types"));
   }
 
   onChangeName(e) {
@@ -167,11 +167,11 @@ class InputProcessor extends Component {
 
   render() {
     let { stepIndex } = this.state;
-    const { settings, unit_types } = this.props;
+    const { settings, usage_types } = this.props;
 
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} settings={settings} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} settings={settings} unitTypes={unit_types} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} settings={settings} usageTypes={usage_types} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
@@ -225,7 +225,7 @@ class InputProcessor extends Component {
 
 function mapStateToProps(state, props) {
   return { settings: state.inputProcessor,
-           unit_types: state.settings.get('unit_types') };
+           usage_types: state.settings.get('usage_types') };
 }
 
 export default connect(mapStateToProps)(InputProcessor);
