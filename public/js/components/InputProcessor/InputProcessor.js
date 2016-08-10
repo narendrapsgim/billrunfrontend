@@ -38,6 +38,7 @@ class InputProcessor extends Component {
     this.onAddField = this.onAddField.bind(this);
     this.handleNext = this.handleNext.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
 
     this.state = {
       stepIndex: 0,
@@ -155,7 +156,15 @@ class InputProcessor extends Component {
       this.props.onCancel();
     }
   }
-  
+
+  handleCancel() {
+    let r = confirm("are you sure you want to stop editing input processor?");
+    if (r) {
+      this.props.dispatch(clearInputProcessor());
+      this.props.onCancel();
+    }   
+  }
+
   render() {
     let { stepIndex } = this.state;
     const { settings, unit_types } = this.props;
@@ -188,14 +197,26 @@ class InputProcessor extends Component {
           { steps[stepIndex] }
         </div>
         <div style={{marginTop: 12, float: "right"}}>
+          {(() => {
+             if (stepIndex > 0) {
+               return (
+                 <FlatButton
+                     label="Back"
+                     onTouchTap={this.handlePrev}
+                     style={{marginRight: 12}} />
+               );
+             }
+           })()}                 
+                 <RaisedButton
+                     label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}
+                     primary={true}
+                     onTouchTap={this.handleNext} />
+        </div>
+        <div style={{marginTop: 12, float: "left"}}>
           <FlatButton
-              label={stepIndex === 0 ? "Cancel" : "Back"}
-              onTouchTap={this.handlePrev}
-              style={{marginRight: 12}} />
-          <RaisedButton
-              label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}
-              primary={true}
-              onTouchTap={this.handleNext} />
+              label="cancel"
+              onTouchTap={this.handleCancel}
+              style={{marginRight: 12}} />          
         </div>
       </div>
     );
