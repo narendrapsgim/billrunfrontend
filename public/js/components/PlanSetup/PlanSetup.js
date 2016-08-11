@@ -12,7 +12,6 @@ import { getInputProcessors } from '../../actions/inputProcessorActions';
 import { savePlanRates } from '../../actions/planProductsActions';
 
 import Plan from './Plan';
-// import PlanRatesList from './PlanRatesList';
 import PlanProductsTab from './PlanProductsTab';
 
 
@@ -24,11 +23,11 @@ class PlanSetup extends Component {
     this.handleSaveRtes = this.handleSaveRtes.bind(this);
 
     this.onAddTariff = this.onAddTariff.bind(this);
-    this.onChangeRecurringPriceFieldValue = this.onChangeRecurringPriceFieldValue.bind(this);    
+    this.onChangeRecurringPriceFieldValue = this.onChangeRecurringPriceFieldValue.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.onChangeDateFieldValue = this.onChangeDateFieldValue.bind(this);
     this.onRemoveRecurringPrice = this.onRemoveRecurringPrice.bind(this);
-    
+
     this.state = {
       stepIndex: 0,
       finished: 0
@@ -40,13 +39,12 @@ class PlanSetup extends Component {
     if (plan_id) {
       this.props.dispatch(getPlan(plan_id));
     }
-    this.props.dispatch(getInputProcessors());
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
   }
-  
+
   onChangeFieldValue(e) {
     const { value, id, checked, type } = e.target;
     const { dispatch } = this.props;
@@ -54,7 +52,7 @@ class PlanSetup extends Component {
                          dispatch(updatePlanField(id, checked)) :
                          dispatch(updatePlanField(id, value));
   }
-  
+
   onChangeRecurringPriceFieldValue(id, idx, e, val) {
     let value = val ? val : e.target.value;
     const { checked, type } = e.target;
@@ -63,7 +61,7 @@ class PlanSetup extends Component {
                          dispatch(updatePlanRecurringPriceField(id, idx, checked)) :
                          dispatch(updatePlanRecurringPriceField(id, idx, value));
   }
-  
+
   onAddTariff(e) {
     e.preventDefault();
     this.props.dispatch(addTariff());
@@ -72,7 +70,7 @@ class PlanSetup extends Component {
   onRemoveRecurringPrice(idx, e) {
     this.props.dispatch(removeRecurringPrice(idx));
   }
-  
+
   onChangeDateFieldValue(id, value) {
     this.props.dispatch(updatePlanField(id, value));
   }
@@ -90,34 +88,37 @@ class PlanSetup extends Component {
   handleBack() {
     browserHistory.goBack();
   }
-  
+
   render() {
     const { plan, validator } = this.props;
+    let planName = plan.get('PlanName');
     return (
       <Tabs defaultActiveKey={2} animation={false} id="SettingsTab" onSelect={this.onSelectTab}>
-          <Tab title="Billing Plan" eventKey={1}>
-      <div className="PlanSetup container">
-        <h3>Billing Plan</h3>
-        <div className="contents bordered-container">
-          <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} validator={validator} plan={plan} />
-        </div>
-        <div style={{marginTop: 12, float: "right"}}>
-          <FlatButton
-              label="Cancel"
-              onTouchTap={this.handleBack}
-              style={{marginRight: 12}}
-          />
-          <RaisedButton
-              label='Save'
-              primary={true}
-              onTouchTap={this.handleSave}
-          />
-        </div>
-      </div>
-         </Tab>
-          <Tab title="Override Product Price" eventKey={2}>
+        <Tab title="Billing Plan" eventKey={1}>
+          <div className="PlanSetup container">
+            <h3>Billing Plan</h3>
             <div className="contents bordered-container">
-              <PlanProductsTab processors={this.props.inputProcessors} planName={this.props.plan.get('PlanName')}/>
+              <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} validator={validator} plan={plan} />
+            </div>
+            <div style={{marginTop: 12, float: "right"}}>
+              <FlatButton
+                  label="Cancel"
+                  onTouchTap={this.handleBack}
+                  style={{marginRight: 12}}
+              />
+              <RaisedButton
+                  label='Save'
+                  primary={true}
+                  onTouchTap={this.handleSave}
+              />
+            </div>
+          </div>
+        </Tab>
+        <Tab title="Override Product Price" eventKey={2}>
+          <div className="product-price container">
+            <h3>Override Product Price for plan {planName}</h3>
+            <div className="contents bordered-container">
+              {planName.length ? <PlanProductsTab planName={planName}/> : null}
             </div>
             <div style={{marginTop: 12, float: "right"}}>
               <FlatButton
@@ -131,8 +132,9 @@ class PlanSetup extends Component {
                   onTouchTap={this.handleSaveRtes}
               />
             </div>
-          </Tab>
-        </Tabs>
+          </div>
+        </Tab>
+      </Tabs>
     );
   }
 }
@@ -142,6 +144,6 @@ function mapStateToProps(state, props) {
     plan: state.plan,
     validator: state.validator
   };
-}  
+}
 
 export default connect(mapStateToProps)(PlanSetup);

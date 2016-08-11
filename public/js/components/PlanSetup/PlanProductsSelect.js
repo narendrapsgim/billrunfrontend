@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Select from 'react-select';
 import moment from 'moment';
-
-
-import {showStatusMessage} from '../../actions';
-import {getProductByKey} from '../../actions/planProductsActions';
 import Field from '../Field';
 import Help from '../Help';
 import { PlanDescription } from '../../FieldDescriptions';
@@ -15,27 +10,21 @@ import { apiBillRun } from '../../Api';
 export default class PlanProductsSelect extends Component {
   constructor(props) {
     super(props);
-
-    this.onSelectNewProductChange = this.onSelectNewProductChange.bind(this);
+    this.onSelectProduct = this.onSelectProduct.bind(this);
     this.getProducts = this.getProducts.bind(this);
-    // this.optionRenderer = this.optionRenderer.bind(this);
 
-    this.state = { };
+    this.state = { val: null };
   }
 
-  onSelectNewProductChange (option) {
+  onSelectProduct (option) {
     if(option){
-      this.props.dispatch(getProductByKey(option.key));
+      this.props.onSelectProduct(option);
     }
+    this.setState({val : null});
   }
-
-  // optionRenderer(option){
-  //   return option.label;
-  // }
-
 
   getProducts (input, callback) {
-    if(input.length){
+    if(input && input.length){
       let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
       let query = {
         queries : [{
@@ -65,22 +54,21 @@ export default class PlanProductsSelect extends Component {
   }
 
   render() {
-    // optionRenderer={this.optionRenderer}
+    console.log("render PlanProductsSelect");
     return (
-      <div>
+      <div key="select-product">
         <h4>Select Products <Help contents={PlanDescription.add_product} /></h4>
-        <Select.Async
-          onChange={this.onSelectNewProductChange}
+        <Select
+          value={this.state.val}
+          cacheAsyncResults={false}
+          onChange={this.onSelectProduct}
+          asyncOptions={this.getProducts}
+          valueKey='key'
+          labelKey='key'
           placeholder='Search by product key...'
-          cache={false}
-          loadOptions={this.getProducts}
-          labelKey="key"
-          autoload={false}
-          valueKey="['_id']['$id']"
+          noResultsText='No products found, please try another key'
         />
       </div>
     );
   }
 }
-
-export default connect()(PlanProductsSelect);
