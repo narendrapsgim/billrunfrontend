@@ -73,7 +73,7 @@ export default class ProductPricePlanOverride extends Component {
             </OverlayTrigger>
              :
              <OverlayTrigger placement="bottom" overlay={this.tooltip("Restore Rate")}>
-               <FontIcon onClick={this.props.onProductInitRate.bind(null, itemKey, planName, item.get('rates').keySeq().first())} className="material-icons" style={{cursor: "pointer", color: Colors.amber300, fontSize: '32px'}}>{"restore"}</FontIcon>
+               <FontIcon onClick={this.props.onNewProductRestore.bind(null, itemKey, planName, item.get('rates').keySeq().first())} className="material-icons" style={{cursor: "pointer", color: Colors.amber300, fontSize: '32px'}}>{"restore"}</FontIcon>
              </OverlayTrigger>
             }
         </div>

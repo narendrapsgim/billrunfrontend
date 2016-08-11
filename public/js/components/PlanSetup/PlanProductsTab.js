@@ -23,6 +23,7 @@ export default class PlanProductsTab extends Component {
     this.onSelectProduct = this.onSelectProduct.bind(this);
     this.onProductRemove = this.onProductRemove.bind(this);
     this.onProductRestore = this.onProductRestore.bind(this);
+    this.onNewProductRestore = this.onNewProductRestore.bind(this);
     this.onProductUndoRemove = this.onProductUndoRemove.bind(this);
     this.onProductRemoveRate = this.onProductRemoveRate.bind(this);
     this.onProductEditRate = this.onProductEditRate.bind(this);
@@ -46,6 +47,11 @@ export default class PlanProductsTab extends Component {
     } else {
       this.props.dispatch(showStatusMessage(`Price of product ${key} already overridden for plan ${planName}`, 'warning'));
     }
+  }
+
+  onNewProductRestore(key, planName, usageType) {
+    this.onProductInitRate(key, planName, usageType)
+    this.props.dispatch(showStatusMessage(`Product ${key} prices for this plan restored to BASE state`, 'info'));
   }
 
   onProductRestore(key, ratePath){
@@ -90,6 +96,7 @@ export default class PlanProductsTab extends Component {
             onProductEditRate={this.onProductEditRate}
             onProductAddRate={this.onProductAddRate}
             onProductInitRate={this.onProductInitRate}
+            onNewProductRestore={this.onNewProductRestore}
           />
         </div>
       </form>
