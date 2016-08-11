@@ -54,7 +54,6 @@ function buildPlanFromState(state) {
     let from = moment().format();
     let to = moment();
 
-    console.log(acc[idx]);
     if (acc.length && acc.length > idx) {
       from = moment(acc[idx]['to']).format();
     } else if (idx > 0) {
@@ -187,8 +186,8 @@ export function clearPlan() {
 }
 
 function savePlanToDB(plan, action) {
-  let saveUrl = '/admin/save';
-  let type = action !== 'new' ? "close_and_new" : action;
+  const saveUrl = '/admin/save';
+  const type = action !== 'new' ? "close_and_new" : action;
 
   var formData = new FormData();
   if (action !== 'new') {
@@ -200,19 +199,24 @@ function savePlanToDB(plan, action) {
 
   return (dispatch) => {
     dispatch(showProgressBar());
-    let request = axiosInstance.post(saveUrl, formData).then(
+    const request = axiosInstance.post(saveUrl, formData).then(
       resp => {
         dispatch(showStatusMessage("Saved plan sucessfully!", 'success'));
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
+      if (error.data.message) {
+        dispatch(showModal(error.data.message, "Error!"));
+      } else {
+        console.log(error);
+        dispatch(showModal("Network error!", "Error!"));
+      }
       dispatch(hideProgressBar());
     });
   };  
 };
 
-export function savePlan(plan, action) {
+export function savePlan(plan, action, bh) {
   // const validations = validate(plan, 'plan_setup');
   // if (!validations.get('valid')) {
   //   return dispatch => {
