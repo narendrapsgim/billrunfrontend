@@ -67,7 +67,8 @@ class SubscribersList extends Component {
     const { subscriber } = this.props;
 
     const fields = [
-      {id: "name", placeholder: "Name"},
+      {id: "firstname", placeholder: "First Name"},
+      {id: "lastname", placeholder: "Last Name"},
       {id: "address", placeholder: "Address"},
       {id: "email", placeholder: "Email"},
       {id: "to", placeholder: "To", display: false, type: "datetime"}
