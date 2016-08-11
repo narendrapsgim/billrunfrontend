@@ -10,6 +10,8 @@ import moment from 'moment';
 export default class Product extends Component {
   constructor(props) {
     super(props);
+
+    this.productDate = this.productDate.bind(this);
   }
 
   productPrefixes() {
@@ -17,6 +19,10 @@ export default class Product extends Component {
     return product.getIn(['params', 'prefix']) ?
            product.getIn(['params', 'prefix']).toJS() :
            [];
+  }
+
+  productDate(d) {
+    return this.props.product.get(d) || moment().format();
   }
   
   render() {
@@ -100,11 +106,11 @@ export default class Product extends Component {
         <div className="form-group">
           <div className="col-xs-3">
             <label>Valid From</label>
-            <DateTimeField id="from" dateTime={product.get('from')} format="" onChange={onChangeDateFieldValue.bind(this, "from")} />
+            <DateTimeField id="from" dateTime={this.productDate('from')} format="" onChange={onChangeDateFieldValue.bind(this, "from")} />
           </div>
           <div className="col-xs-3">
             <label>To</label>
-            <DateTimeField id="to" dateTime={product.get('to')} format="" onChange={onChangeDateFieldValue.bind(this, "to")} />
+            <DateTimeField id="to" dateTime={this.productDate('to')} format="" onChange={onChangeDateFieldValue.bind(this, "to")} />
           </div>
         </div>
         <div className="form-group">
