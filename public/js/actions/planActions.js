@@ -77,7 +77,7 @@ function buildPlanFromState(state) {
     price: prices,
     from: moment().format(),
     to: moment().add(100, 'years').format(),
-    PlanDescription: basic_settings.PlanDescription,
+    description: basic_settings.PlanDescription,
     PlanCode: basic_settings.PlanCode,
     upfront: basic_settings.ChargingMode === "upfront",
     recurrence: {
@@ -142,7 +142,7 @@ function fetchPlan(plan_id) {
     }, []);
     return {
       id: plan._id.$id,
-      PlanDescription: plan.PlanDescription,
+      PlanDescription: plan.description,
       PlanCode: plan.PlanCode,
       PlanName: plan.name,
       to: moment(plan.to).unix() * 1000,

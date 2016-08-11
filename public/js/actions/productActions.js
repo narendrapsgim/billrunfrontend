@@ -18,7 +18,6 @@ let axiosInstance = axios.create({
   baseURL: globalSetting.serverUrl
 });
 
-
 function buildRateFromState(state) {
   const product = state.toJS();
   const { rates, params } = product;
