@@ -48,7 +48,7 @@ class Settings extends Component {
   }
 
   componentWillMount() {
-    this.props.dispatch(getSettings("business_shit"));
+    this.props.dispatch(getSettings("pricing"));
   }
   
   onChangeCollection(e) {

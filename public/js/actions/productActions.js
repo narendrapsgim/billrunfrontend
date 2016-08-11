@@ -11,12 +11,12 @@ import moment from 'moment';
 import Immutable from 'immutable';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
+import { showStatusMessage } from '../actions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
   baseURL: globalSetting.serverUrl
 });
-
 
 function buildRateFromState(state) {
   const product = state.toJS();
@@ -35,11 +35,12 @@ function buildRateFromState(state) {
       }
     }
   }
+
   return {
     key: product.key,
     id: product.id,
-    from: moment(product.from).format(),
-    to: moment(product.to).format(),
+    from: product.from,
+    to: product.to,
     unit_price: product.unit_price,
     description: product.description,
     params: params,
@@ -93,6 +94,8 @@ function fetchProduct(product_id) {
       unit_price: product.unit_price,
       description: product.description,
       params: product.params,
+      from: moment(parseInt(product.from.sec, 10) * 1000).format(),
+      to: moment(parseInt(product.to.sec, 10) * 1000).format(),
       rates: product.rates[unit].BASE.rate.map(rate => {
         return {
           price: parseInt(rate.price, 10),
@@ -126,12 +129,6 @@ export function getProduct(product_id) {
   };
 }
 
-function savedRate() {
-  return {
-    type: 'test'
-  };
-}
-
 function saveRateToDB(rate, action) {
   let saveUrl = '/admin/save';
 
@@ -145,7 +142,7 @@ function saveRateToDB(rate, action) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(saveUrl, formData).then(
       resp => {
-        dispatch(savedRate());
+        dispatch(showStatusMessage("Saved product sucessfully!", 'success'));
         dispatch(hideProgressBar());
       }
     ).catch(error => {

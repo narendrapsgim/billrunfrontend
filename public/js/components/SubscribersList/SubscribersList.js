@@ -6,6 +6,7 @@ import Filter from '../Filter';
 import Field from '../Field';
 import RaisedButton from 'material-ui/RaisedButton';
 import Pager from '../Pager';
+import moment from 'moment';
 
 import { getCustomers } from '../../actions/customerActions';
 
@@ -66,9 +67,11 @@ class SubscribersList extends Component {
     const { subscriber } = this.props;
 
     const fields = [
-      {id: "name", placeholder: "Name"},
+      {id: "firstname", placeholder: "First Name"},
+      {id: "lastname", placeholder: "Last Name"},
       {id: "address", placeholder: "Address"},
-      {id: "email", placeholder: "Email"}
+      {id: "email", placeholder: "Email"},
+      {id: "to", placeholder: "To", display: false, type: "datetime"}
     ];
 
     const table_header = fields.map((field, idx) => (
@@ -89,7 +92,7 @@ class SubscribersList extends Component {
       <div className="SubscribersList">
         <div className="row" style={{marginBottom: 10}}>
           <div className="col-xs-5">
-            <Filter fields={fields} onFilter={this.onFilter} base={{type: "account"}} />
+            <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
           </div>
           <div className="col-xs-5">
             <div style={{float: "right"}}>

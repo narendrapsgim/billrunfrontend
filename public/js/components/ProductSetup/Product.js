@@ -5,10 +5,13 @@ import Field from '../Field';
 import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
 import Chips from '../Chips';
 import Select from 'react-select';
+import moment from 'moment';
 
 export default class Product extends Component {
   constructor(props) {
     super(props);
+
+    this.productDate = this.productDate.bind(this);
   }
 
   productPrefixes() {
@@ -17,27 +20,33 @@ export default class Product extends Component {
            product.getIn(['params', 'prefix']).toJS() :
            [];
   }
+
+  productDate(d) {
+    return this.props.product.get(d) || moment().format();
+  }
   
   render() {
     const { product,
             onChangeItemFieldValue,
+            onChangeDateFieldValue,
             onAddProductProperties,
             onChangeItemSelectFieldValue,
             onRemoveProductProperties,
             onChangePrefix,
             onSelectUnit,
-            unitTypes } = this.props;
+            usageTypes } = this.props;
+
     /* 
        const units = _.uniq(_.flatten(processors.map(processor => {
        return processor.get('rate_calculators').keySeq().map(unit => { return unit; });
        }).toJS()));
      */
     /* const available_units =[(<option disabled value="-1" key={-1}>Select Unit</option>),
-       ...unitTypes.map((unit, key) => (
+       ...usageTypes.map((unit, key) => (
        <option value={unit.get('usaget')} key={key}>{unit.get('usaget')}</option>
        ))]; */
-    const available_units = unitTypes ? unitTypes.map((unit, key) => {
-      return {value: unit.get('usaget'), label: unit.get('usaget')};
+    const available_units = usageTypes ? usageTypes.map((usaget, key) => {
+      return {value: usaget, label: usaget};
     }).toJS() : [];
 
     return (
@@ -97,11 +106,11 @@ export default class Product extends Component {
         <div className="form-group">
           <div className="col-xs-3">
             <label>Valid From</label>
-            <DateTimeField id="from" value={product.get('from')}  onChange={onChangeItemFieldValue.bind(this, "from")} />
+            <DateTimeField id="from" dateTime={this.productDate('from')} format="" onChange={onChangeDateFieldValue.bind(this, "from")} />
           </div>
           <div className="col-xs-3">
             <label>To</label>
-            <DateTimeField id="to"   value={product.get('to')}    onChange={onChangeItemFieldValue.bind(this, "to")} />
+            <DateTimeField id="to" dateTime={this.productDate('to')} format="" onChange={onChangeDateFieldValue.bind(this, "to")} />
           </div>
         </div>
         <div className="form-group">

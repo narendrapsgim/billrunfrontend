@@ -27,6 +27,7 @@ export default class Edit extends Component {
             onChange,
             onClickNewSubscription,
             onSave,
+            newCustomer,
             onCancel } = this.props;
     if (!settings) return (null);
 
@@ -87,26 +88,31 @@ export default class Edit extends Component {
 
     const fieldsHTML = settings.getIn(['account', 'fields']).map((field, key) => {
       if (field.get('display') === false) return (null);
+      let val = account.get(field.get('field_name')) || '';
       return (
-        <div className="col-xs-3" key={key}>
-          <label>{_.capitalize(field.get('field_name'))}</label>
-          <Field id={field.get('field_name')}
-                 value={account.get(field.get('field_name'))}
-                 editable={field.get('editable')}
-                 onChange={onChange} />
+        <div className="form-group">
+          <div className="col-xs-3" key={key}>
+            <label>{_.capitalize(field.get('field_name'))}</label>
+            <Field id={field.get('field_name')}
+                   value={val}
+                   editable={field.get('editable')}
+                   onChange={onChange} />
+          </div>
         </div>
       );
     });
     
     let fields = (
-      <div className="form-group">
+      <div>
         { fieldsHTML }
-        <div className="col-xs-1">
-          <label>&zwnj;</label>
-          <div>
-            <Link to={`/usage?base=${JSON.stringify({aid: account.get('aid')})}`}>
-              <button className="btn">See usage</button>
-            </Link>
+        <div className="form-group">
+          <div className="col-xs-1">
+            <label>&zwnj;</label>
+            <div>
+              <Link to={`/usage?base=${JSON.stringify({aid: account.get('aid')})}`}>
+                <button className="btn">See usage</button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -134,9 +140,15 @@ export default class Edit extends Component {
             </div>
           </form>
         </Tab>
-        <Tab title="Subscriptions" eventKey={2}>
-          { subscribersView }
-        </Tab>
+        {(() => {
+           if (!newCustomer) {
+             return (
+               <Tab title="Subscriptions" eventKey={2}>
+                 { subscribersView }
+               </Tab>
+             );
+           }
+         })()}
       </Tabs>
     );    
   }

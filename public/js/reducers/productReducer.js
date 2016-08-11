@@ -13,8 +13,8 @@ const defaultState = Immutable.fromJS({
   key: '',
   description: '',
   unit_price: '',
-  from: moment().unix() * 1000,
-  to: moment().add(1, 'years').unix() * 1000,
+  from: moment().toISOString(),
+  to: moment().add(1, 'years').toISOString(),
   rates: []
 });
 

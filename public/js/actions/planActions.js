@@ -13,6 +13,7 @@ import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { validate, invalidForm } from './validatorActions';
 import { showModal } from './modalActions';
+import { showStatusMessage } from '../actions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -40,11 +41,9 @@ function buildPlanFromState(state) {
       trial: true,
       price: parseInt(TrialPrice, 10),
       Cycle: TrialCycle,
-      duration: {
-        TrialCycle,
-        from: trial_from,
-        to: getToDate(basic_settings, trial_from, TrialCycle)
-      }
+      TrialCycle,
+      from: trial_from,
+      to: getToDate(basic_settings, trial_from, TrialCycle)
     };
     prices.push(trial);
   }
@@ -56,9 +55,9 @@ function buildPlanFromState(state) {
     let to = moment();
 
     if (acc.length && acc.length > idx) {
-      from = moment(acc[idx]['duration']['to']).format();
+      from = moment(acc[idx]['to']).format();
     } else if (idx > 0) {
-      from = moment(acc[idx - 1]['duration']['to']).format();
+      from = moment(acc[idx - 1]['to']).format();
     }
     to = getToDate(basic_settings, from, price.Cycle);
 
@@ -77,7 +76,7 @@ function buildPlanFromState(state) {
     price: prices,
     from: moment().format(),
     to: moment().add(100, 'years').format(),
-    PlanDescription: basic_settings.PlanDescription,
+    description: basic_settings.PlanDescription,
     PlanCode: basic_settings.PlanCode,
     upfront: basic_settings.ChargingMode === "upfront",
     recurrence: {
@@ -142,7 +141,7 @@ function fetchPlan(plan_id) {
     }, []);
     return {
       id: plan._id.$id,
-      PlanDescription: plan.PlanDescription,
+      PlanDescription: plan.description,
       PlanCode: plan.PlanCode,
       PlanName: plan.name,
       to: moment(plan.to).unix() * 1000,
@@ -186,15 +185,9 @@ export function clearPlan() {
   };
 }
 
-function savedPlan() {
-  return {
-    type: 'test'
-  };
-}
-
 function savePlanToDB(plan, action) {
-  let saveUrl = '/admin/save';
-  let type = action !== 'new' ? "close_and_new" : action;
+  const saveUrl = '/admin/save';
+  const type = action !== 'new' ? "close_and_new" : action;
 
   var formData = new FormData();
   if (action !== 'new') {
@@ -206,19 +199,24 @@ function savePlanToDB(plan, action) {
 
   return (dispatch) => {
     dispatch(showProgressBar());
-    let request = axiosInstance.post(saveUrl, formData).then(
+    const request = axiosInstance.post(saveUrl, formData).then(
       resp => {
-        dispatch(savedPlan());
+        dispatch(showStatusMessage("Saved plan sucessfully!", 'success'));
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
+      if (error.data.message) {
+        dispatch(showModal(error.data.message, "Error!"));
+      } else {
+        console.log(error);
+        dispatch(showModal("Network error!", "Error!"));
+      }
       dispatch(hideProgressBar());
     });
   };  
 };
 
-export function savePlan(plan, action) {
+export function savePlan(plan, action, bh) {
   // const validations = validate(plan, 'plan_setup');
   // if (!validations.get('valid')) {
   //   return dispatch => {

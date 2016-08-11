@@ -9,17 +9,12 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
+import { showStatusMessage } from '../actions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
   baseURL: globalSetting.serverUrl
 });
-
-function savedCustomer() {
-  return {
-    type: 'test'
-  };
-}
 
 export function saveSubscriber(action, data) {
   let saveUrl;
@@ -34,18 +29,14 @@ export function saveSubscriber(action, data) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(saveUrl).then(
       resp => {
-        dispatch(savedCustomer());
+        dispatch(showStatusMessage("Saved customer sucessfully!", 'success'));
         dispatch(hideProgressBar());
       }
     ).catch(error => {
       dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
-  };    
-  /* return {
-     type: SAVE_SUBSCRIBER,
-     newCustomer
-     }; */
+  };
 }
 
 

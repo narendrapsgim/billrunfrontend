@@ -27,17 +27,14 @@ export default class FieldsMapping extends Component {
   }
 
   onChangeUsaget(val) {
-    const { unitTypes } = this.props;
-    const found = unitTypes.find(obj => {
-      return obj.get('usaget') === val;
+    const { usageTypes } = this.props;
+    const found = usageTypes.find(usaget => {
+      return usaget === val;
     });
     if (!found) {
-      this.props.addUsagetMapping({
-        usaget: val,
-        pattern: `/${val}/`
-      });
+      this.props.addUsagetMapping(val);
     }
-    this.setState({usaget: val});
+    this.setState({usaget: val, pattern: `/${val}/`});
   }
 
   addUsagetMapping(e) {
@@ -48,14 +45,14 @@ export default class FieldsMapping extends Component {
 
   render() {
     const { settings,
-            unitTypes,
+            usageTypes,
             onSetFieldMapping } = this.props;
     const available_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
                               ...settings.get('fields').map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
                               ))];
-    const available_units = unitTypes.map((unit, key) => {
-      return {value: unit.get('usaget'), label: unit.get('usaget')};
+    const available_units = usageTypes.map((usaget, key) => {
+      return {value: usaget, label: usaget};
     }).toJS();
 
     return (
