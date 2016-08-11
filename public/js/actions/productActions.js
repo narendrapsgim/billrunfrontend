@@ -41,6 +41,7 @@ function buildRateFromState(state) {
     id: product.id,
     from: product.from,
     to: product.to,
+    code: product.code,
     unit_price: product.unit_price,
     description: product.description,
     params: params,
@@ -94,6 +95,7 @@ function fetchProduct(product_id) {
       unit_price: product.unit_price,
       description: product.description,
       params: product.params,
+      code: product.code,
       from: moment(parseInt(product.from.sec, 10) * 1000).format(),
       to: moment(parseInt(product.to.sec, 10) * 1000).format(),
       rates: product.rates[unit].BASE.rate.map(rate => {
