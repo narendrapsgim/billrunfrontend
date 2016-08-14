@@ -37,6 +37,8 @@ export default class App extends Component {
     const ModalInstance = React.createClass({
       render() {
         const { onClose } = this.props;
+        let { message } = this.props;
+        message = (!Array.isArray(message)) ? message : this.props.message.map( (item, i) => <p key={i}>{item}</p>);
         return (
           <div className="static-modal">
             <Modal show={this.props.show}>
@@ -45,7 +47,7 @@ export default class App extends Component {
               </Modal.Header>
 
               <Modal.Body>
-                {this.props.message}
+                { message }
               </Modal.Body>
 
               <Modal.Footer>
