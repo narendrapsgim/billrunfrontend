@@ -65,7 +65,7 @@ export default class SampleCSV extends Component {
             <label htmlFor="delimiter">Delimiter</label>
           </div>
           <div className="col-xs-6">
-            <div className="col-xs-2" style={{paddingLeft: 0}}>
+            <div className="col-xs-3" style={{paddingLeft: 0}}>
               <div className="input-group">
                 <div className="input-group-addon">
                   <input type="radio" name="delimiter-type" value="separator" onChange={onSetDelimiterType} />By delimiter
@@ -80,7 +80,7 @@ export default class SampleCSV extends Component {
                        value={settings.get('delimiter')} />
               </div>
             </div>
-            <div className="col-xs-2" style={{marginTop: 10}}>
+            <div className="col-xs-3" style={{marginTop: 10}}>
               <input type="radio" name="delimiter-type" value="fixed" onChange={onSetDelimiterType} />Fixed width
               <p className="help-block">&nbsp;</p>
             </div>
