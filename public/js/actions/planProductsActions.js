@@ -131,7 +131,7 @@ function getExistPlanProductsByUsageTypes(planName, usageTypes = [], reset = fal
       '$or':  usageTypes.map((type, i) => {
 								return { [`rates.${type}.${planName}`] : { "$exists" : true } }
 							}),
-      'to':   {"$gte" : toadyApiString},
+      'to': {"$gte" : toadyApiString},
       'from': {"$lte" : toadyApiString}
     };
 
@@ -245,21 +245,21 @@ export function savePlanRates() {
 
       apiBillRun(saveRequest).then(
         response => {
-          var errorMessage = [];
-          var successMessage = [];
+          var errorMessages = [];
+          var successMessages = [];
           if(response.data){
             response.data.forEach( (res) => {
               if(res.hasOwnProperty("error")){
-                errorMessage.push(res.name + ": " + res.error.message);
+                errorMessages.push(`${res.name}: ${res.error.message}`);
               } else {
-                successMessage.push(res.data.key);
+                successMessages.push(res.data.key);
               }
             });
 
             if(errorMessage.length){
-              dispatch(showModal(errorMessage, "Error!"));
+              dispatch(showModal(errorMessages, "Error!"));
             } else {
-              dispatch(showStatusMessage(successMessage.join(', ') + " successfully updated", 'success'));
+              dispatch(showStatusMessage(successMessages.join(', ') + " successfully updated", 'success'));
               dispatch(getExistPlanProducts(planName, true));
             }
 
