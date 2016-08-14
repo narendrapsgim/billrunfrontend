@@ -8,16 +8,19 @@ export const PLAN_PRODUCTS_RATE_INIT = 'PLAN_PRODUCTS_RATE_INIT';
 export const PLAN_PRODUCTS_RATE_UPDATE = 'PLAN_PRODUCTS_RATE_UPDATE';
 export const PLAN_PRODUCTS_RATE_REMOVE = 'PLAN_PRODUCTS_RATE_REMOVE';
 
+import moment from 'moment';
+import { showModal } from './modalActions';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showStatusMessage } from '../actions';
 import { apiBillRun, apiBillRunErrorHandler} from '../Api';
 
 
-function gotPlanProducts(products, planName) {
+function gotPlanProducts(products, planName, reset = false) {
   return {
     type: PLAN_PRODUCTS_SET,
     products,
-    planName
+    planName,
+    reset
   };
 }
 
@@ -86,13 +89,13 @@ export function planProductsClear(){
   }
 }
 
-export function getExistPlanProducts(planName) {
+export function getExistPlanProducts(planName, reset = false) {
   return dispatch => {
 
     return getUsageTypes().then(
       response => {
         if(response.data && response.data[0] && response.data[0].data){
-          return dispatch(getExistPlanProductsByUsageTypes(planName, response.data[0].data));
+          return dispatch(getExistPlanProductsByUsageTypes(planName, response.data[0].data, reset));
         }
         return dispatch(apiBillRunErrorHandler(response));
       },
@@ -115,7 +118,7 @@ function getUsageTypes(){
     return apiBillRun(query);
 }
 
-function getExistPlanProductsByUsageTypes(planName, usageTypes = []) {
+function getExistPlanProductsByUsageTypes(planName, usageTypes = [], reset = false) {
   return dispatch => {
     if(!usageTypes.length){
       return dispatch(showStatusMessage('Usage types not found', 'warning'));
@@ -123,10 +126,13 @@ function getExistPlanProductsByUsageTypes(planName, usageTypes = []) {
     if(!planName){
       return dispatch(showStatusMessage('No plan name', 'warning'));
     }
+    let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
     let queryString = {
-      '$or' : usageTypes.map((type, i) => {
-        return { [`rates.${type}.${planName}`] : { "$exists" : true } }
-      })
+      '$or':  usageTypes.map((type, i) => {
+								return { [`rates.${type}.${planName}`] : { "$exists" : true } }
+							}),
+      'to':   {"$gte" : toadyApiString},
+      'from': {"$lte" : toadyApiString}
     };
 
     let query = {
@@ -157,7 +163,7 @@ function getExistPlanProductsByUsageTypes(planName, usageTypes = []) {
                 poducts.push(prod);
             });
           });
-          return dispatch(gotPlanProducts(poducts, planName));
+          return dispatch(gotPlanProducts(poducts, planName, reset));
         } else {
           return dispatch(apiBillRunErrorHandler(response))
         }
@@ -172,6 +178,7 @@ function getExistPlanProductsByUsageTypes(planName, usageTypes = []) {
 export function getProductByKey(key, planName) {
   if(key && key.length){
     return dispatch => {
+      let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
       let query = {
         queries : [{
           request: {
@@ -180,7 +187,11 @@ export function getProductByKey(key, planName) {
               { collection: "rates" },
               { size: "20" },
               { page: "0" },
-              { query: JSON.stringify({"key": key}) },
+              { query: JSON.stringify({
+                  "key": key,
+                  "to": {"$gte" : toadyApiString},
+                  "from": {"$lte" : toadyApiString},
+              }) },
             ]
           }
         }]
@@ -210,33 +221,53 @@ export function getProductByKey(key, planName) {
 export function savePlanRates() {
     return (dispatch, getState) => {
       const { planProducts, plan } =  getState();
+      var planName = plan.get('PlanName');
+      let saveRequest = { queries:[]};
       planProducts.forEach( prod => {
+        var formData = new FormData();
+        formData.append('id', prod.getIn(['_id', '$id']));
+        formData.append('coll', 'rates');
+        formData.append('type', 'update');
+        formData.append('data', JSON.stringify(prod.delete('uiflags')));
 
-
-        if(prod.getIn(['uiflags','removed'])){
-          console.log(`Delete product price of ${plan.get('PlanName')} :`, prod.toJS());
-        } else {
-          console.log(`Save product price of ${plan.get('PlanName')} :`, prod.toJS());
-        }
+        var q = {
+          request: {
+            api: "save",
+            name: prod.get('key'),
+            options: {
+              method: "POST",
+              body: formData
+            }
+          }
+        };
+        saveRequest.queries.push(q)
       });
-      // if(!planProducts.some( (item) => item.get('key') === key)){
-      //   let query = {
-      //     queries : [{
-      //       request: {
-      //         api: "find",
-      //         params: [
-      //           { collection: "rates" },
-      //           { size: "20" },
-      //           { page: "0" },
-      //           { query: JSON.stringify({"key": key}) },
-      //         ]
-      //       }
-      //     }]
-      //   };
-      //   return dispatch(getPlanProductsByQuery(undefined, query));
-      // } else {
-        return dispatch(showStatusMessage(`Updated`, 'warning'));
-      // }
 
+      apiBillRun(saveRequest).then(
+        response => {
+          var errorMessage = [];
+          var successMessage = [];
+          if(response.data){
+            response.data.forEach( (res) => {
+              if(res.hasOwnProperty("error")){
+                errorMessage.push(res.name + ": " + res.error.message);
+              } else {
+                successMessage.push(res.data.key);
+              }
+            });
+
+            if(errorMessage.length){
+              dispatch(showModal(errorMessage, "Error!"));
+            } else {
+              dispatch(showStatusMessage(successMessage.join(', ') + " successfully updated", 'success'));
+              dispatch(getExistPlanProducts(planName, true));
+            }
+
+          } else { dispatch(apiBillRunErrorHandler(response)); }
+        },
+        error => { dispatch(apiBillRunErrorHandler(error)); }
+      ).catch(
+        error => { dispatch(apiBillRunErrorHandler(error)); }
+      );
     };
 }

@@ -85,8 +85,8 @@ export default class ProductPricePlanOverride extends Component {
                   <p>{item.get('description')}</p>
                 </div>
                 <div style={{flex: '2 0 0', textAlign: 'right', pading: '0 3px'}}>
-                  <p><strong>From: </strong>{moment(item.get('from').get('sec') * 1000).format(globalSetting.dateFormat)}</p>
-                  <p><strong>To: </strong>{moment(item.get('to').get('sec') * 1000).format(globalSetting.dateFormat)}</p>
+                  <p><strong>From: </strong>{moment(item.get('from')).format(globalSetting.dateFormat)}</p>
+                  <p><strong>To: </strong>{moment(item.get('to')).format(globalSetting.dateFormat)}</p>
                 </div>
               </div>
               { (!isRemoved && item.getIn(ratePath)) ? item.getIn(ratePath).map((rate, key) => (

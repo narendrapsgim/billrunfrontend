@@ -54,7 +54,6 @@ export default class PlanProductsSelect extends Component {
   }
 
   render() {
-    console.log("render PlanProductsSelect");
     return (
       <div key="select-product">
         <h4>Select Products <Help contents={PlanDescription.add_product} /></h4>

@@ -29,10 +29,11 @@ export default class PlanProductsTab extends Component {
     this.onProductEditRate = this.onProductEditRate.bind(this);
     this.onProductAddRate = this.onProductAddRate.bind(this);
     this.onProductInitRate = this.onProductInitRate.bind(this);
+    this.state = {planName: props.planName};
   }
 
   componentWillMount() {
-    const { planName } = this.props
+    const { planName } = this.state;
     this.props.dispatch(getExistPlanProducts(planName));
   }
 
@@ -41,7 +42,8 @@ export default class PlanProductsTab extends Component {
   }
 
   onSelectProduct (key) {
-    const { planName, planProducts } = this.props
+    const { planProducts } = this.props;
+    const { planName } = this.state;
     if(!planProducts.some( (item) => item.get('key') === key)){
       this.props.dispatch(getProductByKey(key, planName));
     } else {
@@ -80,8 +82,13 @@ export default class PlanProductsTab extends Component {
   }
 
   render() {
-    const { planName, planProducts } = this.props
-    console.log("render PlanProductsTab");
+    const { planProducts } = this.props;
+    const { planName } = this.state;
+
+    if(typeof planName === 'undefined' || planName === null || planName.length === 0){
+      return null;
+    }
+
     return (
       <form className="form-horizontal basic-products-settings">
         <div className="add-products">

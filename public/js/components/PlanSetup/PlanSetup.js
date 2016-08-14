@@ -91,9 +91,11 @@ class PlanSetup extends Component {
 
   render() {
     const { plan, validator } = this.props;
-    let planName = plan.get('PlanName');
+    const { action } = this.props.location.query;
+    const planName = plan.get('PlanName');
+
     return (
-      <Tabs defaultActiveKey={2} animation={false} id="SettingsTab" onSelect={this.onSelectTab}>
+      <Tabs defaultActiveKey={1} animation={false} id="SettingsTab" onSelect={this.onSelectTab}>
         <Tab title="Billing Plan" eventKey={1}>
           <div className="PlanSetup container">
             <h3>Billing Plan</h3>
@@ -114,26 +116,28 @@ class PlanSetup extends Component {
             </div>
           </div>
         </Tab>
-        <Tab title="Override Product Price" eventKey={2}>
-          <div className="product-price container">
-            <h3>Override Product Price for plan {planName}</h3>
-            <div className="contents bordered-container">
-              {planName.length ? <PlanProductsTab planName={planName}/> : null}
+        {(action === 'update') ?
+          <Tab title="Override Product Price" eventKey={2}>
+            <div className="product-price container">
+              <h3>Override Product Price for plan {planName}</h3>
+              <div className="contents bordered-container">
+                {planName.length ? <PlanProductsTab planName={planName}/> : null}
+              </div>
+              <div style={{marginTop: 12, float: "right"}}>
+                <FlatButton
+                    label="Cancel"
+                    onTouchTap={this.handleBack}
+                    style={{marginRight: 12}}
+                />
+                <RaisedButton
+                    label='Save'
+                    primary={true}
+                    onTouchTap={this.handleSaveRtes}
+                />
+              </div>
             </div>
-            <div style={{marginTop: 12, float: "right"}}>
-              <FlatButton
-                  label="Cancel"
-                  onTouchTap={this.handleBack}
-                  style={{marginRight: 12}}
-              />
-              <RaisedButton
-                  label='Save'
-                  primary={true}
-                  onTouchTap={this.handleSaveRtes}
-              />
-            </div>
-          </div>
-        </Tab>
+          </Tab>
+        : null }
       </Tabs>
     );
   }

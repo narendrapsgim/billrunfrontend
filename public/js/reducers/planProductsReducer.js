@@ -22,10 +22,13 @@ var DefaultRate = Immutable.Record({
 export default function (state = Immutable.List(), action) {
   switch(action.type) {
     case PLAN_PRODUCTS_SET:
+      if(action.reset === true){
+        state = Immutable.List();
+      }
       state = state.withMutations( mutableStateList => {
-          action.products.forEach(prod => {
-             mutableStateList.push(Immutable.fromJS(prod));
-          });
+        action.products.forEach(prod => {
+          mutableStateList.push(Immutable.fromJS(prod));
+        });
       });
       return state;
 
