@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, mapUsaget } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
+import { showStatusMessage } from '../../actions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -33,12 +34,13 @@ class InputProcessor extends Component {
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
     this.addUsagetMapping = this.addUsagetMapping.bind(this);
     this.onSetFieldWidth = this.onSetFieldWidth.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
     this.onAddField = this.onAddField.bind(this);
     this.handleNext = this.handleNext.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
+    this.onError = this.onError.bind(this);
 
     this.state = {
       stepIndex: 0,
@@ -74,7 +76,7 @@ class InputProcessor extends Component {
         /* Only need first line */
         let lines = evt.target.result.split('\n');
         let header = lines[0];
-        let fields = header.split(this.props.settings.get('delimiter'));
+        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/ /g, "_").toLowerCase(); });
         this.props.dispatch(setFields(fields));
       }
     });
@@ -128,6 +130,10 @@ class InputProcessor extends Component {
   addUsagetMapping(val) {
     this.props.dispatch(addUsagetMapping(val));
   }
+
+  onError(message) {
+    this.props.dispatch(showStatusMessage(message, 'error'));
+  }
   
   save() {
     this.props.dispatch(saveInputProcessorSettings(this.props.settings));
@@ -171,7 +177,7 @@ class InputProcessor extends Component {
 
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} settings={settings} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} settings={settings} usageTypes={usage_types} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onError={this.onError} settings={settings} usageTypes={usage_types} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
