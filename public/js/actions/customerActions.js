@@ -29,11 +29,19 @@ export function saveSubscriber(action, data) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(saveUrl).then(
       resp => {
-        dispatch(showStatusMessage("Saved customer sucessfully!", 'success'));
+        if (!resp.data.status) {
+          dispatch(showModal(resp.data.details, "Error!"));
+        } else {
+          dispatch(showStatusMessage("Saved customer sucessfully!", 'success'));
+        }
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
+      if (error.data) {
+        dispatch(showModal(error.data.message, "Error!"));
+      } else {
+        console.log(error);
+      }
       dispatch(hideProgressBar());
     });
   };
