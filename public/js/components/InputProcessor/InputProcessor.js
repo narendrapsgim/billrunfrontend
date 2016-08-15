@@ -41,10 +41,16 @@ class InputProcessor extends Component {
     this.handleNext = this.handleNext.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
     this.onError = this.onError.bind(this);
-
+    
     this.state = {
       stepIndex: 0,
-      finished: 0
+      finished: 0,
+      steps: [
+        "sample_csv",
+        "processor",
+        "customer_identification_fields",
+        "receiver"
+      ]
     };
   }
 
@@ -145,8 +151,10 @@ class InputProcessor extends Component {
       this.save();
       return;
     }
-    const totalSteps = 3; // TODO: don't hardcode
-    let finished = (stepIndex + 1) === totalSteps;
+    /* if (stepIndex > 0)
+       this.props.dispatch(saveInputProcessorSettings(this.props.settings, this.state.steps[stepIndex])); */
+    const totalSteps = this.state.steps.length - 1;
+    const finished = (stepIndex + 1) === totalSteps;
     this.setState({
       stepIndex: stepIndex + 1,
       finished
