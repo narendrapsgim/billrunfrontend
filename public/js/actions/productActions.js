@@ -96,8 +96,8 @@ function fetchProduct(product_id) {
       description: product.description,
       params: product.params,
       code: product.code,
-      from: moment(parseInt(product.from.sec, 10) * 1000).format(),
-      to: moment(parseInt(product.to.sec, 10) * 1000).format(),
+      from: product.from,
+      to: product.to,
       rates: product.rates[unit].BASE.rate.map(rate => {
         return {
           price: parseInt(rate.price, 10),
