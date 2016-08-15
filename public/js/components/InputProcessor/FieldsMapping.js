@@ -28,13 +28,14 @@ export default class FieldsMapping extends Component {
 
   onChangeUsaget(val) {
     const { usageTypes } = this.props;
+    console.log(val);
     const found = usageTypes.find(usaget => {
       return usaget === val;
     });
     if (!found) {
       this.props.addUsagetMapping(val);
     }
-    this.setState({usaget: val, pattern: `/${val}/`});
+    this.setState({usaget: val, pattern: val});
   }
 
   addUsagetMapping(e) {

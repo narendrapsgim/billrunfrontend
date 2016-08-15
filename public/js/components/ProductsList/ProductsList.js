@@ -103,10 +103,10 @@ class ProductsList extends Component {
           <Field value={this.getProductUnitType(row)} coll="Product" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
-          <Field value={moment(parseInt(row.getIn(["from", "sec"]), 10) * 1000).format('L')} coll="Product" editable={false} />
+          <Field value={row.get("from")} coll="Product" editable={false} />
         </TableRowColumn>
         <TableRowColumn>
-          <Field value={moment(parseInt(row.getIn(["to", "sec"]), 10) * 1000).format('L')} coll="Product" editable={false} />
+          <Field value={row.get("to")} coll="Product" editable={false} />
         </TableRowColumn>
       </TableRow>
     ));
