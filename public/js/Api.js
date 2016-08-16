@@ -36,16 +36,18 @@ export function apiBillRun(requests, requiredAllSuccess = true) {
         //all requests was success
         let allSuccess = success.every( responce => responce.status);
         if(allSuccess){
-         return resolve( Object.assign({}, {data: success}) );
+          let data = success.map(responce => {delete responce['status']; return responce; });
+          return resolve( Object.assign({}, { data }) );
         }
         //all requests was faild
         let allFaild = success.every( responce => !responce.status);
         if(allSuccess){
-         return reject( Object.assign({}, {error: success}) );
+          let error = success.map(responce => {delete responce['status']; return responce; });
+          return reject( Object.assign({}, {error}) );
         }
         //mixed, some faild, some success
-        let data = success.filter( responce => responce.status);
-        let error = success.filter( responce => !responce.status);
+        let data = success.filter( responce => responce.status === 1).map(responce => {delete responce['status']; return responce; });
+        let error = success.filter( responce => responce.status === 0).map(responce => {delete responce['status']; return responce; });
         let mix = Object.assign({}, {error}, {data});
         return requiredAllSuccess ? reject( mix ) : resolve( mix );
       },
