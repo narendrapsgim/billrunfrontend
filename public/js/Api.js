@@ -47,7 +47,11 @@ export function sendHttpRequest(query) {
   //Create Api URL
   let api = (query.request.api == "save") ? "/admin/" : "/api/";
   let url = globalSetting.serverUrl + api + query.request.api + buildQueryString(query.request.params);
-  let requestOptions = buildQueryOptions(query.request.options);
+  let requestOptions = (query.request.options && query.request.options.form) ?
+      { method: 'post',
+        credentials: 'include',
+        body: query.request.formData } :
+      buildQueryOptions(query.request.options);
   let response = (query.request.name) ? { name: query.request.name , data: {} } : { data: {} };
   let promise = new Promise((resolve, reject) => {
     fetch(url, requestOptions).then(

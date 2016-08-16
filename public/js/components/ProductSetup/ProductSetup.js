@@ -80,8 +80,11 @@ class ProductSetup extends Component {
   
   onSave() {
     const { action } = this.props.location.query;
-    this.props.dispatch(saveProduct(this.props.product, action));
-//    browserHistory.goBack();
+    const cb = (resp, err) => {
+      console.log(err);
+      if (!err) browserHistory.goBack();
+    };
+    this.props.dispatch(saveProduct(this.props.product, action, cb));
   }
 
   onCancel() {

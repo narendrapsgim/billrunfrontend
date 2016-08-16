@@ -19,27 +19,27 @@ export default class SubscriptionsList extends Component {
             account,
             onClickEditSubscription } = this.props;
 
+    const displayFields = settings.getIn(['subscriber', 'fields'])
+                                  .filter(field => { return field.get('field') !== false; });
+
     const subscriptionsHTML = subscribers.map((sub, key) => {
       return (
         <TableRow key={key}>
-          {settings.getIn(['subscriber', 'fields']).map((field, k) => {
-             if (field.get('display') === false) return (null);
-             return (
-               <TableRowColumn key={k}>
-                 {sub.get(field.get('field_name'))}
-               </TableRowColumn>
-             );
-           })}
-               <TableRowColumn>
-                 <Link to={`/usage?base=${JSON.stringify({sid: sub.get('sid')})}`}>
-                   Usage
-                 </Link>
-                 &nbsp;
-                 <button className="btn btn-link"
-                         onClick={onClickEditSubscription.bind(this, sub.get('sid'))}>
-                   Edit
-                 </button>
-               </TableRowColumn>
+          {displayFields.map((field, k) => (
+                     <TableRowColumn key={k}>
+                       {sub.get(field.get('field_name'))}
+                     </TableRowColumn>
+                   ))}
+                     <TableRowColumn>
+                       <Link to={`/usage?base=${JSON.stringify({sid: sub.get('sid')})}`}>
+                         Usage
+                       </Link>
+                       &nbsp;
+                       <button className="btn btn-link"
+                               onClick={onClickEditSubscription.bind(this, sub.get('sid'))}>
+                         Edit
+                       </button>
+                     </TableRowColumn>
         </TableRow>
       );
     });
@@ -61,13 +61,10 @@ export default class SubscriptionsList extends Component {
             <Table selectable={false}>
               <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
                 <TableRow>
-                  {settings.getIn(['subscriber', 'fields']).map((field, key) => {
-                     if (field.get('display') === false) return (null);
-                     return (
-                       <TableRowColumn key={key}>{this.titlize(field.get('field_name'))}</TableRowColumn>
-                     );
-                   })}
-                       <TableRowColumn></TableRowColumn>
+                  {displayFields.map((field, key) => (
+                             <TableRowColumn key={key}>{this.titlize(field.get('field_name'))}</TableRowColumn>
+                           ))}
+                             <TableRowColumn></TableRowColumn>
                 </TableRow>
               </TableHeader>
               <TableBody displayRowCheckbox={false} stripedRows={true}>
