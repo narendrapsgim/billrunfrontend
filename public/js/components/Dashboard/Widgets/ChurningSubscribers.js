@@ -18,11 +18,12 @@ class ChurningSubscribers extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'churningSubscribers', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('churningSubscribers', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {fromDate, toDate} = this.props;
+    const AGGREGATE = 'aggregate';
 
     var churningSubscribersQuery = [{
       "$match": { "type": "subscriber", "to": { "$lte": toDate, "$gte": fromDate} }
@@ -38,13 +39,11 @@ class ChurningSubscribers extends Component {
 
     var queries = [{
       name: 'churning_subscribers',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(churningSubscribersQuery) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: 'subscribers' },
+        { pipelines: JSON.stringify(churningSubscribersQuery) }
+      ]
     }];
 
     return queries;
@@ -122,4 +121,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.churningSubscribers};
 }
 
-export default connect(mapStateToProps)(ChurningSubscribers);
+export default connect(mapStateToProps, { getData })(ChurningSubscribers);

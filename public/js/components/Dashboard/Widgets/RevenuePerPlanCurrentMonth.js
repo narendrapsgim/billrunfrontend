@@ -17,11 +17,12 @@ class RevenuePerPlanCurrentMonth extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'revenuePerPlanCurrentMonth', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('revenuePerPlanCurrentMonth', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {toDate} = this.props;
+    const AGGREGATE = 'aggregate';
 
     let query = [{
       "$match" : { "type" : "flat", "plan" : { "$exists" : true } }
@@ -37,13 +38,11 @@ class RevenuePerPlanCurrentMonth extends Component {
 
     var queries = [{
       name: 'revenue_per_plan',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "lines" },
-          { pipelines: JSON.stringify(query) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: "lines" },
+        { pipelines: JSON.stringify(query) }
+      ]
     }];
 
     return queries;
@@ -106,4 +105,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.revenuePerPlanCurrentMonth};
 }
 
-export default connect(mapStateToProps)(RevenuePerPlanCurrentMonth);
+export default connect(mapStateToProps, { getData })(RevenuePerPlanCurrentMonth);

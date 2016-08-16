@@ -26,27 +26,27 @@ export default class PlanProductsSelect extends Component {
   getProducts (input, callback) {
     if(input && input.length){
       let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
-      let query = {
-        queries : [{
-          request: {
-            api: "find",
-            params: [
-              { collection: "rates" },
-              { size: "20" },
-              { page: "0" },
-              { query: JSON.stringify({
-                "key": {"$regex": input.toLowerCase(), "$options": "i"},
-                "to": {"$gte" : toadyApiString},
-                "from": {"$lte" : toadyApiString},
-              }) },
-              { project: JSON.stringify({"key": 1}) },
-            ]
-          }
-        }]
-      };
 
-      return apiBillRun(query).then( (response) => {
-        return { options: _.values(response.data[0].data) };
+      let query = {
+        "key": {"$regex": input.toLowerCase(), "$options": "i"},
+        "to": {"$gte" : toadyApiString},
+        "from": {"$lte" : toadyApiString},
+      };
+      let request = [{
+        api: "find",
+        params: [
+          { collection: "rates" },
+          { size: "20" },
+          { page: "0" },
+          { project: JSON.stringify({"key": 1}) },
+          { query: JSON.stringify(query) },
+        ]
+      }];
+
+      return apiBillRun(request).then( (response) => {
+        if (!response.status) return { options: null };
+        let options = _.values(response.data[0].data.details);
+        return { options };
       });
     } else {
       callback(null, { options: []});

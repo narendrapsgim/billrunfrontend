@@ -17,11 +17,12 @@ class SubsPerPlanCurrentMonth extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'subsPerPlanCurrentMonth', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('subsPerPlanCurrentMonth', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {toDate} = this.props;
+    const AGGREGATE = 'aggregate';
 
     var query = [{
       "$match" : { "type" : "subscriber", "plan" : { "$exists" : true } }
@@ -39,13 +40,11 @@ class SubsPerPlanCurrentMonth extends Component {
 
     var queries = [{
       name: 'subsPerPlan',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(query) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: "subscribers" },
+        { pipelines: JSON.stringify(query) }
+      ]
     }];
 
     return queries;
@@ -108,4 +107,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.subsPerPlanCurrentMonth};
 }
 
-export default connect(mapStateToProps)(SubsPerPlanCurrentMonth);
+export default connect(mapStateToProps, { getData })(SubsPerPlanCurrentMonth);

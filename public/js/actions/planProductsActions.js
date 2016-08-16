@@ -94,8 +94,8 @@ export function getExistPlanProducts(planName, reset = false) {
 
     return getUsageTypes().then(
       response => {
-        if(response.data && response.data[0] && response.data[0].data){
-          return dispatch(getExistPlanProductsByUsageTypes(planName, response.data[0].data, reset));
+        if(response[0].data.status){
+          return dispatch(getExistPlanProductsByUsageTypes(planName, response.data[0].data.details, reset));
         }
         return dispatch(apiBillRunErrorHandler(response));
       },
@@ -107,14 +107,10 @@ export function getExistPlanProducts(planName, reset = false) {
 }
 
 function getUsageTypes(){
-    let query = {
-      queries : [{
-        request: {
-          api: "settings",
-          params: [ { category: "usage_types" } ]
-        }
-      }]
-    };
+    let query = [{
+      api: "settings",
+      params: [ { category: "usage_types" } ]
+    }];
     return apiBillRun(query);
 }
 
@@ -135,26 +131,22 @@ function getExistPlanProductsByUsageTypes(planName, usageTypes = [], reset = fal
       'from': {"$lte" : toadyApiString}
     };
 
-    let query = {
-      queries : [{
-        request: {
-          api: "find",
-          params: [
-            { collection: "rates" },
-            { size: "20" },
-            { page: "0" },
-            { query: JSON.stringify(queryString) },
-          ]
-        }
-      }]
-    };
+    let query = [{
+      api: "find",
+      params: [
+        { collection: "rates" },
+        { size: "20" },
+        { page: "0" },
+        { query: JSON.stringify(queryString) },
+      ]
+    }];
 
     apiBillRun(query).then(
       response => {
-        if(response.data){
+        if(response.status){
           var poducts = [];
           response.data.forEach( res => {
-            _.values(res.data).forEach(prod => {
+            _.values(res.data.details).forEach(prod => {
                 var unit = Object.keys(prod.rates)[0];
                 prod.uiflags = {
                   existing: true,
@@ -179,32 +171,28 @@ export function getProductByKey(key, planName) {
   if(key && key.length){
     return dispatch => {
       let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
-      let query = {
-        queries : [{
-          request: {
-            api: "find",
-            params: [
-              { collection: "rates" },
-              { size: "20" },
-              { page: "0" },
-              { query: JSON.stringify({
-                  "key": key,
-                  "to": {"$gte" : toadyApiString},
-                  "from": {"$lte" : toadyApiString},
-              }) },
-            ]
-          }
-        }]
-      };
+      let query = [{
+        api: "find",
+        params: [
+          { collection: "rates" },
+          { size: "20" },
+          { page: "0" },
+          { query: JSON.stringify({
+              "key": key,
+              "to": {"$gte" : toadyApiString},
+              "from": {"$lte" : toadyApiString},
+          }) },
+        ]
+      }];
 
       apiBillRun(query).then(
         response => {
-          if(response.data){
+          if(response.status){
             var poducts = [];
             var unit = '';
             response.data.forEach( res => {
-               _.values(res.data).forEach(prod => poducts.push(prod));
-             });
+              _.values(res.data.details).forEach(prod => poducts.push(prod));
+            });
             return dispatch(gotPlanProducts(poducts, planName));
           } else {
             return dispatch(apiBillRunErrorHandler(response))
@@ -222,7 +210,7 @@ export function savePlanRates() {
     return (dispatch, getState) => {
       const { planProducts, plan } =  getState();
       var planName = plan.get('PlanName');
-      let saveRequest = { queries:[]};
+      let queries = [];
       planProducts.forEach( prod => {
         var formData = new FormData();
         formData.append('id', prod.getIn(['_id', '$id']));
@@ -230,40 +218,34 @@ export function savePlanRates() {
         formData.append('type', 'update');
         formData.append('data', JSON.stringify(prod.delete('uiflags')));
 
-        var q = {
-          request: {
-            api: "save",
-            name: prod.get('key'),
-            options: {
-              method: "POST",
-              body: formData
-            }
+        var query = {
+          api: "save",
+          name: prod.get('key'),
+          options: {
+            method: "POST",
+            body: formData
           }
         };
-        saveRequest.queries.push(q)
+        queries.push(query)
       });
 
-      apiBillRun(saveRequest).then(
+      apiBillRun(queries).then(
         response => {
           var errorMessages = [];
           var successMessages = [];
-          if(response.data){
-            response.data.forEach( (res) => {
-              if(res.hasOwnProperty("error")){
-                errorMessages.push(`${res.name}: ${res.error.message}`);
-              } else {
-                successMessages.push(res.data.key);
-              }
-            });
-
-            if(errorMessage.length){
-              dispatch(showModal(errorMessages, "Error!"));
+          response.data.forEach( (res) => {
+            if(res.status){
+              successMessages.push(res.data.key);
             } else {
-              dispatch(showStatusMessage(successMessages.join(', ') + " successfully updated", 'success'));
-              dispatch(getExistPlanProducts(planName, true));
+              errorMessages.push(`${res.name}: ${res.error.message}`);
             }
-
-          } else { dispatch(apiBillRunErrorHandler(response)); }
+          });
+          if(!response.status){
+            dispatch(showModal(errorMessages, "Error!"));
+          } else {
+            dispatch(showStatusMessage(successMessages.join(', ') + " successfully updated", 'success'));
+            dispatch(getExistPlanProducts(planName, true));
+          }
         },
         error => { dispatch(apiBillRunErrorHandler(error)); }
       ).catch(
