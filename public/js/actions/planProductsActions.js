@@ -91,15 +91,9 @@ export function planProductsClear(){
 
 export function getExistPlanProducts(planName, reset = false) {
   return dispatch => {
-
     return getUsageTypes().then(
-      response => {
-        if(response[0].data.status){
-          return dispatch(getExistPlanProductsByUsageTypes(planName, response.data[0].data.details, reset));
-        }
-        return dispatch(apiBillRunErrorHandler(response));
-      },
-      error => dispatch(apiBillRunErrorHandler(error))
+      success => { dispatch(getExistPlanProductsByUsageTypes(planName, success.data[0].data.details, reset)) },
+      failure => { throw failure }
     ).catch(
       error => dispatch(apiBillRunErrorHandler(error))
     );
@@ -131,7 +125,7 @@ function getExistPlanProductsByUsageTypes(planName, usageTypes = [], reset = fal
       'from': {"$lte" : toadyApiString}
     };
 
-    let query = [{
+    let query = {
       api: "find",
       params: [
         { collection: "rates" },
@@ -139,28 +133,21 @@ function getExistPlanProductsByUsageTypes(planName, usageTypes = [], reset = fal
         { page: "0" },
         { query: JSON.stringify(queryString) },
       ]
-    }];
+    };
 
     apiBillRun(query).then(
-      response => {
-        if(response.status){
-          var poducts = [];
-          response.data.forEach( res => {
-            _.values(res.data.details).forEach(prod => {
-                var unit = Object.keys(prod.rates)[0];
-                prod.uiflags = {
-                  existing: true,
-                  originValue: prod.rates[unit][planName].rate.concat()
-                };
-                poducts.push(prod);
-            });
-          });
-          return dispatch(gotPlanProducts(poducts, planName, reset));
-        } else {
-          return dispatch(apiBillRunErrorHandler(response))
-        }
+      success => {
+        let poducts = _.values(success.data[0].data.details).map(prod => {
+          var unit = Object.keys(prod.rates)[0];
+          prod.uiflags = {
+            existing: true,
+            originValue: [...prod.rates[unit][planName].rate]
+          };
+          return prod;
+        });
+        dispatch(gotPlanProducts(poducts, planName, reset));
       },
-      error => dispatch(apiBillRunErrorHandler(response))
+      failure => { throw failure }
     ).catch(
       error => dispatch(apiBillRunErrorHandler(error))
     );
@@ -171,7 +158,7 @@ export function getProductByKey(key, planName) {
   if(key && key.length){
     return dispatch => {
       let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
-      let query = [{
+      let query = {
         api: "find",
         params: [
           { collection: "rates" },
@@ -183,22 +170,14 @@ export function getProductByKey(key, planName) {
               "from": {"$lte" : toadyApiString},
           }) },
         ]
-      }];
+      };
 
       apiBillRun(query).then(
-        response => {
-          if(response.status){
-            var poducts = [];
-            var unit = '';
-            response.data.forEach( res => {
-              _.values(res.data.details).forEach(prod => poducts.push(prod));
-            });
-            return dispatch(gotPlanProducts(poducts, planName));
-          } else {
-            return dispatch(apiBillRunErrorHandler(response))
-          }
+        success => {
+          let poducts = _.values(success.data[0].data.details);
+          dispatch(gotPlanProducts(poducts, planName));
         },
-        error => dispatch(apiBillRunErrorHandler(response))
+        failure => { throw failure }
       ).catch(
         error => dispatch(apiBillRunErrorHandler(error))
       );
@@ -230,24 +209,15 @@ export function savePlanRates() {
       });
 
       apiBillRun(queries).then(
-        response => {
-          var errorMessages = [];
-          var successMessages = [];
-          response.data.forEach( (res) => {
-            if(res.status){
-              successMessages.push(res.data.key);
-            } else {
-              errorMessages.push(`${res.name}: ${res.error.message}`);
-            }
-          });
-          if(!response.status){
-            dispatch(showModal(errorMessages, "Error!"));
-          } else {
-            dispatch(showStatusMessage(successMessages.join(', ') + " successfully updated", 'success'));
-            dispatch(getExistPlanProducts(planName, true));
-          }
+        sussess => {
+          let successMessages = sussess.data.map( (response) => response.name );
+          dispatch(showStatusMessage(successMessages.join(', ') + " successfully updated", 'success'));
+          dispatch(getExistPlanProducts(planName, true));
         },
-        error => { dispatch(apiBillRunErrorHandler(error)); }
+        failure => {
+          let errorMessages = failure.error.map( (response) => `${response.name}: ${response.error.message}`);
+          dispatch(showModal(errorMessages, "Error!"));
+        }
       ).catch(
         error => { dispatch(apiBillRunErrorHandler(error)); }
       );

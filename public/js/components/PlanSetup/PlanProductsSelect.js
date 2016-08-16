@@ -43,11 +43,13 @@ export default class PlanProductsSelect extends Component {
         ]
       }];
 
-      return apiBillRun(request).then( (response) => {
-        if (!response.status) return { options: null };
-        let options = _.values(response.data[0].data.details);
-        return { options };
-      });
+      return apiBillRun(request).then(
+        sussess => {
+          let options = _.values(sussess.data[0].data.details);
+          return { options };
+        },
+        failure => {return { options : [] }}
+      );
     } else {
       callback(null, { options: []});
     }
