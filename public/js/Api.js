@@ -23,20 +23,35 @@ export function apiBillRunErrorHandler(error, data) {
 }
 
 // Send to API
-export function apiBillRun(request) {
+export function apiBillRun(requests, requiredAllSuccess = true) {
+  if(!Array.isArray(requests)){
+    requests = [requests];
+  }
   //Create Prommisses array from queries
-  let requests = request.map( (query) => sendHttpRequest(query));
+  let promiseRequests = requests.map( (request) => sendHttpRequest(request));
   //Send All prommisses
   var promise = new Promise((resolve, reject) => {
-    Promise.all(requests).then(
-      success   => {
-        //Set true if all requests was success, alse false
-        let status = success.every( responce => responce.status);
-        resolve( Object.assign({}, {data: success}, {status: status}) );
+    Promise.all(promiseRequests).then(
+      success => {
+        //all requests was success
+        let allSuccess = success.every( responce => responce.status);
+        if(allSuccess){
+         return resolve( Object.assign({}, {data: success}) );
+        }
+        //all requests was faild
+        let allFaild = success.every( responce => !responce.status);
+        if(allSuccess){
+         return reject( Object.assign({}, {error: success}) );
+        }
+        //mixed, some faild, some success
+        let data = success.filter( responce => responce.status);
+        let error = success.filter( responce => !responce.status);
+        let mix = Object.assign({}, {error}, {data});
+        return requiredAllSuccess ? reject( mix ) : resolve( mix );
       },
-      error     => { reject( Object.assign({}, {error: error}, {status: 0}) ); }
+      failure => reject( Object.assign({}, {error: failure}) )
     ).catch(
-      message   => { reject( Object.assign({}, {error: message}, {status: 0}) ); }
+      error => reject( Object.assign({}, {error}) )
     );
   });
   return promise;
