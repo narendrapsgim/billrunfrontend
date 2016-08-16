@@ -6,6 +6,7 @@ import axios from 'axios';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { showModal } from './modalActions';
 
 const axiosInstance = axios.create({
   withCredentials: true,
@@ -39,7 +40,11 @@ function fetchSubscribers(aid) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
+      if (error.data) {
+        dispatch(showModal(error.data.message, "Error!"));
+      } else {
+        console.log(error);
+      }
       dispatch(hideProgressBar());
     });
   };  

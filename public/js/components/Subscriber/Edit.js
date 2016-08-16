@@ -9,15 +9,32 @@ import Tabs from 'react-bootstrap/lib/Tabs';
 import Tab from 'react-bootstrap/lib/Tab';
 
 import Field from '../Field';
+import SubscriptionsList from './SubscriptionsList';
+import Subscription from './Subscription';
 import _ from 'lodash';
 
 export default class Edit extends Component {
   constructor(props) {
     super(props);
+
+    this.onClickEditSubscription = this.onClickEditSubscription.bind(this);
+    this.onChangeSubscriptionField = this.onChangeSubscriptionField.bind(this);
+    
+    this.state = {
+      editSubscriber: false,
+      sid: null,
+      plan: null
+    };
   }
-  
-  titlize(str) {
-    return _.capitalize(str.replace(/_/g, ' '));
+
+  onClickEditSubscription(sid) {
+    this.setState({editSubscriber: false, sid: null, plan: null}, () => {
+      this.setState({editSubscriber: true, sid});
+    });
+  }
+
+  onChangeSubscriptionField() {
+    console.log(arguments);
   }
   
   render() {
@@ -31,67 +48,26 @@ export default class Edit extends Component {
             onCancel } = this.props;
     if (!settings) return (null);
 
-    const subscriptionsHTML = subscribers.map((sub, key) => {
-      return (
-        <TableRow key={key}>
-          {settings.getIn(['subscriber', 'fields']).map((field, k) => {
-             if (field.get('display') === false) return (null);
-             return (
-               <TableRowColumn key={k}>
-                 {sub.get(field.get('field_name'))}
-               </TableRowColumn>
-             );
-           })}
-               <TableRowColumn>
-                 <Link to={`/usage?base=${JSON.stringify({sid: sub.get('sid')})}`}>
-                   See usage
-                 </Link>
-               </TableRowColumn>
-        </TableRow>
-      );
-    });
-
-    const subscribersView = (
-      <div style={{margin: 10}}>
-        <div className="row">
-          <div className="col-xs-11">
-            <div className="pull-right">
-              <button className="btn btn-primary" onClick={onClickNewSubscription.bind(this, account.get('aid'))}>Add Subscription</button>
-            </div>
-            <div className="pull-left">
-              <h4>Subscriptions</h4>
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-xs-11">
-            <Table selectable={false}>
-              <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
-                <TableRow>
-                  {settings.getIn(['subscriber', 'fields']).map((field, key) => {
-                     if (field.get('display') === false) return (null);
-                     return (
-                       <TableRowColumn key={key}>{this.titlize(field.get('field_name'))}</TableRowColumn>
-                     );
-                   })}
-                       <TableRowColumn></TableRowColumn>
-                </TableRow>
-              </TableHeader>
-              <TableBody displayRowCheckbox={false} stripedRows={true}>
-                { subscriptionsHTML }
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      </div>
-    );
+    const subscription = this.state.editSubscriber ? subscribers.find(sub => {
+      return sub.get('sid') === this.state.sid;
+    }) : null
+    const subscribersView = !this.state.editSubscriber ?
+                            (<SubscriptionsList account={account}
+                                                onClickNewSubscription={onClickNewSubscription}
+                                                onClickEditSubscription={this.onClickEditSubscription}
+                                                settings={settings}
+                                                subscribers={subscribers} />) :
+                            (<Subscription subscription={subscription}
+                                           settings={settings}
+                                           onChange={this.onChangeSubscriptionField}
+                                           onSave={this.onSaveSubscription} />);
 
     const fieldsHTML = settings.getIn(['account', 'fields']).map((field, key) => {
       if (field.get('display') === false) return (null);
       let val = account.get(field.get('field_name')) || '';
       return (
-        <div className="form-group">
-          <div className="col-xs-3" key={key}>
+        <div className="form-group" key={key}>
+          <div className="col-xs-3">
             <label>{_.capitalize(field.get('field_name'))}</label>
             <Field id={field.get('field_name')}
                    value={val}
@@ -102,7 +78,7 @@ export default class Edit extends Component {
       );
     });
     
-    let fields = (
+    const fields = (
       <div>
         { fieldsHTML }
         <div className="form-group">

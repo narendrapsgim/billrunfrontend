@@ -6,6 +6,7 @@ import { getAccount, updateAccountField } from '../../actions/accountActions';
 import { getSubscribers, getNewSubscriber, updateSubscriberField } from '../../actions/subscribersActions';
 import { clearCustomer, saveSubscriber } from '../../actions/customerActions';
 import { getSettings } from '../../actions/settingsActions';
+import { getPlans } from '../../actions/plansActions';
 
 import New from './New';
 import Edit from './Edit';
@@ -34,6 +35,7 @@ class SubscriberEdit extends Component {
     this.props.dispatch(getSettings('subscribers'));
     if (aid) {
       this.setState({newCustomer: false});
+      this.props.dispatch(getPlans({page: 0, size: 1000000, filter: '', sort: ''}));
       this.props.dispatch(getAccount(aid));
       this.props.dispatch(getSubscribers(aid));
     } else {
@@ -94,11 +96,11 @@ class SubscriberEdit extends Component {
   onClickNewSubscription(aid) {
     window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url=${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}`;
   }
-    
+  
   render() {
-    const { account, subscribers, subscriber, settings } = this.props;
+    const { account, plans, subscribers, subscriber, settings } = this.props;
     const { newCustomer, aid } = this.state;
-    const view = (<Edit account={account} subscribers={subscribers} newCustomer={newCustomer} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
+    const view = (<Edit account={account} subscribers={subscribers} newCustomer={newCustomer} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} plans={plans} onSave={this.onSave} onCancel={this.onCancel} />);
 
     return (
       <div className="SubscriberEdit container">
@@ -116,7 +118,8 @@ function mapStateToProps(state) {
     account: state.account,
     subscribers: state.subscribers.get('subscribers'),
     subscriber: state.subscribers.get('subscriber'),
-    settings: state.settings.get('subscribers')
+    settings: state.settings.get('subscribers'),
+    plans: state.plans
   };
 }
 

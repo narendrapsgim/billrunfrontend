@@ -207,13 +207,13 @@ export function setReceiverField(field, mapping) {
   };
 }
 
-export function saveInputProcessorSettings(state) {
+export function saveInputProcessorSettings(state, part=false) {
   const processor = state.get('processor'),
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver');
 
-  let settings = {
+  const settings = {
     "file_type": state.get('file_type'),
     "parser": {
       "type": state.get('delimiter_type'),
@@ -242,7 +242,8 @@ export function saveInputProcessorSettings(state) {
     }
   };
 
-  let setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settings)}`;
+  const settingsToSave = part ? {file_type: state.get('file_type'), [part]: {...settings[part]}} : settings;
+  const setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settingsToSave)}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(

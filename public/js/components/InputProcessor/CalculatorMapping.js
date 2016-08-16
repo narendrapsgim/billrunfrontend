@@ -15,7 +15,7 @@ export default class CalculatorMapping extends Component {
                                 <option value={field} key={key}>{field}</option>
                               ))];
     const available_target_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
-                                     ...["imsi", "sid", "aid"].map((field, key) => (
+                                     ...["sid", "aid"].map((field, key) => (
                                        <option value={field} key={key}>{field}</option>
                                      ))];
     const available_usagetypes = settings.getIn(['processor', 'usaget_mapping']).map(usaget => {

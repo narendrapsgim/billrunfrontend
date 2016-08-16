@@ -34,12 +34,21 @@ export default class FieldsMapping extends Component {
     if (!found) {
       this.props.addUsagetMapping(val);
     }
-    this.setState({usaget: val, pattern: `/${val}/`});
+    this.setState({usaget: val});
   }
 
   addUsagetMapping(e) {
-    if (!this.props.settings.getIn(['processor', 'src_field'])) return;
-    this.props.onAddUsagetMapping.call(this, this.state);
+    const { usaget, pattern } = this.state;
+    const { onError } = this.props;
+    if (!this.props.settings.getIn(['processor', 'src_field'])) {
+      onError("Please select usage type field");
+      return;
+    }
+    if (!usaget || !pattern){
+      onError("Please input a value and unit type");
+      return;
+    }
+    this.props.onAddUsagetMapping.call(this, {usaget, pattern});
     this.setState({pattern: "", usaget: ""});
   }
 
@@ -62,7 +71,11 @@ export default class FieldsMapping extends Component {
             <label>Time</label>
           </div>
           <div className="col-xs-2">
-            <select id="date_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'date_field'])} defaultValue="-1">
+            <select id="date_field"
+                    className="form-control"
+                    onChange={onSetFieldMapping}
+                    value={settings.getIn(['processor', 'date_field'])}
+                    defaultValue="-1">
               { available_fields }
             </select>
             <p className="help-block">Time of record creation</p>
@@ -73,7 +86,11 @@ export default class FieldsMapping extends Component {
             <label>Volume</label>
           </div>
           <div className="col-xs-2">
-            <select id="volume_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'volume_field'])} defaultValue="-1">
+            <select id="volume_field"
+                    className="form-control"
+                    onChange={onSetFieldMapping}
+                    value={settings.getIn(['processor', 'volume_field'])}
+                    defaultValue="-1">
               { available_fields }
             </select>
             <p className="help-block">Amount calculated</p>
@@ -84,7 +101,11 @@ export default class FieldsMapping extends Component {
             <label>Usage types</label>
           </div>
           <div className="col-xs-2">
-            <select id="src_field" className="form-control" onChange={onSetFieldMapping} value={settings.getIn(['processor', 'src_field'])} defaultValue="-1">
+            <select id="src_field"
+                    className="form-control"
+                    onChange={onSetFieldMapping}
+                    value={settings.getIn(['processor', 'src_field'])}
+                    defaultValue="-1">
               { available_fields }
             </select>
             <p className="help-block">Types of usages and units used for measuring usage</p>
