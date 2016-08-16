@@ -7,6 +7,7 @@ import { getSubscribers, getNewSubscriber, updateSubscriberField } from '../../a
 import { clearCustomer, saveSubscriber } from '../../actions/customerActions';
 import { getSettings } from '../../actions/settingsActions';
 import { getPlans } from '../../actions/plansActions';
+import { saveSubscription } from '../../actions/subscribersActions';
 
 import New from './New';
 import Edit from './Edit';
@@ -24,7 +25,8 @@ class SubscriberEdit extends Component {
     this.onUnsubscribe = this.onUnsubscribe.bind(this);
     this.onClickNewSubscription = this.onClickNewSubscription.bind(this);
     this.onChangeDateFieldValue = this.onChangeDateFieldValue.bind(this);
-
+    this.onSaveSubscription = this.onSaveSubscription.bind(this);
+    
     this.state = {
       newCustomer: false
     };
@@ -71,6 +73,10 @@ class SubscriberEdit extends Component {
     if (r) console.log(`unsubscribe from plan ${sid}`);
   }
 
+  onSaveSubscription(subscription, callback) {
+    this.props.dispatch(saveSubscription(subscription, callback));
+  }
+  
   onSave() {
     const action = this.state.newCustomer ? "new" : this.props.location.query.action;
     this.props.dispatch(saveSubscriber(action, this.props.account));
@@ -100,7 +106,7 @@ class SubscriberEdit extends Component {
   render() {
     const { account, plans, subscribers, subscriber, settings } = this.props;
     const { newCustomer, aid } = this.state;
-    const view = (<Edit account={account} subscribers={subscribers} newCustomer={newCustomer} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} plans={plans} onSave={this.onSave} onCancel={this.onCancel} />);
+    const view = (<Edit account={account} subscribers={subscribers} newCustomer={newCustomer} settings={settings} onChange={this.onChangeAccountFieldValue} onClickNewSubscription={this.onClickNewSubscription} plans={plans} saveSubscription={this.onSaveSubscription} onSave={this.onSave} onCancel={this.onCancel} />);
 
     return (
       <div className="SubscriberEdit container">

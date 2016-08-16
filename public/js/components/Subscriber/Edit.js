@@ -18,25 +18,48 @@ export default class Edit extends Component {
     super(props);
 
     this.onClickEditSubscription = this.onClickEditSubscription.bind(this);
+
     this.onChangeSubscriptionField = this.onChangeSubscriptionField.bind(this);
+    this.onSaveSubscription = this.onSaveSubscription.bind(this);
+    this.onCancelSubscriptionEdit = this.onCancelSubscriptionEdit.bind(this);
     
     this.state = {
       editSubscriber: false,
       sid: null,
-      plan: null
+      subscription: null
     };
   }
-
+  
   onClickEditSubscription(sid) {
     this.setState({editSubscriber: false, sid: null, plan: null}, () => {
-      this.setState({editSubscriber: true, sid});
+      let found = this.props.subscribers.find(sub => { return sub.get('sid') === sid; });
+      this.setState({editSubscriber: true, sid, subscription: found.delete("_id").toJS() });
     });
   }
 
-  onChangeSubscriptionField() {
-    console.log(arguments);
+  onChangeSubscriptionField(e) {
+    const { id, value } = e.target;
+    const newsub = Object.assign({}, this.state.subscription, {
+      [id]: value
+    });
+    this.setState({subscription: newsub});
   }
-  
+
+  onSaveSubscription(e) {
+    const { subscription } = this.state;
+    const cb = (resp, err) => {
+      if (!err) {
+        this.setState({editSubscriber: false, sid: null, subscription: null});
+        
+      }
+    };    
+    this.props.saveSubscription(subscription, cb);
+  }
+
+  onCancelSubscriptionEdit() {
+    this.setState({editSubscriber: false, sid: null, subscription: null});
+  }
+
   render() {
     const { subscribers,
             account,
@@ -48,19 +71,19 @@ export default class Edit extends Component {
             onCancel } = this.props;
     if (!settings) return (null);
 
-    const subscription = this.state.editSubscriber ? subscribers.find(sub => {
-      return sub.get('sid') === this.state.sid;
-    }) : null
-    const subscribersView = !this.state.editSubscriber ?
+    const { subscription } = this.state;
+    const subscribersView = this.state.editSubscriber ?
+                            (<Subscription subscription={subscription}
+                                           settings={settings}
+                                           onChange={this.onChangeSubscriptionField}
+                                           onSave={this.onSaveSubscription}
+                                           onCancel={this.onCancelSubscriptionEdit} />) :                            
                             (<SubscriptionsList account={account}
                                                 onClickNewSubscription={onClickNewSubscription}
                                                 onClickEditSubscription={this.onClickEditSubscription}
                                                 settings={settings}
-                                                subscribers={subscribers} />) :
-                            (<Subscription subscription={subscription}
-                                           settings={settings}
-                                           onChange={this.onChangeSubscriptionField}
-                                           onSave={this.onSaveSubscription} />);
+                                                subscribers={subscribers} />);
+                            
 
     const fieldsHTML = settings.getIn(['account', 'fields']).map((field, key) => {
       if (field.get('display') === false) return (null);
