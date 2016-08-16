@@ -79,14 +79,10 @@ class ProductsList extends Component {
       {id: "to", display: false, type: "datetime"}
     ];
 
-    const table_header = [
-      (<TableHeaderColumn>Name</TableHeaderColumn>),
-      (<TableHeaderColumn>Code</TableHeaderColumn>),
-      (<TableHeaderColumn>Description</TableHeaderColumn>),
-      (<TableHeaderColumn>Unit Type</TableHeaderColumn>),
-      (<TableHeaderColumn>From</TableHeaderColumn>),
-      (<TableHeaderColumn>To</TableHeaderColumn>)
-    ];
+    const table_header =
+    ["Name", "Code", "Description", "Unit Type", "From", "To"].map((header, key) => (
+      <TableHeaderColumn key={key}>{header}</TableHeaderColumn>
+    ));
 
     const rows = products.map((row, key) => (
       <TableRow key={key}>
