@@ -15,11 +15,13 @@ class MapSubscribers extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'mapSubscribers', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('mapSubscribers', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {fromDate, toDate} = this.props;
+    const AGGREGATE = 'aggregate';
+
     var query = [{
     		"$match" : { "type" : "subscriber", "country" : { "$exists" : true },
     			"creation_time" : { "$lte" : toDate, "$gte" : fromDate },
@@ -34,21 +36,21 @@ class MapSubscribers extends Component {
     	}, {
     		"$sort" : { "count" : 1 }
   	}];
+    
     var queries = [{
       name: 'map_subscribers',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(query) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: 'subscribers' },
+        { pipelines: JSON.stringify(query) }
+      ]
     }];
+
     return queries;
   }
 
   prepareChartData(chartData) {
-    let dataset = chartData.find((dataset, i) => dataset.name == "map_subscribers");
+    let dataset = chartData.find((dataset, i) => dataset.name == 'map_subscribers');
     if(!dataset.data || dataset.data.length == 0){
       return null;
     }
@@ -134,4 +136,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.mapSubscribers};
 }
 
-export default connect(mapStateToProps)(MapSubscribers);
+export default connect(mapStateToProps, { getData })(MapSubscribers);

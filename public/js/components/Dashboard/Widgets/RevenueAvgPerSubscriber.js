@@ -18,11 +18,12 @@ class RevenueAvgPerSubscriber extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'revenueAvgPerSubscriber', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('revenueAvgPerSubscriber', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {fromDate, toDate} = this.props;
+    const AGGREGATE = 'aggregate';
 
     var revenueQuery = [{
       "$match": {"confirmation_time": {"$gte": fromDate, "$lte": toDate}, "type": "rec"}
@@ -62,31 +63,25 @@ class RevenueAvgPerSubscriber extends Component {
 
     var queries = [{
       name: 'revenue',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "bills" },
-          { pipelines: JSON.stringify(revenueQuery) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: 'bills' },
+        { pipelines: JSON.stringify(revenueQuery) }
+      ]
     },{
       name: 'new_subscribers',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(newSubscribersQuery) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: 'subscribers' },
+        { pipelines: JSON.stringify(newSubscribersQuery) }
+      ]
     },{
       name: 'total_subscribers',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(totalSubscribersQuery) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: 'subscribers' },
+        { pipelines: JSON.stringify(totalSubscribersQuery) }
+      ]
     }];
 
     return queries;
@@ -184,4 +179,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.revenueAvgPerSubscriber};
 }
 
-export default connect(mapStateToProps)(RevenueAvgPerSubscriber);
+export default connect(mapStateToProps, { getData })(RevenueAvgPerSubscriber);

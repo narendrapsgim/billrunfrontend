@@ -95,7 +95,7 @@ export default class ProductPricePlanOverride extends Component {
                       <label htmlFor={`from-${key}`}>From</label>
                       <Field id={`from-${key}`}
                              coll="Product"
-                             onChange={this.onProductEditRate.bind(this, itemKey, ratePath.concat(key, "from"))}
+                             onChange={this.onProductEditRate.bind(this, itemKey, [...ratePath, key, "from"])}
                              value={rate.get('from')}
                       />
                     </div>
@@ -103,14 +103,14 @@ export default class ProductPricePlanOverride extends Component {
                       <label htmlFor={`to-${key}`}>To</label>
                       <Field id={`to-${key}`}
                              coll="Product"
-                             onChange={this.onProductEditRate.bind(this, itemKey, ratePath.concat(key, "to"))}
+                             onChange={this.onProductEditRate.bind(this, itemKey, [...ratePath, key, "to"])}
                              value={rate.get('to')}
                       />
                     </div>
                     <div className="col-xs-2">
                       <label htmlFor={`interval-${key}`}>Interval</label>
                       <Field id={`interval-${key}`}
-                             onChange={this.onProductEditRate.bind(this, itemKey, ratePath.concat(key, "interval"))}
+                             onChange={this.onProductEditRate.bind(this, itemKey, [...ratePath, key, "interval"])}
                              value={rate.get('interval')}
                       />
                     </div>
@@ -118,7 +118,7 @@ export default class ProductPricePlanOverride extends Component {
                       <label htmlFor={`price-${key}`}>Price</label>
                       <Field id={`price-${key}`}
                              fieldType="price"
-                             onChange={this.onProductEditRate.bind(this, itemKey, ratePath.concat(key, "price"))}
+                             onChange={this.onProductEditRate.bind(this, itemKey, [...ratePath, key, "price"])}
                              value={rate.get('price')}
                       />
                     </div>

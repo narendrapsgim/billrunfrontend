@@ -18,11 +18,12 @@ class TotalSubscribers extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'totalSubscribers', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('totalSubscribers', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {fromDate, toDate} = this.props;
+    const AGGREGATE = 'aggregate';
 
     var newSubscribersQuery = [{
       "$match": { "type": "subscriber", "creation_time": { "$gte": fromDate }, "to": { "$gte": toDate } }
@@ -50,22 +51,18 @@ class TotalSubscribers extends Component {
 
     var queries = [{
       name: 'new_subscribers',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(newSubscribersQuery) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: 'subscribers' },
+        { pipelines: JSON.stringify(newSubscribersQuery) }
+      ]
     },{
       name: 'total_subscribers',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(totalSubscribersQuery) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: 'subscribers' },
+        { pipelines: JSON.stringify(totalSubscribersQuery) }
+      ]
     }];
 
     return queries;
@@ -152,4 +149,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.totalSubscribers};
 }
 
-export default connect(mapStateToProps)(TotalSubscribers);
+export default connect(mapStateToProps, { getData })(TotalSubscribers);

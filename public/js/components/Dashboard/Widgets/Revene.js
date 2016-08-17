@@ -18,11 +18,12 @@ class Revene extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'revene', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('revene', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {fromDate, toDate} = this.props;
+    const AGGREGATE = 'aggregate';
 
     var revenueQuery = [{
       "$match": {"confirmation_time": {"$gte": fromDate, "$lte": toDate}, "type": "rec"}
@@ -38,13 +39,11 @@ class Revene extends Component {
 
     var queries = [{
       name: 'revenue',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "bills" },
-          { pipelines: JSON.stringify(revenueQuery) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: "bills" },
+        { pipelines: JSON.stringify(revenueQuery) }
+      ]
     }];
 
     return queries;
@@ -131,4 +130,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.revene};
 }
 
-export default connect(mapStateToProps)(Revene);
+export default connect(mapStateToProps, { getData })(Revene);

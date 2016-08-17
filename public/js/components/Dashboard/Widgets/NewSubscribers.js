@@ -18,11 +18,12 @@ class NewSubscribers extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'newSubscribers', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('newSubscribers', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {fromDate, toDate} = this.props;
+    const AGGREGATE = 'aggregate';
 
     var newSubscribersQuery = [{
       "$match": { "type": "subscriber", "creation_time": { "$gte": fromDate }, "to": { "$gte": toDate } }
@@ -38,13 +39,11 @@ class NewSubscribers extends Component {
 
     var queries = [{
       name: 'new_subscribers',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(newSubscribersQuery) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: 'subscribers' },
+        { pipelines: JSON.stringify(newSubscribersQuery) }
+      ]
     }];
 
     return queries;
@@ -122,4 +121,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.newSubscribers};
 }
 
-export default connect(mapStateToProps)(NewSubscribers);
+export default connect(mapStateToProps, { getData })(NewSubscribers);
