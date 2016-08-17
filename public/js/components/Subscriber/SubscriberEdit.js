@@ -100,7 +100,7 @@ class SubscriberEdit extends Component {
   }
 
   onClickNewSubscription(aid) {
-    window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url=${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}`;
+    window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url="${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}"`;
   }
   
   render() {
