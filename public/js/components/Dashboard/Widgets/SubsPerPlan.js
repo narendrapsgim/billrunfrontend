@@ -18,11 +18,12 @@ class SubsPerPlan extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getData({type: 'subsPerPlan', queries: this.prepereAgrigateQuery()}));
+    this.props.getData('subsPerPlan', this.prepereAgrigateQuery());
   }
 
   prepereAgrigateQuery() {
     const {fromDate, toDate} = this.props;
+    const AGGREGATE = 'aggregate';
 
     let query = [{
       "$match": {"type":"subscriber", "plan": {"$exists": true}, "creation_time": { "$gte": fromDate }, "to": { "$gte": toDate }}
@@ -38,13 +39,11 @@ class SubsPerPlan extends Component {
 
     var queries = [{
       name: 'subs_per_plan',
-      request: {
-        api: "aggregate",
-        params: [
-          { collection: "subscribers" },
-          { pipelines: JSON.stringify(query) }
-        ]
-      }
+      api: AGGREGATE,
+      params: [
+        { collection: "subscribers" },
+        { pipelines: JSON.stringify(query) }
+      ]
     }];
 
     return queries;
@@ -104,4 +103,4 @@ function mapStateToProps(state, props) {
   return {chartData: state.dashboard.subsPerPlan};
 }
 
-export default connect(mapStateToProps)(SubsPerPlan);
+export default connect(mapStateToProps, { getData })(SubsPerPlan);

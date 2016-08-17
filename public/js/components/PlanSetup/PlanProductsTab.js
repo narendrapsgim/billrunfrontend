@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import PlanProductsList from './PlanProductsList'
 import PlanProductsSelect from './PlanProductsSelect'
 import {
@@ -34,51 +35,51 @@ export default class PlanProductsTab extends Component {
 
   componentWillMount() {
     const { planName } = this.state;
-    this.props.dispatch(getExistPlanProducts(planName));
+    this.props.getExistPlanProducts(planName);
   }
 
   componentWillUnmount() {
-    this.props.dispatch(planProductsClear());
+    this.props.planProductsClear();
   }
 
   onSelectProduct (key) {
     const { planProducts } = this.props;
     const { planName } = this.state;
     if(!planProducts.some( (item) => item.get('key') === key)){
-      this.props.dispatch(getProductByKey(key, planName));
+      this.props.getProductByKey(key, planName);
     } else {
-      this.props.dispatch(showStatusMessage(`Price of product ${key} already overridden for plan ${planName}`, 'warning'));
+      this.props.showStatusMessage(`Price of product ${key} already overridden for plan ${planName}`, 'warning');
     }
   }
 
   onNewProductRestore(key, planName, usageType) {
     this.onProductInitRate(key, planName, usageType)
-    this.props.dispatch(showStatusMessage(`Product ${key} prices for this plan restored to BASE state`, 'info'));
+    this.props.showStatusMessage(`Product ${key} prices for this plan restored to BASE state`, 'info');
   }
 
   onProductRestore(key, ratePath){
-    this.props.dispatch(restorePlanProduct(key, ratePath));
-    this.props.dispatch(showStatusMessage(`Product ${key} prices for this plan restored to original state`, 'info'));
+    this.props.restorePlanProduct(key, ratePath);
+    this.props.showStatusMessage(`Product ${key} prices for this plan restored to original state`, 'info');
   }
   onProductRemove(key, ratePath){
-    this.props.dispatch(removePlanProduct(key, ratePath));
-    this.props.dispatch(showStatusMessage(`Product ${key} prices for this plan will be removed after save`, 'info'));
+    this.props.removePlanProduct(key, ratePath);
+    this.props.showStatusMessage(`Product ${key} prices for this plan will be removed after save`, 'info');
   }
   onProductUndoRemove(key, ratePath){
-    this.props.dispatch(undoRemovePlanProduct(key, ratePath));
-    this.props.dispatch(showStatusMessage(`Product ${key} prices restored`, 'success'));
+    this.props.undoRemovePlanProduct(key, ratePath);
+    this.props.showStatusMessage(`Product ${key} prices restored`, 'success');
   }
   onProductRemoveRate(key, path, idx){
-    this.props.dispatch(planProductsRateRemove(key, path, idx));
+    this.props.planProductsRateRemove(key, path, idx);
   }
   onProductEditRate(key, path, value) {
-    this.props.dispatch(planProductsRateUpdate(key, path, value));
+    this.props.planProductsRateUpdate(key, path, value);
   }
   onProductAddRate(key, path) {
-    this.props.dispatch(planProductsRateAdd(key, path));
+    this.props.planProductsRateAdd(key, path);
   }
   onProductInitRate(key, planName, usageType) {
-    this.props.dispatch(planProductsRateInit(key, planName, usageType));
+    this.props.planProductsRateInit(key, planName, usageType);
   }
 
   render() {
@@ -112,7 +113,22 @@ export default class PlanProductsTab extends Component {
 
 }
 
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    getProductByKey,
+    getExistPlanProducts,
+    removePlanProduct,
+    restorePlanProduct,
+    undoRemovePlanProduct,
+    planProductsRateRemove,
+    planProductsRateAdd,
+    planProductsRateUpdate,
+    planProductsRateInit,
+    planProductsClear,
+    showStatusMessage }, dispatch);
+}
+
 function mapStateToProps(state, props) {
   return  { planProducts: state.planProducts };
 }
-export default connect(mapStateToProps)(PlanProductsTab);
+export default connect(mapStateToProps, mapDispatchToProps)(PlanProductsTab);

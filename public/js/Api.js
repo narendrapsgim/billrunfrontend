@@ -23,59 +23,71 @@ export function apiBillRunErrorHandler(error, data) {
 }
 
 // Send to API
-export function apiBillRun(request) {
-  //Create Prommisses array from queries
-  let requests = [];
-  let response = (request.type) ? { type: request.type } : {};
-  for(var i = 0; i < request.queries.length; i++) {
-    requests.push(sendHttpRequest(request.queries[i]));
+export function apiBillRun(requests, requiredAllSuccess = true) {
+  if(!Array.isArray(requests)){
+    requests = [requests];
   }
+  //Create Prommisses array from queries
+  let promiseRequests = requests.map( (request) => sendHttpRequest(request));
   //Send All prommisses
   var promise = new Promise((resolve, reject) => {
-    Promise.all(requests).then(
-      success   => { resolve( Object.assign(response, {data: success}) ); },
-      error     => { reject( Object.assign(response, {error: error}) ); }
+    Promise.all(promiseRequests).then(
+      success => {
+        //all requests was success
+        let allSuccess = success.every( responce => responce.status);
+        if(allSuccess){
+          let data = success.map(responce => {delete responce['status']; return responce; });
+          return resolve( Object.assign({}, { data }) );
+        }
+        //all requests was faild
+        let allFaild = success.every( responce => !responce.status);
+        if(allSuccess){
+          let error = success.map(responce => {delete responce['status']; return responce; });
+          return reject( Object.assign({}, {error}) );
+        }
+        //mixed, some faild, some success
+        let data = success.filter( responce => responce.status === 1).map(responce => {delete responce['status']; return responce; });
+        let error = success.filter( responce => responce.status === 0).map(responce => {delete responce['status']; return responce; });
+        let mix = Object.assign({}, {error}, {data});
+        return requiredAllSuccess ? reject( mix ) : resolve( mix );
+      },
+      failure => reject( Object.assign({}, {error: failure}) )
     ).catch(
-      message   => { reject( Object.assign(response, {error: message}) ); }
+      error => reject( Object.assign({}, {error}) )
     );
   });
   return promise;
 }
 
 //send Http request
-export function sendHttpRequest(query) {
+function sendHttpRequest(query) {
   //Create Api URL
-  let api = (query.request.api == "save") ? "/admin/" : "/api/";
-  let url = globalSetting.serverUrl + api + query.request.api + buildQueryString(query.request.params);
-  let requestOptions = (query.request.options && query.request.options.form) ?
-      { method: 'post',
-        credentials: 'include',
-        body: query.request.formData } :
-      buildQueryOptions(query.request.options);
-  let response = (query.request.name) ? { name: query.request.name , data: {} } : { data: {} };
+  let api = (query.api == "save") ? "/admin/" : "/api/";
+  let url = globalSetting.serverUrl + api + query.api + buildQueryString(query.params);
+  let requestOptions = buildQueryOptions(query.options);
+  let response = (query.name) ? { name: query.name } : {};
   let promise = new Promise((resolve, reject) => {
     fetch(url, requestOptions).then(
       success => {
         success.json().then(
           body => {
-            if(body.status) {
-              resolve(Object.assign(response, { data: (body.details || body.data) }));
-            } else {
-              resolve(Object.assign(response, { error: body, data: null }));
-            }
-          },
-          error => { resolve(Object.assign(response, { error: error, data: null })); }
-      ).catch(
-        message => { resolve(Object.assign(response, { error: message, data: null })); }
-      );
-    },
-    error => { resolve(Object.assign(response, { error: error, data: null })); });
+            if (!body.status) throw body;
+            resolve(Object.assign(response, { data: body, status:1}));
+          }
+        ).catch(
+          error => { resolve(Object.assign(response, { error: error, status:0 })); }
+        );
+      }
+    ).catch(
+      error => { resolve(Object.assign(response, { error: error, status:0 })); }
+    );
   });
 
   return promise;
 }
 
-function buildQueryOptions(options){
+//help function to bulind query options
+function buildQueryOptions(options = null){
   //default options
   let requestOptions = {
     credentials: 'include'
@@ -88,9 +100,9 @@ function buildQueryOptions(options){
 }
 
 //help function to bulind query params string
-function buildQueryString(params){
+function buildQueryString(params = null){
   let queryParams = '';
-  if(Array.isArray(params) && params.length > 0){
+  if(params && Array.isArray(params) && params.length > 0){
     queryParams = params.reduce((previousValue, currentValue, currentIndex) => {
       let key = Object.keys(currentValue)[0];
       let prev = (currentIndex === 0) ? previousValue : previousValue + '&';
