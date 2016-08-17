@@ -127,15 +127,10 @@ class PlansList extends Component {
        ));
      */
 
-    const table_header = [
-      (<TableHeaderColumn>Name</TableHeaderColumn>),
-      (<TableHeaderColumn>Code</TableHeaderColumn>),
-      (<TableHeaderColumn>Description</TableHeaderColumn>),
-      (<TableHeaderColumn>Trial</TableHeaderColumn>),
-      (<TableHeaderColumn>Recurring Charges</TableHeaderColumn>),
-      (<TableHeaderColumn>Billing Frequency</TableHeaderColumn>),
-      (<TableHeaderColumn>Charging Mode</TableHeaderColumn>)
-    ];
+    const table_header =
+    ["Name", "Code", "Description", "Trial", "Recurring Charges", "Billing Frequency", "Charging Mode"].map((header, key) => (
+      <TableHeaderColumn key={key}>{header}</TableHeaderColumn>
+    ));
 
     const rows = plans.map((plan, plan_key) => (
       <TableRow key={plan_key}>

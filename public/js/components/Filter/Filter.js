@@ -79,7 +79,7 @@ export default class Filter extends Component {
     const inputs = fields.map((field, key) => {
       if (field.display !== undefined && field.display === false) return (null);
       return (
-        <div className="col-xs-3" key={key}>
+        <div className="col-xs-2" key={key}>
           <input id={field.id}
                  type={field.type || "text"}
                  placeholder={field.placeholder}

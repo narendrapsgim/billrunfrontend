@@ -77,7 +77,10 @@ class PlanSetup extends Component {
 
   handleSave() {
     const { action } = this.props.location.query;
-    this.props.dispatch(savePlan(this.props.plan, action, browserHistory));
+    const cb = (resp, err) => {
+      if (!err) browserHistory.goBack();
+    };
+    this.props.dispatch(savePlan(this.props.plan, action, cb));
     //browserHistory.goBack();
   }
 

@@ -12,6 +12,7 @@ import Immutable from 'immutable';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
 import { showStatusMessage } from '../actions';
+import { apiBillRun } from '../Api';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -131,7 +132,7 @@ export function getProduct(product_id) {
   };
 }
 
-function saveRateToDB(rate, action) {
+function saveRateToDB(rate, action, callback) {
   let saveUrl = '/admin/save';
 
   var formData = new FormData();
@@ -140,28 +141,48 @@ function saveRateToDB(rate, action) {
   formData.append("type", action);
   formData.append("data", JSON.stringify(rate));
 
+  const query = {
+    queries: [{
+      request: {
+        api: "save",
+        options: { form: true },
+        formData
+      }
+    }]
+  };
+
   return (dispatch) => {
     dispatch(showProgressBar());
-    let request = axiosInstance.post(saveUrl, formData).then(
-      resp => {
-        dispatch(showStatusMessage("Saved product sucessfully!", 'success'));
-        dispatch(hideProgressBar());
+    apiBillRun(query).then((resp) => {
+      const error = resp.data[0].error;
+      if (error) {
+        dispatch(showModal(error.message, "Error!"));
+      } else {
+        dispatch(showStatusMessage("Saved plan successfully!", 'success'));
       }
-    ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
+      dispatch(hideProgressBar());
+      callback(resp, error);
+    }).catch(error => {
+      console.log("CATCH", error);
+      if (error.data.message) {
+        dispatch(showModal(error.data.message, "Error!"));
+      } else {
+        console.log(error);
+        dispatch(showModal("Network error!", "Error!"));
+      }
       dispatch(hideProgressBar());
     });
   };
 }
 
-export function saveProduct(rate, action) {
+export function saveProduct(rate, action, callback = () => {}) {
   if (!rate.get('unit'))
     return dispatch => {
       return dispatch(showModal("Must specify a unit type!", "Error!"));
     };
   const conv = buildRateFromState(rate);
   return dispatch => {
-    return dispatch(saveRateToDB(conv, action));
+    return dispatch(saveRateToDB(conv, action, callback));
   };
 }
 

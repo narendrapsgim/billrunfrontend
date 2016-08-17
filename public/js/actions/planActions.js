@@ -14,6 +14,7 @@ import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { validate, invalidForm } from './validatorActions';
 import { showModal } from './modalActions';
 import { showStatusMessage } from '../actions';
+import { apiBillRun } from '../Api';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -185,11 +186,9 @@ export function clearPlan() {
   };
 }
 
-function savePlanToDB(plan, action) {
-  const saveUrl = '/admin/save';
+function savePlanToDB(plan, action, callback) {
   const type = action !== 'new' ? "close_and_new" : action;
-
-  var formData = new FormData();
+  const formData = new FormData();
   if (action !== 'new') {
     formData.append('id', plan.id);
   }
@@ -197,14 +196,29 @@ function savePlanToDB(plan, action) {
   formData.append("type", type);
   formData.append("data", JSON.stringify(plan));
 
+  const query = {
+    queries: [{
+      request: {
+        api: "save",
+        options: { form: true },
+        formData
+      }
+    }]
+  };
+
   return (dispatch) => {
     dispatch(showProgressBar());
-    const request = axiosInstance.post(saveUrl, formData).then(
-      resp => {
-        dispatch(showStatusMessage("Saved plan sucessfully!", 'success'));
-        dispatch(hideProgressBar());
+    apiBillRun(query).then((resp) => {
+      const error = resp.data[0].error;
+      if (error) {
+        dispatch(showModal(error.message, "Error!"));
+      } else {
+        dispatch(showStatusMessage("Saved plan successfully!", 'success'));
       }
-    ).catch(error => {
+      dispatch(hideProgressBar());
+      callback(resp, error);
+    }).catch(error => {
+      console.log("CATCH", error);
       if (error.data.message) {
         dispatch(showModal(error.data.message, "Error!"));
       } else {
@@ -213,18 +227,12 @@ function savePlanToDB(plan, action) {
       }
       dispatch(hideProgressBar());
     });
-  };  
-};
+  };
+}
 
-export function savePlan(plan, action, bh) {
-  // const validations = validate(plan, 'plan_setup');
-  // if (!validations.get('valid')) {
-  //   return dispatch => {
-  //     return dispatch(invalidForm(validations));
-  //   };
-  // }
+export function savePlan(plan, action, callback = () => {}) {
   const conv = buildPlanFromState(plan);
   return dispatch => {
-    return dispatch(savePlanToDB(conv, action));
+    return dispatch(savePlanToDB(conv, action, callback));
   };
 }
