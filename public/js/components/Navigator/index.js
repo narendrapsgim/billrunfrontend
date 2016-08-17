@@ -27,7 +27,7 @@ export default class Navigator extends Component {
     super(props);
   }
 
-  render() {
+  render() {    
     let buttons = routes.map((route, key) => (
       <Link to={route.to} key={key} activeClassName='active'>
         <FlatButton label={route.label} labelStyle={{textTransform: "none"}} style={{maxWidth: "240px"}} />

@@ -59,7 +59,7 @@ class SubscribersList extends Component {
   onNewSubscriber() {
     this.context.router.push({
       pathname: "subscriber",
-      query: {action: "new"}
+      query: { action: "new" }
     });
   }
   
@@ -67,11 +67,12 @@ class SubscribersList extends Component {
     const { subscriber } = this.props;
 
     const fields = [
-      {id: "firstname", placeholder: "First Name"},
-      {id: "lastname", placeholder: "Last Name"},
-      {id: "address", placeholder: "Address"},
-      {id: "email", placeholder: "Email"},
-      {id: "to", placeholder: "To", display: false, type: "datetime"}
+      { id: "aid", placeholder: "Account ID" },
+      { id: "firstname", placeholder: "First Name" },
+      { id: "lastname", placeholder: "Last Name" },
+      { id: "address", placeholder: "Address" },
+      { id: "email", placeholder: "Email" },
+      { id: "to", placeholder: "To", display: false, type: "datetime" }
     ];
 
     const table_header = fields.map((field, idx) => (
@@ -91,10 +92,10 @@ class SubscribersList extends Component {
     return (
       <div className="SubscribersList">
         <div className="row" style={{marginBottom: 10}}>
-          <div className="col-xs-5">
+          <div className="col-xs-9">
             <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
           </div>
-          <div className="col-xs-5">
+          <div className="col-xs-3">
             <div style={{float: "right"}}>
               <RaisedButton primary={true} label="New" onMouseUp={this.onNewSubscriber} />
             </div>
