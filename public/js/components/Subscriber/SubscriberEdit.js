@@ -8,6 +8,7 @@ import { clearCustomer, saveSubscriber } from '../../actions/customerActions';
 import { getSettings } from '../../actions/settingsActions';
 import { getPlans } from '../../actions/plansActions';
 import { saveSubscription } from '../../actions/subscribersActions';
+import { showStatusMessage } from '../../actions';
 
 import New from './New';
 import Edit from './Edit';
@@ -78,15 +79,19 @@ class SubscriberEdit extends Component {
   }
   
   onSave() {
+    if (!this.props.account.size) {
+      this.props.dispatch(showStatusMessage("Please input data", "error"));
+      return;
+    }
     const action = this.state.newCustomer ? "new" : this.props.location.query.action;
-    this.props.dispatch(saveSubscriber(action, this.props.account));
-    if (this.state.aid) {
-       this.props.dispatch(getAccount(this.state.aid));
-       this.props.dispatch(getSubscribers(this.state.aid));
-       this.setState({newCustomer: false});
-    }//  else {
-    //   browserHistory.goBack();
-    // }
+    const cb = action !== 'new' ?
+               () => {} :
+                   (err) => {
+                     if (!err) {
+                       browserHistory.goBack();
+                     }
+                   };
+    this.props.dispatch(saveSubscriber(action, this.props.account, cb));
   }
 
   onCancel() {
