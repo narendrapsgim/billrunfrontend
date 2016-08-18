@@ -10,40 +10,47 @@ import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
 import { showStatusMessage } from '../actions';
+import { apiBillRun, apiBillRunErrorHandler } from '../Api';
 
 let axiosInstance = axios.create({
   withCredentials: true,
   baseURL: globalSetting.serverUrl
 });
 
-export function saveSubscriber(action, data) {
-  let saveUrl;
-
-  if (data.get('aid')) {
-    saveUrl = `/api/subscribers?method=update&type=account&query={"aid": ${data.get('aid')}}&update=${JSON.stringify(data.toJS())}`;
-  } else {
-    saveUrl = `/api/subscribers?method=create&type=account&subscriber=${JSON.stringify(data.toJS())}`;
-  }
-
+export function saveSubscriber(action, data, callback) {
+  const params = data.get('aid') ?
+                 [{ method: "update" },
+                  { type: "account" },
+                  { query: JSON.stringify({"aid": data.get('aid')}) },
+                  { update: JSON.stringify(data.toJS()) }] :
+                 [{ method: "create" },
+                  { type: "account" },
+                  { subscriber: JSON.stringify(data.toJS()) }];
+  const query = {
+    api: "subscribers",
+    params
+  };
+  
   return (dispatch) => {
     dispatch(showProgressBar());
-    let request = axiosInstance.post(saveUrl).then(
-      resp => {
-        if (!resp.data.status) {
-          dispatch(showModal(resp.data.details, "Error!"));
-        } else {
-          dispatch(showStatusMessage("Saved customer sucessfully!", 'success'));
-        }
+    apiBillRun(query).then(
+      success => {
+        if (data.get('aid'))
+          dispatch(showStatusMessage("Customer saved successfully", 'success'));
+        else
+          dispatch(showStatusMessage("Customer created successfully", 'success'));
+        callback(false);
         dispatch(hideProgressBar());
+      },
+      failure => {
+        let errorMessages = failure.error.map( (response) => response.error.desc );
+        dispatch(showModal(errorMessages, "Error!"));
+        dispatch(hideProgressBar());
+        callback(true);
       }
-    ).catch(error => {
-      if (error.data) {
-        dispatch(showModal(error.data.message, "Error!"));
-      } else {
-        console.log(error);
-      }
-      dispatch(hideProgressBar());
-    });
+    ).catch(
+      error => dispatch(apiBillRunErrorHandler(error))
+    );
   };
 }
 

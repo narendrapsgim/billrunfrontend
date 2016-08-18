@@ -12,7 +12,7 @@ import Immutable from 'immutable';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
 import { showStatusMessage } from '../actions';
-import { apiBillRun } from '../Api';
+import { apiBillRun, apiBillRunErrorHandler } from '../Api';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -141,37 +141,32 @@ function saveRateToDB(rate, action, callback) {
   formData.append("type", action);
   formData.append("data", JSON.stringify(rate));
 
-  const query = {
-    queries: [{
-      request: {
-        api: "save",
-        options: { form: true },
-        formData
-      }
-    }]
-  };
+  const query = [{
+    api: "save",
+    name: "product",
+    options: {
+      method: "POST",
+      body: formData
+    },
+  }];
 
   return (dispatch) => {
     dispatch(showProgressBar());
-    apiBillRun(query).then((resp) => {
-      const error = resp.data[0].error;
-      if (error) {
-        dispatch(showModal(error.message, "Error!"));
-      } else {
-        dispatch(showStatusMessage("Saved plan successfully!", 'success'));
+    apiBillRun(query).then(
+      success => {
+        dispatch(showStatusMessage("Product saved successfully", 'success'));
+        dispatch(hideProgressBar());
+        callback(false);
+      },
+      failure => {
+        let errorMessages = failure.error.map( (response) => `${response.name}: ${response.error.message}`);
+        dispatch(showModal(errorMessages, "Error!"));
+        dispatch(hideProgressBar());
+        callback(true);
       }
-      dispatch(hideProgressBar());
-      callback(resp, error);
-    }).catch(error => {
-      console.log("CATCH", error);
-      if (error.data.message) {
-        dispatch(showModal(error.data.message, "Error!"));
-      } else {
-        console.log(error);
-        dispatch(showModal("Network error!", "Error!"));
-      }
-      dispatch(hideProgressBar());
-    });
+    ).catch(
+      error => { dispatch(apiBillRunErrorHandler(error)); }
+    );    
   };
 }
 
