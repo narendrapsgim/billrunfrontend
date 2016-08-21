@@ -46,7 +46,7 @@ class InputProcessor extends Component {
       stepIndex: 0,
       finished: 0,
       steps: [
-        "sample_csv",
+        "parser",
         "processor",
         "customer_identification_fields",
         "receiver"
@@ -150,25 +150,25 @@ class InputProcessor extends Component {
   onError(message) {
     this.props.dispatch(showStatusMessage(message, 'error'));
   }
-  
-  save() {
-    this.props.dispatch(saveInputProcessorSettings(this.props.settings));
-  }
-  
+
   handleNext() {
     const { stepIndex } = this.state;
-    if (this.state.finished) {
-      this.save();
-      return;
-    }
-    /* if (stepIndex > 0)
-       this.props.dispatch(saveInputProcessorSettings(this.props.settings, this.state.steps[stepIndex])); */
-    const totalSteps = this.state.steps.length - 1;
-    const finished = (stepIndex + 1) === totalSteps;
-    this.setState({
-      stepIndex: stepIndex + 1,
-      finished
-    });
+    const cb = (err) => {
+      if (err) return;
+      if (this.state.finished) {
+        this.props.dispatch(showStatusMessage("Input processor saved successfully!", "success"));
+        this.props.onCancel();
+      } else {
+        const totalSteps = this.state.steps.length - 1;
+        const finished = (stepIndex + 1) === totalSteps;
+        this.setState({
+          stepIndex: stepIndex + 1,
+          finished
+        });
+      }
+    };
+    const part = this.state.finished ? false : this.state.steps[stepIndex];
+    this.props.dispatch(saveInputProcessorSettings(this.props.settings, cb, part));
   }
 
   handlePrev() {

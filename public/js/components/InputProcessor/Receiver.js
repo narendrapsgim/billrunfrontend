@@ -9,7 +9,6 @@ export default class Receiver extends Component {
     const { settings,
             onSetReceiverField,
             onSetReceiverCheckboxField } = this.props;
-    console.log(settings.toJS());
 
     const period_options = [{min: 1, label: "1 Minute"},
                             {min: 15, label: "15 Minutes"},

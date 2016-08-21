@@ -62,18 +62,14 @@ export function getSubscribers(aid) {
 
 function saveSubscriptionToDB(subscription, callback) {
   const query = {
-    queries: [{
-      request: {
-        api: "subscribers",
-        params: [
-          { method: "update" },
-          { type: "subscriber" },
-          { query: JSON.stringify({aid: subscription.aid, sid: subscription.sid}) },
-          { update: JSON.stringify(subscription) },
-          { project: JSON.stringify({"key": 1}) }
-        ]
-      }
-    }]
+    api: "subscribers",
+    params: [
+      { method: "update" },
+      { type: "subscriber" },
+      { query: JSON.stringify({aid: subscription.aid, sid: subscription.sid}) },
+      { update: JSON.stringify(subscription) },
+      { project: JSON.stringify({"key": 1}) }
+    ]
   };
   return (dispatch) => {
     dispatch(showProgressBar());
