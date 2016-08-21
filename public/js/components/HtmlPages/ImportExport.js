@@ -155,7 +155,7 @@ export default class ImportExport extends Component {
           />
         </Paper>
         <Dialog
-            title="Import Successful!"
+            title="Import Results"
             actions={modal_actions}
             modal={false}
             open={this.state.import_modal_open}
