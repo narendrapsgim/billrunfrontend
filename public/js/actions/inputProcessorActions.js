@@ -48,7 +48,8 @@ function fetchProcessorSettings(file_type) {
         rate_calculators: {},
         receiver: {
           type: "ftp",
-          connections: []
+          passive: false,
+          delete_received: false
         }
       };
     
@@ -241,7 +242,7 @@ export function saveInputProcessorSettings(state, part=false) {
       ]
     }
   };
-
+  
   const settingsToSave = part ? {file_type: state.get('file_type'), [part]: {...settings[part]}} : settings;
   const setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settingsToSave)}`;
   return (dispatch) => {
