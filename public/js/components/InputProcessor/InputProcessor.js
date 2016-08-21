@@ -82,7 +82,7 @@ class InputProcessor extends Component {
         /* Only need first line */
         let lines = evt.target.result.split('\n');
         let header = lines[0];
-        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/ /g, "_").toLowerCase(); });
+        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/[ ([{]/g, "_").replace(/[)\]}]/g, "").toLowerCase(); });
         this.props.dispatch(setFields(fields));
       }
     });
@@ -91,7 +91,17 @@ class InputProcessor extends Component {
   }
 
   onAddField(val, e) {
-    this.props.dispatch(addCSVField(val));
+    if (!val || _.isEmpty(val.replace(/ /g, ''))) {
+      this.props.dispatch(showStatusMessage("Please input field name", 'error'));
+      return;
+    };
+    const value = val.replace(/[ ([{]/g, "_").replace(/[\]})]/g, '').toLowerCase();    
+    const fields = this.props.settings.get('fields');
+    if (fields.includes(value)) {
+      this.props.dispatch(showStatusMessage("Field already exists", "error"));
+      return;
+    }
+    this.props.dispatch(addCSVField(value));
   }
 
   onSetFieldMapping(e) {
