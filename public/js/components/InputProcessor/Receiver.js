@@ -49,7 +49,7 @@ export default class Receiver extends Component {
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="remote_directory" className="col-xs-2 control-label">Direcotry</label>
+            <label htmlFor="remote_directory" className="col-xs-2 control-label">Directory</label>
             <div className="col-xs-4">
               <input className="form-control" id="remote_directory" onChange={onSetReceiverField} value={settings.get('remote_directory')}/>
             </div>

@@ -19,6 +19,7 @@ import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { showModal } from './modalActions';
 import { showStatusMessage } from '../actions';
+import { apiBillRun, apiBillRunErrorHandler } from '../Api';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -48,7 +49,8 @@ function fetchProcessorSettings(file_type) {
         rate_calculators: {},
         receiver: {
           type: "ftp",
-          connections: []
+          passive: false,
+          delete_received: false
         }
       };
     
@@ -207,7 +209,7 @@ export function setReceiverField(field, mapping) {
   };
 }
 
-export function saveInputProcessorSettings(state, part=false) {
+export function saveInputProcessorSettings(state, callback, part=false) {
   const processor = state.get('processor'),
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
@@ -242,24 +244,34 @@ export function saveInputProcessorSettings(state, part=false) {
     }
   };
 
-  const settingsToSave = part ? {file_type: state.get('file_type'), [part]: {...settings[part]}} : settings;
-  const setUrl = `/api/settings?category=file_types&action=set&data=${JSON.stringify(settingsToSave)}`;
+  let settingsToSave;
+  if (part === "customer_identification_fields") {
+    settingsToSave = {file_type: state.get('file_type'), [part]: {...settings[part]}, rate_calculators: settings.rate_calculators};
+  } else {
+    settingsToSave = part ? {file_type: state.get('file_type'), [part]: {...settings[part]}} : settings;
+  }
+  const query = {
+    api: "settings",
+    params: [
+      { category: "file_types" },
+      { action: "set" },
+      { data: JSON.stringify(settingsToSave) }
+    ]
+  };
   return (dispatch) => {
-    dispatch(showProgressBar());
-    let request = axiosInstance.post(setUrl).then(
-      resp => {
-        if (!resp.data.status) {
-          dispatch(showModal(resp.data.desc, "Error!"));
-        } else {
-          dispatch(showStatusMessage("Saved input processor sucessfully!", 'success'));
-        }
-        dispatch(hideProgressBar());
+    apiBillRun(query).then(
+      success => {
+        callback(false);
+      },
+      failure => {
+        const errorMessages = failure.error.map((resp) => resp.error.desc);
+        dispatch(showModal(errorMessages, "Error!"));
+        callback(true);
       }
-    ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
-      dispatch(hideProgressBar());
-    });
-  };  
+    ).catch(
+      error => dispatch(apiBillRunErrorHandler(error))
+    );
+  };
 }
 
 function gotInputProcessors(input_processors) {

@@ -64,10 +64,7 @@ export default function (state = defaultState, action) {
       return state.setIn(['processor', field], mapping);
 
     case ADD_CSV_FIELD:
-      if (!action.field || _.isEmpty(action.field.replace(/ /g, ''))) return state;
-      const fields = state.get('fields');
-      if (fields.includes(action.field)) return state;
-      return state.set('fields', fields.push(action.field));
+      return state.update('fields', list => list.push(action.field));
 
     case MAP_USAGET:
       const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
