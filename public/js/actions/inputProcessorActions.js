@@ -14,6 +14,8 @@ export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
 export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
 export const CLEAR_INPUT_PROCESSOR = 'CLEAR_INPUT_PROCESSOR';
 export const MAP_USAGET = 'MAP_USAGET';
+export const REMOVE_CSV_FIELD = 'REMOVE_CSV_FIELD';
+export const REMOVE_USAGET_MAPPING = 'REMOVE_USAGET_MAPPING';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -90,6 +92,7 @@ function fetchProcessorSettings(file_type) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
+      console.log(error);
       dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
@@ -153,12 +156,20 @@ export function addCSVField(field) {
   };
 }
 
+export function removeCSVField(index) {
+  return {
+    type: REMOVE_CSV_FIELD,
+    index
+  };
+}
+
 export function addUsagetMapping(usaget) {
   let setUrl = `/api/settings?category=usage_types&action=set&data=[${JSON.stringify(usaget)}]`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(
       resp => {
+        dispatch(hideProgressBar());
         if (!resp.data.status) {
           dispatch(showModal(resp.data.desc, "Error!"));
         } else {
@@ -168,12 +179,18 @@ export function addUsagetMapping(usaget) {
             usaget
           };
         }
-        dispatch(hideProgressBar());
       }
     ).catch(error => {
       dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
+  };
+}
+
+export function removeUsagetMapping(index) {
+  return {
+    type: REMOVE_USAGET_MAPPING,
+    index
   };
 }
 
@@ -312,5 +329,28 @@ export function newInputProcessor() {
 export function clearInputProcessor() {
   return {
     type: CLEAR_INPUT_PROCESSOR
+  };
+}
+
+export function deleteInputProcessor(file_type, callback) {
+  const query = {
+    api: "settings",
+    params: [
+      { category: "file_types" },
+      { action: "unset" },
+      { data: JSON.stringify({"file_type": file_type}) }
+    ]
+  };
+
+  return (dispatch) => {
+    apiBillRun(query).then(
+      success => {
+        callback(false);
+      }, failure => {
+        callback(true);
+      }
+    ).catch(error => {
+      console.log(error);
+    })
   };
 }

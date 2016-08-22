@@ -4,6 +4,8 @@ import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
 import Field from '../Field';
 import Help from '../Help';
 import { PlanDescription } from '../../FieldDescriptions';
+import FontIcon from 'material-ui/FontIcon';
+import * as Colors from 'material-ui/styles/colors'
 
 export default class Plan extends Component {
   constructor(props) {
@@ -101,14 +103,13 @@ export default class Plan extends Component {
                   <Field id="PeriodicalRate" onChange={onChangeRecurringPriceFieldValue.bind(this, "PeriodicalRate", key)} value={price.get('PeriodicalRate')} />
                 </div>
                 {(() => {  /* only show remove button if there is more than one interval and only for the last one */
-                   if (plan.get('recurring_prices').size > 1 && key === (plan.get('recurring_prices').size - 1)) {
+                   if (key === (plan.get('recurring_prices').size - 1)) {
                      return (
                        <div className="col-xs-2">
                          <label>&zwnj;</label>
                          <div>
-                           <a className="btn btn-danger" onClick={onRemoveRecurringPrice.bind(this, key)}>
-                             Remove Interval
-                           </a>
+                           <FontIcon onClick={onAddTariff} className="material-icons" style={{cursor: "pointer", color: Colors.green300, fontSize: '24px', paddingRight: '3px', marginTop: '10px'}}>add_circle_outline</FontIcon>                           
+                           <FontIcon onClick={onRemoveRecurringPrice.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '24px'}}>remove_circle_outline</FontIcon>
                          </div>
                        </div>
                      )
@@ -116,11 +117,6 @@ export default class Plan extends Component {
                  })()}
               </div>
           ))}
-          <div className="form-group">
-            <div className="col-xs-3">
-              <a className="btn btn-primary" onClick={onAddTariff} style={{marginTop: 10}}>Add Charges</a>
-            </div>
-          </div>
         </div>
       </form>
     );

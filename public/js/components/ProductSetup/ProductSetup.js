@@ -7,7 +7,6 @@ import { updateProductPropertiesField, updateProductPrefixes, addProductProperti
 import { getSettings } from '../../actions/settingsActions';
 import { addUsagetMapping, getInputProcessors } from '../../actions/inputProcessorActions';
 
-import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Product from './Product';
 
@@ -99,7 +98,7 @@ class ProductSetup extends Component {
           <Product onChangeItemSelectFieldValue={this.onChangeItemSelectFieldValue} onChangeItemFieldValue={this.onChangeItemFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onAddProductProperties={this.onAddProductProperties} onRemoveProductProperties={this.onRemoveProductProperties} onChangePrefix={this.onChangePrefix} product={this.props.product} onSelectUnit={this.onSelectUnit} usageTypes={usage_types} />
         </div>
         <div style={{marginTop: 12, float: "right"}}>
-          <FlatButton
+          <RaisedButton
               label="Cancel"
               onTouchTap={this.onCancel}
               style={{marginRight: 12}}

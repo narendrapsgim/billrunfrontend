@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
+import FontIcon from 'material-ui/FontIcon';
+import * as Colors from 'material-ui/styles/colors'
 
 export default class SampleCSV extends Component {
   constructor(props) {
@@ -16,6 +17,10 @@ export default class SampleCSV extends Component {
     this.props.onAddField.call(this, this.state.newField);
     this.setState({newField: ''});
   }
+
+  removeField(index, e) {
+    this.props.onRemoveField.call(this, index);
+  }
   
   render() {
     let { settings,
@@ -24,12 +29,14 @@ export default class SampleCSV extends Component {
           onChangeDelimiter,
           onSelectSampleCSV,
           onSetFieldWidth,
-          onAddField } = this.props;
+          onAddField,
+          onRemoveField } = this.props;
 
     const fieldsHTML = settings.get('delimiter_type') === "fixed" ?
                        settings.get('fields').map((field, key) => (
                          <div className="form-group" key={key}>
                            <div className="col-xs-2">
+                             <FontIcon onClick={this.removeField.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '13px', marginRight: '5px'}}>remove_circle_outline</FontIcon>
                              {field}
                            </div>
                            <div className="col-xs-2">
@@ -45,6 +52,7 @@ export default class SampleCSV extends Component {
                        settings.get('fields').map((field, key) => (
                          <div className="form-group" key={key}>
                            <div className="col-xs-2">
+                             <FontIcon onClick={this.removeField.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '13px', marginRight: '5px'}}>remove_circle_outline</FontIcon>
                              { field }
                            </div>
                          </div>
@@ -107,7 +115,7 @@ export default class SampleCSV extends Component {
             <input className="form-control" value={this.state.newField} onChange={(e) => { this.setState({newField: e.target.value}) } } placeholder="Field Name"/>
           </div>
           <div className="col-xs-2">
-            <a onClick={this.addField} className="btn btn-primary">Add Field</a>
+            <FontIcon onClick={this.addField} className="material-icons" style={{cursor: "pointer", color: Colors.green300, fontSize: '24px', paddingRight: '3px', marginTop: '10px'}}>add_circle_outline</FontIcon>
           </div>
         </div>
       </div>

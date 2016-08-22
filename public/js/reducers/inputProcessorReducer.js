@@ -7,6 +7,7 @@ import { SET_NAME,
          SET_FIELDS,
          SET_DELIMITER,
          SET_FIELD_MAPPING,
+         REMOVE_CSV_FIELD,
          ADD_CSV_FIELD,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
@@ -14,7 +15,8 @@ import { SET_NAME,
          SET_RECEIVER_FIELD,
          SET_FIELD_WIDTH,
          CLEAR_INPUT_PROCESSOR,
-         GOT_INPUT_PROCESSORS } from '../actions/inputProcessorActions';
+         GOT_INPUT_PROCESSORS,
+         REMOVE_USAGET_MAPPING } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   delimiter: '',
@@ -28,7 +30,8 @@ let defaultState = Immutable.fromJS({
       conditions: [
         {
           field: "usaget",
-          regex: "/.*/"
+          regex: "/.*/",
+          target_key: "sid"
         }
       ],
       clear_regex: "//"
@@ -66,6 +69,9 @@ export default function (state = defaultState, action) {
     case ADD_CSV_FIELD:
       return state.update('fields', list => list.push(action.field));
 
+    case REMOVE_CSV_FIELD:
+      return state.update('fields', list => list.remove(action.index));
+      
     case MAP_USAGET:
       const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
       const { pattern, usaget } = action.mapping;
@@ -74,7 +80,10 @@ export default function (state = defaultState, action) {
         usaget
       });
       return state.updateIn(['processor', 'usaget_mapping'], list => list.push(new_map) ).setIn(['rate_calculators', usaget], Immutable.List());
-    
+
+    case REMOVE_USAGET_MAPPING:
+      return state.updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index));
+      
     case SET_CUSETOMER_MAPPING:
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 
