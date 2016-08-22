@@ -331,3 +331,26 @@ export function clearInputProcessor() {
     type: CLEAR_INPUT_PROCESSOR
   };
 }
+
+export function deleteInputProcessor(file_type, callback) {
+  const query = {
+    api: "settings",
+    params: [
+      { category: "file_types" },
+      { action: "unset" },
+      { data: JSON.stringify({"file_type": file_type}) }
+    ]
+  };
+
+  return (dispatch) => {
+    apiBillRun(query).then(
+      success => {
+        callback(false);
+      }, failure => {
+        callback(true);
+      }
+    ).catch(error => {
+      console.log(error);
+    })
+  };
+}

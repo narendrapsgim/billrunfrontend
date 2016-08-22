@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, mapUsaget, removeUsagetMapping } from '../../actions/inputProcessorActions';
+import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, mapUsaget, removeUsagetMapping, deleteInputProcessor } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showStatusMessage } from '../../actions';
 
@@ -192,9 +192,17 @@ class InputProcessor extends Component {
 
   handleCancel() {
     let r = confirm("are you sure you want to stop editing input processor?");
+    const { dispatch } = this.props;
     if (r) {
-      this.props.dispatch(clearInputProcessor());
-      this.props.onCancel();
+      const cb = (err) => {
+        if (err) {
+          dispatch(showStatusMessage("Please try again", "error"));
+          return;
+        }
+        dispatch(clearInputProcessor());
+        this.props.onCancel();
+      };
+      dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
     }   
   }
 
