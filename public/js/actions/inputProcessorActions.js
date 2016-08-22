@@ -159,6 +159,7 @@ export function addUsagetMapping(usaget) {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(
       resp => {
+        dispatch(hideProgressBar());
         if (!resp.data.status) {
           dispatch(showModal(resp.data.desc, "Error!"));
         } else {
@@ -168,7 +169,6 @@ export function addUsagetMapping(usaget) {
             usaget
           };
         }
-        dispatch(hideProgressBar());
       }
     ).catch(error => {
       dispatch(showModal(error.data.message, "Error!"));

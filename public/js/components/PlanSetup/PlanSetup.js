@@ -10,6 +10,7 @@ import Tab from 'react-bootstrap/lib/Tab';
 import { updatePlanField, updatePlanRecurringPriceField, getPlan, clearPlan, savePlan, addTariff, removeRecurringPrice } from '../../actions/planActions';
 import { getInputProcessors } from '../../actions/inputProcessorActions';
 import { savePlanRates } from '../../actions/planProductsActions';
+import { showStatusMessage } from '../../actions';
 
 import Plan from './Plan';
 import PlanProductsTab from './PlanProductsTab';
@@ -76,11 +77,12 @@ class PlanSetup extends Component {
   }
 
   handleSave() {
+    const { plan, dispatch } = this.props;
     const { action } = this.props.location.query;
     const cb = (err) => {
       if (!err) browserHistory.goBack();
     };
-    this.props.dispatch(savePlan(this.props.plan, action, cb));
+    dispatch(savePlan(this.props.plan, action, cb));
     //browserHistory.goBack();
   }
 
