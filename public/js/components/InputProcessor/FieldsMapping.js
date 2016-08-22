@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { Table } from 'react-bootstrap/lib';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
+import FontIcon from 'material-ui/FontIcon';
+import * as Colors from 'material-ui/styles/colors'
 import Select from 'react-select';
 
 export default class FieldsMapping extends Component {
@@ -52,6 +52,10 @@ export default class FieldsMapping extends Component {
     this.setState({pattern: "", usaget: ""});
   }
 
+  removeUsagetMapping(index, e) {
+    this.props.onRemoveUsagetMapping.call(this, index);
+  }
+  
   render() {
     const { settings,
             usageTypes,
@@ -129,6 +133,9 @@ export default class FieldsMapping extends Component {
                 <div className="form-group" key={key}>
                   <div className="col-xs-2">{usage_t.get('pattern')}</div>
                   <div className="col-xs-2">{usage_t.get('usaget')}</div>
+                  <div className="col-xs-2">
+                    <FontIcon onClick={this.removeUsagetMapping.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '24px'}}>remove_circle_outline</FontIcon>
+                  </div>
                 </div>
               ))
             }
@@ -142,13 +149,12 @@ export default class FieldsMapping extends Component {
                         options={available_units}
                         allowCreate={true}
                         value={this.state.usaget}
+                        style={{marginTop: 3}}
                         onChange={this.onChangeUsaget}
                     />
                   </div>
                   <div className="col-xs-2">
-                    <FloatingActionButton mini={true} onMouseUp={this.addUsagetMapping}>
-                      <ContentAdd />
-                    </FloatingActionButton>
+                    <FontIcon onClick={this.addUsagetMapping} className="material-icons" style={{cursor: "pointer", color: Colors.green300, fontSize: '24px', marginTop: '9px'}}>add_circle_outline</FontIcon>
                   </div>
                 </div>
           </div>

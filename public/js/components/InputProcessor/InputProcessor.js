@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, mapUsaget } from '../../actions/inputProcessorActions';
+import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, mapUsaget, removeUsagetMapping } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showStatusMessage } from '../../actions';
 
@@ -16,7 +16,6 @@ import {
   Stepper,
   StepLabel,
 } from 'material-ui/Stepper';
-import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 
 class InputProcessor extends Component {
@@ -25,6 +24,7 @@ class InputProcessor extends Component {
 
     this.onSetReceiverCheckboxField = this.onSetReceiverCheckboxField.bind(this);
     this.onSetCalculatorMapping = this.onSetCalculatorMapping.bind(this);
+    this.onRemoveUsagetMapping = this.onRemoveUsagetMapping.bind(this);
     this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
     this.onSetReceiverField = this.onSetReceiverField.bind(this);
     this.onSetDelimiterType = this.onSetDelimiterType.bind(this);
@@ -128,6 +128,10 @@ class InputProcessor extends Component {
     this.props.dispatch(mapUsaget(val));
   }
 
+  onRemoveUsagetMapping(index, e) {
+    this.props.dispatch(removeUsagetMapping(index));
+  }
+
   onSetCustomerMapping(e) {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setCustomerMapping(field, mapping));
@@ -200,7 +204,7 @@ class InputProcessor extends Component {
 
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} settings={settings} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onError={this.onError} settings={settings} usageTypes={usage_types} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} settings={settings} usageTypes={usage_types} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
@@ -226,10 +230,14 @@ class InputProcessor extends Component {
           { steps[stepIndex] }
         </div>
         <div style={{marginTop: 12, float: "right"}}>
+          <RaisedButton
+              label="cancel"
+              onTouchTap={this.handleCancel}
+              style={{marginRight: 12}} />
           {(() => {
              if (stepIndex > 0) {
                return (
-                 <FlatButton
+                 <RaisedButton
                      label="Back"
                      onTouchTap={this.handlePrev}
                      style={{marginRight: 12}} />
@@ -240,12 +248,6 @@ class InputProcessor extends Component {
                      label={stepIndex === (steps.length - 1) ? "Finish" : "Next"}
                      primary={true}
                      onTouchTap={this.handleNext} />
-        </div>
-        <div style={{marginTop: 12, float: "left"}}>
-          <FlatButton
-              label="cancel"
-              onTouchTap={this.handleCancel}
-              style={{marginRight: 12}} />          
         </div>
       </div>
     );

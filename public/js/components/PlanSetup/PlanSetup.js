@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Tabs from 'react-bootstrap/lib/Tabs';
 import Tab from 'react-bootstrap/lib/Tab';
@@ -14,7 +13,6 @@ import { showStatusMessage } from '../../actions';
 
 import Plan from './Plan';
 import PlanProductsTab from './PlanProductsTab';
-
 
 class PlanSetup extends Component {
   constructor(props) {
@@ -108,7 +106,7 @@ class PlanSetup extends Component {
               <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} validator={validator} plan={plan} />
             </div>
             <div style={{marginTop: 12, float: "right"}}>
-              <FlatButton
+              <RaisedButton
                   label="Cancel"
                   onTouchTap={this.handleBack}
                   style={{marginRight: 12}}
@@ -129,7 +127,7 @@ class PlanSetup extends Component {
                 {planName.length ? <PlanProductsTab planName={planName}/> : null}
               </div>
               <div style={{marginTop: 12, float: "right"}}>
-                <FlatButton
+                <RaisedButton
                     label="Cancel"
                     onTouchTap={this.handleBack}
                     style={{marginRight: 12}}

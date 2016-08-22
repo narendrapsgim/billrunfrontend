@@ -15,6 +15,7 @@ export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
 export const CLEAR_INPUT_PROCESSOR = 'CLEAR_INPUT_PROCESSOR';
 export const MAP_USAGET = 'MAP_USAGET';
 export const REMOVE_CSV_FIELD = 'REMOVE_CSV_FIELD';
+export const REMOVE_USAGET_MAPPING = 'REMOVE_USAGET_MAPPING';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -183,6 +184,13 @@ export function addUsagetMapping(usaget) {
       dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
+  };
+}
+
+export function removeUsagetMapping(index) {
+  return {
+    type: REMOVE_USAGET_MAPPING,
+    index
   };
 }
 
