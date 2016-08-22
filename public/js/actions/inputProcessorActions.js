@@ -14,6 +14,7 @@ export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
 export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
 export const CLEAR_INPUT_PROCESSOR = 'CLEAR_INPUT_PROCESSOR';
 export const MAP_USAGET = 'MAP_USAGET';
+export const REMOVE_CSV_FIELD = 'REMOVE_CSV_FIELD';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -90,6 +91,7 @@ function fetchProcessorSettings(file_type) {
         dispatch(hideProgressBar());
       }
     ).catch(error => {
+      console.log(error);
       dispatch(showModal(error.data.message, "Error!"));
       dispatch(hideProgressBar());
     });
@@ -150,6 +152,13 @@ export function addCSVField(field) {
   return {
     type: ADD_CSV_FIELD,
     field
+  };
+}
+
+export function removeCSVField(index) {
+  return {
+    type: REMOVE_CSV_FIELD,
+    index
   };
 }
 

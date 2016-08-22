@@ -7,6 +7,7 @@ import { SET_NAME,
          SET_FIELDS,
          SET_DELIMITER,
          SET_FIELD_MAPPING,
+         REMOVE_CSV_FIELD,
          ADD_CSV_FIELD,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
@@ -66,6 +67,9 @@ export default function (state = defaultState, action) {
     case ADD_CSV_FIELD:
       return state.update('fields', list => list.push(action.field));
 
+    case REMOVE_CSV_FIELD:
+      return state.update('fields', list => list.remove(action.index));
+      
     case MAP_USAGET:
       const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
       const { pattern, usaget } = action.mapping;
