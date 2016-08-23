@@ -14,6 +14,7 @@ const defaultState = Immutable.fromJS({
   description: '',
   unit_price: '',
   from: moment().toISOString(),
+  vatable: true,
   to: moment().add(1, 'years').toISOString(),
   rates: []
 });

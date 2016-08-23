@@ -44,6 +44,7 @@ function buildRateFromState(state) {
     to: product.to,
     code: product.code,
     unit_price: product.unit_price,
+    vatable: product.vatable,
     description: product.description,
     params: params,
     rates: r
@@ -96,6 +97,7 @@ function fetchProduct(product_id) {
       unit_price: product.unit_price,
       description: product.description,
       params: product.params,
+      vatable: product.vatable,
       code: product.code,
       from: product.from,
       to: product.to,
@@ -196,6 +198,7 @@ export function convert(product, plan = 'BASE'){
     from: product.from,
     to: product.to,
     code: product.code,
+    vatable: product.vatable,
     unit,
     unit_price: product.unit_price,
     description: product.description,
