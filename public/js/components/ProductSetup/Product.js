@@ -119,6 +119,16 @@ export default class Product extends Component {
             <Chips items={this.productPrefixes()} onChange={onChangePrefix} />
           </div>
         </div>
+        {(() => {
+           if (product.get('rates').size > 0) {
+             return (
+               <div>
+                 <h4>Price Intervals</h4>
+                 <p className="help-block">Leave cycle blank for unlimited</p>
+               </div>
+             );
+           }
+        })()}
         { product.get('rates').map((rate, key) => (
             <div className="form-group" key={key}>
               <div className="col-xs-1">

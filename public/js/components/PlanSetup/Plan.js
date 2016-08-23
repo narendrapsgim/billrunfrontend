@@ -92,6 +92,7 @@ export default class Plan extends Component {
         </div>
         <div className="PlanRecurring" style={{marginTop: 20}}>
           <h4>Recurring Charges</h4>
+          <p className="help-block">Leave cycle blank for unlimited</p>
           { plan.get('recurring_prices').map((price, key) => (
               <div className="form-group" key={key}>
                 <div className="col-xs-1">
