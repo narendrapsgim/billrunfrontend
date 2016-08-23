@@ -83,7 +83,7 @@ class InputProcessor extends Component {
         /* Only need first line */
         let lines = evt.target.result.split('\n');
         let header = lines[0];
-        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/[ ([{]/g, "_").replace(/[)\]}]/g, "").toLowerCase(); });
+        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/[^a-zA-Z_]/g, "_").toLowerCase(); });
         this.props.dispatch(setFields(fields));
       }
     });
@@ -96,7 +96,7 @@ class InputProcessor extends Component {
       this.props.dispatch(showStatusMessage("Please input field name", 'error'));
       return;
     };
-    const value = val.replace(/[ ([{]/g, "_").replace(/[\]})]/g, '').toLowerCase();    
+    const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();    
     const fields = this.props.settings.get('fields');
     if (fields.includes(value)) {
       this.props.dispatch(showStatusMessage("Field already exists", "error"));

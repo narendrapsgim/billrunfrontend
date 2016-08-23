@@ -43,6 +43,7 @@ function fetchProcessorSettings(file_type) {
         delimiter_type: '',
         delimiter: '',
         fields: [],
+        field_widths: {},
         processor: {
           usaget_mapping: [],
           src_field: ''
@@ -62,12 +63,14 @@ function fetchProcessorSettings(file_type) {
             receiver } = settings;
 
     const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
+    const field_widths = parser.type === "fixed" ? parser.structure : {};
 
     return {
       file_type: settings.file_type,
       delimiter_type: parser.type,
       delimiter: parser.separator,
-      fields: parser.structure,
+      fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
+      field_widths,
       processor: Object.assign({}, processor, {
         usaget_mapping: processor.usaget_mapping.map(usaget => {
           return {

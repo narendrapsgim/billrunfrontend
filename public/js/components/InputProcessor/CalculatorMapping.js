@@ -58,28 +58,20 @@ export default class CalculatorMapping extends Component {
           </div>
         </div>
         {
-          available_usagetypes.map((usaget, key) => (
+        available_usagetypes.map((usaget, key) => {
+        return (
             <div key={key}>
               <div className="row">
                 <div className="col-xs-2">
                   <label>{usaget}</label>
                 </div>
-                {/* <div className="col-xs-2">
-                <select id="line_key"
-                className="form-control"
-                data-usaget={usaget}
-                onChange={onSetRating}
-                value={settings.getIn(['rate_calculators', usaget, 'line_key'])}
-                defaultValue="-1">
-                { available_fields }
-                </select>
-                </div> */}
                 <div className="col-xs-1">
                   <input type="radio"
                          name={`${usaget}-type`}
                          value="match"
                          data-usaget={usaget}
                          data-rate_key="key"
+                         checked={settings.getIn(['rate_calculators', usaget, 0, 'type']) === "match"}
                          onChange={onSetRating} />By rate key
                 </div>
                 <div className="col-xs-1">
@@ -87,12 +79,13 @@ export default class CalculatorMapping extends Component {
                          name={`${usaget}-type`}
                          value="longestPrefix"
                          data-usaget={usaget}
+                         checked={settings.getIn(['rate_calculators', usaget, 0, 'type']) === "longestPrefix"}
                          data-rate_key="params.prefix"
                          onChange={onSetRating} />By longest prefix
                 </div>
               </div>
             </div>
-          ))
+          )})
         }
       </div>
     );
