@@ -104,16 +104,22 @@ export default class Edit extends Component {
     const fields = (
       <div>
         { fieldsHTML }
-        <div className="form-group">
-          <div className="col-xs-1">
-            <label>&zwnj;</label>
-            <div>
-              <Link to={`/usage?base=${JSON.stringify({aid: account.get('aid')})}`}>
-                <button className="btn">See usage</button>
-              </Link>
+      {(() => {
+        if (!newCustomer) {
+          return (
+            <div className="form-group">
+              <div className="col-xs-1">
+                <label>&zwnj;</label>
+                <div>
+                  <Link to={`/usage?base=${JSON.stringify({aid: account.get('aid')})}`}>
+                    <button className="btn">See usage</button>
+                  </Link>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        }
+      })()}
       </div>
     );
     

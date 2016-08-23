@@ -31,10 +31,10 @@ export default class SubscriptionsList extends Component {
                      </TableRowColumn>
                    ))}
                      <TableRowColumn>
-                       <Link to={`/usage?base=${JSON.stringify({sid: sub.get('sid')})}`}>
-                         Usage
+                       {/* <Link to={`/usage?base=${JSON.stringify({sid: sub.get('sid')})}`}>
+                       Usage
                        </Link>
-                       &nbsp;
+                       &nbsp; */}
                        <button className="btn btn-link"
                                onClick={onClickEditSubscription.bind(this, sub.get('sid'))}>
                          Edit

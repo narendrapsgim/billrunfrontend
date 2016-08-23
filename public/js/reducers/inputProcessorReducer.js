@@ -57,7 +57,7 @@ export default function (state = defaultState, action) {
       return state.set('delimiter', action.delimiter);
 
     case  SET_FIELDS:
-      if (state.get('fields').size > 0) return state.update('fields', list => list.concat2(action.fields));
+      if (state.get('fields').size > 0) return state.update('fields', list => list.concat(action.fields));
       return state.set('fields', Immutable.fromJS(action.fields));
 
     case SET_FIELD_WIDTH:

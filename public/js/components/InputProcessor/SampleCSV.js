@@ -32,32 +32,6 @@ export default class SampleCSV extends Component {
           onAddField,
           onRemoveField } = this.props;
 
-    const fieldsHTML = settings.get('delimiter_type') === "fixed" ?
-                       settings.get('fields').map((field, key) => (
-                         <div className="form-group" key={key}>
-                           <div className="col-xs-2">
-                             <FontIcon onClick={this.removeField.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '13px', marginRight: '5px'}}>remove_circle_outline</FontIcon>
-                             {field}
-                           </div>
-                           <div className="col-xs-2">
-                             <input type="number"
-                                    className="form-control"
-                                    data-field={field}
-                                    style={{width: 70}}
-                                    onChange={onSetFieldWidth}
-                                    value={settings.getIn(['field_widths', field])} />
-                           </div>
-                         </div>
-                       )) :
-                       settings.get('fields').map((field, key) => (
-                         <div className="form-group" key={key}>
-                           <div className="col-xs-2">
-                             <FontIcon onClick={this.removeField.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '13px', marginRight: '5px'}}>remove_circle_outline</FontIcon>
-                             { field }
-                           </div>
-                         </div>
-                       ));
-
     const selectDelimiterHTML = settings.get('file_type') ? (
       <div className="form-group">
         <div className="col-xs-2">
@@ -92,8 +66,34 @@ export default class SampleCSV extends Component {
         </div>
       </div>
     ) : (null);
-    
-    const setFieldsHTML = settings.get('fields').size < 1 ? (null) : (
+
+    const fieldsHTML = settings.get('delimiter_type') === "fixed" ?
+                       settings.get('fields').map((field, key) => (
+                         <div className="form-group" key={key}>
+                           <div className="col-xs-2">
+                             <FontIcon onClick={this.removeField.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '13px', marginRight: '5px'}}>remove_circle_outline</FontIcon>
+                             {field}
+                           </div>
+                           <div className="col-xs-2">
+                             <input type="number"
+                                    className="form-control"
+                                    data-field={field}
+                                    style={{width: 70}}
+                                    onChange={onSetFieldWidth}
+                                    value={settings.getIn(['field_widths', field])} />
+                           </div>
+                         </div>
+                       )) :
+                       settings.get('fields').map((field, key) => (
+                         <div className="form-group" key={key}>
+                           <div className="col-xs-2">
+                             <FontIcon onClick={this.removeField.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '13px', marginRight: '5px'}}>remove_circle_outline</FontIcon>
+                             { field } 
+                           </div>
+                         </div>
+                       ));
+
+    const setFieldsHTML = (
       <div>
         <div className="form-group">
           <div className="col-xs-2">

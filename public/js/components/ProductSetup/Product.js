@@ -98,7 +98,7 @@ export default class Product extends Component {
           <div className="col-xs-3">
             <div className="checkbox">
               <label>
-                <input type="checkbox" id="vatable" onChange={onChangeItemFieldValue.bind(this, "vatable", -1)} />VATable
+                <input type="checkbox" id="vatable" onChange={onChangeItemFieldValue.bind(this, "vatable", -1)} checked={product.get('vatable')} />VATable
               </label>
             </div>
           </div>
