@@ -124,7 +124,7 @@ export default class Product extends Component {
              return (
                <div>
                  <h4>Price Intervals</h4>
-                 <p className="help-block">Leave cycle blank for unlimited</p>
+                 <p className="help-block">Leave blank for unlimited</p>
                </div>
              );
            }
