@@ -194,16 +194,19 @@ class InputProcessor extends Component {
     let r = confirm("are you sure you want to stop editing input processor?");
     const { dispatch } = this.props;
     if (r) {
-      const cb = (err) => {
-        if (err) {
-          dispatch(showStatusMessage("Please try again", "error"));
-          return;
-        }
-        dispatch(clearInputProcessor());
-        this.props.onCancel();
-      };
-      dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
-    }   
+      dispatch(clearInputProcessor());
+      this.props.onCancel();
+    }
+    //   const cb = (err) => {
+    //     if (err) {
+    //       dispatch(showStatusMessage("Please try again", "error"));
+    //       return;
+    //     }
+    //     dispatch(clearInputProcessor());
+    //     this.props.onCancel();
+    //   };
+    //   dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
+    // }   
   }
 
   render() {
