@@ -54,7 +54,7 @@ function savedSettings() {
 }
 
 function saveSettingsToDB(settings) {
-  let setUrl = `/api/settings?category=business_shit&action=set&data=${JSON.stringify(settings.toJS())}`;
+  let setUrl = `/api/settings?category=settingscat&action=set&data=${JSON.stringify(settings.toJS())}`;
   return (dispatch) => {
     dispatch(showProgressBar());
     let request = axiosInstance.post(setUrl).then(
