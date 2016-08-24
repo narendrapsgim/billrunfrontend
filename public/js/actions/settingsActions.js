@@ -30,7 +30,6 @@ function fetchSettings(categories) {
   });
 
   return (dispatch) => {
-    dispatch(showProgressBar());
     apiBillRun(queries).then(
       success => {
         dispatch(gotSettings(success.data));
@@ -47,6 +46,7 @@ function fetchSettings(categories) {
 
 export function getSettings(categories = []) {
   return (dispatch) => {
+    if (!Array.isArray(categories)) return dispatch(fetchSettings([categories]));
     return dispatch(fetchSettings(categories));
   };
 }
