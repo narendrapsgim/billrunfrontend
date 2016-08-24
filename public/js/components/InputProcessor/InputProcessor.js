@@ -125,7 +125,7 @@ class InputProcessor extends Component {
     this.props.dispatch(setCalculatorMapping(field, mapping));
   }
 
-  onAddUsagetMapping(val, e) {
+  onAddUsagetMapping(val) {
     this.props.dispatch(mapUsaget(val));
   }
 

@@ -24,13 +24,6 @@ export default class FieldsMapping extends Component {
     };
   }
 
-  componentDidMount() {
-    const { settings } = this.props;
-    if (settings.get('usaget_type') === 'static') {
-      this.setState({usaget: settings.getIn(['processor', 'usaget_mapping', 0, 'usaget'])});
-    }
-  }
-
   onChangePattern(e) {
     this.setState({pattern: e.target.value});    
   }
@@ -145,7 +138,7 @@ export default class FieldsMapping extends Component {
                         id="unit"
                         options={available_units}
                         allowCreate={true}
-                        value={this.state.usaget}
+                        value={settings.getIn(['processor', 'static_usaget_mapping', 'usaget'])}
                         style={{marginTop: 3}}
                         onChange={this.onChangeStaticUsaget}
                     />
@@ -183,7 +176,7 @@ export default class FieldsMapping extends Component {
                                defaultValue="-1">
                          { available_fields }
                        </select>
-                       <p className="help-block">Types of usages and units used for measuring usage</p>
+                       <p className="help-block">Field used to map values to usage types</p>
                      </div>
                    </div>
                  </div>

@@ -48,6 +48,7 @@ function fetchProcessorSettings(file_type) {
         field_widths: {},
         processor: {
           usaget_mapping: [],
+          static_usaget_mapping: {},
           src_field: ''
         },
         customer_identification_fields: [],
@@ -242,6 +243,18 @@ export function saveInputProcessorSettings(state, callback, part=false) {
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver');
 
+  const usaget_mapping = state.get('usaget_type') === "static" ? [{
+    src_field: "stamp",
+    pattern: "/.*/",
+    usaget: processor.getIn(['static_usaget_mapping', 'usaget'])
+  }] : processor.get('usaget_mapping').map(usaget => {
+    return {
+      "src_field": processor.get('src_field'),
+      "pattern": `/^${usaget.get('pattern')}$/`,
+      "usaget": usaget.get('usaget')
+    }
+  });
+  
   const settings = {
     "file_type": state.get('file_type'),
     "parser": {
@@ -253,13 +266,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "type": "Usage",
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
-      "usaget_mapping": processor.get('usaget_mapping').map(usaget => {
-        return {
-          "src_field": state.get('usaget_type') === "static" ? 'stamp' : processor.get('src_field'),
-          "pattern": state.get('usaget_type') === "static" ? '/.*/' : `/^${usaget.get('pattern')}$/`,
-          "usaget": usaget.get('usaget')
-        }
-      })
+      usaget_mapping 
     },
     "customer_identification_fields": customer_identification_fields.toJS(),
     "rate_calculators": rate_calculators.toJS(),

@@ -18,8 +18,8 @@ export default class CalculatorMapping extends Component {
                                      ...["sid", "aid"].map((field, key) => (
                                        <option value={field} key={key}>{field}</option>
                                      ))];
-    const available_usagetypes = settings.getIn(['processor', 'usaget_mapping']).map(usaget => {
-      return usaget.get('usaget');
+    const available_usagetypes = settings.get('rate_calculators').keySeq().map(usaget => {
+      return usaget;
     });
 
     return (

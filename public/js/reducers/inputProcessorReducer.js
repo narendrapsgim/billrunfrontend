@@ -25,7 +25,8 @@ let defaultState = Immutable.fromJS({
   fields: [],
   field_widths: {},
   processor: {
-    usaget_mapping: []
+    usaget_mapping: [],
+    static_usaget_mapping: {}
   },
   customer_identification_fields: [
     {
@@ -84,7 +85,10 @@ export default function (state = defaultState, action) {
         pattern,
         usaget
       });
-      return state.updateIn(['processor', 'usaget_mapping'], list => list.push(new_map) ).setIn(['rate_calculators', usaget], Immutable.List());
+      if (state.get('usaget_type') === 'static') {
+        return state.setIn(['processor', 'static_usaget_mapping'], Immutable.fromJS(new_map)).setIn(['rate_calculators', usaget], Immutable.List());
+      }
+      return state.updateIn(['processor', 'usaget_mapping'], list => list.push(new_map)).setIn(['rate_calculators', usaget], Immutable.List());
 
     case REMOVE_USAGET_MAPPING:
       return state.updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index));
