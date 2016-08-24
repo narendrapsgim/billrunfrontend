@@ -1,47 +1,60 @@
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
 
+import { showStatusMessage } from '../actions';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import axios from 'axios';
+import { apiBillRun, apiBillRunErrorHandler } from '../Api';
 
 let axiosInstance = axios.create({
   withCredentials: true
 });
 
-function gotSettings(category, settings) {
+function gotSettings(settings) {
   return {
     type: GOT_SETTINGS,
-    category,
     settings
   };
 }
 
-function fetchSettings(category) {
-  let fetchUrl = `${globalSetting.serverUrl}/api/settings?category=${category}&data={}`;
+function fetchSettings(categories) {
+  const queries = categories.map(category => {
+    return {
+      api: "settings",
+      name: category,
+      params: [
+        { category: category },
+        { data: JSON.stringify({}) }
+      ]
+    };
+  });
+
   return (dispatch) => {
-    dispatch(showProgressBar());
-    let request = axiosInstance.get(fetchUrl).then(
-      resp => {
-        //dispatch(gotSettings(resp.data.details));
-        dispatch(gotSettings(category, resp.data.details));
-        dispatch(hideProgressBar());
+    apiBillRun(queries).then(
+      success => {
+        dispatch(gotSettings(success.data));
+      },
+      failure => {
+        dispatch(showStatusMessage("Network error!", "error"));
+        console.log('failure', failure);
       }
-    ).catch(error => {
-      /* TODO */
-      dispatch(hideProgressBar());
-    });
+    ).catch(error =>
+      dispatch(apiBillRunErrorHandler(error))
+    )
   };
 }
 
-export function getSettings(category="") {
+export function getSettings(categories = []) {
   return (dispatch) => {
-    return dispatch(fetchSettings(category));
+    if (!Array.isArray(categories)) return dispatch(fetchSettings([categories]));
+    return dispatch(fetchSettings(categories));
   };
 }
 
-export function updateSetting(name, value) {
+export function updateSetting(category, name, value) {
   return {
     type: UPDATE_SETTING,
+    category,
     name,
     value
   };
@@ -54,19 +67,30 @@ function savedSettings() {
 }
 
 function saveSettingsToDB(settings) {
-  let setUrl = `/api/settings?category=business_shit&action=set&data=${JSON.stringify(settings.toJS())}`;
+  const queries = settings.keySeq().map(category => {
+    return {
+      api: "settings",
+      params: [
+        { category: category },
+        { action: "set" },
+        { data: JSON.stringify(settings.get(category).toJS()) }
+      ]
+    };
+  }).toJS();
+
   return (dispatch) => {
-    dispatch(showProgressBar());
-    let request = axiosInstance.post(setUrl).then(
-      resp => {
-        dispatch(hideProgressBar());
+    apiBillRun(queries).then(
+      success => {
+        console.log('success!');
+      },
+      failure => {
+        console.log(failure);
+        console.log('failed!');
       }
-    ).catch(error => {
-      console.log(error);
-      dispatch(hideProgressBar());
-    });
-  };  
-  
+    ).catch(error =>
+      dispatch(apiBillRunErrorHandler(error))
+    );
+  }; 
 }
 
 export function saveSettings(settings) {

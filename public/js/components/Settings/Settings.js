@@ -48,7 +48,8 @@ class Settings extends Component {
   }
 
   componentWillMount() {
-    this.props.dispatch(getSettings("pricing"));
+    const { dispatch } = this.props;
+    dispatch(getSettings(["pricing", "billrun"]));
   }
   
   onChangeCollection(e) {
@@ -56,14 +57,19 @@ class Settings extends Component {
     this.props.dispatch(updateSetting(['collection', id], value));
   }
 
+  onChangeFieldValue(category, e) {
+    let { id, value } = e.target;
+    this.props.dispatch(updateSetting(category, id, value));
+  }
+  
   onChangeDatetime(e) {
     let { id, value } = e.target;
-    this.props.dispatch(updateSetting(['datetime', id], value));
+    this.props.dispatch(updateSetting('billrun', id, value));
   }
 
   onChangeCurrencyTax(e) {
     let { id, value } = e.target;
-    this.props.dispatch(updateSetting(['currency_tax', id], value));
+    this.props.dispatch(updateSetting('pricing', id, value));
   }
 
   onSelectInputProcessor(file_type) {
@@ -90,8 +96,8 @@ class Settings extends Component {
   render() {
     let { settings } = this.props;
     let collection = settings.get('collection') || Immutable.Map();
-    let datetime = settings.get('datetime') || Immutable.Map();
-    let currency_tax = settings.get('currency_tax') || Immutable.Map();
+    let datetime = settings.get('billrun') || Immutable.Map();
+    let currency_tax = settings.get('pricing') || Immutable.Map();
     const { processor_selected } = this.state;
     const inputProcessorView = (processor_selected ? <InputProcessor fileType={processor_selected} onCancel={this.onCancelInputProcessorEdit} /> : <InputProcessorsList onSelectInputProcessor={this.onSelectInputProcessor} />);
 
