@@ -59,7 +59,7 @@ class InputProcessor extends Component {
     const { dispatch, fileType } = this.props;
     if (fileType === true) dispatch(getProcessorSettings());
     else dispatch(getProcessorSettings(fileType));
-    dispatch(getSettings("usage_types"));
+    dispatch(getSettings(["usage_types"]));
   }
 
   onChangeName(e) {
