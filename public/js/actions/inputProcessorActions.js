@@ -72,6 +72,10 @@ function fetchProcessorSettings(file_type) {
       file_type: settings.file_type,
       delimiter_type: parser.type,
       delimiter: parser.separator,
+      usaget_type: (processor.usaget_mapping.length === 1 &&
+                    processor.usaget_mapping[0].pattern === '/.*/') ?
+        "static" :
+        "dynamic",
       fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
       field_widths,
       processor: Object.assign({}, processor, {
@@ -237,7 +241,6 @@ export function saveInputProcessorSettings(state, callback, part=false) {
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver');
-  console.log(state.toJS());
 
   const settings = {
     "file_type": state.get('file_type'),

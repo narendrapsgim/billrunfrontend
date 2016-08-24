@@ -24,6 +24,13 @@ export default class FieldsMapping extends Component {
     };
   }
 
+  componentDidMount() {
+    const { settings } = this.props;
+    if (settings.get('usaget_type') === 'static') {
+      this.setState({usaget: settings.getIn(['processor', 'usaget_mapping', 0, 'usaget'])});
+    }
+  }
+
   onChangePattern(e) {
     this.setState({pattern: e.target.value});    
   }
