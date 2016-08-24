@@ -16,6 +16,7 @@ export const CLEAR_INPUT_PROCESSOR = 'CLEAR_INPUT_PROCESSOR';
 export const MAP_USAGET = 'MAP_USAGET';
 export const REMOVE_CSV_FIELD = 'REMOVE_CSV_FIELD';
 export const REMOVE_USAGET_MAPPING = 'REMOVE_USAGET_MAPPING';
+export const SET_USAGET_TYPE = 'SET_USAGET_TYPE';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -37,9 +38,10 @@ function gotProcessorSettings(settings) {
 
 function fetchProcessorSettings(file_type) {
   const convert = (settings) => {
-    if (!settings)
+    if (!settings) {
       return {
         file_type: '',
+        usaget_type: 'static',
         delimiter_type: '',
         delimiter: '',
         fields: [],
@@ -56,6 +58,7 @@ function fetchProcessorSettings(file_type) {
           delete_received: false
         }
       };
+    }
     
     const { parser, processor,
             customer_identification_fields,
@@ -234,6 +237,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver');
+  console.log(state.toJS());
 
   const settings = {
     "file_type": state.get('file_type'),
@@ -248,8 +252,8 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "volume_field": processor.get('volume_field'),
       "usaget_mapping": processor.get('usaget_mapping').map(usaget => {
         return {
-          "src_field": processor.get('src_field'),
-          "pattern": `/^${usaget.get('pattern')}$/`,
+          "src_field": state.get('usaget_type') === "static" ? 'stamp' : processor.get('src_field'),
+          "pattern": state.get('usaget_type') === "static" ? '/.*/' : `/^${usaget.get('pattern')}$/`,
           "usaget": usaget.get('usaget')
         }
       })
@@ -355,5 +359,12 @@ export function deleteInputProcessor(file_type, callback) {
     ).catch(error => {
       console.log(error);
     })
+  };
+}
+
+export function setUsagetType(usaget_type) {
+  return {
+    type: SET_USAGET_TYPE,
+    usaget_type
   };
 }

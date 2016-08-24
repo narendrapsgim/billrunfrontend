@@ -41,8 +41,9 @@ export default class FieldsMapping extends Component {
     this.setState({usaget: val});
   }
 
-  onChangeStaticUsaget(val) {
-    /* TODO: DO SOME SHIT */
+  onChangeStaticUsaget(usaget) {
+    this.onChangeUsaget(usaget);
+    this.props.onAddUsagetMapping.call(this, {usaget, pattern: ''});
   }
   
   addUsagetMapping(e) {
@@ -65,8 +66,8 @@ export default class FieldsMapping extends Component {
   }
 
   onSetType(e) {
-    const { value, name } = e.target;
-    this.setState({[name]: value});
+    const { value } = e.target;
+    this.props.setUsagetType(value);
   }
   
   render() {
@@ -121,11 +122,12 @@ export default class FieldsMapping extends Component {
             <label><input type="radio"
                           name="usage_types_type"
                           value="static"
+                          checked={settings.get('usaget_type') === "static"}
                           onChange={this.onSetType} />
               Static
             </label>
             {(() => {
-              if (this.state.usage_types_type === "static") {
+              if (settings.get('usaget_type') === "static") {
                 return (
                   <div classsName="form-group">
                     <Select
@@ -147,13 +149,14 @@ export default class FieldsMapping extends Component {
             <label><input type="radio"
                           name="usage_types_type"
                           value="dynamic"
+                          checked={settings.get('usaget_type') === "dynamic"}
                           onChange={this.onSetType} />
               Dynamic
             </label>
           </div>
         </div>
         {(() => {
-           if (this.state.usage_types_type === "dynamic") {
+           if (settings.get('usaget_type') === "dynamic") {
              return (
                <div className="form-group">
                  <div className="col-xs-offset-2 col-xs-4">
@@ -178,7 +181,7 @@ export default class FieldsMapping extends Component {
            }})()}
         <div className="form-group">
       {(() => {
-        if (this.state.usage_types_type === "dynamic") {
+        if (settings.get('usaget_type') === "dynamic") {
           return (
           <div className="col-xs-offset-2 col-xs-6">
             <div className="form-group">

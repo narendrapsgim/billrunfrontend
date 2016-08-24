@@ -16,9 +16,11 @@ import { SET_NAME,
          SET_FIELD_WIDTH,
          CLEAR_INPUT_PROCESSOR,
          GOT_INPUT_PROCESSORS,
-         REMOVE_USAGET_MAPPING } from '../actions/inputProcessorActions';
+         REMOVE_USAGET_MAPPING,
+         SET_USAGET_TYPE } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
+  usaget_type: 'static',
   delimiter: '',
   fields: [],
   field_widths: {},
@@ -71,6 +73,9 @@ export default function (state = defaultState, action) {
 
     case REMOVE_CSV_FIELD:
       return state.update('fields', list => list.remove(action.index));
+
+    case SET_USAGET_TYPE:
+      return state.set('usaget_type', action.usaget_type);
       
     case MAP_USAGET:
       const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
