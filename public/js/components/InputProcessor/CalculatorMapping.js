@@ -9,6 +9,7 @@ export default class CalculatorMapping extends Component {
   render() {
     const { settings,
             onSetCustomerMapping,
+            onSetLineKey,
             onSetRating } = this.props;
     const available_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
                               ...settings.get('fields').map((field, key) => (
@@ -57,36 +58,43 @@ export default class CalculatorMapping extends Component {
             <h4>Rate by</h4>
           </div>
         </div>
-        {
-        available_usagetypes.map((usaget, key) => {
-        return (
-            <div key={key}>
-              <div className="row">
-                <div className="col-xs-2">
-                  <label>{usaget}</label>
-                </div>
-                <div className="col-xs-1">
-                  <input type="radio"
-                         name={`${usaget}-type`}
-                         value="match"
+        {available_usagetypes.map((usaget, key) => (
+           <div key={key}>
+             <div className="row">
+               <div className="col-xs-2">
+                 <label>{usaget}</label>
+               </div>
+               <div className="col-xs-2">
+                 <select id="src_key"
+                         className="form-control"
+                         onChange={onSetLineKey.bind(this, key)}
                          data-usaget={usaget}
-                         data-rate_key="key"
-                         checked={settings.getIn(['rate_calculators', usaget, 0, 'type']) === "match"}
-                         onChange={onSetRating} />By rate key
-                </div>
-                <div className="col-xs-1">
-                  <input type="radio"
-                         name={`${usaget}-type`}
-                         value="longestPrefix"
-                         data-usaget={usaget}
-                         checked={settings.getIn(['rate_calculators', usaget, 0, 'type']) === "longestPrefix"}
-                         data-rate_key="params.prefix"
-                         onChange={onSetRating} />By longest prefix
-                </div>
-              </div>
-            </div>
-          )})
-        }
+                         value={settings.getIn(['rate_calculators', usaget, key, 'line_key'])}
+                         defaultValue="-1">
+                   { available_fields }
+                 </select>                 
+               </div>
+               <div className="col-xs-1">
+                 <input type="radio"
+                        name={`${usaget}-type`}
+                        value="match"
+                        data-usaget={usaget}
+                        data-rate_key="key"
+                        checked={settings.getIn(['rate_calculators', usaget, key, 'type']) === "match"}
+                        onChange={onSetRating.bind(this, key)} />By rate key
+               </div>
+               <div className="col-xs-1">
+                 <input type="radio"
+                        name={`${usaget}-type`}
+                        value="longestPrefix"
+                        data-usaget={usaget}
+                        checked={settings.getIn(['rate_calculators', usaget, key, 'type']) === "longestPrefix"}
+                        data-rate_key="params.prefix"
+                        onChange={onSetRating.bind(this, key)} />By longest prefix
+               </div>
+             </div>
+           </div>
+         ))}
       </div>
     );
   }

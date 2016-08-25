@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType } from '../../actions/inputProcessorActions';
+import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showStatusMessage } from '../../actions';
 
@@ -36,6 +36,7 @@ class InputProcessor extends Component {
     this.onSetFieldWidth = this.onSetFieldWidth.bind(this);
     this.onRemoveField = this.onRemoveField.bind(this);
     this.setUsagetType = this.setUsagetType.bind(this);
+    this.onSetLineKey = this.onSetLineKey.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
@@ -83,7 +84,7 @@ class InputProcessor extends Component {
         /* Only need first line */
         let lines = evt.target.result.split('\n');
         let header = lines[0];
-        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/[^a-zA-Z_]/g, "_").toLowerCase(); });
+        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/[^a-zA-Z_\d]/g, "_").toLowerCase(); });
         this.props.dispatch(setFields(fields));
       }
     });
@@ -141,11 +142,16 @@ class InputProcessor extends Component {
     this.props.dispatch(setCustomerMapping(field, mapping));
   }
 
-  onSetRating(e) {
+  onSetRating(index, e) {
     const { dataset: {usaget, rate_key}, value } = e.target;
-    this.props.dispatch(setRatingField(usaget, rate_key, value));
+    this.props.dispatch(setRatingField(usaget, index, rate_key, value));
   }
 
+  onSetLineKey(index, e) {
+    const { dataset: {usaget}, value } = e.target;
+    this.props.dispatch(setLineKey(usaget, index, value));
+  }
+  
   onSetReceiverField(e) {
     const { id, value } = e.target;
     this.props.dispatch(setReceiverField(id, value));
@@ -222,7 +228,7 @@ class InputProcessor extends Component {
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} settings={settings} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} setUsagetType={this.setUsagetType} settings={settings} usageTypes={usage_types} />),
-      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
+      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
 

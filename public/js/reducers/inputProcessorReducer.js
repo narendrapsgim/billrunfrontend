@@ -17,7 +17,8 @@ import { SET_NAME,
          CLEAR_INPUT_PROCESSOR,
          GOT_INPUT_PROCESSORS,
          REMOVE_USAGET_MAPPING,
-         SET_USAGET_TYPE } from '../actions/inputProcessorActions';
+         SET_USAGET_TYPE,
+         SET_LINE_KEY } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   usaget_type: 'static',
@@ -100,16 +101,19 @@ export default function (state = defaultState, action) {
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 
     case SET_RATING_FIELD:
-      var { rate_key, value, usaget } = action;
+      var { rate_key, index, value, usaget } = action;
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: state.get('usaget_type') === "static" ?
-          'stamp' :
-          state.getIn(['processor', 'src_field'])
+        line_key: state.getIn(['rate_calculators', usaget, index, 'line_key'])
       });
-      return state.setIn(['rate_calculators', usaget, 0], new_rating);
+      return state.setIn(['rate_calculators', usaget, index], new_rating);
 
+    case SET_LINE_KEY:
+      var { index, value, usaget } = action;
+      console.log(index, value, usaget, state.toJS());
+      return state.setIn(['rate_calculators', usaget, index, 'line_key'], value);
+      
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
       
