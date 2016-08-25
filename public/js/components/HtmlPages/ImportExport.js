@@ -41,18 +41,20 @@ export default class ImportExport extends Component {
     this.handleClose = this.handleClose.bind(this);
     this.onChangeFilterDate = this.onChangeFilterDate.bind(this);
 
-    this.state = {import_modal_open: false, modal_message: ""};
+    this.state = {import_modal_open: false, modal_message: "",processing:false};
   }
 
   onImportClick(e){
+    let debugParam = globalSetting.serverApiDebug ? '?'+globalSetting.serverApiDebugQueryString : '';
     let form = this.refs['importForm'];
+    this.setState({processing:true});
     if(e.target.files.length){
       var data = new FormData();
       $.each(e.target.files, (key, value) => {
         data.append(key, value);
       });
       $.ajax({
-	url: `${globalSetting.serverUrl}/api/importpriceslist`,
+	url: `${globalSetting.serverUrl}/api/importpriceslist${debugParam}`,
 	type: "POST",
 	data: data,
 	dataType: 'json',
@@ -74,24 +76,29 @@ export default class ImportExport extends Component {
 	      output += "<div class='imported-reason imported-reason"+key+"'><span class='imported-reason-title'>" + reasons[key] + "</span>: <span class='imported-keys'>" + value.join(", ") + "</span></div>";
 	    }
 	  });
-          this.setState({modal_message: output});
-          this.setState({import_modal_open: true});
+          this.setState({modal_message: output,import_modal_open: true});
         }
-      });
+      }).fail(errresp => {
+                  this.setState({
+                                  modal_message: "Network error when importing rates.",
+                                  import_modal_open: true,
+                                });
+     }).always(balh => {  this.setState({ processing:false });  });
     }
   }
 
   onExportClick(e){
+    let debugParam = globalSetting.serverApiDebug ? '&'+globalSetting.serverApiDebugQueryString : '';
     let { serverUrl } = globalSetting;
     let activeDate = moment(this.exportDate).format("YYYY/MM/DD HH:mm:ss");
-    document.getElementById('my_iframe').src = `${globalSetting.serverUrl}/admin/exportplans?export_time=${activeDate}`;
+    document.getElementById('my_iframe').src = `${globalSetting.serverUrl}/admin/exportplans?export_time=${activeDate}${debugParam}`;
   }
 
   onChangeFilterDate(key ,nullEvent, value) {
     this.exportDate = value;
   }
 
-  formatDate(date){
+  forma7tDate(date){
     return (moment(date).format(globalSetting.dateFormat)) ;
   }
 
@@ -125,9 +132,10 @@ export default class ImportExport extends Component {
             primary={true}
             style={styles.button}
             icon={<UploadIcon />}
+            disabled={this.state.processing}
           >
           <form ref="importForm" encType="multipart/form-data" action={globalSetting.serverUrl} method="POST">
-            <input type="file" style={styles.exampleImageInput} onChange={this.onImportClick} multiple="multiple" />
+            <input type="file" style={styles.exampleImageInput} onChange={this.onImportClick} multiple="multiple" disabled={this.state.processing} />
           </form>
           </RaisedButton>
 
@@ -143,10 +151,11 @@ export default class ImportExport extends Component {
             icon={<DownloadIcon />}
             style={styles.button}
             onClick={this.onExportClick}
+            disabled={this.state.processing}
           />
         </Paper>
         <Dialog
-            title="Import Successful!"
+            title="Import Results"
             actions={modal_actions}
             modal={false}
             open={this.state.import_modal_open}

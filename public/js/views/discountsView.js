@@ -64,6 +64,8 @@ const rates_discount_edit_view = {
           { dbkey: "tech_name", label: "Technical Name" },
           { dbkey: "reason", label: "Reason" },
           { dbkey: "erp_account", label: "ERP Account" },
+          { dbkey: "not_prorated", label: "Not prorated", type: "checkbox"  },
+
         ]},
         { row: [
           { dbkey: "type", label: "Type", size: 4 },
@@ -89,6 +91,9 @@ const rates_discount_edit_view = {
         ]},
         { row: [
           { dbkey: "rates", label: "Rates", collapsible: true, collapsed: true, fields: rates_field }
+        ]},
+        { row: [
+          { dbkey: "filter_rates", label: "Rates to calculate price", collapsible: true, collapsed: true, type:"array" }
         ]},
       ]
     }
