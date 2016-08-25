@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, mapUsaget, removeUsagetMapping, deleteInputProcessor } from '../../actions/inputProcessorActions';
+import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showStatusMessage } from '../../actions';
 
@@ -32,9 +32,12 @@ class InputProcessor extends Component {
     this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
+    this.onRemoveAllFields = this.onRemoveAllFields.bind(this);
     this.addUsagetMapping = this.addUsagetMapping.bind(this);
     this.onSetFieldWidth = this.onSetFieldWidth.bind(this);
     this.onRemoveField = this.onRemoveField.bind(this);
+    this.setUsagetType = this.setUsagetType.bind(this);
+    this.onSetLineKey = this.onSetLineKey.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
@@ -57,11 +60,10 @@ class InputProcessor extends Component {
 
   componentWillMount() {
     const { dispatch, fileType } = this.props;
-    if (fileType === true) dispatch(getProcessorSettings());
-    else dispatch(getProcessorSettings(fileType));
-    dispatch(getSettings("usage_types"));
+    if (fileType !== true) dispatch(getProcessorSettings(fileType));
+    dispatch(getSettings(["usage_types"]));
   }
-
+  
   onChangeName(e) {
     this.props.dispatch(setName(e.target.value));
   }
@@ -83,7 +85,7 @@ class InputProcessor extends Component {
         /* Only need first line */
         let lines = evt.target.result.split('\n');
         let header = lines[0];
-        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/[^a-zA-Z_]/g, "_").toLowerCase(); });
+        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/[^a-zA-Z_\d]/g, "_").toLowerCase(); });
         this.props.dispatch(setFields(fields));
       }
     });
@@ -96,7 +98,7 @@ class InputProcessor extends Component {
       this.props.dispatch(showStatusMessage("Please input field name", 'error'));
       return;
     };
-    const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();    
+    const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();
     const fields = this.props.settings.get('fields');
     if (fields.includes(value)) {
       this.props.dispatch(showStatusMessage("Field already exists", "error"));
@@ -107,6 +109,10 @@ class InputProcessor extends Component {
 
   onRemoveField(index, e) {
     this.props.dispatch(removeCSVField(index));
+  }
+
+  onRemoveAllFields() {
+    this.props.dispatch(removeAllCSVFields());
   }
   
   onSetFieldMapping(e) {
@@ -124,7 +130,7 @@ class InputProcessor extends Component {
     this.props.dispatch(setCalculatorMapping(field, mapping));
   }
 
-  onAddUsagetMapping(val, e) {
+  onAddUsagetMapping(val) {
     this.props.dispatch(mapUsaget(val));
   }
 
@@ -132,16 +138,25 @@ class InputProcessor extends Component {
     this.props.dispatch(removeUsagetMapping(index));
   }
 
+  setUsagetType(val) {
+    this.props.dispatch(setUsagetType(val));
+  }
+  
   onSetCustomerMapping(e) {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setCustomerMapping(field, mapping));
   }
 
-  onSetRating(e) {
+  onSetRating(index, e) {
     const { dataset: {usaget, rate_key}, value } = e.target;
-    this.props.dispatch(setRatingField(usaget, rate_key, value));
+    this.props.dispatch(setRatingField(usaget, index, rate_key, value));
   }
 
+  onSetLineKey(index, e) {
+    const { dataset: {usaget}, value } = e.target;
+    this.props.dispatch(setLineKey(usaget, index, value));
+  }
+  
   onSetReceiverField(e) {
     const { id, value } = e.target;
     this.props.dispatch(setReceiverField(id, value));
@@ -192,21 +207,23 @@ class InputProcessor extends Component {
 
   handleCancel() {
     let r = confirm("are you sure you want to stop editing input processor?");
-    const { dispatch } = this.props;
+    const { dispatch, fileType } = this.props;
     if (r) {
-      dispatch(clearInputProcessor());
-      this.props.onCancel();
+      if (fileType !== true) {
+        dispatch(clearInputProcessor());
+        this.props.onCancel();
+      } else {
+        const cb = (err) => {
+          if (err) {
+            dispatch(showStatusMessage("Please try again", "error"));
+            return;
+          }
+          dispatch(clearInputProcessor());
+          this.props.onCancel();
+        };
+        dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
+      }
     }
-    //   const cb = (err) => {
-    //     if (err) {
-    //       dispatch(showStatusMessage("Please try again", "error"));
-    //       return;
-    //     }
-    //     dispatch(clearInputProcessor());
-    //     this.props.onCancel();
-    //   };
-    //   dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
-    // }   
   }
 
   render() {
@@ -214,9 +231,9 @@ class InputProcessor extends Component {
     const { settings, usage_types } = this.props;
 
     const steps = [
-      (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} settings={settings} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} settings={settings} usageTypes={usage_types} />),
-      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} settings={settings} />),
+      (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} onRemoveAllFields={this.onRemoveAllFields} settings={settings} />),
+      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} setUsagetType={this.setUsagetType} settings={settings} usageTypes={usage_types} />),
+      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
 

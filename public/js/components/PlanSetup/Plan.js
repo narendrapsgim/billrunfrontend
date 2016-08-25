@@ -92,6 +92,7 @@ export default class Plan extends Component {
         </div>
         <div className="PlanRecurring" style={{marginTop: 20}}>
           <h4>Recurring Charges</h4>
+          <p className="help-block">Leave cycle blank for unlimited</p>
           { plan.get('recurring_prices').map((price, key) => (
               <div className="form-group" key={key}>
                 <div className="col-xs-1">
@@ -102,19 +103,33 @@ export default class Plan extends Component {
                   <label htmlFor="PeriodicalRate">Price</label>
                   <Field id="PeriodicalRate" onChange={onChangeRecurringPriceFieldValue.bind(this, "PeriodicalRate", key)} value={price.get('PeriodicalRate')} />
                 </div>
-                {(() => {  /* only show remove button if there is more than one interval and only for the last one */
-                   if (key === (plan.get('recurring_prices').size - 1)) {
-                     return (
-                       <div className="col-xs-2">
-                         <label>&zwnj;</label>
-                         <div>
-                           <FontIcon onClick={onAddTariff} className="material-icons" style={{cursor: "pointer", color: Colors.green300, fontSize: '24px', paddingRight: '3px', marginTop: '10px'}}>add_circle_outline</FontIcon>                           
-                           <FontIcon onClick={onRemoveRecurringPrice.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '24px'}}>remove_circle_outline</FontIcon>
-                         </div>
-                       </div>
-                     )
-                   }
-                 })()}
+                <div className="col-xs-2">
+                  <label>&zwnj;</label>
+                  <div>
+                  {(() => {  /* only show remove button if there is more than one interval and only for the last one */
+                     if (key === (plan.get('recurring_prices').size - 1)) {
+                       return (
+                         <FontIcon onClick={onAddTariff}
+                                   className="material-icons"
+                                   style={{cursor: "pointer", color: Colors.green300, fontSize: '24px', paddingRight: '3px', marginTop: '10px'}}>
+                           add_circle_outline
+                         </FontIcon>
+                       );
+                     }})
+                   ()}
+                         {(() => {
+                            if (key === (plan.get('recurring_prices').size - 1) && plan.get('recurring_prices').size > 1) {
+                              return (
+                                <FontIcon onClick={onRemoveRecurringPrice.bind(this, key)}
+                                          className="material-icons"
+                                          style={{cursor: "pointer", color: Colors.red300, fontSize: '24px'}}>
+                                  remove_circle_outline
+                                </FontIcon>
+                              );
+                            }})
+                          ()}
+                  </div>
+                </div>
               </div>
           ))}
         </div>
