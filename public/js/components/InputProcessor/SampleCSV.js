@@ -7,6 +7,7 @@ export default class SampleCSV extends Component {
     super(props);
 
     this.addField = this.addField.bind(this);
+    this.removeAllFields = this.removeAllFields.bind(this);
     
     this.state = {
       newField: ''
@@ -21,6 +22,13 @@ export default class SampleCSV extends Component {
   removeField(index, e) {
     this.props.onRemoveField.call(this, index);
   }
+
+  removeAllFields() {
+    const r = confirm("Are you sure you want to remove all fields?");
+    if (r) {
+      this.props.onRemoveAllFields.call(this);
+    }
+  }
   
   render() {
     let { settings,
@@ -29,8 +37,7 @@ export default class SampleCSV extends Component {
           onChangeDelimiter,
           onSelectSampleCSV,
           onSetFieldWidth,
-          onAddField,
-          onRemoveField } = this.props;
+          onAddField } = this.props;
 
     const selectDelimiterHTML = settings.get('file_type') ? (
       <div className="form-group">
@@ -97,7 +104,7 @@ export default class SampleCSV extends Component {
       <div>
         <div className="form-group">
           <div className="col-xs-2">
-            <label>Field</label>
+            <label>Field <small><a onClick={this.removeAllFields}>(remove all)</a></small></label>
           </div>
           {(() => {             
              if (settings.get('delimiter_type') === "fixed") {

@@ -8,6 +8,7 @@ import { SET_NAME,
          SET_DELIMITER,
          SET_FIELD_MAPPING,
          REMOVE_CSV_FIELD,
+         REMOVE_ALL_CSV_FIELDS,
          ADD_CSV_FIELD,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
@@ -78,6 +79,9 @@ export default function (state = defaultState, action) {
 
     case REMOVE_CSV_FIELD:
       return state.update('fields', list => list.remove(action.index));
+
+    case REMOVE_ALL_CSV_FIELDS:
+      return state.set('fields', Immutable.List());
 
     case SET_USAGET_TYPE:
       return state.set('usaget_type', action.usaget_type);
