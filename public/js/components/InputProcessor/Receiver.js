@@ -71,13 +71,21 @@ export default class Receiver extends Component {
           <div className="form-group">
             <label htmlFor="delete_received" className="col-xs-2 control-label">Delete on retrieve</label>
             <div className="col-xs-4">
-              <input type="checkbox" id="delete_received" onChange={onSetReceiverCheckboxField} defaultChecked={settings.get('delete_received')} value="1" />
+              <input type="checkbox" id="delete_received"
+                     onChange={onSetReceiverCheckboxField}
+                     checked={settings.get('delete_received')}
+                     defaultChecked={false}
+                     value="1" />
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="passive" className="col-xs-2 control-label">Passive</label>
             <div className="col-xs-4">
-              <input type="checkbox" id="passive" onChange={onSetReceiverCheckboxField} defaultChecked={settings.get('passive')} value="1" />
+              <input type="checkbox" id="passive"
+                     onChange={onSetReceiverCheckboxField}
+                     checked={settings.get('passive')}
+                     defaultChecked={false}
+                     value="1" />
             </div>
           </div>
         </form>

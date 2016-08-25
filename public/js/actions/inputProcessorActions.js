@@ -55,8 +55,10 @@ function fetchProcessorSettings(file_type) {
         rate_calculators: {},
         receiver: {
           type: "ftp",
-          passive: false,
-          delete_received: false
+          connections: [{
+            passive: false,
+            delete_received: false
+          }]
         }
       };
     }

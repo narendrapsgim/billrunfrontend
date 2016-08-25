@@ -41,7 +41,10 @@ let defaultState = Immutable.fromJS({
     }
   ],
   rate_calculators: {},
-  receiver: {}
+  receiver: {
+    passive: false,
+    delete_received: false
+  }
 });
 
 export default function (state = defaultState, action) {
