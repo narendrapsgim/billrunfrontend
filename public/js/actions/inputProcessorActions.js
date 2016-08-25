@@ -37,32 +37,7 @@ function gotProcessorSettings(settings) {
 }
 
 function fetchProcessorSettings(file_type) {
-  const convert = (settings) => {
-    if (!settings) {
-      return {
-        file_type: '',
-        usaget_type: 'static',
-        delimiter_type: '',
-        delimiter: '',
-        fields: [],
-        field_widths: {},
-        processor: {
-          usaget_mapping: [],
-          static_usaget_mapping: {},
-          src_field: ''
-        },
-        customer_identification_fields: [],
-        rate_calculators: {},
-        receiver: {
-          type: "ftp",
-          connections: [{
-            passive: false,
-            delete_received: false
-          }]
-        }
-      };
-    }
-    
+  const convert = (settings) => {    
     const { parser, processor,
             customer_identification_fields,
             rate_calculators,
