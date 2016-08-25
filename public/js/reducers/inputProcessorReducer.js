@@ -101,7 +101,9 @@ export default function (state = defaultState, action) {
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: state.getIn(['processor', 'src_field'])
+        line_key: state.get('usaget_type') === "static" ?
+          'stamp' :
+          state.getIn(['processor', 'src_field'])
       });
       return state.setIn(['rate_calculators', usaget, 0], new_rating);
 

@@ -58,8 +58,7 @@ class InputProcessor extends Component {
 
   componentWillMount() {
     const { dispatch, fileType } = this.props;
-    if (fileType === true) dispatch(getProcessorSettings());
-    else dispatch(getProcessorSettings(fileType));
+    if (fileType !== true) dispatch(getProcessorSettings(fileType));
     dispatch(getSettings(["usage_types"]));
   }
 
@@ -97,7 +96,7 @@ class InputProcessor extends Component {
       this.props.dispatch(showStatusMessage("Please input field name", 'error'));
       return;
     };
-    const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();    
+    const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();
     const fields = this.props.settings.get('fields');
     if (fields.includes(value)) {
       this.props.dispatch(showStatusMessage("Field already exists", "error"));
@@ -197,21 +196,23 @@ class InputProcessor extends Component {
 
   handleCancel() {
     let r = confirm("are you sure you want to stop editing input processor?");
-    const { dispatch } = this.props;
+    const { dispatch, fileType } = this.props;
     if (r) {
-      dispatch(clearInputProcessor());
-      this.props.onCancel();
+      if (fileType !== true) {
+        dispatch(clearInputProcessor());
+        this.props.onCancel();
+      } else {
+        const cb = (err) => {
+          if (err) {
+            dispatch(showStatusMessage("Please try again", "error"));
+            return;
+          }
+          dispatch(clearInputProcessor());
+          this.props.onCancel();
+        };
+        dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
+      }
     }
-    //   const cb = (err) => {
-    //     if (err) {
-    //       dispatch(showStatusMessage("Please try again", "error"));
-    //       return;
-    //     }
-    //     dispatch(clearInputProcessor());
-    //     this.props.onCancel();
-    //   };
-    //   dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
-    // }   
   }
 
   render() {

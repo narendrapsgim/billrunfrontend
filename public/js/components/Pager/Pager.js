@@ -34,6 +34,7 @@ export default class Pager extends Component {
         <li className={prevClass} onClick={this.handlePageClick}>
           <a id="previous">Previous</a>
         </li>
+        <li className="active"><a href="#">{this.state.page + 1}</a></li>
         <li id="next" className="next" onClick={this.handlePageClick}>
           <a id="next">Next</a>
         </li>
