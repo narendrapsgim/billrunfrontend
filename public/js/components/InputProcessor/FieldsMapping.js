@@ -43,7 +43,7 @@ export default class FieldsMapping extends Component {
 
   onChangeStaticUsaget(usaget) {
     this.onChangeUsaget(usaget);
-    this.props.onAddUsagetMapping.call(this, {usaget, pattern: ''});
+    this.props.onSetStaticUsaget.call(this, usaget);
   }
   
   addUsagetMapping(e) {
@@ -138,7 +138,7 @@ export default class FieldsMapping extends Component {
                         id="unit"
                         options={available_units}
                         allowCreate={true}
-                        value={settings.getIn(['processor', 'static_usaget_mapping', 'usaget'])}
+                        value={settings.getIn(['processor', 'default_usaget'])}
                         style={{marginTop: 3}}
                         onChange={this.onChangeStaticUsaget}
                     />
