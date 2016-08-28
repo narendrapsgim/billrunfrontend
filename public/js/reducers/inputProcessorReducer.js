@@ -88,7 +88,7 @@ export default function (state = defaultState, action) {
       return state.set('usaget_type', action.usaget_type);
 
     case SET_STATIC_USAGET:
-      return state.setIn(['processor', 'default_usaget'], action.usaget);
+      return state.setIn(['processor', 'default_usaget'], action.usaget).setIn(['rate_calculators', action.usaget], Immutable.List())
     
     case MAP_USAGET:
       const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
@@ -97,9 +97,6 @@ export default function (state = defaultState, action) {
         pattern,
         usaget
       });
-      if (state.get('usaget_type') === 'static') {
-        return state.setIn(['processor', 'static_usaget_mapping'], Immutable.fromJS(new_map)).setIn(['rate_calculators', usaget], Immutable.List());
-      }
       return state.updateIn(['processor', 'usaget_mapping'], list => list.push(new_map)).setIn(['rate_calculators', usaget], Immutable.List());
 
     case REMOVE_USAGET_MAPPING:
