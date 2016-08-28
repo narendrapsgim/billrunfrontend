@@ -19,6 +19,7 @@ export const REMOVE_USAGET_MAPPING = 'REMOVE_USAGET_MAPPING';
 export const SET_USAGET_TYPE = 'SET_USAGET_TYPE';
 export const SET_LINE_KEY = 'SET_LINE_KEY';
 export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
+export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
 
 import axios from 'axios';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -190,6 +191,13 @@ export function removeUsagetMapping(index) {
   };
 }
 
+export function setStaticUsaget(usaget) {
+  return {
+    type: SET_STATIC_USAGET,
+    usaget
+  };
+}
+
 export function mapUsaget(mapping) {
   return {
     type: MAP_USAGET,
@@ -238,17 +246,16 @@ export function saveInputProcessorSettings(state, callback, part=false) {
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver');
 
-  const usaget_mapping = state.get('usaget_type') === "static" ? [{
-    src_field: "stamp",
-    pattern: "/.*/",
-    usaget: processor.getIn(['static_usaget_mapping', 'usaget'])
-  }] : processor.get('usaget_mapping').map(usaget => {
-    return {
-      "src_field": processor.get('src_field'),
-      "pattern": `/^${usaget.get('pattern')}$/`,
-      "usaget": usaget.get('usaget')
-    }
-  });
+  const processor_settings = state.get('usaget_type') === "static" ?
+        { default_usaget: processor.get('default_usaget') } :
+        { usaget_mapping:
+          processor.get('usaget_mapping').map(usaget => {
+            return {
+              "src_field": processor.get('src_field'),
+              "pattern": `/^${usaget.get('pattern')}$/`,
+              "usaget": usaget.get('usaget')
+            }
+          }).toJS() };
   
   const settings = {
     "file_type": state.get('file_type'),
@@ -261,7 +268,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "type": "Usage",
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
-      usaget_mapping 
+      ...processor_settings
     },
     "customer_identification_fields": customer_identification_fields.toJS(),
     "rate_calculators": rate_calculators.toJS(),

@@ -19,6 +19,7 @@ import { SET_NAME,
          GOT_INPUT_PROCESSORS,
          REMOVE_USAGET_MAPPING,
          SET_USAGET_TYPE,
+         SET_STATIC_USAGET,
          SET_LINE_KEY } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
@@ -85,7 +86,10 @@ export default function (state = defaultState, action) {
 
     case SET_USAGET_TYPE:
       return state.set('usaget_type', action.usaget_type);
-      
+
+    case SET_STATIC_USAGET:
+      return state.setIn(['processor', 'default_usaget'], action.usaget);
+    
     case MAP_USAGET:
       const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
       const { pattern, usaget } = action.mapping;
@@ -115,7 +119,6 @@ export default function (state = defaultState, action) {
 
     case SET_LINE_KEY:
       var { index, value, usaget } = action;
-      console.log(index, value, usaget, state.toJS());
       return state.setIn(['rate_calculators', usaget, index, 'line_key'], value);
       
     case SET_RECEIVER_FIELD:
