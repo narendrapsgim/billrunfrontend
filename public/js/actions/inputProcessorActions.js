@@ -48,24 +48,27 @@ function fetchProcessorSettings(file_type) {
 
     const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
     const field_widths = parser.type === "fixed" ? parser.structure : {};
+    const usaget_type = (!processor.usaget_mapping || processor.usaget_mapping.length < 1) ?
+          "static" :
+          "dynamic";
 
     return {
       file_type: settings.file_type,
       delimiter_type: parser.type,
       delimiter: parser.separator,
-      usaget_type: (!processor.usaget_mapping || processor.usaget_mapping.length < 1) ?
-        "static" :
-        "dynamic",
+      usaget_type,
       fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
       field_widths,
       processor: Object.assign({}, processor, {
-        usaget_mapping: processor.usaget_mapping.map(usaget => {
-          return {
-            usaget: usaget.usaget,
-            pattern: usaget.pattern.replace("/^", "").replace("$/", "")
-          }
-        }),
-        src_field: processor.usaget_mapping[0].src_field
+        usaget_mapping: usaget_type === "dynamic" ?
+          processor.usaget_mapping.map(usaget => {
+            return {
+              usaget: usaget.usaget,
+              pattern: usaget.pattern.replace("/^", "").replace("$/", "")
+            }
+          }) :
+        [{}],
+        src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
       }),
       customer_identification_fields,
       rate_calculators,
