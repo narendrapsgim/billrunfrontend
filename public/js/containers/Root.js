@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { Router, hashHistory } from 'react-router';
-import configureStore from '../configureStore.js';
-import routes from '../routes.js';
+import configureStore from '../configureStore';
+import routesModule from '../routes/Router';
+import Immutable from 'immutable';
 
-let initialState = {};
-const store = configureStore(initialState);
+const routes = routesModule();
+const store = configureStore();
 
 export default class Root extends Component {
   constructor(props) {
@@ -16,7 +17,7 @@ export default class Root extends Component {
     return (
       <Provider store={store}>
         <Router history={hashHistory}>
-          {routes()}
+          {routes}
         </Router>
       </Provider>
     );

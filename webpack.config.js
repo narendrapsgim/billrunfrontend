@@ -1,65 +1,74 @@
 var webpack = require('webpack');
-var path = require('path');
-//var css = require('css!./file.css');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-var env = process.env.MIX_ENV || 'dev';
-var isProduction = (env === 'prod');
 
-var plugins = [
-  new ExtractTextPlugin('app.css'),
-  new webpack.optimize.OccurenceOrderPlugin(),
-  new HtmlWebpackPlugin({
-    hash: true,
-    template: 'index.tmpl.html',
-    inject: true
-  })
-];
-
-// This is necessary to get the sass @import's working
-var stylePathResolves = (
-  'includePaths[]=' + path.resolve('./') + '&' +
-    'includePaths[]=' + path.resolve('./node_modules')
-);
-
-if (isProduction) {
-  plugins.push(new webpack.optimize.DedupePlugin());
-  plugins.push(new webpack.optimize.UglifyJsPlugin({
-    minimize: true,
-    sourceMap: false,
-    output: {
-      comments: false
-    },
-    compress: {
-      drop_console: true,
-      warnings: false
-    }
-  }));
-}
-
+var bootstrapPath = __dirname + '/node_modules/bootstrap/dist/css';
+var bootstrapSocialPath = __dirname + '/node_modules/bootstrap-social';
+var fontAwesomePath = __dirname + '/node_modules/font-awesome/css';
+/**
+ * This is the Webpack configuration file for local development. It contains
+ * local-specific configuration such as the React Hot Loader, as well as:
+ *
+ * - The entry point of the application
+ * - Where the output file should be
+ * - Which loaders to use on what files to properly transpile the source
+ *
+ * For more information, see: http://webpack.github.io/docs/configuration.html
+ */
 module.exports = {
-  entry: './public/js/index.js',
 
+  // Efficiently evaluate modules with source maps
+  devtool: "eval",
+
+  // Set entry point to ./src/main and include necessary files for hot load
+  entry:  [
+//    "webpack-dev-server/client?http://localhost:9090",
+    "webpack/hot/only-dev-server",
+    "./public/js/index"
+  ],
+
+  // This will not actually create a bundle.js file in ./build. It is used
+  // by the dev server for dynamic hot loading.
   output: {
-    path: require("path").resolve('./public'),
-    filename: 'app.js'
+    path: __dirname + "/public/",
+    filename: "app.js",
+//    publicPath: "http://localhost:9090/build/"
   },
 
+  // Necessary plugins for hot load
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin(),
+    new ExtractTextPlugin('style.css', { allChunks: true })
+  ],
+
+  // Transform source code using Babel and React Hot Loader
   module: {
-    noParse: /node_modules\/quill\/dist/,
     loaders: [
-      {
-        test: /\.jsx?$/,
-        exclude: /(node_modules|bower_components)/,
+      { test: /\.jsx?$/, exclude: /node_modules/,
         loader: 'babel',
         query: {
-          presets: ['es2015', 'react', 'stage-2']
+          presets: ['es2015', 'react', 'stage-2'],
         }
       },
-      {include: /\.json$/, loaders: ["json-loader"]}
+      { test: /\.css$/, loader: "style!css" },
+      { test: /\.less$/, loader: 'style!css!less' },
+      { test: /\.scss$/, loader: 'style!css!sass' },
+      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
+      { test: /\.(jpe|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/, loaders: ["file-loader"] },
     ]
   },
 
-  plugins: plugins
-};
+  // Automatically transform files with these extensions
+  resolve: {
+    extensions: ['', '.js', '.jsx', '.css'],
+    modulesDirectories: ['node_modules', bootstrapPath, bootstrapSocialPath, fontAwesomePath]
+  },
+
+  // Additional plugins for CSS post processing using postcss-loader
+  postcss: [
+//    require('autoprefixer'), // Automatically include vendor prefixes
+//    require('postcss-nested') // Enable nested rules, like in Sass
+  ]
+
+}
