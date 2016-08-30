@@ -1,5 +1,2 @@
 node_modules/*
 **/*.log
-public/app.js
-public/app.js.map
-public/index.html
