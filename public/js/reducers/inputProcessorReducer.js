@@ -106,17 +106,17 @@ export default function (state = defaultState, action) {
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 
     case SET_RATING_FIELD:
-      var { rate_key, index, value, usaget } = action;
+      var { rate_key, value, usaget } = action;
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: state.getIn(['rate_calculators', usaget, index, 'line_key'])
+        line_key: state.getIn(['rate_calculators', usaget, 0, 'line_key'])
       });
-      return state.setIn(['rate_calculators', usaget, index], new_rating);
+      return state.setIn(['rate_calculators', usaget, 0], new_rating);
 
     case SET_LINE_KEY:
-      var { index, value, usaget } = action;
-      return state.setIn(['rate_calculators', usaget, index, 'line_key'], value);
+      var { value, usaget } = action;
+      return state.setIn(['rate_calculators', usaget, 0, 'line_key'], value);
       
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);

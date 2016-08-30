@@ -187,7 +187,7 @@ export function clearPlan() {
 }
 
 function savePlanToDB(plan, action, callback) {
-  const type = action !== 'new' ? "update" : action;
+  const type = action !== 'new' ? "close_and_new" : action;
   const formData = new FormData();
   if (action !== 'new') {
     formData.append('id', plan.id);
