@@ -152,14 +152,14 @@ class InputProcessor extends Component {
     this.props.dispatch(setCustomerMapping(field, mapping));
   }
 
-  onSetRating(index, e) {
+  onSetRating(e) {
     const { dataset: {usaget, rate_key}, value } = e.target;
-    this.props.dispatch(setRatingField(usaget, index, rate_key, value));
+    this.props.dispatch(setRatingField(usaget, rate_key, value));
   }
 
-  onSetLineKey(index, e) {
+  onSetLineKey(e) {
     const { dataset: {usaget}, value } = e.target;
-    this.props.dispatch(setLineKey(usaget, index, value));
+    this.props.dispatch(setLineKey(usaget, value));
   }
   
   onSetReceiverField(e) {

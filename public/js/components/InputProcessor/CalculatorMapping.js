@@ -65,11 +65,10 @@ export default class CalculatorMapping extends Component {
                  <label>{usaget}</label>
                </div>
                <div className="col-xs-2">
-                 <select id="src_key"
-                         className="form-control"
-                         onChange={onSetLineKey.bind(this, key)}
+                 <select className="form-control"
+                         onChange={onSetLineKey}
                          data-usaget={usaget}
-                         value={settings.getIn(['rate_calculators', usaget, key, 'line_key'])}
+                         value={settings.getIn(['rate_calculators', usaget, 0, 'line_key'])}
                          defaultValue="-1">
                    { available_fields }
                  </select>                 
@@ -80,17 +79,17 @@ export default class CalculatorMapping extends Component {
                         value="match"
                         data-usaget={usaget}
                         data-rate_key="key"
-                        checked={settings.getIn(['rate_calculators', usaget, key, 'type']) === "match"}
-                        onChange={onSetRating.bind(this, key)} />By rate key
+                        checked={settings.getIn(['rate_calculators', usaget, 0, 'type']) === "match"}
+                        onChange={onSetRating} />By rate key
                </div>
                <div className="col-xs-1">
                  <input type="radio"
                         name={`${usaget}-type`}
                         value="longestPrefix"
                         data-usaget={usaget}
-                        checked={settings.getIn(['rate_calculators', usaget, key, 'type']) === "longestPrefix"}
+                        checked={settings.getIn(['rate_calculators', usaget, 0, 'type']) === "longestPrefix"}
                         data-rate_key="params.prefix"
-                        onChange={onSetRating.bind(this, key)} />By longest prefix
+                        onChange={onSetRating} />By longest prefix
                </div>
              </div>
            </div>

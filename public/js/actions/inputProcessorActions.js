@@ -215,21 +215,19 @@ export function setCustomerMapping(field, mapping) {
   };
 }
 
-export function setRatingField(usaget, index, rate_key, value) {
+export function setRatingField(usaget, rate_key, value) {
   return {
     type: SET_RATING_FIELD,
     usaget,
-    index,
     rate_key,
     value
   };
 }
 
-export function setLineKey(usaget, index, value) {
+export function setLineKey(usaget, value) {
   return {
     type: SET_LINE_KEY,
     usaget,
-    index,
     value
   };
 }
