@@ -1,18 +1,7 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React from 'react';
 
+const PlaceHolder = (props) => {
+  return ( <p style={{textAlign: 'center'}}> loading.... </p> );
+};
 
-export default class PlaceHolder extends Component {
-
-  getStyles() {
-    return  { width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'};
-  }
-
-  render() {
-    return (
-      <div style={this.getStyles()}>
-        loading....
-      </div>
-    );
-  }
-}
+export default PlaceHolder;
