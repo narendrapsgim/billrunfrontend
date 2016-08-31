@@ -78,8 +78,9 @@ class SubscribersList extends Component {
     const table_header = fields.map((field, idx) => (
       <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
     ));
-    
-    const rows = subscriber.map((row, key) => (
+
+    const real_subscriber = subscriber.size > this.state.size ? subscriber.pop() : subscriber;
+    const rows = real_subscriber.map((row, key) => (
       <TableRow key={key}>
         {fields.map((field, idx) => (
            <TableRowColumn key={idx}>
@@ -113,7 +114,9 @@ class SubscribersList extends Component {
           <TableFooter>
             <TableRow>
               <TableRowColumn style={{textAlign: 'center'}}>
-                <Pager onClick={this.handlePageClick} />
+                <Pager onClick={this.handlePageClick}
+                       size={this.state.size}
+                       count={subscriber.size} />
               </TableRowColumn>
             </TableRow>
           </TableFooter>

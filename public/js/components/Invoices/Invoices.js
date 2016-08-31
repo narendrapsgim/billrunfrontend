@@ -4,7 +4,7 @@ import $ from 'jquery';
 import { getInvoices } from '../../actions/invoicesActions';
 import moment from 'moment';
 
-import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody } from 'material-ui/Table';
+import { Table, TableHeader, TableRow, TableHeaderColumn, TableRowColumn, TableBody, TableFooter } from 'material-ui/Table';
 import FileDownload from 'material-ui/svg-icons/file/file-download';
 
 
@@ -50,6 +50,34 @@ class Invoices extends Component {
 
     };
 
+    const real_invoices = invoices.size > this.state.size ? invoices.pop() : invoices;
+    const rows = real_invoices.map((row, index) => (
+      <TableRow key={index}>
+        <TableRowColumn>{row.get('invoice_id')}</TableRowColumn>
+        <TableRowColumn>{row.get('invoice_date')}</TableRowColumn>
+        <TableRowColumn>{row.get('due_date')}</TableRowColumn>
+        <TableRowColumn>{row.get('amount')}</TableRowColumn>
+        <TableRowColumn>
+          {(() => {
+             if (row.get('paid_by'))
+               return (<span style={{color: "green"}}>Paid</span>);
+             else if (moment(row.get('due_date')).isAfter(moment()))
+               return (<span style={{color: "yellow"}}>Due</span>);
+             return (<span style={{color: "red"}}>Not Paid</span>);
+           })()}
+        </TableRowColumn>
+        <TableRowColumn>
+          {row.get('aid')}
+        </TableRowColumn>
+        <TableRowColumn>
+          <a onClick={this.downloadInvoice.bind(this, row.get('aid'), row.get('billrun_key'), row.get('invoice_id'))} className="clickable">
+            <FileDownload />
+          </a>
+        </TableRowColumn>
+      </TableRow>
+    ));
+
+    
     return (
       <Table onCellClick={this.onClickCell}>
         <TableHeader displaySelectAll={true}>
@@ -64,32 +92,17 @@ class Invoices extends Component {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {invoices.map((row, index) => (
-             <TableRow key={index}>
-               <TableRowColumn>{row.get('invoice_id')}</TableRowColumn>
-               <TableRowColumn>{row.get('invoice_date')}</TableRowColumn>
-               <TableRowColumn>{row.get('due_date')}</TableRowColumn>
-               <TableRowColumn>{row.get('amount')}</TableRowColumn>
-               <TableRowColumn>
-                 {(() => {
-                    if (row.get('paid_by'))
-                      return (<span style={{color: "green"}}>Paid</span>);
-                    else if (moment(row.get('due_date')).isAfter(moment()))
-                      return (<span style={{color: "yellow"}}>Due</span>);
-                    return (<span style={{color: "red"}}>Not Paid</span>);
-                  })()}
-               </TableRowColumn>
-               <TableRowColumn>
-                 {row.get('aid')}
-               </TableRowColumn>
-               <TableRowColumn>
-                 <a onClick={this.downloadInvoice.bind(this, row.get('aid'), row.get('billrun_key'), row.get('invoice_id'))} className="clickable">
-                   <FileDownload />
-                 </a>
-               </TableRowColumn>
-             </TableRow>
-           ))}
+          { rows }
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableRowColumn style={{textAlign: 'center'}}>
+              <Pager onClick={this.handlePageClick}
+                     size={this.state.size}
+                     count={invoices.size} />
+            </TableRowColumn>
+          </TableRow>
+        </TableFooter>
       </Table>
     );
   }

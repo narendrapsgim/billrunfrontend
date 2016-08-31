@@ -8,7 +8,7 @@ import Dialog from 'material-ui/Dialog';
 
 import * as actions from '../../actions'
 
-export default class LoginPopup extends Component {
+class LoginPopup extends Component {
   constructor(props) {
     super(props);
     this.clickLogin = this.clickLogin.bind(this);
