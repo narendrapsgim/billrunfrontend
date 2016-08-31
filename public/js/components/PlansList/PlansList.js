@@ -7,15 +7,15 @@ import { getList } from '../../actions/listActions';
 class PlansList extends Component {
   constructor(props) {
     super(props);
-  }
-
-  componentDidMount() {
-    const query = {
+    this.state = {
       size: 10,
       page: 0,
       query: {}
-    };
-    this.props.dispatch(getList("plans", query));
+    }
+  }
+
+  componentDidMount() {
+    this.props.dispatch(getList("plans", this.state));
   }
   
   render() {

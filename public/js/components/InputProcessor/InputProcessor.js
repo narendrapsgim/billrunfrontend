@@ -46,6 +46,7 @@ class InputProcessor extends Component {
     this.handleNext = this.handleNext.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
     this.onError = this.onError.bind(this);
+    this.goBack = this.goBack.bind(this);
 
     this.state = {
       stepIndex: 0,
@@ -182,13 +183,19 @@ class InputProcessor extends Component {
     this.props.dispatch(showStatusMessage(message, 'error'));
   }
 
+  goBack() {
+    this.context.router.push({
+      pathname: "input_processors"
+    });
+  }
+  
   handleNext() {
     const { stepIndex } = this.state;
     const cb = (err) => {
       if (err) return;
       if (this.state.finished) {
         this.props.dispatch(showStatusMessage("Input processor saved successfully!", "success"));
-        this.props.onCancel();
+        this.goBack();
       } else {
         const totalSteps = this.state.steps.length - 1;
         const finished = (stepIndex + 1) === totalSteps;
@@ -208,7 +215,7 @@ class InputProcessor extends Component {
     let r = confirm("are you sure you want to stop editing input processor?");
     if (r) {
       this.props.dispatch(clearInputProcessor());
-      this.props.onCancel();
+      this.goBack();
     }
   }
 
@@ -218,7 +225,7 @@ class InputProcessor extends Component {
     if (r) {
       if (fileType !== true) {
         dispatch(clearInputProcessor());
-        this.props.onCancel();
+        this.goBack();
       } else {
         const cb = (err) => {
           if (err) {
@@ -226,7 +233,7 @@ class InputProcessor extends Component {
             return;
           }
           dispatch(clearInputProcessor());
-          this.props.onCancel();
+          this.goBack();
         };
         dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
       }
@@ -289,6 +296,10 @@ class InputProcessor extends Component {
     );
   }
 }
+
+InputProcessor.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
 
 function mapStateToProps(state, props) {
   return { settings: state.inputProcessor,
