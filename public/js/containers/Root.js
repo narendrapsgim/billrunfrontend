@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Router, hashHistory } from 'react-router';
+import { Router, browserHistory } from 'react-router';
 import configureStore from '../configureStore';
 import routesModule from '../routes/Router';
 import Immutable from 'immutable';
@@ -16,7 +16,7 @@ export default class Root extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router history={hashHistory}>
+        <Router history={browserHistory}>
           {routes}
         </Router>
       </Provider>
