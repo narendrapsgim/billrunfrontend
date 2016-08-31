@@ -234,8 +234,13 @@ export default class Navigator extends Component {
                 </div>
               </li>
               <li>
+                <Link to="/dashboard">
+                  <i className="fa fa-dashboard fa-fw"></i> Dashboard
+                </Link>
+              </li>
+              <li>
                 <Link to="/plans">
-                  <i className="fa fa-dashboard fa-fw"></i>Plans
+                  <i className="fa fa-th-list fa-fw"></i> Plans
                 </Link>
               </li>
               <li>
