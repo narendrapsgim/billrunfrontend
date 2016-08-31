@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 const PageNotFound = (props) => {
   return (
@@ -9,6 +10,8 @@ const PageNotFound = (props) => {
       <h3><small>404</small></h3>
       <br/>
       <h5><small>The page you are looking for cannot be found</small></h5>
+      <br/>
+      <h5><small><Link to={'/'}>Return to home page</Link></small></h5>
     </div>
   );
 }

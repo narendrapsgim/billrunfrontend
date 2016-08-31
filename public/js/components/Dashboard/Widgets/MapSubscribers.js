@@ -24,7 +24,6 @@ class MapSubscribers extends Component {
   }
 
   handleResize = (e) => {
-    console.log("handleResize window.innerWidth : ", window.innerWidth);
     this.setState({windowWidth: window.innerWidth});
   }
 
