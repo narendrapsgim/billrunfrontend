@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { Panel, PageHeader, Col, Row} from 'react-bootstrap';
 
 import Navigator from '../components/Navigator';
+import { userCheckLogin } from '../actions/userActions';
 
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
 
@@ -14,11 +17,11 @@ export default class App extends Component {
   }
 
   componentWillMount() {
+    this.props.userCheckLogin();
     this.setState({Height: "100%"});
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("componentWillReceiveProps");
     this.setState({
       title: nextProps.routes[nextProps.routes.length-1].title || nextProps.routes[nextProps.routes.length-1].name
     });
@@ -42,3 +45,12 @@ export default class App extends Component {
     );
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    userCheckLogin }, dispatch);
+}
+function mapStateToProps(state) {
+  return { user: state.user };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(App);

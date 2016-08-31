@@ -1,19 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { PageNotFound_404 } from '../Errors';
 
 const PageNotFound = (props) => {
-  return (
-    <div style={{textAlign:'center'}}>
-      <br/>
-      <i className="fa fa-frown-o fa-fw" style={{fontSize: 70}}></i>
-      <br/>
-      <h3><small>404</small></h3>
-      <br/>
-      <h5><small>The page you are looking for cannot be found</small></h5>
-      <br/>
-      <h5><small><Link to={'/'}>Return to home page</Link></small></h5>
-    </div>
-  );
+  return ( <PageNotFound_404 /> );
 }
 
 export default PageNotFound;
