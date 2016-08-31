@@ -234,7 +234,7 @@ export default class Navigator extends Component {
                 </div>
               </li>
               <li>
-                <Link to="/plans">
+                <Link to="/input_processors">
                   <i className="fa fa-dashboard fa-fw"></i>Plans
                 </Link>
               </li>

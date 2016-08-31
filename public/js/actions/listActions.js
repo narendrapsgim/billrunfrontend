@@ -1,10 +1,11 @@
-import { apiBillRun } from '../common/Api';
+import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 
 export const actions = {
   GOT_LIST: 'GOT_LIST'
 };
 
-const defaultQuery = {
+const defaultParams = {
+  api: "find",
   size: 10,
   page: 0,
   query: {}
@@ -21,8 +22,9 @@ function gotList(collection, list) {
 function fetchList(collection, params) {
   return (dispatch) => {
     const query = {
-      api: "find",
+      api: params.api,
       params: [
+        ...params.additional,        
         { collection: collection },
         { size: params.size },
         { page: params.page },
