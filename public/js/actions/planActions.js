@@ -21,16 +21,6 @@ let axiosInstance = axios.create({
   baseURL: globalSetting.serverUrl
 });
 
-function getToDate(settings, from, cycle) {
-  let amt = settings.EachPeriod.toLowerCase() + 's';
-  let each = parseInt(settings.Each, 10);
-  if (!cycle) {
-    return moment(from).add(100, "years").format();
-  }
-
-  return moment(from).add(parseInt(cycle, 10) * each, amt).format();
-}
-
 function buildPlanFromState(state) {
   let basic_settings = state.toJS();
   let prices = [];
@@ -43,8 +33,8 @@ function buildPlanFromState(state) {
       price: parseInt(TrialPrice, 10),
       Cycle: TrialCycle,
       TrialCycle,
-      from: trial_from,
-      to: getToDate(basic_settings, trial_from, TrialCycle)
+      from: 0,
+      to: parseInt(TrialCycle, 10)
     };
     prices.push(trial);
   }
@@ -52,15 +42,14 @@ function buildPlanFromState(state) {
   let p = _.reduce(basic_settings.recurring_prices, (acc, price, idx) => {
     if (!price.PeriodicalRate) return acc;
 
-    let from = moment().format();
-    let to = moment();
+    let from = 0;
 
     if (acc.length && acc.length > idx) {
-      from = moment(acc[idx]['to']).format();
+      from = acc[idx]['to'];
     } else if (idx > 0) {
-      from = moment(acc[idx - 1]['to']).format();
+      from = acc[idx - 1]['to']
     }
-    to = getToDate(basic_settings, from, price.Cycle);
+    let to = from + parseInt(price.Cycle, 10);    
 
     acc.push({
       price: parseInt(price.PeriodicalRate, 10),
@@ -226,6 +215,7 @@ function savePlanToDB(plan, action, callback) {
 }
 
 export function savePlan(plan, action, callback = () => {}) {
+  console.log(plan);
   const conv = buildPlanFromState(plan);
   return dispatch => {
     return dispatch(savePlanToDB(conv, action, callback));
