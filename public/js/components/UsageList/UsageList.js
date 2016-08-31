@@ -67,6 +67,16 @@ class UsageList extends Component {
                            <option value={field.id} key={idx}>{field.placeholder}</option>
                          ))];
 
+    const real_usages = usages.size > this.state.size ? usages.pop() : usages;
+    const rows = real_usages.map((row, index) => (
+      <TableRow key={index}>
+        <TableRowColumn>{row.get('aid')}</TableRowColumn>
+        <TableRowColumn>{row.get('sid')}</TableRowColumn>
+        <TableRowColumn>{row.get('plan')}</TableRowColumn>
+        <TableRowColumn>{row.get('aprice')}</TableRowColumn>
+      </TableRow>
+    ));
+    
     const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
     return (
       <div className="UsagesList">
@@ -86,19 +96,14 @@ class UsageList extends Component {
             </TableRow>
           </TableHeader>
           <TableBody displayRowCheckbox={false} stripedRows={true}>
-            {usages.valueSeq().map((row, index) => (
-               <TableRow key={index}>
-                 <TableRowColumn>{row.get('aid')}</TableRowColumn>
-                 <TableRowColumn>{row.get('sid')}</TableRowColumn>
-                 <TableRowColumn>{row.get('plan')}</TableRowColumn>
-                 <TableRowColumn>{row.get('aprice')}</TableRowColumn>
-               </TableRow>
-             ))}
+            { rows }
           </TableBody>
           <TableFooter>
             <TableRow>
               <TableRowColumn style={{textAlign: 'center'}}>
-                <Pager onClick={this.handlePageClick} />
+                <Pager onClick={this.handlePageClick}
+                       size={this.state.size}
+                       count={usages.size} />
               </TableRowColumn>
             </TableRow>
           </TableFooter>

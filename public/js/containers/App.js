@@ -17,7 +17,7 @@ import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import { hideModal } from '../actions/modalActions';
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
     injectTapEventPlugin();

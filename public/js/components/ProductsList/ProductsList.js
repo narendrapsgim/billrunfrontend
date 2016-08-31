@@ -84,7 +84,8 @@ class ProductsList extends Component {
       <TableHeaderColumn key={key}>{header}</TableHeaderColumn>
     ));
 
-    const rows = products.map((row, key) => (
+    const real_products = products.size > this.state.size ? products.pop() : products;
+    const rows = real_products.map((row, key) => (
       <TableRow key={key}>
         <TableRowColumn>
           <Field value={row.get("key")} coll="Product" editable={false} />
@@ -131,7 +132,9 @@ class ProductsList extends Component {
           <TableFooter>
             <TableRow>
               <TableRowColumn style={{textAlign: 'center'}}>
-                <Pager onClick={this.handlePageClick} />
+                <Pager onClick={this.handlePageClick}
+                       size={this.state.size}
+                       count={products.size} />
               </TableRowColumn>
             </TableRow>
           </TableFooter>

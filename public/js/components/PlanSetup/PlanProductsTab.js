@@ -17,7 +17,7 @@ import {
 import { showStatusMessage } from '../../actions';
 
 
-export default class PlanProductsTab extends Component {
+class PlanProductsTab extends Component {
 
   constructor(props) {
     super(props);

@@ -13,12 +13,15 @@ export default class Pager extends Component {
   }
 
   handlePageClick(e) {
-    const { onClick } = this.props;
+    const { onClick, size, count } = this.props;
     const { id } = e.target;
     let { page } = this.state;
-    if (id === "next") page++;
-    else if (page > 0) page--;
-    else {
+
+    if (id === "next" && size < count) {
+      page++;
+    } else if (id === "previous" && page > 0) {
+      page--;
+    } else {
       e.preventDefault()
       return;
     }
@@ -28,14 +31,17 @@ export default class Pager extends Component {
   }
   
   render() {
-    let prevClass = "previous" + ( this.state.page === 0 ? ' disabled' : '' );
+    const { size, count } = this.props;    
+    const prevClass = "previous" + ( this.state.page === 0 ? ' disabled' : '' );
+    const nextClass = "next" + (count < size ? ' disabled ' : '');
+
     return (
       <ul className="pagination">
-        <li className={prevClass} onClick={this.handlePageClick}>
+        <li id="previous" className={prevClass} onClick={this.handlePageClick}>
           <a id="previous">Previous</a>
         </li>
-        <li className="active"><a href="#">{this.state.page + 1}</a></li>
-        <li id="next" className="next" onClick={this.handlePageClick}>
+        <li className="active"><a>{this.state.page + 1}</a></li>
+        <li id="next" className={nextClass} onClick={this.handlePageClick}>
           <a id="next">Next</a>
         </li>
       </ul>

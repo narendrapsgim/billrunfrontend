@@ -64,7 +64,7 @@ function gotCustomers(customers) {
 
 function fetchCustomers(query) {
   let sort = query.sort ? `&sort={"${query.sort}":1}` : '';
-  let size = query.size ? `&size=${query.size}` : '';
+  let size = query.size ? `&size=${query.size + 1}` : '';
   let page = query.page ? `&page=${query.page}` : '';
   let q = query.filter ? `&query=${query.filter}` : '';
   let fetchUrl = `/api/find?collection=subscribers&${size}${sort}${page}${q}`;

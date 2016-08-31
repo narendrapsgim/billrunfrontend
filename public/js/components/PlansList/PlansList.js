@@ -27,10 +27,6 @@ class PlansList extends Component {
       sort: ""
     };
   }
-
-  componentDidMount() {
-    //this.props.dispatch(getPlans());
-  }
   
   onClickCell(cell_idx, col_idx, e) {
     let { plans } = this.props;
@@ -106,33 +102,14 @@ class PlansList extends Component {
       {id: "PlanCode", placeholder: "Code"},
       {id: "to", display: false, type: "datetime"}
     ];
-    /* 
-       const sort_fields = [(<option disabled value="-1" key={-1}>Sort</option>),
-       ...fields.map((field, idx) => (
-       <option value={field.id} key={idx}>{field.placeholder}</option>
-       ))];
-
-       const table_header = fields.map((field, idx) => (
-       <TableHeaderColumn tooltip={field.placeholder} key={idx}>{field.placeholder}</TableHeaderColumn>
-       ));
-       
-       const rows = plans.map((row, key) => (
-       <TableRow key={key}>
-       {fields.map((field, idx) => (
-       <TableRowColumn key={idx}>
-       <Field id={field.id} value={row.get(field.id)} coll="Plans" editable={false} />
-       </TableRowColumn>
-       ))}
-       </TableRow>
-       ));
-     */
 
     const table_header =
     ["Name", "Code", "Description", "Trial", "Recurring Charges", "Billing Frequency", "Charging Mode"].map((header, key) => (
       <TableHeaderColumn key={key}>{header}</TableHeaderColumn>
     ));
 
-    const rows = plans.map((plan, plan_key) => (
+    const real_plans = plans.size > this.state.size ? plans.pop() : plans;
+    const rows = real_plans.map((plan, plan_key) => (
       <TableRow key={plan_key}>
         <TableRowColumn>
           <Field value={plan.get('name')} coll="Plans" editable={false} />
@@ -158,8 +135,6 @@ class PlansList extends Component {
       </TableRow>
     ));
 
-    let prevClass = "previous" + (this.state.page > 0 ? '' : ' disabled') ;
-    
     return (
       <div className="PlansList">
         <div className="row" style={{marginBottom: 10}}>
@@ -187,7 +162,9 @@ class PlansList extends Component {
           <TableFooter>
             <TableRow>
               <TableRowColumn style={{textAlign: 'center'}}>
-                <Pager onClick={this.handlePageClick} />
+                <Pager onClick={this.handlePageClick}
+                       size={this.state.size}
+                       count={plans.size} />
               </TableRowColumn>
             </TableRow>
           </TableFooter>
