@@ -10,7 +10,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Divider from 'material-ui/Divider';
 import BraasTheme from '../theme';
 import axios from 'axios';
-import * as actions from '../actions'
+import * as actions from '../actions';
 import LoginPopup from '../components/Authorization/LoginPopup';
 import StatusBar from '../components/StatusBar/StatusBar';
 import Modal from 'react-bootstrap/lib/Modal';
