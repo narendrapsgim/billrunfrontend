@@ -48,7 +48,7 @@ function buildPlanFromState(state) {
     } else if (idx > 0) {
       from = acc[idx - 1]['to']
     }
-    let to = basic_settings.recurring_prices.length === idx+1 ? null : from + parseInt(price.Cycle, 10);
+    let to = basic_settings.recurring_prices.length === idx+1 ? 999999999 : from + parseInt(price.Cycle, 10);
     acc.push({
       price: parseInt(price.PeriodicalRate, 10),
       Cycle: price.Cycle,
