@@ -10,7 +10,7 @@ import {
   FormControl,
   Panel,
   Col,
-  Row } from 'react-bootstrap/lib';
+  Row } from 'react-bootstrap';
 import { Conflict_409 } from '../Errors';
 import { userDoLogin } from '../../actions/userActions';
 

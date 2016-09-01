@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Col } from 'react-bootstrap/lib';
+import { Col } from 'react-bootstrap';
 
 
 const PageNotFound_404 = (props) => {

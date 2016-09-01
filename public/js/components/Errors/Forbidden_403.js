@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Col } from 'react-bootstrap/lib';
+import { Col } from 'react-bootstrap';
 
 const Forbidden_403 = (props) => {
   return (
