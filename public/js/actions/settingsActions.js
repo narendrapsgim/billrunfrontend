@@ -66,26 +66,25 @@ function savedSettings() {
   };
 }
 
-function saveSettingsToDB(settings) {
-  const queries = settings.keySeq().map(category => {
-    return {
-      api: "settings",
-      params: [
-        { category: category },
-        { action: "set" },
-        { data: JSON.stringify(settings.get(category).toJS()) }
-      ]
-    };
-  }).toJS();
+function saveSettingsToDB(category, settings) {
+  const query = {
+    api: "settings",
+    params: [
+      { category: category },
+      { action: "set" },
+      { data: JSON.stringify(settings.get(category).toJS()) }
+    ]
+  };
 
   return (dispatch) => {
-    apiBillRun(queries).then(
+    apiBillRun(query).then(
       success => {
-        console.log('success!');
+        dispatch(showStatusMessage("Settings saved successfuly!", "success"));
       },
       failure => {
         console.log(failure);
         console.log('failed!');
+        dispatch(showStatusMessage("Error saving settings", "error"));
       }
     ).catch(error =>
       dispatch(apiBillRunErrorHandler(error))
@@ -93,8 +92,8 @@ function saveSettingsToDB(settings) {
   }; 
 }
 
-export function saveSettings(settings) {
+export function saveSettings(category, settings) {
   return dispatch => {
-    return dispatch(saveSettingsToDB(settings));
+    return dispatch(saveSettingsToDB(category, settings));
   };  
 }

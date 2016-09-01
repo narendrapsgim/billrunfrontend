@@ -133,7 +133,7 @@ export default class FieldsMapping extends Component {
             {(() => {
               if (settings.get('usaget_type') === "static") {
                 return (
-                  <div classsName="form-group">
+                  <div className="form-group">
                     <Select
                         id="unit"
                         options={available_units}

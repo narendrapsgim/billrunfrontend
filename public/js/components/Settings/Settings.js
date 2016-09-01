@@ -84,7 +84,8 @@ class Settings extends Component {
   }
 
   onSave(e) {
-    this.props.dispatch(saveSettings(this.props.settings));
+    const { setting } = this.props.location.query;
+    this.props.dispatch(saveSettings(setting, this.props.settings));
   }
 
   onSelectTab(selected) {
@@ -101,8 +102,8 @@ class Settings extends Component {
     const inputProcessorView = (processor_selected ? <InputProcessor fileType={processor_selected} onCancel={this.onCancelInputProcessorEdit} /> : <InputProcessorsList onSelectInputProcessor={this.onSelectInputProcessor} />);
 
     const views = {
-      date_time:    (<DateTime onChange={this.onChangeDatetime} data={datetime} />),
-      currency_tax: (<CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />)
+      billrun:    (<DateTime onChange={this.onChangeDatetime} data={datetime} />),
+      pricing: (<CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />)
     };
     const currentView = views[this.props.location.query.setting];
 

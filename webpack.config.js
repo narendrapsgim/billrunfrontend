@@ -23,7 +23,7 @@ module.exports = {
   // Set entry point to ./src/main and include necessary files for hot load
   entry:  [
 //    "webpack-dev-server/client?http://localhost:9090",
-    "webpack/hot/only-dev-server",
+//    "webpack/hot/only-dev-server",
     "./public/js/index"
   ],
 

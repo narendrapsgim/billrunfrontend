@@ -235,17 +235,22 @@ export default class Navigator extends Component {
               </li>
               <li>
                 <Link to="/input_processors">
-                  <i className="fa fa-dashboard fa-fw"></i>Input Processors
+                  <i className="fa fa-dashboard fa-fw"></i> Input Processors
                 </Link>
               </li>
               <li>
                 <Link to="/plans">
-                  <i className="fa fa-dashboard fa-fw"></i>Plans
+                  <i className="fa fa-dashboard fa-fw"></i> Plans
                 </Link>
               </li>
               <li>
-                <Link to="/settings?setting=date_time">
-                  <i className="fa fa-dashboard fa-fw"></i>Date time
+                <Link to="/settings?setting=billrun">
+                  <i className="fa fa-dashboard fa-fw"></i> Date time
+                </Link>
+              </li>
+              <li>
+                <Link to="/settings?setting=pricing">
+                  <i className="fa fa-dashboard fa-fw"></i> Currency and Tax
                 </Link>
               </li>
             </ul>

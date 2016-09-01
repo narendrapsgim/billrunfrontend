@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import FontIcon from 'material-ui/FontIcon';
-import * as Colors from 'material-ui/styles/colors'
 
 export default class SampleCSV extends Component {
   constructor(props) {
@@ -41,11 +39,11 @@ export default class SampleCSV extends Component {
 
     const selectDelimiterHTML = settings.get('file_type') ? (
       <div className="form-group">
-        <div className="col-xs-2">
+        <div className="col-lg-3">
           <label htmlFor="delimiter">Delimiter</label>
         </div>
-        <div className="col-xs-6">
-          <div className="col-xs-3" style={{paddingLeft: 0}}>
+        <div className="col-lg-7">
+          <div className="col-lg-4" style={{paddingLeft: 0}}>
             <div className="input-group">
               <div className="input-group-addon">
                 <input type="radio" name="delimiter-type"
@@ -58,12 +56,12 @@ export default class SampleCSV extends Component {
                      type="text"
                      maxLength="1"
                      disabled={settings.get('delimiter_type') !== "separator"}
-                     style={{width: 30}}
+                     style={{width: 35}}
                      onChange={onChangeDelimiter}
                      value={settings.get('delimiter')} />
             </div>
           </div>
-          <div className="col-xs-3" style={{marginTop: 10}}>
+          <div className="col-lg-3" style={{marginTop: 10}}>
             <input type="radio" name="delimiter-type"
                    value="fixed"
                    onChange={onSetDelimiterType}
@@ -76,11 +74,15 @@ export default class SampleCSV extends Component {
     const fieldsHTML = settings.get('delimiter_type') === "fixed" ?
                        settings.get('fields').map((field, key) => (
                          <div className="form-group" key={key}>
-                           <div className="col-xs-2">
-                             <FontIcon onClick={this.removeField.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '13px', marginRight: '5px'}}>remove_circle_outline</FontIcon>
+                           <div className="col-lg-3">
+                             <button type="button"
+                                     className="btn btn-danger btn-circle"
+                                     onClick={this.removeField.bind(this, key)}>
+                               <i className="fa fa-minus" />
+                             </button>
                              {field}
                            </div>
-                           <div className="col-xs-2">
+                           <div className="col-lg-2">
                              <input type="number"
                                     className="form-control"
                                     data-field={field}
@@ -92,8 +94,12 @@ export default class SampleCSV extends Component {
                        )) :
                        settings.get('fields').map((field, key) => (
                          <div className="form-group" key={key}>
-                           <div className="col-xs-2">
-                             <FontIcon onClick={this.removeField.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '13px', marginRight: '5px'}}>remove_circle_outline</FontIcon>
+                           <div className="col-lg-2">
+                             <button type="button"
+                                     className="btn btn-danger btn-circle"
+                                     onClick={this.removeField.bind(this, key)}>
+                               <i className="fa fa-minus" />
+                             </button>
                              { field } 
                            </div>
                          </div>
@@ -102,13 +108,13 @@ export default class SampleCSV extends Component {
     const setFieldsHTML = (
       <div>
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-lg-3">
             <label>Field <small><a onClick={this.removeAllFields}>(remove all)</a></small></label>
           </div>
           {(() => {             
              if (settings.get('delimiter_type') === "fixed") {
                return (
-                 <div className="col-xs-2">
+                 <div className="col-lg-3">
                    <label>Width</label>
                  </div>
                );
@@ -117,11 +123,15 @@ export default class SampleCSV extends Component {
         </div>
         { fieldsHTML }
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-lg-3">
             <input className="form-control" value={this.state.newField} onChange={(e) => { this.setState({newField: e.target.value}) } } placeholder="Field Name"/>
           </div>
-          <div className="col-xs-2">
-            <FontIcon onClick={this.addField} className="material-icons" style={{cursor: "pointer", color: Colors.green300, fontSize: '24px', paddingRight: '3px', marginTop: '10px'}}>add_circle_outline</FontIcon>
+          <div className="col-lg-2">
+            <button type="button"
+                    className="btn btn-info btn-circle"
+                    onClick={this.addField}>
+              <i className="fa fa-plus"/>
+            </button>
           </div>
         </div>
       </div>
@@ -131,11 +141,11 @@ export default class SampleCSV extends Component {
                             settings.get('delimiter')) && settings.get('file_type')) ? (
       <div>
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-lg-3">
             <label htmlFor="sample_csv">Select Sample CSV</label>
             <p className="help-block">Notice: Spaces will be convereted to underscores</p>
           </div>
-          <div className="col-xs-2">
+          <div className="col-lg-2">
             <input type="file" id="sample_csv" onChange={onSelectSampleCSV} disabled={!settings.get('delimiter_type')} />
           </div>
         </div>
@@ -146,10 +156,10 @@ export default class SampleCSV extends Component {
     return (
       <form className="InputProcessor form-horizontal">
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-lg-3">
             <label htmlFor="file_type">Name</label>
           </div>
-          <div className="col-xs-2">
+          <div className="col-lg-3">
             <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
           </div>
         </div>
