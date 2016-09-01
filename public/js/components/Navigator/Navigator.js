@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { Link } from 'react-router';
+import { userDoLogout } from '../../actions/userActions';
 
-export default class Navigator extends Component {
+class Navigator extends Component {
   constructor(props) {
     super(props);
+  }
+
+  clickLogout = (e) => {
+    e.preventDefault()
+    this.props.userDoLogout();
   }
 
   render() {
@@ -311,16 +319,21 @@ export default class Navigator extends Component {
                   </li>
                 </ul>
               </li>
+
               <li>
                 <a href="#"><i className="fa fa-files-o fa-fw"></i> Sample Pages<span className="fa arrow"></span></a>
                 <ul className="nav nav-second-level">
                   <li>
                     <a href="blank.html">Blank Page</a>
                   </li>
-                  <li>
-                    <Link to="login"> Login Page </Link>
-                  </li>
+
                 </ul>
+              </li>
+              <li>
+                <Link to="login"> <i className="fa fa-sign-in fa-fw"></i> Login Page </Link>
+              </li>
+              <li>
+                <a href="#" onClick={this.clickLogout}><i className="fa fa-sign-out fa-fw"></i>  Logout </a>
               </li>
             </ul>
           </div>
@@ -329,3 +342,9 @@ export default class Navigator extends Component {
     );
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    userDoLogout }, dispatch);
+}
+export default connect(null, mapDispatchToProps)(Navigator);
