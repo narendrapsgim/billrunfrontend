@@ -53,7 +53,7 @@ class SubsPerPlanCurrentMonth extends Component {
   prepareChartData(chartData) {
     const {toDate} = this.props;
     var formatedData = {
-      title: getMonthName(toDate.getUTCMonth()+1) + ", " + '01 to ' + ("0" + toDate.getUTCDate()).slice(-2),
+      // title: getMonthName(toDate.getUTCMonth()+1) + ", " + '01 to ' + ("0" + toDate.getUTCDate()).slice(-2),
       labels: [],
       values: []
     };
