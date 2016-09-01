@@ -89,10 +89,10 @@ export default class FieldsMapping extends Component {
     return (
       <form className="form-horizontal FieldsMapping">
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-lg-2">
             <label>Time</label>
           </div>
-          <div className="col-xs-2">
+          <div className="col-lg-2">
             <select id="date_field"
                     className="form-control"
                     onChange={onSetFieldMapping}
@@ -104,10 +104,10 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-lg-2">
             <label>Volume</label>
           </div>
-          <div className="col-xs-2">
+          <div className="col-lg-2">
             <select id="volume_field"
                     className="form-control"
                     onChange={onSetFieldMapping}
@@ -119,10 +119,10 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-xs-2">
+          <div className="col-lg-2">
             <label>Usage types</label>
           </div>
-          <div className="col-xs-2">
+          <div className="col-lg-2">
             <label><input type="radio"
                           name="usage_types_type"
                           value="static"
@@ -149,7 +149,7 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-xs-offset-2 col-xs-2">
+          <div className="col-lg-offset-2 col-lg-3">
             <label><input type="radio"
                           name="usage_types_type"
                           value="dynamic"
@@ -163,12 +163,12 @@ export default class FieldsMapping extends Component {
            if (settings.get('usaget_type') === "dynamic") {
              return (
                <div className="form-group">
-                 <div className="col-xs-offset-2 col-xs-4">
+                 <div className="col-lg-offset-2 col-lg-4">
                    <div className="form-group">
-                     <div className="col-xs-2">
+                     <div className="col-lg-3">
                        <label>Map field</label>
                      </div>
-                     <div className="col-xs-4">
+                     <div className="col-lg-4">
                        <select id="src_field"
                                className="form-control"
                                onChange={onSetFieldMapping}
@@ -187,31 +187,31 @@ export default class FieldsMapping extends Component {
       {(() => {
         if (settings.get('usaget_type') === "dynamic") {
           return (
-          <div className="col-xs-offset-2 col-xs-6">
+          <div className="col-lg-offset-2 col-lg-6">
             <div className="form-group">
-              <div className="col-xs-2">
+              <div className="col-lg-3">
                 <strong>Input Value</strong>
               </div>
-              <div className="col-xs-2">
+              <div className="col-lg-3">
                 <strong>Usage Type</strong>
               </div>
             </div>
             {
               settings.getIn(['processor', 'usaget_mapping']).map((usage_t, key) => (
             <div className="form-group" key={key}>
-              <div className="col-xs-2">{usage_t.get('pattern')}</div>
-              <div className="col-xs-2">{usage_t.get('usaget')}</div>
-              <div className="col-xs-2">
+              <div className="col-lg-3">{usage_t.get('pattern')}</div>
+              <div className="col-lg-3">{usage_t.get('usaget')}</div>
+              <div className="col-lg-3">
                 <FontIcon onClick={this.removeUsagetMapping.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '24px'}}>remove_circle_outline</FontIcon>
               </div>
             </div>
               ))
             }
             <div className="form-group">
-              <div className="col-xs-2">
+              <div className="col-lg-3">
                 <input className="form-control" onChange={this.onChangePattern} value={this.state.pattern} />
               </div>
-              <div className="col-xs-2">
+              <div className="col-lg-3">
                 <Select
                     id="unit"
                     options={available_units}
@@ -221,7 +221,7 @@ export default class FieldsMapping extends Component {
                     onChange={this.onChangeUsaget}
                 />
               </div>
-              <div className="col-xs-2">
+              <div className="col-lg-3">
                 <FontIcon onClick={this.addUsagetMapping} className="material-icons" style={{cursor: "pointer", color: Colors.green300, fontSize: '24px', marginTop: '9px'}}>add_circle_outline</FontIcon>
               </div>
             </div>
