@@ -27,7 +27,17 @@ class App extends Component {
     });
   }
 
-  render() {
+  renderWithoutLayout(){
+    return (
+      <div className="container">
+        <Row>
+          { this.props.children }
+        </Row>
+      </div>
+    );
+  }
+
+  renderWithLayout(){
     return (
       <div id="wrapper">
         <Navigator />
@@ -43,6 +53,11 @@ class App extends Component {
         </div>
       </div>
     );
+  }
+
+  render() {
+    const { user } = this.props;
+    return (user.get('auth') == true) ? this.renderWithLayout() : this.renderWithoutLayout();
   }
 }
 

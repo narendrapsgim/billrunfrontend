@@ -50,7 +50,7 @@ class LoginForm extends Component {
     const { error } = this.state;
     return (
       <Col md={4} mdOffset={4}>
-        <Panel header="Please Sign In">
+        <Panel header="Please Sign In" className="login-panel">
             <Form onSubmit={this.clickLogin}>
                 <fieldset>
                     <FormGroup validationState={error.length > 0 ? "error" : '' }>
