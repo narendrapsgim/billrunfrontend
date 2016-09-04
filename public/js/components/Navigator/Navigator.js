@@ -244,6 +244,11 @@ export default class Navigator extends Component {
                 </Link>
               </li>
               <li>
+                <Link to="/customers">
+                  <i className="fa fa-dashboard fa-fw"></i> Customers
+                </Link>
+              </li>
+              <li>
                 <Link to="/settings?setting=billrun">
                   <i className="fa fa-dashboard fa-fw"></i> Date time
                 </Link>

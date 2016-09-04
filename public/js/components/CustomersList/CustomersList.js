@@ -4,6 +4,7 @@ import moment from 'moment';
 
 import { PageHeader } from 'react-bootstrap';
 import Pager from '../Pager';
+import Filter from '../Filter';
 
 /* ACTIONS */
 import { getList } from '../../actions/listActions';
@@ -14,6 +15,9 @@ class CustomersList extends Component {
 
     this.buildQuery = this.buildQuery.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
+    this.onNewCustomer = this.onNewCustomer.bind(this);
+    this.onClickCustomer = this.onClickCustomer.bind(this);
+    this.onFilter = this.onFilter.bind(this);
 
     this.state = {
       page: 0,
@@ -33,7 +37,7 @@ class CustomersList extends Component {
       page: this.state.page,
       query: {
         type: "account",
-        to: {"$gt": moment().toISOString()}
+        to: {"$gt": moment().toISOString()},
       }
     };
   }
@@ -43,7 +47,24 @@ class CustomersList extends Component {
       this.props.dispatch(getList("customers", this.buildQuery()))
     });
   }
-  
+
+  onNewCustomer() {
+    this.context.router.push({
+      pathname: "customer",
+      query: { action: "new" }
+    });
+  }
+
+  onClickCustomer(e) {
+    console.log('test');
+  }
+
+  onFilter(filter) {
+    this.setState({filter}, () => {
+      this.props.dispatch(getList("customers", this.buildQuery()))
+    });
+  }
+
   render() {
     const { customers } = this.props;
 
@@ -61,7 +82,7 @@ class CustomersList extends Component {
     ));
 
     const table_body = customers.map((customer, key) => (
-      <tr key={key}>
+      <tr key={key} onClick={this.onClickCustomer}>
         { fields.map((field, field_key) => (
             <td key={field_key}>{ customer.get(field.id) }</td>
           )) }
@@ -77,6 +98,12 @@ class CustomersList extends Component {
           </div>
         </div>
 
+        <div className="row pull-right">
+          <div className="col-lg-12">
+            <button className="btn btn-primary" onClick={this.onNewCustomer}>New</button>
+          </div>
+        </div>
+
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
@@ -84,6 +111,11 @@ class CustomersList extends Component {
                 List of all available customers
               </div>
               <div className="panel-body">
+                <div className="row">
+                  <div className="col-lg-9">
+                    <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
+                  </div>
+                </div>
                 <div className="table-responsive">
                   <table className="table table-hover">
                     <thead>
@@ -114,6 +146,10 @@ class CustomersList extends Component {
     );
   }
 }
+
+CustomersList.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
 
 function mapStateToProps(state) {
   return {
