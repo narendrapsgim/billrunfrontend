@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
 import Immutable from 'immutable';
 
+import { PageHeader } from 'react-bootstrap';
 import Tabs from 'react-bootstrap/lib/Tabs';
 import Tab from 'react-bootstrap/lib/Tab';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -102,19 +103,41 @@ class Settings extends Component {
     const inputProcessorView = (processor_selected ? <InputProcessor fileType={processor_selected} onCancel={this.onCancelInputProcessorEdit} /> : <InputProcessorsList onSelectInputProcessor={this.onSelectInputProcessor} />);
 
     const views = {
-      billrun:    (<DateTime onChange={this.onChangeDatetime} data={datetime} />),
-      pricing: (<CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />)
+      billrun: {
+        component: (<DateTime onChange={this.onChangeDatetime} data={datetime} />),
+        title: "Date and Time"
+      },
+      pricing: {
+        component: (<CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />),
+        title: "Currency and Tax"
+      }
     };
-    const currentView = views[this.props.location.query.setting];
+    const currentView = views[this.props.location.query.setting].component;
 
     return (
       <div>
-        { currentView }
-        <div style={{marginTop: 12}}>
-          <button className="btn btn-primary"
-                  onClick={this.onSave}>
-            Save
-          </button>
+        <div className="row">
+          <div className="col-lg-12">
+            <PageHeader>Settings</PageHeader>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="panel panel-default">
+              <div className="panel-heading">
+                { views[this.props.location.query.setting].title }
+              </div>
+              <div className="panel-body">
+                { currentView }
+                <div style={{marginTop: 12}}>
+                  <button className="btn btn-primary"
+                          onClick={this.onSave}>
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

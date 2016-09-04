@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import { PageHeader } from 'react-bootstrap';
+
 import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showStatusMessage } from '../../actions/commonActions';
@@ -251,46 +253,65 @@ class InputProcessor extends Component {
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
 
+    const { action } = this.props.location.query;
+    const title = action === 'new' ? "New input processor" : `Edit input processor - ${settings.get('file_type')}`;
+    
     return (
-      <div className="InputProcessor">
-        <Stepper activeStep={stepIndex}>
-          <Step>
-            <StepLabel>Select CSV</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Field Mapping</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Calculator Mapping</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Receiver</StepLabel>
-          </Step>
-        </Stepper>
-        <div className="contents bordered-container">
-          { steps[stepIndex] }
+      <div>
+        <div className="row">
+          <div className="col-lg-12">
+            <PageHeader></PageHeader>
+          </div>
         </div>
-        <div style={{marginTop: 12, float: "right"}}>
-          <button className="btn btn-danger"
-                  onClick={this.handleCancel}
-                  style={{marginRight: 12}}>
-            Cancel
-          </button>
-          {(() => {
-             if (stepIndex > 0) {
-               return (
-                 <button className="btn"
-                         onClick={this.handlePrev}
-                         style={{marginRight: 12}}>
-                   Back
-                 </button>
-               );
-             }
-           })()}                 
-                 <button className="btn btn-primary"
-                         onClick={this.handleNext}>
-                   { stepIndex === (steps.length - 1) ? "Finish" : "Next" }
-                 </button>
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="panel panel-default">
+              <div className="panel-heading">
+                { title }
+              </div>
+              <div className="panel-body">
+                <Stepper activeStep={stepIndex}>
+                  <Step>
+                    <StepLabel>Select CSV</StepLabel>
+                  </Step>
+                  <Step>
+                    <StepLabel>Field Mapping</StepLabel>
+                  </Step>
+                  <Step>
+                    <StepLabel>Calculator Mapping</StepLabel>
+                  </Step>
+                  <Step>
+                    <StepLabel>Receiver</StepLabel>
+                  </Step>
+                </Stepper>
+                <div className="contents bordered-container">
+                  { steps[stepIndex] }
+                </div>
+              </div>
+              <div style={{marginTop: 12, float: "right"}}>
+                <button className="btn btn-danger"
+                        onClick={this.handleCancel}
+                        style={{marginRight: 12}}>
+                  Cancel
+                </button>
+                {(() => {
+                   if (stepIndex > 0) {
+                     return (
+                       <button className="btn"
+                               onClick={this.handlePrev}
+                               style={{marginRight: 12}}>
+                         Back
+                       </button>
+                     );
+                   }
+                 })()}                 
+                       <button className="btn btn-primary"
+                               onClick={this.handleNext}>
+                         { stepIndex === (steps.length - 1) ? "Finish" : "Next" }
+                       </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

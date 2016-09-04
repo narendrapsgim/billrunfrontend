@@ -42,15 +42,22 @@ class PlansList extends Component {
 
         <div className="row">
           <div className="col-lg-12">
-            <div className="table-responsive">
-              <table className="table table-hover">
-                <thead>
-                  <tr>{ table_header }</tr>
-                </thead>
-                <tbody>
-                  { table_body }
-                </tbody>
-              </table>
+            <div className="panel panel-default">
+              <div className="panel-heading">
+                All available plans
+              </div>
+              <div className="panel-body">
+                <div className="table-responsive">
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>{ table_header }</tr>
+                    </thead>
+                    <tbody>
+                      { table_body }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -68,20 +68,26 @@ class InputProcessorsList extends Component {
 
         <div className="row">
           <div className="col-lg-12">
-            <Table responsive hover>
-              <thead>
-                <tr>{ table_headers }</tr>
-              </thead>
-              <tbody>
-                { table_body }
-              </tbody>
-            </Table>
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-xs-3">
-            <a className="btn btn-primary" onClick={this.onClickNew} style={{margin: 15}}>Create New</a>
+            <div className="panel panel-default">
+              <div className="panel-heading">
+                All available input processors
+              </div>
+              <div className="panel-body">
+                <Table responsive hover>
+                  <thead>
+                    <tr>{ table_headers }</tr>
+                  </thead>
+                  <tbody>
+                    { table_body }
+                  </tbody>
+                </Table>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs-3">
+                <a className="btn btn-primary" onClick={this.onClickNew} style={{margin: 15}}>Create New</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
