@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import classNames from "classnames";
+import {Navbar, Nav, NavItem, NavDropdown, MenuItem, ProgressBar} from "react-bootstrap";
 
 export default class Navigator extends Component {
   constructor(props) {
@@ -33,35 +34,31 @@ export default class Navigator extends Component {
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
-          <li className="dropdown">
-            <a className="dropdown-toggle" data-toggle="dropdown" href="#">
-              <i className="fa fa-user fa-fw"></i> <i className="fa fa-caret-down"></i>
-            </a>
-            <ul className="dropdown-menu dropdown-user">
-              <li><a href="#"><i className="fa fa-user fa-fw"></i> User Profile</a>
-              </li>
-              <li><a href="#"><i className="fa fa-gear fa-fw"></i> Settings</a>
-              </li>
-              <li className="divider"></li>
-              <li><a href="login.html"><i className="fa fa-sign-out fa-fw"></i> Logout</a>
-              </li>
-            </ul>
-          </li>
+          <NavDropdown  title={<i className="fa fa-user fa-fw"></i>} >
+            <MenuItem eventKey="1">
+              <i className="fa fa-user fa-fw"></i> User Profile
+            </MenuItem> 
+            <MenuItem eventKey="2">
+              <i className="fa fa-gear fa-fw"></i> Settings
+            </MenuItem> 
+            <MenuItem eventKey="3">
+              <a href="http://www.strapui.com/" onClick={ () => { window.location='http://www.strapui.com/'; } }>
+                <i className="fa fa-eye fa-fw"></i> Premium React Themes
+              </a>
+            </MenuItem> 
+            <MenuItem divider />
+            <MenuItem eventKey="4">
+              <Link to="login">
+                <i className="fa fa-sign-out fa-fw"></i> Logout
+              </Link>
+            </MenuItem>
+        </NavDropdown>
         </ul>
 
         <div className="navbar-default sidebar" role="navigation">
           <div className="sidebar-nav navbar-collapse">
-            <ul className="nav" id="side-menu">
-              <li className="sidebar-search">
-                <div className="input-group custom-search-form">
-                  <input type="text" className="form-control" placeholder="Search..." />
-                    <span className="input-group-btn">
-                      <button className="btn btn-default" type="button">
-                        <i className="fa fa-search"></i>
-                      </button>
-                    </span>
-                </div>
-              </li>
+
+            <ul className="nav in" id="side-menu">
               <li>
                 <Link to="/plans">
                   <i className="fa fa-dashboard fa-fw"></i>Plans
