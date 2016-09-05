@@ -24,13 +24,13 @@ function fetchList(collection, params) {
     const query = {
       api: params.api,
       params: [
-        ...params.additional,        
-        { collection: collection },
+        { collection: params.collection || collection },
         { size: params.size },
         { page: params.page },
-        { query: JSON.stringify(params.query) }
+        { query: _.isString(params.query) ? params.query : JSON.stringify(params.query) }
       ]
     };
+    if (params.additional) query.params.push(params.additional);
 
     apiBillRun(query).then(
       success => {

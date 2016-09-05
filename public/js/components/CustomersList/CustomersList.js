@@ -5,6 +5,7 @@ import moment from 'moment';
 import { PageHeader } from 'react-bootstrap';
 import Pager from '../Pager';
 import Filter from '../Filter';
+import { DropdownButton, MenuItem } from "react-bootstrap";
 
 /* ACTIONS */
 import { getList } from '../../actions/listActions';
@@ -21,7 +22,7 @@ class CustomersList extends Component {
 
     this.state = {
       page: 0,
-      size: 1
+      size: 10
     };
   }
 
@@ -35,10 +36,7 @@ class CustomersList extends Component {
       collection: "subscribers",
       size: this.state.size,
       page: this.state.page,
-      query: {
-        type: "account",
-        to: {"$gt": moment().toISOString()},
-      }
+      query: this.state.filter
     };
   }
 
@@ -55,8 +53,14 @@ class CustomersList extends Component {
     });
   }
 
-  onClickCustomer(e) {
-    console.log('test');
+  onClickCustomer(aid, e) {
+    this.context.router.push({
+      pathname: "customer",
+      query: {
+        action: "update",
+        aid
+      }
+    });
   }
 
   onFilter(filter) {
@@ -82,7 +86,7 @@ class CustomersList extends Component {
     ));
 
     const table_body = customers.map((customer, key) => (
-      <tr key={key} onClick={this.onClickCustomer}>
+      <tr key={key} onClick={this.onClickCustomer.bind(this, customer.get('aid'))}>
         { fields.map((field, field_key) => (
             <td key={field_key}>{ customer.get(field.id) }</td>
           )) }
@@ -98,17 +102,18 @@ class CustomersList extends Component {
           </div>
         </div>
 
-        <div className="row pull-right">
-          <div className="col-lg-12">
-            <button className="btn btn-primary" onClick={this.onNewCustomer}>New</button>
-          </div>
-        </div>
-
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                List of all available customers
+                <span>
+                  List of all available customers
+                  <div className="pull-right">
+                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
+                      <MenuItem eventKey="1" onClick={this.onNewCustomer}>New</MenuItem>
+                    </DropdownButton>
+                  </div>
+                </span>
               </div>
               <div className="panel-body">
                 <div className="row">
