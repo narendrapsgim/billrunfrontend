@@ -5,7 +5,10 @@ import { Panel, PageHeader, Col, Row} from 'react-bootstrap';
 
 import ProgressIndicator from '../components/ProgressIndicator';
 import Navigator from '../components/Navigator';
+import Alerts from '../components/Alerts';
 import { userCheckLogin } from '../actions/userActions';
+
+require('../../css/style.css');
 
 
 class App extends Component {
@@ -42,6 +45,7 @@ class App extends Component {
     return (
       <div id="wrapper">
         <ProgressIndicator />
+        <Alerts />
         <Navigator />
         <div id="page-wrapper" style={{minHeight: this.state.Height}}>
           <Row>
