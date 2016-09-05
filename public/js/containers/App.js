@@ -6,6 +6,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import BraasTheme from '../theme';
 
+import ProgressIndicator from '../components/ProgressIndicator';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
 import { userCheckLogin } from '../actions/userActions';
@@ -46,6 +47,7 @@ class App extends Component {
   renderWithLayout(){
     return (
       <div id="wrapper">
+        <ProgressIndicator />
         <Alerts />
         <Navigator />
         <div id="page-wrapper" className="page-wrapper" ref="pageWrapper" style={{minHeight: this.state.Height}}>
