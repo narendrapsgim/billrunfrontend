@@ -7,15 +7,16 @@ import { getList } from '../../actions/listActions';
 class PlansList extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      size: 10,
+      page: 0,
+      api: "find",
+      query: {}
+    }
   }
 
   componentDidMount() {
-    const query = {
-      size: 10,
-      page: 0,
-      query: {}
-    };
-    this.props.dispatch(getList("plans", query));
+    this.props.dispatch(getList("plans", this.state));
   }
   
   render() {
@@ -36,15 +37,22 @@ class PlansList extends Component {
       <div>
         <div className="row">
           <div className="col-lg-12">
-            <div className="table-responsive">
-              <table className="table table-hover">
-                <thead>
-                  <tr>{ table_header }</tr>
-                </thead>
-                <tbody>
-                  { table_body }
-                </tbody>
-              </table>
+            <div className="panel panel-default">
+              <div className="panel-heading">
+                All available plans
+              </div>
+              <div className="panel-body">
+                <div className="table-responsive">
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>{ table_header }</tr>
+                    </thead>
+                    <tbody>
+                      { table_body }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
