@@ -11,25 +11,10 @@ export default class Navigator extends Component {
     };
   }
 
-  toggleMenu(){
-    if($(".navbar-collapse").hasClass('collapse')){
-      $(".navbar-collapse").removeClass('collapse');  
-    }
-    else{
-      $(".navbar-collapse").addClass('collapse');
-    }
-  }
-  
   render() {
     return (
       <nav className="navbar navbar-default navbar-static-top" role="navigation" style={{"marginBottom": "0px"}}>
         <div className="navbar-header">
-          <button type="button" className="navbar-toggle" onClick={this.toggleMenu} style={{position: 'absolute', right: 0, top: 0}}>
-            <span className="sr-only">Toggle navigation</span>
-            <span className="icon-bar"></span>
-            <span className="icon-bar"></span>
-            <span className="icon-bar"></span>
-          </button>
           <a className="navbar-brand" href="index.html">Billrun</a>
         </div>
 
@@ -61,13 +46,13 @@ export default class Navigator extends Component {
             <ul className="nav in" id="side-menu">
               <li>
                 <Link to="/plans">
-                  <i className="fa fa-dashboard fa-fw"></i>Plans
+                  <i className="fa fa-dashboard fa-fw"></i> Plans
                 </Link>
               </li>
               <li>
-                <a href="#"><i className="fa fa-bar-chart-o fa-fw"></i> Products</a>
-                <ul className="nav nav-second-level">
-                </ul>
+                <Link to="/products">
+                  <i className="fa fa-bar-chart-o fa-fw"></i> Products
+                </Link>
               </li>
               <li>
                 <a href="customers.html"><i className="fa fa-table fa-fw"></i> Customers</a>
