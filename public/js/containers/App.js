@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Panel, PageHeader, Col, Row} from 'react-bootstrap';
 
+import ProgressIndicator from '../components/ProgressIndicator';
 import Navigator from '../components/Navigator';
 import { userCheckLogin } from '../actions/userActions';
 
@@ -40,6 +41,7 @@ class App extends Component {
   renderWithLayout(){
     return (
       <div id="wrapper">
+        <ProgressIndicator />
         <Navigator />
         <div id="page-wrapper" style={{minHeight: this.state.Height}}>
           <Row>
