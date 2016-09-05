@@ -31,9 +31,8 @@ class ProgressIndicator extends Component {
     const { infinity = false, step = 10 } = this.props;
     const { now } = this.state;
 
-    console.log("update, now : ", now);
+    let newNow = now + step;
 
-    var newNow = now + step;
     if(newNow > 100){
       if(infinity){
         newNow = 0 - step;
@@ -63,8 +62,6 @@ class ProgressIndicator extends Component {
 }
 
 function mapStateToProps(state) {
-  return {
-    progressIndicator: state.progressIndicator
-  }
+  return { progressIndicator: state.progressIndicator }
 }
 export default connect(mapStateToProps)(ProgressIndicator);
