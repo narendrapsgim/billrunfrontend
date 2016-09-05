@@ -18,12 +18,12 @@ var fontAwesomePath = __dirname + '/node_modules/font-awesome/css';
 module.exports = {
 
   // Efficiently evaluate modules with source maps
-  devtool: "eval",
+  //devtool: "eval",
 
   // Set entry point to ./src/main and include necessary files for hot load
   entry:  [
 //    "webpack-dev-server/client?http://localhost:9090",
-//    "webpack/hot/only-dev-server",
+    "webpack/hot/only-dev-server",
     "./public/js/index"
   ],
 
