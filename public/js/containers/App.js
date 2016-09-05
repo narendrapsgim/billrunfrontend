@@ -7,7 +7,10 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import BraasTheme from '../theme';
 
 import Navigator from '../components/Navigator';
+import Alerts from '../components/Alerts';
 import { userCheckLogin } from '../actions/userActions';
+
+require('../../css/style.css');
 
 
 class App extends Component {
@@ -43,6 +46,7 @@ class App extends Component {
   renderWithLayout(){
     return (
       <div id="wrapper">
+        <Alerts />
         <Navigator />
         <div id="page-wrapper" className="page-wrapper" ref="pageWrapper" style={{minHeight: this.state.Height}}>
           <Row>

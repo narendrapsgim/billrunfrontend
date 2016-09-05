@@ -6,6 +6,7 @@ import settings from './settingsReducer';
 import entity from './entityReducer';
 import dashboard from './dashboardReducer';
 import user from './userReducer';
+import alerts from './alertsReducer';
 
 export default combineReducers({
   list,
@@ -14,5 +15,6 @@ export default combineReducers({
   inputProcessor,
   settings,
   dashboard,
-  user
+  user,
+  alerts
 });
