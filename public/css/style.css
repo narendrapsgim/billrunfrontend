@@ -1,0 +1,16 @@
+/* Syslem Alerts */
+.alerts-enter {
+  opacity: 0.01;
+}
+.alerts-enter.alerts-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+.alerts-leave {
+  opacity: 1;
+}
+.alerts-leave.alerts-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+/* ~ Syslem Alerts */
