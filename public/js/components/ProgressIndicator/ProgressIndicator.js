@@ -9,7 +9,7 @@ class ProgressIndicator extends Component {
   constructor(props) {
     super(props);
     this.progressIndicatorInterval = null;
-    this.interval = 500;
+    this.interval = 10;
     this.state = { now: 0 }
   }
 
@@ -21,8 +21,7 @@ class ProgressIndicator extends Component {
     if(nextProps.progressIndicator === 0 ){
       clearInterval(this.progressIndicatorInterval);
       this.setState({ now: 0 });
-    } else if(nextProps.progressIndicator === 1 && this.props.progressIndicator === 0 ) {
-      clearInterval(this.progressIndicatorInterval);
+    } else if(typeof this.progressIndicatorInterval === "undefined" || this.progressIndicatorInterval === null ) {
       this.progressIndicatorInterval = setInterval(this.updateProgress, this.interval);
     }
   }
