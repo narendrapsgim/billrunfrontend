@@ -1,30 +1,71 @@
 import React, { Component } from 'react';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import BraasTheme from '../theme';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Panel, PageHeader, Col, Row} from 'react-bootstrap';
 
 import Navigator from '../components/Navigator';
+import { userCheckLogin } from '../actions/userActions';
 
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      title: props.routes[props.routes.length-1].title || props.routes[props.routes.length-1].name
+    }
   }
 
   componentWillMount() {
+    this.props.userCheckLogin();
     this.setState({Height: "100%"});
   }
-  
-  render() {
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      title: nextProps.routes[nextProps.routes.length-1].title || nextProps.routes[nextProps.routes.length-1].name
+    });
+  }
+
+  renderWithoutLayout(){
     return (
-      <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>      
-        <div>
-          <Navigator />
-          <div id="page-wrapper" className="page-wrapper" ref="pageWrapper" style={{minHeight: this.state.Height}}>
-            { this.props.children }
-          </div>
-        </div>
-      </MuiThemeProvider>
+      <div className="container">
+        <Row>
+          { this.props.children }
+        </Row>
+      </div>
     );
   }
+
+  renderWithLayout(){
+    return (
+      <div id="wrapper">
+        <Navigator />
+        <div id="page-wrapper" style={{minHeight: this.state.Height}}>
+          <Row>
+            <Col lg={12}>
+                <PageHeader>{this.state.title}</PageHeader>
+            </Col>
+          </Row>
+          <Row>
+            { this.props.children }
+          </Row>
+        </div>
+      </div>
+    );
+  }
+
+  render() {
+    const { user } = this.props;
+    return (user.get('auth') == true) ? this.renderWithLayout() : this.renderWithoutLayout();
+  }
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    userCheckLogin }, dispatch);
+}
+function mapStateToProps(state) {
+  return { user: state.user };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(App);

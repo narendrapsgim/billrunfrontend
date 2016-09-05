@@ -35,12 +35,6 @@ class PlansList extends Component {
     return (
       <div>
         <div className="row">
-          <div className="col-lg-12"> 
-            <PageHeader>Plans</PageHeader> 
-          </div>
-        </div>
-
-        <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">

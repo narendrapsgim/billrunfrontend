@@ -4,11 +4,15 @@ import customer from './customerReducer';
 import inputProcessor from './inputProcessorReducer';
 import settings from './settingsReducer';
 import entity from './entityReducer';
+import dashboard from './dashboardReducer';
+import user from './userReducer';
 
 export default combineReducers({
   list,
   customer,
   entity,
   inputProcessor,
-  settings
+  settings,
+  dashboard,
+  user
 });
