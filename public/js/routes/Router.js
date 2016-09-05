@@ -17,14 +17,14 @@ export default () => {
   return (
     <Route path="/" component={App}>
       <IndexRedirect to="/dashboard" component={RequireAuth(Dashboard)} />
-      <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashbord" name="dashboard" />
-      <Route path="/plans" component={RequireAuth(PlansList)} title="Plans" name="plans" />
-      <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers" name="customers" />
-      <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer" name="customer" />
-      <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor" name="input_processor" />
-      <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" name="input_processors" />
-      <Route path="/settings" component={RequireAuth(Settings)} title="Settings" name="settings" />
-      <Route path="/login" component={LoginPage} title="Login" name="login" />
+      <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashbord" />
+      <Route path="/plans" component={RequireAuth(PlansList)} title="Plans"/>
+      <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
+      <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
+      <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>
+      <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors"/>
+      <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
+      <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />
     </Route>
   );
