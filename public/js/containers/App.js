@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Panel, PageHeader, Col, Row} from 'react-bootstrap';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import BraasTheme from '../theme';
 
 import Navigator from '../components/Navigator';
 import { userCheckLogin } from '../actions/userActions';
@@ -41,10 +44,10 @@ class App extends Component {
     return (
       <div id="wrapper">
         <Navigator />
-        <div id="page-wrapper" style={{minHeight: this.state.Height}}>
+        <div id="page-wrapper" className="page-wrapper" ref="pageWrapper" style={{minHeight: this.state.Height}}>
           <Row>
             <Col lg={12}>
-                <PageHeader>{this.state.title}</PageHeader>
+              <PageHeader>{this.state.title}</PageHeader>
             </Col>
           </Row>
           <Row>
@@ -57,7 +60,12 @@ class App extends Component {
 
   render() {
     const { user } = this.props;
-    return (user.get('auth') == true) ? this.renderWithLayout() : this.renderWithoutLayout();
+    const view = (user.get('auth') == true) ? this.renderWithLayout() : this.renderWithoutLayout();
+    return (
+      <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>
+        { view }
+      </MuiThemeProvider>
+    );
   }
 }
 

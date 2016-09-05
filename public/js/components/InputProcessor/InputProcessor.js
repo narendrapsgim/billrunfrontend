@@ -260,11 +260,6 @@ class InputProcessor extends Component {
       <div>
         <div className="row">
           <div className="col-lg-12">
-            <PageHeader></PageHeader>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
                 { title }

@@ -98,12 +98,6 @@ class CustomersList extends Component {
 
         <div className="row">
           <div className="col-lg-12">
-            <PageHeader>Customers</PageHeader>
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
                 <span>

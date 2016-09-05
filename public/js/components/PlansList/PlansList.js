@@ -10,6 +10,7 @@ class PlansList extends Component {
     this.state = {
       size: 10,
       page: 0,
+      api: "find",
       query: {}
     }
   }

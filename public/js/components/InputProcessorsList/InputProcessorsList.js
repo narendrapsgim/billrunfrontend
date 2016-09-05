@@ -60,11 +60,6 @@ class InputProcessorsList extends Component {
 
     return (
       <div className="InputProcessorsList">
-        <div className="row">
-          <div className="col-lg-12">
-            <PageHeader>Input Processors</PageHeader>
-          </div>
-        </div>
 
         <div className="row">
           <div className="col-lg-12">

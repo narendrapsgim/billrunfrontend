@@ -134,14 +134,10 @@ class CustomerSetup extends Component {
 
         <div className="row">
           <div className="col-lg-12">
-            <PageHeader>Customer</PageHeader>
+            <Tabs defaultActiveKey={1} animation={false} id="CustomerEditTabs">
+              { tabs }
+            </Tabs>
           </div>
-        </div>
-
-        <div className="row">
-          <Tabs defaultActiveKey={1} animation={false} id="CustomerEditTabs">
-            { tabs }
-          </Tabs>
         </div>  
 
       </div>

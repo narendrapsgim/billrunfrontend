@@ -30,7 +30,11 @@ function fetchList(collection, params) {
         { query: _.isString(params.query) ? params.query : JSON.stringify(params.query) }
       ]
     };
-    if (params.additional) query.params.push(params.additional);
+    if (params.additional) {
+      params.additional.map(add => {
+        query.params.push(add);
+      });
+    }
 
     apiBillRun(query).then(
       success => {

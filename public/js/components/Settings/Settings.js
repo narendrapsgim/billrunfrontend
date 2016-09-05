@@ -118,11 +118,6 @@ class Settings extends Component {
       <div>
         <div className="row">
           <div className="col-lg-12">
-            <PageHeader>Settings</PageHeader>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
                 { views[this.props.location.query.setting].title }
