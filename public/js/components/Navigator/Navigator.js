@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { Link } from 'react-router';
+import { userDoLogout } from '../../actions/userActions';
 import classNames from "classnames";
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, ProgressBar} from "react-bootstrap";
 
-export default class Navigator extends Component {
+class Navigator extends Component {
   constructor(props) {
     super(props);
     this.state = {
       uiOpenSetting: false
     };
+  }
+
+  clickLogout = (e) => {
+    e.preventDefault()
+    this.props.userDoLogout();
   }
 
   render() {
@@ -45,6 +53,12 @@ export default class Navigator extends Component {
 
             <ul className="nav in" id="side-menu">
               <li>
+                <Link to="/Dashboard">
+                  <i className="fa fa-dashboard fa-fw"></i> Dashboard
+                </Link>
+              </li>
+
+              <li>
                 <Link to="/plans">
                   <i className="fa fa-dashboard fa-fw"></i> Plans
                 </Link>
@@ -55,29 +69,28 @@ export default class Navigator extends Component {
                 </Link>
               </li>
               <li>
-                <a href="customers.html"><i className="fa fa-table fa-fw"></i> Customers</a>
+                <Link to="/customers"><i className="fa fa-table fa-fw"></i> Customers</Link>
               </li>
-              <li>
-                <a href="usage.html"><i className="fa fa-edit fa-fw"></i> Usage</a>
-              </li>
-              <li>
-                <a href="#"><i className="fa fa-wrench fa-fw"></i> Invoices</a>
-              </li>
-              <li>
-                <a href="#"><i className="fa fa-sitemap fa-fw"></i> Log</a>
-                
-              </li>
+              {/* <li>
+                  <Link to="usage.html"><i className="fa fa-edit fa-fw"></i> Usage</Link>
+                  </li> */}
+              {/* <li>
+                  <Link to="#"><i className="fa fa-wrench fa-fw"></i> Invoices</Link>
+                  </li> */}
+              {/* <li>
+                  <Link to="#"><i className="fa fa-sitemap fa-fw"></i> Log</Link>                
+                  </li> */}
               <li className={classNames({'active': !this.state.uiOpenSetting})}>
-                <a href="javascript:void(0)" onClick={ ()=> this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}><i className="fa fa-files-o fa-fw"></i> Setting<span className="fa arrow"></span></a>
+                <Link to="javascript:void(0)" onClick={ ()=> this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}><i className="fa fa-files-o fa-fw"></i> Setting<span className="fa arrow"></span></Link>
                 <ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>
                   <li>
-                    <a href="blank.html">Date, Time and Zone</a>
+                    <Link to="/settings?setting=billrun">Date, Time and Zone</Link>
                   </li>
                   <li>
-                    <a href="login.html">Currency and Tax</a>
+                    <Link to="settings?setting=pricing">Currency and Tax</Link>
                   </li>
                   <li>
-                    <a href="login.html">Input Processor</a>
+                    <Link to="/input_processors">Input Processors</Link>
                   </li>
                 </ul>
               </li>
@@ -88,3 +101,9 @@ export default class Navigator extends Component {
     );
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    userDoLogout }, dispatch);
+}
+export default connect(null, mapDispatchToProps)(Navigator);

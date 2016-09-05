@@ -1,10 +1,11 @@
-import { apiBillRun } from '../common/Api';
+import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 
 export const actions = {
   GOT_LIST: 'GOT_LIST'
 };
 
-const defaultQuery = {
+const defaultParams = {
+  api: "find",
   size: 10,
   page: 0,
   query: {}
@@ -21,14 +22,19 @@ function gotList(collection, list) {
 function fetchList(collection, params) {
   return (dispatch) => {
     const query = {
-      api: "find",
+      api: params.api,
       params: [
-        { collection: collection },
+        { collection: params.collection || collection },
         { size: params.size },
         { page: params.page },
-        { query: JSON.stringify(params.query) }
+        { query: _.isString(params.query) ? params.query : JSON.stringify(params.query) }
       ]
     };
+    if (params.additional) {
+      params.additional.map(add => {
+        query.params.push(add);
+      });
+    }
 
     apiBillRun(query).then(
       success => {
