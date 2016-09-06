@@ -18,8 +18,8 @@ export default () => {
     <Route path="/" component={App}>
       <Route name="plans" path="/plans" component={PlansList} title="Plans" />
       <Route name="dashboard" path="dashboard" component={RequireAuth(Dashboard)} title="Dashbord"/>
-      <Route name="customers" path="/customers" component={CustomersList} title="Customers" />
-      <Route name="customer" path="/customer" component={CustomerSetup} title="Customer" />
+      <Route name="customers" path="/customers" component={RequireAuth(CustomersList)} title="Customers" />
+      <Route name="customer" path="/customer" component={RequireAuth(CustomerSetup)} title="Customer" />
       <Route name="input_processor" path="/input_processor" component={InputProcessor} title="Input Processor" />
       <Route name="input_processors" path="/input_processors" component={InputProcessorsList} title="Input Processors" />
       <Route name="settings" path="/settings" component={Settings} title="Settings" />

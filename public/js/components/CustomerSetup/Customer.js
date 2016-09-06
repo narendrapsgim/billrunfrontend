@@ -8,8 +8,7 @@ export default class Customer extends Component {
   render() {
     const { customer, onChange, settings } = this.props;
 
-    const fields = settings.getIn(['account', 'fields']).
-                            filter(field => {
+    const fields = settings.filter(field => {
                               return field.get('display') !== false &&
                                      field.get('editable') !== false;
                             }).

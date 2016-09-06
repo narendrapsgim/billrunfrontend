@@ -7,6 +7,9 @@ const defaultState = Immutable.fromJS({
   subscribers: {
     account: {
       fields: []
+    },
+    subscriber: {
+      fields: []
     }
   }
 });

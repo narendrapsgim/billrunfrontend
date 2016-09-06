@@ -1,15 +1,17 @@
-export const GOT_ENTITY = 'GOT_ENTITY';
-export const UPDATE_ENTITY_FIELD = 'UPDATE_ENTITY_FIELD';
-export const CLEAR_ENTITY = 'CLEAR_ENTITY';
-
 import _ from 'lodash';
 import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 
+export const actions = {
+  GOT_ENTITY: 'GOT_ENTITY',
+  UPDATE_ENTITY_FIELD: 'UPDATE_ENTITY_FIELD',
+  CLEAR_ENTITY: 'CLEAR_ENTITY'
+};
+
 export function updateEntityField(collection, field_id, value) {
   return {
-    type: UPDATE_ENTITY_FIELD,
+    type: actions.UPDATE_ENTITY_FIELD,
     collection,
     field_id,
     value
@@ -18,7 +20,7 @@ export function updateEntityField(collection, field_id, value) {
 
 export function gotEntity(collection, entity) {
   return {
-    type: GOT_ENTITY,
+    type: actions.GOT_ENTITY,
     collection,
     entity
   };
@@ -48,7 +50,7 @@ export function getEntity(collection, query) {
 
 export function clearEntity(collection) {
   return {
-    type: CLEAR_ENTITY,
+    type: actions.CLEAR_ENTITY,
     collection
   };
 }

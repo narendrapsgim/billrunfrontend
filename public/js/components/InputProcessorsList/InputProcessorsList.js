@@ -17,7 +17,7 @@ class InputProcessorsList extends Component {
   componentDidMount() {
     const params = {
       api: "settings",
-      additional: [
+      params: [
         { category: "file_types" },
         { data: JSON.stringify({}) }
       ]
@@ -68,7 +68,7 @@ class InputProcessorsList extends Component {
                 All available input processors
               </div>
               <div className="panel-body">
-                <Table responsive hover>
+                <Table responsive hover striped>
                   <thead>
                     <tr>{ table_headers }</tr>
                   </thead>

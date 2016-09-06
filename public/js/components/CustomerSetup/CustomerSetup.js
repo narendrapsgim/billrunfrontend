@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import moment from 'moment';
 
 /* ACTIONS */
 import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
+import { getList, clearList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
 
@@ -24,21 +26,33 @@ class CustomerSetup extends Component {
   componentDidMount() {
     const { aid } = this.props.location.query;
     if (aid) {
-      const params = {
+      const customer_params = {
         api: "subscribers",
         params: [
           { method: "query" },
           { query: JSON.stringify({aid: parseInt(aid, 10), type: "account"}) }
         ]
       };
-      this.props.dispatch(getEntity('customer', params));
-      //this.props.dispatch(getSubscriptions(aid));
+      const subscriptions_params = {
+        api: "find",
+        params: [
+          { collection: "subscribers" },
+          { query: JSON.stringify({
+            aid: parseInt(aid, 10),
+            type: "subscriber",
+            to: {"$gt": moment().toISOString()}
+          }) }
+        ]
+      };
+      this.props.dispatch(getEntity('customer', customer_params));
+      this.props.dispatch(getList('subscriptions', subscriptions_params));
     }
     this.props.dispatch(getSettings('subscribers'));
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearEntity());
+    this.props.dispatch(clearList('subscriptions'));
   }
 
   onChangeCustomerField(e) {
@@ -88,6 +102,10 @@ class CustomerSetup extends Component {
     );
   }
   
+  onClickNewSubscription(aid, e) {
+    window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url="${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}"`;
+  }
+
   onCancel() {
     this.context.router.push({
       pathname: "/customers"
@@ -95,13 +113,13 @@ class CustomerSetup extends Component {
   }
 
   render() {
-    const { customer, settings } = this.props;
+    const { customer, subscriptions, settings } = this.props;
 
     const tabs = [(<Tab title="Customer Details" eventKey={1} key={1}>
   <div className="panel panel-default">
     <div className="panel-body">
       <Customer customer={customer}
-                settings={settings}
+                settings={settings.getIn(['account', 'fields'])}
                 onChange={this.onChangeCustomerField} />
       <button type="button"
               className="btn btn-primary"
@@ -123,7 +141,12 @@ class CustomerSetup extends Component {
         <Tab title="Subscriptions" eventKey={2} key={2}>
           <div className="panel panel-default">
             <div className="panel-body">
-              <SubscriptionsList />
+              <SubscriptionsList
+                  subscriptions={subscriptions}
+                  aid={customer.get('aid')}
+                  settings={settings.getIn(['subscriber', 'fields'])}
+                  onNew={this.onClickNewSubscription}
+              />
             </div>
           </div>
         </Tab>));
@@ -152,7 +175,8 @@ CustomerSetup.contextTypes = {
 function mapStateToProps(state) {
   return {
     customer: state.entity.get('customer') || Immutable.Map(),
-    settings: state.settings.get('subscribers')
+    subscriptions: state.list.get('subscriptions') || Immutable.List(),
+    settings: state.settings.get('subscribers') || Immutable.List()
   };
 }
 

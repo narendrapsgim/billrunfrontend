@@ -27,7 +27,7 @@ class Navigator extends Component {
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
-          <NavDropdown  title={<i className="fa fa-user fa-fw"></i>} >
+          <NavDropdown id="settings-dropwdown" title={<i className="fa fa-user fa-fw"></i>} >
             <MenuItem eventKey="1">
               <i className="fa fa-user fa-fw"></i> User Profile
             </MenuItem> 
