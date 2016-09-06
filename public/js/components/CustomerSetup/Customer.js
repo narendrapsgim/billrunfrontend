@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router';
 
 export default class Customer extends Component {
   constructor(props) {
@@ -8,8 +9,7 @@ export default class Customer extends Component {
   render() {
     const { customer, onChange, settings } = this.props;
 
-    const fields = settings.getIn(['account', 'fields']).
-                            filter(field => {
+    const fields = settings.filter(field => {
                               return field.get('display') !== false &&
                                      field.get('editable') !== false;
                             }).
@@ -31,6 +31,16 @@ export default class Customer extends Component {
             <form>
               { fields }
             </form>
+          </div>
+        </div>
+
+        <div className="row" style={{marginBottom: 15}}>
+          <div className="col-lg-6">
+            <Link to={`/usages?aid=${customer.get('aid')}`}>
+              <button type="button" role="button" className="btn btn-default">
+                See Usage
+              </button>
+            </Link>
           </div>
         </div>
 

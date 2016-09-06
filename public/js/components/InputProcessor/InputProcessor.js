@@ -5,7 +5,7 @@ import { PageHeader } from 'react-bootstrap';
 
 import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
-import { showStatusMessage } from '../../actions/commonActions';
+import { showSuccess } from '../../actions/alertsActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -196,7 +196,7 @@ class InputProcessor extends Component {
     const cb = (err) => {
       if (err) return;
       if (this.state.finished) {
-        this.props.dispatch(showStatusMessage("Input processor saved successfully!", "success"));
+        this.props.dispatch(showSuccess("Input processor saved successfully!"));
         this.goBack();
       } else {
         const totalSteps = this.state.steps.length - 1;
@@ -284,7 +284,7 @@ class InputProcessor extends Component {
                 </div>
               </div>
               <div style={{marginTop: 12, float: "right"}}>
-                <button className="btn btn-danger"
+                <button className="btn btn-default"
                         onClick={this.handleCancel}
                         style={{marginRight: 12}}>
                   Cancel

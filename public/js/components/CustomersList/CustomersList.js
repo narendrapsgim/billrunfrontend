@@ -8,7 +8,8 @@ import Filter from '../Filter';
 import { DropdownButton, MenuItem } from "react-bootstrap";
 
 /* ACTIONS */
-import { getList } from '../../actions/listActions';
+import { getList, clearList } from '../../actions/listActions';
+import { titlize } from '../../common/Util';
 
 class CustomersList extends Component {
   constructor(props) {
@@ -30,13 +31,19 @@ class CustomersList extends Component {
     this.props.dispatch(getList("customers", this.buildQuery()));
   }
 
+  componentWillUnmount() {
+    this.props.dispatch(clearList('customers'));
+  }
+
   buildQuery() {
     return {
       api: "find",
-      collection: "subscribers",
-      size: this.state.size,
-      page: this.state.page,
-      query: this.state.filter
+      params: [
+        { collection: "subscribers" },
+        { size: this.state.size },
+        { page: this.state.page },
+        { query: this.state.filter }
+      ]
     };
   }
 
@@ -82,7 +89,7 @@ class CustomersList extends Component {
     ];
 
     const table_header = fields.map((field, key) => (
-      <th key={key}>{ field.placeholder }</th>
+      <th key={key}>{ titlize(field.placeholder) }</th>
     ));
 
     const table_body = customers.map((customer, key) => (
@@ -116,7 +123,7 @@ class CustomersList extends Component {
                   </div>
                 </div>
                 <div className="table-responsive">
-                  <table className="table table-hover">
+                  <table className="table table-hover table-striped">
                     <thead>
                       <tr>{ table_header }</tr>
                     </thead>
