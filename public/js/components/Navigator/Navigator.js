@@ -2,11 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router';
+import { userDoLogout } from '../../actions/userActions';
 import classNames from "classnames";
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, ProgressBar} from "react-bootstrap";
-
-import { userDoLogout } from '../../actions/userActions';
-
 
 class Navigator extends Component {
   constructor(props) {
@@ -87,9 +85,7 @@ class Navigator extends Component {
                   <Link to="#"><i className="fa fa-sitemap fa-fw"></i> Log</Link>
                   </li> */}
               <li className={classNames({'active': !this.state.uiOpenSetting})}>
-                <Link to="javascript:void(0)" onClick={ ()=> this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}>
-                  <i className="fa fa-gears fa-fw"></i> Setting<span className="fa arrow"></span>
-                </Link>
+                <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-files-o fa-fw"></i> Setting<span className="fa arrow"></span></a>
                 <ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>
                   <li>
                     <Link to="/settings?setting=billrun">Date, Time and Zone</Link>
