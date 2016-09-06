@@ -4,6 +4,7 @@ import { Router, Route, DefaultRoute, RouteHandler, Redirect } from 'react-route
 import RequireAuth from '../containers/Authentication';
 import App       from '../containers/App';
 import CustomersList from '../components/CustomersList';
+import ProductsList from '../components/ProductsList';
 import CustomerSetup from '../components/CustomerSetup';
 import PlansList from '../components/PlansList';
 import InputProcessor from '../components/InputProcessor';
