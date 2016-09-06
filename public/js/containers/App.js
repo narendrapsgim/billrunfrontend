@@ -19,7 +19,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      title: props.routes[props.routes.length-1].title || props.routes[props.routes.length-1].name
+      title: props.routes[props.routes.length-1].title || ''
     }
   }
 
@@ -30,7 +30,7 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      title: nextProps.routes[nextProps.routes.length-1].title || nextProps.routes[nextProps.routes.length-1].name
+      title: nextProps.routes[nextProps.routes.length-1].title || ''
     });
   }
 
@@ -53,7 +53,7 @@ class App extends Component {
         <div id="page-wrapper" className="page-wrapper" ref="pageWrapper" style={{minHeight: this.state.Height}}>
           <Row>
             <Col lg={12}>
-              <PageHeader>{this.state.title}</PageHeader>
+              {this.state.title.length ? <PageHeader>{this.state.title}</PageHeader> : null }
             </Col>
           </Row>
           <Row>
