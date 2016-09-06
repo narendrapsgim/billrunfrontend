@@ -1,7 +1,7 @@
 export const GOT_DATA = 'GOT_DATA';
 export const GOT_DATA_ERROR = 'GOT_DATA_ERROR';
 
-import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun } from '../common/Api';
 
 function gotData(chartId, data) {
@@ -22,16 +22,16 @@ function gotDataError(chartId, error) {
 
 export function getData(chartId, query) {
   return (dispatch) => {
-    dispatch(showProgressBar());
+    dispatch(startProgressIndicator());
     apiBillRun(query).then(
       success => {
         dispatch(gotData(chartId, success.data));
-        dispatch(hideProgressBar());
+        dispatch(finishProgressIndicator());
       },
       failure => { throw failure }
     ).catch(error => {
       dispatch(gotDataError(chartId, error));
-      dispatch(hideProgressBar());
+      dispatch(dismissProgressIndicator());
     });
   };
 }
