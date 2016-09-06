@@ -7,14 +7,16 @@ import entity from './entityReducer';
 import dashboard from './dashboardReducer';
 import user from './userReducer';
 import alerts from './alertsReducer';
+import progressIndicator from './progressIndicatorReducer';
 
 export default combineReducers({
+  progressIndicator,
+  user,
+  alerts,
   list,
   customer,
   entity,
   inputProcessor,
   settings,
   dashboard,
-  user,
-  alerts
 });
