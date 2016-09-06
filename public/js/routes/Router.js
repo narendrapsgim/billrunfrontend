@@ -12,6 +12,7 @@ import Settings from '../components/Settings';
 import Dashboard from '../components/Dashboard';
 import PageNotFound from '../components/PageNotFound';
 import LoginPage from '../components/LoginPage';
+import PlanSetup from '../components/PlanSetup';
 
 export default () => {
   return (
@@ -19,6 +20,7 @@ export default () => {
       <IndexRedirect to="/dashboard" component={RequireAuth(Dashboard)} />
       <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashbord" />
       <Route path="/plans" component={RequireAuth(PlansList)} title="Plans"/>
+      <Route path="/plan_setup" component={RequireAuth(PlanSetup)} title="Edit"/>
       <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
       <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
       <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>

@@ -1,13 +1,16 @@
 import { combineReducers } from 'redux';
+import progressIndicator from './progressIndicatorReducer';
+import alerts from './alertsReducer';
 import list from './listReducer';
+import entity from './entityReducer';
 import customer from './customerReducer';
 import inputProcessor from './inputProcessorReducer';
 import settings from './settingsReducer';
-import entity from './entityReducer';
 import dashboard from './dashboardReducer';
 import user from './userReducer';
-import alerts from './alertsReducer';
-import progressIndicator from './progressIndicatorReducer';
+import plan from './planReducer';
+import planProducts from './planProductsReducer';
+
 
 export default combineReducers({
   progressIndicator,
@@ -19,4 +22,6 @@ export default combineReducers({
   inputProcessor,
   settings,
   dashboard,
+  plan,
+  planProducts
 });
