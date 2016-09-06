@@ -21,27 +21,31 @@ class Navigator extends Component {
 
   render() {
     return (
-      <nav className="navbar navbar-default navbar-static-top" role="navigation" style={{"marginBottom": "0px"}}>
+      <nav className="navbar navbar-default navbar-static-top" role="navigation" style={{ marginBottom: 0 }}>
         <div className="navbar-header">
-          <a className="navbar-brand" href="index.html">Billrun</a>
+          <Link to="/" className="navbar-brand">
+            <img src="/img/billrun-logo-tm.png" style={{ height: 22 }} />
+          </Link>
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
-          <NavDropdown id="settings-dropwdown" title={<i className="fa fa-user fa-fw"></i>} >
+          <NavDropdown  title={<i className="fa fa-user fa-fw"></i>} >
+          {/*
             <MenuItem eventKey="1">
               <i className="fa fa-user fa-fw"></i> User Profile
-            </MenuItem> 
+            </MenuItem>
             <MenuItem eventKey="2">
               <i className="fa fa-gear fa-fw"></i> Settings
-            </MenuItem> 
+            </MenuItem>
             <MenuItem eventKey="3">
               <a href="http://www.strapui.com/" onClick={ () => { window.location='http://www.strapui.com/'; } }>
                 <i className="fa fa-eye fa-fw"></i> Premium React Themes
               </a>
-            </MenuItem> 
+            </MenuItem>
             <MenuItem divider />
+          */}
             <MenuItem eventKey="4">
-              <Link to="login">
+              <Link to="#" onClick={this.clickLogout}>
                 <i className="fa fa-sign-out fa-fw"></i> Logout
               </Link>
             </MenuItem>
@@ -53,19 +57,19 @@ class Navigator extends Component {
 
             <ul className="nav in" id="side-menu">
               <li>
-                <Link to="/Dashboard">
+                <Link to="/dashboard">
                   <i className="fa fa-dashboard fa-fw"></i> Dashboard
                 </Link>
               </li>
 
               <li>
                 <Link to="/plans">
-                  <i className="fa fa-dashboard fa-fw"></i> Plans
+                  <i className="fa fa-table fa-fw"></i> Plans
                 </Link>
               </li>
               <li>
                 <Link to="/products">
-                  <i className="fa fa-bar-chart-o fa-fw"></i> Products
+                  <i className="fa fa-table fa-fw"></i> Products
                 </Link>
               </li>
               <li>
@@ -78,7 +82,7 @@ class Navigator extends Component {
                   <Link to="#"><i className="fa fa-wrench fa-fw"></i> Invoices</Link>
                   </li> */}
               {/* <li>
-                  <Link to="#"><i className="fa fa-sitemap fa-fw"></i> Log</Link>                
+                  <Link to="#"><i className="fa fa-sitemap fa-fw"></i> Log</Link>
                   </li> */}
               <li className={classNames({'active': !this.state.uiOpenSetting})}>
                 <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-files-o fa-fw"></i> Setting<span className="fa arrow"></span></a>
@@ -87,7 +91,7 @@ class Navigator extends Component {
                     <Link to="/settings?setting=billrun">Date, Time and Zone</Link>
                   </li>
                   <li>
-                    <Link to="settings?setting=pricing">Currency and Tax</Link>
+                    <Link to="/settings?setting=pricing">Currency and Tax</Link>
                   </li>
                   <li>
                     <Link to="/input_processors">Input Processors</Link>
