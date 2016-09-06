@@ -23,10 +23,10 @@ class Navigator extends Component {
 
   render() {
     return (
-      <nav className="navbar navbar-default navbar-static-top" role="navigation" style={{"marginBottom": "0px"}}>
+      <nav className="navbar navbar-default navbar-static-top" role="navigation" style={{ marginBottom: 0 }}>
         <div className="navbar-header">
           <Link to="/" className="navbar-brand">
-            BillRun!
+            <img src="/img/billrun-logo-tm.png" style={{ height: 22 }} />
           </Link>
         </div>
 
