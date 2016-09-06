@@ -2,6 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
 
 export const actions = {
   GOT_ENTITY: 'GOT_ENTITY',
@@ -28,16 +29,22 @@ export function gotEntity(collection, entity) {
 
 function fetchEntity(collection, query) {
   return (dispatch) => {
+    dispatch(startProgressIndicator());
     apiBillRun(query).then(
       success => {
+        dispatch(finishProgressIndicator());        
         const entity = success.data[0].data.details[0];
         dispatch(gotEntity(collection, entity));
       },
       failure => {
+        dispatch(finishProgressIndicator());        
         console.log(failure);
       }
     ).catch(
-      error => dispatch(apiBillRunErrorHandler(error))
+      error => {
+        dispatch(finishProgressIndicator());
+        dispatch(apiBillRunErrorHandler(error));
+      }
     );
   };  
 }

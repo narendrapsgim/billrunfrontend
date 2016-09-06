@@ -15,7 +15,7 @@ export default class SubscriptionsList extends Component {
 
   subscription_row(sub) {
     const { settings } = this.props;
-    return settings.map((field, key) => (
+    return settings.filter(field => { return field.get('display') !== false }).map((field, key) => (
       <td key={key}>{ sub.get(field.get('field_name')) }</td>
     ))
   }

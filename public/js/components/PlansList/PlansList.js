@@ -10,13 +10,18 @@ class PlansList extends Component {
     this.state = {
       size: 10,
       page: 0,
-      api: "find",
-      query: {}
     }
   }
 
   componentDidMount() {
-    this.props.dispatch(getList("plans", this.state));
+    const query = {
+      api: "find",
+      params: [
+        { collection: 'plans' },
+        { query: JSON.stringify({}) }
+      ]
+    };
+    this.props.dispatch(getList("plans", query));
   }
   
   render() {
@@ -32,7 +37,7 @@ class PlansList extends Component {
         <td>{ plan.get('name') }</td>
       </tr>
     ));
-    
+
     return (
       <div>
         <div className="row">
@@ -43,7 +48,7 @@ class PlansList extends Component {
               </div>
               <div className="panel-body">
                 <div className="table-responsive">
-                  <table className="table table-hover">
+                  <table className="table table-hover table-striped">
                     <thead>
                       <tr>{ table_header }</tr>
                     </thead>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { Table, PageHeader } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from "react-bootstrap";
 
 //import { getInputProcessors, setInputProcessor } from '../../actions/inputProcessorActions';
 import { getList } from '../../actions/listActions';
@@ -65,7 +66,14 @@ class InputProcessorsList extends Component {
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                All available input processors
+                <span>
+                  All available input processors
+                </span>
+                <div className="pull-right">
+                  <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
+                    <MenuItem eventKey="1" onClick={this.onClickNew}>New</MenuItem>
+                  </DropdownButton>
+                </div>
               </div>
               <div className="panel-body">
                 <Table responsive hover striped>
@@ -76,11 +84,6 @@ class InputProcessorsList extends Component {
                     { table_body }
                   </tbody>
                 </Table>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-xs-3">
-                <a className="btn btn-primary" onClick={this.onClickNew} style={{margin: 15}}>Create New</a>
               </div>
             </div>
           </div>

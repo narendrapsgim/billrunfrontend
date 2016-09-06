@@ -1,4 +1,5 @@
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
 
 export const actions = {
   GOT_LIST: 'GOT_LIST',
@@ -29,14 +30,20 @@ function gotList(collection, list) {
 
 function fetchList(collection, params) {
   return (dispatch) => {
+    dispatch(startProgressIndicator());
     apiBillRun(params).then(
       success => {
+        dispatch(finishProgressIndicator());
         dispatch(gotList(collection, success.data[0].data.details));
       },
       failure => {
+        dispatch(finishProgressIndicator());        
       }
     ).catch(
-      error => dispatch(apiBillRunErrorHandler(error))
+      error => {
+        dispatch(finishProgressIndicator());
+        dispatch(apiBillRunErrorHandler(error));
+      }
     );
   };
 }

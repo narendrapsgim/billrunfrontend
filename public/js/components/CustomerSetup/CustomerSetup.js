@@ -8,6 +8,7 @@ import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../acti
 import { getList, clearList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
+import { showSuccess, showDanger } from '../..//actions/alertsActions';
 
 /* COMPONENTS */
 import { PageHeader, Tabs, Tab } from 'react-bootstrap';
@@ -80,10 +81,11 @@ class CustomerSetup extends Component {
     apiBillRun(query).then(
       success => {
         if (action === "update") {
-          //dispatch(showStatusMessage("Customer saved successfully", 'success'));
+          dispatch(showSuccess("Customer saved successfully"));
         } else {
-          //dispatch(showStatusMessage("Customer created successfully", 'success'));
+          dispatch(showSuccess("Customer created successfully"));
           dispatch(gotEntity('customer', success.data[0].data.details));
+          
           this.context.router.push({
             pathname: '/customer',
             query: {
@@ -95,6 +97,7 @@ class CustomerSetup extends Component {
       },
       failure => {
         let errorMessages = failure.error.map( (response) => response.error.desc );
+        dispatch(showDanger("Network error - could not retrieve customer! Please try again"));
         console.log(errorMessages);
       }
     ).catch(
