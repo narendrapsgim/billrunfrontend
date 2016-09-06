@@ -1,21 +1,30 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { ProgressBar } from 'react-bootstrap';
+// import { ProgressBar } from 'react-bootstrap';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 
 class ProgressIndicator extends Component {
 
   render() {
     const { progressIndicator } = this.props;
-
-    if(!progressIndicator) return null;
+		const enterTimeout = 500;
+		const exitTimeout = 1000;
+    const indecator = (progressIndicator) ? <div key={new Date()} className="system-progress-indecator"></div> : null;
 
     return (
-      <div style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1001}}>
-        <ProgressBar active now={100} style={{ height: 5, marginBottom: 0, backgroundColor: 'transparent', borderRadius: 0}}  />
+      <div className="progress-indicator-container" style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1001}}>
+        <ReactCSSTransitionGroup transitionName="progressindicator" transitionEnterTimeout={enterTimeout} transitionLeaveTimeout={exitTimeout}>
+          { indecator }
+        </ReactCSSTransitionGroup>
       </div>
     );
+    // return (
+    //   <div style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1001}}>
+    //     <ProgressBar active now={100} style={{ height: 5, marginBottom: 0, backgroundColor: 'transparent', borderRadius: 0}}  />
+    //   </div>
+    // );
   }
 
 }

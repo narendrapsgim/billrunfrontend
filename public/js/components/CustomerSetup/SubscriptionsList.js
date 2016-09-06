@@ -1,82 +1,75 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 
+import { DropdownButton, MenuItem } from "react-bootstrap";
+
+/* ACTIONS */
+import { titlize } from '../../common/Util';
+
 export default class SubscriptionsList extends Component {
   constructor(props) {
     super(props);
+
+    this.subscription_row = this.subscription_row.bind(this);
+  }
+
+  subscription_row(sub) {
+    const { settings } = this.props;
+    return settings.filter(field => { return field.get('display') !== false }).map((field, key) => (
+      <td key={key}>{ sub.get(field.get('field_name')) }</td>
+    ))
   }
   
-  titlize(str) {
-    return _.capitalize(str.replace(/_/g, ' '));
-  }
-
   render() {
     const { subscriptions,
-            onClickNewSubscription,
             settings,
-            account,
-            onClickEditSubscription } = this.props;
+            aid,
+            onNew,
+            onEdit } = this.props;
 
+    const table_header = settings.filter(field => { return field.get('display') !== false }).map((field, key) => (
+      <th key={key}>{ titlize(field.get('field_name')) }</th>
+    ));
+  
+    const table_body = subscriptions.map((sub, key) => (
+      <tr key={key}>
+        { this.subscription_row(sub) }
+      </tr>
+    ));
+    
     return (
       <div>
+
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="panel panel-default">
+              <div className="panel-heading">
+                <span>
+                  All action subscriptions
+                  <div className="pull-right">
+                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
+                      <MenuItem eventKey="1" onClick={onNew.bind(this, aid)}>New</MenuItem>
+                    </DropdownButton>
+                  </div>
+                </span>
+              </div>
+              <div className="panel-body">
+                <div className="table-responsive">
+                  <table className="table table-hover table-striped">
+                    <thead>
+                      <tr>{ table_header }</tr>
+                    </thead>
+                    <tbody>
+                      { table_body }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     );
-
-    // const displayFields = settings.getIn(['subscriber', 'fields'])
-    //                               .filter(field => { return field.get('field') !== false; });
-
-    // const subscriptionsHTML = subscribers.map((sub, key) => {
-    //   return (
-    //     <TableRow key={key}>
-    //       {displayFields.map((field, k) => (
-    //                  <TableRowColumn key={k}>
-    //                    {sub.get(field.get('field_name'))}
-    //                  </TableRowColumn>
-    //                ))}
-    //                  <TableRowColumn>
-    //                    {/* <Link to={`/usage?base=${JSON.stringify({sid: sub.get('sid')})}`}>
-    //                    Usage
-    //                    </Link>
-    //                    &nbsp; */}
-    //                    <button className="btn btn-link"
-    //                            onClick={onClickEditSubscription.bind(this, sub.get('sid'))}>
-    //                      Edit
-    //                    </button>
-    //                  </TableRowColumn>
-    //     </TableRow>
-    //   );
-    // });
-
-    // return (
-    //   <div style={{margin: 10}}>
-    //     <div className="row">
-    //       <div className="col-xs-11">
-    //         <div className="pull-right">
-    //           <button className="btn btn-primary" onClick={onClickNewSubscription.bind(this, account.get('aid'))}>Add Subscription</button>
-    //         </div>
-    //         <div className="pull-left">
-    //           <h4>Subscriptions</h4>
-    //         </div>
-    //       </div>
-    //     </div>
-    //     <div className="row">
-    //       <div className="col-xs-11">
-    //         <Table selectable={false}>
-    //           <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
-    //             <TableRow>
-    //               {displayFields.map((field, key) => (
-    //                          <TableRowColumn key={key}>{this.titlize(field.get('field_name'))}</TableRowColumn>
-    //                        ))}
-    //                          <TableRowColumn></TableRowColumn>
-    //             </TableRow>
-    //           </TableHeader>
-    //           <TableBody displayRowCheckbox={false} stripedRows={true}>
-    //             { subscriptionsHTML }
-    //           </TableBody>
-    //         </Table>
-    //       </div>
-    //     </div>
-    //   </div>
-    // );
   }
 }

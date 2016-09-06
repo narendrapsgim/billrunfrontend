@@ -22,10 +22,9 @@ export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
 export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
 
 import axios from 'axios';
-import { showProgressBar, hideProgressBar } from './progressbarActions';
-import { showModal } from './modalActions';
-import { showStatusMessage } from './commonActions';
+import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -78,16 +77,16 @@ function fetchProcessorSettings(file_type) {
 
   let fetchUrl = `/api/settings?category=file_types&data={"file_type":"${file_type}"}`;
   return (dispatch) => {
-    dispatch(showProgressBar());
+    dispatch(startProgressIndicator());
     let request = axiosInstance.get(fetchUrl).then(
       resp => {
+        dispatch(finishProgressIndicator());
         dispatch(gotProcessorSettings(convert(resp.data.details)));
-        dispatch(hideProgressBar());
       }
     ).catch(error => {
       console.log(error);
-      dispatch(showModal(error.data.message, "Error!"));
-      dispatch(hideProgressBar());
+      dispatch(finishProgressIndicator());
+      dispatch(showDanger(error.data.message));
     });
   };
 }
@@ -165,14 +164,13 @@ export function removeAllCSVFields() {
 export function addUsagetMapping(usaget) {
   let setUrl = `/api/settings?category=usage_types&action=set&data=[${JSON.stringify(usaget)}]`;
   return (dispatch) => {
-    dispatch(showProgressBar());
+    dispatch(startProgressIndicator());
     let request = axiosInstance.post(setUrl).then(
       resp => {
-        dispatch(hideProgressBar());
+        dispatch(finishProgressIndicator());
         if (!resp.data.status) {
-          dispatch(showModal(resp.data.desc, "Error!"));
+          dispatch(showDanger(resp.data.desc));
         } else {
-          //dispatch(showStatusMessage("Saved usaget sucessfully!", 'success'));
           return {
             type: ADD_USAGET_MAPPING,
             usaget
@@ -180,8 +178,8 @@ export function addUsagetMapping(usaget) {
         }
       }
     ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
-      dispatch(hideProgressBar());
+      dispatch(finishProgressIndicator());
+      dispatch(showDanger(error.data.message));
     });
   };
 }
@@ -295,17 +293,23 @@ export function saveInputProcessorSettings(state, callback, part=false) {
     ]
   };
   return (dispatch) => {
+    dispatch(startProgressIndicator());
     apiBillRun(query).then(
       success => {
+        dispatch(finishProgressIndicator());        
         callback(false);
       },
       failure => {
+        dispatch(finishProgressIndicator());        
         const errorMessages = failure.error.map((resp) => resp.error.desc);
-        dispatch(showModal(errorMessages, "Error!"));
+        dispatch(showDanger(errorMessages));
         callback(true);
       }
     ).catch(
-      error => dispatch(apiBillRunErrorHandler(error))
+      error => {
+        dispatch(finishProgressIndicator());        
+        dispatch(apiBillRunErrorHandler(error));
+      }
     );
   };
 }
@@ -320,15 +324,15 @@ function gotInputProcessors(input_processors) {
 function fetchInputProcessors() {
   let setUrl = '/api/settings?category=file_types&data={}';
   return (dispatch) => {
-    dispatch(showProgressBar());
+    dispatch(startProgressIndicator());
     let request = axiosInstance.post(setUrl).then(
       resp => {
+        dispatch(finishProgressIndicator());        
         dispatch(gotInputProcessors(resp.data.details));
-        dispatch(hideProgressBar());
       }
     ).catch(error => {
-      dispatch(showModal(error.data.message, "Error!"));
-      dispatch(hideProgressBar());
+      dispatch(showDanger(error.data.message));
+      dispatch(finishProgressIndicator());              
     });
   };
 }

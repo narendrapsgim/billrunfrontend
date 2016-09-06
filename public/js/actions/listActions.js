@@ -1,7 +1,9 @@
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
 
 export const actions = {
-  GOT_LIST: 'GOT_LIST'
+  GOT_LIST: 'GOT_LIST',
+  CLEAR_LIST: 'CLEAR_LIST'
 };
 
 const defaultParams = {
@@ -10,6 +12,13 @@ const defaultParams = {
   page: 0,
   query: {}
 };
+
+export function clearList(collection) {
+  return {
+    type: actions.CLEAR_LIST,
+    collection
+  };
+}
 
 function gotList(collection, list) {
   return {
@@ -21,29 +30,20 @@ function gotList(collection, list) {
 
 function fetchList(collection, params) {
   return (dispatch) => {
-    const query = {
-      api: params.api,
-      params: [
-        { collection: params.collection || collection },
-        { size: params.size },
-        { page: params.page },
-        { query: _.isString(params.query) ? params.query : JSON.stringify(params.query) }
-      ]
-    };
-    if (params.additional) {
-      params.additional.map(add => {
-        query.params.push(add);
-      });
-    }
-
-    apiBillRun(query).then(
+    dispatch(startProgressIndicator());
+    apiBillRun(params).then(
       success => {
+        dispatch(finishProgressIndicator());
         dispatch(gotList(collection, success.data[0].data.details));
       },
       failure => {
+        dispatch(finishProgressIndicator());        
       }
     ).catch(
-      error => dispatch(apiBillRunErrorHandler(error))
+      error => {
+        dispatch(finishProgressIndicator());
+        dispatch(apiBillRunErrorHandler(error));
+      }
     );
   };
 }

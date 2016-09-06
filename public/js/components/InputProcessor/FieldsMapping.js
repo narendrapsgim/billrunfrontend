@@ -202,7 +202,11 @@ export default class FieldsMapping extends Component {
               <div className="col-lg-3">{usage_t.get('pattern')}</div>
               <div className="col-lg-3">{usage_t.get('usaget')}</div>
               <div className="col-lg-3">
-                <FontIcon onClick={this.removeUsagetMapping.bind(this, key)} className="material-icons" style={{cursor: "pointer", color: Colors.red300, fontSize: '24px'}}>remove_circle_outline</FontIcon>
+                <button type="button"
+                        className="btn btn-danger btn-circle"
+                        onClick={this.removeUsagetMapping.bind(this, key)}>
+                  <i className="fa fa-minus" />
+                </button>
               </div>
             </div>
               ))
@@ -222,7 +226,11 @@ export default class FieldsMapping extends Component {
                 />
               </div>
               <div className="col-lg-3">
-                <FontIcon onClick={this.addUsagetMapping} className="material-icons" style={{cursor: "pointer", color: Colors.green300, fontSize: '24px', marginTop: '9px'}}>add_circle_outline</FontIcon>
+                <button type="button"
+                        className="btn btn-info btn-circle"
+                        onClick={this.addUsagetMapping}>
+                  <i className="fa fa-plus"/>
+                </button>                
               </div>
             </div>
           </div>

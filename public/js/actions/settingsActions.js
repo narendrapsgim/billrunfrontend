@@ -5,6 +5,7 @@ import { showStatusMessage } from '../actions/commonActions';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
 import axios from 'axios';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import { showSuccess, showDanger } from './alertsActions';
 
 let axiosInstance = axios.create({
   withCredentials: true
@@ -60,12 +61,6 @@ export function updateSetting(category, name, value) {
   };
 }
 
-function savedSettings() {
-  return {
-    type: 'saved_settings'
-  };
-}
-
 function saveSettingsToDB(category, settings) {
   const query = {
     api: "settings",
@@ -79,12 +74,12 @@ function saveSettingsToDB(category, settings) {
   return (dispatch) => {
     apiBillRun(query).then(
       success => {
-        dispatch(showStatusMessage("Settings saved successfuly!", "success"));
+        dispatch(showSuccess("Settings saved successfuly!", "success"));
       },
       failure => {
         console.log(failure);
         console.log('failed!');
-        dispatch(showStatusMessage("Error saving settings", "error"));
+        dispatch(showDanger("Error saving settings", "error"));
       }
     ).catch(error =>
       dispatch(apiBillRunErrorHandler(error))
