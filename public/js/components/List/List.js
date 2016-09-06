@@ -383,7 +383,7 @@ onClickExport() {
   let { serverUrl } = globalSetting;
   let query = this._buildSearchQuery();
   var iframe = document.createElement('iframe');
-  iframe.src = `${globalSetting.serverUrl}/admin/csvExport?collection=lines${debugParam}&${query}`;
+  iframe.src = `${globalSetting.serverUrl}/api/Export?collection=lines${debugParam}&${query}`;
   iframe.onload = function () {
     $(iframe).remove();
   }
