@@ -73,11 +73,7 @@ class UsageList extends Component {
                 </span>
               </div>
               <div className="panel-body">
-                <div className="row">
-                  <div className="col-lg-9">
-                    <Filter fields={fields} onFilter={this.onFilter} base={base} />
-                  </div>
-                </div>
+                <Filter fields={fields} onFilter={this.onFilter} base={base} />
                 <List items={usages} fields={fields} />
               </div>
             </div>
