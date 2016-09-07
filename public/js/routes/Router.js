@@ -21,6 +21,7 @@ export default () => {
       <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashbord" />
       <Route path="/plans" component={RequireAuth(PlansList)} title="Plans"/>
       <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
+      <Route path="/products" component={RequireAuth(ProductsList)} title="Products"/>
       <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
       <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>
       <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors"/>
