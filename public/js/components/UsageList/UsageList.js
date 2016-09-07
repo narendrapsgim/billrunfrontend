@@ -5,6 +5,7 @@ import moment from 'moment';
 /* COMPONENTS */
 import Pager from '../Pager';
 import Filter from '../Filter';
+import List from '../List';
 
 /* ACTIONS */
 import { getList } from '../../actions/listActions';
@@ -53,25 +54,11 @@ class UsageList extends Component {
     const { usages } = this.props;
 
     const fields = [
-      {id: "aid", placeholder: "Customer", type: "number"},
-      {id: "sid", placeholder: "Subscription", type: "number"},
+      {id: "aid", placeholder: "Customer ID", type: "number"},
+      {id: "sid", placeholder: "Subscription ID", type: "number"},
       {id: "plan", placeholder: "Plan"}
     ];
 
-    const table_header = ["aid", "sid", "Plan", "Price"].map((header, key) => (
-      <th key={key}>{ header }</th>
-    ));
-    
-    const table_body = usages.size < 1 ? (<tr><td colSpan="4" style={{textAlign: "center"}}>No usages</td></tr>) :
-                       usages.map((row, key) => (
-                         <tr key={key}>
-                           <td>{row.get('aid')}</td>
-                           <td>{row.get('sid')}</td>
-                           <td>{row.get('plan')}</td>
-                           <td>{row.get('aprice')}</td>
-                         </tr>
-                       ));
-    
     const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
 
     return (
@@ -91,16 +78,7 @@ class UsageList extends Component {
                     <Filter fields={fields} onFilter={this.onFilter} base={base} />
                   </div>
                 </div>
-                <div className="table-responsive">
-                  <table className="table table-hover table-striped">
-                    <thead>
-                      <tr>{ table_header }</tr>
-                    </thead>
-                    <tbody>
-                      { table_body }
-                    </tbody>
-                  </table>
-                </div>
+                <List items={usages} fields={fields} />
               </div>
             </div>
           </div>

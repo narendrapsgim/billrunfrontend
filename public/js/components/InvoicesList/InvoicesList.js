@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import Immutable from 'immutable';
 
 /* COMPONENTS */
 import Pager from '../Pager';
 import Filter from '../Filter';
+import List from '../List';
 
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
@@ -58,30 +58,14 @@ class InvoicesList extends Component {
     return `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrun_key}&iid=${invoice_id}`;
   }
   
-  printEntityField(entity = Immutable.Map(), field) {
-    if (!Immutable.Iterable.isIterable(entity))
-      return this.printEntityField(Immutable.fromJS(entity), field);
-    if (field.parser)
-      return field.parser(entity);
-    return entity.get(field.id);
-  }
-  
-  buildRow(entity, fields) {
-    return fields.map((field, key) => (
-      <td key={key}>
-        { this.printEntityField(entity, field) }
-      </td>
-    ));
-  }
-  
   render() {
     const { invoices } = this.props;
     const paid_by_parser = (ent) => {
       if (ent.get('paid_by'))
-        return (<span style={{color: "green"}}>Paid</span>);
+        return (<span style={{color: "#3c763d"}}>Paid</span>);
       else if (moment(ent.get('due_date')).isAfter(moment()))
         return (<span style={{color: "#8a6d3b"}}>Due</span>);
-      return (<span style={{color: "red"}}>Not Paid</span>);      
+      return (<span style={{color: "#a94442"}}>Not Paid</span>);      
     };
     const download_parser = (ent) => {
       const download_url = this.downloadURL(ent.get('aid'), ent.get('billrun_key'), ent.get('invoice_id'));
@@ -104,22 +88,11 @@ class InvoicesList extends Component {
       { title: "Download", parser: download_parser }
     ];
     const filter_fields = [
-      { id: "invoice_id", placeholder: "Invoice ID", type: 'number' },
       { id: "aid", placeholder: "Customer ID", type: 'number' }
     ];
 
-    const table_header = fields.map((field, key) => (
-      <th key={key}>{ field.title }</th>
-    ));
+    const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
 
-    const table_body = invoices.size < 1 ?
-                       (<tr><td colSpan={fields.length} style={{textAlign: "center"}}>No invoices</td></tr>) :
-                       invoices.map((invoice, index) => (
-                         <tr key={index}>
-                           { this.buildRow(invoice, fields) }
-                         </tr>
-                       ));
-    
     return (
       <div>
 
@@ -132,21 +105,8 @@ class InvoicesList extends Component {
                 </span>
               </div>
               <div className="panel-body">
-                <div className="row">
-                  <div className="col-lg-9">
-                    <Filter fields={filter_fields} onFilter={this.onFilter} base={{}} />                    
-                  </div>
-                </div>
-                <div className="table-responsive">
-                  <table className="table table-hover table-striped">
-                    <thead>
-                      <tr>{ table_header }</tr>
-                    </thead>
-                    <tbody>
-                      { table_body }
-                    </tbody>
-                  </table>
-                </div>
+                <Filter fields={filter_fields} onFilter={this.onFilter} base={base} />
+                <List items={invoices} fields={fields} />
               </div>
             </div>
           </div>

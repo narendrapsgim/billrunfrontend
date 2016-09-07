@@ -4,6 +4,7 @@ import moment from 'moment';
 
 import Pager from '../Pager';
 import Filter from '../Filter';
+import List from '../List';
 import { DropdownButton, MenuItem } from "react-bootstrap";
 
 /* ACTIONS */
@@ -55,12 +56,12 @@ class CustomersList extends Component {
     });
   }
 
-  onClickCustomer(aid, e) {
+  onClickCustomer(customer, e) {
     this.context.router.push({
       pathname: "customer",
       query: {
         action: "update",
-        aid
+        aid: customer.get('aid')
       }
     });
   }
@@ -75,27 +76,13 @@ class CustomersList extends Component {
     const { customers } = this.props;
 
     const fields = [
-      { id: "aid", placeholder: "Account ID" },
+      { id: "aid", placeholder: "Customer ID" },
       { id: "firstname", placeholder: "First Name" },
       { id: "lastname", placeholder: "Last Name" },
       { id: "address", placeholder: "Address" },
       { id: "email", placeholder: "Email" },
       { id: "to", placeholder: "To", display: false, type: "datetime" }
     ];
-
-    const table_header = fields.map((field, key) => (
-      <th key={key}>{ titlize(field.placeholder) }</th>
-    ));
-
-    const table_body = customers.size < 1 ?
-          (<tr><td colSpan={fields.length} style={{textAlign: "center"}}>No customers</td></tr>) :
-          customers.map((customer, key) => (
-              <tr key={key} onClick={this.onClickCustomer.bind(this, customer.get('aid'))}>
-              { fields.map((field, field_key) => (
-                  <td key={field_key}>{ customer.get(field.id) }</td>
-              )) }
-            </tr>
-          ));
 
     return (
       <div>
@@ -114,21 +101,8 @@ class CustomersList extends Component {
                 </span>
               </div>
               <div className="panel-body">
-                <div className="row">
-                  <div className="col-lg-9">
-                    <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
-                  </div>
-                </div>
-                <div className="table-responsive">
-                  <table className="table table-hover table-striped">
-                    <thead>
-                      <tr>{ table_header }</tr>
-                    </thead>
-                    <tbody>
-                      { table_body }
-                    </tbody>
-                  </table>
-                </div>
+                <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
+                <List items={customers} fields={fields} onClickRow={this.onClickCustomer} />
               </div>
             </div>
           </div>

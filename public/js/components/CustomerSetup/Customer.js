@@ -37,8 +37,13 @@ export default class Customer extends Component {
         <div className="row" style={{marginBottom: 15}}>
           <div className="col-lg-6">
             <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>
-              <button type="button" role="button" className="btn btn-default">
-                See Usage
+              <button type="button" role="button" className="btn btn-outline btn-default" style={{marginRight: 10}}>
+                Usage
+              </button>
+            </Link>
+            <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>
+              <button type="button" role="button" className="btn btn-outline btn-default">
+                Invoices
               </button>
             </Link>
           </div>
