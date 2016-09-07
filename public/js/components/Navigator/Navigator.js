@@ -75,9 +75,12 @@ class Navigator extends Component {
               <li>
                 <Link to="/customers"><i className="fa fa-table fa-fw"></i> Customers</Link>
               </li>
-              {/* <li>
-                  <Link to="usage.html"><i className="fa fa-edit fa-fw"></i> Usage</Link>
-                  </li> */}
+              <li>
+                <Link to="/usage"><i className="fa fa-table fa-fw"></i> Usage</Link>
+              </li>
+              <li>
+                <Link to="/invoices"><i className="fa fa-table fa-fw"></i> Invoices</Link>
+              </li>
               {/* <li>
                   <Link to="#"><i className="fa fa-wrench fa-fw"></i> Invoices</Link>
                   </li> */}

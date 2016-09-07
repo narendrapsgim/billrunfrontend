@@ -16,7 +16,7 @@ export default class Filter extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     if (this.props.base) {
       this.setState({filters: this.props.base}, () => { this.onClickFilterBtn() });
     }
@@ -78,7 +78,7 @@ export default class Filter extends Component {
     const inputs = fields.map((field, key) => {
       if (field.display !== undefined && field.display === false) return (null);
       return (
-        <div className="col-xs-2" key={key}>
+        <div className="col-md-2" key={key}>
           <input id={field.id}
                  type={field.type || "text"}
                  placeholder={field.placeholder}
