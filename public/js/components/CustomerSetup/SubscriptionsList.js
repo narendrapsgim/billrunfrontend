@@ -27,15 +27,21 @@ export default class SubscriptionsList extends Component {
             onNew,
             onEdit } = this.props;
 
-    const table_header = settings.filter(field => { return field.get('display') !== false }).map((field, key) => (
-      <th key={key}>{ titlize(field.get('field_name')) }</th>
+    const fields = settings.filter(field => { return field.get('display') !== false });
+    
+    const table_header = fields.map((field, key) => (
+      <th key={key}>
+        { titlize(field.get('field_name')) }
+      </th>
     ));
   
-    const table_body = subscriptions.map((sub, key) => (
-      <tr key={key}>
-        { this.subscription_row(sub) }
-      </tr>
-    ));
+    const table_body = subscriptions.size < 1 ?
+                       (<tr><td colSpan={fields.size} style={{textAlign: "center"}}>No subscriptions</td></tr>) :
+                       subscriptions.map((sub, key) => (
+                         <tr key={key}>
+                           { this.subscription_row(sub) }
+                         </tr>
+                       ));
     
     return (
       <div>

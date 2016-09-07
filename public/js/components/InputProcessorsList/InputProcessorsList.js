@@ -47,17 +47,21 @@ class InputProcessorsList extends Component {
   }
 
   render() {
+    const { inputProcessors } = this.props;
+
     const table_headers = (
       <th>File Type</th>
     );
 
-    const table_body = this.props.inputProcessors.map((proc, key) => (
-      <tr key={key}>
-        <td onClick={this.onClickCell.bind(this, key)}>
-          { proc.get('file_type') }
-        </td>
-      </tr>
-    ));
+    const table_body = inputProcessors.size < 1 ?
+          (<tr><td colSpan="1" style={{textAlign: "center"}}>No input processors</td></tr>) :
+          inputProcessors.map((proc, key) => (
+              <tr key={key}>
+              <td onClick={this.onClickCell.bind(this, key)}>
+              { proc.get('file_type') }
+            </td>
+              </tr>
+          ));
 
     return (
       <div className="InputProcessorsList">

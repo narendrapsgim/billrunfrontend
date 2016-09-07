@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
-import { PageHeader } from 'react-bootstrap';
 import Pager from '../Pager';
 import Filter from '../Filter';
 import { DropdownButton, MenuItem } from "react-bootstrap";
@@ -25,10 +24,6 @@ class CustomersList extends Component {
       page: 0,
       size: 10
     };
-  }
-
-  componentDidMount() {
-    this.props.dispatch(getList("customers", this.buildQuery()));
   }
 
   componentWillUnmount() {
@@ -92,13 +87,15 @@ class CustomersList extends Component {
       <th key={key}>{ titlize(field.placeholder) }</th>
     ));
 
-    const table_body = customers.map((customer, key) => (
-      <tr key={key} onClick={this.onClickCustomer.bind(this, customer.get('aid'))}>
-        { fields.map((field, field_key) => (
-            <td key={field_key}>{ customer.get(field.id) }</td>
-          )) }
-      </tr>
-    ));
+    const table_body = customers.size < 1 ?
+          (<tr><td colSpan={fields.length} style={{textAlign: "center"}}>No customers</td></tr>) :
+          customers.map((customer, key) => (
+              <tr key={key} onClick={this.onClickCustomer.bind(this, customer.get('aid'))}>
+              { fields.map((field, field_key) => (
+                  <td key={field_key}>{ customer.get(field.id) }</td>
+              )) }
+            </tr>
+          ));
 
     return (
       <div>
