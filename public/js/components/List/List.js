@@ -32,6 +32,7 @@ export default class List extends Component {
     const table_header = fields.map((field, key) => (
       <th key={key}>{ field.title || field.placeholder }</th>
     ));
+
     const table_body = items.size < 1 ?
                        (<tr><td colSpan={fields.length} style={{textAlign: "center"}}>No items found</td></tr>) :
                        items.map((entity, index) => (

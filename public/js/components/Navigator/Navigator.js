@@ -10,7 +10,7 @@ class Navigator extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      uiOpenSetting: false
+      uiOpenSetting: true
     };
   }
 
