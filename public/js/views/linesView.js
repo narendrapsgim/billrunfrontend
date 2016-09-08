@@ -66,6 +66,9 @@ const lines_list_view = {
       defaults : {
         tableHeight : '500px',
       },
+      controllers : {
+        export : { label: 'Export', callback:'onClickExport'},
+      },
       advancedFilter : [
         {
           key: 'called_number',

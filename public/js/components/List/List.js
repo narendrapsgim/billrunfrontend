@@ -137,6 +137,7 @@ class List extends Component {
     this.onRemoveAdvFilter = this.onRemoveAdvFilter.bind(this);
     this.onChangeFilterDate = this.onChangeFilterDate.bind(this);
     this.onClickTableHeader = this.onClickTableHeader.bind(this);
+    this.onClickExport = this.onClickExport.bind(this);
     this._onRowSelection = this._onRowSelection.bind(this);
     this._onAggregate = this._onAggregate.bind(this);
     this._onClearAggregate = this._onClearAggregate.bind(this);
@@ -377,6 +378,17 @@ class List extends Component {
     return (moment(date).format(globalSetting.dateFormat)) ;
   }
 
+onClickExport() {
+  let debugParam = globalSetting.serverApiDebug ? '&'+globalSetting.serverApiDebugQueryString : '';
+  let { serverUrl } = globalSetting;
+  let query = this._buildSearchQuery();
+  var iframe = document.createElement('iframe');
+  iframe.src = `${globalSetting.serverUrl}/api/Export?collection=lines${debugParam}&${query}`;
+  iframe.onload = function () {
+    $(iframe).remove();
+  }
+  $(document.body).append(iframe);
+}
   onClickTableHeader(e, value, sort){
     let newSort = SortTypes.ASC; //default
     if (this.state.sortField == value.key) {
