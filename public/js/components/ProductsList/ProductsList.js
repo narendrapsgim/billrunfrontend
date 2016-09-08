@@ -9,7 +9,7 @@ import { DropdownButton, MenuItem } from "react-bootstrap";
 
 /* ACTIONS */
 import { getList } from '../../actions/listActions';
-
+import List from '../List';
 
 
 class ProductsList extends Component {
@@ -41,12 +41,12 @@ class ProductsList extends Component {
     };
   }
   
-  onClickProduct(productId, e) {
+  onClickProduct(product) {
     this.context.router.push({
       pathname: "product",
       query: {
         action: "update",
-        productId
+        productId: product.get('id')
       }
     });
   }
@@ -68,17 +68,16 @@ class ProductsList extends Component {
 
   onFilter(filter) {
     this.setState({filter}, () => {
-      debugger;
       this.props.dispatch(getList('products', this.buildQuery()))
     });
   }
 
-  getProductUnitType(product) {
-    return Object.keys(product.get('rates').toJS())[0];
-  }
-
   render() {
     const { products } = this.props;
+
+    const unit_type_by_parser = (product) => {
+      return Object.keys(product.get('rates').toJS())[0];
+    };
 
     const fields = [
       {id: "key", placeholder: "Name"},
@@ -87,28 +86,12 @@ class ProductsList extends Component {
 
     const tableFields = [
       {id: 'key', title: 'Name'},
-      {id: 'unit_type', title: "Unit Type"},
+      {id: 'unit_type', title: 'Unit Type', parser: unit_type_by_parser},
       {id: 'code', title: "Code"},
       {id: 'description', title: "Description"},
       {id: 'from', title: 'From'},
       {id: 'to', title: 'To'}
     ];
-
-    const table_header =
-    tableFields.map((tableHeader, key) => (
-      <th key={key}>{ tableHeader.title }</th>
-    ));
-
-    const table_body = products.map((product, key) => (
-      <tr key={key} onClick={this.onClickProduct.bind(this, product.get('aid'))}>
-        { tableFields.map((field, field_key) => {
-            if (field.id === "unit_type") {
-              return (<td key={field_key}>{ this.getProductUnitType(product) }</td>);
-            }
-            return (<td key={field_key}>{ product.get(field.id) }</td>);
-          }) }
-      </tr>
-    ));
 
     return (
       <div>
@@ -132,14 +115,7 @@ class ProductsList extends Component {
                   </div>
                 </div>
                 <div className="table-responsive">
-                  <table className="table table-striped table-hover">
-                    <thead>
-                      <tr>{ table_header }</tr>
-                    </thead>
-                    <tbody>
-                      { table_body }
-                    </tbody>
-                  </table>
+                  <List items={ products } fields={ tableFields } onClickRow={ this.onClickProduct } />
                 </div>
               </div>
             </div>
@@ -168,6 +144,6 @@ ProductsList.contextTypes = {
 
 function mapStateToProps(state, props) {
   return { products: state.list.get('products') || [] };
-}
+};
 
 export default connect(mapStateToProps)(ProductsList);
