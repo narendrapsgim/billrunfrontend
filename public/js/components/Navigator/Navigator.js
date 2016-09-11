@@ -64,22 +64,22 @@ class Navigator extends Component {
 
               <li>
                 <Link to="/plans">
-                  <i className="fa fa-table fa-fw"></i> Plans
+                  <i className="fa fa-cubes fa-fw"></i> Plans
                 </Link>
               </li>
               <li>
                 <Link to="/products">
-                  <i className="fa fa-table fa-fw"></i> Products
+                  <i className="fa fa-book fa-fw"></i> Products
                 </Link>
               </li>
               <li>
-                <Link to="/customers"><i className="fa fa-table fa-fw"></i> Customers</Link>
+                <Link to="/customers"><i className="fa fa-user fa-fw"></i> Customers</Link>
               </li>
               <li>
-                <Link to="/usage"><i className="fa fa-table fa-fw"></i> Usage</Link>
+                <Link to="/usage"><i className="fa fa-list fa-fw"></i> Usage</Link>
               </li>
               <li>
-                <Link to="/invoices"><i className="fa fa-table fa-fw"></i> Invoices</Link>
+                <Link to="/invoices"><i className="fa fa-file-text-o fa-fw"></i> Invoices</Link>
               </li>
               {/* <li>
                   <Link to="#"><i className="fa fa-wrench fa-fw"></i> Invoices</Link>
@@ -88,7 +88,7 @@ class Navigator extends Component {
                   <Link to="#"><i className="fa fa-sitemap fa-fw"></i> Log</Link>
                   </li> */}
               <li className={classNames({'active': !this.state.uiOpenSetting})}>
-                <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-files-o fa-fw"></i> Setting<span className="fa arrow"></span></a>
+                <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-cog fa-fw"></i> Setting<span className="fa arrow"></span></a>
                 <ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>
                   <li>
                     <Link to="/settings?setting=billrun">Date, Time and Zone</Link>
