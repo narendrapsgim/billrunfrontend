@@ -301,13 +301,14 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       },
       failure => {
         dispatch(finishProgressIndicator());        
-        const errorMessages = failure.error.map((resp) => resp.error.desc);
+        const errorMessages = failure.error[0].error.error.message;
         dispatch(showDanger(errorMessages));
         callback(true);
       }
     ).catch(
       error => {
-        dispatch(finishProgressIndicator());        
+        dispatch(finishProgressIndicator());
+        dispatch(showDanger("Network error - please try again"));
         dispatch(apiBillRunErrorHandler(error));
       }
     );

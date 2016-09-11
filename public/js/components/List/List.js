@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
 
+/* ACTIONS */
+import { titlize } from '../../common/Util';
+
 export default class List extends Component {
   constructor(props) {
     super(props);
@@ -26,12 +29,15 @@ export default class List extends Component {
     const {
       items,
       fields,
-      onClickRow = () => {}
+      onClickRow = () => {},
+      edit = false
     } = this.props;
 
-    const table_header = fields.map((field, key) => (
-      <th key={key}>{ field.title || field.placeholder }</th>
-    ));
+    const table_header = fields.map((field, key) => {
+      if (!field.title && !field.placeholder) return (<th key={key}>{ titlize(field.id) }</th>);
+      return (<th key={key}>{ field.title || field.placeholder }</th>)
+    });
+
     const table_body = items.size < 1 ?
                        (<tr><td colSpan={fields.length} style={{textAlign: "center"}}>No items found</td></tr>) :
                        items.map((entity, index) => (

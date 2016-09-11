@@ -93,12 +93,12 @@ class CustomersList extends Component {
               <div className="panel-heading">
                 <span>
                   List of all available customers
-                  <div className="pull-right">
-                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                      <MenuItem eventKey="1" onClick={this.onNewCustomer}>New</MenuItem>
-                    </DropdownButton>
-                  </div>
                 </span>
+                <div className="pull-right">
+                  <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
+                    <MenuItem eventKey="1" onClick={this.onNewCustomer}>New</MenuItem>
+                  </DropdownButton>
+                </div>
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />

@@ -14,6 +14,7 @@ import { showSuccess, showDanger } from '../..//actions/alertsActions';
 import { PageHeader, Tabs, Tab } from 'react-bootstrap';
 import Customer from './Customer';
 import SubscriptionsList from './SubscriptionsList';
+import Subscription from './Subscription';
 
 class CustomerSetup extends Component {
   constructor(props) {
@@ -45,8 +46,18 @@ class CustomerSetup extends Component {
           }) }
         ]
       };
+      const plans_params = {
+        api: "find",
+        params: [
+          { collection: "plans" },
+          { query: JSON.stringify({
+            to: { "$gt": moment().toISOString() }
+          }) }
+        ]
+      };
       this.props.dispatch(getEntity('customer', customer_params));
       this.props.dispatch(getList('subscriptions', subscriptions_params));
+      this.props.dispatch(getList('plans', plans_params));
     }
     this.props.dispatch(getSettings('subscribers'));
   }
@@ -116,7 +127,7 @@ class CustomerSetup extends Component {
   }
 
   render() {
-    const { customer, subscriptions, settings } = this.props;
+    const { customer, subscriptions, settings, plans } = this.props;
 
     const tabs = [(<Tab title="Customer Details" eventKey={1} key={1}>
   <div className="panel panel-default">
@@ -179,7 +190,8 @@ function mapStateToProps(state) {
   return {
     customer: state.entity.get('customer') || Immutable.Map(),
     subscriptions: state.list.get('subscriptions') || Immutable.List(),
-    settings: state.settings.get('subscribers') || Immutable.List()
+    settings: state.settings.get('subscribers') || Immutable.List(),
+    plans: state.list.get('plans') || Immutable.List()
   };
 }
 
