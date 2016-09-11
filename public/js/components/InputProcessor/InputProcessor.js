@@ -292,7 +292,7 @@ class InputProcessor extends Component {
                 {(() => {
                    if (stepIndex > 0) {
                      return (
-                       <button className="btn"
+                       <button className="btn btn-default"
                                onClick={this.handlePrev}
                                style={{marginRight: 12}}>
                          Back
