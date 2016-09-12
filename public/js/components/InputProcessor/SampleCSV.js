@@ -42,8 +42,11 @@ export default class SampleCSV extends Component {
         <div className="col-lg-3">
           <label htmlFor="delimiter">Delimiter</label>
         </div>
-        <div className="col-lg-7">
-          <div className="col-lg-4" style={{paddingLeft: 0}}>
+        <div className="col-lg-4">
+          <div className="col-lg-1" style={{marginTop: 8}}>
+            <i className="fa fa-long-arrow-right"></i>
+          </div>
+          <div className="col-lg-4">
             <div className="input-group">
               <div className="input-group-addon">
                 <input type="radio" name="delimiter-type"
@@ -145,8 +148,16 @@ export default class SampleCSV extends Component {
             <label htmlFor="sample_csv">Select Sample CSV</label>
             <p className="help-block">Notice: Spaces will be convereted to underscores</p>
           </div>
-          <div className="col-lg-2">
-            <input type="file" id="sample_csv" onChange={onSelectSampleCSV} disabled={!settings.get('delimiter_type')} />
+          <div className="col-lg-4">
+            <div className="col-lg-1" style={{marginTop: 8}}>
+              <i className="fa fa-long-arrow-right"></i>
+            </div>
+            <div className="col-lg-9">
+              <input type="file" id="sample_csv"
+                     onChange={onSelectSampleCSV}
+                     disabled={!settings.get('delimiter_type') ||
+                               settings.get('delimiter_type') !== "separator"} />
+            </div>
           </div>
         </div>
         { setFieldsHTML }
@@ -159,8 +170,13 @@ export default class SampleCSV extends Component {
           <div className="col-lg-3">
             <label htmlFor="file_type">Name</label>
           </div>
-          <div className="col-lg-3">
-            <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
+          <div className="col-lg-4">
+            <div className="col-lg-1" style={{marginTop: 8}}>
+              <i className="fa fa-long-arrow-right"></i>
+            </div>
+            <div className="col-lg-9">
+              <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
+            </div>
           </div>
         </div>
         { selectDelimiterHTML }

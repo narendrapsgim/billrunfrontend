@@ -90,7 +90,7 @@ export default class FieldsMapping extends Component {
       <form className="form-horizontal FieldsMapping">
         <div className="form-group">
           <div className="col-lg-3">
-            <label>Time</label>
+            <label htmlFor="date_field">Time</label>
             <p className="help-block">Time of record creation</p>
           </div>
           <div className="col-lg-4">
@@ -111,7 +111,7 @@ export default class FieldsMapping extends Component {
         <div className="separator" />
         <div className="form-group">
           <div className="col-lg-3">
-            <label>Volume</label>
+            <label htmlFor="volume_field">Volume</label>
             <p className="help-block">Amount calculated</p>
           </div>
           <div className="col-lg-4">
@@ -209,6 +209,7 @@ export default class FieldsMapping extends Component {
                       <div className="col-lg-2">
                         <button type="button"
                                 className="btn btn-danger btn-circle"
+                                disabled={settings.get('usaget_type') !== "dynamic"}                                
                                 onClick={this.removeUsagetMapping.bind(this, key)}>
                           <i className="fa fa-minus" />
                         </button>

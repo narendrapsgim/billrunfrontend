@@ -82,7 +82,7 @@ class Navigator extends Component {
                 <Link to="/invoices"><i className="fa fa-file-text-o fa-fw"></i> Invoices</Link>
               </li>
               <li className={classNames({'active': !this.state.uiOpenSetting})}>
-                <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-cog fa-fw"></i> Setting<span className="fa arrow"></span></a>
+                <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-cog fa-fw"></i> Settings<span className="fa arrow"></span></a>
                 <ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>
                   <li>
                     <Link to="/settings?setting=billrun">Date, Time and Zone</Link>
