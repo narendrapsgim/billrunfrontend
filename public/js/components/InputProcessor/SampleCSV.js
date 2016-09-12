@@ -82,6 +82,7 @@ export default class SampleCSV extends Component {
                            <div className="col-lg-3">
                              <button type="button"
                                      className="btn btn-danger btn-circle"
+                                     disabled={!settings.get('file_type')}                                      
                                      onClick={this.removeField.bind(this, key)}>
                                <i className="fa fa-minus" />
                              </button>
@@ -102,6 +103,7 @@ export default class SampleCSV extends Component {
                            <div className="col-lg-2">
                              <button type="button"
                                      className="btn btn-danger btn-circle"
+                                     disabled={!settings.get('file_type')} 
                                      onClick={this.removeField.bind(this, key)}>
                                <i className="fa fa-minus" />
                              </button>
@@ -134,6 +136,7 @@ export default class SampleCSV extends Component {
           <div className="col-lg-2">
             <button type="button"
                     className="btn btn-info btn-circle"
+                    disabled={!settings.get('file_type') || !this.state.newField}
                     onClick={this.addField}>
               <i className="fa fa-plus"/>
             </button>
