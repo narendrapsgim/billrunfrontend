@@ -128,11 +128,13 @@ class CustomerSetup extends Component {
 
   render() {
     const { customer, subscriptions, settings, plans } = this.props;
+    const { action } = this.props.location.query;
 
     const tabs = [(<Tab title="Customer Details" eventKey={1} key={1}>
   <div className="panel panel-default">
     <div className="panel-body">
       <Customer customer={customer}
+                action={action}
                 settings={settings.getIn(['account', 'fields'])}
                 onChange={this.onChangeCustomerField} />
       <button type="button"
@@ -150,7 +152,7 @@ class CustomerSetup extends Component {
   </div>
     </Tab>)
     ];
-    if (this.props.location.query.action === "update") {
+    if (action === "update") {
       tabs.push((
         <Tab title="Subscriptions" eventKey={2} key={2}>
           <div className="panel panel-default">
