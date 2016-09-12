@@ -15,6 +15,7 @@ import Settings from '../components/Settings';
 import Dashboard from '../components/Dashboard';
 import PageNotFound from '../components/PageNotFound';
 import LoginPage from '../components/LoginPage';
+import ProductSetup from '../components/ProductSetup';
 
 export default () => {
   return (
@@ -24,6 +25,7 @@ export default () => {
       <Route path="/plans" component={RequireAuth(PlansList)} title="Plans"/>
       <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
       <Route path="/products" component={RequireAuth(ProductsList)} title="Products"/>
+      <Route path="/product_setup" component={RequireAuth(ProductSetup)} title="Product" />
       <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
       <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>
       <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors"/>
