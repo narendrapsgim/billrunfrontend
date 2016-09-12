@@ -89,40 +89,53 @@ export default class FieldsMapping extends Component {
     return (
       <form className="form-horizontal FieldsMapping">
         <div className="form-group">
-          <div className="col-lg-2">
-            <label>Time</label>
-          </div>
-          <div className="col-lg-2">
-            <select id="date_field"
-                    className="form-control"
-                    onChange={onSetFieldMapping}
-                    value={settings.getIn(['processor', 'date_field'])}
-                    defaultValue="-1">
-              { available_fields }
-            </select>
+          <div className="col-lg-3">
+            <label htmlFor="date_field">Time</label>
             <p className="help-block">Time of record creation</p>
           </div>
-        </div>
-        <div className="form-group">
-          <div className="col-lg-2">
-            <label>Volume</label>
+          <div className="col-lg-4">
+            <div className="col-lg-1" style={{marginTop: 8}}>
+              <i className="fa fa-long-arrow-right"></i>
+            </div>
+            <div className="col-lg-9">
+              <select id="date_field"
+                      className="form-control"
+                      onChange={onSetFieldMapping}
+                      value={settings.getIn(['processor', 'date_field'])}
+                      defaultValue="-1">
+                { available_fields }
+              </select>
+            </div>
           </div>
-          <div className="col-lg-2">
-            <select id="volume_field"
-                    className="form-control"
-                    onChange={onSetFieldMapping}
-                    value={settings.getIn(['processor', 'volume_field'])}
-                    defaultValue="-1">
-              { available_fields }
-            </select>
+        </div>
+        <div className="separator" />
+        <div className="form-group">
+          <div className="col-lg-3">
+            <label htmlFor="volume_field">Volume</label>
             <p className="help-block">Amount calculated</p>
           </div>
+          <div className="col-lg-4">
+            <div className="col-lg-1" style={{marginTop: 8}}>
+              <i className="fa fa-long-arrow-right"></i>
+            </div>
+            <div className="col-lg-9">
+              <select id="volume_field"
+                      className="form-control"
+                      onChange={onSetFieldMapping}
+                      value={settings.getIn(['processor', 'volume_field'])}
+                      defaultValue="-1">
+                { available_fields }
+              </select>
+            </div>
+          </div>
         </div>
+        <div className="separator" />
         <div className="form-group">
           <div className="col-lg-2">
             <label>Usage types</label>
+            <p className="help-block">Types of usages</p>
           </div>
-          <div className="col-lg-2">
+          <div className="col-lg-1">
             <label><input type="radio"
                           name="usage_types_type"
                           value="static"
@@ -130,26 +143,26 @@ export default class FieldsMapping extends Component {
                           onChange={this.onSetType} />
               Static
             </label>
-            {(() => {
-              if (settings.get('usaget_type') === "static") {
-                return (
-                  <div className="form-group">
-                    <Select
-                        id="unit"
-                        options={available_units}
-                        allowCreate={true}
-                        value={settings.getIn(['processor', 'default_usaget'])}
-                        style={{marginTop: 3}}
-                        onChange={this.onChangeStaticUsaget}
-                    />
-                  </div>
-                );
-              }
-            })()}
+          </div>
+          <div className="col-lg-4">
+            <div className="col-lg-1" style={{marginTop: 8}}>
+              <i className="fa fa-long-arrow-right"></i>
+            </div>
+            <div className="col-lg-9">            
+              <Select
+                  id="unit"
+                  options={available_units}
+                  allowCreate={true}
+                  value={settings.getIn(['processor', 'default_usaget'])}
+                  disabled={settings.get('usaget_type') !== "static"}
+                  style={{marginTop: 3}}
+                  onChange={this.onChangeStaticUsaget}
+              />
+            </div>
           </div>
         </div>
         <div className="form-group">
-          <div className="col-lg-offset-2 col-lg-3">
+          <div className="col-lg-offset-2 col-lg-1">
             <label><input type="radio"
                           name="usage_types_type"
                           value="dynamic"
@@ -158,84 +171,84 @@ export default class FieldsMapping extends Component {
               Dynamic
             </label>
           </div>
+          <div className="col-lg-4">
+            <div className="col-lg-1" style={{marginTop: 8}}>
+              <i className="fa fa-long-arrow-right"></i>
+            </div>
+            <div className="col-lg-9">
+              <select id="src_field"
+                      className="form-control"
+                      onChange={onSetFieldMapping}
+                      value={settings.getIn(['processor', 'src_field'])}
+                      disabled={settings.get('usaget_type') !== "dynamic"}
+                      defaultValue="-1">
+                { available_fields }
+              </select>
+            </div>
+          </div>
         </div>
-        {(() => {
-           if (settings.get('usaget_type') === "dynamic") {
-             return (
-               <div className="form-group">
-                 <div className="col-lg-offset-2 col-lg-4">
-                   <div className="form-group">
-                     <div className="col-lg-3">
-                       <label>Map field</label>
-                     </div>
-                     <div className="col-lg-4">
-                       <select id="src_field"
-                               className="form-control"
-                               onChange={onSetFieldMapping}
-                               value={settings.getIn(['processor', 'src_field'])}
-                               defaultValue="-1">
-                         { available_fields }
-                       </select>
-                       <p className="help-block">Field used to map values to usage types</p>
-                     </div>
-                   </div>
-                 </div>
-               </div>
-             );
-           }})()}
         <div className="form-group">
-      {(() => {
-        if (settings.get('usaget_type') === "dynamic") {
-          return (
-          <div className="col-lg-offset-2 col-lg-6">
-            <div className="form-group">
-              <div className="col-lg-3">
+          <div className="col-lg-offset-3 col-lg-4">
+            <div className="col-lg-offset-1 col-lg-9">
+              <div className="col-lg-5">
                 <strong>Input Value</strong>
               </div>
-              <div className="col-lg-3">
+              <div className="col-lg-5">
                 <strong>Usage Type</strong>
               </div>
             </div>
+          </div>
+        </div>
             {
               settings.getIn(['processor', 'usaget_mapping']).map((usage_t, key) => (
-            <div className="form-group" key={key}>
-              <div className="col-lg-3">{usage_t.get('pattern')}</div>
-              <div className="col-lg-3">{usage_t.get('usaget')}</div>
-              <div className="col-lg-3">
-                <button type="button"
-                        className="btn btn-danger btn-circle"
-                        onClick={this.removeUsagetMapping.bind(this, key)}>
-                  <i className="fa fa-minus" />
-                </button>
-              </div>
-            </div>
+                <div className="form-group">
+                  <div className="col-lg-offset-3 col-lg-4">
+                    <div className="col-lg-offset-1 col-lg-9">
+                      <div className="col-lg-5">{usage_t.get('pattern')}</div>
+                      <div className="col-lg-5">{usage_t.get('usaget')}</div>
+                      <div className="col-lg-2">
+                        <button type="button"
+                                className="btn btn-danger btn-circle"
+                                disabled={settings.get('usaget_type') !== "dynamic"}                                
+                                onClick={this.removeUsagetMapping.bind(this, key)}>
+                          <i className="fa fa-minus" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))
             }
-            <div className="form-group">
-              <div className="col-lg-3">
-                <input className="form-control" onChange={this.onChangePattern} value={this.state.pattern} />
+        <div className="form-group">
+          <div className="col-lg-offset-3 col-lg-4">
+            <div className="col-lg-offset-1 col-lg-9">
+              <div className="col-lg-5">
+                <input className="form-control"
+                       onChange={this.onChangePattern}
+                       disabled={settings.get('usaget_type') !== "dynamic"}                   
+                       value={this.state.pattern} />
               </div>
-              <div className="col-lg-3">
+              <div className="col-lg-5">
                 <Select
                     id="unit"
                     options={available_units}
                     allowCreate={true}
                     value={this.state.usaget}
                     style={{marginTop: 3}}
+                    disabled={settings.get('usaget_type') !== "dynamic"}
                     onChange={this.onChangeUsaget}
                 />
               </div>
-              <div className="col-lg-3">
+              <div className="col-lg-2">
                 <button type="button"
                         className="btn btn-info btn-circle"
+                        disabled={settings.get('usaget_type') !== "dynamic"}
                         onClick={this.addUsagetMapping}>
                   <i className="fa fa-plus"/>
                 </button>                
               </div>
             </div>
           </div>
-          );
-        }})()}
         </div>
       </form>
     );

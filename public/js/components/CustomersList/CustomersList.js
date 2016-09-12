@@ -76,7 +76,7 @@ class CustomersList extends Component {
     const { customers } = this.props;
 
     const fields = [
-      { id: "aid", placeholder: "Customer ID" },
+      { id: "aid", placeholder: "Customer ID", type: 'number' },
       { id: "firstname", placeholder: "First Name" },
       { id: "lastname", placeholder: "Last Name" },
       { id: "address", placeholder: "Address" },

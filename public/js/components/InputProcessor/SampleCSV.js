@@ -37,17 +37,21 @@ export default class SampleCSV extends Component {
           onSetFieldWidth,
           onAddField } = this.props;
 
-    const selectDelimiterHTML = settings.get('file_type') ? (
+    const selectDelimiterHTML = (
       <div className="form-group">
         <div className="col-lg-3">
           <label htmlFor="delimiter">Delimiter</label>
         </div>
-        <div className="col-lg-7">
-          <div className="col-lg-4" style={{paddingLeft: 0}}>
+        <div className="col-lg-4">
+          <div className="col-lg-1" style={{marginTop: 8}}>
+            <i className="fa fa-long-arrow-right"></i>
+          </div>
+          <div className="col-lg-4">
             <div className="input-group">
               <div className="input-group-addon">
                 <input type="radio" name="delimiter-type"
                        value="separator"
+                       disabled={!settings.get('file_type')}
                        onChange={onSetDelimiterType}
                        checked={settings.get('delimiter_type') === "separator"} />By delimiter
               </div>
@@ -55,7 +59,7 @@ export default class SampleCSV extends Component {
                      className="form-control"
                      type="text"
                      maxLength="1"
-                     disabled={settings.get('delimiter_type') !== "separator"}
+                     disabled={!settings.get('file_type') || settings.get('delimiter_type') !== "separator"}
                      style={{width: 35}}
                      onChange={onChangeDelimiter}
                      value={settings.get('delimiter')} />
@@ -64,12 +68,13 @@ export default class SampleCSV extends Component {
           <div className="col-lg-3" style={{marginTop: 10}}>
             <input type="radio" name="delimiter-type"
                    value="fixed"
+                   disabled={!settings.get('file_type')}
                    onChange={onSetDelimiterType}
                    checked={settings.get('delimiter_type') === "fixed"} />Fixed width
           </div>
         </div>
       </div>
-    ) : (null);
+    );
 
     const fieldsHTML = settings.get('delimiter_type') === "fixed" ?
                        settings.get('fields').map((field, key) => (
@@ -77,6 +82,7 @@ export default class SampleCSV extends Component {
                            <div className="col-lg-3">
                              <button type="button"
                                      className="btn btn-danger btn-circle"
+                                     disabled={!settings.get('file_type')}                                      
                                      onClick={this.removeField.bind(this, key)}>
                                <i className="fa fa-minus" />
                              </button>
@@ -97,6 +103,7 @@ export default class SampleCSV extends Component {
                            <div className="col-lg-2">
                              <button type="button"
                                      className="btn btn-danger btn-circle"
+                                     disabled={!settings.get('file_type')} 
                                      onClick={this.removeField.bind(this, key)}>
                                <i className="fa fa-minus" />
                              </button>
@@ -129,6 +136,7 @@ export default class SampleCSV extends Component {
           <div className="col-lg-2">
             <button type="button"
                     className="btn btn-info btn-circle"
+                    disabled={!settings.get('file_type') || !this.state.newField}
                     onClick={this.addField}>
               <i className="fa fa-plus"/>
             </button>
@@ -137,21 +145,28 @@ export default class SampleCSV extends Component {
       </div>
     );
 
-    const selectCSVHTML = ((settings.get('delimiter_type') === 'fixed' ||
-                            settings.get('delimiter')) && settings.get('file_type')) ? (
+    const selectCSVHTML =  (
       <div>
         <div className="form-group">
           <div className="col-lg-3">
             <label htmlFor="sample_csv">Select Sample CSV</label>
             <p className="help-block">Notice: Spaces will be convereted to underscores</p>
           </div>
-          <div className="col-lg-2">
-            <input type="file" id="sample_csv" onChange={onSelectSampleCSV} disabled={!settings.get('delimiter_type')} />
+          <div className="col-lg-4">
+            <div className="col-lg-1" style={{marginTop: 8}}>
+              <i className="fa fa-long-arrow-right"></i>
+            </div>
+            <div className="col-lg-9">
+              <input type="file" id="sample_csv"
+                     onChange={onSelectSampleCSV}
+                     disabled={!settings.get('file_type') || !settings.get('delimiter_type') ||
+                               settings.get('delimiter_type') !== "separator"} />
+            </div>
           </div>
         </div>
         { setFieldsHTML }
       </div>
-    ) : (null);
+    );
 
     return (
       <form className="InputProcessor form-horizontal">
@@ -159,8 +174,13 @@ export default class SampleCSV extends Component {
           <div className="col-lg-3">
             <label htmlFor="file_type">Name</label>
           </div>
-          <div className="col-lg-3">
-            <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
+          <div className="col-lg-4">
+            <div className="col-lg-1" style={{marginTop: 8}}>
+              <i className="fa fa-long-arrow-right"></i>
+            </div>
+            <div className="col-lg-9">
+              <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
+            </div>
           </div>
         </div>
         { selectDelimiterHTML }
