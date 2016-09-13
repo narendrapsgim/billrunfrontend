@@ -13,7 +13,6 @@ export default class Filter extends Component {
     this.onClickFilterBtn = this.onClickFilterBtn.bind(this);
     this.buildQueryString = this.buildQueryString.bind(this);
     this.filterCond = this.filterCond.bind(this);
-    this.onClickClear = this.onClickClear.bind(this);
 
     this.state = {
       string: "",
@@ -22,9 +21,7 @@ export default class Filter extends Component {
   }
 
   componentDidMount() {
-    if (this.props.base) {
-      this.setState({filters: this.props.base}, () => { this.onClickFilterBtn() });
-    }
+    this.onClickFilterBtn();
   }
 
   onChangeFilterString(e) {
@@ -49,11 +46,17 @@ export default class Filter extends Component {
 
   buildQueryString() {
     const { string, fields } = this.state;
+    const { base } = this.props;
+    const baseObj = _.reduce(base, (acc, value, field) => {
+      return Object.assign({}, acc, {
+        [field]: this.filterCond(field, value)
+      });
+    }, {});
     const filterObj = _.reduce(fields, (acc, field) => {
       return Object.assign({}, acc, {
         [field]: this.filterCond(field, string)
       });
-    }, {});
+    }, baseObj);
     return JSON.stringify(filterObj);
   }
 
@@ -61,19 +64,6 @@ export default class Filter extends Component {
     const { onFilter } = this.props;
     const filter = this.buildQueryString();
     onFilter(filter);
-  }
-
-  onClickClear() {
-    this.setState({filters: {}},
-                  () => { this.onClickFilterBtn() });
-  }
-
-  getFieldValue(field) {
-    switch(field.type) {
-      case "text":
-      default:
-        return this.state.filters[field.id] || '';
-    }
   }
 
   onSelectFilterField(option, checked) {

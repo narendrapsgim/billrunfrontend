@@ -124,14 +124,8 @@ class PlansList extends Component {
                   </div>
               </div>
               <div className="panel-body">
-                <div className="row">
-                  <div className="col-lg-9">
-                    <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
-                  </div>
-                </div>
-                <div className="table-responsive">
-                  <List items={ plans } fields={ tableFields } />
-                </div>
+                <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
+                <List items={ plans } fields={ tableFields } />
               </div>
             </div>
             <Pager onClick={this.handlePageClick}
