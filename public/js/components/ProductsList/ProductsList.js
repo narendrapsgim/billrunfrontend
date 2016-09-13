@@ -43,10 +43,10 @@ class ProductsList extends Component {
   
   onClickProduct(product) {
     this.context.router.push({
-      pathname: "product",
+      pathname: "product_setup",
       query: {
         action: "update",
-        productId: product.get('id')
+        productId: product.getIn(['_id', '$id'])
       }
     });
   }
