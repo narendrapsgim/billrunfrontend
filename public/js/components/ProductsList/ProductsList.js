@@ -115,7 +115,7 @@ class ProductsList extends Component {
                   </div>
                 </div>
                 <div className="table-responsive">
-                  <List items={ products } fields={ tableFields } onClickRow={ this.onClickProduct } />
+                  <List items={ products } fields={ tableFields } edit={true} onClickEdit={ this.onClickProduct } />
                 </div>
               </div>
             </div>
