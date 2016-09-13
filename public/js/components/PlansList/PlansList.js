@@ -124,28 +124,16 @@ class PlansList extends Component {
                   </div>
               </div>
               <div className="panel-body">
-                <div className="row">
-                  <div className="col-lg-9">
-                    <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
-                  </div>
-                </div>
-                <div className="table-responsive">
-                  <List items={ plans } fields={ tableFields } />
-                </div>
+                <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
+                <List items={ plans } fields={ tableFields } />
               </div>
             </div>
-          </div>
-          <div className="row">
-          <div className="col-lg-6">
-            <div className="dataTables_info" role="status" aria-live="polite">Showing 1 to 10</div>
-          </div>
-          <div className="col-lg-6 dataTables_pagination">
             <Pager onClick={this.handlePageClick}
                    size={this.state.size}
                    count={plans.size || 0} />  
           </div>
         </div>
-        </div>
+
       </div>
     );
   }

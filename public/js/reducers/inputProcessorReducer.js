@@ -34,11 +34,11 @@ let defaultState = Immutable.fromJS({
   },
   customer_identification_fields: [
     {
+      target_key: "sid",      
       conditions: [
         {
           field: "usaget",
           regex: "/.*/",
-          target_key: "sid"
         }
       ],
       clear_regex: "//"
@@ -104,6 +104,7 @@ export default function (state = defaultState, action) {
       return state.updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index));
       
     case SET_CUSETOMER_MAPPING:
+      console.log(field, mapping, state.setIn(['customer_identification_fields', 0, field], mapping).toJS());
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 
     case SET_RATING_FIELD:

@@ -19,9 +19,9 @@ export default class CalculatorMapping extends Component {
                                      ...["sid", "aid"].map((field, key) => (
                                        <option value={field} key={key}>{field}</option>
                                      ))];
-    const available_usagetypes = ['sms', 'call'];/*settings.get('rate_calculators').keySeq().map(usaget => {
+    const available_usagetypes = settings.get('rate_calculators').keySeq().map(usaget => {
       return usaget;
-    });*/
+    });
 
     return (
       <form className="form-horizontal CalculatorMapping">
@@ -30,7 +30,7 @@ export default class CalculatorMapping extends Component {
             <label htmlFor="src_key">Customer identification</label>
             <p className="help-block">Map customer identification field in record to Billrun field</p>
           </div>
-          <div className="col-lg-4">
+          <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
@@ -70,7 +70,7 @@ export default class CalculatorMapping extends Component {
                    { usaget }
                  </label>
                </div>
-               <div className="col-lg-6">
+               <div className="col-lg-9">
                  <div className="col-lg-1" style={{marginTop: 8}}>
                    <i className="fa fa-long-arrow-right"></i>
                  </div>
