@@ -29,7 +29,7 @@ export default class List extends Component {
     const {
       items,
       fields,
-      onClickRow = () => {},
+      onClickEdit = () => {},
       edit = false
     } = this.props;
 
@@ -37,12 +37,17 @@ export default class List extends Component {
       if (!field.title && !field.placeholder) return (<th key={key}>{ titlize(field.id) }</th>);
       return (<th key={key}>{ field.title || field.placeholder }</th>)
     });
+    if (edit) table_header.push((<th>&nbsp;</th>));
 
     const table_body = items.size < 1 ?
                        (<tr><td colSpan={fields.length} style={{textAlign: "center"}}>No items found</td></tr>) :
                        items.map((entity, index) => (
-                         <tr key={index} onClick={onClickRow.bind(this, entity)}>
+                         <tr key={index}>
                            { this.buildRow(entity, fields) }
+                           {(() => {
+                              if (edit)
+                                return (<td><button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>edit</button></td>);
+                            })()}
                          </tr>
                        ));
 

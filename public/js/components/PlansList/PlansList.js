@@ -134,16 +134,12 @@ class PlansList extends Component {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="row">
-          <div className="col-lg-6">
-            <div className="dataTables_info" role="status" aria-live="polite">Showing 1 to 10</div>
-          </div>
-          <Pager onClick={this.handlePageClick}
-                 size={this.state.size}
-                 count={plans.size || 0} />  
+            <Pager onClick={this.handlePageClick}
+                   size={this.state.size}
+                   count={plans.size || 0} />  
           </div>
         </div>
+
       </div>
     );
   }

@@ -122,17 +122,9 @@ class ProductsList extends Component {
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-lg-6">
-            <div className="dataTables_info" role="status" aria-live="polite">Showing 1 to 10</div>
-          </div>
-          <div className="col-lg-6 dataTables_pagination">
-            <Pager onClick={this.handlePageClick}
-                   size={this.state.size}
-                   count={products.size || 0} />  
-          </div>
-        </div>
-
+        <Pager onClick={this.handlePageClick}
+               size={this.state.size}
+               count={products.size || 0} />  
       </div>
     );
   }

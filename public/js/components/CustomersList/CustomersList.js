@@ -102,7 +102,7 @@ class CustomersList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
-                <List items={customers} fields={fields} onClickRow={this.onClickCustomer} />
+                <List items={customers} fields={fields} edit={true} onClickEdit={this.onClickCustomer} />
               </div>
             </div>
           </div>
