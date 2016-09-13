@@ -39,7 +39,7 @@ class UsageList extends Component {
   }
 
   onFilter(filter) {
-    this.setState({filter, page: 1}, () => {
+    this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList('usages', this.buildQuery()))
     });
   }

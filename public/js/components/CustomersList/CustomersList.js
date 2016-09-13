@@ -23,7 +23,7 @@ class CustomersList extends Component {
 
     this.state = {
       page: 0,
-      size: 10
+      size: 1
     };
   }
 
@@ -67,7 +67,7 @@ class CustomersList extends Component {
   }
 
   onFilter(filter) {
-    this.setState({filter, page: 1}, () => {
+    this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList("customers", this.buildQuery()))
     });
   }
