@@ -117,11 +117,11 @@ class PlansList extends Component {
             <div className="panel panel-default">
               <div className="panel-heading">
                 All available plans
-                 <div className="pull-right">
+                {/* <div className="pull-right">
                     <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                      <MenuItem eventKey="1" onClick={this.onNewPlan}>New</MenuItem>
+                    <MenuItem eventKey="1" onClick={this.onNewPlan}>New</MenuItem>
                     </DropdownButton>
-                  </div>
+                    </div> */}
               </div>
               <div className="panel-body">
                 <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
