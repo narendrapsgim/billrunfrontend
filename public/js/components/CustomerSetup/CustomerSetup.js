@@ -137,7 +137,7 @@ class CustomerSetup extends Component {
                 action={action}
                 settings={settings.getIn(['account', 'fields'])}
                 onChange={this.onChangeCustomerField} />
-      <button type="button"
+      <button type="submit"
               className="btn btn-primary"
               onClick={this.onSaveCustomer}
               style={{marginRight: 10}}>
