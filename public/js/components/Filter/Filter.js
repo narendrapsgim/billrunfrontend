@@ -101,7 +101,7 @@ export default class Filter extends Component {
         <div className="col-lg-1 col-md-2 col-xs-3">
           <button className="btn btn-default"
 		  onClick={this.onClickFilterBtn}
-		  disabled={!string || filter_by.length === 0}>
+		  disabled={(string && filter_by.length === 0) || (!string && filter_by.length > 0)}>
 	    <i className="fa fa-search"></i>
 	  </button>
         </div>

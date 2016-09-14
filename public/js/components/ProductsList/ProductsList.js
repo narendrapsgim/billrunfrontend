@@ -89,8 +89,8 @@ class ProductsList extends Component {
       {id: 'unit_type', title: 'Unit Type', parser: unit_type_by_parser},
       {id: 'code', title: "Code"},
       {id: 'description', title: "Description"},
-      {id: 'from', title: 'From'},
-      {id: 'to', title: 'To'}
+      {id: 'from', title: 'From', type: "datetime"},
+      {id: 'to', title: 'To', type: "datetime"}
     ];
 
     return (
