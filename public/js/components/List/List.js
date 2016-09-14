@@ -52,8 +52,8 @@ export default class List extends Component {
                        ));
 
     return (
-      <div className="List col-lg-12">
-        <div className="table-responsive">
+      <div className="List row">
+        <div className="table-responsive col-lg-12">
           <table className="table table-hover table-striped">
             <thead>
               <tr>{ table_header }</tr>
