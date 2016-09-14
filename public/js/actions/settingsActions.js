@@ -62,12 +62,16 @@ export function updateSetting(category, name, value) {
 }
 
 function saveSettingsToDB(category, settings) {
+  const data = settings.get(category).toJS();
+  if (category === "pricing") {
+    data.vat = data.vat / 100;
+  }
   const query = {
     api: "settings",
     params: [
       { category: category },
       { action: "set" },
-      { data: JSON.stringify(settings.get(category).toJS()) }
+      { data: JSON.stringify(data) }
     ]
   };
 

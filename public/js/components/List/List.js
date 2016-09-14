@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
+import moment from 'moment';
 
 /* ACTIONS */
 import { titlize } from '../../common/Util';
@@ -9,11 +10,27 @@ export default class List extends Component {
     super(props);
   }
 
+  displayByType(field, entity) {
+    switch (field.type) {
+      case 'date':
+	return moment(entity.get(field.id)).format('L');
+      case 'time':
+	return moment(entity.get(field.id)).format('LT');
+      case 'datetime':
+	return moment(entity.get(field.id)).format('L LT');
+      case 'text':
+      default:
+	return entity.get(field.id);
+    }
+  }
+  
   printEntityField(entity = Immutable.Map(), field) {
     if (!Immutable.Iterable.isIterable(entity))
       return this.printEntityField(Immutable.fromJS(entity), field);
     if (field.parser)
       return field.parser(entity);
+    if (field.type)
+      return this.displayByType(field, entity);
     return entity.get(field.id);
   }
   
@@ -52,8 +69,8 @@ export default class List extends Component {
                        ));
 
     return (
-      <div className="List col-lg-12">
-        <div className="table-responsive">
+      <div className="List row">
+        <div className="table-responsive col-lg-12">
           <table className="table table-hover table-striped">
             <thead>
               <tr>{ table_header }</tr>

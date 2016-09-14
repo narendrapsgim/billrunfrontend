@@ -154,7 +154,7 @@ function saveRateToDB(rate, action, callback) {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(
       success => {
-        dispatch(showSuccess("Product saved successfully", 'success'));
+        dispatch(showSuccess("Product saved successfully"));
         dispatch(finishProgressIndicator());
         callback(false);
       },

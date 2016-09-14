@@ -27,7 +27,9 @@ export default function (state = defaultState, action) {
   case GOT_SETTINGS:
     return state.withMutations(map => {
       settings.map(setting => {
-        map.set(setting.name, Immutable.fromJS(setting.data.details));
+	const data = setting.data.details;
+	if (setting.name === "pricing") data.vat = data.vat * 100;
+        map.set(setting.name, Immutable.fromJS(data));
       });
     });
 

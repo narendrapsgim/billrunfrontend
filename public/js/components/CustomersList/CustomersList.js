@@ -67,7 +67,7 @@ class CustomersList extends Component {
   }
 
   onFilter(filter) {
-    this.setState({filter}, () => {
+    this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList("customers", this.buildQuery()))
     });
   }
@@ -86,7 +86,7 @@ class CustomersList extends Component {
 
     return (
       <div>
-
+      
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">

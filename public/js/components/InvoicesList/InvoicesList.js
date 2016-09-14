@@ -43,7 +43,7 @@ class InvoicesList extends Component {
   }
 
   onFilter(filter) {
-    this.setState({filter}, () => {
+    this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList('invoices', this.buildQuery()))
     });
   }
