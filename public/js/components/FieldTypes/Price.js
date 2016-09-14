@@ -10,7 +10,7 @@ export default class Price extends Component {
 
     const input = editable ? (<div className="input-group">
         <div className="input-group-addon">{globalSetting.currency}</div>
-        <input type="number" id={id} className="form-control" value={value} onChange={onChange} />
+        <input type="number" id={id} className="form-control" min="0" value={value} onChange={onChange} />
       </div>) : (<span>{`${globalSetting.currency}${parseFloat(value, 10)}`}</span>);
 
     return (

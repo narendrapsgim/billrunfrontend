@@ -97,7 +97,7 @@ class Navigator extends Component {
                      </Link>
 		   </li>
 		   <li>
-                     <Link to="/customers"><i className="fa fa-user fa-fw"></i> Customers</Link>
+                     <Link to="/customers"><i className="fa fa-users fa-fw"></i> Customers</Link>
 		   </li>
 		   <li>
                      <Link to="/usage"><i className="fa fa-list fa-fw"></i> Usage</Link>

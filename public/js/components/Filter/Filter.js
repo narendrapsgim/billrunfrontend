@@ -85,7 +85,7 @@ export default class Filter extends Component {
     });
 
     return (
-      <div className="Filter row">
+      <div className="Filter row" style={{marginBottom: 10}}>
         <div className="col-lg-2 col-md-3 col-xs-4">
           <input id="filter-string"
 		 placeholder="Search for..."
