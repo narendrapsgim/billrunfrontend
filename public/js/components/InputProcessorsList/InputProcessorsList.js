@@ -68,7 +68,7 @@ class InputProcessorsList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <List items={inputProcessors} fields={fields} onClickRow={this.onClickInputProcessor} />
+                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} />
               </div>
             </div>
           </div>

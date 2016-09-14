@@ -93,7 +93,7 @@ export default class FieldsMapping extends Component {
             <label htmlFor="date_field">Time</label>
             <p className="help-block">Time of record creation</p>
           </div>
-          <div className="col-lg-4">
+          <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
@@ -114,7 +114,7 @@ export default class FieldsMapping extends Component {
             <label htmlFor="volume_field">Volume</label>
             <p className="help-block">Amount calculated</p>
           </div>
-          <div className="col-lg-4">
+          <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
@@ -144,7 +144,7 @@ export default class FieldsMapping extends Component {
               Static
             </label>
           </div>
-          <div className="col-lg-4">
+          <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
@@ -171,7 +171,7 @@ export default class FieldsMapping extends Component {
               Dynamic
             </label>
           </div>
-          <div className="col-lg-4">
+          <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
@@ -188,8 +188,8 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-lg-offset-3 col-lg-4">
-            <div className="col-lg-offset-1 col-lg-9">
+          <div className="col-lg-offset-3 col-lg-7">
+            <div className="col-lg-offset-1 col-lg-10">
               <div className="col-lg-5">
                 <strong>Input Value</strong>
               </div>
@@ -202,8 +202,8 @@ export default class FieldsMapping extends Component {
             {
               settings.getIn(['processor', 'usaget_mapping']).map((usage_t, key) => (
                 <div className="form-group">
-                  <div className="col-lg-offset-3 col-lg-4">
-                    <div className="col-lg-offset-1 col-lg-9">
+                  <div className="col-lg-offset-3 col-lg-7">
+                    <div className="col-lg-offset-1 col-lg-10">
                       <div className="col-lg-5">{usage_t.get('pattern')}</div>
                       <div className="col-lg-5">{usage_t.get('usaget')}</div>
                       <div className="col-lg-2">
@@ -220,8 +220,8 @@ export default class FieldsMapping extends Component {
               ))
             }
         <div className="form-group">
-          <div className="col-lg-offset-3 col-lg-4">
-            <div className="col-lg-offset-1 col-lg-9">
+          <div className="col-lg-offset-3 col-lg-7">
+            <div className="col-lg-offset-1 col-lg-10">
               <div className="col-lg-5">
                 <input className="form-control"
                        onChange={this.onChangePattern}
