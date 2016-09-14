@@ -87,10 +87,16 @@ export default class Filter extends Component {
     return (
       <div className="Filter">
         <div className="col-lg-2">
-          <input id="filter-string" onChange={this.onChangeFilterString} className="form-control" />
+          <input id="filter-string"
+		 placeholder="Search for..."
+		 onChange={this.onChangeFilterString}
+		 className="form-control" />
         </div>
         <div className="col-lg-2">
-          <Multiselect data={fields_options} multiple onChange={this.onSelectFilterField} buttonWidth="100%" />
+          <Multiselect data={fields_options}
+		       multiple
+		       onChange={this.onSelectFilterField}
+		       buttonWidth="100%" />
         </div>
         <div className="col-lg-1">
           <button className="btn btn-default"
