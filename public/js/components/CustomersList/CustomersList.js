@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
-import { PageHeader } from 'react-bootstrap';
 import Pager from '../Pager';
 import Filter from '../Filter';
+import List from '../List';
 import { DropdownButton, MenuItem } from "react-bootstrap";
 
 /* ACTIONS */
@@ -25,10 +25,6 @@ class CustomersList extends Component {
       page: 0,
       size: 10
     };
-  }
-
-  componentDidMount() {
-    this.props.dispatch(getList("customers", this.buildQuery()));
   }
 
   componentWillUnmount() {
@@ -60,18 +56,18 @@ class CustomersList extends Component {
     });
   }
 
-  onClickCustomer(aid, e) {
+  onClickCustomer(customer, e) {
     this.context.router.push({
       pathname: "customer",
       query: {
         action: "update",
-        aid
+        aid: customer.get('aid')
       }
     });
   }
 
   onFilter(filter) {
-    this.setState({filter}, () => {
+    this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList("customers", this.buildQuery()))
     });
   }
@@ -80,7 +76,7 @@ class CustomersList extends Component {
     const { customers } = this.props;
 
     const fields = [
-      { id: "aid", placeholder: "Account ID" },
+      { id: "aid", placeholder: "Customer ID", type: 'number' },
       { id: "firstname", placeholder: "First Name" },
       { id: "lastname", placeholder: "Last Name" },
       { id: "address", placeholder: "Address" },
@@ -88,66 +84,33 @@ class CustomersList extends Component {
       { id: "to", placeholder: "To", display: false, type: "datetime" }
     ];
 
-    const table_header = fields.map((field, key) => (
-      <th key={key}>{ titlize(field.placeholder) }</th>
-    ));
-
-    const table_body = customers.map((customer, key) => (
-      <tr key={key} onClick={this.onClickCustomer.bind(this, customer.get('aid'))}>
-        { fields.map((field, field_key) => (
-            <td key={field_key}>{ customer.get(field.id) }</td>
-          )) }
-      </tr>
-    ));
-
     return (
       <div>
-
+      
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
                 <span>
                   List of all available customers
-                  <div className="pull-right">
-                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                      <MenuItem eventKey="1" onClick={this.onNewCustomer}>New</MenuItem>
-                    </DropdownButton>
-                  </div>
                 </span>
+                <div className="pull-right">
+                  <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
+                    <MenuItem eventKey="1" onClick={this.onNewCustomer}>New</MenuItem>
+                  </DropdownButton>
+                </div>
               </div>
               <div className="panel-body">
-                <div className="row">
-                  <div className="col-lg-9">
-                    <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
-                  </div>
-                </div>
-                <div className="table-responsive">
-                  <table className="table table-hover table-striped">
-                    <thead>
-                      <tr>{ table_header }</tr>
-                    </thead>
-                    <tbody>
-                      { table_body }
-                    </tbody>
-                  </table>
-                </div>
+                <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
+                <List items={customers} fields={fields} edit={true} onClickEdit={this.onClickCustomer} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-lg-6">
-            <div className="dataTables_info" role="status" aria-live="polite">Showing 1 to 10</div>
-          </div>
-          <div className="col-lg-6 dataTables_pagination">
-            <Pager onClick={this.handlePageClick}
-                   size={this.state.size}
-                   count={customers.size || 0} />  
-          </div>
-        </div>
-
+        <Pager onClick={this.handlePageClick}
+               size={this.state.size}
+               count={customers.size || 0} />  
       </div>
     );
   }

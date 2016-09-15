@@ -1,32 +1,34 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 
+/* COMPONENTS */
+import Multiselect from 'react-bootstrap-multiselect';
+
 export default class Filter extends Component {
   constructor(props) {
     super(props);
 
-    this.onChangeFilterField = this.onChangeFilterField.bind(this);
-    this.onClickFilterBtn = _.debounce(this.onClickFilterBtn.bind(this), 700);
+    this.onChangeFilterString = this.onChangeFilterString.bind(this);
+    this.onSelectFilterField = this.onSelectFilterField.bind(this);
+    this.onClickFilterBtn = this.onClickFilterBtn.bind(this);
     this.buildQueryString = this.buildQueryString.bind(this);
     this.filterCond = this.filterCond.bind(this);
-    this.onClickClear = this.onClickClear.bind(this);
 
     this.state = {
-      filters: {},
+      string: "",
+      filter_by: [],
     };
   }
 
-  componentWillMount() {
-    if (this.props.base) {
-      this.setState({filters: this.props.base}, () => { this.onClickFilterBtn() });
-    }
-  }
-  
-  onChangeFilterField(e) {
-    const { id, value } = e.target;
-    this.setState({filters: {...this.state.filters, [id]: value}}, () => { this.onClickFilterBtn() });
+  componentDidMount() {
+    this.onClickFilterBtn();
   }
 
+  onChangeFilterString(e) {
+    const { value } = e.target;
+    this.setState({string: value});
+  }
+  
   filterCond(field, value) {
     const { fields } = this.props;
     let found = _.find(fields, (f) => { return f.id === field; });
@@ -41,57 +43,68 @@ export default class Filter extends Component {
         return {"$regex": value, "$options": "i"};
     }
   }
-  
+
   buildQueryString() {
-    const filterObj = _.reduce(this.state.filters, (acc, value, field) => {
-      if (!value) {
-        return _.omit(acc, field);
-      }
+    const { string, filter_by } = this.state;
+    const { base } = this.props;
+    const baseObj = _.reduce(base, (acc, value, field) => {
       return Object.assign({}, acc, {
         [field]: this.filterCond(field, value)
-      })
+      });
     }, {});
+    const filterObj = _.reduce(filter_by, (acc, field) => {
+      return Object.assign({}, acc, {
+        [field]: this.filterCond(field, string)
+      });
+    }, baseObj);
     return JSON.stringify(filterObj);
   }
-  
+
   onClickFilterBtn() {
     const { onFilter } = this.props;
     const filter = this.buildQueryString();
     onFilter(filter);
   }
 
-  onClickClear() {
-    this.setState({filters: {}},
-                  () => { this.onClickFilterBtn() });
-  }
-
-  getFieldValue(field) {
-    switch(field.type) {
-      case "text":
-      default:
-        return this.state.filters[field.id] || '';
-    }
+  onSelectFilterField(option, checked) {
+    const value = option.val();
+    const { filter_by } = this.state;    
+    const included = _.includes(filter_by, value);
+    if (checked && included) return;
+    if (!checked && included) return this.setState({filter_by: _.without(filter_by, value)});
+    return this.setState({filter_by: filter_by.concat(value)});
   }
   
   render() {
     const { fields = [] } = this.props;
-    const inputs = fields.map((field, key) => {
-      if (field.display !== undefined && field.display === false) return (null);
-      return (
-        <div className="col-xs-2" key={key}>
-          <input id={field.id}
-                 type={field.type || "text"}
-                 placeholder={field.placeholder}
-                 onChange={this.onChangeFilterField}
-                 value={this.getFieldValue(field)}
-                 className="form-control" />
-        </div>
-      );
+    const { filter_by, string } = this.state;
+
+    const fields_options = fields.map((field, key) => {
+      let selected = _.includes(filter_by, field.id);
+      return {value: field.id, label: field.placeholder, selected };
     });
 
     return (
-      <div className="Filter">
-          { inputs }
+      <div className="Filter row">
+        <div className="col-lg-2 col-md-3 col-xs-4">
+          <input id="filter-string"
+		 placeholder="Search for..."
+		 onChange={this.onChangeFilterString}
+		 className="form-control" />
+        </div>
+        <div className="col-lg-2 col-md-3 col-xs-4">
+          <Multiselect data={fields_options}
+		       multiple
+		       onChange={this.onSelectFilterField}
+		       buttonWidth="100%" />
+        </div>
+        <div className="col-lg-1 col-md-2 col-xs-3">
+          <button className="btn btn-default"
+		  onClick={this.onClickFilterBtn}
+		  disabled={(string && filter_by.length === 0) || (!string && filter_by.length > 0)}>
+	    <i className="fa fa-search"></i>
+	  </button>
+        </div>
       </div>
     );
   }

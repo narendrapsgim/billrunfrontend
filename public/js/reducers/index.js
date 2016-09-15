@@ -7,6 +7,7 @@ import customer from './customerReducer';
 import inputProcessor from './inputProcessorReducer';
 import settings from './settingsReducer';
 import dashboard from './dashboardReducer';
+import product from './productReducer';
 import user from './userReducer';
 import plan from './planReducer';
 import planProducts from './planProductsReducer';
@@ -14,6 +15,7 @@ import planProducts from './planProductsReducer';
 
 export default combineReducers({
   progressIndicator,
+  product,
   user,
   alerts,
   list,

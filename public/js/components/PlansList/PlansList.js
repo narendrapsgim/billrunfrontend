@@ -1,42 +1,114 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { PageHeader} from 'react-bootstrap';
+import Pager from '../Pager';
+import Filter from '../Filter';
+import moment from 'moment';
+import { DropdownButton, MenuItem } from "react-bootstrap";
 
 import { getList } from '../../actions/listActions';
+import List from '../List';
 
 class PlansList extends Component {
   constructor(props) {
     super(props);
+
+    this.onFilter = this.onFilter.bind(this);
+    this.buildQuery = this.buildQuery.bind(this);
+    this.onNewPlan = this.onNewPlan.bind(this);
+    this.onClickPlan = this.onClickPlan.bind(this);
+    this.handlePageClick = this.handlePageClick.bind(this);
+
     this.state = {
       size: 10,
       page: 0,
+      filter: {}
     }
   }
 
-  componentDidMount() {
-    const query = {
+  buildQuery() {
+    return {
       api: "find",
       params: [
-        { collection: 'plans' },
-        { query: JSON.stringify({}) }
+        { collection: "plans" },
+        { size: this.state.size },
+        { page: this.state.page },
+        { query: this.state.filter }
       ]
     };
-    this.props.dispatch(getList("plans", query));
+  }
+
+
+  handlePageClick(page) {
+    this.setState({page}, () => {
+      this.props.dispatch(getList('plans', this.buildQuery()))
+    });
+  }
+
+  onFilter(filter) {
+    this.setState({filter, page: 0}, () => {
+      this.props.dispatch(getList('plans', this.buildQuery()))
+    });
+  }
+
+  onClickPlan(plan) {
+    this.context.router.push({
+      pathname: "plan",
+      query: {
+        action: "update",
+        planId: plan.get('id')
+      }
+    });
   }
   
+  onNewPlan() {
+    this.context.router.push({
+      pathname: `plan_setup`,
+      query: {
+        action: 'new'
+      }
+    });
+  }
+
   render() {
     const { plans } = this.props;
 
-    const table_header =
-    ["Name", "Code", "Description", "Trial", "Recurring Charges", "Billing Frequency", "Charging Mode"].map((header, key) => (
-      <th key={key}>{header}</th>
-    ));
+    const fields = [
+      {id: "name", placeholder: "Name"},
+      {id: "PlanCode", placeholder: "Code"},
+      {id: "to", display: false, type: "datetime"}
+    ];
+
+    const trial_parser = (plan) => {
+      if (plan.getIn(['price', 0, 'trial'])) {
+        return plan.getIn(['price', 0, 'TrialCycle']) + " " + plan.getIn(['recurrence', 'periodicity']);
+      }
+      return '';
+    };
     
-    const table_body = plans.map((plan, plan_key) => (
-      <tr key={plan_key}>
-        <td>{ plan.get('name') }</td>
-      </tr>
-    ));
+    const recuring_charges_parser = (plan) => {
+      let sub = plan.getIn(['price', 0, 'trial']) ? 1 : 0;
+      let cycles = plan.get('price').size - sub;
+      return cycles + ' cycles';
+    }
+
+    const billing_frequency_parser = (plan) => {
+      return plan.getIn(['recurrence', 'unit']) + " " + plan.getIn(['recurrence', 'periodicity']);
+    }
+
+    const charging_mode_parser = (plan) => {
+      return plan.get('upfront') ? "Upfront" : "Arrears";
+    }
+
+    const tableFields = [
+      {id: 'name', title: 'Name'},
+      {id: 'PlanCode', title: 'Code'},
+      {id: 'description', title: "Description"},
+      {title: 'Trial', parser: trial_parser},
+      {id: 'recurrence_charges', title: 'Recurring Charges', parser: recuring_charges_parser},
+      {id: 'recurrence_frequency', title: 'Billing Frequency', parser: billing_frequency_parser},
+      {id: 'charging_mode', title: 'Charging Mode', parser: charging_mode_parser}
+    ];
 
     return (
       <div>
@@ -45,26 +117,31 @@ class PlansList extends Component {
             <div className="panel panel-default">
               <div className="panel-heading">
                 All available plans
+                {/* <div className="pull-right">
+                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
+                    <MenuItem eventKey="1" onClick={this.onNewPlan}>New</MenuItem>
+                    </DropdownButton>
+                    </div> */}
               </div>
               <div className="panel-body">
-                <div className="table-responsive">
-                  <table className="table table-hover table-striped">
-                    <thead>
-                      <tr>{ table_header }</tr>
-                    </thead>
-                    <tbody>
-                      { table_body }
-                    </tbody>
-                  </table>
-                </div>
+                <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
+                <List items={ plans } fields={ tableFields } />
               </div>
             </div>
+            <Pager onClick={this.handlePageClick}
+                   size={this.state.size}
+                   count={plans.size || 0} />  
           </div>
         </div>
+
       </div>
     );
   }
 }
+
+PlansList.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
 
 function mapStateToProps(state) {
   return {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { Table, PageHeader } from 'react-bootstrap';
+import List from '../List';
 import { DropdownButton, MenuItem } from "react-bootstrap";
 
 //import { getInputProcessors, setInputProcessor } from '../../actions/inputProcessorActions';
@@ -11,7 +11,7 @@ class InputProcessorsList extends Component {
   constructor(props) {
     super(props);
 
-    this.onClickCell = this.onClickCell.bind(this);
+    this.onClickInputProcessor = this.onClickInputProcessor.bind(this);
     this.onClickNew = this.onClickNew.bind(this);
   }
 
@@ -26,12 +26,11 @@ class InputProcessorsList extends Component {
     this.props.dispatch(getList("input_processors", params));
   }
   
-  onClickCell(cell_idx, e) {
-    const file_type = this.props.inputProcessors.valueSeq().get(cell_idx).get('file_type');
+  onClickInputProcessor(input_processor, e) {
     this.context.router.push({
       pathname: 'input_processor',
       query: {
-        file_type,
+        file_type: input_processor.get('file_type'),
         action: 'update'
       }
     });
@@ -47,17 +46,10 @@ class InputProcessorsList extends Component {
   }
 
   render() {
-    const table_headers = (
-      <th>File Type</th>
-    );
-
-    const table_body = this.props.inputProcessors.map((proc, key) => (
-      <tr key={key}>
-        <td onClick={this.onClickCell.bind(this, key)}>
-          { proc.get('file_type') }
-        </td>
-      </tr>
-    ));
+    const { inputProcessors } = this.props;
+    const fields = [
+      { id: "file_type", title: "Name" }
+    ];
 
     return (
       <div className="InputProcessorsList">
@@ -76,14 +68,7 @@ class InputProcessorsList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <Table responsive hover striped>
-                  <thead>
-                    <tr>{ table_headers }</tr>
-                  </thead>
-                  <tbody>
-                    { table_body }
-                  </tbody>
-                </Table>
+                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} />
               </div>
             </div>
           </div>

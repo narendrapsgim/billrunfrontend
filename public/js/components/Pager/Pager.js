@@ -31,20 +31,32 @@ export default class Pager extends Component {
   }
   
   render() {
-    const { size, count } = this.props;    
+    const { size, count } = this.props;
+    const { page } = this.state;
     const prevClass = "previous" + ( this.state.page === 0 ? ' disabled' : '' );
     const nextClass = "next" + (count < size ? ' disabled ' : '');
+    const showing = (page * size + count) === 0 ? 'Showing none' : `Showing ${page * size + 1} to ${page * size + count}`;
 
     return (
-      <ul className="pagination" style={{margin: 0, padding: 0}}>
-        <li id="previous" className={prevClass} onClick={this.handlePageClick}>
-          <a id="previous">Previous</a>
-        </li>
-        <li className="active"><a>{this.state.page + 1}</a></li>
-        <li id="next" className={nextClass} onClick={this.handlePageClick}>
-          <a id="next">Next</a>
-        </li>
-      </ul>
+      <div className="row">
+        <div className="col-lg-2">
+          { showing }
+        </div>
+        <div className="col-lg-10">
+          <ul className="pagination" style={{margin: 0, padding: 0, cursor: "pointer"}}>
+            <li id="previous" className={prevClass} onClick={this.handlePageClick}>
+              <a id="previous" onClick={this.handlePageClick}>
+                <i id="next" className="fa fa-chevron-left" onClick={this.handlePageClick}></i>
+              </a>
+            </li>
+            <li id="next" className={nextClass} onClick={this.handlePageClick}>
+              <a id="next" onClick={this.handlePageClick}>
+                <i id="next" className="fa fa-chevron-right" onClick={this.handlePageClick}></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     );
   }
 }

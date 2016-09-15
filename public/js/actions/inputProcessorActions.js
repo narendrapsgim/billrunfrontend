@@ -86,7 +86,7 @@ function fetchProcessorSettings(file_type) {
     ).catch(error => {
       console.log(error);
       dispatch(finishProgressIndicator());
-      dispatch(showDanger(error.data.message));
+      dispatch(showDanger("Error loading input processor"));
     });
   };
 }
@@ -301,13 +301,14 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       },
       failure => {
         dispatch(finishProgressIndicator());        
-        const errorMessages = failure.error.map((resp) => resp.error.desc);
+        const errorMessages = failure.error[0].error.error.message;
         dispatch(showDanger(errorMessages));
         callback(true);
       }
     ).catch(
       error => {
-        dispatch(finishProgressIndicator());        
+        dispatch(finishProgressIndicator());
+        dispatch(showDanger("Error saving input processor"));
         dispatch(apiBillRunErrorHandler(error));
       }
     );

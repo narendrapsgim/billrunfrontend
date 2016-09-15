@@ -8,18 +8,17 @@ export default class Date extends Component {
   }
 
   render() {
-    let { id, onChange, value, editable } = this.props;
+    let { id, onChange, value, editable, disabled } = this.props;
 
     const input = editable ? ( <DatePicker id={id}
-                                           fullWidth={true}
-                                           hintText={id}
-                                           textFieldStyle={{height: "72px"}}
-                                           value={value}
-                                           onChange={onChange}
-                                           disabled={disabled}
-                               />
-                             ) : (<span>{moment(value).format(globalSetting.datetimeFormat)}</span>);
-
+                           fullWidth={true}                            
+                           hintText={id}
+                           textFieldStyle={{height: "72px"}}
+                           value={value}
+                           onChange={onChange}
+                           disabled={disabled}
+     />) : (<span>{moment(value).format(globalSetting.datetimeFormat)}</span>);
+    
     return (
       <div>{ input }</div>
     );

@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 
+import List from '../List';
 import { DropdownButton, MenuItem } from "react-bootstrap";
-
-/* ACTIONS */
-import { titlize } from '../../common/Util';
 
 export default class SubscriptionsList extends Component {
   constructor(props) {
@@ -19,6 +17,10 @@ export default class SubscriptionsList extends Component {
       <td key={key}>{ sub.get(field.get('field_name')) }</td>
     ))
   }
+
+  onClickSubscription(entity) {
+    
+  }
   
   render() {
     const { subscriptions,
@@ -27,16 +29,12 @@ export default class SubscriptionsList extends Component {
             onNew,
             onEdit } = this.props;
 
-    const table_header = settings.filter(field => { return field.get('display') !== false }).map((field, key) => (
-      <th key={key}>{ titlize(field.get('field_name')) }</th>
-    ));
-  
-    const table_body = subscriptions.map((sub, key) => (
-      <tr key={key}>
-        { this.subscription_row(sub) }
-      </tr>
-    ));
-    
+    const fields = settings
+      .filter(field => { return field.get('display') !== false })
+      .map((field, idx) => {
+        return { id: field.get('field_name') };
+      });
+
     return (
       <div>
 
@@ -54,16 +52,7 @@ export default class SubscriptionsList extends Component {
                 </span>
               </div>
               <div className="panel-body">
-                <div className="table-responsive">
-                  <table className="table table-hover table-striped">
-                    <thead>
-                      <tr>{ table_header }</tr>
-                    </thead>
-                    <tbody>
-                      { table_body }
-                    </tbody>
-                  </table>
-                </div>
+                <List items={subscriptions} fields={fields} onClick={this.onClickSubscription} />
               </div>
             </div>
           </div>

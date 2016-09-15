@@ -14,6 +14,7 @@ import { showSuccess, showDanger } from '../..//actions/alertsActions';
 import { PageHeader, Tabs, Tab } from 'react-bootstrap';
 import Customer from './Customer';
 import SubscriptionsList from './SubscriptionsList';
+import Subscription from './Subscription';
 
 class CustomerSetup extends Component {
   constructor(props) {
@@ -45,8 +46,18 @@ class CustomerSetup extends Component {
           }) }
         ]
       };
+      const plans_params = {
+        api: "find",
+        params: [
+          { collection: "plans" },
+          { query: JSON.stringify({
+            to: { "$gt": moment().toISOString() }
+          }) }
+        ]
+      };
       this.props.dispatch(getEntity('customer', customer_params));
       this.props.dispatch(getList('subscriptions', subscriptions_params));
+      this.props.dispatch(getList('plans', plans_params));
     }
     this.props.dispatch(getSettings('subscribers'));
   }
@@ -116,15 +127,17 @@ class CustomerSetup extends Component {
   }
 
   render() {
-    const { customer, subscriptions, settings } = this.props;
+    const { customer, subscriptions, settings, plans } = this.props;
+    const { action } = this.props.location.query;
 
     const tabs = [(<Tab title="Customer Details" eventKey={1} key={1}>
   <div className="panel panel-default">
     <div className="panel-body">
       <Customer customer={customer}
+                action={action}
                 settings={settings.getIn(['account', 'fields'])}
                 onChange={this.onChangeCustomerField} />
-      <button type="button"
+      <button type="submit"
               className="btn btn-primary"
               onClick={this.onSaveCustomer}
               style={{marginRight: 10}}>
@@ -139,7 +152,7 @@ class CustomerSetup extends Component {
   </div>
     </Tab>)
     ];
-    if (this.props.location.query.action === "update") {
+    if (action === "update") {
       tabs.push((
         <Tab title="Subscriptions" eventKey={2} key={2}>
           <div className="panel panel-default">
@@ -179,7 +192,8 @@ function mapStateToProps(state) {
   return {
     customer: state.entity.get('customer') || Immutable.Map(),
     subscriptions: state.list.get('subscriptions') || Immutable.List(),
-    settings: state.settings.get('subscribers') || Immutable.List()
+    settings: state.settings.get('subscribers') || Immutable.List(),
+    plans: state.list.get('plans') || Immutable.List()
   };
 }
 

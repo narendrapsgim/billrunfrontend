@@ -7,7 +7,7 @@ export default class Customer extends Component {
   }
 
   render() {
-    const { customer, onChange, settings } = this.props;
+    const { customer, onChange, settings, action } = this.props;
 
     const fields = settings.filter(field => {
                               return field.get('display') !== false &&
@@ -34,16 +34,25 @@ export default class Customer extends Component {
           </div>
         </div>
 
-        <div className="row" style={{marginBottom: 15}}>
-          <div className="col-lg-6">
-            <Link to={`/usages?aid=${customer.get('aid')}`}>
-              <button type="button" role="button" className="btn btn-default">
-                See Usage
-              </button>
-            </Link>
+      {(() => {
+        if (action === "new") return (null);
+        return (
+          <div className="row" style={{marginBottom: 15}}>
+            <div className="col-lg-6">
+              <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>
+                <button type="button" role="button" className="btn btn-outline btn-default" style={{marginRight: 10}}>
+                  Usage
+                </button>
+              </Link>
+              <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>
+                <button type="button" role="button" className="btn btn-outline btn-default">
+                  Invoices
+                </button>
+              </Link>
+            </div>
           </div>
-        </div>
-
+        );
+      })()}
       </div>
     );
   }

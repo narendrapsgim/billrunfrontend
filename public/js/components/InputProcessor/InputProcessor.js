@@ -5,7 +5,7 @@ import { PageHeader } from 'react-bootstrap';
 
 import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
-import { showSuccess } from '../../actions/alertsActions';
+import { showSuccess, showWarning, showDanger } from '../../actions/alertsActions';
 
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -101,13 +101,13 @@ class InputProcessor extends Component {
 
   onAddField(val, e) {
     if (!val || _.isEmpty(val.replace(/ /g, ''))) {
-      this.props.dispatch(showStatusMessage("Please input field name", 'error'));
+      this.props.dispatch(showWarning("Please input field name"));
       return;
     };
     const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();
     const fields = this.props.settings.get('fields');
     if (fields.includes(value)) {
-      this.props.dispatch(showStatusMessage("Field already exists", "error"));
+      this.props.dispatch(showWarning("Field already exists"));
       return;
     }
     this.props.dispatch(addCSVField(value));
@@ -182,7 +182,7 @@ class InputProcessor extends Component {
   }
 
   onError(message) {
-    this.props.dispatch(showStatusMessage(message, 'error'));
+    this.props.dispatch(showDanger(message));
   }
 
   goBack() {
@@ -231,7 +231,7 @@ class InputProcessor extends Component {
       } else {
         const cb = (err) => {
           if (err) {
-            dispatch(showStatusMessage("Please try again", "error"));
+            dispatch(showDanger("Please try again"));
             return;
           }
           dispatch(clearInputProcessor());
@@ -292,7 +292,7 @@ class InputProcessor extends Component {
                 {(() => {
                    if (stepIndex > 0) {
                      return (
-                       <button className="btn"
+                       <button className="btn btn-default"
                                onClick={this.handlePrev}
                                style={{marginRight: 12}}>
                          Back

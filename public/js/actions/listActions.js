@@ -1,5 +1,5 @@
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
-import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
+import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
   GOT_LIST: 'GOT_LIST',

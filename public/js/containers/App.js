@@ -46,7 +46,7 @@ class App extends Component {
 
   renderWithLayout(){
     return (
-      <div id="wrapper">
+      <div id="wrapper" style={{height: "100%"}}>
         <ProgressIndicator />
         <Alerts />
         <Navigator />
