@@ -117,6 +117,9 @@ class Navigator extends Component {
                        <li>
 			 <Link to="/input_processors">Input Processors</Link>
                        </li>
+		       <li>
+			 <Link to="/payment_gateways">Payment Gateways</Link>
+		       </li>
                      </ul>
 		   </li>
 		 </ul>
