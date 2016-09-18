@@ -39,7 +39,7 @@ export default class Field extends Component {
       case 'number':
         return (<Number onChange={onChange} ref={id} id={id} value={value} editable={editable} />);
       case 'price':
-        return (<Price onChange={onChange} id={id} value={value}  editable={editable} />);
+        return (<Price onChange={onChange} id={id} value={value} editable={editable} />);
       case 'date':
         return (<Date onChange={onChange} id={id} value={value} editable={editable} />);
       case 'address':
