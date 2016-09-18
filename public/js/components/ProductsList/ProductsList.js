@@ -20,11 +20,14 @@ class ProductsList extends Component {
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onNewProduct = this.onNewProduct.bind(this);
     this.onClickProduct = this.onClickProduct.bind(this);
+
+    this.onSort = this.onSort.bind(this);
     this.onFilter = this.onFilter.bind(this);
 
     this.state = {
       page: 0,
       size: 10,
+      sort: '',
       filter: {}
     };
   }
@@ -36,6 +39,7 @@ class ProductsList extends Component {
         { collection: "rates" },
         { size: this.state.size },
         { page: this.state.page },
+	{ sort: this.state.sort },
         { query: this.state.filter }
       ]
     };
@@ -72,6 +76,12 @@ class ProductsList extends Component {
     });
   }
 
+  onSort(sort) {
+    this.setState({sort}, () => {
+      this.props.dispatch(getList('products', this.buildQuery()))
+    });
+  }
+
   render() {
     const { products } = this.props;
 
@@ -85,7 +95,7 @@ class ProductsList extends Component {
     ];
 
     const tableFields = [
-      {id: 'key', title: 'Name'},
+      {id: 'key', title: 'Name', sort: true},
       {id: 'unit_type', title: 'Unit Type', parser: unit_type_by_parser},
       {id: 'code', title: "Code"},
       {id: 'description', title: "Description"},
@@ -110,7 +120,7 @@ class ProductsList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={{ to: {$gt: moment().toISOString()}}} />
-                <List items={ products } fields={ tableFields } edit={true} onClickEdit={ this.onClickProduct } />
+                <List items={ products } fields={ tableFields } edit={ true } onClickEdit={ this.onClickProduct } onSort={ this.onSort } />
               </div>
             </div>
           </div>

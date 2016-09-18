@@ -71,3 +71,7 @@
     border: 0;
     border-top: 1px solid #c3c3c3;
 }
+
+th > .sort-indicator {
+    margin-left: 5px;
+}

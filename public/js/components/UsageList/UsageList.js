@@ -17,22 +17,25 @@ class UsageList extends Component {
     this.buildQuery = this.buildQuery.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onFilter = this.onFilter.bind(this);
+    this.onSort = this.onSort.bind(this);
     
     this.state = {
       page: 0,
       size: 10,
+      sort: '',
       filter: ""
     };
   }
 
   buildQuery() {
-    const { page, size, filter } = this.state;
+    const { page, size, sort, filter } = this.state;
     return {
       api: "find",
       params: [
         { collection: "lines" },
         { size },
         { page },
+	{ sort },
         { query: filter }
       ]
     };
@@ -47,6 +50,12 @@ class UsageList extends Component {
   handlePageClick(page) {
     this.setState({page}, () => {
       this.props.dispatch(getList('usages', this.buildQuery()))
+    });
+  }
+
+  onSort(sort) {
+    this.setState({sort}, () => {
+      this.props.dispatch(getList('usages', this.buildQuery()));
     });
   }
 
@@ -74,7 +83,7 @@ class UsageList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={base} />
-                <List items={usages} fields={fields} />
+                <List items={usages} fields={fields} onSort={this.onSort} />
               </div>
             </div>
           </div>
