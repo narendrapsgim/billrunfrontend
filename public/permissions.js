@@ -7,7 +7,7 @@ export const permissions = Immutable.fromJS({
   plans: {
     view: ["admin"]
   },
-  plan_setup: {
+  plan: {
     view: ["read"],
     save: ["write"],
     update: ["write"]

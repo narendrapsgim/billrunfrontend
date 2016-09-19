@@ -1,108 +1,59 @@
 export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
-export const UPDATE_PLAN_RECURRING_PRICE_VALUE = 'UPDATE_PLAN_RECURRING_PRICE_VALUE';
 export const ADD_TARIFF = 'ADD_TARIFF';
+export const REMOVE_TARIFF = 'REMOVE_TARIFF';
+export const UPDATE_PLAN_CYCLE = 'UPDATE_PLAN_CYCLE';
+export const UPDATE_PLAN_PRICE = 'UPDATE_PLAN_PRICE';
+
+export const SAVE_PLAN = 'SAVE_PLAN';
 export const GET_PLAN = 'GET_PLAN';
 export const GOT_PLAN = 'GOT_PLAN';
 export const CLEAR_PLAN = 'CLEAR_PLAN';
-export const GET_PRODUCT = 'GET_PRODUCT';
-export const SAVE_PLAN = 'SAVE_PLAN';
-export const REMOVE_RECURRING_PRICE = 'REMOVE_RECURRING_PRICE';
+
 export const REMOVE_INCLUDE = 'REMOVE_INCLUDE';
 export const ADD_INCLUDE = 'ADD_INCLUDE';
 export const CHNAGE_INCLUDE = 'CHNAGE_INCLUDE';
 
-import axios from 'axios';
 import moment from 'moment';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 import { showDanger, showSuccess } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 
-let axiosInstance = axios.create({
-  withCredentials: true,
-  baseURL: globalSetting.serverUrl
-});
 
-function buildPlanFromState(state) {
-  let basic_settings = state.toJS();
-  let prices = [];
-
-  let { TrialPrice, TrialCycle } = basic_settings;
-  if (TrialPrice && TrialCycle) {
-    let trial_from = moment().format();
-    let trial = {
-      trial: true,
-      price: parseInt(TrialPrice, 10),
-      Cycle: TrialCycle,
-      TrialCycle,
-      from: 0,
-      to: parseInt(TrialCycle, 10)
-    };
-    prices.push(trial);
-  }
-
-  let p = _.reduce(basic_settings.recurring_prices, (acc, price, idx) => {
-    if (!price.PeriodicalRate) return acc;
-
-    let from = 0;
-    if (acc.length && acc.length > idx) {
-      from = acc[idx]['to'];
-    } else if (idx > 0) {
-      from = acc[idx - 1]['to']
-    }
-    let to = basic_settings.recurring_prices.length === idx+1 ? 999999999 : from + parseInt(price.Cycle, 10);
-    acc.push({
-      price: parseInt(price.PeriodicalRate, 10),
-      Cycle: price.Cycle,
-      from,
-      to
-    });
-    return acc;
-  }, prices);
-
-  return {
-    id: basic_settings.id,
-    name: basic_settings.PlanName,
-    price: prices,
-    from: moment().format(),
-    to: moment().add(100, 'years').format(),
-    description: basic_settings.PlanDescription,
-    PlanCode: basic_settings.PlanCode,
-    upfront: basic_settings.ChargingMode === "upfront",
-    recurrence: {
-      unit: 1,//parseInt(basic_settings.Each, 10),
-      periodicity: basic_settings.EachPeriod.toLowerCase()
-    },
-    include: basic_settings.include
-  };
-}
-
-export function updatePlanField(field_name, field_value) {
+export function onPlanFieldUpdate(path, value) {
   return {
     type: UPDATE_PLAN_FIELD_VALUE,
-    field_name,
-    field_value
+    path,
+    value
   };
 }
 
-export function updatePlanRecurringPriceField(field_name, field_idx, field_value) {
+export function onPlanCycleUpdate(index, value) {
   return {
-    type: UPDATE_PLAN_RECURRING_PRICE_VALUE,
-    field_name,
-    field_idx,
-    field_value
+    type: UPDATE_PLAN_CYCLE,
+    index,
+    value,
   };
 }
 
-export function addTariff() {
+export function onPlanPriceUpdate(index, value) {
   return {
-    type: ADD_TARIFF
+    type: UPDATE_PLAN_PRICE,
+    index,
+    value,
   };
 }
 
-export function removeRecurringPrice(idx) {
+export function onPlanTariffAdd(trial) {
   return {
-    type: REMOVE_RECURRING_PRICE,
-    idx
+    type: ADD_TARIFF,
+    trial
+  };
+}
+
+export function onPlanTariffRemove(index) {
+  return {
+    type: REMOVE_TARIFF,
+    index
   };
 }
 
@@ -132,64 +83,6 @@ export function changePlanInclude(groupName, usaget, value) {
   };
 }
 
-function gotPlan(plan) {
-  return {
-    type: GOT_PLAN,
-    plan
-  };
-}
-
-function fetchPlan(plan_id) {
-  const convert = (plan) => {
-    let Trial = {TrialPrice: undefined, TrialCycle: undefined};
-    if (plan.price[0].trial) {
-      Trial.TrialPrice = parseFloat(plan.price[0].price);
-      Trial.TrialCycle = parseInt(plan.price[0].Cycle, 10);
-    }
-    const recurring_prices = _.reduce(plan.price, (acc, price) => {
-      if (!price.trial) {
-        acc.push({
-          PeriodicalRate: price.price,
-          Cycle: price.Cycle
-        });
-      }
-      return acc;
-    }, []);
-    return {
-      id: plan._id.$id,
-      PlanDescription: plan.description,
-      PlanCode: plan.PlanCode,
-      PlanName: plan.name,
-      to: moment(plan.to).unix() * 1000,
-      from: moment(plan.from).unix() * 1000,
-      EachPeriod: _.capitalize(plan.recurrence.periodicity),
-      ChargingMode: (plan.upfront ? "upfront" : "arrears"),
-      Each: plan.recurrence.unit,
-        ...Trial,
-      recurring_prices,
-      include: plan.include
-    };
-  };
-
-  let fetchUrl = `/api/find?collection=plans&query={"_id": {"$in": ["${plan_id}"]}}`;
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    let request = axiosInstance.get(fetchUrl).then(
-      resp => {
-        let p = _.values(resp.data.details)[0];
-        dispatch(gotPlan(convert(p)));
-        dispatch(finishProgressIndicator());
-      }
-    ).catch(error => {
-      console.log(error);
-      if (error.data)
-        dispatch(showDanger(error.data.message));
-      dispatch(finishProgressIndicator());
-    });
-  };
-}
-
-
 export function getPlan(plan_id) {
   return dispatch => {
     return dispatch(fetchPlan(plan_id));
@@ -202,11 +95,18 @@ export function clearPlan() {
   };
 }
 
+export function savePlan(plan, action, callback = () => {}) {
+  return dispatch => {
+    return dispatch(savePlanToDB(plan, action, callback));
+  };
+}
+
+/* Internal function */
 function savePlanToDB(plan, action, callback) {
-  const type = action !== 'new' ? "close_and_new" : action;
+  const type = action !== 'new' ? "update" : action;
   const formData = new FormData();
   if (action !== 'new') {
-    formData.append('id', plan.id);
+    formData.append('id', plan.getIn(['_id','$id']));
   }
   formData.append("coll", 'plans');
   formData.append("type", type);
@@ -214,7 +114,6 @@ function savePlanToDB(plan, action, callback) {
 
   const query = [{
     api: "save",
-    name: "plan",
     options: {
       method: "POST",
       body: formData
@@ -227,13 +126,13 @@ function savePlanToDB(plan, action, callback) {
       success => {
         dispatch(showSuccess("Plan saved successfully"));
         dispatch(finishProgressIndicator());
-        callback(false);
+        callback(success);
       },
       failure => {
-        let errorMessages = failure.error.map( (response) => `${response.name}: ${response.error.message}`);
+        let errorMessages = failure.error.map( (response) => response.error.message);
         dispatch(showDanger(errorMessages));
         dispatch(finishProgressIndicator());
-        callback(true);
+        callback(failure);
       }
     ).catch(
       error => { dispatch(apiBillRunErrorHandler(error)); }
@@ -241,10 +140,39 @@ function savePlanToDB(plan, action, callback) {
   };
 }
 
-export function savePlan(plan, action, callback = () => {}) {
-  console.log(plan);
-  const conv = buildPlanFromState(plan);
-  return dispatch => {
-    return dispatch(savePlanToDB(conv, action, callback));
+function gotPlan(plan) {
+  return {
+    type: GOT_PLAN,
+    plan
+  };
+}
+
+function fetchPlan(plan_id) {
+  const query = {
+    api: "find",
+    params: [
+      { collection: "plans" },
+      { size: "1" },
+      { page: "0" },
+      { query: JSON.stringify(
+        {"_id" :  {"$in": [plan_id]}}
+      )},
+    ]
+  };
+
+  return (dispatch) => {
+    dispatch(startProgressIndicator());
+    apiBillRun(query).then(
+      resp => {
+        let plan = _.values(resp.data[0].data.details)[0]
+        dispatch(gotPlan(plan));
+        dispatch(finishProgressIndicator());
+      }
+    ).catch(error => {
+      if (error.data){
+        dispatch(showDanger(error.data.message));
+      }
+      dispatch(finishProgressIndicator());
+    });
   };
 }

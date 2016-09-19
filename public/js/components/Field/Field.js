@@ -10,6 +10,7 @@ import Date  from '../FieldTypes/Date';
 import Address from '../FieldTypes/Address';
 import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
+import Unlimitd from '../FieldTypes/UnlimitedInput';
 
 export default class Field extends Component {
   constructor(props) {
@@ -25,7 +26,7 @@ export default class Field extends Component {
       return FieldSettings[c][i];
     return FieldSettings[i];
   }
-  
+
   createInput() {
     let { onChange,
           id,
@@ -47,11 +48,13 @@ export default class Field extends Component {
         return (<Address onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'textarea':
         return (<TextArea onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+      case 'unlimited':
+        return (<Unlimitd onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} {...this.props} />);
       default:
         return (<Text onChange={onChange} id={id} value={value} editable={editable} required={required} disabled={disabled} />);
     }
   }
-  
+
   render() {
     return (
       <div>

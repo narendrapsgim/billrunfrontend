@@ -2,27 +2,12 @@ import * as actions from '../actions/planActions';
 import moment from 'moment';
 import Immutable from 'immutable';
 
-const defaultState = Immutable.fromJS({
-  PlanName: '',
-  PlanCode: '',
-  PlanDescription: '',
-  TrialCycle: '',
-  TrialPrice: '',
-  Each: '',
-  EachPeriod: "Month",
-  ChargingMode: "upfront",
-  from: moment().unix() * 1000,
-  to: moment().add(10, 'years').unix() * 1000,
-  recurring_prices: [
-    {
-      Cycle: '',
-      PeriodicalRate: '',
-      EndOfDays: true
-    }
-  ],
-  From: '',
-  To: '',
-  include: {}
+const PLAN_CYCLE_UNLIMITED = globalSetting.planCycleUnlimitedValue;
+const defaultState = Immutable.Map();
+const defaultTariff = Immutable.Map({
+  price: '',
+  from: '',
+  to: PLAN_CYCLE_UNLIMITED
 });
 
 export default function (state = defaultState, action) {
@@ -35,27 +20,43 @@ export default function (state = defaultState, action) {
       return state.setIn(['include', 'groups', action.groupName, action.usaget], action.value);
 
     case actions.CHNAGE_INCLUDE:
-      return state.updateIn(['include', 'groups', action.groupName, action.usaget], (value) => action.value);
+      return state.updateIn(['include', 'groups', action.groupName, action.usaget], value => action.value);
+
 
     case actions.UPDATE_PLAN_FIELD_VALUE:
-      return state.set(action.field_name, action.field_value);
+      return state.updateIn(action.path, value => action.value);
 
-    case actions.UPDATE_PLAN_RECURRING_PRICE_VALUE:
-      return state.setIn(['recurring_prices', field_idx, field_name], field_value);
+    case actions.UPDATE_PLAN_CYCLE:
+      return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, action.value));
+
+    case actions.UPDATE_PLAN_PRICE:
+      return state.updateIn(['price', action.index], item => item.set('price', action.value));
 
     case actions.ADD_TARIFF:
-      let new_tariff = Immutable.fromJS({
-        Cycle: '',
-        PeriodicalRate: '',
-        EndOfDays: true
-      });
-      let s = state.get('recurring_prices').size - 1;
-      return state
-                  .setIn(['recurring_prices', s, 'EndOfDays'], false)
-                  .update('recurring_prices', list => list.push(new_tariff));
+      // if trail add to head
+      if(action.trial){
+        let trial = defaultTariff.set('trial', true).set('to', '').set('from', 0);
+        return state.updateIn(['price'], list => list.unshift(trial));
+      }
+      //Clear current last item Unlimited value if it unlimited
+      var size = state.get('price').size;
+      if(size > 0 && state.getIn(['price', size-1, 'to']) === PLAN_CYCLE_UNLIMITED){
+        state = state.updateIn(['price', size-1], item => item.set('to',''));
+      }
+      var lastTo = size > 0 ? parseInt(state.getIn(['price', size-1, 'to']) || 0) : 0;
+      var newTariff = defaultTariff.set('from', lastTo);
+      return state.update('price', list =>  list.push(newTariff));
 
-    case actions.REMOVE_RECURRING_PRICE:
-      return state.update('recurring_prices', list => list.delete(action.idx));
+    case actions.REMOVE_TARIFF:
+      //Set new last item value to unlimited
+      // var size = state.get('price').size;
+      // if(size > 1){
+      //   state = state.updateIn(['price', (size - 2)], item => item.set('to', PLAN_CYCLE_UNLIMITED));
+      // }
+      state = state.update('price', list => list.delete(action.index));
+      //recaluculate cycle
+      return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, 0));
+
 
     case actions.GOT_PLAN:
       return Immutable.fromJS(action.plan);
@@ -66,4 +67,29 @@ export default function (state = defaultState, action) {
     default:
       return state;
   }
+}
+
+function _reaclculateCycles(prices, index, value){
+  return prices.reduce( (newList, price, i, iter) => {
+    if(i == index){
+      if(value === PLAN_CYCLE_UNLIMITED){
+        price = price.set('to', value);
+      } else {
+        price = price.set('to', parseInt(price.get('from')) + parseInt(value));
+      }
+      if(index === 0){
+         price = price.set('from', 0);
+      }
+      return newList.push(price);
+    } else if(i > index){
+      var diff = parseInt(price.get('to') || 0) - parseInt(price.get('from') || 0);
+      var prevTo = parseInt(newList.last().get('to') || 0);
+      price = price.set('from', prevTo);
+      if( price.get('to') !== PLAN_CYCLE_UNLIMITED ){
+        price = price.set('to', prevTo + diff)
+      }
+      return newList.push(price);
+    }
+    return newList.push(price);
+  }, Immutable.List());
 }

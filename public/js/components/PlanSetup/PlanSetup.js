@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { browserHistory } from 'react-router';
 import { Row, Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 
-import { updatePlanField,
-  updatePlanRecurringPriceField,
-  getPlan,
+import {
   clearPlan,
+  getPlan,
   savePlan,
-  addTariff,
-  removeRecurringPrice } from '../../actions/planActions';
-import { getInputProcessors } from '../../actions/inputProcessorActions';
+  onPlanCycleUpdate,
+  onPlanPriceUpdate,
+  onPlanTariffAdd,
+  onPlanTariffRemove,
+  onPlanFieldUpdate } from '../../actions/planActions';
 import { savePlanRates } from '../../actions/planProductsActions';
 
 import Plan from './Plan';
@@ -18,82 +20,57 @@ import PlanProductsPriceTab from './PlanProductsPriceTab';
 import PlanIncludesTab from './PlanIncludesTab';
 
 class PlanSetup extends Component {
-  constructor(props) {
-    super(props);
-    this.onChangeFieldValue = this.onChangeFieldValue.bind(this);
-    this.handleBack = this.handleBack.bind(this);
-
-    this.onAddTariff = this.onAddTariff.bind(this);
-    this.onChangeRecurringPriceFieldValue = this.onChangeRecurringPriceFieldValue.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-    this.onChangeDateFieldValue = this.onChangeDateFieldValue.bind(this);
-    this.onRemoveRecurringPrice = this.onRemoveRecurringPrice.bind(this);
-
-    this.state = {
-      stepIndex: 0,
-      finished: 0
-    };
-  }
 
   componentWillMount() {
-    let { plan_id } = this.props.location.query;
-    if (plan_id) {
-      this.props.dispatch(getPlan(plan_id));
+    let { planId } = this.props.location.query;
+    if (planId) {
+      this.props.getPlan(planId);
     }
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearPlan());
+    this.props.clearPlan();
   }
 
-  onChangeFieldValue(e) {
-    const { value, id, checked, type } = e.target;
-    const { dispatch } = this.props;
-    type === "checkbox" ?
-                         dispatch(updatePlanField(id, checked)) :
-                         dispatch(updatePlanField(id, value));
+  onChangeFieldValue = (path, value) => {
+    this.props.onPlanFieldUpdate(path, value)
   }
 
-  onChangeRecurringPriceFieldValue(id, idx, e, val) {
-    let value = val ? val : e.target.value;
-    const { checked, type } = e.target;
-    const { dispatch } = this.props;
-    type === "checkbox" ?
-                         dispatch(updatePlanRecurringPriceField(id, idx, checked)) :
-                         dispatch(updatePlanRecurringPriceField(id, idx, value));
+  onPlanCycleUpdate = (index, value) => {
+    this.props.onPlanCycleUpdate(index, value);
   }
 
-  onAddTariff(e) {
-    e.preventDefault();
-    this.props.dispatch(addTariff());
+  onPlanPriceUpdate = (index, value) => {
+    this.props.onPlanPriceUpdate(index, value);
   }
 
-  onRemoveRecurringPrice(idx, e) {
-    this.props.dispatch(removeRecurringPrice(idx));
+  onPlanTariffAdd = (trail) => {
+    this.props.onPlanTariffAdd(trail);
   }
 
-  onChangeDateFieldValue(id, value) {
-    this.props.dispatch(updatePlanField(id, value));
+  onPlanTariffRemove = (index) => {
+    this.props.onPlanTariffRemove(index);
   }
 
-  handleSave() {
-    const { plan, dispatch } = this.props;
+  handleSave = () => {
+    const { plan } = this.props;
     const { action } = this.props.location.query;
-    dispatch(savePlan(this.props.plan, action));
-    this.props.dispatch(savePlanRates());
+    console.log(this.props.plan.toJS());
+    this.props.savePlan(plan, action, (res) => {console.log(res)});
+    //this.props.dispatch(savePlanRates());
     //browserHistory.goBack();
   }
 
-  handleBack() {
+  handleBack = () => {
     browserHistory.goBack();
   }
 
   render() {
     const { plan, validator } = this.props;
     const { action } = this.props.location.query;
-    const planName = plan.get('PlanName');
+    const planName = plan.get('name');
     //in update mode wait for plan before render edit screen
-    if(action === 'update' && typeof plan.get('id') === 'undefined'){
+    if(action === 'update' && typeof plan.getIn(['_id', '$id']) === 'undefined'){
       return <div>Loading...</div>
     }
 
@@ -101,8 +78,15 @@ class PlanSetup extends Component {
       <Col lg={12}>
         <Tabs defaultActiveKey={1} animation={false} id="SettingsTab" onSelect={this.onSelectTab}>
           <Tab title="Billing Plan" eventKey={1}>
-            <Panel header={'Basic Settings'}>
-              <Plan onChangeFieldValue={this.onChangeFieldValue} onChangeDateFieldValue={this.onChangeDateFieldValue} onChangeRecurringPriceFieldValue={this.onChangeRecurringPriceFieldValue} onAddTariff={this.onAddTariff} onRemoveRecurringPrice={this.onRemoveRecurringPrice} validator={validator} plan={plan} mode={action}/>
+            <Panel>
+              <Plan plan={plan} mode={action}
+                onChangeFieldValue={this.onChangeFieldValue}
+                onPlanCycleUpdate={this.onPlanCycleUpdate}
+                onPlanPriceUpdate={this.onPlanPriceUpdate}
+                onPlanTariffAdd={this.onPlanTariffAdd}
+                onPlanTariffRemove={this.onPlanTariffRemove}
+                validator={validator}
+              />
             </Panel>
           </Tab>
           {/*
@@ -118,7 +102,7 @@ class PlanSetup extends Component {
           </Tab>
           */}
         </Tabs>
-        <div style={{marginTop: 12, float: "right"}}>
+        <div style={{marginTop: 12}}>
           <Button onClick={this.handleBack} bsStyle="link" style={{marginRight: 12}} >Cancel</Button>
           <Button onClick={this.handleSave} bsStyle="primary">Save</Button>
         </div>
@@ -127,11 +111,22 @@ class PlanSetup extends Component {
   }
 }
 
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    onPlanCycleUpdate,
+    onPlanPriceUpdate,
+    onPlanTariffAdd,
+    onPlanTariffRemove,
+    onPlanFieldUpdate,
+    clearPlan,
+    savePlan,
+    getPlan }, dispatch);
+}
 function mapStateToProps(state, props) {
   return  {
     plan: state.plan,
     validator: state.validator
   };
 }
-
-export default connect(mapStateToProps)(PlanSetup);
+export default connect(mapStateToProps, mapDispatchToProps)(PlanSetup);
