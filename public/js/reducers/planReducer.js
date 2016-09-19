@@ -36,16 +36,26 @@ export default function (state = defaultState, action) {
       // if trail add to head
       if(action.trial){
         let trial = defaultTariff.set('trial', true).set('to', '').set('from', 0);
-        return state.updateIn(['price'], list => list.unshift(trial));
+        return state.updateIn(['price'], list => {
+          if(typeof list === 'undefined'){
+            list = Immutable.List();
+          }
+          return list.unshift(trial)
+        });
       }
       //Clear current last item Unlimited value if it unlimited
-      var size = state.get('price').size;
+      var size = state.get('price', Immutable.List()).size;
       if(size > 0 && state.getIn(['price', size-1, 'to']) === PLAN_CYCLE_UNLIMITED){
         state = state.updateIn(['price', size-1], item => item.set('to',''));
       }
       var lastTo = size > 0 ? parseInt(state.getIn(['price', size-1, 'to']) || 0) : 0;
       var newTariff = defaultTariff.set('from', lastTo);
-      return state.update('price', list =>  list.push(newTariff));
+      return state.update('price', list => {
+        if(typeof list === 'undefined'){
+          list = Immutable.List();
+        }
+        return list.push(newTariff)
+      });
 
     case actions.REMOVE_TARIFF:
       //Set new last item value to unlimited

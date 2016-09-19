@@ -58,7 +58,7 @@ export default class Plan extends Component {
     const { plan } = this.props;
     const count = plan.get('price', Immutable.List()).size;
     const prices = [];
-    plan.get('price').forEach( (price, i) => {
+    plan.get('price', Immutable.List()).forEach( (price, i) => {
       if (price.get('trial') !== true){
         prices.push(
           <PlanPrice key={i}
@@ -114,7 +114,7 @@ export default class Plan extends Component {
   render() {
     let { plan, validator, mode } = this.props;
     const periodicity = plan.getIn(['recurrence', 'periodicity']) || '';
-    const upfront = typeof plan.get('upfront') !== 'boolean' ? true : plan.get('upfront');
+    const upfront = typeof plan.get('upfront') !== 'boolean' ? '' : plan.get('upfront');
 
     return (
       <Row>
@@ -153,6 +153,7 @@ export default class Plan extends Component {
                 <Col lg={4}>
                 <ControlLabel>Charging Mode</ControlLabel>
                 <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
+                  <option value="">Select...</option>
                   <option value={true}>Upfront</option>
                   <option value={false}>Arrears</option>
                 </FormControl>
