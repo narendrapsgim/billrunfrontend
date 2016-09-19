@@ -54,9 +54,11 @@ class UsageList extends Component {
     const { usages } = this.props;
 
     const fields = [
+      {id: "type", placeholder: "Type"},
       {id: "aid", placeholder: "Customer ID", type: "number"},
       {id: "sid", placeholder: "Subscription ID", type: "number"},
-      {id: "plan", placeholder: "Plan"}
+      {id: "plan", placeholder: "Plan"},
+      {id: "urt", placeholder: "Time", type: "datetime"}
     ];
 
     const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
