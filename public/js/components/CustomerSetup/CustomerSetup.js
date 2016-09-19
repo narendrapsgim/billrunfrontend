@@ -107,12 +107,14 @@ class CustomerSetup extends Component {
         }
       },
       failure => {
-        let errorMessages = failure.error.map( (response) => response.error.desc );
-        dispatch(showDanger("Network error - could not retrieve customer! Please try again"));
-        console.log(errorMessages);
+        dispatch(showDanger(`Error - ${failure.error[0].error.desc}`));
+        console.log(failure);
       }
     ).catch(
-      error => dispatch(apiBillRunErrorHandler(error))
+      error => {
+	dispatch(showDanger("Network error - please try again"));
+	dispatch(apiBillRunErrorHandler(error));
+      }
     );
   }
   

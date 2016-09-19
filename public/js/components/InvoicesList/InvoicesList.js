@@ -84,6 +84,7 @@ class InvoicesList extends Component {
       { id: "due_date", title: "Due" },
       { id: "amount", title: "Amount" },
       { id: "paid_by", title: "Status", parser: paid_by_parser },
+      { id: "billrun_key", title: "Cycle" },
       { id: "aid", title: "Customer ID" },
       { title: "Download", parser: download_parser }
     ];
