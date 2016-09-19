@@ -29,11 +29,20 @@ function gotList(collection, list) {
 }
 
 function fetchList(collection, params) {
+  const dummy_gateways = [
+    {name: "paypal", image_url: "", params: ["user", "password"]},
+    {name: "credit guard", image_url: "", params: ["token"]}
+  ];
+
   return (dispatch) => {
     dispatch(startProgressIndicator());
+    dispatch(finishProgressIndicator());
+    if (collection === 'supported_gateways') {
+      dispatch(gotList(collection, dummy_gateways));
+      return;
+    }    
     apiBillRun(params).then(
       success => {
-        dispatch(finishProgressIndicator());
         dispatch(gotList(collection, success.data[0].data.details));
       },
       failure => {

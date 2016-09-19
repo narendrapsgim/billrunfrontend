@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
+import { getList } from '../../actions/listActions';
 import Immutable from 'immutable';
 
 import { PageHeader } from 'react-bootstrap';
@@ -10,6 +11,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 
 import DateTime from './DateTime';
 import CurrencyTax from './CurrencyTax';
+import PaymentGateways from './PaymentGateways';
 
 import InputProcessorsList from '../InputProcessorsList';
 import InputProcessor from '../InputProcessor';
@@ -49,7 +51,8 @@ class Settings extends Component {
 
   componentWillMount() {
     const { dispatch } = this.props;
-    dispatch(getSettings(["pricing", "billrun"]));
+    dispatch(getSettings(["pricing", "billrun", "payment_gateways"]));
+    dispatch(getList("supported_gateways", {api: "supportedgateways"}));
   }
   
   onChangeCollection(e) {
@@ -95,10 +98,12 @@ class Settings extends Component {
   }
   
   render() {
-    let { settings } = this.props;
+    let { settings, supported_gateways } = this.props;
+    
     let collection = settings.get('collection') || Immutable.Map();
     let datetime = settings.get('billrun') || Immutable.Map();
     let currency_tax = settings.get('pricing') || Immutable.Map();
+    let payment_gateways = settings.get('payment_gateways') || Immutable.Map();
     const { processor_selected } = this.state;
     const inputProcessorView = (processor_selected ? <InputProcessor fileType={processor_selected} onCancel={this.onCancelInputProcessorEdit} /> : <InputProcessorsList onSelectInputProcessor={this.onSelectInputProcessor} />);
 
@@ -110,6 +115,10 @@ class Settings extends Component {
       pricing: {
         component: (<CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />),
         title: "Currency and Tax"
+      },
+      payment_gateways: {
+	component: (<PaymentGateways onChange={this.onChangePaymentGateways} data={payment_gateways} gateways={supported_gateways} />),
+	title: "Payment Gateways"
       }
     };
     const currentView = views[this.props.location.query.setting].component;
@@ -140,7 +149,10 @@ class Settings extends Component {
 }
 
 function mapStateToProps(state, props) {
-  return {settings: state.settings};
+  return {
+    settings: state.settings,
+    supported_gateways: state.list.get('supported_gateways') || Immutable.List()
+  };
 }
 
 export default connect(mapStateToProps)(Settings);

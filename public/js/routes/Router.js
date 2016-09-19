@@ -29,7 +29,6 @@ export default () => {
       <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
       <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>
       <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors"/>
-      <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
       <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
       <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
       <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
