@@ -62,7 +62,8 @@ export default class List extends Component {
       items,
       fields,
       onClickEdit = () => {},
-      edit = false
+      edit = false,
+      editText = "edit"
     } = this.props;
 
     const table_header = fields.map((field, key) => {
@@ -84,7 +85,7 @@ export default class List extends Component {
                            { this.buildRow(entity, fields) }
                            {(() => {
                               if (edit)
-                                return (<td><button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>edit</button></td>);
+                                return (<td><button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>{ editText }</button></td>);
                             })()}
                          </tr>
                        ));
