@@ -93,7 +93,8 @@ export default class Plan extends Component {
   }
 
   onChangePlanEach = (e) => {
-    const { value } = e.target;
+    let value = parseInt(e.target.value);
+    value = isNaN(value) ? '' : value;
     this.props.onChangeFieldValue(['recurrence', 'unit'], value);
   }
 
