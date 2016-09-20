@@ -1,9 +1,20 @@
 var outputDiv = document.getElementById("output");
 
+/* Settings */
+var accountsAmount = 10;
+var subscribersAmount = 1000;
+var plans = [
+  'Plan A',
+  'Plan D',
+  'Plan C',
+  'Plan D',
+  'Plan E',
+];
+/* ~Settings */
+
 var accounts = [];
 var bills = [];
 var lines = [];
-var sid = 1;
 
 
 function randomDate(start, end) {
@@ -17,13 +28,6 @@ function replaceDate(stringifyJson) {
 }
 
 function getRandomPlanName() {
-  var plans = [
-    'Plan A',
-    'Plan D',
-    'Plan C',
-    'Plan D',
-    'Plan E',
-  ];
   var randomPlanIndex = chance.integer({min: 0, max: 4});
   return plans[randomPlanIndex];
 }
@@ -53,42 +57,51 @@ function saveFile(data, filename) {
 
 function generateDemoData() {
 
-  for (var x = 0; x < 10; x++) {
-    var month = (x%11) + 1;
-    var accountCreationDate = moment(new Date(2016,month,1)).add(-2, 'months').utc();
-    var name = chance.word();
+  for (var aid = 1; aid <= accountsAmount; aid++) {
+
+    var limit = new Date().getMonth();
+    var month = chance.integer({min: 0, max: limit});
+    var accountCreationDate = moment(new Date(2016,month,1)).utc();
+    var accountToDate = moment(accountCreationDate).add(10, 'years').utc()
+
     var account = {
-      creation_time: 'REPRIGHT' + accountCreationDate.format() + 'REPLEFT',
-      cc_token: x,
+      firstname: chance.first(),
+      lastname: chance.last(),
+      email: chance.email(),
+      country: chance.country({ full: true }),
       address: chance.address(),
-      aid: x,
-      name: name.charAt(0).toUpperCase() + name.slice(1) + " Inc.",
-      type: "account"
+      type: "account",
+      from: 'REPRIGHT' + accountCreationDate.format() + 'REPLEFT',
+      to: 'REPRIGHT' + accountToDate.format() + 'REPLEFT',
+      aid: aid,
     };
     accounts.push(account);
 
-    for (var y = 0; y < 1000; y++) {
-      var subCreationDate = moment(randomDate(new Date(accountCreationDate.format()), new Date(2016,month,29))).utc();
+    /* Generate account subscribers */
+    var subCreationDate = moment(randomDate(new Date(accountCreationDate.format()), new Date(2016,month,29))).utc();
+    for (var sid = 1; sid <= subscribersAmount; sid++) {
+
       var churing = chance.bool({likelihood: 99});
       var subToDate = churing ? moment(subCreationDate).add(3, 'months').utc() : moment(subCreationDate).add(10, 'years').utc();
 
       var subscriber = {
-        name: chance.name(),
-        sid: sid,
         aid: account.aid,
-        creation_time: 'REPRIGHT' + subCreationDate.format() + 'REPLEFT',
-        from: 'REPRIGHT' + subCreationDate.format() + 'REPLEFT',
-        to: 'REPRIGHT' + subToDate.format() + 'REPLEFT',
-        acc_address: true,
+        firstname: chance.first(),
+        lastname: chance.last(),
+        plan: getRandomPlanName(),
+        address: chance.country({ full: true }),
         country: chance.country({ full: true }),
         type: "subscriber",
-        plan: getRandomPlanName(),
-        plan_activation: 'REPRIGHT' + subCreationDate.format() + 'REPLEFT'
+        from: 'REPRIGHT' + subCreationDate.format() + 'REPLEFT',
+        plan_activation: 'REPRIGHT' + subCreationDate.format() + 'REPLEFT',
+        to: 'REPRIGHT' + subToDate.format() + 'REPLEFT',
+        sid: sid,
+        // creation_time: 'REPRIGHT' + subCreationDate.format() + 'REPLEFT',
       };
       accounts.push(subscriber);
-      sid++;
     }
 
+    /* Generate account Bills */
     var billMonths = moment().utc().diff(moment((moment(new Date(2016,month,1)).add(-5, 'months').utc())), 'months', false);
     for (var j = 0; j < billMonths; j++) {
       var billDate = accountCreationDate.add(+j-1, 'months').utc();
@@ -110,7 +123,8 @@ function generateDemoData() {
       bills.push(bill);
     }
 
-    var basedate = moment(new Date(2015,10,15)).utc();
+    /* Generate account Lines */
+    var basedate = moment(new Date()).add(-6, 'months').utc();
     for (var j = 0; j < 8; j++) {
       var lineCreationDate = basedate.add(+1, 'months').utc();
       var line = {
@@ -126,12 +140,11 @@ function generateDemoData() {
         "process_time" : "2016-07-15 01:47:16",
         "offer_id_curr" : "4175",
         "offer_id_next" : "4175",
-        "stamp" : x + "6f9c46364eeec5ff4398378648dc078" + j
+        "stamp" : sid + "6f9c46364eeec5ff4398378648dc078" + j
       }
       lines.push(line);
     }
   }
-  return accounts;
 }
 
 
