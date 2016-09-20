@@ -25,7 +25,7 @@ class CustomersList extends Component {
     this.state = {
       page: 0,
       sort: '',
-      size: 2
+      size: 10
     };
   }
 
