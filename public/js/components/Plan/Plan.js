@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { browserHistory } from 'react-router';
+import { browserHistory, withRouter } from 'react-router';
 import { Row, Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 
 import {
@@ -19,7 +19,7 @@ import PlanTab from './PlanTab';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
 import PlanIncludesTab from './PlanProductsPriceTab';
 
-class PlanSetup extends Component {
+class Plan extends Component {
 
   componentWillMount() {
     let { planId } = this.props.location.query;
@@ -56,9 +56,15 @@ class PlanSetup extends Component {
     const { plan } = this.props;
     const { action } = this.props.location.query;
     console.log(this.props.plan.toJS());
-    this.props.savePlan(plan, action, (res) => {console.log(res)});
-    //this.props.dispatch(savePlanRates());
-    //browserHistory.goBack();
+    this.props.savePlan(plan, action, this.afterSave);
+  }
+
+  afterSave = (data) => {
+    if(typeof data.error !== 'undefined' && data.error.length){
+      console.log("error on save : ", data);
+    } else {
+      this.props.router.push('/plans');
+    }
   }
 
   handleBack = () => {
@@ -111,7 +117,11 @@ class PlanSetup extends Component {
   }
 }
 
-
+Plan.propTypes = {
+  router: React.PropTypes.shape({
+    push: React.PropTypes.func.isRequired
+  }).isRequired
+};
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     onPlanCycleUpdate,
@@ -129,4 +139,4 @@ function mapStateToProps(state, props) {
     validator: state.validator
   };
 }
-export default connect(mapStateToProps, mapDispatchToProps)(PlanSetup);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Plan));

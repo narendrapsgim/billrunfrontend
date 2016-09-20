@@ -29,8 +29,9 @@ export default class PlanPrice extends Component {
 
   onPlanPriceUpdate = (e) => {
     const { index } = this.props;
-    const { value } = e.target;
-    this.props.onPlanPriceUpdate(index, parseFloat(value));
+    let value = parseFloat(e.target.value);
+    value = isNaN(value) ? '' : value;
+    this.props.onPlanPriceUpdate(index, value);
   }
 
   onPlanTariffRemove = () => {

@@ -105,6 +105,11 @@ export function savePlan(plan, action, callback = () => {}) {
 function savePlanToDB(plan, action, callback) {
   const type = action !== 'new' ? "close_and_new" : action;
   const formData = new FormData();
+
+  let from = moment(); //.format(globalSetting.apiDateTimeFormat)
+  let to = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
+  plan = plan.set('from', from).set('to', to);
+
   if (action !== 'new') {
     formData.append('id', plan.getIn(['_id','$id']));
   }
