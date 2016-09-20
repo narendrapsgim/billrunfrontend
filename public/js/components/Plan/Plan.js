@@ -15,9 +15,9 @@ import {
   onPlanFieldUpdate } from '../../actions/planActions';
 import { savePlanRates } from '../../actions/planProductsActions';
 
-import Plan from './Plan';
+import PlanTab from './PlanTab';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
-import PlanIncludesTab from './PlanIncludesTab';
+import PlanIncludesTab from './PlanProductsPriceTab';
 
 class PlanSetup extends Component {
 
@@ -79,7 +79,7 @@ class PlanSetup extends Component {
         <Tabs defaultActiveKey={1} animation={false} id="SettingsTab" onSelect={this.onSelectTab}>
           <Tab title="Billing Plan" eventKey={1}>
             <Panel>
-              <Plan plan={plan} mode={action}
+              <PlanTab plan={plan} mode={action}
                 onChangeFieldValue={this.onChangeFieldValue}
                 onPlanCycleUpdate={this.onPlanCycleUpdate}
                 onPlanPriceUpdate={this.onPlanPriceUpdate}

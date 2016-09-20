@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
-import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
-import Field from '../Field';
-import Help from '../Help';
-import PlanPrice from './components/PlanPrice';
-import { PlanDescription } from '../../FieldDescriptions';
 import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button } from 'react-bootstrap';
+
+import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
+import { PlanDescription } from '../../FieldDescriptions';
+import Help from '../Help';
+import Field from '../Field';
+import PlanPrice from './components/PlanPrice';
 
 
 export default class Plan extends Component {

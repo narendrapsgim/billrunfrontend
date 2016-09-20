@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-
 import Immutable from 'immutable';
 
 import {
   removePlanInclude,
   changePlanInclude } from '../../actions/planActions';
 import { getAllGroup } from '../../actions/planGroupsActions';
-
 
 import Help from '../Help';
 import { PlanDescription } from '../../FieldDescriptions';

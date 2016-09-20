@@ -16,7 +16,7 @@ import Dashboard from '../components/Dashboard';
 import PageNotFound from '../components/PageNotFound';
 import LoginPage from '../components/LoginPage';
 import ProductSetup from '../components/ProductSetup';
-import PlanSetup from '../components/PlanSetup';
+import Plan from '../components/Plan';
 
 export default () => {
   return (
@@ -24,7 +24,7 @@ export default () => {
       <IndexRedirect to="/dashboard" component={RequireAuth(Dashboard)} />
       <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashbord" />
       <Route path="/plans" component={RequireAuth(PlansList)} title="Plans"/>
-      <Route path="/plan" component={RequireAuth(PlanSetup)} title="Create / Edit Plan"/>
+      <Route path="/plan" component={RequireAuth(Plan)} title="Create / Edit Plan"/>
       <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
       <Route path="/products" component={RequireAuth(ProductsList)} title="Products"/>
       <Route path="/product_setup" component={RequireAuth(ProductSetup)} title="Product" />

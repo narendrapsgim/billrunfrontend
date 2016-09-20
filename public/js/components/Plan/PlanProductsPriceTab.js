@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import Help from '../Help';
-import { PlanDescription } from '../../FieldDescriptions';
-import PlanProductsPriceList from './components/PlanProductsPriceList';
-import ProductSearch from './components/ProductSearch';
 import {
   getProductByKey,
   getExistPlanProducts,
@@ -19,6 +15,10 @@ import {
   planProductsClear } from '../../actions/planProductsActions';
 import { showSuccess, showWarning, showDanger, showInfo } from '../../actions/alertsActions';
 
+import { PlanDescription } from '../../FieldDescriptions';
+import Help from '../Help';
+import PlanProductsPriceList from './components/PlanProductsPriceList';
+import ProductSearch from './components/ProductSearch';
 
 class PlanProductsPriceTab extends Component {
 
