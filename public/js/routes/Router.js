@@ -16,6 +16,7 @@ import Dashboard from '../components/Dashboard';
 import PageNotFound from '../components/PageNotFound';
 import LoginPage from '../components/LoginPage';
 import ProductSetup from '../components/ProductSetup';
+import PaymentGateways from '../components/PaymentGateways';
 import Plan from '../components/Plan';
 
 export default () => {
@@ -34,6 +35,7 @@ export default () => {
       <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
       <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
       <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
+      <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
       <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />
     </Route>

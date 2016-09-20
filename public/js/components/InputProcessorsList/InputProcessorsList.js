@@ -13,17 +13,27 @@ class InputProcessorsList extends Component {
 
     this.onClickInputProcessor = this.onClickInputProcessor.bind(this);
     this.onClickNew = this.onClickNew.bind(this);
+    this.onSort = this.onSort.bind(this);
+    this.buildQuery = this.buildQuery.bind(this);
+
+    this.state = {
+      sort: ''
+    };
   }
 
   componentDidMount() {
-    const params = {
+    this.props.dispatch(getList("input_processors", this.buildQuery()));
+  }
+
+  buildQuery() {
+    return {
       api: "settings",
       params: [
         { category: "file_types" },
+	{ sort: this.state.sort },
         { data: JSON.stringify({}) }
       ]
     };
-    this.props.dispatch(getList("input_processors", params));
   }
   
   onClickInputProcessor(input_processor, e) {
@@ -42,6 +52,13 @@ class InputProcessorsList extends Component {
       query: {
         action: 'new'
       }
+    });
+  }
+
+
+  onSort(sort) {
+    this.setState({sort}, () => {
+      this.props.dispatch(getList('input_processors', this.buildQuery()));
     });
   }
 
@@ -68,7 +85,7 @@ class InputProcessorsList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} />
+                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} onSort={this.onSort} />
               </div>
             </div>
           </div>

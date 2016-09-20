@@ -17,10 +17,12 @@ class InvoicesList extends Component {
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onFilter = this.onFilter.bind(this);
     this.buildQuery = this.buildQuery.bind(this);
+    this.onSort = this.onSort.bind(this);
 
     this.state = {
       page: 0,
       size: 10,
+      sort: {},
       filter: ""
     };
   }
@@ -30,13 +32,14 @@ class InvoicesList extends Component {
   }
   
   buildQuery() {
-    const { page, size, filter } = this.state;
+    const { page, size, filter, sort } = this.state;
     return {
       api: "bill",
       params: [
         { action: "query_bills_invoices" },
         { size },
         { page },
+	{ sort },
         { query: filter }
       ]
     };
@@ -44,13 +47,19 @@ class InvoicesList extends Component {
 
   onFilter(filter) {
     this.setState({filter, page: 0}, () => {
-      this.props.dispatch(getList('invoices', this.buildQuery()))
+      this.props.dispatch(getList('invoices', this.buildQuery()));
     });
   }
   
   handlePageClick(page) {
     this.setState({page}, () => {
-      this.props.dispatch(getList('invoices', this.buildQuery()))
+      this.props.dispatch(getList('invoices', this.buildQuery()));
+    });
+  }
+
+  onSort(sort) {
+    this.setState({sort}, () => {
+      this.props.dispatch(getList('invoices', this.buildQuery()));
     });
   }
 
@@ -79,7 +88,7 @@ class InvoicesList extends Component {
       );
     };
     const fields = [
-      { id: "invoice_id", title: "Invoice ID" },
+      { id: "invoice_id", title: "Invoice ID", sort: true },
       { id: "invoice_date", title: "Date" },
       { id: "due_date", title: "Due" },
       { id: "amount", title: "Amount" },
@@ -107,7 +116,7 @@ class InvoicesList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={filter_fields} onFilter={this.onFilter} base={base} />
-                <List items={invoices} fields={fields} />
+                <List items={invoices} fields={fields} onSort={this.onSort} />
               </div>
             </div>
           </div>

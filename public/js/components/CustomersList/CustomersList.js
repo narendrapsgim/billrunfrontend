@@ -20,9 +20,11 @@ class CustomersList extends Component {
     this.onNewCustomer = this.onNewCustomer.bind(this);
     this.onClickCustomer = this.onClickCustomer.bind(this);
     this.onFilter = this.onFilter.bind(this);
+    this.onSort = this.onSort.bind(this);
 
     this.state = {
       page: 0,
+      sort: '',
       size: 10
     };
   }
@@ -38,15 +40,10 @@ class CustomersList extends Component {
         { collection: "subscribers" },
         { size: this.state.size },
         { page: this.state.page },
+	{ sort: this.state.sort },
         { query: this.state.filter }
       ]
     };
-  }
-
-  handlePageClick(page) {
-    this.setState({page}, () => {
-      this.props.dispatch(getList("customers", this.buildQuery()))
-    });
   }
 
   onNewCustomer() {
@@ -66,9 +63,21 @@ class CustomersList extends Component {
     });
   }
 
+  handlePageClick(page) {
+    this.setState({page}, () => {
+      this.props.dispatch(getList("customers", this.buildQuery()))
+    });
+  }
+  
   onFilter(filter) {
     this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList("customers", this.buildQuery()))
+    });
+  }
+
+  onSort(sort) {
+    this.setState({sort}, () => {
+      this.props.dispatch(getList('customers', this.buildQuery()))
     });
   }
 
@@ -76,7 +85,7 @@ class CustomersList extends Component {
     const { customers } = this.props;
 
     const fields = [
-      { id: "aid", placeholder: "Customer ID", type: 'number' },
+      { id: "aid", placeholder: "Customer ID", type: 'number', sort: true },
       { id: "firstname", placeholder: "First Name" },
       { id: "lastname", placeholder: "Last Name" },
       { id: "address", placeholder: "Address" },
@@ -102,7 +111,7 @@ class CustomersList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
-                <List items={customers} fields={fields} edit={true} onClickEdit={this.onClickCustomer} />
+                <List items={customers} fields={fields} edit={true} onClickEdit={this.onClickCustomer} onSort={this.onSort} />
               </div>
             </div>
           </div>
