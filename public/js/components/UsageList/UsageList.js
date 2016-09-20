@@ -63,8 +63,8 @@ class UsageList extends Component {
     const { usages } = this.props;
 
     const fields = [
-      {id: "aid", placeholder: "Customer ID", type: "number"},
-      {id: "sid", placeholder: "Subscription ID", type: "number"},
+      {id: "aid", placeholder: "Customer ID", type: "number", sort: true},
+      {id: "sid", placeholder: "Subscription ID", type: "number", sort: true},
       {id: "plan", placeholder: "Plan"}
     ];
 
