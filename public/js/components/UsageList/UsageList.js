@@ -18,26 +18,29 @@ class UsageList extends Component {
     this.buildQuery = this.buildQuery.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
     this.onFilter = this.onFilter.bind(this);
+    this.onSort = this.onSort.bind(this);
     this.onClickLine = this.onClickLine.bind(this);
     this.onCancelView = this.onCancelView.bind(this);
-    
+
     this.state = {
       line: null,
       viewing: false,
       page: 0,
       size: 10,
+      sort: '',
       filter: ""
     };
   }
 
   buildQuery() {
-    const { page, size, filter } = this.state;
+    const { page, size, sort, filter } = this.state;
     return {
       api: "find",
       params: [
         { collection: "lines" },
         { size },
         { page },
+	{ sort },
         { query: filter }
       ]
     };
@@ -55,6 +58,12 @@ class UsageList extends Component {
     });
   }
 
+  onSort(sort) {
+    this.setState({sort}, () => {
+      this.props.dispatch(getList('usages', this.buildQuery()));
+    });
+  }
+
   onClickLine(line) {
     this.setState({line, viewing: true});
   }
@@ -62,15 +71,15 @@ class UsageList extends Component {
   onCancelView() {
     this.setState({line: null, viewing: false});
   }
-  
+
   render() {
     const { line, viewing } = this.state;
     const { usages } = this.props;
 
     const fields = [
       {id: "type", placeholder: "Type"},
-      {id: "aid", placeholder: "Customer ID", type: "number"},
-      {id: "sid", placeholder: "Subscription ID", type: "number"},
+      {id: "aid", placeholder: "Customer ID", type: "number", sort: true},
+      {id: "sid", placeholder: "Subscription ID", type: "number", sort: true},
       {id: "plan", placeholder: "Plan"},
       {id: "urt", placeholder: "Time", type: "datetime"}
     ];
@@ -89,7 +98,7 @@ class UsageList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={base} />
-                <List items={usages} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" />
+                <List items={usages} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} />
               </div>
             </div>
           </div>

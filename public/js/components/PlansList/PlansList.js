@@ -18,10 +18,12 @@ class PlansList extends Component {
     this.onNewPlan = this.onNewPlan.bind(this);
     this.onClickPlan = this.onClickPlan.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
+    this.onSort = this.onSort.bind(this);
 
     this.state = {
       size: 10,
       page: 0,
+      sort: '',
       filter: {}
     }
   }
@@ -33,6 +35,7 @@ class PlansList extends Component {
         { collection: "plans" },
         { size: this.state.size },
         { page: this.state.page },
+	{ sort: this.state.sort },
         { query: this.state.filter }
       ]
     };
@@ -70,6 +73,13 @@ class PlansList extends Component {
     });
   }
 
+  onSort(sort) {
+    this.setState({sort}, () => {
+      this.props.dispatch(getList('plans', this.buildQuery()))
+    });
+  }
+
+  
   render() {
     const { plans } = this.props;
 
@@ -101,7 +111,7 @@ class PlansList extends Component {
     }
 
     const tableFields = [
-      {id: 'name', title: 'Name'},
+      {id: 'name', title: 'Name', sort: true},
       {id: 'PlanCode', title: 'Code'},
       {id: 'description', title: "Description"},
       {title: 'Trial', parser: trial_parser},
@@ -125,7 +135,7 @@ class PlansList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
-                <List items={ plans } fields={ tableFields } />
+                <List items={ plans } fields={ tableFields } onSort={ this.onSort } />
               </div>
             </div>
             <Pager onClick={this.handlePageClick}

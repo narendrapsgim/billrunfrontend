@@ -10,6 +10,7 @@ const defaultParams = {
   api: "find",
   size: 10,
   page: 0,
+  sort: {},
   query: {}
 };
 
