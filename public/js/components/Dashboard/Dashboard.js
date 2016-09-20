@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
-import { Panel, Col} from 'react-bootstrap';
+import { Row, Panel, Col } from 'react-bootstrap';
 
 import { getData } from '../../actions/dashboardActions';
 import TotalSubscribersWidget from './Widgets/TotalSubscribers';
@@ -34,7 +34,8 @@ class Dashboard extends Component {
     const {fromDate, toDate} = this.state;
 
     return (
-      <div>
+    <Row>
+      <Col lg={8} lgOffset={2}>
         <Col lg={12}>
           <Panel header={<span>Demographic Distribution</span>}>
             <MapSubscribersWidget fromDate={fromDate} toDate={toDate}/>
@@ -85,7 +86,8 @@ class Dashboard extends Component {
             <RevenuePerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565}/>
           </Panel>
         </Col>
-      </div>
+    </Col>
+  </Row>
     );
   }
 }
