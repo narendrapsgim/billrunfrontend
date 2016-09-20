@@ -30,7 +30,7 @@ function gotList(collection, list) {
 
 function fetchList(collection, params) {
   const dummy_gateways = [
-    {name: "paypal", image_url: "", params: ["user", "password"]},
+    {name: "paypal", image_url: "https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-200px.png", params: ["user", "password"]},
     {name: "credit guard", image_url: "", params: ["token"]}
   ];
 

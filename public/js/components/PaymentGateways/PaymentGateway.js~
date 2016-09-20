@@ -1,0 +1,35 @@
+import React, { Component } from 'react';
+
+export default class PaymentGateway extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const { gateway } = this.props;
+
+    return (
+      <div key={key} className="form-group">
+	<div className="col-lg-12">
+	  <div className="checkbox">
+	    <label>
+	      <input type="checkbox" id={gateway.get('name')}
+		     checked={curr !== undefined} />
+	      { gateway.get('name') }
+	    </label>
+	  </div>
+	</div>
+	{gateway.get('params').map((param, param_key) => (
+	   <div className="form-group">
+	     <label className="col-xs-2 control-label">{param}</label>
+	     <div className="col-lg-4">
+	       <input type="text" className="form-control"
+		      disabled={curr === undefined}
+		      value={(curr ? curr.get(param) : "")} />
+	     </div>
+	   </div>
+	 ))}
+      </div>
+    );
+  }
+}
