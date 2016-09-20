@@ -30,7 +30,7 @@ export default class PlanPrice extends Component {
   onPlanPriceUpdate = (e) => {
     const { index } = this.props;
     const { value } = e.target;
-    this.props.onPlanPriceUpdate(index, value);
+    this.props.onPlanPriceUpdate(index, parseFloat(value));
   }
 
   onPlanTariffRemove = () => {
@@ -45,7 +45,6 @@ export default class PlanPrice extends Component {
 
   render() {
     const { price, index, count } = this.props;
-
     const priceValue = price.get('price', '');
     const trial = price.get('trial', false);
     const from = price.get('from', '');

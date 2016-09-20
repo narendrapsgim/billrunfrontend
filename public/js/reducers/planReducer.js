@@ -82,21 +82,30 @@ export default function (state = defaultState, action) {
 function _reaclculateCycles(prices, index, value){
   return prices.reduce( (newList, price, i, iter) => {
     if(i == index){
+      //set new To
       if(value === PLAN_CYCLE_UNLIMITED){
         price = price.set('to', value);
       } else {
         price = price.set('to', parseInt(price.get('from')) + parseInt(value));
       }
+      //set new From
       if(index === 0){
          price = price.set('from', 0);
       }
       return newList.push(price);
     } else if(i > index){
-      var diff = parseInt(price.get('to') || 0) - parseInt(price.get('from') || 0);
-      var prevTo = parseInt(newList.last().get('to') || 0);
+      //set new From
+      var prevTo = parseInt(newList.last().get('to', 0));
       price = price.set('from', prevTo);
-      if( price.get('to') !== PLAN_CYCLE_UNLIMITED ){
-        price = price.set('to', prevTo + diff)
+      //set new To
+      var to = price.get('to', '');
+      if(to === ''){ //TO not set
+        price = price.set('to', price.get('from'));
+      } else if(to === PLAN_CYCLE_UNLIMITED ){ //TO is unlimited
+        // do nothing
+      } else { // normal case, update with shifting
+        var diff = parseInt(price.get('to', 0)) - parseInt(price.get('from', 0));
+        price = price.set('to', prevTo + diff);
       }
       return newList.push(price);
     }
