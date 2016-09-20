@@ -143,7 +143,7 @@ class CustomerSetup extends Component {
               className="btn btn-primary"
               onClick={this.onSaveCustomer}
               style={{marginRight: 10}}>
-        Submit
+        Save
       </button>
       <button type="reset"
               className="btn btn-default"

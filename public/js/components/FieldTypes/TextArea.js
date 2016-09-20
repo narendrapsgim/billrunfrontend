@@ -10,9 +10,10 @@ export default class TextArea extends Component {
           id,
           value,
           placeholder = "",
+          disabled,
           editable } = this.props;
 
-    const input = editable ? (<textarea className="form-control" style={{ resize:"none" }} value={value} onChange={onChange} placeholder={placeholder}></textarea>) : (<span>{value}</span>);
+    const input = editable ? (<textarea className="form-control" value={value} onChange={onChange} placeholder={placeholder} disabled={disabled}></textarea>) : (<span>{value}</span>);
 
     return (
       <div>{ input }</div>

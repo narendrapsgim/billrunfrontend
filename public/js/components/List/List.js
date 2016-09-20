@@ -8,6 +8,12 @@ import { titlize } from '../../common/Util';
 export default class List extends Component {
   constructor(props) {
     super(props);
+
+    this.onClickHeader = this.onClickHeader.bind(this);
+
+    this.state = {
+      sort: {}
+    };
   }
 
   displayByType(field, entity) {
@@ -41,18 +47,34 @@ export default class List extends Component {
       </td>
     ));
   }
+  
+  onClickHeader(field) {
+    const { onSort = () => {} } = this.props;
+    const { sort } = this.state;
+    const sort_dir = sort[field] === -1 ? 1 : -1;
+    this.setState({sort: {[field]: sort_dir}}, () => {
+      onSort(JSON.stringify(this.state.sort));
+    });
+  }
 
   render() {
     const {
       items,
       fields,
       onClickEdit = () => {},
-      edit = false
+      edit = false,
+      editText = "edit"
     } = this.props;
 
     const table_header = fields.map((field, key) => {
-      if (!field.title && !field.placeholder) return (<th key={key}>{ titlize(field.id) }</th>);
-      return (<th key={key}>{ field.title || field.placeholder }</th>)
+      let onclick = field.sort ? this.onClickHeader.bind(this, field.id) : () => {};
+      let style = field.sort ? { cursor: "pointer" } : {};
+      let arrow = (null);
+      if (field.sort) {
+	arrow = this.state.sort[field.id] ? (<i className={`sort-indicator fa fa-sort-${ this.state.sort[field.id] === 1 ? 'down' : 'up' }`}></i>) : (<i className="sort-indicator fa fa-sort"></i>);
+      }
+      if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
+      return (<th key={key} onClick={onclick} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
     });
     if (edit) table_header.push((<th>&nbsp;</th>));
 
@@ -63,7 +85,7 @@ export default class List extends Component {
                            { this.buildRow(entity, fields) }
                            {(() => {
                               if (edit)
-                                return (<td><button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>edit</button></td>);
+                                return (<td><button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>{ editText }</button></td>);
                             })()}
                          </tr>
                        ));

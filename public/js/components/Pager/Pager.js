@@ -44,14 +44,14 @@ export default class Pager extends Component {
         </div>
         <div className="col-lg-10">
           <ul className="pagination" style={{margin: 0, padding: 0, cursor: "pointer"}}>
-            <li id="previous" className={prevClass} onClick={this.handlePageClick}>
+            <li id="previous" className={prevClass}>
               <a id="previous" onClick={this.handlePageClick}>
-                <i id="next" className="fa fa-chevron-left" onClick={this.handlePageClick}></i>
+                <i id="previous" className="fa fa-chevron-left"></i>
               </a>
             </li>
-            <li id="next" className={nextClass} onClick={this.handlePageClick}>
+            <li id="next" className={nextClass}>
               <a id="next" onClick={this.handlePageClick}>
-                <i id="next" className="fa fa-chevron-right" onClick={this.handlePageClick}></i>
+                <i id="next" className="fa fa-chevron-right"></i>
               </a>
             </li>
           </ul>
