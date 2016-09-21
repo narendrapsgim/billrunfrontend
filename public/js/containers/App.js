@@ -34,12 +34,38 @@ class App extends Component {
     });
   }
 
+  renderAppLoading(){
+    return (
+      <div>
+        <ProgressIndicator />
+        <Alerts />
+        <div className="container">
+          <Row>
+            <Col md={4} mdOffset={4}>
+              <div style={{marginTop: '33%', textAlign: 'center'}}>
+                <img src="/img/billrun-logo-tm.png" style={{ height: 50 }} />
+                <br />
+                <br />
+                <br />
+                <p>Loading...</p>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </div>
+    );
+  }
+
   renderWithoutLayout(){
     return (
-      <div className="container">
-        <Row>
-          { this.props.children }
-        </Row>
+      <div>
+        <ProgressIndicator />
+        <Alerts />
+        <div className="container">
+          <Row>
+            { this.props.children }
+          </Row>
+        </div>
       </div>
     );
   }
@@ -47,7 +73,6 @@ class App extends Component {
   renderWithLayout(){
     return (
       <div id="wrapper" style={{height: "100%"}}>
-        <ProgressIndicator />
         <Alerts />
         <Navigator />
         <div id="page-wrapper" className="page-wrapper" ref="pageWrapper" style={{minHeight: this.state.Height}}>
@@ -64,12 +89,25 @@ class App extends Component {
     );
   }
 
+  getView = () => {
+    const { auth } = this.props;
+
+    switch (auth) {
+      case true:
+        return this.renderWithLayout();
+
+      case false:
+        return this.renderWithoutLayout();
+
+      default:
+        return this.renderAppLoading();
+    }
+  }
+
   render() {
-    const { user } = this.props;
-    const view = (user.get('auth') == true) ? this.renderWithLayout() : this.renderWithoutLayout();
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(BraasTheme)}>
-        { view }
+        { this.getView() }
       </MuiThemeProvider>
     );
   }
@@ -80,6 +118,6 @@ function mapDispatchToProps(dispatch) {
     userCheckLogin }, dispatch);
 }
 function mapStateToProps(state) {
-  return { user: state.user };
+  return { auth: state.user.get('auth') };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(App);

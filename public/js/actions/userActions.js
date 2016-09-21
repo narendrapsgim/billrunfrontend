@@ -3,13 +3,41 @@ export const LOGOUT = 'LOGOUT';
 export const LOGIN_ERROR = 'LOGIN_ERROR';
 
 import { apiBillRun } from '../common/Api';
+import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+
+function loginSuccess(data){
+  return {
+    type: LOGIN,
+    data
+  };
+}
+
+function logoutSuccess(){
+  return {
+    type: LOGOUT
+  };
+}
+
+function loginError(data){
+  return {
+    type: LOGIN_ERROR,
+    data
+  };
+}
 
 export function userCheckLogin(){
   const query = { api: "auth" };
   return dispatch => {
+    dispatch(startProgressIndicator());
     apiBillRun(query).then(
-      success => { dispatch({type: LOGIN, data: success.data[0].data.details}) },
-      error => { dispatch({type: LOGOUT}) },
+      success => {
+        dispatch(loginSuccess(success.data[0].data.details));
+        dispatch(finishProgressIndicator());
+      },
+      error => {
+        dispatch(logoutSuccess());
+        dispatch(finishProgressIndicator());
+      },
     );
   }
 }
@@ -20,9 +48,16 @@ export function userDoLogin(username, password){
     params: [ { username }, { password } ]
   };
   return dispatch => {
+    dispatch(startProgressIndicator());
     apiBillRun(query).then(
-      success => { dispatch({type: LOGIN, data: success.data[0].data.details}) },
-      error => { dispatch({type: LOGIN_ERROR, data: error[0]}) }
+      success => {
+        dispatch(loginSuccess(success.data[0].data.details));
+        dispatch(finishProgressIndicator());
+      },
+      error => {
+        dispatch(loginError(error[0]));
+        dispatch(finishProgressIndicator());
+      }
     );
   }
 }
@@ -33,9 +68,16 @@ export function userDoLogout(){
     params: [ { action: 'logout' } ]
   };
   return dispatch => {
+    dispatch(startProgressIndicator());
     apiBillRun(query).then(
-      success => { dispatch({type: LOGOUT}) },
-      error => { console.log("userDoLogout error : ", error); }
+      success => {
+        dispatch(logoutSuccess())
+        dispatch(finishProgressIndicator());
+      },
+      error => {
+        dispatch(finishProgressIndicator());
+        console.log("userDoLogout error : ", error);
+      }
     );
   }
 }
