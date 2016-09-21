@@ -45,7 +45,7 @@ export default class Plan extends Component {
         <PlanPrice
           index={0}
           count={plan.get('price', Immutable.List()).size}
-          price={trial}
+          item={trial}
           onPlanCycleUpdate={this.props.onPlanCycleUpdate}
           onPlanPriceUpdate={this.props.onPlanPriceUpdate}
           onPlanTariffAdd={this.props.onPlanTariffAdd}
@@ -65,7 +65,7 @@ export default class Plan extends Component {
           <PlanPrice key={i}
             index={i}
             count={count}
-            price={price}
+            item={price}
             onPlanCycleUpdate={this.props.onPlanCycleUpdate}
             onPlanPriceUpdate={this.props.onPlanPriceUpdate}
             onPlanTariffAdd={this.props.onPlanTariffAdd}
