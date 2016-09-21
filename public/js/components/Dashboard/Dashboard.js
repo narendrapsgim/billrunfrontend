@@ -35,57 +35,71 @@ class Dashboard extends Component {
 
     return (
     <Row>
-      <Col lg={8} lgOffset={2}>
-        <Col lg={12}>
-          <Panel header={<span>Demographic Distribution</span>}>
-            <MapSubscribersWidget fromDate={fromDate} toDate={toDate}/>
+      <Col lg={8} md={12} sm={12} xs={12} lgOffset={2} mdOffset={0} smOffset={0} xsOffset={0} >
+        <Row>
+          <Col lg={12}>
+            <Panel header={<span>Demographic Distribution</span>}>
+              <MapSubscribersWidget fromDate={fromDate} toDate={toDate}/>
+            </Panel>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col lg={6}>
+            <Panel header={<span>Revenue</span>}>
+              <ReveneWidget fromDate={fromDate} toDate={toDate} width={565}/>
+            </Panel>
+          </Col>
+          <Col lg={6}>
+            <Panel header={<span>Revenue Avg. per Subscriber</span>}>
+              <RevenueAvgPerSubscriberWidget fromDate={fromDate} toDate={toDate} width={565}/>
+            </Panel>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col lg={4}>
+            <Panel header={<span>Total Subscribers</span>}>
+            <TotalSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
           </Panel>
-        </Col>
-        <Col lg={6}>
-          <Panel header={<span>Revenue</span>}>
-            <ReveneWidget fromDate={fromDate} toDate={toDate} width={565}/>
-          </Panel>
-        </Col>
-        <Col lg={6}>
-          <Panel header={<span>Revenue Avg. per Subscriber</span>}>
-            <RevenueAvgPerSubscriberWidget fromDate={fromDate} toDate={toDate} width={565}/>
-          </Panel>
-        </Col>
-        <Col lg={4}>
-          <Panel header={<span>Total Subscribers</span>}>
-          <TotalSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
-        </Panel>
-        </Col>
-        <Col lg={4}>
-          <Panel header={<span>New Subscribers</span>}>
-            <NewSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
-          </Panel>
-        </Col>
-        <Col lg={4}>
-          <Panel header={<span>Churning Subscribers</span>}>
-            <ChurningSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
-          </Panel>
-        </Col>
-        <Col lg={6}>
-          <Panel header={<span>Subscribers per Plan</span>}>
-            <SubsPerPlanWidget fromDate={fromDate} toDate={toDate} width={565}/>
-          </Panel>
-        </Col>
-        <Col lg={6}>
-          <Panel header={<span>Subscribers per Plan<span className="pull-right">{getMonthName(toDate.getUTCMonth()+1) + ", " + '01 to ' + ("0" + toDate.getUTCDate()).slice(-2)}</span></span>}>
-            <SubsPerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565}/>
-          </Panel>
-        </Col>
-        <Col lg={6}>
-          <Panel header={<span>Revenue per Plan</span>}>
-            <RevenuePerPlanWidget fromDate={fromDate} toDate={toDate} width={565}/>
-          </Panel>
-        </Col>
-        <Col lg={6}>
-          <Panel header={<span>Revenue per Plan<span className="pull-right">{getMonthName(toDate.getUTCMonth()+1) + ", " + '01 to ' + ("0" + toDate.getUTCDate()).slice(-2)}</span></span>}>
-            <RevenuePerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565}/>
-          </Panel>
-        </Col>
+          </Col>
+          <Col lg={4}>
+            <Panel header={<span>New Subscribers</span>}>
+              <NewSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
+            </Panel>
+          </Col>
+          <Col lg={4}>
+            <Panel header={<span>Churning Subscribers</span>}>
+              <ChurningSubscribersWidget fromDate={fromDate} toDate={toDate} width={370}/>
+            </Panel>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col lg={6}>
+            <Panel header={<span>Subscribers per Plan</span>}>
+              <SubsPerPlanWidget fromDate={fromDate} toDate={toDate} width={565}/>
+            </Panel>
+          </Col>
+          <Col lg={6}>
+            <Panel header={<span>Subscribers per Plan<span className="pull-right">{getMonthName(toDate.getUTCMonth()+1) + ", " + '01 to ' + ("0" + toDate.getUTCDate()).slice(-2)}</span></span>}>
+              <SubsPerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565}/>
+            </Panel>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col lg={6}>
+            <Panel header={<span>Revenue per Plan</span>}>
+              <RevenuePerPlanWidget fromDate={fromDate} toDate={toDate} width={565}/>
+            </Panel>
+          </Col>
+          <Col lg={6}>
+            <Panel header={<span>Revenue per Plan<span className="pull-right">{getMonthName(toDate.getUTCMonth()+1) + ", " + '01 to ' + ("0" + toDate.getUTCDate()).slice(-2)}</span></span>}>
+              <RevenuePerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565}/>
+            </Panel>
+          </Col>
+        </Row>
     </Col>
   </Row>
     );
