@@ -90,9 +90,9 @@ class App extends Component {
   }
 
   getView = () => {
-    const { user } = this.props;
+    const { auth } = this.props;
 
-    switch (user.get('auth')) {
+    switch (auth) {
       case true:
         return this.renderWithLayout();
 
@@ -118,6 +118,6 @@ function mapDispatchToProps(dispatch) {
     userCheckLogin }, dispatch);
 }
 function mapStateToProps(state) {
-  return { user: state.user };
+  return { auth: state.user.get('auth') };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(App);
