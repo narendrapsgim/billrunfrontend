@@ -1,17 +1,5 @@
 var outputDiv = document.getElementById("output");
 
-/* Settings */
-var accountsAmount = 10;
-var subscribersAmount = 1000;
-var plans = [
-  'Plan A',
-  'Plan D',
-  'Plan C',
-  'Plan D',
-  'Plan E',
-];
-/* ~Settings */
-
 var accounts = [];
 var bills = [];
 var lines = [];
@@ -29,7 +17,7 @@ function replaceDate(stringifyJson) {
 
 function getRandomPlanName() {
   var randomPlanIndex = chance.integer({min: 0, max: 4});
-  return plans[randomPlanIndex];
+  return config.plans[randomPlanIndex];
 }
 
 function saveFile(data, filename) {
@@ -57,7 +45,7 @@ function saveFile(data, filename) {
 
 function generateDemoData() {
 
-  for (var aid = 1; aid <= accountsAmount; aid++) {
+  for (var aid = 1; aid <= config.accountsAmount; aid++) {
 
     var limit = new Date().getMonth();
     var month = chance.integer({min: 0, max: limit});
@@ -79,7 +67,7 @@ function generateDemoData() {
 
     /* Generate account subscribers */
     var subCreationDate = moment(randomDate(new Date(accountCreationDate.format()), new Date(2016,month,29))).utc();
-    for (var sid = 1; sid <= subscribersAmount; sid++) {
+    for (var sid = 1; sid <= config.subscribersAmount; sid++) {
 
       var churing = chance.bool({likelihood: 99});
       var subToDate = churing ? moment(subCreationDate).add(3, 'months').utc() : moment(subCreationDate).add(10, 'years').utc();
