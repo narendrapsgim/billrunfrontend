@@ -123,36 +123,36 @@ export default class Plan extends Component {
         <Col lg={6}>
           <Form horizontal>
               <FormGroup>
-                <Col lg={6}>
+                <Col lg={6} md={6}>
                   <label htmlFor="PlanName">Name</label><Help contents={PlanDescription.name} />
                   <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} disabled={mode === 'update'}/>
                 </Col>
 
-                <Col lg={6}>
+                <Col lg={6} md={6}>
                   <label htmlFor="PlanCode">Code</label>
                   <Field id="PlanCode" onChange={this.onChangePlanCode} value={plan.get('plan_code', '')}/>
                 </Col>
               </FormGroup>
 
               <FormGroup>
-                <Col lg={12}>
+                <Col lg={12} md={12}>
                   <label htmlFor="PlanDescription">Description</label>
                   <Field id="PlanDescription" fieldType="textarea" value={plan.get('description', '')} onChange={this.onChangePlanDescription} />
                 </Col>
               </FormGroup>
 
               <FormGroup>
-                <Col lg={4}>
+                <Col lg={4} md={4}>
                   <label htmlFor="PlanEach">Frequency</label>
                   <Field id="PlanEach" fieldType="number" className="form-control" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
                 </Col>
-                <Col lg={4}>
+                <Col lg={4} md={4}>
                   <ControlLabel>&nbsp;</ControlLabel>
                   <FormControl componentClass="select" placeholder="select" value={periodicity} onChange={this.onChangePeriodicity}>
                     { this.getPeriodicityOptions() }
                   </FormControl>
                 </Col>
-                <Col lg={4}>
+                <Col lg={4} md={4}>
                 <ControlLabel>Charging Mode</ControlLabel>
                 <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
                   <option value="">Select...</option>

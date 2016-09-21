@@ -116,6 +116,6 @@ class ProductSetup extends Component {
 
 function mapStateToProps(state, props) {
   return { product: state.product  || Immutable.Map(),
-    usage_types: state.settings.get('usage_types') };
+    usage_types: state.settings.get('usage_types') || Immutable.List() };
 }
 export default connect(mapStateToProps)(ProductSetup);

@@ -161,6 +161,13 @@ export function removeAllCSVFields() {
   };
 }
 
+function addedUsagetMapping(usaget) {
+  return {
+    type: ADD_USAGET_MAPPING,
+    usaget
+  };
+}
+
 export function addUsagetMapping(usaget) {
   let setUrl = `/api/settings?category=usage_types&action=set&data=[${JSON.stringify(usaget)}]`;
   return (dispatch) => {
@@ -171,10 +178,7 @@ export function addUsagetMapping(usaget) {
         if (!resp.data.status) {
           dispatch(showDanger(resp.data.desc));
         } else {
-          return {
-            type: ADD_USAGET_MAPPING,
-            usaget
-          };
+	  dispatch(addedUsagetMapping(usaget));
         }
       }
     ).catch(error => {
