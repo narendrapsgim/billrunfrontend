@@ -58,7 +58,7 @@ export default class PlanPrice extends Component {
 
     return (
       <FormGroup>
-        <Col lg={5}>
+        <Col lg={5} md={5}>
           <label htmlFor="cycle">Cycles</label>
           { isLast
             ? <Field id="cycle" onChange={this.onUnlimitedCycleUpdate} value={cycle} fieldType="unlimited" unlimitedValue={planCycleUnlimitedValue}/>
@@ -66,18 +66,19 @@ export default class PlanPrice extends Component {
           }
         </Col>
 
-        <Col lg={5}>
+        <Col lg={5} md={5}>
           <label htmlFor="price">Price</label>
           <Field id="price" onChange={this.onPlanPriceUpdate} value={price.get('price', '')} />
         </Col>
 
-        <Col lg={1}>
+        <Col lg={1} md={1} sm={1} xs={2} lgOffset={0} mdOffset={0} smOffset={10} xsOffset={8} className="text-right">
           { showAddButton && <i className="fa fa-plus-circle fa-lg" onClick={this.onPlanTariffAdd} style={{cursor: "pointer", color: 'green', marginTop: 35}} ></i> }
          </Col>
 
-         <Col lg={1}>
+         <Col lg={1} md={1} sm={1} xs={2} className="text-right">
           { showRemoveButton && <i className="fa fa-minus-circle fa-lg" onClick={this.onPlanTariffRemove} style={{cursor: "pointer", color: 'red', marginTop: 35}} ></i> }
         </Col>
+        { !isLast && !trial && <Col lgHidden mdHidden sm={12} xs={12}><hr /></Col> }
       </FormGroup>
     );
   }
