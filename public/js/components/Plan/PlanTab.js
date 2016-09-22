@@ -144,7 +144,7 @@ export default class Plan extends Component {
               <FormGroup>
                 <Col lg={4} md={4}>
                   <label htmlFor="PlanEach">Frequency</label>
-                  <Field id="PlanEach" fieldType="number" className="form-control" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
+                  <Field min="1" id="PlanEach" fieldType="number" className="form-control" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
                 </Col>
                 <Col lg={4} md={4}>
                   <ControlLabel>&nbsp;</ControlLabel>
