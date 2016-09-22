@@ -21,6 +21,12 @@ import PlanIncludesTab from './PlanProductsPriceTab';
 
 class Plan extends Component {
 
+  static propTypes = {
+    router: React.PropTypes.shape({
+      push: React.PropTypes.func.isRequired
+    }).isRequired
+  }
+
   componentWillMount() {
     let { planId } = this.props.location.query;
     if (planId) {
@@ -57,6 +63,7 @@ class Plan extends Component {
     const { action } = this.props.location.query;
     console.log(this.props.plan.toJS());
     this.props.savePlan(plan, action, this.afterSave);
+    // this.props.savePlanRates();
   }
 
   afterSave = (data) => {
@@ -95,12 +102,14 @@ class Plan extends Component {
               />
             </Panel>
           </Tab>
-          {/*
+
           <Tab title="Override Product Price" eventKey={2}>
-            <Panel header={ (planName === '') ? 'Override Products Price' : `Override Products Price for plan "${planName}"`}>
+            <Panel>
               <PlanProductsPriceTab planName={planName}/>
             </Panel>
           </Tab>
+
+          {/*
           <Tab title="Plan Includes" eventKey={3}>
             <Panel header={ (planName === '') ? 'Set Plan Include Groups' : `Edit Plan "${planName}" Group Includes`}>
               <PlanIncludesTab plan={plan} onChangeFieldValue={this.onChangeFieldValue} onIncludeRemove={this.onIncludeRemove} />
@@ -117,11 +126,6 @@ class Plan extends Component {
   }
 }
 
-Plan.propTypes = {
-  router: React.PropTypes.shape({
-    push: React.PropTypes.func.isRequired
-  }).isRequired
-};
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     onPlanCycleUpdate,
@@ -129,9 +133,10 @@ function mapDispatchToProps(dispatch) {
     onPlanTariffAdd,
     onPlanTariffRemove,
     onPlanFieldUpdate,
+    getPlan,
     clearPlan,
     savePlan,
-    getPlan }, dispatch);
+    savePlanRates }, dispatch);
 }
 function mapStateToProps(state, props) {
   return  {
