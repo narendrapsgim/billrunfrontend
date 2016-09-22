@@ -6,36 +6,28 @@ export default class PaymentGateway extends Component {
   }
 
   render() {
-    const { gateway, curr, onCheck, onChangeParam } = this.props;
+    const { settings, enabled } = this.props;
     const style = {};
-    if (!curr) {
+    if (!enabled) {
       style.filter = "grayscale(100%)";
     }
 
     return (
-      <div className="form-group">
+      <div className="form-group" style={{border: "1px solid black"}}>
 	<div className="col-lg-12">
-	  <div className="checkbox">
-	    <label>
-	      <input type="checkbox" id={gateway.get('name')}
-		     checked={curr !== undefined} onChange={onCheck.bind(this, gateway.get('name'))} />
-	      {(() => {
-		 if (!gateway.get('image_url')) return (gateway.get('name'));
-		 return (
-		   <img src={gateway.get('image_url')} style={style} />
-		 );
-	       })()}
-	    </label>
-	  </div>
+	  {(() => {
+	     if (!settings.get('image_url')) return (settings.get('name'));
+	     return (
+	       <img src={settings.get('image_url')} style={style} />
+	     );
+	   })()}
 	</div>
-	{gateway.get('params').map((param, param_key) => (
+	{settings.get('params').map((param, param_key) => (
 	   <div className="form-group" key={param_key}>
 	     <label className="col-xs-2 control-label">{param}</label>
 	     <div className="col-lg-4">
 	       <input type="text" className="form-control"
-		      disabled={curr === undefined}
-		      onChange={onChangeParam.bind(this, gateway.get('name'), param)}
-		      value={(curr ? curr.get(param) : "")} />
+		      value={(enabled ? enabled.get(param) : "")} />
 	     </div>
 	   </div>
 	 ))}

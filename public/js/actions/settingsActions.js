@@ -1,8 +1,5 @@
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
-export const SELECT_PAYMENT_GATEWAY = 'SELECT_PAYMENT_GATEWAY';
-export const DESELECT_PAYMENT_GATEWAY = 'DESELECT_PAYMENT_GATEWAY';
-export const CHANGE_PAYMENT_GATEWAY_PARAM = 'CHANGE_PAYMENT_GATEWAY_PARAM';
 
 import { showStatusMessage } from '../actions/commonActions';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -93,21 +90,4 @@ export function saveSettings(category, settings) {
   return dispatch => {
     return dispatch(saveSettingsToDB(category, settings));
   };  
-}
-
-export function selectPaymentGateway(gateway_name, checked) {
-  const type = checked ? SELECT_PAYMENT_GATEWAY : DESELECT_PAYMENT_GATEWAY;
-  return {
-    type,
-    gateway_name
-  };
-}
-
-export function changePaymentGatewayParam(gateway_name, param, value) {
-  return {
-    type: CHANGE_PAYMENT_GATEWAY_PARAM,
-    gateway_name,
-    param,
-    value
-  };
 }
