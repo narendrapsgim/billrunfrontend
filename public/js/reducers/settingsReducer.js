@@ -1,8 +1,8 @@
 import { UPDATE_SETTING,
          GOT_SETTINGS,
-	 SELECT_PAYMENT_GATEWAY,
-	 DESELECT_PAYMENT_GATEWAY,
-	 CHANGE_PAYMENT_GATEWAY_PARAM } from '../actions/settingsActions';
+	 ADD_PAYMENT_GATEWAY,
+	 REMOVE_PAYMENT_GATEWAY,
+	 UPDATE_PAYMENT_GATEWAY } from '../actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
 import Immutable from 'immutable';
 
@@ -19,7 +19,8 @@ const defaultState = Immutable.fromJS({
 });
 
 export default function (state = defaultState, action) {
-  let { name, value, category, settings, gateway_name, param } = action;
+  let { name, value, category, settings, gateway, param } = action;
+  console.log(action.type);
   switch(action.type) {
     case UPDATE_SETTING:
       return state.setIn([category, name], value);
@@ -36,23 +37,20 @@ export default function (state = defaultState, action) {
           map.set(setting.name, Immutable.fromJS(data));
 	});
       });
-
-    case DESELECT_PAYMENT_GATEWAY:
-      return state.update('payment_gateways', list =>
-	list.filterNot(pg =>
-	  pg.get('name') === gateway_name
-	));
-
-    case SELECT_PAYMENT_GATEWAY:
-      return state.update('payment_gateways', list => list.push(Immutable.fromJS({name: gateway_name})));
-
-    case CHANGE_PAYMENT_GATEWAY_PARAM:
-      const idx = state.get('payment_gateways').findIndex(pg => pg.get('name') === gateway_name);
-      if (idx < 0) return state;
-      return state.update('payment_gateways', list =>
-	list.update(idx, pg => pg.set(param, value))
-      );
       
+    case ADD_PAYMENT_GATEWAY:
+      const added = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway.name).push(Immutable.fromJS(gateway));
+      return state.set('payment_gateways', added);
+
+    case REMOVE_PAYMENT_GATEWAY:
+      const removed = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway);
+      return state.set('payment_gateways', removed);
+      
+    case UPDATE_PAYMENT_GATEWAY:
+      const paymentgateway = state.get('payment_gateways').find(pg => pg.get('name') === gateway.name).set('params', gateway.params);
+      const paymentgateways = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway.name).push(paymentgateway);
+      return state.set('payment_gateways', paymentgateways);
+
     default:
       return state;
   }
