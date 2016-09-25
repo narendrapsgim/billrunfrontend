@@ -11,6 +11,7 @@ export const PLAN_PRODUCTS_RATE_REMOVE = 'PLAN_PRODUCTS_RATE_REMOVE';
 
 import moment from 'moment';
 import { showModal } from './modalActions';
+import { showDanger, showSuccess } from './alertsActions';
 import { showAlert } from '../actions/alertsActions';
 import { apiBillRun, apiBillRunErrorHandler} from '../common/Api';
 
@@ -202,6 +203,8 @@ export function savePlanRates(callback) {
         formData.append('type', 'close_and_new');
         formData.append('data', JSON.stringify(prod));
 
+        console.log("Save product : ", prod.toJS());
+
         var query = {
           api: "save",
           name: prod.get('key'),
@@ -216,7 +219,7 @@ export function savePlanRates(callback) {
       apiBillRun(queries).then(
         sussess => {
           let successMessages = sussess.data.map( (response) => response.name );
-          dispatch(showStatusMessage(successMessages.join(', ') + " successfully updated", 'success'));
+          dispatch(showSuccess(successMessages.join(', ') + " successfully updated", 'success'));
           dispatch(getExistPlanProducts(planName));
           // callback(sussess);
         },

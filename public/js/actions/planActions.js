@@ -117,6 +117,8 @@ function savePlanToDB(plan, action, callback) {
   formData.append("type", type);
   formData.append("data", JSON.stringify(plan));
 
+  console.log("Save plan : ", plan.toJS());
+  
   const query = [{
     api: "save",
     options: {

@@ -61,9 +61,11 @@ class Plan extends Component {
   handleSave = () => {
     const { plan } = this.props;
     const { action } = this.props.location.query;
-    console.log(this.props.plan.toJS());
-    this.props.savePlan(plan, action, this.afterSave);
-    // this.props.savePlanRates();
+    if(action === 'update'){
+      this.props.savePlan(plan, action, this.props.savePlanRates);
+    } else {
+      this.props.savePlan(plan, action, this.afterSave);
+    }
   }
 
   afterSave = (data) => {
