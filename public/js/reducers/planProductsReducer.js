@@ -17,10 +17,10 @@ import Immutable from 'immutable';
 
 
 var DefaultRate = Immutable.Record({
-  from: undefined,
-  to: undefined,
-  interval: undefined,
-  price: undefined
+  from: '',
+  to: '',
+  interval: '',
+  price: ''
 });
 
 var DefaultState = Immutable.Map({
@@ -159,8 +159,13 @@ export default function (state = DefaultState, action) {
 
     case PLAN_PRODUCTS_RATE_ADD:
       let rate = state.getIn(['planProducts', action.productKey]);
-      let insertItem = (rate.get('rates').size > 0) ? rate.getIn(action.path).last() : state.get(itemIndex) ;
-      state = state.updateIn(['planProducts', action.productKey], (item) => item.updateIn(action.path, list => list.push(insertItem)) );
+      let insertItem = (rate.getIn(action.path) && rate.getIn(action.path).size > 0) ? rate.getIn(action.path).last() : new DefaultRate() ;
+      state = state.updateIn(['planProducts', action.productKey], (item) => item.updateIn(action.path, list => {
+        if(typeof list === 'undefined'){
+          list = Immutable.List();
+        }
+        return list.push(insertItem)
+      }));
       return state;
 
     case PLAN_PRODUCTS_RATE_INIT:
