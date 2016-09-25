@@ -120,8 +120,9 @@ export default class Plan extends Component {
 
     return (
       <Row>
-        <Col lg={6}>
-          <Form horizontal>
+        <Col lg={8}>
+          <Form>
+            <Panel>
               <FormGroup>
                 <Col lg={6} md={6}>
                   <label htmlFor="PlanName">Name</label><Help contents={PlanDescription.name} />
@@ -153,14 +154,15 @@ export default class Plan extends Component {
                   </FormControl>
                 </Col>
                 <Col lg={4} md={4}>
-                <ControlLabel>Charging Mode</ControlLabel>
-                <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
-                  <option value="">Select...</option>
-                  <option value={true}>Upfront</option>
-                  <option value={false}>Arrears</option>
-                </FormControl>
-              </Col>
-            </FormGroup>
+                  <ControlLabel>Charging Mode</ControlLabel>
+                  <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
+                    <option value="">Select...</option>
+                    <option value={true}>Upfront</option>
+                    <option value={false}>Arrears</option>
+                  </FormControl>
+                </Col>
+              </FormGroup>
+            </Panel>
 
             <Panel header={<h3>Trial Period</h3>}>
               { this.getTrialPrice() }

@@ -17,7 +17,7 @@ import { savePlanRates } from '../../actions/planProductsActions';
 
 import PlanTab from './PlanTab';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
-import PlanIncludesTab from './PlanProductsPriceTab';
+import PlanIncludesTab from './PlanIncludesTab';
 
 class Plan extends Component {
 
@@ -25,6 +25,10 @@ class Plan extends Component {
     router: React.PropTypes.shape({
       push: React.PropTypes.func.isRequired
     }).isRequired
+  }
+
+  state = {
+    activeTab : parseInt(this.props.location.query.tab) || 1
   }
 
   componentWillMount() {
@@ -62,10 +66,14 @@ class Plan extends Component {
     const { plan } = this.props;
     const { action } = this.props.location.query;
     if(action === 'update'){
-      this.props.savePlan(plan, action, this.props.savePlanRates);
+      this.props.savePlan(plan, action, this.saveRates);
     } else {
       this.props.savePlan(plan, action, this.afterSave);
     }
+  }
+
+  saveRates = () => {
+    this.props.savePlanRates(this.afterSave);
   }
 
   afterSave = (data) => {
@@ -80,6 +88,10 @@ class Plan extends Component {
     browserHistory.goBack();
   }
 
+  handleSelectTab = (key) => {
+    this.setState({activeTab:key});
+  }
+
   render() {
     const { plan, validator } = this.props;
     const { action } = this.props.location.query;
@@ -91,7 +103,7 @@ class Plan extends Component {
 
     return (
       <Col lg={12}>
-        <Tabs defaultActiveKey={1} animation={false} id="SettingsTab" onSelect={this.onSelectTab}>
+        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
           <Tab title="Billing Plan" eventKey={1}>
             <Panel>
               <PlanTab plan={plan} mode={action}
@@ -111,13 +123,12 @@ class Plan extends Component {
             </Panel>
           </Tab>
 
-          {/*
           <Tab title="Plan Includes" eventKey={3}>
-            <Panel header={ (planName === '') ? 'Set Plan Include Groups' : `Edit Plan "${planName}" Group Includes`}>
+            <Panel>
               <PlanIncludesTab plan={plan} onChangeFieldValue={this.onChangeFieldValue} onIncludeRemove={this.onIncludeRemove} />
             </Panel>
           </Tab>
-          */}
+
         </Tabs>
         <div style={{marginTop: 12}}>
           <Button onClick={this.handleBack} bsStyle="link" style={{marginRight: 12}} >Cancel</Button>

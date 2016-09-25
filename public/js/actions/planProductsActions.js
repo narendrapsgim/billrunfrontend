@@ -220,8 +220,7 @@ export function savePlanRates(callback) {
         sussess => {
           let successMessages = sussess.data.map( (response) => response.name );
           dispatch(showSuccess(successMessages.join(', ') + " successfully updated", 'success'));
-          dispatch(getExistPlanProducts(planName));
-          // callback(sussess);
+          callback(sussess);
         },
         failure => {
           let errorMessages = failure.error.map( (response) => `${response.name}: ${response.error.message}`);

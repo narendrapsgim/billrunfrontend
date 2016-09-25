@@ -117,11 +117,11 @@ export default class PlanProduct extends Component {
           {(isRemoved)
             ?
               <OverlayTrigger placement="bottom" overlay={this.tooltip("Undo Remove Rate")}>
-                <i className="fa fa-mail-reply fa-lg" onClick={this.onProductUndoRemove} style={{cursor: "pointer", color: 'green', marginTop: 35}} ></i>
+                <i className="fa fa-mail-reply fa-lg" onClick={this.onProductUndoRemove} style={{cursor: "pointer", color: 'green', marginTop: 15}} ></i>
               </OverlayTrigger>
             :
               <OverlayTrigger placement="bottom" overlay={this.tooltip((isExisting) ? "Mark to Remove Rate" : "Remove Rate")}>
-                <i className={btnRemoveClass} onClick={this.onProductRemove} style={{cursor: "pointer", color: 'red', marginTop: 35}} ></i>
+                <i className={btnRemoveClass} onClick={this.onProductRemove} style={{cursor: "pointer", color: 'red', marginTop: 15}} ></i>
               </OverlayTrigger>
           }
         </Col>
@@ -130,11 +130,11 @@ export default class PlanProduct extends Component {
           {(isExisting)
             ?
               <OverlayTrigger placement="bottom" overlay={this.tooltip("Restore Rate")}>
-                <i className="fa fa-undo fa-lg" onClick={this.onProductRestore} style={{cursor: "pointer", color: '#31708f', marginTop: 35}} ></i>
+                <i className="fa fa-undo fa-lg" onClick={this.onProductRestore} style={{cursor: "pointer", color: '#777', marginTop: 15}} ></i>
               </OverlayTrigger>
             :
               <OverlayTrigger placement="bottom" overlay={this.tooltip("Restore Rate")}>
-                <i className="fa fa-undo fa-lg" onClick={this.onNewProductRestore} style={{cursor: "pointer", color: '#31708f ', marginTop: 35}} ></i>
+                <i className="fa fa-undo fa-lg" onClick={this.onNewProductRestore} style={{cursor: "pointer", color: '#777 ', marginTop: 15}} ></i>
               </OverlayTrigger>
           }
         </Col>
