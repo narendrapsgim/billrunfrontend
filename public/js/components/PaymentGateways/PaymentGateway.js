@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 /* COMPONENTS */
 import GatewayParamsModal from './GatewayParamsModal';
+import ToggleButton from './ToggleButton';
 
 export default class PaymentGateway extends Component {
   constructor(props) {
@@ -55,12 +56,11 @@ export default class PaymentGateway extends Component {
 			    />
 	<div className="form-group">
 	  <div className="col-lg-8 col-md-8">
-	    {(() => {
-	       if (!settings.get('image_url')) return (settings.get('name'));
-	       return (
-		 <img src={settings.get('image_url')} style={style} />
-	       );
-	     })()}
+	    {
+	      !settings.get('image_url') ?
+	      settings.get('name') :
+	      <img src={settings.get('image_url')} style={style} />
+	    }
 	  </div>
 	  <div className="col-lg-4 col-md-4">
 	    <div className="pull-right">
@@ -76,10 +76,7 @@ export default class PaymentGateway extends Component {
 	<div className="form-group">
 	  <div className="col-lg-12 col-md-12">
 	    <div className="pull-right">
-	      {(() => {
-		 if (!enabled) return (<button type="button" className="btn btn-success" onClick={this.onClickEnable}>Enable</button>);
-		 return (<button type="button" className="btn btn-danger" onClick={this.onClickDisable}>Disable</button>);
-	       })()}
+	      <ToggleButton enabled={enabled} onClickEnable={this.onClickEnable} onClickDisable={this.onClickDisable} />
 	    </div>
 	  </div>
 	</div>
