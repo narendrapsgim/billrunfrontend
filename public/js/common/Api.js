@@ -62,7 +62,11 @@ export function apiBillRun(requests, requiredAllSuccess = true) {
 //send Http request
 function sendHttpRequest(query) {
   //Create Api URL
-  let api = (query.api == "save") ? "/admin/" : "/api/";
+  let api;
+  if (query.pre) api = `/${query.pre}/`;
+  else if (query.api === "save") api = "/admin/";
+  else api = "/api/";
+
   let url = globalSetting.serverUrl + api + query.api + buildQueryString(query.params);
   let requestOptions = buildQueryOptions(query.options);
   let response = (query.name) ? { name: query.name } : {};

@@ -1,8 +1,8 @@
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
-export const SELECT_PAYMENT_GATEWAY = 'SELECT_PAYMENT_GATEWAY';
-export const DESELECT_PAYMENT_GATEWAY = 'DESELECT_PAYMENT_GATEWAY';
-export const CHANGE_PAYMENT_GATEWAY_PARAM = 'CHANGE_PAYMENT_GATEWAY_PARAM';
+export const ADD_PAYMENT_GATEWAY = 'ADD_PAYMENT_GATEWAY';
+export const REMOVE_PAYMENT_GATEWAY = 'REMOVE_PAYMENT_GATEWAY';
+export const UPDATE_PAYMENT_GATEWAY = 'UPDATE_PAYMENT_GATEWAY';
 
 import { showStatusMessage } from '../actions/commonActions';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
@@ -59,8 +59,10 @@ export function updateSetting(category, name, value) {
   };
 }
 
-function saveSettingsToDB(category, settings) {
-  const data = settings.get(category).toJS();
+function saveSettingsToDB(category, settings = Immutable.Map()) {
+  if (!data) {
+    data = settings.get(category).toJS();
+  }
   if (category === "pricing") {
     data.vat = data.vat / 100;
   }
@@ -68,7 +70,7 @@ function saveSettingsToDB(category, settings) {
     api: "settings",
     params: [
       { category: category },
-      { action: "set" },
+      { action: action },
       { data: JSON.stringify(data) }
     ]
   };
@@ -76,12 +78,11 @@ function saveSettingsToDB(category, settings) {
   return (dispatch) => {
     apiBillRun(query).then(
       success => {
-        dispatch(showSuccess("Settings saved successfuly!", "success"));
+        dispatch(showSuccess("Settings saved successfuly!"));
       },
       failure => {
-        console.log(failure);
-        console.log('failed!');
-        dispatch(showDanger("Error saving settings", "error"));
+        console.log('failed!', failure);
+        dispatch(showDanger("Error saving settings"));
       }
     ).catch(error =>
       dispatch(apiBillRunErrorHandler(error))
@@ -95,19 +96,23 @@ export function saveSettings(category, settings) {
   };  
 }
 
-export function selectPaymentGateway(gateway_name, checked) {
-  const type = checked ? SELECT_PAYMENT_GATEWAY : DESELECT_PAYMENT_GATEWAY;
+export function addPaymentGateway(gateway) {
   return {
-    type,
-    gateway_name
+    type: ADD_PAYMENT_GATEWAY,
+    gateway
   };
 }
 
-export function changePaymentGatewayParam(gateway_name, param, value) {
+export function removePaymentGateway(gateway) {
   return {
-    type: CHANGE_PAYMENT_GATEWAY_PARAM,
-    gateway_name,
-    param,
-    value
+    type: REMOVE_PAYMENT_GATEWAY,
+    gateway
+  };
+}
+
+export function updatePaymentGateway(gateway) {
+  return {
+    type: UPDATE_PAYMENT_GATEWAY,
+    gateway
   };
 }

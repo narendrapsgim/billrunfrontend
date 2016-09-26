@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { getSettings, saveSettings, selectPaymentGateway, changePaymentGatewayParam } from '../../actions/settingsActions';
-import { getList } from '../../actions/listActions';
+import { getSettings, saveSettings, addPaymentGateway, removePaymentGateway, updatePaymentGateway } from '../../actions/settingsActions';
+import { apiBillRun } from '../../common/Api';
+import { showSuccess, showDanger } from '../../actions/alertsActions';
+import { getList, getPaymentGateways } from '../../actions/listActions';
 import Immutable from 'immutable';
 
 import PaymentGateway from './PaymentGateway';
@@ -9,40 +11,71 @@ import PaymentGateway from './PaymentGateway';
 class PaymentGateways extends Component {
   constructor(props) {
     super(props);
-
-    this.onCheckPaymentGateway = this.onCheckPaymentGateway.bind(this);
-    this.onChangeParam = this.onChangeParam.bind(this);
-    this.onSave = this.onSave.bind(this);
   }
 
   componentDidMount() {
     this.props.dispatch(getSettings("payment_gateways"));
-    this.props.dispatch(getList("supported_gateways", {api: "supportedgateways"}));
+    this.props.dispatch(getPaymentGateways());
   }
 
-  onCheckPaymentGateway(gateway_name, e) {
-    const { checked } = e.target;
-    this.props.dispatch(selectPaymentGateway(gateway_name, checked));
-  }
+  onSaveGatewayParams = (gateway, enabled) => {
+    const { dispatch } = this.props;
+    const query = {
+      api: "settings",
+      params: [
+	{ category: "payment_gateways" },
+	{ action: "set" },
+	{ data: JSON.stringify(gateway) }
+      ]
+    };
 
-  onChangeParam(gateway_name, param, e) {
-    const { value } = e.target;
-    this.props.dispatch(changePaymentGatewayParam(gateway_name, param, value));
-  }
+    apiBillRun(query).then(
+      success => {
+	dispatch(showSuccess("Payment gateway enabled!"));
+	if (!enabled) dispatch(addPaymentGateway(gateway));
+	else dispatch(updatePaymentGateway(gateway));
+      },
+      failure => {
+	dispatch(showDanger("Error saving payment gateway"));
+      }
+    ).catch(
+      error => {
+	dispatch(showDanger("Network error - please try again"));
+      }
+    );
+  };
 
-  onSave() {
-    this.props.dispatch(saveSettings('payment_gateways', this.props.settings));
-  }
-  
+  onDisableGateway = (name) => {
+    const { dispatch } = this.props;
+    const query = {
+      api: "settings",
+      params: [
+	{ category: "payment_gateways" },
+	{ action: "unset" },
+	{ data: JSON.stringify({name}) }
+      ]
+    };
+
+    apiBillRun(query).then(
+      success => {
+	dispatch(showSuccess("Payment gateway disabled!"));
+	dispatch(removePaymentGateway(name));
+      },
+      failure => {
+	console.log('failed!', failure);
+	dispatch(showDanger("Error saving payment gateway"));
+      }
+    ).catch(
+      error => {
+	console.log(error);
+	dispatch(showDanger("Network error - please try again"));
+      }
+    );
+  };
+
   render() {
     const { supported_gateways, settings } = this.props;
-    const payment_gateways = settings.get('payment_gateways') || Immutable.Map();
-    const gateways_view = supported_gateways.map((gateway, key) => {
-      const curr = payment_gateways.find(pg => pg.get('name') === gateway.get('name'));
-      return (
-	<PaymentGateway key={key} curr={curr} gateway={gateway} onCheck={this.onCheckPaymentGateway} onChangeParam={this.onChangeParam} />
-      );
-    });
+    const payment_gateways = settings.get('payment_gateways') || Immutable.List();
 
     return (
       <div className="panel panel-default">
@@ -51,12 +84,17 @@ class PaymentGateways extends Component {
 	</div>
 	<div className="panel-body">
 	  <form className="form-horizontal">
-	    { gateways_view }
-	    <div className="form-group">
-	      <div className="col-lg-12">
-		<button className="btn btn-primary" onClick={this.onSave}>Save</button>
-	      </div>
-	    </div>
+	    { supported_gateways.filter(pg => pg.get('supported') == '1').map((gateway, key) => {
+		const enabled = payment_gateways.find(pg => pg.get('name') === gateway.get('name'));
+		return (
+		  <div className="col-lg-4 col-md-4" key={key}>
+		    <PaymentGateway enabled={enabled}
+				    settings={gateway}
+				    onDisable={this.onDisableGateway}
+				    onSaveParams={this.onSaveGatewayParams} />
+		  </div>
+		);
+	      }) }
 	  </form>
 	</div>
       </div>
