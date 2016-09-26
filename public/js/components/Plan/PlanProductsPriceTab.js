@@ -119,8 +119,8 @@ class PlanProductsPriceTab extends Component {
 
     return (
       <Row>
-        <Col lg={6}>
-          <Form horizontal>
+        <Col lg={8}>
+          <Form>
 
             <Panel header={<h3>Select Products to Override Price <Help contents={PlanDescription.add_product} /></h3>}>
               <ProductSearch onSelectProduct={this.onSelectProduct}/>

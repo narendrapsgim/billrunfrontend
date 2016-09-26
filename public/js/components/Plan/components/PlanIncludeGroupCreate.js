@@ -1,21 +1,20 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button,
+  Panel, Col, Row, Collapse, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-import FlatButton from 'material-ui/FlatButton';
-import * as Colors from 'material-ui/styles/colors'
-import FontIcon from 'material-ui/FontIcon';
-import { Form, FormControl, FormGroup, Col, ControlLabel, Collapse, HelpBlock } from 'react-bootstrap';
-import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
-import Tooltip from 'react-bootstrap/lib/Tooltip';
 
 import UsagetypeSelect from './UsagetypeSelect';
 import Include from './Include';
 import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 
+import {
+  getExistGroupProductsByUsageTypes,
+  addGroupProducts,
+  getAllGroup } from '../../../actions/planGroupsActions';
 import { addPlanInclude } from '../../../actions/planActions';
-import { addGroupProducts, getExistGroupProductsByUsageTypes, getAllGroup } from '../../../actions/planGroupsActions';
 
 
 class PlanIncludeGroupCreate extends Component {
@@ -45,36 +44,9 @@ class PlanIncludeGroupCreate extends Component {
     }
   }
 
-  constructor(props) {
-    super(props);
+  state = Object.assign({}, this.defaultSate);
 
-    this.resetState = this.resetState.bind(this);
-    this.validateStep = this.validateStep.bind(this);
-    this.getExistingGroupProducts = this.getExistingGroupProducts.bind(this);
-
-    this.handleNext = this.handleNext.bind(this);
-    this.handlePrev = this.handlePrev.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
-    this.handleReset = this.handleReset.bind(this);
-    this.handleFinish = this.handleFinish.bind(this);
-    this.handleToggleBoby = this.handleToggleBoby.bind(this);
-
-    this.getStepContent = this.getStepContent.bind(this);
-    this.renderTitle = this.renderTitle.bind(this);
-    this.renderTitleRight = this.renderTitleRight.bind(this);
-    this.renderControllers = this.renderControllers.bind(this);
-    this.renderContent = this.renderContent.bind(this);
-
-    this.onChangeGroupName = this.onChangeGroupName.bind(this);
-    this.onChangeUsageType = this.onChangeUsageType.bind(this);
-    this.onChangeInclud = this.onChangeInclud.bind(this);
-    this.onAddProduct = this.onAddProduct.bind(this);
-    this.onRemoveProduct = this.onRemoveProduct.bind(this);
-
-    this.state = Object.assign({}, this.defaultSate);
-  }
-
-  validateStep(step){
+  validateStep = (step) => {
     switch (step) {
       case 0:
         const { existingGroups } = this.props;
@@ -122,7 +94,7 @@ class PlanIncludeGroupCreate extends Component {
     }
   }
 
-  getExistingGroupProducts(name, usageType){
+  getExistingGroupProducts = (name, usageType) =>{
     getExistGroupProductsByUsageTypes(name, usageType).then(
       (response) => {
         let existingProd = _.values(response.data[0].data.details).map( (prod) => prod.key);
@@ -133,42 +105,42 @@ class PlanIncludeGroupCreate extends Component {
     )
   }
 
-  onChangeGroupName(e){
+  onChangeGroupName = (e) => {
     const name = e.target.value.toUpperCase();
     const error = (name.length && !globalSetting.keyUppercaseRegex.test(name)) ? this.errors.name.allowedCharacters : '';
     this.setState({name, error});
   }
 
-  onChangeUsageType(newValue){
+  onChangeUsageType = (newValue) => {
     this.setState({usage: newValue, products: [], error:''});
     if(newValue.length){
       this.getExistingGroupProducts(this.state.name, newValue);
     }
   }
 
-  onChangeInclud(newValue){
+  onChangeInclud = (newValue) => {
     const error =  (!( /^[+-]?\d+(\.\d+)?$/.test( newValue )) && newValue !== 'UNLIMITED' ) ? this.errors.include.allowedCharacters : '' ;
     this.setState({include: newValue, error});
   }
 
-  onAddProduct(key){
+  onAddProduct = (key) => {
     const products = [...this.state.products, key];
     this.setState({products, error: ''});
   }
 
-  onRemoveProduct(key){
+  onRemoveProduct = (key) => {
     const products = this.state.products.filter( (product) => key !== product);
     this.setState({products, error: ''});
   }
 
-  handlePrev(){
+  handlePrev = () => {
     const {stepIndex} = this.state;
     if (stepIndex > 0) {
       this.setState({stepIndex: stepIndex - 1, error:''});
     }
   }
 
-  handleNext(){
+  handleNext = () => {
     const {stepIndex} = this.state;
     if(this.validateStep(stepIndex)){
       this.setState({
@@ -177,15 +149,15 @@ class PlanIncludeGroupCreate extends Component {
     }
   };
 
-  resetState(open = true){
+  resetState = (open = true) => {
     this.setState(Object.assign({}, this.defaultSate, {open}));
   }
 
-  handleCancel(){
+  handleCancel = () => {
     this.resetState(false);
   }
 
-  handleFinish(){
+  handleFinish = () => {
     const {stepIndex} = this.state;
     if(this.validateStep(stepIndex)){
       this.props.addPlanInclude(this.state.name, this.state.usage, this.state.include);
@@ -194,113 +166,96 @@ class PlanIncludeGroupCreate extends Component {
     }
   };
 
-  handleReset(){
+  handleReset = () => {
     this.resetState();
   }
 
-  handleToggleBoby(){
+  handleToggleBoby = () => {
     this.setState({ open: !this.state.open })
   }
 
-  getStepContent(stepIndex) {
+  getStepContent = (stepIndex) => {
     switch (stepIndex) {
       case 0:
         return (
           <FormGroup validationState={this.state.error.length > 0 ? "error" : '' }>
-            <Col componentClass={ControlLabel} sm={4}>
-              Group Name :
-            </Col>
-            <Col sm={8}>
+            <ControlLabel>Group Name</ControlLabel>
               <FormControl type="text" placeholder="Enter Group Name.." value={this.state.name} onChange={this.onChangeGroupName}/>
               <h5><small>* Group name should be unique for all plans</small></h5>
               { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
-            </Col>
           </FormGroup>
         );
       case 1:
         return (
           <FormGroup validationState={this.state.error.length > 0 ? "error" : ''} >
-            <Col componentClass={ControlLabel} sm={4}>
-              Usage Type :
-            </Col>
-            <Col sm={8}>
-              <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={this.state.usage}/>
-              { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
-            </Col>
+            <ControlLabel>Usage Type</ControlLabel>
+            <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={this.state.usage}/>
+            { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
           </FormGroup>
         );
       case 2:
         return (
           <FormGroup validationState={this.state.error.length > 0 ? "error" : ''} >
-            <Col componentClass={ControlLabel} sm={4}>
-              Includes :
-            </Col>
-            <Col sm={8}>
-              <Include onChangeInclud={this.onChangeInclud} value={this.state.include} />
-              { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
-            </Col>
+            <ControlLabel>Includes</ControlLabel>
+            <Include onChangeInclud={this.onChangeInclud} value={this.state.include} />
+            { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
           </FormGroup>
         );
       case 3:
       return (
           <FormGroup validationState={this.state.error.length > 0 ? "error" : ''}>
-            <Col componentClass={ControlLabel} sm={4}>
-              Products :
-            </Col>
-            <Col sm={8}>
+            <ControlLabel>Products</ControlLabel>
               {this.state.products.length ?
                 <Products
                   onRemoveProduct={this.onRemoveProduct}
                   products={this.state.products}
                 />
               : <p style={{marginTop:8}}>No products in group ...</p>}
+
               <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
                 <ProductSearchByUsagetype
                   addRatesToGroup={this.onAddProduct}
                   usaget={this.state.usage}
                   products={this.state.products}
-                  />
+                />
               </div>
               { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
-            </Col>
           </FormGroup>);
       default:
         return '...';
     }
   }
 
-  renderTitle(){
+  renderTitle = () => {
     return "Create New Group";
   }
 
-  renderTitleRight(){
+  renderTitleRight = () => {
     const { open } = this.state;
-    if( !open ) { return null; }
+
+    if( !open ) {
+      return null;
+    }
+
     return (
       <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Cancel</Tooltip>}>
-        <FontIcon
-          onClick={ this.handleCancel }
-          className="material-icons"
-          style={{ cursor: "pointer", color: Colors.grey500, fontSize: '18px' }}
-        >close</FontIcon>
+        <i className="fa fa-times" onClick={ this.handleCancel } style={{cursor: "pointer"}} ></i>
       </OverlayTrigger>
     );
   }
 
-  renderControllers(){
-    //create_new_folder//add_circle_outline
+  renderTitleLeft = () => {
     return (
       <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Create new gruop</Tooltip>}>
-        <FontIcon
-          onClick={ this.handleToggleBoby }
-          className="material-icons"
-          style={{cursor: "pointer", color: Colors.green300, fontSize: '32px', marginRight: '10px'}}
-        >add_circle_outline</FontIcon>
+        <i className="fa fa-plus-circle fa-lg"
+          onClick={this.handleToggleBoby}
+          style={{cursor: "pointer", color: 'green'}} >
+        </i>
       </OverlayTrigger>
     );
   }
 
-  renderContent(){
+  renderContent = () => {
     const { stepIndex, open } = this.state;
     return (
       <div>
@@ -319,46 +274,24 @@ class PlanIncludeGroupCreate extends Component {
           </Step>
         </Stepper>
 
-        <div style={{marginTop: 50}}>
-          <Form horizontal>
+        <div style={{marginTop: 25, marginBottom: 25}}>
+          <Form>
             {this.getStepContent(stepIndex)}
           </Form>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 50}}>
-          <div>
-            <FlatButton
-              label="Reset"
-              secondary={true}
-              onTouchTap={this.handleReset}
-              style={{marginRight: 24}}
-            />
-          </div>
-          <div> </div>
-          <div>
-            <FlatButton
-              label="Back"
-              disabled={stepIndex === 0}
-              onTouchTap={this.handlePrev}
-              style={{marginRight: 12}}
-            />
-          { (stepIndex !== 3) ?
-              <FlatButton
-                label='Next'
-                primary={true}
-                disabled={stepIndex === 3}
-                onTouchTap={this.handleNext}
-              />
-             :
-             <FlatButton
-               label='Add Group'
-               primary={true}
-               disabled={stepIndex !== 3}
-               onTouchTap={this.handleFinish}
-             />
-           }
-          </div>
-        </div>
+        <Row>
+          <Col lg={3} md={3} sm={3} xs={3} className="text-left">
+            <Button bsStyle="danger" onClick={ this.handleReset }>Reset</Button>
+          </Col>
+          <Col lg={6} md={6} sm={6} xs={6} lgOffset={3} mdOffset={3} smOffset={3} xsOffset={3} className="text-right">
+            <Button onClick={ this.handlePrev } style={{marginRight:10}}>Back</Button>
+            { (stepIndex === 3)
+              ? <Button bsStyle="success" onClick={ this.handleFinish }>Add Group</Button>
+              : <Button bsStyle="success" onClick={ this.handleNext }>Next</Button>
+            }
+           </Col>
+        </Row >
       </div>
     );
   }
@@ -366,28 +299,24 @@ class PlanIncludeGroupCreate extends Component {
   render() {
     const { stepIndex, open } = this.state;
     return (
-      <div style={{display: 'flex', /*borderTop: '1px solid #eee', paddingBottom: 10, /*backgroundColor: open ? 'rgba(0,0,0,0.03)' : 'transparent'*/}}>
-        <div style={{flex: '2 0 0', margin: '6px 40px auto', textAlign: 'left'}}>
-            {this.renderControllers()}
-        </div>
-        <div style={{flex: '9 0 0'}}>
-          <div className="product" style={{marginTop: 20}}>
-            <div style={{display: 'flex', marginBottom: open ? 20 : 0}}>
-              <div style={{flex: '5 0 0', textAlign: 'left', cursor: "pointer"}} onClick={ this.handleToggleBoby }>
-                <h4 style={{marginTop: 0}}><small>{this.renderTitle()}</small></h4>
-              </div>
-              <div style={{flex: '2 0 0', textAlign: 'right', pading: '0 3px', cursor: "pointer"}} onClick={ this.handleToggleBoby }>
-               {this.renderTitleRight()}
-              </div>
-            </div>
-            <Collapse in={open}>
-              <div style={{backgroundColor: "rgba(0, 0, 0, 0.027451)", padding: 20, borderRadius: 5}}>
-                {this.renderContent()}
-              </div>
-            </Collapse>
+      <div>
+        <Row>
+          <Col lg={1} md={1} sm={1} xs={6} className="text-left">
+            {this.renderTitleLeft()}
+          </Col>
+          <Col lg={10} md={10} sm={10} xsHidden className="text-center">
+            <h4 style={{ margin: 0 }}><small>{this.renderTitle()}</small></h4>
+          </Col>
+          <Col lg={1} md={1} sm={1} xs={6} className="text-right">
+            {this.renderTitleRight()}
+          </Col>
+        </Row>
+
+        <Collapse in={open}>
+          <div style={{backgroundColor: "rgba(0, 0, 0, 0.027451)", padding: 25, borderRadius: 5, marginTop: 15}}>
+            {this.renderContent()}
           </div>
-        </div>
-        <div style={{flex: '1 0 0'}}></div>
+        </Collapse>
       </div>
     );
   }
@@ -399,40 +328,7 @@ function mapDispatchToProps(dispatch) {
     addGroupProducts,
     addPlanInclude }, dispatch);
 }
-
 function mapStateToProps(state, props) {
   return  { plan: state.plan };
 }
-
 export default connect(mapStateToProps, mapDispatchToProps)(PlanIncludeGroupCreate);
-
-// import Select from 'react-select';
-//
-// getAvailableGroups(){
-//   const { existingGroups } = this.props;
-//   return existingGroups.map( (name) => {
-//     return ({ value: name, label: name });
-//   });
-// }
-//
-// let options = this.getAvailableGroups();
-//
-// <Select
-//   placeholder={'Select existing group or type new name...'}
-//   addLabelText={'Add new {label} group ?'}
-//   allowCreate={true}
-//   value={this.state.name}
-//   options={options}
-//   onChange={this.onChangeGroupName}
-// />
-//
-// onChangeGroupName(newName){
-//   if(newName.length > 0){
-//     const name = newName.toUpperCase();
-//     const error = (!globalSetting.keyUppercaseRegex.test(name)) ? this.errors.name.allowedCharacters : '';
-//     this.setState({name, error});
-//   } else {
-//     this.setState({name:'', error:''});
-//   }
-// }
-// <h5><small>* Adding/removing products will affect all plans that contain &quot;{name}&quot; group</small></h5>

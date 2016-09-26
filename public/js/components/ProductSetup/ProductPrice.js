@@ -66,28 +66,28 @@ export default class ProductPrice extends Component {
       <Row>
 
         <Col lg={2} md={2} sm={6} xs={12}>
-          <FormGroup style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup>
             <ControlLabel>From</ControlLabel>
             <Field value={item.get('from', '')} onChange={this.onEditFrom} fieldType="number" min={0}/>
           </FormGroup>
         </Col>
 
         <Col lg={2} md={2} sm={6} xs={12}>
-          <FormGroup style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup>
             <ControlLabel>To</ControlLabel>
             <Field value={item.get('to', '')} onChange={this.onEditTo} fieldType="number" min={0}/>
           </FormGroup>
         </Col>
 
         <Col lg={2} md={2} sm={6} xs={12}>
-          <FormGroup style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup>
             <ControlLabel>Interval</ControlLabel>
             <Field value={item.get('interval', '')} onChange={this.onEditInterval} fieldType="number" min={0}/>
           </FormGroup>
         </Col>
 
         <Col lg={4} md={4} sm={6} xs={12}>
-          <FormGroup style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup>
             <ControlLabel>Price</ControlLabel>
             <Field value={item.get('price', '')} onChange={this.onEditPrice} fieldType="price" />
           </FormGroup>
