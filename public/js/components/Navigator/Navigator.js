@@ -9,11 +9,34 @@ import {Navbar, Nav, NavItem, NavDropdown, MenuItem, ProgressBar} from "react-bo
 class Navigator extends Component {
   constructor(props) {
     super(props);
+    this.onToggleMenu = this.onToggleMenu.bind(this);
+    this.onWindowResize = this.onWindowResize.bind(this);
+
     this.state = {
-      uiOpenSetting: true
+      uiOpenSetting: true,
+      showCollapseButton: false,
+      showFullMenu: true
     };
   }
 
+  componentWillMount() {
+    this.onWindowResize();
+    window.addEventListener('resize', this.onWindowResize);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onWindowResize);
+  }
+  
+  onWindowResize() {
+    const small = window.innerWidth < 768;
+    this.setState({ showCollapseButton: small, showFullMenu: !small });
+  }
+
+  onToggleMenu() {
+    const { showFullMenu } = this.state;
+    this.setState({showFullMenu: !showFullMenu});
+  }
+  
   clickLogout = (e) => {
     e.preventDefault()
     this.props.userDoLogout();
@@ -26,6 +49,20 @@ class Navigator extends Component {
           <Link to="/" className="navbar-brand">
             <img src="/img/billrun-logo-tm.png" style={{ height: 22 }} />
           </Link>
+	  {(() => {
+	     if (!this.state.showCollapseButton) return (null);
+	     return (
+	       <button type="button"
+		       className="navbar-toggle"
+		       data-toggle="collapse"
+		       onClick={this.onToggleMenu} >
+		 <span className="sr-only">Toggle navigation</span>
+		 <span className="icon-bar"></span>
+		 <span className="icon-bar"></span>
+		 <span className="icon-bar"></span>
+	       </button>	  
+	     );
+	   })()}
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
@@ -45,62 +82,69 @@ class Navigator extends Component {
             <MenuItem divider />
           */}
             <MenuItem eventKey="4">
-              <Link to="#" onClick={this.clickLogout}>
-                <i className="fa fa-sign-out fa-fw"></i> Logout
-              </Link>
+	      <Link to="#" onClick={this.clickLogout}>
+		<i className="fa fa-sign-out fa-fw"></i> Logout
+	      </Link>
             </MenuItem>
-        </NavDropdown>
+          </NavDropdown>
         </ul>
+	{(() => {
+	   if (!this.state.showFullMenu) return (null);
+	   return (
+             <div className="navbar-default sidebar" role="navigation">
+               <div className="sidebar-nav navbar-collapse">
 
-        <div className="navbar-default sidebar" role="navigation">
-          <div className="sidebar-nav navbar-collapse">
+		 <ul className="nav in" id="side-menu">
+		   <li>
+                     <Link to="/dashboard">
+                       <i className="fa fa-dashboard fa-fw"></i> Dashboard
+                     </Link>
+		   </li>
 
-            <ul className="nav in" id="side-menu">
-              <li>
-                <Link to="/dashboard">
-                  <i className="fa fa-dashboard fa-fw"></i> Dashboard
-                </Link>
-              </li>
-
-              <li>
-                <Link to="/plans">
-                  <i className="fa fa-cubes fa-fw"></i> Plans
-                </Link>
-              </li>
-              <li>
-                <Link to="/products">
-                  <i className="fa fa-book fa-fw"></i> Products
-                </Link>
-              </li>
-              <li>
-                <Link to="/customers"><i className="fa fa-user fa-fw"></i> Customers</Link>
-              </li>
-              <li>
-                <Link to="/usage"><i className="fa fa-list fa-fw"></i> Usage</Link>
-              </li>
-              <li>
-                <Link to="/invoices"><i className="fa fa-file-text-o fa-fw"></i> Invoices</Link>
-              </li>
-              <li>
-                <Link to="/users"><i className="fa fa-user fa-fw"></i> User Managment</Link>
-              </li>
-              <li className={classNames({'active': !this.state.uiOpenSetting})}>
-                <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-cog fa-fw"></i> Settings<span className="fa arrow"></span></a>
-                <ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>
-                  <li>
-                    <Link to="/settings?setting=billrun">Date, Time and Zone</Link>
-                  </li>
-                  <li>
-                    <Link to="/settings?setting=pricing">Currency and Tax</Link>
-                  </li>
-                  <li>
-                    <Link to="/input_processors">Input Processors</Link>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-        </div>
+		   <li>
+                     <Link to="/plans">
+                       <i className="fa fa-cubes fa-fw"></i> Plans
+                     </Link>
+		   </li>
+		   <li>
+                     <Link to="/products">
+                       <i className="fa fa-book fa-fw"></i> Products
+                     </Link>
+		   </li>
+		   <li>
+                     <Link to="/customers"><i className="fa fa-users fa-fw"></i> Customers</Link>
+		   </li>
+		   <li>
+                     <Link to="/usage"><i className="fa fa-list fa-fw"></i> Usage</Link>
+		   </li>
+		   <li>
+                     <Link to="/invoices"><i className="fa fa-file-text-o fa-fw"></i> Invoices</Link>
+		   </li>
+ 		    <li>
+                      <Link to="/users"><i className="fa fa-user fa-fw"></i> User Managment</Link>
+                   </li>
+		   <li className={classNames({'active': !this.state.uiOpenSetting})}>
+                     <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-cog fa-fw"></i> Settings<span className="fa arrow"></span></a>
+                     <ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>
+                       <li>
+			 <Link to="/settings?setting=billrun">Date, Time and Zone</Link>
+                       </li>
+                       <li>
+			 <Link to="/settings?setting=pricing">Currency and Tax</Link>
+                       </li>
+                       <li>
+			 <Link to="/input_processors">Input Processors</Link>
+                       </li>
+		       <li>
+			 <Link to="/payment_gateways">Payment Gateways</Link>
+		       </li>
+                     </ul>
+		   </li>
+		 </ul>
+               </div>
+             </div>
+	   );
+	 })()}
       </nav>
     );
   }

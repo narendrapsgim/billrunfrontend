@@ -1,15 +1,13 @@
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
+export const ADD_PAYMENT_GATEWAY = 'ADD_PAYMENT_GATEWAY';
+export const REMOVE_PAYMENT_GATEWAY = 'REMOVE_PAYMENT_GATEWAY';
+export const UPDATE_PAYMENT_GATEWAY = 'UPDATE_PAYMENT_GATEWAY';
 
 import { showStatusMessage } from '../actions/commonActions';
 import { showProgressBar, hideProgressBar } from './progressbarActions';
-import axios from 'axios';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 import { showSuccess, showDanger } from './alertsActions';
-
-let axiosInstance = axios.create({
-  withCredentials: true
-});
 
 function gotSettings(settings) {
   return {
@@ -61,25 +59,30 @@ export function updateSetting(category, name, value) {
   };
 }
 
-function saveSettingsToDB(category, settings) {
+function saveSettingsToDB(category, settings = Immutable.Map()) {
+  if (!data) {
+    data = settings.get(category).toJS();
+  }
+  if (category === "pricing") {
+    data.vat = data.vat / 100;
+  }
   const query = {
     api: "settings",
     params: [
       { category: category },
-      { action: "set" },
-      { data: JSON.stringify(settings.get(category).toJS()) }
+      { action: action },
+      { data: JSON.stringify(data) }
     ]
   };
 
   return (dispatch) => {
     apiBillRun(query).then(
       success => {
-        dispatch(showSuccess("Settings saved successfuly!", "success"));
+        dispatch(showSuccess("Settings saved successfuly!"));
       },
       failure => {
-        console.log(failure);
-        console.log('failed!');
-        dispatch(showDanger("Error saving settings", "error"));
+        console.log('failed!', failure);
+        dispatch(showDanger("Error saving settings"));
       }
     ).catch(error =>
       dispatch(apiBillRunErrorHandler(error))
@@ -91,4 +94,25 @@ export function saveSettings(category, settings) {
   return dispatch => {
     return dispatch(saveSettingsToDB(category, settings));
   };  
+}
+
+export function addPaymentGateway(gateway) {
+  return {
+    type: ADD_PAYMENT_GATEWAY,
+    gateway
+  };
+}
+
+export function removePaymentGateway(gateway) {
+  return {
+    type: REMOVE_PAYMENT_GATEWAY,
+    gateway
+  };
+}
+
+export function updatePaymentGateway(gateway) {
+  return {
+    type: UPDATE_PAYMENT_GATEWAY,
+    gateway
+  };
 }

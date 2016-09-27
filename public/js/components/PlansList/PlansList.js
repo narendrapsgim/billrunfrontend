@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { PageHeader} from 'react-bootstrap';
+import Immutable from 'immutable';
 import Pager from '../Pager';
 import Filter from '../Filter';
 import moment from 'moment';
@@ -18,10 +19,12 @@ class PlansList extends Component {
     this.onNewPlan = this.onNewPlan.bind(this);
     this.onClickPlan = this.onClickPlan.bind(this);
     this.handlePageClick = this.handlePageClick.bind(this);
+    this.onSort = this.onSort.bind(this);
 
     this.state = {
       size: 10,
       page: 0,
+      sort: '',
       filter: {}
     }
   }
@@ -33,6 +36,7 @@ class PlansList extends Component {
         { collection: "plans" },
         { size: this.state.size },
         { page: this.state.page },
+	{ sort: this.state.sort },
         { query: this.state.filter }
       ]
     };
@@ -46,7 +50,7 @@ class PlansList extends Component {
   }
 
   onFilter(filter) {
-    this.setState({filter}, () => {
+    this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList('plans', this.buildQuery()))
     });
   }
@@ -56,39 +60,46 @@ class PlansList extends Component {
       pathname: "plan",
       query: {
         action: "update",
-        planId: plan.get('id')
+        planId: plan.getIn(['_id', '$id'], '')
       }
     });
   }
-  
+
   onNewPlan() {
     this.context.router.push({
-      pathname: `plan_setup`,
+      pathname: `plan`,
       query: {
         action: 'new'
       }
     });
   }
 
+  onSort(sort) {
+    this.setState({sort}, () => {
+      this.props.dispatch(getList('plans', this.buildQuery()))
+    });
+  }
+
+  
   render() {
     const { plans } = this.props;
 
     const fields = [
       {id: "name", placeholder: "Name"},
-      {id: "PlanCode", placeholder: "Code"},
+      {id: "plan_code", placeholder: "Code"},
       {id: "to", display: false, type: "datetime"}
     ];
 
     const trial_parser = (plan) => {
       if (plan.getIn(['price', 0, 'trial'])) {
-        return plan.getIn(['price', 0, 'TrialCycle']) + " " + plan.getIn(['recurrence', 'periodicity']);
+        return plan.getIn(['price', 0, 'to']) + " " + plan.getIn(['recurrence', 'periodicity']);
       }
       return '';
     };
-    
+
     const recuring_charges_parser = (plan) => {
       let sub = plan.getIn(['price', 0, 'trial']) ? 1 : 0;
-      let cycles = plan.get('price').size - sub;
+      let cycles = plan.get('price', Immutable.List()).size - sub;
       return cycles + ' cycles';
     }
 
@@ -101,8 +112,8 @@ class PlansList extends Component {
     }
 
     const tableFields = [
-      {id: 'name', title: 'Name'},
-      {id: 'PlanCode', title: 'Code'},
+      {id: 'name', title: 'Name', sort: true},
+      {id: 'plan_code', title: 'Code'},
       {id: 'description', title: "Description"},
       {title: 'Trial', parser: trial_parser},
       {id: 'recurrence_charges', title: 'Recurring Charges', parser: recuring_charges_parser},
@@ -117,20 +128,20 @@ class PlansList extends Component {
             <div className="panel panel-default">
               <div className="panel-heading">
                 All available plans
-                 <div className="pull-right">
+                <div className="pull-right">
                     <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                      <MenuItem eventKey="1" onClick={this.onNewPlan}>New</MenuItem>
+                    <MenuItem eventKey="1" onClick={this.onNewPlan}>New</MenuItem>
                     </DropdownButton>
-                  </div>
+                    </div>
               </div>
               <div className="panel-body">
                 <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
-                <List items={ plans } fields={ tableFields } />
+                <List items={ plans } fields={ tableFields } onSort={ this.onSort } edit={true} onClickEdit={ this.onClickPlan }/>
               </div>
             </div>
             <Pager onClick={this.handlePageClick}
                    size={this.state.size}
-                   count={plans.size || 0} />  
+                   count={plans.size || 0} />
           </div>
         </div>
 

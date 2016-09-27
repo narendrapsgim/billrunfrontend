@@ -1,6 +1,7 @@
 var globalSetting = {
   //serverUrl : "http://10.162.20.191:1337", // Roman
   //serverUrl : "http://10.162.20.86", // Eran
+  // serverUrl : "http://10.162.20.247", // Shani
   serverUrl: "http://billrun",
   //serverUrl: "",
   serverApiDebug : false,
@@ -13,5 +14,7 @@ var globalSetting = {
   list : {
     maxItems : 100
   },
-  statusMessageDisplayTimeout:5000
+  statusMessageDisplayTimeout:5000,
+  planCycleUnlimitedValue:999999999,
+  keyUppercaseRegex: /^[A-Z0-9_]*$/,
 };

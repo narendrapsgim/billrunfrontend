@@ -71,7 +71,7 @@ class LoginForm extends Component {
                       />
                     </FormGroup>
                     { (error.length > 0) ? <Alert bsStyle="danger">{error}</Alert> : ''}
-                    <a href="#" className="btn btn-lg btn-success btn-block" onClick={this.clickLogin}>Login</a>
+		    <button type="submit" className="btn btn-lg btn-success btn-block" onClick={this.clickLogin}>Login</button>
                 </fieldset>
             </Form>
         </Panel>

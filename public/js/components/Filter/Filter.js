@@ -16,7 +16,7 @@ export default class Filter extends Component {
 
     this.state = {
       string: "",
-      fields: [],
+      filter_by: [],
     };
   }
 
@@ -45,14 +45,14 @@ export default class Filter extends Component {
   }
 
   buildQueryString() {
-    const { string, fields } = this.state;
+    const { string, filter_by } = this.state;
     const { base } = this.props;
     const baseObj = _.reduce(base, (acc, value, field) => {
       return Object.assign({}, acc, {
         [field]: this.filterCond(field, value)
       });
     }, {});
-    const filterObj = _.reduce(fields, (acc, field) => {
+    const filterObj = _.reduce(filter_by, (acc, field) => {
       return Object.assign({}, acc, {
         [field]: this.filterCond(field, string)
       });
@@ -68,31 +68,42 @@ export default class Filter extends Component {
 
   onSelectFilterField(option, checked) {
     const value = option.val();
-    const included = _.includes(this.state.fields, value);
-    const { fields } = this.state;
+    const { filter_by } = this.state;    
+    const included = _.includes(filter_by, value);
     if (checked && included) return;
-    if (!checked && included) return this.setState({fields: _.without(fields, value)});
-    return this.setState({fields: fields.concat(value)});
+    if (!checked && included) return this.setState({filter_by: _.without(filter_by, value)});
+    return this.setState({filter_by: filter_by.concat(value)});
   }
   
   render() {
     const { fields = [] } = this.props;
+    const { filter_by, string } = this.state;
 
     const fields_options = fields.map((field, key) => {
-      let selected = _.includes(this.state.fields, field.id);
+      let selected = _.includes(filter_by, field.id);
       return {value: field.id, label: field.placeholder, selected };
     });
 
     return (
-      <div className="Filter">
-        <div className="col-lg-2">
-          <input id="filter-string" onChange={this.onChangeFilterString} className="form-control" />
+      <div className="Filter row" style={{marginBottom: 10}}>
+        <div className="col-lg-2 col-md-3 col-xs-4">
+          <input id="filter-string"
+		 placeholder="Search for..."
+		 onChange={this.onChangeFilterString}
+		 className="form-control" />
         </div>
-        <div className="col-lg-2">
-          <Multiselect data={fields_options} multiple onChange={this.onSelectFilterField} buttonWidth="100%" />
+        <div className="col-lg-2 col-md-3 col-xs-4">
+          <Multiselect data={fields_options}
+		       multiple
+		       onChange={this.onSelectFilterField}
+		       buttonWidth="100%" />
         </div>
-        <div className="col-lg-1">
-          <button className="btn btn-default" onClick={this.onClickFilterBtn}><i className="fa fa-search"></i></button>
+        <div className="col-lg-1 col-md-2 col-xs-3">
+          <button className="btn btn-default"
+		  onClick={this.onClickFilterBtn}
+		  disabled={(string && filter_by.length === 0) || (!string && filter_by.length > 0)}>
+	    <i className="fa fa-search"></i>
+	  </button>
         </div>
       </div>
     );

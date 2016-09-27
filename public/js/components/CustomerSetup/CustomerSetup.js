@@ -107,12 +107,14 @@ class CustomerSetup extends Component {
         }
       },
       failure => {
-        let errorMessages = failure.error.map( (response) => response.error.desc );
-        dispatch(showDanger("Network error - could not retrieve customer! Please try again"));
-        console.log(errorMessages);
+        dispatch(showDanger(`Error - ${failure.error[0].error.desc}`));
+        console.log(failure);
       }
     ).catch(
-      error => dispatch(apiBillRunErrorHandler(error))
+      error => {
+	dispatch(showDanger("Network error - please try again"));
+	dispatch(apiBillRunErrorHandler(error));
+      }
     );
   }
   
@@ -137,11 +139,11 @@ class CustomerSetup extends Component {
                 action={action}
                 settings={settings.getIn(['account', 'fields'])}
                 onChange={this.onChangeCustomerField} />
-      <button type="button"
+      <button type="submit"
               className="btn btn-primary"
               onClick={this.onSaveCustomer}
               style={{marginRight: 10}}>
-        Submit
+        Save
       </button>
       <button type="reset"
               className="btn btn-default"
