@@ -75,6 +75,17 @@ function fetchProcessorSettings(file_type) {
 			[{}],
         src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
       });
+      if (!rate_calculators) {
+	ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
+	  acc[mapping.usaget] = [];
+	  return acc;
+	}, {});
+      }
+      if (!customer_identification_fields) {
+	ret.customer_identification_fields = [
+	  {target_key: "sid"}
+	];
+      }
     } else {
       ret.processor = {
 	usaget_mapping: []
@@ -218,6 +229,7 @@ export function mapUsaget(mapping) {
 }
 
 export function setCustomerMapping(field, mapping) {
+  console.log(field, mapping);
   return {
     type: SET_CUSETOMER_MAPPING,
     field,
