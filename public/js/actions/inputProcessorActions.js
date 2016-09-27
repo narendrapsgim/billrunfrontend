@@ -75,7 +75,7 @@ function fetchProcessorSettings(file_type) {
 			[{}],
         src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
       });
-      if (!rate_calculators) {
+      if (!rate_calculators && usaget_type === "dynamic") {
 	ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
 	  acc[mapping.usaget] = [];
 	  return acc;
@@ -297,7 +297,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
   if (customer_identification_fields) {
     settings.customer_identification_fields = customer_identification_fields.toJS();
   }
-  if (rate_calculators) {
+  if (state.get('usaget_type') === "dynamic" && rate_calculators) {
     settings.rate_calculators = rate_calculators.toJS();
   }
   if (receiver) {
@@ -332,7 +332,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       },
       failure => {
         dispatch(finishProgressIndicator());
-        dispatch(showDanger(`Error - ${failure.error[0].error.desc}`));
+        dispatch(showDanger(`Error - ${failure.error[0].error.data.message}`));
         callback(true);
       }
     ).catch(

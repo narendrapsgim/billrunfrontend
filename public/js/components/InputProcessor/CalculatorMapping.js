@@ -56,12 +56,18 @@ export default class CalculatorMapping extends Component {
             </div>
           </div>
         </div>
-        <div className="separator"></div>
-        <div className="form-group">
-          <div className="col-lg-3">
-            <h4>Rate by</h4>
-          </div>
-        </div>
+	{
+	  available_usagetypes.length > 0 ?
+	  <div>
+            <div className="separator"></div>
+            <div className="form-group">
+              <div className="col-lg-3">
+		<h4>Rate by</h4>
+              </div>
+            </div>
+	  </div> :
+	  null
+	}
         {available_usagetypes.map((usaget, key) => (
            <div key={key}>
              <div className="form-group">
