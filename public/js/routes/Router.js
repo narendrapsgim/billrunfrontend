@@ -16,6 +16,8 @@ import Dashboard from '../components/Dashboard';
 import PageNotFound from '../components/PageNotFound';
 import LoginPage from '../components/LoginPage';
 import ProductSetup from '../components/ProductSetup';
+import User from '../components/User';
+import UserSetup from '../components/UserSetup';
 
 export default () => {
   return (
@@ -32,6 +34,8 @@ export default () => {
       <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
       <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
       <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
+      <Route path="/users" component={RequireAuth(User)} title="Users"/>
+      <Route path="/user" component={RequireAuth(UserSetup)} title="Users"/>
       <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />
     </Route>
