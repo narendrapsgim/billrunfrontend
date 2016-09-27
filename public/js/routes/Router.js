@@ -18,7 +18,8 @@ import LoginPage from '../components/LoginPage';
 import ProductSetup from '../components/ProductSetup';
 import PaymentGateways from '../components/PaymentGateways';
 import Plan from '../components/Plan';
-
+import User from '../components/User';
+import UserSetup from '../components/UserSetup';
 export default () => {
   return (
     <Route path="/" component={App}>
@@ -36,6 +37,8 @@ export default () => {
       <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
       <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
       <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
+      <Route path="/users" component={RequireAuth(User)} title="Users"/>
+      <Route path="/user" component={RequireAuth(UserSetup)} title="Users"/>      
       <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />
     </Route>
