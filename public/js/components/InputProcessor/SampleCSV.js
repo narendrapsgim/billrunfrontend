@@ -77,7 +77,7 @@ export default class SampleCSV extends Component {
     );
 
     const fieldsHTML = settings.get('delimiter_type') === "fixed" ?
-                       settings.get('fields').map((field, key) => (
+                       settings.get('fields', []).map((field, key) => (
                          <div className="form-group" key={key}>
                            <div className="col-lg-3">
                              <button type="button"
@@ -98,7 +98,7 @@ export default class SampleCSV extends Component {
                            </div>
                          </div>
                        )) :
-                       settings.get('fields').map((field, key) => (
+                       settings.get('fields', []).map((field, key) => (
                          <div className="form-group" key={key}>
                            <div className="col-lg-2">
                              <button type="button"
