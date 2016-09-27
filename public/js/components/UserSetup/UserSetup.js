@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import _ from 'lodash';
 
 /* ACTIONS */
 import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
@@ -41,17 +42,27 @@ class UserSetup extends Component {
 
 	render(){
 		const { users } = this.props;
-		console.log(users);
-		const fields = users.map((userData, key) => {
-							return (
-                              <div className="form-group" key={key}>
-                                <label>{ userData.get('id') }</label>
-                                <input className="form-control"
-                                       id={ userData.get('_id') }
-                                       value={ userData.get('username') }
-                                        />
-                              </div>
-                            )});
+		const fields = [(
+			<div className="form-group" key={1}>
+                <label>Username</label>
+		        <input className="form-control"
+        	        id="username"
+               	    value={ users.get("username") }
+                />
+            </div>),
+			(<div className="form-group" key={2}>
+				<label>Roles</label>
+				{ ['admin','read','write'].map((role, key) => (
+					<div className="checkbox">
+					<label>
+					<input type="checkbox"
+						value={role}
+						checked={users.get('roles', []).includes(role)}
+					/>{role}
+					</label>
+					</div>
+				)) }
+			</div>)];
 		return(
 			<div className="panel panel-default">
 				<div className="panel-heading">
