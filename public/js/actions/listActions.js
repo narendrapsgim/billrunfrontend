@@ -62,7 +62,17 @@ function fetchPaymentGateways() {
     pre: "paymentgateways",
     api: "list"
   };
+
+  const dummy_data = [
+    { name: "PayPal_Express", image_url: "https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-200px.png", params: {user: "", password: ""}, supported: 1},
+    { name: "Stripe", image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Stripe_logo,_revised_2014.png/200px-Stripe_logo,_revised_2014.png", params: {token: ""}, supported: 1}
+  ];
+
+  return (dispatch) => {
+    dispatch(gotList('supported_gateways', dummy_data));
+  };
   
+  /*  
   return (dispatch) => {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(
@@ -81,6 +91,7 @@ function fetchPaymentGateways() {
       }
     );
   };
+  */
 }
 
 export function getPaymentGateways() {
