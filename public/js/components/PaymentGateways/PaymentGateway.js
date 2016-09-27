@@ -59,7 +59,7 @@ export default class PaymentGateway extends Component {
 	    {
 	      !settings.get('image_url') ?
 	      settings.get('name') :
-	      <img src={settings.get('image_url')} style={style} />
+	      <img src={settings.get('image_url')} style={style} width="200" height="51" />
 	    }
 	  </div>
 	  <div className="col-lg-4 col-md-4">
