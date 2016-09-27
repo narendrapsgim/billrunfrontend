@@ -19,126 +19,111 @@ import Include from './Include';
 import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 
+
 class PlanIncludeGroupEdit extends Component {
 
-  constructor(props) {
-    super(props);
-    this.toggleBoby = this.toggleBoby.bind(this);
-    this.onChangeInclud = this.onChangeInclud.bind(this);
-    this.onAddProduct = this.onAddProduct.bind(this);
-    this.onRemoveProduct = this.onRemoveProduct.bind(this);
-    this.state = {open: false};
+  static propTypes = {
+    onChangeInclud: React.PropTypes.func.isRequired,
+    onGroupRemove: React.PropTypes.func.isRequired,
+    onAddProduct: React.PropTypes.func.isRequired,
+    onRemoveProduct: React.PropTypes.func.isRequired
   }
 
-  componentWillMount() {
+  state = {
+    open: false
+  }
+
+  // shouldComponentUpdate(nextProps, nextState){
+  //   return true;
+  //   //return nextProps.value !== this.props.value;
+  // }
+
+  componentWillMount(){
     const { name, usaget } = this.props;
     this.props.getGroupProducts(name, usaget);
   }
 
-  shouldComponentUpdate(nextProps, nextState){
-    return true;
-    //return nextProps.value !== this.props.value;
-  }
-
-
-  toggleBoby(){
+  toggleBoby = () => {
     this.setState({ open: !this.state.open });
   }
 
-  onChangeInclud(newValue){
+  onChangeInclud = (newValue) => {
     const { name, usaget } = this.props;
     this.props.onIncludeChange(name, usaget, newValue);
   }
 
-  onAddProduct(productKey){
+  onAddProduct = (productKey) => {
     if(productKey){
       const { name, usaget } = this.props;
       this.props.addGroupProducts(name, usaget, productKey);
     }
   }
-  onRemoveProduct(productKey){
+
+  onRemoveProduct = (productKey) => {
     if(productKey){
       const { name, usaget } = this.props;
       this.props.removeGroupProducts(name, usaget, productKey);
     }
   }
 
+  onGroupRemove = (productKey) => {
+    const { name, usaget } = this.props;
+    this.props.onGroupRemove(name, usaget)
+  }
+
   render() {
     const { name, value, usaget, products } = this.props;
     const { open } = this.state;
+    const productsNames = (typeof products === 'undefined') ? null : products.map( (prod) => prod.key).toArray();;
+
 
     return (
-        <div style={{display: 'flex',/* borderTop: '1px solid #eee', paddingBottom: 10, /*backgroundColor: open ? 'rgba(0,0,0,0.03)' : 'transparent'*/}}>
-          <div style={{flex: '2 0 0', margin: '9px 40px auto', textAlign: 'left'}}>
-              <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Remove {name} gruop</Tooltip>}>
-                <FontIcon
-                  onClick={this.props.onGroupRemove.bind(this, name, usaget)}
-                  className="material-icons"
-                  style={{cursor: "pointer", color: Colors.red300, fontSize: '32px', marginRight: '10px'}}
-                >delete_forever</FontIcon>
-              </OverlayTrigger>
-              <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Edit {name} gruop</Tooltip>}>
-                <FontIcon
-                  onClick={ this.toggleBoby }
-                  className="material-icons"
-                  style={{cursor: "pointer", color: Colors.grey500, fontSize: '32px', marginRight: '10px'}}
-                >mode_edit</FontIcon>
-              </OverlayTrigger>
-          </div>
-          <div style={{flex: '9 0 0'}}>
-            <div className="product" style={{marginTop: 20}}>
-              <div style={{display: 'flex', marginBottom: open ? 20 : 0 }}>
+      <div>
+        <Row>
+          <Col lg={1} md={1} sm={1} xs={6} className="text-left">
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Remove {name} gruop</Tooltip>}>
+              <i className="fa fa-times-circle fa-lg" onClick={ this.onGroupRemove } style={{cursor: "pointer", color: 'red'}}></i>
+            </OverlayTrigger>
+          </Col>
+          <Col lg={1} md={1} sm={1} xs={6} className="text-left">
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Edit {name} gruop</Tooltip>}>
+              <i className="fa fa-pencil fa-lg" onClick={ this.toggleBoby } style={{cursor: "pointer", color:'#777'}}></i>
+            </OverlayTrigger>
+          </Col>
+          <Col lg={6} md={6} sm={6} xs={12} className="text-left">
+            <h4 style={{marginTop: 0}}>{name} <small>&lt;{usaget}&gt;</small></h4>
+          </Col>
+          {open
+            ? <Col lg={1} md={1} sm={1} xs={1} lgOffset={3} mdOffset={3} smOffset={3} className="text-right">
+                <i className="fa fa-times" onClick={ this.toggleBoby } style={{cursor: "pointer"}} ></i>
+              </Col>
+            : <Col lg={4} md={4} sm={4} xs={12} className="text-right">{value}</Col>
+          }
+        </Row>
 
-                <div style={{flex: '5 0 0', textAlign: 'left', cursor: "pointer"}} onClick={ this.toggleBoby }>
-                  <h4 style={{marginTop: 0}}>{name} <small>&lt;{usaget}&gt;</small></h4>
-                </div>
-                <div style={{flex: '2 0 0', textAlign: 'right', pading: '0 3px', cursor: "pointer"}} onClick={ this.toggleBoby }>
-                 {!open && value}
-                </div>
-              </div>
-              <Collapse in={open}>
-                <div style={{backgroundColor: "rgba(0, 0, 0, 0.027451)", padding: 20, borderRadius: 5}}>
-                  <Form horizontal style={{marginTop:20}}>
-                    <FormGroup>
-                      <Col componentClass={ControlLabel} sm={4}>
-                        Includes :
-                      </Col>
-                      <Col sm={8}>
-                        <Include onChangeInclud={this.onChangeInclud} value={value} />
-                      </Col>
-                    </FormGroup>
-                    <FormGroup>
-                      <Col componentClass={ControlLabel} sm={4}>
-                        Products :
-                      </Col>
-                      <Col sm={8}>
-
-                        { (typeof products === 'undefined') ?
-                          <p style={{marginTop:8}}>Loading....</p>
-                          :
-                          <div>
-                            <Products
-                              onRemoveProduct={this.onRemoveProduct}
-                              products={products.map( (prod) => prod.key).toArray()}
-                            />
-                            <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                              <ProductSearchByUsagetype
-                                addRatesToGroup={this.onAddProduct}
-                                usaget={usaget}
-                                products={products.map( (prod) => prod.key).toArray()}
-                              />
-                            </div>
-                          </div>
-                        }
-                      </Col>
-                    </FormGroup>
-                  </Form>
-                </div>
-              </Collapse>
-            </div>
+        <Collapse in={open}>
+          <div style={{backgroundColor: "rgba(0, 0, 0, 0.027451)", padding: 25, borderRadius: 5, marginTop: 15}}>
+            <Form>
+              <FormGroup>
+                <ControlLabel>Includes</ControlLabel>
+                <Include onChangeInclud={this.onChangeInclud} value={value} />
+              </FormGroup>
+              <FormGroup>
+                <ControlLabel>Products</ControlLabel>
+                  { ( !productsNames )
+                    ? <p style={{marginTop:8}}>Loading....</p>
+                    : <div>
+                        <Products onRemoveProduct={this.onRemoveProduct} products={productsNames} />
+                        <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
+                          <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={productsNames} />
+                        </div>
+                    </div>
+                  }
+              </FormGroup>
+            </Form>
           </div>
-          <div style={{flex: '1 0 0'}}></div>
-        </div>
+        </Collapse>
+      </div>
     );
   }
 

@@ -65,7 +65,7 @@ export default function (state = defaultState, action) {
       // }
       state = state.update('price', list => list.delete(action.index));
       //recaluculate cycle
-      return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, 0));
+      return state.updateIn(['price'], list => _reaclculateCycles(list, action.index));
 
 
     case actions.GOT_PLAN:
@@ -83,10 +83,13 @@ function _reaclculateCycles(prices, index, value){
   return prices.reduce( (newList, price, i, iter) => {
     if(i == index){
       //set new To
-      if(value === PLAN_CYCLE_UNLIMITED){
+      if(typeof value === 'undefined'){ // first item was removed
+        price = price.set('to', parseInt(price.get('to', 0) || 0) - parseInt(price.get('from', 0) || 0));
+      }
+      else if(value === PLAN_CYCLE_UNLIMITED){ // last value set to unlimited
         price = price.set('to', value);
-      } else {
-        price = price.set('to', parseInt(price.get('from')) + parseInt(value));
+      } else { // simple case, update to new value
+        price = price.set('to', parseInt(price.get('from') || 0) + parseInt(value));
       }
       //set new From
       if(index === 0){
@@ -94,17 +97,18 @@ function _reaclculateCycles(prices, index, value){
       }
       return newList.push(price);
     } else if(i > index){
+      var from = price.get('from', 0);
+      var to = price.get('to', '');
       //set new From
-      var prevTo = parseInt(newList.last().get('to', 0));
+      var prevTo = parseInt(newList.last().get('to', 0) || 0);
       price = price.set('from', prevTo);
       //set new To
-      var to = price.get('to', '');
       if(to === ''){ //TO not set
         price = price.set('to', price.get('from'));
       } else if(to === PLAN_CYCLE_UNLIMITED ){ //TO is unlimited
         // do nothing
       } else { // normal case, update with shifting
-        var diff = parseInt(price.get('to', 0)) - parseInt(price.get('from', 0));
+        var diff = parseInt(to || 0) - parseInt(from || 0);
         price = price.set('to', prevTo + diff);
       }
       return newList.push(price);

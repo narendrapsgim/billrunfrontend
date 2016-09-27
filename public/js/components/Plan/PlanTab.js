@@ -45,7 +45,7 @@ export default class Plan extends Component {
         <PlanPrice
           index={0}
           count={plan.get('price', Immutable.List()).size}
-          price={trial}
+          item={trial}
           onPlanCycleUpdate={this.props.onPlanCycleUpdate}
           onPlanPriceUpdate={this.props.onPlanPriceUpdate}
           onPlanTariffAdd={this.props.onPlanTariffAdd}
@@ -65,7 +65,7 @@ export default class Plan extends Component {
           <PlanPrice key={i}
             index={i}
             count={count}
-            price={price}
+            item={price}
             onPlanCycleUpdate={this.props.onPlanCycleUpdate}
             onPlanPriceUpdate={this.props.onPlanPriceUpdate}
             onPlanTariffAdd={this.props.onPlanTariffAdd}
@@ -120,8 +120,9 @@ export default class Plan extends Component {
 
     return (
       <Row>
-        <Col lg={6}>
-          <Form horizontal>
+        <Col lg={8}>
+          <Form>
+            <Panel>
               <FormGroup>
                 <Col lg={6} md={6}>
                   <label htmlFor="PlanName">Name</label><Help contents={PlanDescription.name} />
@@ -144,7 +145,7 @@ export default class Plan extends Component {
               <FormGroup>
                 <Col lg={4} md={4}>
                   <label htmlFor="PlanEach">Frequency</label>
-                  <Field id="PlanEach" fieldType="number" className="form-control" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
+                  <Field min="1" id="PlanEach" fieldType="number" className="form-control" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
                 </Col>
                 <Col lg={4} md={4}>
                   <ControlLabel>&nbsp;</ControlLabel>
@@ -153,14 +154,15 @@ export default class Plan extends Component {
                   </FormControl>
                 </Col>
                 <Col lg={4} md={4}>
-                <ControlLabel>Charging Mode</ControlLabel>
-                <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
-                  <option value="">Select...</option>
-                  <option value={true}>Upfront</option>
-                  <option value={false}>Arrears</option>
-                </FormControl>
-              </Col>
-            </FormGroup>
+                  <ControlLabel>Charging Mode</ControlLabel>
+                  <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
+                    <option value="">Select...</option>
+                    <option value={true}>Upfront</option>
+                    <option value={false}>Arrears</option>
+                  </FormControl>
+                </Col>
+              </FormGroup>
+            </Panel>
 
             <Panel header={<h3>Trial Period</h3>}>
               { this.getTrialPrice() }

@@ -11,7 +11,7 @@ export const PLAN_PRODUCTS_RATE_REMOVE = 'PLAN_PRODUCTS_RATE_REMOVE';
 
 import moment from 'moment';
 import { showModal } from './modalActions';
-import { showProgressBar, hideProgressBar } from './progressbarActions';
+import { showDanger, showSuccess } from './alertsActions';
 import { showAlert } from '../actions/alertsActions';
 import { apiBillRun, apiBillRunErrorHandler} from '../common/Api';
 
@@ -185,18 +185,25 @@ export function getProductByKey(key, planName) {
   }
 }
 
-export function savePlanRates() {
+export function savePlanRates(callback) {
     return (dispatch, getState) => {
       const { planProducts, plan } =  getState();
       var planName = plan.get('PlanName');
       let queries = [];
       planProducts.get('planProducts').forEach( prod => {
-        var formData = new FormData();
         prod = prod.delete('uiflags');
+        let from = moment(); //.format(globalSetting.apiDateTimeFormat)
+        let to = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
+        prod = prod.set('from', from).set('to', to);
+
+
+        var formData = new FormData();
         formData.append('id', prod.getIn(['_id', '$id']));
         formData.append('coll', 'rates');
-        formData.append('type', 'update');
+        formData.append('type', 'close_and_new');
         formData.append('data', JSON.stringify(prod));
+
+        console.log("Save product : ", prod.toJS());
 
         var query = {
           api: "save",
@@ -212,8 +219,8 @@ export function savePlanRates() {
       apiBillRun(queries).then(
         sussess => {
           let successMessages = sussess.data.map( (response) => response.name );
-          dispatch(showStatusMessage(successMessages.join(', ') + " successfully updated", 'success'));
-          dispatch(getExistPlanProducts(planName));
+          dispatch(showSuccess(successMessages.join(', ') + " successfully updated", 'success'));
+          callback(sussess);
         },
         failure => {
           let errorMessages = failure.error.map( (response) => `${response.name}: ${response.error.message}`);

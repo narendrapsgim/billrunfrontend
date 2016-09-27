@@ -1,5 +1,5 @@
 import Immutable from 'immutable';
-import md5 from 'md5';
+import moment from 'moment';
 
 export const SUCCESS = "success";
 export const WARNING = "warning";
@@ -22,29 +22,25 @@ const Alert = Immutable.Record({
   timeout: 4000
 });
 
-export function showSuccess(message = '', timeout){
+export function showSuccess(message = '', timeout = 2000){
   return showAlert(message, SUCCESS, timeout);
 }
 
-export function showWarning(message = '', timeout){
+export function showWarning(message = '', timeout = 4000){
   return showAlert(message, WARNING, timeout);
 }
 
-export function showDanger(message = '', timeout){
-  timeout = (typeof timeout === 'undefined') ? null : timeout;
+export function showDanger(message = '', timeout = 6000){
   return showAlert(message, DANGER, timeout);
 }
 
-export function showInfo(message = '', timeout){
+export function showInfo(message = '', timeout = 4000){
   return showAlert(message, INFO, timeout);
 }
 
 export function showAlert(message = '', type = INFO, timeout){
-  let alert = new Alert({ message, type, id: md5(message) });
-
-  if(typeof timeout !== 'undefined'){
-    alert = alert.set('timeout', timeout);
-  }
+  let id = moment().unix();
+  let alert = new Alert({ message, type, id, timeout });
 
   return {
     type: SHOW_ALERT,

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { Panel, Form, FormGroup, Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import {
@@ -15,14 +16,14 @@ import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 
 class PlanIncludesTab extends Component {
 
-  constructor(props) {
-    super(props);
-    this.onIncludeChange = this.onIncludeChange.bind(this);
-    this.onGroupRemove = this.onGroupRemove.bind(this);
-    this.renderGroups = this.renderGroups.bind(this);
-
-    this.state = { existingGroups: [] };
+  state = {
+    existingGroups: []
   }
+
+  // shouldComponentUpdate(nextProps, nextState){
+  //   return true;
+  //   // return !Immutable.is(nextProps.plan.get('include'), this.props.plan.get('include'));
+  // }
 
   componentDidMount() {
     getAllGroup().then( (response) => {
@@ -32,40 +33,37 @@ class PlanIncludesTab extends Component {
     })
   }
 
-  shouldComponentUpdate(nextProps, nextState){
-    return true;
-    // return !Immutable.is(nextProps.plan.get('include'), this.props.plan.get('include'));
-  }
 
-  onGroupRemove(groupName, usaget){
+
+  onGroupRemove = (groupName, usaget) => {
     this.props.removePlanInclude(groupName, usaget);
   }
 
-  onIncludeChange(groupName, usaget, value){
+  onIncludeChange = (groupName, usaget, value) => {
     this.props.changePlanInclude(groupName, usaget, value);
   }
 
-  renderGroups(){
+  renderGroups = () => {
     const { plan } = this.props;
     const includeGroups =  plan.getIn(['include', 'groups']);
+
     if(typeof includeGroups === 'undefined'){
       return null;
     }
+
     let groups = [];
     includeGroups.forEach((include, groupName) => {
       include.forEach( (value, usaget) => {
           groups.push(
-            <div key={`${groupName}_${usaget}`}>
-              <hr />
-              <PlanIncludeGroupEdit
+              <PlanIncludeGroupEdit key={`${groupName}_${usaget}`}
                 name={groupName}
                 value={value}
                 usaget={usaget}
                 onIncludeChange={this.onIncludeChange}
                 onGroupRemove={this.onGroupRemove}
               />
-          </div>
-        )
+        );
+        groups.push(<hr />)
       });
     });
 
@@ -73,19 +71,17 @@ class PlanIncludesTab extends Component {
   }
 
   render() {
+
     const { existingGroups } = this.state;
     return (
-      <div>
-        <h4>Groups <Help contents={PlanDescription.include_groups} /></h4>
-        <div className="edit-includes">
-          {this.renderGroups()}
-        </div>
-        <div className="add-include">
-          <hr />
-          <PlanIncludeGroupCreate existingGroups={existingGroups}/>
-          <hr />
-        </div>
-      </div>
+      <Row>
+        <Col lg={8}>
+            <Panel header={<h3>Groups <Help contents={PlanDescription.include_groups} /></h3>}>
+              {this.renderGroups()}
+              <PlanIncludeGroupCreate existingGroups={existingGroups}/>
+            </Panel>
+        </Col>
+      </Row>
     );
   }
 

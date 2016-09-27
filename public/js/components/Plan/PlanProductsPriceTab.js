@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { Panel, Form, FormGroup, Col, Row } from 'react-bootstrap';
+import Immutable from 'immutable';
 
 import {
   getProductByKey,
@@ -17,24 +19,15 @@ import { showSuccess, showWarning, showDanger, showInfo } from '../../actions/al
 
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
-import PlanProductsPriceList from './components/PlanProductsPriceList';
 import ProductSearch from './components/ProductSearch';
+import PlanProduct from './components/PlanProduct';
+
 
 class PlanProductsPriceTab extends Component {
 
-  constructor(props) {
-    super(props);
-    this.onSelectProduct = this.onSelectProduct.bind(this);
-    this.onProductRemove = this.onProductRemove.bind(this);
-    this.onProductRestore = this.onProductRestore.bind(this);
-    this.onNewProductRestore = this.onNewProductRestore.bind(this);
-    this.onProductUndoRemove = this.onProductUndoRemove.bind(this);
-    this.onProductRemoveRate = this.onProductRemoveRate.bind(this);
-    this.onProductEditRate = this.onProductEditRate.bind(this);
-    this.onProductAddRate = this.onProductAddRate.bind(this);
-    this.onProductInitRate = this.onProductInitRate.bind(this);
-    this.state = {planName: props.planName};
-  }
+  state = {
+    planName: this.props.planName
+  };
 
   componentWillMount() {
     const { planName } = this.state;
@@ -47,7 +40,7 @@ class PlanProductsPriceTab extends Component {
     this.props.planProductsClear();
   }
 
-  onSelectProduct (key) {
+  onSelectProduct = (key) => {
     const { productPlanPrice } = this.props;
     const { planName } = this.state;
     if(!productPlanPrice.some( (prod) => prod === key)){
@@ -57,66 +50,89 @@ class PlanProductsPriceTab extends Component {
     }
   }
 
-  onNewProductRestore(key, ratePath) {
-    this.onProductInitRate(key, ratePath);
-    this.props.showInfo(`Product ${key} prices for this plan restored to BASE state`);
+  onNewProductRestore = (productName, productPath) => {
+    this.onProductInitRate(productName, productPath);
+    this.props.showInfo(`Product ${productName} prices for this plan restored to BASE state`);
   }
 
-  onProductRestore(key, ratePath){
-    this.props.restorePlanProduct(key, ratePath);
-    this.props.showInfo(`Product ${key} prices for this plan restored to original state`);
+  onProductRestore = (productName, productPath) => {
+    this.props.restorePlanProduct(productName, productPath);
+    this.props.showInfo(`Product ${productName} prices for this plan restored to original state`);
   }
-  onProductRemove(key, ratePath){
-    this.props.removePlanProduct(key, ratePath);
-    this.props.showInfo(`Product ${key} prices for this plan will be removed after save`);
+  onProductRemove = (productName, productPath) => {
+    this.props.removePlanProduct(productName, productPath);
+    this.props.showInfo(`Product ${productName} prices for this plan will be removed after save`);
   }
-  onProductUndoRemove(key, ratePath){
-    this.props.undoRemovePlanProduct(key, ratePath);
-    this.props.showSuccess(`Product ${key} prices restored`);
+  onProductUndoRemove = (productName, productPath) => {
+    this.props.undoRemovePlanProduct(productName, productPath);
+    this.props.showSuccess(`Product ${productName} prices restored`);
   }
-  onProductRemoveRate(key, path, idx){
-    this.props.planProductsRateRemove(key, path, idx);
+  onProductRemoveRate = (productName, productPath, index) => {
+    this.props.planProductsRateRemove(productName, productPath, index);
   }
-  onProductEditRate(key, path, value) {
-    this.props.planProductsRateUpdate(key, path, value);
+  onProductEditRate = (productName, productPath, value) => {
+    this.props.planProductsRateUpdate(productName, productPath, value);
   }
-  onProductAddRate(key, path) {
-    this.props.planProductsRateAdd(key, path);
+  onProductAddRate = (productName, productPath) => {
+    this.props.planProductsRateAdd(productName, productPath);
   }
-  onProductInitRate(key, path) {
-    this.props.planProductsRateInit(key, path);
+  onProductInitRate = (productName, productPath) => {
+    this.props.planProductsRateInit(productName, productPath);
+  }
+
+  renderNoItems = () => {
+    return ( <Col lg={12}> No overridden prices for this plan </Col> );
+  }
+
+  renderItems = () => {
+    const { planName } = this.state;
+    const { planProducts, productPlanPrice } = this.props;
+
+    return productPlanPrice.map( (key, i) => {
+      var prod = planProducts.get(key);
+      return (
+        <PlanProduct key={prod.getIn(['_id', '$id'])}
+          index={i}
+          count={productPlanPrice.size}
+          item={prod}
+          planName={planName}
+          onProductRemove={this.onProductRemove}
+          onProductUndoRemove={this.onProductUndoRemove}
+          onProductRemoveRate={this.onProductRemoveRate}
+          onProductEditRate={this.onProductEditRate}
+          onProductAddRate={this.onProductAddRate}
+          onProductInitRate={this.onProductInitRate}
+          onProductRestore={this.onProductRestore}
+          onNewProductRestore={this.onNewProductRestore}
+        />
+      )
+    });
   }
 
   render() {
-    const { planProducts, productPlanPrice } = this.props;
     const { planName } = this.state;
+    const { productPlanPrice } = this.props;
 
     if(typeof planName === 'undefined' || planName === null || planName.length === 0){
       return (<p>Override Product Price available only in edit mode</p>);
     }
 
     return (
-      <form className="form-horizontal basic-products-settings">
-        <div className="add-products">
-          <div key="select-product">
-            <h4>Select Products <Help contents={PlanDescription.add_product} /></h4>
-            <ProductSearch onSelectProduct={this.onSelectProduct}/>
-          </div>
-          <PlanProductsPriceList
-            planName={planName}
-            planProducts={planProducts}
-            productPlanPrice={productPlanPrice}
-            onProductRemove={this.onProductRemove}
-            onProductUndoRemove={this.onProductUndoRemove}
-            onProductRestore={this.onProductRestore}
-            onProductRemoveRate={this.onProductRemoveRate}
-            onProductEditRate={this.onProductEditRate}
-            onProductAddRate={this.onProductAddRate}
-            onProductInitRate={this.onProductInitRate}
-            onNewProductRestore={this.onNewProductRestore}
-          />
-        </div>
-      </form>
+      <Row>
+        <Col lg={8}>
+          <Form>
+
+            <Panel header={<h3>Select Products to Override Price <Help contents={PlanDescription.add_product} /></h3>}>
+              <ProductSearch onSelectProduct={this.onSelectProduct}/>
+            </Panel>
+
+            <Panel header={<h3>Overridden Products Prices for Plan &quot;{planName}&quot;</h3>}>
+              { this.props.productPlanPrice.size > 0 ? this.renderItems() : this.renderNoItems() }
+            </Panel>
+
+          </Form>
+        </Col>
+      </Row>
     );
   }
 
