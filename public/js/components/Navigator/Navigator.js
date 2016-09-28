@@ -52,11 +52,9 @@ class Navigator extends Component {
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
-          <NavDropdown  title={<i className="fa fa-user fa-fw"></i>} >
-            <MenuItem eventKey="4">
-	      <Link to="#" onClick={this.clickLogout}>
-		<i className="fa fa-sign-out fa-fw"></i> Logout
-	      </Link>
+          <NavDropdown id="nav-user-menu" title={<i className="fa fa-user fa-fw"></i>} >
+            <MenuItem eventKey="4" onClick={this.clickLogout}>
+	            <i className="fa fa-sign-out fa-fw"></i> Logout
             </MenuItem>
           </NavDropdown>
         </ul>

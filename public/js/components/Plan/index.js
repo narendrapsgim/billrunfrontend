@@ -1,2 +1,2 @@
-import Plan from './Plan';
+import Plan from './PlanSetup';
 export default Plan;
