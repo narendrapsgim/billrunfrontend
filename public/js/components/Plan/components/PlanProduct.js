@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import Immutable from 'immutable';
 import Field from '../../Field';
-import ProductPrice from '../../ProductSetup/ProductPrice';
+import ProductPrice from '../../Product/components/ProductPrice';
 
 export default class PlanProduct extends Component {
 

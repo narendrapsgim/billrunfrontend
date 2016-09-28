@@ -1,23 +1,27 @@
-export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
+export const GOT_PLAN = 'GOT_PLAN';
+export const SAVE_PLAN = 'SAVE_PLAN';
+export const CLEAR_PLAN = 'CLEAR_PLAN';
 export const ADD_TARIFF = 'ADD_TARIFF';
 export const REMOVE_TARIFF = 'REMOVE_TARIFF';
 export const UPDATE_PLAN_CYCLE = 'UPDATE_PLAN_CYCLE';
 export const UPDATE_PLAN_PRICE = 'UPDATE_PLAN_PRICE';
-
-export const SAVE_PLAN = 'SAVE_PLAN';
-export const GET_PLAN = 'GET_PLAN';
-export const GOT_PLAN = 'GOT_PLAN';
-export const CLEAR_PLAN = 'CLEAR_PLAN';
+export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
 
 export const REMOVE_INCLUDE = 'REMOVE_INCLUDE';
-export const ADD_INCLUDE = 'ADD_INCLUDE';
 export const CHNAGE_INCLUDE = 'CHNAGE_INCLUDE';
+export const ADD_INCLUDE = 'ADD_INCLUDE';
 
 import moment from 'moment';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 import { showDanger, showSuccess } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 
+
+export function clearPlan() {
+  return {
+    type: CLEAR_PLAN
+  };
+}
 
 export function onPlanFieldUpdate(path, value) {
   return {
@@ -89,17 +93,12 @@ export function getPlan(plan_id) {
   };
 }
 
-export function clearPlan() {
-  return {
-    type: CLEAR_PLAN
-  };
-}
-
 export function savePlan(plan, action, callback = () => {}) {
   return dispatch => {
     return dispatch(savePlanToDB(plan, action, callback));
   };
 }
+
 
 /* Internal function */
 function savePlanToDB(plan, action, callback) {
@@ -118,7 +117,7 @@ function savePlanToDB(plan, action, callback) {
   formData.append("data", JSON.stringify(plan));
 
   console.log("Save plan : ", plan.toJS());
-  
+
   const query = [{
     api: "save",
     options: {
@@ -136,7 +135,7 @@ function savePlanToDB(plan, action, callback) {
         callback(success);
       },
       failure => {
-        let errorMessages = failure.error.map( (response) => response.error.message);
+        const errorMessages = failure.error.map( (response) => response.error.message);
         dispatch(showDanger(errorMessages));
         dispatch(finishProgressIndicator());
         callback(failure);
@@ -154,7 +153,7 @@ function gotPlan(plan) {
   };
 }
 
-function fetchPlan(plan_id) {
+function fetchPlan(id) {
   const query = {
     api: "find",
     params: [
@@ -162,7 +161,7 @@ function fetchPlan(plan_id) {
       { size: "1" },
       { page: "0" },
       { query: JSON.stringify(
-        {"_id" :  {"$in": [plan_id]}}
+        {"_id" :  {"$in": [id]}}
       )},
     ]
   };
