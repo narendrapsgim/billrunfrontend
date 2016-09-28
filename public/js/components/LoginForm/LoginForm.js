@@ -53,7 +53,7 @@ class LoginForm extends Component {
         <Panel header="Please Sign In" className="login-panel">
             <Form onSubmit={this.clickLogin}>
                 <fieldset>
-                    <FormGroup validationState={error.length > 0 ? "error" : '' }>
+                    <FormGroup validationState={error.length > 0 ? "error" : null }>
                       <FormControl
                         autoFocus
                         type="text"
@@ -62,7 +62,7 @@ class LoginForm extends Component {
                         onChange={this.onChangeUsername}
                       />
                     </FormGroup>
-                    <FormGroup validationState={error.length > 0 ? "error" : '' }>
+                    <FormGroup validationState={error.length > 0 ? "error" : null }>
                       <FormControl
                         type="password"
                         placeholder="Password"
