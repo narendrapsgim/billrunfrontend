@@ -305,7 +305,10 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       },
       failure => {
         dispatch(finishProgressIndicator());
-        dispatch(showDanger(`Error - ${failure.error[0].error.desc}`));
+        const msg = _.result(failure, 'error[0].error.data.message') ?
+                    failure.error[0].error.data.message :
+                    failure.error[0].error.desc;
+        dispatch(showDanger(`Error - ${msg}`));
         callback(true);
       }
     ).catch(
