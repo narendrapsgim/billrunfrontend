@@ -9,6 +9,8 @@ import CustomerSetup from '../components/CustomerSetup';
 import PlansList from '../components/PlansList';
 import InputProcessor from '../components/InputProcessor';
 import InputProcessorsList from '../components/InputProcessorsList';
+import ExportGenerator from '../components/ExportGenerator';
+import ExportGeneratorsList from '../components/ExportGeneratorsList';
 import UsageList from '../components/UsageList';
 import InvoicesList from '../components/InvoicesList';
 import Settings from '../components/Settings';
@@ -32,6 +34,8 @@ export default () => {
       <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
       <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>
       <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors"/>
+      <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator"/>
+      <Route path="/export_generators" component={RequireAuth(ExportGeneratorsList)} title="Export Generators"/>
       <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
       <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
       <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
