@@ -10,13 +10,20 @@ export default class CSVFields extends Component {
 
   render() {
     const { settings, onRemoveField, onSetFieldWidth } = this.props;
-    const fixed = settings.get('delimiter_type') === "fixed";
+    const fixed = settings.get('delimiter_type', '') === "fixed";
 
     return (
       <div>
         {
-          settings.get('fields').map((field, key) => (
-            <CSVField key={key} index={key} onRemoveField={onRemoveField} field={field} onSetFieldWidth={onSetFieldWidth} fixed={fixed} disabled={!settings.get('file_type')} width={settings.getIn(['field_widths', field])} /> ))
+          settings.get('fields', []).map((field, key) => (
+            <CSVField key={key} index={key}
+                      onRemoveField={onRemoveField}
+                      field={field}
+                      onSetFieldWidth={onSetFieldWidth}
+                      fixed={fixed}
+                      disabled={!settings.get('file_type')}
+                      width={settings.getIn(['field_widths', field])} />
+          ))
         }
       </div>
     );

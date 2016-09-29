@@ -48,7 +48,7 @@ class InputProcessorsList extends Component {
   
   onClickNew() {
     this.context.router.push({
-      pathname: 'input_processor',
+      pathname: 'select_input_processor_template',
       query: {
         action: 'new'
       }

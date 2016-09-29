@@ -101,7 +101,7 @@ export default class FieldsMapping extends Component {
               <select id="date_field"
                       className="form-control"
                       onChange={onSetFieldMapping}
-                      value={settings.getIn(['processor', 'date_field'])}
+                      value={settings.getIn(['processor', 'date_field'], '')}
                       defaultValue="-1">
                 { available_fields }
               </select>
@@ -122,7 +122,7 @@ export default class FieldsMapping extends Component {
               <select id="volume_field"
                       className="form-control"
                       onChange={onSetFieldMapping}
-                      value={settings.getIn(['processor', 'volume_field'])}
+                      value={settings.getIn(['processor', 'volume_field'], '')}
                       defaultValue="-1">
                 { available_fields }
               </select>
@@ -139,7 +139,7 @@ export default class FieldsMapping extends Component {
             <label><input type="radio"
                           name="usage_types_type"
                           value="static"
-                          checked={settings.get('usaget_type') === "static"}
+                          checked={settings.get('usaget_type', '') === "static"}
                           onChange={this.onSetType} />
               Static
             </label>
@@ -153,8 +153,8 @@ export default class FieldsMapping extends Component {
                   id="unit"
                   options={available_units}
                   allowCreate={true}
-                  value={settings.getIn(['processor', 'default_usaget'])}
-                  disabled={settings.get('usaget_type') !== "static"}
+                  value={settings.getIn(['processor', 'default_usaget'], '')}
+                  disabled={settings.get('usaget_type', '') !== "static"}
                   style={{marginTop: 3}}
                   onChange={this.onChangeStaticUsaget}
               />
@@ -166,7 +166,7 @@ export default class FieldsMapping extends Component {
             <label><input type="radio"
                           name="usage_types_type"
                           value="dynamic"
-                          checked={settings.get('usaget_type') === "dynamic"}
+                          checked={settings.get('usaget_type', '') === "dynamic"}
                           onChange={this.onSetType} />
               Dynamic
             </label>
@@ -179,8 +179,8 @@ export default class FieldsMapping extends Component {
               <select id="src_field"
                       className="form-control"
                       onChange={onSetFieldMapping}
-                      value={settings.getIn(['processor', 'src_field'])}
-                      disabled={settings.get('usaget_type') !== "dynamic"}
+                      value={settings.getIn(['processor', 'src_field'], '')}
+                      disabled={settings.get('usaget_type', '') !== "dynamic"}
                       defaultValue="-1">
                 { available_fields }
               </select>
@@ -204,12 +204,12 @@ export default class FieldsMapping extends Component {
                 <div className="form-group">
                   <div className="col-lg-offset-3 col-lg-7">
                     <div className="col-lg-offset-1 col-lg-10">
-                      <div className="col-lg-5">{usage_t.get('pattern')}</div>
-                      <div className="col-lg-5">{usage_t.get('usaget')}</div>
+                      <div className="col-lg-5">{usage_t.get('pattern', '')}</div>
+                      <div className="col-lg-5">{usage_t.get('usaget', '')}</div>
                       <div className="col-lg-2">
                         <button type="button"
                                 className="btn btn-danger btn-circle"
-                                disabled={settings.get('usaget_type') !== "dynamic"}                                
+                                disabled={settings.get('usaget_type', '') !== "dynamic"}                                
                                 onClick={this.removeUsagetMapping.bind(this, key)}>
                           <i className="fa fa-minus" />
                         </button>
@@ -225,7 +225,7 @@ export default class FieldsMapping extends Component {
               <div className="col-lg-5">
                 <input className="form-control"
                        onChange={this.onChangePattern}
-                       disabled={settings.get('usaget_type') !== "dynamic"}                   
+                       disabled={settings.get('usaget_type', '') !== "dynamic"}                   
                        value={this.state.pattern} />
               </div>
               <div className="col-lg-5">
@@ -235,14 +235,14 @@ export default class FieldsMapping extends Component {
                     allowCreate={true}
                     value={this.state.usaget}
                     style={{marginTop: 3}}
-                    disabled={settings.get('usaget_type') !== "dynamic"}
+                    disabled={settings.get('usaget_type', '') !== "dynamic"}
                     onChange={this.onChangeUsaget}
                 />
               </div>
               <div className="col-lg-2">
                 <button type="button"
                         className="btn btn-info btn-circle"
-                        disabled={settings.get('usaget_type') !== "dynamic"}
+                        disabled={settings.get('usaget_type', '') !== "dynamic"}
                         onClick={this.addUsagetMapping}>
                   <i className="fa fa-plus"/>
                 </button>                
