@@ -49,27 +49,12 @@ class Navigator extends Component {
           <Link to="/" className="navbar-brand">
             <img src="/img/billrun-logo-tm.png" style={{ height: 22 }} />
           </Link>
-	  {(() => {
-	     if (!this.state.showCollapseButton) return (null);
-	     return (
-	       <button type="button"
-		       className="navbar-toggle"
-		       data-toggle="collapse"
-		       onClick={this.onToggleMenu} >
-		 <span className="sr-only">Toggle navigation</span>
-		 <span className="icon-bar"></span>
-		 <span className="icon-bar"></span>
-		 <span className="icon-bar"></span>
-	       </button>	  
-	     );
-	   })()}
         </div>
+
         <ul className="nav navbar-top-links navbar-right">
-          <NavDropdown  title={<i className="fa fa-user fa-fw"></i>} >
-            <MenuItem eventKey="4">
-	      <Link to="#" onClick={this.clickLogout}>
-		<i className="fa fa-sign-out fa-fw"></i> Logout
-	      </Link>
+          <NavDropdown id="nav-user-menu" title={<i className="fa fa-user fa-fw"></i>} >
+            <MenuItem eventKey="4" onClick={this.clickLogout}>
+	            <i className="fa fa-sign-out fa-fw"></i> Logout
             </MenuItem>
           </NavDropdown>
         </ul>
@@ -105,6 +90,9 @@ class Navigator extends Component {
 		   <li>
                      <Link to="/invoices"><i className="fa fa-file-text-o fa-fw"></i> Invoices</Link>
 		   </li>
+ 		    <li>
+                      <Link to="/users"><i className="fa fa-user fa-fw"></i> User Managment</Link>
+                   </li>
 		   <li className={classNames({'active': !this.state.uiOpenSetting})}>
                      <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-cog fa-fw"></i> Settings<span className="fa arrow"></span></a>
                      <ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>

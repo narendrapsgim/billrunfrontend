@@ -1,4 +1,14 @@
-import * as actions from '../actions/planActions';
+import {
+  REMOVE_INCLUDE,
+  ADD_INCLUDE,
+  CHNAGE_INCLUDE,
+  UPDATE_PLAN_FIELD_VALUE,
+  UPDATE_PLAN_CYCLE,
+  UPDATE_PLAN_PRICE,
+  ADD_TARIFF,
+  REMOVE_TARIFF,
+  GOT_PLAN,
+  CLEAR_PLAN } from '../actions/planActions';
 import moment from 'moment';
 import Immutable from 'immutable';
 
@@ -10,29 +20,30 @@ const defaultTariff = Immutable.Map({
   to: PLAN_CYCLE_UNLIMITED
 });
 
+
 export default function (state = defaultState, action) {
-  const { field_idx, field_name, field_value } = action;
+
   switch (action.type) {
-    case actions.REMOVE_INCLUDE:
+    
+    case REMOVE_INCLUDE:
       return state.deleteIn(['include', 'groups', action.groupName, action.usaget]);
 
-    case actions.ADD_INCLUDE:
+    case ADD_INCLUDE:
       return state.setIn(['include', 'groups', action.groupName, action.usaget], action.value);
 
-    case actions.CHNAGE_INCLUDE:
+    case CHNAGE_INCLUDE:
       return state.updateIn(['include', 'groups', action.groupName, action.usaget], value => action.value);
 
-
-    case actions.UPDATE_PLAN_FIELD_VALUE:
+    case UPDATE_PLAN_FIELD_VALUE:
       return state.updateIn(action.path, value => action.value);
 
-    case actions.UPDATE_PLAN_CYCLE:
+    case UPDATE_PLAN_CYCLE:
       return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, action.value));
 
-    case actions.UPDATE_PLAN_PRICE:
+    case UPDATE_PLAN_PRICE:
       return state.updateIn(['price', action.index], item => item.set('price', action.value));
 
-    case actions.ADD_TARIFF:
+    case ADD_TARIFF:
       // if trail add to head
       if(action.trial){
         let trial = defaultTariff.set('trial', true).set('to', '').set('from', 0);
@@ -57,7 +68,7 @@ export default function (state = defaultState, action) {
         return list.push(newTariff)
       });
 
-    case actions.REMOVE_TARIFF:
+    case REMOVE_TARIFF:
       //Set new last item value to unlimited
       // var size = state.get('price').size;
       // if(size > 1){
@@ -67,11 +78,10 @@ export default function (state = defaultState, action) {
       //recaluculate cycle
       return state.updateIn(['price'], list => _reaclculateCycles(list, action.index));
 
-
-    case actions.GOT_PLAN:
+    case GOT_PLAN:
       return Immutable.fromJS(action.plan);
 
-    case actions.CLEAR_PLAN:
+    case CLEAR_PLAN:
       return defaultState;
 
     default:

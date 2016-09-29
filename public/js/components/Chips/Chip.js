@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import CloseIcon from 'material-ui/svg-icons/navigation/cancel';
 
 const styles = {
@@ -47,64 +47,63 @@ const styles = {
    transition: 'none',
    cursor: 'pointer',
  },
- iconColor: 'rgba(0,0,0,0.3)',
- iconColorHover: 'white',
 }
 
-export default class Chip extends React.Component {
+export default class Chip extends Component {
 
-  constructor(props) {
-    super(props);
-
-    this._handleRemoveClick = this._handleRemoveClick.bind(this);
-
-    this.state = {
-      hover: false,
-    };
+  static defaultProps = {
+    allowRemove: true,
   }
 
-  renderRemoveButton(index) {
+  static propTypes = {
+    index: React.PropTypes.number.isRequired,
+    value: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.number,
+      React.PropTypes.node
+    ]).isRequired,
+    onRemoveClick: React.PropTypes.func.isRequired
+  }
+
+  state = {
+    hover: false
+  }
+
+  renderRemoveButton = () => {
+    const { hover } = this.state;
     return (
-      <CloseIcon
-        style={styles.iconStyle}
-        color={this.state.hover ? styles.iconColorHover : styles.iconColor}
-        size={20}
-        onClick={() => this._handleRemoveClick(index)}
+      <CloseIcon style={styles.iconStyle} color={hover ? 'white' : 'rgba(0,0,0,0.3)'} size={20}
+        onClick={this.handleRemoveClick}
       />
     );
   }
 
-  _handleRemoveClick(index) {
+  handleRemoveClick = () => {
+    const { index } = this.props;
     this.props.onRemoveClick(index);
   }
 
-  _handleOnMouseEnter() {
-    this.setState({hover: true});
+  handleOnMouseEnter = () => {
+    this.setState({ hover: true });
   }
 
-  _handleOnMouseLeave() {
-    this.setState({hover: false});
+  handleOnMouseLeave = () => {
+    this.setState({ hover: false });
   }
 
   render() {
     const {value, allowRemove, index} = this.props;
+
     return (
-      <div
-        style={this.state.hover ? styles.chipStyleHover : styles.chipStyle}
-        onMouseEnter={this._handleOnMouseEnter.bind(this)}
-        onMouseLeave={this._handleOnMouseLeave.bind(this)}
+      <div style={this.state.hover ? styles.chipStyleHover : styles.chipStyle}
+        onMouseEnter={this.handleOnMouseEnter}
+        onMouseLeave={this.handleOnMouseLeave}
       >
         <span style={this.state.hover ? styles.textStyleHover : styles.textStyle}>
           {value}
         </span>
-        { allowRemove ? this.renderRemoveButton(index) : null}
+        { allowRemove && this.renderRemoveButton() }
       </div>
     );
   }
 }
-
-Chip.defaultProps = {
-  onRemoveClick: () => {},
-  value: 'Chip',
-  allowRemove: true,
-};
