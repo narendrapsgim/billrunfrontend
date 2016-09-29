@@ -85,7 +85,7 @@ export default class SampleCSV extends Component {
         <SelectCSV onSelectSampleCSV={onSelectSampleCSV}
                    settings={settings} />
         { setFieldsHTML }
-      </div>      
+      </div>
     );
 
     return (

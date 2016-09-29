@@ -25,6 +25,7 @@ import axios from 'axios';
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
+import _ from 'lodash';
 
 let axiosInstance = axios.create({
   withCredentials: true,
@@ -47,32 +48,54 @@ function fetchProcessorSettings(file_type) {
 
     const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
     const field_widths = parser.type === "fixed" ? parser.structure : {};
-    const usaget_type = (!processor.usaget_mapping || processor.usaget_mapping.length < 1) ?
+    const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
           "static" :
           "dynamic";
 
-    return {
+    const ret = {
       file_type: settings.file_type,
       delimiter_type: parser.type,
       delimiter: parser.separator,
       usaget_type,
       fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
       field_widths,
-      processor: Object.assign({}, processor, {
-        usaget_mapping: usaget_type === "dynamic" ?
-          processor.usaget_mapping.map(usaget => {
-            return {
-              usaget: usaget.usaget,
-              pattern: usaget.pattern.replace("/^", "").replace("$/", "")
-            }
-          }) :
-        [{}],
-        src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
-      }),
       customer_identification_fields,
       rate_calculators,
       receiver: connections
     };
+    if (processor) {
+      ret.processor = Object.assign({}, processor, {
+        usaget_mapping: usaget_type === "dynamic" ?
+			processor.usaget_mapping.map(usaget => {
+			  return {
+			    usaget: usaget.usaget,
+			    pattern: usaget.pattern.replace("/^", "").replace("$/", "")
+			  }
+			}) :
+			[{}],
+        src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
+      });
+      if (!rate_calculators) {
+	if (usaget_type === "dynamic") {
+	  ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
+	    acc[mapping.usaget] = [];
+	    return acc;
+	  }, {});
+	} else {
+	  ret.rate_calculators = {[processor.default_usaget]: []};
+	}
+      }
+      if (!customer_identification_fields) {
+	ret.customer_identification_fields = [
+	  {target_key: "sid"}
+	];
+      }
+    } else {
+      ret.processor = {
+	usaget_mapping: []
+      };
+    }
+    return ret;
   };
 
   let fetchUrl = `/api/settings?category=file_types&data={"file_type":"${file_type}"}`;
@@ -247,17 +270,6 @@ export function saveInputProcessorSettings(state, callback, part=false) {
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver');
-
-  const processor_settings = state.get('usaget_type') === "static" ?
-        { default_usaget: processor.get('default_usaget') } :
-        { usaget_mapping:
-          processor.get('usaget_mapping').map(usaget => {
-            return {
-              "src_field": processor.get('src_field'),
-              "pattern": `/^${usaget.get('pattern')}$/`,
-              "usaget": usaget.get('usaget')
-            }
-          }).toJS() };
   
   const settings = {
     "file_type": state.get('file_type'),
@@ -265,22 +277,40 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
       "structure": state.get('delimiter_type') === "fixed" ? state.get('field_widths') : state.get('fields')
-    },
-    "processor": {
+    }
+  };
+  if (processor) {
+    const processor_settings = state.get('usaget_type') === "static" ?
+			       { default_usaget: processor.get('default_usaget') } :
+			       { usaget_mapping:
+						processor.get('usaget_mapping').map(usaget => {
+						  return {
+						    "src_field": processor.get('src_field'),
+						    "pattern": `/^${usaget.get('pattern')}$/`,
+						    "usaget": usaget.get('usaget')
+						  }
+						}).toJS() };
+    settings.processor = {
       "type": "Usage",
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
       ...processor_settings
-    },
-    "customer_identification_fields": customer_identification_fields.toJS(),
-    "rate_calculators": rate_calculators.toJS(),
-    "receiver": {
+    };
+  }
+  if (customer_identification_fields) {
+    settings.customer_identification_fields = customer_identification_fields.toJS();
+  }
+  if (rate_calculators) {
+    settings.rate_calculators = rate_calculators.toJS();
+  }
+  if (receiver) {
+    settings.receiver = {
       "type": "ftp",
       "connections": [
-        receiver.toJS()
+	receiver.toJS()
       ]
-    }
-  };
+    };
+  }
 
   let settingsToSave;
   if (part === "customer_identification_fields") {
