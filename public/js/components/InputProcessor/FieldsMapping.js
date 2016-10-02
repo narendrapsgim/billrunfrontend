@@ -20,10 +20,17 @@ export default class FieldsMapping extends Component {
 
     this.state = {
       pattern: "",
-      usaget: ""
+      usaget: "",
+      separateTime: false
     };
   }
 
+  componentWillMount() {
+    if (this.props.settings.getIn(['processor', 'time_field'])) {
+      this.setState({separateTime: true});
+    }
+  }
+  
   onChangePattern(e) {
     this.setState({pattern: e.target.value});    
   }
@@ -73,11 +80,17 @@ export default class FieldsMapping extends Component {
     const { value } = e.target;
     this.props.setUsagetType(value);
   }
+
+  onChangeSeparateTime = (e) => {
+    const { checked } = e.target;
+    this.setState({separateTime: !this.state.separateTime});
+  };
   
   render() {
     const { settings,
             usageTypes,
             onSetFieldMapping } = this.props;
+
     const available_fields = [(<option disabled value="" key={-1}>Select Field</option>),
                               ...settings.get('fields', []).map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
@@ -90,8 +103,8 @@ export default class FieldsMapping extends Component {
       <form className="form-horizontal FieldsMapping">
         <div className="form-group">
           <div className="col-lg-3">
-            <label htmlFor="date_field">Time</label>
-            <p className="help-block">Time of record creation</p>
+            <label htmlFor="date_field">Date</label>
+            <p className="help-block">Date of record creation</p>
           </div>
           <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
@@ -102,6 +115,32 @@ export default class FieldsMapping extends Component {
                       className="form-control"
                       onChange={onSetFieldMapping}
                       value={settings.getIn(['processor', 'date_field'], '')}>
+                { available_fields }
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="form-group">
+          <div className="col-lg-3">
+          </div>
+          <div className="col-lg-9">
+            <div className="col-lg-1">
+              <div className="checkbox">
+                <label>
+                  <input type="checkbox"
+                         checked={this.state.separateTime}
+                         onChange={this.onChangeSeparateTime}
+                  />
+                  Time in separate field
+                </label>
+              </div>
+            </div>
+            <div className="col-lg-9">
+              <select id="time_field"
+                      className="form-control"
+                      onChange={onSetFieldMapping}
+                      disabled={!this.state.separateTime}
+                      value={settings.getIn(['processor', 'time_field'], '')}>
                 { available_fields }
               </select>
             </div>
@@ -198,7 +237,7 @@ export default class FieldsMapping extends Component {
         </div>
             {
               settings.getIn(['processor', 'usaget_mapping'], []).map((usage_t, key) => (
-                <div className="form-group">
+                <div className="form-group" key={key}>
                   <div className="col-lg-offset-3 col-lg-7">
                     <div className="col-lg-offset-1 col-lg-10">
                       <div className="col-lg-5">{usage_t.get('pattern', '')}</div>

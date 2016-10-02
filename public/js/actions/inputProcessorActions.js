@@ -309,6 +309,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "volume_field": processor.get('volume_field'),
       ...processor_settings
     };
+    if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');
   }
   if (customer_identification_fields) {
     settings.customer_identification_fields = customer_identification_fields.toJS();
