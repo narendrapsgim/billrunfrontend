@@ -78,7 +78,7 @@ export default class FieldsMapping extends Component {
     const { settings,
             usageTypes,
             onSetFieldMapping } = this.props;
-    const available_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
+    const available_fields = [(<option disabled value="" key={-1}>Select Field</option>),
                               ...settings.get('fields', []).map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
                               ))];
@@ -101,8 +101,7 @@ export default class FieldsMapping extends Component {
               <select id="date_field"
                       className="form-control"
                       onChange={onSetFieldMapping}
-                      value={settings.getIn(['processor', 'date_field'], '')}
-                      defaultValue="-1">
+                      value={settings.getIn(['processor', 'date_field'], '')}>
                 { available_fields }
               </select>
             </div>
@@ -122,8 +121,7 @@ export default class FieldsMapping extends Component {
               <select id="volume_field"
                       className="form-control"
                       onChange={onSetFieldMapping}
-                      value={settings.getIn(['processor', 'volume_field'], '')}
-                      defaultValue="-1">
+                      value={settings.getIn(['processor', 'volume_field'], '')}>
                 { available_fields }
               </select>
             </div>
@@ -180,8 +178,7 @@ export default class FieldsMapping extends Component {
                       className="form-control"
                       onChange={onSetFieldMapping}
                       value={settings.getIn(['processor', 'src_field'], '')}
-                      disabled={settings.get('usaget_type', '') !== "dynamic"}
-                      defaultValue="-1">
+                      disabled={settings.get('usaget_type', '') !== "dynamic"}>
                 { available_fields }
               </select>
             </div>
