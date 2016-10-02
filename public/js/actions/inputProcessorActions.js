@@ -109,7 +109,7 @@ function fetchProcessorSettings(file_type) {
     apiBillRun(query).then(
       resp => {
         dispatch(finishProgressIndicator());
-        dispatch(gotProcessorSettings(convert(resp.data.details)));
+        dispatch(gotProcessorSettings(convert(resp.data[0].data.details)));
       }
     ).catch(error => {
       console.log(error);
