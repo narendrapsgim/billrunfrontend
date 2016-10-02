@@ -29,7 +29,6 @@ import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicat
 import _ from 'lodash';
 
 const convert = (settings) => {
-  console.log(settings);
   const { parser, processor,
           customer_identification_fields,
           rate_calculators,
@@ -53,15 +52,19 @@ const convert = (settings) => {
     receiver: connections
   };
   if (processor) {
+    let usaget_mapping;
+    if (usaget_type === "dynamic") {
+      usaget_mapping = processor.usaget_mapping.map(usaget => {
+	return {
+	  usaget: usaget.usaget,
+	  pattern: usaget.pattern.replace("/^", "").replace("$/", "")
+	}
+      })
+    } else {
+      usaget_mapping = [{}];
+    }
     ret.processor = Object.assign({}, processor, {
-      usaget_mapping: usaget_type === "dynamic" ?
-		      processor.usaget_mapping.map(usaget => {
-			return {
-			  usaget: usaget.usaget,
-			  pattern: usaget.pattern.replace("/^", "").replace("$/", "")
-			}
-		      }) :
-		      [{}],
+      usaget_mapping,
       src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
     });
     if (!rate_calculators) {
