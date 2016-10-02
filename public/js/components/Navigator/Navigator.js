@@ -52,11 +52,9 @@ class Navigator extends Component {
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
-          <NavDropdown  title={<i className="fa fa-user fa-fw"></i>} >
-            <MenuItem eventKey="4">
-	      <Link to="#" onClick={this.clickLogout}>
-		<i className="fa fa-sign-out fa-fw"></i> Logout
-	      </Link>
+          <NavDropdown id="nav-user-menu" title={<i className="fa fa-user fa-fw"></i>} >
+            <MenuItem eventKey="4" onClick={this.clickLogout}>
+	            <i className="fa fa-sign-out fa-fw"></i> Logout
             </MenuItem>
           </NavDropdown>
         </ul>
@@ -107,6 +105,9 @@ class Navigator extends Component {
                        <li>
 			 <Link to="/input_processors">Input Processors</Link>
                        </li>
+            <li>
+                <Link to="/export_generator">Export Generator</Link>
+            </li>
 		       <li>
 			 <Link to="/payment_gateways">Payment Gateways</Link>
 		       </li>

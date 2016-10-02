@@ -154,8 +154,7 @@ export default function (state = DefaultState, action) {
       return state;
 
     case PLAN_PRODUCTS_RATE_UPDATE:
-      state = state.updateIn(['planProducts', action.productKey], (item) => item.setIn(action.path, action.value));
-      return state;
+      return state.updateIn(['planProducts', action.productKey], (item) => item.setIn(action.path, action.value));
 
     case PLAN_PRODUCTS_RATE_ADD:
       let rate = state.getIn(['planProducts', action.productKey]);
@@ -171,12 +170,10 @@ export default function (state = DefaultState, action) {
     case PLAN_PRODUCTS_RATE_INIT:
       let baseRatePath = action.path.map( (val, i) => (i === 2) ? 'BASE' : val );
       let baseRate = state.getIn(['planProducts', action.productKey, ...baseRatePath]);
-      state = state.updateIn(['planProducts', action.productKey], (item) => item.setIn(action.path, baseRate) );
-      return state;
+      return state.updateIn(['planProducts', action.productKey], (item) => item.setIn(action.path, baseRate) );
 
     case PLAN_PRODUCTS_RATE_REMOVE:
-      state = state.updateIn(['planProducts', action.productKey] , (item) => item.updateIn(action.path, list => list.delete(action.idx)) );
-      return state;
+      return state.updateIn(['planProducts', action.productKey] , (item) => item.updateIn(action.path, list => list.delete(action.idx)) );
 
     case PLAN_PRODUCTS_CLEAR:
       return DefaultState;

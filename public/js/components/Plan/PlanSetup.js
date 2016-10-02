@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { browserHistory, withRouter } from 'react-router';
+import { withRouter } from 'react-router';
 import { Row, Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 
 import {
@@ -19,7 +19,7 @@ import PlanTab from './PlanTab';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
 import PlanIncludesTab from './PlanIncludesTab';
 
-class Plan extends Component {
+class PlanSetup extends Component {
 
   static propTypes = {
     router: React.PropTypes.shape({
@@ -85,7 +85,7 @@ class Plan extends Component {
   }
 
   handleBack = () => {
-    browserHistory.goBack();
+    this.props.router.push('/plans');
   }
 
   handleSelectTab = (key) => {
@@ -131,8 +131,8 @@ class Plan extends Component {
 
         </Tabs>
         <div style={{marginTop: 12}}>
-          <Button onClick={this.handleBack} bsStyle="link" style={{marginRight: 12}} >Cancel</Button>
-          <Button onClick={this.handleSave} bsStyle="primary">Save</Button>
+          <Button onClick={this.handleSave} bsStyle="primary" style={{marginRight: 10}}   >Save</Button>
+          <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
         </div>
       </Col>
     );
@@ -157,4 +157,4 @@ function mapStateToProps(state, props) {
     validator: state.validator
   };
 }
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Plan));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PlanSetup));
