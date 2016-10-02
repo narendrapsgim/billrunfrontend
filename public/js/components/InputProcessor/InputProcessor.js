@@ -69,10 +69,7 @@ class InputProcessor extends Component {
     const { dispatch } = this.props;
     const { file_type, action, template } = this.props.location.query;
     if (action !== "new") dispatch(getProcessorSettings(file_type));
-    else if (template) {
-      console.log(Templates, template, Templates[template]);
-      dispatch(setInputProcessorTemplate(Templates[template]));
-    }
+    else if (template) dispatch(setInputProcessorTemplate(Templates[template]));
     dispatch(getSettings(["usage_types"]));
   }
   
