@@ -69,7 +69,10 @@ class InputProcessor extends Component {
     const { dispatch } = this.props;
     const { file_type, action, template } = this.props.location.query;
     if (action !== "new") dispatch(getProcessorSettings(file_type));
-    else dispatch(setInputProcessorTemplate(Templates[template]));
+    else if (template) {
+      console.log(Templates, template, Templates[template]);
+      dispatch(setInputProcessorTemplate(Templates[template]));
+    }
     dispatch(getSettings(["usage_types"]));
   }
   
@@ -106,7 +109,7 @@ class InputProcessor extends Component {
     if (!val || _.isEmpty(val.replace(/ /g, ''))) {
       this.props.dispatch(showWarning("Please input field name"));
       return;
-    };
+    }    
     const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();
     const fields = this.props.settings.get('fields');
     if (fields.includes(value)) {

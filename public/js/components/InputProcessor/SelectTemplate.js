@@ -30,12 +30,10 @@ export default class SelectTemplate extends Component {
 
   handleNext = () => {
     const { selected, template } = this.state;
+    const query = selected === "predefined" ? {action: "new", template} : {action: "new"};
     this.context.router.push({
       pathname: 'input_processor',
-      query: {
-        template,
-        action: 'new'
-      }
+      query
     });
   };
   
@@ -60,7 +58,7 @@ export default class SelectTemplate extends Component {
                     <input type="radio"
                            name="select-template"
                            value="predefined"
-                           onChange={this.onCheck} />Select a predefined template
+                           onChange={this.onCheck} />I will use predefined input processor
                   </div>
                   <div className="col-lg-9 col-md-9">
                     <select className="form-control"
@@ -76,7 +74,7 @@ export default class SelectTemplate extends Component {
                     <input type="radio"
                            name="select-template"
                            value="manual"
-                           onChange={this.onCheck} />Define one myself
+                           onChange={this.onCheck} />I will configure a custom input processor
                   </div>
                 </div>
                 <div style={{marginTop: 12, float: "right"}}>
@@ -88,6 +86,7 @@ export default class SelectTemplate extends Component {
                   </button>
                   <button className="btn btn-primary"
                           type="button"
+                          disabled={!selected}
                           onClick={this.handleNext}>
                     Next
                   </button>
