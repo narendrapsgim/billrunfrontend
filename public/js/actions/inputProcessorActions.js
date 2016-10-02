@@ -22,7 +22,6 @@ export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
 export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
 export const SET_INPUT_PROCESSOR_TEMPLATE = 'SET_INPUT_PROCESSOR_TEMPLATE';
 
-import axios from 'axios';
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
@@ -90,11 +89,6 @@ const convert = (settings) => {
   return ret;
 };
 
-let axiosInstance = axios.create({
-  withCredentials: true,
-  baseURL: globalSetting.serverUrl
-});
-
 function gotProcessorSettings(settings) {
   return {
     type: GOT_PROCESSOR_SETTINGS,
@@ -103,10 +97,16 @@ function gotProcessorSettings(settings) {
 }
 
 function fetchProcessorSettings(file_type) {
-  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"${file_type}"}`;
+  const query = {
+    api: "settings",
+    params: [
+      { category: "file_types" },
+      { data: JSON.stringify({file_type}) }
+    ]
+  };
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    let request = axiosInstance.get(fetchUrl).then(
+    apiBillRun(query).then(
       resp => {
         dispatch(finishProgressIndicator());
         dispatch(gotProcessorSettings(convert(resp.data.details)));
@@ -197,13 +197,21 @@ function addedUsagetMapping(usaget) {
 }
 
 export function addUsagetMapping(usaget) {
-  let setUrl = `/api/settings?category=usage_types&action=set&data=[${JSON.stringify(usaget)}]`;
+  const query = {
+    api: "settings",
+    params: [
+      { category: "usage_types" },
+      { action: "set" },
+      { data: [JSON.stringify(usaget)] }
+    ]
+  };
+
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    let request = axiosInstance.post(setUrl).then(
+    apiBillRun(query).then(
       resp => {
         dispatch(finishProgressIndicator());
-        if (!resp.data.status) {
+        if (!resp.data[0].data.status) {
           dispatch(showDanger(resp.data.desc));
         } else {
 	  dispatch(addedUsagetMapping(usaget));
@@ -360,22 +368,6 @@ function gotInputProcessors(input_processors) {
   return {
     type: GOT_INPUT_PROCESSORS,
     input_processors
-  };
-}
-
-function fetchInputProcessors() {
-  let setUrl = '/api/settings?category=file_types&data={}';
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    let request = axiosInstance.post(setUrl).then(
-      resp => {
-        dispatch(finishProgressIndicator());        
-        dispatch(gotInputProcessors(resp.data.details));
-      }
-    ).catch(error => {
-      dispatch(showDanger(error.data.message));
-      dispatch(finishProgressIndicator());              
-    });
   };
 }
 
