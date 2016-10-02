@@ -121,21 +121,17 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-lg-3">
-          </div>
-          <div className="col-lg-9">
-            <div className="col-lg-1">
-              <div className="checkbox">
-                <label>
-                  <input type="checkbox"
-                         checked={this.state.separateTime}
-                         onChange={this.onChangeSeparateTime}
-                  />
-                  Time in separate field
-                </label>
-              </div>
+          <div className="col-lg-offset-2 col-lg-1">
+            <div className="checkbox">
+              <label>
+                <input type="checkbox"
+                       checked={this.state.separateTime}
+                       onChange={this.onChangeSeparateTime}
+                />
+                Time in separate field
+              </label>
             </div>
-            <div className="col-lg-9">
+            <div className="col-lg-offset-1 col-lg-9">
               <select id="time_field"
                       className="form-control"
                       onChange={onSetFieldMapping}
