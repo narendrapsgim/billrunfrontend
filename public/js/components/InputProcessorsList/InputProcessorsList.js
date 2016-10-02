@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import List from '../List';
 import { DropdownButton, MenuItem } from "react-bootstrap";
 
-//import { getInputProcessors, setInputProcessor } from '../../actions/inputProcessorActions';
 import { getList } from '../../actions/listActions';
 
 class InputProcessorsList extends Component {
@@ -48,7 +47,7 @@ class InputProcessorsList extends Component {
   
   onClickNew() {
     this.context.router.push({
-      pathname: 'input_processor',
+      pathname: 'select_input_processor_template',
       query: {
         action: 'new'
       }
