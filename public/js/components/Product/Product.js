@@ -4,7 +4,6 @@ import moment from 'moment';
 import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Checkbox, Button } from 'react-bootstrap';
 
 import Field from '../Field';
-import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
 import Chips from '../Chips';
 import Select from 'react-select';
 import ProductPrice from './components/ProductPrice';

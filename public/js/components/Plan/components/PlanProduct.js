@@ -8,6 +8,19 @@ import ProductPrice from '../../Product/components/ProductPrice';
 
 export default class PlanProduct extends Component {
 
+  static propTypes = {
+    onProductRemoveRate: React.PropTypes.func.isRequired,
+    onProductUndoRemove: React.PropTypes.func.isRequired,
+    onProductInitRate: React.PropTypes.func.isRequired,
+    onProductEditRate: React.PropTypes.func.isRequired,
+    onProductAddRate: React.PropTypes.func.isRequired,
+    onProductRestore: React.PropTypes.func.isRequired,
+    planName: React.PropTypes.string.isRequired,
+    index: React.PropTypes.number.isRequired,
+    count: React.PropTypes.number.isRequired,
+    item: React.PropTypes.instanceOf(Immutable.Map),
+  }
+
   // shouldComponentUpdate(nextProps, nextState){
   //   return !Immutable.is(this.props.item, nextProps.item);
   // }
@@ -45,6 +58,7 @@ export default class PlanProduct extends Component {
     const fieldPath   = ['rates', usageType, planName, 'rate', index, fieldName];
     this.props.onProductEditRate(productKey, fieldPath, value)
   }
+
   onProductAddRate = () => {
     const { item, planName } = this.props;
     const productKey  = item.get('key');
@@ -52,6 +66,7 @@ export default class PlanProduct extends Component {
     const productPath = ['rates', usageType, planName, 'rate'];
     this.props.onProductAddRate(productKey, productPath);
   }
+
   onProductRemoveRate = (index) => {
     const { item, planName } = this.props;
     const productKey  = item.get('key');
@@ -67,6 +82,7 @@ export default class PlanProduct extends Component {
     const productPath = ['rates', usageType, planName]
     this.props.onProductUndoRemove(productKey, productPath);
   }
+
   onProductRemove = () => {
     const { item, planName } = this.props;
     const productKey  = item.get('key');
@@ -74,6 +90,7 @@ export default class PlanProduct extends Component {
     const productPath = ['rates', usageType, planName];
     this.props.onProductRemove(productKey, productPath);
   }
+
   onProductRestore = () => {
     const { item, planName } = this.props;
     const productKey  = item.get('key');
@@ -81,6 +98,7 @@ export default class PlanProduct extends Component {
     const productPath = ['rates', usageType, planName, 'rate'];
     this.props.onProductRestore(productKey, productPath);
   }
+
   onNewProductRestore = () => {
     const { item, planName } = this.props;
     const productKey  = item.get('key');

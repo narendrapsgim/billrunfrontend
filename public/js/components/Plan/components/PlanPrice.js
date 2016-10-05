@@ -9,6 +9,16 @@ const planCycleUnlimitedValue = globalSetting.planCycleUnlimitedValue;
 
 export default class PlanPrice extends Component {
 
+  static propTypes = {
+    onPlanTariffRemove: React.PropTypes.func.isRequired,
+    onPlanCycleUpdate: React.PropTypes.func.isRequired,
+    onPlanPriceUpdate: React.PropTypes.func.isRequired,
+    onPlanTariffAdd: React.PropTypes.func.isRequired,
+    index: React.PropTypes.number.isRequired,
+    count: React.PropTypes.number.isRequired,
+    item: React.PropTypes.instanceOf(Immutable.Map),
+  }
+
   state = {
     cycleError: '',
     priceError: ''

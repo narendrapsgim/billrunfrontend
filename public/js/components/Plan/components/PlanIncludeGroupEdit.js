@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-
-// import Include from './../PlanInclude';
-import { Row, Col, Collapse, Button, Well, Form, FormGroup, ControlLabel } from 'react-bootstrap';
-
-import * as Colors from 'material-ui/styles/colors';
-import FontIcon from 'material-ui/FontIcon';
-import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
-import Tooltip from 'react-bootstrap/lib/Tooltip';
+import { Row, Col, Collapse, Button, Well, Form, FormGroup, ControlLabel, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import {
   getGroupProducts,
@@ -23,10 +16,8 @@ import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 class PlanIncludeGroupEdit extends Component {
 
   static propTypes = {
-    onChangeInclud: React.PropTypes.func.isRequired,
+    onChangeFieldValue: React.PropTypes.func.isRequired,
     onGroupRemove: React.PropTypes.func.isRequired,
-    onAddProduct: React.PropTypes.func.isRequired,
-    onRemoveProduct: React.PropTypes.func.isRequired
   }
 
   state = {
@@ -47,9 +38,9 @@ class PlanIncludeGroupEdit extends Component {
     this.setState({ open: !this.state.open });
   }
 
-  onChangeInclud = (newValue) => {
+  onChangeInclud = (value) => {
     const { name, usaget } = this.props;
-    this.props.onIncludeChange(name, usaget, newValue);
+    this.props.onChangeFieldValue(['include', 'groups', name, usaget], value);
   }
 
   onAddProduct = (productKey) => {
@@ -67,14 +58,14 @@ class PlanIncludeGroupEdit extends Component {
   }
 
   onGroupRemove = (productKey) => {
-    const { name, usaget } = this.props;
-    this.props.onGroupRemove(name, usaget)
+    const { name } = this.props;
+    this.props.onGroupRemove(name);
   }
 
   render() {
-    const { name, value, usaget, products } = this.props;
+    const { name, value, usaget, groupPoducts } = this.props;
     const { open } = this.state;
-    const productsNames = (typeof products === 'undefined') ? null : products.map( (prod) => prod.key).toArray();;
+    const productsNames = (typeof groupPoducts === 'undefined') ? null : groupPoducts.map( (prod) => prod.key);
 
 
     return (
@@ -138,7 +129,7 @@ function mapDispatchToProps(dispatch) {
 }
 function mapStateToProps(state, props) {
   return  {
-    products: state.planProducts.getIn(['productIncludeGroup', props.name, props.usaget])
+    groupPoducts: state.planProducts.getIn(['productIncludeGroup', props.name, props.usaget])
   };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(PlanIncludeGroupEdit);

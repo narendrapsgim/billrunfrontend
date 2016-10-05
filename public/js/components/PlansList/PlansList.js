@@ -80,13 +80,13 @@ class PlansList extends Component {
     });
   }
 
-  
+
   render() {
     const { plans } = this.props;
 
     const fields = [
       {id: "name", placeholder: "Name"},
-      {id: "plan_code", placeholder: "Code"},
+      {id: "code", placeholder: "Code"},
       {id: "to", display: false, type: "datetime"}
     ];
 
@@ -113,7 +113,7 @@ class PlansList extends Component {
 
     const tableFields = [
       {id: 'name', title: 'Name', sort: true},
-      {id: 'plan_code', title: 'Code'},
+      {id: 'code', title: 'Code'},
       {id: 'description', title: "Description"},
       {title: 'Trial', parser: trial_parser},
       {id: 'recurrence_charges', title: 'Recurring Charges', parser: recuring_charges_parser},

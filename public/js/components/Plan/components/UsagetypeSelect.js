@@ -1,32 +1,27 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
 import Select from 'react-select';
-import moment from 'moment';
 
 import { getUsageTypes } from '../../../actions/planProductsActions';
 
 
-class UsagetypeSelect extends Component {
-  constructor(props) {
-    super(props);
-    this.loadSelectUsageTypes = this.loadSelectUsageTypes.bind(this);
-    this.onSelectUsageType = this.onSelectUsageType.bind(this);
-    this.filterUsageTypes = this.filterUsageTypes.bind(this);
-    this.state = { val: null };
+export default class UsagetypeSelect extends Component {
+
+  static propTypes = {
+    onChangeUsageType: React.PropTypes.func.isRequired,
   }
 
-  onSelectUsageType(key) {
+  state = { val: null }
+
+  onSelectUsageType = (key) => {
     this.props.onChangeUsageType(key);
   }
 
 
-  loadSelectUsageTypes(input, callback) {
+  loadSelectUsageTypes = (input, callback) => {
     return getUsageTypes().then( this.filterUsageTypes, this.filterUsageTypes );
   }
 
-  filterUsageTypes(responce = null){
+  filterUsageTypes = (responce = null) => {
     if(responce === null || !responce.data || !responce.data[0] || !responce.data[0].data.details){
       return { options: [] }
     }
@@ -54,10 +49,3 @@ class UsagetypeSelect extends Component {
     );
   }
 }
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    getUsageTypes }, dispatch);
-}
-
-export default connect(null, mapDispatchToProps)(UsagetypeSelect);
