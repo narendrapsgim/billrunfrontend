@@ -21,7 +21,8 @@ import { SET_NAME,
          SET_USAGET_TYPE,
          SET_STATIC_USAGET,
          SET_LINE_KEY,
-         SET_INPUT_PROCESSOR_TEMPLATE } from '../actions/inputProcessorActions';
+         SET_INPUT_PROCESSOR_TEMPLATE,
+         UNSET_FIELD } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   file_type: '',
@@ -129,6 +130,9 @@ export default function (state = defaultState, action) {
 
     case SET_INPUT_PROCESSOR_TEMPLATE:
       return Immutable.fromJS(action.template);
+
+    case UNSET_FIELD:
+      return state.deleteIn(action.path);
       
     default:
       return state;

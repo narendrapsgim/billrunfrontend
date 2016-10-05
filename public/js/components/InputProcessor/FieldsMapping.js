@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { Table } from 'react-bootstrap/lib';
 import FontIcon from 'material-ui/FontIcon';
-import * as Colors from 'material-ui/styles/colors'
 import Select from 'react-select';
 
 export default class FieldsMapping extends Component {
@@ -83,6 +82,7 @@ export default class FieldsMapping extends Component {
 
   onChangeSeparateTime = (e) => {
     const { checked } = e.target;
+    if (!checked) this.props.unsetField(['processor', 'time_field']);
     this.setState({separateTime: !this.state.separateTime});
   };
   
@@ -121,24 +121,24 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-lg-offset-2 col-lg-1">
-            <div className="checkbox">
-              <label>
-                <input type="checkbox"
-                       checked={this.state.separateTime}
-                       onChange={this.onChangeSeparateTime}
-                />
-                Time in separate field
-              </label>
-            </div>
+          <div className="col-lg-offset-3 col-lg-9">
             <div className="col-lg-offset-1 col-lg-9">
-              <select id="time_field"
-                      className="form-control"
-                      onChange={onSetFieldMapping}
-                      disabled={!this.state.separateTime}
-                      value={settings.getIn(['processor', 'time_field'], '')}>
-                { available_fields }
-              </select>
+              <div className="input-group">
+                <div className="input-group-addon">
+                  <input type="checkbox"
+                         checked={this.state.separateTime}
+                         onChange={this.onChangeSeparateTime}
+                  />
+                  Time in separate field
+                </div>
+                <select id="time_field"
+                        className="form-control"
+                        onChange={onSetFieldMapping}
+                        disabled={!this.state.separateTime}
+                        value={settings.getIn(['processor', 'time_field'], '')}>
+                  { available_fields }
+                </select>
+              </div>
             </div>
           </div>
         </div>

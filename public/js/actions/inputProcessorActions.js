@@ -21,6 +21,7 @@ export const SET_LINE_KEY = 'SET_LINE_KEY';
 export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
 export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
 export const SET_INPUT_PROCESSOR_TEMPLATE = 'SET_INPUT_PROCESSOR_TEMPLATE';
+export const UNSET_FIELD = 'UNSET_FIELD';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
@@ -425,5 +426,13 @@ export function setInputProcessorTemplate(template) {
   return {
     type: SET_INPUT_PROCESSOR_TEMPLATE,
     template: converted
+  };
+}
+
+export function unsetField(field_path = []) {
+  const path = Array.isArray(field_path) ? field_path : [field_path];
+  return {
+    type: UNSET_FIELD,
+    path
   };
 }
