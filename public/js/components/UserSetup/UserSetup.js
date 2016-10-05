@@ -42,6 +42,13 @@ class UserSetup extends Component {
     	this.props.dispatch(clearList('users'));
   	}
 
+	onCancel = () => {
+		this.context.router.push({
+      		pathname: "/users"
+    	});
+	}
+
+
 	onSaveUser = (password) => {
 		const { dispatch, user } = this.props;
 		const { action } = this.props.location.query;
@@ -54,7 +61,7 @@ class UserSetup extends Component {
     	]: [
     		{'action': 'insert'},
     		{'username': user.get('username')},
-    		{'roles': JSON.stringify(user.get('roles').toJS())},
+    		{'roles': JSON.stringify(user.get('roles', Immutable.List()).toJS())},
     		{'password': password}
     	];
 
@@ -72,7 +79,7 @@ class UserSetup extends Component {
 	          });
 	      },
 	      failure => {
-	        dispatch(showDanger(`Error - ${failure.error[0].error.desc}`));
+	        dispatch(showDanger(`Error - ${failure.error[0].error.message}`));
 	      }
 	    ).catch(
 	      error => {
@@ -114,6 +121,7 @@ class UserSetup extends Component {
     				<User  onSaveUser={this.onSaveUser} action={action}
     					onUsernameChange={this.onUsernameChange} user={user}
     					onCheckboxClick={this.onCheckboxClick}
+    					onCancel={this.onCancel}
     				/>
             	</div>
     			</div>

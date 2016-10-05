@@ -43,6 +43,11 @@ export default class User extends Component{
 		onSaveUser(this.state.password);
 	}
 
+	onCancel = () => {
+		const { onCancel } = this.props;
+		onCancel();
+	}
+
 	render(){
 		const { onSaveUser,  onUsernameChange, onCheckboxClick, user, action } = this.props;
 		return (
@@ -114,13 +119,18 @@ export default class User extends Component{
 						{this.state.showPassMessage}
 				</div>): null
 				}
-      		<button type="button"
-	            className="btn btn-primary"
-	            onClick={this.onSaveUser}
-	            style={{marginRight: 10}}
-	            disabled={this.state.disableSave && this.state.isPassChange}>
-	        		Save
-			</button>
+	      		<button type="button"
+		            className="btn btn-primary"
+		            onClick={this.onSaveUser}
+		            style={{marginRight: 10}}
+		            disabled={this.state.disableSave && this.state.isPassChange}>
+		        		Save
+				</button>
+				<button type="reset"
+	              	className="btn btn-default"
+	              	onClick={this.onCancel}>
+	        			Cancel
+	      		</button>
 			</form>
 		)
 	}
