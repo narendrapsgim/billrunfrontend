@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Pager from '../Pager';
 import Filter from '../Filter';
 import List from '../List';
+import { DropdownButton, MenuItem } from "react-bootstrap";
 
 /* ACTIONS */
 import { getList } from '../../actions/listActions';
@@ -17,6 +18,7 @@ class UserList extends Component {
     	this.handlePageClick = this.handlePageClick.bind(this);
     	this.onFilter = this.onFilter.bind(this);
     	this.onClickUser = this.onClickUser.bind(this);
+    	this.onClickNewUser = this.onClickNewUser.bind(this);
 
     	this.state = {
       		page: 0,
@@ -60,6 +62,16 @@ class UserList extends Component {
     	});
   	}
 
+  	onClickNewUser(user){
+  		console.log(user);
+		this.context.router.push({
+	      	pathname: "user",
+	      	query: {
+	        action: "new"
+	      	}
+    	});
+  	}
+
   	render() {
     	const { users } = this.props;
 
@@ -81,8 +93,13 @@ class UserList extends Component {
 	            <div className="panel panel-default">
 	              <div className="panel-heading">
 	                <span>
-	                  List of all users
+                  		List of all  users
 	                </span>
+	                <div className="pull-right">
+	                  <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
+	                    <MenuItem eventKey="1" onClick={ this.onClickNewUser }>New</MenuItem>
+	                  </DropdownButton>
+	                </div>
 	              </div>
 	              <div className="panel-body">
 	                <Filter fields={fields} onFilter={this.onFilter} base={base} />

@@ -7,3 +7,4 @@ public/index.html
 public/build
 public/*.hot-update.js*
 public/*.hot-update.json
+public/build/*

@@ -5,6 +5,7 @@ import configureStore from '../configureStore';
 import routesModule from '../routes/Router';
 import Immutable from 'immutable';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import DevTools from './DevTools';
 
 const routes = routesModule();
 const store = configureStore();
@@ -18,9 +19,12 @@ export default class Root extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router history={hashHistory}>
-          {routes}
-        </Router>
+        <div>
+          <Router history={hashHistory}>
+            {routes}
+          </Router>
+          <DevTools />
+        </div>
       </Provider>
     );
   }
