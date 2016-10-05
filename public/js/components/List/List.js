@@ -60,7 +60,7 @@ export default class List extends Component {
   render() {
     const {
       items,
-      fields,
+      fields = [],
       onClickEdit = () => {},
       edit = false,
       editText = "edit"
@@ -76,17 +76,18 @@ export default class List extends Component {
       if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
       return (<th key={key} onClick={onclick} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
     });
-    if (edit) table_header.push((<th>&nbsp;</th>));
+    if (edit) table_header.push((<th key={fields.length}>&nbsp;</th>));
 
     const table_body = items.size < 1 ?
                        (<tr><td colSpan={fields.length} style={{textAlign: "center"}}>No items found</td></tr>) :
                        items.map((entity, index) => (
                          <tr key={index}>
                            { this.buildRow(entity, fields) }
-                           {(() => {
-                              if (edit)
-                                return (<td><button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>{ editText }</button></td>);
-                            })()}
+                           {
+                             edit ?
+                             <td><button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>{ editText }</button></td> :
+                             null
+                           }
                          </tr>
                        ));
 

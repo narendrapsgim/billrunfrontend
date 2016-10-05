@@ -73,8 +73,7 @@ export default class Receiver extends Component {
             <div className="col-xs-4">
               <input type="checkbox" id="delete_received"
                      onChange={onSetReceiverCheckboxField}
-                     checked={settings.get('delete_received')}
-                     defaultChecked={false}
+                     checked={settings.get('delete_received', false)}
                      value="1" />
             </div>
           </div>
@@ -83,8 +82,7 @@ export default class Receiver extends Component {
             <div className="col-xs-4">
               <input type="checkbox" id="passive"
                      onChange={onSetReceiverCheckboxField}
-                     checked={settings.get('passive')}
-                     defaultChecked={false}
+                     checked={settings.get('passive', false)}
                      value="1" />
             </div>
           </div>

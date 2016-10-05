@@ -7,6 +7,9 @@ import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, s
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showWarning, showDanger } from '../../actions/alertsActions';
 
+import { setInputProcessorTemplate } from '../../actions/inputProcessorActions';
+import Templates from '../../Templates';
+
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
 import CalculatorMapping from './CalculatorMapping';
@@ -64,9 +67,9 @@ class InputProcessor extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const { file_type, action } = this.props.location.query;
-    dispatch(clearInputProcessor());
+    const { file_type, action, template } = this.props.location.query;
     if (action !== "new") dispatch(getProcessorSettings(file_type));
+    else if (template) dispatch(setInputProcessorTemplate(Templates[template]));
     dispatch(getSettings(["usage_types"]));
   }
   
@@ -103,7 +106,7 @@ class InputProcessor extends Component {
     if (!val || _.isEmpty(val.replace(/ /g, ''))) {
       this.props.dispatch(showWarning("Please input field name"));
       return;
-    };
+    }    
     const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();
     const fields = this.props.settings.get('fields');
     if (fields.includes(value)) {

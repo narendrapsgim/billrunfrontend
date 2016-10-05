@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import _ from 'lodash';
+import User from './User';
 
 /* ACTIONS */
 import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
@@ -12,9 +12,7 @@ import { showSuccess, showDanger } from '../../actions/alertsActions';
 
 /* COMPONENTS */
 import { PageHeader, Tabs, Tab } from 'react-bootstrap';
-// import Customer from './Customer';
-// import SubscriptionsList from './SubscriptionsList';
-// import Subscription from './Subscription';
+
 
 class UserSetup extends Component {
 	
@@ -23,8 +21,7 @@ class UserSetup extends Component {
 	}
 
 	componentDidMount() {
-	   // getEntity
-	   const { userId } = this.props.location.query;
+	   const { userId, action } = this.props.location.query;
 	   if(!userId){
 	   		return;
 	   }
@@ -37,32 +34,74 @@ class UserSetup extends Component {
         ]
       };
 
-      	this.props.dispatch(getEntity('users', userParams));
+      	this.props.dispatch(getEntity('user', userParams));
+	}
+
+	componentWillUnmount() {
+    	this.props.dispatch(clearEntity());
+    	this.props.dispatch(clearList('users'));
+  	}
+
+	onSaveUser = (password) => {
+		const { dispatch, user } = this.props;
+		const { action } = this.props.location.query;
+    	const params = action === 'update'? [
+    		{'action': 'update'},
+    		{'userId': user.getIn(['_id', '$id'], '')},
+    		{'username': user.get('username')},
+    		{'roles': JSON.stringify(user.get('roles').toJS())},
+    		{'password': password}
+    	]: [
+    		{'action': 'insert'},
+    		{'username': user.get('username')},
+    		{'roles': JSON.stringify(user.get('roles').toJS())},
+    		{'password': password}
+    	];
+
+
+	    const query = {
+	      api: "users",
+	      params
+	    };
+
+	    apiBillRun(query).then(
+	      success => {
+	          dispatch(showSuccess("User saved successfully"));
+	          this.context.router.push({
+	            pathname: '/users'
+	          });
+	      },
+	      failure => {
+	        dispatch(showDanger(`Error - ${failure.error[0].error.desc}`));
+	      }
+	    ).catch(
+	      error => {
+			dispatch(showDanger("Network error - please try again"));
+			dispatch(apiBillRunErrorHandler(error));
+	      }
+	    );
+	}
+
+	onUsernameChange = (e) => {
+		const { value } = e.target;
+		this.props.dispatch(updateEntityField('user', 'username', value));
+	}
+
+	onCheckboxClick = (e) => {
+		const { user } = this.props;
+		const { value } = e.target;
+		const userRoles = user.update('roles', Immutable.List(), rolesList => {
+			if(rolesList.includes(value)){
+				return rolesList.filterNot(role => role === value);
+			}
+			return rolesList.push(e.target.value);
+		});
+		this.props.dispatch(updateEntityField('user', 'roles', userRoles.get('roles')));
 	}
 
 	render(){
-		const { users } = this.props;
-		const fields = [(
-			<div className="form-group" key={1}>
-                <label>Username</label>
-		        <input className="form-control"
-        	        id="username"
-               	    value={ users.get("username") }
-                />
-            </div>),
-			(<div className="form-group" key={2}>
-				<label>Roles</label>
-				{ ['admin','read','write'].map((role, key) => (
-					<div className="checkbox">
-					<label>
-					<input type="checkbox"
-						value={role}
-						checked={users.get('roles', []).includes(role)}
-					/>{role}
-					</label>
-					</div>
-				)) }
-			</div>)];
+		const { user } = this.props;
+		const { action } = this.props.location.query;
 		return(
 			<div className="panel panel-default">
 				<div className="panel-heading">
@@ -71,9 +110,12 @@ class UserSetup extends Component {
 	                </span>
 				</div>
     			<div className="panel-body">
-    			<form>
-              		{ fields }
-            	</form>
+    			<div className="col-lg-6">
+    				<User  onSaveUser={this.onSaveUser} action={action}
+    					onUsernameChange={this.onUsernameChange} user={user}
+    					onCheckboxClick={this.onCheckboxClick}
+    				/>
+            	</div>
     			</div>
 			</div>
 		)
@@ -87,11 +129,7 @@ UserSetup.contextTypes = {
 
 function mapStateToProps(state) {
   return {
-  	//user: state.list.get('users') || []
-    users: state.entity.get('users') || Immutable.Map()
-    // subscriptions: state.list.get('subscriptions') || Immutable.List(),
-    // settings: state.settings.get('subscribers') || Immutable.List(),
-    // plans: state.list.get('plans') || Immutable.List()
+    user: state.entity.get('user', Immutable.Map())
   };
 }
 
