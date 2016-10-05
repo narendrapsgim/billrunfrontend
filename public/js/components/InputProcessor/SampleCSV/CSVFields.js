@@ -9,20 +9,37 @@ export default class CSVFields extends Component {
   }
 
   render() {
-    const { settings, onRemoveField, onSetFieldWidth } = this.props;
+    const {
+      settings,
+      onRemoveField,
+      onSetFieldWidth,
+      onMoveFieldUp,
+      onMoveFieldDown,
+      onChangeCSVField
+    } = this.props;
     const fixed = settings.get('delimiter_type', '') === "fixed";
 
     return (
       <div>
         {
           settings.get('fields', []).map((field, key) => (
-            <CSVField key={key} index={key}
-                      onRemoveField={onRemoveField}
-                      field={field}
-                      onSetFieldWidth={onSetFieldWidth}
-                      fixed={fixed}
-                      disabled={!settings.get('file_type')}
-                      width={settings.getIn(['field_widths', field])} />
+            <div key={key}>
+              <div className="form-group">
+                <CSVField index={key}
+                          onRemoveField={onRemoveField}
+                          field={field}
+                          onSetFieldWidth={onSetFieldWidth}
+                          fixed={fixed}
+                          allowMoveUp={key !== 0}
+                          allowMoveDown={key !== settings.get('fields', []).size - 1}
+                          onMoveFieldDown={onMoveFieldDown}
+                          onMoveFieldUp={onMoveFieldUp}
+                          onChange={onChangeCSVField}
+                          disabled={!settings.get('file_type')}
+                          width={settings.getIn(['field_widths', field], '')} />
+              </div>
+              <div className="separator"></div>
+            </div>
           ))
         }
       </div>

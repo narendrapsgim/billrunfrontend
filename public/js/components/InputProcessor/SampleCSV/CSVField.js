@@ -9,31 +9,55 @@ export default class CSVFields extends Component {
     const { onRemoveField, index } = this.props;
     onRemoveField(index);
   };
+
+  onMoveFieldUp = () => {
+    const { onMoveFieldUp, index } = this.props;
+    onMoveFieldUp(index);
+  };
+
+  onMoveFieldDown = () => {
+    const { onMoveFieldDown, index } = this.props;
+    onMoveFieldDown(index);
+  };
+
+  onChange = (e) => {
+    const { onChange, index } = this.props;
+    const { value } = e.target;
+    onChange(index, value);
+  };
   
   render() {
-    const { field, fixed, onSetFieldWidth, disabled, width } = this.props;
+    const { field, fixed, onSetFieldWidth, disabled, width, allowMoveUp, allowMoveDown } = this.props;
     return (
-      <div className="form-group">
-        <div className="col-lg-3">
-          <button type="button"
-                  className="btn btn-danger btn-circle"
-                  disabled={disabled}                                      
-                  onClick={this.removeField}>
-            <i className="fa fa-minus" />
-          </button>
-          { field }
+      <div>
+        <div className="col-lg-4 col-md-4">
+          <input type="text"
+                 className="form-control"
+                 value={ field }
+                 onChange={this.onChange} />
         </div>
-        { fixed ?
-          <div className="col-lg-2">
+        <div className="col-lg-1 col-md-1">
+          { fixed ?
             <input type="number"
                    className="form-control"
                    data-field={field}
-                   style={{width: 70}}
+                   disabled={!fixed}
                    onChange={onSetFieldWidth}
-                   value={width} />
-          </div> :
-          null
-        }
+                   value={width} /> :
+            null
+          }
+        </div> 
+        <div className="col-lg-5 col-md-5">
+          <button type="button" style={{marginRight: 5}} disabled={!allowMoveUp} className="btn btn-default" onClick={this.onMoveFieldUp}>
+            <i className="fa fa-arrow-up" /> Move up
+          </button>
+          <button type="button" style={{marginRight: 5}} disabled={!allowMoveDown} className="btn btn-default" onClick={this.onMoveFieldDown}>
+            <i className="fa fa-arrow-down" /> Move down
+          </button>
+          <button type="button" className="btn btn-default" onClick={this.removeField}>
+            <i className="fa fa-trash-o" /> Remove
+          </button>
+        </div>
       </div>
     );
   }
