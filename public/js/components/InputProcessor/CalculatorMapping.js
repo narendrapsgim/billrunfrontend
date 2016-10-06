@@ -11,15 +11,15 @@ export default class CalculatorMapping extends Component {
             onSetCustomerMapping,
             onSetLineKey,
             onSetRating } = this.props;
-    const available_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
-                              ...settings.get('fields').map((field, key) => (
+    const available_fields = [(<option disabled value="" key={-1}>Select Field</option>),
+                              ...settings.get('fields', []).map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
                               ))];
     const available_target_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
                                      ...["sid", "aid"].map((field, key) => (
                                        <option value={field} key={key}>{field}</option>
                                      ))];
-    const available_usagetypes = settings.get('rate_calculators').keySeq().map(usaget => {
+    const available_usagetypes = settings.get('rate_calculators', {}).keySeq().map(usaget => {
       return usaget;
     });
 
@@ -39,8 +39,7 @@ export default class CalculatorMapping extends Component {
                 <select id="src_key"
                         className="form-control"
                         onChange={onSetCustomerMapping}
-                        value={settings.getIn(['customer_identification_fields', 0, 'src_key'])}
-                        defaultValue="-1">
+                        value={settings.getIn(['customer_identification_fields', 0, 'src_key'], '')}>
                   { available_fields }
                 </select>
               </div>
@@ -48,8 +47,7 @@ export default class CalculatorMapping extends Component {
                 <select id="target_key"
                         className="form-control"
                         onChange={onSetCustomerMapping}
-                        value={settings.getIn(['customer_identification_fields', 0, 'target_key'])}
-                        defaultValue="sid">
+                        value={settings.getIn(['customer_identification_fields', 0, 'target_key'], 'sid')}>
                   { available_target_fields }
                 </select>
               </div>
@@ -80,8 +78,7 @@ export default class CalculatorMapping extends Component {
                              id={usaget}
                              onChange={onSetLineKey}
                              data-usaget={usaget}
-                             value={settings.getIn(['rate_calculators', usaget, 0, 'line_key'])}
-                             defaultValue="-1">
+                             value={settings.getIn(['rate_calculators', usaget, 0, 'line_key'], '')}>
                        { available_fields }
                      </select>                 
                    </div>
@@ -92,7 +89,7 @@ export default class CalculatorMapping extends Component {
                             value="match"
                             data-usaget={usaget}
                             data-rate_key="key"
-                            checked={settings.getIn(['rate_calculators', usaget, 0, 'type']) === "match"}
+                            checked={settings.getIn(['rate_calculators', usaget, 0, 'type'], '') === "match"}
                             onChange={onSetRating} />
                      <label htmlFor={`${usaget}-by-rate-key`}>By rate key</label>
                    </div>
@@ -102,7 +99,7 @@ export default class CalculatorMapping extends Component {
                             id={`${usaget}-longest-prefix`}
                             value="longestPrefix"
                             data-usaget={usaget}
-                            checked={settings.getIn(['rate_calculators', usaget, 0, 'type']) === "longestPrefix"}
+                            checked={settings.getIn(['rate_calculators', usaget, 0, 'type'], '') === "longestPrefix"}
                             data-rate_key="params.prefix"
                             onChange={onSetRating} />
                      <label htmlFor={`${usaget}-longest-prefix`}>By longest prefix</label>

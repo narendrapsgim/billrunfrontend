@@ -23,7 +23,7 @@ export default class Root extends Component {
           <Router history={hashHistory}>
             {routes}
           </Router>
-          <DevTools />
+          { process.env.NODE_ENV !== 'production' ? <DevTools /> : null }
         </div>
       </Provider>
     );

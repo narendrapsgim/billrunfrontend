@@ -21,6 +21,10 @@ export const SET_LINE_KEY = 'SET_LINE_KEY';
 export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
 export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
 export const SET_INPUT_PROCESSOR_TEMPLATE = 'SET_INPUT_PROCESSOR_TEMPLATE';
+export const MOVE_CSV_FIELD_UP = 'MOVE_CSV_FIELD_UP';
+export const MOVE_CSV_FIELD_DOWN = 'MOVE_CSV_FIELD_DOWN';
+export const CHANGE_CSV_FIELD = 'CHANGE_CSV_FIELD';
+export const UNSET_FIELD = 'UNSET_FIELD';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
@@ -309,6 +313,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "volume_field": processor.get('volume_field'),
       ...processor_settings
     };
+    if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');    
   }
   if (customer_identification_fields) {
     settings.customer_identification_fields = customer_identification_fields.toJS();
@@ -424,5 +429,38 @@ export function setInputProcessorTemplate(template) {
   return {
     type: SET_INPUT_PROCESSOR_TEMPLATE,
     template: converted
+  };
+}
+
+
+export function moveCSVFieldUp(index, field) {
+  return {
+    type: MOVE_CSV_FIELD_UP,
+    index,
+    field
+  };
+}
+
+export function moveCSVFieldDown(index, field) {
+  return {
+    type: MOVE_CSV_FIELD_DOWN,
+    index,
+    field
+  };
+}
+
+export function changeCSVField(index, value) {
+  return {
+    type: CHANGE_CSV_FIELD,
+    index,
+    value
+  };
+}
+
+export function unsetField(field_path = []) {
+  const path = Array.isArray(field_path) ? field_path : [field_path];
+  return {
+    type: UNSET_FIELD,
+    path
   };
 }

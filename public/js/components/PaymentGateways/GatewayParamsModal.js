@@ -58,7 +58,7 @@ export default class GatewayParamsModal extends Component {
 	  <form className="form-horizontal">
 	    {settings.get('params').keySeq().map((param, param_key) => (
 	       <div className="form-group" key={param_key}>
-		 <label className="col-lg-2 control-label">{param}</label>
+		 <label className="col-lg-3 control-label">{param}</label>
 		 <div className="col-lg-4">
 		   <input type="text"
 			  id={param}

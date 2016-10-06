@@ -1,10 +1,12 @@
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-
 var bootstrapPath = __dirname + '/node_modules/bootstrap/dist/css';
 var bootstrapSocialPath = __dirname + '/node_modules/bootstrap-social';
 var fontAwesomePath = __dirname + '/node_modules/font-awesome/css';
+
+var env = process.env.NODE_ENV || 'dev';
+
 /**
  * This is the Webpack configuration file for local development. It contains
  * local-specific configuration such as the React Hot Loader, as well as:
@@ -38,9 +40,14 @@ module.exports = {
 
   // Necessary plugins for hot load
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify(env)
+      }
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
-    new ExtractTextPlugin('style.css', { allChunks: true })
+    new ExtractTextPlugin('style.css', { allChunks: true }),
   ],
 
   // Transform source code using Babel and React Hot Loader
