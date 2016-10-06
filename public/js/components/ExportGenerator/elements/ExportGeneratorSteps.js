@@ -8,8 +8,9 @@ class ExportGeneratorSteps extends Component {
   }
 
   render() {
+    let stepStyle = {color: '#4cae4c'};
     return (
-      <div>
+      <div className="br-stepper">
         <Stepper activeStep={this.props.stepIndex}>
           <Step>
             <StepLabel>Choose Input</StepLabel>

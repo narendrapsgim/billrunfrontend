@@ -15,7 +15,7 @@ class FtpDetials extends Component {
     console.log(this);
     return (
       <div>
-        FtpDetials
+        FtpDetails
       </div>
     )
   }

@@ -1,17 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import _ from 'lodash';
-
-import { PageHeader } from 'react-bootstrap';
-
-// import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget } from '../../actions/inputProcessorActions';
-import { getSettings } from '../../actions/settingsActions';
-import { showSuccess, showWarning, showDanger } from '../../actions/alertsActions';
+import { showDanger } from '../../actions/alertsActions';
 
 import Steps from './elements/ExportGeneratorSteps';
 import SelectInputProcessor from './elements/SelectInputProcessor';
 import Segmentation from './elements/Segmentation';
-import FtpDetials from './elements/FtpDetials';
+import FtpDetails from './elements/FtpDetails';
 
 class InputProcessor extends Component {
   constructor(props) {
@@ -57,27 +51,14 @@ class InputProcessor extends Component {
 
     const cb = (err) => {
       if (err) return;
-      if (this.state.finished) {
-        this.props.dispatch(showSuccess("Input processor saved successfully!"));
-        this.goBack();
-      } else {
-        const totalSteps = this.state.steps.length - 1;
-        const finished = (stepIndex + 1) === totalSteps;
-        this.setState({
-          stepIndex: stepIndex + 1,
-          finished
-        });
-      }
+      const finished = (stepIndex + 1) === totalSteps;
+      this.setState({
+        stepIndex: stepIndex + 1,
+        finished
+      });
     };
 
-    const finished = (stepIndex + 1) === totalSteps;
-    this.setState({
-      stepIndex: stepIndex + 1,
-      finished
-    });
-
-    //const part = this.state.finished ? false : this.state.steps[stepIndex];
-    // this.props.dispatch(saveInputProcessorSettings(this.props.settings, cb, part));
+    this.validateSteps(cb);
   }
 
   handlePrev() {
@@ -88,6 +69,54 @@ class InputProcessor extends Component {
       this.props.dispatch(clearInputProcessor());
       this.goBack();
     }
+  }
+
+  validateSteps (cb) {
+    const { stepIndex } = this.state || 0;
+    let err = [];
+
+
+    switch (stepIndex) {
+      case 0:
+        // check name
+        if (this.props.settings.get('name').length === 0) {
+          err.push ('Export Process name is mandatory.');
+        }
+
+        //check input processor selected
+        if (this.props.settings.get('inputProcess').size === 0) {
+          err.push ('Please select Input Processor.');
+        }
+        break;
+
+      case 1:
+        // check at last one segment with from/to is selected
+        // let segment = this.props.settings.get('segments').get(0);
+        debugger;
+
+        if (this.props.settings.get('segments').size === 0) {
+          err.push ('Please select one segment at last.');
+        } else {
+          (() => {
+            console.log('Ok');
+            let firstSegment = this.props.settings.get('segments').first();
+            if (!firstSegment.get('field') || ( !firstSegment.get('from') || firstSegment.get('to') )) {
+              err.push ('Generator should has at last one valid segment');
+            }
+          })();
+        }
+        break;
+    }
+
+    if (err.length > 0 ) {
+      this.props.dispatch(showDanger(err.join("\n\n")));
+
+      cb(true);
+      return;
+    }
+
+
+    cb(false);
   }
 
   handleCancel() {
@@ -118,7 +147,7 @@ class InputProcessor extends Component {
     const steps = [
       (<SelectInputProcessor onNext={this.handleNext.bind(this)} settings={settings} />),
       (<Segmentation onNext={this.handleNext.bind(this)} settings={settings} />),
-      (<FtpDetials onNext={this.handleNext.bind(this)} settings={settings} />)
+      (<FtpDetails onNext={this.handleNext.bind(this)} settings={settings} />)
     ];
 
     const { action } = this.props.location.query;
@@ -183,7 +212,7 @@ InputProcessor.contextTypes = {
 };
 
 function mapStateToProps(state, props) {
-  return { settings: state.inputProcessor,
+  return { settings: state.exportGenerator,
            usage_types: state.settings.get('usage_types') };
 }
 

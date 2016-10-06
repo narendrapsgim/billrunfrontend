@@ -11,7 +11,7 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state, props) {
   return {
-    name: state.exportGenerator.name
+    name: state.exportGenerator.get('name')
   };
 }
 

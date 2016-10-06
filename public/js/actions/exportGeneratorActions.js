@@ -1,6 +1,8 @@
 export const SET_GENERATOR_NAME = 'SET_GENERATOR_NAME';
 export const SELECT_INPUT_PROCESSOR = 'SELECT_INPUT_PROCESSOR';
 export const SET_SEGMENTATION = 'SET_SEGMENTATION';
+export const ADD_SEGMENTATION = 'ADD_SEGMENTATION';
+export const DELETE_SEGMENTATION = 'DELETE_SEGMENTATION';
 
 export function setGeneratorName(name) {
   return {
@@ -16,12 +18,25 @@ export function selectInputProcessor(inputProcessor) {
   };
 }
 
-export function setSegmentation(segment, values, oldSegment) {
+export function setSegmentation(index, key, value) {
   return {
     type: SET_SEGMENTATION,
-    segment,
-    values,
-    oldSegment
+    index,
+    key,
+    value
+  };
+}
+
+export function addSegmentation() {
+  return {
+    type: ADD_SEGMENTATION
+  };
+}
+
+export function deleteSegmentation(index) {
+  return {
+    type: DELETE_SEGMENTATION,
+    index
   };
 }
 

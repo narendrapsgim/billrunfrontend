@@ -1,21 +1,19 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { List } from 'immutable';
 import { FormGroup, Radio } from 'react-bootstrap';
-
+import Select from 'react-select';
 import { getList } from '../../../actions/listActions';
 import { selectInputProcessor } from '../../../actions/exportGeneratorActions';
 import GeneratorName from './GeneratorName';
 
 class SelectInputProcessor extends Component {
-  /*static propTypes = {
-   stepIndex: PropTypes.number.isRequired
-   };*/
-
   constructor(props) {
     super(props);
     this.onSort = this.onSort.bind(this);
     this.buildQuery = this.buildQuery.bind(this);
+    this.onInputProcessChange = this.onInputProcessChange.bind(this);
 
     this.state = {
       sort: 'name'
@@ -43,12 +41,25 @@ class SelectInputProcessor extends Component {
     });
   }
 
+  onInputProcessChange(val) {
+    let selected = this.props.inputProcessors.filter(item => item.get('file_type') === val).first();
+    this.props.selectInputProcessor(selected);
+  }
+
+
   render() {
     const { inputProcessors } = this.props;
 
-    var handleClick = function(i, entity) {
+    let handleClick = function(i, entity) {
       this.props.selectInputProcessor(entity);
-      // this.props.onNext(0);
+    };
+
+    let options = [];
+
+    if (List.isList(inputProcessors)) {
+      _.forEach(inputProcessors.toJS(), function (item) {
+        options.push({value: item.file_type, label: item.file_type});
+      });
     }
 
     return (
@@ -61,14 +72,14 @@ class SelectInputProcessor extends Component {
             <div className="col-lg-3">
               <label htmlFor="file_type">Please select Input Processor</label>
             </div>
-            <div className="col-lg-9">
-              <FormGroup>
-                {inputProcessors.map((entity, index) => (
-                  <Radio name="select-input-processor" key={index} onClick={handleClick.bind(this, index, entity)}>
-                    { entity.get('file_type') }
-                  </Radio>
-                ))}
-              </FormGroup>
+            <div className="col-lg-6">
+              <Select
+                name="field-name"
+                value={this.props.selectedProcess.get('file_type')}
+                options={options}
+                onChange={this.onInputProcessChange}
+                Clearable={false}
+              />
             </div>
           </div>
         </form>
@@ -85,7 +96,8 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state, props) {
   return {
-    inputProcessors: state.list.get('input_processors') || []
+    inputProcessors: state.list.get('input_processors') || [],
+    selectedProcess: state.exportGenerator.get('inputProcess')
   };
 }
 

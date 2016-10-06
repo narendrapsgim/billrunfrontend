@@ -77,10 +77,7 @@ class ExportGeneratorsList extends Component {
                   All available Export Generators
                 </span>
                 <div className="pull-right">
-                  <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                    <MenuItem eventKey="1" onClick={this.onClickNew}>New</MenuItem>
-                  </DropdownButton>
-                  <Button bsSize="xsmall" onClick={this.onClickNew}>Add New</Button>
+                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus"></i>&nbsp;Add New</Button>
                 </div>
               </div>
               <div className="panel-body">
