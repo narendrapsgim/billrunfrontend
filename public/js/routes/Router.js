@@ -26,8 +26,8 @@ export default () => {
   return (
     <Route path="/" component={App}>
       <IndexRedirect to="/dashboard" component={RequireAuth(Dashboard)} />
-      <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
-      <Route path="/plans" component={RequireAuth(PlansList)} title="Plans"/>
+      <Route path="/dashboard"  component={RequireAuth(Dashboard)} title="Dashboard" />
+      <Route path="/plans"  component={RequireAuth(PlansList)} title="Plans"/>
       <Route path="/plan" component={RequireAuth(Plan)} title="Create / Edit Plan"/>
       <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
       <Route path="/products" component={RequireAuth(ProductsList)} title="Products"/>

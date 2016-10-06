@@ -15,7 +15,8 @@ class Navigator extends Component {
     this.state = {
       uiOpenSetting: true,
       showCollapseButton: false,
-      showFullMenu: true
+      showFullMenu: true,
+      activeNav: ''
     };
   }
 
@@ -42,6 +43,11 @@ class Navigator extends Component {
     this.props.userDoLogout();
   }
 
+  setActivNav = (e) => {
+    const { id } = e.target;
+    this.setState({ activeNav: id })
+  }
+
   render() {
     return (
       <nav className="navbar navbar-default navbar-static-top" role="navigation" style={{ marginBottom: 0 }}>
@@ -66,50 +72,57 @@ class Navigator extends Component {
 
 		 <ul className="nav in" id="side-menu">
 		   <li>
-                     <Link to="/dashboard">
+                     <Link to="/dashboard" id="dashboard" className={(this.state.activeNav === "dashboard") ? "active" : ""} onClick={this.setActivNav}>
                        <i className="fa fa-dashboard fa-fw"></i> Dashboard
                      </Link>
 		   </li>
 
 		   <li>
-                     <Link to="/plans">
+                     <Link to="/plans" id="plans" className={(this.state.activeNav === "plans") ? "active" : ""} onClick={this.setActivNav}>
                        <i className="fa fa-cubes fa-fw"></i> Plans
                      </Link>
 		   </li>
 		   <li>
-                     <Link to="/products">
+                     <Link to="/products" id="products" className={(this.state.activeNav === "products") ? "active" : ""} onClick={this.setActivNav}>
                        <i className="fa fa-book fa-fw"></i> Products
                      </Link>
 		   </li>
 		   <li>
-                     <Link to="/customers"><i className="fa fa-users fa-fw"></i> Customers</Link>
+                     <Link to="/customers" id="customers" className={(this.state.activeNav === "customers") ? "active" : ""} onClick={this.setActivNav}><i className="fa fa-users fa-fw"></i> Customers</Link>
 		   </li>
 		   <li>
-                     <Link to="/usage"><i className="fa fa-list fa-fw"></i> Usage</Link>
+                     <Link to="/usage" id="usage" className={(this.state.activeNav === "usage") ? "active" : ""} onClick={this.setActivNav}>
+                     <i className="fa fa-list fa-fw"></i> Usage
+                     </Link>
 		   </li>
 		   <li>
-                     <Link to="/invoices"><i className="fa fa-file-text-o fa-fw"></i> Invoices</Link>
+                     <Link to="/invoices" id="invoices" className={(this.state.activeNav === "invoices") ? "active" : ""} onClick={this.setActivNav}>
+                     <i className="fa fa-file-text-o fa-fw"></i> Invoices
+                     </Link>
 		   </li>
  		    <li>
-                      <Link to="/users"><i className="fa fa-user fa-fw"></i> User Managment</Link>
-                   </li>
+                      <Link to="/users" id="users" className={(this.state.activeNav === "users") ? "active" : ""} onClick={this.setActivNav}>
+                      <i className="fa fa-user fa-fw"></i> User Managment
+                      </Link>
+        </li>
 		   <li className={classNames({'active': !this.state.uiOpenSetting})}>
-                     <a href onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-cog fa-fw"></i> Settings<span className="fa arrow"></span></a>
+                     <a href className={classNames({'active': !this.state.uiOpenSetting})} onClick={ (e)=> { e.preventDefault(); this.setState({ uiOpenSetting: !this.state.uiOpenSetting })}}><i className="fa fa-cog fa-fw"></i> Settings<span className="fa arrow"></span></a>
                      <ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>
                        <li>
-			 <Link to="/settings?setting=billrun">Date, Time and Zone</Link>
+
+			 <Link to="/settings?setting=billrun" id="settingsBillrun" className={(this.state.activeNav === "settingsBillrun") ? "active" : ""} onClick={this.setActivNav}>Date, Time and Zone</Link>
                        </li>
                        <li>
-			 <Link to="/settings?setting=pricing">Currency and Tax</Link>
+			 <Link to="/settings?setting=pricing" id="settingsPricing" className={(this.state.activeNav === "settingsPricing") ? "active" : ""} onClick={this.setActivNav}>Currency and Tax</Link>
                        </li>
                        <li>
-			 <Link to="/input_processors">Input Processors</Link>
+			 <Link to="/input_processors" id="settingsProcessor" className={(this.state.activeNav === "settingsProcessor") ? "active" : ""} onClick={this.setActivNav}>Input Processors</Link>
                        </li>
             <li>
-                <Link to="/export_generator">Export Generator</Link>
+                <Link to="/export_generator" id="settingsGenerator" className={(this.state.activeNav === "settingsGenerator") ? "active" : ""} onClick={this.setActivNav}>Export Generator</Link>
             </li>
 		       <li>
-			 <Link to="/payment_gateways">Payment Gateways</Link>
+			 <Link to="/payment_gateways" id="settingsGateway" className={(this.state.activeNav === "settingsGateway") ? "active" : ""} onClick={this.setActivNav}>Payment Gateways</Link>
 		       </li>
                      </ul>
 		   </li>
