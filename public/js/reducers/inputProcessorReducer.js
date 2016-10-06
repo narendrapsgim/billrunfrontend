@@ -22,7 +22,10 @@ import { SET_NAME,
          SET_STATIC_USAGET,
          SET_LINE_KEY,
          SET_INPUT_PROCESSOR_TEMPLATE,
-         UNSET_FIELD } from '../actions/inputProcessorActions';
+         MOVE_CSV_FIELD_DOWN,
+         MOVE_CSV_FIELD_UP,
+         CHANGE_CSV_FIELD,
+	 UNSET_FIELD } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   file_type: '',
@@ -54,7 +57,8 @@ let defaultState = Immutable.fromJS({
 });
 
 export default function (state = defaultState, action) {
-  const { field, mapping, width } = action;
+  const { field, mapping, width, index } = action;
+  let field_to_move;
   switch (action.type) {
     case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
@@ -130,6 +134,17 @@ export default function (state = defaultState, action) {
 
     case SET_INPUT_PROCESSOR_TEMPLATE:
       return Immutable.fromJS(action.template);
+
+    case MOVE_CSV_FIELD_UP:
+      field_to_move = field ? field : state.getIn(['fields', index]);
+      return state.update('fields', list => list.delete(index).insert(index-1, field_to_move));
+
+    case MOVE_CSV_FIELD_DOWN:
+      field_to_move = field ? field : state.getIn(['fields', index]);
+      return state.update('fields', list => list.delete(index).insert(index+1, field_to_move));
+
+    case CHANGE_CSV_FIELD:
+      return state.update('fields', list => list.set(index, action.value));
 
     case UNSET_FIELD:
       return state.deleteIn(action.path);
