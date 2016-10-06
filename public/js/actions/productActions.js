@@ -1,128 +1,52 @@
-export const UPDATE_PRODUCT_PROPERTIES_VALUE = 'UPDATE_PRODUCT_PROPERTIES_VALUE';
-export const UPDATE_PRODUCT_PREFIXES = 'UPDATE_PRODUCT_PREFIXES';
-export const ADD_PRODUCT_PROPERTIES = 'ADD_PRODUCT_PROPERTIES';
-export const REMOVE_PRODUCT_PROPERTIES = 'REMOVE_PRODUCT_PROPERTIES';
 export const GOT_PRODUCT = 'GOT_PRODUCT';
 export const SAVE_PRODUCT = 'SAVE_PRODUCT';
 export const CLEAR_PRODUCT = 'CLEAR_PRODUCT';
+export const ADD_PRODUCT_RATE = 'ADD_PRODUCT_RATE';
+export const REMOVE_PRODUCT_RATE = 'REMOVE_PRODUCT_RATE';
+export const UPDATE_PRODUCT_FIELD_VALUE = 'UPDATE_PRODUCT_FIELD_VALUE';
+export const UPDATE_PRODUCT_USAGET_VALUE = 'UPDATE_PRODUCT_USAGET_VALUE';
 
-import axios from 'axios';
 import moment from 'moment';
-import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 import { showSuccess, showDanger } from './alertsActions';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 
-let axiosInstance = axios.create({
-  withCredentials: true,
-  baseURL: globalSetting.serverUrl
-});
 
-function buildRateFromState(state) {
-  const product = state.toJS();
-  const { rates, params } = product;
-  let r = {
-    [product.unit]: {
-      BASE: {
-        rate: rates.map(rate => {
-          return {
-            from: parseInt(rate.from, 10),
-            to: parseInt(rate.to, 10),
-            price: parseInt(rate.price, 10),
-            interval: parseInt(rate.interval, 10)
-          }
-        })
-      }
-    }
-  }
-
+export function clearProduct() {
   return {
-    key: product.key,
-    id: product.id,
-    from: product.from,
-    to: product.to,
-    code: product.code,
-    unit_price: product.unit_price,
-    vatable: product.vatable,
-    description: product.description,
-    params: params,
-    rates: r
+    type: CLEAR_PRODUCT
   };
 }
 
-export function updateProductPropertiesField(field_name, field_idx, field_value) {
+export function onFieldUpdate(path, value) {
   return {
-    type: UPDATE_PRODUCT_PROPERTIES_VALUE,
-    field_name,
-    field_idx,
-    field_value
-  }
-}
-
-export function updateProductPrefixes(field_value) {
-  return {
-    type: UPDATE_PRODUCT_PREFIXES,
-    field_value
+    type: UPDATE_PRODUCT_FIELD_VALUE,
+    path,
+    value
   };
 }
 
-export function addProductProperties() {
+export function onUsagetUpdate(path, oldUsaget, newUsaget) {
   return {
-    type: ADD_PRODUCT_PROPERTIES
-  }
-}
-
-export function removeProductProperties(idx) {
-  return {
-    type: REMOVE_PRODUCT_PROPERTIES,
-    idx
-  }
-}
-
-function gotProduct(product) {
-  return {
-    type: GOT_PRODUCT,
-    product
-  }
-}
-
-function fetchProduct(product_id) {
-  const convert = (product) => {
-    let unit = _.keys(product.rates)[0];
-    return {
-      key: product.key,
-      id: product._id.$id,
-      unit,
-      unit_price: product.unit_price,
-      description: product.description,
-      params: product.params,
-      vatable: product.vatable,
-      code: product.code,
-      from: product.from,
-      to: product.to,
-      rates: product.rates[unit].BASE.rate.map(rate => {
-        return {
-          price: parseInt(rate.price, 10),
-          to: parseInt(rate.to, 10),
-          interval: parseInt(rate.interval, 10),
-          from: rate.from ? parseInt(rate.from, 10) : rate.from
-        }
-      })
-    };
+    type: UPDATE_PRODUCT_USAGET_VALUE,
+    path,
+    oldUsaget,
+    newUsaget
   };
+}
 
-  let fetchUrl = `/api/find?collection=rates&query={"_id": {"$in": ["${product_id}"]}}`;
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    let request = axiosInstance.get(fetchUrl).then(
-      resp => {
-        let p = _.values(resp.data.details)[0];
-        dispatch(gotProduct(convert(p)));
-        dispatch(hideProgressBar());
-      }
-    ).catch(error => {
-      dispatch(finishProgressIndicator());
-    });
+export function onRateAdd(path) {
+  return {
+    type: ADD_PRODUCT_RATE,
+    path
+  };
+}
+
+export function onRateRemove(path, index) {
+  return {
+    type: REMOVE_PRODUCT_RATE,
+    path,
+    index
   };
 }
 
@@ -132,23 +56,38 @@ export function getProduct(product_id) {
   };
 }
 
-function saveRateToDB(rate, action, callback) {
-  let saveUrl = '/admin/save';
+export function saveProduct(product, action, callback = () => {}) {
+  return dispatch => {
+    return dispatch(saveProductToDB(product, action, callback));
+  };
+}
 
-  var formData = new FormData();
-  if (action !== 'new') formData.append('id', rate.id);
+
+/* Internal function */
+function saveProductToDB(product, action, callback) {
+  const type = action !== 'new' ? "close_and_new" : action;
+  const formData = new FormData();
+
+  let from = moment(); //.format(globalSetting.apiDateTimeFormat)
+  let to = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
+  product = product.set('from', from).set('to', to);
+
+  if (action !== 'new'){
+    formData.append('id', product.getIn(['_id','$id']));
+  }
   formData.append("coll", 'rates');
-  formData.append("type", action);
-  formData.append("data", JSON.stringify(rate));
+  formData.append("type", type);
+  formData.append("data", JSON.stringify(product));
 
-  const query = [{
+  console.log("Save product : ", product.toJS());
+
+  const query = {
     api: "save",
-    name: "product",
     options: {
       method: "POST",
       body: formData
     },
-  }];
+  };
 
   return (dispatch) => {
     dispatch(startProgressIndicator());
@@ -156,57 +95,53 @@ function saveRateToDB(rate, action, callback) {
       success => {
         dispatch(showSuccess("Product saved successfully"));
         dispatch(finishProgressIndicator());
-        callback(false);
+        callback(success);
       },
       failure => {
-        let errorMessages = failure.error.map( (response) => `${response.name}: ${response.error.message}`);
+        const errorMessages = failure.error.map( (response) => response.error.message);
         dispatch(showDanger(errorMessages));
         dispatch(finishProgressIndicator());
-        callback(true);
+        callback(failure);
       }
     ).catch(
       error => { dispatch(apiBillRunErrorHandler(error)); }
-    );    
+    );
   };
 }
 
-export function saveProduct(rate, action, callback = () => {}) {
-  if (!rate.get('unit'))
-    return dispatch => {
-      return dispatch(showDanger("Must specify a unit type!"));
-    };
-  const conv = buildRateFromState(rate);
-  return dispatch => {
-    return dispatch(saveRateToDB(conv, action, callback));
-  };
-}
-
-export function clearProduct() {
+function gotProduct(product) {
   return {
-    type: CLEAR_PRODUCT
-  };
+    type: GOT_PRODUCT,
+    product
+  }
 }
 
+function fetchProduct(id) {
+  const query = {
+    api: "find",
+    params: [
+      { collection: "rates" },
+      { size: "1" },
+      { page: "0" },
+      { query: JSON.stringify(
+        {"_id" :  {"$in": [id]}}
+      )},
+    ]
+  };
 
-export function convert(product, plan = 'BASE'){
-  let unit = _.keys(product.rates)[0];
-  return {
-    key: product.key,
-    id: product._id.$id,
-    from: product.from,
-    to: product.to,
-    code: product.code,
-    vatable: product.vatable,
-    unit,
-    unit_price: product.unit_price,
-    description: product.description,
-    rates: product.rates[unit][plan].rate.map(rate => {
-      return {
-        price: parseInt(rate.price, 10),
-        to: parseInt(rate.to, 10),
-        interval: parseInt(rate.interval, 10),
-        from: rate.from ? parseInt(rate.from, 10) : rate.from
+  return (dispatch) => {
+    dispatch(startProgressIndicator());
+    apiBillRun(query).then(
+      resp => {
+        let p = _.values(resp.data[0].data.details)[0];
+        dispatch(gotProduct(p));
+        dispatch(finishProgressIndicator());
       }
-    })
+    ).catch(error => {
+      if (error.data){
+        dispatch(showDanger(error.data.message));
+      }
+      dispatch(finishProgressIndicator());
+    });
   };
-};
+}

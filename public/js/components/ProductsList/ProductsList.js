@@ -47,7 +47,7 @@ class ProductsList extends Component {
   
   onClickProduct(product) {
     this.context.router.push({
-      pathname: "product_setup",
+      pathname: 'product',
       query: {
         action: "update",
         productId: product.getIn(['_id', '$id'])
@@ -63,7 +63,7 @@ class ProductsList extends Component {
 
   onNewProduct() {
     this.context.router.push({
-      pathname: `product_setup`,
+      pathname: 'product',
       query: {
         action: 'new'
       }
@@ -128,7 +128,7 @@ class ProductsList extends Component {
 
         <Pager onClick={this.handlePageClick}
                size={this.state.size}
-               count={products.size || 0} />  
+               count={products.size || 0} />
       </div>
     );
   }

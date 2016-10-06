@@ -123,45 +123,54 @@ export default class Plan extends Component {
         <Col lg={8}>
           <Form>
             <Panel>
-              <FormGroup>
                 <Col lg={6} md={6}>
-                  <label htmlFor="PlanName">Name</label><Help contents={PlanDescription.name} />
-                  <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} disabled={mode === 'update'}/>
+                  <FormGroup>
+                    <ControlLabel>Name <Help contents={PlanDescription.name} /></ControlLabel>
+                    <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} disabled={mode === 'update'}/>
+                  </FormGroup>
                 </Col>
 
                 <Col lg={6} md={6}>
-                  <label htmlFor="PlanCode">Code</label>
-                  <Field id="PlanCode" onChange={this.onChangePlanCode} value={plan.get('plan_code', '')}/>
+                  <FormGroup>
+                    <ControlLabel>Code</ControlLabel>
+                    <Field onChange={this.onChangePlanCode} value={plan.get('plan_code', '')}/>
+                  </FormGroup>
                 </Col>
-              </FormGroup>
 
-              <FormGroup>
                 <Col lg={12} md={12}>
-                  <label htmlFor="PlanDescription">Description</label>
-                  <Field id="PlanDescription" fieldType="textarea" value={plan.get('description', '')} onChange={this.onChangePlanDescription} />
+                  <FormGroup>
+                    <ControlLabel>Description</ControlLabel>
+                    <Field fieldType="textarea" value={plan.get('description', '')} onChange={this.onChangePlanDescription} />
+                  </FormGroup>
                 </Col>
-              </FormGroup>
 
-              <FormGroup>
-                <Col lg={4} md={4}>
-                  <label htmlFor="PlanEach">Frequency</label>
-                  <Field min="1" id="PlanEach" fieldType="number" className="form-control" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
-                </Col>
-                <Col lg={4} md={4}>
+              <Col lg={4} md={4}>
+                <FormGroup>
+                  <ControlLabel>PlanEach</ControlLabel>
+                  <Field min="1" fieldType="number" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
+                </FormGroup>
+              </Col>
+
+              <Col lg={4} md={4}>
+                <FormGroup>
                   <ControlLabel>&nbsp;</ControlLabel>
                   <FormControl componentClass="select" placeholder="select" value={periodicity} onChange={this.onChangePeriodicity}>
                     { this.getPeriodicityOptions() }
                   </FormControl>
-                </Col>
-                <Col lg={4} md={4}>
+                </FormGroup>
+              </Col>
+
+              <Col lg={4} md={4}>
+                <FormGroup>
                   <ControlLabel>Charging Mode</ControlLabel>
                   <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
                     <option value="">Select...</option>
                     <option value={true}>Upfront</option>
                     <option value={false}>Arrears</option>
                   </FormControl>
-                </Col>
-              </FormGroup>
+                </FormGroup>
+              </Col>
+
             </Panel>
 
             <Panel header={<h3>Trial Period</h3>}>

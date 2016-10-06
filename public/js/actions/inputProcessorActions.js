@@ -20,16 +20,75 @@ export const SET_USAGET_TYPE = 'SET_USAGET_TYPE';
 export const SET_LINE_KEY = 'SET_LINE_KEY';
 export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
 export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
+export const SET_INPUT_PROCESSOR_TEMPLATE = 'SET_INPUT_PROCESSOR_TEMPLATE';
+export const UNSET_FIELD = 'UNSET_FIELD';
 
-import axios from 'axios';
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
+import _ from 'lodash';
 
-let axiosInstance = axios.create({
-  withCredentials: true,
-  baseURL: globalSetting.serverUrl
-});
+const convert = (settings) => {
+  const { parser, processor,
+          customer_identification_fields,
+          rate_calculators,
+          receiver } = settings;
+
+  const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
+  const field_widths = parser.type === "fixed" ? parser.structure : {};
+  const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
+                      "static" :
+                      "dynamic";
+
+  const ret = {
+    file_type: settings.file_type,
+    delimiter_type: parser.type,
+    delimiter: parser.separator,
+    usaget_type,
+    fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
+    field_widths,
+    customer_identification_fields,
+    rate_calculators,
+    receiver: connections
+  };
+  if (processor) {
+    let usaget_mapping;
+    if (usaget_type === "dynamic") {
+      usaget_mapping = processor.usaget_mapping.map(usaget => {
+	return {
+	  usaget: usaget.usaget,
+	  pattern: usaget.pattern.replace("/^", "").replace("$/", "")
+	}
+      })
+    } else {
+      usaget_mapping = [{}];
+    }
+    ret.processor = Object.assign({}, processor, {
+      usaget_mapping,
+      src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
+    });
+    if (!rate_calculators) {
+      if (usaget_type === "dynamic") {
+	ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
+	  acc[mapping.usaget] = [];
+	  return acc;
+	}, {});
+      } else {
+	ret.rate_calculators = {[processor.default_usaget]: []};
+      }
+    }
+    if (!customer_identification_fields) {
+      ret.customer_identification_fields = [
+	{target_key: "sid"}
+      ];
+    }
+  } else {
+    ret.processor = {
+      usaget_mapping: []
+    };
+  }
+  return ret;
+};
 
 function gotProcessorSettings(settings) {
   return {
@@ -39,49 +98,19 @@ function gotProcessorSettings(settings) {
 }
 
 function fetchProcessorSettings(file_type) {
-  const convert = (settings) => {
-    const { parser, processor,
-            customer_identification_fields,
-            rate_calculators,
-            receiver } = settings;
-
-    const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
-    const field_widths = parser.type === "fixed" ? parser.structure : {};
-    const usaget_type = (!processor.usaget_mapping || processor.usaget_mapping.length < 1) ?
-          "static" :
-          "dynamic";
-
-    return {
-      file_type: settings.file_type,
-      delimiter_type: parser.type,
-      delimiter: parser.separator,
-      usaget_type,
-      fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
-      field_widths,
-      processor: Object.assign({}, processor, {
-        usaget_mapping: usaget_type === "dynamic" ?
-          processor.usaget_mapping.map(usaget => {
-            return {
-              usaget: usaget.usaget,
-              pattern: usaget.pattern.replace("/^", "").replace("$/", "")
-            }
-          }) :
-        [{}],
-        src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
-      }),
-      customer_identification_fields,
-      rate_calculators,
-      receiver: connections
-    };
+  const query = {
+    api: "settings",
+    params: [
+      { category: "file_types" },
+      { data: JSON.stringify({file_type}) }
+    ]
   };
-
-  let fetchUrl = `/api/settings?category=file_types&data={"file_type":"${file_type}"}`;
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    let request = axiosInstance.get(fetchUrl).then(
+    apiBillRun(query).then(
       resp => {
         dispatch(finishProgressIndicator());
-        dispatch(gotProcessorSettings(convert(resp.data.details)));
+        dispatch(gotProcessorSettings(convert(resp.data[0].data.details)));
       }
     ).catch(error => {
       console.log(error);
@@ -169,13 +198,21 @@ function addedUsagetMapping(usaget) {
 }
 
 export function addUsagetMapping(usaget) {
-  let setUrl = `/api/settings?category=usage_types&action=set&data=[${JSON.stringify(usaget)}]`;
+  const query = {
+    api: "settings",
+    params: [
+      { category: "usage_types" },
+      { action: "set" },
+      { data: [JSON.stringify(usaget)] }
+    ]
+  };
+
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    let request = axiosInstance.post(setUrl).then(
+    apiBillRun(query).then(
       resp => {
         dispatch(finishProgressIndicator());
-        if (!resp.data.status) {
+        if (!resp.data[0].data.status) {
           dispatch(showDanger(resp.data.desc));
         } else {
 	  dispatch(addedUsagetMapping(usaget));
@@ -247,17 +284,6 @@ export function saveInputProcessorSettings(state, callback, part=false) {
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver');
-
-  const processor_settings = state.get('usaget_type') === "static" ?
-        { default_usaget: processor.get('default_usaget') } :
-        { usaget_mapping:
-          processor.get('usaget_mapping').map(usaget => {
-            return {
-              "src_field": processor.get('src_field'),
-              "pattern": `/^${usaget.get('pattern')}$/`,
-              "usaget": usaget.get('usaget')
-            }
-          }).toJS() };
   
   const settings = {
     "file_type": state.get('file_type'),
@@ -265,22 +291,41 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
       "structure": state.get('delimiter_type') === "fixed" ? state.get('field_widths') : state.get('fields')
-    },
-    "processor": {
+    }
+  };
+  if (processor) {
+    const processor_settings = state.get('usaget_type') === "static" ?
+			       { default_usaget: processor.get('default_usaget') } :
+			       { usaget_mapping:
+						processor.get('usaget_mapping').map(usaget => {
+						  return {
+						    "src_field": processor.get('src_field'),
+						    "pattern": `/^${usaget.get('pattern')}$/`,
+						    "usaget": usaget.get('usaget')
+						  }
+						}).toJS() };
+    settings.processor = {
       "type": "Usage",
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
       ...processor_settings
-    },
-    "customer_identification_fields": customer_identification_fields.toJS(),
-    "rate_calculators": rate_calculators.toJS(),
-    "receiver": {
+    };
+    if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');
+  }
+  if (customer_identification_fields) {
+    settings.customer_identification_fields = customer_identification_fields.toJS();
+  }
+  if (rate_calculators) {
+    settings.rate_calculators = rate_calculators.toJS();
+  }
+  if (receiver) {
+    settings.receiver = {
       "type": "ftp",
       "connections": [
-        receiver.toJS()
+	receiver.toJS()
       ]
-    }
-  };
+    };
+  }
 
   let settingsToSave;
   if (part === "customer_identification_fields") {
@@ -305,7 +350,10 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       },
       failure => {
         dispatch(finishProgressIndicator());
-        dispatch(showDanger(`Error - ${failure.error[0].error.desc}`));
+        const msg = _.result(failure, 'error[0].error.data.message') ?
+                    failure.error[0].error.data.message :
+                    failure.error[0].error.desc;
+        dispatch(showDanger(`Error - ${msg}`));
         callback(true);
       }
     ).catch(
@@ -322,22 +370,6 @@ function gotInputProcessors(input_processors) {
   return {
     type: GOT_INPUT_PROCESSORS,
     input_processors
-  };
-}
-
-function fetchInputProcessors() {
-  let setUrl = '/api/settings?category=file_types&data={}';
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    let request = axiosInstance.post(setUrl).then(
-      resp => {
-        dispatch(finishProgressIndicator());        
-        dispatch(gotInputProcessors(resp.data.details));
-      }
-    ).catch(error => {
-      dispatch(showDanger(error.data.message));
-      dispatch(finishProgressIndicator());              
-    });
   };
 }
 
@@ -386,5 +418,21 @@ export function setUsagetType(usaget_type) {
   return {
     type: SET_USAGET_TYPE,
     usaget_type
+  };
+}
+
+export function setInputProcessorTemplate(template) {
+  const converted = convert(template);
+  return {
+    type: SET_INPUT_PROCESSOR_TEMPLATE,
+    template: converted
+  };
+}
+
+export function unsetField(field_path = []) {
+  const path = Array.isArray(field_path) ? field_path : [field_path];
+  return {
+    type: UNSET_FIELD,
+    path
   };
 }

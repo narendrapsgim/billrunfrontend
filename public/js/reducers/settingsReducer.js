@@ -20,7 +20,7 @@ const defaultState = Immutable.fromJS({
 
 export default function (state = defaultState, action) {
   let { name, value, category, settings, gateway, param } = action;
-  console.log(action.type);
+
   switch(action.type) {
     case UPDATE_SETTING:
       return state.setIn([category, name], value);
