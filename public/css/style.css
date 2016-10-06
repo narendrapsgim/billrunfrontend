@@ -8,6 +8,9 @@ textarea {
 .Select-menu-outer{
   z-index: 5!important;
 }
+.Select-control{
+  height: 34px!important;
+}
 .Select-search-prompt {
     padding: 5px!important;
 }

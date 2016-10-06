@@ -62,7 +62,7 @@ function fetchPaymentGateways() {
     pre: "paymentgateways",
     api: "list"
   };
-  
+
   return (dispatch) => {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(
