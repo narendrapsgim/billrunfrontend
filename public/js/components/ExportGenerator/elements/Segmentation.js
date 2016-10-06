@@ -18,7 +18,7 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state, props) {
   return {
-    fields: state.exportGenerator.get('inputProcess').get('parser').get('structure').toObject(),
+    fields:   state.exportGenerator.getIn(['inputProcess', 'parser', 'structure']), //.toObject(),
     segments: state.exportGenerator.get('segments')
   };
 }
@@ -43,9 +43,7 @@ class Segmentation extends Component {
 
   render() {
     let options = [];
-    _.forEach(this.props.fields, function (value, key) {
-      options.push({value: key, label: key});
-    });
+    this.props.fields.map(( val, key) => options.push({value: key, label: key}));
 
     return (
       <div>

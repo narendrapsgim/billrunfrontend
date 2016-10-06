@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { showDanger } from '../../actions/alertsActions';
-
+import { clearExportGenerator } from '../../actions/exportGeneratorActions';
 import Steps from './elements/ExportGeneratorSteps';
 import SelectInputProcessor from './elements/SelectInputProcessor';
 import Segmentation from './elements/Segmentation';
 import FtpDetails from './elements/FtpDetails';
 
-class InputProcessor extends Component {
+class ExportGenerator extends Component {
   constructor(props) {
     super(props);
 
@@ -15,24 +16,23 @@ class InputProcessor extends Component {
       stepIndex: 0,
       finished: 0,
       steps: [
-        "parser",
-        "processor",
-        "customer_identification_fields",
-        "receiver"
+        "select_input",
+        "segmentation",
+        "ftoDetails"
       ]
     };
 
     this.handleNext = this.handleNext.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
     const { file_type, action } = this.props.location.query;
 
-    // dispatch(clearInputProcessor());
-    if (action !== "new") dispatch(getProcessorSettings(file_type));
-    // dispatch(getSettings(["usage_types"]));
+    // Should be deal with edit
+    // if (action !== "new") dispatch(getProcessorSettings(file_type));
   }
 
   onError(message) {
@@ -41,7 +41,7 @@ class InputProcessor extends Component {
 
   goBack() {
     this.context.router.push({
-      pathname: "input_processors"
+      pathname: "export_generators"
     });
   }
   
@@ -64,10 +64,31 @@ class InputProcessor extends Component {
   handlePrev() {
     const { stepIndex } = this.state;
     if (stepIndex > 0) return this.setState({stepIndex: stepIndex - 1, finished: 0});
-    let r = confirm("are you sure you want to stop editing input processor?");
+    let r = confirm("are you sure you want to stop editing Export Generator?");
     if (r) {
-      this.props.dispatch(clearInputProcessor());
+      this.props.dispatch(clearExportGenerator());
       this.goBack();
+    }
+  }
+  handleCancel() {
+    let r = confirm("are you sure you want to stop editing Export Generator?");
+    const { dispatch, fileType } = this.props;
+    if (r) {
+      if (fileType !== true) {
+        dispatch(clearExportGenerator());
+        this.goBack();
+      } else {
+        const cb = (err) => {
+          if (err) {
+            dispatch(showDanger("Please try again"));
+            return;
+          }
+          dispatch(clearExportGenerator());
+          this.goBack();
+        };
+        // need to handle
+        dispatch(clearExportGenerator(this.props.settings.get('file_type'), cb));
+      }
     }
   }
 
@@ -92,13 +113,10 @@ class InputProcessor extends Component {
       case 1:
         // check at last one segment with from/to is selected
         // let segment = this.props.settings.get('segments').get(0);
-        debugger;
-
         if (this.props.settings.get('segments').size === 0) {
           err.push ('Please select one segment at last.');
         } else {
           (() => {
-            console.log('Ok');
             let firstSegment = this.props.settings.get('segments').first();
             if (!firstSegment.get('field') || ( !firstSegment.get('from') || firstSegment.get('to') )) {
               err.push ('Generator should has at last one valid segment');
@@ -119,30 +137,11 @@ class InputProcessor extends Component {
     cb(false);
   }
 
-  handleCancel() {
-    let r = confirm("are you sure you want to stop editing Export Generator?");
-    const { dispatch, fileType } = this.props;
-    if (r) {
-      if (fileType !== true) {
-        dispatch(clearInputProcessor());
-        this.goBack();
-      } else {
-        const cb = (err) => {
-          if (err) {
-            dispatch(showDanger("Please try again"));
-            return;
-          }
-          dispatch(clearInputProcessor());
-          this.goBack();
-        };
-        dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
-      }
-    }
-  }
+
 
   render() {
     let { stepIndex } = this.state;
-    const { settings, usage_types } = this.props;
+    const { settings } = this.props;
 
     const steps = [
       (<SelectInputProcessor onNext={this.handleNext.bind(this)} settings={settings} />),
@@ -172,32 +171,34 @@ class InputProcessor extends Component {
                   </div>
                 </div>*/}
 
-                <div className="contents bordered-container ">
+                <div className="contents bordered-container" style={{minHeight: '250px'}}>
                   { steps[stepIndex] }
                 </div>
 
               </div>
-              <div style={{marginTop: 12, float: "right"}}>
+              <div style={{marginTop: 12}} className="pull-left">
                 <button className="btn btn-default"
                         onClick={this.handleCancel}
                         style={{marginRight: 12}}>
                   Cancel
                 </button>
+              </div>
+              <div style={{marginTop: 12}} className="pull-right">
                 {(() => {
-                   if (stepIndex > 0) {
-                     return (
-                       <button className="btn btn-default"
-                               onClick={this.handlePrev}
-                               style={{marginRight: 12}}>
-                         Back
-                       </button>
-                     );
-                   }
-                 })()}                 
-                     <button className="btn btn-primary"
-                             onClick={this.handleNext}>
-                       { stepIndex === (steps.length - 1) ? "Finish" : "Next" }
-                     </button>
+                  if (stepIndex > 0) {
+                    return (
+                      <button className="btn btn-default"
+                              onClick={this.handlePrev}
+                              style={{marginRight: 12}}>
+                        Back
+                      </button>
+                    );
+                  }
+                })()}
+                <button className="btn btn-primary"
+                        onClick={this.handleNext}>
+                  { stepIndex === (steps.length - 1) ? "Finish" : "Next" }
+                </button>
               </div>
             </div>
           </div>
@@ -207,13 +208,17 @@ class InputProcessor extends Component {
   }
 }
 
-InputProcessor.contextTypes = {
+ExportGenerator.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
 
-function mapStateToProps(state, props) {
-  return { settings: state.exportGenerator,
-           usage_types: state.settings.get('usage_types') };
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    clearExportGenerator }, dispatch);
 }
 
-export default connect(mapStateToProps)(InputProcessor);
+function mapStateToProps(state, props) {
+  return { settings: state.exportGenerator};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ExportGenerator);

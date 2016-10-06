@@ -6,7 +6,8 @@ import {
   SET_GENERATOR_NAME,
   SET_SEGMENTATION,
   ADD_SEGMENTATION,
-  DELETE_SEGMENTATION
+  DELETE_SEGMENTATION,
+  CLEAR_EXPORT_GENERATOR
 } from '../actions/exportGeneratorActions';
 
 let defaultState = Immutable.fromJS({
@@ -34,10 +35,13 @@ export default function (state = defaultState, action) {
 
     case ADD_SEGMENTATION:
       let newSegment = Immutable.fromJS({id: 0, field: null, from: null, to: null});
-      return state.set('segments', state.get('segments').push(newSegment));
+      return state.update('segments', segments => segments.push(newSegment)); //state.set('segments', state.get('segments').push(newSegment));
 
     case DELETE_SEGMENTATION:
         return state.set('segments', state.get('segments').delete(action.index));
+
+    case CLEAR_EXPORT_GENERATOR:
+      return defaultState;
 
     default:
       return state;

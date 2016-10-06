@@ -3,10 +3,6 @@ import {connect} from 'react-redux';
 import {Button} from 'react-bootstrap';
 import Select from 'react-select';
 
-function mapStateToProps(state, props) {
-  return {};
-}
-
 class Segments extends Component {
   static propTypes = {
     index: React.PropTypes.number.isRequired,
@@ -40,7 +36,7 @@ class Segments extends Component {
         <div className="col-lg-6">
           <Select
             name="field-name"
-            value={this.props.segment.get('field')}
+            value={this.props.segment.get('field', '')}
             options={this.props.options}
             onChange={this.onFieldChange}
             Clearable={false}
@@ -49,11 +45,13 @@ class Segments extends Component {
 
         <div className="col-lg-2">
           <input name="from" className="form-control" onChange={this.onValueChange}
+                 value={this.props.segment.get('from', '')}
                  disabled={!this.props.segment.get('field')}/>
         </div>
 
         <div className="col-lg-2">
           <input name="to" className="form-control" onChange={this.onValueChange}
+                 value={this.props.segment.get('to', '')}
                  disabled={!this.props.segment.get('field')}/>
         </div>
 
@@ -66,5 +64,5 @@ class Segments extends Component {
   }
 }
 
-export default connect(mapStateToProps)(Segments);
+export default Segments;
 

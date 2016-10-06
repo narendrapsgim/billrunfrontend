@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { List } from 'immutable';
-import { FormGroup, Radio } from 'react-bootstrap';
 import Select from 'react-select';
 import { getList } from '../../../actions/listActions';
 import { selectInputProcessor } from '../../../actions/exportGeneratorActions';
@@ -49,25 +48,17 @@ class SelectInputProcessor extends Component {
 
   render() {
     const { inputProcessors } = this.props;
-
-    let handleClick = function(i, entity) {
-      this.props.selectInputProcessor(entity);
-    };
-
     let options = [];
 
     if (List.isList(inputProcessors)) {
-      _.forEach(inputProcessors.toJS(), function (item) {
-        options.push({value: item.file_type, label: item.file_type});
-      });
+      inputProcessors.map(item => options.push({value: item.get('file_type'), label: item.get('file_type')}));
     }
 
     return (
       <div>
         <form className="InputProcessor form-horizontal">
-          <h3>Choose Input Processor</h3>
+          <h3 style={{marginBottom: '35px'}}>Choose Input Processor</h3>
           <GeneratorName />
-
           <div className="form-group">
             <div className="col-lg-3">
               <label htmlFor="file_type">Please select Input Processor</label>
@@ -75,7 +66,7 @@ class SelectInputProcessor extends Component {
             <div className="col-lg-6">
               <Select
                 name="field-name"
-                value={this.props.selectedProcess.get('file_type')}
+                value={this.props.selectedProcess.get('file_type', '')}
                 options={options}
                 onChange={this.onInputProcessChange}
                 Clearable={false}

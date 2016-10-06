@@ -3,6 +3,7 @@ export const SELECT_INPUT_PROCESSOR = 'SELECT_INPUT_PROCESSOR';
 export const SET_SEGMENTATION = 'SET_SEGMENTATION';
 export const ADD_SEGMENTATION = 'ADD_SEGMENTATION';
 export const DELETE_SEGMENTATION = 'DELETE_SEGMENTATION';
+export const CLEAR_EXPORT_GENERATOR = 'CLEAR_EXPORT_GENERATOR';
 
 export function setGeneratorName(name) {
   return {
@@ -40,3 +41,8 @@ export function deleteSegmentation(index) {
   };
 }
 
+export function clearExportGenerator() {
+  return {
+    type: CLEAR_EXPORT_GENERATOR
+  };
+}
