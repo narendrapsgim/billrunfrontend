@@ -42,6 +42,7 @@ export default class CSVFields extends Component {
                    className="form-control"
                    data-field={field}
                    disabled={!fixed}
+                   min="0"
                    onChange={onSetFieldWidth}
                    value={width} /> :
             null
