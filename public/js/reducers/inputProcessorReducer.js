@@ -24,7 +24,8 @@ import { SET_NAME,
          SET_INPUT_PROCESSOR_TEMPLATE,
          MOVE_CSV_FIELD_DOWN,
          MOVE_CSV_FIELD_UP,
-         CHANGE_CSV_FIELD } from '../actions/inputProcessorActions';
+         CHANGE_CSV_FIELD,
+	 UNSET_FIELD } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   file_type: '',
@@ -144,6 +145,9 @@ export default function (state = defaultState, action) {
 
     case CHANGE_CSV_FIELD:
       return state.update('fields', list => list.set(index, action.value));
+
+    case UNSET_FIELD:
+      return state.deleteIn(action.path);
       
     default:
       return state;

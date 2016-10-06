@@ -58,7 +58,7 @@ export default class SelectTemplate extends Component {
                     <input type="radio"
                            name="select-template"
                            value="predefined"
-                           checked={true}
+                           checked={this.state.selected === "predefined"}
                            onChange={this.onCheck} />I will use predefined input processor
                   </div>
                   <div className="col-lg-9 col-md-9">
@@ -75,6 +75,7 @@ export default class SelectTemplate extends Component {
                     <input type="radio"
                            name="select-template"
                            value="manual"
+                           checked={this.state.selected !== "predefined"}
                            onChange={this.onCheck} />I will configure a custom input processor
                   </div>
                 </div>

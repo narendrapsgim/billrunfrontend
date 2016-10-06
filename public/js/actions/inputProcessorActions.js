@@ -24,6 +24,7 @@ export const SET_INPUT_PROCESSOR_TEMPLATE = 'SET_INPUT_PROCESSOR_TEMPLATE';
 export const MOVE_CSV_FIELD_UP = 'MOVE_CSV_FIELD_UP';
 export const MOVE_CSV_FIELD_DOWN = 'MOVE_CSV_FIELD_DOWN';
 export const CHANGE_CSV_FIELD = 'CHANGE_CSV_FIELD';
+export const UNSET_FIELD = 'UNSET_FIELD';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
@@ -430,6 +431,7 @@ export function setInputProcessorTemplate(template) {
   };
 }
 
+
 export function moveCSVFieldUp(index, field) {
   return {
     type: MOVE_CSV_FIELD_UP,
@@ -451,5 +453,13 @@ export function changeCSVField(index, value) {
     type: CHANGE_CSV_FIELD,
     index,
     value
+  };
+}
+
+export function unsetField(field_path = []) {
+  const path = Array.isArray(field_path) ? field_path : [field_path];
+  return {
+    type: UNSET_FIELD,
+    path
   };
 }
