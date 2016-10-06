@@ -12,6 +12,8 @@ import ProductPrice from './components/ProductPrice';
 export default class Product extends Component {
 
   static propTypes = {
+    planName: React.PropTypes.string.isRequired,
+    mode: React.PropTypes.string.isRequired,
     product: React.PropTypes.object.isRequired,
     usaget: React.PropTypes.string.isRequired,
     product: React.PropTypes.object.isRequired,
@@ -90,10 +92,14 @@ export default class Product extends Component {
     const prices      = product.getIn(productPath, Immutable.List());
 
     return prices.map( (price, i) =>
-      <ProductPrice key={i} item={price} index={i} count={prices.size}
-        onProductEditRate={this.onProductRateUpdate}
-        onProductAddRate={this.onProductRateAdd}
-        onProductRemoveRate={this.onProductRateRemove}
+      <ProductPrice
+          count={prices.size}
+          index={i}
+          item={price}
+          key={i}
+          onProductAddRate={this.onProductRateAdd}
+          onProductEditRate={this.onProductRateUpdate}
+          onProductRemoveRate={this.onProductRateRemove}
       />
     )
 
@@ -121,14 +127,14 @@ export default class Product extends Component {
               <Col lg={6} md={6}>
                 <FormGroup>
                   <ControlLabel>Code</ControlLabel>
-                  <Field onChange={ this.onChangeCode } value={ product.get('code', '') } />
+                  <Field onChange={this.onChangeCode} value={ product.get('code', '') } />
                 </FormGroup>
               </Col>
 
               <Col lg={12} md={12}>
                 <FormGroup>
                   <ControlLabel>Description</ControlLabel>
-                  <Field onChange={ this.onChangeDescription } value={ product.get('description', '') } fieldType="textarea" />
+                  <Field onChange={this.onChangeDescription} value={product.get('description', '')} fieldType="textarea" />
                 </FormGroup>
               </Col>
 
@@ -136,19 +142,18 @@ export default class Product extends Component {
               <Col lg={12} md={12}>
                 <FormGroup>
                   <ControlLabel>Unit Type</ControlLabel>
-                  <Select
-                    disabled={mode === 'update'}
-                    options={ this.getUsageTypesOptions() }
-                    allowCreate={ true }
-                    value={ usaget }
-                    onChange={ this.onChangeUsaget }
+                  <Select allowCreate
+                      disabled={mode === 'update'}
+                      onChange={this.onChangeUsaget}
+                      options={this.getUsageTypesOptions()}
+                      value={usaget}
                   />
                 </FormGroup>
               </Col>
 
               <Col lg={12} md={12}>
                 <FormGroup>
-                  <Checkbox checked={ vatable } onChange={ this.onChangeVatable }>
+                  <Checkbox checked={vatable} onChange={this.onChangeVatable}>
                     VATable
                   </Checkbox>
                 </FormGroup>
@@ -157,7 +162,7 @@ export default class Product extends Component {
               <Col lg={12} md={12}>
                 <FormGroup>
                   <ControlLabel>Prefixes</ControlLabel>
-                  <Chips placeholder="Add new prefix" items={ prefixs } onChange={ this.onChangePrefix } />
+                  <Chips onChange={this.onChangePrefix} items={prefixs} placeholder='Add new prefix' />
                 </FormGroup>
               </Col>
 

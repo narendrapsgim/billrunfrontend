@@ -25,6 +25,10 @@ import PlanProduct from './components/PlanProduct';
 
 class PlanProductsPriceTab extends Component {
 
+  static propTypes = {
+    planName : React.PropTypes.string
+  };
+
   state = {
     planName: this.props.planName
   };
@@ -50,19 +54,23 @@ class PlanProductsPriceTab extends Component {
     }
   }
 
-  onNewProductRestore = (productName, productPath) => {
-    this.onProductInitRate(productName, productPath);
-    this.props.showInfo(`Product ${productName} prices for this plan restored to BASE state`);
+  onProductRestore = (productName, productPath, existing = false) => {
+    if(existing){
+      this.props.restorePlanProduct(productName, productPath);
+      this.props.showInfo(`Product ${productName} prices for this plan restored to original state`);
+    } else {
+      this.onProductInitRate(productName, productPath);
+      this.props.showInfo(`Product ${productName} prices for this plan restored to BASE state`);
+    }
   }
 
-  onProductRestore = (productName, productPath) => {
-    this.props.restorePlanProduct(productName, productPath);
-    this.props.showInfo(`Product ${productName} prices for this plan restored to original state`);
+  onProductRemove = (productName, productPath, existing = false) => {
+    this.props.removePlanProduct(productName, productPath, existing);
+    if(existing){
+      this.props.showInfo(`Product ${productName} prices for this plan will be removed after save`);
+    }
   }
-  onProductRemove = (productName, productPath) => {
-    this.props.removePlanProduct(productName, productPath);
-    this.props.showInfo(`Product ${productName} prices for this plan will be removed after save`);
-  }
+
   onProductUndoRemove = (productName, productPath) => {
     this.props.undoRemovePlanProduct(productName, productPath);
     this.props.showSuccess(`Product ${productName} prices restored`);
@@ -92,18 +100,17 @@ class PlanProductsPriceTab extends Component {
       var prod = planProducts.get(key);
       return (
         <PlanProduct key={prod.getIn(['_id', '$id'])}
-          index={i}
-          count={productPlanPrice.size}
-          item={prod}
-          planName={planName}
-          onProductRemove={this.onProductRemove}
-          onProductUndoRemove={this.onProductUndoRemove}
-          onProductRemoveRate={this.onProductRemoveRate}
-          onProductEditRate={this.onProductEditRate}
-          onProductAddRate={this.onProductAddRate}
-          onProductInitRate={this.onProductInitRate}
-          onProductRestore={this.onProductRestore}
-          onNewProductRestore={this.onNewProductRestore}
+            index={i}
+            count={productPlanPrice.size}
+            item={prod}
+            planName={planName}
+            onProductRemove={this.onProductRemove}
+            onProductUndoRemove={this.onProductUndoRemove}
+            onProductRemoveRate={this.onProductRemoveRate}
+            onProductEditRate={this.onProductEditRate}
+            onProductAddRate={this.onProductAddRate}
+            onProductInitRate={this.onProductInitRate}
+            onProductRestore={this.onProductRestore}
         />
       )
     });
@@ -158,8 +165,9 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state, props) {
   return  {
-    planProducts: state.planProducts.get('planProducts'),
-    productPlanPrice: state.planProducts.get('productPlanPrice')
+    planName: state.plan.get('name'),
+    planProducts: state.planProducts.planProducts,
+    productPlanPrice: state.planProducts.productPlanPrice
  };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(PlanProductsPriceTab);

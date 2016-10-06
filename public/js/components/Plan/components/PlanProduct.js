@@ -9,12 +9,13 @@ import ProductPrice from '../../Product/components/ProductPrice';
 export default class PlanProduct extends Component {
 
   static propTypes = {
-    onProductRemoveRate: React.PropTypes.func.isRequired,
-    onProductUndoRemove: React.PropTypes.func.isRequired,
     onProductInitRate: React.PropTypes.func.isRequired,
-    onProductEditRate: React.PropTypes.func.isRequired,
     onProductAddRate: React.PropTypes.func.isRequired,
+    onProductEditRate: React.PropTypes.func.isRequired,
+    onProductRemoveRate: React.PropTypes.func.isRequired,
     onProductRestore: React.PropTypes.func.isRequired,
+    onProductRemove: React.PropTypes.func.isRequired,
+    onProductUndoRemove: React.PropTypes.func.isRequired,
     planName: React.PropTypes.string.isRequired,
     index: React.PropTypes.number.isRequired,
     count: React.PropTypes.number.isRequired,
@@ -88,7 +89,8 @@ export default class PlanProduct extends Component {
     const productKey  = item.get('key');
     const usageType   = item.get('rates').keySeq().first();
     const productPath = ['rates', usageType, planName];
-    this.props.onProductRemove(productKey, productPath);
+    const isExisting  = item.getIn(['uiflags', 'existing'], false);
+    this.props.onProductRemove(productKey, productPath, isExisting);
   }
 
   onProductRestore = () => {
@@ -96,23 +98,16 @@ export default class PlanProduct extends Component {
     const productKey  = item.get('key');
     const usageType   = item.get('rates').keySeq().first();
     const productPath = ['rates', usageType, planName, 'rate'];
-    this.props.onProductRestore(productKey, productPath);
-  }
-
-  onNewProductRestore = () => {
-    const { item, planName } = this.props;
-    const productKey  = item.get('key');
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName, 'rate'];
-    this.props.onNewProductRestore(productKey, productPath);
+    const isExisting  = item.getIn(['uiflags', 'existing'], false);
+    this.props.onProductRestore(productKey, productPath, isExisting);
   }
 
   render() {
     const { item, planName, index, count } = this.props;
     const usageType   = item.get('rates').keySeq().first();
     const productPath = ['rates', usageType, planName, 'rate'];
-    const isRemoved   = (item.getIn(['uiflags', 'removed']) === true ) ? true : false;
-    const isExisting  = (item.getIn(['uiflags', 'existing']) === true ) ? true : false;
+    const isRemoved   = item.getIn(['uiflags', 'removed'], false);
+    const isExisting  = item.getIn(['uiflags', 'existing'], false);
     const itemKey     = item.get('key');
     const isLast      = ((count === 0) || (count-1 === index));
     const priceCount  = (item.getIn(productPath)) ? item.getIn(productPath, Immutable.List()).size : 0;
@@ -134,27 +129,20 @@ export default class PlanProduct extends Component {
         <Col lg={1} md={1} sm={1} xs={1} className="text-center">
           {(isRemoved)
             ?
-              <OverlayTrigger placement="bottom" overlay={this.tooltip("Undo Remove Rate")}>
-                <i className="fa fa-mail-reply fa-lg" onClick={this.onProductUndoRemove} style={{cursor: "pointer", color: 'green', marginTop: 15}} ></i>
+              <OverlayTrigger placement="bottom" overlay={this.tooltip('Undo Remove Rate')}>
+                <i className="fa fa-mail-reply fa-lg" onClick={this.onProductUndoRemove} style={{cursor: 'pointer', color: 'green', marginTop: 15}} />
               </OverlayTrigger>
             :
-              <OverlayTrigger placement="bottom" overlay={this.tooltip((isExisting) ? "Mark to Remove Rate" : "Remove Rate")}>
-                <i className={btnRemoveClass} onClick={this.onProductRemove} style={{cursor: "pointer", color: 'red', marginTop: 15}} ></i>
+              <OverlayTrigger placement="bottom" overlay={this.tooltip((isExisting) ? 'Mark to Remove Rate' : 'Remove Rate')}>
+                <i className={btnRemoveClass} onClick={this.onProductRemove} style={{cursor: 'pointer', color: 'red', marginTop: 15}} />
               </OverlayTrigger>
           }
         </Col>
 
-        <Col lg={1} md={1} sm={1} xs={1}  className="text-center">
-          {(isExisting)
-            ?
-              <OverlayTrigger placement="bottom" overlay={this.tooltip("Restore Rate")}>
-                <i className="fa fa-undo fa-lg" onClick={this.onProductRestore} style={{cursor: "pointer", color: '#777', marginTop: 15}} ></i>
-              </OverlayTrigger>
-            :
-              <OverlayTrigger placement="bottom" overlay={this.tooltip("Restore Rate")}>
-                <i className="fa fa-undo fa-lg" onClick={this.onNewProductRestore} style={{cursor: "pointer", color: '#777 ', marginTop: 15}} ></i>
-              </OverlayTrigger>
-          }
+        <Col lg={1} md={1} sm={1} xs={1} className="text-center">
+          <OverlayTrigger placement="bottom" overlay={this.tooltip('Restore Rate')}>
+            <i className="fa fa-undo fa-lg" onClick={this.onProductRestore} style={{cursor: 'pointer', color: '#777 ', marginTop: 15}} />
+          </OverlayTrigger>
         </Col>
 
         <Col lg={10} md={10} sm={10} xs={10}>
@@ -174,10 +162,12 @@ export default class PlanProduct extends Component {
             <Col lg={12} md={12}>
               { (!isRemoved && priceCount) ?
                   item.getIn(productPath).map( (price, i) =>
-                    <ProductPrice key={i} item={price} index={i} count={priceCount}
-                      onProductEditRate={this.onProductEditRate}
-                      onProductAddRate={this.onProductAddRate}
-                      onProductRemoveRate={this.onProductRemoveRate}
+                    <ProductPrice key={i} item={price}
+                        index={i}
+                        count={priceCount}
+                        onProductEditRate={this.onProductEditRate}
+                        onProductAddRate={this.onProductAddRate}
+                        onProductRemoveRate={this.onProductRemoveRate}
                     />
                   )
                 : null

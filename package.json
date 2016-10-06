@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./node_modules/webpack/bin/webpack.js --watch --colors",
-    "build_prod": "./node_modules/webpack/bin/webpack.js --colors -p"
+    "build_prod": "./node_modules/webpack/bin/webpack.js --colors -p",
+    "lint": "eslint public/js"
   },
   "author": "",
   "license": "ISC",

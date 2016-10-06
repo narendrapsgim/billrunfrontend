@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Row, Col, Collapse, Button, Well, Form, FormGroup, ControlLabel, OverlayTrigger, Tooltip } from 'react-bootstrap';
-
+import Immutable from 'immutable';
 import {
   getGroupProducts,
   addGroupProducts,
   removeGroupProducts } from '../../../actions/planGroupsActions';
-
 import Include from './Include';
 import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
@@ -18,7 +17,13 @@ class PlanIncludeGroupEdit extends Component {
   static propTypes = {
     onChangeFieldValue: React.PropTypes.func.isRequired,
     onGroupRemove: React.PropTypes.func.isRequired,
+    name: React.PropTypes.string.isRequired,
+    usaget: React.PropTypes.string.isRequired,
   }
+
+  static defaultProps = {
+    groupProducts : Immutable.List()
+  };
 
   state = {
     open: false
@@ -57,16 +62,14 @@ class PlanIncludeGroupEdit extends Component {
     }
   }
 
-  onGroupRemove = (productKey) => {
-    const { name } = this.props;
-    this.props.onGroupRemove(name);
+  onGroupRemove = () => {
+    const { name, usaget, groupProducts } = this.props;
+    this.props.onGroupRemove(name, usaget, groupProducts.toArray());
   }
 
   render() {
-    const { name, value, usaget, groupPoducts } = this.props;
+    const { name, value, usaget, groupProducts } = this.props;
     const { open } = this.state;
-    const productsNames = (typeof groupPoducts === 'undefined') ? null : groupPoducts.map( (prod) => prod.key);
-
 
     return (
       <div>
@@ -101,15 +104,10 @@ class PlanIncludeGroupEdit extends Component {
               </FormGroup>
               <FormGroup>
                 <ControlLabel>Products</ControlLabel>
-                  { ( !productsNames )
-                    ? <p style={{marginTop:8}}>Loading....</p>
-                    : <div>
-                        <Products onRemoveProduct={this.onRemoveProduct} products={productsNames} />
-                        <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                          <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={productsNames} />
-                        </div>
-                    </div>
-                  }
+                <Products onRemoveProduct={this.onRemoveProduct} products={productsNames} />
+                <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
+                  <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={productsNames} />
+                </div>
               </FormGroup>
             </Form>
           </div>
@@ -129,7 +127,7 @@ function mapDispatchToProps(dispatch) {
 }
 function mapStateToProps(state, props) {
   return  {
-    groupPoducts: state.planProducts.getIn(['productIncludeGroup', props.name, props.usaget])
+    groupProducts: state.planProducts.productIncludeGroup.getIn([props.name, props.usaget])
   };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(PlanIncludeGroupEdit);

@@ -106,8 +106,8 @@ class PlanSetup extends Component {
     return (
       <Col lg={12}>
         <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
-          <Tab title="Billing Plan" eventKey={1}>
-            <Panel>
+          <Tab title="Details" eventKey={1}>
+            <Panel style={{borderTop: 'none'}}>
               <PlanTab plan={plan} mode={action}
                 onChangeFieldValue={this.onChangeFieldValue}
                 onPlanCycleUpdate={this.onPlanCycleUpdate}
@@ -118,19 +118,19 @@ class PlanSetup extends Component {
           </Tab>
 
           <Tab title="Override Product Price" eventKey={2}>
-            <Panel>
-              <PlanProductsPriceTab planName={planName}/>
+            <Panel style={{borderTop: 'none'}}>
+              <PlanProductsPriceTab />
             </Panel>
           </Tab>
 
           <Tab title="Plan Includes" eventKey={3}>
-            <Panel>
+            <Panel style={{borderTop: 'none'}}>
               <PlanIncludesTab
-                includeGroups={includeGroups}
-                onChangeFieldValue={this.onChangeFieldValue}
-                onRemoveGroup={this.props.onGroupRemove}
-                addGroup={this.props.onGroupAdd}
-                addGroupProducts={this.props.addGroupProducts}
+                  includeGroups={includeGroups}
+                  onChangeFieldValue={this.onChangeFieldValue}
+                  onRemoveGroup={this.props.onGroupRemove}
+                  addGroup={this.props.onGroupAdd}
+                  addGroupProducts={this.props.addGroupProducts}
               />
             </Panel>
           </Tab>
@@ -164,4 +164,4 @@ function mapStateToProps(state, props) {
     plan: state.plan,
   };
 }
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PlanSetup));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PlanSetup));

@@ -97,7 +97,7 @@ export default class ProductPrice extends Component {
       <Row>
 
         <Col lg={5} md={5} sm={6} xs={12}>
-          <FormGroup validationState={this.state.fromError.length > 0 ? "error" : ''}>
+          <FormGroup validationState={this.state.fromError.length > 0 ? "error" : null}>
             <ControlLabel>From</ControlLabel>
             <Field value={item.get('from', '')} onChange={this.onEditFrom} fieldType="number" min={0}/>
             { this.state.fromError.length > 0 ? <HelpBlock>{this.state.fromError}</HelpBlock> : ''}
@@ -105,7 +105,7 @@ export default class ProductPrice extends Component {
         </Col>
 
         <Col lg={5} md={5} sm={6} xs={12}>
-          <FormGroup validationState={this.state.toError.length > 0 ? "error" : ''}>
+          <FormGroup validationState={this.state.toError.length > 0 ? "error" : null}>
             <ControlLabel>To</ControlLabel>
             {isLast
               ? <Field value={item.get('to', '')} onChange={this.onEditUnlimitedTo} fieldType="unlimited" unlimitedValue={this.planCycleUnlimitedValue}/>
@@ -117,7 +117,7 @@ export default class ProductPrice extends Component {
         <Col lg={2} md={2} smHidden xsHidden></Col>
 
         <Col lg={5} md={5} sm={6} xs={12}>
-          <FormGroup  validationState={this.state.intervalError.length > 0 ? "error" : ''}>
+          <FormGroup  validationState={this.state.intervalError.length > 0 ? "error" : null}>
             <ControlLabel>Interval</ControlLabel>
             <Field value={item.get('interval', '')} onChange={this.onEditInterval} fieldType="number" min={0}/>
             { this.state.intervalError.length > 0 ? <HelpBlock>{this.state.intervalError}</HelpBlock> : ''}

@@ -10,7 +10,7 @@ import dashboard from './dashboardReducer';
 import product from './productReducer';
 import user from './userReducer';
 import plan from './planReducer';
-import planProducts from './planProductsReducer';
+import planProducts from './planProducts';
 
 
 export default combineReducers({

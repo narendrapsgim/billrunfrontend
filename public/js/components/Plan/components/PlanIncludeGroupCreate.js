@@ -20,7 +20,7 @@ export default class PlanIncludeGroupCreate extends Component {
     addGroupProducts: React.PropTypes.func.isRequired,
   }
 
-  defaultSate = {
+  defaultState = {
     name: '', usage: '', include: '', products: Immutable.List(),
     error : '',
     stepIndex: 0, open: false
@@ -45,7 +45,7 @@ export default class PlanIncludeGroupCreate extends Component {
     }
   }
 
-  state = Object.assign({}, this.defaultSate);
+  state = Object.assign({}, this.defaultState);
 
   validateStep = (step) => {
     switch (step) {
@@ -134,7 +134,7 @@ export default class PlanIncludeGroupCreate extends Component {
   };
 
   resetState = (open = true) => {
-    this.setState(Object.assign({}, this.defaultSate, {open}));
+    this.setState(Object.assign({}, this.defaultState, {open}));
   }
 
   handleCancel = () => {
@@ -165,7 +165,7 @@ export default class PlanIncludeGroupCreate extends Component {
     switch (stepIndex) {
       case 0:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : '' }>
+          <FormGroup validationState={error.length > 0 ? "error" : null }>
             <ControlLabel>Group Name</ControlLabel>
               <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName}/>
               <h5><small>* Group name should be unique for all plans</small></h5>
@@ -174,7 +174,7 @@ export default class PlanIncludeGroupCreate extends Component {
         );
       case 1:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : ''} >
+          <FormGroup validationState={error.length > 0 ? "error" : null} >
             <ControlLabel>Usage Type</ControlLabel>
             <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={usage}/>
             { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
@@ -182,7 +182,7 @@ export default class PlanIncludeGroupCreate extends Component {
         );
       case 2:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : ''} >
+          <FormGroup validationState={error.length > 0 ? "error" : null} >
             <ControlLabel>Includes</ControlLabel>
             <Include onChangeInclud={this.onChangeInclud} value={include} />
             { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
@@ -191,7 +191,7 @@ export default class PlanIncludeGroupCreate extends Component {
       case 3:
 
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : ''}>
+          <FormGroup validationState={error.length > 0 ? "error" : null}>
             <ControlLabel>Products</ControlLabel>
               { products.size
                ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />

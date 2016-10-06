@@ -89,7 +89,7 @@ export default class PlanPrice extends Component {
     return (
       <Row>
         <Col lg={5} md={5}>
-          <FormGroup validationState={ cycleError.length ? "error" : ''} style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup validationState={ cycleError.length ? "error" : null} style={{marginRight: 0, marginLeft: 0}}>
             <ControlLabel>Cycles</ControlLabel>
               { isLast
                 ? <Field onChange={this.onCycleUpdateValue} value={cycle} fieldType="unlimited" unlimitedValue={planCycleUnlimitedValue}/>
@@ -100,7 +100,7 @@ export default class PlanPrice extends Component {
           </Col>
 
         <Col lg={5} md={5}>
-          <FormGroup validationState={ priceError.length ? "error" : ''} style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup validationState={ priceError.length ? "error" : null} style={{marginRight: 0, marginLeft: 0}}>
           <ControlLabel>Price</ControlLabel>
               <Field onChange={this.onPlanPriceUpdate} value={price} />
               { priceError.length > 0 && <HelpBlock>{priceError}.</HelpBlock>}
