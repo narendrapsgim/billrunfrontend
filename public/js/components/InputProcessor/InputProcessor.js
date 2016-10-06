@@ -4,11 +4,11 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import _ from 'lodash';
 
-import { clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField } from '../../actions/inputProcessorActions';
+import { setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showWarning, showDanger } from '../../actions/alertsActions';
 
-import { setInputProcessorTemplate } from '../../actions/inputProcessorActions';
+/* COMPONENTS */
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
