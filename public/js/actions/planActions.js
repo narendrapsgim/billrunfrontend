@@ -1,15 +1,16 @@
 export const GOT_PLAN = 'GOT_PLAN';
 export const SAVE_PLAN = 'SAVE_PLAN';
 export const CLEAR_PLAN = 'CLEAR_PLAN';
+
 export const ADD_TARIFF = 'ADD_TARIFF';
 export const REMOVE_TARIFF = 'REMOVE_TARIFF';
+
 export const UPDATE_PLAN_CYCLE = 'UPDATE_PLAN_CYCLE';
 export const UPDATE_PLAN_PRICE = 'UPDATE_PLAN_PRICE';
 export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
 
-export const REMOVE_INCLUDE = 'REMOVE_INCLUDE';
-export const CHNAGE_INCLUDE = 'CHNAGE_INCLUDE';
-export const ADD_INCLUDE = 'ADD_INCLUDE';
+export const REMOVE_GROUP = 'REMOVE_GROUP';
+export const ADD_GROUP = 'ADD_GROUP';
 
 import moment from 'moment';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
@@ -39,14 +40,6 @@ export function onPlanCycleUpdate(index, value) {
   };
 }
 
-export function onPlanPriceUpdate(index, value) {
-  return {
-    type: UPDATE_PLAN_PRICE,
-    index,
-    value,
-  };
-}
-
 export function onPlanTariffAdd(trial) {
   return {
     type: ADD_TARIFF,
@@ -61,26 +54,16 @@ export function onPlanTariffRemove(index) {
   };
 }
 
-export function removePlanInclude(groupName, usaget) {
+export function onGroupRemove(groupName) {
   return {
-    type: REMOVE_INCLUDE,
-    groupName,
-    usaget
+    type: REMOVE_GROUP,
+    groupName
   };
 }
 
-export function addPlanInclude(groupName, usaget, value) {
+export function onGroupAdd(groupName, usaget, value) {
   return {
-    type: ADD_INCLUDE,
-    groupName,
-    usaget,
-    value
-  };
-}
-
-export function changePlanInclude(groupName, usaget, value) {
-  return {
-    type: CHNAGE_INCLUDE,
+    type: ADD_GROUP,
     groupName,
     usaget,
     value
@@ -132,13 +115,13 @@ function savePlanToDB(plan, action, callback) {
       success => {
         dispatch(showSuccess("Plan saved successfully"));
         dispatch(finishProgressIndicator());
-        callback(success);
+        //TODO : Reload plan by key when plan view will be by key
+        callback(true);
       },
       failure => {
-        const errorMessages = failure.error.map( (response) => response.error.message);
+        const errorMessages = failure.error.map( (response) => response.error.message );
         dispatch(showDanger(errorMessages));
         dispatch(finishProgressIndicator());
-        callback(failure);
       }
     ).catch(
       error => { dispatch(apiBillRunErrorHandler(error)); }

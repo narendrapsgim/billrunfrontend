@@ -3,16 +3,19 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router';
 import { Row, Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
+import Immutable from 'immutable';
 
 import {
   clearPlan,
   getPlan,
   savePlan,
+  onGroupRemove,
   onPlanCycleUpdate,
-  onPlanPriceUpdate,
   onPlanTariffAdd,
   onPlanTariffRemove,
   onPlanFieldUpdate } from '../../actions/planActions';
+import { addGroupProducts } from '../../actions/planGroupsActions';
+import { onGroupAdd } from '../../actions/planActions';
 import { savePlanRates } from '../../actions/planProductsActions';
 
 import PlanTab from './PlanTab';
@@ -50,10 +53,6 @@ class PlanSetup extends Component {
     this.props.onPlanCycleUpdate(index, value);
   }
 
-  onPlanPriceUpdate = (index, value) => {
-    this.props.onPlanPriceUpdate(index, value);
-  }
-
   onPlanTariffAdd = (trail) => {
     this.props.onPlanTariffAdd(trail);
   }
@@ -63,17 +62,17 @@ class PlanSetup extends Component {
   }
 
   handleSave = () => {
-    const { plan } = this.props;
-    const { action } = this.props.location.query;
-    if(action === 'update'){
-      this.props.savePlan(plan, action, this.saveRates);
-    } else {
-      this.props.savePlan(plan, action, this.afterSave);
-    }
+    this.saveRates();
   }
 
   saveRates = () => {
-    this.props.savePlanRates(this.afterSave);
+    this.props.savePlanRates(this.savePlan);
+  }
+
+  savePlan = () => {
+    const { plan } = this.props;
+    const { action } = this.props.location.query;
+    this.props.savePlan(plan, action, this.afterSave);
   }
 
   afterSave = (data) => {
@@ -93,13 +92,16 @@ class PlanSetup extends Component {
   }
 
   render() {
-    const { plan, validator } = this.props;
+    const { plan } = this.props;
     const { action } = this.props.location.query;
-    const planName = plan.get('name');
+
     //in update mode wait for plan before render edit screen
     if(action === 'update' && typeof plan.getIn(['_id', '$id']) === 'undefined'){
       return <div>Loading...</div>
     }
+
+    const planName = plan.get('name', '');
+    const includeGroups =  plan.getIn(['include', 'groups'], Immutable.Map());
 
     return (
       <Col lg={12}>
@@ -109,10 +111,8 @@ class PlanSetup extends Component {
               <PlanTab plan={plan} mode={action}
                 onChangeFieldValue={this.onChangeFieldValue}
                 onPlanCycleUpdate={this.onPlanCycleUpdate}
-                onPlanPriceUpdate={this.onPlanPriceUpdate}
                 onPlanTariffAdd={this.onPlanTariffAdd}
                 onPlanTariffRemove={this.onPlanTariffRemove}
-                validator={validator}
               />
             </Panel>
           </Tab>
@@ -125,7 +125,13 @@ class PlanSetup extends Component {
 
           <Tab title="Plan Includes" eventKey={3}>
             <Panel>
-              <PlanIncludesTab plan={plan} onChangeFieldValue={this.onChangeFieldValue} onIncludeRemove={this.onIncludeRemove} />
+              <PlanIncludesTab
+                includeGroups={includeGroups}
+                onChangeFieldValue={this.onChangeFieldValue}
+                onRemoveGroup={this.props.onGroupRemove}
+                addGroup={this.props.onGroupAdd}
+                addGroupProducts={this.props.addGroupProducts}
+              />
             </Panel>
           </Tab>
 
@@ -141,8 +147,10 @@ class PlanSetup extends Component {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    onGroupAdd,
+    onGroupRemove,
+    addGroupProducts,
     onPlanCycleUpdate,
-    onPlanPriceUpdate,
     onPlanTariffAdd,
     onPlanTariffRemove,
     onPlanFieldUpdate,
@@ -154,7 +162,6 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state, props) {
   return  {
     plan: state.plan,
-    validator: state.validator
   };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PlanSetup));

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button } from 'react-bootstrap';
 
-import DateTimeField from '../react-bootstrap-datetimepicker/lib/DateTimeField';
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
@@ -11,12 +10,67 @@ import PlanPrice from './components/PlanPrice';
 
 export default class Plan extends Component {
 
+  static propTypes = {
+    onChangeFieldValue: React.PropTypes.func.isRequired,
+    onPlanCycleUpdate: React.PropTypes.func.isRequired,
+    onPlanTariffAdd: React.PropTypes.func.isRequired,
+    onPlanTariffRemove: React.PropTypes.func.isRequired,
+  }
+
+  componentWillMount() {
+    const { plan } = this.props;
+    const count = plan.get('price', Immutable.List()).size
+    if(count === 0){
+      this.props.onPlanTariffAdd(false);
+    }
+  }
+
   onPlanTrailTariffInit = (e) => {
     this.props.onPlanTariffAdd(true);
   }
 
   onPlanTariffInit = (e) => {
     this.props.onPlanTariffAdd(false);
+  }
+
+  onChangePlanName = (e) => {
+    const { value } = e.target;
+    this.props.onChangeFieldValue(['name'], value);
+  }
+
+  onChangePlanCode = (e) => {
+    const { value } = e.target;
+    this.props.onChangeFieldValue(['code'], value);
+  }
+
+  onChangePlanDescription = (e) => {
+    const { value } = e.target;
+    this.props.onChangeFieldValue(['description'], value);
+  }
+
+  onChangePlanEach = (e) => {
+    let value = parseInt(e.target.value);
+    value = isNaN(value) ? '' : value;
+    this.props.onChangeFieldValue(['recurrence', 'unit'], value);
+  }
+
+  onChangePeriodicity = (e) => {
+    const { value } = e.target;
+    this.props.onChangeFieldValue(['recurrence', 'periodicity'], value);
+  }
+
+  onPlanPriceUpdate = (index, value) => {
+    this.props.onChangeFieldValue(['price', index, 'price'], value);
+  }
+
+  onChangeUpfront = (e) => {
+    let value = e.target.value;
+    if(value === 'true' || value === 'TRUE'){
+      value = true;
+    } else if(value === 'false' || value === 'FALSE'){
+      value = false;
+    }
+    this.props.onChangeFieldValue(['upfront'], value);
   }
 
   getPeriodicityOptions = () => {
@@ -46,8 +100,8 @@ export default class Plan extends Component {
           index={0}
           count={plan.get('price', Immutable.List()).size}
           item={trial}
+          onPlanPriceUpdate={this.onPlanPriceUpdate}
           onPlanCycleUpdate={this.props.onPlanCycleUpdate}
-          onPlanPriceUpdate={this.props.onPlanPriceUpdate}
           onPlanTariffAdd={this.props.onPlanTariffAdd}
           onPlanTariffRemove={this.props.onPlanTariffRemove}
         />);
@@ -59,6 +113,7 @@ export default class Plan extends Component {
     const { plan } = this.props;
     const count = plan.get('price', Immutable.List()).size;
     const prices = [];
+
     plan.get('price', Immutable.List()).forEach( (price, i) => {
       if (price.get('trial') !== true){
         prices.push(
@@ -66,8 +121,8 @@ export default class Plan extends Component {
             index={i}
             count={count}
             item={price}
+            onPlanPriceUpdate={this.onPlanPriceUpdate}
             onPlanCycleUpdate={this.props.onPlanCycleUpdate}
-            onPlanPriceUpdate={this.props.onPlanPriceUpdate}
             onPlanTariffAdd={this.props.onPlanTariffAdd}
             onPlanTariffRemove={this.props.onPlanTariffRemove}
           />
@@ -75,42 +130,6 @@ export default class Plan extends Component {
       }
     });
     return (prices.length > 0) ? prices : this.getEmptyPrice(false);
-  }
-
-  onChangePlanName = (e) => {
-    const { value } = e.target;
-    this.props.onChangeFieldValue(['name'], value);
-  }
-
-  onChangePlanCode = (e) => {
-    const { value } = e.target;
-    this.props.onChangeFieldValue(['plan_code'], value);
-  }
-
-  onChangePlanDescription = (e) => {
-    const { value } = e.target;
-    this.props.onChangeFieldValue(['description'], value);
-  }
-
-  onChangePlanEach = (e) => {
-    let value = parseInt(e.target.value);
-    value = isNaN(value) ? '' : value;
-    this.props.onChangeFieldValue(['recurrence', 'unit'], value);
-  }
-
-  onChangePeriodicity = (e) => {
-    const { value } = e.target;
-    this.props.onChangeFieldValue(['recurrence', 'periodicity'], value);
-  }
-
-  onChangeUpfront = (e) => {
-    let value = e.target.value;
-    if(value === 'true' || value === 'TRUE'){
-      value = true;
-    } else if(value === 'false' || value === 'FALSE'){
-      value = false;
-    }
-    this.props.onChangeFieldValue(['upfront'], value);
   }
 
   render() {
@@ -133,7 +152,7 @@ export default class Plan extends Component {
                 <Col lg={6} md={6}>
                   <FormGroup>
                     <ControlLabel>Code</ControlLabel>
-                    <Field onChange={this.onChangePlanCode} value={plan.get('plan_code', '')}/>
+                    <Field onChange={this.onChangePlanCode} value={plan.get('code', '')}/>
                   </FormGroup>
                 </Col>
 
