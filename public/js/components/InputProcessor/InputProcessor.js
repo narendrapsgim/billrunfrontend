@@ -102,17 +102,7 @@ class InputProcessor extends Component {
   }
 
   onAddField(val, e) {
-    if (!val || _.isEmpty(val.replace(/ /g, ''))) {
-      this.props.dispatch(showWarning("Please input field name"));
-      return;
-    }    
-    const value = val.replace(/[^a-zA-Z_]/g, "_").toLowerCase();
-    const fields = this.props.settings.get('fields');
-    if (fields.includes(value)) {
-      this.props.dispatch(showWarning("Field already exists"));
-      return;
-    }
-    this.props.dispatch(addCSVField(value));
+    this.props.dispatch(addCSVField(""));
   }
 
   onRemoveField(index, e) {

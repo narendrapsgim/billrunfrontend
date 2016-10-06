@@ -9,17 +9,7 @@ export default class SampleCSV extends Component {
   constructor(props) {
     super(props);
 
-    this.addField = this.addField.bind(this);
     this.removeAllFields = this.removeAllFields.bind(this);
-    
-    this.state = {
-      newField: ''
-    };
-  }
-
-  addField(val, e) {
-    this.props.onAddField.call(this, this.state.newField);
-    this.setState({newField: ''});
   }
 
   removeAllFields() {
@@ -78,14 +68,10 @@ export default class SampleCSV extends Component {
           </div>
           { fieldsHTML }
           <div className="form-group">
-            <div className="col-lg-4">
-              <input className="form-control" value={this.state.newField} onChange={(e) => { this.setState({newField: e.target.value}) } } placeholder="Field Name"/>
-            </div>
             <div className="col-lg-2">
               <button type="button"
                       className="btn btn-info"
-                      disabled={!settings.get('file_type') || !this.state.newField}
-                      onClick={this.addField}>
+                      onClick={onAddField}>
                 <i className="fa fa-plus"/> Add field
               </button>
             </div>

@@ -5,7 +5,7 @@ var bootstrapPath = __dirname + '/node_modules/bootstrap/dist/css';
 var bootstrapSocialPath = __dirname + '/node_modules/bootstrap-social';
 var fontAwesomePath = __dirname + '/node_modules/font-awesome/css';
 
-var env = process.env.MIX_ENV || 'dev';
+var env = process.env.NODE_ENV || 'dev';
 
 /**
  * This is the Webpack configuration file for local development. It contains
