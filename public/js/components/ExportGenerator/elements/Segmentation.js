@@ -52,7 +52,7 @@ class Segmentation extends Component {
         <br/>
         <Panel header={<h3>Segments <Help contents="Each Segment should has a field and ranges value"/>
           <Button onClick={this.props.addSegmentation} bsSize="xsmall" className="pull-right">
-            <i className="fa fa-plus"></i> Add</Button>
+            <i className="fa fa-plus"></i>&nbsp;Add</Button>
         </h3>}>
           <div className="form-group">
             <div className="col-lg-6">

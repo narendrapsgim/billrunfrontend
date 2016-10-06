@@ -57,7 +57,7 @@ class Segments extends Component {
 
         <div className="col-lg-2" style={{padding: '2px 0'}}>
           <Button onClick={this.onDeleteLine} bsSize="small"><i className="fa fa-trash-o danger-red"/>
-            &nbsp;Delete</Button>
+            &nbsp;Remove</Button>
         </div>
       </div>
     )
