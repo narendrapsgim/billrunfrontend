@@ -433,6 +433,14 @@ table.dataTable thead .sorting:after {
   }
 }
 
+/*!
+ * BillRun specifics
+ */
+
 .danger-red {
   color: #d9534f;
+}
+
+.List.row .btn-link {
+  padding: 0;
 }
