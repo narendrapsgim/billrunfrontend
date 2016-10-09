@@ -55,7 +55,7 @@ export function userDoLogin(username, password){
         dispatch(finishProgressIndicator());
       },
       error => {
-        dispatch(loginError(error[0]));
+        dispatch(loginError(error.error[0].error.details));
         dispatch(finishProgressIndicator());
       }
     );

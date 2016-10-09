@@ -24,7 +24,7 @@ class LoginForm extends Component {
 
   static propTypes = {
     userDoLogin: React.PropTypes.func.isRequired,
-    auth: React.PropTypes.boolean,
+    auth: React.PropTypes.bool,
     error: React.PropTypes.string,
   };
 
@@ -114,9 +114,9 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state) {
   const error = state.user.get('error');
   return {
-      auth: state.user.get('auth'),
-      error,
-      forceReloadState: (error.length) ? new Date() : '', //force reload state because if the error message is same componentWillReceiveProps will not call
+    auth: state.user.get('auth'),
+    error,
+    forceReloadState: (error.length) ? new Date() : '', //force reload state because if the error message is same componentWillReceiveProps will not call
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(LoginForm);
