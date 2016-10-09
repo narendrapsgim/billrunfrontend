@@ -85,7 +85,7 @@ class CustomersList extends Component {
     const { customers } = this.props;
 
     const fields = [
-      { id: "aid", placeholder: "Customer ID", type: 'number', sort: true },
+      { id: "aid", placeholder: "Id", type: 'number', sort: true },
       { id: "firstname", placeholder: "First Name" },
       { id: "lastname", placeholder: "Last Name" },
       { id: "address", placeholder: "Address" },
@@ -107,7 +107,7 @@ class CustomersList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
-                <List items={customers} fields={fields} edit={true} onClickEdit={this.onClickCustomer} onSort={this.onSort} />
+                <List items={customers} fields={fields} editField="firstname" edit={true} onClickEdit={this.onClickCustomer} onSort={this.onSort} />
               </div>
             </div>
           </div>

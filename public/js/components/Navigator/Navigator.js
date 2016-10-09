@@ -56,7 +56,7 @@ class Navigator extends Component {
 
   render() {
     return (
-      <nav className="navbar navbar-default navbar-static-top" role="navigation" style={{marginBottom: 0}}>
+      <nav className="navbar navbar-default navbar-fixed-top" role="navigation" style={{marginBottom: 0}}>
         <div className="navbar-header">
           <Link to="/" className="navbar-brand">
             <img src="/img/billrun-logo-tm.png" style={{height: 22}}/>
