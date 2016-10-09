@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
 import moment from 'moment';
-
+import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 /* ACTIONS */
 import { titlize } from '../../common/Util';
 
@@ -100,9 +100,13 @@ export default class List extends Component {
 	arrow = this.state.sort[field.id] ? (<i className={`sort-indicator fa fa-sort-${ this.state.sort[field.id] === 1 ? 'down' : 'up' }`}></i>) : (<i className="sort-indicator fa fa-sort"></i>);
       }
       if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
-        return (<th key={key} onClick={onclick} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
+        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
     });
     if (edit) table_header.push((<th key={fields.length}>&nbsp;</th>));
+
+    const editTooltip = (
+      <Tooltip id="tooltip">{ editText ?editText : 'Edit'}</Tooltip>
+    );
 
     const table_body = items.size < 1 ?
                        (<tr><td colSpan={fields.length + (edit ? 1 : 0)} style={{textAlign: "center"}}>No items found</td></tr>) :
@@ -113,7 +117,12 @@ export default class List extends Component {
                                 edit ?
                                   <td className="edit-tb">
                                     <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
-                                      { editText ? editText : <span><i className="fa fa-pencil" />&nbsp;Edit</span> }
+                                      { editText ?
+                                        editText :
+                                        <OverlayTrigger overlay={editTooltip} placement="left">
+                                          <i className="fa fa-pencil" />
+                                        </OverlayTrigger>
+                                      }
                                     </button>
                                   </td> : null
                               }
