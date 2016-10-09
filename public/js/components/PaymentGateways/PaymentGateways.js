@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { getSettings, saveSettings, addPaymentGateway, removePaymentGateway, updatePaymentGateway } from '../../actions/settingsActions';
+import { getSettings, addPaymentGateway, removePaymentGateway, updatePaymentGateway } from '../../actions/settingsActions';
 import { apiBillRun } from '../../common/Api';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, getPaymentGateways } from '../../actions/listActions';
