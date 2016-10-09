@@ -163,6 +163,7 @@ class CustomerSetup extends Component {
                   aid={customer.get('aid')}
                   settings={settings.getIn(['subscriber', 'fields'])}
                   plans={plans}
+                  onChangeField={this.onChangeSubscriptionField}
                   onNew={this.onClickNewSubscription}
               />
             </div>

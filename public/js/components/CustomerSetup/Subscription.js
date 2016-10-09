@@ -7,9 +7,13 @@ export default class Subscription extends Component {
     super(props);
   }
 
-  onChangeField() {
-    console.log(arguments);
-  }
+  onChangePlan = (value) => {
+    const { subscription } = this.props;
+    this.props.onChangeField({sid: subscription.get('sid'),
+                              aid: subscription.get('aid'),
+                              id: "plan",
+                              value});
+  };
   
   render() {
     const { subscription, plans, onSave, onCancel } = this.props;
@@ -29,7 +33,7 @@ export default class Subscription extends Component {
               <Select id="plan"
                       options={available_plans}
                       value={subscription.get('plan')}
-                      onChange={this.onChangeField}
+                      onChange={this.onChangePlan}
               />
             </div>
           </div>
