@@ -7,6 +7,7 @@ import { getUsageTypes } from '../../../actions/planProductsActions';
 export default class UsagetypeSelect extends Component {
 
   static propTypes = {
+    value: React.PropTypes.string.isRequired,
     onChangeUsageType: React.PropTypes.func.isRequired,
   }
 
@@ -34,16 +35,16 @@ export default class UsagetypeSelect extends Component {
     const { value } = this.props;
     return (
         <Select
-          value={value}
-          cacheAsyncResults={false}
-          onChange={this.onSelectUsageType}
-          asyncOptions={this.loadSelectUsageTypes}
-          searchable={false}
-          valueKey='key'
-          labelKey='key'
-          placeholder='Select usage type...'
-          noResultsText='No usage types found.'
-          searchPromptText='No usage types found.'
+            value={value}
+            cacheAsyncResults={false}
+            onChange={this.onSelectUsageType}
+            asyncOptions={this.loadSelectUsageTypes}
+            searchable={false}
+            valueKey='key'
+            labelKey='key'
+            placeholder='Select usage type...'
+            noResultsText='No usage types found.'
+            searchPromptText='No usage types found.'
         />
 
     );

@@ -17,11 +17,13 @@ import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 export default class PlanIncludesTab extends Component {
 
   static propTypes = {
-    includeGroups: React.PropTypes.object.isRequired,
+    includeGroups: React.PropTypes.instanceOf(Immutable.Map),
     onChangeFieldValue: React.PropTypes.func.isRequired,
     onRemoveGroup: React.PropTypes.func.isRequired,
     addGroup: React.PropTypes.func.isRequired,
     addGroupProducts: React.PropTypes.func.isRequired,
+    removeGroupProducts: React.PropTypes.func.isRequired,
+    getGroupProducts: React.PropTypes.func.isRequired,
   }
 
   state = {
@@ -58,11 +60,14 @@ export default class PlanIncludesTab extends Component {
       include.forEach( (value, usaget) => {
         groups.push(
           <PlanIncludeGroupEdit key={`${groupName}_${usaget}`}
-            name={groupName}
-            value={value}
-            usaget={usaget}
-            onChangeFieldValue={this.props.onChangeFieldValue}
-            onGroupRemove={this.props.onRemoveGroup}
+              name={groupName}
+              value={value}
+              usaget={usaget}
+              onChangeFieldValue={this.props.onChangeFieldValue}
+              onGroupRemove={this.props.onRemoveGroup}
+              addGroupProducts={this.props.addGroupProducts}
+              getGroupProducts={this.props.getGroupProducts}
+              removeGroupProducts={this.props.removeGroupProducts}
           />
         );
         groups.push(<hr key={`${groupName}_${usaget}_sep`}/>)
@@ -85,9 +90,9 @@ export default class PlanIncludesTab extends Component {
             <Panel header={<h3>Groups <Help contents={PlanDescription.include_groups} /></h3>}>
               {this.renderGroups()}
               <PlanIncludeGroupCreate
-                existinGrousNames={existinGrousNames}
-                addGroup={this.props.addGroup}
-                addGroupProducts={this.props.addGroupProducts}
+                  existinGrousNames={existinGrousNames}
+                  addGroup={this.props.addGroup}
+                  addGroupProducts={this.props.addGroupProducts}
               />
             </Panel>
         </Col>

@@ -89,7 +89,7 @@ export default class PlanPrice extends Component {
     return (
       <Row>
         <Col lg={5} md={5}>
-          <FormGroup validationState={ cycleError.length ? "error" : null} style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup validationState={cycleError.length ? "error" : null} style={{marginRight: 0, marginLeft: 0}}>
             <ControlLabel>Cycles</ControlLabel>
               { isLast
                 ? <Field onChange={this.onCycleUpdateValue} value={cycle} fieldType="unlimited" unlimitedValue={planCycleUnlimitedValue}/>
@@ -100,7 +100,7 @@ export default class PlanPrice extends Component {
           </Col>
 
         <Col lg={5} md={5}>
-          <FormGroup validationState={ priceError.length ? "error" : null} style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup validationState={priceError.length ? "error" : null} style={{marginRight: 0, marginLeft: 0}}>
           <ControlLabel>Price</ControlLabel>
               <Field onChange={this.onPlanPriceUpdate} value={price} />
               { priceError.length > 0 && <HelpBlock>{priceError}.</HelpBlock>}
@@ -108,11 +108,11 @@ export default class PlanPrice extends Component {
         </Col>
 
         <Col lg={1} md={1} sm={1} xs={2} lgOffset={0} mdOffset={0} smOffset={10} xsOffset={8} className="text-right">
-          { showAddButton && <i className="fa fa-plus-circle fa-lg" onClick={this.onPlanTariffAdd} style={{cursor: "pointer", color: 'green', marginTop: 35}} ></i> }
+          { showAddButton && <i className="fa fa-plus-circle fa-lg" onClick={this.onPlanTariffAdd} style={{cursor: "pointer", color: 'green', marginTop: 35}} /> }
          </Col>
 
          <Col lg={1} md={1} sm={1} xs={2} className="text-right">
-          { showRemoveButton && <i className="fa fa-minus-circle fa-lg" onClick={this.onPlanTariffRemove} style={{cursor: "pointer", color: 'red', marginTop: 35}} ></i> }
+          { showRemoveButton && <i className="fa fa-minus-circle fa-lg" onClick={this.onPlanTariffRemove} style={{cursor: "pointer", color: 'red', marginTop: 35}} /> }
         </Col>
         { !isLast && !trial && <Col lgHidden mdHidden sm={12} xs={12}><hr /></Col> }
       </Row>

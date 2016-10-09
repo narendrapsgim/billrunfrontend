@@ -14,7 +14,10 @@ import {
   onPlanTariffAdd,
   onPlanTariffRemove,
   onPlanFieldUpdate } from '../../actions/planActions';
-import { addGroupProducts } from '../../actions/planGroupsActions';
+import {
+  addGroupProducts,
+  getGroupProducts,
+  removeGroupProducts } from '../../actions/planGroupsActions';
 import { onGroupAdd } from '../../actions/planActions';
 import { savePlanRates } from '../../actions/planProductsActions';
 
@@ -131,13 +134,15 @@ class PlanSetup extends Component {
                   onRemoveGroup={this.props.onGroupRemove}
                   addGroup={this.props.onGroupAdd}
                   addGroupProducts={this.props.addGroupProducts}
+                  getGroupProducts={this.props.getGroupProducts}
+                  removeGroupProducts={this.props.removeGroupProducts}
               />
             </Panel>
           </Tab>
 
         </Tabs>
         <div style={{marginTop: 12}}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{marginRight: 10}}   >Save</Button>
+          <Button onClick={this.handleSave} bsStyle="primary" style={{marginRight: 10}}>Save</Button>
           <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
         </div>
       </Col>
@@ -147,9 +152,11 @@ class PlanSetup extends Component {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    getGroupProducts,
+    addGroupProducts,
+    removeGroupProducts,
     onGroupAdd,
     onGroupRemove,
-    addGroupProducts,
     onPlanCycleUpdate,
     onPlanTariffAdd,
     onPlanTariffRemove,

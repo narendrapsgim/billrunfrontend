@@ -1,13 +1,10 @@
 import React, { Component }  from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import Immutable from 'immutable';
 import { Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button,
-  Panel, Col, Row, Collapse, OverlayTrigger, Tooltip } from 'react-bootstrap';
+   Col, Row, Collapse, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-
 import UsagetypeSelect from './UsagetypeSelect';
-import Include from './Include';
+import Field from '../../Field';
 import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 
@@ -15,7 +12,7 @@ import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 export default class PlanIncludeGroupCreate extends Component {
 
   static propTypes = {
-    existinGrousNames: React.PropTypes.array.isRequired,
+    existinGrousNames: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
     addGroup: React.PropTypes.func.isRequired,
     addGroupProducts: React.PropTypes.func.isRequired,
   }
@@ -165,7 +162,7 @@ export default class PlanIncludeGroupCreate extends Component {
     switch (stepIndex) {
       case 0:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : null }>
+          <FormGroup validationState={error.length > 0 ? "error" : null}>
             <ControlLabel>Group Name</ControlLabel>
               <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName}/>
               <h5><small>* Group name should be unique for all plans</small></h5>
@@ -184,7 +181,7 @@ export default class PlanIncludeGroupCreate extends Component {
         return (
           <FormGroup validationState={error.length > 0 ? "error" : null} >
             <ControlLabel>Includes</ControlLabel>
-            <Include onChangeInclud={this.onChangeInclud} value={include} />
+            <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
             { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
           </FormGroup>
         );
@@ -220,7 +217,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
     return (
       <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Cancel</Tooltip>}>
-        <i className="fa fa-times" onClick={ this.handleCancel } style={{cursor: "pointer"}} ></i>
+        <i className="fa fa-times" onClick={this.handleCancel} style={{cursor: "pointer"}} />
       </OverlayTrigger>
     );
   }
@@ -228,10 +225,7 @@ export default class PlanIncludeGroupCreate extends Component {
   renderTitleLeft = () => {
     return (
       <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Create new gruop</Tooltip>}>
-        <i className="fa fa-plus-circle fa-lg"
-          onClick={this.handleToggleBoby}
-          style={{cursor: "pointer", color: 'green'}} >
-        </i>
+        <i className="fa fa-plus-circle fa-lg" onClick={this.handleToggleBoby} style={{cursor: "pointer", color: 'green'}} />
       </OverlayTrigger>
     );
   }
@@ -263,13 +257,13 @@ export default class PlanIncludeGroupCreate extends Component {
 
         <Row>
           <Col lg={3} md={3} sm={3} xs={3} className="text-left">
-            <Button bsStyle="danger" onClick={ this.handleReset }>Reset</Button>
+            <Button bsStyle="danger" onClick={this.handleReset}>Reset</Button>
           </Col>
           <Col lg={6} md={6} sm={6} xs={6} lgOffset={3} mdOffset={3} smOffset={3} xsOffset={3} className="text-right">
-            <Button onClick={ this.handlePrev } style={{marginRight:10}}>Back</Button>
+            <Button onClick={this.handlePrev} style={{marginRight:10}}>Back</Button>
             { (stepIndex === 3)
-              ? <Button bsStyle="success" onClick={ this.handleFinish }>Add Group</Button>
-              : <Button bsStyle="success" onClick={ this.handleNext }>Next</Button>
+              ? <Button bsStyle="success" onClick={this.handleFinish}>Add Group</Button>
+              : <Button bsStyle="success" onClick={this.handleNext}>Next</Button>
             }
            </Col>
         </Row >

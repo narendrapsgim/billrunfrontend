@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
-import Chip from 'material-ui/Chip';
+import Product from './Product';
 import Immutable from 'immutable';
 
-export default class PlanIncludeGroupProducts extends Component {
+export default class Products extends Component {
 
   static defaultProps = {
     products: Immutable.List(),
@@ -14,20 +14,12 @@ export default class PlanIncludeGroupProducts extends Component {
     products: React.PropTypes.instanceOf(Immutable.List)
   }
 
-  static defaultProps = {
-    products: []
-  }
-
   render() {
     const { products } = this.props;
 
     return (
       <div style={{ display: 'flex', flexWrap: 'wrap'}}>
-        { products.map( (product, i) =>
-          <Chip key={i} style={{ margin: 4 }} onRequestDelete={ () => {this.props.onRemoveProduct(product)} } >
-            {product}
-          </Chip>
-        )}
+        { products.map( (product, i) => <Product key={i} onRemoveProduct={this.props.onRemoveProduct} product={product} /> )}
       </div>
     );
   }
