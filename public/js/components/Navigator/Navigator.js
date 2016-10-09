@@ -159,6 +159,7 @@ class Navigator extends Component {
                   <Button onClick={this.changeFont} data-name="Lato">La</Button>
                   <Button onClick={this.changeFont} data-name="Robot">Ro</Button>
                   <Button onClick={this.changeFont} data-name="Ubuntu">Ub</Button>
+                  <Button onClick={this.changeFont} data-name="Noto Sans">No</Button>
                   <Button onClick={this.changeFont} data-name="Helvetica Neue">Hl</Button>
                 </ButtonGroup>
               </div>
