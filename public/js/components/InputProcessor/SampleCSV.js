@@ -9,17 +9,7 @@ export default class SampleCSV extends Component {
   constructor(props) {
     super(props);
 
-    this.addField = this.addField.bind(this);
     this.removeAllFields = this.removeAllFields.bind(this);
-    
-    this.state = {
-      newField: ''
-    };
-  }
-
-  addField(val, e) {
-    this.props.onAddField.call(this, this.state.newField);
-    this.setState({newField: ''});
   }
 
   removeAllFields() {
@@ -37,6 +27,9 @@ export default class SampleCSV extends Component {
           onSelectSampleCSV,
           onSetFieldWidth,
           onRemoveField,
+          onMoveFieldUp,
+          onMoveFieldDown,
+          onChangeCSVField,
           onAddField } = this.props;
 
     const selectDelimiterHTML = (
@@ -45,36 +38,43 @@ export default class SampleCSV extends Component {
                        onChangeDelimiter={onChangeDelimiter} />
     );
 
-    const fieldsHTML = (<CSVFields onRemoveField={onRemoveField} settings={settings} onSetFieldWidth={onSetFieldWidth} />);
+    const fieldsHTML = (<CSVFields onMoveFieldUp={onMoveFieldUp} onMoveFieldDown={onMoveFieldDown} onChangeCSVField={onChangeCSVField} onRemoveField={onRemoveField} settings={settings} onSetFieldWidth={onSetFieldWidth} />);
 
     const setFieldsHTML = (
-      <div>
-        <div className="form-group">
-          <div className="col-lg-3">
-            <label>Field <small><a onClick={this.removeAllFields}>(remove all)</a></small></label>
-          </div>
-          {(() => {             
-             if (settings.get('delimiter_type') === "fixed") {
-               return (
-                 <div className="col-lg-3">
-                   <label>Width</label>
-                 </div>
-               );
-             }
-           })()}
+      <div className="panel panel-default">
+        <div className="panel-heading">
+          CDR Fields
         </div>
-        { fieldsHTML }
-        <div className="form-group">
-          <div className="col-lg-3">
-            <input className="form-control" value={this.state.newField} onChange={(e) => { this.setState({newField: e.target.value}) } } placeholder="Field Name"/>
+        <div className="panel-body">
+          <div className="form-group">
+            <div className="col-lg-4">
+              <label>Field name</label>&nbsp;&nbsp;
+              <button type="button"
+                      disabled={settings.get('fields', []).size < 1}
+                      className="btn btn-default btn-xs"
+                      onClick={this.removeAllFields}>
+                <i className="fa fa-trash-o" /> Remove all
+              </button>
+            </div>
+            {(() => {             
+               if (settings.get('delimiter_type') === "fixed") {
+                 return (
+                   <div className="col-lg-2">
+                     <label>Width</label>
+                   </div>
+                 );
+               }
+             })()}
           </div>
-          <div className="col-lg-2">
-            <button type="button"
-                    className="btn btn-info btn-circle"
-                    disabled={!settings.get('file_type') || !this.state.newField}
-                    onClick={this.addField}>
-              <i className="fa fa-plus"/>
-            </button>
+          { fieldsHTML }
+          <div className="form-group">
+            <div className="col-lg-2">
+              <button type="button"
+                      className="btn btn-info"
+                      onClick={onAddField}>
+                <i className="fa fa-plus"/> Add field
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,42 +1,50 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
 import moment from 'moment';
+import Immutable from 'immutable';
 
 import { apiBillRun } from '../../../common/Api';
 
 
 export default class ProductSearchByUsagetype extends Component {
-  constructor(props) {
-    super(props);
-    this.addRatesToGroup = this.addRatesToGroup.bind(this);
-    this.findGroupRates = this.findGroupRates.bind(this);
-    this.state = { val: null };
+
+  static defaultProps = {
+    disabled: false,
+    products: Immutable.List(),
   }
+
+  static propTypes = {
+    addRatesToGroup: React.PropTypes.func.isRequired,
+    usaget: React.PropTypes.string.isRequired,
+    disabled: React.PropTypes.bool,
+    products: React.PropTypes.instanceOf(Immutable.List),
+  }
+
+  state = { val: null };
 
   shouldComponentUpdate(nextProps, nextState){
     const { disabled, usaget, products } = this.props;
     const { val } = this.state;
 
-    let isSameProducts = (nextProps.products.length === products.length)
-      && nextProps.products.every((prod, i) => prod === products[i] );
-
     return ( nextProps.disabled !== disabled
           || nextProps.usaget !== usaget
-          || !isSameProducts
+          || !Immutable.is(nextProps.products, products)
           || nextState.val !== val
     );
   }
 
-  addRatesToGroup(productKey){
+  addRatesToGroup = (productKey) => {
     if(productKey){
       this.props.addRatesToGroup(productKey);
     }
-    this.setState({val : null});
+    this.setState({val : ''});
   }
 
-  findGroupRates(input, callback){
+  findGroupRates = (input, callback) => {
     if(input && input.length){
+
       const { usaget, products } = this.props;
+
       let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
       let request = {
         api: "find",
@@ -47,7 +55,7 @@ export default class ProductSearchByUsagetype extends Component {
           { project: JSON.stringify({"key": 1}) },
           { query: JSON.stringify({
             "key": {
-              "$nin": products,
+              "$nin": products.toArray(),
               "$regex": input.toLowerCase(), "$options": "i"
             },
             [`rates.${usaget}`]: {"$exists": true},
@@ -70,12 +78,13 @@ export default class ProductSearchByUsagetype extends Component {
 
   render() {
     const { disabled, usaget } = this.props;
+    const { val } = this.state;
     if(typeof usaget === 'undefined'){
       return null;
     }
     return (
       <Select
-        value={this.state.val}
+        value={val}
         onChange={this.addRatesToGroup}
         asyncOptions={this.findGroupRates}
         cacheAsyncResults={false}

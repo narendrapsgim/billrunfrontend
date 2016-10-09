@@ -5,22 +5,21 @@ import { apiBillRun } from '../../../common/Api';
 
 
 export default class ProductSearch extends Component {
-  constructor(props) {
-    super(props);
-    this.onSelectProduct = this.onSelectProduct.bind(this);
-    this.getProducts = this.getProducts.bind(this);
 
-    this.state = { val: null };
+  static propTypes = {
+    onSelectProduct: React.PropTypes.func.isRequired,
   }
 
-  onSelectProduct (productKey) {
+  state = { val: null }
+
+  onSelectProduct = (productKey) => {
     if(productKey){
       this.props.onSelectProduct(productKey);
     }
     this.setState({val : null});
   }
 
-  getProducts (input, callback) {
+  getProducts = (input, callback) => {
     if(input && input.length){
       let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
 

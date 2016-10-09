@@ -14,7 +14,15 @@ import { PlanDescription } from '../../FieldDescriptions';
 import PlanIncludeGroupEdit from './components/PlanIncludeGroupEdit';
 import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 
-class PlanIncludesTab extends Component {
+export default class PlanIncludesTab extends Component {
+
+  static propTypes = {
+    includeGroups: React.PropTypes.object.isRequired,
+    onChangeFieldValue: React.PropTypes.func.isRequired,
+    onRemoveGroup: React.PropTypes.func.isRequired,
+    addGroup: React.PropTypes.func.isRequired,
+    addGroupProducts: React.PropTypes.func.isRequired,
+  }
 
   state = {
     existingGroups: []
@@ -27,25 +35,19 @@ class PlanIncludesTab extends Component {
 
   componentDidMount() {
     getAllGroup().then( (response) => {
-      var groups = [];
-      _.values(response.data[0].data.details).forEach( (plan) => { groups.push( ...Object.keys(plan.include.groups) )} );
-      this.setState({ existingGroups: groups });
-    })
-  }
+      var groups = new Set();
+      _.values(response.data[0].data.details).forEach( (plan) => {
+        Object.keys(plan.include.groups).forEach( (groupName) => {
+          groups.add(groupName);
+        })
+      });
 
-
-
-  onGroupRemove = (groupName, usaget) => {
-    this.props.removePlanInclude(groupName, usaget);
-  }
-
-  onIncludeChange = (groupName, usaget, value) => {
-    this.props.changePlanInclude(groupName, usaget, value);
+      this.setState({ existingGroups: Array.from(groups) });
+    });
   }
 
   renderGroups = () => {
-    const { plan } = this.props;
-    const includeGroups =  plan.getIn(['include', 'groups']);
+    const { includeGroups } = this.props;
 
     if(typeof includeGroups === 'undefined'){
       return null;
@@ -54,16 +56,16 @@ class PlanIncludesTab extends Component {
     let groups = [];
     includeGroups.forEach((include, groupName) => {
       include.forEach( (value, usaget) => {
-          groups.push(
-              <PlanIncludeGroupEdit key={`${groupName}_${usaget}`}
-                name={groupName}
-                value={value}
-                usaget={usaget}
-                onIncludeChange={this.onIncludeChange}
-                onGroupRemove={this.onGroupRemove}
-              />
+        groups.push(
+          <PlanIncludeGroupEdit key={`${groupName}_${usaget}`}
+            name={groupName}
+            value={value}
+            usaget={usaget}
+            onChangeFieldValue={this.props.onChangeFieldValue}
+            onGroupRemove={this.props.onRemoveGroup}
+          />
         );
-        groups.push(<hr />)
+        groups.push(<hr key={`${groupName}_${usaget}_sep`}/>)
       });
     });
 
@@ -71,14 +73,22 @@ class PlanIncludesTab extends Component {
   }
 
   render() {
-
     const { existingGroups } = this.state;
+    const { includeGroups } = this.props;
+    const planGroupsNames = includeGroups.keySeq().toArray();
+    const existinGrousNames = [...new Set([...existingGroups, ...planGroupsNames])];
+
+
     return (
       <Row>
         <Col lg={8}>
             <Panel header={<h3>Groups <Help contents={PlanDescription.include_groups} /></h3>}>
               {this.renderGroups()}
-              <PlanIncludeGroupCreate existingGroups={existingGroups}/>
+              <PlanIncludeGroupCreate
+                existinGrousNames={existinGrousNames}
+                addGroup={this.props.addGroup}
+                addGroupProducts={this.props.addGroupProducts}
+              />
             </Panel>
         </Col>
       </Row>
@@ -86,14 +96,3 @@ class PlanIncludesTab extends Component {
   }
 
 }
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    changePlanInclude,
-    removePlanInclude }, dispatch);
-}
-
-function mapStateToProps(state, props) {
-  return  { plan: state.plan };
-}
-export default connect(mapStateToProps, mapDispatchToProps)(PlanIncludesTab);

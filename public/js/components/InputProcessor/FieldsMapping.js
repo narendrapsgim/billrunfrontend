@@ -240,10 +240,10 @@ export default class FieldsMapping extends Component {
                       <div className="col-lg-5">{usage_t.get('usaget', '')}</div>
                       <div className="col-lg-2">
                         <button type="button"
-                                className="btn btn-danger btn-circle"
+                                className="btn btn-danger"
                                 disabled={settings.get('usaget_type', '') !== "dynamic"}                                
                                 onClick={this.removeUsagetMapping.bind(this, key)}>
-                          <i className="fa fa-minus" />
+                          <i className="fa fa-trash-o" /> Remove
                         </button>
                       </div>
                     </div>
@@ -273,10 +273,9 @@ export default class FieldsMapping extends Component {
               </div>
               <div className="col-lg-2">
                 <button type="button"
-                        className="btn btn-info btn-circle"
-                        disabled={settings.get('usaget_type', '') !== "dynamic"}
+                        className="btn btn-info"
                         onClick={this.addUsagetMapping}>
-                  <i className="fa fa-plus"/>
+                  <i className="fa fa-plus"/> Add mapping
                 </button>                
               </div>
             </div>

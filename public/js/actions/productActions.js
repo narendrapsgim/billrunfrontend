@@ -50,9 +50,9 @@ export function onRateRemove(path, index) {
   };
 }
 
-export function getProduct(product_id) {
+export function getProduct(productId) {
   return dispatch => {
-    return dispatch(fetchProduct(product_id));
+    return dispatch(fetchProduct(productId));
   };
 }
 
@@ -62,38 +62,44 @@ export function saveProduct(product, action, callback = () => {}) {
   };
 }
 
+export function buildSaveProductQuery(product, action){
+    const type = action !== 'new' ? 'close_and_new' : action;
+    const from = moment(); //.format(globalSetting.apiDateTimeFormat)
+    const to = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
+
+    product = product.set('from', from).set('to', to);
+    product = product.delete('uiflags');
+
+    let formData = new FormData();
+    if (action !== 'new'){
+      formData.append('id', product.getIn(['_id','$id']));
+    }
+    formData.append('coll', 'rates');
+    formData.append('type', type);
+    formData.append('data', JSON.stringify(product));
+
+    console.log('Save product : ', product.toJS());
+
+    return {
+      api: 'save',
+      name: product.get('key'),
+      options: {
+        method: 'POST',
+        body: formData
+      }
+    };
+}
 
 /* Internal function */
 function saveProductToDB(product, action, callback) {
-  const type = action !== 'new' ? "close_and_new" : action;
-  const formData = new FormData();
 
-  let from = moment(); //.format(globalSetting.apiDateTimeFormat)
-  let to = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
-  product = product.set('from', from).set('to', to);
-
-  if (action !== 'new'){
-    formData.append('id', product.getIn(['_id','$id']));
-  }
-  formData.append("coll", 'rates');
-  formData.append("type", type);
-  formData.append("data", JSON.stringify(product));
-
-  console.log("Save product : ", product.toJS());
-
-  const query = {
-    api: "save",
-    options: {
-      method: "POST",
-      body: formData
-    },
-  };
+  const query = buildSaveProductQuery(product, action);
 
   return (dispatch) => {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(
       success => {
-        dispatch(showSuccess("Product saved successfully"));
+        dispatch(showSuccess('Product saved successfully'));
         dispatch(finishProgressIndicator());
         callback(success);
       },
@@ -113,18 +119,18 @@ function gotProduct(product) {
   return {
     type: GOT_PRODUCT,
     product
-  }
+  };
 }
 
 function fetchProduct(id) {
   const query = {
-    api: "find",
+    api: 'find',
     params: [
-      { collection: "rates" },
-      { size: "1" },
-      { page: "0" },
+      { collection: 'rates' },
+      { size: '1' },
+      { page: '0' },
       { query: JSON.stringify(
-        {"_id" :  {"$in": [id]}}
+        {'_id' :  {'$in': [id]}}
       )},
     ]
   };

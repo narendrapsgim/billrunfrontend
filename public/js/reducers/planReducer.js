@@ -1,10 +1,8 @@
 import {
-  REMOVE_INCLUDE,
-  ADD_INCLUDE,
-  CHNAGE_INCLUDE,
+  REMOVE_GROUP,
+  ADD_GROUP,
   UPDATE_PLAN_FIELD_VALUE,
   UPDATE_PLAN_CYCLE,
-  UPDATE_PLAN_PRICE,
   ADD_TARIFF,
   REMOVE_TARIFF,
   GOT_PLAN,
@@ -24,24 +22,19 @@ const defaultTariff = Immutable.Map({
 export default function (state = defaultState, action) {
 
   switch (action.type) {
-    
-    case REMOVE_INCLUDE:
-      return state.deleteIn(['include', 'groups', action.groupName, action.usaget]);
 
-    case ADD_INCLUDE:
-      return state.setIn(['include', 'groups', action.groupName, action.usaget], action.value);
+    case REMOVE_GROUP:
+      return state.deleteIn(['include', 'groups', action.groupName]);
 
-    case CHNAGE_INCLUDE:
-      return state.updateIn(['include', 'groups', action.groupName, action.usaget], value => action.value);
+    case ADD_GROUP:
+      const group = Immutable.Map({[action.usaget] : action.value});
+      return state.setIn(['include', 'groups', action.groupName], group);
 
     case UPDATE_PLAN_FIELD_VALUE:
       return state.updateIn(action.path, value => action.value);
 
     case UPDATE_PLAN_CYCLE:
       return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, action.value));
-
-    case UPDATE_PLAN_PRICE:
-      return state.updateIn(['price', action.index], item => item.set('price', action.value));
 
     case ADD_TARIFF:
       // if trail add to head

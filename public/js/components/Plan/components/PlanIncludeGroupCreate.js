@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import Immutable from 'immutable';
 import { Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button,
   Panel, Col, Row, Collapse, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
@@ -10,17 +11,17 @@ import Include from './Include';
 import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 
-import {
-  getExistGroupProductsByUsageTypes,
-  addGroupProducts,
-  getAllGroup } from '../../../actions/planGroupsActions';
-import { addPlanInclude } from '../../../actions/planActions';
 
+export default class PlanIncludeGroupCreate extends Component {
 
-class PlanIncludeGroupCreate extends Component {
+  static propTypes = {
+    existinGrousNames: React.PropTypes.array.isRequired,
+    addGroup: React.PropTypes.func.isRequired,
+    addGroupProducts: React.PropTypes.func.isRequired,
+  }
 
   defaultSate = {
-    name: '', usage: '', include: '', products: [],
+    name: '', usage: '', include: '', products: Immutable.List(),
     error : '',
     stepIndex: 0, open: false
   }
@@ -49,12 +50,13 @@ class PlanIncludeGroupCreate extends Component {
   validateStep = (step) => {
     switch (step) {
       case 0:
-        const { existingGroups } = this.props;
+        const { existinGrousNames } = this.props;
+
         if( this.state.name === '' ){
           this.setState({ error: this.errors.name.required });
           return false;
         }
-        if(existingGroups && existingGroups.includes(this.state.name)){
+        if( existinGrousNames.includes(this.state.name)){
           this.setState({ error: this.errors.name.exist });
           return false;
         }
@@ -68,10 +70,6 @@ class PlanIncludeGroupCreate extends Component {
           this.setState({ error: this.errors.usage.required });
           return false;
         }
-        // if( this.props.plan.getIn(['include', 'groups']) && this.props.plan.getIn(['include', 'groups']).some( (group, name) => (name === this.state.name && group.keySeq().includes( this.state.usage )) ) ){
-        //   this.setState({ error: this.errors.usage.exist });
-        //   return false;
-        // }
         return true;
       case 2:
         if( this.state.include === '' ){
@@ -84,7 +82,7 @@ class PlanIncludeGroupCreate extends Component {
         }
         return true;
       case 3:
-        if( this.state.products.length < 1 ){
+        if( this.state.products.size < 1 ){
           this.setState({ error: this.errors.products.required });
           return false;
         }
@@ -94,17 +92,6 @@ class PlanIncludeGroupCreate extends Component {
     }
   }
 
-  getExistingGroupProducts = (name, usageType) =>{
-    getExistGroupProductsByUsageTypes(name, usageType).then(
-      (response) => {
-        let existingProd = _.values(response.data[0].data.details).map( (prod) => prod.key);
-        if (typeof existingProd !== 'undefined' && Array.isArray(existingProd) && existingProd.length > 0){
-          this.setState({products : [...this.state.products, existingProd]});
-        }
-      }
-    )
-  }
-
   onChangeGroupName = (e) => {
     const name = e.target.value.toUpperCase();
     const error = (name.length && !globalSetting.keyUppercaseRegex.test(name)) ? this.errors.name.allowedCharacters : '';
@@ -112,10 +99,7 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   onChangeUsageType = (newValue) => {
-    this.setState({usage: newValue, products: [], error:''});
-    if(newValue.length){
-      this.getExistingGroupProducts(this.state.name, newValue);
-    }
+    this.setState({usage: newValue, products: Immutable.List(), error:''});
   }
 
   onChangeInclud = (newValue) => {
@@ -124,7 +108,7 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   onAddProduct = (key) => {
-    const products = [...this.state.products, key];
+    const products = this.state.products.push(key);
     this.setState({products, error: ''});
   }
 
@@ -158,10 +142,11 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   handleFinish = () => {
-    const {stepIndex} = this.state;
+    const { stepIndex, name, usage, include, products } = this.state;
+
     if(this.validateStep(stepIndex)){
-      this.props.addPlanInclude(this.state.name, this.state.usage, this.state.include);
-      this.props.addGroupProducts(this.state.name, this.state.usage, this.state.products);
+      this.props.addGroup(name, usage, include);
+      this.props.addGroupProducts(name, usage, products.toArray());
       this.resetState(false);
     }
   };
@@ -175,51 +160,47 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
+    const { name, products, include, usage, error } = this.state;
+
     switch (stepIndex) {
       case 0:
         return (
-          <FormGroup validationState={this.state.error.length > 0 ? "error" : '' }>
+          <FormGroup validationState={error.length > 0 ? "error" : '' }>
             <ControlLabel>Group Name</ControlLabel>
-              <FormControl type="text" placeholder="Enter Group Name.." value={this.state.name} onChange={this.onChangeGroupName}/>
+              <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName}/>
               <h5><small>* Group name should be unique for all plans</small></h5>
-              { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
+              { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
           </FormGroup>
         );
       case 1:
         return (
-          <FormGroup validationState={this.state.error.length > 0 ? "error" : ''} >
+          <FormGroup validationState={error.length > 0 ? "error" : ''} >
             <ControlLabel>Usage Type</ControlLabel>
-            <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={this.state.usage}/>
-            { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
+            <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={usage}/>
+            { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
           </FormGroup>
         );
       case 2:
         return (
-          <FormGroup validationState={this.state.error.length > 0 ? "error" : ''} >
+          <FormGroup validationState={error.length > 0 ? "error" : ''} >
             <ControlLabel>Includes</ControlLabel>
-            <Include onChangeInclud={this.onChangeInclud} value={this.state.include} />
-            { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
+            <Include onChangeInclud={this.onChangeInclud} value={include} />
+            { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
           </FormGroup>
         );
       case 3:
-      return (
-          <FormGroup validationState={this.state.error.length > 0 ? "error" : ''}>
-            <ControlLabel>Products</ControlLabel>
-              {this.state.products.length ?
-                <Products
-                  onRemoveProduct={this.onRemoveProduct}
-                  products={this.state.products}
-                />
-              : <p style={{marginTop:8}}>No products in group ...</p>}
 
+        return (
+          <FormGroup validationState={error.length > 0 ? "error" : ''}>
+            <ControlLabel>Products</ControlLabel>
+              { products.size
+               ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />
+               : <p style={{marginTop:8}}>No products in group ...</p>
+              }
               <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                <ProductSearchByUsagetype
-                  addRatesToGroup={this.onAddProduct}
-                  usaget={this.state.usage}
-                  products={this.state.products}
-                />
+                <ProductSearchByUsagetype usaget={usage} products={products} addRatesToGroup={this.onAddProduct} />
               </div>
-              { this.state.error.length > 0 ? <HelpBlock>{this.state.error}</HelpBlock> : ''}
+              { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
           </FormGroup>);
       default:
         return '...';
@@ -298,6 +279,7 @@ class PlanIncludeGroupCreate extends Component {
 
   render() {
     const { stepIndex, open } = this.state;
+
     return (
       <div>
         <Row>
@@ -321,14 +303,3 @@ class PlanIncludeGroupCreate extends Component {
     );
   }
 }
-
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    addGroupProducts,
-    addPlanInclude }, dispatch);
-}
-function mapStateToProps(state, props) {
-  return  { plan: state.plan };
-}
-export default connect(mapStateToProps, mapDispatchToProps)(PlanIncludeGroupCreate);
