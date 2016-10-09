@@ -15,7 +15,8 @@ export default class Subscription extends Component {
     const { subscription, plans, onSave, onCancel } = this.props;
     if (!subscription) return (null);
     const available_plans = plans.map((plan, key) => {
-      return { value: plan.get('name'), label:  plan.get('name') };
+      return { value: plan.get('name'),
+               label:  plan.get('name') }
     }).toJS();
 
     return (
@@ -26,7 +27,6 @@ export default class Subscription extends Component {
             <div className="col-xs-11">
               <label>Plan</label>
               <Select id="plan"
-                      className="form-control"
                       options={available_plans}
                       value={subscription.get('plan')}
                       onChange={this.onChangeField}

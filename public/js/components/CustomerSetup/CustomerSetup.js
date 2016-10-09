@@ -13,8 +13,7 @@ import { showSuccess, showDanger } from '../..//actions/alertsActions';
 /* COMPONENTS */
 import { PageHeader, Tabs, Tab } from 'react-bootstrap';
 import Customer from './Customer';
-import SubscriptionsList from './SubscriptionsList';
-import Subscription from './Subscription';
+import Subscriptions from './Subscriptions';
 
 class CustomerSetup extends Component {
   constructor(props) {
@@ -159,10 +158,11 @@ class CustomerSetup extends Component {
         <Tab title="Subscriptions" eventKey={2} key={2}>
           <div className="panel panel-default">
             <div className="panel-body">
-              <SubscriptionsList
+              <Subscriptions
                   subscriptions={subscriptions}
                   aid={customer.get('aid')}
                   settings={settings.getIn(['subscriber', 'fields'])}
+                  plans={plans}
                   onNew={this.onClickNewSubscription}
               />
             </div>
