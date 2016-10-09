@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import Pager from '../Pager';
 import Filter from '../Filter';
 import List from '../List';
-import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 /* ACTIONS */
 import { getList } from '../../actions/listActions';
@@ -62,15 +62,14 @@ class UserList extends Component {
     	});
   	}
 
-  	onClickNewUser(user){
-  		console.log(user);
-		this.context.router.push({
-	      	pathname: "user",
-	      	query: {
-	        action: "new"
-	      	}
-    	});
-  	}
+		onClickNewUser(user) {
+			this.context.router.push({
+				pathname: "user",
+				query: {
+					action: "new"
+				}
+			});
+		}
 
   	render() {
     	const { users } = this.props;
@@ -92,14 +91,10 @@ class UserList extends Component {
 	          <div className="col-lg-12">
 	            <div className="panel panel-default">
 	              <div className="panel-heading">
-	                <span>
-                  		List of all  users
-	                </span>
-	                <div className="pull-right">
-	                  <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-	                    <MenuItem eventKey="1" onClick={ this.onClickNewUser }>New</MenuItem>
-	                  </DropdownButton>
-	                </div>
+									List of all  users
+									<div className="pull-right">
+										<Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNewUser}><i className="fa fa-plus"/>&nbsp;Add New</Button>
+									</div>
 	              </div>
 	              <div className="panel-body">
 	                <Filter fields={fields} onFilter={this.onFilter} base={base} />

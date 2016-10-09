@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import List from '../List';
-import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 import { getList } from '../../actions/listActions';
 
@@ -74,13 +74,9 @@ class InputProcessorsList extends Component {
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                <span>
-                  All available input processors
-                </span>
+                All available input processors
                 <div className="pull-right">
-                  <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                    <MenuItem eventKey="1" onClick={this.onClickNew}>New</MenuItem>
-                  </DropdownButton>
+                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus"/>&nbsp;Add New</Button>
                 </div>
               </div>
               <div className="panel-body">

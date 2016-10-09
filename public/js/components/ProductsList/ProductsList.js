@@ -5,7 +5,7 @@ import moment from 'moment';
 import { PageHeader } from 'react-bootstrap';
 import Pager from '../Pager';
 import Filter from '../Filter';
-import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 /* ACTIONS */
 import { getList } from '../../actions/listActions';
@@ -109,14 +109,10 @@ class ProductsList extends Component {
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                <span>
-                  List of all available products
-                  <div className="pull-right">
-                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                      <MenuItem eventKey="1" onClick={this.onNewProduct}>New</MenuItem>
-                    </DropdownButton>
-                  </div>
-                </span>
+                List of all available products
+                <div className="pull-right">
+                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onNewProduct}><i className="fa fa-plus"/>&nbsp;Add New</Button>
+                </div>
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={{ to: {$gt: moment().toISOString()}}} />

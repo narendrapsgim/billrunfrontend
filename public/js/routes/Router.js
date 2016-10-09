@@ -44,7 +44,7 @@ export default () => {
       <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
       <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
       <Route path="/users" component={RequireAuth(User)} title="Users"/>
-      <Route path="/user" component={RequireAuth(UserSetup)} title="Users"/>
+      <Route path="/user" component={RequireAuth(UserSetup)} title="User"/>
       <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Input Processor" />
       <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />
