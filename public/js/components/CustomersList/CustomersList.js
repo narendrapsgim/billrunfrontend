@@ -5,7 +5,7 @@ import moment from 'moment';
 import Pager from '../Pager';
 import Filter from '../Filter';
 import List from '../List';
-import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
@@ -100,13 +100,9 @@ class CustomersList extends Component {
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                <span>
-                  List of all available customers
-                </span>
+                List of all available customers
                 <div className="pull-right">
-                  <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                    <MenuItem eventKey="1" onClick={this.onNewCustomer}>New</MenuItem>
-                  </DropdownButton>
+                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onNewCustomer}><i className="fa fa-plus"/>&nbsp;Add New</Button>
                 </div>
               </div>
               <div className="panel-body">

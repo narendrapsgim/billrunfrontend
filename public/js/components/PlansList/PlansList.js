@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import Pager from '../Pager';
 import Filter from '../Filter';
 import moment from 'moment';
-import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 import { getList } from '../../actions/listActions';
 import List from '../List';
@@ -129,10 +129,8 @@ class PlansList extends Component {
               <div className="panel-heading">
                 All available plans
                 <div className="pull-right">
-                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                    <MenuItem eventKey="1" onClick={this.onNewPlan}>New</MenuItem>
-                    </DropdownButton>
-                    </div>
+                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onNewPlan}><i className="fa fa-plus"/>&nbsp;Add New</Button>
+                </div>
               </div>
               <div className="panel-body">
                 <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
