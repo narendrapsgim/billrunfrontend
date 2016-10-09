@@ -66,7 +66,6 @@ class ProductSetup extends Component {
   handleSave = () => {
     const { product } = this.props;
     const { action } = this.props.location.query;
-    console.log(product.toJS());
     this.props.saveProduct(product, action, this.afterSave);
   }
 

@@ -12,10 +12,16 @@ import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 export default class PlanIncludeGroupCreate extends Component {
 
   static propTypes = {
-    existinGrousNames: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+    allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
+    existinGrousNames: React.PropTypes.instanceOf(Immutable.Set),
     addGroup: React.PropTypes.func.isRequired,
     addGroupProducts: React.PropTypes.func.isRequired,
   }
+
+  static defaultProps = {
+    allGroupsProductsKeys: Immutable.Set(),
+    existinGrousNames: Immutable.Set(),
+  };
 
   defaultState = {
     name: '', usage: '', include: '', products: Immutable.List(),
@@ -38,7 +44,8 @@ export default class PlanIncludeGroupCreate extends Component {
       allowedCharacters: 'Include must be positive number or Unlimited',
     },
     products: {
-      required : 'Products is required',
+      required: 'Products is required',
+      exist: 'Product(s) already exist in another group : '
     }
   }
 
@@ -79,8 +86,15 @@ export default class PlanIncludeGroupCreate extends Component {
         }
         return true;
       case 3:
+        const { allGroupsProductsKeys } = this.props;
+
         if( this.state.products.size < 1 ){
           this.setState({ error: this.errors.products.required });
+          return false;
+        }
+        const duplicateProducts = this.state.products.filter( (product) => allGroupsProductsKeys.includes(product));
+        if( duplicateProducts.size ){
+          this.setState({ error: this.errors.products.exist + duplicateProducts.join(', ') });
           return false;
         }
         return true;
@@ -157,7 +171,9 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
+    const { allGroupsProductsKeys } = this.props;
     const { name, products, include, usage, error } = this.state;
+    const existingProductsKeys = allGroupsProductsKeys.union(products);
 
     switch (stepIndex) {
       case 0:
@@ -195,7 +211,7 @@ export default class PlanIncludeGroupCreate extends Component {
                : <p style={{marginTop:8}}>No products in group ...</p>
               }
               <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                <ProductSearchByUsagetype usaget={usage} products={products} addRatesToGroup={this.onAddProduct} />
+                <ProductSearchByUsagetype usaget={usage} products={existingProductsKeys.toList()} addRatesToGroup={this.onAddProduct} />
               </div>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
           </FormGroup>);

@@ -11,6 +11,7 @@ import product from './productReducer';
 import user from './userReducer';
 import plan from './planReducer';
 import planProducts from './planProducts';
+import exportGenerator from './exportGeneratorReducer';
 
 
 export default combineReducers({
@@ -25,5 +26,6 @@ export default combineReducers({
   settings,
   dashboard,
   plan,
-  planProducts
+  planProducts,
+  exportGenerator
 });

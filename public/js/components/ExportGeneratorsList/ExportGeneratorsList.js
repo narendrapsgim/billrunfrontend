@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-
 import List from '../List';
-import { Button } from "react-bootstrap";
-
+import { DropdownButton, MenuItem, Button } from "react-bootstrap";
 import { getList } from '../../actions/listActions';
 
-class InputProcessorsList extends Component {
+class ExportGeneratorsList extends Component {
   constructor(props) {
     super(props);
 
@@ -22,6 +20,7 @@ class InputProcessorsList extends Component {
 
   componentDidMount() {
     this.props.dispatch(getList("input_processors", this.buildQuery()));
+    // this.props.dispatch(getList("export_generators", this.buildQuery()));
   }
 
   buildQuery() {
@@ -29,7 +28,7 @@ class InputProcessorsList extends Component {
       api: "settings",
       params: [
         { category: "file_types" },
-	{ sort: this.state.sort },
+	      { sort: this.state.sort },
         { data: JSON.stringify({}) }
       ]
     };
@@ -47,13 +46,12 @@ class InputProcessorsList extends Component {
   
   onClickNew() {
     this.context.router.push({
-      pathname: 'select_input_processor_template',
+      pathname: 'export_generator',
       query: {
         action: 'new'
       }
     });
   }
-
 
   onSort(sort) {
     this.setState({sort}, () => {
@@ -67,16 +65,19 @@ class InputProcessorsList extends Component {
       { id: "file_type", title: "Name" }
     ];
 
+    console.log(inputProcessors);
+
     return (
       <div className="InputProcessorsList">
-
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                All available input processors
+                <span>
+                  All available Export Generators
+                </span>
                 <div className="pull-right">
-                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus"/>&nbsp;Add New</Button>
+                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus"></i>&nbsp;Add New</Button>
                 </div>
               </div>
               <div className="panel-body">
@@ -90,7 +91,7 @@ class InputProcessorsList extends Component {
   }
 }
 
-InputProcessorsList.contextTypes = {
+ExportGeneratorsList.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
 
@@ -100,4 +101,4 @@ function mapStateToProps(state, props) {
   };
 }
 
-export default connect(mapStateToProps)(InputProcessorsList);
+export default connect(mapStateToProps)(ExportGeneratorsList);

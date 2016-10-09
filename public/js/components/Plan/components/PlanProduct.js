@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormGroup, Col, Row, ControlLabel, HelpBlock, OverlayTrigger, Tooltip  } from 'react-bootstrap';
+import { Button, FormGroup, Col, Row, ControlLabel, HelpBlock, OverlayTrigger, Tooltip  } from 'react-bootstrap';
 import classNames from 'classnames';
 import moment from 'moment';
 import Immutable from 'immutable';
@@ -22,9 +22,12 @@ export default class PlanProduct extends Component {
     item: React.PropTypes.instanceOf(Immutable.Map),
   }
 
-  // shouldComponentUpdate(nextProps, nextState){
-  //   return !Immutable.is(this.props.item, nextProps.item);
-  // }
+  shouldComponentUpdate(nextProps, nextState){
+    //if count was changed and this is last item
+    const isLastAdded = this.props.count < nextProps.count && this.props.index === (this.props.count - 1);
+    const isLastremoved = this.props.count > nextProps.count && this.props.index === (this.props.count - 2);
+    return !Immutable.is(this.props.item, nextProps.item) || this.props.index !== nextProps.index || isLastAdded || isLastremoved;
+  }
 
   componentWillMount() {
     const { item, planName } = this.props;
@@ -166,12 +169,14 @@ export default class PlanProduct extends Component {
                         index={i}
                         count={priceCount}
                         onProductEditRate={this.onProductEditRate}
-                        onProductAddRate={this.onProductAddRate}
                         onProductRemoveRate={this.onProductRemoveRate}
                     />
                   )
                 : null
               }
+              </Col>
+              <Col lg={12} md={12}>
+              { !isRemoved && <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductAddRate}><i className="fa fa-plus" />&nbsp;Add New</Button> }
             </Col>
           </Row>
         </Col>

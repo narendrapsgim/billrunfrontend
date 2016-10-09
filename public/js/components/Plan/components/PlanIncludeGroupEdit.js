@@ -21,6 +21,8 @@ class PlanIncludeGroupEdit extends Component {
       React.PropTypes.string,
       React.PropTypes.number,
     ]).isRequired,
+    allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
+    groupProducts: React.PropTypes.instanceOf(Immutable.List)
   }
 
   static defaultProps = {
@@ -70,7 +72,7 @@ class PlanIncludeGroupEdit extends Component {
   }
 
   render() {
-    const { name, value, usaget, groupProducts } = this.props;
+    const { name, value, usaget, groupProducts, allGroupsProductsKeys } = this.props;
     const { open } = this.state;
 
     return (
@@ -108,7 +110,7 @@ class PlanIncludeGroupEdit extends Component {
                 <ControlLabel>Products</ControlLabel>
                 <Products onRemoveProduct={this.onRemoveProduct} products={groupProducts} />
                 <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                  <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={groupProducts} />
+                  <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={allGroupsProductsKeys.toList()} />
                 </div>
               </FormGroup>
             </Form>

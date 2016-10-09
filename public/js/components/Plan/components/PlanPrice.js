@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import Immutable from 'immutable';
-import { FormGroup, Col, Row, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Button, FormGroup, Col, Row, ControlLabel, HelpBlock } from 'react-bootstrap';
 
 import Field from '../../Field';
 
@@ -13,7 +13,6 @@ export default class PlanPrice extends Component {
     onPlanTariffRemove: React.PropTypes.func.isRequired,
     onPlanCycleUpdate: React.PropTypes.func.isRequired,
     onPlanPriceUpdate: React.PropTypes.func.isRequired,
-    onPlanTariffAdd: React.PropTypes.func.isRequired,
     index: React.PropTypes.number.isRequired,
     count: React.PropTypes.number.isRequired,
     item: React.PropTypes.instanceOf(Immutable.Map),
@@ -68,11 +67,6 @@ export default class PlanPrice extends Component {
     this.props.onPlanTariffRemove(index);
   }
 
-  onPlanTariffAdd = () => {
-    const trial = this.props.item.get('trial', false);
-    this.props.onPlanTariffAdd(trial);
-  }
-
   render() {
     const { cycleError, priceError } = this.state;
     const { item, index, count } = this.props;
@@ -83,36 +77,35 @@ export default class PlanPrice extends Component {
 
     const cycle = (to === planCycleUnlimitedValue) ? planCycleUnlimitedValue : ( (to === '' ? '' : to - from));
     const isLast = ((count === 0) || (count-1 === index));
-    const showAddButton = !trial && isLast;
     const showRemoveButton = trial || isLast ;
 
     return (
       <Row>
         <Col lg={5} md={5}>
-          <FormGroup validationState={cycleError.length ? "error" : null} style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup validationState={cycleError.length ? "error" : null}>
             <ControlLabel>Cycles</ControlLabel>
-              { isLast
-                ? <Field onChange={this.onCycleUpdateValue} value={cycle} fieldType="unlimited" unlimitedValue={planCycleUnlimitedValue}/>
-                : <Field onChange={this.onCycleUpdateEvent} value={cycle} fieldType="number" min="0"/>
-              }
-              { cycleError.length > 0 && <HelpBlock>{cycleError}.</HelpBlock>}
-            </FormGroup>
-          </Col>
+            { isLast
+              ? <Field onChange={this.onCycleUpdateValue} value={cycle} fieldType="unlimited" unlimitedValue={planCycleUnlimitedValue}/>
+              : <Field onChange={this.onCycleUpdateEvent} value={cycle} fieldType="number" min="0"/>
+            }
+            { cycleError.length > 0 && <HelpBlock>{cycleError}.</HelpBlock>}
+          </FormGroup>
+        </Col>
 
         <Col lg={5} md={5}>
-          <FormGroup validationState={priceError.length ? "error" : null} style={{marginRight: 0, marginLeft: 0}}>
+          <FormGroup validationState={priceError.length ? "error" : null}>
           <ControlLabel>Price</ControlLabel>
               <Field onChange={this.onPlanPriceUpdate} value={price} />
               { priceError.length > 0 && <HelpBlock>{priceError}.</HelpBlock>}
           </FormGroup>
         </Col>
 
-        <Col lg={1} md={1} sm={1} xs={2} lgOffset={0} mdOffset={0} smOffset={10} xsOffset={8} className="text-right">
-          { showAddButton && <i className="fa fa-plus-circle fa-lg" onClick={this.onPlanTariffAdd} style={{cursor: "pointer", color: 'green', marginTop: 35}} /> }
-         </Col>
-
-         <Col lg={1} md={1} sm={1} xs={2} className="text-right">
-          { showRemoveButton && <i className="fa fa-minus-circle fa-lg" onClick={this.onPlanTariffRemove} style={{cursor: "pointer", color: 'red', marginTop: 35}} /> }
+        <Col lg={2} md={2} sm={2} xs={2} className="text-right">
+          { showRemoveButton && <FormGroup>
+              <ControlLabel>&nbsp;</ControlLabel>
+              <div><Button onClick={this.onPlanTariffRemove} bsSize="small"><i className="fa fa-trash-o danger-red"/>&nbsp;Remove</Button></div>
+            </FormGroup>
+          }
         </Col>
         { !isLast && !trial && <Col lgHidden mdHidden sm={12} xs={12}><hr /></Col> }
       </Row>

@@ -170,6 +170,7 @@ export default class Product extends Component {
 
             <Panel header={<h3>Price</h3>}>
              { this.renderPrices() }
+             { <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button> }
             </Panel>
 
           </Form>

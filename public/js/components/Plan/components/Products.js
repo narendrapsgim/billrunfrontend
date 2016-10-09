@@ -14,6 +14,10 @@ export default class Products extends Component {
     products: React.PropTypes.instanceOf(Immutable.List)
   }
 
+  shouldComponentUpdate(nextProps, nextState){
+    return !Immutable.is(this.props.products, nextProps.products)
+  }
+
   render() {
     const { products } = this.props;
 

@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Panel, Form, FormGroup, Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
-
 import {
   getProductByKey,
   getExistPlanProducts,
@@ -16,7 +15,6 @@ import {
   planProductsRateInit,
   planProductsClear } from '../../actions/planProductsActions';
 import { showSuccess, showWarning, showDanger, showInfo } from '../../actions/alertsActions';
-
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import ProductSearch from './components/ProductSearch';
@@ -26,7 +24,28 @@ import PlanProduct from './components/PlanProduct';
 class PlanProductsPriceTab extends Component {
 
   static propTypes = {
-    planName : React.PropTypes.string
+    getProductByKey: React.PropTypes.func.isRequired,
+    getExistPlanProducts: React.PropTypes.func.isRequired,
+    removePlanProduct: React.PropTypes.func.isRequired,
+    restorePlanProduct: React.PropTypes.func.isRequired,
+    undoRemovePlanProduct: React.PropTypes.func.isRequired,
+    planProductsRateRemove: React.PropTypes.func.isRequired,
+    planProductsRateAdd: React.PropTypes.func.isRequired,
+    planProductsRateUpdate: React.PropTypes.func.isRequired,
+    planProductsRateInit: React.PropTypes.func.isRequired,
+    planProductsClear: React.PropTypes.func.isRequired,
+    showSuccess: React.PropTypes.func.isRequired,
+    showWarning: React.PropTypes.func.isRequired,
+    showDanger: React.PropTypes.func.isRequired,
+    showInfo: React.PropTypes.func.isRequired,
+    planName : React.PropTypes.string.isRequired,
+    productsKeys : React.PropTypes.instanceOf(Immutable.List),
+    planProducts : React.PropTypes.instanceOf(Immutable.Map),
+  };
+
+  static defaultProps = {
+    planName: '',
+    productsKeys: Immutable.List()
   };
 
   state = {
@@ -45,9 +64,10 @@ class PlanProductsPriceTab extends Component {
   }
 
   onSelectProduct = (key) => {
-    const { productPlanPrice } = this.props;
+    const { productsKeys } = this.props;
     const { planName } = this.state;
-    if(!productPlanPrice.some( (prod) => prod === key)){
+
+    if(!productsKeys.includes(key)){
       this.props.getProductByKey(key, planName);
     } else {
       this.props.showWarning(`Price of product ${key} already overridden for plan ${planName}`);
@@ -94,14 +114,14 @@ class PlanProductsPriceTab extends Component {
 
   renderItems = () => {
     const { planName } = this.state;
-    const { planProducts, productPlanPrice } = this.props;
-
-    return productPlanPrice.map( (key, i) => {
+    const { planProducts, productsKeys } = this.props;
+    const count = productsKeys.size;
+    return productsKeys.map( (key, i) => {
       var prod = planProducts.get(key);
       return (
         <PlanProduct key={prod.getIn(['_id', '$id'])}
             index={i}
-            count={productPlanPrice.size}
+            count={count}
             item={prod}
             planName={planName}
             onProductRemove={this.onProductRemove}
@@ -118,7 +138,7 @@ class PlanProductsPriceTab extends Component {
 
   render() {
     const { planName } = this.state;
-    const { productPlanPrice } = this.props;
+    const { productsKeys } = this.props;
 
     if(typeof planName === 'undefined' || planName === null || planName.length === 0){
       return (<p>Override Product Price available only in edit mode</p>);
@@ -134,7 +154,7 @@ class PlanProductsPriceTab extends Component {
             </Panel>
 
             <Panel header={<h3>Overridden Products Prices for Plan &quot;{planName}&quot;</h3>}>
-              { this.props.productPlanPrice.size > 0 ? this.renderItems() : this.renderNoItems() }
+              { productsKeys.size > 0 ? this.renderItems() : this.renderNoItems() }
             </Panel>
 
           </Form>
@@ -167,7 +187,7 @@ function mapStateToProps(state, props) {
   return  {
     planName: state.plan.get('name'),
     planProducts: state.planProducts.planProducts,
-    productPlanPrice: state.planProducts.productPlanPrice
+    productsKeys: state.planProducts.productPlanPrice
  };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(PlanProductsPriceTab);

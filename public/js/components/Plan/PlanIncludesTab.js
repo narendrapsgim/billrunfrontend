@@ -14,9 +14,12 @@ import { PlanDescription } from '../../FieldDescriptions';
 import PlanIncludeGroupEdit from './components/PlanIncludeGroupEdit';
 import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 
-export default class PlanIncludesTab extends Component {
+
+class PlanIncludesTab extends Component {
+
 
   static propTypes = {
+    allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
     includeGroups: React.PropTypes.instanceOf(Immutable.Map),
     onChangeFieldValue: React.PropTypes.func.isRequired,
     onRemoveGroup: React.PropTypes.func.isRequired,
@@ -49,7 +52,7 @@ export default class PlanIncludesTab extends Component {
   }
 
   renderGroups = () => {
-    const { includeGroups } = this.props;
+    const { includeGroups, allGroupsProductsKeys } = this.props;
 
     if(typeof includeGroups === 'undefined'){
       return null;
@@ -63,6 +66,7 @@ export default class PlanIncludesTab extends Component {
               name={groupName}
               value={value}
               usaget={usaget}
+              allGroupsProductsKeys={allGroupsProductsKeys}
               onChangeFieldValue={this.props.onChangeFieldValue}
               onGroupRemove={this.props.onRemoveGroup}
               addGroupProducts={this.props.addGroupProducts}
@@ -79,10 +83,9 @@ export default class PlanIncludesTab extends Component {
 
   render() {
     const { existingGroups } = this.state;
-    const { includeGroups } = this.props;
+    const { includeGroups, allGroupsProductsKeys } = this.props;
     const planGroupsNames = includeGroups.keySeq().toArray();
-    const existinGrousNames = [...new Set([...existingGroups, ...planGroupsNames])];
-
+    const existinGrousNames = Immutable.Set([...existingGroups, ...planGroupsNames]);
 
     return (
       <Row>
@@ -91,6 +94,7 @@ export default class PlanIncludesTab extends Component {
               {this.renderGroups()}
               <PlanIncludeGroupCreate
                   existinGrousNames={existinGrousNames}
+                  allGroupsProductsKeys={allGroupsProductsKeys}
                   addGroup={this.props.addGroup}
                   addGroupProducts={this.props.addGroupProducts}
               />
@@ -101,3 +105,18 @@ export default class PlanIncludesTab extends Component {
   }
 
 }
+
+function mapStateToProps(state, props) {
+  let allGroupsProductsKeys = Immutable.Set();
+  state.planProducts.productIncludeGroup.forEach( (group) => {
+    group.forEach( (usage) => {
+      usage.forEach( (productKey) => {
+        allGroupsProductsKeys = allGroupsProductsKeys.add(productKey);
+      })
+    })
+  });
+  return  {
+    allGroupsProductsKeys,
+ };
+}
+export default connect(mapStateToProps)(PlanIncludesTab);

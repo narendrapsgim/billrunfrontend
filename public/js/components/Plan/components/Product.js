@@ -8,6 +8,10 @@ export default class Product extends Component {
     product: React.PropTypes.string.isRequired
   }
 
+  shouldComponentUpdate(nextProps, nextState){
+    return this.props.product != nextProps.product;
+  }
+
   onRemoveProduct =() => {
     const { product } = this.props;
     this.props.onRemoveProduct(product);
