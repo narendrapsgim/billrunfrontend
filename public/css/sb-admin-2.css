@@ -444,3 +444,8 @@ table.dataTable thead .sorting:after {
 .List.row .btn-link {
   padding: 0;
 }
+
+.page-header {
+  border-bottom: none;
+  margin: 0;
+}
