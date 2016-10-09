@@ -50,23 +50,24 @@ export default class List extends Component {
     return fields.map((field, key) => {
       if (field.display === false) {
         return null;
-      } else {
-        let fieldElement;
-
-        if (editField && editField === field.id) {
-          fieldElement =
-            <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
-              {this.printEntityField(entity, field)}
-            </button>
-        } else {
-          fieldElement = this.printEntityField(entity, field);
-        }
-        return (
-          <td key={key}>
-            { fieldElement }
-          </td>
-        )
       }
+      let fieldElement;
+
+      if (editField && editField === field.id) {
+        fieldElement = (
+          <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
+            {this.printEntityField(entity, field)}
+          </button>
+        )
+      } else {
+        fieldElement = this.printEntityField(entity, field);
+      }
+      return (
+        <td key={key}>
+          { fieldElement }
+        </td>
+      )
+
     });
   }
   
