@@ -99,8 +99,8 @@ class ProductsList extends Component {
       {id: 'unit_type', title: 'Unit Type', parser: unit_type_by_parser},
       {id: 'code', title: "Code"},
       {id: 'description', title: "Description"},
-      {id: 'from', title: 'From', type: "datetime"},
-      {id: 'to', title: 'To', type: "datetime"}
+      {id: 'from', title: 'From', type: "datetime", cssClass: 'long-date'},
+      {id: 'to', title: 'To', type: "datetime", cssClass: 'long-date'}
     ];
 
     return (
@@ -116,7 +116,7 @@ class ProductsList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={{ to: {$gt: moment().toISOString()}}} />
-                <List items={ products } fields={ tableFields } edit={ true } onClickEdit={ this.onClickProduct } onSort={ this.onSort } />
+                <List items={ products } fields={ tableFields } editField="key" edit={ true } onClickEdit={ this.onClickProduct } onSort={ this.onSort } />
               </div>
             </div>
           </div>

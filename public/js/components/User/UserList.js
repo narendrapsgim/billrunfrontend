@@ -98,7 +98,7 @@ class UserList extends Component {
 	              </div>
 	              <div className="panel-body">
 	                <Filter fields={fields} onFilter={this.onFilter} base={base} />
-	                <List items={users} fields={fields} edit={true} onClickEdit={ this.onClickUser } />
+	                <List items={users} fields={fields} editField="username" edit={true} onClickEdit={ this.onClickUser } />
 	              </div>
 	            </div>
 	          </div>
