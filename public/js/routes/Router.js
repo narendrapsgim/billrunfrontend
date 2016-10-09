@@ -13,6 +13,8 @@ import Product from '../components/Product';
 import PlansList from '../components/PlansList';
 import Plan from '../components/Plan';
 import InputProcessorsList from '../components/InputProcessorsList';
+import ExportGenerator from '../components/ExportGenerator';
+import ExportGeneratorsList from '../components/ExportGeneratorsList';
 import InputProcessor from '../components/InputProcessor';
 import UsageList from '../components/UsageList';
 import InvoicesList from '../components/InvoicesList';
@@ -35,12 +37,14 @@ export default () => {
       <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
       <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>
       <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors"/>
+      <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator"/>
+      <Route path="/export_generators" component={RequireAuth(ExportGeneratorsList)} title="Export Generators"/>
       <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
       <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
       <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
       <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
       <Route path="/users" component={RequireAuth(User)} title="Users"/>
-      <Route path="/user" component={RequireAuth(UserSetup)} title="Users"/>      
+      <Route path="/user" component={RequireAuth(UserSetup)} title="Users"/>
       <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Input Processor" />
       <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />

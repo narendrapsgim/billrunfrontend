@@ -119,7 +119,7 @@ class Navigator extends Component {
 			 <Link to="/input_processors" id="settingsProcessor" className={(this.state.activeNav === "settingsProcessor") ? "active" : ""} onClick={this.setActivNav}>Input Processors</Link>
                        </li>
             <li>
-                <Link to="/export_generator" id="settingsGenerator" className={(this.state.activeNav === "settingsGenerator") ? "active" : ""} onClick={this.setActivNav}>Export Generator</Link>
+                <Link to="/export_generators" id="settingsGenerator" className={(this.state.activeNav === "settingsGenerator") ? "active" : ""} onClick={this.setActivNav}>Export Generator</Link>
             </li>
 		       <li>
 			 <Link to="/payment_gateways" id="settingsGateway" className={(this.state.activeNav === "settingsGateway") ? "active" : ""} onClick={this.setActivNav}>Payment Gateways</Link>
