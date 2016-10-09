@@ -98,3 +98,36 @@ textarea {
   color: #cccccc!important;
 }
 /* ~Plan Edit screen*/
+
+
+/* General colors */
+.danger-red {
+    color: #d9534f;
+}
+
+/* List */
+.List.row .btn-link {
+    padding: 0;
+}
+.List .table>thead>tr>th i.sort-indicator {
+    float: right;
+    line-height: 20px;
+}
+
+.List .table th.edit-tb, .List .table td.edit-tb {
+    width: 70px;
+    text-align: center;
+}
+
+/* Global page + table */
+
+.page-header {
+    border-bottom: none;
+    margin: 0;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    font-size: 14px;
+}
+
+

@@ -39,13 +39,35 @@ export default class List extends Component {
       return this.displayByType(field, entity);
     return entity.get(field.id);
   }
-  
+
   buildRow(entity, fields) {
-    return fields.map((field, key) => (
-      <td key={key}>
-        { this.printEntityField(entity, field) }
-      </td>
-    ));
+    const {
+      onClickEdit = () => {
+      },
+      editField,
+    } = this.props;
+
+    return fields.map((field, key) => {
+      if (field.display === false) {
+        return null;
+      } else {
+        let fieldElement;
+
+        if (editField && editField === field.id) {
+          fieldElement =
+            <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
+              {this.printEntityField(entity, field)}
+            </button>
+        } else {
+          fieldElement = this.printEntityField(entity, field);
+        }
+        return (
+          <td key={key}>
+            { fieldElement }
+          </td>
+        )
+      }
+    });
   }
   
   onClickHeader(field) {
@@ -63,38 +85,46 @@ export default class List extends Component {
       fields = [],
       onClickEdit = () => {},
       edit = false,
-      editText = "edit"
+      editText,
     } = this.props;
 
     const table_header = fields.map((field, key) => {
       let onclick = field.sort ? this.onClickHeader.bind(this, field.id) : () => {};
       let style = field.sort ? { cursor: "pointer" } : {};
       let arrow = (null);
+      if (field.display === false) {
+        return null;
+      }
+
       if (field.sort) {
 	arrow = this.state.sort[field.id] ? (<i className={`sort-indicator fa fa-sort-${ this.state.sort[field.id] === 1 ? 'down' : 'up' }`}></i>) : (<i className="sort-indicator fa fa-sort"></i>);
       }
       if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
-      return (<th key={key} onClick={onclick} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
+        return (<th key={key} onClick={onclick} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
     });
     if (edit) table_header.push((<th key={fields.length}>&nbsp;</th>));
 
     const table_body = items.size < 1 ?
-                       (<tr><td colSpan={fields.length} style={{textAlign: "center"}}>No items found</td></tr>) :
-                       items.map((entity, index) => (
-                         <tr key={index}>
-                           { this.buildRow(entity, fields) }
-                           {
-                             edit ?
-                             <td><button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>{ editText }</button></td> :
-                             null
-                           }
-                         </tr>
-                       ));
+                       (<tr><td colSpan={fields.length + (edit ? 1 : 0)} style={{textAlign: "center"}}>No items found</td></tr>) :
+                        items.map((entity, index) => (
+                            <tr key={index}>
+                              { this.buildRow(entity, fields) }
+                              {
+                                edit ?
+                                  <td className="edit-tb">
+                                    <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
+                                      { editText ? editText : <span><i className="fa fa-pencil" />&nbsp;Edit</span> }
+                                    </button>
+                                  </td> : null
+                              }
+                            </tr>
+                          )
+                        );
 
     return (
       <div className="List row">
         <div className="table-responsive col-lg-12">
-          <table className="table table-hover table-striped">
+          <table className="table table-hover table-striped table-bordered">
             <thead>
               <tr>{ table_header }</tr>
             </thead>

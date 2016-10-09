@@ -116,7 +116,7 @@ class ProductsList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={{ to: {$gt: moment().toISOString()}}} />
-                <List items={ products } fields={ tableFields } edit={ true } onClickEdit={ this.onClickProduct } onSort={ this.onSort } />
+                <List items={ products } fields={ tableFields } editField="key" edit={ true } onClickEdit={ this.onClickProduct } onSort={ this.onSort } />
               </div>
             </div>
           </div>
