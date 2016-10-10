@@ -59,7 +59,7 @@ export function updateSetting(category, name, value) {
   };
 }
 
-function saveSettingsToDB(category, settings = Immutable.Map()) {
+function saveSettingsToDB(category, settings = Immutable.Map(), action = 'set', data) {
   if (!data) {
     data = settings.get(category).toJS();
   }
