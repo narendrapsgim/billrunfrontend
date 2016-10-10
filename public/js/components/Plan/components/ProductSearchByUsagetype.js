@@ -84,18 +84,18 @@ export default class ProductSearchByUsagetype extends Component {
     }
     return (
       <Select
-        value={val}
-        onChange={this.addRatesToGroup}
-        asyncOptions={this.findGroupRates}
-        cacheAsyncResults={false}
-        searchable={true}
-        autoload={false}
-        disabled={disabled}
-        valueKey='key'
-        labelKey='key'
-        placeholder='Add product...'
-        noResultsText='No products found.'
-        searchPromptText='Type product key to search'
+          value={val}
+          onChange={this.addRatesToGroup}
+          asyncOptions={this.findGroupRates}
+          cacheAsyncResults={false}
+          searchable={true}
+          autoload={false}
+          disabled={disabled}
+          valueKey='key'
+          labelKey='key'
+          placeholder='Add product...'
+          noResultsText='No products found.'
+          searchPromptText='Type product key to search'
       />
     );
   }
