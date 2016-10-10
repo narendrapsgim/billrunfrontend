@@ -8,14 +8,14 @@ export const PLAN_INCLUDE_GROUP_ADD = 'PLAN_INCLUDE_GROUP_ADD';
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler} from '../common/Api';
 
-export function getGroupProducts(groupName, usaget) {
+export function getGroupProducts(groupName, usage) {
   const toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
   const query = {
     api: "find",
     params: [
       { collection: "rates" },
       { query: JSON.stringify({
-        [`rates.${usaget}.groups`]: { "$in": [groupName] },
+        [`rates.${usage}.groups`]: { "$in": [groupName] },
         'to': {"$gte" : toadyApiString},
         'from': {"$lte" : toadyApiString}
       }) },
@@ -30,7 +30,7 @@ export function getGroupProducts(groupName, usaget) {
       dispatch({
         type: PLAN_INCLUDE_GROUP_PRODUCTS_SET,
         group: groupName,
-        usage: usaget,
+        usage,
         products
       });
     }).catch(
@@ -39,17 +39,17 @@ export function getGroupProducts(groupName, usaget) {
   }
 }
 
-export function removeGroupProducts(groupName, usaget, productKeys) {
+export function removeGroupProducts(groupName, usage, productKeys) {
   const keys = Array.isArray(productKeys) ? productKeys : [productKeys] ;
   return {
     type: PLAN_INCLUDE_GROUP_PRODUCTS_REMOVE,
     group: groupName,
-    usage: usaget,
-    keys
+    usage,
+    productKeys : keys
   }
 }
 
-export function addGroupProducts(groupName, usaget, productKeys) {
+export function addGroupProducts(groupName, usage, productKeys) {
   const keys = Array.isArray(productKeys) ? productKeys : [productKeys] ;
   const toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
   const query = {
@@ -72,7 +72,7 @@ export function addGroupProducts(groupName, usaget, productKeys) {
       dispatch({
         type: PLAN_INCLUDE_GROUP_PRODUCTS_ADD,
         group: groupName,
-        usage: usaget,
+        usage: usage,
         products
       });
     }).catch(

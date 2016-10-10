@@ -54,6 +54,41 @@ class Navigator extends Component {
     document.body.style.fontFamily = '"'+ e.target.dataset.name + '", Helvetica,Arial,sans-serif';
   }
 
+  changeTheme = (e) => {
+    e.preventDefault();
+    var cssId = 'myCss';  // you could encode the css path itself to generate id..
+
+    if (!document.getElementById('myCssReset'))
+    {
+      var head  = document.getElementsByTagName('head')[0];
+      var link  = document.createElement('link');
+      link.id   = 'myCssReset';
+      link.rel  = 'stylesheet';
+      link.type = 'text/css';
+      link.href = '/css/themes/myCssReset.css';
+      link.media = 'all';
+      head.appendChild(link);
+    }
+
+    if (document.getElementById(cssId)) {
+      var element = document.getElementById(cssId);
+      element.outerHTML = "";
+      delete document.getElementById(cssId);
+    }
+
+    var head  = document.getElementsByTagName('head')[0];
+    var link  = document.createElement('link');
+    link.id   = cssId;
+    link.rel  = 'stylesheet';
+    link.type = 'text/css';
+    link.href = '/css/themes/'+e.target.dataset.name+'.css';
+    link.media = 'all';
+    head.appendChild(link);
+
+
+  }
+
+
   render() {
     return (
       <nav className="navbar navbar-default navbar-fixed-top" role="navigation" style={{marginBottom: 0}}>
@@ -154,6 +189,12 @@ class Navigator extends Component {
                     </ul>
                   </li>
                 </ul>
+
+                <ButtonGroup style={{position: 'fixed', bottom: '40px'}}>
+                  <Button onClick={this.changeTheme} data-name="Cerulean">Cerulean</Button>
+                  <Button onClick={this.changeTheme} data-name="yeti">yeti</Button>
+                  <Button onClick={this.changeTheme} data-name="superhero">SuperHero</Button>
+                </ButtonGroup>
 
                 <ButtonGroup style={{position: 'fixed', bottom: 0}}>
                   <Button onClick={this.changeFont} data-name="Lato">La</Button>

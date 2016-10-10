@@ -25,8 +25,8 @@ function getExistPlanProductsByUsageTypes(planName, usageTypes = []) {
     let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
     let queryString = {
       '$or':  usageTypes.map((type) => {
-								return { [`rates.${type}.${planName}`] : { '$exists' : true } };
-							}),
+        return { [`rates.${type}.${planName}`] : { '$exists' : true } };
+      }),
       'to': {'$gte' : toadyApiString},
       'from': {'$lte' : toadyApiString}
     };
@@ -69,11 +69,12 @@ function initPlanProducts(products, planName) {
   };
 }
 
-export function removePlanProduct(productKey, path) {
+export function removePlanProduct(productKey, path, existing = false) {
   return {
     type: PLAN_PRODUCTS_REMOVE,
     productKey,
-    path
+    path,
+    existing
   };
 }
 
@@ -187,8 +188,9 @@ export function getProductByKey(key, planName) {
 
 export function savePlanRates(callback) {
   return (dispatch, getState) => {
-    const { planProducts, plan } =  getState();
-
+    const { planProducts } =  getState();
+	
+		/*For now save all products*/
     // var productsKeysToSave = new Set();
     // //Get products
     // planProducts.get('productPlanPrice').forEach( (prodName) => {
@@ -201,7 +203,7 @@ export function savePlanRates(callback) {
     //     });
     //   });
     // });
-    const queries = planProducts.get('planProducts')
+    const queries = planProducts.planProducts
       // .filter( prod => productsKeysToSave.has(prod.get('key')))
       .map( prod => buildSaveProductQuery(prod, 'update')).toArray();
 

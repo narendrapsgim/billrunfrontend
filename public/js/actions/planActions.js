@@ -1,14 +1,11 @@
 export const GOT_PLAN = 'GOT_PLAN';
 export const SAVE_PLAN = 'SAVE_PLAN';
 export const CLEAR_PLAN = 'CLEAR_PLAN';
-
 export const ADD_TARIFF = 'ADD_TARIFF';
 export const REMOVE_TARIFF = 'REMOVE_TARIFF';
-
 export const UPDATE_PLAN_CYCLE = 'UPDATE_PLAN_CYCLE';
 export const UPDATE_PLAN_PRICE = 'UPDATE_PLAN_PRICE';
 export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
-
 export const REMOVE_GROUP = 'REMOVE_GROUP';
 export const ADD_GROUP = 'ADD_GROUP';
 
@@ -54,18 +51,21 @@ export function onPlanTariffRemove(index) {
   };
 }
 
-export function onGroupRemove(groupName) {
+export function onGroupRemove(groupName, usage, productKeys) {
+  const keys = Array.isArray(productKeys) ? productKeys : [productKeys] ;
   return {
     type: REMOVE_GROUP,
-    groupName
+    groupName,
+    usage,
+    productKeys : keys
   };
 }
 
-export function onGroupAdd(groupName, usaget, value) {
+export function onGroupAdd(groupName, usage, value) {
   return {
     type: ADD_GROUP,
     groupName,
-    usaget,
+    usage,
     value
   };
 }

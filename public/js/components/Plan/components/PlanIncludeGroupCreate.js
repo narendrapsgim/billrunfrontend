@@ -1,13 +1,10 @@
 import React, { Component }  from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import Immutable from 'immutable';
 import { Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button,
-  Panel, Col, Row, Collapse, OverlayTrigger, Tooltip } from 'react-bootstrap';
+   Col, Row, Collapse, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-
 import UsagetypeSelect from './UsagetypeSelect';
-import Include from './Include';
+import Field from '../../Field';
 import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 
@@ -15,12 +12,18 @@ import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 export default class PlanIncludeGroupCreate extends Component {
 
   static propTypes = {
-    existinGrousNames: React.PropTypes.array.isRequired,
+    allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
+    existinGrousNames: React.PropTypes.instanceOf(Immutable.Set),
     addGroup: React.PropTypes.func.isRequired,
     addGroupProducts: React.PropTypes.func.isRequired,
   }
 
-  defaultSate = {
+  static defaultProps = {
+    allGroupsProductsKeys: Immutable.Set(),
+    existinGrousNames: Immutable.Set(),
+  };
+
+  defaultState = {
     name: '', usage: '', include: '', products: Immutable.List(),
     error : '',
     stepIndex: 0, open: false
@@ -41,11 +44,12 @@ export default class PlanIncludeGroupCreate extends Component {
       allowedCharacters: 'Include must be positive number or Unlimited',
     },
     products: {
-      required : 'Products is required',
+      required: 'Products is required',
+      exist: 'Product(s) already exist in another group : '
     }
   }
 
-  state = Object.assign({}, this.defaultSate);
+  state = Object.assign({}, this.defaultState);
 
   validateStep = (step) => {
     switch (step) {
@@ -82,8 +86,15 @@ export default class PlanIncludeGroupCreate extends Component {
         }
         return true;
       case 3:
+        const { allGroupsProductsKeys } = this.props;
+
         if( this.state.products.size < 1 ){
           this.setState({ error: this.errors.products.required });
+          return false;
+        }
+        const duplicateProducts = this.state.products.filter( (product) => allGroupsProductsKeys.includes(product));
+        if( duplicateProducts.size ){
+          this.setState({ error: this.errors.products.exist + duplicateProducts.join(', ') });
           return false;
         }
         return true;
@@ -134,7 +145,7 @@ export default class PlanIncludeGroupCreate extends Component {
   };
 
   resetState = (open = true) => {
-    this.setState(Object.assign({}, this.defaultSate, {open}));
+    this.setState(Object.assign({}, this.defaultState, {open}));
   }
 
   handleCancel = () => {
@@ -160,12 +171,14 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
+    const { allGroupsProductsKeys } = this.props;
     const { name, products, include, usage, error } = this.state;
+    const existingProductsKeys = allGroupsProductsKeys.union(products);
 
     switch (stepIndex) {
       case 0:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : '' }>
+          <FormGroup validationState={error.length > 0 ? "error" : null}>
             <ControlLabel>Group Name</ControlLabel>
               <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName}/>
               <h5><small>* Group name should be unique for all plans</small></h5>
@@ -174,7 +187,7 @@ export default class PlanIncludeGroupCreate extends Component {
         );
       case 1:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : ''} >
+          <FormGroup validationState={error.length > 0 ? "error" : null} >
             <ControlLabel>Usage Type</ControlLabel>
             <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={usage}/>
             { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
@@ -182,23 +195,23 @@ export default class PlanIncludeGroupCreate extends Component {
         );
       case 2:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : ''} >
+          <FormGroup validationState={error.length > 0 ? "error" : null} >
             <ControlLabel>Includes</ControlLabel>
-            <Include onChangeInclud={this.onChangeInclud} value={include} />
+            <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
             { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
           </FormGroup>
         );
       case 3:
 
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : ''}>
+          <FormGroup validationState={error.length > 0 ? "error" : null}>
             <ControlLabel>Products</ControlLabel>
               { products.size
                ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />
                : <p style={{marginTop:8}}>No products in group ...</p>
               }
               <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                <ProductSearchByUsagetype usaget={usage} products={products} addRatesToGroup={this.onAddProduct} />
+                <ProductSearchByUsagetype usaget={usage} products={existingProductsKeys.toList()} addRatesToGroup={this.onAddProduct} />
               </div>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
           </FormGroup>);
@@ -220,7 +233,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
     return (
       <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Cancel</Tooltip>}>
-        <i className="fa fa-times" onClick={ this.handleCancel } style={{cursor: "pointer"}} ></i>
+        <i className="fa fa-times" onClick={this.handleCancel} style={{cursor: "pointer"}} />
       </OverlayTrigger>
     );
   }
@@ -228,10 +241,7 @@ export default class PlanIncludeGroupCreate extends Component {
   renderTitleLeft = () => {
     return (
       <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Create new gruop</Tooltip>}>
-        <i className="fa fa-plus-circle fa-lg"
-          onClick={this.handleToggleBoby}
-          style={{cursor: "pointer", color: 'green'}} >
-        </i>
+        <i className="fa fa-plus-circle fa-lg" onClick={this.handleToggleBoby} style={{cursor: "pointer", color: 'green'}} />
       </OverlayTrigger>
     );
   }
@@ -263,13 +273,13 @@ export default class PlanIncludeGroupCreate extends Component {
 
         <Row>
           <Col lg={3} md={3} sm={3} xs={3} className="text-left">
-            <Button bsStyle="danger" onClick={ this.handleReset }>Reset</Button>
+            <Button bsStyle="danger" onClick={this.handleReset}>Reset</Button>
           </Col>
           <Col lg={6} md={6} sm={6} xs={6} lgOffset={3} mdOffset={3} smOffset={3} xsOffset={3} className="text-right">
-            <Button onClick={ this.handlePrev } style={{marginRight:10}}>Back</Button>
+            <Button onClick={this.handlePrev} style={{marginRight:10}}>Back</Button>
             { (stepIndex === 3)
-              ? <Button bsStyle="success" onClick={ this.handleFinish }>Add Group</Button>
-              : <Button bsStyle="success" onClick={ this.handleNext }>Next</Button>
+              ? <Button bsStyle="success" onClick={this.handleFinish}>Add Group</Button>
+              : <Button bsStyle="success" onClick={this.handleNext}>Next</Button>
             }
            </Col>
         </Row >

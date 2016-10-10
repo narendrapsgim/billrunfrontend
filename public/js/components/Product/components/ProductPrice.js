@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormGroup, Col, Row, ControlLabel, HelpBlock, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, FormGroup, Col, Row, ControlLabel, HelpBlock } from 'react-bootstrap';
 import moment from 'moment';
 import Immutable from 'immutable';
 import Field from '../../Field';
@@ -12,7 +12,6 @@ export default class ProductPrice extends Component {
     item: React.PropTypes.object.isRequired,
     onProductEditRate: React.PropTypes.func.isRequired,
     onProductRemoveRate: React.PropTypes.func.isRequired,
-    onProductAddRate: React.PropTypes.func.isRequired,
   }
 
   planCycleUnlimitedValue = globalSetting.productUnlimitedValue;
@@ -31,10 +30,6 @@ export default class ProductPrice extends Component {
   //   const indexChanged = this.props.index !== nextProps.index
   //   return  isLastAdded || isLastremoved || fromError || toError || intervalError || priceError || itemChanged || indexChanged;
   // }
-
-  tooltip = (content) => {
-    return (<Tooltip id="tooltip">{content}</Tooltip>);
-  }
 
   onEditFrom = (e) => {
     const { index } = this.props;
@@ -85,10 +80,6 @@ export default class ProductPrice extends Component {
     this.props.onProductRemoveRate(index);
   }
 
-  onAddItem = () => {
-    this.props.onProductAddRate();
-  }
-
   render() {
     const { item, index, count } = this.props;
     const isLast = ((count === 0) || (count-1 === index));
@@ -97,7 +88,7 @@ export default class ProductPrice extends Component {
       <Row>
 
         <Col lg={5} md={5} sm={6} xs={12}>
-          <FormGroup validationState={this.state.fromError.length > 0 ? "error" : ''}>
+          <FormGroup validationState={this.state.fromError.length > 0 ? "error" : null}>
             <ControlLabel>From</ControlLabel>
             <Field value={item.get('from', '')} onChange={this.onEditFrom} fieldType="number" min={0}/>
             { this.state.fromError.length > 0 ? <HelpBlock>{this.state.fromError}</HelpBlock> : ''}
@@ -105,7 +96,7 @@ export default class ProductPrice extends Component {
         </Col>
 
         <Col lg={5} md={5} sm={6} xs={12}>
-          <FormGroup validationState={this.state.toError.length > 0 ? "error" : ''}>
+          <FormGroup validationState={this.state.toError.length > 0 ? "error" : null}>
             <ControlLabel>To</ControlLabel>
             {isLast
               ? <Field value={item.get('to', '')} onChange={this.onEditUnlimitedTo} fieldType="unlimited" unlimitedValue={this.planCycleUnlimitedValue}/>
@@ -117,7 +108,7 @@ export default class ProductPrice extends Component {
         <Col lg={2} md={2} smHidden xsHidden></Col>
 
         <Col lg={5} md={5} sm={6} xs={12}>
-          <FormGroup  validationState={this.state.intervalError.length > 0 ? "error" : ''}>
+          <FormGroup  validationState={this.state.intervalError.length > 0 ? "error" : null}>
             <ControlLabel>Interval</ControlLabel>
             <Field value={item.get('interval', '')} onChange={this.onEditInterval} fieldType="number" min={0}/>
             { this.state.intervalError.length > 0 ? <HelpBlock>{this.state.intervalError}</HelpBlock> : ''}
@@ -131,20 +122,8 @@ export default class ProductPrice extends Component {
           </FormGroup>
         </Col>
 
-        <Col lg={1} md={1} sm={1} xs={2} lgOffset={0} mdOffset={0} smOffset={10} xsOffset={8} className="text-right">
-          { (isLast) &&
-            <OverlayTrigger placement="top" overlay={this.tooltip("Add interval")}>
-              <i className="fa fa-plus-circle fa-lg" onClick={this.onAddItem} style={{cursor: "pointer", color: 'green', marginTop: 35}} ></i>
-            </OverlayTrigger>
-          }
-        </Col>
-
-        <Col lg={1} md={1} sm={1} xs={2} className="text-right">
-          { (index > 0 && isLast) &&
-            <OverlayTrigger placement="top" overlay={this.tooltip("Remove interval")}>
-              <i className="fa fa-minus-circle fa-lg"  onClick={this.onRemoveItem} style={{cursor: "pointer", color: 'red', marginTop: 35}} ></i>
-            </OverlayTrigger>
-          }
+        <Col lg={2} md={2} sm={2} xs={2} className="text-right">
+          { (index > 0 && isLast) && <Button onClick={this.onRemoveItem} bsSize="small"><i className="fa fa-trash-o danger-red"/> &nbsp;Remove</Button> }
         </Col>
 
         { !isLast && <Col lg={12} md={12} sm={12} xs={12}><hr /></Col> }
