@@ -135,4 +135,9 @@ textarea {
     font-size: 14px;
 }
 
-
+.nav-tabs {
+    border-bottom: 0;
+}
+.nav-tabs>li {
+    margin-bottom: -2px;
+}
