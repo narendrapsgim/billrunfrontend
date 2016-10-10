@@ -12,6 +12,8 @@ import ProductsList from '../components/ProductsList';
 import Product from '../components/Product';
 import PlansList from '../components/PlansList';
 import Plan from '../components/Plan';
+import ServicesList from '../components/ServicesList';
+import Service from '../components/Service';
 import InputProcessorsList from '../components/InputProcessorsList';
 import ExportGenerator from '../components/ExportGenerator';
 import ExportGeneratorsList from '../components/ExportGeneratorsList';
@@ -34,6 +36,8 @@ export default () => {
       <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
       <Route path="/products" component={RequireAuth(ProductsList)} title="Products"/>
       <Route path="/product" component={RequireAuth(Product)} title="Create / Edit Product" />
+      <Route path="/services" component={RequireAuth(ServicesList)} title="Services" />
+      <Route path="/service(/:itemId)" component={RequireAuth(Service)} title="Create / Edit Service" />
       <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
       <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>
       <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors"/>
