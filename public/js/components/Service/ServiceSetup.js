@@ -19,7 +19,9 @@ class ServiceSetup extends Component {
     router: React.PropTypes.shape({
       push: React.PropTypes.func.isRequired
     }).isRequired,
-    params: React.PropTypes.object.isRequired,
+    params: React.PropTypes.shape({
+      itemId: React.PropTypes.string,
+    }).isRequired,
     item: React.PropTypes.instanceOf(Immutable.Map),
     getItem: React.PropTypes.func.isRequired,
     updateItem: React.PropTypes.func.isRequired,
@@ -31,7 +33,6 @@ class ServiceSetup extends Component {
   state = {
     activeTab : 1
   };
-
 
   componentWillMount() {
     const { itemId } = this.props.params;
@@ -55,7 +56,11 @@ class ServiceSetup extends Component {
     try {
       errorMessage = response.error[0].error.data.message;
     } catch (e) {
-      console.log("unknown error response: ", response);
+      try {
+        errorMessage = response.error[0].error.message;
+      } catch (e) {
+        console.log("unknown error response: ", response);
+      }
     }
     this.props.showDanger(errorMessage);
   }

@@ -32,36 +32,32 @@ function apiFetchItem(id){
 
 function apiSaveItem(item, action){
 
-  let itemFrom = moment(); //.format(globalSetting.apiDateTimeFormat)
-  let itemTo = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
-  item = item.set('from', itemFrom).set('to', itemTo);
+  const formData = new FormData();
+  formData.append('method', action);
+
+  if(action === 'create'){
+    let itemFrom = moment(); //.format(globalSetting.apiDateTimeFormat)
+    let itemTo = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
+    item = item.set('from', itemFrom).set('to', itemTo);
+    formData.append('service', JSON.stringify(item));
+  }
+
+  else if(action === 'update'){
+    item = item.delete('to').delete('from').delete('_id');
+    let query = {'name': item.getIn(['name'])};
+    formData.append('query', JSON.stringify(query));
+    formData.append('update', JSON.stringify(item));
+  }
 
   const query = {
     api: 'services',
-    params: [
-      { method: action },
-      { services: JSON.stringify(item)}
-    ]
+    options: {
+      method: 'POST',
+      body: formData
+    },
   };
 
-
-  // const formData = new FormData();
-  // if (action !== 'new') {
-  //   formData.append('id', item.getIn(['_id','$id']));
-  // }
-  // formData.append('coll', 'services');
-  // formData.append('type', action);
-  // formData.append('data', JSON.stringify(item));
-  //
-  // console.log("Save item : ", item.toJS());
-  //
-  // const query = {
-  //   api: "save",
-  //   options: {
-  //     method: "POST",
-  //     body: formData
-  //   },
-  // };
+  console.log('Save item : ', item.toJS());
   return apiBillRun(query);
 }
 
