@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./node_modules/webpack/bin/webpack.js --watch --colors",
     "build_prod": "./node_modules/webpack/bin/webpack.js --colors -p",
-    "lint": "eslint public/js"
+    "lint": "eslint public/js",
+    "validate-webpack": "webpack-validator webpack.config.js"
   },
   "author": "",
   "license": "ISC",
@@ -54,6 +55,7 @@
     "twix": "^1.1.1",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.15.0",
-    "webpack-hot-server": "^0.5.1"
+    "webpack-hot-server": "^0.5.1",
+    "webpack-validator": "^2.2.9"
   }
 }

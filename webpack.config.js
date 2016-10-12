@@ -64,7 +64,7 @@ module.exports = {
       { test: /\.scss$/, loader: 'style!css!sass' },
       { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
       { test: /\.(jpe|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/, loaders: ["file-loader"] },
-      {include: /\.json$/, loaders: ["json-loader"]}
+      { test: /\.json$/, loaders: ["json-loader"], include: /\.json$/}
     ]
   },
 
