@@ -1,7 +1,8 @@
 {
   "name": "brcloud",
+  "description": "BillRun! Cloud",
+  "repository": "git@git.bill.run:sdoc/brcloud.git",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,7 +20,7 @@
     "babel-core": "^6.14.0",
     "babel-eslint": "^7.0.0",
     "babel-loader": "^6.2.5",
-    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-es2015": "^6.16.0",
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-2": "^6.13.0",
     "chart.js": "^2.2.2",
@@ -61,5 +62,8 @@
     "webpack-dev-server": "^1.15.0",
     "webpack-hot-server": "^0.5.1",
     "webpack-validator": "^2.2.9"
+  },
+  "dependencies": {
+    "lodash": "^4.16.4"
   }
 }
