@@ -5,9 +5,16 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import { Row, Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
+import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import { getItem, clearItem, updateItem, saveItem } from '../../actions/serviceActions';
 import { showDanger } from '../../actions/alertsActions';
-
+import {
+  onGroupAdd,
+  onGroupRemove } from '../../actions/planActions';
+import {
+ addGroupProducts,
+ getGroupProducts,
+ removeGroupProducts } from '../../actions/planGroupsActions';
 
 class ServiceSetup extends Component {
 
@@ -65,7 +72,6 @@ class ServiceSetup extends Component {
     this.props.showDanger(errorMessage);
   }
 
-
   updateItem = (path, value) => {
     this.props.updateItem(path, value)
   }
@@ -105,35 +111,53 @@ class ServiceSetup extends Component {
       );
     }
 
+    const includeGroups =  item.getIn(['include', 'groups'], Immutable.Map());
+
     return (
       <Col lg={12}>
+
         <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
+
           <Tab title="Details" eventKey={1}>
             <Panel style={{borderTop: 'none'}}>
               <ServiceDetails item={item} mode={action} updateItem={this.updateItem}/>
             </Panel>
           </Tab>
 
-          {/*
           <Tab title="Service Includes" eventKey={3}>
             <Panel style={{borderTop: 'none'}}>
-              Groups
+              <PlanIncludesTab
+                includeGroups={includeGroups}
+                onChangeFieldValue={this.props.updateItem}
+                onRemoveGroup={this.props.onGroupRemove}
+                addGroup={this.props.onGroupAdd}
+                addGroupProducts={this.props.addGroupProducts}
+                getGroupProducts={this.props.getGroupProducts}
+                removeGroupProducts={this.props.removeGroupProducts}
+              />
             </Panel>
           </Tab>
-          */}
 
         </Tabs>
+
         <div style={{marginTop: 12}}>
           <Button onClick={this.handleSave} bsStyle="primary" style={{marginRight: 10}}>Save</Button>
           <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
         </div>
+
       </Col>
     );
   }
+
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    onGroupRemove,
+    onGroupAdd,
+    addGroupProducts,
+    getGroupProducts,
+    removeGroupProducts,
     getItem,
     clearItem,
     updateItem,

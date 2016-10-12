@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
 import service from './serviceReducer';
-import serviceGroup from './serviceGroupReducer';
+import serviceGroups from '../groupsReducer';
 import serviceProducts from './serviceProductsReducer';
 
 
 export default combineReducers({
   service,
-  serviceGroup,
+  serviceGroups,
   serviceProducts,
 });
