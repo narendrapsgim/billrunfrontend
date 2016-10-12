@@ -7,6 +7,8 @@ var fontAwesomePath = __dirname + '/node_modules/font-awesome/css';
 
 var env = process.env.NODE_ENV || 'dev';
 
+console.log('Node env is : ', env);
+
 /**
  * This is the Webpack configuration file
  * For more information, see: http://webpack.github.io/docs/configuration.html
