@@ -1,11 +1,7 @@
 var webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-var bootstrapPath = __dirname + '/node_modules/bootstrap/dist/css';
-var bootstrapSocialPath = __dirname + '/node_modules/bootstrap-social';
-var fontAwesomePath = __dirname + '/node_modules/font-awesome/css';
-
+var path = require( 'path' );
 var env = process.env.NODE_ENV || 'dev';
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 console.log('Node env is : ', env);
 
@@ -22,7 +18,13 @@ module.exports = {
   // Set entry point to ./src/main and include necessary files for hot load
   entry:  {
     app : './public/js/index.js',
-    vendor: ['axios', 'material-ui', 'moment', 'lodash']
+    vendor: [
+      'axios',
+      'material-ui',
+      'moment',
+      'lodash',
+      'bootstrap',
+    ]
   },
 
   // This will not actually create a bundle.js file in ./build. It is used
@@ -44,14 +46,14 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
     }),
-    new ExtractTextPlugin('style.css', { allChunks: true }),
+    new ExtractTextPlugin('bundle.css'),
   ],
 
   // Transform source code using Babel and React Hot Loader
   module: {
     loaders: [
       { test: /\.jsx?$/, loader: 'babel', exclude: /node_modules/, },
-      { test: /\.css$/, loader: 'style!css' },
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
       { test: /\.less$/, loader: 'style!css!less' },
       { test: /\.scss$/, loader: 'style!css!sass' },
       { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
@@ -62,8 +64,11 @@ module.exports = {
 
   // Automatically transform files with these extensions
   resolve: {
+    alias:{
+      img: path.resolve( __dirname, 'public', 'img' ),
+      css: path.resolve( __dirname, 'public', 'css' ),
+    },
     extensions: ['', '.js', '.jsx', '.css'],
-    modulesDirectories: ['node_modules', bootstrapPath, bootstrapSocialPath, fontAwesomePath]
   },
 
   // Additional plugins for CSS post processing using postcss-loader

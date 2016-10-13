@@ -5,14 +5,12 @@ import { Panel, PageHeader, Col, Row} from 'react-bootstrap';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import BraasTheme from '../theme';
-
 import ProgressIndicator from '../components/ProgressIndicator';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
 import { userCheckLogin } from '../actions/userActions';
-
-import '../../css/style.css';
-
+/* Assets */
+import LogoImg from 'img/billrun-logo-tm.png';
 
 class App extends Component {
   constructor(props) {
@@ -43,7 +41,7 @@ class App extends Component {
           <Row>
             <Col md={4} mdOffset={4}>
               <div style={{marginTop: '33%', textAlign: 'center'}}>
-                <img src="/img/billrun-logo-tm.png" style={{ height: 50 }} />
+                <img src={LogoImg} style={{ height: 50 }} />
                 <br />
                 <br />
                 <br />
