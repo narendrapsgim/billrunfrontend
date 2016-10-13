@@ -13,8 +13,12 @@ export default class Subscriptions extends Component {
     };
   }
 
-  onClickEdit  = (subscription) => this.setState({edit: true, subscription});
-  onCancelEdit = () => this.setState({edit: false, subscription: null});
+  onClickEdit  = (subscription) => { this.setState({edit: true, subscription}); };
+  onCancelEdit = () => { this.setState({edit: false, subscription: null}); };
+  onSaveSubscription = (subscription, data) => {
+    this.props.onSaveSubscription(subscription, data);
+    this.setState({edit: false});
+  };
   
   render() {
     const { edit, subscription } = this.state;
@@ -23,11 +27,12 @@ export default class Subscriptions extends Component {
       <div>
         {
           edit ? 
-          <Subscription {...this.props}
-                        subscription={subscription}
+          <Subscription { ...this.props }
+                        subscription={ subscription }
+                        onSave={ this.onSaveSubscription }
                         onCancel={this.onCancelEdit} /> :
           <SubscriptionsList { ...this.props }
-                             onClickEdit={this.onClickEdit} />
+                             onClickEdit={ this.onClickEdit } />
         }    
       </div>
     );

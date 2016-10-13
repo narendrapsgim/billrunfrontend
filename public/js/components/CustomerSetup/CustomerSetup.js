@@ -122,6 +122,38 @@ class CustomerSetup extends Component {
     window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url="${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}"`;
   }
 
+  onSaveSubscription = (subscription, data) => {
+    const newsub = subscription.withMutations(map => {
+      Object.keys(data).map(field => {
+        map.set(field, data[field]);
+      });
+    });
+    const query = {
+      api: "subscribers",
+      params: [
+        { method: "update" },
+        { type: "subscriber" },
+        { query: JSON.stringify({"aid": subscription.get('aid'),
+                                 "sid": subscription.get('sid')}) },
+        { update: JSON.stringify(data) }
+      ]
+    };
+    apiBillRun(query).then(
+      success => {
+        this.props.dispatch(showSuccess("Saved subscription successfully!"));
+      },
+      failure => {
+        const errorMessage = failure.error[0].error.display.desc ? failure.error[0].error.display.desc : failure.error[0].error.message;
+        dispatch(showDanger(`Error - ${errorMessage}`));
+        console.log(failure);
+      }
+    ).catch(
+      error => {
+        this.props.dispatch(showDanger("Network error - please try again"));
+      }
+    );
+  };
+  
   onCancel() {
     this.context.router.push({
       pathname: "/customers"
@@ -164,7 +196,7 @@ class CustomerSetup extends Component {
                   aid={customer.get('aid')}
                   settings={settings.getIn(['subscriber', 'fields'])}
                   plans={plans}
-                  onChangeField={this.onChangeSubscriptionField}
+                  onSaveSubscription={this.onSaveSubscription}
                   onNew={this.onClickNewSubscription}
               />
             </div>
