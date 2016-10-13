@@ -23,7 +23,6 @@ module.exports = {
       'material-ui',
       'moment',
       'lodash',
-      'bootstrap',
     ]
   },
 

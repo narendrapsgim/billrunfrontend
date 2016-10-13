@@ -8,7 +8,6 @@ import DevTools from './DevTools';
 /* Styles */
 import 'react-bootstrap-multiselect/css/bootstrap-multiselect.css';
 import 'react-select/dist/react-select.css';
-import 'bootstrap/dist/css/bootstrap.css'
 import 'font-awesome/css/font-awesome.css';
 import 'css/sb-admin-2.css';
 import 'css/style.css';
