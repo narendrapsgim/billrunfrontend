@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var sassLoader = require('node-sass');
 
 var bootstrapPath = __dirname + '/node_modules/bootstrap/dist/css';
 var bootstrapSocialPath = __dirname + '/node_modules/bootstrap-social';
@@ -47,7 +48,8 @@ module.exports = {
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
-    new ExtractTextPlugin('style.css', { allChunks: true }),
+    //new ExtractTextPlugin('style.css', { allChunks: true }),
+    new ExtractTextPlugin('./app.css', { allChunks: true }),
   ],
 
   // Transform source code using Babel and React Hot Loader
@@ -61,12 +63,36 @@ module.exports = {
       },
       { test: /\.css$/, loader: "style!css" },
       { test: /\.less$/, loader: 'style!css!less' },
-      { test: /\.scss$/, loader: 'style!css!sass' },
+      /*{ test: /\.scss$/, loader: 'style!css!sass' },*/
       { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
+
       { test: /\.(jpe|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/, loaders: ["file-loader"] },
+      /*{
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"]
+      },*/
+      {
+        test: /\.scss$/,
+        loader: ExtractTextPlugin.extract(
+          'style', // The backup style loader
+          'css?sourceMap!sass?sourceMap'
+        )
+      },
+
+/*      {
+        test: /\.scss$/,
+        // loader: ExtractTextPlugin.extract("style-loader", "css-loader")
+        loader: "style!css!sass"
+        /!*loader: ExtractTextPlugin.extract(
+          'style', // backup loader when not building .css file
+          'css!sass' // loaders to preprocess CSS
+        )*!/
+      },*/
+
       {include: /\.json$/, loaders: ["json-loader"]}
     ]
   },
+
 
   // Automatically transform files with these extensions
   resolve: {
