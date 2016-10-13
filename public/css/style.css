@@ -135,9 +135,7 @@ textarea {
     font-size: 14px;
 }
 
-.nav-tabs {
-    border-bottom: 0;
-}
-.nav-tabs>li {
-    margin-bottom: -2px;
+.panel-heading .btn-xs{
+    margin-top: -2px;
+    padding: 2px 4px;
 }

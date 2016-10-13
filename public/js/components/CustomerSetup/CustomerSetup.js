@@ -13,8 +13,7 @@ import { showSuccess, showDanger } from '../..//actions/alertsActions';
 /* COMPONENTS */
 import { PageHeader, Tabs, Tab } from 'react-bootstrap';
 import Customer from './Customer';
-import SubscriptionsList from './SubscriptionsList';
-import Subscription from './Subscription';
+import Subscriptions from './Subscriptions';
 
 class CustomerSetup extends Component {
   constructor(props) {
@@ -127,6 +126,39 @@ class CustomerSetup extends Component {
     window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url="${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}"`;
   }
 
+  onSaveSubscription = (subscription, data, callback) => {
+    const newsub = subscription.withMutations(map => {
+      Object.keys(data).map(field => {
+        map.set(field, data[field]);
+      });
+    });
+    const query = {
+      api: "subscribers",
+      params: [
+        { method: "update" },
+        { type: "subscriber" },
+        { query: JSON.stringify({"aid": subscription.get('aid'),
+                                 "sid": subscription.get('sid')}) },
+        { update: JSON.stringify(data) }
+      ]
+    };
+    apiBillRun(query).then(
+      success => {
+        callback(true);
+        this.props.dispatch(showSuccess("Saved subscription successfully!"));
+      },
+      failure => {
+        const errorMessage = failure.error[0].error.display.desc ? failure.error[0].error.display.desc : failure.error[0].error.message;
+        dispatch(showDanger(`Error - ${errorMessage}`));
+        console.log(failure);
+      }
+    ).catch(
+      error => {
+        this.props.dispatch(showDanger("Network error - please try again"));
+      }
+    );
+  };
+  
   onCancel() {
     this.context.router.push({
       pathname: "/customers"
@@ -156,10 +188,12 @@ class CustomerSetup extends Component {
         <Tab title="Subscriptions" eventKey={2} key={2}>
           <div className="panel panel-default">
             <div className="panel-body">
-              <SubscriptionsList
+              <Subscriptions
                   subscriptions={subscriptions}
                   aid={customer.get('aid')}
                   settings={settings.getIn(['subscriber', 'fields'])}
+                  plans={plans}
+                  onSaveSubscription={this.onSaveSubscription}
                   onNew={this.onClickNewSubscription}
               />
             </div>

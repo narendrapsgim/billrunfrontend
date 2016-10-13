@@ -16,17 +16,13 @@ export default class SubscriptionsList extends Component {
       <td key={key}>{ sub.get(field.get('field_name')) }</td>
     ))
   }
-
-  onClickSubscription(entity) {
-    
-  }
   
   render() {
     const { subscriptions,
             settings,
             aid,
             onNew,
-            onEdit } = this.props;
+            onClickEdit } = this.props;
 
     const fields = settings
       .filter(field => { return field.get('display') !== false })
@@ -49,7 +45,7 @@ export default class SubscriptionsList extends Component {
                 </span>
               </div>
               <div className="panel-body">
-                <List items={subscriptions} fields={fields} onClick={this.onClickSubscription} />
+                <List items={subscriptions} fields={fields} edit={true} onClickEdit={onClickEdit} />
               </div>
             </div>
           </div>
