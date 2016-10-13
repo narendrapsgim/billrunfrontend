@@ -7,22 +7,30 @@ export default class Customer extends Component {
   }
 
   render() {
-    const { customer, onChange, settings, action } = this.props;
+    const { customer, onChange, settings, action, invalidFields } = this.props;
 
-    const fields = settings.filter(field => {
-                              return field.get('display') !== false &&
-                                     field.get('editable') !== false;
-                            }).
-                            map((setting, key) => (
-                              <div className="form-group" key={key}>
-                                <label>{setting.get('field_name')}</label>
-                                <input className="form-control"
-                                       id={setting.get('field_name')}
-                                       onChange={ onChange }
-                                       value={ customer.get(setting.get('field_name')) } />
-                              </div>
-                            ));
-
+    const fields =
+      settings
+      .filter(field => {
+        return field.get('display') !== false &&
+               field.get('editable') !== false;
+      })
+      .map((setting, key) => {
+        let invalid = invalidFields
+          .filter(invf => invf.get('name') === setting.get('field_name'))
+          .size > 0;
+        let className = `form-group ${invalid && 'has-error'}`;
+        return (
+          <div className={ className } key={key}>
+            <label>{setting.get('field_name')}</label>
+            <input className="form-control"
+                   id={setting.get('field_name')}
+                   onChange={ onChange }
+                   value={ customer.get(setting.get('field_name')) } />
+          </div>
+        );
+      });
+    
     return (
       <div>
 
