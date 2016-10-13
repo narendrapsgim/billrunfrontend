@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Link} from 'react-router';
 import {userDoLogout} from '../../actions/userActions';
 import classNames from "classnames";
-import {Navbar, Nav, NavItem, NavDropdown, MenuItem, ProgressBar, ButtonGroup, Button} from "react-bootstrap";
+import { NavDropdown, MenuItem } from "react-bootstrap";
 
 class Navigator extends Component {
   constructor(props) {
@@ -48,46 +48,6 @@ class Navigator extends Component {
     const {id} = e.target;
     this.setState({activeNav: id})
   }
-
-  changeFont = (e) => {
-    e.preventDefault();
-    document.body.style.fontFamily = '"'+ e.target.dataset.name + '", Helvetica,Arial,sans-serif';
-  }
-
-  changeTheme = (e) => {
-    e.preventDefault();
-    var cssId = 'myCss';  // you could encode the css path itself to generate id..
-
-    if (!document.getElementById('myCssReset'))
-    {
-      var head  = document.getElementsByTagName('head')[0];
-      var link  = document.createElement('link');
-      link.id   = 'myCssReset';
-      link.rel  = 'stylesheet';
-      link.type = 'text/css';
-      link.href = '/css/themes/myCssReset.css';
-      link.media = 'all';
-      head.appendChild(link);
-    }
-
-    if (document.getElementById(cssId)) {
-      var element = document.getElementById(cssId);
-      element.outerHTML = "";
-      delete document.getElementById(cssId);
-    }
-
-    var head  = document.getElementsByTagName('head')[0];
-    var link  = document.createElement('link');
-    link.id   = cssId;
-    link.rel  = 'stylesheet';
-    link.type = 'text/css';
-    link.href = '/css/themes/'+e.target.dataset.name+'.css';
-    link.media = 'all';
-    head.appendChild(link);
-
-
-  }
-
 
   render() {
     return (
@@ -189,20 +149,6 @@ class Navigator extends Component {
                     </ul>
                   </li>
                 </ul>
-
-                <ButtonGroup style={{position: 'fixed', bottom: '40px'}}>
-                  <Button onClick={this.changeTheme} data-name="Cerulean">Cerulean</Button>
-                  <Button onClick={this.changeTheme} data-name="yeti">yeti</Button>
-                  <Button onClick={this.changeTheme} data-name="superhero">SuperHero</Button>
-                </ButtonGroup>
-
-                <ButtonGroup style={{position: 'fixed', bottom: 0}}>
-                  <Button onClick={this.changeFont} data-name="Lato">La</Button>
-                  <Button onClick={this.changeFont} data-name="Robot">Ro</Button>
-                  <Button onClick={this.changeFont} data-name="Ubuntu">Ub</Button>
-                  <Button onClick={this.changeFont} data-name="Noto Sans">No</Button>
-                  <Button onClick={this.changeFont} data-name="Helvetica Neue">Hl</Button>
-                </ButtonGroup>
               </div>
             </div>
           );

@@ -135,4 +135,7 @@ textarea {
     font-size: 14px;
 }
 
-
+.panel-heading .btn-xs{
+    margin-top: -2px;
+    padding: 2px 4px;
+}
