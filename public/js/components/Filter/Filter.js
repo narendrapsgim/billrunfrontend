@@ -86,24 +86,28 @@ export default class Filter extends Component {
 
     return (
       <div className="Filter row" style={{marginBottom: 10}}>
-        <div className="col-lg-2 col-md-3 col-xs-4">
-          <input id="filter-string"
-		 placeholder="Search for..."
-		 onChange={this.onChangeFilterString}
-		 className="form-control" />
-        </div>
-        <div className="col-lg-2 col-md-3 col-xs-4">
-          <Multiselect data={fields_options}
-		       multiple
-		       onChange={this.onSelectFilterField}
-		       buttonWidth="100%" />
-        </div>
-        <div className="col-lg-1 col-md-2 col-xs-3">
-          <button className="btn btn-default"
-		  onClick={this.onClickFilterBtn}
-		  disabled={(string && filter_by.length === 0) || (!string && filter_by.length > 0)}>
-	    <i className="fa fa-search"></i>
-	  </button>
+        <div className="filter-warp">
+          <div className="pull-left">
+            <input id="filter-string"
+                   placeholder="Search for..."
+                   onChange={this.onChangeFilterString}
+                   className="form-control"/>
+          </div>
+          <div className="pull-left">
+            <Multiselect data={fields_options}
+                         multiple
+                         onChange={this.onSelectFilterField}
+                         buttonWidth="100%"
+                         nonSelectedText="Search in fields"
+            />
+          </div>
+          <div className="search-button pull-left">
+            <button className="btn btn-default search-btn"
+                    onClick={this.onClickFilterBtn}
+                    disabled={(string && filter_by.length === 0) || (!string && filter_by.length > 0)}>
+              <i className="fa fa-search"></i>
+            </button>
+          </div>
         </div>
       </div>
     );

@@ -81,16 +81,16 @@ class InvoicesList extends Component {
       return (
         <form method="post" action={download_url}>
           <input type="hidden" name="a" value="a"></input>
-          <button className="btn btn-outline btn-default" type="submit">
-            <i className="fa fa-download"></i>
+          <button className="btn btn-link" type="submit">
+            <i className="fa fa-download"></i> Download
           </button>
         </form>
       );
     };
     const fields = [
-      { id: "invoice_id", title: "Invoice ID", sort: true },
-      { id: "invoice_date", title: "Date" },
-      { id: "due_date", title: "Due" },
+      { id: "invoice_id", title: "Invoice Id", sort: true },
+      { id: "invoice_date", title: "Date", cssClass: 'short-date' },
+      { id: "due_date", title: "Due", cssClass: 'short-date' },
       { id: "amount", title: "Amount" },
       { id: "paid_by", title: "Status", parser: paid_by_parser },
       { id: "billrun_key", title: "Cycle" },
@@ -116,7 +116,7 @@ class InvoicesList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={filter_fields} onFilter={this.onFilter} base={base} />
-                <List items={invoices} fields={fields} onSort={this.onSort} />
+                <List items={invoices} fields={fields} onSort={this.onSort} className="invoices-list" />
               </div>
             </div>
           </div>
