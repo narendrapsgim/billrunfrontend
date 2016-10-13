@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button } from 'react-bootstrap';
-
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
@@ -11,6 +10,8 @@ import PlanPrice from './components/PlanPrice';
 export default class Plan extends Component {
 
   static propTypes = {
+    plan: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+    mode: React.PropTypes.string.isRequired,
     onChangeFieldValue: React.PropTypes.func.isRequired,
     onPlanCycleUpdate: React.PropTypes.func.isRequired,
     onPlanTariffAdd: React.PropTypes.func.isRequired,
@@ -80,15 +81,9 @@ export default class Plan extends Component {
     );
   }
 
-  getEmptyPrice = (trial = false) => {
-    return (
-      <Col lg={1}>
-        {trial
-          ? <Button bsStyle="success" onClick={this.onPlanTrailTariffInit} >Set trial price</Button>
-          : <Button bsStyle="success" onClick={this.onPlanTariffInit}>Set price</Button>
-        }
-      </Col>
-    );
+  getAddPriceButton = (trial = false) => {
+    const onclick = trial ? this.onPlanTrailTariffInit : this.onPlanTariffInit;
+    return ( <Button bsSize="xsmall" className="btn-primary" onClick={onclick} > <i className="fa fa-plus" />&nbsp;Add New </Button> );
   }
 
   getTrialPrice = () => {
@@ -97,16 +92,16 @@ export default class Plan extends Component {
     if(trial){
       return(
         <PlanPrice
-          index={0}
-          count={plan.get('price', Immutable.List()).size}
-          item={trial}
-          onPlanPriceUpdate={this.onPlanPriceUpdate}
-          onPlanCycleUpdate={this.props.onPlanCycleUpdate}
-          onPlanTariffAdd={this.props.onPlanTariffAdd}
-          onPlanTariffRemove={this.props.onPlanTariffRemove}
+            index={0}
+            count={plan.get('price', Immutable.List()).size}
+            item={trial}
+            onPlanPriceUpdate={this.onPlanPriceUpdate}
+            onPlanCycleUpdate={this.props.onPlanCycleUpdate}
+            onPlanTariffAdd={this.props.onPlanTariffAdd}
+            onPlanTariffRemove={this.props.onPlanTariffRemove}
         />);
     }
-    return this.getEmptyPrice(true);
+    return this.getAddPriceButton(true);
   }
 
   getPrices = () => {
@@ -118,22 +113,21 @@ export default class Plan extends Component {
       if (price.get('trial') !== true){
         prices.push(
           <PlanPrice key={i}
-            index={i}
-            count={count}
-            item={price}
-            onPlanPriceUpdate={this.onPlanPriceUpdate}
-            onPlanCycleUpdate={this.props.onPlanCycleUpdate}
-            onPlanTariffAdd={this.props.onPlanTariffAdd}
-            onPlanTariffRemove={this.props.onPlanTariffRemove}
+              index={i}
+              count={count}
+              item={price}
+              onPlanPriceUpdate={this.onPlanPriceUpdate}
+              onPlanCycleUpdate={this.props.onPlanCycleUpdate}
+              onPlanTariffRemove={this.props.onPlanTariffRemove}
           />
         );
       }
     });
-    return (prices.length > 0) ? prices : this.getEmptyPrice(false);
+    return prices;
   }
 
   render() {
-    let { plan, validator, mode } = this.props;
+    let { plan, mode } = this.props;
     const periodicity = plan.getIn(['recurrence', 'periodicity']) || '';
     const upfront = typeof plan.get('upfront') !== 'boolean' ? '' : plan.get('upfront');
 
@@ -165,7 +159,7 @@ export default class Plan extends Component {
 
               <Col lg={4} md={4}>
                 <FormGroup>
-                  <ControlLabel>PlanEach</ControlLabel>
+                  <ControlLabel>Recurrence</ControlLabel>
                   <Field min="1" fieldType="number" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
                 </FormGroup>
               </Col>
@@ -198,6 +192,7 @@ export default class Plan extends Component {
 
             <Panel header={<h3>Recurring Charges</h3>}>
               { this.getPrices() }
+              { this.getAddPriceButton(false) }
             </Panel>
 
           </Form>

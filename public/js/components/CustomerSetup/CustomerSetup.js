@@ -111,7 +111,8 @@ class CustomerSetup extends Component {
         }
       },
       failure => {
-        dispatch(showDanger(`Error - ${failure.error[0].error.desc}`));
+        const errorMessage = failure.error[0].error.display.desc ? failure.error[0].error.display.desc : failure.error[0].error.message;
+        dispatch(showDanger(`Error - ${errorMessage}`));
         console.log(failure);
       }
     ).catch(

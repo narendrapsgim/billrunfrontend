@@ -27,7 +27,7 @@ export default function (state = defaultState, action) {
       return state.deleteIn(['include', 'groups', action.groupName]);
 
     case ADD_GROUP:
-      const group = Immutable.Map({[action.usaget] : action.value});
+      const group = Immutable.Map({[action.usage] : action.value});
       return state.setIn(['include', 'groups', action.groupName], group);
 
     case UPDATE_PLAN_FIELD_VALUE:

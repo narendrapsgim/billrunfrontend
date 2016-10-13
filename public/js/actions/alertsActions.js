@@ -1,10 +1,10 @@
 import Immutable from 'immutable';
 import moment from 'moment';
 
-export const SUCCESS = "success";
-export const WARNING = "warning";
-export const DANGER = "danger";
-export const INFO = "info";
+export const SUCCESS = 'success';
+export const WARNING = 'warning';
+export const DANGER = 'danger';
+export const INFO = 'info';
 
 export const DISMISS_ALL_ALERTS = 'DISMISS_ALL_ALERTS';
 export const DISMISS_ALERT = 'DISMISS_ALERT';

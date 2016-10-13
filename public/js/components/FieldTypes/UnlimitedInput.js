@@ -4,31 +4,37 @@ import { InputGroup, FormControl } from 'react-bootstrap';
 
 export default class UnlimitedInput extends Component {
 
+  static defaultProps = {
+    unlimitedLabel : 'Unlimited'
+  };
+
   static propTypes = {
-    unlimitedValue: React.PropTypes.string.isRequired,
+    value: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.number,
+    ]).isRequired,
+    unlimitedValue: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.number,
+    ]).isRequired,
+    unlimitedLabel: React.PropTypes.string,
     onChange: React.PropTypes.func.isRequired,
   }
 
-  constructor(props) {
-    super(props);
-    this.onUnlimitedChnaged = this.onUnlimitedChnaged.bind(this);
-    this.onValueChanged = this.onValueChanged.bind(this);
-    this.unlimitedValue = props.unlimitedValue;
-    this.unlimitedLabel = (typeof props.unlimitedLabel === 'undefined') ? 'Unlimited' : props.unlimitedLabel;
+  state = {
+    value: this.props.value === this.props.unlimitedValue ? '' : this.props.value,
+    unlimited : this.props.value == this.props.unlimitedValue
+  };
 
-    let unlimited = (props.value === this.unlimitedValue);
-    let value = unlimited ? '' : props.value;
-    this.state = { value, unlimited };
-  }
-
-  onUnlimitedChnaged(e){
+  onUnlimitedChanged = (e) => {
+    const { unlimitedValue } = this.props;
     const unlimited = e.target.checked;
-    let newValue = unlimited ? this.unlimitedValue : this.state.value;
+    let newValue = unlimited ? unlimitedValue : this.state.value;
     this.setState({ unlimited });
     this.props.onChange(newValue);
   }
 
-  onValueChanged(e){
+  onValueChanged = (e) => {
     const { value } = e.target;
     this.setState({ value });
     this.props.onChange(value);
@@ -36,21 +42,22 @@ export default class UnlimitedInput extends Component {
 
   render() {
     const { value, unlimited } = this.state;
+    const { unlimitedLabel } = this.props;
 
     return (
       <InputGroup>
         <InputGroup.Addon>
           <input
-            type="checkbox"
-            onChange={this.onUnlimitedChnaged}
-            checked={unlimited}
-          /> {this.unlimitedLabel}
+              checked={unlimited}
+              onChange={this.onUnlimitedChanged}
+              type="checkbox"
+          /> {unlimitedLabel}
         </InputGroup.Addon>
         <FormControl
-          type="text"
-          value={unlimited ? '' : value}
-          disabled={unlimited}
-          onChange={this.onValueChanged}
+            disabled={unlimited}
+            onChange={this.onValueChanged}
+            type="text"
+            value={unlimited ? '' : value}
         />
       </InputGroup>
     );

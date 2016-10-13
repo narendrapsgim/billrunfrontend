@@ -54,14 +54,14 @@ export default class ProductSearch extends Component {
   render() {
     return (
         <Select
-          value={this.state.val}
-          cacheAsyncResults={false}
-          onChange={this.onSelectProduct}
-          asyncOptions={this.getProducts}
-          valueKey='key'
-          labelKey='key'
-          placeholder='Search by product key...'
-          noResultsText='No products found, please try another key'
+            value={this.state.val}
+            cacheAsyncResults={false}
+            onChange={this.onSelectProduct}
+            asyncOptions={this.getProducts}
+            valueKey='key'
+            labelKey='key'
+            placeholder='Search by product key...'
+            noResultsText='No products found, please try another key'
         />
     );
   }

@@ -34,7 +34,7 @@ export default class Chips extends Component {
     inputType: 'text',
     disabled: false,
     errorText: '',
-    errorStyle: '',
+    errorStyle: {},
     placeholder: '',
   }
 
