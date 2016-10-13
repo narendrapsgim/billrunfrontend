@@ -97,6 +97,10 @@ class CustomerSetup extends Component {
       success => {
         if (action === "update") {
           dispatch(showSuccess("Customer saved successfully"));
+
+          this.context.router.push({
+            pathname: "/customers"
+          });
         } else {
           dispatch(showSuccess("Customer created successfully"));
           dispatch(gotEntity('customer', success.data[0].data.details));
@@ -111,7 +115,7 @@ class CustomerSetup extends Component {
         }
       },
       failure => {
-        if (failure.error[0].error.message === "Invalid fields.") {
+        if (failure.error[0].error.code === 17576) {
           const fields = JSON.parse(failure.error[0].error.display);
           this.setState({invalidFields: Immutable.fromJS(fields)});
         }
@@ -182,18 +186,10 @@ class CustomerSetup extends Component {
                 invalidFields={ invalidFields }
                 settings={settings.getIn(['account', 'fields'])}
                 onChange={this.onChangeCustomerField} />
-      <button type="submit"
-              className="btn btn-primary"
-              onClick={this.onSaveCustomer}
-              style={{marginRight: 10}}>
-        Save
-      </button>
-      <button type="reset"
-              className="btn btn-default"
-              onClick={this.onCancel}>
-        Cancel
-      </button>
+
     </div>
+
+
   </div>
     </Tab>)
     ];
@@ -224,7 +220,21 @@ class CustomerSetup extends Component {
               { tabs }
             </Tabs>
           </div>
-        </div>  
+        </div>
+
+        <div style={{marginTop: 12}}>
+          <button type="submit"
+                  className="btn btn-primary"
+                  onClick={this.onSaveCustomer}
+                  style={{marginRight: 10}}>
+            Save
+          </button>
+          <button type="reset"
+                  className="btn btn-default"
+                  onClick={this.onCancel}>
+            Cancel
+          </button>
+        </div>
 
       </div>
     );
