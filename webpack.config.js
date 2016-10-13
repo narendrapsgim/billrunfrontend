@@ -30,7 +30,7 @@ module.exports = {
   // This will not actually create a bundle.js file in ./build. It is used
   // by the dev server for dynamic hot loading.
   output: {
-    path: __dirname + '/public/build/',
+    path: __dirname + (env === 'production' ? '/dist/' : '/public/build/'),
     filename: './bundle.[name].js'
   },
 
@@ -48,7 +48,7 @@ module.exports = {
     }),
     new ExtractTextPlugin('bundle.css'),
     new HtmlWebpackPlugin({
-      filename: "../index.html",
+      filename: env === 'production' ? "../dist/index.html" : "../index.html",
       hash: true,
       template: 'index.tmpl.html',
       inject: true
