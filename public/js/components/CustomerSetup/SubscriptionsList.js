@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
-
 import List from '../List';
-import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 export default class SubscriptionsList extends Component {
   constructor(props) {
@@ -17,17 +16,13 @@ export default class SubscriptionsList extends Component {
       <td key={key}>{ sub.get(field.get('field_name')) }</td>
     ))
   }
-
-  onClickSubscription(entity) {
-    
-  }
   
   render() {
     const { subscriptions,
             settings,
             aid,
             onNew,
-            onEdit } = this.props;
+            onClickEdit } = this.props;
 
     const fields = settings
       .filter(field => { return field.get('display') !== false })
@@ -45,14 +40,12 @@ export default class SubscriptionsList extends Component {
                 <span>
                   All action subscriptions
                   <div className="pull-right">
-                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                      <MenuItem eventKey="1" onClick={onNew.bind(this, aid)}>New</MenuItem>
-                    </DropdownButton>
+                    <Button bsSize="xsmall" className="btn-primary" onClick={onNew.bind(this, aid)}><i className="fa fa-plus"/>&nbsp;Add New</Button>
                   </div>
                 </span>
               </div>
               <div className="panel-body">
-                <List items={subscriptions} fields={fields} onClick={this.onClickSubscription} />
+                <List items={subscriptions} fields={fields} edit={true} onClickEdit={onClickEdit} />
               </div>
             </div>
           </div>
