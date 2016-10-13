@@ -9,7 +9,9 @@ import DevTools from './DevTools';
 import 'react-bootstrap-multiselect/css/bootstrap-multiselect.css';
 import 'react-select/dist/react-select.css';
 import 'font-awesome/css/font-awesome.css';
+import 'css/normalize.css';
 import 'css/sb-admin-2.css';
+import 'css/yeti.css';
 import 'css/style.css';
 
 const routes = routesModule();
