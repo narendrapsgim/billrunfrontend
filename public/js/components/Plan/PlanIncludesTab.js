@@ -14,14 +14,19 @@ import { PlanDescription } from '../../FieldDescriptions';
 import PlanIncludeGroupEdit from './components/PlanIncludeGroupEdit';
 import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 
-export default class PlanIncludesTab extends Component {
+
+class PlanIncludesTab extends Component {
+
 
   static propTypes = {
-    includeGroups: React.PropTypes.object.isRequired,
+    allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
+    includeGroups: React.PropTypes.instanceOf(Immutable.Map),
     onChangeFieldValue: React.PropTypes.func.isRequired,
     onRemoveGroup: React.PropTypes.func.isRequired,
     addGroup: React.PropTypes.func.isRequired,
     addGroupProducts: React.PropTypes.func.isRequired,
+    removeGroupProducts: React.PropTypes.func.isRequired,
+    getGroupProducts: React.PropTypes.func.isRequired,
   }
 
   state = {
@@ -47,7 +52,7 @@ export default class PlanIncludesTab extends Component {
   }
 
   renderGroups = () => {
-    const { includeGroups } = this.props;
+    const { includeGroups, allGroupsProductsKeys } = this.props;
 
     if(typeof includeGroups === 'undefined'){
       return null;
@@ -58,11 +63,15 @@ export default class PlanIncludesTab extends Component {
       include.forEach( (value, usaget) => {
         groups.push(
           <PlanIncludeGroupEdit key={`${groupName}_${usaget}`}
-            name={groupName}
-            value={value}
-            usaget={usaget}
-            onChangeFieldValue={this.props.onChangeFieldValue}
-            onGroupRemove={this.props.onRemoveGroup}
+              name={groupName}
+              value={value}
+              usaget={usaget}
+              allGroupsProductsKeys={allGroupsProductsKeys}
+              onChangeFieldValue={this.props.onChangeFieldValue}
+              onGroupRemove={this.props.onRemoveGroup}
+              addGroupProducts={this.props.addGroupProducts}
+              getGroupProducts={this.props.getGroupProducts}
+              removeGroupProducts={this.props.removeGroupProducts}
           />
         );
         groups.push(<hr key={`${groupName}_${usaget}_sep`}/>)
@@ -74,10 +83,9 @@ export default class PlanIncludesTab extends Component {
 
   render() {
     const { existingGroups } = this.state;
-    const { includeGroups } = this.props;
+    const { includeGroups, allGroupsProductsKeys } = this.props;
     const planGroupsNames = includeGroups.keySeq().toArray();
-    const existinGrousNames = [...new Set([...existingGroups, ...planGroupsNames])];
-
+    const existinGrousNames = Immutable.Set([...existingGroups, ...planGroupsNames]);
 
     return (
       <Row>
@@ -85,9 +93,10 @@ export default class PlanIncludesTab extends Component {
             <Panel header={<h3>Groups <Help contents={PlanDescription.include_groups} /></h3>}>
               {this.renderGroups()}
               <PlanIncludeGroupCreate
-                existinGrousNames={existinGrousNames}
-                addGroup={this.props.addGroup}
-                addGroupProducts={this.props.addGroupProducts}
+                  existinGrousNames={existinGrousNames}
+                  allGroupsProductsKeys={allGroupsProductsKeys}
+                  addGroup={this.props.addGroup}
+                  addGroupProducts={this.props.addGroupProducts}
               />
             </Panel>
         </Col>
@@ -96,3 +105,18 @@ export default class PlanIncludesTab extends Component {
   }
 
 }
+
+function mapStateToProps(state, props) {
+  let allGroupsProductsKeys = Immutable.Set();
+  state.planProducts.productIncludeGroup.forEach( (group) => {
+    group.forEach( (usage) => {
+      usage.forEach( (productKey) => {
+        allGroupsProductsKeys = allGroupsProductsKeys.add(productKey);
+      })
+    })
+  });
+  return  {
+    allGroupsProductsKeys,
+ };
+}
+export default connect(mapStateToProps)(PlanIncludesTab);

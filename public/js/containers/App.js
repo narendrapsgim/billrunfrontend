@@ -11,7 +11,7 @@ import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
 import { userCheckLogin } from '../actions/userActions';
 
-require('../../css/style.css');
+import '../../css/style.css';
 
 
 class App extends Component {

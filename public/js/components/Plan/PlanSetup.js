@@ -14,7 +14,10 @@ import {
   onPlanTariffAdd,
   onPlanTariffRemove,
   onPlanFieldUpdate } from '../../actions/planActions';
-import { addGroupProducts } from '../../actions/planGroupsActions';
+import {
+  addGroupProducts,
+  getGroupProducts,
+  removeGroupProducts } from '../../actions/planGroupsActions';
 import { onGroupAdd } from '../../actions/planActions';
 import { savePlanRates } from '../../actions/planProductsActions';
 
@@ -106,8 +109,8 @@ class PlanSetup extends Component {
     return (
       <Col lg={12}>
         <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
-          <Tab title="Billing Plan" eventKey={1}>
-            <Panel>
+          <Tab title="Details" eventKey={1}>
+            <Panel style={{borderTop: 'none'}}>
               <PlanTab plan={plan} mode={action}
                 onChangeFieldValue={this.onChangeFieldValue}
                 onPlanCycleUpdate={this.onPlanCycleUpdate}
@@ -118,26 +121,28 @@ class PlanSetup extends Component {
           </Tab>
 
           <Tab title="Override Product Price" eventKey={2}>
-            <Panel>
-              <PlanProductsPriceTab planName={planName}/>
+            <Panel style={{borderTop: 'none'}}>
+              <PlanProductsPriceTab />
             </Panel>
           </Tab>
 
           <Tab title="Plan Includes" eventKey={3}>
-            <Panel>
+            <Panel style={{borderTop: 'none'}}>
               <PlanIncludesTab
-                includeGroups={includeGroups}
-                onChangeFieldValue={this.onChangeFieldValue}
-                onRemoveGroup={this.props.onGroupRemove}
-                addGroup={this.props.onGroupAdd}
-                addGroupProducts={this.props.addGroupProducts}
+                  includeGroups={includeGroups}
+                  onChangeFieldValue={this.onChangeFieldValue}
+                  onRemoveGroup={this.props.onGroupRemove}
+                  addGroup={this.props.onGroupAdd}
+                  addGroupProducts={this.props.addGroupProducts}
+                  getGroupProducts={this.props.getGroupProducts}
+                  removeGroupProducts={this.props.removeGroupProducts}
               />
             </Panel>
           </Tab>
 
         </Tabs>
         <div style={{marginTop: 12}}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{marginRight: 10}}   >Save</Button>
+          <Button onClick={this.handleSave} bsStyle="primary" style={{marginRight: 10}}>Save</Button>
           <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
         </div>
       </Col>
@@ -147,9 +152,11 @@ class PlanSetup extends Component {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    getGroupProducts,
+    addGroupProducts,
+    removeGroupProducts,
     onGroupAdd,
     onGroupRemove,
-    addGroupProducts,
     onPlanCycleUpdate,
     onPlanTariffAdd,
     onPlanTariffRemove,
@@ -164,4 +171,4 @@ function mapStateToProps(state, props) {
     plan: state.plan,
   };
 }
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PlanSetup));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PlanSetup));

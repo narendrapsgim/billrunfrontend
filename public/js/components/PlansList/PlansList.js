@@ -134,7 +134,7 @@ class PlansList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
-                <List items={ plans } fields={ tableFields } onSort={ this.onSort } edit={true} onClickEdit={ this.onClickPlan }/>
+                <List items={ plans } fields={ tableFields } onSort={ this.onSort } editField="name" edit={true} onClickEdit={ this.onClickPlan }/>
               </div>
             </div>
             <Pager onClick={this.handlePageClick}

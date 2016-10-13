@@ -66,7 +66,6 @@ class ProductSetup extends Component {
   handleSave = () => {
     const { product } = this.props;
     const { action } = this.props.location.query;
-    console.log(product.toJS());
     this.props.saveProduct(product, action, this.afterSave);
   }
 
@@ -93,12 +92,12 @@ class ProductSetup extends Component {
       <Col lg={12}>
         <Panel>
           <Product product={product} mode={action} planName="BASE"
-            usaget={usaget}
-            usageTypes={usage_types}
-            onFieldUpdate={this.onFieldUpdate}
-            onUsagetUpdate={this.onUsagetUpdate}
-            onProductRateAdd={this.onProductRateAdd}
-            onProductRateRemove={this.onProductRateRemove}
+              usaget={usaget}
+              usageTypes={usage_types}
+              onFieldUpdate={this.onFieldUpdate}
+              onUsagetUpdate={this.onUsagetUpdate}
+              onProductRateAdd={this.onProductRateAdd}
+              onProductRateRemove={this.onProductRateRemove}
           />
         </Panel>
         <div style={{marginTop: 12}}>
@@ -127,4 +126,4 @@ function mapStateToProps(state, props) {
     product: state.product,
     usage_types: state.settings.get('usage_types') || Immutable.List() };
 }
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ProductSetup));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ProductSetup));
