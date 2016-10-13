@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router';
+import { Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
+
 import Select from 'react-select';
+
 import countries from './countries.data.json';
 
 export default class Customer extends Component {
@@ -24,77 +27,31 @@ export default class Customer extends Component {
       options.push({value: country.name, label: country.name})
     });
 
+    const fields = settings.filter(field => {
+      return field.get('display') !== false &&
+        field.get('editable') !== false;
+    }).map((setting, key) => (
+
+      <FormGroup controlId={setting.get('field_name')}>
+        <Col componentClass={ControlLabel} md={3}>
+          {setting.get('title') || setting.get('field_name')}
+        </Col>
+        <Col sm={9}>
+          <FormControl type="text"
+                       onChange={ onChange }
+                       value={ customer.get(setting.get('field_name')) }
+          />
+        </Col>
+      </FormGroup>
+    ));
+
     return (
       <div>
         <div className="row">
           <div className="col-lg-6">
-            <form className="form-horizontal">
-
-              <div className="form-group">
-                <label htmlFor="firstname" className="col-md-3 control-label">First Name</label>
-                <div className="col-md-9">
-                  <input className="form-control"
-                         type="text"
-                         key="firstname"
-                         id="firstname"
-                         name="firstname"
-                         onChange={ onChange }
-                         value={customer.get('firstname', '')}/>
-
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="lastname" className="col-md-3 control-label">Last Name</label>
-                <div className="col-md-9">
-                  <input className="form-control"
-                         type="text"
-                         key="lastname"
-                         id="lastname"
-                         name="lastname"
-                         onChange={ onChange }
-                         value={ customer.get('lastname', '') }/>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="email" className="col-md-3 control-label">email</label>
-                <div className="col-md-9">
-                  <input className="form-control"
-                         type="email"
-                         key="email"
-                         id="email"
-                         name="email"
-                         onChange={ onChange }
-                         value={ customer.get('email', '') }/>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="country" className="col-md-3 control-label">Country</label>
-                <div className="col-md-9">
-                  <Select
-                    name="country"
-                    value={ customer.get('country', '') }
-                    options={options}
-                    onChange={this.onCountryChange}
-                    Clearable={false} />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="country" className="col-md-3 control-label">Address</label>
-                <div className="col-md-9">
-                  <input className="form-control"
-                         type="text"
-                         key="address"
-                         id="address"
-                         name="address"
-                         onChange={ onChange }
-                         value={ customer.get('address', '') }/>
-                </div>
-              </div>
-            </form>
+            <Form horizontal>
+              { fields }
+            </Form>
           </div>
         </div>
 
