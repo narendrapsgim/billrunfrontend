@@ -126,15 +126,17 @@ class ServiceSetup extends Component {
 
           <Tab title="Service Includes" eventKey={3}>
             <Panel style={{borderTop: 'none'}}>
-              <PlanIncludesTab
-                includeGroups={includeGroups}
-                onChangeFieldValue={this.props.updateItem}
-                onRemoveGroup={this.props.onGroupRemove}
-                addGroup={this.props.onGroupAdd}
-                addGroupProducts={this.props.addGroupProducts}
-                getGroupProducts={this.props.getGroupProducts}
-                removeGroupProducts={this.props.removeGroupProducts}
+             {/*
+							<PlanIncludesTab
+                  includeGroups={includeGroups}
+                  onChangeFieldValue={this.props.updateItem}
+                  onRemoveGroup={this.props.onGroupRemove}
+                  addGroup={this.props.onGroupAdd}
+                  addGroupProducts={this.props.addGroupProducts}
+                  getGroupProducts={this.props.getGroupProducts}
+                  removeGroupProducts={this.props.removeGroupProducts}
               />
+							*/}
             </Panel>
           </Tab>
 

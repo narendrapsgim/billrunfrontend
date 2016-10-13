@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 
 const DefaultState = Immutable.Map({
   description: '',
-  include: [],
+  include: {},
   name: '',
   price: ''
 });

@@ -39,7 +39,7 @@ function apiSaveItem(item, action){
     let itemFrom = moment(); //.format(globalSetting.apiDateTimeFormat)
     let itemTo = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
     item = item.set('from', itemFrom).set('to', itemTo);
-    formData.append('service', JSON.stringify(item));
+    formData.append('query', JSON.stringify(item));
   }
 
   else if(action === 'update'){

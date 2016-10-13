@@ -51,7 +51,7 @@ export default class ServiceDetails extends Component {
 
         <FormGroup controlId="formHorizontalEmail">
           <Col componentClass={ControlLabel} sm={3}>Price</Col>
-          <Col sm={9}>
+          <Col lg={3} sm={4}>
             <Field value={item.get('price', '')} onChange={this.onChangePrice} fieldType='price' />
           </Col>
         </FormGroup>

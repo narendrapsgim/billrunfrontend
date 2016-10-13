@@ -9,7 +9,7 @@ import Pager from '../Pager';
 import Filter from '../Filter';
 import { Button } from 'react-bootstrap';
 /* ACTIONS */
-import { getList } from '../../actions/listActions';
+import { getList, clearList } from '../../actions/listActions';
 import List from '../List';
 
 
@@ -37,6 +37,10 @@ class ServicesList extends Component {
 
   itemsType = 'services';
   itemType = 'service';
+
+  componentWillUnmount() {
+    this.props.clearList(this.itemsType);
+  }
 
   buildQuery = () => {
     return {
@@ -129,6 +133,7 @@ class ServicesList extends Component {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    clearList,
     getList }, dispatch);
 }
 function mapStateToProps(state, props) {
