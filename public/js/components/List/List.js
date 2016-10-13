@@ -87,6 +87,7 @@ export default class List extends Component {
       onClickEdit = () => {},
       edit = false,
       editText,
+      className,
     } = this.props;
 
     const table_header = fields.map((field, key) => {
@@ -132,7 +133,7 @@ export default class List extends Component {
                         );
 
     return (
-      <div className="List row">
+      <div className={"List row " + className}>
         <div className="table-responsive col-lg-12">
           <table className="table table-hover table-striped table-bordered">
             <thead>
