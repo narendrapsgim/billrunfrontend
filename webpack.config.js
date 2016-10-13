@@ -2,6 +2,7 @@ var webpack = require('webpack');
 var path = require( 'path' );
 var env = process.env.NODE_ENV || 'dev';
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 console.log('Node env is : ', env);
 
@@ -46,6 +47,12 @@ module.exports = {
       name: 'vendor',
     }),
     new ExtractTextPlugin('bundle.css'),
+    new HtmlWebpackPlugin({
+      filename: "../index.html",
+      hash: true,
+      template: 'index.tmpl.html',
+      inject: true
+    })
   ],
 
   // Transform source code using Babel and React Hot Loader
