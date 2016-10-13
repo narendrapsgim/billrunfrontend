@@ -5,17 +5,32 @@ import Select from 'react-select';
 export default class Subscription extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      plan: ''
+    };
   }
 
-  onChangeField() {
-    console.log(arguments);
+  componentWillMount() {
+    this.setState({plan: this.props.subscription.get('plan', '')});
   }
+
+  onChangePlan = (plan) => {
+    this.setState({plan});
+  };
+
+  onSave = () => {
+    this.props.onSave(this.props.subscription, this.state);
+  };
   
   render() {
-    const { subscription, plans, onSave, onCancel } = this.props;
+    const { plan } = this.state;
+    const { subscription, plans, onCancel } = this.props;
     if (!subscription) return (null);
+
     const available_plans = plans.map((plan, key) => {
-      return { value: plan.get('name'), label:  plan.get('name') };
+      return { value: plan.get('name'),
+               label:  plan.get('name') }
     }).toJS();
 
     return (
@@ -26,10 +41,9 @@ export default class Subscription extends Component {
             <div className="col-xs-11">
               <label>Plan</label>
               <Select id="plan"
-                      className="form-control"
-                      options={available_plans}
-                      value={subscription.get('plan')}
-                      onChange={this.onChangeField}
+                      options={ available_plans }
+                      value={ plan }
+                      onChange={ this.onChangePlan }
               />
             </div>
           </div>
@@ -37,14 +51,14 @@ export default class Subscription extends Component {
             <div className="col-xs-1">
               <button type="button"
                       className="btn btn-primary"
-                      onClick={onSave}>
+                      onClick={ this.onSave }>
                 Save
               </button>
             </div>
             <div className="col-xs-1">
               <button type="button"
                       className="btn btn-default"
-                      onClick={onCancel}>
+                      onClick={ onCancel }>
                 Cancel
               </button>
             </div>
