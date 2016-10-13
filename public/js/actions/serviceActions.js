@@ -43,9 +43,10 @@ function apiSaveItem(item, action){
   }
 
   else if(action === 'update'){
-    item = item.delete('to').delete('from').delete('_id');
-    let query = {'name': item.getIn(['name'])};
+    let query = {'_id': item.getIn(['_id', '$id'], 'undefined')};
     formData.append('query', JSON.stringify(query));
+
+    item = item.delete('to').delete('from').delete('_id');
     formData.append('update', JSON.stringify(item));
   }
 
