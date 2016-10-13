@@ -122,7 +122,7 @@ class CustomerSetup extends Component {
     window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url="${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}"`;
   }
 
-  onSaveSubscription = (subscription, data) => {
+  onSaveSubscription = (subscription, data, callback) => {
     const newsub = subscription.withMutations(map => {
       Object.keys(data).map(field => {
         map.set(field, data[field]);
@@ -140,6 +140,7 @@ class CustomerSetup extends Component {
     };
     apiBillRun(query).then(
       success => {
+        callback(true);
         this.props.dispatch(showSuccess("Saved subscription successfully!"));
       },
       failure => {

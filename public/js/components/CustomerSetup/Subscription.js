@@ -20,7 +20,6 @@ export default class Subscription extends Component {
   };
 
   onSave = () => {
-    console.log(this.props.subscription, this.state);
     this.props.onSave(this.props.subscription, this.state);
   };
   
