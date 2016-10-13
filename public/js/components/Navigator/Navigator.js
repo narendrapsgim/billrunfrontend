@@ -5,6 +5,8 @@ import {Link} from 'react-router';
 import {userDoLogout} from '../../actions/userActions';
 import classNames from "classnames";
 import { NavDropdown, MenuItem } from "react-bootstrap";
+/* Assets */
+import LogoImg from 'img/billrun-logo-tm.png';
 
 class Navigator extends Component {
   constructor(props) {
@@ -54,7 +56,7 @@ class Navigator extends Component {
       <nav className="navbar navbar-default navbar-fixed-top" role="navigation" style={{marginBottom: 0}}>
         <div className="navbar-header">
           <Link to="/" className="navbar-brand">
-            <img src="/img/billrun-logo-tm.png" style={{height: 22}}/>
+            <img src={LogoImg} style={{height: 22}}/>
           </Link>
         </div>
 
