@@ -7,7 +7,7 @@ import { Row, Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import { getItem, clearItem, updateItem, saveItem } from '../../actions/serviceActions';
-import { showDanger } from '../../actions/alertsActions';
+import { showDanger, showSuccess } from '../../actions/alertsActions';
 import {
   onGroupAdd,
   onGroupRemove } from '../../actions/planActions';
@@ -34,6 +34,7 @@ class ServiceSetup extends Component {
     updateItem: React.PropTypes.func.isRequired,
     saveItem: React.PropTypes.func.isRequired,
     clearItem: React.PropTypes.func.isRequired,
+    showSuccess: React.PropTypes.func.isRequired,
     showDanger: React.PropTypes.func.isRequired,
   }
 
@@ -86,11 +87,14 @@ class ServiceSetup extends Component {
 
   handleSave = () => {
     const { item } = this.props;
+    const action = (typeof this.props.params.itemId === 'undefined') ? 'created' : 'updated';
+
     this.props.saveItem(item).then(
       response => {
         if(response !== true){
           this.handleResponseError(response);
         } else {
+          this.props.showSuccess(`The service was ${action}`);
           this.props.router.push('/services');
         }
       }
@@ -123,10 +127,9 @@ class ServiceSetup extends Component {
               <ServiceDetails item={item} mode={action} updateItem={this.updateItem}/>
             </Panel>
           </Tab>
-
+{/*
           <Tab title="Service Includes" eventKey={3}>
             <Panel style={{borderTop: 'none'}}>
-             {/*
 							<PlanIncludesTab
                   includeGroups={includeGroups}
                   onChangeFieldValue={this.props.updateItem}
@@ -136,10 +139,9 @@ class ServiceSetup extends Component {
                   getGroupProducts={this.props.getGroupProducts}
                   removeGroupProducts={this.props.removeGroupProducts}
               />
-							*/}
             </Panel>
           </Tab>
-
+*/}
         </Tabs>
 
         <div style={{marginTop: 12}}>
@@ -164,6 +166,7 @@ function mapDispatchToProps(dispatch) {
     clearItem,
     updateItem,
     saveItem,
+    showSuccess,
     showDanger }, dispatch);
 }
 function mapStateToProps(state, props) {
