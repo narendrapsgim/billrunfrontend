@@ -82,10 +82,12 @@ export default class Filter extends Component {
     const { fields = [] } = this.props;
     const { filter_by, string } = this.state;
 
-    const fields_options = fields.map((field, key) => {
-      let selected = _.includes(filter_by, field.id);
-      return {value: field.id, label: field.placeholder, selected };
-    });
+    const fields_options = fields
+      .filter(field => field.showFilter !== false)
+      .map((field, key) => {
+        let selected = _.includes(filter_by, field.id);
+        return {value: field.id, label: field.placeholder, selected };
+      });
 
     return (
       <div className="Filter row" style={{marginBottom: 10}}>
