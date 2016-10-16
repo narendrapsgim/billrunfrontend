@@ -52,6 +52,9 @@ export default class Filter extends Component {
         [field]: this.filterCond(field, value)
       });
     }, {});
+
+    if (!string.replace(/\s/gi, '')) return JSON.stringify(baseObj);
+
     const filterObj = _.reduce(filter_by, (acc, field) => {
       return Object.assign({}, acc, {
         [field]: this.filterCond(field, string)
