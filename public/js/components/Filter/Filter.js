@@ -89,32 +89,30 @@ export default class Filter extends Component {
 
     return (
       <div className="Filter row" style={{marginBottom: 10}}>
-        <form action="">
-          <div className="filter-warp">
-            <div className="pull-left">
-              <input id="filter-string"
-                     placeholder="Search for..."
-                     onChange={this.onChangeFilterString}
-                     className="form-control"/>
-            </div>
-            <div className="pull-left">
-              <Multiselect data={fields_options}
-                           multiple
-                           onChange={this.onSelectFilterField}
-                           buttonWidth="100%"
-                           nonSelectedText="Search in fields"
-              />
-            </div>
-            <div className="search-button pull-left">
-              <button className="btn btn-default search-btn"
-                      onClick={this.onClickFilterBtn}
-                      type="submit"
-                      disabled={(string && filter_by.length === 0) || (!string && filter_by.length === 0)}>
-                <i className="fa fa-search"></i>
-              </button>
-            </div>
+        <div className="filter-warp">
+          <div className="pull-left">
+            <input id="filter-string"
+                   placeholder="Search for..."
+                   onChange={this.onChangeFilterString}
+                   className="form-control"/>
           </div>
-        </form>
+          <div className="pull-left">
+            <Multiselect data={fields_options}
+                         multiple
+                         onChange={this.onSelectFilterField}
+                         buttonWidth="100%"
+                         nonSelectedText="Search in fields"
+            />
+          </div>
+          <div className="search-button pull-left">
+            <button className="btn btn-default search-btn"
+                    onClick={this.onClickFilterBtn}
+                    type="submit"
+                    disabled={(string && filter_by.length === 0) || (!string && filter_by.length === 0)}>
+              <i className="fa fa-search"></i>
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
