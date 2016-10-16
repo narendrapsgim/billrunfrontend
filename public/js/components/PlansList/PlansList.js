@@ -127,7 +127,7 @@ class PlansList extends Component {
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                All available plans
+                List of all available plans
                 <div className="pull-right">
                   <Button bsSize="xsmall" className="btn-primary" onClick={this.onNewPlan}><i className="fa fa-plus"/>&nbsp;Add New</Button>
                 </div>
