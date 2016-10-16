@@ -49,14 +49,14 @@ export default class CSVFields extends Component {
           }
         </div> 
         <div className="col-lg-5 col-md-5">
-          <button type="button" style={{marginRight: 5}} disabled={!allowMoveUp} className="btn btn-default" onClick={this.onMoveFieldUp}>
+          <button type="button" style={{marginRight: 5}} disabled={!allowMoveUp} className="btn btn-default btn-sm" onClick={this.onMoveFieldUp}>
             <i className="fa fa-arrow-up" /> Move up
           </button>
-          <button type="button" style={{marginRight: 5}} disabled={!allowMoveDown} className="btn btn-default" onClick={this.onMoveFieldDown}>
+          <button type="button" style={{marginRight: 5}} disabled={!allowMoveDown} className="btn btn-default btn-sm" onClick={this.onMoveFieldDown}>
             <i className="fa fa-arrow-down" /> Move down
           </button>
-          <button type="button" className="btn btn-default" onClick={this.removeField}>
-            <i className="fa fa-trash-o" /> Remove
+          <button type="button" className="btn btn-default btn-sm" onClick={this.removeField}>
+            <i className="fa fa-trash-o danger-red" /> Remove
           </button>
         </div>
       </div>
