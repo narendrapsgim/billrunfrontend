@@ -145,3 +145,9 @@ textarea {
     margin-top: -2px;
     padding: 2px 4px;
 }
+
+.navbar.navbar-default.navbar-fixed-top {
+    margin-bottom: 0px;
+    border-bottom: 1px solid #e7e7e7;
+    background-color: white;
+}
