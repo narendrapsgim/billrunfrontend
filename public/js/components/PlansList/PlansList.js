@@ -87,7 +87,7 @@ class PlansList extends Component {
     const fields = [
       {id: "name", placeholder: "Name"},
       {id: "code", placeholder: "Code"},
-      {id: "to", display: false, type: "datetime"}
+      {id: "to", display: false, type: "datetime", showFilter: false}
     ];
 
     const trial_parser = (plan) => {

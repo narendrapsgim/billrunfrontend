@@ -95,7 +95,7 @@ class ServicesList extends Component {
 
     const fields = [
       {id: 'name', placeholder: 'Name'},
-      {id: 'to', display: false, type: 'datetime'}
+      {id: 'to', showFilter: false, type: 'datetime'}
     ];
 
     const tableFields = [
