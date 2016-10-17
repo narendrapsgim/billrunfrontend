@@ -14,6 +14,7 @@ import { showSuccess, showDanger } from '../..//actions/alertsActions';
 import { PageHeader, Tabs, Tab } from 'react-bootstrap';
 import Customer from './Customer';
 import Subscriptions from './Subscriptions';
+import ActionButtons from './ActionButtons';
 
 class CustomerSetup extends Component {
   constructor(props) {
@@ -22,6 +23,10 @@ class CustomerSetup extends Component {
     this.onChangeCustomerField = this.onChangeCustomerField.bind(this);
     this.onSaveCustomer = this.onSaveCustomer.bind(this);
     this.onCancel = this.onCancel.bind(this);
+
+    this.state = {
+      current: 1
+    };
   }
 
   componentDidMount() {
@@ -78,7 +83,7 @@ class CustomerSetup extends Component {
     const params = action === "update" ?
                    [{ method: "update" },
                     { type: "account" },
-                    { query: JSON.stringify({"aid": customer.get('aid')}) },
+                    { query: JSON.stringify({"_id": customer.getIn(['_id','$id'])}) },
                     { update: JSON.stringify(customer.toJS()) }] :
                    [{ method: "create" },
                     { type: "account" },
@@ -92,6 +97,10 @@ class CustomerSetup extends Component {
       success => {
         if (action === "update") {
           dispatch(showSuccess("Customer saved successfully"));
+
+          this.context.router.push({
+            pathname: "/customers"
+          });
         } else {
           dispatch(showSuccess("Customer created successfully"));
           dispatch(gotEntity('customer', success.data[0].data.details));
@@ -133,8 +142,7 @@ class CustomerSetup extends Component {
       params: [
         { method: "update" },
         { type: "subscriber" },
-        { query: JSON.stringify({"aid": subscription.get('aid'),
-                                 "sid": subscription.get('sid')}) },
+        { query: JSON.stringify({"_id": subscription.getIn(["_id", "$id"])}) },
         { update: JSON.stringify(data) }
       ]
     };
@@ -172,18 +180,10 @@ class CustomerSetup extends Component {
                 action={action}
                 settings={settings.getIn(['account', 'fields'])}
                 onChange={this.onChangeCustomerField} />
-      <button type="submit"
-              className="btn btn-primary"
-              onClick={this.onSaveCustomer}
-              style={{marginRight: 10}}>
-        Save
-      </button>
-      <button type="reset"
-              className="btn btn-default"
-              onClick={this.onCancel}>
-        Cancel
-      </button>
+
     </div>
+
+
   </div>
     </Tab>)
     ];
@@ -210,11 +210,16 @@ class CustomerSetup extends Component {
 
         <div className="row">
           <div className="col-lg-12">
-            <Tabs defaultActiveKey={1} animation={false} id="CustomerEditTabs">
+            <Tabs defaultActiveKey={1} animation={false} id="CustomerEditTabs" onSelect={(current) => { this.setState({current}); } }>
               { tabs }
             </Tabs>
           </div>
-        </div>  
+        </div>
+        <ActionButtons
+            show={this.state.current === 1}
+            onClickSave={this.onSaveCustomer}
+            onClickCancel={this.onCancel}
+        />
 
       </div>
     );

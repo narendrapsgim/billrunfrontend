@@ -19,14 +19,14 @@ export default class List extends Component {
   displayByType(field, entity) {
     switch (field.type) {
       case 'date':
-	return moment(entity.get(field.id)).format('L');
+        return moment(entity.get(field.id)).format(globalSetting.dateFormat);
       case 'time':
-	return moment(entity.get(field.id)).format('LT');
+        return moment(entity.get(field.id)).format(globalSetting.timeFormat);
       case 'datetime':
-	return moment(entity.get(field.id)).format('L LT');
+        return moment(entity.get(field.id)).format(globalSetting.datetimeFormat);
       case 'text':
       default:
-	return entity.get(field.id);
+        return entity.get(field.id);
     }
   }
   
@@ -87,6 +87,7 @@ export default class List extends Component {
       onClickEdit = () => {},
       edit = false,
       editText,
+      className,
     } = this.props;
 
     const table_header = fields.map((field, key) => {
@@ -132,7 +133,7 @@ export default class List extends Component {
                         );
 
     return (
-      <div className="List row">
+      <div className={"List row " + className}>
         <div className="table-responsive col-lg-12">
           <table className="table table-hover table-striped table-bordered">
             <thead>

@@ -9,6 +9,7 @@ import {
   clearPlan,
   getPlan,
   savePlan,
+  onGroupAdd,
   onGroupRemove,
   onPlanCycleUpdate,
   onPlanTariffAdd,
@@ -18,7 +19,6 @@ import {
   addGroupProducts,
   getGroupProducts,
   removeGroupProducts } from '../../actions/planGroupsActions';
-import { onGroupAdd } from '../../actions/planActions';
 import { savePlanRates } from '../../actions/planProductsActions';
 
 import PlanTab from './PlanTab';

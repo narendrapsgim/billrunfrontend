@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
-
 import List from '../List';
-import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 export default class SubscriptionsList extends Component {
   constructor(props) {
@@ -41,9 +40,7 @@ export default class SubscriptionsList extends Component {
                 <span>
                   All action subscriptions
                   <div className="pull-right">
-                    <DropdownButton title="Actions" id="ActionsDropDown" bsSize="xs" pullRight>
-                      <MenuItem eventKey="1" onClick={onNew.bind(this, aid)}>New</MenuItem>
-                    </DropdownButton>
+                    <Button bsSize="xsmall" className="btn-primary" onClick={onNew.bind(this, aid)}><i className="fa fa-plus"/>&nbsp;Add New</Button>
                   </div>
                 </span>
               </div>

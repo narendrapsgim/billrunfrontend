@@ -90,7 +90,7 @@ class CustomersList extends Component {
       { id: "lastname", placeholder: "Last Name" },
       { id: "address", placeholder: "Address" },
       { id: "email", placeholder: "Email" },
-      { id: "to", placeholder: "To", display: false, type: "datetime" }
+      { id: "to", placeholder: "To", showFilter: false, display: false, type: "datetime" }
     ];
 
     return (

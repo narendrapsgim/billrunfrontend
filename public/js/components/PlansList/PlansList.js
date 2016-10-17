@@ -87,7 +87,7 @@ class PlansList extends Component {
     const fields = [
       {id: "name", placeholder: "Name"},
       {id: "code", placeholder: "Code"},
-      {id: "to", display: false, type: "datetime"}
+      {id: "to", display: false, type: "datetime", showFilter: false}
     ];
 
     const trial_parser = (plan) => {
@@ -127,7 +127,7 @@ class PlansList extends Component {
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                All available plans
+                List of all available plans
                 <div className="pull-right">
                   <Button bsSize="xsmall" className="btn-primary" onClick={this.onNewPlan}><i className="fa fa-plus"/>&nbsp;Add New</Button>
                 </div>

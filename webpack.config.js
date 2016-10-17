@@ -2,6 +2,7 @@ var webpack = require('webpack');
 var path = require( 'path' );
 var env = process.env.NODE_ENV || 'dev';
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 console.log('Node env is : ', env);
 
@@ -29,7 +30,7 @@ module.exports = {
   // This will not actually create a bundle.js file in ./build. It is used
   // by the dev server for dynamic hot loading.
   output: {
-    path: __dirname + '/public/build/',
+    path: __dirname + (env === 'production' ? '/dist/' : '/public/build/'),
     filename: './bundle.[name].js'
   },
 
@@ -46,6 +47,12 @@ module.exports = {
       name: 'vendor',
     }),
     new ExtractTextPlugin('bundle.css'),
+    new HtmlWebpackPlugin({
+      filename: env === 'production' ? "../dist/index.html" : "../index.html",
+      hash: true,
+      template: 'index.tmpl.html',
+      inject: true
+    })
   ],
 
   // Transform source code using Babel and React Hot Loader

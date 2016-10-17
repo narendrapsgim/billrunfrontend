@@ -53,7 +53,7 @@ class Navigator extends Component {
 
   render() {
     return (
-      <nav className="navbar navbar-default navbar-fixed-top" role="navigation" style={{marginBottom: 0}}>
+      <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
         <div className="navbar-header">
           <Link to="/" className="navbar-brand">
             <img src={LogoImg} style={{height: 22}}/>
@@ -80,11 +80,16 @@ class Navigator extends Component {
                       <i className="fa fa-dashboard fa-fw"></i> Dashboard
                     </Link>
                   </li>
-
                   <li>
                     <Link to="/plans" id="plans" className={(this.state.activeNav === "plans") ? "active" : ""}
                           onClick={this.setActivNav}>
                       <i className="fa fa-cubes fa-fw"></i> Plans
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/services" id="services" className={(this.state.activeNav === "services") ? "active" : ""}
+                          onClick={this.setActivNav}>
+                      <i className="fa fa-puzzle-piece fa-fw"></i> Services
                     </Link>
                   </li>
                   <li>
