@@ -95,6 +95,7 @@ class InvoicesList extends Component {
       { id: "paid_by", title: "Status", parser: paid_by_parser },
       { id: "billrun_key", title: "Cycle" },
       { id: "aid", title: "Customer ID" },
+      { id: "payer_name", title: "Name" },
       { title: "Download", parser: download_parser }
     ];
     const filter_fields = [
