@@ -91,7 +91,7 @@ class ProductsList extends Component {
 
     const fields = [
       {id: "key", placeholder: "Name"},
-      {id: "to", display: false, type: "datetime"}
+      {id: "to", showFilter: false, type: "datetime"}
     ];
 
     const tableFields = [

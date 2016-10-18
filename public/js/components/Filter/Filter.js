@@ -52,6 +52,9 @@ export default class Filter extends Component {
         [field]: this.filterCond(field, value)
       });
     }, {});
+
+    if (!string.replace(/\s/gi, '')) return JSON.stringify(baseObj);
+
     const filterObj = _.reduce(filter_by, (acc, field) => {
       return Object.assign({}, acc, {
         [field]: this.filterCond(field, string)
@@ -79,10 +82,12 @@ export default class Filter extends Component {
     const { fields = [] } = this.props;
     const { filter_by, string } = this.state;
 
-    const fields_options = fields.map((field, key) => {
-      let selected = _.includes(filter_by, field.id);
-      return {value: field.id, label: field.placeholder, selected };
-    });
+    const fields_options = fields
+      .filter(field => field.showFilter !== false)
+      .map((field, key) => {
+        let selected = _.includes(filter_by, field.id);
+        return {value: field.id, label: field.placeholder, selected };
+      });
 
     return (
       <div className="Filter row" style={{marginBottom: 10}}>
@@ -104,7 +109,8 @@ export default class Filter extends Component {
           <div className="search-button pull-left">
             <button className="btn btn-default search-btn"
                     onClick={this.onClickFilterBtn}
-                    disabled={(string && filter_by.length === 0) || (!string && filter_by.length > 0)}>
+                    type="submit"
+                    disabled={(string && filter_by.length === 0) || (!string && filter_by.length === 0)}>
               <i className="fa fa-search"></i>
             </button>
           </div>

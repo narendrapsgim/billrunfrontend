@@ -70,9 +70,9 @@ export default class SampleCSV extends Component {
           <div className="form-group">
             <div className="col-lg-2">
               <button type="button"
-                      className="btn btn-info"
+                      className="btn btn-primary btn-sm"
                       onClick={onAddField}>
-                <i className="fa fa-plus"/> Add field
+                <i className="fa fa-plus"/> Add Field
               </button>
             </div>
           </div>
