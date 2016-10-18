@@ -2,6 +2,8 @@ export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
 export const SAVE_SERVICE = 'SAVE_SERVICE';
 export const CLEAR_SERVICE = 'CLEAR_SERVICE';
+export const ADD_GROUP_SERVICE = 'ADD_GROUP_SERVICE';
+export const REMOVE_GROUP_SERVICE = 'REMOVE_GROUP_SERVICE';
 
 import moment from 'moment';
 import { apiBillRun } from '../common/Api';
@@ -110,5 +112,24 @@ export function saveItem(item) {
       dispatch(finishProgressIndicator());
       return (error);
     });
+  };
+}
+
+export function onGroupAdd(groupName, usage, value) {
+  return {
+    type: ADD_GROUP_SERVICE,
+    groupName,
+    usage,
+    value
+  };
+}
+
+export function onGroupRemove(groupName, usage, productKeys) {
+  const keys = Array.isArray(productKeys) ? productKeys : [productKeys] ;
+  return {
+    type: REMOVE_GROUP_SERVICE,
+    groupName,
+    usage,
+    productKeys : keys
   };
 }
