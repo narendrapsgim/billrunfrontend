@@ -75,7 +75,7 @@ export default class Plan extends Component {
   }
 
   getPeriodicityOptions = () => {
-    const periodicity_options = {'':'Select...', 'month': 'Month', 'year': 'Year'};
+    const periodicity_options = {'':'Select...', 'month': 'Monthly', 'year': 'Yearly'};
     return Object.keys(periodicity_options).map( (key, i) =>
       <option value={key} key={i}>{periodicity_options[key]}</option>
     );
@@ -157,13 +157,13 @@ export default class Plan extends Component {
                   </FormGroup>
                 </Col>
 
-              <Col lg={4} md={4}>
-                <FormGroup>
-                  <ControlLabel>Recurrence</ControlLabel>
-                  <Field min="1" fieldType="number" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
-                </FormGroup>
-              </Col>
-
+		{/* <Col lg={4} md={4}>
+                    <FormGroup>
+                    <ControlLabel>Recurrence</ControlLabel>
+                    <Field min="1" fieldType="number" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
+                    </FormGroup>
+		    </Col>
+		  */}
               <Col lg={4} md={4}>
                 <FormGroup>
                   <ControlLabel>&nbsp;</ControlLabel>

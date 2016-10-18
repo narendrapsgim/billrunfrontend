@@ -97,7 +97,8 @@ function savePlanToDB(plan, action, callback) {
   }
   formData.append("coll", 'plans');
   formData.append("type", type);
-  formData.append("data", JSON.stringify(plan));
+  /* HARD CODED */
+  formData.append("data", JSON.stringify(plan.setIn(['recurrence', 'unit'], 1)));
 
   console.log("Save plan : ", plan.toJS());
 

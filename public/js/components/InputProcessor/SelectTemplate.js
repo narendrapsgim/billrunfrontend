@@ -55,11 +55,13 @@ export default class SelectTemplate extends Component {
               <form className="form-horizontal">
                 <div className="form-group">
                   <div className="col-lg-3 col-md-4">
-                    <input type="radio"
-                           name="select-template"
-                           value="predefined"
-                           checked={this.state.selected === "predefined"}
-                           onChange={this.onCheck} />I will use predefined input processor
+		    <label>
+                      <input type="radio"
+                             name="select-template"
+                             value="predefined"
+                             checked={this.state.selected === "predefined"}
+                             onChange={this.onCheck} /> I will use predefined input processor
+		    </label>
                   </div>
                   <div className="col-lg-9 col-md-9">
                     <select className="form-control"
@@ -72,11 +74,13 @@ export default class SelectTemplate extends Component {
                 </div>
                 <div className="form-group">
                   <div className="col-lg-3 col-md-4">
-                    <input type="radio"
-                           name="select-template"
-                           value="manual"
-                           checked={this.state.selected !== "predefined"}
-                           onChange={this.onCheck} />I will configure a custom input processor
+		    <label>
+                      <input type="radio"
+                             name="select-template"
+                             value="manual"
+                             checked={this.state.selected !== "predefined"}
+                             onChange={this.onCheck} /> I will configure a custom input processor
+		    </label>
                   </div>
                 </div>
                 <div style={{marginTop: 12, float: "right"}}>
