@@ -157,13 +157,13 @@ export default class Plan extends Component {
                   </FormGroup>
                 </Col>
 
-              <Col lg={4} md={4}>
-                <FormGroup>
-                  <ControlLabel>Recurrence</ControlLabel>
-                  <Field min="1" fieldType="number" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
-                </FormGroup>
-              </Col>
-
+		{/* <Col lg={4} md={4}>
+                    <FormGroup>
+                    <ControlLabel>Recurrence</ControlLabel>
+                    <Field min="1" fieldType="number" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
+                    </FormGroup>
+		    </Col>
+		  */}
               <Col lg={4} md={4}>
                 <FormGroup>
                   <ControlLabel>&nbsp;</ControlLabel>
