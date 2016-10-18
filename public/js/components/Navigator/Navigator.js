@@ -153,6 +153,13 @@ class Navigator extends Component {
                               className={(this.state.activeNav === "settingsGateway") ? "active" : ""}
                               onClick={this.setActivNav}>Payment Gateways</Link>
                       </li>
+
+                      <li>
+                        <Link to="/collections" id="collections"
+                              className={(this.state.activeNav === "collections") ? "active" : ""}
+                              onClick={this.setActivNav}>Collections</Link>
+                      </li>
+
                     </ul>
                   </li>
                 </ul>

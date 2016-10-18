@@ -25,6 +25,8 @@ import PaymentGateways from '../components/PaymentGateways';
 import User from '../components/User';
 import UserSetup from '../components/UserSetup';
 import SelectTemplate from '../components/InputProcessor/SelectTemplate';
+import Collections from '../components/Collections/Collections';
+import Collection from '../components/Collection/Collection';
 
 export default () => {
   return (
@@ -50,6 +52,8 @@ export default () => {
       <Route path="/users" component={RequireAuth(User)} title="Users"/>
       <Route path="/user" component={RequireAuth(UserSetup)} title="User"/>
       <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Input Processor" />
+      <Route path="/collections" component={RequireAuth(Collections)} title="Collections" />
+      <Route path="/collection" component={RequireAuth(Collection)} title="Collection" />
       <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />
     </Route>

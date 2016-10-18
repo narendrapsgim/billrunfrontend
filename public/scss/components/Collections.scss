@@ -1,0 +1,37 @@
+@import "../mixin";
+
+.collections-list {
+   > .panel-default {
+    border: 0;
+  }
+
+  .collections-item-display {
+    text-align: center;
+    height: 150px;
+    margin-bottom: 10px;
+    min-width: 205px;
+
+    .panel {
+      height: 100%;
+    }
+
+    .panel-body {
+      padding: 5px;
+
+      > div {
+        margin: 3px 0 5px;
+      }
+
+      button {
+        margin: 10px 0 5px;
+        width: 70%;
+      }
+    }
+
+    &.add-new {
+      button {
+        @include vertical-align();
+      }
+    }
+  }
+}
