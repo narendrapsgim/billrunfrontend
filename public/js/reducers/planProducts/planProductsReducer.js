@@ -15,6 +15,7 @@ import {
   PLAN_INCLUDE_GROUP_PRODUCTS_REMOVE,
   PLAN_INCLUDE_GROUP_PRODUCTS_SET } from '../../actions/planGroupsActions';
   import { REMOVE_GROUP } from '../../actions/planActions';
+  import { REMOVE_GROUP_SERVICE } from '../../actions/serviceActions';
 
 const DefaultState = Immutable.Map();
 const DefaultRate = Immutable.Record({
@@ -139,6 +140,7 @@ const planProductsReducer = (state = DefaultState, action) => {
       return state;
 
     case REMOVE_GROUP:
+    case REMOVE_GROUP_SERVICE:
       action.productKeys.forEach( (key) => {
         state = state.updateIn([key, 'rates', action.usage, 'groups'], list => list.filter( group => group !== action.groupName));
       });
