@@ -75,7 +75,7 @@ export default class Plan extends Component {
   }
 
   getPeriodicityOptions = () => {
-    const periodicity_options = {'':'Select...', 'month': 'Month', 'year': 'Year'};
+    const periodicity_options = {'':'Select...', 'month': 'Monthly', 'year': 'Yearly'};
     return Object.keys(periodicity_options).map( (key, i) =>
       <option value={key} key={i}>{periodicity_options[key]}</option>
     );

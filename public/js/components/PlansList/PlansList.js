@@ -104,7 +104,7 @@ class PlansList extends Component {
     }
 
     const billing_frequency_parser = (plan) => {
-      return plan.getIn(['recurrence', 'unit']) + " " + plan.getIn(['recurrence', 'periodicity']);
+      return plan.getIn(['recurrence', 'periodicity']) + "ly";
     }
 
     const charging_mode_parser = (plan) => {
