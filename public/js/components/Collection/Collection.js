@@ -3,18 +3,33 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
 import { showDanger } from '../../actions/alertsActions';
+import Help from '../Help';
+import {
+  setCollectionName,
+  setCollectionDays,
+  setCollectionActive,
+  setCollectionMailSubject,
+  setCollectionMailBody,
+  clearCollection
+} from '../../actions/collectionsActions';
 
 /* COMPONENTS */
 import ActionButtons from '../Elements/ActionButtons';
 import StateDropDown from '../Elements/StateDropDown';
 import Field from '../Field';
+import MailEditorRich from '../MailEditor/MailEditorRich';
+
+/* DEV - TO replace with real API */
+import fieldsList from './stub_fields.json';
 
 class Collection extends Component {
   constructor(props) {
     super(props);
 
     this.onChange = this.onChange.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
+    this.onActiveChange = this.onActiveChange.bind(this);
+    this.onMailChange = this.onMailChange.bind(this);
+    this.onCancel = this.onCancel.bind(this);
   }
 
   componentDidMount() {
@@ -30,37 +45,52 @@ class Collection extends Component {
   }
 
   onChange (e) {
-    console.log(e);
+    switch (e.target.name) {
+      case 'name':
+        this.props.dispatch(setCollectionName(e.target.value));
+        break;
 
+      case 'days':
+        this.props.dispatch(setCollectionDays(e.target.value));
+        break;
+
+      case 'active':
+        this.props.dispatch(setCollectionActive(e.target.value));
+        break;
+
+      case 'subject':
+        this.props.dispatch(setCollectionMailSubject(e.target.value));
+        break;
+    }
   }
 
-  handleCancel() {
-    let r = confirm("are you sure you want to stop editing Export Generator?");
-    const { dispatch, fileType } = this.props;
+  onActiveChange (val) {
+    let active = false;
+    if (val === 1) {
+      active = true;
+    }
+    this.props.dispatch(setCollectionActive(active));
+  }
+
+  onMailChange (val) {
+    this.props.dispatch(setCollectionMailBody(val));
+  }
+
+  onCancel() {
+    let r = confirm("are you sure you want to stop editing Collection?");
+    const { dispatch } = this.props;
     if (r) {
-      if (fileType !== true) {
-        dispatch(clearExportGenerator());
-        this.goBack();
-      } else {
-        const cb = (err) => {
-          if (err) {
-            dispatch(showDanger("Please try again"));
-            return;
-          }
-          dispatch(clearExportGenerator());
-          this.goBack();
-        };
-        // need to handle
-        dispatch(clearExportGenerator(this.props.settings.get('file_type'), cb));
-      }
+      dispatch(clearCollection());
+
+      this.context.router.push({
+        pathname: "collections"
+      });
     }
   }
 
   render() {
     const { settings } = this.props;
-    const { action } = this.props.location.query;
-    const title = action === 'new' ? "New Collection" : `Edit Collection - ${settings.get('id')}`;
-
+    const { active } = settings.get('active', 1);
     return (
       <div>
         <div className="row">
@@ -74,15 +104,22 @@ class Collection extends Component {
                   <FormGroup controlId='name'>
                     <Col componentClass={ControlLabel} md={2}>Name</Col>
                     <Col sm={10}>
-                      <FormControl type="text" onChange={this.onChange} value={settings.name}/>
+                      <FormControl type="text" name="name" onChange={this.onChange} value={settings.get('name', '')}/>
                     </Col>
                   </FormGroup>
 
                   <FormGroup controlId='days'>
                     <Col componentClass={ControlLabel} md={2}>Send in</Col>
                     <Col sm={2} className="form-input-with-hint-60">
-                      <Field onChange={this.onChange} value={settings.days} fieldType="number" min="1"/>
+                      <Field name="days" onChange={this.onChange} value={settings.get('days',1)} fieldType="number" min="1"/>
                       <span className="help-block">Days</span>
+                    </Col>
+                  </FormGroup>
+
+                  <FormGroup controlId='active'>
+                    <Col componentClass={ControlLabel} md={2}>Active</Col>
+                    <Col sm={2}>
+                      <StateDropDown name="active" onChange={this.onActiveChange} value={active}/>
                     </Col>
                   </FormGroup>
                 </div>
@@ -90,25 +127,19 @@ class Collection extends Component {
 
               <div className="panel panel-default">
                 <div className="panel-heading">
-                  Email
+                  Email Template <Help contents={"Template for email that will be send to customer"} />
                 </div>
                 <div className="panel-body">
                   <FormGroup controlId='name'>
                     <Col componentClass={ControlLabel} md={2}>Subject</Col>
                     <Col sm={10}>
-                      <FormControl type="text" onChange={this.onChange} value={settings.Subject}/>
+                      <FormControl name="subject" type="text" onChange={this.onChange} value={settings.get('subject','')}/>
                     </Col>
                   </FormGroup>
                   
-                  <Col componentClass={ControlLabel} md={2}>Email Body</Col>
-                  <Col md={12}>
-                    <Col md={8}>
-                      Editor
-                    </Col>
-                    <Col md={4}>
-                      PlaceHolders
-                    </Col>
-                  </Col>
+                  <div>
+                    <MailEditorRich value={settings.get('body','body of the fucking ediutor')} name="body" fields={fieldsList} onChange={this.onMailChange} />
+                  </div>
                 </div>
               </div>
             </Form>
@@ -129,7 +160,13 @@ Collection.contextTypes = {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-     }, dispatch);
+    setCollectionName,
+    setCollectionDays,
+    setCollectionActive,
+    setCollectionMailSubject,
+    setCollectionMailBody,
+    clearCollection
+  }, dispatch);
 }
 
 function mapStateToProps(state, props) {

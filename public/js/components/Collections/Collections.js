@@ -18,8 +18,6 @@ class Collections extends Component {
       page: 0,
       sort: 'days'
     };
-
-    // console.log(collectionStub);
   }
 
   componentDidMount() {
@@ -40,8 +38,6 @@ class Collections extends Component {
   }
 
   render() {
-    // let { settings } = this.props;
-
     let collections = this.props.collections;
 
     return (
@@ -80,4 +76,3 @@ function mapStateToProps(state, props) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Collections);
-

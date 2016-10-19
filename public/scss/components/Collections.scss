@@ -6,7 +6,6 @@
   }
 
   .collections-item-display {
-    text-align: center;
     height: 150px;
     margin-bottom: 10px;
     min-width: 205px;
@@ -15,8 +14,11 @@
       height: 100%;
     }
 
+    .panel-default>.panel-heading {
+      background: #ffffff;
+    }
     .panel-body {
-      padding: 5px;
+      padding: 5px 15px;
 
       > div {
         margin: 3px 0 5px;
@@ -24,13 +26,15 @@
 
       button {
         margin: 10px 0 5px;
-        width: 70%;
+        width: 48%;
       }
     }
 
     &.add-new {
+      text-align: center;
       button {
         @include vertical-align();
+        font-size: 14px;
       }
     }
   }

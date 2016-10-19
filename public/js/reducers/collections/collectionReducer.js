@@ -4,17 +4,17 @@ import {
   SET_COLLECTION_DAYS,
   SET_COLLECTION_ACTIVE,
   SET_COLLECTION_MAIL_SUBJECT,
-  SET_COLLECTION_MAIL_BODY
-
-  } from '../../actions/collectionsActions';
+  SET_COLLECTION_MAIL_BODY,
+  CLEAR_COLLECTION
+} from '../../actions/collectionsActions';
 
 const defaultState = Immutable.Map({
-  id: '',
-  name: '',
-  days: null,
-  active: true,
-  subject: '',
-  body: ''
+  id: undefined,
+  name: undefined,
+  days: 1,
+  active: 1,
+  subject: undefined,
+  body: undefined
 });
 
 const collectionReducer = (state = defaultState, action) => {
@@ -37,6 +37,9 @@ const collectionReducer = (state = defaultState, action) => {
 
     case SET_COLLECTION_MAIL_BODY:
       return state.set('body', action.body);
+
+    case CLEAR_COLLECTION:
+      return defaultState;
 
     default:
       return state;
