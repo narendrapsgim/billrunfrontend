@@ -166,7 +166,7 @@ export default class Plan extends Component {
 		  */}
               <Col lg={4} md={4}>
                 <FormGroup>
-                  <ControlLabel>&nbsp;</ControlLabel>
+                  <ControlLabel>Billing Frequency</ControlLabel>
                   <FormControl componentClass="select" placeholder="select" value={periodicity} onChange={this.onChangePeriodicity}>
                     { this.getPeriodicityOptions() }
                   </FormControl>
