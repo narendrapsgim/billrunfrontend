@@ -117,7 +117,7 @@ export default class ProductPrice extends Component {
 
         <Col lg={5} md={5} sm={6} xs={12}>
           <FormGroup>
-            <ControlLabel>Price</ControlLabel>
+            <ControlLabel>Price Per Interval</ControlLabel>
             <Field value={item.get('price', '')} onChange={this.onEditPrice} fieldType="price" />
           </FormGroup>
         </Col>

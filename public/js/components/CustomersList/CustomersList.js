@@ -86,9 +86,9 @@ class CustomersList extends Component {
 
     const fields = [
       { id: "aid", placeholder: "Id", type: 'number', sort: true },
-      { id: "firstname", placeholder: "First Name" },
-      { id: "lastname", placeholder: "Last Name" },
-      { id: "address", placeholder: "Address" },
+      { id: "firstname", placeholder: "First Name", sort: true },
+      { id: "lastname", placeholder: "Last Name", sort: true },
+      { id: "address1", placeholder: "Address 1", sort: true },
       { id: "email", placeholder: "Email" },
       { id: "to", placeholder: "To", showFilter: false, display: false, type: "datetime" }
     ];
