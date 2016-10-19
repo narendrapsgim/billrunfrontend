@@ -89,13 +89,13 @@ class InvoicesList extends Component {
     };
     const fields = [
       { id: "invoice_id", title: "Invoice Id", sort: true },
-      { id: "invoice_date", title: "Date", cssClass: 'short-date' },
-      { id: "due_date", title: "Due", cssClass: 'short-date' },
-      { id: "amount", title: "Amount" },
+      { id: "invoice_date", title: "Date", cssClass: 'short-date', sort: true },
+      { id: "due_date", title: "Due", cssClass: 'short-date', sort: true },
+      { id: "amount", title: "Amount", sort: true },
       { id: "paid_by", title: "Status", parser: paid_by_parser },
-      { id: "billrun_key", title: "Cycle" },
-      { id: "aid", title: "Customer ID" },
-      { id: "payer_name", title: "Name" },
+      { id: "billrun_key", title: "Cycle", sort: true },
+      { id: "aid", title: "Customer ID", sort: true },
+      { id: "payer_name", title: "Name", sort: true },
       { title: "Download", parser: download_parser }
     ];
     const filter_fields = [
