@@ -115,12 +115,13 @@ export function saveItem(item) {
   };
 }
 
-export function onGroupAdd(groupName, usage, value) {
+export function onGroupAdd(groupName, usage, value, shared) {
   return {
     type: ADD_GROUP_SERVICE,
     groupName,
     usage,
-    value
+    value,
+    shared
   };
 }
 
