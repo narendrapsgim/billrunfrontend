@@ -1,9 +1,13 @@
-import { GOT_SERVICE, CLEAR_SERVICE, UPDATE_SERVICE } from '../../actions/serviceActions';
+import {
+  GOT_SERVICE,
+  CLEAR_SERVICE,
+  UPDATE_SERVICE,
+  ADD_GROUP_SERVICE,
+  REMOVE_GROUP_SERVICE } from '../actions/serviceActions';
 import Immutable from 'immutable';
 
 const DefaultState = Immutable.Map({
   description: '',
-  include: {},
   name: '',
   price: ''
 });
@@ -19,6 +23,13 @@ const serviceReducer = (state = DefaultState, action) => {
 
     case UPDATE_SERVICE:
       return state.setIn(action.path, action.value);
+
+    case ADD_GROUP_SERVICE:
+      const group = Immutable.Map({[action.usage] : action.value});
+      return state.setIn(['include', 'groups', action.groupName], group);
+
+    case REMOVE_GROUP_SERVICE:
+      return state.deleteIn(['include', 'groups', action.groupName]);
 
     default:
       return state;

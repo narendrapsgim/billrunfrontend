@@ -3,12 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Panel, Form, FormGroup, Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
-
-import {
-  removePlanInclude,
-  changePlanInclude } from '../../actions/planActions';
 import { getAllGroup } from '../../actions/planGroupsActions';
-
 import Help from '../Help';
 import { PlanDescription } from '../../FieldDescriptions';
 import PlanIncludeGroupEdit from './components/PlanIncludeGroupEdit';
@@ -16,7 +11,6 @@ import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 
 
 class PlanIncludesTab extends Component {
-
 
   static propTypes = {
     allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
@@ -39,12 +33,14 @@ class PlanIncludesTab extends Component {
   // }
 
   componentDidMount() {
-    getAllGroup().then( (response) => {
+    getAllGroup().then( (responses) => {
       var groups = new Set();
-      _.values(response.data[0].data.details).forEach( (plan) => {
-        Object.keys(plan.include.groups).forEach( (groupName) => {
-          groups.add(groupName);
-        })
+      responses.data.forEach( (response) => {
+        _.values(response.data.details).forEach( (plan) => {
+          Object.keys(plan.include.groups).forEach( (groupName) => {
+            groups.add(groupName);
+          })
+        });
       });
 
       this.setState({ existingGroups: Array.from(groups) });

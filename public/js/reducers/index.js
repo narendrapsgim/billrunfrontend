@@ -12,7 +12,7 @@ import user from './userReducer';
 import plan from './planReducer';
 import planProducts from './planProducts';
 import exportGenerator from './exportGeneratorReducer';
-import services from './servicesReducer';
+import service from './serviceReducer';
 
 
 export default combineReducers({
@@ -29,5 +29,5 @@ export default combineReducers({
   plan,
   planProducts,
   exportGenerator,
-  services
+  service
 });

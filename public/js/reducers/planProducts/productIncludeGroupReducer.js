@@ -5,6 +5,7 @@ import {
   PLAN_INCLUDE_GROUP_PRODUCTS_SET } from '../../actions/planGroupsActions';
 import { PLAN_PRODUCTS_CLEAR } from '../../actions/planProductsActions';
 import { REMOVE_GROUP } from '../../actions/planActions';
+import { REMOVE_GROUP_SERVICE } from '../../actions/serviceActions';
 
 const DefaultState = Immutable.Map();
 
@@ -12,6 +13,7 @@ const productIncludeGroupReducer = (state = DefaultState, action) => {
 
   switch(action.type) {
 
+    case REMOVE_GROUP_SERVICE:
     case REMOVE_GROUP:
       return state.delete(action.groupName);
 
