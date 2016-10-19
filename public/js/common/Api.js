@@ -110,7 +110,7 @@ function buildQueryString(params = null){
     queryParams = params.reduce((previousValue, currentValue, currentIndex) => {
       let key = Object.keys(currentValue)[0];
       let prev = (currentIndex === 0) ? previousValue : previousValue + '&';
-      return prev + key + '=' + currentValue[key];
+      return prev + encodeURIComponent(key) + '=' + encodeURIComponent(currentValue[key]);
     }, '?');
   }
 	//Set server debug flag if it enabled in config file
