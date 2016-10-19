@@ -83,12 +83,6 @@ class PlanIncludeGroupEdit extends Component {
     const { name, value, usaget, shared, groupProducts, allGroupsProductsKeys } = this.props;
     const { open } = this.state;
 
-    const style = {
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-      overflow: 'hidden'
-    }
-
     if(open){ //return edit mode
       return (
         <tr>
@@ -140,11 +134,11 @@ class PlanIncludeGroupEdit extends Component {
 
     return ( //return row mode
       <tr>
-        <td style={style}>{name}</td>
-        <td style={style}>{usaget}</td>
-        <td style={style}>{value}</td>
-        <td style={style}>{ groupProducts.join(', ')}</td>
-        <td className="text-center" style={style}>{shared ? 'Yes' : 'No'}</td>
+        <td className="td-ellipsis">{name}</td>
+        <td className="td-ellipsis">{usaget}</td>
+        <td className="td-ellipsis">{value}</td>
+        <td className="td-ellipsis">{ groupProducts.join(', ')}</td>
+        <td className="text-center td-ellipsis">{shared ? 'Yes' : 'No'}</td>
         <td className="text-right" style={{ paddingRight: 0 }}>
           <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 9, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
           <Button onClick={this.onGroupRemove} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
