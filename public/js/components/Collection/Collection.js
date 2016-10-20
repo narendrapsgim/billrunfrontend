@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { bindActionCreators } from 'redux';
@@ -25,6 +26,8 @@ import fieldsList from './stub_fields.json';
 
 class Collection extends Component {
   static propTypes = {
+    settings: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+    dispatch: React.PropTypes.func.isRequired,
     router: React.PropTypes.shape({
       push: React.PropTypes.func.isRequired
     }).isRequired
@@ -41,7 +44,7 @@ class Collection extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const { file_type, action } = this.props.location.query;
+    // const { file_type, action } = this.props.location.query;
 
     // Should be deal with edit
     // if (action !== "new") dispatch(getProcessorSettings(file_type));
@@ -94,6 +97,7 @@ class Collection extends Component {
   }
 
   render() {
+    console.log(this);
     const { settings } = this.props;
     const { active } = settings.get('active', 1);
     return (
@@ -151,8 +155,8 @@ class Collection extends Component {
           </div>
         </div>
         <ActionButtons
-          onClickSave={this.onSave}
-          onClickCancel={this.onCancel}
+            onClickSave={this.onSave}
+            onClickCancel={this.onCancel}
         />
       </div>
     );

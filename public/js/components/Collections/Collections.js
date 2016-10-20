@@ -9,6 +9,11 @@ import CollectionItemAdd from './Elements/CollectionItemAdd';
 import collectionStub from './stub_collection.json';
 
 class Collections extends Component {
+  static propTypes = {
+    collections: React.PropTypes.instanceOf(Immutable.List)
+  }
+
+
   constructor(props) {
     super(props);
 

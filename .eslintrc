@@ -10,7 +10,7 @@
   "parser": "babel-eslint",
   "rules": {
     "react/display-name": 0,
-    "react/forbid-prop-types": 1,
+    "react/forbid-prop-types": 0,
     "react/react-in-jsx-scope": 1,
     "react/require-extension": 1,
     # "react/require-render-return": 1,
@@ -43,7 +43,7 @@
     "react/jsx-uses-vars": 1,
     "prefer-es6-class": 0,
     # "quotes": [1, "single"],
-    "strict": [2, "never"],
+    "strict": [2, "never"]
   },
   "plugins": [
     "react"
