@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import { bindActionCreators } from 'redux';
 import { Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
 import { showDanger } from '../../actions/alertsActions';
@@ -23,6 +24,12 @@ import MailEditorRich from '../MailEditor/MailEditorRich';
 import fieldsList from './stub_fields.json';
 
 class Collection extends Component {
+  static propTypes = {
+    router: React.PropTypes.shape({
+      push: React.PropTypes.func.isRequired
+    }).isRequired
+  }
+
   constructor(props) {
     super(props);
 
@@ -82,9 +89,7 @@ class Collection extends Component {
     if (r) {
       dispatch(clearCollection());
 
-      this.context.router.push({
-        pathname: "collections"
-      });
+      this.props.router.push(`/collections`);
     }
   }
 
@@ -154,10 +159,6 @@ class Collection extends Component {
   }
 }
 
-Collection.contextTypes = {
-  router: React.PropTypes.object.isRequired
-};
-
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     setCollectionName,
@@ -173,4 +174,4 @@ function mapStateToProps(state, props) {
   return { settings: state.collections.collection};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Collection);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Collection));
