@@ -27,11 +27,6 @@ class PlanIncludesTab extends Component {
     existingGroups: []
   }
 
-  // shouldComponentUpdate(nextProps, nextState){
-  //   return true;
-  //   // return !Immutable.is(nextProps.plan.get('include'), this.props.plan.get('include'));
-  // }
-
   componentDidMount() {
     getAllGroup().then( (responses) => {
       var groups = new Set();
@@ -85,7 +80,7 @@ class PlanIncludesTab extends Component {
         <th style={{ width: 100 }}>Include</th>
         <th>Products</th>
         <th className="text-center" style={{ width: 100 }}>Shared</th>
-        <th style={{ width:177 }}/>
+        <th style={{ width:180 }}/>
       </tr>
     );
     const groupsTable = (

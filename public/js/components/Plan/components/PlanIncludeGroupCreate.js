@@ -1,8 +1,10 @@
 import React, { Component }  from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox,
-   Col, Row, Collapse, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox,
+   Col, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import { GroupsInclude } from '../../../FieldDescriptions';
+import Help from '../../Help';
 import UsagetypeSelect from './UsagetypeSelect';
 import Field from '../../Field';
 import Products from './Products';
@@ -185,47 +187,46 @@ export default class PlanIncludeGroupCreate extends Component {
       case 0:
         return (
           <FormGroup validationState={error.length > 0 ? "error" : null}>
-            <Col componentClass={ControlLabel} sm={2}>Name</Col>
-            <Col sm={10}>
+            <Col componentClass={ControlLabel} sm={3}>Name<Help contents={GroupsInclude.name} /></Col>
+            <Col sm={8}>
               <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName}/>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
-              <h5><small>* Group name should be unique for all plans</small></h5>
             </Col>
           </FormGroup>
         );
 
       case 1:
-        return ([
-          <FormGroup validationState={error.length > 0 ? "error" : null} >
-            <Col componentClass={ControlLabel} sm={2}>Unit Type</Col>
-            <Col sm={10}>
-              <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={usage}/>
-              { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
-            </Col>
-          </FormGroup>,
-          <FormGroup>
-            <Col smOffset={2} sm={10}>
-              <Checkbox checked={shared} onChange={this.onChangeShared}>Shared</Checkbox>
-            </Col>
-          </FormGroup>
-        ]);
-
-      case 2:
         return (
           <FormGroup validationState={error.length > 0 ? "error" : null} >
-            <Col componentClass={ControlLabel} sm={2}>Include</Col>
-            <Col sm={10}>
-              <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
-              { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
+            <Col componentClass={ControlLabel} sm={3}>Unit Type</Col>
+            <Col sm={8}>
+              <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={usage}/>
+              { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
             </Col>
           </FormGroup>
         );
 
+      case 2:
+        return ([
+          <FormGroup validationState={error.length > 0 ? "error" : null} >
+            <Col componentClass={ControlLabel} sm={3}>Include</Col>
+            <Col sm={8}>
+              <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
+              { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
+            </Col>
+          </FormGroup>,
+          <FormGroup>
+            <Col smOffset={3} sm={8}>
+              <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared} /></Checkbox>
+            </Col>
+          </FormGroup>
+        ]);
+
       case 3:
         return (
           <FormGroup validationState={error.length > 0 ? "error" : null}>
-            <Col componentClass={ControlLabel} sm={2}>Products</Col>
-            <Col sm={10}>
+            <Col componentClass={ControlLabel} sm={3}>Products</Col>
+            <Col sm={8}>
               { products.size
                ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />
                : <p style={{marginTop:8}}>No products in group ...</p>
@@ -246,51 +247,46 @@ export default class PlanIncludeGroupCreate extends Component {
     const { stepIndex, open } = this.state;
 
     return (
-      <div >
-        <Col>
-          { open
-            ? <h4 className="text-center" style={{ margin: 0, backgroundColor: "rgba(0, 0, 0, 0.027451)", paddingTop: 15 }}>Create New Group</h4>
-            : <Button bsSize="xsmall" className="btn-primary" onClick={this.handleToggleBoby}><i className="fa fa-plus" />&nbsp;Create New Group</Button>
-          }
-        </Col>
-        <Collapse in={open}>
-          <div style={{ backgroundColor: "rgba(0, 0, 0, 0.027451)", padding: 15, paddingTop: 0}}>
-            <Stepper activeStep={stepIndex}>
-              <Step>
-                <StepLabel>Set Name</StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>Set Usage Type</StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>Set Includes</StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>Set Products</StepLabel>
-              </Step>
-            </Stepper>
+      <div>
+        <Button bsSize="xsmall" className="btn-primary" onClick={this.handleToggleBoby}><i className="fa fa-plus" />&nbsp;Create New Group</Button>
+        <Modal show={open} keyboard={false}>
 
+          <Modal.Header closeButton onHide={this.handleCancel}>
+            <Modal.Title>
+              Create New Group
+              <Stepper activeStep={stepIndex} style={{ height: 20, marginLeft: -15, marginTop: 10 }}>
+                <Step>
+                  <StepLabel>Set Name</StepLabel>
+                </Step>
+                <Step>
+                  <StepLabel>Set Usage Type</StepLabel>
+                </Step>
+                <Step>
+                  <StepLabel>Set Includes</StepLabel>
+                </Step>
+                <Step>
+                  <StepLabel>Set Products</StepLabel>
+                </Step>
+              </Stepper>
+            </Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
             <div style={{marginTop: 25, marginBottom: 25}}>
               <Form horizontal>
                 {this.getStepContent(stepIndex)}
               </Form>
             </div>
+          </Modal.Body>
 
-            <Row>
-              <Col lg={3} md={3} sm={3} xs={3} className="text-left">
-                <Button bsSize="small" onClick={this.handleReset} style={{  marginRight: 9, minWidth: 80 }} ><i className="fa fa-undo danger-red" />&nbsp;Reset</Button>
-                <Button bsSize="small" onClick={this.handleCancel} style={{ minWidth: 80 }}><i className="fa fa-times danger-red" />&nbsp;Cancel</Button>
-              </Col>
-              <Col lg={6} md={6} sm={6} xs={6} lgOffset={3} mdOffset={3} smOffset={3} xsOffset={3} className="text-right">
-                <Button bsSize="small" onClick={this.handlePrev} style={{marginRight: 9, minWidth: 80}}><i className="fa fa-arrow-left" />&nbsp;Back</Button>
-                { (stepIndex === 3)
-                  ? <Button bsSize="small" onClick={this.handleFinish} style={{ minWidth: 80 }}>Save</Button>
-                  : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 80 }}><i className="fa fa-arrow-right" />&nbsp;Next</Button>
-                }
-               </Col>
-            </Row >
-          </div>
-        </Collapse>
+          <Modal.Footer>
+            <Button bsSize="small" onClick={this.handlePrev} style={{marginRight: 9, minWidth: 90}}><i className="fa fa-angle-left" />&nbsp;Back</Button>
+            { (stepIndex === 3)
+              ? <Button bsSize="small" onClick={this.handleFinish} style={{ minWidth: 90 }} bsStyle="primary">Save</Button>
+              : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 90 }}><i className="fa fa-angle-right" />&nbsp;Next</Button>
+            }
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }

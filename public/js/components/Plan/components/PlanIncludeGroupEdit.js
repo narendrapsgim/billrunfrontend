@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Row, Col, Collapse, Button, Well, Form, FormGroup, ControlLabel, OverlayTrigger, Tooltip, Checkbox } from 'react-bootstrap';
+import { Modal, Row, Col, Button, Well, Form, FormGroup, ControlLabel, OverlayTrigger, Tooltip, Checkbox } from 'react-bootstrap';
 import Immutable from 'immutable';
+import { GroupsInclude } from '../../../FieldDescriptions';
+import Help from '../../Help';
+import ConfirmModal from '../../ConfirmModal';
 import Field from '../../Field';
 import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
@@ -32,13 +35,9 @@ class PlanIncludeGroupEdit extends Component {
   };
 
   state = {
-    open: false
+    isEditMode: false,
+    showConfirm: false,
   }
-
-  // shouldComponentUpdate(nextProps, nextState){
-  //   return true;
-  //   //return nextProps.value !== this.props.value;
-  // }
 
   componentWillMount(){
     const { name, usaget } = this.props;
@@ -46,7 +45,7 @@ class PlanIncludeGroupEdit extends Component {
   }
 
   toggleBoby = () => {
-    this.setState({ open: !this.state.open });
+    this.setState({ isEditMode: !this.state.isEditMode });
   }
 
   onChangeInclud = (value) => {
@@ -74,74 +73,79 @@ class PlanIncludeGroupEdit extends Component {
     }
   }
 
-  onGroupRemove = () => {
+  onGroupRemoveAsk = () => {
+   this.setState({ showConfirm: true });
+  }
+
+  onGroupRemoveOk = () => {
     const { name, usaget, groupProducts } = this.props;
-    this.props.onGroupRemove(name, usaget, groupProducts.toArray());
+    this.props.onGroupRemove(name, usaget, groupProducts.toArray())
+    this.setState({ showConfirm: false });
+  }
+
+  onGroupRemoveCancel = () => {
+    this.setState({ showConfirm: false });
+  }
+
+  renderEdit = () => {
+    const { name, value, usaget, shared, groupProducts, allGroupsProductsKeys } = this.props;
+    const { isEditMode } = this.state;
+
+    return(
+      <Modal show={isEditMode}>
+        <Modal.Header closeButton={false}>
+          <Modal.Title>Edit {name} <i>{usaget}</i></Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form horizontal style={{ marginBottom: 0 }}>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>Include</Col>
+              <Col sm={8}> <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" unlimitedValue="UNLIMITED"/> </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <Col smOffset={3} sm={8}>
+                <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared} /></Checkbox>
+              </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>Products</Col>
+              <Col sm={8}>
+                <Products onRemoveProduct={this.onRemoveProduct} products={groupProducts} />
+                <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
+                  <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={allGroupsProductsKeys.toList()} />
+                </div>
+              </Col>
+            </FormGroup>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this.toggleBoby} bsStyle="primary" bsSize="small" style={{ minWidth: 90 }}><i className="fa fa-check" />&nbsp;Done</Button>
+        </Modal.Footer>
+      </Modal>
+    );
   }
 
   render() {
-    const { name, value, usaget, shared, groupProducts, allGroupsProductsKeys } = this.props;
-    const { open } = this.state;
+    const { name, value, usaget, shared, groupProducts } = this.props;
+    const { showConfirm } = this.state;
+    const confirmMessage = `Are you sure you want to remove ${name} group?`;
+    const sharedLabel = shared ? 'Yes' : 'No';
+    const productsLabel = groupProducts.join(', ');
 
-    if(open){ //return edit mode
-      return (
-        <tr>
-          <td colSpan="6" style={{padding: 0}}>
-            <div style={{backgroundColor: "rgba(0, 0, 0, 0.027451)", padding: '15px 25px'}}>
-              <Collapse in={open}>
-                  <Form horizontal style={{marginBottom: 0}}>
-                    <h4 className="text-center" style={{ marginTop: 0 }}>{`Edit ${name} Group`}</h4>
-                    <FormGroup>
-                      <Col componentClass={ControlLabel} sm={2}>Name</Col>
-                      <Col sm={10}> <Field value={name} disabled={true} /> </Col>
-                    </FormGroup>
-
-                    <FormGroup>
-                      <Col componentClass={ControlLabel} sm={2}>Unit Type</Col>
-                      <Col sm={10}> <Field value={usaget} disabled={true} /> </Col>
-                    </FormGroup>
-
-                    <FormGroup>
-                      <Col componentClass={ControlLabel} sm={2}>Include</Col>
-                      <Col sm={10}> <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" unlimitedValue="UNLIMITED"/> </Col>
-                    </FormGroup>
-
-                    <FormGroup>
-                      <Col componentClass={ControlLabel} sm={2}>Products</Col>
-                      <Col sm={10}> <Products onRemoveProduct={this.onRemoveProduct} products={groupProducts} />
-                        <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                          <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={allGroupsProductsKeys.toList()} />
-                        </div>
-                      </Col>
-                    </FormGroup>
-
-                    <FormGroup>
-                      <Col smOffset={2} sm={10}>
-                        <Checkbox checked={shared} onChange={this.onChangeShared}>Shared</Checkbox>
-                      </Col>
-                    </FormGroup>
-
-                    <div className="text-right">
-                      <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ minWidth: 80 }}>Close</Button>
-                    </div>
-                  </Form>
-              </Collapse>
-            </div>
-          </td>
-        </tr>
-      );
-    }
-
-    return ( //return row mode
+    return (
       <tr>
         <td className="td-ellipsis">{name}</td>
         <td className="td-ellipsis">{usaget}</td>
         <td className="td-ellipsis">{value}</td>
-        <td className="td-ellipsis">{ groupProducts.join(', ')}</td>
-        <td className="text-center td-ellipsis">{shared ? 'Yes' : 'No'}</td>
+        <td className="td-ellipsis">{productsLabel}</td>
+        <td className="text-center td-ellipsis">{sharedLabel}</td>
         <td className="text-right" style={{ paddingRight: 0 }}>
-          <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 9, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
-          <Button onClick={this.onGroupRemove} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+          <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
+          <Button onClick={this.onGroupRemoveAsk} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+          <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
+          { this.renderEdit() }
         </td>
       </tr>
     );
