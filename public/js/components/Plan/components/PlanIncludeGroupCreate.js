@@ -254,7 +254,7 @@ export default class PlanIncludeGroupCreate extends Component {
           <Modal.Header closeButton onHide={this.handleCancel}>
             <Modal.Title>
               Create New Group
-              <Stepper activeStep={stepIndex} style={{ height: 20, marginLeft: -15, marginTop: 10 }}>
+              <Stepper activeStep={stepIndex} style={{ height: 20, marginLeft: -15, marginTop: 15 }}>
                 <Step>
                   <StepLabel>Set Name</StepLabel>
                 </Step>
