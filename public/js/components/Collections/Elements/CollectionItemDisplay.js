@@ -4,7 +4,7 @@ import {Button} from 'react-bootstrap';
 class CollectionItemDisplay extends Component {
   static propTypes = {
     index: React.PropTypes.number.isRequired,
-    item: React.PropTypes.object.isRequired,
+    item: React.PropTypes.object.isRequired //React.PropTypes.object.isRequired,
   };
 
   constructor(props) {

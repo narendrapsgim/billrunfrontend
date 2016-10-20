@@ -2167,26 +2167,26 @@ fieldset[disabled] a.btn {
 }
 .btn-default {
     color: #333333;
-    background-color: #e7e7e7;
-    border-color: #cccccc
+    background-color: #ffffff;
+    border-color: #cccccc;
 }
 .btn-default:focus,
 .btn-default.focus {
     color: #333333;
     background-color: #cecece;
-    border-color: #8c8c8c
+    border-color: #8c8c8c;
 }
 .btn-default:hover {
     color: #333333;
     background-color: #cecece;
-    border-color: #adadad
+    border-color: #8c8c8c;
 }
 .btn-default:active,
 .btn-default.active,
 .open>.dropdown-toggle.btn-default {
     color: #333333;
     background-color: #cecece;
-    border-color: #adadad
+    border-color: #adadad;
 }
 .btn-default:active:hover,
 .btn-default.active:hover,

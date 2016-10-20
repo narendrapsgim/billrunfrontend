@@ -9,6 +9,7 @@
     "start": "./node_modules/webpack/bin/webpack.js --watch --colors",
     "build_prod": "NODE_ENV=production ./node_modules/webpack/bin/webpack.js --colors -p",
     "lint": "eslint public/js",
+    "lint-path": "eslint $TARGET",
     "clean-prod": "rimraf prod",
     "copy-prod": "cpy public/index.html public/globalSettings.js prod",
     "validate-webpack": "webpack-validator webpack.config.js"
