@@ -23,18 +23,20 @@ class UserList extends Component {
     this.state = {
       page: 0,
       size: 10,
+      sort: '',
       filter: ""
     };
   }
 
   buildQuery() {
-    const { page, size, filter } = this.state;
+    const { page, size, sort, filter } = this.state;
     return {
       api: "find",
       params: [
 	{ collection: "users" },
 	{ size },
 	{ page },
+	{ sort },
 	{ query: filter }
       ]
     };
@@ -48,6 +50,12 @@ class UserList extends Component {
 
   handlePageClick(page) {
     this.setState({page}, () => {
+      this.props.dispatch(getList('users', this.buildQuery()))
+    });
+  }
+
+  onSort = (sort) => {
+    this.setState({sort}, () => {
       this.props.dispatch(getList('users', this.buildQuery()))
     });
   }
@@ -98,7 +106,7 @@ class UserList extends Component {
 	      </div>
 	      <div className="panel-body">
 	        <Filter fields={fields} onFilter={this.onFilter} base={base} />
-	        <List items={users} fields={fields} editField="username" edit={true} onClickEdit={ this.onClickUser } />
+	        <List items={users} fields={fields} editField="username" edit={true} onClickEdit={ this.onClickUser } onSort={this.onSort} />
 	      </div>
 	    </div>
 	  </div>
