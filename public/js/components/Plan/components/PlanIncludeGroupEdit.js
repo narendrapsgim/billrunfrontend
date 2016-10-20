@@ -140,7 +140,7 @@ class PlanIncludeGroupEdit extends Component {
         <td className="td-ellipsis">{usaget}</td>
         <td className="td-ellipsis">{value}</td>
         <td className="td-ellipsis">{productsLabel}</td>
-        <td className="text-center td-ellipsis">{sharedLabel}</td>
+        <td className="td-ellipsis text-center">{sharedLabel}</td>
         <td className="text-right" style={{ paddingRight: 0 }}>
           <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
           <Button onClick={this.onGroupRemoveAsk} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
