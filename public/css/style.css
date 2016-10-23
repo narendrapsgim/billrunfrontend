@@ -5,6 +5,11 @@ body {
 textarea {
   resize: vertical;
 }
+.td-ellipsis{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 /* ~Global */
 
 /* React-Select */

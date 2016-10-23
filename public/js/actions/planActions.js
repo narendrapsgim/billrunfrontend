@@ -61,12 +61,13 @@ export function onGroupRemove(groupName, usage, productKeys) {
   };
 }
 
-export function onGroupAdd(groupName, usage, value) {
+export function onGroupAdd(groupName, usage, value, shared) {
   return {
     type: ADD_GROUP,
     groupName,
     usage,
-    value
+    value,
+    shared
   };
 }
 

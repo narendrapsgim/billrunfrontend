@@ -164,8 +164,8 @@ class ServiceSetup extends Component {
         </Tabs>
 
         <div style={{marginTop: 12}}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{marginRight: 10}}>Save</Button>
-          <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
+          <Button onClick={this.handleSave} bsStyle="primary" style={{ minWidth: 90, marginRight: 10 }}>Save</Button>
+          <Button onClick={this.handleBack} bsStyle="default" style={{ minWidth: 90 }}>Cancel</Button>
         </div>
 
       </Col>

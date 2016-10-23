@@ -25,7 +25,10 @@ const serviceReducer = (state = DefaultState, action) => {
       return state.setIn(action.path, action.value);
 
     case ADD_GROUP_SERVICE:
-      const group = Immutable.Map({[action.usage] : action.value});
+      const group = Immutable.Map({
+        [action.usage] : action.value,
+        'account_shared': action.shared
+      });
       return state.setIn(['include', 'groups', action.groupName], group);
 
     case REMOVE_GROUP_SERVICE:

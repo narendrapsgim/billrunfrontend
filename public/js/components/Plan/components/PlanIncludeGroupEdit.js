@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Row, Col, Collapse, Button, Well, Form, FormGroup, ControlLabel, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Modal, Row, Col, Button, Well, Form, FormGroup, ControlLabel, OverlayTrigger, Tooltip, Checkbox } from 'react-bootstrap';
 import Immutable from 'immutable';
+import { GroupsInclude } from '../../../FieldDescriptions';
+import Help from '../../Help';
+import ConfirmModal from '../../ConfirmModal';
 import Field from '../../Field';
 import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
@@ -16,6 +19,7 @@ class PlanIncludeGroupEdit extends Component {
     addGroupProducts: React.PropTypes.func.isRequired,
     onGroupRemove: React.PropTypes.func.isRequired,
     usaget: React.PropTypes.string.isRequired,
+    shared: React.PropTypes.bool,
     name: React.PropTypes.string.isRequired,
     value: React.PropTypes.oneOfType([
       React.PropTypes.string,
@@ -26,17 +30,14 @@ class PlanIncludeGroupEdit extends Component {
   }
 
   static defaultProps = {
-    groupProducts : Immutable.List()
+    groupProducts: Immutable.List(),
+    shared: false,
   };
 
   state = {
-    open: false
+    isEditMode: false,
+    showConfirm: false,
   }
-
-  // shouldComponentUpdate(nextProps, nextState){
-  //   return true;
-  //   //return nextProps.value !== this.props.value;
-  // }
 
   componentWillMount(){
     const { name, usaget } = this.props;
@@ -44,12 +45,18 @@ class PlanIncludeGroupEdit extends Component {
   }
 
   toggleBoby = () => {
-    this.setState({ open: !this.state.open });
+    this.setState({ isEditMode: !this.state.isEditMode });
   }
 
   onChangeInclud = (value) => {
     const { name, usaget } = this.props;
     this.props.onChangeFieldValue(['include', 'groups', name, usaget], value);
+  }
+
+  onChangeShared = (e) => {
+    const { checked } = e.target;
+    const { name } = this.props;
+    this.props.onChangeFieldValue(['include', 'groups', name, 'account_shared'], checked);
   }
 
   onAddProduct = (productKey) => {
@@ -66,57 +73,81 @@ class PlanIncludeGroupEdit extends Component {
     }
   }
 
-  onGroupRemove = () => {
-    const { name, usaget, groupProducts } = this.props;
-    this.props.onGroupRemove(name, usaget, groupProducts.toArray());
+  onGroupRemoveAsk = () => {
+   this.setState({ showConfirm: true });
   }
 
-  render() {
-    const { name, value, usaget, groupProducts, allGroupsProductsKeys } = this.props;
-    const { open } = this.state;
+  onGroupRemoveOk = () => {
+    const { name, usaget, groupProducts } = this.props;
+    this.props.onGroupRemove(name, usaget, groupProducts.toArray())
+    this.setState({ showConfirm: false });
+  }
 
-    return (
-      <div>
-        <Row>
-          <Col lg={1} md={1} sm={1} xs={6} className="text-left">
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Remove {name} gruop</Tooltip>}>
-              <i className="fa fa-times-circle fa-lg" onClick={this.onGroupRemove} style={{cursor: "pointer", color: 'red'}} />
-            </OverlayTrigger>
-          </Col>
-          <Col lg={1} md={1} sm={1} xs={6} className="text-left">
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">Edit {name} gruop</Tooltip>}>
-              <i className="fa fa-pencil fa-lg" onClick={this.toggleBoby} style={{cursor: "pointer", color:'#777'}} />
-            </OverlayTrigger>
-          </Col>
-          <Col lg={6} md={6} sm={6} xs={12} className="text-left">
-            <h4 style={{marginTop: 0}}>{name} <small>&lt;{usaget}&gt;</small></h4>
-          </Col>
-          {open
-            ? <Col lg={1} md={1} sm={1} xs={1} lgOffset={3} mdOffset={3} smOffset={3} className="text-right">
-                <i className="fa fa-times" onClick={this.toggleBoby} style={{cursor: "pointer"}} />
+  onGroupRemoveCancel = () => {
+    this.setState({ showConfirm: false });
+  }
+
+  renderEdit = () => {
+    const { name, value, usaget, shared, groupProducts, allGroupsProductsKeys } = this.props;
+    const { isEditMode } = this.state;
+
+    return(
+      <Modal show={isEditMode}>
+        <Modal.Header closeButton={false}>
+          <Modal.Title>Edit {name} <i>{usaget}</i></Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form horizontal style={{ marginBottom: 0 }}>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>Include</Col>
+              <Col sm={8}> <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" unlimitedValue="UNLIMITED"/> </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <Col smOffset={3} sm={8}>
+                <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared} /></Checkbox>
               </Col>
-            : <Col lg={4} md={4} sm={4} xs={12} className="text-right">{value}</Col>
-          }
-        </Row>
+            </FormGroup>
 
-        <Collapse in={open}>
-          <div style={{backgroundColor: "rgba(0, 0, 0, 0.027451)", padding: 25, borderRadius: 5, marginTop: 15}}>
-            <Form>
-              <FormGroup>
-                <ControlLabel>Includes</ControlLabel>
-                <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
-              </FormGroup>
-              <FormGroup>
-                <ControlLabel>Products</ControlLabel>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>Products</Col>
+              <Col sm={8}>
                 <Products onRemoveProduct={this.onRemoveProduct} products={groupProducts} />
                 <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
                   <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={allGroupsProductsKeys.toList()} />
                 </div>
-              </FormGroup>
-            </Form>
-          </div>
-        </Collapse>
-      </div>
+              </Col>
+            </FormGroup>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this.toggleBoby} bsStyle="primary" bsSize="small" style={{ minWidth: 90 }}><i className="fa fa-check" />&nbsp;Done</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  render() {
+    const { name, value, usaget, shared, groupProducts } = this.props;
+    const { showConfirm } = this.state;
+    const confirmMessage = `Are you sure you want to remove ${name} group?`;
+    const sharedLabel = shared ? 'Yes' : 'No';
+    const productsLabel = groupProducts.join(', ');
+
+    return (
+      <tr>
+        <td className="td-ellipsis">{name}</td>
+        <td className="td-ellipsis">{usaget}</td>
+        <td className="td-ellipsis">{value}</td>
+        <td className="td-ellipsis">{productsLabel}</td>
+        <td className="td-ellipsis text-center">{sharedLabel}</td>
+        <td className="text-right" style={{ paddingRight: 0 }}>
+          <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
+          <Button onClick={this.onGroupRemoveAsk} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+          <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
+          { this.renderEdit() }
+        </td>
+      </tr>
     );
   }
 
