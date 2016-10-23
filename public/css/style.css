@@ -12,10 +12,10 @@ textarea {
   z-index: 5!important;
 }
 .Select-control{
-  height: 34px!important;
+  border-radius: 0!important;
 }
 .Select-search-prompt {
-    padding: 5px!important;
+  padding: 5px!important;
 }
 /* ~React-Select */
 
