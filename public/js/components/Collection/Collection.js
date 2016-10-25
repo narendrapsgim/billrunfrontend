@@ -97,7 +97,6 @@ class Collection extends Component {
   }
 
   render() {
-    console.log(this);
     const { settings } = this.props;
     const { active } = settings.get('active', 1);
     return (
@@ -147,7 +146,7 @@ class Collection extends Component {
                   </FormGroup>
                   
                   <div>
-                    <MailEditorRich value={settings.get('body','body of the fucking ediutor')} name="body" fields={fieldsList} onChange={this.onMailChange} />
+                    <MailEditorRich value={settings.get('body')} editorName="editor" name="body" fields={fieldsList} onChange={this.onMailChange} />
                   </div>
                 </div>
               </div>
