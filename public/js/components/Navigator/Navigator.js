@@ -182,6 +182,13 @@ class Navigator extends Component {
                               onClick={this.setActiveNav}><span>Collections</span></Link>
                       </li>
 
+                      <li>
+                        <Link to="/invoice-template" id="invoiceTemplate"
+                              className={(this.state.activeNav === "invoiceTemplate") ? "active" : ""}
+                              onClick={this.setActiveNav}><span>Invoice Template</span></Link>
+                      </li>
+
+
                     </ul>
                   </li>
                 </ul>

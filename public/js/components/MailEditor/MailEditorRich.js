@@ -1,6 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-export default class RichEditorExample extends React.Component {
+class RichEditorExample extends React.Component {
   constructor(props) {
     super(props);
 
@@ -8,41 +9,43 @@ export default class RichEditorExample extends React.Component {
       showWYSIWYG: false
     };
 
-    this.onChange = this.onChange.bind(this);
+    // this.onChange = this.onChange.bind(this);
     this.initEditor = this.initEditor.bind(this);
   }
 
-  onChange(editorContent) {
-    this.props.onChange(editorContent);
-  }
+  /*onChange(editorContent) {
+    debugger;
+    this.props.onChange(editorContent, this.props.name);
+  }*/
 
   initEditor() {
-    var self = this;
+    let self = this;
+    let configPath = self.props.configPath || 'config-br-mails.js';
+    let editorName = self.props.editorName;
 
-    function toggle() {
-      window.CKEDITOR.replace(self.props.editorName,
+    function toggleEditor() {
+      window.CKEDITOR.replace(editorName,
         {
-          customConfig: 'config-br.js',
+          customConfig: configPath,
           toolbar: "Basic",
           // width: 870,
-          height: 250,
+          height: self.props.editorHeight || 250,
           extraPlugins: 'placeholder,placeholder_select',
           placeholder_select: {
             placeholders: self.props.fields
           }
-
         });
 
-      window.CKEDITOR.instances.editor.on('blur', function () {
-        let data = window.CKEDITOR.instances.editor.getData();
-        self.props.onChange(data);
+      window.CKEDITOR.instances[editorName].on('blur', function () {
+        let data = window.CKEDITOR.instances[editorName].getData();
+        self.props.onChange(data, self.props.name);
       });
 
       self.setState({showWYSIWYG: true});
     }
 
     if (!this.state.showWYSIWYG) {
-      window.setTimeout(toggle, 100);
+      window.setTimeout(toggleEditor, 100);
     }
   }
 
@@ -58,3 +61,5 @@ export default class RichEditorExample extends React.Component {
     );
   }
 }
+
+export default connect()(RichEditorExample);

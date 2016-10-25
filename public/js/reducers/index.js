@@ -14,6 +14,7 @@ import planProducts from './planProducts';
 import exportGenerator from './exportGeneratorReducer';
 import service from './serviceReducer';
 import collections from './collections';
+import invoiceTemplate from './invoiceTemplate';
 
 
 export default combineReducers({
@@ -31,5 +32,6 @@ export default combineReducers({
   planProducts,
   exportGenerator,
   service,
-  collections
+  collections,
+  invoiceTemplate
 });
