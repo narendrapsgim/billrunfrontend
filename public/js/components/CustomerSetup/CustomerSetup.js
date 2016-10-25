@@ -25,6 +25,7 @@ class CustomerSetup extends Component {
     this.onCancel = this.onCancel.bind(this);
 
     this.state = {
+      invalidFields: Immutable.List(),
       current: 1
     };
   }
@@ -83,7 +84,7 @@ class CustomerSetup extends Component {
     const params = action === "update" ?
                    [{ method: "update" },
                     { type: "account" },
-                    { query: JSON.stringify({"_id": customer.getIn(['_id','$id'])}) },
+                    { query: JSON.stringify({"_id": customer.getIn(['_id', '$id'])}) },
                     { update: JSON.stringify(customer.toJS()) }] :
                    [{ method: "create" },
                     { type: "account" },
@@ -115,6 +116,10 @@ class CustomerSetup extends Component {
         }
       },
       failure => {
+        if (failure.error[0].error.code === 17576) {
+          const fields = JSON.parse(failure.error[0].error.display);
+          this.setState({invalidFields: Immutable.fromJS(fields)});
+        }
         const errorMessage = failure.error[0].error.display.desc ? failure.error[0].error.display.desc : failure.error[0].error.message;
         dispatch(showDanger(`Error - ${errorMessage}`));
         console.log(failure);
@@ -142,7 +147,7 @@ class CustomerSetup extends Component {
       params: [
         { method: "update" },
         { type: "subscriber" },
-        { query: JSON.stringify({"_id": subscription.getIn(["_id", "$id"])}) },
+        { query: JSON.stringify({"_id": subscription.getIn(['$id', '_id'])}) },
         { update: JSON.stringify(data) }
       ]
     };
@@ -172,12 +177,14 @@ class CustomerSetup extends Component {
   render() {
     const { customer, subscriptions, settings, plans } = this.props;
     const { action } = this.props.location.query;
+    const { invalidFields } = this.state;
 
     const tabs = [(<Tab title="Customer Details" eventKey={1} key={1}>
   <div className="panel panel-default">
     <div className="panel-body">
       <Customer customer={customer}
                 action={action}
+                invalidFields={ invalidFields }
                 settings={settings.getIn(['account', 'fields'])}
                 onChange={this.onChangeCustomerField} />
 
