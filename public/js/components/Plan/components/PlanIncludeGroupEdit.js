@@ -121,7 +121,7 @@ class PlanIncludeGroupEdit extends Component {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.toggleBoby} bsStyle="primary" bsSize="small" style={{ minWidth: 90 }}><i className="fa fa-check" />&nbsp;Done</Button>
+          <Button onClick={this.toggleBoby} bsStyle="primary" bsSize="small" style={{ minWidth: 90 }}><i className="fa fa-check" />&nbsp;Close</Button>
         </Modal.Footer>
       </Modal>
     );
