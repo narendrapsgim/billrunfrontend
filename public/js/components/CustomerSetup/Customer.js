@@ -20,7 +20,7 @@ export default class Customer extends Component {
   }
 
   render() {
-    const {customer, onChange, settings, action} = this.props;
+    const {customer, onChange, settings, action, invalidFields} = this.props;
 
     let options = [];
     countries.forEach((country) => {
@@ -29,24 +29,32 @@ export default class Customer extends Component {
 
     const fields = settings.filter(field => {
       return field.get('display') !== false &&
-        field.get('editable') !== false;
-    }).map((setting, key) => (
-
-      <FormGroup controlId={setting.get('field_name')}>
-        <Col componentClass={ControlLabel} md={3}>
-          {setting.get('title') || setting.get('field_name')}
-        </Col>
-        <Col sm={9}>
-          <FormControl type="text"
-                       onChange={ onChange }
-                       value={ customer.get(setting.get('field_name')) }
-          />
-        </Col>
-      </FormGroup>
-    ));
+             field.get('editable') !== false;
+    }).map((setting, key) => {
+      let invalid = invalidFields
+        .filter(invf => invf.get('name') === setting.get('field_name'))
+        .size > 0;
+      let validationState = invalid ? {validationState: "error"} : {};
+      return (
+        <FormGroup { ...validationState }
+                   controlId={setting.get('field_name')}
+                   key={key}>
+          <Col componentClass={ControlLabel} md={3}>
+            {setting.get('title') || setting.get('field_name')}
+          </Col>
+          <Col sm={9}>
+            <FormControl type="text"
+                         onChange={ onChange }
+                         value={ customer.get(setting.get('field_name')) }
+            />
+          </Col>
+        </FormGroup>
+      );
+    });
 
     return (
       <div>
+
         <div className="row">
           <div className="col-lg-6">
             <Form horizontal>
