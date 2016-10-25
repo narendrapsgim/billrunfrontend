@@ -127,7 +127,7 @@ class Collection extends Component {
                   <FormGroup controlId='active'>
                     <Col componentClass={ControlLabel} md={2}>Active</Col>
                     <Col sm={2}>
-                      {/*<StateDropDown name="active" onChange={this.onActiveChange} value={active}/>*/}
+                      <StateDropDown name="active" onChange={this.onActiveChange} value={active}/>
                     </Col>
                   </FormGroup>
                 </div>
