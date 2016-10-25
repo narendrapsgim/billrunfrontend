@@ -14,7 +14,7 @@ class ProgressIndicator extends Component {
     const indecator = (progressIndicator) ? <div key={new Date()} className="system-progress-indecator"></div> : null;
 
     return (
-      <div className="progress-indicator-container" style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1001}}>
+      <div className="progress-indicator-container" style={{ position: 'fixed', top: 0, width: '100%', zIndex: 5001}}>
         <ReactCSSTransitionGroup transitionName="progressindicator" transitionEnterTimeout={enterTimeout} transitionLeaveTimeout={exitTimeout}>
           { indecator }
         </ReactCSSTransitionGroup>
