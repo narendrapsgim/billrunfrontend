@@ -6,12 +6,11 @@ export default class Price extends Component {
   }
 
   render() {
-    let { onChange, id, value, editable, disabled } = this.props;
+    let { onChange, id, value, editable, disabled, ...otherProps } = this.props;
 
-    const input = editable ? (<div className="input-group">
-        <div className="input-group-addon">{globalSetting.currency}</div>
-        <input type="number" id={id} className="form-control" min="0" value={value} onChange={onChange} disabled={disabled}/>
-      </div>) : (<span>{`${globalSetting.currency}${parseFloat(value, 10)}`}</span>);
+    const input = editable
+      ? <input type="number" {...otherProps} id={id} className="form-control" min="0" value={value} onChange={onChange} disabled={disabled}/>
+      : <span>{parseFloat(value, 10)}</span>;
 
     return (
       <div>{ input }</div>

@@ -52,6 +52,9 @@ export default class Filter extends Component {
         [field]: this.filterCond(field, value)
       });
     }, {});
+
+    if (!string.replace(/\s/gi, '')) return JSON.stringify(baseObj);
+
     const filterObj = _.reduce(filter_by, (acc, field) => {
       return Object.assign({}, acc, {
         [field]: this.filterCond(field, string)
@@ -79,31 +82,38 @@ export default class Filter extends Component {
     const { fields = [] } = this.props;
     const { filter_by, string } = this.state;
 
-    const fields_options = fields.map((field, key) => {
-      let selected = _.includes(filter_by, field.id);
-      return {value: field.id, label: field.placeholder, selected };
-    });
+    const fields_options = fields
+      .filter(field => field.showFilter !== false)
+      .map((field, key) => {
+        let selected = _.includes(filter_by, field.id);
+        return {value: field.id, label: field.placeholder, selected };
+      });
 
     return (
       <div className="Filter row" style={{marginBottom: 10}}>
-        <div className="col-lg-2 col-md-3 col-xs-4">
-          <input id="filter-string"
-		 placeholder="Search for..."
-		 onChange={this.onChangeFilterString}
-		 className="form-control" />
-        </div>
-        <div className="col-lg-2 col-md-3 col-xs-4">
-          <Multiselect data={fields_options}
-		       multiple
-		       onChange={this.onSelectFilterField}
-		       buttonWidth="100%" />
-        </div>
-        <div className="col-lg-1 col-md-2 col-xs-3">
-          <button className="btn btn-default"
-		  onClick={this.onClickFilterBtn}
-		  disabled={(string && filter_by.length === 0) || (!string && filter_by.length > 0)}>
-	    <i className="fa fa-search"></i>
-	  </button>
+        <div className="filter-warp">
+          <div className="pull-left">
+            <input id="filter-string"
+                   placeholder="Search for..."
+                   onChange={this.onChangeFilterString}
+                   className="form-control"/>
+          </div>
+          <div className="pull-left">
+            <Multiselect data={fields_options}
+                         multiple
+                         onChange={this.onSelectFilterField}
+                         buttonWidth="100%"
+                         nonSelectedText="Search in fields"
+            />
+          </div>
+          <div className="search-button pull-left">
+            <button className="btn btn-default search-btn"
+                    onClick={this.onClickFilterBtn}
+                    type="submit"
+                    disabled={(string && filter_by.length === 0) || (!string && filter_by.length === 0)}>
+              <i className="fa fa-search"></i>
+            </button>
+          </div>
         </div>
       </div>
     );

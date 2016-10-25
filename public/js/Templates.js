@@ -78,21 +78,6 @@ const Templates = {
 	  "line_key" : "dst"
 	}
       ]
-    },
-    "receiver" : {
-      "type" : "ftp",
-      "connections" : [
-	{
-	  "passive" : true,
-	  "delete_received" : false,
-	  "name" : "Astersik_CDR",
-	  "host" : "46.101.149.208",
-	  "user" : "ftp_user",
-	  "password" : "j8(B2c_sV",
-	  "remote_directory" : "/Dori/Asterisk_CDR/"
-	}
-      ],
-      "limit" : 3
     }
   },
   UK_Standard_CDR_v3: {
@@ -228,21 +213,6 @@ const Templates = {
 	  "line_key" : "apn"
 	}
       ]
-    },
-    "receiver" : {
-      "type" : "ftp",
-      "connections" : [
-	{
-	  "passive" : true,
-	  "delete_received" : false,
-	  "name" : "UK_Standerd_CDR",
-	  "host" : "46.101.149.208",
-	  "user" : "ftp_user",
-	  "password" : "j8(B2c_sV",
-	  "remote_directory" : "/Dori/UK_Standard_CDR/"
-	}
-      ],
-      "limit" : 3
     }
   },
   FreeSWITCH_CDR: {
@@ -318,21 +288,6 @@ const Templates = {
 	  "line_key" : "caller_id_number"
 	}
       ]
-    },
-    "receiver" : {
-      "type" : "ftp",
-      "connections" : [
-	{
-	  "passive" : true,
-	  "delete_received" : false,
-	  "name" : "FreeSWITCH_CDR",
-	  "host" : "46.101.149.208",
-	  "user" : "ftp_user",
-	  "password" : "j8(B2c_sV",
-	  "remote_directory" : "/Dori/FreeSWITCH_CDR/"
-	}
-      ],
-      "limit" : 3
     }
   },
   Cisco_CDR: {
@@ -592,21 +547,6 @@ const Templates = {
 	  "line_key" : "originalcalledpartynumber"
 	}
       ]
-    },
-    "receiver" : {
-      "type" : "ftp",
-      "connections" : [
-	{
-	  "passive" : true,
-	  "delete_received" : false,
-	  "host" : "46.101.149.208",
-	  "name" : "Cisco_CDR",
-	  "user" : "ftp_user",
-	  "password" : "j8(B2c_sV",
-	  "remote_directory" : "/Dori/Cisco_CDR/"
-	}
-      ],
-      "limit" : 3
     }
   }
 };

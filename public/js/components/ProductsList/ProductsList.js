@@ -91,16 +91,16 @@ class ProductsList extends Component {
 
     const fields = [
       {id: "key", placeholder: "Name"},
-      {id: "to", display: false, type: "datetime"}
+      {id: "to", showFilter: false, type: "datetime"}
     ];
 
     const tableFields = [
       {id: 'key', title: 'Name', sort: true},
       {id: 'unit_type', title: 'Unit Type', parser: unit_type_by_parser},
-      {id: 'code', title: "Code"},
-      {id: 'description', title: "Description"},
-      {id: 'from', title: 'From', type: "datetime", cssClass: 'long-date'},
-      {id: 'to', title: 'To', type: "datetime", cssClass: 'long-date'}
+      {id: 'code', title: "Code", sort: true},
+      {id: 'description', title: "Description", sort: true},
+      {id: 'from', title: 'From', type: "datetime", cssClass: 'long-date', sort: true},
+      {id: 'to', title: 'To', type: "datetime", cssClass: 'long-date', sort: true}
     ];
 
     return (

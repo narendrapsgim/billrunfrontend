@@ -81,20 +81,21 @@ class InvoicesList extends Component {
       return (
         <form method="post" action={download_url}>
           <input type="hidden" name="a" value="a"></input>
-          <button className="btn btn-outline btn-default" type="submit">
-            <i className="fa fa-download"></i>
+          <button className="btn btn-link" type="submit">
+            <i className="fa fa-download"></i> Download
           </button>
         </form>
       );
     };
     const fields = [
-      { id: "invoice_id", title: "Invoice ID", sort: true },
-      { id: "invoice_date", title: "Date" },
-      { id: "due_date", title: "Due" },
-      { id: "amount", title: "Amount" },
+      { id: "invoice_id", title: "Invoice Id", sort: true },
+      { id: "invoice_date", title: "Date", cssClass: 'short-date', sort: true },
+      { id: "due_date", title: "Due", cssClass: 'short-date', sort: true },
+      { id: "amount", title: "Amount", sort: true },
       { id: "paid_by", title: "Status", parser: paid_by_parser },
-      { id: "billrun_key", title: "Cycle" },
-      { id: "aid", title: "Customer ID" },
+      { id: "billrun_key", title: "Cycle", sort: true },
+      { id: "aid", title: "Customer ID", sort: true },
+      { id: "payer_name", title: "Name", sort: true },
       { title: "Download", parser: download_parser }
     ];
     const filter_fields = [
@@ -116,7 +117,7 @@ class InvoicesList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={filter_fields} onFilter={this.onFilter} base={base} />
-                <List items={invoices} fields={fields} onSort={this.onSort} />
+                <List items={invoices} fields={fields} onSort={this.onSort} className="invoices-list" />
               </div>
             </div>
           </div>

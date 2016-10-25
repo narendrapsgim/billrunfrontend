@@ -81,7 +81,7 @@ class UsageList extends Component {
       {id: "aid", placeholder: "Customer ID", type: "number", sort: true},
       {id: "sid", placeholder: "Subscription ID", type: "number", sort: true},
       {id: "plan", placeholder: "Plan"},
-      {id: "urt", placeholder: "Time", type: "datetime", cssClass: 'long-date'}
+      {id: "urt", placeholder: "Time", type: "datetime", cssClass: 'long-date', showFilter: false}
     ];
 
     const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};

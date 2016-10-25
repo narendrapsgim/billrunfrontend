@@ -12,6 +12,8 @@ import ProductsList from '../components/ProductsList';
 import Product from '../components/Product';
 import PlansList from '../components/PlansList';
 import Plan from '../components/Plan';
+import ServicesList from '../components/ServicesList';
+import Service from '../components/Service';
 import InputProcessorsList from '../components/InputProcessorsList';
 import ExportGenerator from '../components/ExportGenerator';
 import ExportGeneratorsList from '../components/ExportGeneratorsList';
@@ -23,6 +25,8 @@ import PaymentGateways from '../components/PaymentGateways';
 import User from '../components/User';
 import UserSetup from '../components/UserSetup';
 import SelectTemplate from '../components/InputProcessor/SelectTemplate';
+import Collections from '../components/Collections/Collections';
+import Collection from '../components/Collection/Collection';
 
 export default () => {
   return (
@@ -34,6 +38,8 @@ export default () => {
       <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
       <Route path="/products" component={RequireAuth(ProductsList)} title="Products"/>
       <Route path="/product" component={RequireAuth(Product)} title="Create / Edit Product" />
+      <Route path="/services" component={RequireAuth(ServicesList)} title="Services" />
+      <Route path="/service(/:itemId)" component={RequireAuth(Service)} title="Create / Edit Service" />
       <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer"/>
       <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor"/>
       <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors"/>
@@ -46,6 +52,8 @@ export default () => {
       <Route path="/users" component={RequireAuth(User)} title="Users"/>
       <Route path="/user" component={RequireAuth(UserSetup)} title="User"/>
       <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Input Processor" />
+      <Route path="/collections" component={RequireAuth(Collections)} title="Collections" />
+      <Route path="/collection" component={RequireAuth(Collection)} title="Collection" />
       <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />
     </Route>

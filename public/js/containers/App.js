@@ -71,6 +71,7 @@ class App extends Component {
   renderWithLayout(){
     return (
       <div id="wrapper" style={{height: "100%"}}>
+        <ProgressIndicator />
         <Alerts />
         <Navigator />
         <div id="page-wrapper" className="page-wrapper" ref="pageWrapper" style={{minHeight: this.state.Height}}>
