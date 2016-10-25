@@ -105,7 +105,7 @@ class PlanIncludeGroupEdit extends Component {
 
             <FormGroup>
               <Col smOffset={3} sm={8}>
-                <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared} /></Checkbox>
+                <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared_desc} /></Checkbox>
               </Col>
             </FormGroup>
 
