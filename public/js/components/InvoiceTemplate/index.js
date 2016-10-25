@@ -1,2 +1,2 @@
-import ExportGenerator from './ExportGenerator';
-export default ExportGenerator;
+import InvoiceTemplate from './InvoiceTemplate';
+export default InvoiceTemplate;

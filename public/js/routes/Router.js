@@ -27,7 +27,7 @@ import UserSetup from '../components/UserSetup';
 import SelectTemplate from '../components/InputProcessor/SelectTemplate';
 import Collections from '../components/Collections/Collections';
 import Collection from '../components/Collection/Collection';
-import InvoiceTemplate from '../components/InvoiceTemplate/InvoiceTemplate';
+import InvoiceTemplate from '../components/InvoiceTemplate';
 
 export default () => {
   return (

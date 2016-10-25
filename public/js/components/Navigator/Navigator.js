@@ -51,7 +51,6 @@ class Navigator extends Component {
 
   setActiveNav = (e) => {
     const {id} = e.target;
-    console.log(e.target.parentElement);
     this.setState({activeNav: id, uiOpenSetting: true})
   };
 
@@ -191,7 +190,7 @@ class Navigator extends Component {
                       <li>
                         <Link to="/invoice-template" id="invoiceTemplate"
                               className={(this.state.activeNav === "invoiceTemplate") ? "active" : ""}
-                              onClick={this.setActiveNav}><span>Invoice Template</span></Link>
+                              onClick={this.setActiveNav}>Invoice Template</Link>
                       </li>
 
 
