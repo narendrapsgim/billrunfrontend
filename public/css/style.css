@@ -22,6 +22,26 @@ textarea {
 .Select-search-prompt {
   padding: 5px!important;
 }
+.has-value > .Select-control > .Select-placeholder{
+  color: #6f6f6f!important;
+}
+.Select-item{
+  color: #6f6f6f!important;
+  background-color: #e7e7e7!important;
+  border-color: #dddddd!important;
+  border-radius: 0!important;
+}
+.Select-item-icon{
+  border-right: none!important;
+}
+.Select-item-icon:hover, .Select-item-icon:focus {
+    background-color: #eeeeee!important;
+    color: #222222!important;
+}
+.Select-item:hover,.Select-item:focus{
+  background-color: #eeeeee!important;
+  color: #222222!important;
+}
 /* ~React-Select */
 
 /* System Alerts */

@@ -40,21 +40,21 @@ export default class ServiceDetails extends Component {
       <Form horizontal>
 
         <FormGroup controlId="formHorizontalEmail">
-          <Col componentClass={ControlLabel} sm={3}>Name</Col>
+          <Col componentClass={ControlLabel} sm={2}>Name</Col>
           <Col sm={9}>
             <Field value={item.get('name', '')} onChange={this.onChangeName} disabled={mode === 'update'}/>
           </Col>
         </FormGroup>
 
         <FormGroup controlId="formHorizontalEmail">
-          <Col componentClass={ControlLabel} sm={3}>Description</Col>
+          <Col componentClass={ControlLabel} sm={2}>Description</Col>
           <Col sm={9}>
             <Field value={item.get('description', '')} onChange={this.onChangeDescription}  fieldType="textarea" />
           </Col>
         </FormGroup>
 
         <FormGroup controlId="formHorizontalEmail">
-          <Col componentClass={ControlLabel} sm={3}>Price</Col>
+          <Col componentClass={ControlLabel} sm={2}>Price</Col>
           <Col lg={3} sm={4}>
             <Field value={item.get('price', '')} onChange={this.onChangePrice} fieldType='price' />
           </Col>
