@@ -155,6 +155,7 @@ class CustomerSetup extends Component {
   }
 
   onSaveSubscription = (subscription, data, callback) => {
+    const { aid } = this.props.location.query;    
     const newsub = subscription.withMutations(map => {
       Object.keys(data).map(field => {
         map.set(field, data[field]);
@@ -172,6 +173,20 @@ class CustomerSetup extends Component {
     apiBillRun(query).then(
       success => {
         callback(true);
+	const subscriptions_params = {
+          api: "find",
+          params: [
+            { collection: "subscribers" },
+            { page: 0 },
+            { size: 999999 },
+            { query: JSON.stringify({
+              aid: parseInt(aid, 10),
+              type: "subscriber",
+              to: {"$gt": moment().toISOString()}
+            }) }
+          ]
+	};
+	this.props.dispatch(getList('subscriptions', subscriptions_params));
         this.props.dispatch(showSuccess("Saved subscription successfully!"));
       },
       failure => {
