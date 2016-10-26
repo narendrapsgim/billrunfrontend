@@ -56,7 +56,7 @@ class Navigator extends Component {
 
   openSetting = (e) => {
     e.preventDefault();
-    const {id} = e.target;
+    const {id} = e.currentTarget;
     this.setState({activeNav: id,uiOpenSetting: !this.state.uiOpenSetting});
   };
 
@@ -68,6 +68,14 @@ class Navigator extends Component {
     let overallNavClassName = classNames({
       'navbar navbar-default navbar-fixed-top': true,
       'collapse-sizebar': this.state.collapseSideBar
+    });
+
+    const settingsChildren =  ['settings', 'settingsProcessor','settingsGenerator','settingsGateway','collections','invoiceTemplate'];
+
+    let settingIsActive = classNames({
+      'active': this.state.activeNav==='settings-menu',
+      'open': settingsChildren.indexOf(this.state.activeNav) > -1 || this.state.activeNav==='settings-menu',
+      'has-second': true
     });
 
     return (
@@ -141,18 +149,17 @@ class Navigator extends Component {
                   <li>
                     <Link to="/users" id="users" className={(this.state.activeNav === "users") ? "active" : ""}
                           onClick={this.setActiveNav}>
-                      <i className="fa fa-user fa-fw" /><span>Users Management</span>
+                      <i className="fa fa-user fa-fw" /><span>User Management</span>
                     </Link>
                   </li>
-                  <li className={classNames({'active': !this.state.uiOpenSetting, 'has-second': true})}>
-                    <a href className={classNames({'active': !this.state.uiOpenSetting})} onClick={this.openSetting}>
+                  <li className={settingIsActive}>
+                    <a href  id="settings-menu" className={classNames({'active': !this.state.uiOpenSetting})} onClick={this.openSetting}>
                       <i className="fa fa-cog fa-fw" /><span>Settings</span><span className="fa arrow"></span></a>
                     {/*<ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>*/}
                     <ul className="nav nav-second-level">
                       <li>
 
-                        <Link to="/settings" id="settings"
-                              className={(this.state.activeNav === "settings") ? "active" : ""}
+                        <Link to="/settings" id="settings" className={(this.state.activeNav === "settings") ? "active" : ""}
                               onClick={this.setActiveNav}><span>General Settings</span></Link>
                       </li>
                       <li>
@@ -172,7 +179,7 @@ class Navigator extends Component {
                       </li>
 
                       <li>
-                        <Link to="/collections" id="collections"
+                          <Link to="/collections" id="collections"
                               className={(this.state.activeNav === "collections") ? "active" : ""}
                               onClick={this.setActiveNav}><span>Collections</span></Link>
                       </li>
