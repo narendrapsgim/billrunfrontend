@@ -1,0 +1,125 @@
+@import "../mixin";
+/*
+* the sidebar - collapse state
+*/
+
+$sidebar-transition: width 400ms linear;
+$page-wrapper-transition: margin 200ms linear;
+
+#top-nav {
+  @include animation('all 1s');
+  .sidebar {
+    -webkit-transition: $sidebar-transition; /* Safari */
+    transition: $sidebar-transition;
+  }
+
+  #btn-collapse-menu {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 2;
+    background: #fbf9f9;
+    width: 250px;
+    padding: 0;
+    height: 30px;
+    border: 0;
+    border-top: 1px #cccccc solid;
+    color: rgba(153, 153, 153, 0.75);
+    font-size: 10px;
+
+    &:active,
+    &:hover,
+    &:focus {
+      border-color: #cccccc;
+      outline: none;
+      box-shadow: none;
+    }
+
+    i {
+      margin-right: -2px;
+    }
+  }
+
+  #nav-user-menu {
+    padding: 15px;
+  }
+}
+
+#top-nav {
+  .sidebar-nav {
+    .nav-second-level {
+      display: none;
+    }
+    li.active {
+      .nav-second-level {
+        display: block;
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+    .sidebar-nav {
+      > ul.nav > li > a > span {
+        margin-left: 5px;
+        position: absolute;
+        top: 7px;
+
+        &.fa {
+          position: initial;
+        }
+      }
+    }
+  }
+  /* end of media query 768px */
+}
+
+#top-nav.collapse-sizebar {
+
+  @media (min-width: 768px) {
+    #btn-collapse-menu i{
+      -ms-transform: rotate(180deg); /* IE 9 */
+      -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
+      transform: rotate(180deg);
+    }
+    .sidebar {
+      width: 50px;
+    }
+    .sidebar-nav {
+
+      > .nav > li {
+        width: 50px;
+      }
+      > .nav > li > a > i {
+        // line-height: 50px;
+      }
+      > .nav > li > a > span {
+        display: none;
+      }
+
+      > .nav > li.has-second:hover {
+        width: 50px;
+      }
+
+      .nav.nav-second-level {
+        position: absolute;
+        width: 250px;
+        background: #ffffff;
+      }
+    }
+
+    #btn-collapse-menu {
+      width: 50px;
+    }
+  }
+  /* end of media query 768px */
+}
+
+/* the main content - collapse state */
+#top-nav + #page-wrapper {
+  -webkit-transition: $page-wrapper-transition; /* Safari */
+  transition: $page-wrapper-transition;
+}
+
+#top-nav.collapse-sizebar + #page-wrapper {
+  margin: 0 0 0 50px;
+}

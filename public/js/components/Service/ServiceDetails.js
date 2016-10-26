@@ -14,6 +14,10 @@ export default class ServiceDetails extends Component {
     updateItem: React.PropTypes.func.isRequired,
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
+  }
+
   onChangeName = (e) => {
     const { value } = e.target;
     this.props.updateItem(['name'], value);
@@ -30,7 +34,7 @@ export default class ServiceDetails extends Component {
   }
 
   render() {
-    let { item, mode } = this.props;
+    const { item, mode } = this.props;
 
     return (
       <Form horizontal>

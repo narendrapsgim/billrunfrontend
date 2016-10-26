@@ -100,20 +100,30 @@ export function getExistGroupProductsByUsageTypes(groupName, usageType){
 }
 
 export function getAllGroup(){
-  let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
-  let queryString = {
+  const toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
+  const projectString = JSON.stringify({
+    "name": 1,
+    "include": 1
+  });
+  const queryString = JSON.stringify({
     "include.groups":{"$exists": true},
     'to': {"$gte" : toadyApiString},
     'from': {"$lte" : toadyApiString}
-  };
-
-  let query = {
+  });
+  const query = [{
     api: "find",
     params: [
-      { collection: "plans" },
-      { query: JSON.stringify( queryString   ) },
-      { project: JSON.stringify( {"name":1, "include":1} ) },
+      { collection: "services" },
+      { query: queryString },
+      { project: projectString },
     ]
-  };
+  },{
+      api: "find",
+      params: [
+        { collection: "plans" },
+        { query: queryString },
+        { project: projectString },
+      ]
+  }];
   return apiBillRun(query);
 }

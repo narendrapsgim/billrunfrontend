@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "name": "First collection",
+    "days": 3,
+    "active": true,
+    "subject": "Please complete your payment to {customer_plan}",
+    "body": "dear sir, pplaee"
+  },
+  {
+    "id": "2",
+    "name": "Second collection",
+    "days": 8,
+    "active": true,
+    "subject": "Last notifiction complete your payment to {customer_plan}",
+    "body": "boo gfoo dear sir, pplaee"
+  },
+  {
+    "id": "3",
+    "name": "Three collection",
+    "days": 8,
+    "active": false,
+    "subject": "Last notifiction complete your payment to {customer_plan}",
+    "body": "boo gfoo dear sir, pplaee"
+  }
+]

@@ -2,3 +2,18 @@
 
 @import "components/List";
 @import "components/Filter";
+@import "components/Collections";
+@import "components/RichEditor";
+@import "components/Navigator";
+
+.form-input-with-hint-60 {
+  input {
+    float: left;
+    width: 60%;
+    margin-right: 10px;
+  }
+  .help-block {
+    display: inline-block;
+    line-height: 2;
+  }
+}

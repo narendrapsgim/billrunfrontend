@@ -6,6 +6,7 @@ import Pager from '../Pager';
 import Filter from '../Filter';
 import moment from 'moment';
 import { Button } from "react-bootstrap";
+import { capitalize } from 'lodash';
 
 import { getList } from '../../actions/listActions';
 import List from '../List';
@@ -104,7 +105,9 @@ class PlansList extends Component {
     }
 
     const billing_frequency_parser = (plan) => {
-      return plan.getIn(['recurrence', 'unit']) + " " + plan.getIn(['recurrence', 'periodicity']);
+      const periodicity = plan.getIn(['recurrence', 'periodicity'], '');
+      if (!periodicity) return '';
+      return capitalize(periodicity) + "ly";
     }
 
     const charging_mode_parser = (plan) => {
@@ -113,8 +116,8 @@ class PlansList extends Component {
 
     const tableFields = [
       {id: 'name', title: 'Name', sort: true},
-      {id: 'code', title: 'Code'},
-      {id: 'description', title: "Description"},
+      {id: 'code', title: 'Code', sort: true},
+      {id: 'description', title: "Description", sort: true},
       {title: 'Trial', parser: trial_parser},
       {id: 'recurrence_charges', title: 'Recurring Charges', parser: recuring_charges_parser},
       {id: 'recurrence_frequency', title: 'Billing Frequency', parser: billing_frequency_parser},

@@ -100,10 +100,10 @@ class ServicesList extends Component {
 
     const tableFields = [
       {id: 'name', title: 'Name', sort: true},
-      {id: 'price', title: 'Price'},
-      {id: 'description', title: 'Description'},
-      {id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date'},
-      {id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date'}
+      {id: 'price', title: 'Price', sort: true},
+      {id: 'description', title: 'Description', sort: true},
+      {id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date', sort: true},
+      {id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date', sort: true}
     ];
 
     return (
