@@ -50,7 +50,7 @@ class Navigator extends Component {
   };
 
   setActiveNav = (e) => {
-    const {id} = e.target;
+    const {id} = e.currentTarget;
     this.setState({activeNav: id, uiOpenSetting: true})
   };
 
