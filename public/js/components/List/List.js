@@ -99,7 +99,7 @@ export default class List extends Component {
       }
 
       if (field.sort) {
-	arrow = this.state.sort[field.id] ? (<i className={`sort-indicator fa fa-sort-${ this.state.sort[field.id] === 1 ? 'down' : 'up' }`}></i>) : (<i className="sort-indicator fa fa-sort"></i>);
+	arrow = this.state.sort[field.id] ? (<i className={`sort-indicator fa fa-sort-${ this.state.sort[field.id] === 1 ? 'up' : 'down' }`}></i>) : (<i className="sort-indicator fa fa-sort"></i>);
       }
       if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
         return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
