@@ -32,7 +32,7 @@ class Segments extends Component {
 
   render() {
     return (
-      <div className="form-group row">
+      <div className="form-group row form-inner-edit-row">
         <div className="col-lg-6">
           <Select
             name="field-name"
@@ -55,7 +55,7 @@ class Segments extends Component {
                  disabled={!this.props.segment.get('field')}/>
         </div>
 
-        <div className="col-lg-2" style={{padding: '2px 0'}}>
+        <div className="col-lg-2" style={{padding: '2px 5px'}}>
           <Button onClick={this.onDeleteLine} bsSize="small"><i className="fa fa-trash-o danger-red"/>
             &nbsp;Remove</Button>
         </div>

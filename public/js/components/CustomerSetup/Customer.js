@@ -22,6 +22,11 @@ export default class Customer extends Component {
   render() {
     const {customer, onChange, settings, action, invalidFields} = this.props;
 
+    //in update mode wait for item before render edit screen
+    if(action === 'update' && typeof customer.getIn(['_id', '$id']) === 'undefined'){
+      return ( <div> <p>Loading...</p> </div> );
+    }
+
     let options = [];
     countries.forEach((country) => {
       options.push({value: country.name, label: country.name})
@@ -39,7 +44,7 @@ export default class Customer extends Component {
         <FormGroup { ...validationState }
                    controlId={setting.get('field_name')}
                    key={key}>
-          <Col componentClass={ControlLabel} md={3}>
+          <Col componentClass={ControlLabel} md={2}>
             {setting.get('title') || setting.get('field_name')}
           </Col>
           <Col sm={9}>
@@ -54,28 +59,16 @@ export default class Customer extends Component {
 
     return (
       <div>
-
-        <div className="row">
-          <div className="col-lg-6">
-            <Form horizontal>
-              { fields }
-            </Form>
+        <Form horizontal>
+          { fields }
+        </Form>
+        {(action !== "new") &&
+          <div>
+            <hr />
+            <p>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></p>
+            <p>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link></p>
           </div>
-        </div>
-
-        {(() => {
-          if (action === "new") return (null);
-          return (
-            <div className="row" style={{marginBottom: 5}}>
-              <hr />
-              <div className="col-lg-6">
-                see Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link>
-                <br />
-                see Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link>
-              </div>
-            </div>
-          );
-        })()}
+        }
       </div>
     );
   }

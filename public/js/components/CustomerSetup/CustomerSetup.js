@@ -11,7 +11,7 @@ import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
 import { showSuccess, showDanger } from '../..//actions/alertsActions';
 
 /* COMPONENTS */
-import { PageHeader, Tabs, Tab } from 'react-bootstrap';
+import { PageHeader, Tabs, Tab, Panel } from 'react-bootstrap';
 import Customer from './Customer';
 import Subscriptions from './Subscriptions';
 import ActionButtons from './ActionButtons';
@@ -44,6 +44,8 @@ class CustomerSetup extends Component {
         api: "find",
         params: [
           { collection: "subscribers" },
+          { page: 0 },
+          { size: 999999 },
           { query: JSON.stringify({
             aid: parseInt(aid, 10),
             type: "subscriber",
@@ -55,6 +57,20 @@ class CustomerSetup extends Component {
         api: "find",
         params: [
           { collection: "plans" },
+          { page: 0 },
+          { size: 999999 },
+          { query: JSON.stringify({
+            to: { "$gt": moment().toISOString() }
+          }) }
+        ]
+      };
+
+      const services_params = {
+        api: "find",
+        params: [
+          { collection: 'services' },
+          { page: 0 },
+          { size: 999999 },
           { query: JSON.stringify({
             to: { "$gt": moment().toISOString() }
           }) }
@@ -63,6 +79,7 @@ class CustomerSetup extends Component {
       this.props.dispatch(getEntity('customer', customer_params));
       this.props.dispatch(getList('subscriptions', subscriptions_params));
       this.props.dispatch(getList('plans', plans_params));
+      this.props.dispatch(getList('customer_available_services', services_params));
     }
     this.props.dispatch(getSettings('subscribers'));
   }
@@ -70,6 +87,7 @@ class CustomerSetup extends Component {
   componentWillUnmount() {
     this.props.dispatch(clearEntity());
     this.props.dispatch(clearList('subscriptions'));
+    this.props.dispatch(clearList('customer_available_services'));
   }
 
   onChangeCustomerField(e) {
@@ -105,7 +123,7 @@ class CustomerSetup extends Component {
         } else {
           dispatch(showSuccess("Customer created successfully"));
           dispatch(gotEntity('customer', success.data[0].data.details));
-          
+
           this.context.router.push({
             pathname: '/customer',
             query: {
@@ -137,6 +155,7 @@ class CustomerSetup extends Component {
   }
 
   onSaveSubscription = (subscription, data, callback) => {
+    const { aid } = this.props.location.query;    
     const newsub = subscription.withMutations(map => {
       Object.keys(data).map(field => {
         map.set(field, data[field]);
@@ -147,13 +166,27 @@ class CustomerSetup extends Component {
       params: [
         { method: "update" },
         { type: "subscriber" },
-        { query: JSON.stringify({"_id": subscription.getIn(['$id', '_id'])}) },
+        { query: JSON.stringify({"_id": subscription.getIn(['_id', '$id'])}) },
         { update: JSON.stringify(data) }
       ]
     };
     apiBillRun(query).then(
       success => {
         callback(true);
+	const subscriptions_params = {
+          api: "find",
+          params: [
+            { collection: "subscribers" },
+            { page: 0 },
+            { size: 999999 },
+            { query: JSON.stringify({
+              aid: parseInt(aid, 10),
+              type: "subscriber",
+              to: {"$gt": moment().toISOString()}
+            }) }
+          ]
+	};
+	this.props.dispatch(getList('subscriptions', subscriptions_params));
         this.props.dispatch(showSuccess("Saved subscription successfully!"));
       },
       failure => {
@@ -175,43 +208,42 @@ class CustomerSetup extends Component {
   }
 
   render() {
-    const { customer, subscriptions, settings, plans } = this.props;
+    const { customer, subscriptions, settings, plans, services } = this.props;
     const { action } = this.props.location.query;
     const { invalidFields } = this.state;
 
-    const tabs = [(<Tab title="Customer Details" eventKey={1} key={1}>
-  <div className="panel panel-default">
-    <div className="panel-body">
-      <Customer customer={customer}
-                action={action}
-                invalidFields={ invalidFields }
-                settings={settings.getIn(['account', 'fields'])}
-                onChange={this.onChangeCustomerField} />
+    const tabs = [(
+      <Tab title="Customer Details" eventKey={1} key={1}>
+        <Panel style={{borderTop: 'none'}}>
+          <Customer
+            customer={customer}
+            action={action}
+            invalidFields={ invalidFields }
+            settings={settings.getIn(['account', 'fields'])}
+            onChange={this.onChangeCustomerField}
+          />
+        </Panel>
+    </Tab>
+    )];
 
-    </div>
-
-
-  </div>
-    </Tab>)
-    ];
     if (action === "update") {
       tabs.push((
         <Tab title="Subscriptions" eventKey={2} key={2}>
-          <div className="panel panel-default">
-            <div className="panel-body">
+            <Panel style={{borderTop: 'none'}}>
               <Subscriptions
-                  subscriptions={subscriptions}
-                  aid={customer.get('aid')}
-                  settings={settings.getIn(['subscriber', 'fields'])}
-                  plans={plans}
-                  onSaveSubscription={this.onSaveSubscription}
-                  onNew={this.onClickNewSubscription}
+                subscriptions={subscriptions}
+                aid={customer.get('aid')}
+                settings={settings.getIn(['subscriber', 'fields'])}
+                all_plans={plans}
+                all_services={services}
+                onSaveSubscription={this.onSaveSubscription}
+                onNew={this.onClickNewSubscription}
               />
-            </div>
-          </div>
-        </Tab>));
+            </Panel>
+        </Tab>
+      ));
     }
-    
+
     return (
       <div>
 
@@ -242,7 +274,8 @@ function mapStateToProps(state) {
     customer: state.entity.get('customer') || Immutable.Map(),
     subscriptions: state.list.get('subscriptions') || Immutable.List(),
     settings: state.settings.get('subscribers') || Immutable.List(),
-    plans: state.list.get('plans') || Immutable.List()
+    plans: state.list.get('plans') || Immutable.List(),
+    services: state.list.get('customer_available_services') || Immutable.List()
   };
 }
 

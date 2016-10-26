@@ -8,9 +8,6 @@ $page-wrapper-transition: margin 200ms linear;
 
 #top-nav {
   @include animation('all 1s');
-  /*transition: 1s;
-  left: 0;*/
-
   .sidebar {
     -webkit-transition: $sidebar-transition; /* Safari */
     transition: $sidebar-transition;
@@ -21,11 +18,12 @@ $page-wrapper-transition: margin 200ms linear;
     left: 0;
     bottom: 0;
     z-index: 2;
-    background: #fff;
-    width: 45px;
+    background: #fbf9f9;
+    width: 250px;
     padding: 0;
     height: 30px;
     border: 0;
+    border-top: 1px #cccccc solid;
     color: rgba(153, 153, 153, 0.75);
     font-size: 10px;
 
@@ -52,9 +50,37 @@ $page-wrapper-transition: margin 200ms linear;
     .nav-second-level {
       display: none;
     }
-    li.active {
+    li.open {
+      > a {
+        background: transparent;
+        font-weight: bold;
+        &:before {
+          position: absolute;
+          left: 0;
+          top: 0;
+          content: '';
+          background: #008cba;
+          width: 6px;
+          height: 100%;
+        }
+      }
+
       .nav-second-level {
         display: block;
+      }
+    }
+
+    a.active {
+      background: transparent;
+      font-weight: bold;
+      &:before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        content: '';
+        background: #008cba;
+        width: 6px;
+        height: 100%;
       }
     }
   }
@@ -64,6 +90,7 @@ $page-wrapper-transition: margin 200ms linear;
       > ul.nav > li > a > span {
         margin-left: 5px;
         position: absolute;
+        top: 7px;
 
         &.fa {
           position: initial;
@@ -106,6 +133,10 @@ $page-wrapper-transition: margin 200ms linear;
         width: 250px;
         background: #ffffff;
       }
+    }
+
+    #btn-collapse-menu {
+      width: 50px;
     }
   }
   /* end of media query 768px */

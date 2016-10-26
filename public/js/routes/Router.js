@@ -27,6 +27,7 @@ import UserSetup from '../components/UserSetup';
 import SelectTemplate from '../components/InputProcessor/SelectTemplate';
 import Collections from '../components/Collections/Collections';
 import Collection from '../components/Collection/Collection';
+import InvoiceTemplate from '../components/InvoiceTemplate';
 
 export default () => {
   return (
@@ -47,13 +48,14 @@ export default () => {
       <Route path="/export_generators" component={RequireAuth(ExportGeneratorsList)} title="Export Generators"/>
       <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
       <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
-      <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
+      <Route path="/settings" component={RequireAuth(Settings)} title="General Settings"/>
       <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
       <Route path="/users" component={RequireAuth(User)} title="Users"/>
       <Route path="/user" component={RequireAuth(UserSetup)} title="User"/>
       <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Input Processor" />
       <Route path="/collections" component={RequireAuth(Collections)} title="Collections" />
       <Route path="/collection" component={RequireAuth(Collection)} title="Collection" />
+      <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
       <Route path="/login" component={LoginPage} title="Login"/>
       <Route path="*" component={PageNotFound} />
     </Route>
