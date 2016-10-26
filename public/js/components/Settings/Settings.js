@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
-import { getList } from '../../actions/listActions';
 import Immutable from 'immutable';
-
-import { PageHeader } from 'react-bootstrap';
-import Tabs from 'react-bootstrap/lib/Tabs';
-import Tab from 'react-bootstrap/lib/Tab';
-import RaisedButton from 'material-ui/RaisedButton';
+import {Tabs, Tab, Panel} from 'react-bootstrap';
 
 import DateTime from './DateTime';
 import CurrencyTax from './CurrencyTax';
+import Tenant from './Tenant';
+import ActionButtons from '../Elements/ActionButtons';
 
 class Settings extends Component {
+
   constructor(props) {
     super(props);
+
+    this.state = {activeTab : parseInt(this.props.location.query.tab) || 1};
 
     this.onChangeDatetime = this.onChangeDatetime.bind(this);
     this.onChangeCurrencyTax = this.onChangeCurrencyTax.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.handleSelectTab = this.handleSelectTab.bind(this);
+  }
+
+  handleSelectTab = (key) => {
+    this.setState({activeTab:key});
   }
 
   componentWillMount() {
@@ -40,9 +45,12 @@ class Settings extends Component {
     this.props.dispatch(updateSetting('pricing', id, value));
   }
 
-  onSave(e) {
-    const { setting } = this.props.location.query;
-    this.props.dispatch(saveSettings(setting, this.props.settings));
+  onSave() {
+    //save 'BillRun'
+    this.props.dispatch(saveSettings('billrun', this.props.settings));
+
+    //save 'pricing'
+    this.props.dispatch(saveSettings('pricing', this.props.settings));
   }
   
   render() {
@@ -52,42 +60,29 @@ class Settings extends Component {
     let datetime = settings.get('billrun') || Immutable.Map();
     let currency_tax = settings.get('pricing') || Immutable.Map();
 
-    const views = {
-      billrun: {
-        component: (<DateTime onChange={this.onChangeDatetime} data={datetime} />),
-        title: "Date and Time"
-      },
-      pricing: {
-        component: (<CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax} />),
-        title: "Currency and Tax"
-      },
-      /* payment_gateways: {
-	 component: (<PaymentGateways onChange={this.onChangePaymentGateways} data={payment_gateways} gateways={supported_gateways} />),
-	 title: "Payment Gateways"
-       * }*/
-    };
-    const currentView = views[this.props.location.query.setting].component;
-
     return (
       <div>
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="panel panel-default">
-              <div className="panel-heading">
-                { views[this.props.location.query.setting].title }
-              </div>
-              <div className="panel-body">
-                { currentView }
-                <div style={{marginTop: 12}}>
-                  <button className="btn btn-primary"
-                          onClick={this.onSave}>
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab"
+              onSelect={this.handleSelectTab}>
+          <Tab title="Company" eventKey={1}>
+            <Panel style={{borderTop: 'none'}}>
+              <Tenant onChange={this.onChangeFieldValue} data={datetime}/>
+            </Panel>
+          </Tab>
+
+          <Tab title="Locale" eventKey={2}>
+            <Panel style={{borderTop: 'none'}}>
+              <DateTime onChange={this.onChangeDatetime} data={datetime}/>
+              <CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax}/>
+            </Panel>
+          </Tab>
+        </Tabs>
+
+
+        <ActionButtons
+          onClickSave={this.onSave}
+          hideCancel={true}/>
+
       </div>
     );
   }

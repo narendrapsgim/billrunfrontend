@@ -6,7 +6,7 @@ export default class ActionButtons extends Component {
   }
 
   render() {
-    const { hide, onClickSave, onClickCancel } = this.props;
+    const { hide, onClickSave, onClickCancel, hideCancel } = this.props;
     if (hide) return (null);
 
     return (
@@ -17,11 +17,14 @@ export default class ActionButtons extends Component {
                 style={{marginRight: 10}}>
           Save
         </button>
-        <button type="reset"
-                className="btn btn-default"
-                onClick={onClickCancel}>
-          Cancel
-        </button>
+        {hideCancel ? null : (
+          <button type="reset"
+                  className="btn btn-default"
+                  onClick={onClickCancel}>
+            Cancel
+          </button>
+        )}
+
       </div>
     );
   }
