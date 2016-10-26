@@ -15,6 +15,7 @@ import exportGenerator from './exportGeneratorReducer';
 import service from './serviceReducer';
 import collections from './collections';
 import invoiceTemplate from './invoiceTemplate';
+import guiState from './guiState';
 
 
 export default combineReducers({
@@ -33,5 +34,6 @@ export default combineReducers({
   exportGenerator,
   service,
   collections,
-  invoiceTemplate
+  invoiceTemplate,
+  guiState
 });

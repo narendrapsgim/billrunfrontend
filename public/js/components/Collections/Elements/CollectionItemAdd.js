@@ -1,13 +1,11 @@
-import React, {Component} from 'react';
-import {Button} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Button } from 'react-bootstrap';
 
 class CollectionItemAdd extends Component {
-
   constructor(props) {
     super(props);
     this.onClickNew = this.onClickNew.bind(this);
   }
-
 
   onClickNew() {
     this.context.router.push({
@@ -17,7 +15,6 @@ class CollectionItemAdd extends Component {
       }
     });
   }
-
 
   render() {
     return (

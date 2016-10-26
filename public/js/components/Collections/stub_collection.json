@@ -5,7 +5,7 @@
     "days": 3,
     "active": true,
     "subject": "Please complete your payment to {customer_plan}",
-    "body": "dear sir, pplaee"
+    "body": "dear sir, Please"
   },
   {
     "id": "2",
@@ -17,7 +17,7 @@
   },
   {
     "id": "3",
-    "name": "Three collection",
+    "name": "Third collection",
     "days": 8,
     "active": false,
     "subject": "Last notifiction complete your payment to {customer_plan}",

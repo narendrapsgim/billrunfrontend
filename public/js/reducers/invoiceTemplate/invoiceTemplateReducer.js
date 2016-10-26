@@ -5,8 +5,8 @@ import {
 } from '../../actions/invoiceTemplateActions';
 
 const defaultState = Immutable.Map({
-  header: undefined,
-  footer: undefined
+  header: '',
+  footer: ''
 });
 
 const collectionReducer = (state = defaultState, action) => {
