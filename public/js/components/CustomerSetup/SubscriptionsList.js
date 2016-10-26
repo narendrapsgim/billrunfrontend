@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 import List from '../List';
 import { Button } from "react-bootstrap";
+import Immutable from 'immutable';
+import moment from 'moment';
+
 
 export default class SubscriptionsList extends Component {
   constructor(props) {
@@ -16,7 +19,16 @@ export default class SubscriptionsList extends Component {
       <td key={key}>{ sub.get(field.get('field_name')) }</td>
     ))
   }
-  
+
+  planActivationParser = (subscription) => {
+    let date = subscription.get('plan_activation', null);
+    return date ? moment(date).format(globalSetting.datetimeFormat) : '';
+  }
+
+  servicesParser = (subscription) => {
+    return subscription.get('services', Immutable.List()).join(', ');
+  }
+
   render() {
     const { subscriptions,
             settings,
@@ -27,7 +39,15 @@ export default class SubscriptionsList extends Component {
     const fields = settings
       .filter(field => { return field.get('display') !== false })
       .map((field, idx) => {
-        return { id: field.get('field_name') };
+        let fieldname = field.get('field_name');
+        switch (fieldname) {
+          case 'plan_activation':
+            return { id: fieldname, parser: this.planActivationParser };
+          case 'services':
+            return { id: fieldname, parser: this.servicesParser };
+          default:
+            return { id: fieldname };
+        }
       });
 
     return (
@@ -35,19 +55,8 @@ export default class SubscriptionsList extends Component {
 
         <div className="row">
           <div className="col-lg-12">
-            <div className="panel panel-default">
-              <div className="panel-heading">
-                <span>
-                  All action subscriptions
-                  <div className="pull-right">
-                    <Button bsSize="xsmall" className="btn-primary" onClick={onNew.bind(this, aid)}><i className="fa fa-plus"/>&nbsp;Add New</Button>
-                  </div>
-                </span>
-              </div>
-              <div className="panel-body">
-                <List items={subscriptions} fields={fields} edit={true} onClickEdit={onClickEdit} />
-              </div>
-            </div>
+            <List items={subscriptions} fields={fields.toArray()} edit={true} onClickEdit={onClickEdit} />
+            <Button bsSize="xsmall" className="btn-primary" onClick={onNew.bind(this, aid)}><i className="fa fa-plus"/>&nbsp;Add New Subscription</Button>
           </div>
         </div>
 
