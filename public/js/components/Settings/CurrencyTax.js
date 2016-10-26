@@ -21,37 +21,37 @@ export default class CurrencyTax extends Component {
       <div>
         <form className="form-horizontal CurrencyTaxSettings">
           <div className="form-group">
-            <div className="col-lg-6">
-	      <div className="col-lg-3 control-label">
-		<label htmlFor="currency">Currency</label>
-	      </div>
-	      <div className="col-lg-9">
-		<select className="form-control"
-			id="currency"
-			value={data.get('currency')}
-			onChange={onChange}>
+            <div className="col-md-12">
+              <div className="col-md-3 control-label">
+                <label htmlFor="currency">Currency</label>
+              </div>
+              <div className="col-md-4">
+                <select className="form-control"
+                        id="currency"
+                        value={data.get('currency', '')}
+                        onChange={onChange}>
                   { currency_options }
-		</select>
-	      </div>
+                </select>
+              </div>
             </div>
           </div>
           <div className="form-group">
-            <div className="col-lg-6">
-	      <div className="col-lg-3 control-label">
-		<label htmlFor="vat">VAT</label>
-	      </div>
-	      <div className="col-lg-9">
-		<div className="input-group">
+            <div className="col-md-12">
+              <div className="col-md-3 control-label">
+                <label htmlFor="vat">VAT</label>
+              </div>
+              <div className="col-md-4">
+                <div className="input-group">
                   <input id="vat"
-			 type="number"
-			 onChange={onChange}
-			 value={data.get('vat')}
-			 className="form-control" />
+                         type="number"
+                         onChange={onChange}
+                         value={data.get('vat', '')}
+                         className="form-control"/>
                   <span className="input-group-addon">%</span>
-		</div>
+                </div>
               </div>
             </div>
-	  </div>
+          </div>
         </form>
       </div>
     );

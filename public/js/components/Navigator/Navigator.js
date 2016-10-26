@@ -151,14 +151,9 @@ class Navigator extends Component {
                     <ul className="nav nav-second-level">
                       <li>
 
-                        <Link to="/settings?setting=billrun" id="settingsBillrun"
-                              className={(this.state.activeNav === "settingsBillrun") ? "active" : ""}
-                              onClick={this.setActiveNav}><span>Date, Time and Zone</span></Link>
-                      </li>
-                      <li>
-                        <Link to="/settings?setting=pricing" id="settingsPricing"
-                              className={(this.state.activeNav === "settingsPricing") ? "active" : ""}
-                              onClick={this.setActiveNav}><span>Currency and Tax</span></Link>
+                        <Link to="/settings" id="settings"
+                              className={(this.state.activeNav === "settings") ? "active" : ""}
+                              onClick={this.setActiveNav}><span>General Settings</span></Link>
                       </li>
                       <li>
                         <Link to="/input_processors" id="settingsProcessor"

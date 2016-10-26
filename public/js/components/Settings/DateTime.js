@@ -26,30 +26,30 @@ export default class DateTime extends Component {
       <div>
         <form className="form-horizontal">
           <div className="form-group">
-            <div className="col-lg-6">
-	      <div className="col-lg-3 control-label">
-		<label htmlFor="time_zone">Time Zone</label>
-	      </div>
-	      <div className="col-lg-9">
-		<select id="timezone" defaultValue={moment.tz.guess()} value={data.get('timezone')}
-			onChange={onChange} className="form-control">
+            <div className="col-md-12">
+              <div className="col-md-3 control-label">
+                <label htmlFor="time_zone">Time Zone</label>
+              </div>
+              <div className="col-md-4">
+                <select id="timezone" defaultValue={moment.tz.guess()} value={data.get('timezone')}
+                        onChange={onChange} className="form-control">
                   { time_zone_options }
-		</select>
-	      </div>
+                </select>
+              </div>
             </div>
           </div>
           <div className="form-group">
-            <div className="col-lg-6">
-	      <div className="col-lg-3 control-label">
-		<label htmlFor="charging_day">Charging Day</label>
-	      </div>
-	      <div className="col-lg-9">
-		<select id="charging_day" value={data.get('charging_day')}
-			onChange={onChange}
-			className="form-control">
+            <div className="col-md-12">
+              <div className="col-md-3 control-label">
+                <label htmlFor="charging_day">Charging Day</label>
+              </div>
+              <div className="col-md-4">
+                <select id="charging_day" value={data.get('charging_day')}
+                        onChange={onChange}
+                        className="form-control">
                   { billing_day_options }
-		</select>
-	      </div>
+                </select>
+              </div>
             </div>
           </div>
         </form>
