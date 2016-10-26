@@ -50,9 +50,37 @@ $page-wrapper-transition: margin 200ms linear;
     .nav-second-level {
       display: none;
     }
-    li.active {
+    li.open {
+      > a {
+        background: transparent;
+        font-weight: bold;
+        &:before {
+          position: absolute;
+          left: 0;
+          top: 0;
+          content: '';
+          background: #008cba;
+          width: 6px;
+          height: 100%;
+        }
+      }
+
       .nav-second-level {
         display: block;
+      }
+    }
+
+    a.active {
+      background: transparent;
+      font-weight: bold;
+      &:before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        content: '';
+        background: #008cba;
+        width: 6px;
+        height: 100%;
       }
     }
   }

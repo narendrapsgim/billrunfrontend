@@ -48,7 +48,7 @@ export default () => {
       <Route path="/export_generators" component={RequireAuth(ExportGeneratorsList)} title="Export Generators"/>
       <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
       <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
-      <Route path="/settings" component={RequireAuth(Settings)} title="Settings"/>
+      <Route path="/settings" component={RequireAuth(Settings)} title="General Settings"/>
       <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
       <Route path="/users" component={RequireAuth(User)} title="Users"/>
       <Route path="/user" component={RequireAuth(UserSetup)} title="User"/>
