@@ -146,16 +146,14 @@ class PlanProductsPriceTab extends Component {
 
     return (
       <Row>
-        <Col lg={8}>
+        <Col lg={12}>
           <Form>
 
             <Panel header={<h3>Select Products to Override Price <Help contents={PlanDescription.add_product} /></h3>}>
               <ProductSearch onSelectProduct={this.onSelectProduct}/>
             </Panel>
 
-            <Panel header={<h3>Overridden Products Prices for Plan &quot;{planName}&quot;</h3>}>
-              { productsKeys.size > 0 ? this.renderItems() : this.renderNoItems() }
-            </Panel>
+            { productsKeys.size > 0 ? this.renderItems() : this.renderNoItems() }
 
           </Form>
         </Col>
