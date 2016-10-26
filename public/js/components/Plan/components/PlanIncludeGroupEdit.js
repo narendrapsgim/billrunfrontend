@@ -105,7 +105,7 @@ class PlanIncludeGroupEdit extends Component {
 
             <FormGroup>
               <Col smOffset={3} sm={8}>
-                <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared} /></Checkbox>
+                <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared_desc} /></Checkbox>
               </Col>
             </FormGroup>
 
@@ -121,7 +121,7 @@ class PlanIncludeGroupEdit extends Component {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.toggleBoby} bsStyle="primary" bsSize="small" style={{ minWidth: 90 }}><i className="fa fa-check" />&nbsp;Done</Button>
+          <Button onClick={this.toggleBoby} bsStyle="primary" bsSize="small" style={{ minWidth: 90 }}><i className="fa fa-check" />&nbsp;Close</Button>
         </Modal.Footer>
       </Modal>
     );
