@@ -12,7 +12,8 @@ import {
   setCollectionActive,
   setCollectionMailSubject,
   setCollectionMailBody,
-  clearCollection
+  clearCollection,
+  setDumnmyCollection
 } from '../../actions/collectionsActions';
 
 /* COMPONENTS */
@@ -44,10 +45,10 @@ class Collection extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    // const { file_type, action } = this.props.location.query;
+    const { collection_id, action } = this.props.location.query;
 
     // Should be deal with edit
-    // if (action !== "new") dispatch(getProcessorSettings(file_type));
+    if (action !== "new") dispatch(setDumnmyCollection());
   }
 
   onError(message) {
@@ -112,7 +113,7 @@ class Collection extends Component {
                   <FormGroup controlId='name'>
                     <Col componentClass={ControlLabel} md={2}>Name</Col>
                     <Col sm={10}>
-                      <FormControl type="text" name="name" onChange={this.onChange} value={settings.get('name', '')}/>
+                      <FormControl type="text" name="name" onChange={this.onChange} value={settings.get('name')}/>
                     </Col>
                   </FormGroup>
 
@@ -169,7 +170,8 @@ function mapDispatchToProps(dispatch) {
     setCollectionActive,
     setCollectionMailSubject,
     setCollectionMailBody,
-    clearCollection
+    clearCollection,
+    setDumnmyCollection
   }, dispatch);
 }
 

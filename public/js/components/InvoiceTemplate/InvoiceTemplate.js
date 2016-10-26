@@ -62,7 +62,6 @@ class InvoiceTemplate extends Component {
 
   render() {
     const { settings } = this.props;
-    const { active } = settings.get('active', 1);
     return (
       <div>
         <div className="row">
@@ -73,7 +72,7 @@ class InvoiceTemplate extends Component {
                   Invoice Header
                 </div>
                 <div className="panel-body">
-                  <MailEditorRich value={settings.get('body')}
+                  <MailEditorRich value={settings.get('header')}
                                   editorName="editor-header"
                                   name="header"
                                   configPath="config-br-invoices.js"
@@ -88,7 +87,7 @@ class InvoiceTemplate extends Component {
                   Invoice Footer
                 </div>
                 <div className="panel-body">
-                  <MailEditorRich value={settings.get('body')}
+                  <MailEditorRich value={settings.get('footer')}
                                   editorName="editor-footer"
                                   name="footer"
                                   configPath="config-br-invoices.js"

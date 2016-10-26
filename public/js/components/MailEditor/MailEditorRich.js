@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
 class RichEditorExample extends React.Component {
   constructor(props) {
@@ -9,14 +9,8 @@ class RichEditorExample extends React.Component {
       showWYSIWYG: false
     };
 
-    // this.onChange = this.onChange.bind(this);
     this.initEditor = this.initEditor.bind(this);
   }
-
-  /*onChange(editorContent) {
-    debugger;
-    this.props.onChange(editorContent, this.props.name);
-  }*/
 
   initEditor() {
     let self = this;
@@ -24,13 +18,19 @@ class RichEditorExample extends React.Component {
     let editorName = self.props.editorName;
 
     function toggleEditor() {
+      let editor = CKEDITOR.instances[editorName];
+
+      if (editor) {
+        editor.destroy(true);
+      }
+
       window.CKEDITOR.replace(editorName,
         {
           customConfig: configPath,
           toolbar: "Basic",
           // width: 870,
           height: self.props.editorHeight || 250,
-          extraPlugins: 'placeholder,placeholder_select',
+          extraPlugins: 'placeholder,placeholder_select,tableresize',
           placeholder_select: {
             placeholders: self.props.fields
           }
@@ -56,7 +56,7 @@ class RichEditorExample extends React.Component {
 
     return (
       <div>
-        <textarea name={this.props.editorName} cols="100" rows="6" defaultValue={editorContent}></textarea>
+        <textarea name={this.props.editorName} cols="100" rows="6" value={editorContent}></textarea>
       </div>
     );
   }

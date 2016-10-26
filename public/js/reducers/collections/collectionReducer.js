@@ -5,16 +5,17 @@ import {
   SET_COLLECTION_ACTIVE,
   SET_COLLECTION_MAIL_SUBJECT,
   SET_COLLECTION_MAIL_BODY,
-  CLEAR_COLLECTION
+  CLEAR_COLLECTION,
+  SET_DUMNMY_COLLECTION
 } from '../../actions/collectionsActions';
 
 const defaultState = Immutable.Map({
   id: undefined,
-  name: undefined,
+  name: '',
   days: 1,
   active: 1,
-  subject: undefined,
-  body: undefined
+  subject: '',
+  body: ''
 });
 
 const collectionReducer = (state = defaultState, action) => {
@@ -37,6 +38,16 @@ const collectionReducer = (state = defaultState, action) => {
 
     case SET_COLLECTION_MAIL_BODY:
       return state.set('body', action.body);
+
+    case SET_DUMNMY_COLLECTION:
+      return  Immutable.Map({
+                id: 1,
+                name: "First collection",
+                days: 3,
+                active: 1,
+                subject: "Please complete your payment",
+                body: "Dear [[customer name]], <br />you have not pay for your last"
+              });
 
     case CLEAR_COLLECTION:
       return defaultState;

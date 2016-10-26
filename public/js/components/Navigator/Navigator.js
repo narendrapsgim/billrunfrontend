@@ -141,7 +141,7 @@ class Navigator extends Component {
                   <li>
                     <Link to="/users" id="users" className={(this.state.activeNav === "users") ? "active" : ""}
                           onClick={this.setActiveNav}>
-                      <i className="fa fa-user fa-fw" /><span>User Management</span>
+                      <i className="fa fa-user fa-fw" /><span>Users Management</span>
                     </Link>
                   </li>
                   <li className={classNames({'active': !this.state.uiOpenSetting, 'has-second': true})}>
