@@ -1,0 +1,13 @@
+.form-inner-edit-row {
+  margin-bottom: 3px;
+
+   > div {
+    padding-right: 0;
+    padding-left: 5px;
+
+     &:first-child {
+       padding-right: 5px;
+     }
+  }
+
+}

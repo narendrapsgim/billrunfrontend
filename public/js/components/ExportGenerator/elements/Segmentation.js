@@ -50,20 +50,11 @@ class Segmentation extends Component {
         Please add segments filters for Export generator.
         <br/>
         <br/>
-        <Panel header={<h3>Segments <Help contents="Each Segment should has a field and ranges value"/>
-          <Button onClick={this.props.addSegmentation} bsSize="xsmall" className="pull-right">
-            <i className="fa fa-plus"></i>&nbsp;Add</Button>
-        </h3>}>
-          <div className="form-group">
-            <div className="col-lg-6">
-              <label htmlFor="date_field">Field</label>
-            </div>
-            <div className="col-lg-2">
-              <label htmlFor="date_field">From</label>
-            </div>
-            <div className="col-lg-2">
-              <label htmlFor="date_field">To</label>
-            </div>
+        <Panel header={<h3>Segments <Help contents="Each Segment should has a field and ranges value" /></h3>}>
+          <div className="form-group form-inner-edit-row">
+            <div className="col-lg-6"><label htmlFor="date_field">Field</label></div>
+            <div className="col-lg-2"><label htmlFor="date_field">From</label></div>
+            <div className="col-lg-2"><label htmlFor="date_field">To</label></div>
           </div>
 
           {this.props.segments.toArray().map((entity, index) => (
@@ -72,6 +63,10 @@ class Segmentation extends Component {
             </div>
           ))
           }
+
+          <Button onClick={this.props.addSegmentation} bsSize="xsmall" className="btn-link">
+            <i className="fa fa-plus"></i>&nbsp;Add Segment</Button>
+
         </Panel>
       </div>
     )
