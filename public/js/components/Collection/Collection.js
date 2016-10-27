@@ -13,7 +13,8 @@ import {
   setCollectionMailSubject,
   setCollectionMailBody,
   clearCollection,
-  setDumnmyCollection
+  setDumnmyCollection,
+  setDumnmyCollection2
 } from '../../actions/collectionsActions';
 
 /* COMPONENTS */
@@ -45,10 +46,17 @@ class Collection extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const { collection_id, action } = this.props.location.query;
+    const { id, action } = this.props.location.query;
 
     // Should be deal with edit
-    if (action !== "new") dispatch(setDumnmyCollection());
+    if (action !== "new") {
+      // for demo only
+      if (id === "1" ){
+        dispatch(setDumnmyCollection());
+      } else {
+        dispatch(setDumnmyCollection2());
+      }
+    }
   }
 
   onError(message) {
@@ -171,7 +179,8 @@ function mapDispatchToProps(dispatch) {
     setCollectionMailSubject,
     setCollectionMailBody,
     clearCollection,
-    setDumnmyCollection
+    setDumnmyCollection,
+    setDumnmyCollection2
   }, dispatch);
 }
 

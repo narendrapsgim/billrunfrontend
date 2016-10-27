@@ -6,7 +6,8 @@ import {
   SET_COLLECTION_MAIL_SUBJECT,
   SET_COLLECTION_MAIL_BODY,
   CLEAR_COLLECTION,
-  SET_DUMNMY_COLLECTION
+  SET_DUMNMY_COLLECTION,
+  SET_DUMNMY_COLLECTION_2
 } from '../../actions/collectionsActions';
 
 const defaultState = Immutable.Map({
@@ -46,8 +47,18 @@ const collectionReducer = (state = defaultState, action) => {
                 days: 3,
                 active: 1,
                 subject: "Please complete your payment",
-                body: "Dear [[customer name]], <br />you have not pay for your last"
+                body: "Hello [[first name]],<br/>As one of our most valued customers, we would like to remind you that the payment of [[amount_due]] of last month was not paid. <br />We will appreciate your action and we highly appreciate your loyalty to us."
               });
+
+    case SET_DUMNMY_COLLECTION_2:
+      return  Immutable.Map({
+        id: 2,
+        name: "Second collection",
+        days: 8,
+        active: 1,
+        subject: "Please complete your payment",
+        body: "Hello [[first name]],<br/>Following our previous note, we wanted to update you that so far ,as of [[current date]] your payment for the amount  due of [[amount_due]] wasn't received.<br/>Please let us know, by responding to this mail or by calling [[call center number]] on your plans to pay."
+      });
 
     case CLEAR_COLLECTION:
       return defaultState;
