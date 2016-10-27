@@ -14,13 +14,5 @@
     "active": true,
     "subject": "Last notifiction complete your payment to {customer_plan}",
     "body": "boo gfoo dear sir, pplaee"
-  },
-  {
-    "id": "3",
-    "name": "Third collection",
-    "days": 8,
-    "active": false,
-    "subject": "Last notifiction complete your payment to {customer_plan}",
-    "body": "boo gfoo dear sir, pplaee"
   }
 ]

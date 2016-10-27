@@ -18,7 +18,8 @@ class CollectionItemDisplay extends Component {
     this.context.router.push({
       pathname: 'collection',
       query: {
-        action: 'edit'
+        action: 'edit',
+        id: this.props.item.get('id')
       }
     });
   }

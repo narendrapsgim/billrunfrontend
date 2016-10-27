@@ -5,6 +5,7 @@ export const SET_COLLECTION_MAIL_SUBJECT = 'SET_COLLECTION_MAIL_SUBJECT';
 export const SET_COLLECTION_MAIL_BODY = 'SET_COLLECTION_MAIL_BODY';
 export const CLEAR_COLLECTION = 'CLEAR_COLLECTION';
 export const SET_DUMNMY_COLLECTION = 'SET_DUMNMY_COLLECTION';
+export const SET_DUMNMY_COLLECTION_2 = 'SET_DUMNMY_COLLECTION_2';
 
 export function setCollectionName(name) {
   return {
@@ -50,5 +51,11 @@ export function clearCollection() {
 export function setDumnmyCollection() {
   return {
     type: SET_DUMNMY_COLLECTION
+  };
+}
+
+export function setDumnmyCollection2() {
+  return {
+    type: SET_DUMNMY_COLLECTION_2
   };
 }

@@ -16,10 +16,9 @@ class RichEditorExample extends React.Component {
     let self = this;
     let configPath = self.props.configPath || 'config-br-mails.js';
     let editorName = self.props.editorName;
-    let editor = CKEDITOR.instances[editorName];
+    const  editor = CKEDITOR && CKEDITOR.instances[editorName];
 
     function toggleEditor() {
-
       if (editor) {
         editor.destroy(true);
       }
