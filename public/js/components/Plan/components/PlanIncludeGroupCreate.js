@@ -283,7 +283,7 @@ export default class PlanIncludeGroupCreate extends Component {
             <Button bsSize="small" onClick={this.handlePrev} style={{marginRight: 9, minWidth: 90}}><i className="fa fa-angle-left" />&nbsp;Back</Button>
             { (stepIndex === 3)
               ? <Button bsSize="small" onClick={this.handleFinish} style={{ minWidth: 90 }} bsStyle="primary">Save</Button>
-              : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 90 }}><i className="fa fa-angle-right" />&nbsp;Next</Button>
+              : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 90 }}>Next&nbsp;<i className="fa fa-angle-right" /></Button>
             }
           </Modal.Footer>
         </Modal>
