@@ -114,63 +114,74 @@ export default class Product extends Component {
 
     return (
       <Row>
-        <Col lg={8}>
+        <Col lg={12}>
           <Form>
             <Panel>
-              <Col lg={6} md={6}>
-                <FormGroup>
-                  <ControlLabel>Name</ControlLabel>
-                  <Field onChange={ this.onChangeName } value={ product.get('key', '') } disabled={mode === 'update'} />
-                </FormGroup>
-              </Col>
 
-              <Col lg={6} md={6}>
-                <FormGroup>
-                  <ControlLabel>Code</ControlLabel>
-                  <Field onChange={this.onChangeCode} value={ product.get('code', '') } />
-                </FormGroup>
-              </Col>
+              <Row>
+                <Col lg={6} md={6}>
+                  <FormGroup>
+                    <ControlLabel>Name</ControlLabel>
+                    <Field onChange={ this.onChangeName } value={ product.get('key', '') } disabled={mode === 'update'} />
+                  </FormGroup>
+                </Col>
 
-              <Col lg={12} md={12}>
-                <FormGroup>
-                  <ControlLabel>Description</ControlLabel>
-                  <Field onChange={this.onChangeDescription} value={product.get('description', '')} fieldType="textarea" />
-                </FormGroup>
-              </Col>
+                <Col lg={6} md={6}>
+                  <FormGroup>
+                    <ControlLabel>Code</ControlLabel>
+                    <Field onChange={this.onChangeCode} value={ product.get('code', '') } />
+                  </FormGroup>
+                </Col>
+              </Row>
 
+              <Row>
+                <Col lg={12} md={12}>
+                  <FormGroup>
+                    <ControlLabel>Description</ControlLabel>
+                    <Field onChange={this.onChangeDescription} value={product.get('description', '')} fieldType="textarea" />
+                  </FormGroup>
+                </Col>
+              </Row>
 
-              <Col lg={12} md={12}>
-                <FormGroup>
-                  <ControlLabel>Unit Type</ControlLabel>
-                  <Select allowCreate
-                      disabled={mode === 'update'}
-                      onChange={this.onChangeUsaget}
-                      options={this.getUsageTypesOptions()}
-                      value={usaget}
-                  />
-                </FormGroup>
-              </Col>
+              <Row>
+                <Col lg={12} md={12}>
+                  <FormGroup>
+                    <ControlLabel>Unit Type</ControlLabel>
+                    <Select allowCreate
+                        disabled={mode === 'update'}
+                        onChange={this.onChangeUsaget}
+                        options={this.getUsageTypesOptions()}
+                        value={usaget}
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
 
-              <Col lg={12} md={12}>
-                <FormGroup>
-                  <Checkbox checked={vatable} onChange={this.onChangeVatable}>
-                    VATable
-                  </Checkbox>
-                </FormGroup>
-              </Col>
+              <Row>
+                <Col lg={12} md={12}>
+                  <FormGroup>
+                    <Checkbox checked={vatable} onChange={this.onChangeVatable}>
+                      VATable
+                    </Checkbox>
+                  </FormGroup>
+                </Col>
+              </Row>
 
-              <Col lg={12} md={12}>
-                <FormGroup>
-                  <ControlLabel>Prefixes</ControlLabel>
-                  <Chips onChange={this.onChangePrefix} items={prefixs} placeholder='Add new prefix' />
-                </FormGroup>
-              </Col>
+              <Row>
+                <Col lg={12} md={12}>
+                  <FormGroup>
+                    <ControlLabel>Prefixes</ControlLabel>
+                    <Chips onChange={this.onChangePrefix} items={prefixs} placeholder='Add new prefix' />
+                  </FormGroup>
+                </Col>
+              </Row>
 
             </Panel>
 
             <Panel header={<h3>Price</h3>}>
              { this.renderPrices() }
-             { <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button> }
+             <br />
+            <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
             </Panel>
 
           </Form>
