@@ -132,7 +132,23 @@ $page-wrapper-transition: margin 200ms linear;
         position: absolute;
         width: 250px;
         background: #ffffff;
+        border: 1px solid #e7e7e7;
+        left: 50px;
+        top: -1px;
       }
+
+      li.open {
+        .nav-second-level {
+          display: none;
+        }
+      }
+
+      li.open.active {
+        .nav-second-level {
+          display: block;
+        }
+      }
+
     }
 
     #btn-collapse-menu {
