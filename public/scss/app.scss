@@ -7,8 +7,6 @@
 @import "components/Navigator";
 @import "components/FormInnerEditTable";
 
-
-
 .form-input-with-hint-60 {
   input {
     float: left;
@@ -19,4 +17,8 @@
     display: inline-block;
     line-height: 2;
   }
+}
+
+.btn-link {
+  cursor: pointer;
 }

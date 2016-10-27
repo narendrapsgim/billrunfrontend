@@ -51,21 +51,19 @@ class Segmentation extends Component {
         <br/>
         <br/>
         <Panel header={<h3>Segments <Help contents="Each Segment should has a field and ranges value" /></h3>}>
-          <div className="form-group form-inner-edit-row">
+          <div className="form-group row form-inner-edit-row">
             <div className="col-lg-6"><label htmlFor="date_field">Field</label></div>
             <div className="col-lg-2"><label htmlFor="date_field">From</label></div>
             <div className="col-lg-2"><label htmlFor="date_field">To</label></div>
           </div>
 
           {this.props.segments.toArray().map((entity, index) => (
-            <div key={index}>
-              <Segments options={options} index={index} segment={entity} onSelectField={this.onSelectField} onDelete={this.onDelete}/>
-            </div>
-          ))
+            <Segments options={options} index={index} segment={entity} onSelectField={this.onSelectField} onDelete={this.onDelete} key={index}/>
+            ))
           }
 
-          <Button onClick={this.props.addSegmentation} bsSize="xsmall" className="btn-link">
-            <i className="fa fa-plus"></i>&nbsp;Add Segment</Button>
+          <a onClick={this.props.addSegmentation}  className="btn-link">
+            <i className="fa fa-plus"></i>&nbsp;Add Segment</a>
 
         </Panel>
       </div>
