@@ -45,7 +45,7 @@ const lines_list_view = {
         {key : 'service_type', label : 'Service Type'},
         {key : 'plan', label : 'plan'},
         {key : 'type', label : 'Type'},
-        {key : 'urt', label : 'URT',  type : 'urt', sortable : true},
+        {key : 'urt', label : 'Usage time', type : 'urt', sortable : true},
         {key : 'usaget', label : 'Usage', type:'select', filter : {
           options: [
             { value: "-", key: ""},
@@ -59,6 +59,7 @@ const lines_list_view = {
             { value: "MMS", key: "sms"},
             { value: "Data", key: "data"},
           ]}, hidden : true},
+        {key : 'aprice', label : 'Charge', type:'number'},
         {key : 'billrun', label : 'Billrun', type:'multiselect', filter : { options: billrun_dates, query:{'billrun':{'$in':1}} ,valuePath:{'billrun':{'$in': null}}}, hidden : true},
         {key : 'urt2', label : 'From',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().subtract(2, 'months')), query:{'urt':{'$gt':1}} ,valuePath:{'urt':{'$gt': null}}  }, hidden : true},
         {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
@@ -66,6 +67,7 @@ const lines_list_view = {
       defaults : {
         tableHeight : '500px',
       },
+      onItemClick : 'edit',
       controllers : {
         export : { label: 'Export', callback:'onClickExport'},
       },
@@ -157,8 +159,60 @@ const lines_list_view = {
   } ]
 };
 
+const lines_edit_view = {
+  title: "Edit line",
+  view_type: "sections",
+  sections: [
+    {
+      display: "inline",
+      fields: [
+        { row: [
+          { dbkey: "_id[$id]", label: "ID", crud: '0100', size:3},
+          { dbkey: "type", label: "Type", size:3},
+          { dbkey: "usaget", label: "Usage Type" , size:3},
+        ]},
+        { row: [
+          {dbkey : 'aid', label : 'AID', type:'number', size:3},
+          {dbkey : 'sid', label : 'SID', type:'number', size:3},
+        ]},
+        { row: [
+          { dbkey: "imsi", label: "IMSI"},
+          { dbkey: "plan", label: "Plan"},
+          { dbkey: "country", label: "Origin Country", size:3},
+          { dbkey: "destination", label: "Destination", size:3},
+          { dbkey: "calling_number", label: "Calling number"},
+          { dbkey: "called_number", label: "called number"},
+        ]},
+        { row: [
+
+          { dbkey: "usagev", label: "Volume" , size:3},
+          { dbkey: "urt", label: "Usage time" , type:'date', size:3},
+          { dbkey: "process_time", label: "Process time", size:3},
+          { dbkey : 'aprice', label : 'Charge', type:'number'},
+        ]},
+        { row: [
+          { dbkey: "cdr_id", label: "CDR ID", size:4},
+          { dbkey: "subscriber_num", label: "Susbscriber number", size:4},
+          { dbkey: "cra_type", label: "CRA Type", size:4},
+          { dbkey: "date", label: "Raw date", size:4},
+          { dbkey: "start_time", label: "Raw date", size:4},
+          { dbkey: "number_type", label: "Identification Number type", size:4},
+          { dbkey: "number", label: "Identification Number", size:4},
+          { dbkey: "service_type", label: "Service type", size:4},
+          { dbkey: "network_source", label: "network source", size:4},
+          { dbkey: "bts_origin", label: "BTS origin", size:4},
+          { dbkey: "sp_value", label: "SP value", size:4},
+
+        ]},
+
+      ]
+    }
+  ]
+};
+
 const LinesView = {
   lines_list_view,
+  lines_edit_view,
 };
 
 export default LinesView;
