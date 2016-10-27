@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { bindActionCreators } from 'redux';
-import { Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
+import { Button , Form } from 'react-bootstrap';
 import { showDanger } from '../../actions/alertsActions';
 import Help from '../Help';
 import {
@@ -14,6 +14,9 @@ import {
 /* COMPONENTS */
 import ActionButtons from '../Elements/ActionButtons';
 import MailEditorRich from '../MailEditor/MailEditorRich';
+
+/* DEV - TO replace with real API */
+import templates from './invoiceTemplates.json';
 
 /* DEV - TO replace with real API */
 import fieldsList from './stub_fields.json';
@@ -32,6 +35,7 @@ class InvoiceTemplate extends Component {
 
     this.onChange = this.onChange.bind(this);
     this.onCancel = this.onCancel.bind(this);
+    this.loadTemplate = this.loadTemplate.bind(this);
   }
 
   componentDidMount() {
@@ -48,6 +52,11 @@ class InvoiceTemplate extends Component {
 
   onChange (content, name) {
     this.props.dispatch(setInvoiceTemplate(name, content));
+  }
+
+  loadTemplate (e) {
+    let templateName= e.target.dataset.template;
+    this.props.dispatch(setInvoiceTemplate(templateName, templates[templateName]));
   }
 
   onCancel() {
@@ -70,6 +79,9 @@ class InvoiceTemplate extends Component {
               <div className="panel panel-default">
                 <div className="panel-heading">
                   Invoice Header
+                  <div className="pull-right">
+                    <Button bsSize="xsmall" className="btn-primary" data-template="header" onClick={this.loadTemplate}>Load default</Button>
+                  </div>
                 </div>
                 <div className="panel-body">
                   <MailEditorRich value={settings.get('header')}
@@ -78,13 +90,16 @@ class InvoiceTemplate extends Component {
                                   configPath="config-br-invoices.js"
                                   editorHeight="150"
                                   fields={fieldsList}
-                                  onChange={this.onChange}/>
+                                  onChange={this.onChange} />
                 </div>
               </div>
 
               <div className="panel panel-default">
                 <div className="panel-heading">
                   Invoice Footer
+                  <div className="pull-right">
+                    <Button bsSize="xsmall" className="btn-primary" data-template="footer" onClick={this.loadTemplate}>Load default</Button>
+                  </div>
                 </div>
                 <div className="panel-body">
                   <MailEditorRich value={settings.get('footer')}
@@ -93,7 +108,7 @@ class InvoiceTemplate extends Component {
                                   configPath="config-br-invoices.js"
                                   editorHeight="150"
                                   fields={fieldsList}
-                                  onChange={this.onChange}/>
+                                  onChange={this.onChange} />
                 </div>
               </div>
 
@@ -117,7 +132,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state, props) {
-  return { settings: state.collections.collection};
+  return { settings: state.invoiceTemplate.invoiceTemplate};
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(InvoiceTemplate));
