@@ -27,7 +27,7 @@ class Settings extends Component {
   }
 
   componentWillMount() {
-    this.props.dispatch(getSettings(["pricing", "billrun"]));
+    this.props.dispatch(getSettings(["pricing", "billrun","tenant"]));
   }
 
   onChangeFieldValue(category, e) {
@@ -51,6 +51,8 @@ class Settings extends Component {
 
     //save 'pricing'
     this.props.dispatch(saveSettings('pricing', this.props.settings));
+    // save 'tenant'
+    this.props.dispatch(saveSettings('tenant', this.props.settings));
   }
   
   render() {
@@ -59,6 +61,9 @@ class Settings extends Component {
     let collection = settings.get('collection') || Immutable.Map();
     let datetime = settings.get('billrun') || Immutable.Map();
     let currency_tax = settings.get('pricing') || Immutable.Map();
+    let tenant = settings.get('tenant') || Immutable.Map();
+
+    console.log(tenant);
 
     return (
       <div>
@@ -66,7 +71,7 @@ class Settings extends Component {
               onSelect={this.handleSelectTab}>
           <Tab title="Company" eventKey={1}>
             <Panel style={{borderTop: 'none'}}>
-              <Tenant onChange={this.onChangeFieldValue} data={datetime}/>
+              <Tenant onChange={this.onChangeFieldValue} data={tenant}/>
             </Panel>
           </Tab>
 

@@ -20,9 +20,9 @@ export default class Tenant extends Component {
               </Col>
               <Col sm={6}>
                 <FormControl type="text"
-                             name="company-name"
+                             name="name"
                              onChange={ onChange }
-                             value={data.get('companyName', '')}/>
+                             value={data.get('name', '')}/>
               </Col>
             </FormGroup>
 
@@ -32,9 +32,9 @@ export default class Tenant extends Component {
               </Col>
               <Col sm={6}>
                 <FormControl componentClass="textarea"
-                             name="company-address"
+                             name="address"
                              onChange={ onChange }
-                             value={data.get('companyAddress', '')}/>
+                             value={data.get('address', '')}/>
 
               </Col>
             </FormGroup>
@@ -45,7 +45,7 @@ export default class Tenant extends Component {
               </Col>
               <Col sm={6}>
                 <FormControl type="text"
-                             name="company-phone"
+                             name="phone"
                              onChange={ onChange }
                              value={data.get('phone', '')}/>
               </Col>
@@ -57,9 +57,9 @@ export default class Tenant extends Component {
               </Col>
               <Col sm={6}>
                 <FormControl type="email"
-                             name="company-email"
+                             name="email"
                              onChange={ onChange }
-                             value={data.get('phone', '')}/>
+                             value={data.get('email', '')}/>
               </Col>
             </FormGroup>
 
@@ -68,10 +68,10 @@ export default class Tenant extends Component {
                 Website
               </Col>
               <Col sm={6}>
-                <FormControl type="email"
-                             name="company-website"
+                <FormControl type="text"
+                             name="website"
                              onChange={ onChange }
-                             value={data.get('phone', '')}/>
+                             value={data.get('website', '')}/>
               </Col>
             </FormGroup>
           </Form>
