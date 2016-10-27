@@ -18,6 +18,7 @@ class Settings extends Component {
 
     this.onChangeDatetime = this.onChangeDatetime.bind(this);
     this.onChangeCurrencyTax = this.onChangeCurrencyTax.bind(this);
+    this.onChangeFieldValue = this.onChangeFieldValue.bind(this);
     this.onSave = this.onSave.bind(this);
     this.handleSelectTab = this.handleSelectTab.bind(this);
   }
@@ -47,12 +48,17 @@ class Settings extends Component {
 
   onSave() {
     //save 'BillRun'
-    this.props.dispatch(saveSettings('billrun', this.props.settings));
-
+    if (this.props.settings.has('billrun')) {
+      this.props.dispatch(saveSettings('billrun', this.props.settings));
+    }
     //save 'pricing'
-    this.props.dispatch(saveSettings('pricing', this.props.settings));
+    if (this.props.settings.has('pricing')) {
+      this.props.dispatch(saveSettings('pricing', this.props.settings));
+    }
     // save 'tenant'
-    this.props.dispatch(saveSettings('tenant', this.props.settings));
+    if (this.props.settings.has('tenant')) {
+      this.props.dispatch(saveSettings('tenant', this.props.settings));
+    }
   }
   
   render() {
@@ -62,8 +68,6 @@ class Settings extends Component {
     let datetime = settings.get('billrun') || Immutable.Map();
     let currency_tax = settings.get('pricing') || Immutable.Map();
     let tenant = settings.get('tenant') || Immutable.Map();
-
-    console.log(tenant);
 
     return (
       <div>
