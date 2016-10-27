@@ -177,14 +177,14 @@ const lines_edit_view = {
         ]},
         { row: [
           { dbkey: "imsi", label: "IMSI"},
-          { dbkey: "plan", label: "Plan"},
+
           { dbkey: "country", label: "Origin Country", size:3},
           { dbkey: "destination", label: "Destination", size:3},
-          { dbkey: "calling_number", label: "Calling number"},
-          { dbkey: "called_number", label: "called number"},
+          { dbkey: "plan", label: "Plan"},
+          { dbkey: "calling_number", label: "Calling number", size:3},
+          { dbkey: "called_number", label: "called number", size:3},
         ]},
         { row: [
-
           { dbkey: "usagev", label: "Volume" , size:3},
           { dbkey: "urt", label: "Usage time" , type:'date', size:3},
           { dbkey: "process_time", label: "Process time", size:3},
