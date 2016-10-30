@@ -4,73 +4,79 @@ import { Panel, Form, FormGroup, Col, FormControl, ControlLabel} from 'react-boo
 export default class Tenant extends Component {
   constructor(props) {
     super(props);
+    
+    this.onChangeField = this.onChangeField.bind(this);
+  }
+
+  onChangeField (e) {
+    this.props.onChange('tenant', e);
   }
 
   render() {
-    const { onChange, data } = this.props;
+    const { data } = this.props;
 
 
     return (
       <div>
         <Panel header="Company Details">
           <Form horizontal>
-            <FormGroup controlId='company-name' key='company-name'>
+            <FormGroup controlId='name' key='name'>
               <Col componentClass={ControlLabel} md={2}>
                 Name
               </Col>
               <Col sm={6}>
                 <FormControl type="text"
                              name="name"
-                             onChange={ onChange }
+                             onChange={this.onChangeField}
                              value={data.get('name', '')}/>
               </Col>
             </FormGroup>
 
-            <FormGroup controlId='company-address' key='company-address'>
+            <FormGroup controlId='address' key='address'>
               <Col componentClass={ControlLabel} md={2}>
                 Address
               </Col>
               <Col sm={6}>
                 <FormControl componentClass="textarea"
                              name="address"
-                             onChange={ onChange }
+                             onChange={this.onChangeField}
                              value={data.get('address', '')}/>
 
               </Col>
             </FormGroup>
 
-            <FormGroup controlId='company-phone' key='company-phone'>
+            <FormGroup controlId='phone' key='phone'>
               <Col componentClass={ControlLabel} md={2}>
                 Phone
               </Col>
               <Col sm={6}>
                 <FormControl type="text"
                              name="phone"
-                             onChange={ onChange }
+                             onChange={this.onChangeField}
                              value={data.get('phone', '')}/>
               </Col>
             </FormGroup>
 
-            <FormGroup controlId='company-email' key='company-email'>
+            <FormGroup controlId='email' key='email'>
               <Col componentClass={ControlLabel} md={2}>
                 Email
               </Col>
               <Col sm={6}>
                 <FormControl type="email"
                              name="email"
-                             onChange={ onChange }
+                             onChange={this.onChangeField}
                              value={data.get('email', '')}/>
               </Col>
             </FormGroup>
 
-            <FormGroup controlId='company-website' key='company-website'>
+            <FormGroup controlId='website' key='website'>
               <Col componentClass={ControlLabel} md={2}>
                 Website
               </Col>
               <Col sm={6}>
                 <FormControl type="text"
                              name="website"
-                             onChange={ onChange }
+                             onChange={this.onChangeField}
                              value={data.get('website', '')}/>
               </Col>
             </FormGroup>
