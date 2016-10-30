@@ -325,9 +325,14 @@ class List extends Component {
     let { page, collection } = this.props;
     let rawData = this.state.rows[row];
     if(column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick){
-      let id = rawData._id.$id;
-      let url = `/${page}/${collection}/${this.state.settings.onItemClick}/${id}`;
-      this.context.router.push(url);
+      if( _.isFunction(this.state.settings.onItemClick) ) {
+        let url = this.state.settings.onItemClick( rawData, this.props );
+        this.context.router.push(url);
+      } else {
+        let id = this.state.settings.itemIdField ? rawData[this.state.settings.itemIdField] : rawData._id.$id ;
+        let url = `/${page}/${collection}/${this.state.settings.onItemClick}/${id}`;
+        this.context.router.push(url);
+      }
       e.stopPropagation();
     }
   }
@@ -771,7 +776,7 @@ onClickExport() {
         {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * itemsPerPage) : 0)}</TableRowColumn>}
         { this.state.fields.map((field, i) => {
           if( !(field.hidden  && field.hidden == true) ){
-            return <TableRowColumn style={styles.tableCell} key={i}>{this._formatField(row, field, i)}</TableRowColumn>
+            return <TableRowColumn style={styles.tableCell} key={i} onClick={field.onClick} >{this._formatField(row, field, i)}</TableRowColumn>
           }
         })}
       </TableRow>

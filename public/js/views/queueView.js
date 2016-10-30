@@ -29,7 +29,8 @@ const queue_list_view = {
       defaults : {
         tableHeight : '500px',
       },
-      onItemClick : 'edit',
+      onItemClick : 'related',
+      itemIdField : 'stamp',
       advancedFilter : [
         {
           key: 'called_number',

@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link, browserHistory } from 'react-router';
 
-import { updateFieldValue, getCollectionEntity, getCollectionEntites, saveCollectionEntity, setInitialItem } from '../../actions';
+import { updateFieldValue, getRelatedEntity,  getCollectionEntity, getCollectionEntites, saveCollectionEntity, setInitialItem } from '../../actions';
 
 import {Tabs, Tab} from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -258,6 +258,17 @@ class PageBuilder extends Component {
     }
   }
 
+  getRelatedItem(props) {
+    let pageName = this.getPageName(props);
+    let { collection, entity_id, action } = props.params;
+    collection = 'lines';
+    this.setState({collection, entity_id, pageName, action});
+
+    if (entity_id) {
+      props.dispatch(getRelatedEntity(entity_id, collection, pageName));
+    }
+  }
+
   getCollectionItem(props) {
     let pageName = this.getPageName(props);
     let { collection, entity_id, action } = props.params;
@@ -281,6 +292,8 @@ class PageBuilder extends Component {
         this.getCollectionItem(nextProps);
       } else if(nextProps.params.action == "edit_multiple"){
         this.getCollectionItems(nextProps);
+      } else if (nextProps.params.action === "related" ) {
+        this.getRelatedItem(nextProps);
       } else {
         this.setInitialState(nextProps);
       }
@@ -512,16 +525,17 @@ class PageBuilder extends Component {
   }
 
   actionButtons(action = this.state.action) {
-    if (action === "edit" || action === "new" || action === "clone" || action === "close_and_new" || action === "edit_multiple") {
+    if (["edit","new", "clone", "close_and_new", "edit_multiple","related"].indexOf(action) != -1) {
       let style = {
         margin: "12px"
       };
+      let saveStyle  =  action === 'related' ? {margin: "12px",display:"none"} : style;
       return (
-        <div className="action-buttons">
+        <div className="action-buttons" >
           <RaisedButton
               label="Save"
               primary={true}
-              style={style}
+              style={saveStyle}
               onMouseUp={this.onSave}
               data-action={action}
           />

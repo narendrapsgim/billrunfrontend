@@ -102,6 +102,7 @@ const View = {
       views: {
         list: QueueView.queue_list_view,
         edit: QueueView.queue_view_view,
+        related: LinesView.lines_edit_view,
       }
     },
     logs: {

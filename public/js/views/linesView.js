@@ -41,8 +41,7 @@ const lines_list_view = {
       fields : [
         {key : 'aid', label : 'AID', type:'number', filter : { defaultValue : ''}},
         {key : 'sid', label : 'SID', type:'number', filter : {}},
-        {key : 'service_name', label : 'Service Name'},
-        {key : 'service_type', label : 'Service Type'},
+        //{key : 'arate', label : 'Rate', type:'rate_ref'},
         {key : 'plan', label : 'plan'},
         {key : 'type', label : 'Type'},
         {key : 'urt', label : 'Usage time', type : 'urt', sortable : true},
