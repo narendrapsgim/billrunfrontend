@@ -627,6 +627,9 @@ onClickExport() {
   _formatField(row, field, i){
     let output = '';
     let value = _.result(row, field.key);
+    if( (typeof value === "undefined")) {
+      return '-';
+    }
     switch (field.type) {
       case 'boolean':
         output = value ? 'Yes' : 'No' ;
@@ -657,7 +660,7 @@ onClickExport() {
         }
         break;
       default:
-        output = (typeof value === "undefined") ? "-" : value;
+        output = value;
     }
     return output;
   }

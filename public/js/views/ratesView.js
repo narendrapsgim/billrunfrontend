@@ -3,34 +3,11 @@ import * as Colors from 'material-ui/styles/colors';
 
 const rates_field = [
   { dbkey: "*", collapsible: true, collapsed: true, fields: [
-      //Rate per plan support
-      { dbkey: "*", collapsible: true, collapsed: true, fields: [
-          { row: [
-            { dbkey: "access", label: "Access", type: "text", size: 4},
-            { dbkey: "currency", label: "Currency", type: "text", size: 4},
-            { dbkey: "unit", label: "Unit", type: "text", size: 4},
-          ]},
-          { row: [
-            { dbkey: "erp_account", label: "ERP Account", type: "text"},
-          ]},
-          { row: [
-            { dbkey: "groups", label : 'Groups', type: 'array'},
-          ]},
-          { row: [
-            { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
-              { row: [
-                { dbkey: "price", label: "Price ", type: "text", size: 4},
-                { dbkey: "interval", label: "Interval", type: "text", size: 4},
-                { dbkey: "to", label: "To", type: "text", size: 4},
-              ], label: ""},
-            ]},
-          ]},
-      ]},
-      //Legacy rates support
       { row: [
         { dbkey: "access", label: "Access", type: "text", size: 4},
         { dbkey: "currency", label: "Currency", type: "text", size: 4},
         { dbkey: "unit", label: "Unit", type: "text", size: 4},
+        { dbkey: "pass_through", label: "Pass Through", type: "checkbox", size: 1},
       ]},
       { row: [
         { dbkey: "erp_account", label: "ERP Account", type: "text"},
@@ -38,7 +15,17 @@ const rates_field = [
       { row: [
         { dbkey: "groups", label : 'Groups', type: 'array'},
       ]},
+
       { row: [
+        { dbkey: "*", crud: '1110', collapsible: false, fields: [
+          { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
+            { row: [
+              { dbkey: "price", label: "Price ", type: "text", size: 4},
+              { dbkey: "interval", label: "Interval", type: "text", size: 4},
+              { dbkey: "to", label: "To", type: "text", size: 4},
+            ], label: ""},
+          ]},
+        ]},
         { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
           { row: [
             { dbkey: "price", label: "Price ", type: "text", size: 4},
@@ -103,9 +90,9 @@ const rates_list_view = {
             'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
           ]}, hidden: true},
         {key: 'usaget', label: 'Type', sortable : true},
-        {key: 'rate[0].price', label: 'Price'},
-        {key: 'rate[0].interval', label: 'Interval', type:'interval'},
-        {key: 'access', label: 'Access'},
+        {key: 'rates.*.BASE.rate[0].price', label: 'Price'},
+        {key: 'rates.*.BASE.rate[0].interval', label: 'Interval', type:'interval'},
+        {key: 'rates.*.access', label: 'Access'},
         {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
         {key: 'from', label: 'From', type:"urt", sortable : true, },
         {key: 'to', label: 'To', type:"urt", sortable : true, },
