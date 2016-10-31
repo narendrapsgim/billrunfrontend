@@ -3,6 +3,30 @@ import * as Colors from 'material-ui/styles/colors';
 
 const rates_field = [
   { dbkey: "*", collapsible: true, collapsed: true, fields: [
+      //Rate per plan support
+      { dbkey: "*", collapsible: true, collapsed: true, fields: [
+          { row: [
+            { dbkey: "access", label: "Access", type: "text", size: 4},
+            { dbkey: "currency", label: "Currency", type: "text", size: 4},
+            { dbkey: "unit", label: "Unit", type: "text", size: 4},
+          ]},
+          { row: [
+            { dbkey: "erp_account", label: "ERP Account", type: "text"},
+          ]},
+          { row: [
+            { dbkey: "groups", label : 'Groups', type: 'array'},
+          ]},
+          { row: [
+            { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
+              { row: [
+                { dbkey: "price", label: "Price ", type: "text", size: 4},
+                { dbkey: "interval", label: "Interval", type: "text", size: 4},
+                { dbkey: "to", label: "To", type: "text", size: 4},
+              ], label: ""},
+            ]},
+          ]},
+      ]},
+      //Legacy rates support
       { row: [
         { dbkey: "access", label: "Access", type: "text", size: 4},
         { dbkey: "currency", label: "Currency", type: "text", size: 4},
