@@ -111,6 +111,28 @@ function fetchItem(item_id, collection, page_name) {
   };
 }
 
+function queryItem(query, collection, page_name) {
+  let itemFetchUrl = `/api/find?collection=${collection}&query=${query}`;
+  return dispatch => {
+    dispatch(showProgressBar());
+    let request = axiosInstance.get(itemFetchUrl).then(
+      response => {
+        let item = _.values(response.data.details).shift();
+        dispatch(gotItem(item, collection, page_name));
+        dispatch(hideProgressBar());
+      }
+    ).catch(
+      error => {
+          console.log(error);
+          dispatch(showStatusMessage(error.message || 'Error, please try again', 'error'));
+          dispatch(hideProgressBar());
+      }
+    );
+  };
+}
+
+
+
 function combineArray(key, items, path){
   let dictionary = {};
   let combinedArray = [];
@@ -171,6 +193,13 @@ function fetchItems(item_ids, collection, page_name) {
   };
 }
 
+
+export function getRelatedEntity(related_id, collection, page_name) {
+  return dispatch => {
+    return dispatch(queryItem(`{"stamp": "${related_id}" }`, collection, page_name));
+  };
+}
+
 export function getCollectionEntity(entity_id, collection, page_name) {
   return dispatch => {
     return dispatch(fetchItem(entity_id, collection, page_name));
@@ -195,6 +224,7 @@ export function saveCollectionEntity(item, collection, page_name, action, bulk =
 
   var formData = new FormData();
   if (id) formData.append("id", id);
+
   formData.append("coll", collection);
   formData.append("type", action);
   formData.append("data", JSON.stringify(entity));

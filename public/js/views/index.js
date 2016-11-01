@@ -3,6 +3,7 @@ import VatsView from './vatsView';
 import DiscountsView from './discountsView';
 import ProductsView from './productsView';
 import LinesView from './linesView';
+import QueueView from './queueView';
 import LogsView from './logsView';
 import ChargesView from './chargesView';
 import PlansView from './plansView';
@@ -91,6 +92,17 @@ const View = {
       route: "lines/lines/list",
       views: {
         list: LinesView.lines_list_view,
+        edit: LinesView.lines_edit_view,
+      }
+    },
+    queue: {
+      permission : ["read"],
+      menu_title: "Queue",
+      route: "queue/queue/list",
+      views: {
+        list: QueueView.queue_list_view,
+        edit: QueueView.queue_view_view,
+        related: LinesView.lines_edit_view,
       }
     },
     logs: {
