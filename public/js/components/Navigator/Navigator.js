@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Link} from 'react-router';
+import {Link, withRouter} from 'react-router';
 import {userDoLogout} from '../../actions/userActions';
 import classNames from "classnames";
 import { NavDropdown, MenuItem, Button } from "react-bootstrap";
@@ -46,7 +46,9 @@ class Navigator extends Component {
 
   clickLogout = (e) => {
     e.preventDefault();
-    this.props.userDoLogout();
+    this.props.userDoLogout().then(res => {
+      this.props.router.push('/');
+    });
   };
 
   setActiveNav = (e) => {
@@ -208,4 +210,4 @@ function mapDispatchToProps(dispatch) {
     userDoLogout
   }, dispatch);
 }
-export default connect(null, mapDispatchToProps)(Navigator);
+export default withRouter(connect(null, mapDispatchToProps)(Navigator));

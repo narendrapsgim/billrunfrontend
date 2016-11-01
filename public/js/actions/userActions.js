@@ -69,7 +69,7 @@ export function userDoLogout(){
   };
   return dispatch => {
     dispatch(startProgressIndicator());
-    apiBillRun(query).then(
+    return apiBillRun(query).then(
       success => {
         dispatch(logoutSuccess())
         dispatch(finishProgressIndicator());
