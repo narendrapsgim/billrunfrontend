@@ -442,7 +442,6 @@ class PageBuilder extends Component {
           return this.createFieldHTML(subfield, `${path}.${subfield.dbkey}`, field_idx);
         }
       });
-      console.log(subfields);
       if( !subfields[0] && subfields.length ) {
         return null;
       }
