@@ -7,6 +7,7 @@ const rates_field = [
         { dbkey: "access", label: "Access", type: "text", size: 4},
         { dbkey: "currency", label: "Currency", type: "text", size: 4},
         { dbkey: "unit", label: "Unit", type: "text", size: 4},
+        { dbkey: "pass_through", label: "Pass Through", type: "checkbox", size: 1},
       ]},
       { row: [
         { dbkey: "erp_account", label: "ERP Account", type: "text"},
@@ -14,7 +15,17 @@ const rates_field = [
       { row: [
         { dbkey: "groups", label : 'Groups', type: 'array'},
       ]},
+
       { row: [
+        { dbkey: "*", crud: '1110', collapsible: false, fields: [
+          { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
+            { row: [
+              { dbkey: "price", label: "Price ", type: "text", size: 4},
+              { dbkey: "interval", label: "Interval", type: "text", size: 4},
+              { dbkey: "to", label: "To", type: "text", size: 4},
+            ], label: ""},
+          ]},
+        ]},
         { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
           { row: [
             { dbkey: "price", label: "Price ", type: "text", size: 4},
@@ -56,6 +67,10 @@ const params_field_bulk_edit = [
   ]}
 ];
 
+const usage_types = [
+    'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
+  ];
+
 const rates_list_view = {
   title: "",
   view_type: "list",
@@ -72,15 +87,11 @@ const rates_list_view = {
         {key: 'country', label: 'Country', filter :  {}, hidden: true},
         {key: 'params.source_types', label: 'Source Types', filter:  {}, hidden: true},
         {key: 'params.source_networks', label: 'Source Networks', filter:  {}, hidden: true},
-        {key: 'rates.*.erp_account', label: 'ERP Account', filter: { wildcard: [
-            'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
-          ]}, hidden: true},
-        {key: 'rates.*.groups', label: 'Groups', filter: { wildcard: [
-            'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
-          ]}, hidden: true},
+        {key: 'rates.*.erp_account', label: 'ERP Account', filter: { wildcard: usage_types }, hidden: true},
+        {key: 'rates.*.groups', label: 'Groups', filter: { wildcard: usage_types }, hidden: true},
         {key: 'usaget', label: 'Type', sortable : true},
-        {key: 'rate[0].price', label: 'Price'},
-        {key: 'rate[0].interval', label: 'Interval', type:'interval'},
+        {key: 'BASE.rate.0.price', label: 'Price'},
+        {key: 'BASE.rate.0.interval', label: 'Interval', type:'interval'},
         {key: 'access', label: 'Access'},
         {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
         {key: 'from', label: 'From', type:"urt", sortable : true, },

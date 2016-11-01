@@ -442,7 +442,10 @@ class PageBuilder extends Component {
           return this.createFieldHTML(subfield, `${path}.${subfield.dbkey}`, field_idx);
         }
       });
-      subfields.push(<div key={field.fields.length++} style={{clear: 'both'}}></div>);
+      if( !subfields[0] && subfields.length ) {
+        return null;
+      }
+      subfields.push(<div key={field.fields.length+1} style={{clear: 'both'}}></div>);
       return (
         <div className={'col-md-' + size} key={field_index}>
           <FieldsContainer
@@ -470,7 +473,7 @@ class PageBuilder extends Component {
       let newPath = (typeof field.dbkey !== 'undefined' ) ?  path + '.' + field.dbkey : path ;
       return this.createFieldHTML(field, newPath, field_idx);
     });
-    output.push(<div key={row.length++} style={{clear: 'both'}}></div>);
+    output.push(<div key={row.length+1} style={{clear: 'both'}}></div>);
     return (<div key={row_idx} className="row">{output}</div>);
   }
 
