@@ -572,8 +572,9 @@ onClickExport() {
         if(baseRateData.hasOwnProperty('rates')){
           let rateRates = Object.assign({}, baseRateData['rates']);
           delete baseRateData['rates']
-          for(let rate in rateRates){
-            let newRate = Object.assign({}, baseRateData, rateRates[rate], {usaget:rate});
+          for(let usaget in rateRates){
+            console.log(rateRates[usaget])
+            let newRate = Object.assign({}, baseRateData, rateRates[usaget], {usaget:usaget});
             rows.push(newRate);
           }
         } else {
