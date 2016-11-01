@@ -67,6 +67,10 @@ const params_field_bulk_edit = [
   ]}
 ];
 
+const usage_types = [
+    'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
+  ];
+
 const rates_list_view = {
   title: "",
   view_type: "list",
@@ -83,15 +87,11 @@ const rates_list_view = {
         {key: 'country', label: 'Country', filter :  {}, hidden: true},
         {key: 'params.source_types', label: 'Source Types', filter:  {}, hidden: true},
         {key: 'params.source_networks', label: 'Source Networks', filter:  {}, hidden: true},
-        {key: 'rates.*.erp_account', label: 'ERP Account', filter: { wildcard: [
-            'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
-          ]}, hidden: true},
-        {key: 'rates.*.groups', label: 'Groups', filter: { wildcard: [
-            'call', 'video', 'forwarded_call', 'forwarded_video', 'incoming_call', 'incoming_video', 'sms', 'sms_acte', 'sms_premium', 'data', 'mms', 'vod'
-          ]}, hidden: true},
+        {key: 'rates.*.erp_account', label: 'ERP Account', filter: { wildcard: usage_types }, hidden: true},
+        {key: 'rates.*.groups', label: 'Groups', filter: { wildcard: usage_types }, hidden: true},
         {key: 'usaget', label: 'Type', sortable : true},
-        {key: 'rates.*.BASE.rate[0].price', label: 'Price'},
-        {key: 'rates.*.BASE.rate[0].interval', label: 'Interval', type:'interval'},
+        {key: 'rates.*.BASE.rate.*.price', label: 'Price'},
+        {key: 'rates.*.BASE.rate.*.interval', label: 'Interval', type:'interval'},
         {key: 'rates.*.access', label: 'Access'},
         {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
         {key: 'from', label: 'From', type:"urt", sortable : true, },
