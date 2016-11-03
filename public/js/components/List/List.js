@@ -22,6 +22,8 @@ import RefreshIndicator from 'material-ui/RefreshIndicator';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+import { NavigationExpandMore, HardwareKeyboardArrowRight} from 'material-ui/svg-icons';
 import theme from '../../theme'
 import _ from 'lodash';
 import aja from 'aja';
@@ -126,6 +128,7 @@ class List extends Component {
     this._sortData = this._sortData.bind(this);
     this._parseResults = this._parseResults.bind(this);
     this._buildSearchQueryArg = this._buildSearchQueryArg.bind(this);
+    this._removeSubRawData = this._removeSubRawData.bind(this);
     //Handlers
     this.validateOnlyOneRowIsSelected = this.validateOnlyOneRowIsSelected.bind(this);
     this.validateAlLeastOneRowIsSelected = this.validateAlLeastOneRowIsSelected.bind(this);
@@ -156,6 +159,7 @@ class List extends Component {
     this.state = {
       height : (props.settings.defaults && props.settings.defaults.tableHeight) || '500px',
       rows : [],
+      subRows : {},
       sortField : '',
       sortType : '',
       filters: filters,
@@ -181,6 +185,7 @@ class List extends Component {
     Object.assign(filters, storedFilters);
     this.setState({
       rows : [],
+      subRows : {},
       sortField : '',
       sortType : '',
       fields: settings.fields,
@@ -324,6 +329,16 @@ class List extends Component {
   onClickRow(row, column, e) {
     let { page, collection } = this.props;
     let rawData = this.state.rows[row];
+    if(e.currentTarget.getAttribute('name') && e.currentTarget.getAttribute('name') == 'stamp'){
+      e.preventDefault();
+      e.stopPropagation();
+      const stamp = e.currentTarget.getElementsByTagName('button')[0].value;
+      this.state.subRows[stamp]
+        ? this._removeSubRawData(stamp)
+        : this._getSubRawData(this._buildSubRowQuery(stamp), stamp);
+      return false;
+    }
+    console.log(row, column, e);
     if(column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick){
       if( _.isFunction(this.state.settings.onItemClick) ) {
         let url = this.state.settings.onItemClick( rawData, this.props );
@@ -533,6 +548,12 @@ onClickExport() {
     return queryArgs;
   }
 
+  _buildSubRowQuery(stamp){
+    let queryString = '/api/find?collection=archive&query=';
+    queryString += JSON.stringify({"u_s": stamp});
+    return queryString;
+  }
+
   _buildSearchQuery(){
     let queryString = '';
     let queryArgs = this._buildSearchQueryArg();
@@ -591,6 +612,51 @@ onClickExport() {
     return rows;
   }
 
+  _removeSubRawData(stamp){
+    const { subRows } = this.state;
+    const removedSubRows = Object.assign({}, this.state.subRows, {[stamp]: undefined});
+    this.setState({ subRows: removedSubRows });
+  }
+
+  _getSubRawData(query, rowId){
+    let url = globalSetting.serverUrl;
+    if (!url) return;
+    if(query && query.length){
+      url += query;
+    }
+    console.log("_getSubRawData url : ", url);
+    this.serverRequest = aja()
+      .method('get')
+      .url(url)
+      .on('success', (response) => {
+          if(response && response.status){
+            const subRows = this._parseResults(this.props.collection, response);
+            if(subRows.length){
+              this.setState({
+                  subRows: Object.assign({}, this.state.subRows, {[rowId]: subRows}),
+                  progress: false
+                },
+                this.props.hideProgressBar
+              );
+            } else {
+              this.setState({ progress: false }, this.props.hideProgressBar );
+            }
+
+          } else {
+            this.handleError(response);
+          }
+        })
+      .on('timeout', (response) => {
+          response['desc'] = errorMessages.serverApiTimeout;
+          this.handleError(response);
+        })
+      .on('error', (response) => {
+          response['desc'] = errorMessages.serverApiNetworkError;
+          this.handleError(response);
+        })
+      .go();
+  }
+
   _getData(query) {
     let url = this.state.settings.url;
     if (!url) return;
@@ -634,6 +700,13 @@ onClickExport() {
     switch (field.type) {
       case 'boolean':
         output = value ? 'Yes' : 'No' ;
+        break;
+      case 'subrow':
+        output = (
+          <IconButton tooltip="Get Archive Lines" touch={true} tooltipPosition="bottom-left" value={value} >
+            {this.state.subRows[value] ?  <NavigationExpandMore /> : <HardwareKeyboardArrowRight />}
+          </IconButton>
+        );
         break;
       case 'price':
           let price = parseFloat(value);
@@ -752,7 +825,10 @@ onClickExport() {
 
     let storedFilters = this._getFilterStoredValues(this.props.page, this.props.settings.fields);
 
-    this.setState({settings, fields, filters: storedFilters, advFilters: [], rows: []}, this._updateTableData);
+    this.setState(
+      {settings, fields, filters: storedFilters, advFilters: [], rows: [], subRows: []},
+      this._updateTableData
+    );
   }
 
   render() {
@@ -773,18 +849,37 @@ onClickExport() {
       </TableRow>
     );
 
-    let rows = this.state.rows.map( (row, index) => {
-      let itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : globalSetting.list.maxItems;
-      return (
-      <TableRow key={index}>
-        {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * itemsPerPage) : 0)}</TableRowColumn>}
-        { this.state.fields.map((field, i) => {
-          if( !(field.hidden  && field.hidden == true) ){
-            return <TableRowColumn style={styles.tableCell} key={i} onClick={field.onClick} >{this._formatField(row, field, i)}</TableRowColumn>
-          }
-        })}
-      </TableRow>
-    )});
+    const itemsPerPage = (this.state.settings.pagination && this.state.settings.pagination.itemsPerPage) ? this.state.settings.pagination.itemsPerPage : globalSetting.list.maxItems;
+    let rows = [];
+    this.state.rows.forEach( (row, index) => {
+      rows.push(
+        <TableRow key={index}>
+          {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * itemsPerPage) : 0)}</TableRowColumn>}
+          { this.state.fields.map((field, i) => {
+            if( !(field.hidden  && field.hidden == true) ){
+              return <TableRowColumn name={field.key} style={styles.tableCell} key={i} onClick={field.onClick} >{this._formatField(row, field, i)}</TableRowColumn>
+            }
+          })}
+        </TableRow>
+      );
+			// Check if subrows exist and print them
+      if(this.state.subRows[row.stamp]){
+        this.state.subRows[row.stamp].forEach( (row, subindex) => {
+          rows.push(
+            <TableRow key={`${index}_${subindex}`} selectable={false} striped={false} className='subRow'>
+              {<TableRowColumn style={{ width: 5}}></TableRowColumn>}
+              { this.state.fields.map((field, i) => {
+                if(field.key === 'stamp'){
+                  return (<TableRowColumn style={{ width: 5}}></TableRowColumn>);
+                } else if( !(field.hidden  && field.hidden == true) ){
+                  return <TableRowColumn name={field.key} style={styles.tableCell} key={i} onClick={field.onClick} >{this._formatField(row, field, i)}</TableRowColumn>
+                }
+              })}
+            </TableRow>
+          );
+        });
+      }
+    });
 
     const getActions = () => {
       let actions = [];
