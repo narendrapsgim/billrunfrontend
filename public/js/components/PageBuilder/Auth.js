@@ -4,7 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import * as actions from '../../actions'
 
 
-export default class Auth extends Component {
+class Auth extends Component {
   constructor(props) {
     super(props);
     this.handleOpenLogin = this.handleOpenLogin.bind(this);
