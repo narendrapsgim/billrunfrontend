@@ -39,6 +39,7 @@ const lines_list_view = {
                   ]
       },
       fields : [
+        {key : 'stamp', label : '', type: 'subrow'},
         {key : 'aid', label : 'AID', type:'number', filter : { defaultValue : ''}},
         {key : 'sid', label : 'SID', type:'number', filter : {}},
         //{key : 'arate', label : 'Rate', type:'rate_ref'},

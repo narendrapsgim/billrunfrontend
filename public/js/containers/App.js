@@ -14,7 +14,7 @@ import * as actions from '../actions'
 import LoginPopup from '../components/Authorization/LoginPopup';
 import StatusBar from '../components/StatusBar/StatusBar';
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
     injectTapEventPlugin();
