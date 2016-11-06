@@ -17,20 +17,20 @@ const rates_field = [
       ]},
 
       { row: [
-        { dbkey: "*", crud: '1110', collapsible: false, fields: [
-          { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
+        { dbkey: "*", crud: '1111', collapsible: true, collapsed: false, fields: [
+          { dbkey: "rate", crud: '1111', fieldType: "array", type : 'objectsArray', label: "", collapsible: true, collapsed: false, fields: [
             { row: [
-              { dbkey: "price", label: "Price ", type: "text", size: 4},
-              { dbkey: "interval", label: "Interval", type: "text", size: 4},
-              { dbkey: "to", label: "To", type: "text", size: 4},
+              { dbkey: "price", label: "Price ", type: "text", size: 4 ,defaultValue:0 },
+              { dbkey: "interval", label: "Interval", type: "text", size: 4 ,defaultValue:1 },
+              { dbkey: "to", label: "To", type: "text", size: 4, defaultValue:60 },
             ], label: ""},
           ]},
         ]},
-        { dbkey: "rate", crud: '1110', fieldType: "array", type : 'objectsArray', label: "", collapsible: false, fields: [
+        { dbkey: "rate", crud: '1111', fieldType: "array", type : 'objectsArray', label: "", collapsible: true, collapsed: false, fields: [
           { row: [
-            { dbkey: "price", label: "Price ", type: "text", size: 4},
-            { dbkey: "interval", label: "Interval", type: "text", size: 4},
-            { dbkey: "to", label: "To", type: "text", size: 4},
+            { dbkey: "price", label: "Price ", type: "text", size: 4 ,defaultValue:0 },
+            { dbkey: "interval", label: "Interval", type: "text", size: 4 ,defaultValue:1},
+            { dbkey: "to", label: "To", type: "text", size: 4, defaultValue:60},
           ], label: ""},
         ]},
       ]},
@@ -92,7 +92,8 @@ const rates_list_view = {
         {key: 'usaget', label: 'Type', sortable : true},
         {key: 'BASE.rate.0.price', label: 'Price'},
         {key: 'BASE.rate.0.interval', label: 'Interval', type:'interval'},
-        {key: 'access', label: 'Access'},
+        {key: 'access', label: 'Access' },
+        {key: 'pass_through', label: 'Pass Through', type:'boolean'},
         {key: 'date', label: 'Date', type:'urt' ,filter :  { defaultValue : (moment()), query:{'from' : {'$lte':1}, 'to' : {'$gt': 1} }  ,valuePath:{ 'from': {'$lte':null}, 'to' : {'$gt' : null} } } , hidden : true},
         {key: 'from', label: 'From', type:"urt", sortable : true, },
         {key: 'to', label: 'To', type:"urt", sortable : true, },
@@ -106,7 +107,7 @@ const rates_list_view = {
         delete : { label: 'Delete', color: Colors.red500  },
       },
       onItemClick : 'edit',
-      defaults : {tableHeight : '450px'}
+      defaults : {tableHeight : '750px'}
     } ]
   } ]
 };

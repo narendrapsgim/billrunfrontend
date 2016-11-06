@@ -122,6 +122,9 @@ const rates_discount_list_view = {
         // {key: 'rates', label: 'rates'}
       ],
       onItemClick : 'edit',
+      defaults : {
+        tableHeight : '750px',
+      },
     } ]
   } ]
 };

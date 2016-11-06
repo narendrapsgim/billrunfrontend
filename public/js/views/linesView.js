@@ -64,7 +64,7 @@ const lines_list_view = {
         {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
       ],
       defaults : {
-        tableHeight : '500px',
+        tableHeight : '750px',
       },
       onItemClick : 'edit',
       controllers : {

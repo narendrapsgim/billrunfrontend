@@ -16,7 +16,10 @@ const logs_list_view = {
         { key: 'start_process_time', label: "Start processing time", type:"urt" },
         { key: 'process_time', label: "Date processed" ,sortable:true},
       ],
-      onItemClick: 'edit'
+      onItemClick: 'edit',
+      defaults : {
+        tableHeight : '750px',
+      },
     } ]
   } ]
 };
