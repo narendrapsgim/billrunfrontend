@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Link} from 'react-router';
+import {Link, withRouter} from 'react-router';
 import {userDoLogout} from '../../actions/userActions';
 import classNames from "classnames";
 import { NavDropdown, MenuItem, Button } from "react-bootstrap";
@@ -46,7 +46,9 @@ class Navigator extends Component {
 
   clickLogout = (e) => {
     e.preventDefault();
-    this.props.userDoLogout();
+    this.props.userDoLogout().then(res => {
+      this.props.router.push('/');
+    });
   };
 
   setActiveNav = (e) => {
@@ -57,7 +59,7 @@ class Navigator extends Component {
   openSetting = (e) => {
     e.preventDefault();
     const {id} = e.currentTarget;
-    this.setState({activeNav: id,uiOpenSetting: !this.state.uiOpenSetting});
+    this.setState({uiOpenSetting: !this.state.uiOpenSetting});
   };
 
   onCollapseSidebar() {
@@ -73,8 +75,8 @@ class Navigator extends Component {
     const settingsChildren =  ['settings', 'settingsProcessor','settingsGenerator','settingsGateway','collections','invoiceTemplate'];
 
     let settingIsActive = classNames({
-      'active': this.state.activeNav==='settings-menu',
-      'open': settingsChildren.indexOf(this.state.activeNav) > -1 || this.state.activeNav==='settings-menu',
+      'active': this.state.uiOpenSetting, //this.state.activeNav==='settings-menu',
+      'open': this.state.uiOpenSetting, //settingsChildren.indexOf(this.state.activeNav) > -1 || this.state.activeNav==='settings-menu',
       'has-second': true
     });
 
@@ -153,7 +155,7 @@ class Navigator extends Component {
                     </Link>
                   </li>
                   <li className={settingIsActive}>
-                    <a href  id="settings-menu" className={classNames({'active': !this.state.uiOpenSetting})} onClick={this.openSetting}>
+                    <a href  id="settings-menu" className={classNames({'active': this.state.uiOpenSetting})} onClick={this.openSetting}>
                       <i className="fa fa-cog fa-fw" /><span>Settings</span><span className="fa arrow"></span></a>
                     {/*<ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>*/}
                     <ul className="nav nav-second-level">
@@ -208,4 +210,4 @@ function mapDispatchToProps(dispatch) {
     userDoLogout
   }, dispatch);
 }
-export default connect(null, mapDispatchToProps)(Navigator);
+export default withRouter(connect(null, mapDispatchToProps)(Navigator));

@@ -75,6 +75,10 @@ function sendHttpRequest(query) {
       success => {
         success.json().then(
           body => {
+	    if (body.code === 17576) {
+	      console.log(body);
+	      location.reload();
+	    }
             if (!body.status) throw body;
             resolve(Object.assign(response, { data: body, status:1}));
           }

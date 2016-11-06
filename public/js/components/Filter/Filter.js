@@ -69,6 +69,12 @@ export default class Filter extends Component {
     onFilter(filter);
   }
 
+  onClearFilter = () => {
+    this.setState({filter_by: [], string: ''}, () => {
+      this.onClickFilterBtn();
+    });
+  };
+
   onSelectFilterField(option, checked) {
     const value = option.val();
     const { filter_by } = this.state;    
@@ -95,7 +101,8 @@ export default class Filter extends Component {
           <div className="pull-left">
             <input id="filter-string"
                    placeholder="Search for..."
-                   onChange={this.onChangeFilterString}
+                   onChange={ this.onChangeFilterString }
+		   value={ string }
                    className="form-control"/>
           </div>
           <div className="pull-left">
@@ -114,6 +121,13 @@ export default class Filter extends Component {
               <i className="fa fa-search"></i>
             </button>
           </div>
+          <div className="search-button pull-left">
+            <button className="btn btn-default search-btn"
+                    onClick={this.onClearFilter}
+                    type="button">
+              <i className="fa fa-eraser"></i>
+            </button>
+	  </div>
         </div>
       </div>
     );
