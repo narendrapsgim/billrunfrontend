@@ -65,6 +65,6 @@ label {
     font-weight: bold;
 }
 
-tr.subRow td {
+tr.sub-row td {
     background-color: rgba(0,0,0,0.075)!important;;
 }

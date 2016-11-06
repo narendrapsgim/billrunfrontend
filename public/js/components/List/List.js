@@ -75,6 +75,7 @@ const styles = {
     whiteSpace: 'normal',
     paddingLeft: '10px',
     paddingRight: '10px',
+    overflow: 'visible',
   },
   createNewButton : {
     margin : '10px'
@@ -124,6 +125,7 @@ class List extends Component {
     //Helpers
     this._updateTableData = this._updateTableData.bind(this);
     this._getData = _.debounce(this._getData.bind(this), 2000);
+    this._getSubRawData = this._getSubRawData.bind(this);
     this._filterData = this._filterData.bind(this);
     this._sortData = this._sortData.bind(this);
     this._parseResults = this._parseResults.bind(this);
@@ -332,13 +334,8 @@ class List extends Component {
     if(e.currentTarget.getAttribute('name') && e.currentTarget.getAttribute('name') == 'stamp'){
       e.preventDefault();
       e.stopPropagation();
-      const stamp = e.currentTarget.getElementsByTagName('button')[0].value;
-      this.state.subRows[stamp]
-        ? this._removeSubRawData(stamp)
-        : this._getSubRawData(this._buildSubRowQuery(stamp), stamp);
       return false;
     }
-    console.log(row, column, e);
     if(column !== -1 && rawData && rawData._id && rawData._id.$id && this.state.settings.onItemClick){
       if( _.isFunction(this.state.settings.onItemClick) ) {
         let url = this.state.settings.onItemClick( rawData, this.props );
@@ -548,7 +545,7 @@ onClickExport() {
     return queryArgs;
   }
 
-  _buildSubRowQuery(stamp){
+  _buildArchiveQuery(stamp){
     let queryString = '/api/find?collection=archive&query=';
     queryString += JSON.stringify({"u_s": stamp});
     return queryString;
@@ -594,7 +591,6 @@ onClickExport() {
           let rateRates = Object.assign({}, baseRateData['rates']);
           delete baseRateData['rates']
           for(let usaget in rateRates){
-            console.log(rateRates[usaget])
             let newRate = Object.assign({}, baseRateData, rateRates[usaget], {usaget:usaget});
             rows.push(newRate);
           }
@@ -624,24 +620,23 @@ onClickExport() {
     if(query && query.length){
       url += query;
     }
-    console.log("_getSubRawData url : ", url);
+
+    this.props.showProgressBar();
+    this.setState({ progress: true });
+
     this.serverRequest = aja()
       .method('get')
       .url(url)
       .on('success', (response) => {
           if(response && response.status){
             const subRows = this._parseResults(this.props.collection, response);
-            if(subRows.length){
-              this.setState({
-                  subRows: Object.assign({}, this.state.subRows, {[rowId]: subRows}),
-                  progress: false
-                },
-                this.props.hideProgressBar
-              );
-            } else {
-              this.setState({ progress: false }, this.props.hideProgressBar );
-            }
-
+            const subRowsData = subRows.length ? subRows : null;
+            this.setState({
+                subRows: Object.assign({}, this.state.subRows, {[rowId]: subRowsData}),
+                progress: false
+              },
+              this.props.hideProgressBar
+            );
           } else {
             this.handleError(response);
           }
@@ -702,11 +697,16 @@ onClickExport() {
         output = value ? 'Yes' : 'No' ;
         break;
       case 'subrow':
-        output = (
-          <IconButton tooltip="Get Archive Lines" touch={true} tooltipPosition="bottom-left" value={value} >
-            {this.state.subRows[value] ?  <NavigationExpandMore /> : <HardwareKeyboardArrowRight />}
-          </IconButton>
-        );
+          const typesWithSublines = ['datart'];
+          if(!typesWithSublines.includes(row.type)){
+            output = '';
+          } else if (this.state.subRows[value] === null) {
+            output = (<span>No Archive Lines</span>);
+          } else if (this.state.subRows[value] && this.state.subRows[value].length) {
+            output = (<IconButton onClick={this._removeSubRawData.bind(null, value)} tooltip="Hide archive lines"> <NavigationExpandMore /> </IconButton>);
+          } else {
+            output = (<IconButton onClick={this._getSubRawData.bind(null, this._buildArchiveQuery(value), value)} tooltip="Show archive lines"> <HardwareKeyboardArrowRight /> </IconButton>);
+          }
         break;
       case 'price':
           let price = parseFloat(value);
@@ -853,11 +853,11 @@ onClickExport() {
     let rows = [];
     this.state.rows.forEach( (row, index) => {
       rows.push(
-        <TableRow key={index}>
-          {<TableRowColumn style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * itemsPerPage) : 0)}</TableRowColumn>}
+        <TableRow key={index} >
+          {<TableRowColumn key={0} style={{ width: 5}}>{index + 1 + ( (this.state.currentPage > 1) ? ((this.state.currentPage-1) * itemsPerPage) : 0)}</TableRowColumn>}
           { this.state.fields.map((field, i) => {
             if( !(field.hidden  && field.hidden == true) ){
-              return <TableRowColumn name={field.key} style={styles.tableCell} key={i} onClick={field.onClick} >{this._formatField(row, field, i)}</TableRowColumn>
+              return <TableRowColumn name={field.key} style={styles.tableCell} key={i+1} onClick={field.onClick} >{this._formatField(row, field, i)}</TableRowColumn>
             }
           })}
         </TableRow>
@@ -866,13 +866,13 @@ onClickExport() {
       if(this.state.subRows[row.stamp]){
         this.state.subRows[row.stamp].forEach( (row, subindex) => {
           rows.push(
-            <TableRow key={`${index}_${subindex}`} selectable={false} striped={false} className='subRow'>
-              {<TableRowColumn style={{ width: 5}}></TableRowColumn>}
+            <TableRow key={`${index}_${subindex}`} selectable={false} striped={false} className='sub-row'>
+              {<TableRowColumn key={0} style={{ width: 5}}></TableRowColumn>}
               { this.state.fields.map((field, i) => {
                 if(field.key === 'stamp'){
-                  return (<TableRowColumn style={{ width: 5}}></TableRowColumn>);
+                  return (<TableRowColumn key={subindex+1} style={{ width: 5}}>{subindex + 1}</TableRowColumn>);
                 } else if( !(field.hidden  && field.hidden == true) ){
-                  return <TableRowColumn name={field.key} style={styles.tableCell} key={i} onClick={field.onClick} >{this._formatField(row, field, i)}</TableRowColumn>
+                  return <TableRowColumn name={field.key} style={styles.tableCell} key={subindex+1} onClick={field.onClick} >{this._formatField(row, field, i)}</TableRowColumn>
                 }
               })}
             </TableRow>
