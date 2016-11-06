@@ -4,17 +4,20 @@ import { Panel, Form, FormGroup, Col, FormControl, ControlLabel} from 'react-boo
 export default class Tenant extends Component {
   constructor(props) {
     super(props);
-    
-    this.onChangeField = this.onChangeField.bind(this);
   }
 
-  onChangeField (e) {
+  onChangeField = (e) => {
     this.props.onChange('tenant', e);
-  }
+  };
+
+  onSelectLogo = (e) => {
+    const { files } = e.target;
+    const logo = files[0];
+    console.log(logo);
+  };
 
   render() {
     const { data } = this.props;
-
 
     return (
       <div>
@@ -80,6 +83,17 @@ export default class Tenant extends Component {
                              value={data.get('website', '')}/>
               </Col>
             </FormGroup>
+	    <FormGroup>
+	      <Col componentClass={ControlLabel} md={2}>
+		Logo
+	      </Col>
+	      <Col sm={6}>
+		<FormControl type="file"
+			     name="logo"
+			     onChange={this.onSelectLogo}
+			     value={data.get('logo', '')} />
+	      </Col>
+	    </FormGroup>
           </Form>
         </Panel>
       </div>

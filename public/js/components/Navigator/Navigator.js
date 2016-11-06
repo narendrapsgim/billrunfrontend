@@ -5,6 +5,8 @@ import {Link, withRouter} from 'react-router';
 import {userDoLogout} from '../../actions/userActions';
 import classNames from "classnames";
 import { NavDropdown, MenuItem, Button } from "react-bootstrap";
+import { getSettings } from '../../actions/settingsActions';
+import Immutable from 'immutable';
 /* Assets */
 import LogoImg from 'img/billrun-logo-tm.png';
 
@@ -28,6 +30,10 @@ class Navigator extends Component {
   componentWillMount() {
     this.onWindowResize();
     window.addEventListener('resize', this.onWindowResize);
+  }
+
+  componentDidMount() {
+    this.props.dispatch(getSettings('tenant'));
   }
 
   componentWillUnmount() {
@@ -205,9 +211,16 @@ class Navigator extends Component {
   }
 }
 
+function mapStateToProps(state) {
+  console.log(state.settings.toJS());
+  return {
+    tenant: state.settings.get('tenant', Immutable.Map())
+  };
+}
+
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     userDoLogout
   }, dispatch);
 }
-export default withRouter(connect(null, mapDispatchToProps)(Navigator));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Navigator));
