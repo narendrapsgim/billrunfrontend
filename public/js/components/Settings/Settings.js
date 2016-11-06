@@ -7,6 +7,7 @@ import {Tabs, Tab, Panel} from 'react-bootstrap';
 import DateTime from './DateTime';
 import CurrencyTax from './CurrencyTax';
 import Tenant from './Tenant';
+import Security from './Security';
 import ActionButtons from '../Elements/ActionButtons';
 
 class Settings extends Component {
@@ -85,6 +86,13 @@ class Settings extends Component {
               <CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax}/>
             </Panel>
           </Tab>
+
+	  <Tab title="Security" eventKey={3}>
+	    <Panel style={{borderTop: 'none'}}>
+	      <Security data={tenant} />
+	    </Panel>
+	  </Tab>
+	  
         </Tabs>
 
 
