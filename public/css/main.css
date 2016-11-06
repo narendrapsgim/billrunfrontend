@@ -64,3 +64,7 @@ label {
 .imported-reason-title {
     font-weight: bold;
 }
+
+tr.sub-row td {
+    background-color: rgba(0,0,0,0.075)!important;;
+}

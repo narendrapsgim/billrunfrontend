@@ -11,7 +11,7 @@ import Receipt from 'material-ui/svg-icons/action/receipt';
 import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 import View from '../../views';
 
-export default class Navigator extends Component {
+class Navigator extends Component {
   constructor(props) {
     super(props);
   }
