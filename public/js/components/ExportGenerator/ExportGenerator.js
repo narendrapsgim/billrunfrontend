@@ -114,14 +114,12 @@ class ExportGenerator extends Component {
         // check at last one segment with from/to is selected
         // let segment = this.props.settings.get('segments').get(0);
         if (this.props.settings.get('segments').size === 0) {
-          err.push ('Please select one segment at last.');
+          err.push ('Please select at least one segment');
         } else {
-          (() => {
-            let firstSegment = this.props.settings.get('segments').first();
-            if (!firstSegment.get('field') || ( !firstSegment.get('from') || firstSegment.get('to') )) {
-              err.push ('Generator should has at last one valid segment');
-            }
-          })();
+          let firstSegment = this.props.settings.get('segments').first();
+          if (!firstSegment.get('field') || ( !firstSegment.get('from') || firstSegment.get('to') )) {
+            err.push ('Generator should has at last one valid segment');
+          }
         }
         break;
     }
@@ -150,7 +148,7 @@ class ExportGenerator extends Component {
     ];
 
     const { action } = this.props.location.query;
-    const title = action === 'new' ? "New export gener" : `Edit input processor - ${settings.get('file_type')}`;
+    const title = action === 'new' ? "New export generator" : `Edit input processor - ${settings.get('file_type')}`;
     
     return (
       <div>

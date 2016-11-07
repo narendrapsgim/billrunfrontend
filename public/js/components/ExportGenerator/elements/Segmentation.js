@@ -7,22 +7,6 @@ import {setSegmentation, addSegmentation, deleteSegmentation} from '../../../act
 import Help from '../../Help';
 import Segments from './Segments';
 
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    setSegmentation,
-    addSegmentation,
-    deleteSegmentation
-  }, dispatch);
-}
-
-function mapStateToProps(state, props) {
-  return {
-    fields:   state.exportGenerator.getIn(['inputProcess', 'parser', 'structure']), //.toObject(),
-    segments: state.exportGenerator.get('segments')
-  };
-}
-
 class Segmentation extends Component {
   /*static propTypes = {
    stepIndex: PropTypes.number.isRequired
@@ -42,8 +26,9 @@ class Segmentation extends Component {
   }
 
   render() {
-    let options = [];
-    this.props.fields.map(( val, key) => options.push({value: key, label: key}));
+    const { fields } = this.props;
+    const options =
+      fields.map((val, key) => ({value: key, label: key})).toJS();
 
     return (
       <div>
@@ -56,19 +41,33 @@ class Segmentation extends Component {
             <div className="col-lg-2"><label htmlFor="date_field">From</label></div>
             <div className="col-lg-2"><label htmlFor="date_field">To</label></div>
           </div>
-
-          {this.props.segments.toArray().map((entity, index) => (
-            <Segments options={options} index={index} segment={entity} onSelectField={this.onSelectField} onDelete={this.onDelete} key={index}/>
+          {
+	    this.props.segments.toArray().map((entity, index) => (
+              <Segments options={options} index={index} segment={entity} onSelectField={this.onSelectField} onDelete={this.onDelete} key={index}/>
             ))
-          }
-
+	  }
           <a onClick={this.props.addSegmentation}  className="btn-link">
-            <i className="fa fa-plus"></i>&nbsp;Add Segment</a>
-
+            <i className="fa fa-plus"></i>&nbsp;Add Segment
+	  </a>
         </Panel>
       </div>
     )
   }
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    setSegmentation,
+    addSegmentation,
+    deleteSegmentation
+  }, dispatch);
+}
+
+function mapStateToProps(state, props) {
+  return {
+    fields:   state.exportGenerator.getIn(['inputProcess', 'parser', 'structure']), //.toObject(),
+    segments: state.exportGenerator.get('segments')
+  };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Segmentation);

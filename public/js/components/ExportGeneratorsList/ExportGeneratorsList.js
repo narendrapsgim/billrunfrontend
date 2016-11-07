@@ -36,7 +36,7 @@ class ExportGeneratorsList extends Component {
   
   onClickInputProcessor(input_processor, e) {
     this.context.router.push({
-      pathname: 'input_processor',
+      pathname: 'export_generator',
       query: {
         file_type: input_processor.get('file_type'),
         action: 'update'
