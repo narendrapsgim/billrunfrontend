@@ -119,6 +119,12 @@ class Navigator extends Component {
                     </Link>
                   </li>
                   <li>
+                    <Link to="/prepaid_plans" id="prepaid_plans" className={(this.state.activeNav === "prepaid_plans") ? "active" : ""}
+                          onClick={this.setActiveNav}>
+                      <i className="fa fa-cubes fa-fw" /><span>Prepaid Plans</span>
+                    </Link>
+                  </li>
+                  <li>
                     <Link to="/services" id="services" className={(this.state.activeNav === "services") ? "active" : ""}
                           onClick={this.setActiveNav}>
                       <i className="fa fa-puzzle-piece fa-fw" /><span>Services</span>

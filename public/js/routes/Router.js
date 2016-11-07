@@ -28,6 +28,8 @@ import SelectTemplate from '../components/InputProcessor/SelectTemplate';
 import Collections from '../components/Collections/Collections';
 import Collection from '../components/Collection/Collection';
 import InvoiceTemplate from '../components/InvoiceTemplate';
+import PrepaidPlansList from '../components/PrepaidPlansList';
+import PrepaidPlan from '../components/PrepaidPlan';
 
 export default () => {
   return (
@@ -36,6 +38,8 @@ export default () => {
       <Route path="/dashboard"  component={RequireAuth(Dashboard)} title="Dashboard" />
       <Route path="/plans"  component={RequireAuth(PlansList)} title="Plans"/>
       <Route path="/plan" component={RequireAuth(Plan)} title="Create / Edit Plan"/>
+      <Route path="/prepaid_plans" component={RequireAuth(PrepaidPlansList)} title="Prepaid Plans" />
+      <Route path="/prepaid_plan" component={RequireAuth(PrepaidPlan)} title="Edit Prepaid Plan" />
       <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers"/>
       <Route path="/products" component={RequireAuth(ProductsList)} title="Products"/>
       <Route path="/product" component={RequireAuth(Product)} title="Create / Edit Product" />
