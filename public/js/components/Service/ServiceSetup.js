@@ -6,17 +6,10 @@ import Immutable from 'immutable';
 import { Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
-import {
-  onGroupAdd,
-  onGroupRemove,
-  getItem,
-  clearItem,
-  updateItem,
-  saveItem } from '../../actions/serviceActions';
-import {
- addGroupProducts,
- getGroupProducts,
- removeGroupProducts } from '../../actions/planGroupsActions';
+import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
+/* ACTIONS */
+import { onGroupAdd, onGroupRemove, getItem, clearItem, updateItem, saveItem } from '../../actions/serviceActions';
+import { addGroupProducts, getGroupProducts, removeGroupProducts } from '../../actions/planGroupsActions';
 import { savePlanRates, planProductsClear } from '../../actions/planProductsActions';
 import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -57,7 +50,7 @@ class ServiceSetup extends Component {
   };
 
   componentDidMount() {
-    const { itemId, mode, item } = this.props;
+    const { itemId, mode } = this.props;
     if (typeof itemId !== 'undefined' && itemId !== null && itemId !== '') {
       this.props.getItem(itemId).then(
         (response) => {
@@ -141,15 +134,9 @@ class ServiceSetup extends Component {
 
   render() {
     const { item, mode, includeGroups } = this.props;
-
     // in update mode wait for item before render edit screen
     if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
-      return (
-        <div>
-          <p>Loading...</p>
-          <Button onClick={this.handleBack} bsStyle="default">Back</Button>
-        </div>
-      );
+      return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     return (
@@ -207,11 +194,10 @@ const mapDispatchToProps = dispatch => bindActionCreators({
 }, dispatch);
 
 const mapStateToProps = (state, props) => {
-  const item = state.service;
-  const itemId = props.params.itemId || null;
-  const mode = (itemId) ? 'update' : 'new';
+  const { service: item } = state;
+  const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
   const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
-  return { includeGroups, itemId, mode, item };
+  return { itemId, mode, item, includeGroups };
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ServiceSetup));

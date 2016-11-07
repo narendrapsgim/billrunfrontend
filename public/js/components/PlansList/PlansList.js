@@ -1,127 +1,130 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { PageHeader} from 'react-bootstrap';
+import { bindActionCreators } from 'redux';
+import { withRouter } from 'react-router';
 import Immutable from 'immutable';
+import moment from 'moment';
+import { Button } from 'react-bootstrap';
+import { capitalize } from 'lodash';
+import List from '../List';
 import Pager from '../Pager';
 import Filter from '../Filter';
-import moment from 'moment';
-import { Button } from "react-bootstrap";
-import { capitalize } from 'lodash';
-
-import { getList } from '../../actions/listActions';
-import List from '../List';
+/* ACTIONS */
+import { getList, clearList } from '../../actions/listActions';
 
 class PlansList extends Component {
+
+  static defaultProps = {
+    items: Immutable.List(),
+  }
+
+  static propTypes = {
+    items: React.PropTypes.instanceOf(Immutable.List),
+    router: React.PropTypes.shape({
+      push: React.PropTypes.func.isRequired,
+    }).isRequired,
+    getList: React.PropTypes.func.isRequired,
+    clearList: React.PropTypes.func.isRequired,
+  }
+
   constructor(props) {
     super(props);
-
-    this.onFilter = this.onFilter.bind(this);
-    this.buildQuery = this.buildQuery.bind(this);
-    this.onNewPlan = this.onNewPlan.bind(this);
-    this.onClickPlan = this.onClickPlan.bind(this);
-    this.handlePageClick = this.handlePageClick.bind(this);
-    this.onSort = this.onSort.bind(this);
-
+    this.itemsType = 'plans';
+    this.itemType = 'plan';
     this.state = {
       size: 10,
       page: 0,
       sort: '',
-      filter: {}
-    }
-  }
-
-  buildQuery() {
-    return {
-      api: "find",
-      params: [
-        { collection: "plans" },
-        { size: this.state.size },
-        { page: this.state.page },
-	{ sort: this.state.sort },
-        { query: this.state.filter }
-      ]
+      filter: {},
     };
   }
 
+  componentWillUnmount() {
+    this.props.clearList(this.itemsType);
+  }
 
-  handlePageClick(page) {
-    this.setState({page}, () => {
-      this.props.dispatch(getList('plans', this.buildQuery()))
+  onClickNew = () => {
+    this.props.router.push(`/${this.itemType}`);
+  }
+
+  onSort = (sort) => {
+    this.setState({ sort }, () => {
+      this.props.getList(this.itemsType, this.buildQuery());
     });
   }
 
-  onFilter(filter) {
-    this.setState({filter, page: 0}, () => {
-      this.props.dispatch(getList('plans', this.buildQuery()))
-    });
+  onClickItem = (item) => {
+    const itemId = item.getIn(['_id', '$id']);
+    this.props.router.push(`/${this.itemType}/${itemId}`);
   }
 
-  onClickPlan(plan) {
-    this.context.router.push({
-      pathname: "plan",
-      query: {
-        action: "update",
-        planId: plan.getIn(['_id', '$id'], '')
-      }
-    });
+  onFilter = (filter) => {
+    this.setState(
+      { filter, page: 0 },
+      this.fetchItems
+    );
   }
 
-  onNewPlan() {
-    this.context.router.push({
-      pathname: `plan`,
-      query: {
-        action: 'new'
-      }
-    });
+  buildQuery = () => ({
+    api: 'find',
+    params: [
+      { collection: this.itemsType },
+      { size: this.state.size },
+      { page: this.state.page },
+      { sort: this.state.sort },
+      { query: this.state.filter },
+    ],
+  });
+
+  fetchItems = () => {
+    this.props.getList(this.itemsType, this.buildQuery());
   }
 
-  onSort(sort) {
-    this.setState({sort}, () => {
-      this.props.dispatch(getList('plans', this.buildQuery()))
-    });
+  handlePageClick = (page) => {
+    this.setState(
+      { page },
+      this.fetchItems
+    );
   }
-
 
   render() {
-    const { plans } = this.props;
+    const { items } = this.props;
+
+    const baseFilter = { to: { $gt: moment().toISOString() } };
+    const chargingModeParser = item => (item.get('upfront') ? 'Upfront' : 'Arrears');
 
     const fields = [
-      {id: "name", placeholder: "Name"},
-      {id: "code", placeholder: "Code"},
-      {id: "to", display: false, type: "datetime", showFilter: false}
+      { id: 'name', placeholder: 'Name' },
+      { id: 'code', placeholder: 'Code' },
+      { id: 'to', display: false, type: 'datetime', showFilter: false },
     ];
 
-    const trial_parser = (plan) => {
-      if (plan.getIn(['price', 0, 'trial'])) {
-        return plan.getIn(['price', 0, 'to']) + " " + plan.getIn(['recurrence', 'periodicity']);
+    const trialParser = (item) => {
+      if (item.getIn(['price', 0, 'trial'])) {
+        return `${item.getIn(['price', 0, 'to'])} ${item.getIn(['recurrence', 'periodicity'])}`;
       }
       return '';
     };
 
-    const recuring_charges_parser = (plan) => {
-      let sub = plan.getIn(['price', 0, 'trial']) ? 1 : 0;
-      let cycles = plan.get('price', Immutable.List()).size - sub;
-      return cycles + ' cycles';
-    }
+    const recuringChargesParser = (item) => {
+      const sub = item.getIn(['price', 0, 'trial']) ? 1 : 0;
+      const cycles = item.get('price', Immutable.List()).size - sub;
+      return `${cycles} cycles`;
+    };
 
-    const billing_frequency_parser = (plan) => {
-      const periodicity = plan.getIn(['recurrence', 'periodicity'], '');
-      if (!periodicity) return '';
-      return capitalize(periodicity) + "ly";
-    }
-
-    const charging_mode_parser = (plan) => {
-      return plan.get('upfront') ? "Upfront" : "Arrears";
-    }
+    const billingFrequencyParser = (item) => {
+      const periodicity = item.getIn(['recurrence', 'periodicity'], '');
+      return (!periodicity) ? '' : `${capitalize(periodicity)}ly`;
+    };
 
     const tableFields = [
-      {id: 'name', title: 'Name', sort: true},
-      {id: 'code', title: 'Code', sort: true},
-      {id: 'description', title: "Description", sort: true},
-      {title: 'Trial', parser: trial_parser},
-      {id: 'recurrence_charges', title: 'Recurring Charges', parser: recuring_charges_parser},
-      {id: 'recurrence_frequency', title: 'Billing Frequency', parser: billing_frequency_parser},
-      {id: 'charging_mode', title: 'Charging Mode', parser: charging_mode_parser}
+      { id: 'name', title: 'Name', sort: true },
+      { id: 'code', title: 'Code', sort: true },
+      { id: 'description', title: 'Description', sort: true },
+      { title: 'Trial', parser: trialParser },
+      { id: 'recurrence_charges', title: 'Recurring Charges', parser: recuringChargesParser },
+      { id: 'recurrence_frequency', title: 'Billing Frequency', parser: billingFrequencyParser },
+      { id: 'charging_mode', title: 'Charging Mode', parser: chargingModeParser },
     ];
 
     return (
@@ -132,17 +135,15 @@ class PlansList extends Component {
               <div className="panel-heading">
                 List of all available plans
                 <div className="pull-right">
-                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onNewPlan}><i className="fa fa-plus"/>&nbsp;Add New</Button>
+                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus" />&nbsp;Add New</Button>
                 </div>
               </div>
               <div className="panel-body">
-                <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}}} />
-                <List items={ plans } fields={ tableFields } onSort={ this.onSort } editField="name" edit={true} onClickEdit={ this.onClickPlan }/>
+                <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
+                <List items={items} fields={tableFields} onSort={this.onSort} editField="name" edit={true} onClickEdit={this.onClickItem} />
               </div>
             </div>
-            <Pager onClick={this.handlePageClick}
-                   size={this.state.size}
-                   count={plans.size || 0} />
+            <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
           </div>
         </div>
 
@@ -151,14 +152,13 @@ class PlansList extends Component {
   }
 }
 
-PlansList.contextTypes = {
-  router: React.PropTypes.object.isRequired
-};
+const mapDispatchToProps = dispatch => bindActionCreators({
+  clearList,
+  getList,
+}, dispatch);
 
-function mapStateToProps(state) {
-  return {
-    plans: state.list.get('plans') || []
-  };
-}
+const mapStateToProps = state => ({
+  items: state.list.get('plans'),
+});
 
-export default connect(mapStateToProps)(PlansList);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PlansList));

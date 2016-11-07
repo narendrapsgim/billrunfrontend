@@ -4,57 +4,57 @@ import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { PageHeader } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import List from '../List';
 import Pager from '../Pager';
 import Filter from '../Filter';
-import { Button } from 'react-bootstrap';
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
-import List from '../List';
 
 
 class ServicesList extends Component {
 
   static defaultProps = {
-    items: Immutable.List()
+    items: Immutable.List(),
   }
 
   static propTypes = {
     items: React.PropTypes.instanceOf(Immutable.List),
     router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired
+      push: React.PropTypes.func.isRequired,
     }).isRequired,
     getList: React.PropTypes.func.isRequired,
+    clearList: React.PropTypes.func.isRequired,
   }
 
-  state = {
-    fields: {'name': 1, 'price': 1, 'description': 1, 'from': 1, 'to': 1},
-    page: 0,
-    size: 10,
-    sort: '',
-    filter: {}
+  constructor(props) {
+    super(props);
+    this.itemsType = 'services';
+    this.itemType = 'service';
+    this.state = {
+      fields: { name: 1, price: 1, description: 1, from: 1, to: 1 },
+      page: 0,
+      size: 10,
+      sort: '',
+      filter: {},
+    };
   }
-
-  itemsType = 'services';
-  itemType = 'service';
 
   componentWillUnmount() {
     this.props.clearList(this.itemsType);
   }
 
-  buildQuery = () => {
-    return {
-      api: 'find',
-      params: [
-        { collection: this.itemsType },
-        { project: JSON.stringify(this.state.fields) },
-        { size: this.state.size },
-        { page: this.state.page },
-        { sort: this.state.sort },
-        { query: this.state.filter }
-      ]
-    };
-  }
+  buildQuery = () => ({
+    api: 'find',
+    params: [
+      { collection: this.itemsType },
+      { project: JSON.stringify(this.state.fields) },
+      { size: this.state.size },
+      { page: this.state.page },
+      { sort: this.state.sort },
+      { query: this.state.filter },
+    ],
+  });
 
   onClickItem = (item) => {
     const itemId = item.getIn(['_id', '$id']);
@@ -63,7 +63,7 @@ class ServicesList extends Component {
 
   handlePageClick = (page) => {
     this.setState(
-      {page},
+      { page },
       this.fetchItems
     );
   }
@@ -74,14 +74,14 @@ class ServicesList extends Component {
 
   onFilter = (filter) => {
     this.setState(
-      {filter, page: 0},
+      { filter, page: 0 },
       this.fetchItems
     );
   }
 
   onSort = (sort) => {
     this.setState(
-      {sort},
+      { sort },
       this.fetchItems
     );
   }
@@ -92,18 +92,17 @@ class ServicesList extends Component {
 
   render() {
     const { items } = this.props;
-
+    const baseFilter = { to: { $gt: moment().toISOString() } };
     const fields = [
-      {id: 'name', placeholder: 'Name'},
-      {id: 'to', showFilter: false, type: 'datetime'}
+      { id: 'name', placeholder: 'Name' },
+      { id: 'to', showFilter: false, type: 'datetime' }
     ];
-
     const tableFields = [
-      {id: 'name', title: 'Name', sort: true},
-      {id: 'price', title: 'Price', sort: true},
-      {id: 'description', title: 'Description', sort: true},
-      {id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date', sort: true},
-      {id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date', sort: true}
+      { id: 'name', title: 'Name', sort: true },
+      { id: 'price', title: 'Price', sort: true },
+      { id: 'description', title: 'Description', sort: true },
+      { id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date', sort: true },
+      { id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date', sort: true },
     ];
 
     return (
@@ -114,11 +113,11 @@ class ServicesList extends Component {
               <div className="panel-heading">
                 List of all available services
                 <div className="pull-right">
-                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus"/>&nbsp;Add New</Button>
+                  <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus" />&nbsp;Add New</Button>
                 </div>
               </div>
               <div className="panel-body">
-                <Filter fields={fields} onFilter={this.onFilter} base={{ to: {$gt: moment().toISOString()}}} />
+                <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
                 <List items={items} fields={tableFields} editField="name" edit={true} onClickEdit={this.onClickItem} onSort={this.onSort} />
               </div>
             </div>
@@ -131,14 +130,13 @@ class ServicesList extends Component {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    clearList,
-    getList }, dispatch);
-}
-function mapStateToProps(state, props) {
-  return {
-    items: state.list.get('services')
-  };
-};
+const mapDispatchToProps = dispatch => bindActionCreators({
+  clearList,
+  getList,
+}, dispatch);
+
+const mapStateToProps = state => ({
+  items: state.list.get('services'),
+});
+
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ServicesList));
