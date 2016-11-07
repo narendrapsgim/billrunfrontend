@@ -7,7 +7,7 @@ const Security = (props) => (
       <Form horizontal>
 	<FormGroup>
 	  <Col componentClass={ControlLabel} md={2}>
-	    Secret
+	    Secret Key
 	  </Col>
 	  <Col sm={6}>
 	    <FormControl type="text"
