@@ -90,6 +90,14 @@ class ServicesList extends Component {
     this.props.getList(this.itemsType, this.buildQuery());
   }
 
+  priceParser = item => item.getIn(['price', 0, 'price'], '');
+
+  cyclesParser = (item) => {
+    const unlimited = globalSetting.serviceCycleUnlimitedValue;
+    const cycle = item.getIn(['price', 0, 'to'], '');
+    return cycle === unlimited ? 'Unlimited' : cycle;
+  }
+
   render() {
     const { items } = this.props;
 
@@ -100,7 +108,8 @@ class ServicesList extends Component {
 
     const tableFields = [
       {id: 'name', title: 'Name', sort: true},
-      {id: 'price', title: 'Price', sort: true},
+      { title: 'Price', parser: this.priceParser, sort: true, id: 'price.0.price' },
+      { title: 'Cycles', parser: this.cyclesParser, sort: true, id: 'price.0.to'  },
       {id: 'description', title: 'Description', sort: true},
       {id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date', sort: true},
       {id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date', sort: true}
