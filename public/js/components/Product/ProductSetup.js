@@ -15,6 +15,7 @@ import {
   clearProduct } from '../../actions/productActions';
 import { getSettings } from '../../actions/settingsActions';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 import Product from './Product';
 
@@ -32,6 +33,22 @@ class ProductSetup extends Component {
       this.props.getProduct(productId);
     }
     this.props.getSettings("usage_types");
+  }
+
+  componentDidMount() {
+    const { action } = this.props.location.query;
+    if (action !== 'update') {
+      this.props.setPageTitle('Create New Product');
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { action } = this.props.location.query;
+    const { product } = nextProps;
+    const { product: oldItem } = this.props;
+    if (action === 'update' && oldItem.get('key') !== product.get('key')) {
+      this.props.setPageTitle(`Edit product - ${product.get('key')}`);
+    }
   }
 
   componentWillUnmount() {
@@ -111,6 +128,7 @@ class ProductSetup extends Component {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    setPageTitle,
     getSettings,
     addUsagetMapping,
     onFieldUpdate,
