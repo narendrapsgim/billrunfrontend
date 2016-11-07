@@ -25,7 +25,11 @@ export default class ServiceDetails extends Component {
 
   onChangePrice = (e) => {
     const { value } = e.target;
-    this.props.updateItem(['price'], value);
+    this.props.updateItem(['price', 0, 'price'], value);
+  }
+
+  onChangeCycle = (value) => {
+    this.props.updateItem(['price', 0, 'to'], value);
   }
 
   onChangeDescription = (e) => {
@@ -35,28 +39,36 @@ export default class ServiceDetails extends Component {
 
   render() {
     const { item, mode } = this.props;
+    const serviceCycleUnlimitedValue = globalSetting.serviceCycleUnlimitedValue;
 
     return (
       <Form horizontal>
 
-        <FormGroup controlId="formHorizontalEmail">
+        <FormGroup>
           <Col componentClass={ControlLabel} sm={2}>Name</Col>
           <Col sm={9}>
-            <Field value={item.get('name', '')} onChange={this.onChangeName} disabled={mode === 'update'}/>
+            <Field value={item.get('name', '')} onChange={this.onChangeName} disabled={mode === 'update'} />
           </Col>
         </FormGroup>
 
-        <FormGroup controlId="formHorizontalEmail">
+        <FormGroup>
           <Col componentClass={ControlLabel} sm={2}>Description</Col>
           <Col sm={9}>
-            <Field value={item.get('description', '')} onChange={this.onChangeDescription}  fieldType="textarea" />
+            <Field value={item.get('description', '')} onChange={this.onChangeDescription} fieldType="textarea" />
           </Col>
         </FormGroup>
 
-        <FormGroup controlId="formHorizontalEmail">
+        <FormGroup>
           <Col componentClass={ControlLabel} sm={2}>Price</Col>
           <Col lg={3} sm={4}>
-            <Field value={item.get('price', '')} onChange={this.onChangePrice} fieldType='price' />
+            <Field value={item.getIn(['price', 0, 'price'], '')} onChange={this.onChangePrice} fieldType="price" />
+          </Col>
+        </FormGroup>
+
+        <FormGroup>
+          <Col componentClass={ControlLabel} sm={2}>Cycles</Col>
+          <Col lg={3} sm={4}>
+            <Field value={item.getIn(['price', 0, 'to'], '')} onChange={this.onChangeCycle} fieldType="unlimited" unlimitedValue={serviceCycleUnlimitedValue} />
           </Col>
         </FormGroup>
 
