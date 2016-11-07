@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import { Row, Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
+import { Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import {
@@ -19,12 +19,13 @@ import {
  removeGroupProducts } from '../../actions/planGroupsActions';
 import { savePlanRates, planProductsClear } from '../../actions/planProductsActions';
 import { showDanger, showSuccess } from '../../actions/alertsActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 
 class ServiceSetup extends Component {
 
   static defaultProps = {
-    item : Immutable.Map(),
+    item: Immutable.Map(),
   };
 
   static propTypes = {
@@ -33,40 +34,54 @@ class ServiceSetup extends Component {
     includeGroups: React.PropTypes.instanceOf(Immutable.Map),
     mode: React.PropTypes.string,
     router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired
+      push: React.PropTypes.func.isRequired,
     }).isRequired,
-    getItem: React.PropTypes.func.isRequired,
-    updateItem: React.PropTypes.func.isRequired,
-    saveItem: React.PropTypes.func.isRequired,
-    clearItem: React.PropTypes.func.isRequired,
-    showSuccess: React.PropTypes.func.isRequired,
-    showDanger: React.PropTypes.func.isRequired,
-    onGroupRemove: React.PropTypes.func.isRequired,
-    onGroupAdd: React.PropTypes.func.isRequired,
     addGroupProducts: React.PropTypes.func.isRequired,
+    clearItem: React.PropTypes.func.isRequired,
     getGroupProducts: React.PropTypes.func.isRequired,
+    getItem: React.PropTypes.func.isRequired,
+    onGroupAdd: React.PropTypes.func.isRequired,
+    onGroupRemove: React.PropTypes.func.isRequired,
+    planProductsClear: React.PropTypes.func.isRequired,
     removeGroupProducts: React.PropTypes.func.isRequired,
+    saveItem: React.PropTypes.func.isRequired,
+    savePlanRates: React.PropTypes.func.isRequired,
+    setPageTitle: React.PropTypes.func.isRequired,
+    showDanger: React.PropTypes.func.isRequired,
+    showSuccess: React.PropTypes.func.isRequired,
+    updateItem: React.PropTypes.func.isRequired,
   }
 
   state = {
     activeTab: 1,
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return !Immutable.is(this.props.item, nextProps.item) || this.props.itemId !== nextProps.itemId;
-  }
-
-  componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
+  componentDidMount() {
+    const { itemId, mode, item } = this.props;
+    if (typeof itemId !== 'undefined' && itemId !== null && itemId !== '') {
       this.props.getItem(itemId).then(
-        response => {
-          if(response !== true){
+        (response) => {
+          if (response !== true) {
             this.handleResponseError(response);
           }
-        },
+        }
       );
     }
+    if (mode === 'new') {
+      this.props.setPageTitle('Create New Service');
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { item, mode } = nextProps;
+    const { item: oldItem } = this.props;
+    if (mode === 'update' && oldItem.get('name') !== item.get('name')) {
+      this.props.setPageTitle(`Edit service - ${item.get('name')}`);
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !Immutable.is(this.props.item, nextState.item) || this.props.itemId !== nextState.itemId;
   }
 
   componentWillUnmount() {
@@ -82,18 +97,18 @@ class ServiceSetup extends Component {
       try {
         errorMessage = response.error[0].error.message;
       } catch (e2) {
-        console.log("unknown error response: ", response);
+        console.log('unknown error response: ', response);
       }
     }
     this.props.showDanger(errorMessage);
   }
 
   updateItem = (path, value) => {
-    this.props.updateItem(path, value)
+    this.props.updateItem(path, value);
   }
 
   handleSelectTab = (activeTab) => {
-    this.setState({activeTab});
+    this.setState({ activeTab });
   }
 
   handleBack = () => {
@@ -110,11 +125,11 @@ class ServiceSetup extends Component {
 
   saveItem = () => {
     const { item, mode } = this.props;
-    const action = (mode == 'new') ? 'created' : 'updated';
+    const action = (mode === 'new') ? 'created' : 'updated';
 
     this.props.saveItem(item).then(
-      response => {
-        if(response !== true){
+      (response) => {
+        if (response !== true) {
           this.handleResponseError(response);
         } else {
           this.props.showSuccess(`The service was ${action}`);
@@ -127,8 +142,8 @@ class ServiceSetup extends Component {
   render() {
     const { item, mode, includeGroups } = this.props;
 
-    //in update mode wait for item before render edit screen
-    if(mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined'){
+    // in update mode wait for item before render edit screen
+    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (
         <div>
           <p>Loading...</p>
@@ -143,27 +158,27 @@ class ServiceSetup extends Component {
         <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
 
           <Tab title="Details" eventKey={1}>
-            <Panel style={{borderTop: 'none'}}>
-              <ServiceDetails item={item} mode={mode} updateItem={this.updateItem}/>
+            <Panel style={{ borderTop: 'none' }}>
+              <ServiceDetails item={item} mode={mode} updateItem={this.updateItem} />
             </Panel>
           </Tab>
 
-          <Tab title="Service Includes" eventKey={3}>
-            <Panel style={{borderTop: 'none'}}>
-							<PlanIncludesTab
-                  includeGroups={includeGroups}
-                  onChangeFieldValue={this.props.updateItem}
-                  onRemoveGroup={this.props.onGroupRemove}
-                  addGroup={this.props.onGroupAdd}
-                  addGroupProducts={this.props.addGroupProducts}
-                  getGroupProducts={this.props.getGroupProducts}
-                  removeGroupProducts={this.props.removeGroupProducts}
+          <Tab title="Service Includes" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanIncludesTab
+                includeGroups={includeGroups}
+                onChangeFieldValue={this.props.updateItem}
+                onRemoveGroup={this.props.onGroupRemove}
+                addGroup={this.props.onGroupAdd}
+                addGroupProducts={this.props.addGroupProducts}
+                getGroupProducts={this.props.getGroupProducts}
+                removeGroupProducts={this.props.removeGroupProducts}
               />
             </Panel>
           </Tab>
         </Tabs>
 
-        <div style={{marginTop: 12}}>
+        <div style={{ marginTop: 12 }}>
           <Button onClick={this.handleSave} bsStyle="primary" style={{ minWidth: 90, marginRight: 10 }}>Save</Button>
           <Button onClick={this.handleBack} bsStyle="default" style={{ minWidth: 90 }}>Cancel</Button>
         </div>
@@ -174,32 +189,29 @@ class ServiceSetup extends Component {
 
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    planProductsClear,
-    savePlanRates,
-    onGroupRemove,
-    onGroupAdd,
-    addGroupProducts,
-    getGroupProducts,
-    removeGroupProducts,
-    getItem,
-    clearItem,
-    updateItem,
-    saveItem,
-    showSuccess,
-    showDanger }, dispatch);
-}
-function mapStateToProps(state, props) {
-	const item = state.service;
+const mapDispatchToProps = dispatch => bindActionCreators({
+  addGroupProducts,
+  clearItem,
+  getGroupProducts,
+  getItem,
+  onGroupAdd,
+  onGroupRemove,
+  planProductsClear,
+  removeGroupProducts,
+  saveItem,
+  savePlanRates,
+  setPageTitle,
+  showDanger,
+  showSuccess,
+  updateItem,
+}, dispatch);
+
+const mapStateToProps = (state, props) => {
+  const item = state.service;
   const itemId = props.params.itemId || null;
   const mode = (itemId) ? 'update' : 'new';
   const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
-  return {
-    includeGroups,
-    itemId,
-    mode,
-    item
-  }
-}
+  return { includeGroups, itemId, mode, item };
+};
+
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ServiceSetup));
