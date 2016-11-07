@@ -20,12 +20,17 @@ import {
   getGroupProducts,
   removeGroupProducts } from '../../actions/planGroupsActions';
 import { savePlanRates } from '../../actions/planProductsActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 import PlanTab from './PlanTab';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
 import PlanIncludesTab from './PlanIncludesTab';
 
 class PlanSetup extends Component {
+
+  static defaultProps = {
+    plan: Immutable.Map(),
+  };
 
   static propTypes = {
     router: React.PropTypes.shape({
@@ -41,6 +46,22 @@ class PlanSetup extends Component {
     let { planId } = this.props.location.query;
     if (planId) {
       this.props.getPlan(planId);
+    }
+  }
+
+  componentDidMount() {
+    const { action } = this.props.location.query;
+    if (action !== 'update') {
+      this.props.setPageTitle('Create New Plan');
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { action } = this.props.location.query;
+    const { plan } = nextProps;
+    const { plan: oldItem } = this.props;
+    if (action === 'update' && oldItem.get('name') !== plan.get('name')) {
+      this.props.setPageTitle(`Edit plan - ${plan.get('name')}`);
     }
   }
 
@@ -163,6 +184,7 @@ function mapDispatchToProps(dispatch) {
     onPlanFieldUpdate,
     getPlan,
     clearPlan,
+    setPageTitle,
     savePlan,
     savePlanRates }, dispatch);
 }
