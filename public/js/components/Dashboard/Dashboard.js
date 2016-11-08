@@ -20,7 +20,7 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     const toDate = getToDate();
-    const fromDate = getFromDate(5, 'months', toDate);
+    const fromDate = getFromDate(6, 'months', toDate);
     this.state = { fromDate, toDate };
   }
 
@@ -80,7 +80,7 @@ class Dashboard extends Component {
             </Col>
             <Col lg={6}>
               <Panel header={<span>Subscribers per Plan<span className="pull-right">{currentMonthRange}</span></span>}>
-                <SubsPerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565} />
+                <SubsPerPlanCurrentMonthWidget toDate={toDate} width={565} />
               </Panel>
             </Col>
           </Row>
@@ -93,7 +93,7 @@ class Dashboard extends Component {
             </Col>
             <Col lg={6}>
               <Panel header={<span>Revenue per Plan<span className="pull-right">{currentMonthRange}</span></span>}>
-                <RevenuePerPlanCurrentMonthWidget fromDate={fromDate} toDate={toDate} width={565} />
+                <RevenuePerPlanCurrentMonthWidget toDate={toDate} width={565} />
               </Panel>
             </Col>
           </Row>
@@ -104,7 +104,7 @@ class Dashboard extends Component {
 }
 
 const mapStateToProps = state => ({
-  dashboard: state.dashboard
+  dashboard: state.dashboard,
 });
 
 export default connect(mapStateToProps)(Dashboard);

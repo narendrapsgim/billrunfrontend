@@ -1,22 +1,22 @@
-export const GOT_DATA = 'GOT_DATA';
-export const GOT_DATA_ERROR = 'GOT_DATA_ERROR';
-
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun } from '../common/Api';
 
-function gotData(chartId, data) {
+export const GOT_DATA = 'GOT_DATA';
+export const GOT_DATA_ERROR = 'GOT_DATA_ERROR';
+
+function gotData(chartId, chartData) {
   return {
     type: GOT_DATA,
-    chartId: chartId,
-    chartData: data
+    chartData,
+    chartId,
   };
 }
 
-function gotDataError(chartId, error) {
+function gotDataError(chartId, chartError) {
   return {
     type: GOT_DATA_ERROR,
-    chartId: chartId,
-    chartError: error
+    chartError,
+    chartId,
   };
 }
 
@@ -24,12 +24,13 @@ export function getData(chartId, query) {
   return (dispatch) => {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(
-      success => {
+      (success) => {
         dispatch(gotData(chartId, success.data));
         dispatch(finishProgressIndicator());
       },
-      failure => { throw failure }
-    ).catch(error => {
+      (failure) => { throw failure; }
+    ).catch((error) => {
+      console.log(`Chart ${chartId} error: `, error);
       dispatch(gotDataError(chartId, error));
       dispatch(dismissProgressIndicator());
     });
