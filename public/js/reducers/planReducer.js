@@ -8,6 +8,7 @@ import {
   GOT_PLAN,
   CLEAR_PLAN } from '../actions/planActions';
 import {
+  ADD_BALANCE_NOTIFICATIONS,
   ADD_NOTIFICATION,
   REMOVE_NOTIFICATION,
   UPDATE_NOTIFICATION_FIELD
@@ -85,6 +86,10 @@ export default function (state = defaultState, action) {
     case CLEAR_PLAN:
       return defaultState;
 
+    case ADD_BALANCE_NOTIFICATIONS:
+      let new_notifications = Immutable.List([Immutable.Map({value: 0, type: '', msg: ''})]);
+      return state.setIn(['notifications_threshold', action.balance], new_notifications);
+      
     case ADD_NOTIFICATION:
       let new_notification = Immutable.Map({value: 0, type: '', msg: ''});
       return state.updateIn(["notifications_threshold", action.threshold_id],

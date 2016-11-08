@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { List } from 'immutable';
 import { times } from '../../../common/Util';
 import { connect } from 'react-redux';
 
+import Select from 'react-select';
 import { Row, Col, Form, Panel, FormGroup, ControlLabel } from 'react-bootstrap';
 import Notifications from './Notifications';
 
@@ -13,6 +14,10 @@ const threshold_id = (name) => name === "On Load" ? 'on_load' : name;
 const PlanNotifications = (props) => {
   const { plan } = props;
 
+  const onSelectBalance = (v) => {
+   props.onSelectBalance(threshold_name(v));
+  };
+  
   const onAddNotification = (name) => {
     const id = threshold_id(name);
     props.onAddNotification(id);
@@ -43,11 +48,16 @@ const PlanNotifications = (props) => {
     );
   };
   
+  const options = times(10, (u, key) => ({value: key, label: `Balance ${(key + 1)}`}));
+  
   return (
     <div className="PlanNotifications">
       <Row>
 	<Col lg={12}>
 	  <Form>
+	    <Panel header={ <h4>Threshold</h4> }>
+	      <Select placeholder="Select" options={ options } onChange={ onSelectBalance } />
+	    </Panel>
 	    { times(10, notifications_el) }
 	    {/*
 	    <Notifications notifications={plan.getIn(['notifications_threshold', 'on_load'], List())}

@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getPlan } from '../../actions/planActions';
+import { List } from 'immutable';
 
 import { addNotification,
 	 removeNotification,
-	 updateNotificationField } from '../../actions/prepaidPlanActions';
+	 updateNotificationField,
+	 addBalanceNotifications } from '../../actions/prepaidPlanActions';
+import { showWarning } from '../../actions/alertsActions';
 
 import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
@@ -20,6 +23,15 @@ class PrepaidPlan extends Component {
     if (planId) this.props.dispatch(getPlan(planId));
   }
 
+  onSelectBalance = (balance) => {
+    const { plan, dispatch } = this.props;
+    if (plan.getIn(['notifications_threshold', balance], List()).size) {
+      dispatch(showWarning(`There are already notifications for ${balance}`));
+      return;
+    }   
+    dispatch(addBalanceNotifications(balance));
+  };
+  
   onAddNotification = (threshold_id) => {
     this.props.dispatch(addNotification(threshold_id));
   };
@@ -64,6 +76,7 @@ class PrepaidPlan extends Component {
 				   onAddNotification={ this.onAddNotification }
 				   onRemoveNotification={ this.onRemoveNotification }
 				   onUpdateNotificationField={ this.onUpdateNotificationField }
+				   onSelectBalance={ this.onSelectBalance }
 		/>
 	      </Panel>
 	    </Tab>

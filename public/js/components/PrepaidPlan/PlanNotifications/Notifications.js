@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 
 import { Row, Col, Form, Panel, FormGroup, ControlLabel, Button } from 'react-bootstrap';
