@@ -12,7 +12,7 @@ const Security = (props) => (
 	  <Col sm={6}>
 	    <FormControl type="text"
 			 disabled={true}
-			 value={props.data.get('secret', '')} />
+			 value={props.data.get('key', '')} />
 	  </Col>
 	</FormGroup>
       </Form>
