@@ -8,7 +8,7 @@ var globalSetting = {
   serverApiDebugQueryString: 'XDEBUG_SESSION_START=netbeans-xdebug',
   datetimeFormat: "DD/MM/YYYY HH:mm",
   dateFormat: "DD/MM/YYYY",
-  timeFormat: "HH:MM",
+  timeFormat: "HH:mm",
   apiDateTimeFormat: "YYYY/MM/DD HH:mm:ss",
   currency: '$',
   list: {
