@@ -7,6 +7,11 @@ import {
   REMOVE_TARIFF,
   GOT_PLAN,
   CLEAR_PLAN } from '../actions/planActions';
+import {
+  ADD_NOTIFICATION,
+  REMOVE_NOTIFICATION,
+  UPDATE_NOTIFICATION_FIELD
+} from '../actions/prepaidPlanActions';
 import moment from 'moment';
 import Immutable from 'immutable';
 
@@ -79,6 +84,23 @@ export default function (state = defaultState, action) {
 
     case CLEAR_PLAN:
       return defaultState;
+
+    case ADD_NOTIFICATION:
+      let new_notification = Immutable.Map({value: 0, type: '', msg: ''});
+      return state.updateIn(["notifications_threshold", action.threshold_id],
+			    Immutable.List(),
+			    list => list.push(new_notification));
+
+    case REMOVE_NOTIFICATION:
+      return state.updateIn(["notifications_threshold", action.threshold_id],
+			    Immutable.List(),
+			    list => list.remove(action.index));
+
+    case UPDATE_NOTIFICATION_FIELD:
+      return state.setIn(["notifications_threshold",
+			  action.threshold_id,
+			  action.index,
+			  action.field], action.value);
 
     default:
       return state;

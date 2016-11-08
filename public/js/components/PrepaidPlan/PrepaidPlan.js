@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getPlan } from '../../actions/planActions';
 
+import { addNotification,
+	 removeNotification,
+	 updateNotificationField } from '../../actions/prepaidPlanActions';
+
 import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
 import PlanNotifications from './PlanNotifications';
@@ -16,6 +20,18 @@ class PrepaidPlan extends Component {
     if (planId) this.props.dispatch(getPlan(planId));
   }
 
+  onAddNotification = (threshold_id) => {
+    this.props.dispatch(addNotification(threshold_id));
+  };
+
+  onRemoveNotification = (threshold_id, index) => {
+    this.props.dispatch(removeNotification(threshold_id, index));
+  };
+
+  onUpdateNotificationField = (threshold_id, index, field, value) => {
+    this.props.dispatch(updateNotificationField(threshold_id, index, field, value));
+  };
+  
   render() {
     const { plan } = this.props;
     const { action } = this.props.location.query;
@@ -44,7 +60,11 @@ class PrepaidPlan extends Component {
 
 	    <Tab title="Notification" eventKey={3}>
 	      <Panel style={{borderTop: 'none'}}>
-		<PlanNotifications plan={plan} />
+		<PlanNotifications plan={plan}
+				   onAddNotification={ this.onAddNotification }
+				   onRemoveNotification={ this.onRemoveNotification }
+				   onUpdateNotificationField={ this.onUpdateNotificationField }
+		/>
 	      </Panel>
 	    </Tab>
 
