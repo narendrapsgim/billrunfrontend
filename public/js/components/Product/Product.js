@@ -160,16 +160,6 @@ export default class Product extends Component {
               <Row>
                 <Col lg={12} md={12}>
                   <FormGroup>
-                    <Checkbox checked={vatable} onChange={this.onChangeVatable}>
-                      VATable
-                    </Checkbox>
-                  </FormGroup>
-                </Col>
-              </Row>
-
-              <Row>
-                <Col lg={12} md={12}>
-                  <FormGroup>
                     <ControlLabel>Prefixes</ControlLabel>
                     <Chips onChange={this.onChangePrefix} items={prefixs} placeholder='Add new prefix' />
                   </FormGroup>
@@ -178,8 +168,17 @@ export default class Product extends Component {
 
             </Panel>
 
-            <Panel header={<h3>Price</h3>}>
-             { this.renderPrices() }
+            <Panel header={<h3>Pricing</h3>}>
+              <Row>
+                <Col lg={12} md={12}>
+                  <FormGroup>
+                    <Checkbox checked={vatable} onChange={this.onChangeVatable}>
+                      This product is VAT rated
+                    </Checkbox>
+                  </FormGroup>
+                </Col>
+              </Row>
+              { this.renderPrices() }
              <br />
             <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
             </Panel>
