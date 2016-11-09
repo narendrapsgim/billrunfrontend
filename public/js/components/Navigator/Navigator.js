@@ -154,6 +154,12 @@ class Navigator extends Component {
                       <i className="fa fa-user fa-fw" /><span>User Management</span>
                     </Link>
                   </li>
+                  <li>
+                    <Link to="/audit-trail" id="audit-trail" className={(this.state.activeNav === "audit-trail") ? "active" : ""}
+                          onClick={this.setActiveNav}>
+                      <i className="fa fa-history fa-fw" /><span>Audit Trail</span>
+                    </Link>
+                  </li>
                   <li className={settingIsActive}>
                     <a href  id="settings-menu" className={classNames({'active': this.state.uiOpenSetting})} onClick={this.openSetting}>
                       <i className="fa fa-cog fa-fw" /><span>Settings</span><span className="fa arrow"></span></a>
