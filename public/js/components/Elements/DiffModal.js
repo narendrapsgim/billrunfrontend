@@ -3,35 +3,35 @@ import Diff from 'react-diff';
 import { Modal, Button } from 'react-bootstrap';
 
 
-const CompareModal = props => (
-  <Modal show={props.show} onHide={props.onCloseCompare}>
+const DiffModal = props => (
+  <Modal show={props.show} onHide={props.onClose}>
     <Modal.Header closeButton>
       <Modal.Title>{props.title}</Modal.Title>
     </Modal.Header>
     <Modal.Body>
-      <Diff inputA={props.inputA} inputB={props.inputB} type={props.compareType} />
+      <Diff inputA={props.inputA} inputB={props.inputB} type={props.diffType} />
     </Modal.Body>
     <Modal.Footer>
-      <Button onClick={props.onCloseCompare}>{props.closeLabel}</Button>
+      <Button onClick={props.onClose}>{props.closeLabel}</Button>
     </Modal.Footer>
   </Modal>
 );
 
-CompareModal.defaultProps = {
+DiffModal.defaultProps = {
   closeLabel: 'Cancel',
-  compareType: 'json',
+  diffType: 'json',
   show: false,
   title: 'Diff',
 };
 
-CompareModal.propTypes = {
+DiffModal.propTypes = {
   closeLabel: React.PropTypes.string,
-  compareType: React.PropTypes.string,
+  diffType: React.PropTypes.string,
   inputA: React.PropTypes.any.isRequired,
   inputB: React.PropTypes.any.isRequired,
-  onCloseCompare: React.PropTypes.func.isRequired,
+  onClose: React.PropTypes.func.isRequired,
   show: React.PropTypes.bool.isRequired,
   title: React.PropTypes.string,
 };
 
-export default CompareModal;
+export default DiffModal;
