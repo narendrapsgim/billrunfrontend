@@ -11,7 +11,8 @@ import {
   ADD_BALANCE_NOTIFICATIONS,
   ADD_NOTIFICATION,
   REMOVE_NOTIFICATION,
-  UPDATE_NOTIFICATION_FIELD
+  UPDATE_NOTIFICATION_FIELD,
+  REMOVE_BALANCE_NOTIFICATIONS
 } from '../actions/prepaidPlanActions';
 import moment from 'moment';
 import Immutable from 'immutable';
@@ -107,6 +108,9 @@ export default function (state = defaultState, action) {
 			  action.index,
 			  action.field], action.value);
 
+    case REMOVE_BALANCE_NOTIFICATIONS:
+      return state.setIn(["notifications_threshold", action.balance_id], Immutable.List());
+      
     default:
       return state;
   }

@@ -13,6 +13,10 @@ const Notifications = (props) => {
     props.onRemove(props.name, index);
   };
 
+  const onRemoveBalance = () => {
+    props.onRemoveBalance(props.name);
+  };
+  
   const onUpdateField = (index, field, value) => {
     props.onUpdateField(props.name, index, field, value);
   };
@@ -30,13 +34,22 @@ const Notifications = (props) => {
 		    key={i} />
     );
   };
+
+  const header = (
+    <h3>
+      { props.name }
+      <Button onClick={ onRemoveBalance } bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}>
+	<i className="fa fa-trash-o danger-red" />&nbsp;Remove
+      </Button>
+    </h3>
+  );
   
   return (
     <div className="Notifications">
-      <Panel header={ <h4>{ props.name }</h4> }>
+      <Panel header={ header }>
 	{ props.notifications.map(notification_el) }
 	<br/>
-	<Button bsSize="small" className="btn-primary" onClick={onAdd}>
+	<Button bsSize="xsmall" className="btn-primary" onClick={ onAdd }>
 	  <i className="fa fa-plus"></i> Add New
 	</Button>
       </Panel>

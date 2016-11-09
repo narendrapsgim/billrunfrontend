@@ -6,7 +6,8 @@ import { List } from 'immutable';
 import { addNotification,
 	 removeNotification,
 	 updateNotificationField,
-	 addBalanceNotifications } from '../../actions/prepaidPlanActions';
+	 addBalanceNotifications,
+	 removeBalanceNotifications } from '../../actions/prepaidPlanActions';
 import { showWarning } from '../../actions/alertsActions';
 
 import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
@@ -43,6 +44,10 @@ class PrepaidPlan extends Component {
   onUpdateNotificationField = (threshold_id, index, field, value) => {
     this.props.dispatch(updateNotificationField(threshold_id, index, field, value));
   };
+
+  onRemoveBalanceNotifications = (balance_id) => {
+    this.props.dispatch(removeBalanceNotifications(balance_id));
+  };
   
   render() {
     const { plan } = this.props;
@@ -77,6 +82,7 @@ class PrepaidPlan extends Component {
 				   onRemoveNotification={ this.onRemoveNotification }
 				   onUpdateNotificationField={ this.onUpdateNotificationField }
 				   onSelectBalance={ this.onSelectBalance }
+				   onRemoveBalanceNotifications={ this.onRemoveBalanceNotifications }
 		/>
 	      </Panel>
 	    </Tab>

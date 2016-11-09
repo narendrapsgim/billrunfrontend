@@ -47,7 +47,7 @@ const Notification = (props) => {
 	  {
 	    (!first && last) &&
 	    <Button bsSize="small" className="pull-right" onClick={ onRemove }>
-	      <i className="fa fa-trash-o danger-red"></i> Remove
+	      <i className="fa fa-trash-o danger-red"></i> &nbsp;Remove
 	    </Button>
 	  }
 	</Col>

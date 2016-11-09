@@ -12,7 +12,7 @@ const threshold_name = (i) => (i + 1).toString();
 const threshold_id = (name) => name === "On Load" ? 'on_load' : name;
 
 const PlanNotifications = (props) => {
-  const { plan } = props;
+  const { plan, onRemoveBalanceNotifications } = props;
 
   const onSelectBalance = (v) => {
    props.onSelectBalance(threshold_name(v));
@@ -32,6 +32,11 @@ const PlanNotifications = (props) => {
     const id = threshold_id(name);
     props.onUpdateNotificationField(id, index, field, value);
   };
+
+  const onRemoveBalance = (name) => {
+    const id = threshold_id(name);
+    props.onRemoveBalanceNotifications(id);
+  };
   
   const notifications_el = (k, i) => {
     let data = plan.getIn(['notifications_threshold', (i + 1).toString()], List());
@@ -42,6 +47,7 @@ const PlanNotifications = (props) => {
 		     onAdd={ onAddNotification }
 		     onRemove={ onRemoveNotification }
 		     onUpdateField={ onUpdateNotificationField }
+		     onRemoveBalance={ onRemoveBalance }
 		     name={ name }
 		     key={i} /> :
       null
