@@ -68,13 +68,14 @@
     "immutable": "^3.8.1",
     "lodash": "^4.16.4",
     "material-ui": "^0.15.4",
-    "moment-timezone": "^0.5.5",
     "moment": "^2.14.1",
-    "react-bootstrap-multiselect": "^2.2.0",
+    "moment-timezone": "^0.5.5",
+    "react": "^15.3.1",
     "react-bootstrap": "^0.30.3",
+    "react-bootstrap-multiselect": "^2.2.0",
+    "react-diff": "0.0.7",
     "react-redux": "^4.4.5",
     "react-router": "^2.7.0",
-    "react": "^15.3.1",
     "redux": "^3.5.2"
   }
 }
