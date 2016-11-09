@@ -9,6 +9,7 @@ import { addNotification,
 	 addBalanceNotifications,
 	 removeBalanceNotifications,
 	 blockProduct } from '../../actions/prepaidPlanActions';
+import { getList } from '../../actions/listActions';
 import { showWarning } from '../../actions/alertsActions';
 
 import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
@@ -24,6 +25,13 @@ class PrepaidPlan extends Component {
   componentDidMount() {
     const { planId } = this.props.location.query;
     if (planId) this.props.dispatch(getPlan(planId));
+    const ppincludes_params = {
+      api: "find",
+      params: [
+	{ collection: "prepaidincludes" }
+      ]
+    };
+    this.props.dispatch(getList('prepaidincludes', ppincludes_params));
   }
 
   onSelectBalance = (balance) => {
@@ -122,8 +130,10 @@ class PrepaidPlan extends Component {
 }
 
 function mapStateToProps(state) {
+  console.log(state.list.get('pp_includes', List()).toJS());
   return {
-    plan: state.plan
+    plan: state.plan,
+    pp_includes: state.list.get('pp_includes', List())
   };
 }
 
