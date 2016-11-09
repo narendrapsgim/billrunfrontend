@@ -11,5 +11,8 @@
   },
   "plugins": [
     "react"
-  ]
+  ],
+  "globals": {
+      "globalSetting": false,
+    }
 }
