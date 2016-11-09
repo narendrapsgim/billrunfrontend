@@ -21,7 +21,7 @@ export default class Usage extends Component {
 	    <div className="panel panel-default">
 	      <div className="panel-body">
 		{line.keySeq().map((field, key) => {
-		   if (field === "_id") return (null);
+		   if (field === "_id" || field === "in_plan" || field === "over_plan" || field === "interconnect_aprice") return (null);
 		   return (
 		     <div className="form-group" key={key}>
 		       <label className="col-lg-2 control-label">{ getFieldName(field, 'lines') }</label>
