@@ -1,20 +1,30 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import moment from 'moment';
-import {LineAreaChart} from '../../Charts';
-import {getData} from '../../../actions/dashboardActions';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { LineAreaChart } from '../../Charts';
+import { getData } from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {getMonthName, getYearsToDisplay, chartOptionCurrencyAxesLabel, chartOptionCurrencyTooltipLabel} from '../Widgets/helper';
+import { getMonthName, getYearsToDisplay, chartOptionCurrencyAxesLabel, chartOptionCurrencyTooltipLabel, isEmptyData, isPointDate } from '../Widgets/helper';
 
 
 class RevenueAvgPerSubscriber extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      width: props.width || 545,
-      height: props.height || 400
-    }
+  static defaultProps = {
+    width: 545,
+    height: 400,
+  };
+
+  static propTypes = {
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
+    getData: React.PropTypes.func.isRequired,
+    fromDate: React.PropTypes.instanceOf(Date).isRequired,
+    toDate: React.PropTypes.instanceOf(Date).isRequired,
+    chartData: React.PropTypes.array, // eslint-disable-line react/forbid-prop-types
+  };
+
+  state = {
+    width: this.props.width,
+    height: this.props.height,
   }
 
   componentDidMount() {
@@ -22,124 +32,121 @@ class RevenueAvgPerSubscriber extends Component {
   }
 
   prepereAgrigateQuery() {
-    const {fromDate, toDate} = this.props;
+    const { fromDate, toDate } = this.props;
     const AGGREGATE = 'aggregate';
 
-    var revenueQuery = [{
-      "$match": {"confirmation_time": {"$gte": fromDate, "$lte": toDate}, "type": "rec"}
-    },{
-      "$group": { "_id": "$aid", "date": { "$first": "$confirmation_time" }, "due":{"$sum":"$due"} }
-    },{
-      "$group": { "_id": { "year": { "$year": "$date" }, "month": { "$month": "$date" } }, "due": { "$sum": "$due" } }
-    },{
-      "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "due": "$due" }
-    },{
-      "$sort": { "year": 1, "month": 1 }
+    const revenueQuery = [{
+      $match: { confirmation_time: { $gte: fromDate, $lte: toDate }, type: 'rec' },
+    }, {
+      $group: { _id: '$aid', date: { $first: '$confirmation_time' }, due: { $sum: '$due' } },
+    }, {
+      $group: { _id: { year: { $year: '$date' }, month: { $month: '$date' } }, due: { $sum: '$due' } },
+    }, {
+      $project: { year: '$_id.year', month: '$_id.month', _id: 0, due: '$due' },
+    }, {
+      $sort: { year: 1, month: 1 },
     }];
 
-    var newSubscribersQuery = [{
-      "$match": { "type": "subscriber", "creation_time": { "$gte": fromDate }, "to": { "$gte": toDate } }
-    },{
-      "$group": { "_id": "$sid", "creation_time": { "$first": "$creation_time" } }
-    },{
-      "$group": { "_id": { "year": { "$year": "$creation_time" }, "month": { "$month": "$creation_time" } }, "count": { "$sum": 1 } }
-    },{
-      "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "count": "$count" }
-    },{
-      "$sort": { "year": 1, "month": 1 }
+    const newSubscribersQuery = [{
+      $match: { type: 'subscriber', creation_time: { $gte: fromDate }, to: { $gte: toDate } },
+    }, {
+      $group: { _id: '$sid', creation_time: { $first: '$creation_time' } },
+    }, {
+      $group: { _id: { year: { $year: '$creation_time' }, month: { $month: '$creation_time' } }, count: { $sum: 1 } },
+    }, {
+      $project: { year: '$_id.year', month: '$_id.month', _id: 0, count: '$count' },
+    }, {
+      $sort: { year: 1, month: 1 },
     }];
 
-    var totalSubscribersQuery = [{
-      "$match" : {"to":{"$gte": toDate},"creation_time":{"$lte": fromDate }  }
-    },{
-      "$sort" : {"creation_time" : 1}
-    },{
-      "$group": {"_id" : "$sid"}
-    },{
-      "$group":{"_id":null, "count" : {"$sum":1}}
-    },{
-      "$project" : {"count":1, "_id":0}
+    const totalSubscribersQuery = [{
+      $match: { to: { $gte: toDate }, creation_time: { $lte: fromDate } },
+    }, {
+      $sort: { creation_time: 1 },
+    }, {
+      $group: { _id: '$sid' },
+    }, {
+      $group: { _id: null, count: { $sum: 1 } },
+    }, {
+      $project: { count: 1, _id: 0 },
     }];
 
-    var queries = [{
+    return [{
       name: 'revenue',
       api: AGGREGATE,
       params: [
         { collection: 'bills' },
-        { pipelines: JSON.stringify(revenueQuery) }
-      ]
-    },{
+        { pipelines: JSON.stringify(revenueQuery) },
+      ],
+    }, {
       name: 'new_subscribers',
       api: AGGREGATE,
       params: [
         { collection: 'subscribers' },
-        { pipelines: JSON.stringify(newSubscribersQuery) }
-      ]
-    },{
+        { pipelines: JSON.stringify(newSubscribersQuery) },
+      ],
+    }, {
       name: 'total_subscribers',
       api: AGGREGATE,
       params: [
         { collection: 'subscribers' },
-        { pipelines: JSON.stringify(totalSubscribersQuery) }
-      ]
+        { pipelines: JSON.stringify(totalSubscribersQuery) },
+      ],
     }];
-
-    return queries;
   }
 
-  prepareChartData(chartData) {
-    const {fromDate, toDate} = this.props;
-    let yearsToDisplay = getYearsToDisplay(fromDate, toDate);
-    let multipleYears = Object.keys(yearsToDisplay).length > 1;
 
-    let total = 0;
-    let formatedData = {
+  prepareChartData() {
+    const { chartData, fromDate, toDate } = this.props;
+    const yearsToDisplay = getYearsToDisplay(fromDate, toDate);
+    const multipleYears = Object.keys(yearsToDisplay).length > 1;
+    const formatedData = {
       // title: 'Revenue Avg. per Subscriber',
-      x: [ { label : 'Avg. Revenue', values : [] } ],
-      y: []
+      x: [{ label: 'Avg. Revenue', values: [] }],
+      y: [],
     };
+    let total = 0;
 
-    let totalSubscribersDataset = chartData.find((dataset, i) => dataset.name == "total_subscribers");
-    if(totalSubscribersDataset && totalSubscribersDataset.data && totalSubscribersDataset.data[0]){
+    const totalSubscribersDataset = chartData.find(dataset => dataset.name === 'total_subscribers');
+    if (!isEmptyData(totalSubscribersDataset)) {
       total = totalSubscribersDataset.data[0].count;
     }
 
-    let newSubscribersDataset = chartData.find((dataset, i) => dataset.name == "new_subscribers");
-    let revenueDataset = chartData.find((dataset, i) => dataset.name == "revenue");
-    if(!revenueDataset.data || revenueDataset.data.length == 0 || !newSubscribersDataset.data || newSubscribersDataset.data.length == 0 ){
+    const newSubscribersDataset = chartData.find(dataset => dataset.name === 'new_subscribers');
+    const revenueDataset = chartData.find(dataset => dataset.name === 'revenue');
+    if (isEmptyData(revenueDataset) || isEmptyData(newSubscribersDataset)) {
       return null;
     }
 
-    for (var year in yearsToDisplay) {
-      yearsToDisplay[year].forEach((month, k) => {
-        let revenue = revenueDataset.data.find((node, revenue_index) => { return (month == node.month && year == node.year)} );
-        let newSubscriber = newSubscribersDataset.data.find((node, newSubscriber_index) => { return (month == node.month && year == node.year)} );
-        total += (newSubscriber) ? newSubscriber.count : 0 ;
-        let avarage = (revenue) ? Math.round(revenue.due / total) : 0;
+    Object.keys(yearsToDisplay).forEach((year) => {
+      yearsToDisplay[year].forEach((month) => {
+        const revenue = revenueDataset.data.find(node => isPointDate({ year, month }, node));
+        const newSubscriber = newSubscribersDataset.data.find(node => isPointDate({ year, month }, node));
+        total += (newSubscriber) ? newSubscriber.count : 0;
+        const avarage = (revenue) ? Math.round(revenue.due / total) : 0;
         formatedData.x[0].values.push(avarage);
         let label = getMonthName(month);
-        if (multipleYears){
-          label += ', ' + year;
+        if (multipleYears) {
+          label += `, ${year}`;
         }
         formatedData.y.push(label);
       });
-    }
-
+    });
     return formatedData;
   }
 
-  overrideChartOptions() {
-    let owerideOptions = {
+  overrideChartOptions() { // eslint-disable-line class-methods-use-this
+    const owerideOptions = {
       legend: {
-        display: false
+        display: false,
       },
       tooltips: {
-          enabled: true,
-          mode: 'single',
-          callbacks: {
-            title: function (tooltipItem, data) { return null; },
-            label: chartOptionCurrencyTooltipLabel
-          }
+        enabled: true,
+        mode: 'single',
+        callbacks: {
+          title: (tooltipItem, data) => null, // eslint-disable-line no-unused-vars
+          label: chartOptionCurrencyTooltipLabel,
+        },
       },
       scales: {
         yAxes: [
@@ -147,31 +154,37 @@ class RevenueAvgPerSubscriber extends Component {
             display: true,
             ticks: {
               beginAtZero: false,
-              callback: chartOptionCurrencyAxesLabel
-            }
-          }
-        ]
+              callback: chartOptionCurrencyAxesLabel,
+            },
+          },
+        ],
       },
     };
     return owerideOptions;
   }
 
-  renderContent(chartData){
-    switch (chartData) {
-      case undefined: return <PlaceHolderWidget/>;
-      case null: return null;
-      default: return <LineAreaChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
+  renderContent() {
+    const { height, width } = this.state;
+    switch (this.props.chartData) {
+      case undefined:
+        return (<PlaceHolderWidget />);
+      case null:
+        return null;
+      default: {
+        const data = this.prepareChartData();
+        const options = this.overrideChartOptions();
+        return <LineAreaChart width={width} height={height} data={data} options={options} />;
+      }
     }
   }
 
   render() {
-    const { chartData } = this.props;
-    return ( <div> {this.renderContent(chartData)} </div> );
+    return (<div className="RevenueAvgPerSubscriber">{this.renderContent()}</div>);
   }
 }
 
-function mapStateToProps(state, props) {
-  return {chartData: state.dashboard.revenueAvgPerSubscriber};
-}
+const mapStateToProps = state => ({
+  chartData: state.dashboard.get('revenueAvgPerSubscriber'),
+});
 
 export default connect(mapStateToProps, { getData })(RevenueAvgPerSubscriber);
