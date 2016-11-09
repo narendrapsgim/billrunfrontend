@@ -40,8 +40,8 @@ export default class ProductSearch extends Component {
       }];
 
       return apiBillRun(request).then(
-        sussess => {
-          let options = _.values(sussess.data[0].data.details);
+        success => {
+          let options = _.values(success.data[0].data.details);
           return { options };
         },
         failure => {return { options : [] }}

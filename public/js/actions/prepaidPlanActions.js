@@ -3,6 +3,7 @@ export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const UPDATE_NOTIFICATION_FIELD = 'UPDATE_NOTIFICATION_FIELD';
 export const ADD_BALANCE_NOTIFICATIONS = 'ADD_BALANCE_NOTIFICATIONS';
 export const REMOVE_BALANCE_NOTIFICATIONS = 'REMOVE_BALANCE_NOTIFICATIONS';
+export const BLOCK_PRODUCT = 'BLOCK_PRODUCT';
 
 export function addBalanceNotifications(balance) {
   return {
@@ -40,5 +41,12 @@ export function removeBalanceNotifications(balance_id) {
   return {
     type: REMOVE_BALANCE_NOTIFICATIONS,
     balance_id
+  };
+}
+
+export function blockProduct(rate) {
+  return {
+    type: BLOCK_PRODUCT,
+    rate
   };
 }

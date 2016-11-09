@@ -7,12 +7,14 @@ import { addNotification,
 	 removeNotification,
 	 updateNotificationField,
 	 addBalanceNotifications,
-	 removeBalanceNotifications } from '../../actions/prepaidPlanActions';
+	 removeBalanceNotifications,
+	 blockProduct } from '../../actions/prepaidPlanActions';
 import { showWarning } from '../../actions/alertsActions';
 
 import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
 import PlanNotifications from './PlanNotifications';
+import BlockedProducts from './BlockedProducts';
 
 class PrepaidPlan extends Component {
   constructor(props) {
@@ -48,6 +50,15 @@ class PrepaidPlan extends Component {
   onRemoveBalanceNotifications = (balance_id) => {
     this.props.dispatch(removeBalanceNotifications(balance_id));
   };
+
+  onSelectBlockProduct = (rate_key) => {
+    const { plan, dispatch } = this.props;
+    if (plan.get('disallowed_rates', List()).includes(rate_key)) {
+      dispatch(showWarning(`${rate_key} already blocked`));
+      return;
+    }
+    dispatch(blockProduct(rate_key));
+  };
   
   render() {
     const { plan } = this.props;
@@ -77,7 +88,7 @@ class PrepaidPlan extends Component {
 
 	    <Tab title="Notification" eventKey={3}>
 	      <Panel style={{borderTop: 'none'}}>
-		<PlanNotifications plan={plan}
+		<PlanNotifications plan={ plan }
 				   onAddNotification={ this.onAddNotification }
 				   onRemoveNotification={ this.onRemoveNotification }
 				   onUpdateNotificationField={ this.onUpdateNotificationField }
@@ -87,9 +98,11 @@ class PrepaidPlan extends Component {
 	      </Panel>
 	    </Tab>
 
-	    <Tab title="Block Products" eventKey={4}>
+	    <Tab title="Blocked Products" eventKey={4}>
 	      <Panel style={{borderTop: 'none'}}>
-		Block Products
+		<BlockedProducts plan={ plan }
+				 onSelectProduct={ this.onSelectBlockProduct }
+		/>
 	      </Panel>
 	    </Tab>
 
