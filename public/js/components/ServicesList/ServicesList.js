@@ -44,6 +44,23 @@ class ServicesList extends Component {
     this.props.clearList(this.itemsType);
   }
 
+  onClickItem = (item) => {
+    const itemId = item.getIn(['_id', '$id']);
+    this.props.router.push(`/${this.itemType}/${itemId}`);
+  }
+
+  onClickNew = () => {
+    this.props.router.push(`/${this.itemType}`);
+  }
+
+  onFilter = (filter) => {
+    this.setState({ filter, page: 0 }, this.fetchItems);
+  }
+
+  onSort = (sort) => {
+    this.setState({ sort }, this.fetchItems);
+  }
+
   buildQuery = () => ({
     api: 'find',
     params: [
@@ -56,34 +73,8 @@ class ServicesList extends Component {
     ],
   });
 
-  onClickItem = (item) => {
-    const itemId = item.getIn(['_id', '$id']);
-    this.props.router.push(`/${this.itemType}/${itemId}`);
-  }
-
   handlePageClick = (page) => {
-    this.setState(
-      { page },
-      this.fetchItems
-    );
-  }
-
-  onClickNew = () => {
-    this.props.router.push(`/${this.itemType}`);
-  }
-
-  onFilter = (filter) => {
-    this.setState(
-      { filter, page: 0 },
-      this.fetchItems
-    );
-  }
-
-  onSort = (sort) => {
-    this.setState(
-      { sort },
-      this.fetchItems
-    );
+    this.setState({ page }, this.fetchItems);
   }
 
   fetchItems = () => {
@@ -103,12 +94,12 @@ class ServicesList extends Component {
     const baseFilter = { to: { $gt: moment().toISOString() } };
     const fields = [
       { id: 'name', placeholder: 'Name' },
-      { id: 'to', showFilter: false, type: 'datetime' }
+      { id: 'to', showFilter: false, type: 'datetime' },
     ];
     const tableFields = [
       { id: 'name', title: 'Name', sort: true },
       { title: 'Price', parser: this.priceParser, sort: true, id: 'price.0.price' },
-      { title: 'Cycles', parser: this.cyclesParser, sort: true, id: 'price.0.to'  },
+      { title: 'Cycles', parser: this.cyclesParser, sort: true, id: 'price.0.to' },
       { id: 'description', title: 'Description', sort: true },
       { id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date', sort: true },
       { id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date', sort: true },
@@ -133,7 +124,7 @@ class ServicesList extends Component {
           </div>
         </div>
 
-        <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size || 0} />
+        <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
       </div>
     );
   }

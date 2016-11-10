@@ -8,6 +8,9 @@ export default class Usage extends Component {
   
   render() {
     const { line, onClickCancel } = this.props;
+    const hidden_fields = [
+      "_id", "in_plan", "over_plan", "interconnect_aprice", "out_plan"
+    ];
 
     return (
       <form className="form-horizontal">
@@ -21,7 +24,7 @@ export default class Usage extends Component {
 	    <div className="panel panel-default">
 	      <div className="panel-body">
 		{line.keySeq().map((field, key) => {
-		   if (field === "_id") return (null);
+		   if (hidden_fields.includes(field)) return (null);
 		   return (
 		     <div className="form-group" key={key}>
 		       <label className="col-lg-2 control-label">{ getFieldName(field, 'lines') }</label>

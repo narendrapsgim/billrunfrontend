@@ -38,7 +38,7 @@ const routes = () => (
     <Route path="/plan(/:itemId)(/:action)" component={RequireAuth(Plan)} />
     <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers" />
     <Route path="/products" component={RequireAuth(ProductsList)} title="Products" />
-    <Route path="/product" component={RequireAuth(Product)} title="Create / Edit Product" />
+    <Route path="/product(/:itemId)(/:action)" component={RequireAuth(Product)} />
     <Route path="/services" component={RequireAuth(ServicesList)} title="Services" />
     <Route path="/service(/:itemId)(/:action)" component={RequireAuth(Service)} />
     <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer" />

@@ -7,6 +7,7 @@ import {Tabs, Tab, Panel} from 'react-bootstrap';
 import DateTime from './DateTime';
 import CurrencyTax from './CurrencyTax';
 import Tenant from './Tenant';
+import Security from './Security';
 import ActionButtons from '../Elements/ActionButtons';
 
 class Settings extends Component {
@@ -28,7 +29,7 @@ class Settings extends Component {
   }
 
   componentWillMount() {
-    this.props.dispatch(getSettings(["pricing", "billrun","tenant"]));
+    this.props.dispatch(getSettings(["pricing", "billrun", "tenant", "shared_secret"]));
   }
 
   onChangeFieldValue(category, e) {
@@ -68,6 +69,7 @@ class Settings extends Component {
     let datetime = settings.get('billrun') || Immutable.Map();
     let currency_tax = settings.get('pricing') || Immutable.Map();
     let tenant = settings.get('tenant') || Immutable.Map();
+    let shared_secret = settings.get('shared_secret', Immutable.Map());
 
     return (
       <div>
@@ -85,6 +87,13 @@ class Settings extends Component {
               <CurrencyTax onChange={this.onChangeCurrencyTax} data={currency_tax}/>
             </Panel>
           </Tab>
+
+	  <Tab title="Security" eventKey={3}>
+	    <Panel style={{borderTop: 'none'}}>
+	      <Security data={shared_secret} />
+	    </Panel>
+	  </Tab>
+	  
         </Tabs>
 
 

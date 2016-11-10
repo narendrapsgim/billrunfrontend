@@ -315,3 +315,11 @@ export function drawDataOnPie() {
       ctx.restore();
     });
 }
+
+export function isEmptyData(data) {
+  return data && data.data && (data.data.length === 0);
+}
+
+export function isPointDate({ year, month }, { year: pointYear, month: pointMonth }) {
+  return String(month) === String(pointMonth) && String(year) === String(pointYear);
+}
