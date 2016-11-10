@@ -2,35 +2,34 @@ import React from 'react';
 import Diff from 'react-diff';
 import { Modal, Button } from 'react-bootstrap';
 
-
-const DiffModal = props => (
-  <Modal show={props.show} onHide={props.onClose}>
+const DiffModal = ({ inputA, inputB, title, show, onClose, diffType, closeLabel }) => (
+  <Modal show={show} onHide={onClose}>
     <Modal.Header closeButton>
-      <Modal.Title>{props.title}</Modal.Title>
+      <Modal.Title>{title}</Modal.Title>
     </Modal.Header>
     <Modal.Body>
-      <Diff inputA={props.inputA} inputB={props.inputB} type={props.diffType} />
+      <Diff inputA={inputA} inputB={inputB} type={diffType} />
     </Modal.Body>
     <Modal.Footer>
-      <Button onClick={props.onClose}>{props.closeLabel}</Button>
+      <Button onClick={onClose}>{closeLabel}</Button>
     </Modal.Footer>
   </Modal>
 );
 
 DiffModal.defaultProps = {
+  show: true,
   closeLabel: 'Close',
   diffType: 'json',
-  show: false,
   title: 'Diff',
 };
 
 DiffModal.propTypes = {
-  closeLabel: React.PropTypes.string,
-  diffType: React.PropTypes.string,
   inputA: React.PropTypes.any.isRequired,
   inputB: React.PropTypes.any.isRequired,
   onClose: React.PropTypes.func.isRequired,
-  show: React.PropTypes.bool.isRequired,
+  show: React.PropTypes.bool,
+  closeLabel: React.PropTypes.string,
+  diffType: React.PropTypes.string,
   title: React.PropTypes.string,
 };
 
