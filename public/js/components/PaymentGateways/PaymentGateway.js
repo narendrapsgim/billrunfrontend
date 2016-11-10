@@ -3,22 +3,28 @@ import React, { Component } from 'react';
 /* COMPONENTS */
 import GatewayParamsModal from './GatewayParamsModal';
 import ToggleButton from './ToggleButton';
+import NotSupportedModal from './NotSupportedModal';
 
 export default class PaymentGateway extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      showParamsModal: false
+      showParamsModal: false,
+      showUnsupported: false
     };
   }
 
   onShowParams = () => {
-    this.setState({showParamsModal: true});
+    if (this.props.settings.get('supported', false)) {
+      this.setState({showParamsModal: true});
+      return;
+    }
+    this.setState({showUnsupported: true});
   };
 
   onCloseParams = () => {
-    this.setState({showParamsModal: false});
+    this.setState({showParamsModal: false, showUnsupported: false});
   };
 
   onSaveParams = (gateway) => {
@@ -40,20 +46,25 @@ export default class PaymentGateway extends Component {
   
   render() {
     const { settings, enabled } = this.props;
-    const { showParamsModal } = this.state;
+    const { showParamsModal, showUnsupported } = this.state;
     const style = {};
     if (!enabled) {
       style['WebkitFilter'] = style.filter = "grayscale(100%)";
     }
 
     return (
-      <div>
-	<GatewayParamsModal settings={settings}
-			    show={showParamsModal}
-			    gateway={enabled}
-			    onSave={this.onSaveParams}
-			    onClose={this.onCloseParams}
-			    />
+      <div className="PaymentGateway">
+	{ settings.get('supported', false)
+	  ? <GatewayParamsModal settings={settings}
+				show={showParamsModal}
+				gateway={enabled}
+				onSave={this.onSaveParams}
+				onClose={this.onCloseParams}
+	    />
+	  : <NotSupportedModal show={ showUnsupported }
+			       onClose={ this.onCloseParams }
+			       gateway={ settings.get('name') } />
+	}
 	<div className="form-group">
 	  <div className="col-lg-8 col-md-8">
 	    {
