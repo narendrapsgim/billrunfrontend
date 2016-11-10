@@ -25,7 +25,6 @@
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-2": "^6.13.0",
     "chart.js": "^2.2.2",
-    "classnames": "^2.2.5",
     "cpy-cli": "^1.0.1",
     "css-loader": "^0.24.0",
     "eslint": "^3.8.0",
@@ -64,6 +63,7 @@
     "webpack-validator": "^2.2.9"
   },
   "dependencies": {
+    "classnames": "^2.2.5",
     "font-awesome": "^4.6.3",
     "immutable": "^3.8.1",
     "lodash": "^4.16.4",
@@ -73,6 +73,7 @@
     "react": "^15.3.1",
     "react-bootstrap": "^0.30.3",
     "react-bootstrap-multiselect": "^2.2.0",
+    "react-datepicker": "^0.34.0",
     "react-diff": "0.0.7",
     "react-redux": "^4.4.5",
     "react-router": "^2.7.0",
