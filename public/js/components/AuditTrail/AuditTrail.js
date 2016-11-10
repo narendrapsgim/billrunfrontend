@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Col, Row, Panel, Button } from 'react-bootstrap';
+import moment from 'moment';
+import { Col, Row, Panel } from 'react-bootstrap';
 import List from '../List';
 import Pager from '../Pager';
+import { AdvancedFilter } from '../Filter';
 import DiffModal from '../Elements/DiffModal';
 import DetailsParser from './DetailsParser';
+import { userNamesQuery, auditTrailEntityTypesQuery } from '../../common/ApiQueries';
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
 
@@ -14,12 +17,16 @@ class AuditTrail extends Component {
   static defaultProps = {
     items: Immutable.List(),
     diffItems: Immutable.List(),
+    userNames: Immutable.List(),
+    auditTrailEntityTypes: Immutable.List(),
     showDiff: false,
   }
 
   static propTypes = {
     items: React.PropTypes.instanceOf(Immutable.List),
     diffItems: React.PropTypes.instanceOf(Immutable.List),
+    userNames: React.PropTypes.instanceOf(Immutable.List),
+    auditTrailEntityTypes: React.PropTypes.instanceOf(Immutable.List),
     getList: React.PropTypes.func.isRequired,
     clearList: React.PropTypes.func.isRequired,
     showDiff: React.PropTypes.bool,
@@ -29,16 +36,9 @@ class AuditTrail extends Component {
     super(props);
     this.itemsType = 'log';
     this.state = {
-      baseFilter: { source: 'audit' },
-      filterFields: [
-          { id: 'urt', title: 'Date', type: 'datetime' },
-          { id: 'user.name', title: 'User' },
-          { id: 'collection', title: 'Entity Type' },
-          { id: 'key', title: 'Entity Key' },
-      ],
       tableFields: [
         { id: 'urt', title: 'Date', type: 'datetime', cssClass: 'long-date', sort: true },
-        { title: 'User', parser: this.userParser, sort: true, id: 'user.name' },
+        { id: 'user.name', title: 'User', parser: this.userParser, sort: true },
         { id: 'collection', title: 'Entity Type', sort: true },
         { id: 'key', title: 'Entity Key', sort: true },
         { title: 'Details', parser: this.detailsParser },
@@ -53,11 +53,15 @@ class AuditTrail extends Component {
 
   componentDidMount() {
     this.fetchItems();
+    this.fetchUser();
+    this.fetchEnityTypes();
   }
 
   componentWillUnmount() {
     this.props.clearList(this.itemsType);
     this.props.clearList('diff');
+    this.props.clearList('autocompleteUser');
+    this.props.clearList('autocompleteAuditTrailEntityTypes');
   }
 
   onSort = (sort) => {
@@ -65,11 +69,21 @@ class AuditTrail extends Component {
   }
 
   onFilter = (filter) => {
-    // this.setState({ filter, page: 0 }, this.fetchItems);
+    this.setState({ filter, page: 0 }, this.fetchItems);
   }
 
   fetchItems = () => {
     this.props.getList(this.itemsType, this.buildQuery());
+  }
+
+  fetchUser = () => {
+    const query = userNamesQuery();
+    this.props.getList('autocompleteUser', query);
+  }
+
+  fetchEnityTypes = () => {
+    const query = auditTrailEntityTypesQuery();
+    this.props.getList('autocompleteAuditTrailEntityTypes', query);
   }
 
   handlePageClick = (page) => {
@@ -77,7 +91,11 @@ class AuditTrail extends Component {
   }
 
   buildQuery = () => {
-    const query = Object.assign({}, this.state.filter, this.state.baseFilter);
+    const query = Object.assign({}, this.state.filter);
+    query.source = 'audit';
+    if (query.urt) {
+      query.urt = this.urtQueryBuilder(query.urt);
+    }
     return {
       api: 'find',
       params: [
@@ -112,18 +130,31 @@ class AuditTrail extends Component {
     const { diffItems } = this.props;
     const inputA = diffItems.get(0, Immutable.Map()).toJS();
     const inputB = diffItems.get(1, Immutable.Map()).toJS();
-    return (<DiffModal onClose={this.closeDiff} inputA={inputA} inputB={inputB} show={true} />);
+    return (<DiffModal onClose={this.closeDiff} inputA={inputA} inputB={inputB} />);
   }
 
+  urtQueryBuilder = (date) => {
+    const fromDate = moment(date).startOf('day');
+    const toDate = moment(date).add(1, 'days');
+    return ({ $gte: fromDate, $lt: toDate });
+  };
+
   render() {
-    const { items, showDiff } = this.props;
-    const { tableFields, filterFields, baseFilter } = this.state;
+    const { items, showDiff, userNames, auditTrailEntityTypes } = this.props;
+    const { tableFields } = this.state;
+
+    const filterFields = [
+        { id: 'urt', title: 'Date', type: 'date' },
+        { id: 'user.name', title: 'User', type: 'select', options: userNames },
+        { id: 'collection', title: 'Entity Type', type: 'select', options: auditTrailEntityTypes },
+        { id: 'key', title: 'Entity Key' },
+    ];
 
     return (
       <div className="AuditTrail">
         <Row>
           <Col lg={12}>
-            <Panel >
+            <Panel header={<AdvancedFilter fields={filterFields} onFilter={this.onFilter} />}>
               <List items={items} fields={tableFields} edit={false} onSort={this.onSort} />
             </Panel>
           </Col>
@@ -144,7 +175,9 @@ const mapStateToProps = (state) => {
   const items = state.list.get('log');
   const diffItems = state.list.get('diff');
   const showDiff = (typeof diffItems !== 'undefined') ? diffItems.size === 2 : false;
-  return { items, diffItems, showDiff };
+  const userNames = state.list.get('autocompleteUser', Immutable.List()).map(user => user.get('username'));
+  const auditTrailEntityTypes = state.list.get('autocompleteAuditTrailEntityTypes', Immutable.List()).map(type => type.get('name'));
+  return { items, diffItems, showDiff, userNames, auditTrailEntityTypes };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuditTrail);

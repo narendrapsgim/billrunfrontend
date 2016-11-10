@@ -176,3 +176,9 @@ textarea {
     border-bottom: 1px solid #e7e7e7;
     background-color: white;
 }
+.pl0{
+  padding-left: 0!important;
+}
+.pr0{
+  padding-right: 0!important;
+}
