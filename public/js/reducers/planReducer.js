@@ -13,7 +13,10 @@ import {
   REMOVE_NOTIFICATION,
   UPDATE_NOTIFICATION_FIELD,
   REMOVE_BALANCE_NOTIFICATIONS,
-  BLOCK_PRODUCT
+  BLOCK_PRODUCT,
+  REMOVE_BLOCK_PRODUCT,
+  ADD_BALANCE_THRESHOLD,
+  CHANGE_BALANCE_THRESHOLD
 } from '../actions/prepaidPlanActions';
 import moment from 'moment';
 import Immutable from 'immutable';
@@ -114,6 +117,17 @@ export default function (state = defaultState, action) {
 
     case BLOCK_PRODUCT:
       return state.update("disallowed_rates", Immutable.List(), list => list.push(action.rate));
+
+    case REMOVE_BLOCK_PRODUCT:
+      return state.update('disallowed_rates',
+			  Immutable.List(),
+			  list => list.filterNot(p => p === action.rate));
+      
+    case ADD_BALANCE_THRESHOLD:
+      return state.setIn(['pp_threshold', action.balance_id], 0);
+
+    case CHANGE_BALANCE_THRESHOLD:
+      return state.setIn(['pp_threshold', action.balance_id], action.value);
       
     default:
       return state;

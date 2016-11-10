@@ -58,7 +58,7 @@ export default class Customer extends Component {
     });
 
     return (
-      <div>
+      <div className="Customer">
         <Form horizontal>
           { fields }
         </Form>

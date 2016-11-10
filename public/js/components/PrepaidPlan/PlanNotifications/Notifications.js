@@ -6,19 +6,19 @@ import Notification from './Notification';
 
 const Notifications = (props) => {
   const onAdd = () => {
-    props.onAdd(props.name);
+    props.onAdd(props.pp_id);
   };
 
   const onRemove = (index) => {
-    props.onRemove(props.name, index);
+    props.onRemove(props.pp_id, index);
   };
 
   const onRemoveBalance = () => {
-    props.onRemoveBalance(props.name);
+    props.onRemoveBalance(props.pp_id);
   };
   
   const onUpdateField = (index, field, value) => {
-    props.onUpdateField(props.name, index, field, value);
+    props.onUpdateField(props.pp_id, index, field, value);
   };
 
   const notification_el = (notification, i) => {
@@ -43,7 +43,7 @@ const Notifications = (props) => {
       </Button>
     </h3>
   );
-  
+
   return (
     <div className="Notifications">
       <Panel header={ header }>
