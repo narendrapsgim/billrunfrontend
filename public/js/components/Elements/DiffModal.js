@@ -18,7 +18,7 @@ const DiffModal = props => (
 );
 
 DiffModal.defaultProps = {
-  closeLabel: 'Cancel',
+  closeLabel: 'Close',
   diffType: 'json',
   show: false,
   title: 'Diff',
