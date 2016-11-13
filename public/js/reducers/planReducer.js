@@ -45,7 +45,7 @@ export default function (state = defaultState, action) {
       return state.setIn(['include', 'groups', action.groupName], group);
 
     case UPDATE_PLAN_FIELD_VALUE:
-      return state.updateIn(action.path, value => action.value);
+      return state.updateIn(action.path, '', value => action.value);
 
     case UPDATE_PLAN_CYCLE:
       return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, action.value));

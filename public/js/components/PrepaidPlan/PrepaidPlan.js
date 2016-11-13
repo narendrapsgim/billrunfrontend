@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { getPlan } from '../../actions/planActions';
+import { withRouter } from 'react-router';
 import { List } from 'immutable';
 import moment from 'moment';
 
@@ -14,9 +14,11 @@ import { addNotification,
 	 addBalanceThreshold,
 	 changeBalanceThreshold } from '../../actions/prepaidPlanActions';
 import { getList } from '../../actions/listActions';
-import { showWarning } from '../../actions/alertsActions';
+import { showWarning, showDanger } from '../../actions/alertsActions';
+import { getPlan, savePlan, clearPlan, onPlanFieldUpdate } from '../../actions/planActions';
+import { savePlanRates } from '../../actions/planProductsActions';
 
-import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
+import { Tabs, Tab, Col, Panel, Button } from 'react-bootstrap';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
 import PlanNotifications from './PlanNotifications';
 import BlockedProducts from './BlockedProducts';
@@ -41,6 +43,15 @@ class PrepaidPlan extends Component {
     this.props.dispatch(getList('pp_includes', ppincludes_params));
   }
 
+  componentWillUnmount() {
+    this.props.dispatch(clearPlan());
+  }
+
+  onChangePlanField = (e) => {
+    const { id, value } = e.currentTarget;
+    this.props.dispatch(onPlanFieldUpdate([id], value));
+  };
+  
   onSelectBalance = (pp_include) => {
     const { plan, dispatch } = this.props;    
     if (plan.getIn(['notifications_threshold', pp_include], List()).size) {
@@ -91,6 +102,43 @@ class PrepaidPlan extends Component {
     }
     dispatch(addBalanceThreshold(balance_id))
   };
+
+  handleResponseError = (response) => {
+    let errorMessage = 'Error, please try again...';
+    try {
+      errorMessage = response.error[0].error.data.message;
+    } catch (e1) {
+      try {
+        errorMessage = response.error[0].error.message;
+      } catch (e2) {
+        console.log('unknown error response: ', response);
+      }
+    }
+    this.props.dispatch(showDanger(errorMessage));
+  }
+  
+  savePlan = () => {
+    const { plan, location, dispatch } = this.props;
+    const { action } = location.query;    
+    dispatch(savePlan(plan, action, this.afterSave));
+  }
+
+  afterSave = (data) => {
+    console.log("data : ", data);
+    if (typeof data.error !== 'undefined' && data.error.length) {
+      this.handleResponseError(data);
+    } else {
+      this.props.router.push('/plans');
+    }
+  }
+  
+  handleSave = () => {
+    this.props.dispatch(savePlanRates(this.savePlan));
+  };
+
+  handleCancel = () => {
+    this.props.router.push('/prepaid_plans');
+  };
   
   render() {
     const { plan, pp_includes } = this.props;
@@ -105,8 +153,10 @@ class PrepaidPlan extends Component {
 		onSelect={this.handleSelectTab}>
 
 	    <Tab title="Details" eventKey={1}>
- 	      <Panel style={{borderTop: 'none'}}>
-		<PrepaidPlanDetails plan={plan} action={action} />
+ 	      <Panel style={ { borderTop: 'none' } }>
+		<PrepaidPlanDetails plan={ plan }
+				    action={ action }
+				    onChangeField={ this.onChangePlanField } />
 	      </Panel>
 	    </Tab>
 
@@ -148,6 +198,12 @@ class PrepaidPlan extends Component {
 	      </Panel>
 	    </Tab>
 	  </Tabs>
+
+          <div style={{ marginTop: 12 }}>
+            <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
+            <Button onClick={this.handleCancel} bsStyle="default">Cancel</Button>
+          </div>	  
+
 	</Col>
       </div>
     );
@@ -161,4 +217,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(PrepaidPlan);
+export default withRouter(connect(mapStateToProps)(PrepaidPlan));

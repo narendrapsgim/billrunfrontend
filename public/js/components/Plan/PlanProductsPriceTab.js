@@ -63,6 +63,12 @@ class PlanProductsPriceTab extends Component {
     this.props.planProductsClear();
   }
 
+  componentWillReceiveProps(props) {
+    if (props.planName && this.state.planName === '') {
+      this.setState({planName: props.planName});
+    }
+  }
+  
   onSelectProduct = (key) => {
     const { productsKeys } = this.props;
     const { planName } = this.state;
@@ -140,7 +146,7 @@ class PlanProductsPriceTab extends Component {
     const { planName } = this.state;
     const { productsKeys } = this.props;
 
-    if(typeof planName === 'undefined' || planName === null || planName.length === 0){
+    if (typeof planName === 'undefined' || planName === null || planName.length === 0){
       return (<p>Override Product Price available only in edit mode</p>);
     }
 
