@@ -91,7 +91,9 @@ export default class AdvancedFilter extends Component {
     }
   }
 
-  renderTitles = (field, index) => (<th key={index}>{field.title}</th>);
+  renderTitles = (field, index, fields) => (
+    <th style={{ width: `${100 / (fields.length === 0 ? 1 : fields.length)}%` }} key={index}>{field.title}</th>
+  );
 
   renderInputs = (field, index, fields) => {
     const input = this.getFilterInput(field);
@@ -106,10 +108,10 @@ export default class AdvancedFilter extends Component {
     const { fields } = this.props;
     return ([
       <td colSpan={fields.length - 1} className="pl0" key="search">
-        <Button bsStyle="primary" onClick={this.onApplay} style={{ marginRight: 10, width: '100%' }}><i className="fa fa-search" />&nbsp;Search</Button>
+        <Button bsStyle="primary" onClick={this.onApplay} className="full-width mr10"><i className="fa fa-search" />&nbsp;Search</Button>
       </td>,
       <td className="pr0" key="reset">
-        <Button onClick={this.onClear} style={{ width: '100%' }}><i className="fa fa-eraser danger-red" />&nbsp;Reset</Button>
+        <Button onClick={this.onClear} className="full-width"><i className="fa fa-eraser danger-red" />&nbsp;Reset</Button>
       </td>,
     ]);
   }
@@ -122,7 +124,7 @@ export default class AdvancedFilter extends Component {
 
     return (
       <div className="AdvancedFilter">
-        <Table responsive style={{ marginBottom: 0 }}>
+        <Table responsive className="mb10">
           <thead>
             <tr>{ titles }</tr>
           </thead>
