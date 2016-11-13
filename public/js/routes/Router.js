@@ -28,6 +28,8 @@ import SelectTemplate from '../components/InputProcessor/SelectTemplate';
 import Collections from '../components/Collections/Collections';
 import Collection from '../components/Collection/Collection';
 import InvoiceTemplate from '../components/InvoiceTemplate';
+import PrepaidIncludesList from '../components/PrepaidIncludesList';
+import PrepaidInclude from '../components/PrepaidInclude';
 
 const routes = () => (
   <Route path="/" component={App}>
@@ -55,6 +57,8 @@ const routes = () => (
     <Route path="/collections" component={RequireAuth(Collections)} title="Collections" />
     <Route path="/collection" component={RequireAuth(Collection)} title="Collection" />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
+    <Route path="/prepaid_includes" component={RequireAuth(PrepaidIncludesList)} title="Prepaid Includes" />
+    <Route path="/prepaid_include" component={RequireAuth(PrepaidInclude)} title="Prepaid Include" />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="*" component={PageNotFound} />
   </Route>
