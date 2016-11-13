@@ -5,7 +5,7 @@ import { withRouter } from 'react-router';
 
 import { getList } from '../../actions/listActions';
 
-import { Row, Col, Panel } from 'react-bootstrap';
+import { Row, Col, Panel, Button } from 'react-bootstrap';
 import List from '../List';
 import Filter from '../Filter';
 import Pager from '../Pager';
@@ -62,6 +62,15 @@ class PrepaidIncludesList extends React.Component {
       }
     });
   }
+
+  onNew = () => {
+    this.props.router.push({
+      pathname: "prepaid_include",
+      query: {
+	action: "new"
+      }
+    });
+  };
   
   render() {
     const { pp_includes } = this.props;
@@ -72,11 +81,20 @@ class PrepaidIncludesList extends React.Component {
       { id: 'priority', showFilter: false }
     ];
 
+    const header = (
+      <h3>
+	List of all available prepaid includes
+        <div className="pull-right">
+          <Button bsSize="xsmall" className="btn-primary" onClick={ this.onNew }><i className="fa fa-plus"/>&nbsp;Add New</Button>
+        </div>	
+      </h3>
+    );
+    
     return (
       <div className="PrepaidIncludesList">
 	<Row>
 	  <Col lg={12} md={12}>
-	    <Panel header={<h3> List of all available Prepaid Includes </h3>}>
+	    <Panel header={ header }>
 	      <Filter fields={ fields } onFilter={ this.onFilter } />
 	      <List items={ pp_includes } fields={ fields } edit={ true } editField="name" onClickEdit={ this.onClickPP } onSort={ this.onSort } />
 	    </Panel>
