@@ -1,2 +1,2 @@
-import PrepaidInclude from './PrepaidInclude';
-export default PrepaidInclude;
+import PrepaidIncludeSetup from './PrepaidIncludeSetup';
+export default PrepaidIncludeSetup;
