@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { showDanger } from '../../actions/alertsActions';
 import { clearExportGenerator } from '../../actions/exportGeneratorActions';
+import { getSettings } from '../../actions/settingsActions';
 import Steps from './elements/ExportGeneratorSteps';
 import SelectInputProcessor from './elements/SelectInputProcessor';
 import Segmentation from './elements/Segmentation';
@@ -29,7 +30,8 @@ class ExportGenerator extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const { file_type, action } = this.props.location.query;
+    const { name, action } = this.props.location.query;
+    dispatch(getSettings(['export_generators']));
 
     // Should be deal with edit
     // if (action !== "new") dispatch(getProcessorSettings(file_type));
