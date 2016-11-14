@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
@@ -12,7 +12,7 @@ import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
 import Unlimitd from '../FieldTypes/UnlimitedInput';
 
-class Field extends Component {
+class Field extends React.Component {
   constructor(props) {
     super(props);
 

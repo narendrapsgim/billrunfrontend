@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router';
+import { connect } from 'react-redux';
 import { Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
-
-import Select from 'react-select';
-
+import Field from '../Field';
 import countries from './countries.data.json';
 
-export default class Customer extends Component {
+class Customer extends Component {
   constructor(props) {
     super(props);
 
@@ -48,9 +47,9 @@ export default class Customer extends Component {
             {setting.get('title') || setting.get('field_name')}
           </Col>
           <Col sm={7}>
-            <FormControl type="text"
-                         onChange={ onChange }
-                         value={ customer.get(setting.get('field_name')) }
+            <Field onChange={ onChange }
+                   id={ setting.get('field_name') }
+                   value={ customer.get(setting.get('field_name'), '') }
             />
           </Col>
         </FormGroup>
@@ -73,3 +72,5 @@ export default class Customer extends Component {
     );
   }
 }
+
+export default connect()(Customer);
