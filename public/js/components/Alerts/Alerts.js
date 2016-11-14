@@ -1,13 +1,30 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import Immutable from 'immutable';
 import { Button } from 'react-bootstrap';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-
-import Alert from './Alert';
 import { hideAlert, hideAllAlerts } from '../../actions/alertsActions';
+import Alert from './Alert';
 
 class Alerts extends Component {
+
+  static defaultProps = {
+    alerts: Immutable.List(),
+    clearAllButtobLabel: 'Clear All',
+    showClearAllButton: true,
+    enterTimeout: 500,
+    exitTimeout: 300,
+  };
+
+  static propTypes = {
+    alerts: React.PropTypes.instanceOf(Immutable.List),
+    clearAllButtobLabel: React.PropTypes.string,
+    showClearAllButton: React.PropTypes.bool,
+    hideAllAlerts: React.PropTypes.func.isRequired,
+    hideAlert: React.PropTypes.func.isRequired,
+    enterTimeout: React.PropTypes.number,
+    exitTimeout: React.PropTypes.number,
+  };
 
   handleAlertsDismiss = () => {
     this.props.hideAllAlerts();
@@ -17,45 +34,42 @@ class Alerts extends Component {
     this.props.hideAlert(id);
   }
 
-  renderClearAll = () => {
+  renderClearAll = () => (
+    <div style={{ textAlign: 'right' }}>
+      <Button onClick={this.handleAlertsDismiss}>{this.props.clearAllButtobLabel}</Button>
+    </div>
+  );
+
+  renderAlert = (alert) => {
+    const { enterTimeout, exitTimeout } = this.props;
     return (
-      <div style={{textAlign: 'right'}}>
-        <Button onClick={this.handleAlertsDismiss}>Clear All</Button>
-      </div>
-    )
-  }
-
-  render(){
-		const enterTimeout = 500;
-		const exitTimeout = 300;
-
-    const alerts = this.props.alerts.map( (alert) =>
       <Alert
-        id={alert.get('id')}
-        key={alert.get('id')}
-        type={alert.get('type')}
-        message={alert.get('message')}
-        timeout={alert.get('timeout')}
-        transitioTime={(enterTimeout + exitTimeout)}
+        alert={alert}
         handleAlertDismiss={this.handleAlertDismiss}
+        key={alert.get('id')}
+        transitioTime={(enterTimeout + exitTimeout)}
       />
     );
+  }
 
+  render() {
+    const { enterTimeout, exitTimeout, alerts: items, showClearAllButton } = this.props;
+    const alerts = items.map(this.renderAlert);
     return (
-      <div className="alert-notifier-container" style={{ width: '50%', position: 'fixed', zIndex: 99999, top: 0, right: 0, padding: 5}}>
+      <div className="alert-notifier-container">
         <ReactCSSTransitionGroup transitionName="alerts" transitionEnterTimeout={enterTimeout} transitionLeaveTimeout={exitTimeout}>
           { alerts }
-          { alerts.size > 1 ? this.renderClearAll() : null}
+          { showClearAllButton && alerts.size > 1 && this.renderClearAll()}
         </ReactCSSTransitionGroup>
       </div>
-    )
+    );
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ hideAllAlerts, hideAlert }, dispatch);
-}
-function mapStateToProps(state) {
-  return { alerts: state.alerts }
-}
+const mapDispatchToProps = (
+  { hideAllAlerts, hideAlert }
+);
+const mapStateToProps = state => (
+  { alerts: state.alerts }
+);
 export default connect(mapStateToProps, mapDispatchToProps)(Alerts);
