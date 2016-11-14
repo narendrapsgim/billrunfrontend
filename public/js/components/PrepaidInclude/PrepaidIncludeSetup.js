@@ -1,12 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 
 import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
 
-import { Button } from 'react-bootstrap';
+import { Button, Tabs, Tab, Panel } from 'react-bootstrap';
 import PrepaidInclude from './PrepaidInclude';
+import LimitedDestinations from './LimitedDestinations';
 
 class PrepaidIncludeSetup extends React.Component {
   constructor(props) {
@@ -46,6 +47,8 @@ class PrepaidIncludeSetup extends React.Component {
   };
 
   render() {
+    const { prepaid_include } = this.props;
+
     const charging_by_options = [
       { value: 'usagev', label: 'Usage volume' },
       { value: 'cost', label: 'Cost' },
@@ -54,10 +57,22 @@ class PrepaidIncludeSetup extends React.Component {
 
     return (
       <div className="PrepaidIncludeSetup">
-        <PrepaidInclude prepaidInclude={ this.props.prepaid_include }
-                        onChangeField={ this.onChangeField }
-                        onChangeSelectField={ this.onChangeSelectField }
-                        chargingByOptions={ charging_by_options } />
+        <Tabs id="PrepaidInclude" defaultActiveKey={1} animation={false}>
+          <Tab title="Details" eventKey={1}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PrepaidInclude prepaidInclude={ prepaid_include }
+                              onChangeField={ this.onChangeField }
+                              onChangeSelectField={ this.onChangeSelectField }
+                              chargingByOptions={ charging_by_options } />
+            </Panel>
+          </Tab>
+          <Tab title="Limited Destinations" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <LimitedDestinations
+                  limitedDestinations={ prepaid_include.get('allowed_in', List()) } />
+            </Panel>
+          </Tab>
+        </Tabs>
 	<div style={{ marginTop: 12 }}>
           <Button onClick={ this.handleSave }
 		  bsStyle="primary"
