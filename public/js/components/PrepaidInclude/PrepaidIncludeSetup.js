@@ -46,6 +46,10 @@ class PrepaidIncludeSetup extends React.Component {
     this.props.router.push('/prepaid_includes');
   };
 
+  onChangeLimitedDestinations = (name, value) => {
+    this.props.dispatch(updateEntityField('prepaid_include', ['allowed_in', name], value));
+  };
+  
   render() {
     const { prepaid_include } = this.props;
 
@@ -69,7 +73,8 @@ class PrepaidIncludeSetup extends React.Component {
           <Tab title="Limited Destinations" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <LimitedDestinations
-                  limitedDestinations={ prepaid_include.get('allowed_in', List()) } />
+                  limitedDestinations={ prepaid_include.get('allowed_in', List()) }
+                  onChange={ this.onChangeLimitedDestinations } />
             </Panel>
           </Tab>
         </Tabs>
