@@ -38,7 +38,7 @@ class PrepaidIncludeSetup extends React.Component {
   };
 
   handleSave = () => {
-    console.log('save entity', this.props.prepaid_include);
+    console.log('save entity', this.props.prepaid_include.toJS());
   };
 
   handleCancel = () => {
@@ -46,10 +46,18 @@ class PrepaidIncludeSetup extends React.Component {
   };
 
   render() {
+    const charging_by_options = [
+      { value: 'usagev', label: 'Usage volume' },
+      { value: 'cost', label: 'Cost' },
+      { value: 'total_cost', label: 'Total cost' }
+    ];
+
     return (
       <div className="PrepaidIncludeSetup">
         <PrepaidInclude prepaidInclude={ this.props.prepaid_include }
-                        onChangeField={ this.onChangeField } />
+                        onChangeField={ this.onChangeField }
+                        onChangeSelectField={ this.onChangeSelectField }
+                        chargingByOptions={ charging_by_options } />
 	<div style={{ marginTop: 12 }}>
           <Button onClick={ this.handleSave }
 		  bsStyle="primary"
