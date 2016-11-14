@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
+import { connect } from 'react-redux';
 import _ from 'lodash';
 
 import FieldSettings from '../../FieldSettings';
@@ -12,7 +12,7 @@ import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
 import Unlimitd from '../FieldTypes/UnlimitedInput';
 
-export default class Field extends Component {
+class Field extends React.Component {
   constructor(props) {
     super(props);
 
@@ -57,9 +57,11 @@ export default class Field extends Component {
 
   render() {
     return (
-      <div>
+      <div className="Field">
         { this.createInput() }
       </div>
     );
   }
 }
+
+export default connect()(Field);
