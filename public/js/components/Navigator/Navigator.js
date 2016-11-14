@@ -21,7 +21,6 @@ class Navigator extends Component {
     this.state = {
       showCollapseButton: false,
       showFullMenu: true,
-      activeMenuItem: 'dashboard',
       collapseSideBar: false,
       openSubMenu:'',
     };
@@ -109,7 +108,6 @@ class Navigator extends Component {
     };
 
 
-    const {activeMenuItem} = this.state;
     return (
         <nav className={overallNavClassName} id="top-nav" role="navigation">
           <div className="navbar-header">
