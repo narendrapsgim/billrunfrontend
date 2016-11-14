@@ -1,27 +1,30 @@
 import React, { Component } from 'react';
 import moment from 'moment-timezone';
+import Immutable from 'immutable';
 
 export default class DateTime extends Component {
-  constructor(props) {
-    super(props);
+
+  static propTypes = {
+    onChange: React.PropTypes.func.isRequired,
+    data: React.PropTypes.instanceOf(Immutable.Map),
+  };
+
+  onChange = (e) => {
+    const { id, value } = e.target;
+    this.props.onChange('billrun', id, value);
   }
 
-  render() {
-    const { onChange, data } = this.props;
+  renderOption = (value, key) => <option value={value} key={key}>{value}</option>;
 
-    const date_format_options = ["dd-mm-yy", "mm-dd-yy"].map((format, key) => (
-      <option value={format} key={key}>{format}</option>
-    ));
-    const time_format_options = ["12-hour", "24-hour"].map((format, key) => (
-      <option value={format} key={key}>{format}</option>
-    ));
-    const time_zone_options = moment.tz.names().map((zone, key) => (
-      <option value={zone} key={key}>{zone}</option>
-    ));
-    const billing_day_options = _.times(28, n => (
-      <option value={n + 1} key={n}>{n + 1}</option>
-    ));
-    
+  render() {
+    const { data } = this.props;
+
+    // const dateFormatOptions = ['dd-mm-yy', 'mm-dd-yy'].map(this.renderOption);
+    // const timeFormatOptions = ['12-hour', '24-hour'].map(this.renderOption);
+    const timeZoneOptions = moment.tz.names().map(this.renderOption);
+    const billingDayOptions = _.times(28, n => this.renderOption((n + 1), n));
+    const timezone = data.get('timezone', '').length !== 0 ? data.get('timezone', '') : moment.tz.guess();
+
     return (
       <div>
         <form className="form-horizontal">
@@ -31,9 +34,8 @@ export default class DateTime extends Component {
                 <label htmlFor="time_zone">Time Zone</label>
               </div>
               <div className="col-md-4">
-                <select id="timezone" defaultValue={moment.tz.guess()} value={data.get('timezone')}
-                        onChange={onChange} className="form-control">
-                  { time_zone_options }
+                <select id="timezone" value={timezone} onChange={this.onChange} className="form-control">
+                  { timeZoneOptions }
                 </select>
               </div>
             </div>
@@ -44,10 +46,11 @@ export default class DateTime extends Component {
                 <label htmlFor="charging_day">Charging Day</label>
               </div>
               <div className="col-md-4">
-                <select id="charging_day" value={data.get('charging_day')}
-                        onChange={onChange}
-                        className="form-control">
-                  { billing_day_options }
+                <select id="charging_day" value={data.get('charging_day', '')} onChange={this.onChange} className="form-control">
+                  {[
+                    <option value="" key="select_charging_day">Select charging day...</option>,
+                    ...billingDayOptions,
+                  ]}
                 </select>
               </div>
             </div>
