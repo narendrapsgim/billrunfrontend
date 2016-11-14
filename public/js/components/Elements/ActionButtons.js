@@ -1,31 +1,32 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { Button } from 'react-bootstrap';
 
-export default class ActionButtons extends Component {
-  constructor(props) {
-    super(props);
-  }
+const ActionButtons = (props) => {
+  const { onClickSave, onClickCancel, cancelLabel, saveLabel, hide, hideCancel } = props;
+  if (hide) return null;
+  return (
+    <div style={{ marginTop: 12 }}>
+      <Button onClick={onClickSave} bsStyle="primary" style={{ minWidth: 90, marginRight: 10 }}>{saveLabel}</Button>
+      {!hideCancel && <Button onClick={onClickCancel} bsStyle="default" style={{ minWidth: 90 }}>{cancelLabel}</Button>}
+    </div>
+  );
+};
 
-  render() {
-    const { hide, onClickSave, onClickCancel, hideCancel } = this.props;
-    if (hide) return (null);
+ActionButtons.defaultProps = {
+  hide: false,
+  hideCancel: false,
+  cancelLabel: 'Cancel',
+  saveLabel: 'Save',
+  onClickCancel: () => {},
+};
 
-    return (
-      <div style={{marginTop: 12}}>
-        <button type="submit"
-                className="btn btn-primary"
-                onClick={onClickSave}
-                style={{marginRight: 10}}>
-          Save
-        </button>
-        {hideCancel ? null : (
-          <button type="reset"
-                  className="btn btn-default"
-                  onClick={onClickCancel}>
-            Cancel
-          </button>
-        )}
+ActionButtons.propTypes = {
+  cancelLabel: React.PropTypes.string,
+  hide: React.PropTypes.bool,
+  hideCancel: React.PropTypes.bool,
+  onClickCancel: React.PropTypes.func,
+  onClickSave: React.PropTypes.func.isRequired,
+  saveLabel: React.PropTypes.string,
+};
 
-      </div>
-    );
-  }
-}
+export default ActionButtons;
