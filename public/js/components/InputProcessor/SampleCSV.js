@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 /* COMPONENTS */
+import Field from '../Field';
 import SelectDelimiter from './SampleCSV/SelectDelimiter';
 import SelectCSV from './SampleCSV/SelectCSV';
 import CSVFields from './SampleCSV/CSVFields';
@@ -99,7 +100,7 @@ export default class SampleCSV extends Component {
               <i className="fa fa-long-arrow-right"></i>
             </div>
             <div className="col-lg-7">
-              <input id="file_type" className="form-control" onChange={onChangeName} value={settings.get('file_type')} />
+              <Field id="file_type" onChange={ onChangeName } value={ settings.get('file_type', '') } />
             </div>
           </div>
         </div>
