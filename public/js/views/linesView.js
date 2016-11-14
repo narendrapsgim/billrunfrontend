@@ -59,13 +59,14 @@ const lines_list_view = {
             { value: "MMS", key: "sms"},
             { value: "Data", key: "data"},
           ]}, hidden : true},
+        {key : 'usagev', label : 'Usage Vol.', type:'number'},
         {key : 'aprice', label : 'Charge', type:'number'},
         {key : 'billrun', label : 'Billrun', type:'multiselect', filter : { options: billrun_dates, query:{'billrun':{'$in':1}} ,valuePath:{'billrun':{'$in': null}}}, hidden : true},
         {key : 'urt2', label : 'From',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().subtract(2, 'months')), query:{'urt':{'$gt':1}} ,valuePath:{'urt':{'$gt': null}}  }, hidden : true},
         {key : 'urt3', label : 'To',  type : 'urt', sortable : true ,filter :  { defaultValue : (moment().add(1, 'months')), query:{'urt':{'$lte':1}} ,valuePath:{'urt':{'$lte':null}}  }, hidden : true},
       ],
       defaults : {
-        tableHeight : '500px',
+        tableHeight : '750px',
       },
       onItemClick : 'edit',
       controllers : {

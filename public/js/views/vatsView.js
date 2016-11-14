@@ -56,6 +56,9 @@ const rates_vat_list_view = {
         delete : { label: 'Delete', color: Colors.red500  },
       },
       onItemClick : 'edit',
+      defaults : {
+        tableHeight : '750px',
+      },
     } ]
   } ]
 };
