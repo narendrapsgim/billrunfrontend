@@ -64,6 +64,14 @@ textarea {
 /* ~React-Select */
 
 /* System Alerts */
+.alert-notifier-container{
+  width: 50%;
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  right: 0;
+  padding: 5;
+}
 .alerts-enter {
   opacity: 0.01;
 }

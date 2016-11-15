@@ -1,5 +1,6 @@
-import { showStatusMessage } from '../actions/commonActions';
 import { hideProgressBar } from '../actions/progressbarActions';
+import { showDanger } from '../actions/alertsActions';
+
 
 //help function to simulate API response with delay
 export function delay(sec = 2, success = true, mock = { 'success': true }) {
@@ -14,11 +15,21 @@ export function delay(sec = 2, success = true, mock = { 'success': true }) {
 }
 
 //Handel API errors
-export function apiBillRunErrorHandler(error, data) {
+export function apiBillRunErrorHandler(error, defaultMessage = 'Error, please try again...') {
   return (dispatch, getState) => {
-    console.log("Api Error", error, data);
+    console.log("Api Error Handler, error: ", error);
     dispatch(hideProgressBar());
-    dispatch(showStatusMessage('API Error', 'error'));
+    let errorMessage;
+    try {
+      errorMessage = error.error[0].error.data.message;
+    } catch (e1) {
+      try {
+        errorMessage = error.error[0].error.message;
+      } catch (e2) {
+        errorMessage = defaultMessage;
+      }
+    }
+    dispatch(showDanger(errorMessage));
   };
 }
 
