@@ -58,7 +58,7 @@ class SelectInputProcessor extends Component {
       <div>
         <form className="InputProcessor form-horizontal">
           <h3 style={{marginBottom: '35px'}}>Choose Input Processor</h3>
-          <GeneratorName />
+          <GeneratorName name={this.props.settings.get('name', '')}/>
           <div className="form-group">
             <div className="col-lg-3">
               <label htmlFor="file_type">Please select Input Processor</label>

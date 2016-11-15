@@ -28,10 +28,10 @@ class Segmentation extends Component {
   render() {
     const { fields } = this.props;
     const options =
-      fields.map((val, key) => ({value: key, label: key})).toJS();
+      fields.map((val, key) => ({value: val, label: val})).toJS();
 
     return (
-      <div>
+      <div className="Segmentation">
         Please add segments filters for Export generator.
         <br/>
         <br/>

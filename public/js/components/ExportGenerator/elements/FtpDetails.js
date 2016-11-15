@@ -2,22 +2,12 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 class FtpDetials extends Component {
-  /*static propTypes = {
-   stepIndex: PropTypes.number.isRequired
-   };*/
-
-  /*  constructor(props) {
-   super(props);
-
-   }*/
-
   render() {
-    console.log(this);
     return (
-      <div>
-        FtpDetails
+      <div className="FtpDetails">
+        <h4>Coming soon. . .</h4>
       </div>
-    )
+    );
   }
 }
 

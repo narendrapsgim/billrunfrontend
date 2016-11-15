@@ -38,7 +38,7 @@ class ExportGeneratorsList extends Component {
     this.context.router.push({
       pathname: 'export_generator',
       query: {
-        file_type: export_generator.get('name'),
+        name: export_generator.get('name'),
         action: 'update'
       }
     });

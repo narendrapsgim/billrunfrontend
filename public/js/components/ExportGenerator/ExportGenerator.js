@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { showDanger } from '../../actions/alertsActions';
-import { clearExportGenerator } from '../../actions/exportGeneratorActions';
+import { getExportGenerator, clearExportGenerator, saveExportGenerator } from '../../actions/exportGeneratorActions';
 import { getSettings } from '../../actions/settingsActions';
 import Steps from './elements/ExportGeneratorSteps';
 import SelectInputProcessor from './elements/SelectInputProcessor';
@@ -19,7 +19,7 @@ class ExportGenerator extends Component {
       steps: [
         "select_input",
         "segmentation",
-        "ftoDetails"
+        "ftpDetails"
       ]
     };
 
@@ -34,7 +34,7 @@ class ExportGenerator extends Component {
     dispatch(getSettings(['export_generators']));
 
     // Should be deal with edit
-    // if (action !== "new") dispatch(getProcessorSettings(file_type));
+    if (action !== "new") dispatch(getExportGenerator(name));
   }
 
   onError(message) {
@@ -72,6 +72,7 @@ class ExportGenerator extends Component {
       this.goBack();
     }
   }
+
   handleCancel() {
     let r = confirm("are you sure you want to stop editing Export Generator?");
     const { dispatch, fileType } = this.props;
@@ -95,46 +96,49 @@ class ExportGenerator extends Component {
   }
 
   validateSteps (cb) {
-    const { stepIndex } = this.state || 0;
+    const { stepIndex, finished } = this.state || 0;
     let err = [];
 
-
-    switch (stepIndex) {
-      case 0:
-        // check name
-        if (this.props.settings.get('name').length === 0) {
-          err.push ('Export Process name is mandatory.');
-        }
-
-        //check input processor selected
-        if (this.props.settings.get('inputProcess').size === 0) {
-          err.push ('Please select Input Processor.');
-        }
-        break;
-
-      case 1:
-        // check at last one segment with from/to is selected
-        // let segment = this.props.settings.get('segments').get(0);
-        if (this.props.settings.get('segments').size === 0) {
-          err.push ('Please select at least one segment');
-        } else {
-          let firstSegment = this.props.settings.get('segments').first();
-          if (!firstSegment.get('field') || ( !firstSegment.get('from') || firstSegment.get('to') )) {
-            err.push ('Generator should has at last one valid segment');
+    if (finished) {
+      this.props.dispatch(saveExportGenerator());
+    } else {      
+      switch (stepIndex) {
+        case 0:
+          // check name
+          if (this.props.settings.get('name').length === 0) {
+            err.push ('Export Process name is mandatory.');
           }
-        }
-        break;
+
+          //check input processor selected
+          if (this.props.settings.get('inputProcess').size === 0) {
+            err.push ('Please select Input Processor.');
+          }
+          break;
+
+        case 1:
+          // check at last one segment with from/to is selected
+          // let segment = this.props.settings.get('segments').get(0);
+          if (this.props.settings.get('segments').size === 0) {
+            err.push ('Please select at least one segment');
+          } else {
+            let firstSegment = this.props.settings.get('segments').first();
+            if (!firstSegment.get('field') || ( !firstSegment.get('from') && firstSegment.get('to') )) {
+              err.push ('Generator should has at last one valid segment');
+            }
+          }
+          break;
+      }
+
+      if (err.length > 0 ) {
+        this.props.dispatch(showDanger(err.join("\n\n")));
+
+        cb(true);
+        return;
+      }
+
+
+      cb(false);
     }
-
-    if (err.length > 0 ) {
-      this.props.dispatch(showDanger(err.join("\n\n")));
-
-      cb(true);
-      return;
-    }
-
-
-    cb(false);
   }
 
 
