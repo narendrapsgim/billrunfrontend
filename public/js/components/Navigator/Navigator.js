@@ -1,10 +1,9 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {Link, withRouter} from 'react-router';
-import {userDoLogout} from '../../actions/userActions';
-import classNames from "classnames";
-import { NavDropdown, Button } from "react-bootstrap";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router';
+import classNames from 'classnames';
+import { NavDropdown, Button, MenuItem as BootstrapMenuItem } from 'react-bootstrap';
+import { userDoLogout } from '../../actions/userActions';
 /* Assets */
 import LogoImg from 'img/billrun-logo-tm.png';
 import MenuItem from './MenuItem';
@@ -12,19 +11,20 @@ import MenuItems from '../../MenuItems';
 import SubMenu from './SubMenu';
 
 class Navigator extends Component {
-  constructor(props) {
-    super(props);
-    this.onToggleMenu = this.onToggleMenu.bind(this);
-    this.onWindowResize = this.onWindowResize.bind(this);
-    this.onCollapseSidebar = this.onCollapseSidebar.bind(this);
 
-    this.state = {
-      showCollapseButton: false,
-      showFullMenu: true,
-      collapseSideBar: false,
-      openSubMenu:'',
-    };
-  }
+  static propTypes = {
+    router: React.PropTypes.shape({
+      push: React.PropTypes.func.isRequired,
+    }).isRequired,
+    userDoLogout: React.PropTypes.func.isRequired,
+  };
+
+  state = {
+    showCollapseButton: false,
+    showFullMenu: true,
+    collapseSideBar: false,
+    openSubMenu: '',
+  };
 
   componentWillMount() {
     this.onWindowResize();
@@ -35,114 +35,121 @@ class Navigator extends Component {
     window.removeEventListener('resize', this.onWindowResize);
   }
 
-  onWindowResize() {
+  onWindowResize = () => {
     const small = window.innerWidth < 768;
-    this.setState({showCollapseButton: small, showFullMenu: !small});
+    this.setState({ showCollapseButton: small, showFullMenu: !small });
   }
 
-  onToggleMenu() {
-    const {showFullMenu} = this.state;
-    this.setState({showFullMenu: !showFullMenu});
+  onToggleMenu = () => {
+    const { showFullMenu } = this.state;
+    this.setState({ showFullMenu: !showFullMenu });
   }
 
-  clickLogout = (e) => {
-    e.preventDefault();
-    this.props.userDoLogout().then(res => {
-      this.props.router.push('/');
-    });
-  };
-
-  onCollapseSidebar() {
-
-    this.setState({collapseSideBar: !this.state.collapseSideBar});
-  };
+  onCollapseSidebar = () => {
+    this.setState({ collapseSideBar: !this.state.collapseSideBar });
+  }
 
   onSetActive = (id) => {
-    this.setState({activeMenuItem: id});
+    this.setState({ activeMenuItem: id });
   };
 
 
   onToggleSubMenu = (id) => {
-
-    this.setState({openSubMenu: this.state.openSubMenu !== id? id : ''});
+    this.setState({ openSubMenu: this.state.openSubMenu !== id ? id : '' });
   };
 
-  render() {
+  clickLogout = (e) => {
+    e.preventDefault();
+    this.props.userDoLogout().then((res) => {
+      this.props.router.push('/');
+    });
+  };
 
+  isMenuOpen = (item) => {
     const { router } = this.props;
+    const { openSubMenu } = this.state;
+    return (openSubMenu === item.id) ||
+      (item.subMenus && item.subMenus.filter(subMenu => router.isActive(subMenu.route)).length > 0);
+  }
 
-    let overallNavClassName = classNames({
+  filterEnabledMenu = menu => menu.show;
+
+  renderSubMenu = (item, key) => {
+    const { id, icon, title } = item;
+    return (
+      <SubMenu
+        icon={`fa ${icon} fa-fw`}
+        id={id}
+        key={key}
+        onClick={this.onToggleSubMenu}
+        open={this.isMenuOpen(item)}
+        title={title}
+      >
+        { item.subMenus.filter(this.filterEnabledMenu).map(this.renderMenu) }
+      </SubMenu>
+    );
+  }
+
+  renderMenu = (menuItem, key) => (
+    menuItem.subMenus ? this.renderSubMenu(menuItem, key) : this.renderMenuItem(menuItem, key)
+  );
+
+  renderMenuItem = (item, key) => {
+    const { router } = this.props;
+    const { id, route, icon, title } = item;
+    return (
+      <MenuItem
+        active={router.isActive(route)}
+        icon={`fa ${icon} fa-fw`}
+        id={id}
+        key={key}
+        onSetActive={this.onSetActive}
+        route={route}
+        title={title}
+      />
+    );
+  }
+
+  render() {
+    const { collapseSideBar } = this.state;
+    const overallNavClassName = classNames({
       'navbar navbar-default navbar-fixed-top': true,
-      'collapse-sizebar': this.state.collapseSideBar
+      'collapse-sizebar': collapseSideBar,
     });
 
-    const filterMenuFunc = (v) => {
-      return v.show;
-    };
-
-
-    const renderMenu = (v, k) => {
-
-      let openSubMenu = (this.state.openSubMenu === v.id) ||
-                              (v.subMenus &&
-                               v.subMenus.filter(subMenu => router.isActive(subMenu.route)).length > 0);
-
-      return v.subMenus ?
-
-          (<SubMenu id={ v.id } key={k}
-                    title={ v.title }
-                    icon={ `fa ${v.icon} fa-fw` }
-                    open={openSubMenu}
-                    onClick={this.onToggleSubMenu}
-          >
-            { v.subMenus.filter(filterMenuFunc).map(renderMenu) }
-          </SubMenu>)
-          :
-          (<MenuItem id={ v.id } key={k}
-                       route={ v.route }
-                       title={ v.title }
-                       icon={ `fa ${v.icon} fa-fw` }
-                       active={ router.isActive(v.route) }
-                       onSetActive={this.onSetActive}
-         />);
-    };
-
-
     return (
-        <nav className={overallNavClassName} id="top-nav" role="navigation">
-          <div className="navbar-header">
-            <Link to="/" className="navbar-brand">
-              <img src={LogoImg} style={{height: 22}}/>
-            </Link>
-            <Button bsSize="xsmall" id="btn-collapse-menu" onClick={this.onCollapseSidebar}>
-              <i className="fa fa-chevron-left" />
-              <i className="fa fa-chevron-left" />
-            </Button>
-          </div>
+      <nav className={overallNavClassName} id="top-nav" role="navigation">
+        <div className="navbar-header">
+          <Link to="/" className="navbar-brand">
+            <img src={LogoImg} style={{ height: 22 }} alt="Logo" />
+          </Link>
+          <Button bsSize="xsmall" id="btn-collapse-menu" onClick={this.onCollapseSidebar}>
+            <i className="fa fa-chevron-left" />
+            <i className="fa fa-chevron-left" />
+          </Button>
+        </div>
 
-          <ul className="nav navbar-top-links navbar-right">
-            <NavDropdown id="nav-user-menu" title={<i className="fa fa-user fa-fw"></i>}>
-              <MenuItem eventKey="4" onClick={this.clickLogout}>
-                <i className="fa fa-sign-out fa-fw"></i> Logout
-              </MenuItem>
-            </NavDropdown>
-          </ul>
-          <div className="navbar-default sidebar" role="navigation">
-            <div className="sidebar-nav navbar-collapse">
+        <ul className="nav navbar-top-links navbar-right">
+          <NavDropdown id="nav-user-menu" title={<i className="fa fa-user fa-fw" />}>
+            <BootstrapMenuItem eventKey="4" onClick={this.clickLogout}>
+              <i className="fa fa-sign-out fa-fw" /> Logout
+              </BootstrapMenuItem>
+          </NavDropdown>
+        </ul>
+        <div className="navbar-default sidebar" role="navigation">
+          <div className="sidebar-nav navbar-collapse">
 
-              <ul className="nav in" id="side-menu">
-                { MenuItems.filter(filterMenuFunc).map(renderMenu) }
-              </ul>
-            </div>
+            <ul className="nav in" id="side-menu">
+              { MenuItems.filter(this.filterEnabledMenu).map(this.renderMenu) }
+            </ul>
           </div>
-        </nav>
+        </div>
+      </nav>
     );
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    userDoLogout
-  }, dispatch);
-}
+const mapDispatchToProps = {
+  userDoLogout,
+};
 export default withRouter(connect(null, mapDispatchToProps)(Navigator));
