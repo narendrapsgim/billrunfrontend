@@ -20,14 +20,14 @@ export default class PlanSearch extends Component {
 
   getPlans = (input, callback) => {
     if(input && input.length){
-      let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
+      const toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
 
-      let query = {
+      const query = {
         "name": {"$regex": input.toLowerCase(), "$options": "i"},
         /* "to": {"$gte" : toadyApiString},
          * "from": {"$lte" : toadyApiString},*/
       };
-      let request = [{
+      const request = [{
         api: "find",
         params: [
           { collection: "plans" },
@@ -39,8 +39,8 @@ export default class PlanSearch extends Component {
       }];
 
       return apiBillRun(request).then(
-        sussess => {
-          let options = _.values(sussess.data[0].data.details);
+        success => {
+          const options = _.values(sussess.data[0].data.details);
           return { options };
         },
         failure => {return { options : [] }}
