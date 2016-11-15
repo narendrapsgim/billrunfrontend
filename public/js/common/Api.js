@@ -86,7 +86,7 @@ function sendHttpRequest(query) {
       success => {
         success.json().then(
           body => {
-	    if (body.code === 17576) {
+	    if (body.code === 17574) {
 	      console.log(body);
 	      location.reload();
 	    }
