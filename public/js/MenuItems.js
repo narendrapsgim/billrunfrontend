@@ -14,6 +14,13 @@ const MenuItems = [
         show:true,
     },
     {
+      id: 'prepaid_plans',
+      title: 'Prepaid Plans',
+      icon: 'fa-cubes',
+      route: 'prepaid_plans',
+      show: true
+    },
+    {
         id:'services',
         title:'Services',
         icon:'fa-puzzle-piece',
