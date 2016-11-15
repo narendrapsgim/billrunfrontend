@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox,
    Col, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import changeCase from 'change-case';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import Help from '../../Help';
@@ -209,7 +210,7 @@ export default class PlanIncludeGroupCreate extends Component {
       case 2:
         return ([
           <FormGroup validationState={error.length > 0 ? "error" : null} >
-            <Col componentClass={ControlLabel} sm={3}>Include</Col>
+            <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`${usage} includes`)}</Col>
             <Col sm={8}>
               <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
