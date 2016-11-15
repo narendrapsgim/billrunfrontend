@@ -4,6 +4,7 @@ import { withRouter } from 'react-router';
 import { Map, List } from 'immutable';
 
 import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
+import { showDanger } from '../../actions/alertsActions';
 
 import { Button, Tabs, Tab, Panel } from 'react-bootstrap';
 import PrepaidInclude from './PrepaidInclude';
@@ -49,6 +50,15 @@ class PrepaidIncludeSetup extends React.Component {
   onChangeLimitedDestinations = (name, value) => {
     this.props.dispatch(updateEntityField('prepaid_include', ['allowed_in', name], value));
   };
+
+  onSelectPlan = (name) => {
+    const { prepaid_include, dispatch } = this.props;
+    if (prepaid_include.getIn(['allowed_in', name])) {
+      dispatch(showDanger("Plan already exists"));
+      return;
+    }
+    this.props.dispatch(updateEntityField('prepaid_include', ['allowed_in', name], Map()));
+  };
   
   render() {
     const { prepaid_include } = this.props;
@@ -74,6 +84,7 @@ class PrepaidIncludeSetup extends React.Component {
             <Panel style={{ borderTop: 'none' }}>
               <LimitedDestinations
                   limitedDestinations={ prepaid_include.get('allowed_in', List()) }
+                  onSelectPlan={ this.onSelectPlan }
                   onChange={ this.onChangeLimitedDestinations } />
             </Panel>
           </Tab>

@@ -4,7 +4,7 @@ import { List } from 'immutable';
 
 import { Panel } from 'react-bootstrap';
 import Select from 'react-select';
-import Products from '../Plan/components/Products';
+import PlanSearch from '../Elements/PlanSearch';
 
 const LimitedDestination = connect()((props) => {
   const onChange = (value) => {
@@ -22,6 +22,9 @@ const LimitedDestination = connect()((props) => {
 
 const LimitedDestinations = (props) => (
   <div className="LimitedDestinations">
+    <Panel>
+      <PlanSearch onSelectPlan={ props.onSelectPlan } />
+    </Panel>
     {
       props.limitedDestinations
            .keySeq()
