@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
+import changeCase from 'change-case';
 import { Col, Row, Panel } from 'react-bootstrap';
 import List from '../List';
 import Pager from '../Pager';
@@ -39,8 +40,8 @@ class AuditTrail extends Component {
       tableFields: [
         { id: 'urt', title: 'Date', type: 'datetime', cssClass: 'long-date', sort: true },
         { id: 'user.name', title: 'User', parser: this.userParser, sort: true },
-        { id: 'collection', title: 'Entity Type', sort: true },
-        { id: 'key', title: 'Entity Key', sort: true },
+        { id: 'collection', title: 'Module Type', parser: this.collectionParser, sort: true },
+        { id: 'key', title: 'Module Key', sort: true },
         { title: 'Details', parser: this.detailsParser },
       ],
       fields: { user: 1, collection: 1, key: 1, new_oid: 1, old_oid: 1, urt: 1, details: 1 },
@@ -111,6 +112,8 @@ class AuditTrail extends Component {
 
   userParser = item => item.getIn(['user', 'name'], '');
 
+  collectionParser = item => changeCase.sentenceCase(item.get('collection', ''));
+
   detailsParser = item => <DetailsParser item={item} openDiff={this.openDiff} />
 
   openDiff = ({ collection, oldid, newid }) => {
@@ -175,8 +178,15 @@ const mapStateToProps = (state) => {
   const items = state.list.get('log');
   const diffItems = state.list.get('diff');
   const showDiff = (typeof diffItems !== 'undefined') ? diffItems.size === 2 : false;
-  const userNames = state.list.get('autocompleteUser', Immutable.List()).map(user => user.get('username'));
-  const auditTrailEntityTypes = state.list.get('autocompleteAuditTrailEntityTypes', Immutable.List()).map(type => type.get('name'));
+  const userNames = state.list.get('autocompleteUser', Immutable.List())
+    .map(user => user.get('username'));
+  const auditTrailEntityTypes = state.list
+    .get('autocompleteAuditTrailEntityTypes', Immutable.List())
+    .map(type => ({
+      key: type.get('name', ''),
+      val: changeCase.sentenceCase(type.get('name', ''))
+    }));
+
   return { items, diffItems, showDiff, userNames, auditTrailEntityTypes };
 };
 

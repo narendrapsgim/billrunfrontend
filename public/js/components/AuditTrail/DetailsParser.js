@@ -26,8 +26,8 @@ const DetailsParser = ({ item, openDiff }) => {
   if (details.length) {
     message = (
       <div>
-        {message}<br />
         <p>{details}</p>
+        {message}
       </div>
     );
   }

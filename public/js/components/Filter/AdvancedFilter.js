@@ -21,9 +21,6 @@ export default class AdvancedFilter extends Component {
     filters: Immutable.Map(),
   }
 
-  componentDidMount() {
-  }
-
   onChangeInput = (e) => {
     const { id, value } = e.target;
     this.onChange(id, value);
@@ -61,13 +58,21 @@ export default class AdvancedFilter extends Component {
 
     switch (field.type) {
       case 'select': {
-        const options = field.options.map(option =>
-          (<option key={option} value={option}>{option}</option>)
-        );
+        const options = field.options.map((option, i) => {
+          let val;
+          let key;
+          if (option && option.key && option.val) {
+            val = option.val;
+            key = option.key;
+          } else {
+            key = val = option;
+          }
+          return (<option key={i} value={key}>{val}</option>);
+        });
         return (
           <select id={field.id} className="form-control" value={value} onChange={this.onChangeInput}>
             [
-              <option value="">Select...</option>,
+              <option key="select" value="">Select...</option>,
               ...{options}
             ]
           </select>

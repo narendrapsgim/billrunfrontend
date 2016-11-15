@@ -63,6 +63,7 @@
     "webpack-validator": "^2.2.9"
   },
   "dependencies": {
+    "change-case": "^3.0.0",
     "classnames": "^2.2.5",
     "font-awesome": "^4.6.3",
     "immutable": "^3.8.1",
