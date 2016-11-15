@@ -56,6 +56,13 @@ const MenuItems = [
         show:true,
     },
     {
+        id:'audit-trail',
+        title:'Audit Trail',
+        icon:'fa-history',
+        route:'audit-trail',
+        show:true,
+    },
+    {
         id:'settings',
         title:'Settings',
         icon:'fa-cog',

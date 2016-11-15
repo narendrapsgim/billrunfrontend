@@ -26,6 +26,15 @@ class Navigator extends Component {
     openSubMenu: '',
   };
 
+  componentDidMount(){
+    const { router } = this.props;
+    MenuItems.filter(this.filterEnabledMenu).map((item,key) => {
+      if (item.subMenus && item.subMenus.filter(subMenu => router.isActive(subMenu.route)).length > 0){
+        this.setState({openSubMenu: item.id});
+      }
+    });
+  }
+
   componentWillMount() {
     this.onWindowResize();
     window.addEventListener('resize', this.onWindowResize);
@@ -55,7 +64,9 @@ class Navigator extends Component {
 
 
   onToggleSubMenu = (id) => {
-    this.setState({ openSubMenu: this.state.openSubMenu !== id ? id : '' });
+    const {openSubMenu} = this.state;
+
+    this.setState({ openSubMenu: openSubMenu !== id ? id : '' });
   };
 
   clickLogout = (e) => {
@@ -65,24 +76,18 @@ class Navigator extends Component {
     });
   };
 
-  isMenuOpen = (item) => {
-    const { router } = this.props;
-    const { openSubMenu } = this.state;
-    return (openSubMenu === item.id) ||
-      (item.subMenus && item.subMenus.filter(subMenu => router.isActive(subMenu.route)).length > 0);
-  }
-
   filterEnabledMenu = menu => menu.show;
 
   renderSubMenu = (item, key) => {
     const { id, icon, title } = item;
+    const {openSubMenu} = this.state;
     return (
       <SubMenu
         icon={`fa ${icon} fa-fw`}
         id={id}
         key={key}
         onClick={this.onToggleSubMenu}
-        open={this.isMenuOpen(item)}
+        open={openSubMenu === item.id}
         title={title}
       >
         { item.subMenus.filter(this.filterEnabledMenu).map(this.renderMenu) }
