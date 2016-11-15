@@ -75,7 +75,7 @@ class PaymentGateways extends Component {
 
   render() {
     const { supported_gateways, settings } = this.props;
-    const payment_gateways = settings.get('payment_gateways') || Immutable.List();
+    const payment_gateways = settings.get('payment_gateways', Immutable.List());
 
     return (
       <div className="panel panel-default">
@@ -84,7 +84,7 @@ class PaymentGateways extends Component {
 	</div>
 	<div className="panel-body">
 	  <form className="form-horizontal">
-	    { supported_gateways.filter(pg => pg.get('supported') == '1').map((gateway, key) => {
+	    { supported_gateways.map((gateway, key) => {
 		const enabled = payment_gateways.find(pg => pg.get('name') === gateway.get('name'));
 		return (
 		  <div className="col-lg-4 col-md-4" key={key}>
@@ -105,7 +105,7 @@ class PaymentGateways extends Component {
 function mapStateToProps(state) {
   return {
     settings: state.settings,
-    supported_gateways: state.list.get('supported_gateways') || Immutable.List()
+    supported_gateways: state.list.get('supported_gateways', Immutable.List())
   };
 }
 
