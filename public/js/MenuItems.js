@@ -67,7 +67,6 @@ const MenuItems = [
                 title:'General Settings',
                 icon:'',
                 route:'settings',
-                show: true,
             },
             {
                 id:'input_processors',
