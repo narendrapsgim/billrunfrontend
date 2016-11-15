@@ -40,7 +40,7 @@ export default class PlanSearch extends Component {
 
       return apiBillRun(request).then(
         success => {
-          const options = _.values(sussess.data[0].data.details);
+          const options = _.values(success.data[0].data.details);
           return { options };
         },
         failure => {return { options : [] }}
@@ -58,8 +58,8 @@ export default class PlanSearch extends Component {
             cacheAsyncResults={false}
             onChange={this.onSelectPlan}
             asyncOptions={this.getPlans}
-            valueKey='key'
-            labelKey='key'
+            valueKey='name'
+            labelKey='name'
             placeholder='Search by plan name...'
             noResultsText='No plans found, please try another name'
         />
