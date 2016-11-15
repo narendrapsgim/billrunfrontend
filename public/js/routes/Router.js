@@ -28,6 +28,7 @@ import SelectTemplate from '../components/InputProcessor/SelectTemplate';
 import Collections from '../components/Collections/Collections';
 import Collection from '../components/Collection/Collection';
 import InvoiceTemplate from '../components/InvoiceTemplate';
+import AuditTrail from '../components/AuditTrail';
 
 const routes = () => (
   <Route path="/" component={App}>
@@ -55,6 +56,7 @@ const routes = () => (
     <Route path="/collections" component={RequireAuth(Collections)} title="Collections" />
     <Route path="/collection" component={RequireAuth(Collection)} title="Collection" />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
+    <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="*" component={PageNotFound} />
   </Route>

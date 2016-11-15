@@ -1,2 +1,7 @@
 import Filter from './Filter';
-export default Filter;
+import AdvancedFilter from './AdvancedFilter';
+
+export {
+  Filter as default,
+  AdvancedFilter,
+};
