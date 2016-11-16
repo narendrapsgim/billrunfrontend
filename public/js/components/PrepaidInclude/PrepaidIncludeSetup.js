@@ -2,9 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { Map, List } from 'immutable';
+import moment from 'moment';
 
 import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
 import { showDanger } from '../../actions/alertsActions';
+import { getList } from '../../actions/listActions';
 
 import { Button, Tabs, Tab, Panel } from 'react-bootstrap';
 import PrepaidInclude from './PrepaidInclude';
@@ -28,6 +30,15 @@ class PrepaidIncludeSetup extends React.Component {
       };
       dispatch(getEntity('prepaid_include', params));
     }
+    const query = {
+      api: 'find',
+      params: [
+        { collection: 'rates' },
+        { query: JSON.stringify({to: {"$gt": moment().toISOString()}}) },
+        { project: JSON.stringify({'key': 1}) }
+      ]
+    };
+    dispatch(getList('all_rates', query));
   }
 
   componentWillUnmount() {
@@ -61,7 +72,7 @@ class PrepaidIncludeSetup extends React.Component {
   };
   
   render() {
-    const { prepaid_include } = this.props;
+    const { prepaid_include, all_rates } = this.props;
 
     const charging_by_options = [
       { value: 'usagev', label: 'Usage volume' },
@@ -69,6 +80,11 @@ class PrepaidIncludeSetup extends React.Component {
       { value: 'total_cost', label: 'Total cost' }
     ];
 
+    const allRatesOptions = all_rates.map(rate => {
+      return {value: rate.get('key'), label: rate.get('key')};
+    }).toJS();
+    console.log(allRatesOptions);
+    
     return (
       <div className="PrepaidIncludeSetup">
         <Tabs id="PrepaidInclude" defaultActiveKey={1} animation={false}>
@@ -85,7 +101,8 @@ class PrepaidIncludeSetup extends React.Component {
               <LimitedDestinations
                   limitedDestinations={ prepaid_include.get('allowed_in', List()) }
                   onSelectPlan={ this.onSelectPlan }
-                  onChange={ this.onChangeLimitedDestinations } />
+                  onChange={ this.onChangeLimitedDestinations }
+                  allRates={ allRatesOptions }/>
             </Panel>
           </Tab>
         </Tabs>
@@ -107,7 +124,8 @@ class PrepaidIncludeSetup extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    prepaid_include: state.entity.get('prepaid_include', Map())
+    prepaid_include: state.entity.get('prepaid_include', Map()),
+    all_rates: state.list.get('all_rates', List())
   };
 }
 
