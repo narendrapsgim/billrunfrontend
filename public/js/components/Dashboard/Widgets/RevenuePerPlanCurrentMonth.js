@@ -1,19 +1,29 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {DoughnutChart} from '../../Charts';
-import {getData} from '../../../actions/dashboardActions';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { DoughnutChart } from '../../Charts';
+import { getData } from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {drawDataOnPie, getMonthName} from '../Widgets/helper';
+import { drawDataOnPie, isEmptyData } from '../Widgets/helper';
 
 
 class RevenuePerPlanCurrentMonth extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      width: props.width || 545,
-      height: props.height || 400
-    }
+  static defaultProps = {
+    width: 545,
+    height: 400,
+  };
+
+  static propTypes = {
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
+    getData: React.PropTypes.func.isRequired,
+    toDate: React.PropTypes.instanceOf(Date).isRequired,
+    chartData: React.PropTypes.array, // eslint-disable-line react/forbid-prop-types
+  };
+
+  state = {
+    width: this.props.width,
+    height: this.props.height,
   }
 
   componentDidMount() {
@@ -21,51 +31,50 @@ class RevenuePerPlanCurrentMonth extends Component {
   }
 
   prepereAgrigateQuery() {
-    const {toDate} = this.props;
-    const AGGREGATE = 'aggregate';
-
-    let query = [{
-      "$match" : { "type" : "flat", "plan" : { "$exists" : true } }
-    },{
-      "$project" : { "year" : { "$year" : "$urt" }, "month" : { "$month" : "$urt" }, "aprice" : 1, "plan" : 1 }
-    },{
-      "$match" : { "year" : toDate.getUTCFullYear(), "month" : toDate.getUTCMonth()+1 }
-    },{
-      "$group" : { "_id" : "$plan", "sum" : { "$sum" : "$aprice" } }
-    },{
-      "$project" : { "_id" : 0, "sum" : 1, "name" : "$_id" }
+    const { toDate } = this.props;
+    const query = [{
+      $match: { type: 'flat', plan: { $exists: true } },
+    }, {
+      $project: { year: { $year: '$urt' }, month: { $month: '$urt' }, aprice: 1, plan: 1 },
+    }, {
+      $match: { year: toDate.getUTCFullYear(), month: toDate.getUTCMonth() + 1 },
+    }, {
+      $group: { _id: '$plan', sum: { $sum: '$aprice' } },
+    }, {
+      $project: { _id: 0, sum: 1, name: '$_id' },
     }];
 
-    var queries = [{
+    return {
       name: 'revenue_per_plan',
-      api: AGGREGATE,
+      api: 'aggregate',
       params: [
-        { collection: "lines" },
-        { pipelines: JSON.stringify(query) }
-      ]
-    }];
-
-    return queries;
+        { collection: 'lines' },
+        { pipelines: JSON.stringify(query) },
+      ],
+    };
   }
 
-  prepareChartData(chartData) {
-    const {toDate} = this.props;
-    var formatedData = {
+  prepareChartData() {
+    const { chartData, toDate } = this.props;
+    const formatedData = {
       // title: getMonthName(toDate.getUTCMonth()+1) + ", " + '01 to ' + ("0" + toDate.getUTCDate()).slice(-2),
       labels: [],
-      values: []
+      values: [],
     };
 
-    let dataset = chartData.find((dataset, i) => dataset.name == "revenue_per_plan");
-    dataset.data.forEach((node, j) => {
+    if (isEmptyData(chartData[0])) {
+      return null;
+    }
+
+    chartData[0].data.forEach((node) => {
       formatedData.labels.push(node.name);
       formatedData.values.push(Math.ceil(node.sum));
     });
     return formatedData;
   }
 
-  overrideChartOptions() {
-    let owerideOptions = {
+  overrideChartOptions() { // eslint-disable-line class-methods-use-this
+    const owerideOptions = {
       tooltips: {
         enabled: false,
       },
@@ -73,31 +82,37 @@ class RevenuePerPlanCurrentMonth extends Component {
         onClick: null,
         position: 'right',
       },
-      valueSuffix : " " + globalSetting.currency,
+      // valueSuffix: ` ${globalSetting.currency}`,
       animation: {
-        onProgress: drawDataOnPie
+        onProgress: drawDataOnPie,
       },
       cutoutPercentage: 20,
     };
     return owerideOptions;
   }
 
-  renderContent(chartData){
-    switch (chartData) {
-      case undefined: return <PlaceHolderWidget/>;
-      case null: return null;
-      default: return <DoughnutChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
+  renderContent() {
+    const { height, width } = this.state;
+    switch (this.props.chartData) {
+      case undefined:
+        return (<PlaceHolderWidget />);
+      case null:
+        return null;
+      default: {
+        const data = this.prepareChartData();
+        const options = this.overrideChartOptions();
+        return (<DoughnutChart width={width} height={height} data={data} options={options} />);
+      }
     }
   }
 
   render() {
-    const { chartData } = this.props;
-    return ( <div> {this.renderContent(chartData)} </div> );
+    return (<div className="revenuePerPlanCurrentMonth">{this.renderContent()}</div>);
   }
 }
 
-function mapStateToProps(state, props) {
-  return {chartData: state.dashboard.revenuePerPlanCurrentMonth};
-}
+const mapStateToProps = state => ({
+  chartData: state.dashboard.get('revenuePerPlanCurrentMonth'),
+});
 
 export default connect(mapStateToProps, { getData })(RevenuePerPlanCurrentMonth);
