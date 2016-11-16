@@ -49,7 +49,8 @@ export default function (state = defaultState, action) {
       return defaultState;
 
     case SET_FTP_FIELD:
-      return state.setIn(['receiver', action.field], value);
+      /* TODO: Change 'receive' name most likely... */
+      return state.setIn(['receiver', action.field], action.value);
       
     default:
       return state;

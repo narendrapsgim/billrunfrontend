@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { showDanger } from '../../actions/alertsActions';
-import { getExportGenerator, clearExportGenerator, saveExportGenerator } from '../../actions/exportGeneratorActions';
+import { getExportGenerator, clearExportGenerator, saveExportGenerator, setFtpField } from '../../actions/exportGeneratorActions';
+import { Map } from 'immutable';
 import { getSettings } from '../../actions/settingsActions';
 import Steps from './elements/ExportGeneratorSteps';
 import SelectInputProcessor from './elements/SelectInputProcessor';
@@ -141,7 +142,10 @@ class ExportGenerator extends Component {
     }
   }
 
-
+  onChangeFTPField = (e) => {
+    const { id, value } = e.target;
+    this.props.dispatch(setFtpField(id, value));
+  };
 
   render() {
     let { stepIndex } = this.state;
@@ -150,7 +154,7 @@ class ExportGenerator extends Component {
     const steps = [
       (<SelectInputProcessor onNext={this.handleNext.bind(this)} settings={settings} />),
       (<Segmentation onNext={this.handleNext.bind(this)} settings={settings} />),
-      (<FtpDetails onNext={this.handleNext.bind(this)} settings={settings} />)
+      (<FtpDetails onNext={this.handleNext.bind(this)} settings={ settings.get('receiver', Map()) } onChangeField={ this.onChangeFTPField } />)
     ];
 
     const { action } = this.props.location.query;
@@ -222,7 +226,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state, props) {
-  return { settings: state.exportGenerator};
+  return { settings: state.exportGenerator };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExportGenerator);
