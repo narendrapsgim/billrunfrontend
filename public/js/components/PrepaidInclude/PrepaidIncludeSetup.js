@@ -83,7 +83,6 @@ class PrepaidIncludeSetup extends React.Component {
     const allRatesOptions = all_rates.map(rate => {
       return {value: rate.get('key'), label: rate.get('key')};
     }).toJS();
-    console.log(allRatesOptions);
     
     return (
       <div className="PrepaidIncludeSetup">
