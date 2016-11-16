@@ -7,6 +7,17 @@ import {
   REMOVE_TARIFF,
   GOT_PLAN,
   CLEAR_PLAN } from '../actions/planActions';
+import {
+  ADD_BALANCE_NOTIFICATIONS,
+  ADD_NOTIFICATION,
+  REMOVE_NOTIFICATION,
+  UPDATE_NOTIFICATION_FIELD,
+  REMOVE_BALANCE_NOTIFICATIONS,
+  BLOCK_PRODUCT,
+  REMOVE_BLOCK_PRODUCT,
+  ADD_BALANCE_THRESHOLD,
+  CHANGE_BALANCE_THRESHOLD
+} from '../actions/prepaidPlanActions';
 import moment from 'moment';
 import Immutable from 'immutable';
 
@@ -34,7 +45,7 @@ export default function (state = defaultState, action) {
       return state.setIn(['include', 'groups', action.groupName], group);
 
     case UPDATE_PLAN_FIELD_VALUE:
-      return state.updateIn(action.path, value => action.value);
+      return state.updateIn(action.path, '', value => action.value);
 
     case UPDATE_PLAN_CYCLE:
       return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, action.value));
@@ -80,6 +91,44 @@ export default function (state = defaultState, action) {
     case CLEAR_PLAN:
       return defaultState;
 
+    case ADD_BALANCE_NOTIFICATIONS:
+      let new_notifications = Immutable.List([Immutable.Map({value: 0, type: '', msg: ''})]);
+      return state.setIn(['notifications_threshold', action.balance], new_notifications);
+      
+    case ADD_NOTIFICATION:
+      let new_notification = Immutable.Map({value: 0, type: '', msg: ''});
+      return state.updateIn(["notifications_threshold", action.threshold_id],
+			    Immutable.List(),
+			    list => list.push(new_notification));
+
+    case REMOVE_NOTIFICATION:
+      return state.updateIn(["notifications_threshold", action.threshold_id],
+			    Immutable.List(),
+			    list => list.remove(action.index));
+
+    case UPDATE_NOTIFICATION_FIELD:
+      return state.setIn(["notifications_threshold",
+			  action.threshold_id,
+			  action.index,
+			  action.field], action.value);
+
+    case REMOVE_BALANCE_NOTIFICATIONS:
+      return state.setIn(["notifications_threshold", action.balance_id], Immutable.List());
+
+    case BLOCK_PRODUCT:
+      return state.update("disallowed_rates", Immutable.List(), list => list.push(action.rate));
+
+    case REMOVE_BLOCK_PRODUCT:
+      return state.update('disallowed_rates',
+			  Immutable.List(),
+			  list => list.filterNot(p => p === action.rate));
+      
+    case ADD_BALANCE_THRESHOLD:
+      return state.setIn(['pp_threshold', action.balance_id], 0);
+
+    case CHANGE_BALANCE_THRESHOLD:
+      return state.setIn(['pp_threshold', action.balance_id], action.value);
+      
     default:
       return state;
   }

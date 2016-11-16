@@ -2,14 +2,10 @@ import React, { Component } from 'react';
 import { Panel, Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
 
 export default class Tenant extends Component {
-  constructor(props) {
-    super(props);
-    
-    this.onChangeField = this.onChangeField.bind(this);
-  }
 
-  onChangeField (e) {
-    this.props.onChange('tenant', e);
+  onChangeField = (e) => {
+    const { id, value } = e.target;
+    this.props.onChange('tenant', id, value);
   }
 
   render() {

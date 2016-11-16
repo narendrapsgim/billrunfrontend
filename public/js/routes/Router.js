@@ -28,6 +28,9 @@ import SelectTemplate from '../components/InputProcessor/SelectTemplate';
 import Collections from '../components/Collections/Collections';
 import Collection from '../components/Collection/Collection';
 import InvoiceTemplate from '../components/InvoiceTemplate';
+import PrepaidPlansList from '../components/PrepaidPlansList';
+import PrepaidPlan from '../components/PrepaidPlan';
+import AuditTrail from '../components/AuditTrail';
 import PrepaidIncludesList from '../components/PrepaidIncludesList';
 import PrepaidIncludeSetup from '../components/PrepaidInclude';
 
@@ -37,6 +40,8 @@ const routes = () => (
     <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
     <Route path="/plans" component={RequireAuth(PlansList)} title="Plans" />
     <Route path="/plan(/:itemId)(/:action)" component={RequireAuth(Plan)} />
+    <Route path="/prepaid_plans" component={RequireAuth(PrepaidPlansList)} title="Prepaid Plans" />
+    <Route path="/prepaid_plan" component={RequireAuth(PrepaidPlan)} title="Edit Prepaid Plan" />
     <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers" />
     <Route path="/products" component={RequireAuth(ProductsList)} title="Products" />
     <Route path="/product(/:itemId)(/:action)" component={RequireAuth(Product)} />
@@ -59,6 +64,7 @@ const routes = () => (
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
     <Route path="/prepaid_includes" component={RequireAuth(PrepaidIncludesList)} title="Prepaid Includes" />
     <Route path="/prepaid_include" component={RequireAuth(PrepaidIncludeSetup)} title="Prepaid Include" />
+    <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="*" component={PageNotFound} />
   </Route>
