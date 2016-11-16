@@ -7,8 +7,9 @@ export default class Tenant extends Component {
   }
 
   onChangeField = (e) => {
-    this.props.onChange('tenant', e);
-  };
+    const { id, value } = e.target;
+    this.props.onChange('tenant', id, value);
+  }
 
   onSelectLogo = (e) => {
     const { files } = e.target;

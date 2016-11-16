@@ -1,21 +1,32 @@
 import React, { Component } from 'react';
+import Immutable from 'immutable';
 
 export default class CurrencyTax extends Component {
-  constructor(props) {
-    super(props);
+
+  static defaultProps = {
+    currencies: [
+      { label: 'NIS ₪', val: 'NIS' },
+      { label: 'USD $', val: 'USD' },
+      { label: 'EUR €', val: 'EUR' },
+    ],
+  };
+
+  static propTypes = {
+    onChange: React.PropTypes.func.isRequired,
+    data: React.PropTypes.instanceOf(Immutable.Map),
+    currencies: React.PropTypes.arrayOf(React.PropTypes.object),
+  };
+
+  onChange = (e) => {
+    const { id, value } = e.target;
+    this.props.onChange('pricing', id, value);
   }
 
-  render() {
-    const { onChange, data } = this.props;
-    const currencies = [
-      { label: "NIS ₪", val: "NIS" },
-      { label: "USD $", val: "USD" },
-      { label: "EUR €", val: "EUR" }
-    ];
+  renderOption = (curr, key) => <option value={curr.val} key={key}>{curr.label}</option>;
 
-    const currency_options = currencies.map((curr, key) => (
-      <option value={curr.val} key={key}>{curr.label}</option>
-    ));
+  render() {
+    const { data, currencies } = this.props;
+    const currencyOptions = currencies.map(this.renderOption);
 
     return (
       <div>
@@ -26,11 +37,13 @@ export default class CurrencyTax extends Component {
                 <label htmlFor="currency">Currency</label>
               </div>
               <div className="col-md-4">
-                <select className="form-control"
-                        id="currency"
-                        value={data.get('currency', '')}
-                        onChange={onChange}>
-                  { currency_options }
+                <select
+                  className="form-control"
+                  id="currency"
+                  value={data.get('currency', '')}
+                  onChange={this.onChange}
+                >
+                  { currencyOptions }
                 </select>
               </div>
             </div>
@@ -42,11 +55,13 @@ export default class CurrencyTax extends Component {
               </div>
               <div className="col-md-4">
                 <div className="input-group">
-                  <input id="vat"
-                         type="number"
-                         onChange={onChange}
-                         value={data.get('vat', '')}
-                         className="form-control"/>
+                  <input
+                    id="vat"
+                    type="number"
+                    onChange={this.onChange}
+                    value={data.get('vat', '')}
+                    className="form-control"
+                  />
                   <span className="input-group-addon">%</span>
                 </div>
               </div>

@@ -10,8 +10,27 @@ textarea {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+
+.pl0{ padding-left: 0!important; }
+.pr0{ padding-right: 0!important; }
+.mb10{ margin-bottom: 0!important; }
+.mr10{ margin-right: 10px!important; }
+
+.full-width{ width: 100%!important; }
+
+/* General colors */
+.danger-red { color: #d9534f; }
 /* ~Global */
 
+/* react-datepicker */
+.react-datepicker__close-icon::after{
+  color: #6f6f6f!important;
+  background-color: #e7e7e7!important;
+}
+.react-datepicker__close-icon:hover::after {
+    background-color: #eeeeee!important;
+    color: #222222!important;
+}
 /* React-Select */
 .Select-menu-outer{
   z-index: 5!important;
@@ -45,6 +64,14 @@ textarea {
 /* ~React-Select */
 
 /* System Alerts */
+.alert-notifier-container{
+  width: 50%;
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  right: 0;
+  padding: 5;
+}
 .alerts-enter {
   opacity: 0.01;
 }
@@ -127,12 +154,6 @@ textarea {
 }
 /* ~Plan Edit screen*/
 
-
-/* General colors */
-.danger-red {
-    color: #d9534f;
-}
-
 /* List */
 .List.row .btn-link {
     padding: 0;
@@ -175,4 +196,8 @@ textarea {
     margin-bottom: 0px;
     border-bottom: 1px solid #e7e7e7;
     background-color: white;
+}
+/* AdvancedFilter Date picker */
+.AdvancedFilter .react-datepicker__input-container{
+  width: 100%
 }

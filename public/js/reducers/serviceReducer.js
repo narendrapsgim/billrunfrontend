@@ -6,10 +6,14 @@ import {
   REMOVE_GROUP_SERVICE } from '../actions/serviceActions';
 import Immutable from 'immutable';
 
-const DefaultState = Immutable.Map({
+const DefaultState = Immutable.fromJS({
   description: '',
   name: '',
-  price: ''
+  price: [{
+    from: 0,
+    to: globalSetting.serviceCycleUnlimitedValue,
+    price: '',
+  }],
 });
 
 const serviceReducer = (state = DefaultState, action) => {

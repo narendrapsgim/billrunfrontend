@@ -124,9 +124,13 @@ function savePlanToDB(plan, action, callback) {
         const errorMessages = failure.error.map( (response) => response.error.message );
         dispatch(showDanger(errorMessages));
         dispatch(finishProgressIndicator());
+        callback(failure);
       }
     ).catch(
-      error => { dispatch(apiBillRunErrorHandler(error)); }
+      error => {
+        dispatch(apiBillRunErrorHandler(error));
+        callback(error);
+      }
     );
   };
 }

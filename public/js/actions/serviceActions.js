@@ -87,7 +87,14 @@ export function getItem(id) {
         if(response.data[0].data.details.length === 0){
           throw response;
         }
-        let item = _.values(response.data[0].data.details)[0];
+        let item = response.data[0].data.details[0];
+        if (typeof item.price === 'undefined' || !Array.isArray(item.price)) {
+          item.price = [{
+            from: 0,
+            to: globalSetting.serviceCycleUnlimitedValue,
+            price: typeof item.price === 'undefined' ? '' : item.price
+          }]
+        }
         dispatch(gotItem(item));
         dispatch(finishProgressIndicator());
         return (true);

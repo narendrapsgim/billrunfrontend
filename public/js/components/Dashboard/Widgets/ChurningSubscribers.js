@@ -1,20 +1,31 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import {LineChart} from '../../Charts';
-import {getData} from '../../../actions/dashboardActions';
+import { LineChart } from '../../Charts';
+import { getData } from '../../../actions/dashboardActions';
 import PlaceHolderWidget from '../Widgets/PlaceHolder';
-import {getMonthName, getYearsToDisplay} from '../Widgets/helper';
+import { getMonthName, getYearsToDisplay, isEmptyData, isPointDate } from '../Widgets/helper';
 
 
 class ChurningSubscribers extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      width: props.width || 350,
-      height: props.height || 400
-    }
+  static defaultProps = {
+    width: 350,
+    height: 400,
+  };
+
+  static propTypes = {
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
+    getData: React.PropTypes.func.isRequired,
+    fromDate: React.PropTypes.instanceOf(Date).isRequired,
+    toDate: React.PropTypes.instanceOf(Date).isRequired,
+    chartData: React.PropTypes.array, // eslint-disable-line react/forbid-prop-types
+  };
+
+  state = {
+    width: this.props.width,
+    height: this.props.height,
   }
 
   componentDidMount() {
@@ -22,67 +33,62 @@ class ChurningSubscribers extends Component {
   }
 
   prepereAgrigateQuery() {
-    const {fromDate, toDate} = this.props;
-    const AGGREGATE = 'aggregate';
-
-    var churningSubscribersQuery = [{
-      "$match": { "type": "subscriber", "to": { "$lte": toDate, "$gte": fromDate} }
-    },{
-      "$group": { "_id": "$sid", "to": { "$last": "$to" } }
-    },{
-      "$group": { "_id": { "year": { "$year": "$to" }, "month": { "$month": "$to" } }, "count": { "$sum": 1 } }
-    },{
-      "$project": { "year": "$_id.year", "month": "$_id.month", "_id": 0, "count": "$count" }
-    },{
-      "$sort": { "year": 1, "month": 1 }
+    const { fromDate, toDate } = this.props;
+    const churningSubscribersQuery = [{
+      $match: { type: 'subscriber', to: { $lte: toDate, $gte: fromDate } },
+    }, {
+      $group: { _id: '$sid', to: { $last: '$to' } },
+    }, {
+      $group: { _id: { year: { $year: '$to' }, month: { $month: '$to' } }, count: { $sum: 1 } },
+    }, {
+      $project: { year: '$_id.year', month: '$_id.month', _id: 0, count: '$count' },
+    }, {
+      $sort: { year: 1, month: 1 },
     }];
 
-    var queries = [{
+    return {
       name: 'churning_subscribers',
-      api: AGGREGATE,
+      api: 'aggregate',
       params: [
         { collection: 'subscribers' },
-        { pipelines: JSON.stringify(churningSubscribersQuery) }
-      ]
-    }];
-
-    return queries;
+        { pipelines: JSON.stringify(churningSubscribersQuery) },
+      ],
+    };
   }
 
-  prepareChartData(chartData) {
-    const {fromDate, toDate} = this.props;
-    let yearsToDisplay = getYearsToDisplay(fromDate, toDate);
-    let multipleYears = Object.keys(yearsToDisplay).length > 1;
-
-    var formatedData = {
+  prepareChartData() {
+    const { chartData, fromDate, toDate } = this.props;
+    const yearsToDisplay = getYearsToDisplay(fromDate, toDate);
+    const multipleYears = Object.keys(yearsToDisplay).length > 1;
+    const formatedData = {
       // title: 'Churning Subscribers',
-      x: [ { label : 'Subsctibers', values : [] } ],
-      y: []
+      x: [{ label: 'Subsctibers', values: [] }],
+      y: [],
     };
 
-    let dataset = chartData.find((dataset, i) => dataset.name == "churning_subscribers");
-    if(!dataset.data || dataset.data.length == 0){
+    const dataset = chartData.find(set => set.name === 'churning_subscribers');
+    if (isEmptyData(dataset)) {
       return null;
     }
-    for (var year in yearsToDisplay) {
-      yearsToDisplay[year].forEach((month, k) => {
-        var point = dataset.data.find((node, i) => { return (month == node.month && year == node.year)} );
-        let data = (point) ? point.count : 0 ;
+    Object.keys(yearsToDisplay).forEach((year) => {
+      yearsToDisplay[year].forEach((month) => {
+        const point = dataset.data.find(node => isPointDate({ year, month }, node));
+        const data = (point) ? point.count : 0;
         formatedData.x[0].values.push(data);
         let label = getMonthName(month);
-        if (multipleYears){
-          label += ', ' + year;
+        if (multipleYears) {
+          label += `, ${year}`;
         }
         formatedData.y.push(label);
       });
-    }
+    });
     return formatedData;
   }
 
-  overrideChartOptions() {
-    let owerideOptions = {
+  overrideChartOptions() { // eslint-disable-line class-methods-use-this
+    return {
       legend: {
-        display: false
+        display: false,
       },
       scales: {
         yAxes: [
@@ -90,30 +96,35 @@ class ChurningSubscribers extends Component {
             display: true,
             ticks: {
               beginAtZero: true,
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
     };
-    return owerideOptions;
   }
 
-  renderContent(chartData){
-    switch (chartData) {
-      case undefined: return <PlaceHolderWidget/>;
-      case null: return null;
-      default: return <LineChart width={this.state.width} height={this.state.height} data={this.prepareChartData(chartData)} options={this.overrideChartOptions()}/>;
+  renderContent() {
+    const { height, width } = this.state;
+    switch (this.props.chartData) {
+      case undefined:
+        return (<PlaceHolderWidget />);
+      case null:
+        return null;
+      default: {
+        const data = this.prepareChartData();
+        const options = this.overrideChartOptions();
+        return (<LineChart width={width} height={height} data={data} options={options} />);
+      }
     }
   }
 
   render() {
-    const { chartData } = this.props;
-    return ( <div> {this.renderContent(chartData)} </div> );
+    return (<div className="churningSubscribers">{this.renderContent()}</div>);
   }
 }
 
-function mapStateToProps(state, props) {
-  return {chartData: state.dashboard.churningSubscribers};
-}
+const mapStateToProps = state => ({
+  chartData: state.dashboard.get('churningSubscribers'),
+});
 
 export default connect(mapStateToProps, { getData })(ChurningSubscribers);
