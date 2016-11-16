@@ -10,15 +10,24 @@ const MenuItems = [
         id:'plans',
         title:'Plans',
         icon:'fa-cubes',
-        route:'plans',
+        route:'',
         show:true,
-    },
-    {
-      id: 'prepaid_plans',
-      title: 'Prepaid Plans',
-      icon: 'fa-cubes',
-      route: 'prepaid_plans',
-      show: true
+        subMenus:[
+            {
+                id:'postpaid',
+                title:'Postpaid',
+                icon:'',
+                route:'plans',
+                show:true,
+            },
+            {
+                id:'prepaid',
+                title:'Prepaid',
+                icon:'',
+                route:'prepaid_plans',
+                show:true,
+            },
+          ]
     },
     {
         id:'services',
