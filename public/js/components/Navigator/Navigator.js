@@ -31,8 +31,7 @@ class Navigator extends Component {
     const {openSubMenu} = this.state;
     MenuItems.filter(this.filterEnabledMenu).map((item,key) => {
       if (item.subMenus && item.subMenus.filter(subMenu => router.isActive(subMenu.route)).length > 0){
-        openSubMenu.push(item.id);
-        this.setState({openSubMenu: openSubMenu});
+        this.setState({openSubMenu: [...openSubMenu,item.id]});
       }
     });
   }
