@@ -11,8 +11,7 @@ export default function (state = defaultState, action) {
 
     case actions.UPDATE_ENTITY_FIELD:
       if (Array.isArray(field_id)) {
-        let path = [collection].concat(field_id);
-        return state.setIn(path, value);
+        return state.setIn([collection, ...field_id], value);
       }
       return state.setIn([collection, field_id], value);
 
