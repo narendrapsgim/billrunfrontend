@@ -245,7 +245,7 @@ class CustomerSetup extends Component {
     }
 
     return (
-      <div>
+      <div className="CustomerSetup">
 
         <div className="row">
           <div className="col-lg-12">

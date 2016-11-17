@@ -127,6 +127,13 @@ const MenuItems = [
                 route:'invoice-template',
                 show:true,
             },
+		{
+		id: 'prepaid_includes',
+		title: 'Prepaid Includes',
+		icon: '',
+		route: 'prepaid_includes',
+		show: true
+		}
         ]
     },
 
