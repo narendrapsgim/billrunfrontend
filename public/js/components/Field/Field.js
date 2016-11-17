@@ -11,6 +11,7 @@ import Address from '../FieldTypes/Address';
 import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
 import Unlimitd from '../FieldTypes/UnlimitedInput';
+import Checkbox from '../FieldTypes/Checkbox';
 
 class Field extends React.Component {
   constructor(props) {
@@ -50,6 +51,8 @@ class Field extends React.Component {
         return (<TextArea onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'unlimited':
         return (<Unlimitd onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} {...this.props} />);
+      case 'checkbox':
+        return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       default:
         return (<Text onChange={onChange} id={id} value={value} editable={editable} required={required} disabled={disabled} />);
     }
