@@ -14,14 +14,16 @@ export default class Tenant extends Component {
   onSelectLogo = (e) => {
     const { files } = e.target;
     const logo = files[0];
-    console.log(logo);
+    const FormData = new FormData();
+    FormData.append('logo', logo);
+    console.log(FormData);
   };
 
   render() {
     const { data } = this.props;
 
     return (
-      <div>
+      <div className="Tenant">
         <Panel header="Company Details">
           <Form horizontal>
             <FormGroup controlId='name' key='name'>
