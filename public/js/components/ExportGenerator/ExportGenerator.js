@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { showDanger } from '../../actions/alertsActions';
 import { getExportGenerator, clearExportGenerator, saveExportGenerator, setFtpField } from '../../actions/exportGeneratorActions';
 import { Map } from 'immutable';
@@ -36,10 +35,6 @@ class ExportGenerator extends Component {
 
     // Should be deal with edit
     if (action !== "new") dispatch(getExportGenerator(name));
-  }
-
-  onError(message) {
-    this.props.dispatch(showDanger(message));
   }
 
   goBack() {
@@ -220,13 +215,8 @@ ExportGenerator.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    clearExportGenerator }, dispatch);
-}
-
 function mapStateToProps(state, props) {
   return { settings: state.exportGenerator };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ExportGenerator);
+export default connect(mapStateToProps)(ExportGenerator);

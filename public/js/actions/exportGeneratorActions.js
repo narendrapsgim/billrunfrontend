@@ -38,7 +38,7 @@ function fetchExportGenerator(name) {
     ).catch(
       error => {
         dispatch(finishProgressIndicator());
-        dispatch(showDanger(`Error loading export generator ${name}`));
+        dispatch(apiBillRunErrorHandler(error, `Error loading export generator ${name}`));
       }
     );
   };
@@ -117,10 +117,7 @@ function saveExportGeneratorToDB(generator) {
         dispatch(finishProgressIndicator());
       },
       failure => {
-        const msg = _.result(failure, 'error[0].error.data.message') ?
-                    failure.error[0].error.data.message :
-                    failure.error[0].error.desc;
-        dispatch(showDanger(`Error - ${msg}`));        
+        dispatch(apiBillRunErrorHandler(`Error - ${msg}`));        
         dispatch(finishProgressIndicator());        
       }
     ).catch(
