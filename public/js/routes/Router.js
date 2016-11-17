@@ -31,6 +31,8 @@ import InvoiceTemplate from '../components/InvoiceTemplate';
 import PrepaidPlansList from '../components/PrepaidPlansList';
 import PrepaidPlan from '../components/PrepaidPlan';
 import AuditTrail from '../components/AuditTrail';
+import ChargingPlansList from '../components/ChargingPlansList';
+import ChargingPlanSetup from '../components/ChargingPlan';
 
 const routes = () => (
   <Route path="/" component={App}>
@@ -61,6 +63,8 @@ const routes = () => (
     <Route path="/collection" component={RequireAuth(Collection)} title="Collection" />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
     <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
+    <Route path="/charging_plans" component={RequireAuth(ChargingPlansList)} title="Charging Plans" />
+    <Route path="/charging_plan" component={RequireAuth(ChargingPlanSetup)} title="Charging Plan" />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="*" component={PageNotFound} />
   </Route>
