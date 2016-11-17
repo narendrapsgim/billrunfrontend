@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox,
    Col, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import changeCase from 'change-case';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import Help from '../../Help';
@@ -18,9 +19,11 @@ export default class PlanIncludeGroupCreate extends Component {
     existinGrousNames: React.PropTypes.instanceOf(Immutable.Set),
     addGroup: React.PropTypes.func.isRequired,
     addGroupProducts: React.PropTypes.func.isRequired,
+    modalTitle: React.PropTypes.string,
   }
 
   static defaultProps = {
+    modalTitle: 'Create New Group',
     allGroupsProductsKeys: Immutable.Set(),
     existinGrousNames: Immutable.Set(),
   };
@@ -209,7 +212,7 @@ export default class PlanIncludeGroupCreate extends Component {
       case 2:
         return ([
           <FormGroup validationState={error.length > 0 ? "error" : null} >
-            <Col componentClass={ControlLabel} sm={3}>Include</Col>
+            <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`${usage} includes`)}</Col>
             <Col sm={8}>
               <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
@@ -225,7 +228,7 @@ export default class PlanIncludeGroupCreate extends Component {
       case 3:
         return (
           <FormGroup validationState={error.length > 0 ? "error" : null}>
-            <Col componentClass={ControlLabel} sm={3}>Products</Col>
+            <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`Products of type ${usage}`)}<Help contents={GroupsInclude.products} /></Col>
             <Col sm={8}>
               { products.size
                ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />
@@ -244,7 +247,11 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   render() {
-    const { stepIndex, open } = this.state;
+    const { stepIndex, open, name } = this.state;
+    let { modalTitle } = this.props;
+    if (name.length) {
+      modalTitle += ` - ${name}`;
+    }
 
     return (
       <div>
@@ -253,7 +260,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
           <Modal.Header closeButton onHide={this.handleCancel}>
             <Modal.Title>
-              Create New Group
+              {modalTitle}
               <Stepper activeStep={stepIndex} style={{ height: 20, marginLeft: -15, marginTop: 15 }}>
                 <Step>
                   <StepLabel>Set Name</StepLabel>
