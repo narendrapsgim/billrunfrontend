@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import List from '../List';
 import { DropdownButton, MenuItem, Button } from "react-bootstrap";
+import Immutable from 'immutable';
 import { getList } from '../../actions/listActions';
 
 class ExportGeneratorsList extends Component {
   constructor(props) {
     super(props);
 
-    this.onClickInputProcessor = this.onClickInputProcessor.bind(this);
+    this.onClickExportGenerator = this.onClickExportGenerator.bind(this);
     this.onClickNew = this.onClickNew.bind(this);
     this.onSort = this.onSort.bind(this);
     this.buildQuery = this.buildQuery.bind(this);
@@ -19,26 +20,25 @@ class ExportGeneratorsList extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getList("input_processors", this.buildQuery()));
-    // this.props.dispatch(getList("export_generators", this.buildQuery()));
+    this.props.dispatch(getList("export_generators", this.buildQuery()));
   }
 
   buildQuery() {
     return {
       api: "settings",
       params: [
-        { category: "file_types" },
-	      { sort: this.state.sort },
+        { category: "export_generators" },
+	{ sort: this.state.sort },
         { data: JSON.stringify({}) }
       ]
     };
   }
   
-  onClickInputProcessor(input_processor, e) {
+  onClickExportGenerator(export_generator) {
     this.context.router.push({
-      pathname: 'input_processor',
+      pathname: 'export_generator',
       query: {
-        file_type: input_processor.get('file_type'),
+        name: export_generator.get('name'),
         action: 'update'
       }
     });
@@ -55,20 +55,18 @@ class ExportGeneratorsList extends Component {
 
   onSort(sort) {
     this.setState({sort}, () => {
-      this.props.dispatch(getList('input_processors', this.buildQuery()));
+      this.props.dispatch(getList('export_generators', this.buildQuery()));
     });
   }
 
   render() {
-    const { inputProcessors } = this.props;
+    const { exportGenerators } = this.props;
     const fields = [
-      { id: "file_type", title: "Name" }
+      { id: "name", title: "Name" }
     ];
 
-    console.log(inputProcessors);
-
     return (
-      <div className="InputProcessorsList">
+      <div className="ExportGeneratorsList">
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
@@ -81,7 +79,7 @@ class ExportGeneratorsList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} onSort={this.onSort} />
+                <List items={exportGenerators} fields={fields} edit={true} onClickEdit={this.onClickExportGenerator} onSort={this.onSort} />
               </div>
             </div>
           </div>
@@ -97,7 +95,7 @@ ExportGeneratorsList.contextTypes = {
 
 function mapStateToProps(state, props) {
   return {
-    inputProcessors: state.list.get('input_processors') || []
+    exportGenerators: state.list.get('export_generators', Immutable.List())
   };
 }
 

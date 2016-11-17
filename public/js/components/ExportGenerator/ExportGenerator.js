@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { showDanger } from '../../actions/alertsActions';
-import { clearExportGenerator } from '../../actions/exportGeneratorActions';
+import { getExportGenerator, clearExportGenerator, saveExportGenerator, setFtpField } from '../../actions/exportGeneratorActions';
+import { Map } from 'immutable';
+import { getSettings } from '../../actions/settingsActions';
 import Steps from './elements/ExportGeneratorSteps';
 import SelectInputProcessor from './elements/SelectInputProcessor';
 import Segmentation from './elements/Segmentation';
@@ -18,7 +19,7 @@ class ExportGenerator extends Component {
       steps: [
         "select_input",
         "segmentation",
-        "ftoDetails"
+        "ftpDetails"
       ]
     };
 
@@ -29,14 +30,11 @@ class ExportGenerator extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const { file_type, action } = this.props.location.query;
+    const { name, action } = this.props.location.query;
+    dispatch(getSettings(['export_generators']));
 
     // Should be deal with edit
-    // if (action !== "new") dispatch(getProcessorSettings(file_type));
-  }
-
-  onError(message) {
-    this.props.dispatch(showDanger(message));
+    if (action !== "new") dispatch(getExportGenerator(name));
   }
 
   goBack() {
@@ -70,6 +68,7 @@ class ExportGenerator extends Component {
       this.goBack();
     }
   }
+
   handleCancel() {
     let r = confirm("are you sure you want to stop editing Export Generator?");
     const { dispatch, fileType } = this.props;
@@ -93,51 +92,55 @@ class ExportGenerator extends Component {
   }
 
   validateSteps (cb) {
-    const { stepIndex } = this.state || 0;
+    const { stepIndex, finished } = this.state || 0;
     let err = [];
 
+    if (finished) {
+      this.props.dispatch(saveExportGenerator());
+    } else {      
+      switch (stepIndex) {
+        case 0:
+          // check name
+          if (this.props.settings.get('name').length === 0) {
+            err.push ('Export Process name is mandatory.');
+          }
 
-    switch (stepIndex) {
-      case 0:
-        // check name
-        if (this.props.settings.get('name').length === 0) {
-          err.push ('Export Process name is mandatory.');
-        }
+          //check input processor selected
+          if (this.props.settings.get('inputProcess').size === 0) {
+            err.push ('Please select Input Processor.');
+          }
+          break;
 
-        //check input processor selected
-        if (this.props.settings.get('inputProcess').size === 0) {
-          err.push ('Please select Input Processor.');
-        }
-        break;
-
-      case 1:
-        // check at last one segment with from/to is selected
-        // let segment = this.props.settings.get('segments').get(0);
-        if (this.props.settings.get('segments').size === 0) {
-          err.push ('Please select one segment at last.');
-        } else {
-          (() => {
+        case 1:
+          // check at last one segment with from/to is selected
+          // let segment = this.props.settings.get('segments').get(0);
+          if (this.props.settings.get('segments').size === 0) {
+            err.push ('Please select at least one segment');
+          } else {
             let firstSegment = this.props.settings.get('segments').first();
-            if (!firstSegment.get('field') || ( !firstSegment.get('from') || firstSegment.get('to') )) {
+            if (!firstSegment.get('field') || ( !firstSegment.get('from') && firstSegment.get('to') )) {
               err.push ('Generator should has at last one valid segment');
             }
-          })();
-        }
-        break;
+          }
+          break;
+      }
+
+      if (err.length > 0 ) {
+        this.props.dispatch(showDanger(err.join("\n\n")));
+
+        cb(true);
+        return;
+      }
+
+
+      cb(false);
     }
-
-    if (err.length > 0 ) {
-      this.props.dispatch(showDanger(err.join("\n\n")));
-
-      cb(true);
-      return;
-    }
-
-
-    cb(false);
   }
 
-
+  onChangeFTPField = (e) => {
+    const { id, value } = e.target;
+    this.props.dispatch(setFtpField(id, value));
+  };
 
   render() {
     let { stepIndex } = this.state;
@@ -146,11 +149,11 @@ class ExportGenerator extends Component {
     const steps = [
       (<SelectInputProcessor onNext={this.handleNext.bind(this)} settings={settings} />),
       (<Segmentation onNext={this.handleNext.bind(this)} settings={settings} />),
-      (<FtpDetails onNext={this.handleNext.bind(this)} settings={settings} />)
+      (<FtpDetails onNext={this.handleNext.bind(this)} settings={ settings.get('receiver', Map()) } onChangeField={ this.onChangeFTPField } />)
     ];
 
     const { action } = this.props.location.query;
-    const title = action === 'new' ? "New export gener" : `Edit input processor - ${settings.get('file_type')}`;
+    const title = action === 'new' ? "New export generator" : `Edit input processor - ${settings.get('file_type')}`;
     
     return (
       <div>
@@ -212,13 +215,8 @@ ExportGenerator.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    clearExportGenerator }, dispatch);
-}
-
 function mapStateToProps(state, props) {
-  return { settings: state.exportGenerator};
+  return { settings: state.exportGenerator };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ExportGenerator);
+export default connect(mapStateToProps)(ExportGenerator);
