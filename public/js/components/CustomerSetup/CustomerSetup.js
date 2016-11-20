@@ -8,7 +8,8 @@ import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../acti
 import { getList, clearList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
-import { showSuccess, showDanger } from '../..//actions/alertsActions';
+import { showSuccess, showDanger } from '../../actions/alertsActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 /* COMPONENTS */
 import { PageHeader, Tabs, Tab, Panel } from 'react-bootstrap';
@@ -33,6 +34,7 @@ class CustomerSetup extends Component {
   componentDidMount() {
     const { aid } = this.props.location.query;
     if (aid) {
+      this.props.dispatch(setPageTitle('Edit Customer'));
       const customer_params = {
         api: "subscribers",
         params: [
@@ -80,6 +82,8 @@ class CustomerSetup extends Component {
       this.props.dispatch(getList('subscriptions', subscriptions_params));
       this.props.dispatch(getList('plans', plans_params));
       this.props.dispatch(getList('customer_available_services', services_params));
+    } else {
+      this.props.dispatch(setPageTitle('Create New Customer'));
     }
     this.props.dispatch(getSettings('subscribers'));
   }
@@ -88,6 +92,15 @@ class CustomerSetup extends Component {
     this.props.dispatch(clearEntity());
     this.props.dispatch(clearList('subscriptions'));
     this.props.dispatch(clearList('customer_available_services'));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { customer: oldItem, location: { query: { action } } } = this.props;
+    const { customer: item } = nextProps;
+    if (action === 'update' && (oldItem.get('firstname') !== item.get('firstname') || oldItem.get('lastname') !== item.get('lastname'))) {
+      const newTitle = `Edit Customer - ${item.get('firstname')} ${item.get('lastname')}`;
+      this.props.dispatch(setPageTitle(newTitle));
+    }
   }
 
   onChangeCustomerField(e) {
