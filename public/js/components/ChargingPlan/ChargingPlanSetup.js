@@ -3,10 +3,15 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 
-import { getPlan, clearPlan, onPlanFieldUpdate } from '../../actions/planActions';
+import { getPlan,
+         clearPlan,
+         onPlanFieldUpdate,
+         addUsagetInclude } from '../../actions/planActions';
+import { showWarning } from '../../actions/alertsActions';
 
 import { Col, Tabs, Tab, Panel } from 'react-bootstrap';
 import ChargingPlanDetails from './ChargingPlanDetails';
+import ChargingPlanIncludes from './ChargingPlanIncludes';
 
 class ChargingPlanSetup extends React.Component {
   static defaultProps = {
@@ -37,6 +42,19 @@ class ChargingPlanSetup extends React.Component {
     const { id, value } = e.target;
     this.props.dispatch(onPlanFieldUpdate([id], value));
   };
+
+  onSelectUsaget = (usaget) => {
+    const { plan, dispatch } = this.props;
+    if (plan.getIn(['include', usaget])) {
+      dispatch(showWarning("Usage type already defined"));
+      return;
+    }
+    dispatch(addUsagetInclude(usaget));
+  };
+
+  onUpdateIncludeField = (usaget, id, value) => {
+    this.props.dispatch(onPlanFieldUpdate(['include', usaget, id], value));
+  };
   
   render() {
     const { plan } = this.props;
@@ -64,7 +82,11 @@ class ChargingPlanSetup extends React.Component {
             </Tab>
             <Tab title="Include" eventKey={3}>
               <Panel style={{  borderTop: 'none' }}>
-                Include
+                <ChargingPlanIncludes
+                    includes={ plan.get('include', Immutable.Map()) }
+                    onSelectUsaget={ this.onSelectUsaget }
+                    onUpdateField={ this.onUpdateIncludeField }
+                />
               </Panel>
             </Tab>
           </Tabs>
