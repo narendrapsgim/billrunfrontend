@@ -30,7 +30,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
-	config.removeButtons = 'Subscript,Superscript,ShowBlocks,Save,NewPage,Preview,Print,Placeholder,Image,Smiley,PageBreak,Iframe,Source,Flash';
+	config.removeButtons = 'Subscript,Superscript,ShowBlocks,Save,NewPage,Print,Placeholder,Image,Smiley,PageBreak,Iframe,Source,Flash';
 
 
 
