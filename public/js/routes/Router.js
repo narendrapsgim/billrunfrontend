@@ -47,7 +47,7 @@ const routes = () => (
     <Route path="/product(/:itemId)(/:action)" component={RequireAuth(Product)} />
     <Route path="/services" component={RequireAuth(ServicesList)} title="Services" />
     <Route path="/service(/:itemId)(/:action)" component={RequireAuth(Service)} />
-    <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer" />
+    <Route path="/customer" component={RequireAuth(CustomerSetup)} />
     <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor" />
     <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" />
     <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator" />
