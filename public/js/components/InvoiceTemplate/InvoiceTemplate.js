@@ -69,8 +69,8 @@ class InvoiceTemplate extends Component {
 
     const htmlTranslation = settings.get('html_translation', Immutable.Map());
     const fieldsList = Array.from(htmlTranslation.keys());
-    const headerTemplates = settings.getIn(['templates', 'header']).map(template => template.get('lable')).toArray();
-    const footerTemplates = settings.getIn(['templates', 'footer']).map(template => template.get('lable')).toArray();
+    const headerTemplates = settings.getIn(['templates', 'header'], Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
+    const footerTemplates = settings.getIn(['templates', 'footer'], Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
 
     return (
       <div>
