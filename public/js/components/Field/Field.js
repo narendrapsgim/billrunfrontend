@@ -33,16 +33,19 @@ class Field extends React.Component {
           id,
           value,
           coll,
+          tooltip,
           fieldType = this.getFieldType(id, coll),
           required = false,
           disabled = false,
-          editable = true } = this.props;
+          editable = true,
+          dispatch,          
+          ...otherProps } = this.props;
 
     switch(fieldType) {
       case 'number':
-        return (<Number {...this.props} onChange={onChange} ref={id} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Number {...otherProps} onChange={onChange} ref={id} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'price':
-        return (<Price onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Price {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'date':
         return (<Date onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'address':

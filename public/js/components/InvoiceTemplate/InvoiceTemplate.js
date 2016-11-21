@@ -26,15 +26,15 @@ class InvoiceTemplate extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getSettings('wkpdf'));
+    this.props.dispatch(getSettings('invoice_export'));
   }
 
   onChange = (name, content) => {
-    this.props.dispatch(updateSetting('wkpdf', name, content));
+    this.props.dispatch(updateSetting('invoice_export', name, content));
   }
 
   onSave = () => {
-    this.props.dispatch(saveSettings('wkpdf'));
+    this.props.dispatch(saveSettings('invoice_export'));
   }
 
   onCancel = () => {
@@ -46,15 +46,14 @@ class InvoiceTemplate extends Component {
   }
 
   onConfirmOk = () => {
-    this.props.dispatch(getSettings('wkpdf'));
+    this.props.dispatch(getSettings('invoice_export'));
     this.setState({ showConfirm: false });
   }
 
   loadTemplate = (name, index) => {
     const { settings } = this.props;
     const newContent = settings.getIn(['templates', name, index, 'content']);
-    // console.log('loadTemplate:', name, newContent);
-    this.props.dispatch(updateSetting('wkpdf', name, newContent));
+    this.props.dispatch(updateSetting('invoice_export', name, newContent));
   }
 
   render() {
@@ -67,8 +66,7 @@ class InvoiceTemplate extends Component {
       return (<p>loading...</p>);
     }
 
-    const htmlTranslation = settings.get('html_translation', Immutable.Map());
-    const fieldsList = Array.from(htmlTranslation.keys());
+    const fieldsList = settings.get('html_translation', Immutable.List()).toArray();
     const headerTemplates = settings.getIn(['templates', 'header'], Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
     const footerTemplates = settings.getIn(['templates', 'footer'], Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
 
@@ -90,6 +88,6 @@ class InvoiceTemplate extends Component {
 }
 
 const mapStateToProps = state => ({
-  settings: state.settings.get('wkpdf'),
+  settings: state.settings.get('invoice_export'),
 });
 export default connect(mapStateToProps)(InvoiceTemplate);

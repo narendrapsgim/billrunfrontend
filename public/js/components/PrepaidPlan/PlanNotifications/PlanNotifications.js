@@ -67,7 +67,7 @@ const PlanNotifications = (props) => {
       <Row>
 	<Col lg={12}>
 	  <Form>
-	    <Panel header={ <h4>Select balance</h4> }>
+	    <Panel header={ <h4>Select prepaid bucket</h4> }>
 	      <Select placeholder="Select" options={ options } onChange={ onSelectBalance } />
 	    </Panel>
 	    <hr/>
