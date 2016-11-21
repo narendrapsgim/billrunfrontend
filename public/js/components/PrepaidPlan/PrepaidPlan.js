@@ -17,6 +17,7 @@ import { getList } from '../../actions/listActions';
 import { showWarning, showDanger } from '../../actions/alertsActions';
 import { getPlan, savePlan, clearPlan, onPlanFieldUpdate } from '../../actions/planActions';
 import { savePlanRates } from '../../actions/planProductsActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 import { Tabs, Tab, Col, Panel, Button } from 'react-bootstrap';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
@@ -31,8 +32,13 @@ class PrepaidPlan extends Component {
   }
 
   componentDidMount() {
-    const { planId } = this.props.location.query;
-    if (planId) this.props.dispatch(getPlan(planId));
+    const { planId, action } = this.props.location.query;
+    if (planId) {
+      this.props.dispatch(getPlan(planId));
+    }
+    if (action === 'new') {
+      this.props.dispatch(setPageTitle('Create New Prepaid Plan'));
+    }
     const ppincludes_params = {
       api: "find",
       params: [
@@ -43,6 +49,14 @@ class PrepaidPlan extends Component {
     this.props.dispatch(getList('pp_includes', ppincludes_params));
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { plan } = nextProps;
+    const { action }  = this.props.location.query;
+    if (action !== 'new' && plan.get('name') && plan.get('name') !== this.props.plan.get('name')) {
+      this.props.dispatch(setPageTitle(`Edit Prepaid Plan - ${plan.get('name')}`));
+    }
+  }
+  
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
   }
@@ -55,7 +69,7 @@ class PrepaidPlan extends Component {
   onSelectBalance = (pp_include) => {
     const { plan, dispatch } = this.props;    
     if (plan.getIn(['notifications_threshold', pp_include], List()).size) {
-      dispatch(showWarning(`There are already notifications for selected balance`));
+      dispatch(showWarning(`There are already notifications for selected prepaid bucket`));
       return;
     }   
     dispatch(addBalanceNotifications(pp_include));
@@ -97,7 +111,7 @@ class PrepaidPlan extends Component {
   onAddBalanceThreshold = (balance_id) => {
     const { plan, dispatch } = this.props;
     if (plan.getIn(['pp_threshold', balance_id])) {
-      dispatch(showWarning("Balance already defined"));
+      dispatch(showWarning("Prepaid bucket already defined"));
       return;
     }
     dispatch(addBalanceThreshold(balance_id))

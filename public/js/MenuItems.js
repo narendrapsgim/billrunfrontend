@@ -129,7 +129,7 @@ const MenuItems = [
             },
 		{
 		id: 'prepaid_includes',
-		title: 'Prepaid Includes',
+		title: 'Prepaid Buckets',
 		icon: '',
 		route: 'prepaid_includes',
 		show: true

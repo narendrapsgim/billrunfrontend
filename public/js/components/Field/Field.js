@@ -33,6 +33,7 @@ class Field extends React.Component {
           id,
           value,
           coll,
+          tooltip,
           fieldType = this.getFieldType(id, coll),
           required = false,
           disabled = false,

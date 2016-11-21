@@ -41,7 +41,7 @@ const PrepaidInclude = (props) => {
 	    <Col lg={7} md={7}>
 	      <Field id="external_id"
 		     value={ props.prepaidInclude.get('external_id', 0) }
-		     onChange={ props.onChangeField }			   
+		     onChange={ props.onChangeField }
 		     fieldType="number" />
 	    </Col>
 	  </FormGroup>
@@ -53,6 +53,7 @@ const PrepaidInclude = (props) => {
 	      <Field id="priority"
 		     value={ props.prepaidInclude.get('priority', 0) }
 		     onChange={ props.onChangeField }
+                     tooltip="Lower number represents higher priority"
 		     fieldType="number" />
 	    </Col>
 	  </FormGroup>
