@@ -34,7 +34,7 @@ const Thresholds = (props) => {
   return (
     <div className="Thresholds">
       <Form horizontal>
-	<Panel header={ <h3>Select balance</h3> }>
+	<Panel header={ <h3>Select prepaid bucket</h3> }>
 	  <Select placeholder="Select" options={ options } onChange={ props.onAddBalance } />
 	</Panel>
 	<hr/>

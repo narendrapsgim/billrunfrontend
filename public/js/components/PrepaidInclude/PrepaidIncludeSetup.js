@@ -7,6 +7,7 @@ import moment from 'moment';
 import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
 import { showDanger } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 import { Button, Tabs, Tab, Panel } from 'react-bootstrap';
 import PrepaidInclude from './PrepaidInclude';
@@ -19,7 +20,10 @@ class PrepaidIncludeSetup extends React.Component {
 
   componentDidMount() {
     const { dispatch, location } = this.props;
-    const { pp_id } = location.query;
+    const { pp_id, action } = location.query;
+    if (action === 'new') {
+      this.props.dispatch(setPageTitle('Create New Prepaid Bucket'));
+    }
     if (pp_id) {
       const params = {
 	api: 'find',
@@ -41,6 +45,16 @@ class PrepaidIncludeSetup extends React.Component {
     dispatch(getList('all_rates', query));
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { prepaid_include } = nextProps;
+    const { action } = this.props.location.query;
+    if (action !== 'new' &&
+        prepaid_include.get('name') &&
+        this.props.prepaid_include.get('name') !== prepaid_include.get('name')) {
+      this.props.dispatch(setPageTitle(`Edit Prepaid Bucket - ${prepaid_include.get('name')}`));
+    }
+  }
+  
   componentWillUnmount() {
     this.props.dispatch(clearEntity('prepaid_include'));
   }
@@ -95,7 +109,7 @@ class PrepaidIncludeSetup extends React.Component {
                               chargingByOptions={ charging_by_options } />
             </Panel>
           </Tab>
-          <Tab title="Limited Destinations" eventKey={2}>
+          <Tab title="Limited Products" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <LimitedDestinations
                   limitedDestinations={ prepaid_include.get('allowed_in', List()) }

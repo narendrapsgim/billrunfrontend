@@ -83,7 +83,7 @@ class PrepaidIncludesList extends React.Component {
 
     const header = (
       <h3>
-	List of all available prepaid includes
+	List of all available prepaid buckets
         <div className="pull-right">
           <Button bsSize="xsmall" className="btn-primary" onClick={ this.onNew }><i className="fa fa-plus"/>&nbsp;Add New</Button>
         </div>	

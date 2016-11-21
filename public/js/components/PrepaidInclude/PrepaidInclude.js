@@ -18,6 +18,7 @@ const PrepaidInclude = (props) => {
 
   const onSelectUsageType = (value) => {
     props.onChangeField({target: {id: 'charging_by_usaget', value}});
+    props.onChangeField({target: {id: 'charging_by', value: 'total_cost'}});
   };
 
   return (
@@ -41,7 +42,7 @@ const PrepaidInclude = (props) => {
 	    <Col lg={7} md={7}>
 	      <Field id="external_id"
 		     value={ props.prepaidInclude.get('external_id', 0) }
-		     onChange={ props.onChangeField }			   
+		     onChange={ props.onChangeField }
 		     fieldType="number" />
 	    </Col>
 	  </FormGroup>
@@ -53,6 +54,7 @@ const PrepaidInclude = (props) => {
 	      <Field id="priority"
 		     value={ props.prepaidInclude.get('priority', 0) }
 		     onChange={ props.onChangeField }
+                     tooltip="Lower number represents higher priority"
 		     fieldType="number" />
 	    </Col>
 	  </FormGroup>
@@ -73,10 +75,17 @@ const PrepaidInclude = (props) => {
 	      Usage type
 	    </Col>
 	    <Col lg={7} md={7}>
-              <UsagetypeSelect
-                  onChangeUsageType={ onSelectUsageType }
-                  value={ props.prepaidInclude.get('charging_by_usaget', '') }
-              />
+              {
+                props.prepaidInclude.get('charging_by') === 'total_cost'
+                ? <Select
+                      disabled={ true }
+                      value={ props.prepaidInclude.get('charging_by') }
+                  />
+                : <UsagetypeSelect
+                      onChangeUsageType={ onSelectUsageType }
+                      value={ props.prepaidInclude.get('charging_by_usaget', '') }
+                  />
+              }
 	    </Col>
 	  </FormGroup>
         </Form>
