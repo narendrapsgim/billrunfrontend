@@ -27,6 +27,13 @@ const MenuItems = [
                 route:'prepaid_plans',
                 show:true,
             },
+            {
+	        id: 'charging',
+		title: 'Charging',
+		icon: '',
+		route: 'charging_plans',
+		show: true
+	    }
           ]
     },
     {

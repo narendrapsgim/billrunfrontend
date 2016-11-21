@@ -8,6 +8,7 @@ export const UPDATE_PLAN_PRICE = 'UPDATE_PLAN_PRICE';
 export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
 export const REMOVE_GROUP = 'REMOVE_GROUP';
 export const ADD_GROUP = 'ADD_GROUP';
+export const ADD_USAGET_INCLUDE = 'ADD_USAGET_INCLUDE';
 
 import moment from 'moment';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
@@ -83,6 +84,12 @@ export function savePlan(plan, action, callback = () => {}) {
   };
 }
 
+export function addUsagetInclude(usaget) {
+  return {
+    type: ADD_USAGET_INCLUDE,
+    usaget
+  };
+}
 
 /* Internal function */
 function savePlanToDB(plan, action, callback) {

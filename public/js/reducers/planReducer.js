@@ -6,7 +6,8 @@ import {
   ADD_TARIFF,
   REMOVE_TARIFF,
   GOT_PLAN,
-  CLEAR_PLAN } from '../actions/planActions';
+  CLEAR_PLAN,
+  ADD_USAGET_INCLUDE } from '../actions/planActions';
 import {
   ADD_BALANCE_NOTIFICATIONS,
   ADD_NOTIFICATION,
@@ -128,6 +129,17 @@ export default function (state = defaultState, action) {
 
     case CHANGE_BALANCE_THRESHOLD:
       return state.setIn(['pp_threshold', action.balance_id], action.value);
+
+    case ADD_USAGET_INCLUDE:
+      const newInclude = Immutable.fromJS({
+        usagev: 0,
+        period: {
+          unit: '',
+          duration: 0
+        },
+        pp_includes_name: '',
+        pp_includes_external_id: ''});
+      return state.setIn(['include', action.usaget], newInclude);
       
     default:
       return state;

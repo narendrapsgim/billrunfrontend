@@ -33,6 +33,8 @@ import PrepaidPlan from '../components/PrepaidPlan';
 import AuditTrail from '../components/AuditTrail';
 import PrepaidIncludesList from '../components/PrepaidIncludesList';
 import PrepaidIncludeSetup from '../components/PrepaidInclude';
+import ChargingPlansList from '../components/ChargingPlansList';
+import ChargingPlanSetup from '../components/ChargingPlan';
 
 const routes = () => (
   <Route path="/" component={App}>
@@ -65,6 +67,8 @@ const routes = () => (
     <Route path="/prepaid_includes" component={RequireAuth(PrepaidIncludesList)} title="Prepaid Buckets" />
     <Route path="/prepaid_include" component={RequireAuth(PrepaidIncludeSetup)} />
     <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
+    <Route path="/charging_plans" component={RequireAuth(ChargingPlansList)} title="Charging Plans" />
+    <Route path="/charging_plan" component={RequireAuth(ChargingPlanSetup)} />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="*" component={PageNotFound} />
   </Route>
