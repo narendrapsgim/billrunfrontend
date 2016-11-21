@@ -180,7 +180,7 @@ class PrepaidPlan extends Component {
 	      </Panel>
 	    </Tab>
 
-	    <Tab title="Notification" eventKey={3}>
+	    <Tab title="Notifications" eventKey={3}>
 	      <Panel style={{borderTop: 'none'}}>
 		<PlanNotifications plan={ plan }
 				   pp_includes={ pp_includes }
@@ -202,7 +202,7 @@ class PrepaidPlan extends Component {
 	      </Panel>
 	    </Tab>
 
-	    <Tab title="Thresholds" eventKey={5}>
+	    <Tab title="Charging Limits" eventKey={5}>
 	      <Panel style={{borderTop: 'none'}}>
 		<Thresholds plan={ plan }
 			    pp_includes={ pp_includes }
