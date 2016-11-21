@@ -41,7 +41,7 @@ class Field extends React.Component {
 
     switch(fieldType) {
       case 'number':
-        return (<Number {...this.props} onChange={onChange} ref={id} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Number onChange={onChange} ref={id} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'price':
         return (<Price onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'date':

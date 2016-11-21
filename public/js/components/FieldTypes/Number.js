@@ -6,9 +6,9 @@ export default class Number extends Component {
   }
 
   render() {
-    let { onChange, id, value, editable, disabled, fieldType, tooltip, ...otherProps } = this.props;
+    let { onChange, id, value, editable, disabled, fieldType, tooltip } = this.props;
     const input = editable ?
-                  (<input {...otherProps} type="number" id={id} className="form-control" value={value} onChange={onChange} disabled={disabled} title={tooltip} />) :
+                  (<input type="number" id={id} className="form-control" value={value} onChange={onChange} disabled={disabled} title={tooltip} />) :
                   (<span>{parseFloat(value, 10)}</span>);
 
     return (

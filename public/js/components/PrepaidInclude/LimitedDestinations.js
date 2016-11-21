@@ -14,8 +14,9 @@ const LimitedDestinations = (props) => (
     {
       props.limitedDestinations
            .keySeq()
-           .map(name => (
+           .map((name, key) => (
              <LimitedDestination
+                 key={ key }
                  rates={ props.limitedDestinations.get(name, List()) }
                  onChange={ props.onChange }
                  allRates={ props.allRates }
