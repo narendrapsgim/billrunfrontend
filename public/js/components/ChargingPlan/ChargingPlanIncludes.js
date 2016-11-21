@@ -6,7 +6,7 @@ import UsagetypeSelect from '../Plan/components/UsagetypeSelect';
 import ChargingPlanInclude from './ChargingPlanInclude';
 
 const ChargingPlanIncludes = (props) => {
-  const { includes } = props;
+  const { includes, prepaid_includes_options } = props;
   
   return (
     <div className="ChargingPlanIncludes">
@@ -23,8 +23,10 @@ const ChargingPlanIncludes = (props) => {
                 .map((type, key) => (
                   <ChargingPlanInclude
                       key={ key }
+                      prepaid_includes_options={ prepaid_includes_options }
                       include={ includes.get(type) }
                       onUpdateField={ props.onUpdateField }
+                      onUpdatePeriodField={ props.onUpdatePeriodField }
                       type={ type }
                   />
                 ))
