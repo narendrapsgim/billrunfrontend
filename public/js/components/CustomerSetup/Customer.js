@@ -46,7 +46,7 @@ class Customer extends Component {
           <Col componentClass={ControlLabel} md={2}>
             {setting.get('title') || setting.get('field_name')}
           </Col>
-          <Col sm={9}>
+          <Col sm={7}>
             <Field onChange={ onChange }
                    id={ setting.get('field_name') }
                    value={ customer.get(setting.get('field_name'), '') }

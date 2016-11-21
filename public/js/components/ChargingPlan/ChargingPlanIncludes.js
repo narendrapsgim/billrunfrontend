@@ -16,7 +16,7 @@ const ChargingPlanIncludes = (props) => {
             onChangeUsageType={ props.onSelectUsaget }
         />
       </Panel>
-      { includes.size && <hr/> }
+      <hr/>
       {
         includes.keySeq()
                 .filter(inc => inc !== 'cost')

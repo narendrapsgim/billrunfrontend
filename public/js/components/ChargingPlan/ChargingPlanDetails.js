@@ -83,18 +83,18 @@ const ChargingPlanDetails = (props) => {
 	            />
                   </FormGroup>
                 </Col>
-                <Col lg={6} md={6}>
-                  <FormGroup>
+                {/* <Col lg={6} md={6}>
+                    <FormGroup>
                     <ControlLabel>Charging type</ControlLabel>
                     <Select
-                        id="charging_type"
-                        options={ charging_type_options }
-                        multi={ true }
-                        value={ plan.get('charging_type', Immutable.List()).join(',') }
-                        onChange={ onSelectChargingType }
+                    id="charging_type"
+                    options={ charging_type_options }
+                    multi={ true }
+                    value={ plan.get('charging_type', Immutable.List()).join(',') }
+                    onChange={ onSelectChargingType }
                     />
-                  </FormGroup>
-                </Col>
+                    </FormGroup>
+                    </Col> */}
               </Row>
               <Row>
                 <Col lg={6} md={6}>

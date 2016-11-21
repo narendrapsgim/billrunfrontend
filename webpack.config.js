@@ -1,10 +1,18 @@
 var webpack = require('webpack');
 var path = require( 'path' );
+var chalk = require( 'chalk' );
+var copyWebpackPlugin = require('copy-webpack-plugin');
 var env = process.env.NODE_ENV || 'dev';
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var isProd = (env === 'production');
 
-console.log('Node env is : ', env);
+if(isProd) {
+  console.log(chalk.bgYellow('Node env is : ', env));
+} else {
+  console.log(chalk.bgGreen('Node env is : ', env));
+}
+
 
 /**
  * This is the Webpack configuration file
@@ -13,25 +21,25 @@ console.log('Node env is : ', env);
 module.exports = {
 
   // Efficiently evaluate modules with source maps
-  //devtool: "eval",
-  //devtool: "source-map",
+  // devtool: "eval",
+  // devtool: "source-map",
 
   // Set entry point to ./src/main and include necessary files for hot load
-  entry:  {
-    app : './public/js/index.js',
+  entry: {
+    app: './public/js/index.js',
     vendor: [
       'axios',
       'material-ui',
       'moment',
       'lodash',
-    ]
+    ],
   },
 
   // This will not actually create a bundle.js file in ./build. It is used
   // by the dev server for dynamic hot loading.
   output: {
-    path: __dirname + (env === 'production' ? '/dist/' : '/public/build/'),
-    filename: './bundle.[name].js'
+    path: __dirname + (isProd ? '/dist/' : '/public/build/'),
+    filename: 'bundle.[name].js'
   },
 
   // Necessary plugins
@@ -48,31 +56,40 @@ module.exports = {
     }),
     new ExtractTextPlugin('bundle.css'),
     new HtmlWebpackPlugin({
-      filename: env === 'production' ? "../dist/index.html" : "../index.html",
+      filename: isProd ? "../dist/index.html" : "../index.html",
       hash: true,
       template: 'index.tmpl.html',
       inject: true
-    })
+    }),
+    new copyWebpackPlugin([
+      {
+        from: 'vendors',
+        to: isProd ? 'vendors' : "../vendors"
+      }, {
+        from: isProd ? 'config/globalSettings.prod.js' : 'config/globalSettings.dev.js',
+        to: isProd ? 'globalSettings.js' : "../globalSettings.js"
+      },
+    ])
   ],
 
   // Transform source code using Babel and React Hot Loader
   module: {
     loaders: [
-      { test: /\.jsx?$/, loader: 'babel', exclude: /node_modules/, },
-      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
+      { test: /\.jsx?$/, loader: 'babel', exclude: /node_modules/ },
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader?sourceMap', 'css-loader?sourceMap') },
       { test: /\.less$/, loader: 'style!css!less' },
       { test: /\.scss$/, loader: 'style!css!sass' },
       { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
       { test: /\.(jpe|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/, loaders: ['file-loader'] },
-      { test: /\.json$/, loaders: ['json-loader'], include: /\.json$/}
+      { test: /\.json$/, loaders: ['json-loader'], include: /\.json$/ },
     ]
   },
 
   // Automatically transform files with these extensions
   resolve: {
-    alias:{
-      img: path.resolve( __dirname, 'public', 'img' ),
-      css: path.resolve( __dirname, 'public', 'css' ),
+    alias: {
+      img: path.resolve(__dirname, 'public', 'img'),
+      css: path.resolve(__dirname, 'public', 'css'),
     },
     extensions: ['', '.js', '.jsx', '.css'],
   },
