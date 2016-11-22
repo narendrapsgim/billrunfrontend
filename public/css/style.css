@@ -245,3 +245,12 @@ textarea {
   color: #424242;
   text-align: center;
 }
+
+.pagination{
+  margin: 0;
+  padding: 0;
+  cursor: "pointer";
+}
+.pagination a{
+  padding: 0 10px!important;;
+}
