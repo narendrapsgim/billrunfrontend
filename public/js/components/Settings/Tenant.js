@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Panel, Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
 
+import { apiBillRun } from '../../common/Api';
+
 export default class Tenant extends Component {
   constructor(props) {
     super(props);
@@ -12,11 +14,29 @@ export default class Tenant extends Component {
   }
 
   onSelectLogo = (e) => {
-    const { files } = e.target;
-    const logo = files[0];
-    const FormData = new FormData();
-    FormData.append('logo', logo);
-    console.log(FormData);
+    const formData = new FormData();
+    formData.append('action', 'save')
+    formData.append('query', JSON.stringify({filename: e.target.files[0].name}));
+    const query = {
+      api: "logo",
+      options: {
+        method: "POST",
+        body: formData
+      },
+    };
+
+    apiBillRun(query).then(
+      success => {
+        console.log("success", success);
+      },
+      failure => {
+        console.log("failure", failure);
+      }
+    ).catch(
+      error => {
+        console.log("!CATCH!", error);
+      }
+    );
   };
 
   render() {
