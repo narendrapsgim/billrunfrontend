@@ -10,7 +10,7 @@ const Checkbox = (props) => {
   return editable
        ? (<input type="checkbox"
                  id={ id }
-                 value={ value }
+                 checked={ value }
                  disabled={ disabled }
                  onChange={ onChange } /> )
        : (<span>{ value }</span>);

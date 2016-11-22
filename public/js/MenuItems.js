@@ -140,7 +140,14 @@ const MenuItems = [
 		icon: '',
 		route: 'prepaid_includes',
 		show: true
-		}
+		},
+          {
+            id: 'custom_fields',
+            title: "Custom Fields",
+            icon: '',
+            route: 'custom_fields',
+            show: true
+          }
         ]
     },
 

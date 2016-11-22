@@ -7,7 +7,7 @@ export const GOT_SETTINGS = 'GOT_SETTINGS';
 export const ADD_PAYMENT_GATEWAY = 'ADD_PAYMENT_GATEWAY';
 export const REMOVE_PAYMENT_GATEWAY = 'REMOVE_PAYMENT_GATEWAY';
 export const UPDATE_PAYMENT_GATEWAY = 'UPDATE_PAYMENT_GATEWAY';
-
+export const REMOVE_SETTING_FIELD = 'REMOVE_SETTING_FIELD';
 
 export function addPaymentGateway(gateway) {
   return {
@@ -36,6 +36,14 @@ export function updateSetting(category, name, value) {
     category,
     name,
     value,
+  };
+}
+
+export function removeSettingField(category, name) {
+  return {
+    type: REMOVE_SETTING_FIELD,
+    category,
+    name
   };
 }
 

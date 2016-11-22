@@ -35,6 +35,7 @@ import PrepaidIncludesList from '../components/PrepaidIncludesList';
 import PrepaidIncludeSetup from '../components/PrepaidInclude';
 import ChargingPlansList from '../components/ChargingPlansList';
 import ChargingPlanSetup from '../components/ChargingPlan';
+import CustomFields from '../components/CustomFields';
 
 const routes = () => (
   <Route path="/" component={App}>
@@ -69,6 +70,7 @@ const routes = () => (
     <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
     <Route path="/charging_plans" component={RequireAuth(ChargingPlansList)} title="Charging Plans" />
     <Route path="/charging_plan" component={RequireAuth(ChargingPlanSetup)} />
+    <Route path="/custom_fields" component={RequireAuth(CustomFields)} title="Custom Fields" />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="*" component={PageNotFound} />
   </Route>
