@@ -5,6 +5,7 @@ import { UPDATE_SETTING,
 	 REMOVE_PAYMENT_GATEWAY,
 	 UPDATE_PAYMENT_GATEWAY } from '../actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
+import { LOGOUT } from '../actions/userActions';
 
 const defaultState = Immutable.fromJS({
   subscribers: {
