@@ -4,7 +4,8 @@ import { showDanger } from './alertsActions';
 
 export const actions = {
   GOT_LIST: 'GOT_LIST',
-  CLEAR_LIST: 'CLEAR_LIST'
+  CLEAR_LIST: 'CLEAR_LIST',
+  SET_NEXT_PAGE: 'SET_NEXT_PAGE'
 };
 
 const defaultParams = {
@@ -30,12 +31,20 @@ function gotList(collection, list) {
   };
 }
 
+function setNextPage(nextPage) {
+  return {
+    type: actions.SET_NEXT_PAGE,
+    nextPage
+  };
+}
+
 function fetchList(collection, params) {
   return (dispatch) => {
     dispatch(startProgressIndicator());
     apiBillRun(params).then(
       success => {
 	dispatch(finishProgressIndicator());
+        dispatch(setNextPage(success.data[0].data.next_page));
         dispatch(gotList(collection, success.data[0].data.details));
       },
       failure => {

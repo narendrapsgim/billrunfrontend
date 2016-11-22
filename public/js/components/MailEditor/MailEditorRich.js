@@ -1,78 +1,98 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
-class RichEditorExample extends React.Component {
-  constructor(props) {
-    super(props);
+class MailEditorRich extends React.Component {
 
-    this.state = {
-      showWYSIWYG: false
-    };
+  static defaultProps = {
+    fields: [],
+    value: '',
+    configPath: 'config-br-mails.js',
+    editorHeight: 250,
+  };
 
-    this.initEditor = this.initEditor.bind(this);
+  static propTypes = {
+    fields: React.PropTypes.array,
+    onChange: React.PropTypes.func.isRequired,
+    value: React.PropTypes.string,
+    editorName: React.PropTypes.string.isRequired,
+    configPath: React.PropTypes.string,
+    editorHeight: React.PropTypes.number,
+  };
+
+  state = {
+    showWYSIWYG: false,
   }
 
-  initEditor() {
-    let self = this;
-    let configPath = self.props.configPath || 'config-br-mails.js';
-    let editorName = self.props.editorName;
-    const  editor = CKEDITOR && CKEDITOR.instances[editorName];
+  componentDidMount() {
+    this.initEditor();
+  }
 
-    function toggleEditor() {
-      if (editor) {
-        editor.destroy(true);
-      }
+  shouldComponentUpdate(nextProps, nextState) {
+    const { value } = this.props;
+    return value !== nextProps.value;
+  }
 
-      window.CKEDITOR.replace(editorName,
-        {
-          customConfig: configPath,
-          toolbar: "Basic",
-          // width: 870,
-          height: self.props.editorHeight || 250,
-          extraPlugins: 'placeholder,placeholder_select,tableresize',
-          placeholder_select: {
-            placeholders: self.props.fields
-          }
-        });
-/*
+  componentDidUpdate(prevProps, prevState) {
+    this.initEditor();
+  }
 
-      window.CKEDITOR.instances[editorName].on('blur', function () {
-        let data = window.CKEDITOR.instances[editorName].getData();
-        self.props.onChange(data, self.props.name);
-      });
-*/
 
-      window.CKEDITOR.instances[editorName].on('change', function () {
-        let data = window.CKEDITOR.instances[editorName].getData();
-        self.props.onChange(data, self.props.name);
-      });
-
-      self.setState({showWYSIWYG: true});
+  toggleEditor = (editor, editorName, configPath) => {
+    const { fields, editorHeight } = this.props;
+    if (editor) {
+      editor.destroy(true);
     }
+    const ckeditorConfig = {
+      customConfig: configPath,
+      toolbar: 'Basic',
+      // width: 870,
+      height: editorHeight,
+      extraPlugins: 'preview,placeholder,placeholder_select,tableresize,sourcedialog,btgrid',
+      placeholder_select: {
+        placeholders: fields,
+      },
+    };
+    window.CKEDITOR.replace(editorName, ckeditorConfig);
+
+/*    window.CKEDITOR.instances[editorName].on('blur', () => {
+      const data = window.CKEDITOR.instances[editorName].getData();
+      this.props.onChange(data, self.props.name);
+    });
+*/
+    window.CKEDITOR.instances[editorName].on('change', () => {
+      const data = window.CKEDITOR.instances[editorName].getData();
+      this.props.onChange(data);
+    });
+
+    this.setState({ showWYSIWYG: true });
+  }
+
+  initEditor = () => {
+    const { configPath, editorName } = this.props;
+    const editor = CKEDITOR && CKEDITOR.instances[editorName];
 
     if (!this.state.showWYSIWYG) {
-      window.setTimeout(toggleEditor, 100);
+      window.setTimeout(() => this.toggleEditor(editor, editorName, configPath), 100);
     } else {
       if (editor) {
-        let editorData = window.CKEDITOR.instances[editorName].getData();
+        const editorData = window.CKEDITOR.instances[editorName].getData();
         if (editorData !== unescape(this.props.value)) {
-          window.setTimeout(toggleEditor, 100);
+          window.setTimeout(() => this.toggleEditor(editor, editorName, configPath), 100);
         }
       }
     }
   }
 
   render() {
-    this.initEditor();
-
-    const editorContent = unescape(this.props.value || '');
+    const { value, editorName } = this.props;
+    const editorContent = unescape(value || '');
 
     return (
-      <div>
-        <textarea name={this.props.editorName} cols="100" rows="6" value={editorContent}></textarea>
+      <div className="MailEditorRich">
+        <textarea name={editorName} cols="100" rows="6" value={editorContent} />
       </div>
     );
   }
 }
 
-export default connect()(RichEditorExample);
+export default connect()(MailEditorRich);

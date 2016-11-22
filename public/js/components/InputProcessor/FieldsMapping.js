@@ -103,8 +103,8 @@ export default class FieldsMapping extends Component {
       <form className="form-horizontal FieldsMapping">
         <div className="form-group">
           <div className="col-lg-3">
-            <label htmlFor="date_field">Date</label>
-            <p className="help-block">Date of record creation</p>
+            <label htmlFor="date_field">Date Time</label>
+            <p className="help-block">Date and time of record creation</p>
           </div>
           <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>

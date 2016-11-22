@@ -31,6 +31,10 @@ import InvoiceTemplate from '../components/InvoiceTemplate';
 import PrepaidPlansList from '../components/PrepaidPlansList';
 import PrepaidPlan from '../components/PrepaidPlan';
 import AuditTrail from '../components/AuditTrail';
+import PrepaidIncludesList from '../components/PrepaidIncludesList';
+import PrepaidIncludeSetup from '../components/PrepaidInclude';
+import ChargingPlansList from '../components/ChargingPlansList';
+import ChargingPlanSetup from '../components/ChargingPlan';
 
 const routes = () => (
   <Route path="/" component={App}>
@@ -39,13 +43,13 @@ const routes = () => (
     <Route path="/plans" component={RequireAuth(PlansList)} title="Plans" />
     <Route path="/plan(/:itemId)(/:action)" component={RequireAuth(Plan)} />
     <Route path="/prepaid_plans" component={RequireAuth(PrepaidPlansList)} title="Prepaid Plans" />
-    <Route path="/prepaid_plan" component={RequireAuth(PrepaidPlan)} title="Edit Prepaid Plan" />
+    <Route path="/prepaid_plan" component={RequireAuth(PrepaidPlan)} />
     <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers" />
     <Route path="/products" component={RequireAuth(ProductsList)} title="Products" />
     <Route path="/product(/:itemId)(/:action)" component={RequireAuth(Product)} />
     <Route path="/services" component={RequireAuth(ServicesList)} title="Services" />
     <Route path="/service(/:itemId)(/:action)" component={RequireAuth(Service)} />
-    <Route path="/customer" component={RequireAuth(CustomerSetup)} title="Customer" />
+    <Route path="/customer" component={RequireAuth(CustomerSetup)} />
     <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor" />
     <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" />
     <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator" />
@@ -60,7 +64,11 @@ const routes = () => (
     <Route path="/collections" component={RequireAuth(Collections)} title="Collections" />
     <Route path="/collection" component={RequireAuth(Collection)} title="Collection" />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
+    <Route path="/prepaid_includes" component={RequireAuth(PrepaidIncludesList)} title="Prepaid Buckets" />
+    <Route path="/prepaid_include" component={RequireAuth(PrepaidIncludeSetup)} />
     <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
+    <Route path="/charging_plans" component={RequireAuth(ChargingPlansList)} title="Charging Plans" />
+    <Route path="/charging_plan" component={RequireAuth(ChargingPlanSetup)} />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="*" component={PageNotFound} />
   </Route>

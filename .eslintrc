@@ -16,5 +16,6 @@
   ],
   "globals": {
       "globalSetting": false,
+      "CKEDITOR": false,
     }
 }

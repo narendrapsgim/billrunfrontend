@@ -49,29 +49,31 @@ export default class Subscription extends Component {
     })).toJS();
 
     return (
-      <Form horizontal>
+      <div className="Subscription">
+	<Form horizontal>
 
-        <FormGroup controlId="formHorizontalEmail">
-          <Col componentClass={ControlLabel} sm={2}>Plan</Col>
-          <Col sm={9}>
-            <Select options={available_plans} value={plan} onChange={this.onChangePlan} />
-          </Col>
-        </FormGroup>
+          <FormGroup controlId="formHorizontalEmail">
+            <Col componentClass={ControlLabel} sm={2}>Plan</Col>
+            <Col sm={7}>
+              <Select options={available_plans} value={plan} onChange={this.onChangePlan} />
+            </Col>
+          </FormGroup>
 
-        <FormGroup controlId="formHorizontalEmail">
-          <Col componentClass={ControlLabel} sm={2}>Services</Col>
-          <Col sm={9}>
-            <Select multi={true} value={services.join(',')} options={available_services} onChange={this.onChangeService} />
-          </Col>
-        </FormGroup>
+          <FormGroup controlId="formHorizontalEmail">
+            <Col componentClass={ControlLabel} sm={2}>Services</Col>
+            <Col sm={7}>
+              <Select multi={true} value={services.join(',')} options={available_services} onChange={this.onChangeService} />
+            </Col>
+          </FormGroup>
 
-        <hr />
-        <div>
-          <Button onClick={this.onSave} bsStyle="primary" style={{ minWidth: 90, marginRight: 10 }}>Save</Button>
-          <Button onClick={onCancel} bsStyle="default" style={{ minWidth: 90 }}>Cancel</Button>
-        </div>
+          <hr />
+          <div>
+            <Button onClick={this.onSave} bsStyle="primary" style={{ minWidth: 90, marginRight: 10 }}>Save</Button>
+            <Button onClick={onCancel} bsStyle="default" style={{ minWidth: 90 }}>Cancel</Button>
+          </div>
 
-      </Form>
+	</Form>
+      </div>
     );
   }
 }

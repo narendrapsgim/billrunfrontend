@@ -10,6 +10,9 @@ export default function (state = defaultState, action) {
       return state.set(collection, Immutable.fromJS(entity));
 
     case actions.UPDATE_ENTITY_FIELD:
+      if (Array.isArray(field_id)) {
+        return state.setIn([collection, ...field_id], value);
+      }
       return state.setIn([collection, field_id], value);
 
     case actions.CLEAR_ENTITY:

@@ -11,6 +11,7 @@ import Address from '../FieldTypes/Address';
 import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
 import Unlimitd from '../FieldTypes/UnlimitedInput';
+import Checkbox from '../FieldTypes/Checkbox';
 
 class Field extends React.Component {
   constructor(props) {
@@ -32,16 +33,19 @@ class Field extends React.Component {
           id,
           value,
           coll,
+          tooltip,
           fieldType = this.getFieldType(id, coll),
           required = false,
           disabled = false,
-          editable = true } = this.props;
+          editable = true,
+          dispatch,          
+          ...otherProps } = this.props;
 
     switch(fieldType) {
       case 'number':
-        return (<Number {...this.props} onChange={onChange} ref={id} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Number {...otherProps} onChange={onChange} ref={id} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'price':
-        return (<Price onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Price {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'date':
         return (<Date onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'address':
@@ -50,6 +54,8 @@ class Field extends React.Component {
         return (<TextArea onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'unlimited':
         return (<Unlimitd onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} {...this.props} />);
+      case 'checkbox':
+        return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       default:
         return (<Text onChange={onChange} id={id} value={value} editable={editable} required={required} disabled={disabled} />);
     }

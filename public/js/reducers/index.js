@@ -14,9 +14,8 @@ import planProducts from './planProducts';
 import exportGenerator from './exportGeneratorReducer';
 import service from './serviceReducer';
 import collections from './collections';
-import invoiceTemplate from './invoiceTemplate';
 import guiState from './guiState';
-
+import pager from './pager';
 
 export default combineReducers({
   progressIndicator,
@@ -34,6 +33,6 @@ export default combineReducers({
   exportGenerator,
   service,
   collections,
-  invoiceTemplate,
-  guiState
+  guiState,
+  pager
 });

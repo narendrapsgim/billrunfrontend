@@ -35,11 +35,11 @@ class Segments extends Component {
       <div className="form-group row form-inner-edit-row">
         <div className="col-lg-6">
           <Select
-            name="field-name"
-            value={this.props.segment.get('field', '')}
-            options={this.props.options}
-            onChange={this.onFieldChange}
-            Clearable={false}
+              name="field-name"
+              value={this.props.segment.get('field', '')}
+              options={this.props.options}
+              onChange={this.onFieldChange}
+              Clearable={false}
           />
         </div>
 

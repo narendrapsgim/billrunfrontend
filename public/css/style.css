@@ -1,6 +1,9 @@
 body {
     margin-top: 50px;
 }
+html {
+    font-size: 12px;
+}
 /* Global */
 textarea {
   resize: vertical;

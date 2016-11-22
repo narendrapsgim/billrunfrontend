@@ -10,15 +10,31 @@ const MenuItems = [
         id:'plans',
         title:'Plans',
         icon:'fa-cubes',
-        route:'plans',
+        route:'',
         show:true,
-    },
-    {
-      id: 'prepaid_plans',
-      title: 'Prepaid Plans',
-      icon: 'fa-cubes',
-      route: 'prepaid_plans',
-      show: true
+        subMenus:[
+            {
+                id:'postpaid',
+                title:'Postpaid',
+                icon:'',
+                route:'plans',
+                show:true,
+            },
+            {
+                id:'prepaid',
+                title:'Prepaid',
+                icon:'',
+                route:'prepaid_plans',
+                show:true,
+            },
+            {
+	        id: 'charging',
+		title: 'Charging',
+		icon: '',
+		route: 'charging_plans',
+		show: true
+	    }
+          ]
     },
     {
         id:'services',
@@ -118,6 +134,13 @@ const MenuItems = [
                 route:'invoice-template',
                 show:true,
             },
+		{
+		id: 'prepaid_includes',
+		title: 'Prepaid Buckets',
+		icon: '',
+		route: 'prepaid_includes',
+		show: true
+		}
         ]
     },
 
