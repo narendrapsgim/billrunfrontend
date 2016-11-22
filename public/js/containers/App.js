@@ -7,6 +7,7 @@ import BraasTheme from '../theme';
 import ProgressIndicator from '../components/ProgressIndicator';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
+import Footer from '../components/Footer';
 import { userCheckLogin } from '../actions/userActions';
 import { setPageTitle } from '../actions/guiStateActions/pageActions';
 import { getSettings } from '../actions/settingsActions';
@@ -99,7 +100,7 @@ class App extends Component {
   );
 
   renderWithLayout = () => {
-    const { title } = this.props;
+    const { title, children } = this.props;
     return (
       <div id="wrapper" style={{ height: '100%' }}>
         <ProgressIndicator />
@@ -107,14 +108,11 @@ class App extends Component {
         <Navigator />
         <div id="page-wrapper" className="page-wrapper" style={{ minHeight: this.state.Height }}>
           <Row>
-            <Col lg={12}>
-              {title ? <PageHeader>{title}</PageHeader> : null }
-            </Col>
+            <Col lg={12}>{title && <PageHeader>{title}</PageHeader> }</Col>
           </Row>
-          <Row>
-            { this.props.children }
-          </Row>
+          <Row>{children}</Row>
         </div>
+        <Footer />
       </div>
     );
   }
