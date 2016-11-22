@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router';
+import Immutable from 'immutable';
 import classNames from 'classnames';
 import { NavDropdown, Button, MenuItem as BootstrapMenuItem } from 'react-bootstrap';
 import { userDoLogout } from '../../actions/userActions';
@@ -12,11 +13,18 @@ import SubMenu from './SubMenu';
 
 class Navigator extends Component {
 
+  static defaultProps = {
+    companyNeme: '',
+    userName: '',
+  };
+
   static propTypes = {
     router: React.PropTypes.shape({
       push: React.PropTypes.func.isRequired,
     }).isRequired,
     userDoLogout: React.PropTypes.func.isRequired,
+    companyNeme: React.PropTypes.string,
+    userName: React.PropTypes.string,
   };
 
   state = {
@@ -118,6 +126,7 @@ class Navigator extends Component {
 
   render() {
     const { collapseSideBar } = this.state;
+    const { userName, companyNeme } = this.props;
     const overallNavClassName = classNames({
       'navbar navbar-default navbar-fixed-top': true,
       'collapse-sizebar': collapseSideBar,
@@ -128,6 +137,7 @@ class Navigator extends Component {
         <div className="navbar-header">
           <Link to="/" className="navbar-brand">
             <img src={LogoImg} style={{ height: 22 }} alt="Logo" />
+            <span className="brand-name">{ companyNeme }</span>
           </Link>
           <Button bsSize="xsmall" id="btn-collapse-menu" onClick={this.onCollapseSidebar}>
             <i className="fa fa-chevron-left" />
@@ -136,7 +146,7 @@ class Navigator extends Component {
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
-          <NavDropdown id="nav-user-menu" title={<i className="fa fa-user fa-fw" />}>
+          <NavDropdown id="nav-user-menu" title={<span><i className="fa fa-user fa-fw" />{ userName }</span>}>
             <BootstrapMenuItem eventKey="4" onClick={this.clickLogout}>
               <i className="fa fa-sign-out fa-fw" /> Logout
               </BootstrapMenuItem>
@@ -158,4 +168,8 @@ class Navigator extends Component {
 const mapDispatchToProps = {
   userDoLogout,
 };
-export default withRouter(connect(null, mapDispatchToProps)(Navigator));
+const mapStateToProps = state => ({
+  companyNeme: state.settings.get('tenant', Immutable.Map()).get('name'),
+  userName: state.user.get('name'),
+});
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Navigator));

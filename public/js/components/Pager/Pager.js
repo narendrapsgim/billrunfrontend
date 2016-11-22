@@ -29,7 +29,7 @@ class Pager extends Component {
       onClick(page)
     });
   }
-  
+
   render() {
     const { size, count, pager } = this.props;
     const { page } = this.state;
@@ -40,11 +40,9 @@ class Pager extends Component {
 
     return (
       <div className="row">
-        <div className="col-lg-2">
-          { showing }
-        </div>
-        <div className="col-lg-10">
-          <ul className="pagination" style={{margin: 0, padding: 0, cursor: "pointer"}}>
+        <div className="col-lg-12">
+          <span style={{ verticalAlign: 'text-bottom' }}>{showing}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          <ul className="pagination">
             <li id="previous" className={prevClass}>
               <a id="previous" onClick={this.handlePageClick}>
                 <i id="previous" className="fa fa-chevron-left"></i>

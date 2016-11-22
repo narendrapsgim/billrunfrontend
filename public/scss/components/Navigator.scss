@@ -161,9 +161,16 @@ $page-wrapper-transition: margin 200ms linear;
   -webkit-transition: $page-wrapper-transition; /* Safari */
   transition: $page-wrapper-transition;
 }
+#top-nav ~ #footer {
+  -webkit-transition: $page-wrapper-transition; /* Safari */
+  transition: $page-wrapper-transition;
+}
 
 #top-nav.collapse-sizebar + #page-wrapper {
-  margin: 0 0 0 50px;
+  margin-left: 50px;
+}
+#top-nav.collapse-sizebar ~ #footer {
+  margin-left: 50px!important;
 }
 
 .sidebar .open > a > .fa.arrow:before {

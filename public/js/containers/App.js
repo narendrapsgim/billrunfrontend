@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { PageHeader, Col, Row } from 'react-bootstrap';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -8,20 +7,21 @@ import BraasTheme from '../theme';
 import ProgressIndicator from '../components/ProgressIndicator';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
+import Footer from '../components/Footer';
 import { userCheckLogin } from '../actions/userActions';
 import { setPageTitle } from '../actions/guiStateActions/pageActions';
+import { getSettings } from '../actions/settingsActions';
 /* Assets */
 import LogoImg from 'img/billrun-logo-tm.png';
 
 class App extends Component {
 
   static propTypes = {
-    setPageTitle: React.PropTypes.func.isRequired,
-    userCheckLogin: React.PropTypes.func.isRequired,
-    auth: React.PropTypes.bool,
-    routes: React.PropTypes.array, // eslint-disable-line react/forbid-prop-types
-    children: React.PropTypes.object, // eslint-disable-line react/forbid-prop-types
-    title: React.PropTypes.string,
+    auth: PropTypes.bool,
+    routes: PropTypes.array,
+    children: PropTypes.object,
+    title: PropTypes.string,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -30,7 +30,8 @@ class App extends Component {
   };
 
   componentWillMount() {
-    this.props.userCheckLogin();
+
+    this.props.dispatch(userCheckLogin());
     this.setState({ Height: '100%' });
   }
 
@@ -38,15 +39,19 @@ class App extends Component {
     const { routes, title } = this.props;
     const newTitle = routes[routes.length - 1].title || title;
     if (newTitle.length) {
-      this.props.setPageTitle(newTitle);
+      this.props.dispatch(setPageTitle(newTitle));
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { title } = this.props;
+    const { title, auth } = this.props;
     const nextTitle = nextProps.routes[nextProps.routes.length - 1].title;
     if (typeof nextTitle !== 'undefined' && nextTitle !== title) {
-      this.props.setPageTitle(nextTitle);
+      this.props.dispatch(setPageTitle(nextTitle));
+    }
+    if (auth !== true && nextProps.auth === true) { // user did success login
+      // get global system settings
+      this.props.dispatch(getSettings(['pricing', 'tenant']));
     }
   }
 
@@ -95,7 +100,7 @@ class App extends Component {
   );
 
   renderWithLayout = () => {
-    const { title } = this.props;
+    const { title, children } = this.props;
     return (
       <div id="wrapper" style={{ height: '100%' }}>
         <ProgressIndicator />
@@ -103,14 +108,11 @@ class App extends Component {
         <Navigator />
         <div id="page-wrapper" className="page-wrapper" style={{ minHeight: this.state.Height }}>
           <Row>
-            <Col lg={12}>
-              {title ? <PageHeader>{title}</PageHeader> : null }
-            </Col>
+            <Col lg={12}>{title && <PageHeader>{title}</PageHeader> }</Col>
           </Row>
-          <Row>
-            { this.props.children }
-          </Row>
+          <Row>{children}</Row>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -124,14 +126,10 @@ class App extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => bindActionCreators({
-  setPageTitle,
-  userCheckLogin,
-}, dispatch);
 
 const mapStateToProps = state => ({
   auth: state.user.get('auth'),
   title: state.guiState.page.get('title'),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps)(App);
