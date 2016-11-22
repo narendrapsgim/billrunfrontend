@@ -25,6 +25,31 @@ textarea {
 .danger-red { color: #d9534f; }
 /* ~Global */
 
+/* Main/Top menu */
+.navbar-default .dropdown-menu {
+  background-color: #EEEEEE;
+}
+.navbar-default .dropdown-menu>li>a, .navbar-default .dropdown-menu>li>a:focus {
+  color: #008cba;
+}
+.navbar-default .dropdown-menu>li>a:hover,
+.navbar-default .dropdown-menu>.active>a,
+.navbar-default .dropdown-menu>.active>a:hover{
+  text-decoration: none;
+  background-color: #eeeeee;
+  font-weight: bold;
+}
+.navbar-brand>img {
+  display: inline-block;
+}
+.navbar-brand .brand-name {
+  color: #6f6f6f;
+  vertical-align: bottom;
+  margin-left: 10px;
+  line-height: 14px;
+}
+/* ~Main/Top menu */
+
 /* react-datepicker */
 .react-datepicker__close-icon::after{
   color: #6f6f6f!important;

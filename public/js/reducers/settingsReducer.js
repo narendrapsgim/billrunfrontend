@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import { UPDATE_SETTING,
          GOT_SETTINGS,
 	 ADD_PAYMENT_GATEWAY,
@@ -22,6 +23,9 @@ export default function (state = defaultState, action) {
   let { name, value, category, settings, gateway, param } = action;
 
   switch(action.type) {
+    case LOGOUT:
+      return defaultState;
+
     case UPDATE_SETTING:
       return state.setIn([category, name], value);
 
