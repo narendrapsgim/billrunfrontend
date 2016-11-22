@@ -41,8 +41,8 @@ class Pager extends Component {
     return (
       <div className="row">
         <div className="col-lg-12">
-          <span style={{ verticalAlign: 'text-bottom' }}>{showing}&nbsp;&nbsp;&nbsp;&nbsp;</span>
           <ul className="pagination">
+            <span className="detalis">{showing}</span>
             <li id="previous" className={prevClass}>
               <a id="previous" onClick={this.handlePageClick}>
                 <i id="previous" className="fa fa-chevron-left"></i>
