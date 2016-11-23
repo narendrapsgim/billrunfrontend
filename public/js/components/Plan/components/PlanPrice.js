@@ -82,14 +82,14 @@ export default class PlanPrice extends Component {
     const showRemoveButton = trial || isLast ;
 
     return (
-      <Row>
+      <Row style={{ marginBottom: 10 }}>
         <Col lg={1} md={1} className="text-center">
-          { isFirst && <ControlLabel >Period</ControlLabel>}
+          { isFirst && <ControlLabel style={{ marginBottom: 5 }}>Period</ControlLabel>}
           <p style={{marginTop: 9}}>{index+1}</p>
         </Col>
-        <Col lg={4} md={4}>
+        <Col lg={4} md={4} style={{ paddingRight: 0 }}>
           <FormGroup validationState={cycleError.length ? "error" : null} style={{margin: 0}}>
-            { isFirst && <ControlLabel>Cycles</ControlLabel>}
+            { isFirst && <ControlLabel style={{ marginBottom: 5 }}>Cycles</ControlLabel>}
             { isLast
               ? <Field onChange={this.onCycleUpdateValue} value={cycle} fieldType="unlimited" unlimitedValue={planCycleUnlimitedValue}/>
               : <Field onChange={this.onCycleUpdateEvent} value={cycle} fieldType="number" min="0"/>
@@ -98,23 +98,24 @@ export default class PlanPrice extends Component {
           </FormGroup>
         </Col>
 
-        <Col lg={4} md={4}>
+        <Col lg={4} md={4} style={{ paddingRight: 0 }}>
           <FormGroup validationState={priceError.length ? "error" : null} style={{margin: 0}}>
-          { isFirst && <ControlLabel>Price</ControlLabel>}
+          { isFirst && <ControlLabel style={{ marginBottom: 5 }}>Price</ControlLabel>}
               <Field onChange={this.onPlanPriceUpdate} value={price} />
               { priceError.length > 0 && <HelpBlock>{priceError}.</HelpBlock>}
           </FormGroup>
         </Col>
 
-        <Col lg={1} md={1} sm={1} xs={1}>
+        <Col lg={3} md={3} sm={3} xs={3}>
           { showRemoveButton &&
             <FormGroup style={{margin: 0}}>
-              { isFirst && <ControlLabel>&nbsp;</ControlLabel>}
-              <Button onClick={this.onPlanTariffRemove} bsSize="small" className="pull-left"><i className="fa fa-trash-o danger-red"/>&nbsp;Remove</Button>
+              { isFirst && <ControlLabel style={{ marginBottom: 5 }}>&nbsp;</ControlLabel>}
+              <div style={{ width: '100%', height: 39 }}>
+                <Button onClick={this.onPlanTariffRemove} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red"/>&nbsp;Remove</Button>
+              </div>
             </FormGroup>
           }
         </Col>
-        { !isLast && !trial && <Col lg={12} md={12} sm={12} xs={12}><hr style={{marginTop: 6, marginBottom: 8}}/></Col> }
       </Row>
     );
   }
