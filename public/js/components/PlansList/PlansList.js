@@ -90,7 +90,7 @@ class PlansList extends Component {
   render() {
     const { items } = this.props;
 
-    const baseFilter = { to: { $gt: moment().toISOString() } };
+    const baseFilter = { to: { $gt: moment().toISOString() }, connection_type: 'postpaid' };
     const chargingModeParser = item => (item.get('upfront') ? 'Upfront' : 'Arrears');
 
     const fields = [

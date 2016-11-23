@@ -8,6 +8,7 @@ import { getEntity, updateEntityField, clearEntity } from '../../actions/entityA
 import { showDanger } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { savePrepaidInclude } from '../../actions/prepaidIncludeActions';
 
 import { Button, Tabs, Tab, Panel } from 'react-bootstrap';
 import PrepaidInclude from './PrepaidInclude';
@@ -65,8 +66,8 @@ class PrepaidIncludeSetup extends React.Component {
   };
 
   handleSave = () => {
-    console.log('save entity', this.props.prepaid_include.toJS());
-  };
+    this.props.dispatch(savePrepaidInclude(this.props.prepaid_include));
+ };
 
   handleCancel = () => {
     this.props.router.push('/prepaid_includes');

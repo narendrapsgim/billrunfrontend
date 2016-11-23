@@ -23,6 +23,11 @@ class PrepaidPlansList extends Component {
     this.onSort = this.onSort.bind(this);
 
     this.state = {
+      baseFilter: {
+        to: { "$gt": moment().toISOString() },
+        'connection_type': 'prepaid',
+        'type': 'customer'
+      },
       size: 10,
       page: 0,
       sort: '',
@@ -84,7 +89,8 @@ class PrepaidPlansList extends Component {
 
   render() {
     const { plans } = this.props;
-
+    const { baseFilter } = this.state;
+    
     const fields = [
       {id: "name", placeholder: "Name"},
       {id: "code", placeholder: "Code"},
@@ -109,7 +115,7 @@ class PrepaidPlansList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}, 'charging_type': 'prepaid'}} />
+                <Filter fields={ fields } onFilter={this.onFilter} base={ baseFilter } />
                 <List items={ plans } fields={ tableFields } onSort={ this.onSort } editField="name" edit={true} onClickEdit={ this.onClickPlan }/>
               </div>
             </div>
