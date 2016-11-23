@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
@@ -17,9 +17,9 @@ class ChargingPlansList extends Component {
   }
 
   static propTypes = {
-    items: React.PropTypes.instanceOf(Immutable.List),
-    router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired,
+    items: PropTypes.instanceOf(Immutable.List),
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
     }).isRequired,
   }
 
@@ -85,21 +85,24 @@ class ChargingPlansList extends Component {
     });
   }
 
+  getFilterFields = () => ([
+    {id: "description", placeholder: "Title"},
+    {id: "name", placeholder: "Key"},
+    {id: "to", display: false, type: "datetime", showFilter: false},
+  ])
+
+  getTableFields = () => ([
+    {id: 'description', title: 'Title', sort: true},
+    {id: 'name', title: 'Key', sort: true},
+    {id: 'code', title: 'External Code', sort: true},
+    {id: 'Operation', title: 'Operation', sort: true},
+    {id: 'charging_value', title: 'Charging value', sort: true},
+  ])
 
   render() {
     const { plans } = this.props;
-
-    const fields = [
-      {id: "name", placeholder: "Name"},
-      {id: "code", placeholder: "Code"},
-      {id: "to", display: false, type: "datetime", showFilter: false}
-    ];
-
-    const tableFields = [
-      {id: 'name', title: 'Name', sort: true},
-      {id: 'code', title: 'Code', sort: true},
-      {id: 'description', title: "Description", sort: true},
-    ];
+    const filterFields = this.getFilterFields();
+    const tableFields = this.getTableFields();
 
     return (
       <div>
@@ -113,8 +116,8 @@ class ChargingPlansList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <Filter fields={ fields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}, 'charging_type': 'prepaid'}} />
-                <List items={ plans } fields={ tableFields } onSort={ this.onSort } editField="name" edit={true} onClickEdit={ this.onClickPlan }/>
+                <Filter fields={ filterFields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}, 'charging_type': 'prepaid'}} />
+                <List items={ plans } fields={ tableFields } onSort={ this.onSort } editField="description" edit={true} onClickEdit={ this.onClickPlan }/>
               </div>
             </div>
             <Pager
