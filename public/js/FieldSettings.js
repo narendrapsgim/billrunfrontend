@@ -7,13 +7,14 @@ const FieldSettings = {
   from: 'date',
   periodicalrate: 'price',
   description: 'textarea',
+  salutation: 'salutation',
   subscriber: {
     address: 'address'
   },
   product: {
     from: 'number',
     to: 'number'
-  }
+  },
 };
 
 export default FieldSettings;
