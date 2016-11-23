@@ -14,6 +14,32 @@ export default class Tenant extends Component {
   }
 
   onSelectLogo = (e) => {
+    const file = e.target.files[0],
+          reader = new FileReader(),
+          url = 'http://billrun/api/logo';
+    
+    reader.onload = (e) => {
+      const formData = new FormData();
+      formData.append('query', JSON.stringify({'filename': e.currentTarget.result}));
+      formData.append('action', 'save');
+      fetch( url, {
+        method: 'post',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: formData
+      })
+        .then( data => {
+          console.log( 'Request succeeded with JSON response', data );
+        })
+        .catch( error => {
+          console.log( 'Request failed', error );
+        });
+    };
+    reader.readAsText( file );
+  }
+
+  shitFunction() {
     const formData = new FormData();
     formData.append('action', 'save')
     formData.append('query', JSON.stringify({filename: e.target.files[0].name}));
