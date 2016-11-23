@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Modal, Row, Col, Button, Well, Form, FormGroup, ControlLabel, OverlayTrigger, Tooltip, Checkbox } from 'react-bootstrap';
+import { Modal, Col, Button, Form, FormGroup, ControlLabel, Checkbox } from 'react-bootstrap';
 import Immutable from 'immutable';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import Help from '../../Help';
@@ -26,7 +26,7 @@ class PlanIncludeGroupEdit extends Component {
       React.PropTypes.number,
     ]).isRequired,
     allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
-    groupProducts: React.PropTypes.instanceOf(Immutable.List)
+    groupProducts: React.PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
@@ -39,13 +39,9 @@ class PlanIncludeGroupEdit extends Component {
     showConfirm: false,
   }
 
-  componentWillMount(){
+  componentWillMount() {
     const { name, usaget } = this.props;
     this.props.getGroupProducts(name, usaget);
-  }
-
-  toggleBoby = () => {
-    this.setState({ isEditMode: !this.state.isEditMode });
   }
 
   onChangeInclud = (value) => {
@@ -60,26 +56,26 @@ class PlanIncludeGroupEdit extends Component {
   }
 
   onAddProduct = (productKey) => {
-    if(productKey){
+    if (productKey) {
       const { name, usaget } = this.props;
       this.props.addGroupProducts(name, usaget, productKey);
     }
   }
 
   onRemoveProduct = (productKey) => {
-    if(productKey){
+    if (productKey) {
       const { name, usaget } = this.props;
       this.props.removeGroupProducts(name, usaget, productKey);
     }
   }
 
   onGroupRemoveAsk = () => {
-   this.setState({ showConfirm: true });
+    this.setState({ showConfirm: true });
   }
 
   onGroupRemoveOk = () => {
     const { name, usaget, groupProducts } = this.props;
-    this.props.onGroupRemove(name, usaget, groupProducts.toArray())
+    this.props.onGroupRemove(name, usaget, groupProducts.toArray());
     this.setState({ showConfirm: false });
   }
 
@@ -87,11 +83,15 @@ class PlanIncludeGroupEdit extends Component {
     this.setState({ showConfirm: false });
   }
 
+  toggleBoby = () => {
+    this.setState({ isEditMode: !this.state.isEditMode });
+  }
+
   renderEdit = () => {
     const { name, value, usaget, shared, groupProducts, allGroupsProductsKeys } = this.props;
     const { isEditMode } = this.state;
 
-    return(
+    return (
       <Modal show={isEditMode}>
         <Modal.Header closeButton={false}>
           <Modal.Title>Edit {name} <i>{usaget}</i></Modal.Title>
@@ -100,12 +100,14 @@ class PlanIncludeGroupEdit extends Component {
           <Form horizontal style={{ marginBottom: 0 }}>
             <FormGroup>
               <Col componentClass={ControlLabel} sm={3}>Include</Col>
-              <Col sm={8}> <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" unlimitedValue="UNLIMITED"/> </Col>
+              <Col sm={8}>
+                <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" unlimitedValue="UNLIMITED" />
+              </Col>
             </FormGroup>
 
             <FormGroup>
               <Col smOffset={3} sm={8}>
-                <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared_desc} /></Checkbox>
+                <Checkbox checked={shared} onChange={this.onChangeShared}>{"Share with all account's subscribers"}<Help contents={GroupsInclude.shared_desc} /></Checkbox>
               </Col>
             </FormGroup>
 
@@ -121,7 +123,7 @@ class PlanIncludeGroupEdit extends Component {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.toggleBoby} bsStyle="primary" bsSize="small" style={{ minWidth: 90 }}><i className="fa fa-check" />&nbsp;Close</Button>
+          <Button onClick={this.toggleBoby} bsStyle="primary" bsSize="small" style={{ minWidth: 90 }}>OK</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -153,9 +155,7 @@ class PlanIncludeGroupEdit extends Component {
 
 }
 
-function mapStateToProps(state, props) {
-  return  {
-    groupProducts: state.planProducts.productIncludeGroup.getIn([props.name, props.usaget])
-  };
-}
+const mapStateToProps = (state, props) => ({
+  groupProducts: state.planProducts.productIncludeGroup.getIn([props.name, props.usaget]),
+});
 export default connect(mapStateToProps)(PlanIncludeGroupEdit);
