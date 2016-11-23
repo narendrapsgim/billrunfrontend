@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import { UPDATE_SETTING,
+         REMOVE_SETTING_FIELD,
          GOT_SETTINGS,
 	 ADD_PAYMENT_GATEWAY,
 	 REMOVE_PAYMENT_GATEWAY,
@@ -27,6 +28,9 @@ export default function (state = defaultState, action) {
       return defaultState;
 
     case UPDATE_SETTING:
+      if (Array.isArray(name)) {
+        return state.setIn([category, ...name], value);
+      }
       return state.setIn([category, name], value);
 
     case ADD_USAGET_MAPPING:
@@ -55,6 +59,12 @@ export default function (state = defaultState, action) {
       const paymentgateways = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway.name).push(paymentgateway);
       return state.set('payment_gateways', paymentgateways);
 
+    case REMOVE_SETTING_FIELD:
+      if (Array.isArray(name)) {
+        return state.deleteIn([category, ...name]);
+      }
+      return state.deleteIn([category, name]);
+      
     default:
       return state;
   }
