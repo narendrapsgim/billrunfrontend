@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
+import { connect } from 'react-redux';
 
-export default class Pager extends Component {
+class Pager extends Component {
   constructor(props) {
     super(props);
 
@@ -29,21 +29,20 @@ export default class Pager extends Component {
       onClick(page)
     });
   }
-  
+
   render() {
-    const { size, count } = this.props;
+    const { size, count, pager } = this.props;
     const { page } = this.state;
+
     const prevClass = "previous" + ( this.state.page === 0 ? ' disabled' : '' );
-    const nextClass = "next" + (count < size ? ' disabled ' : '');
+    const nextClass = "next" + (!pager.get('nextPage') ? ' disabled ' : '');
     const showing = (page * size + count) === 0 ? 'Showing none' : `Showing ${page * size + 1} to ${page * size + count}`;
 
     return (
       <div className="row">
-        <div className="col-lg-2">
-          { showing }
-        </div>
-        <div className="col-lg-10">
-          <ul className="pagination" style={{margin: 0, padding: 0, cursor: "pointer"}}>
+        <div className="col-lg-12">
+          <span style={{ verticalAlign: 'text-bottom' }}>{showing}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          <ul className="pagination">
             <li id="previous" className={prevClass}>
               <a id="previous" onClick={this.handlePageClick}>
                 <i id="previous" className="fa fa-chevron-left"></i>
@@ -60,3 +59,11 @@ export default class Pager extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    pager: state.pager
+  };
+}
+
+export default connect(mapStateToProps)(Pager);

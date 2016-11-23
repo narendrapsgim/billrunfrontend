@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import { UPDATE_SETTING,
          REMOVE_SETTING_FIELD,
          GOT_SETTINGS,
@@ -5,7 +6,7 @@ import { UPDATE_SETTING,
 	 REMOVE_PAYMENT_GATEWAY,
 	 UPDATE_PAYMENT_GATEWAY } from '../actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
-import Immutable from 'immutable';
+import { LOGOUT } from '../actions/userActions';
 
 const defaultState = Immutable.fromJS({
   subscribers: {
@@ -23,6 +24,9 @@ export default function (state = defaultState, action) {
   let { name, value, category, settings, gateway, param } = action;
 
   switch(action.type) {
+    case LOGOUT:
+      return defaultState;
+
     case UPDATE_SETTING:
       if (Array.isArray(name)) {
         return state.setIn([category, ...name], value);
@@ -41,7 +45,7 @@ export default function (state = defaultState, action) {
           map.set(setting.name, Immutable.fromJS(data));
 	});
       });
-      
+
     case ADD_PAYMENT_GATEWAY:
       const added = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway.name).push(Immutable.fromJS(gateway));
       return state.set('payment_gateways', added);
@@ -49,7 +53,7 @@ export default function (state = defaultState, action) {
     case REMOVE_PAYMENT_GATEWAY:
       const removed = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway);
       return state.set('payment_gateways', removed);
-      
+
     case UPDATE_PAYMENT_GATEWAY:
       const paymentgateway = state.get('payment_gateways').find(pg => pg.get('name') === gateway.name).set('params', gateway.params);
       const paymentgateways = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway.name).push(paymentgateway);
