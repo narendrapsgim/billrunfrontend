@@ -5,7 +5,7 @@ import { ucFirst } from 'change-case';
 
 import { getSettings, updateSetting, removeSettingField } from '../../actions/settingsActions';
 
-import { Panel, Row, Col, ControlLabel, FormGroup } from 'react-bootstrap';
+import { Tabs, Tab, Panel, Row, Col } from 'react-bootstrap';
 import CustomField from './CustomField';
 
 class CustomFields extends Component {
@@ -45,31 +45,37 @@ class CustomFields extends Component {
     console.log("saving ", this.props.account, this.props.subscriber);
   };
   
-  fieldsPanelRender = (entity, key) => {
+  renderFieldsTab = (entity, key) => {
     const onAddNew = () => {
       this.onAddNewField(entity);
     };
+
     return (
-      <Panel header={ <h3>{ ucFirst(entity) } Fields</h3> } key={ key }>
-        {
-          this.props[entity]
-              .map((field, field_key) => {
-                return !field.get('generated', false) &&
-                       (<CustomField
-                            key={ field_key }
-                            field={ field }
-                            entity={ entity }
-                            index={ field_key }
-                            onChange={ this.onChangeField }
-                            onRemove={ this.onRemoveField }
-                            last={ field_key === (this.props[entity].size - 1) }
-                        />)
-              })
-        }
-        <button type="button" className="btn btn-link" onClick={ onAddNew }>
-          Add New Field
-        </button>
-      </Panel>
+      <Tab
+          key={ key }
+          title={`${ucFirst(entity)} Fields`}
+          eventKey={key}>
+        <Panel style={{borderTop: 'none'}}>
+          {
+            this.props[entity]
+                .map((field, field_key) => {
+                  return !field.get('generated', false) &&
+                         (<CustomField
+                              key={ field_key }
+                              field={ field }
+                              entity={ entity }
+                              index={ field_key }
+                              onChange={ this.onChangeField }
+                              onRemove={ this.onRemoveField }
+                              last={ field_key === (this.props[entity].size - 1) }
+                          />)
+                })
+          }
+          <button type="button" className="btn btn-link" onClick={ onAddNew }>
+            Add New Field
+          </button>
+        </Panel>
+      </Tab>
     );
   };
   
@@ -78,10 +84,12 @@ class CustomFields extends Component {
 
     return (
       <div className="CustomFields">
-      {
-        ["account", "subscriber"].map((entity, ent_key) =>
-          this.fieldsPanelRender(entity, ent_key))
-      }
+        <Tabs id="CustomFieldsTabs" animation={ false }>
+          {
+            ["account", "subscriber"].map((entity, ent_key) =>
+              this.renderFieldsTab(entity, ent_key))
+          }
+        </Tabs>
         <div style={{marginTop: 12}}>
           <button
               type="submit"
