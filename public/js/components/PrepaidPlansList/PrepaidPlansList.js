@@ -84,7 +84,9 @@ class PrepaidPlansList extends Component {
   getFilterFields = () => ([
     {id: "description", placeholder: "Title"},
     {id: "name", placeholder: "Key"},
-    {id: "to", display: false, type: "datetime", showFilter: false}
+    {id: "to", display: false, type: "datetime", showFilter: false},
+    {id: "connection_type", display: false, showFilter: false},
+    {id: "type", display: false, showFilter: false}
   ])
 
   getTableFields = () => ([
@@ -110,7 +112,7 @@ class PrepaidPlansList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <Filter fields={ filterFields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}, 'charging_type': 'prepaid'}} />
+                <Filter fields={ filterFields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}, 'connection_type': 'prepaid', 'type': 'customer'}} />
                 <List items={ plans } fields={ tableFields } onSort={ this.onSort } editField="description" edit={true} onClickEdit={ this.onClickPlan }/>
               </div>
             </div>

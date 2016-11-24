@@ -131,14 +131,15 @@ export default function (state = defaultState, action) {
       return state.setIn(['pp_threshold', action.balance_id], action.value);
 
     case ADD_USAGET_INCLUDE:
+      let { pp_includes_name, pp_includes_external_id } = action;
       const newInclude = Immutable.fromJS({
         usagev: 0,
         period: {
           unit: '',
           duration: 0
         },
-        pp_includes_name: '',
-        pp_includes_external_id: ''});
+        pp_includes_name,
+        pp_includes_external_id});
       return state.setIn(['include', action.usaget], newInclude);
       
     default:

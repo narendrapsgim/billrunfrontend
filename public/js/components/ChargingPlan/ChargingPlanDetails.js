@@ -77,6 +77,7 @@ export default class ChargingPlanDetails extends Component {
     const { errors } = this.state;
     const { item, mode } = this.props;
     const operationOptions = [
+      { value: 'new', label: 'New' },
       { value: 'inc', label: 'Increment' },
       { value: 'set', label: 'Set' },
     ];

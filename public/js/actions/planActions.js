@@ -84,10 +84,12 @@ export function savePlan(plan, action, callback = () => {}) {
   };
 }
 
-export function addUsagetInclude(usaget) {
+export function addUsagetInclude(usaget, pp_includes_name, pp_includes_external_id) {
   return {
     type: ADD_USAGET_INCLUDE,
-    usaget
+    usaget,
+    pp_includes_name,
+    pp_includes_external_id
   };
 }
 
@@ -166,7 +168,8 @@ function fetchPlan(id) {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(
       resp => {
-        let plan = _.values(resp.data[0].data.details)[0]
+        let plan = _.values(resp.data[0].data.details)[0];
+        console.log(plan);
         dispatch(gotPlan(plan));
         dispatch(finishProgressIndicator());
       }

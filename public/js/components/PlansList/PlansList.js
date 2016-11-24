@@ -115,6 +115,7 @@ class PlansList extends Component {
     { id: 'recurrence_charges', title: 'Recurring Charges', parser: this.recuringChargesParser },
     { id: 'recurrence_frequency', title: 'Billing Frequency', parser: this.billingFrequencyParser },
     { id: 'charging_mode', title: 'Charging Mode', parser: this.chargingModeParser },
+    { id: 'connection_type', display: false, showFilter: false }
   ])
 
   getTableFields = () => ([
@@ -125,7 +126,7 @@ class PlansList extends Component {
 
   render() {
     const { items } = this.props;
-    const baseFilter = { to: { $gt: moment().toISOString() } };
+    const baseFilter = { to: { $gt: moment().toISOString() }, 'connection_type': 'postpaid' };
     const filterFields = this.getTableFields();
     const tableFields = this.getFilterFields();
 
