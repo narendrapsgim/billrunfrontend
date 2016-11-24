@@ -97,6 +97,7 @@ class PlansList extends Component {
       { id: 'name', placeholder: 'Name' },
       { id: 'code', placeholder: 'Code' },
       { id: 'to', display: false, type: 'datetime', showFilter: false },
+      {id: "connection_type", display: false, showFilter: false},      
     ];
 
     const trialParser = (item) => {

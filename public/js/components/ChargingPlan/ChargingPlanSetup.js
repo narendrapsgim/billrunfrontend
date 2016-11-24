@@ -146,7 +146,7 @@ class ChargingPlanSetup extends React.Component {
                 />
               </Panel>
             </Tab>
-            <Tab title="Prepaid Bucket" eventKey={2}>
+            <Tab title="Prepaid Buckets" eventKey={2}>
               <Panel style={{  borderTop: 'none' }}>
                 <ChargingPlanIncludes
                     includes={ plan.get('include', Immutable.Map()) }

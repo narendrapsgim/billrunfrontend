@@ -10,6 +10,7 @@ const ChargingPlanDetails = (props) => {
   const { plan, action, onChangeField } = props;
 
   const operation_options = [
+    { value: 'new', label: 'New' },
     { value: 'inc', label: 'Increment' },
     { value: 'set', label: 'Set' }
   ];

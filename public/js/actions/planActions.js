@@ -166,7 +166,8 @@ function fetchPlan(id) {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(
       resp => {
-        let plan = _.values(resp.data[0].data.details)[0]
+        let plan = _.values(resp.data[0].data.details)[0];
+        console.log(plan);
         dispatch(gotPlan(plan));
         dispatch(finishProgressIndicator());
       }
