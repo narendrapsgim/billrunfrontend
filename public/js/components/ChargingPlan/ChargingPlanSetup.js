@@ -41,8 +41,7 @@ class ChargingPlanSetup extends React.Component {
       api: 'find',
       params: [
 	{ collection: 'prepaidincludes' },
-	{ query: JSON.stringify({}) },
-        { project: JSON.stringify({external_id: 1, name: 1}) }
+	{ query: JSON.stringify({}) }
       ]
     };
     this.props.dispatch(getList('prepaid_includes', params));
@@ -68,17 +67,20 @@ class ChargingPlanSetup extends React.Component {
     this.props.dispatch(onPlanFieldUpdate(path, value));
   };
 
-  onUpdatePeriodField = (type, id, value) => {
-    this.props.dispatch(onPlanFieldUpdate(['include', type, 'period', id], value));
-  };
-
-  onSelectUsaget = (usaget) => {
-    const { plan, dispatch } = this.props;
-    if (plan.getIn(['include', usaget])) {
-      dispatch(showWarning("Usage type already defined"));
+  onSelectPPInclude = (value) => {
+    const pp_include = this.props.prepaid_includes.find(pp => pp.get('name') === value);
+    const usaget = pp_include.get('charging_by_usaget');
+    if (this.props.plan.getIn(['include', usaget])) {
+      this.props.dispatch(showWarning("Prepaid bucket already defined"));
       return;
     }
-    dispatch(addUsagetInclude(usaget));
+    const pp_includes_name = pp_include.get('name');
+    const pp_includes_external_id = pp_include.get('external_id');
+    this.props.dispatch(addUsagetInclude(usaget, pp_includes_name, pp_includes_external_id));
+  };
+  
+  onUpdatePeriodField = (type, id, value) => {
+    this.props.dispatch(onPlanFieldUpdate(['include', type, 'period', id], value));
   };
 
   onUpdateIncludeField = (usaget, id, value) => {
@@ -150,7 +152,7 @@ class ChargingPlanSetup extends React.Component {
                 <ChargingPlanIncludes
                     includes={ plan.get('include', Immutable.Map()) }
                     prepaid_includes_options={ prepaid_includes_options }
-                    onSelectUsaget={ this.onSelectUsaget }
+                    onSelectPPInclude={ this.onSelectPPInclude }
                     onUpdatePeriodField={ this.onUpdatePeriodField }
                     onUpdateField={ this.onUpdateIncludeField }
                 />

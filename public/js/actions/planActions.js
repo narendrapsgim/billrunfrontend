@@ -84,10 +84,12 @@ export function savePlan(plan, action, callback = () => {}) {
   };
 }
 
-export function addUsagetInclude(usaget) {
+export function addUsagetInclude(usaget, pp_includes_name, pp_includes_external_id) {
   return {
     type: ADD_USAGET_INCLUDE,
-    usaget
+    usaget,
+    pp_includes_name,
+    pp_includes_external_id
   };
 }
 
