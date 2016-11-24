@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router';
@@ -19,12 +19,12 @@ class ServicesList extends Component {
   }
 
   static propTypes = {
-    items: React.PropTypes.instanceOf(Immutable.List),
-    router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired,
+    items: PropTypes.instanceOf(Immutable.List),
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
     }).isRequired,
-    getList: React.PropTypes.func.isRequired,
-    clearList: React.PropTypes.func.isRequired,
+    getList: PropTypes.func.isRequired,
+    clearList: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -89,21 +89,25 @@ class ServicesList extends Component {
     return cycle === unlimited ? 'Unlimited' : cycle;
   }
 
+
+  getFilterFields = () => ([
+    { id: 'description', placeholder: 'Title' },
+    { id: 'name', placeholder: 'Key' },
+    { id: 'to', showFilter: false, type: 'datetime' },
+  ])
+
+  getTableFields = () => ([
+    { id: 'description', title: 'Title', sort: true },
+    { id: 'name', title: 'Key', sort: true },
+    { title: 'Price', parser: this.priceParser, sort: true, id: 'price.0.price' },
+    { title: 'Cycles', parser: this.cyclesParser, sort: true, id: 'price.0.to' },
+  ])
+
   render() {
     const { items } = this.props;
     const baseFilter = { to: { $gt: moment().toISOString() } };
-    const fields = [
-      { id: 'name', placeholder: 'Name' },
-      { id: 'to', showFilter: false, type: 'datetime' },
-    ];
-    const tableFields = [
-      { id: 'name', title: 'Name', sort: true },
-      { title: 'Price', parser: this.priceParser, sort: true, id: 'price.0.price' },
-      { title: 'Cycles', parser: this.cyclesParser, sort: true, id: 'price.0.to' },
-      { id: 'description', title: 'Description', sort: true },
-      { id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date', sort: true },
-      { id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date', sort: true },
-    ];
+    const filterFields = this.getFilterFields();
+    const tableFields = this.getTableFields();
 
     return (
       <div>
@@ -117,8 +121,8 @@ class ServicesList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
-                <List items={items} fields={tableFields} editField="name" edit={true} onClickEdit={this.onClickItem} onSort={this.onSort} />
+                <Filter fields={filterFields} onFilter={this.onFilter} base={baseFilter} />
+                <List items={items} fields={tableFields} editField="description" edit={true} onClickEdit={this.onClickItem} onSort={this.onSort} />
               </div>
             </div>
           </div>

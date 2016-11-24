@@ -30,7 +30,7 @@ class ChargingPlanSetup extends React.Component {
       push: React.PropTypes.func.isRequired
     }).isRequired
   };
-  
+
   constructor(props) {
     super(props);
   }
@@ -64,15 +64,14 @@ class ChargingPlanSetup extends React.Component {
     this.props.dispatch(clearPlan());
   }
 
-  onChangeField = (e) => {
-    const { id, value } = e.target;
-    this.props.dispatch(onPlanFieldUpdate([id], value));
+  onChangeField = (path, value) => {
+    this.props.dispatch(onPlanFieldUpdate(path, value));
   };
 
   onUpdatePeriodField = (type, id, value) => {
     this.props.dispatch(onPlanFieldUpdate(['include', type, 'period', id], value));
   };
-  
+
   onSelectUsaget = (usaget) => {
     const { plan, dispatch } = this.props;
     if (plan.getIn(['include', usaget])) {
@@ -103,10 +102,10 @@ class ChargingPlanSetup extends React.Component {
     }
     this.props.dispatch(showDanger(errorMessage));
   }
-  
+
   savePlan = () => {
     const { plan, location, dispatch } = this.props;
-    const { action } = location.query;    
+    const { action } = location.query;
     dispatch(savePlan(plan, action, this.afterSave));
   }
 
@@ -118,11 +117,11 @@ class ChargingPlanSetup extends React.Component {
       this.props.router.push('/plans');
     }
   }
-  
+
   handleSave = () => {
     this.props.dispatch(savePlanRates(this.savePlan));
   };
-  
+
   render() {
     const { plan, prepaid_includes } = this.props;
     const { action } = this.props.location.query;
@@ -140,8 +139,8 @@ class ChargingPlanSetup extends React.Component {
             <Tab title="Details" eventKey={1}>
               <Panel style={{  borderTop: 'none' }}>
                 <ChargingPlanDetails
-                    plan={ plan }
-                    action={ action }
+                    item={ plan }
+                    mode={ action }
                     onChangeField={ this.onChangeField }
                 />
               </Panel>
@@ -168,7 +167,7 @@ class ChargingPlanSetup extends React.Component {
 		    bsStyle="default">
 	      Cancel
 	    </Button>
-	  </div>          
+	  </div>
         </Col>
       </div>
     );
