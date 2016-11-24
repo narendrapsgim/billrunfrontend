@@ -12,6 +12,7 @@ import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
 import Unlimitd from '../FieldTypes/UnlimitedInput';
 import Checkbox from '../FieldTypes/Checkbox';
+import Salutation from '../FieldTypes/Salutation';
 
 class Field extends React.Component {
   constructor(props) {
@@ -38,7 +39,7 @@ class Field extends React.Component {
           required = false,
           disabled = false,
           editable = true,
-          dispatch,          
+          dispatch,
           ...otherProps } = this.props;
 
     switch(fieldType) {
@@ -56,6 +57,8 @@ class Field extends React.Component {
         return (<Unlimitd onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} {...this.props} />);
       case 'checkbox':
         return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+      case 'salutation':
+        return (<Salutation {...this.props} />);
       default:
         return (<Text onChange={onChange} id={id} value={value} editable={editable} required={required} disabled={disabled} />);
     }

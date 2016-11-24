@@ -207,8 +207,9 @@ textarea {
 }
 /* Global page + table */
 .page-header {
-    border-bottom: none;
-    margin: 0;
+  border-bottom: none;
+  margin: 0;
+  color: #6f6f6f;
 }
 
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
@@ -246,11 +247,13 @@ textarea {
   text-align: center;
 }
 
-.pagination{
+.pagination {
   margin: 0;
   padding: 0;
   cursor: "pointer";
 }
-.pagination a{
-  padding: 0 10px!important;;
+.pagination span {
+  line-height: 30px;
+  font-size: 14px;
+  float: left;
 }
