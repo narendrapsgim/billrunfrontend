@@ -87,45 +87,48 @@ class PlansList extends Component {
     );
   }
 
+  trialParser = (item) => {
+    if (item.getIn(['price', 0, 'trial'])) {
+      return `${item.getIn(['price', 0, 'to'])} ${item.getIn(['recurrence', 'periodicity'])}`;
+    }
+    return '';
+  };
+
+  recuringChargesParser = (item) => {
+    const sub = item.getIn(['price', 0, 'trial']) ? 1 : 0;
+    const cycles = item.get('price', Immutable.List()).size - sub;
+    return `${cycles} cycles`;
+  };
+
+  billingFrequencyParser = (item) => {
+    const periodicity = item.getIn(['recurrence', 'periodicity'], '');
+    return (!periodicity) ? '' : `${capitalize(periodicity)}ly`;
+  };
+
+  chargingModeParser = item => (item.get('upfront') ? 'Upfront' : 'Arrears');
+
+  getFilterFields = () => ([
+    { id: 'description', title: 'Title', sort: true },
+    { id: 'name', title: 'Key', sort: true },
+    { id: 'code', title: 'External Code', sort: true },
+    { title: 'Trial', parser: this.trialParser },
+    { id: 'recurrence_charges', title: 'Recurring Charges', parser: this.recuringChargesParser },
+    { id: 'recurrence_frequency', title: 'Billing Frequency', parser: this.billingFrequencyParser },
+    { id: 'charging_mode', title: 'Charging Mode', parser: this.chargingModeParser },
+    { id: 'connection_type', display: false, showFilter: false }
+  ])
+
+  getTableFields = () => ([
+    { id: 'description', placeholder: 'Title' },
+    { id: 'name', placeholder: 'Key' },
+    { id: 'to', display: false, type: 'datetime', showFilter: false },
+  ])
+
   render() {
     const { items } = this.props;
-
-    const baseFilter = { to: { $gt: moment().toISOString() } };
-    const chargingModeParser = item => (item.get('upfront') ? 'Upfront' : 'Arrears');
-
-    const fields = [
-      { id: 'name', placeholder: 'Name' },
-      { id: 'code', placeholder: 'Code' },
-      { id: 'to', display: false, type: 'datetime', showFilter: false },
-    ];
-
-    const trialParser = (item) => {
-      if (item.getIn(['price', 0, 'trial'])) {
-        return `${item.getIn(['price', 0, 'to'])} ${item.getIn(['recurrence', 'periodicity'])}`;
-      }
-      return '';
-    };
-
-    const recuringChargesParser = (item) => {
-      const sub = item.getIn(['price', 0, 'trial']) ? 1 : 0;
-      const cycles = item.get('price', Immutable.List()).size - sub;
-      return `${cycles} cycles`;
-    };
-
-    const billingFrequencyParser = (item) => {
-      const periodicity = item.getIn(['recurrence', 'periodicity'], '');
-      return (!periodicity) ? '' : `${capitalize(periodicity)}ly`;
-    };
-
-    const tableFields = [
-      { id: 'name', title: 'Name', sort: true },
-      { id: 'code', title: 'Code', sort: true },
-      { id: 'description', title: 'Description', sort: true },
-      { title: 'Trial', parser: trialParser },
-      { id: 'recurrence_charges', title: 'Recurring Charges', parser: recuringChargesParser },
-      { id: 'recurrence_frequency', title: 'Billing Frequency', parser: billingFrequencyParser },
-      { id: 'charging_mode', title: 'Charging Mode', parser: chargingModeParser },
-    ];
+    const baseFilter = { to: { $gt: moment().toISOString() }, 'connection_type': 'postpaid' };
+    const filterFields = this.getTableFields();
+    const tableFields = this.getFilterFields();
 
     return (
       <div>
@@ -139,8 +142,8 @@ class PlansList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
-                <List items={items} fields={tableFields} onSort={this.onSort} editField="name" edit={true} onClickEdit={this.onClickItem} />
+                <Filter fields={filterFields} onFilter={this.onFilter} base={baseFilter} />
+                <List items={items} fields={tableFields} onSort={this.onSort} editField="description" edit={true} onClickEdit={this.onClickItem} />
               </div>
             </div>
             <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />

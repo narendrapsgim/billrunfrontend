@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { Panel } from 'react-bootstrap';
-import UsagetypeSelect from '../Plan/components/UsagetypeSelect';
+import Select from 'react-select';
 import ChargingPlanInclude from './ChargingPlanInclude';
 
 const ChargingPlanIncludes = (props) => {
@@ -10,10 +10,11 @@ const ChargingPlanIncludes = (props) => {
   
   return (
     <div className="ChargingPlanIncludes">
-      <Panel header={ <h3>Select usage type</h3> }>
-        <UsagetypeSelect
+      <Panel header={ <h3>Select prepaid bucket</h3> }>
+        <Select
             value=''
-            onChangeUsageType={ props.onSelectUsaget }
+            options={ prepaid_includes_options }
+            onChange={ props.onSelectPPInclude }
         />
       </Panel>
       <hr/>

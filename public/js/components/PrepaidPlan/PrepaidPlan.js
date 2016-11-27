@@ -27,9 +27,6 @@ import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
 import Thresholds from './Thresholds';
 
 class PrepaidPlan extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   componentDidMount() {
     const { planId, action } = this.props.location.query;
@@ -56,25 +53,28 @@ class PrepaidPlan extends Component {
       this.props.dispatch(setPageTitle(`Edit Prepaid Plan - ${plan.get('name')}`));
     }
   }
-  
+
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
   }
 
-  onChangePlanField = (e) => {
-    const { id, value } = e.currentTarget;
-    this.props.dispatch(onPlanFieldUpdate([id], value));
+	onChangePlanField = (path, value) => {
+		this.props.dispatch(onPlanFieldUpdate(path, value));
+  }
+
+  onChangePlanName = (value) => {
+    this.props.dispatch(onPlanFieldUpdate(['name'], value));
   };
-  
+
   onSelectBalance = (pp_include) => {
-    const { plan, dispatch } = this.props;    
+    const { plan, dispatch } = this.props;
     if (plan.getIn(['notifications_threshold', pp_include], List()).size) {
       dispatch(showWarning(`There are already notifications for selected prepaid bucket`));
       return;
-    }   
+    }
     dispatch(addBalanceNotifications(pp_include));
   };
-  
+
   onAddNotification = (threshold_id) => {
     this.props.dispatch(addNotification(threshold_id));
   };
@@ -103,7 +103,7 @@ class PrepaidPlan extends Component {
   onRemoveBlockProduct = (rate_key) => {
     this.props.dispatch(removeBlockProduct(rate_key));
   };
-  
+
   onChangeThreshold = (balance_id, threshold) => {
     this.props.dispatch(changeBalanceThreshold(balance_id, threshold));
   };
@@ -130,10 +130,10 @@ class PrepaidPlan extends Component {
     }
     this.props.dispatch(showDanger(errorMessage));
   }
-  
+
   savePlan = () => {
     const { plan, location, dispatch } = this.props;
-    const { action } = location.query;    
+    const { action } = location.query;
     dispatch(savePlan(plan, action, this.afterSave));
   }
 
@@ -145,7 +145,7 @@ class PrepaidPlan extends Component {
       this.props.router.push('/plans');
     }
   }
-  
+
   handleSave = () => {
     this.props.dispatch(savePlanRates(this.savePlan));
   };
@@ -153,7 +153,7 @@ class PrepaidPlan extends Component {
   handleCancel = () => {
     this.props.router.push('/prepaid_plans');
   };
-  
+
   render() {
     const { plan, pp_includes } = this.props;
     const { action } = this.props.location.query;
@@ -168,9 +168,11 @@ class PrepaidPlan extends Component {
 
 	    <Tab title="Details" eventKey={1}>
  	      <Panel style={ { borderTop: 'none' } }>
-		<PrepaidPlanDetails plan={ plan }
-				    action={ action }
-				    onChangeField={ this.onChangePlanField } />
+					<PrepaidPlanDetails
+						item={plan}
+						mode={action}
+						onChangePlanField={this.onChangePlanField}
+					/>
 	      </Panel>
 	    </Tab>
 
@@ -216,7 +218,7 @@ class PrepaidPlan extends Component {
           <div style={{ marginTop: 12 }}>
             <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
             <Button onClick={this.handleCancel} bsStyle="default">Cancel</Button>
-          </div>	  
+          </div>
 
 	</Col>
       </div>

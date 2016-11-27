@@ -25,6 +25,31 @@ textarea {
 .danger-red { color: #d9534f; }
 /* ~Global */
 
+/* Main/Top menu */
+.navbar-default .dropdown-menu {
+  background-color: #EEEEEE;
+}
+.navbar-default .dropdown-menu>li>a, .navbar-default .dropdown-menu>li>a:focus {
+  color: #008cba;
+}
+.navbar-default .dropdown-menu>li>a:hover,
+.navbar-default .dropdown-menu>.active>a,
+.navbar-default .dropdown-menu>.active>a:hover{
+  text-decoration: none;
+  background-color: #eeeeee;
+  font-weight: bold;
+}
+.navbar-brand>img {
+  display: inline-block;
+}
+.navbar-brand .brand-name {
+  color: #6f6f6f;
+  vertical-align: bottom;
+  margin-left: 10px;
+  line-height: 14px;
+}
+/* ~Main/Top menu */
+
 /* react-datepicker */
 .react-datepicker__close-icon::after{
   color: #6f6f6f!important;
@@ -182,8 +207,9 @@ textarea {
 }
 /* Global page + table */
 .page-header {
-    border-bottom: none;
-    margin: 0;
+  border-bottom: none;
+  margin: 0;
+  color: #6f6f6f;
 }
 
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
@@ -203,4 +229,31 @@ textarea {
 /* AdvancedFilter Date picker */
 .AdvancedFilter .react-datepicker__input-container{
   width: 100%
+}
+#page-wrapper{
+  margin-bottom: -30px;
+  padding-bottom: 40px;
+}
+#footer {
+  height: 30px;
+  padding: 5px 0;
+  margin-left: 250px;
+  background-color: #fff;
+  border: 1px solid #e7e7e7;
+}
+#footer p{
+  margin: 0;
+  color: #424242;
+  text-align: center;
+}
+
+.pagination {
+  margin: 0;
+  padding: 0;
+  cursor: "pointer";
+}
+.pagination span {
+  line-height: 30px;
+  font-size: 14px;
+  float: left;
 }

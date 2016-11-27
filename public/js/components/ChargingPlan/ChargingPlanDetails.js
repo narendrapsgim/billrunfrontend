@@ -1,103 +1,140 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import Immutable from 'immutable';
-
-import { Row, Form, Panel, Col, FormGroup, ControlLabel } from 'react-bootstrap';
+import React, { Component, PropTypes } from 'react';
 import Select from 'react-select';
+import Immutable from 'immutable';
+import { Form, FormGroup, ControlLabel, HelpBlock, Col } from 'react-bootstrap';
+import { PlanDescription } from '../../FieldDescriptions';
+import Help from '../Help';
 import Field from '../Field';
 
-const ChargingPlanDetails = (props) => {
-  const { plan, action, onChangeField } = props;
 
-  const operation_options = [
-    { value: 'inc', label: 'Increment' },
-    { value: 'set', label: 'Set' }
-  ];
+export default class ChargingPlanDetails extends Component {
 
-  const charging_type_options = [
-    { value: 'card', label: 'Card' },
-    { value: 'digital', label: 'Digital' }
-  ];
 
-  const onSelectOperation = (value) => {
-    const e = {target: {id: 'operation', value}};
-    props.onChangeField(e);
+  static propTypes = {
+    item: PropTypes.instanceOf(Immutable.Map).isRequired,
+    mode: PropTypes.string.isRequired,
+    onChangeField: PropTypes.func.isRequired,
+    errorMessages: PropTypes.object,
+  }
+
+  static defaultProps = {
+    errorMessages: {
+      name: {
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+      },
+    },
   };
 
-  const onSelectChargingType = (values) => {
-    const e = {target: {id: 'charging_type', value: values.split(',')}};
-    props.onChangeField(e);
-  };
-  
-  return (
-    <div className="ChargingPlanDetails">
-      <Row>
-        <Col lg={12}>
-          <Form>
-            <Panel>
-              <Row>
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <ControlLabel>Name</ControlLabel>
-                    <Field
-                        id="name"
-                        value={ plan.get('name', '') }
-                        required={ true }
-                        disabled={ action === "update" }
-                        onChange={ onChangeField }
-                    />
-                  </FormGroup>
-                </Col>
-                <Col lg={6} md={6}>
-		  <FormGroup>
-		    <ControlLabel>Code</ControlLabel>
-		    <Field id="code"
-			   value={ plan.get('code', '') }
-			   required={ false }
-			   onChange={ onChangeField }
-		    />
-		  </FormGroup>
-                </Col>
-              </Row>
-	      <Row>
-	        <Col lg={12} md={12}>
-		  <FormGroup>
-		    <ControlLabel>Description</ControlLabel>
-		    <Field id="description"
-			   value={ plan.get('description', '') }
-			   fieldType="textarea"
-			   onChange={ onChangeField }
-		    />
-		  </FormGroup>
-	        </Col>
-	      </Row>
-              <Row>
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <ControlLabel>Operation</ControlLabel>
-	            <Select
-                        id="operation"
-                        options={ operation_options }
-		        value={ plan.get('operation', 'inc') }
-		        onChange={ onSelectOperation }
-	            />
-                  </FormGroup>
-                </Col>
-                <Col lg={6} md={6}>
-                  <ControlLabel>Charging value</ControlLabel>
-                  <Field id="charging_value"
-			 value={ plan.get('charging_value', 0) }
-			 fieldType="number"
-			 onChange={ onChangeField }
-		  />                  
-                </Col>                
-              </Row>
-            </Panel>
-          </Form>
-        </Col>
-      </Row>
-    </div>
-  );
-};
+  state = {
+    errors: {
+      name: '',
+    },
+  }
 
-export default connect()(ChargingPlanDetails);
+  shouldComponentUpdate(nextProps, nextState) {
+    return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
+  }
+
+  componentDidMount() {
+    if (this.props.mode === 'new') {
+      this.setDefaultValues();
+    }
+  }
+
+  onChangeName = (e) => {
+    const { errorMessages: { name: { allowedCharacters } } } = this.props;
+    const { errors } = this.state;
+    const value = e.target.value.toUpperCase();
+    const newError = (!globalSetting.keyUppercaseRegex.test(value)) ? allowedCharacters : '';
+    this.setState({ errors: Object.assign({}, errors, { name: newError }) });
+    this.props.onChangeField(['name'], value);
+  }
+
+  onChangeDescription = (e) => {
+    const { value } = e.target;
+    this.props.onChangeField(['description'], value);
+  }
+
+  onChangeCode = (e) => {
+    const { value } = e.target;
+    this.props.onChangeField(['code'], value);
+  }
+
+  onChangeOperation = (value) => {
+    this.props.onChangeField(['operation'], value);
+  }
+
+  onChangeChargingValue = (e) => {
+    const { value } = e.target;
+    this.props.onChangeField(['charging_value'], value);
+  }
+
+  setDefaultValues = () => {
+    this.props.onChangeField(['operation'], 'inc');
+  }
+
+  render() {
+    const { errors } = this.state;
+    const { item, mode } = this.props;
+    const operationOptions = [
+      { value: 'new', label: 'New' },
+      { value: 'inc', label: 'Increment' },
+      { value: 'set', label: 'Set' },
+    ];
+
+    return (
+      <div className="PrepaidPlanDetails">
+        <Form horizontal>
+
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>
+              Title
+              <Help contents={PlanDescription.description} />
+            </Col>
+            <Col sm={8} lg={9}>
+              <Field value={item.get('description', '')} onChange={this.onChangeDescription} />
+            </Col>
+          </FormGroup>
+
+          {mode === 'new' &&
+            <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
+              <Col componentClass={ControlLabel} sm={3} lg={2}>
+                Key
+                <Help contents={PlanDescription.name} />
+              </Col>
+              <Col sm={8} lg={9}>
+                <Field value={item.get('name', '')} onChange={this.onChangeName} />
+                { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
+              </Col>
+            </FormGroup>
+          }
+
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>
+              External Code
+              <Help contents={PlanDescription.code} />
+            </Col>
+            <Col sm={8} lg={9}>
+              <Field onChange={this.onChangeCode} value={item.get('code', '')} />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>Operation</Col>
+            <Col sm={4}>
+              <Select options={operationOptions} value={item.get('operation', '')} onChange={this.onChangeOperation} />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>Charging value</Col>
+            <Col sm={4}>
+              <Field value={item.get('charging_value', 0)} fieldType="number" onChange={this.onChangeChargingValue} />
+            </Col>
+          </FormGroup>
+
+        </Form>
+      </div>
+    );
+  }
+}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button, HelpBlock } from 'react-bootstrap';
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
@@ -16,12 +16,27 @@ export default class Plan extends Component {
     onPlanCycleUpdate: React.PropTypes.func.isRequired,
     onPlanTariffAdd: React.PropTypes.func.isRequired,
     onPlanTariffRemove: React.PropTypes.func.isRequired,
+    errorMessages: React.PropTypes.object,
+  }
+
+  static defaultProps = {
+    errorMessages: {
+      name: {
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+      },
+    },
+  };
+
+  state = {
+    errors: {
+      name: '',
+    },
   }
 
   componentWillMount() {
     const { plan } = this.props;
-    const count = plan.get('price', Immutable.List()).size
-    if(count === 0){
+    const count = plan.get('price', Immutable.List()).size;
+    if (count === 0) {
       this.props.onPlanTariffAdd(false);
     }
   }
@@ -35,7 +50,11 @@ export default class Plan extends Component {
   }
 
   onChangePlanName = (e) => {
-    const { value } = e.target;
+    const { errorMessages: { name: { allowedCharacters } } } = this.props;
+    const { errors } = this.state;
+    const value = e.target.value.toUpperCase();
+    const newError = (!globalSetting.keyUppercaseRegex.test(value)) ? allowedCharacters : '';
+    this.setState({ errors: Object.assign({}, errors, { name: newError }) });
     this.props.onChangeFieldValue(['name'], value);
   }
 
@@ -66,40 +85,40 @@ export default class Plan extends Component {
 
   onChangeUpfront = (e) => {
     let value = e.target.value;
-    if(value === 'true' || value === 'TRUE'){
+    if (value === 'true' || value === 'TRUE') {
       value = true;
-    } else if(value === 'false' || value === 'FALSE'){
+    } else if (value === 'false' || value === 'FALSE') {
       value = false;
     }
     this.props.onChangeFieldValue(['upfront'], value);
   }
 
   getPeriodicityOptions = () => {
-    const periodicity_options = {'':'Select...', 'month': 'Monthly', 'year': 'Yearly'};
-    return Object.keys(periodicity_options).map( (key, i) =>
-      <option value={key} key={i}>{periodicity_options[key]}</option>
+    const periodicityOptions = { '': 'Select...', month: 'Monthly', year: 'Yearly' };
+    return Object.keys(periodicityOptions).map((key, i) =>
+      <option value={key} key={i}>{periodicityOptions[key]}</option>
     );
   }
 
   getAddPriceButton = (trial = false) => {
     const onclick = trial ? this.onPlanTrailTariffInit : this.onPlanTariffInit;
-    return ( <Button bsSize="xsmall" className="btn-primary" onClick={onclick} > <i className="fa fa-plus" />&nbsp;Add New </Button> );
+    return (<Button bsSize="xsmall" className="btn-primary" onClick={onclick} > <i className="fa fa-plus" />&nbsp;Add New </Button>);
   }
 
   getTrialPrice = () => {
     const { plan } = this.props;
-    const trial = (plan.getIn(['price', 0, 'trial']) == true) ? plan.getIn(['price',0]) : null;
-    if(trial){
-      return(
+    const trial = (plan.getIn(['price', 0, 'trial']) == true) ? plan.getIn(['price', 0]) : null;
+    if (trial) {
+      return (
         <PlanPrice
-            index={0}
-            count={plan.get('price', Immutable.List()).size}
-            item={trial}
-            isTrialExist={true}
-            onPlanPriceUpdate={this.onPlanPriceUpdate}
-            onPlanCycleUpdate={this.props.onPlanCycleUpdate}
-            onPlanTariffAdd={this.props.onPlanTariffAdd}
-            onPlanTariffRemove={this.props.onPlanTariffRemove}
+          index={0}
+          count={plan.get('price', Immutable.List()).size}
+          item={trial}
+          isTrialExist={true}
+          onPlanPriceUpdate={this.onPlanPriceUpdate}
+          onPlanCycleUpdate={this.props.onPlanCycleUpdate}
+          onPlanTariffAdd={this.props.onPlanTariffAdd}
+          onPlanTariffRemove={this.props.onPlanTariffRemove}
         />);
     }
     return this.getAddPriceButton(true);
@@ -107,21 +126,22 @@ export default class Plan extends Component {
 
   getPrices = () => {
     const { plan } = this.props;
-    const isTrialExist = (plan.getIn(['price', 0, 'trial']) == true) ? true : false;
+    const isTrialExist = (plan.getIn(['price', 0, 'trial']) === true || plan.getIn(['price', 0, 'trial']) === 'true');
     const count = plan.get('price', Immutable.List()).size;
     const prices = [];
 
-    plan.get('price', Immutable.List()).forEach( (price, i) => {
-      if (price.get('trial') !== true){
+    plan.get('price', Immutable.List()).forEach((price, i) => {
+      if (price.get('trial') !== true) {
         prices.push(
-          <PlanPrice key={i}
-              index={i}
-              count={count}
-              item={price}
-              isTrialExist={isTrialExist}
-              onPlanPriceUpdate={this.onPlanPriceUpdate}
-              onPlanCycleUpdate={this.props.onPlanCycleUpdate}
-              onPlanTariffRemove={this.props.onPlanTariffRemove}
+          <PlanPrice
+            key={i}
+            index={i}
+            count={count}
+            item={price}
+            isTrialExist={isTrialExist}
+            onPlanPriceUpdate={this.onPlanPriceUpdate}
+            onPlanCycleUpdate={this.props.onPlanCycleUpdate}
+            onPlanTariffRemove={this.props.onPlanTariffRemove}
           />
         );
       }
@@ -130,40 +150,41 @@ export default class Plan extends Component {
   }
 
   render() {
-    let { plan, mode } = this.props;
+    const { errors } = this.state;
+    const { plan, mode } = this.props;
     const periodicity = plan.getIn(['recurrence', 'periodicity']) || '';
     const upfront = typeof plan.get('upfront') !== 'boolean' ? '' : plan.get('upfront');
 
     return (
       <Row>
         <Col lg={12}>
-          <Form>
+          <Form horizontal>
             <Panel>
-              <Row>
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <ControlLabel>Name <Help contents={PlanDescription.name} /></ControlLabel>
-                    <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} disabled={mode === 'update'}/>
-                  </FormGroup>
-                </Col>
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <ControlLabel>Code</ControlLabel>
-                    <Field onChange={this.onChangePlanCode} value={plan.get('code', '')}/>
-                  </FormGroup>
-                </Col>
-              </Row>
 
-              <Row>
-                <Col lg={12} md={12}>
-                  <FormGroup>
-                    <ControlLabel>Description</ControlLabel>
-                    <Field fieldType="textarea" value={plan.get('description', '')} onChange={this.onChangePlanDescription} />
-                  </FormGroup>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Title<Help contents={PlanDescription.description} /></Col>
+                <Col sm={8} lg={9}>
+                  <Field value={plan.get('description', '')} onChange={this.onChangePlanDescription} />
                 </Col>
-              </Row>
+              </FormGroup>
 
-              <Row>
+              {mode === 'new' &&
+                <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>Key <Help contents={PlanDescription.name} /></Col>
+                  <Col sm={8} lg={9}>
+                    <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} />
+                    { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
+                  </Col>
+                </FormGroup>
+              }
+
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>External Code<Help contents={PlanDescription.code} /></Col>
+                <Col sm={8} lg={9}>
+                  <Field onChange={this.onChangePlanCode} value={plan.get('code', '')} />
+                </Col>
+              </FormGroup>
+
 		{/* <Col lg={4} md={4}>
                     <FormGroup>
                     <ControlLabel>Recurrence</ControlLabel>
@@ -171,25 +192,27 @@ export default class Plan extends Component {
                     </FormGroup>
 		    </Col>
 		  */}
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <ControlLabel>Billing Frequency</ControlLabel>
-                    <FormControl componentClass="select" placeholder="select" value={periodicity} onChange={this.onChangePeriodicity}>
-                      { this.getPeriodicityOptions() }
-                    </FormControl>
-                  </FormGroup>
+
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Billing Frequency</Col>
+                <Col sm={4}>
+                  <FormControl componentClass="select" placeholder="select" value={periodicity} onChange={this.onChangePeriodicity}>
+                    { this.getPeriodicityOptions() }
+                  </FormControl>
                 </Col>
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <ControlLabel>Charging Mode</ControlLabel>
-                    <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
-                      <option value="">Select...</option>
-                      <option value={true}>Upfront</option>
-                      <option value={false}>Arrears</option>
-                    </FormControl>
-                  </FormGroup>
+              </FormGroup>
+
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Charging Mode</Col>
+                <Col sm={4}>
+                  <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
+                    <option value="">Select...</option>
+                    <option value={true}>Upfront</option>
+                    <option value={false}>Arrears</option>
+                  </FormControl>
                 </Col>
-              </Row>
+              </FormGroup>
+
             </Panel>
 
             <Panel header={<h3>Trial Period</h3>}>

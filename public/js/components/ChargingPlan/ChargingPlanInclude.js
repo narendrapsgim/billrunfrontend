@@ -13,10 +13,6 @@ const ChargingPlanInclude = (props) => {
     props.onUpdateField(type, id, value);
   };
 
-  const onSelectPPInclude = (value) => {
-    props.onUpdateField(type, 'pp_includes_name', value);
-  };
-
   const onUpdatePeriodField = (e) => {
     const { id, value } = e.target;
     props.onUpdatePeriodField(type, id, value);
@@ -32,7 +28,7 @@ const ChargingPlanInclude = (props) => {
   ];
   
   const header = (
-    <h3>{ type }</h3>
+    <h3>{ include.get('pp_includes_name', '') }</h3>
   );
   
   return (
@@ -49,18 +45,6 @@ const ChargingPlanInclude = (props) => {
                   value={ include.get('usagev', 0) }
                   onChange={ onUpdateField }
                   fieldType="number"
-              />
-            </Col>
-          </FormGroup>
-          <FormGroup>
-            <Col componentClass={ ControlLabel } md={2}>
-              Prepaid Bucket
-            </Col>
-            <Col md={9}>
-              <Select
-                  options={ prepaid_includes_options }
-                  value={ include.get('pp_includes_name', '') }
-                  onChange={ onSelectPPInclude }
               />
             </Col>
           </FormGroup>

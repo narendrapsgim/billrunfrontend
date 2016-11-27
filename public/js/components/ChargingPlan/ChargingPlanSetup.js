@@ -30,7 +30,7 @@ class ChargingPlanSetup extends React.Component {
       push: React.PropTypes.func.isRequired
     }).isRequired
   };
-  
+
   constructor(props) {
     super(props);
   }
@@ -41,8 +41,7 @@ class ChargingPlanSetup extends React.Component {
       api: 'find',
       params: [
 	{ collection: 'prepaidincludes' },
-	{ query: JSON.stringify({}) },
-        { project: JSON.stringify({external_id: 1, name: 1}) }
+	{ query: JSON.stringify({}) }
       ]
     };
     this.props.dispatch(getList('prepaid_includes', params));
@@ -64,22 +63,24 @@ class ChargingPlanSetup extends React.Component {
     this.props.dispatch(clearPlan());
   }
 
-  onChangeField = (e) => {
-    const { id, value } = e.target;
-    this.props.dispatch(onPlanFieldUpdate([id], value));
+  onChangeField = (path, value) => {
+    this.props.dispatch(onPlanFieldUpdate(path, value));
   };
 
-  onUpdatePeriodField = (type, id, value) => {
-    this.props.dispatch(onPlanFieldUpdate(['include', type, 'period', id], value));
-  };
-  
-  onSelectUsaget = (usaget) => {
-    const { plan, dispatch } = this.props;
-    if (plan.getIn(['include', usaget])) {
-      dispatch(showWarning("Usage type already defined"));
+  onSelectPPInclude = (value) => {
+    const pp_include = this.props.prepaid_includes.find(pp => pp.get('name') === value);
+    const usaget = pp_include.get('charging_by_usaget');
+    if (this.props.plan.getIn(['include', usaget])) {
+      this.props.dispatch(showWarning("Prepaid bucket already defined"));
       return;
     }
-    dispatch(addUsagetInclude(usaget));
+    const pp_includes_name = pp_include.get('name');
+    const pp_includes_external_id = pp_include.get('external_id');
+    this.props.dispatch(addUsagetInclude(usaget, pp_includes_name, pp_includes_external_id));
+  };
+  
+  onUpdatePeriodField = (type, id, value) => {
+    this.props.dispatch(onPlanFieldUpdate(['include', type, 'period', id], value));
   };
 
   onUpdateIncludeField = (usaget, id, value) => {
@@ -103,10 +104,10 @@ class ChargingPlanSetup extends React.Component {
     }
     this.props.dispatch(showDanger(errorMessage));
   }
-  
+
   savePlan = () => {
     const { plan, location, dispatch } = this.props;
-    const { action } = location.query;    
+    const { action } = location.query;
     dispatch(savePlan(plan, action, this.afterSave));
   }
 
@@ -118,11 +119,11 @@ class ChargingPlanSetup extends React.Component {
       this.props.router.push('/plans');
     }
   }
-  
+
   handleSave = () => {
     this.props.dispatch(savePlanRates(this.savePlan));
   };
-  
+
   render() {
     const { plan, prepaid_includes } = this.props;
     const { action } = this.props.location.query;
@@ -140,18 +141,18 @@ class ChargingPlanSetup extends React.Component {
             <Tab title="Details" eventKey={1}>
               <Panel style={{  borderTop: 'none' }}>
                 <ChargingPlanDetails
-                    plan={ plan }
-                    action={ action }
+                    item={ plan }
+                    mode={ action }
                     onChangeField={ this.onChangeField }
                 />
               </Panel>
             </Tab>
-            <Tab title="Prepaid Bucket" eventKey={2}>
+            <Tab title="Prepaid Buckets" eventKey={2}>
               <Panel style={{  borderTop: 'none' }}>
                 <ChargingPlanIncludes
                     includes={ plan.get('include', Immutable.Map()) }
                     prepaid_includes_options={ prepaid_includes_options }
-                    onSelectUsaget={ this.onSelectUsaget }
+                    onSelectPPInclude={ this.onSelectPPInclude }
                     onUpdatePeriodField={ this.onUpdatePeriodField }
                     onUpdateField={ this.onUpdateIncludeField }
                 />
@@ -168,7 +169,7 @@ class ChargingPlanSetup extends React.Component {
 		    bsStyle="default">
 	      Cancel
 	    </Button>
-	  </div>          
+	  </div>
         </Col>
       </div>
     );
