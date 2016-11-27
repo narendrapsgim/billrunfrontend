@@ -25,6 +25,7 @@ export const MOVE_CSV_FIELD_UP = 'MOVE_CSV_FIELD_UP';
 export const MOVE_CSV_FIELD_DOWN = 'MOVE_CSV_FIELD_DOWN';
 export const CHANGE_CSV_FIELD = 'CHANGE_CSV_FIELD';
 export const UNSET_FIELD = 'UNSET_FIELD';
+export const SET_PARSER_SETTING = 'SET_PARSER_SETTING';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
@@ -462,5 +463,13 @@ export function unsetField(field_path = []) {
   return {
     type: UNSET_FIELD,
     path
+  };
+}
+
+export function setParserSetting(name, value) {
+  return {
+    type: SET_PARSER_SETTING,
+    name,
+    value
   };
 }

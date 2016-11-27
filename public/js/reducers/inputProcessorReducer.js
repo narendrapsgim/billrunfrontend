@@ -2,6 +2,7 @@ import Immutable from 'immutable';
 import _ from 'lodash';
 
 import { SET_NAME,
+         SET_PARSER_SETTING,
          SET_DELIMITER_TYPE,
          GOT_PROCESSOR_SETTINGS,
          SET_FIELDS,
@@ -148,6 +149,9 @@ export default function (state = defaultState, action) {
 
     case UNSET_FIELD:
       return state.deleteIn(action.path);
+
+    case SET_PARSER_SETTING:
+      return state.setIn(['parser', action.name], action.value);
       
     default:
       return state;

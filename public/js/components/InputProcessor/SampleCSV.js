@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import Field from '../Field';
 import SelectDelimiter from './SampleCSV/SelectDelimiter';
 import SelectCSV from './SampleCSV/SelectCSV';
+import SelectJSON from './SampleCSV/SelectJSON';
 import CSVFields from './SampleCSV/CSVFields';
 
 export default class SampleCSV extends Component {
@@ -22,10 +23,13 @@ export default class SampleCSV extends Component {
   
   render() {
     let { settings,
+          type,
+          format,
           onChangeName,
           onSetDelimiterType,
           onChangeDelimiter,
           onSelectSampleCSV,
+          onSelectJSON,
           onSetFieldWidth,
           onRemoveField,
           onMoveFieldUp,
@@ -33,11 +37,12 @@ export default class SampleCSV extends Component {
           onChangeCSVField,
           onAddField } = this.props;
 
-    const selectDelimiterHTML = (
-      <SelectDelimiter settings={settings}
-                       onSetDelimiterType={onSetDelimiterType}
-                       onChangeDelimiter={onChangeDelimiter} />
-    );
+    const selectDelimiterHTML =
+      type === 'api'
+      ? (null)
+      : (<SelectDelimiter settings={settings}
+                          onSetDelimiterType={onSetDelimiterType}
+                          onChangeDelimiter={onChangeDelimiter} />);
 
     const fieldsHTML = (<CSVFields onMoveFieldUp={onMoveFieldUp} onMoveFieldDown={onMoveFieldDown} onChangeCSVField={onChangeCSVField} onRemoveField={onRemoveField} settings={settings} onSetFieldWidth={onSetFieldWidth} />);
 
@@ -81,13 +86,10 @@ export default class SampleCSV extends Component {
       </div>
     );
 
-    const selectCSVHTML =  (
-      <div>
-        <SelectCSV onSelectSampleCSV={onSelectSampleCSV}
-                   settings={settings} />
-        { setFieldsHTML }
-      </div>
-    );
+    const selectCSVHTML =
+      type === "api"
+      ? (<div><SelectJSON onSelectJSON={ onSelectJSON } settings={ settings } /></div>)
+      : (<div><SelectCSV onSelectSampleCSV={onSelectSampleCSV} settings={settings} /></div>);
 
     return (
       <form className="InputProcessor form-horizontal">
@@ -106,6 +108,7 @@ export default class SampleCSV extends Component {
         </div>
         { selectDelimiterHTML }
         { selectCSVHTML }
+        { setFieldsHTML }        
       </form>
     );
   }

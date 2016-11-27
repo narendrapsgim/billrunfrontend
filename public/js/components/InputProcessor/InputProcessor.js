@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import _ from 'lodash';
 
-import { setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField } from '../../actions/inputProcessorActions';
+import { setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showWarning, showDanger } from '../../actions/alertsActions';
 
@@ -66,10 +66,14 @@ class InputProcessor extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const { file_type, action, template } = this.props.location.query;
+    const { file_type, action, template, type, format } = this.props.location.query;
     if (action !== "new") dispatch(getProcessorSettings(file_type));
     else if (template) dispatch(setInputProcessorTemplate(Templates[template]));
     dispatch(getSettings(["usage_types"]));
+    if (action === 'new' && (type === 'api' && format === 'json')) {
+      dispatch(setParserSetting('type', 'realtime'));
+      dispatch(setDelimiterType('json'));
+    }    
   }
   
   onChangeName(e) {
@@ -84,6 +88,31 @@ class InputProcessor extends Component {
     this.props.dispatch(setDelimiter(e.target.value));
   }
 
+  buildJSONFields = (field, obj) => {
+    if (typeof obj[field] === "object" && !Array.isArray(obj[field])) {
+      const nested = Object.keys(obj[field]).map(key => this.buildJSONFields(key, obj[field]));
+      return nested.map(n => `${field}.${n}`);
+    }
+    return field;
+  };
+
+  onSelectJSON = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = (evt => {
+      if (evt.target.readyState === FileReader.DONE) {
+        const json = JSON.parse(evt.target.result);
+        const fields =
+          Object.keys(json)
+                .map(key =>
+                  this.buildJSONFields(key, json));
+        this.props.dispatch(setFields(_.flattenDeep(fields)));
+      }
+    });
+    const blob = file.slice(0, file.size - 1);
+    reader.readAsText(blob);
+  };
+  
   onSelectSampleCSV(e) {
     let file = e.target.files[0];
     let reader = new FileReader();
@@ -253,15 +282,15 @@ class InputProcessor extends Component {
   render() {
     let { stepIndex } = this.state;
     const { settings, usage_types } = this.props;
+    const { action, type, format } = this.props.location.query;
 
     const steps = [
-      (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} onRemoveAllFields={this.onRemoveAllFields} settings={settings}  onMoveFieldUp={this.onMoveFieldUp} onMoveFieldDown={this.onMoveFieldDown} onChangeCSVField={this.onChangeCSVField} />),
+      (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} onRemoveAllFields={this.onRemoveAllFields} settings={settings}  onMoveFieldUp={this.onMoveFieldUp} onMoveFieldDown={this.onMoveFieldDown} onChangeCSVField={this.onChangeCSVField} type={type} format={format} onSelectJSON={ this.onSelectJSON } />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} onSetStaticUsaget={this.onSetStaticUsaget} setUsagetType={this.setUsagetType} settings={settings} usageTypes={usage_types}  unsetField={this.unsetField} />),
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} />),
       (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
     ];
 
-    const { action } = this.props.location.query;
     const title = action === 'new' ? "New input processor" : `Edit input processor - ${settings.get('file_type')}`;
     
     return (
