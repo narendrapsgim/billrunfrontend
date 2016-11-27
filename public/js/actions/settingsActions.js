@@ -116,6 +116,9 @@ export function saveSettings(categories = []) {
   }
   return (dispatch, getState) => {
     const { settings } = getState();
+    categories.map(cat => {
+      console.log(settings.get(cat).toJS());
+    });
     return dispatch(saveSettingsToDB(categories, settings));
   };
 }
