@@ -2,6 +2,7 @@ import Immutable from 'immutable';
 import { UPDATE_SETTING,
          REMOVE_SETTING_FIELD,
          GOT_SETTINGS,
+    PUSH_TO_SETTING,
 	 ADD_PAYMENT_GATEWAY,
 	 REMOVE_PAYMENT_GATEWAY,
 	 UPDATE_PAYMENT_GATEWAY } from '../actions/settingsActions';
@@ -32,6 +33,18 @@ export default function (state = defaultState, action) {
         return state.setIn([category, ...name], value);
       }
       return state.setIn([category, name], value);
+
+    case PUSH_TO_SETTING: {
+      let path;
+      if (!action.path) {
+        path = [category];
+      } else if (action.path && Array.isArray(action.path)) {
+        path = [category, ...action.path];
+      } else {
+        path = [category, action.path];
+      }
+      return state.updateIn(path, Immutable.List(), list => list.push(action.value));
+    }
 
     case ADD_USAGET_MAPPING:
       const usaget_mapping = state.get('unit_types');
@@ -64,7 +77,7 @@ export default function (state = defaultState, action) {
         return state.deleteIn([category, ...name]);
       }
       return state.deleteIn([category, name]);
-      
+
     default:
       return state;
   }
