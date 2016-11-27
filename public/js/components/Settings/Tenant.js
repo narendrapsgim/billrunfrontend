@@ -20,7 +20,7 @@ export default class Tenant extends Component {
     
     reader.onload = (e) => {
       const formData = new FormData();
-      formData.append('query', JSON.stringify({'filename': e.currentTarget.result}));
+      formData.append('query', JSON.stringify({'filename': e.target.result}));
       formData.append('action', 'save');
       fetch( url, {
         method: 'post',
@@ -36,35 +36,36 @@ export default class Tenant extends Component {
           console.log( 'Request failed', error );
         });
     };
-    reader.readAsText( file );
+    reader.readAsArrayBuffer( file );
   }
 
-  shitFunction() {
-    const formData = new FormData();
-    formData.append('action', 'save')
-    formData.append('query', JSON.stringify({filename: e.target.files[0].name}));
-    const query = {
+  uploadLogoForRealz = (e) => {
+    const body = new FormData();
+    const filename = e.target.files[0];
+    console.log(filename);
+    body.append('query', filename);
+    body.append('action', 'save');
+    const url = "http://billrun/api/logo";
+    const query = [{
       api: "logo",
       options: {
         method: "POST",
-        body: formData
-      },
-    };
-
+        headers: {
+          "Content-Type": filename.contentType
+        },
+        body
+      }
+    }];
     apiBillRun(query).then(
       success => {
-        console.log("success", success);
+        console.log("SUCCESS", success);
       },
       failure => {
-        console.log("failure", failure);
+        console.log("FAILURE", failure);
       }
-    ).catch(
-      error => {
-        console.log("!CATCH!", error);
-      }
-    );
+    ).catch(error => console.log("CATCH", error));
   };
-
+  
   render() {
     const { data } = this.props;
 
@@ -139,7 +140,7 @@ export default class Tenant extends Component {
 	      <Col sm={6}>
 		<FormControl type="file"
 			     name="logo"
-			     onChange={this.onSelectLogo}
+			     onChange={this.uploadLogoForRealz}
 			     value={data.get('logo', '')} />
 	      </Col>
 	    </FormGroup>
