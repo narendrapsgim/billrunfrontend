@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 const SelectJSON = (props) => (
   <div className="form-group">
@@ -18,4 +19,4 @@ const SelectJSON = (props) => (
   </div>    
 );
 
-export default SelectJSON;
+export default connect()(SelectJSON);

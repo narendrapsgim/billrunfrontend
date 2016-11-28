@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import { SET_NAME,
          SET_PARSER_SETTING,
+         SET_PROCESSOR_TYPE,         
          SET_DELIMITER_TYPE,
          GOT_PROCESSOR_SETTINGS,
          SET_FIELDS,
@@ -51,10 +52,10 @@ let defaultState = Immutable.fromJS({
     }
   ],
   rate_calculators: {},
-  receiver: {
-    passive: false,
-    delete_received: false
-  }
+  /* receiver: {
+   *   passive: false,
+   *   delete_received: false
+   * }*/
 });
 
 export default function (state = defaultState, action) {
@@ -67,6 +68,9 @@ export default function (state = defaultState, action) {
     case SET_NAME:
       return state.set('file_type', action.file_type);
 
+    case SET_PROCESSOR_TYPE:
+      return state.set('type', action.processor_type);
+      
     case SET_DELIMITER_TYPE:
       return state.set('delimiter_type', action.delimiter_type);
       

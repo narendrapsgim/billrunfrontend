@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import _ from 'lodash';
 
-import { setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField } from '../../actions/inputProcessorActions';
+import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showWarning, showDanger } from '../../actions/alertsActions';
 
@@ -14,6 +14,7 @@ import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
 import CalculatorMapping from './CalculatorMapping';
 import Receiver from './Receiver';
+import APIDetails from './APIDetails';
 
 import {
   Step,
@@ -73,7 +74,12 @@ class InputProcessor extends Component {
     if (action === 'new' && (type === 'api' && format === 'json')) {
       dispatch(setParserSetting('type', 'realtime'));
       dispatch(setDelimiterType('json'));
+      dispatch(setProcessorType('realtime'));
     }    
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(clearInputProcessor());
   }
   
   onChangeName(e) {
@@ -287,9 +293,13 @@ class InputProcessor extends Component {
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} onRemoveAllFields={this.onRemoveAllFields} settings={settings}  onMoveFieldUp={this.onMoveFieldUp} onMoveFieldDown={this.onMoveFieldDown} onChangeCSVField={this.onChangeCSVField} type={type} format={format} onSelectJSON={ this.onSelectJSON } />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} onSetStaticUsaget={this.onSetStaticUsaget} setUsagetType={this.setUsagetType} settings={settings} usageTypes={usage_types}  unsetField={this.unsetField} />),
-      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} />),
-      (<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />)
+      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} />)
     ];
+    if (type === 'api') {
+      steps.push((<APIDetails />));
+    } else {
+      steps.push((<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />));
+    }
 
     const title = action === 'new' ? "New input processor" : `Edit input processor - ${settings.get('file_type')}`;
     
@@ -313,7 +323,11 @@ class InputProcessor extends Component {
                     <StepLabel>Calculator Mapping</StepLabel>
                   </Step>
                   <Step>
-                    <StepLabel>Receiver</StepLabel>
+                    {
+                      type === "api"
+                      ? (<StepLabel>API Details</StepLabel>)
+                      : (<StepLabel>Receiver</StepLabel>)
+                    }
                   </Step>
                 </Stepper>
                 <div className="contents bordered-container">

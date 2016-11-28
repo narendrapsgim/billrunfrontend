@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 /* COMPONENTS */
 import Field from '../Field';
@@ -7,7 +8,7 @@ import SelectCSV from './SampleCSV/SelectCSV';
 import SelectJSON from './SampleCSV/SelectJSON';
 import CSVFields from './SampleCSV/CSVFields';
 
-export default class SampleCSV extends Component {
+class SampleCSV extends Component {
   constructor(props) {
     super(props);
 
@@ -113,3 +114,5 @@ export default class SampleCSV extends Component {
     );
   }
 }
+
+export default connect()(SampleCSV);

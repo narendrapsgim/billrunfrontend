@@ -26,6 +26,7 @@ export const MOVE_CSV_FIELD_DOWN = 'MOVE_CSV_FIELD_DOWN';
 export const CHANGE_CSV_FIELD = 'CHANGE_CSV_FIELD';
 export const UNSET_FIELD = 'UNSET_FIELD';
 export const SET_PARSER_SETTING = 'SET_PARSER_SETTING';
+export const SET_PROCESSOR_TYPE = 'SET_PROCESSOR_TYPE';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
@@ -53,8 +54,10 @@ const convert = (settings) => {
     field_widths,
     customer_identification_fields,
     rate_calculators,
-    receiver: connections
   };
+  if (settings.type !== 'realtime') {
+    ret.receiver = connections;
+  }
   if (processor) {
     let usaget_mapping;
     if (usaget_type === "dynamic") {
@@ -141,6 +144,13 @@ export function setDelimiterType(delimiter_type) {
   return {
     type: SET_DELIMITER_TYPE,
     delimiter_type
+  };
+}
+
+export function setProcessorType(processor_type) {
+  return {
+    type: SET_PROCESSOR_TYPE,
+    processor_type
   };
 }
 
@@ -291,6 +301,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
   
   const settings = {
     "file_type": state.get('file_type'),
+    "type": state.get('type'),
     "parser": {
       "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
@@ -322,7 +333,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
   if (rate_calculators) {
     settings.rate_calculators = rate_calculators.toJS();
   }
-  if (receiver) {
+  if (state.get('type') !== 'realtime' && receiver) {
     settings.receiver = {
       "type": "ftp",
       "connections": [
@@ -333,9 +344,9 @@ export function saveInputProcessorSettings(state, callback, part=false) {
 
   let settingsToSave;
   if (part === "customer_identification_fields") {
-    settingsToSave = {file_type: state.get('file_type'), [part]: {...settings[part]}, rate_calculators: settings.rate_calculators};
+    settingsToSave = {file_type: state.get('file_type'), type: state.get('type'), [part]: {...settings[part]}, rate_calculators: settings.rate_calculators};
   } else {
-    settingsToSave = part ? {file_type: state.get('file_type'), [part]: {...settings[part]}} : settings;
+    settingsToSave = part ? {file_type: state.get('file_type'), type: state.get('type'), [part]: {...settings[part]}} : settings;
   }
   const query = {
     api: "settings",
