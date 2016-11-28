@@ -51,7 +51,7 @@ export default class Tenant extends Component {
       options: {
         method: "POST",
         headers: {
-          "Content-Type": filename.contentType
+          "Content-Type": filename.type
         },
         body
       }
