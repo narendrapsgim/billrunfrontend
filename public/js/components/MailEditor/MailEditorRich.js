@@ -36,6 +36,14 @@ class MailEditorRich extends React.Component {
     this.initEditor();
   }
 
+  componentWillUnmount() {
+    const { editorName } = this.props;
+    const editor = CKEDITOR && CKEDITOR.instances[editorName];
+    if (editor) {
+      editor.destroy(true);
+    }
+  }
+
 
   toggleEditor = (editor, editorName, configPath) => {
     const { fields, editorHeight } = this.props;

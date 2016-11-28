@@ -1,61 +1,47 @@
-export const SET_COLLECTION_NAME = 'SET_COLLECTION_NAME';
-export const SET_COLLECTION_DAYS = 'SET_COLLECTION_DAYS';
-export const SET_COLLECTION_ACTIVE = 'SET_COLLECTION_ACTIVE';
-export const SET_COLLECTION_MAIL_SUBJECT = 'SET_COLLECTION_MAIL_SUBJECT';
-export const SET_COLLECTION_MAIL_BODY = 'SET_COLLECTION_MAIL_BODY';
+import { saveSettings, UPDATE_SETTING, REMOVE_SETTING_FIELD, PUSH_TO_SETTING } from './settingsActions';
+
+export const UPDATE_COLLECTION = 'UPDATE_COLLECTION';
 export const CLEAR_COLLECTION = 'CLEAR_COLLECTION';
-export const SET_DUMNMY_COLLECTION = 'SET_DUMNMY_COLLECTION';
-export const SET_DUMNMY_COLLECTION_2 = 'SET_DUMNMY_COLLECTION_2';
 
-export function setCollectionName(name) {
+export function saveCollection() {
+  return saveSettings(['collection']);
+}
+
+export function updateCollection(path, value) {
   return {
-    type: SET_COLLECTION_NAME,
-    name
+    type: UPDATE_SETTING,
+    category: 'collection',
+    name: path,
+    value,
   };
 }
 
-export function setCollectionDays(days) {
+export function removeCollection(index) {
   return {
-    type: SET_COLLECTION_DAYS,
-    days
+    type: REMOVE_SETTING_FIELD,
+    category: 'collection',
+    name: index,
   };
 }
 
-export function setCollectionActive(active) {
+export function updateNewCollection(path, value) {
   return {
-    type: SET_COLLECTION_ACTIVE,
-    active
+    type: UPDATE_COLLECTION,
+    path,
+    value,
   };
 }
 
-export function setCollectionMailSubject(subject) {
+export function clearNewCollection() {
   return {
-    type: SET_COLLECTION_MAIL_SUBJECT,
-    subject
+    type: CLEAR_COLLECTION,
   };
 }
 
-export function setCollectionMailBody(body) {
+export function pushNewCollection(value) {
   return {
-    type: SET_COLLECTION_MAIL_BODY,
-    body
-  };
-}
-
-export function clearCollection() {
-  return {
-    type: CLEAR_COLLECTION
-  };
-}
-
-export function setDumnmyCollection() {
-  return {
-    type: SET_DUMNMY_COLLECTION
-  };
-}
-
-export function setDumnmyCollection2() {
-  return {
-    type: SET_DUMNMY_COLLECTION_2
+    type: PUSH_TO_SETTING,
+    category: 'collection',
+    value,
   };
 }

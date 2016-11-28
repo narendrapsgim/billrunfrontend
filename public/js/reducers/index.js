@@ -34,5 +34,5 @@ export default combineReducers({
   service,
   collections,
   guiState,
-  pager
+  pager,
 });
