@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { ucFirst } from 'change-case';
 
-import { getSettings, updateSetting, removeSettingField } from '../../actions/settingsActions';
+import { getSettings, updateSetting, removeSettingField, saveSettings } from '../../actions/settingsActions';
 
 import { Tabs, Tab, Panel, Row, Col } from 'react-bootstrap';
 import CustomField from './CustomField';
@@ -42,7 +42,7 @@ class CustomFields extends Component {
   };
 
   onClickSave = () => {
-    console.log("saving ", this.props.account, this.props.subscriber);
+    this.props.dispatch(saveSettings('subscribers'));
   };
   
   renderFieldsTab = (entity, key) => {
