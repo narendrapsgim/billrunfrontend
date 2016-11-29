@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Panel, Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
+import $ from 'jquery';
 
 import { apiBillRun } from '../../common/Api';
 
@@ -13,59 +14,21 @@ export default class Tenant extends Component {
     this.props.onChange('tenant', id, value);
   }
 
-  onSelectLogo = (e) => {
-    const file = e.target.files[0],
-          reader = new FileReader(),
-          url = 'http://billrun/api/logo';
-    
-    reader.onload = (e) => {
-      const formData = new FormData();
-      formData.append('query', JSON.stringify({'filename': e.target.result}));
-      formData.append('action', 'save');
-      fetch( url, {
-        method: 'post',
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: formData
-      })
-        .then( data => {
-          console.log( 'Request succeeded with JSON response', data );
-        })
-        .catch( error => {
-          console.log( 'Request failed', error );
-        });
-    };
-    reader.readAsArrayBuffer( file );
-  }
-
-  uploadLogoForRealz = (e) => {
-    const body = new FormData();
-    const filename = e.target.files[0];
-    console.log(filename);
-    body.append('query', filename);
-    body.append('action', 'save');
-    const url = "http://billrun/api/logo";
-    const query = [{
-      api: "logo",
-      options: {
-        method: "POST",
-        headers: {
-          "Content-Type": filename.type
-        },
-        body
-      }
-    }];
-    apiBillRun(query).then(
-      success => {
-        console.log("SUCCESS", success);
-      },
-      failure => {
-        console.log("FAILURE", failure);
-      }
-    ).catch(error => console.log("CATCH", error));
+  uploadFile = (e) => {
+    const form = new FormData();
+    form.append('action', 'save');
+    form.append('query', JSON.stringify({'filename': 'file'}));
+    form.append('file', e.target.files[0]);
+    $.ajax({
+      url: "http://billrun/api/logo",
+      method: "POST",
+      data: form,
+      enctype: "multipart/form-data",
+      contentType: false,
+      processData: false
+    });
   };
-  
+
   render() {
     const { data } = this.props;
 
@@ -140,7 +103,7 @@ export default class Tenant extends Component {
 	      <Col sm={6}>
 		<FormControl type="file"
 			     name="logo"
-			     onChange={this.uploadLogoForRealz}
+			     onChange={this.uploadFile}
 			     value={data.get('logo', '')} />
 	      </Col>
 	    </FormGroup>
