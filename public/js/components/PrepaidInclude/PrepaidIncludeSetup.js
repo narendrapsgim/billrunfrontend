@@ -66,7 +66,10 @@ class PrepaidIncludeSetup extends React.Component {
   };
 
   handleSave = () => {
-    this.props.dispatch(savePrepaidInclude(this.props.prepaid_include));
+    this.props.dispatch(savePrepaidInclude(
+      this.props.prepaid_include,
+      this.props.location.query.action
+    ));
  };
 
   handleCancel = () => {
