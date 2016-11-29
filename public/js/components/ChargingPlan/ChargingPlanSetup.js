@@ -49,6 +49,7 @@ class ChargingPlanSetup extends React.Component {
     if (action === 'new') {
       this.props.dispatch(setPageTitle('Create New Charging Plan'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
+      this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'charging'));
     }
   }
