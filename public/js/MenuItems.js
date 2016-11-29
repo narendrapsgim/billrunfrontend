@@ -108,7 +108,7 @@ const MenuItems = [
             },
             {
                 id:'export_generators',
-                title:'Export Generator',
+                title:'Export Generators',
                 icon:'',
                 route:'export_generators',
                 show:true,
