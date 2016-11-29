@@ -14,7 +14,7 @@ import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
 import CalculatorMapping from './CalculatorMapping';
 import Receiver from './Receiver';
-import APIDetails from './APIDetails';
+import RealtimeMapping from './RealtimeMapping';
 
 import {
   Step,
@@ -300,7 +300,7 @@ class InputProcessor extends Component {
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} type={type} format={format} />)
     ];
     if (type === 'api') {
-      steps.push((<APIDetails />));
+      steps.push((<RealtimeMapping />));
     } else {
       steps.push((<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />));
     }
@@ -329,7 +329,7 @@ class InputProcessor extends Component {
                   <Step>
                     {
                       type === "api"
-                      ? (<StepLabel>API Details</StepLabel>)
+                      ? (<StepLabel>Realtime Mapping</StepLabel>)
                       : (<StepLabel>Receiver</StepLabel>)
                     }
                   </Step>

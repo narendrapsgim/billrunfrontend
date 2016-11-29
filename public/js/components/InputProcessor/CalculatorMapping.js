@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import RealtimeMapping from './RealtimeMapping';
-
 export default class CalculatorMapping extends Component {
   constructor(props) {
     super(props);
@@ -113,14 +111,6 @@ export default class CalculatorMapping extends Component {
              </div>
            </div>
          ))}
-        {
-          type === "api" && (
-            <div>
-              <hr/>
-              <RealtimeMapping />
-            </div>
-          )
-        }
       </form>
     );
   }
