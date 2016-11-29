@@ -11,9 +11,12 @@ const SelectJSON = (props) => (
         <i className="fa fa-long-arrow-right"></i>
       </div>
       <div className="col-lg-9">
-        <input type="file" id="sample_csv"
-               onChange={ props.onSelectJSON }
-               disabled={!props.settings.get('file_type') } />
+        <input
+            type="file"
+            id="sample_csv"
+            onChange={ props.onSelectJSON }
+            disabled={!props.settings.get('file_type') }
+        />
       </div>
     </div>
   </div>    

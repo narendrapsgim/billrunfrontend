@@ -107,12 +107,16 @@ class InputProcessor extends Component {
     const reader = new FileReader();
     reader.onloadend = (evt => {
       if (evt.target.readyState === FileReader.DONE) {
-        const json = JSON.parse(evt.target.result);
-        const fields =
-          Object.keys(json)
-                .map(key =>
-                  this.buildJSONFields(key, json));
-        this.props.dispatch(setFields(_.flattenDeep(fields)));
+        try {
+          const json = JSON.parse(evt.target.result);
+          const fields =
+            Object.keys(json)
+                  .map(key =>
+                    this.buildJSONFields(key, json));
+          this.props.dispatch(setFields(_.flattenDeep(fields)));
+        } catch(err) {
+          alert("Not a valid JSON");
+        }
       }
     });
     const blob = file.slice(0, file.size - 1);
@@ -293,7 +297,7 @@ class InputProcessor extends Component {
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} onRemoveAllFields={this.onRemoveAllFields} settings={settings}  onMoveFieldUp={this.onMoveFieldUp} onMoveFieldDown={this.onMoveFieldDown} onChangeCSVField={this.onChangeCSVField} type={type} format={format} onSelectJSON={ this.onSelectJSON } />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} onSetStaticUsaget={this.onSetStaticUsaget} setUsagetType={this.setUsagetType} settings={settings} usageTypes={usage_types}  unsetField={this.unsetField} />),
-      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} />)
+      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} type={type} format={format} />)
     ];
     if (type === 'api') {
       steps.push((<APIDetails />));
