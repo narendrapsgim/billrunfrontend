@@ -1,39 +1,33 @@
-import { startProgressIndicator, stopProgressIndicator } from './progressIndicatorActions';
+import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+
+import $ from 'jquery';
 
 function savePrepaidIncludeToDB(prepaid_include, action, callback) {
   const formData = new FormData();
   formData.append('new_entity', action === 'new');
-  formData.append('data', JSON.stringify(prepaid_include));
-  
-  const query = {
-    pre: "admin",
-    api: "savePPIncludes",
-    options: {
-      method: "POST",
-      body: formData
-    }
-  };
+//  formData.append('data', prepaid_include.toJS());
 
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      success => {
+    $.ajax({
+      method: "POST",
+      url: "http://billrun/admin/savePPInclude",
+      data: {
+        new_entity: action === 'new',
+        data: prepaid_include.toJS()
+      },
+      success: () => {
         dispatch(finishProgressIndicator());
-        console.log('success', success);
         callback(true);
       },
-      failure => {
-        dispatch(finishProgressIndicator());
-        callback(failure);
+      error: (data) => {
+        console.log("ERROR!", data);
+        callback(false);
       }
-    ).catch(
-      error => {
-        apiBillRunErrorHandler(error);
-        callback(error);
-      }
-    );
-  };
+    });
+    dispatch(finishProgressIndicator());
+  }
 }
 
 export function savePrepaidInclude(prepaid_include, action, callback = () => {}) {
