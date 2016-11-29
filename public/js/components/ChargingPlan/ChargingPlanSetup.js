@@ -46,7 +46,11 @@ class ChargingPlanSetup extends React.Component {
     };
     this.props.dispatch(getList('prepaid_includes', params));
     if (planId) this.props.dispatch(getPlan(planId));
-    if (action === 'new') this.props.dispatch(setPageTitle('Create New Charging Plan'));
+    if (action === 'new') {
+      this.props.dispatch(setPageTitle('Create New Charging Plan'));
+      this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
+      this.props.dispatch(onPlanFieldUpdate(['type'], 'charging'));
+    }
   }
 
   componentWillReceiveProps(nextProps) {

@@ -35,6 +35,8 @@ class PrepaidPlan extends Component {
     }
     if (action === 'new') {
       this.props.dispatch(setPageTitle('Create New Prepaid Plan'));
+      this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
+      this.props.dispatch(onPlanFieldUpdate(['type'], 'customer'));
     }
     const ppincludes_params = {
       api: "find",
