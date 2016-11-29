@@ -12,7 +12,7 @@ function savePrepaidIncludeToDB(prepaid_include, action, callback) {
     dispatch(startProgressIndicator());
     $.ajax({
       method: "POST",
-      url: "http://billrun/admin/savePPInclude",
+      url: "/admin/savePPInclude",
       data: {
         new_entity: action === 'new',
         data: prepaid_include.toJS()
