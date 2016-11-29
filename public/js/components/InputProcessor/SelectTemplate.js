@@ -109,7 +109,7 @@ export default class SelectTemplate extends Component {
                           value="json"
                           disabled={ this.state.type !== "api" }
                           checked={ this.state.format === "json" }
-                          onChange={ this.onSelectFormat } /> JSON
+                          onChange={ this.onSelectFormat } /> I will manually configure a JSON API
                     </label>
                   </div>
                 </div>               
