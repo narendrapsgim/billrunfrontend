@@ -20,7 +20,7 @@ export default class Tenant extends Component {
     form.append('query', JSON.stringify({'filename': 'file'}));
     form.append('file', e.target.files[0]);
     $.ajax({
-      url: "http://billrun/api/logo",
+      url: "/api/logo",
       method: "POST",
       data: form,
       enctype: "multipart/form-data",
