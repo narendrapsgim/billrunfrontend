@@ -27,17 +27,21 @@ export const CHANGE_CSV_FIELD = 'CHANGE_CSV_FIELD';
 export const UNSET_FIELD = 'UNSET_FIELD';
 export const SET_PARSER_SETTING = 'SET_PARSER_SETTING';
 export const SET_PROCESSOR_TYPE = 'SET_PROCESSOR_TYPE';
+export const SET_REALTIME_FIELD = 'SET_REALTIME_FIELD';
+export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
 import _ from 'lodash';
+import Immutable from 'immutable';
 
 const convert = (settings) => {
   const { parser, processor,
           customer_identification_fields,
           rate_calculators,
-          receiver } = settings;
+          receiver,
+          realtime = {} } = settings;
 
   const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
   const field_widths = parser.type === "fixed" ? parser.structure : {};
@@ -55,9 +59,13 @@ const convert = (settings) => {
     customer_identification_fields,
     rate_calculators,
   };
+
   if (settings.type !== 'realtime') {
     ret.receiver = connections;
+  } else {
+    ret.realtime = realtime;
   }
+
   if (processor) {
     let usaget_mapping;
     if (usaget_type === "dynamic") {
@@ -297,7 +305,8 @@ export function saveInputProcessorSettings(state, callback, part=false) {
   const processor = state.get('processor'),
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
-        receiver = state.get('receiver');
+        receiver = state.get('receiver'),
+        realtime = state.get('realtime', Immutable.Map());
   
   const settings = {
     "file_type": state.get('file_type'),
@@ -340,6 +349,9 @@ export function saveInputProcessorSettings(state, callback, part=false) {
 	receiver.toJS()
       ]
     };
+  }
+  if (state.get('type') === 'realtime') {
+    settings.realtime = realtime.toJS();
   }
 
   let settingsToSave;
@@ -480,6 +492,22 @@ export function unsetField(field_path = []) {
 export function setParserSetting(name, value) {
   return {
     type: SET_PARSER_SETTING,
+    name,
+    value
+  };
+}
+
+export function setRealtimeField(name, value) {
+  return {
+    type: SET_REALTIME_FIELD,
+    name,
+    value
+  };
+}
+
+export function setRealtimeDefaultField(name, value) {
+  return {
+    type: SET_REALTIME_DEFAULT_FIELD,
     name,
     value
   };

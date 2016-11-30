@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import _ from 'lodash';
 
-import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField } from '../../actions/inputProcessorActions';
+import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField, setRealtimeField, setRealtimeDefaultField } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showWarning, showDanger } from '../../actions/alertsActions';
 
@@ -289,6 +289,16 @@ class InputProcessor extends Component {
     }
   }
 
+  onChangeRealtimeField = (e) => {
+    const { id, value } = e.target;
+    this.props.dispatch(setRealtimeField(id, value));
+  };
+
+  onChangeRealtimeDefaultField = (e) => {
+    const { id, value } = e.target;
+    this.props.dispatch(setRealtimeDefaultField(id, value));
+  };
+
   render() {
     let { stepIndex } = this.state;
     const { settings, usage_types } = this.props;
@@ -300,7 +310,7 @@ class InputProcessor extends Component {
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} type={type} format={format} />)
     ];
     if (type === 'api') {
-      steps.push((<RealtimeMapping settings={ settings } />));
+      steps.push((<RealtimeMapping settings={ settings } onChange={ this.onChangeRealtimeField } onChangeDefault={ this.onChangeRealtimeDefaultField } />));
     } else {
       steps.push((<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />));
     }

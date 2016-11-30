@@ -27,7 +27,9 @@ import { SET_NAME,
          MOVE_CSV_FIELD_DOWN,
          MOVE_CSV_FIELD_UP,
          CHANGE_CSV_FIELD,
-	 UNSET_FIELD } from '../actions/inputProcessorActions';
+	 UNSET_FIELD,
+         SET_REALTIME_FIELD,
+         SET_REALTIME_DEFAULT_FIELD } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   file_type: '',
@@ -156,6 +158,12 @@ export default function (state = defaultState, action) {
 
     case SET_PARSER_SETTING:
       return state.setIn(['parser', action.name], action.value);
+
+    case SET_REALTIME_FIELD:
+      return state.setIn(['realtime', action.name], Immutable.fromJS(action.value));
+
+    case SET_REALTIME_DEFAULT_FIELD:
+      return state.setIn(['realtime', 'default_values', action.name], action.value);
       
     default:
       return state;
