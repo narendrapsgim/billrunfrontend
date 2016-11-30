@@ -118,7 +118,7 @@ class ChargingPlansList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <Filter fields={ filterFields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}, 'type': 'charging', 'charging_type': 'prepaid'}} />
+                <Filter fields={ filterFields } onFilter={this.onFilter} base={{to: {"$gt": moment().toISOString()}, 'type': 'charging', 'connection_type': 'prepaid'}} />
                 <List items={ plans } fields={ tableFields } onSort={ this.onSort } editField="description" edit={true} onClickEdit={ this.onClickPlan }/>
               </div>
             </div>
