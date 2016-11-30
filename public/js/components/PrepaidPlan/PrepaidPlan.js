@@ -148,7 +148,7 @@ class PrepaidPlan extends Component {
     if (typeof data.error !== 'undefined' && data.error.length) {
       this.handleResponseError(data);
     } else {
-      this.props.router.push('/plans');
+      this.props.router.push('/prepaid_plans');
     }
   }
 
