@@ -109,6 +109,7 @@ function saveExportGeneratorToDB(generator) {
       { data: JSON.stringify(generator.remove('inputProcess').toJS()) }
     ]
   };
+
   return dispatch => {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(

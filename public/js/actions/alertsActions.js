@@ -21,7 +21,7 @@ const timeouts = {
 const Alert = Immutable.Record({
   type: 'info',
   message: '',
-  id: uuid.v4(),
+  id: '',
   timeout: timeouts.default,
 });
 

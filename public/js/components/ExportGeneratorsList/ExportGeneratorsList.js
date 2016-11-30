@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import List from '../List';
 import { DropdownButton, MenuItem, Button } from "react-bootstrap";
 import Immutable from 'immutable';
-import { getList } from '../../actions/listActions';
+import { getSettings } from '../../actions/settingsActions';
 
 class ExportGeneratorsList extends Component {
   constructor(props) {
@@ -20,7 +20,7 @@ class ExportGeneratorsList extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getList("export_generators", this.buildQuery()));
+    this.props.dispatch(getSettings("export_generators", this.buildQuery()));
   }
 
   buildQuery() {
@@ -55,12 +55,13 @@ class ExportGeneratorsList extends Component {
 
   onSort(sort) {
     this.setState({sort}, () => {
-      this.props.dispatch(getList('export_generators', this.buildQuery()));
+      this.props.dispatch(getSettings('export_generators', this.buildQuery()));
     });
   }
 
   render() {
     const { exportGenerators } = this.props;
+
     const fields = [
       { id: "name", title: "Name" }
     ];
@@ -79,7 +80,7 @@ class ExportGeneratorsList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <List items={exportGenerators} fields={fields} edit={true} onClickEdit={this.onClickExportGenerator} onSort={this.onSort} />
+                <List items={exportGenerators || Immutable.List()} fields={fields} edit={true} onClickEdit={this.onClickExportGenerator} onSort={this.onSort} />
               </div>
             </div>
           </div>
@@ -95,7 +96,7 @@ ExportGeneratorsList.contextTypes = {
 
 function mapStateToProps(state, props) {
   return {
-    exportGenerators: state.list.get('export_generators', Immutable.List())
+    exportGenerators: state.settings.get('export_generators', Immutable.List())
   };
 }
 

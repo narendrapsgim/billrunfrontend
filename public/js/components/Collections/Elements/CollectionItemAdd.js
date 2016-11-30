@@ -1,38 +1,23 @@
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
 import { Button } from 'react-bootstrap';
 
-class CollectionItemAdd extends Component {
-  constructor(props) {
-    super(props);
-    this.onClickNew = this.onClickNew.bind(this);
-  }
+const CollectionItemAdd = ({ onClickNew, addLabel }) => (
+  <div className="col-md-3 collections-item-display add-new">
+    <div className="panel panel-default ">
+      <Button bsStyle="link" bsSize="xsmall" onClick={onClickNew}>
+        <i className="fa fa-plus" />&nbsp;{addLabel}
+      </Button>
+    </div>
+  </div>
+);
 
-  onClickNew() {
-    this.context.router.push({
-      pathname: 'collection',
-      query: {
-        action: 'new'
-      }
-    });
-  }
-
-  render() {
-    return (
-      <div className="col-md-3 collections-item-display add-new">
-        <div className="panel panel-default ">
-            <Button className="btn btn-primary btn-link" bsSize="xsmall" onClick={this.onClickNew}>
-              <i className="fa fa-plus"/>&nbsp;Add Collection
-            </Button>
-        </div>
-      </div>
-    )
-  }
-}
-
-CollectionItemAdd.contextTypes = {
-  router: React.PropTypes.object.isRequired
+CollectionItemAdd.defaultProps = {
+  addLabel: 'Add Collection',
 };
 
+CollectionItemAdd.propTypes = {
+  addLabel: PropTypes.string,
+  onClickNew: PropTypes.func.isRequired,
+};
 
 export default CollectionItemAdd;
-

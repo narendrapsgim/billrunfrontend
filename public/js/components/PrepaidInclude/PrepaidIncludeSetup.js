@@ -5,7 +5,7 @@ import { Map, List } from 'immutable';
 import moment from 'moment';
 
 import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
-import { showDanger } from '../../actions/alertsActions';
+import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { savePrepaidInclude } from '../../actions/prepaidIncludeActions';
@@ -66,7 +66,19 @@ class PrepaidIncludeSetup extends React.Component {
   };
 
   handleSave = () => {
-    this.props.dispatch(savePrepaidInclude(this.props.prepaid_include));
+    const callback = (success) => {
+      if (success) {
+        this.props.dispatch(showSuccess("Saved prepaid bucket successfuly!"));
+        this.props.router.push('/prepaid_includes');
+      } else {
+        this.props.dispatch(showDanger("Error saving prepaid bucket!"));
+      }
+    };
+    this.props.dispatch(savePrepaidInclude(
+      this.props.prepaid_include,
+      this.props.location.query.action,
+      callback
+    ));
  };
 
   handleCancel = () => {

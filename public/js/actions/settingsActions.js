@@ -8,6 +8,7 @@ export const ADD_PAYMENT_GATEWAY = 'ADD_PAYMENT_GATEWAY';
 export const REMOVE_PAYMENT_GATEWAY = 'REMOVE_PAYMENT_GATEWAY';
 export const UPDATE_PAYMENT_GATEWAY = 'UPDATE_PAYMENT_GATEWAY';
 export const REMOVE_SETTING_FIELD = 'REMOVE_SETTING_FIELD';
+export const PUSH_TO_SETTING = 'PUSH_TO_SETTING';
 
 export function addPaymentGateway(gateway) {
   return {
@@ -35,6 +36,15 @@ export function updateSetting(category, name, value) {
     type: UPDATE_SETTING,
     category,
     name,
+    value,
+  };
+}
+
+export function pushToSetting(category, value, path = null) {
+  return {
+    type: PUSH_TO_SETTING,
+    category,
+    path,
     value,
   };
 }
