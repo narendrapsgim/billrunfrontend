@@ -300,7 +300,7 @@ class InputProcessor extends Component {
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} type={type} format={format} />)
     ];
     if (type === 'api') {
-      steps.push((<RealtimeMapping />));
+      steps.push((<RealtimeMapping settings={ settings } />));
     } else {
       steps.push((<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />));
     }
