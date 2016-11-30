@@ -51,6 +51,9 @@ class ChargingPlanSetup extends React.Component {
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'charging'));
+      this.props.dispatch(onPlanFieldUpdate(['price'], 0));
+      this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
+      this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({unit: 1, periodicity: "month"})));
     }
   }
 
