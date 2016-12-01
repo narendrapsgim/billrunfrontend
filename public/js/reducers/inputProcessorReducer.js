@@ -2,6 +2,8 @@ import Immutable from 'immutable';
 import _ from 'lodash';
 
 import { SET_NAME,
+         SET_PARSER_SETTING,
+         SET_PROCESSOR_TYPE,         
          SET_DELIMITER_TYPE,
          GOT_PROCESSOR_SETTINGS,
          SET_FIELDS,
@@ -25,7 +27,9 @@ import { SET_NAME,
          MOVE_CSV_FIELD_DOWN,
          MOVE_CSV_FIELD_UP,
          CHANGE_CSV_FIELD,
-	 UNSET_FIELD } from '../actions/inputProcessorActions';
+	 UNSET_FIELD,
+         SET_REALTIME_FIELD,
+         SET_REALTIME_DEFAULT_FIELD } from '../actions/inputProcessorActions';
 
 let defaultState = Immutable.fromJS({
   file_type: '',
@@ -50,10 +54,10 @@ let defaultState = Immutable.fromJS({
     }
   ],
   rate_calculators: {},
-  receiver: {
-    passive: false,
-    delete_received: false
-  }
+  /* receiver: {
+   *   passive: false,
+   *   delete_received: false
+   * }*/
 });
 
 export default function (state = defaultState, action) {
@@ -66,6 +70,9 @@ export default function (state = defaultState, action) {
     case SET_NAME:
       return state.set('file_type', action.file_type);
 
+    case SET_PROCESSOR_TYPE:
+      return state.set('type', action.processor_type);
+      
     case SET_DELIMITER_TYPE:
       return state.set('delimiter_type', action.delimiter_type);
       
@@ -148,6 +155,15 @@ export default function (state = defaultState, action) {
 
     case UNSET_FIELD:
       return state.deleteIn(action.path);
+
+    case SET_PARSER_SETTING:
+      return state.setIn(['parser', action.name], action.value);
+
+    case SET_REALTIME_FIELD:
+      return state.setIn(['realtime', action.name], Immutable.fromJS(action.value));
+
+    case SET_REALTIME_DEFAULT_FIELD:
+      return state.setIn(['realtime', 'default_values', action.name], action.value);
       
     default:
       return state;

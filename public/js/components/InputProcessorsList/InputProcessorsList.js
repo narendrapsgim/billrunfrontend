@@ -36,12 +36,18 @@ class InputProcessorsList extends Component {
   }
   
   onClickInputProcessor(input_processor, e) {
+    let query = {
+      file_type: input_processor.get('file_type'),
+      action: 'update'
+    };
+    console.log(input_processor.toJS());
+    if (input_processor.get('type')) {
+      query.type = 'api';
+      query.format = input_processor.get('type');
+    }
     this.context.router.push({
       pathname: 'input_processor',
-      query: {
-        file_type: input_processor.get('file_type'),
-        action: 'update'
-      }
+      query
     });
   }
   
