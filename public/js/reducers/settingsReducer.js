@@ -2,10 +2,11 @@ import Immutable from 'immutable';
 import { UPDATE_SETTING,
          REMOVE_SETTING_FIELD,
          GOT_SETTINGS,
-    PUSH_TO_SETTING,
+         PUSH_TO_SETTING,
 	 ADD_PAYMENT_GATEWAY,
 	 REMOVE_PAYMENT_GATEWAY,
-	 UPDATE_PAYMENT_GATEWAY } from '../actions/settingsActions';
+	 UPDATE_PAYMENT_GATEWAY,
+         SET_FIELD_POSITION } from '../actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
 import { LOGOUT } from '../actions/userActions';
 
@@ -78,6 +79,10 @@ export default function (state = defaultState, action) {
       }
       return state.deleteIn([category, name]);
 
+    case SET_FIELD_POSITION:
+      const curr = state.getIn([...action.setting, action.index]);
+      return state.updateIn(action.setting, list => list.delete(action.index).insert(action.over, curr));
+      
     default:
       return state;
   }

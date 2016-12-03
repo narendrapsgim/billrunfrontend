@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 
 import { Row, Col, FormGroup, ControlLabel, Button } from 'react-bootstrap';
+import SettingsModal from './SettingsModal';
 import Field from '../Field';
 
 class CustomField extends React.Component {
@@ -19,6 +20,10 @@ class CustomField extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      showSettings: false
+    };
   }
 
   onChange = (e) => {
@@ -32,11 +37,24 @@ class CustomField extends React.Component {
     this.props.onRemove(entity, index);
   };
 
-  render() {
-    const { field, entity, index, last } = this.props;
+  dragOver = () => {
+    const { dragOver, index } = this.props;
+    dragOver(index);
+  };
+  
+  dragEnd = () => {
+    const { dragEnd, index } = this.props;
+    dragEnd(index);
+  };
 
+  onCloseModal = () => {
+    this.setState({showSettings: false});
+  };
+  
+  renderField = () => {
+    const { field } = this.props;
     return (
-      <div className="CustomField">
+      <div>
         <Row>
           <Col lg={3} md={3}>
             <FormGroup>
@@ -68,7 +86,19 @@ class CustomField extends React.Component {
               />
             </FormGroup>
           </Col>
-          <Col lgOffset={1} lg={2} md={2}>
+          <Col lg={1} md={1}>
+            <FormGroup>
+              <ControlLabel>&nbsp;</ControlLabel>
+              <button
+                  className="btn btn-link"
+                  onClick={(
+                      () => this.setState({showSettings: true})
+                    )}>
+                Advanced
+              </button>
+            </FormGroup>
+          </Col>
+          <Col lg={2} md={2}>
             <FormGroup>
               <ControlLabel>&nbsp;</ControlLabel>
               <div>
@@ -79,74 +109,32 @@ class CustomField extends React.Component {
             </FormGroup>
           </Col>
         </Row>
-        <Row>
-          <Col lg={2} md={2}>
-            <FormGroup>
-              <Field
-                  id="unique"
-                  onChange={ this.onChange }
-                  value={ field.get('unique', false) }
-                  fieldType="checkbox"
-                  label="Unique"
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={2} md={2}>
-            <FormGroup>
-              <Field
-                  id="mandatory"
-                  onChange={ this.onChange }
-                  value={ field.get('mandatory', false) }
-                  fieldType="checkbox"
-                  label="Mandatory"
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={2} md={2}>
-            <FormGroup>
-              <Field
-                  id="editable"
-                  onChange={ this.onChange }
-                  value={ field.get('editable', false) }
-                  fieldType="checkbox"
-                  label="Editable"
-              />
-            </FormGroup>
-          </Col>        
-          <Col lg={2} md={2}>
-            <FormGroup>
-              <Field
-                  id="display"
-                  onChange={ this.onChange }
-                  value={ field.get('display', false) }
-                  fieldType="checkbox"
-                  label="Display"
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={2} md={2}>
-            <FormGroup>
-              <Field
-                  id="show_in_list"
-                  onChange={ this.onChange }
-                  value={ field.get('show_in_list', false) }
-                  fieldType="checkbox"
-                  label="Show in list"
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={2} md={2}>
-            <FormGroup>
-              <Field
-                  id="select_list"
-                  onChange={ this.onChange }
-                  value={ field.get('select_list', false) }
-                  fieldType="checkbox"
-                  label="Select list"
-              />
-            </FormGroup>
-          </Col>
-        </Row>
+      </div>
+    );
+  }
+
+  renderOver = () => (
+    <div>
+      <Row>
+        <Col lgOffset={5} lg={6}>
+          Set field here
+        </Col>
+      </Row>
+    </div>
+  );
+  
+  render() {
+    const { field, last, over, dragStart, dragEnd } = this.props;
+    const { showSettings } = this.state;
+
+    return (
+      <div className="CustomField" draggable="true" onDragStart={ dragStart } onDragOver={ this.dragOver } onDragEnd={ this.dragEnd }>
+        <SettingsModal field={ field } onClose={ this.onCloseModal }onChange={ this.onChange } show={ showSettings } />
+        {
+          over
+          ? this.renderOver()
+          : this.renderField()
+        }
         { !last && <hr style={{ marginTop: 10, marginBottom: 10 }}/> }
       </div>
     );
