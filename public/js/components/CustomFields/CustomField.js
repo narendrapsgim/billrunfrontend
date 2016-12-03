@@ -58,51 +58,17 @@ class CustomField extends React.Component {
               />
             </FormGroup>
           </Col>
-          <Col lg={1} md={1}>
+          <Col lg={3} md={3}>
             <FormGroup>
-              <ControlLabel>Unique</ControlLabel>
+              <ControlLabel>Default Value</ControlLabel>
               <Field
-                  id="unique"
+                  id="default_value"
                   onChange={ this.onChange }
-                  value={ field.get('unique', false) }
-                  fieldType="checkbox"
+                  value={ field.get('default_value', '') }
               />
             </FormGroup>
           </Col>
-          <Col lg={1} md={1}>
-            <FormGroup>
-              <ControlLabel>Mandatory</ControlLabel>
-              <Field
-                  id="mandatory"
-                  onChange={ this.onChange }
-                  value={ field.get('mandatory', false) }
-                  fieldType="checkbox"
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={1} md={1}>
-            <FormGroup>
-              <ControlLabel>Editable</ControlLabel>
-              <Field
-                  id="editable"
-                  onChange={ this.onChange }
-                  value={ field.get('editable', false) }
-                  fieldType="checkbox"
-              />
-            </FormGroup>
-          </Col>        
-          <Col lg={1} md={1}>
-            <FormGroup>
-              <ControlLabel>Display</ControlLabel>
-              <Field
-                  id="display"
-                  onChange={ this.onChange }
-                  value={ field.get('display', false) }
-                  fieldType="checkbox"
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={2} md={2}>
+          <Col lgOffset={1} lg={2} md={2}>
             <FormGroup>
               <ControlLabel>&nbsp;</ControlLabel>
               <div>
@@ -110,6 +76,74 @@ class CustomField extends React.Component {
                   <i className="fa fa-trash-o danger-red"/> Remove
                 </Button>
               </div>
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <Field
+                  id="unique"
+                  onChange={ this.onChange }
+                  value={ field.get('unique', false) }
+                  fieldType="checkbox"
+                  label="Unique"
+              />
+            </FormGroup>
+          </Col>
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <Field
+                  id="mandatory"
+                  onChange={ this.onChange }
+                  value={ field.get('mandatory', false) }
+                  fieldType="checkbox"
+                  label="Mandatory"
+              />
+            </FormGroup>
+          </Col>
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <Field
+                  id="editable"
+                  onChange={ this.onChange }
+                  value={ field.get('editable', false) }
+                  fieldType="checkbox"
+                  label="Editable"
+              />
+            </FormGroup>
+          </Col>        
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <Field
+                  id="display"
+                  onChange={ this.onChange }
+                  value={ field.get('display', false) }
+                  fieldType="checkbox"
+                  label="Display"
+              />
+            </FormGroup>
+          </Col>
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <Field
+                  id="show_in_list"
+                  onChange={ this.onChange }
+                  value={ field.get('show_in_list', false) }
+                  fieldType="checkbox"
+                  label="Show in list"
+              />
+            </FormGroup>
+          </Col>
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <Field
+                  id="select_list"
+                  onChange={ this.onChange }
+                  value={ field.get('select_list', false) }
+                  fieldType="checkbox"
+                  label="Select list"
+              />
             </FormGroup>
           </Col>
         </Row>
