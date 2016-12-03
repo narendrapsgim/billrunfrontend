@@ -117,7 +117,10 @@ class CustomField extends React.Component {
     <div>
       <Row>
         <Col lgOffset={5} lg={6}>
-          Set field here
+          <FormGroup>
+            <ControlLabel>&nbsp;</ControlLabel>
+            <span>Set field here</span>
+          </FormGroup>
         </Col>
       </Row>
     </div>
