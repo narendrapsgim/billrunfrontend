@@ -1,19 +1,39 @@
 import React, { Component } from 'react';
 import { Panel, Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
+import $ from 'jquery';
+
+import { apiBillRun } from '../../common/Api';
 
 export default class Tenant extends Component {
+  constructor(props) {
+    super(props);
+  }
 
   onChangeField = (e) => {
     const { id, value } = e.target;
     this.props.onChange('tenant', id, value);
   }
 
+  uploadFile = (e) => {
+    const form = new FormData();
+    form.append('action', 'save');
+    form.append('query', JSON.stringify({'filename': 'file'}));
+    form.append('file', e.target.files[0]);
+    $.ajax({
+      url: "/api/logo",
+      method: "POST",
+      data: form,
+      enctype: "multipart/form-data",
+      contentType: false,
+      processData: false
+    });
+  };
+
   render() {
     const { data } = this.props;
 
-
     return (
-      <div>
+      <div className="Tenant">
         <Panel header="Company Details">
           <Form horizontal>
             <FormGroup controlId='name' key='name'>
@@ -76,6 +96,17 @@ export default class Tenant extends Component {
                              value={data.get('website', '')}/>
               </Col>
             </FormGroup>
+	    <FormGroup>
+	      <Col componentClass={ControlLabel} md={2}>
+		Logo
+	      </Col>
+	      <Col sm={6}>
+		<FormControl type="file"
+			     name="logo"
+			     onChange={this.uploadFile}
+			     value={data.get('logo', '')} />
+	      </Col>
+	    </FormGroup>
           </Form>
         </Panel>
       </div>

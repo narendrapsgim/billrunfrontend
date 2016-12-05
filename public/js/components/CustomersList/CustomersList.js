@@ -10,6 +10,7 @@ import { Button } from "react-bootstrap";
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
 import { titlize } from '../../common/Util';
+import { getSettings } from '../../actions/settingsActions';
 
 class CustomersList extends Component {
   constructor(props) {
@@ -29,6 +30,10 @@ class CustomersList extends Component {
     };
   }
 
+  componentDidMount() {
+    this.props.dispatch(getSettings("subscribers"));
+  }
+  
   componentWillUnmount() {
     this.props.dispatch(clearList('customers'));
   }
@@ -82,20 +87,21 @@ class CustomersList extends Component {
   }
 
   render() {
-    const { customers } = this.props;
-
-    const fields = [
-      { id: "aid", placeholder: "Id", type: 'number', sort: true },
-      { id: "firstname", placeholder: "First Name", sort: true },
-      { id: "lastname", placeholder: "Last Name", sort: true },
-      { id: "address1", placeholder: "Address 1", sort: true },
-      { id: "email", placeholder: "Email" },
-      { id: "to", placeholder: "To", showFilter: false, display: false, type: "datetime" }
-    ];
+    const { customers, account } = this.props;
+    const fields =
+      account.filter(field => field.get('show_in_list', false))
+             .map(field => {
+               return {
+                 id: field.get('field_name'),
+                 placeholder: field.get('title', field.get('field_name')),
+                 sort: true                              
+               };
+             })
+             .toJS();
+    fields.push({ id: "to", placeholder: "To", showFilter: false, display: false, type: "datetime" });
 
     return (
-      <div>
-      
+      <div className="CustomersList">
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
@@ -112,7 +118,6 @@ class CustomersList extends Component {
             </div>
           </div>
         </div>
-
         <Pager onClick={this.handlePageClick}
                size={this.state.size}
                count={customers.size || 0} />  
@@ -127,7 +132,8 @@ CustomersList.contextTypes = {
 
 function mapStateToProps(state) {
   return {
-    customers: state.list.get('customers') || []
+    customers: state.list.get('customers') || [],
+    account: state.settings.getIn(['subscribers', 'account', 'fields']) || []
   };
 }
 

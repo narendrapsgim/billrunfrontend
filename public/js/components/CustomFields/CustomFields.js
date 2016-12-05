@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { ucFirst } from 'change-case';
 
-import { getSettings, updateSetting, removeSettingField } from '../../actions/settingsActions';
+import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
 
 import { Tabs, Tab, Panel, Row, Col } from 'react-bootstrap';
 import CustomField from './CustomField';
@@ -21,6 +21,12 @@ class CustomFields extends Component {
   
   constructor(props) {
     super(props);
+
+    this.state = {
+      over: -1,
+      tabs: ["account", "subscriber"],
+      tab: 0
+    };
   }
 
   componentDidMount() {
@@ -42,9 +48,30 @@ class CustomFields extends Component {
   };
 
   onClickSave = () => {
-    console.log("saving ", this.props.account, this.props.subscriber);
+    this.props.dispatch(saveSettings('subscribers'));
   };
   
+  dragStart = (e) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.currentTarget);
+  };
+
+  dragOver = (over) => {
+    this.setState({over});
+  };
+  
+  dragEnd = (index) => {
+    const { over, tab, tabs } = this.state;
+    const setting = tabs[tab];
+    this.props.dispatch(setFieldPosition(index, over, ['subscribers', setting, 'fields']));
+    this.setState({'over': -1});
+  };
+  
+  onSelectTab = (key) => {
+    console.log(this.state.tabs[key]);
+    this.setState({tab: this.state.tabs[key]});
+  };
+
   renderFieldsTab = (entity, key) => {
     const onAddNew = () => {
       this.onAddNewField(entity);
@@ -65,6 +92,10 @@ class CustomFields extends Component {
                               field={ field }
                               entity={ entity }
                               index={ field_key }
+                              dragStart={ this.dragStart }
+                              dragOver={ this.dragOver }
+                              dragEnd={ this.dragEnd }
+                              over={ this.state.over === field_key }
                               onChange={ this.onChangeField }
                               onRemove={ this.onRemoveField }
                               last={ field_key === (this.props[entity].size - 1) }
@@ -84,9 +115,12 @@ class CustomFields extends Component {
 
     return (
       <div className="CustomFields">
-        <Tabs id="CustomFieldsTabs" animation={ false }>
+        <Tabs
+            id="CustomFieldsTabs"
+            animation={ false }
+            onSelect={ this.onSelectTab }>
           {
-            ["account", "subscriber"].map((entity, ent_key) =>
+            this.state.tabs.map((entity, ent_key) =>
               this.renderFieldsTab(entity, ent_key))
           }
         </Tabs>

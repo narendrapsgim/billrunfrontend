@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 
 import { Row, Col, FormGroup, ControlLabel, Button } from 'react-bootstrap';
+import SettingsModal from './SettingsModal';
 import Field from '../Field';
 
 class CustomField extends React.Component {
@@ -19,6 +20,10 @@ class CustomField extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      showSettings: false
+    };
   }
 
   onChange = (e) => {
@@ -32,11 +37,24 @@ class CustomField extends React.Component {
     this.props.onRemove(entity, index);
   };
 
-  render() {
-    const { field, entity, index, last } = this.props;
+  dragOver = () => {
+    const { dragOver, index } = this.props;
+    dragOver(index);
+  };
+  
+  dragEnd = () => {
+    const { dragEnd, index } = this.props;
+    dragEnd(index);
+  };
 
+  onCloseModal = () => {
+    this.setState({showSettings: false});
+  };
+  
+  renderField = () => {
+    const { field } = this.props;
     return (
-      <div className="CustomField">
+      <div>
         <Row>
           <Col lg={3} md={3}>
             <FormGroup>
@@ -58,48 +76,26 @@ class CustomField extends React.Component {
               />
             </FormGroup>
           </Col>
-          <Col lg={1} md={1}>
+          <Col lg={3} md={3}>
             <FormGroup>
-              <ControlLabel>Unique</ControlLabel>
+              <ControlLabel>Default Value</ControlLabel>
               <Field
-                  id="unique"
+                  id="default_value"
                   onChange={ this.onChange }
-                  value={ field.get('unique', false) }
-                  fieldType="checkbox"
+                  value={ field.get('default_value', '') }
               />
             </FormGroup>
           </Col>
           <Col lg={1} md={1}>
             <FormGroup>
-              <ControlLabel>Mandatory</ControlLabel>
-              <Field
-                  id="mandatory"
-                  onChange={ this.onChange }
-                  value={ field.get('mandatory', false) }
-                  fieldType="checkbox"
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={1} md={1}>
-            <FormGroup>
-              <ControlLabel>Editable</ControlLabel>
-              <Field
-                  id="editable"
-                  onChange={ this.onChange }
-                  value={ field.get('editable', false) }
-                  fieldType="checkbox"
-              />
-            </FormGroup>
-          </Col>        
-          <Col lg={1} md={1}>
-            <FormGroup>
-              <ControlLabel>Display</ControlLabel>
-              <Field
-                  id="display"
-                  onChange={ this.onChange }
-                  value={ field.get('display', false) }
-                  fieldType="checkbox"
-              />
+              <ControlLabel>&nbsp;</ControlLabel>
+              <button
+                  className="btn btn-link"
+                  onClick={(
+                      () => this.setState({showSettings: true})
+                    )}>
+                Advanced
+              </button>
             </FormGroup>
           </Col>
           <Col lg={2} md={2}>
@@ -113,6 +109,35 @@ class CustomField extends React.Component {
             </FormGroup>
           </Col>
         </Row>
+      </div>
+    );
+  }
+
+  renderOver = () => (
+    <div>
+      <Row>
+        <Col lgOffset={5} lg={6}>
+          <FormGroup>
+            <ControlLabel>&nbsp;</ControlLabel>
+            <span>Set field here</span>
+          </FormGroup>
+        </Col>
+      </Row>
+    </div>
+  );
+  
+  render() {
+    const { field, last, over, dragStart, dragEnd } = this.props;
+    const { showSettings } = this.state;
+
+    return (
+      <div className="CustomField" draggable="true" onDragStart={ dragStart } onDragOver={ this.dragOver } onDragEnd={ this.dragEnd }>
+        <SettingsModal field={ field } onClose={ this.onCloseModal }onChange={ this.onChange } show={ showSettings } />
+        {
+          over
+          ? this.renderOver()
+          : this.renderField()
+        }
         { !last && <hr style={{ marginTop: 10, marginBottom: 10 }}/> }
       </div>
     );

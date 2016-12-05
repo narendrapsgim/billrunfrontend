@@ -7,10 +7,22 @@ export default class SelectTemplate extends Component {
     super(props);
 
     this.state = {
-      selected: "predefined",
+      type: 'api',
+      selected: '',
+      format: '',
       template: Object.keys(Templates)[0]
     };
   }
+
+  onSelectFormat = (e) => {
+    const { value } = e.target;
+    this.setState({format: value});
+  };
+  
+  onSelectType = (e) => {
+    const { value } = e.target;
+    this.setState({type: value});
+  };
 
   onCheck = (e) => {
     const { value } = e.target;
@@ -28,12 +40,34 @@ export default class SelectTemplate extends Component {
     });
   };
 
+  buildQuery = () => {
+    const { type, format, selected, template } = this.state;
+    const action = "new";
+    if (type === "api") {
+      return {
+        action,
+        type,
+        format
+      };
+    }
+
+    if (selected === "predefined") {
+      return {
+        action,
+        template
+      };
+    }
+
+    return {
+      action
+    };
+  };
+  
   handleNext = () => {
     const { selected, template } = this.state;
-    const query = selected === "predefined" ? {action: "new", template} : {action: "new"};
     this.context.router.push({
       pathname: 'input_processor',
-      query
+      query: this.buildQuery()
     });
   };
   
@@ -53,36 +87,78 @@ export default class SelectTemplate extends Component {
             </div>
             <div className="panel-body">
               <form className="form-horizontal">
+
                 <div className="form-group">
+                  <div className="col-lg-3 col-md-4">
+		    <label>
+                      <input type="radio"
+                             name="select-type"
+                             value="api"
+                             checked={ this.state.type === "api" }
+                             onChange={ this.onSelectType } /> API-based
+		    </label>
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginLeft: 15 }}>
+                  <div className="col-lg-3">
+                    <label>
+                      <input
+                          type="radio"
+                          name="format"
+                          value="json"
+                          disabled={ this.state.type !== "api" }
+                          checked={ this.state.format === "json" }
+                          onChange={ this.onSelectFormat } /> I will manually configure a JSON API
+                    </label>
+                  </div>
+                </div>               
+
+                <div className="form-group">
+                  <div className="col-lg-3 col-md-4">
+		    <label>
+                      <input type="radio"
+                             name="select-type"
+                             value="file"
+                             checked={ this.state.type === "file" }
+                             onChange={ this.onSelectType } /> File-based
+		    </label>
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginLeft: 15 }}>
                   <div className="col-lg-3 col-md-4">
 		    <label>
                       <input type="radio"
                              name="select-template"
                              value="predefined"
-                             checked={this.state.selected === "predefined"}
-                             onChange={this.onCheck} /> I will use predefined input processor
+                             disabled={ this.state.type !== "file" }
+                             checked={ this.state.selected === "predefined" }
+                             onChange={ this.onCheck } /> I will use predefined input processor
 		    </label>
                   </div>
-                  <div className="col-lg-9 col-md-9">
+                  <div className="col-lg-7 col-md-7">
                     <select className="form-control"
                             value={template}
                             onChange={this.onSelectTemplate}
-                            disabled={selected !== "predefined"}>
+                            disabled={selected !== "predefined" || this.state.type !== "file" }>
                       { template_options }
                     </select>
                   </div>
                 </div>
-                <div className="form-group">
+                <div className="form-group" style={{ marginLeft: 15 }}>
                   <div className="col-lg-3 col-md-4">
 		    <label>
                       <input type="radio"
                              name="select-template"
                              value="manual"
-                             checked={this.state.selected !== "predefined"}
+                             disabled={ this.state.type !== "file" }
+                             checked={this.state.selected === "manual"}
                              onChange={this.onCheck} /> I will configure a custom input processor
 		    </label>
                   </div>
                 </div>
+
                 <div style={{marginTop: 12, float: "right"}}>
                   <button className="btn btn-default"
                           type="button"
@@ -92,7 +168,6 @@ export default class SelectTemplate extends Component {
                   </button>
                   <button className="btn btn-primary"
                           type="button"
-                          disabled={!selected}
                           onClick={this.handleNext}>
                     Next
                   </button>

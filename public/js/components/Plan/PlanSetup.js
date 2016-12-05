@@ -73,6 +73,7 @@ class PlanSetup extends Component {
     const { mode } = this.props;
     if (mode === 'new') {
       this.props.setPageTitle('Create New Plan');
+      this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'postpaid'));
     }
   }
 

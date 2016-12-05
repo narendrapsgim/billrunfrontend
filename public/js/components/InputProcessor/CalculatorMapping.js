@@ -8,6 +8,8 @@ export default class CalculatorMapping extends Component {
 
   render() {
     const { settings,
+            type,
+            format,
             onSetCustomerMapping,
             onSetLineKey,
             onSetRating } = this.props;

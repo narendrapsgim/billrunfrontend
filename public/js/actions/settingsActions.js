@@ -9,6 +9,7 @@ export const REMOVE_PAYMENT_GATEWAY = 'REMOVE_PAYMENT_GATEWAY';
 export const UPDATE_PAYMENT_GATEWAY = 'UPDATE_PAYMENT_GATEWAY';
 export const REMOVE_SETTING_FIELD = 'REMOVE_SETTING_FIELD';
 export const PUSH_TO_SETTING = 'PUSH_TO_SETTING';
+export const SET_FIELD_POSITION = 'SET_FIELD_POSITION';
 
 export function addPaymentGateway(gateway) {
   return {
@@ -127,5 +128,14 @@ export function saveSettings(categories = []) {
   return (dispatch, getState) => {
     const { settings } = getState();
     return dispatch(saveSettingsToDB(categories, settings));
+  };
+}
+
+export function setFieldPosition(index, over, setting) {
+  return {
+    type: SET_FIELD_POSITION,
+    index,
+    over,
+    setting
   };
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux';
 
-export default class SelectDelimiter extends Component {
+export default connect()(class SelectDelimiter extends Component {
   constructor(props) {
     super(props);
   }
@@ -50,4 +51,4 @@ export default class SelectDelimiter extends Component {
 
     );
   }
-}
+});

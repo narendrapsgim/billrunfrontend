@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import moment from 'moment';
 
 import { addNotification,
@@ -35,6 +35,12 @@ class PrepaidPlan extends Component {
     }
     if (action === 'new') {
       this.props.dispatch(setPageTitle('Create New Prepaid Plan'));
+      this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
+      this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
+      this.props.dispatch(onPlanFieldUpdate(['type'], 'customer'));
+      this.props.dispatch(onPlanFieldUpdate(['price'], 0));
+      this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
+      this.props.dispatch(onPlanFieldUpdate(['recurrence'], Map({unit: 1, periodicity: "month"})));
     }
     const ppincludes_params = {
       api: "find",
@@ -142,7 +148,7 @@ class PrepaidPlan extends Component {
     if (typeof data.error !== 'undefined' && data.error.length) {
       this.handleResponseError(data);
     } else {
-      this.props.router.push('/plans');
+      this.props.router.push('/prepaid_plans');
     }
   }
 

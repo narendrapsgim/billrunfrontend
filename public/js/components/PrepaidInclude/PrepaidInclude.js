@@ -14,11 +14,13 @@ import Field from '../Field';
 const PrepaidInclude = (props) => {
   const onSelectChargingBy = (value) => {
     props.onChangeField({target: {id: 'charging_by', value}});
+    if (value === "total_cost") {
+      props.onChangeField({target: {id: 'charging_by', value: 'total_cost'}});
+    }
   };
 
   const onSelectUsageType = (value) => {
     props.onChangeField({target: {id: 'charging_by_usaget', value}});
-    props.onChangeField({target: {id: 'charging_by', value: 'total_cost'}});
   };
 
   return (
