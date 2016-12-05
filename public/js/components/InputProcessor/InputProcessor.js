@@ -328,7 +328,7 @@ class InputProcessor extends Component {
               <div className="panel-body">
                 <Stepper activeStep={stepIndex}>
                   <Step>
-                    <StepLabel>Select CSV</StepLabel>
+                    <StepLabel>CDR Fields</StepLabel>
                   </Step>
                   <Step>
                     <StepLabel>Field Mapping</StepLabel>

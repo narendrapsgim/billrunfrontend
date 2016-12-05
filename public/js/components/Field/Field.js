@@ -40,6 +40,7 @@ class Field extends React.Component {
           disabled = false,
           editable = true,
           dispatch,
+          label = '',
           ...otherProps } = this.props;
 
     switch(fieldType) {
@@ -56,7 +57,7 @@ class Field extends React.Component {
       case 'unlimited':
         return (<Unlimitd onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} {...this.props} />);
       case 'checkbox':
-        return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} label={ label } />);
       case 'salutation':
         return (<Salutation {...this.props} />);
       default:
