@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import { Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
 import Field from '../Field';
 import countries from './countries.data.json';
@@ -16,6 +17,15 @@ class Customer extends Component {
     var pseudoE = {};
     pseudoE.target = {id: 'country', value: val};
     this.props.onChange(pseudoE);
+  }
+
+  renderInCollection = () => {
+    const { customer } = this.props;
+    if (customer.get('in_collection', false) === true || customer.get('in_collection', 0) === 1) {
+      const fromDate = moment(customer.get('in_collection_from', '')).format(globalSetting.dateFormat);
+      return (<p className="danger-red">In collection from {fromDate}</p>);
+    }
+    return null;
   }
 
   render() {
@@ -64,6 +74,7 @@ class Customer extends Component {
         {(action !== "new") &&
           <div>
             <hr />
+            { this.renderInCollection() }
             <p>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></p>
             <p>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link></p>
           </div>
