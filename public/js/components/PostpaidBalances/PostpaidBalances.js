@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import moment from 'moment';
 
 import { getSettings } from '../../actions/settingsActions';
 import { getList } from '../../actions/listActions';
@@ -12,18 +13,21 @@ import Pager from '../Pager';
 class PostpaidBalances extends Component {
   static propTypes = {
     balances: React.PropTypes.instanceOf(Immutable.List).isRequired,
-    usage_types: React.PropTypes.instanceOf(Immutable.List)
+    usage_types: React.PropTypes.instanceOf(Immutable.List).isRequired,
+    aid: React.PropTypes.number.isRequired
   };
 
   static defaultProps = {
     balances: Immutable.List(),
-    usage_types: Immutable.List()
+    usage_types: Immutable.List(),
+    aid: null
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
+      aid: props.aid,
       size: 10,
       page: 0,
       sort: '',
@@ -37,6 +41,7 @@ class PostpaidBalances extends Component {
   
   buildQuery = () => {
     const { size, page, sort, filter } = this.state;
+    /** TODO: Will probably change **/
     return {
       api: 'find',
       params: [
@@ -66,7 +71,9 @@ class PostpaidBalances extends Component {
   }
   
   render() {
-    const { uasge_types } = this.props;
+    const { usage_types, balances } = this.props;
+    const { aid } = this.state;
+
     const usage_fields = usage_types.map((usaget, key) => {
       return {
         id: usaget,
@@ -76,10 +83,12 @@ class PostpaidBalances extends Component {
       };
     }).toJS();
     const fields = [
-      { id: 'aid', placeholder: 'Account', type: 'number', sort: true },
+      { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
       { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
       { id: 'current_plan', placeholder: 'Plan' },
-      ...usage_fields
+      ...usage_fields,
+      { id: "from", placeholder: "From", showFilter: false, type: "datetime" },
+      { id: "to", placeholder: "To", showFilter: false, type: "datetime" },
     ];
     
     return (
@@ -87,15 +96,8 @@ class PostpaidBalances extends Component {
         
         <div className="row">
           <div className="col-lg-12">
-            <div className="panel panel-default">
-              <div className="panel-heading">
-                List of all postpaid counters
-              </div>
-              <div className="panel-body">
-                <Filter fields={fields} onFilter={this.onFilter} />
-                <List items={balances} fields={fields} onSort={this.onSort} />
-              </div>
-            </div>
+            <Filter fields={fields} onFilter={this.onFilter} base={{to: {$gt: moment().toISOString()}, aid: aid}} />
+            <List items={balances} fields={fields} onSort={this.onSort} />
           </div>
         </div>
 
@@ -109,7 +111,7 @@ class PostpaidBalances extends Component {
 
 function mapStateToProps(state) {
   return {
-    balances: state.list.get('balances')
+    balances: state.list.get('balances'),
     usage_types: state.settings.get('usage_types')
   };
 }

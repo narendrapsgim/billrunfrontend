@@ -16,6 +16,7 @@ import { PageHeader, Tabs, Tab, Panel } from 'react-bootstrap';
 import Customer from './Customer';
 import Subscriptions from './Subscriptions';
 import ActionButtons from './ActionButtons';
+import PostpaidBalances from '../PostpaidBalances';
 
 class CustomerSetup extends Component {
   constructor(props) {
@@ -30,7 +31,7 @@ class CustomerSetup extends Component {
       current: 1
     };
   }
-
+  
   componentDidMount() {
     const { aid } = this.props.location.query;
     if (aid) {
@@ -223,6 +224,7 @@ class CustomerSetup extends Component {
   render() {
     const { customer, subscriptions, settings, plans, services } = this.props;
     const { action } = this.props.location.query;
+    const aid = parseInt(this.props.location.query.aid, 10);
     const { invalidFields } = this.state;
 
     const tabs = [(
@@ -245,7 +247,7 @@ class CustomerSetup extends Component {
             <Panel style={{borderTop: 'none'}}>
               <Subscriptions
                 subscriptions={subscriptions}
-                aid={customer.get('aid')}
+                aid={ aid }
                 settings={settings.getIn(['subscriber', 'fields'])}
                 all_plans={plans}
                 all_services={services}
@@ -253,6 +255,13 @@ class CustomerSetup extends Component {
                 onNew={this.onClickNewSubscription}
               />
             </Panel>
+        </Tab>
+      ));
+      tabs.push((
+        <Tab title="Counters" eventKey={3} key={3}>
+          <Panel style={{borderTop: 'none'}}>
+            <PostpaidBalances aid={ aid } />
+          </Panel>
         </Tab>
       ));
     }

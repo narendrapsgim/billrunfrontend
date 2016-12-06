@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
 import moment from 'moment';
+import { connect } from 'react-redux';
+
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
+
 /* ACTIONS */
 import { titlize } from '../../common/Util';
 
-export default class List extends Component {
+class List extends Component {
   constructor(props) {
     super(props);
 
@@ -148,3 +151,5 @@ export default class List extends Component {
     );
   }
 }
+
+export default connect()(List);
