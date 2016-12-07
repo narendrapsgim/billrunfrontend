@@ -1,30 +1,33 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router';
 import Immutable from 'immutable';
 import classNames from 'classnames';
 import { NavDropdown, Button, MenuItem as BootstrapMenuItem } from 'react-bootstrap';
 import { userDoLogout } from '../../actions/userActions';
+import MenuItem from './MenuItem';
+import SubMenu from './SubMenu';
 /* Assets */
 import LogoImg from 'img/billrun-logo-tm.png';
-import MenuItem from './MenuItem';
-import MenuItems from '../../MenuItems';
-import SubMenu from './SubMenu';
 
 class Navigator extends Component {
 
   static defaultProps = {
     companyNeme: '',
     userName: '',
+    menuItems: Immutable.List(),
+    userRoles: [],
   };
 
   static propTypes = {
-    router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
     }).isRequired,
-    userDoLogout: React.PropTypes.func.isRequired,
-    companyNeme: React.PropTypes.string,
-    userName: React.PropTypes.string,
+    menuItems: PropTypes.instanceOf(Immutable.Iterable),
+    userDoLogout: PropTypes.func.isRequired,
+    companyNeme: PropTypes.string,
+    userName: PropTypes.string,
+    userRoles: PropTypes.array,
   };
 
   state = {
@@ -34,19 +37,22 @@ class Navigator extends Component {
     openSubMenu: [],
   };
 
-  componentDidMount(){
-    const { router } = this.props;
-    const {openSubMenu} = this.state;
-    MenuItems.filter(this.filterEnabledMenu).map((item,key) => {
-      if (item.subMenus && item.subMenus.filter(subMenu => router.isActive(subMenu.route)).length > 0){
-        this.setState({openSubMenu: [...openSubMenu,item.id]});
-      }
-    });
-  }
-
   componentWillMount() {
     this.onWindowResize();
     window.addEventListener('resize', this.onWindowResize);
+  }
+
+  componentDidMount() {
+    const { router, menuItems } = this.props;
+    const { openSubMenu } = this.state;
+    menuItems
+      .filter(this.filterEnabledMenu)
+      .filter(this.filterPermission)
+      .forEach((item) => {
+        if (item.get('subMenus', Immutable.List()).filter(subMenu => router.isActive(subMenu.route)).length > 0) {
+          this.setState({ openSubMenu: [...openSubMenu, item.get('id')] });
+        }
+      });
   }
 
   componentWillUnmount() {
@@ -73,9 +79,9 @@ class Navigator extends Component {
 
 
   onToggleSubMenu = (id) => {
-    const {openSubMenu, collapseSideBar} = this.state;
-    const toggleSubMenu =  openSubMenu.includes(id)? openSubMenu.filter(item => item!= id):[...openSubMenu,id];
-    this.setState({ openSubMenu: toggleSubMenu, collapseSideBar:false});
+    const { openSubMenu } = this.state;
+    const toggleSubMenu = openSubMenu.includes(id) ? openSubMenu.filter(item => item != id) : [...openSubMenu, id];
+    this.setState({ openSubMenu: toggleSubMenu, collapseSideBar: false });
   };
 
   clickLogout = (e) => {
@@ -85,32 +91,56 @@ class Navigator extends Component {
     });
   };
 
-  filterEnabledMenu = menu => menu.show;
+  filterEnabledMenu = menu => menu.get('show', false);
+
+  filterPermission = (menu) => {
+    const { userRoles } = this.props;
+    const menuRoles = menu.get('roles', Immutable.List());
+    // If menu doesn't limitation to role, return true
+    if (menuRoles.size === 0) {
+      return true;
+    }
+    // If user is Admin, return true
+    if (userRoles.includes('admin')) {
+      return true;
+    }
+    return menuRoles.toSet().intersect(userRoles).size > 0;
+  }
 
   renderSubMenu = (item, key) => {
-    const { id, icon, title } = item;
-    const {openSubMenu} = this.state;
+    const { openSubMenu } = this.state;
+    const id = item.get('id', '');
+    const icon = item.get('icon', '');
+    const title = item.get('title', '');
+    const subMenus = item.get('subMenus', Immutable.List());
     return (
       <SubMenu
         icon={`fa ${icon} fa-fw`}
         id={id}
         key={key}
         onClick={this.onToggleSubMenu}
-        open={openSubMenu.includes(item.id)}
+        open={openSubMenu.includes(id)}
         title={title}
       >
-        { item.subMenus.filter(this.filterEnabledMenu).map(this.renderMenu) }
+        { subMenus
+            .filter(this.filterEnabledMenu)
+            .filter(this.filterPermission)
+            .map(this.renderMenu)
+        }
       </SubMenu>
     );
   }
 
   renderMenu = (menuItem, key) => (
-    menuItem.subMenus ? this.renderSubMenu(menuItem, key) : this.renderMenuItem(menuItem, key)
+    menuItem.get('subMenus') ? this.renderSubMenu(menuItem, key) : this.renderMenuItem(menuItem, key)
   );
 
   renderMenuItem = (item, key) => {
     const { router } = this.props;
-    const { id, route, icon, title } = item;
+    const id = item.get('id', '');
+    const icon = item.get('icon', '');
+    const title = item.get('title', '');
+    const route = item.get('route', '');
     return (
       <MenuItem
         active={router.isActive(route)}
@@ -126,7 +156,7 @@ class Navigator extends Component {
 
   render() {
     const { collapseSideBar } = this.state;
-    const { userName, companyNeme } = this.props;
+    const { userName, companyNeme, menuItems } = this.props;
     const overallNavClassName = classNames({
       'navbar navbar-default navbar-fixed-top': true,
       'collapse-sizebar': collapseSideBar,
@@ -156,7 +186,11 @@ class Navigator extends Component {
           <div className="sidebar-nav navbar-collapse">
 
             <ul className="nav in" id="side-menu">
-              { MenuItems.filter(this.filterEnabledMenu).map(this.renderMenu) }
+              { menuItems
+                  .filter(this.filterEnabledMenu)
+                  .filter(this.filterPermission)
+                  .map(this.renderMenu)
+              }
             </ul>
           </div>
         </div>
@@ -171,5 +205,7 @@ const mapDispatchToProps = {
 const mapStateToProps = state => ({
   companyNeme: state.settings.get('tenant', Immutable.Map()).get('name'),
   userName: state.user.get('name'),
+  menuItems: state.settings.getIn(['menu', 'main'], Immutable.List()),
+  userRoles: state.user.get('roles'),
 });
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Navigator));

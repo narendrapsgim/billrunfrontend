@@ -7,6 +7,7 @@ import DateTime from './DateTime';
 import CurrencyTax from './CurrencyTax';
 import Tenant from './Tenant';
 import Security from './Security';
+import EditMenu from './EditMenu';
 import ActionButtons from '../Elements/ActionButtons';
 
 
@@ -28,7 +29,7 @@ class Settings extends Component {
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret']));
+    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu']));
   }
 
   onChangeFieldValue = (category, id, value) => {
@@ -37,7 +38,7 @@ class Settings extends Component {
 
   onSave = () => {
     const { settings } = this.props;
-    let categoryToSave = [];
+    const categoryToSave = [];
     // save 'BillRun'
     if (settings.has('billrun')) {
       categoryToSave.push('billrun');
@@ -49,6 +50,10 @@ class Settings extends Component {
     // save 'tenant'
     if (settings.has('tenant')) {
       categoryToSave.push('tenant');
+    }
+    // save 'Menu'
+    if (settings.has('menu')) {
+      categoryToSave.push('menu');
     }
     if (categoryToSave.length) {
       this.props.dispatch(saveSettings(categoryToSave));
@@ -66,6 +71,7 @@ class Settings extends Component {
     const datetime = settings.get('billrun', Immutable.Map());
     const sharedSecret = settings.get('shared_secret', Immutable.Map());
     const tenant = settings.get('tenant', Immutable.Map());
+    const mainMenu = settings.getIn(['menu', 'main'], Immutable.List());
 
     return (
       <div>
@@ -83,7 +89,13 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Security" eventKey={3}>
+          <Tab title="Menu" eventKey={3}>
+            <Panel style={{ borderTop: 'none' }}>
+              <EditMenu onChange={this.onChangeFieldValue} data={mainMenu} />
+            </Panel>
+          </Tab>
+
+          <Tab title="Security" eventKey={4}>
             <Panel style={{ borderTop: 'none' }}>
               <Security data={sharedSecret} />
             </Panel>

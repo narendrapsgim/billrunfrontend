@@ -51,7 +51,7 @@ class App extends Component {
     }
     if (auth !== true && nextProps.auth === true) { // user did success login
       // get global system settings
-      this.props.dispatch(getSettings(['pricing', 'tenant']));
+      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu']));
     }
   }
 
