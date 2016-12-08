@@ -257,3 +257,8 @@ textarea {
   font-size: 14px;
   float: left;
 }
+
+.draggable-menu{
+  background-color: #eee;
+  opacity: .7;
+}

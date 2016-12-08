@@ -16,6 +16,7 @@ const SortableMenuItem = props => (
         idx={props.idx}
         path={props.path}
         onChangeField={props.onChangeField}
+        onChangeShowHide={props.onChangeShowHide}
       />
       {props.subMenus.size > 0 && props.renderTree(props.subMenus, [...props.newPath, 'subMenus'])}
     </Col>
@@ -31,6 +32,7 @@ SortableMenuItem.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map).isRequired,
   newPath: PropTypes.string.isRequired,
   onChangeField: React.PropTypes.func.isRequired,
+  onChangeShowHide: React.PropTypes.func.isRequired,
   path: PropTypes.array.isRequired,
   renderTree: PropTypes.func.isRequired,
   subMenus: PropTypes.instanceOf(Immutable.List),

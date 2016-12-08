@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Col } from 'react-bootstrap';
+import { Col, Form, FormGroup, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../../Field';
+import EditMenuItemsDetails from './EditMenuItemsDetails';
 
 
 class EditMenuItem extends Component {
@@ -12,33 +13,18 @@ class EditMenuItem extends Component {
     path: PropTypes.array,
     idx: PropTypes.number,
     onChangeField: PropTypes.func,
+    onChangeShowHide: PropTypes.func,
   };
 
   state = {
-    editTitleMode: false,
-    editRoleMode: false,
+    editMode: false,
     mouseOver: false,
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { editRoleMode } = this.state;
-    if (editRoleMode) {
-      this.refs.selectRole.focus();
-    }
-  }
-
-  onKeyDown = (event) => {
-    if (event.keyCode === 13) {
-      this.finishEditing();
-    } else if (event.keyCode === 27) {
-      this.finishEditing();
-    }
   }
 
   onChangeShowHide = (e) => {
     const { value } = e.target;
     const { path, idx } = this.props;
-    this.props.onChangeField([...path, idx, 'show'], value);
+    this.props.onChangeShowHide([...path, idx], value);
   }
 
   onChangeTitle = (e) => {
@@ -61,117 +47,86 @@ class EditMenuItem extends Component {
     this.setState({ mouseOver: false });
   }
 
-  toggleEditTitle = (e) => {
+  toggleEdit = (e) => {
     e.preventDefault();
-    const { editTitleMode } = this.state;
-    const isEditMode = !editTitleMode;
-    this.setState({ editTitleMode: isEditMode });
+    const { editMode } = this.state;
+    const isEditMode = !editMode;
+    this.setState({ editMode: isEditMode });
   }
 
-  toggleEditRole = (e) => {
-    e.preventDefault();
-    const { editRoleMode } = this.state;
-    const isEditMode = !editRoleMode;
-    this.setState({ editRoleMode: isEditMode });
-  }
-
-  finishEditing = () => {
-    this.setState({ editTitleMode: false, editRoleMode: false });
-  }
-
-  renderInput = () => {
-    const { editTitleMode } = this.state;
+  renderEditModal = () => {
+    const { editMode } = this.state;
     const { item } = this.props;
-    const value = item.get('title', '');
-
-    if (editTitleMode) {
-      return (
-        <div style={{ display: 'inline-block' }}>
-          <div style={{ display: 'inline-block' }}>
-            <Field
-              autoFocus
-              onBlur={this.finishEditing}
-              onChange={this.onChangeTitle}
-              onKeyDown={this.fonKeyDown}
-              value={value}
-            />
-          </div>
-          <span style={{ verticalAlign: 'text-bottom', cursor: 'pointer', color: 'green' }}>&nbsp;<i className="fa fa-check fa-fw" onClick={this.toggleEditTitle} /></span>
-        </div>
-      );
-    }
-    return (<span style={{ cursor: 'pointer' }} onClick={this.toggleEditTitle}>{value}</span>);
-  }
-
-  renderRoleSelect = () => {
-    const { editRoleMode } = this.state;
-    const { item } = this.props;
+    const title = item.get('title', '');
     const roles = item.get('roles', []).join(',');
     const availableRoles = ['admin', 'read', 'write'].map(role => ({
       value: role,
       label: role,
     }));
 
-    if (editRoleMode) {
-      return (
-        <div style={{ display: 'inline-block', width: '100%' }}>
-          <div style={{ display: 'inline-block', width: '85%' }}>
-            <Select
-              autofocus
-              ref="selectRole"
-              multi={true}
-              value={roles}
-              options={availableRoles}
-              onChange={this.onChangeRoles}
-              onKeyDown={this.onKeyDown}
-            />
-          </div>
-          <span style={{ verticalAlign: 'text-bottom', cursor: 'pointer', lineHeight: '39px', color: 'green' }}>&nbsp;<i className="fa fa-check fa-fw" onClick={this.toggleEditRole} /></span>
-        </div>
-      );
-    } else if (roles.length === 0) {
-      return (<small style={{ cursor: 'pointer' }} onClick={this.toggleEditRole}>Visible to all roles</small>);
-    }
-    return (<small style={{ cursor: 'pointer' }} onClick={this.toggleEditRole}>{roles}</small>);
+    return (
+      <EditMenuItemsDetails show={editMode} onOk={this.toggleEdit} title="Edit Menu details">
+        <Form horizontal>
+          <FormGroup>
+            <Col sm={2} componentClass={ControlLabel}>Label</Col>
+            <Col sm={10}>
+              <Field autoFocus onChange={this.onChangeTitle} value={title} />
+            </Col>
+          </FormGroup>
+
+          <FormGroup >
+            <Col sm={2} componentClass={ControlLabel}>Roles</Col>
+            <Col sm={10}>
+              <Select multi={true} value={roles} options={availableRoles} onChange={this.onChangeRoles} />
+            </Col>
+          </FormGroup>
+        </Form>
+      </EditMenuItemsDetails>
+    )
   }
 
-  rendermouseOver = (type) => {
-    let onClick = () => {};
-    switch (type) {
-      case 'roles': onClick = this.toggleEditRole
-        break;
-      case 'title': onClick = this.toggleEditTitle
-        break;
+  renderRole = () => {
+    const { item } = this.props;
+    const roles = item.get('roles', []).join(',');
+    if (roles.length === 0) {
+      return (<small>Visible to all roles</small>);
     }
-    return <span>&nbsp;<i className="fa fa-pencil-square-o fa-fw" onClick={onClick} /></span>;
+    return (<small>{roles}</small>);
   }
+
+  renderTitle = () => {
+    const { item } = this.props;
+    const title = item.get('title', '');
+    const icon = item.get('icon', '');
+    const menuIcon = icon.length ? (<i className={`fa ${icon} fa-fw`} />) : (null);
+    return (<span>{menuIcon} {title}</span>);
+  }
+
+  renderMouseOver = () => <span>&nbsp;<i className="fa fa-pencil-square-o fa-fw" /></span>;
 
   render() {
     const { item } = this.props;
-    const { mouseOver, editRoleMode, editTitleMode } = this.state;
-    const icon = item.get('icon', '');
+    const { mouseOver, editMode } = this.state;
     const show = item.get('show', false);
 
     return (
       <Col md={12} onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
 
-        <Col md={6} style={{ color: '#008cba' }}>
-          { icon.length > 0
-            ? <span><i className={`fa ${icon} fa-fw`} />&nbsp;</span>
-            : <span>&nbsp;</span>
-          }
-          { this.renderInput() }
-          { mouseOver && !editTitleMode && this.rendermouseOver('title') }
+        <Col md={6} style={{ color: '#008cba', cursor: 'pointer' }} onClick={this.toggleEdit}>
+          { this.renderTitle() }
+          { mouseOver && !editMode && this.renderMouseOver() }
         </Col>
 
-        <Col md={4} className="text-right">
-          { this.renderRoleSelect() }
-          { mouseOver && !editRoleMode && this.rendermouseOver('roles') }
+        <Col md={4} className="text-right" style={{ cursor: 'pointer' }} onClick={this.toggleEdit}>
+          { this.renderRole() }
+          { mouseOver && !editMode && this.renderMouseOver() }
         </Col>
 
         <Col md={2} className="text-right">
           <Field onChange={this.onChangeShowHide} value={show} fieldType="checkbox" />
         </Col>
+
+        {this.renderEditModal()}
       </Col>
     );
   }

@@ -16,6 +16,16 @@ export default class EditMenu extends Component {
     this.props.onChange('menu', ['main', ...path], value);
   }
 
+  onChangeShowHide = (path, value) => {
+    const { data } = this.props;
+    if (value === false && data.getIn(path).has('subMenus')) {
+      data.getIn([...path, 'subMenus']).forEach((menu, idx) => {
+        this.props.onChange('menu', ['main', ...path, 'subMenus', idx, 'show'], value);
+      });
+    }
+    this.props.onChange('menu', ['main', ...path, 'show'], value);
+  }
+
   onDragEnd = ({ oldIndex, newIndex, collection }) => {
     const { data } = this.props;
     const path = (collection === '') ? [] : collection.split('-');
@@ -40,6 +50,7 @@ export default class EditMenu extends Component {
         key={newPath.join('-')}
         newPath={newPath}
         onChangeField={this.onChangeField}
+        onChangeShowHide={this.onChangeShowHide}
         path={path}
         renderTree={this.renderTree}
         subMenus={subMenus}
@@ -49,6 +60,8 @@ export default class EditMenu extends Component {
 
   renderTree = (tree, path) => (
     <SortableMenuList
+      axis="y"
+      helperClass="draggable-menu"
       items={tree}
       key={path.join('-')}
       onSortEnd={this.onDragEnd}
@@ -63,11 +76,10 @@ export default class EditMenu extends Component {
     const { data } = this.props;
     return (
       <div>
-        <Col md={1} className="text-left">&nbsp;</Col>
-        <Col md={5} className="text-left">&nbsp;</Col>
+        <Col md={6} className="text-left">Main Menu</Col>
         <Col md={4} className="text-right">Roles</Col>
         <Col md={2} className="text-right">Show/Hide</Col>
-        <Grid bsClass="wrapper">
+        <Grid bsClass="wrapper" style={{ paddingTop: 35 }}>
           { this.renderTree(data, []) }
         </Grid>
       </div>
