@@ -90,8 +90,32 @@ const PrepaidInclude = (props) => {
               }
 	    </Col>
 	  </FormGroup>
+	  <FormGroup>
+	    <Col lg={2} md={2} componentClass={ ControlLabel }>
+	      Shared bucket
+	    </Col>
+	    <Col lg={7} md={7}>
+				<Field id="shared"
+					value={ props.prepaidInclude.get('shared', false) }
+				 	onChange={ props.onChangeField }
+					fieldType="checkbox"
+				/>
+	    </Col>
+	  </FormGroup>
+	  <FormGroup>
+	    <Col lg={2} md={2} componentClass={ ControlLabel }>
+	      Unlimited
+	    </Col>
+	    <Col lg={7} md={7}>
+				<Field id="unlimited"
+					value={ props.prepaidInclude.get('unlimited', false) }
+				 	onChange={ props.onChangeField }
+					fieldType="checkbox"
+				/>
+	    </Col>
+	  </FormGroup>
         </Form>
-      </Panel>	  
+      </Panel>
     </div>
   );
 };
