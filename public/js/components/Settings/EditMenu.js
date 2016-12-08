@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Grid, Col } from 'react-bootstrap';
-import EditMenuItem from './EditMenu/EditMenuItem';
+import SortableMenuItem from './EditMenu/SortableMenuItem';
+import SortableMenuList from './EditMenu/SortableMenuList';
 
 
 export default class EditMenu extends Component {
@@ -15,33 +16,58 @@ export default class EditMenu extends Component {
     this.props.onChange('menu', ['main', ...path], value);
   }
 
+  onDragEnd = ({ oldIndex, newIndex, collection }) => {
+    const { data } = this.props;
+    const path = (collection === '') ? [] : collection.split('-');
+    const pathFrom = [...path, oldIndex];
+    const sortedMenuItem = data.getIn(pathFrom);
+    const newOrder = data
+      .deleteIn(pathFrom)
+      .updateIn([...path], Immutable.List(), list => list.insert(newIndex, sortedMenuItem));
+    this.onChangeField([], newOrder);
+  };
+
   renderMenu = (item, index, path) => {
     const subMenus = item.get('subMenus', Immutable.List());
     const newPath = [...path, index];
+    const collection = path.join('-');
     return (
-      <div key={newPath.join('-')} >
-        <EditMenuItem item={item} index={index} path={path} onChangeField={this.onChangeField} />
-        <Col lg={12} md={12} className="pr0"><hr style={{ margin: '10px 0' }} /></Col>
-        {subMenus.size > 0 && this.renderTree(subMenus, [...newPath, 'subMenus'])}
-      </div>
+      <SortableMenuItem
+        collection={collection}
+        idx={index}
+        index={index}
+        item={item}
+        key={newPath.join('-')}
+        newPath={newPath}
+        onChangeField={this.onChangeField}
+        path={path}
+        renderTree={this.renderTree}
+        subMenus={subMenus}
+      />
     );
   }
 
   renderTree = (tree, path) => (
-    <Col lg={12} md={12} className="pr0">
-      {tree.map((item, index) => this.renderMenu(item, index, path))}
-    </Col>
-  );
+    <SortableMenuList
+      items={tree}
+      key={path.join('-')}
+      onSortEnd={this.onDragEnd}
+      path={path}
+      useDragHandle={true}
+      renderMenu={this.renderMenu}
+    />
+  )
+
 
   render() {
     const { data } = this.props;
     return (
       <div>
-        <Col lg={1} md={1} className="text-left">&nbsp;</Col>
-        <Col lg={5} md={5} className="text-left">Menu</Col>
-        <Col lg={4} md={4} className="text-left">Roles</Col>
-        <Col lg={2} md={2} className="text-left">Show/Hide</Col>
-        <Col lg={12} md={12} className="pr0"><hr /></Col>
+        <Col md={1} className="text-left">&nbsp;</Col>
+        <Col md={5} className="text-left">Menu</Col>
+        <Col md={4} className="text-left">Roles</Col>
+        <Col md={2} className="text-left">Show/Hide</Col>
+        <Col md={12} className="pr0"><hr /></Col>
         <Grid bsClass="wrapper">
           { this.renderTree(data, []) }
         </Grid>

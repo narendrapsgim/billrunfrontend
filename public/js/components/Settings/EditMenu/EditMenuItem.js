@@ -10,7 +10,7 @@ class EditMenuItem extends Component {
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     path: PropTypes.array,
-    index: PropTypes.number,
+    idx: PropTypes.number,
     onChangeField: PropTypes.func,
   };
 
@@ -37,20 +37,20 @@ class EditMenuItem extends Component {
 
   onChangeShowHide = (e) => {
     const { value } = e.target;
-    const { path, index } = this.props;
-    this.props.onChangeField([...path, index, 'show'], value);
+    const { path, idx } = this.props;
+    this.props.onChangeField([...path, idx, 'show'], value);
   }
 
   onChangeTitle = (e) => {
     const { value } = e.target;
-    const { path, index } = this.props;
-    this.props.onChangeField([...path, index, 'title'], value);
+    const { path, idx } = this.props;
+    this.props.onChangeField([...path, idx, 'title'], value);
   }
 
   onChangeRoles = (roles) => {
-    const { path, index } = this.props;
+    const { path, idx } = this.props;
     const rolesList = (roles.length) ? roles.split(',') : [];
-    this.props.onChangeField([...path, index, 'roles'], rolesList);
+    this.props.onChangeField([...path, idx, 'roles'], rolesList);
   }
 
   onMouseEnter = (e) => {
@@ -132,7 +132,7 @@ class EditMenuItem extends Component {
     } else if (roles.length === 0) {
       return (<small style={{ cursor: 'pointer' }} onClick={this.toggleEditRole}>Visible to all roles</small>);
     }
-    return (<span style={{ cursor: 'pointer' }} onClick={this.toggleEditRole}>{roles}</span>);
+    return (<small style={{ cursor: 'pointer' }} onClick={this.toggleEditRole}>{roles}</small>);
   }
 
   rendermouseOver = (type) => {
@@ -153,12 +153,9 @@ class EditMenuItem extends Component {
     const show = item.get('show', false);
 
     return (
-      <Col lg={12} md={12} onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
-        <Col lg={1} md={1}>
-          { <i className="fa fa-arrows fa-fw" /> }
-        </Col>
+      <Col md={12} onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
 
-        <Col lg={5} md={5} style={{ color: '#008cba' }}>
+        <Col md={6} style={{ color: '#008cba' }}>
           { icon.length > 0
             ? <span><i className={`fa ${icon} fa-fw`} />&nbsp;</span>
             : <span>&nbsp;</span>
@@ -167,12 +164,12 @@ class EditMenuItem extends Component {
           { mouseOver && !editTitleMode && this.rendermouseOver('title') }
         </Col>
 
-        <Col lg={4} md={4}>
+        <Col md={4} className="text-right">
           { this.renderRoleSelect() }
           { mouseOver && !editRoleMode && this.rendermouseOver('roles') }
         </Col>
 
-        <Col lg={2} md={2} className="text-center">
+        <Col md={2} className="text-right">
           <Field onChange={this.onChangeShowHide} value={show} fieldType="checkbox" />
         </Col>
       </Col>
