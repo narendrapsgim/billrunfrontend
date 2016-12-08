@@ -64,10 +64,9 @@ export default class EditMenu extends Component {
     return (
       <div>
         <Col md={1} className="text-left">&nbsp;</Col>
-        <Col md={5} className="text-left">Menu</Col>
-        <Col md={4} className="text-left">Roles</Col>
-        <Col md={2} className="text-left">Show/Hide</Col>
-        <Col md={12} className="pr0"><hr /></Col>
+        <Col md={5} className="text-left">&nbsp;</Col>
+        <Col md={4} className="text-right">Roles</Col>
+        <Col md={2} className="text-right">Show/Hide</Col>
         <Grid bsClass="wrapper">
           { this.renderTree(data, []) }
         </Grid>

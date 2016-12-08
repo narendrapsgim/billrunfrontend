@@ -6,7 +6,7 @@ import EditMenuItem from './EditMenuItem';
 import DragHandle from './DragHandle';
 
 const SortableMenuItem = props => (
-  <Col md={12} className="pr0">
+  <Col md={12} className="pr0" style={{ borderTop: '1px solid #eee', borderBottom: '1px solid #eee', lineHeight: '35px' }} >
     <Col md={1}>
       <DragHandle />
     </Col>
@@ -17,7 +17,6 @@ const SortableMenuItem = props => (
         path={props.path}
         onChangeField={props.onChangeField}
       />
-      <Col md={12} className="pr0"><hr style={{ margin: '10px 0' }} /></Col>
       {props.subMenus.size > 0 && props.renderTree(props.subMenus, [...props.newPath, 'subMenus'])}
     </Col>
   </Col>

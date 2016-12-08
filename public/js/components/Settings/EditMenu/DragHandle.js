@@ -4,7 +4,7 @@ import { SortableHandle } from 'react-sortable-hoc';
 const DragHandle = ({ element }) => element;
 
 DragHandle.defaultProps = {
-  element: <i className="fa fa-bars fa-fw" style={{ cursor: 'row-resize', opacity: '.25' }} />,
+  element: <i className="fa fa-bars fa-fw" style={{ cursor: 'row-resize', opacity: '.25', lineHeight: '35px' }} />,
 };
 
 DragHandle.propTypes = {
