@@ -257,3 +257,7 @@ textarea {
   font-size: 14px;
   float: left;
 }
+
+.movable {
+    cursor: move;
+}

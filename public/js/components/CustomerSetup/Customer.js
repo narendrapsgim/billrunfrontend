@@ -65,7 +65,7 @@ class Customer extends Component {
       let options;
       if (setting.get('select_list', false)) {
         options =
-          setting.get('default_value', '')
+          setting.get('select_options', '')
                  .split(',')
                  .map(val => {
                    return {
