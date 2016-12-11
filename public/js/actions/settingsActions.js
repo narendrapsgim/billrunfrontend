@@ -93,16 +93,19 @@ function saveSettingsToDB(categories, settings) {
     if (multipleCategories) {
       return ({ [category]: data });
     }
-    return ({ data });
+    return data;
   });
+
+  const category = multipleCategories ? 'ROOT' : categories[0];
+  const data = multipleCategories ? categoryData : categoryData[0];
 
   const queries = ({
     api: 'settings',
     name: categories.join(','),
     params: [
-      { category: multipleCategories ? 'ROOT' : categories[0] },
+      { category },
       { action: 'set' },
-      { data: JSON.stringify(categoryData) },
+      { data: JSON.stringify(data) },
     ],
   });
 
