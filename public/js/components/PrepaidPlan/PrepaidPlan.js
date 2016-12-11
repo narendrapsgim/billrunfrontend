@@ -182,11 +182,14 @@ class PrepaidPlan extends Component {
 	      </Panel>
 	    </Tab>
 
-	    <Tab title="Override Product Price" eventKey={2}>
-	      <Panel style={{borderTop: 'none'}}>
-		<PlanProductsPriceTab />
-	      </Panel>
-	    </Tab>
+            {
+              action !== 'new' &&
+	      (<Tab title="Override Product Price" eventKey={2}>
+	        <Panel style={{borderTop: 'none'}}>
+		  <PlanProductsPriceTab />
+	        </Panel>
+	      </Tab>)
+            }
 
 	    <Tab title="Notifications" eventKey={3}>
 	      <Panel style={{borderTop: 'none'}}>
