@@ -84,20 +84,26 @@ function fetchSettings(categories) {
 }
 
 function saveSettingsToDB(categories, settings) {
-  const queries = categories.map((category) => {
+  const multipleCategories = categories.length > 1;
+  const categoryData = categories.map((category) => {
     let data = settings.get(category);
     if (category === 'pricing') {
       data = data.set('vat', data.get('vat') / 100);
     }
-    return ({
-      api: 'settings',
-      name: category,
-      params: [
-        { category },
-        { action: 'set' },
-        { data: JSON.stringify(data) },
-      ],
-    });
+    if (multipleCategories) {
+      return ({ [category]: data });
+    }
+    return ({ data });
+  });
+
+  const queries = ({
+    api: 'settings',
+    name: categories.join(','),
+    params: [
+      { category: multipleCategories ? 'ROOT' : categories[0] },
+      { action: 'set' },
+      { data: JSON.stringify(categoryData) },
+    ],
   });
 
   return (dispatch) => {
@@ -110,7 +116,6 @@ function saveSettingsToDB(categories, settings) {
     });
   };
 }
-
 
 export function getSettings(categories = []) {
   if (!Array.isArray(categories)) {
