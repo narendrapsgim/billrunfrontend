@@ -25,6 +25,7 @@ import PlanNotifications from './PlanNotifications';
 import BlockedProducts from './BlockedProducts';
 import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
 import Thresholds from './Thresholds';
+import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 
 class PrepaidPlan extends Component {
 
@@ -163,6 +164,10 @@ class PrepaidPlan extends Component {
   render() {
     const { plan, pp_includes } = this.props;
     const { action } = this.props.location.query;
+
+    if (action !== 'new' && !plan.get('name')) {
+      return (<LoadingItemPlaceholder onClick={this.handleCancel} />);
+    }
 
     return (
       <div className="PrepaidPlan">
