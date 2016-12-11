@@ -65,7 +65,7 @@ class EditMenuItem extends Component {
     }));
 
     return (
-      <EditMenuItemsDetails show={editMode} onOk={this.toggleEdit} title="Edit Menu details">
+      <EditMenuItemsDetails show={editMode} onOk={this.toggleEdit} title={`Edit ${title} Details`}>
         <Form horizontal>
           <FormGroup>
             <Col sm={2} componentClass={ControlLabel}>Label</Col>
