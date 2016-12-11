@@ -17,6 +17,7 @@ import Customer from './Customer';
 import Subscriptions from './Subscriptions';
 import ActionButtons from './ActionButtons';
 import PostpaidBalances from '../PostpaidBalances';
+import PrepaidBalances from '../PrepaidBalances';
 
 class CustomerSetup extends Component {
   constructor(props) {
@@ -31,7 +32,7 @@ class CustomerSetup extends Component {
       current: 1
     };
   }
-  
+
   componentDidMount() {
     const { aid } = this.props.location.query;
     if (aid) {
@@ -108,7 +109,7 @@ class CustomerSetup extends Component {
     const { value, id } = e.target;
     this.props.dispatch(updateEntityField('customer', id, value));
   }
-  
+
   onSaveCustomer() {
     const { dispatch, customer, location } = this.props;
     const { action } = location.query;
@@ -125,7 +126,7 @@ class CustomerSetup extends Component {
       api: "subscribers",
       params
     };
-    
+
     apiBillRun(query).then(
       success => {
         if (action === "update") {
@@ -163,13 +164,13 @@ class CustomerSetup extends Component {
       }
     );
   }
-  
+
   onClickNewSubscription(aid, e) {
     window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url="${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}"`;
   }
 
   onSaveSubscription = (subscription, data, callback) => {
-    const { aid } = this.props.location.query;    
+    const { aid } = this.props.location.query;
     const newsub = subscription.withMutations(map => {
       Object.keys(data).map(field => {
         map.set(field, data[field]);
@@ -214,7 +215,7 @@ class CustomerSetup extends Component {
       }
     );
   };
-  
+
   onCancel() {
     this.context.router.push({
       pathname: "/customers"
@@ -261,6 +262,13 @@ class CustomerSetup extends Component {
         <Tab title="Postpaid Counters" eventKey={3} key={3}>
           <Panel style={{borderTop: 'none'}}>
             <PostpaidBalances aid={ aid } />
+          </Panel>
+        </Tab>
+      ));
+      tabs.push((
+        <Tab title="Prepaid Counters" eventKey={4} key={4}>
+          <Panel style={{borderTop: 'none'}}>
+            <PrepaidBalances aid={ aid } />
           </Panel>
         </Tab>
       ));

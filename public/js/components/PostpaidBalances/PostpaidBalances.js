@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
+import ChangeCase from 'change-case';
 
 import { getSettings } from '../../actions/settingsActions';
 import { getList } from '../../actions/listActions';
@@ -38,7 +39,7 @@ class PostpaidBalances extends Component {
   componentDidMount() {
     this.props.dispatch(getSettings(["usage_types"]));
   }
-  
+
   buildQuery = () => {
     const { size, page, sort, filter } = this.state;
     /** TODO: Will probably change **/
@@ -57,11 +58,11 @@ class PostpaidBalances extends Component {
   getBalances = () => {
     this.props.dispatch(getList("balances", this.buildQuery()));
   }
-  
+
   handlePageClick = (page) => {
     this.setState({page}, this.getBalances);
   }
-  
+
   onFilter = (filter) => {
     this.setState({filter, page: 0}, this.getBalances);
   }
@@ -69,7 +70,7 @@ class PostpaidBalances extends Component {
   onSort = (sort) => {
     this.setState({sort}, this.getBalances);
   }
-  
+
   render() {
     const { usage_types, balances } = this.props;
     const { aid } = this.state;
@@ -77,7 +78,7 @@ class PostpaidBalances extends Component {
     const usage_fields = usage_types.map((usaget, key) => {
       return {
         id: usaget,
-        placeholder: usaget,
+        placeholder: ChangeCase.titleCase(usaget),
         showFilter: false,
         parser: (ent) => ent.getIn(['balance', 'totals', usaget], '')
       };
@@ -90,10 +91,10 @@ class PostpaidBalances extends Component {
       { id: "from", placeholder: "From", showFilter: false, type: "datetime" },
       { id: "to", placeholder: "To", showFilter: false, type: "datetime" },
     ];
-    
+
     return (
       <div className="PostpaidBalances">
-        
+
         <div className="row">
           <div className="col-lg-12">
             <Filter fields={fields} onFilter={this.onFilter} base={{to: {$gt: moment().toISOString()}, aid: aid}} />
@@ -103,7 +104,7 @@ class PostpaidBalances extends Component {
 
         <Pager onClick={this.handlePageClick}
                size={this.state.size}
-               count={balances.size || 0} />  
+               count={balances.size || 0} />
       </div>
     );
   }
@@ -117,4 +118,3 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps)(PostpaidBalances);
-
