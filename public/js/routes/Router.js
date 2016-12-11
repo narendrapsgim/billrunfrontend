@@ -68,7 +68,7 @@ const routes = () => (
     <Route path="/prepaid_includes" component={RequireAuth(PrepaidIncludesList)} title="Prepaid Buckets" />
     <Route path="/prepaid_include" component={RequireAuth(PrepaidIncludeSetup)} />
     <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
-    <Route path="/charging_plans" component={RequireAuth(ChargingPlansList)} title="Charging Plans" />
+    <Route path="/charging_plans" component={RequireAuth(ChargingPlansList)} title="Buckets Group" />
     <Route path="/charging_plan" component={RequireAuth(ChargingPlanSetup)} />
     <Route path="/custom_fields" component={RequireAuth(CustomFields)} title="Custom Fields" />
     <Route path="/login" component={LoginPage} title="Login" />

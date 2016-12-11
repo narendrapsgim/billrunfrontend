@@ -29,7 +29,7 @@ const MenuItems = [
       },
       {
 	id: 'charging',
-	title: 'Charging',
+	title: 'Buckets Group',
 	icon: '',
 	route: 'charging_plans',
 	show: true
@@ -63,7 +63,7 @@ const MenuItems = [
         icon:'',
         route:'services',
         show:true,
-      }      
+      }
     ]
   },
   {
