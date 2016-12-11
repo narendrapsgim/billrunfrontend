@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router';
 import { connect } from 'react-redux';
-
+import moment from 'moment';
 import { Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
@@ -24,6 +24,15 @@ class Customer extends Component {
     const e = {target: {id: field[0].field, value}};
     this.props.onChange(e);
   };
+
+  renderInCollection = () => {
+    const { customer } = this.props;
+    if (customer.get('in_collection', false) === true || customer.get('in_collection', 0) === 1) {
+      const fromDate = moment(customer.get('in_collection_from', '')).format(globalSetting.dateFormat);
+      return (<p className="danger-red">In collection from {fromDate}</p>);
+    }
+    return null;
+  }
   
   render() {
     const {customer, onChange, settings, action, invalidFields} = this.props;
@@ -98,6 +107,7 @@ class Customer extends Component {
         {(action !== "new") &&
           <div>
             <hr />
+            { this.renderInCollection() }
             <p>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></p>
             <p>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link></p>
           </div>

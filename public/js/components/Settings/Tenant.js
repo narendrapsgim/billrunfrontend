@@ -27,6 +27,7 @@ export default class Tenant extends Component {
       contentType: false,
       processData: false
     });
+    this.props.onChange('tenant', 'logo', e.target.files[0].name);
   };
 
   render() {
