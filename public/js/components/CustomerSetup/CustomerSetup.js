@@ -258,7 +258,7 @@ class CustomerSetup extends Component {
         </Tab>
       ));
       tabs.push((
-        <Tab title="Counters" eventKey={3} key={3}>
+        <Tab title="Postpaid Counters" eventKey={3} key={3}>
           <Panel style={{borderTop: 'none'}}>
             <PostpaidBalances aid={ aid } />
           </Panel>
