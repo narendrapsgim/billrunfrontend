@@ -45,7 +45,7 @@ class PrepaidBalances extends Component {
   }
 
   getBalances = () => {
-    this.props.dispatch(getList('balances', this.buildQuery()));
+    this.props.dispatch(getList('prepaidBalances', this.buildQuery()));
   }
 
   handlePageClick = (page) => {
@@ -58,7 +58,7 @@ class PrepaidBalances extends Component {
     return {
       api: 'find',
       params: [
-        { collection: 'billing' },
+        { collection: 'balances' },
         { size },
         { page },
         { sort },
@@ -76,7 +76,7 @@ class PrepaidBalances extends Component {
 
   render() {
     const { aid, balances } = this.props;
-    const baseFilter = { to: { $gt: moment().toISOString() }, aid };
+    const baseFilter = { to: { $gt: moment().toISOString() }, aid, connection_type: 'prepaid' };
     const fields = [
       { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
       { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
@@ -107,7 +107,7 @@ class PrepaidBalances extends Component {
 
 function mapStateToProps(state) {
   return {
-    balances: state.list.get('balances'),
+    balances: state.list.get('prepaidBalances'),
   };
 }
 
