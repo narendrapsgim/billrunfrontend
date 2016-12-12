@@ -82,6 +82,19 @@ class SettingsModal extends React.Component {
               </FormGroup>
             </Col>
           </Row>
+          <Row>
+            <Col>
+              <ControlLabel>Select Options <small>(comma-separated list)</small></ControlLabel>
+              <FormGroup>
+                <Field
+                    id="select_options"
+                    onChange={ onChange }
+                    disabled={ !field.get('select_list', false) }
+                    value={ field.get('select_options', '') }
+                />
+              </FormGroup>
+            </Col>
+          </Row>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={ onClose }>Close</Button>

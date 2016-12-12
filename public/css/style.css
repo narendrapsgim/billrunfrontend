@@ -258,6 +258,9 @@ textarea {
   float: left;
 }
 
+.movable {
+    cursor: move;
+}
 .draggable-menu{
   background-color: #eee;
   opacity: .7;
