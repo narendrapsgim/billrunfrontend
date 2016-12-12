@@ -61,6 +61,13 @@ function fetchList(collection, params) {
 }
 
 export function getList(collection, params = defaultParams) {
+  /* if (collection === "balances") {
+   *   const resp = [
+   *     { "_id" : {"$id": "5844819c3c18ecb240a274c5"}, "sid" : 2, "from" : "2016-09-30T21:00:00Z", "to" : "2016-10-31T22:00:00Z", "current_plan" : "Test Plan TO BE DYNAMIC", "aid" : 1, "balance" : { "cost" : 5770, "totals" : { "call" : { "usagev" : 625, "cost" : 1210, "count" : 9 }, "sms" : { "usagev" : 218, "cost" : 880, "count" : 5 }, "data" : { "usagev" : 369, "cost" : 3680, "count" : 7 } } } },
+   *     { "_id" : {"$id": "5844819c3c18ecb240a274c6"}, "sid" : 2, "from" : "2016-09-30T21:00:00Z", "to" : "2016-10-31T22:00:00Z", "current_plan" : "A different plan", "aid" : 1, "balance" : { "cost" : 5770, "totals" : { "papers" : { "usagev" : 553, "cost" : 1210, "count" : 9 }, "cakes" : { "usagev" : 222, "cost" : 880, "count" : 5 }, "fish" : { "usagev" : 333, "cost" : 3680, "count" : 7 } } } }
+   *   ];
+   *   return (dispatch) => dispatch(gotList(collection, resp));
+   * }*/
   return (dispatch) => {
     return dispatch(fetchList(collection, params));
   };
