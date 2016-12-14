@@ -31,6 +31,24 @@ export default class AdvancedFilter extends Component {
     this.onChange('urt', value);
   }
 
+  onChangeDateFrom = (momentFromDate) => {
+    const id = 'urt';
+    const fromValue = momentFromDate ? momentFromDate.toJSON() : '';
+    const { filters } = this.state;
+    const value = filters.get(id, {});
+    value.from = fromValue;
+    this.onChange(id, value);
+  }
+
+  onChangeDateTo = (momentToDate) => {
+    const id = 'urt';
+    const toValue = momentToDate ? momentToDate.toJSON() : '';
+    const { filters } = this.state;
+    const value = filters.get(id, {});
+    value.to = toValue;
+    this.onChange(id, value);
+  }
+
 
   onChange = (filterName, value) => {
     const { filters } = this.state;
@@ -89,6 +107,39 @@ export default class AdvancedFilter extends Component {
             isClearable={true}
             placeholderText="Select Date..."
           />
+        );
+      }
+      case 'date-range': {
+        let dateFrom = value ? value.from : '';
+        dateFrom = (dateFrom ? moment(dateFrom) : null);
+
+        let dateTo = value ? value.to : '';
+        dateTo = (dateTo ? moment(dateTo) : null);
+        return (
+          <div>
+            <DatePicker
+              className="form-control"
+              dateFormat="DD/MM/YYYY"
+              selected={dateFrom}
+              selectsStart
+              startDate={dateFrom}
+              endDate={dateTo}
+              onChange={this.onChangeDateFrom}
+              isClearable={true}
+              placeholderText="Select Start Date..."
+            />
+            <DatePicker
+              className="form-control"
+              dateFormat="DD/MM/YYYY"
+              selected={dateTo}
+              selectsEnd
+              startDate={dateFrom}
+              endDate={dateTo}
+              onChange={this.onChangeDateTo}
+              isClearable={true}
+              placeholderText="Select End Date..."
+            />
+          </div>
         );
       }
       default:
