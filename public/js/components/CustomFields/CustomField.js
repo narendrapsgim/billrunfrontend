@@ -63,7 +63,7 @@ class CustomField extends React.Component {
                 <i className="fa fa-arrows-v movable" />
               </FormGroup>
             </Col>
-            <Col lg={11} md={11}>
+            <Col lg={10} md={10}>
               <FormGroup>
                 <ControlLabel>Field Name</ControlLabel>
                 <Field
