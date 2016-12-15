@@ -49,7 +49,7 @@ class Navigator extends Component {
       .filter(this.filterEnabledMenu)
       .filter(this.filterPermission)
       .forEach((item) => {
-        if (item.get('subMenus', Immutable.List()).filter(subMenu => router.isActive(subMenu.route)).length > 0) {
+        if (item.get('subMenus', Immutable.List()).filter(subMenu => router.isActive(subMenu.get('route', ''))).size > 0) {
           this.setState({ openSubMenu: [...openSubMenu, item.get('id')] });
         }
       });
@@ -205,7 +205,7 @@ const mapDispatchToProps = {
 const mapStateToProps = state => ({
   companyNeme: state.settings.get('tenant', Immutable.Map()).get('name'),
   userName: state.user.get('name'),
-  menuItems: state.settings.getIn(['menu', 'main'], Immutable.List()),
+  menuItems: state.guiState.menu.get('main', Immutable.List()),
   userRoles: state.user.get('roles'),
 });
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Navigator));
