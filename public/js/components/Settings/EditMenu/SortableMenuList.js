@@ -3,21 +3,14 @@ import Immutable from 'immutable';
 import { Col } from 'react-bootstrap';
 import { SortableContainer } from 'react-sortable-hoc';
 
-const SortableMenuList = props => (
+const SortableMenuList = ({ data: { items, renderMenu, path } }) => (
   <Col lg={12} md={12} className="pr0">
-    { props.items.map((item, i) => props.renderMenu(item, i, props.path)) }
+    { items.map((item, i) => renderMenu(item, i, path)) }
   </Col>
 );
 
-SortableMenuList.defaultProps = {
-  items: Immutable.List(),
-  path: [],
-};
-
 SortableMenuList.propTypes = {
-  path: React.PropTypes.array,
-  renderMenu: PropTypes.func.isRequired,
-  items: PropTypes.instanceOf(Immutable.List),
+  data: PropTypes.instanceOf(Immutable.Record).isRequired,
 };
 
 export default SortableContainer(SortableMenuList);

@@ -10,62 +10,91 @@ class EditMenuItem extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
-    path: PropTypes.array,
-    idx: PropTypes.number,
     onChangeField: PropTypes.func,
-    onChangeShowHide: PropTypes.func,
   };
 
-  state = {
-    editMode: false,
-    mouseOver: false,
+  constructor(props) {
+    super(props);
+
+    const MenuItem = Immutable.Record({
+      title: props.item.get('title', ''),
+      roles: props.item.get('roles', Immutable.List()),
+    });
+
+    this.state = {
+      editMode: false,
+      mouseOver: false,
+      menuItem: new MenuItem(),
+    };
   }
 
-  onChangeShowHide = (e) => {
-    const { value } = e.target;
-    const { path, idx } = this.props;
-    this.props.onChangeShowHide([...path, idx], value);
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
+    return !Immutable.is(this.props.item, nextProps.item) || this.state !== nextState;
   }
 
   onChangeTitle = (e) => {
     const { value } = e.target;
-    const { path, idx } = this.props;
-    this.props.onChangeField([...path, idx, 'title'], value);
+    const { menuItem } = this.state;
+    this.setState({ menuItem: menuItem.set('title', value) });
   }
 
   onChangeRoles = (roles) => {
-    const { path, idx } = this.props;
+    const { menuItem } = this.state;
     const rolesList = (roles.length) ? roles.split(',') : [];
-    this.props.onChangeField([...path, idx, 'roles'], rolesList);
+    this.setState({ menuItem: menuItem.set('roles', Immutable.List(rolesList)) });
   }
 
-  onMouseEnter = (e) => {
+  onChangeShowHide = (e) => {
+    const { value } = e.target;
+    const { item } = this.props;
+    this.props.onChangeField(item.get('id'), 'show', value);
+  }
+
+  onCancelAdvencedEdit = () => {
+    const { menuItem } = this.state;
+    this.setState({ menuItem: menuItem.remove('title').remove('roles') });
+    this.closeEdit();
+  }
+
+  onSaveAdvencedEdit = () => {
+    const { props: { item }, state: { menuItem } } = this;
+    const itemId = item.get('id');
+    menuItem.forEach((value, key) => {
+      if (item.get(key, '') !== value) {
+        this.props.onChangeField(itemId, key, value);
+      }
+    });
+    this.closeEdit();
+  }
+
+  onMouseEnter = (e) => { // eslint-disable-line no-unused-vars
     this.setState({ mouseOver: true });
   }
 
-  onMouseLeave = (e) => {
+  onMouseLeave = (e) => { // eslint-disable-line no-unused-vars
     this.setState({ mouseOver: false });
   }
 
   toggleEdit = (e) => {
     e.preventDefault();
     const { editMode } = this.state;
-    const isEditMode = !editMode;
-    this.setState({ editMode: isEditMode });
+    this.setState({ editMode: !editMode });
+  }
+
+  closeEdit = () => {
+    this.setState({ editMode: false });
   }
 
   renderEditModal = () => {
-    const { editMode } = this.state;
-    const { item } = this.props;
-    const title = item.get('title', '');
-    const roles = item.get('roles', []).join(',');
+    const { props: { item }, state: { editMode, menuItem: { title, roles } } } = this;
+    const currentTitle = item.get('title', '');
     const availableRoles = ['admin', 'read', 'write'].map(role => ({
       value: role,
       label: role,
     }));
 
     return (
-      <EditMenuItemsDetails show={editMode} onOk={this.toggleEdit} title={`Edit ${title} Details`}>
+      <EditMenuItemsDetails show={editMode} onOk={this.onSaveAdvencedEdit} onCancel={this.onCancelAdvencedEdit} title={`Edit ${currentTitle} Details`}>
         <Form horizontal>
           <FormGroup>
             <Col sm={2} componentClass={ControlLabel}>Label</Col>
@@ -77,26 +106,24 @@ class EditMenuItem extends Component {
           <FormGroup >
             <Col sm={2} componentClass={ControlLabel}>Roles</Col>
             <Col sm={10}>
-              <Select multi={true} value={roles} options={availableRoles} onChange={this.onChangeRoles} />
+              <Select multi={true} value={roles.join(',')} options={availableRoles} onChange={this.onChangeRoles} />
             </Col>
           </FormGroup>
         </Form>
       </EditMenuItemsDetails>
-    )
+    );
   }
 
   renderRole = () => {
-    const { item } = this.props;
-    const roles = item.get('roles', []).join(',');
-    if (roles.length === 0) {
+    const { menuItem: { roles } } = this.state;
+    if (roles.size === 0) {
       return (<small>Visible to all roles</small>);
     }
-    return (<small>{roles}</small>);
+    return (<small>{roles.join(',')}</small>);
   }
 
   renderTitle = () => {
-    const { item } = this.props;
-    const title = item.get('title', '');
+    const { props: { item }, state: { menuItem: { title } } } = this;
     const icon = item.get('icon', '');
     const menuIcon = icon.length ? (<i className={`fa ${icon} fa-fw`} />) : (null);
     return (<span>{menuIcon} {title}</span>);
@@ -105,8 +132,7 @@ class EditMenuItem extends Component {
   renderMouseOver = () => <span>&nbsp;<i className="fa fa-pencil-square-o fa-fw" /></span>;
 
   render() {
-    const { item } = this.props;
-    const { mouseOver, editMode } = this.state;
+    const { props: { item }, state: { mouseOver, editMode } } = this;
     const show = item.get('show', false);
 
     return (
