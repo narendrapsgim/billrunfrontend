@@ -1,8 +1,8 @@
-
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import Immutable from 'immutable';
+import mainMenu from '../mainMenu.json';
 import LoginForm from '../components/LoginForm';
 import { Forbidden_403 } from '../components/Errors';
 
@@ -64,31 +64,20 @@ export default function (ComposedComponent) {
   }
 
 
-  function createPermissionFromMenu(permissions, menu) {
-    const route = menu.get('route', '');
-    const viewRoles = Immutable.Map({
-      view: menu.get('roles', Immutable.List()),
-    });
-    if (route.length) {
-      return permissions.set(route, viewRoles);
-    }
-    return permissions;
-  }
-  function createPermissionFromMenuTree(permissions, tree) {
-    let permissionsTree = permissions;
-    tree.forEach((menuItem) => {
-      permissionsTree = createPermissionFromMenu(permissionsTree, menuItem);
-      if (menuItem.has('subMenus')) {
-        permissionsTree = createPermissionFromMenuTree(permissionsTree, menuItem.get('subMenus', Immutable.List()));
-      }
-    });
-    return permissionsTree;
-  }
-
   const mapStateToProps = (state) => {
-    let permissions = Immutable.Map();
-    const menuTree = state.settings.getIn(['menu', 'main'], Immutable.List());
-    permissions = createPermissionFromMenuTree(permissions, menuTree);
+		//TODO: use https://github.com/reactjs/reselect
+    const permissions = Immutable.Map().withMutations((permissionsWithMutations) => {
+      Object.keys(mainMenu).forEach((menuItemKey) => {
+        const menuItem = mainMenu[menuItemKey];
+        const route = menuItem.route || '';
+        if (route.length) {
+          const viewRoles = Immutable.Map({
+            view: Immutable.List(menuItem.roles),
+          });
+          permissionsWithMutations.set(route, viewRoles);
+        }
+      });
+    });
 
     return ({
       auth: state.user.get('auth'),
