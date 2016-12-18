@@ -49,7 +49,7 @@ function fetchList(collection, params) {
       },
       failure => {
 	dispatch(showDanger("Error retreiving list"));
-        dispatch(finishProgressIndicator());        
+        dispatch(finishProgressIndicator());
       }
     ).catch(
       error => {
@@ -81,7 +81,7 @@ function fetchPaymentGateways() {
       },
       failure => {
 	dispatch(showDanger("Error retrieving payment gateways"));
-        dispatch(finishProgressIndicator());        
+        dispatch(finishProgressIndicator());
       }
     ).catch(
       error => {
