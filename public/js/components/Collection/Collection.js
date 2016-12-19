@@ -14,13 +14,11 @@ import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
 import MailEditorRich from '../MailEditor/MailEditorRich';
 
-/* DEV - TO replace with real API */
-import fieldsList from './stub_fields.json';
-
 class Collection extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
+    templateToken: PropTypes.instanceOf(Immutable.Map),
     index: PropTypes.number.isRequired,
     mode: PropTypes.string.isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -39,10 +37,12 @@ class Collection extends Component {
       this.props.dispatch(clearNewCollection());
     }
     this.props.dispatch(getSettings('collection'));
+    this.props.dispatch(getSettings('template_token'));
   }
 
   shouldComponentUpdate(nextProps) {
-    return !Immutable.is(this.props.item, nextProps.item);
+    return !Immutable.is(this.props.item, nextProps.item)
+            || !Immutable.is(this.props.templateToken, nextProps.templateToken);
   }
 
   onChangeName = (e) => {
@@ -123,10 +123,14 @@ class Collection extends Component {
   }
 
   render() {
-    const { item } = this.props;
-    if (!item) {
+    const { item, templateToken } = this.props;
+    if (item === null || templateToken === null) {
       return (<LoadingItemPlaceholder onClick={this.backToList} loadingLabel="Collections not found." />);
     }
+    const fieldsList = [];
+    templateToken.forEach((tokens, type) =>
+      tokens.forEach(token => fieldsList.push(`${type}::${token}`))
+    );
 
     if (!item.get('id', null)) {
       return (<LoadingItemPlaceholder onClick={this.backToList} />);
@@ -210,6 +214,7 @@ class Collection extends Component {
 
 const mapStateToProps = (state, props) => {
   const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
+  const templateToken = state.settings.get('template_token', null);
   let item = state.collections.collection;
   let index = -1;
   if (itemId && state.settings.get('collection', Immutable.List()).size) {
@@ -218,7 +223,7 @@ const mapStateToProps = (state, props) => {
       ? state.settings.get('collection', Immutable.List()).get(index)
       : null;
   }
-  return { item, index, mode };
+  return { item, index, mode, templateToken };
 };
 
 export default withRouter(connect(mapStateToProps)(Collection));
