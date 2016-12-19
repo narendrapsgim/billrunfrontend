@@ -70,6 +70,6 @@ class Collections extends Component {
 
 
 const mapStateToProps = state => ({
-  collections: state.settings.get('collection'),
+  collections: state.settings.getIn(['collection', 'steps']),
 });
 export default withRouter(connect(mapStateToProps)(Collections));

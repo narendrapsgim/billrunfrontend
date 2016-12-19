@@ -7,6 +7,11 @@ const ConfirmModal = (props) => (
     <Modal.Header closeButton={false}>
       <Modal.Title>{ props.message }</Modal.Title>
     </Modal.Header>
+    { props.children &&
+      <Modal.Body>
+        { props.children }
+      </Modal.Body>
+    }
     <Modal.Footer>
       <Button bsSize="small" style={{ minWidth: 90, marginRight: 5 }} onClick={props.onCancel} >{props.labelCancel}</Button>
       <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onOk} bsStyle="primary" >{props.labelOk}</Button>
@@ -15,18 +20,20 @@ const ConfirmModal = (props) => (
 )
 
 ConfirmModal.defaultProps = {
-  show: false,
+  children: null,
   labelCancel: 'Cancel',
   labelOk: 'Ok',
+  show: false,
 }
 
 ConfirmModal.propTypes = {
-  show: React.PropTypes.bool.isRequired,
+  children: React.PropTypes.element,
+  labelCancel: React.PropTypes.string,
+  labelOk: React.PropTypes.string,
   message: React.PropTypes.string.isRequired,
   onCancel: React.PropTypes.func.isRequired,
   onOk: React.PropTypes.func.isRequired,
-  labelCancel: React.PropTypes.string,
-  labelOk: React.PropTypes.string,
+  show: React.PropTypes.bool.isRequired,
 }
 
 export default ConfirmModal;
