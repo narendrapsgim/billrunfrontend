@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { SET_NAME,
          SET_PARSER_SETTING,
-         SET_PROCESSOR_TYPE,         
+         SET_PROCESSOR_TYPE,
          SET_DELIMITER_TYPE,
          GOT_PROCESSOR_SETTINGS,
          SET_FIELDS,
@@ -15,6 +15,8 @@ import { SET_NAME,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
          SET_RATING_FIELD,
+         ADD_RATING_FIELD,
+         REMOVE_RATING_FIELD,
          SET_RECEIVER_FIELD,
          SET_FIELD_WIDTH,
          CLEAR_INPUT_PROCESSOR,
@@ -43,7 +45,7 @@ let defaultState = Immutable.fromJS({
   },
   customer_identification_fields: [
     {
-      target_key: "sid",      
+      target_key: "sid",
       conditions: [
         {
           field: "usaget",
@@ -66,16 +68,16 @@ export default function (state = defaultState, action) {
   switch (action.type) {
     case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
-      
+
     case SET_NAME:
       return state.set('file_type', action.file_type);
 
     case SET_PROCESSOR_TYPE:
       return state.set('type', action.processor_type);
-      
+
     case SET_DELIMITER_TYPE:
       return state.set('delimiter_type', action.delimiter_type);
-      
+
     case SET_DELIMITER:
       return state.set('delimiter', action.delimiter);
 
@@ -85,7 +87,7 @@ export default function (state = defaultState, action) {
 
     case SET_FIELD_WIDTH:
       return state.setIn(['field_widths', field], parseInt(width, 10));
-      
+
     case SET_FIELD_MAPPING:
       return state.setIn(['processor', field], mapping);
 
@@ -103,7 +105,7 @@ export default function (state = defaultState, action) {
 
     case SET_STATIC_USAGET:
       return state.setIn(['processor', 'default_usaget'], action.usaget).setIn(['rate_calculators', action.usaget], Immutable.List())
-    
+
     case MAP_USAGET:
       const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
       const { pattern, usaget } = action.mapping;
@@ -115,9 +117,8 @@ export default function (state = defaultState, action) {
 
     case REMOVE_USAGET_MAPPING:
       return state.updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index));
-      
+
     case SET_CUSETOMER_MAPPING:
-      console.log(field, mapping, state.setIn(['customer_identification_fields', 0, field], mapping).toJS());
       return state.setIn(['customer_identification_fields', 0, field], mapping);
 
     case SET_RATING_FIELD:
@@ -125,17 +126,32 @@ export default function (state = defaultState, action) {
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: state.getIn(['rate_calculators', usaget, 0, 'line_key'])
+        line_key: state.getIn(['rate_calculators', usaget, index, 'line_key'])
       });
-      return state.setIn(['rate_calculators', usaget, 0], new_rating);
+      return state.setIn(['rate_calculators', usaget, index], new_rating);
+
+    case ADD_RATING_FIELD: {
+      const { usaget } = action;
+      const newRating = Immutable.fromJS({
+        type: '',
+        rate_key: '',
+        line_key: '',
+      });
+      return state.updateIn(['rate_calculators', usaget], list => list.push(newRating));
+    }
+
+    case REMOVE_RATING_FIELD: {
+      const { usaget } = action;
+      return state.updateIn(['rate_calculators', usaget], list => list.remove(index));
+    }
 
     case SET_LINE_KEY:
       var { value, usaget } = action;
-      return state.setIn(['rate_calculators', usaget, 0, 'line_key'], value);
-      
+      return state.setIn(['rate_calculators', usaget, index, 'line_key'], value);
+
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
-      
+
     case CLEAR_INPUT_PROCESSOR:
       return defaultState;
 
@@ -164,7 +180,7 @@ export default function (state = defaultState, action) {
 
     case SET_REALTIME_DEFAULT_FIELD:
       return state.setIn(['realtime', 'default_values', action.name], action.value);
-      
+
     default:
       return state;
   }
