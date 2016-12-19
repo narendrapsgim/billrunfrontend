@@ -41,7 +41,7 @@ export default class CalculatorMapping extends Component {
           </FormGroup>
         </Col>
 
-        <Col lg={3} md={3} style={{ paddingRight: 0, lineHeight: '43px' }}>
+        <Col lg={2} md={2} style={{ paddingRight: 0, lineHeight: '43px' }}>
           <FormGroup style={{ margin: 0 }}>
             <input
               type="radio"
@@ -58,7 +58,7 @@ export default class CalculatorMapping extends Component {
           </FormGroup>
         </Col>
 
-        <Col lg={3} md={3} style={{ paddingRight: 0, lineHeight: '43px' }}>
+        <Col lg={2} md={2} style={{ paddingRight: 0, lineHeight: '43px' }}>
           <FormGroup style={{ margin: 0 }}>
             <input
               type="radio"
@@ -75,7 +75,7 @@ export default class CalculatorMapping extends Component {
           </FormGroup>
         </Col>
 
-        <Col lg={3} md={3} sm={3} xs={3}>
+        <Col lg={2} md={2} sm={2} xs={2}>
           { calcKey > 0 &&
             <FormGroup style={{ margin: 0 }}>
               <div style={{ width: '100%', height: 39 }}>
@@ -158,12 +158,12 @@ export default class CalculatorMapping extends Component {
         {this.availableUsagetypes().map((usaget, key) => (
           <div key={key}>
             <div className="form-group">
-              <div className="col-lg-3">
+              <div className="col-lg-1">
                 <label htmlFor={usaget}>
                   { usaget }
                 </label>
               </div>
-              <div className="col-lg-9">
+              <div className="col-lg-11">
                 <div className="col-lg-1" style={{ marginTop: 8 }}>
                   <i className="fa fa-long-arrow-right" />
                 </div>
