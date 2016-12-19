@@ -11,7 +11,7 @@ export function updateCollection(path, value) {
   return {
     type: UPDATE_SETTING,
     category: 'collection',
-    name: path,
+    name: ['steps', ...path],
     value,
   };
 }
@@ -20,7 +20,7 @@ export function removeCollection(index) {
   return {
     type: REMOVE_SETTING_FIELD,
     category: 'collection',
-    name: index,
+    name: ['steps', index],
   };
 }
 
@@ -43,5 +43,6 @@ export function pushNewCollection(value) {
     type: PUSH_TO_SETTING,
     category: 'collection',
     value,
+    path: 'steps',
   };
 }

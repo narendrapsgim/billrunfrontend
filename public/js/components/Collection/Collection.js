@@ -40,9 +40,11 @@ class Collection extends Component {
     this.props.dispatch(getSettings('template_token'));
   }
 
-  shouldComponentUpdate(nextProps) {
-    return !Immutable.is(this.props.item, nextProps.item)
-            || !Immutable.is(this.props.templateToken, nextProps.templateToken);
+  shouldComponentUpdate(nextProps, nextState) {
+    const { props: { item, templateToken }, state: { showConfirm } } = this;
+    return !Immutable.is(item, nextProps.item)
+						|| !Immutable.is(templateToken, nextProps.templateToken)
+						|| showConfirm !== nextState.showConfirm;
   }
 
   onChangeName = (e) => {
@@ -213,14 +215,15 @@ class Collection extends Component {
 
 
 const mapStateToProps = (state, props) => {
+  // TODO: make it more readably
   const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
   const templateToken = state.settings.get('template_token', null);
   let item = state.collections.collection;
   let index = -1;
-  if (itemId && state.settings.get('collection', Immutable.List()).size) {
-    index = state.settings.get('collection').findIndex(collection => collection.get('id') === itemId);
+  if (itemId && state.settings.getIn(['collection', 'steps'], Immutable.List()).size) {
+    index = state.settings.getIn(['collection', 'steps'], Immutable.List()).findIndex(collection => collection.get('id') === itemId);
     item = (index > -1)
-      ? state.settings.get('collection', Immutable.List()).get(index)
+      ? state.settings.getIn(['collection', 'steps'], Immutable.List()).get(index)
       : null;
   }
   return { item, index, mode, templateToken };
