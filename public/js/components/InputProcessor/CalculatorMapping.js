@@ -36,7 +36,7 @@ export default class CalculatorMapping extends Component {
               data-index={calcKey}
               value={calc.get('line_key', '')}
             >
-              { this.availableFields() }
+              { this.availableFields(true) }
             </select>
           </FormGroup>
         </Col>
@@ -94,14 +94,15 @@ export default class CalculatorMapping extends Component {
 
   availableUsagetypes = () => (this.props.settings.get('rate_calculators', {}).keySeq().map(usaget => (usaget)));
 
-  availableFields = () => (
-    [
-      (<option disabled value="" key={-1}>Select Field</option>),
-      ...this.props.settings.get('fields', []).map((field, key) => (
+  availableFields = (addBillrunFields) => {
+    const billrunFields = Immutable.fromJS(addBillrunFields ? ['type', 'usaget'] : []);
+    return [
+      (<option disabled value="" key={-3}>Select Field</option>),
+      ...(billrunFields.push(...this.props.settings.get('fields', []))).map((field, key) => (
         <option value={field} key={key}>{field}</option>
       )),
-    ]
-  );
+    ];
+  };
 
   render() {
     const {
@@ -133,7 +134,7 @@ export default class CalculatorMapping extends Component {
                   onChange={onSetCustomerMapping}
                   value={settings.getIn(['customer_identification_fields', 0, 'src_key'], '')}
                 >
-                  { this.availableFields() }
+                  { this.availableFields(false) }
                 </select>
               </div>
               <div className="col-lg-6">
