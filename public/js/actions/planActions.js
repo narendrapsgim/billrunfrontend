@@ -130,8 +130,6 @@ function savePlanToDB(plan, action, callback) {
         callback(true);
       },
       failure => {
-        const errorMessages = failure.error.map( (response) => response.error.message );
-        dispatch(showDanger(errorMessages));
         dispatch(finishProgressIndicator());
         callback(failure);
       }
