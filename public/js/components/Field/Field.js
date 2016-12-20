@@ -61,7 +61,7 @@ class Field extends React.Component {
       case 'salutation':
         return (<Salutation {...this.props} />);
       default:
-        return (<Text onChange={onChange} id={id} value={value} editable={editable} required={required} disabled={disabled} />);
+        return (<Text {...otherProps} onChange={onChange} id={id} value={value} editable={editable} required={required} disabled={disabled} />);
     }
   }
 

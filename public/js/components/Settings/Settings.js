@@ -7,7 +7,9 @@ import DateTime from './DateTime';
 import CurrencyTax from './CurrencyTax';
 import Tenant from './Tenant';
 import Security from './Security';
+import EditMenu from './EditMenu';
 import ActionButtons from '../Elements/ActionButtons';
+import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
 
 
 class Settings extends Component {
@@ -28,16 +30,33 @@ class Settings extends Component {
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret']));
+    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu']));
   }
 
   onChangeFieldValue = (category, id, value) => {
     this.props.dispatch(updateSetting(category, id, value));
   }
 
+  onChangeMenuOrder = (path, newOrder) => {
+    const { settings } = this.props;
+    const mainMenuOverrides = settings.getIn(['menu', ...path], Immutable.Map()).withMutations(
+      (mainMenuOverridesWithMutations) => {
+        newOrder.forEach((order, key) => {
+          if (mainMenuOverridesWithMutations.has(key)) {
+            mainMenuOverridesWithMutations.setIn([key, 'order'], order);
+          } else {
+            const orderField = Immutable.Map({ order });
+            mainMenuOverridesWithMutations.set(key, orderField);
+          }
+        });
+      }
+    );
+    this.props.dispatch(updateSetting('menu', path, mainMenuOverrides));
+  }
+
   onSave = () => {
     const { settings } = this.props;
-    let categoryToSave = [];
+    const categoryToSave = [];
     // save 'BillRun'
     if (settings.has('billrun')) {
       categoryToSave.push('billrun');
@@ -50,8 +69,19 @@ class Settings extends Component {
     if (settings.has('tenant')) {
       categoryToSave.push('tenant');
     }
+    // save 'Menu'
+    if (settings.has('menu')) {
+      categoryToSave.push('menu');
+    }
     if (categoryToSave.length) {
-      this.props.dispatch(saveSettings(categoryToSave));
+      this.props.dispatch(saveSettings(categoryToSave)).then(
+        (status) => {
+          if (status === true) { // settings successfully saved
+            const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
+            this.props.dispatch(initMainMenu(mainMenuOverrides));
+          }
+        }
+      );
     }
   }
 
@@ -66,6 +96,8 @@ class Settings extends Component {
     const datetime = settings.get('billrun', Immutable.Map());
     const sharedSecret = settings.get('shared_secret', Immutable.Map());
     const tenant = settings.get('tenant', Immutable.Map());
+    const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
+    const mainMenu = prossessMenuTree(combineMenuOverrides(mainMenuOverrides), 'root');
 
     return (
       <div>
@@ -83,7 +115,17 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Security" eventKey={3}>
+          <Tab title="Menu" eventKey={3}>
+            <Panel style={{ borderTop: 'none' }}>
+              <EditMenu
+                data={mainMenu}
+                onChange={this.onChangeFieldValue}
+                onChangeMenuOrder={this.onChangeMenuOrder}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Security" eventKey={4}>
             <Panel style={{ borderTop: 'none' }}>
               <Security data={sharedSecret} />
             </Panel>
