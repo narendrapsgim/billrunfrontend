@@ -19,6 +19,7 @@ class Collection extends Component {
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     templateToken: PropTypes.instanceOf(Immutable.Map),
+    tokensCategories: PropTypes.arrayOf(React.PropTypes.string),
     index: PropTypes.number.isRequired,
     mode: PropTypes.string.isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -26,6 +27,12 @@ class Collection extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
   }
+
+  static defaultProps = {
+    item: Immutable.Map(),
+    templateToken: Immutable.Map(),
+    tokensCategories: ['general', 'account', 'collection'],
+  };
 
   state = {
     showConfirm: false,
@@ -125,13 +132,15 @@ class Collection extends Component {
   }
 
   render() {
-    const { item, templateToken } = this.props;
+    const { item, templateToken, tokensCategories } = this.props;
     if (item === null || templateToken === null) {
       return (<LoadingItemPlaceholder onClick={this.backToList} loadingLabel="Collections not found." />);
     }
     const fieldsList = [];
-    templateToken.forEach((tokens, type) =>
-      tokens.forEach(token => fieldsList.push(`${type}::${token}`))
+    templateToken
+      .filter((tokens, type) => tokensCategories.includes(type))
+      .forEach((tokens, type) =>
+        tokens.forEach(token => fieldsList.push(`${type}::${token}`))
     );
 
     if (!item.get('id', null)) {
