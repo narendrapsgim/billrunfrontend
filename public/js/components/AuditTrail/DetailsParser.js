@@ -12,7 +12,7 @@ const DetailsParser = ({ item, openDiff }) => {
   let message = '';
   if (newid) {
     if (!oldid) {
-      message = 'Created';
+      message = <span>Created</span>;
     } else {
       message = (
         <Button bsStyle="link" onClick={onOpenDiff} style={{ width: '100%' }}>
@@ -21,7 +21,7 @@ const DetailsParser = ({ item, openDiff }) => {
       );
     }
   } else if (!newid && oldid) {
-    message = 'Deleted';
+    message = <span>Deleted</span>;
   }
   if (details.length) {
     message = (
