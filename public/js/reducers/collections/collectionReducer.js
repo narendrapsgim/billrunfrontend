@@ -3,7 +3,7 @@ import uuid from 'uuid';
 import { UPDATE_COLLECTION, CLEAR_COLLECTION } from '../../actions/collectionsActions';
 
 const defaultState = Immutable.Map();
-const mailCollection = Immutable.Map({
+const collectionStepMail = Immutable.Map({
   id: '',
   name: '',
   type: 'mail',
@@ -22,7 +22,7 @@ const collectionReducer = (state = defaultState, action) => {
 
     case CLEAR_COLLECTION: {
       const id = uuid.v4();
-      return mailCollection.set('id', id);
+      return collectionStepMail.set('id', id);
     }
 
     default:

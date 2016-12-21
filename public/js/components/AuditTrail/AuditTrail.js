@@ -129,18 +129,18 @@ class AuditTrail extends Component {
     this.props.clearList('diff');
   }
 
+  urtQueryBuilder = (date) => {
+    const fromDate = moment(date).startOf('day');
+    const toDate = moment(date).add(1, 'days');
+    return ({ $gte: fromDate, $lt: toDate });
+  };
+
   renderDiff = () => {
     const { diffItems } = this.props;
     const inputA = diffItems.get(0, Immutable.Map()).toJS();
     const inputB = diffItems.get(1, Immutable.Map()).toJS();
     return (<DiffModal onClose={this.closeDiff} inputA={inputA} inputB={inputB} />);
   }
-
-  urtQueryBuilder = (date) => {
-    const fromDate = moment(date).startOf('day');
-    const toDate = moment(date).add(1, 'days');
-    return ({ $gte: fromDate, $lt: toDate });
-  };
 
   render() {
     const { items, showDiff, userNames, auditTrailEntityTypes } = this.props;
@@ -184,7 +184,7 @@ const mapStateToProps = (state) => {
     .get('autocompleteAuditTrailEntityTypes', Immutable.List())
     .map(type => ({
       key: type.get('name', ''),
-      val: changeCase.sentenceCase(type.get('name', ''))
+      val: changeCase.sentenceCase(type.get('name', '')),
     }));
 
   return { items, diffItems, showDiff, userNames, auditTrailEntityTypes };
