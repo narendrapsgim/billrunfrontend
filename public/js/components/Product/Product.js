@@ -7,6 +7,7 @@ import Field from '../Field';
 import Chips from '../Chips';
 import Select from 'react-select';
 import ProductPrice from './components/ProductPrice';
+import ProductParam from './components/ProductParam';
 
 
 export default class Product extends Component {
@@ -63,6 +64,22 @@ export default class Product extends Component {
     this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixes));
   }
 
+  onChangeParamKey = (e) => {
+    console.log(e.defaultValue);
+    const { value: newParamKey } = e.target;
+    console.log(newParamKey);
+    //this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixes));
+  }
+
+  onChangeParamValues = (e) => {
+
+  }
+
+  onRemoveParam = (e) => {
+    const { dataset: { paramkey } } = e.target;
+    //this.props.onFieldUpdate(['vatable'], checked);
+  }
+
   onProductRateUpdate = (index, fieldName, value) => {
     const { product, planName, usaget } = this.props;
     const fieldPath   = ['rates', usaget, planName, 'rate', index, fieldName];
@@ -77,6 +94,11 @@ export default class Product extends Component {
     const { product, planName, usaget } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
     this.props.onProductRateRemove(productPath, index);
+  }
+
+  onProductParamAdd = (e) => {
+    // const { value } = e.target;
+    // this.props.onFieldUpdate(['description'], value);
   }
 
   getUsageTypesOptions = () => {
@@ -103,6 +125,21 @@ export default class Product extends Component {
       />
     )
 
+  }
+
+  renderParameters = () => {
+    const { product } = this.props;
+    const params = product.get('params', Immutable.List());
+
+    return params.map((paramValues, paramKey) =>
+      <ProductParam
+        paramKey={paramKey}
+        paramValues={paramValues}
+        onChangeParamKey={this.onChangeParamKey}
+        onChangeParamValues={this.onChangeParamValues}
+        onRemoveParam={this.onRemoveParam}
+      />
+    );
   }
 
   render() {
@@ -181,6 +218,12 @@ export default class Product extends Component {
               { this.renderPrices() }
              <br />
             <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
+            </Panel>
+
+            <Panel header={<h3>Additional Parameters</h3>}>
+              { this.renderParameters() }
+              <br />
+              <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductParamAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
             </Panel>
 
           </Form>
