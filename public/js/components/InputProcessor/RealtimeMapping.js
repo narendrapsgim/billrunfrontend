@@ -69,6 +69,7 @@ const RealtimeMapping = (props) => {
                     id="request_type_field"
                     className="form-control"
                     onChange={ onChange }
+                    disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
                     value={settings.getIn(['realtime', 'request_type_field'], '')}>
                   { available_fields }
                 </select>
@@ -115,6 +116,7 @@ const RealtimeMapping = (props) => {
                     id="used_usagev_field"
                     className="form-control"
                     onChange={ onChange }
+                    disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
                     value={settings.getIn(['realtime', 'used_usagev_field'], '')}>
                   { available_fields }>
                 </select>
@@ -138,6 +140,7 @@ const RealtimeMapping = (props) => {
                     id="session_id_fields"
                     options={ multi_available_fields }
                     onChange={ onChangeSessionField }
+                    disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
                     multi={ true }
                     value={ settings.getIn(['realtime', 'session_id_fields'], List()).join(',') }
                 />
@@ -164,6 +167,7 @@ const RealtimeMapping = (props) => {
                     type="number"
                     className="form-control"
                     onChange={ onChangeDefault }
+                    disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
                     value={ settings.getIn(['realtime', 'default_values', 'initial_request'], 10) }
                 />
               </div>
@@ -187,6 +191,7 @@ const RealtimeMapping = (props) => {
                     type="number"
                     className="form-control"
                     onChange={ onChangeDefault }
+                    disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
                     value={ settings.getIn(['realtime', 'default_values', 'update_request'], 10) }
                 />
               </div>
@@ -210,6 +215,7 @@ const RealtimeMapping = (props) => {
                     type="number"
                     className="form-control"
                     onChange={ onChangeDefault }
+                    disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
                     value={ settings.getIn(['realtime', 'default_values', 'final_request'], 0) }
                 />
               </div>
@@ -233,6 +239,7 @@ const RealtimeMapping = (props) => {
                     type="number"
                     className="form-control"
                     onChange={ onChangeDefault }
+                    disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
                     value={ settings.getIn(['realtime', 'default_values', 'default'], 15) }
                 />
               </div>
