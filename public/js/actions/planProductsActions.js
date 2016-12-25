@@ -17,7 +17,7 @@ import { apiBillRun, apiBillRunErrorHandler} from '../common/Api';
 function getExistPlanProductsByUsageTypes(planName, usageTypes = []) {
   return dispatch => {
     if(!usageTypes.length){
-      return dispatch(showWarning('Usage types not found'));
+      return false;//dispatch(showWarning('Usage types not found'));
     }
     if(!planName){
       return dispatch(showWarning('No plan name'));
@@ -189,7 +189,7 @@ export function getProductByKey(key, planName) {
 export function savePlanRates(callback) {
   return (dispatch, getState) => {
     const { planProducts } =  getState();
-	
+
 		/*For now save all products*/
     // var productsKeysToSave = new Set();
     // //Get products
