@@ -2,17 +2,16 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import { Form, FormGroup, Col, FormControl, ControlLabel, InputGroup } from 'react-bootstrap';
+import { Button, Form, FormGroup, Col, FormControl, ControlLabel, InputGroup } from 'react-bootstrap';
 import Help from '../Help';
-import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-import { getSettings } from '../../actions/settingsActions';
-import { saveCollection, updateCollection, updateNewCollection, clearNewCollection, pushNewCollection } from '../../actions/collectionsActions';
-
-/* COMPONENTS */
-import ConfirmModal from '../../components/ConfirmModal';
-import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
+import ActionButtons from '../Elements/ActionButtons';
+import ConfirmModal from '../../components/ConfirmModal';
 import MailEditorRich from '../MailEditor/MailEditorRich';
+import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { getSettings } from '../../actions/settingsActions';
+import { getCollection, saveCollection, updateCollectionSteps, updateNewCollection, clearNewCollection, pushNewCollection } from '../../actions/collectionsActions';
 
 class Collection extends Component {
 
@@ -42,16 +41,25 @@ class Collection extends Component {
     const { mode } = this.props;
     if (mode === 'new') {
       this.props.dispatch(clearNewCollection());
+      this.props.dispatch(setPageTitle('Create New Collection Step'));
     }
-    this.props.dispatch(getSettings('collection'));
+    this.props.dispatch(getCollection('steps'));
     this.props.dispatch(getSettings('template_token'));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { mode, item } = nextProps;
+    const id = item.get('id', '');
+    if (mode !== 'new' && id.length > 0) {
+      this.props.dispatch(setPageTitle(`Edit Collection Step - ${item.get('name', '')}`));
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     const { props: { item, templateToken }, state: { showConfirm } } = this;
     return !Immutable.is(item, nextProps.item)
-						|| !Immutable.is(templateToken, nextProps.templateToken)
-						|| showConfirm !== nextState.showConfirm;
+            || !Immutable.is(templateToken, nextProps.templateToken)
+            || showConfirm !== nextState.showConfirm;
   }
 
   onChangeName = (e) => {
@@ -92,7 +100,7 @@ class Collection extends Component {
     if (mode === 'new') {
       this.props.dispatch(updateNewCollection(path, value));
     } else {
-      this.props.dispatch(updateCollection([index, ...path], value));
+      this.props.dispatch(updateCollectionSteps([index, ...path], value));
     }
   }
 
@@ -215,7 +223,9 @@ class Collection extends Component {
             </Form>
           </div>
         </div>
-        <ActionButtons onClickSave={this.onSave} onClickCancel={this.onCancelAsk} />
+        <ActionButtons onClickSave={this.onSave} onClickCancel={this.onCancelAsk}>
+          <Button onClick={this.backToList} bsStyle="default" className="pull-right" style={{ minWidth: 90, marginRight: 10 }}>Back</Button>
+        </ActionButtons>
         <ConfirmModal onOk={this.onCancelOk} onCancel={this.onCancelCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
       </div>
     );

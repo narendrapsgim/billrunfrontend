@@ -1,11 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
+import { Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import CollectionItemDisplay from './Elements/CollectionItemDisplay';
 import CollectionItemAdd from './Elements/CollectionItemAdd';
-import { getSettings, saveSettings } from '../../actions/settingsActions';
-import { removeCollection } from '../../actions/collectionsActions';
+import CollectionSettings from './Elements/CollectionSettings';
+import { removeCollectionStep, getCollection, saveCollection } from '../../actions/collectionsActions';
 
 
 class Collections extends Component {
@@ -22,20 +23,25 @@ class Collections extends Component {
     }).isRequired,
   }
 
-  componentDidMount() {
-    this.props.dispatch(getSettings('collection'));
+  state = {
+    edit: false,
   }
 
-  shouldComponentUpdate(nextProps) {
-    return !Immutable.is(this.props.collections, nextProps.collections);
+  componentDidMount() {
+    this.props.dispatch(getCollection('steps'));
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !Immutable.is(this.props.collections, nextProps.collections)
+            || this.state.edit !== nextState.edit;
   }
 
   onRemove = (id) => {
     const { collections } = this.props;
     const index = collections.findIndex(item => item.get('id') === id);
     if (index > -1) {
-      this.props.dispatch(removeCollection(index));
-      this.props.dispatch(saveSettings('collection'));
+      this.props.dispatch(removeCollectionStep(index));
+      this.props.dispatch(saveCollection('steps'));
     }
   }
 
@@ -57,12 +63,13 @@ class Collections extends Component {
     const { collections } = this.props;
     return (
       <div className="row collections-list col-lg-12 clearfix">
-        <div className="panel panel-default">
-          <div className="col-md-12">
-            { collections.sort(this.sortCollections).map(this.renderCollection) }
-            <CollectionItemAdd onClickNew={this.onClickNew} />
-          </div>
-        </div>
+        <Panel header={<span>Settings</span>}>
+          <CollectionSettings />
+        </Panel>
+        <Panel header={<span>Steps</span>}>
+          { collections.sort(this.sortCollections).map(this.renderCollection) }
+          <CollectionItemAdd onClickNew={this.onClickNew} />
+        </Panel>
       </div>
     );
   }
