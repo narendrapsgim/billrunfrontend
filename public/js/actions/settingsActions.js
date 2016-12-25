@@ -86,7 +86,7 @@ function fetchSettings(categories) {
 function saveSettingsToDB(categories, settings) {
   const multipleCategories = categories.length > 1;
   const categoryData = categories.map((category) => {
-    let data = settings.get(category);
+    let data = settings.getIn(category.split('.'));
     if (category === 'pricing') {
       data = data.set('vat', data.get('vat') / 100);
     }
