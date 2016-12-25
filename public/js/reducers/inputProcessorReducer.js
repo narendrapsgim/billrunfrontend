@@ -81,7 +81,7 @@ export default function (state = defaultState, action) {
 
     case SET_FIELDS:
       if (state.get('fields').size > 0) {
-        return state.update('fields', list => [...list, ...action.fields])
+        return state.update('fields', list => [...list, ...action.fields]);
       }
       return state.set('fields', Immutable.fromJS(action.fields));
 
