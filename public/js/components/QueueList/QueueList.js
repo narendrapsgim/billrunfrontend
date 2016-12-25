@@ -16,10 +16,12 @@ class QueueList extends Component {
   static propTypes = {
     queueLines: React.PropTypes.instanceOf(Immutable.List).isRequired,
     getList: React.PropTypes.func.isRequired,
+    calculators: React.PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
     queueLines: Immutable.List(),
+    calculators: Immutable.List([false, ...globalSetting.queue_calculators, '-']),
     dispatch: () => {},
   };
 
@@ -56,15 +58,13 @@ class QueueList extends Component {
     this.setState({ line: null, viewing: false });
   }
 
-  getCalculators = () => Immutable.fromJS([false, ...globalSetting.queue_calculators, '-']);
-
   getNextCalculator = (calcName) => {
-    const calculators = this.getCalculators();
+    const { calculators } = this.props;
     return calculators.get(calculators.indexOf(calcName) + 1);
   }
 
   getPreviousCalculator = (calcName) => {
-    const calculators = this.getCalculators();
+    const { calculators } = this.props;
     return calculators.get(calculators.indexOf(calcName) - 1);
   }
 
