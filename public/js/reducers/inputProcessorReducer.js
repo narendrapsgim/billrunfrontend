@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { SET_NAME,
          SET_PARSER_SETTING,
-         SET_PROCESSOR_TYPE,         
+         SET_PROCESSOR_TYPE,
          SET_DELIMITER_TYPE,
          GOT_PROCESSOR_SETTINGS,
          SET_FIELDS,
@@ -43,7 +43,7 @@ let defaultState = Immutable.fromJS({
   },
   customer_identification_fields: [
     {
-      target_key: "sid",      
+      target_key: "sid",
       conditions: [
         {
           field: "usaget",
@@ -66,16 +66,16 @@ export default function (state = defaultState, action) {
   switch (action.type) {
     case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
-      
+
     case SET_NAME:
       return state.set('file_type', action.file_type);
 
     case SET_PROCESSOR_TYPE:
       return state.set('type', action.processor_type);
-      
+
     case SET_DELIMITER_TYPE:
       return state.set('delimiter_type', action.delimiter_type);
-      
+
     case SET_DELIMITER:
       return state.set('delimiter', action.delimiter);
 
@@ -85,7 +85,7 @@ export default function (state = defaultState, action) {
 
     case SET_FIELD_WIDTH:
       return state.setIn(['field_widths', field], parseInt(width, 10));
-      
+
     case SET_FIELD_MAPPING:
       return state.setIn(['processor', field], mapping);
 
@@ -103,7 +103,7 @@ export default function (state = defaultState, action) {
 
     case SET_STATIC_USAGET:
       return state.setIn(['processor', 'default_usaget'], action.usaget).setIn(['rate_calculators', action.usaget], Immutable.List())
-    
+
     case MAP_USAGET:
       const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
       const { pattern, usaget } = action.mapping;
@@ -115,7 +115,7 @@ export default function (state = defaultState, action) {
 
     case REMOVE_USAGET_MAPPING:
       return state.updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index));
-      
+
     case SET_CUSETOMER_MAPPING:
       console.log(field, mapping, state.setIn(['customer_identification_fields', 0, field], mapping).toJS());
       return state.setIn(['customer_identification_fields', 0, field], mapping);
@@ -132,10 +132,10 @@ export default function (state = defaultState, action) {
     case SET_LINE_KEY:
       var { value, usaget } = action;
       return state.setIn(['rate_calculators', usaget, 0, 'line_key'], value);
-      
+
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
-      
+
     case CLEAR_INPUT_PROCESSOR:
       return defaultState;
 
@@ -164,7 +164,7 @@ export default function (state = defaultState, action) {
 
     case SET_REALTIME_DEFAULT_FIELD:
       return state.setIn(['realtime', 'default_values', action.name], action.value);
-      
+
     default:
       return state;
   }

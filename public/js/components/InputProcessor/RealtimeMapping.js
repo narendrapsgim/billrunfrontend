@@ -15,15 +15,44 @@ const RealtimeMapping = (props) => {
   const multi_available_fields = settings.get('fields', []).map(field => {
     return { label: field, value: field }
   }).toJS();
-  
+
   const onChangeSessionField = (values) => {
     const e = {target: {id: 'session_id_fields', value: values.split(',')}};
     onChange(e);
   };
-  
+
+  const onChangePostpayCharge = (e) => {
+    onChange({ target: { id: 'postpay_charge', value: (e.target.value === 'true') } });
+  };
+
   return (
     <div className="RealtimeMapping">
       <form className="form-horizontal CalculatorMapping">
+
+        <div className="form-group">
+          <div className="col-lg-3">
+            <input
+              type="radio"
+              name="postpay_charge"
+              id="postpay_charge_false"
+              value="false"
+              onChange={onChangePostpayCharge}
+              checked={!settings.getIn(['realtime', 'postpay_charge'], false)}
+            />
+            <label htmlFor="postpay_charge">&nbsp;Allocation based requests</label>
+          </div>
+          <div className="col-lg-3">
+            <input
+              type="radio"
+              name="postpay_charge"
+              id="postpay_charge_true"
+              value="true"
+              onChange={onChangePostpayCharge}
+              checked={settings.getIn(['realtime', 'postpay_charge'], false)}
+            />
+            <label htmlFor="postpay_charge">&nbsp;One time charge requests</label>
+          </div>
+        </div>
 
         <div className="form-group">
           <div className="col-lg-3">
@@ -210,7 +239,7 @@ const RealtimeMapping = (props) => {
             </div>
           </div>
         </div>
-        
+
       </form>
     </div>
   );

@@ -38,7 +38,7 @@ class InputProcessor extends Component {
     this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
     this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
     this.onRemoveAllFields = this.onRemoveAllFields.bind(this);
-    this.onSetStaticUsaget = this.onSetStaticUsaget.bind(this);    
+    this.onSetStaticUsaget = this.onSetStaticUsaget.bind(this);
     this.addUsagetMapping = this.addUsagetMapping.bind(this);
     this.onSetFieldWidth = this.onSetFieldWidth.bind(this);
     this.onRemoveField = this.onRemoveField.bind(this);
@@ -75,13 +75,13 @@ class InputProcessor extends Component {
       dispatch(setParserSetting('type', 'realtime'));
       dispatch(setDelimiterType('json'));
       dispatch(setProcessorType('realtime'));
-    }    
+    }
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearInputProcessor());
   }
-  
+
   onChangeName(e) {
     this.props.dispatch(setName(e.target.value));
   }
@@ -122,7 +122,7 @@ class InputProcessor extends Component {
     const blob = file.slice(0, file.size - 1);
     reader.readAsText(blob);
   };
-  
+
   onSelectSampleCSV(e) {
     let file = e.target.files[0];
     let reader = new FileReader();
@@ -151,7 +151,7 @@ class InputProcessor extends Component {
   onRemoveAllFields() {
     this.props.dispatch(removeAllCSVFields());
   }
-  
+
   onSetFieldMapping(e) {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setFieldMapping(field, mapping));
@@ -161,7 +161,7 @@ class InputProcessor extends Component {
     const { value, dataset: {field} } = e.target;
     this.props.dispatch(setFieldWidth(field, value));
   }
-  
+
   onSetCalculatorMapping(e) {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setCalculatorMapping(field, mapping));
@@ -182,7 +182,7 @@ class InputProcessor extends Component {
   setUsagetType(val) {
     this.props.dispatch(setUsagetType(val));
   }
-  
+
   onSetCustomerMapping(e) {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setCustomerMapping(field, mapping));
@@ -197,12 +197,12 @@ class InputProcessor extends Component {
     const { dataset: {usaget}, value } = e.target;
     this.props.dispatch(setLineKey(usaget, value));
   }
-  
+
   onSetReceiverField(e) {
     const { id, value } = e.target;
     this.props.dispatch(setReceiverField(id, value));
   }
-  
+
   onSetReceiverCheckboxField(e) {
     const { id, checked } = e.target;
     this.props.dispatch(setReceiverField(id, checked));
@@ -223,7 +223,7 @@ class InputProcessor extends Component {
   onChangeCSVField = (index, value) => {
     this.props.dispatch(changeCSVField(index, value));
   };
-  
+
   unsetField = (field_path) => {
     this.props.dispatch(unsetField(field_path));
   }
@@ -237,7 +237,7 @@ class InputProcessor extends Component {
       pathname: "input_processors"
     });
   }
-  
+
   handleNext() {
     const { stepIndex } = this.state;
     const cb = (err) => {
@@ -316,7 +316,7 @@ class InputProcessor extends Component {
     }
 
     const title = action === 'new' ? "New input processor" : `Edit input processor - ${settings.get('file_type')}`;
-    
+
     return (
       <div>
         <div className="row">
@@ -364,7 +364,7 @@ class InputProcessor extends Component {
                        </button>
                      );
                    }
-                 })()}                 
+                 })()}
                        <button className="btn btn-primary"
                                onClick={this.handleNext}>
                          { stepIndex === (steps.length - 1) ? "Finish" : "Next" }

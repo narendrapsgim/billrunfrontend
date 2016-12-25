@@ -82,7 +82,7 @@ export default class CalculatorMapping extends Component {
                              data-usaget={usaget}
                              value={settings.getIn(['rate_calculators', usaget, 0, 'line_key'], '')}>
                        { available_fields }
-                     </select>                 
+                     </select>
                    </div>
                    <div className="col-lg-3">
                      <input type="radio"
