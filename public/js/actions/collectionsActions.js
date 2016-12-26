@@ -3,6 +3,19 @@ import { saveSettings, getSettings,
 
 export const UPDATE_COLLECTION = 'UPDATE_COLLECTION';
 export const CLEAR_COLLECTION = 'CLEAR_COLLECTION';
+export const RESET_COLLECTION_EDITED = 'RESET_COLLECTION_EDITED';
+export const SET_COLLECTION_EDITED = 'SET_COLLECTION_EDITED';
+
+export function resetCollectionEdited() {
+  return {
+    type: RESET_COLLECTION_EDITED,
+  };
+}
+export function setCollectionEdited() {
+  return {
+    type: SET_COLLECTION_EDITED,
+  };
+}
 
 export function saveCollection(subCategories = 'steps') {
   const saveCategories = Array.isArray(subCategories)

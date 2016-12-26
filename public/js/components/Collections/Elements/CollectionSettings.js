@@ -55,7 +55,7 @@ class CollectionSettings extends Component {
       <Form horizontal>
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
-            Min Debt
+            Minimum debt
           </Col>
           <Col sm={8} lg={9}>
             <div style={{ lineHeight: '36px', paddingLeft: 12 }}>{minDebt}</div>
@@ -73,7 +73,7 @@ class CollectionSettings extends Component {
       <Form horizontal>
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
-            Min Debt
+            Minimum debt
           </Col>
           <Col sm={4} lg={4}>
             <Field value={minDebt} onChange={this.onChangeMinDeb} fieldType="number" />

@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import { Button, Form, FormGroup, Col, FormControl, ControlLabel, InputGroup } from 'react-bootstrap';
+import { Form, FormGroup, Col, FormControl, ControlLabel, InputGroup } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
 import ActionButtons from '../Elements/ActionButtons';
@@ -11,7 +11,7 @@ import MailEditorRich from '../MailEditor/MailEditorRich';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { getSettings } from '../../actions/settingsActions';
-import { getCollection, saveCollection, updateCollectionSteps, updateNewCollection, clearNewCollection, pushNewCollection } from '../../actions/collectionsActions';
+import { getCollection, saveCollection, updateCollectionSteps, updateNewCollection, clearNewCollection, pushNewCollection, resetCollectionEdited, setCollectionEdited } from '../../actions/collectionsActions';
 
 class Collection extends Component {
 
@@ -21,6 +21,7 @@ class Collection extends Component {
     tokensCategories: PropTypes.arrayOf(React.PropTypes.string),
     index: PropTypes.number.isRequired,
     mode: PropTypes.string.isRequired,
+    wasChanged: PropTypes.bool.isRequired,
     dispatch: PropTypes.func.isRequired,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
@@ -31,6 +32,7 @@ class Collection extends Component {
     item: Immutable.Map(),
     templateToken: Immutable.Map(),
     tokensCategories: ['general', 'account', 'collection'],
+    wasChanged: false,
   };
 
   state = {
@@ -56,10 +58,15 @@ class Collection extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { props: { item, templateToken }, state: { showConfirm } } = this;
+    const { props: { item, templateToken, wasChanged }, state: { showConfirm } } = this;
     return !Immutable.is(item, nextProps.item)
             || !Immutable.is(templateToken, nextProps.templateToken)
-            || showConfirm !== nextState.showConfirm;
+            || showConfirm !== nextState.showConfirm
+            || wasChanged !== nextProps.wasChanged;
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(resetCollectionEdited());
   }
 
   onChangeName = (e) => {
@@ -96,7 +103,10 @@ class Collection extends Component {
   }
 
   onChange = (path, value) => {
-    const { mode, index } = this.props;
+    const { mode, index, wasChanged } = this.props;
+    if (!wasChanged) {
+      this.props.dispatch(setCollectionEdited());
+    }
     if (mode === 'new') {
       this.props.dispatch(updateNewCollection(path, value));
     } else {
@@ -106,6 +116,7 @@ class Collection extends Component {
 
   onSave = () => {
     const { mode, item } = this.props;
+    this.props.dispatch(resetCollectionEdited());
     if (mode === 'new') {
       this.props.dispatch(pushNewCollection(item));
       this.props.dispatch(saveCollection());
@@ -140,7 +151,7 @@ class Collection extends Component {
   }
 
   render() {
-    const { item, templateToken, tokensCategories } = this.props;
+    const { item, templateToken, tokensCategories, wasChanged } = this.props;
     if (item === null || templateToken === null) {
       return (<LoadingItemPlaceholder onClick={this.backToList} loadingLabel="Collections not found." />);
     }
@@ -165,7 +176,7 @@ class Collection extends Component {
             <Form horizontal>
               <div className="panel panel-default">
                 <div className="panel-heading">
-                  Collection Details
+                  Collection step details
                 </div>
                 <div className="panel-body">
 
@@ -189,7 +200,7 @@ class Collection extends Component {
 
 
                   <FormGroup>
-                    <Col componentClass={ControlLabel} sm={3} lg={2}>Active</Col>
+                    <Col componentClass={ControlLabel} sm={3} lg={2}>{'Active?'}</Col>
                     <Col sm={4}>
                       <FormControl componentClass="select" placeholder="" value={item.get('active', '')} onChange={this.onChangeActive}>
                         <option value="">Select...</option>
@@ -223,9 +234,11 @@ class Collection extends Component {
             </Form>
           </div>
         </div>
-        <ActionButtons onClickSave={this.onSave} onClickCancel={this.onCancelAsk}>
-          <Button onClick={this.backToList} bsStyle="default" className="pull-right" style={{ minWidth: 90, marginRight: 10 }}>Back</Button>
-        </ActionButtons>
+        <ActionButtons
+          onClickSave={this.onSave}
+          onClickCancel={wasChanged ? this.onCancelAsk : this.backToList}
+          cancelLabel={wasChanged ? 'Cancel' : 'Back'}
+        />
         <ConfirmModal onOk={this.onCancelOk} onCancel={this.onCancelCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
       </div>
     );
@@ -237,7 +250,8 @@ const mapStateToProps = (state, props) => {
   // TODO: make it more readably
   const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
   const templateToken = state.settings.get('template_token', null);
-  let item = state.collections.collection;
+  const wasChanged = state.collections.collection.get('changed', false);
+  let item = state.collections.newCollection;
   let index = -1;
   if (itemId && state.settings.getIn(['collection', 'steps'], Immutable.List()).size) {
     index = state.settings.getIn(['collection', 'steps'], Immutable.List()).findIndex(collection => collection.get('id') === itemId);
@@ -245,7 +259,7 @@ const mapStateToProps = (state, props) => {
       ? state.settings.getIn(['collection', 'steps'], Immutable.List()).get(index)
       : null;
   }
-  return { item, index, mode, templateToken };
+  return { item, index, mode, templateToken, wasChanged };
 };
 
 export default withRouter(connect(mapStateToProps)(Collection));
