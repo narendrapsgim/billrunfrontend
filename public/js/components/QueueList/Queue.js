@@ -6,12 +6,12 @@ import { getFieldName } from '../../common/Util';
 export default class Queue extends Component {
 
   static propTypes = {
-    line: React.PropTypes.instanceOf(Immutable.List).isRequired,
+    line: React.PropTypes.instanceOf(Immutable.Map).isRequired,
     onClickCancel: React.PropTypes.func,
   };
 
   static defaultProps = {
-    line: Immutable.List(),
+    line: Immutable.Map(),
     onClickCancel: () => {},
   };
 

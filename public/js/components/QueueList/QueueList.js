@@ -82,8 +82,8 @@ class QueueList extends Component {
   }
 
   urtQueryBuilder = () => {
-    const { filter } = this.state;
-    const urtQuery = filter.urt || {};
+    const { filter: { urt = {} } } = this.state;
+    const urtQuery = Object.assign({}, urt);
     if (urtQuery.from) {
       urtQuery.$gte = urtQuery.from;
       delete urtQuery.from;
@@ -96,20 +96,21 @@ class QueueList extends Component {
   }
 
   handleQuerySpecialValues = () => {
-    const { filter } = this.state;
+    const { filter = {} } = this.state;
+    const filterQuery = Object.assign({}, filter);
 
-    if (filter.calc_name) {
-      filter.calc_name.$regex = this.getPreviousCalculator(filter.calc_name.$regex);
+    if (filterQuery.calc_name) {
+      filterQuery.calc_name.$regex = this.getPreviousCalculator(filterQuery.calc_name.$regex);
     }
 
-    if (filter.urt) {
-      filter.urt = this.urtQueryBuilder();
-      if (!Object.keys(filter.urt).length) {
-        delete filter.urt;
+    if (filterQuery.urt) {
+      filterQuery.urt = this.urtQueryBuilder();
+      if (!Object.keys(filterQuery.urt).length) {
+        delete filterQuery.urt;
       }
     }
 
-    return filter || {};
+    return filterQuery;
   }
 
   buildQuery = () => {
@@ -128,24 +129,29 @@ class QueueList extends Component {
     };
   }
 
-  render() {
-    const { line, viewing } = this.state;
-    const { queueLines } = this.props;
+  renderQueueItem = () => {
+    const { line } = this.state;
 
+    return (
+      <Queue line={line} onClickCancel={this.onCancelView} />
+    );
+  }
+
+  renderQueueList = () => {
+    const { queueLines } = this.props;
     const fields = [
       { id: 'type', placeholder: 'Type' },
       { id: 'calc_time', placeholder: 'Last Calculation Time', type: 'timestamp', sort: true },
       { id: 'calc_name', placeholder: 'Calculator Stage', type: 'text', sort: true, parser: this.getCalculatorStage },
       { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false },
     ];
-
     const filterFields = [
       { id: 'type', title: 'Type', type: 'text' },
       { id: 'calc_name', title: 'Calculator Stage', type: 'text' },
       { id: 'urt', title: 'Date', type: 'date-range' },
     ];
 
-    const currentView = viewing ? (<Queue line={line} onClickCancel={this.onCancelView} />) : (
+    return (
       <div>
         <div className="row">
           <div className="col-lg-12">
@@ -167,13 +173,21 @@ class QueueList extends Component {
           </div>
         </div>
 
-        <Pager onClick={this.handlePageClick} size={this.state.size} count={queueLines.size || 0} />
+        <Pager
+          onClick={this.handlePageClick}
+          size={this.state.size}
+          count={queueLines.size || 0}
+        />
       </div>
     );
+  }
+
+  render() {
+    const { viewing } = this.state;
 
     return (
-      <div>
-        { currentView }
+      <div className="QueueList">
+        { viewing ? this.renderQueueItem() : this.renderQueueList() }
       </div>
     );
   }
@@ -183,10 +197,8 @@ const mapDispatchToProps = {
   getList,
 };
 
-function mapStateToProps(state) {
-  return {
-    queueLines: state.list.get('queueLines'),
-  };
-}
+const mapStateToProps = state => ({
+  queueLines: state.list.get('queueLines'),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueueList);
