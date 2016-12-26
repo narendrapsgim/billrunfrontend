@@ -11,7 +11,13 @@ const DiffModal = ({ inputA, inputB, title, show, onClose, diffType, closeLabel 
       <Diff inputA={inputA} inputB={inputB} type={diffType} />
     </Modal.Body>
     <Modal.Footer>
-      <Button onClick={onClose}>{closeLabel}</Button>
+      <div className="push-left" style={{ width: '50%', display: 'inline-block' }}>
+        <p className="text-center" style={{ backgroundColor: 'salmon', marginBottom: 5 }}> Old value </p>
+        <p className="text-center" style={{ backgroundColor: 'lightgreen', marginBottom: 5 }}> New value </p>
+      </div>
+      <div className="push-right" style={{ width: '50%', display: 'inline-block' }}>
+        <Button onClick={onClose}>{closeLabel}</Button>
+      </div>
     </Modal.Footer>
   </Modal>
 );
