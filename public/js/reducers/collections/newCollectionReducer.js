@@ -15,7 +15,7 @@ const collectionStepMail = Immutable.Map({
   }),
 });
 
-const collectionReducer = (state = defaultState, action) => {
+const newCollectionReducer = (state = defaultState, action) => {
   switch (action.type) {
     case UPDATE_COLLECTION:
       return state.setIn(action.path, action.value);
@@ -30,4 +30,4 @@ const collectionReducer = (state = defaultState, action) => {
   }
 };
 
-export default collectionReducer;
+export default newCollectionReducer;

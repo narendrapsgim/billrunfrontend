@@ -62,8 +62,8 @@ const routes = () => (
     <Route path="/users" component={RequireAuth(User)} title="Users" />
     <Route path="/user" component={RequireAuth(UserSetup)} title="User" />
     <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Input Processor" />
-    <Route path="/collections" component={RequireAuth(Collections)} title="Collections" />
-    <Route path="/collection(/:itemId)(/:action)" component={RequireAuth(Collection)} title="Collection" />
+    <Route path="/collections" component={RequireAuth(Collections)} title="Collection" />
+    <Route path="/collection(/:itemId)(/:action)" component={RequireAuth(Collection)} />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
     <Route path="/prepaid_includes" component={RequireAuth(PrepaidIncludesList)} title="Prepaid Buckets" />
     <Route path="/prepaid_include" component={RequireAuth(PrepaidIncludeSetup)} />

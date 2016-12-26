@@ -172,7 +172,7 @@
     "parent": "settings"
   },
   "collections": {
-    "title": "Collections",
+    "title": "Collection",
     "icon": "",
     "route": "collections",
     "show": true,
