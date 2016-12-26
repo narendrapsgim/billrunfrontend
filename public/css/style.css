@@ -257,3 +257,11 @@ textarea {
   font-size: 14px;
   float: left;
 }
+
+.movable {
+    cursor: move;
+}
+.draggable-menu{
+  background-color: #eee;
+  opacity: .7;
+}

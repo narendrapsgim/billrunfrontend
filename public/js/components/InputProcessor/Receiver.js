@@ -19,7 +19,7 @@ export default class Receiver extends Component {
                             {min: 1440, label: "24 Hours"}].map((opt, key) => (
                               <option value={opt.min} key={key}>{opt.label}</option>
                             ));
-    
+
     return (
       <div className="ReceiverSettings">
         <h4>FTP</h4>
@@ -27,47 +27,47 @@ export default class Receiver extends Component {
           <div className="form-group">
             <label htmlFor="name" className="col-xs-2 control-label">Name</label>
             <div className="col-xs-4">
-              <input className="form-control" id="name" onChange={onSetReceiverField} value={settings.get('name')}/>
+              <input className="form-control" id="name" onChange={onSetReceiverField} value={settings.get('name', '')} />
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="host" className="col-xs-2 control-label">Host</label>
             <div className="col-xs-4">
-              <input className="form-control" id="host" onChange={onSetReceiverField} value={settings.get('host')}/>
+              <input className="form-control" id="host" onChange={onSetReceiverField} value={settings.get('host', '')} />
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="user" className="col-xs-2 control-label">User</label>
             <div className="col-xs-4">
-              <input className="form-control" id="user" onChange={onSetReceiverField} value={settings.get('user')}/>
+              <input className="form-control" id="user" onChange={onSetReceiverField} value={settings.get('user', '')} />
             </div>
-          </div>          
+          </div>
           <div className="form-group">
             <label htmlFor="password" className="col-xs-2 control-label">Password</label>
             <div className="col-xs-4">
-              <input className="form-control" id="password" onChange={onSetReceiverField} value={settings.get('password')}/>
+              <input className="form-control" id="password" onChange={onSetReceiverField} value={settings.get('password', '')} />
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="remote_directory" className="col-xs-2 control-label">Directory</label>
             <div className="col-xs-4">
-              <input className="form-control" id="remote_directory" onChange={onSetReceiverField} value={settings.get('remote_directory')}/>
+              <input className="form-control" id="remote_directory" onChange={onSetReceiverField} value={settings.get('remote_directory', '')} />
             </div>
-          </div>                    
+          </div>
           <div className="form-group">
             <label htmlFor="filename_regex" className="col-xs-2 control-label">Regex</label>
             <div className="col-xs-4">
-              <input className="form-control" id="filename_regex" onChange={onSetReceiverField} value={settings.get('filename_regex')}/>
+              <input className="form-control" id="filename_regex" onChange={onSetReceiverField} value={settings.get('filename_regex', '')} />
             </div>
-          </div>                    
+          </div>
           <div className="form-group">
             <label htmlFor="period" className="col-xs-2 control-label">Period</label>
             <div className="col-xs-4">
-              <select className="form-control" id="period" onChange={onSetReceiverField} value={settings.get('period')}>
+              <select className="form-control" id="period" onChange={onSetReceiverField} value={settings.get('period', '')}>
                 { period_options }
               </select>
             </div>
-          </div>                    
+          </div>
           <div className="form-group">
             <label htmlFor="delete_received" className="col-xs-2 control-label">Delete on retrieve</label>
             <div className="col-xs-4">

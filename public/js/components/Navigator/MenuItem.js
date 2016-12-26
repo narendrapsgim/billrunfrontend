@@ -14,7 +14,7 @@ const MenuItem = (props) =>{
 
     return  (
         <li>
-            <Link to={'/' + route}
+            <Link to={`/${route}`}
                   id={id}
                   className={(active) ? "active" : ""}
                   onClick={setActive}>

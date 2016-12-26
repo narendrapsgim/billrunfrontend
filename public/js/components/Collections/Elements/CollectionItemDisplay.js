@@ -16,8 +16,9 @@ export default class CollectionItemDisplay extends Component {
     showConfirm: false,
   }
 
-  shouldComponentUpdate(nextProps) {
-    return !Immutable.is(this.props.item, nextProps.item);
+  shouldComponentUpdate(nextProps, nextState) {
+    const { props: { item }, state: { showConfirm } } = this;
+    return !Immutable.is(item, nextProps.item) || showConfirm !== nextState.showConfirm;
   }
 
   onClickEdit = () => {

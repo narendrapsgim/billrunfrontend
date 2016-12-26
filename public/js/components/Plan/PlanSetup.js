@@ -173,11 +173,14 @@ class PlanSetup extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Override Product Price" eventKey={2}>
-            <Panel style={{ borderTop: 'none' }}>
-              <PlanProductsPriceTab />
-            </Panel>
-          </Tab>
+          {
+            mode !== 'new' &&
+            (<Tab title="Override Product Price" eventKey={2}>
+              <Panel style={{ borderTop: 'none' }}>
+                <PlanProductsPriceTab />
+              </Panel>
+            </Tab>)
+          }
 
           <Tab title="Plan Includes" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>

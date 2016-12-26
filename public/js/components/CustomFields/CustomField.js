@@ -57,14 +57,22 @@ class CustomField extends React.Component {
       <div>
         <Row>
           <Col lg={3} md={3}>
-            <FormGroup>
-              <ControlLabel>Field Name</ControlLabel>
-              <Field
-                  id="field_name"
-                  onChange={ this.onChange }
-                  value={ field.get('field_name', '') }
-              />
-            </FormGroup>
+            <Col lg={1} md={1}>
+              <FormGroup>
+                <ControlLabel>&nbsp;</ControlLabel>
+                <i className="fa fa-arrows-v movable" />
+              </FormGroup>
+            </Col>
+            <Col lg={10} md={10}>
+              <FormGroup>
+                <ControlLabel>Field Name</ControlLabel>
+                <Field
+                    id="field_name"
+                    onChange={ this.onChange }
+                    value={ field.get('field_name', '') }
+                />
+              </FormGroup>
+            </Col>
           </Col>
           <Col lg={3} md={3}>
             <FormGroup>
@@ -89,13 +97,15 @@ class CustomField extends React.Component {
           <Col lg={1} md={1}>
             <FormGroup>
               <ControlLabel>&nbsp;</ControlLabel>
-              <button
-                  className="btn btn-link"
-                  onClick={(
-                      () => this.setState({showSettings: true})
-                    )}>
-                Advanced
-              </button>
+              <div>
+                <button
+                    className="btn btn-link"
+                    onClick={(
+                        () => this.setState({showSettings: true})
+                      )}>
+                  Advanced
+                </button>
+              </div>
             </FormGroup>
           </Col>
           <Col lg={2} md={2}>

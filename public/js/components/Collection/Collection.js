@@ -14,13 +14,12 @@ import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
 import MailEditorRich from '../MailEditor/MailEditorRich';
 
-/* DEV - TO replace with real API */
-import fieldsList from './stub_fields.json';
-
 class Collection extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
+    templateToken: PropTypes.instanceOf(Immutable.Map),
+    tokensCategories: PropTypes.arrayOf(React.PropTypes.string),
     index: PropTypes.number.isRequired,
     mode: PropTypes.string.isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -28,6 +27,12 @@ class Collection extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
   }
+
+  static defaultProps = {
+    item: Immutable.Map(),
+    templateToken: Immutable.Map(),
+    tokensCategories: ['general', 'account', 'collection'],
+  };
 
   state = {
     showConfirm: false,
@@ -39,10 +44,14 @@ class Collection extends Component {
       this.props.dispatch(clearNewCollection());
     }
     this.props.dispatch(getSettings('collection'));
+    this.props.dispatch(getSettings('template_token'));
   }
 
-  shouldComponentUpdate(nextProps) {
-    return !Immutable.is(this.props.item, nextProps.item);
+  shouldComponentUpdate(nextProps, nextState) {
+    const { props: { item, templateToken }, state: { showConfirm } } = this;
+    return !Immutable.is(item, nextProps.item)
+						|| !Immutable.is(templateToken, nextProps.templateToken)
+						|| showConfirm !== nextState.showConfirm;
   }
 
   onChangeName = (e) => {
@@ -123,10 +132,16 @@ class Collection extends Component {
   }
 
   render() {
-    const { item } = this.props;
-    if (!item) {
+    const { item, templateToken, tokensCategories } = this.props;
+    if (item === null || templateToken === null) {
       return (<LoadingItemPlaceholder onClick={this.backToList} loadingLabel="Collections not found." />);
     }
+    const fieldsList = [];
+    templateToken
+      .filter((tokens, type) => tokensCategories.includes(type))
+      .forEach((tokens, type) =>
+        tokens.forEach(token => fieldsList.push(`${type}::${token}`))
+    );
 
     if (!item.get('id', null)) {
       return (<LoadingItemPlaceholder onClick={this.backToList} />);
@@ -209,16 +224,18 @@ class Collection extends Component {
 
 
 const mapStateToProps = (state, props) => {
+  // TODO: make it more readably
   const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
+  const templateToken = state.settings.get('template_token', null);
   let item = state.collections.collection;
   let index = -1;
-  if (itemId && state.settings.get('collection', Immutable.List()).size) {
-    index = state.settings.get('collection').findIndex(collection => collection.get('id') === itemId);
+  if (itemId && state.settings.getIn(['collection', 'steps'], Immutable.List()).size) {
+    index = state.settings.getIn(['collection', 'steps'], Immutable.List()).findIndex(collection => collection.get('id') === itemId);
     item = (index > -1)
-      ? state.settings.get('collection', Immutable.List()).get(index)
+      ? state.settings.getIn(['collection', 'steps'], Immutable.List()).get(index)
       : null;
   }
-  return { item, index, mode };
+  return { item, index, mode, templateToken };
 };
 
 export default withRouter(connect(mapStateToProps)(Collection));

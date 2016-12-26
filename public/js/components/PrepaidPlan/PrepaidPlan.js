@@ -25,6 +25,7 @@ import PlanNotifications from './PlanNotifications';
 import BlockedProducts from './BlockedProducts';
 import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
 import Thresholds from './Thresholds';
+import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 
 class PrepaidPlan extends Component {
 
@@ -164,6 +165,10 @@ class PrepaidPlan extends Component {
     const { plan, pp_includes } = this.props;
     const { action } = this.props.location.query;
 
+    if (action !== 'new' && !plan.get('name')) {
+      return (<LoadingItemPlaceholder onClick={this.handleCancel} />);
+    }
+
     return (
       <div className="PrepaidPlan">
 	<Col lg={12}>
@@ -182,11 +187,14 @@ class PrepaidPlan extends Component {
 	      </Panel>
 	    </Tab>
 
-	    <Tab title="Override Product Price" eventKey={2}>
-	      <Panel style={{borderTop: 'none'}}>
-		<PlanProductsPriceTab />
-	      </Panel>
-	    </Tab>
+            {
+              action !== 'new' &&
+	      (<Tab title="Override Product Price" eventKey={2}>
+	        <Panel style={{borderTop: 'none'}}>
+		  <PlanProductsPriceTab />
+	        </Panel>
+	      </Tab>)
+            }
 
 	    <Tab title="Notifications" eventKey={3}>
 	      <Panel style={{borderTop: 'none'}}>
