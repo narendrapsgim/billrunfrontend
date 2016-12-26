@@ -31,8 +31,7 @@ export default class AdvancedFilter extends Component {
     this.onChange('urt', value);
   }
 
-  onChangeDateFrom = (momentFromDate) => {
-    const id = 'urt';
+  onChangeDateFrom = (id, momentFromDate) => {
     const fromValue = momentFromDate ? momentFromDate.toJSON() : '';
     const { filters } = this.state;
     const value = filters.get(id, {});
@@ -40,8 +39,7 @@ export default class AdvancedFilter extends Component {
     this.onChange(id, value);
   }
 
-  onChangeDateTo = (momentToDate) => {
-    const id = 'urt';
+  onChangeDateTo = (id, momentToDate) => {
     const toValue = momentToDate ? momentToDate.toJSON() : '';
     const { filters } = this.state;
     const value = filters.get(id, {});
@@ -124,7 +122,7 @@ export default class AdvancedFilter extends Component {
               selectsStart
               startDate={dateFrom}
               endDate={dateTo}
-              onChange={this.onChangeDateFrom}
+              onChange={this.onChangeDateFrom.bind(this, field.id)}
               isClearable={true}
               placeholderText="Select Start Date..."
             />
@@ -135,7 +133,7 @@ export default class AdvancedFilter extends Component {
               selectsEnd
               startDate={dateFrom}
               endDate={dateTo}
-              onChange={this.onChangeDateTo}
+              onChange={this.onChangeDateTo.bind(this, field.id)}
               isClearable={true}
               placeholderText="Select End Date..."
             />

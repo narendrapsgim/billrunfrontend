@@ -87,9 +87,13 @@ class QueueList extends Component {
     if (urtQuery.from) {
       urtQuery.$gte = urtQuery.from;
       delete urtQuery.from;
+    } else if (urtQuery.from === '') {
+      delete urtQuery.from;
     }
     if (urtQuery.to) {
       urtQuery.$lte = urtQuery.to;
+      delete urtQuery.to;
+    } else if (urtQuery.to === '') {
       delete urtQuery.to;
     }
     return urtQuery;
