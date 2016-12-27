@@ -1,7 +1,9 @@
 import { combineReducers } from 'redux';
-import collection from './collectionReducer';
+import newCollection from './newCollectionReducer';
+import collection from './collectionsReducer';
 
 
 export default combineReducers({
-  collection
+  newCollection,
+  collection,
 });

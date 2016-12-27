@@ -54,6 +54,7 @@ const convert = (settings) => {
     delimiter_type: parser.type,
     delimiter: parser.separator,
     usaget_type,
+    type: settings.type,
     fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
     field_widths,
     customer_identification_fields,
@@ -307,7 +308,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver'),
         realtime = state.get('realtime', Immutable.Map());
-  
+
   const settings = {
     "file_type": state.get('file_type'),
     "type": state.get('type'),
@@ -317,6 +318,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "structure": state.get('delimiter_type') === "fixed" ? state.get('field_widths') : state.get('fields')
     }
   };
+
   if (processor) {
     const processor_settings = state.get('usaget_type') === "static" ?
 			       { default_usaget: processor.get('default_usaget') } :
@@ -334,7 +336,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "volume_field": processor.get('volume_field'),
       ...processor_settings
     };
-    if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');    
+    if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');
   }
   if (customer_identification_fields) {
     settings.customer_identification_fields = customer_identification_fields.toJS();
@@ -372,7 +374,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
     dispatch(startProgressIndicator());
     apiBillRun(query).then(
       success => {
-        dispatch(finishProgressIndicator());        
+        dispatch(finishProgressIndicator());
         callback(false);
       },
       failure => {
@@ -408,7 +410,7 @@ export function getInputProcessors() {
 
 export function newInputProcessor() {
   return {
-    type: 'NEW_PROCESSOR'    
+    type: 'NEW_PROCESSOR'
   };
 }
 

@@ -47,7 +47,7 @@ class ChargingPlanSetup extends React.Component {
     this.props.dispatch(getList('prepaid_includes', params));
     if (planId) this.props.dispatch(getPlan(planId));
     if (action === 'new') {
-      this.props.dispatch(setPageTitle('Create New Charging Plan'));
+      this.props.dispatch(setPageTitle('Create New Buckets Group'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'charging'));
@@ -63,7 +63,7 @@ class ChargingPlanSetup extends React.Component {
     if (action !== 'new' &&
         plan.get('name') &&
         this.props.plan.get('name') !== plan.get('name')) {
-      this.props.dispatch(setPageTitle(`Edit Charging Plan - ${plan.get('name')}`));
+      this.props.dispatch(setPageTitle(`Edit Buckets Group - ${plan.get('name')}`));
     }
   }
 
@@ -86,7 +86,7 @@ class ChargingPlanSetup extends React.Component {
     const pp_includes_external_id = pp_include.get('external_id');
     this.props.dispatch(addUsagetInclude(usaget, pp_includes_name, pp_includes_external_id));
   };
-  
+
   onUpdatePeriodField = (type, id, value) => {
     this.props.dispatch(onPlanFieldUpdate(['include', type, 'period', id], value));
   };

@@ -52,12 +52,14 @@ export default function (state = defaultState, action) {
       return state.update('usage_types', list => list.push(action.usaget));
 
     case GOT_SETTINGS:
-      return state.withMutations(map => {
-	settings.map(setting => {
-	  const data = setting.data.details;
-	  if (setting.name === "pricing") data.vat = data.vat * 100;
-          map.set(setting.name, Immutable.fromJS(data));
-	});
+      return state.withMutations((stateWithMutations) => {
+        settings.forEach((setting) => {
+          const data = setting.data.details;
+          if (setting.name === 'pricing') {
+            data.vat *= 100;
+          }
+          stateWithMutations.setIn(setting.name.split('.'), Immutable.fromJS(data));
+        });
       });
 
     case ADD_PAYMENT_GATEWAY:
@@ -82,7 +84,7 @@ export default function (state = defaultState, action) {
     case SET_FIELD_POSITION:
       const curr = state.getIn([...action.setting, action.index]);
       return state.updateIn(action.setting, list => list.delete(action.index).insert(action.over, curr));
-      
+
     default:
       return state;
   }

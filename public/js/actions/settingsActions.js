@@ -86,7 +86,7 @@ function fetchSettings(categories) {
 function saveSettingsToDB(categories, settings) {
   const multipleCategories = categories.length > 1;
   const categoryData = categories.map((category) => {
-    let data = settings.get(category);
+    let data = settings.getIn(category.split('.'));
     if (category === 'pricing') {
       data = data.set('vat', data.get('vat') / 100);
     }
@@ -110,12 +110,14 @@ function saveSettingsToDB(categories, settings) {
   });
 
   return (dispatch) => {
-    apiBillRun(queries).then(
+    return apiBillRun(queries).then(
       (success) => {
         dispatch(showSuccess('Settings saved successfuly!'));
+        return true;
       }
     ).catch((error) => {
       dispatch(apiBillRunErrorHandler(error, 'Error saving settings'));
+      return false;
     });
   };
 }
