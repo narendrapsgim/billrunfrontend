@@ -5,8 +5,9 @@ import $ from 'jquery';
 import { apiBillRun } from '../../common/Api';
 
 export default class Tenant extends Component {
-  constructor(props) {
-    super(props);
+
+  state = {
+    logo: '',
   }
 
   onChangeField = (e) => {
@@ -14,25 +15,36 @@ export default class Tenant extends Component {
     this.props.onChange('tenant', id, value);
   }
 
+  updateLogoPreview = (input) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.setState({ logo: e.target.result });
+    };
+    reader.readAsDataURL(input);
+  }
+
   uploadFile = (e) => {
     const form = new FormData();
     form.append('action', 'save');
-    form.append('query', JSON.stringify({'filename': 'file'}));
+    form.append('query', JSON.stringify({ filename: 'file' }));
+    form.append('metadata', JSON.stringify({ billtype: 'logo' }));
     form.append('file', e.target.files[0]);
     $.ajax({
-      url: "/api/logo",
-      method: "POST",
+      url: `${globalSetting.serverUrl}/api/files`,
+      method: 'POST',
       data: form,
-      enctype: "multipart/form-data",
+      enctype: 'multipart/form-data',
       contentType: false,
-      processData: false
+      processData: false,
     });
     this.props.onChange('tenant', 'logo', e.target.files[0].name);
+    this.updateLogoPreview(e.target.files[0]);
   };
 
   render() {
     const { data } = this.props;
-
+    const logo = this.state.logo.length > 0 ? this.state.logo : this.props.logo;
+    
     return (
       <div className="Tenant">
         <Panel header="Company Details">
@@ -105,7 +117,8 @@ export default class Tenant extends Component {
 		<FormControl type="file"
 			     name="logo"
 			     onChange={this.uploadFile}
-			     value={data.get('logo', '')} />
+			    />
+        { logo.length > 0 && <img src={logo} style={{ height: 100, marginTop: 20 }} alt="Logo" />}
 	      </Col>
 	    </FormGroup>
           </Form>
