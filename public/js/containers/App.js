@@ -10,22 +10,27 @@ import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
 import Footer from '../components/Footer';
 import { userCheckLogin } from '../actions/userActions';
-import { setPageTitle } from '../actions/guiStateActions/pageActions';
+import { setPageTitle, systemRequirementsLoadingComplete } from '../actions/guiStateActions/pageActions';
 import { initMainMenu } from '../actions/guiStateActions/menuActions';
-import { getSettings } from '../actions/settingsActions';
-/* Assets */
-import LogoImg from 'img/billrun-logo-tm.png';
+import { getSettings, fetchFile } from '../actions/settingsActions';
+
 
 class App extends Component {
 
   static propTypes = {
     auth: PropTypes.bool,
+    systemRequirementsLoad: PropTypes.bool,
     routes: PropTypes.array,
     children: PropTypes.element,
     title: PropTypes.string,
+    logo: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     mainMenuOverrides: React.PropTypes.oneOfType([
       PropTypes.instanceOf(Immutable.Iterable),
+      null,
+    ]),
+    logoName: React.PropTypes.oneOfType([
+      PropTypes.string,
       null,
     ]),
     menuItems: React.PropTypes.oneOfType([
@@ -35,9 +40,12 @@ class App extends Component {
   };
 
   static defaultProps = {
+    menuItems: null,
     mainMenuOverrides: null,
-    auth: undefined,
+    auth: null,
     title: '',
+    logoName: '',
+    systemRequirementsLoad: false,
   };
 
   componentWillMount() {
@@ -56,7 +64,7 @@ class App extends Component {
   componentWillReceiveProps(nextProps) {
     const { title, auth, mainMenuOverrides } = this.props;
 
-    // Update main menu with telant overrides
+    // Update main menu with tenant overrides
     if (mainMenuOverrides === null && nextProps.mainMenuOverrides !== null) {
       this.props.dispatch(initMainMenu(nextProps.mainMenuOverrides));
     }
@@ -67,50 +75,58 @@ class App extends Component {
     }
     if (auth !== true && nextProps.auth === true) { // user did success login
       // get global system settings
-      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu']));
+      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu']))
+      .then(
+        responce => ((responce) ? this.props.logoName : '')
+      ).then(
+        logoFileName => ((logoFileName && logoFileName.length > 0) ? this.props.dispatch(fetchFile({ filename: logoFileName }, 'logo')) : true
+      )).then(
+        () => { this.props.dispatch(systemRequirementsLoadingComplete()); }
+      );
     }
   }
 
   getView = () => {
-    const { auth, menuItems } = this.props;
-    let appState = null;
+    const { auth, systemRequirementsLoad } = this.props;
+    let appState = 'waiting';
     if (auth === false) {
-      appState = false;
-    } else if (auth === null || menuItems === null) {
-      appState = 'waiting';
-    } else if (auth !== null && menuItems !== null) {
-      appState = true;
+      appState = 'noLogin';
+    } else if (systemRequirementsLoad && auth === true) {
+      appState = 'ready';
     }
 
     switch (appState) {
-      case true:
+      case 'ready':
         return this.renderWithLayout();
-      case false:
+      case 'noLogin':
         return this.renderWithoutLayout();
-      default:
+      default: // 'waiting'
         return this.renderAppLoading();
     }
   }
 
-  renderAppLoading = () => (
-    <div>
-      <ProgressIndicator />
-      <Alerts />
-      <div className="container">
-        <Row>
-          <Col md={4} mdOffset={4}>
-            <div style={{ marginTop: '33%', textAlign: 'center' }}>
-              <img alt="logo" src={LogoImg} style={{ height: 50 }} />
-              <br />
-              <br />
-              <br />
-              <p>Loading...</p>
-            </div>
-          </Col>
-        </Row>
+  renderAppLoading = () => {
+    const { logo } = this.props;
+    return (
+      <div>
+        <ProgressIndicator />
+        <Alerts />
+        <div className="container">
+          <Row>
+            <Col md={4} mdOffset={4}>
+              <div style={{ marginTop: '33%', textAlign: 'center' }}>
+                <img alt="logo" src={logo} style={{ height: 50 }} />
+                <br />
+                <br />
+                <br />
+                <p>Loading...</p>
+              </div>
+            </Col>
+          </Row>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   renderWithoutLayout = () => (
     <div>
@@ -153,10 +169,13 @@ class App extends Component {
 
 
 const mapStateToProps = state => ({
-  auth: state.user.get('auth', null),
+  auth: state.user.get('auth'),
   title: state.guiState.page.get('title'),
-  mainMenuOverrides: state.settings.getIn(['menu', 'main'], null),
-  menuItems: state.guiState.menu.get('main', null),
+  systemRequirementsLoad: state.guiState.page.get('systemRequirementsLoad'),
+  mainMenuOverrides: state.settings.getIn(['menu', 'main']),
+  menuItems: state.guiState.menu.get('main'),
+  logo: state.settings.getIn(['files', 'logo']),
+  logoName: state.settings.getIn(['tenant', 'logo']),
 });
 
 export default connect(mapStateToProps)(App);

@@ -7,8 +7,7 @@ import { NavDropdown, Button, MenuItem as BootstrapMenuItem } from 'react-bootst
 import { userDoLogout } from '../../actions/userActions';
 import MenuItem from './MenuItem';
 import SubMenu from './SubMenu';
-/* Assets */
-import LogoImg from 'img/billrun-logo-tm.png';
+
 
 class Navigator extends Component {
 
@@ -26,6 +25,7 @@ class Navigator extends Component {
     menuItems: PropTypes.instanceOf(Immutable.Iterable),
     userDoLogout: PropTypes.func.isRequired,
     companyNeme: PropTypes.string,
+    logo: PropTypes.string.isRequired,
     userName: PropTypes.string,
     userRoles: PropTypes.array,
   };
@@ -156,7 +156,7 @@ class Navigator extends Component {
 
   render() {
     const { collapseSideBar } = this.state;
-    const { userName, companyNeme, menuItems } = this.props;
+    const { userName, companyNeme, menuItems, logo } = this.props;
     const overallNavClassName = classNames({
       'navbar navbar-default navbar-fixed-top': true,
       'collapse-sizebar': collapseSideBar,
@@ -166,7 +166,7 @@ class Navigator extends Component {
       <nav className={overallNavClassName} id="top-nav" role="navigation">
         <div className="navbar-header">
           <Link to="/" className="navbar-brand">
-            <img src={LogoImg} style={{ height: 22 }} alt="Logo" />
+            <img src={logo} style={{ height: 22 }} alt="Logo" />
             <span className="brand-name">{ companyNeme }</span>
           </Link>
           <Button bsSize="xsmall" id="btn-collapse-menu" onClick={this.onCollapseSidebar}>
@@ -207,5 +207,6 @@ const mapStateToProps = state => ({
   userName: state.user.get('name'),
   menuItems: state.guiState.menu.get('main', Immutable.List()),
   userRoles: state.user.get('roles'),
+  logo: state.settings.getIn(['files', 'logo']),
 });
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Navigator));
