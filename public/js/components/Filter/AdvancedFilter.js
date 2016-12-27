@@ -114,29 +114,33 @@ export default class AdvancedFilter extends Component {
         let dateTo = value ? value.to : '';
         dateTo = (dateTo ? moment(dateTo) : null);
         return (
-          <div>
-            <DatePicker
-              className="form-control"
-              dateFormat="DD/MM/YYYY"
-              selected={dateFrom}
-              selectsStart
-              startDate={dateFrom}
-              endDate={dateTo}
-              onChange={this.onChangeDateFrom.bind(this, field.id)}
-              isClearable={true}
-              placeholderText="Select Start Date..."
-            />
-            <DatePicker
-              className="form-control"
-              dateFormat="DD/MM/YYYY"
-              selected={dateTo}
-              selectsEnd
-              startDate={dateFrom}
-              endDate={dateTo}
-              onChange={this.onChangeDateTo.bind(this, field.id)}
-              isClearable={true}
-              placeholderText="Select End Date..."
-            />
+          <div style={{ width: '100%' }}>
+            <div className="pull-left" style={{ width: '48%' }}>
+              <DatePicker
+                className="form-control"
+                dateFormat="DD/MM/YYYY"
+                selected={dateFrom}
+                selectsStart
+                startDate={dateFrom}
+                endDate={dateTo}
+                onChange={this.onChangeDateFrom.bind(this, field.id)}
+                isClearable={true}
+                placeholderText="Select Start Date..."
+              />
+            </div>
+            <div className="pull-right" style={{ width: '48%' }}>
+              <DatePicker
+                className="form-control"
+                dateFormat="DD/MM/YYYY"
+                selected={dateTo}
+                selectsEnd
+                startDate={dateFrom}
+                endDate={dateTo}
+                onChange={this.onChangeDateTo.bind(this, field.id)}
+                isClearable={true}
+                placeholderText="Select End Date..."
+              />
+            </div>
           </div>
         );
       }
