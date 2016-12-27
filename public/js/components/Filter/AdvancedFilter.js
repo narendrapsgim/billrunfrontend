@@ -26,11 +26,10 @@ export default class AdvancedFilter extends Component {
     this.onChange(id, value);
   }
 
-  onChangeDate = (momentDate) => {
+  onChangeDate = (id, momentDate) => {
     const value = momentDate ? momentDate.toJSON() : '';
-    this.onChange('urt', value);
+    this.onChange(id, value);
   }
-
 
   onChange = (filterName, value) => {
     const { filters } = this.state;
@@ -85,7 +84,7 @@ export default class AdvancedFilter extends Component {
             className="form-control"
             dateFormat="DD/MM/YYYY"
             selected={value.length ? moment(value) : null}
-            onChange={this.onChangeDate}
+            onChange={this.onChangeDate.bind(this, field.id)}
             isClearable={true}
             placeholderText="Select Date..."
           />
