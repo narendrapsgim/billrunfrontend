@@ -41,7 +41,7 @@ class Tenant extends Component {
     const { files } = e.target;
     if (files.length > 0) {
       const maxBytesSize = globalSetting.logoMaxSize * 1024 * 1024;
-      if (files[0].size < maxBytesSize) {
+      if (files[0].size <= maxBytesSize) {
         saveFile(files[0], { billtype: 'logo' });
         this.props.onChange('tenant', 'logo', files[0].name);
         this.updateLogoPreview(files[0]);
