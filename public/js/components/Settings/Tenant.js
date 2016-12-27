@@ -1,14 +1,19 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Panel, Form, FormGroup, Col, FormControl, ControlLabel } from 'react-bootstrap';
+import filesize from 'file-size';
 import { saveFile } from '../../actions/settingsActions';
+import { showWarning } from '../../actions/alertsActions';
 
-export default class Tenant extends Component {
+
+class Tenant extends Component {
 
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     data: PropTypes.instanceOf(Immutable.Map),
     logo: PropTypes.string.isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -35,9 +40,14 @@ export default class Tenant extends Component {
   uploadFile = (e) => {
     const { files } = e.target;
     if (files.length > 0) {
-      saveFile(files[0], { billtype: 'logo' });
-      this.props.onChange('tenant', 'logo', e.target.files[0].name);
-      this.updateLogoPreview(e.target.files[0]);
+      const maxBytesSize = globalSetting.logoMaxSize * 1024 * 1024;
+      if (files[0].size < maxBytesSize) {
+        saveFile(files[0], { billtype: 'logo' });
+        this.props.onChange('tenant', 'logo', files[0].name);
+        this.updateLogoPreview(files[0]);
+      } else {
+        this.props.dispatch(showWarning(`Max file size is ${filesize(maxBytesSize).human()}`));
+      }
     }
   };
 
@@ -107,3 +117,10 @@ export default class Tenant extends Component {
     );
   }
 }
+
+
+const mapStateToProps = (state, props) => ({
+  logo: state.settings.getIn(['files', 'logo']),
+});
+
+export default connect(mapStateToProps)(Tenant);

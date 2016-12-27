@@ -17,4 +17,5 @@ var globalSetting = {
   keyUppercaseRegex: /^[A-Z0-9_]*$/,
   defaultLogo: 'billRun-cloud-logo.png',
   billrunLogo: 'billRun-logo.png',
+  logoMaxSize: 2,
 };
