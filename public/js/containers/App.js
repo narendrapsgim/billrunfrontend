@@ -89,7 +89,7 @@ class App extends Component {
   getView = () => {
     const { auth, systemRequirementsLoad } = this.props;
     let appState = 'waiting';
-    if (systemRequirementsLoad && auth === false) {
+    if (auth === false) {
       appState = 'noLogin';
     } else if (systemRequirementsLoad && auth === true) {
       appState = 'ready';
