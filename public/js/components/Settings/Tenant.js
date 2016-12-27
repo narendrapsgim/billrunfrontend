@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Panel, Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
-import $ from 'jquery';
-
-import { apiBillRun } from '../../common/Api';
+import { Panel, Form, FormGroup, Col, FormControl, ControlLabel } from 'react-bootstrap';
+import { saveFile } from '../../actions/settingsActions';
 
 export default class Tenant extends Component {
 
@@ -24,27 +22,18 @@ export default class Tenant extends Component {
   }
 
   uploadFile = (e) => {
-    const form = new FormData();
-    form.append('action', 'save');
-    form.append('query', JSON.stringify({ filename: 'file' }));
-    form.append('metadata', JSON.stringify({ billtype: 'logo' }));
-    form.append('file', e.target.files[0]);
-    $.ajax({
-      url: `${globalSetting.serverUrl}/api/files`,
-      method: 'POST',
-      data: form,
-      enctype: 'multipart/form-data',
-      contentType: false,
-      processData: false,
-    });
-    this.props.onChange('tenant', 'logo', e.target.files[0].name);
-    this.updateLogoPreview(e.target.files[0]);
+    const { files } = e.target;
+    if (files.length > 0) {
+      saveFile(files[0], { billtype: 'logo' });
+      this.props.onChange('tenant', 'logo', e.target.files[0].name);
+      this.updateLogoPreview(e.target.files[0]);
+    }
   };
 
   render() {
     const { data } = this.props;
     const logo = this.state.logo.length > 0 ? this.state.logo : this.props.logo;
-    
+
     return (
       <div className="Tenant">
         <Panel header="Company Details">

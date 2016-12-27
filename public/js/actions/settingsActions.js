@@ -91,6 +91,24 @@ function fetchSettings(categories) {
     });
 }
 
+export function saveFile(file, metadata = {}) {
+  const formData = new FormData();
+  formData.append('action', 'save');
+  formData.append('metadata', JSON.stringify(metadata));
+  formData.append('query', JSON.stringify({ filename: 'file' }));
+  formData.append('file', file);
+
+  const query = {
+    api: 'files',
+    name: 'saveFile',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  };
+  return apiBillRun(query);
+}
+
 export function fetchFile(query, path = 'file') {
   const apiQuery = {
     api: 'files',
