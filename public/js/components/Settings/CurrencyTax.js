@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
+import { Form, FormGroup, Col, InputGroup, FormControl, ControlLabel } from 'react-bootstrap';
+
 
 export default class CurrencyTax extends Component {
 
@@ -29,45 +31,30 @@ export default class CurrencyTax extends Component {
     const currencyOptions = currencies.map(this.renderOption);
 
     return (
-      <div>
-        <form className="form-horizontal CurrencyTaxSettings">
-          <div className="form-group">
-            <div className="col-md-12">
-              <div className="col-md-3 control-label">
-                <label htmlFor="currency">Currency</label>
-              </div>
-              <div className="col-md-4">
-                <select
-                  className="form-control"
-                  id="currency"
-                  value={data.get('currency', '')}
-                  onChange={this.onChange}
-                >
-                  { currencyOptions }
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="form-group">
-            <div className="col-md-12">
-              <div className="col-md-3 control-label">
-                <label htmlFor="vat">VAT</label>
-              </div>
-              <div className="col-md-4">
-                <div className="input-group">
-                  <input
-                    id="vat"
-                    type="number"
-                    onChange={this.onChange}
-                    value={data.get('vat', '')}
-                    className="form-control"
-                  />
-                  <span className="input-group-addon">%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
+      <div className="CurrencyTax">
+        <Form horizontal>
+          <FormGroup controlId="currency" key="currency">
+            <Col componentClass={ControlLabel} md={2}>
+              Currency
+            </Col>
+            <Col sm={6}>
+              <select className="form-control" id="currency" value={data.get('currency', '')} onChange={this.onChange}>
+                { currencyOptions }
+              </select>
+            </Col>
+          </FormGroup>
+          <FormGroup controlId="vat" key="vat">
+            <Col componentClass={ControlLabel} md={2}>
+              VAT
+            </Col>
+            <Col sm={6}>
+              <InputGroup>
+                <FormControl type="text" name="vat" onChange={this.onChange} value={data.get('vat', '')} />
+                <InputGroup.Addon>%</InputGroup.Addon>
+              </InputGroup>
+            </Col>
+          </FormGroup>
+        </Form>
       </div>
     );
   }
