@@ -36,7 +36,7 @@
     "parent":"prepaid"
   },
   "charging": {
-    "title": "Charging",
+    "title": "Buckets Group",
     "icon": "",
     "route": "charging_plans",
     "show": true,
@@ -172,7 +172,7 @@
     "parent": "settings"
   },
   "collections": {
-    "title": "Collections",
+    "title": "Collection",
     "icon": "",
     "route": "collections",
     "show": true,

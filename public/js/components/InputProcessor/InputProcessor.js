@@ -324,7 +324,7 @@ class InputProcessor extends Component {
     if (type === 'api') {
       steps.push((<RealtimeMapping settings={ settings } onChange={ this.onChangeRealtimeField } onChangeDefault={ this.onChangeRealtimeDefaultField } />));
     } else {
-      steps.push((<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver')} />));
+      steps.push((<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver', Immutable.Map())} />));
     }
 
     const title = action === 'new' ? "New input processor" : `Edit input processor - ${settings.get('file_type')}`;

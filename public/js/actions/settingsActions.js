@@ -65,6 +65,15 @@ function gotSettings(settings) {
   };
 }
 
+function gotFile(fileData, path) {
+  return {
+    type: UPDATE_SETTING,
+    category: 'files',
+    name: path,
+    value: `data:image/png;base64,${fileData}`,
+  };
+}
+
 function fetchSettings(categories) {
   const queries = categories.map(category => ({
     api: 'settings',
@@ -72,21 +81,59 @@ function fetchSettings(categories) {
     params: [{ category }, { data: JSON.stringify({}) }],
   }));
 
-  return (dispatch) => {
-    apiBillRun(queries).then(
-      (success) => {
-        dispatch(gotSettings(success.data));
-      }
-    ).catch((error) => {
+  return dispatch => apiBillRun(queries).then(
+    (success) => {
+      dispatch(gotSettings(success.data));
+      return true;
+    }).catch((error) => {
       dispatch(apiBillRunErrorHandler(error));
+      return false;
     });
+}
+
+export function saveFile(file, metadata = {}) {
+  const formData = new FormData();
+  formData.append('action', 'save');
+  formData.append('metadata', JSON.stringify(metadata));
+  formData.append('query', JSON.stringify({ filename: 'file' }));
+  formData.append('file', file);
+
+  const query = {
+    api: 'files',
+    name: 'saveFile',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
   };
+  return apiBillRun(query);
+}
+
+export function fetchFile(query, path = 'file') {
+  const apiQuery = {
+    api: 'files',
+    params: [
+      { action: 'read' },
+      { query: JSON.stringify(query) },
+    ],
+  };
+  return dispatch => apiBillRun(apiQuery).then(
+    (success) => {
+      if (success.data && success.data[0] && success.data[0].data && success.data[0].data.desc) {
+        dispatch(gotFile(success.data[0].data.desc, path));
+				return true;
+      }
+      return success;
+    }).catch((error) => {
+      dispatch(apiBillRunErrorHandler(error));
+      return error;
+    });
 }
 
 function saveSettingsToDB(categories, settings) {
   const multipleCategories = categories.length > 1;
   const categoryData = categories.map((category) => {
-    let data = settings.get(category);
+    let data = settings.getIn(category.split('.'));
     if (category === 'pricing') {
       data = data.set('vat', data.get('vat') / 100);
     }

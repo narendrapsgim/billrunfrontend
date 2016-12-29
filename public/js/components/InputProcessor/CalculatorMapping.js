@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Button, Panel, FormGroup, Col, Row } from 'react-bootstrap';
 
@@ -105,15 +106,23 @@ export default class CalculatorMapping extends Component {
   };
 
   render() {
-    const {
-      settings,
-      onSetCustomerMapping,
-    } = this.props;
-
-    const availableTargetFields = [(<option disabled value="-1" key={-1}>Select Field</option>),
-      ...['sid', 'aid'].map((field, key) => (
-        <option value={field} key={key}>{field}</option>
+    const { settings,
+            type,
+            format,
+            onSetCustomerMapping,
+            onSetLineKey,
+            onSetRating } = this.props;
+    const available_fields = [(<option disabled value="" key={-1}>Select Field</option>),
+                              ...settings.get('fields', []).map((field, key) => (
+                                <option value={field} key={key}>{field}</option>
+                              ))];
+    const available_target_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
+                                     ...['sid', 'aid'].map((field, key) => (
+                                       <option value={field} key={key}>{field}</option>
                                      ))];
+    const available_usagetypes = settings.get('rate_calculators', {}).keySeq().map(usaget => {
+      return usaget;
+    });
 
     return (
       <form className="form-horizontal CalculatorMapping">

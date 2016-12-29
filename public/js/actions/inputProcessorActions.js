@@ -43,7 +43,9 @@ const convert = (settings) => {
           customer_identification_fields,
           rate_calculators,
           receiver,
-          realtime = {} } = settings;
+          realtime = {},
+          response = {},
+        } = settings;
 
   const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
   const field_widths = parser.type === "fixed" ? parser.structure : {};
@@ -56,6 +58,7 @@ const convert = (settings) => {
     delimiter_type: parser.type,
     delimiter: parser.separator,
     usaget_type,
+    type: settings.type,
     fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
     field_widths,
     customer_identification_fields,
@@ -66,6 +69,7 @@ const convert = (settings) => {
     ret.receiver = connections;
   } else {
     ret.realtime = realtime;
+    ret.response = response;
   }
 
   if (processor) {
@@ -325,7 +329,8 @@ export function saveInputProcessorSettings(state, callback, part=false) {
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver'),
-        realtime = state.get('realtime', Immutable.Map());
+        realtime = state.get('realtime', Immutable.Map()),
+        response = state.get('response', Immutable.Map());
 
   const settings = {
     "file_type": state.get('file_type'),
@@ -336,6 +341,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       "structure": state.get('delimiter_type') === "fixed" ? state.get('field_widths') : state.get('fields')
     }
   };
+
   if (processor) {
     const processor_settings = state.get('usaget_type') === "static" ?
 			       { default_usaget: processor.get('default_usaget') } :
@@ -348,7 +354,7 @@ export function saveInputProcessorSettings(state, callback, part=false) {
 						  }
 						}).toJS() };
     settings.processor = {
-      "type": "Usage",
+      type: (settings.type === 'realtime' ? 'Realtime' : 'Usage'),
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
       ...processor_settings
@@ -369,8 +375,20 @@ export function saveInputProcessorSettings(state, callback, part=false) {
       ]
     };
   }
+  const defaultResponse = {
+    encode: 'json',
+    fields: [
+      { response_field_name: 'requestNum', row_field_name: 'request_num' },
+      { response_field_name: 'requestType', row_field_name: 'request_type' },
+      { response_field_name: 'sessionId', row_field_name: 'session_id' },
+      { response_field_name: 'returnCode', row_field_name: 'granted_return_code' },
+      { response_field_name: 'sid', row_field_name: 'sid' },
+      { response_field_name: 'grantedVolume', row_field_name: 'usagev' },
+    ],
+  };
   if (state.get('type') === 'realtime') {
     settings.realtime = realtime.toJS();
+    settings.response = (response.size > 0 ? response.toJS() : defaultResponse);
   }
 
   let settingsToSave;
