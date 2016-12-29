@@ -10,6 +10,7 @@ import { UPDATE_SETTING,
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
 import { LOGOUT } from '../actions/userActions';
 
+const LogoImg = require(`img/${globalSetting.defaultLogo}`);// eslint-disable-line  import/no-dynamic-require
 const defaultState = Immutable.fromJS({
   subscribers: {
     account: {
@@ -18,6 +19,9 @@ const defaultState = Immutable.fromJS({
     subscriber: {
       fields: []
     }
+  },
+  files: {
+    logo: LogoImg,
   },
   payment_gateways: []
 });

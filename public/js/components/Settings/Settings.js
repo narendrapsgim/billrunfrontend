@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
-import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
 import DateTime from './DateTime';
 import CurrencyTax from './CurrencyTax';
 import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
 import ActionButtons from '../Elements/ActionButtons';
+import { getSettings, updateSetting, saveSettings, fetchFile } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
 
 
@@ -23,6 +23,7 @@ class Settings extends Component {
     activeTab: React.PropTypes.number,
     dispatch: React.PropTypes.func.isRequired,
     settings: React.PropTypes.instanceOf(Immutable.Map),
+    logo: React.PropTypes.string.isRequired,
   };
 
   state = {
@@ -77,8 +78,13 @@ class Settings extends Component {
       this.props.dispatch(saveSettings(categoryToSave)).then(
         (status) => {
           if (status === true) { // settings successfully saved
+            // Reload Menu
             const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
             this.props.dispatch(initMainMenu(mainMenuOverrides));
+            // Update logo
+            if (categoryToSave.includes('tenant') && settings.getIn(['tenant', 'logo'], '').length > 0) {
+              this.props.dispatch(fetchFile({ filename: settings.getIn(['tenant', 'logo'], '') }, 'logo'));
+            }
           }
         }
       );
@@ -90,7 +96,7 @@ class Settings extends Component {
   }
 
   render() {
-    const { props: { settings }, state: { activeTab } } = this;
+    const { props: { settings, logo }, state: { activeTab } } = this;
 
     const currencyTax = settings.get('pricing', Immutable.Map());
     const datetime = settings.get('billrun', Immutable.Map());
@@ -104,7 +110,7 @@ class Settings extends Component {
         <Tabs defaultActiveKey={activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
           <Tab title="Company" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
-              <Tenant onChange={this.onChangeFieldValue} data={tenant} />
+              <Tenant onChange={this.onChangeFieldValue} data={tenant} logo={logo} />
             </Panel>
           </Tab>
 
@@ -143,5 +149,6 @@ class Settings extends Component {
 const mapStateToProps = (state, props) => ({
   activeTab: props.location.query.tab,
   settings: state.settings,
+  logo: state.settings.getIn(['files', 'logo']),
 });
 export default connect(mapStateToProps)(Settings);
