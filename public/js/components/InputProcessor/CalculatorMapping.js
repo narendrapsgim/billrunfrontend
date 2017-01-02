@@ -5,7 +5,7 @@ import { Button, Panel, FormGroup, Col, Row } from 'react-bootstrap';
 
 export default class CalculatorMapping extends Component {
   static propTypes = {
-    settings: React.PropTypes.instanceOf(Immutable.List).isRequired,
+    settings: React.PropTypes.instanceOf(Immutable.Map).isRequired,
     onAddRating: React.PropTypes.func.isRequired,
     onSetRating: React.PropTypes.func.isRequired,
     onRemoveRating: React.PropTypes.func.isRequired,
@@ -26,7 +26,7 @@ export default class CalculatorMapping extends Component {
   getRateCalculators(usaget) {
     const { onSetLineKey, onSetRating, onRemoveRating } = this.props;
     return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => (
-      <Row style={{ marginBottom: 10 }}>
+      <Row key={calcKey} style={{ marginBottom: 10 }}>
         <Col lg={3} md={3} style={{ paddingRight: 0 }}>
           <FormGroup style={{ margin: 0 }}>
             <select
@@ -99,7 +99,10 @@ export default class CalculatorMapping extends Component {
     const billrunFields = Immutable.fromJS(addBillrunFields ? ['type', 'usaget'] : []);
     return [
       (<option disabled value="" key={-3}>Select Field</option>),
-      ...(billrunFields.push(...this.props.settings.get('fields', []))).map((field, key) => (
+      ...(this.props.settings.get('fields', [])).map((field, key) => (
+        <option value={`uf.${field}`} key={`uf.${key}`}>{field}</option>
+      )),
+      ...billrunFields.map((field, key) => (
         <option value={field} key={key}>{field}</option>
       )),
     ];
@@ -116,7 +119,7 @@ export default class CalculatorMapping extends Component {
                               ...settings.get('fields', []).map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
                               ))];
-    const available_target_fields = [(<option disabled value="-1" key={-1}>Select Field</option>),
+    const availableTargetFields = [(<option disabled value="-1" key={-1}>Select Field</option>),
                                      ...['sid', 'aid'].map((field, key) => (
                                        <option value={field} key={key}>{field}</option>
                                      ))];
