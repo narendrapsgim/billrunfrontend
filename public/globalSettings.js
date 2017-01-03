@@ -19,7 +19,7 @@ var globalSetting = {
   serviceCycleUnlimitedValue: 999999999,
   productUnlimitedValue: 999999999,
   keyUppercaseRegex: /^[A-Z0-9_]*$/,
-  queue_calculators: ['customer', 'rate', 'pricing'], // TODO: remove hard-coded values (fetch from BE)
   defaultLogo: 'billRun-cloud-logo.png',
   billrunLogo: 'billRun-logo.png',
+  queue_calculators: ['customer', 'rate', 'pricing'],
 };
