@@ -41,7 +41,7 @@ import CustomFields from '../components/CustomFields';
 
 const routes = () => (
   <Route path="/" component={App}>
-    <IndexRoute component={RequireAuth(WelcomePage)} />
+    <IndexRoute component={RequireAuth(WelcomePage)} title="" />
     <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
     <Route path="/plans" component={RequireAuth(PlansList)} title="Plans" />
     <Route path="/plan(/:itemId)(/:action)" component={RequireAuth(Plan)} />

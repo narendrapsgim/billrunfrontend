@@ -84,6 +84,10 @@ class Navigator extends Component {
     this.setState({ openSubMenu: toggleSubMenu, collapseSideBar: false });
   };
 
+  resetMenuActive = () => {
+    this.onSetActive('');
+  }
+
   clickLogout = (e) => {
     e.preventDefault();
     this.props.userDoLogout().then((res) => {
@@ -165,7 +169,7 @@ class Navigator extends Component {
     return (
       <nav className={overallNavClassName} id="top-nav" role="navigation">
         <div className="navbar-header">
-          <Link to="/" className="navbar-brand">
+          <Link to="/" className="navbar-brand" onClick={this.resetMenuActive}>
             <img src={logo} style={{ height: 22 }} alt="Logo" />
             <span className="brand-name">{ companyNeme }</span>
           </Link>
