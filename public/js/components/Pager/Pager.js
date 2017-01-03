@@ -1,42 +1,45 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import Immutable from 'immutable';
+
 
 class Pager extends Component {
-  constructor(props) {
-    super(props);
 
-    this.handlePageClick = this.handlePageClick.bind(this);
-
-    this.state = {
-      page: 0
-    };
+  static propTypes = {
+    pager: React.PropTypes.instanceOf(Immutable.Map),
+    size: React.PropTypes.number,
+    count: React.PropTypes.number,
+    onClick: React.PropTypes.func,
   }
 
-  handlePageClick(e) {
-    const { onClick, size, count, pager } = this.props;
+  state = {
+    page: 0,
+  }
+
+  handlePageClick = (e) => {
+    e.preventDefault();
+    const { pager } = this.props;
     const { id } = e.target;
     let { page } = this.state;
 
-    if (id === "next" && pager.get('nextPage', true)) {
-      page++;
-    } else if (id === "previous" && page > 0) {
-      page--;
+    if (id === 'next' && pager.get('nextPage', true)) {
+      page += 1;
+    } else if (id === 'previous' && page > 0) {
+      page -= 1;
     } else {
-      e.preventDefault()
       return;
     }
-    this.setState({page}, () => {
-      onClick(page)
-    });
+    this.setState({ page });
+    this.props.onClick(page);
   }
 
   render() {
     const { size, count, pager } = this.props;
     const { page } = this.state;
-
-    const prevClass = "previous" + ( this.state.page === 0 ? ' disabled' : '' );
-    const nextClass = "next" + (!pager.get('nextPage') ? ' disabled ' : '');
-    const showing = (page * size + count) === 0 ? 'Showing none' : `Showing ${page * size + 1} to ${page * size + count}`;
+    const offset = page * size;
+    const prevClass = `previous${this.state.page === 0 ? ' disabled' : ''}`;
+    const nextClass = `next${!pager.get('nextPage') ? ' disabled ' : ''}`;
+    const showing = (offset + count) === 0 ? 'Showing none' : `Showing ${offset + 1} to ${offset + count}`;
 
     return (
       <div className="row">
@@ -45,12 +48,12 @@ class Pager extends Component {
             <span className="detalis">{showing}</span>
             <li id="previous" className={prevClass}>
               <a id="previous" onClick={this.handlePageClick}>
-                <i id="previous" className="fa fa-chevron-left"></i>
+                <i id="previous" className="fa fa-chevron-left" />
               </a>
             </li>
             <li id="next" className={nextClass}>
               <a id="next" onClick={this.handlePageClick}>
-                <i id="next" className="fa fa-chevron-right"></i>
+                <i id="next" className="fa fa-chevron-right" />
               </a>
             </li>
           </ul>
@@ -60,10 +63,8 @@ class Pager extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    pager: state.pager
-  };
-}
+const mapStateToProps = state => ({
+  pager: state.pager,
+});
 
 export default connect(mapStateToProps)(Pager);
