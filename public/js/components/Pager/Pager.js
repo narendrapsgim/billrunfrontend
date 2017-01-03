@@ -13,11 +13,11 @@ class Pager extends Component {
   }
 
   handlePageClick(e) {
-    const { onClick, size, count } = this.props;
+    const { onClick, size, count, pager } = this.props;
     const { id } = e.target;
     let { page } = this.state;
 
-    if (id === "next" && size <= count) {
+    if (id === "next" && pager.get('nextPage', true)) {
       page++;
     } else if (id === "previous" && page > 0) {
       page--;
