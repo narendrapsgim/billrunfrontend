@@ -27,12 +27,15 @@ class List extends Component {
         return moment(entity.get(field.id)).format(globalSetting.timeFormat);
       case 'datetime':
         return moment(entity.get(field.id)).format(globalSetting.datetimeFormat);
+      case 'timestamp':
+        return moment(parseInt(entity.get(field.id), 10) * 1000)
+          .format(globalSetting.datetimeFormat);
       case 'text':
       default:
         return entity.get(field.id);
     }
   }
-  
+
   printEntityField(entity = Immutable.Map(), field) {
     if (!Immutable.Iterable.isIterable(entity))
       return this.printEntityField(Immutable.fromJS(entity), field);
@@ -73,7 +76,7 @@ class List extends Component {
 
     });
   }
-  
+
   onClickHeader(field) {
     const { onSort = () => {} } = this.props;
     const { sort } = this.state;
