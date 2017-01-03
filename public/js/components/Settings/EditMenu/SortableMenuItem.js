@@ -5,17 +5,20 @@ import { SortableElement } from 'react-sortable-hoc';
 import EditMenuItem from './EditMenuItem';
 import DragHandle from './DragHandle';
 
-const SortableMenuItem = ({ data: { item, onChangeField, subMenus, renderTree, newPath } }) => (
-  <Col md={12} className="pr0" style={{ borderTop: '1px solid #eee', borderBottom: '1px solid #eee', lineHeight: '35px' }} >
-    <Col md={1}>
-      <DragHandle />
+const SortableMenuItem = (props) => {
+  const { item, onChangeField, subMenus, renderTree, newPath, editShow } = props.data;
+  return (
+    <Col md={12} className="pr0" style={{ borderTop: '1px solid #eee', borderBottom: '1px solid #eee', lineHeight: '35px' }} >
+      <Col md={1}>
+        <DragHandle />
+      </Col>
+      <Col md={11} className="pr0">
+        <EditMenuItem item={item} onChangeField={onChangeField} editShow={editShow} />
+        {subMenus.size > 0 && renderTree(subMenus, [...newPath, 'subMenus'], item.get('id'))}
+      </Col>
     </Col>
-    <Col md={11} className="pr0">
-      <EditMenuItem item={item} onChangeField={onChangeField} />
-      {subMenus.size > 0 && renderTree(subMenus, [...newPath, 'subMenus'], item.get('id'))}
-    </Col>
-  </Col>
-);
+  );
+};
 
 SortableMenuItem.propTypes = {
   data: PropTypes.instanceOf(Immutable.Record).isRequired,

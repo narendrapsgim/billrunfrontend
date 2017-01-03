@@ -10,7 +10,14 @@ class EditMenuItem extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
+    editShow: PropTypes.bool,
     onChangeField: PropTypes.func,
+  };
+
+  static defaultProps = {
+    editShow: true,
+    item: Immutable.Map(),
+    onChangeField: () => {},
   };
 
   constructor(props) {
@@ -132,7 +139,7 @@ class EditMenuItem extends Component {
   renderMouseOver = () => <span>&nbsp;<i className="fa fa-pencil-square-o fa-fw" /></span>;
 
   render() {
-    const { props: { item }, state: { mouseOver, editMode } } = this;
+    const { props: { item, editShow }, state: { mouseOver, editMode } } = this;
     const show = item.get('show', false);
 
     return (
@@ -149,7 +156,7 @@ class EditMenuItem extends Component {
         </Col>
 
         <Col md={2} className="text-right">
-          <Field onChange={this.onChangeShowHide} value={show} fieldType="checkbox" />
+          <Field onChange={this.onChangeShowHide} value={show} fieldType="checkbox" disabled={!editShow} />
         </Col>
 
         {this.renderEditModal()}
