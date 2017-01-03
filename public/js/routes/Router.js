@@ -1,10 +1,11 @@
 import React from 'react';
-import { Route, IndexRedirect } from 'react-router';
+import { Route, IndexRoute } from 'react-router';
 
 import RequireAuth from '../containers/Authentication';
 import App from '../containers/App';
 import Dashboard from '../components/Dashboard';
 import LoginPage from '../components/LoginPage';
+import WelcomePage from '../components/WelcomePage';
 import PageNotFound from '../components/PageNotFound';
 import CustomersList from '../components/CustomersList';
 import CustomerSetup from '../components/CustomerSetup';
@@ -40,7 +41,7 @@ import CustomFields from '../components/CustomFields';
 
 const routes = () => (
   <Route path="/" component={App}>
-    <IndexRedirect to="/dashboard" component={RequireAuth(Dashboard)} />
+    <IndexRoute component={RequireAuth(WelcomePage)} />
     <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
     <Route path="/plans" component={RequireAuth(PlansList)} title="Plans" />
     <Route path="/plan(/:itemId)(/:action)" component={RequireAuth(Plan)} />
