@@ -96,8 +96,7 @@ class ProductsList extends Component {
       { id: 'unit_type', title: 'Unit Type', parser: this.usegtParser },
       { id: 'code', title: 'Code', sort: true },
       { id: 'description', title: 'Description', sort: true },
-      { id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date', sort: true },
-      { id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date', sort: true },
+      { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
     ];
 
     return (
