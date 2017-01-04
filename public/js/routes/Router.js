@@ -1,10 +1,11 @@
 import React from 'react';
-import { Route, IndexRedirect } from 'react-router';
+import { Route, IndexRoute } from 'react-router';
 
 import RequireAuth from '../containers/Authentication';
 import App from '../containers/App';
 import Dashboard from '../components/Dashboard';
 import LoginPage from '../components/LoginPage';
+import WelcomePage from '../components/WelcomePage';
 import PageNotFound from '../components/PageNotFound';
 import CustomersList from '../components/CustomersList';
 import CustomerSetup from '../components/CustomerSetup';
@@ -19,6 +20,7 @@ import ExportGenerator from '../components/ExportGenerator';
 import ExportGeneratorsList from '../components/ExportGeneratorsList';
 import InputProcessor from '../components/InputProcessor';
 import UsageList from '../components/UsageList';
+import QueueList from '../components/QueueList';
 import InvoicesList from '../components/InvoicesList';
 import Settings from '../components/Settings';
 import PaymentGateways from '../components/PaymentGateways';
@@ -39,7 +41,7 @@ import CustomFields from '../components/CustomFields';
 
 const routes = () => (
   <Route path="/" component={App}>
-    <IndexRedirect to="/dashboard" component={RequireAuth(Dashboard)} />
+    <IndexRoute component={RequireAuth(WelcomePage)} title="" />
     <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
     <Route path="/plans" component={RequireAuth(PlansList)} title="Plans" />
     <Route path="/plan(/:itemId)(/:action)" component={RequireAuth(Plan)} />
@@ -51,17 +53,18 @@ const routes = () => (
     <Route path="/services" component={RequireAuth(ServicesList)} title="Services" />
     <Route path="/service(/:itemId)(/:action)" component={RequireAuth(Service)} />
     <Route path="/customer" component={RequireAuth(CustomerSetup)} />
-    <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor" />
+    <Route path="/input_processor" component={RequireAuth(InputProcessor)} />
     <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" />
     <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator" />
     <Route path="/export_generators" component={RequireAuth(ExportGeneratorsList)} title="Export Generators" />
     <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
+    <Route path="/queue" component={RequireAuth(QueueList)} title="Queue" />
     <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
     <Route path="/settings" component={RequireAuth(Settings)} title="General Settings" />
     <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
     <Route path="/users" component={RequireAuth(User)} title="Users" />
     <Route path="/user" component={RequireAuth(UserSetup)} title="User" />
-    <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Input Processor" />
+    <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Create New Input Processor" />
     <Route path="/collections" component={RequireAuth(Collections)} title="Collection" />
     <Route path="/collection(/:itemId)(/:action)" component={RequireAuth(Collection)} />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />

@@ -11,6 +11,11 @@ export default class EditMenu extends Component {
     onChange: PropTypes.func.isRequired,
     onChangeMenuOrder: PropTypes.func.isRequired,
     data: PropTypes.instanceOf(Immutable.Iterable),
+    disallowEditShow: PropTypes.instanceOf(Immutable.Iterable),
+  };
+
+  static defaultProps = {
+    disallowEditShow: Immutable.List(['dashboard', 'settings']),
   };
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
@@ -46,6 +51,7 @@ export default class EditMenu extends Component {
   };
 
   renderMenu = (item, index, path) => {
+    const { disallowEditShow } = this.props;
     const collection = path.join('-');
     const MenuItemData = Immutable.Record({
       item,
@@ -53,13 +59,14 @@ export default class EditMenu extends Component {
       onChangeField: this.onChangeField,
       renderTree: this.renderTree,
       subMenus: item.get('subMenus', Immutable.List()),
+      editShow: true,
     });
     return (
       <SortableMenuItem
         collection={collection}
         index={index}
         key={item.get('id')}
-        data={new MenuItemData()}
+        data={new MenuItemData({ editShow: !disallowEditShow.includes(item.get('id')) })}
       />
     );
   }

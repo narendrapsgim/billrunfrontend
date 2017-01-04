@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import { Link } from 'react-router';
 
 /* COMPONENTS */
 import Pager from '../Pager';
@@ -95,6 +96,9 @@ class UsageList extends Component {
                 <span>
                   List of all usages
                 </span>
+                <div className="pull-right">
+                  <Link to={'/queue'} className="btn btn-default btn-xs">Go to Queue</Link>
+                </div>
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={base} />
