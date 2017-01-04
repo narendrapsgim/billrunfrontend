@@ -1,5 +1,4 @@
 import Immutable from 'immutable';
-import _ from 'lodash';
 
 import { SET_NAME,
          SET_PARSER_SETTING,
@@ -27,11 +26,11 @@ import { SET_NAME,
          MOVE_CSV_FIELD_DOWN,
          MOVE_CSV_FIELD_UP,
          CHANGE_CSV_FIELD,
-	 UNSET_FIELD,
+         UNSET_FIELD,
          SET_REALTIME_FIELD,
          SET_REALTIME_DEFAULT_FIELD } from '../actions/inputProcessorActions';
 
-let defaultState = Immutable.fromJS({
+const defaultState = Immutable.fromJS({
   file_type: '',
   usaget_type: 'static',
   delimiter: '',
@@ -39,20 +38,9 @@ let defaultState = Immutable.fromJS({
   field_widths: {},
   processor: {
     usaget_mapping: [],
-    static_usaget_mapping: {}
+    static_usaget_mapping: {},
   },
-  customer_identification_fields: [
-    {
-      target_key: "sid",
-      conditions: [
-        {
-          field: "usaget",
-          regex: "/.*/",
-        }
-      ],
-      clear_regex: "//"
-    }
-  ],
+  customer_identification_fields: [],
   rate_calculators: {},
   /* receiver: {
    *   passive: false,
@@ -106,21 +94,34 @@ export default function (state = defaultState, action) {
     case SET_STATIC_USAGET:
       return state.setIn(['processor', 'default_usaget'], action.usaget).setIn(['rate_calculators', action.usaget], Immutable.List())
 
-    case MAP_USAGET:
-      const usaget_mapping = state.getIn(['processor', 'usaget_mapping']);
+    case MAP_USAGET: {
       const { pattern, usaget } = action.mapping;
-      const new_map = Immutable.fromJS({
+      const newMap = Immutable.fromJS({
         pattern,
-        usaget
+        usaget,
       });
-      return state.updateIn(['processor', 'usaget_mapping'], list => list.push(new_map)).setIn(['rate_calculators', usaget], Immutable.List());
+      const customerIdentification = Immutable.fromJS({
+        target_key: 'sid',
+        src_key: '',
+        conditions: [{
+          field: 'usaget',
+          regex: `/^${usaget}$/`,
+        }],
+        clear_regex: '//',
+      });
+      return state
+        .updateIn(['processor', 'usaget_mapping'], list => list.push(newMap))
+        .setIn(['rate_calculators', usaget], Immutable.List())
+        .updateIn(['customer_identification_fields'], list => list.push(customerIdentification));
+    }
 
     case REMOVE_USAGET_MAPPING:
-      return state.updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index));
+      return state
+        .updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index))
+        .updateIn(['customer_identification_fields'], list => list.remove(action.index));
 
     case SET_CUSETOMER_MAPPING:
-      console.log(field, mapping, state.setIn(['customer_identification_fields', 0, field], mapping).toJS());
-      return state.setIn(['customer_identification_fields', 0, field], mapping);
+      return state.setIn(['customer_identification_fields', action.index, field], mapping);
 
     case SET_RATING_FIELD:
       var { rate_key, value, usaget } = action;

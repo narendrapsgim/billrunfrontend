@@ -52,7 +52,7 @@ const routes = () => (
     <Route path="/services" component={RequireAuth(ServicesList)} title="Services" />
     <Route path="/service(/:itemId)(/:action)" component={RequireAuth(Service)} />
     <Route path="/customer" component={RequireAuth(CustomerSetup)} />
-    <Route path="/input_processor" component={RequireAuth(InputProcessor)} title="Input Processor" />
+    <Route path="/input_processor" component={RequireAuth(InputProcessor)} />
     <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" />
     <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator" />
     <Route path="/export_generators" component={RequireAuth(ExportGeneratorsList)} title="Export Generators" />
@@ -63,7 +63,7 @@ const routes = () => (
     <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
     <Route path="/users" component={RequireAuth(User)} title="Users" />
     <Route path="/user" component={RequireAuth(UserSetup)} title="User" />
-    <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Input Processor" />
+    <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Create New Input Processor" />
     <Route path="/collections" component={RequireAuth(Collections)} title="Collection" />
     <Route path="/collection(/:itemId)(/:action)" component={RequireAuth(Collection)} />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
