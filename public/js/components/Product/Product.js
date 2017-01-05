@@ -100,20 +100,18 @@ export default class Product extends Component {
   renderPrices = () => {
     const { product, planName, usaget } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
-    const prices      = product.getIn(productPath, Immutable.List());
+    const prices = product.getIn(productPath, Immutable.List());
 
-    return prices.map( (price, i) =>
+    return prices.map((price, i) =>
       <ProductPrice
-          count={prices.size}
-          index={i}
-          item={price}
-          key={i}
-          onProductAddRate={this.onProductRateAdd}
-          onProductEditRate={this.onProductRateUpdate}
-          onProductRemoveRate={this.onProductRateRemove}
+        count={prices.size}
+        index={i}
+        item={price}
+        key={i}
+        onProductEditRate={this.onProductRateUpdate}
+        onProductRemoveRate={this.onProductRateRemove}
       />
-    )
-
+    );
   }
 
   render() {

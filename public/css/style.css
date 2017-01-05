@@ -8,7 +8,7 @@ html {
 textarea {
   resize: vertical;
 }
-.btn-sm {
+.actions button.btn-sm {
     padding: 9px 12px;
 }
 .td-ellipsis{

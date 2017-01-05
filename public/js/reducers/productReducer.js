@@ -31,10 +31,10 @@ export default function (state = defaultState, action) {
 
     case UPDATE_PRODUCT_TO_VALUE: {
       return state.updateIn(action.path, Immutable.List(), (list) => {
-        if (list.size > action.index) {
+        if (action.index < list.size - 1) {
           const nextItemIndex = action.index + 1;
           return list
-            .update(nextItemIndex, Immutable.Map(), item => item.set('from', action.value))
+            .update(nextItemIndex, Immutable.Map(), nextItem => nextItem.set('from', action.value))
             .update(action.index, Immutable.Map(), item => item.set('to', action.value));
         }
         return list.update(action.index, Immutable.Map(), item => item.set('to', action.value));
@@ -54,12 +54,10 @@ export default function (state = defaultState, action) {
       }
       return state.updateIn(action.path, Immutable.List(), (list) => {
         // use last item for new price row
-        const newItem = list.last();
+        const newItem = list.last().set('to', PRODUCT_UNLIMITED);
+				const lastItemIndex = list.size - 1;
         return list
-          .update(list.size - 1, Immutable.Map(), item => (
-            // reset TO value of last item if it 'Unlimited'
-            (item.get('to') === PRODUCT_UNLIMITED) ? item.set('to', '') : item)
-          )
+          .update(lastItemIndex, Immutable.Map(), prevItem => prevItem.set('to', ''))
           .push(newItem);
       });
     }
