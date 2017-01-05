@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
-import moment from 'moment';
-import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Checkbox, Button } from 'react-bootstrap';
-
-import Field from '../Field';
-import Chips from '../Chips';
 import Select from 'react-select';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, Button, HelpBlock } from 'react-bootstrap';
+import Help from '../Help';
+import Field from '../Field';
+import { ProductDescription } from '../../FieldDescriptions';
+
 import ProductPrice from './components/ProductPrice';
 
 
@@ -22,6 +22,21 @@ export default class Product extends Component {
     onUsagetUpdate: React.PropTypes.func.isRequired,
     onProductRateAdd: React.PropTypes.func.isRequired,
     onProductRateRemove: React.PropTypes.func.isRequired,
+    errorMessages: React.PropTypes.object,
+  }
+
+  static defaultProps = {
+    errorMessages: {
+      name: {
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+      },
+    },
+  };
+
+  state = {
+    errors: {
+      name: '',
+    },
   }
 
   componentDidMount(){
@@ -35,7 +50,11 @@ export default class Product extends Component {
   }
 
   onChangeName = (e) => {
-    const { value } = e.target;
+    const { errorMessages: { name: { allowedCharacters } } } = this.props;
+    const { errors } = this.state;
+    const value = e.target.value.toUpperCase();
+    const newError = (!globalSetting.keyUppercaseRegex.test(value)) ? allowedCharacters : '';
+    this.setState({ errors: Object.assign({}, errors, { name: newError }) });
     this.props.onFieldUpdate(['key'], value);
   }
 
@@ -60,7 +79,8 @@ export default class Product extends Component {
   }
 
   onChangePrefix = (prefixes) => {
-    this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixes));
+    const prefixesList = (prefixes.length) ? prefixes.split(',') : [];
+    this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixesList));
   }
 
   onProductRateUpdate = (index, fieldName, value) => {
@@ -115,70 +135,76 @@ export default class Product extends Component {
   }
 
   render() {
+    const { errors } = this.state;
     const { product, planName, usageTypes, usaget, mode } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
     const priceCount  = (product.getIn(productPath)) ? product.getIn(productPath, Immutable.List()).size : 0;
     const vatable     = product.get('vatable') ? true : false;
-    const prefixs     = product.getIn(['params', 'prefix'], Immutable.List()).toArray();
+    const prefixs     = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
+    const availablePrefix =  product.getIn(['params', 'prefix'], Immutable.List()).map(prefix => ({
+      value: prefix,
+      label: prefix,
+    })).toJS();
 
     return (
       <Row>
         <Col lg={12}>
-          <Form>
+          <Form horizontal>
             <Panel>
 
-              <Row>
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <ControlLabel>Name</ControlLabel>
-                    <Field onChange={ this.onChangeName } value={ product.get('key', '') } disabled={mode === 'update'} />
-                  </FormGroup>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Title<Help contents={ProductDescription.description} /></Col>
+                <Col sm={8} lg={9}>
+                    <Field onChange={this.onChangeDescription} value={product.get('description', '')} />
                 </Col>
+              </FormGroup>
 
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <ControlLabel>Code</ControlLabel>
+              {mode === 'new' &&
+                <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>Key<Help contents={ProductDescription.key} /></Col>
+                  <Col sm={8} lg={9}>
+                      <Field onChange={ this.onChangeName } value={ product.get('key', '') } disabled={mode === 'update'} />
+                      { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
+                  </Col>
+                </FormGroup>
+              }
+
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>External Code</Col>
+                <Col sm={8} lg={9}>
                     <Field onChange={this.onChangeCode} value={ product.get('code', '') } />
-                  </FormGroup>
                 </Col>
-              </Row>
+              </FormGroup>
 
-              <Row>
-                <Col lg={12} md={12}>
-                  <FormGroup>
-                    <ControlLabel>Description</ControlLabel>
-                    <Field onChange={this.onChangeDescription} value={product.get('description', '')} fieldType="textarea" />
-                  </FormGroup>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Prefixes</Col>
+                <Col sm={8} lg={9}>
+                  <Select
+                    allowCreate
+                    multi={true}
+                    value={prefixs}
+                    options={availablePrefix}
+                    onChange={this.onChangePrefix}
+                  />
                 </Col>
-              </Row>
+              </FormGroup>
 
-              <Row>
-                <Col lg={12} md={12}>
-                  <FormGroup>
-                    <ControlLabel>Unit Type</ControlLabel>
-                    <Select allowCreate
-                        disabled={mode === 'update'}
-                        onChange={this.onChangeUsaget}
-                        options={this.getUsageTypesOptions()}
-                        value={usaget}
-                    />
-                  </FormGroup>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
+                <Col sm={4}>
+                  <Select
+                    allowCreate
+                    disabled={mode === 'update'}
+                    onChange={this.onChangeUsaget}
+                    options={this.getUsageTypesOptions()}
+                    value={usaget}
+                  />
                 </Col>
-              </Row>
-
-              <Row>
-                <Col lg={12} md={12}>
-                  <FormGroup>
-                    <ControlLabel>Prefixes</ControlLabel>
-                    <Chips onChange={this.onChangePrefix} items={prefixs} placeholder='Add new prefix' />
-                  </FormGroup>
-                </Col>
-              </Row>
+              </FormGroup>
 
             </Panel>
 
             <Panel header={<h3>Pricing</h3>}>
-              <Row>
                 <Col lg={12} md={12}>
                   <FormGroup>
                     <Checkbox checked={vatable} onChange={this.onChangeVatable}>
@@ -186,10 +212,9 @@ export default class Product extends Component {
                     </Checkbox>
                   </FormGroup>
                 </Col>
-              </Row>
               { this.renderPrices() }
-             <br />
-            <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
+              <br />
+              <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
             </Panel>
 
           </Form>
