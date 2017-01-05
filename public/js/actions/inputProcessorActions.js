@@ -272,11 +272,12 @@ export function mapUsaget(mapping) {
   };
 }
 
-export function setCustomerMapping(field, mapping) {
+export function setCustomerMapping(field, mapping, index) {
   return {
     type: SET_CUSETOMER_MAPPING,
     field,
-    mapping
+    mapping,
+    index,
   };
 }
 

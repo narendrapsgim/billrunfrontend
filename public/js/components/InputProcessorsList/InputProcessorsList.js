@@ -34,13 +34,12 @@ class InputProcessorsList extends Component {
       ]
     };
   }
-  
+
   onClickInputProcessor(input_processor, e) {
     let query = {
       file_type: input_processor.get('file_type'),
       action: 'update'
     };
-    console.log(input_processor.toJS());
     if (input_processor.get('type')) {
       query.type = 'api';
       query.format = input_processor.get('type');
@@ -50,7 +49,7 @@ class InputProcessorsList extends Component {
       query
     });
   }
-  
+
   onClickNew() {
     this.context.router.push({
       pathname: 'select_input_processor_template',
