@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import { Col, Panel, Button } from 'react-bootstrap';
@@ -21,38 +20,29 @@ class ProductSetup extends Component {
   };
 
   static propTypes = {
-    itemId: React.PropTypes.string,
-    item: React.PropTypes.instanceOf(Immutable.Map),
-    usaget: React.PropTypes.string,
-    usageTypes: React.PropTypes.instanceOf(Immutable.List),
-    mode: React.PropTypes.string,
-    router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired,
+    item: PropTypes.instanceOf(Immutable.Map),
+    itemId: PropTypes.string,
+    usaget: PropTypes.string,
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    mode: PropTypes.string,
+    dispatch: PropTypes.func.isRequired,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
     }).isRequired,
-    addUsagetMapping: React.PropTypes.func.isRequired,
-    clearProduct: React.PropTypes.func.isRequired,
-    getProduct: React.PropTypes.func.isRequired,
-    getSettings: React.PropTypes.func.isRequired,
-    onFieldUpdate: React.PropTypes.func.isRequired,
-    onRateAdd: React.PropTypes.func.isRequired,
-    onRateRemove: React.PropTypes.func.isRequired,
-    onUsagetUpdate: React.PropTypes.func.isRequired,
-    saveProduct: React.PropTypes.func.isRequired,
-    setPageTitle: React.PropTypes.func.isRequired,
   }
 
   componentWillMount() {
     const { itemId } = this.props;
     if (itemId) {
-      this.props.getProduct(itemId);
+      this.props.dispatch(getProduct(itemId));
     }
-    this.props.getSettings('usage_types');
+    this.props.dispatch(getSettings('usage_types'));
   }
 
   componentDidMount() {
     const { mode } = this.props;
     if (mode === 'new') {
-      this.props.setPageTitle('Create New Product');
+      this.props.dispatch(setPageTitle('Create New Product'));
     }
   }
 
@@ -60,36 +50,36 @@ class ProductSetup extends Component {
     const { item } = this.props;
     const { item: nextItem, mode } = nextProps;
     if (mode === 'update' && item.get('key') !== nextItem.get('key')) {
-      this.props.setPageTitle(`Edit product - ${nextItem.get('key')}`);
+      this.props.dispatch(setPageTitle(`Edit product - ${nextItem.get('key')}`));
     }
   }
 
   componentWillUnmount() {
-    this.props.clearProduct();
+    this.props.dispatch(clearProduct());
   }
 
   onFieldUpdate = (path, value) => {
-    this.props.onFieldUpdate(path, value);
+    this.props.dispatch(onFieldUpdate(path, value));
   }
 
   onToUpdate = (path, index, value) => {
-    this.props.onToUpdate(path, index, value);
+    this.props.dispatch(onToUpdate(path, index, value));
   }
 
   onUsagetUpdate = (path, oldUsaget, newUsaget) => {
     const { usageTypes } = this.props;
     if (newUsaget.length > 0 && !usageTypes.includes(newUsaget)) {
-      this.props.addUsagetMapping(newUsaget);
+      this.props.dispatch(addUsagetMapping(newUsaget));
     }
-    this.props.onUsagetUpdate(path, oldUsaget, newUsaget);
+    this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
   }
 
   onProductRateAdd = (productPath) => {
-    this.props.onRateAdd(productPath);
+    this.props.dispatch(onRateAdd(productPath));
   }
 
   onProductRateRemove = (productPath, index) => {
-    this.props.onRateRemove(productPath, index);
+    this.props.dispatch(onRateRemove(productPath, index));
   }
 
   handleBack = () => {
@@ -98,7 +88,7 @@ class ProductSetup extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
-    this.props.saveProduct(item, mode, this.afterSave);
+    this.props.dispatch(saveProduct(item, mode, this.afterSave));
   }
 
   afterSave = (data) => {
@@ -142,19 +132,6 @@ class ProductSetup extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => bindActionCreators({
-  addUsagetMapping,
-  clearProduct,
-  getProduct,
-  getSettings,
-  onFieldUpdate,
-  onToUpdate,
-  onRateAdd,
-  onRateRemove,
-  onUsagetUpdate,
-  saveProduct,
-  setPageTitle,
-}, dispatch);
 
 const mapStateToProps = (state, props) => {
   const { product: item } = state;
@@ -164,4 +141,4 @@ const mapStateToProps = (state, props) => {
   return { itemId, item, mode, usaget, usageTypes };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ProductSetup));
+export default withRouter(connect(mapStateToProps)(ProductSetup));

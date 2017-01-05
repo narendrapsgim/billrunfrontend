@@ -5,24 +5,23 @@ import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, Button, HelpB
 import Help from '../Help';
 import Field from '../Field';
 import { ProductDescription } from '../../FieldDescriptions';
-
 import ProductPrice from './components/ProductPrice';
 
 
 export default class Product extends Component {
 
   static propTypes = {
-    planName: React.PropTypes.string.isRequired,
+    errorMessages: React.PropTypes.object,
     mode: React.PropTypes.string.isRequired,
+    onFieldUpdate: React.PropTypes.func.isRequired,
+    onProductRateAdd: React.PropTypes.func.isRequired,
+    onProductRateRemove: React.PropTypes.func.isRequired,
+    onToUpdate: React.PropTypes.func.isRequired,
+    onUsagetUpdate: React.PropTypes.func.isRequired,
+    planName: React.PropTypes.string.isRequired,
     product: React.PropTypes.object.isRequired,
     usaget: React.PropTypes.string.isRequired,
     usageTypes: React.PropTypes.object.isRequired,
-    onFieldUpdate: React.PropTypes.func.isRequired,
-    onToUpdate: React.PropTypes.func.isRequired,
-    onUsagetUpdate: React.PropTypes.func.isRequired,
-    onProductRateAdd: React.PropTypes.func.isRequired,
-    onProductRateRemove: React.PropTypes.func.isRequired,
-    errorMessages: React.PropTypes.object,
   }
 
   static defaultProps = {
@@ -39,12 +38,12 @@ export default class Product extends Component {
     },
   }
 
-  componentDidMount(){
+  componentDidMount() {
     const { product, planName, usaget } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
-    const prices      = product.getIn(productPath, Immutable.List());
+    const prices = product.getIn(productPath, Immutable.List());
 
-    if(prices.size == 0){
+    if (prices.size === 0) {
       this.props.onProductRateAdd(productPath);
     }
   }
@@ -100,21 +99,19 @@ export default class Product extends Component {
   }
 
   onProductRateAdd = () => {
-    const { product, planName, usaget } = this.props;
+    const { planName, usaget } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
     this.props.onProductRateAdd(productPath);
   }
   onProductRateRemove = (index) => {
-    const { product, planName, usaget } = this.props;
+    const { planName, usaget } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
     this.props.onProductRateRemove(productPath, index);
   }
 
   getUsageTypesOptions = () => {
     const { usageTypes } = this.props;
-    return usageTypes.map((usaget, key) => {
-      return {value: usaget, label: usaget};
-    }).toJS();
+    return usageTypes.map(usaget => ({ value: usaget, label: usaget })).toJS();
   }
 
   renderPrices = () => {
@@ -136,15 +133,10 @@ export default class Product extends Component {
 
   render() {
     const { errors } = this.state;
-    const { product, planName, usageTypes, usaget, mode } = this.props;
-    const productPath = ['rates', usaget, planName, 'rate'];
-    const priceCount  = (product.getIn(productPath)) ? product.getIn(productPath, Immutable.List()).size : 0;
-    const vatable     = product.get('vatable') ? true : false;
-    const prefixs     = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
-    const availablePrefix =  product.getIn(['params', 'prefix'], Immutable.List()).map(prefix => ({
-      value: prefix,
-      label: prefix,
-    })).toJS();
+    const { product, usaget, mode } = this.props;
+    const vatable = (product.get('vatable', false) === true);
+    const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
+    const availablePrefix = [];
 
     return (
       <Row>
@@ -153,18 +145,22 @@ export default class Product extends Component {
             <Panel>
 
               <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>Title<Help contents={ProductDescription.description} /></Col>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  Title<Help contents={ProductDescription.description} />
+                </Col>
                 <Col sm={8} lg={9}>
-                    <Field onChange={this.onChangeDescription} value={product.get('description', '')} />
+                  <Field onChange={this.onChangeDescription} value={product.get('description', '')} />
                 </Col>
               </FormGroup>
 
               {mode === 'new' &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>Key<Help contents={ProductDescription.key} /></Col>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    Key<Help contents={ProductDescription.key} />
+                  </Col>
                   <Col sm={8} lg={9}>
-                      <Field onChange={ this.onChangeName } value={ product.get('key', '') } disabled={mode === 'update'} />
-                      { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
+                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={mode === 'update'} />
+                    { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
                   </Col>
                 </FormGroup>
               }
@@ -172,7 +168,7 @@ export default class Product extends Component {
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>External Code</Col>
                 <Col sm={8} lg={9}>
-                    <Field onChange={this.onChangeCode} value={ product.get('code', '') } />
+                  <Field onChange={this.onChangeCode} value={product.get('code', '')} />
                 </Col>
               </FormGroup>
 
@@ -185,6 +181,7 @@ export default class Product extends Component {
                     value={prefixs}
                     options={availablePrefix}
                     onChange={this.onChangePrefix}
+                    placeholder="Add Prefix..."
                   />
                 </Col>
               </FormGroup>
@@ -205,13 +202,13 @@ export default class Product extends Component {
             </Panel>
 
             <Panel header={<h3>Pricing</h3>}>
-                <Col lg={12} md={12}>
-                  <FormGroup>
-                    <Checkbox checked={vatable} onChange={this.onChangeVatable}>
+              <Col lg={12} md={12}>
+                <FormGroup>
+                  <Checkbox checked={vatable} onChange={this.onChangeVatable}>
                       This product is VAT rated
                     </Checkbox>
-                  </FormGroup>
-                </Col>
+                </FormGroup>
+              </Col>
               { this.renderPrices() }
               <br />
               <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
