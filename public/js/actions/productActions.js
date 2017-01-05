@@ -5,6 +5,7 @@ export const ADD_PRODUCT_RATE = 'ADD_PRODUCT_RATE';
 export const REMOVE_PRODUCT_RATE = 'REMOVE_PRODUCT_RATE';
 export const UPDATE_PRODUCT_FIELD_VALUE = 'UPDATE_PRODUCT_FIELD_VALUE';
 export const UPDATE_PRODUCT_USAGET_VALUE = 'UPDATE_PRODUCT_USAGET_VALUE';
+export const UPDATE_PRODUCT_TO_VALUE = 'UPDATE_PRODUCT_TO_VALUE';
 
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
@@ -22,6 +23,15 @@ export function onFieldUpdate(path, value) {
   return {
     type: UPDATE_PRODUCT_FIELD_VALUE,
     path,
+    value
+  };
+}
+
+export function onToUpdate(path, index, value) {
+  return {
+    type: UPDATE_PRODUCT_TO_VALUE,
+    path,
+    index,
     value
   };
 }

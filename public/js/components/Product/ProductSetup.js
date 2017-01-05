@@ -7,7 +7,7 @@ import { Col, Panel, Button } from 'react-bootstrap';
 import Product from './Product';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 /* ACTIONS */
-import { onRateAdd, onRateRemove, onFieldUpdate, onUsagetUpdate, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
+import { onRateAdd, onRateRemove, onFieldUpdate, onToUpdate, onUsagetUpdate, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
 import { getSettings } from '../../actions/settingsActions';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -72,6 +72,10 @@ class ProductSetup extends Component {
     this.props.onFieldUpdate(path, value);
   }
 
+  onToUpdate = (path, index, value) => {
+    this.props.onToUpdate(path, index, value);
+  }
+
   onUsagetUpdate = (path, oldUsaget, newUsaget) => {
     const { usageTypes } = this.props;
     if (newUsaget.length > 0 && !usageTypes.includes(newUsaget)) {
@@ -119,6 +123,7 @@ class ProductSetup extends Component {
           <Product
             mode={mode}
             onFieldUpdate={this.onFieldUpdate}
+            onToUpdate={this.onToUpdate}
             onProductRateAdd={this.onProductRateAdd}
             onProductRateRemove={this.onProductRateRemove}
             onUsagetUpdate={this.onUsagetUpdate}
@@ -143,6 +148,7 @@ const mapDispatchToProps = dispatch => bindActionCreators({
   getProduct,
   getSettings,
   onFieldUpdate,
+  onToUpdate,
   onRateAdd,
   onRateRemove,
   onUsagetUpdate,

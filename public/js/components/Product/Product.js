@@ -16,9 +16,9 @@ export default class Product extends Component {
     mode: React.PropTypes.string.isRequired,
     product: React.PropTypes.object.isRequired,
     usaget: React.PropTypes.string.isRequired,
-    product: React.PropTypes.object.isRequired,
     usageTypes: React.PropTypes.object.isRequired,
     onFieldUpdate: React.PropTypes.func.isRequired,
+    onToUpdate: React.PropTypes.func.isRequired,
     onUsagetUpdate: React.PropTypes.func.isRequired,
     onProductRateAdd: React.PropTypes.func.isRequired,
     onProductRateRemove: React.PropTypes.func.isRequired,
@@ -64,10 +64,21 @@ export default class Product extends Component {
   }
 
   onProductRateUpdate = (index, fieldName, value) => {
-    const { product, planName, usaget } = this.props;
-    const fieldPath   = ['rates', usaget, planName, 'rate', index, fieldName];
-    this.props.onFieldUpdate(fieldPath, value);
+    const { planName, usaget } = this.props;
+    switch (fieldName) {
+      case 'to': {
+        const fieldPath = ['rates', usaget, planName, 'rate'];
+        this.props.onToUpdate(fieldPath, index, value);
+      }
+        break;
+
+      default: {
+        const fieldPath = ['rates', usaget, planName, 'rate', index, fieldName];
+        this.props.onFieldUpdate(fieldPath, value);
+      }
+    }
   }
+
   onProductRateAdd = () => {
     const { product, planName, usaget } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
