@@ -79,7 +79,7 @@ class QueueList extends Component {
     if (calcTime === false) {
       return 'Never';
     }
-    return moment(parseInt(calcTime, 10) * 1000)
+    return moment(calcTime)
       .format(globalSetting.datetimeFormat);
   }
 
