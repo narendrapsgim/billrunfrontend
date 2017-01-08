@@ -70,9 +70,9 @@ export function apiBillRun(requests, requiredAllSuccess = true) {
   return promise;
 }
 
-// send Http request
+//send Http request
 function sendHttpRequest(query) {
-  // Create Api URL
+  //Create Api URL
   let url = globalSetting.serverUrl + buildApiString(query) + buildQueryString(query.params);
   let requestOptions = buildQueryOptions(query.options);
   let response = (query.name) ? { name: query.name } : {};
@@ -120,6 +120,7 @@ function buildApiString(params = {}) {
     case undefined:
       return `/billapi/${params.entity}/${params.action}`;
     case 'save':
+    case 'savePPIncludes':
       return `/admin/${params.api}`;
     case 'paymentgateways':
       return `/${params.api}/${params.action}`;

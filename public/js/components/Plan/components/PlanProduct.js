@@ -13,6 +13,7 @@ export default class PlanProduct extends Component {
     onProductInitRate: React.PropTypes.func.isRequired,
     onProductAddRate: React.PropTypes.func.isRequired,
     onProductEditRate: React.PropTypes.func.isRequired,
+    onProductEditRateTo: React.PropTypes.func.isRequired,
     onProductRemoveRate: React.PropTypes.func.isRequired,
     onProductRestore: React.PropTypes.func.isRequired,
     onProductRemove: React.PropTypes.func.isRequired,
@@ -54,10 +55,20 @@ export default class PlanProduct extends Component {
 
   onProductEditRate = (index, fieldName, value) => {
     const { item, planName } = this.props;
-    const productKey  = item.get('key');
-    const usageType   = item.get('rates').keySeq().first();
-    const fieldPath   = ['rates', usageType, planName, 'rate', index, fieldName];
-    this.props.onProductEditRate(productKey, fieldPath, value)
+    const productKey = item.get('key');
+    const usageType = item.get('rates').keySeq().first();
+    switch (fieldName) {
+      case 'to': {
+        const fieldPath = ['rates', usageType, planName, 'rate'];
+        this.props.onProductEditRateTo(productKey, fieldPath, index, value);
+      }
+        break;
+
+      default: {
+        const fieldPath = ['rates', usageType, planName, 'rate', index, fieldName];
+        this.props.onProductEditRate(productKey, fieldPath, value);
+      }
+    }
   }
 
   onProductAddRate = () => {
@@ -129,7 +140,11 @@ export default class PlanProduct extends Component {
     return (
       <Panel header={header}>
         { !isRemoved && priceCount && item.getIn(productPath).map( (price, i) =>
-          <ProductPrice key={i} item={price} index={i} count={priceCount}
+          <ProductPrice
+            key={i}
+            item={price}
+            index={i}
+            count={priceCount}
             onProductEditRate={this.onProductEditRate}
             onProductRemoveRate={this.onProductRemoveRate}
           />

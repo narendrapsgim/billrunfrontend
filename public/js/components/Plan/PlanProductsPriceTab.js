@@ -12,6 +12,7 @@ import {
   planProductsRateRemove,
   planProductsRateAdd,
   planProductsRateUpdate,
+  planProductsRateUpdateTo,
   planProductsRateInit,
   planProductsClear } from '../../actions/planProductsActions';
 import { showSuccess, showWarning, showDanger, showInfo } from '../../actions/alertsActions';
@@ -32,6 +33,7 @@ class PlanProductsPriceTab extends Component {
     planProductsRateRemove: React.PropTypes.func.isRequired,
     planProductsRateAdd: React.PropTypes.func.isRequired,
     planProductsRateUpdate: React.PropTypes.func.isRequired,
+    planProductsRateUpdateTo: React.PropTypes.func.isRequired,
     planProductsRateInit: React.PropTypes.func.isRequired,
     planProductsClear: React.PropTypes.func.isRequired,
     showSuccess: React.PropTypes.func.isRequired,
@@ -68,7 +70,7 @@ class PlanProductsPriceTab extends Component {
       this.setState({planName: props.planName});
     }
   }
-  
+
   onSelectProduct = (key) => {
     const { productsKeys } = this.props;
     const { planName } = this.state;
@@ -107,6 +109,9 @@ class PlanProductsPriceTab extends Component {
   onProductEditRate = (productName, productPath, value) => {
     this.props.planProductsRateUpdate(productName, productPath, value);
   }
+  onProductEditRateTo = (productName, productPath, index, value) => {
+    this.props.planProductsRateUpdateTo(productName, productPath, index, value);
+  }
   onProductAddRate = (productName, productPath) => {
     this.props.planProductsRateAdd(productName, productPath);
   }
@@ -134,6 +139,7 @@ class PlanProductsPriceTab extends Component {
             onProductUndoRemove={this.onProductUndoRemove}
             onProductRemoveRate={this.onProductRemoveRate}
             onProductEditRate={this.onProductEditRate}
+            onProductEditRateTo={this.onProductEditRateTo}
             onProductAddRate={this.onProductAddRate}
             onProductInitRate={this.onProductInitRate}
             onProductRestore={this.onProductRestore}
@@ -179,6 +185,7 @@ function mapDispatchToProps(dispatch) {
     planProductsRateRemove,
     planProductsRateAdd,
     planProductsRateUpdate,
+    planProductsRateUpdateTo,
     planProductsRateInit,
     planProductsClear,
     showSuccess,

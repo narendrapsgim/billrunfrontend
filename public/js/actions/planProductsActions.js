@@ -8,6 +8,7 @@ export const PLAN_PRODUCTS_RATE_ADD = 'PLAN_PRODUCTS_RATE_ADD';
 export const PLAN_PRODUCTS_RATE_INIT = 'PLAN_PRODUCTS_RATE_INIT';
 export const PLAN_PRODUCTS_RATE_UPDATE = 'PLAN_PRODUCTS_RATE_UPDATE';
 export const PLAN_PRODUCTS_RATE_REMOVE = 'PLAN_PRODUCTS_RATE_REMOVE';
+export const PLAN_PRODUCTS_RATE_UPDATE_TO = 'PLAN_PRODUCTS_RATE_UPDATE_TO';
 
 import moment from 'moment';
 import { buildSaveProductQuery } from './productActions';
@@ -100,6 +101,16 @@ export function planProductsRateUpdate(productKey, path, value) {
     productKey,
     path,
     value
+  };
+}
+
+export function planProductsRateUpdateTo(productKey, path, idx, value) {
+  return {
+    type: PLAN_PRODUCTS_RATE_UPDATE_TO,
+    productKey,
+    path,
+    idx,
+    value,
   };
 }
 
