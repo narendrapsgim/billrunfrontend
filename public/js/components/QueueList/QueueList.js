@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Link } from 'react-router';
 import { Panel } from 'react-bootstrap';
+import moment from 'moment';
 
 import Pager from '../Pager';
 import { AdvancedFilter } from '../Filter';
@@ -71,6 +72,15 @@ class QueueList extends Component {
   getCalculatorStage = (ent) => {
     const calcName = ent.get('calc_name');
     return this.getNextCalculator(calcName);
+  }
+
+  getLastCalcTime = (ent) => {
+    const calcTime = ent.get('calc_time');
+    if (calcTime === false) {
+      return 'Never';
+    }
+    return moment(parseInt(calcTime, 10) * 1000)
+      .format(globalSetting.datetimeFormat);
   }
 
   fetchItems = () => {
@@ -145,7 +155,7 @@ class QueueList extends Component {
     const { queueLines } = this.props;
     const fields = [
       { id: 'type', placeholder: 'Type' },
-      { id: 'calc_time', placeholder: 'Last Calculation Time', type: 'timestamp', sort: true },
+      { id: 'calc_time', placeholder: 'Last Calculation Time', type: 'timestamp', sort: true, parser: this.getLastCalcTime },
       { id: 'calc_name', placeholder: 'Calculator Stage', type: 'text', sort: true, parser: this.getCalculatorStage },
       { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false },
     ];
