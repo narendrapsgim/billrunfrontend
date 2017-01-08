@@ -55,7 +55,7 @@ class Segments extends Component {
                  disabled={!this.props.segment.get('field')}/>
         </div>
 
-        <div className="col-lg-2" style={{padding: '2px 5px'}}>
+        <div className="col-lg-2 actions">
           <Button onClick={this.onDeleteLine} bsSize="small"><i className="fa fa-trash-o danger-red"/>
             &nbsp;Remove</Button>
         </div>

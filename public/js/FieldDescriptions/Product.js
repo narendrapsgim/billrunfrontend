@@ -1,5 +1,6 @@
-const product = {
-  name: "Product name"
+const ProductDescription = {
+  description: 'Title',
+  key: 'Key',
 };
 
-export default product;
+export default ProductDescription;

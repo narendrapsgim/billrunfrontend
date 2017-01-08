@@ -5,7 +5,7 @@ import { InputGroup, FormControl } from 'react-bootstrap';
 export default class UnlimitedInput extends Component {
 
   static defaultProps = {
-    unlimitedLabel : 'Unlimited'
+    unlimitedLabel: 'Unlimited',
   };
 
   static propTypes = {
