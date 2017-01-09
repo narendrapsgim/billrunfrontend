@@ -43,3 +43,22 @@ export const auditTrailEntityTypesQuery = () => {
 
   return querie;
 };
+
+
+export const savePaymentGatewayQuery = gateway => ({
+  api: 'settings',
+  params: [
+    { category: 'payment_gateways' },
+    { action: 'set' },
+    { data: JSON.stringify(gateway) },
+  ],
+});
+
+export const disablePaymentGatewayQuery = name => ({
+  api: 'settings',
+  params: [
+    { category: 'payment_gateways' },
+    { action: 'unset' },
+    { data: JSON.stringify({ name }) },
+  ],
+});

@@ -1,14 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-
+import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import _ from 'lodash';
-
+import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, addRatingField, removeRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField, setRealtimeField, setRealtimeDefaultField } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
-import { showSuccess, showWarning, showDanger } from '../../actions/alertsActions';
-
-/* COMPONENTS */
+import { showSuccess, showDanger } from '../../actions/alertsActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -16,19 +15,25 @@ import CalculatorMapping from './CalculatorMapping';
 import Receiver from './Receiver';
 import RealtimeMapping from './RealtimeMapping';
 
-import {
-  Step,
-  Stepper,
-  StepLabel,
-} from 'material-ui/Stepper';
-import RaisedButton from 'material-ui/RaisedButton';
 
 class InputProcessor extends Component {
+
+  static propTypes = {
+    settings: PropTypes.instanceOf(Immutable.Map),
+    dispatch: PropTypes.func.isRequired,
+    router: React.PropTypes.shape({
+      push: React.PropTypes.func.isRequired,
+    }).isRequired,
+  };
+
+  static defaultProps = {
+    settings: Immutable.Map(),
+  };
+
   constructor(props) {
     super(props);
 
     this.onSetReceiverCheckboxField = this.onSetReceiverCheckboxField.bind(this);
-    this.onSetCalculatorMapping = this.onSetCalculatorMapping.bind(this);
     this.onRemoveUsagetMapping = this.onRemoveUsagetMapping.bind(this);
     this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
     this.onSetReceiverField = this.onSetReceiverField.bind(this);
@@ -59,24 +64,38 @@ class InputProcessor extends Component {
       stepIndex: 0,
       finished: 0,
       steps: [
-        "parser",
-        "processor",
-        "customer_identification_fields",
-        "receiver"
-      ]
+        'parser',
+        'processor',
+        'customer_identification_fields',
+        'receiver',
+      ],
     };
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
     const { file_type, action, template, type, format } = this.props.location.query;
-    if (action !== "new") dispatch(getProcessorSettings(file_type));
-    else if (template) dispatch(setInputProcessorTemplate(Templates[template]));
-    dispatch(getSettings(["usage_types"]));
+    if (action !== 'new') {
+      this.props.dispatch(getProcessorSettings(file_type));
+    } else if (template) {
+      this.props.dispatch(setInputProcessorTemplate(Templates[template]));
+    }
+    this.props.dispatch(getSettings(['usage_types']));
     if (action === 'new' && (type === 'api' && format === 'json')) {
-      dispatch(setParserSetting('type', 'realtime'));
-      dispatch(setDelimiterType('json'));
-      dispatch(setProcessorType('realtime'));
+      this.props.dispatch(setParserSetting('type', 'realtime'));
+      this.props.dispatch(setDelimiterType('json'));
+      this.props.dispatch(setProcessorType('realtime'));
+    }
+    const pageTitle = (action === 'new') ? 'Create New Input Processor' : 'Edit Input Processor';
+    this.props.dispatch(setPageTitle(pageTitle));
+
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { settings, location: { query: { action } } } = this.props;
+    const name = settings.get('file_type', '');
+    const newName = nextProps.settings.get('file_type', '');
+    if (action !== 'new' && newName !== name) {
+      this.props.dispatch(setPageTitle(`Edit Input Processor - ${newName}`));
     }
   }
 
@@ -96,18 +115,10 @@ class InputProcessor extends Component {
     this.props.dispatch(setDelimiter(e.target.value));
   }
 
-  buildJSONFields = (field, obj) => {
-    if (typeof obj[field] === "object" && !Array.isArray(obj[field])) {
-      const nested = Object.keys(obj[field]).map(key => this.buildJSONFields(key, obj[field]));
-      return nested.map(n => `${field}.${n}`);
-    }
-    return field;
-  };
-
   onSelectJSON = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
-    reader.onloadend = (evt => {
+    reader.onloadend = ((evt) => {
       if (evt.target.readyState === FileReader.DONE) {
         try {
           const json = JSON.parse(evt.target.result);
@@ -117,7 +128,7 @@ class InputProcessor extends Component {
                     this.buildJSONFields(key, json));
           this.props.dispatch(setFields(_.flattenDeep(fields)));
         } catch(err) {
-          alert("Not a valid JSON");
+          this.props.dispatch(showDanger('Not a valid JSON'));
         }
       }
     });
@@ -126,24 +137,24 @@ class InputProcessor extends Component {
   };
 
   onSelectSampleCSV(e) {
-    let file = e.target.files[0];
-    let reader = new FileReader();
+    const file = e.target.files[0];
+    const reader = new FileReader();
     if (!this.props.settings.get('delimiter')) return;
-    reader.onloadend = (evt => {
+    reader.onloadend = ((evt) => {
       if (evt.target.readyState == FileReader.DONE) {
         /* Only need first line */
-        let lines = evt.target.result.split('\n');
-        let header = lines[0];
-        let fields = header.split(this.props.settings.get('delimiter')).map(field => { return field.replace(/[^a-zA-Z_\d]/g, "_").toLowerCase(); });
+        const lines = evt.target.result.split('\n');
+        const header = lines[0];
+        const fields = header.split(this.props.settings.get('delimiter')).map(field => field.replace(/[^a-zA-Z_\d]/g, '_').toLowerCase());
         this.props.dispatch(setFields(fields));
       }
     });
-    let blob = file.slice(0, file.size - 1);
+    const blob = file.slice(0, file.size - 1);
     reader.readAsText(blob);
   }
 
   onAddField(val, e) {
-    this.props.dispatch(addCSVField(""));
+    this.props.dispatch(addCSVField(''));
   }
 
   onRemoveField(index, e) {
@@ -164,11 +175,6 @@ class InputProcessor extends Component {
     this.props.dispatch(setFieldWidth(field, value));
   }
 
-  onSetCalculatorMapping(e) {
-    const { value: mapping, id: field } = e.target;
-    this.props.dispatch(setCalculatorMapping(field, mapping));
-  }
-
   onAddUsagetMapping(val) {
     this.props.dispatch(mapUsaget(val));
   }
@@ -181,13 +187,8 @@ class InputProcessor extends Component {
     this.props.dispatch(removeUsagetMapping(index));
   }
 
-  setUsagetType(val) {
-    this.props.dispatch(setUsagetType(val));
-  }
-
-  onSetCustomerMapping(e) {
-    const { value: mapping, id: field } = e.target;
-    this.props.dispatch(setCustomerMapping(field, mapping));
+  onSetCustomerMapping(field, mapping, index) {
+    this.props.dispatch(setCustomerMapping(field, mapping, index));
   }
 
   onSetRating(e) {
@@ -220,10 +221,6 @@ class InputProcessor extends Component {
     this.props.dispatch(setReceiverField(id, checked));
   }
 
-  addUsagetMapping(val) {
-    this.props.dispatch(addUsagetMapping(val));
-  }
-
   onMoveFieldUp = (index) => {
     this.props.dispatch(moveCSVFieldUp(index));
   };
@@ -236,71 +233,6 @@ class InputProcessor extends Component {
     this.props.dispatch(changeCSVField(index, value));
   };
 
-  unsetField = (field_path) => {
-    this.props.dispatch(unsetField(field_path));
-  }
-
-  onError(message) {
-    this.props.dispatch(showDanger(message));
-  }
-
-  goBack() {
-    this.context.router.push({
-      pathname: "input_processors"
-    });
-  }
-
-  handleNext() {
-    const { stepIndex } = this.state;
-    const cb = (err) => {
-      if (err) return;
-      if (this.state.finished) {
-        this.props.dispatch(showSuccess("Input processor saved successfully!"));
-        this.goBack();
-      } else {
-        const totalSteps = this.state.steps.length - 1;
-        const finished = (stepIndex + 1) === totalSteps;
-        this.setState({
-          stepIndex: stepIndex + 1,
-          finished
-        });
-      }
-    };
-    const part = this.state.finished ? false : this.state.steps[stepIndex];
-    this.props.dispatch(saveInputProcessorSettings(this.props.settings, cb, part));
-  }
-
-  handlePrev() {
-    const { stepIndex } = this.state;
-    if (stepIndex > 0) return this.setState({stepIndex: stepIndex - 1, finished: 0});
-    let r = confirm("are you sure you want to stop editing input processor?");
-    if (r) {
-      this.props.dispatch(clearInputProcessor());
-      this.goBack();
-    }
-  }
-
-  handleCancel() {
-    let r = confirm("are you sure you want to stop editing input processor?");
-    const { dispatch, fileType } = this.props;
-    if (r) {
-      if (fileType !== true) {
-        dispatch(clearInputProcessor());
-        this.goBack();
-      } else {
-        const cb = (err) => {
-          if (err) {
-            dispatch(showDanger("Please try again"));
-            return;
-          }
-          dispatch(clearInputProcessor());
-          this.goBack();
-        };
-        dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
-      }
-    }
-  }
-
   onChangeRealtimeField = (e) => {
     const { id, value } = e.target;
     this.props.dispatch(setRealtimeField(id, value));
@@ -311,8 +243,111 @@ class InputProcessor extends Component {
     this.props.dispatch(setRealtimeDefaultField(id, value));
   };
 
+  onError(message) {
+    this.props.dispatch(showDanger(message));
+  }
+
+  setUsagetType(val) {
+    this.props.dispatch(setUsagetType(val));
+  }
+
+  unsetField = (fieldPath) => {
+    this.props.dispatch(unsetField(fieldPath));
+  }
+
+  buildJSONFields = (field, obj) => {
+    if (typeof obj[field] === 'object' && !Array.isArray(obj[field])) {
+      const nested = Object.keys(obj[field]).map(key => this.buildJSONFields(key, obj[field]));
+      return nested.map(n => `${field}.${n}`);
+    }
+    return field;
+  };
+
+  addUsagetMapping(val) {
+    this.props.dispatch(addUsagetMapping(val));
+  }
+
+  goBack() {
+    this.props.router.push('/input_processors');
+  }
+
+  handleNext() {
+    const { stepIndex } = this.state;
+    const cb = (err) => {
+      if (err) return;
+      if (this.state.finished) {
+        this.props.dispatch(showSuccess('Input processor saved successfully!'));
+        this.goBack();
+      } else {
+        const totalSteps = this.state.steps.length - 1;
+        const finished = (stepIndex + 1) === totalSteps;
+        this.setState({
+          stepIndex: stepIndex + 1,
+          finished,
+        });
+      }
+    };
+    const part = this.state.finished ? false : this.state.steps[stepIndex];
+    this.props.dispatch(saveInputProcessorSettings(this.props.settings, cb, part));
+  }
+
+  handlePrev() {
+    const { stepIndex } = this.state;
+    if (stepIndex > 0) {
+      this.setState({ stepIndex: stepIndex - 1, finished: 0 });
+    } else {
+      const r = confirm('Are you sure you want to stop editing input processor ?');
+    if (r) {
+      this.props.dispatch(clearInputProcessor());
+      this.goBack();
+    }
+  }
+  }
+
+  handleCancel() {
+    const r = confirm('Are you sure you want to stop editing input processor ?');
+    const { dispatch, fileType } = this.props;
+    if (r) {
+      if (fileType !== true) {
+        dispatch(clearInputProcessor());
+        this.goBack();
+      } else {
+        const cb = (err) => {
+          if (err) {
+            dispatch(showDanger('Please try again'));
+            return;
+          }
+          dispatch(clearInputProcessor());
+          this.goBack();
+        };
+        dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
+      }
+    }
+  }
+
+  renderStepper = () => {
+    const { stepIndex } = this.state;
+    const { type } = this.props.location.query;
+    return (
+      <Stepper activeStep={stepIndex}>
+        <Step>
+          <StepLabel>CDR Fields</StepLabel>
+        </Step>
+        <Step>
+          <StepLabel>Field Mapping</StepLabel>
+        </Step>
+        <Step>
+          <StepLabel>Calculator Mapping</StepLabel>
+        </Step>
+        <Step>
+          <StepLabel>{type === 'api' ? 'Realtime Mapping' : 'Receiver' }</StepLabel>
+        </Step>
+      </Stepper>
+    );
+  }
+
   render() {
-    let { stepIndex } = this.state;
+    const { stepIndex } = this.state;
     const { settings, usage_types } = this.props;
     const { action, type, format } = this.props.location.query;
 
@@ -322,12 +357,10 @@ class InputProcessor extends Component {
       (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onAddRating={this.onAddRating} onRemoveRating={this.onRemoveRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} type={type} format={format} />)
     ];
     if (type === 'api') {
-      steps.push((<RealtimeMapping settings={ settings } onChange={ this.onChangeRealtimeField } onChangeDefault={ this.onChangeRealtimeDefaultField } />));
+      steps.push(<RealtimeMapping settings={settings} onChange={this.onChangeRealtimeField} onChangeDefault={this.onChangeRealtimeDefaultField} />);
     } else {
-      steps.push((<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver', Immutable.Map())} />));
+      steps.push(<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver', Immutable.Map())} />);
     }
-
-    const title = action === 'new' ? "New input processor" : `Edit input processor - ${settings.get('file_type')}`;
 
     return (
       <div>
@@ -335,52 +368,19 @@ class InputProcessor extends Component {
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading">
-                { title }
+                { this.renderStepper() }
               </div>
               <div className="panel-body">
-                <Stepper activeStep={stepIndex}>
-                  <Step>
-                    <StepLabel>CDR Fields</StepLabel>
-                  </Step>
-                  <Step>
-                    <StepLabel>Field Mapping</StepLabel>
-                  </Step>
-                  <Step>
-                    <StepLabel>Calculator Mapping</StepLabel>
-                  </Step>
-                  <Step>
-                    {
-                      type === "api"
-                      ? (<StepLabel>Realtime Mapping</StepLabel>)
-                      : (<StepLabel>Receiver</StepLabel>)
-                    }
-                  </Step>
-                </Stepper>
                 <div className="contents bordered-container">
                   { steps[stepIndex] }
                 </div>
               </div>
-              <div style={{marginTop: 12, float: "right"}}>
-                <button className="btn btn-default"
-                        onClick={this.handleCancel}
-                        style={{marginRight: 12}}>
-                  Cancel
-                </button>
-                {(() => {
-                   if (stepIndex > 0) {
-                     return (
-                       <button className="btn btn-default"
-                               onClick={this.handlePrev}
-                               style={{marginRight: 12}}>
-                         Back
-                       </button>
-                     );
+              <div style={{ marginTop: 12, float: 'right' }}>
+                <button className="btn btn-default" onClick={this.handleCancel} style={{ marginRight: 12 }} > Cancel </button>
+                { (stepIndex > 0) &&
+                  <button className="btn btn-default" onClick={this.handlePrev} style={{ marginRight: 12 }} > Back </button>
                    }
-                 })()}
-                       <button className="btn btn-primary"
-                               onClick={this.handleNext}>
-                         { stepIndex === (steps.length - 1) ? "Finish" : "Next" }
-                       </button>
+                <button className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (steps.length - 1) ? 'Finish' : 'Next' }</button>
               </div>
             </div>
           </div>
@@ -390,13 +390,10 @@ class InputProcessor extends Component {
   }
 }
 
-InputProcessor.contextTypes = {
-  router: React.PropTypes.object.isRequired
-};
 
-function mapStateToProps(state, props) {
-  return { settings: state.inputProcessor,
-           usage_types: state.settings.get('usage_types', Immutable.List()) };
-}
+const mapStateToProps = state => ({
+  settings: state.inputProcessor,
+  usage_types: state.settings.get('usage_types', Immutable.List()),
+});
 
-export default connect(mapStateToProps)(InputProcessor);
+export default withRouter(connect(mapStateToProps)(InputProcessor));

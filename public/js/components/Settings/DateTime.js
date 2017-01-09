@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment-timezone';
 import Immutable from 'immutable';
+import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 
 export default class DateTime extends Component {
 
@@ -22,40 +23,36 @@ export default class DateTime extends Component {
     // const dateFormatOptions = ['dd-mm-yy', 'mm-dd-yy'].map(this.renderOption);
     // const timeFormatOptions = ['12-hour', '24-hour'].map(this.renderOption);
     const timeZoneOptions = moment.tz.names().map(this.renderOption);
-    const billingDayOptions = _.times(28, n => this.renderOption((n + 1), n));
+    const billingDayOptions = [...Array(28)].map((_, i) => this.renderOption((i + 1), i));
     const timezone = data.get('timezone', '').length !== 0 ? data.get('timezone', '') : moment.tz.guess();
 
     return (
-      <div>
-        <form className="form-horizontal">
-          <div className="form-group">
-            <div className="col-md-12">
-              <div className="col-md-3 control-label">
-                <label htmlFor="time_zone">Time Zone</label>
-              </div>
-              <div className="col-md-4">
-                <select id="timezone" value={timezone} onChange={this.onChange} className="form-control">
-                  { timeZoneOptions }
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="form-group">
-            <div className="col-md-12">
-              <div className="col-md-3 control-label">
-                <label htmlFor="charging_day">Charging Day</label>
-              </div>
-              <div className="col-md-4">
-                <select id="charging_day" value={data.get('charging_day', '')} onChange={this.onChange} className="form-control">
-                  {[
-                    <option value="" key="select_charging_day">Select charging day...</option>,
-                    ...billingDayOptions,
-                  ]}
-                </select>
-              </div>
-            </div>
-          </div>
-        </form>
+      <div className="DateTime">
+        <Form horizontal>
+          <FormGroup controlId="timezone" key="timezone">
+            <Col componentClass={ControlLabel} md={2}>
+              Time Zone
+            </Col>
+            <Col sm={6}>
+              <select id="timezone" name="timezone" value={timezone} onChange={this.onChange} className="form-control">
+                { timeZoneOptions }
+              </select>
+            </Col>
+          </FormGroup>
+          <FormGroup controlId="charging_day" key="charging_day">
+            <Col componentClass={ControlLabel} md={2}>
+              Charging Day
+            </Col>
+            <Col sm={6}>
+              <select id="charging_day" name="charging_day" value={data.get('charging_day', '')} onChange={this.onChange} className="form-control">
+                {[
+                  <option value="" key="select_charging_day">Select charging day...</option>,
+                  ...billingDayOptions,
+                ]}
+              </select>
+            </Col>
+          </FormGroup>
+        </Form>
       </div>
     );
   }

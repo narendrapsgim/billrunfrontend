@@ -28,8 +28,25 @@ export default class AdvancedFilter extends Component {
 
   onChangeDate = (id, momentDate) => {
     const value = momentDate ? momentDate.toJSON() : '';
+    this.onChange('urt', value);
+  }
+
+  onChangeDateFrom = (id, momentFromDate) => {
+    const fromValue = momentFromDate ? momentFromDate.toJSON() : '';
+    const { filters } = this.state;
+    const value = filters.get(id, {});
+    value.from = fromValue;
     this.onChange(id, value);
   }
+
+  onChangeDateTo = (id, momentToDate) => {
+    const toValue = momentToDate ? momentToDate.toJSON() : '';
+    const { filters } = this.state;
+    const value = filters.get(id, {});
+    value.to = toValue;
+    this.onChange(id, value);
+  }
+
 
   onChange = (filterName, value) => {
     const { filters } = this.state;
@@ -88,6 +105,43 @@ export default class AdvancedFilter extends Component {
             isClearable={true}
             placeholderText="Select Date..."
           />
+        );
+      }
+      case 'date-range': {
+        let dateFrom = value ? value.from : '';
+        dateFrom = (dateFrom ? moment(dateFrom) : null);
+
+        let dateTo = value ? value.to : '';
+        dateTo = (dateTo ? moment(dateTo) : null);
+        return (
+          <div style={{ width: '100%' }}>
+            <div className="pull-left" style={{ width: '48%' }}>
+              <DatePicker
+                className="form-control"
+                dateFormat="DD/MM/YYYY"
+                selected={dateFrom}
+                selectsStart
+                startDate={dateFrom}
+                endDate={dateTo}
+                onChange={this.onChangeDateFrom.bind(this, field.id)}
+                isClearable={true}
+                placeholderText="Select Start Date..."
+              />
+            </div>
+            <div className="pull-right" style={{ width: '48%' }}>
+              <DatePicker
+                className="form-control"
+                dateFormat="DD/MM/YYYY"
+                selected={dateTo}
+                selectsEnd
+                startDate={dateFrom}
+                endDate={dateTo}
+                onChange={this.onChangeDateTo.bind(this, field.id)}
+                isClearable={true}
+                placeholderText="Select End Date..."
+              />
+            </div>
+          </div>
         );
       }
       default:

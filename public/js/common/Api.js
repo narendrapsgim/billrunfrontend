@@ -75,7 +75,7 @@ function sendHttpRequest(query) {
   //Create Api URL
   let api;
   if (query.pre) api = `/${query.pre}/`;
-  else if (query.api === "save") api = "/admin/";
+  else if (query.api === 'save' || query.api === 'savePPIncludes') api = '/admin/';
   else api = "/api/";
 
   let url = globalSetting.serverUrl + api + query.api + buildQueryString(query.params);

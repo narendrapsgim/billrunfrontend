@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import { Button } from 'react-bootstrap';
 import List from '../List';
-import { Button } from "react-bootstrap";
+import ConfirmModal from '../ConfirmModal';
 
 import { getList } from '../../actions/listActions';
+import { deleteInputProcessor } from '../../actions/inputProcessorActions';
+import { showDanger } from '../../actions/alertsActions';
 
 class InputProcessorsList extends Component {
   constructor(props) {
@@ -16,8 +19,14 @@ class InputProcessorsList extends Component {
     this.buildQuery = this.buildQuery.bind(this);
 
     this.state = {
-      sort: ''
+      sort: '',
+      showConfirmRemove: false,
+      inputProcessor: null,
     };
+  }
+
+  static propTypes = {
+    dispatch: React.PropTypes.func.isRequired,
   }
 
   componentDidMount() {
@@ -34,13 +43,12 @@ class InputProcessorsList extends Component {
       ]
     };
   }
-  
+
   onClickInputProcessor(input_processor, e) {
     let query = {
       file_type: input_processor.get('file_type'),
       action: 'update'
     };
-    console.log(input_processor.toJS());
     if (input_processor.get('type')) {
       query.type = 'api';
       query.format = input_processor.get('type');
@@ -50,7 +58,38 @@ class InputProcessorsList extends Component {
       query
     });
   }
-  
+
+  onClickRemove = (inputProcessor) => {
+    this.setState({
+      showConfirmRemove: true,
+      inputProcessor,
+    });
+  }
+
+  onClickRemoveCancel = () => {
+    this.setState({
+      showConfirmRemove: false,
+      inputProcessor: null,
+    });
+  }
+
+  onClickRemoveOk = () => {
+    const { inputProcessor } = this.state;
+    this.setState({
+      showConfirmRemove: false,
+      inputProcessor: null,
+    });
+    const fileType = inputProcessor.get('file_type')
+    this.props.dispatch(deleteInputProcessor(fileType, (err) => {
+      if (err) {
+        const errorMessage = 'Error occured while trying to remove input processor';
+        this.props.dispatch(showDanger(errorMessage));
+      } else {
+        this.props.dispatch(getList('input_processors', this.buildQuery()));
+      }
+    }));
+  }
+
   onClickNew() {
     this.context.router.push({
       pathname: 'select_input_processor_template',
@@ -60,7 +99,6 @@ class InputProcessorsList extends Component {
     });
   }
 
-
   onSort(sort) {
     this.setState({sort}, () => {
       this.props.dispatch(getList('input_processors', this.buildQuery()));
@@ -69,6 +107,9 @@ class InputProcessorsList extends Component {
 
   render() {
     const { inputProcessors } = this.props;
+    const { showConfirmRemove, inputProcessor } = this.state;
+    const inputProcessorName = inputProcessor ? inputProcessor.get('file_type') : '';
+    const removeConfirmMessage = `Are you sure you want to remove input processor "${inputProcessorName}"?`;
     const fields = [
       { id: "file_type", title: "Name" }
     ];
@@ -86,7 +127,8 @@ class InputProcessorsList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} onSort={this.onSort} />
+                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} onSort={this.onSort} enableRemove={true} onClickRemove={this.onClickRemove} />
+                <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveCancel} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
               </div>
             </div>
           </div>

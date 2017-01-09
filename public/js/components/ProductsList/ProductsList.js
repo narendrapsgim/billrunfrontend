@@ -92,12 +92,11 @@ class ProductsList extends Component {
       { id: 'to', showFilter: false, type: 'datetime' },
     ];
     const tableFields = [
-      { id: 'key', title: 'Name', sort: true },
+      { id: 'description', title: 'Title', sort: true },
+      { id: 'key', title: 'Key', sort: true },
       { id: 'unit_type', title: 'Unit Type', parser: this.usegtParser },
-      { id: 'code', title: 'Code', sort: true },
-      { id: 'description', title: 'Description', sort: true },
-      { id: 'from', title: 'From', type: 'datetime', cssClass: 'long-date', sort: true },
-      { id: 'to', title: 'To', type: 'datetime', cssClass: 'long-date', sort: true },
+      { id: 'code', title: 'External Code', sort: true },
+      { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
     ];
 
     return (
@@ -113,7 +112,7 @@ class ProductsList extends Component {
               </div>
               <div className="panel-body">
                 <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
-                <List items={items} fields={tableFields} editField="key" edit={true} onClickEdit={this.onClickItem} onSort={this.onSort} />
+                <List items={items} fields={tableFields} editField="description" edit={true} onClickEdit={this.onClickItem} onSort={this.onSort} />
               </div>
             </div>
           </div>

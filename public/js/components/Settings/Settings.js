@@ -23,7 +23,6 @@ class Settings extends Component {
     activeTab: React.PropTypes.number,
     dispatch: React.PropTypes.func.isRequired,
     settings: React.PropTypes.instanceOf(Immutable.Map),
-    logo: React.PropTypes.string.isRequired,
   };
 
   state = {
@@ -96,7 +95,7 @@ class Settings extends Component {
   }
 
   render() {
-    const { props: { settings, logo }, state: { activeTab } } = this;
+    const { props: { settings }, state: { activeTab } } = this;
 
     const currencyTax = settings.get('pricing', Immutable.Map());
     const datetime = settings.get('billrun', Immutable.Map());
@@ -110,7 +109,7 @@ class Settings extends Component {
         <Tabs defaultActiveKey={activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
           <Tab title="Company" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
-              <Tenant onChange={this.onChangeFieldValue} data={tenant} logo={logo} />
+              <Tenant onChange={this.onChangeFieldValue} data={tenant} />
             </Panel>
           </Tab>
 
@@ -149,6 +148,5 @@ class Settings extends Component {
 const mapStateToProps = (state, props) => ({
   activeTab: props.location.query.tab,
   settings: state.settings,
-  logo: state.settings.getIn(['files', 'logo']),
 });
 export default connect(mapStateToProps)(Settings);

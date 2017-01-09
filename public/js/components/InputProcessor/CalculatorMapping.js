@@ -1,32 +1,96 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Button, Panel, FormGroup, Col, Row } from 'react-bootstrap';
-
+import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button, HelpBlock } from 'react-bootstrap';
 export default class CalculatorMapping extends Component {
   static propTypes = {
-    settings: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-    onAddRating: React.PropTypes.func.isRequired,
-    onSetRating: React.PropTypes.func.isRequired,
-    onRemoveRating: React.PropTypes.func.isRequired,
-    onSetLineKey: React.PropTypes.func.isRequired,
-    onSetCustomerMapping: React.PropTypes.func.isRequired,
+    onSetCustomerMapping: PropTypes.func.isRequired,
+    onSetLineKey: PropTypes.func.isRequired,
+    onAddRating: PropTypes.func.isRequired,
+    onSetRating: PropTypes.func.isRequired,
+    onRemoveRating: PropTypes.func.isRequired,
+    settings: PropTypes.instanceOf(Immutable.Map),
   }
+  static defaultProps = {
+    settings: Immutable.Map(),
+  };
 
   componentDidMount = () => {
-    const { settings, onAddRating } = this.props;
-    this.availableUsagetypes().forEach((usaget) => {
+    const { settings } = this.props;
+    const availableUsagetypes = settings.get('rate_calculators', Immutable.Map()).keySeq().map(usaget => (usaget));
+    availableUsagetypes.forEach((usaget) => {
       const calcs = settings.getIn(['rate_calculators', usaget], Immutable.List());
       if (calcs.size === 0) {
-        onAddRating({ target: { dataset: { usaget } } });
+        this.props.onAddRating({ target: { dataset: { usaget } } });
       }
     });
-  }
+  };
 
-  getRateCalculators(usaget) {
+  onSetCustomerMapping = (index, e) => {
+    const { value, id } = e.target;
+    this.props.onSetCustomerMapping(id, value, index);
+  }
+  getAvailableFields = (addBillrunFields) => {
+    const { settings } = this.props;
+    const billrunFields = Immutable.fromJS(addBillrunFields ? ['type', 'usaget'] : []);
+    const options = [
+      (<option disabled value="" key={-3}>Select Field</option>),
+      ...(billrunFields.push(...settings.get('fields', []))).map((field, key) => (
+        <option value={field} key={key}>{field}</option>
+      )),
+    ];
+    return options;
+  }
+  getAvailableTargetFields = () => {
+    const optionsKeys = ['sid', 'aid'];
+    const options = [
+      (<option disabled value="-1" key={-1}>Select Field</option>),
+      ...optionsKeys.map((field, key) => <option value={field} key={key}>{field}</option>),
+    ];
+    return options;
+  }
+  renderCustomerIdentification = () => {
+    const { settings } = this.props;
+    const availableFields = this.getAvailableFields(false);
+    const availableTargetFields = this.getAvailableTargetFields();
+    const availableUsagetypes = settings.get('customer_identification_fields', Immutable.List());
+    return availableUsagetypes.map((usaget, key) => {
+      const regex = usaget.getIn(['conditions', 0, 'regex'], '');
+      const label = regex.substring(2, regex.length - 2);
+      const targetKey = usaget.getIn(['target_key'], 'sid');
+      const srcKey = usaget.getIn(['src_key'], '');
+      return (
+        <div key={key}>
+          <div className="form-group">
+            <div className="col-lg-3">
+              <label htmlFor={label}>{ label }</label>
+            </div>
+            <div className="col-lg-9">
+              <div className="col-lg-1" style={{ marginTop: 8 }}>
+                <i className="fa fa-long-arrow-right" />
+              </div>
+              <div className="col-lg-9">
+                <div className="col-lg-6">
+                  <select id="src_key" className="form-control" onChange={this.onSetCustomerMapping.bind(this, key)} value={srcKey} >
+                    { availableFields }
+                  </select>
+                </div>
+                <div className="col-lg-6">
+                  <select id="target_key" className="form-control" onChange={this.onSetCustomerMapping.bind(this, key)} value={targetKey}>
+                    { availableTargetFields }
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }
+  getRateCalculators = (usaget) => {
     const { onSetLineKey, onSetRating, onRemoveRating } = this.props;
+    const availableFields = this.getAvailableFields(true);
     return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => (
-      <Row key={calcKey} style={{ marginBottom: 10 }}>
+      <Row style={{ marginBottom: 10 }}>
         <Col lg={3} md={3} style={{ paddingRight: 0 }}>
           <FormGroup style={{ margin: 0 }}>
             <select
@@ -37,12 +101,12 @@ export default class CalculatorMapping extends Component {
               data-index={calcKey}
               value={calc.get('line_key', '')}
             >
-              { this.availableFields(true) }
+              { availableFields }
             </select>
           </FormGroup>
         </Col>
 
-        <Col lg={2} md={2} style={{ paddingRight: 0, lineHeight: '43px' }}>
+        <Col lg={3} md={3} style={{ paddingRight: 0, lineHeight: '43px' }}>
           <FormGroup style={{ margin: 0 }}>
             <input
               type="radio"
@@ -59,7 +123,7 @@ export default class CalculatorMapping extends Component {
           </FormGroup>
         </Col>
 
-        <Col lg={2} md={2} style={{ paddingRight: 0, lineHeight: '43px' }}>
+        <Col lg={3} md={3} style={{ paddingRight: 0, lineHeight: '43px' }}>
           <FormGroup style={{ margin: 0 }}>
             <input
               type="radio"
@@ -76,7 +140,7 @@ export default class CalculatorMapping extends Component {
           </FormGroup>
         </Col>
 
-        <Col lg={2} md={2} sm={2} xs={2}>
+        <Col lg={3} md={3} sm={3} xs={3}>
           { calcKey > 0 &&
             <FormGroup style={{ margin: 0 }}>
               <div style={{ width: '100%', height: 39 }}>
@@ -90,91 +154,37 @@ export default class CalculatorMapping extends Component {
   }
 
   getAddRatingButton = usaget => (<Button bsSize="xsmall" className="btn-primary" data-usaget={usaget} onClick={this.props.onAddRating}><i className="fa fa-plus" />&nbsp;Add</Button>);
-
   rateCalculatorsForUsaget = usaget => (this.props.settings.getIn(['rate_calculators', usaget], Immutable.List()));
 
-  availableUsagetypes = () => (this.props.settings.get('rate_calculators', {}).keySeq().map(usaget => (usaget)));
-
-  availableFields = (addBillrunFields) => {
-    const billrunFields = Immutable.fromJS(addBillrunFields ? ['type', 'usaget'] : []);
-    return [
-      (<option disabled value="" key={-3}>Select Field</option>),
-      ...(this.props.settings.get('fields', [])).map((field, key) => (
-        <option value={`uf.${field}`} key={`uf.${key}`}>{field}</option>
-      )),
-      ...billrunFields.map((field, key) => (
-        <option value={field} key={key}>{field}</option>
-      )),
-    ];
-  };
-
   render() {
-    const { settings,
-            type,
-            format,
-            onSetCustomerMapping,
-            onSetLineKey,
-            onSetRating } = this.props;
-    const available_fields = [(<option disabled value="" key={-1}>Select Field</option>),
-      ...settings.get('fields', []).map((field, key) => (
-        <option value={field} key={key}>{field}</option>
-                              ))];
-    const availableTargetFields = [(<option disabled value="-1" key={-1}>Select Field</option>),
-      ...['sid', 'aid'].map((field, key) => (
-        <option value={field} key={key}>{field}</option>
-                                     ))];
-    const available_usagetypes = settings.get('rate_calculators', {}).keySeq().map(usaget => usaget);
-
+    const { settings } = this.props;
+    const availableUsagetypes = settings.get('rate_calculators', Immutable.Map()).keySeq().map(usaget => (usaget));
     return (
-      <form className="form-horizontal CalculatorMapping">
+      <Form horizontal className="CalculatorMapping">
         <div className="form-group">
-          <div className="col-lg-3">
-            <label htmlFor="src_key">Customer identification</label>
-            <p className="help-block">Map customer identification field in record to Billrun field</p>
-          </div>
-          <div className="col-lg-9">
-            <div className="col-lg-1" style={{ marginTop: 8 }}>
-              <i className="fa fa-long-arrow-right" />
-            </div>
-            <div className="col-lg-9">
-              <div className="col-lg-6">
-                <select
-                  id="src_key"
-                  className="form-control"
-                  onChange={onSetCustomerMapping}
-                  value={settings.getIn(['customer_identification_fields', 0, 'src_key'], '')}
-                >
-                  { this.availableFields(false) }
-                </select>
-              </div>
-              <div className="col-lg-6">
-                <select
-                  id="target_key"
-                  className="form-control"
-                  onChange={onSetCustomerMapping}
-                  value={settings.getIn(['customer_identification_fields', 0, 'target_key'], 'sid')}
-                >
-                  { availableTargetFields }
-                </select>
-              </div>
-            </div>
+          <div className="col-lg-12">
+            <h4>
+              Customer identification
+              <small> | Map customer identification field in record to Billrun field</small>
+            </h4>
           </div>
         </div>
+        { this.renderCustomerIdentification() }
         <div className="separator" />
         <div className="form-group">
-          <div className="col-lg-3">
+          <div className="col-lg-12">
             <h4>Rate by</h4>
           </div>
         </div>
-        {this.availableUsagetypes().map((usaget, key) => (
+        {availableUsagetypes.map((usaget, key) => (
           <div key={key}>
             <div className="form-group">
-              <div className="col-lg-1">
+              <div className="col-lg-3">
                 <label htmlFor={usaget}>
                   { usaget }
                 </label>
               </div>
-              <div className="col-lg-11">
+              <div className="col-lg-9">
                 <div className="col-lg-1" style={{ marginTop: 8 }}>
                   <i className="fa fa-long-arrow-right" />
                 </div>
@@ -189,7 +199,7 @@ export default class CalculatorMapping extends Component {
             </div>
           </div>
          ))}
-      </form>
+      </Form>
     );
   }
 }

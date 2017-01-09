@@ -4,6 +4,7 @@ import moment from 'moment';
 import { connect } from 'react-redux';
 
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
+import { Button } from 'react-bootstrap';
 
 /* ACTIONS */
 import { titlize } from '../../common/Util';
@@ -15,9 +16,19 @@ class List extends Component {
     this.onClickHeader = this.onClickHeader.bind(this);
 
     this.state = {
-      sort: {}
+      sort: {},
     };
   }
+
+  static propTypes = {
+    enableRemove: React.PropTypes.bool,
+    onClickRemove: React.PropTypes.func,
+  };
+
+  static defaultProps = {
+    enableRemove: false,
+    onClickRemove: () => {},
+  };
 
   displayByType(field, entity) {
     switch (field.type) {
@@ -27,12 +38,15 @@ class List extends Component {
         return moment(entity.get(field.id)).format(globalSetting.timeFormat);
       case 'datetime':
         return moment(entity.get(field.id)).format(globalSetting.datetimeFormat);
+      case 'timestamp':
+        return moment(parseInt(entity.get(field.id), 10) * 1000)
+          .format(globalSetting.datetimeFormat);
       case 'text':
       default:
         return entity.get(field.id);
     }
   }
-  
+
   printEntityField(entity = Immutable.Map(), field) {
     if (!Immutable.Iterable.isIterable(entity))
       return this.printEntityField(Immutable.fromJS(entity), field);
@@ -73,7 +87,7 @@ class List extends Component {
 
     });
   }
-  
+
   onClickHeader(field) {
     const { onSort = () => {} } = this.props;
     const { sort } = this.state;
@@ -91,7 +105,11 @@ class List extends Component {
       edit = false,
       editText,
       className,
+      enableRemove,
+      onClickRemove,
     } = this.props;
+
+    const { showConfirmRemove } = this.state;
 
     const table_header = fields.map((field, key) => {
       let onclick = field.sort ? this.onClickHeader.bind(this, field.id) : () => {};
@@ -108,6 +126,7 @@ class List extends Component {
         return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
     });
     if (edit) table_header.push((<th key={fields.length}>&nbsp;</th>));
+    if (enableRemove) table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
 
     const editTooltip = (
       <Tooltip id="tooltip">{ editText ?editText : 'Edit'}</Tooltip>
@@ -130,6 +149,13 @@ class List extends Component {
                                       }
                                     </button>
                                   </td> : null
+                              }
+                              {
+                                enableRemove ?
+                                  <td className="edit-tb">
+                                    <Button onClick={onClickRemove.bind(this, entity)} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+                                  </td>
+                                : null
                               }
                             </tr>
                           )
