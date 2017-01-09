@@ -23,11 +23,17 @@ class List extends Component {
   static propTypes = {
     enableRemove: React.PropTypes.bool,
     onClickRemove: React.PropTypes.func,
+    removeText: React.PropTypes.string,
+    enableEnabled: React.PropTypes.bool,
+    onClickEnabled: React.PropTypes.func,
   };
 
   static defaultProps = {
     enableRemove: false,
     onClickRemove: () => {},
+    removeText: 'Remove',
+    enableEnabled: false,
+    onClickEnabled: () => {},
   };
 
   displayByType(field, entity) {
@@ -107,11 +113,14 @@ class List extends Component {
       className,
       enableRemove,
       onClickRemove,
+      removeText,
+      enableEnabled,
+      onClickEnabled,
     } = this.props;
 
     const { showConfirmRemove } = this.state;
 
-    const table_header = fields.map((field, key) => {
+    let table_header = fields.map((field, key) => {
       let onclick = field.sort ? this.onClickHeader.bind(this, field.id) : () => {};
       let style = field.sort ? { cursor: "pointer" } : {};
       let arrow = (null);
@@ -125,17 +134,28 @@ class List extends Component {
       if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
         return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
     });
+    if (enableEnabled) table_header = [(<th key={-1}></th>), ...table_header]
     if (edit) table_header.push((<th key={fields.length}>&nbsp;</th>));
     if (enableRemove) table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
 
     const editTooltip = (
       <Tooltip id="tooltip">{ editText ?editText : 'Edit'}</Tooltip>
     );
+    const removeTooltip = (
+      <Tooltip id="tooltip">{ removeText }</Tooltip>
+    );
 
     const table_body = items.size < 1 ?
                        (<tr><td colSpan={fields.length + (edit ? 1 : 0)} style={{textAlign: "center"}}>No items found</td></tr>) :
                         items.map((entity, index) => (
-                            <tr key={index}>
+                            <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled'}>
+                              {
+                                enableEnabled ?
+                                  <td className="edit-tb">
+                                    <input type="checkbox" checked={entity.get('enabled', true)} onChange={onClickEnabled.bind(this, entity)} />
+                                  </td>
+                                : null
+                              }
                               { this.buildRow(entity, fields) }
                               {
                                 edit ?
@@ -153,7 +173,11 @@ class List extends Component {
                               {
                                 enableRemove ?
                                   <td className="edit-tb">
-                                    <Button onClick={onClickRemove.bind(this, entity)} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+                                    <button onClick={onClickRemove.bind(this, entity)} disabled={entity.get('enabled', true)} className="btn btn-link" >
+                                      <OverlayTrigger overlay={removeTooltip} placement="left">
+                                        <i className="fa fa-trash-o danger-red" />
+                                      </OverlayTrigger>
+                                    </button>
                                   </td>
                                 : null
                               }

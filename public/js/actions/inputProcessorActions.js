@@ -412,6 +412,30 @@ export function saveInputProcessorSettings(state, callback, part=false) {
   };
 }
 
+export function updateInputProcessorEnabled(inputProcessor, enabled, callback) {
+  const query = {
+    api: 'settings',
+    params: [
+      { category: 'file_types' },
+      { action: 'set' },
+      { data: JSON.stringify({ file_type: inputProcessor.get('file_type'), type: inputProcessor.get('type'), enabled }) },
+    ],
+  };
+
+  return () => {
+    apiBillRun(query).then(
+      (success) => {
+        callback(false, success);
+      },
+      (failure) => {
+        callback(true, failure);
+      }
+    ).catch((error) => {
+      callback(true, error);
+    });
+  };
+}
+
 function gotInputProcessors(input_processors) {
   return {
     type: GOT_INPUT_PROCESSORS,

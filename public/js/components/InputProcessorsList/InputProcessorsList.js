@@ -6,7 +6,7 @@ import List from '../List';
 import ConfirmModal from '../ConfirmModal';
 
 import { getList } from '../../actions/listActions';
-import { deleteInputProcessor } from '../../actions/inputProcessorActions';
+import { deleteInputProcessor, updateInputProcessorEnabled } from '../../actions/inputProcessorActions';
 import { showDanger } from '../../actions/alertsActions';
 
 class InputProcessorsList extends Component {
@@ -79,10 +79,22 @@ class InputProcessorsList extends Component {
       showConfirmRemove: false,
       inputProcessor: null,
     });
-    const fileType = inputProcessor.get('file_type')
+    const fileType = inputProcessor.get('file_type');
     this.props.dispatch(deleteInputProcessor(fileType, (err) => {
       if (err) {
         const errorMessage = 'Error occured while trying to remove input processor';
+        this.props.dispatch(showDanger(errorMessage));
+      } else {
+        this.props.dispatch(getList('input_processors', this.buildQuery()));
+      }
+    }));
+  }
+
+  onClickEnabled = (inputProcessor, e) => {
+    const { checked } = e.target;
+    this.props.dispatch(updateInputProcessorEnabled(inputProcessor, checked, (err) => {
+      if (err) {
+        const errorMessage = 'Error occured while trying to enable/disable input processor';
         this.props.dispatch(showDanger(errorMessage));
       } else {
         this.props.dispatch(getList('input_processors', this.buildQuery()));
@@ -127,7 +139,7 @@ class InputProcessorsList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} onSort={this.onSort} enableRemove={true} onClickRemove={this.onClickRemove} />
+                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} onSort={this.onSort} enableRemove={true} onClickRemove={this.onClickRemove} enableEnabled={true} onClickEnabled={this.onClickEnabled} />
                 <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveCancel} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
               </div>
             </div>
