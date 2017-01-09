@@ -51,40 +51,33 @@ export default function (state = defaultState, action) {
     case UPDATE_PLAN_CYCLE:
       return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, action.value));
 
-    case ADD_TARIFF:
-      // if trail add to head
-      if(action.trial){
-        let trial = defaultTariff.set('trial', true).set('to', '').set('from', 0);
-        return state.updateIn(['price'], list => {
-          if(typeof list === 'undefined'){
-            list = Immutable.List();
-          }
-          return list.unshift(trial)
-        });
-      }
-      //Clear current last item Unlimited value if it unlimited
-      var size = state.get('price', Immutable.List()).size;
-      if(size > 0 && state.getIn(['price', size-1, 'to']) === PLAN_CYCLE_UNLIMITED){
-        state = state.updateIn(['price', size-1], item => item.set('to',''));
-      }
-      var lastTo = size > 0 ? parseInt(state.getIn(['price', size-1, 'to']) || 0) : 0;
-      var newTariff = defaultTariff.set('from', lastTo);
-      return state.update('price', list => {
-        if(typeof list === 'undefined'){
-          list = Immutable.List();
+    case ADD_TARIFF: {
+      // If trail add to head
+      if (action.trial) {
+        const trial = defaultTariff.set('trial', true).set('from', 0);
+        if (!state.get('price', Immutable.List()).isEmpty()) {
+          return state.update('price', Immutable.List(), list => list.unshift(trial.set('to', '')));
         }
-        return list.push(newTariff)
-      });
+        return state.update('price', Immutable.List(), list => list.unshift(trial));
+      } else if (state.get('price', Immutable.List()).isEmpty()) {
+        return state.update('price', Immutable.List(), list => list.push(defaultTariff));
+      }
+      return state.update('price', Immutable.List(), list =>
+        list
+          .update(list.size - 1, Immutable.Map(), item => item.set('to', ''))
+          .push(defaultTariff)
+      );
+    }
 
     case REMOVE_TARIFF:
-      //Set new last item value to unlimited
-      // var size = state.get('price').size;
-      // if(size > 1){
-      //   state = state.updateIn(['price', (size - 2)], item => item.set('to', PLAN_CYCLE_UNLIMITED));
-      // }
-      state = state.update('price', list => list.delete(action.index));
-      //recaluculate cycle
-      return state.updateIn(['price'], list => _reaclculateCycles(list, action.index));
+      if (action.index < 1) {
+        return state.update('price', Immutable.List(), list => list.delete(action.index));
+      }
+      return state.update('price', Immutable.List(), list =>
+        list
+          .update(action.index - 1, item => item.set('to', PLAN_CYCLE_UNLIMITED))
+          .delete(action.index)
+      );
 
     case GOT_PLAN:
       return Immutable.fromJS(action.plan);
@@ -95,7 +88,7 @@ export default function (state = defaultState, action) {
     case ADD_BALANCE_NOTIFICATIONS:
       let new_notifications = Immutable.List([Immutable.Map({value: 0, type: '', msg: ''})]);
       return state.setIn(['notifications_threshold', action.balance], new_notifications);
-      
+
     case ADD_NOTIFICATION:
       let new_notification = Immutable.Map({value: 0, type: '', msg: ''});
       return state.updateIn(["notifications_threshold", action.threshold_id],
@@ -123,7 +116,7 @@ export default function (state = defaultState, action) {
       return state.update('disallowed_rates',
 			  Immutable.List(),
 			  list => list.filterNot(p => p === action.rate));
-      
+
     case ADD_BALANCE_THRESHOLD:
       return state.setIn(['pp_threshold', action.balance_id], 0);
 
@@ -141,7 +134,7 @@ export default function (state = defaultState, action) {
         pp_includes_name,
         pp_includes_external_id});
       return state.setIn(['include', action.usaget], newInclude);
-      
+
     default:
       return state;
   }

@@ -15,7 +15,7 @@ var globalSetting = {
     maxItems: 100
   },
   statusMessageDisplayTimeout: 5000,
-  planCycleUnlimitedValue: 999999999,
+  planCycleUnlimitedValue: 'UNLIMITED',
   serviceCycleUnlimitedValue: 999999999,
   productUnlimitedValue: 'UNLIMITED',
   keyUppercaseRegex: /^[A-Z0-9_]*$/,

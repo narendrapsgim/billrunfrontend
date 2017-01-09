@@ -9,9 +9,9 @@ export default class ProductPrice extends Component {
     index: PropTypes.number.isRequired,
     count: PropTypes.number.isRequired,
     item: PropTypes.object.isRequired,
-    productUnlimitedValue: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number,
+    productUnlimitedValue: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
     ]).isRequired,
     onProductEditRate: PropTypes.func.isRequired,
     onProductRemoveRate: PropTypes.func.isRequired,
