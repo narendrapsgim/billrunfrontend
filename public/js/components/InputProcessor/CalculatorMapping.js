@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, Col, Row, Panel, Button } from 'react-bootstrap';
+
 export default class CalculatorMapping extends Component {
   static propTypes = {
     onSetCustomerMapping: PropTypes.func.isRequired,
@@ -47,44 +48,6 @@ export default class CalculatorMapping extends Component {
       ...optionsKeys.map((field, key) => <option value={field} key={key}>{field}</option>),
     ];
     return options;
-  }
-  renderCustomerIdentification = () => {
-    const { settings } = this.props;
-    const availableFields = this.getAvailableFields(false);
-    const availableTargetFields = this.getAvailableTargetFields();
-    const availableUsagetypes = settings.get('customer_identification_fields', Immutable.List());
-    return availableUsagetypes.map((usaget, key) => {
-      const regex = usaget.getIn(['conditions', 0, 'regex'], '');
-      const label = regex.substring(2, regex.length - 2);
-      const targetKey = usaget.getIn(['target_key'], 'sid');
-      const srcKey = usaget.getIn(['src_key'], '');
-      return (
-        <div key={key}>
-          <div className="form-group">
-            <div className="col-lg-3">
-              <label htmlFor={label}>{ label }</label>
-            </div>
-            <div className="col-lg-9">
-              <div className="col-lg-1" style={{ marginTop: 8 }}>
-                <i className="fa fa-long-arrow-right" />
-              </div>
-              <div className="col-lg-9">
-                <div className="col-lg-6">
-                  <select id="src_key" className="form-control" onChange={this.onSetCustomerMapping.bind(this, key)} value={srcKey} >
-                    { availableFields }
-                  </select>
-                </div>
-                <div className="col-lg-6">
-                  <select id="target_key" className="form-control" onChange={this.onSetCustomerMapping.bind(this, key)} value={targetKey}>
-                    { availableTargetFields }
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    });
   }
   getRateCalculators = (usaget) => {
     const { onSetLineKey, onSetRating, onRemoveRating } = this.props;
@@ -155,6 +118,45 @@ export default class CalculatorMapping extends Component {
 
   getAddRatingButton = usaget => (<Button bsSize="xsmall" className="btn-primary" data-usaget={usaget} onClick={this.props.onAddRating}><i className="fa fa-plus" />&nbsp;Add</Button>);
   rateCalculatorsForUsaget = usaget => (this.props.settings.getIn(['rate_calculators', usaget], Immutable.List()));
+
+  renderCustomerIdentification = () => {
+    const { settings } = this.props;
+    const availableFields = this.getAvailableFields(false);
+    const availableTargetFields = this.getAvailableTargetFields();
+    const availableUsagetypes = settings.get('customer_identification_fields', Immutable.List());
+    return availableUsagetypes.map((usaget, key) => {
+      const regex = usaget.getIn(['conditions', 0, 'regex'], '');
+      const label = regex.substring(2, regex.length - 2);
+      const targetKey = usaget.getIn(['target_key'], 'sid');
+      const srcKey = usaget.getIn(['src_key'], '');
+      return (
+        <div key={key}>
+          <div className="form-group">
+            <div className="col-lg-3">
+              <label htmlFor={label}>{ label }</label>
+            </div>
+            <div className="col-lg-9">
+              <div className="col-lg-1" style={{ marginTop: 8 }}>
+                <i className="fa fa-long-arrow-right" />
+              </div>
+              <div className="col-lg-9">
+                <div className="col-lg-6">
+                  <select id="src_key" className="form-control" onChange={this.onSetCustomerMapping.bind(this, key)} value={srcKey} >
+                    { availableFields }
+                  </select>
+                </div>
+                <div className="col-lg-6">
+                  <select id="target_key" className="form-control" onChange={this.onSetCustomerMapping.bind(this, key)} value={targetKey}>
+                    { availableTargetFields }
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }
 
   render() {
     const { settings } = this.props;
