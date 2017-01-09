@@ -110,7 +110,6 @@ export default class PlanPrice extends Component {
         <Col lg={4} md={4} style={{ paddingRight: 0 }}>
           <FormGroup validationState={cycleError.length ? 'error' : null} style={{ margin: 0 }}>
             { isFirst && <ControlLabel style={{ marginBottom: 5 }}>Cycles</ControlLabel>}
-
             { (to === planCycleUnlimitedValue)
               ? <Field value={cycle} disabled={true} />
               : <Field value={cycle} onChange={this.onCycleUpdateEvent} fieldType="number" min={0} />
