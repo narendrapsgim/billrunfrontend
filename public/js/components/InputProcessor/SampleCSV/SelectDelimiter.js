@@ -23,11 +23,11 @@ export default connect()(class SelectDelimiter extends Component {
           <div className="col-lg-5">
             <div className="input-group">
               <div className="input-group-addon">
-                <input type="radio" name="delimiter-type"
+                <input type="radio" name="delimiter-type" style={{ verticalAlign: 'middle' }}
                        value="separator"
                        disabled={!settings.get('file_type', false)}
                        onChange={onSetDelimiterType}
-                       checked={settings.get('delimiter_type', '') === "separator"} />By delimiter
+                       checked={settings.get('delimiter_type', '') === "separator"} /><small>&nbsp;By delimiter</small>
               </div>
               <input id="separator"
                      className="form-control"
@@ -40,11 +40,11 @@ export default connect()(class SelectDelimiter extends Component {
             </div>
           </div>
           <div className="col-lg-3" style={{marginTop: 10}}>
-            <input type="radio" name="delimiter-type"
+            <input type="radio" name="delimiter-type" style={{ verticalAlign: 'middle' }}
                    value="fixed"
                    disabled={!settings.get('file_type', false)}
                    onChange={onSetDelimiterType}
-                   checked={settings.get('delimiter_type', '') === "fixed"} />Fixed width
+                   checked={settings.get('delimiter_type', '') === "fixed"} /><label htmlFor="delimiter-type">&nbsp;Fixed width</label>
           </div>
         </div>
       </div>
