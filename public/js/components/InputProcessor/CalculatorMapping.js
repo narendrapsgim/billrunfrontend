@@ -116,16 +116,14 @@ export default class CalculatorMapping extends Component {
             onSetLineKey,
             onSetRating } = this.props;
     const available_fields = [(<option disabled value="" key={-1}>Select Field</option>),
-                              ...settings.get('fields', []).map((field, key) => (
-                                <option value={field} key={key}>{field}</option>
+      ...settings.get('fields', []).map((field, key) => (
+        <option value={field} key={key}>{field}</option>
                               ))];
     const availableTargetFields = [(<option disabled value="-1" key={-1}>Select Field</option>),
-                                     ...['sid', 'aid'].map((field, key) => (
-                                       <option value={field} key={key}>{field}</option>
+      ...['sid', 'aid'].map((field, key) => (
+        <option value={field} key={key}>{field}</option>
                                      ))];
-    const available_usagetypes = settings.get('rate_calculators', {}).keySeq().map(usaget => {
-      return usaget;
-    });
+    const available_usagetypes = settings.get('rate_calculators', {}).keySeq().map(usaget => usaget);
 
     return (
       <form className="form-horizontal CalculatorMapping">
