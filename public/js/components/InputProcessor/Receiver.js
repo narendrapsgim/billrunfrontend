@@ -1,8 +1,30 @@
 import React, { Component } from 'react';
 
 export default class Receiver extends Component {
-  constructor(props) {
-    super(props);
+
+  componentDidMount() {
+    const { action } = this.props;
+    if (action === 'new') {
+      this.initDefaultValues();
+    }
+  }
+
+  initDefaultValues = () => {
+    const passive = {
+      target: {
+        id: 'passive',
+        checked: false,
+      },
+    };
+    this.props.onSetReceiverCheckboxField(passive);
+
+    const deletReceived = {
+      target: {
+        id: 'delete_received',
+        checked: false,
+      },
+    };
+    this.props.onSetReceiverCheckboxField(deletReceived);
   }
 
   render() {
@@ -78,7 +100,7 @@ export default class Receiver extends Component {
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="passive" className="col-xs-2 control-label">Passive</label>
+            <label htmlFor="passive" className="col-xs-2 control-label">Passive mode</label>
             <div className="col-xs-4">
               <input type="checkbox" id="passive"
                      onChange={onSetReceiverCheckboxField}
