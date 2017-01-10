@@ -3,12 +3,15 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { Col, Panel, Button } from 'react-bootstrap';
 import Immutable from 'immutable';
+import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import User from './User';
 /* ACTIONS */
-import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
+import { getEntity, updateEntityField, deleteEntityField, clearEntity, saveEntity } from '../../actions/entityActions';
 import { clearList } from '../../actions/listActions';
-import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
+import { apiBillRunErrorHandler } from '../../common/Api';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+
 
 class UserSetup extends Component {
 
@@ -28,7 +31,7 @@ class UserSetup extends Component {
   };
 
   componentDidMount() {
-    const { userId } = this.props.location.query;
+    const { userId, action } = this.props.location.query;
     if (userId) {
       const userParams = {
         api: 'users',
@@ -39,6 +42,19 @@ class UserSetup extends Component {
       };
       this.props.dispatch(getEntity('user', userParams));
     }
+    if (action === 'new') {
+      this.props.dispatch(setPageTitle('Create New User'));
+    } else {
+      this.props.dispatch(setPageTitle('Edit user'));
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { user, location: { query: { action } } } = nextProps;
+    const { user: oldUser } = this.props;
+    if (action === 'update' && oldUser.get('username', '') !== user.get('username', '')) {
+      this.props.dispatch(setPageTitle(`Edit user - ${user.get('username', '')}`));
+    }
   }
 
   componentWillUnmount() {
@@ -46,74 +62,85 @@ class UserSetup extends Component {
     this.props.dispatch(clearList('users'));
   }
 
-  onCancel = () => {
+  onBack = () => {
     this.props.router.push('/users');
   }
 
-  onSaveUser = (password) => {
-    const { user, location: { query: { action } } } = this.props;
-    const params = action === 'update' ? [
-        { action: 'update' },
-        { userId: user.getIn(['_id', '$id'], '') },
-        { username: user.get('username') },
-        { roles: JSON.stringify(user.get('roles').toJS()) },
-        { password },
-    ] : [
-        { action: 'insert' },
-        { username: user.get('username') },
-        { roles: JSON.stringify(user.get('roles', Immutable.List()).toJS()) },
-        { password },
-    ];
-
-    const query = {
-      api: 'users',
-      params,
-    };
-
-    apiBillRun(query).then(
-        (success) => { // eslint-disable-line no-unused-vars
+  onSave = () => {
+    if (this.validate()) {
+      this.props.dispatch(saveEntity('user')).then((response) => {
+        if (response === true) {
           this.props.dispatch(showSuccess('User saved successfully'));
-          this.onCancel();
-        },
-        (failure) => {
-          this.props.dispatch(showDanger(`Error - ${failure.error[0].error.message}`));
+          this.onBack();
+        } else {
+          this.props.dispatch(apiBillRunErrorHandler(response));
         }
-      ).catch(
-        (error) => {
-          this.props.dispatch(apiBillRunErrorHandler(error));
-        }
-      );
+      });
+    }
   }
 
-  onUsernameChange = (e) => {
-    const { value } = e.target;
-    this.props.dispatch(updateEntityField('user', 'username', value));
+  onUpdateValue = (path, value = '') => {
+    this.props.dispatch(updateEntityField('user', path, value));
   }
 
-  onCheckboxClick = (roles = '') => {
-    const userRoles = roles.length > 0 ? roles.split(',') : [];
-    this.props.dispatch(updateEntityField('user', 'roles', userRoles));
+  onDeleteValue = (path) => {
+    this.props.dispatch(deleteEntityField('user', path));
   }
 
+  validate = () => {
+    const { user, location: { query: { action } } } = this.props;
+    if (action === 'new') {
+      if (user.get('username', '').length === 0) {
+        this.props.dispatch(showDanger('User name field is required'));
+        return false;
+      }
+      if (user.get('password', '').length === 0) {
+        this.props.dispatch(showDanger('Password field is required'));
+        return false;
+      }
+
+      if (user.get('roles').length === 0) {
+        this.props.dispatch(showDanger('Roles field is required'));
+        return false;
+      }
+      return true;
+    }
+
+    if (user.has('username') && user.get('username', '').length === 0) {
+      this.props.dispatch(showDanger('User name field is required'));
+      return false;
+    }
+    if (user.has('password') && user.get('password', '').length === 0) {
+      this.props.dispatch(showDanger('Password field is required'));
+      return false;
+    }
+
+    if (user.has('roles') && user.get('roles').length === 0) {
+      this.props.dispatch(showDanger('Roles field is required'));
+      return false;
+    }
+    return true;
+  }
 
   render() {
     const { user, location: { query: { action } } } = this.props;
-
+    // in update mode wait for item before render edit screen
+    if (action === 'update' && typeof user.getIn(['_id', '$id']) === 'undefined') {
+      return (<LoadingItemPlaceholder onClick={this.onBack} />);
+    }
     return (
       <Col lg={12}>
         <Panel>
           <User
             action={action}
             user={user}
-            onSaveUser={this.onSaveUser}
-            onUsernameChange={this.onUsernameChange}
-            onCheckboxClick={this.onCheckboxClick}
-            onCancel={this.onCancel}
+            onUpdateValue={this.onUpdateValue}
+            onDeleteValue={this.onDeleteValue}
           />
         </Panel>
         <div style={{ marginTop: 12 }}>
-          <Button onClick={this.onSaveUser} bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
-          <Button onClick={this.onCancel} bsStyle="default">Cancel</Button>
+          <Button onClick={this.onSave} bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+          <Button onClick={this.onBack} bsStyle="default">Cancel</Button>
         </div>
       </Col>
     );
