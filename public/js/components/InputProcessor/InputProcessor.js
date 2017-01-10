@@ -347,7 +347,7 @@ class InputProcessor extends Component {
     if (type === 'api') {
       steps.push(<RealtimeMapping settings={settings} onChange={this.onChangeRealtimeField} onChangeDefault={this.onChangeRealtimeDefaultField} />);
     } else {
-      steps.push(<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver', Immutable.Map())} />);
+      steps.push(<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver', Immutable.Map())} action={action}/>);
     }
 
     return (

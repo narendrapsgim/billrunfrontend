@@ -1,8 +1,30 @@
 import React, { Component } from 'react';
 
 export default class Receiver extends Component {
-  constructor(props) {
-    super(props);
+
+  componentDidMount() {
+    const { action } = this.props;
+    if (action === 'new') {
+      this.initDefaultValues();
+    }
+  }
+
+  initDefaultValues = () => {
+    const passive = {
+      target: {
+        id: 'passive',
+        checked: false,
+      },
+    };
+    this.props.onSetReceiverCheckboxField(passive);
+
+    const deletReceived = {
+      target: {
+        id: 'delete_received',
+        checked: false,
+      },
+    };
+    this.props.onSetReceiverCheckboxField(deletReceived);
   }
 
   render() {
@@ -71,16 +93,16 @@ export default class Receiver extends Component {
           <div className="form-group">
             <label htmlFor="delete_received" className="col-xs-2 control-label">Delete on retrieve</label>
             <div className="col-xs-4">
-              <input type="checkbox" id="delete_received"
+              <input type="checkbox" id="delete_received" style={{ marginTop: 12 }}
                      onChange={onSetReceiverCheckboxField}
                      checked={settings.get('delete_received', false)}
                      value="1" />
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="passive" className="col-xs-2 control-label">Passive</label>
+            <label htmlFor="passive" className="col-xs-2 control-label">Passive mode</label>
             <div className="col-xs-4">
-              <input type="checkbox" id="passive"
+              <input type="checkbox" id="passive" style={{ marginTop: 12 }}
                      onChange={onSetReceiverCheckboxField}
                      checked={settings.get('passive', false)}
                      value="1" />
