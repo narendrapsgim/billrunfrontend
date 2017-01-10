@@ -73,12 +73,7 @@ export function apiBillRun(requests, requiredAllSuccess = true) {
 //send Http request
 function sendHttpRequest(query) {
   //Create Api URL
-  let api;
-  if (query.pre) api = `/${query.pre}/`;
-  else if (query.api === 'save' || query.api === 'savePPIncludes') api = '/admin/';
-  else api = "/api/";
-
-  let url = globalSetting.serverUrl + api + query.api + buildQueryString(query.params);
+  let url = globalSetting.serverUrl + buildApiString(query) + buildQueryString(query.params);
   let requestOptions = buildQueryOptions(query.options);
   let response = (query.name) ? { name: query.name } : {};
   let promise = new Promise((resolve, reject) => {
@@ -116,6 +111,22 @@ function buildQueryOptions(options = null){
     Object.assign(requestOptions, options);
   }
   return requestOptions;
+}
+
+// Helper function to build API url
+function buildApiString(params = {}) {
+  switch (params.api) {
+    case 'billapi':
+    case undefined:
+      return `/billapi/${params.entity}/${params.action}`;
+    case 'save':
+    case 'savePPIncludes':
+      return `/admin/${params.api}`;
+    case 'paymentgateways':
+      return `/${params.api}/${params.action}`;
+    default:
+      return `/api/${params.api}`;
+  }
 }
 
 //help function to bulind query params string

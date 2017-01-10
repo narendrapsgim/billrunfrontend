@@ -63,7 +63,7 @@ const Templates = {
 	"conditions" : [
 	  {
 	    "field" : "usaget",
-	    "regex" : "/.*/"
+	    "regex" : "/^call$/"
 	  }
 	],
 	"clear_regex" : "//",
@@ -198,7 +198,7 @@ const Templates = {
 	"conditions" : [
 	  {
 	    "field" : "usaget",
-	    "regex" : "/.*/"
+	    "regex" : "/^GPRS Data$/"
 	  }
 	],
 	"clear_regex" : "//",
@@ -273,7 +273,7 @@ const Templates = {
 	"conditions" : [
 	  {
 	    "field" : "usaget",
-	    "regex" : "/.*/"
+	    "regex" : "/^call$/"
 	  }
 	],
 	"clear_regex" : "//",
@@ -532,7 +532,7 @@ const Templates = {
 	"conditions" : [
 	  {
 	    "field" : "usaget",
-	    "regex" : "/.*/"
+	    "regex" : "/^NA$/"
 	  }
 	],
 	"clear_regex" : "//",
