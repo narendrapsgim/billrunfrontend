@@ -1,144 +1,129 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
+import { Col, Panel, Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 import User from './User';
-
 /* ACTIONS */
-import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
-import { getList, clearList } from '../../actions/listActions';
-import { getSettings } from '../../actions/settingsActions';
+import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
+import { clearList } from '../../actions/listActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 
-/* COMPONENTS */
-import { PageHeader, Tabs, Tab } from 'react-bootstrap';
-
-
 class UserSetup extends Component {
-	
-	constructor(props){
-		super(props);
-	}
 
-	componentDidMount() {
-	   const { userId, action } = this.props.location.query;
-	   if(!userId){
-	   		return;
-	   }
+  static propTypes = {
+    user: PropTypes.instanceOf(Immutable.Map),
+    dispatch: PropTypes.func.isRequired,
+    location: PropTypes.shape({
+      query: PropTypes.object.isRequired,
+    }).isRequired,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
+  }
 
-	   const userParams = {
-        api: "users",
+  static defaultProps = {
+    user: Immutable.Map(),
+  };
+
+  componentDidMount() {
+    const { userId } = this.props.location.query;
+    if (userId) {
+      const userParams = {
+        api: 'users',
         params: [
           { userId },
-          { action: 'read' } 
-        ]
+          { action: 'read' },
+        ],
       };
+      this.props.dispatch(getEntity('user', userParams));
+    }
+  }
 
-      	this.props.dispatch(getEntity('user', userParams));
-	}
+  componentWillUnmount() {
+    this.props.dispatch(clearEntity('user'));
+    this.props.dispatch(clearList('users'));
+  }
 
-	componentWillUnmount() {
-    	this.props.dispatch(clearEntity());
-    	this.props.dispatch(clearList('users'));
-  	}
+  onCancel = () => {
+    this.props.router.push('/users');
+  }
 
-	onCancel = () => {
-		this.context.router.push({
-      		pathname: "/users"
-    	});
-	}
+  onSaveUser = (password) => {
+    const { user, location: { query: { action } } } = this.props;
+    const params = action === 'update' ? [
+        { action: 'update' },
+        { userId: user.getIn(['_id', '$id'], '') },
+        { username: user.get('username') },
+        { roles: JSON.stringify(user.get('roles').toJS()) },
+        { password },
+    ] : [
+        { action: 'insert' },
+        { username: user.get('username') },
+        { roles: JSON.stringify(user.get('roles', Immutable.List()).toJS()) },
+        { password },
+    ];
+
+    const query = {
+      api: 'users',
+      params,
+    };
+
+    apiBillRun(query).then(
+        (success) => { // eslint-disable-line no-unused-vars
+          this.props.dispatch(showSuccess('User saved successfully'));
+          this.onCancel();
+        },
+        (failure) => {
+          this.props.dispatch(showDanger(`Error - ${failure.error[0].error.message}`));
+        }
+      ).catch(
+        (error) => {
+          this.props.dispatch(apiBillRunErrorHandler(error));
+        }
+      );
+  }
+
+  onUsernameChange = (e) => {
+    const { value } = e.target;
+    this.props.dispatch(updateEntityField('user', 'username', value));
+  }
+
+  onCheckboxClick = (roles = '') => {
+    const userRoles = roles.length > 0 ? roles.split(',') : [];
+    this.props.dispatch(updateEntityField('user', 'roles', userRoles));
+  }
 
 
-	onSaveUser = (password) => {
-		const { dispatch, user } = this.props;
-		const { action } = this.props.location.query;
-    	const params = action === 'update'? [
-    		{'action': 'update'},
-    		{'userId': user.getIn(['_id', '$id'], '')},
-    		{'username': user.get('username')},
-    		{'roles': JSON.stringify(user.get('roles').toJS())},
-    		{'password': password}
-    	]: [
-    		{'action': 'insert'},
-    		{'username': user.get('username')},
-    		{'roles': JSON.stringify(user.get('roles', Immutable.List()).toJS())},
-    		{'password': password}
-    	];
+  render() {
+    const { user, location: { query: { action } } } = this.props;
 
-
-	    const query = {
-	      api: "users",
-	      params
-	    };
-
-	    apiBillRun(query).then(
-	      success => {
-	          dispatch(showSuccess("User saved successfully"));
-	          this.context.router.push({
-	            pathname: '/users'
-	          });
-	      },
-	      failure => {
-	        dispatch(showDanger(`Error - ${failure.error[0].error.message}`));
-	      }
-	    ).catch(
-	      error => {
-			dispatch(showDanger("Network error - please try again"));
-			dispatch(apiBillRunErrorHandler(error));
-	      }
-	    );
-	}
-
-	onUsernameChange = (e) => {
-		const { value } = e.target;
-		this.props.dispatch(updateEntityField('user', 'username', value));
-	}
-
-	onCheckboxClick = (e) => {
-		const { user } = this.props;
-		const { value } = e.target;
-		const userRoles = user.update('roles', Immutable.List(), rolesList => {
-			if(rolesList.includes(value)){
-				return rolesList.filterNot(role => role === value);
-			}
-			return rolesList.push(e.target.value);
-		});
-		this.props.dispatch(updateEntityField('user', 'roles', userRoles.get('roles')));
-	}
-
-	render(){
-		const { user } = this.props;
-		const { action } = this.props.location.query;
-		return(
-			<div className="panel panel-default">
-				<div className="panel-heading">
-					<span>
-	                  Edit user
-	                </span>
-				</div>
-    			<div className="panel-body">
-    			<div className="col-lg-6">
-    				<User  onSaveUser={this.onSaveUser} action={action}
-    					onUsernameChange={this.onUsernameChange} user={user}
-    					onCheckboxClick={this.onCheckboxClick}
-    					onCancel={this.onCancel}
-    				/>
-            	</div>
-    			</div>
-			</div>
-		)
-	};
+    return (
+      <Col lg={12}>
+        <Panel>
+          <User
+            action={action}
+            user={user}
+            onSaveUser={this.onSaveUser}
+            onUsernameChange={this.onUsernameChange}
+            onCheckboxClick={this.onCheckboxClick}
+            onCancel={this.onCancel}
+          />
+        </Panel>
+        <div style={{ marginTop: 12 }}>
+          <Button onClick={this.onSaveUser} bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+          <Button onClick={this.onCancel} bsStyle="default">Cancel</Button>
+        </div>
+      </Col>
+    );
+  }
 
 }
 
-UserSetup.contextTypes = {
-  router: React.PropTypes.object.isRequired
-};
 
-function mapStateToProps(state) {
-  return {
-    user: state.entity.get('user', Immutable.Map())
-  };
-}
+const mapStateToProps = state => ({
+  user: state.entity.get('user', Immutable.Map()),
+});
 
-export default connect(mapStateToProps)(UserSetup);
+export default withRouter(connect(mapStateToProps)(UserSetup));
