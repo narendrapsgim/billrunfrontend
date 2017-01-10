@@ -21,7 +21,7 @@ class SampleCSV extends Component {
       this.props.onRemoveAllFields.call(this);
     }
   }
-  
+
   render() {
     let { settings,
           type,
@@ -63,15 +63,11 @@ class SampleCSV extends Component {
                 <i className="fa fa-trash-o" /> Remove all
               </button>
             </div>
-            {(() => {             
-               if (settings.get('delimiter_type') === "fixed") {
-                 return (
-                   <div className="col-lg-2">
-                     <label>Width</label>
-                   </div>
-                 );
-               }
-             })()}
+            { (settings.get('delimiter_type') === 'fixed') &&
+              <div className="col-lg-2">
+                <label>Width</label>
+              </div>
+            }
           </div>
           { fieldsHTML }
           <div className="form-group">
@@ -109,7 +105,7 @@ class SampleCSV extends Component {
         </div>
         { selectDelimiterHTML }
         { selectCSVHTML }
-        { setFieldsHTML }        
+        { setFieldsHTML }
       </form>
     );
   }
