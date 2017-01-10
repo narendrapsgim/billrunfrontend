@@ -48,7 +48,7 @@ function buildUserRequestData(item, action) {
 
 function requestDataBuilder(collection, item, action) {
   switch (collection) {
-    case 'user': return buildUserRequestData(item, action);
+    case 'users': return buildUserRequestData(item, action);
     default: return new FormData();
   }
 }
@@ -75,7 +75,7 @@ export function saveEntity(collection, action = '') {
     if (action.length > 0) {
       saveAction = action;
     } else {
-      saveAction = item.getIn(['_id', '$id'], null) ? 'update' : 'create';
+      saveAction = item.getIn(['_id', '$id'], '').length > 0 ? 'update' : 'create';
     }
     return apiSaveEntity(collection, item, saveAction).then(
       (success) => { // eslint-disable-line no-unused-vars

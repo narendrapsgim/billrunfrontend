@@ -40,7 +40,7 @@ class UserSetup extends Component {
           { action: 'read' },
         ],
       };
-      this.props.dispatch(getEntity('user', userParams));
+      this.props.dispatch(getEntity('users', userParams));
     }
     if (action === 'new') {
       this.props.dispatch(setPageTitle('Create New User'));
@@ -58,7 +58,7 @@ class UserSetup extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearEntity('user'));
+    this.props.dispatch(clearEntity('users'));
     this.props.dispatch(clearList('users'));
   }
 
@@ -68,7 +68,7 @@ class UserSetup extends Component {
 
   onSave = () => {
     if (this.validate()) {
-      this.props.dispatch(saveEntity('user')).then((response) => {
+      this.props.dispatch(saveEntity('users')).then((response) => {
         if (response === true) {
           this.props.dispatch(showSuccess('User saved successfully'));
           this.onBack();
@@ -80,11 +80,11 @@ class UserSetup extends Component {
   }
 
   onUpdateValue = (path, value = '') => {
-    this.props.dispatch(updateEntityField('user', path, value));
+    this.props.dispatch(updateEntityField('users', path, value));
   }
 
   onDeleteValue = (path) => {
-    this.props.dispatch(deleteEntityField('user', path));
+    this.props.dispatch(deleteEntityField('users', path));
   }
 
   validate = () => {
@@ -150,7 +150,7 @@ class UserSetup extends Component {
 
 
 const mapStateToProps = state => ({
-  user: state.entity.get('user', Immutable.Map()),
+  user: state.entity.get('users', Immutable.Map()),
 });
 
 export default withRouter(connect(mapStateToProps)(UserSetup));
