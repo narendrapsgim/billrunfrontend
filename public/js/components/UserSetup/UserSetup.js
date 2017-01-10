@@ -6,7 +6,7 @@ import Immutable from 'immutable';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import User from './User';
 /* ACTIONS */
-import { getEntity, updateEntityField, deleteEntityField, clearEntity, saveEntity } from '../../actions/entityActions';
+import { getUser, saveUser, clearUser, updateUserField, deleteUserField } from '../../actions/userActions';
 import { clearList } from '../../actions/listActions';
 import { apiBillRunErrorHandler } from '../../common/Api';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
@@ -40,7 +40,7 @@ class UserSetup extends Component {
           { action: 'read' },
         ],
       };
-      this.props.dispatch(getEntity('users', userParams));
+      this.props.dispatch(getUser(userParams));
     }
     if (action === 'new') {
       this.props.dispatch(setPageTitle('Create New User'));
@@ -58,7 +58,7 @@ class UserSetup extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearEntity('users'));
+    this.props.dispatch(clearUser());
     this.props.dispatch(clearList('users'));
   }
 
@@ -68,7 +68,7 @@ class UserSetup extends Component {
 
   onSave = () => {
     if (this.validate()) {
-      this.props.dispatch(saveEntity('users')).then((response) => {
+      this.props.dispatch(saveUser()).then((response) => {
         if (response === true) {
           this.props.dispatch(showSuccess('User saved successfully'));
           this.onBack();
@@ -80,11 +80,11 @@ class UserSetup extends Component {
   }
 
   onUpdateValue = (path, value = '') => {
-    this.props.dispatch(updateEntityField('users', path, value));
+    this.props.dispatch(updateUserField(path, value));
   }
 
   onDeleteValue = (path) => {
-    this.props.dispatch(deleteEntityField('users', path));
+    this.props.dispatch(deleteUserField(path));
   }
 
   validate = () => {
