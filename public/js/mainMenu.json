@@ -194,6 +194,7 @@
     "icon": "",
     "route": "custom_fields",
     "show": true,
+    "roles": ["admin"],
     "order": 6,
     "parent": "settings"
   }
