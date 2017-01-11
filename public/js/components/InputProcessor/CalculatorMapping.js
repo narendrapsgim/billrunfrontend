@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button, HelpBlock } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 
 export default class CalculatorMapping extends Component {
@@ -10,6 +10,7 @@ export default class CalculatorMapping extends Component {
     onSetLineKey: PropTypes.func.isRequired,
     onSetRating: PropTypes.func.isRequired,
     settings: PropTypes.instanceOf(Immutable.Map),
+    subscriberFields: PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
@@ -31,7 +32,10 @@ export default class CalculatorMapping extends Component {
   }
 
   getAvailableTargetFields = () => {
-    const optionsKeys = ['sid', 'aid'];
+    const { subscriberFields } = this.props;
+    const optionsKeys = subscriberFields
+      .filter(field => field.get('unique', false))
+      .map(field => field.get('field_name', ''));
     const options = [
       (<option disabled value="-1" key={-1}>Select Field</option>),
       ...optionsKeys.map((field, key) => <option value={field} key={key}>{field}</option>),
