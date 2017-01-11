@@ -214,7 +214,7 @@ export default class PlanIncludeGroupCreate extends Component {
           <FormGroup validationState={error.length > 0 ? "error" : null} >
             <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`${usage} includes`)}</Col>
             <Col sm={8}>
-              <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
+              <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" />
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
             </Col>
           </FormGroup>,
