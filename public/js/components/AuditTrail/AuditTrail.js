@@ -42,7 +42,7 @@ class AuditTrail extends Component {
       fields: {},
       page: 0,
       size: 10,
-      sort: '',
+      sort: JSON.stringify({ urt: -1 }),
       filter: {},
     };
   }

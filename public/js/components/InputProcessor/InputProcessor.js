@@ -20,6 +20,7 @@ class InputProcessor extends Component {
 
   static propTypes = {
     settings: PropTypes.instanceOf(Immutable.Map),
+    subscriberFields: PropTypes.instanceOf(Immutable.List),
     dispatch: PropTypes.func.isRequired,
     router: React.PropTypes.shape({
       push: React.PropTypes.func.isRequired,
@@ -28,6 +29,7 @@ class InputProcessor extends Component {
 
   static defaultProps = {
     settings: Immutable.Map(),
+    subscriberFields: Immutable.List(),
   };
 
   constructor(props) {
@@ -77,7 +79,7 @@ class InputProcessor extends Component {
     } else if (template) {
       this.props.dispatch(setInputProcessorTemplate(Templates[template]));
     }
-    this.props.dispatch(getSettings(['usage_types']));
+    this.props.dispatch(getSettings(['usage_types', 'subscribers.subscriber.fields']));
     if (action === 'new' && (type === 'api' && format === 'json')) {
       this.props.dispatch(setParserSetting('type', 'realtime'));
       this.props.dispatch(setDelimiterType('json'));
@@ -336,18 +338,18 @@ class InputProcessor extends Component {
 
   render() {
     const { stepIndex } = this.state;
-    const { settings, usage_types } = this.props;
+    const { settings, usage_types, subscriberFields } = this.props;
     const { action, type, format } = this.props.location.query;
 
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} onRemoveAllFields={this.onRemoveAllFields} settings={settings} onMoveFieldUp={this.onMoveFieldUp} onMoveFieldDown={this.onMoveFieldDown} onChangeCSVField={this.onChangeCSVField} type={type} format={format} onSelectJSON={this.onSelectJSON} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} onSetStaticUsaget={this.onSetStaticUsaget} setUsagetType={this.setUsagetType} settings={settings} usageTypes={usage_types} unsetField={this.unsetField} />),
-      (<CalculatorMapping onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} />),
+      (<CalculatorMapping onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} subscriberFields={subscriberFields} />),
     ];
     if (type === 'api') {
       steps.push(<RealtimeMapping settings={settings} onChange={this.onChangeRealtimeField} onChangeDefault={this.onChangeRealtimeDefaultField} />);
     } else {
-      steps.push(<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver', Immutable.Map())} />);
+      steps.push(<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver', Immutable.Map())} action={action}/>);
     }
 
     return (
@@ -382,6 +384,7 @@ class InputProcessor extends Component {
 const mapStateToProps = state => ({
   settings: state.inputProcessor,
   usage_types: state.settings.get('usage_types', Immutable.List()),
+  subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
 });
 
 export default withRouter(connect(mapStateToProps)(InputProcessor));

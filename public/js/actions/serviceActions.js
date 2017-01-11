@@ -32,35 +32,27 @@ function apiFetchItem(id){
   return apiBillRun(query);
 }
 
-function apiSaveItem(item, action){
-
+function apiSaveItem(item, action) {
   const formData = new FormData();
-  formData.append('method', action);
-
-  if(action === 'create'){
-    let itemFrom = moment(); //.format(globalSetting.apiDateTimeFormat)
-    let itemTo = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
-    item = item.set('from', itemFrom).set('to', itemTo);
-    formData.append('query', JSON.stringify(item));
-  }
-
-  else if(action === 'update'){
-    let query = {'_id': item.getIn(['_id', '$id'], 'undefined')};
+  if (action === 'create') {
+    const itemFrom = moment();
+    const itemTo = moment().add(100, 'years');
+    formData.append('update', JSON.stringify(item.set('from', itemFrom).set('to', itemTo)));
+  } else if (action === 'update') {
+    const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+    const update = item.delete('to').delete('from').delete('_id');
     formData.append('query', JSON.stringify(query));
-
-    item = item.delete('to').delete('from').delete('_id');
-    formData.append('update', JSON.stringify(item));
+    formData.append('update', JSON.stringify(update));
   }
 
   const query = {
-    api: 'services',
+    entity: 'services',
+    action,
     options: {
       method: 'POST',
-      body: formData
+      body: formData,
     },
   };
-
-  console.log('Save item : ', item.toJS());
   return apiBillRun(query);
 }
 
