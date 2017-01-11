@@ -26,7 +26,7 @@ const PLAN_CYCLE_UNLIMITED = globalSetting.planCycleUnlimitedValue;
 const defaultState = Immutable.Map();
 const defaultTariff = Immutable.Map({
   price: '',
-  from: '',
+  from: 0,
   to: PLAN_CYCLE_UNLIMITED
 });
 
@@ -54,7 +54,7 @@ export default function (state = defaultState, action) {
     case ADD_TARIFF: {
       // If trail add to head
       if (action.trial) {
-        const trial = defaultTariff.set('trial', true).set('from', 0);
+        const trial = defaultTariff.set('trial', true);
         if (!state.get('price', Immutable.List()).isEmpty()) {
           return state.update('price', Immutable.List(), list => list.unshift(trial.set('to', '')));
         }
@@ -65,19 +65,28 @@ export default function (state = defaultState, action) {
       return state.update('price', Immutable.List(), list =>
         list
           .update(list.size - 1, Immutable.Map(), item => item.set('to', ''))
-          .push(defaultTariff)
+          .push(defaultTariff.set('from', ''))
       );
     }
 
-    case REMOVE_TARIFF:
-      if (action.index < 1) {
-        return state.update('price', Immutable.List(), list => list.delete(action.index));
+    case REMOVE_TARIFF: {
+      if (action.index === 0) { // removed first item
+        return state.update('price', Immutable.List(), (list) => {
+          if (list.size > 1) { // there is other items in list, update next item from to 0
+            return list
+              .update(action.index + 1, Immutable.Map(), item => item.set('from', 0))
+              .delete(action.index);
+          }
+          return list.delete(action.index); // only on item, delete it
+        });
       }
+      // item removed from end and there is other items (index > 0)
       return state.update('price', Immutable.List(), list =>
         list
           .update(action.index - 1, item => item.set('to', PLAN_CYCLE_UNLIMITED))
           .delete(action.index)
       );
+    }
 
     case GOT_PLAN:
       return Immutable.fromJS(action.plan);
