@@ -45,7 +45,7 @@ export default class User extends Component {
     if (value.length === 0) {
       errorMessage = 'Password is required';
     }
-    this.props.onDeleteValue('password');
+    this.props.onUpdateValue('password', '');
     this.setState({
       errors: Object.assign({}, errors, { password: errorMessage }),
       password: value,
@@ -68,7 +68,7 @@ export default class User extends Component {
     if (errorMessage.length === 0) {
       this.props.onUpdateValue('password', value);
     } else {
-      this.props.onDeleteValue('password');
+      this.props.onUpdateValue('password', '');
     }
     this.setState({
       errors: Object.assign({}, errors, { password1: errorMessage }),
@@ -98,6 +98,7 @@ export default class User extends Component {
         password1: '',
       });
     } else {
+      this.props.onUpdateValue('password', '');
       this.setState({ enableChangePassword: checked });
     }
   }
