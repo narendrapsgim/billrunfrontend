@@ -2,13 +2,13 @@ import React from 'react';
 import Diff from 'react-diff';
 import { Modal, Button } from 'react-bootstrap';
 
-const DiffModal = ({ inputA, inputB, title, show, onClose, diffType, closeLabel }) => (
+const DiffModal = ({ inputNew, inputOld, title, show, onClose, diffType, closeLabel }) => (
   <Modal show={show} onHide={onClose}>
     <Modal.Header closeButton>
       <Modal.Title>{title}</Modal.Title>
     </Modal.Header>
     <Modal.Body>
-      <Diff inputA={inputA} inputB={inputB} type={diffType} />
+      <Diff inputA={inputOld} inputB={inputNew} type={diffType} />
     </Modal.Body>
     <Modal.Footer>
       <div className="push-left" style={{ width: '50%', display: 'inline-block' }}>
@@ -30,8 +30,8 @@ DiffModal.defaultProps = {
 };
 
 DiffModal.propTypes = {
-  inputA: React.PropTypes.any.isRequired,
-  inputB: React.PropTypes.any.isRequired,
+  inputNew: React.PropTypes.any.isRequired,
+  inputOld: React.PropTypes.any.isRequired,
   onClose: React.PropTypes.func.isRequired,
   show: React.PropTypes.bool,
   closeLabel: React.PropTypes.string,
