@@ -5,8 +5,8 @@ export function titlize(str) {
   return _.capitalize(str.replace(/_/g, ' '));
 }
 
-export function getFieldName(field, collection) {
-  if (FieldNames[collection]) return FieldNames[collection][field] || field;
+export function getFieldName(field, category) {
+  if (FieldNames[category]) return FieldNames[category][field] || field;
   return FieldNames[field] || field;
 }
 
