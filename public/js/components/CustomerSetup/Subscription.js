@@ -27,10 +27,50 @@ export default class Subscription extends Component {
     all_services: Immutable.List(),
   };
 
-  state = {
-    systemFields: this.initSystemFields(),
-    customFields: this.initCustomFields(),
+  constructor(props) {
+    super(props);
+    this.state = {
+      systemFields: this.initSystemFields(),
+      customFields: this.initCustomFields(),
+    };
   }
+
+  initSystemFields = () => {
+    const { subscription } = this.props;
+    if (!subscription) {
+      return Immutable.Map();
+    }
+    return Immutable.Map({
+      plan: subscription.get('plan', ''),
+      services: subscription.get('services', Immutable.List()).toArray(),
+    });
+  }
+
+  initCustomFields = () => {
+    const { settings, subscription } = this.props;
+    if (!subscription) {
+      return Immutable.Map();
+    }
+    const FieldData = Immutable.Record({
+      value: '',
+      type: 'text',
+      label: '',
+      params: null,
+    });
+
+    return Immutable.Map({}).withMutations((customFieldsWithMutations) => {
+      settings.filter(this.filterCustomFields).forEach((field) => {
+        const fieldData = new FieldData({
+          value: subscription.get(field.field_name, ''),
+          type: field.get('select_list', false) ? 'select' : 'text',
+          label: field.get('title', ''),
+          params: field.get('select_list', false) ? field.get('select_options', []).split(',') : null,
+        });
+        customFieldsWithMutations.set(field.get('field_name', 'defaultFieldName'), fieldData);
+      });
+    });
+  }
+
 
   onChangePlan = (plan) => {
     const { systemFields } = this.state;
@@ -94,41 +134,6 @@ export default class Subscription extends Component {
       value: service.get('name'),
       label: service.get('name'),
     }));
-  }
-
-  initSystemFields = () => {
-    const { subscription } = this.props;
-    if (!subscription) {
-      return Immutable.Map();
-    }
-    return Immutable.Map({
-      plan: subscription.get('plan', ''),
-      services: subscription.get('services', Immutable.List()).toArray(),
-    });
-  }
-
-  initCustomFields = () => {
-    const { settings, subscription } = this.props;
-    if (!subscription) {
-      return Immutable.Map();
-    }
-    const FieldData = Immutable.Record({
-      value: '',
-      type: 'text',
-      label: '',
-      params: null,
-    });
-    return Immutable.Map({}).withMutations((customFieldsWithMutations) => {
-      settings.filter(this.filterCustomFields).forEach((field) => {
-        const fieldData = new FieldData({
-          value: subscription.get(field.field_name, ''),
-          type: field.get('select_list', false) ? 'select' : 'text',
-          label: field.get('title', ''),
-          params: field.get('select_list', false) ? field.get('select_options', []).split(',') : null,
-        });
-        customFieldsWithMutations.set(field.get('field_name', 'defaultFieldName'), fieldData);
-      });
-    });
   }
 
   filterCustomFields = (field) => {
