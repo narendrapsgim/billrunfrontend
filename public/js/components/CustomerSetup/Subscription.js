@@ -64,7 +64,7 @@ export default class Subscription extends Component {
           value: subscription.get(field.get('field_name'), ''),
           type: field.get('select_list', false) ? 'select' : 'text',
           label: field.get('title', ''),
-          params: field.get('select_list', false) ? field.get('select_options', []).split(',') : null,
+          params: field.get('select_list', false) ? field.get('select_options', '').split(',') : null,
         });
         customFieldsWithMutations.set(field.get('field_name', 'defaultFieldName'), fieldData);
       });
