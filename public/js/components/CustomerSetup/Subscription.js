@@ -9,7 +9,7 @@ import Field from '../Field';
 export default class Subscription extends Component {
 
   static propTypes = {
-    subscription: React.PropTypes.oneOfType([
+    subscription: PropTypes.oneOfType([
       PropTypes.instanceOf(Immutable.Map),
       null,
     ]),
@@ -61,7 +61,7 @@ export default class Subscription extends Component {
     return Immutable.Map({}).withMutations((customFieldsWithMutations) => {
       settings.filter(this.filterCustomFields).forEach((field) => {
         const fieldData = new FieldData({
-          value: subscription.get(field.field_name, ''),
+          value: subscription.get(field.get('field_name'), ''),
           type: field.get('select_list', false) ? 'select' : 'text',
           label: field.get('title', ''),
           params: field.get('select_list', false) ? field.get('select_options', []).split(',') : null,
