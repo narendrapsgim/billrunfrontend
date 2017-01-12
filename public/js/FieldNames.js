@@ -1,4 +1,7 @@
 const FieldNames = {
+  customerIdentification: {
+    sid: 'Subscriber id (BillRun system field)',
+  },
   lines: {
     arate: 'Product reference',
     arate_key: 'Product name',
