@@ -1,65 +1,87 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router';
-import List from '../List';
-import { Button } from "react-bootstrap";
-import Immutable from 'immutable';
+import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
+import Immutable from 'immutable';
+import { Button } from 'react-bootstrap';
+import changeCase from 'change-case';
+import List from '../List';
 
 
 export default class SubscriptionsList extends Component {
-  constructor(props) {
-    super(props);
 
-    this.subscription_row = this.subscription_row.bind(this);
-  }
+  static propTypes = {
+    subscriptions: PropTypes.instanceOf(Immutable.Iterable),
+    settings: PropTypes.instanceOf(Immutable.List),
+    aid: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
+    defaultListFields: PropTypes.arrayOf(PropTypes.string),
+    onNew: PropTypes.func.isRequired,
+    onClickEdit: PropTypes.func.isRequired,
+  };
 
-  subscription_row(sub) {
-    const { settings } = this.props;
-    return settings.filter(field => { return field.get('display') !== false }).map((field, key) => (
-      <td key={key}>{ sub.get(field.get('field_name')) }</td>
-    ))
-  }
+  static defaultProps = {
+    subscriptions: Immutable.List(),
+    settings: Immutable.List(),
+    defaultListFields: ['firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
+    aid: '',
+  };
+
 
   planActivationParser = (subscription) => {
-    let date = subscription.get('plan_activation', null);
+    const date = subscription.get('plan_activation', null);
     return date ? moment(date).format(globalSetting.datetimeFormat) : '';
   }
 
-  servicesParser = (subscription) => {
-    return subscription.get('services', Immutable.List()).join(', ');
+  servicesParser = subscription => subscription.get('services', Immutable.List()).join(', ');
+
+  addressParser = (subscription) => {
+    if (subscription.get('country', '').length > 0) {
+      return `${subscription.get('address', '')} ,${subscription.get('country', '')}`;
+    }
+    return subscription.get('address', '');
   }
 
-  render() {
-    const { subscriptions,
-            settings,
-            aid,
-            onNew,
-            onClickEdit } = this.props;
+  onClickNew = (e) => {
+    const { aid } = this.props;
+    this.props.onNew(aid, e);
+  }
 
-    const fields = settings
-      .filter(field => { return field.get('display') !== false })
-      .map((field, idx) => {
-        let fieldname = field.get('field_name');
+  getFields = () => {
+    const { settings, defaultListFields } = this.props;
+    return settings
+      .filter(field => (field.get('show_in_list', false) || defaultListFields.includes(field.get('field_name', ''))))
+      .map((field) => {
+        const fieldname = field.get('field_name');
         switch (fieldname) {
           case 'plan_activation':
             return { id: fieldname, parser: this.planActivationParser };
           case 'services':
             return { id: fieldname, parser: this.servicesParser };
-          default:
-            return { id: fieldname };
+          case 'address':
+            return { id: fieldname, parser: this.addressParser };
+          default: {
+            let title = fieldname;
+            if (fieldname === 'firstname') {
+              title = 'first name';
+            } else if (fieldname === 'lastname') {
+              title = 'last name';
+            }
+            return { id: fieldname, title: changeCase.sentenceCase(title) };
+          }
         }
       });
+  }
 
+  render() {
+    const { subscriptions } = this.props;
+    const fields = this.getFields();
     return (
-      <div>
-
-        <div className="row">
-          <div className="col-lg-12">
-            <List items={subscriptions} fields={fields.toArray()} edit={true} onClickEdit={onClickEdit} />
-            <Button bsSize="xsmall" className="btn-primary" onClick={onNew.bind(this, aid)}><i className="fa fa-plus"/>&nbsp;Add New Subscription</Button>
-          </div>
+      <div className="row">
+        <div className="col-lg-12">
+          <List items={subscriptions} fields={fields.toArray()} edit={true} onClickEdit={this.props.onClickEdit} />
+          <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus" />&nbsp;Add New Subscription</Button>
         </div>
-
       </div>
     );
   }
