@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Modal, Col, Button, Form, FormGroup, ControlLabel, Checkbox } from 'react-bootstrap';
 import Immutable from 'immutable';
+import changeCase from 'change-case';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import Help from '../../Help';
 import ConfirmModal from '../../ConfirmModal';
@@ -101,7 +102,7 @@ class PlanIncludeGroupEdit extends Component {
             <FormGroup>
               <Col componentClass={ControlLabel} sm={3}>Include</Col>
               <Col sm={8}>
-                <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" unlimitedValue="UNLIMITED" />
+                <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" />
               </Col>
             </FormGroup>
 
@@ -135,12 +136,13 @@ class PlanIncludeGroupEdit extends Component {
     const confirmMessage = `Are you sure you want to remove ${name} group?`;
     const sharedLabel = shared ? 'Yes' : 'No';
     const productsLabel = groupProducts.join(', ');
+    const valueLabel = changeCase.titleCase(value);
 
     return (
       <tr>
         <td className="td-ellipsis">{name}</td>
         <td className="td-ellipsis">{usaget}</td>
-        <td className="td-ellipsis">{value}</td>
+        <td className="td-ellipsis">{valueLabel}</td>
         <td className="td-ellipsis">{productsLabel}</td>
         <td className="td-ellipsis text-center">{sharedLabel}</td>
         <td className="text-right" style={{ paddingRight: 0 }}>

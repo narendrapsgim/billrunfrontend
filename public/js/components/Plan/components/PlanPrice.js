@@ -84,7 +84,7 @@ export default class PlanPrice extends Component {
     const to = item.get('to', '');
     const from = item.get('from', '');
     switch (to) {
-      case planCycleUnlimitedValue: return 'Unlimited';
+      case planCycleUnlimitedValue: return 'Infinite';
       case '': return '';
       default: return (to - from);
     }

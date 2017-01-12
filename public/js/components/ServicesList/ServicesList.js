@@ -86,7 +86,7 @@ class ServicesList extends Component {
   cyclesParser = (item) => {
     const unlimited = globalSetting.serviceCycleUnlimitedValue;
     const cycle = item.getIn(['price', 0, 'to'], '');
-    return cycle === unlimited ? 'Unlimited' : cycle;
+    return cycle === unlimited ? 'Infinite' : cycle;
   }
 
 
