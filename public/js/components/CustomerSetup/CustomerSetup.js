@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -20,6 +20,14 @@ import PostpaidBalances from '../PostpaidBalances';
 import PrepaidBalances from '../PrepaidBalances';
 
 class CustomerSetup extends Component {
+
+  static propTypes = {
+    activeTab: PropTypes.number
+  };
+
+  static defaultProps = {
+    activeTab: 1,
+  };
   constructor(props) {
     super(props);
 
@@ -29,7 +37,7 @@ class CustomerSetup extends Component {
 
     this.state = {
       invalidFields: Immutable.List(),
-      current: 1
+      current: Number.isInteger(props.activeTab) ? props.activeTab : 1,
     };
   }
 
@@ -166,7 +174,10 @@ class CustomerSetup extends Component {
   }
 
   onClickNewSubscription(aid, e) {
-    window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url="${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}"`;
+    const returnUrl = `${window.location.origin}/#/customer?action=update&aid=${aid}&tab=2`
+    const returnUrlParam = `return_url=${encodeURIComponent(returnUrl)}`;
+    const aidParam = `aid=${encodeURIComponent(`${aid}`)}`;
+    window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}`;
   }
 
   onSaveSubscription = (subscription, data, callback) => {
@@ -226,7 +237,7 @@ class CustomerSetup extends Component {
     const { customer, subscriptions, settings, plans, services } = this.props;
     const { action } = this.props.location.query;
     const aid = parseInt(this.props.location.query.aid, 10);
-    const { invalidFields } = this.state;
+    const { invalidFields, current } = this.state;
 
     const tabs = [(
       <Tab title="Customer Details" eventKey={1} key={1}>
@@ -279,7 +290,7 @@ class CustomerSetup extends Component {
 
         <div className="row">
           <div className="col-lg-12">
-            <Tabs defaultActiveKey={1} animation={false} id="CustomerEditTabs" onSelect={(current) => { this.setState({current}); } }>
+            <Tabs defaultActiveKey={current} animation={false} id="CustomerEditTabs" onSelect={(current) => { this.setState({current}); } }>
               { tabs }
             </Tabs>
           </div>
@@ -299,8 +310,11 @@ CustomerSetup.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
 
-function mapStateToProps(state) {
+function mapStateToProps(state, props) {
+  const { tab } = props.location.query;
+  const activeTab = (typeof tab === 'undefined') ? tab : parseInt(tab);
   return {
+    activeTab,
     customer: state.entity.get('customer') || Immutable.Map(),
     subscriptions: state.list.get('subscriptions') || Immutable.List(),
     settings: state.settings.get('subscribers') || Immutable.List(),
