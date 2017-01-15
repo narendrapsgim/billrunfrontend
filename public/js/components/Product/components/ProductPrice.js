@@ -9,9 +9,9 @@ export default class ProductPrice extends Component {
     index: PropTypes.number.isRequired,
     count: PropTypes.number.isRequired,
     item: PropTypes.object.isRequired,
-    productUnlimitedValue: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number,
+    productUnlimitedValue: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
     ]).isRequired,
     onProductEditRate: PropTypes.func.isRequired,
     onProductRemoveRate: PropTypes.func.isRequired,
@@ -102,7 +102,7 @@ export default class ProductPrice extends Component {
     const from = item.get('from', 0);
     const fromDisplayValue = (from > 0 ? from + 1 : from);
     const to = item.get('to', '');
-    const toDisplayValue = (to === productUnlimitedValue) ? 'Unlimited' : to;
+    const toDisplayValue = (to === productUnlimitedValue) ? 'Infinite' : to;
 
     return (
       <Row className="form-inner-edit-row">

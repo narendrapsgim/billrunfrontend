@@ -58,9 +58,9 @@ class DetailsParser extends Component {
     const { item } = this.props;
     const dataNew = item.get('new', Immutable.Map());
     const dataOld = item.get('old', Immutable.Map());
-    const itemA = dataNew.delete('_id').toJS();
-    const itemB = dataOld.delete('_id').toJS();
-    return (<DiffModal show={showDiff} onClose={this.closeDiff} inputA={itemA} inputB={itemB} />);
+    const itemNew = dataNew.delete('_id').toJS();
+    const itemOld = dataOld.delete('_id').toJS();
+    return (<DiffModal show={showDiff} onClose={this.closeDiff} inputNew={itemNew} inputOld={itemOld} />);
   }
 
   renderMessage = () => {

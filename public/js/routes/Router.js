@@ -63,7 +63,7 @@ const routes = () => (
     <Route path="/settings" component={RequireAuth(Settings)} title="General Settings" />
     <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
     <Route path="/users" component={RequireAuth(User)} title="Users" />
-    <Route path="/user" component={RequireAuth(UserSetup)} title="User" />
+    <Route path="/user" component={RequireAuth(UserSetup)} />
     <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Create New Input Processor" />
     <Route path="/collections" component={RequireAuth(Collections)} title="Collection" />
     <Route path="/collection(/:itemId)(/:action)" component={RequireAuth(Collection)} />

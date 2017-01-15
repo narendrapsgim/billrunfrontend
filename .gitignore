@@ -10,3 +10,4 @@ public/vendors/
 public/*.hot-update.js*
 public/*.hot-update.json
 public/build/*
+dist/*

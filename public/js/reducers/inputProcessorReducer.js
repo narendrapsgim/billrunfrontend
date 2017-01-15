@@ -19,7 +19,6 @@ import { SET_NAME,
          SET_RECEIVER_FIELD,
          SET_FIELD_WIDTH,
          CLEAR_INPUT_PROCESSOR,
-         GOT_INPUT_PROCESSORS,
          REMOVE_USAGET_MAPPING,
          SET_USAGET_TYPE,
          SET_STATIC_USAGET,
@@ -40,7 +39,6 @@ const defaultState = Immutable.fromJS({
   field_widths: {},
   processor: {
     usaget_mapping: [],
-    static_usaget_mapping: {},
   },
   customer_identification_fields: [],
   rate_calculators: {},
@@ -48,6 +46,16 @@ const defaultState = Immutable.fromJS({
    *   passive: false,
    *   delete_received: false
    * }*/
+});
+
+const defaultCustomerIdentification = Immutable.fromJS({
+  target_key: 'sid',
+  src_key: '',
+  conditions: [{
+    field: 'usaget',
+    regex: "/.*/",
+  }],
+  clear_regex: '//',
 });
 
 export default function (state = defaultState, action) {
@@ -91,30 +99,30 @@ export default function (state = defaultState, action) {
       return state.set('fields', Immutable.List());
 
     case SET_USAGET_TYPE:
-      return state.set('usaget_type', action.usaget_type);
+      return state
+        .set('usaget_type', action.usaget_type)
+        .set('customer_identification_fields', Immutable.List())
+        .setIn(['processor', 'usaget_mapping'], Immutable.List())
+        .setIn(['processor', 'default_usaget'], '')
+        .setIn(['processor', 'src_field'], '')
+        .setIn(['rate_calculators'], Immutable.Map());
 
-    case SET_STATIC_USAGET:
-      return state.setIn(['processor', 'default_usaget'], action.usaget).setIn(['rate_calculators', action.usaget], Immutable.List())
+    case SET_STATIC_USAGET: {
+      const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], `/^${action.usaget}$/`);
+      return state
+        .setIn(['processor', 'default_usaget'], action.usaget)
+        .setIn(['rate_calculators', action.usaget], Immutable.List())
+        .update('customer_identification_fields', Immutable.List(), list => list.clear().push(customerIdentification));
+    }
 
     case MAP_USAGET: {
       const { pattern, usaget } = action.mapping;
-      const newMap = Immutable.fromJS({
-        pattern,
-        usaget,
-      });
-      const customerIdentification = Immutable.fromJS({
-        target_key: 'sid',
-        src_key: '',
-        conditions: [{
-          field: 'usaget',
-          regex: `/^${usaget}$/`,
-        }],
-        clear_regex: '//',
-      });
+      const newMap = Immutable.fromJS({ pattern, usaget });
+      const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], `/^${usaget}$/`);
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.push(newMap))
         .setIn(['rate_calculators', usaget], Immutable.List())
-        .updateIn(['customer_identification_fields'], list => list.push(customerIdentification));
+        .update('customer_identification_fields', Immutable.List(), list => list.push(customerIdentification));
     }
 
     case REMOVE_USAGET_MAPPING:
