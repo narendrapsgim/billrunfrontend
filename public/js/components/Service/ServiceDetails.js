@@ -91,7 +91,7 @@ export default class ServiceDetails extends Component {
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Cycles</Col>
           <Col sm={4}>
-            <Field value={item.getIn(['price', 0, 'to'], '')} onChange={this.onChangeCycle} fieldType="unlimited" unlimitedValue={serviceCycleUnlimitedValue} />
+            <Field value={item.getIn(['price', 0, 'to'], '')} onChange={this.onChangeCycle} fieldType="unlimited" unlimitedValue={serviceCycleUnlimitedValue} unlimitedLabel="Infinite" />
           </Col>
         </FormGroup>
 

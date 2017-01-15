@@ -102,7 +102,7 @@ export default class ProductPrice extends Component {
     const from = item.get('from', 0);
     const fromDisplayValue = (from > 0 ? from + 1 : from);
     const to = item.get('to', '');
-    const toDisplayValue = (to === productUnlimitedValue) ? 'Unlimited' : to;
+    const toDisplayValue = (to === productUnlimitedValue) ? 'Infinite' : to;
 
     return (
       <Row className="form-inner-edit-row">

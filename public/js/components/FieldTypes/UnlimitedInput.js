@@ -6,6 +6,7 @@ export default class UnlimitedInput extends Component {
 
   static defaultProps = {
     unlimitedLabel: 'Unlimited',
+    unlimitedValue: 'UNLIMITED',
   };
 
   static propTypes = {
@@ -16,7 +17,7 @@ export default class UnlimitedInput extends Component {
     unlimitedValue: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.number,
-    ]).isRequired,
+    ]),
     unlimitedLabel: React.PropTypes.string,
     onChange: React.PropTypes.func.isRequired,
   }
