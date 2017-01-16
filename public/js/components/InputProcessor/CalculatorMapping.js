@@ -67,11 +67,13 @@ export default class CalculatorMapping extends Component {
     const { onSetLineKey, onSetRating, onRemoveRating } = this.props;
     const availableFields = this.getAvailableFields(true);
     return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => {
-      let selectedRadio = 3;
+      let selectedRadio = 4;
       if (calc.get('type', '') === 'longestPrefix') {
-        selectedRadio = 2;
+        selectedRadio = 3;
       } else if (calc.get('rate_key', '') === 'key') {
         selectedRadio = 1;
+      } else if (calc.get('rate_key', '') === 'usaget') {
+        selectedRadio = 2;
       }
       return (
         <div>
@@ -111,10 +113,25 @@ export default class CalculatorMapping extends Component {
                 <input
                   type="radio"
                   name={`${usaget}-${calcKey}-type`}
+                  id={`${usaget}-${calcKey}-by-rate-usaget`}
+                  value="match"
+                  data-usaget={usaget}
+                  data-rate_key="usaget"
+                  data-index={calcKey}
+                  checked={selectedRadio === 2}
+                  onChange={onSetRating}
+                />&nbsp;
+                <label htmlFor={`${usaget}-${calcKey}-by-rate-usaget`} style={{ verticalAlign: 'middle' }}>By product unit type</label>
+              </FormGroup>
+
+              <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
+                <input
+                  type="radio"
+                  name={`${usaget}-${calcKey}-type`}
                   id={`${usaget}-${calcKey}-longest-prefix`}
                   value="longestPrefix"
                   data-usaget={usaget}
-                  checked={selectedRadio === 2}
+                  checked={selectedRadio === 3}
                   data-rate_key="params.prefix"
                   data-index={calcKey}
                   onChange={onSetRating}
@@ -131,7 +148,7 @@ export default class CalculatorMapping extends Component {
                       id={`${usaget}-${calcKey}-by-param`}
                       value="match"
                       data-usaget={usaget}
-                      checked={selectedRadio === 3}
+                      checked={selectedRadio === 4}
                       data-rate_key="params."
                       data-index={calcKey}
                       onChange={onSetRating}
@@ -145,8 +162,8 @@ export default class CalculatorMapping extends Component {
                     id={`${usaget}-${calcKey}-by-param-name`}
                     data-usaget={usaget}
                     data-index={calcKey}
-                    checked={selectedRadio !== 3}
-                    value={selectedRadio !== 3 ? '' : calc.get('rate_key', '').replace('params.', '')}
+                    checked={selectedRadio !== 4}
+                    value={selectedRadio !== 4 ? '' : calc.get('rate_key', '').replace('params.', '')}
                     onChange={this.onChangeAdditionalParamRating}
                   />
                 </div>
