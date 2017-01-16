@@ -5,7 +5,7 @@ import moment from 'moment';
 
 /* ACTIONS */
 import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
-import { getList, clearList } from '../../actions/listActions';
+import { getList, clearList, getPaymentGateways } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
@@ -22,11 +22,13 @@ import PrepaidBalances from '../PrepaidBalances';
 class CustomerSetup extends Component {
 
   static propTypes = {
-    activeTab: PropTypes.number
+    activeTab: PropTypes.number,
+    supportedGateways: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
     activeTab: 1,
+    supportedGateways: Immutable.List(),
   };
   constructor(props) {
     super(props);
@@ -88,6 +90,7 @@ class CustomerSetup extends Component {
           }) }
         ]
       };
+      this.props.dispatch(getPaymentGateways());
       this.props.dispatch(getEntity('customer', customer_params));
       this.props.dispatch(getList('subscriptions', subscriptions_params));
       this.props.dispatch(getList('plans', plans_params));
@@ -154,6 +157,7 @@ class CustomerSetup extends Component {
               aid: success.data[0].data.details.aid
             }
           });
+          this.props.dispatch(setPageTitle('Edit Customer'));
         }
       },
       failure => {
@@ -178,6 +182,14 @@ class CustomerSetup extends Component {
     const returnUrlParam = `return_url=${encodeURIComponent(returnUrl)}`;
     const aidParam = `aid=${encodeURIComponent(`${aid}`)}`;
     window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}`;
+  }
+
+  onClickChangePaymentGateway(aid, e) {
+    const returnUrl = `${window.location.origin}/#/customer?action=update&aid=${aid}&tab=2`
+    const returnUrlParam = `return_url=${encodeURIComponent(returnUrl)}`;
+    const aidParam = `aid=${encodeURIComponent(aid)}`;
+    const action = `action=${encodeURIComponent('updatePaymentGateway')}`;
+    window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}&${action}`;
   }
 
   onSaveSubscription = (subscription, data, callback) => {
@@ -234,7 +246,7 @@ class CustomerSetup extends Component {
   }
 
   render() {
-    const { customer, subscriptions, settings, plans, services } = this.props;
+    const { customer, subscriptions, settings, plans, services, supportedGateways } = this.props;
     const { action } = this.props.location.query;
     const aid = parseInt(this.props.location.query.aid, 10);
     const { invalidFields, current } = this.state;
@@ -247,7 +259,9 @@ class CustomerSetup extends Component {
             action={action}
             invalidFields={ invalidFields }
             settings={settings.getIn(['account', 'fields'])}
+            supportedGateways={supportedGateways}
             onChange={this.onChangeCustomerField}
+            onChangePaymentGateway={this.onClickChangePaymentGateway}
           />
         </Panel>
     </Tab>
@@ -319,7 +333,8 @@ function mapStateToProps(state, props) {
     subscriptions: state.list.get('subscriptions') || Immutable.List(),
     settings: state.settings.get('subscribers') || Immutable.List(),
     plans: state.list.get('plans') || Immutable.List(),
-    services: state.list.get('customer_available_services') || Immutable.List()
+    services: state.list.get('customer_available_services') || Immutable.List(),
+    supportedGateways: state.list.get('supported_gateways') || undefined,
   };
 }
 

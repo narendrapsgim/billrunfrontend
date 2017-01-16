@@ -1,20 +1,27 @@
-import React, {Component} from 'react';
+import React, { Component, PropTypes } from 'react';
 import {Link} from 'react-router';
 import { connect } from 'react-redux';
+import Immutable from 'immutable';
 import moment from 'moment';
-import { Form, FormGroup, Col, FormControl, ControlLabel} from 'react-bootstrap';
+import { Form, FormGroup, Col, Button, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
 import countries from './countries.data.json';
 
 class Customer extends Component {
-  constructor(props) {
-    super(props);
 
-    this.onCountryChange = this.onCountryChange.bind(this);
-  }
+  static propTypes = {
+    customer: PropTypes.instanceOf(Immutable.Map),
+    supportedGateways: PropTypes.instanceOf(Immutable.List),
+    onChangePaymentGateway: PropTypes.func.isRequired,
+  };
 
-  onCountryChange(val) {
+  static defaultProps = {
+    customer: Immutable.Map(),
+    supportedGateways: Immutable.List(),
+  };
+
+  onCountryChange = (val) => {
     var pseudoE = {};
     pseudoE.target = {id: 'country', value: val};
     this.props.onChange(pseudoE);
@@ -25,6 +32,38 @@ class Customer extends Component {
     this.props.onChange(e);
   };
 
+  onChangePaymentGateway = () => {
+    const { customer } = this.props;
+    const aid = customer.get('aid', null);
+    this.props.onChangePaymentGateway(aid);
+  }
+
+  renderChangePaymentGateway = () => {
+    const { customer, supportedGateways } = this.props;
+    if (customer.get('payment_gateway', Immutable.Map()).isEmpty()) {
+      return null;
+    }
+    const customerPgName = customer.getIn(['payment_gateway', 'name'], '');
+    const pg = supportedGateways.filter(item => customerPgName === item.get('name'));
+    const label = (!pg.isEmpty() && pg.get(0).get('image_url', '').length > 0)
+      ? <img src={`${globalSetting.serverUrl}/${pg.get(0).get('image_url', '')}`} height="30" alt={pg.get(0).get('name', '')} />
+      : customerPgName;
+    return (
+      <FormGroup>
+        <Col componentClass={ControlLabel} md={2}>
+          Payment Gateway
+        </Col>
+        <Col sm={7}>
+          {label}
+          <Button onClick={this.onChangePaymentGateway} bsSize="xsmall" style={{ marginLeft: 10, minWidth: 80 }}>
+            <i className="fa fa-pencil" />
+            &nbsp;Change
+          </Button>
+        </Col>
+      </FormGroup>
+    );
+  }
+
   renderInCollection = () => {
     const { customer } = this.props;
     if (customer.get('in_collection', false) === true || customer.get('in_collection', 0) === 1) {
@@ -33,7 +72,7 @@ class Customer extends Component {
     }
     return null;
   }
-  
+
   render() {
     const {customer, onChange, settings, action, invalidFields} = this.props;
 
@@ -103,6 +142,7 @@ class Customer extends Component {
       <div className="Customer">
         <Form horizontal>
           { fields }
+          { (action !== 'new') && this.renderChangePaymentGateway() }
         </Form>
         {(action !== "new") &&
           <div>
