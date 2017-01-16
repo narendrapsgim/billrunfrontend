@@ -5,6 +5,7 @@ import moment from 'moment';
 import Pager from '../Pager';
 import Filter from '../Filter';
 import List from '../List';
+import Credit from '../Credit/Credit';
 import { Button } from "react-bootstrap";
 
 /* ACTIONS */
@@ -26,14 +27,15 @@ class CustomersList extends Component {
     this.state = {
       page: 0,
       sort: '',
-      size: 10
+      size: 10,
+      show: false,
     };
   }
 
   componentDidMount() {
     this.props.dispatch(getSettings("subscribers"));
   }
-  
+
   componentWillUnmount() {
     this.props.dispatch(clearList('customers'));
   }
@@ -73,7 +75,7 @@ class CustomersList extends Component {
       this.props.dispatch(getList("customers", this.buildQuery()))
     });
   }
-  
+
   onFilter(filter) {
     this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList("customers", this.buildQuery()))
@@ -86,6 +88,14 @@ class CustomersList extends Component {
     });
   }
 
+  onShow = () => {
+    this.setState({show: true});
+  }
+
+  onClose = () => {
+    this.setState({show: false});
+  }
+
   render() {
     const { customers, account } = this.props;
     const fields =
@@ -94,7 +104,7 @@ class CustomersList extends Component {
                return {
                  id: field.get('field_name'),
                  placeholder: field.get('title', field.get('field_name')),
-                 sort: true                              
+                 sort: true
                };
              })
              .toJS();
@@ -112,6 +122,14 @@ class CustomersList extends Component {
                 </div>
               </div>
               <div className="panel-body">
+                <Button bsSize="xsmall" className="btn-primary" onClick={this.onShow}>SHOW</Button>
+                {this.state.show ?
+                  <Credit
+                    onClose={this.onClose}
+                    sid={777777777}
+                    aid={11111}
+                  />
+                : null}
                 <Filter fields={fields} onFilter={this.onFilter} base={{type: "account", to: {$gt: moment().toISOString()}}} />
                 <List items={customers} fields={fields} editField="firstname" edit={true} onClickEdit={this.onClickCustomer} onSort={this.onSort} />
               </div>
@@ -120,7 +138,7 @@ class CustomersList extends Component {
         </div>
         <Pager onClick={this.handlePageClick}
                size={this.state.size}
-               count={customers.size || 0} />  
+               count={customers.size || 0} />
       </div>
     );
   }
