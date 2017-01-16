@@ -82,7 +82,7 @@ const convert = (settings) => {
 	}
       })
     } else {
-      usaget_mapping = [{}];
+      usaget_mapping = [];
     }
     ret.processor = Object.assign({}, processor, {
       usaget_mapping,

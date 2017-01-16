@@ -228,7 +228,7 @@ export default class CalculatorMapping extends Component {
             </h4>
           </div>
         </div>
-        { this.renderCustomerIdentification() }
+        { this.renderCustomerIdentification().toArray() }
         <div className="separator" />
         <div className="form-group">
           <div className="col-lg-12">
