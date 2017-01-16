@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Row, Col, FormGroup, HelpBlock, Modal, Form } from 'react-bootstrap';
+import { Button, Row, Col, FormGroup, HelpBlock, Modal, Form, ControlLabel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import Field from '../../Field';
@@ -92,34 +92,27 @@ export default class ProductParamEdit extends Component {
         </Modal.Header>
         <Modal.Body>
           <Form horizontal>
-            <Row>
-              <Col lg={3} md={3}>
-                Key
+            <FormGroup validationState={paramKeyError.length > 0 ? 'error' : null}>
+              <Col sm={2} componentClass={ControlLabel}>Key</Col>
+              <Col sm={10}>
+                <Field onChange={this.onChangeParamKey} value={editedData.key} />
+                { paramKeyError.length > 0 ? <HelpBlock>{paramKeyError}</HelpBlock> : ''}
               </Col>
-              <Col lg={6} md={6}>
-                <FormGroup validationState={paramKeyError.length > 0 ? 'error' : null} style={{ margin: 0 }}>
-                  <Field onChange={this.onChangeParamKey} value={editedData.key} />
-                  { paramKeyError.length > 0 ? <HelpBlock>{paramKeyError}</HelpBlock> : ''}
-                </FormGroup>
+            </FormGroup>
+
+            <FormGroup >
+              <Col sm={2} componentClass={ControlLabel}>Values</Col>
+              <Col sm={10}>
+                <Select
+                  allowCreate
+                  disabled={editedData.key === ''}
+                  multi={true}
+                  value={editedData.values.join(',')}
+                  onChange={this.onChangeParamValues}
+                  placeholder={`${addLabel} ${editedData.key}`}
+                />
               </Col>
-            </Row>
-            <Row>
-              <Col lg={3} md={3}>
-                Values
-              </Col>
-              <Col lg={6} md={6}>
-                <FormGroup style={{ margin: 0 }}>
-                  <Select
-                    allowCreate
-                    disabled={editedData.key === ''}
-                    multi={true}
-                    value={editedData.values.join(',')}
-                    onChange={this.onChangeParamValues}
-                    placeholder={`${addLabel} ${editedData.key}`}
-                  />
-                </FormGroup>
-              </Col>
-            </Row>
+            </FormGroup>
           </Form>
         </Modal.Body>
         <Modal.Footer>

@@ -94,7 +94,7 @@ export default class Product extends Component {
 
   onChangeParamValues = (key, values) => {
     const paramPath = ['params', key];
-    this.props.onFieldUpdate(paramPath, Immutable.fromJS(values));
+    this.props.onFieldUpdate(paramPath, Immutable.List(values));
   }
 
   onRemoveParam = (paramKey) => {

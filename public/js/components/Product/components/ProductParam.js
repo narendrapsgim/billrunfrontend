@@ -33,11 +33,6 @@ export default class ProductParam extends Component {
     this.setState({ edit: true });
   };
 
-  onParamSave = (key, values) => {
-    const { paramKey } = this.props;
-    this.props.onProductParamSave(key, paramKey, values, false);
-  }
-
   onParamEditClose = () => {
     this.setState({ edit: false });
   }
@@ -71,7 +66,7 @@ export default class ProductParam extends Component {
         {edit ?
           <ProductParamEdit
             newParam={false}
-            onParamSave={this.onParamSave}
+            onParamSave={this.props.onProductParamSave}
             onParamEditClose={this.onParamEditClose}
             paramKey={paramKey}
             paramValues={paramValues}
