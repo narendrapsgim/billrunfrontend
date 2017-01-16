@@ -89,14 +89,14 @@ export default class CalculatorMapping extends Component {
   renderRateBy = () => {
     const { settings } = this.props;
     const availableFields = this.getAvailableFields();
-    const availableUsagetypes = settings.get('rate_calculators', {}).keySeq().map(usaget => usaget);
+    const availableUsagetypes = settings.get('rate_calculators', Immutable.Map());
 
-    return availableUsagetypes.map((usaget, key) => {
+    return availableUsagetypes.map((rateCalculator, usaget) => {
       const lineKey = settings.getIn(['rate_calculators', usaget, 0, 'line_key'], '');
       const isMatch = settings.getIn(['rate_calculators', usaget, 0, 'type'], '') === 'match';
       const islongestPrefix = settings.getIn(['rate_calculators', usaget, 0, 'type'], '') === 'longestPrefix';
       return (
-        <div key={key}>
+        <div key={usaget}>
           <div className="form-group">
             <div className="col-lg-3">
               <label htmlFor={usaget}>{ usaget }</label>
@@ -139,7 +139,7 @@ export default class CalculatorMapping extends Component {
             </h4>
           </div>
         </div>
-        { this.renderCustomerIdentification() }
+        { this.renderCustomerIdentification().toArray() }
 
         <div className="separator" />
 

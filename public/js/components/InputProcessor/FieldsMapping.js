@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-
+import Immutable from 'immutable';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { Table } from 'react-bootstrap/lib';
 import FontIcon from 'material-ui/FontIcon';
@@ -92,7 +92,7 @@ export default class FieldsMapping extends Component {
             onSetFieldMapping } = this.props;
 
     const available_fields = [(<option disabled value="" key={-1}>Select Field...</option>),
-                              ...settings.get('fields', []).map((field, key) => (
+                              ...settings.get('fields', Immutable.List()).map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
                               ))];
     const available_units = usageTypes.map((usaget, key) => {
@@ -168,7 +168,7 @@ export default class FieldsMapping extends Component {
             <label>Usage types</label>
             <p className="help-block">Types of usages</p>
           </div>
-          <div className="col-lg-1">
+          <div className="col-lg-1" style={{ marginTop: 8 }}>
             <label><input type="radio" style={{ verticalAlign: 'top' }}
                           name="usage_types_type"
                           value="static"
@@ -195,7 +195,7 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-lg-offset-2 col-lg-1">
+          <div className="col-lg-offset-2 col-lg-1" style={{ marginTop: 8 }}>
             <label><input type="radio" style={{ verticalAlign: 'top' }}
                           name="usage_types_type"
                           value="dynamic"
@@ -232,7 +232,7 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
             {
-              settings.getIn(['processor', 'usaget_mapping'], []).map((usage_t, key) => (
+              settings.getIn(['processor', 'usaget_mapping'], Immutable.List()).map((usage_t, key) => (
                 <div className="form-group" key={key}>
                   <div className="col-lg-offset-3 col-lg-7">
                     <div className="col-lg-offset-1 col-lg-10">
