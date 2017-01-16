@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, Col, Row, Panel, Button } from 'react-bootstrap';
 import { getFieldName } from '../../common/Util';
+import Help from '../Help';
 
 export default class CalculatorMapping extends Component {
   static propTypes = {
@@ -27,6 +28,14 @@ export default class CalculatorMapping extends Component {
       }
     });
   };
+
+  onChangeAdditionalParamRating = (e) => {
+    const { value } = e.target;
+    const eModified = Object.assign({}, e);
+    eModified.target.dataset.rate_key = `params.${value}`;
+    eModified.target.value = 'match';
+    this.props.onSetRating(eModified);
+  }
 
   onSetCustomerMapping = (index, e) => {
     const { value, id } = e.target;
@@ -57,68 +66,109 @@ export default class CalculatorMapping extends Component {
   getRateCalculators = (usaget) => {
     const { onSetLineKey, onSetRating, onRemoveRating } = this.props;
     const availableFields = this.getAvailableFields(true);
-    return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => (
-      <Row key={calcKey} style={{ marginBottom: 10 }}>
-        <Col lg={3} md={3} style={{ paddingRight: 0 }}>
-          <FormGroup style={{ margin: 0 }}>
-            <select
-              className="form-control"
-              id={usaget}
-              onChange={onSetLineKey}
-              data-usaget={usaget}
-              data-index={calcKey}
-              value={calc.get('line_key', '')}
-            >
-              { availableFields }
-            </select>
-          </FormGroup>
-        </Col>
+    return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => {
+      let selectedRadio = 3;
+      if (calc.get('type', '') === 'longestPrefix') {
+        selectedRadio = 2;
+      } else if (calc.get('rate_key', '') === 'key') {
+        selectedRadio = 1;
+      }
+      return (
+        <div>
+          <Row key={calcKey} style={{ marginBottom: 10 }}>
+            <Col lg={3} md={3} style={{ paddingRight: 0 }}>
+              <FormGroup style={{ margin: 0 }}>
+                <select
+                  className="form-control"
+                  id={usaget}
+                  onChange={onSetLineKey}
+                  data-usaget={usaget}
+                  data-index={calcKey}
+                  value={calc.get('line_key', '')}
+                >
+                  { availableFields }
+                </select>
+              </FormGroup>
+            </Col>
 
-        <Col lg={3} md={3} style={{ paddingRight: 0, lineHeight: '43px' }}>
-          <FormGroup style={{ margin: 0 }}>
-            <input
-              type="radio"
-              name={`${usaget}-${calcKey}-type`}
-              id={`${usaget}-${calcKey}-by-rate-key`}
-              value="match"
-              data-usaget={usaget}
-              data-rate_key="key"
-              data-index={calcKey}
-              checked={calc.get('type', '') === 'match'}
-              onChange={onSetRating}
-            />&nbsp;
-            <label htmlFor={`${usaget}-${calcKey}-by-rate-key`} style={{ verticalAlign: 'middle' }}>By product key</label>
-          </FormGroup>
-        </Col>
+            <Col lg={6} md={6} style={{ paddingRight: 0 }}>
+              <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
+                <input
+                  type="radio"
+                  name={`${usaget}-${calcKey}-type`}
+                  id={`${usaget}-${calcKey}-by-rate-key`}
+                  value="match"
+                  data-usaget={usaget}
+                  data-rate_key="key"
+                  data-index={calcKey}
+                  checked={selectedRadio === 1}
+                  onChange={onSetRating}
+                />&nbsp;
+                <label htmlFor={`${usaget}-${calcKey}-by-rate-key`} style={{ verticalAlign: 'middle' }}>By product key</label>
+              </FormGroup>
 
-        <Col lg={3} md={3} style={{ paddingRight: 0, lineHeight: '43px' }}>
-          <FormGroup style={{ margin: 0 }}>
-            <input
-              type="radio"
-              name={`${usaget}-${calcKey}-type`}
-              id={`${usaget}-${calcKey}-longest-prefix`}
-              value="longestPrefix"
-              data-usaget={usaget}
-              checked={calc.get('type', '') === 'longestPrefix'}
-              data-rate_key="params.prefix"
-              data-index={calcKey}
-              onChange={onSetRating}
-            />&nbsp;
-            <label htmlFor={`${usaget}-${calcKey}-longest-prefix`} style={{ verticalAlign: 'middle' }}>By longest prefix</label>
-          </FormGroup>
-        </Col>
+              <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
+                <input
+                  type="radio"
+                  name={`${usaget}-${calcKey}-type`}
+                  id={`${usaget}-${calcKey}-longest-prefix`}
+                  value="longestPrefix"
+                  data-usaget={usaget}
+                  checked={selectedRadio === 2}
+                  data-rate_key="params.prefix"
+                  data-index={calcKey}
+                  onChange={onSetRating}
+                />&nbsp;
+                <label htmlFor={`${usaget}-${calcKey}-longest-prefix`} style={{ verticalAlign: 'middle' }}>By longest prefix</label>
+              </FormGroup>
 
-        <Col lg={3} md={3} sm={3} xs={3}>
-          { calcKey > 0 &&
-            <FormGroup style={{ margin: 0 }}>
-              <div style={{ width: '100%', height: 39 }}>
-                <Button onClick={onRemoveRating} data-usaget={usaget} data-index={calcKey} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
-              </div>
-            </FormGroup>
-          }
-        </Col>
-      </Row>
-    ));
+              <FormGroup style={{ margin: 0 }}>
+                <div className="input-group">
+                  <div className="input-group-addon">
+                    <input
+                      type="radio"
+                      name={`${usaget}-${calcKey}-type`}
+                      id={`${usaget}-${calcKey}-by-param`}
+                      value="match"
+                      data-usaget={usaget}
+                      checked={selectedRadio === 3}
+                      data-rate_key="params."
+                      data-index={calcKey}
+                      onChange={onSetRating}
+                    />&nbsp;
+                    <label htmlFor={`${usaget}-${calcKey}-by-param`} style={{ verticalAlign: 'middle' }}>By product param</label>
+                    <Help contents="This field needs to be configured in the 'Additional Parameters' of a Product" />
+                  </div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id={`${usaget}-${calcKey}-by-param-name`}
+                    data-usaget={usaget}
+                    data-index={calcKey}
+                    checked={selectedRadio !== 3}
+                    value={selectedRadio !== 3 ? '' : calc.get('rate_key', '').replace('params.', '')}
+                    onChange={this.onChangeAdditionalParamRating}
+                  />
+                </div>
+              </FormGroup>
+            </Col>
+
+            <Col lg={1} md={1} sm={1} xs={1} />
+
+            <Col lg={2} md={2} sm={2} xs={2}>
+              { calcKey > 0 &&
+                <FormGroup style={{ margin: 0 }}>
+                  <div style={{ width: '100%', height: 39 }}>
+                    <Button onClick={onRemoveRating} data-usaget={usaget} data-index={calcKey} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+                  </div>
+                </FormGroup>
+              }
+            </Col>
+          </Row>
+          <hr />
+        </div>
+      );
+    });
   }
 
   getAddRatingButton = usaget => (<Button bsSize="xsmall" className="btn-primary" data-usaget={usaget} onClick={this.props.onAddRating}><i className="fa fa-plus" />&nbsp;Add</Button>);
@@ -200,7 +250,6 @@ export default class CalculatorMapping extends Component {
                 <div className="col-lg-11">
                   <Panel>
                     { this.getRateCalculators(usaget) }
-                    <br />
                     { this.getAddRatingButton(usaget) }
                   </Panel>
                 </div>
