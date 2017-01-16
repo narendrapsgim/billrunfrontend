@@ -7,6 +7,7 @@ import Field from '../Field';
 import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
 import ProductParam from './components/ProductParam';
+import ProductParamEdit from './components/ProductParamEdit';
 
 
 export default class Product extends Component {
@@ -37,6 +38,7 @@ export default class Product extends Component {
     errors: {
       name: '',
     },
+    newProductParam: false,
   }
 
   componentDidMount() {
@@ -83,20 +85,58 @@ export default class Product extends Component {
     this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixesList));
   }
 
-  onChangeParamKey = (e) => {
-    console.log(e.defaultValue);
-    const { value: newParamKey } = e.target;
-    console.log(newParamKey);
-    //this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixes));
+  onChangeParamKey = (oldKey, newKey) => {
+    const { product } = this.props;
+    const paramValues = product.getIn(['params', oldKey], Immutable.List());
+    const updatedParams = product.get('params', Immutable.Map()).delete(oldKey).set(newKey, paramValues);
+    this.props.onFieldUpdate(['params'], updatedParams);
   }
 
-  onChangeParamValues = (e) => {
-
+  onChangeParamValues = (key, values) => {
+    const paramPath = ['params', key];
+    this.props.onFieldUpdate(paramPath, Immutable.fromJS(values));
   }
 
-  onRemoveParam = (e) => {
-    const { dataset: { paramkey } } = e.target;
-    //this.props.onFieldUpdate(['vatable'], checked);
+  onRemoveParam = (paramKey) => {
+    const { product } = this.props;
+    const updatedParams = product.get('params', Immutable.Map()).delete(paramKey);
+    this.props.onFieldUpdate(['params'], updatedParams);
+  }
+
+  onProductParamSave = (key, oldKey, values, newParam) => {
+    if (!newParam && oldKey !== key) {
+      this.onChangeParamKey(oldKey, key);
+    }
+    this.onChangeParamValues(key, values);
+  }
+
+  onProductParamAdd = () => {
+    this.setState({ newProductParam: true });
+  }
+
+  onParamEditClose = () => {
+    this.setState({ newProductParam: false });
+  }
+
+  getExistingParamKeys = () => {
+    const { product } = this.props;
+    const params = product.get('params', Immutable.Map());
+    return params.keySeq().toList();
+  }
+
+  renderNewProductParam = () => {
+    const { newProductParam } = this.state;
+
+    return newProductParam ?
+    (<ProductParamEdit
+      newParam={true}
+      onParamSave={this.onProductParamSave}
+      onParamEditClose={this.onParamEditClose}
+      paramKey={''}
+      paramValues={[]}
+      existingKeys={this.getExistingParamKeys()}
+    />)
+    : null;
   }
 
   onProductRateUpdate = (index, fieldName, value) => {
@@ -126,11 +166,6 @@ export default class Product extends Component {
     this.props.onProductRateRemove(productPath, index);
   }
 
-  onProductParamAdd = (e) => {
-    // const { value } = e.target;
-    // this.props.onFieldUpdate(['description'], value);
-  }
-
   getUsageTypesOptions = () => {
     const { usageTypes } = this.props;
     return usageTypes.map(usaget => ({ value: usaget, label: usaget })).toJS();
@@ -155,17 +190,22 @@ export default class Product extends Component {
 
   renderParameters = () => {
     const { product } = this.props;
-    const params = product.get('params', Immutable.List());
+    const params = product.get('params', Immutable.Map());
+    const mainParams = Immutable.List(['prefix']);
+    let index = 0;
 
-    return params.map((paramValues, paramKey) =>
-      <ProductParam
-        paramKey={paramKey}
-        paramValues={paramValues}
-        onChangeParamKey={this.onChangeParamKey}
-        onChangeParamValues={this.onChangeParamValues}
-        onRemoveParam={this.onRemoveParam}
-      />
-    );
+    return params
+      .filter((paramValues, paramKey) => !mainParams.includes(paramKey))
+      .map((paramValues, paramKey) =>
+        <ProductParam
+          key={index++}
+          paramKey={paramKey}
+          paramValues={paramValues.toJS()}
+          existingKeys={this.getExistingParamKeys()}
+          onProductParamSave={this.onProductParamSave}
+          onRemoveParam={this.onRemoveParam}
+        />
+    ).toList();
   }
 
   render() {
@@ -256,6 +296,8 @@ export default class Product extends Component {
               <br />
               <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductParamAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
             </Panel>
+
+            {this.renderNewProductParam()}
 
           </Form>
         </Col>

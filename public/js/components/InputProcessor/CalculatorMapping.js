@@ -58,7 +58,7 @@ export default class CalculatorMapping extends Component {
     const { onSetLineKey, onSetRating, onRemoveRating } = this.props;
     const availableFields = this.getAvailableFields(true);
     return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => (
-      <Row style={{ marginBottom: 10 }}>
+      <Row key={calcKey} style={{ marginBottom: 10 }}>
         <Col lg={3} md={3} style={{ paddingRight: 0 }}>
           <FormGroup style={{ margin: 0 }}>
             <select
