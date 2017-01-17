@@ -47,23 +47,35 @@ class InputProcessor extends Component {
     format: null,
   };
 
-  state = {
-    errors: Immutable.Map({
+  constructor(props) {
+    super(props);
+
+    const errors = Immutable.Map({
       sampleCSV: Immutable.Map(),
       fieldsMapping: Immutable.Map(),
       calculatorMapping: Immutable.Map(),
       realtimeMapping: Immutable.Map(),
       receiver: Immutable.Map(),
-    }),
-    stepIndex: 0,
-    finished: 0,
-    steps: [
-      'parser',
-      'processor',
-      'customer_identification_fields',
-      'receiver',
-    ],
-  };
+    });
+
+    let steps = Immutable.Map({
+      parser: { idx: 0, label: 'CDR Fields' },
+      processor: { idx: 1, label: 'Field Mapping' },
+      customer_identification_fields: { idx: 1, label: 'Calculator Mapping' },
+    });
+    if (props.type === 'api') {
+      steps = steps.set('realtimeMapping', { idx: 3, label: 'Realtime Mapping' });
+    } else {
+      steps = steps.set('receiver', { idx: 3, label: 'Receiver' });
+    }
+
+    this.state = {
+      stepIndex: 0,
+      finished: 0,
+      errors,
+      steps,
+    };
+  }
 
   componentDidMount() {
     const { fileType, action, template, type, format } = this.props;
@@ -282,7 +294,7 @@ class InputProcessor extends Component {
         this.props.dispatch(showSuccess('Input processor saved successfully!'));
         this.goBack();
       } else {
-        const totalSteps = this.state.steps.length - 1;
+        const totalSteps = this.state.steps.size - 1;
         const finished = (stepIndex + 1) === totalSteps;
         this.setState({
           stepIndex: stepIndex + 1,
@@ -327,103 +339,96 @@ class InputProcessor extends Component {
       }
     }
   }
-
-  getStapsContent = () => {
+  getStepContent = () => {
     const { settings, usageTypes, subscriberFields, action, type, format } = this.props;
-    const { stepIndex, errors } = this.state;
+    const { stepIndex, errors, steps } = this.state;
     switch (stepIndex) {
-      case 0: return (
+      case steps.getIn(['parser', 'idx'], 0): return (
         <SampleCSV
+          settings={settings}
           type={type}
           action={action}
           format={format}
           errors={errors.get('sampleCSV', Immutable.Map())}
-          onChangeName={this.onChangeName}
-          onSetDelimiterType={this.onSetDelimiterType}
-          onChangeDelimiter={this.onChangeDelimiter}
-          onSelectSampleCSV={this.onSelectSampleCSV}
           onAddField={this.onAddField}
-          onSetFieldWidth={this.onSetFieldWidth}
+          onSelectJSON={this.onSelectJSON}
+          onChangeName={this.onChangeName}
           onRemoveField={this.onRemoveField}
-          onRemoveAllFields={this.onRemoveAllFields}
-          settings={settings} onMoveFieldUp={this.onMoveFieldUp}
+          onMoveFieldUp={this.onMoveFieldUp}
+          onSetFieldWidth={this.onSetFieldWidth}
           onMoveFieldDown={this.onMoveFieldDown}
           onChangeCSVField={this.onChangeCSVField}
-          onSelectJSON={this.onSelectJSON}
+          onChangeDelimiter={this.onChangeDelimiter}
+          onSelectSampleCSV={this.onSelectSampleCSV}
+          onRemoveAllFields={this.onRemoveAllFields}
+          onSetDelimiterType={this.onSetDelimiterType}
         />
       );
 
-      case 1: return (
+      case steps.getIn(['processor', 'idx'], 1): return (
         <FieldsMapping
-          onSetFieldMapping={this.onSetFieldMapping}
-          onAddUsagetMapping={this.onAddUsagetMapping}
-          addUsagetMapping={this.addUsagetMapping}
-          onRemoveUsagetMapping={this.onRemoveUsagetMapping}
-          onError={this.onError}
-          onSetStaticUsaget={this.onSetStaticUsaget}
-          setUsagetType={this.setUsagetType}
           settings={settings}
           usageTypes={usageTypes}
+          onError={this.onError}
           unsetField={this.unsetField}
+          setUsagetType={this.setUsagetType}
+          addUsagetMapping={this.addUsagetMapping}
+          onSetStaticUsaget={this.onSetStaticUsaget}
+          onSetFieldMapping={this.onSetFieldMapping}
+          onAddUsagetMapping={this.onAddUsagetMapping}
+          onRemoveUsagetMapping={this.onRemoveUsagetMapping}
         />
       );
 
-      case 2: return (
+      case steps.getIn(['customer_identification_fields', 'idx'], 2): return (
         <CalculatorMapping
-          onSetRating={this.onSetRating}
-          onSetCustomerMapping={this.onSetCustomerMapping}
-          onSetLineKey={this.onSetLineKey}
           settings={settings}
           subscriberFields={subscriberFields}
+          onSetRating={this.onSetRating}
+          onSetLineKey={this.onSetLineKey}
+          onSetCustomerMapping={this.onSetCustomerMapping}
         />
       );
 
-      case 3: {
-        if (type === 'api') {
-          return (
-            <RealtimeMapping
-              settings={settings}
-              onChange={this.onChangeRealtimeField}
-              onChangeDefault={this.onChangeRealtimeDefaultField}
-            />
-          );
-        }
-        return (
-          <Receiver
-            onSetReceiverField={this.onSetReceiverField}
-            onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}
-            settings={settings.get('receiver', Immutable.Map())}
-            action={action}
-          />
-        );
-      }
+      case steps.getIn(['realtimeMapping', 'idx'], 3): return (
+        <RealtimeMapping
+          settings={settings}
+          onChange={this.onChangeRealtimeField}
+          onChangeDefault={this.onChangeRealtimeDefaultField}
+        />
+      );
+
+      case steps.getIn(['receiver', 'idx'], 3): return (
+        <Receiver
+          action={action}
+          settings={settings.get('receiver', Immutable.Map())}
+          onSetReceiverField={this.onSetReceiverField}
+          onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}
+        />
+      );
 
       default: return null;
     }
   }
 
   renderStepper = () => {
-    const { state: { stepIndex }, props: { type } } = this;
+    const { stepIndex, steps } = this.state;
+
     return (
       <Stepper activeStep={stepIndex}>
-        <Step>
-          <StepLabel>CDR Fields</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Field Mapping</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Calculator Mapping</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>{type === 'api' ? 'Realtime Mapping' : 'Receiver' }</StepLabel>
-        </Step>
+        {
+          steps.sortBy((step => step.idx)).map((step, key) => (
+            <Step key={key}>
+              <StepLabel>{step.label}</StepLabel>
+            </Step>
+          )).toArray()
+        }
       </Stepper>
     );
   }
 
   render() {
-    const { stepIndex } = this.state;
+    const { stepIndex, steps } = this.state;
     return (
       <div>
         <div className="row">
@@ -434,13 +439,13 @@ class InputProcessor extends Component {
               </div>
               <div className="panel-body">
                 <div className="contents bordered-container">
-                  { this.getStapsContent() }
+                  { this.getStepContent() }
                 </div>
               </div>
               <div style={{ marginTop: 12, float: 'right' }}>
                 <button className="btn btn-default" onClick={this.handleCancel} style={{ marginRight: 12 }} > Cancel </button>
                 { (stepIndex > 0) && <button className="btn btn-default" onClick={this.handlePrev} style={{ marginRight: 12 }} > Back </button>}
-                <button className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (3) ? 'Finish' : 'Next' }</button>
+                <button className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (steps.size - 1) ? 'Finish' : 'Next' }</button>
               </div>
             </div>
           </div>
