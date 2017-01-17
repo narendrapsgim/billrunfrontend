@@ -125,15 +125,22 @@ class List extends Component {
       if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
         return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
     });
-    if (edit) table_header.push((<th key={fields.length}>&nbsp;</th>));
-    if (enableRemove) table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
+    let colSpan = fields.length;
+    if (edit) {
+      table_header.push((<th key={fields.length}>&nbsp;</th>));
+      colSpan += 1;
+    }
+    if (enableRemove) {
+      table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
+      colSpan += 1;
+    }
 
     const editTooltip = (
       <Tooltip id="tooltip">{ editText ?editText : 'Edit'}</Tooltip>
     );
 
     const table_body = items.size < 1 ?
-                       (<tr><td colSpan={fields.length + (edit ? 1 : 0)} style={{textAlign: "center"}}>No items found</td></tr>) :
+                       (<tr><td colSpan={colSpan} style={{textAlign: "center"}}>No items found</td></tr>) :
                         items.map((entity, index) => (
                             <tr key={index}>
                               { this.buildRow(entity, fields) }
