@@ -52,7 +52,7 @@ const convert = (settings) => {
                       "dynamic";
 
   const ret = {
-    file_type: '',
+    file_type: settings.file_type,
     delimiter_type: parser.type,
     delimiter: parser.separator,
     usaget_type,
@@ -306,7 +306,8 @@ export function setReceiverField(field, mapping) {
   };
 }
 
-export function saveInputProcessorSettings(state, callback, part=false) {
+export function saveInputProcessorSettings(state, parts = []) {
+  const action = (parts.length === 0) ? 'set' : 'validate';
   const processor = state.get('processor'),
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
@@ -373,40 +374,32 @@ export function saveInputProcessorSettings(state, callback, part=false) {
     settings.response = (response.size > 0 ? response.toJS() : defaultResponse);
   }
 
-  let settingsToSave;
-  if (part === "customer_identification_fields") {
-    settingsToSave = {file_type: state.get('file_type'), type: state.get('type'), [part]: {...settings[part]}, rate_calculators: settings.rate_calculators};
+  let settingsToSave = {};
+  if (action === 'set') {
+    settingsToSave = settings;
   } else {
-    settingsToSave = part ? {file_type: state.get('file_type'), type: state.get('type'), [part]: {...settings[part]}} : settings;
+    parts.forEach((part) => { settingsToSave[part] = settings[part]; });
   }
   const query = {
-    api: "settings",
+    api: 'settings',
     params: [
-      { category: "file_types" },
-      { action: "set" },
-      { data: JSON.stringify(settingsToSave) }
-    ]
+      { category: 'file_types' },
+      { action },
+      { data: JSON.stringify(settingsToSave) },
+    ],
   };
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      success => {
+    return apiBillRun(query).then(
+      (success) => {
         dispatch(finishProgressIndicator());
-        callback(false);
-      },
-      failure => {
-        dispatch(finishProgressIndicator());
-        const msg = _.result(failure, 'error[0].error.data.message') ?
-                    failure.error[0].error.data.message :
-                    failure.error[0].error.desc;
-        dispatch(showDanger(`Error - ${msg}`));
-        callback(true);
+        return success;
       }
     ).catch(
-      error => {
+      (error) => {
         dispatch(finishProgressIndicator());
-        dispatch(showDanger("Error saving input processor"));
-        dispatch(apiBillRunErrorHandler(error));
+        dispatch(apiBillRunErrorHandler(error, 'Error saving input processor'));
+        return false;
       }
     );
   };

@@ -59,19 +59,38 @@ class InputProcessor extends Component {
     });
 
     let steps = Immutable.Map({
-      parser: { idx: 0, label: 'CDR Fields' },
-      processor: { idx: 1, label: 'Field Mapping' },
-      customer_identification_fields: { idx: 2, label: 'Calculator Mapping' },
+      parser: {
+        idx: 0,
+        label: 'CDR Fields',
+        parts: ['file_type', 'parser'],
+      },
+      processor: {
+        idx: 1,
+        label: 'Field Mapping',
+        parts: ['file_type', 'parser', 'processor'],
+      },
+      customer_identification_fields: {
+        idx: 2,
+        label: 'Calculator Mapping',
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators'],
+      },
     });
     if (props.type === 'api') {
-      steps = steps.set('realtimeMapping', { idx: 3, label: 'Realtime Mapping' });
+      steps = steps.set('realtimeMapping', {
+        idx: 3,
+        label: 'Realtime Mapping',
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response'],
+      });
     } else {
-      steps = steps.set('receiver', { idx: 3, label: 'Receiver' });
+      steps = steps.set('receiver', {
+        idx: 3,
+        label: 'Receiver',
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver'],
+      });
     }
 
     this.state = {
       stepIndex: 0,
-      finished: 0,
       errors,
       steps,
     };
@@ -83,6 +102,7 @@ class InputProcessor extends Component {
     if (action === 'new') {
       if (template) {
         this.props.dispatch(setInputProcessorTemplate(Templates[template]));
+        this.props.dispatch(setName(''));
         pageTitle = `Create New Input Processor - ${template}`;
       } else {
         pageTitle = 'Create New Input Processor';
@@ -287,58 +307,54 @@ class InputProcessor extends Component {
   }
 
   handleNext = () => {
-    const { stepIndex, steps, finished } = this.state;
-    const cb = (err) => {
-      if (err) return;
-      if (this.state.finished) {
-        this.props.dispatch(showSuccess('Input processor saved successfully!'));
-        this.goBack();
-      } else {
-        const totalSteps = this.state.steps.size - 1;
-        const finished = (stepIndex + 1) === totalSteps;
-        this.setState({
-          stepIndex: stepIndex + 1,
-          finished,
-        });
-      }
-    };
-    const part = finished ? false : steps.findKey(step => step.idx === stepIndex);
-    this.props.dispatch(saveInputProcessorSettings(this.props.settings, cb, part));
+    const { stepIndex, steps } = this.state;
+    const parts = steps.get(steps.findKey(step => step.idx === stepIndex), {}).parts;
+    this.props.dispatch(saveInputProcessorSettings(this.props.settings, parts)
+      ).then((response) => {
+        if (response !== false) {
+          if (stepIndex === steps.size - 1) {
+            return true;
+          }
+          this.setState({ stepIndex: stepIndex + 1 });
+        }
+        return false;
+      }).then((isfinished) => {
+        if (isfinished) {
+          return this.props.dispatch(saveInputProcessorSettings(this.props.settings));
+        }
+        return false;
+      }).then((saveStatus) => {
+        if (saveStatus !== false) {
+          this.props.dispatch(showSuccess('Input processor saved successfully!'));
+          this.goBack();
+        }
+      });
   }
 
   handlePrev = () => {
     const { stepIndex } = this.state;
     if (stepIndex > 0) {
-      this.setState({ stepIndex: stepIndex - 1, finished: 0 });
+      this.setState({ stepIndex: stepIndex - 1 });
     } else {
-      const r = confirm('Are you sure you want to stop editing input processor ?');
-      if (r) {
-        this.props.dispatch(clearInputProcessor());
-        this.goBack();
-      }
+      this.handleCancel();
     }
   }
 
   handleCancel = () => {
     const r = confirm('Are you sure you want to stop editing input processor ?');
-    const { dispatch, fileType } = this.props;
     if (r) {
-      if (fileType !== true) {
-        dispatch(clearInputProcessor());
-        this.goBack();
-      } else {
-        const cb = (err) => {
-          if (err) {
-            dispatch(showDanger('Please try again'));
-            return;
-          }
-          dispatch(clearInputProcessor());
-          this.goBack();
-        };
-        dispatch(deleteInputProcessor(this.props.settings.get('file_type'), cb));
-      }
+      this.goBack();
     }
   }
+
+  isValidForm = () => {
+    const { errors } = this.state;
+    const hasEroor = errors.reduce((errorExist, section) =>
+      errorExist || !section.isEmpty()
+    , false);
+    return !hasEroor;
+  }
+
   getStepContent = () => {
     const { settings, usageTypes, subscriberFields, action, type, format } = this.props;
     const { stepIndex, errors, steps } = this.state;
@@ -430,6 +446,7 @@ class InputProcessor extends Component {
 
   render() {
     const { stepIndex, steps } = this.state;
+    const isValidForm = this.isValidForm();
     return (
       <div>
         <div className="row">
@@ -444,9 +461,9 @@ class InputProcessor extends Component {
                 </div>
               </div>
               <div style={{ marginTop: 12, float: 'right' }}>
-                <button className="btn btn-default" onClick={this.handleCancel} style={{ marginRight: 12 }} > Cancel </button>
+                <button className="btn btn-default" onClick={this.handleCancel} style={{ marginRight: 12 }}> Cancel </button>
                 { (stepIndex > 0) && <button className="btn btn-default" onClick={this.handlePrev} style={{ marginRight: 12 }} > Back </button>}
-                <button className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (steps.size - 1) ? 'Finish' : 'Next' }</button>
+                <button disabled={!isValidForm} className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (steps.size - 1) ? 'Finish' : 'Next' }</button>
               </div>
             </div>
           </div>
