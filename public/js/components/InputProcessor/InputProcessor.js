@@ -4,94 +4,93 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import _ from 'lodash';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField, setRealtimeField, setRealtimeDefaultField } from '../../actions/inputProcessorActions';
-import { getSettings } from '../../actions/settingsActions';
-import { showSuccess, showDanger } from '../../actions/alertsActions';
-import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
 import CalculatorMapping from './CalculatorMapping';
 import Receiver from './Receiver';
 import RealtimeMapping from './RealtimeMapping';
+import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField, setRealtimeField, setRealtimeDefaultField } from '../../actions/inputProcessorActions';
+import { getSettings } from '../../actions/settingsActions';
+import { showSuccess, showDanger } from '../../actions/alertsActions';
+import { getList, clearList } from '../../actions/listActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 
 class InputProcessor extends Component {
 
   static propTypes = {
     settings: PropTypes.instanceOf(Immutable.Map),
+    usageTypes: PropTypes.instanceOf(Immutable.List),
     subscriberFields: PropTypes.instanceOf(Immutable.List),
+    inputProcessorsExitNames: PropTypes.instanceOf(Immutable.List),
     dispatch: PropTypes.func.isRequired,
-    router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
     }).isRequired,
+    fileType: React.PropTypes.string,
+    action: React.PropTypes.string,
+    template: React.PropTypes.string,
+    type: React.PropTypes.string,
+    format: React.PropTypes.string,
   };
 
   static defaultProps = {
     settings: Immutable.Map(),
     subscriberFields: Immutable.List(),
+    inputProcessorsExitNames: Immutable.List(),
+    usageTypes: Immutable.List(),
+    fileType: '',
+    action: 'new',
+    template: null,
+    type: null,
+    format: null,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.onSetReceiverCheckboxField = this.onSetReceiverCheckboxField.bind(this);
-    this.onRemoveUsagetMapping = this.onRemoveUsagetMapping.bind(this);
-    this.onSetCustomerMapping = this.onSetCustomerMapping.bind(this);
-    this.onSetReceiverField = this.onSetReceiverField.bind(this);
-    this.onSetDelimiterType = this.onSetDelimiterType.bind(this);
-    this.onAddUsagetMapping = this.onAddUsagetMapping.bind(this);
-    this.onChangeDelimiter = this.onChangeDelimiter.bind(this);
-    this.onSelectSampleCSV = this.onSelectSampleCSV.bind(this);
-    this.onSetFieldMapping = this.onSetFieldMapping.bind(this);
-    this.onRemoveAllFields = this.onRemoveAllFields.bind(this);
-    this.onSetStaticUsaget = this.onSetStaticUsaget.bind(this);
-    this.addUsagetMapping = this.addUsagetMapping.bind(this);
-    this.onSetFieldWidth = this.onSetFieldWidth.bind(this);
-    this.onRemoveField = this.onRemoveField.bind(this);
-    this.setUsagetType = this.setUsagetType.bind(this);
-    this.onSetLineKey = this.onSetLineKey.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
-    this.onChangeName = this.onChangeName.bind(this);
-    this.onSetRating = this.onSetRating.bind(this);
-    this.onAddField = this.onAddField.bind(this);
-    this.handleNext = this.handleNext.bind(this);
-    this.handlePrev = this.handlePrev.bind(this);
-    this.onError = this.onError.bind(this);
-    this.goBack = this.goBack.bind(this);
-
-    this.state = {
-      stepIndex: 0,
-      finished: 0,
-      steps: [
-        'parser',
-        'processor',
-        'customer_identification_fields',
-        'receiver',
-      ],
-    };
-  }
+  state = {
+    errors: Immutable.Map({
+      sampleCSV: Immutable.Map(),
+      fieldsMapping: Immutable.Map(),
+      calculatorMapping: Immutable.Map(),
+      realtimeMapping: Immutable.Map(),
+      receiver: Immutable.Map(),
+    }),
+    stepIndex: 0,
+    finished: 0,
+    steps: [
+      'parser',
+      'processor',
+      'customer_identification_fields',
+      'receiver',
+    ],
+  };
 
   componentDidMount() {
-    const { file_type, action, template, type, format } = this.props.location.query;
-    if (action !== 'new') {
-      this.props.dispatch(getProcessorSettings(file_type));
-    } else if (template) {
-      this.props.dispatch(setInputProcessorTemplate(Templates[template]));
+    const { fileType, action, template, type, format } = this.props;
+    let pageTitle = '';
+    if (action === 'new') {
+      if (template) {
+        this.props.dispatch(setInputProcessorTemplate(Templates[template]));
+        pageTitle = `Create New Input Processor - ${template}`;
+      } else {
+        pageTitle = 'Create New Input Processor';
+      }
+      if (type === 'api' && format === 'json') {
+        this.props.dispatch(setParserSetting('type', 'realtime'));
+        this.props.dispatch(setDelimiterType('json'));
+        this.props.dispatch(setProcessorType('realtime'));
+      }
+      this.props.dispatch(getList('all_input_processors', this.buildGetAllQuery()));
+    } else {
+      this.props.dispatch(getProcessorSettings(fileType));
+      pageTitle = 'Edit Input Processor';
     }
     this.props.dispatch(getSettings(['usage_types', 'subscribers.subscriber.fields']));
-    if (action === 'new' && (type === 'api' && format === 'json')) {
-      this.props.dispatch(setParserSetting('type', 'realtime'));
-      this.props.dispatch(setDelimiterType('json'));
-      this.props.dispatch(setProcessorType('realtime'));
-    }
-    const pageTitle = (action === 'new') ? 'Create New Input Processor' : 'Edit Input Processor';
     this.props.dispatch(setPageTitle(pageTitle));
-
   }
 
   componentWillReceiveProps(nextProps) {
-    const { settings, location: { query: { action } } } = this.props;
+    const { settings, action } = this.props;
     const name = settings.get('file_type', '');
     const newName = nextProps.settings.get('file_type', '');
     if (action !== 'new' && newName !== name) {
@@ -101,17 +100,34 @@ class InputProcessor extends Component {
 
   componentWillUnmount() {
     this.props.dispatch(clearInputProcessor());
+    this.props.dispatch(clearList('all_input_processors'));
   }
 
-  onChangeName(e) {
+  buildGetAllQuery = () => ({
+    api: 'settings',
+    params: [
+      { category: 'file_types' },
+      { data: JSON.stringify({}) },
+    ],
+  })
+
+  onChangeName = (e) => {
+    const { inputProcessorsExitNames } = this.props;
+    const { errors } = this.state;
+    const { value } = e.target;
+    if (inputProcessorsExitNames.includes(value)) {
+      this.setState({ errors: errors.setIn(['sampleCSV', 'name'], `Name ${value} already exist`) });
+    } else {
+      this.setState({ errors: errors.deleteIn(['sampleCSV', 'name']) });
+    }
     this.props.dispatch(setName(e.target.value));
   }
 
-  onSetDelimiterType(e) {
+  onSetDelimiterType = (e) => {
     this.props.dispatch(setDelimiterType(e.target.value));
   }
 
-  onChangeDelimiter(e) {
+  onChangeDelimiter = (e) => {
     this.props.dispatch(setDelimiter(e.target.value));
   }
 
@@ -122,10 +138,7 @@ class InputProcessor extends Component {
       if (evt.target.readyState === FileReader.DONE) {
         try {
           const json = JSON.parse(evt.target.result);
-          const fields =
-            Object.keys(json)
-                  .map(key =>
-                    this.buildJSONFields(key, json));
+          const fields = Object.keys(json).map(key => this.buildJSONFields(key, json));
           this.props.dispatch(setFields(_.flattenDeep(fields)));
         } catch (err) {
           this.props.dispatch(showDanger('Not a valid JSON'));
@@ -136,12 +149,12 @@ class InputProcessor extends Component {
     reader.readAsText(blob);
   };
 
-  onSelectSampleCSV(e) {
+  onSelectSampleCSV = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
     if (!this.props.settings.get('delimiter')) return;
     reader.onloadend = ((evt) => {
-      if (evt.target.readyState == FileReader.DONE) {
+      if (evt.target.readyState === FileReader.DONE) {
         /* Only need first line */
         const lines = evt.target.result.split('\n');
         const header = lines[0];
@@ -153,60 +166,60 @@ class InputProcessor extends Component {
     reader.readAsText(blob);
   }
 
-  onAddField(val, e) {
+  onAddField = (val, e) => { // eslint-disable-line no-unused-vars
     this.props.dispatch(addCSVField(''));
   }
 
-  onRemoveField(index, e) {
+  onRemoveField = (index, e) => { // eslint-disable-line no-unused-vars
     this.props.dispatch(removeCSVField(index));
   }
 
-  onRemoveAllFields() {
+  onRemoveAllFields = () => {
     this.props.dispatch(removeAllCSVFields());
   }
 
-  onSetFieldMapping(e) {
+  onSetFieldMapping = (e) => {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setFieldMapping(field, mapping));
   }
 
-  onSetFieldWidth(e) {
+  onSetFieldWidth = (e) => {
     const { value, dataset: { field } } = e.target;
     this.props.dispatch(setFieldWidth(field, value));
   }
 
-  onAddUsagetMapping(val) {
+  onAddUsagetMapping = (val) => {
     this.props.dispatch(mapUsaget(val));
   }
 
-  onSetStaticUsaget(val) {
+  onSetStaticUsaget = (val) => {
     this.props.dispatch(setStaticUsaget(val));
   }
 
-  onRemoveUsagetMapping(index, e) {
+  onRemoveUsagetMapping = (index, e) => { // eslint-disable-line no-unused-vars
     this.props.dispatch(removeUsagetMapping(index));
   }
 
-  onSetCustomerMapping(field, mapping, index) {
+  onSetCustomerMapping = (field, mapping, index) => {
     this.props.dispatch(setCustomerMapping(field, mapping, index));
   }
 
-  onSetRating(e) {
+  onSetRating = (e) => {
     const { dataset: { usaget, rate_key }, value } = e.target;
     this.props.dispatch(setRatingField(usaget, rate_key, value));
   }
 
-  onSetLineKey(e) {
+  onSetLineKey = (e) => {
     const { dataset: { usaget }, value } = e.target;
     this.props.dispatch(setLineKey(usaget, value));
   }
 
-  onSetReceiverField(e) {
+  onSetReceiverField = (e) => {
     const { id, value } = e.target;
     this.props.dispatch(setReceiverField(id, value));
   }
 
-  onSetReceiverCheckboxField(e) {
+  onSetReceiverCheckboxField = (e) => {
     const { id, checked } = e.target;
     this.props.dispatch(setReceiverField(id, checked));
   }
@@ -233,11 +246,11 @@ class InputProcessor extends Component {
     this.props.dispatch(setRealtimeDefaultField(id, value));
   };
 
-  onError(message) {
+  onError = (message) => {
     this.props.dispatch(showDanger(message));
   }
 
-  setUsagetType(val) {
+  setUsagetType = (val) => {
     this.props.dispatch(setUsagetType(val));
   }
 
@@ -253,15 +266,15 @@ class InputProcessor extends Component {
     return field;
   };
 
-  addUsagetMapping(val) {
+  addUsagetMapping = (val) => {
     this.props.dispatch(addUsagetMapping(val));
   }
 
-  goBack() {
+  goBack = () => {
     this.props.router.push('/input_processors');
   }
 
-  handleNext() {
+  handleNext = () => {
     const { stepIndex } = this.state;
     const cb = (err) => {
       if (err) return;
@@ -281,7 +294,7 @@ class InputProcessor extends Component {
     this.props.dispatch(saveInputProcessorSettings(this.props.settings, cb, part));
   }
 
-  handlePrev() {
+  handlePrev = () => {
     const { stepIndex } = this.state;
     if (stepIndex > 0) {
       this.setState({ stepIndex: stepIndex - 1, finished: 0 });
@@ -294,7 +307,7 @@ class InputProcessor extends Component {
     }
   }
 
-  handleCancel() {
+  handleCancel = () => {
     const r = confirm('Are you sure you want to stop editing input processor ?');
     const { dispatch, fileType } = this.props;
     if (r) {
@@ -315,9 +328,82 @@ class InputProcessor extends Component {
     }
   }
 
+  getStapsContent = () => {
+    const { settings, usageTypes, subscriberFields, action, type, format } = this.props;
+    const { stepIndex, errors } = this.state;
+    switch (stepIndex) {
+      case 0: return (
+        <SampleCSV
+          type={type}
+          action={action}
+          format={format}
+          errors={errors.get('sampleCSV', Immutable.Map())}
+          onChangeName={this.onChangeName}
+          onSetDelimiterType={this.onSetDelimiterType}
+          onChangeDelimiter={this.onChangeDelimiter}
+          onSelectSampleCSV={this.onSelectSampleCSV}
+          onAddField={this.onAddField}
+          onSetFieldWidth={this.onSetFieldWidth}
+          onRemoveField={this.onRemoveField}
+          onRemoveAllFields={this.onRemoveAllFields}
+          settings={settings} onMoveFieldUp={this.onMoveFieldUp}
+          onMoveFieldDown={this.onMoveFieldDown}
+          onChangeCSVField={this.onChangeCSVField}
+          onSelectJSON={this.onSelectJSON}
+        />
+      );
+
+      case 1: return (
+        <FieldsMapping
+          onSetFieldMapping={this.onSetFieldMapping}
+          onAddUsagetMapping={this.onAddUsagetMapping}
+          addUsagetMapping={this.addUsagetMapping}
+          onRemoveUsagetMapping={this.onRemoveUsagetMapping}
+          onError={this.onError}
+          onSetStaticUsaget={this.onSetStaticUsaget}
+          setUsagetType={this.setUsagetType}
+          settings={settings}
+          usageTypes={usageTypes}
+          unsetField={this.unsetField}
+        />
+      );
+
+      case 2: return (
+        <CalculatorMapping
+          onSetRating={this.onSetRating}
+          onSetCustomerMapping={this.onSetCustomerMapping}
+          onSetLineKey={this.onSetLineKey}
+          settings={settings}
+          subscriberFields={subscriberFields}
+        />
+      );
+
+      case 3: {
+        if (type === 'api') {
+          return (
+            <RealtimeMapping
+              settings={settings}
+              onChange={this.onChangeRealtimeField}
+              onChangeDefault={this.onChangeRealtimeDefaultField}
+            />
+          );
+        }
+        return (
+          <Receiver
+            onSetReceiverField={this.onSetReceiverField}
+            onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}
+            settings={settings.get('receiver', Immutable.Map())}
+            action={action}
+          />
+        );
+      }
+
+      default: return null;
+    }
+  }
+
   renderStepper = () => {
-    const { stepIndex } = this.state;
-    const { type } = this.props.location.query;
+    const { state: { stepIndex }, props: { type } } = this;
     return (
       <Stepper activeStep={stepIndex}>
         <Step>
@@ -338,20 +424,6 @@ class InputProcessor extends Component {
 
   render() {
     const { stepIndex } = this.state;
-    const { settings, usage_types, subscriberFields } = this.props;
-    const { action, type, format } = this.props.location.query;
-
-    const steps = [
-      (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} onRemoveAllFields={this.onRemoveAllFields} settings={settings} onMoveFieldUp={this.onMoveFieldUp} onMoveFieldDown={this.onMoveFieldDown} onChangeCSVField={this.onChangeCSVField} type={type} format={format} onSelectJSON={this.onSelectJSON} />),
-      (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} onSetStaticUsaget={this.onSetStaticUsaget} setUsagetType={this.setUsagetType} settings={settings} usageTypes={usage_types} unsetField={this.unsetField} />),
-      (<CalculatorMapping onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} subscriberFields={subscriberFields} />),
-    ];
-    if (type === 'api') {
-      steps.push(<RealtimeMapping settings={settings} onChange={this.onChangeRealtimeField} onChangeDefault={this.onChangeRealtimeDefaultField} />);
-    } else {
-      steps.push(<Receiver onSetReceiverField={this.onSetReceiverField} onSetReceiverCheckboxField={this.onSetReceiverCheckboxField} settings={settings.get('receiver', Immutable.Map())} action={action}/>);
-    }
-
     return (
       <div>
         <div className="row">
@@ -362,15 +434,13 @@ class InputProcessor extends Component {
               </div>
               <div className="panel-body">
                 <div className="contents bordered-container">
-                  { steps[stepIndex] }
+                  { this.getStapsContent() }
                 </div>
               </div>
               <div style={{ marginTop: 12, float: 'right' }}>
                 <button className="btn btn-default" onClick={this.handleCancel} style={{ marginRight: 12 }} > Cancel </button>
-                { (stepIndex > 0) &&
-                  <button className="btn btn-default" onClick={this.handlePrev} style={{ marginRight: 12 }} > Back </button>
-                }
-                <button className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (steps.length - 1) ? 'Finish' : 'Next' }</button>
+                { (stepIndex > 0) && <button className="btn btn-default" onClick={this.handlePrev} style={{ marginRight: 12 }} > Back </button>}
+                <button className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (3) ? 'Finish' : 'Next' }</button>
               </div>
             </div>
           </div>
@@ -381,10 +451,19 @@ class InputProcessor extends Component {
 }
 
 
-const mapStateToProps = state => ({
-  settings: state.inputProcessor,
-  usage_types: state.settings.get('usage_types', Immutable.List()),
-  subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
-});
+const mapStateToProps = (state, props) => {
+  const { file_type: fileType, action, template, type, format } = props.location.query;
+  return {
+    inputProcessorsExitNames: state.list.get('all_input_processors', Immutable.List()).map(ip => ip.get('file_type', '')),
+    settings: state.inputProcessor,
+    usageTypes: state.settings.get('usage_types', Immutable.List()),
+    subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
+    fileType,
+    action,
+    template,
+    type,
+    format,
+  };
+};
 
 export default withRouter(connect(mapStateToProps)(InputProcessor));

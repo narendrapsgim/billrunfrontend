@@ -52,7 +52,7 @@ const convert = (settings) => {
                       "dynamic";
 
   const ret = {
-    file_type: settings.file_type,
+    file_type: '',
     delimiter_type: parser.type,
     delimiter: parser.separator,
     usaget_type,
