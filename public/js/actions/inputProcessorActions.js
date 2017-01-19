@@ -7,6 +7,8 @@ export const ADD_CSV_FIELD = 'ADD_CSV_FIELD';
 export const ADD_USAGET_MAPPING = 'ADD_USAGET_MAPPING';
 export const SET_CUSTOMER_MAPPING = 'SET_CUSTOMER_MAPPING';
 export const SET_RATING_FIELD = 'SET_RATING_FIELD';
+export const ADD_RATING_FIELD = 'ADD_RATING_FIELD';
+export const REMOVE_RATING_FIELD = 'REMOVE_RATING_FIELD';
 export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
@@ -281,19 +283,36 @@ export function setCustomerMapping(field, mapping, index) {
   };
 }
 
-export function setRatingField(usaget, rate_key, value) {
+export function setRatingField(usaget, index, rate_key, value) {
   return {
     type: SET_RATING_FIELD,
     usaget,
+    index,
     rate_key,
     value
   };
 }
 
-export function setLineKey(usaget, value) {
+export function addRatingField(usaget) {
+  return {
+    type: ADD_RATING_FIELD,
+    usaget,
+  };
+}
+
+export function removeRatingField(usaget, index) {
+  return {
+    type: REMOVE_RATING_FIELD,
+    usaget,
+    index,
+  };
+}
+
+export function setLineKey(usaget, index, value) {
   return {
     type: SET_LINE_KEY,
     usaget,
+    index,
     value
   };
 }

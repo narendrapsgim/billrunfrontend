@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import _ from 'lodash';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField, setRealtimeField, setRealtimeDefaultField } from '../../actions/inputProcessorActions';
+import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, addRatingField, removeRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField, setRealtimeField, setRealtimeDefaultField } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -54,6 +54,8 @@ class InputProcessor extends Component {
     this.handleCancel = this.handleCancel.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onSetRating = this.onSetRating.bind(this);
+    this.onAddRating = this.onAddRating.bind(this);
+    this.onRemoveRating = this.onRemoveRating.bind(this);
     this.onAddField = this.onAddField.bind(this);
     this.handleNext = this.handleNext.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
@@ -192,13 +194,23 @@ class InputProcessor extends Component {
   }
 
   onSetRating(e) {
-    const { dataset: { usaget, rate_key }, value } = e.target;
-    this.props.dispatch(setRatingField(usaget, rate_key, value));
+    const { dataset: {usaget, rate_key, index}, value } = e.target;
+    this.props.dispatch(setRatingField(usaget, parseInt(index, 10), rate_key, value));
+  }
+
+  onAddRating(e) {
+    const { dataset: { usaget } } = e.target;
+    this.props.dispatch(addRatingField(usaget));
+  }
+
+  onRemoveRating(e) {
+    const { dataset: { usaget, index } } = e.target;
+    this.props.dispatch(removeRatingField(usaget, parseInt(index, 10)));
   }
 
   onSetLineKey(e) {
-    const { dataset: { usaget }, value } = e.target;
-    this.props.dispatch(setLineKey(usaget, value));
+    const { dataset: { usaget, index }, value } = e.target;
+    this.props.dispatch(setLineKey(usaget, parseInt(index, 10), value));
   }
 
   onSetReceiverField(e) {
@@ -344,7 +356,7 @@ class InputProcessor extends Component {
     const steps = [
       (<SampleCSV onChangeName={this.onChangeName} onSetDelimiterType={this.onSetDelimiterType} onChangeDelimiter={this.onChangeDelimiter} onSelectSampleCSV={this.onSelectSampleCSV} onAddField={this.onAddField} onSetFieldWidth={this.onSetFieldWidth} onRemoveField={this.onRemoveField} onRemoveAllFields={this.onRemoveAllFields} settings={settings} onMoveFieldUp={this.onMoveFieldUp} onMoveFieldDown={this.onMoveFieldDown} onChangeCSVField={this.onChangeCSVField} type={type} format={format} onSelectJSON={this.onSelectJSON} />),
       (<FieldsMapping onSetFieldMapping={this.onSetFieldMapping} onAddUsagetMapping={this.onAddUsagetMapping} addUsagetMapping={this.addUsagetMapping} onRemoveUsagetMapping={this.onRemoveUsagetMapping} onError={this.onError} onSetStaticUsaget={this.onSetStaticUsaget} setUsagetType={this.setUsagetType} settings={settings} usageTypes={usage_types} unsetField={this.unsetField} />),
-      (<CalculatorMapping onSetRating={this.onSetRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} subscriberFields={subscriberFields} />),
+      (<CalculatorMapping onSetCalculatorMapping={this.onSetCalculatorMapping} onSetRating={this.onSetRating} onAddRating={this.onAddRating} onRemoveRating={this.onRemoveRating} onSetCustomerMapping={this.onSetCustomerMapping} onSetLineKey={this.onSetLineKey} settings={settings} type={type} format={format} subscriberFields={subscriberFields} />)
     ];
     if (type === 'api') {
       steps.push(<RealtimeMapping settings={settings} onChange={this.onChangeRealtimeField} onChangeDefault={this.onChangeRealtimeDefaultField} />);
