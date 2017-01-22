@@ -28,7 +28,7 @@ class UsageList extends Component {
       viewing: false,
       page: 0,
       size: 10,
-      sort: '',
+      sort: JSON.stringify({ urt: -1 }),
       filter: ""
     };
   }
@@ -74,7 +74,7 @@ class UsageList extends Component {
   }
 
   render() {
-    const { line, viewing } = this.state;
+    const { line, viewing, sort } = this.state;
     const { usages } = this.props;
 
     const fields = [
@@ -82,41 +82,38 @@ class UsageList extends Component {
       {id: "aid", placeholder: "Customer ID", type: "number", sort: true},
       {id: "sid", placeholder: "Subscription ID", type: "number", sort: true},
       {id: "plan", placeholder: "Plan"},
-      {id: "urt", placeholder: "Time", type: "datetime", cssClass: 'long-date', showFilter: false}
+      {id: "urt", placeholder: "Time", type: "datetime", cssClass: 'long-date', showFilter: false, sort: true }
     ];
 
     const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
 
-    const current_view = viewing ? (<Usage line={line} onClickCancel={this.onCancelView} />) : (
+    return (
       <div>
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="panel panel-default">
-              <div className="panel-heading">
-                <span>
-                  List of all usages
-                </span>
-                <div className="pull-right">
-                  <Link to={'/queue'} className="btn btn-default btn-xs">Go to Queue</Link>
+        { viewing ? (<Usage line={line} onClickCancel={this.onCancelView} />) : null }
+        <div style={{ display: viewing ? 'none' : 'block' }}>
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="panel panel-default">
+                <div className="panel-heading">
+                  <span>
+                    List of all usages
+                  </span>
+                  <div className="pull-right">
+                    <Link to={'/queue'} className="btn btn-default btn-xs">Go to Queue</Link>
+                  </div>
                 </div>
-              </div>
-              <div className="panel-body">
-                <Filter fields={fields} onFilter={this.onFilter} base={base} />
-                <List items={usages} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} />
+                <div className="panel-body">
+                  <Filter fields={fields} onFilter={this.onFilter} base={base} />
+                  <List items={usages} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} sort={sort}/>
+                </div>
               </div>
             </div>
           </div>
+
+          <Pager onClick={this.handlePageClick}
+                 size={this.state.size}
+                 count={usages.size || 0} />
         </div>
-
-        <Pager onClick={this.handlePageClick}
-               size={this.state.size}
-               count={usages.size || 0} />
-      </div>
-    );
-
-    return (
-      <div>
-	{ current_view }
       </div>
     );
   }
