@@ -43,7 +43,7 @@ export default class PaymentGateway extends Component {
     if (r)
       onDisable(settings.get('name'));
   };
-  
+
   render() {
     const { settings, enabled } = this.props;
     const { showParamsModal, showUnsupported } = this.state;
@@ -70,7 +70,7 @@ export default class PaymentGateway extends Component {
 	    {
 	      !settings.get('image_url') ?
 	      settings.get('name') :
-	      <img src={settings.get('image_url')} style={style} width="200" height="51" />
+	      <img src={`${globalSetting.serverUrl}/${settings.get('image_url')}`} style={style} width="200" height="51" />
 	    }
 	  </div>
 	  <div className="col-lg-4 col-md-4">

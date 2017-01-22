@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
 
 /* ACTIONS */
 import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
-import { getList, clearList } from '../../actions/listActions';
+import { getList, clearList, getPaymentGateways } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
@@ -20,6 +20,16 @@ import PostpaidBalances from '../PostpaidBalances';
 import PrepaidBalances from '../PrepaidBalances';
 
 class CustomerSetup extends Component {
+
+  static propTypes = {
+    activeTab: PropTypes.number,
+    supportedGateways: PropTypes.instanceOf(Immutable.List),
+  };
+
+  static defaultProps = {
+    activeTab: 1,
+    supportedGateways: Immutable.List(),
+  };
   constructor(props) {
     super(props);
 
@@ -29,7 +39,7 @@ class CustomerSetup extends Component {
 
     this.state = {
       invalidFields: Immutable.List(),
-      current: 1
+      current: Number.isInteger(props.activeTab) ? props.activeTab : 1,
     };
   }
 
@@ -80,6 +90,7 @@ class CustomerSetup extends Component {
           }) }
         ]
       };
+      this.props.dispatch(getPaymentGateways());
       this.props.dispatch(getEntity('customer', customer_params));
       this.props.dispatch(getList('subscriptions', subscriptions_params));
       this.props.dispatch(getList('plans', plans_params));
@@ -146,6 +157,7 @@ class CustomerSetup extends Component {
               aid: success.data[0].data.details.aid
             }
           });
+          this.props.dispatch(setPageTitle('Edit Customer'));
         }
       },
       failure => {
@@ -166,7 +178,18 @@ class CustomerSetup extends Component {
   }
 
   onClickNewSubscription(aid, e) {
-    window.location = `${globalSetting.serverUrl}/internalpaypage?aid=${aid}&return_url="${globalSetting.serverUrl}/subscriber?action=update&aid=${aid}"`;
+    const returnUrl = `${window.location.origin}/#/customer?action=update&aid=${aid}&tab=2`
+    const returnUrlParam = `return_url=${encodeURIComponent(returnUrl)}`;
+    const aidParam = `aid=${encodeURIComponent(`${aid}`)}`;
+    window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}`;
+  }
+
+  onClickChangePaymentGateway(aid, e) {
+    const returnUrl = `${window.location.origin}/#/customer?action=update&aid=${aid}&tab=2`
+    const returnUrlParam = `return_url=${encodeURIComponent(returnUrl)}`;
+    const aidParam = `aid=${encodeURIComponent(aid)}`;
+    const action = `action=${encodeURIComponent('updatePaymentGateway')}`;
+    window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}&${action}`;
   }
 
   onSaveSubscription = (subscription, data, callback) => {
@@ -223,10 +246,10 @@ class CustomerSetup extends Component {
   }
 
   render() {
-    const { customer, subscriptions, settings, plans, services } = this.props;
+    const { customer, subscriptions, settings, plans, services, supportedGateways } = this.props;
     const { action } = this.props.location.query;
     const aid = parseInt(this.props.location.query.aid, 10);
-    const { invalidFields } = this.state;
+    const { invalidFields, current } = this.state;
 
     const tabs = [(
       <Tab title="Customer Details" eventKey={1} key={1}>
@@ -236,7 +259,9 @@ class CustomerSetup extends Component {
             action={action}
             invalidFields={ invalidFields }
             settings={settings.getIn(['account', 'fields'])}
+            supportedGateways={supportedGateways}
             onChange={this.onChangeCustomerField}
+            onChangePaymentGateway={this.onClickChangePaymentGateway}
           />
         </Panel>
     </Tab>
@@ -279,7 +304,7 @@ class CustomerSetup extends Component {
 
         <div className="row">
           <div className="col-lg-12">
-            <Tabs defaultActiveKey={1} animation={false} id="CustomerEditTabs" onSelect={(current) => { this.setState({current}); } }>
+            <Tabs defaultActiveKey={current} animation={false} id="CustomerEditTabs" onSelect={(current) => { this.setState({current}); } }>
               { tabs }
             </Tabs>
           </div>
@@ -299,13 +324,17 @@ CustomerSetup.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
 
-function mapStateToProps(state) {
+function mapStateToProps(state, props) {
+  const { tab } = props.location.query;
+  const activeTab = (typeof tab === 'undefined') ? tab : parseInt(tab);
   return {
+    activeTab,
     customer: state.entity.get('customer') || Immutable.Map(),
     subscriptions: state.list.get('subscriptions') || Immutable.List(),
     settings: state.settings.get('subscribers') || Immutable.List(),
     plans: state.list.get('plans') || Immutable.List(),
-    services: state.list.get('customer_available_services') || Immutable.List()
+    services: state.list.get('customer_available_services') || Immutable.List(),
+    supportedGateways: state.list.get('supported_gateways') || undefined,
   };
 }
 

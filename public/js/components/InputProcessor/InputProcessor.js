@@ -10,7 +10,39 @@ import FieldsMapping from './FieldsMapping';
 import CalculatorMapping from './CalculatorMapping';
 import Receiver from './Receiver';
 import RealtimeMapping from './RealtimeMapping';
-import { setProcessorType, setParserSetting, setInputProcessorTemplate, clearInputProcessor, getProcessorSettings, setName, setDelimiterType, setDelimiter, setFields, setFieldMapping, setFieldWidth, addCSVField, addUsagetMapping, setCustomerMapping, setRatingField, setReceiverField, saveInputProcessorSettings, removeCSVField, removeAllCSVFields, mapUsaget, removeUsagetMapping, deleteInputProcessor, setUsagetType, setLineKey, setStaticUsaget, moveCSVFieldUp, moveCSVFieldDown, changeCSVField, unsetField, setRealtimeField, setRealtimeDefaultField } from '../../actions/inputProcessorActions';
+import {
+  setProcessorType,
+  setParserSetting,
+  setInputProcessorTemplate,
+  clearInputProcessor,
+  getProcessorSettings,
+  setName, setDelimiterType,
+  setDelimiter,
+  setFields,
+  setFieldMapping,
+  setFieldWidth,
+  addCSVField,
+  addUsagetMapping,
+  setCustomerMapping,
+  setRatingField,
+  setReceiverField,
+  saveInputProcessorSettings,
+  removeCSVField,
+  removeAllCSVFields,
+  mapUsaget,
+  removeUsagetMapping,
+  setUsagetType,
+  setLineKey,
+  setStaticUsaget,
+  moveCSVFieldUp,
+  moveCSVFieldDown,
+  changeCSVField,
+  unsetField,
+  setRealtimeField,
+  setRealtimeDefaultField,
+  addRatingField,
+  removeRatingField,
+ } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
@@ -237,13 +269,23 @@ class InputProcessor extends Component {
   }
 
   onSetRating = (e) => {
-    const { dataset: { usaget, rate_key }, value } = e.target;
-    this.props.dispatch(setRatingField(usaget, rate_key, value));
+    const { dataset: { usaget, rate_key, index }, value } = e.target;
+    this.props.dispatch(setRatingField(usaget, parseInt(index, 10), rate_key, value));
+  }
+
+  onAddRating = (e) => {
+    const { dataset: { usaget } } = e.target;
+    this.props.dispatch(addRatingField(usaget));
+  }
+
+  onRemoveRating = (e) => {
+    const { dataset: { usaget, index } } = e.target;
+    this.props.dispatch(removeRatingField(usaget, parseInt(index, 10)));
   }
 
   onSetLineKey = (e) => {
-    const { dataset: { usaget }, value } = e.target;
-    this.props.dispatch(setLineKey(usaget, value));
+    const { dataset: { usaget, index }, value } = e.target;
+    this.props.dispatch(setLineKey(usaget, parseInt(index, 10), value));
   }
 
   onSetReceiverField = (e) => {
@@ -404,6 +446,8 @@ class InputProcessor extends Component {
           onSetRating={this.onSetRating}
           onSetLineKey={this.onSetLineKey}
           onSetCustomerMapping={this.onSetCustomerMapping}
+          onAddRating={this.onAddRating}
+          onRemoveRating={this.onRemoveRating}
         />
       );
 
@@ -461,7 +505,7 @@ class InputProcessor extends Component {
                 </div>
               </div>
               <div style={{ marginTop: 12, float: 'right' }}>
-                <button className="btn btn-default" onClick={this.handleCancel} style={{ marginRight: 12 }}> Cancel </button>
+                <button className="btn btn-default" onClick={this.handleCancel} style={{ marginRight: 12 }} > Cancel </button>
                 { (stepIndex > 0) && <button className="btn btn-default" onClick={this.handlePrev} style={{ marginRight: 12 }} > Back </button>}
                 <button disabled={!isValidForm} className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (steps.size - 1) ? 'Finish' : 'Next' }</button>
               </div>

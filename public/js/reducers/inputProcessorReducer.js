@@ -14,6 +14,8 @@ import { SET_NAME,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
          SET_RATING_FIELD,
+         ADD_RATING_FIELD,
+         REMOVE_RATING_FIELD,
          SET_RECEIVER_FIELD,
          SET_FIELD_WIDTH,
          CLEAR_INPUT_PROCESSOR,
@@ -25,7 +27,7 @@ import { SET_NAME,
          MOVE_CSV_FIELD_DOWN,
          MOVE_CSV_FIELD_UP,
          CHANGE_CSV_FIELD,
-         UNSET_FIELD,
+	 UNSET_FIELD,
          SET_REALTIME_FIELD,
          SET_REALTIME_DEFAULT_FIELD } from '../actions/inputProcessorActions';
 
@@ -159,13 +161,28 @@ export default function (state = defaultState, action) {
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: state.getIn(['rate_calculators', usaget, 0, 'line_key'])
+        line_key: state.getIn(['rate_calculators', usaget, index, 'line_key'])
       });
-      return state.setIn(['rate_calculators', usaget, 0], new_rating);
+      return state.setIn(['rate_calculators', usaget, index], new_rating);
+
+    case ADD_RATING_FIELD: {
+      const { usaget } = action;
+      const newRating = Immutable.fromJS({
+        type: '',
+        rate_key: '',
+        line_key: '',
+      });
+      return state.updateIn(['rate_calculators', usaget], list => list.push(newRating));
+    }
+
+    case REMOVE_RATING_FIELD: {
+      const { usaget } = action;
+      return state.updateIn(['rate_calculators', usaget], list => list.remove(index));
+    }
 
     case SET_LINE_KEY:
       var { value, usaget } = action;
-      return state.setIn(['rate_calculators', usaget, 0, 'line_key'], value);
+      return state.setIn(['rate_calculators', usaget, index, 'line_key'], value);
 
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
