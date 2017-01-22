@@ -16,7 +16,7 @@ class List extends Component {
     this.onClickHeader = this.onClickHeader.bind(this);
 
     this.state = {
-      sort: {},
+      sort: JSON.parse(props.sort),
     };
   }
 
@@ -28,6 +28,7 @@ class List extends Component {
   static defaultProps = {
     enableRemove: false,
     onClickRemove: () => {},
+    sort: '{}',
   };
 
   displayByType(field, entity) {
