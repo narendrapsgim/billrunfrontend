@@ -23,7 +23,7 @@ export default class SubscriptionsList extends Component {
   static defaultProps = {
     subscriptions: Immutable.List(),
     settings: Immutable.List(),
-    defaultListFields: ['firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
+    defaultListFields: ['sid', 'firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
     aid: '',
   };
 
@@ -60,6 +60,8 @@ export default class SubscriptionsList extends Component {
             return { id: fieldname, parser: this.servicesParser };
           case 'address':
             return { id: fieldname, parser: this.addressParser };
+          case 'sid':
+            return { id: fieldname, title: 'ID' };
           default: {
             let title = fieldname;
             if (fieldname === 'firstname') {
