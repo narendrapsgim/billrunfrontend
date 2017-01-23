@@ -136,6 +136,5 @@ export function apiBillRun(requests, params = {}) {
       const error = responses.filter(responce => responce.status === 0).map((responce) => { delete responce.status; return responce; });
       const mix = Object.assign({}, { error }, { data });
       return apiParams.requiredAllSuccess ? Promise.reject(mix) : Promise.resolve(mix);
-    })
-    .catch(error => Promise.reject(Object.assign({}, { error })));
+    });
 }

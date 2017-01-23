@@ -119,10 +119,7 @@ class PlanSetup extends Component {
   }
 
   afterSave = (data) => {
-    console.log("data : ", data);
-    if (typeof data.error !== 'undefined' && data.error.length) {
-      this.handleResponseError(data);
-    } else {
+    if (data === true) {
       this.props.router.push('/plans');
     }
   }
@@ -133,20 +130,6 @@ class PlanSetup extends Component {
 
   handleSelectTab = (key) => {
     this.setState({ activeTab: key });
-  }
-
-  handleResponseError = (response) => {
-    let errorMessage = 'Error, please try again...';
-    try {
-      errorMessage = response.error[0].error.data.message;
-    } catch (e1) {
-      try {
-        errorMessage = response.error[0].error.message;
-      } catch (e2) {
-        console.log('unknown error response: ', response);
-      }
-    }
-    this.props.showDanger(errorMessage);
   }
 
   render() {
