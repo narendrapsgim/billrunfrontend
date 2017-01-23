@@ -6,7 +6,7 @@ export const ADD_GROUP_SERVICE = 'ADD_GROUP_SERVICE';
 export const REMOVE_GROUP_SERVICE = 'REMOVE_GROUP_SERVICE';
 
 import moment from 'moment';
-import { apiBillRun } from '../common/Api';
+import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 
 /* Helper */
@@ -99,16 +99,16 @@ export function getItem(id) {
 }
 
 export function saveItem(item) {
-  const action = item.getIn(['_id','$id'], null) ? 'update' : 'create' ;
+  const action = item.getIn(['_id', '$id'], null) ? 'update' : 'create';
   return dispatch => {
     dispatch(startProgressIndicator());
     return apiSaveItem(item, action).then(
-      success => {
+      (success) => {
         dispatch(finishProgressIndicator());
         return (true);
       }
-    ).catch(error => {
-      dispatch(finishProgressIndicator());
+    ).catch((error) => {
+      dispatch(apiBillRunErrorHandler(error));
       return (error);
     });
   };

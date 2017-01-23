@@ -5,7 +5,7 @@ import moment from 'moment';
 
 /* ACTIONS */
 import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
-import { getList, clearList, getPaymentGateways } from '../../actions/listActions';
+import { getList, clearList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
@@ -90,7 +90,11 @@ class CustomerSetup extends Component {
           }) }
         ]
       };
-      this.props.dispatch(getPaymentGateways());
+      const paymentGatewaysQuery = {
+        api: 'paymentgateways',
+        action: 'list',
+      };
+      this.props.dispatch(getList('supported_gateways', paymentGatewaysQuery));
       this.props.dispatch(getEntity('customer', customer_params));
       this.props.dispatch(getList('subscriptions', subscriptions_params));
       this.props.dispatch(getList('plans', plans_params));

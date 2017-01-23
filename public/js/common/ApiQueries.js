@@ -2,6 +2,8 @@
  * Create Api query object to get users names
  * @type {Object} = { size , page, sort, project, query }
  */
+import moment from 'moment';
+
 export const userNamesQuery = (
   {
     size = 1000,
@@ -60,5 +62,19 @@ export const disablePaymentGatewayQuery = name => ({
     { category: 'payment_gateways' },
     { action: 'unset' },
     { data: JSON.stringify({ name }) },
+  ],
+});
+
+export const getProductByKeyQuery = key => ({
+  api: 'find',
+  params: [
+    { collection: 'rates' },
+    { size: '2' },
+    { page: '0' },
+    { query: JSON.stringify({
+      key,
+      to: { $gte: moment() },
+      from: { $lte: moment() },
+    }) },
   ],
 });

@@ -7,7 +7,7 @@ import { Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-/* ACTIONS */
+import { apiBillRunErrorHandler } from '../../common/Api';
 import { onGroupAdd, onGroupRemove, getItem, clearItem, updateItem, saveItem } from '../../actions/serviceActions';
 import { addGroupProducts, getGroupProducts, removeGroupProducts } from '../../actions/planGroupsActions';
 import { savePlanRates, planProductsClear } from '../../actions/planProductsActions';
@@ -52,13 +52,7 @@ class ServiceSetup extends Component {
   componentDidMount() {
     const { itemId, mode } = this.props;
     if (typeof itemId !== 'undefined' && itemId !== null && itemId !== '') {
-      this.props.getItem(itemId).then(
-        (response) => {
-          if (response !== true) {
-            this.handleResponseError(response);
-          }
-        }
-      );
+      this.props.getItem(itemId);
     }
     if (mode === 'new') {
       this.props.setPageTitle('Create New Service');
@@ -80,20 +74,6 @@ class ServiceSetup extends Component {
   componentWillUnmount() {
     this.props.clearItem();
     this.props.planProductsClear();
-  }
-
-  handleResponseError = (response) => {
-    let errorMessage = 'Error, please try again...';
-    try {
-      errorMessage = response.error[0].error.data.message;
-    } catch (e1) {
-      try {
-        errorMessage = response.error[0].error.message;
-      } catch (e2) {
-        console.log('unknown error response: ', response);
-      }
-    }
-    this.props.showDanger(errorMessage);
   }
 
   updateItem = (path, value) => {
@@ -122,9 +102,7 @@ class ServiceSetup extends Component {
 
     this.props.saveItem(item).then(
       (response) => {
-        if (response !== true) {
-          this.handleResponseError(response);
-        } else {
+        if (response === true) {
           this.props.showSuccess(`The service was ${action}`);
           this.props.router.push('/services');
         }
