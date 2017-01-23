@@ -82,7 +82,7 @@ export default class Product extends Component {
 
   onChangePrefix = (prefixes) => {
     const prefixesList = (prefixes.length) ? prefixes.split(',') : [];
-    this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixesList));
+    this.props.onFieldUpdate(['params', 'prefix'], Immutable.Set(prefixesList));
   }
 
   onChangeParamKey = (oldKey, newKey) => {
@@ -126,17 +126,19 @@ export default class Product extends Component {
 
   renderNewProductParam = () => {
     const { newProductParam } = this.state;
-
-    return newProductParam ?
-    (<ProductParamEdit
-      newParam={true}
-      onParamSave={this.onProductParamSave}
-      onParamEditClose={this.onParamEditClose}
-      paramKey={''}
-      paramValues={[]}
-      existingKeys={this.getExistingParamKeys()}
-    />)
-    : null;
+    if (newProductParam) {
+      return (
+        <ProductParamEdit
+          newParam={true}
+          onParamSave={this.onProductParamSave}
+          onParamEditClose={this.onParamEditClose}
+          paramKey={''}
+          paramValues={[]}
+          existingKeys={this.getExistingParamKeys()}
+        />
+      );
+    }
+    return null;
   }
 
   onProductRateUpdate = (index, fieldName, value) => {
