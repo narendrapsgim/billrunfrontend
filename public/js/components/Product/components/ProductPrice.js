@@ -100,7 +100,7 @@ export default class ProductPrice extends Component {
     const isFirst = index === 0;
     const isLast = ((count === 0) || (count - 1 === index));
     const from = item.get('from', 0);
-    const fromDisplayValue = (from > 0 ? from + 1 : from);
+    const fromDisplayValue = (from > 0 ? Number(from) + 1 : from);
     const to = item.get('to', '');
     const toDisplayValue = (to === productUnlimitedValue) ? 'Infinite' : to;
 
