@@ -34,19 +34,18 @@ export default class UsagetypeSelect extends Component {
   render() {
     const { value } = this.props;
     return (
-        <Select
-            value={value}
-            cacheAsyncResults={false}
-            onChange={this.onSelectUsageType}
-            asyncOptions={this.loadSelectUsageTypes}
-            searchable={false}
-            valueKey='key'
-            labelKey='key'
-            placeholder='Select usage type...'
-            noResultsText='No usage types found.'
-            searchPromptText='No usage types found.'
-        />
-
+      <Select
+          value={value}
+          cacheAsyncResults={false}
+          onChange={this.onSelectUsageType}
+          asyncOptions={this.loadSelectUsageTypes}
+          searchable={false}
+          valueKey='key'
+          labelKey='key'
+          placeholder='Select usage type...'
+          noResultsText='No usage types found.'
+          searchPromptText='No usage types found.'
+      />
     );
   }
 }

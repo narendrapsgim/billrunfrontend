@@ -1,11 +1,11 @@
-export const GOT_PRODUCT = 'GOT_PRODUCT';
+export const PRODUCT_GOT = 'PRODUCT_GOT';
 export const SAVE_PRODUCT = 'SAVE_PRODUCT';
-export const CLEAR_PRODUCT = 'CLEAR_PRODUCT';
-export const ADD_PRODUCT_RATE = 'ADD_PRODUCT_RATE';
-export const REMOVE_PRODUCT_RATE = 'REMOVE_PRODUCT_RATE';
-export const UPDATE_PRODUCT_FIELD_VALUE = 'UPDATE_PRODUCT_FIELD_VALUE';
-export const UPDATE_PRODUCT_USAGET_VALUE = 'UPDATE_PRODUCT_USAGET_VALUE';
-export const UPDATE_PRODUCT_TO_VALUE = 'UPDATE_PRODUCT_TO_VALUE';
+export const PRODUCT_CLEAR = 'PRODUCT_CLEAR';
+export const PRODUCT_ADD_RATE = 'PRODUCT_ADD_RATE';
+export const PRODUCT_REMOVE_RATE = 'PRODUCT_REMOVE_RATE';
+export const PRODUCT_UPDATE_FIELD_VALUE = 'PRODUCT_UPDATE_FIELD_VALUE';
+export const PRODUCT_UPDATE_USAGET_VALUE = 'PRODUCT_UPDATE_USAGET_VALUE';
+export const PRODUCT_UPDATE_TO_VALUE = 'PRODUCT_UPDATE_TO_VALUE';
 
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
@@ -15,13 +15,13 @@ import { startProgressIndicator, finishProgressIndicator } from './progressIndic
 
 export function clearProduct() {
   return {
-    type: CLEAR_PRODUCT
+    type: PRODUCT_CLEAR
   };
 }
 
 export function onFieldUpdate(path, value) {
   return {
-    type: UPDATE_PRODUCT_FIELD_VALUE,
+    type: PRODUCT_UPDATE_FIELD_VALUE,
     path,
     value
   };
@@ -29,7 +29,7 @@ export function onFieldUpdate(path, value) {
 
 export function onToUpdate(path, index, value) {
   return {
-    type: UPDATE_PRODUCT_TO_VALUE,
+    type: PRODUCT_UPDATE_TO_VALUE,
     path,
     index,
     value
@@ -38,7 +38,7 @@ export function onToUpdate(path, index, value) {
 
 export function onUsagetUpdate(path, oldUsaget, newUsaget) {
   return {
-    type: UPDATE_PRODUCT_USAGET_VALUE,
+    type: PRODUCT_UPDATE_USAGET_VALUE,
     path,
     oldUsaget,
     newUsaget
@@ -47,14 +47,14 @@ export function onUsagetUpdate(path, oldUsaget, newUsaget) {
 
 export function onRateAdd(path) {
   return {
-    type: ADD_PRODUCT_RATE,
+    type: PRODUCT_ADD_RATE,
     path
   };
 }
 
 export function onRateRemove(path, index) {
   return {
-    type: REMOVE_PRODUCT_RATE,
+    type: PRODUCT_REMOVE_RATE,
     path,
     index
   };
@@ -112,12 +112,6 @@ function saveProductToDB(product, action, callback) {
         dispatch(showSuccess('Product saved successfully'));
         dispatch(finishProgressIndicator());
         callback(success);
-      },
-      failure => {
-        const errorMessages = failure.error.map( (response) => response.error.message);
-        dispatch(showDanger(errorMessages));
-        dispatch(finishProgressIndicator());
-        callback(failure);
       }
     ).catch(
       error => { dispatch(apiBillRunErrorHandler(error)); }
@@ -127,7 +121,7 @@ function saveProductToDB(product, action, callback) {
 
 function gotProduct(product) {
   return {
-    type: GOT_PRODUCT,
+    type: PRODUCT_GOT,
     product
   };
 }

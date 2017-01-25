@@ -33,63 +33,63 @@ const planProductsReducer = (state = DefaultState, action) => {
 
   switch(action.type) {
 
-    case PLAN_PRODUCTS_RATE_INIT: {
-      const baseRatePath = action.path.map((val, i) => ((i === 2) ? 'BASE' : val));
-      const baseRate = state.getIn([action.productKey, ...baseRatePath]);
-      return state.setIn([action.productKey, ...action.path], baseRate);
-    }
+    // case PLAN_PRODUCTS_RATE_INIT: {
+    //   const baseRatePath = action.path.map((val, i) => ((i === 2) ? 'BASE' : val));
+    //   const baseRate = state.getIn([action.productKey, ...baseRatePath]);
+    //   return state.setIn([action.productKey, ...action.path], baseRate);
+    // }
 
-    case PLAN_PRODUCTS_RATE_ADD: {
-      return state.updateIn([action.productKey, ...action.path], Immutable.List(), (list) => {
-        if (list.size === 0) {
-          return list.push(new DefaultRate());
-        }
-        const newItem = list.last().set('to', PRODUCT_UNLIMITED);
-        return list
-          .update(list.size - 1, Immutable.Map(), item => (
-            // reset TO value of last item if it 'Unlimited'
-            (item.get('to') === PRODUCT_UNLIMITED) ? item.set('to', '') : item
-          )).push(newItem);
-      });
-    }
+    // case PLAN_PRODUCTS_RATE_ADD: {
+    //   return state.updateIn([action.productKey, ...action.path], Immutable.List(), (list) => {
+    //     if (list.size === 0) {
+    //       return list.push(new DefaultRate());
+    //     }
+    //     const newItem = list.last().set('to', PRODUCT_UNLIMITED);
+    //     return list
+    //       .update(list.size - 1, Immutable.Map(), item => (
+    //         // reset TO value of last item if it 'Unlimited'
+    //         (item.get('to') === PRODUCT_UNLIMITED) ? item.set('to', '') : item
+    //       )).push(newItem);
+    //   });
+    // }
 
-    case PLAN_PRODUCTS_RATE_UPDATE:
-      return state.setIn([action.productKey, ...action.path], action.value);
+    // case PLAN_PRODUCTS_RATE_UPDATE:
+    //   return state.setIn([action.productKey, ...action.path], action.value);
 
-    case PLAN_PRODUCTS_RATE_UPDATE_TO: {
-      return state.updateIn([action.productKey, ...action.path], Immutable.List(), (list) => {
-        if (action.idx < list.size - 1) {
-          const nextItemIndex = action.idx + 1;
-          return list
-            .update(nextItemIndex, Immutable.Map(), item => item.set('from', action.value))
-            .update(action.idx, Immutable.Map(), item => item.set('to', action.value));
-        }
-        return list.update(action.idx, Immutable.Map(), item => item.set('to', action.value));
-      });
-    }
+    // case PLAN_PRODUCTS_RATE_UPDATE_TO: {
+    //   return state.updateIn([action.productKey, ...action.path], Immutable.List(), (list) => {
+    //     if (action.idx < list.size - 1) {
+    //       const nextItemIndex = action.idx + 1;
+    //       return list
+    //         .update(nextItemIndex, Immutable.Map(), item => item.set('from', action.value))
+    //         .update(action.idx, Immutable.Map(), item => item.set('to', action.value));
+    //     }
+    //     return list.update(action.idx, Immutable.Map(), item => item.set('to', action.value));
+    //   });
+    // }
 
-    case PLAN_PRODUCTS_RATE_REMOVE:
-      return state
-      .updateIn([action.productKey, ...action.path], Immutable.List(), (list) => {
-        const prevItemIndex = action.idx - 1;
-        return list
-          .update(prevItemIndex, item => item.set('to', PRODUCT_UNLIMITED))
-          .delete(action.idx);
-      });
-
-    case PLAN_PRODUCTS_REMOVE:
-      //for existing set flag for UNDO option
-      if(action.existing){
-        state = state.update(action.productKey, (item) =>
-          item.withMutations((mutableItem) =>
-            mutableItem
-              .setIn(['uiflags', 'removed'], true)
-              .setIn(['uiflags', 'oldValue'], mutableItem.getIn(action.path))
-          )
-        );
-      }
-      state = state.deleteIn([action.productKey, ...action.path]);
-      return state;
+    // case PLAN_PRODUCTS_RATE_REMOVE:
+    //   return state
+    //   .updateIn([action.productKey, ...action.path], Immutable.List(), (list) => {
+    //     const prevItemIndex = action.idx - 1;
+    //     return list
+    //       .update(prevItemIndex, item => item.set('to', PRODUCT_UNLIMITED))
+    //       .delete(action.idx);
+    //   });
+    //
+    // case PLAN_PRODUCTS_REMOVE:
+    //   //for existing set flag for UNDO option
+    //   if(action.existing){
+    //     state = state.update(action.productKey, (item) =>
+    //       item.withMutations((mutableItem) =>
+    //         mutableItem
+    //           .setIn(['uiflags', 'removed'], true)
+    //           .setIn(['uiflags', 'oldValue'], mutableItem.getIn(action.path))
+    //       )
+    //     );
+    //   }
+    //   state = state.deleteIn([action.productKey, ...action.path]);
+    //   return state;
 
     case PLAN_PRODUCTS_UNDO_REMOVE:
       if(state.getIn([action.productKey, 'uiflags', 'existing']) === true){

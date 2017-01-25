@@ -1,13 +1,32 @@
+import Immutable from 'immutable';
+
+import productReduser from './productReducer';
+
 import {
+  PLAN_PRODUCTS_REMOVE,
+  PLAN_PRODUCTS_UNDO_REMOVE,
+  PLAN_PRODUCTS_RATE_UPDATE_TO,
+  PLAN_PRODUCTS_RATE_UPDATE,
+  PLAN_PRODUCTS_RATE_REMOVE,
+  PLAN_PRODUCTS_RATE_ADD,
+  PLAN_PRODUCTS_RATE_INIT,
+  PLAN_UPDATE_FIELD_VALUE,
+  PLAN_UPDATE_PLAN_CYCLE,
+  PLAN_ADD_TARIFF,
+  PLAN_REMOVE_TARIFF,
+  PLAN_GOT,
+  PLAN_CLEAR,
   REMOVE_GROUP,
   ADD_GROUP,
-  UPDATE_PLAN_FIELD_VALUE,
-  UPDATE_PLAN_CYCLE,
-  ADD_TARIFF,
-  REMOVE_TARIFF,
-  GOT_PLAN,
-  CLEAR_PLAN,
   ADD_USAGET_INCLUDE } from '../actions/planActions';
+
+import {
+  PRODUCT_UPDATE_FIELD_VALUE,
+  PRODUCT_UPDATE_TO_VALUE,
+  PRODUCT_ADD_RATE,
+  PRODUCT_REMOVE_RATE,
+} from '../actions/productActions';
+
 import {
   ADD_BALANCE_NOTIFICATIONS,
   ADD_NOTIFICATION,
@@ -17,41 +36,71 @@ import {
   BLOCK_PRODUCT,
   REMOVE_BLOCK_PRODUCT,
   ADD_BALANCE_THRESHOLD,
-  CHANGE_BALANCE_THRESHOLD
+  CHANGE_BALANCE_THRESHOLD,
 } from '../actions/prepaidPlanActions';
-import moment from 'moment';
-import Immutable from 'immutable';
+
 
 const PLAN_CYCLE_UNLIMITED = globalSetting.planCycleUnlimitedValue;
 const defaultState = Immutable.Map();
 const defaultTariff = Immutable.Map({
   price: '',
   from: 0,
-  to: PLAN_CYCLE_UNLIMITED
+  to: PLAN_CYCLE_UNLIMITED,
 });
 
 
 export default function (state = defaultState, action) {
-
   switch (action.type) {
+
+    case PLAN_PRODUCTS_UNDO_REMOVE:
+      return state.setIn([...action.path, action.price]);
+
+    case PLAN_PRODUCTS_REMOVE:
+      return state.deleteIn([...action.path, action.name]);
+
+    case PLAN_PRODUCTS_RATE_UPDATE_TO: {
+      const productAction = Object.assign(action, { type: PRODUCT_UPDATE_TO_VALUE });
+      return productReduser(state, productAction);
+    }
+
+    case PLAN_PRODUCTS_RATE_UPDATE: {
+      const productAction = Object.assign(action, { type: PRODUCT_UPDATE_FIELD_VALUE });
+      return productReduser(state, productAction);
+    }
+
+    case PLAN_PRODUCTS_RATE_REMOVE: {
+      const productAction = Object.assign(action, { type: PRODUCT_REMOVE_RATE });
+      return productReduser(state, productAction);
+    }
+
+    case PLAN_PRODUCTS_RATE_ADD: {
+      const productAction = Object.assign(action, { type: PRODUCT_ADD_RATE });
+      return productReduser(state, productAction);
+    }
+
+    case PLAN_PRODUCTS_RATE_INIT: {
+      const usaget = action.product.get('rates', Immutable.Map()).keySeq().first();
+      return state.setIn(action.path, action.product.getIn(['rates', usaget, 'BASE', 'rate']));
+    }
 
     case REMOVE_GROUP:
       return state.deleteIn(['include', 'groups', action.groupName]);
 
-    case ADD_GROUP:
+    case ADD_GROUP: {
       const group = Immutable.Map({
-        [action.usage] : action.value,
-        'account_shared': action.shared
+        [action.usage]: action.value,
+        account_shared: action.shared,
       });
       return state.setIn(['include', 'groups', action.groupName], group);
+    }
 
-    case UPDATE_PLAN_FIELD_VALUE:
-      return state.updateIn(action.path, '', value => action.value);
+    case PLAN_UPDATE_FIELD_VALUE:
+      return state.setIn(action.path, action.value);
 
-    case UPDATE_PLAN_CYCLE:
-      return state.updateIn(['price'], list => _reaclculateCycles(list, action.index, action.value));
+    case PLAN_UPDATE_PLAN_CYCLE:
+      return state.updateIn(['price'], list => reaclculateCycles(list, action.index, action.value));
 
-    case ADD_TARIFF: {
+    case PLAN_ADD_TARIFF: {
       // If trail add to head
       if (action.trial) {
         const trial = defaultTariff.set('trial', true);
@@ -69,7 +118,7 @@ export default function (state = defaultState, action) {
       );
     }
 
-    case REMOVE_TARIFF: {
+    case PLAN_REMOVE_TARIFF: {
       if (action.index === 0) { // removed first item
         return state.update('price', Immutable.List(), (list) => {
           if (list.size > 1) { // there is other items in list, update next item from to 0
@@ -88,10 +137,10 @@ export default function (state = defaultState, action) {
       );
     }
 
-    case GOT_PLAN:
+    case PLAN_GOT:
       return Immutable.fromJS(action.plan);
 
-    case CLEAR_PLAN:
+    case PLAN_CLEAR:
       return defaultState;
 
     case ADD_BALANCE_NOTIFICATIONS:
@@ -149,40 +198,37 @@ export default function (state = defaultState, action) {
   }
 }
 
-function _reaclculateCycles(prices, index, value){
-  return prices.reduce( (newList, price, i, iter) => {
-    if(i == index){
-      //set new To
-      if(typeof value === 'undefined'){ // first item was removed
-        price = price.set('to', parseInt(price.get('to', 0) || 0) - parseInt(price.get('from', 0) || 0));
-      }
-      else if(value === PLAN_CYCLE_UNLIMITED){ // last value set to unlimited
-        price = price.set('to', value);
-      } else { // simple case, update to new value
-        price = price.set('to', parseInt(price.get('from') || 0) + parseInt(value));
-      }
-      //set new From
-      if(index === 0){
-         price = price.set('from', 0);
-      }
-      return newList.push(price);
-    } else if(i > index){
-      var from = price.get('from', 0);
-      var to = price.get('to', '');
-      //set new From
-      var prevTo = parseInt(newList.last().get('to', 0) || 0);
-      price = price.set('from', prevTo);
-      //set new To
-      if(to === ''){ //TO not set
-        price = price.set('to', price.get('from'));
-      } else if(to === PLAN_CYCLE_UNLIMITED ){ //TO is unlimited
-        // do nothing
-      } else { // normal case, update with shifting
-        var diff = parseInt(to || 0) - parseInt(from || 0);
-        price = price.set('to', prevTo + diff);
-      }
-      return newList.push(price);
+const reaclculateCycles = (prices, index, value) => prices.reduce((newList, price, i) => {
+  if (i === index) {
+    // set new To
+    if (typeof value === 'undefined') { // first item was removed
+      price = price.set('to', parseInt(price.get('to', 0) || 0) - parseInt(price.get('from', 0) || 0));
+    } else if (value === PLAN_CYCLE_UNLIMITED) { // last value set to unlimited
+      price = price.set('to', value);
+    } else { // simple case, update to new value
+      price = price.set('to', parseInt(price.get('from') || 0) + parseInt(value));
+    }
+    // set new From
+    if (index === 0) {
+       price = price.set('from', 0);
     }
     return newList.push(price);
-  }, Immutable.List());
-}
+  } else if (i > index) {
+    const from = price.get('from', 0);
+    const to = price.get('to', '');
+    // set new From
+    const prevTo = parseInt(newList.last().get('to', 0) || 0);
+    price = price.set('from', prevTo);
+    // set new To
+    if (to === '') { // TO not set
+      price = price.set('to', price.get('from'));
+    } else if (to === PLAN_CYCLE_UNLIMITED) { // TO is unlimited
+      // do nothing
+    } else { // normal case, update with shifting
+      const diff = parseInt(to || 0) - parseInt(from || 0);
+      price = price.set('to', prevTo + diff);
+    }
+    return newList.push(price);
+  }
+  return newList.push(price);
+}, Immutable.List());

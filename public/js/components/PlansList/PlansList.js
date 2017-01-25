@@ -32,7 +32,7 @@ class PlansList extends Component {
     this.itemsType = 'plans';
     this.itemType = 'plan';
     this.state = {
-      size: 10,
+      size: 20,
       page: 0,
       sort: '',
       filter: {},

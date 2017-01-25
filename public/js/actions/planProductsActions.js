@@ -70,14 +70,14 @@ function initPlanProducts(products, planName) {
   };
 }
 
-export function removePlanProduct(productKey, path, existing = false) {
-  return {
-    type: PLAN_PRODUCTS_REMOVE,
-    productKey,
-    path,
-    existing
-  };
-}
+// export function removePlanProduct(productKey, path, existing = false) {
+//   return {
+//     type: PLAN_PRODUCTS_REMOVE,
+//     productKey,
+//     path,
+//     existing
+//   };
+// }
 
 export function restorePlanProduct(productKey, path) {
   return {
@@ -95,49 +95,49 @@ export function undoRemovePlanProduct(productKey, path) {
   };
 }
 
-export function planProductsRateUpdate(productKey, path, value) {
-  return {
-    type: PLAN_PRODUCTS_RATE_UPDATE,
-    productKey,
-    path,
-    value
-  };
-}
+// export function planProductsRateUpdate(productKey, path, value) {
+//   return {
+//     type: PLAN_PRODUCTS_RATE_UPDATE,
+//     productKey,
+//     path,
+//     value
+//   };
+// }
 
-export function planProductsRateUpdateTo(productKey, path, idx, value) {
-  return {
-    type: PLAN_PRODUCTS_RATE_UPDATE_TO,
-    productKey,
-    path,
-    idx,
-    value,
-  };
-}
+// export function planProductsRateUpdateTo(productKey, path, idx, value) {
+//   return {
+//     type: PLAN_PRODUCTS_RATE_UPDATE_TO,
+//     productKey,
+//     path,
+//     idx,
+//     value,
+//   };
+// }
 
-export function planProductsRateAdd(productKey, path) {
-  return {
-    type: PLAN_PRODUCTS_RATE_ADD,
-    productKey,
-    path
-  };
-}
+// export function planProductsRateAdd(productKey, path) {
+//   return {
+//     type: PLAN_PRODUCTS_RATE_ADD,
+//     productKey,
+//     path
+//   };
+// }
 
-export function planProductsRateInit(productKey, path) {
-  return {
-    type: PLAN_PRODUCTS_RATE_INIT,
-    productKey,
-    path
-  };
-}
+// export function planProductsRateInit(productKey, path) {
+//   return {
+//     type: PLAN_PRODUCTS_RATE_INIT,
+//     productKey,
+//     path
+//   };
+// }
 
-export function planProductsRateRemove(productKey, path, idx) {
-  return {
-    type: PLAN_PRODUCTS_RATE_REMOVE,
-    productKey,
-    path,
-    idx
-  };
-}
+// export function planProductsRateRemove(productKey, path, idx) {
+//   return {
+//     type: PLAN_PRODUCTS_RATE_REMOVE,
+//     productKey,
+//     path,
+//     idx
+//   };
+// }
 
 export function planProductsClear(){
   return {
@@ -153,49 +153,52 @@ export function getUsageTypes(){
     return apiBillRun(query);
 }
 
-export function getExistPlanProducts(planName) {
-  return dispatch => {
-    return getUsageTypes().then(
-      success => {
-        dispatch( getExistPlanProductsByUsageTypes(planName, success.data[0].data.details) );
-      },
-      failure => { throw failure; }
-    ).catch(
-      error => dispatch(apiBillRunErrorHandler(error))
-    );
-  };
-}
+// export function getExistPlanProducts(planName) {
+//   return dispatch => {
+//     return getUsageTypes().then(
+//       success => {
+//         dispatch( getExistPlanProductsByUsageTypes(planName, success.data[0].data.details) );
+//       },
+//       failure => { throw failure; }
+//     ).catch(
+//       error => dispatch(apiBillRunErrorHandler(error))
+//     );
+//   };
+// }
 
-export function getProductByKey(key, planName) {
-  if(key && key.length){
-    return dispatch => {
-      let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
-      let query = {
-        api: 'find',
-        params: [
-          { collection: 'rates' },
-          { size: '2' },
-          { page: '0' },
-          { query: JSON.stringify({
-              'key': key,
-              'to': {'$gte' : toadyApiString},
-              'from': {'$lte' : toadyApiString},
-          }) },
-        ]
-      };
-
-      apiBillRun(query).then(
-        success => {
-          let poducts = _.values(success.data[0].data.details);
-          dispatch(gotPlanProducts(poducts, planName));
-        },
-        failure => { throw failure; }
-      ).catch(
-        error => dispatch(apiBillRunErrorHandler(error))
-      );
-    };
-  }
-}
+// export function getProductByKey(key, planName) {
+//   if(key && key.length){
+//     return dispatch => {
+//       let toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
+//       let query = {
+//         api: 'find',
+//         params: [
+//           { collection: 'rates' },
+//           { size: '2' },
+//           { page: '0' },
+//           { query: JSON.stringify({
+//               'key': key,
+//               'to': {'$gte' : toadyApiString},
+//               'from': {'$lte' : toadyApiString},
+//           }) },
+//         ]
+//       };
+//
+//       apiBillRun(query).then(
+//         (success) => {
+//           try {
+//             const poduct = success.data[0].data.details[0];
+//             dispatch(gotPlanProducts([poduct], planName));
+//           } catch (e) {
+//             dispatch(apiBillRunErrorHandler(e, 'Error retrieving the product'));
+//           }
+//         }
+//       ).catch(
+//         error => dispatch(apiBillRunErrorHandler(error))
+//       );
+//     };
+//   }
+// }
 
 export function savePlanRates(callback) {
   return (dispatch, getState) => {
@@ -216,26 +219,22 @@ export function savePlanRates(callback) {
     // });
     const queries = planProducts.planProducts
       // .filter( prod => productsKeysToSave.has(prod.get('key')))
-      .map( prod => buildSaveProductQuery(prod, 'update')).toArray();
+      .map(prod => buildSaveProductQuery(prod, 'update')).toArray();
 
-    if(queries.length){
-      apiBillRun(queries).then(
-        sussess => {
-          const prodNames = sussess.data.map( (response) => response.name );
+    if (queries.length) {
+      apiBillRun(queries)
+        .then((sussess) => {
+          const prodNames = sussess.data.map(response => response.name);
           let successMessage = prodNames.length ? 'Products' : 'Product';
-          successMessage += ' ' + prodNames.join(', ') + ' successfully updated';
-          dispatch(showSuccess( successMessage ));
-          //TODO : reload ratea by key
+          successMessage += ` ${prodNames.join(', ')} successfully updated`;
+          dispatch(showSuccess(successMessage));
+          // TODO : reload ratea by key
           callback(sussess);
-        },
-        failure => {
-          let errorMessages = failure.error.map( (response) => `${response.name}: ${response.error.message}` );
-          dispatch(showDanger(errorMessages));
-          //TODO : reload sussessed rates by key
-        }
-      ).catch(
-        error => { dispatch(apiBillRunErrorHandler(error)); }
-      );
+        })
+        .catch((error) => {
+          dispatch(apiBillRunErrorHandler(error));
+          callback(false);
+        });
     } else {
       callback(true);
     }

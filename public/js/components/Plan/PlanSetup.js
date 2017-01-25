@@ -8,21 +8,20 @@ import PlanTab from './PlanTab';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
 import PlanIncludesTab from './PlanIncludesTab';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-/* ACTIONS */
 import {
-  clearPlan,
   getPlan,
   savePlan,
+  clearPlan,
   onGroupAdd,
   onGroupRemove,
   onPlanCycleUpdate,
   onPlanTariffAdd,
   onPlanTariffRemove,
-  onPlanFieldUpdate } from '../../actions/planActions';
+  onPlanFieldUpdate,
+} from '../../actions/planActions';
 import { addGroupProducts, getGroupProducts, removeGroupProducts } from '../../actions/planGroupsActions';
-import { savePlanRates } from '../../actions/planProductsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { showDanger } from '../../actions/alertsActions';
+import { gotEntity, clearEntity } from '../../actions/entityActions';
 
 
 class PlanSetup extends Component {
@@ -42,37 +41,28 @@ class PlanSetup extends Component {
       push: React.PropTypes.func.isRequired,
     }).isRequired,
     addGroupProducts: React.PropTypes.func.isRequired,
-    clearPlan: React.PropTypes.func.isRequired,
     getGroupProducts: React.PropTypes.func.isRequired,
-    getPlan: React.PropTypes.func.isRequired,
     onGroupAdd: React.PropTypes.func.isRequired,
     onGroupRemove: React.PropTypes.func.isRequired,
-    onPlanCycleUpdate: React.PropTypes.func.isRequired,
-    onPlanFieldUpdate: React.PropTypes.func.isRequired,
-    onPlanTariffAdd: React.PropTypes.func.isRequired,
-    onPlanTariffRemove: React.PropTypes.func.isRequired,
     removeGroupProducts: React.PropTypes.func.isRequired,
-    savePlan: React.PropTypes.func.isRequired,
-    savePlanRates: React.PropTypes.func.isRequired,
-    setPageTitle: React.PropTypes.func.isRequired,
-    showDanger: React.PropTypes.func.isRequired,
+    dispatch: React.PropTypes.func.isRequired,
   }
 
   state = {
-    activeTab: parseInt(this.props.activeTab, 10),
+    activeTab: parseInt(this.props.activeTab),
   }
 
   componentWillMount() {
     const { itemId } = this.props;
     if (itemId) {
-      this.props.getPlan(itemId);
+      this.props.dispatch(getPlan(itemId)).then(this.setOriginItem);
     }
   }
 
   componentDidMount() {
     const { mode } = this.props;
     if (mode === 'new') {
-      this.props.setPageTitle('Create New Plan');
+      this.props.dispatch(setPageTitle('Create New Plan'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'postpaid'));
     }
   }
@@ -81,46 +71,47 @@ class PlanSetup extends Component {
     const { item: oldItem, mode } = this.props;
     const { item } = nextProps;
     if (mode === 'update' && oldItem.get('name') !== item.get('name')) {
-      this.props.setPageTitle(`Edit plan - ${item.get('name')}`);
+      this.props.dispatch(setPageTitle(`Edit plan - ${item.get('name')}`));
     }
   }
 
   componentWillUnmount() {
-    this.props.clearPlan();
+    this.props.dispatch(clearPlan());
+    this.props.dispatch(clearEntity('planOriginal'));
+  }
+
+  setOriginItem = (response) => {
+    if (response.status) {
+      this.props.dispatch(gotEntity('planOriginal', response.data[0]));
+    }
   }
 
   onChangeFieldValue = (path, value) => {
-    this.props.onPlanFieldUpdate(path, value);
+    this.props.dispatch(onPlanFieldUpdate(path, value));
   }
 
   onPlanCycleUpdate = (index, value) => {
-    this.props.onPlanCycleUpdate(index, value);
+    this.props.dispatch(onPlanCycleUpdate(index, value));
   }
 
   onPlanTariffAdd = (trail) => {
-    this.props.onPlanTariffAdd(trail);
+    this.props.dispatch(onPlanTariffAdd(trail));
   }
 
   onPlanTariffRemove = (index) => {
-    this.props.onPlanTariffRemove(index);
+    this.props.dispatch(onPlanTariffRemove(index));
   }
 
   handleSave = () => {
-    this.saveRates();
-  }
-
-  saveRates = () => {
-    this.props.savePlanRates(this.savePlan);
-  }
-
-  savePlan = () => {
     const { item, mode } = this.props;
-    this.props.savePlan(item, mode, this.afterSave);
+    this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
   }
-
-  afterSave = (data) => {
-    if (data === true) {
-      this.props.router.push('/plans');
+  afterSave = (response) => {
+    const { mode } = this.props;
+    if (response.status && mode === 'new') {
+      this.handleBack();
+    } else if (response.status && mode !== 'new') {
+      this.handleBack();
     }
   }
 
@@ -156,14 +147,11 @@ class PlanSetup extends Component {
             </Panel>
           </Tab>
 
-          {
-            mode !== 'new' &&
-            (<Tab title="Override Product Price" eventKey={2}>
-              <Panel style={{ borderTop: 'none' }}>
-                <PlanProductsPriceTab />
-              </Panel>
-            </Tab>)
-          }
+          <Tab title="Override Product Price" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanProductsPriceTab plan={item} />
+            </Panel>
+          </Tab>
 
           <Tab title="Plan Includes" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
@@ -191,20 +179,10 @@ class PlanSetup extends Component {
 
 const mapDispatchToProps = dispatch => bindActionCreators({
   addGroupProducts,
-  clearPlan,
   getGroupProducts,
-  getPlan,
   onGroupAdd,
   onGroupRemove,
-  onPlanCycleUpdate,
-  onPlanFieldUpdate,
-  onPlanTariffAdd,
-  onPlanTariffRemove,
   removeGroupProducts,
-  savePlan,
-  savePlanRates,
-  setPageTitle,
-  showDanger,
 }, dispatch);
 
 

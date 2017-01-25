@@ -69,7 +69,7 @@ export const getProductByKeyQuery = key => ({
   api: 'find',
   params: [
     { collection: 'rates' },
-    { size: '2' },
+    { size: '1' },
     { page: '0' },
     { query: JSON.stringify({
       key,
@@ -77,4 +77,39 @@ export const getProductByKeyQuery = key => ({
       from: { $lte: moment() },
     }) },
   ],
+});
+
+export const getProductsByKeysQuery = (keys, project = {}) => ({
+  api: 'find',
+  params: [
+    { collection: 'rates' },
+    { size: 1000 },
+    { project: JSON.stringify(project) },
+    { page: 0 },
+    { query: JSON.stringify({
+      key: { $in: keys },
+      to: { $gte: moment() },
+      from: { $lte: moment() },
+    }) },
+  ],
+});
+
+export const fetchPlanByIdQuery = id => ({
+  api: 'find',
+  params: [
+    { collection: 'plans' },
+    { size: 1 },
+    { page: 0 },
+    { query: JSON.stringify(
+      { _id: { $in: [id] } }
+    ) },
+  ],
+});
+
+export const saveQuery = body => ({
+  api: 'save',
+  options: {
+    method: 'POST',
+    body,
+  },
 });
