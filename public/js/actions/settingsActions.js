@@ -1,6 +1,5 @@
-import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
-import { showSuccess, showDanger } from './alertsActions';
+import { showSuccess } from './alertsActions';
 
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
