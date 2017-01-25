@@ -9,8 +9,10 @@ export default function (state = defaultState, action) {
     case actions.GOT_LIST:
       return state.set(collection, Immutable.fromJS(action.list).toList());
 
-    case actions.ADD_TO_LIST:
-      return state.update(collection, Immutable.List(), list => list.push(action.item));
+    case actions.ADD_TO_LIST: {
+      const items = Immutable.fromJS(action.items).toList();
+      return state.update(collection, Immutable.List(), list => list.push(...items));
+    }
 
     case actions.REMOVE_FROM_LIST:
       return state.update(collection, Immutable.List(), list => list.delete(action.index));

@@ -1,4 +1,4 @@
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -20,21 +20,30 @@ const setNextPage = nextPage => ({
   nextPage,
 });
 
-const fetchList = (collection, params) => (dispatch) => {
+export const addToList = (collection, items) => ({
+  type: actions.ADD_TO_LIST,
+  collection,
+  items,
+});
+
+const fetchList = (collection, params, reset = true) => (dispatch) => {
   dispatch(startProgressIndicator());
-  apiBillRun(params).then(
-    (success) => {
-      try {
-        dispatch(finishProgressIndicator());
-        dispatch(setNextPage(success.data[0].data.next_page));
+  return apiBillRun(params)
+  .then((success) => {
+    try {
+      if (reset) {
         dispatch(gotList(collection, success.data[0].data.details));
-      } catch (e) {
-        throw new Error('Error retreiving list');
+        dispatch(setNextPage(success.data[0].data.next_page));
+      } else {
+        dispatch(addToList(collection, success.data[0].data.details));
       }
+      return dispatch(apiBillRunSuccessHandler(success));
+    } catch (e) {
+      console.log('fetchList error: ', e);
+      throw new Error('Error retreiving list');
     }
-  ).catch((error) => {
-    dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again'));
-  });
+  })
+  .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
 };
 
 export const clearList = collection => ({
@@ -42,16 +51,11 @@ export const clearList = collection => ({
   collection,
 });
 
-export const addToList = (collection, item) => ({
-  type: actions.ADD_TO_LIST,
-  collection,
-  item,
-});
-
 export const deleteFromList = (collection, index) => ({
-  type: actions.ADD_TO_LIST,
+  type: actions.REMOVE_FROM_LIST,
   collection,
   index,
 });
 
-export const getList = (collection, params) => dispatch => dispatch(fetchList(collection, params));
+export const getList = (collection, params, reset) => dispatch =>
+  dispatch(fetchList(collection, params, reset));
