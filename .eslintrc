@@ -17,7 +17,8 @@
         'everything-else',
         'render'
       ]
-    }]
+    }],
+    "radix": ["error", "as-needed"],
   },
   "plugins": [
     "react"
