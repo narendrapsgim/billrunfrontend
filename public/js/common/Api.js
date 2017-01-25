@@ -1,5 +1,5 @@
-import { hideProgressBar } from '../actions/progressbarActions';
-import { showDanger } from '../actions/alertsActions';
+import { dismissProgressIndicator, finishProgressIndicator } from '../actions/progressIndicatorActions';
+import { showDanger, showSuccess } from '../actions/alertsActions';
 
 // Helper function to simulate API response with delay
 export const delay = (sec = 2, success = true, mock = { success: true }) =>
@@ -77,10 +77,38 @@ const buildQueryString = (params = null) => {
   return queryParams;
 };
 
-// Handel API errors
+// Handel API success (ugly code to handle non standard API responses - should be improved with BillAPI)
+export const apiBillRunSuccessHandler = (success, message = false) => (dispatch) => {
+  dispatch(finishProgressIndicator());
+  let data;
+  try {
+    data = success.data[0].data.details;
+    if (typeof data === 'undefined') {
+      throw new Error();
+    }
+  } catch (e3) {
+    try {
+      data = success.data[0].data.data;
+      if (typeof data === 'undefined') {
+        throw new Error();
+      }
+    } catch (e1) {
+      data = null;
+    }
+  }
+  if (message) {
+    dispatch(showSuccess(message));
+  }
+  return ({
+    status: true,
+    data,
+  });
+};
+
+// Handel API errors (ugly code to handle non standard API responses - should be improved with standard BillAPI)
 export const apiBillRunErrorHandler = (error, defaultMessage = 'Error, please try again...') => (dispatch) => {
   console.log('Api Error Handler, error: ', error); // eslint-disable-line  no-console
-  dispatch(hideProgressBar());
+  dispatch(dismissProgressIndicator());
   let errorMessage;
   if (typeof error.message === 'string') {
     errorMessage = error.message;
@@ -100,6 +128,10 @@ export const apiBillRunErrorHandler = (error, defaultMessage = 'Error, please tr
     }
   }
   dispatch(showDanger(errorMessage));
+  return ({
+    status: false,
+    error,
+  });
 };
 
 // Send Http request
