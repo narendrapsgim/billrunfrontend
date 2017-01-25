@@ -113,3 +113,23 @@ export const saveQuery = body => ({
     body,
   },
 });
+
+
+export const getPPIncludesQuery = () => ({
+  api: 'find',
+  params: [
+    { collection: 'prepaidincludes' },
+    { query: JSON.stringify(
+      { to: { $gt: moment() } }
+    ) },
+  ],
+});
+
+
+export const getPrepaidIncludesQuery = () => ({
+  api: 'find',
+  params: [
+    { collection: 'prepaidincludes' },
+    { query: JSON.stringify({}) },
+  ],
+});

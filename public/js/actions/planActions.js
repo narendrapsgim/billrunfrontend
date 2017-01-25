@@ -181,11 +181,11 @@ export const onPlanTariffRemove = index => ({
   index,
 });
 
-export const addUsagetInclude = (usaget, pp_includes_name, pp_includes_external_id) => ({
+export const addUsagetInclude = (usaget, ppIncludesName, ppIncludesExternalId) => ({
   type: ADD_USAGET_INCLUDE,
   usaget,
-  pp_includes_name,
-  pp_includes_external_id,
+  ppIncludesName,
+  ppIncludesExternalId,
 });
 
 export const getPlan = planId => dispatch => dispatch(fetchPlan(planId));

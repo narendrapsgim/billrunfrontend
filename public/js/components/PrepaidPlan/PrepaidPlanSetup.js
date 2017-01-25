@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { List, Map } from 'immutable';
-import moment from 'moment';
 import { Tabs, Tab, Col, Panel, Button } from 'react-bootstrap';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
 import PlanNotifications from './PlanNotifications';
@@ -10,6 +9,7 @@ import BlockedProducts from './BlockedProducts';
 import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
 import Thresholds from './Thresholds';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
+import { getPPIncludesQuery } from '../../common/ApiQueries';
 import {
   addNotification,
   removeNotification,
@@ -22,10 +22,10 @@ import {
   changeBalanceThreshold,
 } from '../../actions/prepaidPlanActions';
 import { getList } from '../../actions/listActions';
-import { showWarning, showDanger } from '../../actions/alertsActions';
+import { showWarning } from '../../actions/alertsActions';
 import { getPlan, savePlan, clearPlan, onPlanFieldUpdate } from '../../actions/planActions';
-import { savePlanRates } from '../../actions/planProductsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { gotEntity, clearEntity } from '../../actions/entityActions';
 
 
 class PrepaidPlanSetup extends Component {
@@ -46,11 +46,15 @@ class PrepaidPlanSetup extends Component {
     }).isRequired,
   }
 
-  componentDidMount() {
-    const { planId, action } = this.props;
+  componentWillMount() {
+    const { planId } = this.props;
     if (planId) {
-      this.props.dispatch(getPlan(planId));
+      this.props.dispatch(getPlan(planId)).then(this.setOriginItem);
     }
+  }
+
+  componentDidMount() {
+    const { action } = this.props;
     if (action === 'new') {
       this.props.dispatch(setPageTitle('Create New Prepaid Plan'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
@@ -60,35 +64,31 @@ class PrepaidPlanSetup extends Component {
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Map({ unit: 1, periodicity: 'month' })));
     }
-    const ppincludesParams = {
-      api: 'find',
-      params: [
-        { collection: 'prepaidincludes' },
-        { query: JSON.stringify({ to: { $gt: moment() } }) },
-      ],
-    };
-    this.props.dispatch(getList('pp_includes', ppincludesParams));
+    this.props.dispatch(getList('pp_includes', getPPIncludesQuery()));
   }
 
   componentWillReceiveProps(nextProps) {
+    const { plan: oldPlan, action } = this.props;
     const { plan } = nextProps;
-    const { action } = this.props;
-    if (action !== 'new' && plan.get('name') && plan.get('name') !== this.props.plan.get('name')) {
+    if (action !== 'new' && plan.get('name') && plan.get('name') !== oldPlan.get('name')) {
       this.props.dispatch(setPageTitle(`Edit Prepaid Plan - ${plan.get('name')}`));
     }
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
+    this.props.dispatch(clearEntity('planOriginal'));
+  }
+
+  setOriginItem = (response) => {
+    if (response.status) {
+      this.props.dispatch(gotEntity('planOriginal', response.data[0]));
+    }
   }
 
   onChangePlanField = (path, value) => {
     this.props.dispatch(onPlanFieldUpdate(path, value));
   }
-
-  onChangePlanName = (value) => {
-    this.props.dispatch(onPlanFieldUpdate(['name'], value));
-  };
 
   onSelectBalance = (ppInclude) => {
     const { plan, dispatch } = this.props;
@@ -141,58 +141,36 @@ class PrepaidPlanSetup extends Component {
     }
   };
 
-  handleResponseError = (response) => {
-    let errorMessage = 'Error, please try again...';
-    try {
-      errorMessage = response.error[0].error.data.message;
-    } catch (e1) {
-      try {
-        errorMessage = response.error[0].error.message;
-      } catch (e2) {
-        console.log('unknown error response: ', response);
-      }
-    }
-    this.props.dispatch(showDanger(errorMessage));
-  }
-
-  savePlan = () => {
-    const { plan, action } = this.props;
-    this.props.dispatch(savePlan(plan, action, this.afterSave));
-  }
-
-  afterSave = (data) => {
-    console.log('data : ', data);
-    if (typeof data.error !== 'undefined' && data.error.length) {
-      this.handleResponseError(data);
-    } else {
-      this.props.router.push('/prepaid_plans');
+  afterSave = (response) => {
+    const { action } = this.props;
+    if (response.status && action === 'new') {
+      this.handleBack();
+    } else if (response.status && action !== 'new') {
+      this.handleBack();
     }
   }
 
   handleSave = () => {
-    this.props.dispatch(savePlanRates(this.savePlan));
+    const { plan, action } = this.props;
+    this.props.dispatch(savePlan(plan, action)).then(this.afterSave);
   };
 
-  handleCancel = () => {
+  handleBack = () => {
     this.props.router.push('/prepaid_plans');
   };
 
   render() {
     const { plan, ppIncludes, action } = this.props;
 
-    if (action !== 'new' && !plan.get('name')) {
-      return (<LoadingItemPlaceholder onClick={this.handleCancel} />);
+    // in update mode wait for plan before render edit screen
+    if (action === 'update' && typeof plan.getIn(['_id', '$id']) === 'undefined') {
+      return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     return (
       <div className="PrepaidPlan">
         <Col lg={12}>
-          <Tabs
-            defaultActiveKey={1}
-            id="PrepaidPlan"
-            animation={false}
-            onSelect={this.handleSelectTab}
-          >
+          <Tabs defaultActiveKey={1} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
 
             <Tab title="Details" eventKey={1}>
               <Panel style={{ borderTop: 'none' }}>
@@ -206,7 +184,7 @@ class PrepaidPlanSetup extends Component {
 
             <Tab title="Override Product Price" eventKey={2}>
               <Panel style={{ borderTop: 'none' }}>
-                <PlanProductsPriceTab />
+                <PlanProductsPriceTab plan={plan} />
               </Panel>
             </Tab>
 
@@ -248,7 +226,7 @@ class PrepaidPlanSetup extends Component {
 
           <div style={{ marginTop: 12 }}>
             <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
-            <Button onClick={this.handleCancel} bsStyle="default">Cancel</Button>
+            <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
           </div>
 
         </Col>

@@ -47,6 +47,11 @@ const defaultTariff = Immutable.Map({
   from: 0,
   to: PLAN_CYCLE_UNLIMITED,
 });
+const defaultNotification = Immutable.Map({
+  value: 0,
+  type: '',
+  msg: '',
+});
 
 
 export default function (state = defaultState, action) {
@@ -143,55 +148,51 @@ export default function (state = defaultState, action) {
     case PLAN_CLEAR:
       return defaultState;
 
-    case ADD_BALANCE_NOTIFICATIONS:
-      let new_notifications = Immutable.List([Immutable.Map({value: 0, type: '', msg: ''})]);
-      return state.setIn(['notifications_threshold', action.balance], new_notifications);
+    case ADD_BALANCE_NOTIFICATIONS: {
+      const newNotifications = Immutable.List([defaultNotification]);
+      return state.setIn(['notifications_threshold', action.balance], newNotifications);
+    }
 
     case ADD_NOTIFICATION:
-      let new_notification = Immutable.Map({value: 0, type: '', msg: ''});
-      return state.updateIn(["notifications_threshold", action.threshold_id],
-			    Immutable.List(),
-			    list => list.push(new_notification));
+      return state.updateIn(['notifications_threshold', action.thresholdId], Immutable.List(), list => list.push(defaultNotification));
 
     case REMOVE_NOTIFICATION:
-      return state.updateIn(["notifications_threshold", action.threshold_id],
-			    Immutable.List(),
-			    list => list.remove(action.index));
+      return state.updateIn(['notifications_threshold', action.thresholdId], Immutable.List(), list => list.remove(action.index));
 
-    case UPDATE_NOTIFICATION_FIELD:
-      return state.setIn(["notifications_threshold",
-			  action.threshold_id,
-			  action.index,
-			  action.field], action.value);
+    case UPDATE_NOTIFICATION_FIELD: {
+      const path = ['notifications_threshold', action.thresholdId, action.index, action.field];
+      return state.setIn(path, action.value);
+    }
 
-    case REMOVE_BALANCE_NOTIFICATIONS:
-      return state.setIn(["notifications_threshold", action.balance_id], Immutable.List());
+    case REMOVE_BALANCE_NOTIFICATIONS: {
+      const path = ['notifications_threshold', action.balanceId];
+      return state.setIn(path, Immutable.List());
+    }
 
     case BLOCK_PRODUCT:
-      return state.update("disallowed_rates", Immutable.List(), list => list.push(action.rate));
+      return state.update('disallowed_rates', Immutable.List(), list => list.push(action.rate));
 
     case REMOVE_BLOCK_PRODUCT:
-      return state.update('disallowed_rates',
-			  Immutable.List(),
-			  list => list.filterNot(p => p === action.rate));
+      return state.update('disallowed_rates', Immutable.List(), list => list.filterNot(p => p === action.rate));
 
     case ADD_BALANCE_THRESHOLD:
-      return state.setIn(['pp_threshold', action.balance_id], 0);
+      return state.setIn(['pp_threshold', action.balanceId], 0);
 
     case CHANGE_BALANCE_THRESHOLD:
-      return state.setIn(['pp_threshold', action.balance_id], action.value);
+      return state.setIn(['pp_threshold', action.balanceId], action.value);
 
-    case ADD_USAGET_INCLUDE:
-      let { pp_includes_name, pp_includes_external_id } = action;
+    case ADD_USAGET_INCLUDE: {
       const newInclude = Immutable.fromJS({
         usagev: 0,
         period: {
           unit: '',
-          duration: 0
+          duration: 0,
         },
-        pp_includes_name,
-        pp_includes_external_id});
+        pp_includes_name: action.ppIncludesName,
+        pp_includes_external_id: action.ppIncludesExternalId,
+      });
       return state.setIn(['include', action.usaget], newInclude);
+    }
 
     default:
       return state;

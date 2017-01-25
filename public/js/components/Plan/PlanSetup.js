@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router';
@@ -32,20 +32,20 @@ class PlanSetup extends Component {
   };
 
   static propTypes = {
-    itemId: React.PropTypes.string,
-    item: React.PropTypes.instanceOf(Immutable.Map),
-    includeGroups: React.PropTypes.instanceOf(Immutable.Map),
-    mode: React.PropTypes.string,
-    activeTab: React.PropTypes.number,
-    router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired,
+    itemId: PropTypes.string,
+    item: PropTypes.instanceOf(Immutable.Map),
+    includeGroups: PropTypes.instanceOf(Immutable.Map),
+    mode: PropTypes.string,
+    activeTab: PropTypes.number,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
     }).isRequired,
-    addGroupProducts: React.PropTypes.func.isRequired,
-    getGroupProducts: React.PropTypes.func.isRequired,
-    onGroupAdd: React.PropTypes.func.isRequired,
-    onGroupRemove: React.PropTypes.func.isRequired,
-    removeGroupProducts: React.PropTypes.func.isRequired,
-    dispatch: React.PropTypes.func.isRequired,
+    addGroupProducts: PropTypes.func.isRequired,
+    getGroupProducts: PropTypes.func.isRequired,
+    onGroupAdd: PropTypes.func.isRequired,
+    onGroupRemove: PropTypes.func.isRequired,
+    removeGroupProducts: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired,
   }
 
   state = {

@@ -1,51 +1,49 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import Immutable from 'immutable';
-
-import { getPlan,
-         clearPlan,
-         savePlan,
-         onPlanFieldUpdate,
-         addUsagetInclude } from '../../actions/planActions';
-import { getList } from '../../actions/listActions';
-import { showWarning, showDanger } from '../../actions/alertsActions';
-import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { savePlanRates } from '../../actions/planProductsActions';
-
 import { Col, Tabs, Tab, Panel, Button } from 'react-bootstrap';
+import Immutable from 'immutable';
 import ChargingPlanDetails from './ChargingPlanDetails';
 import ChargingPlanIncludes from './ChargingPlanIncludes';
+import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
+import {
+  getPlan,
+  clearPlan,
+  savePlan,
+  onPlanFieldUpdate,
+  addUsagetInclude,
+} from '../../actions/planActions';
+import { getList } from '../../actions/listActions';
+import { showWarning } from '../../actions/alertsActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
-class ChargingPlanSetup extends React.Component {
+
+class ChargingPlanSetup extends Component {
   static defaultProps = {
     plan: Immutable.Map(),
-    prepaid_includes: Immutable.List()
+    prepaidIncludes: Immutable.List(),
   };
 
   static propTypes = {
-    plan: React.PropTypes.instanceOf(Immutable.Map),
-    prepaid_includes: React.PropTypes.instanceOf(Immutable.List),
-    router: React.PropTypes.shape({
-      push: React.PropTypes.func.isRequired
-    }).isRequired
+    planId: PropTypes.string,
+    action: PropTypes.string,
+    plan: PropTypes.instanceOf(Immutable.Map),
+    prepaidIncludes: PropTypes.instanceOf(Immutable.List),
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
+  componentWillMount() {
+    const { planId } = this.props;
+    if (planId) {
+      this.props.dispatch(getPlan(planId));
+    }
   }
 
   componentDidMount() {
-    const { planId, action } = this.props.location.query;
-    const params = {
-      api: 'find',
-      params: [
-	{ collection: 'prepaidincludes' },
-	{ query: JSON.stringify({}) }
-      ]
-    };
-    this.props.dispatch(getList('prepaid_includes', params));
-    if (planId) this.props.dispatch(getPlan(planId));
+    const { action } = this.props;
     if (action === 'new') {
       this.props.dispatch(setPageTitle('Create New Buckets Group'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
@@ -53,16 +51,15 @@ class ChargingPlanSetup extends React.Component {
       this.props.dispatch(onPlanFieldUpdate(['type'], 'charging'));
       this.props.dispatch(onPlanFieldUpdate(['price'], 0));
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
-      this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({unit: 1, periodicity: "month"})));
+      this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({ unit: 1, periodicity: 'month' })));
     }
+    this.props.dispatch(getList('prepaid_includes', getPrepaidIncludesQuery()));
   }
 
   componentWillReceiveProps(nextProps) {
     const { plan } = nextProps;
-    const { action } = this.props.location.query;
-    if (action !== 'new' &&
-        plan.get('name') &&
-        this.props.plan.get('name') !== plan.get('name')) {
+    const { plan: oldPlan, action } = this.props;
+    if (action !== 'new' && plan.get('name') && oldPlan.get('name', '') !== plan.get('name', '')) {
       this.props.dispatch(setPageTitle(`Edit Buckets Group - ${plan.get('name')}`));
     }
   }
@@ -76,15 +73,16 @@ class ChargingPlanSetup extends React.Component {
   };
 
   onSelectPPInclude = (value) => {
-    const pp_include = this.props.prepaid_includes.find(pp => pp.get('name') === value);
-    const usaget = pp_include.get('charging_by_usaget');
+    const { prepaidIncludes } = this.props;
+    const ppInclude = prepaidIncludes.find(pp => pp.get('name') === value);
+    const usaget = ppInclude.get('charging_by_usaget');
     if (this.props.plan.getIn(['include', usaget])) {
-      this.props.dispatch(showWarning("Prepaid bucket already defined"));
-      return;
+      this.props.dispatch(showWarning('Prepaid bucket already defined'));
+    } else {
+      const ppIncludesName = ppInclude.get('name');
+      const ppIncludesExternalId = ppInclude.get('external_id');
+      this.props.dispatch(addUsagetInclude(usaget, ppIncludesName, ppIncludesExternalId));
     }
-    const pp_includes_name = pp_include.get('name');
-    const pp_includes_external_id = pp_include.get('external_id');
-    this.props.dispatch(addUsagetInclude(usaget, pp_includes_name, pp_includes_external_id));
   };
 
   onUpdatePeriodField = (type, id, value) => {
@@ -95,100 +93,74 @@ class ChargingPlanSetup extends React.Component {
     this.props.dispatch(onPlanFieldUpdate(['include', usaget, id], value));
   };
 
-  handleCancel = () => {
+  handleBack = () => {
     this.props.router.push('/charging_plans');
   };
 
-  handleResponseError = (response) => {
-    let errorMessage = 'Error, please try again...';
-    try {
-      errorMessage = response.error[0].error.data.message;
-    } catch (e1) {
-      try {
-        errorMessage = response.error[0].error.message;
-      } catch (e2) {
-        console.log('unknown error response: ', response);
-      }
-    }
-    this.props.dispatch(showDanger(errorMessage));
-  }
-
-  savePlan = () => {
-    const { plan, location, dispatch } = this.props;
-    const { action } = location.query;
-    dispatch(savePlan(plan, action, this.afterSave));
-  }
-
-  afterSave = (data) => {
-    console.log("data : ", data);
-    if (typeof data.error !== 'undefined' && data.error.length) {
-      this.handleResponseError(data);
-    } else {
-      this.props.router.push('/charging_plans');
+  afterSave = (response) => {
+    const { action } = this.props;
+    if (response.status && action === 'new') {
+      this.handleBack();
+    } else if (response.status && action !== 'new') {
+      this.handleBack();
     }
   }
 
   handleSave = () => {
-    this.props.dispatch(savePlanRates(this.savePlan));
+    const { plan, action } = this.props;
+    this.props.dispatch(savePlan(plan, action)).then(this.afterSave);
   };
 
   render() {
-    const { plan, prepaid_includes } = this.props;
-    const { action } = this.props.location.query;
-
-    const prepaid_includes_options = prepaid_includes.map(pp => {
-      return { label: pp.get('name'), value: pp.get('name') };
-    }).toJS();
+    const { plan, prepaidIncludes, action } = this.props;
+    const prepaidIncludesOptions = prepaidIncludes.map(pp => ({
+      label: pp.get('name'),
+      value: pp.get('name'),
+    })).toJS();
 
     return (
       <div className="ChargingPlanSetup">
         <Col lg={12} md={12}>
-          <Tabs defaultActiveKey={1}
-                id="ChargingPlan"
-                animation={false}>
+          <Tabs defaultActiveKey={1} id="ChargingPlan" animation={false}>
+
             <Tab title="Details" eventKey={1}>
-              <Panel style={{  borderTop: 'none' }}>
+              <Panel style={{ borderTop: 'none' }}>
                 <ChargingPlanDetails
-                    item={ plan }
-                    mode={ action }
-                    onChangeField={ this.onChangeField }
+                  item={plan}
+                  mode={action}
+                  onChangeField={this.onChangeField}
                 />
               </Panel>
             </Tab>
+
             <Tab title="Prepaid Buckets" eventKey={2}>
-              <Panel style={{  borderTop: 'none' }}>
+              <Panel style={{ borderTop: 'none' }}>
                 <ChargingPlanIncludes
-                    includes={ plan.get('include', Immutable.Map()) }
-                    prepaid_includes_options={ prepaid_includes_options }
-                    onSelectPPInclude={ this.onSelectPPInclude }
-                    onUpdatePeriodField={ this.onUpdatePeriodField }
-                    onUpdateField={ this.onUpdateIncludeField }
+                  includes={plan.get('include', Immutable.Map())}
+                  prepaid_includes_options={prepaidIncludesOptions}
+                  onSelectPPInclude={this.onSelectPPInclude}
+                  onUpdatePeriodField={this.onUpdatePeriodField}
+                  onUpdateField={this.onUpdateIncludeField}
                 />
               </Panel>
             </Tab>
           </Tabs>
-	  <div style={{ marginTop: 12 }}>
-            <Button onClick={ this.handleSave }
-		    bsStyle="primary"
-		    style={{ marginRight: 10 }}>
-	      Save
-	    </Button>
-            <Button onClick={ this.handleCancel }
-		    bsStyle="default">
-	      Cancel
-	    </Button>
-	  </div>
+
+          <div style={{ marginTop: 12 }}>
+            <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
+            <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
+          </div>
         </Col>
       </div>
     );
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    plan: state.plan,
-    prepaid_includes: state.list.get('prepaid_includes', Immutable.List())
-  };
-}
+const mapStateToProps = (state, props) => {
+  const { planId, action } = props.location.query;
+  const plan = state.plan;
+  const prepaidIncludes = state.list.get('prepaid_includes');
+  return { action, planId, plan, prepaidIncludes };
+};
 
 export default withRouter(connect(mapStateToProps)(ChargingPlanSetup));
