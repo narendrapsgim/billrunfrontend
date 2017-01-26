@@ -39,10 +39,11 @@ import _ from 'lodash';
 import Immutable from 'immutable';
 
 const convert = (settings) => {
-  const { parser, processor,
-          customer_identification_fields,
-          rate_calculators,
-          receiver,
+  const { parser = {},
+          processor = {},
+          customer_identification_fields = [],
+          rate_calculators = {},
+          receiver = {},
           realtime = {},
           response = {},
         } = settings;
