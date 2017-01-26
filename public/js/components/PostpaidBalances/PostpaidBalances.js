@@ -101,7 +101,7 @@ class PostpaidBalances extends Component {
           <div className="col-lg-12">
             <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
             <List items={balances} fields={fields} onSort={this.onSort} />
-          </div>postpaidBalances
+          </div>
         </div>
 
         <Pager onClick={this.handlePageClick}
