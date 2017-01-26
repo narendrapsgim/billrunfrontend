@@ -80,13 +80,13 @@ class PostpaidBalances extends Component {
         id: usaget,
         placeholder: ChangeCase.titleCase(usaget),
         showFilter: false,
-        parser: (ent) => ent.getIn(['balance', 'totals', usaget], '')
+        parser: (ent) => ent.getIn(['balance', 'totals', usaget, 'usagev'], '')
       };
     }).toJS();
     const fields = [
       { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
       { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
-      { id: 'current_plan', placeholder: 'Plan' },
+      { id: 'plan_description', placeholder: 'Plan' },
       ...usage_fields,
       { id: "from", placeholder: "From", showFilter: false, type: "datetime" },
       { id: "to", placeholder: "To", showFilter: false, type: "datetime" },
