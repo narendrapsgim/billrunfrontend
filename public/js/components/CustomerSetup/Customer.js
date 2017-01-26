@@ -40,14 +40,12 @@ class Customer extends Component {
 
   renderChangePaymentGateway = () => {
     const { customer, supportedGateways } = this.props;
-    if (customer.get('payment_gateway', Immutable.Map()).isEmpty()) {
-      return null;
-    }
+    const hasPaymentGateway = !(customer.get('payment_gateway', Immutable.Map()).isEmpty());
     const customerPgName = customer.getIn(['payment_gateway', 'name'], '');
     const pg = supportedGateways.filter(item => customerPgName === item.get('name'));
-    const label = (!pg.isEmpty() && pg.get(0).get('image_url', '').length > 0)
+    const label = hasPaymentGateway ? ((!pg.isEmpty() && pg.get(0).get('image_url', '').length > 0)
       ? <img src={`${globalSetting.serverUrl}/${pg.get(0).get('image_url', '')}`} height="30" alt={pg.get(0).get('name', '')} />
-      : customerPgName;
+      : customerPgName) : 'None';
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} md={2}>
@@ -57,7 +55,7 @@ class Customer extends Component {
           {label}
           <Button onClick={this.onChangePaymentGateway} bsSize="xsmall" style={{ marginLeft: 10, minWidth: 80 }}>
             <i className="fa fa-pencil" />
-            &nbsp;Change
+            &nbsp;{hasPaymentGateway? "Change" : "Add"}
           </Button>
         </Col>
       </FormGroup>
