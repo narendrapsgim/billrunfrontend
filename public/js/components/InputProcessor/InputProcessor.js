@@ -350,19 +350,15 @@ class InputProcessor extends Component {
 
   handleNext = () => {
     const { stepIndex, steps } = this.state;
-    const parts = steps.get(steps.findKey(step => step.idx === stepIndex), {}).parts;
+    const isLastStep = (stepIndex === steps.size - 1);
+    const parts = isLastStep ? [] : steps.get(steps.findKey(step => step.idx === stepIndex), {}).parts;
     this.props.dispatch(saveInputProcessorSettings(this.props.settings, parts)
       ).then((response) => {
-        if (response !== false) {
-          if (stepIndex === steps.size - 1) {
-            return true;
-          }
+        if (response !== false && !isLastStep) {
           this.setState({ stepIndex: stepIndex + 1 });
-        }
-        return false;
-      }).then((isfinished) => {
-        if (isfinished) {
-          return this.props.dispatch(saveInputProcessorSettings(this.props.settings));
+          return false;
+        } else if (response !== false && isLastStep) {
+          return response;
         }
         return false;
       }).then((saveStatus) => {
