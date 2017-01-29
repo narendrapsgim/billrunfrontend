@@ -209,6 +209,5 @@ class PlanProductsPriceTab extends Component {
 const mapStateToProps = state => ({
   originalRates: state.entity.getIn(['planOriginal', 'rates']),
   products: state.list.get('plan_products'),
-  productsKeys: state.planProducts.productPlanPrice,
 });
 export default connect(mapStateToProps)(PlanProductsPriceTab);

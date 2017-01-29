@@ -94,15 +94,34 @@ export const getProductsByKeysQuery = (keys, project = {}) => ({
   ],
 });
 
+export const getActiveProductsKeysQuery = () => ({
+  api: 'find',
+  params: [
+    { collection: 'rates' },
+    { size: 1000 },
+    { page: 0 },
+    { query: JSON.stringify({ to: { $gt: moment() } }) },
+    { project: JSON.stringify({ key: 1 }) },
+  ],
+});
+
 export const fetchPlanByIdQuery = id => ({
   api: 'find',
   params: [
     { collection: 'plans' },
     { size: 1 },
     { page: 0 },
-    { query: JSON.stringify(
-      { _id: { $in: [id] } }
-    ) },
+    { query: JSON.stringify({ _id: id }) },
+  ],
+});
+
+export const fetchPrepaidIncludeByIdQuery = id => ({
+  api: 'find',
+  params: [
+    { collection: 'prepaidincludes' },
+    { size: 1 },
+    { page: 0 },
+    { query: JSON.stringify({ _id: id }) },
   ],
 });
 
