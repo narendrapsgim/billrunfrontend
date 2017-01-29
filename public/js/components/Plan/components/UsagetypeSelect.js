@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
-
 import { getUsageTypes } from '../../../actions/planProductsActions';
 
-
+/* REMOVE THIS */
 export default class UsagetypeSelect extends Component {
 
   static propTypes = {

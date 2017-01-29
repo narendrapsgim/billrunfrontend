@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router';
 import { Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -12,14 +11,13 @@ import {
   getPlan,
   savePlan,
   clearPlan,
-  onGroupAdd,
-  onGroupRemove,
+  onPlanFieldUpdate,
   onPlanCycleUpdate,
   onPlanTariffAdd,
   onPlanTariffRemove,
-  onPlanFieldUpdate,
+  onGroupAdd,
+  onGroupRemove,
 } from '../../actions/planActions';
-import { addGroupProducts, getGroupProducts, removeGroupProducts } from '../../actions/planGroupsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 
@@ -34,17 +32,14 @@ class PlanSetup extends Component {
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
-    includeGroups: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
-    activeTab: PropTypes.number,
+    activeTab: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
-    addGroupProducts: PropTypes.func.isRequired,
-    getGroupProducts: PropTypes.func.isRequired,
-    onGroupAdd: PropTypes.func.isRequired,
-    onGroupRemove: PropTypes.func.isRequired,
-    removeGroupProducts: PropTypes.func.isRequired,
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -90,6 +85,10 @@ class PlanSetup extends Component {
     this.props.dispatch(onPlanFieldUpdate(path, value));
   }
 
+  onDeleteField = (path, value) => {
+    this.props.dispatch(onPlanFieldUpdate(path, value));
+  }
+
   onPlanCycleUpdate = (index, value) => {
     this.props.dispatch(onPlanCycleUpdate(index, value));
   }
@@ -101,6 +100,15 @@ class PlanSetup extends Component {
   onPlanTariffRemove = (index) => {
     this.props.dispatch(onPlanTariffRemove(index));
   }
+
+  onGroupAdd = (groupName, usage, value, shared, products) => {
+    this.props.dispatch(onGroupAdd(groupName, usage, value, shared, products));
+  }
+
+  onGroupRemove = (groupName) => {
+    this.props.dispatch(onGroupRemove(groupName));
+  }
+
 
   handleSave = () => {
     const { item, mode } = this.props;
@@ -124,12 +132,15 @@ class PlanSetup extends Component {
   }
 
   render() {
-    const { item, mode, includeGroups } = this.props;
+    const { item, mode } = this.props;
 
     // in update mode wait for plan before render edit screen
     if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
+
+    const planRates = item.get('rates', Immutable.Map());
+    const planIncludes = item.getIn(['include', 'groups'], Immutable.Map());
 
     return (
       <Col lg={12}>
@@ -138,31 +149,31 @@ class PlanSetup extends Component {
             <Panel style={{ borderTop: 'none' }}>
               <PlanTab
                 mode={mode}
+                plan={item}
                 onChangeFieldValue={this.onChangeFieldValue}
                 onPlanCycleUpdate={this.onPlanCycleUpdate}
                 onPlanTariffAdd={this.onPlanTariffAdd}
                 onPlanTariffRemove={this.onPlanTariffRemove}
-                plan={item}
               />
             </Panel>
           </Tab>
 
           <Tab title="Override Product Price" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
-              <PlanProductsPriceTab plan={item} />
+              <PlanProductsPriceTab
+                planRates={planRates}
+                onChangeFieldValue={this.onChangeFieldValue}
+              />
             </Panel>
           </Tab>
 
           <Tab title="Plan Includes" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanIncludesTab
-                addGroup={this.props.onGroupAdd}
-                addGroupProducts={this.props.addGroupProducts}
-                getGroupProducts={this.props.getGroupProducts}
-                includeGroups={includeGroups}
+                planIncludes={planIncludes}
                 onChangeFieldValue={this.onChangeFieldValue}
-                onRemoveGroup={this.props.onGroupRemove}
-                removeGroupProducts={this.props.removeGroupProducts}
+                onGroupAdd={this.onGroupAdd}
+                onGroupRemove={this.onGroupRemove}
               />
             </Panel>
           </Tab>
@@ -177,21 +188,12 @@ class PlanSetup extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => bindActionCreators({
-  addGroupProducts,
-  getGroupProducts,
-  onGroupAdd,
-  onGroupRemove,
-  removeGroupProducts,
-}, dispatch);
-
 
 const mapStateToProps = (state, props) => {
   const { tab: activeTab } = props.location.query;
   const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
   const { plan: item } = state;
-  const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
-  return { itemId, item, mode, includeGroups, activeTab };
+  return { itemId, item, mode, activeTab };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PlanSetup));
+export default withRouter(connect(mapStateToProps)(PlanSetup));

@@ -126,6 +126,53 @@ export const getPPIncludesQuery = () => ({
 });
 
 
+export const getPlansGroupsQuery = () => {
+  const toadyApiString = moment();
+  const projectString = JSON.stringify({
+    name: 1,
+    include: 1,
+  });
+  const queryString = JSON.stringify({
+    'include.groups': { $exists: true },
+    to: { $gte: toadyApiString },
+    from: { $lte: toadyApiString },
+  });
+  return {
+    api: 'find',
+    params: [
+      { collection: 'plans' },
+      { query: queryString },
+      { project: projectString },
+    ],
+  };
+};
+
+export const getServicesGroupsQuery = () => {
+  const toadyApiString = moment();
+  const projectString = JSON.stringify({
+    name: 1,
+    include: 1,
+  });
+  const queryString = JSON.stringify({
+    'include.groups': { $exists: true },
+    to: { $gte: toadyApiString },
+    from: { $lte: toadyApiString },
+  });
+  return {
+    api: 'find',
+    params: [
+      { collection: 'services' },
+      { query: queryString },
+      { project: projectString },
+    ],
+  };
+};
+
+export const getAllGroupsQuery = () => ([
+  getPlansGroupsQuery(),
+  getServicesGroupsQuery(),
+]);
+
 export const getPrepaidIncludesQuery = () => ({
   api: 'find',
   params: [

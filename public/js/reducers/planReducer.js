@@ -12,6 +12,7 @@ import {
   PLAN_PRODUCTS_RATE_INIT,
   PLAN_UPDATE_FIELD_VALUE,
   PLAN_UPDATE_PLAN_CYCLE,
+  PLAN_REMOVE_FIELD,
   PLAN_ADD_TARIFF,
   PLAN_REMOVE_TARIFF,
   PLAN_GOT,
@@ -95,6 +96,7 @@ export default function (state = defaultState, action) {
       const group = Immutable.Map({
         [action.usage]: action.value,
         account_shared: action.shared,
+        rates: Immutable.List(action.products),
       });
       return state.setIn(['include', 'groups', action.groupName], group);
     }
@@ -102,8 +104,11 @@ export default function (state = defaultState, action) {
     case PLAN_UPDATE_FIELD_VALUE:
       return state.setIn(action.path, action.value);
 
+    case PLAN_REMOVE_FIELD:
+      return state.deleteIn(action.path);
+
     case PLAN_UPDATE_PLAN_CYCLE:
-      return state.updateIn(['price'], list => reaclculateCycles(list, action.index, action.value));
+      return state.updateIn(['price'], list => reCalculateCycles(list, action.index, action.value));
 
     case PLAN_ADD_TARIFF: {
       // If trail add to head
@@ -199,7 +204,7 @@ export default function (state = defaultState, action) {
   }
 }
 
-const reaclculateCycles = (prices, index, value) => prices.reduce((newList, price, i) => {
+const reCalculateCycles = (prices, index, value) => prices.reduce((newList, price, i) => {
   if (i === index) {
     // set new To
     if (typeof value === 'undefined') { // first item was removed

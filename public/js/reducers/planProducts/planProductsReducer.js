@@ -91,87 +91,87 @@ const planProductsReducer = (state = DefaultState, action) => {
     //   state = state.deleteIn([action.productKey, ...action.path]);
     //   return state;
 
-    case PLAN_PRODUCTS_UNDO_REMOVE:
-      if(state.getIn([action.productKey, 'uiflags', 'existing']) === true){
-        state = state.update(action.productKey, (item) =>
-          item.withMutations((mutableItem) =>
-            mutableItem
-              .setIn(action.path, mutableItem.getIn(['uiflags','oldValue']))
-              .setIn(['uiflags','removed'], false)
-          )
-        );
-      }
-      return state;
+    // case PLAN_PRODUCTS_UNDO_REMOVE:
+    //   if(state.getIn([action.productKey, 'uiflags', 'existing']) === true){
+    //     state = state.update(action.productKey, (item) =>
+    //       item.withMutations((mutableItem) =>
+    //         mutableItem
+    //           .setIn(action.path, mutableItem.getIn(['uiflags','oldValue']))
+    //           .setIn(['uiflags','removed'], false)
+    //       )
+    //     );
+    //   }
+    //   return state;
 
-    case PLAN_PRODUCTS_RESTORE:
-      state = state.update(action.productKey, (item) =>
-        item.withMutations((mutableItem) =>
-          mutableItem
-            .setIn(action.path, mutableItem.getIn(['uiflags','originValue']))
-            .setIn(['uiflags','removed'], false)
-        )
-      );
-      return state;
+    // case PLAN_PRODUCTS_RESTORE:
+    //   state = state.update(action.productKey, (item) =>
+    //     item.withMutations((mutableItem) =>
+    //       mutableItem
+    //         .setIn(action.path, mutableItem.getIn(['uiflags','originValue']))
+    //         .setIn(['uiflags','removed'], false)
+    //     )
+    //   );
+    //   return state;
 
-    case PLAN_PRODUCTS_INIT:
-      state = state.withMutations( mapWithMutations => {
-        action.products.forEach( prod => {
-          var unit = Object.keys(prod.rates)[0];
-          prod.uiflags = {
-            existing: true,
-            originValue: [...prod.rates[unit][action.planName].rate]
-          };
-          mapWithMutations.set(prod.key, Immutable.fromJS(prod));
-        });
-      });
-      return state;
+    // case PLAN_PRODUCTS_INIT:
+    //   state = state.withMutations( mapWithMutations => {
+    //     action.products.forEach( prod => {
+    //       var unit = Object.keys(prod.rates)[0];
+    //       prod.uiflags = {
+    //         existing: true,
+    //         originValue: [...prod.rates[unit][action.planName].rate]
+    //       };
+    //       mapWithMutations.set(prod.key, Immutable.fromJS(prod));
+    //     });
+    //   });
+    //   return state;
 
-    case PLAN_PRODUCTS_SET:
-    case PLAN_INCLUDE_GROUP_PRODUCTS_SET:
-      state = state.withMutations(mapWithMutations => {
-        action.products.forEach( prod => {
-          if(!existingKeys.includes(prod.key)){
-            mapWithMutations.set(prod.key, Immutable.fromJS(prod));
-          }
-        });
-      });
-      return state;
+    // case PLAN_PRODUCTS_SET:
+    // case PLAN_INCLUDE_GROUP_PRODUCTS_SET:
+    //   state = state.withMutations(mapWithMutations => {
+    //     action.products.forEach( prod => {
+    //       if(!existingKeys.includes(prod.key)){
+    //         mapWithMutations.set(prod.key, Immutable.fromJS(prod));
+    //       }
+    //     });
+    //   });
+    //   return state;
 
-    case PLAN_INCLUDE_GROUP_PRODUCTS_ADD:
-      //Add product if not exist
-      state = state.withMutations(mapWithMutations => {
-        action.products.forEach( prod => {
-          if(!existingKeys.includes(prod.key)){
-            mapWithMutations.set(prod.key, Immutable.fromJS(prod));
-          }
-        });
-      });
+    // case PLAN_INCLUDE_GROUP_PRODUCTS_ADD:
+    //   //Add product if not exist
+    //   state = state.withMutations(mapWithMutations => {
+    //     action.products.forEach( prod => {
+    //       if(!existingKeys.includes(prod.key)){
+    //         mapWithMutations.set(prod.key, Immutable.fromJS(prod));
+    //       }
+    //     });
+    //   });
+    //
+    //   action.products.forEach( (prod) => {
+    //     state = state.updateIn([ prod.key, 'rates', action.usage, 'groups'], (list) => {
+    //       if(typeof list === 'undefined'){
+    //         list = Immutable.List();
+    //       }
+    //       return list.push(action.group);
+    //     });
+    //   });
+    //   return state;
 
-      action.products.forEach( (prod) => {
-        state = state.updateIn([ prod.key, 'rates', action.usage, 'groups'], (list) => {
-          if(typeof list === 'undefined'){
-            list = Immutable.List();
-          }
-          return list.push(action.group);
-        });
-      });
-      return state;
+    // case PLAN_INCLUDE_GROUP_PRODUCTS_REMOVE:
+    //   action.productKeys.forEach( (key) => {
+    //     state = state.updateIn([key, 'rates', action.usage, 'groups'], list => list.filter( group => group !== action.group));
+    //   });
+    //  return state;
 
-    case PLAN_INCLUDE_GROUP_PRODUCTS_REMOVE:
-      action.productKeys.forEach( (key) => {
-        state = state.updateIn([key, 'rates', action.usage, 'groups'], list => list.filter( group => group !== action.group));
-      });
-      return state;
+    // case REMOVE_GROUP:
+    // case REMOVE_GROUP_SERVICE:
+    //   action.productKeys.forEach( (key) => {
+    //     state = state.updateIn([key, 'rates', action.usage, 'groups'], list => list.filter( group => group !== action.groupName));
+    //   });
+    //   return state;
 
-    case REMOVE_GROUP:
-    case REMOVE_GROUP_SERVICE:
-      action.productKeys.forEach( (key) => {
-        state = state.updateIn([key, 'rates', action.usage, 'groups'], list => list.filter( group => group !== action.groupName));
-      });
-      return state;
-
-    case PLAN_PRODUCTS_CLEAR:
-      return DefaultState;
+    // case PLAN_PRODUCTS_CLEAR:
+    //   return DefaultState;
 
     default:
       return state;
