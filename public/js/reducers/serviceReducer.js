@@ -1,4 +1,6 @@
 import Immutable from 'immutable';
+import includeGroupsReducer from './includeGroupsReducer';
+import { ADD_GROUP, REMOVE_GROUP } from '../actions/includeGroupsActions';
 import {
   GOT_SERVICE,
   CLEAR_SERVICE,
@@ -28,16 +30,14 @@ const serviceReducer = (state = DefaultState, action) => {
       return state.setIn(action.path, action.value);
 
     case ADD_GROUP_SERVICE: {
-      const group = Immutable.Map({
-        [action.usage]: action.value,
-        account_shared: action.shared,
-        rates: Immutable.List(action.products),
-      });
-      return state.setIn(['include', 'groups', action.groupName], group);
+      const includeGroupsAction = Object.assign({}, action, { type: ADD_GROUP });
+      return includeGroupsReducer(state, includeGroupsAction);
     }
 
-    case REMOVE_GROUP_SERVICE:
-      return state.deleteIn(['include', 'groups', action.groupName]);
+    case REMOVE_GROUP_SERVICE: {
+      const includeGroupsAction = Object.assign({}, action, { type: REMOVE_GROUP });
+      return includeGroupsReducer(state, includeGroupsAction);
+    }
 
     default:
       return state;

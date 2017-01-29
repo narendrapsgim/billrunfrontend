@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
-
+import includeGroupsReducer from './includeGroupsReducer';
+import { ADD_GROUP, REMOVE_GROUP } from '../actions/includeGroupsActions';
 import productReduser from './productReducer';
 
 import {
@@ -17,8 +18,8 @@ import {
   PLAN_REMOVE_TARIFF,
   PLAN_GOT,
   PLAN_CLEAR,
-  REMOVE_GROUP,
-  ADD_GROUP,
+  REMOVE_GROUP_PLAN,
+  ADD_GROUP_PLAN,
   ADD_USAGET_INCLUDE } from '../actions/planActions';
 
 import {
@@ -89,16 +90,14 @@ export default function (state = defaultState, action) {
       return state.setIn(action.path, action.product.getIn(['rates', usaget, 'BASE', 'rate']));
     }
 
-    case REMOVE_GROUP:
-      return state.deleteIn(['include', 'groups', action.groupName]);
+    case REMOVE_GROUP_PLAN: {
+      const includeGroupsAction = Object.assign({}, action, { type: REMOVE_GROUP });
+      return includeGroupsReducer(state, includeGroupsAction);
+    }
 
-    case ADD_GROUP: {
-      const group = Immutable.Map({
-        [action.usage]: action.value,
-        account_shared: action.shared,
-        rates: Immutable.List(action.products),
-      });
-      return state.setIn(['include', 'groups', action.groupName], group);
+    case ADD_GROUP_PLAN: {
+      const includeGroupsAction = Object.assign({}, action, { type: ADD_GROUP });
+      return includeGroupsReducer(state, includeGroupsAction);
     }
 
     case PLAN_UPDATE_FIELD_VALUE:

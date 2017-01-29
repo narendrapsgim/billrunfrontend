@@ -11,8 +11,8 @@ export const PLAN_UPDATE_PLAN_CYCLE = 'PLAN_UPDATE_PLAN_CYCLE';
 export const PLAN_UPDATE_FIELD_VALUE = 'PLAN_UPDATE_FIELD_VALUE';
 export const PLAN_REMOVE_FIELD = 'PLAN_REMOVE_FIELD';
 
-export const REMOVE_GROUP = 'REMOVE_GROUP';
-export const ADD_GROUP = 'ADD_GROUP';
+export const REMOVE_GROUP_PLAN = 'REMOVE_GROUP_PLAN';
+export const ADD_GROUP_PLAN = 'ADD_GROUP_PLAN';
 export const ADD_USAGET_INCLUDE = 'ADD_USAGET_INCLUDE';
 
 export const PLAN_PRODUCTS_RATE_INIT = 'PLAN_PRODUCTS_RATE_INIT';
@@ -75,12 +75,12 @@ function savePlanToDB(plan, action) {
 
 
 export const onGroupRemove = groupName => ({
-  type: REMOVE_GROUP,
+  type: REMOVE_GROUP_PLAN,
   groupName,
 });
 
 export const onGroupAdd = (groupName, usage, value, shared, products) => ({
-  type: ADD_GROUP,
+  type: ADD_GROUP_PLAN,
   groupName,
   usage,
   value,
