@@ -137,7 +137,6 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   onChangeUsageType = (newValue) => {
-    console.log('ne val : ', newValue);
     this.setState({ usage: newValue, products: Immutable.List(), error: '' });
   }
 
@@ -218,10 +217,9 @@ export default class PlanIncludeGroupCreate extends Component {
 
       case 1:
         return (
-          <FormGroup validationState={error.length > 0 ? 'error' : null} >
+          <FormGroup validationState={error.length > 0 ? 'error' : null}>
             <Col componentClass={ControlLabel} sm={3}>Unit Type</Col>
             <Col sm={8}>
-
               <Select
                 name="field-name"
                 value={usage}
@@ -236,14 +234,14 @@ export default class PlanIncludeGroupCreate extends Component {
 
       case 2:
         return ([
-          <FormGroup validationState={error.length > 0 ? 'error' : null} >
+          <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usage}_includes`}>
             <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`${usage} includes`)}</Col>
             <Col sm={8}>
               <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" />
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
             </Col>
           </FormGroup>,
-          <FormGroup>
+          <FormGroup key={`${usage}_shared`}>
             <Col smOffset={3} sm={8}>
               <Checkbox checked={shared} onChange={this.onChangeShared}>
                 Share with all account&apos;s subscribers
@@ -271,7 +269,8 @@ export default class PlanIncludeGroupCreate extends Component {
               </div>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
             </Col>
-          </FormGroup>);
+          </FormGroup>
+        );
 
       default:
         return '...';

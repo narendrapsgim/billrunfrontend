@@ -109,16 +109,16 @@ class PlanSetup extends Component {
     this.props.dispatch(onGroupRemove(groupName));
   }
 
-
   handleSave = () => {
     const { item, mode } = this.props;
     this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
   }
+
   afterSave = (response) => {
     const { mode } = this.props;
-    if (response.status && mode === 'new') {
+    if (response.status && mode === 'new') { // on success save new item
       this.handleBack();
-    } else if (response.status && mode !== 'new') {
+    } else if (response.status && mode !== 'new') { // on success update item
       this.handleBack();
     }
   }
