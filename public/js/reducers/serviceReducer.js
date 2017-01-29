@@ -1,10 +1,10 @@
+import Immutable from 'immutable';
 import {
   GOT_SERVICE,
   CLEAR_SERVICE,
   UPDATE_SERVICE,
   ADD_GROUP_SERVICE,
   REMOVE_GROUP_SERVICE } from '../actions/serviceActions';
-import Immutable from 'immutable';
 
 const DefaultState = Immutable.fromJS({
   description: '',
@@ -17,7 +17,6 @@ const DefaultState = Immutable.fromJS({
 });
 
 const serviceReducer = (state = DefaultState, action) => {
-
   switch (action.type) {
     case CLEAR_SERVICE:
       return DefaultState;
@@ -28,12 +27,14 @@ const serviceReducer = (state = DefaultState, action) => {
     case UPDATE_SERVICE:
       return state.setIn(action.path, action.value);
 
-    case ADD_GROUP_SERVICE:
+    case ADD_GROUP_SERVICE: {
       const group = Immutable.Map({
-        [action.usage] : action.value,
-        'account_shared': action.shared
+        [action.usage]: action.value,
+        account_shared: action.shared,
+        rates: Immutable.List(action.products),
       });
       return state.setIn(['include', 'groups', action.groupName], group);
+    }
 
     case REMOVE_GROUP_SERVICE:
       return state.deleteIn(['include', 'groups', action.groupName]);
@@ -41,7 +42,6 @@ const serviceReducer = (state = DefaultState, action) => {
     default:
       return state;
   }
-
-}
+};
 
 export default serviceReducer;
