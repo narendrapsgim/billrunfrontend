@@ -23,7 +23,12 @@ import {
 } from '../../actions/prepaidPlanActions';
 import { getList } from '../../actions/listActions';
 import { showWarning } from '../../actions/alertsActions';
-import { getPlan, savePlan, clearPlan, onPlanFieldUpdate } from '../../actions/planActions';
+import {
+  getPlan,
+  savePlan,
+  clearPlan,
+  onPlanFieldUpdate,
+} from '../../actions/planActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 
@@ -167,6 +172,8 @@ class PrepaidPlanSetup extends Component {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
+    const planRates = plan.get('rates', Map());
+
     return (
       <div className="PrepaidPlan">
         <Col lg={12}>
@@ -184,7 +191,10 @@ class PrepaidPlanSetup extends Component {
 
             <Tab title="Override Product Price" eventKey={2}>
               <Panel style={{ borderTop: 'none' }}>
-                <PlanProductsPriceTab plan={plan} />
+                <PlanProductsPriceTab
+                  planRates={planRates}
+                  onChangeFieldValue={this.onChangePlanField}
+                />
               </Panel>
             </Tab>
 

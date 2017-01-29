@@ -115,6 +115,16 @@ export const fetchPlanByIdQuery = id => ({
   ],
 });
 
+export const fetchProductByIdQuery = id => ({
+  api: 'find',
+  params: [
+    { collection: 'rates' },
+    { size: 1 },
+    { page: 0 },
+    { query: JSON.stringify({ _id: id }) },
+  ],
+});
+
 export const fetchPrepaidIncludeByIdQuery = id => ({
   api: 'find',
   params: [

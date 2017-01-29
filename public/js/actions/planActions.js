@@ -88,6 +88,12 @@ export const onGroupAdd = (groupName, usage, value, shared, products) => ({
   products,
 });
 
+export const planProductRemove = (path, name) => ({
+  type: PLAN_PRODUCTS_REMOVE,
+  path,
+  name,
+});
+
 export const planProductsRateUpdateTo = (path, index, value) => ({
   type: PLAN_PRODUCTS_RATE_UPDATE_TO,
   path,
