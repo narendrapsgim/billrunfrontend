@@ -28,7 +28,6 @@ module.exports = {
   entry: {
     app: './public/js/index.js',
     vendor: [
-      'axios',
       'material-ui',
       'moment',
       'lodash',
