@@ -1,29 +1,18 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import { Col, Form, Panel, FormGroup, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
 
 const PrepaidInclude = (props) => {
-  const onSelectChargingBy = (value) => {
-    props.onChangeField({ target: { id: 'charging_by', value } });
-    if (value === 'total_cost') {
-      props.onChangeField({ target: { id: 'charging_by', value: 'total_cost' } });
-    }
+  const { usageTypes, prepaidInclude, chargingByOptions } = props;
+  const onSelectChange = id => (value) => {
+    props.onChangeField({ target: { id, value } });
   };
-
-  const onSelectUsageType = (value) => {
-    props.onChangeField({ target: { id: 'charging_by_usaget', value } });
-  };
-
-  // console.log('--',props.usageTypes.map(key => ({ value: key, label: key })).toJS());
-  const usageTypesOptions = [
-    { value: 'new', label: 'New' },
-    { value: 'inc', label: 'Increment' },
-    { value: 'set', label: 'Set' },
-  ];
-
+  const usageTypesOptions = usageTypes
+    .map(key => ({ value: key, label: key }))
+    .toArray();
   return (
     <div className="PrepaidInclude">
       <Panel>
@@ -33,7 +22,7 @@ const PrepaidInclude = (props) => {
             <Col lg={7} md={7}>
               <Field
                 id="name"
-                value={props.prepaidInclude.get('name', '')}
+                value={prepaidInclude.get('name', '')}
                 onChange={props.onChangeField}
               />
             </Col>
@@ -43,7 +32,7 @@ const PrepaidInclude = (props) => {
             <Col lg={7} md={7}>
               <Field
                 id="external_id"
-                value={props.prepaidInclude.get('external_id', '')}
+                value={prepaidInclude.get('external_id', '')}
                 onChange={props.onChangeField}
                 fieldType="number"
               />
@@ -54,7 +43,7 @@ const PrepaidInclude = (props) => {
             <Col lg={7} md={7}>
               <Field
                 id="priority"
-                value={props.prepaidInclude.get('priority', '')}
+                value={prepaidInclude.get('priority', '')}
                 onChange={props.onChangeField}
                 tooltip="Lower number represents higher priority"
                 fieldType="number"
@@ -65,11 +54,10 @@ const PrepaidInclude = (props) => {
             <Col lg={2} md={2} componentClass={ControlLabel}>Charging by</Col>
             <Col lg={7} md={7}>
               <Select
-                inputProps={{ id: 'charging_by' }}
                 name="charging_by"
-                value={props.prepaidInclude.get('charging_by', '')}
-                options={props.chargingByOptions}
-                onChange={onSelectChargingBy}
+                value={prepaidInclude.get('charging_by', '')}
+                options={chargingByOptions}
+                onChange={onSelectChange('charging_by')}
               />
             </Col>
           </FormGroup>
@@ -77,15 +65,15 @@ const PrepaidInclude = (props) => {
             <Col lg={2} md={2} componentClass={ControlLabel}>Usage type</Col>
             <Col lg={7} md={7}>
               {
-                props.prepaidInclude.get('charging_by') === 'total_cost'
+                prepaidInclude.get('charging_by') === 'total_cost'
                 ? <Select
                   disabled={true}
-                  value={props.prepaidInclude.get('charging_by')}
+                  value={prepaidInclude.get('charging_by')}
                 />
                 : <Select
-                  value={props.prepaidInclude.get('charging_by_usaget', '')}
+                  value={prepaidInclude.get('charging_by_usaget', '')}
                   options={usageTypesOptions}
-                  onChange={onSelectUsageType}
+                  onChange={onSelectChange('charging_by_usaget')}
                   searchable={false}
                 />
               }
@@ -96,7 +84,7 @@ const PrepaidInclude = (props) => {
             <Col lg={7} md={7}>
               <Field
                 id="shared"
-                value={props.prepaidInclude.get('shared', false)}
+                value={prepaidInclude.get('shared', false)}
                 onChange={props.onChangeField}
                 fieldType="checkbox"
               />
@@ -107,7 +95,7 @@ const PrepaidInclude = (props) => {
             <Col lg={7} md={7}>
               <Field
                 id="unlimited"
-                value={props.prepaidInclude.get('unlimited', false)}
+                value={prepaidInclude.get('unlimited', false)}
                 onChange={props.onChangeField}
                 fieldType="checkbox"
               />
@@ -122,11 +110,13 @@ const PrepaidInclude = (props) => {
 PrepaidInclude.defaultProps = {
   prepaidInclude: Map(),
   chargingByOptions: [],
+  usageTypes: List(),
 };
 
 PrepaidInclude.propTypes = {
   onChangeField: React.PropTypes.func.isRequired,
   prepaidInclude: PropTypes.instanceOf(Map),
+  usageTypes: PropTypes.instanceOf(List),
   chargingByOptions: PropTypes.array,
 };
 
