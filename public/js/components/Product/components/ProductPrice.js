@@ -49,7 +49,6 @@ export default class ProductPrice extends Component {
 
   onEditTo = (e) => {
     const { index, productUnlimitedValue, item } = this.props;
-    console.log();
     let { value } = e.target;
     let toError = '';
     if (value === '') {
