@@ -29,8 +29,18 @@ module.exports = {
     app: './public/js/index.js',
     vendor: [
       'material-ui',
+      'immutable',
       'moment',
+      'moment-timezone',
       'lodash',
+      'react-select',
+      'react-datepicker',
+      'uuid',
+      'change-case',
+      'file-size',
+      'classnames',
+
+
     ],
   },
 

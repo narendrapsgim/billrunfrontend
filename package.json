@@ -38,7 +38,6 @@
     "json-loader": "^0.5.4",
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
-    "md5": "^2.2.1",
     "node-sass": "^3.10.1",
     "react-chartjs": "git+https://github.com/jhudson8/react-chartjs/#chartjs-v2",
     "react-datamaps": "^0.1.1",
