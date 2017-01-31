@@ -32,7 +32,7 @@ class PlansList extends Component {
     this.itemsType = 'plans';
     this.itemType = 'plan';
     this.state = {
-      size: 20,
+      size: 10,
       page: 0,
       sort: '',
       filter: {},
@@ -66,13 +66,12 @@ class PlansList extends Component {
   }
 
   buildQuery = () => ({
-    api: 'find',
+    entity: this.itemsType,
+    action: 'uniqueget',
     params: [
-      { collection: this.itemsType },
-      { size: this.state.size },
       { page: this.state.page },
       { sort: this.state.sort },
-      { query: this.state.filter },
+      // { query: this.state.filter },
     ],
   });
 
