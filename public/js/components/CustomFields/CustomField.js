@@ -11,6 +11,7 @@ class CustomField extends Component {
     field: PropTypes.instanceOf(Immutable.Map),
     entity: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
+    disabled: PropTypes.bool,
     last: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
@@ -50,41 +51,39 @@ class CustomField extends Component {
   };
 
   renderField = () => {
-    const { field } = this.props;
+    const { field, disabled } = this.props;
     return (
       <div>
         <Row>
-          <Col lg={3} md={3}>
-            <Col lg={1} md={1}>
-              <FormGroup>
-                <ControlLabel>&nbsp;</ControlLabel>
-                <i className="fa fa-arrows-v movable" />
-              </FormGroup>
-            </Col>
-            <Col lg={10} md={10}>
-              <FormGroup>
-                <ControlLabel>Field Name</ControlLabel>
-                <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} />
-              </FormGroup>
-            </Col>
-          </Col>
-          <Col lg={3} md={3}>
-            <FormGroup>
-              <ControlLabel>Title</ControlLabel>
-              <Field id="title" onChange={this.onChange} value={field.get('title', '')} />
-            </FormGroup>
-          </Col>
-          <Col lg={3} md={3}>
-            <FormGroup>
-              <ControlLabel>Default Value</ControlLabel>
-              <Field id="default_value" onChange={this.onChange} value={field.get('default_value', '')} />
-            </FormGroup>
-          </Col>
           <Col lg={1} md={1}>
             <FormGroup>
               <ControlLabel>&nbsp;</ControlLabel>
-              <div>
-                <button className="btn btn-link" onClick={() => this.setState({ showSettings: true })}> Advanced </button>
+              <div><i className="fa fa-arrows-v movable" /></div>
+            </FormGroup>
+          </Col>
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <ControlLabel>Field Name</ControlLabel>
+              <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={disabled} />
+            </FormGroup>
+          </Col>
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <ControlLabel>Title</ControlLabel>
+              <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={disabled} />
+            </FormGroup>
+          </Col>
+          <Col lg={2} md={2}>
+            <FormGroup>
+              <ControlLabel>Default Value</ControlLabel>
+              <Field id="default_value" onChange={this.onChange} value={field.get('default_value', '')} disabled={disabled} />
+            </FormGroup>
+          </Col>
+          <Col lg={3} md={3}>
+            <FormGroup>
+              <ControlLabel>&nbsp;</ControlLabel>
+              <div className="text-center">
+                {!disabled && <button className="btn btn-link" onClick={() => this.setState({ showSettings: true })}> Advanced </button> }
               </div>
             </FormGroup>
           </Col>
@@ -92,7 +91,7 @@ class CustomField extends Component {
             <FormGroup>
               <ControlLabel>&nbsp;</ControlLabel>
               <div>
-                <Button onClick={this.onRemove} bsSize="small"><i className="fa fa-trash-o danger-red" /> Remove </Button>
+                {!disabled && <Button onClick={this.onRemove} bsSize="small"><i className="fa fa-trash-o danger-red" /> Remove </Button> }
               </div>
             </FormGroup>
           </Col>
