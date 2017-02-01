@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import { ucFirst } from 'change-case';
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import CustomField from './CustomField';
 import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
 
@@ -32,7 +33,6 @@ class CustomFields extends Component {
   };
 
   state = {
-    over: -1,
     tab: 0,
   };
 
@@ -58,21 +58,11 @@ class CustomFields extends Component {
     this.props.dispatch(saveSettings('subscribers'));
   };
 
-  dragStart = (e) => {
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', e.currentTarget);
-  };
-
-  dragOver = (over) => {
-    this.setState({ over });
-  };
-
-  dragEnd = (index) => {
-    const { over, tab } = this.state;
+  onSortEnd = ({ oldIndex, newIndex }) => {
+    const { tab } = this.state;
     const { tabs } = this.props;
-    const setting = tabs[tab];
-    this.props.dispatch(setFieldPosition(index, over, ['subscribers', setting, 'fields']));
-    this.setState({ over: -1 });
+    const entity = tabs[tab];
+    this.props.dispatch(setFieldPosition(oldIndex, newIndex, ['subscribers', entity, 'fields']));
   };
 
   onSelectTab = (tab) => {
@@ -87,30 +77,43 @@ class CustomFields extends Component {
     entityFields.forEach((field, index) => {
       if (!field.get('generated', false) && !defaultHiddenFields.includes(field.get('field_name', ''))) {
         const editable = !field.get('system', false) && !defaultDisabledFields.includes(field.get('field_name', ''));
+        const SortableItem = SortableElement(props => (
+          <div style={{ borderTop: '1px solid #eee', borderBottom: '1px solid #eee', paddingTop: 10 }}>
+            <CustomField
+              field={props.field}
+              entity={props.entity}
+              index={props.idx}
+              disabled={!props.editable}
+              onChange={this.onChangeField}
+              onRemove={this.onRemoveField}
+            />
+          </div>
+        ));
         fields.push(
-          <CustomField
-            key={index}
+          <SortableItem
+            key={`item-${index}`}
+            index={index}
             field={field}
             entity={entity}
-            index={index}
-            disabled={!editable}
-            onChange={this.onChangeField}
-            onRemove={this.onRemoveField}
-            dragStart={this.dragStart}
-            dragOver={this.dragOver}
-            dragEnd={this.dragEnd}
-            over={this.state.over === index}
-            last={index === (this.props[entity].size - 1)}
+            editable={editable}
+            idx={index}
           />
-      );
+        );
       }
     });
+    const SortableList = SortableContainer(({ sortableFields }) =>
+      (<Panel style={{ borderTop: 'none' }}>{sortableFields}</Panel>)
+    );
     return (
       <Tab key={key} title={`${ucFirst(entity)} Fields`} eventKey={key}>
-        <Panel style={{ borderTop: 'none' }}>
-          { fields }
-          <button type="button" className="btn btn-link" onClick={this.onAddNewField(entity)}> Add New Field </button>
-        </Panel>
+        <SortableList
+          lockAxis="y"
+          helperClass="draggable-menu"
+          useDragHandle={true}
+          sortableFields={fields}
+          onSortEnd={this.onSortEnd}
+        />
+        <button type="button" className="btn btn-link" onClick={this.onAddNewField(entity)}> Add New Field </button>
       </Tab>
     );
   };
