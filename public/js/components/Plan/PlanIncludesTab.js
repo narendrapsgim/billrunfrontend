@@ -13,7 +13,7 @@ import { getSettings } from '../../actions/settingsActions';
 class PlanIncludesTab extends Component {
 
   static propTypes = {
-    planIncludes: PropTypes.instanceOf(Immutable.Map),
+    includeGroups: PropTypes.instanceOf(Immutable.Map),
     usageTypes: PropTypes.instanceOf(Immutable.List),
     onChangeFieldValue: PropTypes.func.isRequired,
     onGroupAdd: PropTypes.func.isRequired,
@@ -22,14 +22,15 @@ class PlanIncludesTab extends Component {
   }
 
   static defaultProps = {
-    planIncludes: Immutable.Map(),
+    includeGroups: Immutable.Map(),
+    usageTypes: Immutable.List(),
   };
 
   constructor(props) {
     super(props);
 
     const usedProducts = Immutable.Set().withMutations((productsWithMutations) => {
-      props.planIncludes.forEach((group) => {
+      props.includeGroups.forEach((group) => {
         productsWithMutations.union(group.get('rates'));
       });
     }).toList();
@@ -74,36 +75,36 @@ class PlanIncludesTab extends Component {
   }
 
   onGroupProductsAdd = (groupName, usaget, productKey) => {
-    const { planIncludes } = this.props;
+    const { includeGroups } = this.props;
     const { usedProducts } = this.state;
     this.setState({
       usedProducts: usedProducts.push(productKey),
     });
     const path = ['include', 'groups', groupName, 'rates'];
-    const products = planIncludes.getIn([groupName, 'rates'], Immutable.List()).push(productKey);
+    const products = includeGroups.getIn([groupName, 'rates'], Immutable.List()).push(productKey);
     this.props.onChangeFieldValue(path, products);
   }
 
   onGroupProductsRemove = (groupName, usaget, productKey) => {
-    const { planIncludes } = this.props;
+    const { includeGroups } = this.props;
     const { usedProducts } = this.state;
     this.setState({
       usedProducts: usedProducts.filter(key => key !== productKey),
     });
     const path = ['include', 'groups', groupName, 'rates'];
-    const products = planIncludes.getIn([groupName, 'rates'], Immutable.List()).filter(key => key !== productKey);
+    const products = includeGroups.getIn([groupName, 'rates'], Immutable.List()).filter(key => key !== productKey);
     this.props.onChangeFieldValue(path, products);
   }
 
   renderGroups = () => {
     const { usedProducts } = this.state;
-    const { planIncludes } = this.props;
+    const { includeGroups } = this.props;
 
-    if (typeof planIncludes === 'undefined' || planIncludes.size === 0) {
+    if (typeof includeGroups === 'undefined' || includeGroups.size === 0) {
       return (<tr><td colSpan="6" className="text-center">No Groups</td></tr>);
     }
 
-    return planIncludes.map((include, groupName) => {
+    return includeGroups.map((include, groupName) => {
       const shared = include.get('account_shared', false);
       const products = include.get('rates', Immutable.List());
       const usaget = include.findKey(prop => (prop !== 'account_shared' && prop !== 'rates'), '');
@@ -168,7 +169,7 @@ class PlanIncludesTab extends Component {
 
 }
 const mapStateToProps = (state) => {
-  const usageTypes = state.settings.get('usage_types', Immutable.List());
+  const usageTypes = state.settings.get('usage_types');
   return { usageTypes };
 };
 export default connect(mapStateToProps)(PlanIncludesTab);

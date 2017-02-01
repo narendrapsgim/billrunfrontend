@@ -140,7 +140,7 @@ class PlanSetup extends Component {
     }
 
     const planRates = item.get('rates', Immutable.Map());
-    const planIncludes = item.getIn(['include', 'groups'], Immutable.Map());
+    const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
 
     return (
       <Col lg={12}>
@@ -170,7 +170,7 @@ class PlanSetup extends Component {
           <Tab title="Plan Includes" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanIncludesTab
-                planIncludes={planIncludes}
+                includeGroups={includeGroups}
                 onChangeFieldValue={this.onChangeFieldValue}
                 onGroupAdd={this.onGroupAdd}
                 onGroupRemove={this.onGroupRemove}
