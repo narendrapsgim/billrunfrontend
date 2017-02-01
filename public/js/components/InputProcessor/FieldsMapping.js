@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { addUsagetMapping } from '../../actions/inputProcessorActions';
-import { Table } from 'react-bootstrap/lib';
-import FontIcon from 'material-ui/FontIcon';
 import Select from 'react-select';
 
 export default class FieldsMapping extends Component {
   constructor(props) {
-    super (props);
+    super(props);
 
     this.onChangePattern = this.onChangePattern.bind(this);
     this.onChangeUsaget  = this.onChangeUsaget.bind(this);

@@ -9,7 +9,6 @@ import { Button } from "react-bootstrap";
 
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
-import { titlize } from '../../common/Util';
 import { getSettings } from '../../actions/settingsActions';
 
 class CustomersList extends Component {
@@ -33,7 +32,7 @@ class CustomersList extends Component {
   componentDidMount() {
     this.props.dispatch(getSettings("subscribers"));
   }
-  
+
   componentWillUnmount() {
     this.props.dispatch(clearList('customers'));
   }
@@ -73,7 +72,7 @@ class CustomersList extends Component {
       this.props.dispatch(getList("customers", this.buildQuery()))
     });
   }
-  
+
   onFilter(filter) {
     this.setState({filter, page: 0}, () => {
       this.props.dispatch(getList("customers", this.buildQuery()))
@@ -94,7 +93,7 @@ class CustomersList extends Component {
                return {
                  id: field.get('field_name'),
                  placeholder: field.get('title', field.get('field_name')),
-                 sort: true                              
+                 sort: true
                };
              })
              .toJS();
@@ -120,7 +119,7 @@ class CustomersList extends Component {
         </div>
         <Pager onClick={this.handlePageClick}
                size={this.state.size}
-               count={customers.size || 0} />  
+               count={customers.size || 0} />
       </div>
     );
   }
