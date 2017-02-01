@@ -31,7 +31,7 @@ class PlanIncludesTab extends Component {
 
     const usedProducts = Immutable.Set().withMutations((productsWithMutations) => {
       props.includeGroups.forEach((group) => {
-        productsWithMutations.union(group.get('rates'));
+        productsWithMutations.union(group.get('rates', Immutable.List()));
       });
     }).toList();
 
