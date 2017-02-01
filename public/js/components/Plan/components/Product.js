@@ -5,11 +5,11 @@ export default class Product extends Component {
 
   static propTypes = {
     onRemoveProduct: React.PropTypes.func.isRequired,
-    product: React.PropTypes.string.isRequired
+    product: React.PropTypes.string.isRequired,
   }
 
-  shouldComponentUpdate(nextProps, nextState){
-    return this.props.product != nextProps.product;
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
+    return this.props.product !== nextProps.product;
   }
 
   onRemoveProduct =() => {
