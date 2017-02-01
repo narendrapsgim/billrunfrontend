@@ -4,6 +4,7 @@ import Select from 'react-select';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, Button, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
+import CreateButton from '../Elements/CreateButton';
 import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
 import ProductParam from './components/ProductParam';
@@ -288,13 +289,13 @@ export default class Product extends Component {
               </Col>
               { this.renderPrices() }
               <br />
-              <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
+              <CreateButton onClick={this.onProductRateAdd} label="Add New" />
             </Panel>
 
             <Panel header={<h3>Additional Parameters</h3>}>
               { this.renderParameters() }
               <br />
-              <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductParamAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
+              <CreateButton onClick={this.onProductParamAdd} label="Add New" />
             </Panel>
 
             {this.renderNewProductParam()}

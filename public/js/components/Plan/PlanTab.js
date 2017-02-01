@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
+import CreateButton from '../Elements/CreateButton';
 import PlanPrice from './components/PlanPrice';
 
 
@@ -102,12 +103,12 @@ export default class Plan extends Component {
 
   getAddPriceButton = (trial = false) => {
     const onclick = trial ? this.onPlanTrailTariffInit : this.onPlanTariffInit;
-    return (<Button bsSize="xsmall" className="btn-primary" onClick={onclick} > <i className="fa fa-plus" />&nbsp;Add New </Button>);
+    return (<CreateButton onClick={onclick} label="Add New" />);
   }
 
   getTrialPrice = () => {
     const { plan } = this.props;
-    const trial = (plan.getIn(['price', 0, 'trial']) == true) ? plan.getIn(['price', 0]) : null;
+    const trial = (plan.getIn(['price', 0, 'trial']) === true) ? plan.getIn(['price', 0]) : null;
     if (trial) {
       return (
         <PlanPrice
@@ -170,7 +171,7 @@ export default class Plan extends Component {
 
               {mode === 'new' &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>Key <Help contents={PlanDescription.name} /></Col>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>Key<Help contents={PlanDescription.name} /></Col>
                   <Col sm={8} lg={9}>
                     <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} />
                     { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
@@ -185,13 +186,14 @@ export default class Plan extends Component {
                 </Col>
               </FormGroup>
 
-		{/* <Col lg={4} md={4}>
+              {/*
+              <Col lg={4} md={4}>
                     <FormGroup>
                     <ControlLabel>Recurrence</ControlLabel>
                     <Field min="1" fieldType="number" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
                     </FormGroup>
-		    </Col>
-		  */}
+              </Col>
+              */}
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Billing Frequency</Col>
