@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Immutable from 'immutable';
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 import { SUCCESS, DANGER, INFO, WARNING } from '../../actions/alertsActions';
 
