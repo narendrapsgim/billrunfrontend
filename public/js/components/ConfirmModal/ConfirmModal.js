@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
 
-const ConfirmModal = (props) => (
+const ConfirmModal = props => (
   <Modal show={props.show}>
     <Modal.Header closeButton={false}>
       <Modal.Title>{ props.message }</Modal.Title>
@@ -17,23 +17,23 @@ const ConfirmModal = (props) => (
       <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onOk} bsStyle="primary" >{props.labelOk}</Button>
     </Modal.Footer>
   </Modal>
-)
+);
 
 ConfirmModal.defaultProps = {
   children: null,
   labelCancel: 'Cancel',
   labelOk: 'Ok',
   show: false,
-}
+};
 
 ConfirmModal.propTypes = {
-  children: React.PropTypes.element,
-  labelCancel: React.PropTypes.string,
-  labelOk: React.PropTypes.string,
-  message: React.PropTypes.string.isRequired,
-  onCancel: React.PropTypes.func.isRequired,
-  onOk: React.PropTypes.func.isRequired,
-  show: React.PropTypes.bool.isRequired,
-}
+  children: PropTypes.element,
+  labelCancel: PropTypes.string,
+  labelOk: PropTypes.string,
+  message: PropTypes.string.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onOk: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
+};
 
 export default ConfirmModal;
