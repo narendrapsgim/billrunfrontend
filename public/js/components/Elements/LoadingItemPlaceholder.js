@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap';
 const LoadingItemPlaceholder = props => (
   <div>
     <p>{props.loadingLabel}</p>
-    { props.onClick !== 'undefined' && <Button onClick={props.onClick} bsStyle="default">{props.buttonLabel}</Button> }
+    { props.onClick && <Button onClick={props.onClick} bsStyle="default">{props.buttonLabel}</Button> }
   </div>
 );
 
