@@ -13,27 +13,32 @@ import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 class ServiceSetup extends Component {
 
-  static defaultProps = {
-    item: Immutable.Map(),
-  };
-
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
+    activeTab: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
   }
 
-  state = {
+  static defaultProps = {
+    item: Immutable.Map(),
     activeTab: 1,
+  };
+
+  state = {
+    activeTab: parseInt(this.props.activeTab),
   };
 
   componentDidMount() {
     const { itemId, mode } = this.props;
-    if (typeof itemId !== 'undefined' && itemId !== null && itemId !== '') {
+    if (itemId) {
       this.props.dispatch(getItem(itemId));
     }
     if (mode === 'new') {
@@ -137,8 +142,9 @@ class ServiceSetup extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const { service: item } = state;
-  const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
+  const { service: item, action } = state;
+  const { itemId } = props.params;
+  const mode = action || ((itemId) ? 'update' : 'new');
   return { itemId, mode, item };
 };
 export default withRouter(connect(mapStateToProps)(ServiceSetup));
