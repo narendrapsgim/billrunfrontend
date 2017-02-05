@@ -29,6 +29,10 @@ class EntityList extends Component {
     editable: PropTypes.bool,
     size: PropTypes.number,
     inProgress: PropTypes.bool,
+    update: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.bool,
+    ]),
     filter: PropTypes.instanceOf(Immutable.Map),
     sort: PropTypes.instanceOf(Immutable.Map),
     router: PropTypes.shape({
@@ -44,6 +48,7 @@ class EntityList extends Component {
     nextPage: false,
     editable: true,
     inProgress: false,
+    update: false,
     baseFilter: {},
     tableFields: [],
     filterFields: [],
@@ -53,7 +58,8 @@ class EntityList extends Component {
   }
 
   componentWillMount() {
-    if (this.props.items == null || this.props.items.isEmpty()) {
+    const { update, items } = this.props;
+    if (update === 'true' || items == null || items.isEmpty()) {
       this.fetchItems(this.props);
     }
   }
@@ -216,6 +222,7 @@ class EntityList extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
+  update: props.location.query.update,
   collection: props.collection || props.itemsType,
   items: state.entityList.items.get(props.itemsType),
   page: state.entityList.page.get(props.itemsType),

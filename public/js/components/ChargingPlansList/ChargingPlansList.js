@@ -1,7 +1,7 @@
 import React from 'react';
 import EntityList from '../EntityList';
 
-const ChargingPlansList = () => {
+const ChargingPlansList = (props) => {
   const filterFields = [
     { id: 'description', placeholder: 'Title' },
     { id: 'name', placeholder: 'Key' },
@@ -33,6 +33,7 @@ const ChargingPlansList = () => {
 
   return (
     <EntityList
+      {...props}
       collection="plans"
       itemsType="charging_plans"
       itemType="charging_plan"
