@@ -14,7 +14,6 @@ const filterReducer = (state = defaultState, action) => {
     }
 
     case actions.SET_FILTER: {
-      console.log(actions);
       if (action.collection && action.collection.length > 0) {
         return state.set(action.collection, Immutable.fromJS(action.filter));
       }
