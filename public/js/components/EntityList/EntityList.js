@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
+import changeCase from 'change-case';
 import { Col, Row, Panel, Button } from 'react-bootstrap';
 import List from '../List';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
@@ -146,7 +147,7 @@ class EntityList extends Component {
     const { itemsType } = this.props;
     return (
       <div>
-        List of all available {itemsType}
+        List of all available {changeCase.noCase(itemsType)}
         <div className="pull-right">
           <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}>
             <i className="fa fa-plus" />&nbsp;Add New
