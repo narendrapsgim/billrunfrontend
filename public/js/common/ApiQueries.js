@@ -88,7 +88,7 @@ export const getProductsByKeysQuery = (keys, project = {}) => ({
     { page: 0 },
     { query: JSON.stringify({
       key: { $in: keys },
-      to: { $gte: moment() },
+      to: { $gt: moment() },
       from: { $lte: moment() },
     }) },
   ],
