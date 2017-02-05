@@ -74,6 +74,12 @@ const routes = () => (
       <Route path="charging_plan" component={RequireAuth(ChargingPlanSetup)} />
     </Route>
 
+    <Route path="prepaid_includes" >
+      <IndexRoute component={RequireAuth(PrepaidIncludesList)} title="Prepaid Buckets" />
+      <Route path="prepaid_include/:itemId" component={RequireAuth(PrepaidIncludeSetup)} />
+      <Route path="prepaid_include" component={RequireAuth(PrepaidIncludeSetup)} />
+    </Route>
+
     <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers" />
     <Route path="/customer" component={RequireAuth(CustomerSetup)} />
     <Route path="/input_processor" component={RequireAuth(InputProcessor)} />
@@ -91,8 +97,7 @@ const routes = () => (
     <Route path="/collections" component={RequireAuth(Collections)} title="Collection" />
     <Route path="/collection(/:itemId)(/:action)" component={RequireAuth(Collection)} />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
-    <Route path="/prepaid_includes" component={RequireAuth(PrepaidIncludesList)} title="Prepaid Buckets" />
-    <Route path="/prepaid_include" component={RequireAuth(PrepaidIncludeSetup)} />
+
     <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
     <Route path="/custom_fields" component={RequireAuth(CustomFields)} title="Custom Fields" />
     <Route path="/login" component={LoginPage} title="Login" />
