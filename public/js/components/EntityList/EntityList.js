@@ -125,12 +125,12 @@ class EntityList extends Component {
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   }
 
-  buildQuery = ({ collection, page, size, sort, filter, projectFields }) => ({
+  buildQuery = ({ collection, page, size, sort, filter, baseFilter, projectFields }) => ({
     action: 'uniqueget',
     entity: collection,
     params: [
       { sort: JSON.stringify(sort) },
-      { query: JSON.stringify(filter) },
+      { query: JSON.stringify({ ...filter.toObject(), ...baseFilter }) },
       { project: JSON.stringify(projectFields) },
       { page },
       { size },
@@ -157,10 +157,9 @@ class EntityList extends Component {
   }
 
   renderFilter = () => {
-    const { baseFilter, filter, filterFields } = this.props;
+    const { filter, filterFields } = this.props;
     return (
       <Filter
-        base={baseFilter}
         filter={filter}
         fields={filterFields}
         onFilter={this.onFilter}
