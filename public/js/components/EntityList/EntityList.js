@@ -14,6 +14,7 @@ class EntityList extends Component {
   static propTypes = {
     itemType: PropTypes.string.isRequired,
     itemsType: PropTypes.string.isRequired,
+    collection: PropTypes.string.isRequired,
     items: PropTypes.oneOfType([
       PropTypes.instanceOf(Immutable.List),
       null,
@@ -121,13 +122,12 @@ class EntityList extends Component {
   onClickItem = (item) => {
     const { itemsType, itemType } = this.props;
     const itemId = item.getIn(['_id', '$id']);
-    console.log(`${itemsType}/${itemType}/${itemId}`);
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   }
 
-  buildQuery = ({ itemsType, page, size, sort, filter, projectFields }) => ({
+  buildQuery = ({ collection, page, size, sort, filter, projectFields }) => ({
     action: 'uniqueget',
-    entity: itemsType,
+    entity: collection,
     params: [
       { sort: JSON.stringify(sort) },
       { query: JSON.stringify(filter) },
@@ -216,6 +216,7 @@ class EntityList extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
+  collection: props.collection || props.itemsType,
   items: state.entityList.items.get(props.itemsType),
   page: state.entityList.page.get(props.itemsType),
   nextPage: state.entityList.nextPage.get(props.itemsType),
