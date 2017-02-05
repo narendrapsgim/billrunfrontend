@@ -14,21 +14,31 @@ import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 class ProductSetup extends Component {
 
-  static defaultProps = {
-    item: Immutable.Map(),
-    usaget: '',
-  };
-
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     itemId: PropTypes.string,
+    mode: PropTypes.string,
     usaget: PropTypes.string,
     usageTypes: PropTypes.instanceOf(Immutable.List),
-    mode: PropTypes.string,
-    dispatch: PropTypes.func.isRequired,
+    activeTab: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    dispatch: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    item: Immutable.Map(),
+    usageTypes: Immutable.List(),
+    usaget: '',
+    activeTab: 1,
+  };
+
+  state = {
+    activeTab: parseInt(this.props.activeTab),
   }
 
   componentWillMount() {
@@ -95,7 +105,7 @@ class ProductSetup extends Component {
     if (typeof data.error !== 'undefined' && data.error.length) {
       console.log('error on save : ', data);
     } else {
-      this.props.router.push('/products');
+      this.handleBack();
     }
   }
 
@@ -134,11 +144,13 @@ class ProductSetup extends Component {
 
 
 const mapStateToProps = (state, props) => {
+  const { tab: activeTab, action } = props.location.query;
+  const { itemId } = props.params;
+  const mode = action || ((itemId) ? 'update' : 'new');
   const { product: item } = state;
-  const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
-  const usageTypes = state.settings.get('usage_types', Immutable.List());
   const usaget = item.get('rates', Immutable.Map()).keySeq().first();
-  return { itemId, item, mode, usaget, usageTypes };
+  const usageTypes = state.settings.get('usage_types', Immutable.List());
+  return { itemId, item, mode, usaget, usageTypes, activeTab };
 };
 
 export default withRouter(connect(mapStateToProps)(ProductSetup));
