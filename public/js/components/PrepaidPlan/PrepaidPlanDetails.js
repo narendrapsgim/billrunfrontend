@@ -30,7 +30,7 @@ export default class PrepaidPlanDetails extends Component {
     },
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
   }
 

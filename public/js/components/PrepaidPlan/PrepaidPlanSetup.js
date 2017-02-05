@@ -35,32 +35,41 @@ import { gotEntity, clearEntity } from '../../actions/entityActions';
 
 class PrepaidPlanSetup extends Component {
 
-  static defaultProps = {
-    plan: Map(),
-    ppIncludes: List(),
-  };
-
   static propTypes = {
-    planId: PropTypes.string,
-    action: PropTypes.string,
-    dispatch: PropTypes.func.isRequired,
-    plan: PropTypes.instanceOf(Map),
+    itemId: PropTypes.string,
+    item: PropTypes.instanceOf(Map),
+    mode: PropTypes.string,
     ppIncludes: PropTypes.instanceOf(List),
+    activeTab: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     router: React.PropTypes.shape({
       push: React.PropTypes.func.isRequired,
     }).isRequired,
+    dispatch: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    item: Map(),
+    ppIncludes: List(),
+    activeTab: 1,
+  };
+
+  state = {
+    activeTab: parseInt(this.props.activeTab),
   }
 
   componentWillMount() {
-    const { planId } = this.props;
-    if (planId) {
-      this.props.dispatch(getPlan(planId)).then(this.setOriginItem);
+    const { itemId } = this.props;
+    if (itemId) {
+      this.props.dispatch(getPlan(itemId)).then(this.setOriginItem);
     }
   }
 
   componentDidMount() {
-    const { action } = this.props;
-    if (action === 'new') {
+    const { mode } = this.props;
+    if (mode === 'new') {
       this.props.dispatch(setPageTitle('Create New Prepaid Plan'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
@@ -73,10 +82,10 @@ class PrepaidPlanSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { plan: oldPlan, action } = this.props;
-    const { plan } = nextProps;
-    if (action !== 'new' && plan.get('name') && plan.get('name') !== oldPlan.get('name')) {
-      this.props.dispatch(setPageTitle(`Edit Prepaid Plan - ${plan.get('name')}`));
+    const { item: oldItem, mode } = this.props;
+    const { item } = nextProps;
+    if (mode !== 'new' && item.get('name') && item.get('name') !== oldItem.get('name')) {
+      this.props.dispatch(setPageTitle(`Edit Prepaid Plan - ${item.get('name')}`));
     }
   }
 
@@ -96,8 +105,8 @@ class PrepaidPlanSetup extends Component {
   }
 
   onSelectBalance = (ppInclude) => {
-    const { plan, dispatch } = this.props;
-    if (plan.getIn(['notifications_threshold', ppInclude], List()).size) {
+    const { item, dispatch } = this.props;
+    if (item.getIn(['notifications_threshold', ppInclude], List()).size) {
       dispatch(showWarning('There are already notifications for selected prepaid bucket'));
       return;
     }
@@ -121,8 +130,8 @@ class PrepaidPlanSetup extends Component {
   };
 
   onSelectBlockProduct = (productKey) => {
-    const { plan, dispatch } = this.props;
-    if (plan.get('disallowed_rates', List()).includes(productKey)) {
+    const { item, dispatch } = this.props;
+    if (item.get('disallowed_rates', List()).includes(productKey)) {
       dispatch(showWarning(`${productKey} already blocked`));
       return;
     }
@@ -138,8 +147,8 @@ class PrepaidPlanSetup extends Component {
   };
 
   onAddBalanceThreshold = (balanceId) => {
-    const { plan, dispatch } = this.props;
-    if (plan.getIn(['pp_threshold', balanceId])) {
+    const { item, dispatch } = this.props;
+    if (item.getIn(['pp_threshold', balanceId])) {
       dispatch(showWarning('Prepaid bucket already defined'));
     } else {
       dispatch(addBalanceThreshold(balanceId));
@@ -147,43 +156,47 @@ class PrepaidPlanSetup extends Component {
   };
 
   afterSave = (response) => {
-    const { action } = this.props;
-    if (response.status && action === 'new') {
+    const { mode } = this.props;
+    if (response.status && mode === 'new') { // on success save new item
       this.handleBack();
-    } else if (response.status && action !== 'new') {
+    } else if (response.status && mode !== 'new') { // on success update item
       this.handleBack();
     }
   }
 
   handleSave = () => {
-    const { plan, action } = this.props;
-    this.props.dispatch(savePlan(plan, action)).then(this.afterSave);
+    const { item, mode } = this.props;
+    this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
   };
 
   handleBack = () => {
     this.props.router.push('/prepaid_plans');
   };
 
+  handleSelectTab = (key) => {
+    this.setState({ activeTab: key });
+  }
+
   render() {
-    const { plan, ppIncludes, action } = this.props;
+    const { item, ppIncludes, mode } = this.props;
 
     // in update mode wait for plan before render edit screen
-    if (action === 'update' && typeof plan.getIn(['_id', '$id']) === 'undefined') {
+    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
-    const planRates = plan.get('rates', Map());
+    const planRates = item.get('rates', Map());
 
     return (
       <div className="PrepaidPlan">
         <Col lg={12}>
-          <Tabs defaultActiveKey={1} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
+          <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
 
             <Tab title="Details" eventKey={1}>
               <Panel style={{ borderTop: 'none' }}>
                 <PrepaidPlanDetails
-                  item={plan}
-                  mode={action}
+                  item={item}
+                  mode={mode}
                   onChangePlanField={this.onChangePlanField}
                 />
               </Panel>
@@ -201,8 +214,8 @@ class PrepaidPlanSetup extends Component {
             <Tab title="Notifications" eventKey={3}>
               <Panel style={{ borderTop: 'none' }}>
                 <PlanNotifications
-                  plan={plan}
-                  pp_includes={ppIncludes}
+                  plan={item}
+                  ppIncludes={ppIncludes}
                   onAddNotification={this.onAddNotification}
                   onRemoveNotification={this.onRemoveNotification}
                   onUpdateNotificationField={this.onUpdateNotificationField}
@@ -215,7 +228,7 @@ class PrepaidPlanSetup extends Component {
             <Tab title="Blocked Products" eventKey={4}>
               <Panel style={{ borderTop: 'none' }}>
                 <BlockedProducts
-                  plan={plan}
+                  plan={item}
                   onSelectProduct={this.onSelectBlockProduct}
                   onRemoveProduct={this.onRemoveBlockProduct}
                 />
@@ -225,8 +238,8 @@ class PrepaidPlanSetup extends Component {
             <Tab title="Charging Limits" eventKey={5}>
               <Panel style={{ borderTop: 'none' }}>
                 <Thresholds
-                  plan={plan}
-                  pp_includes={ppIncludes}
+                  plan={item}
+                  ppIncludes={ppIncludes}
                   onChangeThreshold={this.onChangeThreshold}
                   onAddBalance={this.onAddBalanceThreshold}
                 />
@@ -246,10 +259,12 @@ class PrepaidPlanSetup extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const { planId, action } = props.location.query;
-  const plan = state.plan;
+  const { tab: activeTab, action } = props.location.query;
+  const { itemId } = props.params;
+  const mode = action || ((itemId) ? 'update' : 'new');
   const ppIncludes = state.list.get('pp_includes');
-  return { action, planId, plan, ppIncludes };
+  const { plan: item } = state;
+  return { itemId, item, mode, ppIncludes, activeTab };
 };
 
 export default withRouter(connect(mapStateToProps)(PrepaidPlanSetup));

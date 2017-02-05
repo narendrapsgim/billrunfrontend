@@ -39,16 +39,6 @@ import ChargingPlansList from '../components/ChargingPlansList';
 import ChargingPlanSetup from '../components/ChargingPlan';
 import CustomFields from '../components/CustomFields';
 
-
-    //
-    //     <Route path="plans">
-        //   <IndexRoute component={PlansList} />
-        //   <Route path="plan">
-        //     <IndexRoute component={Plan} />
-        //     <Route path="@:itemId" component={Plan} />
-        //   </Route>
-        // </Route>
-
 const routes = () => (
   <Route path="/" component={App}>
     <IndexRoute component={RequireAuth(WelcomePage)} title="" />
@@ -72,12 +62,14 @@ const routes = () => (
       <Route path="product" component={RequireAuth(Product)} />
     </Route>
 
+    <Route path="prepaid_plans" >
+      <IndexRoute component={RequireAuth(PrepaidPlansList)} title="Prepaid Plans" />
+      <Route path="prepaid_plan/:itemId" component={RequireAuth(PrepaidPlan)} />
+      <Route path="prepaid_plan" component={RequireAuth(PrepaidPlan)} />
+    </Route>
 
-    <Route path="/prepaid_plans" component={RequireAuth(PrepaidPlansList)} title="Prepaid Plans" />
-    <Route path="/prepaid_plan" component={RequireAuth(PrepaidPlan)} />
+
     <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers" />
-
-
     <Route path="/customer" component={RequireAuth(CustomerSetup)} />
     <Route path="/input_processor" component={RequireAuth(InputProcessor)} />
     <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" />
