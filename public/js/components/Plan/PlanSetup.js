@@ -24,11 +24,6 @@ import { gotEntity, clearEntity } from '../../actions/entityActions';
 
 class PlanSetup extends Component {
 
-  static defaultProps = {
-    item: Immutable.Map(),
-    activeTab: 1,
-  };
-
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
@@ -42,6 +37,12 @@ class PlanSetup extends Component {
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
   }
+
+  static defaultProps = {
+    item: Immutable.Map(),
+    activeTab: 1,
+  };
+
 
   state = {
     activeTab: parseInt(this.props.activeTab),
@@ -190,8 +191,9 @@ class PlanSetup extends Component {
 
 
 const mapStateToProps = (state, props) => {
-  const { tab: activeTab } = props.location.query;
-  const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
+  const { tab: activeTab, action } = props.location.query;
+  const { itemId } = props.params;
+  const mode = action || ((itemId) ? 'update' : 'new');
   const { plan: item } = state;
   return { itemId, item, mode, activeTab };
 };
