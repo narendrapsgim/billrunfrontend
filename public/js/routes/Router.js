@@ -39,19 +39,45 @@ import ChargingPlansList from '../components/ChargingPlansList';
 import ChargingPlanSetup from '../components/ChargingPlan';
 import CustomFields from '../components/CustomFields';
 
+
+    //
+    //     <Route path="plans">
+        //   <IndexRoute component={PlansList} />
+        //   <Route path="plan">
+        //     <IndexRoute component={Plan} />
+        //     <Route path="@:itemId" component={Plan} />
+        //   </Route>
+        // </Route>
+
 const routes = () => (
   <Route path="/" component={App}>
     <IndexRoute component={RequireAuth(WelcomePage)} title="" />
     <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
-    <Route path="/plans" component={RequireAuth(PlansList)} title="Plans" />
-    <Route path="/plan(/:itemId)(/:action)" component={RequireAuth(Plan)} />
+
+    <Route path="plans">
+      <IndexRoute component={RequireAuth(PlansList)} title="Plans" />
+      <Route path="plan/:itemId" component={RequireAuth(Plan)} />
+      <Route path="plan" component={RequireAuth(Plan)} />
+    </Route>
+
+    <Route path="services" >
+      <IndexRoute component={RequireAuth(ServicesList)} title="Services" />
+      <Route path="service/:itemId" component={RequireAuth(Service)} />
+      <Route path="service" component={RequireAuth(Service)} />
+    </Route>
+
+    <Route path="products" >
+      <IndexRoute component={RequireAuth(ProductsList)} title="Products" />
+      <Route path="product/:itemId" component={RequireAuth(Product)} />
+      <Route path="product" component={RequireAuth(Product)} />
+    </Route>
+
+
     <Route path="/prepaid_plans" component={RequireAuth(PrepaidPlansList)} title="Prepaid Plans" />
     <Route path="/prepaid_plan" component={RequireAuth(PrepaidPlan)} />
     <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers" />
-    <Route path="/products" component={RequireAuth(ProductsList)} title="Products" />
-    <Route path="/product(/:itemId)(/:action)" component={RequireAuth(Product)} />
-    <Route path="/services" component={RequireAuth(ServicesList)} title="Services" />
-    <Route path="/service(/:itemId)(/:action)" component={RequireAuth(Service)} />
+
+
     <Route path="/customer" component={RequireAuth(CustomerSetup)} />
     <Route path="/input_processor" component={RequireAuth(InputProcessor)} />
     <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" />
