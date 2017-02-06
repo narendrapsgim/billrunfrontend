@@ -2,9 +2,10 @@ import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '..
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
-  GOT_ENTITY_LIST: 'GOT_ENTITY_LIST',
   CLEAR_ENTITY_LIST: 'CLEAR_ENTITY_LIST',
+  CLEAR_ITEMS: 'CLEAR_ITEMS',
   SET_NEXT_PAGE: 'SET_NEXT_PAGE',
+  SET_ITEMS: 'SET_ITEMS',
   SET_FILTER: 'SET_FILTER',
   SET_PAGE: 'SET_PAGE',
   SET_SORT: 'SET_SORT',
@@ -12,7 +13,7 @@ export const actions = {
 };
 
 const gotList = (collection, list) => ({
-  type: actions.GOT_ENTITY_LIST,
+  type: actions.SET_ITEMS,
   collection,
   list,
 });
@@ -65,6 +66,11 @@ export const setListPage = (collection, page) => ({
 
 export const clearList = collection => ({
   type: actions.CLEAR_ENTITY_LIST,
+  collection,
+});
+
+export const clearItems = collection => ({
+  type: actions.CLEAR_ITEMS,
   collection,
 });
 
