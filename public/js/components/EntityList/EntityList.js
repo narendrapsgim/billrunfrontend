@@ -8,7 +8,7 @@ import List from '../List';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import Pager from './Pager';
 import Filter from './Filter';
-import { getList, clearList, setListSort, setListFilter, setListPage, setListSize } from '../../actions/entityListActions';
+import { getList, clearList, setListSort, setListFilter, setListPage, setListSize, clearItem } from '../../actions/entityListActions';
 
 class EntityList extends Component {
 
@@ -29,9 +29,9 @@ class EntityList extends Component {
     editable: PropTypes.bool,
     size: PropTypes.number,
     inProgress: PropTypes.bool,
-    update: PropTypes.oneOfType([
-      PropTypes.string,
+    forceRefetchItems: PropTypes.oneOfType([
       PropTypes.bool,
+      PropTypes.number,
     ]),
     filter: PropTypes.instanceOf(Immutable.Map),
     sort: PropTypes.instanceOf(Immutable.Map),
@@ -48,7 +48,7 @@ class EntityList extends Component {
     nextPage: false,
     editable: true,
     inProgress: false,
-    update: false,
+    forceRefetchItems: false,
     baseFilter: {},
     tableFields: [],
     filterFields: [],
@@ -58,8 +58,8 @@ class EntityList extends Component {
   }
 
   componentWillMount() {
-    const { update, items } = this.props;
-    if (update === 'true' || items == null || items.isEmpty()) {
+    const { forceRefetchItems, items } = this.props;
+    if (forceRefetchItems || items == null || items.isEmpty()) {
       this.fetchItems(this.props);
     }
   }
@@ -77,17 +77,11 @@ class EntityList extends Component {
   // }
 
   componentWillUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
-    // console.log('page: ', this.props.page !== nextProps.page, this.props.page, nextProps.page);
-    // console.log('nextPage: ', this.props.nextPage !== nextProps.nextPage, this.props.nextPage, nextProps.nextPage);
-    // console.log('size: ', this.props.size !== nextProps.size);
-    // console.log('filter: ', !Immutable.is(this.props.filter, nextProps.filter));
-    // console.log('sort: ', !Immutable.is(this.props.sort, nextProps.sort));
-    if (
-    this.props.page !== nextProps.page
-    || this.props.size !== nextProps.size
-    || !Immutable.is(this.props.filter, nextProps.filter)
-    || !Immutable.is(this.props.sort, nextProps.sort)
-    ) {
+    const pageChanged = this.props.page !== nextProps.page;
+    const sizeChanged = this.props.size !== nextProps.size;
+    const filterChanged = !Immutable.is(this.props.filter, nextProps.filter)
+    const sortChanged = !Immutable.is(this.props.sort, nextProps.sort)
+    if (pageChanged || sizeChanged || filterChanged || sortChanged) {
       console.log('Refatch items');
       this.fetchItems(nextProps);
     }
@@ -95,7 +89,11 @@ class EntityList extends Component {
 
   componentWillUnmount() {
     // const { itemsType } = this.props;
+    // TODO: decide what to do after leaving list page
+    // clear all list props - Items, sort, filter, page
     // this.props.dispatch(clearList(itemsType));
+    // OR clear only items, and refetch them on back to list with same props
+    // this.props.dispatch(clearItem(itemsType));
   }
 
   onClickNew = () => {
@@ -222,7 +220,6 @@ class EntityList extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  update: props.location.query.update,
   collection: props.collection || props.itemsType,
   items: state.entityList.items.get(props.itemsType),
   page: state.entityList.page.get(props.itemsType),
