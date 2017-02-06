@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import EntityList from '../EntityList';
 
 
-const ProductsList = (props) => {
+const ProductsList = () => {
   const parserUsegt = (item) => {
     const usegt = item.get('rates', Immutable.Map()).keySeq().first();
     return (typeof usegt !== 'undefined') ? usegt : '';
@@ -33,10 +33,9 @@ const ProductsList = (props) => {
 
   return (
     <EntityList
-      {...props}
+      collection="rates"
       itemType="product"
       itemsType="products"
-      collection="rates"
       filterFields={filterFields}
       tableFields={tableFields}
       projectFields={projectFields}

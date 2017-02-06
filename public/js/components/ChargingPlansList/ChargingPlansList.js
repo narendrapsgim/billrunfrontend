@@ -1,7 +1,7 @@
 import React from 'react';
 import EntityList from '../EntityList';
 
-const ChargingPlansList = (props) => {
+const ChargingPlansList = () => {
   const filterFields = [
     { id: 'description', placeholder: 'Title' },
     { id: 'name', placeholder: 'Key' },
@@ -19,11 +19,11 @@ const ChargingPlansList = (props) => {
   ];
 
   const projectFields = {
+    charging_value: 1,
     description: 1,
+    Operation: 1,
     name: 1,
     code: 1,
-    Operation: 1,
-    charging_value: 1,
   };
 
   const baseFilter = {
@@ -33,10 +33,9 @@ const ChargingPlansList = (props) => {
 
   return (
     <EntityList
-      {...props}
       collection="plans"
-      itemsType="charging_plans"
       itemType="charging_plan"
+      itemsType="charging_plans"
       filterFields={filterFields}
       baseFilter={baseFilter}
       tableFields={tableFields}

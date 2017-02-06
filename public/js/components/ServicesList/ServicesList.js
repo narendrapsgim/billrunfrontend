@@ -1,9 +1,8 @@
-
 import React from 'react';
 import EntityList from '../EntityList';
 
 
-const ServicesList = (props) => {
+const ServicesList = () => {
   const parserPrice = item => item.getIn(['price', 0, 'price'], '');
 
   const parserCycles = (item) => {
@@ -27,13 +26,12 @@ const ServicesList = (props) => {
 
   const projectFields = {
     description: 1,
-    name: 1,
     price: 1,
+    name: 1,
   };
 
   return (
     <EntityList
-      {...props}
       itemsType="services"
       itemType="service"
       filterFields={filterFields}

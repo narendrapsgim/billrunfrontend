@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { Map, List } from 'immutable';
-import { Button, Tabs, Tab, Panel } from 'react-bootstrap';
+import { Tabs, Tab, Panel } from 'react-bootstrap';
+import ActionButtons from '../Elements/ActionButtons';
 import { fetchPrepaidIncludeByIdQuery, getActiveProductsKeysQuery } from '../../common/ApiQueries';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
@@ -12,6 +13,8 @@ import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { savePrepaidInclude } from '../../actions/prepaidIncludeActions';
 import { getSettings } from '../../actions/settingsActions';
+import { clearItems } from '../../actions/entityListActions';
+
 
 class PrepaidIncludeSetup extends Component {
 
@@ -91,33 +94,21 @@ class PrepaidIncludeSetup extends Component {
     this.props.dispatch(updateEntityField('prepaid_include', ['allowed_in', name], Map()));
   };
 
-  handleSave = () => {
-    const { item, mode } = this.props;
-    const callback = (success) => {
-      if (success) {
-        this.props.dispatch(showSuccess('Saved prepaid bucket successfuly!'));
-        this.handleBack(true);
-      } else {
-        this.props.dispatch(showDanger('Error saving prepaid bucket!'));
-      }
-    };
-    this.props.dispatch(savePrepaidInclude(item, mode, callback));
-  };
-
-  handleBack = (update = false) => {
-    if (update) {
-      this.props.router.push({
-        pathname: '/prepaid_includes',
-        query: { update },
-      });
-    } else {
-      this.props.router.push('/prepaid_includes');
+  afterSave = (response) => {
+    if (response.status) {
+      this.props.dispatch(clearItems('charging_plans')); // refetch items list because item was (changed in / added to) list
+      this.handleBack();
     }
   }
 
-  handleCancel = () => {
-    this.handleBack();
+  handleSave = () => {
+    const { item, mode } = this.props;
+    this.props.dispatch(savePrepaidInclude(item, mode, this.afterSave));
   };
+
+  handleBack = () => {
+    this.props.router.push('/prepaid_includes');
+  }
 
   handleSelectTab = (key) => {
     this.setState({ activeTab: key });
@@ -162,10 +153,7 @@ class PrepaidIncludeSetup extends Component {
           </Tab>
         </Tabs>
 
-        <div style={{ marginTop: 12 }}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
-          <Button onClick={this.handleCancel} bsStyle="default">Cancel</Button>
-        </div>
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
 
       </div>
     );

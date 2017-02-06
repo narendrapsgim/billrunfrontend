@@ -2,14 +2,15 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import { Col, Panel, Button } from 'react-bootstrap';
+import { Col, Panel } from 'react-bootstrap';
+import ActionButtons from '../Elements/ActionButtons';
 import Product from './Product';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-/* ACTIONS */
 import { onRateAdd, onRateRemove, onFieldUpdate, onToUpdate, onUsagetUpdate, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
 import { getSettings } from '../../actions/settingsActions';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { clearItems } from '../../actions/entityListActions';
 
 
 class ProductSetup extends Component {
@@ -92,8 +93,13 @@ class ProductSetup extends Component {
     this.props.dispatch(onRateRemove(productPath, index));
   }
 
-  handleBack = () => {
-    this.props.router.push('/products');
+  afterSave = (data) => {
+    if (typeof data.error !== 'undefined' && data.error.length) {
+      console.log('error on save : ', data);
+    } else {
+      this.props.dispatch(clearItems('products')); // refetch items list because item was (changed in / added to) list
+      this.handleBack();
+    }
   }
 
   handleSave = () => {
@@ -101,12 +107,8 @@ class ProductSetup extends Component {
     this.props.dispatch(saveProduct(item, mode, this.afterSave));
   }
 
-  afterSave = (data) => {
-    if (typeof data.error !== 'undefined' && data.error.length) {
-      console.log('error on save : ', data);
-    } else {
-      this.handleBack();
-    }
+  handleBack = () => {
+    this.props.router.push('/products');
   }
 
   render() {
@@ -133,10 +135,9 @@ class ProductSetup extends Component {
             usageTypes={usageTypes}
           />
         </Panel>
-        <div style={{ marginTop: 12 }}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
-          <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
-        </div>
+
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
+
       </Col>
     );
   }

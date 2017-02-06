@@ -5,6 +5,7 @@ import { Col, Tabs, Tab, Panel, Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 import ChargingPlanDetails from './ChargingPlanDetails';
 import ChargingPlanIncludes from './ChargingPlanIncludes';
+import ActionButtons from '../Elements/ActionButtons';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
 import {
   getPlan,
@@ -16,6 +17,7 @@ import {
 import { getList } from '../../actions/listActions';
 import { showWarning } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { clearItems } from '../../actions/entityListActions';
 
 
 class ChargingPlanSetup extends Component {
@@ -103,15 +105,9 @@ class ChargingPlanSetup extends Component {
     this.props.dispatch(onPlanFieldUpdate(['include', usaget, id], value));
   };
 
-  handleBack = () => {
-    this.props.router.push('/charging_plans');
-  };
-
   afterSave = (response) => {
-    const { mode } = this.props;
-    if (response.status && mode === 'new') {
-      this.handleBack();
-    } else if (response.status && mode !== 'new') {
+    if (response.status) {
+      this.props.dispatch(clearItems('charging_plans')); // refetch items list because item was (changed in / added to) list
       this.handleBack();
     }
   }
@@ -119,6 +115,10 @@ class ChargingPlanSetup extends Component {
   handleSave = () => {
     const { item, mode } = this.props;
     this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
+  };
+
+  handleBack = () => {
+    this.props.router.push('/charging_plans');
   };
 
   handleSelectTab = (key) => {
@@ -160,10 +160,8 @@ class ChargingPlanSetup extends Component {
             </Tab>
           </Tabs>
 
-          <div style={{ marginTop: 12 }}>
-            <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
-            <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
-          </div>
+          <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
+
         </Col>
       </div>
     );

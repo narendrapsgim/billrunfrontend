@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { List, Map } from 'immutable';
-import { Tabs, Tab, Col, Panel, Button } from 'react-bootstrap';
+import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
+import ActionButtons from '../Elements/ActionButtons';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
 import PlanNotifications from './PlanNotifications';
 import BlockedProducts from './BlockedProducts';
@@ -23,14 +24,10 @@ import {
 } from '../../actions/prepaidPlanActions';
 import { getList } from '../../actions/listActions';
 import { showWarning } from '../../actions/alertsActions';
-import {
-  getPlan,
-  savePlan,
-  clearPlan,
-  onPlanFieldUpdate,
-} from '../../actions/planActions';
+import { getPlan, savePlan, clearPlan, onPlanFieldUpdate } from '../../actions/planActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
+import { clearItems } from '../../actions/entityListActions';
 
 
 class PrepaidPlanSetup extends Component {
@@ -156,10 +153,8 @@ class PrepaidPlanSetup extends Component {
   };
 
   afterSave = (response) => {
-    const { mode } = this.props;
-    if (response.status && mode === 'new') { // on success save new item
-      this.handleBack();
-    } else if (response.status && mode !== 'new') { // on success update item
+    if (response.status) { // on success save new item
+      this.props.dispatch(clearItems('prepaid_plans')); // refetch items list because item was (changed in / added to) list
       this.handleBack();
     }
   }
@@ -247,10 +242,7 @@ class PrepaidPlanSetup extends Component {
             </Tab>
           </Tabs>
 
-          <div style={{ marginTop: 12 }}>
-            <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
-            <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
-          </div>
+          <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
 
         </Col>
       </div>

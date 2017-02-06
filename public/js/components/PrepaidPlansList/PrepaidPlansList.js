@@ -1,7 +1,7 @@
 import React from 'react';
 import EntityList from '../EntityList';
 
-const PrepaidPlansList = (props) => {
+const PrepaidPlansList = () => {
   const filterFields = [
     { id: 'description', placeholder: 'Title' },
     { id: 'name', placeholder: 'Key' },
@@ -29,10 +29,9 @@ const PrepaidPlansList = (props) => {
 
   return (
     <EntityList
-      {...props}
+      collection="plans"
       itemType="prepaid_plan"
       itemsType="prepaid_plans"
-      collection="plans"
       filterFields={filterFields}
       baseFilter={baseFilter}
       tableFields={tableFields}

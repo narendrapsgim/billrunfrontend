@@ -2,13 +2,15 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import { Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
+import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
+import ActionButtons from '../Elements/ActionButtons';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import { onGroupAdd, onGroupRemove, getItem, clearItem, updateItem, saveItem } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { clearItems } from '../../actions/entityListActions';
 
 
 class ServiceSetup extends Component {
@@ -76,6 +78,16 @@ class ServiceSetup extends Component {
     this.props.dispatch(updateItem(path, value));
   }
 
+  afterSave = (response) => {
+    const { mode } = this.props;
+    if (response === true) {
+      this.props.dispatch(clearItems('services')); // refetch items list because item was (changed in / added to) list
+      const action = (mode === 'new') ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The service was ${action}`));
+      this.handleBack();
+    }
+  }
+
   handleSelectTab = (activeTab) => {
     this.setState({ activeTab });
   }
@@ -85,17 +97,8 @@ class ServiceSetup extends Component {
   }
 
   handleSave = () => {
-    const { item, mode } = this.props;
-    const action = (mode === 'new') ? 'created' : 'updated';
-
-    this.props.dispatch(saveItem(item)).then(
-      (response) => {
-        if (response === true) {
-          this.props.dispatch(showSuccess(`The service was ${action}`));
-          this.handleBack();
-        }
-      }
-    );
+    const { item } = this.props;
+    this.props.dispatch(saveItem(item)).then(this.afterSave);
   }
 
   render() {
@@ -130,10 +133,7 @@ class ServiceSetup extends Component {
           </Tab>
         </Tabs>
 
-        <div style={{ marginTop: 12 }}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{ minWidth: 90, marginRight: 10 }}>Save</Button>
-          <Button onClick={this.handleBack} bsStyle="default" style={{ minWidth: 90 }}>Cancel</Button>
-        </div>
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
 
       </Col>
     );

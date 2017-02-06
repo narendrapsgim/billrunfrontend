@@ -2,7 +2,7 @@ import React from 'react';
 import EntityList from '../EntityList';
 
 
-const PrepaidIncludesList = (props) => {
+const PrepaidIncludesList = () => {
   const fields = [
     { id: 'name' },
     { id: 'charging_by', showFilter: false },
@@ -11,18 +11,17 @@ const PrepaidIncludesList = (props) => {
   ];
 
   const projectFields = {
-    name: 1,
-    charging_by: 1,
     charging_by_usaget: 1,
+    charging_by: 1,
     priority: 1,
+    name: 1,
   };
 
   return (
     <EntityList
-      {...props}
       collection="prepaidincludes"
-      itemsType="prepaid_includes"
       itemType="prepaid_include"
+      itemsType="prepaid_includes"
       filterFields={fields}
       tableFields={fields}
       projectFields={projectFields}

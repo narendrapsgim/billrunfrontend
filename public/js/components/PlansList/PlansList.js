@@ -4,7 +4,7 @@ import changeCase from 'change-case';
 import EntityList from '../EntityList';
 
 
-const PlansList = (props) => {
+const PlansList = () => {
   const parserTrial = (item) => {
     if (item.getIn(['price', 0, 'trial'])) {
       return `${item.getIn(['price', 0, 'to'])} ${item.getIn(['recurrence', 'periodicity'])}`;
@@ -58,9 +58,8 @@ const PlansList = (props) => {
 
   return (
     <EntityList
-      {...props}
-      itemsType="plans"
       itemType="plan"
+      itemsType="plans"
       filterFields={filterFields}
       tableFields={tableFields}
       projectFields={projectFields}
