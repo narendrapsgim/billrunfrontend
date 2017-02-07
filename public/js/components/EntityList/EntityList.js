@@ -16,6 +16,7 @@ class EntityList extends Component {
     itemType: PropTypes.string.isRequired,
     itemsType: PropTypes.string.isRequired,
     collection: PropTypes.string.isRequired,
+    api: PropTypes.string,
     items: PropTypes.oneOfType([
       PropTypes.instanceOf(Immutable.List),
       null,
@@ -43,6 +44,7 @@ class EntityList extends Component {
 
   static defaultProps = {
     items: null,
+    api: 'uniqueget',
     page: 0,
     size: 5,
     nextPage: false,
@@ -130,8 +132,8 @@ class EntityList extends Component {
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   }
 
-  buildQuery = ({ collection, page, size, sort, filter, baseFilter, projectFields }) => ({
-    action: 'uniqueget',
+  buildQuery = ({ collection, page, size, sort, filter, baseFilter, projectFields, api }) => ({
+    action: api,
     entity: collection,
     params: [
       { sort: JSON.stringify(sort) },
