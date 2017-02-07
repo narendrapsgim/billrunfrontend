@@ -24,7 +24,7 @@ import QueueList from '../components/QueueList';
 import InvoicesList from '../components/InvoicesList';
 import Settings from '../components/Settings';
 import PaymentGateways from '../components/PaymentGateways';
-import User from '../components/User';
+import UserList from '../components/UserList';
 import UserSetup from '../components/UserSetup';
 import SelectTemplate from '../components/InputProcessor/SelectTemplate';
 import Collections from '../components/Collections/Collections';
@@ -80,8 +80,18 @@ const routes = () => (
       <Route path="prepaid_include" component={RequireAuth(PrepaidIncludeSetup)} />
     </Route>
 
-    <Route path="/customers" component={RequireAuth(CustomersList)} title="Customers" />
-    <Route path="/customer" component={RequireAuth(CustomerSetup)} />
+    <Route path="customers" >
+      <IndexRoute component={RequireAuth(CustomersList)} title="Customers" />
+      <Route path="customer/:itemId" component={RequireAuth(CustomerSetup)} />
+      <Route path="customer" component={RequireAuth(CustomerSetup)} />
+    </Route>
+
+    <Route path="users" >
+      <IndexRoute component={RequireAuth(UserList)} title="Users" />
+      <Route path="user/:itemId" component={RequireAuth(UserSetup)} />
+      <Route path="user" component={RequireAuth(UserSetup)} />
+    </Route>
+
     <Route path="/input_processor" component={RequireAuth(InputProcessor)} />
     <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" />
     <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator" />
@@ -91,13 +101,10 @@ const routes = () => (
     <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
     <Route path="/settings" component={RequireAuth(Settings)} title="General Settings" />
     <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
-    <Route path="/users" component={RequireAuth(User)} title="Users" />
-    <Route path="/user" component={RequireAuth(UserSetup)} />
     <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Create New Input Processor" />
     <Route path="/collections" component={RequireAuth(Collections)} title="Collection" />
     <Route path="/collection(/:itemId)(/:action)" component={RequireAuth(Collection)} />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
-
     <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
     <Route path="/custom_fields" component={RequireAuth(CustomFields)} title="Custom Fields" />
     <Route path="/login" component={LoginPage} title="Login" />
