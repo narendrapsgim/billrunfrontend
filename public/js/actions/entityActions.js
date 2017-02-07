@@ -1,4 +1,5 @@
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { getEntityByIdQuery } from '../common/ApiQueries';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -32,7 +33,7 @@ export const clearEntity = collection => ({
   collection,
 });
 
-const buildUserRequestData = (item, action) => {
+const buildRequestData = (item, action) => {
   const formData = new FormData();
   if (action === 'create') {
     formData.append('update', JSON.stringify(item));
@@ -47,10 +48,7 @@ const buildUserRequestData = (item, action) => {
 
 const requestDataBuilder = (collection, item, action) => {
   switch (collection) {
-    case 'users':
-      return buildUserRequestData(item, action);
-    default:
-      return new FormData();
+    default: return buildRequestData(item, action);
   }
 };
 
@@ -67,40 +65,35 @@ const apiSaveEntity = (collection, item, action) => {
   return apiBillRun(query);
 };
 
-export const saveEntity = (collection, action = '') => (dispatch, getState) => {
+export const saveEntity = (collection, item, action) => (dispatch) => {
   dispatch(startProgressIndicator());
-  const { entity } = getState();
-  const item = entity.get(collection);
-  let saveAction;
-  if (action.length > 0) {
-    saveAction = action;
-  } else {
-    saveAction = item.getIn(['_id', '$id'], '').length > 0 ? 'update' : 'create';
-  }
-  return apiSaveEntity(collection, item, saveAction)
-    .then((success) => { // eslint-disable-line no-unused-vars
-      dispatch(finishProgressIndicator());
-      return (true);
-    })
-    .catch((error) => {
-      dispatch(finishProgressIndicator());
-      return (error);
-    });
+  return apiSaveEntity(collection, item, action)
+    .then(success => dispatch(apiBillRunSuccessHandler(success)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
 };
 
 const fetchEntity = (collection, query) => (dispatch) => {
   dispatch(startProgressIndicator());
-  apiBillRun(query)
+  return apiBillRun(query)
     .then((success) => {
-      try {
-        dispatch(finishProgressIndicator());
-        dispatch(gotEntity(collection, success.data[0].data.details[0]));
-      } catch (e) {
-        throw new Error('Error retreiving Entity');
-      }
+      dispatch(gotEntity(collection, success.data[0].data.details[0]));
+      return dispatch(apiBillRunSuccessHandler(success));
     })
-    .catch((error) => { dispatch(apiBillRunErrorHandler(error)); });
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));
+};
+
+const fetchEntityById = (name, collection, id) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  return apiBillRun(getEntityByIdQuery(collection, id))
+    .then((success) => {
+      dispatch(gotEntity(name, success.data[0].data.details[0]));
+      return dispatch(apiBillRunSuccessHandler(success));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));
 };
 
 export const getEntity = (collection, query) => dispatch =>
   dispatch(fetchEntity(collection, query));
+
+export const getEntityById = (name, collection, id) => dispatch =>
+  dispatch(fetchEntityById(name, collection, id));
