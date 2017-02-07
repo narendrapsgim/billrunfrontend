@@ -1,139 +1,147 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
-
+import Immutable from 'immutable';
+import { Col, Row, Panel } from 'react-bootstrap';
 /* COMPONENTS */
 import Pager from '../Pager';
 import Filter from '../Filter';
 import List from '../List';
-
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
 
+
 class InvoicesList extends Component {
-  constructor(props) {
-    super(props);
 
-    this.handlePageClick = this.handlePageClick.bind(this);
-    this.onFilter = this.onFilter.bind(this);
-    this.buildQuery = this.buildQuery.bind(this);
-    this.onSort = this.onSort.bind(this);
-
-    this.state = {
-      page: 0,
-      size: 10,
-      sort: {},
-      filter: ""
-    };
+  static propTypes = {
+    items: PropTypes.instanceOf(Immutable.List),
+    collection: PropTypes.string,
+    baseFilter: PropTypes.object,
+    dispatch: PropTypes.func.isRequired,
   }
+
+  static defaultProps = {
+    items: Immutable.List(),
+    baseFilter: {},
+    collection: 'bill',
+  }
+
+  state = {
+    page: 0,
+    size: 10,
+    sort: Immutable.Map({ invoice_id: -1 }),
+    filter: {},
+  };
 
   componentWillUnmount() {
     this.props.dispatch(clearList('invoices'));
   }
-  
-  buildQuery() {
+
+  buildQuery = () => {
+    const { collection } = this.props;
     const { page, size, filter, sort } = this.state;
     return {
-      api: "bill",
+      api: collection,
       params: [
-        { action: "query_bills_invoices" },
+        { action: 'query_bills_invoices' },
         { size },
         { page },
-	{ sort },
-        { query: filter }
-      ]
+        { sort: JSON.stringify(sort) },
+        { query: JSON.stringify(filter) },
+      ],
     };
   }
 
-  onFilter(filter) {
-    this.setState({filter, page: 0}, () => {
-      this.props.dispatch(getList('invoices', this.buildQuery()));
-    });
-  }
-  
-  handlePageClick(page) {
-    this.setState({page}, () => {
-      this.props.dispatch(getList('invoices', this.buildQuery()));
-    });
+  onFilter = (filter) => {
+    this.setState({ filter, page: 0 }, this.fetchItems);
   }
 
-  onSort(sort) {
-    this.setState({sort}, () => {
-      this.props.dispatch(getList('invoices', this.buildQuery()));
-    });
+  handlePageClick = (page) => {
+    this.setState({ page }, this.fetchItems);
   }
 
-  downloadURL(aid, billrun_key, invoice_id) {
-    return `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrun_key}&iid=${invoice_id}`;
+  onSort = (newSort) => {
+    const sort = Immutable.Map(newSort);
+    this.setState({ sort }, this.fetchItems);
   }
-  
-  render() {
-    const { invoices } = this.props;
-    const paid_by_parser = (ent) => {
-      if (ent.get('paid_by'))
-        return (<span style={{color: "#3c763d"}}>Paid</span>);
-      else if (moment(ent.get('due_date')).isAfter(moment()))
-        return (<span style={{color: "#8a6d3b"}}>Due</span>);
-      return (<span style={{color: "#a94442"}}>Not Paid</span>);      
-    };
-    const download_parser = (ent) => {
-      const download_url = this.downloadURL(ent.get('aid'), ent.get('billrun_key'), ent.get('invoice_id'));
-      return (
-        <form method="post" action={download_url}>
-          <input type="hidden" name="a" value="a"></input>
-          <button className="btn btn-link" type="submit">
-            <i className="fa fa-download"></i> Download
-          </button>
-        </form>
-      );
-    };
-    const fields = [
-      { id: "invoice_id", title: "Invoice Id", sort: true },
-      { id: "invoice_date", title: "Date", cssClass: 'short-date', sort: true },
-      { id: "due_date", title: "Due", cssClass: 'short-date', sort: true },
-      { id: "amount", title: "Amount", sort: true },
-      { id: "paid_by", title: "Status", parser: paid_by_parser },
-      { id: "billrun_key", title: "Cycle", sort: true },
-      { id: "aid", title: "Customer ID", sort: true },
-      { id: "payer_name", title: "Name", sort: true },
-      { title: "Download", parser: download_parser }
-    ];
-    const filter_fields = [
-      { id: "aid", placeholder: "Customer ID", type: 'number' }
-    ];
 
-    const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
+  fetchItems = () => {
+    this.props.dispatch(getList('invoices', this.buildQuery()));
+  }
 
+  downloadURL = (aid, billrunKey, invoiceId) =>
+  `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`
+
+  renderMainPanelTitle = () => (
+    <div>
+      <span>
+        List of all invoices
+      </span>
+    </div>
+  );
+
+  parserPaidBy = (ent) => {
+    if (ent.get('paid_by')) {
+      return (<span style={{ color: '#3c763d' }}>Paid</span>);
+    }
+    if (moment(ent.get('due_date')).isAfter(moment())) {
+      return (<span style={{ color: '#8a6d3b' }}>Due</span>);
+    }
+    return (<span style={{ color: '#a94442' }}>Not Paid</span>);
+  }
+
+  parserDownload = (ent) => {
+    const downloadUrl = this.downloadURL(ent.get('aid'), ent.get('billrun_key'), ent.get('invoice_id'));
     return (
-      <div>
+      <form method="post" action={downloadUrl}>
+        <input type="hidden" name="a" value="a" />
+        <button className="btn btn-link" type="submit">
+          <i className="fa fa-download" /> Download
+        </button>
+      </form>
+    );
+  };
 
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="panel panel-default">
-              <div className="panel-heading">
-                <span>
-                  List of all invoices
-                </span>
-              </div>
-              <div className="panel-body">
-                <Filter fields={filter_fields} onFilter={this.onFilter} base={base} />
-                <List items={invoices} fields={fields} onSort={this.onSort} className="invoices-list" />
-              </div>
-            </div>
-          </div>
-        </div>
+  getTableFields = () => ([
+    { id: 'invoice_id', title: 'Invoice Id', sort: true },
+    { id: 'invoice_date', title: 'Date', cssClass: 'short-date', sort: true },
+    { id: 'due_date', title: 'Due', cssClass: 'short-date', sort: true },
+    { id: 'amount', title: 'Amount', sort: true },
+    { id: 'paid_by', title: 'Status', parser: this.parserPaidBy },
+    { id: 'billrun_key', title: 'Cycle', sort: true },
+    { id: 'aid', title: 'Customer ID', sort: true },
+    { id: 'payer_name', title: 'Name', sort: true },
+    { title: 'Download', parser: this.parserDownload },
+  ]);
 
-        <Pager onClick={this.handlePageClick}
-               size={this.state.size}
-               count={invoices.size || 0} />  
+  getFilterFields = () => ([
+    { id: 'aid', placeholder: 'Customer ID', type: 'number' },
+  ])
 
+  render() {
+    const { sort } = this.state;
+    const { items, baseFilter } = this.props;
+    const tableFieds = this.getTableFields();
+    const filterFields = this.getFilterFields();
+    return (
+      <div className="InvoicesList">
+        <Row>
+          <Col lg={12}>
+            <Panel header={this.renderMainPanelTitle()}>
+              <Filter fields={filterFields} onFilter={this.onFilter} base={baseFilter} />
+              <List items={items} fields={tableFieds} onSort={this.onSort} sort={sort} className="invoices-list" />
+            </Panel>
+          </Col>
+        </Row>
+        <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
       </div>
     );
   }
 }
 
-function mapStateToProps(state, props) {
-  return { invoices: state.list.get('invoices') || [] };
-}
+const mapStateToProps = (state, props) => ({
+  baseFilter: props.location.query.base ? JSON.parse(props.location.query.base) : {},
+  items: state.list.get('invoices'),
+});
 
 export default connect(mapStateToProps)(InvoicesList);
