@@ -47,12 +47,14 @@ const Pager = (props) => {
           </ul>
         </div>
         <div className="col-lg-6 pull-right" style={{ paddingRight: 0 }}>
-          <select value={size} className="form-control" onChange={onChangeSize} style={sizeStyle}>
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={15}>15</option>
-            <option value={20}>20</option>
-          </select>
+          { props.onChangeSize &&
+            <select value={size} className="form-control" onChange={onChangeSize} style={sizeStyle}>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+            </select>
+          }
         </div>
       </div>
     </div>
