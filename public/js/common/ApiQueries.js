@@ -69,12 +69,12 @@ export const getProductByKeyQuery = key => ({
   api: 'find',
   params: [
     { collection: 'rates' },
-    { size: '1' },
-    { page: '0' },
+    { size: 1 },
+    { page: 0 },
     { query: JSON.stringify({
       key,
-      to: { $gte: moment() },
-      from: { $lte: moment() },
+      to: { $gte: moment().toISOString() },
+      from: { $lte: moment().toISOString() },
     }) },
   ],
 });
@@ -84,54 +84,13 @@ export const getProductsByKeysQuery = (keys, project = {}) => ({
   params: [
     { collection: 'rates' },
     { size: 1000 },
-    { project: JSON.stringify(project) },
     { page: 0 },
+    { project: JSON.stringify(project) },
     { query: JSON.stringify({
       key: { $in: keys },
-      to: { $gt: moment() },
-      from: { $lte: moment() },
+      to: { $gt: moment().toISOString() },
+      from: { $lte: moment().toISOString() },
     }) },
-  ],
-});
-
-export const getActiveProductsKeysQuery = () => ({
-  api: 'find',
-  params: [
-    { collection: 'rates' },
-    { size: 1000 },
-    { page: 0 },
-    { query: JSON.stringify({ to: { $gt: moment() } }) },
-    { project: JSON.stringify({ key: 1 }) },
-  ],
-});
-
-export const fetchPlanByIdQuery = id => ({
-  api: 'find',
-  params: [
-    { collection: 'plans' },
-    { size: 1 },
-    { page: 0 },
-    { query: JSON.stringify({ _id: id }) },
-  ],
-});
-
-export const fetchProductByIdQuery = id => ({
-  api: 'find',
-  params: [
-    { collection: 'rates' },
-    { size: 1 },
-    { page: 0 },
-    { query: JSON.stringify({ _id: id }) },
-  ],
-});
-
-export const fetchPrepaidIncludeByIdQuery = id => ({
-  api: 'find',
-  params: [
-    { collection: 'prepaidincludes' },
-    { size: 1 },
-    { page: 0 },
-    { query: JSON.stringify({ _id: id }) },
   ],
 });
 
@@ -143,54 +102,20 @@ export const saveQuery = body => ({
   },
 });
 
-
-export const getPPIncludesQuery = () => ({
-  api: 'find',
-  params: [
-    { collection: 'prepaidincludes' },
-    { query: JSON.stringify(
-      { to: { $gt: moment() } }
-    ) },
-  ],
-});
-
-
-export const getPlansGroupsQuery = () => {
-  const toadyApiString = moment();
+export const getGroupsNamesQuery = (collection) => {
+  const queryString = JSON.stringify({
+    'include.groups': { $exists: true },
+    to: { $gte: moment().toISOString() },
+    from: { $lte: moment().toISOString() },
+  });
   const projectString = JSON.stringify({
     name: 1,
     include: 1,
   });
-  const queryString = JSON.stringify({
-    'include.groups': { $exists: true },
-    to: { $gte: toadyApiString },
-    from: { $lte: toadyApiString },
-  });
   return {
     api: 'find',
     params: [
-      { collection: 'plans' },
-      { query: queryString },
-      { project: projectString },
-    ],
-  };
-};
-
-export const getServicesGroupsQuery = () => {
-  const toadyApiString = moment();
-  const projectString = JSON.stringify({
-    name: 1,
-    include: 1,
-  });
-  const queryString = JSON.stringify({
-    'include.groups': { $exists: true },
-    to: { $gte: toadyApiString },
-    from: { $lte: toadyApiString },
-  });
-  return {
-    api: 'find',
-    params: [
-      { collection: 'services' },
+      { collection },
       { query: queryString },
       { project: projectString },
     ],
@@ -198,14 +123,77 @@ export const getServicesGroupsQuery = () => {
 };
 
 export const getAllGroupsQuery = () => ([
-  getPlansGroupsQuery(),
-  getServicesGroupsQuery(),
+  getGroupsNamesQuery('plans'),
+  getGroupsNamesQuery('services'),
 ]);
 
-export const getPrepaidIncludesQuery = () => ({
+export const getSubscribersByAidQuery = aid => ({
   api: 'find',
   params: [
-    { collection: 'prepaidincludes' },
-    { query: JSON.stringify({}) },
+    { collection: 'subscribers' },
+    { page: 0 },
+    { size: 999999 },
+    { query: JSON.stringify({
+      aid,
+      type: 'subscriber',
+      to: { $gt: moment().toISOString() },
+    }) },
   ],
 });
+
+export const getPaymentGatewaysQuery = () => ({
+  api: 'paymentgateways',
+  action: 'list',
+});
+
+export const getEntityByIdQuery = (collection, id) => ({
+  api: 'find',
+  params: [
+    { collection },
+    { size: 1 },
+    { page: 0 },
+    { query: JSON.stringify({ _id: id }) },
+  ],
+//   action: 'get',
+//   entity: collection,
+//   params: [
+//     { query: JSON.stringify({ _id: id }) },
+//     { page: 0 },
+//     { size: 1 },
+//   ],
+});
+export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
+export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
+export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
+export const fetchUserByIdQuery = id => ({
+  api: 'users',
+  params: [
+    { userId: id },
+    { action: 'read' },
+  ],
+});
+
+export const getEntitesQuery = (collection, project = {}) => ({
+  api: 'find',
+  params: [
+    { collection },
+    { size: 9999 },
+    { page: 0 },
+    { query: JSON.stringify({
+      to: { $gt: moment().toISOString() },
+    }) },
+    { project: JSON.stringify(project) },
+  ],
+  //   action: 'uniqueget',
+  //   entity: collection,
+  //   params: [
+  //     { page: 0 },
+  //     { size: 9999 },
+  //     { project: JSON.stringify(project) },
+  //   ],
+});
+
+export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
+export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
+export const getServicesQuery = () => getEntitesQuery('services');
+export const getPlansQuery = () => getEntitesQuery('plans');
