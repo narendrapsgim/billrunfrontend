@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import Immutable from 'immutable';
+import { Col, Row, Panel } from 'react-bootstrap';
 /* COMPONENTS */
 import Pager from '../Pager';
 import Filter from '../Filter';
@@ -28,7 +29,6 @@ class UsageList extends Component {
   state = {
     line: null,
     viewing: false,
-    fields: {},
     page: 0,
     size: 10,
     sort: Immutable.Map(),
@@ -75,40 +75,39 @@ class UsageList extends Component {
     this.props.dispatch(getList('usages', this.buildQuery()));
   }
 
+  getTableFields = () => ([
+    { id: 'type', placeholder: 'Type' },
+    { id: 'aid', placeholder: 'Customer ID', type: 'number', sort: true },
+    { id: 'sid', placeholder: 'Subscription ID', type: 'number', sort: true },
+    { id: 'plan', placeholder: 'Plan' },
+    { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false, sort: true },
+  ]);
+
+  renderMainPanelTitle = () => (
+    <div>
+      <span>List of all usages</span>
+      <div className="pull-right">
+        <Link to={'/queue'} className="btn btn-default btn-xs">Go to Queue</Link>
+      </div>
+    </div>
+  );
+
   render() {
     const { line, viewing, sort } = this.state;
     const { items, baseFilter } = this.props;
-
-    const fields = [
-      { id: 'type', placeholder: 'Type' },
-      { id: 'aid', placeholder: 'Customer ID', type: 'number', sort: true },
-      { id: 'sid', placeholder: 'Subscription ID', type: 'number', sort: true },
-      { id: 'plan', placeholder: 'Plan' },
-      { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false, sort: true },
-    ];
-
+    const fields = this.getTableFields();
     return (
-      <div>
+      <div className="UsageList">
         { viewing ? (<Usage line={line} onClickCancel={this.onCancelView} />) : null }
         <div style={{ display: viewing ? 'none' : 'block' }}>
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="panel panel-default">
-                <div className="panel-heading">
-                  <span>
-                    List of all usages
-                  </span>
-                  <div className="pull-right">
-                    <Link to={'/queue'} className="btn btn-default btn-xs">Go to Queue</Link>
-                  </div>
-                </div>
-                <div className="panel-body">
-                  <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
-                  <List items={items} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} sort={sort} />
-                </div>
-              </div>
-            </div>
-          </div>
+          <Row>
+            <Col lg={12}>
+              <Panel header={this.renderMainPanelTitle()}>
+                <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
+                <List items={items} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} sort={sort} />
+              </Panel>
+            </Col>
+          </Row>
           <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
         </div>
       </div>
