@@ -38,7 +38,7 @@ const Pager = (props) => {
                 <i className="fa fa-chevron-left" />
               </a>
             </li>
-            <span className="detalis" style={{ padding: '0 10px' }}>{pageLabel} | {showing}</span>
+            <span className="detalis" style={{ padding: '0 10px' }}>{pageLabel}{showing !== 0 && ` | ${showing}`}</span>
             <li className={nextClass}>
               <a onClick={handleNextPageClick}>
                 <i className="fa fa-chevron-right" />
