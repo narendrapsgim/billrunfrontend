@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -14,17 +14,19 @@ import { getList, clearList } from '../../actions/listActions';
 
 class AuditTrail extends Component {
 
+  static propTypes = {
+    items: PropTypes.instanceOf(Immutable.List),
+    userNames: PropTypes.instanceOf(Immutable.List),
+    auditTrailEntityTypes: PropTypes.instanceOf(Immutable.List),
+    collection: PropTypes.string,
+    dispatch: PropTypes.func.isRequired,
+  }
+
   static defaultProps = {
     items: Immutable.List(),
     userNames: Immutable.List(),
     auditTrailEntityTypes: Immutable.List(),
-  }
-
-  static propTypes = {
-    items: React.PropTypes.instanceOf(Immutable.List),
-    userNames: React.PropTypes.instanceOf(Immutable.List),
-    auditTrailEntityTypes: React.PropTypes.instanceOf(Immutable.List),
-    dispatch: React.PropTypes.func.isRequired,
+    collection: 'log',
   }
 
   constructor(props) {
@@ -36,13 +38,12 @@ class AuditTrail extends Component {
       { id: 'key', title: 'Module Key', sort: true },
       { title: 'Details', parser: this.detailsParser },
     ];
-    this.itemsType = 'log';
     this.state = {
       tableFields,
       fields: {},
       page: 0,
       size: 10,
-      sort: JSON.stringify({ urt: -1 }),
+      sort: Immutable.Map({ urt: -1 }),
       filter: {},
     };
   }
@@ -54,12 +55,14 @@ class AuditTrail extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearList(this.itemsType));
+    const { collection } = this.props;
+    this.props.dispatch(clearList(collection));
     this.props.dispatch(clearList('autocompleteUser'));
     this.props.dispatch(clearList('autocompleteAuditTrailEntityTypes'));
   }
 
-  onSort = (sort) => {
+  onSort = (newSort) => {
+    const sort = Immutable.Map(newSort);
     this.setState({ sort }, this.fetchItems);
   }
 
@@ -68,7 +71,8 @@ class AuditTrail extends Component {
   }
 
   fetchItems = () => {
-    this.props.dispatch(getList(this.itemsType, this.buildQuery()));
+    const { collection } = this.props;
+    this.props.dispatch(getList(collection, this.buildQuery()));
   }
 
   fetchUser = () => {
@@ -86,7 +90,9 @@ class AuditTrail extends Component {
   }
 
   buildQuery = () => {
-    const query = Object.assign({}, this.state.filter);
+    const { collection } = this.props;
+    const { fields, size, page, sort, filter } = this.state;
+    const query = Object.assign({}, filter);
     query.source = 'audit';
     if (query.urt) {
       query.urt = this.urtQueryBuilder(query.urt);
@@ -94,11 +100,11 @@ class AuditTrail extends Component {
     return {
       api: 'find',
       params: [
-        { collection: this.itemsType },
-        { project: JSON.stringify(this.state.fields) },
-        { size: this.state.size },
-        { page: this.state.page },
-        { sort: this.state.sort },
+        { collection },
+        { size },
+        { page },
+        { project: JSON.stringify(fields) },
+        { sort: JSON.stringify(sort) },
         { query: JSON.stringify(query) },
       ],
     };
@@ -118,8 +124,7 @@ class AuditTrail extends Component {
 
   render() {
     const { items, userNames, auditTrailEntityTypes } = this.props;
-    const { tableFields } = this.state;
-
+    const { tableFields, sort } = this.state;
     const filterFields = [
         { id: 'urt', title: 'Date', type: 'date' },
         { id: 'user.name', title: 'User', type: 'select', options: userNames },
@@ -132,7 +137,13 @@ class AuditTrail extends Component {
         <Row>
           <Col lg={12}>
             <Panel header={<AdvancedFilter fields={filterFields} onFilter={this.onFilter} />}>
-              <List items={items} fields={tableFields} edit={false} onSort={this.onSort} />
+              <List
+                items={items}
+                fields={tableFields}
+                edit={false}
+                sort={sort}
+                onSort={this.onSort}
+              />
             </Panel>
           </Col>
         </Row>
