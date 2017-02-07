@@ -1,91 +1,91 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import moment from 'moment';
 import { Link } from 'react-router';
-
+import Immutable from 'immutable';
 /* COMPONENTS */
 import Pager from '../Pager';
 import Filter from '../Filter';
 import List from '../List';
 import Usage from './Usage';
-
 /* ACTIONS */
 import { getList } from '../../actions/listActions';
 
 class UsageList extends Component {
-  constructor(props) {
-    super(props);
 
-    this.buildQuery = this.buildQuery.bind(this);
-    this.handlePageClick = this.handlePageClick.bind(this);
-    this.onFilter = this.onFilter.bind(this);
-    this.onSort = this.onSort.bind(this);
-    this.onClickLine = this.onClickLine.bind(this);
-    this.onCancelView = this.onCancelView.bind(this);
-
-    this.state = {
-      line: null,
-      viewing: false,
-      page: 0,
-      size: 10,
-      sort: JSON.stringify({ urt: -1 }),
-      filter: ""
-    };
+  static propTypes = {
+    items: PropTypes.instanceOf(Immutable.List),
+    collection: PropTypes.string,
+    baseFilter: PropTypes.object,
+    dispatch: PropTypes.func.isRequired,
   }
 
-  buildQuery() {
+  static defaultProps = {
+    items: Immutable.List(),
+    baseFilter: {},
+    collection: 'lines',
+  }
+
+  state = {
+    line: null,
+    viewing: false,
+    fields: {},
+    page: 0,
+    size: 10,
+    sort: Immutable.Map(),
+    filter: {},
+  };
+
+  buildQuery = () => {
+    const { collection } = this.props;
     const { page, size, sort, filter } = this.state;
     return {
-      api: "find",
+      api: 'find',
       params: [
-        { collection: "lines" },
+        { collection },
         { size },
         { page },
-	{ sort },
-        { query: filter }
-      ]
+        { sort: JSON.stringify(sort) },
+        { query: JSON.stringify(filter) },
+      ],
     };
   }
 
-  onFilter(filter) {
-    this.setState({filter, page: 0}, () => {
-      this.props.dispatch(getList('usages', this.buildQuery()))
-    });
+  onFilter = (filter) => {
+    this.setState({ filter, page: 0 }, this.fetchItems);
   }
 
-  handlePageClick(page) {
-    this.setState({page}, () => {
-      this.props.dispatch(getList('usages', this.buildQuery()))
-    });
+  handlePageClick = (page) => {
+    this.setState({ page }, this.fetchItems);
   }
 
-  onSort(sort) {
-    this.setState({sort}, () => {
-      this.props.dispatch(getList('usages', this.buildQuery()));
-    });
+  onSort(newSort) {
+    const sort = Immutable.Map(newSort);
+    this.setState({ sort }, this.fetchItems);
   }
 
-  onClickLine(line) {
-    this.setState({line, viewing: true});
+  onClickLine = (line) => {
+    this.setState({ line, viewing: true });
   }
 
-  onCancelView() {
-    this.setState({line: null, viewing: false});
+  onCancelView = () => {
+    this.setState({ line: null, viewing: false });
+  }
+
+  fetchItems = () => {
+    this.props.dispatch(getList('usages', this.buildQuery()));
   }
 
   render() {
     const { line, viewing, sort } = this.state;
-    const { usages } = this.props;
+    const { items, baseFilter } = this.props;
 
     const fields = [
-      {id: "type", placeholder: "Type"},
-      {id: "aid", placeholder: "Customer ID", type: "number", sort: true},
-      {id: "sid", placeholder: "Subscription ID", type: "number", sort: true},
-      {id: "plan", placeholder: "Plan"},
-      {id: "urt", placeholder: "Time", type: "datetime", cssClass: 'long-date', showFilter: false, sort: true }
+      { id: 'type', placeholder: 'Type' },
+      { id: 'aid', placeholder: 'Customer ID', type: 'number', sort: true },
+      { id: 'sid', placeholder: 'Subscription ID', type: 'number', sort: true },
+      { id: 'plan', placeholder: 'Plan' },
+      { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false, sort: true },
     ];
-
-    const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
 
     return (
       <div>
@@ -103,24 +103,22 @@ class UsageList extends Component {
                   </div>
                 </div>
                 <div className="panel-body">
-                  <Filter fields={fields} onFilter={this.onFilter} base={base} />
-                  <List items={usages} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} sort={sort}/>
+                  <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
+                  <List items={items} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} sort={sort} />
                 </div>
               </div>
             </div>
           </div>
-
-          <Pager onClick={this.handlePageClick}
-                 size={this.state.size}
-                 count={usages.size || 0} />
+          <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
         </div>
       </div>
     );
   }
 }
 
-function mapStateToProps(state, props) {
-  return { usages: state.list.get('usages') || [] };
-}
+const mapStateToProps = (state, props) => ({
+  baseFilter: props.location.query.base ? JSON.parse(props.location.query.base) : {},
+  items: state.list.get('usages'),
+});
 
 export default connect(mapStateToProps)(UsageList);
