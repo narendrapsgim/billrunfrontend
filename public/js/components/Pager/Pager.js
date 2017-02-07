@@ -39,18 +39,19 @@ class Pager extends Component {
     const offset = page * size;
     const prevClass = `previous${this.state.page === 0 ? ' disabled' : ''}`;
     const nextClass = `next${!pager.get('nextPage') ? ' disabled ' : ''}`;
-    const showing = (offset + count) === 0 ? 'Showing none' : `Showing ${offset + 1} to ${offset + count}`;
+    const showing = count === 0 ? 0 : `${offset + 1} to ${offset + count}`;
+    const pageLabel = `Page ${page + 1}`;
 
     return (
       <div className="row">
         <div className="col-lg-12">
           <ul className="pagination">
-            <span className="detalis">{showing}</span>
             <li id="previous" className={prevClass}>
               <a id="previous" onClick={this.handlePageClick}>
                 <i id="previous" className="fa fa-chevron-left" />
               </a>
             </li>
+            <span className="detalis" style={{ padding: '0 10px' }}>{pageLabel} | {showing}</span>
             <li id="next" className={nextClass}>
               <a id="next" onClick={this.handlePageClick}>
                 <i id="next" className="fa fa-chevron-right" />
