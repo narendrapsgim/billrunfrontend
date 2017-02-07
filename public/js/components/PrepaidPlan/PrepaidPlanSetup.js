@@ -10,7 +10,7 @@ import BlockedProducts from './BlockedProducts';
 import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
 import Thresholds from './Thresholds';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-import { getPPIncludesQuery } from '../../common/ApiQueries';
+import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
 import {
   addNotification,
   removeNotification,
@@ -75,7 +75,7 @@ class PrepaidPlanSetup extends Component {
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Map({ unit: 1, periodicity: 'month' })));
     }
-    this.props.dispatch(getList('pp_includes', getPPIncludesQuery()));
+    this.props.dispatch(getList('pp_includes', getPrepaidIncludesQuery()));
   }
 
   componentWillReceiveProps(nextProps) {

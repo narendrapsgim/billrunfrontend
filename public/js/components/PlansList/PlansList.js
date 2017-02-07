@@ -25,7 +25,7 @@ const PlansList = () => {
 
   const parserChargingMode = item => (item.get('upfront') ? 'Upfront' : 'Arrears');
 
-  const filterFields = [
+  const tableFields = [
     { id: 'description', title: 'Title', sort: true },
     { id: 'name', title: 'Key', sort: true },
     { id: 'code', title: 'External Code', sort: true },
@@ -36,10 +36,9 @@ const PlansList = () => {
     { id: 'connection_type', display: false, showFilter: false },
   ];
 
-  const tableFields = [
+  const filterFields = [
     { id: 'name', placeholder: 'Key' },
     { id: 'description', placeholder: 'Title' },
-    { id: 'to', display: false, type: 'datetime', showFilter: false },
   ];
 
   const projectFields = {
@@ -53,7 +52,6 @@ const PlansList = () => {
     price: 1,
     name: 1,
     code: 1,
-    to: 1,
   };
 
   return (

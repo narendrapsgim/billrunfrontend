@@ -4,11 +4,11 @@ import { withRouter } from 'react-router';
 import { Map, List } from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import ActionButtons from '../Elements/ActionButtons';
-import { fetchPrepaidIncludeByIdQuery, getActiveProductsKeysQuery } from '../../common/ApiQueries';
+import { fetchPrepaidIncludeByIdQuery, getProductsKeysQuery } from '../../common/ApiQueries';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
 import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
-import { showDanger, showSuccess } from '../../actions/alertsActions';
+import { showDanger } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { savePrepaidInclude } from '../../actions/prepaidIncludeActions';
@@ -55,7 +55,7 @@ class PrepaidIncludeSetup extends Component {
       const query = fetchPrepaidIncludeByIdQuery(itemId);
       this.props.dispatch(getEntity('prepaid_include', query));
     }
-    this.props.dispatch(getList('all_rates', getActiveProductsKeysQuery()));
+    this.props.dispatch(getList('all_rates', getProductsKeysQuery()));
     this.props.dispatch(getSettings('usage_types'));
   }
 

@@ -1,12 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
+import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
 import Immutable from 'immutable';
 import PlanTab from './PlanTab';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
 import PlanIncludesTab from './PlanIncludesTab';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
+import ActionButtons from '../Elements/ActionButtons';
 import {
   getPlan,
   savePlan,
@@ -180,10 +181,9 @@ class PlanSetup extends Component {
           </Tab>
 
         </Tabs>
-        <div style={{ marginTop: 12 }}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
-          <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
-        </div>
+
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
+
       </Col>
     );
   }
