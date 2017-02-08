@@ -58,7 +58,7 @@ class UsageList extends Component {
     this.setState({ page }, this.fetchItems);
   }
 
-  onSort(newSort) {
+  onSort = (newSort) => {
     const sort = Immutable.Map(newSort);
     this.setState({ sort }, this.fetchItems);
   }
@@ -114,6 +114,7 @@ class UsageList extends Component {
     );
   }
 }
+
 
 const mapStateToProps = (state, props) => ({
   baseFilter: props.location.query.base ? JSON.parse(props.location.query.base) : {},
