@@ -120,8 +120,8 @@ export default class User extends Component {
         <FormGroup validationState={hasError ? 'error' : null} >
           <Col componentClass={ControlLabel} sm={3} lg={2}>&nbsp;</Col>
           <Col sm={8} lg={9}>
-            <label>
-              <input type="checkbox" checked={enableChangePassword} onChange={this.onEnableChangePassword} style={{ verticalAlign: 'text-bottom' }} />
+            <label htmlFor="enable-change-password">
+              <input id="enable-change-password" type="checkbox" checked={enableChangePassword} onChange={this.onEnableChangePassword} style={{ verticalAlign: 'text-bottom' }} />
               &nbsp;Enable Password Change
             </label>
           </Col>
