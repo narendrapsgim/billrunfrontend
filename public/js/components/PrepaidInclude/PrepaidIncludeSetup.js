@@ -4,14 +4,13 @@ import { withRouter } from 'react-router';
 import { Map, List } from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import ActionButtons from '../Elements/ActionButtons';
-import { fetchPrepaidIncludeByIdQuery, getProductsKeysQuery } from '../../common/ApiQueries';
+import { getProductsKeysQuery } from '../../common/ApiQueries';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
-import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
 import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { savePrepaidInclude } from '../../actions/prepaidIncludeActions';
+import { savePrepaidInclude, getPrepaidInclude, clearPrepaidInclude, updatePrepaidInclude } from '../../actions/prepaidIncludeActions';
 import { getSettings } from '../../actions/settingsActions';
 import { clearItems } from '../../actions/entityListActions';
 
@@ -52,8 +51,7 @@ class PrepaidIncludeSetup extends Component {
       this.setDefaultValues();
     }
     if (itemId) {
-      const query = fetchPrepaidIncludeByIdQuery(itemId);
-      this.props.dispatch(getEntity('prepaid_include', query));
+      this.props.dispatch(getPrepaidInclude(itemId));
     }
     this.props.dispatch(getList('all_rates', getProductsKeysQuery()));
     this.props.dispatch(getSettings('usage_types'));
@@ -68,21 +66,21 @@ class PrepaidIncludeSetup extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearEntity('prepaid_include'));
+    this.props.dispatch(clearPrepaidInclude());
   }
 
   setDefaultValues = () => {
-    this.props.dispatch(updateEntityField('prepaid_include', 'shared', false));
-    this.props.dispatch(updateEntityField('prepaid_include', 'unlimited', false));
+    this.props.dispatch(updatePrepaidInclude('shared', false));
+    this.props.dispatch(updatePrepaidInclude('unlimited', false));
   }
 
   onChangeField = (e) => {
     const { id, value } = e.target;
-    this.props.dispatch(updateEntityField('prepaid_include', id, value));
+    this.props.dispatch(updatePrepaidInclude(id, value));
   };
 
   onChangeLimitedDestinations = (name, value) => {
-    this.props.dispatch(updateEntityField('prepaid_include', ['allowed_in', name], value));
+    this.props.dispatch(updatePrepaidInclude(['allowed_in', name], value));
   };
 
   onSelectPlan = (name) => {
@@ -91,7 +89,7 @@ class PrepaidIncludeSetup extends Component {
       dispatch(showDanger('Plan already exists'));
       return;
     }
-    this.props.dispatch(updateEntityField('prepaid_include', ['allowed_in', name], Map()));
+    this.props.dispatch(updatePrepaidInclude(['allowed_in', name], Map()));
   };
 
   afterSave = (response) => {
