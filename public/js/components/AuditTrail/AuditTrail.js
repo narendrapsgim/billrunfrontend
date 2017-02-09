@@ -29,24 +29,14 @@ class AuditTrail extends Component {
     collection: 'log',
   }
 
-  constructor(props) {
-    super(props);
-    const tableFields = [
-      { id: 'urt', title: 'Date', type: 'datetime', cssClass: 'long-date', sort: true },
-      { id: 'user.name', title: 'User', parser: this.userParser, sort: true },
-      { id: 'collection', title: 'Module Type', parser: this.collectionParser, sort: true },
-      { id: 'key', title: 'Module Key', sort: true },
-      { title: 'Details', parser: this.detailsParser },
-    ];
-    this.state = {
-      tableFields,
-      fields: {},
-      page: 0,
-      size: 10,
-      sort: Immutable.Map({ urt: -1 }),
-      filter: {},
-    };
-  }
+  state = {
+    fields: {},
+    page: 0,
+    size: 10,
+    sort: Immutable.Map({ urt: -1 }),
+    filter: {},
+  };
+
 
   componentDidMount() {
     this.fetchItems();
@@ -122,18 +112,31 @@ class AuditTrail extends Component {
     return ({ $gte: fromDate, $lt: toDate });
   };
 
-  render() {
-    const { items, userNames, auditTrailEntityTypes } = this.props;
-    const { tableFields, sort } = this.state;
-    const filterFields = [
-        { id: 'urt', title: 'Date', type: 'date' },
-        { id: 'user.name', title: 'User', type: 'select', options: userNames },
-        { id: 'collection', title: 'Entity Type', type: 'select', options: auditTrailEntityTypes },
-        { id: 'key', title: 'Entity Key' },
-    ];
+  getFilterFields = () => {
+    const { userNames, auditTrailEntityTypes } = this.props;
+    return ([
+      { id: 'urt', title: 'Date', type: 'date' },
+      { id: 'user.name', title: 'User', type: 'select', options: userNames },
+      { id: 'collection', title: 'Entity Type', type: 'select', options: auditTrailEntityTypes },
+      { id: 'key', title: 'Entity Key' },
+    ]);
+  }
 
+  getTableFields = () => ([
+    { id: 'urt', title: 'Date', type: 'datetime', cssClass: 'long-date', sort: true },
+    { id: 'user.name', title: 'User', parser: this.userParser, sort: true },
+    { id: 'collection', title: 'Module Type', parser: this.collectionParser, sort: true },
+    { id: 'key', title: 'Module Key', sort: true },
+    { title: 'Details', parser: this.detailsParser },
+  ]);
+
+  render() {
+    const { items } = this.props;
+    const { sort } = this.state;
+    const filterFields = this.getFilterFields();
+    const tableFields = this.getTableFields();
     return (
-      <div className="AuditTrail">
+      <div className="Audit-Trail">
         <Row>
           <Col lg={12}>
             <Panel header={<AdvancedFilter fields={filterFields} onFilter={this.onFilter} />}>

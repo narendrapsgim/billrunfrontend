@@ -70,7 +70,7 @@ class InvoicesList extends Component {
   }
 
   downloadURL = (aid, billrunKey, invoiceId) =>
-  `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`
+    `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`
 
   renderMainPanelTitle = () => (
     <div>
@@ -114,13 +114,18 @@ class InvoicesList extends Component {
     { title: 'Download', parser: this.parserDownload },
   ]);
 
-  getFilterFields = () => ([
-    { id: 'aid', placeholder: 'Customer ID', type: 'number' },
-  ])
+  getFilterFields = () => {
+    const { baseFilter } = this.props;
+    return ([
+      { id: 'aid', placeholder: 'Customer ID', type: 'number', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'aid') },
+      { id: 'payer_name', placeholder: 'Name', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'payer_name') },
+      { id: 'invoice_id', placeholder: 'Invoice Id', type: 'number', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'invoice_id') },
+    ]);
+  }
 
   render() {
-    const { sort } = this.state;
     const { items, baseFilter } = this.props;
+    const { sort } = this.state;
     const tableFieds = this.getTableFields();
     const filterFields = this.getFilterFields();
     return (

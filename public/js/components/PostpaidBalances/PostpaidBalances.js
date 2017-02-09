@@ -1,43 +1,44 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import moment from 'moment';
 import ChangeCase from 'change-case';
-
-import { getSettings } from '../../actions/settingsActions';
-import { getList } from '../../actions/listActions';
-
+import { Col, Row } from 'react-bootstrap';
+/* COMPONENTS */
 import Filter from '../Filter';
 import List from '../List';
 import Pager from '../Pager';
+/* ACTIONS */
+import { getSettings } from '../../actions/settingsActions';
+import { getList } from '../../actions/listActions';
+
 
 class PostpaidBalances extends Component {
+
   static propTypes = {
-    balances: React.PropTypes.instanceOf(Immutable.List).isRequired,
-    usage_types: React.PropTypes.instanceOf(Immutable.List).isRequired,
-    aid: React.PropTypes.number.isRequired
+    items: PropTypes.instanceOf(Immutable.List).isRequired,
+    usageTypes: PropTypes.instanceOf(Immutable.List).isRequired,
+    aid: PropTypes.number.isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    balances: Immutable.List(),
-    usage_types: Immutable.List(),
-    aid: null
+    items: Immutable.List(),
+    usageTypes: Immutable.List(),
   };
 
-  constructor(props) {
-    super(props);
+  state = {
+    page: 0,
+    size: 10,
+    sort: Immutable.Map({ sid: 1 }),
+    filter: {},
+  };
 
-    this.state = {
-      aid: props.aid,
-      size: 10,
-      page: 0,
-      sort: '',
-      filter: ''
-    };
-  }
 
   componentDidMount() {
-    this.props.dispatch(getSettings(["usage_types"]));
+    const { usageTypes } = this.props;
+    if (usageTypes.isEmpty()) {
+      this.props.dispatch(getSettings(['usage_types']));
+    }
   }
 
   buildQuery = () => {
@@ -49,74 +50,70 @@ class PostpaidBalances extends Component {
         { collection: 'balances' },
         { size },
         { page },
-        { sort },
-        { query: filter }
-      ]
+        { sort: JSON.stringify(sort) },
+        { query: JSON.stringify(filter) },
+      ],
     };
   }
 
-  getBalances = () => {
-    this.props.dispatch(getList('postpaidBalances', this.buildQuery()));
+  fetchItems = () => {
+    this.props.dispatch(getList('postpaid_balances', this.buildQuery()));
   }
 
   handlePageClick = (page) => {
-    this.setState({page}, this.getBalances);
+    this.setState({ page }, this.fetchItems);
   }
 
   onFilter = (filter) => {
-    this.setState({filter, page: 0}, this.getBalances);
+    this.setState({ filter, page: 0 }, this.fetchItems);
   }
 
-  onSort = (sort) => {
-    this.setState({sort}, this.getBalances);
+  onSort = (newSort) => {
+    const sort = Immutable.Map(newSort);
+    this.setState({ sort }, this.fetchItems);
   }
 
-  render() {
-    const { usage_types, balances } = this.props;
-    const { aid } = this.state;
+  getTableFields = () => {
+    const { usageTypes } = this.props;
+    const usageFields = usageTypes.map(usaget => ({
+      id: usaget,
+      placeholder: ChangeCase.titleCase(usaget),
+      showFilter: false,
+      parser: ent => ent.getIn(['balance', 'totals', usaget, 'usagev'], ''),
+    })).toJS();
 
-    const usage_fields = usage_types.map((usaget, key) => {
-      return {
-        id: usaget,
-        placeholder: ChangeCase.titleCase(usaget),
-        showFilter: false,
-        parser: (ent) => ent.getIn(['balance', 'totals', usaget, 'usagev'], '')
-      };
-    }).toJS();
-    const fields = [
+    return ([
       { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
       { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
       { id: 'plan_description', placeholder: 'Plan' },
-      ...usage_fields,
-      { id: "from", placeholder: "From", showFilter: false, type: "datetime" },
-      { id: "to", placeholder: "To", showFilter: false, type: "datetime" },
-    ];
+      ...usageFields,
+      { id: 'from', placeholder: 'From', showFilter: false, type: 'datetime' },
+      { id: 'to', placeholder: 'To', showFilter: false, type: 'datetime' },
+    ]);
+  }
 
-    const baseFilter = { to: { $gt: moment().toISOString() }, aid, connection_type: 'postpaid' };
-
+  render() {
+    const { items, aid } = this.props;
+    const { sort } = this.state;
+    const fields = this.getTableFields();
+    const baseFilter = { aid, connection_type: 'postpaid' };
     return (
-      <div className="PostpaidBalances">
-
-        <div className="row">
-          <div className="col-lg-12">
+      <div className="Postpaid-Balances">
+        <Row>
+          <Col lg={12}>
             <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
-            <List items={balances} fields={fields} onSort={this.onSort} />
-          </div>
-        </div>
-
-        <Pager onClick={this.handlePageClick}
-               size={this.state.size}
-               count={balances.size || 0} />
+            <List items={items} fields={fields} onSort={this.onSort} sort={sort} />
+          </Col>
+        </Row>
+        <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
       </div>
     );
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    balances: state.list.get('postpaidBalances'),
-    usage_types: state.settings.get('usage_types')
-  };
-}
+const mapStateToProps = state => ({
+  items: state.list.get('postpaid_balances'),
+  usageTypes: state.settings.get('usage_types'),
+});
 
 export default connect(mapStateToProps)(PostpaidBalances);

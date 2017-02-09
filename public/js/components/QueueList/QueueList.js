@@ -1,43 +1,38 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Link } from 'react-router';
-import { Panel } from 'react-bootstrap';
 import moment from 'moment';
-
+import { Col, Row, Panel } from 'react-bootstrap';
 import Pager from '../Pager';
 import { AdvancedFilter } from '../Filter';
 import List from '../List';
 import Queue from './Queue';
-
+/* ACTIONS */
 import { getList } from '../../actions/listActions';
+
 
 class QueueList extends Component {
 
   static propTypes = {
-    queueLines: React.PropTypes.instanceOf(Immutable.List).isRequired,
-    getList: React.PropTypes.func.isRequired,
-    calculators: React.PropTypes.instanceOf(Immutable.List),
+    items: PropTypes.instanceOf(Immutable.List).isRequired,
+    calculators: PropTypes.instanceOf(Immutable.List),
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    queueLines: Immutable.List(),
+    items: Immutable.List(),
     calculators: Immutable.List([false, ...globalSetting.queue_calculators, '-']),
-    dispatch: () => {},
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      line: null,
-      viewing: false,
-      page: 0,
-      size: 10,
-      sort: '',
-      filter: '',
-    };
-  }
+  state = {
+    line: null,
+    viewing: false,
+    page: 0,
+    size: 10,
+    sort: Immutable.Map({ calc_time: -1 }),
+    filter: {},
+  };
 
   componentDidMount() {
     this.fetchItems();
@@ -47,7 +42,8 @@ class QueueList extends Component {
     this.setState({ filter, page: 0 }, this.fetchItems);
   }
 
-  onSort = (sort) => {
+  onSort = (newSort) => {
+    const sort = Immutable.Map(newSort);
     this.setState({ sort }, this.fetchItems);
   }
 
@@ -69,22 +65,21 @@ class QueueList extends Component {
     return calculators.get(calculators.indexOf(calcName) - 1);
   }
 
-  getCalculatorStage = (ent) => {
+  parseCalcName = (ent) => {
     const calcName = ent.get('calc_name');
     return this.getNextCalculator(calcName);
   }
 
-  getLastCalcTime = (ent) => {
+  parseCalcTime = (ent) => {
     const calcTime = ent.get('calc_time');
     if (calcTime === false) {
       return 'Never';
     }
-    return moment(calcTime)
-      .format(globalSetting.datetimeFormat);
+    return moment(calcTime).format(globalSetting.datetimeFormat);
   }
 
   fetchItems = () => {
-    this.props.getList('queueLines', this.buildQuery());
+    this.props.dispatch(getList('queue_lines', this.buildQuery()));
   }
 
   handlePageClick = (page) => {
@@ -130,75 +125,79 @@ class QueueList extends Component {
   buildQuery = () => {
     const { page, size, sort } = this.state;
     const query = this.handleQuerySpecialValues();
-
     return {
       api: 'find',
       params: [
         { collection: 'queue' },
         { size },
         { page },
-        { sort },
+        { sort: JSON.stringify(sort) },
         { query: JSON.stringify(query) },
       ],
     };
   }
 
+  getFilterFields = () => ([
+    { id: 'type', title: 'Type', type: 'text' },
+    { id: 'calc_name', title: 'Calculator Stage', type: 'text' },
+    { id: 'urt', title: 'Date', type: 'date-range' },
+  ]);
+
+  getTableFields = () => ([
+    { id: 'type', placeholder: 'Type' },
+    { id: 'calc_time', placeholder: 'Last Calculation Time', type: 'timestamp', sort: true, parser: this.parseCalcTime },
+    { id: 'calc_name', placeholder: 'Calculator Stage', type: 'text', sort: true, parser: this.parseCalcName },
+    { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false },
+  ]);
+
+  renderPanelTitle = () => (
+    <div>
+      <span>
+        List of queue data
+      </span>
+      <div className="pull-right">
+        <Link to={'/usage'} className="btn btn-default btn-xs">Back to Usage</Link>
+      </div>
+    </div>
+  );
+
+  renderQueueList = () => {
+    const { items } = this.props;
+    const { sort } = this.state;
+    const tableFields = this.getTableFields();
+    const filterFields = this.getFilterFields();
+    return (
+      <div>
+        <Row>
+          <Col lg={12}>
+            <Panel header={this.renderPanelTitle()}>
+              <AdvancedFilter fields={filterFields} onFilter={this.onFilter} />
+              <List
+                items={items}
+                fields={tableFields}
+                edit={true}
+                onClickEdit={this.onClickLine}
+                editText="view"
+                onSort={this.onSort}
+                sort={sort}
+              />
+            </Panel>
+          </Col>
+        </Row>
+        <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
+      </div>
+    );
+  }
+
   renderQueueItem = () => {
     const { line } = this.state;
-
     return (
       <Queue line={line} onClickCancel={this.onCancelView} />
     );
   }
 
-  renderQueueList = () => {
-    const { queueLines } = this.props;
-    const fields = [
-      { id: 'type', placeholder: 'Type' },
-      { id: 'calc_time', placeholder: 'Last Calculation Time', type: 'timestamp', sort: true, parser: this.getLastCalcTime },
-      { id: 'calc_name', placeholder: 'Calculator Stage', type: 'text', sort: true, parser: this.getCalculatorStage },
-      { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false },
-    ];
-    const filterFields = [
-      { id: 'type', title: 'Type', type: 'text' },
-      { id: 'calc_name', title: 'Calculator Stage', type: 'text' },
-      { id: 'urt', title: 'Date', type: 'date-range' },
-    ];
-
-    return (
-      <div>
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="panel panel-default">
-              <div className="panel-heading">
-                <span>
-                  List of queue data
-                </span>
-                <div className="pull-right">
-                  <Link to={'/usage'} className="btn btn-default btn-xs">Back to Usage</Link>
-                </div>
-              </div>
-              <div className="panel-body">
-                <Panel header={<AdvancedFilter fields={filterFields} onFilter={this.onFilter} />}>
-                  <List items={queueLines} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} />
-                </Panel>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Pager
-          onClick={this.handlePageClick}
-          size={this.state.size}
-          count={queueLines.size || 0}
-        />
-      </div>
-    );
-  }
-
   render() {
     const { viewing } = this.state;
-
     return (
       <div className="QueueList">
         { viewing ? this.renderQueueItem() : this.renderQueueList() }
@@ -207,12 +206,9 @@ class QueueList extends Component {
   }
 }
 
-const mapDispatchToProps = {
-  getList,
-};
 
 const mapStateToProps = state => ({
-  queueLines: state.list.get('queueLines'),
+  items: state.list.get('queue_lines'),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(QueueList);
+export default connect(mapStateToProps)(QueueList);

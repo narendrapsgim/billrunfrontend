@@ -15,7 +15,6 @@ class UsageList extends Component {
 
   static propTypes = {
     items: PropTypes.instanceOf(Immutable.List),
-    collection: PropTypes.string,
     baseFilter: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
   }
@@ -23,7 +22,6 @@ class UsageList extends Component {
   static defaultProps = {
     items: Immutable.List(),
     baseFilter: {},
-    collection: 'lines',
   }
 
   state = {
@@ -36,12 +34,12 @@ class UsageList extends Component {
   };
 
   buildQuery = () => {
-    const { collection } = this.props;
     const { page, size, sort, filter } = this.state;
+    /** TODO: Will probably change **/
     return {
       api: 'find',
       params: [
-        { collection },
+        { collection: 'lines' },
         { size },
         { page },
         { sort: JSON.stringify(sort) },
@@ -75,13 +73,17 @@ class UsageList extends Component {
     this.props.dispatch(getList('usages', this.buildQuery()));
   }
 
-  getTableFields = () => ([
-    { id: 'type', placeholder: 'Type' },
-    { id: 'aid', placeholder: 'Customer ID', type: 'number', sort: true },
-    { id: 'sid', placeholder: 'Subscription ID', type: 'number', sort: true },
-    { id: 'plan', placeholder: 'Plan' },
-    { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false, sort: true },
-  ]);
+  getTableFields = () => {
+    const { baseFilter } = this.props;
+
+    return ([
+      { id: 'type', placeholder: 'Type', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'type') },
+      { id: 'aid', placeholder: 'Customer ID', type: 'number', sort: true, showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'aid') },
+      { id: 'sid', placeholder: 'Subscription ID', type: 'number', sort: true, showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'sid') },
+      { id: 'plan', placeholder: 'Plan', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'plan') },
+      { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false, sort: true },
+    ]);
+  }
 
   renderMainPanelTitle = () => (
     <div>
@@ -104,7 +106,15 @@ class UsageList extends Component {
             <Col lg={12}>
               <Panel header={this.renderMainPanelTitle()}>
                 <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
-                <List items={items} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} sort={sort} />
+                <List
+                  items={items}
+                  fields={fields}
+                  edit={true}
+                  onClickEdit={this.onClickLine}
+                  editText="view"
+                  onSort={this.onSort}
+                  sort={sort}
+                />
               </Panel>
             </Col>
           </Row>
@@ -117,8 +127,8 @@ class UsageList extends Component {
 
 
 const mapStateToProps = (state, props) => ({
-  baseFilter: props.location.query.base ? JSON.parse(props.location.query.base) : {},
   items: state.list.get('usages'),
+  baseFilter: props.location.query.base ? JSON.parse(props.location.query.base) : {},
 });
 
 export default connect(mapStateToProps)(UsageList);
