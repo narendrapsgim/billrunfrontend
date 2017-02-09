@@ -21,6 +21,8 @@ import {
 } from '../../actions/planActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
+import { clearItems } from '../../actions/entityListActions';
+import { showSuccess } from '../../actions/alertsActions';
 
 
 class PlanSetup extends Component {
@@ -44,7 +46,6 @@ class PlanSetup extends Component {
     activeTab: 1,
   };
 
-
   state = {
     activeTab: parseInt(this.props.activeTab),
   }
@@ -58,7 +59,7 @@ class PlanSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'new') {
+    if (mode === 'create') {
       this.props.dispatch(setPageTitle('Create New Plan'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'postpaid'));
     }
@@ -118,9 +119,10 @@ class PlanSetup extends Component {
 
   afterSave = (response) => {
     const { mode } = this.props;
-    if (response.status && mode === 'new') { // on success save new item
-      this.handleBack();
-    } else if (response.status && mode !== 'new') { // on success update item
+    if (response.status) {
+      this.props.dispatch(clearItems('plans')); // refetch items list because item was (changed in / added to) list
+      const action = (mode === 'create') ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The plan was ${action}`));
       this.handleBack();
     }
   }
@@ -143,7 +145,6 @@ class PlanSetup extends Component {
 
     const planRates = item.get('rates', Immutable.Map());
     const planIncludes = item.getIn(['include', 'groups'], Immutable.Map());
-
     return (
       <Col lg={12}>
         <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
@@ -181,9 +182,7 @@ class PlanSetup extends Component {
           </Tab>
 
         </Tabs>
-
         <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
-
       </Col>
     );
   }
@@ -193,9 +192,8 @@ class PlanSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'new');
+  const mode = action || ((itemId) ? 'update' : 'create');
   const { plan: item } = state;
   return { itemId, item, mode, activeTab };
 };
-
 export default withRouter(connect(mapStateToProps)(PlanSetup));

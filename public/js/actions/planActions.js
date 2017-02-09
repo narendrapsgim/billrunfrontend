@@ -1,7 +1,7 @@
-import moment from 'moment';
-import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
-import { fetchPlanByIdQuery, saveQuery, getAllGroupsQuery } from '../common/ApiQueries';
+import { fetchPlanByIdQuery, getAllGroupsQuery } from '../common/ApiQueries';
+import { saveEntity } from '../actions/entityActions';
 
 export const PLAN_GOT = 'PLAN_GOT';
 export const PLAN_CLEAR = 'PLAN_CLEAR';
@@ -23,56 +23,14 @@ export const PLAN_PRODUCTS_RATE_UPDATE_TO = 'PLAN_PRODUCTS_RATE_UPDATE_TO';
 export const PLAN_PRODUCTS_REMOVE = 'PLAN_PRODUCTS_REMOVE';
 
 
-const gotPlan = plan => ({
+const gotItem = plan => ({
   type: PLAN_GOT,
   plan,
 });
 
-const fetchPlan = id => (dispatch) => {
-  const query = fetchPlanByIdQuery(id);
-  dispatch(startProgressIndicator());
-  return apiBillRun(query).then(
-    (response) => {
-      try {
-        dispatch(finishProgressIndicator());
-        const plan = response.data[0].data.details[0];
-        dispatch(gotPlan(plan));
-        return dispatch(apiBillRunSuccessHandler(response));
-      } catch (e) {
-        console.log('fetchPlan error: ', e);
-        throw new Error(`Error retreiving plan ${id}`);
-      }
-    }
-  ).catch((error) => {
-    dispatch(apiBillRunErrorHandler(error));
-    return false;
-  });
-};
-
-function savePlanToDB(plan, action) {
-  const type = action !== 'new' ? 'close_and_new' : action;
-  const formData = new FormData();
-  const from = moment();
-  const to = moment().add(100, 'years');
-  const planData = plan
-    .setIn(['recurrence', 'unit'], 1)/* HARD CODED */
-    .set('from', from)
-    .set('to', to);
-  formData.append('data', JSON.stringify(planData));
-  formData.append('type', type);
-  formData.append('coll', 'plans');
-  if (action !== 'new') {
-    formData.append('id', plan.getIn(['_id', '$id']));
-  }
-  const query = saveQuery(formData);
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    return apiBillRun(query)
-      .then(success => dispatch(apiBillRunSuccessHandler(success, 'Plan saved successfully')))
-      .catch(error => dispatch(apiBillRunErrorHandler(error)));
-  };
-}
-
+export const clearPlan = () => ({
+  type: PLAN_CLEAR,
+});
 
 export const onGroupRemove = groupName => ({
   type: REMOVE_GROUP_PLAN,
@@ -124,10 +82,6 @@ export const planProductsRateRemove = (path, index) => ({
   index,
 });
 
-export const clearPlan = () => ({
-  type: PLAN_CLEAR,
-});
-
 export const onPlanFieldUpdate = (path, value) => ({
   type: PLAN_UPDATE_FIELD_VALUE,
   path,
@@ -162,9 +116,18 @@ export const addUsagetInclude = (usaget, ppIncludesName, ppIncludesExternalId) =
   ppIncludesExternalId,
 });
 
-export const getPlan = planId => dispatch => dispatch(fetchPlan(planId));
+export const savePlan = (plan, action) => saveEntity('plans', plan, action);
 
-export const savePlan = (plan, action, callback = () => {}) => dispatch =>
-    dispatch(savePlanToDB(plan, action, callback));
+export const getPlan = id => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = fetchPlanByIdQuery(id);
+  return apiBillRun(query)
+    .then((response) => {
+      const item = response.data[0].data.details[0];
+      dispatch(gotItem(item));
+      return dispatch(apiBillRunSuccessHandler(response));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving plan')));
+};
 
 export const getAllGroup = () => apiBillRun(getAllGroupsQuery());
