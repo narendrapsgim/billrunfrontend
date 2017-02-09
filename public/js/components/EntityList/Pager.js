@@ -29,33 +29,31 @@ const Pager = (props) => {
   };
 
   return (
-    <div className="row">
-      <div className="col-lg-12">
-        <div className="col-lg-6 pull-left" style={{ paddingLeft: 0 }}>
-          <ul className="pagination">
-            <li className={prevClass}>
-              <a onClick={handlePrevPage}>
-                <i className="fa fa-chevron-left" />
-              </a>
-            </li>
-            <span className="detalis" style={{ padding: '0 10px' }}>{pageLabel}{showing !== 0 && ` | ${showing}`}</span>
-            <li className={nextClass}>
-              <a onClick={handleNextPageClick}>
-                <i className="fa fa-chevron-right" />
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div className="col-lg-6 pull-right" style={{ paddingRight: 0 }}>
-          { props.onChangeSize &&
-            <select value={size} className="form-control" onChange={onChangeSize} style={sizeStyle}>
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-              <option value={20}>20</option>
-            </select>
-          }
-        </div>
+    <div className="col-12">
+      <div className="col-6 pull-left">
+        <ul className="pagination">
+          <li className={prevClass}>
+            <a onClick={handlePrevPage}>
+              <i className="fa fa-chevron-left" />
+            </a>
+          </li>
+          <span className="detalis" style={{ padding: '0 10px' }}>{pageLabel}{showing !== 0 && ` | ${showing}`}</span>
+          <li className={nextClass}>
+            <a onClick={handleNextPageClick}>
+              <i className="fa fa-chevron-right" />
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div className="col-6 pull-right">
+        { props.onChangeSize &&
+          <select value={size} className="form-control" onChange={onChangeSize} style={sizeStyle}>
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20}>20</option>
+          </select>
+        }
       </div>
     </div>
   );
