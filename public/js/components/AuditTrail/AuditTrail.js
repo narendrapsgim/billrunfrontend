@@ -8,7 +8,7 @@ import List from '../List';
 import Pager from '../Pager';
 import { AdvancedFilter } from '../Filter';
 import DetailsParser from './DetailsParser';
-import { userNamesQuery, auditTrailEntityTypesQuery } from '../../common/ApiQueries';
+import { getUserKeysQuery, auditTrailEntityTypesQuery } from '../../common/ApiQueries';
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
 
@@ -66,7 +66,7 @@ class AuditTrail extends Component {
   }
 
   fetchUser = () => {
-    const query = userNamesQuery();
+    const query = getUserKeysQuery();
     this.props.dispatch(getList('autocompleteUser', query));
   }
 
