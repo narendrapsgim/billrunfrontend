@@ -160,6 +160,7 @@ export const getAllGroupsQuery = () => ([
   getGroupsQuery('services'),
 ]);
 // By ID
+export const fetchServiceByIdQuery = id => getEntityByIdQuery('services', id);
 export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
 export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);

@@ -1,7 +1,7 @@
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
 import { saveEntity } from './entityActions';
-import { getEntityByIdQuery } from '../common/ApiQueries';
+import { fetchServiceByIdQuery } from '../common/ApiQueries';
 
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
@@ -44,7 +44,7 @@ export const saveService = (item, action) => saveEntity('services', item, action
 
 export const getService = id => (dispatch) => {
   dispatch(startProgressIndicator());
-  const query = getEntityByIdQuery('services', id);
+  const query = fetchServiceByIdQuery(id);
   return apiBillRun(query).then(
     (response) => {
       const item = response.data[0].data.details[0];

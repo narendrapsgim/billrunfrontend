@@ -137,9 +137,10 @@ class ServiceSetup extends Component {
 
 
 const mapStateToProps = (state, props) => {
-  const { service: item, action } = state;
+  const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
   const mode = action || ((itemId) ? 'update' : 'create');
-  return { itemId, mode, item };
+  const { service: item } = state;
+  return { itemId, item, mode, activeTab };
 };
 export default withRouter(connect(mapStateToProps)(ServiceSetup));
