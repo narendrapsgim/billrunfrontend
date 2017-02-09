@@ -24,22 +24,6 @@ const setNextPage = (collection, nextPage) => ({
   nextPage,
 });
 
-const fetchList = (collection, params) => (dispatch) => {
-  dispatch(startProgressIndicator());
-  return apiBillRun(params)
-    .then((success) => {
-      try {
-        dispatch(gotList(collection, success.data[0].data.details));
-        dispatch(setNextPage(collection, success.data[0].data.next_page));
-        return dispatch(apiBillRunSuccessHandler(success));
-      } catch (e) {
-        console.log('fetchList error: ', e);
-        throw new Error('Error retreiving list');
-      }
-    })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
-};
-
 export const setListSort = (collection, sort) => ({
   type: actions.SET_SORT,
   collection,
@@ -74,5 +58,18 @@ export const clearItems = collection => ({
   collection,
 });
 
-export const getList = (collection, params, reset) => dispatch =>
-  dispatch(fetchList(collection, params, reset));
+export const getList = (collection, params) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  return apiBillRun(params)
+    .then((success) => {
+      try {
+        dispatch(gotList(collection, success.data[0].data.details));
+        dispatch(setNextPage(collection, success.data[0].data.next_page));
+        return dispatch(apiBillRunSuccessHandler(success));
+      } catch (e) {
+        console.log('fetchList error: ', e);
+        throw new Error('Error retreiving list');
+      }
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
+};
