@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { Map, List } from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
-import ActionButtons from '../Elements/ActionButtons';
+import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { getProductsKeysQuery } from '../../common/ApiQueries';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
@@ -116,7 +116,11 @@ class PrepaidIncludeSetup extends Component {
   }
 
   render() {
-    const { item, allRates, usageTypes } = this.props;
+    const { item, mode, allRates, usageTypes } = this.props;
+    // in update mode wait for item before render edit screen
+    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+      return (<LoadingItemPlaceholder onClick={this.handleBack} />);
+    }
 
     const chargingByOptions = [
       { value: 'usagev', label: 'Usage volume' },
@@ -125,7 +129,6 @@ class PrepaidIncludeSetup extends Component {
     ];
 
     const allRatesOptions = allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
-
     return (
       <div className="PrepaidIncludeSetup">
         <Tabs defaultActiveKey={this.state.activeTab} id="PrepaidInclude" animation={false} onSelect={this.handleSelectTab}>
@@ -153,13 +156,12 @@ class PrepaidIncludeSetup extends Component {
             </Panel>
           </Tab>
         </Tabs>
-
         <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
-
       </div>
     );
   }
 }
+
 
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
@@ -170,5 +172,4 @@ const mapStateToProps = (state, props) => {
   const allRates = state.list.get('all_rates');
   return { itemId, item, mode, usageTypes, allRates, activeTab };
 };
-
 export default withRouter(connect(mapStateToProps)(PrepaidIncludeSetup));
