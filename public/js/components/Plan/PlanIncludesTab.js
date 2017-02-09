@@ -42,7 +42,10 @@ class PlanIncludesTab extends Component {
 
 
   componentDidMount() {
-    this.props.dispatch(getSettings('usage_types'));
+    const { usageTypes } = this.props;
+    if (usageTypes.isEmpty()) {
+      this.props.dispatch(getSettings('usage_types'));
+    }
     getAllGroup().then((responses) => {
       const existingGroups = Immutable.Set().withMutations((groupsWithMutations) => {
         responses.data.forEach((response) => {
@@ -167,8 +170,7 @@ class PlanIncludesTab extends Component {
   }
 
 }
-const mapStateToProps = (state) => {
-  const usageTypes = state.settings.get('usage_types', Immutable.List());
-  return { usageTypes };
-};
+const mapStateToProps = state => ({
+  usageTypes: state.settings.get('usage_types', Immutable.List()),
+});
 export default connect(mapStateToProps)(PlanIncludesTab);
