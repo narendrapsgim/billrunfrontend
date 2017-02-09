@@ -81,10 +81,9 @@ class EntityList extends Component {
   componentWillUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     const pageChanged = this.props.page !== nextProps.page;
     const sizeChanged = this.props.size !== nextProps.size;
-    const filterChanged = !Immutable.is(this.props.filter, nextProps.filter)
-    const sortChanged = !Immutable.is(this.props.sort, nextProps.sort)
+    const filterChanged = !Immutable.is(this.props.filter, nextProps.filter);
+    const sortChanged = !Immutable.is(this.props.sort, nextProps.sort);
     if (pageChanged || sizeChanged || filterChanged || sortChanged) {
-      console.log('Refatch items');
       this.fetchItems(nextProps);
     }
   }

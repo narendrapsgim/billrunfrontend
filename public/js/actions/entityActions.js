@@ -54,7 +54,8 @@ const buildRequestData = (item, action) => {
 
 const requestDataBuilder = (collection, item, action) => {
   switch (collection) {
-    default: return buildRequestData(item, action);
+    default:
+      return buildRequestData(item, action);
   }
 };
 
