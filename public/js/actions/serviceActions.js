@@ -3,6 +3,7 @@ import { startProgressIndicator } from './progressIndicatorActions';
 import { saveEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
 
+
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
 export const SAVE_SERVICE = 'SAVE_SERVICE';
@@ -40,13 +41,13 @@ export const removeGroup = groupName => ({
   groupName,
 });
 
-export const saveService = (item, action) => saveEntity('services', item, action);
+export const saveService = (service, action) => saveEntity('services', service, action);
 
 export const getService = id => (dispatch) => {
   dispatch(startProgressIndicator());
   const query = fetchServiceByIdQuery(id);
-  return apiBillRun(query).then(
-    (response) => {
+  return apiBillRun(query)
+    .then((response) => {
       const item = response.data[0].data.details[0];
       // for back capability
       if (typeof item.price === 'undefined' || !Array.isArray(item.price)) {

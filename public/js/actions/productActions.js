@@ -56,12 +56,11 @@ export const onRateRemove = (path, index) => ({
 
 export const saveProduct = (product, action) => saveEntity('rates', product, action);
 
-
 export const getProduct = id => (dispatch) => {
   dispatch(startProgressIndicator());
   const query = fetchProductByIdQuery(id);
-  return apiBillRun(query).then(
-    (response) => {
+  return apiBillRun(query)
+    .then((response) => {
       const item = response.data[0].data.details[0];
       dispatch(gotItem(item));
       return dispatch(apiBillRunSuccessHandler(response));
