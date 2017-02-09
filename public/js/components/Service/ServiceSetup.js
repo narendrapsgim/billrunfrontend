@@ -5,9 +5,8 @@ import Immutable from 'immutable';
 import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
-import ActionButtons from '../Elements/ActionButtons';
-import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-import { onGroupAdd, onGroupRemove, getItem, clearItem, updateItem, saveItem } from '../../actions/serviceActions';
+import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
+import { addGroup, removeGroup, getService, clearService, updateService, saveService } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems } from '../../actions/entityListActions';
@@ -41,9 +40,9 @@ class ServiceSetup extends Component {
   componentDidMount() {
     const { itemId, mode } = this.props;
     if (itemId) {
-      this.props.dispatch(getItem(itemId));
+      this.props.dispatch(getService(itemId));
     }
-    if (mode === 'new') {
+    if (mode === 'create') {
       this.props.dispatch(setPageTitle('Create New Service'));
     }
   }
@@ -61,28 +60,25 @@ class ServiceSetup extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearItem());
+    this.props.dispatch(clearService());
   }
-
-
   onGroupAdd = (groupName, usage, value, shared, products) => {
-    this.props.dispatch(onGroupAdd(groupName, usage, value, shared, products));
+    this.props.dispatch(addGroup(groupName, usage, value, shared, products));
   }
 
   onGroupRemove = (groupName) => {
-    this.props.dispatch(onGroupRemove(groupName));
+    this.props.dispatch(removeGroup(groupName));
   }
 
-
   onUpdateItem = (path, value) => {
-    this.props.dispatch(updateItem(path, value));
+    this.props.dispatch(updateService(path, value));
   }
 
   afterSave = (response) => {
     const { mode } = this.props;
-    if (response === true) {
+    if (response.status) {
       this.props.dispatch(clearItems('services')); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'new') ? 'created' : 'updated';
+      const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The service was ${action}`));
       this.handleBack();
     }
@@ -97,8 +93,8 @@ class ServiceSetup extends Component {
   }
 
   handleSave = () => {
-    const { item } = this.props;
-    this.props.dispatch(saveItem(item)).then(this.afterSave);
+    const { item, mode } = this.props;
+    this.props.dispatch(saveService(item, mode)).then(this.afterSave);
   }
 
   render() {
@@ -109,7 +105,6 @@ class ServiceSetup extends Component {
     }
 
     const planIncludes = item.getIn(['include', 'groups'], Immutable.Map());
-
     return (
       <Col lg={12}>
 
@@ -131,20 +126,20 @@ class ServiceSetup extends Component {
               />
             </Panel>
           </Tab>
+
         </Tabs>
-
         <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
-
       </Col>
     );
   }
 
 }
 
+
 const mapStateToProps = (state, props) => {
   const { service: item, action } = state;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'new');
+  const mode = action || ((itemId) ? 'update' : 'create');
   return { itemId, mode, item };
 };
 export default withRouter(connect(mapStateToProps)(ServiceSetup));
