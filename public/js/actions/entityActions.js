@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery } from '../common/ApiQueries';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
@@ -36,7 +37,12 @@ export const clearEntity = collection => ({
 const buildRequestData = (item, action) => {
   const formData = new FormData();
   if (action === 'create') {
-    formData.append('update', JSON.stringify(item));
+    const dafaultFrom = moment().toISOString();
+    const dafaultTo = moment().add(100, 'years').toISOString();
+    const update = item
+      .set('from', item.get('from', dafaultFrom))
+      .set('to', item.get('to', dafaultTo));
+    formData.append('update', JSON.stringify(update));
   } else if (action === 'update') {
     const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
     const update = item.delete('_id');
@@ -82,18 +88,10 @@ const fetchEntity = (collection, query) => (dispatch) => {
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));
 };
 
-const fetchEntityById = (name, collection, id) => (dispatch) => {
-  dispatch(startProgressIndicator());
-  return apiBillRun(getEntityByIdQuery(collection, id))
-    .then((success) => {
-      dispatch(gotEntity(name, success.data[0].data.details[0]));
-      return dispatch(apiBillRunSuccessHandler(success));
-    })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));
-};
-
 export const getEntity = (collection, query) => dispatch =>
   dispatch(fetchEntity(collection, query));
 
-export const getEntityById = (name, collection, id) => dispatch =>
-  dispatch(fetchEntityById(name, collection, id));
+export const getEntityById = (name, collection, id) => (dispatch) => {
+  const query = getEntityByIdQuery(collection, id);
+  return dispatch(fetchEntity(name, query));
+};
