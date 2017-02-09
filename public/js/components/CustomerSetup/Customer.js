@@ -1,12 +1,11 @@
 import React, { Component, PropTypes } from 'react';
-import {Link} from 'react-router';
+import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { Form, FormGroup, Col, Button, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
-import countries from './countries.data.json';
 
 class Customer extends Component {
 
@@ -14,21 +13,40 @@ class Customer extends Component {
     customer: PropTypes.instanceOf(Immutable.Map),
     supportedGateways: PropTypes.instanceOf(Immutable.List),
     onChangePaymentGateway: PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
+    action: PropTypes.string,
+    fields: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
+    action: 'create',
     customer: Immutable.Map(),
+    fields: Immutable.List(),
     supportedGateways: Immutable.List(),
   };
 
-  onCountryChange = (val) => {
-    var pseudoE = {};
-    pseudoE.target = {id: 'country', value: val};
-    this.props.onChange(pseudoE);
+  componentDidMount() {
+    const { action } = this.props;
+    if (action === 'create') {
+      this.initDefaultValues()
+    }
+  }
+
+  initDefaultValues = () => {
+    const { fields } = this.props;
+    fields.forEach((field) => {
+      if (field.has('default_value')) {
+        const e = { target: {
+          id: field.get('field_name', ''),
+          value: field.get('default_value', ''),
+        } };
+        this.props.onChange(e);
+      }
+    });
   }
 
   onSelect = (value, field) => {
-    const e = {target: {id: field[0].field, value}};
+    const e = { target: { id: field[0].field, value } };
     this.props.onChange(e);
   };
 
@@ -38,14 +56,21 @@ class Customer extends Component {
     this.props.onChangePaymentGateway(aid);
   }
 
-  renderChangePaymentGateway = () => {
+  filterPrinableFields = field => (field.get('display') !== false && field.get('editable') !== false);
+
+  renderPaymentGatewayLabel = () => {
     const { customer, supportedGateways } = this.props;
-    const hasPaymentGateway = !(customer.get('payment_gateway', Immutable.Map()).isEmpty());
     const customerPgName = customer.getIn(['payment_gateway', 'name'], '');
     const pg = supportedGateways.filter(item => customerPgName === item.get('name'));
-    const label = hasPaymentGateway ? ((!pg.isEmpty() && pg.get(0).get('image_url', '').length > 0)
+    return (!pg.isEmpty() && pg.get(0).get('image_url', '').length > 0)
       ? <img src={`${globalSetting.serverUrl}/${pg.get(0).get('image_url', '')}`} height="30" alt={pg.get(0).get('name', '')} />
-      : customerPgName) : 'None';
+      : customerPgName;
+  }
+
+  renderChangePaymentGateway = () => {
+    const { customer } = this.props;
+    const hasPaymentGateway = !(customer.get('payment_gateway', Immutable.Map()).isEmpty());
+    const label = hasPaymentGateway ? this.renderPaymentGatewayLabel() : 'None';
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} md={2}>
@@ -55,7 +80,7 @@ class Customer extends Component {
           {label}
           <Button onClick={this.onChangePaymentGateway} bsSize="xsmall" style={{ marginLeft: 10, minWidth: 80 }}>
             <i className="fa fa-pencil" />
-            &nbsp;{hasPaymentGateway? "Change" : "Add"}
+            &nbsp;{hasPaymentGateway ? 'Change' : 'Add'}
           </Button>
         </Col>
       </FormGroup>
@@ -71,78 +96,60 @@ class Customer extends Component {
     return null;
   }
 
+  renderSelectInput = (field) => {
+    const { customer } = this.props;
+    const fieldName = field.get('field_name');
+    const options = field.get('select_options', '')
+      .split(',')
+      .map(val => ({
+        field: field.get('field_name'),
+        value: val,
+        label: val,
+      }));
+    return (
+      <Select id={fieldName} onChange={this.onSelect} options={options} value={customer.get(fieldName, '')} />
+    );
+  }
+
+  renderField = (field, key) => {
+    const { customer, onChange } = this.props;
+    const fieldName = field.get('field_name');
+    return (
+      <FormGroup controlId={fieldName} key={key} >
+        <Col componentClass={ControlLabel} md={2}>
+          { field.get('title', fieldName) }
+        </Col>
+        <Col sm={7}>
+          { field.get('select_list', false)
+            ? this.renderSelectInput(field)
+            : <Field onChange={onChange} id={fieldName} value={customer.get(fieldName, '')} />
+          }
+        </Col>
+      </FormGroup>
+    );
+  }
+
+  renderFields = () => {
+    const { fields } = this.props;
+    return fields
+      .filter(this.filterPrinableFields)
+      .map(this.renderField);
+  }
+
   render() {
-    const {customer, onChange, settings, action, invalidFields} = this.props;
-
-    //in update mode wait for item before render edit screen
-    if(action === 'update' && typeof customer.getIn(['_id', '$id']) === 'undefined'){
-      return ( <div> <p>Loading...</p> </div> );
+    const { customer, action } = this.props;
+    // in update mode wait for item before render edit screen
+    if (action === 'update' && typeof customer.getIn(['_id', '$id']) === 'undefined') {
+      return (<div> <p>Loading...</p> </div>);
     }
-
-    let options = [];
-    countries.forEach((country) => {
-      options.push({value: country.name, label: country.name})
-    });
-
-    const fields = settings.filter(field => {
-      return field.get('display') !== false &&
-             field.get('editable') !== false;
-    }).map((setting, key) => {
-      let invalid = invalidFields
-        .filter(invf => invf.get('name') === setting.get('field_name'))
-        .size > 0;
-      let validationState = invalid ? {validationState: "error"} : {};
-      let field_name = setting.get('field_name');
-      let value;
-      if (action === 'new' && !setting.get('select_list', false)) {
-        value = customer.get(field_name, setting.get('default_value', ''));
-      } else {
-        value = customer.get(field_name, '');
-      }
-      let options;
-      if (setting.get('select_list', false)) {
-        options =
-          setting.get('select_options', '')
-                 .split(',')
-                 .map(val => {
-                   return {
-                     field: setting.get('field_name'),
-                     value: val,
-                     label: val
-                   }
-                 });
-      }
-      return (
-        <FormGroup { ...validationState }
-                   controlId={ field_name }
-                   key={key}>
-          <Col componentClass={ ControlLabel } md={2}>
-            {setting.get('title') || field_name}
-          </Col>
-          <Col sm={7}>
-            {
-              setting.get('select_list', false)
-              ? (<Select
-                     onChange={ this.onSelect }
-                     options={ options }
-                     value={ value } />)
-              : (<Field onChange={ onChange }
-                        id={ field_name }
-                        value={ value }
-                 />)
-            }
-          </Col>
-        </FormGroup>
-      );
-    });
 
     return (
       <div className="Customer">
         <Form horizontal>
-          { fields }
-          { (action !== 'new') && this.renderChangePaymentGateway() }
+          { this.renderFields() }
+          { (action !== 'create') && this.renderChangePaymentGateway() }
         </Form>
-        {(action !== "new") &&
+        {(action !== 'create') &&
           <div>
             <hr />
             { this.renderInCollection() }
