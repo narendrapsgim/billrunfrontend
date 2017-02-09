@@ -8,7 +8,7 @@ import { fetchPrepaidIncludeByIdQuery, getProductsKeysQuery } from '../../common
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
 import { getEntity, updateEntityField, clearEntity } from '../../actions/entityActions';
-import { showDanger } from '../../actions/alertsActions';
+import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { savePrepaidInclude } from '../../actions/prepaidIncludeActions';
@@ -47,7 +47,7 @@ class PrepaidIncludeSetup extends Component {
 
   componentDidMount() {
     const { itemId, mode } = this.props;
-    if (mode === 'new') {
+    if (mode === 'create') {
       this.props.dispatch(setPageTitle('Create New Prepaid Bucket'));
       this.setDefaultValues();
     }
@@ -62,7 +62,7 @@ class PrepaidIncludeSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { item, mode } = nextProps;
     const { item: oldItem } = this.props;
-    if (mode !== 'new' && item.get('name') && oldItem.get('name') !== item.get('name')) {
+    if (mode !== 'create' && item.get('name') && oldItem.get('name') !== item.get('name')) {
       this.props.dispatch(setPageTitle(`Edit Prepaid Bucket - ${item.get('name')}`));
     }
   }
@@ -95,15 +95,18 @@ class PrepaidIncludeSetup extends Component {
   };
 
   afterSave = (response) => {
+    const { mode } = this.props;
     if (response.status) {
-      this.props.dispatch(clearItems('charging_plans')); // refetch items list because item was (changed in / added to) list
+      const action = (mode === 'create') ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The prepaid bucke was ${action}`));
+      this.props.dispatch(clearItems('prepaid_includes')); // refetch items list because item was (changed in / added to) list
       this.handleBack();
     }
   }
 
   handleSave = () => {
     const { item, mode } = this.props;
-    this.props.dispatch(savePrepaidInclude(item, mode, this.afterSave));
+    this.props.dispatch(savePrepaidInclude(item, mode)).then(this.afterSave);
   };
 
   handleBack = () => {
@@ -163,7 +166,7 @@ class PrepaidIncludeSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'new');
+  const mode = action || ((itemId) ? 'update' : 'create');
   const item = state.entity.get('prepaid_include');
   const usageTypes = state.settings.get('usage_types');
   const allRates = state.list.get('all_rates');
