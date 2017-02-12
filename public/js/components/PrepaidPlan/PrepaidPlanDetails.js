@@ -71,7 +71,7 @@ export default class PrepaidPlanDetails extends Component {
             </Col>
           </FormGroup>
 
-          {mode === 'new' &&
+          {mode === 'create' &&
             <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
               <Col componentClass={ControlLabel} sm={3} lg={2}>
                 Key

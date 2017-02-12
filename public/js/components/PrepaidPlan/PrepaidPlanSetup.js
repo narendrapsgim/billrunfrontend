@@ -24,7 +24,7 @@ import {
 } from '../../actions/prepaidPlanActions';
 import { getList } from '../../actions/listActions';
 import { showWarning } from '../../actions/alertsActions';
-import { getPlan, savePlan, clearPlan, onPlanFieldUpdate } from '../../actions/planActions';
+import { getPlan, savePlan, clearPlan, onPlanFieldUpdate, onPlanTariffAdd } from '../../actions/planActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems } from '../../actions/entityListActions';
@@ -66,12 +66,13 @@ class PrepaidPlanSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'new') {
+    if (mode === 'create') {
       this.props.dispatch(setPageTitle('Create New Prepaid Plan'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'customer'));
-      this.props.dispatch(onPlanFieldUpdate(['price'], 0));
+      this.props.dispatch(onPlanTariffAdd());
+      this.props.dispatch(onPlanFieldUpdate(['price', 0, 'price'], 0));
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Map({ unit: 1, periodicity: 'month' })));
     }
@@ -81,7 +82,7 @@ class PrepaidPlanSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { item: oldItem, mode } = this.props;
     const { item } = nextProps;
-    if (mode !== 'new' && item.get('name') && item.get('name') !== oldItem.get('name')) {
+    if (mode !== 'create' && item.get('name') && item.get('name') !== oldItem.get('name')) {
       this.props.dispatch(setPageTitle(`Edit Prepaid Plan - ${item.get('name')}`));
     }
   }
@@ -176,7 +177,7 @@ class PrepaidPlanSetup extends Component {
     const { item, ppIncludes, mode } = this.props;
 
     // in update mode wait for plan before render edit screen
-    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
@@ -253,7 +254,7 @@ class PrepaidPlanSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'new');
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   const ppIncludes = state.list.get('pp_includes');
   const { plan: item } = state;
   return { itemId, item, mode, ppIncludes, activeTab };
