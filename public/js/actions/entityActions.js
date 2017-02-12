@@ -35,21 +35,32 @@ export const clearEntity = collection => ({
 });
 
 const buildRequestData = (item, action) => {
-  const formData = new FormData();
-  if (action === 'create') {
-    const dafaultFrom = moment().toISOString();
-    const dafaultTo = moment().add(100, 'years').toISOString();
-    const update = item
-      .set('from', item.get('from', dafaultFrom))
-      .set('to', item.get('to', dafaultTo));
-    formData.append('update', JSON.stringify(update));
-  } else if (action === 'update') {
-    const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-    const update = item.delete('_id');
-    formData.append('query', JSON.stringify(query));
-    formData.append('update', JSON.stringify(update));
+  switch (action) {
+
+    case 'create': {
+      const formData = new FormData();
+      const dafaultFrom = moment().toISOString();
+      const dafaultTo = moment().add(100, 'years').toISOString();
+      const update = item
+        .set('from', item.get('from', dafaultFrom))
+        .set('to', item.get('to', dafaultTo));
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
+    case 'update':
+    case 'closeandnew': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      const update = item.delete('_id');
+      formData.append('query', JSON.stringify(query));
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
+    default:
+      return new FormData();
   }
-  return formData;
 };
 
 const requestDataBuilder = (collection, item, action) => {
