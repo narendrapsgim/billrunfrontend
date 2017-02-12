@@ -50,7 +50,7 @@ class ServiceSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { item, mode } = nextProps;
     const { item: oldItem } = this.props;
-    if (mode === 'update' && oldItem.get('name') !== item.get('name')) {
+    if (mode !== 'create' && oldItem.get('name') !== item.get('name')) {
       this.props.dispatch(setPageTitle(`Edit service - ${item.get('name')}`));
     }
   }
@@ -100,7 +100,7 @@ class ServiceSetup extends Component {
   render() {
     const { item, mode } = this.props;
     // in update mode wait for item before render edit screen
-    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
@@ -139,7 +139,7 @@ class ServiceSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'create');
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   const { service: item } = state;
   return { itemId, item, mode, activeTab };
 };

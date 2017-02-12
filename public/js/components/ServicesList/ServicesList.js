@@ -14,7 +14,6 @@ const ServicesList = () => {
   const filterFields = [
     { id: 'description', placeholder: 'Title' },
     { id: 'name', placeholder: 'Key' },
-    { id: 'to', showFilter: false, type: 'datetime' },
   ];
 
   const tableFields = [
