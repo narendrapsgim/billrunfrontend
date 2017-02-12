@@ -68,7 +68,7 @@ class PlanSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { item: oldItem, mode } = this.props;
     const { item } = nextProps;
-    if (mode === 'update' && oldItem.get('name') !== item.get('name')) {
+    if (mode !== 'create' && oldItem.get('name') !== item.get('name')) {
       this.props.dispatch(setPageTitle(`Edit plan - ${item.get('name')}`));
     }
   }
@@ -139,7 +139,7 @@ class PlanSetup extends Component {
     const { item, mode } = this.props;
 
     // in update mode wait for plan before render edit screen
-    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
@@ -192,7 +192,7 @@ class PlanSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'create');
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   const { plan: item } = state;
   return { itemId, item, mode, activeTab };
 };
