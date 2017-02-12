@@ -29,14 +29,19 @@ class List extends Component {
   displayByType(field, entity) {
     switch (field.type) {
       case 'date':
-        return moment(entity.get(field.id)).format(globalSetting.dateFormat);
+        return moment(entity.get(field.id, 0)).format(globalSetting.dateFormat);
       case 'time':
-        return moment(entity.get(field.id)).format(globalSetting.timeFormat);
+        return moment(entity.get(field.id, 0)).format(globalSetting.timeFormat);
       case 'datetime':
-        return moment(entity.get(field.id)).format(globalSetting.datetimeFormat);
+        return moment(entity.get(field.id, 0)).format(globalSetting.datetimeFormat);
+      case 'mongodate':
+        return moment.unix(entity.getIn([field.id, 'sec'], 0)).format(globalSetting.dateFormat);
+      case 'mongotime':
+        return moment.unix(entity.getIn([field.id, 'sec'], 0)).format(globalSetting.timeFormat);
+      case 'mongodatetime':
+        return moment.unix(entity.getIn([field.id, 'sec'], 0)).format(globalSetting.datetimeFormat);
       case 'timestamp':
-        return moment(parseInt(entity.get(field.id), 10) * 1000)
-          .format(globalSetting.datetimeFormat);
+        return moment.unix(entity.get(field.id, 0)).format(globalSetting.datetimeFormat);
       case 'text':
       default:
         return entity.get(field.id);
