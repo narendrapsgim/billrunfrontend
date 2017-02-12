@@ -61,7 +61,7 @@ class ProductSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { item } = this.props;
     const { item: nextItem, mode } = nextProps;
-    if (mode === 'update' && item.get('key') !== nextItem.get('key')) {
+    if (mode !== 'create' && item.get('key') !== nextItem.get('key')) {
       this.props.dispatch(setPageTitle(`Edit product - ${nextItem.get('key')}`));
     }
   }
@@ -98,7 +98,7 @@ class ProductSetup extends Component {
     const { mode } = this.props;
     if (response.status) {
       this.props.dispatch(clearItems('products')); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (mode === 'create' || mode === 'closeandnew') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The product was ${action}`));
       this.handleBack();
     }
@@ -117,7 +117,7 @@ class ProductSetup extends Component {
     const { item, usageTypes, mode } = this.props;
 
     // in update mode wait for item before render edit screen
-    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
@@ -148,7 +148,7 @@ class ProductSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'create');
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   const { product: item } = state;
   const usageTypes = state.settings.get('usage_types');
   return { itemId, item, mode, usageTypes, activeTab };

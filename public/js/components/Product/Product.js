@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, Button, HelpBlock } from 'react-bootstrap';
@@ -13,20 +13,22 @@ import ProductParamEdit from './components/ProductParamEdit';
 export default class Product extends Component {
 
   static propTypes = {
-    errorMessages: React.PropTypes.object,
-    mode: React.PropTypes.string.isRequired,
-    onFieldUpdate: React.PropTypes.func.isRequired,
-    onProductRateAdd: React.PropTypes.func.isRequired,
-    onProductRateRemove: React.PropTypes.func.isRequired,
-    onToUpdate: React.PropTypes.func.isRequired,
-    onUsagetUpdate: React.PropTypes.func.isRequired,
-    planName: React.PropTypes.string.isRequired,
-    product: React.PropTypes.object.isRequired,
-    usaget: React.PropTypes.string.isRequired,
-    usageTypes: React.PropTypes.object.isRequired,
+    product: PropTypes.instanceOf(Immutable.Map),
+    mode: PropTypes.string.isRequired,
+    usaget: PropTypes.string,
+    planName: PropTypes.string,
+    usageTypes: PropTypes.object.isRequired,
+    errorMessages: PropTypes.object,
+    onFieldUpdate: PropTypes.func.isRequired,
+    onProductRateAdd: PropTypes.func.isRequired,
+    onProductRateRemove: PropTypes.func.isRequired,
+    onToUpdate: PropTypes.func.isRequired,
+    onUsagetUpdate: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
+    planName: 'BASE',
+    product: Immutable.Map(),
     errorMessages: {
       name: {
         allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
@@ -238,7 +240,7 @@ export default class Product extends Component {
                     Key<Help contents={ProductDescription.key} />
                   </Col>
                   <Col sm={8} lg={9}>
-                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={mode === 'update'} />
+                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={mode !== 'create'} />
                     { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
                   </Col>
                 </FormGroup>
@@ -270,7 +272,7 @@ export default class Product extends Component {
                 <Col sm={4}>
                   <Select
                     allowCreate
-                    disabled={mode === 'update'}
+                    disabled={mode !== 'create'}
                     onChange={this.onChangeUsaget}
                     options={this.getUsageTypesOptions()}
                     value={usaget}
