@@ -99,7 +99,7 @@ export const onPlanCycleUpdate = (index, value) => ({
   value,
 });
 
-export const onPlanTariffAdd = trial => ({
+export const onPlanTariffAdd = (trial = false) => ({
   type: PLAN_ADD_TARIFF,
   trial,
 });

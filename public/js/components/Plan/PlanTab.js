@@ -37,7 +37,7 @@ export default class Plan extends Component {
     const { plan } = this.props;
     const count = plan.get('price', Immutable.List()).size;
     if (count === 0) {
-      this.props.onPlanTariffAdd(false);
+      this.props.onPlanTariffAdd();
     }
   }
 
@@ -46,7 +46,7 @@ export default class Plan extends Component {
   }
 
   onPlanTariffInit = (e) => {
-    this.props.onPlanTariffAdd(false);
+    this.props.onPlanTariffAdd();
   }
 
   onChangePlanName = (e) => {
