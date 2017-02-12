@@ -71,11 +71,11 @@ class QueueList extends Component {
   }
 
   parseCalcTime = (ent) => {
-    const calcTime = ent.get('calc_time');
+    const calcTime = ent.get('calc_time', false);
     if (calcTime === false) {
       return 'Never';
     }
-    return moment(calcTime).format(globalSetting.datetimeFormat);
+    return moment.unix(calcTime).format(globalSetting.datetimeFormat);
   }
 
   fetchItems = () => {
@@ -109,7 +109,10 @@ class QueueList extends Component {
     const filterQuery = Object.assign({}, filter);
 
     if (filterQuery.calc_name) {
-      filterQuery.calc_name.$regex = this.getPreviousCalculator(filterQuery.calc_name.$regex);
+      filterQuery.calc_name = {
+        $regex: this.getPreviousCalculator(filterQuery.calc_name.$regex),
+        $options: 'i',
+      };
     }
 
     if (filterQuery.urt) {
@@ -144,10 +147,10 @@ class QueueList extends Component {
   ]);
 
   getTableFields = () => ([
-    { id: 'type', placeholder: 'Type' },
-    { id: 'calc_time', placeholder: 'Last Calculation Time', type: 'timestamp', sort: true, parser: this.parseCalcTime },
-    { id: 'calc_name', placeholder: 'Calculator Stage', type: 'text', sort: true, parser: this.parseCalcName },
-    { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false },
+    { id: 'type', title: 'Type' },
+    { id: 'calc_time', title: 'Last Calculation Time', sort: true, parser: this.parseCalcTime, cssClass: 'long-date' },
+    { id: 'calc_name', title: 'Calculator Stage', sort: true, parser: this.parseCalcName },
+    { id: 'urt', title: 'Time', type: 'datetime', cssClass: 'long-date' },
   ]);
 
   renderPanelTitle = () => (
