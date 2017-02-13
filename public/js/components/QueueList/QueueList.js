@@ -7,8 +7,7 @@ import { Col, Row, Panel } from 'react-bootstrap';
 import Pager from '../Pager';
 import { AdvancedFilter } from '../Filter';
 import List from '../List';
-import Queue from './Queue';
-/* ACTIONS */
+import Queue from './Queue';import { queueListQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 
 
@@ -128,16 +127,7 @@ class QueueList extends Component {
   buildQuery = () => {
     const { page, size, sort } = this.state;
     const query = this.handleQuerySpecialValues();
-    return {
-      api: 'find',
-      params: [
-        { collection: 'queue' },
-        { size },
-        { page },
-        { sort: JSON.stringify(sort) },
-        { query: JSON.stringify(query) },
-      ],
-    };
+    return queueListQuery(query, page, sort, size);
   }
 
   getFilterFields = () => ([

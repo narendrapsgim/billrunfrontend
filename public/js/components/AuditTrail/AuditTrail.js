@@ -8,8 +8,7 @@ import List from '../List';
 import Pager from '../Pager';
 import { AdvancedFilter } from '../Filter';
 import DetailsParser from './DetailsParser';
-import { getUserKeysQuery, auditTrailEntityTypesQuery } from '../../common/ApiQueries';
-/* ACTIONS */
+import { getUserKeysQuery, auditTrailEntityTypesQuery, auditTrailListQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
 
 class AuditTrail extends Component {
@@ -18,7 +17,6 @@ class AuditTrail extends Component {
     items: PropTypes.instanceOf(Immutable.List),
     userNames: PropTypes.instanceOf(Immutable.List),
     auditTrailEntityTypes: PropTypes.instanceOf(Immutable.List),
-    collection: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -26,7 +24,6 @@ class AuditTrail extends Component {
     items: Immutable.List(),
     userNames: Immutable.List(),
     auditTrailEntityTypes: Immutable.List(),
-    collection: 'log',
   }
 
   state = {
@@ -45,8 +42,7 @@ class AuditTrail extends Component {
   }
 
   componentWillUnmount() {
-    const { collection } = this.props;
-    this.props.dispatch(clearList(collection));
+    this.props.dispatch(clearList('log'));
     this.props.dispatch(clearList('autocompleteUser'));
     this.props.dispatch(clearList('autocompleteAuditTrailEntityTypes'));
   }
@@ -61,8 +57,7 @@ class AuditTrail extends Component {
   }
 
   fetchItems = () => {
-    const { collection } = this.props;
-    this.props.dispatch(getList(collection, this.buildQuery()));
+    this.props.dispatch(getList('log', this.buildQuery()));
   }
 
   fetchUser = () => {
@@ -80,24 +75,13 @@ class AuditTrail extends Component {
   }
 
   buildQuery = () => {
-    const { collection } = this.props;
     const { fields, size, page, sort, filter } = this.state;
     const query = Object.assign({}, filter);
     query.source = 'audit';
     if (query.urt) {
       query.urt = this.urtQueryBuilder(query.urt);
     }
-    return {
-      api: 'find',
-      params: [
-        { collection },
-        { size },
-        { page },
-        { project: JSON.stringify(fields) },
-        { sort: JSON.stringify(sort) },
-        { query: JSON.stringify(query) },
-      ],
-    };
+    return auditTrailListQuery(query, page, fields, sort, size);
   }
 
   userParser = item => item.getIn(['user', 'name'], '');

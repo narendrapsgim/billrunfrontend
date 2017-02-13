@@ -1,14 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import moment from 'moment';
 import ChangeCase from 'change-case';
 import { Col, Row } from 'react-bootstrap';
-/* COMPONENTS */
 import Filter from '../Filter';
 import List from '../List';
 import Pager from '../Pager';
-/* ACTIONS */
+import { prepaidBalancesListQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 
 
@@ -51,17 +49,7 @@ class PrepaidBalances extends Component {
 
   buildQuery = () => {
     const { size, page, sort, filter } = this.state;
-    /** TODO: Will probably change **/
-    return {
-      api: 'find',
-      params: [
-        { collection: 'balances' },
-        { size },
-        { page },
-        { sort: JSON.stringify(sort) },
-        { query: JSON.stringify(filter) },
-      ],
-    };
+    return prepaidBalancesListQuery(filter, page, sort, size);
   }
 
   parserUsageTypeName = ent => ChangeCase.titleCase(ent.get('charging_by_usaget', ''));

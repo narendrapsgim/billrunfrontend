@@ -3,12 +3,11 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import Immutable from 'immutable';
 import { Col, Row, Panel } from 'react-bootstrap';
-/* COMPONENTS */
 import Pager from '../Pager';
 import Filter from '../Filter';
 import List from '../List';
 import Usage from './Usage';
-/* ACTIONS */
+import { usageListQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 
 class UsageList extends Component {
@@ -35,17 +34,7 @@ class UsageList extends Component {
 
   buildQuery = () => {
     const { page, size, sort, filter } = this.state;
-    /** TODO: Will probably change **/
-    return {
-      api: 'find',
-      params: [
-        { collection: 'lines' },
-        { size },
-        { page },
-        { sort: JSON.stringify(sort) },
-        { query: JSON.stringify(filter) },
-      ],
-    };
+    return usageListQuery(filter, page, sort, size);
   }
 
   onFilter = (filter) => {

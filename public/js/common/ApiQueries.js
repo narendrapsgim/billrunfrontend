@@ -1,4 +1,3 @@
-import moment from 'moment';
 
 export const saveQuery = body => ({
   api: 'save',
@@ -11,6 +10,63 @@ export const saveQuery = body => ({
 export const getPaymentGatewaysQuery = () => ({
   api: 'paymentgateways',
   action: 'list',
+});
+
+/* List Components queries*/
+export const usageListQuery = (query, page, sort, size) => ({
+  api: 'find',
+  params: [
+    { collection: 'lines' },
+    { size },
+    { page },
+    { sort: JSON.stringify(sort) },
+    { query: JSON.stringify(query) },
+  ],
+});
+
+export const queueListQuery = (query, page, sort, size) => ({
+  api: 'find',
+  params: [
+    { collection: 'queue' },
+    { size },
+    { page },
+    { sort: JSON.stringify(sort) },
+    { query: JSON.stringify(query) },
+  ],
+});
+
+export const prepaidBalancesListQuery = (query, page, sort, size) => ({
+  api: 'find',
+  params: [
+    { collection: 'balances' },
+    { size },
+    { page },
+    { sort: JSON.stringify(sort) },
+    { query: JSON.stringify(query) },
+  ],
+});
+
+export const postpaidBalancesListQuery = (query, page, sort, size) => ({
+  api: 'find',
+  params: [
+    { collection: 'balances' },
+    { size },
+    { page },
+    { sort: JSON.stringify(sort) },
+    { query: JSON.stringify(query) },
+  ],
+});
+
+export const auditTrailListQuery = (query, page, fields, sort, size) => ({
+  api: 'find',
+  params: [
+    { collection: 'log' },
+    { size },
+    { page },
+    { project: JSON.stringify(fields) },
+    { sort: JSON.stringify(sort) },
+    { query: JSON.stringify(query) },
+  ],
 });
 
 

@@ -3,13 +3,12 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import ChangeCase from 'change-case';
 import { Col, Row } from 'react-bootstrap';
-/* COMPONENTS */
 import Filter from '../Filter';
 import List from '../List';
 import Pager from '../Pager';
-/* ACTIONS */
 import { getSettings } from '../../actions/settingsActions';
 import { getList } from '../../actions/listActions';
+import { postpaidBalancesListQuery } from '../../common/ApiQueries';
 
 
 class PostpaidBalances extends Component {
@@ -43,17 +42,7 @@ class PostpaidBalances extends Component {
 
   buildQuery = () => {
     const { size, page, sort, filter } = this.state;
-    /** TODO: Will probably change **/
-    return {
-      api: 'find',
-      params: [
-        { collection: 'balances' },
-        { size },
-        { page },
-        { sort: JSON.stringify(sort) },
-        { query: JSON.stringify(filter) },
-      ],
-    };
+    return postpaidBalancesListQuery(filter, page, sort, size);
   }
 
   fetchItems = () => {
