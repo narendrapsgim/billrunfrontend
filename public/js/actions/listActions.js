@@ -1,5 +1,5 @@
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
-import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
   GOT_LIST: 'GOT_LIST',
@@ -26,20 +26,31 @@ export const addToList = (collection, items) => ({
   items,
 });
 
-const fetchList = (collection, params, reset = true) => (dispatch) => {
+const fetchList = (collection, params) => (dispatch) => {
   dispatch(startProgressIndicator());
   return apiBillRun(params)
   .then((success) => {
     try {
-      if (reset) {
-        dispatch(gotList(collection, success.data[0].data.details));
-        dispatch(setNextPage(success.data[0].data.next_page));
-      } else {
-        dispatch(addToList(collection, success.data[0].data.details));
-      }
+      dispatch(gotList(collection, success.data[0].data.details));
+      dispatch(setNextPage(success.data[0].data.next_page));
       return dispatch(apiBillRunSuccessHandler(success));
     } catch (e) {
       console.log('fetchList error: ', e);
+      throw new Error('Error retreiving list');
+    }
+  })
+  .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
+};
+
+const fetchToList = (collection, params) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  return apiBillRun(params)
+  .then((success) => {
+    try {
+      dispatch(addToList(collection, success.data[0].data.details));
+      return dispatch(apiBillRunSuccessHandler(success));
+    } catch (e) {
+      console.log('fetchToList error: ', e);
       throw new Error('Error retreiving list');
     }
   })
@@ -57,5 +68,8 @@ export const deleteFromList = (collection, index) => ({
   index,
 });
 
-export const getList = (collection, params, reset) => dispatch =>
-  dispatch(fetchList(collection, params, reset));
+export const getList = (collection, params) => dispatch =>
+  dispatch(fetchList(collection, params));
+
+export const pushToList = (collection, params) => dispatch =>
+  dispatch(fetchToList(collection, params));
