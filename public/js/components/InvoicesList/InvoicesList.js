@@ -40,8 +40,15 @@ class InvoicesList extends Component {
   buildQuery = () => {
     const { collection } = this.props;
     const { page, size, filter, sort } = this.state;
-		// TODO: improve it
-    const listFilter = { action: 'query_bills_invoices' };
+
+    const query = Object.assign({}, filter, { action: 'query_bills_invoices' });
+    if (query.aid) {
+      query.aid = { $in: [query.aid] };
+    }
+    if (query.invoice_id) {
+      query.invoice_id = { $in: [query.invoice_id] };
+    }
+
     return {
       entity: collection,
       action: 'get',
@@ -49,7 +56,7 @@ class InvoicesList extends Component {
         { size },
         { page },
         { sort: JSON.stringify(sort) },
-        { query: JSON.stringify({ ...filter, ...listFilter }) },
+        { query: JSON.stringify(query) },
       ],
     };
   }
@@ -120,7 +127,6 @@ class InvoicesList extends Component {
     const { baseFilter } = this.props;
     return ([
       { id: 'aid', placeholder: 'Customer ID', type: 'number', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'aid') },
-      { id: 'payer_name', placeholder: 'Name', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'payer_name') },
       { id: 'invoice_id', placeholder: 'Invoice Id', type: 'number', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'invoice_id') },
     ]);
   }
