@@ -1,35 +1,5 @@
 import moment from 'moment';
 
-
-export const getProductByKeyQuery = key => ({
-  api: 'find',
-  params: [
-    { collection: 'rates' },
-    { size: 1 },
-    { page: 0 },
-    { query: JSON.stringify({
-      key,
-      to: { $gte: moment().toISOString() },
-      from: { $lte: moment().toISOString() },
-    }) },
-  ],
-});
-
-export const getProductsByKeysQuery = (keys, project = {}) => ({
-  api: 'find',
-  params: [
-    { collection: 'rates' },
-    { size: 1000 },
-    { page: 0 },
-    { project: JSON.stringify(project) },
-    { query: JSON.stringify({
-      key: { $in: keys },
-      to: { $gt: moment().toISOString() },
-      from: { $lte: moment().toISOString() },
-    }) },
-  ],
-});
-
 export const saveQuery = body => ({
   api: 'save',
   options: {
@@ -86,27 +56,21 @@ export const disablePaymentGatewayQuery = name => ({
 
 
 /* BillAPI */
-export const getGroupsQuery = (collection) => {
-  const queryString = {
-    'include.groups': { $exists: true },
-    to: { $gte: moment().toISOString() },
-    from: { $lte: moment().toISOString() },
-  };
-  const projectString = {
-    name: 1,
-    include: 1,
-  };
-  return {
-    action: 'uniqueget',
-    entity: collection,
-    params: [
-      { query: JSON.stringify(queryString) },
-      { project: JSON.stringify(projectString) },
-      { page: 0 },
-      { size: 9999 },
-    ],
-  };
-};
+export const getGroupsQuery = collection => ({
+  action: 'uniqueget',
+  entity: collection,
+  params: [
+    { query: JSON.stringify({
+      'include.groups': { $exists: true },
+    }) },
+    { project: JSON.stringify({
+      name: 1,
+      include: 1,
+    }) },
+    { page: 0 },
+    { size: 9999 },
+  ],
+});
 
 export const getSubscribersByAidQuery = aid => ({
   action: 'uniqueget',
@@ -165,3 +129,41 @@ export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
 export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);
+
+export const getProductByKeyQuery = key => ({
+  action: 'get',
+  entity: 'rates',
+  params: [
+    { query: JSON.stringify({ key }) },
+    { page: 0 },
+    { size: 1 },
+  ],
+});
+
+export const searchProductsByKeyQuery = (key, project = {}) => ({
+  action: 'uniqueget',
+  entity: 'rates',
+  params: [
+    { page: 0 },
+    { size: 9999 },
+    { project: JSON.stringify(project) },
+    { sort: JSON.stringify(project) },
+    { query: JSON.stringify({
+      key: { $regex: key, $options: 'i' },
+    }) },
+  ],
+});
+
+export const getProductsByKeysQuery = (keys, project = {}) => ({
+  action: 'uniqueget',
+  entity: 'rates',
+  params: [
+    { page: 0 },
+    { size: 9999 },
+    { project: JSON.stringify(project) },
+    { sort: JSON.stringify(project) },
+    { query: JSON.stringify({
+      key: { $in: keys },
+    }) },
+  ],
+});
