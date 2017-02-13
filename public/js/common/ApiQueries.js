@@ -131,10 +131,10 @@ export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);
 
 export const getProductByKeyQuery = key => ({
-  action: 'get',
+  action: 'uniqueget',
   entity: 'rates',
   params: [
-    { query: JSON.stringify({ key }) },
+    { query: JSON.stringify({ key: { $regex: `^${key}$` } }) },
     { page: 0 },
     { size: 1 },
   ],
