@@ -4,10 +4,10 @@ import EntityList from '../EntityList';
 
 const PrepaidIncludesList = () => {
   const fields = [
-    { id: 'name' },
+    { id: 'name', sort: true },
     { id: 'charging_by', showFilter: false },
     { id: 'charging_by_usaget', showFilter: false },
-    { id: 'priority', showFilter: false },
+    { id: 'priority', showFilter: false, sort: true },
   ];
 
   const projectFields = {

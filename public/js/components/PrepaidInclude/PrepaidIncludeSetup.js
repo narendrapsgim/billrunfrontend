@@ -118,7 +118,7 @@ class PrepaidIncludeSetup extends Component {
   render() {
     const { item, mode, allRates, usageTypes } = this.props;
     // in update mode wait for item before render edit screen
-    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
@@ -166,7 +166,7 @@ class PrepaidIncludeSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'create');
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   const item = state.entity.get('prepaid_include');
   const usageTypes = state.settings.get('usage_types');
   const allRates = state.list.get('all_rates');
