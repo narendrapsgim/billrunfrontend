@@ -71,7 +71,6 @@ export default class Subscription extends Component {
     });
   }
 
-
   onChangePlan = (plan) => {
     const { systemFields } = this.state;
     const newSystemFields = systemFields.set('plan', plan);
@@ -86,16 +85,17 @@ export default class Subscription extends Component {
   }
 
   onSave = () => {
+    const { subscription } = this.props;
     const { systemFields, customFields } = this.state;
-    const data = Immutable.Map({}).withMutations((dataWithMutations) => {
+    const data = subscription.withMutations((subscriptionWithMutations) => {
       systemFields.forEach((value, key) => {
-        dataWithMutations.set(key, value);
+        subscriptionWithMutations.set(key, value);
       });
       customFields.forEach((fieldData, key) => {
-        dataWithMutations.set(key, fieldData.get('value'));
+        subscriptionWithMutations.set(key, fieldData.get('value'));
       });
     });
-    this.props.onSave(this.props.subscription, data);
+    this.props.onSave(data);
   };
 
   onChangeCustomFields = (e) => {
@@ -103,7 +103,7 @@ export default class Subscription extends Component {
     this.setCustomFieldsValue([id], value);
   }
 
-  onChangeCustomFieldsSelect = (id, value) => {
+  onChangeCustomFieldsSelect = id => (value) => {
     this.setCustomFieldsValue([id], value);
   }
 
@@ -158,14 +158,14 @@ export default class Subscription extends Component {
     const plan = systemFields.get('plan', '');
 
     return ([(
-      <FormGroup controlId="formHorizontalEmail" key="plan">
+      <FormGroup key="plan">
         <Col componentClass={ControlLabel} sm={2}>Plan</Col>
         <Col sm={7}>
-          <Select options={availablePlans} value={plan} onChange={this.onChangePlan} />
+          <Select options={availablePlans} value={plan} onChange={this.onChangePlan} allowCreate={true}/>
         </Col>
       </FormGroup>
       ), (
-      <FormGroup controlId="formHorizontalEmail" key="services">
+      <FormGroup key="services">
         <Col componentClass={ControlLabel} sm={2}>Services</Col>
         <Col sm={7}>
           <Select multi={true} value={services} options={availableServices} onChange={this.onChangeService} />
@@ -180,11 +180,11 @@ export default class Subscription extends Component {
     customFields.forEach((fieldData, key) => {
       const { label, value, params, type } = fieldData;
       fields.push(
-        <FormGroup controlId="formHorizontalEmail" key={key}>
+        <FormGroup key={key}>
           <Col componentClass={ControlLabel} sm={2}>{label.length > 0 ? label : key}</Col>
           <Col sm={7}>
             { type === 'select'
-              ? <Select options={this.getSelectValues(params)} value={value} onChange={this.onChangeCustomFieldsSelect.bind(this, key)} />
+              ? <Select options={this.getSelectValues(params)} value={value} onChange={this.onChangeCustomFieldsSelect(key)} />
               : <Field value={value} onChange={this.onChangeCustomFields} id={key} />
             }
           </Col>

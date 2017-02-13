@@ -139,7 +139,7 @@ class Customer extends Component {
   render() {
     const { customer, action } = this.props;
     // in update mode wait for item before render edit screen
-    if (action === 'update' && typeof customer.getIn(['_id', '$id']) === 'undefined') {
+    if (action !== 'create' && typeof customer.getIn(['_id', '$id']) === 'undefined') {
       return (<div> <p>Loading...</p> </div>);
     }
 

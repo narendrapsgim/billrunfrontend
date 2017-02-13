@@ -17,12 +17,18 @@ import {
   getServicesKeysQuery,
   getPaymentGatewaysQuery,
 } from '../../common/ApiQueries';
-import { saveCustomer, updateCustomerField, clearCustomer, getCustomer } from '../../actions/customerActions';
+import {
+  saveSubscription,
+  saveCustomer,
+  updateCustomerField,
+  clearCustomer,
+  getCustomer,
+} from '../../actions/customerActions';
 import { clearItems } from '../../actions/entityListActions';
 import { getList, clearList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { showSuccess, showDanger } from '../../actions/alertsActions';
+import { showSuccess } from '../../actions/alertsActions';
 
 class CustomerSetup extends Component {
 
@@ -60,7 +66,6 @@ class CustomerSetup extends Component {
     activeTab: parseInt(this.props.activeTab),
   };
 
-
   componentDidMount() {
     const { itemId } = this.props;
     if (itemId) {
@@ -83,7 +88,7 @@ class CustomerSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { customer: oldItem, mode } = this.props;
     const { customer: item } = nextProps;
-    if (mode === 'update' && (oldItem.get('first_name') !== item.get('first_name') || oldItem.get('last_name') !== item.get('last_name'))) {
+    if (mode !== 'create' && (oldItem.get('first_name') !== item.get('first_name') || oldItem.get('last_name') !== item.get('last_name'))) {
       const newTitle = `Edit Customer - ${item.get('first_name')} ${item.get('last_name')}`;
       this.props.dispatch(setPageTitle(newTitle));
     }
@@ -129,47 +134,19 @@ class CustomerSetup extends Component {
     window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}&${action}`;
   }
 
-  onSaveSubscription = (subscription, data, callback) => {
+  onSaveSubscription = subscription =>
+    this.props.dispatch(saveSubscription(subscription, 'closeandnew')).then(this.afterSaveSubscription);
+
+
+  afterSaveSubscription = (response) => {
     const { aid } = this.props;
-    const query = {
-      api: 'subscribers',
-      params: [
-        { method: 'update' },
-        { type: 'subscriber' },
-        { query: JSON.stringify({ _id: subscription.getIn(['_id', '$id']) }) },
-        { update: JSON.stringify(data) },
-      ],
-    };
-    apiBillRun(query).then(
-      (success) => {
-        callback(true);
-        const subscriptions_params = {
-          api: 'find',
-          params: [
-            { collection: 'subscribers' },
-            { page: 0 },
-            { size: 999999 },
-            { query: JSON.stringify({
-              aid: parseInt(aid),
-              type: 'subscriber',
-              to: { $gt: moment().toISOString() },
-            }) },
-          ],
-        };
-        this.props.dispatch(getList('subscriptions', subscriptions_params));
-        this.props.dispatch(showSuccess('Saved subscription successfully!'));
-      },
-      (failure) => {
-        const errorMessage = failure.error[0].error.display.desc ? failure.error[0].error.display.desc : failure.error[0].error.message;
-        dispatch(showDanger(`Error - ${errorMessage}`));
-        console.log(failure);
-      }
-    ).catch(
-      (error) => {
-        this.props.dispatch(showDanger('Network error - please try again'));
-      }
-    );
-  };
+    if (response.status === true) {
+      this.props.dispatch(showSuccess('Customer was updated'));
+      this.props.dispatch(getList('subscriptions', getSubscribersByAidQuery(aid)));
+      return true;
+    }
+    return false;
+  }
 
   onBack = () => {
     this.props.router.push('/customers');
@@ -190,7 +167,7 @@ class CustomerSetup extends Component {
     const showActionButtons = (activeTab === 1);
 
     // in update mode wait for plan before render edit screen
-    if ((mode === 'update' && typeof customer.getIn(['_id', '$id']) === 'undefined')) {
+    if ((mode !== 'create' && typeof customer.getIn(['_id', '$id']) === 'undefined')) {
       return (<LoadingItemPlaceholder onClick={this.onBack} />);
     }
 
@@ -217,7 +194,7 @@ class CustomerSetup extends Component {
                 </Tab>
               }
 
-              { (mode === 'update') && !subscriberFields.isEmpty() &&
+              { (mode !== 'create') && !subscriberFields.isEmpty() &&
                 <Tab title="Subscriptions" eventKey={2}>
                   <Panel style={{ borderTop: 'none' }}>
                     <Subscriptions
@@ -232,14 +209,14 @@ class CustomerSetup extends Component {
                   </Panel>
                 </Tab>
               }
-              { (mode === 'update') &&
+              { (mode !== 'create') &&
                 <Tab title="Postpaid Counters" eventKey={3}>
                   <Panel style={{ borderTop: 'none' }}>
                     <PostpaidBalances aid={aid} />
                   </Panel>
                 </Tab>
               }
-              { (mode === 'update') &&
+              { (mode !== 'create') &&
                 <Tab title="Prepaid Counters" eventKey={4}>
                   <Panel style={{ borderTop: 'none' }}>
                     <PrepaidBalances aid={aid} />
@@ -261,7 +238,7 @@ class CustomerSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'create');
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   return {
     itemId,
     mode,
