@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
-import moment from 'moment';
 import Immutable from 'immutable';
 import { apiBillRun } from '../../../common/Api';
+import { searchProductsByKeyAndUsagetQuery } from '../../../common/ApiQueries';
 
 
 export default class ProductSearchByUsagetype extends Component {
@@ -39,38 +39,17 @@ export default class ProductSearchByUsagetype extends Component {
     this.setState({ val: '' });
   }
 
-  findGroupRates = (input, callback) => {
+  findGroupRates = (input) => {
     if (input && input.length) {
       const { usaget, products } = this.props;
-
-      const toadyApiString = moment();//  .format(globalSetting.apiDateTimeFormat);
-      const request = {
-        api: 'find',
-        params: [
-          { collection: 'rates' },
-          { size: '20' },
-          { page: '0' },
-          { project: JSON.stringify({ key: 1 }) },
-          { query: JSON.stringify({
-            key: {
-              $nin: products.toArray(),
-              $regex: input.toLowerCase(), $options: 'i',
-            },
-            [`rates.${usaget}`]: { $exists: true },
-            to: { $gte: toadyApiString },
-            from: { $lte: toadyApiString },
-          }) },
-        ],
-      };
-      return apiBillRun(request).then(
-        (sussess) => {
-          const options = _.values(sussess.data[0].data.details);
-          return { options, complete: true };
-        },
-        () => ({ options: [] })
-      );
+      const key = input.toLowerCase();
+      const notKeys = products.toArray();
+      const query = searchProductsByKeyAndUsagetQuery(usaget, key, notKeys);
+      return apiBillRun(query)
+      .then(success => ({ options: success.data[0].data.details }))
+      .catch(() => ({ options: [] }));
     }
-    callback(null, { options: [] });
+    return Promise.resolve({ options: [] });
   }
 
   render() {

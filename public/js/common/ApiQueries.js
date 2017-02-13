@@ -1,3 +1,21 @@
+// TODO: fix to uniqueget (for now billAoi can't search by 'rates')
+export const searchProductsByKeyAndUsagetQuery = (usaget, key, notKeys) => ({
+  api: 'find',
+  params: [
+    { collection: 'rates' },
+    { size: '20' },
+    { page: '0' },
+    { project: JSON.stringify({ key: 1 }) },
+    { query: JSON.stringify({
+      key: {
+        $nin: notKeys,
+        $regex: key,
+        $options: 'i',
+      },
+      [`rates.${usaget}`]: { $exists: true },
+    }) },
+  ],
+});
 
 export const saveQuery = body => ({
   api: 'save',
@@ -206,6 +224,20 @@ export const searchProductsByKeyQuery = (key, project = {}) => ({
     { sort: JSON.stringify(project) },
     { query: JSON.stringify({
       key: { $regex: key, $options: 'i' },
+    }) },
+  ],
+});
+
+export const searchPlansByKeyQuery = (name, project = {}) => ({
+  action: 'uniqueget',
+  entity: 'plans',
+  params: [
+    { page: 0 },
+    { size: 9999 },
+    { project: JSON.stringify(project) },
+    { sort: JSON.stringify(project) },
+    { query: JSON.stringify({
+      name: { $regex: name, $options: 'i' },
     }) },
   ],
 });
