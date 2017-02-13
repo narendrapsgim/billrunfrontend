@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, Tabs, Tab, Panel, Button } from 'react-bootstrap';
+import { Col, Tabs, Tab, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import ChargingPlanDetails from './ChargingPlanDetails';
 import ChargingPlanIncludes from './ChargingPlanIncludes';
@@ -13,6 +13,7 @@ import {
   savePlan,
   onPlanFieldUpdate,
   addUsagetInclude,
+  onPlanTariffAdd,
 } from '../../actions/planActions';
 import { getList } from '../../actions/listActions';
 import { showWarning } from '../../actions/alertsActions';
@@ -56,12 +57,13 @@ class ChargingPlanSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'new') {
+    if (mode === 'create') {
       this.props.dispatch(setPageTitle('Create New Buckets Group'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'charging'));
-      this.props.dispatch(onPlanFieldUpdate(['price'], 0));
+      this.props.dispatch(onPlanTariffAdd());
+      this.props.dispatch(onPlanFieldUpdate(['price', 0, 'price'], 0));
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({ unit: 1, periodicity: 'month' })));
     }
@@ -71,7 +73,7 @@ class ChargingPlanSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { item } = nextProps;
     const { item: oldItem, mode } = this.props;
-    if (mode !== 'new' && item.get('name') && oldItem.get('name', '') !== item.get('name', '')) {
+    if (mode !== 'create' && item.get('name') && oldItem.get('name', '') !== item.get('name', '')) {
       this.props.dispatch(setPageTitle(`Edit Buckets Group - ${item.get('name')}`));
     }
   }
@@ -171,7 +173,7 @@ class ChargingPlanSetup extends Component {
 const mapStateToProps = (state, props) => {
   const { tab: activeTab, action } = props.location.query;
   const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'update' : 'new');
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   const { plan: item } = state;
   const prepaidIncludes = state.list.get('prepaid_includes');
   return { itemId, item, mode, prepaidIncludes, activeTab };

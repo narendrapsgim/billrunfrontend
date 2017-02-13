@@ -5,9 +5,6 @@ const ChargingPlansList = () => {
   const filterFields = [
     { id: 'description', placeholder: 'Title' },
     { id: 'name', placeholder: 'Key' },
-    { id: 'to', display: false, type: 'datetime', showFilter: false },
-    { id: 'connection_type', display: false, showFilter: false },
-    { id: 'type', display: false, showFilter: false },
   ];
 
   const tableFields = [
