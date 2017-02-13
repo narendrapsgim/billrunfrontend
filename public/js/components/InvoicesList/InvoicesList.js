@@ -23,7 +23,7 @@ class InvoicesList extends Component {
   static defaultProps = {
     items: Immutable.List(),
     baseFilter: {},
-    collection: 'bill',
+    collection: 'bills',
   }
 
   state = {
@@ -40,14 +40,16 @@ class InvoicesList extends Component {
   buildQuery = () => {
     const { collection } = this.props;
     const { page, size, filter, sort } = this.state;
+		// TODO: improve it
+    const listFilter = { action: 'query_bills_invoices' };
     return {
-      api: collection,
+      entity: collection,
+      action: 'get',
       params: [
-        { action: 'query_bills_invoices' },
         { size },
         { page },
         { sort: JSON.stringify(sort) },
-        { query: JSON.stringify(filter) },
+        { query: JSON.stringify({ ...filter, ...listFilter }) },
       ],
     };
   }
