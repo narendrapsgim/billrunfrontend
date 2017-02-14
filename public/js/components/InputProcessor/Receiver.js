@@ -4,27 +4,29 @@ export default class Receiver extends Component {
 
   componentDidMount() {
     const { action } = this.props;
-    if (action === 'new') {
-      this.initDefaultValues();
-    }
+    this.initDefaultValues();
   }
 
   initDefaultValues = () => {
-    const passive = {
-      target: {
-        id: 'passive',
-        checked: false,
-      },
-    };
-    this.props.onSetReceiverCheckboxField(passive);
-
-    const deletReceived = {
-      target: {
-        id: 'delete_received',
-        checked: false,
-      },
-    };
-    this.props.onSetReceiverCheckboxField(deletReceived);
+    const { settings } = this.props;
+    if (settings.get('passive', null) === null) {
+      const passive = {
+        target: {
+          id: 'passive',
+          checked: false,
+        },
+      };
+      this.props.onSetReceiverCheckboxField(passive);
+    }
+    if (settings.get('delete_received', null) === null) {
+      const deletReceived = {
+        target: {
+          id: 'delete_received',
+          checked: false,
+        },
+      };
+      this.props.onSetReceiverCheckboxField(deletReceived);
+    }
   }
 
   render() {

@@ -10,6 +10,8 @@ export default class CurrencyTax extends Component {
       { label: 'NIS ₪', val: 'NIS' },
       { label: 'USD $', val: 'USD' },
       { label: 'EUR €', val: 'EUR' },
+      { label: 'AUD $', val: 'AUD' },
+      { label: 'SRD $', val: 'SRD' },
     ],
   };
 

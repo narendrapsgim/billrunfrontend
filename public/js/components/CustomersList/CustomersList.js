@@ -10,7 +10,6 @@ import { Button } from "react-bootstrap";
 
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
-import { titlize } from '../../common/Util';
 import { getSettings } from '../../actions/settingsActions';
 
 class CustomersList extends Component {

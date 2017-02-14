@@ -33,14 +33,9 @@ class App extends Component {
       PropTypes.string,
       null,
     ]),
-    menuItems: React.PropTypes.oneOfType([
-      PropTypes.instanceOf(Immutable.Iterable),
-      null,
-    ]),
   };
 
   static defaultProps = {
-    menuItems: null,
     mainMenuOverrides: null,
     auth: null,
     title: '',
@@ -76,13 +71,16 @@ class App extends Component {
     if (auth !== true && nextProps.auth === true) { // user did success login
       // get global system settings
       this.props.dispatch(getSettings(['pricing', 'tenant', 'menu']))
-      .then(
-        responce => ((responce) ? this.props.logoName : '')
-      ).then(
-        logoFileName => ((logoFileName && logoFileName.length > 0) ? this.props.dispatch(fetchFile({ filename: logoFileName }, 'logo')) : true
-      )).then(
-        () => { this.props.dispatch(systemRequirementsLoadingComplete()); }
-      );
+        .then(responce => ((responce) ? this.props.logoName : ''))
+        .then((logoFileName) => {
+          if (logoFileName && logoFileName.length > 0) {
+            return this.props.dispatch(fetchFile({ filename: logoFileName }, 'logo'));
+          }
+          return true;
+        })
+        .then(() => {
+          this.props.dispatch(systemRequirementsLoadingComplete());
+        });
     }
   }
 
@@ -125,7 +123,7 @@ class App extends Component {
           </Row>
         </div>
       </div>
-    )
+    );
   }
 
   renderWithoutLayout = () => (
@@ -173,7 +171,6 @@ const mapStateToProps = state => ({
   title: state.guiState.page.get('title'),
   systemRequirementsLoad: state.guiState.page.get('systemRequirementsLoad'),
   mainMenuOverrides: state.settings.getIn(['menu', 'main']),
-  menuItems: state.guiState.menu.get('main'),
   logo: state.settings.getIn(['files', 'logo']),
   logoName: state.settings.getIn(['tenant', 'logo']),
 });
