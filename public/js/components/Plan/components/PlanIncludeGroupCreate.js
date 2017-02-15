@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
+import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import Select from 'react-select';
-import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { GroupsInclude } from '../../../FieldDescriptions';
+import CreateButton from '../../Elements/CreateButton';
 import Help from '../../Help';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '../../Field';
@@ -29,7 +30,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
   defaultState = {
     name: '', usage: '', include: '', products: Immutable.List(), shared: false,
-    error: '',
+    error : '',
     stepIndex: 0, open: false,
   }
 
@@ -113,7 +114,7 @@ export default class PlanIncludeGroupCreate extends Component {
           return false;
         }
         const duplicateProducts = products.filter(product => usedProducts.includes(product));
-        if (duplicateProducts.size) {
+        if( duplicateProducts.size ){
           this.setState({ error: productsErrors.exist + duplicateProducts.join(', ') });
           return false;
         }
@@ -128,43 +129,43 @@ export default class PlanIncludeGroupCreate extends Component {
   onChangeGroupName = (e) => {
     const name = e.target.value.toUpperCase();
     const error = (name.length && !globalSetting.keyUppercaseRegex.test(name)) ? this.errors.name.allowedCharacters : '';
-    this.setState({ name, error });
+    this.setState({name, error});
   }
 
   onChangeShared = (e) => {
-    const { checked: shared } = e.target;
+    const { checked:shared } = e.target;
     this.setState({ shared });
   }
 
   onChangeUsageType = (newValue) => {
-    this.setState({ usage: newValue, products: Immutable.List(), error: '' });
+    this.setState({usage: newValue, products: Immutable.List(), error:''});
   }
 
   onChangeInclud = (newValue) => {
-    const error = (!(/^[+-]?\d+(\.\d+)?$/.test(newValue)) && newValue !== 'UNLIMITED') ? this.errors.include.allowedCharacters : '';
-    this.setState({ include: newValue, error });
+    const error =  (!( /^[+-]?\d+(\.\d+)?$/.test( newValue )) && newValue !== 'UNLIMITED' ) ? this.errors.include.allowedCharacters : '' ;
+    this.setState({include: newValue, error});
   }
 
   onAddProduct = (key) => {
     const products = this.state.products.push(key);
-    this.setState({ products, error: '' });
+    this.setState({products, error: ''});
   }
 
   onRemoveProduct = (key) => {
     const products = this.state.products.filter(product => key !== product);
-    this.setState({ products, error: '' });
+    this.setState({products, error: ''});
   }
 
   handlePrev = () => {
-    const { stepIndex } = this.state;
+    const {stepIndex} = this.state;
     if (stepIndex > 0) {
-      this.setState({ stepIndex: stepIndex - 1, error: '' });
+      this.setState({stepIndex: stepIndex - 1, error:''});
     }
   }
 
   handleNext = () => {
-    const { stepIndex } = this.state;
-    if (this.validateStep(stepIndex)) {
+    const {stepIndex} = this.state;
+    if(this.validateStep(stepIndex)){
       this.setState({
         stepIndex: stepIndex + 1,
       });
@@ -172,7 +173,7 @@ export default class PlanIncludeGroupCreate extends Component {
   };
 
   resetState = (open = true) => {
-    this.setState(Object.assign({}, this.defaultState, { open }));
+    this.setState(Object.assign({}, this.defaultState, {open}));
   }
 
   handleCancel = () => {
@@ -181,7 +182,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
   handleFinish = () => {
     const { stepIndex, name, usage, include, products, shared } = this.state;
-    if (this.validateStep(stepIndex)) {
+    if(this.validateStep(stepIndex)){
       this.props.addGroup(name, usage, include, shared, products);
       this.resetState(false);
     }
@@ -209,7 +210,7 @@ export default class PlanIncludeGroupCreate extends Component {
               Name<Help contents={GroupsInclude.name} />
             </Col>
             <Col sm={8}>
-              <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName} />
+              <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName}/>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
             </Col>
           </FormGroup>
@@ -258,7 +259,7 @@ export default class PlanIncludeGroupCreate extends Component {
             <Col sm={8}>
               { products.size
                ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />
-               : <p style={{ marginTop: 8 }}>No products in group ...</p>
+               : <p style={{marginTop:8}}>No products in group ...</p>
               }
               <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
                 <ProductSearchByUsagetype
@@ -287,7 +288,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
     return (
       <div>
-        <Button bsSize="xsmall" className="btn-primary" onClick={this.handleToggleBoby}><i className="fa fa-plus" />&nbsp;Create New Group</Button>
+        <CreateButton onClick={this.handleToggleBoby} type="Group" />
         <Modal show={open} keyboard={false}>
 
           <Modal.Header closeButton onHide={this.handleCancel}>
@@ -311,7 +312,7 @@ export default class PlanIncludeGroupCreate extends Component {
           </Modal.Header>
 
           <Modal.Body>
-            <div style={{ marginTop: 25, marginBottom: 25 }}>
+            <div style={{marginTop: 25, marginBottom: 25}}>
               <Form horizontal>
                 {this.getStepContent(stepIndex)}
               </Form>
@@ -319,7 +320,7 @@ export default class PlanIncludeGroupCreate extends Component {
           </Modal.Body>
 
           <Modal.Footer>
-            <Button bsSize="small" onClick={this.handlePrev} style={{ marginRight: 9, minWidth: 90 }}><i className="fa fa-angle-left" />&nbsp;Back</Button>
+            <Button bsSize="small" onClick={this.handlePrev} style={{marginRight: 9, minWidth: 90}}><i className="fa fa-angle-left" />&nbsp;Back</Button>
             { (stepIndex === 3)
               ? <Button bsSize="small" onClick={this.handleFinish} style={{ minWidth: 90 }} bsStyle="primary">Add</Button>
               : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 90 }}>Next&nbsp;<i className="fa fa-angle-right" /></Button>
