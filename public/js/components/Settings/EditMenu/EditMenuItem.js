@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { Col, Form, FormGroup, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../../Field';
-import EditMenuItemsDetails from './EditMenuItemsDetails';
+import ModalWrapper from '../../Elements/ModalWrapper';
 
 
 class EditMenuItem extends Component {
@@ -101,7 +101,7 @@ class EditMenuItem extends Component {
     }));
 
     return (
-      <EditMenuItemsDetails show={editMode} onOk={this.onSaveAdvencedEdit} onCancel={this.onCancelAdvencedEdit} title={`Edit ${currentTitle} Details`}>
+      <ModalWrapper show={editMode} onOk={this.onSaveAdvencedEdit} onCancel={this.onCancelAdvencedEdit} title={`Edit ${currentTitle} Details`}>
         <Form horizontal>
           <FormGroup>
             <Col sm={2} componentClass={ControlLabel}>Label</Col>
@@ -117,7 +117,7 @@ class EditMenuItem extends Component {
             </Col>
           </FormGroup>
         </Form>
-      </EditMenuItemsDetails>
+      </ModalWrapper>
     );
   }
 

@@ -1,7 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { Panel, Button } from 'react-bootstrap';
+import classNames from 'classnames';
 import Immutable from 'immutable';
 import Help from '../../Help';
+import CreateButton from '../../Elements/CreateButton';
 import ProductPrice from '../../Product/components/ProductPrice';
 
 export default class PlanProduct extends Component {
@@ -27,7 +29,7 @@ export default class PlanProduct extends Component {
   componentWillMount() {
     const { item, usaget, prices } = this.props;
     this.addDefaultPriceIfNoPrice(item, usaget, prices);
-  }
+    }
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     const { prices } = this.props;
@@ -67,21 +69,21 @@ export default class PlanProduct extends Component {
 
   onProductAddRate = () => {
     const { item, usaget } = this.props;
-    const productKey = item.get('key');
+    const productKey  = item.get('key');
     const productPath = ['rates', productKey, usaget];
     this.props.onProductAddRate(productPath);
   }
 
   onProductRemoveRate = (index) => {
     const { item, usaget } = this.props;
-    const productKey = item.get('key');
+    const productKey  = item.get('key');
     const productPath = ['rates', productKey, usaget];
     this.props.onProductRemoveRate(productPath, index);
   }
 
   onProductRemove = () => {
     const { item } = this.props;
-    const productKey = item.get('key');
+    const productKey  = item.get('key');
     const productPath = ['rates'];
     this.props.onProductRemove(productPath, productKey);
   }
@@ -116,10 +118,7 @@ export default class PlanProduct extends Component {
             onProductRemoveRate={this.onProductRemoveRate}
           />
         )}
-        <div>
-          <br />
-          <Button bsSize="xsmall" className="btn-primary pull-left" onClick={this.onProductAddRate}><i className="fa fa-plus" />&nbsp;Add New</Button>
-        </div>
+        { !isRemoved && <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
       </Panel>
     );
   }

@@ -193,11 +193,11 @@ export function saveSettings(categories = []) {
   };
 }
 
-export function setFieldPosition(index, over, setting) {
+export function setFieldPosition(oldIndex, newIndex, path) {
   return {
     type: SET_FIELD_POSITION,
-    index,
-    over,
-    setting
+    oldIndex,
+    newIndex,
+    path,
   };
 }
