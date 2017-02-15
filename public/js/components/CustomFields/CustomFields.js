@@ -28,8 +28,8 @@ class CustomFields extends Component {
       subscriber: ['firstname', 'lastname'],
     },
     defaultHiddenFields: {
-      account: ['aid'],
-      subscriber: ['sid', 'aid'],
+      account: ['aid', 'payment_gateway'],
+      subscriber: ['sid', 'aid', 'plan_activation', 'services'],
     },
     tabs: ['account', 'subscriber'],
   };
