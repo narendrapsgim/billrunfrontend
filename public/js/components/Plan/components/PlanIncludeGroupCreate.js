@@ -3,7 +3,6 @@ import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import Select from 'react-select';
-import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import CreateButton from '../../Elements/CreateButton';
