@@ -13,7 +13,10 @@ class CollectionSettings extends Component {
   };
 
   static propTypes = {
-    minDebt: PropTypes.number,
+    minDebt: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     dispatch: PropTypes.func.isRequired,
   }
 

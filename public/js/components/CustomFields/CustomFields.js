@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { ucFirst } from 'change-case';
-
+import { Tabs, Tab, Panel } from 'react-bootstrap';
 import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
-
-import { Tabs, Tab, Panel, Row, Col } from 'react-bootstrap';
 import CustomField from './CustomField';
 
 class CustomFields extends Component {
@@ -18,7 +16,7 @@ class CustomFields extends Component {
     subscriber: React.PropTypes.instanceOf(Immutable.List),
     account: React.PropTypes.instanceOf(Immutable.List)
   };
-  
+
   constructor(props) {
     super(props);
 
@@ -50,7 +48,7 @@ class CustomFields extends Component {
   onClickSave = () => {
     this.props.dispatch(saveSettings('subscribers'));
   };
-  
+
   dragStart = (e) => {
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', e.currentTarget);
@@ -59,16 +57,15 @@ class CustomFields extends Component {
   dragOver = (over) => {
     this.setState({over});
   };
-  
+
   dragEnd = (index) => {
     const { over, tab, tabs } = this.state;
     const setting = tabs[tab];
     this.props.dispatch(setFieldPosition(index, over, ['subscribers', setting, 'fields']));
     this.setState({'over': -1});
   };
-  
+
   onSelectTab = (key) => {
-    console.log(this.state.tabs[key]);
     this.setState({tab: this.state.tabs[key]});
   };
 
@@ -109,7 +106,7 @@ class CustomFields extends Component {
       </Tab>
     );
   };
-  
+
   render() {
     const { account, subscriber } = this.props;
 

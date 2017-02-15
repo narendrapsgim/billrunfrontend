@@ -31,14 +31,14 @@ export default class ChargingPlanDetails extends Component {
     },
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
-  }
-
   componentDidMount() {
     if (this.props.mode === 'new') {
       this.setDefaultValues();
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
+    return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
   }
 
   onChangeName = (e) => {

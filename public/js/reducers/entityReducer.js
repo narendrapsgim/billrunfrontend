@@ -23,7 +23,7 @@ export default function (state = defaultState, action) {
 
     case actions.CLEAR_ENTITY:
       if (collection) {
-        return state.set(collection, Immutable.Map())
+        return state.set(collection, Immutable.Map());
       }
       return defaultState;
 

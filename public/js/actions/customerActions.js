@@ -4,7 +4,6 @@ export const CLEAR_CUSTOMER = 'CLEAR_CUSTOMER';
 
 import _ from 'lodash';
 import moment from 'moment';
-import { showProgressBar, hideProgressBar } from './progressbarActions';
 import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
 
 export function updateCustomerField(field_id, value) {
@@ -48,7 +47,7 @@ function fetchCustomer(aid) {
     ).catch(
       error => dispatch(apiBillRunErrorHandler(error))
     );
-  };  
+  };
 }
 
 export function getCustomer(aid) {

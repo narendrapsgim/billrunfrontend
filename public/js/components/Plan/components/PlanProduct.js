@@ -1,145 +1,112 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Panel, Button } from 'react-bootstrap';
-import classNames from 'classnames';
-import moment from 'moment';
 import Immutable from 'immutable';
 import Help from '../../Help';
-import Field from '../../Field';
 import ProductPrice from '../../Product/components/ProductPrice';
 
 export default class PlanProduct extends Component {
 
   static propTypes = {
-    onProductInitRate: React.PropTypes.func.isRequired,
-    onProductAddRate: React.PropTypes.func.isRequired,
-    onProductEditRate: React.PropTypes.func.isRequired,
-    onProductEditRateTo: React.PropTypes.func.isRequired,
-    onProductRemoveRate: React.PropTypes.func.isRequired,
-    onProductRestore: React.PropTypes.func.isRequired,
-    onProductRemove: React.PropTypes.func.isRequired,
-    onProductUndoRemove: React.PropTypes.func.isRequired,
-    planName: React.PropTypes.string.isRequired,
-    index: React.PropTypes.number.isRequired,
-    count: React.PropTypes.number.isRequired,
-    item: React.PropTypes.instanceOf(Immutable.Map),
+    onProductInitRate: PropTypes.func.isRequired,
+    onProductAddRate: PropTypes.func.isRequired,
+    onProductEditRate: PropTypes.func.isRequired,
+    onProductEditRateTo: PropTypes.func.isRequired,
+    onProductRemoveRate: PropTypes.func.isRequired,
+    onProductRemove: PropTypes.func.isRequired,
+    onProductRestore: PropTypes.func.isRequired,
+    usaget: PropTypes.string.isRequired,
+    item: PropTypes.instanceOf(Immutable.Map),
+    prices: PropTypes.instanceOf(Immutable.List),
   }
 
-  shouldComponentUpdate(nextProps, nextState){
-    //if count was changed and this is last item
-    const isLastAdded = this.props.count < nextProps.count && this.props.index === (this.props.count - 1);
-    const isLastremoved = this.props.count > nextProps.count && this.props.index === (this.props.count - 2);
-    return !Immutable.is(this.props.item, nextProps.item) || this.props.index !== nextProps.index || isLastAdded || isLastremoved;
-  }
+  static defaultProps = {
+    item: Immutable.Map(),
+    prices: Immutable.List(),
+  };
 
   componentWillMount() {
-    const { item, planName } = this.props;
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName, 'rate'];
-    // if product don't have pricing for this plan, init with BASE price
-    if(typeof item.getIn(productPath) === 'undefined'){
-      this.props.onProductInitRate(item.get('key'), productPath);
-    }
+    const { item, usaget, prices } = this.props;
+    this.addDefaultPriceIfNoPrice(item, usaget, prices);
   }
 
-  componentWillUpdate(nextProps, nextState){
-    const { item, planName } = nextProps;
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName, 'rate'];
-    const isRemoved   = (item.getIn(['uiflags', 'removed']) === true) ? true : false;
-    const isEmpty     = (item.getIn(productPath) && item.getIn(productPath, Immutable.List()).size > 0 )  ? false : true;
-    // If product don't have pricing in PLAN, set new empty one
-    if(!isRemoved && isEmpty){
-      this.props.onProductAddRate(item.get('key'), productPath);
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
+    const { prices } = this.props;
+    return !Immutable.is(prices, nextProps.prices);
+  }
+
+  componentWillUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
+    const { item, usaget, prices } = nextProps;
+    this.addDefaultPriceIfNoPrice(item, usaget, prices);
+  }
+
+  addDefaultPriceIfNoPrice = (item, usaget, prices) => {
+    // if product don't have pricing for this plan, init with BASE price
+    if (prices.size === 0) {
+      const productKey = item.get('key', '');
+      const productPath = ['rates', productKey, usaget];
+      this.props.onProductInitRate(item, productPath);
     }
   }
 
   onProductEditRate = (index, fieldName, value) => {
-    const { item, planName } = this.props;
+    const { item, usaget } = this.props;
     const productKey = item.get('key');
-    const usageType = item.get('rates').keySeq().first();
     switch (fieldName) {
       case 'to': {
-        const fieldPath = ['rates', usageType, planName, 'rate'];
-        this.props.onProductEditRateTo(productKey, fieldPath, index, value);
+        const fieldPath = ['rates', productKey, usaget];
+        this.props.onProductEditRateTo(fieldPath, index, value);
       }
         break;
 
       default: {
-        const fieldPath = ['rates', usageType, planName, 'rate', index, fieldName];
-        this.props.onProductEditRate(productKey, fieldPath, value);
+        const fieldPath = ['rates', productKey, usaget, index, fieldName];
+        this.props.onProductEditRate(fieldPath, value);
       }
     }
   }
 
   onProductAddRate = () => {
-    const { item, planName } = this.props;
-    const productKey  = item.get('key');
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName, 'rate'];
-    this.props.onProductAddRate(productKey, productPath);
+    const { item, usaget } = this.props;
+    const productKey = item.get('key');
+    const productPath = ['rates', productKey, usaget];
+    this.props.onProductAddRate(productPath);
   }
 
   onProductRemoveRate = (index) => {
-    const { item, planName } = this.props;
-    const productKey  = item.get('key');
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName, 'rate'];
-    this.props.onProductRemoveRate(productKey, productPath, index);
-  }
-
-  onProductUndoRemove = () => {
-    const { item, planName } = this.props;
-    const productKey  = item.get('key');
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName]
-    this.props.onProductUndoRemove(productKey, productPath);
+    const { item, usaget } = this.props;
+    const productKey = item.get('key');
+    const productPath = ['rates', productKey, usaget];
+    this.props.onProductRemoveRate(productPath, index);
   }
 
   onProductRemove = () => {
-    const { item, planName } = this.props;
-    const productKey  = item.get('key');
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName];
-    const isExisting  = item.getIn(['uiflags', 'existing'], false);
-    this.props.onProductRemove(productKey, productPath, isExisting);
+    const { item } = this.props;
+    const productKey = item.get('key');
+    const productPath = ['rates'];
+    this.props.onProductRemove(productPath, productKey);
   }
 
   onProductRestore = () => {
-    const { item, planName } = this.props;
-    const productKey  = item.get('key');
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName, 'rate'];
-    const isExisting  = item.getIn(['uiflags', 'existing'], false);
-    this.props.onProductRestore(productKey, productPath, isExisting);
+    const { item, usaget } = this.props;
+    const productKey = item.get('key', '');
+    const productPath = ['rates', productKey, usaget];
+    this.props.onProductRestore(item, productPath);
   }
 
   render() {
-    const { item, planName, index, count } = this.props;
-    const usageType   = item.get('rates').keySeq().first();
-    const productPath = ['rates', usageType, planName, 'rate'];
-    const isRemoved   = item.getIn(['uiflags', 'removed'], false);
-    const isExisting  = item.getIn(['uiflags', 'existing'], false);
-    const isLast      = ((count === 0) || (count-1 === index));
-    const priceCount  = (item.getIn(productPath)) ? item.getIn(productPath, Immutable.List()).size : 0;
-
-    const isRemovedClass = classNames({
-      'product-removed': isRemoved,
-    });
-
+    const { item, prices, usaget } = this.props;
+    const priceCount = prices.size;
     const header = (
-      <h3 className={isRemovedClass}>
-        {item.get('key')} <i>{item.get('code')}</i><Help contents={item.get('description')}/>
-        {(isRemoved)
-          ? <Button onClick={this.onProductUndoRemove} bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}><i className="fa fa-mail-reply" />&nbsp;Undo</Button>
-          : <Button onClick={this.onProductRemove} bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
-        }
+      <h3>
+        {item.get('key')} ({usaget}) <i>{item.get('code')}</i><Help contents={item.get('description')} />
+        <Button onClick={this.onProductRemove} bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
         <Button onClick={this.onProductRestore} bsSize="xsmall" className="pull-right" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-undo fa-lg" /> &nbsp;Restore </Button>
       </h3>
     );
 
     return (
       <Panel header={header}>
-        { !isRemoved && priceCount && item.getIn(productPath).map( (price, i) =>
+        { prices.map((price, i) =>
           <ProductPrice
             key={i}
             item={price}
@@ -149,7 +116,10 @@ export default class PlanProduct extends Component {
             onProductRemoveRate={this.onProductRemoveRate}
           />
         )}
-        { !isRemoved && <div><br /><Button bsSize="xsmall" className="btn-primary pull-left" onClick={this.onProductAddRate}><i className="fa fa-plus" />&nbsp;Add New</Button></div> }
+        <div>
+          <br />
+          <Button bsSize="xsmall" className="btn-primary pull-left" onClick={this.onProductAddRate}><i className="fa fa-plus" />&nbsp;Add New</Button>
+        </div>
       </Panel>
     );
   }

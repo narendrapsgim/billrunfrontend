@@ -1,120 +1,50 @@
-import { hideProgressBar } from '../actions/progressbarActions';
-import { showDanger } from '../actions/alertsActions';
+import { dismissProgressIndicator, finishProgressIndicator } from '../actions/progressIndicatorActions';
+import { showDanger, showSuccess } from '../actions/alertsActions';
 
-
-//help function to simulate API response with delay
-export function delay(sec = 2, success = true, mock = { 'success': true }) {
-  return new Promise((resolve, reject) => {
-    let callback = success ? () => {
-      resolve(mock);
-    } : () => {
-      reject(mock);
-    };
+// Helper function to simulate API response with delay
+export const delay = (sec = 2, success = true, mock = { success: true }) =>
+  new Promise((resolve, reject) => {
+    const callback = success
+      ? () => { resolve(mock); }
+      : () => { reject(mock); };
     setTimeout(callback, sec * 1000);
   });
-}
 
-//Handel API errors
-export function apiBillRunErrorHandler(error, defaultMessage = 'Error, please try again...') {
-  return (dispatch, getState) => {
-    console.log("Api Error Handler, error: ", error);
-    dispatch(hideProgressBar());
-    let errorMessage;
-    try {
-      errorMessage = error.error[0].error.data.message;
-    } catch (e1) {
-      try {
-        errorMessage = error.error[0].error.message;
-      } catch (e2) {
-        errorMessage = defaultMessage;
-      }
-    }
-    dispatch(showDanger(errorMessage));
-  };
-}
+// Helper function to remove status property from response object
+const removeStatus = ({ status, ...rest }) => rest; // eslint-disable-line no-unused-vars
 
-// Send to API
-export function apiBillRun(requests, requiredAllSuccess = true) {
-  if(!Array.isArray(requests)){
-    requests = [requests];
+// Helper function to check response user login
+const checkLogin = (response = {}) => {
+  if (response.code === 17574) {
+    location.reload();
+    throw new Error('login is required');
   }
-  //Create Prommisses array from queries
-  let promiseRequests = requests.map( (request) => sendHttpRequest(request));
-  //Send All prommisses
-  var promise = new Promise((resolve, reject) => {
-    Promise.all(promiseRequests).then(
-      success => {
-        //all requests was success
-        let allSuccess = success.every( responce => responce.status);
-        if(allSuccess){
-          let data = success.map(responce => {delete responce['status']; return responce; });
-          return resolve( Object.assign({}, { data }) );
-        }
-        //all requests was faild
-        let allFaild = success.every( responce => !responce.status);
-        if(allSuccess){
-          let error = success.map(responce => {delete responce['status']; return responce; });
-          return reject( Object.assign({}, {error}) );
-        }
-        //mixed, some faild, some success
-        let data = success.filter( responce => responce.status === 1).map(responce => {delete responce['status']; return responce; });
-        let error = success.filter( responce => responce.status === 0).map(responce => {delete responce['status']; return responce; });
-        let mix = Object.assign({}, {error}, {data});
-        return requiredAllSuccess ? reject( mix ) : resolve( mix );
-      },
-      failure => reject( Object.assign({}, {error: failure}) )
-    ).catch(
-      error => reject( Object.assign({}, {error}) )
-    );
-  });
-  return promise;
-}
+  return response;
+};
 
-//send Http request
-function sendHttpRequest(query) {
-  //Create Api URL
-  let url = globalSetting.serverUrl + buildApiString(query) + buildQueryString(query.params);
-  let requestOptions = buildQueryOptions(query.options);
-  let response = (query.name) ? { name: query.name } : {};
-  let promise = new Promise((resolve, reject) => {
-    fetch(url, requestOptions).then(
-      success => {
-        success.json().then(
-          body => {
-	    if (body.code === 17574) {
-	      console.log(body);
-	      location.reload();
-	    }
-            if (!body.status) throw body;
-            resolve(Object.assign(response, { data: body, status:1}));
-          }
-        ).catch(
-          error => { resolve(Object.assign(response, { error: error, status:0 })); }
-        );
-      }
-    ).catch(
-      error => { resolve(Object.assign(response, { error: error, status:0 })); }
-    );
-  });
+// Helper function to check response status OK
+const checkStatus = (response = null) => {
+  if (!response || !response.status) { // Check status OK
+    throw response;
+  }
+  return response;
+};
 
-  return promise;
-}
-
-//help function to bulind query options
-function buildQueryOptions(options = null){
-  //default options
-  let requestOptions = {
-    credentials: 'include'
+// Helper function to bulind query options
+const buildQueryOptions = (options = null) => {
+  // default options
+  const requestOptions = {
+    credentials: 'include',
   };
-  //overide / add option
-  if(options){
+  // overide / add option
+  if (options) {
     Object.assign(requestOptions, options);
   }
   return requestOptions;
-}
+};
 
 // Helper function to build API url
-function buildApiString(params = {}) {
+const buildApiString = (params = {}) => {
   switch (params.api) {
     case 'billapi':
     case undefined:
@@ -127,22 +57,119 @@ function buildApiString(params = {}) {
     default:
       return `/api/${params.api}`;
   }
-}
+};
 
-//help function to bulind query params string
-function buildQueryString(params = null){
+// Helper function to bulind query params string
+const buildQueryString = (params = null) => {
   let queryParams = '';
-  if(params && Array.isArray(params) && params.length > 0){
+  if (params && Array.isArray(params) && params.length > 0) {
     queryParams = params.reduce((previousValue, currentValue, currentIndex) => {
-      let key = Object.keys(currentValue)[0];
-      let prev = (currentIndex === 0) ? previousValue : previousValue + '&';
-      return prev + encodeURIComponent(key) + '=' + encodeURIComponent(currentValue[key]);
+      const key = Object.keys(currentValue)[0];
+      const prev = (currentIndex === 0) ? previousValue : `${previousValue}&`;
+      return `${prev}${encodeURIComponent(key)}=${encodeURIComponent(currentValue[key])}`;
     }, '?');
   }
-	//Set server debug flag if it enabled in config file
-  if(globalSetting.serverApiDebug === true){
+  // Set server debug flag if it enabled in config file
+  if (globalSetting.serverApiDebug === true) {
     queryParams += (queryParams.length > 0) ? '&' : '?';
     queryParams += globalSetting.serverApiDebugQueryString;
   }
   return queryParams;
-}
+};
+
+// Handel API success (ugly code to handle non standard API responses - should be improved with BillAPI)
+export const apiBillRunSuccessHandler = (success, message = false) => (dispatch) => {
+  dispatch(finishProgressIndicator());
+  let data;
+  try {
+    data = success.data[0].data.details;
+    if (typeof data === 'undefined') {
+      throw new Error();
+    }
+  } catch (e3) {
+    try {
+      data = success.data[0].data.data;
+      if (typeof data === 'undefined') {
+        throw new Error();
+      }
+    } catch (e1) {
+      data = null;
+    }
+  }
+  if (message) {
+    dispatch(showSuccess(message));
+  }
+  return ({
+    status: true,
+    data,
+  });
+};
+
+// Handel API errors (ugly code to handle non standard API responses - should be improved with standard BillAPI)
+export const apiBillRunErrorHandler = (error, defaultMessage = 'Error, please try again...') => (dispatch) => {
+  console.log('Api Error Handler, error: ', error); // eslint-disable-line  no-console
+  dispatch(dismissProgressIndicator());
+  let errorMessage;
+  if (typeof error.message === 'string') {
+    errorMessage = error.message;
+  } else {
+    try {
+      errorMessage = error.error[0].error.data.message;
+    } catch (e1) {
+      try {
+        errorMessage = error.error[0].error.message;
+      } catch (e2) {
+        try {
+          errorMessage = error.error.error[0].error.message;
+        } catch (e3) {
+          errorMessage = defaultMessage;
+        }
+      }
+    }
+  }
+  dispatch(showDanger(errorMessage));
+  return ({
+    status: false,
+    error,
+  });
+};
+
+// Send Http request
+const sendHttpRequest = (query) => {
+  // Create Api URL
+  const url = globalSetting.serverUrl + buildApiString(query) + buildQueryString(query.params);
+  const requestOptions = buildQueryOptions(query.options);
+  const response = (query.name) ? { name: query.name } : {};
+  return fetch(url, requestOptions)
+    .then(res => res.json())
+    .then(checkLogin)
+    .then(checkStatus)
+    .then(data => Object.assign(response, { data, status: 1 }))
+    .catch(error => Object.assign(response, { error, status: 0 }));
+};
+
+// Send to API
+export const apiBillRun = (requests, params = {}) => {
+  // Default api params
+  const apiParams = Object.assign({ requiredAllSuccess: true }, params);
+  const apiRequests = Array.isArray(requests) ? requests : [requests];
+  // Create Prommisses array from queries
+  const promiseRequests = apiRequests.map(request => sendHttpRequest(request));
+  // Send All prommisses
+  return Promise.all(promiseRequests)
+    .then((responses) => {
+      const data = responses.filter(responce => responce.status).map(removeStatus);
+      const error = responses.filter(responce => !responce.status).map(removeStatus);
+      // all requests was success
+      if (data.length === responses.length) {
+        return Promise.resolve({ data });
+      }
+      // all requests was faild
+      if (error.length === responses.length) {
+        return Promise.reject({ error });
+      }
+      // mixed, some faild, some success
+      const mix = { error, data };
+      return apiParams.requiredAllSuccess ? Promise.reject(mix) : Promise.resolve(mix);
+    });
+};

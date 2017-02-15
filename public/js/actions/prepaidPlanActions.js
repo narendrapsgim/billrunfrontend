@@ -11,67 +11,67 @@ export const REMOVE_BLOCK_PRODUCT = 'REMOVE_BLOCK_PRODUCT';
 export function addBalanceNotifications(balance) {
   return {
     type: ADD_BALANCE_NOTIFICATIONS,
-    balance
+    balance,
   };
 }
 
-export function addNotification(threshold_id) {
+export function addNotification(thresholdId) {
   return {
     type: ADD_NOTIFICATION,
-    threshold_id
+    thresholdId,
   };
 }
 
-export function removeNotification(threshold_id, index) {
+export function removeNotification(thresholdId, index) {
   return {
     type: REMOVE_NOTIFICATION,
-    threshold_id,
-    index
+    thresholdId,
+    index,
   };
 }
 
-export function updateNotificationField(threshold_id, index, field, value) {
+export function updateNotificationField(thresholdId, index, field, value) {
   return {
     type: UPDATE_NOTIFICATION_FIELD,
-    threshold_id,
+    thresholdId,
     index,
     field,
-    value
+    value,
   };
 }
 
-export function removeBalanceNotifications(balance_id) {
+export function removeBalanceNotifications(balanceId) {
   return {
     type: REMOVE_BALANCE_NOTIFICATIONS,
-    balance_id
+    balanceId,
   };
 }
 
 export function blockProduct(rate) {
   return {
     type: BLOCK_PRODUCT,
-    rate
+    rate,
   };
 }
 
 export function removeBlockProduct(rate) {
   return {
     type: REMOVE_BLOCK_PRODUCT,
-    rate
+    rate,
   };
 }
 
-export function addBalanceThreshold(balance_id) {
+export function addBalanceThreshold(balanceId) {
   return {
     type: ADD_BALANCE_THRESHOLD,
-    balance_id
+    balanceId,
   };
 }
 
-export function changeBalanceThreshold(balance_id, value) {
+export function changeBalanceThreshold(balanceId, value) {
   return {
     type: CHANGE_BALANCE_THRESHOLD,
-    balance_id,
-    value
+    balanceId,
+    value,
   };
 }
