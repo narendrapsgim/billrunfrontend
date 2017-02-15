@@ -118,7 +118,7 @@ export default class PlanProduct extends Component {
             onProductRemoveRate={this.onProductRemoveRate}
           />
         )}
-        { !isRemoved && <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
+        { <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
       </Panel>
     );
   }
