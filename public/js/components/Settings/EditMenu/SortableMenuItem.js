@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { Col } from 'react-bootstrap';
 import { SortableElement } from 'react-sortable-hoc';
 import EditMenuItem from './EditMenuItem';
-import DragHandle from './DragHandle';
+import DragHandle from '../../Elements/DragHandle';
 
 const SortableMenuItem = (props) => {
   const { item, onChangeField, subMenus, renderTree, newPath, editShow } = props.data;

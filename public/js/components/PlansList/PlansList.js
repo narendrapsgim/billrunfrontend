@@ -54,11 +54,14 @@ const PlansList = () => {
     code: 1,
   };
 
+  const baseFilter = { connection_type: 'postpaid' };
+
   return (
     <EntityList
       itemType="plan"
       itemsType="plans"
       filterFields={filterFields}
+      baseFilter={baseFilter}
       tableFields={tableFields}
       projectFields={projectFields}
     />

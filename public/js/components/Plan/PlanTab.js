@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, Button, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
+import CreateButton from '../Elements/CreateButton';
 import PlanPrice from './components/PlanPrice';
 
 
@@ -102,12 +103,12 @@ export default class Plan extends Component {
 
   getAddPriceButton = (trial = false) => {
     const onclick = trial ? this.onPlanTrailTariffInit : this.onPlanTariffInit;
-    return (<Button bsSize="xsmall" className="btn-primary" onClick={onclick} > <i className="fa fa-plus" />&nbsp;Add New </Button>);
+    return (<CreateButton onClick={onclick} label="Add New" />);
   }
 
   getTrialPrice = () => {
     const { plan } = this.props;
-    const trial = (plan.getIn(['price', 0, 'trial']) == true) ? plan.getIn(['price', 0]) : null;
+    const trial = (plan.getIn(['price', 0, 'trial']) === true) ? plan.getIn(['price', 0]) : null;
     if (trial) {
       return (
         <PlanPrice

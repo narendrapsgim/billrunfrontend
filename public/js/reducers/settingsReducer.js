@@ -1,12 +1,12 @@
 import Immutable from 'immutable';
 import {
   UPDATE_SETTING,
-  REMOVE_SETTING_FIELD,
-  GOT_SETTINGS,
-  PUSH_TO_SETTING,
-  ADD_PAYMENT_GATEWAY,
-  REMOVE_PAYMENT_GATEWAY,
-  UPDATE_PAYMENT_GATEWAY,
+         REMOVE_SETTING_FIELD,
+         GOT_SETTINGS,
+         PUSH_TO_SETTING,
+	 ADD_PAYMENT_GATEWAY,
+	 REMOVE_PAYMENT_GATEWAY,
+	 UPDATE_PAYMENT_GATEWAY,
   SET_FIELD_POSITION,
 } from '../actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
@@ -31,7 +31,7 @@ const defaultState = Immutable.fromJS({
 export default function (state = defaultState, action) {
   const { name, value, category, settings, gateway } = action;
 
-  switch (action.type) {
+  switch(action.type) {
     case LOGOUT:
       return defaultState;
 
@@ -92,9 +92,9 @@ export default function (state = defaultState, action) {
     }
 
     case SET_FIELD_POSITION: {
-      const curr = state.getIn([...action.setting, action.index]);
-      return state.updateIn(action.setting, list =>
-        list.delete(action.index).insert(action.over, curr)
+      const curr = state.getIn([...action.path, action.oldIndex]);
+      return state.updateIn(action.path, Immutable.List(), list =>
+        list.delete(action.oldIndex).insert(action.newIndex, curr)
       );
     }
 
