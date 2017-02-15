@@ -104,7 +104,7 @@ class ServiceSetup extends Component {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
-    const planIncludes = item.getIn(['include', 'groups'], Immutable.Map());
+    const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
     return (
       <Col lg={12}>
 
@@ -119,7 +119,7 @@ class ServiceSetup extends Component {
           <Tab title="Service Includes" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanIncludesTab
-                planIncludes={planIncludes}
+                includeGroups={includeGroups}
                 onChangeFieldValue={this.onUpdateItem}
                 onGroupAdd={this.onGroupAdd}
                 onGroupRemove={this.onGroupRemove}
