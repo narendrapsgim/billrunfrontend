@@ -24,8 +24,8 @@ const ChargingPlansList = () => {
   };
 
   const baseFilter = {
-    type: 'charging',
-    connection_type: 'prepaid',
+    connection_type: { $regex: '^prepaid$' },
+    type: { $regex: '^charging$' },
   };
 
   return (
