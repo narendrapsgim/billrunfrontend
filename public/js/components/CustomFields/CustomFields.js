@@ -12,14 +12,14 @@ import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldP
 class CustomFields extends Component {
 
   static propTypes = {
-    subscriber: PropTypes.instanceOf(Immutable.List),
-    account: PropTypes.instanceOf(Immutable.List),
+    subscriber: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
+    account: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     defaultDisabledFields: PropTypes.object,
     defaultHiddenFields: PropTypes.object,
     tabs: PropTypes.arrayOf(PropTypes.string),
     dispatch: PropTypes.func.isRequired,
   };
-  
+
   static defaultProps = {
     subscriber: Immutable.List(),
     account: Immutable.List(),
@@ -36,7 +36,7 @@ class CustomFields extends Component {
 
   state = {
     tab: 0,
-    };
+  };
 
   componentDidMount() {
     this.props.dispatch(getSettings('subscribers'));
@@ -66,7 +66,7 @@ class CustomFields extends Component {
   onClickSave = () => {
     this.props.dispatch(saveSettings('subscribers'));
   };
-  
+
   onSortEnd = ({ oldIndex, newIndex }) => {
     const { tab } = this.state;
     const { tabs } = this.props;
@@ -91,14 +91,14 @@ class CustomFields extends Component {
             key={`item-${index}`}
             index={index}
             idx={index}
-                              field={ field }
-                              entity={ entity }
+            field={field}
+            entity={entity}
             editable={editable}
-                              onChange={ this.onChangeField }
-                              onRemove={ this.onRemoveField }
+            onChange={this.onChangeField}
+            onRemove={this.onRemoveField}
           />
         );
-          }
+      }
     });
 
     return (
@@ -116,7 +116,7 @@ class CustomFields extends Component {
       </Tab>
     );
   };
-  
+
   render() {
     const { tabs } = this.props;
     return (
@@ -129,6 +129,7 @@ class CustomFields extends Component {
     );
   }
 }
+
 
 const mapStateToProps = state => ({
   subscriber: state.settings.getIn(['subscribers', 'subscriber', 'fields']),
