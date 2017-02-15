@@ -28,7 +28,7 @@ export default class Filter extends Component {
     const { value } = e.target;
     this.setState({string: value});
   }
-  
+
   filterCond(field, value) {
     const { fields } = this.props;
     let found = _.find(fields, (f) => { return f.id === field; });
@@ -53,14 +53,14 @@ export default class Filter extends Component {
       });
     }, {});
 
-    if (!string.replace(/\s/gi, '')) return JSON.stringify(baseObj);
+    if (!string.replace(/\s/gi, '')) return baseObj;
 
     const filterObj = _.reduce(filter_by, (acc, field) => {
       return Object.assign({}, acc, {
         [field]: this.filterCond(field, string)
       });
     }, baseObj);
-    return JSON.stringify(filterObj);
+    return filterObj;
   }
 
   onClickFilterBtn() {
@@ -77,13 +77,13 @@ export default class Filter extends Component {
 
   onSelectFilterField(option, checked) {
     const value = option.val();
-    const { filter_by } = this.state;    
+    const { filter_by } = this.state;
     const included = _.includes(filter_by, value);
     if (checked && included) return;
     if (!checked && included) return this.setState({filter_by: _.without(filter_by, value)});
     return this.setState({filter_by: filter_by.concat(value)});
   }
-  
+
   render() {
     const { fields = [] } = this.props;
     const { filter_by, string } = this.state;

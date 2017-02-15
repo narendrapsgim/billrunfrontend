@@ -1,126 +1,123 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import moment from 'moment';
 import { Link } from 'react-router';
-
-/* COMPONENTS */
+import Immutable from 'immutable';
+import { Col, Row, Panel } from 'react-bootstrap';
 import Pager from '../Pager';
 import Filter from '../Filter';
 import List from '../List';
 import Usage from './Usage';
-
-/* ACTIONS */
+import { usageListQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 
 class UsageList extends Component {
-  constructor(props) {
-    super(props);
 
-    this.buildQuery = this.buildQuery.bind(this);
-    this.handlePageClick = this.handlePageClick.bind(this);
-    this.onFilter = this.onFilter.bind(this);
-    this.onSort = this.onSort.bind(this);
-    this.onClickLine = this.onClickLine.bind(this);
-    this.onCancelView = this.onCancelView.bind(this);
-
-    this.state = {
-      line: null,
-      viewing: false,
-      page: 0,
-      size: 10,
-      sort: JSON.stringify({ urt: -1 }),
-      filter: ""
-    };
+  static propTypes = {
+    items: PropTypes.instanceOf(Immutable.List),
+    baseFilter: PropTypes.object,
+    dispatch: PropTypes.func.isRequired,
   }
 
-  buildQuery() {
+  static defaultProps = {
+    items: Immutable.List(),
+    baseFilter: {},
+  }
+
+  state = {
+    line: null,
+    viewing: false,
+    page: 0,
+    size: 10,
+    sort: Immutable.Map(),
+    filter: {},
+  };
+
+  buildQuery = () => {
     const { page, size, sort, filter } = this.state;
-    return {
-      api: "find",
-      params: [
-        { collection: "lines" },
-        { size },
-        { page },
-	{ sort },
-        { query: filter }
-      ]
-    };
+    return usageListQuery(filter, page, sort, size);
   }
 
-  onFilter(filter) {
-    this.setState({filter, page: 0}, () => {
-      this.props.dispatch(getList('usages', this.buildQuery()))
-    });
+  onFilter = (filter) => {
+    this.setState({ filter, page: 0 }, this.fetchItems);
   }
 
-  handlePageClick(page) {
-    this.setState({page}, () => {
-      this.props.dispatch(getList('usages', this.buildQuery()))
-    });
+  handlePageClick = (page) => {
+    this.setState({ page }, this.fetchItems);
   }
 
-  onSort(sort) {
-    this.setState({sort}, () => {
-      this.props.dispatch(getList('usages', this.buildQuery()));
-    });
+  onSort = (newSort) => {
+    const sort = Immutable.Map(newSort);
+    this.setState({ sort }, this.fetchItems);
   }
 
-  onClickLine(line) {
-    this.setState({line, viewing: true});
+  onClickLine = (line) => {
+    this.setState({ line, viewing: true });
   }
 
-  onCancelView() {
-    this.setState({line: null, viewing: false});
+  onCancelView = () => {
+    this.setState({ line: null, viewing: false });
   }
+
+  fetchItems = () => {
+    this.props.dispatch(getList('usages', this.buildQuery()));
+  }
+
+  getTableFields = () => {
+    const { baseFilter } = this.props;
+
+    return ([
+      { id: 'type', placeholder: 'Type', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'type') },
+      { id: 'aid', placeholder: 'Customer ID', type: 'number', sort: true, showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'aid') },
+      { id: 'sid', placeholder: 'Subscription ID', type: 'number', sort: true, showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'sid') },
+      { id: 'plan', placeholder: 'Plan', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'plan') },
+      { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false, sort: true },
+    ]);
+  }
+
+  renderMainPanelTitle = () => (
+    <div>
+      <span>List of all usages</span>
+      <div className="pull-right">
+        <Link to={'/queue'} className="btn btn-default btn-xs">Go to Queue</Link>
+      </div>
+    </div>
+  );
 
   render() {
     const { line, viewing, sort } = this.state;
-    const { usages } = this.props;
-
-    const fields = [
-      {id: "type", placeholder: "Type"},
-      {id: "aid", placeholder: "Customer ID", type: "number", sort: true},
-      {id: "sid", placeholder: "Subscription ID", type: "number", sort: true},
-      {id: "plan", placeholder: "Plan"},
-      {id: "urt", placeholder: "Time", type: "datetime", cssClass: 'long-date', showFilter: false, sort: true }
-    ];
-
-    const base = this.props.location.query.base ? JSON.parse(this.props.location.query.base) : {};
-
+    const { items, baseFilter } = this.props;
+    const fields = this.getTableFields();
     return (
-      <div>
+      <div className="UsageList">
         { viewing ? (<Usage line={line} onClickCancel={this.onCancelView} />) : null }
         <div style={{ display: viewing ? 'none' : 'block' }}>
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="panel panel-default">
-                <div className="panel-heading">
-                  <span>
-                    List of all usages
-                  </span>
-                  <div className="pull-right">
-                    <Link to={'/queue'} className="btn btn-default btn-xs">Go to Queue</Link>
-                  </div>
-                </div>
-                <div className="panel-body">
-                  <Filter fields={fields} onFilter={this.onFilter} base={base} />
-                  <List items={usages} fields={fields} edit={true} onClickEdit={this.onClickLine} editText="view" onSort={this.onSort} sort={sort}/>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Pager onClick={this.handlePageClick}
-                 size={this.state.size}
-                 count={usages.size || 0} />
+          <Row>
+            <Col lg={12}>
+              <Panel header={this.renderMainPanelTitle()}>
+                <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
+                <List
+                  items={items}
+                  fields={fields}
+                  edit={true}
+                  onClickEdit={this.onClickLine}
+                  editText="view"
+                  onSort={this.onSort}
+                  sort={sort}
+                />
+              </Panel>
+            </Col>
+          </Row>
+          <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
         </div>
       </div>
     );
   }
 }
 
-function mapStateToProps(state, props) {
-  return { usages: state.list.get('usages') || [] };
-}
+
+const mapStateToProps = (state, props) => ({
+  items: state.list.get('usages'),
+  baseFilter: props.location.query.base ? JSON.parse(props.location.query.base) : {},
+});
 
 export default connect(mapStateToProps)(UsageList);

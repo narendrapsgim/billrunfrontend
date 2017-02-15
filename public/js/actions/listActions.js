@@ -1,99 +1,75 @@
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
-import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator } from './progressIndicatorActions';
-import { showDanger } from './alertsActions';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
   GOT_LIST: 'GOT_LIST',
+  ADD_TO_LIST: 'ADD_TO_LIST',
+  REMOVE_FROM_LIST: 'REMOVE_FROM_LIST',
   CLEAR_LIST: 'CLEAR_LIST',
-  SET_NEXT_PAGE: 'SET_NEXT_PAGE'
+  SET_NEXT_PAGE: 'SET_NEXT_PAGE',
 };
 
-const defaultParams = {
-  api: "find",
-  size: 10,
-  page: 0,
-  sort: {},
-  query: {}
+const gotList = (collection, list) => ({
+  type: actions.GOT_LIST,
+  collection,
+  list,
+});
+
+const setNextPage = nextPage => ({
+  type: actions.SET_NEXT_PAGE,
+  nextPage,
+});
+
+export const addToList = (collection, items) => ({
+  type: actions.ADD_TO_LIST,
+  collection,
+  items,
+});
+
+const fetchList = (collection, params) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  return apiBillRun(params)
+  .then((success) => {
+    try {
+      dispatch(gotList(collection, success.data[0].data.details));
+      dispatch(setNextPage(success.data[0].data.next_page));
+      return dispatch(apiBillRunSuccessHandler(success));
+    } catch (e) {
+      console.log('fetchList error: ', e);
+      throw new Error('Error retreiving list');
+    }
+  })
+  .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
 };
 
-export function clearList(collection) {
-  return {
-    type: actions.CLEAR_LIST,
-    collection
-  };
-}
+const fetchToList = (collection, params) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  return apiBillRun(params)
+  .then((success) => {
+    try {
+      dispatch(addToList(collection, success.data[0].data.details));
+      return dispatch(apiBillRunSuccessHandler(success));
+    } catch (e) {
+      console.log('fetchToList error: ', e);
+      throw new Error('Error retreiving list');
+    }
+  })
+  .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
+};
 
-function gotList(collection, list) {
-  return {
-    type: actions.GOT_LIST,
-    collection,
-    list
-  };
-}
+export const clearList = collection => ({
+  type: actions.CLEAR_LIST,
+  collection,
+});
 
-function setNextPage(nextPage) {
-  return {
-    type: actions.SET_NEXT_PAGE,
-    nextPage
-  };
-}
+export const deleteFromList = (collection, index) => ({
+  type: actions.REMOVE_FROM_LIST,
+  collection,
+  index,
+});
 
-function fetchList(collection, params) {
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    apiBillRun(params).then(
-      success => {
-	dispatch(finishProgressIndicator());
-        dispatch(setNextPage(success.data[0].data.next_page));
-        dispatch(gotList(collection, success.data[0].data.details));
-      },
-      failure => {
-	dispatch(showDanger("Error retreiving list"));
-        dispatch(finishProgressIndicator());
-      }
-    ).catch(
-      error => {
-        dispatch(finishProgressIndicator());
-	dispatch(showDanger("Network error - please refresh and try again"));
-      }
-    );
-  };
-}
+export const getList = (collection, params) => dispatch =>
+  dispatch(fetchList(collection, params));
 
-export function getList(collection, params = defaultParams) {
-  return (dispatch) => {
-    return dispatch(fetchList(collection, params));
-  };
-}
-
-function fetchPaymentGateways() {
-  const query = {
-    api: "paymentgateways",
-    action: "list"
-  };
-
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      success => {
-	dispatch(finishProgressIndicator());
-        dispatch(gotList('supported_gateways', success.data[0].data.details));
-      },
-      failure => {
-	dispatch(showDanger("Error retrieving payment gateways"));
-        dispatch(finishProgressIndicator());
-      }
-    ).catch(
-      error => {
-        dispatch(finishProgressIndicator());
-	dispatch(showDanger("Network error - please refresh and try again"));
-      }
-    );
-  };
-}
-
-export function getPaymentGateways() {
-  return (dispatch) => {
-    return dispatch(fetchPaymentGateways());
-  };
-}
+export const pushToList = (collection, params) => dispatch =>
+  dispatch(fetchToList(collection, params));

@@ -38,7 +38,7 @@ export default class Plan extends Component {
     const { plan } = this.props;
     const count = plan.get('price', Immutable.List()).size;
     if (count === 0) {
-      this.props.onPlanTariffAdd(false);
+      this.props.onPlanTariffAdd();
     }
   }
 
@@ -47,7 +47,7 @@ export default class Plan extends Component {
   }
 
   onPlanTariffInit = (e) => {
-    this.props.onPlanTariffAdd(false);
+    this.props.onPlanTariffAdd();
   }
 
   onChangePlanName = (e) => {
@@ -163,15 +163,19 @@ export default class Plan extends Component {
             <Panel>
 
               <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>Title<Help contents={PlanDescription.description} /></Col>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  Title<Help contents={PlanDescription.description} />
+                </Col>
                 <Col sm={8} lg={9}>
                   <Field value={plan.get('description', '')} onChange={this.onChangePlanDescription} />
                 </Col>
               </FormGroup>
 
-              {mode === 'new' &&
+              {mode === 'create' &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>Key<Help contents={PlanDescription.name} /></Col>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    Key <Help contents={PlanDescription.name} />
+                  </Col>
                   <Col sm={8} lg={9}>
                     <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} />
                     { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
@@ -180,20 +184,13 @@ export default class Plan extends Component {
               }
 
               <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>External Code<Help contents={PlanDescription.code} /></Col>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  External Code<Help contents={PlanDescription.code} />
+                </Col>
                 <Col sm={8} lg={9}>
                   <Field onChange={this.onChangePlanCode} value={plan.get('code', '')} />
                 </Col>
               </FormGroup>
-
-              {/*
-              <Col lg={4} md={4}>
-                    <FormGroup>
-                    <ControlLabel>Recurrence</ControlLabel>
-                    <Field min="1" fieldType="number" value={plan.getIn(['recurrence', 'unit'], '')} onChange={this.onChangePlanEach} />
-                    </FormGroup>
-              </Col>
-              */}
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Billing Frequency</Col>

@@ -1,37 +1,37 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
+import Select from 'react-select';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import CreateButton from '../../Elements/CreateButton';
 import Help from '../../Help';
-import UsagetypeSelect from './UsagetypeSelect';
+import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '../../Field';
 import Products from './Products';
-import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 
 
 export default class PlanIncludeGroupCreate extends Component {
 
   static propTypes = {
-    allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
-    existinGrousNames: React.PropTypes.instanceOf(Immutable.Set),
-    addGroup: React.PropTypes.func.isRequired,
-    addGroupProducts: React.PropTypes.func.isRequired,
-    modalTitle: React.PropTypes.string,
+    existinGrousNames: PropTypes.instanceOf(Immutable.List),
+    usedProducts: PropTypes.instanceOf(Immutable.List),
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    modalTitle: PropTypes.string,
+    addGroup: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     modalTitle: 'Create New Group',
-    allGroupsProductsKeys: Immutable.Set(),
-    existinGrousNames: Immutable.Set(),
+    allGroupsProductsKeys: Immutable.List(),
+    existinGrousNames: Immutable.List(),
   };
 
   defaultState = {
     name: '', usage: '', include: '', products: Immutable.List(), shared: false,
     error : '',
-    stepIndex: 0, open: false
+    stepIndex: 0, open: false,
   }
 
   errors = {
@@ -42,7 +42,7 @@ export default class PlanIncludeGroupCreate extends Component {
     },
     usage: {
       required: 'Usage type is required',
-      exist: 'Group with same name and usage type already exist'
+      exist: 'Group with same name and usage type already exist',
     },
     include: {
       required: 'Inclide is required',
@@ -50,59 +50,77 @@ export default class PlanIncludeGroupCreate extends Component {
     },
     products: {
       required: 'Products is required',
-      exist: 'Product(s) already exist in another group : '
-    }
+      exist: 'Product(s) already exist in another group : ',
+    },
   }
 
   state = Object.assign({}, this.defaultState);
 
   validateStep = (step) => {
     switch (step) {
-      case 0:
+      case 0: {
         const { existinGrousNames } = this.props;
+        const { name: nameErrors } = this.errors;
+        const { name } = this.state;
 
-        if( this.state.name === '' ){
-          this.setState({ error: this.errors.name.required });
+        if (name === '') {
+          this.setState({ error: nameErrors.required });
           return false;
         }
-        if( existinGrousNames.includes(this.state.name)){
-          this.setState({ error: this.errors.name.exist });
+        if (existinGrousNames.includes(name)) {
+          this.setState({ error: nameErrors.exist });
           return false;
         }
-        if(!globalSetting.keyUppercaseRegex.test(this.state.name)){
-          this.setState({ error: this.errors.name.allowedCharacters });
-          return false;
-        }
-        return true;
-      case 1:
-        if( this.state.usage === '' ){
-          this.setState({ error: this.errors.usage.required });
+        if (!globalSetting.keyUppercaseRegex.test(name)) {
+          this.setState({ error: nameErrors.allowedCharacters });
           return false;
         }
         return true;
-      case 2:
-        if( this.state.include === '' ){
-          this.setState({ error: this.errors.include.required });
-          return false;
-        }
-        if(!( /^\d+(\.\d+)?$/.test( this.state.include )) && this.state.include !== 'UNLIMITED' ){
-          this.setState({ error: this.errors.include.allowedCharacters });
-          return false;
-        }
-        return true;
-      case 3:
-        const { allGroupsProductsKeys } = this.props;
+      }
 
-        if( this.state.products.size < 1 ){
-          this.setState({ error: this.errors.products.required });
+      case 1: {
+        const { usage: usageErrors } = this.errors;
+        const { usage } = this.state;
+
+        if (usage === '') {
+          this.setState({ error: usageErrors.required });
           return false;
         }
-        const duplicateProducts = this.state.products.filter( (product) => allGroupsProductsKeys.includes(product));
+        return true;
+      }
+
+      case 2: {
+        const { include: includeErrors } = this.errors;
+        const { include } = this.state;
+
+        if (include === '') {
+          this.setState({ error: includeErrors.required });
+          return false;
+        }
+        if (!(/^\d+(\.\d+)?$/.test(include)) && include !== 'UNLIMITED') {
+          this.setState({ error: includeErrors.allowedCharacters });
+          return false;
+        }
+        return true;
+      }
+
+      case 3: {
+        const { usedProducts } = this.props;
+        const { products: productsErrors } = this.errors;
+        const { products } = this.state;
+
+        if (products.size < 1) {
+          this.setState({ error: productsErrors.required });
+          return false;
+        }
+        const duplicateProducts = products.filter(product => usedProducts.includes(product));
         if( duplicateProducts.size ){
-          this.setState({ error: this.errors.products.exist + duplicateProducts.join(', ') });
+          this.setState({ error: productsErrors.exist + duplicateProducts.join(', ') });
           return false;
         }
         return true;
+      }
+
       default: return true;
 
     }
@@ -134,7 +152,7 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   onRemoveProduct = (key) => {
-    const products = this.state.products.filter( (product) => key !== product);
+    const products = this.state.products.filter(product => key !== product);
     this.setState({products, error: ''});
   }
 
@@ -164,10 +182,8 @@ export default class PlanIncludeGroupCreate extends Component {
 
   handleFinish = () => {
     const { stepIndex, name, usage, include, products, shared } = this.state;
-
     if(this.validateStep(stepIndex)){
-      this.props.addGroup(name, usage, include, shared);
-      this.props.addGroupProducts(name, usage, products.toArray());
+      this.props.addGroup(name, usage, include, shared, products);
       this.resetState(false);
     }
   };
@@ -177,20 +193,22 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   handleToggleBoby = () => {
-    this.setState({ open: !this.state.open })
+    this.setState({ open: !this.state.open });
   }
 
   getStepContent = (stepIndex) => {
-    const { allGroupsProductsKeys } = this.props;
+    const { usedProducts, usageTypes } = this.props;
     const { name, products, include, usage, shared, error } = this.state;
-    const existingProductsKeys = allGroupsProductsKeys.union(products);
+    const existingProductsKeys = usedProducts.push(...products);
 
     switch (stepIndex) {
 
       case 0:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : null}>
-            <Col componentClass={ControlLabel} sm={3}>Name<Help contents={GroupsInclude.name} /></Col>
+          <FormGroup validationState={error.length > 0 ? 'error' : null}>
+            <Col componentClass={ControlLabel} sm={3}>
+              Name<Help contents={GroupsInclude.name} />
+            </Col>
             <Col sm={8}>
               <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName}/>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
@@ -200,10 +218,16 @@ export default class PlanIncludeGroupCreate extends Component {
 
       case 1:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : null} >
+          <FormGroup validationState={error.length > 0 ? 'error' : null}>
             <Col componentClass={ControlLabel} sm={3}>Unit Type</Col>
             <Col sm={8}>
-              <UsagetypeSelect onChangeUsageType={this.onChangeUsageType} value={usage}/>
+              <Select
+                name="field-name"
+                value={usage}
+                options={usageTypes.map(key => ({ value: key, label: key })).toJS()}
+                onChange={this.onChangeUsageType}
+                Clearable={false}
+              />
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
             </Col>
           </FormGroup>
@@ -211,23 +235,26 @@ export default class PlanIncludeGroupCreate extends Component {
 
       case 2:
         return ([
-          <FormGroup validationState={error.length > 0 ? "error" : null} >
+          <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usage}_includes`}>
             <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`${usage} includes`)}</Col>
             <Col sm={8}>
               <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" />
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
             </Col>
           </FormGroup>,
-          <FormGroup>
+          <FormGroup key={`${usage}_shared`}>
             <Col smOffset={3} sm={8}>
-              <Checkbox checked={shared} onChange={this.onChangeShared}>Share with all account's subscribers<Help contents={GroupsInclude.shared_desc} /></Checkbox>
+              <Checkbox checked={shared} onChange={this.onChangeShared}>
+                Share with all account&apos;s subscribers
+                <Help contents={GroupsInclude.shared_desc} />
+              </Checkbox>
             </Col>
-          </FormGroup>
+          </FormGroup>,
         ]);
 
       case 3:
         return (
-          <FormGroup validationState={error.length > 0 ? "error" : null}>
+          <FormGroup validationState={error.length > 0 ? 'error' : null}>
             <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`Products of type ${usage}`)}<Help contents={GroupsInclude.products} /></Col>
             <Col sm={8}>
               { products.size
@@ -235,11 +262,16 @@ export default class PlanIncludeGroupCreate extends Component {
                : <p style={{marginTop:8}}>No products in group ...</p>
               }
               <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                <ProductSearchByUsagetype usaget={usage} products={existingProductsKeys.toList()} addRatesToGroup={this.onAddProduct} />
+                <ProductSearchByUsagetype
+                  usaget={usage}
+                  products={existingProductsKeys}
+                  addRatesToGroup={this.onAddProduct}
+                />
               </div>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
             </Col>
-          </FormGroup>);
+          </FormGroup>
+        );
 
       default:
         return '...';
@@ -252,6 +284,7 @@ export default class PlanIncludeGroupCreate extends Component {
     if (name.length) {
       modalTitle += ` - ${name}`;
     }
+    const styleStepper = { height: 20, marginLeft: -15, marginTop: 15 };
 
     return (
       <div>
@@ -261,7 +294,7 @@ export default class PlanIncludeGroupCreate extends Component {
           <Modal.Header closeButton onHide={this.handleCancel}>
             <Modal.Title>
               {modalTitle}
-              <Stepper activeStep={stepIndex} style={{ height: 20, marginLeft: -15, marginTop: 15 }}>
+              <Stepper activeStep={stepIndex} style={styleStepper}>
                 <Step>
                   <StepLabel>Set Name</StepLabel>
                 </Step>

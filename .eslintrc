@@ -10,14 +10,15 @@
     "react/jsx-boolean-value": 0,
     "react/forbid-prop-types": 0,
     "react/sort-comp": [1, {
-      order: [
+      "order": [
         'static-methods',
         'lifecycle',
         '/^init.+$/',
         'everything-else',
         'render'
       ]
-    }]
+    }],
+    "radix": ["error", "as-needed"],
   },
   "plugins": [
     "react"

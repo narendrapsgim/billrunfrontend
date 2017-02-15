@@ -1,14 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, Panel, Button } from 'react-bootstrap';
+import { Col, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
+import ActionButtons from '../Elements/ActionButtons';
 import User from './User';
 /* ACTIONS */
 import { getUser, saveUser, clearUser, updateUserField, deleteUserField } from '../../actions/userActions';
-import { clearList } from '../../actions/listActions';
-import { apiBillRunErrorHandler } from '../../common/Api';
+import { clearItems } from '../../actions/entityListActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
@@ -16,14 +16,13 @@ import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 class UserSetup extends Component {
 
   static propTypes = {
-    user: PropTypes.instanceOf(Immutable.Map),
-    dispatch: PropTypes.func.isRequired,
-    location: PropTypes.shape({
-      query: PropTypes.object.isRequired,
-    }).isRequired,
+    itemId: PropTypes.string,
+    item: PropTypes.instanceOf(Immutable.Map),
+    mode: PropTypes.string,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -31,18 +30,11 @@ class UserSetup extends Component {
   };
 
   componentDidMount() {
-    const { userId, action } = this.props.location.query;
-    if (userId) {
-      const userParams = {
-        api: 'users',
-        params: [
-          { userId },
-          { action: 'read' },
-        ],
-      };
-      this.props.dispatch(getUser(userParams));
+    const { itemId, mode } = this.props;
+    if (itemId) {
+      this.props.dispatch(getUser(itemId));
     }
-    if (action === 'new') {
+    if (mode === 'create') {
       this.props.dispatch(setPageTitle('Create New User'));
     } else {
       this.props.dispatch(setPageTitle('Edit user'));
@@ -50,16 +42,15 @@ class UserSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { user, location: { query: { action } } } = nextProps;
-    const { user: oldUser } = this.props;
-    if (action === 'update' && oldUser.get('username', '') !== user.get('username', '')) {
-      this.props.dispatch(setPageTitle(`Edit user - ${user.get('username', '')}`));
+    const { item, mode } = nextProps;
+    const { item: olditem } = this.props;
+    if (mode === 'update' && olditem.get('username', '') !== item.get('username', '')) {
+      this.props.dispatch(setPageTitle(`Edit user - ${item.get('username', '')}`));
     }
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearUser());
-    this.props.dispatch(clearList('users'));
   }
 
   onBack = () => {
@@ -67,15 +58,19 @@ class UserSetup extends Component {
   }
 
   onSave = () => {
+    const { item, mode } = this.props;
     if (this.validate()) {
-      this.props.dispatch(saveUser()).then((response) => {
-        if (response === true) {
-          this.props.dispatch(showSuccess('User saved successfully'));
-          this.onBack();
-        } else {
-          this.props.dispatch(apiBillRunErrorHandler(response));
-        }
-      });
+      this.props.dispatch(saveUser(item, mode)).then(this.afterSave);
+    }
+  }
+
+  afterSave = (response) => {
+    const { mode } = this.props;
+    if (response.status) {
+      this.props.dispatch(clearItems('users')); // refetch items list because item was (changed in / added to) list
+      const action = (mode === 'create') ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`User was ${action}`));
+      this.onBack();
     }
   }
 
@@ -88,34 +83,34 @@ class UserSetup extends Component {
   }
 
   validate = () => {
-    const { user, location: { query: { action } } } = this.props;
-    if (action === 'new') {
-      if (user.get('username', '').length === 0) {
+    const { item, mode } = this.props;
+    if (mode === 'create') {
+      if (item.get('username', '').length === 0) {
         this.props.dispatch(showDanger('User name field is required'));
         return false;
       }
-      if (user.get('password', '').length === 0) {
+      if (item.get('password', '').length === 0) {
         this.props.dispatch(showDanger('Password field is required'));
         return false;
       }
 
-      if (user.get('roles').length === 0) {
+      if (item.get('roles').length === 0) {
         this.props.dispatch(showDanger('Roles field is required'));
         return false;
       }
       return true;
     }
 
-    if (user.has('username') && user.get('username', '').length === 0) {
+    if (item.has('username') && item.get('username', '').length === 0) {
       this.props.dispatch(showDanger('User name field is required'));
       return false;
     }
-    if (user.has('password') && user.get('password', '').length === 0) {
+    if (item.has('password') && item.get('password', '').length === 0) {
       this.props.dispatch(showDanger('Password field is required'));
       return false;
     }
 
-    if (user.has('roles') && user.get('roles').length === 0) {
+    if (item.has('roles') && item.get('roles').length === 0) {
       this.props.dispatch(showDanger('Roles field is required'));
       return false;
     }
@@ -123,25 +118,26 @@ class UserSetup extends Component {
   }
 
   render() {
-    const { user, location: { query: { action } } } = this.props;
+    const { item, mode } = this.props;
+
     // in update mode wait for item before render edit screen
-    if (action === 'update' && typeof user.getIn(['_id', '$id']) === 'undefined') {
+    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.onBack} />);
     }
+
     return (
       <Col lg={12}>
         <Panel>
           <User
-            action={action}
-            user={user}
+            action={mode}
+            user={item}
             onUpdateValue={this.onUpdateValue}
             onDeleteValue={this.onDeleteValue}
           />
         </Panel>
-        <div style={{ marginTop: 12 }}>
-          <Button onClick={this.onSave} bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
-          <Button onClick={this.onBack} bsStyle="default">Cancel</Button>
-        </div>
+
+        <ActionButtons onClickSave={this.onSave} onClickCancel={this.onBack} />
+
       </Col>
     );
   }
@@ -149,8 +145,11 @@ class UserSetup extends Component {
 }
 
 
-const mapStateToProps = state => ({
-  user: state.entity.get('users', Immutable.Map()),
-});
+const mapStateToProps = (state, props) => {
+  const { params: { itemId }, location: { query: { action } } } = props;
+  const mode = action || ((itemId) ? 'update' : 'create');
+  const item = state.entity.get('users', Immutable.Map());
+  return ({ mode, item, itemId });
+};
 
 export default withRouter(connect(mapStateToProps)(UserSetup));

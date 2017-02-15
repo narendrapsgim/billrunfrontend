@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -8,11 +8,17 @@ import List from '../List';
 import Pager from '../Pager';
 import { AdvancedFilter } from '../Filter';
 import DetailsParser from './DetailsParser';
-import { userNamesQuery, auditTrailEntityTypesQuery } from '../../common/ApiQueries';
-/* ACTIONS */
+import { getUserKeysQuery, auditTrailEntityTypesQuery, auditTrailListQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
 
 class AuditTrail extends Component {
+
+  static propTypes = {
+    items: PropTypes.instanceOf(Immutable.List),
+    userNames: PropTypes.instanceOf(Immutable.List),
+    auditTrailEntityTypes: PropTypes.instanceOf(Immutable.List),
+    dispatch: PropTypes.func.isRequired,
+  }
 
   static defaultProps = {
     items: Immutable.List(),
@@ -20,32 +26,14 @@ class AuditTrail extends Component {
     auditTrailEntityTypes: Immutable.List(),
   }
 
-  static propTypes = {
-    items: React.PropTypes.instanceOf(Immutable.List),
-    userNames: React.PropTypes.instanceOf(Immutable.List),
-    auditTrailEntityTypes: React.PropTypes.instanceOf(Immutable.List),
-    dispatch: React.PropTypes.func.isRequired,
-  }
+  state = {
+    fields: {},
+    page: 0,
+    size: 10,
+    sort: Immutable.Map({ urt: -1 }),
+    filter: {},
+  };
 
-  constructor(props) {
-    super(props);
-    const tableFields = [
-      { id: 'urt', title: 'Date', type: 'datetime', cssClass: 'long-date', sort: true },
-      { id: 'user.name', title: 'User', parser: this.userParser, sort: true },
-      { id: 'collection', title: 'Module Type', parser: this.collectionParser, sort: true },
-      { id: 'key', title: 'Module Key', sort: true },
-      { title: 'Details', parser: this.detailsParser },
-    ];
-    this.itemsType = 'log';
-    this.state = {
-      tableFields,
-      fields: {},
-      page: 0,
-      size: 10,
-      sort: JSON.stringify({ urt: -1 }),
-      filter: {},
-    };
-  }
 
   componentDidMount() {
     this.fetchItems();
@@ -54,12 +42,13 @@ class AuditTrail extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearList(this.itemsType));
+    this.props.dispatch(clearList('log'));
     this.props.dispatch(clearList('autocompleteUser'));
     this.props.dispatch(clearList('autocompleteAuditTrailEntityTypes'));
   }
 
-  onSort = (sort) => {
+  onSort = (newSort) => {
+    const sort = Immutable.Map(newSort);
     this.setState({ sort }, this.fetchItems);
   }
 
@@ -68,11 +57,11 @@ class AuditTrail extends Component {
   }
 
   fetchItems = () => {
-    this.props.dispatch(getList(this.itemsType, this.buildQuery()));
+    this.props.dispatch(getList('log', this.buildQuery()));
   }
 
   fetchUser = () => {
-    const query = userNamesQuery();
+    const query = getUserKeysQuery();
     this.props.dispatch(getList('autocompleteUser', query));
   }
 
@@ -86,22 +75,13 @@ class AuditTrail extends Component {
   }
 
   buildQuery = () => {
-    const query = Object.assign({}, this.state.filter);
+    const { fields, size, page, sort, filter } = this.state;
+    const query = Object.assign({}, filter);
     query.source = 'audit';
     if (query.urt) {
       query.urt = this.urtQueryBuilder(query.urt);
     }
-    return {
-      api: 'find',
-      params: [
-        { collection: this.itemsType },
-        { project: JSON.stringify(this.state.fields) },
-        { size: this.state.size },
-        { page: this.state.page },
-        { sort: this.state.sort },
-        { query: JSON.stringify(query) },
-      ],
-    };
+    return auditTrailListQuery(query, page, fields, sort, size);
   }
 
   userParser = item => item.getIn(['user', 'name'], '');
@@ -116,23 +96,41 @@ class AuditTrail extends Component {
     return ({ $gte: fromDate, $lt: toDate });
   };
 
+  getFilterFields = () => {
+    const { userNames, auditTrailEntityTypes } = this.props;
+    return ([
+      { id: 'urt', title: 'Date', type: 'date' },
+      { id: 'user.name', title: 'User', type: 'select', options: userNames },
+      { id: 'collection', title: 'Entity Type', type: 'select', options: auditTrailEntityTypes },
+      { id: 'key', title: 'Entity Key' },
+    ]);
+  }
+
+  getTableFields = () => ([
+    { id: 'urt', title: 'Date', type: 'datetime', cssClass: 'long-date', sort: true },
+    { id: 'user.name', title: 'User', parser: this.userParser, sort: true },
+    { id: 'collection', title: 'Module Type', parser: this.collectionParser, sort: true },
+    { id: 'key', title: 'Module Key', sort: true },
+    { title: 'Details', parser: this.detailsParser },
+  ]);
+
   render() {
-    const { items, userNames, auditTrailEntityTypes } = this.props;
-    const { tableFields } = this.state;
-
-    const filterFields = [
-        { id: 'urt', title: 'Date', type: 'date' },
-        { id: 'user.name', title: 'User', type: 'select', options: userNames },
-        { id: 'collection', title: 'Entity Type', type: 'select', options: auditTrailEntityTypes },
-        { id: 'key', title: 'Entity Key' },
-    ];
-
+    const { items } = this.props;
+    const { sort } = this.state;
+    const filterFields = this.getFilterFields();
+    const tableFields = this.getTableFields();
     return (
-      <div className="AuditTrail">
+      <div className="Audit-Trail">
         <Row>
           <Col lg={12}>
             <Panel header={<AdvancedFilter fields={filterFields} onFilter={this.onFilter} />}>
-              <List items={items} fields={tableFields} edit={false} onSort={this.onSort} />
+              <List
+                items={items}
+                fields={tableFields}
+                edit={false}
+                sort={sort}
+                onSort={this.onSort}
+              />
             </Panel>
           </Col>
         </Row>

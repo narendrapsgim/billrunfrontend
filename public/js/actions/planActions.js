@@ -1,181 +1,133 @@
-export const GOT_PLAN = 'GOT_PLAN';
-export const SAVE_PLAN = 'SAVE_PLAN';
-export const CLEAR_PLAN = 'CLEAR_PLAN';
-export const ADD_TARIFF = 'ADD_TARIFF';
-export const REMOVE_TARIFF = 'REMOVE_TARIFF';
-export const UPDATE_PLAN_CYCLE = 'UPDATE_PLAN_CYCLE';
-export const UPDATE_PLAN_PRICE = 'UPDATE_PLAN_PRICE';
-export const UPDATE_PLAN_FIELD_VALUE = 'UPDATE_PLAN_FIELD_VALUE';
-export const REMOVE_GROUP = 'REMOVE_GROUP';
-export const ADD_GROUP = 'ADD_GROUP';
+import { startProgressIndicator } from './progressIndicatorActions';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { fetchPlanByIdQuery, getAllGroupsQuery } from '../common/ApiQueries';
+import { saveEntity } from '../actions/entityActions';
+
+export const PLAN_GOT = 'PLAN_GOT';
+export const PLAN_CLEAR = 'PLAN_CLEAR';
+export const PLAN_ADD_TARIFF = 'PLAN_ADD_TARIFF';
+export const PLAN_REMOVE_TARIFF = 'PLAN_REMOVE_TARIFF';
+export const PLAN_UPDATE_PLAN_CYCLE = 'PLAN_UPDATE_PLAN_CYCLE';
+export const PLAN_UPDATE_FIELD_VALUE = 'PLAN_UPDATE_FIELD_VALUE';
+export const PLAN_REMOVE_FIELD = 'PLAN_REMOVE_FIELD';
+
+export const REMOVE_GROUP_PLAN = 'REMOVE_GROUP_PLAN';
+export const ADD_GROUP_PLAN = 'ADD_GROUP_PLAN';
 export const ADD_USAGET_INCLUDE = 'ADD_USAGET_INCLUDE';
 
-import moment from 'moment';
-import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
-import { showDanger, showSuccess } from './alertsActions';
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+export const PLAN_PRODUCTS_RATE_INIT = 'PLAN_PRODUCTS_RATE_INIT';
+export const PLAN_PRODUCTS_RATE_ADD = 'PLAN_PRODUCTS_RATE_ADD';
+export const PLAN_PRODUCTS_RATE_REMOVE = 'PLAN_PRODUCTS_RATE_REMOVE';
+export const PLAN_PRODUCTS_RATE_UPDATE = 'PLAN_PRODUCTS_RATE_UPDATE';
+export const PLAN_PRODUCTS_RATE_UPDATE_TO = 'PLAN_PRODUCTS_RATE_UPDATE_TO';
+export const PLAN_PRODUCTS_REMOVE = 'PLAN_PRODUCTS_REMOVE';
 
 
-export function clearPlan() {
-  return {
-    type: CLEAR_PLAN
-  };
-}
+const gotItem = plan => ({
+  type: PLAN_GOT,
+  plan,
+});
 
-export function onPlanFieldUpdate(path, value) {
-  return {
-    type: UPDATE_PLAN_FIELD_VALUE,
-    path,
-    value
-  };
-}
+export const clearPlan = () => ({
+  type: PLAN_CLEAR,
+});
 
-export function onPlanCycleUpdate(index, value) {
-  return {
-    type: UPDATE_PLAN_CYCLE,
-    index,
-    value,
-  };
-}
+export const onGroupRemove = groupName => ({
+  type: REMOVE_GROUP_PLAN,
+  groupName,
+});
 
-export function onPlanTariffAdd(trial) {
-  return {
-    type: ADD_TARIFF,
-    trial
-  };
-}
+export const onGroupAdd = (groupName, usage, value, shared, products) => ({
+  type: ADD_GROUP_PLAN,
+  groupName,
+  usage,
+  value,
+  shared,
+  products,
+});
 
-export function onPlanTariffRemove(index) {
-  return {
-    type: REMOVE_TARIFF,
-    index
-  };
-}
+export const planProductRemove = (path, name) => ({
+  type: PLAN_PRODUCTS_REMOVE,
+  path,
+  name,
+});
 
-export function onGroupRemove(groupName, usage, productKeys) {
-  const keys = Array.isArray(productKeys) ? productKeys : [productKeys] ;
-  return {
-    type: REMOVE_GROUP,
-    groupName,
-    usage,
-    productKeys : keys
-  };
-}
+export const planProductsRateUpdateTo = (path, index, value) => ({
+  type: PLAN_PRODUCTS_RATE_UPDATE_TO,
+  path,
+  index,
+  value,
+});
 
-export function onGroupAdd(groupName, usage, value, shared) {
-  return {
-    type: ADD_GROUP,
-    groupName,
-    usage,
-    value,
-    shared
-  };
-}
+export const planProductsRateUpdate = (path, value) => ({
+  type: PLAN_PRODUCTS_RATE_UPDATE,
+  path,
+  value,
+});
 
-export function getPlan(plan_id) {
-  return dispatch => {
-    return dispatch(fetchPlan(plan_id));
-  };
-}
+export const planProductsRateInit = (product, path) => ({
+  type: PLAN_PRODUCTS_RATE_INIT,
+  product,
+  path,
+});
 
-export function savePlan(plan, action, callback = () => {}) {
-  return dispatch => {
-    return dispatch(savePlanToDB(plan, action, callback));
-  };
-}
+export const planProductsRateAdd = path => ({
+  type: PLAN_PRODUCTS_RATE_ADD,
+  path,
+});
 
-export function addUsagetInclude(usaget, pp_includes_name, pp_includes_external_id) {
-  return {
-    type: ADD_USAGET_INCLUDE,
-    usaget,
-    pp_includes_name,
-    pp_includes_external_id
-  };
-}
+export const planProductsRateRemove = (path, index) => ({
+  type: PLAN_PRODUCTS_RATE_REMOVE,
+  path,
+  index,
+});
 
-/* Internal function */
-function savePlanToDB(plan, action, callback) {
-  const type = action !== 'new' ? "close_and_new" : action;
-  const formData = new FormData();
+export const onPlanFieldUpdate = (path, value) => ({
+  type: PLAN_UPDATE_FIELD_VALUE,
+  path,
+  value,
+});
 
-  let from = moment(); //.format(globalSetting.apiDateTimeFormat)
-  let to = moment().add(100, 'years'); //.format(globalSetting.apiDateTimeFormat)
-  plan = plan.set('from', from).set('to', to);
+export const onPlanFieldRemove = path => ({
+  type: PLAN_REMOVE_FIELD,
+  path,
+});
 
-  if (action !== 'new') {
-    formData.append('id', plan.getIn(['_id','$id']));
-  }
-  formData.append("coll", 'plans');
-  formData.append("type", type);
-  /* HARD CODED */
-  formData.append("data", JSON.stringify(plan.setIn(['recurrence', 'unit'], 1)));
+export const onPlanCycleUpdate = (index, value) => ({
+  type: PLAN_UPDATE_PLAN_CYCLE,
+  index,
+  value,
+});
 
-  console.log("Save plan : ", plan.toJS());
+export const onPlanTariffAdd = (trial = false) => ({
+  type: PLAN_ADD_TARIFF,
+  trial,
+});
 
-  const query = [{
-    api: "save",
-    options: {
-      method: "POST",
-      body: formData
-    },
-  }];
+export const onPlanTariffRemove = index => ({
+  type: PLAN_REMOVE_TARIFF,
+  index,
+});
 
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      success => {
-        dispatch(showSuccess("Plan saved successfully"));
-        dispatch(finishProgressIndicator());
-        //TODO : Reload plan by key when plan view will be by key
-        callback(true);
-      },
-      failure => {
-        dispatch(finishProgressIndicator());
-        callback(failure);
-      }
-    ).catch(
-      error => {
-        dispatch(apiBillRunErrorHandler(error));
-        callback(error);
-      }
-    );
-  };
-}
+export const addUsagetInclude = (usaget, ppIncludesName, ppIncludesExternalId) => ({
+  type: ADD_USAGET_INCLUDE,
+  usaget,
+  ppIncludesName,
+  ppIncludesExternalId,
+});
 
-function gotPlan(plan) {
-  return {
-    type: GOT_PLAN,
-    plan
-  };
-}
+export const savePlan = (plan, action) => saveEntity('plans', plan, action);
 
-function fetchPlan(id) {
-  const query = {
-    api: "find",
-    params: [
-      { collection: "plans" },
-      { size: "1" },
-      { page: "0" },
-      { query: JSON.stringify(
-        {"_id" :  {"$in": [id]}}
-      )},
-    ]
-  };
+export const getPlan = id => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = fetchPlanByIdQuery(id);
+  return apiBillRun(query)
+    .then((response) => {
+      const item = response.data[0].data.details[0];
+      dispatch(gotItem(item));
+      return dispatch(apiBillRunSuccessHandler(response));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving plan')));
+};
 
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      resp => {
-        let plan = _.values(resp.data[0].data.details)[0];
-        console.log(plan);
-        dispatch(gotPlan(plan));
-        dispatch(finishProgressIndicator());
-      }
-    ).catch(error => {
-      if (error.data){
-        dispatch(showDanger(error.data.message));
-      }
-      dispatch(finishProgressIndicator());
-    });
-  };
-}
+export const getAllGroup = () => apiBillRun(getAllGroupsQuery());

@@ -1,12 +1,12 @@
 import Immutable from 'immutable';
 import {
-  UPDATE_PRODUCT_FIELD_VALUE,
-  UPDATE_PRODUCT_USAGET_VALUE,
-  UPDATE_PRODUCT_TO_VALUE,
-  ADD_PRODUCT_RATE,
-  REMOVE_PRODUCT_RATE,
-  GOT_PRODUCT,
-  CLEAR_PRODUCT } from '../actions/productActions';
+  PRODUCT_UPDATE_FIELD_VALUE,
+  PRODUCT_UPDATE_USAGET_VALUE,
+  PRODUCT_UPDATE_TO_VALUE,
+  PRODUCT_ADD_RATE,
+  PRODUCT_REMOVE_RATE,
+  PRODUCT_GOT,
+  PRODUCT_CLEAR } from '../actions/productActions';
 
 const PRODUCT_UNLIMITED = globalSetting.productUnlimitedValue;
 const defaultState = Immutable.Map({
@@ -26,10 +26,10 @@ const DefaultRate = Immutable.Record({
 export default function (state = defaultState, action) {
   switch (action.type) {
 
-    case UPDATE_PRODUCT_FIELD_VALUE:
+    case PRODUCT_UPDATE_FIELD_VALUE:
       return state.setIn(action.path, action.value);
 
-    case UPDATE_PRODUCT_TO_VALUE: {
+    case PRODUCT_UPDATE_TO_VALUE: {
       return state.updateIn(action.path, Immutable.List(), (list) => {
         if (action.index < list.size - 1) {
           const nextItemIndex = action.index + 1;
@@ -41,13 +41,13 @@ export default function (state = defaultState, action) {
       });
     }
 
-    case UPDATE_PRODUCT_USAGET_VALUE: {
+    case PRODUCT_UPDATE_USAGET_VALUE: {
       const oldPath = [...action.path, action.oldUsaget];
       const newPath = [...action.path, action.newUsaget];
       return state.setIn(newPath, state.getIn(oldPath, Immutable.List())).deleteIn(oldPath);
     }
 
-    case ADD_PRODUCT_RATE: {
+    case PRODUCT_ADD_RATE: {
       // if product prices array is empty - add new default item
       if (state.getIn(action.path, Immutable.List()).size === 0) {
         return state.updateIn(action.path, Immutable.List(), list => list.push(new DefaultRate()));
@@ -55,14 +55,14 @@ export default function (state = defaultState, action) {
       return state.updateIn(action.path, Immutable.List(), (list) => {
         // use last item for new price row
         const newItem = list.last().set('to', PRODUCT_UNLIMITED);
-				const lastItemIndex = list.size - 1;
+        const lastItemIndex = list.size - 1;
         return list
           .update(lastItemIndex, Immutable.Map(), prevItem => prevItem.set('to', ''))
           .push(newItem);
       });
     }
 
-    case REMOVE_PRODUCT_RATE:
+    case PRODUCT_REMOVE_RATE:
       return state.updateIn(action.path, (list) => {
         if (action.index > 0) {
           const prevItemIndex = action.index - 1;
@@ -73,10 +73,10 @@ export default function (state = defaultState, action) {
         return list.delete(action.index);
       });
 
-    case GOT_PRODUCT:
+    case PRODUCT_GOT:
       return Immutable.fromJS(action.product);
 
-    case CLEAR_PRODUCT:
+    case PRODUCT_CLEAR:
       return defaultState;
 
     default:

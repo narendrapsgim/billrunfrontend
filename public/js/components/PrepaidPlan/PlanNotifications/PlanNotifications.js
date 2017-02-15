@@ -1,29 +1,23 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { List, Map } from 'immutable';
-import { times } from '../../../common/Util';
 import { connect } from 'react-redux';
-
 import Select from 'react-select';
-import { Row, Col, Form, Panel, FormGroup, ControlLabel } from 'react-bootstrap';
+import { Row, Col, Form, Panel } from 'react-bootstrap';
 import Notifications from './Notifications';
 
-// TODO: get from server or somewhere names of thresholds
-const threshold_name = (i) => (i + 1).toString();
-const threshold_id = (name) => name === "On Load" ? 'on_load' : name;
 
 const PlanNotifications = (props) => {
-  const { plan, onRemoveBalanceNotifications, pp_includes } = props;
+  const { plan, ppIncludes } = props;
 
-  const pp_include_name = (pp_id) => {
-    return props.pp_includes
-		.find(pp => pp.get('external_id') === parseInt(pp_id, 10), Map())
-		.get('name');
+  const getPpIncludeName = (ppId) => {
+    const PpInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId), Map());
+    return (PpInclude) ? PpInclude.get('name', '') : '';
   };
-  
-  const onSelectBalance = (pp_include_id) => {
-   props.onSelectBalance(pp_include_id.toString());
+
+  const onSelectBalance = (ppIncludeId) => {
+    props.onSelectBalance(ppIncludeId.toString());
   };
-  
+
   const onAddNotification = (id) => {
     props.onAddNotification(id);
   };
@@ -39,56 +33,75 @@ const PlanNotifications = (props) => {
   const onRemoveBalance = (id) => {
     props.onRemoveBalanceNotifications(id);
   };
-  
-  const notifications_el = (pp_id, i) => {
-    let data = plan.getIn(['notifications_threshold', pp_id], List());
-    let name = pp_include_name(pp_id);
+
+  const notificationsEl = (ppId, i) => {
+    const data = plan.getIn(['notifications_threshold', ppId], List());
+    const name = getPpIncludeName(ppId);
     return (
       data.size ?
-      <Notifications notifications={ data }
-		     onAdd={ onAddNotification }
-		     onRemove={ onRemoveNotification }
-		     onUpdateField={ onUpdateNotificationField }
-		     onRemoveBalance={ onRemoveBalance }
-		     name={ name }
-		     pp_id={ pp_id }
-		     key={i} /> :
+        <Notifications
+          notifications={data}
+          onAdd={onAddNotification}
+          onRemove={onRemoveNotification}
+          onUpdateField={onUpdateNotificationField}
+          onRemoveBalance={onRemoveBalance}
+          name={name}
+          pp_id={ppId}
+          key={i}
+        /> :
       null
     );
   };
-  
-  const options = pp_includes.map(pp => (
-    { value: pp.get('external_id'),
-      label: pp.get('name') }
-  )).toJS();
+
+  const options = ppIncludes.map(pp => ({
+    value: pp.get('external_id'),
+    label: pp.get('name'),
+  })).toJS();
 
   return (
     <div className="PlanNotifications">
       <Row>
-	<Col lg={12}>
-	  <Form>
-	    <Panel header={ <h4>Select prepaid bucket</h4> }>
-	      <Select placeholder="Select" options={ options } onChange={ onSelectBalance } />
-	    </Panel>
-	    <hr/>
-	    {
-	      plan.get('notifications_threshold', Map())
-		  .keySeq()
-		  .filter(i => i !== 'on_load')
-		  .map(notifications_el)
-	    }
-	    {/*
-	    <Notifications notifications={plan.getIn(['notifications_threshold', 'on_load'], List())}
-			   onAdd={ onAddNotification }
-			   onRemove={ onRemoveNotification }
-			   onUpdateField={ onUpdateNotificationField }
-			   name="On Load" />
-	    */}
-	  </Form>
-	</Col>
+        <Col lg={12}>
+          <Form>
+            <Panel header={<h4>Select prepaid bucket</h4>}>
+              <Select placeholder="Select" options={options} onChange={onSelectBalance} />
+            </Panel>
+            <hr />
+            {
+              plan.get('notifications_threshold', Map())
+                .keySeq()
+                .filter(i => i !== 'on_load')
+                .map(notificationsEl)
+            }
+            {/*
+              <Notifications
+                notifications={plan.getIn(['notifications_threshold', 'on_load'], List())}
+                onAdd={onAddNotification}
+                onRemove={onRemoveNotification}
+                onUpdateField={onUpdateNotificationField}
+                name="On Load"
+              />
+            */}
+          </Form>
+        </Col>
       </Row>
     </div>
   );
+};
+
+PlanNotifications.defaultProps = {
+  plan: Map(),
+  ppIncludes: List(),
+};
+
+PlanNotifications.propTypes = {
+  plan: PropTypes.instanceOf(Map),
+  ppIncludes: PropTypes.instanceOf(List),
+  onAddNotification: PropTypes.func.isRequired,
+  onRemoveNotification: PropTypes.func.isRequired,
+  onUpdateNotificationField: PropTypes.func.isRequired,
+  onSelectBalance: PropTypes.func.isRequired,
+  onRemoveBalanceNotifications: PropTypes.func.isRequired,
 };
 
 export default connect()(PlanNotifications);

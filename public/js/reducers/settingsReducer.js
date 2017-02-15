@@ -1,12 +1,14 @@
 import Immutable from 'immutable';
-import { UPDATE_SETTING,
+import {
+  UPDATE_SETTING,
          REMOVE_SETTING_FIELD,
          GOT_SETTINGS,
          PUSH_TO_SETTING,
 	 ADD_PAYMENT_GATEWAY,
 	 REMOVE_PAYMENT_GATEWAY,
 	 UPDATE_PAYMENT_GATEWAY,
-         SET_FIELD_POSITION } from '../actions/settingsActions';
+  SET_FIELD_POSITION,
+} from '../actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
 import { LOGOUT } from '../actions/userActions';
 
@@ -14,30 +16,31 @@ const LogoImg = require(`img/${globalSetting.defaultLogo}`);// eslint-disable-li
 const defaultState = Immutable.fromJS({
   subscribers: {
     account: {
-      fields: []
+      fields: [],
     },
     subscriber: {
-      fields: []
-    }
+      fields: [],
+    },
   },
   files: {
     logo: LogoImg,
   },
-  payment_gateways: []
+  payment_gateways: [],
 });
 
 export default function (state = defaultState, action) {
-  let { name, value, category, settings, gateway, param } = action;
+  const { name, value, category, settings, gateway } = action;
 
   switch(action.type) {
     case LOGOUT:
       return defaultState;
 
-    case UPDATE_SETTING:
+    case UPDATE_SETTING: {
       if (Array.isArray(name)) {
         return state.setIn([category, ...name], value);
       }
       return state.setIn([category, name], value);
+    }
 
     case PUSH_TO_SETTING: {
       let path;
@@ -52,7 +55,6 @@ export default function (state = defaultState, action) {
     }
 
     case ADD_USAGET_MAPPING:
-      const usaget_mapping = state.get('unit_types');
       return state.update('usage_types', list => list.push(action.usaget));
 
     case GOT_SETTINGS:
@@ -66,24 +68,28 @@ export default function (state = defaultState, action) {
         });
       });
 
-    case ADD_PAYMENT_GATEWAY:
+    case ADD_PAYMENT_GATEWAY: {
       const added = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway.name).push(Immutable.fromJS(gateway));
       return state.set('payment_gateways', added);
+    }
 
-    case REMOVE_PAYMENT_GATEWAY:
+    case REMOVE_PAYMENT_GATEWAY: {
       const removed = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway);
       return state.set('payment_gateways', removed);
+    }
 
-    case UPDATE_PAYMENT_GATEWAY:
+    case UPDATE_PAYMENT_GATEWAY: {
       const paymentgateway = state.get('payment_gateways').find(pg => pg.get('name') === gateway.name).set('params', gateway.params);
       const paymentgateways = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway.name).push(paymentgateway);
       return state.set('payment_gateways', paymentgateways);
+    }
 
-    case REMOVE_SETTING_FIELD:
+    case REMOVE_SETTING_FIELD: {
       if (Array.isArray(name)) {
         return state.deleteIn([category, ...name]);
       }
       return state.deleteIn([category, name]);
+    }
 
     case SET_FIELD_POSITION: {
       const curr = state.getIn([...action.path, action.oldIndex]);
