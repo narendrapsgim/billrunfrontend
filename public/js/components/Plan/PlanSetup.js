@@ -1,12 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, Panel, Tabs, Tab, Button } from 'react-bootstrap';
+import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
 import Immutable from 'immutable';
 import PlanTab from './PlanTab';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
 import PlanIncludesTab from './PlanIncludesTab';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
+import ActionButtons from '../Elements/ActionButtons';
 import {
   getPlan,
   savePlan,
@@ -20,14 +21,11 @@ import {
 } from '../../actions/planActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
+import { clearItems } from '../../actions/entityListActions';
+import { showSuccess } from '../../actions/alertsActions';
 
 
 class PlanSetup extends Component {
-
-  static defaultProps = {
-    item: Immutable.Map(),
-    activeTab: 1,
-  };
 
   static propTypes = {
     itemId: PropTypes.string,
@@ -43,6 +41,11 @@ class PlanSetup extends Component {
     dispatch: PropTypes.func.isRequired,
   }
 
+  static defaultProps = {
+    item: Immutable.Map(),
+    activeTab: 1,
+  };
+
   state = {
     activeTab: parseInt(this.props.activeTab),
   }
@@ -56,7 +59,7 @@ class PlanSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'new') {
+    if (mode === 'create') {
       this.props.dispatch(setPageTitle('Create New Plan'));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'postpaid'));
     }
@@ -65,7 +68,7 @@ class PlanSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { item: oldItem, mode } = this.props;
     const { item } = nextProps;
-    if (mode === 'update' && oldItem.get('name') !== item.get('name')) {
+    if (mode !== 'create' && oldItem.get('name') !== item.get('name')) {
       this.props.dispatch(setPageTitle(`Edit plan - ${item.get('name')}`));
     }
   }
@@ -116,9 +119,10 @@ class PlanSetup extends Component {
 
   afterSave = (response) => {
     const { mode } = this.props;
-    if (response.status && mode === 'new') { // on success save new item
-      this.handleBack();
-    } else if (response.status && mode !== 'new') { // on success update item
+    if (response.status) {
+      this.props.dispatch(clearItems('plans')); // refetch items list because item was (changed in / added to) list
+      const action = (mode === 'create') ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The plan was ${action}`));
       this.handleBack();
     }
   }
@@ -135,13 +139,12 @@ class PlanSetup extends Component {
     const { item, mode } = this.props;
 
     // in update mode wait for plan before render edit screen
-    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const planRates = item.get('rates', Immutable.Map());
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
-
     return (
       <Col lg={12}>
         <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
@@ -179,10 +182,7 @@ class PlanSetup extends Component {
           </Tab>
 
         </Tabs>
-        <div style={{ marginTop: 12 }}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }} >Save</Button>
-          <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
-        </div>
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
       </Col>
     );
   }
@@ -190,10 +190,10 @@ class PlanSetup extends Component {
 
 
 const mapStateToProps = (state, props) => {
-  const { tab: activeTab } = props.location.query;
-  const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
+  const { tab: activeTab, action } = props.location.query;
+  const { itemId } = props.params;
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   const { plan: item } = state;
   return { itemId, item, mode, activeTab };
 };
-
 export default withRouter(connect(mapStateToProps)(PlanSetup));

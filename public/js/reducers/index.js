@@ -2,8 +2,8 @@ import { combineReducers } from 'redux';
 import progressIndicator from './progressIndicatorReducer';
 import alerts from './alertsReducer';
 import list from './listReducer';
+import entityList from './entityList';
 import entity from './entityReducer';
-import customer from './customerReducer';
 import inputProcessor from './inputProcessorReducer';
 import settings from './settingsReducer';
 import dashboard from './dashboardReducer';
@@ -21,8 +21,8 @@ export default combineReducers({
   product,
   user,
   alerts,
+  entityList,
   list,
-  customer,
   entity,
   inputProcessor,
   settings,

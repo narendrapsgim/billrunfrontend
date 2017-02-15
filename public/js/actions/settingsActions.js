@@ -109,6 +109,11 @@ export function saveFile(file, metadata = {}) {
 }
 
 export function fetchFile(query, path = 'file') {
+  const dataImage = localStorage.getItem(path);
+  if (dataImage) {
+    return dispatch => dispatch(gotFile(dataImage, path));
+  }
+
   const apiQuery = {
     api: 'files',
     params: [
@@ -119,8 +124,9 @@ export function fetchFile(query, path = 'file') {
   return dispatch => apiBillRun(apiQuery).then(
     (success) => {
       if (success.data && success.data[0] && success.data[0].data && success.data[0].data.desc) {
+        localStorage.setItem(path, success.data[0].data.desc);
         dispatch(gotFile(success.data[0].data.desc, path));
-				return true;
+        return true;
       }
       return success;
     }).catch((error) => {

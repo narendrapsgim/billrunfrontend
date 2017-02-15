@@ -10,17 +10,19 @@ export default class User extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(Immutable.Map),
     action: PropTypes.string,
+    availableRoles: PropTypes.arrayOf(PropTypes.string),
     onUpdateValue: PropTypes.func.isRequired,
     onDeleteValue: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     user: Immutable.Map(),
-    action: 'new',
+    availableRoles: ['admin', 'read', 'write'],
+    action: 'create',
   };
 
   state = {
-    enableChangePassword: this.props.action === 'new',
+    enableChangePassword: this.props.action === 'create',
     password: '',
     password1: '',
     errors: {
@@ -31,11 +33,15 @@ export default class User extends Component {
 
   componentDidMount() {
     const { action } = this.props;
-    if (action === 'new') {
+    if (action === 'create') {
       this.initDefaultValues();
     } else {
       this.props.onDeleteValue('password'); // remove user hashed password, to not send it back to BE on save
     }
+  }
+
+  initDefaultValues = () => {
+    this.props.onUpdateValue('roles', ['read']);
   }
 
   onPasswordChange = (e) => {
@@ -103,10 +109,6 @@ export default class User extends Component {
     }
   }
 
-  initDefaultValues = () => {
-    this.props.onUpdateValue('roles', ['read']);
-  }
-
   renderChangePassword = () => {
     const { action } = this.props;
     const { password, password1, enableChangePassword, errors } = this.state;
@@ -114,12 +116,12 @@ export default class User extends Component {
 
     return (
       <span>
-        { action !== 'new' &&
+        { action !== 'create' &&
         <FormGroup validationState={hasError ? 'error' : null} >
           <Col componentClass={ControlLabel} sm={3} lg={2}>&nbsp;</Col>
           <Col sm={8} lg={9}>
-            <label>
-              <input type="checkbox" checked={enableChangePassword} onChange={this.onEnableChangePassword} style={{ verticalAlign: 'text-bottom' }} />
+            <label htmlFor="enable-change-password">
+              <input id="enable-change-password" type="checkbox" checked={enableChangePassword} onChange={this.onEnableChangePassword} style={{ verticalAlign: 'text-bottom' }} />
               &nbsp;Enable Password Change
             </label>
           </Col>
@@ -145,8 +147,8 @@ export default class User extends Component {
   }
 
   render() {
-    const { user } = this.props;
-    const availableRoles = ['admin', 'read', 'write'].map(role => ({
+    const { user, availableRoles } = this.props;
+    const rolesOptions = availableRoles.map(role => ({
       value: role,
       label: role,
     }));
@@ -167,7 +169,7 @@ export default class User extends Component {
                 <Select
                   multi={true}
                   value={user.get('roles', []).join(',')}
-                  options={availableRoles}
+                  options={rolesOptions}
                   onChange={this.onChangeRoles}
                   placeholder="Add role..."
                 />

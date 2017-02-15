@@ -1,4 +1,5 @@
 import { apiBillRun } from '../common/Api';
+import { fetchUserByIdQuery } from '../common/ApiQueries';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 import { saveEntity, getEntity, actions } from './entityActions';
 
@@ -7,12 +8,12 @@ export const LOGOUT = 'LOGOUT';
 export const LOGIN_ERROR = 'LOGIN_ERROR';
 
 
-export function getUser(userParams) {
-  return getEntity('users', userParams);
+export function getUser(id) {
+  return getEntity('users', fetchUserByIdQuery(id));
 }
 
-export function saveUser(userParams) {
-  return saveEntity('users', userParams);
+export function saveUser(user, action) {
+  return saveEntity('users', user, action);
 }
 
 export function updateUserField(path, value) {

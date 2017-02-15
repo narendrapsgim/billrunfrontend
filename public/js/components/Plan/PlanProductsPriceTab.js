@@ -10,7 +10,7 @@ import Help from '../Help';
 import ProductSearch from './components/ProductSearch';
 import { getProductsByKeysQuery, getProductByKeyQuery } from '../../common/ApiQueries';
 import { showSuccess, showWarning, showInfo } from '../../actions/alertsActions';
-import { getList, clearList } from '../../actions/listActions';
+import { getList, clearList, pushToList } from '../../actions/listActions';
 import {
   planProductRemove,
   planProductsRateRemove,
@@ -67,7 +67,7 @@ class PlanProductsPriceTab extends Component {
     if (productKeys.includes(key)) {
       this.props.dispatch(showWarning(`Price of product ${key} already overridden`));
     } else {
-      this.props.dispatch(getList('plan_products', getProductByKeyQuery(key), false))
+      this.props.dispatch(pushToList('plan_products', getProductByKeyQuery(key)))
         .then((result) => {
           if (result.status) {
             this.addNewProductToPlan(result.data);

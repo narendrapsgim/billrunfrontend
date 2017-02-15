@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { connect } from 'react-redux';
-
+import classNames from 'classnames';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 import { Button } from 'react-bootstrap';
 
@@ -10,38 +10,38 @@ import { Button } from 'react-bootstrap';
 import { titlize } from '../../common/Util';
 
 class List extends Component {
-  constructor(props) {
-    super(props);
-
-    this.onClickHeader = this.onClickHeader.bind(this);
-
-    this.state = {
-      sort: JSON.parse(props.sort),
-    };
-  }
 
   static propTypes = {
-    enableRemove: React.PropTypes.bool,
-    onClickRemove: React.PropTypes.func,
+    enableRemove: PropTypes.bool,
+    onClickRemove: PropTypes.func,
+    onSort: PropTypes.func,
+    sort: PropTypes.instanceOf(Immutable.Map),
   };
 
   static defaultProps = {
     enableRemove: false,
     onClickRemove: () => {},
-    sort: '{}',
+    onClickEdit: () => {},
+    onSort: () => {},
+    sort: Immutable.Map(),
   };
 
   displayByType(field, entity) {
     switch (field.type) {
       case 'date':
-        return moment(entity.get(field.id)).format(globalSetting.dateFormat);
+        return moment(entity.get(field.id, 0)).format(globalSetting.dateFormat);
       case 'time':
-        return moment(entity.get(field.id)).format(globalSetting.timeFormat);
+        return moment(entity.get(field.id, 0)).format(globalSetting.timeFormat);
       case 'datetime':
-        return moment(entity.get(field.id)).format(globalSetting.datetimeFormat);
+        return moment(entity.get(field.id, 0)).format(globalSetting.datetimeFormat);
+      case 'mongodate':
+        return moment.unix(entity.getIn([field.id, 'sec'], 0)).format(globalSetting.dateFormat);
+      case 'mongotime':
+        return moment.unix(entity.getIn([field.id, 'sec'], 0)).format(globalSetting.timeFormat);
+      case 'mongodatetime':
+        return moment.unix(entity.getIn([field.id, 'sec'], 0)).format(globalSetting.datetimeFormat);
       case 'timestamp':
-        return moment(parseInt(entity.get(field.id), 10) * 1000)
-          .format(globalSetting.datetimeFormat);
+        return moment.unix(entity.get(field.id, 0)).format(globalSetting.datetimeFormat);
       case 'text':
       default:
         return entity.get(field.id);
@@ -59,19 +59,13 @@ class List extends Component {
   }
 
   buildRow(entity, fields) {
-    const {
-      onClickEdit = () => {
-      },
-      editField,
-    } = this.props;
-
+    const { onClickEdit, edit } = this.props;
     return fields.map((field, key) => {
       if (field.display === false) {
         return null;
       }
       let fieldElement;
-
-      if (editField && editField === field.id) {
+      if (edit && key === 0) {
         fieldElement = (
           <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
             {this.printEntityField(entity, field)}
@@ -89,20 +83,18 @@ class List extends Component {
     });
   }
 
-  onClickHeader(field) {
-    const { onSort = () => {} } = this.props;
-    const { sort } = this.state;
-    const sort_dir = sort[field] === -1 ? 1 : -1;
-    this.setState({sort: {[field]: sort_dir}}, () => {
-      onSort(JSON.stringify(this.state.sort));
-    });
+  onClickHeader = (field) => {
+    const { sort } = this.props;
+    const sortdir = sort.get(field, 1) * -1;
+    this.props.onSort({ [field]: sortdir });
   }
 
   render() {
     const {
+      sort,
       items,
       fields = [],
-      onClickEdit = () => {},
+      onClickEdit,
       edit = false,
       editText,
       className,
@@ -110,21 +102,25 @@ class List extends Component {
       onClickRemove,
     } = this.props;
 
-    const { showConfirmRemove } = this.state;
-
     const table_header = fields.map((field, key) => {
-      let onclick = field.sort ? this.onClickHeader.bind(this, field.id) : () => {};
-      let style = field.sort ? { cursor: "pointer" } : {};
-      let arrow = (null);
+      const onclick = field.sort ? this.onClickHeader.bind(this, field.id) : () => {};
+      const style = field.sort ? { cursor: 'pointer' } : {};
+      let arrow = null;
       if (field.display === false) {
         return null;
       }
-
       if (field.sort) {
-	arrow = this.state.sort[field.id] ? (<i className={`sort-indicator fa fa-sort-${ this.state.sort[field.id] === 1 ? 'up' : 'down' }`}></i>) : (<i className="sort-indicator fa fa-sort"></i>);
+        const arrowClass = classNames('sort-indicator', 'fa', {
+          'fa-sort-down': sort.get(field.id, 0) === -1,
+          'fa-sort-up': sort.get(field.id, 0) === 1,
+          'fa-sort': sort.get(field.id, 0) === 0,
+        });
+        arrow = (<i className={arrowClass} />);
       }
-      if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
-        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
+      if (!field.title && !field.placeholder) {
+        return (<th key={key} onClick={onclick} style={style}>{titlize(field.id)}{arrow}</th>);
+      }
+      return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>)
     });
     let colSpan = fields.length;
     if (edit) {
@@ -137,7 +133,7 @@ class List extends Component {
     }
 
     const editTooltip = (
-      <Tooltip id="tooltip">{ editText ?editText : 'Edit'}</Tooltip>
+      <Tooltip id="tooltip">{ editText || 'Edit'}</Tooltip>
     );
 
     const table_body = items.size < 1 ?
@@ -146,7 +142,7 @@ class List extends Component {
                             <tr key={index}>
                               { this.buildRow(entity, fields) }
                               {
-                                edit ?
+                                edit &&
                                   <td className="edit-tb">
                                     <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
                                       { editText ?
@@ -156,14 +152,13 @@ class List extends Component {
                                         </OverlayTrigger>
                                       }
                                     </button>
-                                  </td> : null
+                                  </td>
                               }
                               {
-                                enableRemove ?
+                                enableRemove &&
                                   <td className="edit-tb">
                                     <Button onClick={onClickRemove.bind(this, entity)} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
                                   </td>
-                                : null
                               }
                             </tr>
                           )

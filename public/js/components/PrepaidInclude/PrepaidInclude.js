@@ -7,12 +7,17 @@ import Field from '../Field';
 
 const PrepaidInclude = (props) => {
   const { usageTypes, prepaidInclude, chargingByOptions } = props;
+
   const onSelectChange = id => (value) => {
     props.onChangeField({ target: { id, value } });
   };
+
   const usageTypesOptions = usageTypes
     .map(key => ({ value: key, label: key }))
     .toArray();
+
+  const checkboxStyle = { marginTop: 10 };
+
   return (
     <div className="PrepaidInclude">
       <Panel>
@@ -20,45 +25,25 @@ const PrepaidInclude = (props) => {
           <FormGroup>
             <Col lg={2} md={2} componentClass={ControlLabel}>Name</Col>
             <Col lg={7} md={7}>
-              <Field
-                id="name"
-                value={prepaidInclude.get('name', '')}
-                onChange={props.onChangeField}
-              />
+              <Field id="name" value={prepaidInclude.get('name', '')} onChange={props.onChangeField} />
             </Col>
           </FormGroup>
           <FormGroup>
             <Col lg={2} md={2} componentClass={ControlLabel}>External ID</Col>
             <Col lg={7} md={7}>
-              <Field
-                id="external_id"
-                value={prepaidInclude.get('external_id', '')}
-                onChange={props.onChangeField}
-                fieldType="number"
-              />
+              <Field id="external_id" value={prepaidInclude.get('external_id', '')} onChange={props.onChangeField} fieldType="number" />
             </Col>
           </FormGroup>
           <FormGroup>
             <Col lg={2} md={2} componentClass={ControlLabel}>Priority</Col>
             <Col lg={7} md={7}>
-              <Field
-                id="priority"
-                value={prepaidInclude.get('priority', '')}
-                onChange={props.onChangeField}
-                tooltip="Lower number represents higher priority"
-                fieldType="number"
-              />
+              <Field id="priority" value={prepaidInclude.get('priority', '')} onChange={props.onChangeField} tooltip="Lower number represents higher priority" fieldType="number" />
             </Col>
           </FormGroup>
           <FormGroup>
             <Col lg={2} md={2} componentClass={ControlLabel}>Charging by</Col>
             <Col lg={7} md={7}>
-              <Select
-                name="charging_by"
-                value={prepaidInclude.get('charging_by', '')}
-                options={chargingByOptions}
-                onChange={onSelectChange('charging_by')}
-              />
+              <Select name="charging_by" value={prepaidInclude.get('charging_by', '')} options={chargingByOptions} onChange={onSelectChange('charging_by')} />
             </Col>
           </FormGroup>
           <FormGroup>
@@ -66,10 +51,7 @@ const PrepaidInclude = (props) => {
             <Col lg={7} md={7}>
               {
                 prepaidInclude.get('charging_by') === 'total_cost'
-                ? <Select
-                  disabled={true}
-                  value={prepaidInclude.get('charging_by')}
-                />
+                ? <Select disabled={true} value={prepaidInclude.get('charging_by')} />
                 : <Select
                   value={prepaidInclude.get('charging_by_usaget', '')}
                   options={usageTypesOptions}
@@ -81,24 +63,14 @@ const PrepaidInclude = (props) => {
           </FormGroup>
           <FormGroup>
             <Col lg={2} md={2} componentClass={ControlLabel}>Shared bucket</Col>
-            <Col lg={7} md={7}>
-              <Field
-                id="shared"
-                value={prepaidInclude.get('shared', false)}
-                onChange={props.onChangeField}
-                fieldType="checkbox"
-              />
+            <Col lg={7} md={7} style={checkboxStyle}>
+              <Field id="shared" value={prepaidInclude.get('shared', false)} onChange={props.onChangeField} fieldType="checkbox" />
             </Col>
           </FormGroup>
           <FormGroup>
             <Col lg={2} md={2} componentClass={ControlLabel}>Unlimited</Col>
-            <Col lg={7} md={7}>
-              <Field
-                id="unlimited"
-                value={prepaidInclude.get('unlimited', false)}
-                onChange={props.onChangeField}
-                fieldType="checkbox"
-              />
+            <Col lg={7} md={7} style={checkboxStyle}>
+              <Field id="unlimited" value={prepaidInclude.get('unlimited', false)} onChange={props.onChangeField} fieldType="checkbox" />
             </Col>
           </FormGroup>
         </Form>
