@@ -1,157 +1,161 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-
-import { Row, Col, FormGroup, ControlLabel, Button } from 'react-bootstrap';
-import SettingsModal from './SettingsModal';
+import changeCase from 'change-case';
+import { Form, InputGroup, Row, Col, FormGroup, ControlLabel, Button, HelpBlock } from 'react-bootstrap';
+import { SortableElement } from 'react-sortable-hoc';
+import ModalWrapper from '../Elements/ModalWrapper';
+import DragHandle from '../Elements/DragHandle';
 import Field from '../Field';
 
-class CustomField extends React.Component {
+
+class CustomField extends Component {
+
   static propTypes = {
-    field: React.PropTypes.instanceOf(Immutable.Map),
-    entity: React.PropTypes.string.isRequired,
-    index: React.PropTypes.number.isRequired,  
-    last: React.PropTypes.bool,
+    field: PropTypes.instanceOf(Immutable.Map),
+    entity: PropTypes.string.isRequired,
+    idx: PropTypes.number.isRequired,
+    editable: PropTypes.bool,
+    onChange: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    last: false
+    field: Immutable.Map(),
+    editable: true,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showSettings: false
-    };
+  state = {
+    showAdvancedEdit: false,
   }
 
   onChange = (e) => {
-    const { entity, index } = this.props;
+    const { entity, idx } = this.props;
     const { id, value } = e.target;
-    this.props.onChange(entity, index, id, value);
+    this.props.onChange(entity, idx, id, value);
   };
 
   onRemove = () => {
-    const { entity, index } = this.props;
-    this.props.onRemove(entity, index);
-  };
-
-  dragOver = () => {
-    const { dragOver, index } = this.props;
-    dragOver(index);
-  };
-  
-  dragEnd = () => {
-    const { dragEnd, index } = this.props;
-    dragEnd(index);
+    const { entity, idx } = this.props;
+    this.props.onRemove(entity, idx);
   };
 
   onCloseModal = () => {
-    this.setState({showSettings: false});
+    this.setState({ showAdvancedEdit: false });
   };
-  
-  renderField = () => {
+
+  renderAdvancedEdit = () => {
     const { field } = this.props;
+    const { showAdvancedEdit } = this.state;
+    const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'filed')} Details`);
+    const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
     return (
-      <div>
-        <Row>
-          <Col lg={3} md={3}>
-            <Col lg={1} md={1}>
-              <FormGroup>
-                <ControlLabel>&nbsp;</ControlLabel>
-                <i className="fa fa-arrows-v movable" />
-              </FormGroup>
+      <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
+        <Form horizontal>
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Unique</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="unique" onChange={this.onChange} value={field.get('unique', false)} fieldType="checkbox" />
             </Col>
-            <Col lg={10} md={10}>
-              <FormGroup>
-                <ControlLabel>Field Name</ControlLabel>
-                <Field
-                    id="field_name"
-                    onChange={ this.onChange }
-                    value={ field.get('field_name', '') }
-                />
-              </FormGroup>
+          </FormGroup>
+
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Mandatory</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', false)} fieldType="checkbox" />
             </Col>
-          </Col>
-          <Col lg={3} md={3}>
-            <FormGroup>
-              <ControlLabel>Title</ControlLabel>
-              <Field
-                  id="title"
-                  onChange={ this.onChange }
-                  value={ field.get('title', '') }
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={3} md={3}>
-            <FormGroup>
-              <ControlLabel>Default Value</ControlLabel>
-              <Field
-                  id="default_value"
-                  onChange={ this.onChange }
-                  value={ field.get('default_value', '') }
-              />
-            </FormGroup>
-          </Col>
-          <Col lg={1} md={1}>
-            <FormGroup>
-              <ControlLabel>&nbsp;</ControlLabel>
-              <div>
-                <button
-                    className="btn btn-link"
-                    onClick={(
-                        () => this.setState({showSettings: true})
-                      )}>
-                  Advanced
-                </button>
-              </div>
-            </FormGroup>
-          </Col>
-          <Col lg={2} md={2}>
-            <FormGroup>
-              <ControlLabel>&nbsp;</ControlLabel>
-              <div>
-                <Button onClick={ this.onRemove } bsSize="small">
-                  <i className="fa fa-trash-o danger-red"/> Remove
-                </Button>
-              </div>
-            </FormGroup>
-          </Col>
-        </Row>
-      </div>
+          </FormGroup>
+
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Editable</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="editable" onChange={this.onChange} value={field.get('editable', false)} fieldType="checkbox" />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Display</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="display" onChange={this.onChange} value={field.get('display', false)} fieldType="checkbox" />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Show in list</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="show_in_list" onChange={this.onChange} value={field.get('show_in_list', false)} fieldType="checkbox" />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Select list</Col>
+            <Col sm={9}>
+              <InputGroup>
+                <InputGroup.Addon>
+                  <Field id="select_list" onChange={this.onChange} value={field.get('select_list', false)} fieldType="checkbox" />
+                </InputGroup.Addon>
+                <Field id="select_options" onChange={this.onChange} value={field.get('select_options', '')} disabled={!field.get('select_list', false)} />
+              </InputGroup>
+              { field.get('select_list', false) && <HelpBlock style={{ marginLeft: 40 }}>Select Options <small>(comma-separated list)</small></HelpBlock>}
+            </Col>
+          </FormGroup>
+
+        </Form>
+      </ModalWrapper>
     );
   }
 
-  renderOver = () => (
-    <div>
+  renderField = () => {
+    const { field, editable } = this.props;
+    return (
       <Row>
-        <Col lgOffset={5} lg={6}>
+        <Col lg={1} md={1} style={{ paddingTop: 10 }}><DragHandle /></Col>
+        <Col lg={2} md={2}>
+          <FormGroup>
+            <ControlLabel>Field Name</ControlLabel>
+            <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!editable} />
+          </FormGroup>
+        </Col>
+        <Col lg={2} md={2}>
+          <FormGroup>
+            <ControlLabel>Title</ControlLabel>
+            <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={!editable} />
+          </FormGroup>
+        </Col>
+        <Col lg={2} md={2}>
+          <FormGroup>
+            <ControlLabel>Default Value</ControlLabel>
+            <Field id="default_value" onChange={this.onChange} value={field.get('default_value', '')} disabled={!editable} />
+          </FormGroup>
+        </Col>
+        <Col lg={3} md={3}>
           <FormGroup>
             <ControlLabel>&nbsp;</ControlLabel>
-            <span>Set field here</span>
+            <div className="text-center">
+              {editable && <button className="btn btn-link" onClick={() => this.setState({ showAdvancedEdit: true })}> Advanced </button> }
+            </div>
+          </FormGroup>
+        </Col>
+        <Col lg={2} md={2}>
+          <FormGroup>
+            <ControlLabel>&nbsp;</ControlLabel>
+            <div>
+              {editable && <Button onClick={this.onRemove} bsSize="small"><i className="fa fa-trash-o danger-red" /> Remove </Button> }
+            </div>
           </FormGroup>
         </Col>
       </Row>
-    </div>
-  );
-  
-  render() {
-    const { field, last, over, dragStart, dragEnd } = this.props;
-    const { showSettings } = this.state;
+    );
+  }
 
+  render() {
     return (
-      <div className="CustomField" draggable="true" onDragStart={ dragStart } onDragOver={ this.dragOver } onDragEnd={ this.dragEnd }>
-        <SettingsModal field={ field } onClose={ this.onCloseModal }onChange={ this.onChange } show={ showSettings } />
-        {
-          over
-          ? this.renderOver()
-          : this.renderField()
-        }
-        { !last && <hr style={{ marginTop: 10, marginBottom: 10 }}/> }
+      <div className="CustomField" style={{ borderTop: '1px solid #eee', borderBottom: '1px solid #eee', paddingTop: 10 }}>
+        { this.renderField() }
+        { this.renderAdvancedEdit() }
       </div>
     );
   }
 }
 
-export default connect()(CustomField);
+export default connect()(SortableElement(CustomField));

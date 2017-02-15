@@ -1,36 +1,45 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import { Tabs, Tab, Panel } from 'react-bootstrap';
 import { ucFirst } from 'change-case';
-
+import CustomField from './CustomField';
+import ActionButtons from '../Elements/ActionButtons';
+import CreateButton from '../Elements/CreateButton';
+import SortableFieldsContainer from './SortableFieldsContainer';
 import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
 
-import { Tabs, Tab, Panel, Row, Col } from 'react-bootstrap';
-import CustomField from './CustomField';
-
 class CustomFields extends Component {
-  static defaultProps = {
-    subscriber: Immutable.List(),
-    account: Immutable.List()
-  };
 
   static propTypes = {
-    subscriber: React.PropTypes.instanceOf(Immutable.List),
-    account: React.PropTypes.instanceOf(Immutable.List)
+    subscriber: PropTypes.instanceOf(Immutable.List),
+    account: PropTypes.instanceOf(Immutable.List),
+    defaultDisabledFields: PropTypes.object,
+    defaultHiddenFields: PropTypes.object,
+    tabs: PropTypes.arrayOf(PropTypes.string),
+    dispatch: PropTypes.func.isRequired,
   };
-  
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      over: -1,
-      tabs: ["account", "subscriber"],
-      tab: 0
-    };
-  }
+  static defaultProps = {
+    subscriber: Immutable.List(),
+    account: Immutable.List(),
+    defaultDisabledFields: {
+      account: ['first_name', 'last_name'],
+      subscriber: ['firstname', 'lastname'],
+    },
+    defaultHiddenFields: {
+      account: ['aid', 'payment_gateway'],
+      subscriber: ['sid', 'aid', 'plan_activation', 'services'],
+    },
+    tabs: ['account', 'subscriber'],
+  };
+
+  state = {
+    tab: 0,
+  };
 
   componentDidMount() {
-    this.props.dispatch(getSettings("subscribers"));
+    this.props.dispatch(getSettings('subscribers'));
   }
 
   onChangeField = (entity, index, id, value) => {
@@ -41,115 +50,88 @@ class CustomFields extends Component {
     this.props.dispatch(removeSettingField('subscribers', [entity, 'fields', index]));
   };
 
-  onAddNewField = (entity) => {
+  onAddNewField = () => {
+    const { tab } = this.state;
+    const { tabs } = this.props;
+    const entity = tabs[tab];
     const size = this.props[entity].size;
     const newField = Immutable.Map();
     this.props.dispatch(updateSetting('subscribers', [entity, 'fields', size], newField));
   };
 
+  onClickCancel = () => {
+    this.props.dispatch(getSettings('subscribers'));
+  }
+
   onClickSave = () => {
     this.props.dispatch(saveSettings('subscribers'));
   };
-  
-  dragStart = (e) => {
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', e.currentTarget);
+
+  onSortEnd = ({ oldIndex, newIndex }) => {
+    const { tab } = this.state;
+    const { tabs } = this.props;
+    const entity = tabs[tab];
+    this.props.dispatch(setFieldPosition(oldIndex, newIndex, ['subscribers', entity, 'fields']));
   };
 
-  dragOver = (over) => {
-    this.setState({over});
-  };
-  
-  dragEnd = (index) => {
-    const { over, tab, tabs } = this.state;
-    const setting = tabs[tab];
-    this.props.dispatch(setFieldPosition(index, over, ['subscribers', setting, 'fields']));
-    this.setState({'over': -1});
-  };
-  
-  onSelectTab = (key) => {
-    console.log(this.state.tabs[key]);
-    this.setState({tab: this.state.tabs[key]});
+  onSelectTab = (tab) => {
+    this.setState({ tab });
   };
 
   renderFieldsTab = (entity, key) => {
-    const onAddNew = () => {
-      this.onAddNewField(entity);
-    };
+    const defaultDisabledFields = this.props.defaultDisabledFields[entity];
+    const defaultHiddenFields = this.props.defaultHiddenFields[entity];
+    const entityFields = this.props[entity];
+    const fields = [];
+    entityFields.forEach((field, index) => {
+      if (!field.get('generated', false) && !defaultHiddenFields.includes(field.get('field_name', ''))) {
+        const editable = !field.get('system', false) && !defaultDisabledFields.includes(field.get('field_name', ''));
+        fields.push(
+          <CustomField
+            key={`item-${index}`}
+            index={index}
+            idx={index}
+            field={field}
+            entity={entity}
+            editable={editable}
+            onChange={this.onChangeField}
+            onRemove={this.onRemoveField}
+          />
+        );
+      }
+    });
 
     return (
-      <Tab
-          key={ key }
-          title={`${ucFirst(entity)} Fields`}
-          eventKey={key}>
-        <Panel style={{borderTop: 'none'}}>
-          {
-            this.props[entity]
-                .map((field, field_key) => {
-                  return !field.get('generated', false) &&
-                         (<CustomField
-                              key={ field_key }
-                              field={ field }
-                              entity={ entity }
-                              index={ field_key }
-                              dragStart={ this.dragStart }
-                              dragOver={ this.dragOver }
-                              dragEnd={ this.dragEnd }
-                              over={ this.state.over === field_key }
-                              onChange={ this.onChangeField }
-                              onRemove={ this.onRemoveField }
-                              last={ field_key === (this.props[entity].size - 1) }
-                          />)
-                })
-          }
-          <button type="button" className="btn btn-link" onClick={ onAddNew }>
-            Add New Field
-          </button>
+      <Tab key={key} title={`${ucFirst(entity)} Fields`} eventKey={key}>
+        <Panel style={{ borderTop: 'none' }}>
+          <SortableFieldsContainer
+            lockAxis="y"
+            helperClass="draggable-menu"
+            useDragHandle={true}
+            items={fields}
+            onSortEnd={this.onSortEnd}
+          />
+          <CreateButton onClick={this.onAddNewField} type="Field" style={{ marginTop: 15 }} />
         </Panel>
       </Tab>
     );
   };
-  
-  render() {
-    const { account, subscriber } = this.props;
 
+  render() {
+    const { tabs } = this.props;
     return (
       <div className="CustomFields">
-        <Tabs
-            id="CustomFieldsTabs"
-            animation={ false }
-            onSelect={ this.onSelectTab }>
-          {
-            this.state.tabs.map((entity, ent_key) =>
-              this.renderFieldsTab(entity, ent_key))
-          }
+        <Tabs id="CustomFieldsTabs" animation={false} onSelect={this.onSelectTab}>
+          { tabs.map(this.renderFieldsTab) }
         </Tabs>
-        <div style={{marginTop: 12}}>
-          <button
-              type="submit"
-              className="btn btn-primary"
-              onClick={ this.onClickSave }
-              style={{ marginRight: 10 }}
-          >
-            Save
-          </button>
-          <button
-              type="reset"
-              className="btn btn-default"
-              onClick={ this.onClickCancel }
-          >
-            Cancel
-          </button>
-        </div>
+        <ActionButtons onClickSave={this.onClickSave} onClickCancel={this.onClickCancel} />
       </div>
     );
   }
 }
-function mapStateToProps(state) {
-  return {
-    subscriber: state.settings.getIn(['subscribers', 'subscriber', 'fields']),
-    account: state.settings.getIn(['subscribers', 'account', 'fields'])
-  };
-}
 
+const mapStateToProps = state => ({
+  subscriber: state.settings.getIn(['subscribers', 'subscriber', 'fields']),
+  account: state.settings.getIn(['subscribers', 'account', 'fields']),
+});
 export default connect(mapStateToProps)(CustomFields);
