@@ -48,11 +48,20 @@ const buildRequestData = (item, action) => {
       return formData;
     }
 
-    case 'update':
-    case 'closeandnew': {
+    case 'update': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
       const update = item.delete('_id');
+      formData.append('query', JSON.stringify(query));
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
+    case 'closeandnew': {
+      const now = moment().toISOString();
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      const update = item.delete('_id').set('from', now);
       formData.append('query', JSON.stringify(query));
       formData.append('update', JSON.stringify(update));
       return formData;
