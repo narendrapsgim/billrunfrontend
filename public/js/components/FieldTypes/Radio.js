@@ -50,7 +50,7 @@ class Radio extends Component {
       return (
         <label htmlFor={id} style={{ paddingTop: '10px' }}>
           {this.renderInput()}
-          &nbsp;&nbsp;{ label }
+          {label}
         </label>
       );
     }
