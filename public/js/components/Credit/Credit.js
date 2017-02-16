@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Select from 'react-select';
 import { connect } from 'react-redux';
 import { Button, Col, FormGroup, HelpBlock, Modal, Form, ControlLabel } from 'react-bootstrap';
 import moment from 'moment';
@@ -50,8 +51,7 @@ class Credit extends Component {
     this.props.dispatch(getSettings('usage_types'));
   }
 
-  onChangeCreditValue = (field, e) => {
-    const { value } = e.target;
+  onChangeValue = (field, value) => {
     const { validationErrors } = this.state;
     const newState = {};
     newState[field] = value;
@@ -62,6 +62,15 @@ class Credit extends Component {
     }
     this.setState(newState);
   };
+
+  onChangeCreditValue = (field, e) => {
+    const { value } = e.target;
+    this.onChangeValue(field, value);
+  };
+
+  onChangeSelectValue = (field, value) => {
+    this.onChangeValue(field, value);
+  }
 
   onChangeCreditBy = (e) => {
     const { value } = e.target;
@@ -114,18 +123,12 @@ class Credit extends Component {
 
   getAvailableUsageTypes = () => {
     const { usageTypes } = this.props;
-    return [
-      (<option disabled value="" key={-1}>Select Unit Type...</option>),
-      ...usageTypes.map(usaget => (<option value={usaget} key={usaget}>{usaget}</option>)),
-    ];
+    return usageTypes.map(usaget => ({ value: usaget, label: usaget })).toArray();
   }
 
   getAvailableRates = () => {
     const { allRates } = this.props;
-    return [
-      (<option disabled value="" key={-1}>Select Rate...</option>),
-      ...allRates.map(rate => (<option value={rate.get('key')} key={rate.get('key')}>{rate.get('key')}</option>)),
-    ];
+    return allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
   }
 
   render() {
@@ -143,24 +146,28 @@ class Credit extends Component {
             <FormGroup>
               <Col sm={2} componentClass={ControlLabel}>Rate By</Col>
               <Col sm={10}>
-                <input
-                  type="radio"
-                  name="rate-by"
-                  id="rate-by-fix"
-                  value="fix"
-                  checked={rateBy === 'fix'}
-                  onChange={this.onChangeCreditBy}
-                />
-                <label htmlFor="rate-by-fix">fix price</label>
-                <input
-                  type="radio"
-                  name="rate-by"
-                  id="rate-by-usagev"
-                  value="usagev"
-                  checked={rateBy === 'usagev'}
-                  onChange={this.onChangeCreditBy}
-                />
-                <label htmlFor="rate-by-usagev">volume</label>
+                <Col sm={3}>
+                  <Field
+                    fieldType="radio"
+                    name="rate-by"
+                    id="rate-by-fix"
+                    value="fix"
+                    checked={rateBy === 'fix'}
+                    onChange={this.onChangeCreditBy}
+                    label="&nbsp;fix price"
+                  />
+                </Col>
+                <Col sm={3}>
+                  <Field
+                    fieldType="radio"
+                    name="rate-by"
+                    id="rate-by-usagev"
+                    value="usagev"
+                    checked={rateBy === 'usagev'}
+                    onChange={this.onChangeCreditBy}
+                    label="&nbsp;volume"
+                  />
+                </Col>
               </Col>
             </FormGroup>
 
@@ -193,15 +200,13 @@ class Credit extends Component {
             <FormGroup validationState={validationErrors.get('usaget', '').length > 0 ? 'error' : null}>
               <Col sm={2} componentClass={ControlLabel}>Unit Type</Col>
               <Col sm={10}>
-                <select
+                <Select
                   id="usaget"
-                  className="form-control"
-                  onChange={this.onChangeCreditValue.bind(this, 'usaget')}
+                  onChange={this.onChangeSelectValue.bind(this, 'usaget')}
                   value={usaget}
                   disabled={rateBy !== 'usagev'}
-                >
-                  { availableUsageTypes }
-                </select>
+                  options={availableUsageTypes}
+                />
                 { validationErrors.get('usaget', '').length > 0 ? <HelpBlock>{validationErrors.get('usaget', '')}</HelpBlock> : ''}
               </Col>
             </FormGroup>
@@ -209,14 +214,12 @@ class Credit extends Component {
             <FormGroup validationState={validationErrors.get('rate', '').length > 0 ? 'error' : null}>
               <Col sm={2} componentClass={ControlLabel}>Rate</Col>
               <Col sm={10}>
-                <select
+                <Select
                   id="rate"
-                  className="form-control"
-                  onChange={this.onChangeCreditValue.bind(this, 'rate')}
+                  onChange={this.onChangeSelectValue.bind(this, 'rate')}
                   value={rate}
-                >
-                  { availableRates }
-                </select>
+                  options={availableRates}
+                />
                 { validationErrors.get('rate', '').length > 0 ? <HelpBlock>{validationErrors.get('rate', '')}</HelpBlock> : ''}
               </Col>
             </FormGroup>
