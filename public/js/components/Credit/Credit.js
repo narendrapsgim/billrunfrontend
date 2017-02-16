@@ -1,55 +1,100 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Button, Col, FormGroup, HelpBlock, Modal, Form, ControlLabel } from 'react-bootstrap';
 import moment from 'moment';
+import { Map, List } from 'immutable';
 import Field from '../Field';
+import { showSuccess } from '../../actions/alertsActions';
+import { getProductsKeysQuery } from '../../common/ApiQueries';
+import { getList } from '../../actions/listActions';
+import { getSettings } from '../../actions/settingsActions';
 import { creditCharge } from '../../actions/creditActions';
 
 class Credit extends Component {
   static defaultProps = {
+    allRates: List(),
+    usageTypes: List(),
     cancelLabel: 'Cancel',
     chargeLabel: 'Charge',
     sid: false,
   };
 
   static propTypes = {
-    dispatch: React.PropTypes.func.isRequired,
-    onClose: React.PropTypes.func.isRequired,
-    sid: React.PropTypes.number,
-    aid: React.PropTypes.number.isRequired,
-    cancelLabel: React.PropTypes.string,
-    chargeLabel: React.PropTypes.string,
+    dispatch: PropTypes.func.isRequired,
+    allRates: PropTypes.instanceOf(List),
+    usageTypes: PropTypes.instanceOf(List),
+    onClose: PropTypes.func.isRequired,
+    sid: PropTypes.number,
+    aid: PropTypes.number.isRequired,
+    cancelLabel: PropTypes.string,
+    chargeLabel: PropTypes.string,
   };
 
   state = {
+    validationErrors: Map({
+      aprice: 'required',
+      usagev: '',
+      usaget: '',
+      rate: 'required',
+    }),
     paramKeyError: '',
     rateBy: 'fix',
-    aprice: 0,
-    usagev: 0,
+    aprice: '',
+    usagev: '',
     usaget: '',
     rate: '',
   }
 
+  componentDidMount() {
+    this.props.dispatch(getList('all_rates', getProductsKeysQuery()));
+    this.props.dispatch(getSettings('usage_types'));
+  }
+
   onChangeCreditValue = (field, e) => {
     const { value } = e.target;
+    const { validationErrors } = this.state;
     const newState = {};
     newState[field] = value;
+    if (value.length === 0) {
+      newState.validationErrors = validationErrors.set(field, 'required');
+    } else {
+      newState.validationErrors = validationErrors.set(field, '');
+    }
     this.setState(newState);
   };
 
   onChangeCreditBy = (e) => {
     const { value } = e.target;
-    this.setState({ rateBy: value });
+    const { validationErrors } = this.state;
+    let newState;
+    if (value === 'fix') {
+      newState = {
+        rateBy: value,
+        usaget: '',
+        usagev: '',
+        validationErrors: validationErrors.set('aprice', 'required').set('usagev', '').set('usaget', ''),
+      };
+    } else {
+      newState = {
+        rateBy: value,
+        aprice: '',
+        validationErrors: validationErrors.set('aprice', '').set('usagev', 'required').set('usaget', 'required'),
+      };
+    }
+    this.setState(newState);
   }
 
   onCreditCharge = () => {
     const { aid, sid } = this.props;
-    const { rateBy, aprice, usagev, usaget, rate, paramKeyError } = this.state;
+    const { rateBy, aprice, usagev, usaget, rate, validationErrors } = this.state;
+    if (validationErrors.valueSeq().includes('required')) {
+      return;
+    }
     let params = [
       { aid },
       { sid },
       { rate },
-      { time: moment().unix() },
+      { credit_time: moment().toISOString() },
     ];
     if (rateBy === 'fix') {
       params = [...params, { aprice }];
@@ -58,25 +103,36 @@ class Credit extends Component {
     }
     this.props.dispatch(creditCharge(params))
     .then(
-      (s) => {
-        //TODO: success message
-        console.log(s);
+      (response) => {
+        if (response === true) {
+          this.props.dispatch(showSuccess('Credit successfully!'));
+          this.props.onClose();
+        }
       }
     );
   };
 
+  getAvailableUsageTypes = () => {
+    const { usageTypes } = this.props;
+    return [
+      (<option disabled value="" key={-1}>Select Unit Type...</option>),
+      ...usageTypes.map(usaget => (<option value={usaget} key={usaget}>{usaget}</option>)),
+    ];
+  }
+
   getAvailableRates = () => {
-    const rates = ['test_rate', 'rate1', 'rate2', 'rate3']; //TODO: get real rates
+    const { allRates } = this.props;
     return [
       (<option disabled value="" key={-1}>Select Rate...</option>),
-      ...rates.map(rate => (<option value={rate} key={rate}>{rate}</option>)),
+      ...allRates.map(rate => (<option value={rate.get('key')} key={rate.get('key')}>{rate.get('key')}</option>)),
     ];
   }
 
   render() {
     const { cancelLabel, chargeLabel } = this.props;
-    const { rateBy, aprice, usagev, usaget, rate, paramKeyError } = this.state;
+    const { rateBy, aprice, usagev, usaget, rate, validationErrors } = this.state;
     const availableRates = this.getAvailableRates();
+    const availableUsageTypes = this.getAvailableUsageTypes();
     return (
       <Modal show={true}>
         <Modal.Header closeButton={false}>
@@ -108,7 +164,7 @@ class Credit extends Component {
               </Col>
             </FormGroup>
 
-            <FormGroup validationState={paramKeyError.length > 0 ? 'error' : null}>
+            <FormGroup validationState={validationErrors.get('aprice', '').length > 0 ? 'error' : null}>
               <Col sm={2} componentClass={ControlLabel}>Price</Col>
               <Col sm={10}>
                 <Field
@@ -117,11 +173,11 @@ class Credit extends Component {
                   fieldType="price"
                   disabled={rateBy !== 'fix'}
                 />
-                { paramKeyError.length > 0 ? <HelpBlock>{paramKeyError}</HelpBlock> : ''}
+                { validationErrors.get('aprice', '').length > 0 ? <HelpBlock>{validationErrors.get('aprice', '')}</HelpBlock> : ''}
               </Col>
             </FormGroup>
 
-            <FormGroup validationState={paramKeyError.length > 0 ? 'error' : null}>
+            <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
               <Col sm={2} componentClass={ControlLabel}>Volume</Col>
               <Col sm={10}>
                 <Field
@@ -130,23 +186,27 @@ class Credit extends Component {
                   fieldType="number"
                   disabled={rateBy !== 'usagev'}
                 />
-                { paramKeyError.length > 0 ? <HelpBlock>{paramKeyError}</HelpBlock> : ''}
+                { validationErrors.get('usagev', '').length > 0 ? <HelpBlock>{validationErrors.get('usagev', '')}</HelpBlock> : ''}
               </Col>
             </FormGroup>
 
-            <FormGroup validationState={paramKeyError.length > 0 ? 'error' : null}>
+            <FormGroup validationState={validationErrors.get('usaget', '').length > 0 ? 'error' : null}>
               <Col sm={2} componentClass={ControlLabel}>Unit Type</Col>
               <Col sm={10}>
-                <Field
+                <select
+                  id="usaget"
+                  className="form-control"
                   onChange={this.onChangeCreditValue.bind(this, 'usaget')}
                   value={usaget}
                   disabled={rateBy !== 'usagev'}
-                />
-                { paramKeyError.length > 0 ? <HelpBlock>{paramKeyError}</HelpBlock> : ''}
+                >
+                  { availableUsageTypes }
+                </select>
+                { validationErrors.get('usaget', '').length > 0 ? <HelpBlock>{validationErrors.get('usaget', '')}</HelpBlock> : ''}
               </Col>
             </FormGroup>
 
-            <FormGroup validationState={paramKeyError.length > 0 ? 'error' : null}>
+            <FormGroup validationState={validationErrors.get('rate', '').length > 0 ? 'error' : null}>
               <Col sm={2} componentClass={ControlLabel}>Rate</Col>
               <Col sm={10}>
                 <select
@@ -157,7 +217,7 @@ class Credit extends Component {
                 >
                   { availableRates }
                 </select>
-                { paramKeyError.length > 0 ? <HelpBlock>{paramKeyError}</HelpBlock> : ''}
+                { validationErrors.get('rate', '').length > 0 ? <HelpBlock>{validationErrors.get('rate', '')}</HelpBlock> : ''}
               </Col>
             </FormGroup>
           </Form>
@@ -171,4 +231,10 @@ class Credit extends Component {
   }
 }
 
-export default connect()(Credit);
+const mapStateToProps = (state) => {
+  const usageTypes = state.settings.get('usage_types');
+  const allRates = state.list.get('all_rates');
+  return { usageTypes, allRates };
+};
+
+export default connect(mapStateToProps)(Credit);
