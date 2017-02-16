@@ -10,6 +10,7 @@ export const actions = {
   SET_PAGE: 'SET_PAGE',
   SET_SORT: 'SET_SORT',
   SET_SIZE: 'SET_SIZE',
+  SET_STATE: 'SET_STATE',
 };
 
 const gotList = (collection, list) => ({
@@ -46,6 +47,12 @@ export const setListPage = (collection, page) => ({
   type: actions.SET_PAGE,
   collection,
   page,
+});
+
+export const setListState = (collection, state) => ({
+  type: actions.SET_STATE,
+  collection,
+  state,
 });
 
 export const clearList = collection => ({

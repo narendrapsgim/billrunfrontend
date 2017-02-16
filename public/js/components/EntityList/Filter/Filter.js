@@ -9,10 +9,12 @@ export default class Filter extends Component {
 
   static propTypes = {
     filter: PropTypes.instanceOf(Immutable.Map),
+    children: PropTypes.element,
   };
 
   static defaultProps = {
     filter: Immutable.Map(),
+    children: null,
   };
 
   constructor(props) {
@@ -111,7 +113,7 @@ export default class Filter extends Component {
   }
 
   render() {
-    const { fields = [] } = this.props;
+    const { fields = [], children } = this.props;
     const { filter_by, string } = this.state;
 
     const fields_options = fields
@@ -153,7 +155,8 @@ export default class Filter extends Component {
                     type="button">
               <i className="fa fa-eraser"></i>
             </button>
-	  </div>
+          </div>
+          { children }
         </div>
       </div>
     );

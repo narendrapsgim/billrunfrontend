@@ -65,7 +65,7 @@ class List extends Component {
         return null;
       }
       let fieldElement;
-      if (edit && key === 0) {
+      if (edit && ((key === 0 && field.id !== 'state') || (key === 1 && fields[0].id === 'state'))) {
         fieldElement = (
           <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
             {this.printEntityField(entity, field)}
@@ -75,11 +75,10 @@ class List extends Component {
         fieldElement = this.printEntityField(entity, field);
       }
       return (
-        <td key={key}>
+        <td key={key} className={field.cssClass} >
           { fieldElement }
         </td>
       )
-
     });
   }
 
@@ -118,7 +117,7 @@ class List extends Component {
         arrow = (<i className={arrowClass} />);
       }
       if (!field.title && !field.placeholder) {
-        return (<th key={key} onClick={onclick} style={style}>{titlize(field.id)}{arrow}</th>);
+        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{titlize(field.id)}{arrow}</th>);
       }
       return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>)
     });

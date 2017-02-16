@@ -255,3 +255,21 @@ export const getProductsByKeysQuery = (keys, project = {}) => ({
     }) },
   ],
 });
+
+export const getEntityRevisionsQuery = (collection, revisionBy, key, size) => ({
+  action: 'get',
+  entity: collection,
+  params: [
+    { sort: JSON.stringify({ from: 1 }) },
+    { query: JSON.stringify({
+      [revisionBy]: {
+        $regex: `^${key}$`,
+        $options: 'i',
+      },
+    }) },
+    { project: JSON.stringify({ from: 1, to: 1, description: 1 }) },
+    { page: 0 },
+    { size },
+    { history: true },
+  ],
+});

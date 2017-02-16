@@ -5,6 +5,7 @@ import sort from './sortReducer';
 import filter from './filterReducer';
 import nextPage from './nextPageReducer';
 import size from './sizeReducer';
+import state from './stateReducer';
 
 
 export default combineReducers({
@@ -14,4 +15,5 @@ export default combineReducers({
   filter,
   nextPage,
   size,
+  state,
 });
