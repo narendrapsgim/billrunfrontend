@@ -66,6 +66,7 @@ const PlansList = () => {
       baseFilter={baseFilter}
       tableFields={tableFields}
       projectFields={projectFields}
+      showRevisionBy="name"
     />
   );
 };
