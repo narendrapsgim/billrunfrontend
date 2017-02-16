@@ -260,7 +260,7 @@ export const getEntityRevisionsQuery = (collection, revisionBy, key, size) => ({
   action: 'get',
   entity: collection,
   params: [
-    { sort: JSON.stringify({ from: 1 }) },
+    { sort: JSON.stringify({ from: -1 }) },
     { query: JSON.stringify({
       [revisionBy]: {
         $regex: `^${key}$`,

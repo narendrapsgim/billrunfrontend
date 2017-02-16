@@ -25,6 +25,7 @@ class EntityRevisionModal extends Component {
     loaded: false,
     progress: false,
     revisions: [],
+    more: false,
   }
 
   onEnter = () => {
@@ -39,11 +40,22 @@ class EntityRevisionModal extends Component {
   }
 
   onFetchSuccess = (response) => {
-    const revisions = response.data[0].data.details.map(revision => ({
-      from: revision.from.sec,
-      to: revision.to.sec,
-    }));
-    this.setState({ revisions, progress: false });
+    if (response.data
+      && response.data[0]
+      && response.data[0].data
+      && response.data[0].data.details
+      && Array.isArray(response.data[0].data.details)
+    ) {
+      const more = response.data[0].data.next_page;
+      const revisions = response.data[0].data.details
+        .reverse()
+        .map(revision => ({
+          from: revision.from.sec,
+          to: revision.to.sec,
+        }));
+      this.setState({ revisions, more, progress: false });
+    }
+    this.setState({ progress: false });
   }
 
   onFetchFaild = (error) => {
@@ -77,10 +89,11 @@ class EntityRevisionModal extends Component {
 
   popoverItems = () => {
     const { item } = this.props;
-    const { revisions } = this.state;
+    const { revisions, more } = this.state;
     return (
-      <Popover id={`${item.getIn(['_id', '$id'], '')}-revisions`} title="Revision History">
+      <Popover id={`${item.getIn(['_id', '$id'], '')}-revisions`} title="Revision History" className="entity-revision-history-popover">
         <ul className="revision-history-list">
+          { more && <li key={`${item.getIn(['_id', '$id'], '')}-more`} className="more"><div>&nbsp;</div></li>}
           { revisions.map((revision) => {
             const from = moment.unix(revision.from);
             const to = moment.unix(revision.to);

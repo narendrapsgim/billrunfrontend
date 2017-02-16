@@ -277,6 +277,9 @@ textarea {
   opacity: .7;
 }
 /* Entity Revision */
+.entity-revision-history-popover {
+  max-width: none;
+}
 .cycle {
   width: 15px;
   height: 15px;
@@ -313,6 +316,9 @@ ul.revision-history-list li {
   text-align: center;
   position: relative;
 }
+ul.revision-history-list li.more {
+  width: 20px;
+}
 ul.revision-history-list li .cycle {
   margin-bottom: 10px;
 }
@@ -331,5 +337,11 @@ ul.revision-history-list li:last-child::after {
   content: "";
   width: 0;
   border-bottom: none;
+}
+ul.revision-history-list li.more::after {
+  border-bottom: 2px dotted #91A384;
+  width: 22px;
+  top: -8px;
+  left: 30px;
 }
 /* ~Entity Revision */
