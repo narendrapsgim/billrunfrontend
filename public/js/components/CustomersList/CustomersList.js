@@ -13,11 +13,13 @@ class CustomersList extends Component {
       PropTypes.instanceOf(Immutable.List),
       null,
     ]),
+    accountAllwaysShownFields: PropTypes.instanceOf(Immutable.List),
     dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     accountFields: null,
+    accountAllwaysShownFields: Immutable.List(['firstname', 'lastname']),
   };
 
   componentDidMount() {
@@ -28,14 +30,14 @@ class CustomersList extends Component {
   }
 
   render() {
-    const { accountFields } = this.props;
+    const { accountFields, accountAllwaysShownFields } = this.props;
 
     if (accountFields === null) {
       return (<LoadingItemPlaceholder />);
     }
 
     const fields = accountFields
-      .filter(field => field.get('show_in_list', false))
+      .filter(field => field.get('show_in_list', false) || accountAllwaysShownFields.includes(field.get('field_name', '')))
       .map(field => ({
         id: field.get('field_name'),
         placeholder: field.get('title', field.get('field_name')),
