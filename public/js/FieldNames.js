@@ -38,14 +38,34 @@ const FieldNames = {
     accountcode: 'CDR account ID',
     type: 'Input processor name',
     source: 'Record source',
+    connection_type: 'Connection_type',
     end: 'End time',
     aid: 'Customer ID',
     process_time: 'Process time',
     usagesb: 'Accumulative usage',
     row_number: 'Record number',
+    realtime: 'Realtime?',
     dstchannel: 'Destination channel',
-    answer: 'Answer time'
-  }
+    answer: 'Answer time',
+    session_id: 'Session ID',
+    request_type: 'Request type',
+    record_type: 'Record type',
+    billrun_pretend: 'Pretend?',
+    request_num: 'Request number',
+    granted_return_code: 'Return code',
+  },
+
+  queue: {
+    calc_name: 'Calculator stage',
+    calc_time: 'Last Calculation Time',
+    realtime: 'Realtime?',
+    session_id: 'Session ID',
+    request_type: 'Request type',
+    record_type: 'Record type',
+    billrun_pretend: 'Pretend?',
+    request_num: 'Request number',
+    granted_return_code: 'Return code',
+  },
 };
 
 export default FieldNames;
