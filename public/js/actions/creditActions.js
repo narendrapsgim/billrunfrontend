@@ -1,30 +1,11 @@
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
-import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { getCreditChargeQuery } from '../common/ApiQueries';
+import { startProgressIndicator } from './progressIndicatorActions';
 
-function creditChargeApi(params) {
-  const query = {
-    api: 'credit',
-    params,
-  };
-  return apiBillRun(query);
-}
-
-export function creditCharge(params) { // eslint-disable-line import/prefer-default-export
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    return creditChargeApi(params)
-    .then(
-      () => {
-        dispatch(finishProgressIndicator());
-        return (true);
-      }
-    )
-    .catch(
-      (error) => {
-        dispatch(finishProgressIndicator());
-        dispatch(apiBillRunErrorHandler(error));
-        return (error);
-      }
-    );
-  };
-}
+export const creditCharge = params => (dispatch) => { // eslint-disable-line import/prefer-default-export
+  dispatch(startProgressIndicator());
+  const query = getCreditChargeQuery(params);
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Credit successfully!')))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
+};

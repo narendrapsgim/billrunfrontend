@@ -1,11 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import Select from 'react-select';
 import { connect } from 'react-redux';
-import { Button, Col, FormGroup, HelpBlock, Modal, Form, ControlLabel } from 'react-bootstrap';
 import moment from 'moment';
 import { Map, List } from 'immutable';
+import { Col, FormGroup, HelpBlock, Form, ControlLabel } from 'react-bootstrap';
+import ModalWrapper from '../Elements/ModalWrapper';
 import Field from '../Field';
-import { showSuccess } from '../../actions/alertsActions';
 import { getProductsKeysQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
@@ -113,8 +113,7 @@ class Credit extends Component {
     this.props.dispatch(creditCharge(params))
     .then(
       (response) => {
-        if (response === true) {
-          this.props.dispatch(showSuccess('Credit successfully!'));
+        if (response.status) {
           this.props.onClose();
         }
       }
@@ -137,99 +136,97 @@ class Credit extends Component {
     const availableRates = this.getAvailableRates();
     const availableUsageTypes = this.getAvailableUsageTypes();
     return (
-      <Modal show={true}>
-        <Modal.Header closeButton={false}>
-          <Modal.Title>Credit Charge</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form horizontal>
-            <FormGroup>
-              <Col sm={2} componentClass={ControlLabel}>Rate By</Col>
-              <Col sm={10}>
-                <Col sm={3}>
-                  <Field
-                    fieldType="radio"
-                    name="rate-by"
-                    id="rate-by-fix"
-                    value="fix"
-                    checked={rateBy === 'fix'}
-                    onChange={this.onChangeCreditBy}
-                    label="&nbsp;fix price"
-                  />
-                </Col>
-                <Col sm={3}>
-                  <Field
-                    fieldType="radio"
-                    name="rate-by"
-                    id="rate-by-usagev"
-                    value="usagev"
-                    checked={rateBy === 'usagev'}
-                    onChange={this.onChangeCreditBy}
-                    label="&nbsp;volume"
-                  />
-                </Col>
-              </Col>
-            </FormGroup>
-
-            <FormGroup validationState={validationErrors.get('aprice', '').length > 0 ? 'error' : null}>
-              <Col sm={2} componentClass={ControlLabel}>Price</Col>
-              <Col sm={10}>
+      <ModalWrapper
+        show={true}
+        onOk={this.onCreditCharge}
+        labelOk={chargeLabel}
+        onCancel={this.props.onClose}
+        labelCancel={cancelLabel}
+        title="Credit Charge"
+      >
+        <Form horizontal>
+          <FormGroup>
+            <Col sm={2} componentClass={ControlLabel}>Rate By</Col>
+            <Col sm={10}>
+              <Col sm={3}>
                 <Field
-                  onChange={this.onChangeCreditValue.bind(this, 'aprice')}
-                  value={aprice}
-                  fieldType="price"
-                  disabled={rateBy !== 'fix'}
+                  fieldType="radio"
+                  name="rate-by"
+                  id="rate-by-fix"
+                  value="fix"
+                  checked={rateBy === 'fix'}
+                  onChange={this.onChangeCreditBy}
+                  label="&nbsp;fix price"
                 />
-                { validationErrors.get('aprice', '').length > 0 ? <HelpBlock>{validationErrors.get('aprice', '')}</HelpBlock> : ''}
               </Col>
-            </FormGroup>
-
-            <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
-              <Col sm={2} componentClass={ControlLabel}>Volume</Col>
-              <Col sm={10}>
+              <Col sm={3}>
                 <Field
-                  onChange={this.onChangeCreditValue.bind(this, 'usagev')}
-                  value={usagev}
-                  fieldType="number"
-                  disabled={rateBy !== 'usagev'}
+                  fieldType="radio"
+                  name="rate-by"
+                  id="rate-by-usagev"
+                  value="usagev"
+                  checked={rateBy === 'usagev'}
+                  onChange={this.onChangeCreditBy}
+                  label="&nbsp;volume"
                 />
-                { validationErrors.get('usagev', '').length > 0 ? <HelpBlock>{validationErrors.get('usagev', '')}</HelpBlock> : ''}
               </Col>
-            </FormGroup>
+            </Col>
+          </FormGroup>
 
-            <FormGroup validationState={validationErrors.get('usaget', '').length > 0 ? 'error' : null}>
-              <Col sm={2} componentClass={ControlLabel}>Unit Type</Col>
-              <Col sm={10}>
-                <Select
-                  id="usaget"
-                  onChange={this.onChangeSelectValue.bind(this, 'usaget')}
-                  value={usaget}
-                  disabled={rateBy !== 'usagev'}
-                  options={availableUsageTypes}
-                />
-                { validationErrors.get('usaget', '').length > 0 ? <HelpBlock>{validationErrors.get('usaget', '')}</HelpBlock> : ''}
-              </Col>
-            </FormGroup>
+          <FormGroup validationState={validationErrors.get('aprice', '').length > 0 ? 'error' : null}>
+            <Col sm={2} componentClass={ControlLabel}>Price</Col>
+            <Col sm={10}>
+              <Field
+                onChange={this.onChangeCreditValue.bind(this, 'aprice')}
+                value={aprice}
+                fieldType="price"
+                disabled={rateBy !== 'fix'}
+              />
+              { validationErrors.get('aprice', '').length > 0 ? <HelpBlock>{validationErrors.get('aprice', '')}</HelpBlock> : ''}
+            </Col>
+          </FormGroup>
 
-            <FormGroup validationState={validationErrors.get('rate', '').length > 0 ? 'error' : null}>
-              <Col sm={2} componentClass={ControlLabel}>Rate</Col>
-              <Col sm={10}>
-                <Select
-                  id="rate"
-                  onChange={this.onChangeSelectValue.bind(this, 'rate')}
-                  value={rate}
-                  options={availableRates}
-                />
-                { validationErrors.get('rate', '').length > 0 ? <HelpBlock>{validationErrors.get('rate', '')}</HelpBlock> : ''}
-              </Col>
-            </FormGroup>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button bsSize="small" onClick={this.props.onClose}>{cancelLabel}</Button>
-          <Button bsSize="small" onClick={this.onCreditCharge} bsStyle="primary" >{chargeLabel}</Button>
-        </Modal.Footer>
-      </Modal>
+          <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
+            <Col sm={2} componentClass={ControlLabel}>Volume</Col>
+            <Col sm={10}>
+              <Field
+                onChange={this.onChangeCreditValue.bind(this, 'usagev')}
+                value={usagev}
+                fieldType="number"
+                disabled={rateBy !== 'usagev'}
+              />
+              { validationErrors.get('usagev', '').length > 0 ? <HelpBlock>{validationErrors.get('usagev', '')}</HelpBlock> : ''}
+            </Col>
+          </FormGroup>
+
+          <FormGroup validationState={validationErrors.get('usaget', '').length > 0 ? 'error' : null}>
+            <Col sm={2} componentClass={ControlLabel}>Unit Type</Col>
+            <Col sm={10}>
+              <Select
+                id="usaget"
+                onChange={this.onChangeSelectValue.bind(this, 'usaget')}
+                value={usaget}
+                disabled={rateBy !== 'usagev'}
+                options={availableUsageTypes}
+              />
+              { validationErrors.get('usaget', '').length > 0 ? <HelpBlock>{validationErrors.get('usaget', '')}</HelpBlock> : ''}
+            </Col>
+          </FormGroup>
+
+          <FormGroup validationState={validationErrors.get('rate', '').length > 0 ? 'error' : null}>
+            <Col sm={2} componentClass={ControlLabel}>Rate</Col>
+            <Col sm={10}>
+              <Select
+                id="rate"
+                onChange={this.onChangeSelectValue.bind(this, 'rate')}
+                value={rate}
+                options={availableRates}
+              />
+              { validationErrors.get('rate', '').length > 0 ? <HelpBlock>{validationErrors.get('rate', '')}</HelpBlock> : ''}
+            </Col>
+          </FormGroup>
+        </Form>
+      </ModalWrapper>
     );
   }
 }
