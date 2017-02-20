@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap';
 const LoadingItemPlaceholder = props => (
   <div>
     <p>{props.loadingLabel}</p>
-    <Button onClick={props.onClick} bsStyle="default">{props.buttonLabel}</Button>
+    { props.onClick && <Button onClick={props.onClick} bsStyle="default">{props.buttonLabel}</Button> }
   </div>
 );
 
@@ -15,7 +15,7 @@ LoadingItemPlaceholder.defaultProps = {
 };
 
 LoadingItemPlaceholder.propTypes = {
-  onClick: React.PropTypes.func.isRequired,
+  onClick: React.PropTypes.func,
   buttonLabel: React.PropTypes.string,
   loadingLabel: React.PropTypes.string,
 };

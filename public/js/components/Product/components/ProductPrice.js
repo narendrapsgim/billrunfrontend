@@ -48,13 +48,16 @@ export default class ProductPrice extends Component {
   }
 
   onEditTo = (e) => {
-    const { index, productUnlimitedValue } = this.props;
+    const { index, productUnlimitedValue, item } = this.props;
     let { value } = e.target;
     let toError = '';
     if (value === '') {
       toError = 'Required';
     } else if (productUnlimitedValue !== value && Number.isInteger(Number(value)) && Number(value) > 0) {
       value = Number(value);
+      if (value <= item.get('from', 0)) {
+        toError = 'Must be greater than "From"';
+      }
     } else {
       toError = 'Must be positive integer';
     }

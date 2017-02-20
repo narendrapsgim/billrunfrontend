@@ -42,7 +42,7 @@ class Tenant extends Component {
     if (files.length > 0) {
       const maxBytesSize = globalSetting.logoMaxSize * 1024 * 1024;
       if (files[0].size <= maxBytesSize) {
-      saveFile(files[0], { billtype: 'logo' });
+        saveFile(files[0], { billtype: 'logo' });
         this.props.onChange('tenant', 'logo', files[0].name);
         this.updateLogoPreview(files[0]);
       } else {
@@ -117,7 +117,7 @@ class Tenant extends Component {
 }
 
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = state => ({
   logo: state.settings.getIn(['files', 'logo']),
 });
 

@@ -1,37 +1,48 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { List } from 'immutable';
-
-import LimitedDestination from './LimitedDestination';
+import { Map, List } from 'immutable';
 import { Panel } from 'react-bootstrap';
+import LimitedDestination from './LimitedDestination';
 import PlanSearch from '../Elements/PlanSearch';
 
-const LimitedDestinations = (props) => (
+const LimitedDestinations = ({ onSelectPlan, limitedDestinations, onChange, allRates }) => (
   <div className="LimitedDestinations">
     <Panel>
-      <PlanSearch onSelectPlan={ props.onSelectPlan } />
+      <PlanSearch onSelectPlan={onSelectPlan} />
     </Panel>
     <LimitedDestination
-        rates={ props.limitedDestinations.get("BASE", List()) }
-        onChange={ props.onChange }
-        allRates={ props.allRates }
-        name="BASE"
+      rates={limitedDestinations.get('BASE', List())}
+      onChange={onChange}
+      allRates={allRates}
+      name="BASE"
     />
     {
-      props.limitedDestinations
+      limitedDestinations
            .keySeq()
            .filter(n => n !== 'BASE')
            .map((name, key) => (
              <LimitedDestination
-                 key={ key }
-                 rates={ props.limitedDestinations.get(name, List()) }
-                 onChange={ props.onChange }
-                 allRates={ props.allRates }
-                 name={ name }
+               key={key}
+               rates={limitedDestinations.get(name, List())}
+               onChange={onChange}
+               allRates={allRates}
+               name={name}
              />
            ))
     }
   </div>
 );
+
+LimitedDestinations.defaultProps = {
+  limitedDestinations: Map(),
+  allRates: [],
+};
+
+LimitedDestinations.propTypes = {
+  limitedDestinations: PropTypes.instanceOf(Map),
+  allRates: PropTypes.array,
+  onSelectPlan: React.PropTypes.func.isRequired,
+  onChange: React.PropTypes.func.isRequired,
+};
 
 export default connect()(LimitedDestinations);

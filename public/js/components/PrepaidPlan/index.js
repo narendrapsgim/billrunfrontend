@@ -1,2 +1,3 @@
-import PrepaidPlan from './PrepaidPlan';
-export default PrepaidPlan;
+import PrepaidPlanSetup from './PrepaidPlanSetup';
+
+export default PrepaidPlanSetup;

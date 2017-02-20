@@ -6,6 +6,7 @@ const defaultState = Immutable.fromJS({});
 export default function (state = defaultState, action) {
   const { collection, path, value, type, entity } = action;
   switch (type) {
+
     case actions.GOT_ENTITY:
       return state.set(collection, Immutable.fromJS(entity));
 
@@ -23,7 +24,7 @@ export default function (state = defaultState, action) {
 
     case actions.CLEAR_ENTITY:
       if (collection) {
-        return state.set(collection, Immutable.Map())
+        return state.set(collection, Immutable.Map());
       }
       return defaultState;
 

@@ -2,46 +2,57 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import { Col, Panel, Button } from 'react-bootstrap';
+import { Col, Panel } from 'react-bootstrap';
+import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import Product from './Product';
-import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-/* ACTIONS */
 import { onRateAdd, onRateRemove, onFieldUpdate, onToUpdate, onUsagetUpdate, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
 import { getSettings } from '../../actions/settingsActions';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
+import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { clearItems } from '../../actions/entityListActions';
 
 
 class ProductSetup extends Component {
 
-  static defaultProps = {
-    item: Immutable.Map(),
-    usaget: '',
-  };
-
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     itemId: PropTypes.string,
-    usaget: PropTypes.string,
-    usageTypes: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
-    dispatch: PropTypes.func.isRequired,
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    activeTab: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    dispatch: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    item: Immutable.Map(),
+    usageTypes: Immutable.List(),
+    activeTab: 1,
+  };
+
+  state = {
+    activeTab: parseInt(this.props.activeTab),
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
+    const { itemId, usageTypes } = this.props;
     if (itemId) {
       this.props.dispatch(getProduct(itemId));
     }
-    this.props.dispatch(getSettings('usage_types'));
+    if (usageTypes.isEmpty()) {
+      this.props.dispatch(getSettings('usage_types'));
+    }
   }
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'new') {
+    if (mode === 'create') {
       this.props.dispatch(setPageTitle('Create New Product'));
     }
   }
@@ -49,7 +60,7 @@ class ProductSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { item } = this.props;
     const { item: nextItem, mode } = nextProps;
-    if (mode === 'update' && item.get('key') !== nextItem.get('key')) {
+    if (mode !== 'create' && item.get('key') !== nextItem.get('key')) {
       this.props.dispatch(setPageTitle(`Edit product - ${nextItem.get('key')}`));
     }
   }
@@ -82,31 +93,34 @@ class ProductSetup extends Component {
     this.props.dispatch(onRateRemove(productPath, index));
   }
 
-  handleBack = () => {
-    this.props.router.push('/products');
+  afterSave = (response) => {
+    const { mode } = this.props;
+    if (response.status) {
+      this.props.dispatch(clearItems('products')); // refetch items list because item was (changed in / added to) list
+      const action = (mode === 'create' || mode === 'closeandnew') ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The product was ${action}`));
+      this.handleBack();
+    }
   }
 
   handleSave = () => {
     const { item, mode } = this.props;
-    this.props.dispatch(saveProduct(item, mode, this.afterSave));
+    this.props.dispatch(saveProduct(item, mode)).then(this.afterSave);
   }
 
-  afterSave = (data) => {
-    if (typeof data.error !== 'undefined' && data.error.length) {
-      console.log('error on save : ', data);
-    } else {
-      this.props.router.push('/products');
-    }
+  handleBack = () => {
+    this.props.router.push('/products');
   }
 
   render() {
-    const { item, usaget, usageTypes, mode } = this.props;
+    const { item, usageTypes, mode } = this.props;
 
     // in update mode wait for item before render edit screen
-    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
+    const usaget = item.get('rates', Immutable.Map()).keySeq().first();
     return (
       <Col lg={12}>
         <Panel>
@@ -123,10 +137,7 @@ class ProductSetup extends Component {
             usageTypes={usageTypes}
           />
         </Panel>
-        <div style={{ marginTop: 12 }}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
-          <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
-        </div>
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
       </Col>
     );
   }
@@ -134,11 +145,11 @@ class ProductSetup extends Component {
 
 
 const mapStateToProps = (state, props) => {
+  const { tab: activeTab, action } = props.location.query;
+  const { itemId } = props.params;
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
   const { product: item } = state;
-  const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
-  const usageTypes = state.settings.get('usage_types', Immutable.List());
-  const usaget = item.get('rates', Immutable.Map()).keySeq().first();
-  return { itemId, item, mode, usaget, usageTypes };
+  const usageTypes = state.settings.get('usage_types');
+  return { itemId, item, mode, usageTypes, activeTab };
 };
-
 export default withRouter(connect(mapStateToProps)(ProductSetup));

@@ -19,7 +19,7 @@ class CustomFields extends Component {
     tabs: PropTypes.arrayOf(PropTypes.string),
     dispatch: PropTypes.func.isRequired,
   };
-
+  
   static defaultProps = {
     subscriber: Immutable.List(),
     account: Immutable.List(),
@@ -36,7 +36,7 @@ class CustomFields extends Component {
 
   state = {
     tab: 0,
-  };
+    };
 
   componentDidMount() {
     this.props.dispatch(getSettings('subscribers'));
@@ -66,7 +66,7 @@ class CustomFields extends Component {
   onClickSave = () => {
     this.props.dispatch(saveSettings('subscribers'));
   };
-
+  
   onSortEnd = ({ oldIndex, newIndex }) => {
     const { tab } = this.state;
     const { tabs } = this.props;
@@ -91,14 +91,14 @@ class CustomFields extends Component {
             key={`item-${index}`}
             index={index}
             idx={index}
-            field={field}
-            entity={entity}
+                              field={ field }
+                              entity={ entity }
             editable={editable}
-            onChange={this.onChangeField}
-            onRemove={this.onRemoveField}
+                              onChange={ this.onChangeField }
+                              onRemove={ this.onRemoveField }
           />
         );
-      }
+          }
     });
 
     return (
@@ -116,7 +116,7 @@ class CustomFields extends Component {
       </Tab>
     );
   };
-
+  
   render() {
     const { tabs } = this.props;
     return (

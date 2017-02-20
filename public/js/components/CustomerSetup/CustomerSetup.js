@@ -1,341 +1,256 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-
-/* ACTIONS */
-import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
-import { getList, clearList, getPaymentGateways } from '../../actions/listActions';
-import { getSettings } from '../../actions/settingsActions';
-import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
-import { showSuccess, showDanger } from '../../actions/alertsActions';
-import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-
-/* COMPONENTS */
-import { PageHeader, Tabs, Tab, Panel } from 'react-bootstrap';
+import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Customer from './Customer';
 import Subscriptions from './Subscriptions';
-import ActionButtons from './ActionButtons';
+import ActionButtons from '../Elements/ActionButtons';
+import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import PostpaidBalances from '../PostpaidBalances';
 import PrepaidBalances from '../PrepaidBalances';
+import { apiBillRun } from '../../common/Api';
+import {
+  getSubscribersByAidQuery,
+  getPlansKeysQuery,
+  getServicesKeysQuery,
+  getPaymentGatewaysQuery,
+} from '../../common/ApiQueries';
+import {
+  saveSubscription,
+  saveCustomer,
+  updateCustomerField,
+  clearCustomer,
+  getCustomer,
+} from '../../actions/customerActions';
+import { clearItems } from '../../actions/entityListActions';
+import { getList, clearList } from '../../actions/listActions';
+import { getSettings } from '../../actions/settingsActions';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { showSuccess } from '../../actions/alertsActions';
 
 class CustomerSetup extends Component {
 
   static propTypes = {
-    activeTab: PropTypes.number,
-    supportedGateways: PropTypes.instanceOf(Immutable.List),
+    itemId: PropTypes.string,
+    aid: PropTypes.number,
+    mode: PropTypes.string,
+    customer: PropTypes.instanceOf(Immutable.Map),
+    settings: PropTypes.instanceOf(Immutable.Map),
+    subscriptions: PropTypes.instanceOf(Immutable.List),
+    plans: PropTypes.instanceOf(Immutable.List),
+    services: PropTypes.instanceOf(Immutable.List),
+    gateways: PropTypes.instanceOf(Immutable.List),
+    activeTab: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     activeTab: 1,
-    supportedGateways: Immutable.List(),
+    customer: Immutable.Map(),
+    settings: Immutable.List(),
+    subscriptions: Immutable.List(),
+    gateways: Immutable.List(),
+    plans: Immutable.List(),
+    services: Immutable.List(),
   };
-  constructor(props) {
-    super(props);
 
-    this.onChangeCustomerField = this.onChangeCustomerField.bind(this);
-    this.onSaveCustomer = this.onSaveCustomer.bind(this);
-    this.onCancel = this.onCancel.bind(this);
-
-    this.state = {
-      invalidFields: Immutable.List(),
-      current: Number.isInteger(props.activeTab) ? props.activeTab : 1,
-    };
-  }
+  state = {
+    activeTab: parseInt(this.props.activeTab),
+  };
 
   componentDidMount() {
-    const { aid } = this.props.location.query;
-    if (aid) {
+    const { itemId } = this.props;
+    if (itemId) {
       this.props.dispatch(setPageTitle('Edit Customer'));
-      const customer_params = {
-        api: "subscribers",
-        params: [
-          { method: "query" },
-          { query: JSON.stringify({aid: parseInt(aid, 10), type: "account"}) }
-        ]
-      };
-      const subscriptions_params = {
-        api: "find",
-        params: [
-          { collection: "subscribers" },
-          { page: 0 },
-          { size: 999999 },
-          { query: JSON.stringify({
-            aid: parseInt(aid, 10),
-            type: "subscriber",
-            to: {"$gt": moment().toISOString()}
-          }) }
-        ]
-      };
-      const plans_params = {
-        api: "find",
-        params: [
-          { collection: "plans" },
-          { page: 0 },
-          { size: 999999 },
-          { query: JSON.stringify({
-            to: { "$gt": moment().toISOString() }
-          }) }
-        ]
-      };
-
-      const services_params = {
-        api: "find",
-        params: [
-          { collection: 'services' },
-          { page: 0 },
-          { size: 999999 },
-          { query: JSON.stringify({
-            to: { "$gt": moment().toISOString() }
-          }) }
-        ]
-      };
-      this.props.dispatch(getPaymentGateways());
-      this.props.dispatch(getEntity('customer', customer_params));
-      this.props.dispatch(getList('subscriptions', subscriptions_params));
-      this.props.dispatch(getList('plans', plans_params));
-      this.props.dispatch(getList('customer_available_services', services_params));
+      this.props.dispatch(getCustomer(itemId))
+      .then((response) => {
+        if (response.status) {
+          this.props.dispatch(getList('subscriptions', getSubscribersByAidQuery(this.props.aid)));
+        }
+      });
+      this.props.dispatch(getList('available_gateways', getPaymentGatewaysQuery()));
+      this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
+      this.props.dispatch(getList('available_services', getServicesKeysQuery()));
     } else {
       this.props.dispatch(setPageTitle('Create New Customer'));
     }
     this.props.dispatch(getSettings('subscribers'));
   }
 
-  componentWillUnmount() {
-    this.props.dispatch(clearEntity());
-    this.props.dispatch(clearList('subscriptions'));
-    this.props.dispatch(clearList('customer_available_services'));
-  }
-
   componentWillReceiveProps(nextProps) {
-    const { customer: oldItem, location: { query: { action } } } = this.props;
+    const { customer: oldItem, mode } = this.props;
     const { customer: item } = nextProps;
-    if (action === 'update' && (oldItem.get('firstname') !== item.get('firstname') || oldItem.get('lastname') !== item.get('lastname'))) {
-      const newTitle = `Edit Customer - ${item.get('firstname')} ${item.get('lastname')}`;
+    if (mode !== 'create' && (oldItem.get('first_name') !== item.get('first_name') || oldItem.get('last_name') !== item.get('last_name'))) {
+      const newTitle = `Edit Customer - ${item.get('first_name')} ${item.get('last_name')}`;
       this.props.dispatch(setPageTitle(newTitle));
     }
   }
 
-  onChangeCustomerField(e) {
+  componentWillUnmount() {
+    this.props.dispatch(clearCustomer());
+    this.props.dispatch(clearList('available_gateways'));
+    this.props.dispatch(clearList('available_plans'));
+    this.props.dispatch(clearList('available_services'));
+  }
+
+  onChangeCustomerField = (e) => {
     const { value, id } = e.target;
-    this.props.dispatch(updateEntityField('customer', id, value));
+    this.props.dispatch(updateCustomerField(id, value));
   }
 
-  onSaveCustomer() {
-    const { dispatch, customer, location } = this.props;
-    const { action } = location.query;
-
-    const params = action === "update" ?
-                   [{ method: "update" },
-                    { type: "account" },
-                    { query: JSON.stringify({"_id": customer.getIn(['_id', '$id'])}) },
-                    { update: JSON.stringify(customer.toJS()) }] :
-                   [{ method: "create" },
-                    { type: "account" },
-                    { subscriber: JSON.stringify(customer.toJS()) }];
-    const query = {
-      api: "subscribers",
-      params
-    };
-
-    apiBillRun(query).then(
-      success => {
-        if (action === "update") {
-          dispatch(showSuccess("Customer saved successfully"));
-
-          this.context.router.push({
-            pathname: "/customers"
-          });
-        } else {
-          dispatch(showSuccess("Customer created successfully"));
-          dispatch(gotEntity('customer', success.data[0].data.details));
-
-          this.context.router.push({
-            pathname: '/customer',
-            query: {
-              action: "update",
-              aid: success.data[0].data.details.aid
-            }
-          });
-          this.props.dispatch(setPageTitle('Edit Customer'));
-        }
-      },
-      failure => {
-        if (failure.error[0].error.code === 17576) {
-          const fields = JSON.parse(failure.error[0].error.display);
-          this.setState({invalidFields: Immutable.fromJS(fields)});
-        }
-        const errorMessage = failure.error[0].error.display.desc ? failure.error[0].error.display.desc : failure.error[0].error.message;
-        dispatch(showDanger(`Error - ${errorMessage}`));
-        console.log(failure);
-      }
-    ).catch(
-      error => {
-	dispatch(showDanger("Network error - please try again"));
-	dispatch(apiBillRunErrorHandler(error));
-      }
-    );
+  afterSaveCustomer = (response) => {
+    const { mode } = this.props;
+    if (response.status === true) {
+      this.props.dispatch(clearItems('customers')); // refetch items list because item was (changed in / added to) list
+      const action = (mode === 'create') ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`Customer was ${action}`));
+      this.onBack();
+    }
   }
 
-  onClickNewSubscription(aid, e) {
-    const returnUrl = `${window.location.origin}/#/customer?action=update&aid=${aid}&tab=2`
-    const returnUrlParam = `return_url=${encodeURIComponent(returnUrl)}`;
+  onSaveCustomer = () => {
+    const { customer, mode } = this.props;
+    this.props.dispatch(saveCustomer(customer, mode)).then(this.afterSaveCustomer);
+  }
+
+  onClickNewSubscription = (aid) => {
+    const returnUrlParam = `return_url=${encodeURIComponent(this.getReturnUrl())}`;
     const aidParam = `aid=${encodeURIComponent(`${aid}`)}`;
     window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}`;
   }
 
-  onClickChangePaymentGateway(aid, e) {
-    const returnUrl = `${window.location.origin}/#/customer?action=update&aid=${aid}&tab=2`
-    const returnUrlParam = `return_url=${encodeURIComponent(returnUrl)}`;
+  onClickChangePaymentGateway = (aid) => {
+    const returnUrlParam = `return_url=${encodeURIComponent(this.getReturnUrl())}`;
     const aidParam = `aid=${encodeURIComponent(aid)}`;
     const action = `action=${encodeURIComponent('updatePaymentGateway')}`;
     window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}&${action}`;
   }
 
-  onSaveSubscription = (subscription, data, callback) => {
-    const { aid } = this.props.location.query;
-    const newsub = subscription.withMutations(map => {
-      Object.keys(data).map(field => {
-        map.set(field, data[field]);
-      });
-    });
-    const query = {
-      api: "subscribers",
-      params: [
-        { method: "update" },
-        { type: "subscriber" },
-        { query: JSON.stringify({"_id": subscription.getIn(['_id', '$id'])}) },
-        { update: JSON.stringify(data) }
-      ]
-    };
-    apiBillRun(query).then(
-      success => {
-        callback(true);
-	const subscriptions_params = {
-          api: "find",
-          params: [
-            { collection: "subscribers" },
-            { page: 0 },
-            { size: 999999 },
-            { query: JSON.stringify({
-              aid: parseInt(aid, 10),
-              type: "subscriber",
-              to: {"$gt": moment().toISOString()}
-            }) }
-          ]
-	};
-	this.props.dispatch(getList('subscriptions', subscriptions_params));
-        this.props.dispatch(showSuccess("Saved subscription successfully!"));
-      },
-      failure => {
-        const errorMessage = failure.error[0].error.display.desc ? failure.error[0].error.display.desc : failure.error[0].error.message;
-        dispatch(showDanger(`Error - ${errorMessage}`));
-        console.log(failure);
-      }
-    ).catch(
-      error => {
-        this.props.dispatch(showDanger("Network error - please try again"));
-      }
-    );
-  };
+  onSaveSubscription = subscription =>
+    this.props.dispatch(saveSubscription(subscription, 'closeandnew')).then(this.afterSaveSubscription);
 
-  onCancel() {
-    this.context.router.push({
-      pathname: "/customers"
-    });
+
+  afterSaveSubscription = (response) => {
+    const { aid } = this.props;
+    if (response.status === true) {
+      this.props.dispatch(showSuccess('Customer was updated'));
+      this.props.dispatch(getList('subscriptions', getSubscribersByAidQuery(aid)));
+      return true;
+    }
+    return false;
+  }
+
+  onBack = () => {
+    this.props.router.push('/customers');
+  }
+
+  getReturnUrl = () => {
+    const { itemId } = this.props;
+    return `${window.location.origin}/#/customers/customer/${itemId}?tab=2`;
+  }
+
+  handleSelectTab = (key) => {
+    this.setState({ activeTab: key });
   }
 
   render() {
-    const { customer, subscriptions, settings, plans, services, supportedGateways } = this.props;
-    const { action } = this.props.location.query;
-    const aid = parseInt(this.props.location.query.aid, 10);
-    const { invalidFields, current } = this.state;
+    const { customer, subscriptions, settings, plans, services, gateways, mode, aid } = this.props;
+    const { activeTab } = this.state;
+    const showActionButtons = (activeTab === 1);
 
-    const tabs = [(
-      <Tab title="Customer Details" eventKey={1} key={1}>
-        <Panel style={{borderTop: 'none'}}>
-          <Customer
-            customer={customer}
-            action={action}
-            invalidFields={ invalidFields }
-            settings={settings.getIn(['account', 'fields'])}
-            supportedGateways={supportedGateways}
-            onChange={this.onChangeCustomerField}
-            onChangePaymentGateway={this.onClickChangePaymentGateway}
-          />
-        </Panel>
-    </Tab>
-    )];
-
-    if (action === "update") {
-      tabs.push((
-        <Tab title="Subscriptions" eventKey={2} key={2}>
-            <Panel style={{borderTop: 'none'}}>
-              <Subscriptions
-                subscriptions={subscriptions}
-                aid={ aid }
-                settings={settings.getIn(['subscriber', 'fields'])}
-                all_plans={plans}
-                all_services={services}
-                onSaveSubscription={this.onSaveSubscription}
-                onNew={this.onClickNewSubscription}
-              />
-            </Panel>
-        </Tab>
-      ));
-      tabs.push((
-        <Tab title="Postpaid Counters" eventKey={3} key={3}>
-          <Panel style={{borderTop: 'none'}}>
-            <PostpaidBalances aid={ aid } />
-          </Panel>
-        </Tab>
-      ));
-      tabs.push((
-        <Tab title="Prepaid Counters" eventKey={4} key={4}>
-          <Panel style={{borderTop: 'none'}}>
-            <PrepaidBalances aid={ aid } />
-          </Panel>
-        </Tab>
-      ));
+    // in update mode wait for plan before render edit screen
+    if ((mode !== 'create' && typeof customer.getIn(['_id', '$id']) === 'undefined')) {
+      return (<LoadingItemPlaceholder onClick={this.onBack} />);
     }
+
+    const accountFields = settings.getIn(['account', 'fields'], Immutable.List());
+    const subscriberFields = settings.getIn(['subscriber', 'fields'], Immutable.List());
 
     return (
       <div className="CustomerSetup">
-
         <div className="row">
           <div className="col-lg-12">
-            <Tabs defaultActiveKey={current} animation={false} id="CustomerEditTabs" onSelect={(current) => { this.setState({current}); } }>
-              { tabs }
+            <Tabs defaultActiveKey={activeTab} animation={false} id="CustomerEditTabs" onSelect={this.handleSelectTab}>
+              { !accountFields.isEmpty() &&
+                <Tab title="Customer Details" eventKey={1} key={1}>
+                  <Panel style={{ borderTop: 'none' }}>
+                    <Customer
+                      customer={customer}
+                      action={mode}
+                      fields={accountFields}
+                      supportedGateways={gateways}
+                      onChange={this.onChangeCustomerField}
+                      onChangePaymentGateway={this.onClickChangePaymentGateway}
+                    />
+                  </Panel>
+                </Tab>
+              }
+
+              { (mode !== 'create') && !subscriberFields.isEmpty() &&
+                <Tab title="Subscriptions" eventKey={2}>
+                  <Panel style={{ borderTop: 'none' }}>
+                    <Subscriptions
+                      items={subscriptions}
+                      aid={aid}
+                      settings={subscriberFields}
+                      all_plans={plans}
+                      all_services={services}
+                      onSaveSubscription={this.onSaveSubscription}
+                      onNew={this.onClickNewSubscription}
+                    />
+                  </Panel>
+                </Tab>
+              }
+              { (mode !== 'create') &&
+                <Tab title="Postpaid Counters" eventKey={3}>
+                  <Panel style={{ borderTop: 'none' }}>
+                    <PostpaidBalances aid={aid} />
+                  </Panel>
+                </Tab>
+              }
+              { (mode !== 'create') &&
+                <Tab title="Prepaid Counters" eventKey={4}>
+                  <Panel style={{ borderTop: 'none' }}>
+                    <PrepaidBalances aid={aid} />
+                  </Panel>
+                </Tab>
+              }
             </Tabs>
           </div>
         </div>
-        <ActionButtons
-            show={this.state.current === 1}
-            onClickSave={this.onSaveCustomer}
-            onClickCancel={this.onCancel}
-        />
-
+        { showActionButtons &&
+          <ActionButtons onClickSave={this.onSaveCustomer} onClickCancel={this.onBack} />
+        }
       </div>
     );
   }
 }
 
-CustomerSetup.contextTypes = {
-  router: React.PropTypes.object.isRequired
+
+const mapStateToProps = (state, props) => {
+  const { tab: activeTab, action } = props.location.query;
+  const { itemId } = props.params;
+  const mode = action || ((itemId) ? 'closeandnew' : 'create');
+  return {
+    itemId,
+    mode,
+    activeTab,
+    customer: state.entity.get('customer') || undefined,
+    aid: state.entity.getIn(['customer', 'aid']) || undefined,
+    settings: state.settings.get('subscribers') || undefined,
+    subscriptions: state.list.get('subscriptions') || undefined,
+    plans: state.list.get('available_plans') || undefined,
+    services: state.list.get('available_services') || undefined,
+    gateways: state.list.get('available_gateways') || undefined,
+  };
 };
 
-function mapStateToProps(state, props) {
-  const { tab } = props.location.query;
-  const activeTab = (typeof tab === 'undefined') ? tab : parseInt(tab);
-  return {
-    activeTab,
-    customer: state.entity.get('customer') || Immutable.Map(),
-    subscriptions: state.list.get('subscriptions') || Immutable.List(),
-    settings: state.settings.get('subscribers') || Immutable.List(),
-    plans: state.list.get('plans') || Immutable.List(),
-    services: state.list.get('customer_available_services') || Immutable.List(),
-    supportedGateways: state.list.get('supported_gateways') || undefined,
-  };
-}
-
-export default connect(mapStateToProps)(CustomerSetup);
+export default withRouter(connect(mapStateToProps)(CustomerSetup));

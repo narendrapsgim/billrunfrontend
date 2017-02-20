@@ -29,7 +29,7 @@ export default class ServiceDetails extends Component {
     },
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
   }
 
@@ -65,15 +65,19 @@ export default class ServiceDetails extends Component {
       <Form horizontal>
 
         <FormGroup>
-          <Col componentClass={ControlLabel} sm={3} lg={2}>Title<Help contents={ServiceDescription.description} /></Col>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>
+            Title<Help contents={ServiceDescription.description} />
+          </Col>
           <Col sm={8} lg={9}>
             <Field value={item.get('description', '')} onChange={this.onChangeDescription} />
           </Col>
         </FormGroup>
 
-        {mode === 'new' &&
+        {mode === 'create' &&
           <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
-            <Col componentClass={ControlLabel} sm={3} lg={2}>Key <Help contents={ServiceDescription.name} /></Col>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>
+              Key <Help contents={ServiceDescription.name} />
+            </Col>
             <Col sm={8} lg={9}>
               <Field value={item.get('name', '')} onChange={this.onChangeName} />
               { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }

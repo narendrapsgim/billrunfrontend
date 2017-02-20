@@ -26,7 +26,7 @@ class Settings extends Component {
   };
 
   state = {
-    activeTab: parseInt(this.props.activeTab, 10),
+    activeTab: parseInt(this.props.activeTab),
   };
 
   componentWillMount() {
@@ -82,6 +82,7 @@ class Settings extends Component {
             this.props.dispatch(initMainMenu(mainMenuOverrides));
             // Update logo
             if (categoryToSave.includes('tenant') && settings.getIn(['tenant', 'logo'], '').length > 0) {
+              localStorage.removeItem('logo');
               this.props.dispatch(fetchFile({ filename: settings.getIn(['tenant', 'logo'], '') }, 'logo'));
             }
           }

@@ -9,7 +9,7 @@ import List from '../List';
 export default class SubscriptionsList extends Component {
 
   static propTypes = {
-    subscriptions: PropTypes.instanceOf(Immutable.Iterable),
+    items: PropTypes.instanceOf(Immutable.Iterable),
     settings: PropTypes.instanceOf(Immutable.List),
     aid: PropTypes.oneOfType([
       PropTypes.string,
@@ -21,7 +21,7 @@ export default class SubscriptionsList extends Component {
   };
 
   static defaultProps = {
-    subscriptions: Immutable.List(),
+    items: Immutable.List(),
     settings: Immutable.List(),
     defaultListFields: ['sid', 'firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
     aid: '',
@@ -72,16 +72,17 @@ export default class SubscriptionsList extends Component {
             return { id: fieldname, title: changeCase.sentenceCase(title) };
           }
         }
-      });
+      })
+      .toArray();
   }
 
   render() {
-    const { subscriptions } = this.props;
+    const { items } = this.props;
     const fields = this.getFields();
     return (
       <div className="row">
         <div className="col-lg-12">
-          <List items={subscriptions} fields={fields.toArray()} edit={true} onClickEdit={this.props.onClickEdit} />
+          <List items={items} fields={fields} edit={true} onClickEdit={this.props.onClickEdit} />
           <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus" />&nbsp;Add New Subscription</Button>
         </div>
       </div>
