@@ -426,12 +426,13 @@ export function saveInputProcessorSettings(state, parts = []) {
 }
 
 export function updateInputProcessorEnabled(inputProcessor, enabled, callback) {
+  const action = (enabled ? 'enable' : 'disable');
   const query = {
     api: 'settings',
     params: [
       { category: 'file_types' },
-      { action: 'set' },
-      { data: JSON.stringify({ file_type: inputProcessor.get('file_type'), type: inputProcessor.get('type'), enabled }) },
+      { action },
+      { data: JSON.stringify({ file_type: inputProcessor.get('file_type') }) },
     ],
   };
 
