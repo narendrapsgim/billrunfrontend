@@ -115,8 +115,7 @@ export default class Subscription extends Component {
         subscriptionWithMutations.set(key, fieldData.get('value'));
       });
       subscriptionWithMutations.delete('from');
-    });
-    console.log(data.toJS());
+    });    
     this.props.onSave(data);
   };
 
