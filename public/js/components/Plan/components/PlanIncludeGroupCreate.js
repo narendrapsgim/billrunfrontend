@@ -1,10 +1,10 @@
-import React, { Component }  from 'react';
+import React, { Component } from 'react';
 import Immutable from 'immutable';
-import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox,
-   Col, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { GroupsInclude } from '../../../FieldDescriptions';
+import CreateButton from '../../Elements/CreateButton';
 import Help from '../../Help';
 import UsagetypeSelect from './UsagetypeSelect';
 import Field from '../../Field';
@@ -214,7 +214,7 @@ export default class PlanIncludeGroupCreate extends Component {
           <FormGroup validationState={error.length > 0 ? "error" : null} >
             <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`${usage} includes`)}</Col>
             <Col sm={8}>
-              <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" unlimitedValue="UNLIMITED"/>
+              <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" />
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
             </Col>
           </FormGroup>,
@@ -255,7 +255,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
     return (
       <div>
-        <Button bsSize="xsmall" className="btn-primary" onClick={this.handleToggleBoby}><i className="fa fa-plus" />&nbsp;Create New Group</Button>
+        <CreateButton onClick={this.handleToggleBoby} type="Group" />
         <Modal show={open} keyboard={false}>
 
           <Modal.Header closeButton onHide={this.handleCancel}>

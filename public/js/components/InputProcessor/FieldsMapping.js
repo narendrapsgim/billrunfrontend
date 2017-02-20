@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-
-import { addUsagetMapping } from '../../actions/inputProcessorActions';
-import { Table } from 'react-bootstrap/lib';
-import FontIcon from 'material-ui/FontIcon';
+import Immutable from 'immutable';
 import Select from 'react-select';
 
 export default class FieldsMapping extends Component {
   constructor(props) {
-    super (props);
+    super(props);
 
     this.onChangePattern = this.onChangePattern.bind(this);
     this.onChangeUsaget  = this.onChangeUsaget.bind(this);
@@ -29,9 +25,9 @@ export default class FieldsMapping extends Component {
       this.setState({separateTime: true});
     }
   }
-  
+
   onChangePattern(e) {
-    this.setState({pattern: e.target.value});    
+    this.setState({pattern: e.target.value});
   }
 
   onChangeUsaget(val) {
@@ -51,7 +47,7 @@ export default class FieldsMapping extends Component {
     this.onChangeUsaget(usaget);
     this.props.onSetStaticUsaget.call(this, usaget);
   }
-  
+
   addUsagetMapping(e) {
     const { usaget, pattern } = this.state;
     const { onError } = this.props;
@@ -85,14 +81,14 @@ export default class FieldsMapping extends Component {
     if (!checked) this.props.unsetField(['processor', 'time_field']);
     this.setState({separateTime: !this.state.separateTime});
   };
-  
+
   render() {
     const { settings,
             usageTypes,
             onSetFieldMapping } = this.props;
 
-    const available_fields = [(<option disabled value="" key={-1}>Select Field</option>),
-                              ...settings.get('fields', []).map((field, key) => (
+    const available_fields = [(<option disabled value="" key={-1}>Select Field...</option>),
+                              ...settings.get('fields', Immutable.List()).map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
                               ))];
     const available_units = usageTypes.map((usaget, key) => {
@@ -129,7 +125,7 @@ export default class FieldsMapping extends Component {
                          checked={this.state.separateTime}
                          onChange={this.onChangeSeparateTime}
                   />
-                  Time in separate field
+                  <small style={{ verticalAlign: 'bottom' }}>&nbsp;Time in separate field</small>
                 </div>
                 <select id="time_field"
                         className="form-control"
@@ -168,20 +164,20 @@ export default class FieldsMapping extends Component {
             <label>Usage types</label>
             <p className="help-block">Types of usages</p>
           </div>
-          <div className="col-lg-1">
-            <label><input type="radio"
+          <div className="col-lg-1" style={{ marginTop: 8 }}>
+            <label><input type="radio" style={{ verticalAlign: 'top' }}
                           name="usage_types_type"
                           value="static"
                           checked={settings.get('usaget_type', '') === "static"}
                           onChange={this.onSetType} />
-              Static
+              &nbsp;Static
             </label>
           </div>
           <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
-            <div className="col-lg-9">            
+            <div className="col-lg-9">
               <Select
                   id="unit"
                   options={available_units}
@@ -195,13 +191,13 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
         <div className="form-group">
-          <div className="col-lg-offset-2 col-lg-1">
-            <label><input type="radio"
+          <div className="col-lg-offset-2 col-lg-1" style={{ marginTop: 8 }}>
+            <label><input type="radio" style={{ verticalAlign: 'top' }}
                           name="usage_types_type"
                           value="dynamic"
                           checked={settings.get('usaget_type', '') === "dynamic"}
                           onChange={this.onSetType} />
-              Dynamic
+              &nbsp;Dynamic
             </label>
           </div>
           <div className="col-lg-9">
@@ -232,7 +228,7 @@ export default class FieldsMapping extends Component {
           </div>
         </div>
             {
-              settings.getIn(['processor', 'usaget_mapping'], []).map((usage_t, key) => (
+              settings.getIn(['processor', 'usaget_mapping'], Immutable.List()).map((usage_t, key) => (
                 <div className="form-group" key={key}>
                   <div className="col-lg-offset-3 col-lg-7">
                     <div className="col-lg-offset-1 col-lg-10">
@@ -241,7 +237,7 @@ export default class FieldsMapping extends Component {
                       <div className="col-lg-2">
                         <button type="button"
                                 className="btn btn-default btn-sm"
-                                disabled={settings.get('usaget_type', '') !== "dynamic"}                                
+                                disabled={settings.get('usaget_type', '') !== "dynamic"}
                                 onClick={this.removeUsagetMapping.bind(this, key)}>
                           <i className="fa fa-trash-o danger-red" /> Remove
                         </button>
@@ -257,7 +253,7 @@ export default class FieldsMapping extends Component {
               <div className="col-lg-5">
                 <input className="form-control"
                        onChange={this.onChangePattern}
-                       disabled={settings.get('usaget_type', '') !== "dynamic"}                   
+                       disabled={settings.get('usaget_type', '') !== "dynamic"}
                        value={this.state.pattern} />
               </div>
               <div className="col-lg-5">
@@ -276,7 +272,7 @@ export default class FieldsMapping extends Component {
                         className="btn btn-primary btn-sm"
                         onClick={this.addUsagetMapping}>
                   <i className="fa fa-plus"/> Add Mapping
-                </button>                
+                </button>
               </div>
             </div>
           </div>

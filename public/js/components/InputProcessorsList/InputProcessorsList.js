@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap';
 import List from '../List';
 import ConfirmModal from '../ConfirmModal';
 
-import { getList } from '../../actions/listActions';
+import { getList, clearList } from '../../actions/listActions';
 import { deleteInputProcessor, updateInputProcessorEnabled } from '../../actions/inputProcessorActions';
 import { showDanger } from '../../actions/alertsActions';
 
@@ -31,6 +31,10 @@ class InputProcessorsList extends Component {
 
   componentDidMount() {
     this.props.dispatch(getList("input_processors", this.buildQuery()));
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(clearList('input_processors'));
   }
 
   buildQuery() {

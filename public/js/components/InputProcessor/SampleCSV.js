@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-
+import { FormGroup, HelpBlock } from 'react-bootstrap';
 /* COMPONENTS */
 import Field from '../Field';
 import SelectDelimiter from './SampleCSV/SelectDelimiter';
@@ -21,10 +21,12 @@ class SampleCSV extends Component {
       this.props.onRemoveAllFields.call(this);
     }
   }
-  
+
   render() {
     let { settings,
           type,
+          action,
+          errors,
           format,
           onChangeName,
           onSetDelimiterType,
@@ -63,15 +65,11 @@ class SampleCSV extends Component {
                 <i className="fa fa-trash-o" /> Remove all
               </button>
             </div>
-            {(() => {             
-               if (settings.get('delimiter_type') === "fixed") {
-                 return (
-                   <div className="col-lg-2">
-                     <label>Width</label>
-                   </div>
-                 );
-               }
-             })()}
+            { (settings.get('delimiter_type') === 'fixed') &&
+              <div className="col-lg-2">
+                <label>Width</label>
+              </div>
+            }
           </div>
           { fieldsHTML }
           <div className="form-group">
@@ -91,7 +89,7 @@ class SampleCSV extends Component {
       type === "api"
       ? (<div><SelectJSON onSelectJSON={ onSelectJSON } settings={ settings } /></div>)
       : (<div><SelectCSV onSelectSampleCSV={onSelectSampleCSV} settings={settings} /></div>);
-
+      
     return (
       <form className="InputProcessor form-horizontal">
         <div className="form-group">
@@ -102,14 +100,15 @@ class SampleCSV extends Component {
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
-            <div className="col-lg-7">
-              <Field id="file_type" onChange={ onChangeName } value={ settings.get('file_type', '') } />
+            <div className={`col-lg-7${(errors.get('name', '').length > 0) ? ' has-error' : ''}`}>
+              <Field id="file_type" onChange={onChangeName} value={settings.get('file_type', '')} disabled={action !== 'new'} />
+              {(errors.get('name', '').length > 0) && <HelpBlock>{errors.get('name', '')}</HelpBlock>}
             </div>
           </div>
         </div>
         { selectDelimiterHTML }
         { selectCSVHTML }
-        { setFieldsHTML }        
+        { setFieldsHTML }
       </form>
     );
   }

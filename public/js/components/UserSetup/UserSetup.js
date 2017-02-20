@@ -1,144 +1,156 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
+import { Col, Panel, Button } from 'react-bootstrap';
 import Immutable from 'immutable';
+import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import User from './User';
-
 /* ACTIONS */
-import { getEntity, updateEntityField, gotEntity, clearEntity } from '../../actions/entityActions';
-import { getList, clearList } from '../../actions/listActions';
-import { getSettings } from '../../actions/settingsActions';
-import { apiBillRun, apiBillRunErrorHandler } from '../../common/Api';
+import { getUser, saveUser, clearUser, updateUserField, deleteUserField } from '../../actions/userActions';
+import { clearList } from '../../actions/listActions';
+import { apiBillRunErrorHandler } from '../../common/Api';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
-
-/* COMPONENTS */
-import { PageHeader, Tabs, Tab } from 'react-bootstrap';
+import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 
 
 class UserSetup extends Component {
-	
-	constructor(props){
-		super(props);
-	}
 
-	componentDidMount() {
-	   const { userId, action } = this.props.location.query;
-	   if(!userId){
-	   		return;
-	   }
+  static propTypes = {
+    user: PropTypes.instanceOf(Immutable.Map),
+    dispatch: PropTypes.func.isRequired,
+    location: PropTypes.shape({
+      query: PropTypes.object.isRequired,
+    }).isRequired,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
+  }
 
-	   const userParams = {
-        api: "users",
+  static defaultProps = {
+    user: Immutable.Map(),
+  };
+
+  componentDidMount() {
+    const { userId, action } = this.props.location.query;
+    if (userId) {
+      const userParams = {
+        api: 'users',
         params: [
           { userId },
-          { action: 'read' } 
-        ]
+          { action: 'read' },
+        ],
       };
+      this.props.dispatch(getUser(userParams));
+    }
+    if (action === 'new') {
+      this.props.dispatch(setPageTitle('Create New User'));
+    } else {
+      this.props.dispatch(setPageTitle('Edit user'));
+    }
+  }
 
-      	this.props.dispatch(getEntity('user', userParams));
-	}
+  componentWillReceiveProps(nextProps) {
+    const { user, location: { query: { action } } } = nextProps;
+    const { user: oldUser } = this.props;
+    if (action === 'update' && oldUser.get('username', '') !== user.get('username', '')) {
+      this.props.dispatch(setPageTitle(`Edit user - ${user.get('username', '')}`));
+    }
+  }
 
-	componentWillUnmount() {
-    	this.props.dispatch(clearEntity());
-    	this.props.dispatch(clearList('users'));
-  	}
+  componentWillUnmount() {
+    this.props.dispatch(clearUser());
+    this.props.dispatch(clearList('users'));
+  }
 
-	onCancel = () => {
-		this.context.router.push({
-      		pathname: "/users"
-    	});
-	}
+  onBack = () => {
+    this.props.router.push('/users');
+  }
 
+  onSave = () => {
+    if (this.validate()) {
+      this.props.dispatch(saveUser()).then((response) => {
+        if (response === true) {
+          this.props.dispatch(showSuccess('User saved successfully'));
+          this.onBack();
+        } else {
+          this.props.dispatch(apiBillRunErrorHandler(response));
+        }
+      });
+    }
+  }
 
-	onSaveUser = (password) => {
-		const { dispatch, user } = this.props;
-		const { action } = this.props.location.query;
-    	const params = action === 'update'? [
-    		{'action': 'update'},
-    		{'userId': user.getIn(['_id', '$id'], '')},
-    		{'username': user.get('username')},
-    		{'roles': JSON.stringify(user.get('roles').toJS())},
-    		{'password': password}
-    	]: [
-    		{'action': 'insert'},
-    		{'username': user.get('username')},
-    		{'roles': JSON.stringify(user.get('roles', Immutable.List()).toJS())},
-    		{'password': password}
-    	];
+  onUpdateValue = (path, value = '') => {
+    this.props.dispatch(updateUserField(path, value));
+  }
 
+  onDeleteValue = (path) => {
+    this.props.dispatch(deleteUserField(path));
+  }
 
-	    const query = {
-	      api: "users",
-	      params
-	    };
+  validate = () => {
+    const { user, location: { query: { action } } } = this.props;
+    if (action === 'new') {
+      if (user.get('username', '').length === 0) {
+        this.props.dispatch(showDanger('User name field is required'));
+        return false;
+      }
+      if (user.get('password', '').length === 0) {
+        this.props.dispatch(showDanger('Password field is required'));
+        return false;
+      }
 
-	    apiBillRun(query).then(
-	      success => {
-	          dispatch(showSuccess("User saved successfully"));
-	          this.context.router.push({
-	            pathname: '/users'
-	          });
-	      },
-	      failure => {
-	        dispatch(showDanger(`Error - ${failure.error[0].error.message}`));
-	      }
-	    ).catch(
-	      error => {
-			dispatch(showDanger("Network error - please try again"));
-			dispatch(apiBillRunErrorHandler(error));
-	      }
-	    );
-	}
+      if (user.get('roles').length === 0) {
+        this.props.dispatch(showDanger('Roles field is required'));
+        return false;
+      }
+      return true;
+    }
 
-	onUsernameChange = (e) => {
-		const { value } = e.target;
-		this.props.dispatch(updateEntityField('user', 'username', value));
-	}
+    if (user.has('username') && user.get('username', '').length === 0) {
+      this.props.dispatch(showDanger('User name field is required'));
+      return false;
+    }
+    if (user.has('password') && user.get('password', '').length === 0) {
+      this.props.dispatch(showDanger('Password field is required'));
+      return false;
+    }
 
-	onCheckboxClick = (e) => {
-		const { user } = this.props;
-		const { value } = e.target;
-		const userRoles = user.update('roles', Immutable.List(), rolesList => {
-			if(rolesList.includes(value)){
-				return rolesList.filterNot(role => role === value);
-			}
-			return rolesList.push(e.target.value);
-		});
-		this.props.dispatch(updateEntityField('user', 'roles', userRoles.get('roles')));
-	}
+    if (user.has('roles') && user.get('roles').length === 0) {
+      this.props.dispatch(showDanger('Roles field is required'));
+      return false;
+    }
+    return true;
+  }
 
-	render(){
-		const { user } = this.props;
-		const { action } = this.props.location.query;
-		return(
-			<div className="panel panel-default">
-				<div className="panel-heading">
-					<span>
-	                  Edit user
-	                </span>
-				</div>
-    			<div className="panel-body">
-    			<div className="col-lg-6">
-    				<User  onSaveUser={this.onSaveUser} action={action}
-    					onUsernameChange={this.onUsernameChange} user={user}
-    					onCheckboxClick={this.onCheckboxClick}
-    					onCancel={this.onCancel}
-    				/>
-            	</div>
-    			</div>
-			</div>
-		)
-	};
+  render() {
+    const { user, location: { query: { action } } } = this.props;
+    // in update mode wait for item before render edit screen
+    if (action === 'update' && typeof user.getIn(['_id', '$id']) === 'undefined') {
+      return (<LoadingItemPlaceholder onClick={this.onBack} />);
+    }
+    return (
+      <Col lg={12}>
+        <Panel>
+          <User
+            action={action}
+            user={user}
+            onUpdateValue={this.onUpdateValue}
+            onDeleteValue={this.onDeleteValue}
+          />
+        </Panel>
+        <div style={{ marginTop: 12 }}>
+          <Button onClick={this.onSave} bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+          <Button onClick={this.onBack} bsStyle="default">Cancel</Button>
+        </div>
+      </Col>
+    );
+  }
 
 }
 
-UserSetup.contextTypes = {
-  router: React.PropTypes.object.isRequired
-};
 
-function mapStateToProps(state) {
-  return {
-    user: state.entity.get('user', Immutable.Map())
-  };
-}
+const mapStateToProps = state => ({
+  user: state.entity.get('users', Immutable.Map()),
+});
 
-export default connect(mapStateToProps)(UserSetup);
+export default withRouter(connect(mapStateToProps)(UserSetup));

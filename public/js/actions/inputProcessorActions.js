@@ -7,6 +7,8 @@ export const ADD_CSV_FIELD = 'ADD_CSV_FIELD';
 export const ADD_USAGET_MAPPING = 'ADD_USAGET_MAPPING';
 export const SET_CUSTOMER_MAPPING = 'SET_CUSTOMER_MAPPING';
 export const SET_RATING_FIELD = 'SET_RATING_FIELD';
+export const ADD_RATING_FIELD = 'ADD_RATING_FIELD';
+export const REMOVE_RATING_FIELD = 'REMOVE_RATING_FIELD';
 export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
@@ -37,10 +39,11 @@ import _ from 'lodash';
 import Immutable from 'immutable';
 
 const convert = (settings) => {
-  const { parser, processor,
-          customer_identification_fields,
-          rate_calculators,
-          receiver,
+  const { parser = {},
+          processor = {},
+          customer_identification_fields = [],
+          rate_calculators = {},
+          receiver = {},
           realtime = {},
           response = {},
         } = settings;
@@ -80,7 +83,7 @@ const convert = (settings) => {
 	}
       })
     } else {
-      usaget_mapping = [{}];
+      usaget_mapping = [];
     }
     ret.processor = Object.assign({}, processor, {
       usaget_mapping,
@@ -281,19 +284,36 @@ export function setCustomerMapping(field, mapping, index) {
   };
 }
 
-export function setRatingField(usaget, rate_key, value) {
+export function setRatingField(usaget, index, rate_key, value) {
   return {
     type: SET_RATING_FIELD,
     usaget,
+    index,
     rate_key,
     value
   };
 }
 
-export function setLineKey(usaget, value) {
+export function addRatingField(usaget) {
+  return {
+    type: ADD_RATING_FIELD,
+    usaget,
+  };
+}
+
+export function removeRatingField(usaget, index) {
+  return {
+    type: REMOVE_RATING_FIELD,
+    usaget,
+    index,
+  };
+}
+
+export function setLineKey(usaget, index, value) {
   return {
     type: SET_LINE_KEY,
     usaget,
+    index,
     value
   };
 }
@@ -306,7 +326,8 @@ export function setReceiverField(field, mapping) {
   };
 }
 
-export function saveInputProcessorSettings(state, callback, part=false) {
+export function saveInputProcessorSettings(state, parts = []) {
+  const action = (parts.length === 0) ? 'set' : 'validate';
   const processor = state.get('processor'),
         customer_identification_fields = state.get('customer_identification_fields'),
         rate_calculators = state.get('rate_calculators'),
@@ -373,40 +394,32 @@ export function saveInputProcessorSettings(state, callback, part=false) {
     settings.response = (response.size > 0 ? response.toJS() : defaultResponse);
   }
 
-  let settingsToSave;
-  if (part === "customer_identification_fields") {
-    settingsToSave = {file_type: state.get('file_type'), type: state.get('type'), [part]: {...settings[part]}, rate_calculators: settings.rate_calculators};
+  let settingsToSave = {};
+  if (action === 'set') {
+    settingsToSave = settings;
   } else {
-    settingsToSave = part ? {file_type: state.get('file_type'), type: state.get('type'), [part]: {...settings[part]}} : settings;
+    parts.forEach((part) => { settingsToSave[part] = settings[part]; });
   }
   const query = {
-    api: "settings",
+    api: 'settings',
     params: [
-      { category: "file_types" },
-      { action: "set" },
-      { data: JSON.stringify(settingsToSave) }
-    ]
+      { category: 'file_types' },
+      { action },
+      { data: JSON.stringify(settingsToSave) },
+    ],
   };
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      success => {
+    return apiBillRun(query).then(
+      (success) => {
         dispatch(finishProgressIndicator());
-        callback(false);
-      },
-      failure => {
-        dispatch(finishProgressIndicator());
-        const msg = _.result(failure, 'error[0].error.data.message') ?
-                    failure.error[0].error.data.message :
-                    failure.error[0].error.desc;
-        dispatch(showDanger(`Error - ${msg}`));
-        callback(true);
+        return success;
       }
     ).catch(
-      error => {
+      (error) => {
         dispatch(finishProgressIndicator());
-        dispatch(showDanger("Error saving input processor"));
-        dispatch(apiBillRunErrorHandler(error));
+        dispatch(apiBillRunErrorHandler(error, 'Error saving input processor'));
+        return false;
       }
     );
   };

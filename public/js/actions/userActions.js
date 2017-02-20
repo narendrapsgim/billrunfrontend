@@ -1,9 +1,43 @@
+import { apiBillRun } from '../common/Api';
+import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+import { saveEntity, getEntity, actions } from './entityActions';
+
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 export const LOGIN_ERROR = 'LOGIN_ERROR';
 
-import { apiBillRun } from '../common/Api';
-import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+
+export function getUser(userParams) {
+  return getEntity('users', userParams);
+}
+
+export function saveUser(userParams) {
+  return saveEntity('users', userParams);
+}
+
+export function updateUserField(path, value) {
+  return {
+    type: actions.UPDATE_ENTITY_FIELD,
+    collection: 'users',
+    path,
+    value,
+  };
+}
+
+export function deleteUserField(path) {
+  return {
+    type: actions.DELETE_ENTITY_FIELD,
+    collection: 'users',
+    path,
+  };
+}
+
+export function clearUser() {
+  return {
+    type: actions.CLEAR_ENTITY,
+    collection: 'users',
+  };
+}
 
 function loginSuccess(data){
   return {

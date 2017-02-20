@@ -7,7 +7,7 @@ import Select from 'react-select'
 const RealtimeMapping = (props) => {
   const { onChange, onChangeDefault, settings } = props;
 
-  const available_fields = [(<option disabled value="" key={-1}>Select Field</option>),
+  const available_fields = [(<option disabled value="" key={-1}>Select Field...</option>),
                             ...settings.get('fields', []).map((field, key) => (
                               <option value={field} key={key}>{field}</option>
                             ))];

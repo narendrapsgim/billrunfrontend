@@ -16,7 +16,7 @@ class List extends Component {
     this.onClickHeader = this.onClickHeader.bind(this);
 
     this.state = {
-      sort: {},
+      sort: JSON.parse(props.sort),
     };
   }
 
@@ -31,6 +31,7 @@ class List extends Component {
   static defaultProps = {
     enableRemove: false,
     onClickRemove: () => {},
+    sort: '{}',
     removeText: 'Remove',
     enableEnabled: false,
     onClickEnabled: () => {},
@@ -134,9 +135,19 @@ class List extends Component {
       if (!field.title && !field.placeholder) return (<th key={key} onClick={onclick} style={style}>{ titlize(field.id) }{ arrow }</th>);
         return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{ field.title || field.placeholder }{ arrow }</th>)
     });
-    if (enableEnabled) table_header = [(<th key={-1}></th>), ...table_header]
-    if (edit) table_header.push((<th key={fields.length}>&nbsp;</th>));
-    if (enableRemove) table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
+    let colSpan = fields.length;
+    if (enableEnabled) {
+	table_header = [(<th key={-1}></th>), ...table_header]
+      colSpan += 1;
+	}
+    if (edit) {
+      table_header.push((<th key={fields.length}>&nbsp;</th>));
+      colSpan += 1;
+    }
+    if (enableRemove) {
+      table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
+      colSpan += 1;
+    }
 
     const editTooltip = (
       <Tooltip id="tooltip">{ editText ?editText : 'Edit'}</Tooltip>
@@ -146,7 +157,7 @@ class List extends Component {
     );
 
     const table_body = items.size < 1 ?
-                       (<tr><td colSpan={fields.length + (edit ? 1 : 0)} style={{textAlign: "center"}}>No items found</td></tr>) :
+                       (<tr><td colSpan={colSpan} style={{textAlign: "center"}}>No items found</td></tr>) :
                         items.map((entity, index) => (
                             <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled'}>
                               {

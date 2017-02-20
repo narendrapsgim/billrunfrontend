@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Panel, Button } from 'react-bootstrap';
 import classNames from 'classnames';
-import moment from 'moment';
 import Immutable from 'immutable';
 import Help from '../../Help';
-import Field from '../../Field';
+import CreateButton from '../../Elements/CreateButton';
 import ProductPrice from '../../Product/components/ProductPrice';
 
 export default class PlanProduct extends Component {
@@ -149,7 +148,7 @@ export default class PlanProduct extends Component {
             onProductRemoveRate={this.onProductRemoveRate}
           />
         )}
-        { !isRemoved && <div><br /><Button bsSize="xsmall" className="btn-primary pull-left" onClick={this.onProductAddRate}><i className="fa fa-plus" />&nbsp;Add New</Button></div> }
+        { !isRemoved && <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
       </Panel>
     );
   }

@@ -4,8 +4,11 @@ import Select from 'react-select';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, Button, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
+import CreateButton from '../Elements/CreateButton';
 import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
+import ProductParam from './components/ProductParam';
+import ProductParamEdit from './components/ProductParamEdit';
 
 
 export default class Product extends Component {
@@ -36,6 +39,7 @@ export default class Product extends Component {
     errors: {
       name: '',
     },
+    newProductParam: false,
   }
 
   componentDidMount() {
@@ -80,6 +84,60 @@ export default class Product extends Component {
   onChangePrefix = (prefixes) => {
     const prefixesList = (prefixes.length) ? prefixes.split(',') : [];
     this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixesList));
+  }
+
+  onChangeParamKey = (oldKey, newKey) => {
+    const { product } = this.props;
+    const paramValues = product.getIn(['params', oldKey], Immutable.List());
+    const updatedParams = product.get('params', Immutable.Map()).delete(oldKey).set(newKey, paramValues);
+    this.props.onFieldUpdate(['params'], updatedParams);
+  }
+
+  onChangeParamValues = (key, values) => {
+    const paramPath = ['params', key];
+    this.props.onFieldUpdate(paramPath, Immutable.List(values));
+  }
+
+  onRemoveParam = (paramKey) => {
+    const { product } = this.props;
+    const updatedParams = product.get('params', Immutable.Map()).delete(paramKey);
+    this.props.onFieldUpdate(['params'], updatedParams);
+  }
+
+  onProductParamSave = (key, oldKey, values, newParam) => {
+    if (!newParam && oldKey !== key) {
+      this.onChangeParamKey(oldKey, key);
+    }
+    this.onChangeParamValues(key, values);
+  }
+
+  onProductParamAdd = () => {
+    this.setState({ newProductParam: true });
+  }
+
+  onParamEditClose = () => {
+    this.setState({ newProductParam: false });
+  }
+
+  getExistingParamKeys = () => {
+    const { product } = this.props;
+    const params = product.get('params', Immutable.Map());
+    return params.keySeq().toList();
+  }
+
+  renderNewProductParam = () => {
+    const { newProductParam } = this.state;
+
+    return newProductParam ?
+    (<ProductParamEdit
+      newParam={true}
+      onParamSave={this.onProductParamSave}
+      onParamEditClose={this.onParamEditClose}
+      paramKey={''}
+      paramValues={[]}
+      existingKeys={this.getExistingParamKeys()}
+    />)
+    : null;
   }
 
   onProductRateUpdate = (index, fieldName, value) => {
@@ -129,6 +187,26 @@ export default class Product extends Component {
         onProductRemoveRate={this.onProductRateRemove}
       />
     );
+  }
+
+  renderParameters = () => {
+    const { product } = this.props;
+    const params = product.get('params', Immutable.Map());
+    const mainParams = Immutable.List(['prefix']);
+    let index = 0;
+
+    return params
+      .filter((paramValues, paramKey) => !mainParams.includes(paramKey))
+      .map((paramValues, paramKey) =>
+        <ProductParam
+          key={index++}
+          paramKey={paramKey}
+          paramValues={paramValues.toJS()}
+          existingKeys={this.getExistingParamKeys()}
+          onProductParamSave={this.onProductParamSave}
+          onRemoveParam={this.onRemoveParam}
+        />
+    ).toList();
   }
 
   render() {
@@ -211,8 +289,16 @@ export default class Product extends Component {
               </Col>
               { this.renderPrices() }
               <br />
-              <Button bsSize="xsmall" className="btn-primary" onClick={this.onProductRateAdd}><i className="fa fa-plus" />&nbsp;Add New</Button>
+              <CreateButton onClick={this.onProductRateAdd} label="Add New" />
             </Panel>
+
+            <Panel header={<h3>Additional Parameters</h3>}>
+              { this.renderParameters() }
+              <br />
+              <CreateButton onClick={this.onProductParamAdd} label="Add New" />
+            </Panel>
+
+            {this.renderNewProductParam()}
 
           </Form>
         </Col>

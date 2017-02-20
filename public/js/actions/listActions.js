@@ -68,8 +68,8 @@ export function getList(collection, params = defaultParams) {
 
 function fetchPaymentGateways() {
   const query = {
-    pre: "paymentgateways",
-    api: "list"
+    api: "paymentgateways",
+    action: "list"
   };
 
   return (dispatch) => {

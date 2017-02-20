@@ -1,42 +1,48 @@
-import React, { Component } from 'react';
-
+import React, { Component, PropTypes } from 'react';
 /* COMPONENTS */
 import SubscriptionsList from './SubscriptionsList';
 import Subscription from './Subscription';
 
 export default class Subscriptions extends Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      edit: false
-    };
+  static propTypes = {
+    onSaveSubscription: PropTypes.func.isRequired,
+  };
+
+  state = {
+    subscription: null,
   }
 
-  onClickEdit  = (subscription) => { this.setState({edit: true, subscription}); };
-  onCancelEdit = () => { this.setState({edit: false, subscription: null}); };
-  onSaveSubscription = (subscription, data) => {
-    const callback = (passed) => {
-      if (passed) this.setState({edit: false});
-    }
-    this.props.onSaveSubscription(subscription, data, callback);
-  };
-  
-  render() {
-    const { edit, subscription } = this.state;
+  onClickEdit = (subscription) => {
+    this.setState({ subscription });
+  }
 
+  onCancelEdit = () => {
+    this.setState({ subscription: null });
+  }
+
+  onSaveSubscription = (subscription, data) => {
+    this.props.onSaveSubscription(subscription, data, this.onSaveSuccessfully);
+  };
+
+  onSaveSuccessfully = (response) => {
+    if (response) {
+      this.setState({ subscription: null });
+    }
+  }
+
+  render() {
+    const { subscription } = this.state;
+    if (!subscription) {
+      return (<SubscriptionsList {...this.props} onClickEdit={this.onClickEdit} />);
+    }
     return (
-      <div>
-        {
-          edit ? 
-          <Subscription { ...this.props }
-                        subscription={ subscription }
-                        onSave={ this.onSaveSubscription }
-                        onCancel={this.onCancelEdit} /> :
-          <SubscriptionsList { ...this.props }
-                             onClickEdit={ this.onClickEdit } />
-        }    
-      </div>
+      <Subscription
+        {...this.props}
+        subscription={subscription}
+        onSave={this.onSaveSubscription}
+        onCancel={this.onCancelEdit}
+      />
     );
   }
 
