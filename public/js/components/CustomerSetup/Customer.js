@@ -60,7 +60,8 @@ class Customer extends Component {
 
   renderPaymentGatewayLabel = () => {
     const { customer, supportedGateways } = this.props;
-    const customerPgName = customer.getIn(['payment_gateway', 'name'], '');
+    const paymentGatewayObj = customer.get('payment_gateway');
+    const customerPgName = paymentGatewayObj.getIn(['active', 'name'], '');
     const pg = supportedGateways.filter(item => customerPgName === item.get('name'));
     return (!pg.isEmpty() && pg.get(0).get('image_url', '').length > 0)
       ? <img src={`${globalSetting.serverUrl}/${pg.get(0).get('image_url', '')}`} height="30" alt={pg.get(0).get('name', '')} />
@@ -69,7 +70,8 @@ class Customer extends Component {
 
   renderChangePaymentGateway = () => {
     const { customer } = this.props;
-    const hasPaymentGateway = !(customer.get('payment_gateway', Immutable.Map()).isEmpty());
+    const paymentGatewayObj = customer.get('payment_gateway');
+    const hasPaymentGateway = !(paymentGatewayObj.get('active', Immutable.Map()).isEmpty());
     const label = hasPaymentGateway ? this.renderPaymentGatewayLabel() : 'None';
     return (
       <FormGroup>
