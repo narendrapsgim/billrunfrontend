@@ -54,7 +54,9 @@ const PlansList = () => {
     code: 1,
   };
 
-  const baseFilter = { connection_type: 'postpaid' };
+  const baseFilter = {
+    connection_type: { $regex: '^postpaid$' },
+  };
 
   return (
     <EntityList
