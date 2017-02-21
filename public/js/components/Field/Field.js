@@ -12,6 +12,7 @@ import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
 import Unlimitd from '../FieldTypes/UnlimitedInput';
 import Checkbox from '../FieldTypes/Checkbox';
+import Radio from '../FieldTypes/Radio';
 import Salutation from '../FieldTypes/Salutation';
 
 class Field extends React.Component {
@@ -32,12 +33,14 @@ class Field extends React.Component {
   createInput() {
     let { onChange,
           id,
+          name,
           value,
           coll,
           tooltip,
           fieldType = this.getFieldType(id, coll),
           required = false,
           disabled = false,
+          checked = false,
           editable = true,
           dispatch,
           label = '',
@@ -58,6 +61,8 @@ class Field extends React.Component {
         return (<Unlimitd onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} {...this.props} />);
       case 'checkbox':
         return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} label={label} />);
+      case 'radio':
+        return (<Radio onChange={onChange} id={id} name={name} value={value} editable={editable} disabled={disabled} checked={checked} label={label} />);
       case 'salutation':
         return (<Salutation {...this.props} />);
       default:
