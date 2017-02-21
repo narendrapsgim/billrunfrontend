@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Button } from 'react-bootstrap';
 import Select from 'react-select';
 import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
+import Credit from '../Credit/Credit';
 
 
 export default class Subscription extends Component {
@@ -34,6 +35,10 @@ export default class Subscription extends Component {
       customFields: this.initCustomFields(),
     };
   }
+
+  state = {
+    showCreditCharge: false,
+  };
 
   initSystemFields = () => {
     const { subscription } = this.props;
@@ -197,6 +202,31 @@ export default class Subscription extends Component {
     return fields;
   }
 
+  onShowCreditCharge = () => {
+    this.setState({ showCreditCharge: true });
+  }
+
+  onCloseCreditCharge = () => {
+    this.setState({ showCreditCharge: false });
+  }
+
+  renderCreditCharge = () => {
+    const { subscription } = this.props;
+    const { showCreditCharge } = this.state;
+    return (
+      <div>
+        <Button bsSize="xsmall" className="btn-primary" onClick={this.onShowCreditCharge}>Credit Charge</Button>
+        {showCreditCharge ?
+          <Credit
+            onClose={this.onCloseCreditCharge}
+            sid={subscription.get('sid', '')}
+            aid={subscription.get('aid', '')}
+          />
+          : null}
+      </div>
+    );
+  }
+
   render() {
     const { subscription } = this.props;
     if (!subscription) {
@@ -209,6 +239,8 @@ export default class Subscription extends Component {
           { this.renderSystemFields() }
           <hr />
           { this.renderCustomFields() }
+          { this.renderCreditCharge() }
+          <hr />
           <ActionButtons onClickSave={this.onSave} onClickCancel={this.props.onCancel} />
         </Form>
       </div>
