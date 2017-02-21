@@ -25,6 +25,7 @@ const EntityRevisionList = (props) => {
   const onClickEdit = (item) => {
     const { itemsType, itemType } = props;
     const itemId = item.getIn(['_id', '$id']);
+    props.onSelectItem();
     props.router.push(`${itemsType}/${itemType}/${itemId}`);
   };
 
@@ -33,10 +34,12 @@ const EntityRevisionList = (props) => {
 
 EntityRevisionList.defaultProps = {
   items: Immutable.List(),
+  onSelectItem: () => {},
 };
 
 EntityRevisionList.propTypes = {
   items: PropTypes.instanceOf(Immutable.List),
+  onSelectItem: PropTypes.func,
   router: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,

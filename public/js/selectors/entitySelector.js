@@ -48,7 +48,7 @@ const selectRevisions = (item, allRevisions, uniqueFiled) => {
   return undefined;
 };
 
-const selectFormMode = (action, id, item) => {
+const selectFormMode = (action, id, item, revisions) => {
   if (action) {
     return action;
   }
@@ -63,6 +63,13 @@ const selectFormMode = (action, id, item) => {
     }
     if (from.isAfter(moment())) {
       return 'update';
+    }
+    // Check if item has future revision - if has - item is readonly
+    if (item && item.getIn(['_id', '$id'], false) && revisions) {
+      const idx = revisions.findIndex(revision => revision.getIn(['_id', '$id'], false) === item.getIn(['_id', '$id'], false));
+      if (idx !== 0) {
+        return 'view';
+      }
     }
     return 'closeandnew';
   }
@@ -95,5 +102,6 @@ export const modeSelector = createSelector(
   getAction,
   idSelector,
   itemSelector,
+  revisionsSelector,
   selectFormMode,
 );

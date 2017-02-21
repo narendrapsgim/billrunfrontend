@@ -9,23 +9,21 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
   const more = revisions.size > size && (start + size !== revisions.size);
   const renderMore = type => (
     <li key={`${item.getIn(['_id', '$id'], '')}-more-${type}`} className={`more ${type}`}>
-      <div style={{ lineHeight: '12px' }}>
-        &nbsp;
-      </div>
+      <div style={{ lineHeight: '12px' }}>&nbsp;</div>
       <div>
         <div>&nbsp;</div>
         <div>&nbsp;</div>
       </div>
     </li>
   );
-  const renderRevision = (revision, key) => {
+  const renderRevision = (revision, key, list) => {
     const from = revision.getIn(['from', 'sec'], '');
     const to = revision.getIn(['to', 'sec'], '');
     const isActive = revision.getIn(['_id', '$id'], '') === item.getIn(['_id', '$id'], '');
     const activeClass = classNames('revision', {
       active: isActive,
       first: key === 0,
-      last: key === (size - 1),
+      last: key === (list.size - 1),
     });
     return (
       <li key={`${revision.getIn(['_id', '$id'], '')}`} className={activeClass}>
@@ -42,7 +40,7 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
       </li>
     );
   };
-  // console.log('slice: ', start, '-', size);
+
   return (
     <ul className="revision-history-list">
       { more && renderMore('before') }

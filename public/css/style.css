@@ -8,6 +8,14 @@ html {
 textarea {
   resize: vertical;
 }
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus {
+  outline: none;
+}
 .clickable {
   cursor: pointer;
 }

@@ -1,12 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
+import { Popover, OverlayTrigger, Overlay, Tooltip, Button } from 'react-bootstrap';
 import ModalWrapper from './ModalWrapper';
 import StateIcon from './StateIcon';
 import RevisionTimeline from './RevisionTimeline';
 import EntityRevisionList from '../EntityList/EntityRevisionList';
-// import { apiBillRun } from '../../common/Api';
 import { getEntityRevisionsQuery } from '../../common/ApiQueries';
 import { getRevisions } from '../../actions/entityListActions';
 
@@ -47,6 +46,8 @@ class EntityRevisionModal extends Component {
   }
 
   showManageRevisions = () => {
+    const { revisionOverlay = {} } = this.refs; // eslint-disable-line  react/no-string-refs
+    revisionOverlay.hide();
     this.setState({ showList: true });
   }
 
@@ -77,7 +78,12 @@ class EntityRevisionModal extends Component {
     const { showList } = this.state;
     return (
       <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
-        <EntityRevisionList items={revisions} itemType={itemType} itemsType={itemsType} />
+        <EntityRevisionList
+          items={revisions}
+          itemType={itemType}
+          itemsType={itemsType}
+          onSelectItem={this.hideManageRevisions}
+        />
       </ModalWrapper>
     );
   }
@@ -95,7 +101,7 @@ class EntityRevisionModal extends Component {
     const to = item.getIn(['to', 'sec'], '');
     return (
       <div>
-        <OverlayTrigger trigger="click" rootClose placement="right" overlay={this.renderRevisionTooltip()} onEnter={this.onEnter}>
+        <OverlayTrigger trigger="click" rootClose placement="right" ref="revisionOverlay" overlay={this.renderRevisionTooltip()} onEnter={this.onEnter}>
           <OverlayTrigger overlay={this.renderHelpTooltip()} placement="left">
             <div className="clickable">
               <StateIcon from={from} to={to} />

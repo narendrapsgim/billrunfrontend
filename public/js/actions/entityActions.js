@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery } from '../common/ApiQueries';
-import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
   GOT_ENTITY: 'GOT_ENTITY',
@@ -58,12 +58,20 @@ const buildRequestData = (item, action) => {
     }
 
     case 'closeandnew': {
-      const now = moment().toISOString();
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-      const update = item.delete('_id').set('from', now);
+      const fromDate = item.get('from', null);
+      if (typeof fromDate === 'string') {
+        let formatedFromDate = moment(fromDate).utcOffset(0);
+        formatedFromDate = formatedFromDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+        formatedFromDate = formatedFromDate.toISOString();
+        const update = item.delete('_id').set('from', formatedFromDate);
+        formData.append('update', JSON.stringify(update));
+      } else {
+        const update = item.delete('_id').delete('from');
+        formData.append('update', JSON.stringify(update));
+      }
       formData.append('query', JSON.stringify(query));
-      formData.append('update', JSON.stringify(update));
       return formData;
     }
 

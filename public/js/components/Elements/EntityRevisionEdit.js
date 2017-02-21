@@ -53,7 +53,12 @@ class EntityRevisionEdit extends Component {
     const { showList } = this.state;
     return (
       <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
-        <EntityRevisionList items={revisions} itemType={itemType} itemsType={itemsType} />
+        <EntityRevisionList
+          items={revisions}
+          itemType={itemType}
+          itemsType={itemsType}
+          onSelectItem={this.hideManageRevisions}
+        />
       </ModalWrapper>
     );
   }
@@ -86,7 +91,7 @@ class EntityRevisionEdit extends Component {
   renderDateFromfields = () => {
     const { item, mode } = this.props;
     const from = this.getFromDateValue(item);
-    if (mode === 'view') {
+    if (mode === 'view' || mode === 'update') {
       return (
         <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)}</p>
       );
@@ -104,42 +109,68 @@ class EntityRevisionEdit extends Component {
     );
   }
 
-  render() {
-    const { item, revisions, revisionItemsInTimeLine } = this.props;
+  renderRevisionsBlock = () => {
+    const { item, revisions, revisionItemsInTimeLine, mode } = this.props;
+    if (mode === 'create') {
+      return null;
+    }
     const start = this.getStartIndex();
+    return (
+      <div className="inline pull-right">
+        <div className="inline mr10">
+          <RevisionTimeline
+            revisions={revisions}
+            item={item}
+            size={revisionItemsInTimeLine}
+            start={start}
+          />
+        </div>
+        <div className="inline">
+          <Button bsStyle="link" className="pull-right" style={{ padding: '0 10px 15px 10px' }} onClick={this.showManageRevisions}>
+            Manage Revisions
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
+  renderDateSelectBlock = () => (
+    <div className="inline" style={{ width: 155, padding: 0, margin: '9px 25px 0 25px' }}>
+      <Form horizontal style={{ marginBottom: 0 }}>
+        <FormGroup style={{ marginBottom: 0 }}>
+          <div className="inline" style={{ verticalAlign: 'top', marginTop: 10, marginRight: 15 }}>
+            <label>From</label>
+          </div>
+          <div className="inline" style={{ padding: 0, width: 120 }}>
+            { this.renderDateFromfields() }
+          </div>
+        </FormGroup>
+      </Form>
+    </div>
+  )
+
+  renderTitle = () => {
+    const { mode } = this.props;
+    if (mode === 'create') {
+      return (
+        <div className="inline" style={{ verticalAlign: 'top', marginTop: 18, width: 110 }}>
+          &nbsp;
+        </div>
+      );
+    }
+    return (
+      <div className="inline" style={{ verticalAlign: 'top', marginTop: 18, width: 110 }}>
+        <label>Revisions History</label>
+      </div>
+    );
+  }
+
+  render() {
     return (
       <div className="entity-revision-edit">
-        <div className="inline" style={{ verticalAlign: 'top', marginTop: 18, width: 110 }}>
-          <label>Revisions History</label>
-        </div>
-        <div className="inline" style={{ width: 155, padding: 0, margin: '9px 25px 0 25px' }}>
-          <Form horizontal style={{ marginBottom: 0 }}>
-            <FormGroup style={{ marginBottom: 0 }}>
-              <div className="inline" style={{ verticalAlign: 'top', marginTop: 10, marginRight: 15 }}>
-                <label>From</label>
-              </div>
-              <div className="inline" style={{ padding: 0, width: 120 }}>
-                { this.renderDateFromfields() }
-              </div>
-            </FormGroup>
-          </Form>
-        </div>
-        <div className="inline pull-right">
-          <div className="inline mr10">
-            <RevisionTimeline
-              revisions={revisions}
-              item={item}
-              size={revisionItemsInTimeLine}
-              start={start}
-            />
-          </div>
-          <div className="inline">
-            <Button bsStyle="link" className="pull-right" style={{ padding: '0 10px 15px 10px' }} onClick={this.showManageRevisions}>
-              Manage Revisions
-            </Button>
-          </div>
-        </div>
+        { this.renderTitle() }
+        { this.renderDateSelectBlock() }
+        { this.renderRevisionsBlock() }
         { this.renderVerisionList() }
       </div>
     );
