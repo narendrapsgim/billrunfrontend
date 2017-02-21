@@ -9,6 +9,7 @@ import List from '../List';
 import Usage from './Usage';
 import { usageListQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
+import ConfirmModal from '../ConfirmModal';
 
 class UsageList extends Component {
 
@@ -30,6 +31,7 @@ class UsageList extends Component {
     size: 10,
     sort: Immutable.Map(),
     filter: {},
+    showRemoveConfirm: false,
   };
 
   buildQuery = () => {
@@ -83,13 +85,53 @@ class UsageList extends Component {
     </div>
   );
 
+  showRemoveConfirmDialog = () => {
+    this.setState({ showRemoveConfirm: true });
+  }
+
+  onRemoveOk = () => {
+    //TODO: remove line!!
+    this.setState({ showRemoveConfirm: false });
+  }
+
+  onRemoveCancel = () => {
+    this.setState({ showRemoveConfirm: false });
+  }
+
+  renderUsage = () => {
+    const { line, viewing, showRemoveConfirm } = this.state;
+    const enableRemove = (line && line.get('type', '') === 'credit');
+    if (!viewing) {
+      return null;
+    }
+    if (enableRemove) {
+      return (
+        <div>
+          <Usage
+            line={line}
+            onClickCancel={this.onCancelView}
+            enableRemove={enableRemove}
+            onClickRemove={this.showRemoveConfirmDialog}
+          />
+          <ConfirmModal
+            onOk={this.onRemoveOk}
+            onCancel={this.onRemoveCancel}
+            show={showRemoveConfirm}
+            message={'Are you sure you want to remove this line?'}
+            labelOk="Yes"
+          />
+        </div>);
+    }
+    return (<Usage line={line} onClickCancel={this.onCancelView} />);
+  }
+
   render() {
-    const { line, viewing, sort } = this.state;
+    const { viewing, sort } = this.state;
     const { items, baseFilter } = this.props;
     const fields = this.getTableFields();
     return (
       <div className="UsageList">
-        { viewing ? (<Usage line={line} onClickCancel={this.onCancelView} />) : null }
+        { this.renderUsage() }
         <div style={{ display: viewing ? 'none' : 'block' }}>
           <Row>
             <Col lg={12}>

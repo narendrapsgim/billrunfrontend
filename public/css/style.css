@@ -269,3 +269,8 @@ textarea {
   background-color: #eee;
   opacity: .7;
 }
+
+.panel-no-border {
+  border: 0;
+  margin: 0;
+}
