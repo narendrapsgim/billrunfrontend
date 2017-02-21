@@ -182,7 +182,7 @@ export default class AdvancedFilter extends Component {
 
     return (
       <div className="AdvancedFilter">
-        <Table responsive className="mb10">
+        <Table responsive className="mb0">
           <thead>
             <tr>{ titles }</tr>
           </thead>
