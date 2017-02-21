@@ -92,10 +92,6 @@ class ServiceSetup extends Component {
     this.props.dispatch(removeGroup(groupName));
   }
 
-  onChangeFrom = (a, b, c) => {
-    console.log('onChangeFrom: ', a, b, c);
-  }
-
   onUpdateItem = (path, value) => {
     this.props.dispatch(updateService(path, value));
   }
@@ -140,7 +136,7 @@ class ServiceSetup extends Component {
             revisions={revisions}
             item={item}
             mode={mode}
-            onChangeFrom={this.onChangeFrom}
+            onChangeFrom={this.onUpdateItem}
             itemType="service"
             itemsType="services"
             revisionBy="name"

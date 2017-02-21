@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Form, FormGroup, ControlLabel, Col, Row, Button } from 'react-bootstrap';
+import { Form, FormGroup, Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import RevisionTimeline from './RevisionTimeline';
 import ModalWrapper from './ModalWrapper';
@@ -70,9 +70,22 @@ class EntityRevisionEdit extends Component {
     return index - 1;
   }
 
+  onChangeFrom = (value) => {
+    if (value) {
+      this.props.onChangeFrom(['from'], value.toISOString());
+    }
+  }
+
+  getFromDateValue = (item) => {
+    if (item.get('from', false) && typeof item.get('from', false) === 'string') {
+      return moment(item.get('from', moment()));
+    }
+    return moment.unix(item.getIn(['from', 'sec'], moment().unix()));
+  }
+
   renderDateFromfields = () => {
     const { item, mode } = this.props;
-    const from = moment.unix(item.getIn(['from', 'sec'], moment().unix()));
+    const from = this.getFromDateValue(item);
     if (mode === 'view') {
       return (
         <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)}</p>
@@ -82,10 +95,11 @@ class EntityRevisionEdit extends Component {
       <DatePicker
         className="form-control"
         dateFormat={globalSetting.dateFormat}
-        selected={from || moment()}
-        onChange={this.props.onChangeFrom}
-        isClearable={true}
+        selected={from}
+        onChange={this.onChangeFrom}
+        isClearable={false}
         placeholderText="Select Date..."
+        minDate={moment()}
       />
     );
   }
@@ -99,34 +113,32 @@ class EntityRevisionEdit extends Component {
         <div className="inline" style={{ verticalAlign: 'top', marginTop: 18, width: 110 }}>
           <label>Revisions History</label>
         </div>
-        <div className="inline" style={{ width: 190, padding: 0, margin: '9px 40px 0 30px' }}>
+        <div className="inline" style={{ width: 155, padding: 0, margin: '9px 25px 0 25px' }}>
           <Form horizontal style={{ marginBottom: 0 }}>
             <FormGroup style={{ marginBottom: 0 }}>
-              <div className="inline" style={{ verticalAlign: 'top', marginTop: 10, marginRight: 15}}>
+              <div className="inline" style={{ verticalAlign: 'top', marginTop: 10, marginRight: 15 }}>
                 <label>From</label>
               </div>
-              <div className="inline" style={{ padding: 0, width: 140 }}>
+              <div className="inline" style={{ padding: 0, width: 120 }}>
                 { this.renderDateFromfields() }
               </div>
             </FormGroup>
           </Form>
         </div>
         <div className="inline pull-right">
-          <Row>
-            <div className="inline mr10">
-              <RevisionTimeline
-                revisions={revisions}
-                item={item}
-                size={revisionItemsInTimeLine}
-                start={start}
-              />
-            </div>
-            <div className="inline">
-              <Button bsStyle="link" className="pull-right" style={{ padding: '0 10px 15px 10px' }} onClick={this.showManageRevisions}>
-                Manage Revisions
-              </Button>
-            </div>
-          </Row>
+          <div className="inline mr10">
+            <RevisionTimeline
+              revisions={revisions}
+              item={item}
+              size={revisionItemsInTimeLine}
+              start={start}
+            />
+          </div>
+          <div className="inline">
+            <Button bsStyle="link" className="pull-right" style={{ padding: '0 10px 15px 10px' }} onClick={this.showManageRevisions}>
+              Manage Revisions
+            </Button>
+          </div>
         </div>
         { this.renderVerisionList() }
       </div>
