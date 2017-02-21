@@ -195,9 +195,15 @@ class EntityList extends Component {
   }
 
   parserState = (item) => {
-    const { collection, showRevisionBy } = this.props;
+    const { collection, showRevisionBy, itemType, itemsType } = this.props;
     return (
-      <EntityRevisionModal item={item} collection={collection} revisionBy={showRevisionBy} />
+      <EntityRevisionModal
+        item={item}
+        collection={collection}
+        revisionBy={showRevisionBy}
+        itemType={itemType}
+        itemsType={itemsType}
+      />
     );
   };
 
