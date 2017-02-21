@@ -1,20 +1,28 @@
-import _ from 'lodash';
+import Immutable from 'immutable';
+import changeCase from 'change-case';
 import FieldNames from '../FieldNames';
 
-export function titlize(str) {
-  return _.capitalize(str.replace(/_/g, ' '));
-}
 
-export function getFieldName(field, category) {
-  if (FieldNames[category]) return FieldNames[category][field] || field;
+export const titlize = str => changeCase.upperCaseFirst(str);
+
+export const getFieldName = (field, category) => {
+  if (FieldNames[category]) {
+    return FieldNames[category][field] || field;
+  }
   return FieldNames[field] || field;
-}
+};
 
-
-export function range(n = 1) {
-  return Array.apply(null, new Array(n));
-}
-
-export function times(n = 1, fn = () => {}) {
-  return range(n).map(fn);
-}
+export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
+  switch (mode) {
+    case 'create':
+      return `Create New ${changeCase.upperCaseFirst(entityName)}`;
+    case 'closeandnew':
+      return `Edit ${entityName} - ${item.get('name')}`;
+    case 'view':
+      return `${changeCase.upperCaseFirst(entityName)} - ${item.get('name')}`;
+    case 'update':
+      return `Update ${entityName} - ${item.get('name')}`;
+    default:
+      return '';
+  }
+};
