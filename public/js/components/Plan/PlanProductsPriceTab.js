@@ -55,7 +55,7 @@ class PlanProductsPriceTab extends Component {
       const newProduct = products.find(planProd => planProd.get('key', '') === product.key);
       if (newProduct) {
         const usaget = newProduct.get('rates', Immutable.Map()).keySeq().first();
-        const productPath = ['rates', newProduct.get('key', ''), usaget];
+        const productPath = ['rates', newProduct.get('key', ''), usaget, 'rate'];
         this.props.dispatch(planProductsRateInit(newProduct, productPath));
       }
     });
@@ -155,7 +155,7 @@ class PlanProductsPriceTab extends Component {
     const { products, planRates } = this.props;
     return planRates.map((productUsageTypes, productKey) => {
       const usaget = productUsageTypes.keySeq().first();
-      const prices = productUsageTypes.get(usaget, Immutable.List());
+      const prices = productUsageTypes.getIn([usaget, 'rate'], Immutable.List());
       const prod = products.find(planProduct => planProduct.get('key', '') === productKey);
       if (!prod) {
         return null;

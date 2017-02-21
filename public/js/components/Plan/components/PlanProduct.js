@@ -29,7 +29,7 @@ export default class PlanProduct extends Component {
   componentWillMount() {
     const { item, usaget, prices } = this.props;
     this.addDefaultPriceIfNoPrice(item, usaget, prices);
-    }
+  }
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     const { prices } = this.props;
@@ -45,7 +45,7 @@ export default class PlanProduct extends Component {
     // if product don't have pricing for this plan, init with BASE price
     if (prices.size === 0) {
       const productKey = item.get('key', '');
-      const productPath = ['rates', productKey, usaget];
+      const productPath = ['rates', productKey, usaget, 'rate'];
       this.props.onProductInitRate(item, productPath);
     }
   }
@@ -55,13 +55,13 @@ export default class PlanProduct extends Component {
     const productKey = item.get('key');
     switch (fieldName) {
       case 'to': {
-        const fieldPath = ['rates', productKey, usaget];
+        const fieldPath = ['rates', productKey, usaget, 'rate'];
         this.props.onProductEditRateTo(fieldPath, index, value);
       }
         break;
 
       default: {
-        const fieldPath = ['rates', productKey, usaget, index, fieldName];
+        const fieldPath = ['rates', productKey, usaget, 'rate', index, fieldName];
         this.props.onProductEditRate(fieldPath, value);
       }
     }
@@ -70,14 +70,14 @@ export default class PlanProduct extends Component {
   onProductAddRate = () => {
     const { item, usaget } = this.props;
     const productKey  = item.get('key');
-    const productPath = ['rates', productKey, usaget];
+    const productPath = ['rates', productKey, usaget, 'rate'];
     this.props.onProductAddRate(productPath);
   }
 
   onProductRemoveRate = (index) => {
     const { item, usaget } = this.props;
     const productKey  = item.get('key');
-    const productPath = ['rates', productKey, usaget];
+    const productPath = ['rates', productKey, usaget, 'rate'];
     this.props.onProductRemoveRate(productPath, index);
   }
 
@@ -91,7 +91,7 @@ export default class PlanProduct extends Component {
   onProductRestore = () => {
     const { item, usaget } = this.props;
     const productKey = item.get('key', '');
-    const productPath = ['rates', productKey, usaget];
+    const productPath = ['rates', productKey, usaget, 'rate'];
     this.props.onProductRestore(item, productPath);
   }
 
