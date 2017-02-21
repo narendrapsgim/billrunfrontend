@@ -18,12 +18,14 @@ class PlanIncludesTab extends Component {
     onChangeFieldValue: PropTypes.func.isRequired,
     onGroupAdd: PropTypes.func.isRequired,
     onGroupRemove: PropTypes.func.isRequired,
+    mode: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     includeGroups: Immutable.Map(),
     usageTypes: Immutable.List(),
+    mode: 'create',
   };
 
   constructor(props) {
@@ -45,7 +47,7 @@ class PlanIncludesTab extends Component {
   componentDidMount() {
     const { usageTypes } = this.props;
     if (usageTypes.isEmpty()) {
-    this.props.dispatch(getSettings('usage_types'));
+      this.props.dispatch(getSettings('usage_types'));
     }
     getAllGroup().then((responses) => {
       const existingGroups = Immutable.Set().withMutations((groupsWithMutations) => {
@@ -101,7 +103,7 @@ class PlanIncludesTab extends Component {
 
   renderGroups = () => {
     const { usedProducts } = this.state;
-    const { includeGroups } = this.props;
+    const { includeGroups, mode } = this.props;
 
     if (typeof includeGroups === 'undefined' || includeGroups.size === 0) {
       return (<tr><td colSpan="6" className="text-center">No Groups</td></tr>);
@@ -115,6 +117,7 @@ class PlanIncludesTab extends Component {
       return (
         <PlanIncludeGroupEdit
           key={`${groupName}_${usaget}`}
+          mode={mode}
           name={groupName}
           value={value}
           usaget={usaget}
@@ -130,20 +133,25 @@ class PlanIncludesTab extends Component {
     }).toArray();
   }
 
-  renderHeader = () => (
-    <tr>
-      <th style={{ width: 150 }}>Name</th>
-      <th style={{ width: 100 }}>Unit Type</th>
-      <th style={{ width: 100 }}>Include</th>
-      <th>Products</th>
-      <th className="text-center" style={{ width: 100 }}>Shared</th>
-      <th style={{ width: 180 }} />
-    </tr>
-  );
+  renderHeader = () => {
+    const { mode } = this.props;
+    const allowEdit = mode !== 'view';
+    return (
+      <tr>
+        <th style={{ width: 150 }}>Name</th>
+        <th style={{ width: 100 }}>Unit Type</th>
+        <th style={{ width: 100 }}>Include</th>
+        <th>Products</th>
+        <th className="text-center" style={{ width: 100 }}>Shared</th>
+        {allowEdit && <th style={{ width: 180 }} />}
+      </tr>
+    );
+  }
 
   render() {
-    const { usageTypes } = this.props;
+    const { usageTypes, mode } = this.props;
     const { existingGroups, usedProducts } = this.state;
+    const allowCreate = mode !== 'view';
 
     return (
       <Row>
@@ -159,12 +167,14 @@ class PlanIncludesTab extends Component {
             </Table>
 
           </Panel>
-          <PlanIncludeGroupCreate
-            usageTypes={usageTypes}
-            existinGrousNames={existingGroups}
-            usedProducts={usedProducts}
-            addGroup={this.onGroupAdd}
-          />
+          { allowCreate &&
+            <PlanIncludeGroupCreate
+              usageTypes={usageTypes}
+              existinGrousNames={existingGroups}
+              usedProducts={usedProducts}
+              addGroup={this.onGroupAdd}
+            />
+          }
         </Col>
       </Row>
     );

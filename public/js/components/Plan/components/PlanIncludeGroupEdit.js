@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Modal, Col, Button, Form, FormGroup, ControlLabel, Checkbox } from 'react-bootstrap';
+import { Modal, Col, Button, Form, FormGroup, ControlLabel, Checkbox, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
 import { GroupsInclude } from '../../../FieldDescriptions';
@@ -25,6 +25,7 @@ export default class PlanIncludeGroupEdit extends Component {
     onChangeFieldValue: PropTypes.func.isRequired,
     removeGroupProducts: PropTypes.func.isRequired,
     addGroupProducts: PropTypes.func.isRequired,
+    mode: PropTypes.string,
     onGroupRemove: PropTypes.func.isRequired,
   }
 
@@ -32,6 +33,7 @@ export default class PlanIncludeGroupEdit extends Component {
     products: Immutable.List(),
     usedProducts: Immutable.List(),
     shared: false,
+    mode: 'create',
   };
 
   state = {
@@ -82,6 +84,12 @@ export default class PlanIncludeGroupEdit extends Component {
     this.setState({ isEditMode: !this.state.isEditMode });
   }
 
+  renderProductsTooltip = productsLabels => (
+    <Tooltip id={productsLabels}>
+      {productsLabels}
+    </Tooltip>
+  )
+
   renderEdit = () => {
     const { name, value, usaget, shared, products, usedProducts } = this.props;
     const { isEditMode } = this.state;
@@ -128,26 +136,33 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   render() {
-    const { name, value, usaget, shared, products } = this.props;
+    const { name, value, usaget, shared, products, mode } = this.props;
     const { showConfirm } = this.state;
     const confirmMessage = `Are you sure you want to remove ${name} group?`;
     const sharedLabel = shared ? 'Yes' : 'No';
-    const productsLabel = products.join(', ');
+    const productsLabels = products.join(', ');
     const valueLabel = changeCase.titleCase(value);
-
+    const allowEdit = mode !== 'view';
+    const tooltip = this.renderProductsTooltip(productsLabels);
     return (
       <tr>
         <td className="td-ellipsis">{name}</td>
         <td className="td-ellipsis">{usaget}</td>
         <td className="td-ellipsis">{valueLabel}</td>
-        <td className="td-ellipsis">{productsLabel}</td>
-        <td className="td-ellipsis text-center">{sharedLabel}</td>
-        <td className="text-right" style={{ paddingRight: 0 }}>
-          <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
-          <Button onClick={this.onGroupRemoveAsk} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
-          <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
-          { this.renderEdit() }
+        <td className="td-ellipsis">
+          <OverlayTrigger placement="left" overlay={tooltip}>
+            <span>{productsLabels}</span>
+          </OverlayTrigger>
         </td>
+        <td className="td-ellipsis text-center">{sharedLabel}</td>
+        { allowEdit &&
+          <td className="text-right" style={{ paddingRight: 0 }}>
+            <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
+            <Button onClick={this.onGroupRemoveAsk} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+            <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
+            { this.renderEdit() }
+          </td>
+        }
       </tr>
     );
   }
