@@ -225,6 +225,7 @@ export const searchProductsByKeyQuery = (key, project = {}) => ({
     { query: JSON.stringify({
       key: { $regex: key, $options: 'i' },
     }) },
+    { states: JSON.stringify([0]) },
   ],
 });
 
@@ -239,6 +240,7 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
     { query: JSON.stringify({
       name: { $regex: name, $options: 'i' },
     }) },
+    { states: JSON.stringify([0]) },
   ],
 });
 
@@ -256,7 +258,7 @@ export const getProductsByKeysQuery = (keys, project = {}) => ({
   ],
 });
 
-export const getEntityRevisionsQuery = (collection, revisionBy, key, size) => ({
+export const getEntityRevisionsQuery = (collection, revisionBy, key, size = 9999) => ({
   action: 'get',
   entity: collection,
   params: [
@@ -264,12 +266,11 @@ export const getEntityRevisionsQuery = (collection, revisionBy, key, size) => ({
     { query: JSON.stringify({
       [revisionBy]: {
         $regex: `^${key}$`,
-        $options: 'i',
       },
     }) },
     { project: JSON.stringify({ from: 1, to: 1, description: 1 }) },
     { page: 0 },
     { size },
-    { history: true },
+    { state: JSON.stringify([0, 1, 2]) },
   ],
 });
