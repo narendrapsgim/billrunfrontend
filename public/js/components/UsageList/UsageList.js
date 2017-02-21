@@ -10,6 +10,8 @@ import Usage from './Usage';
 import { usageListQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 import ConfirmModal from '../ConfirmModal';
+import { deleteLine } from '../../actions/linesActions';
+
 
 class UsageList extends Component {
 
@@ -90,8 +92,18 @@ class UsageList extends Component {
   }
 
   onRemoveOk = () => {
-    //TODO: remove line!!
-    this.setState({ showRemoveConfirm: false });
+    const { line } = this.state;
+    const id = line.getIn(['_id', '$id'], 'undefined');
+    this.props.dispatch(deleteLine(id))
+    .then(
+      (response) => {
+        if (response.status) {
+          this.setState({ showRemoveConfirm: false });
+          this.onCancelView();
+          this.fetchItems();
+        }
+      }
+    );
   }
 
   onRemoveCancel = () => {

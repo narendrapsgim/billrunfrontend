@@ -192,6 +192,15 @@ export const getEntitesQuery = (collection, project = {}) => {
   });
 };
 
+export const getDeleteLineQuery = id => ({
+  action: 'delete',
+  entity: 'lines',
+  params: [
+    { query: JSON.stringify({ _id: id }) },
+  ],
+});
+
+
 // List
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
