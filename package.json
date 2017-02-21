@@ -81,6 +81,7 @@
     "react-select": "^0.9.1",
     "react-sortable-hoc": "^0.4.2",
     "redux": "^3.5.2",
+    "reselect": "^2.5.4",
     "uuid": "^2.0.3"
   }
 }

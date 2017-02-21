@@ -14,8 +14,14 @@ textarea {
 .movable {
     cursor: move;
 }
+.non-editble-field{
+  line-height: 32px;
+}
 .actions button.btn-sm {
     padding: 9px 12px;
+}
+.inline {
+  display: inline-block;;
 }
 .td-ellipsis{
   white-space: nowrap;
@@ -25,7 +31,8 @@ textarea {
 
 .pl0{ padding-left: 0!important; }
 .pr0{ padding-right: 0!important; }
-.mb10{ margin-bottom: 0!important; }
+.mb0{ margin-bottom: 0!important; }
+.mb10{ margin-bottom: 10px!important; }
 .mr10{ margin-right: 10px!important; }
 
 .full-width{ width: 100%!important; }
@@ -310,38 +317,55 @@ ul.revision-history-list  {
   white-space: nowrap;
 }
 ul.revision-history-list li {
-  width: 80px;
+  width: 50px;
   display: inline-block;
-  padding: 10px;
   text-align: center;
   position: relative;
 }
 ul.revision-history-list li.more {
   width: 20px;
 }
+ul.revision-history-list li.more::after {
+  border-bottom: 2px dotted #91A384;
+  width: 15px;
+  left: 23px;
+}
+ul.revision-history-list li.more.after::after {
+  left: -15px;
+}
 ul.revision-history-list li .cycle {
-  margin-bottom: 10px;
+  margin-bottom: 3px;
+}
+ul.revision-history-list li .date {
+  text-align: center;
 }
 
 ul.revision-history-list li::after {
-  /*content: "\2192";*/
   content: "\0020";
   position: absolute;
-  top: 17px;
-  left: 45px;
+  top: 7px;
+  left: 32px;
   border-bottom: 2px solid #91A384;
-  width: 70px;
-  z-index: -1;
+  width: 36px;
 }
-ul.revision-history-list li:last-child::after {
+ul.revision-history-list li.last::after {
   content: "";
   width: 0;
   border-bottom: none;
 }
-ul.revision-history-list li.more::after {
-  border-bottom: 2px dotted #91A384;
-  width: 22px;
-  top: -8px;
-  left: 30px;
+
+.entity-revision-edit ul.revision-history-list li .date {
+  color: #6f6f6f;
 }
+.entity-revision-edit ul.revision-history-list li.active .date{
+  font-weight: bold;
+  color: black;
+}
+.entity-revision-edit ul.revision-history-list li.active .cycle {
+  border-color: black;
+}
+.entity-revision-edit ul.revision-history-list li.more::after {
+  top: 10px;
+}
+
 /* ~Entity Revision */
