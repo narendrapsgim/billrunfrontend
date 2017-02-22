@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import moment from 'moment';
 import changeCase from 'change-case';
 import FieldNames from '../FieldNames';
 
@@ -10,6 +11,12 @@ export const getFieldName = (field, category) => {
     return FieldNames[category][field] || field;
   }
   return FieldNames[field] || field;
+};
+
+export const getZiroTimeDate = (date = moment()) => {
+  const dateWithoutTime = moment(date).utcOffset(0);
+  dateWithoutTime.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+  return dateWithoutTime;
 };
 
 export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {

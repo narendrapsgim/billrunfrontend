@@ -1,6 +1,6 @@
-import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery } from '../common/ApiQueries';
+import { getZiroTimeDate } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -39,12 +39,15 @@ const buildRequestData = (item, action) => {
 
     case 'create': {
       const formData = new FormData();
-      const dafaultFrom = moment().toISOString();
-      const dafaultTo = moment().add(100, 'years').toISOString();
-      const update = item
-        .set('from', item.get('from', dafaultFrom))
-        .set('to', item.get('to', dafaultTo));
-      formData.append('update', JSON.stringify(update));
+      // If from-date is string -> date was changed from UI and UI need to send it
+      // it use for future entity creation
+      if (typeof item.get('from', null) === 'string') {
+        const newFrom = getZiroTimeDate(item.get('from', null)).toISOString();
+        const update = item.set('from', newFrom);
+        formData.append('update', JSON.stringify(update));
+        return formData;
+      }
+      formData.append('update', JSON.stringify(item));
       return formData;
     }
 
@@ -60,18 +63,17 @@ const buildRequestData = (item, action) => {
     case 'closeandnew': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-      const fromDate = item.get('from', null);
-      if (typeof fromDate === 'string') {
-        let formatedFromDate = moment(fromDate).utcOffset(0);
-        formatedFromDate = formatedFromDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-        formatedFromDate = formatedFromDate.toISOString();
-        const update = item.delete('_id').set('from', formatedFromDate);
+      formData.append('query', JSON.stringify(query));
+      // If from-date is string -> date was changed from UI and UI need to send it
+      // it use for future entity creation
+      if (typeof item.get('from', null) === 'string') {
+        const newFrom = getZiroTimeDate(item.get('from', null)).toISOString();
+        const update = item.delete('_id').set('from', newFrom);
         formData.append('update', JSON.stringify(update));
       } else {
         const update = item.delete('_id').delete('from');
         formData.append('update', JSON.stringify(update));
       }
-      formData.append('query', JSON.stringify(query));
       return formData;
     }
 
