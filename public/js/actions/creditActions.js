@@ -7,5 +7,5 @@ export const creditCharge = params => (dispatch) => { // eslint-disable-line imp
   const query = getCreditChargeQuery(params);
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success, 'Credit successfully!')))
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error crediting')));
 };

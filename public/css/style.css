@@ -26,6 +26,10 @@ textarea {
 
 /* General colors */
 .danger-red { color: #d9534f; }
+.disabled {
+  color: #6f6f6f;
+  background-color: #eeeeee;
+}
 /* ~Global */
 
 /* Main/Top menu */

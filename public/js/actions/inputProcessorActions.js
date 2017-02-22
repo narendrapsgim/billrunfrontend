@@ -33,8 +33,9 @@ export const SET_REALTIME_FIELD = 'SET_REALTIME_FIELD';
 export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 
 import { showSuccess, showDanger } from './alertsActions';
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
+import { getInputProcessorActionQuery } from '../common/ApiQueries';
 import _ from 'lodash';
 import Immutable from 'immutable';
 
@@ -450,28 +451,22 @@ export function clearInputProcessor() {
   };
 }
 
-export function deleteInputProcessor(file_type, callback) {
-  const query = {
-    api: "settings",
-    params: [
-      { category: "file_types" },
-      { action: "unset" },
-      { data: JSON.stringify({"file_type": file_type}) }
-    ]
-  };
+export const deleteInputProcessor = fileType => (dispatch) => {
+  const query = getInputProcessorActionQuery(fileType, 'unset');
+  dispatch(startProgressIndicator());
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error occured while trying to delete input processor')));
+};
 
-  return (dispatch) => {
-    apiBillRun(query).then(
-      success => {
-        callback(false);
-      }, failure => {
-        callback(true);
-      }
-    ).catch(error => {
-      console.log(error);
-    })
-  };
-}
+export const updateInputProcessorEnabled = (fileType, enabled) => (dispatch) => {
+  const action = (enabled ? 'enable' : 'disable');
+  const query = getInputProcessorActionQuery(fileType, action);
+  dispatch(startProgressIndicator());
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, `Error occured while trying to ${action} input processor`)));
+};
 
 export function setUsagetType(usaget_type) {
   return {
