@@ -30,6 +30,15 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
+export const getInputProcessorActionQuery = (fileType, action) => ({
+  api: 'settings',
+  params: [
+    { category: 'file_types' },
+    { action },
+    { data: JSON.stringify({ file_type: fileType }) },
+  ],
+});
+
 export const getCreditChargeQuery = params => ({
   api: 'credit',
   params,

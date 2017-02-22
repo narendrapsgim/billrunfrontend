@@ -83,27 +83,28 @@ class InputProcessorsList extends Component {
       showConfirmRemove: false,
       inputProcessor: null,
     });
-    const fileType = inputProcessor.get('file_type');
-    this.props.dispatch(deleteInputProcessor(fileType, (err) => {
-      if (err) {
-        const errorMessage = 'Error occured while trying to remove input processor';
-        this.props.dispatch(showDanger(errorMessage));
-      } else {
-        this.props.dispatch(getList('input_processors', this.buildQuery()));
+    const fileType = inputProcessor.get('file_type', '');
+    this.props.dispatch(deleteInputProcessor(fileType))
+    .then(
+      (response) => {
+        if (response.status) {
+          this.props.dispatch(getList('input_processors', this.buildQuery()));
+        }
       }
-    }));
+    );
   }
 
   onClickEnabled = (inputProcessor, e) => {
     const { checked } = e.target;
-    this.props.dispatch(updateInputProcessorEnabled(inputProcessor, checked, (err) => {
-      if (err) {
-        const errorMessage = 'Error occured while trying to enable/disable input processor';
-        this.props.dispatch(showDanger(errorMessage));
-      } else {
-        this.props.dispatch(getList('input_processors', this.buildQuery()));
+    const fileType = inputProcessor.get('file_type', '');
+    this.props.dispatch(updateInputProcessorEnabled(fileType, checked))
+    .then(
+      (response) => {
+        if (response.status) {
+          this.props.dispatch(getList('input_processors', this.buildQuery()));
+        }
       }
-    }));
+    );
   }
 
   onClickNew() {
