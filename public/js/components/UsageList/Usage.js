@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Button } from 'react-bootstrap';
+import changeCase from 'change-case';
 import { getFieldName } from '../../common/Util';
 
 
@@ -16,12 +17,13 @@ const Usage = ({ line, onClickCancel, hiddenFields, cancelLabel }) => {
   const renderFields = (data) => {
     const fields = [];
     data.forEach((value, key) => {
+      const formattedValue = (key === 'connection_type') ? changeCase.upperCaseFirst(value) : value;
       if (!hiddenFields.includes(key)) {
         fields.push(
           <FormGroup key={key}>
             <Col componentClass={ControlLabel} sm={3} lg={2}>{ getFieldName(key, 'lines') }</Col>
             <Col sm={8} lg={9}>
-              <input disabled className="form-control" value={(value === null) ? '' : value} />
+              <input disabled className="form-control" value={(formattedValue === null) ? '' : formattedValue} />
             </Col>
           </FormGroup>
         );

@@ -30,6 +30,11 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
+export const getCreditChargeQuery = params => ({
+  api: 'credit',
+  params,
+});
+
 /* List Components queries*/
 export const usageListQuery = (query, page, sort, size) => ({
   api: 'find',

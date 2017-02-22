@@ -10,7 +10,7 @@ const ProductsList = () => {
   };
 
   const filterFields = [
-    { id: 'key', placeholder: 'Name' },
+    { id: 'key', placeholder: 'Key' },
   ];
 
   const tableFields = [
