@@ -5,6 +5,7 @@ import EntityRevisionModal from './EntityRevisionModal';
 import StateIcon from './StateIcon';
 import RevisionTimeline from './RevisionTimeline';
 import EntityRevisionEdit from './EntityRevisionEdit';
+import ConfirmModal from '../ConfirmModal';
 
 export {
   ActionButtons,
@@ -14,4 +15,5 @@ export {
   RevisionTimeline,
   StateIcon,
   EntityRevisionEdit,
+  ConfirmModal,
 };

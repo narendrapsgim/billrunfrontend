@@ -1,48 +1,116 @@
-import React, { PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { StateIcon } from '../Elements';
+import { ConfirmModal, StateIcon } from '../Elements';
 import List from '../../components/List';
+import { showSuccess } from '../../actions/alertsActions';
+import { deleteEntity } from '../../actions/entityActions';
+import { getRevisions } from '../../actions/entityListActions';
 
 
-const EntityRevisionList = (props) => {
-  const { items } = props;
-  const parserState = (item) => {
-    const from = item.getIn(['from', 'sec'], '');
-    const to = item.getIn(['to', 'sec'], '');
-    return (<StateIcon from={from} to={to} />);
+class EntityRevisionList extends Component {
+
+  static propTypes = {
+    items: PropTypes.instanceOf(Immutable.List),
+    onSelectItem: PropTypes.func,
+    onDeleteItem: PropTypes.func,
+    itemName: PropTypes.string.isRequired,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
-  const parseDate = (item) => {
-    const from = moment.unix(item.getIn(['from', 'sec'], 0));
-    return from.format(globalSetting.dateFormat);
-  };
-  const fields = [
-    { id: 'state', parser: parserState, cssClass: 'state' },
-    { id: 'from', title: 'Start date', parser: parseDate },
-  ];
 
-  const onClickEdit = (item) => {
-    const { itemsType, itemType } = props;
+  static defaultProps = {
+    items: Immutable.List(),
+    onSelectItem: () => {},
+    onDeleteItem: () => {},
+  };
+
+  state = {
+    showConfirmRemove: false,
+    itemToRemove: null,
+  }
+
+  isItemEditable = item => moment.unix(item.getIn(['to', 'sec'], 0)).isAfter(moment());
+  isItemRemovable = item => moment.unix(item.getIn(['from', 'sec'], 0)).isAfter(moment());
+
+  parseDate = item => moment.unix(item.getIn(['from', 'sec'], 0)).format(globalSetting.dateFormat);
+  parserState = item => (<StateIcon from={item.getIn(['from', 'sec'], '')} to={item.getIn(['to', 'sec'], '')} />);
+  parseEditShow = item => this.isItemEditable(item);
+  parseViewShow = item => !this.isItemEditable(item);
+  parseRemoveEnable = item => this.isItemRemovable(item);
+
+  onClickEdit = (item) => {
+    const { itemName } = this.props;
     const itemId = item.getIn(['_id', '$id']);
-    props.onSelectItem();
-    props.router.push(`${itemsType}/${itemType}/${itemId}`);
+    const itemType = globalSetting.systemItems[itemName].itemType;
+    const itemsType = globalSetting.systemItems[itemName].itemsType;
+    this.props.onSelectItem();
+    this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   };
 
-  return (<List items={items} fields={fields} edit={true} onClickEdit={onClickEdit} />);
-};
+  onClickRemove = (item) => {
+    this.setState({
+      showConfirmRemove: true,
+      itemToRemove: item,
+    });
+  }
 
-EntityRevisionList.defaultProps = {
-  items: Immutable.List(),
-  onSelectItem: () => {},
-};
+  onClickRemoveClose = () => {
+    this.setState({
+      showConfirmRemove: false,
+      itemToRemove: null,
+    });
+  }
 
-EntityRevisionList.propTypes = {
-  items: PropTypes.instanceOf(Immutable.List),
-  onSelectItem: PropTypes.func,
-  router: PropTypes.shape({
-    push: PropTypes.func.isRequired,
-  }).isRequired,
-};
+  onClickRemoveOk = () => {
+    const { itemName } = this.props;
+    const { itemToRemove } = this.state;
+    const collection = globalSetting.systemItems[itemName].collection;
+    this.props.dispatch(deleteEntity(collection, itemToRemove)).then(this.afterRemove);
+  }
 
-export default withRouter(EntityRevisionList);
+  afterRemove = (response) => {
+    const { itemToRemove } = this.state;
+    const { itemName } = this.props;
+    if (response.status) {
+      this.props.dispatch(showSuccess('Revision was removed'));
+      const collection = globalSetting.systemItems[itemName].collection;
+      const uniqueField = globalSetting.systemItems[itemName].uniqueField;
+      const key = itemToRemove.get(uniqueField, '');
+      this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
+      this.props.onDeleteItem(itemToRemove);
+      this.onClickRemoveClose();
+    }
+  }
+
+  getListFields = () => [
+    { id: 'state', parser: this.parserState, cssClass: 'state' },
+    { id: 'from', title: 'Start date', parser: this.parseDate },
+  ]
+
+  getListActions = () => [
+    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEdit, show: this.parseEditShow },
+    { type: 'view', showIcon: true, helpText: 'View', onClick: this.onClickEdit, show: this.parseViewShow },
+    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove, enable: this.parseRemoveEnable },
+  ]
+
+  render() {
+    const { items } = this.props;
+    const { showConfirmRemove } = this.state;
+    const fields = this.getListFields();
+    const actions = this.getListActions();
+    const removeConfirmMessage = 'Are you sure you want to remove revision ?';
+    return (
+      <div>
+        <List items={items} fields={fields} edit={false} actions={actions} />
+        <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
+      </div>
+    );
+  }
+}
+
+export default withRouter(connect()(EntityRevisionList));

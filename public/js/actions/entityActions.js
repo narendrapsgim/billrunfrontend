@@ -1,5 +1,5 @@
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
-import { getEntityByIdQuery } from '../common/ApiQueries';
+import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
 import { getZiroTimeDate } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
@@ -36,6 +36,13 @@ export const clearEntity = collection => ({
 
 const buildRequestData = (item, action) => {
   switch (action) {
+
+    case 'delete': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      return formData;
+    }
 
     case 'create': {
       const formData = new FormData();
@@ -89,22 +96,11 @@ const requestDataBuilder = (collection, item, action) => {
   }
 };
 
-const apiSaveEntity = (collection, item, action) => {
-  const body = requestDataBuilder(collection, item, action);
-  const query = {
-    entity: collection,
-    action,
-    options: {
-      method: 'POST',
-      body,
-    },
-  };
-  return apiBillRun(query);
-};
-
 export const saveEntity = (collection, item, action) => (dispatch) => {
   dispatch(startProgressIndicator());
-  return apiSaveEntity(collection, item, action)
+  const body = requestDataBuilder(collection, item, action);
+  const query = apiEntityQuery(collection, action, body);
+  return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
 };
@@ -126,3 +122,6 @@ export const getEntityById = (name, collection, id) => (dispatch) => {
   const query = getEntityByIdQuery(collection, id);
   return dispatch(fetchEntity(name, query));
 };
+
+export const deleteEntity = (collection, item) => dispatch =>
+  dispatch(saveEntity(collection, item, 'delete'));

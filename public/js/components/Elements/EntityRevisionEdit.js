@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { Form, FormGroup, Button } from 'react-bootstrap';
@@ -14,10 +15,11 @@ class EntityRevisionEdit extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
     onChangeFrom: PropTypes.func,
-    itemType: PropTypes.string.isRequired,
-    itemsType: PropTypes.string.isRequired,
-    revisionBy: PropTypes.string.isRequired,
+    itemName: PropTypes.string.isRequired,
     revisionItemsInTimeLine: PropTypes.number,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
   };
 
   static defaultProps = {
@@ -48,16 +50,30 @@ class EntityRevisionEdit extends Component {
     this.setState({ showList: false });
   }
 
+  onDeleteItem = (removedItem) => {
+    const { item, revisions, itemName } = this.props;
+    if (item.getIn(['_id', '$id'], '') === removedItem.getIn(['_id', '$id'], '')) {
+      const idx = revisions.findIndex(revision => revision.getIn(['_id', '$id'], false) === item.getIn(['_id', '$id'], false));
+      if (idx === 0 && revisions.size > 1) {
+        const prevItemId = revisions.getIn([1, '_id', '$id'], '');
+        const itemType = globalSetting.systemItems[itemName].itemType;
+        const itemsType = globalSetting.systemItems[itemName].itemsType;
+        this.props.router.push(`${itemsType}/${itemType}/${prevItemId}`);
+      }
+    }
+  }
+
   renderVerisionList = () => {
-    const { itemType, itemsType, revisions, revisionBy, item } = this.props;
+    const { itemName, revisions, item } = this.props;
     const { showList } = this.state;
+    const revisionBy = globalSetting.systemItems[itemName].uniqueField;
     return (
       <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
         <EntityRevisionList
           items={revisions}
-          itemType={itemType}
-          itemsType={itemsType}
+          itemName={itemName}
           onSelectItem={this.hideManageRevisions}
+          onDeleteItem={this.onDeleteItem}
         />
       </ModalWrapper>
     );
@@ -70,7 +86,7 @@ class EntityRevisionEdit extends Component {
       return 0;
     }
     if (index + 1 === revisions.size) {
-      return index - 2;
+      return ((index - 2) >= 0) ? index - 2 : 0;
     }
     return index - 1;
   }
@@ -134,6 +150,17 @@ class EntityRevisionEdit extends Component {
     );
   }
 
+  renderDateViewBlock = () => {
+    const { item } = this.props;
+    const from = moment.unix(item.getIn(['from', 'sec'], moment().unix()));
+    const to = moment.unix(item.getIn(['to', 'sec'], moment().unix()));
+    return (
+      <div className="inline" style={{ width: 165, padding: 0, margin: '9px 20px 0 20px' }}>
+        <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)} - { to.format(globalSetting.dateFormat)}</p>
+      </div>
+    );
+  }
+
   renderDateSelectBlock = () => (
     <div className="inline" style={{ width: 155, padding: 0, margin: '9px 25px 0 25px' }}>
       <Form horizontal style={{ marginBottom: 0 }}>
@@ -165,17 +192,34 @@ class EntityRevisionEdit extends Component {
     );
   }
 
+  renderEditMessage = () => {
+    const { mode, item } = this.props;
+    if (mode === 'view' && moment.unix(item.getIn(['to', 'sec'], moment().unix())).isAfter(moment())) {
+      return (
+        <small className="danger-red"> You cannot edit the current revision because future revision exists.</small>
+      );
+    }
+    return null;
+  }
+
   render() {
+    const { mode } = this.props;
     return (
       <div className="entity-revision-edit">
-        { this.renderTitle() }
-        { this.renderDateSelectBlock() }
-        { this.renderRevisionsBlock() }
-        { this.renderVerisionList() }
+        <div>
+          { this.renderTitle() }
+          { mode === 'view'
+            ? this.renderDateViewBlock()
+            : this.renderDateSelectBlock()
+          }
+          { this.renderRevisionsBlock() }
+          { this.renderVerisionList() }
+        </div>
+        { this.renderEditMessage() }
       </div>
     );
   }
 
 }
 
-export default EntityRevisionEdit;
+export default withRouter(EntityRevisionEdit);

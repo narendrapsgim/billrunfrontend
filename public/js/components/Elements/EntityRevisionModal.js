@@ -1,12 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Popover, OverlayTrigger, Overlay, Tooltip, Button } from 'react-bootstrap';
+import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import ModalWrapper from './ModalWrapper';
 import StateIcon from './StateIcon';
 import RevisionTimeline from './RevisionTimeline';
 import EntityRevisionList from '../EntityList/EntityRevisionList';
-import { getEntityRevisionsQuery } from '../../common/ApiQueries';
 import { getRevisions } from '../../actions/entityListActions';
 
 
@@ -14,14 +13,13 @@ class EntityRevisionModal extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
+    itemName: PropTypes.string.isRequired,
     revisions: PropTypes.oneOfType([
       PropTypes.instanceOf(Immutable.List),
       null,
     ]),
     collection: PropTypes.string.isRequired,
     revisionBy: PropTypes.string.isRequired,
-    itemType: PropTypes.string.isRequired,
-    itemsType: PropTypes.string.isRequired,
     size: PropTypes.number,
     dispatch: PropTypes.func.isRequired,
   };
@@ -40,8 +38,7 @@ class EntityRevisionModal extends Component {
     const { collection, item, revisionBy, revisions } = this.props;
     if (!revisions) {
       const key = item.get(revisionBy, '');
-      const query = getEntityRevisionsQuery(collection, revisionBy, key);
-      this.props.dispatch(getRevisions(collection, key, query));
+      this.props.dispatch(getRevisions(collection, revisionBy, key));
     }
   }
 
@@ -74,14 +71,13 @@ class EntityRevisionModal extends Component {
   }
 
   renderVerisionList = () => {
-    const { item, revisionBy, itemType, itemsType, revisions } = this.props;
+    const { item, itemName, revisions, revisionBy } = this.props;
     const { showList } = this.state;
     return (
       <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
         <EntityRevisionList
           items={revisions}
-          itemType={itemType}
-          itemsType={itemsType}
+          itemName={itemName}
           onSelectItem={this.hideManageRevisions}
         />
       </ModalWrapper>
@@ -116,10 +112,10 @@ class EntityRevisionModal extends Component {
 
 
 const mapStateToProps = (state, props) => {
-  const uniqueField = props.revisionBy;
-  const collection = props.itemsType;
-  const key = props.item.get(uniqueField, 'no name');
+  const revisionBy = globalSetting.systemItems[props.itemName].uniqueField;
+  const collection = globalSetting.systemItems[props.itemName].collection;
+  const key = props.item.get(revisionBy, '');
   const revisions = state.entityList.revisions.getIn([collection, key]);
-  return ({ revisions });
+  return ({ revisions, collection, revisionBy });
 };
 export default connect(mapStateToProps)(EntityRevisionModal);

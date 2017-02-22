@@ -45,7 +45,7 @@ class ServiceSetup extends Component {
   componentDidMount() {
     const { itemId, mode } = this.props;
     if (itemId) {
-      this.props.dispatch(getService(itemId)).then(this.initRevisions);
+      this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
     }
     if (mode === 'create') {
       const pageTitle = buildPageTitle(mode, 'service');
@@ -79,8 +79,15 @@ class ServiceSetup extends Component {
     const { item, revisions } = this.props;
     if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
       const key = item.get('name', '');
-      const query = getEntityRevisionsQuery('services', 'name', key);
-      this.props.dispatch(getRevisions('services', key, query));
+      this.props.dispatch(getRevisions('services', 'name', key));
+    }
+  }
+
+  afterItemReceived = (response) => {
+    if (response.status) {
+      this.initRevisions();
+    } else {
+      this.handleBack();
     }
   }
 
@@ -113,7 +120,8 @@ class ServiceSetup extends Component {
   }
 
   handleBack = () => {
-    this.props.router.push('/services');
+    const listUrl = globalSetting.systemItems.service.itemsType;
+    this.props.router.push(`/${listUrl}`);
   }
 
   handleSave = () => {
@@ -137,9 +145,7 @@ class ServiceSetup extends Component {
             item={item}
             mode={mode}
             onChangeFrom={this.onUpdateItem}
-            itemType="service"
-            itemsType="services"
-            revisionBy="name"
+            itemName="service"
           />
         </Panel>
 

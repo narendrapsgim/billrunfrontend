@@ -1,4 +1,5 @@
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { getEntityRevisionsQuery } from '../common/ApiQueries';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -96,15 +97,17 @@ export const getList = (collection, params) => (dispatch) => {
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
 };
 
-export const getRevisions = (collection, key, params) => dispatch =>
-  apiBillRun(params)
-    .then((success) => {
-      try {
-        dispatch(setRevisions(collection, key, success.data[0].data.details));
-        return dispatch(apiBillRunSuccessHandler(success));
-      } catch (e) {
-        console.log('fetch revision error: ', e);
-        throw new Error('fetch revision error');
-      }
-    })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
+export const getRevisions = (collection, uniqueField, key) => (dispatch) => {
+  const query = getEntityRevisionsQuery(collection, uniqueField, key);
+  return apiBillRun(query)
+  .then((success) => {
+    try {
+      dispatch(setRevisions(collection, key, success.data[0].data.details));
+      return dispatch(apiBillRunSuccessHandler(success));
+    } catch (e) {
+      console.log('fetch revision error: ', e);
+      throw new Error('fetch revision error');
+    }
+  })
+  .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));
+};
