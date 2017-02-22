@@ -41,6 +41,10 @@ fieldset[disabled] .btn {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.td-actions {
+  width:1%;
+  white-space:nowrap;
+}
 
 .pl0{ padding-left: 0!important; }
 .pr0{ padding-right: 0!important; }

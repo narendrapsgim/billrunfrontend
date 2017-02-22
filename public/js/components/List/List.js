@@ -169,7 +169,7 @@ class List extends Component {
                               }
                               {
                                 actions.length > 0 &&
-                                  <td className="actions-tb">
+                                  <td className="td-actions">
                                     <Actions actions={actions} data={entity} />
                                   </td>
                               }
