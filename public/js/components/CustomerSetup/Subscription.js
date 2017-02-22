@@ -4,6 +4,7 @@ import { Form, FormGroup, ControlLabel, Col, Button } from 'react-bootstrap';
 import Select from 'react-select';
 import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
+import moment from 'moment';
 import Credit from '../Credit/Credit';
 
 
@@ -47,7 +48,10 @@ export default class Subscription extends Component {
     }
     return Immutable.Map({
       plan: subscription.get('plan', ''),
-      services: subscription.get('services', Immutable.List()).toArray(),
+      services: subscription
+        .get('services', Immutable.List())
+        .map(service => service.get('name',''))
+        .toArray(),
     });
   }
 
@@ -92,14 +96,31 @@ export default class Subscription extends Component {
   onSave = () => {
     const { subscription } = this.props;
     const { systemFields, customFields } = this.state;
+
     const data = subscription.withMutations((subscriptionWithMutations) => {
       systemFields.forEach((value, key) => {
-        subscriptionWithMutations.set(key, value);
+        if(key == 'services') {
+          let services = [];
+          value.forEach((serviceName, srvKey) => {
+            let entry = subscription.get('services',Immutable.List()).find(service => service.get('name') == serviceName);
+            if(!entry) {
+              entry = { name : serviceName,
+                        from : moment().toISOString(),
+                        to : subscription.get('to') };
+            }
+            services.push(entry);
+          });
+          subscriptionWithMutations.set(key, services);
+        } else {
+          subscriptionWithMutations.set(key, value);
+        }
+
       });
       customFields.forEach((fieldData, key) => {
         subscriptionWithMutations.set(key, fieldData.get('value'));
       });
-    });
+      subscriptionWithMutations.delete('from');
+    });    
     this.props.onSave(data);
   };
 
