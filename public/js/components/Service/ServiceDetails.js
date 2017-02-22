@@ -29,8 +29,19 @@ export default class ServiceDetails extends Component {
     },
   }
 
+  componentDidMount() {
+    this.setDefaultValues();
+  }
+
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
+  }
+
+  setDefaultValues = () => {
+    const { item } = this.props;
+    if (item.get('prorated', null) === null) {
+      this.props.updateItem(['prorated'], true);
+    }
   }
 
   onChangeName = (e) => {
@@ -49,6 +60,11 @@ export default class ServiceDetails extends Component {
 
   onChangeCycle = (value) => {
     this.props.updateItem(['price', 0, 'to'], value);
+  }
+
+  onChangeProrated = (e) => {
+    const { value } = e.target;
+    this.props.updateItem(['prorated'], value);
   }
 
   onChangeDescription = (e) => {
@@ -96,6 +112,13 @@ export default class ServiceDetails extends Component {
           <Col componentClass={ControlLabel} sm={3} lg={2}>Cycles</Col>
           <Col sm={4}>
             <Field value={item.getIn(['price', 0, 'to'], '')} onChange={this.onChangeCycle} fieldType="unlimited" unlimitedValue={serviceCycleUnlimitedValue} unlimitedLabel="Infinite" />
+          </Col>
+        </FormGroup>
+
+        <FormGroup>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
+          <Col sm={4} style={{ padding: '10px' }}>
+            <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
           </Col>
         </FormGroup>
 
