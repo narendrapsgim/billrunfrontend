@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 import { Button } from 'react-bootstrap';
+import Actions from '../Elements/Actions';
 
 /* ACTIONS */
 import { titlize } from '../../common/Util';
@@ -16,6 +17,7 @@ class List extends Component {
     onClickRemove: PropTypes.func,
     onSort: PropTypes.func,
     sort: PropTypes.instanceOf(Immutable.Map),
+    actions: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {
@@ -24,6 +26,7 @@ class List extends Component {
     onClickEdit: () => {},
     onSort: () => {},
     sort: Immutable.Map(),
+    actions: [],
   };
 
   displayByType(field, entity) {
@@ -99,6 +102,7 @@ class List extends Component {
       className,
       enableRemove,
       onClickRemove,
+      actions,
     } = this.props;
 
     const table_header = fields.map((field, key) => {
@@ -130,6 +134,10 @@ class List extends Component {
       table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
       colSpan += 1;
     }
+    if (actions.length > 0) {
+      table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
+      colSpan += 1;
+    }
 
     const editTooltip = (
       <Tooltip id="tooltip">{ editText || 'Edit'}</Tooltip>
@@ -157,6 +165,12 @@ class List extends Component {
                                 enableRemove &&
                                   <td className="edit-tb">
                                     <Button onClick={onClickRemove.bind(this, entity)} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+                                  </td>
+                              }
+                              {
+                                actions.length > 0 &&
+                                  <td className="actions-tb">
+                                    <Actions actions={actions} data={entity} />
                                   </td>
                               }
                             </tr>

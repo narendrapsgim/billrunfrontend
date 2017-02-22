@@ -16,6 +16,11 @@ textarea {
 .btn.active.focus {
   outline: none;
 }
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+  opacity: 0.3;
+}
 .clickable {
   cursor: pointer;
 }
@@ -42,6 +47,7 @@ textarea {
 .mb0{ margin-bottom: 0!important; }
 .mb10{ margin-bottom: 10px!important; }
 .mr10{ margin-right: 10px!important; }
+.mr0{ margin-right: 0!important; }
 
 .full-width{ width: 100%!important; }
 
