@@ -30,6 +30,15 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
+export const getInputProcessorActionQuery = (fileType, action) => ({
+  api: 'settings',
+  params: [
+    { category: 'file_types' },
+    { action },
+    { data: JSON.stringify({ file_type: fileType }) },
+  ],
+});
+
 export const getCreditChargeQuery = params => ({
   api: 'credit',
   params,
@@ -201,6 +210,15 @@ export const getEntitesQuery = (collection, project = {}) => {
     ],
   });
 };
+
+export const getDeleteLineQuery = id => ({
+  action: 'delete',
+  entity: 'lines',
+  params: [
+    { query: JSON.stringify({ _id: id }) },
+  ],
+});
+
 
 // List
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');

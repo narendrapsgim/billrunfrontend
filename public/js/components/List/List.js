@@ -15,6 +15,9 @@ class List extends Component {
   static propTypes = {
     enableRemove: PropTypes.bool,
     onClickRemove: PropTypes.func,
+    removeText: React.PropTypes.string,
+    enableEnabled: React.PropTypes.bool,
+    onClickEnabled: React.PropTypes.func,
     onSort: PropTypes.func,
     sort: PropTypes.instanceOf(Immutable.Map),
     actions: PropTypes.arrayOf(PropTypes.object),
@@ -26,6 +29,9 @@ class List extends Component {
     onClickEdit: () => {},
     onSort: () => {},
     sort: Immutable.Map(),
+    removeText: 'Remove',
+    enableEnabled: false,
+    onClickEnabled: () => {},
     actions: [],
   };
 
@@ -52,12 +58,11 @@ class List extends Component {
   }
 
   printEntityField(entity = Immutable.Map(), field) {
-    if (!Immutable.Iterable.isIterable(entity))
+    if (!Immutable.Iterable.isIterable(entity)) {
       return this.printEntityField(Immutable.fromJS(entity), field);
-    if (field.parser)
-      return field.parser(entity);
-    if (field.type)
-      return this.displayByType(field, entity);
+    }
+    if (field.parser) { return field.parser(entity); }
+    if (field.type) { return this.displayByType(field, entity); }
     return entity.get(field.id);
   }
 
@@ -73,7 +78,7 @@ class List extends Component {
           <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
             {this.printEntityField(entity, field)}
           </button>
-        )
+        );
       } else {
         fieldElement = this.printEntityField(entity, field);
       }
@@ -81,7 +86,7 @@ class List extends Component {
         <td key={key} className={field.cssClass} >
           { fieldElement }
         </td>
-      )
+      );
     });
   }
 
@@ -102,10 +107,13 @@ class List extends Component {
       className,
       enableRemove,
       onClickRemove,
+      removeText,
+      enableEnabled,
+      onClickEnabled,
       actions,
     } = this.props;
 
-    const table_header = fields.map((field, key) => {
+    let table_header = fields.map((field, key) => {
       const onclick = field.sort ? this.onClickHeader.bind(this, field.id) : () => {};
       const style = field.sort ? { cursor: 'pointer' } : {};
       let arrow = null;
@@ -123,9 +131,13 @@ class List extends Component {
       if (!field.title && !field.placeholder) {
         return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{titlize(field.id)}{arrow}</th>);
       }
-      return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>)
+      return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>);
     });
     let colSpan = fields.length;
+    if (enableEnabled) {
+      table_header = [(<th key={-1} />), ...table_header];
+      colSpan += 1;
+    }
     if (edit) {
       table_header.push((<th key={fields.length}>&nbsp;</th>));
       colSpan += 1;
@@ -144,9 +156,16 @@ class List extends Component {
     );
 
     const table_body = items.size < 1 ?
-                       (<tr><td colSpan={colSpan} style={{textAlign: "center"}}>No items found</td></tr>) :
+                       (<tr><td colSpan={colSpan} style={{ textAlign: 'center' }}>No items found</td></tr>) :
                         items.map((entity, index) => (
-                            <tr key={index}>
+                          <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled'}>
+                            {
+                                enableEnabled ?
+                                  <td className="edit-tb">
+                                    <input type="checkbox" checked={entity.get('enabled', true)} onChange={onClickEnabled.bind(this, entity)} />
+                                  </td>
+                                : null
+                              }
                               { this.buildRow(entity, fields) }
                               {
                                 edit &&
@@ -178,7 +197,7 @@ class List extends Component {
                         );
 
     return (
-      <div className={"List row " + className}>
+      <div className={`List row ${className}`}>
         <div className="table-responsive col-lg-12">
           <table className="table table-hover table-striped table-bordered">
             <thead>
