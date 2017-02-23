@@ -5,10 +5,11 @@ import Immutable from 'immutable';
 import changeCase from 'change-case';
 import { Col, Row, Panel, Button } from 'react-bootstrap';
 import List from '../List';
-import { LoadingItemPlaceholder, EntityRevisionModal } from '../Elements';
+import { LoadingItemPlaceholder } from '../Elements';
 import Pager from './Pager';
 import State from './State';
 import Filter from './Filter';
+import StateDetails from './StateDetails';
 import {
   getList,
   clearList,
@@ -197,7 +198,7 @@ class EntityList extends Component {
   parserState = (item) => {
     const { itemType } = this.props;
     return (
-      <EntityRevisionModal item={item} itemName={itemType} />
+      <StateDetails item={item} itemName={itemType} />
     );
   };
 

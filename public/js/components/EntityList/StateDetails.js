@@ -2,14 +2,12 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
-import ModalWrapper from './ModalWrapper';
-import StateIcon from './StateIcon';
-import RevisionTimeline from './RevisionTimeline';
-import EntityRevisionList from '../EntityList/EntityRevisionList';
+import { ModalWrapper, StateIcon, RevisionTimeline } from '../Elements';
+import RevisionList from '../RevisionList';
 import { getRevisions } from '../../actions/entityListActions';
 
 
-class EntityRevisionModal extends Component {
+class StateDetails extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
@@ -75,7 +73,7 @@ class EntityRevisionModal extends Component {
     const { showList } = this.state;
     return (
       <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
-        <EntityRevisionList
+        <RevisionList
           items={revisions}
           itemName={itemName}
           onSelectItem={this.hideManageRevisions}
@@ -118,4 +116,4 @@ const mapStateToProps = (state, props) => {
   const revisions = state.entityList.revisions.getIn([collection, key]);
   return ({ revisions, collection, revisionBy });
 };
-export default connect(mapStateToProps)(EntityRevisionModal);
+export default connect(mapStateToProps)(StateDetails);

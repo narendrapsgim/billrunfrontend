@@ -10,7 +10,7 @@ import { deleteEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
 
 
-class EntityRevisionList extends Component {
+class RevisionList extends Component {
 
   static propTypes = {
     items: PropTypes.instanceOf(Immutable.List),
@@ -113,4 +113,4 @@ class EntityRevisionList extends Component {
   }
 }
 
-export default withRouter(connect()(EntityRevisionList));
+export default withRouter(connect()(RevisionList));

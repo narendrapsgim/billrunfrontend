@@ -4,11 +4,10 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { Form, FormGroup, Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
-import RevisionTimeline from './RevisionTimeline';
-import ModalWrapper from './ModalWrapper';
-import EntityRevisionList from '../EntityList/EntityRevisionList';
+import { RevisionTimeline, ModalWrapper } from '../Elements';
+import RevisionList from '../RevisionList';
 
-class EntityRevisionEdit extends Component {
+class EntityRevisionDetails extends Component {
 
   static propTypes = {
     revisions: PropTypes.instanceOf(Immutable.List),
@@ -69,7 +68,7 @@ class EntityRevisionEdit extends Component {
     const revisionBy = globalSetting.systemItems[itemName].uniqueField;
     return (
       <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
-        <EntityRevisionList
+        <RevisionList
           items={revisions}
           itemName={itemName}
           onSelectItem={this.hideManageRevisions}
@@ -222,4 +221,4 @@ class EntityRevisionEdit extends Component {
 
 }
 
-export default withRouter(EntityRevisionEdit);
+export default withRouter(EntityRevisionDetails);

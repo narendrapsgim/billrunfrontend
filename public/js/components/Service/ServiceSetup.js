@@ -5,9 +5,9 @@ import Immutable from 'immutable';
 import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
-import { ActionButtons, LoadingItemPlaceholder, EntityRevisionEdit } from '../Elements';
+import { EntityRevisionDetails } from '../Entity';
+import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { buildPageTitle } from '../../common/Util';
-import { getEntityRevisionsQuery } from '../../common/ApiQueries';
 import { addGroup, removeGroup, getService, clearService, updateService, saveService } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -140,7 +140,7 @@ class ServiceSetup extends Component {
     return (
       <Col lg={12}>
         <Panel>
-          <EntityRevisionEdit
+          <EntityRevisionDetails
             revisions={revisions}
             item={item}
             mode={mode}
