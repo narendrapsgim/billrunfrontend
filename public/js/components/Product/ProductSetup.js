@@ -80,9 +80,17 @@ class ProductSetup extends Component {
   onUsagetUpdate = (path, oldUsaget, newUsaget) => {
     const { usageTypes } = this.props;
     if (newUsaget.length > 0 && !usageTypes.includes(newUsaget)) {
-      this.props.dispatch(addUsagetMapping(newUsaget));
+      this.props.dispatch(addUsagetMapping(newUsaget))
+      .then(
+        (response) => {
+          if (response.status) {
+            this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
+          }
+        }
+      );
+    } else {
+      this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
     }
-    this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
   }
 
   onProductRateAdd = (productPath) => {
