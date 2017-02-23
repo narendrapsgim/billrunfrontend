@@ -7,6 +7,8 @@ export default class UnlimitedInput extends Component {
   static defaultProps = {
     unlimitedLabel: 'Unlimited',
     unlimitedValue: 'UNLIMITED',
+    disabled: false,
+    editable: true,
   };
 
   static propTypes = {
@@ -19,18 +21,20 @@ export default class UnlimitedInput extends Component {
       React.PropTypes.number,
     ]),
     unlimitedLabel: React.PropTypes.string,
+    disabled: React.PropTypes.bool,
+    editable: React.PropTypes.bool,
     onChange: React.PropTypes.func.isRequired,
   }
 
   state = {
     value: this.props.value === this.props.unlimitedValue ? '' : this.props.value,
-    unlimited : this.props.value == this.props.unlimitedValue
+    unlimited: this.props.value == this.props.unlimitedValue,
   };
 
   onUnlimitedChanged = (e) => {
     const { unlimitedValue } = this.props;
     const unlimited = e.target.checked;
-    let newValue = unlimited ? unlimitedValue : this.state.value;
+    const newValue = unlimited ? unlimitedValue : this.state.value;
     this.setState({ unlimited });
     this.props.onChange(newValue);
   }
@@ -43,7 +47,11 @@ export default class UnlimitedInput extends Component {
 
   render() {
     const { value, unlimited } = this.state;
-    const { unlimitedLabel } = this.props;
+    const { unlimitedLabel, disabled, editable } = this.props;
+
+    if (!editable) {
+      return (<div className="non-editble-field">{ unlimited ? unlimitedLabel : unlimitedLabel }</div>);
+    }
 
     return (
       <InputGroup>
@@ -52,10 +60,11 @@ export default class UnlimitedInput extends Component {
               checked={unlimited}
               onChange={this.onUnlimitedChanged}
               type="checkbox"
+              disabled={disabled}
           /><small style={{verticalAlign: 'bottom'}}> {unlimitedLabel}</small>
         </InputGroup.Addon>
         <FormControl
-            disabled={unlimited}
+            disabled={unlimited || disabled}
             onChange={this.onValueChanged}
             type="text"
             value={unlimited ? '' : value}

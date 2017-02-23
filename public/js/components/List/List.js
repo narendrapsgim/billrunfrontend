@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 import { Button } from 'react-bootstrap';
+import Actions from '../Elements/Actions';
 
 /* ACTIONS */
 import { titlize } from '../../common/Util';
@@ -19,6 +20,7 @@ class List extends Component {
     onClickEnabled: React.PropTypes.func,
     onSort: PropTypes.func,
     sort: PropTypes.instanceOf(Immutable.Map),
+    actions: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {
@@ -30,6 +32,7 @@ class List extends Component {
     removeText: 'Remove',
     enableEnabled: false,
     onClickEnabled: () => {},
+    actions: [],
   };
 
   displayByType(field, entity) {
@@ -70,7 +73,7 @@ class List extends Component {
         return null;
       }
       let fieldElement;
-      if (edit && key === 0) {
+      if (edit && ((key === 0 && field.id !== 'state') || (key === 1 && fields[0].id === 'state'))) {
         fieldElement = (
           <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
             {this.printEntityField(entity, field)}
@@ -80,7 +83,7 @@ class List extends Component {
         fieldElement = this.printEntityField(entity, field);
       }
       return (
-        <td key={key}>
+        <td key={key} className={field.cssClass} >
           { fieldElement }
         </td>
       );
@@ -107,6 +110,7 @@ class List extends Component {
       removeText,
       enableEnabled,
       onClickEnabled,
+      actions,
     } = this.props;
 
     let table_header = fields.map((field, key) => {
@@ -125,7 +129,7 @@ class List extends Component {
         arrow = (<i className={arrowClass} />);
       }
       if (!field.title && !field.placeholder) {
-        return (<th key={key} onClick={onclick} style={style}>{titlize(field.id)}{arrow}</th>);
+        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{titlize(field.id)}{arrow}</th>);
       }
       return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>);
     });
@@ -139,6 +143,10 @@ class List extends Component {
       colSpan += 1;
     }
     if (enableRemove) {
+      table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
+      colSpan += 1;
+    }
+    if (actions.length > 0) {
       table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
       colSpan += 1;
     }
@@ -158,8 +166,8 @@ class List extends Component {
                                   </td>
                                 : null
                               }
-                            { this.buildRow(entity, fields) }
-                            {
+                              { this.buildRow(entity, fields) }
+                              {
                                 edit &&
                                   <td className="edit-tb">
                                     <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
@@ -172,13 +180,19 @@ class List extends Component {
                                     </button>
                                   </td>
                               }
-                            {
+                              {
                                 enableRemove &&
                                   <td className="edit-tb">
                                     <Button onClick={onClickRemove.bind(this, entity)} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
                                   </td>
                               }
-                          </tr>
+                              {
+                                actions.length > 0 &&
+                                  <td className="td-actions">
+                                    <Actions actions={actions} data={entity} />
+                                  </td>
+                              }
+                            </tr>
                           )
                         );
 

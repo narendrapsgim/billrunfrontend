@@ -5,11 +5,14 @@ import Immutable from 'immutable';
 import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
+import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
+import { buildPageTitle } from '../../common/Util';
 import { addGroup, removeGroup, getService, clearService, updateService, saveService } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { clearItems } from '../../actions/entityListActions';
+import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
+import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
 
 
 class ServiceSetup extends Component {
@@ -17,6 +20,7 @@ class ServiceSetup extends Component {
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
+    revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
@@ -30,6 +34,7 @@ class ServiceSetup extends Component {
 
   static defaultProps = {
     item: Immutable.Map(),
+    revisions: Immutable.List(),
     activeTab: 1,
   };
 
@@ -40,28 +45,52 @@ class ServiceSetup extends Component {
   componentDidMount() {
     const { itemId, mode } = this.props;
     if (itemId) {
-      this.props.dispatch(getService(itemId));
+      this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
     }
     if (mode === 'create') {
-      this.props.dispatch(setPageTitle('Create New Service'));
+      const pageTitle = buildPageTitle(mode, 'service');
+      this.props.dispatch(setPageTitle(pageTitle));
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode } = nextProps;
-    const { item: oldItem } = this.props;
-    if (mode !== 'create' && oldItem.get('name') !== item.get('name')) {
-      this.props.dispatch(setPageTitle(`Edit service - ${item.get('name')}`));
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+      const pageTitle = buildPageTitle(mode, 'service', item);
+      this.props.dispatch(setPageTitle(pageTitle));
+    }
+    if (itemId !== oldItemId) {
+      this.props.dispatch(getService(itemId));
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return !Immutable.is(this.props.item, nextState.item) || this.props.itemId !== nextState.itemId;
+    return !Immutable.is(this.props.item, nextState.item)
+      || this.props.itemId !== nextProps.itemId
+      || this.props.mode !== nextProps.mode;
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearService());
   }
+
+  initRevisions = () => {
+    const { item, revisions } = this.props;
+    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+      const key = item.get('name', '');
+      this.props.dispatch(getRevisions('services', 'name', key));
+    }
+  }
+
+  afterItemReceived = (response) => {
+    if (response.status) {
+      this.initRevisions();
+    } else {
+      this.handleBack();
+    }
+  }
+
   onGroupAdd = (groupName, usage, value, shared, products) => {
     this.props.dispatch(addGroup(groupName, usage, value, shared, products));
   }
@@ -75,9 +104,11 @@ class ServiceSetup extends Component {
   }
 
   afterSave = (response) => {
-    const { mode } = this.props;
+    const { mode, item } = this.props;
     if (response.status) {
+      const key = item.get('name', '');
       this.props.dispatch(clearItems('services')); // refetch items list because item was (changed in / added to) list
+      this.props.dispatch(clearRevisions('services', key)); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The service was ${action}`));
       this.handleBack();
@@ -89,7 +120,8 @@ class ServiceSetup extends Component {
   }
 
   handleBack = () => {
-    this.props.router.push('/services');
+    const listUrl = globalSetting.systemItems.service.itemsType;
+    this.props.router.push(`/${listUrl}`);
   }
 
   handleSave = () => {
@@ -98,15 +130,24 @@ class ServiceSetup extends Component {
   }
 
   render() {
-    const { item, mode } = this.props;
-    // in update mode wait for item before render edit screen
-    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    const { item, mode, revisions } = this.props;
+    if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
+    const allowEdit = mode !== 'view';
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
     return (
       <Col lg={12}>
+        <Panel>
+          <EntityRevisionDetails
+            revisions={revisions}
+            item={item}
+            mode={mode}
+            onChangeFrom={this.onUpdateItem}
+            itemName="service"
+          />
+        </Panel>
 
         <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
 
@@ -123,12 +164,18 @@ class ServiceSetup extends Component {
                 onChangeFieldValue={this.onUpdateItem}
                 onGroupAdd={this.onGroupAdd}
                 onGroupRemove={this.onGroupRemove}
+                mode={mode}
               />
             </Panel>
           </Tab>
 
         </Tabs>
-        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
+        <ActionButtons
+          onClickCancel={this.handleBack}
+          onClickSave={this.handleSave}
+          hideSave={!allowEdit}
+          cancelLabel={allowEdit ? undefined : 'Back'}
+        />
       </Col>
     );
   }
@@ -136,11 +183,12 @@ class ServiceSetup extends Component {
 }
 
 
-const mapStateToProps = (state, props) => {
-  const { tab: activeTab, action } = props.location.query;
-  const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'closeandnew' : 'create');
-  const { service: item } = state;
-  return { itemId, item, mode, activeTab };
-};
+const mapStateToProps = (state, props) => ({
+  itemId: idSelector(state, props, 'service'),
+  item: itemSelector(state, props, 'service'),
+  mode: modeSelector(state, props, 'service'),
+  activeTab: tabSelector(state, props, 'service'),
+  revisions: revisionsSelector(state, props, 'service'),
+});
+
 export default withRouter(connect(mapStateToProps)(ServiceSetup));

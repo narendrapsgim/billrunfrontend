@@ -60,6 +60,7 @@ export default class ServiceDetails extends Component {
     const { errors } = this.state;
     const { item, mode } = this.props;
     const serviceCycleUnlimitedValue = globalSetting.serviceCycleUnlimitedValue;
+    const editable = (mode !== 'view');
 
     return (
       <Form horizontal>
@@ -69,7 +70,7 @@ export default class ServiceDetails extends Component {
             Title<Help contents={ServiceDescription.description} />
           </Col>
           <Col sm={8} lg={9}>
-            <Field value={item.get('description', '')} onChange={this.onChangeDescription} />
+            <Field value={item.get('description', '')} onChange={this.onChangeDescription} editable={editable} />
           </Col>
         </FormGroup>
 
@@ -79,7 +80,7 @@ export default class ServiceDetails extends Component {
               Key <Help contents={ServiceDescription.name} />
             </Col>
             <Col sm={8} lg={9}>
-              <Field value={item.get('name', '')} onChange={this.onChangeName} />
+              <Field value={item.get('name', '')} onChange={this.onChangeName} editable={editable} />
               { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
             </Col>
           </FormGroup>
@@ -88,14 +89,14 @@ export default class ServiceDetails extends Component {
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Price</Col>
           <Col sm={4}>
-            <Field value={item.getIn(['price', 0, 'price'], '')} onChange={this.onChangePrice} fieldType="price" />
+            <Field value={item.getIn(['price', 0, 'price'], '')} onChange={this.onChangePrice} fieldType="price" editable={editable} />
           </Col>
         </FormGroup>
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Cycles</Col>
           <Col sm={4}>
-            <Field value={item.getIn(['price', 0, 'to'], '')} onChange={this.onChangeCycle} fieldType="unlimited" unlimitedValue={serviceCycleUnlimitedValue} unlimitedLabel="Infinite" />
+            <Field value={item.getIn(['price', 0, 'to'], '')} onChange={this.onChangeCycle} fieldType="unlimited" unlimitedValue={serviceCycleUnlimitedValue} unlimitedLabel="Infinite" editable={editable} />
           </Col>
         </FormGroup>
 

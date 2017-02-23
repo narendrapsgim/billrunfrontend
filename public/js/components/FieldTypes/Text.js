@@ -18,7 +18,7 @@ export default class Text extends Component {
     const input = editable ? (<input {...otherProps} type="text" id={id} className="form-control" value={value} onChange={onChange} placeholder={placeholder} required={required} disabled={disabled} />) : (<span>{value}</span>);
 
     return (
-      <div>{ input }</div>
+      <div className="non-editble-field">{ input }</div>
     );
   }
 }

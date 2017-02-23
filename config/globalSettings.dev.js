@@ -25,4 +25,12 @@ var globalSetting = {
   queue_calculators: ['customer', 'rate', 'pricing'],
   mail_support: 'cloud_support@billrun.com',
   logoMaxSize: 2,
+  systemItems: {
+    service: {
+      collection: 'services',
+      uniqueField: 'name',
+      itemType: 'service',
+      itemsType: 'services',
+    },
+  },
 };

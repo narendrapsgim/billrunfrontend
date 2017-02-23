@@ -36,6 +36,7 @@ const ServicesList = () => {
       filterFields={filterFields}
       tableFields={tableFields}
       projectFields={projectFields}
+      showRevisionBy="name"
     />
   );
 };

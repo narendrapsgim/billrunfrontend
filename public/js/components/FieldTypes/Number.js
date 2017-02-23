@@ -12,7 +12,7 @@ export default class Number extends Component {
                   (<span>{parseFloat(value, 10)}</span>);
 
     return (
-      <div>{ input }</div>
+      <div className="non-editble-field">{ input }</div>
     );
   }
 }
