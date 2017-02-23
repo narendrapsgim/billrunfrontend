@@ -18,7 +18,7 @@ const ProductsList = () => {
     { id: 'key', title: 'Key', sort: true },
     { id: 'unit_type', title: 'Unit Type', parser: parserUsegt },
     { id: 'code', title: 'External Code', sort: true },
-    { id: 'from', title: 'Modified', type: 'mongodatetime', cssClass: 'long-date', sort: true },
+    { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
   ];
 
   const projectFields = {

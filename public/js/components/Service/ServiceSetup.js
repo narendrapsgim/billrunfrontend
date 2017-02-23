@@ -2,12 +2,13 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
+import moment from 'moment';
 import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
-import { buildPageTitle } from '../../common/Util';
+import { buildPageTitle, getItemDateValue } from '../../common/Util';
 import { addGroup, removeGroup, getService, clearService, updateService, saveService } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -51,6 +52,7 @@ class ServiceSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'service');
       this.props.dispatch(setPageTitle(pageTitle));
     }
+    this.initDefaultValues();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -61,7 +63,7 @@ class ServiceSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     if (itemId !== oldItemId) {
-      this.props.dispatch(getService(itemId));
+      this.props.dispatch(getService(itemId)).then(this.initDefaultValues);
     }
   }
 
@@ -75,6 +77,14 @@ class ServiceSetup extends Component {
     this.props.dispatch(clearService());
   }
 
+  initDefaultValues = () => {
+    const { mode, item } = this.props;
+    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+      const defaultFromValue = moment().add(1, 'days').toISOString();
+      this.props.dispatch(updateService(['from'], defaultFromValue));
+    }
+  }
+
   initRevisions = () => {
     const { item, revisions } = this.props;
     if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
@@ -86,6 +96,7 @@ class ServiceSetup extends Component {
   afterItemReceived = (response) => {
     if (response.status) {
       this.initRevisions();
+      this.initDefaultValues();
     } else {
       this.handleBack();
     }
@@ -107,7 +118,6 @@ class ServiceSetup extends Component {
     const { mode, item } = this.props;
     if (response.status) {
       const key = item.get('name', '');
-      this.props.dispatch(clearItems('services')); // refetch items list because item was (changed in / added to) list
       this.props.dispatch(clearRevisions('services', key)); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The service was ${action}`));
@@ -119,7 +129,10 @@ class ServiceSetup extends Component {
     this.setState({ activeTab });
   }
 
-  handleBack = () => {
+  handleBack = (itemWasChanged = false) => {
+    if (itemWasChanged) {
+      this.props.dispatch(clearItems('services')); // refetch items list because item was (changed in / added to) list
+    }
     const listUrl = globalSetting.systemItems.service.itemsType;
     this.props.router.push(`/${listUrl}`);
   }
@@ -146,6 +159,7 @@ class ServiceSetup extends Component {
             mode={mode}
             onChangeFrom={this.onUpdateItem}
             itemName="service"
+            backToList={this.handleBack}
           />
         </Panel>
 

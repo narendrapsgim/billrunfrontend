@@ -4,6 +4,7 @@ import Immutable from 'immutable';
 import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { ModalWrapper, StateIcon, RevisionTimeline } from '../Elements';
 import RevisionList from '../RevisionList';
+import { getItemDateValue } from '../../common/Util';
 import { getRevisions } from '../../actions/entityListActions';
 
 
@@ -91,14 +92,14 @@ class StateDetails extends Component {
 
   render() {
     const { item } = this.props;
-    const from = item.getIn(['from', 'sec'], '');
-    const to = item.getIn(['to', 'sec'], '');
+    const from = getItemDateValue(item, 'from');
+    const to = getItemDateValue(item, 'to');
     return (
       <div>
         <OverlayTrigger trigger="click" rootClose placement="right" ref="revisionOverlay" overlay={this.renderRevisionTooltip()} onEnter={this.onEnter}>
           <OverlayTrigger overlay={this.renderHelpTooltip()} placement="left">
             <div className="clickable">
-              <StateIcon from={from} to={to} />
+              <StateIcon from={from.toISOString()} to={to.toISOString()} />
             </div>
           </OverlayTrigger>
         </OverlayTrigger>

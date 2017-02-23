@@ -6,6 +6,8 @@ import { Form, FormGroup, Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
+import { getItemDateValue } from '../../common/Util';
+
 
 class EntityRevisionDetails extends Component {
 
@@ -14,6 +16,7 @@ class EntityRevisionDetails extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
     onChangeFrom: PropTypes.func,
+    backToList: PropTypes.func,
     itemName: PropTypes.string.isRequired,
     revisionItemsInTimeLine: PropTypes.number,
     router: PropTypes.shape({
@@ -26,6 +29,7 @@ class EntityRevisionDetails extends Component {
     item: Immutable.Map(),
     mode: 'view',
     onChangeFrom: () => {},
+    backToList: () => {},
     revisionItemsInTimeLine: 3,
   };
 
@@ -51,15 +55,22 @@ class EntityRevisionDetails extends Component {
 
   onDeleteItem = (removedItem) => {
     const { item, revisions, itemName } = this.props;
+    // if screen vas with deleted item, go to prev revision or list
     if (item.getIn(['_id', '$id'], '') === removedItem.getIn(['_id', '$id'], '')) {
+      const itemType = globalSetting.systemItems[itemName].itemType;
+      const itemsType = globalSetting.systemItems[itemName].itemsType;
+      if (revisions.size <= 1) { // only one revision
+        this.props.backToList(true);
+        return false;
+      }
       const idx = revisions.findIndex(revision => revision.getIn(['_id', '$id'], false) === item.getIn(['_id', '$id'], false));
-      if (idx === 0 && revisions.size > 1) {
-        const prevItemId = revisions.getIn([1, '_id', '$id'], '');
-        const itemType = globalSetting.systemItems[itemName].itemType;
-        const itemsType = globalSetting.systemItems[itemName].itemsType;
+      if (revisions.size > 1) {
+        const prevItemId = (idx !== -1) ? revisions.getIn([idx + 1, '_id', '$id'], revisions.getIn([idx - 1, '_id', '$id'], '')) : revisions.getIn([0, '_id', '$id'], '');
         this.props.router.push(`${itemsType}/${itemType}/${prevItemId}`);
+        return false;
       }
     }
+    return true;
   }
 
   renderVerisionList = () => {
@@ -96,21 +107,15 @@ class EntityRevisionDetails extends Component {
     }
   }
 
-  getFromDateValue = (item) => {
-    if (item.get('from', false) && typeof item.get('from', false) === 'string') {
-      return moment(item.get('from', moment()));
-    }
-    return moment.unix(item.getIn(['from', 'sec'], moment().unix()));
-  }
-
   renderDateFromfields = () => {
     const { item, mode } = this.props;
-    const from = this.getFromDateValue(item);
+    const from = getItemDateValue(item, 'from');
     if (mode === 'view' || mode === 'update') {
       return (
         <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)}</p>
       );
     }
+    const tommorow = moment().add(1, 'days');
     return (
       <DatePicker
         className="form-control"
@@ -119,7 +124,7 @@ class EntityRevisionDetails extends Component {
         onChange={this.onChangeFrom}
         isClearable={false}
         placeholderText="Select Date..."
-        minDate={moment()}
+        minDate={tommorow}
       />
     );
   }
@@ -151,8 +156,8 @@ class EntityRevisionDetails extends Component {
 
   renderDateViewBlock = () => {
     const { item } = this.props;
-    const from = moment.unix(item.getIn(['from', 'sec'], moment().unix()));
-    const to = moment.unix(item.getIn(['to', 'sec'], moment().unix()));
+    const from = getItemDateValue(item, 'originalValue');
+    const to = getItemDateValue(item, 'to');
     return (
       <div className="inline" style={{ width: 165, padding: 0, margin: '9px 20px 0 20px' }}>
         <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)} - { to.format(globalSetting.dateFormat)}</p>
@@ -193,7 +198,7 @@ class EntityRevisionDetails extends Component {
 
   renderEditMessage = () => {
     const { mode, item } = this.props;
-    if (mode === 'view' && moment.unix(item.getIn(['to', 'sec'], moment().unix())).isAfter(moment())) {
+    if (mode === 'view' && getItemDateValue(item, 'to').isAfter(moment())) {
       return (
         <small className="danger-red"> You cannot edit the current revision because future revision exists.</small>
       );

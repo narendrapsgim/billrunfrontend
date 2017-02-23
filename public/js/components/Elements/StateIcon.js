@@ -4,8 +4,8 @@ import classNames from 'classnames';
 
 
 const StateIcon = ({ from, to }) => {
-  const fromTime = moment.unix(from);
-  const toTime = moment.unix(to);
+  const fromTime = moment(from);
+  const toTime = moment(to);
   const stateClass = classNames('cycle', {
     expired: toTime.isBefore(moment()),
     future: fromTime.isAfter(moment()),
@@ -15,8 +15,8 @@ const StateIcon = ({ from, to }) => {
 };
 
 StateIcon.propTypes = {
-  from: PropTypes.number,
-  to: PropTypes.number,
+  from: PropTypes.string,
+  to: PropTypes.string,
 };
 
 export default StateIcon;
