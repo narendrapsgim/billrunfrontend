@@ -5,6 +5,7 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { ConfirmModal, StateIcon } from '../Elements';
 import List from '../../components/List';
+import { getItemDateValue } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
@@ -34,11 +35,16 @@ class RevisionList extends Component {
     itemToRemove: null,
   }
 
-  isItemEditable = item => moment.unix(item.getIn(['to', 'sec'], 0)).isAfter(moment());
-  isItemRemovable = item => moment.unix(item.getIn(['from', 'sec'], 0)).isAfter(moment());
+  isItemEditable = item => getItemDateValue(item, 'to', moment(0)).isAfter(moment());
+  isItemRemovable = item => getItemDateValue(item, 'from', moment(0)).isAfter(moment());
 
-  parseDate = item => moment.unix(item.getIn(['from', 'sec'], 0)).format(globalSetting.dateFormat);
-  parserState = item => (<StateIcon from={item.getIn(['from', 'sec'], '')} to={item.getIn(['to', 'sec'], '')} />);
+  parseDate = item => getItemDateValue(item, 'from', moment(0)).format(globalSetting.dateFormat);
+  parserState = item => (
+    <StateIcon
+      from={getItemDateValue(item, 'from', moment(0)).toISOString()}
+      to={getItemDateValue(item, 'to', moment(0)).toISOString()}
+    />
+  );
   parseEditShow = item => this.isItemEditable(item);
   parseViewShow = item => !this.isItemEditable(item);
   parseRemoveEnable = item => this.isItemRemovable(item);

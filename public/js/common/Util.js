@@ -33,3 +33,18 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
       return '';
   }
 };
+
+export const getItemDateValue = (item, fieldName, defaultValue = moment()) => {
+  let value = item.get(fieldName, false);
+  if (!value) {
+    return defaultValue;
+  }
+  if (value && typeof value === 'string') {
+    return moment(value);
+  }
+  value = item.getIn([fieldName, 'sec'], false);
+  if (value && typeof value === 'number') {
+    return moment.unix(value);
+  }
+  return defaultValue;
+};

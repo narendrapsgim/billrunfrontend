@@ -6,6 +6,8 @@ import { Form, FormGroup, Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
+import { getItemDateValue } from '../../common/Util';
+
 
 class EntityRevisionDetails extends Component {
 
@@ -96,16 +98,9 @@ class EntityRevisionDetails extends Component {
     }
   }
 
-  getFromDateValue = (item) => {
-    if (item.get('from', false) && typeof item.get('from', false) === 'string') {
-      return moment(item.get('from', moment()));
-    }
-    return moment.unix(item.getIn(['from', 'sec'], moment().unix()));
-  }
-
   renderDateFromfields = () => {
     const { item, mode } = this.props;
-    const from = this.getFromDateValue(item);
+    const from = getItemDateValue(item, 'from');
     if (mode === 'view' || mode === 'update') {
       return (
         <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)}</p>
@@ -151,8 +146,8 @@ class EntityRevisionDetails extends Component {
 
   renderDateViewBlock = () => {
     const { item } = this.props;
-    const from = moment.unix(item.getIn(['from', 'sec'], moment().unix()));
-    const to = moment.unix(item.getIn(['to', 'sec'], moment().unix()));
+    const from = getItemDateValue(item, 'from');
+    const to = getItemDateValue(item, 'to');
     return (
       <div className="inline" style={{ width: 165, padding: 0, margin: '9px 20px 0 20px' }}>
         <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)} - { to.format(globalSetting.dateFormat)}</p>
@@ -193,7 +188,7 @@ class EntityRevisionDetails extends Component {
 
   renderEditMessage = () => {
     const { mode, item } = this.props;
-    if (mode === 'view' && moment.unix(item.getIn(['to', 'sec'], moment().unix())).isAfter(moment())) {
+    if (mode === 'view' && getItemDateValue(item, 'to').isAfter(moment())) {
       return (
         <small className="danger-red"> You cannot edit the current revision because future revision exists.</small>
       );

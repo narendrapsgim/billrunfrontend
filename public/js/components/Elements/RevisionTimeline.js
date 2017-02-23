@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
-import moment from 'moment';
 import Immutable from 'immutable';
 import classNames from 'classnames';
 import StateIcon from './StateIcon';
+import { getItemDateValue } from '../../common/Util';
 
 
 const RevisionTimeline = ({ revisions, size, item, start }) => {
@@ -17,8 +17,8 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
     </li>
   );
   const renderRevision = (revision, key, list) => {
-    const from = revision.getIn(['from', 'sec'], '');
-    const to = revision.getIn(['to', 'sec'], '');
+    const from = getItemDateValue(revision, 'from');
+    const to = getItemDateValue(revision, 'to');
     const isActive = revision.getIn(['_id', '$id'], '') === item.getIn(['_id', '$id'], '');
     const activeClass = classNames('revision', {
       active: isActive,
@@ -29,12 +29,12 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
       <li key={`${revision.getIn(['_id', '$id'], '')}`} className={activeClass}>
         <div>
           <div>
-            <StateIcon from={from} to={to} />
+            <StateIcon from={from.toISOString()} to={to.toISOString()} />
           </div>
           <small className="date">
-            { moment.unix(revision.getIn(['from', 'sec'], '')).format('MMM DD')}
+            { from.format('MMM DD')}
             <br />
-            { moment.unix(revision.getIn(['from', 'sec'], '')).format('YYYY')}
+            { from.format('YYYY')}
           </small>
         </div>
       </li>

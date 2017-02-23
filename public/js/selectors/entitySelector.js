@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
 import moment from 'moment';
+import { getItemDateValue } from '../common/Util';
+
 
 const getUniqueFiled = (state, props, itemType) => {
   switch (itemType) {
@@ -56,8 +58,8 @@ const selectFormMode = (action, id, item, revisions) => {
     return 'create';
   }
   if (item && item.getIn(['_id', '$id'], false)) {
-    const from = moment.unix(item.getIn(['from', 'sec'], 0));
-    const to = moment.unix(item.getIn(['to', 'sec'], 0));
+    const from = getItemDateValue(item, 'from', moment(0));
+    const to = getItemDateValue(item, 'to', moment(0));
     if (to.isBefore(moment())) {
       return 'view';
     }
