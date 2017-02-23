@@ -121,7 +121,7 @@ class ServiceSetup extends Component {
       this.props.dispatch(clearRevisions('services', key)); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The service was ${action}`));
-      this.handleBack();
+      this.handleBack(true);
     }
   }
 
