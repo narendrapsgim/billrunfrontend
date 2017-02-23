@@ -58,7 +58,7 @@ const selectFormMode = (action, id, item, revisions) => {
     return 'create';
   }
   if (item && item.getIn(['_id', '$id'], false)) {
-    const from = getItemDateValue(item, 'from', moment(0));
+    const from = getItemDateValue(item, 'originalValue', moment(0));
     const to = getItemDateValue(item, 'to', moment(0));
     if (to.isBefore(moment())) {
       return 'view';

@@ -1,6 +1,7 @@
+import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getZiroTimeDate } from '../common/Util';
+import { getZiroTimeDate, getItemDateValue } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -46,22 +47,16 @@ const buildRequestData = (item, action) => {
 
     case 'create': {
       const formData = new FormData();
-      // If from-date is string -> date was changed from UI and UI need to send it
-      // it use for future entity creation
-      if (typeof item.get('from', null) === 'string') {
-        const newFrom = getZiroTimeDate(item.get('from', null)).toISOString();
-        const update = item.set('from', newFrom);
-        formData.append('update', JSON.stringify(update));
-        return formData;
-      }
-      formData.append('update', JSON.stringify(item));
+      const newFrom = getItemDateValue(item, 'from', moment().add(1, 'days')).format('YYYY-MM-DD');
+      const update = item.set('from', newFrom);
+      formData.append('update', JSON.stringify(update));
       return formData;
     }
 
     case 'update': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-      const update = item.delete('_id');
+      const update = item.delete('_id').delete('originalValue');
       formData.append('query', JSON.stringify(query));
       formData.append('update', JSON.stringify(update));
       return formData;
@@ -69,18 +64,11 @@ const buildRequestData = (item, action) => {
 
     case 'closeandnew': {
       const formData = new FormData();
+      const newFrom = getItemDateValue(item, 'from', moment().add(1, 'days')).format('YYYY-MM-DD');
+      const update = item.delete('_id').set('from', newFrom).delete('originalValue');
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('update', JSON.stringify(update));
       formData.append('query', JSON.stringify(query));
-      // If from-date is string -> date was changed from UI and UI need to send it
-      // it use for future entity creation
-      if (typeof item.get('from', null) === 'string') {
-        const newFrom = getZiroTimeDate(item.get('from', null)).toISOString();
-        const update = item.delete('_id').set('from', newFrom);
-        formData.append('update', JSON.stringify(update));
-      } else {
-        const update = item.delete('_id').delete('from');
-        formData.append('update', JSON.stringify(update));
-      }
       return formData;
     }
 

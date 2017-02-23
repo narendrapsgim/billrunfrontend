@@ -88,8 +88,10 @@ class RevisionList extends Component {
       const uniqueField = globalSetting.systemItems[itemName].uniqueField;
       const key = itemToRemove.get(uniqueField, '');
       this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
-      this.props.onDeleteItem(itemToRemove);
-      this.onClickRemoveClose();
+      const stayOnPage = this.props.onDeleteItem(itemToRemove);
+      if (stayOnPage) {
+        this.onClickRemoveClose();
+      }
     }
   }
 
