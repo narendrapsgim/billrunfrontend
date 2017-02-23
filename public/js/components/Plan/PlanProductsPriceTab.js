@@ -25,6 +25,7 @@ class PlanProductsPriceTab extends Component {
 
   static propTypes = {
     planRates: PropTypes.instanceOf(Immutable.Map),
+    mode: PropTypes.string,
     originalRates: PropTypes.instanceOf(Immutable.Map),
     products: PropTypes.instanceOf(Immutable.List),
     onChangeFieldValue: PropTypes.func.isRequired,
@@ -33,6 +34,7 @@ class PlanProductsPriceTab extends Component {
 
   static defaultProps = {
     planRates: Immutable.Map(),
+    mode: 'create',
     originalRates: Immutable.Map(),
     products: Immutable.List(),
   };
@@ -152,7 +154,7 @@ class PlanProductsPriceTab extends Component {
   }
 
   renderItems = () => {
-    const { products, planRates } = this.props;
+    const { products, planRates, mode } = this.props;
     return planRates.map((productUsageTypes, productKey) => {
       const usaget = productUsageTypes.keySeq().first();
       const prices = productUsageTypes.getIn([usaget, 'rate'], Immutable.List());
@@ -166,6 +168,7 @@ class PlanProductsPriceTab extends Component {
           item={prod}
           prices={prices}
           usaget={usaget}
+          mode={mode}
           onProductInitRate={this.onProductInitRate}
           onProductRemoveRate={this.onProductRemoveRate}
           onProductAddRate={this.onProductAddRate}
@@ -175,11 +178,12 @@ class PlanProductsPriceTab extends Component {
           onProductRestore={this.onProductRestore}
         />
       );
-    });
+    }).toArray();
   }
 
   render() {
-    const { products, planRates } = this.props;
+    const { products, planRates, mode } = this.props;
+    const editable = (mode !== 'view');
 
     if (planRates.size > 0 && products.size === 0) {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -192,11 +196,13 @@ class PlanProductsPriceTab extends Component {
       <Row>
         <Col lg={12}>
           <Form>
-            <Panel header={panelTitle}>
-              <ProductSearch onSelectProduct={this.onSelectProduct} />
-            </Panel>
+            { editable &&
+              <Panel header={panelTitle}>
+                <ProductSearch onSelectProduct={this.onSelectProduct} />
+              </Panel>
+            }
             { this.renderRemovedItems() }
-            { this.renderItems().toArray() }
+            { this.renderItems() }
             { (products.size === 0) && this.renderNoItems() }
           </Form>
         </Col>

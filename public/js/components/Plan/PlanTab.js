@@ -107,7 +107,8 @@ export default class Plan extends Component {
   }
 
   getTrialPrice = () => {
-    const { plan } = this.props;
+    const { plan, mode } = this.props;
+    const editable = (mode !== 'view');
     const trial = (plan.getIn(['price', 0, 'trial']) === true) ? plan.getIn(['price', 0]) : null;
     if (trial) {
       return (
@@ -115,6 +116,7 @@ export default class Plan extends Component {
           index={0}
           count={plan.get('price', Immutable.List()).size}
           item={trial}
+          mode={mode}
           isTrialExist={true}
           onPlanPriceUpdate={this.onPlanPriceUpdate}
           onPlanCycleUpdate={this.props.onPlanCycleUpdate}
@@ -122,11 +124,11 @@ export default class Plan extends Component {
           onPlanTariffRemove={this.props.onPlanTariffRemove}
         />);
     }
-    return this.getAddPriceButton(true);
+    return editable ? this.getAddPriceButton(true) : null;
   }
 
   getPrices = () => {
-    const { plan } = this.props;
+    const { plan, mode } = this.props;
     const isTrialExist = (plan.getIn(['price', 0, 'trial']) === true || plan.getIn(['price', 0, 'trial']) === 'true');
     const count = plan.get('price', Immutable.List()).size;
     const prices = [];
@@ -139,6 +141,7 @@ export default class Plan extends Component {
             index={i}
             count={count}
             item={price}
+            mode={mode}
             isTrialExist={isTrialExist}
             onPlanPriceUpdate={this.onPlanPriceUpdate}
             onPlanCycleUpdate={this.props.onPlanCycleUpdate}
@@ -155,6 +158,7 @@ export default class Plan extends Component {
     const { plan, mode } = this.props;
     const periodicity = plan.getIn(['recurrence', 'periodicity']) || '';
     const upfront = typeof plan.get('upfront') !== 'boolean' ? '' : plan.get('upfront');
+    const editable = (mode !== 'view');
 
     return (
       <Row>
@@ -167,7 +171,7 @@ export default class Plan extends Component {
                   Title<Help contents={PlanDescription.description} />
                 </Col>
                 <Col sm={8} lg={9}>
-                  <Field value={plan.get('description', '')} onChange={this.onChangePlanDescription} />
+                  <Field value={plan.get('description', '')} onChange={this.onChangePlanDescription} editable={editable} />
                 </Col>
               </FormGroup>
 
@@ -177,7 +181,7 @@ export default class Plan extends Component {
                     Key <Help contents={PlanDescription.name} />
                   </Col>
                   <Col sm={8} lg={9}>
-                    <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} />
+                    <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} editable={editable} />
                     { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
                   </Col>
                 </FormGroup>
@@ -188,27 +192,38 @@ export default class Plan extends Component {
                   External Code<Help contents={PlanDescription.code} />
                 </Col>
                 <Col sm={8} lg={9}>
-                  <Field onChange={this.onChangePlanCode} value={plan.get('code', '')} />
+                  <Field onChange={this.onChangePlanCode} value={plan.get('code', '')} editable={editable} />
                 </Col>
               </FormGroup>
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Billing Frequency</Col>
                 <Col sm={4}>
-                  <FormControl componentClass="select" placeholder="select" value={periodicity} onChange={this.onChangePeriodicity}>
-                    { this.getPeriodicityOptions() }
-                  </FormControl>
+                  { editable
+                    ? (
+                      <FormControl componentClass="select" placeholder="select" value={periodicity} onChange={this.onChangePeriodicity} >
+                        { this.getPeriodicityOptions() }
+                      </FormControl>
+                    )
+                  : <div className="non-editble-field">{ periodicity }</div>
+                  }
                 </Col>
               </FormGroup>
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Charging Mode</Col>
                 <Col sm={4}>
-                  <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
-                    <option value="">Select...</option>
-                    <option value={true}>Upfront</option>
-                    <option value={false}>Arrears</option>
-                  </FormControl>
+                  { editable
+                    ? (
+                      <FormControl componentClass="select" placeholder="select" value={upfront} onChange={this.onChangeUpfront}>
+                        <option value="">Select...</option>
+                        <option value={true}>Upfront</option>
+                        <option value={false}>Arrears</option>
+                      </FormControl>
+                    )
+                    : <div className="non-editble-field">{ upfront ? 'Upfront' : 'Arrears'}</div>
+                  }
+
                 </Col>
               </FormGroup>
 
@@ -221,7 +236,7 @@ export default class Plan extends Component {
             <Panel header={<h3>Recurring Charges</h3>}>
               { this.getPrices() }
               <br />
-              { this.getAddPriceButton(false) }
+              { editable && this.getAddPriceButton(false) }
             </Panel>
 
           </Form>
