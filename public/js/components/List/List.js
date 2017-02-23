@@ -66,6 +66,42 @@ class List extends Component {
     return entity.get(field.id);
   }
 
+  getRowAction = (row, idx, entity) => {
+    const { actions } = this.props;
+    const rowActions = actions.filter((action) => {
+      const ruleExist = typeof action.onClickColumn !== 'undefined';
+      const byId = action.onClickColumn === row.id;
+      const byIndex = action.onClickColumn === idx;
+      return ruleExist && (byId || byIndex);
+    });
+    if (rowActions.length === 0) {
+      return false;
+    }
+    // Find first enable and show onClick Actin
+    const onClickAction = rowActions.reduce((action, rowAction) => {
+      if (action === false) {
+        if (typeof rowAction.onClick === 'undefined') {
+          return false;
+        }
+        if (typeof rowAction.enable !== 'undefined') {
+          const isEnable = (typeof rowAction.enable === 'function') ? rowAction.enable(entity) : rowAction.enable;
+          if (!isEnable) {
+            return false;
+          }
+        }
+        if (typeof rowAction.show !== 'undefined') {
+          const isShow = (typeof rowAction.show === 'function') ? rowAction.show(entity) : rowAction.show;
+          if (!isShow) {
+            return false;
+          }
+        }
+        return rowAction.onClick;
+      }
+      return action;
+    }, false);
+    return onClickAction;
+  }
+
   buildRow(entity, fields) {
     const { onClickEdit, edit } = this.props;
     return fields.map((field, key) => {
@@ -73,7 +109,14 @@ class List extends Component {
         return null;
       }
       let fieldElement;
-      if (edit && ((key === 0 && field.id !== 'state') || (key === 1 && fields[0].id === 'state'))) {
+      const rowAction = this.getRowAction(field, key, entity);
+      if (rowAction) {
+        fieldElement = (
+          <button className="btn btn-link" onClick={rowAction.bind(this, entity)}>
+            {this.printEntityField(entity, field)}
+          </button>
+        );
+      } else if (edit && ((key === 0 && field.id !== 'state') || (key === 1 && fields[0].id === 'state'))) {
         fieldElement = (
           <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
             {this.printEntityField(entity, field)}
