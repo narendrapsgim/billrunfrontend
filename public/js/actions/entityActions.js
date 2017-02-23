@@ -35,7 +35,7 @@ export const clearEntity = collection => ({
   collection,
 });
 
-const buildRequestData = (item, action) => {
+const buildRequestData = (item, action, collection) => {
   switch (action) {
 
     case 'delete': {
@@ -47,7 +47,7 @@ const buildRequestData = (item, action) => {
 
     case 'create': {
       const formData = new FormData();
-      const newFrom = getItemDateValue(item, 'from', moment().add(1, 'days')).format('YYYY-MM-DD');
+      const newFrom = getItemDateValue(item, 'from').format('YYYY-MM-DD');
       const update = item.set('from', newFrom);
       formData.append('update', JSON.stringify(update));
       return formData;
@@ -64,10 +64,21 @@ const buildRequestData = (item, action) => {
 
     case 'closeandnew': {
       const formData = new FormData();
-      const newFrom = getItemDateValue(item, 'from', moment().add(1, 'days')).format('YYYY-MM-DD');
-      const update = item.delete('_id').set('from', newFrom).delete('originalValue');
+
+      switch (collection) {
+        case 'services': {
+          const newFrom = getItemDateValue(item, 'from').format('YYYY-MM-DD');
+          const update = item.delete('_id').set('from', newFrom).delete('originalValue');
+          formData.append('update', JSON.stringify(update));
+        }
+          break;
+        default: {
+          const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
+          formData.append('update', JSON.stringify(update));
+        }
+      }
+
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-      formData.append('update', JSON.stringify(update));
       formData.append('query', JSON.stringify(query));
       return formData;
     }
@@ -80,7 +91,7 @@ const buildRequestData = (item, action) => {
 const requestDataBuilder = (collection, item, action) => {
   switch (collection) {
     default:
-      return buildRequestData(item, action);
+      return buildRequestData(item, action, collection);
   }
 };
 
