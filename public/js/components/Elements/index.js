@@ -4,7 +4,7 @@ import LoadingItemPlaceholder from './LoadingItemPlaceholder';
 import StateIcon from './StateIcon';
 import RevisionTimeline from './RevisionTimeline';
 import ModalWrapper from './ModalWrapper';
-import ConfirmModal from '../ConfirmModal';
+import ConfirmModal from './ConfirmModal';
 
 export {
   ActionButtons,
