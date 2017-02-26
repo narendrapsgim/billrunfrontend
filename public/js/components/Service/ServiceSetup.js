@@ -56,13 +56,17 @@ class ServiceSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId } = nextProps;
-    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    const { item, mode, itemId, revisions } = nextProps;
+    const { item: oldItem,
+      itemId: oldItemId,
+      mode: oldMode,
+      revisions: oldRevisions,
+    } = this.props;
     if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
       const pageTitle = buildPageTitle(mode, 'service', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId) {
+    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
       this.props.dispatch(getService(itemId)).then(this.initDefaultValues);
     }
   }
@@ -121,7 +125,7 @@ class ServiceSetup extends Component {
       this.props.dispatch(clearRevisions('services', key)); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The service was ${action}`));
-      this.handleBack();
+      this.handleBack(true);
     }
   }
 
