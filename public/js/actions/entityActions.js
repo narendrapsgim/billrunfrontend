@@ -66,7 +66,7 @@ const buildRequestData = (item, action) => {
       const formData = new FormData();
 
       // Temp Fix
-      if (getItemDateValue(item, 'from').isBefore(moment())) {
+      if (getItemDateValue(item, 'from').isBefore(moment()) || getItemDateValue(item, 'from').isSame(moment())) {
         const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
         formData.append('update', JSON.stringify(update));
       } else {
