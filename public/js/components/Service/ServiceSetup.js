@@ -43,11 +43,15 @@ class ServiceSetup extends Component {
     activeTab: parseInt(this.props.activeTab),
   };
 
-  componentDidMount() {
-    const { itemId, mode } = this.props;
+  componentWillMount() {
+    const { itemId } = this.props;
     if (itemId) {
       this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
     }
+  }
+
+  componentDidMount() {
+    const { mode } = this.props;
     if (mode === 'create') {
       const pageTitle = buildPageTitle(mode, 'service');
       this.props.dispatch(setPageTitle(pageTitle));
@@ -67,12 +71,14 @@ class ServiceSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getService(itemId)).then(this.initDefaultValues);
+      this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return !Immutable.is(this.props.item, nextState.item)
+      || !Immutable.is(this.props.revisions, nextState.revisions)
+      || this.props.activeTab !== nextProps.activeTab
       || this.props.itemId !== nextProps.itemId
       || this.props.mode !== nextProps.mode;
   }
