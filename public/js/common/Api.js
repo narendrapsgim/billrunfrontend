@@ -54,6 +54,8 @@ const buildApiString = (params = {}) => {
       return `/admin/${params.api}`;
     case 'paymentgateways':
       return `/${params.api}/${params.action}`;
+    case 'currencies':
+      return `/api/${params.api}`;
     default:
       return `/api/${params.api}`;
   }

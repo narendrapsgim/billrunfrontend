@@ -25,6 +25,10 @@ export const saveQuery = body => ({
   },
 });
 
+export const getCurrenciesQuery = () => ({
+  api: 'currencies',
+});
+
 export const getPaymentGatewaysQuery = () => ({
   api: 'paymentgateways',
   action: 'list',
