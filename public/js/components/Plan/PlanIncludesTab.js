@@ -106,7 +106,7 @@ class PlanIncludesTab extends Component {
     const { usedProducts } = this.state;
     const { includeGroups, mode } = this.props;
 
-    if (typeof includeGroups === 'undefined' || includeGroups.size === 0) {
+    if (includeGroups.isEmpty()) {
       return (<tr><td colSpan="6" className="text-center">No Groups</td></tr>);
     }
 

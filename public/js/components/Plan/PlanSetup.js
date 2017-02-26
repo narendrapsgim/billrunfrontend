@@ -85,7 +85,7 @@ class PlanSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPlan(itemId)).then(this.initDefaultValues);
+      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
     }
   }
 
