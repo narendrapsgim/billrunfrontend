@@ -200,7 +200,7 @@ class EntityRevisionDetails extends Component {
     const { mode, item } = this.props;
     if (mode === 'view' && getItemDateValue(item, 'to').isAfter(moment())) {
       return (
-        <small className="danger-red"> You cannot edit the current revision because a future revision exists.</small>
+        <small className="danger-red"> You cannot edit the current revision because future revision exists.</small>
       );
     }
     return null;

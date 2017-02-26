@@ -41,9 +41,21 @@ class PlanProductsPriceTab extends Component {
 
   componentWillMount() {
     const { planRates } = this.props;
-    const productKeys = planRates.map((rate, key) => key).toArray();
-    if (productKeys.length) {
-      this.props.dispatch(getList('plan_products', getProductsByKeysQuery(productKeys)));
+    const productKeys = planRates.keySeq();
+    if (!productKeys.isEmpty()) {
+      this.props.dispatch(getList('plan_products', getProductsByKeysQuery(productKeys.toArray())));
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { planRates, products } = nextProps;
+    const { planRates: oldPlanRates } = this.props;
+    if (!Immutable.is(planRates, oldPlanRates)) {
+      const productKeys = planRates.keySeq();
+      const newProducts = !productKeys.filter(key => !products.includes(key));
+      if (productKeys.length && !newProducts.isEmpty()) {
+        this.props.dispatch(pushToList('plan_products', getProductsByKeysQuery(newProducts.toArray())));
+      }
     }
   }
 
@@ -144,7 +156,7 @@ class PlanProductsPriceTab extends Component {
       const usaget = originalRates.get(productKey).keySeq().first();
       return (
         <PlanProductRemoved
-          key={prod.getIn(['_id', '$id'])}
+          key={prod.getIn(['_id', '$id'], '')}
           usaget={usaget}
           item={prod}
           onProductUndoRemove={this.onProductUndoRemove}
@@ -185,8 +197,8 @@ class PlanProductsPriceTab extends Component {
     const { products, planRates, mode } = this.props;
     const editable = (mode !== 'view');
 
-    if (planRates.size > 0 && products.size === 0) {
-      return (<LoadingItemPlaceholder onClick={this.handleBack} />);
+    if (!planRates.isEmpty() && products.isEmpty()) {
+      return (<LoadingItemPlaceholder />);
     }
 
     const panelTitle = (
@@ -203,7 +215,7 @@ class PlanProductsPriceTab extends Component {
             }
             { this.renderRemovedItems() }
             { this.renderItems() }
-            { (products.size === 0) && this.renderNoItems() }
+            { planRates.isEmpty() && this.renderNoItems() }
           </Form>
         </Col>
       </Row>
