@@ -244,7 +244,7 @@ export default class PlanIncludeGroupCreate extends Component {
     const { usedProducts, usageTypes } = this.props;
     const { name, products, include, usage, shared, error, monetaryBased, steps } = this.state;
     const existingProductsKeys = usedProducts.push(...products);
-    const setIncludesTitle = monetaryBased ? `Total ${globalSetting.currency} included` : `${usage} includes`;
+    const setIncludesTitle = monetaryBased ? `Total ${globalSetting.currency} included` : changeCase.sentenceCase(`${usage} includes`);
 
     switch (stepIndex) {
 
@@ -301,7 +301,7 @@ export default class PlanIncludeGroupCreate extends Component {
         return ([
           <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usage}_includes`}>
             <Col componentClass={ControlLabel} sm={3}>
-              {changeCase.sentenceCase(setIncludesTitle)}
+              {setIncludesTitle}
             </Col>
             <Col sm={8}>
               {monetaryBased
