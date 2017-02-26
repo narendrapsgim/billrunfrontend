@@ -55,7 +55,7 @@ class EntityRevisionDetails extends Component {
 
   onDeleteItem = (removedItem) => {
     const { item, revisions, itemName } = this.props;
-    // if screen vas with deleted item, go to prev revision or list
+    // if screen was with deleted item, go to prev revision or list
     if (item.getIn(['_id', '$id'], '') === removedItem.getIn(['_id', '$id'], '')) {
       const itemType = globalSetting.systemItems[itemName].itemType;
       const itemsType = globalSetting.systemItems[itemName].itemsType;

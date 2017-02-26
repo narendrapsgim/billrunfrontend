@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getZiroTimeDate, getItemDateValue } from '../common/Util';
+import { getItemDateValue } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -35,7 +35,7 @@ export const clearEntity = collection => ({
   collection,
 });
 
-const buildRequestData = (item, action, collection) => {
+const buildRequestData = (item, action) => {
   switch (action) {
 
     case 'delete': {
@@ -65,17 +65,14 @@ const buildRequestData = (item, action, collection) => {
     case 'closeandnew': {
       const formData = new FormData();
 
-      switch (collection) {
-        case 'services': {
-          const newFrom = getItemDateValue(item, 'from').format('YYYY-MM-DD');
-          const update = item.delete('_id').set('from', newFrom).delete('originalValue');
-          formData.append('update', JSON.stringify(update));
-        }
-          break;
-        default: {
-          const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
-          formData.append('update', JSON.stringify(update));
-        }
+      // Temp Fix
+      if (getItemDateValue(item, 'from').isBefore(moment())) {
+        const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
+        formData.append('update', JSON.stringify(update));
+      } else {
+        const newFrom = getItemDateValue(item, 'from').format('YYYY-MM-DD');
+        const update = item.delete('_id').set('from', newFrom).delete('originalValue');
+        formData.append('update', JSON.stringify(update));
       }
 
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
@@ -91,7 +88,7 @@ const buildRequestData = (item, action, collection) => {
 const requestDataBuilder = (collection, item, action) => {
   switch (collection) {
     default:
-      return buildRequestData(item, action, collection);
+      return buildRequestData(item, action);
   }
 };
 

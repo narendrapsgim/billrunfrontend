@@ -43,7 +43,6 @@ class PlanIncludesTab extends Component {
     };
   }
 
-
   componentDidMount() {
     const { usageTypes } = this.props;
     if (usageTypes.isEmpty()) {
@@ -53,7 +52,9 @@ class PlanIncludesTab extends Component {
       const existingGroups = Immutable.Set().withMutations((groupsWithMutations) => {
         responses.data.forEach((response) => {
           response.data.details.forEach((item) => {
-            groupsWithMutations.union(Object.keys(item.include.groups));
+            if (item.include && item.include.groups) {
+              groupsWithMutations.union(Object.keys(item.include.groups));
+            }
           });
         });
       }).toList();
@@ -183,8 +184,8 @@ class PlanIncludesTab extends Component {
 }
 
 
-const mapStateToProps = (state) => {
-  const usageTypes = state.settings.get('usage_types');
-  return { usageTypes };
-};
+const mapStateToProps = (state, props) => ({
+  includeGroups: props.includeGroups || undefined,
+  usageTypes: state.settings.get('usage_types'),
+});
 export default connect(mapStateToProps)(PlanIncludesTab);

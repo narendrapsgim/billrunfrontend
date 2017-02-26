@@ -124,6 +124,7 @@ export const getPlan = id => (dispatch) => {
   return apiBillRun(query)
     .then((response) => {
       const item = response.data[0].data.details[0];
+      item.originalValue = item.from;
       dispatch(gotItem(item));
       return dispatch(apiBillRunSuccessHandler(response));
     })

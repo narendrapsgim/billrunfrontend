@@ -32,5 +32,11 @@ var globalSetting = {
       itemType: 'service',
       itemsType: 'services',
     },
+    plan: {
+      collection: 'plans',
+      uniqueField: 'name',
+      itemType: 'plan',
+      itemsType: 'plans',
+    },
   },
 };
