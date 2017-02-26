@@ -10,6 +10,7 @@ import Help from '../../Help';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '../../Field';
 import Products from './Products';
+import { validateUnlimitedValue, validatePriceValue, validateKey } from '../../../common/Validators';
 
 
 export default class PlanIncludeGroupCreate extends Component {
@@ -29,10 +30,24 @@ export default class PlanIncludeGroupCreate extends Component {
   };
 
   defaultState = {
-    name: '', usage: '', include: '', products: Immutable.List(), shared: false,
-    error : '',
-    stepIndex: 0, open: false,
+    name: '',
+    usage: '',
+    include: '',
+    products: Immutable.List(),
+    shared: false,
+    error: '',
+    stepIndex: 0,
+    open: false,
+    monetaryBased: false,
+    steps: Immutable.Map({
+      SetNameAndType: { index: 0, label: 'Set Name & Type' },
+      SetUsageType: { index: 1, label: 'Set Usage Type' },
+      SetIncludes: { index: 2, label: 'Set Includes' },
+      SetProducts: { index: 3, label: 'Set Products' },
+    }),
   }
+
+  state = Object.assign({}, this.defaultState);
 
   errors = {
     name: {
@@ -45,8 +60,9 @@ export default class PlanIncludeGroupCreate extends Component {
       exist: 'Group with same name and usage type already exist',
     },
     include: {
-      required: 'Inclide is required',
+      required: 'Include is required',
       allowedCharacters: 'Include must be positive number or Unlimited',
+      allowedCharactersMonetary: 'Include must be positive number',
     },
     products: {
       required: 'Products is required',
@@ -54,11 +70,10 @@ export default class PlanIncludeGroupCreate extends Component {
     },
   }
 
-  state = Object.assign({}, this.defaultState);
-
   validateStep = (step) => {
+    const { steps } = this.state;
     switch (step) {
-      case 0: {
+      case steps.get('SetNameAndType', { index: -1 }).index: {
         const { existinGrousNames } = this.props;
         const { name: nameErrors } = this.errors;
         const { name } = this.state;
@@ -71,14 +86,14 @@ export default class PlanIncludeGroupCreate extends Component {
           this.setState({ error: nameErrors.exist });
           return false;
         }
-        if (!globalSetting.keyUppercaseRegex.test(name)) {
+        if (!validateKey(name)) {
           this.setState({ error: nameErrors.allowedCharacters });
           return false;
         }
         return true;
       }
 
-      case 1: {
+      case steps.get('SetUsageType', { index: -1 }).index: {
         const { usage: usageErrors } = this.errors;
         const { usage } = this.state;
 
@@ -89,7 +104,7 @@ export default class PlanIncludeGroupCreate extends Component {
         return true;
       }
 
-      case 2: {
+      case steps.get('SetIncludes', { index: -1 }).index: {
         const { include: includeErrors } = this.errors;
         const { include } = this.state;
 
@@ -97,14 +112,14 @@ export default class PlanIncludeGroupCreate extends Component {
           this.setState({ error: includeErrors.required });
           return false;
         }
-        if (!(/^\d+(\.\d+)?$/.test(include)) && include !== 'UNLIMITED') {
+        if (!validateUnlimitedValue(include)) {
           this.setState({ error: includeErrors.allowedCharacters });
           return false;
         }
         return true;
       }
 
-      case 3: {
+      case steps.get('SetProducts', { index: -1 }).index: {
         const { usedProducts } = this.props;
         const { products: productsErrors } = this.errors;
         const { products } = this.state;
@@ -114,7 +129,7 @@ export default class PlanIncludeGroupCreate extends Component {
           return false;
         }
         const duplicateProducts = products.filter(product => usedProducts.includes(product));
-        if( duplicateProducts.size ){
+        if (duplicateProducts.size) {
           this.setState({ error: productsErrors.exist + duplicateProducts.join(', ') });
           return false;
         }
@@ -128,44 +143,50 @@ export default class PlanIncludeGroupCreate extends Component {
 
   onChangeGroupName = (e) => {
     const name = e.target.value.toUpperCase();
-    const error = (name.length && !globalSetting.keyUppercaseRegex.test(name)) ? this.errors.name.allowedCharacters : '';
-    this.setState({name, error});
+    const error = (name.length && !validateKey(name)) ? this.errors.name.allowedCharacters : '';
+    this.setState({ name, error });
   }
 
   onChangeShared = (e) => {
-    const { checked:shared } = e.target;
+    const { checked: shared } = e.target;
     this.setState({ shared });
   }
 
   onChangeUsageType = (newValue) => {
-    this.setState({usage: newValue, products: Immutable.List(), error:''});
+    this.setState({ usage: newValue, products: Immutable.List(), error: '' });
   }
 
   onChangeInclud = (newValue) => {
-    const error =  (!( /^[+-]?\d+(\.\d+)?$/.test( newValue )) && newValue !== 'UNLIMITED' ) ? this.errors.include.allowedCharacters : '' ;
-    this.setState({include: newValue, error});
+    const error = !validateUnlimitedValue(newValue) ? this.errors.include.allowedCharacters : '';
+    this.setState({ include: newValue, error });
+  }
+
+  onChangeIncludeMonetaryBased = (e) => {
+    const { value } = e.target;
+    const error = !validatePriceValue(value) ? this.errors.include.allowedCharactersMonetary : '';
+    this.setState({ include: value, error });
   }
 
   onAddProduct = (key) => {
     const products = this.state.products.push(key);
-    this.setState({products, error: ''});
+    this.setState({ products, error: '' });
   }
 
   onRemoveProduct = (key) => {
     const products = this.state.products.filter(product => key !== product);
-    this.setState({products, error: ''});
+    this.setState({ products, error: '' });
   }
 
   handlePrev = () => {
-    const {stepIndex} = this.state;
+    const { stepIndex } = this.state;
     if (stepIndex > 0) {
-      this.setState({stepIndex: stepIndex - 1, error:''});
+      this.setState({ stepIndex: stepIndex - 1, error: '' });
     }
   }
 
   handleNext = () => {
-    const {stepIndex} = this.state;
-    if(this.validateStep(stepIndex)){
+    const { stepIndex } = this.state;
+    if (this.validateStep(stepIndex)) {
       this.setState({
         stepIndex: stepIndex + 1,
       });
@@ -173,7 +194,7 @@ export default class PlanIncludeGroupCreate extends Component {
   };
 
   resetState = (open = true) => {
-    this.setState(Object.assign({}, this.defaultState, {open}));
+    this.setState(Object.assign({}, this.defaultState, { open }));
   }
 
   handleCancel = () => {
@@ -182,7 +203,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
   handleFinish = () => {
     const { stepIndex, name, usage, include, products, shared } = this.state;
-    if(this.validateStep(stepIndex)){
+    if (this.validateStep(stepIndex)) {
       this.props.addGroup(name, usage, include, shared, products);
       this.resetState(false);
     }
@@ -196,27 +217,70 @@ export default class PlanIncludeGroupCreate extends Component {
     this.setState({ open: !this.state.open });
   }
 
+  onChangeBasedOn = (e) => {
+    const { value } = e.target;
+    const monetaryBased = (value === 'monetary');
+    let usage = '';
+    let steps;
+    if (monetaryBased) {
+      usage = 'cost';
+      steps = Immutable.Map({
+        SetNameAndType: { index: 0, label: 'Set Name & Type' },
+        SetIncludes: { index: 1, label: 'Set Includes' },
+        SetProducts: { index: 2, label: 'Set Products' },
+      });
+    } else {
+      steps = Immutable.Map({
+        SetNameAndType: { index: 0, label: 'Set Name & Type' },
+        SetUsageType: { index: 1, label: 'Set Usage Type' },
+        SetIncludes: { index: 2, label: 'Set Includes' },
+        SetProducts: { index: 3, label: 'Set Products' },
+      });
+    }
+    this.setState({ monetaryBased, steps, usage, products: Immutable.List(), error: '' });
+  }
+
   getStepContent = (stepIndex) => {
     const { usedProducts, usageTypes } = this.props;
-    const { name, products, include, usage, shared, error } = this.state;
+    const { name, products, include, usage, shared, error, monetaryBased, steps } = this.state;
     const existingProductsKeys = usedProducts.push(...products);
+    const setIncludesTitle = monetaryBased ? `Total ${globalSetting.currency} included` : `${usage} includes`;
 
     switch (stepIndex) {
 
-      case 0:
+      case steps.get('SetNameAndType', { index: -1 }).index:
         return (
           <FormGroup validationState={error.length > 0 ? 'error' : null}>
             <Col componentClass={ControlLabel} sm={3}>
               Name<Help contents={GroupsInclude.name} />
             </Col>
             <Col sm={8}>
-              <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName}/>
+              <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName} />
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
+
+              <Field
+                fieldType="radio"
+                name="based-on"
+                id="usage-based"
+                value="usage"
+                onChange={this.onChangeBasedOn}
+                checked={!monetaryBased}
+                label="&nbsp;Usage based"
+              />
+              <Field
+                fieldType="radio"
+                name="based-on"
+                id="monetary-based"
+                value="monetary"
+                checked={monetaryBased}
+                onChange={this.onChangeBasedOn}
+                label="&nbsp;Monetary based"
+              />
             </Col>
           </FormGroup>
         );
 
-      case 1:
+      case steps.get('SetUsageType', { index: -1 }).index:
         return (
           <FormGroup validationState={error.length > 0 ? 'error' : null}>
             <Col componentClass={ControlLabel} sm={3}>Unit Type</Col>
@@ -233,12 +297,17 @@ export default class PlanIncludeGroupCreate extends Component {
           </FormGroup>
         );
 
-      case 2:
+      case steps.get('SetIncludes', { index: -1 }).index:
         return ([
           <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usage}_includes`}>
-            <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`${usage} includes`)}</Col>
+            <Col componentClass={ControlLabel} sm={3}>
+              {changeCase.sentenceCase(setIncludesTitle)}
+            </Col>
             <Col sm={8}>
-              <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" />
+              {monetaryBased
+                ? <Field onChange={this.onChangeIncludeMonetaryBased} value={include} fieldType="text" />
+                : <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" />
+              }
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
             </Col>
           </FormGroup>,
@@ -252,14 +321,17 @@ export default class PlanIncludeGroupCreate extends Component {
           </FormGroup>,
         ]);
 
-      case 3:
+      case steps.get('SetProducts', { index: -1 }).index:
         return (
           <FormGroup validationState={error.length > 0 ? 'error' : null}>
-            <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`Products of type ${usage}`)}<Help contents={GroupsInclude.products} /></Col>
+            {monetaryBased
+              ? <Col componentClass={ControlLabel} sm={3} />
+              : <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`Products of type ${usage}`)}<Help contents={GroupsInclude.products} /></Col>
+            }
             <Col sm={8}>
               { products.size
                ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />
-               : <p style={{marginTop:8}}>No products in group ...</p>
+               : <p style={{ marginTop: 8 }}>No products in group ...</p>
               }
               <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
                 <ProductSearchByUsagetype
@@ -276,6 +348,15 @@ export default class PlanIncludeGroupCreate extends Component {
       default:
         return '...';
     }
+  }
+
+  renderSteps = () => {
+    const { steps } = this.state;
+    return steps.toList().map(step => (
+      <Step key={step.index}>
+        <StepLabel>{step.label}</StepLabel>
+      </Step>
+    )).toArray();
   }
 
   render() {
@@ -295,24 +376,13 @@ export default class PlanIncludeGroupCreate extends Component {
             <Modal.Title>
               {modalTitle}
               <Stepper activeStep={stepIndex} style={styleStepper}>
-                <Step>
-                  <StepLabel>Set Name</StepLabel>
-                </Step>
-                <Step>
-                  <StepLabel>Set Usage Type</StepLabel>
-                </Step>
-                <Step>
-                  <StepLabel>Set Includes</StepLabel>
-                </Step>
-                <Step>
-                  <StepLabel>Set Products</StepLabel>
-                </Step>
+                {this.renderSteps()}
               </Stepper>
             </Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
-            <div style={{marginTop: 25, marginBottom: 25}}>
+            <div style={{ marginTop: 25, marginBottom: 25 }}>
               <Form horizontal>
                 {this.getStepContent(stepIndex)}
               </Form>
@@ -320,7 +390,7 @@ export default class PlanIncludeGroupCreate extends Component {
           </Modal.Body>
 
           <Modal.Footer>
-            <Button bsSize="small" onClick={this.handlePrev} style={{marginRight: 9, minWidth: 90}}><i className="fa fa-angle-left" />&nbsp;Back</Button>
+            <Button bsSize="small" onClick={this.handlePrev} style={{ marginRight: 9, minWidth: 90 }}><i className="fa fa-angle-left" />&nbsp;Back</Button>
             { (stepIndex === 3)
               ? <Button bsSize="small" onClick={this.handleFinish} style={{ minWidth: 90 }} bsStyle="primary">Add</Button>
               : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 90 }}>Next&nbsp;<i className="fa fa-angle-right" /></Button>

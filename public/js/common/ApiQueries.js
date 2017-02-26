@@ -1,21 +1,26 @@
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
-export const searchProductsByKeyAndUsagetQuery = (usaget, key, notKeys) => ({
-  api: 'find',
-  params: [
-    { collection: 'rates' },
-    { size: '20' },
-    { page: '0' },
-    { project: JSON.stringify({ key: 1 }) },
-    { query: JSON.stringify({
-      key: {
-        $nin: notKeys,
-        $regex: key,
-        $options: 'i',
-      },
-      [`rates.${usaget}`]: { $exists: true },
-    }) },
-  ],
-});
+export const searchProductsByKeyAndUsagetQuery = (usaget, key, notKeys) => {
+  const query = {
+    key: {
+      $nin: notKeys,
+      $regex: key,
+      $options: 'i',
+    },
+  };
+  if (usaget !== 'cost') {
+    query[`rates.${usaget}`] = { $exists: true };
+  }
+  return {
+    api: 'find',
+    params: [
+      { collection: 'rates' },
+      { size: '20' },
+      { page: '0' },
+      { project: JSON.stringify({ key: 1 }) },
+      { query: JSON.stringify(query) },
+    ],
+  };
+};
 
 export const saveQuery = body => ({
   api: 'save',
