@@ -38,6 +38,7 @@ const ProductsList = () => {
       filterFields={filterFields}
       tableFields={tableFields}
       projectFields={projectFields}
+      showRevisionBy="key"
     />
   );
 };

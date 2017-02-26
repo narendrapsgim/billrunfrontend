@@ -9,7 +9,7 @@ var globalSetting = {
   datetimeFormat: "DD/MM/YYYY HH:mm",
   dateFormat: "DD/MM/YYYY",
   timeFormat: "HH:mm",
-  apiDateTimeFormat: "YYYY/MM/DD HH:mm:ss",
+  apiDateTimeFormat: "YYYY-MM-DD",
   currency: '$',
   list: {
     maxItems: 100
@@ -37,6 +37,12 @@ var globalSetting = {
       uniqueField: 'name',
       itemType: 'plan',
       itemsType: 'plans',
+    },
+    product: {
+      collection: 'rates',
+      uniqueField: 'key',
+      itemType: 'product',
+      itemsType: 'products',
     },
   },
 };

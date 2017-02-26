@@ -47,7 +47,7 @@ const buildRequestData = (item, action) => {
 
     case 'create': {
       const formData = new FormData();
-      const newFrom = getItemDateValue(item, 'from').format('YYYY-MM-DD');
+      const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
       const update = item.set('from', newFrom);
       formData.append('update', JSON.stringify(update));
       return formData;
@@ -70,7 +70,7 @@ const buildRequestData = (item, action) => {
         const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
         formData.append('update', JSON.stringify(update));
       } else {
-        const newFrom = getItemDateValue(item, 'from').format('YYYY-MM-DD');
+        const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
         const update = item.delete('_id').set('from', newFrom).delete('originalValue');
         formData.append('update', JSON.stringify(update));
       }
