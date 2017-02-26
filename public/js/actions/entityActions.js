@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getZiroTimeDate, getItemDateValue } from '../common/Util';
+import { getItemDateValue } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
