@@ -38,6 +38,7 @@ import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicat
 import { getInputProcessorActionQuery, getAddUsagetQuery } from '../common/ApiQueries';
 import _ from 'lodash';
 import Immutable from 'immutable';
+import { getSettings } from './settingsActions';
 
 const convert = (settings) => {
   const { parser = {},
@@ -231,7 +232,10 @@ export const addUsagetMapping = usaget => (dispatch) => { // eslint-disable-line
   dispatch(startProgressIndicator());
   const query = getAddUsagetQuery(usaget);
   return apiBillRun(query)
-    .then(success => dispatch(apiBillRunSuccessHandler(success)))
+    .then((success) => {
+      dispatch(getSettings('usage_types'));
+      return dispatch(apiBillRunSuccessHandler(success));
+    })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Illegal usage type')));
 };
 

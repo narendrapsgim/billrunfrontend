@@ -340,9 +340,9 @@ class InputProcessor extends Component {
     return field;
   };
 
-  addUsagetMapping = (val) => {
-    this.props.dispatch(addUsagetMapping(val));
-  }
+  addUsagetMapping = val => (
+    this.props.dispatch(addUsagetMapping(val))
+  );
 
   goBack = () => {
     this.props.router.push('/input_processors');
