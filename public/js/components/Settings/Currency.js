@@ -1,41 +1,39 @@
-import React, { Component } from 'react';
-import Immutable from 'immutable';
+import React, { PropTypes } from 'react';
 import Select from 'react-select';
 import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 
 
-export default class Currency extends Component {
-
-  static propTypes = {
-    onChange: React.PropTypes.func.isRequired,
-    data: React.PropTypes.instanceOf(Immutable.Map),
-    currencies: React.PropTypes.arrayOf(React.PropTypes.object),
+const Currency = (props) => {
+  const { data, currencies } = props;
+  const onChangeCurrency = (value) => {
+    props.onChange('pricing', 'currency', value);
   };
+  return (
+    <div className="CurrencyTax">
+      <Form horizontal>
+        <FormGroup controlId="currency" key="currency">
+          <Col componentClass={ControlLabel} md={2}>
+            Currency
+          </Col>
+          <Col sm={6}>
+            <Select options={currencies} value={data} onChange={onChangeCurrency} />
+          </Col>
+        </FormGroup>
+      </Form>
+    </div>
+  );
+};
 
-  static defaultProps = {
-    currencies: [],
-  };
+Currency.defaultProps = {
+  data: '',
+  currencies: [],
+};
 
-  onChangeCurrency = (value) => {
-    this.props.onChange('pricing', 'currency', value);
-  }
+Currency.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  data: PropTypes.string,
+  currencies: PropTypes.arrayOf(React.PropTypes.object),
+};
 
-  render() {
-    const { data, currencies } = this.props;
 
-    return (
-      <div className="CurrencyTax">
-        <Form horizontal>
-          <FormGroup controlId="currency" key="currency">
-            <Col componentClass={ControlLabel} md={2}>
-              Currency
-            </Col>
-            <Col sm={6}>
-              <Select options={currencies} value={data} onChange={this.onChangeCurrency} />
-            </Col>
-          </FormGroup>
-        </Form>
-      </div>
-    );
-  }
-}
+export default Currency;
