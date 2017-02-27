@@ -41,9 +41,9 @@ class PlanProductsPriceTab extends Component {
 
   componentWillMount() {
     const { planRates } = this.props;
-    const productKeys = planRates.keySeq();
-    if (!productKeys.isEmpty()) {
-      this.props.dispatch(getList('plan_products', getProductsByKeysQuery(productKeys.toArray())));
+    if (!planRates.isEmpty()) {
+      const planRatesKeys = planRates.keySeq();
+      this.props.dispatch(getList('plan_products', getProductsByKeysQuery(planRatesKeys.toArray())));
     }
   }
 
@@ -51,10 +51,12 @@ class PlanProductsPriceTab extends Component {
     const { planRates, products } = nextProps;
     const { planRates: oldPlanRates } = this.props;
     if (!Immutable.is(planRates, oldPlanRates)) {
-      const productKeys = planRates.keySeq();
-      const newProducts = !productKeys.filter(key => !products.includes(key));
-      if (productKeys.length && !newProducts.isEmpty()) {
-        this.props.dispatch(pushToList('plan_products', getProductsByKeysQuery(newProducts.toArray())));
+      const newProductsKeys = planRates.keySeq().filter(planRateKey =>
+        // Get all products that exist in plan but not fetched from server
+        (products.findIndex(product => product.get('key', '') === planRateKey) === -1)
+      );
+      if (!newProductsKeys.isEmpty()) {
+        this.props.dispatch(pushToList('plan_products', getProductsByKeysQuery(newProductsKeys.toArray())));
       }
     }
   }
@@ -77,8 +79,7 @@ class PlanProductsPriceTab extends Component {
 
   onSelectProduct = (key) => {
     const { planRates } = this.props;
-    const productKeys = planRates.map((rate, productKey) => productKey);
-    if (productKeys.includes(key)) {
+    if (planRates.has(key)) {
       this.props.dispatch(showWarning(`Price of product ${key} already overridden`));
     } else {
       this.props.dispatch(pushToList('plan_products', getProductByKeyQuery(key)))

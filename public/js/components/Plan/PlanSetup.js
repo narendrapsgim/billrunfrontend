@@ -89,6 +89,14 @@ class PlanSetup extends Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return !Immutable.is(this.props.item, nextState.item)
+      || !Immutable.is(this.props.revisions, nextState.revisions)
+      || this.props.activeTab !== nextProps.activeTab
+      || this.props.itemId !== nextProps.itemId
+      || this.props.mode !== nextProps.mode;
+  }
+
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
     this.props.dispatch(clearEntity('planOriginal'));
@@ -112,7 +120,6 @@ class PlanSetup extends Component {
       this.props.dispatch(getRevisions('plans', 'name', key));
     }
   }
-
 
   afterItemReceived = (response) => {
     if (response.status) {
@@ -181,9 +188,7 @@ class PlanSetup extends Component {
 
   render() {
     const { item, mode, revisions } = this.props;
-
-    // in update mode wait for plan before render edit screen
-    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 

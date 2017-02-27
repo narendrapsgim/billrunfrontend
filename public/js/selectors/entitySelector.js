@@ -14,9 +14,12 @@ const getUniqueFiled = (state, props, itemType) => {
 
 const getRevisions = (state, props, itemType) => {
   switch (itemType) {
-    default:
+    case 'product':
+      return state.entityList.revisions.get('rates');
+    default: {
       const itemsType = `${itemType}s`;
       return state.entityList.revisions.get(itemsType);
+    }
   }
 };
 

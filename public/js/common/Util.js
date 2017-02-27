@@ -23,12 +23,21 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
   switch (mode) {
     case 'create':
       return `Create New ${changeCase.upperCaseFirst(entityName)}`;
-    case 'closeandnew':
-      return `Edit ${entityName} - ${item.get('name')}`;
-    case 'view':
-      return `${changeCase.upperCaseFirst(entityName)} - ${item.get('name')}`;
-    case 'update':
-      return `Update ${entityName} - ${item.get('name')}`;
+    case 'closeandnew': {
+      const uniqueField = globalSetting.systemItems[entityName].uniqueField;
+      const itemType = globalSetting.systemItems[entityName].itemType;
+      return `Edit ${itemType} - ${item.get(uniqueField, '')}`;
+    }
+    case 'view': {
+      const uniqueField = globalSetting.systemItems[entityName].uniqueField;
+      const itemType = globalSetting.systemItems[entityName].itemType;
+      return `${changeCase.upperCaseFirst(itemType)} - ${item.get(uniqueField, '')}`;
+    }
+    case 'update': {
+      const uniqueField = globalSetting.systemItems[entityName].uniqueField;
+      const itemType = globalSetting.systemItems[entityName].itemType;
+      return `Update ${itemType} - ${item.get(uniqueField, '')}`;
+    }
     default:
       return '';
   }
