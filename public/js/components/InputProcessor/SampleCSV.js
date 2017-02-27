@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { FormGroup, HelpBlock } from 'react-bootstrap';
+import { HelpBlock } from 'react-bootstrap';
+import Immutable from 'immutable';
 /* COMPONENTS */
 import Field from '../Field';
 import SelectDelimiter from './SampleCSV/SelectDelimiter';
@@ -9,25 +10,59 @@ import SelectJSON from './SampleCSV/SelectJSON';
 import CSVFields from './SampleCSV/CSVFields';
 
 class SampleCSV extends Component {
-  constructor(props) {
-    super(props);
 
-    this.removeAllFields = this.removeAllFields.bind(this);
+  static propTypes = {
+    settings: PropTypes.instanceOf(Immutable.Map).isRequired,
+    type: PropTypes.string,
+    action: PropTypes.string.isRequired,
+    errors: PropTypes.instanceOf(Immutable.Map),
+    onChangeName: PropTypes.func.isRequired,
+    onSetDelimiterType: PropTypes.func.isRequired,
+    onChangeDelimiter: PropTypes.func.isRequired,
+    onSelectSampleCSV: PropTypes.func.isRequired,
+    onSelectJSON: PropTypes.func.isRequired,
+    onSetFieldWidth: PropTypes.func.isRequired,
+    onRemoveField: PropTypes.func.isRequired,
+    onMoveFieldUp: PropTypes.func.isRequired,
+    onMoveFieldDown: PropTypes.func.isRequired,
+    onChangeCSVField: PropTypes.func.isRequired,
+    onAddField: PropTypes.func.isRequired,
+    onChangeInputProcessorField: PropTypes.func.isRequired,
   }
 
-  removeAllFields() {
+  static defaultProps = {
+    type: '',
+    errors: Immutable.Map(),
+  }
+
+  removeAllFields = () => {
     const r = confirm("Are you sure you want to remove all fields?");
     if (r) {
       this.props.onRemoveAllFields.call(this);
     }
   }
 
+  componentDidMount() {
+    this.initDefaultValues();
+  }
+
+  initDefaultValues = () => {
+    const { type, settings } = this.props;
+    if (type !== 'api') {
+      if (settings.get('csv_has_footer', null) === null) {
+        this.props.onChangeInputProcessorField(['csv_has_footer'], false);
+      }
+      if (settings.get('csv_has_header', null) === null) {
+        this.props.onChangeInputProcessorField(['csv_has_header'], false);
+      }
+    }
+  }
+
   render() {
-    let { settings,
+    const { settings,
           type,
           action,
           errors,
-          format,
           onChangeName,
           onSetDelimiterType,
           onChangeDelimiter,
@@ -89,7 +124,53 @@ class SampleCSV extends Component {
       type === "api"
       ? (<div><SelectJSON onSelectJSON={ onSelectJSON } settings={ settings } /></div>)
       : (<div><SelectCSV onSelectSampleCSV={onSelectSampleCSV} settings={settings} /></div>);
-      
+
+    const onChangeCsvFooter = (e) => {
+      const { value } = e.target;
+      this.props.onChangeInputProcessorField(['csv_has_footer'], value);
+    };
+
+    const onChangeCsvHeader = (e) => {
+      const { value } = e.target;
+      this.props.onChangeInputProcessorField(['csv_has_header'], value);
+    };
+
+    const selectHeaderHTML = () => (
+      type === 'api'
+      ? (null)
+      : (<div className="form-group">
+        <div className="col-lg-3">
+          <label htmlFor="file_type">CSV has header?</label>
+        </div>
+        <div className="col-lg-9">
+          <div className="col-lg-1" style={{ marginTop: 8 }}>
+            <i className="fa fa-long-arrow-right" />
+          </div>
+          <div className={'col-lg-7'} style={{ marginTop: 8 }}>
+            <Field id="csvHeader" value={settings.get('csv_has_header', false)} onChange={onChangeCsvHeader} fieldType="checkbox" />
+          </div>
+        </div>
+      </div>)
+    );
+
+    const selectFooterHTML = () => (
+      type === 'api'
+      ? (null)
+      : (<div className="form-group">
+        <div className="col-lg-3">
+          <label htmlFor="file_type">CSV has footer?</label>
+        </div>
+        <div className="col-lg-9">
+          <div className="col-lg-1" style={{ marginTop: 8 }}>
+            <i className="fa fa-long-arrow-right" />
+          </div>
+          <div className={'col-lg-7'} style={{ marginTop: 8 }}>
+            <Field id="csvFooter" value={settings.get('csv_has_footer', false)} onChange={onChangeCsvFooter} fieldType="checkbox" />
+          </div>
+        </div>
+      </div>)
+    );
+
     return (
       <form className="InputProcessor form-horizontal">
         <div className="form-group">
@@ -107,6 +188,8 @@ class SampleCSV extends Component {
           </div>
         </div>
         { selectDelimiterHTML }
+        { selectHeaderHTML() }
+        { selectFooterHTML() }
         { selectCSVHTML }
         { setFieldsHTML }
       </form>
