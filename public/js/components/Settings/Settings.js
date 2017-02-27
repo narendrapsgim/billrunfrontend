@@ -4,10 +4,11 @@ import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import DateTime from './DateTime';
 import Currency from './Currency';
+import Tax from './Tax';
 import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
-import ActionButtons from '../Elements/ActionButtons';
+import { ActionButtons } from '../Elements';
 import { getCurrenciesQuery } from '../../common/ApiQueries';
 import { apiBillRun } from '../../common/Api';
 import { getSettings, updateSetting, saveSettings, fetchFile } from '../../actions/settingsActions';
@@ -118,7 +119,8 @@ class Settings extends Component {
   render() {
     const { props: { settings }, state: { activeTab, currencyOptions } } = this;
 
-    const currencyTax = settings.get('pricing', Immutable.Map());
+    const currency = settings.getIn(['pricing', 'currency'], '');
+    const vat = settings.getIn(['pricing', 'vat'], '');
     const datetime = settings.get('billrun', Immutable.Map());
     const sharedSecret = settings.get('shared_secret', Immutable.Map());
     const tenant = settings.get('tenant', Immutable.Map());
@@ -134,14 +136,21 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
+
           <Tab title="Locale" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <DateTime onChange={this.onChangeFieldValue} data={datetime} />
-              <Currency onChange={this.onChangeFieldValue} data={currencyTax} currencies={currencyOptions} />
+              <Currency onChange={this.onChangeFieldValue} data={currency} currencies={currencyOptions} />
             </Panel>
           </Tab>
 
-          <Tab title="Menu" eventKey={3}>
+          <Tab title="Tax" eventKey={3}>
+            <Panel style={{ borderTop: 'none' }}>
+              <Tax vat={vat} onChange={this.onChangeFieldValue} />
+            </Panel>
+          </Tab>
+
+          <Tab title="Menu" eventKey={4}>
             <Panel style={{ borderTop: 'none' }}>
               <EditMenu
                 data={mainMenu}
@@ -151,7 +160,7 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Security" eventKey={4}>
+          <Tab title="Security" eventKey={5}>
             <Panel style={{ borderTop: 'none' }}>
               <Security data={sharedSecret} />
             </Panel>

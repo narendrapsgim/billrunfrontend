@@ -31,7 +31,7 @@ export default class Currency extends Component {
               Currency
             </Col>
             <Col sm={6}>
-              <Select options={currencies} value={data.get('currency', '')} onChange={this.onChangeCurrency} />
+              <Select options={currencies} value={data} onChange={this.onChangeCurrency} />
             </Col>
           </FormGroup>
         </Form>
