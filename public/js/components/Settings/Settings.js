@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import DateTime from './DateTime';
-import CurrencyTax from './CurrencyTax';
+import Currency from './Currency';
 import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
@@ -137,7 +137,7 @@ class Settings extends Component {
           <Tab title="Locale" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <DateTime onChange={this.onChangeFieldValue} data={datetime} />
-              <CurrencyTax onChange={this.onChangeFieldValue} data={currencyTax} currencies={currencyOptions} />
+              <Currency onChange={this.onChangeFieldValue} data={currencyTax} currencies={currencyOptions} />
             </Panel>
           </Tab>
 
