@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
+import Select from 'react-select';
 import { Form, FormGroup, Col, InputGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
 
@@ -21,16 +22,12 @@ export default class CurrencyTax extends Component {
     currencies: React.PropTypes.arrayOf(React.PropTypes.object),
   };
 
-  onChange = (e) => {
-    const { id, value } = e.target;
-    this.props.onChange('pricing', id, value);
+  onChangeCurrency = (value) => {
+    this.props.onChange('pricing', 'currency', value);
   }
-
-  renderOption = (curr, key) => <option value={curr.val} key={key}>{curr.label}</option>;
 
   render() {
     const { data, currencies } = this.props;
-    const currencyOptions = currencies.map(this.renderOption);
 
     return (
       <div className="CurrencyTax">
@@ -40,9 +37,7 @@ export default class CurrencyTax extends Component {
               Currency
             </Col>
             <Col sm={6}>
-              <select className="form-control" id="currency" value={data.get('currency', '')} onChange={this.onChange}>
-                { currencyOptions }
-              </select>
+              <Select options={currencies} value={data.get('currency', '')} onChange={this.onChangeCurrency} />
             </Col>
           </FormGroup>
           <FormGroup controlId="vat" key="vat">

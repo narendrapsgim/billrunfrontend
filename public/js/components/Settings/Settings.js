@@ -8,6 +8,8 @@ import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
 import ActionButtons from '../Elements/ActionButtons';
+import { getCurrenciesQuery } from '../../common/ApiQueries';
+import { apiBillRun } from '../../common/Api';
 import { getSettings, updateSetting, saveSettings, fetchFile } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
 
@@ -27,10 +29,28 @@ class Settings extends Component {
 
   state = {
     activeTab: parseInt(this.props.activeTab),
+    currencyOptions: [],
   };
 
   componentWillMount() {
     this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu']));
+  }
+
+  componentDidMount() {
+    this.getCurrencies()
+        .then((currencies) => {
+          const currenciesBuild = currencies.options.map(function (currency) {
+            return { label: `${currency.code} ${currency.symbol}`, value: currency.name };
+          });
+          this.setState({ currencyOptions: currenciesBuild });
+        });
+  }
+
+  getCurrencies = () => {
+    const query = getCurrenciesQuery();
+    return apiBillRun(query)
+      .then(success => ({ options: success.data[0].data.details }))
+      .catch(() => ({ options: [] }));
   }
 
   onChangeFieldValue = (category, id, value) => {
@@ -96,7 +116,7 @@ class Settings extends Component {
   }
 
   render() {
-    const { props: { settings }, state: { activeTab } } = this;
+    const { props: { settings }, state: { activeTab, currencyOptions } } = this;
 
     const currencyTax = settings.get('pricing', Immutable.Map());
     const datetime = settings.get('billrun', Immutable.Map());
@@ -117,7 +137,7 @@ class Settings extends Component {
           <Tab title="Locale" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <DateTime onChange={this.onChangeFieldValue} data={datetime} />
-              <CurrencyTax onChange={this.onChangeFieldValue} data={currencyTax} />
+              <CurrencyTax onChange={this.onChangeFieldValue} data={currencyTax} currencies={currencyOptions} />
             </Panel>
           </Tab>
 
