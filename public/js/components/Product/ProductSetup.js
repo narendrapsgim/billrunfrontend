@@ -184,7 +184,7 @@ class ProductSetup extends Component {
             revisions={revisions}
             item={item}
             mode={mode}
-            onChangeFrom={this.onChangeFieldValue}
+            onChangeFrom={this.onFieldUpdate}
             itemName="product"
             backToList={this.handleBack}
           />
