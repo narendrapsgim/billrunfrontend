@@ -24,8 +24,8 @@ const getRevisions = (state, props, itemType) => {
 };
 
 const getTab = (state, props, itemType) => { // eslint-disable-line no-unused-vars
-  if (props.location && props.location.query) {
-    return props.location.query.tab || undefined;
+  if (props.location && props.location.query && typeof props.location.query.tab !== 'undefined') {
+    return parseInt(props.location.query.tab) || undefined;
   }
   return undefined;
 };

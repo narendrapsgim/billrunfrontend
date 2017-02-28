@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import DateTime from './DateTime';
@@ -13,6 +14,7 @@ import { getCurrenciesQuery } from '../../common/ApiQueries';
 import { apiBillRun } from '../../common/Api';
 import { getSettings, updateSetting, saveSettings, fetchFile } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
+import { tabSelector } from '../../selectors/entitySelector';
 
 
 class Settings extends Component {
@@ -23,18 +25,22 @@ class Settings extends Component {
   };
 
   static propTypes = {
-    activeTab: React.PropTypes.number,
-    dispatch: React.PropTypes.func.isRequired,
-    settings: React.PropTypes.instanceOf(Immutable.Map),
+    activeTab: PropTypes.number,
+    settings: PropTypes.instanceOf(Immutable.Map),
+    location: PropTypes.shape({
+      pathname: PropTypes.string,
+      query: PropTypes.object,
+    }),
+    router: PropTypes.object,
+    dispatch: PropTypes.func.isRequired,
   };
 
   state = {
-    activeTab: parseInt(this.props.activeTab),
     currencyOptions: [],
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu']));
+    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types']));
   }
 
   componentDidMount() {
@@ -94,6 +100,9 @@ class Settings extends Component {
     if (settings.has('menu')) {
       categoryToSave.push('menu');
     }
+    if (settings.has('taxation')) {
+      categoryToSave.push('taxation');
+    }
     if (categoryToSave.length) {
       this.props.dispatch(saveSettings(categoryToSave)).then(
         (status) => {
@@ -112,15 +121,18 @@ class Settings extends Component {
     }
   }
 
-  handleSelectTab = (key) => {
-    this.setState({ activeTab: key });
+  handleSelectTab = (tab) => {
+    const { pathname, query } = this.props.location;
+    this.props.router.push({
+      pathname,
+      query: Object.assign({}, query, { tab }),
+    });
   }
 
   render() {
-    const { props: { settings }, state: { activeTab, currencyOptions } } = this;
+    const { props: { settings, activeTab }, state: { currencyOptions } } = this;
 
     const currency = settings.getIn(['pricing', 'currency'], '');
-    const vat = settings.getIn(['pricing', 'vat'], '');
     const datetime = settings.get('billrun', Immutable.Map());
     const sharedSecret = settings.get('shared_secret', Immutable.Map());
     const tenant = settings.get('tenant', Immutable.Map());
@@ -146,7 +158,7 @@ class Settings extends Component {
 
           <Tab title="Tax" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
-              <Tax vat={vat} onChange={this.onChangeFieldValue} />
+              <Tax data={settings} onChange={this.onChangeFieldValue} />
             </Panel>
           </Tab>
 
@@ -176,7 +188,7 @@ class Settings extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  activeTab: props.location.query.tab,
+  activeTab: tabSelector(state, props, 'settings'),
   settings: state.settings,
 });
-export default connect(mapStateToProps)(Settings);
+export default withRouter(connect(mapStateToProps)(Settings));
