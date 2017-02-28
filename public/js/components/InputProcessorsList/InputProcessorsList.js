@@ -94,10 +94,17 @@ class InputProcessorsList extends Component {
     );
   }
 
-  onClickEnabled = (inputProcessor, e) => {
-    const { checked } = e.target;
+  onClickDisabled = (inputProcessor) => {
+    this.updateEnabled(inputProcessor, false);
+  }
+
+  onClickEnabled = (inputProcessor) => {
+    this.updateEnabled(inputProcessor, true);
+  }
+
+  updateEnabled = (inputProcessor, enabled) => {
     const fileType = inputProcessor.get('file_type', '');
-    this.props.dispatch(updateInputProcessorEnabled(fileType, checked))
+    this.props.dispatch(updateInputProcessorEnabled(fileType, enabled))
     .then(
       (response) => {
         if (response.status) {
@@ -122,14 +129,30 @@ class InputProcessorsList extends Component {
     });
   }
 
+  parseShowEnable = item => !item.get('enabled', true);
+  parseShowDisable = item => !(this.parseShowEnable(item));
+
+  getListActions = () => [
+    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickInputProcessor, show: true, onClickColumn: 'file_type' },
+    { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.onClickEnabled, show: this.parseShowEnable },
+    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickDisabled, show: this.parseShowDisable },
+    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove, show: true },
+  ];
+
+  parseInputProcessorStatus = item => (
+    item.get('enabled', true) ? 'Enabled' : 'Disabled'
+  );
+
   render() {
     const { inputProcessors } = this.props;
     const { showConfirmRemove, inputProcessor } = this.state;
     const inputProcessorName = inputProcessor ? inputProcessor.get('file_type') : '';
     const removeConfirmMessage = `Are you sure you want to remove input processor "${inputProcessorName}"?`;
     const fields = [
-      { id: "file_type", title: "Name" }
+      { id: 'file_type', title: 'Name' },
+      { id: 'enabled', title: 'Status', parser: this.parseInputProcessorStatus, cssClass: 'list-status-col' },
     ];
+    const actions = this.getListActions();
 
     return (
       <div className="InputProcessorsList">
@@ -144,7 +167,7 @@ class InputProcessorsList extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                <List items={inputProcessors} fields={fields} edit={true} onClickEdit={this.onClickInputProcessor} onSort={this.onSort} enableRemove={true} onClickRemove={this.onClickRemove} enableEnabled={true} onClickEnabled={this.onClickEnabled} />
+                <List items={inputProcessors} fields={fields} onSort={this.onSort} actions={actions} />
                 <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveCancel} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
               </div>
             </div>
