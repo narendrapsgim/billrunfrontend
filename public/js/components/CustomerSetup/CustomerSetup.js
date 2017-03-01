@@ -108,7 +108,7 @@ class CustomerSetup extends Component {
 
   afterSaveCustomer = (response) => {
     const { mode } = this.props;
-    if (response.status === true) {
+    if (response.status) {
       this.props.dispatch(clearItems('customers')); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`Customer was ${action}`));
@@ -140,7 +140,7 @@ class CustomerSetup extends Component {
 
   afterSaveSubscription = (response) => {
     const { aid } = this.props;
-    if (response.status === true) {
+    if (response.status) {
       this.props.dispatch(showSuccess('Customer was updated'));
       this.props.dispatch(getList('subscriptions', getSubscribersByAidQuery(aid)));
       return true;

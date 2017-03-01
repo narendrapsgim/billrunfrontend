@@ -1,5 +1,5 @@
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
-import { showSuccess } from './alertsActions';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { startProgressIndicator } from './progressIndicatorActions';
 
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
@@ -162,9 +162,10 @@ function saveSettingsToDB(categories, settings) {
   });
 
   return (dispatch) => {
+    dispatch(startProgressIndicator());
     return apiBillRun(queries).then(
       (success) => {
-        dispatch(showSuccess('Settings saved successfuly!'));
+        dispatch(apiBillRunSuccessHandler(success, 'Settings saved successfuly!'));
         return true;
       }
     ).catch((error) => {

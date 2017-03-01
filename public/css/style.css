@@ -139,6 +139,9 @@ fieldset[disabled] .btn {
   right: 0;
   padding: 5;
 }
+.alert-notifier-container .alert {
+  margin-bottom: 5px;
+}
 .alerts-enter {
   opacity: 0.01;
 }
