@@ -124,7 +124,7 @@ class CustomFields extends Component {
         <Tabs id="CustomFieldsTabs" animation={false} onSelect={this.onSelectTab}>
           { tabs.map(this.renderFieldsTab) }
         </Tabs>
-        <ActionButtons onClickSave={this.onClickSave} onClickCancel={this.onClickCancel} />
+        <ActionButtons onClickSave={this.onClickSave} onClickCancel={this.onClickCancel} cancelLabel="Reset changes" />
       </div>
     );
   }
