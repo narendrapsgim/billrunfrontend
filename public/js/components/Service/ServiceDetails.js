@@ -4,6 +4,7 @@ import { Form, FormGroup, ControlLabel, HelpBlock, Col } from 'react-bootstrap';
 import { ServiceDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
+import EntityFields from '../Entity/EntityFields';
 
 
 export default class ServiceDetails extends Component {
@@ -56,6 +57,10 @@ export default class ServiceDetails extends Component {
     this.props.updateItem(['description'], value);
   }
 
+  onChangeAdditionalField = (field, value) => {
+    this.props.updateItem([field], value);
+  }
+
   render() {
     const { errors } = this.state;
     const { item, mode } = this.props;
@@ -99,6 +104,13 @@ export default class ServiceDetails extends Component {
             <Field value={item.getIn(['price', 0, 'to'], '')} onChange={this.onChangeCycle} fieldType="unlimited" unlimitedValue={serviceCycleUnlimitedValue} unlimitedLabel="Infinite" editable={editable} />
           </Col>
         </FormGroup>
+
+        <EntityFields
+          entityName="services"
+          entity={item}
+          onChangeField={this.onChangeAdditionalField}
+          editable={true}
+        />
 
       </Form>
     );
