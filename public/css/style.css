@@ -239,6 +239,9 @@ fieldset[disabled] .btn {
 .List .table th.state {
   width: 60px;
 }
+.List .table th.list-status-col {
+    width: 90px;
+}
 
 .List .table th.edit-tb, .List .table td.edit-tb {
     width: 30px;

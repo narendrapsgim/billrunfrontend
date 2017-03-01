@@ -17,8 +17,10 @@ const Action = (props) => {
     'fa-eye': type === 'view',
     'fa-pencil': type === 'edit',
     'fa-files-o': type === 'clone',
-    'danger-red': type === 'remove',
+    'danger-red': type === 'remove' || type === 'enable',
     'fa-trash-o': type === 'remove',
+    'fa-toggle-off': type === 'enable',
+    'fa-toggle-on': type === 'disable',
   });
 
   const onClick = () => {

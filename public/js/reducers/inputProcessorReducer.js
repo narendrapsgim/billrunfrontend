@@ -4,6 +4,7 @@ import { SET_NAME,
          SET_PARSER_SETTING,
          SET_PROCESSOR_TYPE,
          SET_DELIMITER_TYPE,
+         UPDATE_INPUT_PROCESSOR_FIELD,
          GOT_PROCESSOR_SETTINGS,
          SET_FIELDS,
          SET_DELIMITER,
@@ -73,6 +74,9 @@ export default function (state = defaultState, action) {
 
     case SET_DELIMITER_TYPE:
       return state.set('delimiter_type', action.delimiter_type);
+
+    case UPDATE_INPUT_PROCESSOR_FIELD:
+      return state.setIn(action.fieldPath, action.value);
 
     case SET_DELIMITER:
       return state.set('delimiter', action.delimiter);
