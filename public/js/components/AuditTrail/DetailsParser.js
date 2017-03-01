@@ -32,25 +32,9 @@ class DetailsParser extends Component {
     this.setState({ showDiff: false });
   }
 
-  isCreateAction = () => {
+  isCompare = () => {
     const { item } = this.props;
-    const dataNew = item.get('new', Immutable.Map());
-    const dataOld = item.get('old', Immutable.Map());
-    return dataNew && !dataOld && !dataNew.isEmpty();
-  }
-
-  isDeletedAction = () => {
-    const { item } = this.props;
-    const dataNew = item.get('new', Immutable.Map());
-    const dataOld = item.get('old', Immutable.Map());
-    return !dataNew && dataOld && !dataOld.isEmpty();
-  }
-
-  isUpdateAction = () => {
-    const { item } = this.props;
-    const dataNew = item.get('new', Immutable.Map());
-    const dataOld = item.get('old', Immutable.Map());
-    return dataNew && dataOld && !dataNew.isEmpty() && !dataOld.isEmpty();
+    return item.get('new', null) && item.get('old', null);
   }
 
   renderDiff = () => {
@@ -89,7 +73,7 @@ class DetailsParser extends Component {
         <Button bsStyle="link" onClick={this.openDiff} style={{ verticalAlign: 'bottom' }}>
           <i className="fa fa-compress" />
           &nbsp;
-          {this.isUpdateAction() ? 'Compare' : 'Details'}
+          {this.isCompare() ? 'Compare' : 'Details'}
           { this.renderDiff() }
         </Button>
       </p>
