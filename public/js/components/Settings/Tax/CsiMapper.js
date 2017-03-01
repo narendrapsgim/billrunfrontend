@@ -6,15 +6,19 @@ import { FormGroup, Col, ControlLabel, Panel } from 'react-bootstrap';
 class CsiMapper extends Component {
 
   static propTypes = {
-    fileType: PropTypes.instanceOf(Immutable.Map),
+    fileType: PropTypes.string,
+    usageType: PropTypes.string,
     csiMap: PropTypes.instanceOf(Immutable.Map),
+    options: PropTypes.instanceOf(Immutable.List),
     disabled: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    fileType: Immutable.Map(),
+    fileType: '',
+    usageType: '',
     csiMap: Immutable.Map(),
+    options: Immutable.List(),
     disabled: false,
   };
 
@@ -25,37 +29,34 @@ class CsiMapper extends Component {
 
   onChangeOrigNum = (e) => {
     const { value } = e.target;
-    const { fileType } = this.props;
-    const mapName = fileType.get('file_type', '');
-    this.props.onChange(mapName, 'orig_num', value);
+    const { fileType, usageType } = this.props;
+    this.props.onChange(fileType, usageType, 'orig_num', value);
   }
 
   onChangeBillNum = (e) => {
     const { value } = e.target;
-    const { fileType } = this.props;
-    const mapName = fileType.get('file_type', '');
-    this.props.onChange(mapName, 'bill_num', value);
+    const { fileType, usageType } = this.props;
+    this.props.onChange(fileType, usageType, 'bill_num', value);
   }
 
   onChangeTermNum = (e) => {
     const { value } = e.target;
-    const { fileType } = this.props;
-    const mapName = fileType.get('file_type', '');
-    this.props.onChange(mapName, 'term_num', value);
+    const { fileType, usageType } = this.props;
+    this.props.onChange(fileType, usageType, 'term_num', value);
   }
 
 
   renderOptions = () => {
-    const { fileType } = this.props;
-    return fileType.getIn(['parser', 'custom_keys'], Immutable.List()).map(option => (
+    const { options } = this.props;
+    return options.map(option => (
       <option key={option} value={option}>{option}</option>
     ));
   }
 
   render() {
-    const { fileType, csiMap, disabled } = this.props;
+    const { fileType, usageType, csiMap, disabled } = this.props;
     return (
-      <Panel header={fileType.get('file_type', '')}>
+      <Panel header={`${fileType} - ${usageType}`}>
         <FormGroup>
           <Col componentClass={ControlLabel} md={2}>
             Original Number

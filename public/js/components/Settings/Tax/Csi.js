@@ -16,13 +16,14 @@ class Csi extends Component {
 
   static defaultProps = {
     csi: Immutable.Map(),
-    fileTypes: Immutable.Map(),
+    fileTypes: Immutable.List(),
     disabled: false,
     onChange: () => {},
   };
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     return this.props.disabled !== nextProps.disabled
+      || !Immutable.is(this.props.fileTypes, nextProps.fileTypes)
       || !Immutable.is(this.props.csi, nextProps.csi);
   }
 
@@ -54,12 +55,16 @@ class Csi extends Component {
     ));
   }
 
-  onChangeTaxationMapping = (fileType, filed, value) => {
+  onChangeTaxationMapping = (fileType, usaget, filed, value) => {
     const { csi } = this.props;
     const newCSI = csi.update('taxation_mapping', Immutable.List(), (list) => {
-      const taxationMapIndex = list.findIndex(taxationMap => taxationMap.get('file_type', '') === fileType);
+      const taxationMapIndex = list.findIndex(taxationMap => (
+        taxationMap.get('file_type', '') === fileType
+        && taxationMap.get('usaget', '') === usaget
+      ));
       if (taxationMapIndex === -1) {
         const newTaxationMap = Immutable.Map({
+          usaget,
           file_type: fileType,
           [filed]: value,
         });
@@ -70,25 +75,30 @@ class Csi extends Component {
     this.props.onChange(newCSI);
   }
 
-  renderTaxationMapping = () => {
-    const { csi, fileTypes, disabled } = this.props;
-    return fileTypes.map((inputProssesor, idx) => {
-      const mapper = csi
-        .get('taxation_mapping', Immutable.List())
-        .find(taxationMap => taxationMap.get('file_type', '') === inputProssesor.get('file_type', ''),
-          null,
-          Immutable.Map()
-        );
-      return (
-        <CsiMapper
-          key={idx}
-          fileType={inputProssesor}
-          csiMap={mapper}
-          disabled={disabled}
-          onChange={this.onChangeTaxationMapping}
-        />
+  getMapperFileType = (fileType) => {
+    const { csi } = this.props;
+    return csi
+      .get('taxation_mapping', Immutable.List())
+      .find(taxationMap => (
+          taxationMap.get('file_type', '') === fileType.get('fileType', '')
+          && taxationMap.get('usaget', '') === fileType.get('usageType', '')
+        ), null, Immutable.Map()
       );
-    }).toArray();
+  }
+
+  renderTaxationMapping = () => {
+    const { fileTypes, disabled } = this.props;
+    return fileTypes.map((fileType, idx) => (
+      <CsiMapper
+        key={idx}
+        csiMap={this.getMapperFileType(fileType)}
+        fileType={fileType.get('fileType', '')}
+        usageType={fileType.get('usageType', '')}
+        options={fileType.get('customKeys', Immutable.List())}
+        disabled={disabled}
+        onChange={this.onChangeTaxationMapping}
+      />
+    )).toArray();
   }
 
   render() {
