@@ -25,7 +25,7 @@ class CustomFields extends Component {
     account: Immutable.List(),
     defaultDisabledFields: {
       account: ['first_name', 'last_name', 'firstname', 'lastname', 'address'],
-      subscriber: ['firstname', 'lastname'],
+      subscriber: ['firstname', 'lastname', 'plan'],
     },
     defaultHiddenFields: {
       account: ['aid', 'payment_gateway'],
