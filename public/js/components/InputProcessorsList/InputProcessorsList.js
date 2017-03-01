@@ -21,6 +21,8 @@ class InputProcessorsList extends Component {
     this.state = {
       sort: '',
       showConfirmRemove: false,
+      showConfirmEnable: false,
+      showConfirmDisable: false,
       inputProcessor: null,
     };
   }
@@ -94,12 +96,50 @@ class InputProcessorsList extends Component {
     );
   }
 
-  onClickDisabled = (inputProcessor) => {
-    this.updateEnabled(inputProcessor, false);
+  onClickEnabled = (inputProcessor) => {
+    this.setState({
+      showConfirmEnable: true,
+      inputProcessor,
+    });
   }
 
-  onClickEnabled = (inputProcessor) => {
+  onClickEnableCancel = () => {
+    this.setState({
+      showConfirmEnable: false,
+      inputProcessor: null,
+    });
+  }
+
+  onClickEnableOk = () => {
+    const { inputProcessor } = this.state;
+    this.setState({
+      showConfirmEnable: false,
+      inputProcessor: null,
+    });
     this.updateEnabled(inputProcessor, true);
+  }
+
+  onClickDisabled = (inputProcessor) => {
+    this.setState({
+      showConfirmDisable: true,
+      inputProcessor,
+    });
+  }
+
+  onClickDisableCancel = () => {
+    this.setState({
+      showConfirmDisable: false,
+      inputProcessor: null,
+    });
+  }
+
+  onClickDisableOk = () => {
+    const { inputProcessor } = this.state;
+    this.setState({
+      showConfirmDisable: false,
+      inputProcessor: null,
+    });
+    this.updateEnabled(inputProcessor, false);
   }
 
   updateEnabled = (inputProcessor, enabled) => {
@@ -145,9 +185,11 @@ class InputProcessorsList extends Component {
 
   render() {
     const { inputProcessors } = this.props;
-    const { showConfirmRemove, inputProcessor } = this.state;
+    const { showConfirmRemove, showConfirmEnable, showConfirmDisable, inputProcessor } = this.state;
     const inputProcessorName = inputProcessor ? inputProcessor.get('file_type') : '';
     const removeConfirmMessage = `Are you sure you want to remove input processor "${inputProcessorName}"?`;
+    const enableConfirmMessage = `Are you sure you want to enable input processor "${inputProcessorName}"?`;
+    const disableConfirmMessage = `Are you sure you want to disable input processor "${inputProcessorName}"?`;
     const fields = [
       { id: 'file_type', title: 'Name' },
       { id: 'enabled', title: 'Status', parser: this.parseInputProcessorStatus, cssClass: 'list-status-col' },
@@ -169,6 +211,8 @@ class InputProcessorsList extends Component {
               <div className="panel-body">
                 <List items={inputProcessors} fields={fields} onSort={this.onSort} actions={actions} />
                 <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveCancel} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
+                <ConfirmModal onOk={this.onClickEnableOk} onCancel={this.onClickEnableCancel} show={showConfirmEnable} message={enableConfirmMessage} labelOk="Yes" />
+                <ConfirmModal onOk={this.onClickDisableOk} onCancel={this.onClickDisableCancel} show={showConfirmDisable} message={disableConfirmMessage} labelOk="Yes" />
               </div>
             </div>
           </div>
