@@ -56,35 +56,44 @@ class DetailsParser extends Component {
   renderDiff = () => {
     const { showDiff } = this.state;
     const { item } = this.props;
-    const dataNew = item.get('new', Immutable.Map());
-    const dataOld = item.get('old', Immutable.Map());
-    const itemNew = dataNew.delete('_id').toJS();
-    const itemOld = dataOld.delete('_id').toJS();
+    const dataNew = item.get('new', null);
+    const dataOld = item.get('old', null);
+    const itemNew = Immutable.Map.isMap(dataNew) ? dataNew.delete('_id').toJS() : '';
+    const itemOld = Immutable.Map.isMap(dataOld) ? dataOld.delete('_id').toJS() : '';
     return (
       <DiffModal show={showDiff} onClose={this.closeDiff} inputNew={itemNew} inputOld={itemOld} />
     );
   }
 
+  getActionLabel = (action) => {
+    switch (action) {
+      case 'closeandnew':
+        return 'New revision';
+      case 'update':
+        return 'Updated';
+      case 'delete':
+        return 'Deleted';
+      case 'create':
+        return 'Created';
+      default:
+        return '';
+    }
+  }
+
   renderMessage = () => {
     const { item } = this.props;
-    if (this.isCreateAction()) {
-      return (<span>Created</span>);
-    } else if (this.isDeletedAction()) {
-      return (<span>Deleted</span>);
-    } else if (this.isUpdateAction()) {
-      return (
-        <p>
-          { item.get('type', '') === 'closeandnew' ? 'New revision' : 'Updated' }
+    return (
+      <p>
+        { this.getActionLabel(item.get('type', '')) }
+        &nbsp;
+        <Button bsStyle="link" onClick={this.openDiff} style={{ verticalAlign: 'bottom' }}>
+          <i className="fa fa-compress" />
           &nbsp;
-          <Button bsStyle="link" onClick={this.openDiff} style={{ verticalAlign: 'bottom' }}>
-            <i className="fa fa-compress" />
-            &nbsp;Compare
-            { this.renderDiff() }
-          </Button>
-        </p>
-      );
-    }
-    return '';
+          {this.isUpdateAction() ? 'Compare' : 'Details'}
+          { this.renderDiff() }
+        </Button>
+      </p>
+    );
   }
 
   renderDetails = () => {
