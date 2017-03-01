@@ -9,7 +9,7 @@ var globalSetting = {
   datetimeFormat: "DD/MM/YYYY HH:mm",
   dateFormat: "DD/MM/YYYY",
   timeFormat: "HH:mm",
-  apiDateTimeFormat: "YYYY/MM/DD HH:mm:ss",
+  apiDateTimeFormat: "YYYY-MM-DD",
   currency: '$',
   list: {
     maxItems: 100
@@ -25,4 +25,24 @@ var globalSetting = {
   queue_calculators: ['customer', 'rate', 'pricing'],
   mail_support: 'cloud_support@billrun.com',
   logoMaxSize: 2,
+  systemItems: {
+    service: {
+      collection: 'services',
+      uniqueField: 'name',
+      itemType: 'service',
+      itemsType: 'services',
+    },
+    plan: {
+      collection: 'plans',
+      uniqueField: 'name',
+      itemType: 'plan',
+      itemsType: 'plans',
+    },
+    product: {
+      collection: 'rates',
+      uniqueField: 'key',
+      itemType: 'product',
+      itemsType: 'products',
+    },
+  },
 };

@@ -5,19 +5,28 @@
     "node": true,
   },
   "rules": {
-    "new-cap" : 0,
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "react/jsx-boolean-value": 0,
-    "react/forbid-prop-types": 0,
-    "react/sort-comp": [1, {
-      order: [
+    "new-cap" : "off",
+    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+    "react/jsx-boolean-value": "off",
+    "react/forbid-prop-types": "off",
+    "react/sort-comp": ["warn", {
+      "order": [
         'static-methods',
         'lifecycle',
         '/^init.+$/',
         'everything-else',
         'render'
       ]
-    }]
+    }],
+    "radix": ["error", "as-needed"],
+    'max-len': ['error', 100, 2, {
+      "ignoreUrls": true,
+      "ignoreComments": false,
+      "ignoreRegExpLiterals": true,
+      "ignoreStrings": true,
+      "ignoreTemplateLiterals": true,
+      "ignoreTrailingComments": true,
+    }],
   },
   "plugins": [
     "react"

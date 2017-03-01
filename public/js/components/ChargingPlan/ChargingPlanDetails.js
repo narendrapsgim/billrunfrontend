@@ -31,14 +31,14 @@ export default class ChargingPlanDetails extends Component {
     },
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
-  }
-
   componentDidMount() {
-    if (this.props.mode === 'new') {
+    if (this.props.mode === 'create') {
       this.setDefaultValues();
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
+    return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
   }
 
   onChangeName = (e) => {
@@ -96,7 +96,7 @@ export default class ChargingPlanDetails extends Component {
             </Col>
           </FormGroup>
 
-          {mode === 'new' &&
+          {mode === 'create' &&
             <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
               <Col componentClass={ControlLabel} sm={3} lg={2}>
                 Key

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, Button, HelpBlock } from 'react-bootstrap';
@@ -14,20 +14,22 @@ import ProductParamEdit from './components/ProductParamEdit';
 export default class Product extends Component {
 
   static propTypes = {
-    errorMessages: React.PropTypes.object,
-    mode: React.PropTypes.string.isRequired,
-    onFieldUpdate: React.PropTypes.func.isRequired,
-    onProductRateAdd: React.PropTypes.func.isRequired,
-    onProductRateRemove: React.PropTypes.func.isRequired,
-    onToUpdate: React.PropTypes.func.isRequired,
-    onUsagetUpdate: React.PropTypes.func.isRequired,
-    planName: React.PropTypes.string.isRequired,
-    product: React.PropTypes.object.isRequired,
-    usaget: React.PropTypes.string.isRequired,
-    usageTypes: React.PropTypes.object.isRequired,
+    product: PropTypes.instanceOf(Immutable.Map),
+    mode: PropTypes.string.isRequired,
+    usaget: PropTypes.string,
+    planName: PropTypes.string,
+    usageTypes: PropTypes.object.isRequired,
+    errorMessages: PropTypes.object,
+    onFieldUpdate: PropTypes.func.isRequired,
+    onProductRateAdd: PropTypes.func.isRequired,
+    onProductRateRemove: PropTypes.func.isRequired,
+    onToUpdate: PropTypes.func.isRequired,
+    onUsagetUpdate: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
+    planName: 'BASE',
+    product: Immutable.Map(),
     errorMessages: {
       name: {
         allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
@@ -83,7 +85,7 @@ export default class Product extends Component {
 
   onChangePrefix = (prefixes) => {
     const prefixesList = (prefixes.length) ? prefixes.split(',') : [];
-    this.props.onFieldUpdate(['params', 'prefix'], Immutable.List(prefixesList));
+    this.props.onFieldUpdate(['params', 'prefix'], Immutable.Set(prefixesList));
   }
 
   onChangeParamKey = (oldKey, newKey) => {
@@ -127,17 +129,19 @@ export default class Product extends Component {
 
   renderNewProductParam = () => {
     const { newProductParam } = this.state;
-
-    return newProductParam ?
-    (<ProductParamEdit
-      newParam={true}
-      onParamSave={this.onProductParamSave}
-      onParamEditClose={this.onParamEditClose}
-      paramKey={''}
-      paramValues={[]}
-      existingKeys={this.getExistingParamKeys()}
-    />)
-    : null;
+    if (newProductParam) {
+      return (
+        <ProductParamEdit
+          newParam={true}
+          onParamSave={this.onProductParamSave}
+          onParamEditClose={this.onParamEditClose}
+          paramKey={''}
+          paramValues={[]}
+          existingKeys={this.getExistingParamKeys()}
+        />
+      );
+    }
+    return null;
   }
 
   onProductRateUpdate = (index, fieldName, value) => {
@@ -173,12 +177,13 @@ export default class Product extends Component {
   }
 
   renderPrices = () => {
-    const { product, planName, usaget } = this.props;
+    const { product, planName, usaget, mode } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
     const prices = product.getIn(productPath, Immutable.List());
 
     return prices.map((price, i) =>
       <ProductPrice
+        mode={mode}
         count={prices.size}
         index={i}
         item={price}
@@ -190,16 +195,18 @@ export default class Product extends Component {
   }
 
   renderParameters = () => {
-    const { product } = this.props;
+    const { product, mode } = this.props;
     const params = product.get('params', Immutable.Map());
     const mainParams = Immutable.List(['prefix']);
     let index = 0;
+    const editable = (mode !== 'view');
 
     return params
       .filter((paramValues, paramKey) => !mainParams.includes(paramKey))
       .map((paramValues, paramKey) =>
         <ProductParam
           key={index++}
+          editable={editable}
           paramKey={paramKey}
           paramValues={paramValues.toJS()}
           existingKeys={this.getExistingParamKeys()}
@@ -215,6 +222,7 @@ export default class Product extends Component {
     const vatable = (product.get('vatable', false) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
     const availablePrefix = [];
+    const editable = (mode !== 'view');
 
     return (
       <Row>
@@ -227,17 +235,17 @@ export default class Product extends Component {
                   Title<Help contents={ProductDescription.description} />
                 </Col>
                 <Col sm={8} lg={9}>
-                  <Field onChange={this.onChangeDescription} value={product.get('description', '')} />
+                  <Field onChange={this.onChangeDescription} value={product.get('description', '')} editable={editable} />
                 </Col>
               </FormGroup>
 
-              {mode === 'new' &&
+              {mode === 'create' &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
                     Key<Help contents={ProductDescription.key} />
                   </Col>
                   <Col sm={8} lg={9}>
-                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={mode === 'update'} />
+                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={mode !== 'create'} editable={editable} />
                     { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
                   </Col>
                 </FormGroup>
@@ -246,34 +254,45 @@ export default class Product extends Component {
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>External Code</Col>
                 <Col sm={8} lg={9}>
-                  <Field onChange={this.onChangeCode} value={product.get('code', '')} />
+                  <Field onChange={this.onChangeCode} value={product.get('code', '')} editable={editable}  />
                 </Col>
               </FormGroup>
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Prefixes</Col>
                 <Col sm={8} lg={9}>
-                  <Select
-                    allowCreate
-                    multi={true}
-                    value={prefixs}
-                    options={availablePrefix}
-                    onChange={this.onChangePrefix}
-                    placeholder="Add Prefix..."
-                  />
+                  { editable
+                    ? (
+                      <Select
+                        allowCreate
+                        multi={true}
+                        value={prefixs}
+                        options={availablePrefix}
+                        onChange={this.onChangePrefix}
+                        placeholder="Add Prefix..."
+                      />
+                    )
+                    : <div className="non-editble-field">{ prefixs }</div>
+                  }
+
                 </Col>
               </FormGroup>
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
                 <Col sm={4}>
-                  <Select
-                    allowCreate
-                    disabled={mode === 'update'}
-                    onChange={this.onChangeUsaget}
-                    options={this.getUsageTypesOptions()}
-                    value={usaget}
-                  />
+                  { editable
+                    ? (
+                      <Select
+                        allowCreate
+                        disabled={mode !== 'create'}
+                        onChange={this.onChangeUsaget}
+                        options={this.getUsageTypesOptions()}
+                        value={usaget}
+                      />
+                    )
+                    : <div className="non-editble-field">{ usaget }</div>
+                  }
                 </Col>
               </FormGroup>
 
@@ -282,20 +301,33 @@ export default class Product extends Component {
             <Panel header={<h3>Pricing</h3>}>
               <Col lg={12} md={12}>
                 <FormGroup>
-                  <Checkbox checked={vatable} onChange={this.onChangeVatable}>
-                      This product is VAT rated
-                    </Checkbox>
+                  { editable
+                    ? (
+                      <Checkbox checked={vatable} onChange={this.onChangeVatable}>
+                        This product is VAT rated
+                      </Checkbox>
+                    )
+                    :
+                    (
+                      <div className="non-editble-field">
+                        { vatable
+                          ? 'This product is VAT rated'
+                          : 'This product is not VAT rated'
+                        }
+                      </div>
+                    )
+                }
                 </FormGroup>
               </Col>
               { this.renderPrices() }
               <br />
-              <CreateButton onClick={this.onProductRateAdd} label="Add New" />
+              { editable && <CreateButton onClick={this.onProductRateAdd} label="Add New" />}
             </Panel>
 
             <Panel header={<h3>Additional Parameters</h3>}>
               { this.renderParameters() }
               <br />
-              <CreateButton onClick={this.onProductParamAdd} label="Add New" />
+              { editable && <CreateButton onClick={this.onProductParamAdd} label="Add New" />}
             </Panel>
 
             {this.renderNewProductParam()}

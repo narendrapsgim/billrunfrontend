@@ -21,11 +21,11 @@ export default class Subscriptions extends Component {
     this.setState({ subscription: null });
   }
 
-  onSaveSubscription = (subscription, data) => {
-    this.props.onSaveSubscription(subscription, data, this.onSaveSuccessfully);
+  onSaveSubscription = (subscription) => {
+    this.props.onSaveSubscription(subscription).then(this.afterSave);
   };
 
-  onSaveSuccessfully = (response) => {
+  afterSave = (response) => {
     if (response) {
       this.setState({ subscription: null });
     }

@@ -8,24 +8,59 @@ html {
 textarea {
   resize: vertical;
 }
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus {
+  outline: none;
+}
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+  opacity: 0.3;
+}
+.clickable {
+  cursor: pointer;
+}
+.movable {
+    cursor: move;
+}
+.non-editble-field{
+  line-height: 32px;
+}
 .actions button.btn-sm {
     padding: 9px 12px;
+}
+.inline {
+  display: inline-block;;
 }
 .td-ellipsis{
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.td-actions {
+  width:1%;
+  white-space:nowrap;
+}
 
 .pl0{ padding-left: 0!important; }
 .pr0{ padding-right: 0!important; }
-.mb10{ margin-bottom: 0!important; }
+.mb0{ margin-bottom: 0!important; }
+.mb10{ margin-bottom: 10px!important; }
 .mr10{ margin-right: 10px!important; }
+.mr0{ margin-right: 0!important; }
 
 .full-width{ width: 100%!important; }
 
 /* General colors */
 .danger-red { color: #d9534f; }
+.disabled {
+  color: #6f6f6f;
+  background-color: #eeeeee;
+}
 /* ~Global */
 
 /* Main/Top menu */
@@ -201,6 +236,12 @@ textarea {
 .List .table th.short-date {
     width: 95px;
 }
+.List .table th.state {
+  width: 60px;
+}
+.List .table th.list-status-col {
+    width: 90px;
+}
 
 .List .table th.edit-tb, .List .table td.edit-tb {
     width: 30px;
@@ -234,6 +275,7 @@ textarea {
 .AdvancedFilter .react-datepicker__input-container{
   width: 100%
 }
+/* ~AdvancedFilter Date picker */
 #page-wrapper{
   margin-bottom: -30px;
   padding-bottom: 40px;
@@ -262,10 +304,98 @@ textarea {
   float: left;
 }
 
-.movable {
-    cursor: move;
-}
 .draggable-menu{
   background-color: #eee;
   opacity: .7;
 }
+
+.panel-no-border {
+  border: 0;
+  margin: 0;
+}
+/* Entity Revision */
+.entity-revision-history-popover {
+  max-width: none;
+}
+.cycle {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid #91A384;
+  margin: 0 auto;
+}
+.cycle.option {
+  display: inline-block;
+  vertical-align: text-top;
+}
+.cycle.expired {
+  background-color: #BDCCD4;
+}
+.cycle.future {
+  background-color: #FF931E;
+}
+.cycle.active {
+  background-color: #7AC943;
+}
+.cycle.all {
+  background: radial-gradient(closest-side, #7AC943, #FF931E, #BDCCD4);
+}
+ul.revision-history-list  {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+ul.revision-history-list li {
+  width: 50px;
+  display: inline-block;
+  text-align: center;
+  position: relative;
+}
+ul.revision-history-list li.more {
+  width: 20px;
+}
+ul.revision-history-list li.more::after {
+  border-bottom: 2px dotted #91A384;
+  width: 15px;
+  left: 23px;
+}
+ul.revision-history-list li.more.after::after {
+  left: -15px;
+}
+ul.revision-history-list li .cycle {
+  margin-bottom: 3px;
+}
+ul.revision-history-list li .date {
+  text-align: center;
+}
+
+ul.revision-history-list li::after {
+  content: "\0020";
+  position: absolute;
+  top: 7px;
+  left: 32px;
+  border-bottom: 2px solid #91A384;
+  width: 36px;
+}
+ul.revision-history-list li.last::after {
+  content: "";
+  width: 0;
+  border-bottom: none;
+}
+
+.entity-revision-edit ul.revision-history-list li .date {
+  color: #6f6f6f;
+}
+.entity-revision-edit ul.revision-history-list li.active .date{
+  font-weight: bold;
+  color: black;
+}
+.entity-revision-edit ul.revision-history-list li.active .cycle {
+  border-color: black;
+}
+.entity-revision-edit ul.revision-history-list li.more::after {
+  top: 10px;
+}
+
+/* ~Entity Revision */

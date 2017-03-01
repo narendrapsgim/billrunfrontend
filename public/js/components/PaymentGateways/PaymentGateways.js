@@ -7,7 +7,7 @@ import { savePaymentGatewayQuery, disablePaymentGatewayQuery } from '../../commo
 
 import { getSettings, addPaymentGateway, removePaymentGateway, updatePaymentGateway } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
-import { getPaymentGateways } from '../../actions/listActions';
+import { getList } from '../../actions/listActions';
 
 class PaymentGateways extends Component {
 
@@ -24,7 +24,11 @@ class PaymentGateways extends Component {
 
   componentDidMount() {
     this.props.dispatch(getSettings('payment_gateways'));
-    this.props.dispatch(getPaymentGateways());
+    const paymentGatewaysQuery = {
+      api: 'paymentgateways',
+      action: 'list',
+    };
+    this.props.dispatch(getList('supported_gateways', paymentGatewaysQuery));
   }
 
   onSaveGatewayParams = (gateway, enabled) => {

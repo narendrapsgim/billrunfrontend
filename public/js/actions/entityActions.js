@@ -1,125 +1,123 @@
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
-import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+import moment from 'moment';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
+import { getItemDateValue } from '../common/Util';
+import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
   GOT_ENTITY: 'GOT_ENTITY',
   UPDATE_ENTITY_FIELD: 'UPDATE_ENTITY_FIELD',
   DELETE_ENTITY_FIELD: 'DELETE_ENTITY_FIELD',
-  CLEAR_ENTITY: 'CLEAR_ENTITY'
+  CLEAR_ENTITY: 'CLEAR_ENTITY',
 };
 
-export function updateEntityField(collection, path, value) {
-  return {
-    type: actions.UPDATE_ENTITY_FIELD,
-    collection,
-    path,
-    value
-  };
-}
+export const updateEntityField = (collection, path, value) => ({
+  type: actions.UPDATE_ENTITY_FIELD,
+  collection,
+  path,
+  value,
+});
 
-export function deleteEntityField(collection, path) {
-  return {
-    type: actions.DELETE_ENTITY_FIELD,
-    collection,
-    path,
-  };
-}
+export const deleteEntityField = (collection, path) => ({
+  type: actions.DELETE_ENTITY_FIELD,
+  collection,
+  path,
+});
 
-export function gotEntity(collection, entity) {
-  return {
-    type: actions.GOT_ENTITY,
-    collection,
-    entity
-  };
-}
+export const gotEntity = (collection, entity) => ({
+  type: actions.GOT_ENTITY,
+  collection,
+  entity,
+});
 
-function buildUserRequestData(item, action) {
-  const formData = new FormData();
-  if (action === 'create') {
-    formData.append('update', JSON.stringify(item));
-  } else if (action === 'update') {
-    const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-    const update = item.delete('_id');
-    formData.append('query', JSON.stringify(query));
-    formData.append('update', JSON.stringify(update));
-  }
-  return formData;
-}
+export const clearEntity = collection => ({
+  type: actions.CLEAR_ENTITY,
+  collection,
+});
 
-function requestDataBuilder(collection, item, action) {
-  switch (collection) {
-    case 'users': return buildUserRequestData(item, action);
-    default: return new FormData();
-  }
-}
+const buildRequestData = (item, action) => {
+  switch (action) {
 
-function apiSaveEntity(collection, item, action) {
-  const body = requestDataBuilder(collection, item, action);
-  const query = {
-    entity: collection,
-    action,
-    options: {
-      method: 'POST',
-      body,
-    },
-  };
-  return apiBillRun(query);
-}
-
-export function saveEntity(collection, action = '') {
-  return (dispatch, getState) => {
-    dispatch(startProgressIndicator());
-    const { entity } = getState();
-    const item = entity.get(collection);
-    let saveAction;
-    if (action.length > 0) {
-      saveAction = action;
-    } else {
-      saveAction = item.getIn(['_id', '$id'], '').length > 0 ? 'update' : 'create';
+    case 'delete': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      return formData;
     }
-    return apiSaveEntity(collection, item, saveAction).then(
-      (success) => { // eslint-disable-line no-unused-vars
-        dispatch(finishProgressIndicator());
-        return (true);
-      }
-    ).catch((error) => {
-      dispatch(finishProgressIndicator());
-      return (error);
-    });
-  };
-}
 
-function fetchEntity(collection, query) {
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      success => {
-        dispatch(finishProgressIndicator());
-        const entity = success.data[0].data.details[0];
-        dispatch(gotEntity(collection, entity));
-      },
-      failure => {
-        dispatch(finishProgressIndicator());
-        console.log(failure);
-      }
-    ).catch(
-      error => {
-        dispatch(finishProgressIndicator());
-        dispatch(apiBillRunErrorHandler(error));
-      }
-    );
-  };
-}
+    case 'create': {
+      const formData = new FormData();
+      const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
+      const update = item.set('from', newFrom);
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
 
-export function getEntity(collection, query) {
-  return dispatch => {
-    return dispatch(fetchEntity(collection, query));
-  };
-}
+    case 'update': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      const update = item.delete('_id').delete('originalValue');
+      formData.append('query', JSON.stringify(query));
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
 
-export function clearEntity(collection) {
-  return {
-    type: actions.CLEAR_ENTITY,
-    collection
-  };
-}
+    case 'closeandnew': {
+      const formData = new FormData();
+
+      // Temp Fix
+      if (getItemDateValue(item, 'from').isBefore(moment()) || getItemDateValue(item, 'from').isSame(moment())) {
+        const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
+        formData.append('update', JSON.stringify(update));
+      } else {
+        const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
+        const update = item.delete('_id').set('from', newFrom).delete('originalValue');
+        formData.append('update', JSON.stringify(update));
+      }
+
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      return formData;
+    }
+
+    default:
+      return new FormData();
+  }
+};
+
+const requestDataBuilder = (collection, item, action) => {
+  switch (collection) {
+    default:
+      return buildRequestData(item, action);
+  }
+};
+
+export const saveEntity = (collection, item, action) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const body = requestDataBuilder(collection, item, action);
+  const query = apiEntityQuery(collection, action, body);
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
+};
+
+const fetchEntity = (collection, query) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  return apiBillRun(query)
+    .then((success) => {
+      dispatch(gotEntity(collection, success.data[0].data.details[0]));
+      return dispatch(apiBillRunSuccessHandler(success));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));
+};
+
+export const getEntity = (collection, query) => dispatch =>
+  dispatch(fetchEntity(collection, query));
+
+export const getEntityById = (name, collection, id) => (dispatch) => {
+  const query = getEntityByIdQuery(collection, id);
+  return dispatch(fetchEntity(name, query));
+};
+
+export const deleteEntity = (collection, item) => dispatch =>
+  dispatch(saveEntity(collection, item, 'delete'));

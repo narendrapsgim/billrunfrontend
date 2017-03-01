@@ -1,114 +1,98 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import moment from 'moment';
 import ChangeCase from 'change-case';
-
-import { getList } from '../../actions/listActions';
-
+import { Col, Row } from 'react-bootstrap';
 import Filter from '../Filter';
 import List from '../List';
 import Pager from '../Pager';
+import { prepaidBalancesListQuery } from '../../common/ApiQueries';
+import { getList } from '../../actions/listActions';
+
 
 class PrepaidBalances extends Component {
 
   static propTypes = {
-    balances: React.PropTypes.instanceOf(Immutable.List).isRequired,
-    aid: React.PropTypes.number.isRequired,
-    dispatch: React.PropTypes.func,
+    items: PropTypes.instanceOf(Immutable.List).isRequired,
+    aid: PropTypes.number.isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    balances: Immutable.List(),
-    aid: null,
-    dispatch: () => {},
+    items: Immutable.List(),
   };
 
-  constructor(props) {
-    super(props);
+  state = {
+    size: 10,
+    page: 0,
+    sort: Immutable.Map({ sid: 1 }),
+    filter: {},
+  };
 
-    this.state = {
-      aid: props.aid,
-      size: 10,
-      page: 0,
-      sort: '',
-      filter: '',
-    };
-  }
 
   onFilter = (filter) => {
-    this.setState({ filter, page: 0 }, this.getBalances);
+    this.setState({ filter, page: 0 }, this.fetchItems);
   }
 
-  onSort = (sort) => {
-    this.setState({ sort }, this.getBalances);
+  onSort = (newSort) => {
+    const sort = Immutable.Map(newSort);
+    this.setState({ sort }, this.fetchItems);
   }
 
-  getBalances = () => {
-    this.props.dispatch(getList('prepaidBalances', this.buildQuery()));
+  fetchItems = () => {
+    this.props.dispatch(getList('prepaid_balances', this.buildQuery()));
   }
 
   handlePageClick = (page) => {
-    this.setState({ page }, this.getBalances);
+    this.setState({ page }, this.fetchItems);
   }
 
   buildQuery = () => {
     const { size, page, sort, filter } = this.state;
-    /** TODO: Will probably change **/
-    return {
-      api: 'find',
-      params: [
-        { collection: 'balances' },
-        { size },
-        { page },
-        { sort },
-        { query: filter },
-      ],
-    };
+    return prepaidBalancesListQuery(filter, page, sort, size);
   }
 
-  usageTypeValueParser = (ent) => {
+  parserUsageTypeName = ent => ChangeCase.titleCase(ent.get('charging_by_usaget', ''));
+
+  parserUsageTypeValue = (ent) => {
     const usaget = ent.get('charging_by_usaget');
     const chargingBy = ent.get('charging_by');
     const balanceKey = (usaget === 'total_cost' ? ['cost'] : ['totals', usaget, chargingBy]);
     return ent.getIn(['balance', ...balanceKey], '');
   }
 
-  render() {
-    const { aid, balances } = this.props;
-    const baseFilter = { to: { $gt: moment().toISOString() }, aid, connection_type: 'prepaid' };
-    const fields = [
-      { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
-      { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
-      { id: 'pp_includes_name', placeholder: 'Bucket', sort: true },
-      { id: 'charging_by_usaget', placeholder: 'Usage Type Name', sort: true, showFilter: false, parser: ent => ChangeCase.titleCase(ent.get('charging_by_usaget', '')) },
-      { id: 'usaget_type_value', placeholder: 'Usage Type Value', sort: true, showFilter: false, parser: this.usageTypeValueParser },
-      { id: 'from', placeholder: 'From', showFilter: false, type: 'datetime' },
-      { id: 'to', placeholder: 'To', showFilter: false, type: 'datetime' },
-    ];
-    return (
-      <div className="PrepaidBalances">
-        <div className="row">
-          <div className="col-lg-12">
-            <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
-            <List items={balances} fields={fields} onSort={this.onSort} />
-          </div>
-        </div>
+  getTableFields = () => ([
+    { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
+    { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
+    { id: 'pp_includes_name', placeholder: 'Bucket', sort: true },
+    { id: 'charging_by_usaget', placeholder: 'Usage Type Name', sort: true, showFilter: false, parser: this.parserUsageTypeName },
+    { id: 'usaget_type_value', placeholder: 'Usage Type Value', sort: true, showFilter: false, parser: this.parserUsageTypeValue },
+    { id: 'from', placeholder: 'From', showFilter: false, type: 'datetime' },
+    { id: 'to', placeholder: 'To', showFilter: false, type: 'datetime' },
+  ]);
 
-        <Pager
-          onClick={this.handlePageClick}
-          size={this.state.size}
-          count={balances.size || 0}
-        />
+  render() {
+    const { aid, items } = this.props;
+    const { sort } = this.state;
+    const baseFilter = { aid, connection_type: 'prepaid' };
+    const fields = this.getTableFields();
+    return (
+      <div className="Prepaid-Balances">
+        <Row>
+          <Col lg={12}>
+            <Filter fields={fields} onFilter={this.onFilter} base={baseFilter} />
+            <List items={items} fields={fields} onSort={this.onSort} sort={sort} />
+          </Col>
+        </Row>
+        <Pager onClick={this.handlePageClick} size={this.state.size} count={items.size} />
       </div>
     );
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    balances: state.list.get('prepaidBalances'),
-  };
-}
+
+const mapStateToProps = state => ({
+  items: state.list.get('prepaid_balances'),
+});
 
 export default connect(mapStateToProps)(PrepaidBalances);

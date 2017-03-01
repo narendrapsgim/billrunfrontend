@@ -12,6 +12,7 @@ export default class PlanPrice extends Component {
     onPlanPriceUpdate: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
     count: PropTypes.number.isRequired,
+    mode: PropTypes.string,
     isTrialExist: PropTypes.bool.isRequired,
     item: PropTypes.instanceOf(Immutable.Map),
     planCycleUnlimitedValue: PropTypes.oneOfType([
@@ -22,6 +23,7 @@ export default class PlanPrice extends Component {
 
   static defaultProps = {
     planCycleUnlimitedValue: globalSetting.planCycleUnlimitedValue,
+    mode: 'create',
   };
 
   state = {
@@ -30,13 +32,14 @@ export default class PlanPrice extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { props: { count, index }, state: { cycleError, priceError } } = this;
+    const { props: { count, index, mode }, state: { cycleError, priceError } } = this;
     // if count was changed and this is last item
     const isLastAdded = count < nextProps.count && index === (count - 1);
     const isLastremoved = count > nextProps.count && index === (count - 2);
     const error = nextState.cycleError !== cycleError || nextState.priceError !== priceError;
     return !Immutable.is(this.props.item, nextProps.item)
-      || this.props.index !== nextProps.index
+      || index !== nextProps.index
+      || mode !== nextProps.mode
       || isLastAdded
       || isLastremoved
       || error;
@@ -92,7 +95,7 @@ export default class PlanPrice extends Component {
 
   render() {
     const { cycleError, priceError } = this.state;
-    const { item, index, count, isTrialExist, planCycleUnlimitedValue } = this.props;
+    const { item, index, count, isTrialExist, planCycleUnlimitedValue, mode } = this.props;
     const price = item.get('price', '');
     const trial = item.get('trial', false);
     const to = item.get('to', '');
@@ -100,19 +103,20 @@ export default class PlanPrice extends Component {
     const isFirst = (index === 0 || (isTrialExist && index === 1));
     const isLast = ((count === 0) || (count - 1 === index));
     const showRemoveButton = trial || isLast;
+    const editable = (mode !== 'view');
 
     return (
       <Row style={{ marginBottom: 10 }}>
         <Col lg={1} md={1} className="text-center">
           { isFirst && <ControlLabel style={{ marginBottom: 5 }}>Period</ControlLabel>}
-          <p style={{ marginTop: 9 }}>{ index + 1 }</p>
+          <p style={{ marginTop: editable ? 9 : 5 }}>{ index + 1 }</p>
         </Col>
         <Col lg={4} md={4} style={{ paddingRight: 0 }}>
           <FormGroup validationState={cycleError.length ? 'error' : null} style={{ margin: 0 }}>
             { isFirst && <ControlLabel style={{ marginBottom: 5 }}>Cycles</ControlLabel>}
             { (to === planCycleUnlimitedValue)
-              ? <Field value={cycle} disabled={true} />
-              : <Field value={cycle} onChange={this.onCycleUpdateEvent} fieldType="number" min={0} />
+              ? <Field value={cycle} disabled={true} editable={editable} />
+              : <Field value={cycle} onChange={this.onCycleUpdateEvent} fieldType="number" min={0} editable={editable} />
             }
             { cycleError.length > 0 && <HelpBlock>{cycleError}.</HelpBlock>}
           </FormGroup>
@@ -121,13 +125,13 @@ export default class PlanPrice extends Component {
         <Col lg={4} md={4} style={{ paddingRight: 0 }}>
           <FormGroup validationState={priceError.length ? 'error' : null} style={{ margin: 0 }}>
             { isFirst && <ControlLabel style={{ marginBottom: 5 }}>Price</ControlLabel>}
-            <Field onChange={this.onPlanPriceUpdate} value={price} />
+            <Field onChange={this.onPlanPriceUpdate} value={price} editable={editable} />
             { priceError.length > 0 && <HelpBlock>{priceError}.</HelpBlock>}
           </FormGroup>
         </Col>
 
         <Col lg={3} md={3} sm={3} xs={3}>
-          { showRemoveButton &&
+          { showRemoveButton && editable &&
             <FormGroup style={{ margin: 0 }}>
               { isFirst && <ControlLabel style={{ marginBottom: 5 }}>&nbsp;</ControlLabel>}
               <div style={{ width: '100%', height: 39 }}>

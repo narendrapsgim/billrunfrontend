@@ -2,60 +2,113 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import { Col, Panel, Button } from 'react-bootstrap';
+import moment from 'moment';
+import { Col, Panel } from 'react-bootstrap';
+import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
+import { EntityRevisionDetails } from '../Entity';
 import Product from './Product';
-import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-/* ACTIONS */
 import { onRateAdd, onRateRemove, onFieldUpdate, onToUpdate, onUsagetUpdate, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
 import { getSettings } from '../../actions/settingsActions';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
+import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
+import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
+import { buildPageTitle, getItemDateValue } from '../../common/Util';
 
 
 class ProductSetup extends Component {
 
-  static defaultProps = {
-    item: Immutable.Map(),
-    usaget: '',
-  };
-
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     itemId: PropTypes.string,
-    usaget: PropTypes.string,
-    usageTypes: PropTypes.instanceOf(Immutable.List),
+    revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
-    dispatch: PropTypes.func.isRequired,
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    activeTab: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    dispatch: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    item: Immutable.Map(),
+    revisions: Immutable.List(),
+    usageTypes: Immutable.List(),
+    activeTab: 1,
+  };
+
+  state = {
+    activeTab: parseInt(this.props.activeTab),
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
+    const { itemId, usageTypes } = this.props;
     if (itemId) {
-      this.props.dispatch(getProduct(itemId));
+      this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
     }
-    this.props.dispatch(getSettings('usage_types'));
+    if (usageTypes.isEmpty()) {
+      this.props.dispatch(getSettings('usage_types'));
+    }
   }
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'new') {
-      this.props.dispatch(setPageTitle('Create New Product'));
+    if (mode === 'create') {
+      const pageTitle = buildPageTitle(mode, 'product');
+      this.props.dispatch(setPageTitle(pageTitle));
     }
+    this.initDefaultValues();
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item } = this.props;
-    const { item: nextItem, mode } = nextProps;
-    if (mode === 'update' && item.get('key') !== nextItem.get('key')) {
-      this.props.dispatch(setPageTitle(`Edit product - ${nextItem.get('key')}`));
+    const { item, mode, itemId, revisions } = nextProps;
+    const { item: oldItem,
+      itemId: oldItemId,
+      mode: oldMode,
+      revisions: oldRevisions,
+    } = this.props;
+    if (mode !== oldMode || oldItem.get('key') !== item.get('key')) {
+      const pageTitle = buildPageTitle(mode, 'product', item);
+      this.props.dispatch(setPageTitle(pageTitle));
+
+      this.props.dispatch(setPageTitle(pageTitle));
     }
+    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
+      this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !Immutable.is(this.props.item, nextState.item)
+      || !Immutable.is(this.props.revisions, nextState.revisions)
+      || this.props.activeTab !== nextProps.activeTab
+      || this.props.itemId !== nextProps.itemId
+      || this.props.mode !== nextProps.mode;
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearProduct());
+  }
+
+  initDefaultValues = () => {
+    const { mode, item } = this.props;
+    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+      const defaultFromValue = moment().add(1, 'days').toISOString();
+      this.props.dispatch(onFieldUpdate(['from'], defaultFromValue));
+    }
+  }
+
+  initRevisions = () => {
+    const { item, revisions } = this.props;
+    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+      const key = item.get('key', '');
+      this.props.dispatch(getRevisions('rates', 'key', key));
+    }
   }
 
   onFieldUpdate = (path, value) => {
@@ -82,33 +135,61 @@ class ProductSetup extends Component {
     this.props.dispatch(onRateRemove(productPath, index));
   }
 
-  handleBack = () => {
-    this.props.router.push('/products');
+  afterItemReceived = (response) => {
+    if (response.status) {
+      this.initRevisions();
+      this.initDefaultValues();
+    } else {
+      this.handleBack();
+    }
+  }
+
+  afterSave = (response) => {
+    const { mode, item } = this.props;
+    if (response.status) {
+      const key = item.get('key', '');
+      this.props.dispatch(clearRevisions('rates', key)); //
+      const action = (mode === 'create' || mode === 'closeandnew') ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The product was ${action}`));
+      this.handleBack(true);
+    }
   }
 
   handleSave = () => {
     const { item, mode } = this.props;
-    this.props.dispatch(saveProduct(item, mode, this.afterSave));
+    this.props.dispatch(saveProduct(item, mode)).then(this.afterSave);
   }
 
-  afterSave = (data) => {
-    if (typeof data.error !== 'undefined' && data.error.length) {
-      console.log('error on save : ', data);
-    } else {
-      this.props.router.push('/products');
+  handleBack = (itemWasChanged = false) => {
+    if (itemWasChanged) {
+      this.props.dispatch(clearItems('product')); // refetch items list because item was (changed in / added to) list
     }
+    const listUrl = globalSetting.systemItems.product.itemsType;
+
+    this.props.router.push(`/${listUrl}`);
   }
 
   render() {
-    const { item, usaget, usageTypes, mode } = this.props;
-
-    // in update mode wait for item before render edit screen
-    if (mode === 'update' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    const { item, usageTypes, mode, revisions } = this.props;
+    if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
+    const usaget = item.get('rates', Immutable.Map()).keySeq().first();
     return (
       <Col lg={12}>
+
+        <Panel>
+          <EntityRevisionDetails
+            revisions={revisions}
+            item={item}
+            mode={mode}
+            onChangeFrom={this.onFieldUpdate}
+            itemName="product"
+            backToList={this.handleBack}
+          />
+        </Panel>
+
         <Panel>
           <Product
             mode={mode}
@@ -123,22 +204,19 @@ class ProductSetup extends Component {
             usageTypes={usageTypes}
           />
         </Panel>
-        <div style={{ marginTop: 12 }}>
-          <Button onClick={this.handleSave} bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
-          <Button onClick={this.handleBack} bsStyle="default">Cancel</Button>
-        </div>
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
       </Col>
     );
   }
 }
 
-
-const mapStateToProps = (state, props) => {
-  const { product: item } = state;
-  const { itemId, action: mode = (itemId) ? 'update' : 'new' } = props.params;
-  const usageTypes = state.settings.get('usage_types', Immutable.List());
-  const usaget = item.get('rates', Immutable.Map()).keySeq().first();
-  return { itemId, item, mode, usaget, usageTypes };
-};
+const mapStateToProps = (state, props) => ({
+  itemId: idSelector(state, props, 'product'),
+  item: itemSelector(state, props, 'product'),
+  mode: modeSelector(state, props, 'product'),
+  activeTab: tabSelector(state, props, 'product'),
+  revisions: revisionsSelector(state, props, 'product'),
+  usageTypes: state.settings.get('usage_types'),
+});
 
 export default withRouter(connect(mapStateToProps)(ProductSetup));

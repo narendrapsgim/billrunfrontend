@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import Immutable from 'immutable';
 
 import { getFieldName } from '../../common/Util';
@@ -33,12 +34,13 @@ export default class Queue extends Component {
             <div className="panel panel-default">
               <div className="panel-body">
                 {line.keySeq().map((field, key) => {
+                  const formattedValue = (field === 'calc_time') ? moment.unix(line.get(field)).format(globalSetting.datetimeFormat) : line.get(field);
                   if (hiddenFields.includes(field)) return (null);
                   return (
                     <div className="form-group" key={key}>
                       <label className="col-lg-2 control-label" htmlFor="input">{ getFieldName(field, 'queue') }</label>
                       <div className="col-lg-4">
-                        <input disabled className="form-control" value={line.get(field)} />
+                        <input disabled className="form-control" value={formattedValue} />
                       </div>
                     </div>
                   );

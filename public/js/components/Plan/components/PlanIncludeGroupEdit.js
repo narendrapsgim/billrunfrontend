@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Modal, Col, Button, Form, FormGroup, ControlLabel, Checkbox } from 'react-bootstrap';
+import React, { Component, PropTypes } from 'react';
+import { Modal, Col, Button, Form, FormGroup, ControlLabel, Checkbox, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
 import { GroupsInclude } from '../../../FieldDescriptions';
@@ -11,38 +10,35 @@ import Products from './Products';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 
 
-class PlanIncludeGroupEdit extends Component {
+export default class PlanIncludeGroupEdit extends Component {
 
   static propTypes = {
-    onChangeFieldValue: React.PropTypes.func.isRequired,
-    removeGroupProducts: React.PropTypes.func.isRequired,
-    getGroupProducts: React.PropTypes.func.isRequired,
-    addGroupProducts: React.PropTypes.func.isRequired,
-    onGroupRemove: React.PropTypes.func.isRequired,
-    usaget: React.PropTypes.string.isRequired,
-    shared: React.PropTypes.bool,
-    name: React.PropTypes.string.isRequired,
-    value: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number,
+    name: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
     ]).isRequired,
-    allGroupsProductsKeys: React.PropTypes.instanceOf(Immutable.Set),
-    groupProducts: React.PropTypes.instanceOf(Immutable.List),
+    usaget: PropTypes.string.isRequired,
+    shared: PropTypes.bool,
+    products: PropTypes.instanceOf(Immutable.List),
+    usedProducts: PropTypes.instanceOf(Immutable.List),
+    onChangeFieldValue: PropTypes.func.isRequired,
+    removeGroupProducts: PropTypes.func.isRequired,
+    addGroupProducts: PropTypes.func.isRequired,
+    mode: PropTypes.string,
+    onGroupRemove: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    groupProducts: Immutable.List(),
+    products: Immutable.List(),
+    usedProducts: Immutable.List(),
     shared: false,
+    mode: 'create',
   };
 
   state = {
     isEditMode: false,
     showConfirm: false,
-  }
-
-  componentWillMount() {
-    const { name, usaget } = this.props;
-    this.props.getGroupProducts(name, usaget);
   }
 
   onChangeInclud = (value) => {
@@ -75,8 +71,8 @@ class PlanIncludeGroupEdit extends Component {
   }
 
   onGroupRemoveOk = () => {
-    const { name, usaget, groupProducts } = this.props;
-    this.props.onGroupRemove(name, usaget, groupProducts.toArray());
+    const { name, products } = this.props;
+    this.props.onGroupRemove(name, products);
     this.setState({ showConfirm: false });
   }
 
@@ -88,10 +84,15 @@ class PlanIncludeGroupEdit extends Component {
     this.setState({ isEditMode: !this.state.isEditMode });
   }
 
-  renderEdit = () => {
-    const { name, value, usaget, shared, groupProducts, allGroupsProductsKeys } = this.props;
-    const { isEditMode } = this.state;
+  renderProductsTooltip = productsLabels => (
+    <Tooltip id={productsLabels}>
+      {productsLabels}
+    </Tooltip>
+  )
 
+  renderEdit = () => {
+    const { name, value, usaget, shared, products, usedProducts } = this.props;
+    const { isEditMode } = this.state;
     return (
       <Modal show={isEditMode}>
         <Modal.Header closeButton={false}>
@@ -115,9 +116,13 @@ class PlanIncludeGroupEdit extends Component {
             <FormGroup>
               <Col componentClass={ControlLabel} sm={3}>Products</Col>
               <Col sm={8}>
-                <Products onRemoveProduct={this.onRemoveProduct} products={groupProducts} />
+                <Products onRemoveProduct={this.onRemoveProduct} products={products} />
                 <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
-                  <ProductSearchByUsagetype addRatesToGroup={this.onAddProduct} usaget={usaget} products={allGroupsProductsKeys.toList()} />
+                  <ProductSearchByUsagetype
+                    addRatesToGroup={this.onAddProduct}
+                    usaget={usaget}
+                    products={usedProducts.toList()}
+                  />
                 </div>
               </Col>
             </FormGroup>
@@ -131,33 +136,35 @@ class PlanIncludeGroupEdit extends Component {
   }
 
   render() {
-    const { name, value, usaget, shared, groupProducts } = this.props;
+    const { name, value, usaget, shared, products, mode } = this.props;
     const { showConfirm } = this.state;
     const confirmMessage = `Are you sure you want to remove ${name} group?`;
     const sharedLabel = shared ? 'Yes' : 'No';
-    const productsLabel = groupProducts.join(', ');
+    const productsLabels = products.join(', ');
     const valueLabel = changeCase.titleCase(value);
-
+    const allowEdit = mode !== 'view';
+    const tooltip = this.renderProductsTooltip(productsLabels);
     return (
       <tr>
         <td className="td-ellipsis">{name}</td>
         <td className="td-ellipsis">{usaget}</td>
         <td className="td-ellipsis">{valueLabel}</td>
-        <td className="td-ellipsis">{productsLabel}</td>
-        <td className="td-ellipsis text-center">{sharedLabel}</td>
-        <td className="text-right" style={{ paddingRight: 0 }}>
-          <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
-          <Button onClick={this.onGroupRemoveAsk} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
-          <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
-          { this.renderEdit() }
+        <td className="td-ellipsis">
+          <OverlayTrigger placement="left" overlay={tooltip}>
+            <span>{productsLabels}</span>
+          </OverlayTrigger>
         </td>
+        <td className="td-ellipsis text-center">{sharedLabel}</td>
+        { allowEdit &&
+          <td className="text-right" style={{ paddingRight: 0 }}>
+            <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
+            <Button onClick={this.onGroupRemoveAsk} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+            <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
+            { this.renderEdit() }
+          </td>
+        }
       </tr>
     );
   }
 
 }
-
-const mapStateToProps = (state, props) => ({
-  groupProducts: state.planProducts.productIncludeGroup.getIn([props.name, props.usaget]),
-});
-export default connect(mapStateToProps)(PlanIncludeGroupEdit);

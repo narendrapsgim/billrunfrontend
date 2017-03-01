@@ -1,119 +1,33 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import Immutable from 'immutable';
-import { withRouter } from 'react-router';
+import EntityList from '../EntityList';
 
-import { getList } from '../../actions/listActions';
 
-import { Row, Col, Panel, Button } from 'react-bootstrap';
-import List from '../List';
-import Filter from '../Filter';
-import Pager from '../Pager';
+const PrepaidIncludesList = () => {
+  const fields = [
+    { id: 'name', sort: true },
+    { id: 'charging_by', showFilter: false },
+    { id: 'charging_by_usaget', showFilter: false },
+    { id: 'priority', showFilter: false, sort: true },
+  ];
 
-class PrepaidIncludesList extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      size: 10,
-      page: 0,
-      sort: '',
-      filter: {}
-    };
-  }
-
-  buildQuery = () => {
-    const { size, page, sort, filter } = this.state;
-    return {
-      api: 'find',
-      params: [
-	{ collection: "prepaidincludes" },
-	{ size },
-	{ page },
-	{ sort },
-	{ query: filter }
-      ]
-    };
-  }
-
-  getPPList = () => {
-    this.props.dispatch(getList("prepaid_includes", this.buildQuery()));
-  }
-  
-  handlePageClick = (page) => {
-    this.setState({page}, this.getPPList);
-  }
-  
-  onFilter = (filter) => {
-    this.setState({filter, page: 0}, this.getPPList);
-  }
-
-  onSort = (sort) => {
-    this.setState({sort}, this.getPPList);
-  }
-
-  onClickPP = (pp) => {
-    const pp_id = pp.getIn(['_id', '$id']);
-    this.props.router.push({
-      pathname: "prepaid_include",
-      query: {
-	action: "update",
-	pp_id
-      }
-    });
-  }
-
-  onNew = () => {
-    this.props.router.push({
-      pathname: "prepaid_include",
-      query: {
-	action: "new"
-      }
-    });
+  const projectFields = {
+    charging_by_usaget: 1,
+    charging_by: 1,
+    priority: 1,
+    name: 1,
   };
-  
-  render() {
-    const { pp_includes } = this.props;
-    const fields = [
-      { id: 'name' },
-      { id: 'charging_by', showFilter: false },
-      { id: 'charging_by_usaget', showFilter: false },
-      { id: 'priority', showFilter: false }
-    ];
 
-    const header = (
-      <h3>
-	List of all available prepaid buckets
-        <div className="pull-right">
-          <Button bsSize="xsmall" className="btn-primary" onClick={ this.onNew }><i className="fa fa-plus"/>&nbsp;Add New</Button>
-        </div>	
-      </h3>
-    );
-    
-    return (
-      <div className="PrepaidIncludesList">
-	<Row>
-	  <Col lg={12} md={12}>
-	    <Panel header={ header }>
-	      <Filter fields={ fields } onFilter={ this.onFilter } />
-	      <List items={ pp_includes } fields={ fields } edit={ true } editField="name" onClickEdit={ this.onClickPP } onSort={ this.onSort } />
-	    </Panel>
-	  </Col>
-	</Row>
-	<div>
-	  <Pager onClick={ this.handlePageClick }
-		 size={ this.state.size }
-		 count={ pp_includes.size || 0 } />
-	</div>
-      </div>
-    );
-  }
-}
+  return (
+    <EntityList
+      collection="prepaidincludes"
+      itemType="prepaid_include"
+      itemsType="prepaid_includes"
+      filterFields={fields}
+      tableFields={fields}
+      projectFields={projectFields}
+    />
+  );
+};
 
-function mapStateToProps(state) {
-  return {
-    pp_includes: state.list.get('prepaid_includes', Immutable.List())
-  };
-}
 
-export default withRouter(connect(mapStateToProps)(PrepaidIncludesList));
+export default PrepaidIncludesList;

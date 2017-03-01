@@ -60,21 +60,28 @@ class DetailsParser extends Component {
     const dataOld = item.get('old', Immutable.Map());
     const itemNew = dataNew.delete('_id').toJS();
     const itemOld = dataOld.delete('_id').toJS();
-    return (<DiffModal show={showDiff} onClose={this.closeDiff} inputNew={itemNew} inputOld={itemOld} />);
+    return (
+      <DiffModal show={showDiff} onClose={this.closeDiff} inputNew={itemNew} inputOld={itemOld} />
+    );
   }
 
   renderMessage = () => {
+    const { item } = this.props;
     if (this.isCreateAction()) {
       return (<span>Created</span>);
     } else if (this.isDeletedAction()) {
       return (<span>Deleted</span>);
     } else if (this.isUpdateAction()) {
       return (
-        <Button bsStyle="link" onClick={this.openDiff} style={{ width: '100%' }}>
-          <i className="fa fa-compress" />
-          &nbsp;Compare
-          { this.renderDiff() }
-        </Button>
+        <p>
+          { item.get('type', '') === 'closeandnew' ? 'New revision' : 'Updated' }
+          &nbsp;
+          <Button bsStyle="link" onClick={this.openDiff} style={{ verticalAlign: 'bottom' }}>
+            <i className="fa fa-compress" />
+            &nbsp;Compare
+            { this.renderDiff() }
+          </Button>
+        </p>
       );
     }
     return '';

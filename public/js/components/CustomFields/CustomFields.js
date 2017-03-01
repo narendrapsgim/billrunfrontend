@@ -12,8 +12,8 @@ import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldP
 class CustomFields extends Component {
 
   static propTypes = {
-    subscriber: PropTypes.instanceOf(Immutable.List),
-    account: PropTypes.instanceOf(Immutable.List),
+    subscriber: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
+    account: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     defaultDisabledFields: PropTypes.object,
     defaultHiddenFields: PropTypes.object,
     tabs: PropTypes.arrayOf(PropTypes.string),
@@ -24,8 +24,8 @@ class CustomFields extends Component {
     subscriber: Immutable.List(),
     account: Immutable.List(),
     defaultDisabledFields: {
-      account: ['first_name', 'last_name'],
-      subscriber: ['firstname', 'lastname'],
+      account: ['first_name', 'last_name', 'firstname', 'lastname', 'address'],
+      subscriber: ['firstname', 'lastname', 'plan'],
     },
     defaultHiddenFields: {
       account: ['aid', 'payment_gateway'],
@@ -124,11 +124,12 @@ class CustomFields extends Component {
         <Tabs id="CustomFieldsTabs" animation={false} onSelect={this.onSelectTab}>
           { tabs.map(this.renderFieldsTab) }
         </Tabs>
-        <ActionButtons onClickSave={this.onClickSave} onClickCancel={this.onClickCancel} />
+        <ActionButtons onClickSave={this.onClickSave} onClickCancel={this.onClickCancel} cancelLabel="Reset changes" />
       </div>
     );
   }
 }
+
 
 const mapStateToProps = state => ({
   subscriber: state.settings.getIn(['subscribers', 'subscriber', 'fields']),
