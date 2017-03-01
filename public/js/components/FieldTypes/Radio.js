@@ -23,6 +23,7 @@ const Radio = ({ name, id, value, editable, disabled, checked, label, onChange }
     return (
       <label htmlFor={id} style={{ paddingTop: '10px' }}>
         {inputField}
+        &nbsp;
         {label}
       </label>
     );

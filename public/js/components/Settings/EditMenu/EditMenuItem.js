@@ -141,7 +141,7 @@ class EditMenuItem extends Component {
   render() {
     const { props: { item, editShow }, state: { mouseOver, editMode } } = this;
     const show = item.get('show', false);
-
+    const checkboxStyle = { marginTop: 10 };
     return (
       <Col md={12} onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
 
@@ -155,7 +155,7 @@ class EditMenuItem extends Component {
           { mouseOver && !editMode && this.renderMouseOver() }
         </Col>
 
-        <Col md={2} className="text-right">
+        <Col md={2} className="text-right" style={checkboxStyle}>
           <Field onChange={this.onChangeShowHide} value={show} fieldType="checkbox" disabled={!editShow} />
         </Col>
 
