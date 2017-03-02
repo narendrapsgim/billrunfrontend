@@ -3,8 +3,13 @@ import moment from 'moment';
 import changeCase from 'change-case';
 import FieldNames from '../FieldNames';
 
-
-export const getConfig = (key, defaultValue) => {
+/**
+ * Get data from globalSettings.js file
+ * @param  {[String/Array of strings]} key/path in globalSettings
+ * @param  {[Any]} [defaultValue=null] If key/Path not exist
+ * @return {[Any]} Value from globalSettings.js or default value if key/path not exist
+ */
+export const getConfig = (key, defaultValue = null) => {
   const path = Array.isArray(key) ? key : [key];
   return Immutable.fromJS(globalSetting).getIn(path, defaultValue);
 };
