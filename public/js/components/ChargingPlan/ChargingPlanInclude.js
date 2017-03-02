@@ -39,7 +39,7 @@ const ChargingPlanInclude = (props) => {
           <FormGroup>
             <Col componentClass={ControlLabel} md={2}> Volume </Col>
             <Col md={9}>
-              <Field id="usagev" value={include.get('usagev', 0)} onChange={onUpdateField} fieldType="number" />
+              <Field id="usagev" value={include.get('usagev', 0)} onChange={onUpdateField} fieldType="number" editable={props.editable} />
             </Col>
           </FormGroup>
 
@@ -47,10 +47,15 @@ const ChargingPlanInclude = (props) => {
             <Col componentClass={ControlLabel} md={2}> Duration </Col>
             <Col md={9}>
               <Col md={6} style={{ paddingLeft: 0 }}>
-                <Field id="duration" value={include.getIn(['period', 'duration'], 0)} onChange={onUpdatePeriodField} fieldType="number" />
+                { props.editable
+                  ? <Field id="duration" value={include.getIn(['period', 'duration'], 0)} onChange={onUpdatePeriodField} fieldType="number" editable={props.editable} />
+                  : <div className="non-editble-field">{`${include.getIn(['period', 'duration'], 0)} ${include.getIn(['period', 'unit'], '')}`}</div>
+                }
               </Col>
               <Col md={6}>
-                <Select options={unitOptions} value={include.getIn(['period', 'unit'], '')} onChange={onSelectPeriodUnit} />
+                { props.editable &&
+                  <Select options={unitOptions} value={include.getIn(['period', 'unit'], '')} onChange={onSelectPeriodUnit} />
+                }
               </Col>
             </Col>
           </FormGroup>
@@ -64,6 +69,7 @@ const ChargingPlanInclude = (props) => {
 ChargingPlanInclude.defaultProps = {
   include: Map(),
   type: '',
+  editable: true,
 };
 
 ChargingPlanInclude.propTypes = {
@@ -71,6 +77,7 @@ ChargingPlanInclude.propTypes = {
   type: PropTypes.string,
   onUpdatePeriodField: PropTypes.func.isRequired,
   onUpdateField: PropTypes.func.isRequired,
+  editable: PropTypes.bool,
 };
 
 export default connect()(ChargingPlanInclude);
