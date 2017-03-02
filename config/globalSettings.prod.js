@@ -37,6 +37,7 @@ var globalSetting = {
     prepaid_plan: {
       collection: 'plans',
       uniqueField: 'name',
+      itemName: 'Prepaid Plan',
       itemType: 'prepaid_plan',
       itemsType: 'prepaid_plans',
     },
