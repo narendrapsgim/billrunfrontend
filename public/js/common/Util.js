@@ -4,6 +4,11 @@ import changeCase from 'change-case';
 import FieldNames from '../FieldNames';
 
 
+export const getConfig = (key, defaultValue) => {
+  const path = Array.isArray(key) ? key : [key];
+  return Immutable.fromJS(globalSetting).getIn(path, defaultValue);
+};
+
 export const titlize = str => changeCase.upperCaseFirst(str);
 
 export const getFieldName = (field, category) => {
@@ -29,25 +34,25 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     }
 
     case 'closeandnew': {
-      const entitySettings = globalSetting.systemItems[entityName];
+      const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `Edit ${entitySettings.itemType} - ${item.get(entitySettings.uniqueField, '')}`;
+        return `Edit ${entitySettings.get('itemType', '')} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'Edit';
     }
 
     case 'view': {
-      const entitySettings = globalSetting.systemItems[entityName];
+      const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `${changeCase.upperCaseFirst(entitySettings.itemType)} - ${item.get(entitySettings.uniqueField, '')}`;
+        return `${changeCase.upperCaseFirst(entitySettings.get('itemType', ''))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'View';
     }
 
     case 'update': {
-      const entitySettings = globalSetting.systemItems[entityName];
+      const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `Update ${entitySettings.itemType} - ${item.get(entitySettings.uniqueField, '')}`;
+        return `Update ${entitySettings.get('itemType', '')} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'Update';
     }

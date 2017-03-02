@@ -14,7 +14,7 @@ import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
-import { buildPageTitle, getItemDateValue } from '../../common/Util';
+import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
 
 
 class ProductSetup extends Component {
@@ -162,7 +162,7 @@ class ProductSetup extends Component {
     if (itemWasChanged) {
       this.props.dispatch(clearItems('product')); // refetch items list because item was (changed in / added to) list
     }
-    const listUrl = globalSetting.systemItems.product.itemsType;
+    const listUrl = getConfig(['systemItems', 'product', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
   }
 
