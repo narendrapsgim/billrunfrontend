@@ -75,8 +75,6 @@ class ProductSetup extends Component {
     if (mode !== oldMode || oldItem.get('key') !== item.get('key')) {
       const pageTitle = buildPageTitle(mode, 'product', item);
       this.props.dispatch(setPageTitle(pageTitle));
-
-      this.props.dispatch(setPageTitle(pageTitle));
     }
     if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
       this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
@@ -148,7 +146,7 @@ class ProductSetup extends Component {
     const { mode, item } = this.props;
     if (response.status) {
       const key = item.get('key', '');
-      this.props.dispatch(clearRevisions('rates', key)); //
+      this.props.dispatch(clearRevisions('rates', key));
       const action = (mode === 'create' || mode === 'closeandnew') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The product was ${action}`));
       this.handleBack(true);
@@ -165,7 +163,6 @@ class ProductSetup extends Component {
       this.props.dispatch(clearItems('product')); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = globalSetting.systemItems.product.itemsType;
-
     this.props.router.push(`/${listUrl}`);
   }
 
