@@ -25,9 +25,22 @@ export const saveQuery = body => ({
   },
 });
 
+export const getCurrenciesQuery = () => ({
+  api: 'currencies',
+});
+
 export const getPaymentGatewaysQuery = () => ({
   api: 'paymentgateways',
   action: 'list',
+});
+
+export const getInputProcessorActionQuery = (fileType, action) => ({
+  api: 'settings',
+  params: [
+    { category: 'file_types' },
+    { action },
+    { data: JSON.stringify({ file_type: fileType }) },
+  ],
 });
 
 export const getCreditChargeQuery = params => ({
@@ -135,6 +148,16 @@ export const disablePaymentGatewayQuery = name => ({
 
 
 /* BillAPI */
+export const apiEntityQuery = (collection, action, body) => ({
+  entity: collection,
+  action,
+  options: {
+    method: 'POST',
+    body,
+  },
+});
+
+
 export const getGroupsQuery = collection => ({
   action: 'uniqueget',
   entity: collection,
@@ -192,6 +215,15 @@ export const getEntitesQuery = (collection, project = {}) => {
   });
 };
 
+export const getDeleteLineQuery = id => ({
+  action: 'delete',
+  entity: 'lines',
+  params: [
+    { query: JSON.stringify({ _id: id }) },
+  ],
+});
+
+
 // List
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
@@ -230,6 +262,7 @@ export const searchProductsByKeyQuery = (key, project = {}) => ({
     { query: JSON.stringify({
       key: { $regex: key, $options: 'i' },
     }) },
+    { states: JSON.stringify([0]) },
   ],
 });
 
@@ -244,6 +277,7 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
     { query: JSON.stringify({
       name: { $regex: name, $options: 'i' },
     }) },
+    { states: JSON.stringify([0]) },
   ],
 });
 
@@ -258,5 +292,22 @@ export const getProductsByKeysQuery = (keys, project = {}) => ({
     { query: JSON.stringify({
       key: { $in: keys },
     }) },
+  ],
+});
+
+export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => ({
+  action: 'get',
+  entity: collection,
+  params: [
+    { sort: JSON.stringify({ from: -1 }) },
+    { query: JSON.stringify({
+      [revisionBy]: {
+        $regex: `^${value}$`,
+      },
+    }) },
+    { project: JSON.stringify({ from: 1, to: 1, description: 1, [revisionBy]: 1 }) },
+    { page: 0 },
+    { size },
+    { state: JSON.stringify([0, 1, 2]) },
   ],
 });

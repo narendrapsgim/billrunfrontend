@@ -25,6 +25,7 @@ class PlanProductsPriceTab extends Component {
 
   static propTypes = {
     planRates: PropTypes.instanceOf(Immutable.Map),
+    mode: PropTypes.string,
     originalRates: PropTypes.instanceOf(Immutable.Map),
     products: PropTypes.instanceOf(Immutable.List),
     onChangeFieldValue: PropTypes.func.isRequired,
@@ -33,15 +34,30 @@ class PlanProductsPriceTab extends Component {
 
   static defaultProps = {
     planRates: Immutable.Map(),
+    mode: 'create',
     originalRates: Immutable.Map(),
     products: Immutable.List(),
   };
 
   componentWillMount() {
     const { planRates } = this.props;
-    const productKeys = planRates.map((rate, key) => key).toArray();
-    if (productKeys.length) {
-      this.props.dispatch(getList('plan_products', getProductsByKeysQuery(productKeys)));
+    if (!planRates.isEmpty()) {
+      const planRatesKeys = planRates.keySeq();
+      this.props.dispatch(getList('plan_products', getProductsByKeysQuery(planRatesKeys.toArray())));
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { planRates, products } = nextProps;
+    const { planRates: oldPlanRates } = this.props;
+    if (!Immutable.is(planRates, oldPlanRates)) {
+      const newProductsKeys = planRates.keySeq().filter(planRateKey =>
+        // Get all products that exist in plan but not fetched from server
+        (products.findIndex(product => product.get('key', '') === planRateKey) === -1)
+      );
+      if (!newProductsKeys.isEmpty()) {
+        this.props.dispatch(pushToList('plan_products', getProductsByKeysQuery(newProductsKeys.toArray())));
+      }
     }
   }
 
@@ -55,7 +71,7 @@ class PlanProductsPriceTab extends Component {
       const newProduct = products.find(planProd => planProd.get('key', '') === product.key);
       if (newProduct) {
         const usaget = newProduct.get('rates', Immutable.Map()).keySeq().first();
-        const productPath = ['rates', newProduct.get('key', ''), usaget];
+        const productPath = ['rates', newProduct.get('key', ''), usaget, 'rate'];
         this.props.dispatch(planProductsRateInit(newProduct, productPath));
       }
     });
@@ -63,8 +79,7 @@ class PlanProductsPriceTab extends Component {
 
   onSelectProduct = (key) => {
     const { planRates } = this.props;
-    const productKeys = planRates.map((rate, productKey) => productKey);
-    if (productKeys.includes(key)) {
+    if (planRates.has(key)) {
       this.props.dispatch(showWarning(`Price of product ${key} already overridden`));
     } else {
       this.props.dispatch(pushToList('plan_products', getProductByKeyQuery(key)))
@@ -142,7 +157,7 @@ class PlanProductsPriceTab extends Component {
       const usaget = originalRates.get(productKey).keySeq().first();
       return (
         <PlanProductRemoved
-          key={prod.getIn(['_id', '$id'])}
+          key={prod.getIn(['_id', '$id'], '')}
           usaget={usaget}
           item={prod}
           onProductUndoRemove={this.onProductUndoRemove}
@@ -152,10 +167,10 @@ class PlanProductsPriceTab extends Component {
   }
 
   renderItems = () => {
-    const { products, planRates } = this.props;
+    const { products, planRates, mode } = this.props;
     return planRates.map((productUsageTypes, productKey) => {
       const usaget = productUsageTypes.keySeq().first();
-      const prices = productUsageTypes.get(usaget, Immutable.List());
+      const prices = productUsageTypes.getIn([usaget, 'rate'], Immutable.List());
       const prod = products.find(planProduct => planProduct.get('key', '') === productKey);
       if (!prod) {
         return null;
@@ -166,6 +181,7 @@ class PlanProductsPriceTab extends Component {
           item={prod}
           prices={prices}
           usaget={usaget}
+          mode={mode}
           onProductInitRate={this.onProductInitRate}
           onProductRemoveRate={this.onProductRemoveRate}
           onProductAddRate={this.onProductAddRate}
@@ -175,14 +191,15 @@ class PlanProductsPriceTab extends Component {
           onProductRestore={this.onProductRestore}
         />
       );
-    });
+    }).toArray();
   }
 
   render() {
-    const { products, planRates } = this.props;
+    const { products, planRates, mode } = this.props;
+    const editable = (mode !== 'view');
 
-    if (planRates.size > 0 && products.size === 0) {
-      return (<LoadingItemPlaceholder onClick={this.handleBack} />);
+    if (!planRates.isEmpty() && products.isEmpty()) {
+      return (<LoadingItemPlaceholder />);
     }
 
     const panelTitle = (
@@ -192,12 +209,14 @@ class PlanProductsPriceTab extends Component {
       <Row>
         <Col lg={12}>
           <Form>
-            <Panel header={panelTitle}>
-              <ProductSearch onSelectProduct={this.onSelectProduct} />
-            </Panel>
+            { editable &&
+              <Panel header={panelTitle}>
+                <ProductSearch onSelectProduct={this.onSelectProduct} />
+              </Panel>
+            }
             { this.renderRemovedItems() }
-            { this.renderItems().toArray() }
-            { (products.size === 0) && this.renderNoItems() }
+            { this.renderItems() }
+            { planRates.isEmpty() && this.renderNoItems() }
           </Form>
         </Col>
       </Row>

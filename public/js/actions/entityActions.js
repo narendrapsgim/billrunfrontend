@@ -1,7 +1,8 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
-import { getEntityByIdQuery } from '../common/ApiQueries';
-import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
+import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
+import { getItemDateValue } from '../common/Util';
+import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
   GOT_ENTITY: 'GOT_ENTITY',
@@ -37,24 +38,45 @@ export const clearEntity = collection => ({
 const buildRequestData = (item, action) => {
   switch (action) {
 
+    case 'delete': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      return formData;
+    }
+
     case 'create': {
       const formData = new FormData();
-      const dafaultFrom = moment().toISOString();
-      const dafaultTo = moment().add(100, 'years').toISOString();
-      const update = item
-        .set('from', item.get('from', dafaultFrom))
-        .set('to', item.get('to', dafaultTo));
+      const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
+      const update = item.set('from', newFrom);
       formData.append('update', JSON.stringify(update));
       return formData;
     }
 
-    case 'update':
-    case 'closeandnew': {
+    case 'update': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-      const update = item.delete('_id');
+      const update = item.delete('_id').delete('originalValue');
       formData.append('query', JSON.stringify(query));
       formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
+    case 'closeandnew': {
+      const formData = new FormData();
+
+      // Temp Fix
+      if (getItemDateValue(item, 'from').isBefore(moment()) || getItemDateValue(item, 'from').isSame(moment())) {
+        const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
+        formData.append('update', JSON.stringify(update));
+      } else {
+        const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
+        const update = item.delete('_id').set('from', newFrom).delete('originalValue');
+        formData.append('update', JSON.stringify(update));
+      }
+
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
       return formData;
     }
 
@@ -70,22 +92,11 @@ const requestDataBuilder = (collection, item, action) => {
   }
 };
 
-const apiSaveEntity = (collection, item, action) => {
-  const body = requestDataBuilder(collection, item, action);
-  const query = {
-    entity: collection,
-    action,
-    options: {
-      method: 'POST',
-      body,
-    },
-  };
-  return apiBillRun(query);
-};
-
 export const saveEntity = (collection, item, action) => (dispatch) => {
   dispatch(startProgressIndicator());
-  return apiSaveEntity(collection, item, action)
+  const body = requestDataBuilder(collection, item, action);
+  const query = apiEntityQuery(collection, action, body);
+  return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
 };
@@ -107,3 +118,6 @@ export const getEntityById = (name, collection, id) => (dispatch) => {
   const query = getEntityByIdQuery(collection, id);
   return dispatch(fetchEntity(name, query));
 };
+
+export const deleteEntity = (collection, item) => dispatch =>
+  dispatch(saveEntity(collection, item, 'delete'));

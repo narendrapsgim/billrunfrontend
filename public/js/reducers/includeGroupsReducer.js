@@ -12,7 +12,11 @@ const includeGroupsReducer = (state = DefaultState, action) => {
         account_shared: action.shared,
         rates: Immutable.List(action.products),
       });
-      return state.setIn(['include', 'groups', action.groupName], group);
+      return state
+        // if groups is empty, server return it as empty array instead of empty object
+        // in this case ImmutableJS will fail to set new group at key XYZ on list
+        .updateIn(['include', 'groups'], Immutable.Map(), groups => (groups.isEmpty() ? Immutable.Map() : groups))
+        .setIn(['include', 'groups', action.groupName], group);
     }
 
     case REMOVE_GROUP:

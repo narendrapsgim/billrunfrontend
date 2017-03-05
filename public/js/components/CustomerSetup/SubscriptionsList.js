@@ -33,7 +33,10 @@ export default class SubscriptionsList extends Component {
     return date ? moment(date).format(globalSetting.datetimeFormat) : '';
   }
 
-  servicesParser = subscription => subscription.get('services', Immutable.List()).join(', ');
+  servicesParser = subscription => subscription
+    .get('services', Immutable.List())
+    .map( service => service.get('name','') )
+    .join(', ');
 
   addressParser = (subscription) => {
     if (subscription.get('country', '').length > 0) {

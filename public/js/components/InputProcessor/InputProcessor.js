@@ -18,6 +18,7 @@ import {
   getProcessorSettings,
   setName, setDelimiterType,
   setDelimiter,
+  updateInputProcessorField,
   setFields,
   setFieldMapping,
   setFieldWidth,
@@ -189,6 +190,10 @@ class InputProcessor extends Component {
 
   onSetDelimiterType = (e) => {
     this.props.dispatch(setDelimiterType(e.target.value));
+  }
+
+  onChangeInputProcessorField = (fieldPath, value) => {
+    this.props.dispatch(updateInputProcessorField(fieldPath, value));
   }
 
   onChangeDelimiter = (e) => {
@@ -417,6 +422,7 @@ class InputProcessor extends Component {
           onSelectSampleCSV={this.onSelectSampleCSV}
           onRemoveAllFields={this.onRemoveAllFields}
           onSetDelimiterType={this.onSetDelimiterType}
+          onChangeInputProcessorField={this.onChangeInputProcessorField}
         />
       );
 

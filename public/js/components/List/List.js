@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 import { Button } from 'react-bootstrap';
+import Actions from '../Elements/Actions';
 
 /* ACTIONS */
 import { titlize } from '../../common/Util';
@@ -14,8 +15,12 @@ class List extends Component {
   static propTypes = {
     enableRemove: PropTypes.bool,
     onClickRemove: PropTypes.func,
+    removeText: React.PropTypes.string,
+    enableEnabled: React.PropTypes.bool,
+    onClickEnabled: React.PropTypes.func,
     onSort: PropTypes.func,
     sort: PropTypes.instanceOf(Immutable.Map),
+    actions: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {
@@ -24,6 +29,10 @@ class List extends Component {
     onClickEdit: () => {},
     onSort: () => {},
     sort: Immutable.Map(),
+    removeText: 'Remove',
+    enableEnabled: false,
+    onClickEnabled: () => {},
+    actions: [],
   };
 
   displayByType(field, entity) {
@@ -49,13 +58,48 @@ class List extends Component {
   }
 
   printEntityField(entity = Immutable.Map(), field) {
-    if (!Immutable.Iterable.isIterable(entity))
+    if (!Immutable.Iterable.isIterable(entity)) {
       return this.printEntityField(Immutable.fromJS(entity), field);
-    if (field.parser)
-      return field.parser(entity);
-    if (field.type)
-      return this.displayByType(field, entity);
+    }
+    if (field.parser) { return field.parser(entity); }
+    if (field.type) { return this.displayByType(field, entity); }
     return entity.get(field.id);
+  }
+
+  getRowAction = (row, idx, entity) => {
+    const { actions } = this.props;
+    const rowActions = actions.filter((action) => {
+      const ruleExist = typeof action.onClickColumn !== 'undefined';
+      const byId = action.onClickColumn === row.id;
+      const byIndex = action.onClickColumn === idx;
+      return ruleExist && (byId || byIndex);
+    });
+    if (rowActions.length === 0) {
+      return false;
+    }
+    // Find first enable and show onClick Actin
+    const onClickAction = rowActions.reduce((action, rowAction) => {
+      if (action === false) {
+        if (typeof rowAction.onClick === 'undefined') {
+          return false;
+        }
+        if (typeof rowAction.enable !== 'undefined') {
+          const isEnable = (typeof rowAction.enable === 'function') ? rowAction.enable(entity) : rowAction.enable;
+          if (!isEnable) {
+            return false;
+          }
+        }
+        if (typeof rowAction.show !== 'undefined') {
+          const isShow = (typeof rowAction.show === 'function') ? rowAction.show(entity) : rowAction.show;
+          if (!isShow) {
+            return false;
+          }
+        }
+        return rowAction.onClick;
+      }
+      return action;
+    }, false);
+    return onClickAction;
   }
 
   buildRow(entity, fields) {
@@ -65,21 +109,27 @@ class List extends Component {
         return null;
       }
       let fieldElement;
-      if (edit && key === 0) {
+      const rowAction = this.getRowAction(field, key, entity);
+      if (rowAction) {
+        fieldElement = (
+          <button className="btn btn-link" onClick={rowAction.bind(this, entity)}>
+            {this.printEntityField(entity, field)}
+          </button>
+        );
+      } else if (edit && ((key === 0 && field.id !== 'state') || (key === 1 && fields[0].id === 'state'))) {
         fieldElement = (
           <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
             {this.printEntityField(entity, field)}
           </button>
-        )
+        );
       } else {
         fieldElement = this.printEntityField(entity, field);
       }
       return (
-        <td key={key}>
+        <td key={key} className={field.cssClass} >
           { fieldElement }
         </td>
-      )
-
+      );
     });
   }
 
@@ -100,9 +150,13 @@ class List extends Component {
       className,
       enableRemove,
       onClickRemove,
+      removeText,
+      enableEnabled,
+      onClickEnabled,
+      actions,
     } = this.props;
 
-    const table_header = fields.map((field, key) => {
+    let table_header = fields.map((field, key) => {
       const onclick = field.sort ? this.onClickHeader.bind(this, field.id) : () => {};
       const style = field.sort ? { cursor: 'pointer' } : {};
       let arrow = null;
@@ -118,16 +172,24 @@ class List extends Component {
         arrow = (<i className={arrowClass} />);
       }
       if (!field.title && !field.placeholder) {
-        return (<th key={key} onClick={onclick} style={style}>{titlize(field.id)}{arrow}</th>);
+        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{titlize(field.id)}{arrow}</th>);
       }
-      return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>)
+      return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>);
     });
     let colSpan = fields.length;
+    if (enableEnabled) {
+      table_header = [(<th key={-1} />), ...table_header];
+      colSpan += 1;
+    }
     if (edit) {
       table_header.push((<th key={fields.length}>&nbsp;</th>));
       colSpan += 1;
     }
     if (enableRemove) {
+      table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
+      colSpan += 1;
+    }
+    if (actions.length > 0) {
       table_header.push((<th key={fields.length + 1}>&nbsp;</th>));
       colSpan += 1;
     }
@@ -137,9 +199,16 @@ class List extends Component {
     );
 
     const table_body = items.size < 1 ?
-                       (<tr><td colSpan={colSpan} style={{textAlign: "center"}}>No items found</td></tr>) :
+                       (<tr><td colSpan={colSpan} style={{ textAlign: 'center' }}>No items found</td></tr>) :
                         items.map((entity, index) => (
-                            <tr key={index}>
+                          <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled'}>
+                            {
+                                enableEnabled ?
+                                  <td className="edit-tb">
+                                    <input type="checkbox" checked={entity.get('enabled', true)} onChange={onClickEnabled.bind(this, entity)} />
+                                  </td>
+                                : null
+                              }
                               { this.buildRow(entity, fields) }
                               {
                                 edit &&
@@ -160,12 +229,18 @@ class List extends Component {
                                     <Button onClick={onClickRemove.bind(this, entity)} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
                                   </td>
                               }
+                              {
+                                actions.length > 0 &&
+                                  <td className="td-actions">
+                                    <Actions actions={actions} data={entity} />
+                                  </td>
+                              }
                             </tr>
                           )
                         );
 
     return (
-      <div className={"List row " + className}>
+      <div className={`List row ${className}`}>
         <div className="table-responsive col-lg-12">
           <table className="table table-hover table-striped table-bordered">
             <thead>

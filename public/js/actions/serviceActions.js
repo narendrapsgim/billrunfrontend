@@ -57,6 +57,7 @@ export const getService = id => (dispatch) => {
           price: typeof item.price === 'undefined' ? '' : item.price,
         }];
       }
+      item.originalValue = item.from;
       dispatch(gotItem(item));
       return dispatch(apiBillRunSuccessHandler(response));
     })

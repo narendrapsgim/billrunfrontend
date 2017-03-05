@@ -8,6 +8,7 @@ export default class ProductParam extends Component {
     removeLabel: 'Remove',
     editLabel: 'Edit',
     existingKeys: Immutable.List(),
+    editable: true,
   };
 
   static propTypes = {
@@ -18,6 +19,7 @@ export default class ProductParam extends Component {
     onRemoveParam: React.PropTypes.func.isRequired,
     removeLabel: React.PropTypes.string,
     editLabel: React.PropTypes.string,
+    editable: React.PropTypes.bool,
   };
 
   state = {
@@ -38,7 +40,7 @@ export default class ProductParam extends Component {
   }
 
   render() {
-    const { paramKey, paramValues, existingKeys, removeLabel, editLabel } = this.props;
+    const { paramKey, paramValues, existingKeys, removeLabel, editLabel, editable } = this.props;
     const { edit } = this.state;
     return (
       <Row>
@@ -51,14 +53,14 @@ export default class ProductParam extends Component {
         <Col lg={1} md={1} sm={1} xs={1}>
           <FormGroup style={{ margin: 0 }}>
             <div style={{ width: '100%', height: 39 }}>
-              <Button onClick={this.onEditParam} bsSize="small" className="pull-left" ><i className="fa fa-pencil-square-o" />&nbsp;{editLabel}</Button>
+              { editable && <Button onClick={this.onEditParam} bsSize="small" className="pull-left" ><i className="fa fa-pencil-square-o" />&nbsp;{editLabel}</Button>}
             </div>
           </FormGroup>
         </Col>
         <Col lg={1} md={1} sm={1} xs={1}>
           <FormGroup style={{ margin: 0 }}>
             <div style={{ width: '100%', height: 39 }}>
-              <Button onClick={this.onRemoveParam} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;{removeLabel}</Button>
+              { editable && <Button onClick={this.onRemoveParam} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;{removeLabel}</Button>}
             </div>
           </FormGroup>
         </Col>

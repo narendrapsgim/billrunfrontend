@@ -16,6 +16,7 @@ export default class PlanProduct extends Component {
     onProductRemoveRate: PropTypes.func.isRequired,
     onProductRemove: PropTypes.func.isRequired,
     onProductRestore: PropTypes.func.isRequired,
+    mode: PropTypes.string,
     usaget: PropTypes.string.isRequired,
     item: PropTypes.instanceOf(Immutable.Map),
     prices: PropTypes.instanceOf(Immutable.List),
@@ -24,16 +25,17 @@ export default class PlanProduct extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     prices: Immutable.List(),
+    mode: 'create',
   };
 
   componentWillMount() {
     const { item, usaget, prices } = this.props;
     this.addDefaultPriceIfNoPrice(item, usaget, prices);
-    }
+  }
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
-    const { prices } = this.props;
-    return !Immutable.is(prices, nextProps.prices);
+    const { prices, mode } = this.props;
+    return !Immutable.is(prices, nextProps.prices) || mode !== nextProps.mode;
   }
 
   componentWillUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
@@ -45,7 +47,7 @@ export default class PlanProduct extends Component {
     // if product don't have pricing for this plan, init with BASE price
     if (prices.size === 0) {
       const productKey = item.get('key', '');
-      const productPath = ['rates', productKey, usaget];
+      const productPath = ['rates', productKey, usaget, 'rate'];
       this.props.onProductInitRate(item, productPath);
     }
   }
@@ -55,13 +57,13 @@ export default class PlanProduct extends Component {
     const productKey = item.get('key');
     switch (fieldName) {
       case 'to': {
-        const fieldPath = ['rates', productKey, usaget];
+        const fieldPath = ['rates', productKey, usaget, 'rate'];
         this.props.onProductEditRateTo(fieldPath, index, value);
       }
         break;
 
       default: {
-        const fieldPath = ['rates', productKey, usaget, index, fieldName];
+        const fieldPath = ['rates', productKey, usaget, 'rate', index, fieldName];
         this.props.onProductEditRate(fieldPath, value);
       }
     }
@@ -70,14 +72,14 @@ export default class PlanProduct extends Component {
   onProductAddRate = () => {
     const { item, usaget } = this.props;
     const productKey  = item.get('key');
-    const productPath = ['rates', productKey, usaget];
+    const productPath = ['rates', productKey, usaget, 'rate'];
     this.props.onProductAddRate(productPath);
   }
 
   onProductRemoveRate = (index) => {
     const { item, usaget } = this.props;
     const productKey  = item.get('key');
-    const productPath = ['rates', productKey, usaget];
+    const productPath = ['rates', productKey, usaget, 'rate'];
     this.props.onProductRemoveRate(productPath, index);
   }
 
@@ -91,18 +93,19 @@ export default class PlanProduct extends Component {
   onProductRestore = () => {
     const { item, usaget } = this.props;
     const productKey = item.get('key', '');
-    const productPath = ['rates', productKey, usaget];
+    const productPath = ['rates', productKey, usaget, 'rate'];
     this.props.onProductRestore(item, productPath);
   }
 
   render() {
-    const { item, prices, usaget } = this.props;
+    const { item, prices, usaget, mode } = this.props;
+    const editable = (mode !== 'view');
     const priceCount = prices.size;
     const header = (
       <h3>
-        {item.get('key')} ({usaget}) <i>{item.get('code')}</i><Help contents={item.get('description')} />
-        <Button onClick={this.onProductRemove} bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
-        <Button onClick={this.onProductRestore} bsSize="xsmall" className="pull-right" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-undo fa-lg" /> &nbsp;Restore </Button>
+        { `${item.get('key')} (${usaget}) `} <i>{item.get('code')}</i><Help contents={item.get('description')} />
+        { editable && <Button onClick={this.onProductRemove} bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>}
+        { editable && <Button onClick={this.onProductRestore} bsSize="xsmall" className="pull-right" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-undo fa-lg" /> &nbsp;Restore </Button>}
       </h3>
     );
 
@@ -113,12 +116,13 @@ export default class PlanProduct extends Component {
             key={i}
             item={price}
             index={i}
+            mode={mode}
             count={priceCount}
             onProductEditRate={this.onProductEditRate}
             onProductRemoveRate={this.onProductRemoveRate}
           />
         )}
-        { <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
+        { editable && <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
       </Panel>
     );
   }

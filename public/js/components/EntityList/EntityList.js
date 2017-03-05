@@ -5,10 +5,21 @@ import Immutable from 'immutable';
 import changeCase from 'change-case';
 import { Col, Row, Panel, Button } from 'react-bootstrap';
 import List from '../List';
-import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
+import { LoadingItemPlaceholder } from '../Elements';
 import Pager from './Pager';
+import State from './State';
 import Filter from './Filter';
-import { getList, clearList, setListSort, setListFilter, setListPage, setListSize, clearItem } from '../../actions/entityListActions';
+import StateDetails from './StateDetails';
+import {
+  getList,
+  clearList,
+  setListSort,
+  setListFilter,
+  setListPage,
+  setListSize,
+  setListState,
+  clearItem,
+} from '../../actions/entityListActions';
 
 class EntityList extends Component {
 
@@ -28,6 +39,10 @@ class EntityList extends Component {
     page: PropTypes.number,
     nextPage: PropTypes.bool,
     editable: PropTypes.bool,
+    showRevisionBy: PropTypes.oneOfType([
+      PropTypes.bool,
+      PropTypes.string,
+    ]),
     size: PropTypes.number,
     inProgress: PropTypes.bool,
     forceRefetchItems: PropTypes.oneOfType([
@@ -36,6 +51,7 @@ class EntityList extends Component {
     ]),
     filter: PropTypes.instanceOf(Immutable.Map),
     sort: PropTypes.instanceOf(Immutable.Map),
+    state: PropTypes.instanceOf(Immutable.List),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -49,6 +65,7 @@ class EntityList extends Component {
     size: 5,
     nextPage: false,
     editable: true,
+    showRevisionBy: false,
     inProgress: false,
     forceRefetchItems: false,
     baseFilter: {},
@@ -57,6 +74,7 @@ class EntityList extends Component {
     projectFields: {},
     sort: Immutable.Map(),
     filter: Immutable.Map(),
+    state: Immutable.List([0, 1, 2]),
   }
 
   componentWillMount() {
@@ -83,7 +101,8 @@ class EntityList extends Component {
     const sizeChanged = this.props.size !== nextProps.size;
     const filterChanged = !Immutable.is(this.props.filter, nextProps.filter);
     const sortChanged = !Immutable.is(this.props.sort, nextProps.sort);
-    if (pageChanged || sizeChanged || filterChanged || sortChanged) {
+    const stateChanged = !Immutable.is(this.props.state, nextProps.state);
+    if (pageChanged || sizeChanged || filterChanged || sortChanged || stateChanged) {
       this.fetchItems(nextProps);
     }
   }
@@ -125,28 +144,68 @@ class EntityList extends Component {
     this.props.dispatch(setListSize(itemsType, size));
   }
 
+  onStateChange = (states) => {
+    const { itemsType } = this.props;
+    this.props.dispatch(setListPage(itemsType, 0));
+    this.props.dispatch(setListState(itemsType, states));
+  }
+
   onClickItem = (item) => {
     const { itemsType, itemType } = this.props;
     const itemId = item.getIn(['_id', '$id']);
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   }
 
-  buildQuery = ({ collection, page, size, sort, filter, baseFilter, projectFields, api }) => ({
-    action: api,
-    entity: collection,
-    params: [
-      { sort: JSON.stringify(sort) },
-      { query: JSON.stringify({ ...filter.toObject(), ...baseFilter }) },
-      { project: JSON.stringify(projectFields) },
-      { page },
-      { size },
-    ],
-  });
+  buildQuery = (props) => {
+    const {
+      collection,
+      page,
+      size,
+      sort,
+      filter,
+      state,
+      baseFilter,
+      projectFields,
+      api,
+      showRevisionBy,
+    } = props;
+    const project = showRevisionBy ? { ...projectFields, ...{ to: 1, from: 1 } } : projectFields;
+    const query = { ...filter.toObject(), ...baseFilter };
+    const request = {
+      action: api,
+      entity: collection,
+      params: [
+        { sort: JSON.stringify(sort) },
+        { query: JSON.stringify(query) },
+        { project: JSON.stringify(project) },
+        { page },
+        { size },
+      ],
+    };
+    if (showRevisionBy) {
+      request.params.push(
+          { states: JSON.stringify(state) },
+      );
+    }
+    return request;
+  }
 
   fetchItems = (props) => {
     const { itemsType } = props;
     this.props.dispatch(getList(itemsType, this.buildQuery(props)));
   }
+
+  parserState = (item) => {
+    const { itemType } = this.props;
+    return (
+      <StateDetails item={item} itemName={itemType} />
+    );
+  };
+
+  addStateColumn = fields => ([
+    { id: 'state', parser: this.parserState, cssClass: 'state' },
+    ...fields,
+  ])
 
   renderPanelHeader = () => {
     const { itemsType } = this.props;
@@ -165,11 +224,21 @@ class EntityList extends Component {
   renderFilter = () => {
     const { filter, filterFields } = this.props;
     return (
-      <Filter
-        filter={filter}
-        fields={filterFields}
-        onFilter={this.onFilter}
-      />
+      <Filter filter={filter} fields={filterFields} onFilter={this.onFilter}>
+        { this.renderStateFilter() }
+      </Filter>
+    );
+  }
+
+  renderStateFilter = () => {
+    const { state, showRevisionBy } = this.props;
+    if (!showRevisionBy) {
+      return null;
+    }
+    return (
+      <div className="pull-right" style={{ marginRight: 30 }}>
+        <State states={state} onChangeState={this.onStateChange} />
+      </div>
     );
   }
 
@@ -188,12 +257,13 @@ class EntityList extends Component {
   }
 
   renderList = () => {
-    const { items, sort, tableFields, editable } = this.props;
+    const { items, sort, tableFields, editable, showRevisionBy } = this.props;
+    const fields = (!showRevisionBy) ? tableFields : this.addStateColumn(tableFields);
     return (
       <List
         sort={sort}
         items={items}
-        fields={tableFields}
+        fields={fields}
         edit={editable}
         onSort={this.onSort}
         onClickEdit={this.onClickItem}
@@ -224,6 +294,7 @@ const mapStateToProps = (state, props) => ({
   collection: props.collection || props.itemsType,
   items: state.entityList.items.get(props.itemsType),
   page: state.entityList.page.get(props.itemsType),
+  state: state.entityList.state.get(props.itemsType),
   nextPage: state.entityList.nextPage.get(props.itemsType),
   sort: state.entityList.sort.get(props.itemsType),
   filter: state.entityList.filter.get(props.itemsType),
