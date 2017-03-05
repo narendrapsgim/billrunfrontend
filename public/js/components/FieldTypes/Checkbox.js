@@ -10,7 +10,7 @@ const Checkbox = (props) => {
   const { id = uuid.v4(), value='', editable=true, disabled=false, label = '' } = props;
 
   if (!editable) {
-    return (<span>{ value }</span>);
+    return (<span>{ value ? 'Yes' : 'No' }</span>);
   }
 
   if (label.length) {
