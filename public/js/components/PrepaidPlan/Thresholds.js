@@ -6,7 +6,9 @@ import Select from 'react-select';
 import BalanceThreshold from './BalanceThreshold';
 
 const Thresholds = (props) => {
-  const { plan, ppIncludes } = props;
+  const { plan, ppIncludes, mode } = props;
+
+  const editable = (mode !== 'view');
 
   const ppIncludeName = (ppId) => {
     const ppInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId), Map());
@@ -18,6 +20,7 @@ const Thresholds = (props) => {
     return (
       <BalanceThreshold
         key={key}
+        editable={editable}
         name={name}
         pp_id={ppId}
         value={plan.getIn(['pp_threshold', ppId], 0)}
@@ -31,18 +34,21 @@ const Thresholds = (props) => {
     label: pp.get('name'),
   })).toJS();
 
+  const thresholds = plan.get('pp_threshold', Map());
+
   return (
     <div className="Thresholds">
       <Form horizontal>
-        <Panel header={<h3>Select prepaid bucket</h3>}>
-          <Select placeholder="Select" options={options} onChange={props.onAddBalance} />
-        </Panel>
-        <hr />
+        { editable &&
+          <Panel header={<h3>Select prepaid bucket</h3>}>
+            <Select placeholder="Select" options={options} onChange={props.onAddBalance} />
+          </Panel>
+        }
+        { editable && <hr /> }
         <Panel>
-          {
-            plan.get('pp_threshold', Map())
-              .keySeq().filter(i => i !== 'on_load')
-              .map(thresholdEl)
+          { !thresholds.isEmpty()
+            ? thresholds.keySeq().filter(i => i !== 'on_load').map(thresholdEl)
+            : (<p>No charging limits</p>)
           }
         </Panel>
       </Form>
@@ -53,6 +59,7 @@ const Thresholds = (props) => {
 Thresholds.defaultProps = {
   plan: Map(),
   ppIncludes: List(),
+  mode: 'create',
 };
 
 Thresholds.propTypes = {
@@ -60,6 +67,7 @@ Thresholds.propTypes = {
   ppIncludes: PropTypes.instanceOf(List),
   onChangeThreshold: PropTypes.func.isRequired,
   onAddBalance: PropTypes.func.isRequired,
+  mode: PropTypes.string,
 };
 
 export default connect()(Thresholds);

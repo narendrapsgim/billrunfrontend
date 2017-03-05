@@ -86,11 +86,15 @@ class CustomerSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { customer: oldItem, mode } = this.props;
-    const { customer: item } = nextProps;
-    if (mode !== 'create' && (oldItem.get('first_name') !== item.get('first_name') || oldItem.get('last_name') !== item.get('last_name'))) {
-      const newTitle = `Edit Customer - ${item.get('first_name')} ${item.get('last_name')}`;
-      this.props.dispatch(setPageTitle(newTitle));
+    const { customer: oldItem } = this.props;
+    const { customer: item, mode } = nextProps;
+    if (mode !== 'create') {
+      if (oldItem.getIn(['_id', '$id'], null) === null && item.getIn(['_id', '$id'], null) !== null) {
+        const firstName = this.getFirstName(item);
+        const lastName = this.getLastName(item);
+        const newTitle = `Edit Customer - ${firstName} ${lastName}`;
+        this.props.dispatch(setPageTitle(newTitle));
+      }
     }
   }
 
@@ -151,6 +155,10 @@ class CustomerSetup extends Component {
   onBack = () => {
     this.props.router.push('/customers');
   }
+
+  getFirstName = item => item.get('first_name', item.get('firstname', ''));
+
+  getLastName = item => item.get('last_name', item.get('lastname', ''));
 
   getReturnUrl = () => {
     const { itemId } = this.props;
