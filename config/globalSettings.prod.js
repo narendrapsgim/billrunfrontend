@@ -41,6 +41,13 @@ var globalSetting = {
       itemType: 'charging_plan',
       itemsType: 'charging_plans',
     },
+    prepaid_plan: {
+      collection: 'plans',
+      uniqueField: 'name',
+      itemName: 'Prepaid Plan',
+      itemType: 'prepaid_plan',
+      itemsType: 'prepaid_plans',
+    },
     product: {
       collection: 'rates',
       uniqueField: 'key',

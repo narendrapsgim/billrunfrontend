@@ -33,6 +33,7 @@ const PrepaidPlansList = () => {
       baseFilter={baseFilter}
       tableFields={tableFields}
       projectFields={projectFields}
+      showRevisionBy="key"
     />
   );
 };

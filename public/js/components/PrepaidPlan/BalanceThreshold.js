@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { FormGroup, Col, ControlLabel, FormControl } from 'react-bootstrap';
+import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
+import Field from '../Field';
 
 const BalanceThreshold = (props) => {
-  const { name, ppId, value } = props;
+  const { name, ppId, value, editable } = props;
 
   const onChange = (e) => {
     props.onChange(ppId, e.target.value);
@@ -15,7 +16,7 @@ const BalanceThreshold = (props) => {
         { name }
       </Col>
       <Col md={9}>
-        <FormControl type="number" onChange={onChange} value={value} />
+        <Field fieldType="number" onChange={onChange} value={value} editable={editable} />
       </Col>
     </FormGroup>
   );
@@ -26,10 +27,12 @@ BalanceThreshold.defaultProps = {
   name: '',
   value: '',
   ppId: '',
+  editable: true,
 };
 
 BalanceThreshold.propTypes = {
   name: PropTypes.string,
+  editable: PropTypes.bool,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
