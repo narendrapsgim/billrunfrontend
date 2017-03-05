@@ -9,6 +9,7 @@ import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
 import ProductParam from './components/ProductParam';
 import ProductParamEdit from './components/ProductParamEdit';
+import EntityFields from '../Entity/EntityFields';
 
 
 export default class Product extends Component {
@@ -176,6 +177,10 @@ export default class Product extends Component {
     return usageTypes.map(usaget => ({ value: usaget, label: usaget })).toJS();
   }
 
+  onChangeAdditionalField = (field, value) => {
+    this.props.onFieldUpdate([field], value);
+  }
+
   renderPrices = () => {
     const { product, planName, usaget, mode } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
@@ -295,6 +300,13 @@ export default class Product extends Component {
                   }
                 </Col>
               </FormGroup>
+
+              <EntityFields
+                entityName="rates"
+                entity={product}
+                onChangeField={this.onChangeAdditionalField}
+                editable={editable}
+              />
 
             </Panel>
 

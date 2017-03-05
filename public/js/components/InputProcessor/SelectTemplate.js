@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import { showDanger } from '../../actions/alertsActions';
 import Templates from '../../Templates';
 
 export default class SelectTemplate extends Component {
@@ -18,7 +18,7 @@ export default class SelectTemplate extends Component {
     const { value } = e.target;
     this.setState({format: value});
   };
-  
+
   onSelectType = (e) => {
     const { value } = e.target;
     this.setState({type: value});
@@ -62,15 +62,19 @@ export default class SelectTemplate extends Component {
       action
     };
   };
-  
+
   handleNext = () => {
-    const { selected, template } = this.state;
-    this.context.router.push({
-      pathname: 'input_processor',
-      query: this.buildQuery()
-    });
+    const { selected, type } = this.state;
+    if (selected === '' && type !== 'api') {
+      this.props.dispatch(showDanger('Please choose one option'));
+    } else {
+      this.context.router.push({
+        pathname: 'input_processor',
+        query: this.buildQuery(),
+      });
+    }
   };
-  
+
   render() {
     const { selected, template } = this.state;
 
@@ -108,11 +112,11 @@ export default class SelectTemplate extends Component {
                           name="format"
                           value="json"
                           disabled={ this.state.type !== "api" }
-                          checked={ this.state.format === "json" }
+                          checked={ this.state.format === "json" || this.state.type === 'api'}
                           onChange={ this.onSelectFormat } /> I will manually configure a JSON API
                     </label>
                   </div>
-                </div>               
+                </div>
 
                 <div className="form-group">
                   <div className="col-lg-3 col-md-4">

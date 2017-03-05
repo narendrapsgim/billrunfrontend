@@ -76,6 +76,7 @@ export default class ChargingPlanDetails extends Component {
   render() {
     const { errors } = this.state;
     const { item, mode } = this.props;
+    const editable = (mode !== 'view');
     const operationOptions = [
       { value: 'new', label: 'New' },
       { value: 'inc', label: 'Increment' },
@@ -92,7 +93,7 @@ export default class ChargingPlanDetails extends Component {
               <Help contents={PlanDescription.description} />
             </Col>
             <Col sm={8} lg={9}>
-              <Field value={item.get('description', '')} onChange={this.onChangeDescription} />
+              <Field value={item.get('description', '')} onChange={this.onChangeDescription} editable={editable} />
             </Col>
           </FormGroup>
 
@@ -103,7 +104,7 @@ export default class ChargingPlanDetails extends Component {
                 <Help contents={PlanDescription.name} />
               </Col>
               <Col sm={8} lg={9}>
-                <Field value={item.get('name', '')} onChange={this.onChangeName} />
+                <Field value={item.get('name', '')} onChange={this.onChangeName} editable={editable} />
                 { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
               </Col>
             </FormGroup>
@@ -115,21 +116,24 @@ export default class ChargingPlanDetails extends Component {
               <Help contents={PlanDescription.code} />
             </Col>
             <Col sm={8} lg={9}>
-              <Field onChange={this.onChangeCode} value={item.get('code', '')} />
+              <Field onChange={this.onChangeCode} value={item.get('code', '')} editable={editable} />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2}>Operation</Col>
             <Col sm={4}>
-              <Select options={operationOptions} value={item.get('operation', '')} onChange={this.onChangeOperation} />
+              { editable
+                ? <Select options={operationOptions} value={item.get('operation', '')} onChange={this.onChangeOperation} />
+                : <div className="non-editble-field">{ item.get('operation', '') }</div>
+              }
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2}>Charging value</Col>
             <Col sm={4}>
-              <Field value={item.get('charging_value', 0)} fieldType="number" onChange={this.onChangeChargingValue} />
+              <Field value={item.get('charging_value', 0)} fieldType="number" onChange={this.onChangeChargingValue} editable={editable} />
             </Col>
           </FormGroup>
 
