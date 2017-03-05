@@ -112,7 +112,8 @@ export default function (state = defaultState, action) {
         .setIn(['rate_calculators'], Immutable.Map());
 
     case SET_STATIC_USAGET: {
-      const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], `/^${action.usaget}$/`);
+      const regex = new RegExp(`^${action.usaget}$`).toString();
+      const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], regex);
       return state
         .setIn(['processor', 'default_usaget'], action.usaget)
         .update('rate_calculators', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.List()))
@@ -122,7 +123,7 @@ export default function (state = defaultState, action) {
     case MAP_USAGET: {
       const { pattern, usaget } = action.mapping;
       const newMap = Immutable.fromJS({ pattern, usaget });
-      const regex = `/^${usaget}$/`;
+      const regex = new RegExp(`^${usaget}$`).toString();
       const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], regex);
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.push(newMap))
