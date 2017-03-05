@@ -121,21 +121,19 @@ export default class ServiceDetails extends Component {
           </Col>
         </FormGroup>
 
-<<<<<<< HEAD
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
           <Col sm={4} style={{ padding: '10px' }}>
             <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
           </Col>
         </FormGroup>
-=======
+
         <EntityFields
           entityName="services"
           entity={item}
           onChangeField={this.onChangeAdditionalField}
           editable={true}
         />
->>>>>>> version_53
 
       </Form>
     );
