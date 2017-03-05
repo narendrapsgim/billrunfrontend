@@ -3,6 +3,16 @@ import moment from 'moment';
 import changeCase from 'change-case';
 import FieldNames from '../FieldNames';
 
+/**
+ * Get data from globalSettings.js file
+ * @param  {[String/Array of strings]} key/path in globalSettings
+ * @param  {[Any]} [defaultValue=null] If key/Path not exist
+ * @return {[Any]} Value from globalSettings.js or default value if key/path not exist
+ */
+export const getConfig = (key, defaultValue = null) => {
+  const path = Array.isArray(key) ? key : [key];
+  return Immutable.fromJS(globalSetting).getIn(path, defaultValue);
+};
 
 export const titlize = str => changeCase.upperCaseFirst(str);
 
@@ -22,32 +32,33 @@ export const getZiroTimeDate = (date = moment()) => {
 export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
   switch (mode) {
     case 'create': {
-      if (entityName) {
-        return `Create New ${changeCase.upperCaseFirst(entityName)}`;
+      const entitySettings = getConfig(['systemItems', entityName]);
+      if (entitySettings) {
+        return `Create New ${changeCase.upperCaseFirst(entitySettings.get('itemName', entitySettings.get('itemType', '')))}`;
       }
       return 'Create';
     }
 
     case 'closeandnew': {
-      const entitySettings = globalSetting.systemItems[entityName];
+      const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `Edit ${entitySettings.itemType} - ${item.get(entitySettings.uniqueField, '')}`;
+        return `Edit ${entitySettings.get('itemName', entitySettings.get('itemType', ''))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'Edit';
     }
 
     case 'view': {
-      const entitySettings = globalSetting.systemItems[entityName];
+      const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `${changeCase.upperCaseFirst(entitySettings.itemType)} - ${item.get(entitySettings.uniqueField, '')}`;
+        return `${changeCase.upperCaseFirst(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'View';
     }
 
     case 'update': {
-      const entitySettings = globalSetting.systemItems[entityName];
+      const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `Update ${entitySettings.itemType} - ${item.get(entitySettings.uniqueField, '')}`;
+        return `Update ${entitySettings.get('itemName', entitySettings.get('itemType', ''))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'Update';
     }

@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { ModalWrapper, StateIcon, RevisionTimeline } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getItemDateValue } from '../../common/Util';
+import { getItemDateValue, getConfig } from '../../common/Util';
 import { getRevisions } from '../../actions/entityListActions';
 
 
@@ -111,8 +111,8 @@ class StateDetails extends Component {
 
 
 const mapStateToProps = (state, props) => {
-  const revisionBy = globalSetting.systemItems[props.itemName].uniqueField;
-  const collection = globalSetting.systemItems[props.itemName].collection;
+  const revisionBy = getConfig(['systemItems', props.itemName, 'uniqueField'], '');
+  const collection = getConfig(['systemItems', props.itemName, 'collection'], '');
   const key = props.item.get(revisionBy, '');
   const revisions = state.entityList.revisions.getIn([collection, key]);
   return ({ revisions, collection, revisionBy });

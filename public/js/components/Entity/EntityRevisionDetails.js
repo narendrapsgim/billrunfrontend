@@ -6,7 +6,7 @@ import { Form, FormGroup, Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getItemDateValue } from '../../common/Util';
+import { getItemDateValue, getConfig } from '../../common/Util';
 
 
 class EntityRevisionDetails extends Component {
@@ -57,8 +57,8 @@ class EntityRevisionDetails extends Component {
     const { item, revisions, itemName } = this.props;
     // if screen was with deleted item, go to prev revision or list
     if (item.getIn(['_id', '$id'], '') === removedItem.getIn(['_id', '$id'], '')) {
-      const itemType = globalSetting.systemItems[itemName].itemType;
-      const itemsType = globalSetting.systemItems[itemName].itemsType;
+      const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+      const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
       if (revisions.size <= 1) { // only one revision
         this.props.backToList(true);
         return false;
@@ -76,7 +76,7 @@ class EntityRevisionDetails extends Component {
   renderVerisionList = () => {
     const { itemName, revisions, item } = this.props;
     const { showList } = this.state;
-    const revisionBy = globalSetting.systemItems[itemName].uniqueField;
+    const revisionBy = getConfig(['systemItems', itemName, 'uniqueField'], '');
     return (
       <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
         <RevisionList

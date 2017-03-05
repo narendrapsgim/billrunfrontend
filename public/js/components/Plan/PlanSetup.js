@@ -20,7 +20,7 @@ import {
   onGroupAdd,
   onGroupRemove,
 } from '../../actions/planActions';
-import { buildPageTitle, getItemDateValue } from '../../common/Util';
+import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
@@ -179,7 +179,8 @@ class PlanSetup extends Component {
     if (itemWasChanged) {
       this.props.dispatch(clearItems('plans')); // refetch items list because item was (changed in / added to) list
     }
-    this.props.router.push('/plans');
+    const listUrl = getConfig(['systemItems', 'plan', 'itemsType'], '');
+    this.props.router.push(`/${listUrl}`);
   }
 
   handleSelectTab = (key) => {
