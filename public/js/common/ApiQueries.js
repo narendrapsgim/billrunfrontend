@@ -27,6 +27,9 @@ export const saveQuery = body => ({
 
 export const getCurrenciesQuery = () => ({
   api: 'currencies',
+  params: [
+    { simpleArray: true },
+  ],
 });
 
 export const getPaymentGatewaysQuery = () => ({
