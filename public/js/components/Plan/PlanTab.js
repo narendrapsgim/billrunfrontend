@@ -6,6 +6,7 @@ import Help from '../Help';
 import Field from '../Field';
 import CreateButton from '../Elements/CreateButton';
 import PlanPrice from './components/PlanPrice';
+import EntityFields from '../Entity/EntityFields';
 
 
 export default class Plan extends Component {
@@ -108,6 +109,10 @@ export default class Plan extends Component {
       value = false;
     }
     this.props.onChangeFieldValue(['upfront'], value);
+  }
+
+  onChangeAdditionalField = (field, value) => {
+    this.props.onChangeFieldValue([field], value);
   }
 
   getPeriodicityOptions = () => {
@@ -249,6 +254,15 @@ export default class Plan extends Component {
                   <Field value={plan.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
                 </Col>
               </FormGroup>
+
+              <EntityFields
+                entityName="plans"
+                entity={plan}
+                onChangeField={this.onChangeAdditionalField}
+                editable={editable}
+              />
+
+
 
             </Panel>
 

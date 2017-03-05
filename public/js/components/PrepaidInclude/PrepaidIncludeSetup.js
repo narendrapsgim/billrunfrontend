@@ -1,28 +1,33 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Map, List } from 'immutable';
+import Immutable from 'immutable';
+import moment from 'moment';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
-import { getProductsKeysQuery } from '../../common/ApiQueries';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
+import { EntityRevisionDetails } from '../Entity';
+import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import { getProductsKeysQuery } from '../../common/ApiQueries';
 import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { savePrepaidInclude, getPrepaidInclude, clearPrepaidInclude, updatePrepaidInclude } from '../../actions/prepaidIncludeActions';
 import { getSettings } from '../../actions/settingsActions';
-import { clearItems } from '../../actions/entityListActions';
+import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
+import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
 
 
 class PrepaidIncludeSetup extends Component {
 
   static propTypes = {
     itemId: PropTypes.string,
-    item: PropTypes.instanceOf(Map),
+    item: PropTypes.instanceOf(Immutable.Map),
+    revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
-    allRates: PropTypes.instanceOf(List),
-    usageTypes: PropTypes.instanceOf(List),
+    allRates: PropTypes.instanceOf(Immutable.List),
+    usageTypes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -34,9 +39,10 @@ class PrepaidIncludeSetup extends Component {
   }
 
   static defaultProps = {
-    item: Map(),
-    allRates: List(),
-    usageTypes: List(),
+    item: Immutable.Map(),
+    revisions: Immutable.List(),
+    allRates: Immutable.List(),
+    usageTypes: Immutable.List(),
     activeTab: 1,
   };
 
@@ -44,24 +50,38 @@ class PrepaidIncludeSetup extends Component {
     activeTab: parseInt(this.props.activeTab),
   }
 
-  componentDidMount() {
-    const { itemId, mode } = this.props;
-    if (mode === 'create') {
-      this.props.dispatch(setPageTitle('Create New Prepaid Bucket'));
-      this.setDefaultValues();
-    }
+  componentWillMount() {
+    const { itemId } = this.props;
     if (itemId) {
-      this.props.dispatch(getPrepaidInclude(itemId));
+      this.props.dispatch(getPrepaidInclude(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  componentDidMount() {
+    const { mode } = this.props;
+    if (mode === 'create') {
+      const pageTitle = buildPageTitle(mode, 'prepaid_include');
+      this.props.dispatch(setPageTitle(pageTitle));
     }
     this.props.dispatch(getList('all_rates', getProductsKeysQuery()));
     this.props.dispatch(getSettings('usage_types'));
+    this.initDefaultValues();
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode } = nextProps;
-    const { item: oldItem } = this.props;
-    if (mode !== 'create' && item.get('name') && oldItem.get('name') !== item.get('name')) {
-      this.props.dispatch(setPageTitle(`Edit Prepaid Bucket - ${item.get('name')}`));
+    const { item, mode, itemId, revisions } = nextProps;
+    const {
+      item: oldItem,
+      itemId: oldItemId,
+      mode: oldMode,
+      revisions: oldRevisions,
+    } = this.props;
+    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+      const pageTitle = buildPageTitle(mode, 'prepaid_include', item);
+      this.props.dispatch(setPageTitle(pageTitle));
+    }
+    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
+      this.props.dispatch(getPrepaidInclude(itemId)).then(this.afterItemReceived);
     }
   }
 
@@ -69,18 +89,47 @@ class PrepaidIncludeSetup extends Component {
     this.props.dispatch(clearPrepaidInclude());
   }
 
-  setDefaultValues = () => {
-    this.props.dispatch(updatePrepaidInclude('shared', false));
-    this.props.dispatch(updatePrepaidInclude('unlimited', false));
+  initDefaultValues = () => {
+    const { mode, item } = this.props;
+    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+      const defaultFromValue = moment().add(1, 'days').toISOString();
+      this.onChangeFieldValue(['from'], defaultFromValue);
+    }
+    if (mode === 'create') {
+      this.onChangeFieldValue(['shared'], false);
+      this.onChangeFieldValue(['unlimited'], false);
+    }
+  }
+
+  initRevisions = () => {
+    const { item, revisions } = this.props;
+    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+      const key = item.get('name', '');
+      this.props.dispatch(getRevisions('prepaidincludes', 'name', key));
+    }
+  }
+
+  afterItemReceived = (response) => {
+    if (response.status) {
+      this.initRevisions();
+      this.initDefaultValues();
+    } else {
+      this.handleBack();
+    }
+  }
+
+  onChangeFieldValue = (path, value) => {
+    this.props.dispatch(updatePrepaidInclude(path, value));
   }
 
   onChangeField = (e) => {
     const { id, value } = e.target;
-    this.props.dispatch(updatePrepaidInclude(id, value));
+    this.onChangeFieldValue(id, value);
   };
 
+
   onChangeLimitedDestinations = (name, value) => {
-    this.props.dispatch(updatePrepaidInclude(['allowed_in', name], value));
+    this.onChangeFieldValue(['allowed_in', name], value);
   };
 
   onSelectPlan = (name) => {
@@ -89,16 +138,17 @@ class PrepaidIncludeSetup extends Component {
       dispatch(showDanger('Plan already exists'));
       return;
     }
-    this.props.dispatch(updatePrepaidInclude(['allowed_in', name], Map()));
+    this.onChangeFieldValue(['allowed_in', name], Immutable.Map());
   };
 
   afterSave = (response) => {
-    const { mode } = this.props;
+    const { mode, item } = this.props;
     if (response.status) {
+      const key = item.get('name', '');
+      this.props.dispatch(clearRevisions('prepaidincludes', key)); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The prepaid bucke was ${action}`));
-      this.props.dispatch(clearItems('prepaid_includes')); // refetch items list because item was (changed in / added to) list
-      this.handleBack();
+      this.handleBack(true);
     }
   }
 
@@ -107,8 +157,12 @@ class PrepaidIncludeSetup extends Component {
     this.props.dispatch(savePrepaidInclude(item, mode)).then(this.afterSave);
   };
 
-  handleBack = () => {
-    this.props.router.push('/prepaid_includes');
+  handleBack = (itemWasChanged = false) => {
+    const itemsType = getConfig(['systemItems', 'prepaid_include', 'itemsType'], '');
+    if (itemWasChanged) {
+      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
+    }
+    this.props.router.push(`/${itemsType}`);
   }
 
   handleSelectTab = (key) => {
@@ -116,9 +170,8 @@ class PrepaidIncludeSetup extends Component {
   }
 
   render() {
-    const { item, mode, allRates, usageTypes } = this.props;
-    // in update mode wait for item before render edit screen
-    if (mode !== 'create' && typeof item.getIn(['_id', '$id']) === 'undefined') {
+    const { item, mode, allRates, usageTypes, revisions } = this.props;
+    if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
@@ -128,14 +181,31 @@ class PrepaidIncludeSetup extends Component {
       { value: 'total_cost', label: 'Total cost' },
     ];
 
-    const allRatesOptions = allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
+    const allRatesOptions = allRates.map(rate => ({
+      value: rate.get('key'),
+      label: rate.get('key'),
+    })).toArray();
+
     return (
       <div className="PrepaidIncludeSetup">
+
+        <Panel>
+          <EntityRevisionDetails
+            revisions={revisions}
+            item={item}
+            mode={mode}
+            onChangeFrom={this.onChangeFieldValue}
+            itemName="prepaid_include"
+            backToList={this.handleBack}
+          />
+        </Panel>
+
         <Tabs defaultActiveKey={this.state.activeTab} id="PrepaidInclude" animation={false} onSelect={this.handleSelectTab}>
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
               <PrepaidInclude
+                mode={mode}
                 prepaidInclude={item}
                 usageTypes={usageTypes}
                 chargingByOptions={chargingByOptions}
@@ -148,7 +218,8 @@ class PrepaidIncludeSetup extends Component {
           <Tab title="Limited Products" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <LimitedDestinations
-                limitedDestinations={item.get('allowed_in', Map())}
+                mode={mode}
+                limitedDestinations={item.get('allowed_in', Immutable.Map())}
                 allRates={allRatesOptions}
                 onSelectPlan={this.onSelectPlan}
                 onChange={this.onChangeLimitedDestinations}
@@ -162,14 +233,13 @@ class PrepaidIncludeSetup extends Component {
   }
 }
 
-
-const mapStateToProps = (state, props) => {
-  const { tab: activeTab, action } = props.location.query;
-  const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'closeandnew' : 'create');
-  const item = state.entity.get('prepaid_include');
-  const usageTypes = state.settings.get('usage_types');
-  const allRates = state.list.get('all_rates');
-  return { itemId, item, mode, usageTypes, allRates, activeTab };
-};
+const mapStateToProps = (state, props) => ({
+  itemId: idSelector(state, props, 'prepaid_include'),
+  item: itemSelector(state, props, 'prepaid_include'),
+  mode: modeSelector(state, props, 'prepaid_include'),
+  activeTab: tabSelector(state, props, 'prepaid_include'),
+  revisions: revisionsSelector(state, props, 'prepaid_include'),
+  allRates: state.list.get('all_rates'),
+  usageTypes: state.settings.get('usage_types'),
+});
 export default withRouter(connect(mapStateToProps)(PrepaidIncludeSetup));

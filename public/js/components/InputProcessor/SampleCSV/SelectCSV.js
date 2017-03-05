@@ -18,7 +18,7 @@ const SelectCSV = (props) => {
           <input type="file" id="sample_csv"
                  onChange={onSelectSampleCSV}
                  disabled={!settings.get('file_type') || !settings.get('delimiter_type') ||
-                           settings.get('delimiter_type') !== "separator"} />
+                           settings.get('delimiter_type') !== "separator" || settings.get('delimiter') === ''} />
         </div>
       </div>
     </div>

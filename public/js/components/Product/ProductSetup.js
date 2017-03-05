@@ -14,7 +14,7 @@ import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
-import { buildPageTitle, getItemDateValue } from '../../common/Util';
+import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
 
 
 class ProductSetup extends Component {
@@ -74,8 +74,6 @@ class ProductSetup extends Component {
     } = this.props;
     if (mode !== oldMode || oldItem.get('key') !== item.get('key')) {
       const pageTitle = buildPageTitle(mode, 'product', item);
-      this.props.dispatch(setPageTitle(pageTitle));
-
       this.props.dispatch(setPageTitle(pageTitle));
     }
     if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
@@ -148,7 +146,7 @@ class ProductSetup extends Component {
     const { mode, item } = this.props;
     if (response.status) {
       const key = item.get('key', '');
-      this.props.dispatch(clearRevisions('rates', key)); //
+      this.props.dispatch(clearRevisions('rates', key));
       const action = (mode === 'create' || mode === 'closeandnew') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The product was ${action}`));
       this.handleBack(true);
@@ -164,8 +162,7 @@ class ProductSetup extends Component {
     if (itemWasChanged) {
       this.props.dispatch(clearItems('product')); // refetch items list because item was (changed in / added to) list
     }
-    const listUrl = globalSetting.systemItems.product.itemsType;
-
+    const listUrl = getConfig(['systemItems', 'product', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
   }
 

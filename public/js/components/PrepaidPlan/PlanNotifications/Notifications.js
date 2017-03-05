@@ -26,6 +26,7 @@ const Notifications = (props) => {
     const last = i === props.notifications.size - 1;
     return (
       <Notification
+        editable={props.editable}
         notification={notification}
         first={first}
         last={last}
@@ -40,9 +41,11 @@ const Notifications = (props) => {
   const header = (
     <h3>
       { props.name }
-      <Button onClick={onRemoveBalance} bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}>
-        <i className="fa fa-trash-o danger-red" />&nbsp;Remove
-      </Button>
+      { props.editable &&
+        <Button onClick={onRemoveBalance} bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}>
+          <i className="fa fa-trash-o danger-red" />&nbsp;Remove
+        </Button>
+      }
     </h3>
   );
 
@@ -51,7 +54,7 @@ const Notifications = (props) => {
       <Panel header={header}>
         { props.notifications.map(notification_el) }
         <br />
-        <CreateButton onClick={onAdd} label="Add New" />
+        { props.editable && <CreateButton onClick={onAdd} label="Add New" /> }
       </Panel>
     </div>
   );
