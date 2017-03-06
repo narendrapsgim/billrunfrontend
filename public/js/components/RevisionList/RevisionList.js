@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { ConfirmModal, StateIcon } from '../Elements';
 import List from '../../components/List';
-import { getItemDateValue } from '../../common/Util';
+import { getItemDateValue, getConfig } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
@@ -52,8 +52,8 @@ class RevisionList extends Component {
   onClickEdit = (item) => {
     const { itemName } = this.props;
     const itemId = item.getIn(['_id', '$id']);
-    const itemType = globalSetting.systemItems[itemName].itemType;
-    const itemsType = globalSetting.systemItems[itemName].itemsType;
+    const itemType =  getConfig(['systemItems', itemName, 'itemType'], '');
+    const itemsType =  getConfig(['systemItems', itemName, 'itemsType'], '');
     this.props.onSelectItem();
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   };
@@ -75,7 +75,7 @@ class RevisionList extends Component {
   onClickRemoveOk = () => {
     const { itemName } = this.props;
     const { itemToRemove } = this.state;
-    const collection = globalSetting.systemItems[itemName].collection;
+    const collection = getConfig(['systemItems', itemName, 'collection'], '');
     this.props.dispatch(deleteEntity(collection, itemToRemove)).then(this.afterRemove);
   }
 
@@ -84,8 +84,8 @@ class RevisionList extends Component {
     const { itemName } = this.props;
     if (response.status) {
       this.props.dispatch(showSuccess('Revision was removed'));
-      const collection = globalSetting.systemItems[itemName].collection;
-      const uniqueField = globalSetting.systemItems[itemName].uniqueField;
+      const collection = getConfig(['systemItems', itemName, 'collection'], '');
+      const uniqueField = getConfig(['systemItems', itemName, 'uniqueField'], '');
       const key = itemToRemove.get(uniqueField, '');
       this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
       const stayOnPage = this.props.onDeleteItem(itemToRemove);

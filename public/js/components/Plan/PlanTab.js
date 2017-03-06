@@ -43,6 +43,17 @@ export default class Plan extends Component {
     }
   }
 
+  componentDidMount() {
+    this.setDefaultValues();
+  }
+
+  setDefaultValues = () => {
+    const { plan } = this.props;
+    if (plan.get('prorated', null) === null) {
+      this.props.onChangeFieldValue(['prorated'], true);
+    }
+  }
+
   onPlanTrailTariffInit = (e) => {
     this.props.onPlanTariffAdd(true);
   }
@@ -63,6 +74,11 @@ export default class Plan extends Component {
   onChangePlanCode = (e) => {
     const { value } = e.target;
     this.props.onChangeFieldValue(['code'], value);
+  }
+
+  onChangeProrated = (e) => {
+    const { value } = e.target;
+    this.props.onChangeFieldValue(['prorated'], value);
   }
 
   onChangePlanDescription = (e) => {
@@ -232,12 +248,21 @@ export default class Plan extends Component {
                 </Col>
               </FormGroup>
 
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
+                <Col sm={4} style={{ padding: '10px' }}>
+                  <Field value={plan.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
+                </Col>
+              </FormGroup>
+
               <EntityFields
                 entityName="plans"
                 entity={plan}
                 onChangeField={this.onChangeAdditionalField}
                 editable={editable}
               />
+
+
 
             </Panel>
 

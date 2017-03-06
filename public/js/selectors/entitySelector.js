@@ -16,6 +16,8 @@ const getRevisions = (state, props, itemType) => {
   switch (itemType) {
     case 'product':
       return state.entityList.revisions.get('rates');
+    case 'prepaid_include':
+      return state.entityList.revisions.get('prepaidincludes');
     default: {
       const itemsType = `${itemType}s`;
       return state.entityList.revisions.get(itemsType);
@@ -44,7 +46,15 @@ const getId = (state, props, itemType) => { // eslint-disable-line no-unused-var
   return null;
 };
 
-const getItem = (state, props, itemType) => state[itemType];
+const getItem = (state, props, itemType) => {
+  switch (itemType) {
+    case 'prepaid_include':
+      return state.entity.get(itemType);
+    default: {
+      return state[itemType];
+    }
+  }
+};
 
 const selectRevisions = (item, allRevisions, uniqueFiled) => {
   if (allRevisions && item && item.getIn(['_id', '$id'], false)) {

@@ -8,7 +8,7 @@ import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
-import { buildPageTitle, getItemDateValue } from '../../common/Util';
+import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
 import { addGroup, removeGroup, getService, clearService, updateService, saveService } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -143,7 +143,7 @@ class ServiceSetup extends Component {
     if (itemWasChanged) {
       this.props.dispatch(clearItems('services')); // refetch items list because item was (changed in / added to) list
     }
-    const listUrl = globalSetting.systemItems.service.itemsType;
+    const listUrl = getConfig(['systemItems', 'service', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
   }
 

@@ -56,7 +56,7 @@ export default class PrepaidPlanDetails extends Component {
   render() {
     const { errors } = this.state;
     const { item, mode } = this.props;
-
+    const editable = (mode !== 'view');
     return (
       <div className="PrepaidPlanDetails">
         <Form horizontal>
@@ -67,7 +67,7 @@ export default class PrepaidPlanDetails extends Component {
               <Help contents={PlanDescription.description} />
             </Col>
             <Col sm={8} lg={9}>
-              <Field value={item.get('description', '')} onChange={this.onChangeDescription} />
+              <Field value={item.get('description', '')} onChange={this.onChangeDescription} editable={editable} />
             </Col>
           </FormGroup>
 
@@ -78,7 +78,7 @@ export default class PrepaidPlanDetails extends Component {
                 <Help contents={PlanDescription.name} />
               </Col>
               <Col sm={8} lg={9}>
-                <Field value={item.get('name', '')} onChange={this.onChangeName} />
+                <Field value={item.get('name', '')} onChange={this.onChangeName} editable={editable} />
                 { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
               </Col>
             </FormGroup>
@@ -90,7 +90,7 @@ export default class PrepaidPlanDetails extends Component {
               <Help contents={PlanDescription.code} />
             </Col>
             <Col sm={8} lg={9}>
-              <Field onChange={this.onChangeCode} value={item.get('code', '')} />
+              <Field onChange={this.onChangeCode} value={item.get('code', '')} editable={editable} />
             </Col>
           </FormGroup>
 
