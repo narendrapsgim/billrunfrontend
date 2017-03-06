@@ -7,7 +7,9 @@ import Notifications from './Notifications';
 
 
 const PlanNotifications = (props) => {
-  const { plan, ppIncludes } = props;
+  const { plan, ppIncludes, mode } = props;
+
+  const editable = (mode !== 'view');
 
   const getPpIncludeName = (ppId) => {
     const PpInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId), Map());
@@ -40,6 +42,7 @@ const PlanNotifications = (props) => {
     return (
       data.size ?
         <Notifications
+          editable={editable}
           notifications={data}
           onAdd={onAddNotification}
           onRemove={onRemoveNotification}
@@ -63,10 +66,12 @@ const PlanNotifications = (props) => {
       <Row>
         <Col lg={12}>
           <Form>
-            <Panel header={<h4>Select prepaid bucket</h4>}>
-              <Select placeholder="Select" options={options} onChange={onSelectBalance} />
-            </Panel>
-            <hr />
+            { editable &&
+              <Panel header={<h4>Select prepaid bucket</h4>}>
+                <Select placeholder="Select" options={options} onChange={onSelectBalance} />
+              </Panel>
+            }
+            { editable && <hr /> }
             {
               plan.get('notifications_threshold', Map())
                 .keySeq()
@@ -92,6 +97,7 @@ const PlanNotifications = (props) => {
 PlanNotifications.defaultProps = {
   plan: Map(),
   ppIncludes: List(),
+  mode: 'create',
 };
 
 PlanNotifications.propTypes = {
@@ -102,6 +108,7 @@ PlanNotifications.propTypes = {
   onUpdateNotificationField: PropTypes.func.isRequired,
   onSelectBalance: PropTypes.func.isRequired,
   onRemoveBalanceNotifications: PropTypes.func.isRequired,
+  mode: PropTypes.string,
 };
 
 export default connect()(PlanNotifications);
