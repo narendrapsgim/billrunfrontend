@@ -72,8 +72,9 @@ class StateDetails extends Component {
   renderVerisionList = () => {
     const { item, itemName, revisions, revisionBy } = this.props;
     const { showList } = this.state;
+    const title = `${item.get(revisionBy, '')} - Revision History`;
     return (
-      <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
+      <ModalWrapper title={title} show={showList} onCancel={this.hideManageRevisions} onHide={this.hideManageRevisions} labelCancel="Close">
         <RevisionList
           items={revisions}
           itemName={itemName}

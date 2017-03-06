@@ -77,8 +77,9 @@ class EntityRevisionDetails extends Component {
     const { itemName, revisions, item } = this.props;
     const { showList } = this.state;
     const revisionBy = getConfig(['systemItems', itemName, 'uniqueField'], '');
+    const title = `${item.get(revisionBy, '')} - Revision History`;
     return (
-      <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
+      <ModalWrapper title={title} show={showList} onCancel={this.hideManageRevisions} onHide={this.hideManageRevisions} labelCancel="Close">
         <RevisionList
           items={revisions}
           itemName={itemName}

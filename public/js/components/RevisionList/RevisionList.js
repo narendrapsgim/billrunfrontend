@@ -4,8 +4,9 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { ConfirmModal, StateIcon } from '../Elements';
+import CloseActionBox from '../Entity/CloseActionBox';
 import List from '../../components/List';
-import { getItemDateValue, getConfig } from '../../common/Util';
+import { getItemDateValue, getConfig, isItemClosed } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
@@ -37,8 +38,16 @@ class RevisionList extends Component {
 
   isItemEditable = item => getItemDateValue(item, 'to', moment(0)).isAfter(moment());
   isItemRemovable = item => getItemDateValue(item, 'from', moment(0)).isAfter(moment());
+  parseFromDate = item => getItemDateValue(item, 'from', moment(0)).format(globalSetting.dateFormat);
+  parseToDate = (item) => {
+    const { items } = this.props;
+    const toDate = getItemDateValue(item, 'to', moment(0));
+    if (toDate.isBefore(moment()) || isItemClosed(item, items)) {
+      return toDate.format(globalSetting.dateFormat);
+    }
+    return 'Infinity';
+  };
 
-  parseDate = item => getItemDateValue(item, 'from', moment(0)).format(globalSetting.dateFormat);
   parserState = item => (
     <StateIcon
       from={getItemDateValue(item, 'from', moment(0)).toISOString()}
@@ -52,8 +61,8 @@ class RevisionList extends Component {
   onClickEdit = (item) => {
     const { itemName } = this.props;
     const itemId = item.getIn(['_id', '$id']);
-    const itemType =  getConfig(['systemItems', itemName, 'itemType'], '');
-    const itemsType =  getConfig(['systemItems', itemName, 'itemsType'], '');
+    const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+    const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
     this.props.onSelectItem();
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   };
@@ -95,9 +104,18 @@ class RevisionList extends Component {
     }
   }
 
+  getActiveRevision = () => {
+    const { items } = this.props;
+    return items.find(item => (
+      getItemDateValue(item, 'from', null).isBefore(moment())
+      && getItemDateValue(item, 'to', null).isAfter(moment())
+    ));
+  }
+
   getListFields = () => [
     { id: 'state', parser: this.parserState, cssClass: 'state' },
-    { id: 'from', title: 'Start date', parser: this.parseDate },
+    { id: 'from', title: 'Start date', parser: this.parseFromDate },
+    { id: 'to', title: 'To date', parser: this.parseToDate },
   ]
 
   getListActions = () => [
@@ -107,14 +125,16 @@ class RevisionList extends Component {
   ]
 
   render() {
-    const { items } = this.props;
+    const { items, itemName } = this.props;
     const { showConfirmRemove } = this.state;
     const fields = this.getListFields();
     const actions = this.getListActions();
+    const activeItem = this.getActiveRevision();
     const removeConfirmMessage = 'Are you sure you want to remove revision ?';
     return (
       <div>
         <List items={items} fields={fields} edit={false} actions={actions} />
+        <CloseActionBox itemName={itemName} item={activeItem} revisions={items} />
         <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
       </div>
     );

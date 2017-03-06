@@ -78,3 +78,8 @@ export const getItemDateValue = (item, fieldName, defaultValue = moment()) => {
   }
   return defaultValue;
 };
+
+export const isItemClosed = (item) => {
+  const toTime = getItemDateValue(item, 'to');
+  return toTime.isAfter(moment()) && toTime.isBefore(moment().add(50, 'years'));
+};
