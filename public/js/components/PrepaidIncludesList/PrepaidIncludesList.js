@@ -25,6 +25,7 @@ const PrepaidIncludesList = () => {
       filterFields={fields}
       tableFields={fields}
       projectFields={projectFields}
+      showRevisionBy="name"
     />
   );
 };
