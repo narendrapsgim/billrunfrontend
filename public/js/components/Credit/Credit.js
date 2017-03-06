@@ -156,7 +156,7 @@ class Credit extends Component {
                   value="fix"
                   checked={rateBy === 'fix'}
                   onChange={this.onChangeCreditBy}
-                  label="&nbsp;fix price"
+                  label="&nbsp;Fixed price"
                 />
               </Col>
               <Col sm={3}>
@@ -167,7 +167,7 @@ class Credit extends Component {
                   value="usagev"
                   checked={rateBy === 'usagev'}
                   onChange={this.onChangeCreditBy}
-                  label="&nbsp;volume"
+                  label="&nbsp;Volume"
                 />
               </Col>
             </Col>

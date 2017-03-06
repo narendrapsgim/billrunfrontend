@@ -10,9 +10,8 @@ import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
 import { ActionButtons } from '../Elements';
-import { getCurrenciesQuery } from '../../common/ApiQueries';
 import { apiBillRun } from '../../common/Api';
-import { getSettings, updateSetting, saveSettings, fetchFile } from '../../actions/settingsActions';
+import { getSettings, updateSetting, saveSettings, fetchFile, getCurrencies } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
 import { tabSelector } from '../../selectors/entitySelector';
 
@@ -41,23 +40,17 @@ class Settings extends Component {
 
   componentWillMount() {
     this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types']));
+    this.props.dispatch(getCurrencies()).then(this.initCurrencyOptions);
   }
 
-  componentDidMount() {
-    this.getCurrencies()
-        .then((currencies) => {
-          const currenciesBuild = currencies.options.map(function (currency) {
-            return { label: `${currency.code} ${currency.symbol}`, value: currency.name };
-          });
-          this.setState({ currencyOptions: currenciesBuild });
-        });
-  }
-
-  getCurrencies = () => {
-    const query = getCurrenciesQuery();
-    return apiBillRun(query)
-      .then(success => ({ options: success.data[0].data.details }))
-      .catch(() => ({ options: [] }));
+  initCurrencyOptions = (response) => {
+    if (response.status) {
+      const currencyOptions = Immutable.fromJS(response.data).map(currency => ({
+        label: `${currency.get('code', '')} - ${currency.get('name', '')} ${currency.get('symbol', '')}`,
+        value: currency.get('code', ''),
+      })).toArray();
+      this.setState({ currencyOptions });
+    }
   }
 
   onChangeFieldValue = (category, id, value) => {
