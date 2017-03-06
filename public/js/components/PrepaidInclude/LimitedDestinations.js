@@ -5,37 +5,47 @@ import { Panel } from 'react-bootstrap';
 import LimitedDestination from './LimitedDestination';
 import PlanSearch from '../Elements/PlanSearch';
 
-const LimitedDestinations = ({ onSelectPlan, limitedDestinations, onChange, allRates }) => (
-  <div className="LimitedDestinations">
-    <Panel>
-      <PlanSearch onSelectPlan={onSelectPlan} />
-    </Panel>
-    <LimitedDestination
-      rates={limitedDestinations.get('BASE', List())}
-      onChange={onChange}
-      allRates={allRates}
-      name="BASE"
-    />
-    {
-      limitedDestinations
-           .keySeq()
-           .filter(n => n !== 'BASE')
-           .map((name, key) => (
-             <LimitedDestination
-               key={key}
-               rates={limitedDestinations.get(name, List())}
-               onChange={onChange}
-               allRates={allRates}
-               name={name}
-             />
-           ))
-    }
-  </div>
-);
+const LimitedDestinations = (props) => {
+  const { limitedDestinations, allRates, mode } = props;
+  const editable = (mode !== 'view');
+
+  return (
+    <div className="LimitedDestinations">
+      { editable &&
+        <Panel>
+          <PlanSearch onSelectPlan={props.onSelectPlan} />
+        </Panel>
+      }
+      <LimitedDestination
+        editable={editable}
+        rates={limitedDestinations.get('BASE', List())}
+        onChange={props.onChange}
+        allRates={allRates}
+        name="BASE"
+      />
+      {
+        limitedDestinations
+          .keySeq()
+          .filter(n => n !== 'BASE')
+          .map((name, key) => (
+            <LimitedDestination
+              editable={editable}
+              key={key}
+              rates={limitedDestinations.get(name, List())}
+              onChange={props.onChange}
+              allRates={allRates}
+              name={name}
+            />
+          ))
+      }
+    </div>
+  );
+};
 
 LimitedDestinations.defaultProps = {
   limitedDestinations: Map(),
   allRates: [],
+  mode: 'create',
 };
 
 LimitedDestinations.propTypes = {
@@ -43,6 +53,7 @@ LimitedDestinations.propTypes = {
   allRates: PropTypes.array,
   onSelectPlan: React.PropTypes.func.isRequired,
   onChange: React.PropTypes.func.isRequired,
+  mode: PropTypes.string,
 };
 
 export default connect()(LimitedDestinations);
