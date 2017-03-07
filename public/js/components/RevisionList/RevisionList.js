@@ -111,7 +111,7 @@ class RevisionList extends Component {
     const { showConfirmRemove } = this.state;
     const fields = this.getListFields();
     const actions = this.getListActions();
-    const removeConfirmMessage = 'Are you sure you want to remove revision ?';
+    const removeConfirmMessage = 'Are you sure you want to remove this revision?';
     return (
       <div>
         <List items={items} fields={fields} edit={false} actions={actions} />
