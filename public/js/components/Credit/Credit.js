@@ -38,7 +38,7 @@ class Credit extends Component {
     paramKeyError: '',
     rateBy: 'fix',
     aprice: '',
-    usagev: '',
+    usagev: 1,
     rate: '',
   }
 
@@ -75,13 +75,14 @@ class Credit extends Component {
     if (value === 'fix') {
       newState = {
         rateBy: value,
-        usagev: '',
+        usagev: 1,
         validationErrors: validationErrors.set('aprice', 'required').set('usagev', ''),
       };
     } else {
       newState = {
         rateBy: value,
         aprice: '',
+        usagev: '',
         validationErrors: validationErrors.set('aprice', '').set('usagev', 'required'),
       };
     }
@@ -101,7 +102,7 @@ class Credit extends Component {
       { credit_time: moment().toISOString() },
     ];
     if (rateBy === 'fix') {
-      params = [...params, { aprice }];
+      params = [...params, { aprice }, { usagev }];
     } else {
       params = [...params, { usagev }];
     }
@@ -176,13 +177,12 @@ class Credit extends Component {
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>Volume</Col>
+            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? 'Volume' : 'Quantity'}</Col>
             <Col sm={10}>
               <Field
                 onChange={this.onChangeCreditValue.bind(this, 'usagev')}
                 value={usagev}
                 fieldType="number"
-                disabled={rateBy !== 'usagev'}
               />
               { validationErrors.get('usagev', '').length > 0 ? <HelpBlock>{validationErrors.get('usagev', '')}</HelpBlock> : ''}
             </Col>
