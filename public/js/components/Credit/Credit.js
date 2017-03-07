@@ -14,7 +14,6 @@ import { creditCharge } from '../../actions/creditActions';
 class Credit extends Component {
   static defaultProps = {
     allRates: List(),
-    usageTypes: List(),
     cancelLabel: 'Cancel',
     chargeLabel: 'Charge',
     sid: false,
@@ -23,7 +22,6 @@ class Credit extends Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     allRates: PropTypes.instanceOf(List),
-    usageTypes: PropTypes.instanceOf(List),
     onClose: PropTypes.func.isRequired,
     sid: PropTypes.number,
     aid: PropTypes.number.isRequired,
@@ -35,14 +33,12 @@ class Credit extends Component {
     validationErrors: Map({
       aprice: 'required',
       usagev: '',
-      usaget: '',
       rate: 'required',
     }),
     paramKeyError: '',
     rateBy: 'fix',
     aprice: '',
     usagev: '',
-    usaget: '',
     rate: '',
   }
 
@@ -79,15 +75,14 @@ class Credit extends Component {
     if (value === 'fix') {
       newState = {
         rateBy: value,
-        usaget: '',
         usagev: '',
-        validationErrors: validationErrors.set('aprice', 'required').set('usagev', '').set('usaget', ''),
+        validationErrors: validationErrors.set('aprice', 'required').set('usagev', ''),
       };
     } else {
       newState = {
         rateBy: value,
         aprice: '',
-        validationErrors: validationErrors.set('aprice', '').set('usagev', 'required').set('usaget', 'required'),
+        validationErrors: validationErrors.set('aprice', '').set('usagev', 'required'),
       };
     }
     this.setState(newState);
@@ -95,7 +90,7 @@ class Credit extends Component {
 
   onCreditCharge = () => {
     const { aid, sid } = this.props;
-    const { rateBy, aprice, usagev, usaget, rate, validationErrors } = this.state;
+    const { rateBy, aprice, usagev, rate, validationErrors } = this.state;
     if (validationErrors.valueSeq().includes('required')) {
       return;
     }
@@ -108,7 +103,7 @@ class Credit extends Component {
     if (rateBy === 'fix') {
       params = [...params, { aprice }];
     } else {
-      params = [...params, { usagev }, { usaget }];
+      params = [...params, { usagev }];
     }
     this.props.dispatch(creditCharge(params))
     .then(
@@ -120,11 +115,6 @@ class Credit extends Component {
     );
   };
 
-  getAvailableUsageTypes = () => {
-    const { usageTypes } = this.props;
-    return usageTypes.map(usaget => ({ value: usaget, label: usaget })).toArray();
-  }
-
   getAvailableRates = () => {
     const { allRates } = this.props;
     return allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
@@ -132,9 +122,8 @@ class Credit extends Component {
 
   render() {
     const { cancelLabel, chargeLabel } = this.props;
-    const { rateBy, aprice, usagev, usaget, rate, validationErrors } = this.state;
+    const { rateBy, aprice, usagev, rate, validationErrors } = this.state;
     const availableRates = this.getAvailableRates();
-    const availableUsageTypes = this.getAvailableUsageTypes();
     return (
       <ModalWrapper
         show={true}
@@ -199,20 +188,6 @@ class Credit extends Component {
             </Col>
           </FormGroup>
 
-          <FormGroup validationState={validationErrors.get('usaget', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>Unit Type</Col>
-            <Col sm={10}>
-              <Select
-                id="usaget"
-                onChange={this.onChangeSelectValue.bind(this, 'usaget')}
-                value={usaget}
-                disabled={rateBy !== 'usagev'}
-                options={availableUsageTypes}
-              />
-              { validationErrors.get('usaget', '').length > 0 ? <HelpBlock>{validationErrors.get('usaget', '')}</HelpBlock> : ''}
-            </Col>
-          </FormGroup>
-
           <FormGroup validationState={validationErrors.get('rate', '').length > 0 ? 'error' : null}>
             <Col sm={2} componentClass={ControlLabel}>Rate</Col>
             <Col sm={10}>
@@ -232,9 +207,8 @@ class Credit extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const usageTypes = state.settings.get('usage_types');
   const allRates = state.list.get('all_rates');
-  return { usageTypes, allRates };
+  return { allRates };
 };
 
 export default connect(mapStateToProps)(Credit);
