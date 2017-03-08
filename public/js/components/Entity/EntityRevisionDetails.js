@@ -6,7 +6,7 @@ import { Form, FormGroup, Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getItemDateValue, getConfig } from '../../common/Util';
+import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
 
 
 class EntityRevisionDetails extends Component {
@@ -17,6 +17,8 @@ class EntityRevisionDetails extends Component {
     mode: PropTypes.string,
     onChangeFrom: PropTypes.func,
     backToList: PropTypes.func,
+    reLoadItem: PropTypes.func,
+    clearRevisions: PropTypes.func,
     itemName: PropTypes.string.isRequired,
     revisionItemsInTimeLine: PropTypes.number,
     router: PropTypes.shape({
@@ -25,12 +27,14 @@ class EntityRevisionDetails extends Component {
   };
 
   static defaultProps = {
+    revisionItemsInTimeLine: 3,
     revisions: Immutable.List(),
     item: Immutable.Map(),
     mode: 'view',
     onChangeFrom: () => {},
     backToList: () => {},
-    revisionItemsInTimeLine: 3,
+    reLoadItem: () => {},
+    clearRevisions: () => {},
   };
 
   state = {
@@ -40,7 +44,7 @@ class EntityRevisionDetails extends Component {
   componentWillReceiveProps(nextProps) {
     const { item } = nextProps;
     const { item: oldItem } = this.props;
-    if (item.getIn(['_id', '$id'], '') !== oldItem.getIn(['_id', '$id'], '')) {
+    if (getItemId(item) !== getItemId(oldItem)) {
       this.hideManageRevisions();
     }
   }
@@ -53,24 +57,29 @@ class EntityRevisionDetails extends Component {
     this.setState({ showList: false });
   }
 
-  onDeleteItem = (removedItem) => {
+  onDeleteItem = (removedItemId) => {
     const { item, revisions, itemName } = this.props;
     // if screen was with deleted item, go to prev revision or list
-    if (item.getIn(['_id', '$id'], '') === removedItem.getIn(['_id', '$id'], '')) {
-      const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
-      const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
-      if (revisions.size <= 1) { // only one revision
-        this.props.backToList(true);
-        return false;
-      }
-      const idx = revisions.findIndex(revision => revision.getIn(['_id', '$id'], false) === item.getIn(['_id', '$id'], false));
+    if (getItemId(item) === removedItemId) {
       if (revisions.size > 1) {
+        const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+        const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
+        const idx = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
         const prevItemId = (idx !== -1) ? revisions.getIn([idx + 1, '_id', '$id'], revisions.getIn([idx - 1, '_id', '$id'], '')) : revisions.getIn([0, '_id', '$id'], '');
         this.props.router.push(`${itemsType}/${itemType}/${prevItemId}`);
-        return false;
+      } else { // only one revision
+        this.props.backToList(true);
       }
+    } else {
+      // refresh current item because it may effect by deleted revision
+      // i.e active_with_future turn be editable
+      this.props.reLoadItem();
     }
-    return true;
+  }
+
+  onCloseItem = () => {
+    this.props.clearRevisions();
+    this.props.reLoadItem();
   }
 
   renderVerisionList = () => {
@@ -85,6 +94,7 @@ class EntityRevisionDetails extends Component {
           itemName={itemName}
           onSelectItem={this.hideManageRevisions}
           onDeleteItem={this.onDeleteItem}
+          onCloseItem={this.onCloseItem}
         />
       </ModalWrapper>
     );
@@ -92,7 +102,7 @@ class EntityRevisionDetails extends Component {
 
   getStartIndex = () => {
     const { item, revisions } = this.props;
-    const index = revisions.findIndex(revision => revision.getIn(['_id', '$id'], '') === item.getIn(['_id', '$id'], ''));
+    const index = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
     if (index <= 0) {
       return 0;
     }
@@ -199,7 +209,7 @@ class EntityRevisionDetails extends Component {
 
   renderEditMessage = () => {
     const { mode, item } = this.props;
-    if (mode === 'view' && getItemDateValue(item, 'to').isAfter(moment())) {
+    if (mode === 'view' && ['active_with_future'].includes(item.getIn(['revision_info', 'status'], ''))) {
       return (
         <small className="danger-red"> You cannot edit the current revision because a future revision exists.</small>
       );

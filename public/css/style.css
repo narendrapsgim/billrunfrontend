@@ -360,6 +360,11 @@ ul.revision-history-list li.more::after {
   width: 15px;
   left: 23px;
 }
+ul.revision-history-list li.closed::after {
+  width: 34px;
+  left: -18px;
+  top: 8px;
+}
 ul.revision-history-list li.more.after::after {
   left: -15px;
 }
@@ -383,7 +388,6 @@ ul.revision-history-list li.last::after {
   width: 0;
   border-bottom: none;
 }
-
 .entity-revision-edit ul.revision-history-list li .date {
   color: #6f6f6f;
 }

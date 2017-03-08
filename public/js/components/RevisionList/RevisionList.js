@@ -6,7 +6,7 @@ import moment from 'moment';
 import { ConfirmModal, StateIcon } from '../Elements';
 import CloseActionBox from '../Entity/CloseActionBox';
 import List from '../../components/List';
-import { getItemDateValue, getConfig, isItemClosed } from '../../common/Util';
+import { getItemDateValue, getConfig, isItemClosed, getItemId } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
@@ -18,6 +18,7 @@ class RevisionList extends Component {
     items: PropTypes.instanceOf(Immutable.List),
     onSelectItem: PropTypes.func,
     onDeleteItem: PropTypes.func,
+    onCloseItem: PropTypes.func,
     itemName: PropTypes.string.isRequired,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
@@ -29,6 +30,7 @@ class RevisionList extends Component {
     items: Immutable.List(),
     onSelectItem: () => {},
     onDeleteItem: () => {},
+    onCloseItem: () => {},
   };
 
   state = {
@@ -36,27 +38,34 @@ class RevisionList extends Component {
     itemToRemove: null,
   }
 
-  isItemEditable = item => getItemDateValue(item, 'to', moment(0)).isAfter(moment());
-  isItemRemovable = item => getItemDateValue(item, 'from', moment(0)).isAfter(moment());
-  parseFromDate = item => getItemDateValue(item, 'from', moment(0)).format(globalSetting.dateFormat);
-  parseToDate = (item) => {
-    const { items } = this.props;
-    const toDate = getItemDateValue(item, 'to', moment(0));
-    if (toDate.isBefore(moment()) || isItemClosed(item, items)) {
-      return toDate.format(globalSetting.dateFormat);
+  isItemEditable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
+
+  isItemRemovable = item => ['future'].includes(item.getIn(['revision_info', 'status'], ''));
+
+  parseEditShow = item => this.isItemEditable(item);
+
+  parseViewShow = item => !this.isItemEditable(item);
+
+  parseRemoveEnable = item => this.isItemRemovable(item);
+
+  parserState = item => (<StateIcon status={item.getIn(['revision_info', 'status'], '')} />);
+
+  parseFromDate = (item) => {
+    const fromDate = getItemDateValue(item, 'from', null);
+    if (moment.isMoment(fromDate)) {
+      return fromDate.format(globalSetting.dateFormat);
     }
-    return 'Infinity';
+    return '-';
   };
 
-  parserState = item => (
-    <StateIcon
-      from={getItemDateValue(item, 'from', moment(0)).toISOString()}
-      to={getItemDateValue(item, 'to', moment(0)).toISOString()}
-    />
-  );
-  parseEditShow = item => this.isItemEditable(item);
-  parseViewShow = item => !this.isItemEditable(item);
-  parseRemoveEnable = item => this.isItemRemovable(item);
+  parseToDate = (item) => {
+    const toDate = getItemDateValue(item, 'to', null);
+    const statusWithToDate = ['expired', 'active_with_future'].includes(item.getIn(['revision_info', 'status'], ''));
+    if (moment.isMoment(toDate) && (isItemClosed(item) || statusWithToDate)) {
+      return toDate.format(globalSetting.dateFormat);
+    }
+    return '-';
+  };
 
   onClickEdit = (item) => {
     const { itemName } = this.props;
@@ -96,11 +105,10 @@ class RevisionList extends Component {
       const collection = getConfig(['systemItems', itemName, 'collection'], '');
       const uniqueField = getConfig(['systemItems', itemName, 'uniqueField'], '');
       const key = itemToRemove.get(uniqueField, '');
+      const removedRevisionId = getItemId(itemToRemove);
       this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
-      const stayOnPage = this.props.onDeleteItem(itemToRemove);
-      if (stayOnPage) {
-        this.onClickRemoveClose();
-      }
+      this.onClickRemoveClose();
+      this.props.onDeleteItem(removedRevisionId);
     }
   }
 
@@ -114,7 +122,7 @@ class RevisionList extends Component {
 
   getListFields = () => [
     { id: 'state', parser: this.parserState, cssClass: 'state' },
-    { id: 'from', title: 'Start date', parser: this.parseFromDate },
+    { id: 'from', title: 'Start date', parser: this.parseFromDate, cssClass: 'short-date' },
     { id: 'to', title: 'To date', parser: this.parseToDate },
   ]
 
@@ -134,7 +142,13 @@ class RevisionList extends Component {
     return (
       <div>
         <List items={items} fields={fields} edit={false} actions={actions} />
-        <CloseActionBox itemName={itemName} item={activeItem} revisions={items} />
+        { activeItem &&
+          <CloseActionBox
+            itemName={itemName}
+            item={activeItem}
+            onCloseItem={this.props.onCloseItem}
+          />
+        }
         <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
       </div>
     );

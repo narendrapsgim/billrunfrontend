@@ -2,13 +2,18 @@ import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import classNames from 'classnames';
 import StateIcon from './StateIcon';
-import { getItemDateValue } from '../../common/Util';
+import { getItemDateValue, isItemClosed, getItemId } from '../../common/Util';
 
 
 const RevisionTimeline = ({ revisions, size, item, start }) => {
   const more = revisions.size > size && (start + size !== revisions.size);
+  const lastItem = revisions
+      .slice(start, start + 1)
+      .reverse()
+      .get(0, Immutable.Map());
+  const end = isItemClosed(lastItem) ? ((start + size) - 1) : start + size;
   const renderMore = type => (
-    <li key={`${item.getIn(['_id', '$id'], '')}-more-${type}`} className={`more ${type}`}>
+    <li key={`${getItemId(item, '')}-more-${type}`} className={`more ${type}`}>
       <div style={{ lineHeight: '12px' }}>&nbsp;</div>
       <div>
         <div>&nbsp;</div>
@@ -18,18 +23,17 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
   );
   const renderRevision = (revision, key, list) => {
     const from = getItemDateValue(revision, 'from');
-    const to = getItemDateValue(revision, 'to');
-    const isActive = revision.getIn(['_id', '$id'], '') === item.getIn(['_id', '$id'], '');
+    const isActive = getItemId(revision, '') === getItemId(item, '');
     const activeClass = classNames('revision', {
       active: isActive,
       first: key === 0,
       last: key === (list.size - 1),
     });
     return (
-      <li key={`${revision.getIn(['_id', '$id'], '')}`} className={activeClass}>
+      <li key={`${getItemId(revision, '')}`} className={activeClass}>
         <div>
           <div>
-            <StateIcon from={from.toISOString()} to={to.toISOString()} />
+            <StateIcon status={revision.getIn(['revision_info', 'status'], '')} />
           </div>
           <small className="date">
             { from.format('MMM DD')}
@@ -41,15 +45,34 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
     );
   };
 
+  const renderClosedRevision = () => {
+    const to = getItemDateValue(lastItem, 'to');
+    return (
+      <li key={`${getItemId(lastItem, '')}-closed`} className="closed">
+        <div>
+          <div><i style={{ fontSize: 19 }} className="fa fa-times-circle" /></div>
+          <small className="date">
+            { to.format('MMM DD')}
+            <br />
+            { to.format('YYYY')}
+          </small>
+        </div>
+      </li>
+    );
+  };
+
   return (
     <ul className="revision-history-list">
       { more && renderMore('before') }
       { revisions
-        .slice(start, start + size)
+        .slice(start, end)
         .reverse()
         .map(renderRevision)
       }
-      { (start > 0) && renderMore('after') }
+      { isItemClosed(lastItem)
+        ? renderClosedRevision()
+        : (start > 0) && renderMore('after')
+      }
     </ul>
   );
 };

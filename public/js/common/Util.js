@@ -79,7 +79,18 @@ export const getItemDateValue = (item, fieldName, defaultValue = moment()) => {
   return defaultValue;
 };
 
+export const getItemId = (item, defaultValue = null) => {
+  if (Immutable.Map.isMap(item)) {
+    return item.getIn(['_id', '$id'], defaultValue);
+  }
+  return defaultValue;
+};
+
 export const isItemClosed = (item) => {
+  const earlyExpiration = item.getIn(['revision_info', 'early_expiration'], null);
+  if (earlyExpiration !== null) {
+    return earlyExpiration;
+  }
   const toTime = getItemDateValue(item, 'to');
   return toTime.isAfter(moment()) && toTime.isBefore(moment().add(50, 'years'));
 };

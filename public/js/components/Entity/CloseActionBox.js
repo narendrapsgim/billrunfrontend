@@ -5,35 +5,29 @@ import moment from 'moment';
 import { Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { ConfirmModal } from '../Elements';
-import { getItemDateValue, getConfig, isItemClosed } from '../../common/Util';
+import { getItemDateValue, getItemId, getConfig, isItemClosed } from '../../common/Util';
 import { closeEntity } from '../../actions/entityActions';
 import { showSuccess } from '../../actions/alertsActions';
-import { getRevisions } from '../../actions/entityListActions';
 
 
 class CloseActionBox extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
-    revisions: PropTypes.instanceOf(Immutable.List),
     itemName: PropTypes.string.isRequired,
+    onCloseItem: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
-  };
+  }
 
   static defaultProps = {
     item: Immutable.Map(),
-    revisions: Immutable.List(),
-  };
+    onCloseItem: () => {},
+  }
 
-  constructor(props) {
-    super(props);
-    const isItemWillClose = props.item && isItemClosed(props.item, props.revisions);
-    this.state = {
-      showConfirmRemove: false,
-      showConfirmClose: false,
-      itemToRemove: null,
-      closeDate: isItemWillClose ? getItemDateValue(props.item, 'to', null) : null,
-    };
+  state = {
+    showConfirmClose: false,
+    showCloseDetails: false,
+    closeDate: isItemClosed(this.props.item) ? getItemDateValue(this.props.item, 'to', null) : null,
   }
 
   onClickCloseConfirm = () => {
@@ -56,14 +50,12 @@ class CloseActionBox extends Component {
 
   afterClose = (response) => {
     const { closeDate } = this.state;
-    const { itemName, item } = this.props;
+    const { item } = this.props;
     if (response.status) {
       this.props.dispatch(showSuccess(`Close date was set to ${closeDate.format(globalSetting.dateFormat)}`));
-      const collection = getConfig(['systemItems', itemName, 'collection'], '');
-      const uniqueField = getConfig(['systemItems', itemName, 'uniqueField'], '');
-      const key = item.get(uniqueField, '');
-      this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
+      const closedItemId = getItemId(item, '');
       this.onClickCloseConfirm();
+      this.props.onCloseItem(closedItemId);
     }
   }
 
@@ -79,11 +71,6 @@ class CloseActionBox extends Component {
 
   onChangeFrom = (date) => {
     this.setState({ closeDate: date });
-  }
-
-  isFutureRevisionexist = () => {
-    const { revisions } = this.props;
-    return revisions.findIndex(item => getItemDateValue(item, 'from', null).isAfter(moment())) !== -1;
   }
 
   renderDateFromfields = () => {
@@ -115,8 +102,9 @@ class CloseActionBox extends Component {
   render() {
     const { item } = this.props;
     const { showCloseDetails, showConfirmClose } = this.state;
+    const statusSupportCloseAction = ['active'].includes(item.getIn(['revision_info', 'status'], ''));
     const closeConfirmMessage = 'Are you sure you want to close revision ?';
-    if (item && !this.isFutureRevisionexist()) {
+    if (statusSupportCloseAction) {
       return (
         <div>
           <Button bsStyle="link" onClick={this.toggleCloseAction} style={{ verticalAlign: 'bottom', lineHeight: '24px' }}>
