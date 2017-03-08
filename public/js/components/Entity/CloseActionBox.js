@@ -100,7 +100,7 @@ class CloseActionBox extends Component {
   }
 
   render() {
-    const { item } = this.props;
+    const { item, itemName } = this.props;
     const { showCloseDetails, showConfirmClose } = this.state;
     const statusSupportCloseAction = ['active'].includes(item.getIn(['revision_info', 'status'], ''));
     const closeConfirmMessage = 'Are you sure you want to close revision ?';
@@ -108,7 +108,7 @@ class CloseActionBox extends Component {
       return (
         <div>
           <Button bsStyle="link" onClick={this.toggleCloseAction} style={{ verticalAlign: 'bottom', lineHeight: '24px' }}>
-            Close <i className="fa fa-angle-right" />
+            Close { getConfig(['systemItems', itemName, 'itemName'], 'item') } <i className="fa fa-angle-right" />
           </Button>
           { showCloseDetails && this.renderDateFromfields() }
           <ConfirmModal onOk={this.onClickCloseOk} onCancel={this.onClickCloseConfirm} show={showConfirmClose} message={closeConfirmMessage} labelOk="Yes" />
