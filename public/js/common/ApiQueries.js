@@ -51,6 +51,15 @@ export const getInputProcessorActionQuery = (fileType, action) => ({
   ],
 });
 
+export const getAddUsagetQuery = usaget => ({
+  api: 'settings',
+  params: [
+    { category: 'usage_types' },
+    { action: 'set' },
+    { data: [JSON.stringify(usaget)] },
+  ],
+});
+
 export const getCreditChargeQuery = params => ({
   api: 'credit',
   params,

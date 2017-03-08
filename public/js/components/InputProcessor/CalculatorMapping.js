@@ -76,7 +76,7 @@ export default class CalculatorMapping extends Component {
         selectedRadio = 2;
       }
       return (
-        <div>
+        <div key={calcKey}>
           <Row key={calcKey} style={{ marginBottom: 10 }}>
             <Col lg={3} md={3} style={{ paddingRight: 0 }}>
               <FormGroup style={{ margin: 0 }}>
