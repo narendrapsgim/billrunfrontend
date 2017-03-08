@@ -107,15 +107,19 @@ class EntityRevisionDetails extends Component {
     }
   }
 
-  renderDateFromfields = () => {
-    const { item, mode } = this.props;
-    const from = getItemDateValue(item, 'from');
-    if (mode === 'view' || mode === 'update') {
-      return (
-        <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)}</p>
-      );
-    }
+  filterDateAvailableFromDates = (date) => {
+    const { item } = this.props;
     const tommorow = moment().add(1, 'days');
+    const originalfrom = getItemDateValue(item, 'originalValue');
+    return originalfrom.isSame(date, 'day') || date.isSameOrAfter(tommorow, 'day');
+  }
+
+
+
+  renderDateFromfields = () => {
+    const { item } = this.props;
+    const from = getItemDateValue(item, 'from');
+    const originalfrom = getItemDateValue(item, 'originalValue');
     return (
       <DatePicker
         className="form-control"
@@ -124,7 +128,8 @@ class EntityRevisionDetails extends Component {
         onChange={this.onChangeFrom}
         isClearable={false}
         placeholderText="Select Date..."
-        minDate={tommorow}
+        filterDate={this.filterDateAvailableFromDates}
+        highlightDates={[originalfrom]}
       />
     );
   }
@@ -155,12 +160,15 @@ class EntityRevisionDetails extends Component {
   }
 
   renderDateViewBlock = () => {
-    const { item } = this.props;
+    const { item, mode } = this.props;
     const from = getItemDateValue(item, 'originalValue');
     const to = getItemDateValue(item, 'to');
     return (
       <div className="inline" style={{ width: 165, padding: 0, margin: '9px 20px 0 20px' }}>
-        <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)} - { to.format(globalSetting.dateFormat)}</p>
+        { mode === 'update'
+          ? (<p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)}</p>)
+          : (<p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)} - { to.format(globalSetting.dateFormat)}</p>)
+        }
       </div>
     );
   }
@@ -212,7 +220,7 @@ class EntityRevisionDetails extends Component {
       <div className="entity-revision-edit">
         <div>
           { this.renderTitle() }
-          { mode === 'view'
+          { (mode === 'view' || mode === 'update')
             ? this.renderDateViewBlock()
             : this.renderDateSelectBlock()
           }
