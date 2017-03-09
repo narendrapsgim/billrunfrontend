@@ -1,8 +1,21 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 
 export default class FieldsMapping extends Component {
+
+  static propTypes = {
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    addUsagetMapping: PropTypes.func,
+    onSetStaticUsaget: PropTypes.func,
+  };
+
+  static defaultProps = {
+    usageTypes: Immutable.List(),
+    addUsagetMapping: () => {},
+    onSetStaticUsaget: () => {},
+  };
+
   constructor(props) {
     super(props);
 
@@ -33,19 +46,25 @@ export default class FieldsMapping extends Component {
   onChangeUsaget(val) {
     const { usageTypes } = this.props;
 
-    const found = usageTypes.find(usaget => {
-      return usaget === val;
-    });
+    const found = usageTypes.find(usaget => (usaget === val));
     if (!found) {
-      this.props.addUsagetMapping(val);
+      this.props.addUsagetMapping(val)
+      .then(
+        (response) => {
+          if (response.status) {
+            this.setState({ usaget: val });
+            this.props.onSetStaticUsaget(val);
+          }
+        }
+      );
+    } else {
+      this.setState({ usaget: val });
+      this.props.onSetStaticUsaget(val);
     }
-
-    this.setState({usaget: val});
   }
 
   onChangeStaticUsaget(usaget) {
     this.onChangeUsaget(usaget);
-    this.props.onSetStaticUsaget.call(this, usaget);
   }
 
   addUsagetMapping(e) {
