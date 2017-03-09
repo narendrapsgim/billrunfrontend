@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, Col, ControlLabel, Panel } from 'react-bootstrap';
-import { inputProssesorCsiOptionsSelector } from '../../selectors/settingsSelector';
 import Field from '../Field';
 import Vat from './Tax/Vat';
 import Csi from './Tax/Csi';
@@ -11,11 +10,13 @@ class Tax extends Component {
 
   static propTypes = {
     data: PropTypes.instanceOf(Immutable.Map),
+    csiOptions: PropTypes.instanceOf(Immutable.Iterable),
     onChange: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     data: Immutable.Map(),
+    csiOptions: Immutable.List(),
   };
 
   state = {
@@ -24,13 +25,13 @@ class Tax extends Component {
   }
 
   componentDidMount() {
-    const type = this.props.data.getIn(['taxation', 'tax_type'], '');
+    const type = this.props.data.get('tax_type', '');
     this.switchPanels(type);
   }
 
   componentWillReceiveProps(nextProps) {
-    const newType = nextProps.data.getIn(['taxation', 'tax_type'], '');
-    const oldType = this.props.data.getIn(['taxation', 'tax_type'], '');
+    const newType = nextProps.data.get('tax_type', '');
+    const oldType = this.props.data.get('tax_type', '');
     if (newType !== oldType) {
       this.switchPanels(newType);
     }
@@ -53,7 +54,7 @@ class Tax extends Component {
 
   onChangeVat = (e) => {
     const { value } = e.target;
-    this.props.onChange('pricing', 'vat', value);
+    this.props.onChange('taxation', 'vat', value);
   }
 
   onChangeCsi = (csi) => {
@@ -71,10 +72,9 @@ class Tax extends Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, csiOptions } = this.props;
     const { showTax, showCsi } = this.state;
-    const isSimpleVat = data.getIn(['taxation', 'tax_type'], '') === 'vat';
-    const csiOptions = inputProssesorCsiOptionsSelector(data);
+    const isSimpleVat = data.get('tax_type', '') === 'vat';
     return (
       <div className="tax">
         <Form horizontal>
@@ -93,12 +93,12 @@ class Tax extends Component {
           </FormGroup>
 
           <Panel header={<span onClick={this.onClickVatPanle} className="clickable">VAT</span>} collapsible expanded={showTax} >
-            <Vat vat={data.getIn(['pricing', 'vat'], '')} onChange={this.onChangeVat} disabled={!isSimpleVat} />
+            <Vat vat={data.get('vat', '')} onChange={this.onChangeVat} disabled={!isSimpleVat} />
           </Panel>
 
           <Panel header={<span onClick={this.onClickCsiPanle} className="clickable">CSI</span>} collapsible expanded={showCsi} >
             <Csi
-              csi={data.getIn(['taxation', 'CSI'], Immutable.Map())}
+              csi={data.get('CSI', Immutable.Map())}
               onChange={this.onChangeCsi}
               disabled={isSimpleVat}
               fileTypes={csiOptions}

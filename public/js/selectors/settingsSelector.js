@@ -1,6 +1,8 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 
+const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['taxation']);
 
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
@@ -19,8 +21,8 @@ const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   return usageTypes.toList();
 };
 
-const getInputProssesors = settings =>  // eslint-disable-line no-unused-vars
-  settings.get('file_types', Immutable.Map());
+const getInputProssesors = (state, props) =>  // eslint-disable-line no-unused-vars
+  state.settings.get('file_types', Immutable.Map());
 
 const selectCsiOptions = (inputProssesors) => {
   let options = Immutable.List();
@@ -42,4 +44,9 @@ const selectCsiOptions = (inputProssesors) => {
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
   selectCsiOptions
+);
+
+export const taxationSelector = createSelector(
+  getTaxation,
+  taxation => taxation
 );
