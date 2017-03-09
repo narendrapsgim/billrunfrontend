@@ -10,10 +10,10 @@ import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
 import { ActionButtons } from '../Elements';
-import { apiBillRun } from '../../common/Api';
 import { getSettings, updateSetting, saveSettings, fetchFile, getCurrencies } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
 import { tabSelector } from '../../selectors/entitySelector';
+import { inputProssesorCsiOptionsSelector, taxationSelector } from '../../selectors/settingsSelector';
 
 
 class Settings extends Component {
@@ -21,6 +21,8 @@ class Settings extends Component {
   static defaultProps = {
     activeTab: 1,
     settings: Immutable.Map(),
+    csiOptions: Immutable.List(),
+    taxation: Immutable.Map(),
   };
 
   static propTypes = {
@@ -30,6 +32,8 @@ class Settings extends Component {
       pathname: PropTypes.string,
       query: PropTypes.object,
     }),
+    csiOptions: PropTypes.instanceOf(Immutable.Iterable),
+    taxation: PropTypes.instanceOf(Immutable.Map),
     router: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
   };
@@ -123,7 +127,8 @@ class Settings extends Component {
   }
 
   render() {
-    const { props: { settings, activeTab }, state: { currencyOptions } } = this;
+    const { settings, activeTab, csiOptions, taxation } = this.props;
+    const { currencyOptions } = this.state;
 
     const currency = settings.getIn(['pricing', 'currency'], '');
     const datetime = settings.get('billrun', Immutable.Map());
@@ -151,7 +156,7 @@ class Settings extends Component {
 
           <Tab title="Tax" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
-              <Tax data={settings} onChange={this.onChangeFieldValue} />
+              <Tax data={taxation} csiOptions={csiOptions} onChange={this.onChangeFieldValue} />
             </Panel>
           </Tab>
 
@@ -183,5 +188,7 @@ class Settings extends Component {
 const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'settings'),
   settings: state.settings,
+  csiOptions: inputProssesorCsiOptionsSelector(state, props),
+  taxation: taxationSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(Settings));

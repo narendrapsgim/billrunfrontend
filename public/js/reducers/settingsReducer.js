@@ -61,7 +61,7 @@ export default function (state = defaultState, action) {
       return state.withMutations((stateWithMutations) => {
         settings.forEach((setting) => {
           const data = setting.data.details;
-          if (setting.name === 'pricing') {
+          if (setting.name === 'taxation') {
             data.vat *= 100;
           }
           stateWithMutations.setIn(setting.name.split('.'), Immutable.fromJS(data));
