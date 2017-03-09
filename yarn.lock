@@ -1506,6 +1506,10 @@ csso@~2.2.1:
     clap "^1.0.9"
     source-map "^0.5.3"
 
+currency-symbol-map@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/currency-symbol-map/-/currency-symbol-map-3.1.0.tgz#b2b42c53e80d205bb508ca80eafc7816c9628d5b"
+
 currently-unhandled@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/currently-unhandled/-/currently-unhandled-0.4.1.tgz#988df33feab191ef799a61369dd76c17adf957ea"
