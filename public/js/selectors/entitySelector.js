@@ -11,8 +11,8 @@ const getRevisions = (state, props, entityName) => {
 };
 
 const getTab = (state, props) => {
-  if (props.location && props.location.query) {
-    return props.location.query.tab || undefined;
+  if (props.location && props.location.query && typeof props.location.query.tab !== 'undefined') {
+    return parseInt(props.location.query.tab) || undefined;
   }
   return undefined;
 };

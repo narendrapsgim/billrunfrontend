@@ -1,17 +1,19 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import DateTime from './DateTime';
-import CurrencyTax from './CurrencyTax';
+import Currency from './Currency';
+import Tax from './Tax';
 import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
-import ActionButtons from '../Elements/ActionButtons';
-import { getCurrenciesQuery } from '../../common/ApiQueries';
-import { apiBillRun } from '../../common/Api';
-import { getSettings, updateSetting, saveSettings, fetchFile } from '../../actions/settingsActions';
+import { ActionButtons } from '../Elements';
+import { getSettings, updateSetting, saveSettings, fetchFile, getCurrencies } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
+import { tabSelector } from '../../selectors/entitySelector';
+import { inputProssesorCsiOptionsSelector, taxationSelector } from '../../selectors/settingsSelector';
 
 
 class Settings extends Component {
@@ -19,38 +21,40 @@ class Settings extends Component {
   static defaultProps = {
     activeTab: 1,
     settings: Immutable.Map(),
+    csiOptions: Immutable.List(),
+    taxation: Immutable.Map(),
   };
 
   static propTypes = {
-    activeTab: React.PropTypes.number,
-    dispatch: React.PropTypes.func.isRequired,
-    settings: React.PropTypes.instanceOf(Immutable.Map),
+    activeTab: PropTypes.number,
+    settings: PropTypes.instanceOf(Immutable.Map),
+    location: PropTypes.shape({
+      pathname: PropTypes.string,
+      query: PropTypes.object,
+    }),
+    csiOptions: PropTypes.instanceOf(Immutable.Iterable),
+    taxation: PropTypes.instanceOf(Immutable.Map),
+    router: PropTypes.object,
+    dispatch: PropTypes.func.isRequired,
   };
 
   state = {
-    activeTab: parseInt(this.props.activeTab),
     currencyOptions: [],
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu']));
+    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types']));
+    this.props.dispatch(getCurrencies()).then(this.initCurrencyOptions);
   }
 
-  componentDidMount() {
-    this.getCurrencies()
-        .then((currencies) => {
-          const currenciesBuild = currencies.options.map(function (currency) {
-            return { label: `${currency.code} ${currency.symbol}`, value: currency.name };
-          });
-          this.setState({ currencyOptions: currenciesBuild });
-        });
-  }
-
-  getCurrencies = () => {
-    const query = getCurrenciesQuery();
-    return apiBillRun(query)
-      .then(success => ({ options: success.data[0].data.details }))
-      .catch(() => ({ options: [] }));
+  initCurrencyOptions = (response) => {
+    if (response.status) {
+      const currencyOptions = Immutable.fromJS(response.data).map(currency => ({
+        label: `${currency.get('code', '')} - ${currency.get('name', '')} ${currency.get('symbol', '')}`,
+        value: currency.get('code', ''),
+      })).toArray();
+      this.setState({ currencyOptions });
+    }
   }
 
   onChangeFieldValue = (category, id, value) => {
@@ -93,6 +97,9 @@ class Settings extends Component {
     if (settings.has('menu')) {
       categoryToSave.push('menu');
     }
+    if (settings.has('taxation')) {
+      categoryToSave.push('taxation');
+    }
     if (categoryToSave.length) {
       this.props.dispatch(saveSettings(categoryToSave)).then(
         (status) => {
@@ -111,14 +118,19 @@ class Settings extends Component {
     }
   }
 
-  handleSelectTab = (key) => {
-    this.setState({ activeTab: key });
+  handleSelectTab = (tab) => {
+    const { pathname, query } = this.props.location;
+    this.props.router.push({
+      pathname,
+      query: Object.assign({}, query, { tab }),
+    });
   }
 
   render() {
-    const { props: { settings }, state: { activeTab, currencyOptions } } = this;
+    const { settings, activeTab, csiOptions, taxation } = this.props;
+    const { currencyOptions } = this.state;
 
-    const currencyTax = settings.get('pricing', Immutable.Map());
+    const currency = settings.getIn(['pricing', 'currency'], '');
     const datetime = settings.get('billrun', Immutable.Map());
     const sharedSecret = settings.get('shared_secret', Immutable.Map());
     const tenant = settings.get('tenant', Immutable.Map());
@@ -134,14 +146,21 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
+
           <Tab title="Locale" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <DateTime onChange={this.onChangeFieldValue} data={datetime} />
-              <CurrencyTax onChange={this.onChangeFieldValue} data={currencyTax} currencies={currencyOptions} />
+              <Currency onChange={this.onChangeFieldValue} data={currency} currencies={currencyOptions} />
             </Panel>
           </Tab>
 
-          <Tab title="Menu" eventKey={3}>
+          <Tab title="Tax" eventKey={3}>
+            <Panel style={{ borderTop: 'none' }}>
+              <Tax data={taxation} csiOptions={csiOptions} onChange={this.onChangeFieldValue} />
+            </Panel>
+          </Tab>
+
+          <Tab title="Menu" eventKey={4}>
             <Panel style={{ borderTop: 'none' }}>
               <EditMenu
                 data={mainMenu}
@@ -151,7 +170,7 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Security" eventKey={4}>
+          <Tab title="Security" eventKey={5}>
             <Panel style={{ borderTop: 'none' }}>
               <Security data={sharedSecret} />
             </Panel>
@@ -167,7 +186,9 @@ class Settings extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  activeTab: props.location.query.tab,
+  activeTab: tabSelector(state, props, 'settings'),
   settings: state.settings,
+  csiOptions: inputProssesorCsiOptionsSelector(state, props),
+  taxation: taxationSelector(state, props),
 });
-export default connect(mapStateToProps)(Settings);
+export default withRouter(connect(mapStateToProps)(Settings));

@@ -1,4 +1,7 @@
-import { apiBillRun, apiBillRunErrorHandler } from '../common/Api';
+import moment from 'moment';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { startProgressIndicator } from './progressIndicatorActions';
+import { getCurrenciesQuery } from '../common/ApiQueries';
 import { showSuccess } from './alertsActions';
 
 export const UPDATE_SETTING = 'UPDATE_SETTING';
@@ -139,7 +142,7 @@ function saveSettingsToDB(categories, settings) {
   const multipleCategories = categories.length > 1;
   const categoryData = categories.map((category) => {
     let data = settings.getIn(category.split('.'));
-    if (category === 'pricing') {
+    if (category === 'taxation') {
       data = data.set('vat', data.get('vat') / 100);
     }
     if (multipleCategories) {
@@ -201,3 +204,22 @@ export function setFieldPosition(oldIndex, newIndex, path) {
     path,
   };
 }
+
+export const getCurrencies = () => (dispatch) => {
+  const now = moment();
+  const cacheForMinutes = 60;
+  const cacheKey = 'currencies-options';
+  const cache = JSON.parse(localStorage.getItem(cacheKey));
+  if (cache && moment(cache.time).add(cacheForMinutes, 'minutes').isAfter(now)) {
+    return Promise.resolve(cache.data);
+  }
+  dispatch(startProgressIndicator());
+  const query = getCurrenciesQuery();
+  return apiBillRun(query)
+    .then((success) => {
+      const data = dispatch(apiBillRunSuccessHandler(success));
+      localStorage.setItem(cacheKey, JSON.stringify({ time: now, data }));
+      return data;
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving currencies')));
+};

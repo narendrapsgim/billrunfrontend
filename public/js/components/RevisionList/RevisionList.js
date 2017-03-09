@@ -70,8 +70,8 @@ class RevisionList extends Component {
   onClickEdit = (item) => {
     const { itemName } = this.props;
     const itemId = item.getIn(['_id', '$id']);
-    const itemType =  getConfig(['systemItems', itemName, 'itemType'], '');
-    const itemsType =  getConfig(['systemItems', itemName, 'itemsType'], '');
+    const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+    const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
     this.props.onSelectItem();
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   };
@@ -107,10 +107,10 @@ class RevisionList extends Component {
       const key = itemToRemove.get(uniqueField, '');
       const removedRevisionId = getItemId(itemToRemove);
       this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
-        this.onClickRemoveClose();
+      this.onClickRemoveClose();
       this.props.onDeleteItem(removedRevisionId);
-      }
     }
+  }
 
   getActiveRevision = () => {
     const { items } = this.props;
