@@ -108,18 +108,19 @@ class EntityRevisionDetails extends Component {
   }
 
   filterDateAvailableFromDates = (date) => {
-    const { item } = this.props;
+    const { item, mode } = this.props;
+    if (mode === 'create') {
+      return true;
+    }
     const tommorow = moment().add(1, 'days');
     const originalfrom = getItemDateValue(item, 'originalValue');
     return originalfrom.isSame(date, 'day') || date.isSameOrAfter(tommorow, 'day');
   }
 
-
-
   renderDateFromfields = () => {
-    const { item } = this.props;
+    const { item, mode } = this.props;
     const from = getItemDateValue(item, 'from');
-    const originalfrom = getItemDateValue(item, 'originalValue');
+    const highlightDates = (mode === 'create') ? [] : [getItemDateValue(item, 'originalValue')];
     return (
       <DatePicker
         className="form-control"
@@ -129,7 +130,7 @@ class EntityRevisionDetails extends Component {
         isClearable={false}
         placeholderText="Select Date..."
         filterDate={this.filterDateAvailableFromDates}
-        highlightDates={[originalfrom]}
+        highlightDates={highlightDates}
       />
     );
   }
