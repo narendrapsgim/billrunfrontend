@@ -74,7 +74,7 @@ export default class ServiceDetails extends Component {
   }
 
   onChangeAdditionalField = (field, value) => {
-    this.props.updateItem([field], value);
+    this.props.updateItem(field, value);
   }
 
   render() {
