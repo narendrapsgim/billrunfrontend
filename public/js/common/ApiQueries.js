@@ -279,7 +279,7 @@ export const searchProductsByKeyQuery = (key, project = {}) => ({
     { query: JSON.stringify({
       key: { $regex: key, $options: 'i' },
     }) },
-    { states: JSON.stringify([0]) },
+    { states: JSON.stringify([0, 1]) },
   ],
 });
 
