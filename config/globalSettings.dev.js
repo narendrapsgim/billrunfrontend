@@ -1,4 +1,5 @@
 var globalSetting = {
+  storageVersion: 'v0.1',
   //serverUrl : "http://10.162.20.191:1337", // Roman
   //serverUrl : "http://10.162.20.86", // Eran
   // serverUrl : "http://10.162.20.247", // Shani
@@ -12,7 +13,8 @@ var globalSetting = {
   apiDateTimeFormat: "YYYY-MM-DD",
   currency: '$',
   list: {
-    maxItems: 100
+    maxItems: 100,
+    defaultItems: 10,
   },
   statusMessageDisplayTimeout: 5000,
   planCycleUnlimitedValue: 'UNLIMITED',
