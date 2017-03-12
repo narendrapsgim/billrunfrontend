@@ -31,7 +31,7 @@ export const gotEntity = (collection, entity) => ({
   entity,
 });
 
-export const setCloneEntity = (collection, entityName) =>  ({
+export const setCloneEntity = (collection, entityName) => ({
   type: actions.CLONE_RESET_ENTITY,
   collection,
   uniquefields: getConfig(['systemItems', entityName, 'uniqueField'], []),

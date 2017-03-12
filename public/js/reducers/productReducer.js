@@ -76,7 +76,7 @@ export default function (state = defaultState, action) {
       });
 
     case PRODUCT_CLONE_RESET: {
-      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', 'key'];
+      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', ...action.uniquefields];
       return state.withMutations((itemWithMutations) => {
         keysToDeleteOnClone.forEach((keyToDelete) => {
           itemWithMutations.delete(keyToDelete);

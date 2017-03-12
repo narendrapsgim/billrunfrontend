@@ -113,7 +113,7 @@ export const onPlanTariffRemove = index => ({
 
 export const setClonePlan = () => ({
   type: PLAN_CLONE_RESET,
-  uniquefields: getConfig(['systemItems', 'plan', 'uniqueField'], 'name'),
+  uniquefields: ['name'],
 });
 
 export const addUsagetInclude = (usaget, ppIncludesName, ppIncludesExternalId) => ({

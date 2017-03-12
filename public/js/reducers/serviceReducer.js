@@ -1,8 +1,6 @@
 import Immutable from 'immutable';
 import includeGroupsReducer from './includeGroupsReducer';
-import entityReducer from './entityReducer';
 import { ADD_GROUP, REMOVE_GROUP } from '../actions/includeGroupsActions';
-import { actions } from '../actions/entityActions';
 import {
   GOT_SERVICE,
   CLONE_RESET_SERVICE,
@@ -33,8 +31,12 @@ const serviceReducer = (state = DefaultState, action) => {
       return state.setIn(action.path, action.value);
 
     case CLONE_RESET_SERVICE: {
-      const entityAction = Object.assign({}, action, { type: actions.CLONE_RESET_ENTITY });
-      return entityReducer(state, entityAction);
+      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', ...action.uniquefields];
+      return state.withMutations((itemWithMutations) => {
+        keysToDeleteOnClone.forEach((keyToDelete) => {
+          itemWithMutations.delete(keyToDelete);
+        });
+      });
     }
 
     case ADD_GROUP_SERVICE: {

@@ -1,13 +1,10 @@
 import Immutable from 'immutable';
 import includeGroupsReducer from './includeGroupsReducer';
-import entityReducer from './entityReducer';
 import productReduser from './productReducer';
 
 import {
   ADD_GROUP, REMOVE_GROUP,
 } from '../actions/includeGroupsActions';
-
-import { actions } from '../actions/entityActions';
 
 import {
   PLAN_PRODUCTS_REMOVE,
@@ -161,8 +158,12 @@ export default function (state = defaultState, action) {
       return defaultState;
 
     case PLAN_CLONE_RESET: {
-      const entityAction = Object.assign({}, action, { type: actions.CLONE_RESET_ENTITY });
-      return entityReducer(state, entityAction);
+      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', ...action.uniquefields];
+      return state.withMutations((itemWithMutations) => {
+        keysToDeleteOnClone.forEach((keyToDelete) => {
+          itemWithMutations.delete(keyToDelete);
+        });
+      });
     }
 
     case ADD_BALANCE_NOTIFICATIONS: {

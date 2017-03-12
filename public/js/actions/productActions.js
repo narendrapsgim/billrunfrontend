@@ -57,6 +57,7 @@ export const onRateRemove = (path, index) => ({
 
 export const setCloneProduct = () => ({
   type: PRODUCT_CLONE_RESET,
+  uniquefields: ['key'],
 });
 
 export const saveProduct = (product, action) => saveEntity('rates', product, action);

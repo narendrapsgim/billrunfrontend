@@ -49,7 +49,7 @@ class ServiceSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'service');
       this.props.dispatch(setPageTitle(pageTitle));
     }
