@@ -19,8 +19,9 @@ import {
   onPlanTariffRemove,
   onGroupAdd,
   onGroupRemove,
+  setClonePlan,
 } from '../../actions/planActions';
-import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
+import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
@@ -61,7 +62,7 @@ class PlanSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -76,7 +77,7 @@ class PlanSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
     }
   }
@@ -100,6 +101,9 @@ class PlanSetup extends Component {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onPlanFieldUpdate(['from'], defaultFromValue));
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'postpaid'));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePlan());
     }
   }
 
@@ -169,7 +173,7 @@ class PlanSetup extends Component {
   afterSave = (response) => {
     const { mode } = this.props;
     if (response.status) {
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
       this.clearRevisions();
       this.handleBack(true);

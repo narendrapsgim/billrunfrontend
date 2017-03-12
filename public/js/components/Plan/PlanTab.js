@@ -196,7 +196,7 @@ export default class Plan extends Component {
                 </Col>
               </FormGroup>
 
-              {mode === 'create' &&
+              {['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
                     Key <Help contents={PlanDescription.name} />
@@ -261,8 +261,6 @@ export default class Plan extends Component {
                 onChangeField={this.onChangeAdditionalField}
                 editable={editable}
               />
-
-
 
             </Panel>
 
