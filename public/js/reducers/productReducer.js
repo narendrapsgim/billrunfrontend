@@ -6,7 +6,9 @@ import {
   PRODUCT_ADD_RATE,
   PRODUCT_REMOVE_RATE,
   PRODUCT_GOT,
-  PRODUCT_CLEAR } from '../actions/productActions';
+  PRODUCT_CLEAR,
+  PRODUCT_CLONE_RESET,
+} from '../actions/productActions';
 
 const PRODUCT_UNLIMITED = globalSetting.productUnlimitedValue;
 const defaultState = Immutable.Map({
@@ -72,6 +74,15 @@ export default function (state = defaultState, action) {
         }
         return list.delete(action.index);
       });
+
+    case PRODUCT_CLONE_RESET: {
+      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', 'key'];
+      return state.withMutations((itemWithMutations) => {
+        keysToDeleteOnClone.forEach((keyToDelete) => {
+          itemWithMutations.delete(keyToDelete);
+        });
+      });
+    }
 
     case PRODUCT_GOT:
       return Immutable.fromJS(action.product);

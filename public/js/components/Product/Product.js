@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, Button, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
 import CreateButton from '../Elements/CreateButton';
@@ -244,13 +244,13 @@ export default class Product extends Component {
                 </Col>
               </FormGroup>
 
-              {mode === 'create' &&
+              { ['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
                     Key<Help contents={ProductDescription.key} />
                   </Col>
                   <Col sm={8} lg={9}>
-                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={mode !== 'create'} editable={editable} />
+                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={!['clone', 'create'].includes(mode)} editable={editable} />
                     { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
                   </Col>
                 </FormGroup>
@@ -259,7 +259,7 @@ export default class Product extends Component {
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>External Code</Col>
                 <Col sm={8} lg={9}>
-                  <Field onChange={this.onChangeCode} value={product.get('code', '')} editable={editable}  />
+                  <Field onChange={this.onChangeCode} value={product.get('code', '')} editable={editable} />
                 </Col>
               </FormGroup>
 
@@ -290,7 +290,7 @@ export default class Product extends Component {
                     ? (
                       <Select
                         allowCreate
-                        disabled={mode !== 'create'}
+                        disabled={!['clone', 'create'].includes(mode)}
                         onChange={this.onChangeUsaget}
                         options={this.getUsageTypesOptions()}
                         value={usaget}
