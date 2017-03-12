@@ -9,7 +9,7 @@ import ChargingPlanIncludes from './ChargingPlanIncludes';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
-import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
+import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 import {
   getPlan,
   clearPlan,
@@ -17,6 +17,7 @@ import {
   onPlanFieldUpdate,
   addUsagetInclude,
   onPlanTariffAdd,
+  setClonePlan,
 } from '../../actions/planActions';
 import { getList } from '../../actions/listActions';
 import { showWarning, showSuccess } from '../../actions/alertsActions';
@@ -61,7 +62,7 @@ class ChargingPlanSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'charging_plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -76,7 +77,7 @@ class ChargingPlanSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'charging_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
     }
   }
@@ -97,6 +98,10 @@ class ChargingPlanSetup extends Component {
       this.props.dispatch(onPlanFieldUpdate(['price', 0, 'price'], 0));
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({ unit: 1, periodicity: 'month' })));
+      this.props.dispatch(onPlanFieldUpdate(['operation'], 'inc'));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePlan());
     }
   }
 
@@ -157,7 +162,7 @@ class ChargingPlanSetup extends Component {
   afterSave = (response) => {
     const { mode } = this.props;
     if (response.status) {
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
       this.clearRevisions();
       this.handleBack(true);
