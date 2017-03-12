@@ -165,9 +165,10 @@ function saveSettingsToDB(categories, settings) {
   });
 
   return (dispatch) => {
+    dispatch(startProgressIndicator());
     return apiBillRun(queries).then(
       (success) => {
-        dispatch(showSuccess('Settings saved successfuly!'));
+        dispatch(apiBillRunSuccessHandler(success, 'Settings saved successfuly!'));
         return true;
       }
     ).catch((error) => {
