@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
+import { Col } from 'react-bootstrap';
+import Field from '../Field';
 
 export default class Receiver extends Component {
+
+  state = {
+    receiverType: 'ftp',
+    receiverName: 'FTP',
+  };
 
   componentDidMount() {
     const { action } = this.props;
@@ -29,10 +36,18 @@ export default class Receiver extends Component {
     }
   }
 
+  onChangeReceiverType = (e) => {
+    const { value } = e.target;
+    this.setState({
+      receiver_type: value,
+    });
+  }
+
   render() {
     const { settings,
             onSetReceiverField,
             onSetReceiverCheckboxField } = this.props;
+    const { receiverType, receiverName } = this.state;
 
     const period_options = [{min: 1, label: "1 Minute"},
                             {min: 15, label: "15 Minutes"},
@@ -46,7 +61,13 @@ export default class Receiver extends Component {
 
     return (
       <div className="ReceiverSettings">
-        <h4>FTP</h4>
+        <Col sm={3}>
+          <Field fieldType="radio" onChange={this.onChangeReceiverType} name="receiver_type" value="ftp" label="FTP" checked={receiverType === 'ftp'} />
+        </Col>
+        <Col sm={3}>
+          <Field fieldType="radio" onChange={this.onChangeReceiverType} name="receiver_type" value="ssh" label="SFTP" checked={receiverType === 'ssh'} />
+        </Col>
+        <h4>{receiverName}</h4>
         <form className="form-horizontal">
           <div className="form-group">
             <label htmlFor="name" className="col-xs-2 control-label">Name</label>
