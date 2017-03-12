@@ -11,7 +11,7 @@ import Thresholds from './Thresholds';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
-import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
+import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
 import {
@@ -27,7 +27,14 @@ import {
 } from '../../actions/prepaidPlanActions';
 import { getList } from '../../actions/listActions';
 import { showWarning, showSuccess } from '../../actions/alertsActions';
-import { getPlan, savePlan, clearPlan, onPlanFieldUpdate, onPlanTariffAdd } from '../../actions/planActions';
+import {
+  getPlan,
+  savePlan,
+  clearPlan,
+  onPlanFieldUpdate,
+  onPlanTariffAdd,
+  setClonePlan,
+} from '../../actions/planActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
@@ -68,7 +75,7 @@ class PrepaidPlanSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'prepaid_plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -83,7 +90,7 @@ class PrepaidPlanSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'prepaid_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
     }
   }
@@ -105,6 +112,9 @@ class PrepaidPlanSetup extends Component {
       this.props.dispatch(onPlanFieldUpdate(['price', 0, 'price'], 0));
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({ unit: 1, periodicity: 'month' })));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePlan());
     }
   }
 
@@ -201,7 +211,7 @@ class PrepaidPlanSetup extends Component {
   afterSave = (response) => {
     const { mode } = this.props;
     if (response.status) {
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
       this.clearRevisions();
       this.handleBack(true);
