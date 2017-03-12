@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import { actions } from '../actions/entityActions';
 
-const defaultState = Immutable.fromJS({});
+const defaultState = Immutable.Map();
 
 export default function (state = defaultState, action) {
   const { collection, path, value, type, entity } = action;
@@ -21,6 +21,22 @@ export default function (state = defaultState, action) {
         return state.deleteIn([collection, ...path]);
       }
       return state.deleteIn([collection, path]);
+
+    case actions.CLONE_RESET_ENTITY: {
+      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue'];
+      if (typeof action.uniquefields === 'string') {
+        keysToDeleteOnClone.push(action.uniquefields);
+      } else if (Array.isArray(action.uniquefields)) {
+        keysToDeleteOnClone.push(...action.uniquefields);
+      }
+      // deleteAll() function still not avalible in v3.8.1 only from 4.0
+      // return state.deleteAll(keysToDeleteOnClone);
+      return state.withMutations((itemWithMutations) => {
+        keysToDeleteOnClone.forEach((keyToDelete) => {
+          itemWithMutations.delete(keyToDelete);
+        });
+      });
+    }
 
     case actions.CLEAR_ENTITY:
       if (collection) {

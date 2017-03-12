@@ -9,6 +9,7 @@ export const actions = {
   UPDATE_ENTITY_FIELD: 'UPDATE_ENTITY_FIELD',
   DELETE_ENTITY_FIELD: 'DELETE_ENTITY_FIELD',
   CLEAR_ENTITY: 'CLEAR_ENTITY',
+  CLONE_RESET_ENTITY: 'CLONE_RESET_ENTITY',
 };
 
 export const updateEntityField = (collection, path, value) => ({
@@ -97,6 +98,9 @@ const buildRequestData = (item, action) => {
 const requestActionBuilder = (collection, item, action) => {
   if (action === 'closeandnew' && getItemDateValue(item, 'from').isSame(getItemDateValue(item, 'originalValue', moment(0)), 'day')) {
     return 'update';
+  }
+  if (action === 'clone') {
+    return 'create';
   }
   return action;
 };
