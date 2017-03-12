@@ -84,7 +84,7 @@ class Tax extends Component {
             </Col>
             <Col sm={6}>
               <span style={{ display: 'inline-block', marginRight: 20 }}>
-                <Field fieldType="radio" onChange={this.onChangeTaxType} name="tax_type" value="vat" label="Vat" checked={isSimpleVat} />
+                <Field fieldType="radio" onChange={this.onChangeTaxType} name="tax_type" value="vat" label="VAT" checked={isSimpleVat} />
               </span>
               <span style={{ display: 'inline-block' }}>
                 <Field fieldType="radio" onChange={this.onChangeTaxType} name="tax_type" value="CSI" label="CSI" checked={!isSimpleVat} />
