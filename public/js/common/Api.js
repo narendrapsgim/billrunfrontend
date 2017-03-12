@@ -1,5 +1,11 @@
 import { dismissProgressIndicator, finishProgressIndicator } from '../actions/progressIndicatorActions';
-import { showDanger, showSuccess } from '../actions/alertsActions';
+import { showDanger, showSuccess, showWarning } from '../actions/alertsActions';
+
+
+export const API_STATUS_SUCCESS = 1;
+export const API_STATUS_ERROR = 0;
+export const API_STATUS_WARNING = 2;
+
 
 // Helper function to simulate API response with delay
 export const delay = (sec = 2, success = true, mock = { success: true }) =>
@@ -24,7 +30,7 @@ const checkLogin = (response = {}) => {
 
 // Helper function to check response status OK
 const checkStatus = (response = null) => {
-  if (!response || !response.status) { // Check status OK
+  if (!response || response.status === API_STATUS_ERROR) { // Check status OK
     throw response;
   }
   return response;
@@ -81,6 +87,7 @@ const buildQueryString = (params = null) => {
 export const apiBillRunSuccessHandler = (success, message = false) => (dispatch) => {
   dispatch(finishProgressIndicator());
   let data;
+  let status = API_STATUS_SUCCESS;
   try {
     data = success.data[0].data.details;
     if (typeof data === 'undefined') {
@@ -96,13 +103,28 @@ export const apiBillRunSuccessHandler = (success, message = false) => (dispatch)
       data = null;
     }
   }
-  if (message) {
+  // Check for warning
+  if (success.data[0] && success.data[0].data && success.data[0].data.status === API_STATUS_WARNING) {
+    status = API_STATUS_WARNING;
+    let warningMessages = [];
+    try {
+      warningMessages = success.data[0].data.warnings;
+      if (!Array.isArray(warningMessages)) {
+        throw new Error();
+      }
+    } catch (e1) {
+      warningMessages = ['Warrning !'];
+    }
+    warningMessages.forEach((warningMessage) => {
+      dispatch(showWarning(warningMessage, 0));
+    });
+  }
+
+  if (message && status === 1) {
     dispatch(showSuccess(message));
   }
-  return ({
-    status: true,
-    data,
-  });
+
+  return ({ status, data });
 };
 
 // Handel API errors (ugly code to handle non standard API responses - should be improved with standard BillAPI)
@@ -129,7 +151,7 @@ export const apiBillRunErrorHandler = (error, defaultMessage = 'Error, please tr
   }
   dispatch(showDanger(errorMessage));
   return ({
-    status: false,
+    status: API_STATUS_ERROR,
     error,
   });
 };

@@ -53,7 +53,7 @@ class EntityFields extends Component {
         </Col>
         <Col sm={8} lg={9}>
           {editable
-            ? <Field onChange={this.onChangeField.bind(this, fieldName)} id={fieldName} value={entity.getIn(fieldNamePath, '')} />
+            ? <Field onChange={this.onChangeField.bind(this, fieldNamePath)} id={fieldName} value={entity.getIn(fieldNamePath, '')} />
             : entity.get(fieldName, '')
           }
         </Col>
