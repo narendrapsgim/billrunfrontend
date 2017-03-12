@@ -178,7 +178,7 @@ export default class Product extends Component {
   }
 
   onChangeAdditionalField = (field, value) => {
-    this.props.onFieldUpdate([field], value);
+    this.props.onFieldUpdate(field, value);
   }
 
   renderPrices = () => {

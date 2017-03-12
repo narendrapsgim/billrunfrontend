@@ -112,7 +112,7 @@ export default class Plan extends Component {
   }
 
   onChangeAdditionalField = (field, value) => {
-    this.props.onChangeFieldValue([field], value);
+    this.props.onChangeFieldValue(field, value);
   }
 
   getPeriodicityOptions = () => {
