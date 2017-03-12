@@ -2,12 +2,13 @@ import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '..
 import { startProgressIndicator } from './progressIndicatorActions';
 import { saveEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
-
+import { getConfig } from '../common/Util';
 
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
 export const SAVE_SERVICE = 'SAVE_SERVICE';
 export const CLEAR_SERVICE = 'CLEAR_SERVICE';
+export const CLONE_RESET_SERVICE = 'CLONE_RESET_SERVICE';
 export const ADD_GROUP_SERVICE = 'ADD_GROUP_SERVICE';
 export const REMOVE_GROUP_SERVICE = 'REMOVE_GROUP_SERVICE';
 
@@ -40,6 +41,14 @@ export const removeGroup = groupName => ({
   type: REMOVE_GROUP_SERVICE,
   groupName,
 });
+
+export const setCloneService = () => {
+  const uniquefields = getConfig(['systemItems', 'service', 'uniqueField'], 'name');
+  return ({
+    type: CLONE_RESET_SERVICE,
+    uniquefields,
+  });
+};
 
 export const saveService = (service, action) => saveEntity('services', service, action);
 
