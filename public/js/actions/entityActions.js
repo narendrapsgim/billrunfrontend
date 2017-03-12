@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getItemDateValue } from '../common/Util';
+import { getItemDateValue, getConfig } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -29,6 +29,12 @@ export const gotEntity = (collection, entity) => ({
   type: actions.GOT_ENTITY,
   collection,
   entity,
+});
+
+export const setCloneEntity = (collection, entityName) =>  ({
+  type: actions.CLONE_RESET_ENTITY,
+  collection,
+  uniquefields: getConfig(['systemItems', entityName, 'uniqueField'], []),
 });
 
 export const clearEntity = collection => ({

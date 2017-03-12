@@ -29,11 +29,9 @@ export default function (state = defaultState, action) {
       } else if (Array.isArray(action.uniquefields)) {
         keysToDeleteOnClone.push(...action.uniquefields);
       }
-      // deleteAll() function still not avalible in v3.8.1 only from 4.0
-      // return state.deleteAll(keysToDeleteOnClone);
       return state.withMutations((itemWithMutations) => {
         keysToDeleteOnClone.forEach((keyToDelete) => {
-          itemWithMutations.delete(keyToDelete);
+          itemWithMutations.deleteIn([collection, keyToDelete]);
         });
       });
     }
