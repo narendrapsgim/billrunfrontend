@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
+import Immutable from 'immutable';
 import Field from '../Field';
 
 export default class Receiver extends Component {
 
   state = {
     receiverType: 'ftp',
-    receiverName: 'FTP',
   };
 
   componentDidMount() {
@@ -34,20 +34,50 @@ export default class Receiver extends Component {
       };
       this.props.onSetReceiverCheckboxField(deletReceived);
     }
+
+    this.setState({
+      receiverType: settings.get('receiver_type', 'ftp'),
+    });
   }
+
+  receiverTypes = Immutable.Map({
+    ftp: 'FTP',
+    ssh: 'SFTP',
+  });
 
   onChangeReceiverType = (e) => {
     const { value } = e.target;
     this.setState({
-      receiver_type: value,
+      receiverType: value,
     });
+    this.props.onSetReceiverField({ target: { value, id: 'receiver_type' } });
   }
+
+  renderReceiverType = (name, type) => {
+    const { receiverType } = this.state;
+    return (
+      <Col sm={3} key={type}>
+        <Field
+          fieldType="radio"
+          onChange={this.onChangeReceiverType}
+          name="receiver_type"
+          value={type}
+          label={name}
+          checked={receiverType === type}
+        />
+      </Col>
+    );
+  }
+
+  renderReceiverTypes = () => (
+    this.receiverTypes.map((name, type) => this.renderReceiverType(name, type)).toArray()
+  );
 
   render() {
     const { settings,
             onSetReceiverField,
             onSetReceiverCheckboxField } = this.props;
-    const { receiverType, receiverName } = this.state;
+    const { receiverType } = this.state;
 
     const period_options = [{min: 1, label: "1 Minute"},
                             {min: 15, label: "15 Minutes"},
@@ -61,14 +91,13 @@ export default class Receiver extends Component {
 
     return (
       <div className="ReceiverSettings">
-        <Col sm={3}>
-          <Field fieldType="radio" onChange={this.onChangeReceiverType} name="receiver_type" value="ftp" label="FTP" checked={receiverType === 'ftp'} />
-        </Col>
-        <Col sm={3}>
-          <Field fieldType="radio" onChange={this.onChangeReceiverType} name="receiver_type" value="ssh" label="SFTP" checked={receiverType === 'ssh'} />
-        </Col>
-        <h4>{receiverName}</h4>
         <form className="form-horizontal">
+          <div className="form-group">
+            <label htmlFor="name" className="col-xs-2 control-label">Receiver Type</label>
+            <div className="col-xs-9">
+              {this.renderReceiverTypes()}
+            </div>
+          </div>
           <div className="form-group">
             <label htmlFor="name" className="col-xs-2 control-label">Name</label>
             <div className="col-xs-4">
@@ -102,7 +131,7 @@ export default class Receiver extends Component {
           <div className="form-group">
             <label htmlFor="filename_regex" className="col-xs-2 control-label">Regex</label>
             <div className="col-xs-4">
-              <input className="form-control" id="filename_regex" onChange={onSetReceiverField} value={settings.get('filename_regex', '')} />
+              <input className="form-control" id="filename_regex" onChange={onSetReceiverField} value={settings.get('filename_regex', '')} disabled={receiverType !== 'ftp'} />
             </div>
           </div>
           <div className="form-group">
@@ -125,10 +154,15 @@ export default class Receiver extends Component {
           <div className="form-group">
             <label htmlFor="passive" className="col-xs-2 control-label">Passive mode</label>
             <div className="col-xs-4">
-              <input type="checkbox" id="passive" style={{ marginTop: 12 }}
-                     onChange={onSetReceiverCheckboxField}
-                     checked={settings.get('passive', false)}
-                     value="1" />
+              <input
+                type="checkbox"
+                id="passive"
+                style={{ marginTop: 12 }}
+                onChange={onSetReceiverCheckboxField}
+                checked={settings.get('passive', false)}
+                value="1"
+                disabled={receiverType !== 'ftp'}
+              />
             </div>
           </div>
         </form>

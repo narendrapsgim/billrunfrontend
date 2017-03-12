@@ -370,11 +370,12 @@ export function saveInputProcessorSettings(state, parts = []) {
     settings.rate_calculators = rate_calculators.toJS();
   }
   if (state.get('type') !== 'realtime' && receiver) {
+    const receiverType = receiver.get('receiver_type', 'ftp');
     settings.receiver = {
-      "type": "ftp",
-      "connections": [
-	receiver.toJS()
-      ]
+      type: receiverType,
+      connections: [
+        receiver.toJS(),
+      ],
     };
   }
   const defaultResponse = {
