@@ -198,6 +198,7 @@ export const getSubscribersByAidQuery = aid => ({
     { query: JSON.stringify({ aid }) },
     { page: 0 },
     { size: 9999 },
+    { project: JSON.stringify({ from: 0, to: 0 }) },
   ],
 });
 
