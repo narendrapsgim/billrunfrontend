@@ -131,7 +131,7 @@ export default class Receiver extends Component {
           <div className="form-group">
             <label htmlFor="filename_regex" className="col-xs-2 control-label">Regex</label>
             <div className="col-xs-4">
-              <input className="form-control" id="filename_regex" onChange={onSetReceiverField} value={settings.get('filename_regex', '')} disabled={receiverType !== 'ftp'} />
+              <input className="form-control" id="filename_regex" onChange={onSetReceiverField} value={settings.get('filename_regex', '')} />
             </div>
           </div>
           <div className="form-group">
