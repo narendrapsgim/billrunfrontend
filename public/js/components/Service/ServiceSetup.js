@@ -63,7 +63,7 @@ class ServiceSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'service', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
     }
   }

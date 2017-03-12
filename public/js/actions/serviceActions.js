@@ -42,13 +42,10 @@ export const removeGroup = groupName => ({
   groupName,
 });
 
-export const setCloneService = () => {
-  const uniquefields = getConfig(['systemItems', 'service', 'uniqueField'], 'name');
-  return ({
-    type: CLONE_RESET_SERVICE,
-    uniquefields,
-  });
-};
+export const setCloneService = () =>  ({
+  type: CLONE_RESET_SERVICE,
+  uniquefields: getConfig(['systemItems', 'service', 'uniqueField'], 'name'),
+});
 
 export const saveService = (service, action) => saveEntity('services', service, action);
 
