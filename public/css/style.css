@@ -317,6 +317,19 @@ fieldset[disabled] .btn {
   margin: 0;
 }
 /* Entity Revision */
+.entity-revision-history-popover .popover-content{
+  padding: 10px 0 0 0;
+}
+.entity-revision-history-popover .popover-content ul.revision-history-list{
+  text-align: center;
+}
+.entity-revision-history-popover .popover-content hr{
+  margin: 7px 0 0 0;
+  border-color: #565656;
+}
+.entity-revision-history-popover .popover-title {
+  border-bottom: 1px solid #565656;
+}
 .entity-revision-history-popover {
   max-width: none;
 }
