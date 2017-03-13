@@ -15,8 +15,6 @@ class Credit extends Component {
   static defaultProps = {
     allRates: List(),
     usageTypes: List(),
-    cancelLabel: 'Cancel',
-    chargeLabel: 'Charge',
     sid: false,
   };
 
@@ -27,8 +25,6 @@ class Credit extends Component {
     onClose: PropTypes.func.isRequired,
     sid: PropTypes.number,
     aid: PropTypes.number.isRequired,
-    cancelLabel: PropTypes.string,
-    chargeLabel: PropTypes.string,
   };
 
   state = {
@@ -44,6 +40,7 @@ class Credit extends Component {
     usagev: '',
     usaget: '',
     rate: '',
+    progress: false,
   }
 
   componentDidMount() {
@@ -110,15 +107,16 @@ class Credit extends Component {
     } else {
       params = [...params, { usagev }, { usaget }];
     }
-    this.props.dispatch(creditCharge(params))
-    .then(
-      (response) => {
-        if (response.status) {
-          this.props.onClose();
-        }
-      }
-    );
+    this.setState({ progress: true });
+    this.props.dispatch(creditCharge(params)).then(this.afterCharge);
   };
+
+  afterCharge = (response) => {
+    this.setState({ progress: false });
+    if (response.status) {
+      this.props.onClose();
+    }
+  }
 
   getAvailableUsageTypes = () => {
     const { usageTypes } = this.props;
@@ -131,18 +129,18 @@ class Credit extends Component {
   }
 
   render() {
-    const { cancelLabel, chargeLabel } = this.props;
-    const { rateBy, aprice, usagev, usaget, rate, validationErrors } = this.state;
+    const { rateBy, aprice, usagev, usaget, rate, validationErrors, progress } = this.state;
     const availableRates = this.getAvailableRates();
     const availableUsageTypes = this.getAvailableUsageTypes();
     return (
       <ModalWrapper
         show={true}
-        onOk={this.onCreditCharge}
-        labelOk={chargeLabel}
-        onCancel={this.props.onClose}
-        labelCancel={cancelLabel}
+        progress={progress}
+        labelProgress="Charging..."
+        labelOk="Charge"
         title="Credit Charge"
+        onOk={this.onCreditCharge}
+        onCancel={this.props.onClose}
       >
         <Form horizontal>
           <FormGroup>
@@ -156,7 +154,7 @@ class Credit extends Component {
                   value="fix"
                   checked={rateBy === 'fix'}
                   onChange={this.onChangeCreditBy}
-                  label="&nbsp;Fixed price"
+                  label="Fixed price"
                 />
               </Col>
               <Col sm={3}>
@@ -167,7 +165,7 @@ class Credit extends Component {
                   value="usagev"
                   checked={rateBy === 'usagev'}
                   onChange={this.onChangeCreditBy}
-                  label="&nbsp;Volume"
+                  label="Volume"
                 />
               </Col>
             </Col>
@@ -231,10 +229,9 @@ class Credit extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  const usageTypes = state.settings.get('usage_types');
-  const allRates = state.list.get('all_rates');
-  return { usageTypes, allRates };
-};
+const mapStateToProps = state => ({
+  usageTypes: state.settings.get('usage_types'),
+  allRates: state.list.get('all_rates'),
+});
 
 export default connect(mapStateToProps)(Credit);
