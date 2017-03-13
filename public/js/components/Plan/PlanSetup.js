@@ -96,12 +96,10 @@ class PlanSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onPlanFieldUpdate(['from'], defaultFromValue));
-    }
-    if (mode === 'create') {
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'postpaid'));
     }
     if (item.get('prorated', null) === null) {
