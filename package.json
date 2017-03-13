@@ -49,7 +49,6 @@
     "redux-devtools-dock-monitor": "^1.1.1",
     "redux-devtools-filter-actions": "^1.2.0",
     "redux-devtools-log-monitor": "^1.0.11",
-    "redux-thunk": "^2.1.0",
     "rimraf": "^2.5.4",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
@@ -81,6 +80,8 @@
     "react-select": "^0.9.1",
     "react-sortable-hoc": "^0.4.2",
     "redux": "^3.5.2",
+    "redux-localstorage": "^0.4.1",
+    "redux-thunk": "^2.1.0",
     "reselect": "^2.5.4",
     "uuid": "^2.0.3"
   }
