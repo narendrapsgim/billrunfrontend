@@ -20,6 +20,8 @@ import {
   setListState,
   clearItem,
 } from '../../actions/entityListActions';
+import { getConfig } from '../../common/Util.js';
+
 
 class EntityList extends Component {
 
@@ -62,7 +64,7 @@ class EntityList extends Component {
     items: null,
     api: 'uniqueget',
     page: 0,
-    size: 5,
+    size: getConfig(['list', 'defaultItems'], 10),
     nextPage: false,
     editable: true,
     showRevisionBy: false,
