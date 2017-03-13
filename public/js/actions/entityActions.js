@@ -48,7 +48,11 @@ const buildRequestData = (item, action) => {
     case 'create': {
       const formData = new FormData();
       const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
-      const update = item.set('from', newFrom);
+      const update = item.withMutations((itemwithMutations) => {
+        itemwithMutations
+          .set('from', newFrom)
+          .delete('originalValue');
+      });
       formData.append('update', JSON.stringify(update));
       return formData;
     }
@@ -56,7 +60,11 @@ const buildRequestData = (item, action) => {
     case 'update': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-      const update = item.delete('_id').delete('originalValue');
+      const update = item.withMutations((itemwithMutations) => {
+        itemwithMutations
+          .delete('_id')
+          .delete('originalValue');
+      });
       formData.append('query', JSON.stringify(query));
       formData.append('update', JSON.stringify(update));
       return formData;
@@ -64,17 +72,18 @@ const buildRequestData = (item, action) => {
 
     case 'closeandnew': {
       const formData = new FormData();
-
-      // Temp Fix
-      if (getItemDateValue(item, 'from').isBefore(moment()) || getItemDateValue(item, 'from').isSame(moment())) {
-        const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
-        formData.append('update', JSON.stringify(update));
-      } else {
-        const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
-        const update = item.delete('_id').set('from', newFrom).delete('originalValue');
-        formData.append('update', JSON.stringify(update));
-      }
-
+      const update = item.withMutations((itemwithMutations) => {
+        const originalFrom = getItemDateValue(item, 'originalValue', null);
+        if (originalFrom !== null) {
+          if (originalFrom.isSame(getItemDateValue(item, 'from', moment(0)), 'days')) {
+            itemwithMutations.delete('from');
+          }
+        }
+        itemwithMutations
+          .delete('_id')
+          .delete('originalValue');
+      });
+      formData.append('update', JSON.stringify(update));
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
       formData.append('query', JSON.stringify(query));
       return formData;
