@@ -33,12 +33,6 @@ class CsiMapper extends Component {
     this.props.onChange(fileType, usageType, 'orig_num', value);
   }
 
-  onChangeBillNum = (e) => {
-    const { value } = e.target;
-    const { fileType, usageType } = this.props;
-    this.props.onChange(fileType, usageType, 'bill_num', value);
-  }
-
   onChangeTermNum = (e) => {
     const { value } = e.target;
     const { fileType, usageType } = this.props;
@@ -63,17 +57,6 @@ class CsiMapper extends Component {
           </Col>
           <Col sm={6}>
             <select value={csiMap.get('orig_num', '')} onChange={this.onChangeOrigNum} className="form-control" disabled={disabled}>
-              <option value="">Select...</option>
-              { this.renderOptions() }
-            </select>
-          </Col>
-        </FormGroup>
-        <FormGroup>
-          <Col componentClass={ControlLabel} md={2}>
-            Bill Number
-          </Col>
-          <Col sm={6}>
-            <select value={csiMap.get('bill_num', '')} onChange={this.onChangeBillNum} className="form-control" disabled={disabled}>
               <option value="">Select...</option>
               { this.renderOptions() }
             </select>
