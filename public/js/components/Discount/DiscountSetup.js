@@ -3,33 +3,25 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Tabs, Tab, Panel } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { EntityRevisionDetails } from '../Entity';
+import DiscountDetails from './DiscountDetails';
 import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
-import { getProductsKeysQuery } from '../../common/ApiQueries';
-import { showDanger, showSuccess } from '../../actions/alertsActions';
-import { getList } from '../../actions/listActions';
+import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { saveDiscount, getDiscount, clearDiscount, updateDiscount } from '../../actions/discountsActions';
-import { getSettings } from '../../actions/settingsActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
-import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
+import { modeSelector, itemSelector, idSelector, revisionsSelector } from '../../selectors/entitySelector';
 
 
-class Discount extends Component {
+class DiscountSetup extends Component {
 
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
-    allRates: PropTypes.instanceOf(Immutable.List),
-    usageTypes: PropTypes.instanceOf(Immutable.List),
-    activeTab: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-    ]),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -39,13 +31,10 @@ class Discount extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     revisions: Immutable.List(),
-    allRates: Immutable.List(),
-    usageTypes: Immutable.List(),
-    activeTab: 1,
   }
 
   state = {
-    activeTab: parseInt(this.props.activeTab),
+    progress: false,
   }
 
   componentWillMount() {
@@ -122,6 +111,7 @@ class Discount extends Component {
   }
 
   afterSave = (response) => {
+    this.setState({ progress: false });
     const { mode } = this.props;
     if (response.status) {
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
@@ -133,6 +123,7 @@ class Discount extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
+    this.setState({ progress: true });
     this.props.dispatch(saveDiscount(item, mode)).then(this.afterSave);
   }
 
@@ -149,6 +140,7 @@ class Discount extends Component {
   }
 
   render() {
+    const { progress } = this.state;
     const { item, mode, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -168,7 +160,14 @@ class Discount extends Component {
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
           />
-          <p>discount</p>
+        </Panel>
+
+        <Panel>
+          <DiscountDetails
+            discount={item}
+            mode={mode}
+            onFieldUpdate={this.onChangeFieldValue}
+          />
         </Panel>
 
         <ActionButtons
@@ -176,6 +175,7 @@ class Discount extends Component {
           onClickSave={this.handleSave}
           hideSave={!allowEdit}
           cancelLabel={allowEdit ? undefined : 'Back'}
+          progress={progress}
         />
       </div>
     );
@@ -185,7 +185,6 @@ const mapStateToProps = (state, props) => ({
   itemId: idSelector(state, props, 'discount'),
   item: itemSelector(state, props, 'discount'),
   mode: modeSelector(state, props, 'discount'),
-  activeTab: tabSelector(state, props, 'discount'),
   revisions: revisionsSelector(state, props, 'discount'),
 });
-export default withRouter(connect(mapStateToProps)(Discount));
+export default withRouter(connect(mapStateToProps)(DiscountSetup));

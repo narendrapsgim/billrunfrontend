@@ -6,7 +6,7 @@ import { saveEntity, gotEntity, clearEntity, updateEntityField } from './entityA
 
 export const clearDiscount = () => clearEntity('discount');
 
-export const saveDiscount = (item, action) => saveEntity('discount', item, action);
+export const saveDiscount = (item, action) => saveEntity('discounts', item, action);
 
 export const updateDiscount = (path, value) => updateEntityField('discount', path, value);
 

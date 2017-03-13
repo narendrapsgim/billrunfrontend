@@ -1,3 +1,3 @@
-import Discount from './Discount';
+import Discount from './DiscountSetup';
 
 export default Discount;
