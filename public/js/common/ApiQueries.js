@@ -42,6 +42,25 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
+export const getUserLoginQuery = (username, password) => ({
+  api: 'auth',
+  params: [
+    { username },
+    { password },
+  ],
+});
+
+export const getUserLogoutQuery = () => ({
+  api: 'auth',
+  params: [
+    { action: 'logout' },
+  ],
+});
+
+export const getUserCheckLoginQuery = () => ({
+  api: 'auth',
+});
+
 export const getInputProcessorActionQuery = (fileType, action) => ({
   api: 'settings',
   params: [
