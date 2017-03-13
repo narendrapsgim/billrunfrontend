@@ -65,6 +65,7 @@ class Credit extends Component {
 
   updateChargingMessage = (usagev, aprice) => {
     const { currency } = this.props;
+    console.log(currency);
     const { helperMsg, rateBy } = this.state;
     if (rateBy !== 'fix') {
       return;
@@ -141,10 +142,10 @@ class Credit extends Component {
 
   afterCharge = (response) => {
     this.setState({ progress: false });
-        if (response.status) {
-          this.props.onClose();
-        }
-      }
+    if (response.status) {
+      this.props.onClose();
+    }
+  }
 
   getAvailableRates = () => {
     const { allRates } = this.props;
@@ -152,8 +153,7 @@ class Credit extends Component {
   }
 
   render() {
-    const { cancelLabel, chargeLabel } = this.props;
-    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg } = this.state;
+    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg, progress } = this.state;
     const availableRates = this.getAvailableRates();
     return (
       <ModalWrapper
@@ -241,9 +241,9 @@ class Credit extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, props) => ({
   usageTypes: state.settings.get('usage_types'),
-	currency: currencySelector(state, props);
+  currency: currencySelector(state, props),
   allRates: state.list.get('all_rates'),
 });
 
