@@ -11,8 +11,20 @@ const ModalWrapper = props => (
       { props.children }
     </Modal.Body>
     <Modal.Footer>
-      { props.onCancel && <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onCancel}>{props.labelCancel}</Button> }
-      { props.onOk && <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onOk} bsStyle="primary" >{props.labelOk}</Button> }
+      { props.onCancel && (
+        <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onCancel}>
+          { props.labelCancel }
+        </Button>
+      ) }
+      { props.onOk && (
+        <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onOk} bsStyle="primary" disabled={props.progress}>
+          { props.progress && (<span><i className="fa fa-spinner fa-pulse" />&nbsp;&nbsp;</span>) }
+          { (props.progress && props.labelProgress !== null)
+            ? props.labelProgress
+            : props.labelOk
+          }
+        </Button>
+      ) }
     </Modal.Footer>
   </Modal>
 );
@@ -20,8 +32,10 @@ const ModalWrapper = props => (
 ModalWrapper.defaultProps = {
   title: 'Edit',
   show: false,
+  progress: false,
   labelOk: 'OK',
   labelCancel: 'Cancel',
+  labelProgress: null,
 };
 
 ModalWrapper.propTypes = {
@@ -31,6 +45,8 @@ ModalWrapper.propTypes = {
   onOk: PropTypes.func,
   onCancel: PropTypes.func,
   show: PropTypes.bool.isRequired,
+  progress: PropTypes.bool,
+  labelProgress: PropTypes.string,
   title: PropTypes.string.isRequired,
   onHide: PropTypes.func,
 };

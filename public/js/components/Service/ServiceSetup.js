@@ -41,6 +41,7 @@ class ServiceSetup extends Component {
 
   state = {
     activeTab: parseInt(this.props.activeTab),
+    progress: false,
   };
 
   componentWillMount() {
@@ -129,6 +130,7 @@ class ServiceSetup extends Component {
 
   afterSave = (response) => {
     const { mode, item } = this.props;
+    this.setState({ progress: false });
     if (response.status) {
       const key = item.get('name', '');
       this.props.dispatch(clearRevisions('services', key)); // refetch items list because item was (changed in / added to) list
@@ -152,10 +154,12 @@ class ServiceSetup extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
+    this.setState({ progress: true });
     this.props.dispatch(saveService(item, mode)).then(this.afterSave);
   }
 
   render() {
+    const { progress, activeTab } = this.state;
     const { item, mode, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -176,7 +180,7 @@ class ServiceSetup extends Component {
           />
         </Panel>
 
-        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
+        <Tabs defaultActiveKey={activeTab} animation={false} id="ServiceTab" onSelect={this.handleSelectTab}>
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
@@ -202,6 +206,7 @@ class ServiceSetup extends Component {
           onClickSave={this.handleSave}
           hideSave={!allowEdit}
           cancelLabel={allowEdit ? undefined : 'Back'}
+          progress={progress}
         />
       </Col>
     );
