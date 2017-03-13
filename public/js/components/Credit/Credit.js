@@ -4,17 +4,19 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import { Map, List } from 'immutable';
 import { Col, FormGroup, HelpBlock, Form, ControlLabel } from 'react-bootstrap';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
 import ModalWrapper from '../Elements/ModalWrapper';
 import Field from '../Field';
 import { getProductsKeysQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { creditCharge } from '../../actions/creditActions';
+import { currencySelector } from '../../selectors/settingsSelector';
 
 class Credit extends Component {
   static defaultProps = {
     allRates: List(),
-    usageTypes: List(),
+    currency: '',
     cancelLabel: 'Cancel',
     chargeLabel: 'Charge',
     sid: false,
@@ -23,7 +25,7 @@ class Credit extends Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     allRates: PropTypes.instanceOf(List),
-    usageTypes: PropTypes.instanceOf(List),
+    currency: PropTypes.string,
     onClose: PropTypes.func.isRequired,
     sid: PropTypes.number,
     aid: PropTypes.number.isRequired,
@@ -35,14 +37,15 @@ class Credit extends Component {
     validationErrors: Map({
       aprice: 'required',
       usagev: '',
-      usaget: '',
       rate: 'required',
+    }),
+    helperMsg: Map({
+      aprice: '',
     }),
     paramKeyError: '',
     rateBy: 'fix',
     aprice: '',
-    usagev: '',
-    usaget: '',
+    usagev: 1,
     rate: '',
   }
 
@@ -63,10 +66,33 @@ class Credit extends Component {
     this.setState(newState);
   };
 
-  onChangeCreditValue = (field, e) => {
+  updateChargingMessage = (usagev, aprice) => {
+    const { currency } = this.props;
+    const { helperMsg, rateBy } = this.state;
+    if (rateBy !== 'fix') {
+      return;
+    }
+    const costValue = usagev !== '' ? usagev * aprice : aprice;
+    const displayCost = `${Math.abs(costValue)}${getSymbolFromCurrency(currency)}`;
+    const msg = costValue >= 0
+      ? `Subscriber will be charged by ${displayCost}`
+      : `${displayCost} will be refunded to the subscriber`;
+    this.setState({ helperMsg: helperMsg.set('aprice', msg) });
+  }
+
+  onChangeCreditUsagevValue = (field, e) => {
     const { value } = e.target;
+    const { aprice } = this.state;
     this.onChangeValue(field, value);
-  };
+    this.updateChargingMessage(value, aprice);
+  }
+
+  onChangeCreditApriceValue = (field, e) => {
+    const { value } = e.target;
+    const { usagev } = this.state;
+    this.onChangeValue(field, value);
+    this.updateChargingMessage(usagev, value);
+  }
 
   onChangeSelectValue = (field, value) => {
     this.onChangeValue(field, value);
@@ -74,20 +100,22 @@ class Credit extends Component {
 
   onChangeCreditBy = (e) => {
     const { value } = e.target;
-    const { validationErrors } = this.state;
+    const { validationErrors, helperMsg } = this.state;
     let newState;
     if (value === 'fix') {
       newState = {
         rateBy: value,
-        usaget: '',
-        usagev: '',
-        validationErrors: validationErrors.set('aprice', 'required').set('usagev', '').set('usaget', ''),
+        usagev: 1,
+        validationErrors: validationErrors.set('aprice', 'required').set('usagev', ''),
+        helperMsg: helperMsg.set('aprice', ''),
       };
     } else {
       newState = {
         rateBy: value,
         aprice: '',
-        validationErrors: validationErrors.set('aprice', '').set('usagev', 'required').set('usaget', 'required'),
+        usagev: '',
+        validationErrors: validationErrors.set('aprice', '').set('usagev', 'required'),
+        helperMsg: helperMsg.set('aprice', 'The refund amount will be calculated based on the volume'),
       };
     }
     this.setState(newState);
@@ -95,7 +123,7 @@ class Credit extends Component {
 
   onCreditCharge = () => {
     const { aid, sid } = this.props;
-    const { rateBy, aprice, usagev, usaget, rate, validationErrors } = this.state;
+    const { rateBy, aprice, usagev, rate, validationErrors } = this.state;
     if (validationErrors.valueSeq().includes('required')) {
       return;
     }
@@ -106,9 +134,9 @@ class Credit extends Component {
       { credit_time: moment().toISOString() },
     ];
     if (rateBy === 'fix') {
-      params = [...params, { aprice }];
+      params = [...params, { aprice }, { usagev }];
     } else {
-      params = [...params, { usagev }, { usaget }];
+      params = [...params, { usagev }];
     }
     this.props.dispatch(creditCharge(params))
     .then(
@@ -120,11 +148,6 @@ class Credit extends Component {
     );
   };
 
-  getAvailableUsageTypes = () => {
-    const { usageTypes } = this.props;
-    return usageTypes.map(usaget => ({ value: usaget, label: usaget })).toArray();
-  }
-
   getAvailableRates = () => {
     const { allRates } = this.props;
     return allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
@@ -132,9 +155,8 @@ class Credit extends Component {
 
   render() {
     const { cancelLabel, chargeLabel } = this.props;
-    const { rateBy, aprice, usagev, usaget, rate, validationErrors } = this.state;
+    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg } = this.state;
     const availableRates = this.getAvailableRates();
-    const availableUsageTypes = this.getAvailableUsageTypes();
     return (
       <ModalWrapper
         show={true}
@@ -177,39 +199,28 @@ class Credit extends Component {
             <Col sm={2} componentClass={ControlLabel}>Price</Col>
             <Col sm={10}>
               <Field
-                onChange={this.onChangeCreditValue.bind(this, 'aprice')}
+                onChange={this.onChangeCreditApriceValue.bind(this, 'aprice')}
                 value={aprice}
                 fieldType="price"
                 disabled={rateBy !== 'fix'}
               />
-              { validationErrors.get('aprice', '').length > 0 ? <HelpBlock>{validationErrors.get('aprice', '')}</HelpBlock> : ''}
+              <HelpBlock>
+                { validationErrors.get('aprice', '').length > 0
+                  ? validationErrors.get('aprice', '')
+                  : helperMsg.get('aprice', '') }
+              </HelpBlock>
             </Col>
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>Volume</Col>
+            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? 'Volume' : 'Quantity'}</Col>
             <Col sm={10}>
               <Field
-                onChange={this.onChangeCreditValue.bind(this, 'usagev')}
+                onChange={this.onChangeCreditUsagevValue.bind(this, 'usagev')}
                 value={usagev}
                 fieldType="number"
-                disabled={rateBy !== 'usagev'}
               />
               { validationErrors.get('usagev', '').length > 0 ? <HelpBlock>{validationErrors.get('usagev', '')}</HelpBlock> : ''}
-            </Col>
-          </FormGroup>
-
-          <FormGroup validationState={validationErrors.get('usaget', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>Unit Type</Col>
-            <Col sm={10}>
-              <Select
-                id="usaget"
-                onChange={this.onChangeSelectValue.bind(this, 'usaget')}
-                value={usaget}
-                disabled={rateBy !== 'usagev'}
-                options={availableUsageTypes}
-              />
-              { validationErrors.get('usaget', '').length > 0 ? <HelpBlock>{validationErrors.get('usaget', '')}</HelpBlock> : ''}
             </Col>
           </FormGroup>
 
@@ -231,10 +242,10 @@ class Credit extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  const usageTypes = state.settings.get('usage_types');
+const mapStateToProps = (state, props) => {
   const allRates = state.list.get('all_rates');
-  return { usageTypes, allRates };
+  const currency = currencySelector(state, props);
+  return { allRates, currency };
 };
 
 export default connect(mapStateToProps)(Credit);

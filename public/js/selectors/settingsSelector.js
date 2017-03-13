@@ -4,6 +4,9 @@ import Immutable from 'immutable';
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
 
+const getPricing = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['pricing']);
+
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
   const defaultUsaget = inputProssesor.getIn(['processor', 'default_usaget'], '');
@@ -49,4 +52,14 @@ export const inputProssesorCsiOptionsSelector = createSelector(
 export const taxationSelector = createSelector(
   getTaxation,
   taxation => taxation
+);
+
+export const pricingSelector = createSelector(
+  getPricing,
+  pricing => pricing
+);
+
+export const currencySelector = createSelector(
+  pricingSelector,
+  pricing => pricing.get('currency')
 );
