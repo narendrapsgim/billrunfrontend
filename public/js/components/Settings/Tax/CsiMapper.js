@@ -53,7 +53,7 @@ class CsiMapper extends Component {
       <Panel header={`${fileType} - ${usageType}`}>
         <FormGroup>
           <Col componentClass={ControlLabel} md={2}>
-            Original Number
+            Origin Number
           </Col>
           <Col sm={6}>
             <select value={csiMap.get('orig_num', '')} onChange={this.onChangeOrigNum} className="form-control" disabled={disabled}>
