@@ -103,6 +103,13 @@ const buildRequestData = (item, action) => {
   }
 };
 
+const requestActionBuilder = (collection, item, action) => {
+  if (action === 'closeandnew' && getItemDateValue(item, 'from').isSame(getItemDateValue(item, 'originalValue', moment(0)), 'day')) {
+    return 'update';
+  }
+  return action;
+};
+
 const requestDataBuilder = (collection, item, action) => {
   switch (collection) {
     default:
@@ -112,8 +119,9 @@ const requestDataBuilder = (collection, item, action) => {
 
 export const saveEntity = (collection, item, action) => (dispatch) => {
   dispatch(startProgressIndicator());
-  const body = requestDataBuilder(collection, item, action);
-  const query = apiEntityQuery(collection, action, body);
+  const apiAction = requestActionBuilder(collection, item, action);
+  const body = requestDataBuilder(collection, item, apiAction);
+  const query = apiEntityQuery(collection, apiAction, body);
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
