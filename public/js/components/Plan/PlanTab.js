@@ -43,17 +43,6 @@ export default class Plan extends Component {
     }
   }
 
-  componentDidMount() {
-    this.setDefaultValues();
-  }
-
-  setDefaultValues = () => {
-    const { plan } = this.props;
-    if (plan.get('prorated', null) === null) {
-      this.props.onChangeFieldValue(['prorated'], true);
-    }
-  }
-
   onPlanTrailTariffInit = (e) => {
     this.props.onPlanTariffAdd(true);
   }

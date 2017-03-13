@@ -111,6 +111,9 @@ class PlanSetup extends Component {
     if (mode === 'create') {
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'postpaid'));
     }
+    if (item.get('prorated', null) === null) {
+      this.props.dispatch(onPlanFieldUpdate(['prorated'], 'true'));
+    }
   }
 
   initRevisions = () => {
