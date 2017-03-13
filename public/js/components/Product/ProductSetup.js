@@ -7,14 +7,34 @@ import { Col, Panel } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { EntityRevisionDetails } from '../Entity';
 import Product from './Product';
-import { onRateAdd, onRateRemove, onFieldUpdate, onToUpdate, onUsagetUpdate, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
+import {
+  onRateAdd,
+  onRateRemove,
+  onFieldUpdate,
+  onToUpdate,
+  onUsagetUpdate,
+  getProduct,
+  saveProduct,
+  clearProduct,
+  setCloneProduct,
+} from '../../actions/productActions';
 import { getSettings } from '../../actions/settingsActions';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
-import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import {
+  clearItems,
+  getRevisions,
+  clearRevisions,
+} from '../../actions/entityListActions';
+import {
+  modeSelector,
+  itemSelector,
+  idSelector,
+  tabSelector,
+  revisionsSelector,
+} from '../../selectors/entitySelector';
+import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 
 
 class ProductSetup extends Component {
@@ -47,10 +67,8 @@ class ProductSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId, usageTypes } = this.props;
-    if (itemId) {
-      this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
-    }
+    const { usageTypes } = this.props;
+    this.fetchItem();
     if (usageTypes.isEmpty()) {
       this.props.dispatch(getSettings('usage_types'));
     }
@@ -58,7 +76,7 @@ class ProductSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'product');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -66,18 +84,14 @@ class ProductSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const { item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('key') !== item.get('key')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'product', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -99,6 +113,9 @@ class ProductSetup extends Component {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onFieldUpdate(['from'], defaultFromValue));
     }
+    if (mode === 'clone') {
+      this.props.dispatch(setCloneProduct());
+    }
   }
 
   initRevisions = () => {
@@ -107,6 +124,18 @@ class ProductSetup extends Component {
       const key = item.get('key', '');
       this.props.dispatch(getRevisions('rates', 'key', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('key', '');
+    this.props.dispatch(clearRevisions('rates', key));
   }
 
   onFieldUpdate = (path, value) => {
@@ -151,12 +180,11 @@ class ProductSetup extends Component {
   }
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('key', '');
-      this.props.dispatch(clearRevisions('rates', key));
-      const action = (mode === 'create' || mode === 'closeandnew') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The product was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }

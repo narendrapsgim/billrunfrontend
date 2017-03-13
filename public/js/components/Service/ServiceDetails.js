@@ -84,7 +84,7 @@ export default class ServiceDetails extends Component {
           </Col>
         </FormGroup>
 
-        {mode === 'create' &&
+        {['clone', 'create'].includes(mode) &&
           <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
             <Col componentClass={ControlLabel} sm={3} lg={2}>
               Key <Help contents={ServiceDescription.name} />
@@ -112,7 +112,7 @@ export default class ServiceDetails extends Component {
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-          <Col sm={4} style={{ padding: '10px' }}>
+          <Col sm={4} style={{ padding: '10px 15px' }}>
             <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
           </Col>
         </FormGroup>
@@ -121,7 +121,7 @@ export default class ServiceDetails extends Component {
           entityName="services"
           entity={item}
           onChangeField={this.onChangeAdditionalField}
-          editable={true}
+          editable={editable}
         />
 
       </Form>

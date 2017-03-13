@@ -6,7 +6,10 @@ const Actions = ({ actions, data }) => (
   <div className="actions-buttons">
     { actions.map((action, idx, list) => {
       const isLast = idx === (list.length - 1);
-      const isEnable = (typeof action.show === 'function') ? action.show(data) : action.show;
+      let isEnable = true;
+      if (typeof action.show !== 'undefined') {
+        isEnable = (typeof action.show === 'function') ? action.show(data) : action.show;
+      }
       const actionClass = classNames({
         mr10: !isLast && isEnable,
         mr0: isLast || !isEnable,

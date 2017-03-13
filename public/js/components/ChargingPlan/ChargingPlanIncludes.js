@@ -18,7 +18,7 @@ const ChargingPlanIncludes = (props) => {
       {
         props.includes
           .keySeq()
-          .filter(inc => inc !== 'cost')
+          .filter(inc => (inc !== 'cost' && inc !== 'groups'))
           .map((type, key) => (
             <ChargingPlanInclude
               key={key}

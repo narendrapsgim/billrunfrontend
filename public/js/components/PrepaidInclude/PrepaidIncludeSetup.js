@@ -8,15 +8,31 @@ import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
 import { EntityRevisionDetails } from '../Entity';
-import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
+import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 import { getProductsKeysQuery } from '../../common/ApiQueries';
 import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { savePrepaidInclude, getPrepaidInclude, clearPrepaidInclude, updatePrepaidInclude } from '../../actions/prepaidIncludeActions';
+import {
+  savePrepaidInclude,
+  getPrepaidInclude,
+  clearPrepaidInclude,
+  updatePrepaidInclude,
+  setClonePrepaidInclude,
+} from '../../actions/prepaidIncludeActions';
 import { getSettings } from '../../actions/settingsActions';
-import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
-import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
+import {
+  clearItems,
+  getRevisions,
+  clearRevisions,
+} from '../../actions/entityListActions';
+import {
+  modeSelector,
+  itemSelector,
+  idSelector,
+  tabSelector,
+  revisionsSelector,
+} from '../../selectors/entitySelector';
 
 
 class PrepaidIncludeSetup extends Component {
@@ -72,7 +88,7 @@ class PrepaidIncludeSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'prepaid_include', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
     }
   }
@@ -88,6 +104,9 @@ class PrepaidIncludeSetup extends Component {
       this.onChangeFieldValue(['from'], defaultFromValue);
       this.onChangeFieldValue(['shared'], false);
       this.onChangeFieldValue(['unlimited'], false);
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePrepaidInclude());
     }
   }
 
@@ -145,7 +164,7 @@ class PrepaidIncludeSetup extends Component {
   afterSave = (response) => {
     const { mode } = this.props;
     if (response.status) {
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The prepaid bucke was ${action}`));
       this.clearRevisions();
       this.handleBack(true);

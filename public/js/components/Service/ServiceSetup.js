@@ -8,8 +8,8 @@ import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
-import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
-import { addGroup, removeGroup, getService, clearService, updateService, saveService } from '../../actions/serviceActions';
+import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
+import { addGroup, removeGroup, getService, clearService, updateService, saveService, setCloneService } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
@@ -50,7 +50,7 @@ class ServiceSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'service');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -64,7 +64,7 @@ class ServiceSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'service', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
     }
   }
@@ -82,10 +82,13 @@ class ServiceSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode } = this.props;
+    const { mode, item } = this.props;
     if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(updateService(['from'], defaultFromValue));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setCloneService());
     }
     if (item.get('prorated', null) === null) {
       this.props.dispatch(updateService(['prorated'], true));
@@ -137,7 +140,7 @@ class ServiceSetup extends Component {
     const { mode } = this.props;
     this.setState({ progress: false });
     if (response.status) {
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The service was ${action}`));
       this.clearRevisions();
       this.handleBack(true);
