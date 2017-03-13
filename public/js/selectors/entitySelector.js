@@ -36,7 +36,7 @@ const getItem = (state, props, entityName) => {
     case 'prepaid_include':
       return state.entity.get(entityName);
     case 'discount':
-      return state.entity.get(itemType);
+      return state.entity.get(entityName);
     default: {
       return state[entityName];
     }

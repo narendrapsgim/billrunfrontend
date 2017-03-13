@@ -92,7 +92,7 @@ class Discount extends Component {
     const { item, revisions } = this.props;
     if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('key', '');
-      this.props.dispatch(getRevisions('discount', 'key', key));
+      this.props.dispatch(getRevisions('discounts', 'key', key));
     }
   }
 
@@ -105,7 +105,7 @@ class Discount extends Component {
   clearRevisions = () => {
     const { item } = this.props;
     const key = item.get('key', '');
-    this.props.dispatch(clearRevisions('discount', key)); // refetch items list because item was (changed in / added to) list
+    this.props.dispatch(clearRevisions('discounts', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
