@@ -81,6 +81,15 @@
     "order": 1,
     "parent": "postpaid"
   },
+  "discounts": {
+    "title": "Discounts",
+    "icon": "fa-tags",
+    "route": "discounts",
+    "show": true,
+    "roles": [],
+    "order": 4,
+    "parent": "root"
+  },
   "customers": {
     "title": "Customers",
     "icon": "fa-users",

@@ -50,6 +50,8 @@ const getItem = (state, props, itemType) => {
   switch (itemType) {
     case 'prepaid_include':
       return state.entity.get(itemType);
+    case 'discount':
+      return state.entity.get(itemType);
     default: {
       return state[itemType];
     }
