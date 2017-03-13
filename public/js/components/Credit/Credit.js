@@ -240,9 +240,9 @@ class Credit extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, props) => ({
   usageTypes: state.settings.get('usage_types'),
-	currency: currencySelector(state, props)
+  currency: currencySelector(state, props),
   allRates: state.list.get('all_rates'),
 });
 
