@@ -38,6 +38,15 @@ export const clearEntity = collection => ({
 const buildRequestData = (item, action) => {
   switch (action) {
 
+    case 'close': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      const update = { to: getItemDateValue(item, 'to').format(globalSetting.apiDateTimeFormat) };
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
     case 'delete': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
@@ -48,7 +57,11 @@ const buildRequestData = (item, action) => {
     case 'create': {
       const formData = new FormData();
       const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
-      const update = item.set('from', newFrom);
+      const update = item.withMutations((itemwithMutations) => {
+        itemwithMutations
+          .set('from', newFrom)
+          .delete('originalValue');
+      });
       formData.append('update', JSON.stringify(update));
       return formData;
     }
@@ -56,7 +69,11 @@ const buildRequestData = (item, action) => {
     case 'update': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-      const update = item.delete('_id').delete('originalValue');
+      const update = item.withMutations((itemwithMutations) => {
+        itemwithMutations
+          .delete('_id')
+          .delete('originalValue');
+      });
       formData.append('query', JSON.stringify(query));
       formData.append('update', JSON.stringify(update));
       return formData;
@@ -64,17 +81,18 @@ const buildRequestData = (item, action) => {
 
     case 'closeandnew': {
       const formData = new FormData();
-
-      // Temp Fix
-      if (getItemDateValue(item, 'from').isBefore(moment()) || getItemDateValue(item, 'from').isSame(moment())) {
-        const update = item.delete('_id').set('from', moment().toISOString()).delete('originalValue');
-        formData.append('update', JSON.stringify(update));
-      } else {
-        const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
-        const update = item.delete('_id').set('from', newFrom).delete('originalValue');
-        formData.append('update', JSON.stringify(update));
-      }
-
+      const update = item.withMutations((itemwithMutations) => {
+        const originalFrom = getItemDateValue(item, 'originalValue', null);
+        if (originalFrom !== null) {
+          if (originalFrom.isSame(getItemDateValue(item, 'from', moment(0)), 'days')) {
+            itemwithMutations.delete('from');
+          }
+        }
+        itemwithMutations
+          .delete('_id')
+          .delete('originalValue');
+      });
+      formData.append('update', JSON.stringify(update));
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
       formData.append('query', JSON.stringify(query));
       return formData;
@@ -83,6 +101,13 @@ const buildRequestData = (item, action) => {
     default:
       return new FormData();
   }
+};
+
+const requestActionBuilder = (collection, item, action) => {
+  if (action === 'closeandnew' && getItemDateValue(item, 'from').isSame(getItemDateValue(item, 'originalValue', moment(0)), 'day')) {
+    return 'update';
+  }
+  return action;
 };
 
 const requestDataBuilder = (collection, item, action) => {
@@ -94,8 +119,9 @@ const requestDataBuilder = (collection, item, action) => {
 
 export const saveEntity = (collection, item, action) => (dispatch) => {
   dispatch(startProgressIndicator());
-  const body = requestDataBuilder(collection, item, action);
-  const query = apiEntityQuery(collection, action, body);
+  const apiAction = requestActionBuilder(collection, item, action);
+  const body = requestDataBuilder(collection, item, apiAction);
+  const query = apiEntityQuery(collection, apiAction, body);
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
@@ -121,3 +147,6 @@ export const getEntityById = (name, collection, id) => (dispatch) => {
 
 export const deleteEntity = (collection, item) => dispatch =>
   dispatch(saveEntity(collection, item, 'delete'));
+
+export const closeEntity = (collection, item) => dispatch =>
+  dispatch(saveEntity(collection, item, 'close'));

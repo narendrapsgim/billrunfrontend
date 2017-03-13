@@ -1,90 +1,68 @@
 import { createSelector } from 'reselect';
-import moment from 'moment';
-import { getItemDateValue } from '../common/Util';
+import { getConfig, isItemClosed, getItemId } from '../common/Util';
 
 
-const getUniqueFiled = (state, props, itemType) => {
-  switch (itemType) {
-    case 'product':
-      return 'key';
-    default:
-      return 'name';
-  }
+const getUniqueFiled = (state, props, entityName) =>
+  getConfig(['systemItems', entityName, 'uniqueField'], 'name');
+
+const getRevisions = (state, props, entityName) => {
+  const entityCollectin = getConfig(['systemItems', entityName, 'collection'], '');
+  return state.entityList.revisions.get(entityCollectin);
 };
 
-const getRevisions = (state, props, itemType) => {
-  switch (itemType) {
-    case 'product':
-      return state.entityList.revisions.get('rates');
-    case 'prepaid_include':
-      return state.entityList.revisions.get('prepaidincludes');
-    default: {
-      const itemsType = `${itemType}s`;
-      return state.entityList.revisions.get(itemsType);
-    }
-  }
-};
-
-const getTab = (state, props, itemType) => { // eslint-disable-line no-unused-vars
+const getTab = (state, props) => {
   if (props.location && props.location.query && typeof props.location.query.tab !== 'undefined') {
     return parseInt(props.location.query.tab) || undefined;
   }
   return undefined;
 };
 
-const getAction = (state, props, itemType) => { // eslint-disable-line no-unused-vars
+const getAction = (state, props) => {
   if (props.location && props.location.query && props.location.query.action) {
     return props.location.query.action.length > 0 ? props.location.query.action : null;
   }
   return null;
 };
 
-const getId = (state, props, itemType) => { // eslint-disable-line no-unused-vars
+const getId = (state, props) => {
   if (props.params && props.params.itemId) {
     return props.params.itemId.length > 0 ? props.params.itemId : null;
   }
   return null;
 };
 
-const getItem = (state, props, itemType) => {
-  switch (itemType) {
+const getItem = (state, props, entityName) => {
+  switch (entityName) {
     case 'prepaid_include':
-      return state.entity.get(itemType);
+      return state.entity.get(entityName);
     default: {
-      return state[itemType];
+      return state[entityName];
     }
   }
 };
 
 const selectRevisions = (item, allRevisions, uniqueFiled) => {
-  if (allRevisions && item && item.getIn(['_id', '$id'], false)) {
+  if (allRevisions && getItemId(item, false)) {
     return allRevisions.get(item.get(uniqueFiled, ''));
   }
   return undefined;
 };
 
-const selectFormMode = (action, id, item, revisions) => {
+const selectFormMode = (action, id, item) => {
   if (action) {
     return action;
   }
   if (!id) {
     return 'create';
   }
-  if (item && item.getIn(['_id', '$id'], false)) {
-    const from = getItemDateValue(item, 'originalValue', moment(0));
-    const to = getItemDateValue(item, 'to', moment(0));
-    if (to.isBefore(moment())) {
+
+  if (getItemId(item, false)) {
+    const status = item.getIn(['revision_info', 'status'], '');
+    if (['expired', 'active_with_future'].includes(status)) {
       return 'view';
     }
-    if (from.isAfter(moment())) {
+    if (['future'].includes(status) || isItemClosed(item)) {
       return 'update';
-    }
-    // Check if item has future revision - if has - item is readonly
-    if (item && item.getIn(['_id', '$id'], false) && revisions) {
-      const idx = revisions.findIndex(revision => revision.getIn(['_id', '$id'], false) === item.getIn(['_id', '$id'], false));
-      if (idx !== 0) {
-        return 'view';
-      }
     }
     return 'closeandnew';
   }
@@ -117,6 +95,5 @@ export const modeSelector = createSelector(
   getAction,
   idSelector,
   itemSelector,
-  revisionsSelector,
   selectFormMode,
 );

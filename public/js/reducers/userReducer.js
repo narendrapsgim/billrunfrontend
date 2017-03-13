@@ -1,5 +1,5 @@
 import Immutable from 'immutable';
-import { LOGIN, LOGOUT, LOGIN_ERROR } from '../actions/userActions';
+import { LOGIN, LOGOUT, LOGIN_ERROR, CLEAR_LOGIN_ERROR } from '../actions/userActions';
 
 const User = Immutable.Record({
   auth: null,
@@ -17,7 +17,10 @@ export default function (state = new User(), action) {
       return new User({ auth: false });
 
     case LOGIN_ERROR:
-      return state.set('error', 'Incorrect user name or password, please try again.');
+      return state.set('error', action.error);
+
+    case CLEAR_LOGIN_ERROR:
+      return state.set('error', '');
 
     default:
       return state;

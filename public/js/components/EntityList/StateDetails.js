@@ -52,12 +52,10 @@ class StateDetails extends Component {
   }
 
   renderRevisionTooltip = () => {
-    const { item, revisions, size, revisionBy } = this.props;
-    const key = item.get(revisionBy, '');
-    const title = `${key} - Revision History`;
+    const { item, revisions, size } = this.props;
     if (!revisions) {
       return (
-        <Popover id={`${item.getIn(['_id', '$id'], '')}-loading`} title={title} className="entity-revision-history-popover">
+        <Popover id={`${getItemId(item, '')}-loading`} title={title} className="entity-revision-history-popover">
           <div style={{ padding: 15 }}><i className="fa fa-spinner fa-pulse" />&nbsp;&nbsp;&nbsp;loading...</div>
           <hr />
           <div style={{ padding: '8px 12px 7px' }}>&nbsp;</div>
@@ -65,9 +63,9 @@ class StateDetails extends Component {
       );
     }
     return (
-      <Popover id={`${item.getIn(['_id', '$id'], '')}-revisions`} title={title} className="entity-revision-history-popover">
+      <Popover id={`${getItemId(item, '')}-revisions`} title={title} className="entity-revision-history-popover">
         <RevisionTimeline revisions={revisions} item={item} size={size} />
-        <hr />
+        <hr style={{ margin: 0, borderColor: '#3A3A3A', borderWidth: 2 }} />
         <Button bsStyle="link" style={{ color: '#fff' }} onClick={this.showManageRevisions}>Manage Revisions</Button>
       </Popover>
     );

@@ -94,8 +94,8 @@ class ProductSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onFieldUpdate(['from'], defaultFromValue));
     }
@@ -180,6 +180,7 @@ class ProductSetup extends Component {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
+    const allowEdit = mode !== 'view';
     const usaget = item.get('rates', Immutable.Map()).keySeq().first();
     return (
       <Col lg={12}>
@@ -209,7 +210,13 @@ class ProductSetup extends Component {
             usageTypes={usageTypes}
           />
         </Panel>
-        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
+
+        <ActionButtons
+          onClickCancel={this.handleBack}
+          onClickSave={this.handleSave}
+          hideSave={!allowEdit}
+          cancelLabel={allowEdit ? undefined : 'Back'}
+        />
       </Col>
     );
   }
