@@ -44,7 +44,7 @@ class FtpDetials extends Component {
                      onChange={onChangeField}
                      value={settings.get('user', '')} />
             </div>
-          </div>          
+          </div>
           <div className="form-group">
             <label htmlFor="password" className="col-xs-2 control-label">Password</label>
             <div className="col-xs-4">
@@ -60,7 +60,7 @@ class FtpDetials extends Component {
                      onChange={onChangeField}
                      value={settings.get('remote_directory', '')} />
             </div>
-          </div>                    
+          </div>
           <div className="form-group">
             <label htmlFor="filename_regex" className="col-xs-2 control-label">Regex</label>
             <div className="col-xs-4">
@@ -68,7 +68,7 @@ class FtpDetials extends Component {
                      onChange={onChangeField}
                      value={settings.get('filename_regex')} />
             </div>
-          </div>                    
+          </div>
           <div className="form-group">
             <label htmlFor="period" className="col-xs-2 control-label">Period</label>
             <div className="col-xs-4">
@@ -76,7 +76,7 @@ class FtpDetials extends Component {
                 { period_options }
               </select>
             </div>
-          </div>                    
+          </div>
           <div className="form-group">
             <label htmlFor="delete_received" className="col-xs-2 control-label">Delete on retrieve</label>
             <div className="col-xs-4">

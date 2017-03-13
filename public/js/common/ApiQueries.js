@@ -42,6 +42,25 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
+export const getUserLoginQuery = (username, password) => ({
+  api: 'auth',
+  params: [
+    { username },
+    { password },
+  ],
+});
+
+export const getUserLogoutQuery = () => ({
+  api: 'auth',
+  params: [
+    { action: 'logout' },
+  ],
+});
+
+export const getUserCheckLoginQuery = () => ({
+  api: 'auth',
+});
+
 export const getInputProcessorActionQuery = (fileType, action) => ({
   api: 'settings',
   params: [
@@ -198,6 +217,7 @@ export const getSubscribersByAidQuery = aid => ({
     { query: JSON.stringify({ aid }) },
     { page: 0 },
     { size: 9999 },
+    { project: JSON.stringify({ from: 0, to: 0 }) },
   ],
 });
 
@@ -279,7 +299,7 @@ export const searchProductsByKeyQuery = (key, project = {}) => ({
     { query: JSON.stringify({
       key: { $regex: key, $options: 'i' },
     }) },
-    { states: JSON.stringify([0]) },
+    { states: JSON.stringify([0, 1]) },
   ],
 });
 
@@ -322,7 +342,13 @@ export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 99
         $regex: `^${value}$`,
       },
     }) },
-    { project: JSON.stringify({ from: 1, to: 1, description: 1, [revisionBy]: 1 }) },
+    { project: JSON.stringify({
+      from: 1,
+      to: 1,
+      description: 1,
+      [revisionBy]: 1,
+      revision_info: 1,
+    }) },
     { page: 0 },
     { size },
     { state: JSON.stringify([0, 1, 2]) },

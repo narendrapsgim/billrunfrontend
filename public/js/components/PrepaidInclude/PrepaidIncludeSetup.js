@@ -8,7 +8,7 @@ import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
 import { EntityRevisionDetails } from '../Entity';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import { getProductsKeysQuery } from '../../common/ApiQueries';
 import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
@@ -51,10 +51,7 @@ class PrepaidIncludeSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getPrepaidInclude(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
   }
 
   componentDidMount() {
@@ -69,19 +66,14 @@ class PrepaidIncludeSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const {
-      item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'prepaid_include', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPrepaidInclude(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -90,12 +82,10 @@ class PrepaidIncludeSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.onChangeFieldValue(['from'], defaultFromValue);
-    }
-    if (mode === 'create') {
       this.onChangeFieldValue(['shared'], false);
       this.onChangeFieldValue(['unlimited'], false);
     }
@@ -103,10 +93,22 @@ class PrepaidIncludeSetup extends Component {
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
       this.props.dispatch(getRevisions('prepaidincludes', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getPrepaidInclude(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('prepaidincludes', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -127,7 +129,6 @@ class PrepaidIncludeSetup extends Component {
     this.onChangeFieldValue(id, value);
   };
 
-
   onChangeLimitedDestinations = (name, value) => {
     this.onChangeFieldValue(['allowed_in', name], value);
   };
@@ -142,12 +143,11 @@ class PrepaidIncludeSetup extends Component {
   };
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('prepaidincludes', key)); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The prepaid bucke was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
@@ -191,12 +191,14 @@ class PrepaidIncludeSetup extends Component {
 
         <Panel>
           <EntityRevisionDetails
+            itemName="prepaid_include"
             revisions={revisions}
             item={item}
             mode={mode}
             onChangeFrom={this.onChangeFieldValue}
-            itemName="prepaid_include"
             backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
           />
         </Panel>
 

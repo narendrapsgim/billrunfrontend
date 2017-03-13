@@ -11,7 +11,7 @@ import Thresholds from './Thresholds';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
 import {
@@ -63,10 +63,7 @@ class PrepaidPlanSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
   }
 
   componentDidMount() {
@@ -80,19 +77,14 @@ class PrepaidPlanSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const {
-      item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'prepaid_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -102,12 +94,10 @@ class PrepaidPlanSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onPlanFieldUpdate(['from'], defaultFromValue));
-    }
-    if (mode === 'create') {
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'customer'));
@@ -120,10 +110,22 @@ class PrepaidPlanSetup extends Component {
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
       this.props.dispatch(getRevisions('plans', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -197,19 +199,18 @@ class PrepaidPlanSetup extends Component {
   }
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
 
   handleBack = (itemWasChanged = false) => {
     if (itemWasChanged) {
-      this.props.dispatch(clearItems('prepaid_plan')); // refetch items list because item was (changed in / added to) list
+      this.props.dispatch(clearItems('prepaid_plans')); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = getConfig(['systemItems', 'prepaid_plan', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
@@ -233,12 +234,14 @@ class PrepaidPlanSetup extends Component {
 
           <Panel>
             <EntityRevisionDetails
+              itemName="prepaid_plan"
               revisions={revisions}
               item={item}
               mode={mode}
               onChangeFrom={this.onChangePlanField}
-              itemName="prepaid_plan"
               backToList={this.handleBack}
+              reLoadItem={this.fetchItem}
+              clearRevisions={this.clearRevisions}
             />
           </Panel>
 

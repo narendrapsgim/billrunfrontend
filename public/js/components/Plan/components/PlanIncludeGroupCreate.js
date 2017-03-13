@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import Select from 'react-select';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import CreateButton from '../../Elements/CreateButton';
 import Help from '../../Help';
@@ -11,9 +13,10 @@ import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '../../Field';
 import Products from './Products';
 import { validateUnlimitedValue, validatePriceValue, validateKey } from '../../../common/Validators';
+import { currencySelector } from '../../../selectors/settingsSelector';
 
 
-export default class PlanIncludeGroupCreate extends Component {
+class PlanIncludeGroupCreate extends Component {
 
   static propTypes = {
     existinGrousNames: PropTypes.instanceOf(Immutable.List),
@@ -21,12 +24,14 @@ export default class PlanIncludeGroupCreate extends Component {
     usageTypes: PropTypes.instanceOf(Immutable.List),
     modalTitle: PropTypes.string,
     addGroup: PropTypes.func.isRequired,
+    currency: PropTypes.string,
   }
 
   static defaultProps = {
     modalTitle: 'Create New Group',
     allGroupsProductsKeys: Immutable.List(),
     existinGrousNames: Immutable.List(),
+    currency: 'USD',
   };
 
   defaultState = {
@@ -241,10 +246,10 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
-    const { usedProducts, usageTypes } = this.props;
+    const { usedProducts, usageTypes, currency } = this.props;
     const { name, products, include, usage, shared, error, monetaryBased, steps } = this.state;
     const existingProductsKeys = usedProducts.push(...products);
-    const setIncludesTitle = monetaryBased ? `Total ${globalSetting.currency} included` : changeCase.sentenceCase(`${usage} includes`);
+    const setIncludesTitle = monetaryBased ? `Total ${getSymbolFromCurrency(currency)} included` : changeCase.sentenceCase(`${usage} includes`);
 
     switch (stepIndex) {
 
@@ -360,7 +365,7 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   render() {
-    const { stepIndex, open, name } = this.state;
+    const { stepIndex, open, name, steps } = this.state;
     let { modalTitle } = this.props;
     if (name.length) {
       modalTitle += ` - ${name}`;
@@ -391,7 +396,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
           <Modal.Footer>
             <Button bsSize="small" onClick={this.handlePrev} style={{ marginRight: 9, minWidth: 90 }}><i className="fa fa-angle-left" />&nbsp;Back</Button>
-            { (stepIndex === 3)
+            { (stepIndex === steps.count() - 1)
               ? <Button bsSize="small" onClick={this.handleFinish} style={{ minWidth: 90 }} bsStyle="primary">Add</Button>
               : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 90 }}>Next&nbsp;<i className="fa fa-angle-right" /></Button>
             }
@@ -401,3 +406,12 @@ export default class PlanIncludeGroupCreate extends Component {
     );
   }
 }
+
+const mapStateToProps = (state, props) => {
+  const currency = currencySelector(state, props);
+  return {
+    currency,
+  };
+};
+
+export default connect(mapStateToProps)(PlanIncludeGroupCreate);

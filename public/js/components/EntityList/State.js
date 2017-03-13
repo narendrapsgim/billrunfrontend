@@ -47,6 +47,8 @@ class State extends Component {
     this.props.onChangeState(states);
   }
 
+  buttonTitle = () => '';
+
   getHistoryOptions = () => {
     const { states } = this.state;
     return (
@@ -85,6 +87,7 @@ class State extends Component {
         allSelectedText="<span><div class='cycle all option' /> All States</span>"
         selectAllNumber={false}
         onDropdownHide={this.onDropdownHide}
+        buttonTitle={this.buttonTitle}
       />
     );
   }
