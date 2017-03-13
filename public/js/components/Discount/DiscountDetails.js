@@ -70,6 +70,16 @@ export default class DiscountDetails extends Component {
                 </Col>
               </FormGroup>
 
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  Limit
+                </Col>
+                <Col sm={8} lg={9}>
+                  <Field onChange={this.onChangeDescription} value={discount.get('limit', '')} editable={editable} />
+                  <HelpBlock>leave blank for no limit.</HelpBlock>
+                </Col>
+              </FormGroup>
+
               { ['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
