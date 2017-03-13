@@ -105,6 +105,9 @@ class PlanSetup extends Component {
     if (mode === 'clone') {
       this.props.dispatch(setClonePlan());
     }
+    if (item.get('prorated', null) === null) {
+      this.props.dispatch(onPlanFieldUpdate(['prorated'], 'true'));
+    }
   }
 
   initRevisions = () => {
