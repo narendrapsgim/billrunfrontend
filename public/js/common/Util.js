@@ -34,7 +34,7 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'create': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `Create New ${changeCase.upperCaseFirst(entitySettings.get('itemName', entitySettings.get('itemType', '')))}`;
+        return `Create New ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))}`;
       }
       return 'Create';
     }
@@ -42,7 +42,7 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'closeandnew': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `Edit ${entitySettings.get('itemName', entitySettings.get('itemType', ''))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
+        return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'Edit';
     }
@@ -50,7 +50,7 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'view': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `${changeCase.upperCaseFirst(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
+        return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'View';
     }
@@ -58,7 +58,7 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'update': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        return `Update ${entitySettings.get('itemName', entitySettings.get('itemType', ''))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
+        return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'Update';
     }
@@ -77,4 +77,20 @@ export const getItemDateValue = (item, fieldName, defaultValue = moment()) => {
     return moment.unix(dateUnix);
   }
   return defaultValue;
+};
+
+export const getItemId = (item, defaultValue = null) => {
+  if (Immutable.Map.isMap(item)) {
+    return item.getIn(['_id', '$id'], defaultValue);
+  }
+  return defaultValue;
+};
+
+export const isItemClosed = (item) => {
+  const earlyExpiration = item.getIn(['revision_info', 'early_expiration'], null);
+  if (earlyExpiration !== null) {
+    return earlyExpiration;
+  }
+  const toTime = getItemDateValue(item, 'to');
+  return toTime.isAfter(moment()) && toTime.isBefore(moment().add(50, 'years'));
 };
