@@ -1,4 +1,5 @@
 var globalSetting = {
+  storageVersion: 'v0.1',
   serverUrl: "",
   serverApiDebug: false,
   serverApiDebugQueryString: 'XDEBUG_SESSION_START=netbeans-xdebug',
@@ -8,7 +9,8 @@ var globalSetting = {
   apiDateTimeFormat: "YYYY-MM-DD",
   currency: '$',
   list: {
-    maxItems: 100
+    maxItems: 100,
+    defaultItems: 10,
   },
   statusMessageDisplayTimeout: 5000,
   planCycleUnlimitedValue: 'UNLIMITED',

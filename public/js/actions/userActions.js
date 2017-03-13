@@ -1,118 +1,105 @@
 import { apiBillRun } from '../common/Api';
-import { fetchUserByIdQuery } from '../common/ApiQueries';
+import {
+  fetchUserByIdQuery,
+  getUserLoginQuery,
+  getUserCheckLoginQuery,
+  getUserLogoutQuery,
+} from '../common/ApiQueries';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 import { saveEntity, getEntity, actions } from './entityActions';
 
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 export const LOGIN_ERROR = 'LOGIN_ERROR';
+export const CLEAR_LOGIN_ERROR = 'CLEAR_LOGIN_ERROR';
 
 
-export function getUser(id) {
-  return getEntity('users', fetchUserByIdQuery(id));
-}
+export const getUser = id => getEntity('users', fetchUserByIdQuery(id));
 
-export function saveUser(user, action) {
-  return saveEntity('users', user, action);
-}
+export const saveUser = (user, action) => saveEntity('users', user, action);
 
-export function updateUserField(path, value) {
-  return {
-    type: actions.UPDATE_ENTITY_FIELD,
-    collection: 'users',
-    path,
-    value,
-  };
-}
+export const updateUserField = (path, value) => ({
+  type: actions.UPDATE_ENTITY_FIELD,
+  collection: 'users',
+  path,
+  value,
+});
 
-export function deleteUserField(path) {
-  return {
-    type: actions.DELETE_ENTITY_FIELD,
-    collection: 'users',
-    path,
-  };
-}
+export const deleteUserField = path => ({
+  type: actions.DELETE_ENTITY_FIELD,
+  collection: 'users',
+  path,
+});
 
-export function clearUser() {
-  return {
-    type: actions.CLEAR_ENTITY,
-    collection: 'users',
-  };
-}
+export const clearUser = () => ({
+  type: actions.CLEAR_ENTITY,
+  collection: 'users',
+});
 
-function loginSuccess(data){
-  return {
-    type: LOGIN,
-    data
-  };
-}
+const loginSuccess = data => ({
+  type: LOGIN,
+  data,
+});
 
-function logoutSuccess(){
-  return {
-    type: LOGOUT
-  };
-}
+const logoutSuccess = () => ({
+  type: LOGOUT,
+});
 
-function loginError(data){
-  return {
-    type: LOGIN_ERROR,
-    data
-  };
-}
+const loginError = error => ({
+  type: LOGIN_ERROR,
+  error,
+});
 
-export function userCheckLogin(){
-  const query = { api: "auth" };
-  return dispatch => {
-    dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      success => {
-        dispatch(loginSuccess(success.data[0].data.details));
-        dispatch(finishProgressIndicator());
-      },
-      error => {
-        dispatch(logoutSuccess());
-        dispatch(finishProgressIndicator());
-      },
-    );
-  }
-}
+const clearLoginError = () => ({
+  type: CLEAR_LOGIN_ERROR,
+});
 
-export function userDoLogin(username, password){
-  const query = {
-    api: "auth",
-    params: [ { username }, { password } ]
-  };
-  return dispatch => {
-    dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      success => {
-        dispatch(loginSuccess(success.data[0].data.details));
-        dispatch(finishProgressIndicator());
-      },
-      error => {
-        dispatch(loginError(error.error[0].error.details));
-        dispatch(finishProgressIndicator());
-      }
-    );
-  }
-}
+export const userCheckLogin = () => (dispatch) => {
+  const query = getUserCheckLoginQuery();
+  dispatch(startProgressIndicator());
+  return apiBillRun(query)
+    .then((success) => {
+      dispatch(loginSuccess(success.data[0].data.details));
+      dispatch(finishProgressIndicator());
+      return success;
+    })
+    .catch((error) => { // eslint-disable-line no-unused-vars
+      dispatch(logoutSuccess());
+      dispatch(finishProgressIndicator());
+      return error;
+    });
+};
 
-export function userDoLogout(){
-  const query = {
-    api: "auth",
-    params: [ { action: 'logout' } ]
-  };
-  return dispatch => {
-    dispatch(startProgressIndicator());
-    return apiBillRun(query).then(
-      success => {
-        dispatch(logoutSuccess())
-        dispatch(finishProgressIndicator());
-      },
-      error => {
-        dispatch(finishProgressIndicator());
-        console.log("userDoLogout error : ", error);
-      }
-    );
-  }
-}
+
+export const userDoLogin = (username, password) => (dispatch) => {
+  const query = getUserLoginQuery(username, password);
+  dispatch(startProgressIndicator());
+  dispatch(clearLoginError());
+  return apiBillRun(query)
+    .then((success) => {
+      dispatch(loginSuccess(success.data[0].data.details));
+      dispatch(finishProgressIndicator());
+      return success;
+    })
+    .catch((error) => { // eslint-disable-line no-unused-vars
+      const message = 'Incorrect user name or password, please try again.';
+      dispatch(loginError(message));
+      dispatch(finishProgressIndicator());
+      return error;
+    });
+};
+
+export const userDoLogout = () => (dispatch) => {
+  const query = getUserLogoutQuery();
+  dispatch(startProgressIndicator());
+  return apiBillRun(query)
+    .then((success) => {
+      dispatch(logoutSuccess());
+      dispatch(finishProgressIndicator());
+      return success;
+    })
+    .catch((error) => {
+      dispatch(finishProgressIndicator());
+      return error;
+    });
+};
