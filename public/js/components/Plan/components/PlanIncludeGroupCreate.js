@@ -360,7 +360,7 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   render() {
-    const { stepIndex, open, name } = this.state;
+    const { stepIndex, open, name, steps } = this.state;
     let { modalTitle } = this.props;
     if (name.length) {
       modalTitle += ` - ${name}`;
@@ -391,7 +391,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
           <Modal.Footer>
             <Button bsSize="small" onClick={this.handlePrev} style={{ marginRight: 9, minWidth: 90 }}><i className="fa fa-angle-left" />&nbsp;Back</Button>
-            { (stepIndex === 3)
+            { (stepIndex === steps.count() - 1)
               ? <Button bsSize="small" onClick={this.handleFinish} style={{ minWidth: 90 }} bsStyle="primary">Add</Button>
               : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 90 }}>Next&nbsp;<i className="fa fa-angle-right" /></Button>
             }
