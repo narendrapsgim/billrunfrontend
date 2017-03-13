@@ -85,7 +85,6 @@ class EntityList extends Component {
   }
 
   // shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
-  //   return !nextProps.inProgress;
   //   // return (
   //   //   this.props.page !== nextProps.page
   //   //   || this.props.nextPage !== nextProps.nextPage
@@ -169,7 +168,7 @@ class EntityList extends Component {
       api,
       showRevisionBy,
     } = props;
-    const project = showRevisionBy ? { ...projectFields, ...{ to: 1, from: 1 } } : projectFields;
+    const project = showRevisionBy ? { ...projectFields, ...{ to: 1, from: 1, revision_info: 1 } } : projectFields;
     const query = { ...filter.toObject(), ...baseFilter };
     const request = {
       action: api,
@@ -272,13 +271,13 @@ class EntityList extends Component {
   }
 
   render() {
-    const { items, inProgress } = this.props;
-    if (items === null || inProgress) {
+    const { items } = this.props;
+    if (items === null) {
       return (<LoadingItemPlaceholder />);
     }
     return (
       <Row>
-        <Col lg={12}>
+        <Col lg={12} >
           <Panel header={this.renderPanelHeader()}>
             { this.renderFilter() }
             { this.renderList() }

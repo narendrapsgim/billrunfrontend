@@ -38,6 +38,15 @@ export const clearEntity = collection => ({
 const buildRequestData = (item, action) => {
   switch (action) {
 
+    case 'close': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      const update = { to: getItemDateValue(item, 'to').format(globalSetting.apiDateTimeFormat) };
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
     case 'delete': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
@@ -130,3 +139,6 @@ export const getEntityById = (name, collection, id) => (dispatch) => {
 
 export const deleteEntity = (collection, item) => dispatch =>
   dispatch(saveEntity(collection, item, 'delete'));
+
+export const closeEntity = (collection, item) => dispatch =>
+  dispatch(saveEntity(collection, item, 'close'));

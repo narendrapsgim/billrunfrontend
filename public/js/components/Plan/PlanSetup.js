@@ -20,7 +20,7 @@ import {
   onGroupAdd,
   onGroupRemove,
 } from '../../actions/planActions';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
@@ -56,10 +56,7 @@ class PlanSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
   }
 
   componentDidMount() {
@@ -73,19 +70,14 @@ class PlanSetup extends Component {
 
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const {
-      item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, itemId, mode } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -115,10 +107,22 @@ class PlanSetup extends Component {
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
       this.props.dispatch(getRevisions('plans', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -165,12 +169,11 @@ class PlanSetup extends Component {
   }
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
       const action = (mode === 'create') ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
@@ -201,12 +204,14 @@ class PlanSetup extends Component {
 
         <Panel>
           <EntityRevisionDetails
+            itemName="plan"
             revisions={revisions}
             item={item}
             mode={mode}
             onChangeFrom={this.onChangeFieldValue}
-            itemName="plan"
             backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
           />
         </Panel>
 
