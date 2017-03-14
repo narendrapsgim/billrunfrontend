@@ -93,6 +93,9 @@ class ServiceSetup extends Component {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(updateService(['from'], defaultFromValue));
     }
+    if (item.get('prorated', null) === null) {
+      this.props.dispatch(updateService(['prorated'], true));
+    }
   }
 
   initRevisions = () => {
