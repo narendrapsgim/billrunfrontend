@@ -57,17 +57,17 @@ export default class UnlimitedInput extends Component {
       <InputGroup>
         <InputGroup.Addon>
           <input
-              checked={unlimited}
-              onChange={this.onUnlimitedChanged}
-              type="checkbox"
-              disabled={disabled}
-          /><small style={{verticalAlign: 'bottom'}}> {unlimitedLabel}</small>
+            checked={unlimited}
+            onChange={this.onUnlimitedChanged}
+            type="checkbox"
+            disabled={disabled}
+          /><small style={{ verticalAlign: 'bottom' }}> {unlimitedLabel}</small>
         </InputGroup.Addon>
         <FormControl
-            disabled={unlimited || disabled}
-            onChange={this.onValueChanged}
-            type="text"
-            value={unlimited ? '' : value}
+          disabled={unlimited || disabled}
+          onChange={this.onValueChanged}
+          type="text"
+          value={unlimited ? '' : value}
         />
       </InputGroup>
     );
