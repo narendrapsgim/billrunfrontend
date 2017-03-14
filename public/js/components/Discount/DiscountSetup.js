@@ -8,10 +8,15 @@ import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { EntityRevisionDetails } from '../Entity';
 import DiscountDetails from './DiscountDetails';
 import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
+import {
+  getPlansKeysQuery,
+  getServicesKeysQuery,
+} from '../../common/ApiQueries';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { saveDiscount, getDiscount, clearDiscount, updateDiscount } from '../../actions/discountsActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
+import { getList, clearList } from '../../actions/listActions';
 import { modeSelector, itemSelector, idSelector, revisionsSelector } from '../../selectors/entitySelector';
 
 
@@ -22,6 +27,8 @@ class DiscountSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    availablePlans: PropTypes.instanceOf(Immutable.List),
+    availableServices: PropTypes.instanceOf(Immutable.List),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -31,6 +38,8 @@ class DiscountSetup extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     revisions: Immutable.List(),
+    availablePlans: Immutable.List(),
+    availableServices: Immutable.List(),
   }
 
   state = {
@@ -48,6 +57,8 @@ class DiscountSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     this.initDefaultValues();
+    this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
+    this.props.dispatch(getList('available_services', getServicesKeysQuery()));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -64,6 +75,8 @@ class DiscountSetup extends Component {
 
   componentWillUnmount() {
     this.props.dispatch(clearDiscount());
+    this.props.dispatch(clearList('available_plans'));
+    this.props.dispatch(clearList('available_services'));
   }
 
   initDefaultValues = () => {
@@ -71,9 +84,6 @@ class DiscountSetup extends Component {
     if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.onChangeFieldValue(['from'], defaultFromValue);
-    }
-    if (mode === 'create') {
-      // set defaults values
     }
   }
 
@@ -141,7 +151,7 @@ class DiscountSetup extends Component {
 
   render() {
     const { progress } = this.state;
-    const { item, mode, revisions } = this.props;
+    const { item, mode, revisions, availablePlans, availableServices } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -167,6 +177,8 @@ class DiscountSetup extends Component {
             discount={item}
             mode={mode}
             onFieldUpdate={this.onChangeFieldValue}
+            availablePlans={availablePlans}
+            availableServices={availableServices}
           />
         </Panel>
 
@@ -181,10 +193,15 @@ class DiscountSetup extends Component {
     );
   }
 }
+
+
 const mapStateToProps = (state, props) => ({
   itemId: idSelector(state, props, 'discount'),
   item: itemSelector(state, props, 'discount'),
   mode: modeSelector(state, props, 'discount'),
   revisions: revisionsSelector(state, props, 'discount'),
+  availablePlans: state.list.get('available_plans') || undefined,
+  availableServices: state.list.get('available_services') || undefined,
 });
+
 export default withRouter(connect(mapStateToProps)(DiscountSetup));
