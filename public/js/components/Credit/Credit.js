@@ -65,7 +65,6 @@ class Credit extends Component {
 
   updateChargingMessage = (usagev, aprice) => {
     const { currency } = this.props;
-    console.log(currency);
     const { helperMsg, rateBy } = this.state;
     if (rateBy !== 'fix') {
       return;
