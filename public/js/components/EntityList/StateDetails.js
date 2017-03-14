@@ -4,8 +4,8 @@ import Immutable from 'immutable';
 import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { ModalWrapper, StateIcon, RevisionTimeline } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getConfig, getItemId } from '../../common/Util';
-import { getRevisions, clearRevisions } from '../../actions/entityListActions';
+import { getItemDateValue, getConfig } from '../../common/Util';
+import { getRevisions } from '../../actions/entityListActions';
 
 
 class StateDetails extends Component {
@@ -55,13 +55,15 @@ class StateDetails extends Component {
     const { item, revisions, size } = this.props;
     if (!revisions) {
       return (
-        <Popover id={`${getItemId(item, '')}-loading`} title="Revision History">
-          <div>loading...</div>
+        <Popover id={`${getItemId(item, '')}-loading`} title={title} className="entity-revision-history-popover">
+          <div style={{ padding: 15 }}><i className="fa fa-spinner fa-pulse" />&nbsp;&nbsp;&nbsp;loading...</div>
+          <hr />
+          <div style={{ padding: '8px 12px 7px' }}>&nbsp;</div>
         </Popover>
       );
     }
     return (
-      <Popover id={`${getItemId(item, '')}-revisions`} title="Revision History" className="entity-revision-history-popover">
+      <Popover id={`${getItemId(item, '')}-revisions`} title={title} className="entity-revision-history-popover">
         <RevisionTimeline revisions={revisions} item={item} size={size} />
         <hr style={{ margin: 0, borderColor: '#3A3A3A', borderWidth: 2 }} />
         <Button bsStyle="link" style={{ color: '#fff' }} onClick={this.showManageRevisions}>Manage Revisions</Button>
@@ -69,23 +71,15 @@ class StateDetails extends Component {
     );
   }
 
-  onCloseItem = () => {
-    const { item, collection, revisionBy } = this.props;
-    const key = item.get(revisionBy, '');
-    this.props.dispatch(getRevisions(collection, revisionBy, key));
-  }
-
   renderVerisionList = () => {
     const { item, itemName, revisions, revisionBy } = this.props;
     const { showList } = this.state;
-    const title = `${item.get(revisionBy, '')} - Revision History`;
     return (
-      <ModalWrapper title={title} show={showList} onCancel={this.hideManageRevisions} onHide={this.hideManageRevisions} labelCancel="Close">
+      <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
         <RevisionList
           items={revisions}
           itemName={itemName}
           onSelectItem={this.hideManageRevisions}
-          onCloseItem={this.onCloseItem}
         />
       </ModalWrapper>
     );
@@ -94,18 +88,20 @@ class StateDetails extends Component {
   renderHelpTooltip = () => {
     const { item } = this.props;
     return (
-      <Tooltip id={`${getItemId(item, '')}-help`}>Click to get<br />revision history</Tooltip>
+      <Tooltip id={`${item.getIn(['_id', '$id'], '')}-help`}>Click to get<br />revision history</Tooltip>
     );
   }
 
   render() {
     const { item } = this.props;
+    const from = getItemDateValue(item, 'from');
+    const to = getItemDateValue(item, 'to');
     return (
       <div>
         <OverlayTrigger trigger="click" rootClose placement="right" ref="revisionOverlay" overlay={this.renderRevisionTooltip()} onEnter={this.onEnter}>
           <OverlayTrigger overlay={this.renderHelpTooltip()} placement="left">
             <div className="clickable">
-              <StateIcon status={item.getIn(['revision_info', 'status'], '')} />
+              <StateIcon from={from.toISOString()} to={to.toISOString()} />
             </div>
           </OverlayTrigger>
         </OverlayTrigger>
