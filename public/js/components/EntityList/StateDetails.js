@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { ModalWrapper, StateIcon, RevisionTimeline } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getItemDateValue, getConfig } from '../../common/Util';
+import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import { getRevisions } from '../../actions/entityListActions';
 
 
@@ -52,7 +52,8 @@ class StateDetails extends Component {
   }
 
   renderRevisionTooltip = () => {
-    const { item, revisions, size } = this.props;
+    const { item, revisions, size, revisionBy } = this.props;
+    const title = `${item.get(revisionBy, '')} - Revision History`;
     if (!revisions) {
       return (
         <Popover id={`${getItemId(item, '')}-loading`} title={title} className="entity-revision-history-popover">
