@@ -159,9 +159,9 @@ class Credit extends Component {
       <ModalWrapper
         show={true}
         progress={progress}
-        labelProgress="Charging..."
-        labelOk="Charge"
-        title="Credit Charge"
+        labelProgress="Processing..."
+        labelOk="Apply"
+        title="Manual charge / refund"
         onOk={this.onCreditCharge}
         onCancel={this.props.onClose}
       >
@@ -195,7 +195,7 @@ class Credit extends Component {
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('aprice', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>Price</Col>
+            <Col sm={2} componentClass={ControlLabel}>Charge</Col>
             <Col sm={10}>
               <Field
                 onChange={this.onChangeCreditApriceValue.bind(this, 'aprice')}
@@ -224,7 +224,7 @@ class Credit extends Component {
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('rate', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>Rate</Col>
+            <Col sm={2} componentClass={ControlLabel}>Product</Col>
             <Col sm={10}>
               <Select
                 id="rate"
