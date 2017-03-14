@@ -54,6 +54,7 @@ class PlanSetup extends Component {
 
   state = {
     activeTab: parseInt(this.props.activeTab),
+    progress: false,
   }
 
   componentWillMount() {
@@ -170,11 +171,13 @@ class PlanSetup extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
+    this.setState({ progress: true });
     this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
   }
 
   afterSave = (response) => {
     const { mode } = this.props;
+    this.setState({ progress: false });
     if (response.status) {
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
@@ -196,6 +199,7 @@ class PlanSetup extends Component {
   }
 
   render() {
+    const { progress, activeTab } = this.state;
     const { item, mode, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -220,7 +224,7 @@ class PlanSetup extends Component {
           />
         </Panel>
 
-        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
+        <Tabs defaultActiveKey={activeTab} animation={false} id="PlanTab" onSelect={this.handleSelectTab}>
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanTab
@@ -262,6 +266,7 @@ class PlanSetup extends Component {
           onClickSave={this.handleSave}
           hideSave={!allowEdit}
           cancelLabel={allowEdit ? undefined : 'Back'}
+          progress={progress}
         />
       </Col>
     );
