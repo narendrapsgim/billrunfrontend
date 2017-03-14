@@ -36,7 +36,6 @@ class LoginForm extends Component {
 
 
   clickLogin = (e) => {
-    console.log('clickLogin...');
     const { username, password } = this.state;
     this.setState({ progress: true });
     e.preventDefault();
