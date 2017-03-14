@@ -31,6 +31,7 @@ export const getZiroTimeDate = (date = moment()) => {
 
 export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
   switch (mode) {
+    case 'clone':
     case 'create': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {

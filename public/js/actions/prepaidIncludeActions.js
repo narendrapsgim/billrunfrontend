@@ -1,10 +1,18 @@
 import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { fetchPrepaidIncludeByIdQuery } from '../common/ApiQueries';
-import { saveEntity, gotEntity, clearEntity, updateEntityField } from './entityActions';
+import {
+  saveEntity,
+  gotEntity,
+  clearEntity,
+  setCloneEntity,
+  updateEntityField,
+} from './entityActions';
 
 
 export const clearPrepaidInclude = () => clearEntity('prepaid_include');
+
+export const setClonePrepaidInclude = () => setCloneEntity('prepaid_include', 'prepaid_include');
 
 export const savePrepaidInclude = (prepaidInclude, action) => saveEntity('prepaidincludes', prepaidInclude, action);
 

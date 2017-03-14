@@ -7,6 +7,7 @@ import { saveEntity } from './entityActions';
 export const PRODUCT_GOT = 'PRODUCT_GOT';
 export const SAVE_PRODUCT = 'SAVE_PRODUCT';
 export const PRODUCT_CLEAR = 'PRODUCT_CLEAR';
+export const PRODUCT_CLONE_RESET = 'PRODUCT_CLONE_RESET';
 export const PRODUCT_ADD_RATE = 'PRODUCT_ADD_RATE';
 export const PRODUCT_REMOVE_RATE = 'PRODUCT_REMOVE_RATE';
 export const PRODUCT_UPDATE_FIELD_VALUE = 'PRODUCT_UPDATE_FIELD_VALUE';
@@ -52,6 +53,11 @@ export const onRateRemove = (path, index) => ({
   type: PRODUCT_REMOVE_RATE,
   path,
   index,
+});
+
+export const setCloneProduct = () => ({
+  type: PRODUCT_CLONE_RESET,
+  uniquefields: ['key'],
 });
 
 export const saveProduct = (product, action) => saveEntity('rates', product, action);

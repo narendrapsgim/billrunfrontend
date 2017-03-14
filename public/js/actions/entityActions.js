@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getItemDateValue } from '../common/Util';
+import { getItemDateValue, getConfig } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -9,6 +9,7 @@ export const actions = {
   UPDATE_ENTITY_FIELD: 'UPDATE_ENTITY_FIELD',
   DELETE_ENTITY_FIELD: 'DELETE_ENTITY_FIELD',
   CLEAR_ENTITY: 'CLEAR_ENTITY',
+  CLONE_RESET_ENTITY: 'CLONE_RESET_ENTITY',
 };
 
 export const updateEntityField = (collection, path, value) => ({
@@ -28,6 +29,12 @@ export const gotEntity = (collection, entity) => ({
   type: actions.GOT_ENTITY,
   collection,
   entity,
+});
+
+export const setCloneEntity = (collection, entityName) => ({
+  type: actions.CLONE_RESET_ENTITY,
+  collection,
+  uniquefields: getConfig(['systemItems', entityName, 'uniqueField'], []),
 });
 
 export const clearEntity = collection => ({
@@ -106,6 +113,9 @@ const buildRequestData = (item, action) => {
 const requestActionBuilder = (collection, item, action) => {
   if (action === 'closeandnew' && getItemDateValue(item, 'from').isSame(getItemDateValue(item, 'originalValue', moment(0)), 'day')) {
     return 'update';
+  }
+  if (action === 'clone') {
+    return 'create';
   }
   return action;
 };

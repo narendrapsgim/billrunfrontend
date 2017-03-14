@@ -90,6 +90,20 @@ class RevisionList extends Component {
     });
   }
 
+  onClickClone = (item) => {
+    const { itemName } = this.props;
+    const itemId = item.getIn(['_id', '$id']);
+    const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+    const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
+    this.props.onSelectItem();
+    this.props.router.push({
+      pathname: `${itemsType}/${itemType}/${itemId}`,
+      query: {
+        action: 'clone',
+      },
+    });
+  }
+
   onClickRemoveOk = () => {
     const { itemName } = this.props;
     const { itemToRemove } = this.state;
@@ -129,6 +143,7 @@ class RevisionList extends Component {
   getListActions = () => [
     { type: 'view', showIcon: true, helpText: 'View', onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
+    { type: 'clone', showIcon: true, helpText: 'Clone', onClick: this.onClickClone },
     { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove, enable: this.parseRemoveEnable },
   ]
 

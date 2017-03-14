@@ -31,12 +31,6 @@ export default class ChargingPlanDetails extends Component {
     },
   }
 
-  componentDidMount() {
-    if (this.props.mode === 'create') {
-      this.setDefaultValues();
-    }
-  }
-
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
   }
@@ -69,10 +63,6 @@ export default class ChargingPlanDetails extends Component {
     this.props.onChangeField(['charging_value'], value);
   }
 
-  setDefaultValues = () => {
-    this.props.onChangeField(['operation'], 'inc');
-  }
-
   render() {
     const { errors } = this.state;
     const { item, mode } = this.props;
@@ -97,7 +87,7 @@ export default class ChargingPlanDetails extends Component {
             </Col>
           </FormGroup>
 
-          {mode === 'create' &&
+          {['clone', 'create'].includes(mode) &&
             <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
               <Col componentClass={ControlLabel} sm={3} lg={2}>
                 Key

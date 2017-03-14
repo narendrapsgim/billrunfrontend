@@ -51,7 +51,7 @@ const PrepaidInclude = (props) => {
     <div className="PrepaidInclude">
       <Panel>
         <Form horizontal>
-          { mode === 'create' &&
+          { ['clone', 'create'].includes(mode) &&
             <FormGroup>
               <Col lg={2} md={2} componentClass={ControlLabel}>Name</Col>
               <Col lg={7} md={7}>

@@ -120,7 +120,7 @@ class EntityRevisionDetails extends Component {
 
   filterDateAvailableFromDates = (date) => {
     const { item, mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       return true;
     }
     const tommorow = moment().add(1, 'days');
@@ -148,7 +148,7 @@ class EntityRevisionDetails extends Component {
 
   renderRevisionsBlock = () => {
     const { item, revisions, revisionItemsInTimeLine, mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       return null;
     }
     const start = this.getStartIndex();
@@ -202,7 +202,7 @@ class EntityRevisionDetails extends Component {
 
   renderTitle = () => {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       return (
         <div className="inline" style={{ verticalAlign: 'top', marginTop: 18, width: 110 }}>
           &nbsp;
