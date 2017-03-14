@@ -96,7 +96,7 @@ class PlanSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode } = this.props;
+    const { mode, item } = this.props;
     if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onPlanFieldUpdate(['from'], defaultFromValue));
