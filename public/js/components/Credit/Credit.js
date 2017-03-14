@@ -141,10 +141,10 @@ class Credit extends Component {
 
   afterCharge = (response) => {
     this.setState({ progress: false });
-        if (response.status) {
-          this.props.onClose();
-        }
-      }
+    if (response.status) {
+      this.props.onClose();
+    }
+  }
 
   getAvailableRates = () => {
     const { allRates } = this.props;
@@ -152,7 +152,7 @@ class Credit extends Component {
   }
 
   render() {
-    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg } = this.state;
+    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg, progress } = this.state;
     const availableRates = this.getAvailableRates();
     return (
       <ModalWrapper
