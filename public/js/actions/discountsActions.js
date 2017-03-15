@@ -1,14 +1,24 @@
 import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { fetchDiscountByIdQuery } from '../common/ApiQueries';
-import { saveEntity, gotEntity, clearEntity, updateEntityField } from './entityActions';
+import {
+  saveEntity,
+  gotEntity,
+  clearEntity,
+  updateEntityField,
+  deleteEntityField,
+  setCloneEntity,
+} from './entityActions';
 
+export const setCloneDiscount = () => setCloneEntity('discount', 'discount');
 
 export const clearDiscount = () => clearEntity('discount');
 
 export const saveDiscount = (item, action) => saveEntity('discounts', item, action);
 
 export const updateDiscount = (path, value) => updateEntityField('discount', path, value);
+
+export const deleteDiscountValue = path => deleteEntityField('discount', path);
 
 export const getDiscount = id => (dispatch) => {
   dispatch(startProgressIndicator());

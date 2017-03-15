@@ -11,15 +11,13 @@ const DiscountsList = () => {
   const tableFields = [
     { id: 'description', title: 'Title', sort: true },
     { id: 'key', title: 'Key', sort: true },
-    { id: 'from', title: 'From', type: 'date', cssClass: 'short-date', sort: true },
-    { id: 'to', title: 'To', type: 'date', cssClass: 'short-date', sort: true },
+    { id: 'discount_type', title: 'Type', sort: true },
   ];
 
   const projectFields = {
     key: 1,
     description: 1,
-    from: 1,
-    to: 1,
+    discount_type: 1,
   };
 
   return (

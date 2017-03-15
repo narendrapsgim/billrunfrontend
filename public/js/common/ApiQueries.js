@@ -262,6 +262,7 @@ export const getDeleteLineQuery = id => ({
 
 
 // List
+export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
@@ -319,19 +320,21 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
   ],
 });
 
-export const getProductsByKeysQuery = (keys, project = {}) => ({
+export const getEntitesByKeysQuery = (entity, keyField, keys, project = {}) => ({
   action: 'uniqueget',
-  entity: 'rates',
+  entity,
   params: [
     { page: 0 },
     { size: 9999 },
     { project: JSON.stringify(project) },
     { sort: JSON.stringify(project) },
     { query: JSON.stringify({
-      key: { $in: keys },
+      [keyField]: { $in: keys },
     }) },
   ],
 });
+export const getServicesByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('services', 'name', keys, project);
+export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('rates', 'key', keys, project);
 
 export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => ({
   action: 'get',

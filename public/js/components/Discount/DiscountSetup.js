@@ -10,14 +10,22 @@ import DiscountDetails from './DiscountDetails';
 import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import {
   getPlansKeysQuery,
-  getServicesKeysQuery,
+  getServicesKeysWithInfoQuery,
 } from '../../common/ApiQueries';
-import { showSuccess } from '../../actions/alertsActions';
+import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { saveDiscount, getDiscount, clearDiscount, updateDiscount } from '../../actions/discountsActions';
+import {
+  saveDiscount,
+  getDiscount,
+  clearDiscount,
+  updateDiscount,
+  deleteDiscountValue,
+  setCloneDiscount,
+} from '../../actions/discountsActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { getList, clearList } from '../../actions/listActions';
 import { modeSelector, itemSelector, idSelector, revisionsSelector } from '../../selectors/entitySelector';
+import { currencySelector } from '../../selectors/settingsSelector';
 
 
 class DiscountSetup extends Component {
@@ -27,6 +35,7 @@ class DiscountSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    currency: PropTypes.string,
     availablePlans: PropTypes.instanceOf(Immutable.List),
     availableServices: PropTypes.instanceOf(Immutable.List),
     router: PropTypes.shape({
@@ -37,6 +46,7 @@ class DiscountSetup extends Component {
 
   static defaultProps = {
     item: Immutable.Map(),
+    currency: '',
     revisions: Immutable.List(),
     availablePlans: Immutable.List(),
     availableServices: Immutable.List(),
@@ -58,7 +68,7 @@ class DiscountSetup extends Component {
     }
     this.initDefaultValues();
     this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
-    this.props.dispatch(getList('available_services', getServicesKeysQuery()));
+    this.props.dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -68,7 +78,7 @@ class DiscountSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'discount', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
     }
   }
@@ -84,6 +94,12 @@ class DiscountSetup extends Component {
     if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.onChangeFieldValue(['from'], defaultFromValue);
+    }
+    if (item.get('discount_type', null) === null) {
+      this.onChangeFieldValue(['discount_type'], 'monetary');
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setCloneDiscount());
     }
   }
 
@@ -117,7 +133,16 @@ class DiscountSetup extends Component {
   }
 
   onChangeFieldValue = (path, value) => {
-    this.props.dispatch(updateDiscount(path, value));
+    const stringPath = Array.isArray(path) ? path.join('.') : path;
+    const deletePathOnEmptyValue = ['limit', 'cycles', 'params.plan'];
+    const deletePathOnNullValue = ['discount_subject.plan', 'discount_subject.service', 'params.service'];
+    if (value === '' && deletePathOnEmptyValue.includes(stringPath)) {
+      this.props.dispatch(deleteDiscountValue(path));
+    } else if (value === null && deletePathOnNullValue.includes(stringPath)) {
+      this.props.dispatch(deleteDiscountValue(path));
+    } else {
+      this.props.dispatch(updateDiscount(path, value));
+    }
   }
 
   afterSave = (response) => {
@@ -133,8 +158,10 @@ class DiscountSetup extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
-    this.setState({ progress: true });
-    this.props.dispatch(saveDiscount(item, mode)).then(this.afterSave);
+    if (this.validate()) {
+      this.setState({ progress: true });
+      this.props.dispatch(saveDiscount(item, mode)).then(this.afterSave);
+    }
   }
 
   handleBack = (itemWasChanged = false) => {
@@ -149,16 +176,39 @@ class DiscountSetup extends Component {
     this.setState({ activeTab: key });
   }
 
+  validate = () => {
+    const { item } = this.props;
+    if (item.getIn(['params', 'service'], Immutable.List()).isEmpty() && item.getIn(['params', 'plan'], '').lenght === 0) {
+      this.props.dispatch(showDanger('Please select discount conditions'));
+      return false;
+    }
+
+    const serviceDiscountExist = item
+      .getIn(['discount_subject', 'service'], Immutable.Map())
+      .some(value => (value !== null && value !== ''));
+
+    const planDiscountExist = item
+      .getIn(['discount_subject', 'plan'], Immutable.Map())
+      .some(value => (value !== null && value !== ''));
+
+    if (!serviceDiscountExist && !planDiscountExist) {
+      this.props.dispatch(showDanger('Please set discount value'));
+      return false;
+    }
+
+    return true;
+  }
+
   render() {
     const { progress } = this.state;
-    const { item, mode, revisions, availablePlans, availableServices } = this.props;
+    const { item, mode, revisions, availablePlans, availableServices, currency } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const allowEdit = mode !== 'view';
     return (
-      <div className="DiscountSetup">
+      <div className="discount-setup">
         <Panel>
           <EntityRevisionDetails
             itemName="discount"
@@ -176,6 +226,7 @@ class DiscountSetup extends Component {
           <DiscountDetails
             discount={item}
             mode={mode}
+            currency={currency}
             onFieldUpdate={this.onChangeFieldValue}
             availablePlans={availablePlans}
             availableServices={availableServices}
@@ -202,6 +253,7 @@ const mapStateToProps = (state, props) => ({
   revisions: revisionsSelector(state, props, 'discount'),
   availablePlans: state.list.get('available_plans') || undefined,
   availableServices: state.list.get('available_services') || undefined,
+  currency: currencySelector(state, props) || undefined,
 });
 
 export default withRouter(connect(mapStateToProps)(DiscountSetup));

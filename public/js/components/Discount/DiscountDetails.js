@@ -2,11 +2,13 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
 import Select from 'react-select';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
+import { getFieldName, getConfig } from '../../common/Util';
 import Help from '../Help';
-import { DiscountDescription } from '../../FieldDescriptions';
 import Field from '../Field';
 import EntityFields from '../Entity/EntityFields';
+import { DiscountDescription } from '../../FieldDescriptions';
 
 
 export default class DiscountDetails extends Component {
@@ -14,6 +16,7 @@ export default class DiscountDetails extends Component {
   static propTypes = {
     discount: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
+    currency: PropTypes.string,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
     availablePlans: PropTypes.instanceOf(Immutable.List),
@@ -22,6 +25,7 @@ export default class DiscountDetails extends Component {
 
   static defaultProps = {
     discount: Immutable.Map(),
+    currency: '',
     availablePlans: Immutable.List(),
     availableServices: Immutable.List(),
     errorMessages: {
@@ -42,7 +46,7 @@ export default class DiscountDetails extends Component {
     const { errorMessages: { name: { allowedCharacters } } } = this.props;
     const { errors } = this.state;
     const value = e.target.value.toUpperCase();
-    const newError = (!globalSetting.keyUppercaseRegex.test(value)) ? allowedCharacters : '';
+    const newError = (!getConfig('keyUppercaseRegex', /./).test(value)) ? allowedCharacters : '';
     this.setState({ errors: Object.assign({}, errors, { name: newError }) });
     this.props.onFieldUpdate(['key'], value);
   }
@@ -71,57 +75,132 @@ export default class DiscountDetails extends Component {
 
   onChangePlan = (plan) => {
     this.props.onFieldUpdate(['params', 'plan'], plan);
-  }
-
-  onChangeDiscountValue = (value, a, b) => {
-    console.log(value, a, b);
+    this.props.onFieldUpdate(['discount_subject', 'plan'], null); // send null to remove property
   }
 
   onChangeService = (services) => {
-    const servicesList = (services.length) ? services.split(',') : [];
-    this.props.onFieldUpdate(['params', 'service'], servicesList);
+    const { discount } = this.props;
+    const servicesList = Immutable.List((services.length) ? services.split(',') : []);
+    if (servicesList.isEmpty()) {
+      this.props.onFieldUpdate(['params', 'service'], null); // send null to remove property
+      this.props.onFieldUpdate(['discount_subject', 'service'], null); // send null to remove property
+    } else {
+      this.props.onFieldUpdate(['params', 'service'], servicesList);
+      const discounts = discount.getIn(['discount_subject', 'service'], Immutable.Map());
+      // set to Map if empty, server always return empty array in it empty
+      const onlyExistDiscount = discounts.isEmpty()
+        ? null // send null to remove property
+        : discounts.filter((val, name) => servicesList.includes(name));
+      this.props.onFieldUpdate(['discount_subject', 'service'], onlyExistDiscount);
+    }
   }
 
-  getAvailablePlans = () => {
+  onChangeServiceDiscountValue = (key, value) => {
+    this.onChangeDiscountValue(key, value, 'service');
+  }
+
+  onChangePlanDiscountValue = (key, value) => {
+    this.onChangeDiscountValue(key, value, 'plan');
+  }
+
+  onChangeDiscountValue = (key, value, type) => {
+    const { discount } = this.props;
+    const isPercentaget = discount.get('discount_type', '') === 'percentage';
+    let discounts = discount.getIn(['discount_subject', type], Immutable.Map());
+    if (value === null) {
+      discounts = discounts.filter((val, name) => name !== key);
+    } else {
+      const formatedValue = isPercentaget ? this.fromPercentaget(value) : this.toNumber(value);
+      discounts = discounts.set(key, formatedValue);
+    }
+    this.props.onFieldUpdate(['discount_subject', type], discounts);
+  }
+
+  createPlansOptions = () => {
     const { availablePlans } = this.props;
     return availablePlans.map(plan => ({
       value: plan.get('name'),
       label: plan.get('name'),
-    }));
+    })).toArray();
   }
 
-  getAvailableServices = () => {
+  createServicesOptions = () => {
     const { availableServices } = this.props;
     return availableServices.map(service => ({
       value: service.get('name'),
       label: service.get('name'),
-    }));
+    })).toArray();
   }
 
-  renderDiscountValues = () => {
-    const { discount, mode } = this.props;
+  renderServivesDiscountValues = () => {
+    const { discount, availableServices } = this.props;
+    const discountSubject = discount.getIn(['params', 'service'], Immutable.List());
+    return discountSubject.map((key) => {
+      const value = discount.getIn(['discount_subject', 'service', key], null);
+      const isQuantitative = availableServices.findIndex(service =>
+        service.get('name', '') === key && service.get('quantitative', false) === true
+      );
+      const helpText = isQuantitative !== -1 ? 'Amount will be multiplied by the subscription service quantity' : '';
+      return this.renderDiscountValue(key, value, this.onChangeServiceDiscountValue, helpText);
+    });
+  }
+
+  renderPlanDiscountValues = () => {
+    const { discount } = this.props;
+    const key = discount.getIn(['params', 'plan'], '');
+    if (key && key.length) {
+      const value = discount.getIn(['discount_subject', 'plan', key], null);
+      return this.renderDiscountValue(key, value, this.onChangePlanDiscountValue);
+    }
+    return null;
+  }
+
+  renderDiscountValue = (key, value, onChange, helpText = '') => {
+    const { discount, mode, currency } = this.props;
     const editable = (mode !== 'view');
-    const discountSubject = discount.getIn(['params', 'service'], []);
-    return discountSubject.map(key => (
+    if (!editable && value === null) {
+      return null;
+    }
+    const isPercentaget = discount.get('discount_type', '') === 'percentage';
+    const suffix = isPercentaget ? <i className="fa fa-percent" /> : getSymbolFromCurrency(currency);
+    const onChangeBind = (val) => { onChange(key, val); };
+    const displayValue = isPercentaget ? this.toPercentaget(value) : value;
+    const showHelpText = helpText.length > 0 && (editable);
+    return (
       <FormGroup key={`${paramCase(key)}-discount-value`}>
         <Col componentClass={ControlLabel} sm={3} lg={2}>
           {key}
         </Col>
         <Col sm={8} lg={9}>
-          <Field value="" onChange={this.onChangeDiscountValue} unlimitedLabel="Disabled" unlimitedValue="" fieldType="unlimited" editable={editable} />
+          <Field
+            value={displayValue}
+            onChange={onChangeBind}
+            label="Discount by"
+            fieldType="toggeledInput"
+            editable={editable}
+            suffix={suffix}
+            inputProps={{ fieldType: 'number' }}
+          />
+          { showHelpText && <HelpBlock>{helpText}</HelpBlock> }
         </Col>
       </FormGroup>
-    ));
+    );
   }
+
+  toPercentaget = value => ((isNaN(value) || value === null) ? value : Number(value) * 100);
+
+  toNumber = value => ((isNaN(value) || value === null) ? value : Number(value));
+
+  fromPercentaget = value => ((isNaN(value) || value === null) ? value : Number(value) / 100);
 
   render() {
     const { errors } = this.state;
-    const { discount, mode } = this.props;
+    const { discount, mode, currency } = this.props;
     const editable = (mode !== 'view');
     const isPercentaget = discount.get('discount_type', '') === 'percentage';
-    const availablePlans = this.getAvailablePlans().toJS();
-    const availableServices = this.getAvailableServices().toJS();
-    const services = discount.getIn(['params', 'service'], []).join(',');
+    const plansOptions = this.createPlansOptions();
+    const servicesOptions = this.createServicesOptions();
+    const services = discount.getIn(['params', 'service'], Immutable.List()).join(',');
     return (
       <Row>
         <Col lg={12}>
@@ -130,7 +209,7 @@ export default class DiscountDetails extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Title<Help contents={DiscountDescription.description} />
+                  { getFieldName('Title', 'discounts')}<Help contents={DiscountDescription.description} />
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field onChange={this.onChangeDescription} value={discount.get('description', '')} editable={editable} />
@@ -140,7 +219,7 @@ export default class DiscountDetails extends Component {
               { ['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    Key<Help contents={DiscountDescription.key} />
+                    { getFieldName('Key', 'discounts')}<Help contents={DiscountDescription.key} />
                   </Col>
                   <Col sm={8} lg={9}>
                     <Field onChange={this.onChangeName} value={discount.get('key', '')} disabled={!['clone', 'create'].includes(mode)} editable={editable} />
@@ -151,7 +230,7 @@ export default class DiscountDetails extends Component {
 
               <FormGroup >
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Type
+                  { getFieldName('Type', 'discounts')}
                 </Col>
                 <Col sm={8} lg={9}>
                   { editable
@@ -172,47 +251,10 @@ export default class DiscountDetails extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Limit
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
-                </Col>
-              </FormGroup>
-
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Cycles
+                  { getFieldName('Cycles', 'discounts')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field value={discount.get('cycles', '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
-                </Col>
-              </FormGroup>
-
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Plan
-                </Col>
-                <Col sm={8} lg={9}>
-                  { editable
-                    ? (
-                      <Select options={availablePlans} value={discount.getIn(['params', 'plan'], '')} onChange={this.onChangePlan} />
-                      )
-                    : <div className="non-editble-field">{ discount.getIn(['params', 'plan'], '') }</div>
-                  }
-                </Col>
-              </FormGroup>
-
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Services
-                </Col>
-                <Col sm={8} lg={9}>
-                  { editable
-                    ? (
-                      <Select multi={true} value={services} options={availableServices} onChange={this.onChangeService} />
-                      )
-                    : <div className="non-editble-field">{ discount.getIn(['params', 'service'], []).join(', ') }</div>
-                  }
                 </Col>
               </FormGroup>
 
@@ -223,10 +265,46 @@ export default class DiscountDetails extends Component {
                 editable={editable}
               />
 
-              <Panel header={<h3>Discount Values</h3>}>
-                { this.renderDiscountValues() }
+              <Panel header={<h3>Discount Conditions</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('Plan', 'discounts')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    { editable
+                      ? <Select options={plansOptions} value={discount.getIn(['params', 'plan'], '')} onChange={this.onChangePlan} />
+                      : <div className="non-editble-field">{ discount.getIn(['params', 'plan'], '') }</div>
+                    }
+                  </Col>
+                </FormGroup>
+
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('Services', 'discounts')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    { editable
+                      ? <Select multi={true} value={services} options={servicesOptions} onChange={this.onChangeService} />
+                      : <div className="non-editble-field">{ discount.getIn(['params', 'service'], Immutable.List()).join(', ') }</div>
+                    }
+                  </Col>
+                </FormGroup>
               </Panel>
 
+              <Panel header={<h3>Discount Values</h3>}>
+                { this.renderPlanDiscountValues() }
+                { (discount.getIn(['params', 'plan'], '').length > 0) && <hr /> }
+                { this.renderServivesDiscountValues() }
+                { (!discount.getIn(['params', 'service'], Immutable.List()).isEmpty()) && <hr /> }
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('Overall Limit', 'discounts')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
+                  </Col>
+                </FormGroup>
+              </Panel>
             </Panel>
           </Form>
         </Col>
