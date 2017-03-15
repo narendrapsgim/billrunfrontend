@@ -6,7 +6,7 @@ import FieldSettings from '../../FieldSettings';
 
 import Number from '../FieldTypes/Number';
 import Price from '../FieldTypes/Price';
-import Date  from '../FieldTypes/Date';
+import Date from '../FieldTypes/Date';
 import Address from '../FieldTypes/Address';
 import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
@@ -14,6 +14,7 @@ import Unlimitd from '../FieldTypes/UnlimitedInput';
 import Checkbox from '../FieldTypes/Checkbox';
 import Radio from '../FieldTypes/Radio';
 import Salutation from '../FieldTypes/Salutation';
+import ToggeledInput from '../FieldTypes/ToggeledInput';
 
 class Field extends React.Component {
   constructor(props) {
@@ -58,7 +59,9 @@ class Field extends React.Component {
       case 'textarea':
         return (<TextArea onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'unlimited':
-        return (<Unlimitd onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} {...this.props} />);
+        return (<Unlimitd {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+      case 'toggeledInput':
+        return (<ToggeledInput {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'checkbox':
         return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} label={label} />);
       case 'radio':
