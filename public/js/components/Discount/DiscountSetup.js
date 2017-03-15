@@ -150,7 +150,7 @@ class DiscountSetup extends Component {
     const { mode } = this.props;
     if (response.status) {
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
-      this.props.dispatch(showSuccess(`The discounts was ${action}`));
+      this.props.dispatch(showSuccess(`The discount was ${action}`));
       this.clearRevisions();
       this.handleBack(true);
     }
