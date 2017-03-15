@@ -329,3 +329,25 @@ export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 99
     { state: JSON.stringify([0, 1, 2]) },
   ],
 });
+
+export const getCyclesQuery = () => ({
+  api: 'billrun',
+  action: 'cycles',
+});
+
+export const getCycleQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'cycle',
+  params: [
+    { stamp: billrunKey },
+  ],
+});
+
+export const getRunCycleQuery = (billrunKey, rerun) => ({
+  api: 'billrun',
+  action: 'completecycle',
+  params: [
+    { stamp: billrunKey },
+    { rerun },
+  ],
+});

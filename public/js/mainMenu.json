@@ -99,13 +99,31 @@
     "order": 5,
     "parent": "root"
   },
+  "cycle": {
+    "title": "Billing cycle",
+    "icon": "fa-clock-o",
+    "route": "",
+    "show": true,
+    "roles": [],
+    "order":6,
+    "parent": "root"
+  },
+  "run_cycle": {
+    "title": "run a billing cycle",
+    "icon": "",
+    "route": "run_cycle",
+    "show": true,
+    "roles": [],
+    "order":0,
+    "parent":"cycle"
+  },
   "invoices": {
     "title": "Invoices",
     "icon": "fa-file-text-o",
     "route": "invoices",
     "show": true,
     "roles": [],
-    "order": 6,
+    "order": 7,
     "parent": "root"
   },
   "users": {
@@ -114,7 +132,7 @@
     "route": "users",
     "show": true,
     "roles": [],
-    "order": 7,
+    "order": 8,
     "parent": "root"
   },
   "audit_trail": {
@@ -123,7 +141,7 @@
     "route": "audit-trail",
     "show": true,
     "roles": [],
-    "order": 8,
+    "order": 9,
     "parent": "root"
   },
   "settings": {
@@ -132,7 +150,7 @@
     "route": "",
     "show": true,
     "roles": ["admin"],
-    "order": 9,
+    "order": 10,
     "parent": "root"
   },
   "settings_general": {
