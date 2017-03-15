@@ -241,7 +241,7 @@ export default class CalculatorMapping extends Component {
           <div className="col-lg-12">
             <h4>
               Customer identification
-              <small> | Map customer identification field in record to Billrun field</small>
+              <small> | Map customer identification field in record to BillRun field</small>
             </h4>
           </div>
         </div>

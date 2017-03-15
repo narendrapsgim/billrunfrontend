@@ -88,7 +88,7 @@ class LoginForm extends Component {
                   />
                 </InputGroup>
               </FormGroup>
-              <Button bsStyle="success" bsSize="large" block onClick={this.clickLogin} disabled={progress}>
+              <Button type="submit" bsStyle="success" bsSize="large" block onClick={this.clickLogin} disabled={progress}>
                 { progress && (<span><i className="fa fa-spinner fa-pulse" /> &nbsp;&nbsp;&nbsp;</span>) }
                 Login
               </Button>
