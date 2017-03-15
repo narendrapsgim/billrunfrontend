@@ -112,8 +112,8 @@ export default class ServiceDetails extends Component {
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-          <Col sm={4} style={{ padding: '10px 15px' }}>
-            <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
+          <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+            <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" editable={editable} />
           </Col>
         </FormGroup>
 
