@@ -20,7 +20,7 @@ import {
   setListState,
   clearItem,
 } from '../../actions/entityListActions';
-import { getConfig } from '../../common/Util.js';
+import { getConfig } from '../../common/Util';
 
 
 class EntityList extends Component {
