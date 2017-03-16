@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { titleCase } from 'change-case';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 import { Button } from 'react-bootstrap';
 import Actions from '../Elements/Actions';
@@ -172,7 +173,7 @@ class List extends Component {
         arrow = (<i className={arrowClass} />);
       }
       if (!field.title && !field.placeholder) {
-        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{titlize(field.id)}{arrow}</th>);
+        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{titleCase(field.id)}{arrow}</th>);
       }
       return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>);
     });
