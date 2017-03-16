@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Button } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Button, Panel } from 'react-bootstrap';
 import Select from 'react-select';
 import moment from 'moment';
 import ActionButtons from '../Elements/ActionButtons';
@@ -215,10 +215,9 @@ export default class Subscription extends Component {
 
   renderCustomFields = () => {
     const { customFields } = this.state;
-    const fields = [];
-    customFields.forEach((fieldData, key) => {
+    return customFields.map((fieldData, key) => {
       const { label, value, params, type } = fieldData;
-      fields.push(
+      return (
         <FormGroup key={key}>
           <Col componentClass={ControlLabel} sm={2}>{label.length > 0 ? label : key}</Col>
           <Col sm={7}>
@@ -235,11 +234,7 @@ export default class Subscription extends Component {
           </Col>
         </FormGroup>
       );
-    });
-    if (fields.length > 0) {
-      fields.push(<hr key="customFieldsDivider" />);
-    }
-    return fields;
+    }).toArray();
   }
 
   onShowCreditCharge = () => {
@@ -268,17 +263,20 @@ export default class Subscription extends Component {
     if (!subscription) {
       return (null);
     }
-    const renderCreditCharge = getItemId(subscription, false) !== false;
+    const isEdit = getItemId(subscription, false) !== false;
+    const title = isEdit ? 'Edit Subscription' : 'Create New Subscription';
     return (
       <div className="Subscription">
-        <Form horizontal>
-          { this.renderSystemFields() }
-          <hr />
-          { this.renderCustomFields() }
-          { renderCreditCharge && this.renderCreditCharge() }
-          { renderCreditCharge && <hr /> }
-          <ActionButtons onClickSave={this.onSave} onClickCancel={this.props.onCancel} />
-        </Form>
+        <Panel header={title}>
+          <Form horizontal>
+            { this.renderSystemFields() }
+            <hr />
+            { this.renderCustomFields() }
+            { isEdit && <hr /> }
+            { isEdit && this.renderCreditCharge() }
+          </Form>
+        </Panel>
+        <ActionButtons onClickSave={this.onSave} onClickCancel={this.props.onCancel} />
       </div>
     );
   }
