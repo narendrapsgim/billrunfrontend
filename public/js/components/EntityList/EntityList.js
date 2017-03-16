@@ -56,6 +56,7 @@ class EntityList extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    showAddButton: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -75,6 +76,7 @@ class EntityList extends Component {
     sort: Immutable.Map(),
     filter: Immutable.Map(),
     state: Immutable.List([0, 1, 2]),
+    showAddButton: true,
   }
 
   componentWillMount() {
@@ -102,7 +104,11 @@ class EntityList extends Component {
     const filterChanged = !Immutable.is(this.props.filter, nextProps.filter);
     const sortChanged = !Immutable.is(this.props.sort, nextProps.sort);
     const stateChanged = !Immutable.is(this.props.state, nextProps.state);
-    if (pageChanged || sizeChanged || filterChanged || sortChanged || stateChanged) {
+    const baseFilterMap = (Immutable.Map(this.props.baseFilter));
+    const baseFilterNextMap = (Immutable.Map(nextProps.baseFilter));
+    const baseFilterChanged = !Immutable.is(baseFilterMap, baseFilterNextMap);
+    if (pageChanged || sizeChanged || filterChanged ||
+      sortChanged || stateChanged || baseFilterChanged) {
       this.fetchItems(nextProps);
     }
   }
@@ -208,15 +214,15 @@ class EntityList extends Component {
   ])
 
   renderPanelHeader = () => {
-    const { itemsType } = this.props;
+    const { itemsType, showAddButton } = this.props;
     return (
       <div>
         List of all available {changeCase.noCase(itemsType)}
-        <div className="pull-right">
+        {showAddButton && (<div className="pull-right">
           <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}>
             <i className="fa fa-plus" />&nbsp;Add New
           </Button>
-        </div>
+        </div>)}
       </div>
     );
   }
