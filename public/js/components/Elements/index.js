@@ -5,6 +5,7 @@ import StateIcon from './StateIcon';
 import RevisionTimeline from './RevisionTimeline';
 import ModalWrapper from './ModalWrapper';
 import ConfirmModal from './ConfirmModal';
+import CreateButton from './CreateButton';
 
 export {
   ActionButtons,
@@ -14,4 +15,5 @@ export {
   StateIcon,
   ModalWrapper,
   ConfirmModal,
+  CreateButton,
 };
