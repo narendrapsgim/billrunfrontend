@@ -2,10 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, ControlLabel, Col, Button } from 'react-bootstrap';
 import Select from 'react-select';
+import moment from 'moment';
 import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
-import moment from 'moment';
 import Credit from '../Credit/Credit';
+import { getItemId } from '../../common/Util';
 
 
 export default class Subscription extends Component {
@@ -16,8 +17,8 @@ export default class Subscription extends Component {
       null,
     ]),
     settings: PropTypes.instanceOf(Immutable.List), // Subscriptions Fields
-    all_plans: PropTypes.instanceOf(Immutable.List),
-    all_services: PropTypes.instanceOf(Immutable.List),
+    allPlans: PropTypes.instanceOf(Immutable.List),
+    allServices: PropTypes.instanceOf(Immutable.List),
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
   };
@@ -25,8 +26,8 @@ export default class Subscription extends Component {
   static defaultProps = {
     subscription: null,
     settings: Immutable.List(),
-    all_plans: Immutable.List(),
-    all_services: Immutable.List(),
+    allPlans: Immutable.List(),
+    allServices: Immutable.List(),
   };
 
   constructor(props) {
@@ -50,7 +51,7 @@ export default class Subscription extends Component {
       plan: subscription.get('plan', ''),
       services: subscription
         .get('services', Immutable.List())
-        .map(service => service.get('name',''))
+        .map(service => service.get('name', ''))
         .toArray(),
     });
   }
@@ -96,17 +97,20 @@ export default class Subscription extends Component {
   onSave = () => {
     const { subscription } = this.props;
     const { systemFields, customFields } = this.state;
+    const mode = getItemId(subscription, false) ? 'closeandnew' : 'create';
 
     const data = subscription.withMutations((subscriptionWithMutations) => {
       systemFields.forEach((value, key) => {
-        if(key == 'services') {
-          let services = [];
-          value.forEach((serviceName, srvKey) => {
-            let entry = subscription.get('services',Immutable.List()).find(service => service.get('name') == serviceName);
-            if(!entry) {
-              entry = { name : serviceName,
-                        from : moment().toISOString(),
-                        to : subscription.get('to') };
+        if (key === 'services') {
+          const services = [];
+          value.forEach((serviceName) => {
+            let entry = subscription.get('services', Immutable.List()).find(service => service.get('name') === serviceName);
+            if (!entry) {
+              entry = {
+                name: serviceName,
+                from: moment().toISOString(),
+                to: subscription.get('to'),
+              };
             }
             services.push(entry);
           });
@@ -114,14 +118,13 @@ export default class Subscription extends Component {
         } else {
           subscriptionWithMutations.set(key, value);
         }
-
       });
       customFields.forEach((fieldData, key) => {
         subscriptionWithMutations.set(key, fieldData.get('value'));
       });
       subscriptionWithMutations.delete('from');
-    });    
-    this.props.onSave(data);
+    });
+    this.props.onSave(data, mode);
   };
 
   onChangeCustomFields = (e) => {
@@ -147,16 +150,16 @@ export default class Subscription extends Component {
   )
 
   getAvailablePlans = () => {
-    const { all_plans } = this.props;
-    return all_plans.map(plan => ({
+    const { allPlans } = this.props;
+    return allPlans.map(plan => ({
       value: plan.get('name'),
       label: plan.get('name'),
     }));
   }
 
   getAvailableServices = () => {
-    const { all_services } = this.props;
-    return all_services.map(service => ({
+    const { allServices } = this.props;
+    return allServices.map(service => ({
       value: service.get('name'),
       label: service.get('name'),
     }));
@@ -187,14 +190,24 @@ export default class Subscription extends Component {
       <FormGroup key="plan">
         <Col componentClass={ControlLabel} sm={2}>Plan</Col>
         <Col sm={7}>
-          <Select options={availablePlans} value={plan} onChange={this.onChangePlan} allowCreate={true}/>
+          <Select
+            options={availablePlans}
+            value={plan}
+            onChange={this.onChangePlan}
+            allowCreate={true}
+          />
         </Col>
       </FormGroup>
       ), (
       <FormGroup key="services">
         <Col componentClass={ControlLabel} sm={2}>Services</Col>
         <Col sm={7}>
-          <Select multi={true} value={services} options={availableServices} onChange={this.onChangeService} />
+          <Select
+            multi={true}
+            value={services}
+            options={availableServices}
+            onChange={this.onChangeService}
+          />
         </Col>
       </FormGroup>
     )]);
@@ -210,7 +223,13 @@ export default class Subscription extends Component {
           <Col componentClass={ControlLabel} sm={2}>{label.length > 0 ? label : key}</Col>
           <Col sm={7}>
             { type === 'select'
-              ? <Select options={this.getSelectValues(params)} value={value} onChange={this.onChangeCustomFieldsSelect(key)} />
+              ? (
+                <Select
+                  options={this.getSelectValues(params)}
+                  value={value}
+                  onChange={this.onChangeCustomFieldsSelect(key)}
+                />
+                )
               : <Field value={value} onChange={this.onChangeCustomFields} id={key} />
             }
           </Col>
@@ -234,16 +253,12 @@ export default class Subscription extends Component {
   renderCreditCharge = () => {
     const { subscription } = this.props;
     const { showCreditCharge } = this.state;
+    const sid = subscription.get('sid', '');
+    const aid = subscription.get('aid', '');
     return (
       <div>
         <Button bsSize="xsmall" className="btn-primary" onClick={this.onShowCreditCharge}>Manual charge / refund</Button>
-        {showCreditCharge ?
-          <Credit
-            onClose={this.onCloseCreditCharge}
-            sid={subscription.get('sid', '')}
-            aid={subscription.get('aid', '')}
-          />
-          : null}
+        { showCreditCharge && (<Credit aid={aid} sid={sid} onClose={this.onCloseCreditCharge} />) }
       </div>
     );
   }
@@ -253,15 +268,15 @@ export default class Subscription extends Component {
     if (!subscription) {
       return (null);
     }
-
+    const renderCreditCharge = getItemId(subscription, false) !== false;
     return (
       <div className="Subscription">
         <Form horizontal>
           { this.renderSystemFields() }
           <hr />
           { this.renderCustomFields() }
-          { this.renderCreditCharge() }
-          <hr />
+          { renderCreditCharge && this.renderCreditCharge() }
+          { renderCreditCharge && <hr /> }
           <ActionButtons onClickSave={this.onSave} onClickCancel={this.props.onCancel} />
         </Form>
       </div>

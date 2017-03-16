@@ -59,7 +59,7 @@ class CustomerSetup extends Component {
   static defaultProps = {
     activeTab: 1,
     customer: Immutable.Map(),
-    settings: Immutable.List(),
+    settings: Immutable.Map(),
     subscriptions: Immutable.List(),
     gateways: Immutable.List(),
     plans: Immutable.List(),
@@ -125,12 +125,6 @@ class CustomerSetup extends Component {
     this.props.dispatch(saveCustomer(customer, mode)).then(this.afterSaveCustomer);
   }
 
-  onClickNewSubscription = (aid) => {
-    const returnUrlParam = `return_url=${encodeURIComponent(this.getReturnUrl())}`;
-    const aidParam = `aid=${encodeURIComponent(`${aid}`)}`;
-    window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}`;
-  }
-
   onClickChangePaymentGateway = (aid) => {
     const returnUrlParam = `return_url=${encodeURIComponent(this.getReturnUrl())}`;
     const aidParam = `aid=${encodeURIComponent(aid)}`;
@@ -138,8 +132,8 @@ class CustomerSetup extends Component {
     window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}&${action}`;
   }
 
-  onSaveSubscription = subscription =>
-    this.props.dispatch(saveSubscription(subscription, 'closeandnew')).then(this.afterSaveSubscription);
+  onSaveSubscription = (subscription, mode) =>
+    this.props.dispatch(saveSubscription(subscription, mode)).then(this.afterSaveSubscription);
 
 
   afterSaveSubscription = (response) => {
@@ -222,10 +216,9 @@ class CustomerSetup extends Component {
                       items={subscriptions}
                       aid={aid}
                       settings={subscriberFields}
-                      all_plans={plans}
-                      all_services={services}
+                      allPlans={plans}
+                      allServices={services}
                       onSaveSubscription={this.onSaveSubscription}
-                      onNew={this.onClickNewSubscription}
                     />
                   </Panel>
                 </Tab>
