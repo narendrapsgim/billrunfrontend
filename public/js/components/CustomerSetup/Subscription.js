@@ -3,10 +3,11 @@ import Immutable from 'immutable';
 import { Form, FormGroup, ControlLabel, Col, Button, Panel } from 'react-bootstrap';
 import Select from 'react-select';
 import moment from 'moment';
+import { titleCase } from 'change-case';
 import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
 import Credit from '../Credit/Credit';
-import { getItemId } from '../../common/Util';
+import { getItemId, getFieldName } from '../../common/Util';
 
 
 export default class Subscription extends Component {
@@ -219,7 +220,9 @@ export default class Subscription extends Component {
       const { label, value, params, type } = fieldData;
       return (
         <FormGroup key={key}>
-          <Col componentClass={ControlLabel} sm={2}>{label.length > 0 ? label : key}</Col>
+          <Col componentClass={ControlLabel} sm={2}>
+            { label.length > 0 ? label : titleCase(getFieldName(key, 'subscription')) }
+          </Col>
           <Col sm={7}>
             { type === 'select'
               ? (
