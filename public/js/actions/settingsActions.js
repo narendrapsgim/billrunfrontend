@@ -186,7 +186,7 @@ export function getSettings(categories = []) {
   };
 }
 
-export function saveSettings(categories = [], addNew = false) {
+export function saveSettings(categories = []) {
   if (!Array.isArray(categories)) {
     categories = [categories];
   }

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { Panel, Col, Row, Button } from 'react-bootstrap';
 import List from '../../components/List';
-import { getItemDateValue } from '../../common/Util';
+import { getItemDateValue, getConfig } from '../../common/Util';
 import { StateIcon, ConfirmModal } from '../Elements';
 import { updateSetting, saveSettings, removeSettingField, pushToSetting } from '../../actions/settingsActions';
 import SecurityForm from './Security/SecurityForm';
@@ -27,11 +27,8 @@ class Security extends Component {
   }
 
   parseDate = (item, field) => {
-    const fieldValue = item.get(field.id, false);
-    if (fieldValue) {
-      return moment(fieldValue).format(globalSetting.dateFormat);
-    }
-    return '';
+    const date = getItemDateValue(item, field.id, false);
+    return date ? date.format(getConfig('dateFormat', 'DD/MM/YYYY')) : '';
   }
 
   parserState = item => (
@@ -63,12 +60,13 @@ class Security extends Component {
     this.setState({ currentItem: null });
   }
 
-  onSave = (item) => {
+  onSave = (item, action) => {
     const { data } = this.props;
-    const key = item.get('key');
-    if (typeof key === 'undefined') {
+    console.log('action: ', action);
+    if (action === 'create') {
       this.props.dispatch(pushToSetting('shared_secret', item));
     } else {
+      const key = item.get('key', null);
       const idx = data.findIndex(dataItem => dataItem.get('key') === key);
       this.props.dispatch(updateSetting('shared_secret', [idx], item));
     }
