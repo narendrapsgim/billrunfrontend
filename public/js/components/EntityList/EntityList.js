@@ -108,8 +108,8 @@ class EntityList extends Component {
     const filterChanged = !Immutable.is(this.props.filter, nextProps.filter);
     const sortChanged = !Immutable.is(this.props.sort, nextProps.sort);
     const stateChanged = !Immutable.is(this.props.state, nextProps.state);
-    const baseFilterMap = (Immutable.Map(this.props.baseFilter));
-    const baseFilterNextMap = (Immutable.Map(nextProps.baseFilter));
+    const baseFilterMap = (Immutable.fromJS(this.props.baseFilter));
+    const baseFilterNextMap = (Immutable.fromJS(nextProps.baseFilter));
     const baseFilterChanged = !Immutable.is(baseFilterMap, baseFilterNextMap);
     if (pageChanged || sizeChanged || filterChanged ||
       sortChanged || stateChanged || baseFilterChanged) {
