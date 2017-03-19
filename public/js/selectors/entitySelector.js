@@ -35,6 +35,7 @@ const getItem = (state, props, entityName) => {
   switch (entityName) {
     case 'prepaid_include':
     case 'customer':
+    case 'subscription':
       return state.entity.get(entityName);
     default: {
       return state[entityName];

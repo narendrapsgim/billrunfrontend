@@ -48,12 +48,10 @@ export default class Subscription extends Component {
     if (!subscription) {
       return Immutable.Map();
     }
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
     return Immutable.Map({
       plan: subscription.get('plan', ''),
-      services: subscription
-        .get('services', Immutable.List())
-        .map(service => service.get('name', ''))
-        .toArray(),
+      services: services.map(service => service.get('name', '')),
     });
   }
 
@@ -105,13 +103,14 @@ export default class Subscription extends Component {
         if (key === 'services') {
           const services = [];
           value.forEach((serviceName) => {
-            let entry = subscription.get('services', Immutable.List()).find(service => service.get('name') === serviceName);
+            const subscriptionServices = subscription.get('services', Immutable.List()) || Immutable.List();
+            let entry = subscriptionServices.find(service => service.get('name') === serviceName);
             if (!entry) {
-              entry = {
+              entry = Immutable.Map({
                 name: serviceName,
                 from: moment().toISOString(),
                 to: subscription.get('to'),
-              };
+              });
             }
             services.push(entry);
           });

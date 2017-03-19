@@ -1,30 +1,22 @@
 import { saveEntity, getEntityById, actions } from './entityActions';
 
 
-export function getCustomer(id) {
-  return getEntityById('customer', 'accounts', id);
-}
+export const getCustomer = id => getEntityById('customer', 'accounts', id);
 
-export function saveCustomer(customer, action) {
-  return saveEntity('accounts', customer, action);
-}
+export const getSubscription = id => getEntityById('subscription', 'subscribers', id);
 
-export function saveSubscription(subscription, action) {
-  return saveEntity('subscribers', subscription, action);
-}
+export const saveCustomer = (customer, action) => saveEntity('accounts', customer, action);
 
-export function updateCustomerField(path, value) {
-  return {
-    type: actions.UPDATE_ENTITY_FIELD,
-    collection: 'customer',
-    path,
-    value,
-  };
-}
+export const saveSubscription = (subscription, action) => saveEntity('subscribers', subscription, action);
 
-export function clearCustomer() {
-  return {
-    type: actions.CLEAR_ENTITY,
-    collection: 'customer',
-  };
-}
+export const updateCustomerField = (path, value) => ({
+  type: actions.UPDATE_ENTITY_FIELD,
+  collection: 'customer',
+  path,
+  value,
+});
+
+export const clearCustomer = () => ({
+  type: actions.CLEAR_ENTITY,
+  collection: 'customer',
+});

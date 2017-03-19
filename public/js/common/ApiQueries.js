@@ -210,14 +210,14 @@ export const getGroupsQuery = collection => ({
   ],
 });
 
-export const getSubscribersByAidQuery = aid => ({
+export const getSubscriptionsByAidQuery = (aid, project = {}) => ({
   action: 'uniqueget',
   entity: 'subscribers',
   params: [
     { query: JSON.stringify({ aid }) },
     { page: 0 },
     { size: 9999 },
-    { project: JSON.stringify({ from: 0 }) },
+    { project: JSON.stringify(project) },
   ],
 });
 
@@ -332,25 +332,30 @@ export const getProductsByKeysQuery = (keys, project = {}) => ({
   ],
 });
 
-export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => ({
-  action: 'get',
-  entity: collection,
-  params: [
-    { sort: JSON.stringify({ from: -1 }) },
-    { query: JSON.stringify({
-      [revisionBy]: {
-        $regex: `^${value}$`,
-      },
-    }) },
-    { project: JSON.stringify({
-      from: 1,
-      to: 1,
-      description: 1,
-      [revisionBy]: 1,
-      revision_info: 1,
-    }) },
-    { page: 0 },
-    { size },
-    { state: JSON.stringify([0, 1, 2]) },
-  ],
-});
+export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => {
+  let query = {};
+  switch (collection) {
+    case 'subscription':
+      query = { [revisionBy]: value };
+      break;
+    default: query = { [revisionBy]: { $regex: `^${value}$` } };
+  }
+  return ({
+    action: 'get',
+    entity: collection,
+    params: [
+      { sort: JSON.stringify({ from: -1 }) },
+      { query: JSON.stringify(query) },
+      { project: JSON.stringify({
+        from: 1,
+        to: 1,
+        description: 1,
+        [revisionBy]: 1,
+        revision_info: 1,
+      }) },
+      { page: 0 },
+      { size },
+      { state: JSON.stringify([0, 1, 2]) },
+    ],
+  });
+};

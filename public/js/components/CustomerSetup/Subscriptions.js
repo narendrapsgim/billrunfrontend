@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import SubscriptionsList from './SubscriptionsList';
 import Subscription from './Subscription';
+import { getItemId } from '../../common/Util';
 
 
 export default class Subscriptions extends Component {
@@ -12,7 +13,9 @@ export default class Subscriptions extends Component {
     settings: PropTypes.instanceOf(Immutable.List),
     allPlans: PropTypes.instanceOf(Immutable.List),
     allServices: PropTypes.instanceOf(Immutable.List),
+    defaultListFields: PropTypes.arrayOf(PropTypes.string),
     onSaveSubscription: PropTypes.func.isRequired,
+    getSubscription: PropTypes.func,
   };
 
   static defaultProps = {
@@ -20,14 +23,20 @@ export default class Subscriptions extends Component {
     settings: Immutable.List(),
     allPlans: Immutable.List(),
     allServices: Immutable.List(),
+    defaultListFields: [],
   };
 
   state = {
     subscription: null,
   }
 
-  onClickEdit = (subscription) => {
-    this.setState({ subscription });
+  onClickEdit = (row) => {
+    const id = getItemId(row, null);
+    if (id !== null) {
+      this.props.getSubscription(id).then((subscription) => {
+        this.setState({ subscription });
+      });
+    }
   }
 
   onClickNew = (aid) => {
@@ -49,7 +58,7 @@ export default class Subscriptions extends Component {
   }
 
   render() {
-    const { aid, items, settings, allPlans, allServices } = this.props;
+    const { aid, items, settings, allPlans, allServices, defaultListFields } = this.props;
     const { subscription } = this.state;
     if (!subscription) {
       return (
@@ -59,6 +68,7 @@ export default class Subscriptions extends Component {
           aid={aid}
           onNew={this.onClickNew}
           onClickEdit={this.onClickEdit}
+          defaultListFields={defaultListFields}
         />
       );
     }

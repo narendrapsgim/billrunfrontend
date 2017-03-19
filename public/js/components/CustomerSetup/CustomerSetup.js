@@ -10,7 +10,7 @@ import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import PostpaidBalances from '../PostpaidBalances';
 import PrepaidBalances from '../PrepaidBalances';
 import {
-  getSubscribersByAidQuery,
+  getSubscriptionsByAidQuery,
   getPlansKeysQuery,
   getServicesKeysQuery,
   getPaymentGatewaysQuery,
@@ -21,6 +21,7 @@ import {
   updateCustomerField,
   clearCustomer,
   getCustomer,
+  getSubscription,
 } from '../../actions/customerActions';
 import { clearItems } from '../../actions/entityListActions';
 import { getList, clearList } from '../../actions/listActions';
@@ -37,11 +38,13 @@ class CustomerSetup extends Component {
     aid: PropTypes.number,
     mode: PropTypes.string,
     customer: PropTypes.instanceOf(Immutable.Map),
+    subscription: PropTypes.instanceOf(Immutable.Map),
     settings: PropTypes.instanceOf(Immutable.Map),
     subscriptions: PropTypes.instanceOf(Immutable.List),
     plans: PropTypes.instanceOf(Immutable.List),
     services: PropTypes.instanceOf(Immutable.List),
     gateways: PropTypes.instanceOf(Immutable.List),
+    defaultSubsctiptionListFields: PropTypes.array,
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -59,12 +62,18 @@ class CustomerSetup extends Component {
   static defaultProps = {
     activeTab: 1,
     customer: Immutable.Map(),
+    subscription: Immutable.Map(),
     settings: Immutable.Map(),
     subscriptions: Immutable.List(),
     gateways: Immutable.List(),
     plans: Immutable.List(),
     services: Immutable.List(),
+    defaultSubsctiptionListFields: ['sid', 'firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
   };
+
+  componentWillMount() {
+    this.props.dispatch(getSettings('subscribers'));
+  }
 
   componentDidMount() {
     const { itemId } = this.props;
@@ -73,7 +82,8 @@ class CustomerSetup extends Component {
       this.props.dispatch(getCustomer(itemId))
       .then((response) => {
         if (response.status) {
-          this.props.dispatch(getList('subscriptions', getSubscribersByAidQuery(this.props.aid)));
+          const listFields = this.getSubsctiptionListProject();
+          this.props.dispatch(getList('subscriptions', getSubscriptionsByAidQuery(this.props.aid, listFields)));
         }
       });
       this.props.dispatch(getList('available_gateways', getPaymentGatewaysQuery()));
@@ -82,7 +92,6 @@ class CustomerSetup extends Component {
     } else {
       this.props.dispatch(setPageTitle('Create New Customer'));
     }
-    this.props.dispatch(getSettings('subscribers'));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -140,7 +149,8 @@ class CustomerSetup extends Component {
     const { aid } = this.props;
     if (response.status) {
       this.props.dispatch(showSuccess('Customer was updated'));
-      this.props.dispatch(getList('subscriptions', getSubscribersByAidQuery(aid)));
+      const listFields = this.getSubsctiptionListProject();
+      this.props.dispatch(getList('subscriptions', getSubscriptionsByAidQuery(aid, listFields)));
       return true;
     }
     return false;
@@ -148,6 +158,29 @@ class CustomerSetup extends Component {
 
   onBack = () => {
     this.props.router.push('/customers');
+  }
+
+  getSubscription = id => this.props.dispatch(getSubscription(id))
+    .then((response) => {
+      if (response.status) {
+        return this.props.subscription;
+      }
+      return null;
+    });
+
+  getSubsctiptionListProject = () => {
+    const { settings, defaultSubsctiptionListFields } = this.props;
+    return Immutable.Map().withMutations((fieldsWithMutations) => {
+      fieldsWithMutations.set('from', 1);
+      fieldsWithMutations.set('to', 1);
+      fieldsWithMutations.set('revision_info', 1);
+      settings
+        .getIn(['subscriber', 'fields'], Immutable.List())
+        .filter(field => (field.get('show_in_list', false) || defaultSubsctiptionListFields.includes(field.get('field_name', ''))))
+        .forEach((field) => {
+          fieldsWithMutations.set(field.get('field_name', ''), 1);
+        });
+    }).toJS();
   }
 
   getFirstName = item => item.get('first_name', item.get('firstname', ''));
@@ -171,6 +204,7 @@ class CustomerSetup extends Component {
     const {
       customer,
       subscriptions,
+      defaultSubsctiptionListFields,
       settings,
       plans,
       services,
@@ -181,8 +215,7 @@ class CustomerSetup extends Component {
     } = this.props;
     const showActionButtons = (activeTab === 1);
 
-    // in update mode wait for plan before render edit screen
-    if ((mode !== 'create' && typeof customer.getIn(['_id', '$id']) === 'undefined')) {
+    if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.onBack} />);
     }
 
@@ -219,6 +252,8 @@ class CustomerSetup extends Component {
                       allPlans={plans}
                       allServices={services}
                       onSaveSubscription={this.onSaveSubscription}
+                      defaultListFields={defaultSubsctiptionListFields}
+                      getSubscription={this.getSubscription}
                     />
                   </Panel>
                 </Tab>
@@ -252,6 +287,7 @@ class CustomerSetup extends Component {
 const mapStateToProps = (state, props) => ({
   itemId: idSelector(state, props, 'customer'),
   customer: itemSelector(state, props, 'customer'),
+  subscription: itemSelector(state, props, 'subscription'),
   mode: modeSelector(state, props, 'customer'),
   activeTab: tabSelector(state, props),
   aid: state.entity.getIn(['customer', 'aid']) || undefined,
