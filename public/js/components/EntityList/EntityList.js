@@ -10,6 +10,7 @@ import Pager from './Pager';
 import State from './State';
 import Filter from './Filter';
 import StateDetails from './StateDetails';
+import Actions from '../Elements/Actions';
 import {
   getList,
   clearList,
@@ -56,7 +57,10 @@ class EntityList extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
-    showAddButton: PropTypes.bool,
+    listActions: PropTypes.oneOfType([
+      PropTypes.bool,
+      PropTypes.arrayOf(PropTypes.object),
+    ]),
   }
 
   static defaultProps = {
@@ -76,7 +80,6 @@ class EntityList extends Component {
     sort: Immutable.Map(),
     filter: Immutable.Map(),
     state: Immutable.List([0, 1, 2]),
-    showAddButton: true,
   }
 
   componentWillMount() {
@@ -213,16 +216,33 @@ class EntityList extends Component {
     ...fields,
   ])
 
+  getListActions = () => {
+    const { listActions } = this.props;
+    if (typeof listActions === 'undefined') {
+      return [{
+        type: 'add',
+        label: 'Add New',
+        actionStyle: 'default',
+        showIcon: true,
+        onClick: this.onClickNew,
+        actionSize: 'xsmall',
+        actionClass: 'btn-primary',
+      }];
+    }
+    if (listActions === false) {
+      return [];
+    }
+    return listActions;
+  }
+
   renderPanelHeader = () => {
-    const { itemsType, showAddButton } = this.props;
+    const { itemsType } = this.props;
     return (
       <div>
         List of all available {changeCase.noCase(itemsType)}
-        {showAddButton && (<div className="pull-right">
-          <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}>
-            <i className="fa fa-plus" />&nbsp;Add New
-          </Button>
-        </div>)}
+        <div className="pull-right">
+          <Actions actions={this.getListActions()} />
+        </div>
       </div>
     );
   }

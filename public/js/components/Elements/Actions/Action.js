@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 
 const Action = (props) => {
-  const { type, label, data, actionStyle, showIcon } = props;
+  const { type, label, data, actionStyle, showIcon, actionSize, actionClass } = props;
 
   if ((typeof props.show === 'boolean' && !props.show)
     || (typeof props.show === 'function' && !props.show(data))) {
@@ -21,6 +21,7 @@ const Action = (props) => {
     'fa-trash-o': type === 'remove',
     'fa-toggle-off': type === 'enable',
     'fa-toggle-on': type === 'disable',
+    'fa-plus': type === 'add',
   });
 
   const onClick = () => {
@@ -37,7 +38,13 @@ const Action = (props) => {
   );
 
   const button = (
-    <Button onClick={onClick} bsStyle={actionStyle} disabled={!isEnable}>
+    <Button
+      onClick={onClick}
+      bsStyle={actionStyle}
+      bsSize={actionSize}
+      className={actionClass}
+      disabled={!isEnable}
+    >
       { showIcon && <i className={iconClass} /> }
       { showIcon && label.length > 0 && <span>&nbsp;</span> }
       { label.length > 0 && label}
@@ -60,6 +67,8 @@ Action.defaultProps = {
   label: '',
   helpText: '',
   actionStyle: 'link',
+  actionSize: '',
+  actionClass: '',
   showIcon: true,
   enable: true,
   show: true,
@@ -72,6 +81,8 @@ Action.propTypes = {
   label: PropTypes.string,
   showIcon: PropTypes.bool,
   actionStyle: PropTypes.string,
+  actionSize: PropTypes.string,
+  actionClass: PropTypes.string,
   helpText: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func,
