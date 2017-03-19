@@ -17,8 +17,6 @@ class Credit extends Component {
   static defaultProps = {
     allRates: List(),
     currency: '',
-    cancelLabel: 'Cancel',
-    chargeLabel: 'Charge',
     sid: false,
   };
 
@@ -29,8 +27,6 @@ class Credit extends Component {
     onClose: PropTypes.func.isRequired,
     sid: PropTypes.number,
     aid: PropTypes.number.isRequired,
-    cancelLabel: PropTypes.string,
-    chargeLabel: PropTypes.string,
   };
 
   state = {
@@ -47,6 +43,7 @@ class Credit extends Component {
     aprice: '',
     usagev: 1,
     rate: '',
+    progress: false,
   }
 
   componentDidMount() {
@@ -138,15 +135,16 @@ class Credit extends Component {
     } else {
       params = [...params, { usagev }];
     }
-    this.props.dispatch(creditCharge(params))
-    .then(
-      (response) => {
-        if (response.status) {
-          this.props.onClose();
-        }
-      }
-    );
+    this.setState({ progress: true });
+    this.props.dispatch(creditCharge(params)).then(this.afterCharge);
   };
+
+  afterCharge = (response) => {
+    this.setState({ progress: false });
+    if (response.status) {
+      this.props.onClose();
+    }
+  }
 
   getAvailableRates = () => {
     const { allRates } = this.props;
@@ -154,17 +152,17 @@ class Credit extends Component {
   }
 
   render() {
-    const { cancelLabel, chargeLabel } = this.props;
-    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg } = this.state;
+    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg, progress } = this.state;
     const availableRates = this.getAvailableRates();
     return (
       <ModalWrapper
         show={true}
+        progress={progress}
+        labelProgress="Processing..."
+        labelOk="Apply"
+        title="Manual charge / refund"
         onOk={this.onCreditCharge}
-        labelOk={chargeLabel}
         onCancel={this.props.onClose}
-        labelCancel={cancelLabel}
-        title="Credit Charge"
       >
         <Form horizontal>
           <FormGroup>
@@ -178,7 +176,7 @@ class Credit extends Component {
                   value="fix"
                   checked={rateBy === 'fix'}
                   onChange={this.onChangeCreditBy}
-                  label="&nbsp;Fixed price"
+                  label="Fixed price"
                 />
               </Col>
               <Col sm={3}>
@@ -189,14 +187,14 @@ class Credit extends Component {
                   value="usagev"
                   checked={rateBy === 'usagev'}
                   onChange={this.onChangeCreditBy}
-                  label="&nbsp;Volume"
+                  label="Volume"
                 />
               </Col>
             </Col>
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('aprice', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>Price</Col>
+            <Col sm={2} componentClass={ControlLabel}>Charge</Col>
             <Col sm={10}>
               <Field
                 onChange={this.onChangeCreditApriceValue.bind(this, 'aprice')}
@@ -225,7 +223,7 @@ class Credit extends Component {
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('rate', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>Rate</Col>
+            <Col sm={2} componentClass={ControlLabel}>Product</Col>
             <Col sm={10}>
               <Select
                 id="rate"
@@ -242,10 +240,10 @@ class Credit extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  const allRates = state.list.get('all_rates');
-  const currency = currencySelector(state, props);
-  return { allRates, currency };
-};
+const mapStateToProps = (state, props) => ({
+  usageTypes: state.settings.get('usage_types'),
+  currency: currencySelector(state, props),
+  allRates: state.list.get('all_rates'),
+});
 
 export default connect(mapStateToProps)(Credit);

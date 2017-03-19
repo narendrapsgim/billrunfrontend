@@ -30,19 +30,8 @@ export default class ServiceDetails extends Component {
     },
   }
 
-  componentDidMount() {
-    this.setDefaultValues();
-  }
-
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
-  }
-
-  setDefaultValues = () => {
-    const { item } = this.props;
-    if (item.get('prorated', null) === null) {
-      this.props.updateItem(['prorated'], true);
-    }
   }
 
   onChangeName = (e) => {
@@ -95,7 +84,7 @@ export default class ServiceDetails extends Component {
           </Col>
         </FormGroup>
 
-        {mode === 'create' &&
+        {['clone', 'create'].includes(mode) &&
           <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
             <Col componentClass={ControlLabel} sm={3} lg={2}>
               Key <Help contents={ServiceDescription.name} />
@@ -123,8 +112,8 @@ export default class ServiceDetails extends Component {
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-          <Col sm={4} style={{ padding: '10px' }}>
-            <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
+          <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+            <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" editable={editable} />
           </Col>
         </FormGroup>
 
@@ -132,7 +121,7 @@ export default class ServiceDetails extends Component {
           entityName="services"
           entity={item}
           onChangeField={this.onChangeAdditionalField}
-          editable={true}
+          editable={editable}
         />
 
       </Form>

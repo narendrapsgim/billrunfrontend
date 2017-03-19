@@ -236,7 +236,7 @@ export default class Subscription extends Component {
     const { showCreditCharge } = this.state;
     return (
       <div>
-        <Button bsSize="xsmall" className="btn-primary" onClick={this.onShowCreditCharge}>Credit Charge</Button>
+        <Button bsSize="xsmall" className="btn-primary" onClick={this.onShowCreditCharge}>Manual charge / refund</Button>
         {showCreditCharge ?
           <Credit
             onClose={this.onCloseCreditCharge}

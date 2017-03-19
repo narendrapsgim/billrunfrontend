@@ -2,6 +2,7 @@ import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { fetchPlanByIdQuery, getAllGroupsQuery } from '../common/ApiQueries';
 import { saveEntity } from '../actions/entityActions';
+import { getConfig } from '../common/Util';
 
 export const PLAN_GOT = 'PLAN_GOT';
 export const PLAN_CLEAR = 'PLAN_CLEAR';
@@ -10,6 +11,7 @@ export const PLAN_REMOVE_TARIFF = 'PLAN_REMOVE_TARIFF';
 export const PLAN_UPDATE_PLAN_CYCLE = 'PLAN_UPDATE_PLAN_CYCLE';
 export const PLAN_UPDATE_FIELD_VALUE = 'PLAN_UPDATE_FIELD_VALUE';
 export const PLAN_REMOVE_FIELD = 'PLAN_REMOVE_FIELD';
+export const PLAN_CLONE_RESET = 'PLAN_CLONE_RESET';
 
 export const REMOVE_GROUP_PLAN = 'REMOVE_GROUP_PLAN';
 export const ADD_GROUP_PLAN = 'ADD_GROUP_PLAN';
@@ -107,6 +109,11 @@ export const onPlanTariffAdd = (trial = false) => ({
 export const onPlanTariffRemove = index => ({
   type: PLAN_REMOVE_TARIFF,
   index,
+});
+
+export const setClonePlan = () => ({
+  type: PLAN_CLONE_RESET,
+  uniquefields: ['name'],
 });
 
 export const addUsagetInclude = (usaget, ppIncludesName, ppIncludesExternalId) => ({

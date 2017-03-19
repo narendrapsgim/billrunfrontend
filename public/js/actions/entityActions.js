@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getItemDateValue } from '../common/Util';
+import { getItemDateValue, getConfig } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -9,6 +9,7 @@ export const actions = {
   UPDATE_ENTITY_FIELD: 'UPDATE_ENTITY_FIELD',
   DELETE_ENTITY_FIELD: 'DELETE_ENTITY_FIELD',
   CLEAR_ENTITY: 'CLEAR_ENTITY',
+  CLONE_RESET_ENTITY: 'CLONE_RESET_ENTITY',
 };
 
 export const updateEntityField = (collection, path, value) => ({
@@ -30,6 +31,12 @@ export const gotEntity = (collection, entity) => ({
   entity,
 });
 
+export const setCloneEntity = (collection, entityName) => ({
+  type: actions.CLONE_RESET_ENTITY,
+  collection,
+  uniquefields: getConfig(['systemItems', entityName, 'uniqueField'], []),
+});
+
 export const clearEntity = collection => ({
   type: actions.CLEAR_ENTITY,
   collection,
@@ -37,6 +44,15 @@ export const clearEntity = collection => ({
 
 const buildRequestData = (item, action) => {
   switch (action) {
+
+    case 'close': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      const update = { to: getItemDateValue(item, 'to').format(globalSetting.apiDateTimeFormat) };
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
 
     case 'delete': {
       const formData = new FormData();
@@ -94,6 +110,16 @@ const buildRequestData = (item, action) => {
   }
 };
 
+const requestActionBuilder = (collection, item, action) => {
+  if (action === 'closeandnew' && getItemDateValue(item, 'from').isSame(getItemDateValue(item, 'originalValue', moment(0)), 'day')) {
+    return 'update';
+  }
+  if (action === 'clone') {
+    return 'create';
+  }
+  return action;
+};
+
 const requestDataBuilder = (collection, item, action) => {
   switch (collection) {
     default:
@@ -103,8 +129,9 @@ const requestDataBuilder = (collection, item, action) => {
 
 export const saveEntity = (collection, item, action) => (dispatch) => {
   dispatch(startProgressIndicator());
-  const body = requestDataBuilder(collection, item, action);
-  const query = apiEntityQuery(collection, action, body);
+  const apiAction = requestActionBuilder(collection, item, action);
+  const body = requestDataBuilder(collection, item, apiAction);
+  const query = apiEntityQuery(collection, apiAction, body);
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
@@ -130,3 +157,6 @@ export const getEntityById = (name, collection, id) => (dispatch) => {
 
 export const deleteEntity = (collection, item) => dispatch =>
   dispatch(saveEntity(collection, item, 'delete'));
+
+export const closeEntity = (collection, item) => dispatch =>
+  dispatch(saveEntity(collection, item, 'close'));

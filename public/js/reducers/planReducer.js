@@ -1,7 +1,10 @@
 import Immutable from 'immutable';
 import includeGroupsReducer from './includeGroupsReducer';
-import { ADD_GROUP, REMOVE_GROUP } from '../actions/includeGroupsActions';
 import productReduser from './productReducer';
+
+import {
+  ADD_GROUP, REMOVE_GROUP,
+} from '../actions/includeGroupsActions';
 
 import {
   PLAN_PRODUCTS_REMOVE,
@@ -20,7 +23,9 @@ import {
   PLAN_CLEAR,
   REMOVE_GROUP_PLAN,
   ADD_GROUP_PLAN,
-  ADD_USAGET_INCLUDE } from '../actions/planActions';
+  ADD_USAGET_INCLUDE,
+  PLAN_CLONE_RESET,
+} from '../actions/planActions';
 
 import {
   PRODUCT_UPDATE_FIELD_VALUE,
@@ -151,6 +156,15 @@ export default function (state = defaultState, action) {
 
     case PLAN_CLEAR:
       return defaultState;
+
+    case PLAN_CLONE_RESET: {
+      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', ...action.uniquefields];
+      return state.withMutations((itemWithMutations) => {
+        keysToDeleteOnClone.forEach((keyToDelete) => {
+          itemWithMutations.delete(keyToDelete);
+        });
+      });
+    }
 
     case ADD_BALANCE_NOTIFICATIONS: {
       const newNotifications = Immutable.List([defaultNotification]);

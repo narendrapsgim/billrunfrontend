@@ -43,17 +43,6 @@ export default class Plan extends Component {
     }
   }
 
-  componentDidMount() {
-    this.setDefaultValues();
-  }
-
-  setDefaultValues = () => {
-    const { plan } = this.props;
-    if (plan.get('prorated', null) === null) {
-      this.props.onChangeFieldValue(['prorated'], true);
-    }
-  }
-
   onPlanTrailTariffInit = (e) => {
     this.props.onPlanTariffAdd(true);
   }
@@ -196,7 +185,7 @@ export default class Plan extends Component {
                 </Col>
               </FormGroup>
 
-              {mode === 'create' &&
+              {['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
                     Key <Help contents={PlanDescription.name} />
@@ -250,8 +239,8 @@ export default class Plan extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-                <Col sm={4} style={{ padding: '10px' }}>
-                  <Field value={plan.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
+                <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+                  <Field value={plan.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" editable={editable} />
                 </Col>
               </FormGroup>
 
@@ -261,8 +250,6 @@ export default class Plan extends Component {
                 onChangeField={this.onChangeAdditionalField}
                 editable={editable}
               />
-
-
 
             </Panel>
 

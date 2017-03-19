@@ -9,7 +9,7 @@ import ChargingPlanIncludes from './ChargingPlanIncludes';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 import {
   getPlan,
   clearPlan,
@@ -17,6 +17,7 @@ import {
   onPlanFieldUpdate,
   addUsagetInclude,
   onPlanTariffAdd,
+  setClonePlan,
 } from '../../actions/planActions';
 import { getList } from '../../actions/listActions';
 import { showWarning, showSuccess } from '../../actions/alertsActions';
@@ -55,16 +56,13 @@ class ChargingPlanSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
     this.initDefaultValues();
   }
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'charging_plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -73,19 +71,14 @@ class ChargingPlanSetup extends Component {
 
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const {
-      item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'charging_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -94,12 +87,10 @@ class ChargingPlanSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onPlanFieldUpdate(['from'], defaultFromValue));
-    }
-    if (mode === 'create') {
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'charging'));
@@ -107,15 +98,31 @@ class ChargingPlanSetup extends Component {
       this.props.dispatch(onPlanFieldUpdate(['price', 0, 'price'], 0));
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({ unit: 1, periodicity: 'month' })));
+      this.props.dispatch(onPlanFieldUpdate(['operation'], 'inc'));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePlan());
     }
   }
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
       this.props.dispatch(getRevisions('plans', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -153,12 +160,11 @@ class ChargingPlanSetup extends Component {
   };
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
@@ -196,12 +202,14 @@ class ChargingPlanSetup extends Component {
 
           <Panel>
             <EntityRevisionDetails
+              itemName="charging_plan"
               revisions={revisions}
               item={item}
               mode={mode}
               onChangeFrom={this.onChangeField}
-              itemName="charging_plan"
               backToList={this.handleBack}
+              reLoadItem={this.fetchItem}
+              clearRevisions={this.clearRevisions}
             />
           </Panel>
 

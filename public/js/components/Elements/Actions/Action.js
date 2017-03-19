@@ -13,7 +13,7 @@ const Action = (props) => {
 
   const isEnable = (typeof props.enable === 'function') ? props.enable(data) : props.enable;
 
-  const iconClass = classNames('fa', {
+  const iconClass = classNames('fa fa-fw', {
     'fa-eye': type === 'view',
     'fa-pencil': type === 'edit',
     'fa-files-o': type === 'clone',

@@ -35,19 +35,19 @@
     "order":0,
     "parent":"prepaid"
   },
-  "charging": {
-    "title": "Buckets Group",
+  "prepaid_includes": {
+    "title": "Buckets",
     "icon": "",
-    "route": "charging_plans",
+    "route": "prepaid_includes",
     "show": true,
     "roles": [],
     "order": 1,
     "parent":"prepaid"
   },
-  "prepaid_includes": {
-    "title": "Buckets",
+  "charging": {
+    "title": "Buckets Group",
     "icon": "",
-    "route": "prepaid_includes",
+    "route": "charging_plans",
     "show": true,
     "roles": [],
     "order": 2,

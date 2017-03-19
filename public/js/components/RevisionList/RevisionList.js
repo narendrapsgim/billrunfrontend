@@ -4,8 +4,9 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { ConfirmModal, StateIcon } from '../Elements';
+import CloseActionBox from '../Entity/CloseActionBox';
 import List from '../../components/List';
-import { getItemDateValue, getConfig } from '../../common/Util';
+import { getItemDateValue, getConfig, isItemClosed, getItemId } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
@@ -17,6 +18,7 @@ class RevisionList extends Component {
     items: PropTypes.instanceOf(Immutable.List),
     onSelectItem: PropTypes.func,
     onDeleteItem: PropTypes.func,
+    onCloseItem: PropTypes.func,
     itemName: PropTypes.string.isRequired,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
@@ -28,6 +30,7 @@ class RevisionList extends Component {
     items: Immutable.List(),
     onSelectItem: () => {},
     onDeleteItem: () => {},
+    onCloseItem: () => {},
   };
 
   state = {
@@ -35,25 +38,40 @@ class RevisionList extends Component {
     itemToRemove: null,
   }
 
-  isItemEditable = item => getItemDateValue(item, 'to', moment(0)).isAfter(moment());
-  isItemRemovable = item => getItemDateValue(item, 'from', moment(0)).isAfter(moment());
+  isItemEditable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
 
-  parseDate = item => getItemDateValue(item, 'from', moment(0)).format(globalSetting.dateFormat);
-  parserState = item => (
-    <StateIcon
-      from={getItemDateValue(item, 'from', moment(0)).toISOString()}
-      to={getItemDateValue(item, 'to', moment(0)).toISOString()}
-    />
-  );
+  isItemRemovable = item => ['future'].includes(item.getIn(['revision_info', 'status'], ''));
+
   parseEditShow = item => this.isItemEditable(item);
+
   parseViewShow = item => !this.isItemEditable(item);
+
   parseRemoveEnable = item => this.isItemRemovable(item);
+
+  parserState = item => (<StateIcon status={item.getIn(['revision_info', 'status'], '')} />);
+
+  parseFromDate = (item) => {
+    const fromDate = getItemDateValue(item, 'from', null);
+    if (moment.isMoment(fromDate)) {
+      return fromDate.format(globalSetting.dateFormat);
+    }
+    return '-';
+  };
+
+  parseToDate = (item) => {
+    const toDate = getItemDateValue(item, 'to', null);
+    const statusWithToDate = ['expired', 'active_with_future'].includes(item.getIn(['revision_info', 'status'], ''));
+    if (moment.isMoment(toDate) && (isItemClosed(item) || statusWithToDate)) {
+      return toDate.format(globalSetting.dateFormat);
+    }
+    return '-';
+  };
 
   onClickEdit = (item) => {
     const { itemName } = this.props;
     const itemId = item.getIn(['_id', '$id']);
-    const itemType =  getConfig(['systemItems', itemName, 'itemType'], '');
-    const itemsType =  getConfig(['systemItems', itemName, 'itemsType'], '');
+    const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+    const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
     this.props.onSelectItem();
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
   };
@@ -72,6 +90,20 @@ class RevisionList extends Component {
     });
   }
 
+  onClickClone = (item) => {
+    const { itemName } = this.props;
+    const itemId = item.getIn(['_id', '$id']);
+    const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+    const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
+    this.props.onSelectItem();
+    this.props.router.push({
+      pathname: `${itemsType}/${itemType}/${itemId}`,
+      query: {
+        action: 'clone',
+      },
+    });
+  }
+
   onClickRemoveOk = () => {
     const { itemName } = this.props;
     const { itemToRemove } = this.state;
@@ -87,34 +119,51 @@ class RevisionList extends Component {
       const collection = getConfig(['systemItems', itemName, 'collection'], '');
       const uniqueField = getConfig(['systemItems', itemName, 'uniqueField'], '');
       const key = itemToRemove.get(uniqueField, '');
+      const removedRevisionId = getItemId(itemToRemove);
       this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
-      const stayOnPage = this.props.onDeleteItem(itemToRemove);
-      if (stayOnPage) {
-        this.onClickRemoveClose();
-      }
+      this.onClickRemoveClose();
+      this.props.onDeleteItem(removedRevisionId);
     }
+  }
+
+  getActiveRevision = () => {
+    const { items } = this.props;
+    return items.find(item => (
+      getItemDateValue(item, 'from', null).isBefore(moment())
+      && getItemDateValue(item, 'to', null).isAfter(moment())
+    ));
   }
 
   getListFields = () => [
     { id: 'state', parser: this.parserState, cssClass: 'state' },
-    { id: 'from', title: 'Start date', parser: this.parseDate },
+    { id: 'from', title: 'Start date', parser: this.parseFromDate, cssClass: 'short-date' },
+    { id: 'to', title: 'To date', parser: this.parseToDate },
   ]
 
   getListActions = () => [
     { type: 'view', showIcon: true, helpText: 'View', onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
+    { type: 'clone', showIcon: true, helpText: 'Clone', onClick: this.onClickClone },
     { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove, enable: this.parseRemoveEnable },
   ]
 
   render() {
-    const { items } = this.props;
+    const { items, itemName } = this.props;
     const { showConfirmRemove } = this.state;
     const fields = this.getListFields();
     const actions = this.getListActions();
+    const activeItem = this.getActiveRevision();
     const removeConfirmMessage = 'Are you sure you want to remove this revision?';
     return (
       <div>
         <List items={items} fields={fields} edit={false} actions={actions} />
+        { activeItem &&
+          <CloseActionBox
+            itemName={itemName}
+            item={activeItem}
+            onCloseItem={this.props.onCloseItem}
+          />
+        }
         <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
       </div>
     );

@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { ModalWrapper, StateIcon, RevisionTimeline } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getItemDateValue, getConfig } from '../../common/Util';
+import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import { getRevisions } from '../../actions/entityListActions';
 
 
@@ -52,16 +52,19 @@ class StateDetails extends Component {
   }
 
   renderRevisionTooltip = () => {
-    const { item, revisions, size } = this.props;
+    const { item, revisions, size, revisionBy } = this.props;
+    const title = `${item.get(revisionBy, '')} - Revision History`;
     if (!revisions) {
       return (
-        <Popover id={`${item.getIn(['_id', '$id'], '')}-loading`} title="Revision History">
-          <div>loading...</div>
+        <Popover id={`${getItemId(item, '')}-loading`} title={title} className="entity-revision-history-popover">
+          <div style={{ padding: 15 }}><i className="fa fa-spinner fa-pulse" />&nbsp;&nbsp;&nbsp;loading...</div>
+          <hr />
+          <div style={{ padding: '8px 12px 7px' }}>&nbsp;</div>
         </Popover>
       );
     }
     return (
-      <Popover id={`${item.getIn(['_id', '$id'], '')}-revisions`} title="Revision History" className="entity-revision-history-popover">
+      <Popover id={`${getItemId(item, '')}-revisions`} title={title} className="entity-revision-history-popover">
         <RevisionTimeline revisions={revisions} item={item} size={size} />
         <hr style={{ margin: 0, borderColor: '#3A3A3A', borderWidth: 2 }} />
         <Button bsStyle="link" style={{ color: '#fff' }} onClick={this.showManageRevisions}>Manage Revisions</Button>

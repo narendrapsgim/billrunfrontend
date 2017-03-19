@@ -317,6 +317,19 @@ fieldset[disabled] .btn {
   margin: 0;
 }
 /* Entity Revision */
+.entity-revision-history-popover .popover-content{
+  padding: 10px 0 0 0;
+}
+.entity-revision-history-popover .popover-content ul.revision-history-list{
+  text-align: center;
+}
+.entity-revision-history-popover .popover-content hr{
+  margin: 7px 0 0 0;
+  border-color: #565656;
+}
+.entity-revision-history-popover .popover-title {
+  border-bottom: 1px solid #565656;
+}
 .entity-revision-history-popover {
   max-width: none;
 }
@@ -363,6 +376,11 @@ ul.revision-history-list li.more::after {
   width: 15px;
   left: 23px;
 }
+ul.revision-history-list li.closed::after {
+  width: 34px;
+  left: -18px;
+  top: 8px;
+}
 ul.revision-history-list li.more.after::after {
   left: -15px;
 }
@@ -386,7 +404,6 @@ ul.revision-history-list li.last::after {
   width: 0;
   border-bottom: none;
 }
-
 .entity-revision-edit ul.revision-history-list li .date {
   color: #6f6f6f;
 }
