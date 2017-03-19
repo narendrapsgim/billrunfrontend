@@ -34,6 +34,7 @@ const getId = (state, props) => {
 const getItem = (state, props, entityName) => {
   switch (entityName) {
     case 'prepaid_include':
+    case 'customer':
       return state.entity.get(entityName);
     case 'discount':
       return state.entity.get(entityName);

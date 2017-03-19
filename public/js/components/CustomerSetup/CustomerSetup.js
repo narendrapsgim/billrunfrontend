@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import moment from 'moment';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Customer from './Customer';
 import Subscriptions from './Subscriptions';
@@ -10,7 +9,6 @@ import ActionButtons from '../Elements/ActionButtons';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import PostpaidBalances from '../PostpaidBalances';
 import PrepaidBalances from '../PrepaidBalances';
-import { apiBillRun } from '../../common/Api';
 import {
   getSubscribersByAidQuery,
   getPlansKeysQuery,
@@ -29,6 +27,8 @@ import { getList, clearList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { showSuccess } from '../../actions/alertsActions';
+import { modeSelector, itemSelector, idSelector, tabSelector } from '../../selectors/entitySelector';
+
 
 class CustomerSetup extends Component {
 
@@ -46,6 +46,10 @@ class CustomerSetup extends Component {
       PropTypes.string,
       PropTypes.number,
     ]),
+    location: PropTypes.shape({
+      pathname: PropTypes.string,
+      query: PropTypes.object,
+    }),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -55,15 +59,11 @@ class CustomerSetup extends Component {
   static defaultProps = {
     activeTab: 1,
     customer: Immutable.Map(),
-    settings: Immutable.List(),
+    settings: Immutable.Map(),
     subscriptions: Immutable.List(),
     gateways: Immutable.List(),
     plans: Immutable.List(),
     services: Immutable.List(),
-  };
-
-  state = {
-    activeTab: parseInt(this.props.activeTab),
   };
 
   componentDidMount() {
@@ -125,12 +125,6 @@ class CustomerSetup extends Component {
     this.props.dispatch(saveCustomer(customer, mode)).then(this.afterSaveCustomer);
   }
 
-  onClickNewSubscription = (aid) => {
-    const returnUrlParam = `return_url=${encodeURIComponent(this.getReturnUrl())}`;
-    const aidParam = `aid=${encodeURIComponent(`${aid}`)}`;
-    window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}`;
-  }
-
   onClickChangePaymentGateway = (aid) => {
     const returnUrlParam = `return_url=${encodeURIComponent(this.getReturnUrl())}`;
     const aidParam = `aid=${encodeURIComponent(aid)}`;
@@ -138,8 +132,8 @@ class CustomerSetup extends Component {
     window.location = `${globalSetting.serverUrl}/internalpaypage?${aidParam}&${returnUrlParam}&${action}`;
   }
 
-  onSaveSubscription = subscription =>
-    this.props.dispatch(saveSubscription(subscription, 'closeandnew')).then(this.afterSaveSubscription);
+  onSaveSubscription = (subscription, mode) =>
+    this.props.dispatch(saveSubscription(subscription, mode)).then(this.afterSaveSubscription);
 
 
   afterSaveSubscription = (response) => {
@@ -165,13 +159,26 @@ class CustomerSetup extends Component {
     return `${window.location.origin}/#/customers/customer/${itemId}?tab=2`;
   }
 
-  handleSelectTab = (key) => {
-    this.setState({ activeTab: key });
+  handleSelectTab = (tab) => {
+    const { pathname, query } = this.props.location;
+    this.props.router.push({
+      pathname,
+      query: Object.assign({}, query, { tab }),
+    });
   }
 
   render() {
-    const { customer, subscriptions, settings, plans, services, gateways, mode, aid } = this.props;
-    const { activeTab } = this.state;
+    const {
+      customer,
+      subscriptions,
+      settings,
+      plans,
+      services,
+      gateways,
+      mode,
+      aid,
+      activeTab,
+    } = this.props;
     const showActionButtons = (activeTab === 1);
 
     // in update mode wait for plan before render edit screen
@@ -209,10 +216,9 @@ class CustomerSetup extends Component {
                       items={subscriptions}
                       aid={aid}
                       settings={subscriberFields}
-                      all_plans={plans}
-                      all_services={services}
+                      allPlans={plans}
+                      allServices={services}
                       onSaveSubscription={this.onSaveSubscription}
-                      onNew={this.onClickNewSubscription}
                     />
                   </Panel>
                 </Tab>
@@ -243,22 +249,17 @@ class CustomerSetup extends Component {
 }
 
 
-const mapStateToProps = (state, props) => {
-  const { tab: activeTab, action } = props.location.query;
-  const { itemId } = props.params;
-  const mode = action || ((itemId) ? 'closeandnew' : 'create');
-  return {
-    itemId,
-    mode,
-    activeTab,
-    customer: state.entity.get('customer') || undefined,
-    aid: state.entity.getIn(['customer', 'aid']) || undefined,
-    settings: state.settings.get('subscribers') || undefined,
-    subscriptions: state.list.get('subscriptions') || undefined,
-    plans: state.list.get('available_plans') || undefined,
-    services: state.list.get('available_services') || undefined,
-    gateways: state.list.get('available_gateways') || undefined,
-  };
-};
+const mapStateToProps = (state, props) => ({
+  itemId: idSelector(state, props, 'customer'),
+  customer: itemSelector(state, props, 'customer'),
+  mode: modeSelector(state, props, 'customer'),
+  activeTab: tabSelector(state, props),
+  aid: state.entity.getIn(['customer', 'aid']) || undefined,
+  settings: state.settings.get('subscribers') || undefined,
+  subscriptions: state.list.get('subscriptions') || undefined,
+  plans: state.list.get('available_plans') || undefined,
+  services: state.list.get('available_services') || undefined,
+  gateways: state.list.get('available_gateways') || undefined,
+});
 
 export default withRouter(connect(mapStateToProps)(CustomerSetup));
