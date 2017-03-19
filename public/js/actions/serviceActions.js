@@ -2,7 +2,6 @@ import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '..
 import { startProgressIndicator } from './progressIndicatorActions';
 import { saveEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
-import { getConfig } from '../common/Util';
 
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
