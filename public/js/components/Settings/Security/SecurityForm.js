@@ -21,6 +21,7 @@ class SecurityForm extends Component {
   state = {
     item: this.props.item,
     title: this.props.item.isEmpty() ? 'New' : 'Edit',
+    action: this.props.item.isEmpty() ? 'create' : 'edit',
   };
 
   onChangeName = (e) => {
@@ -31,23 +32,24 @@ class SecurityForm extends Component {
 
   onChangeDateFrom = (momentFromDate) => {
     const { item } = this.state;
-    const fromValue = momentFromDate ? momentFromDate.toJSON() : '';
+    const fromValue = momentFromDate ? momentFromDate.toISOString() : '';
     this.setState({ item: item.set('from', fromValue) });
   }
 
   onChangeDateTo = (momentFromDate) => {
     const { item } = this.state;
-    const fromValue = momentFromDate ? momentFromDate.toJSON() : '';
+    const fromValue = momentFromDate ? momentFromDate.toISOString() : '';
     this.setState({ item: item.set('to', fromValue) });
   }
 
   onSave = () => {
-    const { item } = this.state;
-    this.props.onSave(item);
+    const { item, action } = this.state;
+    this.props.onSave(item, action);
   }
 
   render() {
-    const { item, title } = this.state;
+    const { item, action } = this.state;
+    const title = action === 'create' ? 'New' : 'Edit';
 
     return (
       <ModalWrapper title={`${title} Secret`} show={true} onOk={this.onSave} onCancel={this.props.onCancel} labelOk="Save" >
