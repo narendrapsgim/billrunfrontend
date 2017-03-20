@@ -69,8 +69,10 @@ export default class Subscription extends Component {
 
     return Immutable.Map({}).withMutations((customFieldsWithMutations) => {
       settings.filter(this.filterCustomFields).forEach((field) => {
+        const fieldName = field.get('field_name', '');
+        const fieldNamePath = fieldName.split('.');
         const fieldData = new FieldData({
-          value: subscription.get(field.get('field_name'), ''),
+          value: subscription.getIn(fieldNamePath, ''),
           type: field.get('select_list', false) ? 'select' : 'text',
           label: field.get('title', ''),
           params: field.get('select_list', false) ? field.get('select_options', '').split(',') : null,
@@ -120,7 +122,7 @@ export default class Subscription extends Component {
         subscriptionWithMutations.set(key, fieldData.get('value'));
       });
       subscriptionWithMutations.delete('from');
-    });    
+    });
     this.props.onSave(data);
   };
 
