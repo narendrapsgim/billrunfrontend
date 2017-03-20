@@ -1,12 +1,25 @@
 import React, { Component, PropTypes } from 'react';
-/* COMPONENTS */
+import Immutable from 'immutable';
 import SubscriptionsList from './SubscriptionsList';
 import Subscription from './Subscription';
+
 
 export default class Subscriptions extends Component {
 
   static propTypes = {
+    aid: PropTypes.number.isRequired,
+    items: PropTypes.instanceOf(Immutable.List),
+    settings: PropTypes.instanceOf(Immutable.List),
+    allPlans: PropTypes.instanceOf(Immutable.List),
+    allServices: PropTypes.instanceOf(Immutable.List),
     onSaveSubscription: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    items: Immutable.List(),
+    settings: Immutable.List(),
+    allPlans: Immutable.List(),
+    allServices: Immutable.List(),
   };
 
   state = {
@@ -17,12 +30,16 @@ export default class Subscriptions extends Component {
     this.setState({ subscription });
   }
 
-  onCancelEdit = () => {
+  onClickNew = (aid) => {
+    this.setState({ subscription: Immutable.Map({ aid }) });
+  }
+
+  onClickCancel = () => {
     this.setState({ subscription: null });
   }
 
-  onSaveSubscription = (subscription) => {
-    this.props.onSaveSubscription(subscription).then(this.afterSave);
+  onClickSave = (subscription, mode) => {
+    this.props.onSaveSubscription(subscription, mode).then(this.afterSave);
   };
 
   afterSave = (response) => {
@@ -32,16 +49,27 @@ export default class Subscriptions extends Component {
   }
 
   render() {
+    const { aid, items, settings, allPlans, allServices } = this.props;
     const { subscription } = this.state;
     if (!subscription) {
-      return (<SubscriptionsList {...this.props} onClickEdit={this.onClickEdit} />);
+      return (
+        <SubscriptionsList
+          items={items}
+          settings={settings}
+          aid={aid}
+          onNew={this.onClickNew}
+          onClickEdit={this.onClickEdit}
+        />
+      );
     }
     return (
       <Subscription
-        {...this.props}
+        settings={settings}
+        allPlans={allPlans}
+        allServices={allServices}
         subscription={subscription}
-        onSave={this.onSaveSubscription}
-        onCancel={this.onCancelEdit}
+        onSave={this.onClickSave}
+        onCancel={this.onClickCancel}
       />
     );
   }

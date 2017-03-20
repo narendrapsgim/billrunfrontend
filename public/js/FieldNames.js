@@ -66,6 +66,10 @@ const FieldNames = {
     request_num: 'Request number',
     granted_return_code: 'Return code',
   },
+  subscription: {
+    firstname: 'First Name',
+    lastname: 'Last Name',
+  },
 };
 
 export default FieldNames;

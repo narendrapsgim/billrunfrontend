@@ -13,6 +13,8 @@ import ProductsList from '../components/ProductsList';
 import Product from '../components/Product';
 import PlansList from '../components/PlansList';
 import Plan from '../components/Plan';
+import DiscountsList from '../components/DiscountsList';
+import Discount from '../components/Discount';
 import ServicesList from '../components/ServicesList';
 import Service from '../components/Service';
 import InputProcessorsList from '../components/InputProcessorsList';
@@ -55,6 +57,12 @@ const routes = () => (
       <IndexRoute component={RequireAuth(ServicesList)} title="Services" />
       <Route path="service/:itemId" component={RequireAuth(Service)} />
       <Route path="service" component={RequireAuth(Service)} />
+    </Route>
+
+    <Route path="discounts" >
+      <IndexRoute component={RequireAuth(DiscountsList)} title="Discounts" />
+      <Route path="discount/:itemId" component={RequireAuth(Discount)} />
+      <Route path="discount" component={RequireAuth(Discount)} />
     </Route>
 
     <Route path="products" >

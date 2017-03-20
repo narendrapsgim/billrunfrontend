@@ -217,7 +217,7 @@ export const getSubscribersByAidQuery = aid => ({
     { query: JSON.stringify({ aid }) },
     { page: 0 },
     { size: 9999 },
-    { project: JSON.stringify({ from: 0, to: 0 }) },
+    { project: JSON.stringify({ from: 0 }) },
   ],
 });
 
@@ -262,6 +262,7 @@ export const getDeleteLineQuery = id => ({
 
 
 // List
+export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
@@ -275,6 +276,7 @@ export const getAllGroupsQuery = () => ([
 export const fetchServiceByIdQuery = id => getEntityByIdQuery('services', id);
 export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
 export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
+export const fetchDiscountByIdQuery = id => getEntityByIdQuery('discounts', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);
 
@@ -318,19 +320,21 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
   ],
 });
 
-export const getProductsByKeysQuery = (keys, project = {}) => ({
+export const getEntitesByKeysQuery = (entity, keyField, keys, project = {}) => ({
   action: 'uniqueget',
-  entity: 'rates',
+  entity,
   params: [
     { page: 0 },
     { size: 9999 },
     { project: JSON.stringify(project) },
     { sort: JSON.stringify(project) },
     { query: JSON.stringify({
-      key: { $in: keys },
+      [keyField]: { $in: keys },
     }) },
   ],
 });
+export const getServicesByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('services', 'name', keys, project);
+export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('rates', 'key', keys, project);
 
 export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => ({
   action: 'get',

@@ -417,5 +417,8 @@ ul.revision-history-list li.last::after {
 .entity-revision-edit ul.revision-history-list li.more::after {
   top: 10px;
 }
-
 /* ~Entity Revision */
+
+.discount-setup .help-block {
+  margin-bottom: 0;
+}
