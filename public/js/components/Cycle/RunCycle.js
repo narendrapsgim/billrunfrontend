@@ -5,10 +5,9 @@ import { Map, List } from 'immutable';
 import Select from 'react-select';
 import { getCyclesQuery, getCycleQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
-import { runBillingCycle, confirmCycleInvoice, confirmCycle } from '../../actions/cycleActions';
+import { runBillingCycle } from '../../actions/cycleActions';
 import ConfirmModal from '../../components/ConfirmModal';
-import EntityList from '../EntityList';
-import { getConfig } from '../../common/Util';
+import CycleData from './CycleData';
 
 class RunCycle extends Component {
 
@@ -23,14 +22,83 @@ class RunCycle extends Component {
     cycleAdditionalData: Map(),
   };
 
+  constructor(props) {
+    super(props);
+    this.autoRefresh = null;
+  }
+
   state = {
     selectedCycle: Map(),
     selectedCycleName: '',
     showRerunConfirm: false,
+    autoRefreshRunning: false,
+    autoRefreshStep: 0,
+    autoRefreshIterations: 0,
+    showRefreshButton: false,
   }
 
   componentDidMount() {
     this.props.dispatch(getList('cycles_list', getCyclesQuery()));
+  }
+
+  componentWillReceiveProps() {
+    const { cycleAdditionalData } = this.props;
+    const { autoRefreshRunning, showRefreshButton } = this.state;
+    if (!showRefreshButton && !autoRefreshRunning && cycleAdditionalData.get('cycle_status', '') === 'running') {
+      this.initAutoRefresh();
+    }
+  }
+
+  componentWillUnmount() {
+    this.unsetAutoRefresh();
+  }
+
+  initAutoRefresh = () => {
+    this.unsetAutoRefresh();
+    this.setState({
+      autoRefreshRunning: true,
+      autoRefreshIterations: 0,
+      autoRefreshStep: 0,
+    });
+    this.autoRefresh = setTimeout(this.runAutoRefresh, this.refreshSteps[0].timeout);
+  }
+
+  refreshSteps = [
+    { timeout: 10000, iterations: 6 },
+    { timeout: 60000, iterations: 60 },
+  ];
+
+  unsetAutoRefresh = () => {
+    clearTimeout(this.autoRefresh);
+  }
+
+  runAutoRefresh = () => {
+    const { cycleAdditionalData } = this.props;
+    if (cycleAdditionalData.get('cycle_status', '') !== 'running') {
+      this.unsetAutoRefresh();
+      this.setState({ autoRefreshRunning: false });
+      return;
+    }
+    this.reloadCycleData();
+    const { autoRefreshIterations, autoRefreshStep } = this.state;
+    const refreshStep = this.refreshSteps[autoRefreshStep];
+    this.unsetAutoRefresh();
+    if (autoRefreshIterations < refreshStep.iterations - 1) {
+      this.setState({ autoRefreshIterations: autoRefreshIterations + 1 });
+      this.autoRefresh = setTimeout(this.runAutoRefresh, refreshStep.timeout);
+    } else {
+      const newAutoRefreshStep = autoRefreshStep + 1;
+      if (newAutoRefreshStep >= this.refreshSteps.length) {
+        this.setState({ showRefreshButton: true, autoRefreshRunning: false });
+        return;
+      }
+      const newRefreshStep = this.refreshSteps[newAutoRefreshStep];
+      this.autoRefresh = setTimeout(this.runAutoRefresh, newRefreshStep.timeout);
+      this.setState({
+        autoRefreshStep: newAutoRefreshStep,
+        autoRefreshIterations: 0,
+      });
+    }
   }
 
   getSelectedCycleStatus = () => {
@@ -59,12 +127,16 @@ class RunCycle extends Component {
     this.setState({ showRerunConfirm: true });
   }
 
+  onClickChargeAll = () => {
+    // TODO: implement after API is ready in BE
+  }
+
   onClickRefresh = () => {
     this.reloadCycleData();
   }
 
   renderRefreshButton = () => (
-    this.getSelectedCycleStatus() === 'running' &&
+    this.state.showRefreshButton && this.getSelectedCycleStatus() === 'running' &&
     (<div className="pull-right">
       <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickRefresh}>
         <i className="fa fa-refresh" />&nbsp;Refresh
@@ -227,9 +299,9 @@ class RunCycle extends Component {
       (<Button onClick={this.onClickRerun}>Re-run</Button>)
   )
 
-  renderConfirmAllButton = () => (
-    this.getSelectedCycleStatus() === 'finished' &&
-      (<Button onClick={this.onClickConfirmAllClick}>Confirm All</Button>)
+  renderChargeAllButton = () => (
+    this.getSelectedCycleStatus() === 'confirmed' &&
+      (<Button disabled={true} onClick={this.onClickChargeAll}>Charge All</Button>)
   )
 
   onRerunCancel = () => {
@@ -254,77 +326,14 @@ class RunCycle extends Component {
     );
   }
 
-  parseCycleDataFirstName = entity => entity.getIn(['attributes', 'firstname'], '');
-  parseCycleDataLastName = entity => entity.getIn(['attributes', 'lastname'], '');
-  parseCycleDataInvoiceTotal = entity => entity.getIn(['totals', 'after_vat_rounded'], '');
-  parseCycleDataSubscriptionNum = entity => entity.get('subs', List()).size;
-
-  downloadURL = (aid, billrunKey, invoiceId) =>
-    `${getConfig('serverUrl')}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`;
-
-  parseCycleDataDownload = (entity) => {
-    const downloadUrl = this.downloadURL(entity.get('aid'), entity.get('billrun_key'), entity.get('invoice_id'));
-    return (
-      <form method="post" action={downloadUrl} target="_blank">
-        <button className="btn btn-link" type="submit">
-          <i className="fa fa-download" /> Download
-        </button>
-      </form>
-    );
-  };
-
-  onInvoiceConfirmClick = (entity) => {
-    const { selectedCycle } = this.state;
-    this.props.dispatch(confirmCycleInvoice(selectedCycle.get('billrun_key', ''), entity.get('invoice_id', '')))
-      .then(
-        (response) => {
-          if (response.status) {
-            this.reloadCycleData();
-          }
-        }
-      );
-  }
-
-  onClickConfirmAllClick = () => {
-    const { selectedCycle } = this.state;
-    this.props.dispatch(confirmCycle(selectedCycle.get('billrun_key', '')))
-      .then(
-        (response) => {
-          if (response.status) {
-            this.reloadCycleData();
-          }
-        }
-      );
-  }
-
-  parseCycleDataConfirm = entity => (
-    entity.get('billed', false)
-      ? (<Label bsStyle={'success'} className={'non-editble-field'}>CONFIRMED</Label>)
-      : (<Button onClick={this.onInvoiceConfirmClick.bind(this, entity)}>confirm</Button>)
-  );
-
   render() {
     const { selectedCycle } = this.state;
+    const billrunKey = selectedCycle.get('billrun_key', '');
     const shouldDisplayBillrunData = List(['running', 'finished', 'confirmed']).contains(this.getSelectedCycleStatus());
+    const showConfirmAllButton = this.getSelectedCycleStatus() === 'finished';
     const baseFilter = {
-      billrun_key: selectedCycle.get('billrun_key', ''),
+      billrun_key: billrunKey,
     };
-
-    const filterFields = [
-      { id: 'aid', placeholder: 'Customer Number', type: 'number' },
-      { id: 'attributes.firstname', placeholder: 'Customer First Name' },
-      { id: 'attributes.lastname', placeholder: 'Customer Last Name' },
-    ];
-
-    const tableFields = [
-      { id: 'aid', title: 'Customer Number', sort: true },
-      { id: 'attributes.firstname', title: 'Customer First Name', sort: true, parser: this.parseCycleDataFirstName },
-      { id: 'attributes.lastname', title: 'Customer Last Name', sort: true, parser: this.parseCycleDataLastName },
-      { id: 'totals.after_vat_rounded', title: 'Invoice Total', parser: this.parseCycleDataInvoiceTotal },
-      { id: 'subss', title: '# of Subscriptions', parser: this.parseCycleDataSubscriptionNum },
-      { id: 'download', title: 'Invoice', parser: this.parseCycleDataDownload },
-      { id: 'confirm', title: 'Confirm', parser: this.parseCycleDataConfirm },
-    ];
 
     return (
       <Row>
@@ -338,23 +347,19 @@ class RunCycle extends Component {
                 <Col sm={6} lg={6}>
                   {this.renderRunButton()}
                   {this.renderRerunButton()}
-                  {this.renderConfirmAllButton()}
+                  {this.renderChargeAllButton()}
                 </Col>
               </FormGroup>
             </Form>
 
             {
               shouldDisplayBillrunData &&
-              <EntityList
-                collection="billrun"
-                api="get"
-                itemType="billrun"
-                itemsType="billruns"
-                filterFields={filterFields}
+              <CycleData
+                billrunKey={billrunKey}
+                selectedCycle={selectedCycle}
                 baseFilter={baseFilter}
-                tableFields={tableFields}
-                showAddButton={false}
-                editable={false}
+                reloadCycleData={this.reloadCycleData}
+                showConfirmAllButton={showConfirmAllButton}
               />
             }
 
