@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 import { Label, Button, FormGroup, HelpBlock } from 'react-bootstrap';
 import { List, Map } from 'immutable';
 import { getSymbolFromCurrency } from 'currency-symbol-map';
+import { getAllInvoicesQuery } from '../../common/ApiQueries';
 import EntityList from '../EntityList';
+import { getList } from '../../actions/listActions';
 import { getConfig } from '../../common/Util';
 import { confirmCycleInvoice, confirmCycle } from '../../actions/cycleActions';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -19,6 +21,7 @@ class CycleData extends Component {
     reloadCycleData: PropTypes.func,
     showConfirmAllButton: PropTypes.bool,
     currency: PropTypes.string,
+    invoicesNum: PropTypes.number,
   };
 
   static defaultProps = {
@@ -26,6 +29,7 @@ class CycleData extends Component {
     baseFilter: {},
     showConfirmAllButton: true,
     currency: '',
+    invoicesNum: 0,
   };
 
   state = {
@@ -36,6 +40,22 @@ class CycleData extends Component {
       warningMessage: 'This action is irreversible',
       onClick: () => {},
     },
+  }
+
+  componentDidMount() {
+    const { billrunKey } = this.props;
+    this.updateInvoicesNum(billrunKey);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { billrunKey } = this.props;
+    if (nextProps.billrunKey !== billrunKey) {
+      this.updateInvoicesNum(nextProps.billrunKey);
+    }
+  }
+
+  updateInvoicesNum = (billrunKey) => {
+    this.props.dispatch(getList('billrunInvoices', getAllInvoicesQuery(billrunKey)));
   }
 
   getDateToDisplay = str => str.substr(0, str.indexOf(' '));
@@ -72,13 +92,13 @@ class CycleData extends Component {
   }
 
   onClickConfirmAll = () => {
-    const { selectedCycle } = this.props;
+    const { selectedCycle, invoicesNum } = this.props;
     const { confirmationModalData } = this.state;
     confirmationModalData.show = true;
     confirmationModalData.title = 'Confirm all invoices';
     confirmationModalData.message = `Are you sure you want to confirm all the invoices for the cycle of
       ${this.getDateToDisplay(selectedCycle.get('start_date', ''))} - ${this.getDateToDisplay(selectedCycle.get('end_date', ''))}?
-      <#invoices> invoices will be confirmed after this action`; // TODO: add <#invoices>
+      ${invoicesNum} invoices will be confirmed after this action`; // TODO: add <#invoices>
     confirmationModalData.onClick = this.onClickConfirmAllConfirm;
     this.setState({ confirmationModalData });
   }
@@ -193,6 +213,7 @@ class CycleData extends Component {
 
 const mapStateToProps = (state, props) => ({
   currency: currencySelector(state, props),
+  invoicesNum: state.list.get('billrunInvoices', List()).size,
 });
 
 export default connect(mapStateToProps)(CycleData);

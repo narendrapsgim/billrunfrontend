@@ -402,3 +402,12 @@ export const getChargeAllCycleQuery = () => ({
   api: 'billrun',
   action: 'chargeaccount',
 });
+
+export const getAllInvoicesQuery = billrunKey => ({
+  action: 'get',
+  entity: 'billrun',
+  params: [
+    { query: JSON.stringify({ billrun_key: billrunKey }) },
+    { project: JSON.stringify({ _id: 1 }) },
+  ],
+});
