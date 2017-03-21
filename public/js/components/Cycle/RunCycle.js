@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Col, Row, Panel, Form, FormGroup, ControlLabel, Label, Button, HelpBlock } from 'react-bootstrap';
 import { Map, List } from 'immutable';
 import Select from 'react-select';
-import { getCyclesQuery, getCycleQuery } from '../../common/ApiQueries';
+import { getCyclesQuery, getCycleQuery, getChargeStatusQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
 import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -15,11 +15,13 @@ class RunCycle extends Component {
     dispatch: PropTypes.func.isRequired,
     cycles: PropTypes.instanceOf(List),
     cycleAdditionalData: PropTypes.instanceOf(Map),
+    chargeStatus: PropTypes.instanceOf(Map),
   };
 
   static defaultProps = {
     cycles: List(),
     cycleAdditionalData: Map(),
+    chargeStatus: Map(),
   };
 
   constructor(props) {
@@ -31,6 +33,7 @@ class RunCycle extends Component {
     selectedCycle: Map(),
     selectedCycleName: '',
     showRerunConfirm: false,
+    showChargeAllConfirm: false,
     autoRefreshRunning: false,
     autoRefreshStep: 0,
     autoRefreshIterations: 0,
@@ -39,6 +42,7 @@ class RunCycle extends Component {
 
   componentDidMount() {
     this.props.dispatch(getList('cycles_list', getCyclesQuery()));
+    this.props.dispatch(getList('charge_status', getChargeStatusQuery()));
   }
 
   componentWillReceiveProps() {
@@ -128,6 +132,10 @@ class RunCycle extends Component {
   }
 
   onClickChargeAll = () => {
+    this.setState({ showChargeAllConfirm: true });
+  }
+
+  chargeAll = () => {
     this.props.dispatch(chargeAllCycle());
   }
 
@@ -299,10 +307,17 @@ class RunCycle extends Component {
       (<Button onClick={this.onClickRerun}>Re-run</Button>)
   )
 
-  renderChargeAllButton = () => (
-    this.getSelectedCycleStatus() === 'confirmed' &&
-      (<Button onClick={this.onClickChargeAll}>Charge All</Button>)
-  )
+  renderChargeAllButton = () => {
+    const { chargeStatus } = this.props;
+    let disabled = false;
+    let title = 'Charge All';
+    if (!chargeStatus.get('status', false)) {
+      disabled = true;
+      title = chargeStatus.get('amount_owed', 0) === 0 ? 'Nothing to charge' : 'Cycle running...';
+    }
+
+    return (<Button disabled={disabled} onClick={this.onClickChargeAll}>{title}</Button>);
+  }
 
   onRerunCancel = () => {
     this.setState({ showRerunConfirm: false });
@@ -326,6 +341,28 @@ class RunCycle extends Component {
     );
   }
 
+  onChargeAllCancel = () => {
+    this.setState({ showChargeAllConfirm: false });
+  }
+
+  onChargeAllOk = () => {
+    this.chargeAll();
+    this.setState({ showChargeAllConfirm: false });
+  }
+
+  renderChargeAllConfirmationModal = () => {
+    const { showChargeAllConfirm } = this.state;
+    const confirmMessage = 'Are you sure you want to run a "Charge All" request?';
+    const warningMessage = 'The action will charge all customers';
+    return (
+      <ConfirmModal onOk={this.onChargeAllOk} onCancel={this.onChargeAllCancel} show={showChargeAllConfirm} message={confirmMessage} labelOk="Yes">
+        <FormGroup validationState="error">
+          <HelpBlock>{warningMessage}</HelpBlock>
+        </FormGroup>
+      </ConfirmModal>
+    );
+  }
+
   render() {
     const { selectedCycle } = this.state;
     const billrunKey = selectedCycle.get('billrun_key', '');
@@ -336,37 +373,46 @@ class RunCycle extends Component {
     };
 
     return (
-      <Row>
-        <Col lg={12}>
-          <Panel header={this.renderPanelHeader()}>
-            <Form horizontal>
-              {this.renderFields()}
+      <div>
+        <Row>
+          <Col lg={12}>
+            <div className="pull-right" style={{ paddingBottom: 10 }}>
+              {this.renderChargeAllButton()}
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={12}>
+            <Panel header={this.renderPanelHeader()}>
+              <Form horizontal>
+                {this.renderFields()}
 
-              <FormGroup>
-                <Col sm={3} lg={2} componentClass={ControlLabel} />
-                <Col sm={6} lg={6}>
-                  {this.renderRunButton()}
-                  {this.renderRerunButton()}
-                  {this.renderChargeAllButton()}
-                </Col>
-              </FormGroup>
-            </Form>
+                <FormGroup>
+                  <Col sm={3} lg={2} componentClass={ControlLabel} />
+                  <Col sm={6} lg={6}>
+                    {this.renderRunButton()}
+                    {this.renderRerunButton()}
+                  </Col>
+                </FormGroup>
+              </Form>
 
-            {
-              shouldDisplayBillrunData &&
-              <CycleData
-                billrunKey={billrunKey}
-                selectedCycle={selectedCycle}
-                baseFilter={baseFilter}
-                reloadCycleData={this.reloadCycleData}
-                showConfirmAllButton={showConfirmAllButton}
-              />
-            }
+              {
+                shouldDisplayBillrunData &&
+                <CycleData
+                  billrunKey={billrunKey}
+                  selectedCycle={selectedCycle}
+                  baseFilter={baseFilter}
+                  reloadCycleData={this.reloadCycleData}
+                  showConfirmAllButton={showConfirmAllButton}
+                />
+              }
 
-            {this.renderRerunConfirmationModal()}
-          </Panel>
-        </Col>
-      </Row>
+              {this.renderRerunConfirmationModal()}
+              {this.renderChargeAllConfirmationModal()}
+            </Panel>
+          </Col>
+        </Row>
+      </div>
     );
   }
 }
@@ -374,6 +420,7 @@ class RunCycle extends Component {
 const mapStateToProps = state => ({
   cycles: state.list.get('cycles_list'),
   cycleAdditionalData: state.list.get('cycle_data', List()).get(0) || Map(),
+  chargeStatus: state.list.get('charge_status', List()).get(0) || Map(),
 });
 
 export default connect(mapStateToProps)(RunCycle);

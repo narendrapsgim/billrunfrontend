@@ -411,3 +411,8 @@ export const getAllInvoicesQuery = billrunKey => ({
     { project: JSON.stringify({ _id: 1 }) },
   ],
 });
+
+export const getChargeStatusQuery = () => ({
+  api: 'billrun',
+  action: 'chargestatus',
+});
