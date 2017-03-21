@@ -23,6 +23,8 @@ class RevisionList extends Component {
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    onActionEdit: PropTypes.func,
+    onActionClone: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -41,6 +43,8 @@ class RevisionList extends Component {
   isItemEditable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
 
   isItemRemovable = item => ['future'].includes(item.getIn(['revision_info', 'status'], ''));
+
+  isItemActive = item => ['active'].includes(item.getIn(['revision_info', 'status'], ''));
 
   parseEditShow = item => this.isItemEditable(item);
 
@@ -69,11 +73,15 @@ class RevisionList extends Component {
 
   onClickEdit = (item) => {
     const { itemName } = this.props;
-    const itemId = item.getIn(['_id', '$id']);
-    const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
-    const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
     this.props.onSelectItem();
-    this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
+    if (!this.props.onActionEdit) {
+      const itemId = getItemId(item, '');
+      const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+      const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
+      this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
+    } else {
+      this.props.onActionEdit(item, itemName);
+    }
   };
 
   onClickRemove = (item) => {
@@ -92,16 +100,20 @@ class RevisionList extends Component {
 
   onClickClone = (item) => {
     const { itemName } = this.props;
-    const itemId = item.getIn(['_id', '$id']);
-    const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
-    const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
     this.props.onSelectItem();
-    this.props.router.push({
-      pathname: `${itemsType}/${itemType}/${itemId}`,
-      query: {
-        action: 'clone',
-      },
-    });
+    if (!this.props.onActionClone) {
+      const itemId = getItemId(item, '');
+      const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+      const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
+      this.props.router.push({
+        pathname: `${itemsType}/${itemType}/${itemId}`,
+        query: {
+          action: 'clone',
+        },
+      });
+    } else {
+      this.props.onActionClone(item, itemName, 'clone');
+    }
   }
 
   onClickRemoveOk = () => {
@@ -126,14 +138,6 @@ class RevisionList extends Component {
     }
   }
 
-  getActiveRevision = () => {
-    const { items } = this.props;
-    return items.find(item => (
-      getItemDateValue(item, 'from', null).isBefore(moment())
-      && getItemDateValue(item, 'to', null).isAfter(moment())
-    ));
-  }
-
   getListFields = () => [
     { id: 'state', parser: this.parserState, cssClass: 'state' },
     { id: 'from', title: 'Start date', parser: this.parseFromDate, cssClass: 'short-date' },
@@ -152,7 +156,7 @@ class RevisionList extends Component {
     const { showConfirmRemove } = this.state;
     const fields = this.getListFields();
     const actions = this.getListActions();
-    const activeItem = this.getActiveRevision();
+    const activeItem = items.find(this.isItemActive);
     const removeConfirmMessage = 'Are you sure you want to remove this revision?';
     return (
       <div>

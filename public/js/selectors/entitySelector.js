@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { getConfig, isItemClosed, getItemId } from '../common/Util';
+import { getConfig, isItemClosed, getItemId, getItemMode } from '../common/Util';
 
 
 const getUniqueFiled = (state, props, entityName) =>
@@ -59,14 +59,7 @@ const selectFormMode = (action, id, item) => {
   }
 
   if (getItemId(item, false)) {
-    const status = item.getIn(['revision_info', 'status'], '');
-    if (['expired', 'active_with_future'].includes(status)) {
-      return 'view';
-    }
-    if (['future'].includes(status) || isItemClosed(item)) {
-      return 'update';
-    }
-    return 'closeandnew';
+    return getItemMode(item);
   }
   return 'loading';
 };

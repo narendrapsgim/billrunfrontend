@@ -77,5 +77,12 @@ var globalSetting = {
       itemType: 'subscription',
       itemsType: 'subscriptions',
     },
+    customer: {
+      collection: 'subscribers',
+      uniqueField: 'aid',
+      itemName: 'customer',
+      itemType: 'customer',
+      itemsType: 'customers',
+    },
   },
 };

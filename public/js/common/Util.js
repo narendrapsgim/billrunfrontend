@@ -29,6 +29,10 @@ export const getZiroTimeDate = (date = moment()) => {
   return dateWithoutTime;
 };
 
+export const getFirstName = item => item.get('first_name', item.get('firstname', ''));
+
+export const getLastName = item => item.get('last_name', item.get('lastname', ''));
+
 export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
   switch (mode) {
     case 'clone':
@@ -40,9 +44,13 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
       return 'Create';
     }
 
+    case 'loading':
     case 'closeandnew': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
+        if (entityName === 'subscription' || entityName === 'customer') {
+          return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        }
         return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'Edit';
@@ -51,6 +59,9 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'view': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
+        if (['subscription', 'customer'].includes(entityName)) {
+          return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        }
         return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'View';
@@ -59,6 +70,9 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'update': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
+        if (['subscription', 'customer'].includes(entityName)) {
+          return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        }
         return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
       return 'Update';
@@ -94,4 +108,21 @@ export const isItemClosed = (item) => {
   }
   const toTime = getItemDateValue(item, 'to');
   return toTime.isAfter(moment()) && toTime.isBefore(moment().add(50, 'years'));
+};
+
+export const getItemMode = (item, undefindItemStatus = 'create') => {
+  if (Immutable.Map.isMap(item)) {
+    if (getItemId(item, null) === null) {
+      return 'create';
+    }
+    const status = item.getIn(['revision_info', 'status'], '');
+    if (['expired', 'active_with_future'].includes(status)) {
+      return 'view';
+    }
+    if (['future'].includes(status) || isItemClosed(item)) {
+      return 'update';
+    }
+    return 'closeandnew';
+  }
+  return undefindItemStatus;
 };

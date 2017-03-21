@@ -335,7 +335,7 @@ export const getProductsByKeysQuery = (keys, project = {}) => ({
 export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => {
   let query = {};
   switch (collection) {
-    case 'subscription':
+    case 'subscribers':
       query = { [revisionBy]: value };
       break;
     default: query = { [revisionBy]: { $regex: `^${value}$` } };

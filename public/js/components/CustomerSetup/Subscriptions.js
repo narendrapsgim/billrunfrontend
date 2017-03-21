@@ -15,7 +15,8 @@ export default class Subscriptions extends Component {
     allServices: PropTypes.instanceOf(Immutable.List),
     defaultListFields: PropTypes.arrayOf(PropTypes.string),
     onSaveSubscription: PropTypes.func.isRequired,
-    getSubscription: PropTypes.func,
+    getSubscription: PropTypes.func.isRequired,
+    clearRevisions: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -30,11 +31,11 @@ export default class Subscriptions extends Component {
     subscription: null,
   }
 
-  onClickEdit = (row) => {
-    const id = getItemId(row, null);
+  fetchSubscription = (subscription, name, action) => {
+    const id = getItemId(subscription, null);
     if (id !== null) {
-      this.props.getSubscription(id).then((subscription) => {
-        this.setState({ subscription });
+      this.props.getSubscription(id, action).then((newSubscription) => {
+        this.setState({ subscription: newSubscription });
       });
     }
   }
@@ -67,17 +68,19 @@ export default class Subscriptions extends Component {
           settings={settings}
           aid={aid}
           onNew={this.onClickNew}
-          onClickEdit={this.onClickEdit}
+          onClickEdit={this.fetchSubscription}
           defaultListFields={defaultListFields}
         />
       );
     }
     return (
       <Subscription
+        subscription={subscription}
         settings={settings}
         allPlans={allPlans}
         allServices={allServices}
-        subscription={subscription}
+        clearRevisions={this.props.clearRevisions}
+        getSubscription={this.fetchSubscription}
         onSave={this.onClickSave}
         onCancel={this.onClickCancel}
       />

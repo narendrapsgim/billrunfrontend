@@ -84,8 +84,21 @@ export default class SubscriptionsList extends Component {
     { type: 'edit', helpText: 'Edit', onClick: this.props.onClickEdit, onClickColumn: 'sid' },
   ]
 
+  onActionEdit = (item) => {
+    this.props.onClickEdit(item);
+  }
+
+  onActionClone = (item) => {
+    this.props.onClickEdit(item, 'subscription', 'clone');
+  }
+
   parserState = item => (
-    <StateDetails item={item} itemName="subscriber" />
+    <StateDetails
+      item={item}
+      itemName="subscription"
+      onActionEdit={this.onActionEdit}
+      onActionClone={this.onActionClone}
+    />
   );
 
   addStateColumn = fields => ([

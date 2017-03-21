@@ -19,6 +19,8 @@ class EntityRevisionDetails extends Component {
     backToList: PropTypes.func,
     reLoadItem: PropTypes.func,
     clearRevisions: PropTypes.func,
+    onActionEdit: PropTypes.func,
+    onActionClone: PropTypes.func,
     itemName: PropTypes.string.isRequired,
     revisionItemsInTimeLine: PropTypes.number,
     router: PropTypes.shape({
@@ -65,8 +67,14 @@ class EntityRevisionDetails extends Component {
         const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
         const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
         const idx = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
-        const prevItemId = (idx !== -1) ? revisions.getIn([idx + 1, '_id', '$id'], revisions.getIn([idx - 1, '_id', '$id'], '')) : revisions.getIn([0, '_id', '$id'], '');
-        this.props.router.push(`${itemsType}/${itemType}/${prevItemId}`);
+        const prevItem = (idx !== -1)
+          ? revisions.get(idx + 1, revisions.get(idx - 1, ''))
+          : revisions.get(0, '');
+        if (!this.props.onActionEdit) {
+          this.props.router.push(`${itemsType}/${itemType}/${getItemId(prevItem)}`);
+        } else {
+          this.props.onActionEdit(prevItem);
+        }
       } else { // only one revision
         this.props.backToList(true);
       }
@@ -95,6 +103,8 @@ class EntityRevisionDetails extends Component {
           onSelectItem={this.hideManageRevisions}
           onDeleteItem={this.onDeleteItem}
           onCloseItem={this.onCloseItem}
+          onActionEdit={this.props.onActionEdit}
+          onActionClone={this.props.onActionClone}
         />
       </ModalWrapper>
     );
