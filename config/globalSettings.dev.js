@@ -70,6 +70,13 @@ var globalSetting = {
       itemType: 'product',
       itemsType: 'products',
     },
+    discount: {
+      collection: 'discounts',
+      uniqueField: 'key',
+      itemName: 'discount',
+      itemType: 'discount',
+      itemsType: 'discounts',
+    },
     subscription: {
       collection: 'subscribers',
       uniqueField: 'sid',

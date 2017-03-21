@@ -37,6 +37,8 @@ const getItem = (state, props, entityName) => {
     case 'customer':
     case 'subscription':
       return state.entity.get(entityName);
+    case 'discount':
+      return state.entity.get(entityName);
     default: {
       return state[entityName];
     }
