@@ -397,3 +397,8 @@ export const getConfirmCycleAllQuery = billrunKey => ({
     { stamp: billrunKey },
   ],
 });
+
+export const getChargeAllCycleQuery = () => ({
+  api: 'billrun',
+  action: 'chargeaccount',
+});

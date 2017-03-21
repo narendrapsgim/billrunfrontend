@@ -5,7 +5,7 @@ import { Map, List } from 'immutable';
 import Select from 'react-select';
 import { getCyclesQuery, getCycleQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
-import { runBillingCycle } from '../../actions/cycleActions';
+import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
 import ConfirmModal from '../../components/ConfirmModal';
 import CycleData from './CycleData';
 
@@ -128,7 +128,7 @@ class RunCycle extends Component {
   }
 
   onClickChargeAll = () => {
-    // TODO: implement after API is ready in BE
+    this.props.dispatch(chargeAllCycle());
   }
 
   onClickRefresh = () => {
@@ -301,7 +301,7 @@ class RunCycle extends Component {
 
   renderChargeAllButton = () => (
     this.getSelectedCycleStatus() === 'confirmed' &&
-      (<Button disabled={true} onClick={this.onClickChargeAll}>Charge All</Button>)
+      (<Button onClick={this.onClickChargeAll}>Charge All</Button>)
   )
 
   onRerunCancel = () => {

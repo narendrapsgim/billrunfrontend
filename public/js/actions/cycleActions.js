@@ -1,5 +1,5 @@
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
-import { getRunCycleQuery, getConfirmCycleInvoiceQuery, getConfirmCycleAllQuery } from '../common/ApiQueries';
+import { getRunCycleQuery, getConfirmCycleInvoiceQuery, getConfirmCycleAllQuery, getChargeAllCycleQuery } from '../common/ApiQueries';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const runBillingCycle = (billrunKey, rerun = false) => (dispatch) => { // eslint-disable-line import/prefer-default-export
@@ -24,4 +24,12 @@ export const confirmCycle = billrunKey => (dispatch) => {
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success, 'Cycle confirmed!')))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error confirming cycle')));
+};
+
+export const chargeAllCycle = () => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = getChargeAllCycleQuery();
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Charged all success!')))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error charging all')));
 };
