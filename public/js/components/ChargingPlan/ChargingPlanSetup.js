@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, Tabs, Tab, Panel } from 'react-bootstrap';
+import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
 import ChargingPlanDetails from './ChargingPlanDetails';
@@ -198,50 +198,48 @@ class ChargingPlanSetup extends Component {
     })).toJS();
     return (
       <div className="ChargingPlanSetup">
-        <Col lg={12} md={12}>
 
-          <Panel>
-            <EntityRevisionDetails
-              itemName="charging_plan"
-              revisions={revisions}
-              item={item}
-              mode={mode}
-              onChangeFrom={this.onChangeField}
-              backToList={this.handleBack}
-              reLoadItem={this.fetchItem}
-              clearRevisions={this.clearRevisions}
-            />
-          </Panel>
+        <Panel>
+          <EntityRevisionDetails
+            itemName="charging_plan"
+            revisions={revisions}
+            item={item}
+            mode={mode}
+            onChangeFrom={this.onChangeField}
+            backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
+          />
+        </Panel>
 
-          <Tabs defaultActiveKey={this.state.activeTab} id="ChargingPlan" animation={false} onSelect={this.handleSelectTab}>
+        <Tabs defaultActiveKey={this.state.activeTab} id="ChargingPlan" animation={false} onSelect={this.handleSelectTab}>
 
-            <Tab title="Details" eventKey={1}>
-              <Panel style={{ borderTop: 'none' }}>
-                <ChargingPlanDetails
-                  item={item}
-                  mode={mode}
-                  onChangeField={this.onChangeField}
-                />
-              </Panel>
-            </Tab>
+          <Tab title="Details" eventKey={1}>
+            <Panel style={{ borderTop: 'none' }}>
+              <ChargingPlanDetails
+                item={item}
+                mode={mode}
+                onChangeField={this.onChangeField}
+              />
+            </Panel>
+          </Tab>
 
-            <Tab title="Prepaid Buckets" eventKey={2}>
-              <Panel style={{ borderTop: 'none' }}>
-                <ChargingPlanIncludes
-                  mode={mode}
-                  includes={item.get('include', Immutable.Map())}
-                  prepaidIncludesOptions={prepaidIncludesOptions}
-                  onSelectPPInclude={this.onSelectPPInclude}
-                  onUpdatePeriodField={this.onUpdatePeriodField}
-                  onUpdateField={this.onUpdateIncludeField}
-                />
-              </Panel>
-            </Tab>
-          </Tabs>
+          <Tab title="Prepaid Buckets" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <ChargingPlanIncludes
+                mode={mode}
+                includes={item.get('include', Immutable.Map())}
+                prepaidIncludesOptions={prepaidIncludesOptions}
+                onSelectPPInclude={this.onSelectPPInclude}
+                onUpdatePeriodField={this.onUpdatePeriodField}
+                onUpdateField={this.onUpdateIncludeField}
+              />
+            </Panel>
+          </Tab>
+        </Tabs>
 
-          <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
 
-        </Col>
       </div>
     );
   }

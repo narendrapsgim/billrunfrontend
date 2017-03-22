@@ -22,3 +22,18 @@
 .btn-link {
   cursor: pointer;
 }
+
+@media all and (max-width: 768px) {
+  body {
+    margin-top: 90px;
+  }
+  #footer {
+      margin-left: 0!important;
+  }
+  #top-nav.collapse-sizebar ~ #footer {
+      margin-left: 0!important;
+  }
+  #top-nav.collapse-sizebar + #page-wrapper {
+    margin-left: 0!important;
+  }
+}

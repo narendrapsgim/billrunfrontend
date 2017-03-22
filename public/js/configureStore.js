@@ -16,9 +16,12 @@ export default function configureStore(initialState = {}) {
         sort: state.entityList.sort,
         state: state.entityList.state,
       },
+      guiState: {
+        menu: state.guiState.menu,
+      },
     }),
     deserialize: (serializedData) => {
-      const immutableDataKeys = ['entityList'];
+      const immutableDataKeys = ['entityList', 'guiState'];
       const parseData = JSON.parse(serializedData);
       if (parseData) {
         Object.keys(parseData).forEach((key) => {

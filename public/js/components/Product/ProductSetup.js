@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Col, Panel } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { EntityRevisionDetails } from '../Entity';
 import Product from './Product';
@@ -211,7 +211,7 @@ class ProductSetup extends Component {
     const allowEdit = mode !== 'view';
     const usaget = item.get('rates', Immutable.Map()).keySeq().first();
     return (
-      <Col lg={12}>
+      <div className="ProductSetup" >
 
         <Panel>
           <EntityRevisionDetails
@@ -245,7 +245,7 @@ class ProductSetup extends Component {
           hideSave={!allowEdit}
           cancelLabel={allowEdit ? undefined : 'Back'}
         />
-      </Col>
+      </div>
     );
   }
 }

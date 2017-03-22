@@ -82,7 +82,7 @@ class State extends Component {
         enableHTML
         data={this.getHistoryOptions()}
         onChange={this.onSelectState}
-        buttonWidth="200px"
+        buttonWidth="100%"
         nonSelectedText="Select State"
         allSelectedText="<span><div class='cycle all option' /> All States</span>"
         selectAllNumber={false}
