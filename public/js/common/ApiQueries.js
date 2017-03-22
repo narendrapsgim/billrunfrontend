@@ -416,3 +416,11 @@ export const getChargeStatusQuery = () => ({
   api: 'billrun',
   action: 'chargestatus',
 });
+
+export const getOperationsQuery = () => ({
+  api: 'operations',
+  params: [
+    { action: 'charge_accoun' },
+    { filteration: 'all' },
+  ],
+});

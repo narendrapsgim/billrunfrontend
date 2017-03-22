@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Col, Row, Panel, Form, FormGroup, ControlLabel, Label, Button, HelpBlock } from 'react-bootstrap';
 import { Map, List } from 'immutable';
 import Select from 'react-select';
-import { getCyclesQuery, getCycleQuery, getChargeStatusQuery } from '../../common/ApiQueries';
+import { getCyclesQuery, getCycleQuery, getChargeStatusQuery, getOperationsQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
 import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -16,17 +16,23 @@ class RunCycle extends Component {
     cycles: PropTypes.instanceOf(List),
     cycleAdditionalData: PropTypes.instanceOf(Map),
     chargeStatus: PropTypes.instanceOf(Map),
+    chargeStatusRefreshed: PropTypes.oneOfType([
+      PropTypes.instanceOf(Map),
+      PropTypes.instanceOf(List),
+    ]),
   };
 
   static defaultProps = {
     cycles: List(),
     cycleAdditionalData: Map(),
     chargeStatus: Map(),
+    chargeStatusRefreshed: Map(),
   };
 
   constructor(props) {
     super(props);
     this.autoRefresh = null;
+    this.autoRefreshChargingStatus = null;
   }
 
   state = {
@@ -38,6 +44,7 @@ class RunCycle extends Component {
     autoRefreshStep: 0,
     autoRefreshIterations: 0,
     showRefreshButton: false,
+    ChargedAllClicked: false,
   }
 
   componentDidMount() {
@@ -55,6 +62,7 @@ class RunCycle extends Component {
 
   componentWillUnmount() {
     this.unsetAutoRefresh();
+    clearTimeout(this.autoRefreshChargingStatus);
   }
 
   initAutoRefresh = () => {
@@ -65,6 +73,24 @@ class RunCycle extends Component {
       autoRefreshStep: 0,
     });
     this.autoRefresh = setTimeout(this.runAutoRefresh, this.refreshSteps[0].timeout);
+  }
+
+  initAutoRefreshChargingStatus = () => {
+    this.setState({ ChargedAllClicked: true });
+    clearTimeout(this.autoRefreshChargingStatus);
+    this.autoRefreshChargingStatus = setTimeout(() =>
+      this.runAutoRefreshChargingStatus(true), 10000);
+  }
+
+  runAutoRefreshChargingStatus = (firstTime = false) => {
+    const { chargeStatusRefreshed } = this.props;
+    clearTimeout(this.autoRefreshChargingStatus);
+    if (!firstTime && chargeStatusRefreshed.get('start_date', null) === null) {
+      this.setState({ ChargedAllClicked: false });
+      return;
+    }
+    this.props.dispatch(getList('charge_status_refresh', getOperationsQuery()));
+    this.autoRefreshChargingStatus = setTimeout(this.runAutoRefreshChargingStatus, 10000);
   }
 
   refreshSteps = [
@@ -136,6 +162,7 @@ class RunCycle extends Component {
   }
 
   chargeAll = () => {
+    this.initAutoRefreshChargingStatus();
     this.props.dispatch(chargeAllCycle());
   }
 
@@ -307,11 +334,21 @@ class RunCycle extends Component {
       (<Button onClick={this.onClickRerun}>Re-run</Button>)
   )
 
+  isChargingStatusProcessing = () => {
+    const { chargeStatusRefreshed } = this.props;
+    const { ChargedAllClicked } = this.state;
+    const processing = chargeStatusRefreshed.get('start_date', null) !== null;
+    return ChargedAllClicked && processing;
+  }
+
   renderChargeAllButton = () => {
     const { chargeStatus } = this.props;
     let disabled = false;
     let title = 'Charge All';
-    if (!chargeStatus.get('status', false)) {
+    if (this.isChargingStatusProcessing()) {
+      disabled = true;
+      title = 'Processing...';
+    } else if (!chargeStatus.get('status', false)) {
       disabled = true;
       title = chargeStatus.get('amount_owed', 0) === 0 ? 'Nothing to charge' : 'Cycle running...';
     }
@@ -346,8 +383,8 @@ class RunCycle extends Component {
   }
 
   onChargeAllOk = () => {
-    this.chargeAll();
     this.setState({ showChargeAllConfirm: false });
+    this.chargeAll();
   }
 
   renderChargeAllConfirmationModal = () => {
@@ -421,6 +458,7 @@ const mapStateToProps = state => ({
   cycles: state.list.get('cycles_list'),
   cycleAdditionalData: state.list.get('cycle_data', List()).get(0) || Map(),
   chargeStatus: state.list.get('charge_status', List()).get(0) || Map(),
+  chargeStatusRefreshed: state.list.get('charge_status_refresh', List()).get(0) || Map({}),
 });
 
 export default connect(mapStateToProps)(RunCycle);
