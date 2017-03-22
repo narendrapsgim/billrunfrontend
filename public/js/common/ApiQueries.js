@@ -358,3 +358,10 @@ export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 99
     { state: JSON.stringify([0, 1, 2]) },
   ],
 });
+
+export const getRebalanceAccountQuery = aid => ({
+  api: 'resetlines',
+  params: [
+    { aid },
+  ],
+});
