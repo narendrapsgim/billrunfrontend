@@ -83,13 +83,15 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
 };
 
 export const getItemDateValue = (item, fieldName, defaultValue = moment()) => {
-  const dateString = item.get(fieldName, false);
-  if (typeof dateString === 'string') {
-    return moment(dateString);
-  }
-  const dateUnix = item.getIn([fieldName, 'sec'], false);
-  if (typeof dateUnix === 'number') {
-    return moment.unix(dateUnix);
+  if (Immutable.Map.isMap(item)) {
+    const dateString = item.get(fieldName, false);
+    if (typeof dateString === 'string') {
+      return moment(dateString);
+    }
+    const dateUnix = item.getIn([fieldName, 'sec'], false);
+    if (typeof dateUnix === 'number') {
+      return moment.unix(dateUnix);
+    }
   }
   return defaultValue;
 };

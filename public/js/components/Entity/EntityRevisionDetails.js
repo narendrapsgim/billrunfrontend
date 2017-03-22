@@ -14,6 +14,7 @@ class EntityRevisionDetails extends Component {
   static propTypes = {
     revisions: PropTypes.instanceOf(Immutable.List),
     item: PropTypes.instanceOf(Immutable.Map),
+    minForm: PropTypes.instanceOf(moment),
     mode: PropTypes.string,
     onChangeFrom: PropTypes.func,
     backToList: PropTypes.func,
@@ -129,13 +130,17 @@ class EntityRevisionDetails extends Component {
   }
 
   filterDateAvailableFromDates = (date) => {
-    const { item, mode } = this.props;
+    const { item, mode, minForm } = this.props;
     if (['clone', 'create'].includes(mode)) {
       return true;
     }
     const tommorow = moment().add(1, 'days');
     const originalfrom = getItemDateValue(item, 'originalValue');
-    return originalfrom.isSame(date, 'day') || date.isSameOrAfter(tommorow, 'day');
+    const validDate = originalfrom.isSame(date, 'day') || date.isSameOrAfter(tommorow, 'day');
+    if (minForm) {
+      return validDate && date.isSameOrAfter(minForm, 'day');
+    }
+    return validDate;
   }
 
   renderDateFromfields = () => {
