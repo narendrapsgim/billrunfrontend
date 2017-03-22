@@ -9,7 +9,7 @@ import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
 import Credit from '../Credit/Credit';
 import { EntityRevisionDetails } from '../Entity';
-import { getConfig, getItemId, getFieldName, getItemMode, buildPageTitle } from '../../common/Util';
+import { getItemDateValue, getConfig, getItemId, getFieldName, getItemMode, buildPageTitle } from '../../common/Util';
 
 
 class Subscription extends Component {
@@ -90,30 +90,49 @@ class Subscription extends Component {
     this.props.onSave(subscription, mode);
   }
 
+  onChangeFrom = (path, value) => {
+    const { subscription } = this.state;
+    // update FROM field to added services
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const servicesList = services.map(service => service.get('name', '')).toArray();
+    const to = getItemDateValue(subscription, 'to', moment().add(100, 'years')).toISOString();
+    const newServices = this.updateServicesDates(servicesList, value, to);
+    const newSubscription = subscription.withMutations(subscriptionWithMutations =>
+      subscriptionWithMutations
+        .setIn(path, value)
+        .set('services', newServices)
+    );
+    this.setState({ subscription: newSubscription });
+  }
+
   onChangePlan = (plan) => {
     this.updateSubscriptionField(['plan'], plan);
   }
 
   onChangeService = (services) => {
-    const { subscription } = this.props;
+    const { subscription } = this.state;
     const servicesList = (services.length) ? services.split(',') : [];
-    const newServices = Immutable.List().withMutations((servicesWithMutations) => {
-      if (servicesList.length) {
-        servicesList.forEach((serviceName) => {
-          const subscriptionServices = subscription.get('services', Immutable.List()) || Immutable.List();
-          let entry = subscriptionServices.find(service => service.get('name') === serviceName);
-          if (!entry) {
-            entry = Immutable.Map({
-              name: serviceName,
-              from: moment().toISOString(),
-              to: subscription.get('to'),
-            });
-          }
-          servicesWithMutations.push(entry);
+    const from = getItemDateValue(subscription, 'from').toISOString();
+    const to = getItemDateValue(subscription, 'to', moment().add(100, 'years')).toISOString();
+    const newServices = this.updateServicesDates(servicesList, from, to);
+    this.updateSubscriptionField(['services'], newServices);
+  }
+
+  updateServicesDates = (servicesNames, from, to) => {
+    const { subscription } = this.props;
+    return Immutable.List().withMutations((servicesWithMutations) => {
+      if (servicesNames.length) {
+        servicesNames.forEach((name) => {
+          const originServices = subscription.get('services', Immutable.List()) || Immutable.List();
+          const service = originServices.find(
+            originService => originService.get('name') === name,
+            null,
+            Immutable.Map({ name, from, to })
+          );
+          servicesWithMutations.push(service);
         });
       }
     });
-    this.updateSubscriptionField(['services'], newServices);
   }
 
   onChangeCustomFields = (e) => {
@@ -278,7 +297,7 @@ class Subscription extends Component {
             revisions={revisions}
             item={subscription}
             mode={mode}
-            onChangeFrom={this.updateSubscriptionField}
+            onChangeFrom={this.onChangeFrom}
             backToList={this.props.onCancel}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
