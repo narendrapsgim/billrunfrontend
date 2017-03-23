@@ -117,7 +117,7 @@ class Customer extends Component {
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} md={2}>
-          Total debt
+          Total Debt
         </Col>
         <Col sm={7}>
           <div className="non-editble-field">{debt}{getSymbolFromCurrency(currency)}</div>
