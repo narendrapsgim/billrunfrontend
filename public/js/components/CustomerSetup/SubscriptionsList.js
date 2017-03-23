@@ -36,7 +36,14 @@ export default class SubscriptionsList extends Component {
 
   servicesParser = (subscription) => {
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
-    return services.map(service => service.get('name', '')).join(', ');
+    return services
+      .map((service) => {
+        if (service.get('quantity', null) !== null) {
+          return `${service.get('name', '')}(${service.get('quantity', '')})`;
+        }
+        return service.get('name', '');
+      })
+      .join(', ');
   }
 
   addressParser = (subscription) => {

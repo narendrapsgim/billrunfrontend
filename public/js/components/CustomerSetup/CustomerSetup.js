@@ -12,7 +12,7 @@ import PrepaidBalances from '../PrepaidBalances';
 import {
   getSubscriptionsByAidQuery,
   getPlansKeysQuery,
-  getServicesKeysQuery,
+  getServicesKeysWithInfoQuery,
   getPaymentGatewaysQuery,
 } from '../../common/ApiQueries';
 import {
@@ -86,7 +86,7 @@ class CustomerSetup extends Component {
     } else {
       this.props.dispatch(getList('available_gateways', getPaymentGatewaysQuery()));
       this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
-      this.props.dispatch(getList('available_services', getServicesKeysQuery()));
+      this.props.dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
     }
   }
 

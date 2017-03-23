@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Button, Panel } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Button, Panel, InputGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import moment from 'moment';
 import { titleCase } from 'change-case';
@@ -109,6 +109,17 @@ class Subscription extends Component {
     this.updateSubscriptionField(['plan'], plan);
   }
 
+  onChangeServiceQuantity = (serviceName, e) => {
+    const { value } = e.target;
+    const { subscription } = this.state;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const serviceIndex = services.findIndex(service => service.get('name', '') === serviceName);
+    if (serviceIndex > -1) {
+      const fixedValue = value > 1 ? value : 1; // not possible to add 0 for quantity service
+      this.updateSubscriptionField(['services', serviceIndex, 'quantity'], fixedValue);
+    }
+  }
+
   onChangeService = (services) => {
     const { subscription } = this.state;
     const servicesList = (services.length) ? services.split(',') : [];
@@ -119,16 +130,22 @@ class Subscription extends Component {
   }
 
   updateServicesDates = (servicesNames, from, to) => {
-    const { subscription } = this.props;
+    const { subscription, allServices } = this.props;
+    const originServices = subscription.get('services', Immutable.List()) || Immutable.List();
     return Immutable.List().withMutations((servicesWithMutations) => {
       if (servicesNames.length) {
         servicesNames.forEach((name) => {
-          const originServices = subscription.get('services', Immutable.List()) || Immutable.List();
-          const service = originServices.find(
+          // get existting or create new
+          let service = originServices.find(
             originService => originService.get('name') === name,
             null,
             Immutable.Map({ name, from, to })
           );
+          // if service type quantitative, set default quantity for new and fix existing
+          const serviceOption = allServices.find(option => option.get('name', '') === name);
+          if (serviceOption.get('quantitative', false) === true && !service.has('quantity')) {
+            service = service.set('quantity', 1);
+          }
           servicesWithMutations.push(service);
         });
       }
@@ -259,6 +276,31 @@ class Subscription extends Component {
     }).toArray();
   }
 
+  renderServisesQuentity = (editable) => {
+    const { subscription } = this.state;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    return services
+      .filter(service => service.get('quantity', null) !== null)
+      .map((service, key) => {
+        const serviceName = service.get('name', '');
+        const onChangeBind = (e) => { this.onChangeServiceQuantity(serviceName, e); };
+        return (
+          <FormGroup key={key}>
+            <Col componentClass={ControlLabel} sm={2}>
+              { `Service ${serviceName}` }
+            </Col>
+            <Col sm={7}>
+              <InputGroup>
+                <Field fieldType="number" min={1} value={service.get('quantity', '')} onChange={onChangeBind} editable={editable} />
+                <InputGroup.Addon>quantity</InputGroup.Addon>
+              </InputGroup>
+            </Col>
+          </FormGroup>
+        );
+      })
+      .toArray();
+  }
+
   renderCreditCharge = () => {
     const { subscription } = this.props;
     const { showCreditCharge } = this.state;
@@ -288,6 +330,7 @@ class Subscription extends Component {
     const title = buildPageTitle(mode, 'subscription', this.props.subscription);
     const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
+    const servisesQuentity = this.renderServisesQuentity(allowEdit);
     return (
       <div className="Subscription">
         <Panel header={title}>
@@ -309,6 +352,8 @@ class Subscription extends Component {
 
           <Form horizontal>
             { this.renderSystemFields(allowEdit) }
+            { servisesQuentity.length > 0 && <hr />}
+            { servisesQuentity.length > 0 && servisesQuentity }
             <hr />
             { this.renderCustomFields(allowEdit) }
             { allowAddCredit && <hr /> }

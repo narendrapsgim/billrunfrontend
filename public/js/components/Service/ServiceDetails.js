@@ -124,8 +124,8 @@ export default class ServiceDetails extends Component {
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Quantitative?</Col>
-          <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
-            <Field value={item.get('quantitative', '')} onChange={this.onChangeQuantitative} fieldType="checkbox" editable={editable} />
+          <Col sm={4} style={['clone', 'create'].includes(mode) ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+            <Field value={item.get('quantitative', '')} onChange={this.onChangeQuantitative} fieldType="checkbox" editable={['clone', 'create'].includes(mode)} />
           </Col>
         </FormGroup>
 
