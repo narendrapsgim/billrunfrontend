@@ -19,7 +19,7 @@ const PrepaidIncludesList = () => {
 
   return (
     <EntityList
-      collection="prepaidincludes"
+      collection="prepaid_buckets"
       itemType="prepaid_include"
       itemsType="prepaid_includes"
       filterFields={fields}
