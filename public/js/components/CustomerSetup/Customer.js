@@ -5,9 +5,11 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { Form, FormGroup, Col, Button, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
 import Field from '../Field';
-import { rebalanceAccount } from '../../actions/customerActions';
+import { rebalanceAccount, getCollectionDebt } from '../../actions/customerActions';
 import ConfirmModal from '../../components/ConfirmModal';
+import { currencySelector } from '../../selectors/settingsSelector';
 
 class Customer extends Component {
 
@@ -18,11 +20,13 @@ class Customer extends Component {
     onChangePaymentGateway: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
     action: PropTypes.string,
+    currency: PropTypes.string,
     fields: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
     action: 'create',
+    currency: '',
     customer: Immutable.Map(),
     fields: Immutable.List(),
     supportedGateways: Immutable.List(),
@@ -30,6 +34,7 @@ class Customer extends Component {
 
   state = {
     showRebalanceConfirmation: false,
+    debt: 0,
   };
 
   componentDidMount() {
@@ -37,6 +42,7 @@ class Customer extends Component {
     if (action === 'create') {
       this.initDefaultValues();
     }
+    this.initDebt();
   }
 
   initDefaultValues = () => {
@@ -50,6 +56,17 @@ class Customer extends Component {
         this.props.onChange(e);
       }
     });
+  }
+
+  initDebt = () => {
+    const { customer } = this.props;
+    const aid = customer.get('aid', null);
+    this.props.dispatch(getCollectionDebt(aid))
+      .then((response) => {
+        if (response.status) {
+          this.setState({ debt: response.data[aid].total2 });
+        }
+      });
   }
 
   onSelect = (value, field) => {
@@ -89,6 +106,21 @@ class Customer extends Component {
             <i className="fa fa-pencil" />
             &nbsp;{hasPaymentGateway ? 'Change' : 'Add'}
           </Button>
+        </Col>
+      </FormGroup>
+    );
+  }
+
+  renderDebt = () => {
+    const { currency } = this.props;
+    const { debt } = this.state;
+    return (
+      <FormGroup>
+        <Col componentClass={ControlLabel} md={2}>
+          Total debt
+        </Col>
+        <Col sm={7}>
+          <div className="non-editble-field">{debt}{getSymbolFromCurrency(currency)}</div>
         </Col>
       </FormGroup>
     );
@@ -153,7 +185,7 @@ class Customer extends Component {
 
   onRebalanceConfirmationOk = () => {
     const { customer } = this.props;
-    this.props.dispatch(rebalanceAccount(customer.get('aid')))
+    this.props.dispatch(rebalanceAccount(customer.get('aid')));
     this.onRebalanceConfirmationClose();
   }
 
@@ -192,6 +224,7 @@ class Customer extends Component {
         <Form horizontal>
           { this.renderFields() }
           { (action !== 'create') && this.renderChangePaymentGateway() }
+          { this.renderDebt() }
         </Form>
         {(action !== 'create') &&
           <div>
@@ -207,4 +240,8 @@ class Customer extends Component {
   }
 }
 
-export default connect()(Customer);
+const mapStateToProps = (state, props) => ({
+  currency: currencySelector(state, props),
+});
+
+export default connect(mapStateToProps)(Customer);

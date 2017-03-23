@@ -1,6 +1,6 @@
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { saveEntity, getEntityById, actions } from './entityActions';
-import { getRebalanceAccountQuery } from '../common/ApiQueries';
+import { getRebalanceAccountQuery, getCollectionDebtQuery } from '../common/ApiQueries';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 
@@ -38,4 +38,12 @@ export const rebalanceAccount = aid => (dispatch) => {
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success, 'Rebalance account request sent')))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error rebalancing account')));
+};
+
+export const getCollectionDebt = aid => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = getCollectionDebtQuery(aid);
+  return apiBillRun(query)
+    .then(response => dispatch(apiBillRunSuccessHandler(response)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error)));
 };

@@ -365,3 +365,11 @@ export const getRebalanceAccountQuery = aid => ({
     { aid },
   ],
 });
+
+export const getCollectionDebtQuery = aid => ({
+  api: 'bill',
+  params: [
+    { action: 'collection_debt' },
+    { aids: JSON.stringify([aid]) },
+  ],
+});
