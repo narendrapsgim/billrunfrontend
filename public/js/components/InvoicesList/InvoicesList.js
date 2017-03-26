@@ -9,6 +9,7 @@ import Filter from '../Filter';
 import List from '../List';
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
+import { getConfig } from '../../common/Util';
 
 
 class InvoicesList extends Component {
@@ -41,7 +42,7 @@ class InvoicesList extends Component {
     const { collection } = this.props;
     const { page, size, filter, sort } = this.state;
 
-    const query = Object.assign({}, filter, { action: 'query_bills_invoices' });
+    const query = Object.assign({}, filter, { action: 'query_bills_invoices', type: 'inv' });
     if (query.aid) {
       query.aid = { $in: [query.aid] };
     }
@@ -79,7 +80,7 @@ class InvoicesList extends Component {
   }
 
   downloadURL = (aid, billrunKey, invoiceId) =>
-    `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`
+    `${getConfig('serverUrl')}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`
 
   renderMainPanelTitle = () => (
     <div>

@@ -14,11 +14,14 @@ class EntityRevisionDetails extends Component {
   static propTypes = {
     revisions: PropTypes.instanceOf(Immutable.List),
     item: PropTypes.instanceOf(Immutable.Map),
+    minForm: PropTypes.instanceOf(moment),
     mode: PropTypes.string,
     onChangeFrom: PropTypes.func,
     backToList: PropTypes.func,
     reLoadItem: PropTypes.func,
     clearRevisions: PropTypes.func,
+    onActionEdit: PropTypes.func,
+    onActionClone: PropTypes.func,
     itemName: PropTypes.string.isRequired,
     revisionItemsInTimeLine: PropTypes.number,
     router: PropTypes.shape({
@@ -65,8 +68,14 @@ class EntityRevisionDetails extends Component {
         const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
         const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
         const idx = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
-        const prevItemId = (idx !== -1) ? revisions.getIn([idx + 1, '_id', '$id'], revisions.getIn([idx - 1, '_id', '$id'], '')) : revisions.getIn([0, '_id', '$id'], '');
-        this.props.router.push(`${itemsType}/${itemType}/${prevItemId}`);
+        const prevItem = (idx !== -1)
+          ? revisions.get(idx + 1, revisions.get(idx - 1, ''))
+          : revisions.get(0, '');
+        if (!this.props.onActionEdit) {
+          this.props.router.push(`${itemsType}/${itemType}/${getItemId(prevItem)}`);
+        } else {
+          this.props.onActionEdit(prevItem);
+        }
       } else { // only one revision
         this.props.backToList(true);
       }
@@ -95,6 +104,8 @@ class EntityRevisionDetails extends Component {
           onSelectItem={this.hideManageRevisions}
           onDeleteItem={this.onDeleteItem}
           onCloseItem={this.onCloseItem}
+          onActionEdit={this.props.onActionEdit}
+          onActionClone={this.props.onActionClone}
         />
       </ModalWrapper>
     );
@@ -119,13 +130,17 @@ class EntityRevisionDetails extends Component {
   }
 
   filterDateAvailableFromDates = (date) => {
-    const { item, mode } = this.props;
+    const { item, mode, minForm } = this.props;
     if (['clone', 'create'].includes(mode)) {
       return true;
     }
     const tommorow = moment().add(1, 'days');
     const originalfrom = getItemDateValue(item, 'originalValue');
-    return originalfrom.isSame(date, 'day') || date.isSameOrAfter(tommorow, 'day');
+    const validDate = originalfrom.isSame(date, 'day') || date.isSameOrAfter(tommorow, 'day');
+    if (minForm) {
+      return validDate && date.isSameOrAfter(minForm, 'day');
+    }
+    return validDate;
   }
 
   renderDateFromfields = () => {

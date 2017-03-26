@@ -2,7 +2,6 @@ import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
 import { getCurrenciesQuery } from '../common/ApiQueries';
-import { showSuccess } from './alertsActions';
 
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';

@@ -10,6 +10,7 @@ import Pager from './Pager';
 import State from './State';
 import Filter from './Filter';
 import StateDetails from './StateDetails';
+import Actions from '../Elements/Actions';
 import {
   getList,
   clearList,
@@ -58,6 +59,10 @@ class EntityList extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    listActions: PropTypes.oneOfType([
+      PropTypes.bool,
+      PropTypes.arrayOf(PropTypes.object),
+    ]),
   }
 
   static defaultProps = {
@@ -103,7 +108,11 @@ class EntityList extends Component {
     const filterChanged = !Immutable.is(this.props.filter, nextProps.filter);
     const sortChanged = !Immutable.is(this.props.sort, nextProps.sort);
     const stateChanged = !Immutable.is(this.props.state, nextProps.state);
-    if (pageChanged || sizeChanged || filterChanged || sortChanged || stateChanged) {
+    const baseFilterMap = (Immutable.fromJS(this.props.baseFilter));
+    const baseFilterNextMap = (Immutable.fromJS(nextProps.baseFilter));
+    const baseFilterChanged = !Immutable.is(baseFilterMap, baseFilterNextMap);
+    if (pageChanged || sizeChanged || filterChanged ||
+      sortChanged || stateChanged || baseFilterChanged) {
       this.fetchItems(nextProps);
     }
   }
@@ -208,15 +217,32 @@ class EntityList extends Component {
     ...fields,
   ])
 
+  getListActions = () => {
+    const { listActions } = this.props;
+    if (typeof listActions === 'undefined') {
+      return [{
+        type: 'add',
+        label: 'Add New',
+        actionStyle: 'default',
+        showIcon: true,
+        onClick: this.onClickNew,
+        actionSize: 'xsmall',
+        actionClass: 'btn-primary',
+      }];
+    }
+    if (listActions === false) {
+      return [];
+    }
+    return listActions;
+  }
+
   renderPanelHeader = () => {
     const { itemsType } = this.props;
     return (
       <div>
         List of all available {changeCase.noCase(itemsType)}
         <div className="pull-right">
-          <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}>
-            <i className="fa fa-plus" />&nbsp;Add New
-          </Button>
+          <Actions actions={this.getListActions()} />
         </div>
       </div>
     );
@@ -237,7 +263,7 @@ class EntityList extends Component {
       return null;
     }
     return (
-      <div className="pull-right" style={{ marginRight: 30 }}>
+      <div className="pull-right" style={{ marginRight: 40 }}>
         <State states={state} onChangeState={this.onStateChange} />
       </div>
     );
