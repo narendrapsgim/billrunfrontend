@@ -6,10 +6,13 @@ import moment from 'moment';
 import { Form, FormGroup, Col, Button, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
+import { rebalanceAccount } from '../../actions/customerActions';
+import ConfirmModal from '../../components/ConfirmModal';
 
 class Customer extends Component {
 
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     customer: PropTypes.instanceOf(Immutable.Map),
     supportedGateways: PropTypes.instanceOf(Immutable.List),
     onChangePaymentGateway: PropTypes.func.isRequired,
@@ -25,10 +28,14 @@ class Customer extends Component {
     supportedGateways: Immutable.List(),
   };
 
+  state = {
+    showRebalanceConfirmation: false,
+  };
+
   componentDidMount() {
     const { action } = this.props;
     if (action === 'create') {
-      this.initDefaultValues()
+      this.initDefaultValues();
     }
   }
 
@@ -136,6 +143,43 @@ class Customer extends Component {
       .map(this.renderField);
   }
 
+  onClickRebalance = () => {
+    this.setState({ showRebalanceConfirmation: true });
+  }
+
+  onRebalanceConfirmationClose = () => {
+    this.setState({ showRebalanceConfirmation: false });
+  }
+
+  onRebalanceConfirmationOk = () => {
+    const { customer } = this.props;
+    this.props.dispatch(rebalanceAccount(customer.get('aid')))
+    this.onRebalanceConfirmationClose();
+  }
+
+  renderRebalanceButton = () => {
+    const { customer } = this.props;
+    const { showRebalanceConfirmation } = this.state;
+    const confirmationTitle = `Are you sure you want to rebalance account ${customer.get('aid')}?`;
+    return (
+      <div>
+        <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickRebalance}>Rebalance</Button>
+        <ConfirmModal onOk={this.onRebalanceConfirmationOk} onCancel={this.onRebalanceConfirmationClose} show={showRebalanceConfirmation} message={confirmationTitle} labelOk="Yes">
+          <FormGroup>
+            Rebalance operation will send all customer billing lines
+            for recalculation price and bundles options.
+            It can take few hours to finish the recalculations.
+            Meanwhile lines pricing properties will be empty.
+            <br />
+            This operation is useful when an update is required with reference data
+            (plans, products, services, etc) that raised non-desired pricing results.
+            After fixing the reference data, the operation will recalculate the billing lines.
+          </FormGroup>
+        </ConfirmModal>
+      </div>
+    );
+  }
+
   render() {
     const { customer, action } = this.props;
     // in update mode wait for item before render edit screen
@@ -155,6 +199,7 @@ class Customer extends Component {
             { this.renderInCollection() }
             <p>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></p>
             <p>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link></p>
+            { this.renderRebalanceButton() }
           </div>
         }
       </div>
