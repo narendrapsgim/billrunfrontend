@@ -83,12 +83,12 @@
   },
   "discounts": {
     "title": "Discounts",
-    "icon": "fa-tags",
+    "icon": "",
     "route": "discounts",
     "show": true,
     "roles": [],
-    "order": 4,
-    "parent": "root"
+    "order": 2,
+    "parent": "postpaid"
   },
   "customers": {
     "title": "Customers",
@@ -118,7 +118,7 @@
     "parent": "root"
   },
   "run_cycle": {
-    "title": "run a billing cycle",
+    "title": "Run a Blling Cycle",
     "icon": "",
     "route": "run_cycle",
     "show": true,
