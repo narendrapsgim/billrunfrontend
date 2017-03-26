@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
+import { Panel, Tabs, Tab } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
 import PlanTab from './PlanTab';
@@ -209,7 +209,7 @@ class PlanSetup extends Component {
     const planRates = item.get('rates', Immutable.Map());
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
     return (
-      <Col lg={12}>
+      <div className="PlanSetup">
 
         <Panel>
           <EntityRevisionDetails
@@ -268,7 +268,7 @@ class PlanSetup extends Component {
           cancelLabel={allowEdit ? undefined : 'Back'}
           progress={progress}
         />
-      </Col>
+    </div>
     );
   }
 }

@@ -110,17 +110,15 @@ class App extends Component {
         <ProgressIndicator />
         <Alerts />
         <div className="container">
-          <Row>
-            <Col md={4} mdOffset={4}>
-              <div style={{ marginTop: '33%', textAlign: 'center' }}>
-                <img alt="logo" src={logo} style={{ height: 50 }} />
-                <br />
-                <br />
-                <br />
-                <p>Loading...</p>
-              </div>
-            </Col>
-          </Row>
+          <Col md={4} mdOffset={4}>
+            <div style={{ marginTop: '33%', textAlign: 'center' }}>
+              <img alt="logo" src={logo} style={{ height: 50 }} />
+              <br />
+              <br />
+              <br />
+              <p>Loading...</p>
+            </div>
+          </Col>
         </div>
       </div>
     );
@@ -131,9 +129,7 @@ class App extends Component {
       <ProgressIndicator />
       <Alerts />
       <div className="container">
-        <Row>
-          { this.props.children }
-        </Row>
+        { this.props.children }
       </div>
     </div>
   );
@@ -149,7 +145,7 @@ class App extends Component {
           <Row>
             <Col lg={12}>{title && <PageHeader>{title}</PageHeader> }</Col>
           </Row>
-          <Row>{children}</Row>
+          <div>{children}</div>
         </div>
         <Footer />
       </div>

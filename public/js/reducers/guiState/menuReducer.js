@@ -1,25 +1,22 @@
 import Immutable from 'immutable';
-import { PREPARE_MAIN_MENU_STRUCTURE, prossessMenuTree, combineMenuOverrides } from '../../actions/guiStateActions/menuActions';
+import { PREPARE_MAIN_MENU_STRUCTURE, TOGGLE_SIDE_BAR, prossessMenuTree, combineMenuOverrides } from '../../actions/guiStateActions/menuActions';
 
 const defaultState = Immutable.Map({
   main: null,
+  collapseSideBar: false,
 });
 
 const menuReducer = (state = defaultState, action) => {
   switch (action.type) {
+    case TOGGLE_SIDE_BAR: {
+      if (action.state === null) {
+        return state.set('collapseSideBar', !state.get('collapseSideBar', true));
+      }
+      return state.set('collapseSideBar', action.state);
+    }
+
     case PREPARE_MAIN_MENU_STRUCTURE: {
       const overrides = Immutable.fromJS(action.mainMenuOverrides);
-      // const mainMenuTree = Immutable.fromJS(mainMenu).withMutations(mainMenuTreeWithMutations => {
-      //   if (overrides && overrides.size) {
-      //     overrides.forEach((menuData, menuKey) => {
-      //       if (mainMenuTreeWithMutations.has(menuKey)) {
-      //         menuData.forEach((value, menuProperty) => {
-      //           mainMenuTreeWithMutations.setIn([menuKey, menuProperty], value);
-      //         });
-      //       }
-      //     });
-      //   }
-      // });
       return state.set('main', prossessMenuTree(combineMenuOverrides(overrides), 'root'));
     }
     default:

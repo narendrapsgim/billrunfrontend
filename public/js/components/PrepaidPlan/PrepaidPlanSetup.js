@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import moment from 'moment';
 import Immutable from 'immutable';
-import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
+import { Tabs, Tab, Panel } from 'react-bootstrap';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
 import PlanNotifications from './PlanNotifications';
 import BlockedProducts from './BlockedProducts';
@@ -240,88 +240,86 @@ class PrepaidPlanSetup extends Component {
     const planRates = item.get('rates', Immutable.Map());
     return (
       <div className="PrepaidPlan">
-        <Col lg={12}>
 
-          <Panel>
-            <EntityRevisionDetails
-              itemName="prepaid_plan"
-              revisions={revisions}
-              item={item}
-              mode={mode}
-              onChangeFrom={this.onChangePlanField}
-              backToList={this.handleBack}
-              reLoadItem={this.fetchItem}
-              clearRevisions={this.clearRevisions}
-            />
-          </Panel>
-
-          <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
-
-            <Tab title="Details" eventKey={1}>
-              <Panel style={{ borderTop: 'none' }}>
-                <PrepaidPlanDetails
-                  item={item}
-                  mode={mode}
-                  onChangePlanField={this.onChangePlanField}
-                />
-              </Panel>
-            </Tab>
-
-            <Tab title="Override Product Price" eventKey={2}>
-              <Panel style={{ borderTop: 'none' }}>
-                <PlanProductsPriceTab
-                  mode={mode}
-                  planRates={planRates}
-                  onChangeFieldValue={this.onChangePlanField}
-                />
-              </Panel>
-            </Tab>
-
-            <Tab title="Notifications" eventKey={3}>
-              <Panel style={{ borderTop: 'none' }}>
-                <PlanNotifications
-                  plan={item}
-                  mode={mode}
-                  ppIncludes={ppIncludes}
-                  onAddNotification={this.onAddNotification}
-                  onRemoveNotification={this.onRemoveNotification}
-                  onUpdateNotificationField={this.onUpdateNotificationField}
-                  onSelectBalance={this.onSelectBalance}
-                  onRemoveBalanceNotifications={this.onRemoveBalanceNotifications}
-                />
-              </Panel>
-            </Tab>
-
-            <Tab title="Blocked Products" eventKey={4}>
-              <Panel style={{ borderTop: 'none' }}>
-                <BlockedProducts
-                  plan={item}
-                  mode={mode}
-                  onSelectProduct={this.onSelectBlockProduct}
-                  onRemoveProduct={this.onRemoveBlockProduct}
-                />
-              </Panel>
-            </Tab>
-
-            <Tab title="Charging Limits" eventKey={5}>
-              <Panel style={{ borderTop: 'none' }}>
-                <Thresholds
-                  plan={item}
-                  mode={mode}
-                  ppIncludes={ppIncludes}
-                  onChangeThreshold={this.onChangeThreshold}
-                  onAddBalance={this.onAddBalanceThreshold}
-                />
-              </Panel>
-            </Tab>
-          </Tabs>
-          <ActionButtons
-            onClickCancel={this.handleBack}
-            onClickSave={this.handleSave}
-            hideSave={!allowEdit}
-            cancelLabel={allowEdit ? undefined : 'Back'}
+        <Panel>
+          <EntityRevisionDetails
+            itemName="prepaid_plan"
+            revisions={revisions}
+            item={item}
+            mode={mode}
+            onChangeFrom={this.onChangePlanField}
+            backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
           />
-        </Col>
+        </Panel>
+
+        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
+
+          <Tab title="Details" eventKey={1}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PrepaidPlanDetails
+                item={item}
+                mode={mode}
+                onChangePlanField={this.onChangePlanField}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Override Product Price" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanProductsPriceTab
+                mode={mode}
+                planRates={planRates}
+                onChangeFieldValue={this.onChangePlanField}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Notifications" eventKey={3}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanNotifications
+                plan={item}
+                mode={mode}
+                ppIncludes={ppIncludes}
+                onAddNotification={this.onAddNotification}
+                onRemoveNotification={this.onRemoveNotification}
+                onUpdateNotificationField={this.onUpdateNotificationField}
+                onSelectBalance={this.onSelectBalance}
+                onRemoveBalanceNotifications={this.onRemoveBalanceNotifications}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Blocked Products" eventKey={4}>
+            <Panel style={{ borderTop: 'none' }}>
+              <BlockedProducts
+                plan={item}
+                mode={mode}
+                onSelectProduct={this.onSelectBlockProduct}
+                onRemoveProduct={this.onRemoveBlockProduct}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Charging Limits" eventKey={5}>
+            <Panel style={{ borderTop: 'none' }}>
+              <Thresholds
+                plan={item}
+                mode={mode}
+                ppIncludes={ppIncludes}
+                onChangeThreshold={this.onChangeThreshold}
+                onAddBalance={this.onAddBalanceThreshold}
+              />
+            </Panel>
+          </Tab>
+        </Tabs>
+        <ActionButtons
+          onClickCancel={this.handleBack}
+          onClickSave={this.handleSave}
+          hideSave={!allowEdit}
+          cancelLabel={allowEdit ? undefined : 'Back'}
+        />
       </div>
     );
   }

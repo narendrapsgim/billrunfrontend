@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
+import { Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import { EntityRevisionDetails } from '../Entity';
@@ -175,7 +175,7 @@ class ServiceSetup extends Component {
     const allowEdit = mode !== 'view';
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
     return (
-      <Col lg={12}>
+      <div className="ServiceSetup">
         <Panel>
           <EntityRevisionDetails
             itemName="service"
@@ -217,7 +217,7 @@ class ServiceSetup extends Component {
           cancelLabel={allowEdit ? undefined : 'Back'}
           progress={progress}
         />
-      </Col>
+    </div>
     );
   }
 

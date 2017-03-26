@@ -263,7 +263,7 @@ class EntityList extends Component {
       return null;
     }
     return (
-      <div className="pull-right" style={{ marginRight: 40 }}>
+      <div className="pull-right">
         <State states={state} onChangeState={this.onStateChange} />
       </div>
     );
