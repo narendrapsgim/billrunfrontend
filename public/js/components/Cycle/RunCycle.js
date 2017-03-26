@@ -457,7 +457,7 @@ class RunCycle extends Component {
 const mapStateToProps = state => ({
   cycles: state.list.get('cycles_list'),
   cycleAdditionalData: state.list.get('cycle_data', List()).get(0) || Map(),
-  chargeStatus: state.list.get('charge_status', List()).get(0) || Map(),
+  chargeStatus: state.list.get('charge_status', Map()),
   chargeStatusRefreshed: state.list.get('charge_status_refresh', List()).get(0) || Map({}),
 });
 
