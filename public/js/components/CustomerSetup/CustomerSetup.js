@@ -10,9 +10,9 @@ import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import PostpaidBalances from '../PostpaidBalances';
 import PrepaidBalances from '../PrepaidBalances';
 import {
-  getSubscribersByAidQuery,
+  getSubscriptionsByAidQuery,
   getPlansKeysQuery,
-  getServicesKeysQuery,
+  getServicesKeysWithInfoQuery,
   getPaymentGatewaysQuery,
 } from '../../common/ApiQueries';
 import {
@@ -21,13 +21,16 @@ import {
   updateCustomerField,
   clearCustomer,
   getCustomer,
+  getSubscription,
+  setCloneSubscription,
 } from '../../actions/customerActions';
-import { clearItems } from '../../actions/entityListActions';
+import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { getList, clearList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { modeSelector, itemSelector, idSelector, tabSelector } from '../../selectors/entitySelector';
+import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 
 
 class CustomerSetup extends Component {
@@ -37,11 +40,13 @@ class CustomerSetup extends Component {
     aid: PropTypes.number,
     mode: PropTypes.string,
     customer: PropTypes.instanceOf(Immutable.Map),
+    subscription: PropTypes.instanceOf(Immutable.Map),
     settings: PropTypes.instanceOf(Immutable.Map),
     subscriptions: PropTypes.instanceOf(Immutable.List),
     plans: PropTypes.instanceOf(Immutable.List),
     services: PropTypes.instanceOf(Immutable.List),
     gateways: PropTypes.instanceOf(Immutable.List),
+    defaultSubsctiptionListFields: PropTypes.array,
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -59,42 +64,42 @@ class CustomerSetup extends Component {
   static defaultProps = {
     activeTab: 1,
     customer: Immutable.Map(),
+    subscription: Immutable.Map(),
     settings: Immutable.Map(),
     subscriptions: Immutable.List(),
     gateways: Immutable.List(),
     plans: Immutable.List(),
     services: Immutable.List(),
+    defaultSubsctiptionListFields: ['sid', 'firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
   };
 
-  componentDidMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(setPageTitle('Edit Customer'));
-      this.props.dispatch(getCustomer(itemId))
-      .then((response) => {
-        if (response.status) {
-          this.props.dispatch(getList('subscriptions', getSubscribersByAidQuery(this.props.aid)));
-        }
-      });
-      this.props.dispatch(getList('available_gateways', getPaymentGatewaysQuery()));
-      this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
-      this.props.dispatch(getList('available_services', getServicesKeysQuery()));
-    } else {
-      this.props.dispatch(setPageTitle('Create New Customer'));
-    }
-    this.props.dispatch(getSettings('subscribers'));
+  componentWillMount() {
+    this.props.dispatch(getSettings('subscribers'))
+      .then(() => this.fetchItem());
   }
 
+  componentDidMount() {
+    const { mode } = this.props;
+    if (['clone', 'create'].includes(mode)) {
+      const pageTitle = buildPageTitle(mode, 'customer');
+      this.props.dispatch(setPageTitle(pageTitle));
+    } else {
+      this.props.dispatch(getList('available_gateways', getPaymentGatewaysQuery()));
+      this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
+      this.props.dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
+    }
+  }
+
+
   componentWillReceiveProps(nextProps) {
-    const { customer: oldItem } = this.props;
-    const { customer: item, mode } = nextProps;
-    if (mode !== 'create') {
-      if (oldItem.getIn(['_id', '$id'], null) === null && item.getIn(['_id', '$id'], null) !== null) {
-        const firstName = this.getFirstName(item);
-        const lastName = this.getLastName(item);
-        const newTitle = `Edit Customer - ${firstName} ${lastName}`;
-        this.props.dispatch(setPageTitle(newTitle));
-      }
+    const { customer, mode, itemId } = nextProps;
+    const { customer: oldCustomer, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(customer) !== getItemId(oldCustomer)) {
+      const pageTitle = buildPageTitle(mode, 'customer', customer);
+      this.props.dispatch(setPageTitle(pageTitle));
+    }
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -105,6 +110,25 @@ class CustomerSetup extends Component {
     this.props.dispatch(clearList('available_services'));
   }
 
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getCustomer(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  afterItemReceived = (response) => {
+    if (response.status) {
+      this.getSubscriptions(this.props.aid);
+    } else {
+      this.handleBack();
+    }
+  }
+
+  getSubscriptions = (aid) => {
+    const listFields = this.getSubsctiptionListProject();
+    this.props.dispatch(getList('subscriptions', getSubscriptionsByAidQuery(aid, listFields)));
+  }
+
   onChangeCustomerField = (e) => {
     const { value, id } = e.target;
     this.props.dispatch(updateCustomerField(id, value));
@@ -113,10 +137,9 @@ class CustomerSetup extends Component {
   afterSaveCustomer = (response) => {
     const { mode } = this.props;
     if (response.status) {
-      this.props.dispatch(clearItems('customers')); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'create') ? 'created' : 'updated';
-      this.props.dispatch(showSuccess(`Customer was ${action}`));
-      this.onBack();
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The customer was ${action}`));
+      this.handleBack(true);
     }
   }
 
@@ -139,20 +162,59 @@ class CustomerSetup extends Component {
   afterSaveSubscription = (response) => {
     const { aid } = this.props;
     if (response.status) {
-      this.props.dispatch(showSuccess('Customer was updated'));
-      this.props.dispatch(getList('subscriptions', getSubscribersByAidQuery(aid)));
+      const action = (['clone', 'create'].includes(response.action)) ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The subscription was ${action}`));
+      this.clearSubscriptionRevisions(response.subscription);
+      this.getSubscriptions(aid);
       return true;
     }
     return false;
   }
 
-  onBack = () => {
-    this.props.router.push('/customers');
+  clearSubscriptionRevisions = (subscription) => {
+    const key = subscription.get('sid', '');
+    this.props.dispatch(clearRevisions('subscribers', key));// refetch items list because item was (changed in / added to) list
   }
 
-  getFirstName = item => item.get('first_name', item.get('firstname', ''));
+  handleBack = (itemWasChanged = false) => {
+    if (itemWasChanged) {
+      this.props.dispatch(clearItems('customers')); // refetch items list because item was (changed in / added to) list
+    }
+    const listUrl = getConfig(['systemItems', 'customer', 'itemsType'], '');
+    this.props.router.push(`/${listUrl}`);
+  }
 
-  getLastName = item => item.get('last_name', item.get('lastname', ''));
+  getSubscription = (id, mode) => this.props.dispatch(getSubscription(id))
+    .then((response) => {
+      if (response.status) {
+        if (mode === 'clone') {
+          this.props.dispatch(setCloneSubscription());
+          return this.props.subscription;
+        }
+        const key = this.props.subscription.get('sid', '');
+        this.props.dispatch(getRevisions('subscribers', 'sid', key));
+        return this.props.subscription;
+      }
+      return null;
+    });
+
+  getSubsctiptionListProject = () => {
+    const { settings, defaultSubsctiptionListFields } = this.props;
+    return Immutable.Map().withMutations((fieldsWithMutations) => {
+      fieldsWithMutations.set('from', 1);
+      fieldsWithMutations.set('to', 1);
+      fieldsWithMutations.set('revision_info', 1);
+      defaultSubsctiptionListFields.forEach((defaultSubsctiptionListField) => {
+        fieldsWithMutations.set(defaultSubsctiptionListField, 1);
+      });
+      settings
+        .getIn(['subscriber', 'fields'], Immutable.List())
+        .filter(field => field.get('show_in_list', false))
+        .forEach((field) => {
+          fieldsWithMutations.set(field.get('field_name', ''), 1);
+        });
+    }).toJS();
+  }
 
   getReturnUrl = () => {
     const { itemId } = this.props;
@@ -171,6 +233,7 @@ class CustomerSetup extends Component {
     const {
       customer,
       subscriptions,
+      defaultSubsctiptionListFields,
       settings,
       plans,
       services,
@@ -181,9 +244,8 @@ class CustomerSetup extends Component {
     } = this.props;
     const showActionButtons = (activeTab === 1);
 
-    // in update mode wait for plan before render edit screen
-    if ((mode !== 'create' && typeof customer.getIn(['_id', '$id']) === 'undefined')) {
-      return (<LoadingItemPlaceholder onClick={this.onBack} />);
+    if (mode === 'loading') {
+      return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const accountFields = settings.getIn(['account', 'fields'], Immutable.List());
@@ -219,6 +281,9 @@ class CustomerSetup extends Component {
                       allPlans={plans}
                       allServices={services}
                       onSaveSubscription={this.onSaveSubscription}
+                      defaultListFields={defaultSubsctiptionListFields}
+                      getSubscription={this.getSubscription}
+                      clearRevisions={this.clearSubscriptionRevisions}
                     />
                   </Panel>
                 </Tab>
@@ -241,7 +306,7 @@ class CustomerSetup extends Component {
           </div>
         </div>
         { showActionButtons &&
-          <ActionButtons onClickSave={this.onSaveCustomer} onClickCancel={this.onBack} />
+          <ActionButtons onClickSave={this.onSaveCustomer} onClickCancel={this.handleBack} />
         }
       </div>
     );
@@ -252,6 +317,7 @@ class CustomerSetup extends Component {
 const mapStateToProps = (state, props) => ({
   itemId: idSelector(state, props, 'customer'),
   customer: itemSelector(state, props, 'customer'),
+  subscription: itemSelector(state, props, 'subscription'),
   mode: modeSelector(state, props, 'customer'),
   activeTab: tabSelector(state, props),
   aid: state.entity.getIn(['customer', 'aid']) || undefined,
