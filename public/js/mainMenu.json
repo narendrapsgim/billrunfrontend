@@ -109,7 +109,7 @@
     "parent": "root"
   },
   "cycle": {
-    "title": "Billing cycle",
+    "title": "Billing Cycle",
     "icon": "fa-clock-o",
     "route": "",
     "show": true,
@@ -118,7 +118,7 @@
     "parent": "root"
   },
   "run_cycle": {
-    "title": "Run a Blling Cycle",
+    "title": "Run",
     "icon": "",
     "route": "run_cycle",
     "show": true,
