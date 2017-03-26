@@ -2,7 +2,6 @@ import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { fetchPlanByIdQuery, getAllGroupsQuery, fetchPrepaidGroupByIdQuery } from '../common/ApiQueries';
 import { saveEntity } from '../actions/entityActions';
-import { getConfig } from '../common/Util';
 
 export const PLAN_GOT = 'PLAN_GOT';
 export const PLAN_CLEAR = 'PLAN_CLEAR';
@@ -150,7 +149,7 @@ export const getPrepaidGroup = id => (dispatch) => {
       dispatch(gotItem(item));
       return dispatch(apiBillRunSuccessHandler(response));
     })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving plan')));
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving prepaid group')));
 };
 
 export const getAllGroup = () => apiBillRun(getAllGroupsQuery());

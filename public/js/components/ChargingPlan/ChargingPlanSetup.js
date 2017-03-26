@@ -115,7 +115,7 @@ class ChargingPlanSetup extends Component {
 
   fetchItem = (itemId = this.props.itemId) => {
     if (itemId) {
-      this.props.dispatch(getPrepaidGroup(itemId)).then(this.afterItemReceived); // TODO: the problem is here!!
+      this.props.dispatch(getPrepaidGroup(itemId)).then(this.afterItemReceived);
     }
   }
 
