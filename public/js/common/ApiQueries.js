@@ -437,3 +437,28 @@ export const getOperationsQuery = () => ({
     { filteration: 'all' },
   ],
 });
+
+export const getCollectionDebtQuery = aid => ({
+  api: 'bill',
+  params: [
+    { action: 'collection_debt' },
+    { aids: JSON.stringify([aid]) },
+  ],
+});
+
+export const getOfflinePaymentQuery = (method, aid, amount, payerName, chequeNo) => ({
+  api: 'pay',
+  params: [
+    { method },
+    { payments: JSON.stringify([{
+      amount,
+      aid,
+      payer_name: payerName,
+      dir: 'fc',
+      deposit_slip: '',
+      deposit_slip_bank: '',
+      cheque_no: chequeNo,
+      source: '',
+    }]) },
+  ],
+});
