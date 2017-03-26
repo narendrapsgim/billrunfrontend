@@ -74,7 +74,7 @@ class CustomerSetup extends Component {
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings('subscribers'))
+    this.props.dispatch(getSettings(['subscribers', 'billrun']))
       .then(() => this.fetchItem());
   }
 
