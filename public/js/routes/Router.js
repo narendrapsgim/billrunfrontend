@@ -22,6 +22,7 @@ import ExportGenerator from '../components/ExportGenerator';
 import ExportGeneratorsList from '../components/ExportGeneratorsList';
 import InputProcessor from '../components/InputProcessor';
 import UsageList from '../components/UsageList';
+import RunCycle from '../components/Cycle';
 import QueueList from '../components/QueueList';
 import InvoicesList from '../components/InvoicesList';
 import Settings from '../components/Settings';
@@ -105,6 +106,7 @@ const routes = () => (
     <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator" />
     <Route path="/export_generators" component={RequireAuth(ExportGeneratorsList)} title="Export Generators" />
     <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
+    <Route path="/run_cycle" component={RequireAuth(RunCycle)} title="Billing Cycle" />
     <Route path="/queue" component={RequireAuth(QueueList)} title="Queue" />
     <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
     <Route path="/settings" component={RequireAuth(Settings)} title="General Settings" />

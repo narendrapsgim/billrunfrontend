@@ -371,3 +371,69 @@ export const getRebalanceAccountQuery = aid => ({
     { aid },
   ],
 });
+
+export const getCyclesQuery = () => ({
+  api: 'billrun',
+  action: 'cycles',
+});
+
+export const getCycleQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'cycle',
+  params: [
+    { stamp: billrunKey },
+  ],
+});
+
+export const getRunCycleQuery = (billrunKey, rerun) => ({
+  api: 'billrun',
+  action: 'completecycle',
+  params: [
+    { stamp: billrunKey },
+    { rerun },
+  ],
+});
+
+export const getConfirmCycleInvoiceQuery = (billrunKey, invoiceId) => ({
+  api: 'billrun',
+  action: 'cycleconfirmation',
+  params: [
+    { stamp: billrunKey },
+    { invoices: JSON.stringify([invoiceId.toString()]) },
+  ],
+});
+
+export const getConfirmCycleAllQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'cycleconfirmation',
+  params: [
+    { stamp: billrunKey },
+  ],
+});
+
+export const getChargeAllCycleQuery = () => ({
+  api: 'billrun',
+  action: 'chargeaccount',
+});
+
+export const getAllInvoicesQuery = billrunKey => ({
+  action: 'get',
+  entity: 'billrun',
+  params: [
+    { query: JSON.stringify({ billrun_key: billrunKey }) },
+    { project: JSON.stringify({ _id: 1 }) },
+  ],
+});
+
+export const getChargeStatusQuery = () => ({
+  api: 'billrun',
+  action: 'chargestatus',
+});
+
+export const getOperationsQuery = () => ({
+  api: 'operations',
+  params: [
+    { action: 'charge_accoun' },
+    { filteration: 'all' },
+  ],
+});
