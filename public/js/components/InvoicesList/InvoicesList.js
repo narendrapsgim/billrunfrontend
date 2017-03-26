@@ -41,7 +41,7 @@ class InvoicesList extends Component {
     const { collection } = this.props;
     const { page, size, filter, sort } = this.state;
 
-    const query = Object.assign({}, filter, { action: 'query_bills_invoices' });
+    const query = Object.assign({}, filter, { action: 'query_bills_invoices', type: 'inv' });
     if (query.aid) {
       query.aid = { $in: [query.aid] };
     }
