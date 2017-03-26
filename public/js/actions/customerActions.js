@@ -1,4 +1,7 @@
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { saveEntity, getEntityById, actions } from './entityActions';
+import { getRebalanceAccountQuery } from '../common/ApiQueries';
+import { startProgressIndicator } from './progressIndicatorActions';
 
 
 export function getCustomer(id) {
@@ -28,3 +31,11 @@ export function clearCustomer() {
     collection: 'customer',
   };
 }
+
+export const rebalanceAccount = aid => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = getRebalanceAccountQuery(aid);
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Rebalance account request sent')))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error rebalancing account')));
+};
