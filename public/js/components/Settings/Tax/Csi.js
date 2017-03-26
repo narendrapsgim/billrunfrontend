@@ -50,8 +50,8 @@ class Csi extends Component {
 
   renderProviderOptions = () => {
     const { csi } = this.props;
-    return csi.get('providers', ['03']).map(option => (
-      <option key={option} value={option}>{option}</option>
+    return csi.get('available_providers',Immutable.Map({})).map((name, key) => (
+      <option key={key} value={key}>{name}</option>
     ));
   }
 

@@ -19,7 +19,7 @@ class CustomersList extends Component {
 
   static defaultProps = {
     accountFields: null,
-    accountAllwaysShownFields: Immutable.List(['firstname', 'lastname']),
+    accountAllwaysShownFields: Immutable.List(['aid', 'firstname', 'lastname']),
   };
 
   componentDidMount() {

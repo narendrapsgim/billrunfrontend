@@ -196,7 +196,7 @@ class ProductSetup extends Component {
 
   handleBack = (itemWasChanged = false) => {
     if (itemWasChanged) {
-      this.props.dispatch(clearItems('product')); // refetch items list because item was (changed in / added to) list
+      this.props.dispatch(clearItems('products')); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = getConfig(['systemItems', 'product', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);

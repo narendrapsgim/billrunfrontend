@@ -7,6 +7,9 @@ const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
 const getPricing = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['pricing']);
 
+const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
+      state.settings.get('billrun');
+
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
   const defaultUsaget = inputProssesor.getIn(['processor', 'default_usaget'], '');
@@ -59,7 +62,17 @@ export const pricingSelector = createSelector(
   pricing => pricing
 );
 
+export const billrunSelector = createSelector(
+  getBillrun,
+  billrun => billrun
+);
+
 export const currencySelector = createSelector(
   pricingSelector,
-  pricing => pricing.get('currency')
+  (pricing = Immutable.Map()) => pricing.get('currency')
+);
+
+export const chargingDaySelector = createSelector(
+  billrunSelector,
+  (billrun = Immutable.Map()) => billrun.get('charging_day')
 );

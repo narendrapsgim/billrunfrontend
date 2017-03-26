@@ -25,6 +25,8 @@ const StateIcon = ({ from, to, status }) => {
 
 StateIcon.propTypes = {
   status: PropTypes.string,
+  from: PropTypes.string,
+  to: PropTypes.string,
 };
 
 StateIcon.defaultProps = {

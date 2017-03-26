@@ -210,14 +210,14 @@ export const getGroupsQuery = collection => ({
   ],
 });
 
-export const getSubscribersByAidQuery = aid => ({
+export const getSubscriptionsByAidQuery = (aid, project = {}) => ({
   action: 'uniqueget',
   entity: 'subscribers',
   params: [
     { query: JSON.stringify({ aid }) },
     { page: 0 },
     { size: 9999 },
-    { project: JSON.stringify({ from: 0 }) },
+    { project: JSON.stringify(project) },
   ],
 });
 
@@ -278,6 +278,7 @@ export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
 export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
 export const fetchDiscountByIdQuery = id => getEntityByIdQuery('discounts', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
+export const fetchPrepaidGroupByIdQuery = id => getEntityByIdQuery('prepaidgroups', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);
 
 export const getProductByKeyQuery = key => ({
@@ -336,25 +337,128 @@ export const getEntitesByKeysQuery = (entity, keyField, keys, project = {}) => (
 export const getServicesByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('services', 'name', keys, project);
 export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('rates', 'key', keys, project);
 
-export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => ({
-  action: 'get',
-  entity: collection,
+export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => {
+  let query = {};
+  switch (collection) {
+    case 'subscribers':
+      query = { [revisionBy]: value };
+      break;
+    default: query = { [revisionBy]: { $regex: `^${value}$` } };
+  }
+  return ({
+    action: 'get',
+    entity: collection,
+    params: [
+      { sort: JSON.stringify({ from: -1 }) },
+      { query: JSON.stringify(query) },
+      { project: JSON.stringify({
+        from: 1,
+        to: 1,
+        description: 1,
+        [revisionBy]: 1,
+        revision_info: 1,
+      }) },
+      { page: 0 },
+      { size },
+      { state: JSON.stringify([0, 1, 2]) },
+    ],
+  });
+};
+
+export const getRebalanceAccountQuery = aid => ({
+  api: 'resetlines',
   params: [
-    { sort: JSON.stringify({ from: -1 }) },
-    { query: JSON.stringify({
-      [revisionBy]: {
-        $regex: `^${value}$`,
-      },
-    }) },
-    { project: JSON.stringify({
-      from: 1,
-      to: 1,
-      description: 1,
-      [revisionBy]: 1,
-      revision_info: 1,
-    }) },
-    { page: 0 },
-    { size },
-    { state: JSON.stringify([0, 1, 2]) },
+    { aid },
+  ],
+});
+
+export const getCyclesQuery = () => ({
+  api: 'billrun',
+  action: 'cycles',
+});
+
+export const getCycleQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'cycle',
+  params: [
+    { stamp: billrunKey },
+  ],
+});
+
+export const getRunCycleQuery = (billrunKey, rerun) => ({
+  api: 'billrun',
+  action: 'completecycle',
+  params: [
+    { stamp: billrunKey },
+    { rerun },
+  ],
+});
+
+export const getConfirmCycleInvoiceQuery = (billrunKey, invoiceId) => ({
+  api: 'billrun',
+  action: 'cycleconfirmation',
+  params: [
+    { stamp: billrunKey },
+    { invoices: JSON.stringify([invoiceId.toString()]) },
+  ],
+});
+
+export const getConfirmCycleAllQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'cycleconfirmation',
+  params: [
+    { stamp: billrunKey },
+  ],
+});
+
+export const getChargeAllCycleQuery = () => ({
+  api: 'billrun',
+  action: 'chargeaccount',
+});
+
+export const getAllInvoicesQuery = billrunKey => ({
+  action: 'get',
+  entity: 'billrun',
+  params: [
+    { query: JSON.stringify({ billrun_key: billrunKey }) },
+    { project: JSON.stringify({ _id: 1 }) },
+  ],
+});
+
+export const getChargeStatusQuery = () => ({
+  api: 'billrun',
+  action: 'chargestatus',
+});
+
+export const getOperationsQuery = () => ({
+  api: 'operations',
+  params: [
+    { action: 'charge_accoun' },
+    { filteration: 'all' },
+  ],
+});
+
+export const getCollectionDebtQuery = aid => ({
+  api: 'bill',
+  params: [
+    { action: 'collection_debt' },
+    { aids: JSON.stringify([aid]) },
+  ],
+});
+
+export const getOfflinePaymentQuery = (method, aid, amount, payerName, chequeNo) => ({
+  api: 'pay',
+  params: [
+    { method },
+    { payments: JSON.stringify([{
+      amount,
+      aid,
+      payer_name: payerName,
+      dir: 'fc',
+      deposit_slip: '',
+      deposit_slip_bank: '',
+      cheque_no: chequeNo,
+      source: '',
+    }]) },
   ],
 });

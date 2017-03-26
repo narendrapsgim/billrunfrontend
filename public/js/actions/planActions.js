@@ -1,8 +1,7 @@
 import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
-import { fetchPlanByIdQuery, getAllGroupsQuery } from '../common/ApiQueries';
+import { fetchPlanByIdQuery, getAllGroupsQuery, fetchPrepaidGroupByIdQuery } from '../common/ApiQueries';
 import { saveEntity } from '../actions/entityActions';
-import { getConfig } from '../common/Util';
 
 export const PLAN_GOT = 'PLAN_GOT';
 export const PLAN_CLEAR = 'PLAN_CLEAR';
@@ -125,6 +124,8 @@ export const addUsagetInclude = (usaget, ppIncludesName, ppIncludesExternalId) =
 
 export const savePlan = (plan, action) => saveEntity('plans', plan, action);
 
+export const savePrepaidGroup = (prepaidGroup, action) => saveEntity('prepaidgroups', prepaidGroup, action);
+
 export const getPlan = id => (dispatch) => {
   dispatch(startProgressIndicator());
   const query = fetchPlanByIdQuery(id);
@@ -136,6 +137,19 @@ export const getPlan = id => (dispatch) => {
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving plan')));
+};
+
+export const getPrepaidGroup = id => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = fetchPrepaidGroupByIdQuery(id);
+  return apiBillRun(query)
+    .then((response) => {
+      const item = response.data[0].data.details[0];
+      item.originalValue = item.from;
+      dispatch(gotItem(item));
+      return dispatch(apiBillRunSuccessHandler(response));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving prepaid group')));
 };
 
 export const getAllGroup = () => apiBillRun(getAllGroupsQuery());

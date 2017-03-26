@@ -11,9 +11,9 @@ import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
 import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 import {
-  getPlan,
+  getPrepaidGroup,
   clearPlan,
-  savePlan,
+  savePrepaidGroup,
   onPlanFieldUpdate,
   addUsagetInclude,
   onPlanTariffAdd,
@@ -109,20 +109,20 @@ class ChargingPlanSetup extends Component {
     const { item, revisions } = this.props;
     if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
-      this.props.dispatch(getRevisions('plans', 'name', key));
+      this.props.dispatch(getRevisions('prepaidgroups', 'name', key));
     }
   }
 
   fetchItem = (itemId = this.props.itemId) => {
     if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+      this.props.dispatch(getPrepaidGroup(itemId)).then(this.afterItemReceived);
     }
   }
 
   clearRevisions = () => {
     const { item } = this.props;
     const key = item.get('name', '');
-    this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
+    this.props.dispatch(clearRevisions('prepaidgroups', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -171,7 +171,7 @@ class ChargingPlanSetup extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
-    this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
+    this.props.dispatch(savePrepaidGroup(item, mode)).then(this.afterSave);
   };
 
   handleBack = (itemWasChanged = false) => {

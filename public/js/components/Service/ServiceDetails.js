@@ -57,6 +57,11 @@ export default class ServiceDetails extends Component {
     this.props.updateItem(['prorated'], value);
   }
 
+  onChangeQuantitative = (e) => {
+    const { value } = e.target;
+    this.props.updateItem(['quantitative'], value);
+  }
+
   onChangeDescription = (e) => {
     const { value } = e.target;
     this.props.updateItem(['description'], value);
@@ -114,6 +119,13 @@ export default class ServiceDetails extends Component {
           <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
           <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
             <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" editable={editable} />
+          </Col>
+        </FormGroup>
+
+        <FormGroup>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>Quantitative?</Col>
+          <Col sm={4} style={['clone', 'create'].includes(mode) ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+            <Field value={item.get('quantitative', '')} onChange={this.onChangeQuantitative} fieldType="checkbox" editable={['clone', 'create'].includes(mode)} />
           </Col>
         </FormGroup>
 

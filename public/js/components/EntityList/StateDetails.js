@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { ModalWrapper, StateIcon, RevisionTimeline } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
+import { getConfig, getItemId } from '../../common/Util';
 import { getRevisions } from '../../actions/entityListActions';
 
 
@@ -20,6 +20,8 @@ class StateDetails extends Component {
     collection: PropTypes.string.isRequired,
     revisionBy: PropTypes.string.isRequired,
     size: PropTypes.number,
+    onActionEdit: PropTypes.func,
+    onActionClone: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -75,12 +77,15 @@ class StateDetails extends Component {
   renderVerisionList = () => {
     const { item, itemName, revisions, revisionBy } = this.props;
     const { showList } = this.state;
+    const title = `${item.get(revisionBy, '')} - Revision History`;
     return (
-      <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
+      <ModalWrapper title={title} show={showList} onCancel={this.hideManageRevisions} onHide={this.hideManageRevisions} labelCancel="Close">
         <RevisionList
           items={revisions}
           itemName={itemName}
           onSelectItem={this.hideManageRevisions}
+          onActionEdit={this.props.onActionEdit}
+          onActionClone={this.props.onActionClone}
         />
       </ModalWrapper>
     );
@@ -89,20 +94,18 @@ class StateDetails extends Component {
   renderHelpTooltip = () => {
     const { item } = this.props;
     return (
-      <Tooltip id={`${item.getIn(['_id', '$id'], '')}-help`}>Click to get<br />revision history</Tooltip>
+      <Tooltip id={`${getItemId(item, '')}-help`}>Click to get<br />revision history</Tooltip>
     );
   }
 
   render() {
     const { item } = this.props;
-    const from = getItemDateValue(item, 'from');
-    const to = getItemDateValue(item, 'to');
     return (
       <div>
         <OverlayTrigger trigger="click" rootClose placement="right" ref="revisionOverlay" overlay={this.renderRevisionTooltip()} onEnter={this.onEnter}>
           <OverlayTrigger overlay={this.renderHelpTooltip()} placement="left">
             <div className="clickable">
-              <StateIcon from={from.toISOString()} to={to.toISOString()} />
+              <StateIcon status={item.getIn(['revision_info', 'status'], '')} />
             </div>
           </OverlayTrigger>
         </OverlayTrigger>
