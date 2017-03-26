@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Select from 'react-select';
 import { connect } from 'react-redux';
 import { List, Map } from 'immutable';
-import { Col, FormGroup, Form, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Col, FormGroup, Form, ControlLabel, HelpBlock, InputGroup } from 'react-bootstrap';
 import { getSymbolFromCurrency } from 'currency-symbol-map';
 import Field from '../Field';
 import ModalWrapper from '../Elements/ModalWrapper';
@@ -123,19 +123,19 @@ class OfflinePayment extends Component {
 
           <FormGroup validationState={validationErrors.get('monetaryValue', '').length > 0 ? 'error' : null}>
             <Col sm={2} componentClass={ControlLabel}>Monetary Value</Col>
-            <Col sm={6}>
-              <Field
-                id="monetaryValue"
-                onChange={this.onChangeMonetaryValue}
-                value={monetaryValue}
-                fieldType="number"
-              />
+            <Col sm={8}>
+              <InputGroup>
+                <Field
+                  id="monetaryValue"
+                  onChange={this.onChangeMonetaryValue}
+                  value={monetaryValue}
+                  fieldType="number"
+                />
+                <InputGroup.Addon>
+                  {getSymbolFromCurrency(currency)}
+                </InputGroup.Addon>
+              </InputGroup>
               { validationErrors.get('monetaryValue', '').length > 0 ? <HelpBlock>{validationErrors.get('monetaryValue', '')}</HelpBlock> : ''}
-            </Col>
-            <Col sm={2}>
-              <div className={'non-editble-field'}>
-                {getSymbolFromCurrency(currency)}
-              </div>
             </Col>
           </FormGroup>
 
