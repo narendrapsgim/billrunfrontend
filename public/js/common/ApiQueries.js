@@ -263,7 +263,7 @@ export const getDeleteLineQuery = id => ({
 
 // List
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
-export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaid_buckets');
+export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
 export const getPlansKeysQuery = () => getEntitesQuery('plans', { name: 1 });
@@ -275,7 +275,7 @@ export const getAllGroupsQuery = () => ([
 // By ID
 export const fetchServiceByIdQuery = id => getEntityByIdQuery('services', id);
 export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
-export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaid_buckets', id);
+export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
 export const fetchDiscountByIdQuery = id => getEntityByIdQuery('discounts', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
 export const fetchPrepaidGroupByIdQuery = id => getEntityByIdQuery('prepaidgroups', id);

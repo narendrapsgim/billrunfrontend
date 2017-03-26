@@ -114,7 +114,7 @@ class PrepaidIncludeSetup extends Component {
     const { item, revisions } = this.props;
     if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
-      this.props.dispatch(getRevisions('prepaid_buckets', 'name', key));
+      this.props.dispatch(getRevisions('prepaidincludes', 'name', key));
     }
   }
 
@@ -127,7 +127,7 @@ class PrepaidIncludeSetup extends Component {
   clearRevisions = () => {
     const { item } = this.props;
     const key = item.get('name', '');
-    this.props.dispatch(clearRevisions('prepaid_buckets', key)); // refetch items list because item was (changed in / added to) list
+    this.props.dispatch(clearRevisions('prepaidincludes', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {

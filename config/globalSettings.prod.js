@@ -53,7 +53,7 @@ var globalSetting = {
       itemsType: 'prepaid_plans',
     },
     prepaid_include: {
-      collection: 'prepaid_buckets',
+      collection: 'prepaidincludes',
       uniqueField: 'name',
       itemName: 'prepaid bucket',
       itemType: 'prepaid_include',
