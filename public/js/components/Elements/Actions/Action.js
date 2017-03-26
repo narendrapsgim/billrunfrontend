@@ -67,7 +67,7 @@ Action.defaultProps = {
   label: '',
   helpText: '',
   actionStyle: 'link',
-  actionSize: '',
+  actionSize: 'default',
   actionClass: '',
   showIcon: true,
   enable: true,
