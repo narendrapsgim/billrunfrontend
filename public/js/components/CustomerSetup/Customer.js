@@ -240,7 +240,7 @@ class Customer extends Component {
     const payerName = `${customer.get('firstname', '')} ${customer.get('lastname', '')}`;
     return (
       <div>
-        <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickOfflinePayment}>Offline Payment</Button>
+        <Button bsSize="xsmall" className="btn-primary" style={{ marginTop: 12 }} onClick={this.onClickOfflinePayment}>Offline Payment</Button>
         { showOfflinePayement &&
           (<OfflinePayment
             aid={customer.get('aid')}
