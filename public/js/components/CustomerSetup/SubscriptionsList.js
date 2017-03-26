@@ -39,7 +39,7 @@ export default class SubscriptionsList extends Component {
     return services
       .map((service) => {
         if (service.get('quantity', null) !== null) {
-          return `${service.get('name', '')}(${service.get('quantity', '')})`;
+          return `${service.get('name', '')} (${service.get('quantity', '')})`;
         }
         return service.get('name', '');
       })

@@ -116,7 +116,13 @@ class Subscription extends Component {
     const serviceIndex = services.findIndex(service => service.get('name', '') === serviceName);
     if (serviceIndex > -1) {
       const fixedValue = value > 1 ? value : 1; // not possible to add 0 for quantity service
-      this.updateSubscriptionField(['services', serviceIndex, 'quantity'], fixedValue);
+      const newService = services.get(serviceIndex, Immutable.Map())
+        .withMutations((servicesWithMutations) => {
+          servicesWithMutations
+            .set('quantity', fixedValue)
+            .set('from', getItemDateValue(subscription, 'from').toISOString());
+        });
+      this.updateSubscriptionField(['services', serviceIndex], newService);
     }
   }
 
