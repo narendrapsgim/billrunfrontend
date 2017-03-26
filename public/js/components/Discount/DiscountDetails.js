@@ -105,13 +105,11 @@ export default class DiscountDetails extends Component {
 
   onChangeDiscountValue = (key, value, type) => {
     const { discount } = this.props;
-    const isPercentaget = discount.get('discount_type', '') === 'percentage';
     let discounts = discount.getIn(['discount_subject', type], Immutable.Map());
-    if (value === null) {
+    if (value === null) { // removed discount
       discounts = discounts.filter((val, name) => name !== key);
-    } else {
-      const formatedValue = isPercentaget ? this.fromPercentaget(value) : this.toNumber(value);
-      discounts = discounts.set(key, formatedValue);
+    } else { // added discount
+      discounts = discounts.set(key, value);
     }
     this.props.onFieldUpdate(['discount_subject', type], discounts);
   }
@@ -138,7 +136,7 @@ export default class DiscountDetails extends Component {
     return discountSubject.map((key) => {
       const value = discount.getIn(['discount_subject', 'service', key], null);
       const isQuantitative = availableServices.findIndex(service =>
-        service.get('name', '') === key && service.get('quantitative', false) === true
+        (service.get('name', '') === key && service.get('quantitative', false) === true)
       );
       const helpText = isQuantitative !== -1 ? 'Amount will be multiplied by the subscription service quantity' : '';
       return this.renderDiscountValue(key, value, this.onChangeServiceDiscountValue, helpText);
@@ -164,7 +162,6 @@ export default class DiscountDetails extends Component {
     const isPercentaget = discount.get('discount_type', '') === 'percentage';
     const suffix = isPercentaget ? <i className="fa fa-percent" /> : getSymbolFromCurrency(currency);
     const onChangeBind = (val) => { onChange(key, val); };
-    const displayValue = isPercentaget ? this.toPercentaget(value) : value;
     const showHelpText = helpText.length > 0 && (editable);
     return (
       <FormGroup key={`${paramCase(key)}-discount-value`}>
@@ -173,7 +170,7 @@ export default class DiscountDetails extends Component {
         </Col>
         <Col sm={8} lg={9}>
           <Field
-            value={displayValue}
+            value={value}
             onChange={onChangeBind}
             label="Discount by"
             fieldType="toggeledInput"
@@ -186,12 +183,6 @@ export default class DiscountDetails extends Component {
       </FormGroup>
     );
   }
-
-  toPercentaget = value => ((isNaN(value) || value === null) ? value : Number(value) * 100);
-
-  toNumber = value => ((isNaN(value) || value === null) ? value : Number(value));
-
-  fromPercentaget = value => ((isNaN(value) || value === null) ? value : Number(value) / 100);
 
   render() {
     const { errors } = this.state;
