@@ -74,5 +74,8 @@ export const currencySelector = createSelector(
 
 export const chargingDaySelector = createSelector(
   billrunSelector,
-  (billrun = Immutable.Map()) => billrun.get('charging_day')
+  (billrun = Immutable.Map()) => {
+    const chargingDay = billrun.get('charging_day');
+    return (isNaN(chargingDay)) ? chargingDay : Number(chargingDay);
+  }
 );
