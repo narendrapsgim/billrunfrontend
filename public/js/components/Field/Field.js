@@ -53,7 +53,7 @@ class Field extends React.Component {
       case 'price':
         return (<Price {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'date':
-        return (<Date onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Date {...otherProps} onChange={onChange} value={value} editable={editable} disabled={disabled} />);
       case 'address':
         return (<Address onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'textarea':
@@ -61,7 +61,7 @@ class Field extends React.Component {
       case 'unlimited':
         return (<Unlimitd {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'toggeledInput':
-        return (<ToggeledInput {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<ToggeledInput {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} label={label} />);
       case 'checkbox':
         return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} label={label} />);
       case 'radio':
