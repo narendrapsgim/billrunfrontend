@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, IndexRoute } from 'react-router';
+import { Route, IndexRoute, IndexRedirect } from 'react-router';
 
 import RequireAuth from '../containers/Authentication';
 import App from '../containers/App';
@@ -45,7 +45,14 @@ import CustomFields from '../components/CustomFields';
 const routes = () => (
   <Route path="/" component={App}>
     <IndexRoute component={RequireAuth(WelcomePage)} title="" />
-    <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
+
+    <Route path="dashboard">
+      <Route path="overview" component={RequireAuth(Dashboard)} title="Overview Dashboard" />
+      <Route path="revenue" component={RequireAuth(Dashboard)} title="Revenue Dashboard" />
+      <Route path="commercial" component={RequireAuth(Dashboard)} title="Commercial Dashboard" />
+      <Route path="customers" component={RequireAuth(Dashboard)} title="Customers Dashboard" />
+      <IndexRedirect to="overview" />
+    </Route>
 
     <Route path="plans">
       <IndexRoute component={RequireAuth(PlansList)} title="Plans" />
