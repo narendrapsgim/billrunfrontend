@@ -8,41 +8,42 @@ export default class ToggeledInput extends Component {
   static defaultProps = {
     label: 'Enable',
     disabledValue: null,
+    disabledDisplayValue: '',
     disabled: false,
     editable: true,
     suffix: null,
     inputProps: {},
+    compare: (a, b) => a === b,
   };
 
   static propTypes = {
-    value: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-      null,
-    ]),
-    disabledValue: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-      null,
-    ]),
+    value: PropTypes.any,
+    disabledDisplayValue: PropTypes.any,
+    disabledValue: PropTypes.any,
     label: PropTypes.string,
     disabled: PropTypes.bool,
     editable: PropTypes.bool,
     inputProps: PropTypes.object,
     suffix: PropTypes.node,
     onChange: PropTypes.func.isRequired,
+    compare: PropTypes.func.isRequired,
   }
 
-  state = {
-    value: this.props.value === this.props.disabledValue ? '' : this.props.value,
-    off: this.props.value === this.props.disabledValue,
+
+  constructor(props) {
+    super(props);
+    const isSame = props.compare(props.value, props.disabledValue);
+    this.state = {
+      value: isSame ? props.disabledDisplayValue : props.value,
+      off: isSame,
+    };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.value !== this.props.value && nextProps.value !== nextProps.disabledValue) {
-      this.setState({
-        value: nextProps.value,
-      });
+    const isSameValue = this.props.compare(nextProps.value, this.props.value);
+    const isSame = this.props.compare(nextProps.value, nextProps.disabledValue);
+    if (!isSameValue && !isSame) {
+      this.setState({ value: nextProps.value });
     }
   }
 
@@ -55,17 +56,27 @@ export default class ToggeledInput extends Component {
   }
 
   onValueChanged = (e) => {
-    const { value } = e.target;
+    const value = this.getValue(e);
     this.setState({ value });
     this.props.onChange(value);
   }
 
+  getValue = (e) => {
+    const { inputProps: { fieldType = 'text' } } = this.props;
+    switch (fieldType) {
+      case 'date':
+        return e;
+      default:
+        return e.target.value;
+    }
+  }
+
   render() {
     const { value, off } = this.state;
-    const { label, disabled, editable, suffix, inputProps } = this.props;
+    const { label, disabled, editable, suffix, inputProps, disabledDisplayValue } = this.props;
 
     if (!editable) {
-      return (<div className="non-editble-field">{ off ? '' : value }</div>);
+      return (<div className="non-editable-field">{ off ? disabledDisplayValue : value }</div>);
     }
 
     return (
@@ -81,7 +92,7 @@ export default class ToggeledInput extends Component {
         <Field
           disabled={off || disabled}
           onChange={this.onValueChanged}
-          value={off ? '' : value}
+          value={off ? disabledDisplayValue : value}
           {...inputProps}
         />
         { (suffix !== null) && <InputGroup.Addon>{suffix}</InputGroup.Addon> }
