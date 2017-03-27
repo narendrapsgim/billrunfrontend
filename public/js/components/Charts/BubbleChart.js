@@ -1,5 +1,5 @@
 import React from 'react';
-import {Bubble} from 'react-chartjs';
+import {Bubble} from 'react-chartjs-2';
 import {palitra} from './helpers';
 
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Line} from 'react-chartjs';
+import {Line} from 'react-chartjs-2';
 import {palitra, hexToRgba, trend} from './helpers';
 
 
