@@ -27,7 +27,7 @@ fieldset[disabled] .btn {
 .movable {
     cursor: move;
 }
-.non-editble-field{
+.non-editable-field{
   line-height: 32px;
 }
 .actions button.btn-sm {
