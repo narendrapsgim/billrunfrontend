@@ -40,6 +40,7 @@ class PlanIncludeGroupCreate extends Component {
     include: '',
     products: Immutable.List(),
     shared: false,
+    pooled: false,
     error: '',
     stepIndex: 0,
     open: false,
@@ -155,6 +156,14 @@ class PlanIncludeGroupCreate extends Component {
   onChangeShared = (e) => {
     const { checked: shared } = e.target;
     this.setState({ shared });
+    if (!shared) {
+      this.setState({ pooled: false });
+    }
+  }
+
+  onChangePooled = (e) => {
+    const { checked: pooled } = e.target;
+    this.setState({ pooled });
   }
 
   onChangeUsageType = (newValue) => {
@@ -207,9 +216,9 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   handleFinish = () => {
-    const { stepIndex, name, usage, include, products, shared } = this.state;
+    const { stepIndex, name, usage, include, products, shared, pooled } = this.state;
     if (this.validateStep(stepIndex)) {
-      this.props.addGroup(name, usage, include, shared, products);
+      this.props.addGroup(name, usage, include, shared, pooled, products);
       this.resetState(false);
     }
   };
@@ -247,7 +256,7 @@ class PlanIncludeGroupCreate extends Component {
 
   getStepContent = (stepIndex) => {
     const { usedProducts, usageTypes, currency } = this.props;
-    const { name, products, include, usage, shared, error, monetaryBased, steps } = this.state;
+    const { name, products, include, usage, shared, pooled, error, monetaryBased, steps } = this.state;
     const existingProductsKeys = usedProducts.push(...products);
     const setIncludesTitle = monetaryBased ? `Total ${getSymbolFromCurrency(currency)} included` : changeCase.sentenceCase(`${usage} includes`);
 
@@ -319,8 +328,16 @@ class PlanIncludeGroupCreate extends Component {
           <FormGroup key={`${usage}_shared`}>
             <Col smOffset={3} sm={8}>
               <Checkbox checked={shared} onChange={this.onChangeShared}>
-                Share with all account&apos;s subscribers
+                {"Share with all account's subscribers"}
                 <Help contents={GroupsInclude.shared_desc} />
+              </Checkbox>
+            </Col>
+          </FormGroup>,
+          <FormGroup key={`${usage}_pooled`}>
+            <Col smOffset={3} sm={8}>
+              <Checkbox disabled={!shared} checked={pooled} onChange={this.onChangePooled}>
+                {'Includes is pooled?'}
+                <Help contents={GroupsInclude.pooled_desc} />
               </Checkbox>
             </Col>
           </FormGroup>,
