@@ -155,9 +155,10 @@ class PlanIncludeGroupCreate extends Component {
 
   onChangeShared = (e) => {
     const { checked: shared } = e.target;
-    this.setState({ shared });
-    if (!shared) {
-      this.setState({ pooled: false });
+    if (shared) {
+      this.setState({ shared });
+    } else {
+      this.setState({ shared, pooled: false });
     }
   }
 
