@@ -202,7 +202,7 @@ class List extends Component {
     const table_body = items.size < 1 ?
                        (<tr><td colSpan={colSpan} style={{ textAlign: 'center' }}>No items found</td></tr>) :
                         items.map((entity, index) => (
-                          <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled'}>
+                          <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled disabled-bg'}>
                             {
                                 enableEnabled ?
                                   <td className="edit-tb">
