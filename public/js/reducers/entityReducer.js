@@ -14,7 +14,7 @@ export default function (state = defaultState, action) {
       if (Array.isArray(path)) {
         return state.setIn([collection, ...path], value);
       }
-      return state.setIn([collection, path], value);
+      return state.setIn([collection, ...path.split('.')], value);
 
     case actions.DELETE_ENTITY_FIELD:
       if (Array.isArray(path)) {

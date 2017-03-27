@@ -114,6 +114,7 @@ class Customer extends Component {
   renderField = (field, key) => {
     const { customer, onChange } = this.props;
     const fieldName = field.get('field_name');
+    const fieldNamePath = fieldName.split('.');
     return (
       <FormGroup controlId={fieldName} key={key} >
         <Col componentClass={ControlLabel} md={2}>
@@ -122,7 +123,7 @@ class Customer extends Component {
         <Col sm={7}>
           { field.get('select_list', false)
             ? this.renderSelectInput(field)
-            : <Field onChange={onChange} id={fieldName} value={customer.get(fieldName, '')} />
+            : <Field onChange={onChange} id={fieldName} value={customer.getIn(fieldNamePath, '')} />
           }
         </Col>
       </FormGroup>
