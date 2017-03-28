@@ -18,8 +18,8 @@ export default class ToggeledInput extends Component {
 
   static propTypes = {
     value: PropTypes.any,
-    disabledDisplayValue: PropTypes.any,
     disabledValue: PropTypes.any,
+    disabledDisplayValue: PropTypes.any,
     label: PropTypes.string,
     disabled: PropTypes.bool,
     editable: PropTypes.bool,
@@ -32,10 +32,11 @@ export default class ToggeledInput extends Component {
 
   constructor(props) {
     super(props);
-    const isSame = props.compare(props.value, props.disabledValue);
+    const off = props.compare(props.value, props.disabledValue);
+    const value = off ? props.disabledValue : props.value;
     this.state = {
-      value: isSame ? props.disabledDisplayValue : props.value,
-      off: isSame,
+      value,
+      off,
     };
   }
 
