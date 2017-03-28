@@ -109,7 +109,8 @@ class CycleData extends Component {
       .then(
         (response) => {
           if (response.status) {
-            this.props.reloadCycleData();
+            this.closeConfirmationModal();
+            setTimeout(this.props.reloadCycleData, 1000);
           }
         }
       );
@@ -151,6 +152,10 @@ class CycleData extends Component {
   }
 
   onCloseConfirmationModal = () => {
+    this.closeConfirmationModal();
+  }
+
+  closeConfirmationModal = () => {
     const { confirmationModalData } = this.state;
     confirmationModalData.show = false;
     confirmationModalData.title = '';
