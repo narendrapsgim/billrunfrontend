@@ -130,13 +130,18 @@ class EntityRevisionDetails extends Component {
     }
   }
 
-  filterDateAvailableFromDates = (date) => {
-    const { item, mode, minFrom } = this.props;
+  filterLegalFromDate = (date) => {
+    const { item, mode } = this.props;
     if (['clone', 'create'].includes(mode)) {
       return true;
     }
     const originDate = getItemDateValue(item, 'originalValue').isSame(date, 'day');
-    return originDate || date.isSameOrAfter(minFrom, 'day');
+    return originDate || this.filterLegalFromDateByMin(date);
+  }
+
+  filterLegalFromDateByMin = (date) => {
+    const { minFrom } = this.props;
+    return date.isSameOrAfter(minFrom, 'day');
   }
 
   renderRevisionsBlock = () => {
@@ -180,13 +185,15 @@ class EntityRevisionDetails extends Component {
     const editable = (['closeandnew', 'clone', 'create'].includes(mode));
     const from = getItemDateValue(item, 'from');
     const originFrom = getItemDateValue(item, 'originalValue');
+    const tommorow = moment().add(1, 'day');
+    const selectedValue = from.isSame(originFrom, 'day') ? tommorow : from;
     const highlightDates = (mode === 'create') ? [] : [originFrom];
     const inputProps = {
       fieldType: 'date',
       dateFormat: getConfig('dateFormat', 'DD/MM/YYYY'),
       isClearable: false,
       placeholder: 'Select Date...',
-      filterDate: this.filterDateAvailableFromDates,
+      filterDate: this.filterLegalFromDateByMin,
       highlightDates,
     };
     if (['closeandnew'].includes(mode)) {
@@ -194,7 +201,7 @@ class EntityRevisionDetails extends Component {
         <div className="inline" style={{ width: 220, padding: 0, margin: '7px 7px 0' }}>
           <Field
             fieldType="toggeledInput"
-            value={from}
+            value={selectedValue}
             onChange={this.onChangeFrom}
             label="Change From"
             editable={editable}
@@ -223,7 +230,7 @@ class EntityRevisionDetails extends Component {
                 dateFormat={getConfig('dateFormat', 'DD/MM/YYYY')}
                 isClearable={false}
                 placeholder="Select Date..."
-                filterDate={this.filterDateAvailableFromDates}
+                filterDate={this.filterLegalFromDate}
                 highlightDates={highlightDates}
               />
             </div>
