@@ -9,8 +9,8 @@ import { EntityRevisionDetails } from '../Entity';
 import DiscountDetails from './DiscountDetails';
 import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import {
-  getPlansKeysQuery,
-  getServicesKeysWithInfoQuery,
+  getPlansQuery,
+  getServicesQuery,
 } from '../../common/ApiQueries';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -67,8 +67,8 @@ class DiscountSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     this.initDefaultValues();
-    this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
-    this.props.dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
+    this.props.dispatch(getList('available_plans', getPlansQuery({ name: 1, description: 1 })));
+    this.props.dispatch(getList('available_services', getServicesQuery({ name: 1, description: 1, quantitative: 1 })));
   }
 
   componentWillReceiveProps(nextProps) {
