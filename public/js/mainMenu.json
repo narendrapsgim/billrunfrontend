@@ -8,9 +8,8 @@
     "order": 0,
     "parent": "root"
   },
-
   "overview_dashboard": {
-    "title": "Overview Dashboard",
+    "title": "Overview",
     "icon": "",
     "route": "dashboard/overview",
     "show": true,
@@ -19,7 +18,7 @@
     "parent":"dashboard"
   },
   "revenue_dashboard": {
-    "title": "Revenue Dashboard",
+    "title": "Revenue",
     "icon": "",
     "route": "dashboard/revenue",
     "show": true,
@@ -28,7 +27,7 @@
     "parent":"dashboard"
   },
   "commercial_dashboard": {
-    "title": "Commercial Dashboard",
+    "title": "Commercial",
     "icon": "",
     "route": "dashboard/commercial",
     "show": true,
@@ -37,7 +36,7 @@
     "parent":"dashboard"
   },
   "customers_dashboard": {
-    "title": "Customers Dashboard",
+    "title": "Customers",
     "icon": "",
     "route": "dashboard/customers",
     "show": true,
@@ -45,9 +44,6 @@
     "order": 4,
     "parent":"dashboard"
   },
-
-
-
   "products": {
     "title": "Products",
     "icon": "fa-book",
