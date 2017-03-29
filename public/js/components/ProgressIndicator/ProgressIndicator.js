@@ -1,35 +1,31 @@
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-// import { ProgressBar } from 'react-bootstrap';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 
-class ProgressIndicator extends Component {
+const ProgressIndicator = ({ progressIndicator, enterTimeout, exitTimeout }) => (
+  <div className="progress-indicator-container" style={{ position: 'fixed', top: 0, width: '100%', zIndex: 5001 }}>
+    <ReactCSSTransitionGroup transitionName="progressindicator" transitionEnterTimeout={enterTimeout} transitionLeaveTimeout={exitTimeout}>
+      { progressIndicator && <div key="progressIndicator" className="system-progress-indecator" /> }
+    </ReactCSSTransitionGroup>
+  </div>
+);
 
-  render() {
-    const { progressIndicator } = this.props;
-		const enterTimeout = 500;
-		const exitTimeout = 1000;
-    const indecator = (progressIndicator) ? <div key={new Date()} className="system-progress-indecator"></div> : null;
 
-    return (
-      <div className="progress-indicator-container" style={{ position: 'fixed', top: 0, width: '100%', zIndex: 5001}}>
-        <ReactCSSTransitionGroup transitionName="progressindicator" transitionEnterTimeout={enterTimeout} transitionLeaveTimeout={exitTimeout}>
-          { indecator }
-        </ReactCSSTransitionGroup>
-      </div>
-    );
-    // return (
-    //   <div style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1001}}>
-    //     <ProgressBar active now={100} style={{ height: 5, marginBottom: 0, backgroundColor: 'transparent', borderRadius: 0}}  />
-    //   </div>
-    // );
-  }
+ProgressIndicator.defaultProps = {
+  progressIndicator: false,
+  enterTimeout: 250,
+  exitTimeout: 250,
+};
 
-}
+ProgressIndicator.propTypes = {
+  progressIndicator: PropTypes.bool,
+  enterTimeout: PropTypes.number,
+  exitTimeout: PropTypes.number,
+};
 
-function mapStateToProps(state) {
-  return { progressIndicator: state.progressIndicator > 0 }
-}
+const mapStateToProps = state => ({
+  progressIndicator: state.progressIndicator > 0,
+});
+
 export default connect(mapStateToProps)(ProgressIndicator);

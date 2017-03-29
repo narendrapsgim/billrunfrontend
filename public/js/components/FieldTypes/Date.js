@@ -1,26 +1,43 @@
-import React, { Component } from 'react';
-import DatePicker from 'material-ui/DatePicker';
+import React, { PropTypes } from 'react';
+import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import { getConfig } from '../../common/Util';
 
-export default class Date extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    let { id, onChange, value, editable, disabled } = this.props;
-
-    const input = editable ? ( <DatePicker id={id}
-                           fullWidth={true}                            
-                           hintText={id}
-                           textFieldStyle={{height: "72px"}}
-                           value={value}
-                           onChange={onChange}
-                           disabled={disabled}
-     />) : (<span>{moment(value).format(globalSetting.datetimeFormat)}</span>);
-    
+const Date = (props) => {
+  const { editable, value, disabled, placeholder, onChange, ...otherProps } = props;
+  if (!editable) {
+    const displayValue = value.isValid() ? value.format(getConfig('dateFormat', 'DD/MM/YYYY')) : value;
     return (
-      <div>{ input }</div>
+      <div className="non-editable-field">{ displayValue }</div>
     );
   }
-}
+  const placeholderText = (disabled && !value) ? '' : placeholder;
+  return (
+    <DatePicker
+      {...otherProps}
+      className="form-control"
+      selected={value}
+      onChange={onChange}
+      disabled={disabled}
+      placeholderText={placeholderText}
+    />
+  );
+};
+
+Date.defaultProps = {
+  required: false,
+  disabled: false,
+  editable: true,
+  placeholder: '',
+  onChange: () => {},
+};
+
+Date.propTypes = {
+  value: PropTypes.instanceOf(moment),
+  disabled: PropTypes.bool,
+  editable: PropTypes.bool,
+  placeholder: PropTypes.string,
+  onChange: PropTypes.func,
+};
+
+export default Date;

@@ -21,6 +21,7 @@ export default class PlanIncludeGroupEdit extends Component {
     ]).isRequired,
     usaget: PropTypes.string.isRequired,
     shared: PropTypes.bool,
+    pooled: PropTypes.bool,
     products: PropTypes.instanceOf(Immutable.List),
     usedProducts: PropTypes.instanceOf(Immutable.List),
     onChangeFieldValue: PropTypes.func.isRequired,
@@ -34,6 +35,7 @@ export default class PlanIncludeGroupEdit extends Component {
     products: Immutable.List(),
     usedProducts: Immutable.List(),
     shared: false,
+    pooled: false,
     mode: 'create',
   };
 
@@ -81,6 +83,15 @@ export default class PlanIncludeGroupEdit extends Component {
     const { checked } = e.target;
     const { name } = this.props;
     this.props.onChangeFieldValue(['include', 'groups', name, 'account_shared'], checked);
+    if (!checked) {
+      this.props.onChangeFieldValue(['include', 'groups', name, 'account_pool'], false);
+    }
+  }
+
+  onChangePooled = (e) => {
+    const { checked } = e.target;
+    const { name } = this.props;
+    this.props.onChangeFieldValue(['include', 'groups', name, 'account_pool'], checked);
   }
 
   onAddProduct = (productKey) => {
@@ -122,7 +133,7 @@ export default class PlanIncludeGroupEdit extends Component {
   )
 
   renderEdit = () => {
-    const { name, value, usaget, shared, products, usedProducts } = this.props;
+    const { name, value, usaget, shared, pooled, products, usedProducts } = this.props;
     const { isEditMode, errorInclude } = this.state;
     return (
       <Modal show={isEditMode}>
@@ -145,6 +156,12 @@ export default class PlanIncludeGroupEdit extends Component {
             <FormGroup>
               <Col smOffset={3} sm={8}>
                 <Checkbox checked={shared} onChange={this.onChangeShared}>{"Share with all account's subscribers"}<Help contents={GroupsInclude.shared_desc} /></Checkbox>
+              </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <Col smOffset={3} sm={8}>
+                <Checkbox disabled={!shared} checked={pooled} onChange={this.onChangePooled}>{'Includes is pooled?'}<Help contents={GroupsInclude.pooled_desc} /></Checkbox>
               </Col>
             </FormGroup>
 
