@@ -59,6 +59,8 @@ fieldset[disabled] .btn {
 .danger-red { color: #d9534f; }
 .disabled {
   color: #6f6f6f;
+}
+.disabled-bg {
   background-color: #eeeeee;
 }
 /* ~Global */

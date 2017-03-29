@@ -38,12 +38,13 @@ export const onGroupRemove = groupName => ({
   groupName,
 });
 
-export const onGroupAdd = (groupName, usage, value, shared, products) => ({
+export const onGroupAdd = (groupName, usage, value, shared, pooled, products) => ({
   type: ADD_GROUP_PLAN,
   groupName,
   usage,
   value,
   shared,
+  pooled,
   products,
 });
 
