@@ -63,6 +63,7 @@ class EntityList extends Component {
       PropTypes.bool,
       PropTypes.arrayOf(PropTypes.object),
     ]),
+    refreshString: PropTypes.string,
   }
 
   static defaultProps = {
@@ -82,6 +83,7 @@ class EntityList extends Component {
     sort: Immutable.Map(),
     filter: Immutable.Map(),
     state: Immutable.List([0, 1, 2]),
+    refreshString: '',
   }
 
   componentWillMount() {
@@ -111,8 +113,9 @@ class EntityList extends Component {
     const baseFilterMap = (Immutable.fromJS(this.props.baseFilter));
     const baseFilterNextMap = (Immutable.fromJS(nextProps.baseFilter));
     const baseFilterChanged = !Immutable.is(baseFilterMap, baseFilterNextMap);
+    const refreshStringChanged = this.props.refreshString !== nextProps.refreshString;
     if (pageChanged || sizeChanged || filterChanged ||
-      sortChanged || stateChanged || baseFilterChanged) {
+      sortChanged || stateChanged || baseFilterChanged || refreshStringChanged) {
       this.fetchItems(nextProps);
     }
   }

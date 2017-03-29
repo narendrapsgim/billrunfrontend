@@ -6,6 +6,7 @@ import Select from 'react-select';
 import { getCyclesQuery, getCycleQuery, getChargeStatusQuery, getOperationsQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
 import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
+import { clearItems } from '../../actions/entityListActions';
 import ConfirmModal from '../../components/ConfirmModal';
 import CycleData from './CycleData';
 
@@ -15,7 +16,10 @@ class RunCycle extends Component {
     dispatch: PropTypes.func.isRequired,
     cycles: PropTypes.instanceOf(List),
     cycleAdditionalData: PropTypes.instanceOf(Map),
-    chargeStatus: PropTypes.instanceOf(Map),
+    chargeStatus: PropTypes.oneOfType([
+      PropTypes.instanceOf(Map),
+      PropTypes.instanceOf(List),
+    ]),
     chargeStatusRefreshed: PropTypes.oneOfType([
       PropTypes.instanceOf(Map),
       PropTypes.instanceOf(List),
@@ -33,6 +37,7 @@ class RunCycle extends Component {
     super(props);
     this.autoRefresh = null;
     this.autoRefreshChargingStatus = null;
+    this.refreshAfterRun = null;
   }
 
   state = {
@@ -63,6 +68,7 @@ class RunCycle extends Component {
   componentWillUnmount() {
     this.unsetAutoRefresh();
     clearTimeout(this.autoRefreshChargingStatus);
+    clearTimeout(this.refreshAfterRun);
   }
 
   initAutoRefresh = () => {
@@ -143,7 +149,7 @@ class RunCycle extends Component {
     .then(
       (response) => {
         if (response.status) {
-          this.reloadCycleData();
+          this.refreshAfterRun = setTimeout(this.reloadCycleData, 1000);
         }
       }
     );
@@ -223,6 +229,7 @@ class RunCycle extends Component {
   }
 
   onChangeSelectedCycle = (selectedCycleName) => {
+    this.props.dispatch(clearItems('billruns')); // refetch items list because item was (changed in / added to) list
     this.setState({
       selectedCycle: this.getCycleData(selectedCycleName),
       selectedCycleName,
@@ -442,7 +449,7 @@ class RunCycle extends Component {
                   reloadCycleData={this.reloadCycleData}
                   showConfirmAllButton={showConfirmAllButton}
                 />
-              }
+            }
 
               {this.renderRerunConfirmationModal()}
               {this.renderChargeAllConfirmationModal()}

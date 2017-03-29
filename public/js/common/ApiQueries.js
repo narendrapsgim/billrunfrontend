@@ -398,16 +398,16 @@ export const getRunCycleQuery = (billrunKey, rerun) => ({
 
 export const getConfirmCycleInvoiceQuery = (billrunKey, invoiceId) => ({
   api: 'billrun',
-  action: 'cycleconfirmation',
+  action: 'confirmCycle',
   params: [
     { stamp: billrunKey },
-    { invoices: JSON.stringify([invoiceId.toString()]) },
+    { invoices: invoiceId },
   ],
 });
 
 export const getConfirmCycleAllQuery = billrunKey => ({
   api: 'billrun',
-  action: 'cycleconfirmation',
+  action: 'confirmCycle',
   params: [
     { stamp: billrunKey },
   ],
