@@ -9,8 +9,16 @@ import ActionButtons from '../Elements/ActionButtons';
 import Field from '../Field';
 import Credit from '../Credit/Credit';
 import { EntityRevisionDetails } from '../Entity';
-import { getItemDateValue, getConfig, getItemId, getFieldName, getItemMode, buildPageTitle } from '../../common/Util';
-import { chargingDaySelector } from '../../selectors/settingsSelector'
+import {
+  getConfig,
+  getItemId,
+  getFieldName,
+  getItemMode,
+  getItemMinFromDate,
+  getItemDateValue,
+  buildPageTitle,
+} from '../../common/Util';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class Subscription extends Component {
@@ -332,16 +340,6 @@ class Subscription extends Component {
     this.props.clearRevisions(subscription);
   }
 
-  getChargingDate = (chargingDay, now = moment()) => {
-    const bufferDays = getConfig('chargingBufferDays', 5);
-    const currentMonthChargingDate = now.clone().date(chargingDay);
-    const currentMonthChargingDateWihtBuffer = currentMonthChargingDate.clone().add(bufferDays, 'days');
-    if (currentMonthChargingDateWihtBuffer.isSameOrBefore(now, 'day')) {
-      return currentMonthChargingDate;
-    }
-    return currentMonthChargingDate.add(-1, 'month');
-  }
-
   render() {
     const { progress, subscription } = this.state;
     const { revisions, mode, chargingDay } = this.props;
@@ -349,9 +347,7 @@ class Subscription extends Component {
     const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
     const servisesQuentity = this.renderServisesQuentity(allowEdit);
-    const chargingDate = this.getChargingDate(chargingDay);
-    const originFromDate = getItemDateValue(subscription, 'originalValue');
-    const minFrom = moment.max(chargingDate, originFromDate);
+    const minFrom = getItemMinFromDate(subscription, chargingDay);
     return (
       <div className="Subscription">
         <Panel header={title}>
