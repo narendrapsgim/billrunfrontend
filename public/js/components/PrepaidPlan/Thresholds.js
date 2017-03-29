@@ -22,7 +22,7 @@ const Thresholds = (props) => {
         key={key}
         editable={editable}
         name={name}
-        pp_id={ppId}
+        ppId={ppId}
         value={plan.getIn(['pp_threshold', ppId], 0)}
         onChange={props.onChangeThreshold}
       />
