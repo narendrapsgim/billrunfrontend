@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
+import { lowerCase, sentenceCase } from 'change-case';
 import { ConfirmModal, StateIcon } from '../Elements';
 import CloseActionBox from '../Entity/CloseActionBox';
 import List from '../../components/List';
@@ -138,6 +139,22 @@ class RevisionList extends Component {
     }
   }
 
+  getActionHelpText = (type) => {
+    const { itemName } = this.props;
+    switch (lowerCase(type)) {
+      case 'clone':
+        return `Clone as new ${getConfig(['systemItems', itemName, 'itemName'], 'item')}`;
+      case 'remove':
+        return 'Remove revision';
+      case 'edit':
+        return 'Edit revision';
+      case 'view':
+        return 'View revision details';
+      default:
+        return sentenceCase(type);
+    }
+  }
+
   getListFields = () => [
     { id: 'state', parser: this.parserState, cssClass: 'state' },
     { id: 'from', title: 'Start date', parser: this.parseFromDate, cssClass: 'short-date' },
@@ -145,10 +162,10 @@ class RevisionList extends Component {
   ]
 
   getListActions = () => [
-    { type: 'view', showIcon: true, helpText: 'View', onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
-    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
-    { type: 'clone', showIcon: true, helpText: 'Clone', onClick: this.onClickClone },
-    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove, enable: this.parseRemoveEnable },
+    { type: 'view', helpText: this.getActionHelpText('view'), onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
+    { type: 'edit', helpText: this.getActionHelpText('edit'), onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
+    { type: 'clone', helpText: this.getActionHelpText('clone'), onClick: this.onClickClone },
+    { type: 'remove', helpText: this.getActionHelpText('remove'), onClick: this.onClickRemove, enable: this.parseRemoveEnable },
   ]
 
   render() {
