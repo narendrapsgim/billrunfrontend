@@ -1,48 +1,61 @@
-import React from 'react';
-import {HorizontalBar} from 'react-chartjs-2';
-import {palitra} from './helpers';
+import React, { Component, PropTypes } from 'react';
+import { HorizontalBar } from 'react-chartjs-2';
+import { palitra } from './helpers';
 
 
-export default class BarHorizontalStrackedChart extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+export default class BarHorizontalStrackedChart extends Component {
 
-  getOptions(data, options = {}) {
-    let defaultOptions = {
+  static propTypes = {
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    data: PropTypes.oneOfType([
+      PropTypes.object,
+      null,
+    ]),
+    options: PropTypes.object,
+  };
+
+  static defaultProps = {
+    options: {},
+    data: null,
+  };
+
+  getOptions = () => {
+    const { data, options } = this.props;
+    const defaultOptions = {
       responsive: true,
       title: {
         display: (typeof data.title !== 'undefined'),
-        text: data.title
+        text: data.title,
       },
       legend: {
-        position: 'bottom'
+        position: 'bottom',
       },
       hover: {
-        mode: 'single'
+        mode: 'single',
       },
       tooltips: {
-        mode: 'single'
+        mode: 'single',
       },
       scales: {
         xAxes: [
           {
-            stacked: true
-          }
+            stacked: true,
+          },
         ],
         yAxes: [
           {
-            stacked: true
-          }
-        ]
-      }
+            stacked: true,
+          },
+        ],
+      },
     };
     return Object.assign(defaultOptions, options);
   }
 
-  prepareData(data) {
-    let chartData = {};
+  prepareData = () => {
+    const { data } = this.props;
+    const chartData = {};
     chartData.labels = data.y || Array.from(new Array(data.x[0].values.length), (x, i) => i + 1);
     chartData.datasets = data.x.map((x, i) => ({
       label: x.label,
@@ -58,8 +71,18 @@ export default class BarHorizontalStrackedChart extends React.Component {
   }
 
   render() {
-    const {width, height, data, options} = this.props;
-    if (!data || !data.x) return null;
-    return ( <HorizontalBar data={this.prepareData(data)} options={this.getOptions(data, options)} type={'horizontalBar'} width={width} height={height}/> );
+    const { width, height, data } = this.props;
+    if (!data || !data.x) {
+      return null;
+    }
+    return (
+      <HorizontalBar
+        type="horizontalBar"
+        data={this.prepareData()}
+        options={this.getOptions()}
+        width={width}
+        height={height}
+      />
+    );
   }
 }
