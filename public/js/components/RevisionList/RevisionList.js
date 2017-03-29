@@ -43,7 +43,7 @@ class RevisionList extends Component {
 
   isItemEditable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
 
-  isItemRemovable = item => ['future'].includes(item.getIn(['revision_info', 'status'], ''));
+  isItemRemovable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
 
   isItemActive = item => ['active'].includes(item.getIn(['revision_info', 'status'], ''));
 
