@@ -235,7 +235,7 @@ export default class DiscountDetails extends Component {
                         </span>
                       </span>
                     )
-                  : <div className="non-editble-field">{ titleCase(discount.get('discount_type', '')) }</div>
+                  : <div className="non-editable-field">{ titleCase(discount.get('discount_type', '')) }</div>
                   }
                 </Col>
               </FormGroup>
@@ -264,7 +264,7 @@ export default class DiscountDetails extends Component {
                   <Col sm={8} lg={9}>
                     { editable
                       ? <Select options={plansOptions} value={discount.getIn(['params', 'plan'], '')} onChange={this.onChangePlan} />
-                      : <div className="non-editble-field">{ discount.getIn(['params', 'plan'], '') }</div>
+                      : <div className="non-editable-field">{ discount.getIn(['params', 'plan'], '') }</div>
                     }
                   </Col>
                 </FormGroup>
@@ -276,7 +276,7 @@ export default class DiscountDetails extends Component {
                   <Col sm={8} lg={9}>
                     { editable
                       ? <Select multi={true} value={services} options={servicesOptions} onChange={this.onChangeService} />
-                      : <div className="non-editble-field">{ discount.getIn(['params', 'service'], Immutable.List()).join(', ') }</div>
+                      : <div className="non-editable-field">{ discount.getIn(['params', 'service'], Immutable.List()).join(', ') }</div>
                     }
                   </Col>
                 </FormGroup>

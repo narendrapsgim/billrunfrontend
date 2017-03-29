@@ -133,7 +133,7 @@ class CycleData extends Component {
     };
 
     return entity.get('billed', false)
-      ? (<Label bsStyle={'success'} className={'non-editble-field'}>CONFIRMED</Label>)
+      ? (<Label bsStyle={'success'} className={'non-editable-field'}>CONFIRMED</Label>)
       : (<Button onClick={onClick}>confirm</Button>);
   };
 

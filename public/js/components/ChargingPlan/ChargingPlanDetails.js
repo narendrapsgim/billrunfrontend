@@ -115,7 +115,7 @@ export default class ChargingPlanDetails extends Component {
             <Col sm={4}>
               { editable
                 ? <Select options={operationOptions} value={item.get('operation', '')} onChange={this.onChangeOperation} />
-                : <div className="non-editble-field">{ item.get('operation', '') }</div>
+                : <div className="non-editable-field">{ item.get('operation', '') }</div>
               }
             </Col>
           </FormGroup>

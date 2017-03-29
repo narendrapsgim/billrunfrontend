@@ -19,7 +19,7 @@ const LimitedDestination = ({ name, rates, allRates, onChange, editable }) => {
             options={allRates}
             onChange={onChangeValue}
           />
-          : <div className="non-editble-field">{rates.join(',')}</div>
+          : <div className="non-editable-field">{rates.join(',')}</div>
         }
       </Panel>
     </div>
