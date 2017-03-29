@@ -34,7 +34,13 @@ import {
   tabSelector,
   revisionsSelector,
 } from '../../selectors/entitySelector';
-import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 
 
 class ProductSetup extends Component {
@@ -44,6 +50,7 @@ class ProductSetup extends Component {
     itemId: PropTypes.string,
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     usageTypes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
@@ -203,13 +210,14 @@ class ProductSetup extends Component {
   }
 
   render() {
-    const { item, usageTypes, mode, revisions } = this.props;
+    const { item, usageTypes, mode, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const allowEdit = mode !== 'view';
     const usaget = item.get('rates', Immutable.Map()).keySeq().first();
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="ProductSetup" >
 
@@ -221,6 +229,7 @@ class ProductSetup extends Component {
             onChangeFrom={this.onFieldUpdate}
             itemName="product"
             backToList={this.handleBack}
+            minFrom={minFrom}
           />
         </Panel>
 
@@ -257,6 +266,7 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'product'),
   revisions: revisionsSelector(state, props, 'product'),
   usageTypes: state.settings.get('usage_types'),
+  chargingDay: chargingDaySelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ProductSetup));
