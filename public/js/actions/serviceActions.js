@@ -27,12 +27,13 @@ export const updateService = (path, value) => ({
   value,
 });
 
-export const addGroup = (groupName, usage, value, shared, products) => ({
+export const addGroup = (groupName, usage, value, shared, pooled, products) => ({
   type: ADD_GROUP_SERVICE,
   groupName,
   usage,
   value,
   shared,
+  pooled,
   products,
 });
 

@@ -27,7 +27,7 @@ fieldset[disabled] .btn {
 .movable {
     cursor: move;
 }
-.non-editble-field{
+.non-editable-field{
   line-height: 32px;
 }
 .actions button.btn-sm {
@@ -59,6 +59,8 @@ fieldset[disabled] .btn {
 .danger-red { color: #d9534f; }
 .disabled {
   color: #6f6f6f;
+}
+.disabled-bg {
   background-color: #eeeeee;
 }
 /* ~Global */
@@ -188,7 +190,7 @@ fieldset[disabled] .btn {
 }
 .progressindicator-leave.progressindicator-leave-active {
   opacity: 0.01;
-  transition: opacity 1500ms ease-in;
+  transition: opacity 500ms ease-in;
 }
 
 @keyframes progressindicator-in-progress {
@@ -217,7 +219,7 @@ fieldset[disabled] .btn {
     height:2px;
     box-shadow: 1px 1px 1px rgba(0,0,0,0.4);
     animation-name: progressindicator-in-progress;
-    animation-duration: 1500ms;
+    animation-duration: 500ms;
 }
 /* ~System Progress Ingecator */
 

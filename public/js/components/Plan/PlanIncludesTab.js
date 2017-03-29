@@ -62,13 +62,13 @@ class PlanIncludesTab extends Component {
     });
   }
 
-  onGroupAdd = (groupName, usage, include, shared, products) => {
+  onGroupAdd = (groupName, usage, include, shared, pooled, products) => {
     const { usedProducts, existingGroups } = this.state;
     this.setState({
       usedProducts: usedProducts.push(...products),
       existingGroups: existingGroups.push(groupName),
     });
-    this.props.onGroupAdd(groupName, usage, include, shared, products);
+    this.props.onGroupAdd(groupName, usage, include, shared, pooled, products);
   }
 
   onGroupRemove = (groupName, groupProducts) => {
@@ -112,6 +112,7 @@ class PlanIncludesTab extends Component {
 
     return includeGroups.map((include, groupName) => {
       const shared = include.get('account_shared', false);
+      const pooled = include.get('account_pool', false);
       const products = include.get('rates', Immutable.List());
       const usaget = include.findKey(prop => (prop !== 'account_shared' && prop !== 'rates'), '');
       const value = include.get(usaget, '');
@@ -123,6 +124,7 @@ class PlanIncludesTab extends Component {
           value={value}
           usaget={usaget}
           shared={shared}
+          pooled={pooled}
           products={products}
           usedProducts={usedProducts.toList()}
           onChangeFieldValue={this.props.onChangeFieldValue}

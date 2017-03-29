@@ -277,7 +277,7 @@ export default class Product extends Component {
                         placeholder="Add Prefix..."
                       />
                     )
-                    : <div className="non-editble-field">{ prefixs }</div>
+                    : <div className="non-editable-field">{ prefixs }</div>
                   }
 
                 </Col>
@@ -296,7 +296,7 @@ export default class Product extends Component {
                         value={usaget}
                       />
                     )
-                    : <div className="non-editble-field">{ usaget }</div>
+                    : <div className="non-editable-field">{ usaget }</div>
                   }
                 </Col>
               </FormGroup>
@@ -321,7 +321,7 @@ export default class Product extends Component {
                     )
                     :
                     (
-                      <div className="non-editble-field">
+                      <div className="non-editable-field">
                         { vatable
                           ? 'This product is VAT rated'
                           : 'This product is not VAT rated'

@@ -125,7 +125,7 @@ class Customer extends Component {
   renderDebt = () => {
     const { currency } = this.props;
     const { debt } = this.state;
-    const debtClass = classNames('non-editble-field', {
+    const debtClass = classNames('non-editable-field', {
       'danger-red': debt < 0,
     });
     return debt !== null &&

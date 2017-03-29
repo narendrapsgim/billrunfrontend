@@ -27,7 +27,7 @@ const PrepaidInclude = (props) => {
       );
     }
     return (
-      <div className="non-editble-field">{prepaidInclude.get('charging_by', '')}</div>
+      <div className="non-editable-field">{prepaidInclude.get('charging_by', '')}</div>
     );
   };
 
@@ -43,7 +43,7 @@ const PrepaidInclude = (props) => {
       );
     }
     return (
-      <div className="non-editble-field">{prepaidInclude.get('charging_by_usaget', '')}</div>
+      <div className="non-editable-field">{prepaidInclude.get('charging_by_usaget', '')}</div>
     );
   };
 
@@ -77,7 +77,7 @@ const PrepaidInclude = (props) => {
               {
                 editable
                 ? <Select name="charging_by" value={prepaidInclude.get('charging_by', '')} options={chargingByOptions} onChange={onSelectChange('charging_by')} />
-                : <div className="non-editble-field">{prepaidInclude.get('charging_by', '')}</div>
+                : <div className="non-editable-field">{prepaidInclude.get('charging_by', '')}</div>
               }
             </Col>
           </FormGroup>

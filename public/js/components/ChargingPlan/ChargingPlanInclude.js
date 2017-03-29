@@ -49,7 +49,7 @@ const ChargingPlanInclude = (props) => {
               <Col md={6} style={{ paddingLeft: 0 }}>
                 { props.editable
                   ? <Field id="duration" value={include.getIn(['period', 'duration'], 0)} onChange={onUpdatePeriodField} fieldType="number" editable={props.editable} />
-                  : <div className="non-editble-field">{`${include.getIn(['period', 'duration'], 0)} ${include.getIn(['period', 'unit'], '')}`}</div>
+                  : <div className="non-editable-field">{`${include.getIn(['period', 'duration'], 0)} ${include.getIn(['period', 'unit'], '')}`}</div>
                 }
               </Col>
               <Col md={6}>

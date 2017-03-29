@@ -260,14 +260,14 @@ class RunCycle extends Component {
 
   renderCycleStatus = () => {
     const cycleStatus = this.getSelectedCycleStatus();
-    return (<Label bsStyle={this.getStatusStyle(cycleStatus)} className={'non-editble-field'}>{cycleStatus.toUpperCase()}</Label>);
+    return (<Label bsStyle={this.getStatusStyle(cycleStatus)} className={'non-editable-field'}>{cycleStatus.toUpperCase()}</Label>);
   }
 
   renderStartDate = () => {
     const { cycleAdditionalData } = this.props;
     const { selectedCycle } = this.state;
     return (
-      <div className={'non-editble-field'}>
+      <div className={'non-editable-field'}>
         {cycleAdditionalData.get('start_date', selectedCycle.get('start_date', '-'))}
       </div>
     );
@@ -277,7 +277,7 @@ class RunCycle extends Component {
     const { cycleAdditionalData } = this.props;
     const { selectedCycle } = this.state;
     return (
-      <div className={'non-editble-field'}>
+      <div className={'non-editable-field'}>
         {cycleAdditionalData.get('end_date', selectedCycle.get('end_date', '-'))}
       </div>
     );
@@ -287,7 +287,7 @@ class RunCycle extends Component {
     const { cycleAdditionalData } = this.props;
     const completionPercentage = cycleAdditionalData.get('completion_percentage', false);
     return (
-      <div className={'non-editble-field'}>
+      <div className={'non-editable-field'}>
         {completionPercentage ? `${completionPercentage}%` : '-'}
       </div>
     );
@@ -297,7 +297,7 @@ class RunCycle extends Component {
     const { cycleAdditionalData } = this.props;
     const confirmationPercentage = cycleAdditionalData.get('confirmation_percentage', false);
     return (
-      <div className={'non-editble-field'}>
+      <div className={'non-editable-field'}>
         {confirmationPercentage ? `${confirmationPercentage}%` : '-'}
       </div>
     );

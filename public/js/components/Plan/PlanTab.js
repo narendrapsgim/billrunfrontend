@@ -215,7 +215,7 @@ export default class Plan extends Component {
                         { this.getPeriodicityOptions() }
                       </FormControl>
                     )
-                  : <div className="non-editble-field">{ periodicity }</div>
+                  : <div className="non-editable-field">{ periodicity }</div>
                   }
                 </Col>
               </FormGroup>
@@ -231,7 +231,7 @@ export default class Plan extends Component {
                         <option value={false}>Arrears</option>
                       </FormControl>
                     )
-                    : <div className="non-editble-field">{ upfront ? 'Upfront' : 'Arrears'}</div>
+                    : <div className="non-editable-field">{ upfront ? 'Upfront' : 'Arrears'}</div>
                   }
 
                 </Col>
