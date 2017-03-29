@@ -3,7 +3,10 @@ import { Route, IndexRoute, IndexRedirect } from 'react-router';
 
 import RequireAuth from '../containers/Authentication';
 import App from '../containers/App';
-import Dashboard from '../components/Dashboard';
+import CommercialDashboard from '../components/Dashboard/CommercialDashboard';
+import CustomersDashboard from '../components/Dashboard/CustomersDashboard';
+import OverviewDashboard from '../components/Dashboard/OverviewDashboard';
+import RevenueDashboard from '../components/Dashboard/RevenueDashboard';
 import LoginPage from '../components/LoginPage';
 import WelcomePage from '../components/WelcomePage';
 import PageNotFound from '../components/PageNotFound';
@@ -47,10 +50,10 @@ const routes = () => (
     <IndexRoute component={RequireAuth(WelcomePage)} title="" />
 
     <Route path="dashboard">
-      <Route path="overview" component={RequireAuth(Dashboard)} title="Overview Dashboard" />
-      <Route path="revenue" component={RequireAuth(Dashboard)} title="Revenue Dashboard" />
-      <Route path="commercial" component={RequireAuth(Dashboard)} title="Commercial Dashboard" />
-      <Route path="customers" component={RequireAuth(Dashboard)} title="Customers Dashboard" />
+      <Route path="overview" component={RequireAuth(OverviewDashboard)} title="Overview Dashboard" />
+      <Route path="revenue" component={RequireAuth(RevenueDashboard)} title="Revenue Dashboard" />
+      <Route path="commercial" component={RequireAuth(CommercialDashboard)} title="Commercial Dashboard" />
+      <Route path="customers" component={RequireAuth(CustomersDashboard)} title="Customers Dashboard" />
       <IndexRedirect to="overview" />
     </Route>
 
