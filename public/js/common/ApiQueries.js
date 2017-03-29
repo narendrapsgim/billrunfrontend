@@ -262,6 +262,8 @@ export const getDeleteLineQuery = id => ({
 
 
 // List
+export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
+export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
