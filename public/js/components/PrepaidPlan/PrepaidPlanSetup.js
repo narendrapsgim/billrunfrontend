@@ -24,6 +24,7 @@ import {
   removeBlockProduct,
   addBalanceThreshold,
   changeBalanceThreshold,
+  removeBalanceThreshold,
 } from '../../actions/prepaidPlanActions';
 import { getList } from '../../actions/listActions';
 import { showWarning, showSuccess } from '../../actions/alertsActions';
@@ -194,6 +195,10 @@ class PrepaidPlanSetup extends Component {
     this.props.dispatch(changeBalanceThreshold(balanceId, threshold));
   }
 
+  onRemoveThreshold = (balanceId) => {
+    this.props.dispatch(removeBalanceThreshold(balanceId));
+  }
+
   onAddBalanceThreshold = (balanceId) => {
     const { item, dispatch } = this.props;
     if (item.getIn(['pp_threshold', balanceId])) {
@@ -309,6 +314,7 @@ class PrepaidPlanSetup extends Component {
                 mode={mode}
                 ppIncludes={ppIncludes}
                 onChangeThreshold={this.onChangeThreshold}
+                onRemoveThreshold={this.onRemoveThreshold}
                 onAddBalance={this.onAddBalanceThreshold}
               />
             </Panel>

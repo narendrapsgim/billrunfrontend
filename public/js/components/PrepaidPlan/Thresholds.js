@@ -25,6 +25,7 @@ const Thresholds = (props) => {
         ppId={ppId}
         value={plan.getIn(['pp_threshold', ppId], 0)}
         onChange={props.onChangeThreshold}
+        onRemove={props.onRemoveThreshold}
       />
     );
   };
@@ -66,6 +67,7 @@ Thresholds.propTypes = {
   plan: PropTypes.instanceOf(Map),
   ppIncludes: PropTypes.instanceOf(List),
   onChangeThreshold: PropTypes.func.isRequired,
+  onRemoveThreshold: PropTypes.func.isRequired,
   onAddBalance: PropTypes.func.isRequired,
   mode: PropTypes.string,
 };
