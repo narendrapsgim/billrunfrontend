@@ -8,33 +8,49 @@ export default class DoughnutChart extends Component {
   static propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+    selectedRadiusMargin: PropTypes.number,
+    selectable: PropTypes.bool,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
     ]),
     options: PropTypes.object,
+    onClick: PropTypes.func,
   };
 
   static defaultProps = {
     options: {},
     data: null,
+    selectedRadiusMargin: 10,
+    selectable: true,
+    onClick: () => {},
   };
 
-  getOptions = () => {
-    const { data, options } = this.props;
-    const defaultOptions = {
+  constructor(props) {
+    super(props);
+    this.state = {
+      options: this.options,
+      selectedIndex: null,
+    };
+  }
+
+  get options() {
+    const { options } = this.props;
+    return Object.assign({}, {
       responsive: true,
       title: {
-        display: (typeof data.title !== 'undefined'),
-        text: data.title,
+        display: false,
       },
       legend: {
-        display: (data.values.length > 1),
-        position: 'right',
-        boxWidth: 20,
+        display: false,
       },
-    };
-    return Object.assign(defaultOptions, options);
+      cutoutPercentage: 40,
+      layout: {
+        padding: 40,
+      },
+    },
+    options
+    );
   }
 
   prepareData = () => {
@@ -53,17 +69,38 @@ export default class DoughnutChart extends Component {
     return chartData;
   }
 
-  render() {
-    const { width, height, data } = this.props;
-    if (!data || !data.values) {
-      return null;
+  onElementsClick = (elems) => {
+    const { selectedIndex } = this.state;
+    const { selectedRadiusMargin, selectable } = this.props;
+    if (selectable && elems.length > 0) {
+      const clickedIndex = elems[0]._index;
+      const chartRef = this.refs.chartRef.chart_instance;
+      // reset
+      chartRef.update();
+      if (clickedIndex !== selectedIndex) {
+        elems[0]._model.outerRadius = chartRef.outerRadius + selectedRadiusMargin;
+        elems[0]._model.innerRadius = chartRef.innerRadius + selectedRadiusMargin;
+      }
+      chartRef.render(500, false);
+      this.setState({
+        selectedIndex: (clickedIndex === selectedIndex) ? null : clickedIndex,
+      });
+      this.props.onClick(clickedIndex);
     }
+  }
+
+  render() {
+    const { width, height } = this.props;
+    const { options } = this.state;
+
     return (
       <Doughnut
+        ref="chartRef"
         data={this.prepareData()}
-        options={this.getOptions()}
+        options={options}
         width={width}
         height={height}
+        onElementsClick={this.onElementsClick}
       />
     );
   }
