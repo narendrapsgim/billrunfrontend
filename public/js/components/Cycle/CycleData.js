@@ -214,7 +214,6 @@ class CycleData extends Component {
           showAddButton={false}
           listActions={this.getListActions()}
           refreshString={refreshString}
-          actions={[]}
         />
 
         {this.renderConfirmationModal()}
