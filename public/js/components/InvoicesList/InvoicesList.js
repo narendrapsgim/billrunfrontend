@@ -91,7 +91,7 @@ class InvoicesList extends Component {
   );
 
   parserPaidBy = (ent) => {
-    if (ent.get('paid_by')) {
+    if (ent.get('paid_by', false) === true) {
       return (<span style={{ color: '#3c763d' }}>Paid</span>);
     }
     if (moment(ent.get('due_date')).isAfter(moment())) {
