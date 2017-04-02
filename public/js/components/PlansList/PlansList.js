@@ -58,6 +58,10 @@ const PlansList = () => {
     connection_type: { $regex: '^postpaid$' },
   };
 
+  const actions = [
+    { type: 'edit' },
+  ];
+
   return (
     <EntityList
       itemType="plan"
@@ -67,6 +71,7 @@ const PlansList = () => {
       tableFields={tableFields}
       projectFields={projectFields}
       showRevisionBy="key"
+      actions={actions}
     />
   );
 };

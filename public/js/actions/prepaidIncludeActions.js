@@ -7,6 +7,7 @@ import {
   clearEntity,
   setCloneEntity,
   updateEntityField,
+  deleteEntity,
 } from './entityActions';
 
 
@@ -15,6 +16,8 @@ export const clearPrepaidInclude = () => clearEntity('prepaid_include');
 export const setClonePrepaidInclude = () => setCloneEntity('prepaid_include', 'prepaid_include');
 
 export const savePrepaidInclude = (prepaidInclude, action) => saveEntity('prepaidincludes', prepaidInclude, action);
+
+export const deletePrepaidInclude = prepaidInclude => deleteEntity('prepaidincludes', prepaidInclude);
 
 export const updatePrepaidInclude = (path, value) => updateEntityField('prepaid_include', path, value);
 
