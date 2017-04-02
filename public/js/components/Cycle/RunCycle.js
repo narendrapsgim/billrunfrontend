@@ -6,6 +6,7 @@ import Select from 'react-select';
 import { getCyclesQuery, getCycleQuery, getChargeStatusQuery, getOperationsQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
 import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
+import { clearItems } from '../../actions/entityListActions';
 import ConfirmModal from '../../components/ConfirmModal';
 import CycleData from './CycleData';
 
@@ -15,7 +16,10 @@ class RunCycle extends Component {
     dispatch: PropTypes.func.isRequired,
     cycles: PropTypes.instanceOf(List),
     cycleAdditionalData: PropTypes.instanceOf(Map),
-    chargeStatus: PropTypes.instanceOf(Map),
+    chargeStatus: PropTypes.oneOfType([
+      PropTypes.instanceOf(Map),
+      PropTypes.instanceOf(List),
+    ]),
     chargeStatusRefreshed: PropTypes.oneOfType([
       PropTypes.instanceOf(Map),
       PropTypes.instanceOf(List),
@@ -33,6 +37,7 @@ class RunCycle extends Component {
     super(props);
     this.autoRefresh = null;
     this.autoRefreshChargingStatus = null;
+    this.refreshAfterRun = null;
   }
 
   state = {
@@ -63,6 +68,7 @@ class RunCycle extends Component {
   componentWillUnmount() {
     this.unsetAutoRefresh();
     clearTimeout(this.autoRefreshChargingStatus);
+    clearTimeout(this.refreshAfterRun);
   }
 
   initAutoRefresh = () => {
@@ -143,7 +149,7 @@ class RunCycle extends Component {
     .then(
       (response) => {
         if (response.status) {
-          this.reloadCycleData();
+          this.refreshAfterRun = setTimeout(this.reloadCycleData, 1000);
         }
       }
     );
@@ -223,6 +229,7 @@ class RunCycle extends Component {
   }
 
   onChangeSelectedCycle = (selectedCycleName) => {
+    this.props.dispatch(clearItems('billruns')); // refetch items list because item was (changed in / added to) list
     this.setState({
       selectedCycle: this.getCycleData(selectedCycleName),
       selectedCycleName,
@@ -338,19 +345,23 @@ class RunCycle extends Component {
     const { chargeStatusRefreshed } = this.props;
     const { ChargedAllClicked } = this.state;
     const processing = chargeStatusRefreshed.get('start_date', null) !== null;
-    return ChargedAllClicked && processing;
+    return ChargedAllClicked || processing;
   }
 
   renderChargeAllButton = () => {
     const { chargeStatus } = this.props;
-    let disabled = false;
-    let title = 'Charge All';
+    let disabled = true;
+    let title = '';
     if (this.isChargingStatusProcessing()) {
       disabled = true;
       title = 'Processing...';
-    } else if (!chargeStatus.get('status', false)) {
+    } else if (chargeStatus.get('status', false)) {
+      const hasAmountTocharge = chargeStatus.get('owed_amount', 0) !== 0;
+      disabled = !hasAmountTocharge;
+      title = hasAmountTocharge ? 'Charge All' : 'Nothing to charge';
+    } else {
       disabled = true;
-      title = chargeStatus.get('amount_owed', 0) === 0 ? 'Nothing to charge' : 'Cycle running...';
+      title = 'Charge is running...';
     }
 
     return (<Button disabled={disabled} onClick={this.onClickChargeAll}>{title}</Button>);
@@ -442,7 +453,7 @@ class RunCycle extends Component {
                   reloadCycleData={this.reloadCycleData}
                   showConfirmAllButton={showConfirmAllButton}
                 />
-              }
+            }
 
               {this.renderRerunConfirmationModal()}
               {this.renderChargeAllConfirmationModal()}
@@ -457,8 +468,8 @@ class RunCycle extends Component {
 const mapStateToProps = state => ({
   cycles: state.list.get('cycles_list'),
   cycleAdditionalData: state.list.get('cycle_data', List()).get(0) || Map(),
-  chargeStatus: state.list.get('charge_status', Map()),
-  chargeStatusRefreshed: state.list.get('charge_status_refresh', List()).get(0) || Map({}),
+  chargeStatus: state.list.get('charge_status', List()).get(0) || Map(),
+  chargeStatusRefreshed: state.list.get('charge_status_refresh', List()).get(0) || Map(),
 });
 
 export default connect(mapStateToProps)(RunCycle);

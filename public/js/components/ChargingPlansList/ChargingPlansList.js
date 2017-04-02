@@ -23,6 +23,10 @@ const ChargingPlansList = () => {
     code: 1,
   };
 
+  const actions = [
+    { type: 'edit' },
+  ];
+
   return (
     <EntityList
       collection="prepaidgroups"
@@ -32,6 +36,7 @@ const ChargingPlansList = () => {
       tableFields={tableFields}
       projectFields={projectFields}
       showRevisionBy="name"
+      actions={actions}
     />
   );
 };

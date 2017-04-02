@@ -7,10 +7,16 @@ import { Panel } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { EntityRevisionDetails } from '../Entity';
 import DiscountDetails from './DiscountDetails';
-import { buildPageTitle, getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import {
-  getPlansKeysQuery,
-  getServicesKeysWithInfoQuery,
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemDateValue,
+  getItemMinFromDate,
+} from '../../common/Util';
+import {
+  getPlansQuery,
+  getServicesQuery,
 } from '../../common/ApiQueries';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -25,7 +31,7 @@ import {
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { getList, clearList } from '../../actions/listActions';
 import { modeSelector, itemSelector, idSelector, revisionsSelector } from '../../selectors/entitySelector';
-import { currencySelector } from '../../selectors/settingsSelector';
+import { currencySelector, chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class DiscountSetup extends Component {
@@ -35,6 +41,7 @@ class DiscountSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     currency: PropTypes.string,
     availablePlans: PropTypes.instanceOf(Immutable.List),
     availableServices: PropTypes.instanceOf(Immutable.List),
@@ -67,8 +74,8 @@ class DiscountSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     this.initDefaultValues();
-    this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
-    this.props.dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
+    this.props.dispatch(getList('available_plans', getPlansQuery({ name: 1, description: 1 })));
+    this.props.dispatch(getList('available_services', getServicesQuery({ name: 1, description: 1, quantitative: 1 })));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -201,12 +208,13 @@ class DiscountSetup extends Component {
 
   render() {
     const { progress } = this.state;
-    const { item, mode, revisions, availablePlans, availableServices, currency } = this.props;
+    const { item, mode, revisions, availablePlans, availableServices, currency, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const allowEdit = mode !== 'view';
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="discount-setup">
         <Panel>
@@ -219,6 +227,7 @@ class DiscountSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
         </Panel>
 
@@ -254,6 +263,7 @@ const mapStateToProps = (state, props) => ({
   availablePlans: state.list.get('available_plans') || undefined,
   availableServices: state.list.get('available_services') || undefined,
   currency: currencySelector(state, props) || undefined,
+  chargingDay: chargingDaySelector(state, props) || undefined,
 });
 
 export default withRouter(connect(mapStateToProps)(DiscountSetup));

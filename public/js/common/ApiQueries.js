@@ -262,6 +262,8 @@ export const getDeleteLineQuery = id => ({
 
 
 // List
+export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
+export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
@@ -396,16 +398,16 @@ export const getRunCycleQuery = (billrunKey, rerun) => ({
 
 export const getConfirmCycleInvoiceQuery = (billrunKey, invoiceId) => ({
   api: 'billrun',
-  action: 'cycleconfirmation',
+  action: 'confirmCycle',
   params: [
     { stamp: billrunKey },
-    { invoices: JSON.stringify([invoiceId.toString()]) },
+    { invoices: invoiceId },
   ],
 });
 
 export const getConfirmCycleAllQuery = billrunKey => ({
   api: 'billrun',
-  action: 'cycleconfirmation',
+  action: 'confirmCycle',
   params: [
     { stamp: billrunKey },
   ],
@@ -433,8 +435,8 @@ export const getChargeStatusQuery = () => ({
 export const getOperationsQuery = () => ({
   api: 'operations',
   params: [
-    { action: 'charge_accoun' },
-    { filteration: 'all' },
+    { action: 'charge_account' },
+    { filtration: 'all' },
   ],
 });
 

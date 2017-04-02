@@ -24,6 +24,10 @@ const PrepaidPlansList = () => {
     type: { $regex: '^customer$' },
   };
 
+  const actions = [
+    { type: 'edit' },
+  ];
+
   return (
     <EntityList
       collection="plans"
@@ -34,6 +38,7 @@ const PrepaidPlansList = () => {
       tableFields={tableFields}
       projectFields={projectFields}
       showRevisionBy="key"
+      actions={actions}
     />
   );
 };

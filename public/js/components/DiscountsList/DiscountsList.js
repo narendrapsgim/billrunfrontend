@@ -20,6 +20,10 @@ const DiscountsList = () => {
     discount_type: 1,
   };
 
+  const actions = [
+    { type: 'edit' },
+  ];
+
   return (
     <EntityList
       itemsType="discounts"
@@ -28,6 +32,7 @@ const DiscountsList = () => {
       tableFields={tableFields}
       projectFields={projectFields}
       showRevisionBy="key"
+      actions={actions}
     />
   );
 };

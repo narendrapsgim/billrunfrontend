@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Label, Button, FormGroup, HelpBlock } from 'react-bootstrap';
 import { List, Map } from 'immutable';
 import { getSymbolFromCurrency } from 'currency-symbol-map';
+import moment from 'moment';
 import { getAllInvoicesQuery } from '../../common/ApiQueries';
 import EntityList from '../EntityList';
 import { getList } from '../../actions/listActions';
@@ -39,6 +40,7 @@ class CycleData extends Component {
       message: '',
       warningMessage: 'This action is irreversible',
       onClick: () => {},
+      refreshString: '',
     },
   }
 
@@ -85,7 +87,9 @@ class CycleData extends Component {
       .then(
         (response) => {
           if (response.status) {
-            this.props.reloadCycleData();
+            this.closeConfirmationModal();
+            this.setState({ refreshString: moment().format() });
+            setTimeout(this.props.reloadCycleData, 1000);
           }
         }
       );
@@ -98,7 +102,7 @@ class CycleData extends Component {
     confirmationModalData.title = 'Confirm all invoices';
     confirmationModalData.message = `Are you sure you want to confirm all the invoices for the cycle of
       ${this.getDateToDisplay(selectedCycle.get('start_date', ''))} - ${this.getDateToDisplay(selectedCycle.get('end_date', ''))}?
-      ${invoicesNum} invoices will be confirmed after this action`; // TODO: add <#invoices>
+      ${invoicesNum} invoices will be confirmed after this action`;
     confirmationModalData.onClick = this.onClickConfirmAllConfirm;
     this.setState({ confirmationModalData });
   }
@@ -109,7 +113,9 @@ class CycleData extends Component {
       .then(
         (response) => {
           if (response.status) {
-            this.props.reloadCycleData();
+            this.closeConfirmationModal();
+            this.setState({ refreshString: moment().format() });
+            setTimeout(this.props.reloadCycleData, 1000);
           }
         }
       );
@@ -151,6 +157,10 @@ class CycleData extends Component {
   }
 
   onCloseConfirmationModal = () => {
+    this.closeConfirmationModal();
+  }
+
+  closeConfirmationModal = () => {
     const { confirmationModalData } = this.state;
     confirmationModalData.show = false;
     confirmationModalData.title = '';
@@ -173,6 +183,7 @@ class CycleData extends Component {
 
   render() {
     const { baseFilter } = this.props;
+    const { refreshString } = this.state;
 
     const filterFields = [
       { id: 'aid', placeholder: 'Customer Number', type: 'number' },
@@ -201,8 +212,8 @@ class CycleData extends Component {
           baseFilter={baseFilter}
           tableFields={tableFields}
           showAddButton={false}
-          editable={false}
           listActions={this.getListActions()}
+          refreshString={refreshString}
         />
 
         {this.renderConfirmationModal()}
