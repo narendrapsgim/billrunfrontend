@@ -4,6 +4,9 @@ import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
 import { getItemDateValue, getConfig } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
+
+const apiTimeOutMessage = 'Oops! Something went wrong. Please try again in a few moments.';
+
 export const actions = {
   GOT_ENTITY: 'GOT_ENTITY',
   UPDATE_ENTITY_FIELD: 'UPDATE_ENTITY_FIELD',
@@ -132,14 +135,14 @@ export const saveEntity = (collection, item, action) => (dispatch) => {
   const apiAction = requestActionBuilder(collection, item, action);
   const body = requestDataBuilder(collection, item, apiAction);
   const query = apiEntityQuery(collection, apiAction, body);
-  return apiBillRun(query)
+  return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
 };
 
 const fetchEntity = (collection, query) => (dispatch) => {
   dispatch(startProgressIndicator());
-  return apiBillRun(query)
+  return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })
     .then((success) => {
       dispatch(gotEntity(collection, success.data[0].data.details[0]));
       return dispatch(apiBillRunSuccessHandler(success));
