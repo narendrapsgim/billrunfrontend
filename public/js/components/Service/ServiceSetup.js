@@ -8,13 +8,18 @@ import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
-import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import { addGroup, removeGroup, getService, clearService, updateService, saveService, setCloneService } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
-
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 class ServiceSetup extends Component {
 
@@ -23,6 +28,7 @@ class ServiceSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -167,13 +173,14 @@ class ServiceSetup extends Component {
 
   render() {
     const { progress, activeTab } = this.state;
-    const { item, mode, revisions } = this.props;
+    const { item, mode, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const allowEdit = mode !== 'view';
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="ServiceSetup">
         <Panel>
@@ -186,6 +193,7 @@ class ServiceSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
         </Panel>
 
@@ -230,6 +238,7 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'service'),
   activeTab: tabSelector(state, props, 'service'),
   revisions: revisionsSelector(state, props, 'service'),
+  chargingDay: chargingDaySelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ServiceSetup));

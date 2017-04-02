@@ -9,7 +9,12 @@ import ChargingPlanIncludes from './ChargingPlanIncludes';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
-import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import {
   getPrepaidGroup,
   clearPlan,
@@ -24,7 +29,7 @@ import { showWarning, showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
-
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 class ChargingPlanSetup extends Component {
 
@@ -33,6 +38,7 @@ class ChargingPlanSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     prepaidIncludes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
@@ -187,7 +193,7 @@ class ChargingPlanSetup extends Component {
   }
 
   render() {
-    const { item, prepaidIncludes, mode, revisions } = this.props;
+    const { item, prepaidIncludes, mode, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -196,6 +202,7 @@ class ChargingPlanSetup extends Component {
       label: pp.get('name'),
       value: pp.get('name'),
     })).toJS();
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="ChargingPlanSetup">
 
@@ -209,6 +216,7 @@ class ChargingPlanSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
         </Panel>
 
@@ -253,5 +261,6 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'plan'),
   prepaidIncludes: state.list.get('prepaid_includes'),
+  chargingDay: chargingDaySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(ChargingPlanSetup));
