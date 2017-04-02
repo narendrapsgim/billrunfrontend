@@ -91,7 +91,7 @@ class InvoicesList extends Component {
   );
 
   parserPaidBy = (ent) => {
-    if (ent.get('paid_by', false) === true) {
+    if (ent.get('paid', false) === true) {
       return (<span style={{ color: '#3c763d' }}>Paid</span>);
     }
     if (moment(ent.get('due_date')).isAfter(moment())) {
@@ -117,7 +117,7 @@ class InvoicesList extends Component {
     { id: 'invoice_date', title: 'Date', cssClass: 'short-date', sort: true, type: 'date' },
     { id: 'due_date', title: 'Due', cssClass: 'short-date', sort: true, type: 'date' },
     { id: 'amount', title: 'Amount', sort: true },
-    { id: 'paid_by', title: 'Status', parser: this.parserPaidBy },
+    { id: 'paid', title: 'Status', parser: this.parserPaidBy },
     { id: 'billrun_key', title: 'Cycle', sort: true },
     { id: 'aid', title: 'Customer ID', sort: true },
     { id: 'payer_name', title: 'Name', sort: true },
