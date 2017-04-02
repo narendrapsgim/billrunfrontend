@@ -10,6 +10,7 @@ export default class DoughnutChart extends Component {
     height: PropTypes.number.isRequired,
     selectedRadiusMargin: PropTypes.number,
     selectable: PropTypes.bool,
+    message: PropTypes.string,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
@@ -23,6 +24,7 @@ export default class DoughnutChart extends Component {
     data: null,
     selectedRadiusMargin: 10,
     selectable: true,
+    message: '',
     onClick: () => {},
   };
 
@@ -31,8 +33,19 @@ export default class DoughnutChart extends Component {
     this.state = {
       options: this.options,
       selectedIndex: null,
+      height: 0,
+      width: 0,
     };
   }
+
+  componentDidMount() {
+    // Charts are responsive, width/height should be updated only after first render
+    this.setState({
+      width: this.refs.chartRef.chart_instance.chart.width,
+      height: this.refs.chartRef.chart_instance.chart.height,
+    });
+  }
+
 
   get options() {
     const { options } = this.props;
@@ -44,13 +57,21 @@ export default class DoughnutChart extends Component {
       legend: {
         display: false,
       },
-      cutoutPercentage: 40,
+      cutoutPercentage: 50,
       layout: {
-        padding: 40,
+        padding: 20,
       },
+      onResize: this.onChartResize,
     },
     options
     );
+  }
+
+  onChartResize = (chart, size) => {
+    this.setState({
+      width: size.width,
+      height: size.height,
+    });
   }
 
   prepareData = () => {
@@ -73,13 +94,14 @@ export default class DoughnutChart extends Component {
     const { selectedIndex } = this.state;
     const { selectedRadiusMargin, selectable } = this.props;
     if (selectable && elems.length > 0) {
-      const clickedIndex = elems[0]._index;
+      const clickedIndex = elems[0]._index; // eslint-disable-line  no-underscore-dangle
       const chartRef = this.refs.chartRef.chart_instance;
       // reset
       chartRef.update();
       if (clickedIndex !== selectedIndex) {
-        elems[0]._model.outerRadius = chartRef.outerRadius + selectedRadiusMargin;
-        elems[0]._model.innerRadius = chartRef.innerRadius + selectedRadiusMargin;
+        const newRatio = 1 + (selectedRadiusMargin / 100);
+        elems[0]._model.outerRadius = chartRef.outerRadius * newRatio;
+        elems[0]._model.innerRadius = chartRef.innerRadius * newRatio;
       }
       chartRef.render(500, false);
       this.setState({
@@ -89,19 +111,35 @@ export default class DoughnutChart extends Component {
     }
   }
 
+  renderMessage = () => {
+    const { message } = this.props;
+    const { height } = this.state;
+    if (!message || message === '') {
+      return null;
+    }
+    const fontSize = (height / 114).toFixed(2);
+    return (
+      <p className="doughnut-message" style={{ fontSize: `${fontSize}em` }}>
+        {message}
+      </p>
+    );
+  }
+
   render() {
     const { width, height } = this.props;
     const { options } = this.state;
-
     return (
-      <Doughnut
-        ref="chartRef"
-        data={this.prepareData()}
-        options={options}
-        width={width}
-        height={height}
-        onElementsClick={this.onElementsClick}
-      />
+      <div className="doughnut-wrapper">
+        { this.renderMessage() }
+        <Doughnut
+          ref="chartRef"
+          data={this.prepareData()}
+          options={options}
+          width={width}
+          height={height}
+          onElementsClick={this.onElementsClick}
+        />
+      </div>
     );
   }
 }

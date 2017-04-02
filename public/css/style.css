@@ -439,3 +439,19 @@ ul.revision-history-list li.last::after {
 .discount-setup .help-block {
   margin-bottom: 0;
 }
+
+/* Chart */
+.doughnut-wrapper {
+  position: relative;
+}
+.doughnut-message {
+  position: absolute;
+  color: #7C7C7C;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+.doughnut-legend {
+
+}
+/* ~Chart */
