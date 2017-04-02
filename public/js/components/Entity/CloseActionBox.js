@@ -16,11 +16,13 @@ class CloseActionBox extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     itemName: PropTypes.string.isRequired,
     onCloseItem: PropTypes.func,
+    minDate: PropTypes.instanceOf(moment),
     dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     item: Immutable.Map(),
+    minDate: moment().add(1, 'days'), // default minDate is tommorow
     onCloseItem: () => {},
   }
 
@@ -74,13 +76,13 @@ class CloseActionBox extends Component {
   }
 
   renderDateFromfields = () => {
-    const { item } = this.props;
+    const { item, minDate } = this.props;
     const { closeDate } = this.state;
-    const tommorow = moment().add(1, 'days');
     const btnStyle = { marginLeft: 5, verticalAlign: 'bottom' };
     const itemToDate = getItemDateValue(item, 'to', null);
     const disableSubmit = closeDate === null
       || (itemToDate && closeDate && itemToDate.isSame(closeDate));
+    const highlightDates = [moment()];
     return (
       <div className="inline">
         <DatePicker
@@ -90,7 +92,8 @@ class CloseActionBox extends Component {
           onChange={this.onChangeFrom}
           isClearable={true}
           placeholderText="Select Date..."
-          minDate={tommorow}
+          minDate={minDate}
+          highlightDates={highlightDates}
         />
         <Button onClick={this.toggleCloseConfirm} style={btnStyle} disabled={disableSubmit}>
           OK
