@@ -7,10 +7,17 @@ import { lowerCase, sentenceCase } from 'change-case';
 import { ConfirmModal, StateIcon } from '../Elements';
 import CloseActionBox from '../Entity/CloseActionBox';
 import List from '../../components/List';
-import { getItemDateValue, getConfig, isItemClosed, getItemId } from '../../common/Util';
+import {
+  getItemDateValue,
+  getConfig,
+  isItemClosed,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class RevisionList extends Component {
@@ -21,6 +28,7 @@ class RevisionList extends Component {
     onDeleteItem: PropTypes.func,
     onCloseItem: PropTypes.func,
     itemName: PropTypes.string.isRequired,
+    chargingDay: PropTypes.number,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -172,12 +180,13 @@ class RevisionList extends Component {
   ]
 
   render() {
-    const { items, itemName } = this.props;
+    const { items, itemName, chargingDay } = this.props;
     const { showConfirmRemove } = this.state;
     const fields = this.getListFields();
     const actions = this.getListActions();
     const activeItem = items.find(this.isItemActive);
     const removeConfirmMessage = 'Are you sure you want to remove this revision?';
+    const minDate = getItemMinFromDate(activeItem.set('originalValue', activeItem.get('from')), chargingDay);
     return (
       <div>
         <List items={items} fields={fields} edit={false} actions={actions} />
@@ -186,6 +195,7 @@ class RevisionList extends Component {
             itemName={itemName}
             item={activeItem}
             onCloseItem={this.props.onCloseItem}
+            minDate={minDate}
           />
         }
         <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
@@ -194,4 +204,7 @@ class RevisionList extends Component {
   }
 }
 
-export default withRouter(connect()(RevisionList));
+const mapStateToProps = (state, props) => ({
+  chargingDay: chargingDaySelector(state, props),
+});
+export default withRouter(connect(mapStateToProps)(RevisionList));
