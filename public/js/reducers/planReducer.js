@@ -44,6 +44,7 @@ import {
   REMOVE_BLOCK_PRODUCT,
   ADD_BALANCE_THRESHOLD,
   CHANGE_BALANCE_THRESHOLD,
+  REMOVE_BALANCE_THRESHOLD,
 } from '../actions/prepaidPlanActions';
 
 
@@ -198,6 +199,9 @@ export default function (state = defaultState, action) {
 
     case CHANGE_BALANCE_THRESHOLD:
       return state.setIn(['pp_threshold', action.balanceId], action.value);
+
+    case REMOVE_BALANCE_THRESHOLD:
+      return state.deleteIn(['pp_threshold', action.balanceId]);
 
     case ADD_USAGET_INCLUDE: {
       const newInclude = Immutable.fromJS({
