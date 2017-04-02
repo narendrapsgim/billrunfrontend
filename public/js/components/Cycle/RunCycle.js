@@ -345,19 +345,23 @@ class RunCycle extends Component {
     const { chargeStatusRefreshed } = this.props;
     const { ChargedAllClicked } = this.state;
     const processing = chargeStatusRefreshed.get('start_date', null) !== null;
-    return ChargedAllClicked && processing;
+    return ChargedAllClicked || processing;
   }
 
   renderChargeAllButton = () => {
     const { chargeStatus } = this.props;
-    let disabled = false;
-    let title = 'Charge All';
+    let disabled = true;
+    let title = '';
     if (this.isChargingStatusProcessing()) {
       disabled = true;
       title = 'Processing...';
-    } else if (!chargeStatus.get('status', false)) {
+    } else if (chargeStatus.get('status', false)) {
+      const hasAmountTocharge = chargeStatus.get('owed_amount', 0) !== 0;
+      disabled = !hasAmountTocharge;
+      title = hasAmountTocharge ? 'Charge All' : 'Nothing to charge';
+    } else {
       disabled = true;
-      title = chargeStatus.get('amount_owed', 0) === 0 ? 'Nothing to charge' : 'Cycle running...';
+      title = 'Charge is running...';
     }
 
     return (<Button disabled={disabled} onClick={this.onClickChargeAll}>{title}</Button>);
@@ -464,8 +468,8 @@ class RunCycle extends Component {
 const mapStateToProps = state => ({
   cycles: state.list.get('cycles_list'),
   cycleAdditionalData: state.list.get('cycle_data', List()).get(0) || Map(),
-  chargeStatus: state.list.get('charge_status', Map()),
-  chargeStatusRefreshed: state.list.get('charge_status_refresh', List()).get(0) || Map({}),
+  chargeStatus: state.list.get('charge_status', List()).get(0) || Map(),
+  chargeStatusRefreshed: state.list.get('charge_status_refresh', List()).get(0) || Map(),
 });
 
 export default connect(mapStateToProps)(RunCycle);
