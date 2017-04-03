@@ -46,6 +46,10 @@ class CustomersList extends Component {
       .toJS();
     fields.push({ id: 'to', placeholder: 'To', showFilter: false, display: false, type: 'datetime' });
 
+    const actions = [
+      { type: 'edit' },
+    ];
+
     return (
       <EntityList
         collection="accounts"
@@ -53,6 +57,7 @@ class CustomersList extends Component {
         itemType="customer"
         tableFields={fields}
         filterFields={fields}
+        actions={actions}
       />
     );
   }

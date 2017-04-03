@@ -8,7 +8,12 @@ import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
 import { EntityRevisionDetails } from '../Entity';
-import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import { getProductsKeysQuery } from '../../common/ApiQueries';
 import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
@@ -33,6 +38,7 @@ import {
   tabSelector,
   revisionsSelector,
 } from '../../selectors/entitySelector';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class PrepaidIncludeSetup extends Component {
@@ -42,6 +48,7 @@ class PrepaidIncludeSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     allRates: PropTypes.instanceOf(Immutable.List),
     usageTypes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
@@ -205,7 +212,7 @@ class PrepaidIncludeSetup extends Component {
   }
 
   render() {
-    const { item, mode, allRates, usageTypes, revisions } = this.props;
+    const { item, mode, allRates, usageTypes, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -220,7 +227,7 @@ class PrepaidIncludeSetup extends Component {
       value: rate.get('key'),
       label: rate.get('key'),
     })).toArray();
-
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="PrepaidIncludeSetup">
 
@@ -234,6 +241,7 @@ class PrepaidIncludeSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
         </Panel>
 
@@ -279,5 +287,6 @@ const mapStateToProps = (state, props) => ({
   revisions: revisionsSelector(state, props, 'prepaid_include'),
   allRates: state.list.get('all_rates'),
   usageTypes: state.settings.get('usage_types'),
+  chargingDay: chargingDaySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PrepaidIncludeSetup));

@@ -435,8 +435,8 @@ export const getChargeStatusQuery = () => ({
 export const getOperationsQuery = () => ({
   api: 'operations',
   params: [
-    { action: 'charge_accoun' },
-    { filteration: 'all' },
+    { action: 'charge_account' },
+    { filtration: 'all' },
   ],
 });
 

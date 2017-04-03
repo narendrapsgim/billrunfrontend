@@ -212,7 +212,6 @@ class CycleData extends Component {
           baseFilter={baseFilter}
           tableFields={tableFields}
           showAddButton={false}
-          editable={false}
           listActions={this.getListActions()}
           refreshString={refreshString}
         />
