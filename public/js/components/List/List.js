@@ -62,7 +62,7 @@ class List extends Component {
     if (!Immutable.Iterable.isIterable(entity)) {
       return this.printEntityField(Immutable.fromJS(entity), field);
     }
-    if (field.parser) { return field.parser(entity); }
+    if (field.parser) { return field.parser(entity, field); }
     if (field.type) { return this.displayByType(field, entity); }
     return entity.get(field.id);
   }

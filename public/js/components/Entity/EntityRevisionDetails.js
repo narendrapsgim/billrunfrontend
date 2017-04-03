@@ -187,7 +187,7 @@ class EntityRevisionDetails extends Component {
     const originFrom = getItemDateValue(item, 'originalValue');
     const tommorow = moment().add(1, 'day');
     const selectedValue = from.isSame(originFrom, 'day') ? tommorow : from;
-    const highlightDates = (mode === 'create') ? [] : [originFrom];
+    const highlightDates = (mode === 'create') ? [moment()] : [originFrom, moment()];
     const inputProps = {
       fieldType: 'date',
       dateFormat: getConfig('dateFormat', 'DD/MM/YYYY'),
