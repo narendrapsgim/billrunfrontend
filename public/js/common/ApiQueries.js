@@ -399,7 +399,7 @@ export const getConfirmCycleInvoiceQuery = (billrunKey, invoiceId) => ({
   action: 'confirmCycle',
   params: [
     { stamp: billrunKey },
-    { invoices: JSON.stringify([invoiceId.toString()]) },
+    { invoices: invoiceId },
   ],
 });
 
