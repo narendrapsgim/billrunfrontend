@@ -91,7 +91,7 @@ class InvoicesList extends Component {
   );
 
   parserPaidBy = (ent) => {
-		let paid = ent.get('paid', false);
+    let paid = ent.get('paid', false);
     if ([true, '1'].includes(paid)) {
       return (<span style={{ color: '#3c763d' }}>Paid</span>);
     }
