@@ -45,9 +45,9 @@ LimitedDestinations.defaultProps = {
 LimitedDestinations.propTypes = {
   limitedDestinations: PropTypes.instanceOf(Map),
   allRates: PropTypes.array,
-  onSelectPlan: React.PropTypes.func.isRequired,
-  onChange: React.PropTypes.func.isRequired,
-  onRemove: React.PropTypes.func.isRequired,
+  onSelectPlan: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
   mode: PropTypes.string,
 };
 
