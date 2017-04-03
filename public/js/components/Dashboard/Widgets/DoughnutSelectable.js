@@ -5,6 +5,16 @@ import { palitra } from '../../Charts/helpers';
 
 class DoughnutSelectable extends Component {
 
+  static propTypes = {
+    width: PropTypes.number,
+    height: PropTypes.number,
+    data: PropTypes.object,
+    type: PropTypes.string,
+    parseValue: PropTypes.func,
+    parseLabel: PropTypes.func,
+    parsePercent: PropTypes.func,
+  };
+
   static defaultProps = {
     width: 100,
     height: 100,
@@ -13,13 +23,10 @@ class DoughnutSelectable extends Component {
       values: [],
     },
     type: 'legend',
-  };
+    parseValue: value => value,
+    parseLabel: label => label,
+    parsePercent: percent => Number(percent).toLocaleString('en-US', { style: 'percent', maximumFractionDigits: 2 }),
 
-  static propTypes = {
-    width: PropTypes.number,
-    height: PropTypes.number,
-    data: PropTypes.object,
-    type: PropTypes.string,
   };
 
   state = {
@@ -68,8 +75,8 @@ class DoughnutSelectable extends Component {
     const width = 100 / data.labels.length;
     return data.labels.map((label, idx) => (
       <div className="inline" style={{ width: `${width}%`, textAlign: 'center', color: palitra(idx), fontWeight: (idx === selectedIndex) ? 'bold' : 'normal' }}>
-        <p>{data.values[idx]}</p>
-        <p>{label}</p>
+        <p>{ this.props.parseValue(data.values[idx]) }</p>
+        <p>{ this.props.parseLabel(label)}</p>
       </div>
     ));
   }
@@ -84,7 +91,7 @@ class DoughnutSelectable extends Component {
             { selectedIndex !== null
               ? (
                 <span>
-                  {this.convertToPercentageString(percentage)} | {data.values[selectedIndex]}
+                  { this.props.parsePercent(percentage)} | { this.props.parseValue(data.values[selectedIndex]) }
                 </span>
               )
               : <span>&nbsp;</span>
@@ -103,7 +110,7 @@ class DoughnutSelectable extends Component {
         <div>
           <p className="mb0" style={{ color: (selectedIndex !== null) ? palitra(selectedIndex) : '#000' }}>
             { (selectedIndex !== null)
-              ? data.labels[selectedIndex]
+              ? this.props.parseLabel(data.labels[selectedIndex])
               : <span>&nbsp;</span>
             }
           </p>
@@ -112,13 +119,11 @@ class DoughnutSelectable extends Component {
     );
   }
 
-  convertToPercentageString = percentage => `${parseFloat((percentage * 100).toFixed(1))}%`
-
   render() {
     const { width, height, data, type } = this.props;
     const options = this.getOptions();
     const percentage = this.calcSelectedItemPercentage();
-    const message = (type === 'legend' && percentage !== '') ? this.convertToPercentageString(percentage) : '';
+    const message = (type === 'legend' && percentage !== '') ? this.props.parsePercent(percentage) : '';
 
     return (
       <div>
