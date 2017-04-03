@@ -1,13 +1,20 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
+import { currencySelector } from '../../selectors/settingsSelector';
+
 
 const DashboardBase = (ComposedComponent) => {
   class DashboardLayout extends Component {
 
-    static propTypes = {};
+    static propTypes = {
+      currency: PropTypes.string,
+    };
 
-    static defaultProps = {};
+    static defaultProps = {
+      currency: '',
+    };
 
     constructor(props) {
       super(props);
@@ -17,18 +24,23 @@ const DashboardBase = (ComposedComponent) => {
     }
 
     render() {
+      const { currency } = this.props;
       const { fromDate, toDate } = this.state;
       return (
         <Row>
           <Col lg={8} md={12} sm={12} xs={12} lgOffset={2} mdOffset={0} smOffset={0} xsOffset={0} >
-            <ComposedComponent fromDate={fromDate} toDate={toDate} />
+            <ComposedComponent fromDate={fromDate} toDate={toDate} currency={currency} />
           </Col>
         </Row>
       );
     }
   }
 
-  return DashboardLayout;
+  const mapStateToProps = (state, props) => ({
+    currency: currencySelector(state, props),
+  });
+
+  return connect(mapStateToProps)(DashboardLayout);
 };
 
 export default DashboardBase;
