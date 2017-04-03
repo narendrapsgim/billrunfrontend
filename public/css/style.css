@@ -454,4 +454,48 @@ ul.revision-history-list li.last::after {
 .doughnut-legend {
 
 }
+
+.percentBarChart .marker {
+  position: absolute;
+  color: white;
+  margin-top: 5px;
+  padding: 0 5px;
+  background-color: #388E3C;
+  opacity: .8;
+}
+.percentBarChart .marker.negative {
+  background-color: #D32F2F;
+}
+.percentBarChart .marker:after {
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  opacity: .8;
+  border-bottom-color: #388E3C;
+  border-width: 6px;
+  margin-left: -6px;
+}
+.percentBarChart .marker.negative:after {
+  border-bottom-color: #D32F2F;
+}
+.percentBarChart .diff {
+  color: #388E3C;
+}
+.percentBarChart .diff.negative {
+  color: #D32F2F;
+}
+.percentBarChart .legend {
+  background-color: black;
+  color: white;
+  padding: 1px 4px;
+  margin-right: 3px;
+}
+.percentBarChart .value {
+  color: #7C7C7C;
+}
 /* ~Chart */
