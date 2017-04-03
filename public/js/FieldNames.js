@@ -38,7 +38,7 @@ const FieldNames = {
     accountcode: 'CDR account ID',
     type: 'Input processor name',
     source: 'Record source',
-    connection_type: 'Connection_type',
+    connection_type: 'Postpaid / Prepaid',
     end: 'End time',
     aid: 'Customer ID',
     process_time: 'Process time',
