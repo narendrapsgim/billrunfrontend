@@ -91,8 +91,12 @@ class InvoicesList extends Component {
   );
 
   parserPaidBy = (ent) => {
-    if (ent.get('paid', false) === true) {
+		let paid = ent.get('paid', false);
+    if ([true, '1'].includes(paid)) {
       return (<span style={{ color: '#3c763d' }}>Paid</span>);
+    }
+    else if (paid === '2') {
+      return (<span style={{ color: '#5b5e5b' }}>Pending</span>);
     }
     if (moment(ent.get('due_date')).isAfter(moment())) {
       return (<span style={{ color: '#8a6d3b' }}>Due</span>);
