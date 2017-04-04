@@ -52,6 +52,7 @@ fieldset[disabled] .btn {
 .mb10{ margin-bottom: 10px!important; }
 .mr10{ margin-right: 10px!important; }
 .mr0{ margin-right: 0!important; }
+.mt0{ margin-top: 0!important; }
 
 .full-width{ width: 100%!important; }
 
@@ -475,7 +476,6 @@ ul.revision-history-list li.last::after {
   width: 0;
   position: absolute;
   pointer-events: none;
-  opacity: .8;
   border-bottom-color: #388E3C;
   border-width: 6px;
   margin-left: -6px;

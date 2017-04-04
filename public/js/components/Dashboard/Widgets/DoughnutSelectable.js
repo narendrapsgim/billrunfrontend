@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { DoughnutChart } from '../../Charts';
 import { palitra } from '../../Charts/helpers';
-
+import WidgetsHOC from './WidgetsHOC';
 
 class DoughnutSelectable extends Component {
 
@@ -17,7 +17,7 @@ class DoughnutSelectable extends Component {
 
   static defaultProps = {
     width: 100,
-    height: 100,
+    height: 70,
     data: {
       labels: [],
       values: [],
@@ -25,25 +25,28 @@ class DoughnutSelectable extends Component {
     type: 'legend',
     parseValue: value => value,
     parseLabel: label => label,
-    parsePercent: percent => Number(percent).toLocaleString('en-US', { style: 'percent', maximumFractionDigits: 2 }),
-
+    parsePercent: percent => percent,
   };
 
   state = {
     selectedIndex: null,
   }
 
-  getOptions() { // eslint-disable-line class-methods-use-this
-    const owerideOptions = {
-      tooltips: {
-        enabled: false,
+  getOptions = () => ({
+    tooltips: {
+      enabled: true,
+      displayColors: false,
+      callbacks: {
+        label: (tooltipItem, data) => {
+          const label = data.labels[tooltipItem.index] || '';
+          return this.props.parseLabel(label);
+        },
       },
-      legend: {
-        display: false,
-      },
-    };
-    return owerideOptions;
-  }
+    },
+    legend: {
+      display: false,
+    },
+  })
 
   onClick = (index) => {
     const { selectedIndex } = this.state;
@@ -58,13 +61,8 @@ class DoughnutSelectable extends Component {
     const { data } = this.props;
     const { selectedIndex } = this.state;
     if (selectedIndex !== null) {
-      return data.values.reduce((accumulator, currentValue, idx, array) => {
-        const sum = accumulator + currentValue;
-        if (array.length - 1 === idx) {
-          return array[selectedIndex] / sum;
-        }
-        return sum;
-      }, 0);
+      const sum = data.values.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+      return data.values[selectedIndex] / sum;
     }
     return '';
   }
@@ -74,8 +72,8 @@ class DoughnutSelectable extends Component {
     const { selectedIndex } = this.state;
     const width = 100 / data.labels.length;
     return data.labels.map((label, idx) => (
-      <div className="inline" style={{ width: `${width}%`, textAlign: 'center', color: palitra(idx), fontWeight: (idx === selectedIndex) ? 'bold' : 'normal' }}>
-        <p>{ this.props.parseValue(data.values[idx]) }</p>
+      <div key={idx} className="inline" style={{ width: `${width}%`, textAlign: 'center', color: palitra(idx), fontWeight: (idx === selectedIndex) ? 'bold' : 'normal' }}>
+        <p className="mb0">{ this.props.parseValue(data.values[idx]) }</p>
         <p>{ this.props.parseLabel(label)}</p>
       </div>
     ));
@@ -84,20 +82,27 @@ class DoughnutSelectable extends Component {
   renderDetails = (percentage) => {
     const { data } = this.props;
     const { selectedIndex } = this.state;
+
+    if (selectedIndex === null) {
+      return (
+        <div style={{ minHeight: 72.5 }}>
+          <ul className="mb0">
+            { data.labels.map((label, idx) =>
+              <li key={idx} className="mb0" style={{ color: palitra(idx), lineHeight: '17px' }}>
+                { this.props.parseLabel(label) }
+              </li>
+            )}
+          </ul>
+        </div>
+      );
+    }
     return (
       <div>
         <div>
           <h4 className="pull-left" style={{ color: '#7C7C7C' }}>
-            { selectedIndex !== null
-              ? (
-                <span>
-                  { this.props.parsePercent(percentage)} | { this.props.parseValue(data.values[selectedIndex]) }
-                </span>
-              )
-              : <span>&nbsp;</span>
-            }
+            {`${this.props.parsePercent(percentage)} | ${this.props.parseValue(data.values[selectedIndex])}`}
           </h4>
-          { (selectedIndex !== null && data.sign && data.sign[selectedIndex] !== 0) &&
+          { (data.sign && data.sign[selectedIndex] !== 0) &&
             <p className="pull-right">
               { (data.sign[selectedIndex] > 0)
                 ? <i className="fa fa-caret-up fa-3x" style={{ height: 30, color: 'green' }} />
@@ -108,11 +113,8 @@ class DoughnutSelectable extends Component {
         </div>
         <div className="clearfix" />
         <div>
-          <p className="mb0" style={{ color: (selectedIndex !== null) ? palitra(selectedIndex) : '#000' }}>
-            { (selectedIndex !== null)
-              ? this.props.parseLabel(data.labels[selectedIndex])
-              : <span>&nbsp;</span>
-            }
+          <p style={{ color: palitra(selectedIndex) }}>
+            { this.props.parseLabel(data.labels[selectedIndex]) }
           </p>
         </div>
       </div>
@@ -143,4 +145,4 @@ class DoughnutSelectable extends Component {
 }
 
 
-export default DoughnutSelectable;
+export default WidgetsHOC(DoughnutSelectable);

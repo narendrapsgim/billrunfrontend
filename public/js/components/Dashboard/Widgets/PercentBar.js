@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import classNames from 'classnames';
 import { palitra } from '../../Charts/helpers';
+import WidgetsHOC from './WidgetsHOC';
 
 
 class PercentBar extends Component {
@@ -16,7 +17,7 @@ class PercentBar extends Component {
       values: [],
     },
     parseValue: value => value,
-    parsePercent: percent => Number(percent).toLocaleString('en-US', { style: 'percent', maximumFractionDigits: 2 }),
+    parsePercent: percent => percent,
 
   };
 
@@ -29,7 +30,7 @@ class PercentBar extends Component {
     const prevValue = values[values.length - 2];
     const persent = value / maxValue;
 
-    const barStyle = { width: `${persent * 100}%`, backgroundColor: palitra(1) };
+    const barStyle = { width: `${persent * 100}%`, backgroundColor: palitra(1), height: 12 };
 
     const yearDiff = (value - yearAvg) / yearAvg;
     const yearPercent = yearAvg / maxValue;
@@ -55,9 +56,9 @@ class PercentBar extends Component {
     return (
       <div className="percentBarChart">
         <div>
-          <h3 className="value" style={{ marginTop: 0 }}>{ this.props.parseValue(value) }</h3>
+          <h2 className="value" style={{ marginTop: 0 }}>{ this.props.parseValue(value) }</h2>
           <div style={{ position: 'relative' }}>
-            <div style={{ backgroundColor: '#F5F5F5' }}>
+            <div style={{ backgroundColor: '#DDDDDD' }}>
               <div style={barStyle}>&nbsp;</div>
             </div>
             <span className={markerYearClass} style={charPersentYStyle}>Y</span>
@@ -91,4 +92,4 @@ class PercentBar extends Component {
 }
 
 
-export default PercentBar;
+export default WidgetsHOC(PercentBar);
