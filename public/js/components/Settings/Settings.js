@@ -151,7 +151,7 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Security" eventKey={4}>
+          <Tab title="Security" eventKey={5}>
             <Panel style={{ borderTop: 'none' }}>
               <Security data={sharedSecret} />
             </Panel>
