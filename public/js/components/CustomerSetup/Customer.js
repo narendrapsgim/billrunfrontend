@@ -66,8 +66,8 @@ class Customer extends Component {
     const aid = customer.get('aid', null);
     this.props.dispatch(getCollectionDebt(aid))
       .then((response) => {
-        if (response.status && response.data && response.data[aid]) {
-          this.setState({ debt: response.data[aid].total2 });
+        if (response.status && response.data && response.data.balance) {
+          this.setState({ debt: response.data.balance.total });
         }
       });
   }
