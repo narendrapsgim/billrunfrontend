@@ -15,7 +15,7 @@ class OfflinePayment extends Component {
     onClose: PropTypes.func.isRequired,
     aid: PropTypes.number.isRequired,
     payerName: PropTypes.string,
-    methods: PropTypes.instanceOf(List),
+    methods: PropTypes.instanceOf(Map),
     currency: PropTypes.string,
     debt: PropTypes.oneOfType([
       PropTypes.number,
@@ -25,7 +25,11 @@ class OfflinePayment extends Component {
 
   static defaultProps = {
     payerName: '',
-    methods: List(['cash', 'cheque', 'write_off']),
+    methods: Map({
+      cash: 'Cash',
+      cheque: 'Cheque',
+      credit: 'Credit Card',
+    }),
     currency: '',
     debt: null,
   };
@@ -78,7 +82,7 @@ class OfflinePayment extends Component {
 
   getAvailableMethods = () => {
     const { methods } = this.props;
-    return methods.map(method => ({ value: method, label: method })).toArray();
+    return methods.map((methodName, method) => ({ value: method, label: methodName })).toArray();
   }
 
   onPay = () => {

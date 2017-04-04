@@ -458,7 +458,7 @@ export const getOfflinePaymentQuery = (method, aid, amount, payerName, chequeNo)
       deposit_slip: '',
       deposit_slip_bank: '',
       cheque_no: chequeNo,
-      source: '',
+      source: 'web',
     }]) },
   ],
 });
