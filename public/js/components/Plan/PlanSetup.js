@@ -21,12 +21,18 @@ import {
   onGroupRemove,
   setClonePlan,
 } from '../../actions/planActions';
-import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class PlanSetup extends Component {
@@ -36,6 +42,7 @@ class PlanSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -161,8 +168,8 @@ class PlanSetup extends Component {
     this.props.dispatch(onPlanTariffRemove(index));
   }
 
-  onGroupAdd = (groupName, usage, value, shared, products) => {
-    this.props.dispatch(onGroupAdd(groupName, usage, value, shared, products));
+  onGroupAdd = (groupName, usage, value, shared, pooled, products) => {
+    this.props.dispatch(onGroupAdd(groupName, usage, value, shared, pooled, products));
   }
 
   onGroupRemove = (groupName) => {
@@ -200,7 +207,7 @@ class PlanSetup extends Component {
 
   render() {
     const { progress, activeTab } = this.state;
-    const { item, mode, revisions } = this.props;
+    const { item, mode, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -208,6 +215,7 @@ class PlanSetup extends Component {
     const allowEdit = mode !== 'view';
     const planRates = item.get('rates', Immutable.Map());
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="PlanSetup">
 
@@ -221,6 +229,7 @@ class PlanSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
         </Panel>
 
@@ -280,5 +289,6 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'plan'),
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'plan'),
+  chargingDay: chargingDaySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PlanSetup));

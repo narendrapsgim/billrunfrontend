@@ -101,6 +101,11 @@ export default class Product extends Component {
     this.props.onFieldUpdate(paramPath, Immutable.List(values));
   }
 
+  onChangePricingMethod = (e) => {
+    const { value } = e.target;
+    this.props.onFieldUpdate(['pricing_method'], value);
+  }
+
   onRemoveParam = (paramKey) => {
     const { product } = this.props;
     const updatedParams = product.get('params', Immutable.Map()).delete(paramKey);
@@ -226,6 +231,7 @@ export default class Product extends Component {
     const { product, usaget, mode } = this.props;
     const vatable = (product.get('vatable', false) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
+    const pricingMethod = product.get('pricing_method', 'tiered');
     const availablePrefix = [];
     const editable = (mode !== 'view');
 
@@ -277,7 +283,7 @@ export default class Product extends Component {
                         placeholder="Add Prefix..."
                       />
                     )
-                    : <div className="non-editble-field">{ prefixs }</div>
+                    : <div className="non-editable-field">{ prefixs }</div>
                   }
 
                 </Col>
@@ -296,7 +302,7 @@ export default class Product extends Component {
                         value={usaget}
                       />
                     )
-                    : <div className="non-editble-field">{ usaget }</div>
+                    : <div className="non-editable-field">{ usaget }</div>
                   }
                 </Col>
               </FormGroup>
@@ -311,6 +317,56 @@ export default class Product extends Component {
             </Panel>
 
             <Panel header={<h3>Pricing</h3>}>
+              <FormGroup>
+                <Col sm={12}>
+                  { editable
+                    ? [(
+                      <Col sm={3} key="pricing-method-1">
+                        <div className="inline">
+                          <Field
+                            fieldType="radio"
+                            name="pricing-method"
+                            id="pricing-method-tiered"
+                            value="tiered"
+                            checked={pricingMethod === 'tiered'}
+                            onChange={this.onChangePricingMethod}
+                            label="Tiered pricing"
+                          />
+                        </div>
+                        &nbsp;<Help contents={ProductDescription.tieredPricing} />
+                      </Col>
+                    ),
+                    (
+                      <Col sm={3} key="pricing-method-2">
+                        <div className="inline">
+                          <Field
+                            fieldType="radio"
+                            name="pricing-method"
+                            id="pricing-method-volume"
+                            value="volume"
+                            checked={pricingMethod === 'volume'}
+                            onChange={this.onChangePricingMethod}
+                            label="Volume pricing"
+                          />
+                        </div>
+                        &nbsp;<Help contents={ProductDescription.volumePricing} />
+                      </Col>
+                    )]
+                    : (
+                      <div className="non-editble-field">
+                        { pricingMethod === 'tiered'
+                          ? 'Tiered pricing'
+                          : 'Volume pricing'
+                        }
+                      </div>
+                    )
+                  }
+                </Col>
+              </FormGroup>
+
+              { this.renderPrices() }
+              <br />
+              { editable && <CreateButton onClick={this.onProductRateAdd} label="Add New" />}
               <Col lg={12} md={12}>
                 <FormGroup>
                   { editable
@@ -321,7 +377,7 @@ export default class Product extends Component {
                     )
                     :
                     (
-                      <div className="non-editble-field">
+                      <div className="non-editable-field">
                         { vatable
                           ? 'This product is VAT rated'
                           : 'This product is not VAT rated'
@@ -331,9 +387,6 @@ export default class Product extends Component {
                 }
                 </FormGroup>
               </Col>
-              { this.renderPrices() }
-              <br />
-              { editable && <CreateButton onClick={this.onProductRateAdd} label="Add New" />}
             </Panel>
 
             <Panel header={<h3>Additional Parameters</h3>}>

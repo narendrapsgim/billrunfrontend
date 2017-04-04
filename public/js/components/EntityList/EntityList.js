@@ -63,6 +63,8 @@ class EntityList extends Component {
       PropTypes.bool,
       PropTypes.arrayOf(PropTypes.object),
     ]),
+    refreshString: PropTypes.string,
+    actions: PropTypes.arrayOf(PropTypes.object),
   }
 
   static defaultProps = {
@@ -82,6 +84,8 @@ class EntityList extends Component {
     sort: Immutable.Map(),
     filter: Immutable.Map(),
     state: Immutable.List([0, 1, 2]),
+    refreshString: '',
+    actions: [],
   }
 
   componentWillMount() {
@@ -111,8 +115,9 @@ class EntityList extends Component {
     const baseFilterMap = (Immutable.fromJS(this.props.baseFilter));
     const baseFilterNextMap = (Immutable.fromJS(nextProps.baseFilter));
     const baseFilterChanged = !Immutable.is(baseFilterMap, baseFilterNextMap);
+    const refreshStringChanged = this.props.refreshString !== nextProps.refreshString;
     if (pageChanged || sizeChanged || filterChanged ||
-      sortChanged || stateChanged || baseFilterChanged) {
+      sortChanged || stateChanged || baseFilterChanged || refreshStringChanged) {
       this.fetchItems(nextProps);
     }
   }
@@ -283,17 +288,27 @@ class EntityList extends Component {
     );
   }
 
+  getActions = () => {
+    const { actions, showRevisionBy } = this.props;
+    const editColumn = showRevisionBy ? 1 : 0;
+    const editAction = { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickItem, show: true, onClickColumn: editColumn };
+
+    return actions.map(action => (
+      action.type === 'edit' ? Object.assign(editAction, action) : action
+    ));
+  }
+
   renderList = () => {
-    const { items, sort, tableFields, editable, showRevisionBy } = this.props;
+    const { items, sort, tableFields, showRevisionBy } = this.props;
+    const actions = this.getActions();
     const fields = (!showRevisionBy) ? tableFields : this.addStateColumn(tableFields);
     return (
       <List
         sort={sort}
         items={items}
         fields={fields}
-        edit={editable}
         onSort={this.onSort}
-        onClickEdit={this.onClickItem}
+        actions={actions}
       />
     );
   }

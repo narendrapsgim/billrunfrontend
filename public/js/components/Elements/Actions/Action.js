@@ -32,7 +32,7 @@ const Action = (props) => {
     <Tooltip id="tooltip">
       { (typeof props.helpText === 'string')
         ? props.helpText
-        : props.helpText(data)
+        : props.helpText(data, type)
       }
     </Tooltip>
   );
@@ -67,7 +67,6 @@ Action.defaultProps = {
   label: '',
   helpText: '',
   actionStyle: 'link',
-  actionSize: '',
   actionClass: '',
   showIcon: true,
   enable: true,

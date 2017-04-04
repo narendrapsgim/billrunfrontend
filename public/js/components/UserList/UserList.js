@@ -14,6 +14,10 @@ const UserList = () => {
     roles: 1,
   };
 
+  const actions = [
+    { type: 'edit' },
+  ];
+
   return (
     <EntityList
       api="get"
@@ -22,6 +26,7 @@ const UserList = () => {
       filterFields={fields}
       tableFields={fields}
       projectFields={projectFields}
+      actions={actions}
     />
   );
 };

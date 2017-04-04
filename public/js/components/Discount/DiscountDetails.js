@@ -114,46 +114,50 @@ export default class DiscountDetails extends Component {
     this.props.onFieldUpdate(['discount_subject', type], discounts);
   }
 
-  createPlansOptions = () => {
-    const { availablePlans } = this.props;
-    return availablePlans.map(plan => ({
-      value: plan.get('name'),
-      label: plan.get('name'),
-    })).toArray();
-  }
+  createPlansOptions = () => this.props.availablePlans
+    .map(this.createOption)
+    .toArray();
 
-  createServicesOptions = () => {
-    const { availableServices } = this.props;
-    return availableServices.map(service => ({
-      value: service.get('name'),
-      label: service.get('name'),
-    })).toArray();
-  }
+  createServicesOptions = () => this.props.availableServices
+    .map(this.createOption)
+    .toArray();
+
+  createOption = item => ({
+    value: item.get('name'),
+    label: item.get('description'),
+  })
 
   renderServivesDiscountValues = () => {
     const { discount, availableServices } = this.props;
     const discountSubject = discount.getIn(['params', 'service'], Immutable.List());
     return discountSubject.map((key) => {
       const value = discount.getIn(['discount_subject', 'service', key], null);
-      const isQuantitative = availableServices.findIndex(service =>
-        (service.get('name', '') === key && service.get('quantitative', false) === true)
-      );
-      const helpText = isQuantitative !== -1 ? 'Amount will be multiplied by the subscription service quantity' : '';
-      return this.renderDiscountValue(key, value, this.onChangeServiceDiscountValue, helpText);
+      const isQuantitative = availableServices.findIndex(service => (
+        service.get('name', '') === key
+        && service.get('quantitative', false) === true
+      ));
+      const info = isQuantitative !== -1 ? 'Amount will be multiplied by the subscription service quantity' : '';
+      const label = this.getLabel(availableServices, key);
+      return this.renderDiscountValue(key, value, label, this.onChangeServiceDiscountValue, info);
     });
   }
 
+  getLabel = (items, key) => items
+    .find(item => item.get('name') === key, null, Immutable.Map())
+    .get('description', key);
+
   renderPlanDiscountValues = () => {
-    const { discount } = this.props;
+    const { discount, availablePlans } = this.props;
     const key = discount.getIn(['params', 'plan'], '');
     if (key && key.length) {
+      const label = this.getLabel(availablePlans, key);
       const value = discount.getIn(['discount_subject', 'plan', key], null);
-      return this.renderDiscountValue(key, value, this.onChangePlanDiscountValue);
+      return this.renderDiscountValue(key, value, label, this.onChangePlanDiscountValue);
     }
     return null;
   }
 
-  renderDiscountValue = (key, value, onChange, helpText = '') => {
+  renderDiscountValue = (key, value, label, onChange, info = '') => {
     const { discount, mode, currency } = this.props;
     const editable = (mode !== 'view');
     if (!editable && value === null) {
@@ -162,11 +166,11 @@ export default class DiscountDetails extends Component {
     const isPercentaget = discount.get('discount_type', '') === 'percentage';
     const suffix = isPercentaget ? <i className="fa fa-percent" /> : getSymbolFromCurrency(currency);
     const onChangeBind = (val) => { onChange(key, val); };
-    const showHelpText = helpText.length > 0 && (editable);
+    const showHelpText = info.length > 0 && editable;
     return (
       <FormGroup key={`${paramCase(key)}-discount-value`}>
         <Col componentClass={ControlLabel} sm={3} lg={2}>
-          {key}
+          { label }
         </Col>
         <Col sm={8} lg={9}>
           <Field
@@ -178,7 +182,7 @@ export default class DiscountDetails extends Component {
             suffix={suffix}
             inputProps={{ fieldType: 'number' }}
           />
-          { showHelpText && <HelpBlock>{helpText}</HelpBlock> }
+          { showHelpText && <HelpBlock>{ info }</HelpBlock> }
         </Col>
       </FormGroup>
     );
@@ -235,7 +239,7 @@ export default class DiscountDetails extends Component {
                         </span>
                       </span>
                     )
-                  : <div className="non-editble-field">{ titleCase(discount.get('discount_type', '')) }</div>
+                  : <div className="non-editable-field">{ titleCase(discount.get('discount_type', '')) }</div>
                   }
                 </Col>
               </FormGroup>
@@ -264,7 +268,7 @@ export default class DiscountDetails extends Component {
                   <Col sm={8} lg={9}>
                     { editable
                       ? <Select options={plansOptions} value={discount.getIn(['params', 'plan'], '')} onChange={this.onChangePlan} />
-                      : <div className="non-editble-field">{ discount.getIn(['params', 'plan'], '') }</div>
+                      : <div className="non-editable-field">{ discount.getIn(['params', 'plan'], '') }</div>
                     }
                   </Col>
                 </FormGroup>
@@ -276,7 +280,7 @@ export default class DiscountDetails extends Component {
                   <Col sm={8} lg={9}>
                     { editable
                       ? <Select multi={true} value={services} options={servicesOptions} onChange={this.onChangeService} />
-                      : <div className="non-editble-field">{ discount.getIn(['params', 'service'], Immutable.List()).join(', ') }</div>
+                      : <div className="non-editable-field">{ discount.getIn(['params', 'service'], Immutable.List()).join(', ') }</div>
                     }
                   </Col>
                 </FormGroup>

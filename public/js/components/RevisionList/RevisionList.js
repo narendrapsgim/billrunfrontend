@@ -3,13 +3,21 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
+import { lowerCase, sentenceCase } from 'change-case';
 import { ConfirmModal, StateIcon } from '../Elements';
 import CloseActionBox from '../Entity/CloseActionBox';
 import List from '../../components/List';
-import { getItemDateValue, getConfig, isItemClosed, getItemId } from '../../common/Util';
+import {
+  getItemDateValue,
+  getConfig,
+  isItemClosed,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class RevisionList extends Component {
@@ -20,6 +28,7 @@ class RevisionList extends Component {
     onDeleteItem: PropTypes.func,
     onCloseItem: PropTypes.func,
     itemName: PropTypes.string.isRequired,
+    chargingDay: PropTypes.number,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -42,7 +51,10 @@ class RevisionList extends Component {
 
   isItemEditable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
 
-  isItemRemovable = item => ['future'].includes(item.getIn(['revision_info', 'status'], ''));
+  isItemRemovable = item => (
+    item.getIn(['revision_info', 'removable'], true) // if removable flag not exist, check status
+    && ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''))
+  );
 
   isItemActive = item => ['active'].includes(item.getIn(['revision_info', 'status'], ''));
 
@@ -138,6 +150,22 @@ class RevisionList extends Component {
     }
   }
 
+  getActionHelpText = (type) => {
+    const { itemName } = this.props;
+    switch (lowerCase(type)) {
+      case 'clone':
+        return `Clone as new ${getConfig(['systemItems', itemName, 'itemName'], 'item')}`;
+      case 'remove':
+        return 'Remove revision';
+      case 'edit':
+        return 'Edit revision';
+      case 'view':
+        return 'View revision details';
+      default:
+        return sentenceCase(type);
+    }
+  }
+
   getListFields = () => [
     { id: 'state', parser: this.parserState, cssClass: 'state' },
     { id: 'from', title: 'Start date', parser: this.parseFromDate, cssClass: 'short-date' },
@@ -145,19 +173,20 @@ class RevisionList extends Component {
   ]
 
   getListActions = () => [
-    { type: 'view', showIcon: true, helpText: 'View', onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
-    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
-    { type: 'clone', showIcon: true, helpText: 'Clone', onClick: this.onClickClone },
-    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove, enable: this.parseRemoveEnable },
+    { type: 'view', helpText: this.getActionHelpText('view'), onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
+    { type: 'edit', helpText: this.getActionHelpText('edit'), onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
+    { type: 'clone', helpText: this.getActionHelpText('clone'), onClick: this.onClickClone },
+    { type: 'remove', helpText: this.getActionHelpText('remove'), onClick: this.onClickRemove, enable: this.parseRemoveEnable },
   ]
 
   render() {
-    const { items, itemName } = this.props;
+    const { items, itemName, chargingDay } = this.props;
     const { showConfirmRemove } = this.state;
     const fields = this.getListFields();
     const actions = this.getListActions();
     const activeItem = items.find(this.isItemActive);
     const removeConfirmMessage = 'Are you sure you want to remove this revision?';
+    const minDate = getItemMinFromDate(activeItem.set('originalValue', activeItem.get('from')), chargingDay);
     return (
       <div>
         <List items={items} fields={fields} edit={false} actions={actions} />
@@ -166,6 +195,7 @@ class RevisionList extends Component {
             itemName={itemName}
             item={activeItem}
             onCloseItem={this.props.onCloseItem}
+            minDate={minDate}
           />
         }
         <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
@@ -174,4 +204,7 @@ class RevisionList extends Component {
   }
 }
 
-export default withRouter(connect()(RevisionList));
+const mapStateToProps = (state, props) => ({
+  chargingDay: chargingDaySelector(state, props),
+});
+export default withRouter(connect(mapStateToProps)(RevisionList));

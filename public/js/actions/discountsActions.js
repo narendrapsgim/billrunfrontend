@@ -46,13 +46,13 @@ export const getDiscount = id => (dispatch) => {
       const item = response.data[0].data.details[0];
       item.originalValue = item.from;
       if (item.discount_type === 'percentage') {
-        // convert discount percentage value to display value 
-        if (item.discount_subject && item.discount_subject.service) {
-          ['service', 'plan'].forEach((type) => {
-            Object.keys(item.discount_subject[type]).forEach((serviceName) => {
-              if (!isNaN(item.discount_subject[type][serviceName])) {
-                item.discount_subject[type][serviceName]
-                  = parseFloat((Number(item.discount_subject[type][serviceName]) * 100).toFixed(2));
+        // convert discount percentage value to display value
+        if (item.discount_subject) {
+          Object.keys(item.discount_subject).forEach((subjectType) => {
+            Object.keys(item.discount_subject[subjectType]).forEach((subjectName) => {
+              if (!isNaN(item.discount_subject[subjectType][subjectName])) {
+                const percentage = Number(item.discount_subject[subjectType][subjectName]) * 100;
+                item.discount_subject[subjectType][subjectName] = parseFloat(percentage.toFixed(2));
               }
             });
           });

@@ -1,24 +1,52 @@
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
 
-export default class Text extends Component {
-  constructor(props) {
-    super(props);
-  }
+const Text = (props) => {
+  const {
+    onChange,
+    value,
+    placeholder,
+    required,
+    disabled,
+    editable,
+    ...otherProps
+  } = props;
 
-  render() {
-    let { onChange,
-          id,
-          value,
-          placeholder = "",
-          required = false,
-          disabled = false,
-          editable = true,
-          ...otherProps } = this.props;
-
-    const input = editable ? (<input {...otherProps} type="text" id={id} className="form-control" value={value} onChange={onChange} placeholder={placeholder} required={required} disabled={disabled} />) : (<span>{value}</span>);
-
+  if (editable) {
     return (
-      <div className="non-editble-field">{ input }</div>
+      <div>
+        <input
+          {...otherProps}
+          type="text"
+          className="form-control"
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          required={required}
+          disabled={disabled}
+        />
+      </div>
     );
   }
-}
+  return (
+    <div className="non-editable-field">{ value }</div>
+  );
+};
+
+Text.defaultProps = {
+  required: false,
+  disabled: false,
+  editable: true,
+  placeholder: '',
+  onChange: () => {},
+};
+
+Text.propTypes = {
+  value: PropTypes.string,
+  required: PropTypes.bool,
+  disabled: PropTypes.bool,
+  editable: PropTypes.bool,
+  placeholder: PropTypes.string,
+  onChange: PropTypes.func,
+};
+
+export default Text;
