@@ -69,6 +69,7 @@ class RunCycle extends Component {
     this.unsetAutoRefresh();
     clearTimeout(this.autoRefreshChargingStatus);
     clearTimeout(this.refreshAfterRun);
+    this.clearData();
   }
 
   initAutoRefresh = () => {
@@ -86,6 +87,14 @@ class RunCycle extends Component {
     clearTimeout(this.autoRefreshChargingStatus);
     this.autoRefreshChargingStatus = setTimeout(() =>
       this.runAutoRefreshChargingStatus(true), 10000);
+  }
+
+  clearData = () => {
+    this.props.dispatch(clearList('cycles_list'));
+    this.props.dispatch(clearList('cycle_data'));
+    this.props.dispatch(clearList('charge_status'));
+    this.props.dispatch(clearList('charge_status_refresh'));
+    this.props.dispatch(clearList('billrunInvoices'));
   }
 
   runAutoRefreshChargingStatus = (firstTime = false) => {
