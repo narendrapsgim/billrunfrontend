@@ -1,27 +1,35 @@
 import React, { Component, PropTypes } from 'react';
 import { Pie } from 'react-chartjs-2';
-import { palitra, hexToRgba } from './helpers';
+import { palitra } from './helpers';
 
-
-const addRadiusMargin = 10;
-let currentSelectedPieceLabel = '';
 
 export default class PieChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
     ]),
     options: PropTypes.object,
+    selectable: PropTypes.bool,
+    onClick: PropTypes.func,
   };
 
   static defaultProps = {
     options: {},
     data: null,
+    selectable: true,
+    onClick: () => {},
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedIndex: null,
+    };
+  }
 
   getOptions = () => {
     const { data, options } = this.props;
@@ -44,17 +52,34 @@ export default class PieChart extends Component {
   }
 
   prepareData = () => {
+    const { selectedIndex } = this.state;
     const { data } = this.props;
     const chartData = {
       labels: data.labels,
       datasets: [
         {
           data: data.values,
-          backgroundColor: data.values.map((x, i) => hexToRgba(palitra([i]), 0.8)),
-          borderWidth: 1,
-          hoverBackgroundColor: data.values.map((x, i) => palitra([i], 'dark')),
-          hoverBorderColor: data.values.map((x, i) => palitra([i], 'dark')),
-          hoverBorderWidth: 3,
+          backgroundColor: data.values.map((x, i) => (
+            selectedIndex === i
+              ? palitra(i, 'dark')
+              : palitra(i)
+          )),
+          borderColor: data.values.map((x, i) => (
+            selectedIndex === i
+              ? '#000'
+              : '#fff'
+          )),
+          borderWidth: data.values.map((x, i) => (selectedIndex === i ? 1 : 1)),
+          hoverBackgroundColor: data.values.map((x, i) => (
+            selectedIndex === i
+              ? palitra(i, 'dark')
+              : palitra(i, 'light')
+          )),
+          hoverBorderColor: data.values.map((x, i) => (selectedIndex === i
+            ? '#000'
+            : palitra(i, 'light')
+          )),
+          hoverBorderWidth: data.values.map((x, i) => (selectedIndex === i ? 1 : 1)),
         },
       ],
     };
@@ -62,58 +87,15 @@ export default class PieChart extends Component {
   }
 
   onElementsClick = (elems) => {
-    const activePoints = elems;
-    const myChart = this.refs.mychart.chart_instance;
-    const defaultRadiusMyChart = this.refs.mychart.chart_instance.outerRadius;
-    if (activePoints.length > 0) {
-      // get the internal index of slice in pie chart
-      const clickedElementindex = activePoints[0]._index;
-
-      // get specific label by index
-      const clickedLabel = myChart.data.labels[clickedElementindex];
-
-      if (currentSelectedPieceLabel.toUpperCase() === '') {
-        // no piece selected yet, save piece label
-        currentSelectedPieceLabel = clickedLabel.toUpperCase();
-
-        // clear whole pie
-        myChart.outerRadius = defaultRadiusMyChart;
-        myChart.innerRadius = 0;
-        myChart.update();
-
-        // update selected pie
-        activePoints[0]._model.outerRadius = defaultRadiusMyChart + addRadiusMargin;
-        activePoints[0]._model.innerRadius = addRadiusMargin;
-      } else if (clickedLabel.toUpperCase() === currentSelectedPieceLabel.toUpperCase()) {
-          // already selected piece clicked, clear the chart
-        currentSelectedPieceLabel = '';
-
-          // clear whole pie
-        myChart.outerRadius = defaultRadiusMyChart;
-        myChart.innerRadius = 0;
-        myChart.update();
-
-          // update selected pie
-        activePoints[0]._model.outerRadius = defaultRadiusMyChart;
-      } else {
-          // other piece clicked
-        currentSelectedPieceLabel = clickedLabel.toUpperCase();
-
-          // clear whole pie
-        myChart.outerRadius = defaultRadiusMyChart;
-        myChart.innerRadius = 0;
-        myChart.update();
-
-          // update the newly selected piece
-        activePoints[0]._model.outerRadius = defaultRadiusMyChart + addRadiusMargin;
-        activePoints[0]._model.innerRadius = addRadiusMargin;
-      }
-      myChart.render(500, false);
+    const { selectedIndex } = this.state;
+    const { selectable } = this.props;
+    if (selectable && elems.length > 0) {
+      const clickedIndex = elems[0]._index; // eslint-disable-line  no-underscore-dangle
+      this.setState({
+        selectedIndex: (clickedIndex === selectedIndex) ? null : clickedIndex,
+      });
+      this.props.onClick(clickedIndex);
     }
-  }
-
-  getElementsAtEvent = (elems) => {
-    console.log('getElementsAtEvent', elems);
   }
 
   render() {
@@ -123,13 +105,11 @@ export default class PieChart extends Component {
     }
     return (
       <Pie
-        ref="mychart"
         data={this.prepareData()}
         options={this.getOptions()}
         width={width}
         height={height}
         onElementsClick={this.onElementsClick}
-        getElementsAtEvent={this.getElementsAtEvent}
       />
     );
   }

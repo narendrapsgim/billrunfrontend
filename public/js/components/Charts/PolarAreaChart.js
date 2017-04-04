@@ -6,8 +6,8 @@ import { palitra } from './helpers';
 export default class PolarAreaChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
@@ -50,8 +50,8 @@ export default class PolarAreaChart extends Component {
       datasets: [
         {
           data: data.values,
-          backgroundColor: data.values.map((x, i) => palitra([i])),
-          hoverBackgroundColor: data.values.map((x, i) => palitra([i], 'light')),
+          backgroundColor: data.values.map((x, i) => palitra(i)),
+          hoverBackgroundColor: data.values.map((x, i) => palitra(i, 'light')),
           borderWidth: 1,
         },
       ],

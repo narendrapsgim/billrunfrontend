@@ -1,13 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import { Line } from 'react-chartjs-2';
-import { palitra, hexToRgba } from './helpers';
+import { palitra } from './helpers';
 
 
 export default class LineAreaStackedChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
@@ -64,12 +64,12 @@ export default class LineAreaStackedChart extends Component {
       fill: true,
       lineTension: 0.2,
       borderWidth: 1,
-      borderColor: palitra([i]),
-      backgroundColor: hexToRgba((palitra([i])), 1),
+      borderColor: palitra(i),
+      backgroundColor: palitra(i),
       pointBackgroundColor: 'white',
-      pointBorderColor: palitra([i]),
+      pointBorderColor: palitra(i),
       pointHoverBorderColor: 'white',
-      pointHoverBackgroundColor: palitra([i], 'dark'),
+      pointHoverBackgroundColor: palitra(i, 'dark'),
     }));
     return chartData;
   }

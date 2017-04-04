@@ -5,8 +5,8 @@ import { palitra } from './helpers';
 export default class BarHorizontalChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
@@ -55,11 +55,11 @@ export default class BarHorizontalChart extends Component {
       label: x.label,
       data: x.values,
       borderWidth: 1,
-      backgroundColor: palitra([i]),
-      borderColor: palitra([i]),
+      backgroundColor: palitra(i),
+      borderColor: palitra(i),
       hoverBorderWidth: 1,
-      hoverBackgroundColor: palitra([i], 'light'),
-      hoverBorderColor: palitra([i], 'dark'),
+      hoverBackgroundColor: palitra(i, 'light'),
+      hoverBorderColor: palitra(i, 'dark'),
     }));
     return chartData;
   }

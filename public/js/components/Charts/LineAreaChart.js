@@ -6,8 +6,8 @@ import { palitra, hexToRgba, trend } from './helpers';
 export default class LineAreaChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
@@ -62,12 +62,12 @@ export default class LineAreaChart extends Component {
         lineTension: 0.2,
         fill: true,
         borderWidth: 1,
-        borderColor: linesCount === 1 ? trend(direction) : palitra([i]), // palitra([i]),
-        backgroundColor: hexToRgba(((linesCount === 1) ? trend(direction) : palitra([i], 'light')), 0.5),
+        borderColor: linesCount === 1 ? trend(direction) : palitra(i),
+        backgroundColor: hexToRgba(((linesCount === 1) ? trend(direction) : palitra(i, 'light')), 0.5),
         pointBackgroundColor: 'white',
-        pointBorderColor: (linesCount === 1) ? trend(direction) : palitra([i]),
+        pointBorderColor: (linesCount === 1) ? trend(direction) : palitra(i),
         pointHoverBorderColor: 'white',
-        pointHoverBackgroundColor: (linesCount === 1) ? trend(direction) : palitra([i], 'dark'),
+        pointHoverBackgroundColor: (linesCount === 1) ? trend(direction) : palitra(i, 'dark'),
       };
     });
     return chartData;

@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { Bar } from 'react-chartjs-2';
-import { palitra, hexToRgba, trend } from './helpers';
+import { palitra, trend } from './helpers';
 
 export default class BarChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
@@ -58,11 +58,11 @@ export default class BarChart extends Component {
         label: x.label,
         data: x.values,
         borderWidth: 1,
-        backgroundColor: hexToRgba(((linesCount === 1) ? trend(direction) : palitra([i])), 1),
-        borderColor: hexToRgba(((linesCount === 1) ? trend(direction) : palitra([i])), 1),
+        backgroundColor: ((linesCount === 1) ? trend(direction) : palitra(i)),
+        borderColor: ((linesCount === 1) ? trend(direction) : palitra(i)),
         hoverBorderWidth: 1,
-        hoverBackgroundColor: linesCount === 1 ? trend(direction) : palitra([i], 'light'),
-        hoverBorderColor: linesCount === 1 ? trend(direction) : palitra([i], 'dark'),
+        hoverBackgroundColor: linesCount === 1 ? trend(direction) : palitra(i, 'light'),
+        hoverBorderColor: linesCount === 1 ? trend(direction) : palitra(i, 'dark'),
       };
     });
     return chartData;

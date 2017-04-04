@@ -6,8 +6,8 @@ import { palitra } from './helpers';
 export default class DoughnutChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     selectedRadiusMargin: PropTypes.number,
     selectable: PropTypes.bool,
     message: PropTypes.string,
@@ -34,14 +34,12 @@ export default class DoughnutChart extends Component {
       options: this.options,
       selectedIndex: null,
       height: 0,
-      width: 0,
     };
   }
 
   componentDidMount() {
-    // Charts are responsive, width/height should be updated only after first render
+    // Charts are responsive, height should be updated only after first render
     this.setState({
-      width: this.refs.chartRef.chart_instance.chart.width,
       height: this.refs.chartRef.chart_instance.chart.height,
     });
   }
@@ -69,7 +67,6 @@ export default class DoughnutChart extends Component {
 
   onChartResize = (chart, size) => {
     this.setState({
-      width: size.width,
       height: size.height,
     });
   }
@@ -81,8 +78,8 @@ export default class DoughnutChart extends Component {
       datasets: [
         {
           data: data.values,
-          backgroundColor: data.values.map((x, i) => palitra([i])),
-          hoverBackgroundColor: data.values.map((x, i) => palitra([i], 'light')),
+          backgroundColor: data.values.map((x, i) => palitra(i)),
+          hoverBackgroundColor: data.values.map((x, i) => palitra(i, 'light')),
           borderWidth: 1,
         },
       ],
@@ -117,7 +114,7 @@ export default class DoughnutChart extends Component {
     if (!message || message === '') {
       return null;
     }
-    const fontSize = (height / 120).toFixed(2);
+    const fontSize = (height / 130).toFixed(2);
     return (
       <p className="doughnut-message" style={{ fontSize: `${fontSize}em` }}>
         {message}

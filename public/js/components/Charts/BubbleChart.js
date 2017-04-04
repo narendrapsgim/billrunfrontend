@@ -6,8 +6,8 @@ import { palitra } from './helpers';
 export default class BubbleChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
@@ -52,8 +52,8 @@ export default class BubbleChart extends Component {
             r: data.z[i],
           },
         ],
-        backgroundColor: palitra([i]),
-        hoverBackgroundColor: palitra([i], 'light'),
+        backgroundColor: palitra(i),
+        hoverBackgroundColor: palitra(i, 'light'),
       })),
     };
     return chartData;

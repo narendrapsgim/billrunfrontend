@@ -6,8 +6,8 @@ import { palitra, trend } from './helpers';
 export default class LineChart extends Component {
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     data: PropTypes.oneOfType([
       PropTypes.object,
       null,
@@ -105,11 +105,11 @@ export default class LineChart extends Component {
         // hidden: true,
         // borderDash: [5, 5],
         lineTension: 0, // line angel
-        borderColor: linesCount === 1 ? trend(direction) : palitra([i]),
-        backgroundColor: linesCount === 1 ? trend(direction) : palitra([i]),
-        pointBackgroundColor: linesCount === 1 ? trend(direction) : palitra([i]),
-        pointBorderColor: linesCount === 1 ? trend(direction) : palitra([i]),
-        pointHoverBorderColor: linesCount === 1 ? trend(direction, 'dark') : palitra([i], 'dark'),
+        borderColor: linesCount === 1 ? trend(direction) : palitra(i),
+        backgroundColor: linesCount === 1 ? trend(direction) : palitra(i),
+        pointBackgroundColor: linesCount === 1 ? trend(direction) : palitra(i),
+        pointBorderColor: linesCount === 1 ? trend(direction) : palitra(i),
+        pointHoverBorderColor: linesCount === 1 ? trend(direction, 'dark') : palitra(i, 'dark'),
         pointHoverBackgroundColor: 'white',
       };
     });
