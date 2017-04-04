@@ -41,20 +41,24 @@ class OverviewDashboard extends Component {
   componentDidMount() {
     const { fromDate, toDate } = this.props;
     fakeDoughnutDetails(fromDate, toDate).then(
-      (doughnutDetailsData) => { this.setState({ doughnutDetailsData }); }
+      (doughnutDetailsData) => { this.isUnmount !== true && this.setState({ doughnutDetailsData }); }
     );
     fakeDoughnutLegend(fromDate, toDate).then(
-      (doughnutLegendData) => { this.setState({ doughnutLegendData }); }
+      (doughnutLegendData) => { this.isUnmount !== true && this.setState({ doughnutLegendData }); }
     );
     fakePercentBar(fromDate, toDate).then(
-      (percentBarData) => { this.setState({ percentBarData }); }
+      (percentBarData) => { this.isUnmount !== true && this.setState({ percentBarData }); }
     );
     fakeLines(fromDate, toDate).then(
-      (linesData) => { this.setState({ linesData }); }
+      (linesData) => { this.isUnmount !== true && this.setState({ linesData }); }
     );
     fakeBar(fromDate, toDate).then(
-      (barData) => { this.setState({ barData }); }
+      (barData) => { this.isUnmount !== true && this.setState({ barData }); }
     );
+  }
+
+  componentWillUnmount() {
+    this.isUnmount = true;
   }
 
   parseCurrencyValue = value => parseCurrencyValue(value, this.props.currency);

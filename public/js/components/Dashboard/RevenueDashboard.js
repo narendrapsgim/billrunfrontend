@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react';
-import { Row, Panel, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import DashboardBase from './DashboardBase';
 
 
-const RevenueDashboard = ({ fromDate, toDate }) => (
+const RevenueDashboard = ({ fromDate, toDate, currency }) => (
   <Row>
     <Col lg={6}>
-      <p>RevenueDashboard</p>
+      <p>&nbsp;</p>
     </Col>
   </Row>
 );
