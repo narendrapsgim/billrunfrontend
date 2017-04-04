@@ -28,7 +28,7 @@ const DashboardBase = (ComposedComponent) => {
       const { fromDate, toDate } = this.state;
       return (
         <Row>
-          <Col lg={8} md={12} sm={12} xs={12} lgOffset={2} mdOffset={0} smOffset={0} xsOffset={0} >
+          <Col lg={12} md={12} sm={12} xs={12} lgOffset={0} mdOffset={0} smOffset={0} xsOffset={0} >
             <ComposedComponent fromDate={fromDate} toDate={toDate} currency={currency} />
           </Col>
         </Row>
