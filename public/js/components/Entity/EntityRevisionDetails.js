@@ -126,7 +126,7 @@ class EntityRevisionDetails extends Component {
 
   onChangeFrom = (value) => {
     if (value) {
-      this.props.onChangeFrom(['from'], value.toISOString());
+      this.props.onChangeFrom(['from'], value.format('YYYY-MM-DD'));
     }
   }
 
