@@ -186,7 +186,7 @@ class RevisionList extends Component {
     const actions = this.getListActions();
     const activeItem = items.find(this.isItemActive);
     const removeConfirmMessage = 'Are you sure you want to remove this revision?';
-    const minDate = getItemMinFromDate(activeItem.set('originalValue', activeItem.get('from')), chargingDay);
+    const minDate = activeItem && getItemMinFromDate(activeItem.set('originalValue', activeItem.get('from')), chargingDay);
     return (
       <div>
         <List items={items} fields={fields} edit={false} actions={actions} />
