@@ -11,6 +11,7 @@ import { getConfig } from '../../common/Util';
 import { confirmCycleInvoice, confirmCycle } from '../../actions/cycleActions';
 import ConfirmModal from '../../components/ConfirmModal';
 import { currencySelector } from '../../selectors/settingsSelector';
+import { getDateToDisplay } from './CycleUtil';
 
 class CycleData extends Component {
 
@@ -60,8 +61,6 @@ class CycleData extends Component {
     this.props.dispatch(getList('billrunInvoices', getAllInvoicesQuery(billrunKey)));
   }
 
-  getDateToDisplay = str => str.substr(0, str.indexOf(' '));
-
   parseCycleDataFirstName = entity => entity.getIn(['attributes', 'firstname'], '');
   parseCycleDataLastName = entity => entity.getIn(['attributes', 'lastname'], '');
   parseCycleDataInvoiceTotal = entity => entity.getIn(['totals', 'after_vat_rounded'], '');
@@ -101,7 +100,7 @@ class CycleData extends Component {
     confirmationModalData.show = true;
     confirmationModalData.title = 'Confirm all invoices';
     confirmationModalData.message = `Are you sure you want to confirm all the invoices for the cycle of
-      ${this.getDateToDisplay(selectedCycle.get('start_date', ''))} - ${this.getDateToDisplay(selectedCycle.get('end_date', ''))}?
+      ${getDateToDisplay(selectedCycle.get('start_date', ''))} - ${getDateToDisplay(selectedCycle.get('end_date', ''))}?
       ${invoicesNum} invoices will be confirmed after this action`;
     confirmationModalData.onClick = this.onClickConfirmAllConfirm;
     this.setState({ confirmationModalData });

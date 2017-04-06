@@ -2,19 +2,19 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Col, Row, Panel, Form, FormGroup, ControlLabel, Label, Button, HelpBlock } from 'react-bootstrap';
 import { Map, List } from 'immutable';
-import Select from 'react-select';
-import { getCyclesQuery, getCycleQuery, getChargeStatusQuery, getOperationsQuery } from '../../common/ApiQueries';
+import { getCycleQuery, getChargeStatusQuery, getOperationsQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
 import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
 import { clearItems } from '../../actions/entityListActions';
 import ConfirmModal from '../../components/ConfirmModal';
 import CycleData from './CycleData';
+import CyclesSelector from './CyclesSelector';
+import { getCycleName } from './CycleUtil';
 
 class RunCycle extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    cycles: PropTypes.instanceOf(List),
     cycleAdditionalData: PropTypes.instanceOf(Map),
     chargeStatus: PropTypes.oneOfType([
       PropTypes.instanceOf(Map),
@@ -27,7 +27,6 @@ class RunCycle extends Component {
   };
 
   static defaultProps = {
-    cycles: List(),
     cycleAdditionalData: Map(),
     chargeStatus: Map(),
     chargeStatusRefreshed: Map(),
@@ -53,7 +52,6 @@ class RunCycle extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getList('cycles_list', getCyclesQuery()));
     this.props.dispatch(getList('charge_status', getChargeStatusQuery()));
   }
 
@@ -192,22 +190,6 @@ class RunCycle extends Component {
     </div>
   );
 
-
-  getDateToDisplay = str => str.substr(0, str.indexOf(' '));
-
-  getCycleName = cycle => `cycle of ${this.getDateToDisplay(cycle.get('start_date', ''))}-${this.getDateToDisplay(cycle.get('end_date', ''))}`;
-
-  getCyclesSelectOptions = () => {
-    const { cycles } = this.props;
-    const cycleStatusesToDisplay = List(['running', 'to_run', 'finished', 'confirmed']);
-    return cycles
-      .filter(cycle => cycleStatusesToDisplay.contains(cycle.get('cycle_status', '')))
-      .map(cycle => ({
-        value: cycle.get('billrun_key', ''),
-        label: this.getCycleName(cycle),
-      })).toArray();
-  }
-
   clearCycleData = () => {
     this.props.dispatch(clearList('cycle_data'));
   }
@@ -222,8 +204,7 @@ class RunCycle extends Component {
   }
 
   getCycleData = (cycleName) => {
-    const { cycles } = this.props;
-    const selectedCycle = cycles.find(cycle => (cycle.get('billrun_key', '') === cycleName)) || Map();
+    const selectedCycle = Map({ billrun_key: cycleName });
     this.reloadCycleData(selectedCycle);
     return selectedCycle;
   }
@@ -239,11 +220,10 @@ class RunCycle extends Component {
   renderCyclesSelect = () => {
     const { selectedCycleName } = this.state;
     return (
-      <Select
-        id="cycle"
-        value={selectedCycleName}
+      <CyclesSelector
         onChange={this.onChangeSelectedCycle}
-        options={this.getCyclesSelectOptions()}
+        statusesToDisplay={List(['running', 'to_run', 'finished', 'confirmed'])}
+        selectedCycles={selectedCycleName}
       />
     );
   };
@@ -378,7 +358,7 @@ class RunCycle extends Component {
 
   renderRerunConfirmationModal = () => {
     const { showRerunConfirm, selectedCycle } = this.state;
-    const confirmMessage = `Are you sure you want to re-run ${this.getCycleName(selectedCycle)}?`;
+    const confirmMessage = `Are you sure you want to re-run ${getCycleName(selectedCycle)}?`;
     const warningMessage = 'Cycle data will be reset';
     return (
       <ConfirmModal onOk={this.onRerunOk} onCancel={this.onRerunCancel} show={showRerunConfirm} message={confirmMessage} labelOk="Yes">
@@ -466,7 +446,6 @@ class RunCycle extends Component {
 }
 
 const mapStateToProps = state => ({
-  cycles: state.list.get('cycles_list'),
   cycleAdditionalData: state.list.get('cycle_data', List()).get(0) || Map(),
   chargeStatus: state.list.get('charge_status', List()).get(0) || Map(),
   chargeStatusRefreshed: state.list.get('charge_status_refresh', List()).get(0) || Map(),
