@@ -464,3 +464,19 @@ export const getOfflinePaymentQuery = (method, aid, amount, payerName, chequeNo)
     }]) },
   ],
 });
+
+export const getConfirmationOperationAllQuery = () => ({
+  api: 'operations',
+  params: [
+    { action: 'confirm_cycle' },
+    { filtration: 'all' },
+  ],
+});
+
+export const getConfirmationOperationInvoiceQuery = invoiceId => ({
+  api: 'operations',
+  params: [
+    { action: 'confirm_cycle' },
+    { filtration: invoiceId },
+  ],
+});
