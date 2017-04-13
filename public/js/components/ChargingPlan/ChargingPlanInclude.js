@@ -6,20 +6,20 @@ import Select from 'react-select';
 import Field from '../Field';
 
 const ChargingPlanInclude = (props) => {
-  const { include, type } = props;
+  const { include, index } = props;
 
   const onUpdateField = (e) => {
     const { id, value } = e.target;
-    props.onUpdateField(type, id, value);
+    props.onUpdateField(index, id, value);
   };
 
   const onUpdatePeriodField = (e) => {
     const { id, value } = e.target;
-    props.onUpdatePeriodField(type, id, value);
+    props.onUpdatePeriodField(index, id, value);
   };
 
   const onSelectPeriodUnit = (value) => {
-    props.onUpdatePeriodField(type, 'unit', value);
+    props.onUpdatePeriodField(index, 'unit', value);
   };
 
   const unitOptions = [
@@ -68,13 +68,13 @@ const ChargingPlanInclude = (props) => {
 
 ChargingPlanInclude.defaultProps = {
   include: Map(),
-  type: '',
+  index: 0,
   editable: true,
 };
 
 ChargingPlanInclude.propTypes = {
   include: PropTypes.instanceOf(Map),
-  type: PropTypes.string,
+  index: PropTypes.number,
   onUpdatePeriodField: PropTypes.func.isRequired,
   onUpdateField: PropTypes.func.isRequired,
   editable: PropTypes.bool,

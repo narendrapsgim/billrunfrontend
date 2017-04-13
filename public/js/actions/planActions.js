@@ -116,9 +116,8 @@ export const setClonePlan = () => ({
   uniquefields: ['name'],
 });
 
-export const addUsagetInclude = (usaget, ppIncludesName, ppIncludesExternalId) => ({
+export const addUsagetInclude = (ppIncludesName, ppIncludesExternalId) => ({
   type: ADD_USAGET_INCLUDE,
-  usaget,
   ppIncludesName,
   ppIncludesExternalId,
 });
