@@ -47,7 +47,9 @@ class Customer extends Component {
     if (action === 'create') {
       this.initDefaultValues();
     }
-    this.initDebt();
+    if (action !== 'create') {
+      this.initDebt();
+    }
   }
 
   initDefaultValues = () => {
