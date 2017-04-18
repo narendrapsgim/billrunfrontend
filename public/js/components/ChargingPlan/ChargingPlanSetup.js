@@ -147,22 +147,17 @@ class ChargingPlanSetup extends Component {
   onSelectPPInclude = (value) => {
     const { prepaidIncludes } = this.props;
     const ppInclude = prepaidIncludes.find(pp => pp.get('name') === value);
-    const usaget = ppInclude.get('charging_by_usaget');
-    if (this.props.item.getIn(['include', usaget])) {
-      this.props.dispatch(showWarning('Prepaid bucket already defined'));
-    } else {
-      const ppIncludesName = ppInclude.get('name');
-      const ppIncludesExternalId = ppInclude.get('external_id');
-      this.props.dispatch(addUsagetInclude(usaget, ppIncludesName, ppIncludesExternalId));
-    }
+    const ppIncludesName = ppInclude.get('name');
+    const ppIncludesExternalId = ppInclude.get('external_id');
+    this.props.dispatch(addUsagetInclude(ppIncludesName, ppIncludesExternalId));
   };
 
-  onUpdatePeriodField = (type, id, value) => {
-    this.props.dispatch(onPlanFieldUpdate(['include', type, 'period', id], value));
+  onUpdatePeriodField = (index, id, value) => {
+    this.props.dispatch(onPlanFieldUpdate(['include', index, 'period', id], value));
   };
 
-  onUpdateIncludeField = (usaget, id, value) => {
-    this.props.dispatch(onPlanFieldUpdate(['include', usaget, id], value));
+  onUpdateIncludeField = (index, id, value) => {
+    this.props.dispatch(onPlanFieldUpdate(['include', index, id], value));
   };
 
   afterSave = (response) => {
@@ -236,7 +231,7 @@ class ChargingPlanSetup extends Component {
             <Panel style={{ borderTop: 'none' }}>
               <ChargingPlanIncludes
                 mode={mode}
-                includes={item.get('include', Immutable.Map())}
+                includes={item.get('include', Immutable.List())}
                 prepaidIncludesOptions={prepaidIncludesOptions}
                 onSelectPPInclude={this.onSelectPPInclude}
                 onUpdatePeriodField={this.onUpdatePeriodField}
