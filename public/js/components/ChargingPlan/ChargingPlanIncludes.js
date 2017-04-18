@@ -26,6 +26,7 @@ const ChargingPlanIncludes = (props) => {
               include={props.includes.get(index)}
               onUpdateField={props.onUpdateField}
               onUpdatePeriodField={props.onUpdatePeriodField}
+              onRemove={props.onRemoveChargingPlan}
               index={index}
             />
           ))
@@ -45,6 +46,7 @@ ChargingPlanIncludes.propTypes = {
   prepaidIncludesOptions: PropTypes.array,
   onSelectPPInclude: PropTypes.func.isRequired,
   onUpdatePeriodField: PropTypes.func.isRequired,
+  onRemoveChargingPlan: PropTypes.func.isRequired,
   mode: PropTypes.string,
 };
 

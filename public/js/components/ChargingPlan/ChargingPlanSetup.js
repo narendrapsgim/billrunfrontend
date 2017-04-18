@@ -160,6 +160,11 @@ class ChargingPlanSetup extends Component {
     this.props.dispatch(onPlanFieldUpdate(['include', index, id], value));
   };
 
+  onRemoveChargingPlan = (index) => {
+    const { item } = this.props;
+    this.props.dispatch(onPlanFieldUpdate(['include'], item.get('include').remove(index)));
+  };
+
   afterSave = (response) => {
     const { mode } = this.props;
     if (response.status) {
@@ -236,6 +241,7 @@ class ChargingPlanSetup extends Component {
                 onSelectPPInclude={this.onSelectPPInclude}
                 onUpdatePeriodField={this.onUpdatePeriodField}
                 onUpdateField={this.onUpdateIncludeField}
+                onRemoveChargingPlan={this.onRemoveChargingPlan}
               />
             </Panel>
           </Tab>

@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Map, List } from 'immutable';
+import { Map } from 'immutable';
 import { Panel, Col, FormGroup, Form, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
+import Actions from '../Elements/Actions';
 
 const ChargingPlanInclude = (props) => {
   const { include, index } = props;
@@ -27,8 +28,21 @@ const ChargingPlanInclude = (props) => {
     { value: 'months', label: 'Months' },
   ];
 
+  const onRemoveClick = () => {
+    props.onRemove(index);
+  };
+
+  const actions = [
+    { type: 'remove', showIcon: true, onClick: onRemoveClick },
+  ];
+
   const header = (
-    <h3>{ include.get('pp_includes_name', '') }</h3>
+    <div>
+      { include.get('pp_includes_name', '') }
+      <div className="pull-right" style={{ marginTop: -5 }}>
+        <Actions actions={actions} />
+      </div>
+    </div>
   );
 
   return (
@@ -77,6 +91,7 @@ ChargingPlanInclude.propTypes = {
   index: PropTypes.number,
   onUpdatePeriodField: PropTypes.func.isRequired,
   onUpdateField: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
   editable: PropTypes.bool,
 };
 
