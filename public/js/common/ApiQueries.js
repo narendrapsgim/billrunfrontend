@@ -464,3 +464,28 @@ export const getOfflinePaymentQuery = (method, aid, amount, payerName, chequeNo)
     }]) },
   ],
 });
+
+// Dashboard reports queries
+
+export const getTotalRevenueQuery = () => ({
+  api: 'reports',
+  params: [
+    { action: 'totalRevenue' },
+  ],
+});
+
+export const getOutstandingDebtQuery = () => ({
+  api: 'reports',
+  params: [
+    { action: 'outstandingDebt' },
+  ],
+});
+
+export const getCustomerStateDistributionQuery = () => ({
+  api: 'reports',
+  params: [
+    { action: 'customerStateDistribution' },
+  ],
+});
+
+// Dashboard reports queries - end

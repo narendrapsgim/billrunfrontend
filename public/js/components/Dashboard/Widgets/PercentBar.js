@@ -36,7 +36,7 @@ class PercentBar extends Component {
     const yearPercent = yearAvg / maxValue;
     const charPersentYStyle = { marginLeft: `${(yearPercent * 100) - 3}%` };
 
-    const monthDiff = (value - maxValue) / maxValue;
+    const monthDiff = (value - prevValue) / maxValue;
     const monthPercent = prevValue / maxValue;
     const charPersentMStyle = { marginLeft: `${(monthPercent * 100) - 3}%` };
 

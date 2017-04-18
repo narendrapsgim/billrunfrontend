@@ -1,6 +1,11 @@
 import moment from 'moment';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun } from '../common/Api';
+import {
+  getTotalRevenueQuery,
+  getOutstandingDebtQuery,
+  getCustomerStateDistributionQuery,
+} from '../common/ApiQueries';
 
 export const GOT_DATA = 'GOT_DATA';
 export const GOT_DATA_ERROR = 'GOT_DATA_ERROR';
@@ -43,3 +48,12 @@ export const getData = (chartId, query) => {
       });
   };
 };
+
+export const getTotalRevenue = key =>
+  getData(key, getTotalRevenueQuery());
+
+export const getOutstandingDebt = key =>
+  getData(key, getOutstandingDebtQuery());
+
+export const getCustomerStateDistribution = key =>
+  getData(key, getCustomerStateDistributionQuery());
