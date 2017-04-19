@@ -4,6 +4,7 @@ import { apiBillRun } from '../common/Api';
 import {
   getTotalRevenueQuery,
   getOutstandingDebtQuery,
+  getTotalNumOfCustomersQuery,
   getCustomerStateDistributionQuery,
 } from '../common/ApiQueries';
 
@@ -54,6 +55,9 @@ export const getTotalRevenue = key =>
 
 export const getOutstandingDebt = key =>
   getData(key, getOutstandingDebtQuery());
+
+export const getTotalNumOfCustomers = key =>
+  getData(key, getTotalNumOfCustomersQuery());
 
 export const getCustomerStateDistribution = key =>
   getData(key, getCustomerStateDistributionQuery());

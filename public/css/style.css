@@ -445,6 +445,11 @@ ul.revision-history-list li.last::after {
 .doughnut-wrapper {
   position: relative;
 }
+.doughnut-wrapper canvas {
+  max-height: 139px;
+  width:auto!important;
+  margin: auto;
+}
 .doughnut-message {
   position: absolute;
   color: #7C7C7C;

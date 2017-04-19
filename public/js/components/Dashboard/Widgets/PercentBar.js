@@ -25,20 +25,21 @@ class PercentBar extends Component {
     const { data: { values } } = this.props;
     const maxValue = Math.max(...values);
     const yearAvg = values.reduce((p, c) => p + c, 0) / values.length;
-
     const value = values[values.length - 1];
     const prevValue = values[values.length - 2];
-    const persent = value / maxValue;
+    const percent = value / maxValue;
 
-    const barStyle = { width: `${persent * 100}%`, backgroundColor: palitra(1), height: 12 };
+    const barStyle = { width: `${percent * 100}%`, backgroundColor: palitra(1), height: 12 };
 
-    const yearDiff = (value - yearAvg) / yearAvg;
-    const yearPercent = yearAvg / maxValue;
-    const charPersentYStyle = { marginLeft: `${(yearPercent * 100) - 3}%` };
+    const yearDiff = value - yearAvg;
+    const yearPercent = yearDiff / yearAvg;
+    const yearPercentFromMax = yearAvg / maxValue;
+    const charPersentYStyle = { marginLeft: `${(yearPercentFromMax * 100) - 3}%` };
 
-    const monthDiff = (value - prevValue) / maxValue;
-    const monthPercent = prevValue / maxValue;
-    const charPersentMStyle = { marginLeft: `${(monthPercent * 100) - 3}%` };
+    const monthDiff = value - prevValue;
+    const monthPercent = monthDiff / prevValue;
+    const monthPercentFromMax = prevValue / maxValue;
+    const charPersentMStyle = { marginLeft: `${(monthPercentFromMax * 100) - 3}%` };
 
     const markerYearClass = classNames('marker', {
       negative: yearDiff < 0,
@@ -69,7 +70,7 @@ class PercentBar extends Component {
         <br />
         <div>
           <div className="pull-left text-left">
-            <h4 className={valueMonthClass}>{ this.props.parsePercent(monthDiff) }</h4>
+            <h4 className={valueMonthClass}>{ this.props.parsePercent(monthPercent) }</h4>
             <h4 className="value">{ this.props.parseValue(prevValue) }</h4>
             <div>
               <span className="legend">M</span>
@@ -77,7 +78,7 @@ class PercentBar extends Component {
             </div>
           </div>
           <div className="pull-right text-right">
-            <h4 className={valueYearClass}>{ this.props.parsePercent(yearDiff) }</h4>
+            <h4 className={valueYearClass}>{ this.props.parsePercent(yearPercent) }</h4>
             <h4 className="value">{ this.props.parseValue(yearAvg) }</h4>
             <div>
               <span className="legend">Y</span>

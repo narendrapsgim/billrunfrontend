@@ -1,8 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Row, Panel, Col } from 'react-bootstrap';
-import moment from 'moment';
-import { Map } from 'immutable';
+import { List } from 'immutable';
 import changeCase from 'change-case';
 import DashboardBase from './DashboardBase';
 import DoughnutSelectable from './Widgets/DoughnutSelectable';
@@ -14,11 +13,9 @@ import {
   parsePercent,
 } from './helper';
 import {
-  fakePercentBar,
-} from './fakeData';
-import {
   getTotalRevenue,
   getOutstandingDebt,
+  getTotalNumOfCustomers,
   getCustomerStateDistribution,
 } from '../../actions/dashboardActions';
 
@@ -26,78 +23,56 @@ class OverviewDashboard extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    fromDate: PropTypes.instanceOf(moment),
-    toDate: PropTypes.instanceOf(moment),
     currency: PropTypes.string,
-    totalRevenue: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.array,
-    ]),
-    outstandingDebt: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.array,
-    ]),
-    customerStateDistribution: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.array,
-    ]),
+    totalRevenue: PropTypes.array,
+    outstandingDebt: PropTypes.array,
+    totalNumOfCustomers: PropTypes.array,
+    customerStateDistribution: PropTypes.array,
   };
 
   static defaultProps = {
-    totalRevenue: {},
-    outstandingDebt: {},
-    customerStateDistribution: {},
-  }
-
-  state = {
-    percentBarData: null,
+    totalRevenue: [],
+    outstandingDebt: [],
+    totalNumOfCustomers: [],
+    customerStateDistribution: [],
   }
 
   componentDidMount() {
-    const { fromDate, toDate } = this.props;
     this.props.dispatch(getTotalRevenue('total_revenue'));
     this.props.dispatch(getOutstandingDebt('outstanding_debt'));
+    this.props.dispatch(getTotalNumOfCustomers('total_num_of_customers'));
     this.props.dispatch(getCustomerStateDistribution('customer_state_distribution'));
-
-    fakePercentBar(fromDate, toDate).then(
-      (percentBarData) => {
-        this.isUnmount !== true && this.setState({ percentBarData });
-      }
-    );
-  }
-
-  componentWillUnmount() {
-    this.isUnmount = true;
   }
 
   parseCurrencyValue = value => parseCurrencyValue(value, this.props.currency);
   parseCurrencyThousandValue = value => parseCurrencyThousandValue(value, this.props.currency);
 
   getParsedData = (data) => {
-    if (!data || !data[0] || !data[0].data || !data[0].data[0]) {
-      return Map();
+    if (!data || !data[0] || !data[0].data) {
+      return List();
     }
 
-    return Map(data[0].data[0]).sort();
+    return List(data[0].data);
   }
 
   getParsedTotalRevenueData = () => {
     const { totalRevenue } = this.props;
     return {
-      values: this.getParsedData(totalRevenue).map(val => val).toArray(),
+      values: this.getParsedData(totalRevenue).map(val => val.due).toArray(),
     };
   }
 
   getParsedOutstandingDebtData = () => {
     const { outstandingDebt } = this.props;
-    console.log('Before:');
-    console.log(this.getParsedData(outstandingDebt));
-    console.log('After:');
-    this.getParsedData(outstandingDebt).forEach(val => {
-      console.log(val);
-    });
     return {
-      values: this.getParsedData(outstandingDebt).map(val => val).toArray(),
+      values: this.getParsedData(outstandingDebt).map(val => val.due).toArray(),
+    };
+  }
+
+  getParsedTotalNumOfCustomersData = () => {
+    const { totalNumOfCustomers } = this.props;
+    return {
+      values: this.getParsedData(totalNumOfCustomers).map(val => val.customers_num).toArray(),
     };
   }
 
@@ -107,61 +82,51 @@ class OverviewDashboard extends Component {
       labels: [],
       values: [],
     };
-    this.getParsedData(customerStateDistribution).forEach((val, key) => {
-      ret.labels.push(changeCase.titleCase(key));
-      ret.values.push(val);
+    this.getParsedData(customerStateDistribution).forEach((val) => {
+      ret.labels.push(changeCase.titleCase(val.state));
+      ret.values.push(val.customers_num);
     });
     return ret;
   }
 
   render() {
-    const {
-      percentBarData,
-    } = this.state;
-
-    console.log(this.getParsedOutstandingDebtData());
-
     return (
       <Row>
-        <Col sm={12}>
-          <Col sm={6}>
-            <Panel header="Total Revenue">
-              <PercentBar
-                data={this.getParsedTotalRevenueData()}
-                parseValue={this.parseCurrencyValue}
-                parsePercent={parsePercent}
-              />
-            </Panel>
-          </Col>
-          <Col sm={6}>
-            <Panel header="Outstanding Debt">
-              <PercentBar
-                data={this.getParsedOutstandingDebtData()}
-                parseValue={this.parseCurrencyValue}
-                parsePercent={parsePercent}
-              />
-            </Panel>
-          </Col>
+        <Col sm={6} lg={3}>
+          <Panel header="Total Revenue">
+            <PercentBar
+              data={this.getParsedTotalRevenueData()}
+              parseValue={this.parseCurrencyValue}
+              parsePercent={parsePercent}
+            />
+          </Panel>
         </Col>
-        <Col sm={12}>
-          <Col sm={6}>
-            <Panel header="Total number of Customers">
-              <PercentBar
-                data={percentBarData}
-                parseValue={this.parseCurrencyValue}
-                parsePercent={parsePercent}
-              />
-            </Panel>
-          </Col>
-          <Col sm={6}>
-            <Panel header="Customer State Distribution" className="mt0">
-              <DoughnutSelectable
-                data={this.getParsedCustomerStateDistributionData()}
-                parseValue={parseCountValue}
-                parsePercent={parsePercent}
-              />
-            </Panel>
-          </Col>
+        <Col sm={6} lg={3}>
+          <Panel header="Outstanding Debt">
+            <PercentBar
+              data={this.getParsedOutstandingDebtData()}
+              parseValue={this.parseCurrencyValue}
+              parsePercent={parsePercent}
+            />
+          </Panel>
+        </Col>
+        <Col sm={6} lg={3}>
+          <Panel header="Total number of Customers">
+            <PercentBar
+              data={this.getParsedTotalNumOfCustomersData()}
+              parseValue={parseCountValue}
+              parsePercent={parsePercent}
+            />
+          </Panel>
+        </Col>
+        <Col sm={6} lg={3}>
+          <Panel header="Customer State Distribution" className="mt0">
+            <DoughnutSelectable
+              data={this.getParsedCustomerStateDistributionData()}
+              parseValue={parseCountValue}
+              parsePercent={parsePercent}
+            />
+          </Panel>
         </Col>
       </Row>
     );
@@ -171,6 +136,7 @@ class OverviewDashboard extends Component {
 const mapStateToProps = (state, props) => ({ // eslint-disable-line no-unused-vars
   totalRevenue: state.dashboard.get('total_revenue'),
   outstandingDebt: state.dashboard.get('outstanding_debt'),
+  totalNumOfCustomers: state.dashboard.get('total_num_of_customers'),
   customerStateDistribution: state.dashboard.get('customer_state_distribution'),
 });
 

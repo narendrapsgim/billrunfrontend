@@ -481,6 +481,13 @@ export const getOutstandingDebtQuery = () => ({
   ],
 });
 
+export const getTotalNumOfCustomersQuery = () => ({
+  api: 'reports',
+  params: [
+    { action: 'totalNumOfCustomers' },
+  ],
+});
+
 export const getCustomerStateDistributionQuery = () => ({
   api: 'reports',
   params: [
