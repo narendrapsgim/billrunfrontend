@@ -114,7 +114,7 @@ export default class DoughnutChart extends Component {
     if (!message || message === '') {
       return null;
     }
-    const fontSize = (height / 130).toFixed(2);
+    const fontSize = (height / 200).toFixed(2);
     return (
       <p className="doughnut-message" style={{ fontSize: `${fontSize}em` }}>
         {message}
