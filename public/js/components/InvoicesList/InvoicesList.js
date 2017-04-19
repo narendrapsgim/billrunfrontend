@@ -118,8 +118,8 @@ class InvoicesList extends Component {
 
   getTableFields = () => ([
     { id: 'invoice_id', title: 'Invoice Id', sort: true },
-    { id: 'invoice_date', title: 'Date', cssClass: 'short-date', sort: true, type: 'date' },
-    { id: 'due_date', title: 'Due', cssClass: 'short-date', sort: true, type: 'date' },
+    { id: 'invoice_date', title: 'Date', cssClass: 'short-date', sort: true, type: 'mongodate' },
+    { id: 'due_date', title: 'Due', cssClass: 'short-date', sort: true, type: 'mongodate' },
     { id: 'amount', title: 'Amount', sort: true },
     { id: 'paid', title: 'Status', parser: this.parserPaidBy },
     { id: 'billrun_key', title: 'Cycle', sort: true },
