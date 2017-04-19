@@ -42,9 +42,13 @@ export default class ToggeledInput extends Component {
 
   componentWillReceiveProps(nextProps) {
     const isSameValue = this.props.compare(nextProps.value, this.props.value);
-    const isSame = this.props.compare(nextProps.value, nextProps.disabledValue);
-    if (!isSameValue && !isSame) {
-      this.setState({ value: nextProps.value });
+    if (!isSameValue) {
+      const off = nextProps.compare(nextProps.value, nextProps.disabledValue);
+      const value = off ? nextProps.disabledValue : nextProps.value;
+      this.state = {
+        value,
+        off,
+      };
     }
   }
 
