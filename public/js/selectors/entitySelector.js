@@ -17,6 +17,13 @@ const getTab = (state, props) => {
   return undefined;
 };
 
+const getMessage = (state, props) => {
+  if (props.location && props.location.query && typeof props.location.query.message !== 'undefined') {
+    return props.location.query.message;
+  }
+  return undefined;
+};
+
 const getAction = (state, props) => {
   if (props.location && props.location.query && props.location.query.action) {
     return props.location.query.action.length > 0 ? props.location.query.action : null;
@@ -76,6 +83,20 @@ export const revisionsSelector = createSelector(
 export const tabSelector = createSelector(
   getTab,
   tab => tab
+);
+
+export const messageSelector = createSelector(
+  getMessage,
+  (message) => {
+    if (message) {
+      try {
+        return JSON.parse(message);
+      } catch (e) {
+        return undefined;
+      }
+    }
+    return undefined;
+  }
 );
 
 export const itemSelector = createSelector(
