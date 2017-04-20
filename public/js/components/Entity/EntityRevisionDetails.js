@@ -6,7 +6,7 @@ import { Form, FormGroup, Button, ControlLabel, Label } from 'react-bootstrap';
 import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
 import Field from '../Field';
-import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
+import { getItemDateValue, getConfig, getItemId, getRevisionStartIndex } from '../../common/Util';
 
 
 class EntityRevisionDetails extends Component {
@@ -112,18 +112,6 @@ class EntityRevisionDetails extends Component {
     );
   }
 
-  getStartIndex = () => {
-    const { item, revisions } = this.props;
-    const index = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
-    if (index <= 0) {
-      return 0;
-    }
-    if (index + 1 === revisions.size) {
-      return ((index - 2) >= 0) ? index - 2 : 0;
-    }
-    return index - 1;
-  }
-
   onChangeFrom = (value) => {
     if (value) {
       this.props.onChangeFrom(['from'], value.format('YYYY-MM-DD'));
@@ -149,7 +137,7 @@ class EntityRevisionDetails extends Component {
     if (['clone', 'create'].includes(mode)) {
       return null;
     }
-    const start = this.getStartIndex();
+    const start = getRevisionStartIndex(item, revisions);
     return (
       <div className="inline pull-right">
         <div className="inline mr10">

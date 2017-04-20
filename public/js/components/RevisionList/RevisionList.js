@@ -6,6 +6,7 @@ import moment from 'moment';
 import { lowerCase, sentenceCase } from 'change-case';
 import { ConfirmModal, StateIcon } from '../Elements';
 import CloseActionBox from '../Entity/CloseActionBox';
+import MoveActionBox from '../Entity/MoveActionBox';
 import List from '../../components/List';
 import {
   getItemDateValue,
@@ -15,7 +16,7 @@ import {
   getItemMinFromDate,
 } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
-import { deleteEntity } from '../../actions/entityActions';
+import { deleteEntity, moveEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
 import { chargingDaySelector } from '../../selectors/settingsSelector';
 
@@ -47,6 +48,8 @@ class RevisionList extends Component {
   state = {
     showConfirmRemove: false,
     itemToRemove: null,
+    showMoveModal: false,
+    itemToMove: null,
   }
 
   isItemEditable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
@@ -56,6 +59,8 @@ class RevisionList extends Component {
     && ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''))
   );
 
+  isItemMovable = item => item.getIn(['revision_info', 'movable'], true);
+
   isItemActive = item => ['active'].includes(item.getIn(['revision_info', 'status'], ''));
 
   parseEditShow = item => this.isItemEditable(item);
@@ -63,6 +68,8 @@ class RevisionList extends Component {
   parseViewShow = item => !this.isItemEditable(item);
 
   parseRemoveEnable = item => this.isItemRemovable(item);
+
+  parseMoveEnable = item => this.isItemMovable(item);
 
   parserState = item => (<StateIcon status={item.getIn(['revision_info', 'status'], '')} />);
 
@@ -135,6 +142,33 @@ class RevisionList extends Component {
     this.props.dispatch(deleteEntity(collection, itemToRemove)).then(this.afterRemove);
   }
 
+  onClickMove = (item) => {
+    this.setState({
+      showMoveModal: true,
+      itemToMove: item,
+    });
+  }
+
+  onClickMoveClose = () => {
+    this.setState({
+      showMoveModal: false,
+      itemToMove: null,
+    });
+  }
+
+  onClickMoveOk = (item, type) => {
+    const { itemName } = this.props;
+    const collection = getConfig(['systemItems', itemName, 'collection'], '');
+    this.props.dispatch(moveEntity(collection, item, type)).then(this.afterMove);
+  }
+
+  afterMove = (response) => {
+    if (response.status) {
+      this.props.dispatch(showSuccess('Revision was moved'));
+      this.props.onCloseItem();
+    }
+  }
+
   afterRemove = (response) => {
     const { itemToRemove } = this.state;
     const { itemName } = this.props;
@@ -161,6 +195,8 @@ class RevisionList extends Component {
         return 'Edit revision';
       case 'view':
         return 'View revision details';
+      case 'move':
+        return 'Move revision in time';
       default:
         return sentenceCase(type);
     }
@@ -176,8 +212,26 @@ class RevisionList extends Component {
     { type: 'view', helpText: this.getActionHelpText('view'), onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
     { type: 'edit', helpText: this.getActionHelpText('edit'), onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
     { type: 'clone', helpText: this.getActionHelpText('clone'), onClick: this.onClickClone },
+    { type: 'move', helpText: this.getActionHelpText('move'), onClick: this.onClickMove, enable: this.parseMoveEnable },
     { type: 'remove', helpText: this.getActionHelpText('remove'), onClick: this.onClickRemove, enable: this.parseRemoveEnable },
   ]
+
+  renderMoveModal = () => {
+    const { items, itemName } = this.props;
+    const { showMoveModal, itemToMove } = this.state;
+    if (showMoveModal) {
+      return (
+        <MoveActionBox
+          item={itemToMove}
+          itemName={itemName}
+          revisions={items}
+          onMoveItem={this.onClickMoveOk}
+          onCancelMoveItem={this.onClickMoveClose}
+        />
+      );
+    }
+    return null;
+  }
 
   render() {
     const { items, itemName, chargingDay } = this.props;
@@ -199,6 +253,7 @@ class RevisionList extends Component {
           />
         }
         <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
+        { this.renderMoveModal() }
       </div>
     );
   }
