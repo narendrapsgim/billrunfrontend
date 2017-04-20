@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Row, Panel, Col } from 'react-bootstrap';
-import { List } from 'immutable';
 import changeCase from 'change-case';
 import DashboardBase from './DashboardBase';
 import DoughnutSelectable from './Widgets/DoughnutSelectable';
@@ -11,6 +10,7 @@ import {
   parseCurrencyThousandValue,
   parseCountValue,
   parsePercent,
+  getParsedData,
 } from './helper';
 import {
   getTotalRevenue,
@@ -47,32 +47,24 @@ class OverviewDashboard extends Component {
   parseCurrencyValue = value => parseCurrencyValue(value, this.props.currency);
   parseCurrencyThousandValue = value => parseCurrencyThousandValue(value, this.props.currency);
 
-  getParsedData = (data) => {
-    if (!data || !data[0] || !data[0].data) {
-      return List();
-    }
-
-    return List(data[0].data);
-  }
-
   getParsedTotalRevenueData = () => {
     const { totalRevenue } = this.props;
     return {
-      values: this.getParsedData(totalRevenue).map(val => val.due).toArray(),
+      values: getParsedData(totalRevenue).map(val => val.due).toArray(),
     };
   }
 
   getParsedOutstandingDebtData = () => {
     const { outstandingDebt } = this.props;
     return {
-      values: this.getParsedData(outstandingDebt).map(val => val.due).toArray(),
+      values: getParsedData(outstandingDebt).map(val => val.due).toArray(),
     };
   }
 
   getParsedTotalNumOfCustomersData = () => {
     const { totalNumOfCustomers } = this.props;
     return {
-      values: this.getParsedData(totalNumOfCustomers).map(val => val.customers_num).toArray(),
+      values: getParsedData(totalNumOfCustomers).map(val => val.customers_num).toArray(),
     };
   }
 
@@ -82,7 +74,7 @@ class OverviewDashboard extends Component {
       labels: [],
       values: [],
     };
-    this.getParsedData(customerStateDistribution).forEach((val) => {
+    getParsedData(customerStateDistribution).forEach((val) => {
       ret.labels.push(changeCase.titleCase(val.state));
       ret.values.push(val.customers_num);
     });
@@ -94,38 +86,46 @@ class OverviewDashboard extends Component {
       <Row>
         <Col sm={6} lg={3}>
           <Panel header="Total Revenue">
-            <PercentBar
-              data={this.getParsedTotalRevenueData()}
-              parseValue={this.parseCurrencyValue}
-              parsePercent={parsePercent}
-            />
+            <div className="dashboard-chart-wrapper">
+              <PercentBar
+                data={this.getParsedTotalRevenueData()}
+                parseValue={this.parseCurrencyValue}
+                parsePercent={parsePercent}
+              />
+            </div>
           </Panel>
         </Col>
         <Col sm={6} lg={3}>
           <Panel header="Outstanding Debt">
-            <PercentBar
-              data={this.getParsedOutstandingDebtData()}
-              parseValue={this.parseCurrencyValue}
-              parsePercent={parsePercent}
-            />
+            <div className="dashboard-chart-wrapper">
+              <PercentBar
+                data={this.getParsedOutstandingDebtData()}
+                parseValue={this.parseCurrencyValue}
+                parsePercent={parsePercent}
+              />
+            </div>
           </Panel>
         </Col>
         <Col sm={6} lg={3}>
           <Panel header="Total number of Customers">
-            <PercentBar
-              data={this.getParsedTotalNumOfCustomersData()}
-              parseValue={parseCountValue}
-              parsePercent={parsePercent}
-            />
+            <div className="dashboard-chart-wrapper">
+              <PercentBar
+                data={this.getParsedTotalNumOfCustomersData()}
+                parseValue={parseCountValue}
+                parsePercent={parsePercent}
+              />
+            </div>
           </Panel>
         </Col>
         <Col sm={6} lg={3}>
           <Panel header="Customer State Distribution" className="mt0">
-            <DoughnutSelectable
-              data={this.getParsedCustomerStateDistributionData()}
-              parseValue={parseCountValue}
-              parsePercent={parsePercent}
-            />
+            <div className="dashboard-chart-wrapper">
+              <DoughnutSelectable
+                data={this.getParsedCustomerStateDistributionData()}
+                parseValue={parseCountValue}
+                parsePercent={parsePercent}
+              />
+            </div>
           </Panel>
         </Col>
       </Row>

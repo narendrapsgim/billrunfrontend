@@ -6,6 +6,10 @@ import {
   getOutstandingDebtQuery,
   getTotalNumOfCustomersQuery,
   getCustomerStateDistributionQuery,
+  getRevenueOverTimeQuery,
+  getRevenueByPlanQuery,
+  getAgingDebtQuery,
+  getDebtOverTimeQuery,
 } from '../common/ApiQueries';
 
 export const GOT_DATA = 'GOT_DATA';
@@ -61,3 +65,15 @@ export const getTotalNumOfCustomers = key =>
 
 export const getCustomerStateDistribution = key =>
   getData(key, getCustomerStateDistributionQuery());
+
+export const getRevenueOverTime = key =>
+  getData(key, getRevenueOverTimeQuery());
+
+export const getRevenueByPlan = key =>
+  getData(key, getRevenueByPlanQuery());
+
+export const getAgingDebt = key =>
+  getData(key, getAgingDebtQuery());
+
+export const getDebtOverTime = key =>
+  getData(key, getDebtOverTimeQuery());

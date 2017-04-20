@@ -85,15 +85,7 @@ class DoughnutSelectable extends Component {
 
     if (selectedIndex === null) {
       return (
-        <div style={{ minHeight: 72.5 }}>
-          <ul className="mb0">
-            { data.labels.map((label, idx) =>
-              <li key={idx} className="mb0" style={{ color: palitra(idx), lineHeight: '17px' }}>
-                { this.props.parseLabel(label) }
-              </li>
-            )}
-          </ul>
-        </div>
+        <div style={{ minHeight: 72.5 }} />
       );
     }
     return (

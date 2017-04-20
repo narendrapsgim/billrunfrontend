@@ -79,6 +79,8 @@ class LineCompare extends Component {
         top: 0,
       },
     },
+    responsive: true,
+    maintainAspectRatio: false,
   });
 
   render() {

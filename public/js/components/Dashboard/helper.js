@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { List } from 'immutable';
 import countries from './countries.json';
 
 export const getCountryKeyByCountryName = (name, notSetValue = null) => {
@@ -22,5 +23,16 @@ export const parseCountValue = value =>
 export const parseDateValue = value =>
   moment(value).format('MMM YYYY');
 
+export const parseMonthValue = value =>
+  moment(value).format('MMM');
+
 export const parsePercent = value =>
   Number(value).toLocaleString('en-US', { style: 'percent', maximumFractionDigits: 2 });
+
+export const getParsedData = (data) => {
+  if (!data || !data[0] || !data[0].data) {
+    return List();
+  }
+
+  return List(data[0].data);
+};

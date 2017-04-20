@@ -467,32 +467,20 @@ export const getOfflinePaymentQuery = (method, aid, amount, payerName, chequeNo)
 
 // Dashboard reports queries
 
-export const getTotalRevenueQuery = () => ({
+const getDashboardQuery = action => ({
   api: 'reports',
   params: [
-    { action: 'totalRevenue' },
+    { action },
   ],
 });
 
-export const getOutstandingDebtQuery = () => ({
-  api: 'reports',
-  params: [
-    { action: 'outstandingDebt' },
-  ],
-});
-
-export const getTotalNumOfCustomersQuery = () => ({
-  api: 'reports',
-  params: [
-    { action: 'totalNumOfCustomers' },
-  ],
-});
-
-export const getCustomerStateDistributionQuery = () => ({
-  api: 'reports',
-  params: [
-    { action: 'customerStateDistribution' },
-  ],
-});
+export const getTotalRevenueQuery = () => getDashboardQuery('totalRevenue');
+export const getOutstandingDebtQuery = () => getDashboardQuery('outstandingDebt');
+export const getTotalNumOfCustomersQuery = () => getDashboardQuery('totalNumOfCustomers');
+export const getCustomerStateDistributionQuery = () => getDashboardQuery('customerStateDistribution');
+export const getRevenueOverTimeQuery = () => getDashboardQuery('revenueOverTime');
+export const getRevenueByPlanQuery = () => getDashboardQuery('revenueByPlan');
+export const getAgingDebtQuery = () => getDashboardQuery('agingDebt');
+export const getDebtOverTimeQuery = () => getDashboardQuery('debtOverTime');
 
 // Dashboard reports queries - end
