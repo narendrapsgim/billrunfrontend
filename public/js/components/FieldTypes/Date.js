@@ -4,9 +4,10 @@ import moment from 'moment';
 import { getConfig } from '../../common/Util';
 
 const Date = (props) => {
-  const { editable, value, disabled, placeholder, onChange, ...otherProps } = props;
+  const { editable, value, disabled, placeholder, onChange, dateFormat, ...otherProps } = props;
+  const format = dateFormat || getConfig('dateFormat', 'DD/MM/YYYY');
   if (!editable) {
-    const displayValue = value.isValid() ? value.format(getConfig('dateFormat', 'DD/MM/YYYY')) : value;
+    const displayValue = value.isValid() ? value.format(format) : value;
     return (
       <div className="non-editable-field">{ displayValue }</div>
     );
@@ -16,6 +17,7 @@ const Date = (props) => {
     <DatePicker
       {...otherProps}
       className="form-control"
+      dateFormat={format}
       selected={value}
       onChange={onChange}
       disabled={disabled}
@@ -37,6 +39,7 @@ Date.propTypes = {
   disabled: PropTypes.bool,
   editable: PropTypes.bool,
   placeholder: PropTypes.string,
+  dateFormat: PropTypes.string,
   onChange: PropTypes.func,
 };
 
