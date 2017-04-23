@@ -95,7 +95,7 @@ class CloseActionBox extends Component {
           minDate={minDate}
           highlightDates={highlightDates}
         />
-        <Button onClick={this.toggleCloseConfirm} style={btnStyle} disabled={disableSubmit}>
+        <Button onClick={this.toggleCloseConfirm} style={btnStyle} disabled={disableSubmit} bsStyle="primary">
           OK
         </Button>
       </div>
