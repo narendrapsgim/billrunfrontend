@@ -442,13 +442,25 @@ ul.revision-history-list li.active .cycle {
 .entity-revision-edit ul.revision-history-list li.more::after {
   top: 10px;
 }
+
+.move-modal ul.revision-history-list li {
+  opacity: 0.5;
+}
+.move-modal ul.revision-history-list li.active {
+  opacity: 1;
+}
 /* ~Entity Revision */
 
 .discount-setup .help-block {
   margin-bottom: 0;
 }
 
-#move-entity .nav-tabs li{
+#move-entity .nav-tabs li,
+#move-entity .nav-pills li {
   width: 50%;
   text-align: center;
+  background-color: #eeeeee;
+}
+#move-entity .nav-pills>li+li {
+     margin-left: 0;
 }

@@ -1,22 +1,28 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import DatePicker from 'react-datepicker';
+import moment from 'moment';
 import { Form, FormGroup, Col, Tabs, Tab, Button } from 'react-bootstrap';
 import { ModalWrapper, RevisionTimeline, ConfirmModal } from '../Elements';
-import { getItemDateValue, getConfig, getRevisionStartIndex } from '../../common/Util';
+import { getItemDateValue, getConfig, getRevisionStartIndex, getItemId, getClosestChargingDate } from '../../common/Util';
+import Field from '../Field';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
-class CloseActionBox extends Component {
+
+class MoveActionBox extends Component {
 
   static propTypes = {
+    itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
     itemName: PropTypes.string.isRequired,
     revisions: PropTypes.instanceOf(Immutable.List),
+    chargingDay: PropTypes.number,
     onMoveItem: PropTypes.func,
     onCancelMoveItem: PropTypes.func,
   }
 
   static defaultProps = {
+    itemId: PropTypes.string,
     item: Immutable.Map(),
     revisions: Immutable.List(),
     onMoveItem: () => {},
@@ -26,10 +32,19 @@ class CloseActionBox extends Component {
   state = {
     startDate: getItemDateValue(this.props.item, 'from', null),
     endDate: getItemDateValue(this.props.item, 'to', null),
-    activeTab: 1,
+    activeTab: this.props.item.getIn(['revision_info', 'movable_from'], true) ? 1 : 2,
     progress: false,
     showEndConfirm: false,
     showStartConfirm: false,
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!Immutable.is(this.props.item, nextProps.item)) {
+      this.setState({
+        startDate: getItemDateValue(nextProps.item, 'from', null),
+        endDate: getItemDateValue(nextProps.item, 'to', null),
+      });
+    }
   }
 
   onClickEndMoveOk = () => {
@@ -94,8 +109,25 @@ class CloseActionBox extends Component {
     this.setState({ showEndConfirm: false, showStartConfirm: false });
   }
 
+  onUnlimitedChanged = (e) => {
+    const { item } = this.props;
+    const { value } = e.target;
+    const unlimited = moment().add(50, 'years').isBefore(getItemDateValue(item, 'to', null));
+    if (value) { // is new value is set or infinity is checked
+      if (unlimited) {
+        this.setState({ endDate: getItemDateValue(item, 'to', null) });
+      } else {
+        this.setState({ endDate: moment().add(100, 'years') });
+      }
+    } else if (unlimited) { // infinity unchecked and item vas unlimited
+      this.setState({ endDate: moment().add(1, 'day') });
+    } else { // infinity unchecked
+      this.setState({ endDate: getItemDateValue(item, 'to', null) });
+    }
+  }
+
   render() {
-    const { item, revisions, itemName } = this.props;
+    const { item, revisions, itemName, chargingDay } = this.props;
     const {
       startDate,
       endDate,
@@ -104,6 +136,11 @@ class CloseActionBox extends Component {
       showEndConfirm,
       showStartConfirm,
     } = this.state;
+
+    if (revisions.isEmpty()) {
+      return null;
+    }
+
     const start = getRevisionStartIndex(item, revisions);
     const revisionBy = getConfig(['systemItems', itemName, 'uniqueField'], '');
     const title = `${item.get(revisionBy, '')} - Move`;
@@ -112,71 +149,92 @@ class CloseActionBox extends Component {
     const disableFromSubmit = startDate.isSame(getItemDateValue(item, 'from', null), 'days') || progress;
     const disableToSubmit = endDate.isSame(getItemDateValue(item, 'to', null), 'days') || progress;
     const dateFormat = getConfig('dateFormat', 'DD/MM/YYYY');
-    const startConfirmMessage = `Are you sure you want to set new start date ${startDate.format(dateFormat)} ?`;
-    const endConfirmMessage = `Are you sure you want to set new end date ${endDate.format(dateFormat)} ?`;
+    const isEndDateUnlimited = moment().add(50, 'years').isBefore(endDate);
+    const startConfirmMessage = `Are you sure you want to set start date to be ${startDate.format(dateFormat)} ?`;
+    const endConfirmMessage = `Are you sure you want to set end date to be  ${isEndDateUnlimited ? 'infinite' : endDate.format(dateFormat)} ?`;
+    const revisionIndex = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
+    const isLast = revisionIndex === 0;
+    const isFirst = revisionIndex === revisions.size - 1;
+    const closestChargingDate = getClosestChargingDate(chargingDay);
+    const minStart = !isFirst ? moment.max(getItemDateValue(revisions.get(revisionIndex + 1), 'from'), closestChargingDate) : closestChargingDate;
+    const maxStart = getItemDateValue(item, 'to');
+    const minEnd = getItemDateValue(item, 'from');
+    const maxEnd = isLast ? moment().add(200, 'years') : getItemDateValue(revisions.get(revisionIndex - 1), 'to');
+    const disableStartInput = !item.getIn(['revision_info', 'movable_from'], true);
+    const disableEndInput = !item.getIn(['revision_info', 'movable_to'], true) || (isEndDateUnlimited && isLast);
+
     return (
       <ModalWrapper show={true} title={title} labelCancel="Close" onCancel={this.onClickCancel} onHide={this.onClickCancel}>
-
-        <div className="text-center">
+        <div className="text-center move-modal">
           <RevisionTimeline
             revisions={revisions}
             item={item}
             size={10}
             start={start}
           />
-        </div>
-        <br />
-        <Tabs defaultActiveKey={activeTab} animation={false} id="move-entity" onSelect={this.handleSelectTab}>
-          <Tab title="Move Start Date" eventKey={1}>
-            <Form horizontal style={formStyle}>
-              <FormGroup>
-                <Col sm={12} className="text-left">
-                  <div className="inline">
-                    <DatePicker
-                      className="form-control inline"
-                      dateFormat={dateFormat}
-                      selected={startDate}
+          <Form horizontal style={formStyle}>
+            <FormGroup>
+              <Tabs bsStyle="pills" defaultActiveKey={activeTab} animation={false} id="move-entity" onSelect={this.handleSelectTab}>
+                <Tab title="Move Start Date" eventKey={1} disabled={!item.getIn(['revision_info', 'movable_from'], true)}>
+                  <br />
+                  <Col sm={3} className="text-right" style={{ padding: '10px 15px' }}>
+                    &nbsp;
+                  </Col>
+                  <Col sm={6} className="pr0">
+                    <Field
+                      fieldType="date"
+                      value={startDate}
+                      minDate={minStart}
+                      maxDate={maxStart}
                       onChange={this.onChangeDateFrom}
                       isClearable={true}
-                      placeholderText="Select Start Date..."
+                      placeholder="Select Start Date..."
+                      disabled={disableStartInput}
                     />
-                  <Button onClick={this.toggleStartConfirm} style={btnStyle} disabled={disableFromSubmit}>
+                  </Col>
+                  <Col sm={3} className="pl0 text-left">
+                    <Button onClick={this.toggleStartConfirm} style={btnStyle} disabled={disableFromSubmit} bsStyle="primary">
                       OK
                     </Button>
                     <ConfirmModal onOk={this.onClickStartMoveOk} onCancel={this.onClickCloseConfirm} show={showStartConfirm} message={startConfirmMessage} labelOk="Yes" />
-                  </div>
-                </Col>
-              </FormGroup>
-            </Form>
-          </Tab>
-          <Tab title="Move End Date" eventKey={2}>
-            <Form horizontal style={formStyle}>
-              <FormGroup>
-                <Col sm={12} className="text-right">
-                  <div className="inline">
-                    <DatePicker
-                      className="form-control inline"
-                      dateFormat={dateFormat}
-                      selected={endDate}
+                  </Col>
+                </Tab>
+
+                <Tab title="Move End Date" eventKey={2} disabled={!item.getIn(['revision_info', 'movable_to'], true)}>
+                  <br />
+                  <Col sm={3} className="text-right" style={{ padding: '10px 15px' }}>
+                    <Field value={isEndDateUnlimited} onChange={this.onUnlimitedChanged} fieldType="checkbox" label="Infinite" disabled={!isLast} />
+                  </Col>
+                  <Col sm={6} className="pr0">
+                    <Field
+                      fieldType="date"
+                      value={isEndDateUnlimited && isLast ? null : endDate}
                       onChange={this.onChangeDateTo}
                       isClearable={true}
-                      placeholderText="Select End Date..."
+                      minDate={minEnd}
+                      maxDate={maxEnd}
+                      disabled={disableEndInput}
+                      placeholder="Select End Date..."
                     />
-                    <Button onClick={this.toggleEndConfirm} style={btnStyle} disabled={disableToSubmit}>
+                  </Col>
+                  <Col sm={3} className="pl0 text-left">
+                    <Button onClick={this.toggleEndConfirm} style={btnStyle} disabled={disableToSubmit} bsStyle="primary">
                       OK
                     </Button>
                     <ConfirmModal onOk={this.onClickEndMoveOk} onCancel={this.onClickCloseConfirm} show={showEndConfirm} message={endConfirmMessage} labelOk="Yes" />
-                  </div>
-                </Col>
-              </FormGroup>
-            </Form>
-          </Tab>
-
-        </Tabs>
-
+                  </Col>
+                </Tab>
+              </Tabs>
+            </FormGroup>
+          </Form>
+        </div>
       </ModalWrapper>
     );
   }
 }
 
-export default connect()(CloseActionBox);
+const mapStateToProps = (state, props) => ({
+  chargingDay: chargingDaySelector(state, props),
+  item: props.revisions.find(revision => getItemId(revision) === props.itemId),
+});
+export default connect(mapStateToProps)(MoveActionBox);

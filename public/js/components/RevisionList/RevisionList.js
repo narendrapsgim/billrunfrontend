@@ -59,7 +59,7 @@ class RevisionList extends Component {
     && ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''))
   );
 
-  isItemMovable = item => item.getIn(['revision_info', 'movable'], true);
+  isItemMovable = item => item.getIn(['revision_info', 'movable_from'], true) || item.getIn(['revision_info', 'movable_to'], true);
 
   isItemActive = item => ['active'].includes(item.getIn(['revision_info', 'status'], ''));
 
@@ -222,7 +222,7 @@ class RevisionList extends Component {
     if (showMoveModal) {
       return (
         <MoveActionBox
-          item={itemToMove}
+          itemId={getItemId(itemToMove)}
           itemName={itemName}
           revisions={items}
           onMoveItem={this.onClickMoveOk}
