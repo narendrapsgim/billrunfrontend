@@ -106,7 +106,8 @@ class Subscription extends Component {
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     const servicesList = services.map(service => service.get('name', '')).toArray();
     const to = getItemDateValue(subscription, 'to', moment().add(100, 'years')).toISOString();
-    const newServices = this.updateServicesDates(servicesList, value, to);
+    const from = moment(value).toISOString();
+    const newServices = this.updateServicesDates(servicesList, from, to);
     const newSubscription = subscription.withMutations(subscriptionWithMutations =>
       subscriptionWithMutations
         .setIn(path, value)
@@ -147,6 +148,7 @@ class Subscription extends Component {
 
   updateServicesDates = (servicesNames, from, to) => {
     const { subscription, allServices } = this.props;
+    const { subscription: currentSubscription } = this.state;
     const originServices = subscription.get('services', Immutable.List()) || Immutable.List();
     return Immutable.List().withMutations((servicesWithMutations) => {
       if (servicesNames.length) {
@@ -157,10 +159,18 @@ class Subscription extends Component {
             null,
             Immutable.Map({ name, from, to })
           );
-          // if service type quantitative, set default quantity for new and fix existing
+          // if service type quantitative,
+          // for new -> set default quantity.
+          // for existing -> set existing quantity.
           const serviceOption = allServices.find(option => option.get('name', '') === name);
-          if (serviceOption.get('quantitative', false) === true && !service.has('quantity')) {
-            service = service.set('quantity', 1);
+          if (serviceOption.get('quantitative', false) === true) {
+            const currentServices = currentSubscription.get('services', Immutable.List()) || Immutable.List();
+            const quantity = currentServices.find(
+              currentService => currentService.get('name') === name,
+              null,
+              Immutable.Map()
+            ).get('quantity', 1);
+            service = service.set('quantity', quantity);
           }
           servicesWithMutations.push(service);
         });
