@@ -16,13 +16,6 @@ const LimitedDestinations = (props) => {
           <PlanSearch onSelectPlan={props.onSelectPlan} />
         </Panel>
       }
-      <LimitedDestination
-        editable={editable}
-        rates={limitedDestinations.get('BASE', List())}
-        onChange={props.onChange}
-        allRates={allRates}
-        name="BASE"
-      />
       {
         limitedDestinations
           .keySeq()
@@ -33,6 +26,7 @@ const LimitedDestinations = (props) => {
               key={key}
               rates={limitedDestinations.get(name, List())}
               onChange={props.onChange}
+              onRemove={props.onRemove}
               allRates={allRates}
               name={name}
             />
@@ -51,8 +45,9 @@ LimitedDestinations.defaultProps = {
 LimitedDestinations.propTypes = {
   limitedDestinations: PropTypes.instanceOf(Map),
   allRates: PropTypes.array,
-  onSelectPlan: React.PropTypes.func.isRequired,
-  onChange: React.PropTypes.func.isRequired,
+  onSelectPlan: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
   mode: PropTypes.string,
 };
 

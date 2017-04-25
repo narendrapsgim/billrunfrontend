@@ -28,8 +28,8 @@ import { clearItems, getRevisions, clearRevisions } from '../../actions/entityLi
 import { getList, clearList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { showSuccess } from '../../actions/alertsActions';
-import { modeSelector, itemSelector, idSelector, tabSelector } from '../../selectors/entitySelector';
+import { showSuccess, showAlert } from '../../actions/alertsActions';
+import { modeSelector, itemSelector, idSelector, tabSelector, messageSelector } from '../../selectors/entitySelector';
 import { buildPageTitle, getConfig, getItemId } from '../../common/Util';
 
 
@@ -50,6 +50,10 @@ class CustomerSetup extends Component {
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
+    ]),
+    message: PropTypes.oneOfType([
+      PropTypes.object,
+      null,
     ]),
     location: PropTypes.shape({
       pathname: PropTypes.string,
@@ -79,7 +83,10 @@ class CustomerSetup extends Component {
   }
 
   componentDidMount() {
-    const { mode } = this.props;
+    const { mode, message } = this.props;
+    if (message) {
+      this.props.dispatch(showAlert(message.content, message.type));
+    }
     if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'customer');
       this.props.dispatch(setPageTitle(pageTitle));
@@ -326,6 +333,7 @@ const mapStateToProps = (state, props) => ({
   plans: state.list.get('available_plans') || undefined,
   services: state.list.get('available_services') || undefined,
   gateways: state.list.get('available_gateways') || undefined,
+  message: messageSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(CustomerSetup));

@@ -146,6 +146,7 @@ class PlanIncludesTab extends Component {
         <th style={{ width: 100 }}>Include</th>
         <th>Products</th>
         <th className="text-center" style={{ width: 100 }}>Shared</th>
+        <th className="text-center" style={{ width: 100 }}>Pooled</th>
         {allowEdit && <th style={{ width: 180 }} />}
       </tr>
     );

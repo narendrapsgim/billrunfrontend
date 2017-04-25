@@ -188,10 +188,11 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   render() {
-    const { name, value, usaget, shared, products, mode } = this.props;
+    const { name, value, usaget, shared, pooled, products, mode } = this.props;
     const { showConfirm } = this.state;
     const confirmMessage = `Are you sure you want to remove ${name} group?`;
     const sharedLabel = shared ? 'Yes' : 'No';
+    const pooledLabel = pooled ? 'Yes' : 'No';
     const productsLabels = products.join(', ');
     const valueLabel = changeCase.titleCase(value);
     const allowEdit = mode !== 'view';
@@ -207,6 +208,7 @@ export default class PlanIncludeGroupEdit extends Component {
           </OverlayTrigger>
         </td>
         <td className="td-ellipsis text-center">{sharedLabel}</td>
+        <td className="td-ellipsis text-center">{pooledLabel}</td>
         { allowEdit &&
           <td className="text-right" style={{ paddingRight: 0 }}>
             <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>

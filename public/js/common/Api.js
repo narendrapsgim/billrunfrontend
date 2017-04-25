@@ -157,13 +157,33 @@ export const apiBillRunErrorHandler = (error, defaultMessage = 'Error, please tr
   });
 };
 
+
+const promiseTimeout = (ms, promise, timeOutMessage = 'Request timeout') => new Promise(
+  (resolve, reject) => {
+    // create a timeout to reject promise if not resolved
+    const promiseTimeoutTimer = setTimeout(() => {
+      reject(new Error(timeOutMessage));
+    }, ms);
+
+    promise
+    .then((responce) => {
+      clearTimeout(promiseTimeoutTimer);
+      resolve(responce);
+    })
+    .catch((error) => {
+      clearTimeout(promiseTimeoutTimer);
+      reject(error);
+    });
+  });
+
 // Send Http request
-const sendHttpRequest = (query) => {
+const sendHttpRequest = (query, apiParams = {}) => {
   // Create Api URL
   const url = globalSetting.serverUrl + buildApiString(query) + buildQueryString(query.params);
   const requestOptions = buildQueryOptions(query.options);
   const response = (query.name) ? { name: query.name } : {};
-  return fetch(url, requestOptions)
+  const timeout = query.timeout || globalSetting.serverApiTimeOut;
+  return promiseTimeout(timeout, fetch(url, requestOptions), apiParams.timeOutMessage)
     .then(res => res.json())
     .then(checkLogin)
     .then(checkStatus)
@@ -177,7 +197,7 @@ export const apiBillRun = (requests, params = {}) => {
   const apiParams = Object.assign({ requiredAllSuccess: true }, params);
   const apiRequests = Array.isArray(requests) ? requests : [requests];
   // Create Prommisses array from queries
-  const promiseRequests = apiRequests.map(request => sendHttpRequest(request));
+  const promiseRequests = apiRequests.map(request => sendHttpRequest(request, apiParams));
   // Send All prommisses
   return Promise.all(promiseRequests)
     .then((responses) => {

@@ -12,11 +12,12 @@ const Date = (props) => {
     );
   }
   const placeholderText = (disabled && !value) ? '' : placeholder;
+  const selected = value.isValid() ? value : null;
   return (
     <DatePicker
       {...otherProps}
       className="form-control"
-      selected={value}
+      selected={selected}
       onChange={onChange}
       disabled={disabled}
       placeholderText={placeholderText}
