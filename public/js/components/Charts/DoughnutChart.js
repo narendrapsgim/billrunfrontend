@@ -71,7 +71,7 @@ export default class DoughnutChart extends Component {
     });
   }
 
-  prepareData = () => {
+  prepareData = (canvas) => {
     const { data } = this.props;
     const chartData = {
       labels: data.labels,
@@ -130,7 +130,7 @@ export default class DoughnutChart extends Component {
         { this.renderMessage() }
         <Doughnut
           ref="chartRef"
-          data={this.prepareData()}
+          data={this.prepareData}
           options={options}
           width={width}
           height={height}

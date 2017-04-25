@@ -13,8 +13,6 @@ class LineCompare extends Component {
   };
 
   static defaultProps = {
-    // width: 100,
-    // height: 50,
     data: {
       x: [{ values: [] }],
       y: [],
@@ -30,7 +28,6 @@ class LineCompare extends Component {
       labels: {
         padding: 20,
         usePointStyle: true,
-        pointStyle: 'line',
       },
     },
     scales: {
@@ -40,20 +37,21 @@ class LineCompare extends Component {
           drawBorder: false,
         },
         ticks: {
-          padding: 20,
+          padding: 10,
           callback: label => this.props.parseXValue(label),
         },
       }],
       yAxes: [{
         gridLines: {
-          display: false,
+          display: true,
+          color: 'rgba(199, 195, 196, 0.5)',
           drawBorder: false,
         },
         ticks: {
           suggestedMax: 100,
           suggestedMin: 0,
           autoSkip: true,
-          padding: 40,
+          padding: 10,
           callback: (label) => {
             const val = (label > 1000) ? label / 1000 : label;
             return label > 1000 ? `${val}k` : val;
@@ -87,7 +85,7 @@ class LineCompare extends Component {
     const { data, width, height } = this.props;
     const options = this.getOptions();
     return (
-      <div className="LineCompare">
+      <div className="LineCompare" style={{ width: '100%', height: '100%' }}>
         <LineChart width={width} height={height} data={data} options={options} />
       </div>
     );

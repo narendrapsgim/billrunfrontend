@@ -442,8 +442,16 @@ ul.revision-history-list li.last::after {
 }
 
 /* Chart */
+.dashboard-chart-wrapper {
+  height: 280px;
+  overflow: hidden;
+}
 .doughnut-wrapper {
   position: relative;
+  height: 230px;
+}
+.chart-doughnut-details .details{
+  margin-top: -10px;
 }
 .doughnut-message {
   position: absolute;
@@ -451,13 +459,6 @@ ul.revision-history-list li.last::after {
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
-}
-.doughnut-legend {
-
-}
-
-.dashboard-chart-wrapper {
-  height: 280px;
 }
 
 .percentBarChart .marker {
@@ -499,7 +500,12 @@ ul.revision-history-list li.last::after {
   padding: 1px 4px;
   margin-right: 3px;
 }
+.percentBarChart .details {
+  margin-top: 50px
+}
 .percentBarChart .value {
   color: #7C7C7C;
+  margin-top: 25px;
+  margin-bottom: 25px;
 }
 /* ~Chart */

@@ -16,8 +16,8 @@ class DoughnutSelectable extends Component {
   };
 
   static defaultProps = {
-    width: 100,
-    height: 70,
+    // width: 100,
+    // height: 70,
     data: {
       labels: [],
       values: [],
@@ -46,6 +46,8 @@ class DoughnutSelectable extends Component {
     legend: {
       display: false,
     },
+    responsive: true,
+    maintainAspectRatio: false,
   })
 
   onClick = (index) => {
@@ -89,7 +91,7 @@ class DoughnutSelectable extends Component {
       );
     }
     return (
-      <div>
+      <div className="details">
         <div>
           <h4 className="pull-left" style={{ color: '#7C7C7C' }}>
             {`${this.props.parsePercent(percentage)} | ${this.props.parseValue(data.values[selectedIndex])}`}
@@ -120,7 +122,7 @@ class DoughnutSelectable extends Component {
     const message = (type === 'legend' && percentage !== '') ? this.props.parsePercent(percentage) : '';
 
     return (
-      <div>
+      <div style={{ width: '100%', height: '100%' }} className={`chart-doughnut-${type}`}>
         <DoughnutChart
           width={width}
           height={height}

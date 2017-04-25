@@ -57,7 +57,7 @@ class PercentBar extends Component {
     return (
       <div className="percentBarChart">
         <div>
-          <h2 className="value" style={{ marginTop: 0 }}>{ this.props.parseValue(value) }</h2>
+          <h2 className="value">{ this.props.parseValue(value) }</h2>
           <div style={{ position: 'relative' }}>
             <div style={{ backgroundColor: '#DDDDDD' }}>
               <div style={barStyle}>&nbsp;</div>
@@ -66,9 +66,8 @@ class PercentBar extends Component {
             <span className={markerMonthClass} style={charPersentMStyle}>M</span>
           </div>
         </div>
-        <br />
-        <br />
-        <div>
+        <div className="clearfix" />
+        <div className="details">
           <div className="pull-left text-left">
             <h4 className={valueMonthClass}>{ this.props.parsePercent(monthPercent) }</h4>
             <h4 className="value">{ this.props.parseValue(prevValue) }</h4>
