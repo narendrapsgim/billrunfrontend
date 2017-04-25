@@ -122,7 +122,7 @@ class RevenueDashboard extends Component {
     getParsedData(revenueByPlan).forEach((val) => {
       ret.labels.push(val.plan);
       ret.values.push(val.amount);
-      ret.sign.push(val.amount >= val.prev_amount ? 1 : -1);
+      ret.sign.push(val.prev_amount);
     });
     return ret;
   }
