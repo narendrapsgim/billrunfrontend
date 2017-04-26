@@ -7,13 +7,13 @@ const Date = (props) => {
   const { editable, value, disabled, placeholder, onChange, dateFormat, ...otherProps } = props;
   const format = dateFormat || getConfig('dateFormat', 'DD/MM/YYYY');
   if (!editable) {
-    const displayValue = value.isValid() ? value.format(format) : value;
+    const displayValue = (moment.isMoment(value) && value.isValid()) ? value.format(format) : value;
     return (
       <div className="non-editable-field">{ displayValue }</div>
     );
   }
   const placeholderText = (disabled && !value) ? '' : placeholder;
-  const selected = value.isValid() ? value : null;
+  const selected = (moment.isMoment(value) && value.isValid()) ? value : null;
   return (
     <DatePicker
       {...otherProps}
@@ -36,7 +36,10 @@ Date.defaultProps = {
 };
 
 Date.propTypes = {
-  value: PropTypes.instanceOf(moment),
+  value: PropTypes.oneOfType([
+    PropTypes.instanceOf(moment),
+    null,
+  ]),
   disabled: PropTypes.bool,
   editable: PropTypes.bool,
   placeholder: PropTypes.string,
