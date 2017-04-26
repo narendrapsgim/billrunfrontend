@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Immutable from 'immutable'
 import { Doughnut } from 'react-chartjs-2';
 import { palitra } from './helpers';
 
@@ -12,7 +13,7 @@ export default class DoughnutChart extends Component {
     selectable: PropTypes.bool,
     message: PropTypes.string,
     data: PropTypes.oneOfType([
-      PropTypes.object,
+      PropTypes.instanceOf(Immutable.Map),
       null,
     ]),
     options: PropTypes.object,
@@ -21,7 +22,7 @@ export default class DoughnutChart extends Component {
 
   static defaultProps = {
     options: {},
-    data: null,
+    data: Immutable.Map(),
     selectedRadiusMargin: 10,
     selectable: true,
     message: '',
@@ -74,12 +75,12 @@ export default class DoughnutChart extends Component {
   prepareData = (canvas) => { // eslint-disable-line no-unused-vars
     const { data } = this.props;
     const chartData = {
-      labels: data.labels,
+      labels: data.get('labels', Immutable.List()).toArray(),
       datasets: [
         {
-          data: data.values,
-          backgroundColor: data.values.map((x, i) => palitra(i)),
-          hoverBackgroundColor: data.values.map((x, i) => palitra(i, 'light')),
+          data: data.get('values', Immutable.List()).toArray(),
+          backgroundColor: data.get('values', Immutable.List()).map((x, i) => palitra(i)).toArray(),
+          hoverBackgroundColor: data.get('values', Immutable.List()).map((x, i) => palitra(i, 'light')).toArray(),
           borderWidth: 1,
         },
       ],

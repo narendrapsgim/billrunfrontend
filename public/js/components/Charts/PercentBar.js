@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Immutable from 'immutable';
 import classNames from 'classnames';
 import { palitra } from './helpers';
 import WidgetsHOC from './WidgetsHOC';
@@ -7,38 +8,39 @@ import WidgetsHOC from './WidgetsHOC';
 class PercentBar extends Component {
 
   static propTypes = {
-    data: PropTypes.object,
+    data: PropTypes.instanceOf(Immutable.Map),
     parseValue: PropTypes.func,
     parsePercent: PropTypes.func,
   };
 
   static defaultProps = {
-    data: {
-      values: [],
-    },
+    data: Immutable.Map({
+      values: Immutable.List(),
+    }),
     parseValue: value => value,
     parsePercent: percent => percent,
 
   };
 
   render() {
-    const { data: { values } } = this.props;
+    const { data } = this.props;
+    const values = data.get('values', Immutable.List());
     const maxValue = Math.max(...values);
-    const yearAvg = values.reduce((p, c) => p + c, 0) / values.length;
-    const value = values[values.length - 1];
-    const prevValue = values[values.length - 2];
-    const percent = value / maxValue;
+    const yearAvg = values.reduce((acc, cur) => acc + cur, 0) / values.size;
+    const value = values.get(values.size - 1);
+    const prevValue = values.get(values.size - 2);
+    const percent = value / (maxValue !== 0 ? maxValue : 1);
 
     const barStyle = { width: `${percent * 100}%`, backgroundColor: palitra(1), height: 12 };
 
     const yearDiff = value - yearAvg;
-    const yearPercent = yearDiff / yearAvg;
-    const yearPercentFromMax = yearAvg / maxValue;
+    const yearPercent = yearDiff / (yearAvg !== 0 ? yearAvg : 1);
+    const yearPercentFromMax = yearAvg / (maxValue !== 0 ? maxValue : 1);
     const charPersentYStyle = { marginLeft: `${(yearPercentFromMax * 100) - 3}%` };
 
     const monthDiff = value - prevValue;
-    const monthPercent = monthDiff / prevValue;
-    const monthPercentFromMax = prevValue / maxValue;
+    const monthPercent = monthDiff / (prevValue !== 0 ? prevValue : 1);
+    const monthPercentFromMax = prevValue / (maxValue !== 0 ? maxValue : 1);
     const charPersentMStyle = { marginLeft: `${(monthPercentFromMax * 100) - 3}%` };
 
     const markerYearClass = classNames('marker', {

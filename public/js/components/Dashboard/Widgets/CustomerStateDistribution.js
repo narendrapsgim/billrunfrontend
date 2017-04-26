@@ -1,22 +1,20 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { PercentBar } from '../../Charts';
+import { DoughnutSelectable } from '../../Charts';
 import {
-  parseCurrencyValue,
-  parseCurrencyThousandValue,
+  parseCountValue,
   parsePercent,
 } from '../helper';
-import { getTotalRevenue } from '../../../actions/dashboardActions';
+import { getCustomerStateDistribution } from '../../../actions/dashboardActions';
 
-class TotalRevenue extends Component {
+class CustomerStateDistribution extends Component {
 
   static propTypes = {
     data: PropTypes.oneOfType([
       PropTypes.instanceOf(Immutable.Map),
       null,
     ]),
-    currency: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -25,22 +23,19 @@ class TotalRevenue extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getTotalRevenue('total_revenue'));
+    this.props.dispatch(getCustomerStateDistribution('customer_state_distribution'));
   }
 
   shouldComponentUpdate(nextProps) {
     return !Immutable.is(this.props.data, nextProps.data);
   }
 
-  parseCurrencyValue = value => parseCurrencyValue(value, this.props.currency);
-  parseCurrencyThousandValue = value => parseCurrencyThousandValue(value, this.props.currency);
-
   render() {
     const { data } = this.props;
     return (
-      <PercentBar
+      <DoughnutSelectable
         data={data}
-        parseValue={this.parseCurrencyValue}
+        parseValue={parseCountValue}
         parsePercent={parsePercent}
       />
     );
@@ -48,7 +43,7 @@ class TotalRevenue extends Component {
 }
 
 const mapStateToProps = state => ({
-  data: state.dashboard.get('total_revenue'),
+  data: state.dashboard.get('customer_state_distribution'),
 });
 
-export default connect(mapStateToProps)(TotalRevenue);
+export default connect(mapStateToProps)(CustomerStateDistribution);

@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Immutable from 'immutable';
 import LineChart from './LineChart';
 import WidgetsHOC from './WidgetsHOC';
 
@@ -7,16 +8,20 @@ class LineCompare extends Component {
   static propTypes = {
     width: PropTypes.number,
     height: PropTypes.number,
-    data: PropTypes.object,
+    data: PropTypes.instanceOf(Immutable.Map),
     parseXValue: PropTypes.func,
     parseYValue: PropTypes.func,
   };
 
   static defaultProps = {
-    data: {
-      x: [{ values: [] }],
-      y: [],
-    },
+    data: Immutable.Map({
+      x: Immutable.List([
+        Immutable.Map({
+          values: Immutable.List()
+        })
+      ]),
+      y: Immutable.List(),
+    }),
     parseXValue: value => value,
     parseYValue: label => label,
   };

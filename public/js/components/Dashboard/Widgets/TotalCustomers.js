@@ -3,20 +3,18 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { PercentBar } from '../../Charts';
 import {
-  parseCurrencyValue,
-  parseCurrencyThousandValue,
+  parseCountValue,
   parsePercent,
 } from '../helper';
-import { getTotalRevenue } from '../../../actions/dashboardActions';
+import { getTotalNumOfCustomers } from '../../../actions/dashboardActions';
 
-class TotalRevenue extends Component {
+class TotalCustomers extends Component {
 
   static propTypes = {
     data: PropTypes.oneOfType([
       PropTypes.instanceOf(Immutable.Map),
       null,
     ]),
-    currency: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -25,22 +23,19 @@ class TotalRevenue extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getTotalRevenue('total_revenue'));
+    this.props.dispatch(getTotalNumOfCustomers('total_num_of_customers'));
   }
 
   shouldComponentUpdate(nextProps) {
     return !Immutable.is(this.props.data, nextProps.data);
   }
 
-  parseCurrencyValue = value => parseCurrencyValue(value, this.props.currency);
-  parseCurrencyThousandValue = value => parseCurrencyThousandValue(value, this.props.currency);
-
   render() {
     const { data } = this.props;
     return (
       <PercentBar
         data={data}
-        parseValue={this.parseCurrencyValue}
+        parseValue={parseCountValue}
         parsePercent={parsePercent}
       />
     );
@@ -48,7 +43,7 @@ class TotalRevenue extends Component {
 }
 
 const mapStateToProps = state => ({
-  data: state.dashboard.get('total_revenue'),
+  data: state.dashboard.get('total_num_of_customers'),
 });
 
-export default connect(mapStateToProps)(TotalRevenue);
+export default connect(mapStateToProps)(TotalCustomers);

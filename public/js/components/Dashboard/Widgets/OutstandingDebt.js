@@ -4,12 +4,11 @@ import Immutable from 'immutable';
 import { PercentBar } from '../../Charts';
 import {
   parseCurrencyValue,
-  parseCurrencyThousandValue,
   parsePercent,
 } from '../helper';
-import { getTotalRevenue } from '../../../actions/dashboardActions';
+import { getOutstandingDebt } from '../../../actions/dashboardActions';
 
-class TotalRevenue extends Component {
+class OutstandingDebt extends Component {
 
   static propTypes = {
     data: PropTypes.oneOfType([
@@ -25,7 +24,7 @@ class TotalRevenue extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getTotalRevenue('total_revenue'));
+    this.props.dispatch(getOutstandingDebt('outstanding_debt'));
   }
 
   shouldComponentUpdate(nextProps) {
@@ -33,7 +32,6 @@ class TotalRevenue extends Component {
   }
 
   parseCurrencyValue = value => parseCurrencyValue(value, this.props.currency);
-  parseCurrencyThousandValue = value => parseCurrencyThousandValue(value, this.props.currency);
 
   render() {
     const { data } = this.props;
@@ -48,7 +46,7 @@ class TotalRevenue extends Component {
 }
 
 const mapStateToProps = state => ({
-  data: state.dashboard.get('total_revenue'),
+  data: state.dashboard.get('outstanding_debt'),
 });
 
-export default connect(mapStateToProps)(TotalRevenue);
+export default connect(mapStateToProps)(OutstandingDebt);

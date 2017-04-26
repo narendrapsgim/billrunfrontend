@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { List } from 'immutable';
 import countries from './countries.json';
 
 export const getCountryKeyByCountryName = (name, notSetValue = null) => {

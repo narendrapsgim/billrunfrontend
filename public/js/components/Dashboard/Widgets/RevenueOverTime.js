@@ -1,15 +1,15 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { PercentBar } from '../../Charts';
+import { LineCompare } from '../../Charts';
 import {
   parseCurrencyValue,
   parseCurrencyThousandValue,
-  parsePercent,
+  parseMonthValue,
 } from '../helper';
-import { getTotalRevenue } from '../../../actions/dashboardActions';
+import { getRevenueOverTime } from '../../../actions/dashboardActions';
 
-class TotalRevenue extends Component {
+class RevenueOverTime extends Component {
 
   static propTypes = {
     data: PropTypes.oneOfType([
@@ -25,7 +25,7 @@ class TotalRevenue extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getTotalRevenue('total_revenue'));
+    this.props.dispatch(getRevenueOverTime('revenue_over_time'));
   }
 
   shouldComponentUpdate(nextProps) {
@@ -38,17 +38,17 @@ class TotalRevenue extends Component {
   render() {
     const { data } = this.props;
     return (
-      <PercentBar
+      <LineCompare
         data={data}
-        parseValue={this.parseCurrencyValue}
-        parsePercent={parsePercent}
+        parseYValue={this.parseCurrencyThousandValue}
+        parseXValue={parseMonthValue}
       />
     );
   }
 }
 
 const mapStateToProps = state => ({
-  data: state.dashboard.get('total_revenue'),
+  data: state.dashboard.get('revenue_over_time'),
 });
 
-export default connect(mapStateToProps)(TotalRevenue);
+export default connect(mapStateToProps)(RevenueOverTime);

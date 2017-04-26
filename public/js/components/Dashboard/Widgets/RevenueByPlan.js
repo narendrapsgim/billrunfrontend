@@ -1,15 +1,15 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { PercentBar } from '../../Charts';
+import { DoughnutSelectable } from '../../Charts';
 import {
   parseCurrencyValue,
   parseCurrencyThousandValue,
   parsePercent,
 } from '../helper';
-import { getTotalRevenue } from '../../../actions/dashboardActions';
+import { getRevenueByPlan } from '../../../actions/dashboardActions';
 
-class TotalRevenue extends Component {
+class RevenueByPlan extends Component {
 
   static propTypes = {
     data: PropTypes.oneOfType([
@@ -25,7 +25,7 @@ class TotalRevenue extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getTotalRevenue('total_revenue'));
+    this.props.dispatch(getRevenueByPlan('revenue_by_plan'));
   }
 
   shouldComponentUpdate(nextProps) {
@@ -38,8 +38,9 @@ class TotalRevenue extends Component {
   render() {
     const { data } = this.props;
     return (
-      <PercentBar
+      <DoughnutSelectable
         data={data}
+        type="details"
         parseValue={this.parseCurrencyValue}
         parsePercent={parsePercent}
       />
@@ -48,7 +49,7 @@ class TotalRevenue extends Component {
 }
 
 const mapStateToProps = state => ({
-  data: state.dashboard.get('total_revenue'),
+  data: state.dashboard.get('revenue_by_plan'),
 });
 
-export default connect(mapStateToProps)(TotalRevenue);
+export default connect(mapStateToProps)(RevenueByPlan);

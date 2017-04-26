@@ -5,35 +5,27 @@ import { List } from 'immutable';
 import moment from 'moment';
 import DashboardBase from './DashboardBase';
 import {
-  PercentBar,
-  LineCompare,
-  DoughnutSelectable,
-} from '../Charts';
-import {
   parseCurrencyValue,
   parseCurrencyThousandValue,
-  parsePercent,
-  parseDateValue,
-  parseMonthValue,
   getParsedData,
 } from './helper';
 import {
-  getTotalRevenue,
-  getRevenueOverTime,
-  getRevenueByPlan,
   getAgingDebt,
   getOutstandingDebt,
   getDebtOverTime,
 } from '../../actions/dashboardActions';
+import {
+  TotalRevenue,
+  RevenueOverTime,
+  RevenueByPlan,
+} from './Widgets';
+
 
 class RevenueDashboard extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     currency: PropTypes.string,
-    totalRevenue: PropTypes.array,
-    revenueOverTime: PropTypes.array,
-    revenueByPlan: PropTypes.array,
     agingDebt: PropTypes.array,
     outstandingDebt: PropTypes.array,
     debtOverTime: PropTypes.array,
@@ -41,17 +33,12 @@ class RevenueDashboard extends Component {
 
   static defaultProps = {
     totalRevenue: [],
-    revenueOverTime: [],
-    revenueByPlan: [],
     agingDebt: [],
     outstandingDebt: [],
     debtOverTime: [],
   }
 
   componentDidMount() {
-    this.props.dispatch(getTotalRevenue('total_revenue'));
-    this.props.dispatch(getRevenueOverTime('revenue_over_time'));
-    this.props.dispatch(getRevenueByPlan('revenue_by_plan'));
     this.props.dispatch(getAgingDebt('aging_debt'));
     this.props.dispatch(getOutstandingDebt('outstanding_debt'));
     this.props.dispatch(getDebtOverTime('debt_over_time'));
@@ -101,34 +88,6 @@ class RevenueDashboard extends Component {
     };
   }
 
-  getParsedTotalRevenueData = () => {
-    const { totalRevenue } = this.props;
-    return {
-      values: getParsedData(totalRevenue).map(val => val.due).toArray(),
-    };
-  }
-
-  getParsedRevenueOverTimeData = () => {
-    const { revenueOverTime } = this.props;
-    return this.getLineChartWithAvgData(revenueOverTime, 'due');
-  }
-
-  getParsedRevenueByPlanData = () => {
-    const { revenueByPlan } = this.props;
-    const ret = {
-      labels: [],
-      values: [],
-      sign: [],
-    };
-
-    getParsedData(revenueByPlan).forEach((val) => {
-      ret.labels.push(val.plan);
-      ret.values.push(val.amount);
-      ret.sign.push(val.amount - val.prev_amount);
-    });
-    return ret;
-  }
-
   getAgingDebtData = () => {
     const { agingDebt } = this.props;
     const values = [];
@@ -163,87 +122,77 @@ class RevenueDashboard extends Component {
   }
 
   render() {
+    const { currency } = this.props;
     return (
       <Row>
         <Col sm={5} lg={3}>
           <Panel header="Total Revenue">
             <div className="dashboard-chart-wrapper">
-              <PercentBar
-                data={this.getParsedTotalRevenueData()}
-                parseValue={this.parseCurrencyValue}
-                parsePercent={parsePercent}
-              />
+              <TotalRevenue currency={currency} />
             </div>
           </Panel>
         </Col>
         <Col sm={7} lg={9}>
           <Panel header="Revenue over time">
             <div className="dashboard-chart-wrapper">
-              <LineCompare
-                data={this.getParsedRevenueOverTimeData()}
-                parseYValue={this.parseCurrencyThousandValue}
-                parseXValue={parseMonthValue}
-              />
+              <RevenueOverTime currency={currency} />
             </div>
           </Panel>
         </Col>
+
         <Col sm={5} lg={3}>
           <Panel header="Revenue by Plan">
             <div className="dashboard-chart-wrapper">
-              <DoughnutSelectable
-                data={this.getParsedRevenueByPlanData()}
-                type="details"
-                parseValue={this.parseCurrencyValue}
-                parsePercent={parsePercent}
-              />
+              <RevenueByPlan currency={currency} />
             </div>
           </Panel>
         </Col>
-        <Col sm={7} lg={9}>
-          <Panel header="Aging Debt">
-            <div className="dashboard-chart-wrapper">
-              <LineCompare
-                data={this.getAgingDebtData()}
-                parseYValue={this.parseCurrencyThousandValue}
-                parseXValue={parseDateValue}
-              />
-            </div>
-          </Panel>
-        </Col>
-        <Col sm={5} lg={3}>
-          <Panel header="Outstanding Debt">
-            <div className="dashboard-chart-wrapper">
-              <PercentBar
-                data={this.getParsedOutstandingDebtData()}
-                parseValue={this.parseCurrencyValue}
-                parsePercent={parsePercent}
-              />
-            </div>
-          </Panel>
-        </Col>
-        <Col sm={7} lg={9}>
-          <Panel header="Debt over time">
-            <div className="dashboard-chart-wrapper">
-              <LineCompare
-                data={this.getParsedDebtOverTimeData()}
-                parseYValue={this.parseCurrencyThousandValue}
-                parseXValue={parseMonthValue}
-              />
-            </div>
-          </Panel>
-        </Col>
+
       </Row>
     );
   }
 }
 
 const mapStateToProps = (state, props) => ({ // eslint-disable-line no-unused-vars
-  totalRevenue: state.dashboard.get('total_revenue'),
-  revenueOverTime: state.dashboard.get('revenue_over_time'),
-  revenueByPlan: state.dashboard.get('revenue_by_plan'),
-  agingDebt: state.dashboard.get('aging_debt'),
-  outstandingDebt: state.dashboard.get('outstanding_debt'),
-  debtOverTime: state.dashboard.get('debt_over_time'),
+  // agingDebt: state.dashboard.get('aging_debt'),
+  // outstandingDebt: state.dashboard.get('outstanding_debt'),
+  // debtOverTime: state.dashboard.get('debt_over_time'),
 });
 
 export default DashboardBase(connect(mapStateToProps)(RevenueDashboard));
+
+
+
+// <Col sm={7} lg={9}>
+//   <Panel header="Aging Debt">
+//     <div className="dashboard-chart-wrapper">
+//       <LineCompare
+//         data={this.getAgingDebtData()}
+//         parseYValue={this.parseCurrencyThousandValue}
+//         parseXValue={parseDateValue}
+//       />
+//     </div>
+//   </Panel>
+// </Col>
+// <Col sm={5} lg={3}>
+//   <Panel header="Outstanding Debt">
+//     <div className="dashboard-chart-wrapper">
+//       <PercentBar
+//         data={this.getParsedOutstandingDebtData()}
+//         parseValue={this.parseCurrencyValue}
+//         parsePercent={parsePercent}
+//       />
+//     </div>
+//   </Panel>
+// </Col>
+// <Col sm={7} lg={9}>
+//   <Panel header="Debt over time">
+//     <div className="dashboard-chart-wrapper">
+//       <LineCompare
+//         data={this.getParsedDebtOverTimeData()}
+//         parseYValue={this.parseCurrencyThousandValue}
+//         parseXValue={parseMonthValue}
+//       />
+//     </div>
+//   </Panel>
+// </Col>

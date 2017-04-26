@@ -461,6 +461,10 @@ ul.revision-history-list li.last::after {
   transform: translate(-50%,-50%);
 }
 
+.percentBarChart {
+  margin: 0 10px;
+}
+
 .percentBarChart .marker {
   position: absolute;
   color: white;
