@@ -344,6 +344,14 @@ fieldset[disabled] .btn {
   margin: 7px 0 0 0;
   border-color: #565656;
 }
+.entity-revision-history-popover .popover-content ul.revision-history-list li.active .date{
+  font-weight: bold;
+  color: white;
+}
+.entity-revision-history-popover .popover-content ul.revision-history-list li.active .cycle {
+  border-color: white;
+}
+
 .entity-revision-history-popover .popover-title {
   border-bottom: 1px solid #565656;
 }
@@ -421,21 +429,38 @@ ul.revision-history-list li.last::after {
   width: 0;
   border-bottom: none;
 }
-.entity-revision-edit ul.revision-history-list li .date {
-  color: #6f6f6f;
-}
-.entity-revision-edit ul.revision-history-list li.active .date{
+ul.revision-history-list li.active .date{
   font-weight: bold;
   color: black;
 }
-.entity-revision-edit ul.revision-history-list li.active .cycle {
+ul.revision-history-list li.active .cycle {
   border-color: black;
+}
+.entity-revision-edit ul.revision-history-list li .date {
+  color: #6f6f6f;
 }
 .entity-revision-edit ul.revision-history-list li.more::after {
   top: 10px;
+}
+
+.move-modal ul.revision-history-list li {
+  opacity: 0.5;
+}
+.move-modal ul.revision-history-list li.active {
+  opacity: 1;
 }
 /* ~Entity Revision */
 
 .discount-setup .help-block {
   margin-bottom: 0;
+}
+
+#move-entity .nav-tabs li,
+#move-entity .nav-pills li {
+  width: 50%;
+  text-align: center;
+  background-color: #eeeeee;
+}
+#move-entity .nav-pills>li+li {
+     margin-left: 0;
 }

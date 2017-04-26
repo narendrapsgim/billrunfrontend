@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import uuid from 'uuid';
 
 const Checkbox = (props) => {
+  const { id, value, editable, disabled, label } = props;
   const onChange = (e) => {
-    const { id, checked } = e.target;
+    const { checked } = e.target;
     props.onChange({ target: { id, value: checked } });
   };
-
-  const { id = uuid.v4(), value='', editable=true, disabled=false, label = '' } = props;
 
   if (!editable) {
     return (<span>{ value ? 'Yes' : 'No' }</span>);
@@ -17,6 +16,7 @@ const Checkbox = (props) => {
     return (
       <label htmlFor={id}>
         <input
+          style={{ verticalAlign: 'top' }}
           type="checkbox"
           id={id}
           checked={value}
@@ -37,6 +37,25 @@ const Checkbox = (props) => {
       onChange={onChange}
     />
   );
+};
+
+Checkbox.defaultProps = {
+  id: uuid.v4(),
+  label: '',
+  value: false,
+  editable: true,
+  checked: false,
+  disabled: false,
+  onChange: () => {},
+};
+
+Checkbox.propTypes = {
+  id: PropTypes.string,
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOf([true, false, '']),
+  editable: PropTypes.bool,
+  disabled: PropTypes.bool,
+  onChange: PropTypes.func,
 };
 
 export default Checkbox;

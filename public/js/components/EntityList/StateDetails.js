@@ -43,6 +43,12 @@ class StateDetails extends Component {
     }
   }
 
+  onCloseItem = () => {
+    const { collection, item, revisionBy } = this.props;
+    const key = item.get(revisionBy, '');
+    this.props.dispatch(getRevisions(collection, revisionBy, key));
+  }
+
   showManageRevisions = () => {
     const { revisionOverlay = {} } = this.refs; // eslint-disable-line  react/no-string-refs
     revisionOverlay.hide();
@@ -86,6 +92,7 @@ class StateDetails extends Component {
           onSelectItem={this.hideManageRevisions}
           onActionEdit={this.props.onActionEdit}
           onActionClone={this.props.onActionClone}
+          onCloseItem={this.onCloseItem}
         />
       </ModalWrapper>
     );
