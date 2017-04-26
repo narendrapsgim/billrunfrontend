@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { List } from 'immutable';
-
-import Select from 'react-select'
+import Select from 'react-select';
+import Field from '../Field';
 
 const RealtimeMapping = (props) => {
   const { onChange, onChangeDefault, settings } = props;
@@ -120,6 +120,29 @@ const RealtimeMapping = (props) => {
                     value={settings.getIn(['realtime', 'used_usagev_field'], '')}>
                   { available_fields }>
                 </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <div className="col-lg-3">
+            <label htmlFor="used_usagev_field">Rebalance on last request only?</label>
+            <p className="help-block" />
+          </div>
+          <div className="col-lg-9">
+            <div className="col-lg-1" style={{ marginTop: 8 }}>
+              <i className="fa fa-long-arrow-right" />
+            </div>
+            <div className="col-lg-9">
+              <div className="col-lg-6">
+                <Field
+                  id="rebalance_on_final"
+                  value={settings.getIn(['realtime', 'rebalance_on_final'], false)}
+                  disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
+                  onChange={onChange}
+                  fieldType="checkbox"
+                />
               </div>
             </div>
           </div>
