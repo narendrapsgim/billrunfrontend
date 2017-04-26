@@ -277,7 +277,7 @@ class PlanSetup extends Component {
           cancelLabel={allowEdit ? undefined : 'Back'}
           progress={progress}
         />
-    </div>
+      </div>
     );
   }
 }

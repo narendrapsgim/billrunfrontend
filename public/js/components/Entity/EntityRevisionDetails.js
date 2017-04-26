@@ -45,11 +45,24 @@ class EntityRevisionDetails extends Component {
     showList: false,
   }
 
+  componentDidMount() {
+    this.initFormDate();
+  }
+
   componentWillReceiveProps(nextProps) {
     const { item } = nextProps;
     const { item: oldItem } = this.props;
     if (getItemId(item) !== getItemId(oldItem)) {
       this.hideManageRevisions();
+      this.initFormDate();
+    }
+  }
+
+  initFormDate = () => {
+    const { mode } = this.props;
+    if (['closeandnew'].includes(mode)) {
+      const tommorow = moment().add(1, 'day');
+      this.onChangeFrom(tommorow);
     }
   }
 
@@ -168,13 +181,24 @@ class EntityRevisionDetails extends Component {
     );
   }
 
+  onChangeToggleFrom = (newDate) => {
+    const { item } = this.props;
+    if (moment.isMoment(newDate) && newDate.isValid()) {
+      const tommorow = moment().add(1, 'day');
+      const from = getItemDateValue(item, 'from');
+      const selectedValue = newDate.isSame(from, 'day') ? tommorow : newDate;
+      this.onChangeFrom(selectedValue);
+    } else {
+      const originFrom = getItemDateValue(item, 'originalValue');
+      this.onChangeFrom(originFrom);
+    }
+  }
+
   renderDateSelectBlock = () => {
     const { item, mode } = this.props;
     const editable = (['closeandnew', 'clone', 'create'].includes(mode));
     const from = getItemDateValue(item, 'from');
     const originFrom = getItemDateValue(item, 'originalValue');
-    const tommorow = moment().add(1, 'day');
-    const selectedValue = from.isSame(originFrom, 'day') ? tommorow : from;
     const highlightDates = (mode === 'create') ? [moment()] : [originFrom, moment()];
     const inputProps = {
       fieldType: 'date',
@@ -189,8 +213,8 @@ class EntityRevisionDetails extends Component {
         <div className="inline" style={{ width: 220, padding: 0, margin: '7px 7px 0' }}>
           <Field
             fieldType="toggeledInput"
-            value={selectedValue}
-            onChange={this.onChangeFrom}
+            value={from}
+            onChange={this.onChangeToggleFrom}
             label="Change From"
             editable={editable}
             inputProps={inputProps}

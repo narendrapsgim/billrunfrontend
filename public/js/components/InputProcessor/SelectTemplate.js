@@ -9,7 +9,7 @@ export default class SelectTemplate extends Component {
     this.state = {
       type: 'api',
       selected: '',
-      format: '',
+      format: 'json',
       template: Object.keys(Templates)[0]
     };
   }
