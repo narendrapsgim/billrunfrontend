@@ -6,12 +6,15 @@ import { getItemDateValue, isItemClosed, getItemId } from '../../common/Util';
 
 
 const RevisionTimeline = ({ revisions, size, item, start }) => {
-  const more = revisions.size > size && (start + size !== revisions.size);
+  const index = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
+  const from = revisions.size <= size ? 0 : start;
   const lastItem = revisions
-      .slice(start, start + 1)
+      .slice(from, from + 1)
       .reverse()
       .get(0, Immutable.Map());
-  const end = isItemClosed(lastItem) ? ((start + size) - 1) : start + size;
+  const addClosedIcon = isItemClosed(lastItem) && ((index !== revisions.size - 1 && size <= revisions.size) || size > revisions.size);
+  const more = (revisions.size > size && (from + size < revisions.size)) || (addClosedIcon && revisions.size >= size);
+  const end = addClosedIcon ? ((from + size) - 1) : from + size;
   const renderMore = type => (
     <li key={`${getItemId(item, '')}-more-${type}`} className={`more ${type}`}>
       <div style={{ lineHeight: '12px' }}>&nbsp;</div>
@@ -22,7 +25,7 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
     </li>
   );
   const renderRevision = (revision, key, list) => {
-    const from = getItemDateValue(revision, 'from');
+    const fromDate = getItemDateValue(revision, 'from');
     const isActive = getItemId(revision, '') === getItemId(item, '');
     const activeClass = classNames('revision', {
       active: isActive,
@@ -36,9 +39,9 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
             <StateIcon status={revision.getIn(['revision_info', 'status'], '')} />
           </div>
           <small className="date">
-            { from.format('MMM DD')}
+            { fromDate.format('MMM DD')}
             <br />
-            { from.format('YYYY')}
+            { fromDate.format('YYYY')}
           </small>
         </div>
       </li>
@@ -65,13 +68,13 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
     <ul className="revision-history-list">
       { more && renderMore('before') }
       { revisions
-        .slice(start, end)
+        .slice(from, end)
         .reverse()
         .map(renderRevision)
       }
-      { isItemClosed(lastItem)
+      { addClosedIcon
         ? renderClosedRevision()
-        : (start > 0) && renderMore('after')
+        : (from > 0 || (!addClosedIcon && isItemClosed(lastItem))) && renderMore('after')
       }
     </ul>
   );

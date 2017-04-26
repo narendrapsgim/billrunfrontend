@@ -178,7 +178,7 @@ class PrepaidIncludeSetup extends Component {
     const { mode } = this.props;
     if (response.status) {
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
-      this.props.dispatch(showSuccess(`The prepaid bucke was ${action}`));
+      this.props.dispatch(showSuccess(`The prepaid bucket was ${action}`));
       this.clearRevisions();
       this.handleBack(true);
     }
