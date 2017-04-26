@@ -106,7 +106,7 @@ class CloseActionBox extends Component {
     const { item, itemName } = this.props;
     const { showCloseDetails, showConfirmClose } = this.state;
     const statusSupportCloseAction = ['active'].includes(item.getIn(['revision_info', 'status'], ''));
-    const closeConfirmMessage = 'Are you sure you want to close revision ?';
+    const closeConfirmMessage = 'Are you sure you want to close the revision?';
     if (statusSupportCloseAction) {
       return (
         <div>
