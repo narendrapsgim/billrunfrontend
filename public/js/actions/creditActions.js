@@ -6,6 +6,6 @@ export const creditCharge = params => (dispatch) => { // eslint-disable-line imp
   dispatch(startProgressIndicator());
   const query = getCreditChargeQuery(params);
   return apiBillRun(query)
-    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Credit successfully!')))
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Success crediting')))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error crediting')));
 };

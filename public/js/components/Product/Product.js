@@ -372,15 +372,15 @@ export default class Product extends Component {
                   { editable
                     ? (
                       <Checkbox checked={vatable} onChange={this.onChangeVatable}>
-                        This product is VAT rated
+                        This product is taxable
                       </Checkbox>
                     )
                     :
                     (
                       <div className="non-editable-field">
                         { vatable
-                          ? 'This product is VAT rated'
-                          : 'This product is not VAT rated'
+                          ? 'This product is taxable'
+                          : 'This product is not taxable'
                         }
                       </div>
                     )
