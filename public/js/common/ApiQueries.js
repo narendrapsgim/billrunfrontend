@@ -483,3 +483,23 @@ export const getConfirmationOperationInvoiceQuery = invoiceId => ({
     { filtration: invoiceId },
   ],
 });
+
+// Dashboard reports queries
+
+const getDashboardQuery = action => ({
+  api: 'reports',
+  params: [
+    { action },
+  ],
+});
+
+export const getTotalRevenueQuery = () => getDashboardQuery('totalRevenue');
+export const getOutstandingDebtQuery = () => getDashboardQuery('outstandingDebt');
+export const getTotalNumOfCustomersQuery = () => getDashboardQuery('totalNumOfCustomers');
+export const getCustomerStateDistributionQuery = () => getDashboardQuery('customerStateDistribution');
+export const getRevenueOverTimeQuery = () => getDashboardQuery('revenueOverTime');
+export const getRevenueByPlanQuery = () => getDashboardQuery('revenueByPlan');
+export const getAgingDebtQuery = () => getDashboardQuery('agingDebt');
+export const getDebtOverTimeQuery = () => getDashboardQuery('debtOverTime');
+
+// Dashboard reports queries - end

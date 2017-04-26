@@ -1,6 +1,16 @@
 import moment from 'moment';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun } from '../common/Api';
+import {
+  getTotalRevenueQuery,
+  getOutstandingDebtQuery,
+  getTotalNumOfCustomersQuery,
+  getCustomerStateDistributionQuery,
+  getRevenueOverTimeQuery,
+  getRevenueByPlanQuery,
+  getAgingDebtQuery,
+  getDebtOverTimeQuery,
+} from '../common/ApiQueries';
 
 export const GOT_DATA = 'GOT_DATA';
 export const GOT_DATA_ERROR = 'GOT_DATA_ERROR';
@@ -43,3 +53,27 @@ export const getData = (chartId, query) => {
       });
   };
 };
+
+export const getTotalRevenue = key =>
+  getData(key, getTotalRevenueQuery());
+
+export const getOutstandingDebt = key =>
+  getData(key, getOutstandingDebtQuery());
+
+export const getTotalNumOfCustomers = key =>
+  getData(key, getTotalNumOfCustomersQuery());
+
+export const getCustomerStateDistribution = key =>
+  getData(key, getCustomerStateDistributionQuery());
+
+export const getRevenueOverTime = key =>
+  getData(key, getRevenueOverTimeQuery());
+
+export const getRevenueByPlan = key =>
+  getData(key, getRevenueByPlanQuery());
+
+export const getAgingDebt = key =>
+  getData(key, getAgingDebtQuery());
+
+export const getDebtOverTime = key =>
+  getData(key, getDebtOverTimeQuery());

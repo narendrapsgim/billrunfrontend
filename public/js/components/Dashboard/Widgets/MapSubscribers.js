@@ -130,9 +130,9 @@ class MapSubscribers extends Component {
   render() {
     const { chartData } = this.props;
     return (
-      <div style={{padding: '0', backgroundColor: '#2B2E3C' }}>
+      <div style={{padding: 0, backgroundColor: '#2B2E3C' }}>
           {this.renderContent(chartData)}
-          <div style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', marginTop: '-20', padding: '10 20'}}>
+          <div style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', marginTop: -20, padding: '10px 20px'}}>
             {/*this.renderTitle(chartData)*/}
             {this.renderLegend(chartData)}
           </div>

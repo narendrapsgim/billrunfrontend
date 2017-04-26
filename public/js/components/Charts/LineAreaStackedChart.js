@@ -1,16 +1,28 @@
-import React from 'react';
-import {Line} from 'react-chartjs';
-import {palitra, hexToRgba} from './helpers';
+import React, { Component, PropTypes } from 'react';
+import { Line } from 'react-chartjs-2';
+import { palitra } from './helpers';
 
 
-export default class LineAreaStackedChart extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+export default class LineAreaStackedChart extends Component {
 
-  getOptions(data, options = {}) {
-    let defaultOptions = {
+  static propTypes = {
+    width: PropTypes.number,
+    height: PropTypes.number,
+    data: PropTypes.oneOfType([
+      PropTypes.object,
+      null,
+    ]),
+    options: PropTypes.object,
+  };
+
+  static defaultProps = {
+    options: {},
+    data: null,
+  };
+
+  getOptions = () => {
+    const { data, options } = this.props;
+    const defaultOptions = {
       responsive: true,
       title: {
         display: (typeof data.title !== 'undefined'),
@@ -21,49 +33,59 @@ export default class LineAreaStackedChart extends React.Component {
         position: 'bottom',
       },
       tooltips: {
-        mode: 'label'
+        mode: 'label',
       },
       hover: {
-        mode: 'label'
+        mode: 'label',
       },
       scales: {
         xAxes: [
           {
-            stacked: true
-          }
+            stacked: true,
+          },
         ],
         yAxes: [
           {
-            stacked: true
-          }
+            stacked: true,
+          },
         ],
       },
     };
     return Object.assign(defaultOptions, options);
   }
 
-  prepareData(data) {
-    let chartData = {};
+  prepareData = () => {
+    const { data } = this.props;
+    const chartData = {};
     chartData.labels = data.y || Array.from(new Array(data.x[0].values.length), (x, i) => i + 1);
     chartData.datasets = data.x.map((x, i) => ({
       label: x.label,
       data: x.values,
       fill: true,
-      lineTension:0.2,
+      lineTension: 0.2,
       borderWidth: 1,
-      borderColor: palitra([i]),
-      backgroundColor: hexToRgba((palitra([i])), 1),
+      borderColor: palitra(i),
+      backgroundColor: palitra(i),
       pointBackgroundColor: 'white',
-      pointBorderColor: palitra([i]),
+      pointBorderColor: palitra(i),
       pointHoverBorderColor: 'white',
-      pointHoverBackgroundColor: palitra([i], 'dark')
+      pointHoverBackgroundColor: palitra(i, 'dark'),
     }));
     return chartData;
   }
 
   render() {
-    const {width, height, data, options} = this.props;
-    if (!data || !data.x || !data.y) return null;
-    return (<Line data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
+    const { width, height, data } = this.props;
+    if (!data || !data.x || !data.y) {
+      return null;
+    }
+    return (
+      <Line
+        data={this.prepareData()}
+        options={this.getOptions()}
+        width={width}
+        height={height}
+      />
+    );
   }
 }
