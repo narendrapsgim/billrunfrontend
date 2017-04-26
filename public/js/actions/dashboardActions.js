@@ -30,7 +30,7 @@ const gotDataError = (chartId, chartError) => ({
 export const getData = (chartId, query) => {
   const cacheKey = `dashboard-chart-${chartId}`;
   const cache = JSON.parse(localStorage.getItem(cacheKey));
-  if (cache && moment(cache.time).add(5, 'minutes').isAfter(moment())) {
+  if (false && cache && moment(cache.time).add(5, 'minutes').isAfter(moment())) {
     return dispatch => dispatch(gotData(chartId, cache.data));
   }
 
@@ -38,10 +38,11 @@ export const getData = (chartId, query) => {
     dispatch(startProgressIndicator());
     apiBillRun(query)
       .then((success) => {
-        dispatch(gotData(chartId, success.data));
+        const data = success.data[0].data.details;
+        dispatch(gotData(chartId, data));
         const newCache = JSON.stringify({
           time: moment(),
-          data: success.data,
+          data,
         });
         localStorage.setItem(cacheKey, newCache);
         dispatch(finishProgressIndicator());

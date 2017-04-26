@@ -4,9 +4,11 @@ import { Row, Panel, Col } from 'react-bootstrap';
 import { List } from 'immutable';
 import moment from 'moment';
 import DashboardBase from './DashboardBase';
-import PercentBar from './Widgets/PercentBar';
-import LineCompare from './Widgets/LineCompare';
-import DoughnutSelectable from './Widgets/DoughnutSelectable';
+import {
+  PercentBar,
+  LineCompare,
+  DoughnutSelectable,
+} from '../Charts';
 import {
   parseCurrencyValue,
   parseCurrencyThousandValue,
@@ -122,7 +124,7 @@ class RevenueDashboard extends Component {
     getParsedData(revenueByPlan).forEach((val) => {
       ret.labels.push(val.plan);
       ret.values.push(val.amount);
-      ret.sign.push(val.prev_amount);
+      ret.sign.push(val.amount - val.prev_amount);
     });
     return ret;
   }

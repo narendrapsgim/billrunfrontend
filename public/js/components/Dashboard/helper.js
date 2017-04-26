@@ -28,11 +28,3 @@ export const parseMonthValue = value =>
 
 export const parsePercent = value =>
   Number(value).toLocaleString('en-US', { style: 'percent', maximumFractionDigits: 2 });
-
-export const getParsedData = (data) => {
-  if (!data || !data[0] || !data[0].data) {
-    return List();
-  }
-
-  return List(data[0].data);
-};

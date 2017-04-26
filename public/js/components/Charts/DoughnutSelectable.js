@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
-import { DoughnutChart } from '../../Charts';
-import { palitra } from '../../Charts/helpers';
+import classNames from 'classnames';
+import DoughnutChart from './DoughnutChart';
+import { palitra, trend } from './helpers';
 import WidgetsHOC from './WidgetsHOC';
 
 class DoughnutSelectable extends Component {
@@ -90,27 +91,28 @@ class DoughnutSelectable extends Component {
         <div style={{ minHeight: 72.5 }} />
       );
     }
+
+    const sign = (data.sign && data.sign[selectedIndex] !== 0) ? data.sign[selectedIndex] : 0;
+    const signClass = classNames('fa fa-3x', {
+      'fa-caret-up': sign > 0,
+      'fa-caret-down': sign < 0,
+    });
+
     return (
       <div className="details">
-        <div>
-          <h4 className="pull-left" style={{ color: '#7C7C7C' }}>
+        <div style={{ height: 40 }}>
+          <h4 className="details-left">
             {`${this.props.parsePercent(percentage)} | ${this.props.parseValue(data.values[selectedIndex])}`}
           </h4>
-          { (data.sign && data.sign[selectedIndex] !== 0) &&
-            <p className="pull-right">
-              { (data.sign[selectedIndex] > 0)
-                ? <i className="fa fa-caret-up fa-3x" style={{ height: 30, color: 'green' }} />
-                : <i className="fa fa-caret-down fa-3x" style={{ height: 30, color: 'red' }} />
-              }
+          { (sign !== 0) &&
+            <p className="details-right">
+              <i className={signClass} style={{ color: trend(sign) }} />
             </p>
           }
         </div>
-        <div className="clearfix" />
-        <div>
-          <p style={{ color: palitra(selectedIndex) }}>
-            { this.props.parseLabel(data.labels[selectedIndex]) }
-          </p>
-        </div>
+        <p style={{ color: palitra(selectedIndex) }}>
+          { this.props.parseLabel(data.labels[selectedIndex]) }
+        </p>
       </div>
     );
   }

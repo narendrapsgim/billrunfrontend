@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import { LineChart } from '../../Charts';
+import BarChart from './BarChart';
 import WidgetsHOC from './WidgetsHOC';
 
-class LineCompare extends Component {
+class BarCompare extends Component {
 
   static propTypes = {
     width: PropTypes.number,
@@ -13,6 +13,8 @@ class LineCompare extends Component {
   };
 
   static defaultProps = {
+    // width: 100,
+    // height: 50,
     data: {
       x: [{ values: [] }],
       y: [],
@@ -28,30 +30,32 @@ class LineCompare extends Component {
       labels: {
         padding: 20,
         usePointStyle: true,
+        pointStyle: 'line',
       },
     },
     scales: {
       xAxes: [{
+        stacked: true,
         gridLines: {
           display: false,
           drawBorder: false,
         },
         ticks: {
-          padding: 10,
+          padding: 20,
           callback: label => this.props.parseXValue(label),
         },
       }],
       yAxes: [{
+        stacked: true,
         gridLines: {
-          display: true,
-          color: 'rgba(199, 195, 196, 0.5)',
+          display: false,
           drawBorder: false,
         },
         ticks: {
           suggestedMax: 100,
           suggestedMin: 0,
           autoSkip: true,
-          padding: 10,
+          padding: 40,
           callback: (label) => {
             const val = (label > 1000) ? label / 1000 : label;
             return label > 1000 ? `${val}k` : val;
@@ -68,7 +72,7 @@ class LineCompare extends Component {
       displayColors: false,
       callbacks: {
         label: tooltipItem => this.props.parseYValue(tooltipItem.yLabel),
-        title: tooltipItem => this.props.parseXValue(tooltipItem.yLabel),
+        title: (tooltipItem, data) => data.datasets[tooltipItem[0].datasetIndex].label || '',
       },
     },
     layout: {
@@ -85,12 +89,12 @@ class LineCompare extends Component {
     const { data, width, height } = this.props;
     const options = this.getOptions();
     return (
-      <div className="LineCompare" style={{ width: '100%', height: '100%' }}>
-        <LineChart width={width} height={height} data={data} options={options} />
+      <div className="BarCompare" style={{ width: '100%', height: '100%' }}>
+        <BarChart width={width} height={height} data={data} options={options} />
       </div>
     );
   }
 }
 
 
-export default WidgetsHOC(LineCompare);
+export default WidgetsHOC(BarCompare);

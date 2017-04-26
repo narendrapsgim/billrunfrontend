@@ -2,10 +2,12 @@ import React, { Component, PropTypes } from 'react';
 import { Row, Panel, Col } from 'react-bootstrap';
 import moment from 'moment';
 import DashboardBase from './DashboardBase';
-import DoughnutSelectable from './Widgets/DoughnutSelectable';
-import PercentBar from './Widgets/PercentBar';
-import LineCompare from './Widgets/LineCompare';
-import BarCompare from './Widgets/BarCompare';
+import {
+  BarCompare,
+  LineCompare,
+  PercentBar,
+  DoughnutSelectable,
+} from '../Charts';
 import {
   parseCurrencyValue,
   parseCurrencyThousandValue,
@@ -79,46 +81,57 @@ class FakeDataDashboard extends Component {
 
     return (
       <Row>
-
-        <Col sm={12}>
-          <Col sm={4}>
-            <Panel header="Fake data selectable doughnut with details chart">
+        <Col sm={4}>
+          <Panel header="Fake data selectable doughnut with details chart">
+            <div className="dashboard-chart-wrapper">
               <DoughnutSelectable data={doughnutDetailsData} type="details" parseValue={this.parseCurrencyValue} parsePercent={parsePercent} />
-            </Panel>
-          </Col>
-          <Col sm={8}>
-            <Panel header="Fake data bar chart">
+            </div>
+          </Panel>
+        </Col>
+        <Col sm={8}>
+          <Panel header="Fake data bar chart">
+            <div className="dashboard-chart-wrapper">
               <BarCompare data={barData} parseYValue={this.parseCurrencyThousandValue} placeHolderProps={placeHolder} />
-            </Panel>
-          </Col>
+            </div>
+          </Panel>
         </Col>
 
-        <Col sm={12}>
-          <Col sm={4}>
-            <Panel header="Fake data selectable doughnut with legend chart" className="mt0">
+        <Col sm={4}>
+          <Panel header="Fake data selectable doughnut with legend chart" className="mt0">
+            <div className="dashboard-chart-wrapper">
               <DoughnutSelectable data={doughnutLegendData} parseValue={parseCountValue} parsePercent={parsePercent} />
-            </Panel>
-          </Col>
-          <Col sm={8}>
-            <Panel header="Fake data lines chart">
+            </div>
+          </Panel>
+        </Col>
+        <Col sm={8}>
+          <Panel header="Fake data lines chart">
+            <div className="dashboard-chart-wrapper">
               <LineCompare data={linesData} parseYValue={this.parseCurrencyThousandValue} parseXValue={parseDateValue} />
-            </Panel>
-          </Col>
+            </div>
+          </Panel>
         </Col>
 
-        <Col sm={12}>
-          <Col sm={6}>
-            <Panel header="Fake data percent chart">
+        <Col sm={4}>
+          <Panel header="Fake data percent chart">
+            <div className="dashboard-chart-wrapper">
               <PercentBar data={percentBarData} parseValue={this.parseCurrencyValue} parsePercent={parsePercent} />
-            </Panel>
-          </Col>
-          <Col sm={6}>
-            <Panel header="Fake data percent chart">
-              <PercentBar data={percentBarData} parseValue={this.parseCurrencyValue} parsePercent={parsePercent} />
-            </Panel>
-          </Col>
+            </div>
+          </Panel>
         </Col>
-
+        <Col sm={4}>
+          <Panel header="Fake data percent chart">
+            <div className="dashboard-chart-wrapper">
+              <PercentBar data={percentBarData} parseValue={this.parseCurrencyValue} parsePercent={parsePercent} />
+            </div>
+          </Panel>
+        </Col>
+        <Col sm={4}>
+          <Panel header="Fake data percent chart">
+            <div className="dashboard-chart-wrapper">
+              <PercentBar data={percentBarData} parseValue={this.parseCurrencyValue} parsePercent={parsePercent} />
+            </div>
+          </Panel>
+        </Col>
       </Row>
     );
   }

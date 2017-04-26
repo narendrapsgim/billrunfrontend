@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import { currencySelector } from '../../selectors/settingsSelector';
 

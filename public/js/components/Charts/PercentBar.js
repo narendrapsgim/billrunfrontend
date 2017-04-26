@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import classNames from 'classnames';
-import { palitra } from '../../Charts/helpers';
+import { palitra } from './helpers';
 import WidgetsHOC from './WidgetsHOC';
 
 
@@ -68,7 +68,7 @@ class PercentBar extends Component {
         </div>
         <div className="clearfix" />
         <div className="details">
-          <div className="pull-left text-left">
+          <div className="details-left text-left">
             <h4 className={valueMonthClass}>{ this.props.parsePercent(monthPercent) }</h4>
             <h4 className="value">{ this.props.parseValue(prevValue) }</h4>
             <div>
@@ -76,7 +76,7 @@ class PercentBar extends Component {
               <span>Prev. Month</span>
             </div>
           </div>
-          <div className="pull-right text-right">
+          <div className="details-right text-right">
             <h4 className={valueYearClass}>{ this.props.parsePercent(yearPercent) }</h4>
             <h4 className="value">{ this.props.parseValue(yearAvg) }</h4>
             <div>

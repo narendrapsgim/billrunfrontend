@@ -16,6 +16,11 @@ import BubbleChart from './BubbleChart';
 
 import MapChart from './MapChart';
 
+import PercentBar from './PercentBar';
+import BarCompare from './BarCompare';
+import LineCompare from './LineCompare';
+import DoughnutSelectable from './DoughnutSelectable';
+
 export {
   LineChart,
   LineAreaChart,
@@ -29,4 +34,8 @@ export {
   PolarAreaChart,
   BubbleChart,
   MapChart,
+  PercentBar,
+  BarCompare,
+  LineCompare,
+  DoughnutSelectable,
 };

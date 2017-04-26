@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import { BarChart } from '../../Charts';
+import LineChart from './LineChart';
 import WidgetsHOC from './WidgetsHOC';
 
-class BarCompare extends Component {
+class LineCompare extends Component {
 
   static propTypes = {
     width: PropTypes.number,
@@ -13,8 +13,6 @@ class BarCompare extends Component {
   };
 
   static defaultProps = {
-    // width: 100,
-    // height: 50,
     data: {
       x: [{ values: [] }],
       y: [],
@@ -30,32 +28,30 @@ class BarCompare extends Component {
       labels: {
         padding: 20,
         usePointStyle: true,
-        pointStyle: 'line',
       },
     },
     scales: {
       xAxes: [{
-        stacked: true,
         gridLines: {
           display: false,
           drawBorder: false,
         },
         ticks: {
-          padding: 20,
+          padding: 10,
           callback: label => this.props.parseXValue(label),
         },
       }],
       yAxes: [{
-        stacked: true,
         gridLines: {
-          display: false,
+          display: true,
+          color: 'rgba(199, 195, 196, 0.5)',
           drawBorder: false,
         },
         ticks: {
           suggestedMax: 100,
           suggestedMin: 0,
           autoSkip: true,
-          padding: 40,
+          padding: 10,
           callback: (label) => {
             const val = (label > 1000) ? label / 1000 : label;
             return label > 1000 ? `${val}k` : val;
@@ -72,7 +68,7 @@ class BarCompare extends Component {
       displayColors: false,
       callbacks: {
         label: tooltipItem => this.props.parseYValue(tooltipItem.yLabel),
-        title: (tooltipItem, data) => data.datasets[tooltipItem[0].datasetIndex].label || '',
+        title: tooltipItem => this.props.parseXValue(tooltipItem.yLabel),
       },
     },
     layout: {
@@ -81,18 +77,20 @@ class BarCompare extends Component {
         top: 0,
       },
     },
+    responsive: true,
+    maintainAspectRatio: false,
   });
 
   render() {
     const { data, width, height } = this.props;
     const options = this.getOptions();
     return (
-      <div className="BarCompare">
-        <BarChart width={width} height={height} data={data} options={options} />
+      <div className="LineCompare" style={{ width: '100%', height: '100%' }}>
+        <LineChart width={width} height={height} data={data} options={options} />
       </div>
     );
   }
 }
 
 
-export default WidgetsHOC(BarCompare);
+export default WidgetsHOC(LineCompare);

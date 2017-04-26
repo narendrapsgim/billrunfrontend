@@ -71,7 +71,7 @@ export default class DoughnutChart extends Component {
     });
   }
 
-  prepareData = (canvas) => {
+  prepareData = (canvas) => { // eslint-disable-line no-unused-vars
     const { data } = this.props;
     const chartData = {
       labels: data.labels,

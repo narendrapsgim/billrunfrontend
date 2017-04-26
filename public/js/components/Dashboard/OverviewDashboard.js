@@ -3,14 +3,15 @@ import { connect } from 'react-redux';
 import { Row, Panel, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import DashboardBase from './DashboardBase';
-import DoughnutSelectable from './Widgets/DoughnutSelectable';
-import PercentBar from './Widgets/PercentBar';
+import {
+  DoughnutSelectable,
+  PercentBar,
+} from '../Charts';
 import {
   parseCurrencyValue,
   parseCurrencyThousandValue,
   parseCountValue,
   parsePercent,
-  getParsedData,
 } from './helper';
 import {
   getTotalRevenue,
@@ -18,23 +19,25 @@ import {
   getTotalNumOfCustomers,
   getCustomerStateDistribution,
 } from '../../actions/dashboardActions';
+import {
+  TotalRevenue,
+} from './Widgets';
+
 
 class OverviewDashboard extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     currency: PropTypes.string,
-    totalRevenue: PropTypes.array,
     outstandingDebt: PropTypes.array,
     totalNumOfCustomers: PropTypes.array,
     customerStateDistribution: PropTypes.array,
   };
 
   static defaultProps = {
-    totalRevenue: [],
-    outstandingDebt: [],
-    totalNumOfCustomers: [],
-    customerStateDistribution: [],
+    outstandingDebt: null,
+    totalNumOfCustomers: null,
+    customerStateDistribution: null,
   }
 
   componentDidMount() {
@@ -47,22 +50,21 @@ class OverviewDashboard extends Component {
   parseCurrencyValue = value => parseCurrencyValue(value, this.props.currency);
   parseCurrencyThousandValue = value => parseCurrencyThousandValue(value, this.props.currency);
 
-  getParsedTotalRevenueData = () => {
-    const { totalRevenue } = this.props;
-    return {
-      values: getParsedData(totalRevenue).map(val => val.due).toArray(),
-    };
-  }
-
   getParsedOutstandingDebtData = () => {
     const { outstandingDebt } = this.props;
+    if (outstandingDebt === null) {
+      return null;
+    }
     return {
-      values: getParsedData(outstandingDebt).map(val => val.due).toArray(),
+      values: outstandingDebt.map(val => val.due).toArray(),
     };
   }
 
   getParsedTotalNumOfCustomersData = () => {
     const { totalNumOfCustomers } = this.props;
+    if (totalNumOfCustomers === null) {
+      return null;
+    }
     return {
       values: getParsedData(totalNumOfCustomers).map(val => val.customers_num).toArray(),
     };
@@ -70,6 +72,9 @@ class OverviewDashboard extends Component {
 
   getParsedCustomerStateDistributionData = () => {
     const { customerStateDistribution } = this.props;
+    if (customerStateDistribution === null) {
+      return null;
+    }
     const ret = {
       labels: [],
       values: [],
@@ -82,16 +87,13 @@ class OverviewDashboard extends Component {
   }
 
   render() {
+    const { currency } = this.props;
     return (
       <Row>
         <Col sm={6} lg={3}>
           <Panel header="Total Revenue">
             <div className="dashboard-chart-wrapper">
-              <PercentBar
-                data={this.getParsedTotalRevenueData()}
-                parseValue={this.parseCurrencyValue}
-                parsePercent={parsePercent}
-              />
+              <TotalRevenue currency={currency} />
             </div>
           </Panel>
         </Col>
@@ -134,7 +136,6 @@ class OverviewDashboard extends Component {
 }
 
 const mapStateToProps = (state, props) => ({ // eslint-disable-line no-unused-vars
-  totalRevenue: state.dashboard.get('total_revenue'),
   outstandingDebt: state.dashboard.get('outstanding_debt'),
   totalNumOfCustomers: state.dashboard.get('total_num_of_customers'),
   customerStateDistribution: state.dashboard.get('customer_state_distribution'),
