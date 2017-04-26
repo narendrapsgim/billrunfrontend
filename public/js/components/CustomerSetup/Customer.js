@@ -12,6 +12,7 @@ import { rebalanceAccount, getCollectionDebt } from '../../actions/customerActio
 import ConfirmModal from '../../components/ConfirmModal';
 import { currencySelector } from '../../selectors/settingsSelector';
 import OfflinePayment from '../Payments/OfflinePayment';
+import CyclesSelector from '../Cycle/CyclesSelector';
 
 class Customer extends Component {
 
@@ -38,6 +39,7 @@ class Customer extends Component {
     showRebalanceConfirmation: false,
     showOfflinePayement: false,
     debt: null,
+    selectedCyclesNames: '',
   };
 
   componentDidMount() {
@@ -45,7 +47,9 @@ class Customer extends Component {
     if (action === 'create') {
       this.initDefaultValues();
     }
-    this.initDebt();
+    if (action !== 'create') {
+      this.initDebt();
+    }
   }
 
   initDefaultValues = () => {
@@ -66,8 +70,8 @@ class Customer extends Component {
     const aid = customer.get('aid', null);
     this.props.dispatch(getCollectionDebt(aid))
       .then((response) => {
-        if (response.status && response.data && response.data[aid]) {
-          this.setState({ debt: response.data[aid].total2 });
+        if (response.status && response.data && response.data.balance) {
+          this.setState({ debt: response.data.balance.total });
         }
       });
   }
@@ -193,12 +197,13 @@ class Customer extends Component {
   }
 
   onRebalanceConfirmationClose = () => {
-    this.setState({ showRebalanceConfirmation: false });
+    this.setState({ showRebalanceConfirmation: false, selectedCyclesNames: '' });
   }
 
   onRebalanceConfirmationOk = () => {
     const { customer } = this.props;
-    this.props.dispatch(rebalanceAccount(customer.get('aid')));
+    const { selectedCyclesNames } = this.state;
+    this.props.dispatch(rebalanceAccount(customer.get('aid'), selectedCyclesNames));
     this.onRebalanceConfirmationClose();
   }
 
@@ -211,23 +216,43 @@ class Customer extends Component {
     this.initDebt();
   }
 
+  onChangeSelectedCycle = (selectedCyclesNames) => {
+    this.setState({ selectedCyclesNames });
+  }
+
   renderRebalanceButton = () => {
     const { customer } = this.props;
-    const { showRebalanceConfirmation } = this.state;
+    const { showRebalanceConfirmation, selectedCyclesNames } = this.state;
     const confirmationTitle = `Are you sure you want to rebalance account ${customer.get('aid')}?`;
     return (
       <div>
         <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickRebalance}>Rebalance</Button>
         <ConfirmModal onOk={this.onRebalanceConfirmationOk} onCancel={this.onRebalanceConfirmationClose} show={showRebalanceConfirmation} message={confirmationTitle} labelOk="Yes">
           <FormGroup>
-            Rebalance operation will send all customer billing lines
-            for recalculation price and bundles options.
-            It can take few hours to finish the recalculations.
-            Meanwhile lines pricing properties will be empty.
-            <br />
-            This operation is useful when an update is required with reference data
-            (plans, products, services, etc) that raised non-desired pricing results.
-            After fixing the reference data, the operation will recalculate the billing lines.
+            <Row>
+              <Col sm={12} lg={12}>
+                Rebalance operation will send all customer billing lines
+                for recalculation price and bundles options.
+                It can take few hours to finish the recalculations.
+                Meanwhile lines pricing properties will be empty.
+                <br />
+                This operation is useful when an update is required with reference data
+                (plans, products, services, etc) that raised non-desired pricing results.
+                After fixing the reference data, the operation will recalculate the billing lines.
+                <br /><br />
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={3} lg={2} componentClass={ControlLabel} className={'non-editable-field'}>Select cycle/s</Col>
+              <Col sm={9} lg={8}>
+                <CyclesSelector
+                  onChange={this.onChangeSelectedCycle}
+                  statusesToDisplay={Immutable.List(['current', 'to_run'])}
+                  selectedCycles={selectedCyclesNames}
+                  multi={true}
+                />
+              </Col>
+            </Row>
           </FormGroup>
         </ConfirmModal>
       </div>

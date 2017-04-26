@@ -367,12 +367,16 @@ export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 99
   });
 };
 
-export const getRebalanceAccountQuery = aid => ({
-  api: 'resetlines',
-  params: [
-    { aid },
-  ],
-});
+export const getRebalanceAccountQuery = (aid, billrunKey = '') => {
+  const params = [{ aid }];
+  if (billrunKey !== '') {
+    params.push({ billrun_key: billrunKey });
+  }
+  return {
+    api: 'resetlines',
+    params,
+  };
+};
 
 export const getCyclesQuery = () => ({
   api: 'billrun',
@@ -443,8 +447,7 @@ export const getOperationsQuery = () => ({
 export const getCollectionDebtQuery = aid => ({
   api: 'bill',
   params: [
-    { action: 'collection_debt' },
-    { aids: JSON.stringify([aid]) },
+    { aid },
   ],
 });
 
@@ -460,8 +463,24 @@ export const getOfflinePaymentQuery = (method, aid, amount, payerName, chequeNo)
       deposit_slip: '',
       deposit_slip_bank: '',
       cheque_no: chequeNo,
-      source: '',
+      source: 'web',
     }]) },
+  ],
+});
+
+export const getConfirmationOperationAllQuery = () => ({
+  api: 'operations',
+  params: [
+    { action: 'confirm_cycle' },
+    { filtration: 'all' },
+  ],
+});
+
+export const getConfirmationOperationInvoiceQuery = invoiceId => ({
+  api: 'operations',
+  params: [
+    { action: 'confirm_cycle' },
+    { filtration: invoiceId },
   ],
 });
 

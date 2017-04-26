@@ -33,6 +33,8 @@ export const getFirstName = item => item.get('first_name', item.get('firstname',
 
 export const getLastName = item => item.get('last_name', item.get('lastname', ''));
 
+export const getCustomerId = item => item.get('aid', '');
+
 export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
   switch (mode) {
     case 'clone':
@@ -48,7 +50,9 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'closeandnew': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        if (entityName === 'subscription' || entityName === 'customer') {
+        if (entityName === 'customer') {
+          return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
+        } else if (entityName === 'subscription') {
           return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
         }
         return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;

@@ -54,10 +54,14 @@ export const clearCustomer = () => ({
   collection: 'customer',
 });
 
-export const rebalanceAccount = aid => (dispatch) => {
+export const rebalanceAccount = (aid, billrunKeys) => (dispatch) => {
   dispatch(startProgressIndicator());
-  const query = getRebalanceAccountQuery(aid);
-  return apiBillRun(query)
+  const queries = [];
+  for (const billrunKey of billrunKeys.split(',')) {
+    queries.push(getRebalanceAccountQuery(aid, billrunKey));
+  }
+
+  return apiBillRun(queries)
     .then(success => dispatch(apiBillRunSuccessHandler(success, 'Rebalance account request sent')))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error rebalancing account')));
 };

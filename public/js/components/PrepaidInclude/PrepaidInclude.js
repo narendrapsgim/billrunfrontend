@@ -23,11 +23,11 @@ const PrepaidInclude = (props) => {
   const renderChargingBy = () => {
     if (editable) {
       return (
-        <Select disabled={true} value={prepaidInclude.get('charging_by', '')} />
+        <Select disabled={true} value="All" />
       );
     }
     return (
-      <div className="non-editable-field">{prepaidInclude.get('charging_by', '')}</div>
+      <div className="non-editable-field">All</div>
     );
   };
 

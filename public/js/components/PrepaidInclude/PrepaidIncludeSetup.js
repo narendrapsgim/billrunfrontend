@@ -159,13 +159,19 @@ class PrepaidIncludeSetup extends Component {
     this.onChangeFieldValue(['allowed_in', name], value);
   };
 
+  onRemoveLimitedDestinations = (name) => {
+    const { item } = this.props;
+    const allowedIn = item.get('allowed_in', Immutable.Map());
+    this.onChangeFieldValue(['allowed_in'], allowedIn.remove(name));
+  };
+
   onSelectPlan = (name) => {
     const { item, dispatch } = this.props;
     if (item.getIn(['allowed_in', name])) {
       dispatch(showDanger('Plan already exists'));
       return;
     }
-    this.onChangeFieldValue(['allowed_in', name], Immutable.Map());
+    this.onChangeFieldValue(['allowed_in', name], Immutable.List());
   };
 
   afterSave = (response) => {
@@ -178,9 +184,19 @@ class PrepaidIncludeSetup extends Component {
     }
   }
 
+  validatePrepaidBucket = () => {
+    const { item } = this.props;
+    const allowedIn = item.get('allowed_in', Immutable.Map());
+    return allowedIn.every(rates => rates.first());
+  }
+
   handleSave = () => {
     const { item, mode } = this.props;
-    this.props.dispatch(savePrepaidInclude(item, mode)).then(this.afterSave);
+    if (!this.validatePrepaidBucket()) {
+      this.props.dispatch(showDanger('Associate Products - cannot have plan without products in it'));
+    } else {
+      this.props.dispatch(savePrepaidInclude(item, mode)).then(this.afterSave);
+    }
   };
 
   handleBack = (itemWasChanged = false) => {
@@ -244,7 +260,7 @@ class PrepaidIncludeSetup extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Limited Products" eventKey={2}>
+          <Tab title="Associate Products" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <LimitedDestinations
                 mode={mode}
@@ -252,6 +268,7 @@ class PrepaidIncludeSetup extends Component {
                 allRates={allRatesOptions}
                 onSelectPlan={this.onSelectPlan}
                 onChange={this.onChangeLimitedDestinations}
+                onRemove={this.onRemoveLimitedDestinations}
               />
             </Panel>
           </Tab>
