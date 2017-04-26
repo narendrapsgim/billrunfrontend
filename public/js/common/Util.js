@@ -148,3 +148,14 @@ export const getItemMinFromDate = (item, chargingDay, now = moment()) => {
   const originFromDate = getItemDateValue(item, 'originalValue');
   return moment.max(chargingDate, originFromDate);
 };
+
+export const getRevisionStartIndex = (item, revisions) => {
+  const index = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
+  if (index <= 0) {
+    return 0;
+  }
+  if (index + 1 === revisions.size) {
+    return ((index - 2) >= 0) ? index - 2 : 0;
+  }
+  return index - 1;
+};

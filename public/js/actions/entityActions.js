@@ -1,4 +1,5 @@
 import moment from 'moment';
+import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
 import { getItemDateValue, getConfig } from '../common/Util';
@@ -47,6 +48,17 @@ export const clearEntity = collection => ({
 
 const buildRequestData = (item, action) => {
   switch (action) {
+
+    case 'move': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      const update = (item.has('from'))
+        ? { from: getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat) }
+        : { to: getItemDateValue(item, 'to').format(globalSetting.apiDateTimeFormat) };
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
 
     case 'close': {
       const formData = new FormData();
@@ -163,3 +175,15 @@ export const deleteEntity = (collection, item) => dispatch =>
 
 export const closeEntity = (collection, item) => dispatch =>
   dispatch(saveEntity(collection, item, 'close'));
+
+export const moveEntity = (collection, item, type) => (dispatch) => {
+  const hackedItem = Immutable.Map().withMutations((itemWithMutations) => {
+    itemWithMutations.set('_id', item.get('_id'));
+    if (type === 'to') {
+      itemWithMutations.set('to', item.get('to'));
+    } else {
+      itemWithMutations.set('from', item.get('from'));
+    }
+  });
+  return dispatch(saveEntity(collection, hackedItem, 'move'));
+};
