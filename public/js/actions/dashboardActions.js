@@ -21,7 +21,7 @@ const gotDataError = (chartId, chartError) => ({
 export const getData = (chartId, query) => {
   const cacheKey = `dashboard-chart-${chartId}`;
   const cache = JSON.parse(localStorage.getItem(cacheKey));
-  if (false && cache && moment(cache.time).add(5, 'minutes').isAfter(moment())) {
+  if (cache && moment(cache.time).add(5, 'minutes').isAfter(moment())) {
     return dispatch => dispatch(gotData(chartId, cache.data));
   }
 
@@ -37,12 +37,12 @@ export const getData = (chartId, query) => {
         });
         localStorage.setItem(cacheKey, newCache);
         dispatch(finishProgressIndicator());
+      })
+      .catch((error) => {
+        console.log(`Chart ${chartId} error: `, error);
+        dispatch(gotDataError(chartId, error));
+        dispatch(dismissProgressIndicator());
       });
-      // .catch((error) => {
-      //   console.log(`Chart ${chartId} error: `, error);
-      //   dispatch(gotDataError(chartId, error));
-      //   dispatch(dismissProgressIndicator());
-      // });
   };
 };
 
