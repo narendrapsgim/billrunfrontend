@@ -33,7 +33,7 @@ const OverviewDashboard = ({ currency }) => (
       </Panel>
     </Col>
     <Col sm={6} lg={3}>
-      <Panel header="Customer State Distribution">
+      <Panel header="Subscribers State Distribution">
         <div className="dashboard-chart-wrapper">
           <CustomerStateDistribution />
         </div>

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import pluralize from 'pluralize';
 import { PercentBar } from '../../Charts';
 import {
   parseCountValue,
@@ -30,7 +31,7 @@ class TotalCustomers extends Component {
     return !Immutable.is(this.props.data, nextProps.data);
   }
 
-  parseCountValue = value => `${parseCountValue(value)} Subscribers`;
+  parseCountValue = value => `${parseCountValue(value)} ${pluralize('Subscriber', value)}`;
 
   render() {
     const { data } = this.props;
