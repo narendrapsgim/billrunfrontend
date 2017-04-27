@@ -57,7 +57,7 @@ const routes = () => (
       <Route path="revenue" component={RequireAuth(RevenueDashboard)} title="Revenue Dashboard" />
       <Route path="commercial" component={RequireAuth(CommercialDashboard)} title="Commercial Dashboard" />
       <Route path="customers" component={RequireAuth(CustomersDashboard)} title="Customers Dashboard" />
-      <Route path="fake" component={RequireAuth(FakeDataDashboard)} title="Fake Dashboard" />
+      <Route path="demo" component={RequireAuth(FakeDataDashboard)} title="Demo Dashboard" />
       <IndexRedirect to="overview" />
     </Route>
 

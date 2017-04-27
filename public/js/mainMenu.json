@@ -8,6 +8,15 @@
     "order": 0,
     "parent": "root"
   },
+  "overview_fake": {
+    "title": "Demo Data",
+    "icon": "",
+    "route": "dashboard/demo",
+    "show": false,
+    "roles": [],
+    "order": 1,
+    "parent":"dashboard"
+  },
   "overview_dashboard": {
     "title": "Overview",
     "icon": "",
@@ -24,6 +33,24 @@
     "show": true,
     "roles": [],
     "order": 2,
+    "parent":"dashboard"
+  },
+  "commercial_dashboard": {
+    "title": "Commercial",
+    "icon": "",
+    "route": "dashboard/commercial",
+    "show": true,
+    "roles": [],
+    "order": 3,
+    "parent":"dashboard"
+  },
+  "customers_dashboard": {
+    "title": "Customers",
+    "icon": "",
+    "route": "dashboard/customers",
+    "show": false,
+    "roles": [],
+    "order": 4,
     "parent":"dashboard"
   },
   "products": {

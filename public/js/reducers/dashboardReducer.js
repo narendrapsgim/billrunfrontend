@@ -32,6 +32,7 @@ export default function (state = defaultState, action) {
           return state.set(chartId, parsedData);
         }
 
+        case 'plan_by_customers':
         case 'revenue_by_plan': {
           const parsedData = Immutable.Map({
             labels: Immutable.List(chartData.map(val => val.plan)),

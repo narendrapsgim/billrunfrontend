@@ -6,6 +6,7 @@ import RevenueOverTime from './RevenueOverTime';
 import RevenueByPlan from './RevenueByPlan';
 import AgingDebt from './AgingDebt';
 import DebtOverTime from './DebtOverTime';
+import PlanByCustomers from './PlanByCustomers';
 
 export {
   TotalRevenue,
@@ -16,4 +17,5 @@ export {
   RevenueByPlan,
   AgingDebt,
   DebtOverTime,
+  PlanByCustomers,
 };

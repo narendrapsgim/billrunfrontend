@@ -69,3 +69,6 @@ export const getAgingDebt = key =>
 
 export const getDebtOverTime = key =>
   getData(key, getDashboardQuery('debtOverTime'));
+
+export const getPlanByCustomers = key =>
+  getData(key, getDashboardQuery('planByCustomers'));
