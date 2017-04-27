@@ -4,6 +4,8 @@ import TotalCustomers from './TotalCustomers';
 import CustomerStateDistribution from './CustomerStateDistribution';
 import RevenueOverTime from './RevenueOverTime';
 import RevenueByPlan from './RevenueByPlan';
+import AgingDebt from './AgingDebt';
+import DebtOverTime from './DebtOverTime';
 
 export {
   TotalRevenue,
@@ -12,4 +14,6 @@ export {
   CustomerStateDistribution,
   RevenueOverTime,
   RevenueByPlan,
+  AgingDebt,
+  DebtOverTime,
 };

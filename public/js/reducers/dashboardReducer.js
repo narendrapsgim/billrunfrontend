@@ -41,6 +41,21 @@ export default function (state = defaultState, action) {
           return state.set(chartId, parsedData);
         }
 
+        case 'aging_debt': {
+          const parsedData = Immutable.Map({
+            x: Immutable.List([
+              Immutable.Map({
+                label: 'Aging Debt',
+                values: Immutable.List(chartData.map(val => val.left_to_pay)),
+              }),
+            ]),
+            y: Immutable.List(chartData.map(val => moment(`${val.billrun_key}01`, 'YYYYMMDD'))),
+          });
+
+          return state.set(chartId, parsedData);
+        }
+
+        case 'debt_over_time':
         case 'revenue_over_time': {
           const currYear = moment().format('YYYY');
           const lastYear = moment().subtract(1, 'years').format('YYYY');
