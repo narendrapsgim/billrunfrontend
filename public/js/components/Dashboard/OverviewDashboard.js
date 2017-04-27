@@ -26,7 +26,7 @@ const OverviewDashboard = ({ currency }) => (
       </Panel>
     </Col>
     <Col sm={6} lg={3}>
-      <Panel header="Total number of Subscribers">
+      <Panel header="Total Number of Subscribers">
         <div className="dashboard-chart-wrapper">
           <TotalCustomers />
         </div>

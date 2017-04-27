@@ -21,7 +21,7 @@ const RevenueDashboard = ({ currency }) => (
       </Panel>
     </Col>
     <Col sm={7} lg={9}>
-      <Panel header="Revenue over time">
+      <Panel header="Revenue Over Time">
         <div className="dashboard-chart-wrapper">
           <RevenueOverTime currency={currency} />
         </div>
@@ -49,7 +49,7 @@ const RevenueDashboard = ({ currency }) => (
       </Panel>
     </Col>
     <Col sm={7} lg={9}>
-      <Panel header="Debt over time">
+      <Panel header="Debt Over Time">
         <div className="dashboard-chart-wrapper">
           <DebtOverTime currency={currency} />
         </div>

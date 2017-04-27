@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import { titleCase } from 'change-case';
 import { DoughnutSelectable } from '../../Charts';
 import {
   parseCurrencyValue,
@@ -34,6 +35,7 @@ class RevenueByPlan extends Component {
 
   parseCurrencyValue = value => parseCurrencyValue(value, this.props.currency);
   parseCurrencyThousandValue = value => parseCurrencyThousandValue(value, this.props.currency);
+  parseLabel = value => titleCase(value);
 
   render() {
     const { data } = this.props;
@@ -43,6 +45,7 @@ class RevenueByPlan extends Component {
         type="details"
         parseValue={this.parseCurrencyValue}
         parsePercent={parsePercent}
+        parseLabel={this.parseLabel}
       />
     );
   }
