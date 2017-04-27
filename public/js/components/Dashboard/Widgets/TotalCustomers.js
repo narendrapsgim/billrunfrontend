@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import pluralize from 'pluralize';
 import { PercentBar } from '../../Charts';
 import {
-  parseCountValue,
+  parseIntegerValue,
   parsePercent,
 } from '../helper';
 import { getTotalNumOfCustomers } from '../../../actions/dashboardActions';
@@ -31,14 +31,14 @@ class TotalCustomers extends Component {
     return !Immutable.is(this.props.data, nextProps.data);
   }
 
-  parseCountValue = value => `${parseCountValue(value)} ${pluralize('Subscriber', value)}`;
+  parseValue = value => `${parseIntegerValue(value)} ${pluralize('Subscriber', value)}`;
 
   render() {
     const { data } = this.props;
     return (
       <PercentBar
         data={data}
-        parseValue={this.parseCountValue}
+        parseValue={this.parseValue}
         parsePercent={parsePercent}
       />
     );

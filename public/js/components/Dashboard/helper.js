@@ -19,6 +19,9 @@ export const parseCurrencyThousandValue = (value, currency) =>
 export const parseCountValue = value =>
   Number(value).toLocaleString('en-US');
 
+export const parseIntegerValue = value =>
+  Number(value).toLocaleString('en-US', { maximumFractionDigits: 0 });
+
 export const parseDateValue = value =>
   moment(value).format('MMM YYYY');
 
