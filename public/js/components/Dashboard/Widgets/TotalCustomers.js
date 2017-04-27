@@ -30,12 +30,14 @@ class TotalCustomers extends Component {
     return !Immutable.is(this.props.data, nextProps.data);
   }
 
+  parseCountValue = value => `${parseCountValue(value)} Subscribers`;
+
   render() {
     const { data } = this.props;
     return (
       <PercentBar
         data={data}
-        parseValue={parseCountValue}
+        parseValue={this.parseCountValue}
         parsePercent={parsePercent}
       />
     );
