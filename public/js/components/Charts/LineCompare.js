@@ -17,8 +17,8 @@ class LineCompare extends Component {
     data: Immutable.Map({
       x: Immutable.List([
         Immutable.Map({
-          values: Immutable.List()
-        })
+          values: Immutable.List(),
+        }),
       ]),
       y: Immutable.List(),
     }),
