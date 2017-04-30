@@ -89,5 +89,12 @@ var globalSetting = {
       itemType: 'customer',
       itemsType: 'customers',
     },
+    report: {
+      collection: 'reports',
+      uniqueField: 'key',
+      itemName: 'report',
+      itemType: 'report',
+      itemsType: 'reports',
+    },
   },
 };

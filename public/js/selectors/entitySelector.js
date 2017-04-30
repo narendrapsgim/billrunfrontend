@@ -44,6 +44,7 @@ const getItem = (state, props, entityName) => {
     case 'customer':
     case 'subscription':
     case 'discount':
+    case 'reports':
       return state.entity.get(entityName);
     case 'charging_plan':
       return state.plan;
@@ -70,6 +71,20 @@ const selectFormMode = (action, id, item) => {
 
   if (getItemId(item, false)) {
     return getItemMode(item);
+  }
+  return 'loading';
+};
+
+const selectSimpleMode = (action, id, item) => {
+  if (action) {
+    return action;
+  }
+  if (!id) {
+    return 'create';
+  }
+
+  if (getItemId(item, false)) {
+    return 'update';
   }
   return 'loading';
 };
@@ -115,4 +130,11 @@ export const modeSelector = createSelector(
   idSelector,
   itemSelector,
   selectFormMode,
+);
+
+export const modeSimpleSelector = createSelector(
+  getAction,
+  idSelector,
+  itemSelector,
+  selectSimpleMode,
 );

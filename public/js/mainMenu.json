@@ -135,6 +135,15 @@
     "order": 7,
     "parent": "root"
   },
+  "reports": {
+    "title": "Reports",
+    "icon": "fa-list-alt",
+    "route": "reports",
+    "show": true,
+    "roles": [],
+    "order": 7.5,
+    "parent": "root"
+  },
   "users": {
     "title": "User Management",
     "icon": "fa-user",
