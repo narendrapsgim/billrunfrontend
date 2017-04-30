@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { getConfig, isItemClosed, getItemId, getItemMode } from '../common/Util';
+import { getConfig, getItemId, getItemMode } from '../common/Util';
 
 
 const getUniqueFiled = (state, props, entityName) =>
@@ -43,9 +43,10 @@ const getItem = (state, props, entityName) => {
     case 'prepaid_include':
     case 'customer':
     case 'subscription':
-      return state.entity.get(entityName);
     case 'discount':
       return state.entity.get(entityName);
+    case 'charging_plan':
+      return state.plan;
     default: {
       return state[entityName];
     }
