@@ -260,7 +260,7 @@ const mapStateToProps = (state, props) => ({
   item: itemSelector(state, props, 'plan'),
   mode: modeSelector(state, props, 'plan'),
   activeTab: tabSelector(state, props, 'plan'),
-  revisions: revisionsSelector(state, props, 'plan'),
+  revisions: revisionsSelector(state, props, 'charging_plan'),
   prepaidIncludes: state.list.get('prepaid_includes'),
   chargingDay: chargingDaySelector(state, props),
 });
