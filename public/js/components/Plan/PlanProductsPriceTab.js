@@ -98,7 +98,7 @@ class PlanProductsPriceTab extends Component {
     if (originalKeys.includes(productName)) {
       const prices = originalRates.get(productName, Immutable.Map());
       this.props.onChangeFieldValue(['rates', productName], prices);
-      this.props.dispatch(showInfo(`Product ${productName} prices for this plan restored to original state`));
+      this.props.dispatch(showInfo(`Product ${productName} prices for this plan restored to origin state`));
     } else {
       this.props.dispatch(planProductsRateInit(product, productPath));
       this.props.dispatch(showInfo(`Product ${productName} prices for this plan restored to BASE state`));
@@ -168,30 +168,33 @@ class PlanProductsPriceTab extends Component {
 
   renderItems = () => {
     const { products, planRates, mode } = this.props;
-    return planRates.map((productUsageTypes, productKey) => {
-      const usaget = productUsageTypes.keySeq().first();
-      const prices = productUsageTypes.getIn([usaget, 'rate'], Immutable.List());
-      const prod = products.find(planProduct => planProduct.get('key', '') === productKey);
-      if (!prod) {
-        return null;
-      }
-      return (
-        <PlanProduct
-          key={prod.getIn(['_id', '$id'])}
-          item={prod}
-          prices={prices}
-          usaget={usaget}
-          mode={mode}
-          onProductInitRate={this.onProductInitRate}
-          onProductRemoveRate={this.onProductRemoveRate}
-          onProductAddRate={this.onProductAddRate}
-          onProductEditRate={this.onProductEditRate}
-          onProductEditRateTo={this.onProductEditRateTo}
-          onProductRemove={this.onProductRemove}
-          onProductRestore={this.onProductRestore}
-        />
-      );
-    }).toArray();
+    return planRates
+      .reverse()
+      .map((productUsageTypes, productKey) => {
+        const usaget = productUsageTypes.keySeq().first();
+        const prices = productUsageTypes.getIn([usaget, 'rate'], Immutable.List());
+        const prod = products.find(planProduct => planProduct.get('key', '') === productKey);
+        if (!prod) {
+          return null;
+        }
+        return (
+          <PlanProduct
+            key={prod.getIn(['_id', '$id'])}
+            item={prod}
+            prices={prices}
+            usaget={usaget}
+            mode={mode}
+            onProductInitRate={this.onProductInitRate}
+            onProductRemoveRate={this.onProductRemoveRate}
+            onProductAddRate={this.onProductAddRate}
+            onProductEditRate={this.onProductEditRate}
+            onProductEditRateTo={this.onProductEditRateTo}
+            onProductRemove={this.onProductRemove}
+            onProductRestore={this.onProductRestore}
+          />
+        );
+      })
+      .toArray();
   }
 
   render() {

@@ -80,26 +80,13 @@ class PlanIncludesTab extends Component {
     this.props.onGroupRemove(groupName);
   }
 
-  onGroupProductsAdd = (groupName, usaget, productKey) => {
-    const { includeGroups } = this.props;
+  onChangeGroupProducts = (groupName, usaget, productKeys) => {
     const { usedProducts } = this.state;
     this.setState({
-      usedProducts: usedProducts.push(productKey),
+      usedProducts: usedProducts.push(...productKeys),
     });
     const path = ['include', 'groups', groupName, 'rates'];
-    const products = includeGroups.getIn([groupName, 'rates'], Immutable.List()).push(productKey);
-    this.props.onChangeFieldValue(path, products);
-  }
-
-  onGroupProductsRemove = (groupName, usaget, productKey) => {
-    const { includeGroups } = this.props;
-    const { usedProducts } = this.state;
-    this.setState({
-      usedProducts: usedProducts.filter(key => key !== productKey),
-    });
-    const path = ['include', 'groups', groupName, 'rates'];
-    const products = includeGroups.getIn([groupName, 'rates'], Immutable.List()).filter(key => key !== productKey);
-    this.props.onChangeFieldValue(path, products);
+    this.props.onChangeFieldValue(path, productKeys);
   }
 
   renderGroups = () => {
@@ -129,28 +116,23 @@ class PlanIncludesTab extends Component {
           usedProducts={usedProducts.toList()}
           onChangeFieldValue={this.props.onChangeFieldValue}
           onGroupRemove={this.onGroupRemove}
-          addGroupProducts={this.onGroupProductsAdd}
-          removeGroupProducts={this.onGroupProductsRemove}
+          onChangeGroupProducts={this.onChangeGroupProducts}
         />
       );
     }).toArray();
   }
 
-  renderHeader = () => {
-    const { mode } = this.props;
-    const allowEdit = mode !== 'view';
-    return (
-      <tr>
-        <th style={{ width: 150 }}>Name</th>
-        <th style={{ width: 100 }}>Unit Type</th>
-        <th style={{ width: 100 }}>Include</th>
-        <th>Products</th>
-        <th className="text-center" style={{ width: 100 }}>Shared</th>
-        <th className="text-center" style={{ width: 100 }}>Pooled</th>
-        {allowEdit && <th style={{ width: 180 }} />}
-      </tr>
-    );
-  }
+  renderHeader = () => (
+    <tr>
+      <th style={{ width: 150 }}>Name</th>
+      <th style={{ width: 100 }}>Unit Type</th>
+      <th style={{ width: 100 }}>Include</th>
+      <th>Products</th>
+      <th className="text-center" style={{ width: 80 }}>Shared</th>
+      <th className="text-center" style={{ width: 80 }}>Pooled</th>
+      <th style={{ width: 60 }} />
+    </tr>
+  );
 
   render() {
     const { usageTypes, mode } = this.props;

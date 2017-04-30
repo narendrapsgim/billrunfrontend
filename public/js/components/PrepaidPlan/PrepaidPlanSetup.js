@@ -187,17 +187,10 @@ class PrepaidPlanSetup extends Component {
     this.props.dispatch(removeBalanceNotifications(balanceId));
   }
 
-  onSelectBlockProduct = (productKey) => {
-    const { item, dispatch } = this.props;
-    if (item.get('disallowed_rates', Immutable.List()).includes(productKey)) {
-      dispatch(showWarning(`${productKey} already blocked`));
-      return;
-    }
-    dispatch(blockProduct(productKey));
-  }
 
-  onRemoveBlockProduct = (productKey) => {
-    this.props.dispatch(removeBlockProduct(productKey));
+  onChangeBlockProduct = (productKeys) => {
+    const productKeysList = (productKeys.length) ? productKeys.split(',') : [];
+    this.props.dispatch(blockProduct(Immutable.List(productKeysList)));
   }
 
   onChangeThreshold = (balanceId, threshold) => {
@@ -312,8 +305,7 @@ class PrepaidPlanSetup extends Component {
               <BlockedProducts
                 plan={item}
                 mode={mode}
-                onSelectProduct={this.onSelectBlockProduct}
-                onRemoveProduct={this.onRemoveBlockProduct}
+                onChangeBlockProduct={this.onChangeBlockProduct}
               />
             </Panel>
           </Tab>

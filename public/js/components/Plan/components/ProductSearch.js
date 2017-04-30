@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
 import { apiBillRun } from '../../../common/Api';
-import { searchProductsByKeyQuery } from '../../../common/ApiQueries';
+import { getProductsKeysQuery } from '../../../common/ApiQueries';
 
 
 export default class ProductSearch extends Component {
@@ -10,36 +10,35 @@ export default class ProductSearch extends Component {
     onSelectProduct: React.PropTypes.func.isRequired,
   }
 
-  state = { val: null }
+  state = { val: '' }
 
   onSelectProduct = (productKey) => {
     if (productKey) {
       this.props.onSelectProduct(productKey);
     }
-    this.setState({ val: null });
+    this.setState({ val: '' });
   }
 
-  getProducts = (input) => {
-    if (input && input.length) {
-      const key = input.toLowerCase();
-      const query = searchProductsByKeyQuery(key, { key: 1 });
-      return apiBillRun(query)
-        .then(success => ({ options: success.data[0].data.details }))
-        .catch(() => ({ options: [] }));
-    }
-    return Promise.resolve({ options: [] });
-  }
+  getProducts = () => apiBillRun(getProductsKeysQuery({ key: 1, description: 1 }))
+    .then(success => ({
+      options: success.data[0].data.details.map(option => ({
+        value: option.key,
+        label: `${option.key} (${option.description})`,
+      })),
+      complete: true,
+    }))
+    .catch(() => ({ options: [] }));
 
   render() {
+    const { val } = this.state;
     return (
       <Select
-        value={this.state.val}
-        cacheAsyncResults={false}
+        value={val}
         onChange={this.onSelectProduct}
         asyncOptions={this.getProducts}
-        valueKey="key"
-        labelKey="key"
-        placeholder="Search by product key..."
+        autoload={true}
+        searchable={true}
+        placeholder="Search by product key or title..."
         noResultsText="No products found, please try another key"
       />
     );
