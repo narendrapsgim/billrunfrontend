@@ -11,7 +11,6 @@ import CreateButton from '../../Elements/CreateButton';
 import Help from '../../Help';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '../../Field';
-import Products from './Products';
 import { validateUnlimitedValue, validatePriceValue, validateKey } from '../../../common/Validators';
 import { currencySelector } from '../../../selectors/settingsSelector';
 
@@ -182,14 +181,8 @@ class PlanIncludeGroupCreate extends Component {
     this.setState({ include: value, error });
   }
 
-  onAddProduct = (key) => {
-    const products = this.state.products.push(key);
-    this.setState({ products, error: '' });
-  }
-
-  onRemoveProduct = (key) => {
-    const products = this.state.products.filter(product => key !== product);
-    this.setState({ products, error: '' });
+  onChangeGroupRates = (keys) => {
+    this.setState({ products: Immutable.List(keys), error: '' });
   }
 
   handlePrev = () => {
@@ -352,15 +345,12 @@ class PlanIncludeGroupCreate extends Component {
               : <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`Products of type ${usage}`)}<Help contents={GroupsInclude.products} /></Col>
             }
             <Col sm={8}>
-              { products.size
-               ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />
-               : <p style={{ marginTop: 8 }}>No products in group ...</p>
-              }
-              <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
+              <div style={{ marginTop: 10, minWidth: 250, width: '100%', minHeight: 42 }}>
                 <ProductSearchByUsagetype
+                  products={products}
                   usaget={usage}
-                  products={existingProductsKeys}
-                  addRatesToGroup={this.onAddProduct}
+                  onChangeGroupRates={this.onChangeGroupRates}
+                  existingProducts={existingProductsKeys}
                 />
               </div>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}

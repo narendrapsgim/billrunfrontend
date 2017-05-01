@@ -6,7 +6,7 @@ import { GroupsInclude } from '../../../FieldDescriptions';
 import Help from '../../Help';
 import ConfirmModal from '../../ConfirmModal';
 import Field from '../../Field';
-import Products from './Products';
+import Actions from '../../Elements/Actions';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import { validateUnlimitedValue, validatePriceValue } from '../../../common/Validators';
 
@@ -25,8 +25,7 @@ export default class PlanIncludeGroupEdit extends Component {
     products: PropTypes.instanceOf(Immutable.List),
     usedProducts: PropTypes.instanceOf(Immutable.List),
     onChangeFieldValue: PropTypes.func.isRequired,
-    removeGroupProducts: PropTypes.func.isRequired,
-    addGroupProducts: PropTypes.func.isRequired,
+    onChangeGroupProducts: PropTypes.func.isRequired,
     mode: PropTypes.string,
     onGroupRemove: PropTypes.func.isRequired,
   }
@@ -94,18 +93,9 @@ export default class PlanIncludeGroupEdit extends Component {
     this.props.onChangeFieldValue(['include', 'groups', name, 'account_pool'], checked);
   }
 
-  onAddProduct = (productKey) => {
-    if (productKey) {
-      const { name, usaget } = this.props;
-      this.props.addGroupProducts(name, usaget, productKey);
-    }
-  }
-
-  onRemoveProduct = (productKey) => {
-    if (productKey) {
-      const { name, usaget } = this.props;
-      this.props.removeGroupProducts(name, usaget, productKey);
-    }
+  onChangeGroupRates = (productKey) => {
+    const { name, usaget } = this.props;
+    this.props.onChangeGroupProducts(name, usaget, productKey);
   }
 
   onGroupRemoveAsk = () => {
@@ -124,6 +114,15 @@ export default class PlanIncludeGroupEdit extends Component {
 
   toggleBoby = () => {
     this.setState({ isEditMode: !this.state.isEditMode });
+  }
+
+  getListActions = () => {
+    const { mode } = this.props;
+    const allowEdit = mode !== 'view';
+    return ([
+      { type: 'edit', helpText: 'Edit group', onClick: this.toggleBoby, enable: allowEdit },
+      { type: 'remove', helpText: 'Remove Group', onClick: this.onGroupRemoveAsk, enable: allowEdit },
+    ]);
   }
 
   renderProductsTooltip = productsLabels => (
@@ -168,12 +167,12 @@ export default class PlanIncludeGroupEdit extends Component {
             <FormGroup>
               <Col componentClass={ControlLabel} sm={3}>Products</Col>
               <Col sm={8}>
-                <Products onRemoveProduct={this.onRemoveProduct} products={products} />
                 <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
                   <ProductSearchByUsagetype
-                    addRatesToGroup={this.onAddProduct}
+                    products={products}
                     usaget={usaget}
-                    products={usedProducts.toList()}
+                    existingProducts={usedProducts.toList()}
+                    onChangeGroupRates={this.onChangeGroupRates}
                   />
                 </div>
               </Col>
@@ -188,17 +187,18 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   render() {
-    const { name, value, usaget, shared, pooled, products, mode } = this.props;
+    const { name, value, usaget, shared, pooled, products } = this.props;
     const { showConfirm } = this.state;
     const confirmMessage = `Are you sure you want to remove ${name} group?`;
     const sharedLabel = shared ? 'Yes' : 'No';
     const pooledLabel = pooled ? 'Yes' : 'No';
     const productsLabels = products.join(', ');
     const valueLabel = changeCase.titleCase(value);
-    const allowEdit = mode !== 'view';
     const tooltip = this.renderProductsTooltip(productsLabels);
+    const actions = this.getListActions();
+
     return (
-      <tr>
+      <tr className="List">
         <td className="td-ellipsis">{name}</td>
         <td className="td-ellipsis">{usaget}</td>
         <td className="td-ellipsis">{valueLabel}</td>
@@ -209,14 +209,11 @@ export default class PlanIncludeGroupEdit extends Component {
         </td>
         <td className="td-ellipsis text-center">{sharedLabel}</td>
         <td className="td-ellipsis text-center">{pooledLabel}</td>
-        { allowEdit &&
-          <td className="text-right" style={{ paddingRight: 0 }}>
-            <Button onClick={this.toggleBoby} bsSize="xsmall" style={{ marginRight: 10, minWidth: 80 }}><i className="fa fa-pencil" />&nbsp;Edit</Button>
-            <Button onClick={this.onGroupRemoveAsk} bsSize="xsmall" style={{ minWidth: 80 }}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
-            <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
-            { this.renderEdit() }
-          </td>
-        }
+        <td className="text-right row" style={{ paddingRight: 0, paddingLeft: 0 }}>
+          <Actions actions={actions} />
+          <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
+          { this.renderEdit() }
+        </td>
       </tr>
     );
   }
