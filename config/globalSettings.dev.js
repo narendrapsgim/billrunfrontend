@@ -29,6 +29,18 @@ var globalSetting = {
   mail_support: 'cloud_support@billrun.com',
   logoMaxSize: 2,
   chargingBufferDays: 5,
+  reports: {
+    entities: ['lines', 'subscription', 'customer'],
+    fields: {
+      lines: [
+        { id: 'final_charge', title: 'Final Charge', type: 'number' },
+        { id: 'realtime', type: 'checkbox' },
+        { id: 'usaget' },
+        { id: 'urt', type: 'date' },
+        { id: 'connection_type', type: 'select', option: ['postpaid', 'postpaid'] },
+      ],
+    },
+  },
   systemItems: {
     service: {
       collection: 'services',

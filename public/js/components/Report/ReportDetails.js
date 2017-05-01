@@ -12,7 +12,6 @@ const ReportDetails = ({ mode, report, ...props }) => {
   };
   return (
     <div>
-      <h5>mode: {mode}</h5>
       <Field onChange={onChnageName} value={report.get('key', '')} />
     </div>
   );

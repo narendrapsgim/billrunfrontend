@@ -5,6 +5,7 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { Panel } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
+import { CustomFilter } from '../EntityList/Filter';
 import ReportDetails from './ReportDetails';
 import {
   buildPageTitle,
@@ -167,6 +168,11 @@ class ReportSetup extends Component {
     return (
       <div className="report-setup">
         <Panel>
+          <CustomFilter
+            filters={item.get('filters', Immutable.List())}
+            entity={item.get('entity', '')}
+            onChangefilter={this.onChangeFieldValue}
+          />
           <ReportDetails
             report={item}
             mode={mode}
