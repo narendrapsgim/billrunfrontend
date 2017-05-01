@@ -120,6 +120,10 @@ class RunCycle extends Component {
     if (cycleAdditionalData.get('cycle_status', '') !== 'running') {
       this.unsetAutoRefresh();
       this.setState({ autoRefreshRunning: false });
+      if (cycleAdditionalData.get('cycle_status', '') === 'finished') {
+        const { selectedCycleName } = this.state;
+        this.onChangeSelectedCycle(selectedCycleName);
+      }
       return;
     }
     this.reloadCycleData();
