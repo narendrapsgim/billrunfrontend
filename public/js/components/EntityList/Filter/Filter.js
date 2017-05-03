@@ -35,7 +35,9 @@ export default class Filter extends Component {
       filter_by = props.filter.keySeq().toArray();
       const firstFilter = props.filter.first();
 
-      if (firstFilter && !Immutable.Map.isMap(firstFilter)) {
+      if (firstFilter === null) {
+        string = '';
+      } else if (firstFilter && !Immutable.Map.isMap(firstFilter)) {
         string = firstFilter;
       } else if (firstFilter.get('$regex', '').length > 0) {
         string = firstFilter.get('$regex', '');
