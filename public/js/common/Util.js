@@ -159,3 +159,15 @@ export const getRevisionStartIndex = (item, revisions) => {
   }
   return index - 1;
 };
+
+export const formatSelectOptions = option => (
+  Immutable.Map.isMap(option)
+    ? { value: option.get('value', ''), label: option.get('label', '') }
+    : { value: changeCase.snakeCase(option), label: changeCase.sentenceCase(option) }
+);
+
+export const parseConfigSelectOptions = configOption => formatSelectOptions(
+  configOption.has('title')
+    ? Immutable.Map({ value: configOption.get('id'), label: configOption.get('title') })
+    : configOption.get('id')
+);

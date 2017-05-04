@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import { getFieldName, getConfig } from '../common/Util';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
@@ -46,11 +47,56 @@ const selectCsiOptions = (inputProssesors) => {
   return options;
 };
 
+const selectCustomKeys = (inputProssesors) => {
+  let options = Immutable.Set();
+  inputProssesors.forEach((inputProssesor) => {
+    const customKeys = inputProssesor.getIn(['parser', 'custom_keys'], Immutable.List());
+    options = options.concat(customKeys);
+  });
+  return options.toList();
+};
+
+const selectLinesFileds = (customKeys) => {
+  const predefinedFileds = getConfig(['reports', 'fields', 'lines'], Immutable.List());
+  return Immutable.List().withMutations((optionsWithMutations) => {
+    // Set predefined fields
+    predefinedFileds.forEach((predefinedFiled) => {
+      if (predefinedFiled.has('title')) {
+        optionsWithMutations.push(predefinedFiled);
+      } else {
+        optionsWithMutations.push(predefinedFiled.set('title', getFieldName(predefinedFiled.get('id', ''), 'lines')));
+      }
+    });
+    // Set custom fields
+    customKeys.forEach((customKey) => {
+      if (predefinedFileds.findIndex(predefinedFiled => predefinedFiled.get('id', '') === customKey) === -1) {
+        optionsWithMutations.push(Immutable.Map({
+          id: customKey,
+          title: getFieldName(customKey, 'lines'),
+          filter: true,
+          display: true,
+        }));
+      }
+    });
+  });
+};
+
 
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
   selectCsiOptions
 );
+
+export const inputProssesorCustomKeysSelector = createSelector(
+  getInputProssesors,
+  selectCustomKeys
+);
+
+export const linesFiledsSelector = createSelector(
+  inputProssesorCustomKeysSelector,
+  selectLinesFileds
+);
+
 
 export const taxationSelector = createSelector(
   getTaxation,

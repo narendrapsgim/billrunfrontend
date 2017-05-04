@@ -22,8 +22,10 @@ const ReportsList = () => {
   };
 
   const actions = [
-    { type: 'edit' },
+    { type: 'view' },
+    { type: 'edit', onClickColumn: null },
   ];
+
   return (
     <EntityList
       collection="reports"

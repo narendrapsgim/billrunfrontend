@@ -33,13 +33,31 @@ var globalSetting = {
     entities: ['lines', 'subscription', 'customer'],
     fields: {
       lines: [
-        { id: 'final_charge', title: 'Final Charge', type: 'number' },
-        { id: 'realtime', type: 'checkbox' },
+        { id: 'final_charge', type: 'number', filter: true, display: false },
+        { id: 'source', filter: false, display: true },
+        { id: 'type', filter: false, display: true },
+        { id: 'realtime', type: 'boolean', filter: true, display: false },
         { id: 'usaget' },
-        { id: 'urt', type: 'date' },
-        { id: 'connection_type', type: 'select', option: ['postpaid', 'postpaid'] },
+        { id: 'urt', type: 'date', filter: true, display: true },
+        { id: 'connection_type', filter: true, display: false, inputConfig: {
+          inputType: 'select',
+          options: ['postpaid', 'prepaid'],
+        } },
       ],
     },
+    operators: [
+      { id: 'equals', title: '==', types: ['text', 'number', 'boolean', 'date'] }, // 'Equals'
+      { id: 'ne', title: '!=', types: ['text', 'number', 'boolean', 'date'] }, // 'Not equals'
+      { id: 'lt', title: '<', types: ['number', 'date'] }, // 'Less than'
+      { id: 'lte', title: '<=', types: ['number', 'date'] }, // 'Less than or equals'
+      { id: 'gt', title: '>', types: ['number', 'date'] }, // 'Greater than'
+      { id: 'gte', title: '>=', types: ['number', 'date'] }, // 'Greater than or equals'
+      { id: 'like', title: 'Contains', types: ['text', 'number'] },
+      { id: 'starts_with', title: 'Starts with', types: ['text'] },
+      { id: 'ends_with', title: 'Ends with', types: ['text'] },
+      { id: 'exists', title: 'Exists', types: ['text', 'number', 'boolean', 'date'] },
+      { id: 'in', title: 'In', types: ['text', 'number'] },
+    ],
   },
   systemItems: {
     service: {
