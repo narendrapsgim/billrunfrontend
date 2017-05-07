@@ -229,7 +229,7 @@ export default class Product extends Component {
   render() {
     const { errors } = this.state;
     const { product, usaget, mode } = this.props;
-    const vatable = (product.get('vatable', false) === true);
+    const vatable = (product.get('vatable', true) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
     const pricingMethod = product.get('pricing_method', 'tiered');
     const availablePrefix = [];
