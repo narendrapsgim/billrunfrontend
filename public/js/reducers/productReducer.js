@@ -15,7 +15,7 @@ const defaultState = Immutable.Map({
   key: '',
   code: '',
   description: '',
-  vatable: false,
+  vatable: true,
   pricing_method: 'tiered',
 });
 const DefaultRate = Immutable.Record({

@@ -33,7 +33,7 @@ const FieldNames = {
     duration: 'Call duration',
     over_group: 'Deviation units',
     usagev: 'Activity volume',
-    urt: 'Unified record time',
+    urt: 'Record time',
     disposition: 'Disposition',
     accountcode: 'CDR account ID',
     type: 'Input processor name',
