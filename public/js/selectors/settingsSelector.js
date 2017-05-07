@@ -56,7 +56,19 @@ const selectCustomKeys = (inputProssesors) => {
   return options.toList();
 };
 
-const selectLinesFileds = (customKeys) => {
+const sortFieldOption = (optionsA, optionB) => {
+  const a = optionsA.get('title', '').toUpperCase(); // ignore upper and lowercase
+  const b = optionB.get('title', '').toUpperCase(); // ignore upper and lowercase
+  if (a < b) {
+    return -1;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return 0;
+};
+
+const selectLinesFields = (customKeys) => {
   const predefinedFileds = getConfig(['reports', 'fields', 'lines'], Immutable.List());
   return Immutable.List().withMutations((optionsWithMutations) => {
     // Set predefined fields
@@ -78,7 +90,8 @@ const selectLinesFileds = (customKeys) => {
         }));
       }
     });
-  });
+  })
+  .sort(sortFieldOption);
 };
 
 
@@ -94,7 +107,7 @@ export const inputProssesorCustomKeysSelector = createSelector(
 
 export const linesFiledsSelector = createSelector(
   inputProssesorCustomKeysSelector,
-  selectLinesFileds
+  selectLinesFields
 );
 
 

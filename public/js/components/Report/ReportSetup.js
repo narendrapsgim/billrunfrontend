@@ -33,6 +33,7 @@ class ReportSetup extends Component {
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
+    linesFileds: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     userName: PropTypes.string,
     router: PropTypes.shape({
@@ -43,6 +44,7 @@ class ReportSetup extends Component {
 
   static defaultProps = {
     item: Immutable.Map(),
+    linesFileds: Immutable.List(),
     userName: 'Unknown',
   }
 
@@ -205,8 +207,6 @@ class ReportSetup extends Component {
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
-
-    console.log(linesFileds);
 
     const allowEdit = mode !== 'view';
     const tableFields = this.getTableFields();
