@@ -464,3 +464,13 @@ ul.revision-history-list li.active .cycle {
 #move-entity .nav-pills>li+li {
      margin-left: 0;
 }
+
+
+/* Reports */
+.report-setup .CustomFilter .action button{
+  height: 39px;
+}
+.report-setup .CustomFilter .react-datepicker__input-container {
+  width: 100%;
+}
+/* ~Reports */

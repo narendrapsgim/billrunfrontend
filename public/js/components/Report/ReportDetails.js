@@ -179,7 +179,7 @@ export default class ReportDetails extends Component {
           { this.renderValue(filter, confField, index, disabled) }
         </Col>
 
-        <Col sm={3}>
+        <Col sm={3} className="action">
           <Button onClick={onFilterRemove} bsSize="small" className="pull-left" disabled={disabled} >
             <i className="fa fa-trash-o danger-red" />&nbsp;Remove
           </Button>
@@ -189,7 +189,6 @@ export default class ReportDetails extends Component {
   }
 
   renderValue = (filed, config, index, disabled) => {
-
     const onChangeSelect = (value) => {
       this.onChangeFilterValue(index, value);
     };
@@ -254,8 +253,8 @@ export default class ReportDetails extends Component {
       );
     }
 
-    if (config.get('type', '') === 'number'  && !filed.get('op', '') === 'in') {
-      return(
+    if (config.get('type', '') === 'number' && !filed.get('op', '') === 'in') {
+      return (
         <Field value={filed.get('value', '')} onChange={onChangeNumber} fieldType="number" disabled={disabled} />
       );
     }
@@ -263,9 +262,7 @@ export default class ReportDetails extends Component {
     if (config.get('type', '') === 'date') {
       const value = moment(filed.get('value', null));
       return (
-        <div style={{ width: '100%' }}>
-          <Field value={value} onChange={onChangeDate} fieldType="date" disabled={disabled} width="100%" />
-        </div>
+        <Field value={value} onChange={onChangeDate} fieldType="date" disabled={disabled} />
       );
     }
 
@@ -322,7 +319,7 @@ export default class ReportDetails extends Component {
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} sm={3}>
-          Entity
+          Name
         </Col>
         <Col sm={7}>
           <Field onChange={this.onChangeReportKey} value={key} disabled={disabled} />
