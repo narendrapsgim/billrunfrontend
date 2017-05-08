@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { Form, Button, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Form, Button, FormGroup, Col, ControlLabel, HelpBlock, Label } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
 import Select from 'react-select';
@@ -17,6 +17,7 @@ export default class ReportDetails extends Component {
     report: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
     operators: PropTypes.instanceOf(Immutable.List),
+    groupByOperators: PropTypes.instanceOf(Immutable.List),
     linesFileds: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
     onUpdate: PropTypes.func,
@@ -27,6 +28,7 @@ export default class ReportDetails extends Component {
     report: Immutable.Map(),
     mode: 'update',
     operators: getConfig(['reports', 'operators'], Immutable.List()),
+    groupByOperators: getConfig(['reports', 'groupByOperators'], Immutable.List()),
     linesFileds: Immutable.List(),
     onFilter: () => {},
     onUpdate: () => {},
@@ -39,6 +41,8 @@ export default class ReportDetails extends Component {
       this.onChangefilter('entity', '');
       this.onChangefilter('filters', Immutable.List());
       this.onChangefilter('display', Immutable.List());
+      this.onChangefilter('group_by', Immutable.List());
+      this.onChangefilter('group_by_fields', Immutable.List());
     } else {
       this.props.onReset();
     }
@@ -83,6 +87,47 @@ export default class ReportDetails extends Component {
     this.onChangefilter('filters', newFilters);
   }
 
+  onChangeBroupByField = (idx, value) => {
+    const { report } = this.props;
+    const groupBy = report
+      .get('group_by', Immutable.List())
+      .setIn([idx, 'field'], value)
+      .setIn([idx, 'op'], '');
+    this.onChangefilter('group_by', groupBy);
+  }
+
+  onChangeGroupByOperator = (idx, value) => {
+    const { report } = this.props;
+    const groupBy = report
+      .get('group_by', Immutable.List())
+      .setIn([idx, 'op'], value);
+    this.onChangefilter('group_by', groupBy);
+  }
+
+  onGroupByRemove = (index) => {
+    const { report } = this.props;
+    const groupBy = report
+      .get('group_by', Immutable.List())
+      .delete(index);
+    this.onChangefilter('group_by', groupBy);
+  }
+
+  onGroupByAdd = () => {
+    const { report } = this.props;
+    const groupBy = report
+      .get('group_by', Immutable.List())
+      .push(Immutable.Map({
+        op: '',
+        field: '',
+      }));
+    this.onChangefilter('group_by', groupBy);
+  }
+
+  onChangeGroupByFields = (fields) => {
+    const groupByFields = (fields.length) ? fields.split(',') : [];
+    this.onChangefilter('group_by_fields', Immutable.List(groupByFields));
+  }
+
   onChangeEntity = (val) => {
     this.onChangefilter('entity', val);
     this.onChangefilter('filters', Immutable.List());
@@ -91,19 +136,13 @@ export default class ReportDetails extends Component {
 
   onChangeDisplayFields = (fields) => {
     const fieldsList = (fields.length) ? fields.split(',') : [];
-    this.setState({ display: fieldsList });
-    this.onChangefilter('display', fieldsList);
+    this.onChangefilter('display', Immutable.List(fieldsList));
   }
 
   onChangeReportKey = (e) => {
     const { value } = e.target;
-    this.setState({ key: value });
     this.onChangefilter('key', value);
   };
-
-  onChangefilter = (type, value) => {
-    this.props.onUpdate(type, value);
-  }
 
   onAddFilter = () => {
     const { report } = this.props;
@@ -117,11 +156,15 @@ export default class ReportDetails extends Component {
     this.onChangefilter('filters', newFilters);
   }
 
+  onChangefilter = (type, value) => {
+    this.props.onUpdate(type, value);
+  }
+
   filterOptionByFieldType = (option, field) => {
     if (!field) {
       return false;
     }
-    return option.get('types', Immutable.List()).includes(field.get('type', 'text'));
+    return option.get('types', Immutable.List()).includes(field.get('type', 'string'));
   }
 
   getEntityFields = () => {
@@ -142,7 +185,7 @@ export default class ReportDetails extends Component {
 
     const disabled = mode === 'view';
     const fieldOptions = fieldConfig
-      .filter(filed => filed.get('filter', false))
+      .filter(filed => filed.get('filter', true))
       .map(parseConfigSelectOptions)
       .toArray();
     const opOptions = operators
@@ -150,9 +193,9 @@ export default class ReportDetails extends Component {
       .map(parseConfigSelectOptions)
       .toArray();
 
-    const onChangeFilterField = (e) => { this.onChangeFilterField(index, e); };
-    const onChangeFilterOperator = (e) => { this.onChangeFilterOperator(index, e); };
-    const onFilterRemove = (e) => { this.onFilterRemove(index, e); };
+    const onChangeField = (e) => { this.onChangeFilterField(index, e); };
+    const onChangeOperator = (e) => { this.onChangeFilterOperator(index, e); };
+    const onRemove = (e) => { this.onFilterRemove(index, e); };
 
     return (
       <FormGroup className="form-inner-edit-row" key={index}>
@@ -160,17 +203,17 @@ export default class ReportDetails extends Component {
           <Select
             options={fieldOptions}
             value={filter.get('field', '')}
-            onChange={onChangeFilterField}
+            onChange={onChangeField}
             disabled={disabled}
           />
         </Col>
 
-        <Col sm={3}>
+        <Col sm={2}>
           <Select
             clearable={false}
             options={opOptions}
             value={filter.get('op', '')}
-            onChange={onChangeFilterOperator}
+            onChange={onChangeOperator}
             disabled={disabled}
           />
         </Col>
@@ -180,7 +223,55 @@ export default class ReportDetails extends Component {
         </Col>
 
         <Col sm={3} className="action">
-          <Button onClick={onFilterRemove} bsSize="small" className="pull-left" disabled={disabled} >
+          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} >
+            <i className="fa fa-trash-o danger-red" />&nbsp;Remove
+          </Button>
+        </Col>
+      </FormGroup>
+    );
+  }
+
+  renderGroupByInputs = (filter, index) => {
+    const { mode, groupByOperators } = this.props;
+    const fieldConfig = this.getEntityFields();
+    const confField = fieldConfig.find(conf => conf.get('id', '') === filter.get('field', ''), null, Immutable.Map());
+
+    const disabled = mode === 'view';
+
+    const fieldOptions = fieldConfig
+      .filter(filed => filed.get('groupBy', true))
+      .map(parseConfigSelectOptions)
+      .toArray();
+    const opOptions = groupByOperators
+      .filter(opt => this.filterOptionByFieldType(opt, confField))
+      .map(parseConfigSelectOptions)
+      .toArray();
+
+    const onChangeField = (e) => { this.onChangeBroupByField(index, e); };
+    const onChangeOperator = (e) => { this.onChangeGroupByOperator(index, e); };
+    const onRemove = (e) => { this.onGroupByRemove(index, e); };
+
+    return (
+      <FormGroup className="form-inner-edit-row" key={index}>
+        <Col sm={5}>
+          <Select
+            options={fieldOptions}
+            value={filter.get('field', '')}
+            onChange={onChangeField}
+            disabled={disabled}
+          />
+        </Col>
+        <Col sm={3}>
+          <Select
+            clearable={false}
+            options={opOptions}
+            value={filter.get('op', '')}
+            onChange={onChangeOperator}
+            disabled={disabled}
+          />
+        </Col>
+        <Col sm={3} className="action">
+          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} >
             <i className="fa fa-trash-o danger-red" />&nbsp;Remove
           </Button>
         </Col>
@@ -235,7 +326,7 @@ export default class ReportDetails extends Component {
       );
     }
 
-    if (config.get('type', 'text') === 'text' && config.getIn(['inputConfig', 'inputType']) === 'select') {
+    if (config.get('type', 'string') === 'string' && config.getIn(['inputConfig', 'inputType']) === 'select') {
       const options = config
         .getIn(['inputConfig', 'options'])
         .map(formatSelectOptions)
@@ -266,7 +357,7 @@ export default class ReportDetails extends Component {
       );
     }
 
-    // 'text'
+    // 'string'
     return (
       <div>
         <Field value={filed.get('value', '')} onChange={onChangeText} disabled={disabled} />
@@ -275,7 +366,7 @@ export default class ReportDetails extends Component {
     );
   }
 
-  renderActions = () => {
+  renderFilterActions = () => {
     const { mode } = this.props;
     const disabled = mode === 'view';
     if (disabled) {
@@ -285,6 +376,21 @@ export default class ReportDetails extends Component {
       <div style={{ height: 40 }}>
         <Button bsStyle="link" onClick={this.onAddFilter} className="pull-left" disabled={disabled} >
           <i className="fa fa-plus" />&nbsp;Add Filter
+        </Button>
+      </div>
+    );
+  }
+
+  renderGroupByActions = () => {
+    const { mode } = this.props;
+    const disabled = mode === 'view';
+    if (disabled) {
+      return null;
+    }
+    return (
+      <div style={{ height: 40 }}>
+        <Button bsStyle="link" onClick={this.onGroupByAdd} className="pull-left" disabled={disabled} >
+          <i className="fa fa-plus" />&nbsp;Add Group By
         </Button>
       </div>
     );
@@ -330,11 +436,12 @@ export default class ReportDetails extends Component {
 
   renderDisplayFieldsSelector = () => {
     const { mode, report } = this.props;
-    const disabled = mode === 'view';
+    const isGroupBy = !report.get('group_by_fields', Immutable.List()).isEmpty();
+    const disabled = mode === 'view' || isGroupBy;
     const display = report.get('display', Immutable.List());
     const displayFieldsValues = display.join(',');
     const options = this.getEntityFields()
-      .filter(field => field.get('display', false))
+      .filter(field => field.get('display', true))
       .map(parseConfigSelectOptions).toArray();
     return (
       <FormGroup>
@@ -349,6 +456,33 @@ export default class ReportDetails extends Component {
             onChange={this.onChangeDisplayFields}
             disabled={disabled}
           />
+          { isGroupBy && <HelpBlock><Label bsStyle="warning">Display filed will be ovveriden by Group By</Label></HelpBlock>}
+        </Col>
+      </FormGroup>
+    );
+  }
+
+  renderGroupByFieldsSelector = () => {
+    const { mode, report } = this.props;
+    const disabled = mode === 'view';
+    const groupBy = report.get('group_by_fields', Immutable.List());
+    const groupByFieldsValues = groupBy.join(',');
+    const options = this.getEntityFields()
+      .filter(field => field.get('display', true))
+      .map(parseConfigSelectOptions).toArray();
+    return (
+      <FormGroup>
+        <Col componentClass={ControlLabel} sm={3}>
+          Group By
+        </Col>
+        <Col sm={7}>
+          <Select
+            multi={true}
+            options={options}
+            value={groupByFieldsValues}
+            onChange={this.onChangeGroupByFields}
+            disabled={disabled}
+          />
         </Col>
       </FormGroup>
     );
@@ -356,20 +490,24 @@ export default class ReportDetails extends Component {
 
   render() {
     const { report } = this.props;
+
     const filters = report.get('filters', Immutable.List());
-    const entityName = this.renderEntityName();
-    const entitySelector = this.renderEntitySelector();
-    const displayFieldsSelector = this.renderDisplayFieldsSelector();
-    const inputs = filters.map(this.renderInputs);
-    const actions = this.renderActions();
+    const filtersInputs = filters.map(this.renderInputs);
+
+    const groupBy = report.get('group_by', Immutable.List());
+    const groupByInputs = groupBy.map(this.renderGroupByInputs);
+
     return (
       <div className="CustomFilter">
         <Form horizontal>
-          <Col sm={12}>{entityName}</Col>
-          <Col sm={12}>{entitySelector}</Col>
-          <Col sm={12}>{displayFieldsSelector}</Col>
-          <Col sm={12}>{inputs}</Col>
-          <Col sm={12}>{actions}</Col>
+          <Col sm={12}>{ this.renderEntityName() }</Col>
+          <Col sm={12}>{ this.renderEntitySelector() }</Col>
+          <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
+          <Col sm={12}>{ filtersInputs }</Col>
+          <Col sm={12}>{ this.renderFilterActions() }</Col>
+          <Col sm={12}>{ this.renderGroupByFieldsSelector() }</Col>
+          <Col sm={12}>{ groupByInputs }</Col>
+          <Col sm={12}>{ this.renderGroupByActions() }</Col>
         </Form>
       </div>
     );

@@ -1,4 +1,4 @@
-import { fetchReportByIdQuery } from '../common/ApiQueries';
+import { fetchReportByIdQuery, getReportQuery } from '../common/ApiQueries';
 import {
   saveEntity,
   getEntity,
@@ -7,6 +7,10 @@ import {
   deleteEntityField,
   setCloneEntity,
 } from './entityActions';
+import {
+  getList,
+  clearItems,
+} from './entityListActions';
 
 export const setCloneReport = () => setCloneEntity('reports', 'report');
 
@@ -19,3 +23,7 @@ export const updateReport = (path, value) => updateEntityField('reports', path, 
 export const deleteReportValue = path => deleteEntityField('reports', path);
 
 export const getReport = id => dispatch => dispatch(getEntity('reports', fetchReportByIdQuery(id)));
+
+export const getReportData = data => dispatch => dispatch(getList('reportData', getReportQuery(data)));
+
+export const clearReportData = () => dispatch => dispatch(clearItems('reportData'));

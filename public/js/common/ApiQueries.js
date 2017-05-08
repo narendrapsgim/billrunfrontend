@@ -485,3 +485,11 @@ export const getConfirmationOperationInvoiceQuery = invoiceId => ({
     { filtration: invoiceId },
   ],
 });
+
+export const getReportQuery = data => ({
+  api: 'report',
+  params: [{
+    action: 'generateReport',
+    data,
+  }],
+});

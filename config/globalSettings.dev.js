@@ -33,7 +33,8 @@ var globalSetting = {
     entities: ['lines', 'subscription', 'customer'],
     fields: {
       lines: [
-        { id: 'final_charge', type: 'number', filter: true, display: false },
+// default settings { id: required, type: 'string', filter: true, display: true, groupBy: true }
+        { id: 'final_charge', type: 'number', filter: true, display: false, groupBy: true },
         { id: 'source', filter: false, display: true },
         { id: 'type', filter: false, display: true },
         { id: 'realtime', type: 'boolean', filter: true, display: false },
@@ -46,17 +47,27 @@ var globalSetting = {
       ],
     },
     operators: [
-      { id: 'equals', title: '==', types: ['text', 'number', 'boolean', 'date'] }, // 'Equals'
-      { id: 'ne', title: '!=', types: ['text', 'number', 'boolean', 'date'] }, // 'Not equals'
+      { id: 'equals', title: '==', types: ['string', 'number', 'boolean', 'date'] }, // 'Equals'
+      { id: 'ne', title: '!=', types: ['string', 'number', 'boolean', 'date'] }, // 'Not equals'
       { id: 'lt', title: '<', types: ['number', 'date'] }, // 'Less than'
       { id: 'lte', title: '<=', types: ['number', 'date'] }, // 'Less than or equals'
       { id: 'gt', title: '>', types: ['number', 'date'] }, // 'Greater than'
       { id: 'gte', title: '>=', types: ['number', 'date'] }, // 'Greater than or equals'
-      { id: 'like', title: 'Contains', types: ['text', 'number'] },
-      { id: 'starts_with', title: 'Starts with', types: ['text'] },
-      { id: 'ends_with', title: 'Ends with', types: ['text'] },
-      { id: 'exists', title: 'Exists', types: ['text', 'number', 'boolean', 'date'] },
-      { id: 'in', title: 'In', types: ['text', 'number'] },
+      { id: 'like', title: 'Contains', types: ['string', 'number'] },
+      { id: 'starts_with', title: 'Starts with', types: ['string'] },
+      { id: 'ends_with', title: 'Ends with', types: ['string'] },
+      { id: 'exists', title: 'Exists', types: ['string', 'number', 'boolean', 'date'] },
+      { id: 'in', title: 'In', types: ['string', 'number'] },
+    ],
+    groupByOperators: [
+      { id: 'sum', title: 'Sum', types: ['number'] },
+      { id: 'avg', title: 'Sverage', types: ['number'] },
+      { id: 'first', title: 'First', types: ['string', 'number', 'boolean', 'date'] },
+      { id: 'last', title: 'Last', types: ['string', 'number', 'boolean', 'date'] },
+      { id: 'max', title: 'Max', types: ['number', 'date'] },
+      { id: 'min', title: 'Min', types: ['number', 'date'] },
+      { id: 'push', title: 'List', types: ['string', 'number', 'boolean', 'date'] },
+      { id: 'addToSet', title: 'Unique List', types: ['string', 'number', 'boolean', 'date'] },
     ],
   },
   systemItems: {

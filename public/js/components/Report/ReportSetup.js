@@ -21,6 +21,8 @@ import {
   updateReport,
   deleteReportValue,
   setCloneReport,
+  getReportData,
+  clearReportData,
 } from '../../actions/reportsActions';
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
@@ -34,6 +36,7 @@ class ReportSetup extends Component {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
     linesFileds: PropTypes.instanceOf(Immutable.List),
+    reportData: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     userName: PropTypes.string,
     router: PropTypes.shape({
@@ -45,6 +48,7 @@ class ReportSetup extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     linesFileds: Immutable.List(),
+    reportData: Immutable.List(),
     userName: 'Unknown',
   }
 
@@ -107,15 +111,25 @@ class ReportSetup extends Component {
   }
 
   afterItemReceived = (response) => {
+    const { mode } = this.props;
     this.setState({ progress: false });
     if (response.status) {
       this.initDefaultValues();
+      if (mode === 'view') {
+        this.getReportData();
+      }
     } else {
       this.handleBack();
     }
   }
 
+  getReportData = () => {
+    const query = this.buildReportQuery();
+    this.props.dispatch(getReportData(query));
+  }
+
   onChangeFieldValue = (path, value) => {
+    this.props.dispatch(clearReportData());
     const stringPath = Array.isArray(path) ? path.join('.') : path;
     const deletePathOnEmptyValue = [];
     const deletePathOnNullValue = [];
@@ -178,14 +192,30 @@ class ReportSetup extends Component {
     }
   }
 
-  applyFilter = () => {
+  buildGroupByQuery = (acc, val) => {
+    const op = val.get('op');
+    const field = val.get('field');
+    const value = Immutable.Map({
+      [`$${op}`]: field,
+    });
+    return acc.set(`${field}_${op}`, value);
+  }
+
+  buildReportQuery = () => {
     const { item } = this.props;
-    const qeryObject = {
+    const query = {
       collection: item.get('entity', ''),
       project: item.get('display', Immutable.List()).reduce((acc, val) => acc.set(val, 1), Immutable.Map()),
       query: item.get('filters', Immutable.List()).reduce(this.buildQuery, Immutable.Map()),
+      groupByFields: item.get('group_by_fields', Immutable.List()),
+      groupBy: item.get('group_by', Immutable.List()).reduce(this.buildGroupByQuery, Immutable.Map()),
     };
-    console.log('applyFilter: ', qeryObject);
+    console.log('applyFilter: ', query);
+    return query;
+  }
+
+  applyFilter = () => {
+    this.getReportData();
   }
 
   getTableFields = () => {
@@ -203,7 +233,7 @@ class ReportSetup extends Component {
 
   render() {
     const { progress } = this.state;
-    const { item, mode, linesFileds } = this.props;
+    const { item, mode, linesFileds, reportData } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -222,7 +252,7 @@ class ReportSetup extends Component {
             onFilter={this.applyFilter}
           />
 
-          { !allowEdit && <List items={Immutable.List()} fields={tableFields} className="report-list" /> }
+          <List items={reportData} fields={tableFields} className="report-list" />
           <div className="clearfix" />
           <hr className="mb0" />
           <Col sm={12}>
@@ -260,6 +290,7 @@ const mapStateToProps = (state, props) => ({
   item: itemSelector(state, props, 'reports'),
   mode: modeSimpleSelector(state, props, 'reports'),
   linesFileds: linesFiledsSelector(state, props, 'reports'),
+  reportData: state.entityList.items.get('reportData'),
 });
 
 export default withRouter(connect(mapStateToProps)(ReportSetup));
