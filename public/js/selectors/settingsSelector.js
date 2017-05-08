@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import { sentenceCase } from 'change-case';
 import { getFieldName, getConfig } from '../common/Util';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
@@ -76,15 +77,19 @@ const selectLinesFields = (customKeys) => {
       if (predefinedFiled.has('title')) {
         optionsWithMutations.push(predefinedFiled);
       } else {
-        optionsWithMutations.push(predefinedFiled.set('title', getFieldName(predefinedFiled.get('id', ''), 'lines')));
+        const fieldName = getFieldName(predefinedFiled.get('id', ''), 'lines');
+        const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
+        optionsWithMutations.push(predefinedFiled.set('title', title));
       }
     });
     // Set custom fields
     customKeys.forEach((customKey) => {
       if (predefinedFileds.findIndex(predefinedFiled => predefinedFiled.get('id', '') === customKey) === -1) {
+        const fieldName = getFieldName(customKey, 'lines');
+        const title = fieldName === customKey ? sentenceCase(fieldName) : fieldName;
         optionsWithMutations.push(Immutable.Map({
           id: customKey,
-          title: getFieldName(customKey, 'lines'),
+          title,
           filter: true,
           display: true,
         }));

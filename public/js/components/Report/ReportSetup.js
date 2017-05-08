@@ -237,12 +237,36 @@ class ReportSetup extends Component {
   }
 
   getTableFields = () => {
-    const { item } = this.props;
+    const { item, linesFileds } = this.props;
+    // const selectedFields = item.get('display', Immutable.List());
+    // return getConfig(['reports', 'fields', item.get('entity', '')], Immutable.List())
+    //   .filter(field => field.get('display', false))
+    //   .filter(field => selectedFields.includes(field.get('id', '')))
+    //   .toJS();
+
     const selectedFields = item.get('display', Immutable.List());
-    return getConfig(['reports', 'fields', item.get('entity', '')], Immutable.List())
-      .filter(field => field.get('display', false))
-      .filter(field => selectedFields.includes(field.get('id', '')))
-      .toJS();
+    const isGroupBy = !item.get('group_by_fields', Immutable.List()).isEmpty();
+    const configFields = linesFileds;
+    const groupByOperators = getConfig(['reports', 'groupByOperators'], Immutable.List());
+
+
+    return Immutable.List().withMutations((listWithMutations) => {
+      configFields.forEach((configField) => {
+        listWithMutations.push(configField);
+      });
+      if (isGroupBy) {
+        item.get('group_by', Immutable.List()).forEach((groupBy) => {
+          const field = configFields.find(conf => conf.get('id', '') === groupBy.get('field', ''), null, Immutable.Map());
+          const operator = groupByOperators.find(op => op.get('id', '') === groupBy.get('op', ''), null, Immutable.Map());
+          listWithMutations.push(Immutable.Map({
+            id: `${groupBy.get('field', '')}_${groupBy.get('op', '')}`,
+            title: `${field.get('title', '')} (${operator.get('title', groupBy.get('op', ''))})`,
+          }));
+        });
+      }
+    })
+    .filter(field => selectedFields.includes(field.get('id', '')))
+    .toJS();
   }
 
   onPageChange = (page) => {

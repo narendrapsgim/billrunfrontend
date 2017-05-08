@@ -124,7 +124,16 @@ export default class ReportDetails extends Component {
   }
 
   onChangeGroupByFields = (fields) => {
+    const { report } = this.props;
+    const isGroupByEmpty = report.get('group_by_fields', Immutable.List()).isEmpty();
     const groupByFields = (fields.length) ? fields.split(',') : [];
+    if (groupByFields.length === 0) {
+      this.onChangefilter('group_by', Immutable.List());
+    }
+    // Empty display values if group_by_fields was cleared or was init
+    if (isGroupByEmpty || groupByFields.length === 0) {
+      this.onChangefilter('display', Immutable.List());
+    }
     this.onChangefilter('group_by_fields', Immutable.List(groupByFields));
   }
 
@@ -382,15 +391,16 @@ export default class ReportDetails extends Component {
   }
 
   renderGroupByActions = () => {
-    const { mode } = this.props;
-    const disabled = mode === 'view';
-    if (disabled) {
+    const { mode, report } = this.props;
+    const isGroupBy = report.get('group_by_fields', Immutable.List()).isEmpty();
+    const disabled = mode === 'view' || isGroupBy;
+    if (mode === 'view') {
       return null;
     }
     return (
       <div style={{ height: 40 }}>
         <Button bsStyle="link" onClick={this.onGroupByAdd} className="pull-left" disabled={disabled} >
-          <i className="fa fa-plus" />&nbsp;Add Group By
+          <i className="fa fa-plus" />&nbsp;Add Group By Operator
         </Button>
       </div>
     );
@@ -435,14 +445,40 @@ export default class ReportDetails extends Component {
   }
 
   renderDisplayFieldsSelector = () => {
-    const { mode, report } = this.props;
+    const { mode, report, groupByOperators } = this.props;
     const isGroupBy = !report.get('group_by_fields', Immutable.List()).isEmpty();
-    const disabled = mode === 'view' || isGroupBy;
+    const fieldConfig = this.getEntityFields();
+    const disabled = mode === 'view';// || isGroupBy;
     const display = report.get('display', Immutable.List());
     const displayFieldsValues = display.join(',');
-    const options = this.getEntityFields()
+
+    let options = [];
+    if (isGroupBy) {
+      options = Immutable.List().withMutations((listWithMutations) => {
+        report.get('group_by_fields', Immutable.List()).forEach((groupByField) => {
+          const field = fieldConfig.find(conf => conf.get('id', '') === groupByField, null, Immutable.Map());
+          listWithMutations.push(Immutable.Map({
+            id: groupByField,
+            title: field.get('title', groupByField),
+          }));
+        });
+        report.get('group_by', Immutable.List()).forEach((groupBy) => {
+          const field = fieldConfig.find(conf => conf.get('id', '') === groupBy.get('field', ''), null, Immutable.Map());
+          const operator = groupByOperators.find(op => op.get('id', '') === groupBy.get('op', ''), null, Immutable.Map());
+          listWithMutations.push(Immutable.Map({
+            id: `${groupBy.get('field', '')}_${groupBy.get('op', '')}`,
+            title: `${field.get('title', '')} (${operator.get('title', groupBy.get('op', ''))})`,
+          }));
+        });
+      })
+      .map(parseConfigSelectOptions)
+      .toArray();
+    } else {
+      options = this.getEntityFields()
       .filter(field => field.get('display', true))
       .map(parseConfigSelectOptions).toArray();
+    }
+
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} sm={3}>
@@ -456,7 +492,6 @@ export default class ReportDetails extends Component {
             onChange={this.onChangeDisplayFields}
             disabled={disabled}
           />
-          { isGroupBy && <HelpBlock><Label bsStyle="warning">Display filed will be ovveriden by Group By</Label></HelpBlock>}
         </Col>
       </FormGroup>
     );
@@ -501,13 +536,17 @@ export default class ReportDetails extends Component {
       <div className="CustomFilter">
         <Form horizontal>
           <Col sm={12}>{ this.renderEntityName() }</Col>
+          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
           <Col sm={12}>{ this.renderEntitySelector() }</Col>
-          <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
+          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
           <Col sm={12}>{ filtersInputs }</Col>
           <Col sm={12}>{ this.renderFilterActions() }</Col>
+          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
           <Col sm={12}>{ this.renderGroupByFieldsSelector() }</Col>
           <Col sm={12}>{ groupByInputs }</Col>
           <Col sm={12}>{ this.renderGroupByActions() }</Col>
+          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
+          <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
         </Form>
       </div>
     );
