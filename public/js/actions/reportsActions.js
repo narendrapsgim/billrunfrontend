@@ -10,6 +10,8 @@ import {
 import {
   getList,
   clearItems,
+  setListPage,
+  setListSize,
 } from './entityListActions';
 
 export const setCloneReport = () => setCloneEntity('reports', 'report');
@@ -27,3 +29,7 @@ export const getReport = id => dispatch => dispatch(getEntity('reports', fetchRe
 export const getReportData = data => dispatch => dispatch(getList('reportData', getReportQuery(data)));
 
 export const clearReportData = () => dispatch => dispatch(clearItems('reportData'));
+
+export const setReportDataListPage = num => dispatch => dispatch(setListPage('reportData', num));
+
+export const setReportDataListSize = num => dispatch => dispatch(setListSize('reportData', num));

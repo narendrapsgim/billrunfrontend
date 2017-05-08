@@ -7,6 +7,7 @@ import { Panel, Col } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import ReportDetails from './ReportDetails';
 import List from '../List';
+import Pager from '../EntityList/Pager';
 import {
   buildPageTitle,
   getConfig,
@@ -23,6 +24,8 @@ import {
   setCloneReport,
   getReportData,
   clearReportData,
+  setReportDataListPage,
+  setReportDataListSize,
 } from '../../actions/reportsActions';
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
@@ -39,6 +42,9 @@ class ReportSetup extends Component {
     reportData: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     userName: PropTypes.string,
+    page: PropTypes.number,
+    nextPage: PropTypes.bool,
+    size: PropTypes.number,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -50,6 +56,9 @@ class ReportSetup extends Component {
     linesFileds: Immutable.List(),
     reportData: Immutable.List(),
     userName: 'Unknown',
+    page: 0,
+    size: getConfig(['list', 'defaultItems'], 10),
+    nextPage: false,
   }
 
   state = {
@@ -79,6 +88,14 @@ class ReportSetup extends Component {
     }
     if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { page, size } = this.props;
+    const { page: oldPage, size: oldiSize } = prevProps;
+    if (page !== oldPage || size !== oldiSize) {
+      this.getReportData();
     }
   }
 
@@ -124,8 +141,9 @@ class ReportSetup extends Component {
   }
 
   getReportData = () => {
+    const { size, page } = this.props;
     const query = this.buildReportQuery();
-    this.props.dispatch(getReportData(query));
+    this.props.dispatch(getReportData({ query, page, size }));
   }
 
   onChangeFieldValue = (path, value) => {
@@ -227,13 +245,22 @@ class ReportSetup extends Component {
       .toJS();
   }
 
+  onPageChange = (page) => {
+    this.props.dispatch(setReportDataListPage(page));
+  }
+
+  onSizeChange = (size) => {
+    this.props.dispatch(setReportDataListPage(0));
+    this.props.dispatch(setReportDataListSize(size));
+  }
+
   onReset = () => {
     this.fetchItem();
   }
 
   render() {
     const { progress } = this.state;
-    const { item, mode, linesFileds, reportData } = this.props;
+    const { item, mode, linesFileds, reportData, size, page, nextPage } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -253,6 +280,15 @@ class ReportSetup extends Component {
           />
 
           <List items={reportData} fields={tableFields} className="report-list" />
+          <Pager
+            page={page}
+            size={size}
+            count={reportData.size}
+            nextPage={nextPage}
+            onChangePage={this.onPageChange}
+            onChangeSize={this.onSizeChange}
+          />
+
           <div className="clearfix" />
           <hr className="mb0" />
           <Col sm={12}>
@@ -291,6 +327,9 @@ const mapStateToProps = (state, props) => ({
   mode: modeSimpleSelector(state, props, 'reports'),
   linesFileds: linesFiledsSelector(state, props, 'reports'),
   reportData: state.entityList.items.get('reportData'),
+  page: state.entityList.page.get('reportData'),
+  nextPage: state.entityList.nextPage.get('reportData'),
+  size: state.entityList.size.get('reportData'),
 });
 
 export default withRouter(connect(mapStateToProps)(ReportSetup));
