@@ -58,7 +58,7 @@ class PlanIncludeGroupCreate extends Component {
     name: {
       required: 'Group name is required',
       exist: 'Group name already exist',
-      allowedCharacters: 'Group name contains illegal characters, name should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+      allowedCharacters: 'Group name contains illegal characters, name should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
     },
     usage: {
       required: 'Usage type is required',
