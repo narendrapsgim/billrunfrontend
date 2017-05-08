@@ -48,6 +48,10 @@ class ReportSetup extends Component {
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    location: PropTypes.shape({
+      pathname: PropTypes.string,
+      query: PropTypes.object,
+    }),
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -178,6 +182,14 @@ class ReportSetup extends Component {
     }
   }
 
+  handleEdit = () => {
+    const { pathname, query } = this.props.location;
+    this.props.router.push({
+      pathname,
+      query: Object.assign({}, query, { action: 'update' }),
+    });
+  }
+
   handleBack = (itemWasChanged = false) => {
     const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
     if (itemWasChanged) {
@@ -294,14 +306,14 @@ class ReportSetup extends Component {
     return (
       <div className="report-setup">
         <Panel>
-          <ReportDetails
+          { allowEdit && <ReportDetails
             report={item}
             linesFileds={linesFileds}
             mode={mode}
             onUpdate={this.onChangeFieldValue}
             onReset={this.fetchItem}
             onFilter={this.applyFilter}
-          />
+          />}
 
           <List items={reportData} fields={tableFields} className="report-list" />
           <Pager
@@ -327,14 +339,22 @@ class ReportSetup extends Component {
               />
             </Col>
             <Col sm={6} className="text-right">
-              <ActionButtons
-                cancelLabel="Reset"
-                onClickCancel={this.onReset}
-                saveLabel="Search"
-                onClickSave={this.applyFilter}
-                disableSave={progress}
-                disableCancel={progress}
-              />
+              { allowEdit
+                ? <ActionButtons
+                  cancelLabel="Reset"
+                  onClickCancel={this.onReset}
+                  saveLabel="Search"
+                  onClickSave={this.applyFilter}
+                  disableSave={progress}
+                  disableCancel={progress}
+                />
+                : <ActionButtons
+                  saveLabel="Edit"
+                  onClickSave={this.handleEdit}
+                  hideCancel={true}
+                />
+              }
+
             </Col>
           </Col>
         </Panel>
