@@ -17,7 +17,7 @@ const FieldNames = {
     clid: 'Full Calling ID',
     dst: 'Destination extension',
     charging_type: 'Subscriber type',
-    aprice: 'Record charge',
+    aprice: 'Charge before taxes',
     log_stamp: 'File unique ID',
     file: 'File name',
     plan: "Subscriber's plan name",
@@ -53,6 +53,7 @@ const FieldNames = {
     billrun_pretend: 'Pretend?',
     request_num: 'Request number',
     granted_return_code: 'Return code',
+    final_charge: 'Total charge'
   },
 
   queue: {

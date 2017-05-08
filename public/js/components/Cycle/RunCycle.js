@@ -120,6 +120,10 @@ class RunCycle extends Component {
     if (cycleAdditionalData.get('cycle_status', '') !== 'running') {
       this.unsetAutoRefresh();
       this.setState({ autoRefreshRunning: false });
+      if (cycleAdditionalData.get('cycle_status', '') === 'finished') {
+        const { selectedCycleName } = this.state;
+        this.onChangeSelectedCycle(selectedCycleName);
+      }
       return;
     }
     this.reloadCycleData();
@@ -368,7 +372,7 @@ class RunCycle extends Component {
   renderRerunConfirmationModal = () => {
     const { showRerunConfirm, selectedCycle } = this.state;
     const confirmMessage = `Are you sure you want to re-run ${getCycleName(selectedCycle)}?`;
-    const warningMessage = 'Cycle data will be reset';
+    const warningMessage = 'Cycle data will be reset (except for confirmed invoices)';
     return (
       <ConfirmModal onOk={this.onRerunOk} onCancel={this.onRerunCancel} show={showRerunConfirm} message={confirmMessage} labelOk="Yes">
         <FormGroup validationState="error">

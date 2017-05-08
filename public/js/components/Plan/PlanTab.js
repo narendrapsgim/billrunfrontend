@@ -24,7 +24,7 @@ export default class Plan extends Component {
   static defaultProps = {
     errorMessages: {
       name: {
-        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
       },
     },
   };

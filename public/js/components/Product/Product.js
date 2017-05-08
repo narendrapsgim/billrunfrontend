@@ -33,7 +33,7 @@ export default class Product extends Component {
     product: Immutable.Map(),
     errorMessages: {
       name: {
-        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
       },
     },
   };
@@ -229,7 +229,7 @@ export default class Product extends Component {
   render() {
     const { errors } = this.state;
     const { product, usaget, mode } = this.props;
-    const vatable = (product.get('vatable', false) === true);
+    const vatable = (product.get('vatable', true) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
     const pricingMethod = product.get('pricing_method', 'tiered');
     const availablePrefix = [];

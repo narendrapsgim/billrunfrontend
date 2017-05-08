@@ -42,6 +42,7 @@ class CustomersList extends Component {
         id: field.get('field_name'),
         placeholder: field.get('title', field.get('field_name')),
         sort: true,
+        type: field.get('field_name') === 'aid' ? 'number' : 'text',
       }))
       .toJS();
     fields.push({ id: 'to', placeholder: 'To', showFilter: false, display: false, type: 'datetime' });
