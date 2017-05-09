@@ -47,7 +47,7 @@ var globalSetting = {
       ],
     },
     operators: [
-      { id: 'equals', title: '==', types: ['string', 'number', 'boolean', 'date'] }, // 'Equals'
+      { id: 'eq', title: '==', types: ['string', 'number', 'boolean', 'date'] }, // 'Equals'
       { id: 'ne', title: '!=', types: ['string', 'number', 'boolean', 'date'] }, // 'Not equals'
       { id: 'lt', title: '<', types: ['number', 'date'] }, // 'Less than'
       { id: 'lte', title: '<=', types: ['number', 'date'] }, // 'Less than or equals'

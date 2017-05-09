@@ -208,19 +208,22 @@ class ReportSetup extends Component {
     return true;
   }
 
-  buildQuery = (acc, val) => {
-    const op = val.get('op');
-    switch (op) {
-      case 'equals':
-        return acc.set(val.get('field'), val.get('value'));
-      default: {
-        const value = Immutable.Map({
-          [`$${op}`]: val.get('value'),
-        });
-        return acc.set(val.get('field'), value);
-      }
-    }
-  }
+  filterQuery = val => [
+    val.get('op', ''),
+    val.get('field', ''),
+    val.get('value', ''),
+  ].every(param => param !== '');
+
+  filterGroupBy = val => [
+    val.get('op', ''),
+    val.get('field', ''),
+  ].every(param => param !== '');
+
+  buildQuery = (acc, val) => acc.push(Immutable.Map({
+    [val.get('field', '')]: Immutable.Map({
+      [`$${val.get('op', '')}`]: val.get('value', ''),
+    }),
+  }));
 
   buildGroupByQuery = (acc, val) => {
     const op = val.get('op');
@@ -236,9 +239,13 @@ class ReportSetup extends Component {
     const query = {
       collection: item.get('entity', ''),
       project: item.get('display', Immutable.List()).reduce((acc, val) => acc.set(val, 1), Immutable.Map()),
-      query: item.get('filters', Immutable.List()).reduce(this.buildQuery, Immutable.Map()),
+      query: item.get('filters', Immutable.List())
+        .filter(this.filterQuery)
+        .reduce(this.buildQuery, Immutable.List()),
       groupByFields: item.get('group_by_fields', Immutable.List()),
-      groupBy: item.get('group_by', Immutable.List()).reduce(this.buildGroupByQuery, Immutable.Map()),
+      groupBy: item.get('group_by', Immutable.List())
+        .filter(this.filterGroupBy)
+        .reduce(this.buildGroupByQuery, Immutable.Map()),
     };
     console.log('applyFilter: ', query);
     return query;
