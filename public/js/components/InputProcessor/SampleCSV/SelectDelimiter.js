@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import Select from 'react-select';
 import { connect } from 'react-redux';
 
 export default connect()(class SelectDelimiter extends Component {
@@ -6,10 +7,18 @@ export default connect()(class SelectDelimiter extends Component {
     super(props);
   }
 
+  onChangeDelimiter = (value) => {
+    this.props.onChangeDelimiter({ target: { value } });
+  }
+
+  delimiterOptions = [
+    { value: '	', label: 'tab' }, // eslint-disable-line no-tabs
+    { value: ' ', label: 'space' },
+  ];
+
   render() {
     const { settings,
-            onSetDelimiterType,
-            onChangeDelimiter } = this.props;
+            onSetDelimiterType } = this.props;
 
     return (
       <div className="form-group">
@@ -29,14 +38,16 @@ export default connect()(class SelectDelimiter extends Component {
                        onChange={onSetDelimiterType}
                        checked={settings.get('delimiter_type', '') === "separator"} /><small>&nbsp;By delimiter</small>
               </div>
-              <input id="separator"
-                     className="form-control"
-                     type="text"
-                     maxLength="1"
-                     disabled={!settings.get('file_type', '') || settings.get('delimiter_type', '') !== "separator"}
-                     style={{width: 35}}
-                     onChange={onChangeDelimiter}
-                     value={settings.get('delimiter', '')} />
+              <Select
+                id="separator"
+                className="delimiter-select"
+                allowCreate
+                disabled={!settings.get('file_type', '') || settings.get('delimiter_type', '') !== 'separator'}
+                onChange={this.onChangeDelimiter}
+                options={this.delimiterOptions}
+                value={settings.get('delimiter', '')}
+                placeholder="Select or Write..."
+              />
             </div>
           </div>
           <div className="col-lg-3" style={{marginTop: 10}}>

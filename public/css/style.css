@@ -464,3 +464,7 @@ ul.revision-history-list li.active .cycle {
 #move-entity .nav-pills>li+li {
      margin-left: 0;
 }
+
+.delimiter-select {
+  width: 150px;
+}
