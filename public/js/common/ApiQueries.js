@@ -486,7 +486,7 @@ export const getConfirmationOperationInvoiceQuery = invoiceId => ({
   ],
 });
 
-export const getReportQuery = ({ query, page, size }) => ({
+export const getReportQuery = ({ query, page = 0, size = 10 }) => ({
   api: 'report',
   params: [
     { action: 'generateReport' },

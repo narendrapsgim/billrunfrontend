@@ -221,7 +221,7 @@ class ReportSetup extends Component {
 
   buildQuery = (acc, val) => acc.push(Immutable.Map({
     [val.get('field', '')]: Immutable.Map({
-      [`$${val.get('op', '')}`]: val.get('value', ''),
+      [`${val.get('op', '')}`]: val.get('value', ''),
     }),
   }));
 
@@ -229,7 +229,7 @@ class ReportSetup extends Component {
     const op = val.get('op');
     const field = val.get('field');
     const value = Immutable.Map({
-      [`$${op}`]: field,
+      [`${op}`]: field,
     });
     return acc.set(`${field}_${op}`, value);
   }
@@ -269,7 +269,7 @@ class ReportSetup extends Component {
     const groupByOperators = getConfig(['reports', 'groupByOperators'], Immutable.List());
 
 
-    return Immutable.List().withMutations((listWithMutations) => {
+    const allFieldsConfig = Immutable.List().withMutations((listWithMutations) => {
       configFields.forEach((configField) => {
         listWithMutations.push(configField);
       });
@@ -283,8 +283,18 @@ class ReportSetup extends Component {
           }));
         });
       }
+    });
+
+    return Immutable.List().withMutations((listWithMutations) => {
+      selectedFields.forEach((selectedField) => {
+        const field = allFieldsConfig.find(
+          configField => configField.get('id', '') === selectedField,
+        );
+        if (field) {
+          listWithMutations.push(field);
+        }
+      });
     })
-    .filter(field => selectedFields.includes(field.get('id', '')))
     .toJS();
   }
 

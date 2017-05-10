@@ -61,13 +61,14 @@ var globalSetting = {
     ],
     groupByOperators: [
       { id: 'sum', title: 'Sum', types: ['number'] },
-      { id: 'avg', title: 'Sverage', types: ['number'] },
+      { id: 'avg', title: 'Average', types: ['number'] },
       { id: 'first', title: 'First', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'last', title: 'Last', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'max', title: 'Max', types: ['number', 'date'] },
       { id: 'min', title: 'Min', types: ['number', 'date'] },
       { id: 'push', title: 'List', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'addToSet', title: 'Unique List', types: ['string', 'number', 'boolean', 'date'] },
+      { id: 'count', title: 'Count', types: ['string', 'number', 'boolean', 'date'] },
     ],
   },
   systemItems: {

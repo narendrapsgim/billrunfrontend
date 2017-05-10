@@ -88,8 +88,8 @@ const selectLinesFields = (customKeys) => {
         const fieldName = getFieldName(customKey, 'lines');
         const title = fieldName === customKey ? sentenceCase(fieldName) : fieldName;
         optionsWithMutations.push(Immutable.Map({
-          id: customKey,
-          title,
+          id: `uf.${customKey}`,
+          title: `${title} (CF)`,
           filter: true,
           display: true,
         }));

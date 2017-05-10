@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { Form, Button, FormGroup, Col, ControlLabel, HelpBlock, Label } from 'react-bootstrap';
+import { Form, Button, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
 import Select from 'react-select';
@@ -89,6 +89,7 @@ export default class ReportDetails extends Component {
 
   onChangeBroupByField = (idx, value) => {
     const { report } = this.props;
+    this.removeDisplayOnGroupByChange(idx);
     const groupBy = report
       .get('group_by', Immutable.List())
       .setIn([idx, 'field'], value)
@@ -98,6 +99,7 @@ export default class ReportDetails extends Component {
 
   onChangeGroupByOperator = (idx, value) => {
     const { report } = this.props;
+    this.removeDisplayOnGroupByChange(idx);
     const groupBy = report
       .get('group_by', Immutable.List())
       .setIn([idx, 'op'], value);
@@ -106,10 +108,20 @@ export default class ReportDetails extends Component {
 
   onGroupByRemove = (index) => {
     const { report } = this.props;
+    this.removeDisplayOnGroupByChange(index);
     const groupBy = report
       .get('group_by', Immutable.List())
       .delete(index);
     this.onChangefilter('group_by', groupBy);
+  }
+
+  removeDisplayOnGroupByChange = (index) => {
+    const { report } = this.props;
+    const groupByField = report.getIn(['group_by', index], Immutable.Map());
+    const groupByFieldLabel = `${groupByField.get('field', '')}_${groupByField.get('op', '')}`;
+    const displayFields = report.get('display', Immutable.List())
+      .filter(display => display !== groupByFieldLabel);
+    this.onChangefilter('display', displayFields);
   }
 
   onGroupByAdd = () => {
@@ -463,12 +475,14 @@ export default class ReportDetails extends Component {
           }));
         });
         report.get('group_by', Immutable.List()).forEach((groupBy) => {
-          const field = fieldConfig.find(conf => conf.get('id', '') === groupBy.get('field', ''), null, Immutable.Map());
-          const operator = groupByOperators.find(op => op.get('id', '') === groupBy.get('op', ''), null, Immutable.Map());
-          listWithMutations.push(Immutable.Map({
-            id: `${groupBy.get('field', '')}_${groupBy.get('op', '')}`,
-            title: `${field.get('title', '')} (${operator.get('title', groupBy.get('op', ''))})`,
-          }));
+          if (groupBy.get('field', '') !== '' && groupBy.get('op', '') !== '') {
+            const field = fieldConfig.find(conf => conf.get('id', '') === groupBy.get('field', ''), null, Immutable.Map());
+            const operator = groupByOperators.find(op => op.get('id', '') === groupBy.get('op', ''), null, Immutable.Map());
+            listWithMutations.push(Immutable.Map({
+              id: `${groupBy.get('field', '')}_${groupBy.get('op', '')}`,
+              title: `${field.get('title', '')} (${operator.get('title', groupBy.get('op', ''))})`,
+            }));
+          }
         });
       })
       .map(parseConfigSelectOptions)
