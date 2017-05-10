@@ -3,11 +3,13 @@ import { Route, IndexRoute, IndexRedirect } from 'react-router';
 
 import RequireAuth from '../containers/Authentication';
 import App from '../containers/App';
-import CommercialDashboard from '../components/Dashboard/CommercialDashboard';
-import CustomersDashboard from '../components/Dashboard/CustomersDashboard';
-import OverviewDashboard from '../components/Dashboard/OverviewDashboard';
+import {
+  RevenueDashboard,
+  OverviewDashboard,
+  CustomersDashboard,
+  CommercialDashboard,
+} from '../components/Dashboard';
 import FakeDataDashboard from '../components/Dashboard/FakeDataDashboard';
-import RevenueDashboard from '../components/Dashboard/RevenueDashboard';
 import LoginPage from '../components/LoginPage';
 import WelcomePage from '../components/WelcomePage';
 import PageNotFound from '../components/PageNotFound';
@@ -55,7 +57,7 @@ const routes = () => (
       <Route path="revenue" component={RequireAuth(RevenueDashboard)} title="Revenue Dashboard" />
       <Route path="commercial" component={RequireAuth(CommercialDashboard)} title="Commercial Dashboard" />
       <Route path="customers" component={RequireAuth(CustomersDashboard)} title="Customers Dashboard" />
-      <Route path="fake" component={RequireAuth(FakeDataDashboard)} title="Customers Dashboard" />
+      <Route path="demo" component={RequireAuth(FakeDataDashboard)} title="Demo Dashboard" />
       <IndexRedirect to="overview" />
     </Route>
 

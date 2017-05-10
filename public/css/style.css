@@ -467,8 +467,16 @@ ul.revision-history-list li.active .cycle {
 }
 
 /* Chart */
+.dashboard-chart-wrapper {
+  height: 280px;
+  overflow: hidden;
+}
 .doughnut-wrapper {
   position: relative;
+  height: 230px;
+}
+.chart-doughnut-details .details{
+  margin-top: -10px;
 }
 .doughnut-message {
   position: absolute;
@@ -477,12 +485,9 @@ ul.revision-history-list li.active .cycle {
   top: 50%;
   transform: translate(-50%,-50%);
 }
-.doughnut-legend {
 
-}
-
-.dashboard-chart-wrapper {
-  height: 280px;
+.percentBarChart {
+  margin: 0 10px;
 }
 
 .percentBarChart .marker {
@@ -524,7 +529,40 @@ ul.revision-history-list li.active .cycle {
   padding: 1px 4px;
   margin-right: 3px;
 }
+.percentBarChart .details {
+  position: relative;
+  height: 120px;
+  margin-top: 50px;
+}
+.chart-doughnut-details .details {
+  position: relative;
+}
+.percentBarChart .details-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+.percentBarChart .details-left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+.chart-doughnut-details .details-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-top: -15px;
+}
+.chart-doughnut-details .details-left  {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #7C7C7C;
+  margin-top: 0;
+}
 .percentBarChart .value {
   color: #7C7C7C;
+  margin-top: 25px;
+  margin-bottom: 25px;
 }
 /* ~Chart */

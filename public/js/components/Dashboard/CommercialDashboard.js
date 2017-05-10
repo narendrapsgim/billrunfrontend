@@ -1,13 +1,19 @@
 import React, { PropTypes } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Panel } from 'react-bootstrap';
 import moment from 'moment';
 import DashboardBase from './DashboardBase';
-
+import {
+  PlanByCustomers,
+} from './Widgets';
 
 const CommercialDashboard = ({ fromDate, toDate, currency }) => (
   <Row>
-    <Col lg={6}>
-      <p>&nbsp;</p>
+    <Col sm={5} lg={3}>
+      <Panel header="Plan By Subscribers">
+        <div className="dashboard-chart-wrapper">
+          <PlanByCustomers />
+        </div>
+      </Panel>
     </Col>
   </Row>
 );

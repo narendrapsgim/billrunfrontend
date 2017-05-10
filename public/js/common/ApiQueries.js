@@ -1,11 +1,12 @@
+import moment from 'moment';
+
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
-export const searchProductsByKeyAndUsagetQuery = (usaget, key, notKeys) => {
+export const searchProductsByKeyAndUsagetQuery = (usaget, notKeys) => {
   const query = {
     key: {
-      $nin: notKeys,
-      $regex: key,
-      $options: 'i',
+      $nin: [...notKeys, ''], // don't get broken products with empty key
     },
+    to: { $gt: moment().toISOString() }, // only active and future
   };
   if (usaget !== 'cost') {
     query[`rates.${usaget}`] = { $exists: true };
@@ -14,8 +15,8 @@ export const searchProductsByKeyAndUsagetQuery = (usaget, key, notKeys) => {
     api: 'find',
     params: [
       { collection: 'rates' },
-      { size: '20' },
-      { page: '0' },
+      { size: 99999 },
+      { page: 0 },
       { project: JSON.stringify({ key: 1 }) },
       { query: JSON.stringify(query) },
     ],
@@ -266,7 +267,7 @@ export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans',
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
-export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
+export const getProductsKeysQuery = (project = { key: 1 }) => getEntitesQuery('rates', project);
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
 export const getPlansKeysQuery = () => getEntitesQuery('plans', { name: 1 });
 export const getUserKeysQuery = () => getEntitesQuery('users', { username: 1 });
@@ -485,21 +486,10 @@ export const getConfirmationOperationInvoiceQuery = invoiceId => ({
 });
 
 // Dashboard reports queries
-
-const getDashboardQuery = action => ({
+export const getDashboardQuery = action => ({
   api: 'reports',
   params: [
     { action },
   ],
 });
-
-export const getTotalRevenueQuery = () => getDashboardQuery('totalRevenue');
-export const getOutstandingDebtQuery = () => getDashboardQuery('outstandingDebt');
-export const getTotalNumOfCustomersQuery = () => getDashboardQuery('totalNumOfCustomers');
-export const getCustomerStateDistributionQuery = () => getDashboardQuery('customerStateDistribution');
-export const getRevenueOverTimeQuery = () => getDashboardQuery('revenueOverTime');
-export const getRevenueByPlanQuery = () => getDashboardQuery('revenueByPlan');
-export const getAgingDebtQuery = () => getDashboardQuery('agingDebt');
-export const getDebtOverTimeQuery = () => getDashboardQuery('debtOverTime');
-
 // Dashboard reports queries - end

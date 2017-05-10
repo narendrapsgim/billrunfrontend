@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Immutable from 'immutable';
 import { Line } from 'react-chartjs-2';
 import { palitra, trend } from './helpers';
 
@@ -8,16 +9,13 @@ export default class LineChart extends Component {
   static propTypes = {
     width: PropTypes.number,
     height: PropTypes.number,
-    data: PropTypes.oneOfType([
-      PropTypes.object,
-      null,
-    ]),
+    data: PropTypes.instanceOf(Immutable.Map),
     options: PropTypes.object,
   };
 
   static defaultProps = {
     options: {},
-    data: null,
+    data: Immutable.Map(),
   };
 
   getOptions = () => {
@@ -25,11 +23,11 @@ export default class LineChart extends Component {
     const defaultOptions = {
       responsive: true,
       title: {
-        display: (typeof data.title !== 'undefined'),
-        text: data.title,
+        display: (data.get('title', null) !== null),
+        text: data.get('title', ''),
       },
       legend: {
-        display: (data.x.length > 1),
+        display: (data.get('x', Immutable.List()).size > 1),
         position: 'bottom',
         boxWidth: 20,
       },
@@ -93,32 +91,33 @@ export default class LineChart extends Component {
 
   prepareData = () => {
     const { data } = this.props;
-    const linesCount = data.x.length;
-    const chartData = {};
-    chartData.labels = data.y || Array.from(new Array(data.x[0].values.length), (x, i) => i + 1);
-    chartData.datasets = data.x.map((x, i) => {
-      const direction = x.values[x.values.length - 1] - x.values[0];
-      return {
-        label: x.label,
-        data: x.values,
-        fill: false,
-        // hidden: true,
-        // borderDash: [5, 5],
-        lineTension: 0, // line angel
-        borderColor: linesCount === 1 ? trend(direction) : palitra(i),
-        backgroundColor: linesCount === 1 ? trend(direction) : palitra(i),
-        pointBackgroundColor: linesCount === 1 ? trend(direction) : palitra(i),
-        pointBorderColor: linesCount === 1 ? trend(direction) : palitra(i),
-        pointHoverBorderColor: linesCount === 1 ? trend(direction, 'dark') : palitra(i, 'dark'),
-        pointHoverBackgroundColor: 'white',
-      };
-    });
-    return chartData;
+    const linesCount = data.get('x', Immutable.List()).size;
+    const valuesCount = data.getIn(['x', 0, 'values'], Immutable.List()).size;
+    const labels = data.get('y', Immutable.List(Array.from(new Array(valuesCount), (x, i) => i + 1)));
+    return {
+      labels: labels.toArray(),
+      datasets: data.get('x', Immutable.List()).map((dataset, i) => {
+        const direction = dataset.get('values', Immutable.List()).last() - dataset.get('values', Immutable.List()).first();
+        return {
+          label: dataset.get('label', ''),
+          data: dataset.get('values', Immutable.List()).toArray(),
+          fill: false,
+          // hidden: true,
+          // borderDash: [5, 5],
+          lineTension: 0, // line angel
+          borderColor: linesCount === 1 ? trend(direction) : palitra(i),
+          backgroundColor: linesCount === 1 ? trend(direction) : palitra(i),
+          pointBackgroundColor: linesCount === 1 ? trend(direction) : palitra(i),
+          pointBorderColor: linesCount === 1 ? trend(direction) : palitra(i),
+          pointHoverBorderColor: linesCount === 1 ? trend(direction, 'dark') : palitra(i, 'dark'),
+          pointHoverBackgroundColor: 'white',
+        };
+      }).toArray(),
+    };
   }
 
   render() {
-    const { width, height, data } = this.props;
-    if (!data || !data.x || !data.y) return null;
+    const { width, height } = this.props;
     return (
       <Line
         data={this.prepareData()}

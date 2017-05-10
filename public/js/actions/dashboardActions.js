@@ -1,16 +1,7 @@
 import moment from 'moment';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun } from '../common/Api';
-import {
-  getTotalRevenueQuery,
-  getOutstandingDebtQuery,
-  getTotalNumOfCustomersQuery,
-  getCustomerStateDistributionQuery,
-  getRevenueOverTimeQuery,
-  getRevenueByPlanQuery,
-  getAgingDebtQuery,
-  getDebtOverTimeQuery,
-} from '../common/ApiQueries';
+import { getDashboardQuery } from '../common/ApiQueries';
 
 export const GOT_DATA = 'GOT_DATA';
 export const GOT_DATA_ERROR = 'GOT_DATA_ERROR';
@@ -38,10 +29,11 @@ export const getData = (chartId, query) => {
     dispatch(startProgressIndicator());
     apiBillRun(query)
       .then((success) => {
-        dispatch(gotData(chartId, success.data));
+        const data = success.data[0].data.details;
+        dispatch(gotData(chartId, data));
         const newCache = JSON.stringify({
           time: moment(),
-          data: success.data,
+          data,
         });
         localStorage.setItem(cacheKey, newCache);
         dispatch(finishProgressIndicator());
@@ -55,25 +47,28 @@ export const getData = (chartId, query) => {
 };
 
 export const getTotalRevenue = key =>
-  getData(key, getTotalRevenueQuery());
+  getData(key, getDashboardQuery('totalRevenue'));
 
 export const getOutstandingDebt = key =>
-  getData(key, getOutstandingDebtQuery());
+  getData(key, getDashboardQuery('outstandingDebt'));
 
 export const getTotalNumOfCustomers = key =>
-  getData(key, getTotalNumOfCustomersQuery());
+  getData(key, getDashboardQuery('totalNumOfCustomers'));
 
 export const getCustomerStateDistribution = key =>
-  getData(key, getCustomerStateDistributionQuery());
+  getData(key, getDashboardQuery('customerStateDistribution'));
 
 export const getRevenueOverTime = key =>
-  getData(key, getRevenueOverTimeQuery());
+  getData(key, getDashboardQuery('revenueOverTime'));
 
 export const getRevenueByPlan = key =>
-  getData(key, getRevenueByPlanQuery());
+  getData(key, getDashboardQuery('revenueByPlan'));
 
 export const getAgingDebt = key =>
-  getData(key, getAgingDebtQuery());
+  getData(key, getDashboardQuery('agingDebt'));
 
 export const getDebtOverTime = key =>
-  getData(key, getDebtOverTimeQuery());
+  getData(key, getDashboardQuery('debtOverTime'));
+
+export const getPlanByCustomers = key =>
+  getData(key, getDashboardQuery('planByCustomers'));

@@ -9,66 +9,66 @@ export default class ProductSearchByUsagetype extends Component {
 
   static defaultProps = {
     disabled: false,
+    existingProducts: Immutable.List(),
     products: Immutable.List(),
   }
 
   static propTypes = {
-    addRatesToGroup: React.PropTypes.func.isRequired,
+    onChangeGroupRates: React.PropTypes.func.isRequired,
     usaget: React.PropTypes.string.isRequired,
     disabled: React.PropTypes.bool,
+    existingProducts: React.PropTypes.instanceOf(Immutable.List),
     products: React.PropTypes.instanceOf(Immutable.List),
   }
 
-  state = { val: null };
-
-  shouldComponentUpdate(nextProps, nextState) {
-    const { disabled, usaget, products } = this.props;
-    const { val } = this.state;
-
+  shouldComponentUpdate(nextProps) {
+    const { disabled, usaget, existingProducts, products } = this.props;
     return (nextProps.disabled !== disabled
           || nextProps.usaget !== usaget
-          || !Immutable.is(nextProps.products, products)
-          || nextState.val !== val
+          || !Immutable.is(nextProps.existingProducts, existingProducts)
+          || nextProps.products !== products
     );
   }
 
-  addRatesToGroup = (productKey) => {
-    if (productKey) {
-      this.props.addRatesToGroup(productKey);
-    }
-    this.setState({ val: '' });
+  onChangeGroupRates = (productKeys) => {
+    const productKeysList = (productKeys.length) ? productKeys.split(',') : [];
+    this.props.onChangeGroupRates(Immutable.List(productKeysList));
   }
 
-  findGroupRates = (input) => {
-    if (input && input.length) {
-      const { usaget, products } = this.props;
-      const key = input.toLowerCase();
-      const notKeys = products.toArray();
-      const query = searchProductsByKeyAndUsagetQuery(usaget, key, notKeys);
-      return apiBillRun(query)
-      .then(success => ({ options: success.data[0].data.details }))
+  findGroupRates = () => {
+    const { usaget, existingProducts } = this.props;
+    const notKeys = existingProducts.toArray();
+    const query = searchProductsByKeyAndUsagetQuery(usaget, notKeys);
+    return apiBillRun(query)
+      .then((success) => {
+        const uniqueKeys = [...new Set(success.data[0].data.details.map(option => option.key))];
+        return ({
+          options: uniqueKeys.map(key => ({
+            value: key,
+            label: key,
+          })),
+          complete: true,
+        });
+      })
       .catch(() => ({ options: [] }));
-    }
-    return Promise.resolve({ options: [] });
   }
 
   render() {
-    const { disabled, usaget } = this.props;
-    const { val } = this.state;
+    const { disabled, usaget, products } = this.props;
     if (typeof usaget === 'undefined') {
       return null;
     }
+    const product = products.join(',');
     return (
       <Select
-        value={val}
-        onChange={this.addRatesToGroup}
+        value={product}
+        onChange={this.onChangeGroupRates}
         asyncOptions={this.findGroupRates}
-        cacheAsyncResults={false}
+        cacheAsyncResults={true}
+        autoload={true}
+        multi={true}
         searchable={true}
-        autoload={false}
         disabled={disabled}
-        valueKey="key"
-        labelKey="key"
         placeholder="Add product..."
         noResultsText="No products found."
         searchPromptText="Type product key to search"
