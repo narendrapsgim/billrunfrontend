@@ -43,7 +43,7 @@ export default class FieldsMapping extends Component {
     this.setState({pattern: e.target.value});
   }
 
-  onChangeUsaget(val) {
+  changeUsaget(val, setStaticUsaget) {
     const { usageTypes } = this.props;
 
     const found = usageTypes.find(usaget => (usaget === val));
@@ -53,18 +53,26 @@ export default class FieldsMapping extends Component {
         (response) => {
           if (response.status) {
             this.setState({ usaget: val });
-            this.props.onSetStaticUsaget(val);
+            if (setStaticUsaget) {
+              this.props.onSetStaticUsaget(val);
+            }
           }
         }
       );
     } else {
       this.setState({ usaget: val });
-      this.props.onSetStaticUsaget(val);
+      if (setStaticUsaget) {
+        this.props.onSetStaticUsaget(val);
+      }
     }
   }
 
+  onChangeUsaget(val) {
+    this.changeUsaget(val, false);
+  }
+
   onChangeStaticUsaget(usaget) {
-    this.onChangeUsaget(usaget);
+    this.changeUsaget(usaget, true);
   }
 
   addUsagetMapping(e) {
@@ -113,6 +121,8 @@ export default class FieldsMapping extends Component {
     const available_units = usageTypes.map((usaget, key) => {
       return {value: usaget, label: usaget};
     }).toJS();
+
+    const defaultUsaget = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_usaget'], '')
 
     return (
       <form className="form-horizontal FieldsMapping">
@@ -201,7 +211,7 @@ export default class FieldsMapping extends Component {
                   id="unit"
                   options={available_units}
                   allowCreate={true}
-                  value={settings.getIn(['processor', 'default_usaget'], '')}
+                  value={defaultUsaget}
                   disabled={settings.get('usaget_type', '') !== "static"}
                   style={{marginTop: 3}}
                   onChange={this.onChangeStaticUsaget}
