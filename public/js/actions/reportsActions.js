@@ -1,4 +1,8 @@
-import { fetchReportByIdQuery, getReportQuery } from '../common/ApiQueries';
+import {
+  fetchReportByIdQuery,
+  getReportQuery,
+  getCyclesQuery,
+ } from '../common/ApiQueries';
 import {
   saveEntity,
   getEntity,
@@ -8,11 +12,14 @@ import {
   setCloneEntity,
 } from './entityActions';
 import {
-  getList,
+  getList as getEntityList,
   clearItems,
   setListPage,
   setListSize,
 } from './entityListActions';
+import {
+  getList,
+} from './listActions';
 
 export const setCloneReport = () => setCloneEntity('reports', 'report');
 
@@ -26,10 +33,12 @@ export const deleteReportValue = path => deleteEntityField('reports', path);
 
 export const getReport = id => dispatch => dispatch(getEntity('reports', fetchReportByIdQuery(id)));
 
-export const getReportData = data => dispatch => dispatch(getList('reportData', getReportQuery(data)));
+export const getReportData = data => dispatch => dispatch(getEntityList('reportData', getReportQuery(data)));
 
 export const clearReportData = () => dispatch => dispatch(clearItems('reportData'));
 
 export const setReportDataListPage = num => dispatch => dispatch(setListPage('reportData', num));
 
 export const setReportDataListSize = num => dispatch => dispatch(setListSize('reportData', num));
+
+export const getCyclesOptions = () => dispatch => dispatch(getList('cycles_list', getCyclesQuery()));
