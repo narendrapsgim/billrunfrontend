@@ -12,8 +12,8 @@ export default connect()(class SelectDelimiter extends Component {
   }
 
   delimiterOptions = [
-    { value: '	', label: 'tab' }, // eslint-disable-line no-tabs
-    { value: ' ', label: 'space' },
+    { value: '	', label: 'Tab' }, // eslint-disable-line no-tabs
+    { value: ' ', label: 'Space' },
   ];
 
   render() {
@@ -46,7 +46,8 @@ export default connect()(class SelectDelimiter extends Component {
                 onChange={this.onChangeDelimiter}
                 options={this.delimiterOptions}
                 value={settings.get('delimiter', '')}
-                placeholder="Select or Write..."
+                placeholder="Select or type..."
+                addLabelText="{label}"
               />
             </div>
           </div>
