@@ -109,7 +109,19 @@ export default class FieldsMapping extends Component {
     this.setState({separateTime: !this.state.separateTime});
   };
 
+  onChangeVolume = (volumes) => {
+    const volumesList = (volumes.length) ? volumes.split(',') : [];
+    const e = {
+      target: {
+        value: Immutable.List(volumesList),
+        id: 'volume_field',
+      },
+    };
+    this.props.onSetFieldMapping(e);
+  }
+
   render() {
+    const { separateTime } = this.state;
     const { settings,
             usageTypes,
             onSetFieldMapping } = this.props;
@@ -123,6 +135,12 @@ export default class FieldsMapping extends Component {
     }).toJS();
 
     const defaultUsaget = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_usaget'], '')
+    const volumeOptions = settings.get('fields', Immutable.List()).map(field => ({
+      label: field,
+      value: field,
+    })).toArray();
+    const volume = settings.getIn(['processor', 'volume_field'], Immutable.List());
+    const volumeList = (typeof volume === 'string') ? volume : volume.join(',');
 
     return (
       <form className="form-horizontal FieldsMapping">
@@ -151,7 +169,7 @@ export default class FieldsMapping extends Component {
               <div className="input-group">
                 <div className="input-group-addon">
                   <input type="checkbox"
-                         checked={this.state.separateTime}
+                         checked={separateTime}
                          onChange={this.onChangeSeparateTime}
                   />
                   <small style={{ verticalAlign: 'bottom' }}>&nbsp;Time in separate field</small>
@@ -159,7 +177,7 @@ export default class FieldsMapping extends Component {
                 <select id="time_field"
                         className="form-control"
                         onChange={onSetFieldMapping}
-                        disabled={!this.state.separateTime}
+                        disabled={!separateTime}
                         value={settings.getIn(['processor', 'time_field'], '')}>
                   { available_fields }
                 </select>
@@ -178,12 +196,13 @@ export default class FieldsMapping extends Component {
               <i className="fa fa-long-arrow-right"></i>
             </div>
             <div className="col-lg-9">
-              <select id="volume_field"
-                      className="form-control"
-                      onChange={onSetFieldMapping}
-                      value={settings.getIn(['processor', 'volume_field'], '')}>
-                { available_fields }
-              </select>
+              <Select
+                inputProps={{ id: 'volume_field' }}
+                multi={true}
+                value={volumeList}
+                options={volumeOptions}
+                onChange={this.onChangeVolume}
+              />
             </div>
           </div>
         </div>
