@@ -155,6 +155,7 @@ class RunCycle extends Component {
   }
 
   runCycle = (rerun = false) => {
+    this.props.dispatch(clearItems('billruns'));
     const { selectedCycle } = this.state;
     this.props.dispatch(runBillingCycle(selectedCycle.get('billrun_key', ''), rerun))
     .then(
