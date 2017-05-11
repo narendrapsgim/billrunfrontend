@@ -79,7 +79,7 @@ const selectLinesFields = (customKeys) => {
       } else {
         const fieldName = getFieldName(predefinedFiled.get('id', ''), 'lines');
         const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
-        optionsWithMutations.push(predefinedFiled.set('title', title));
+        optionsWithMutations.push(predefinedFiled.set('title', `${title} (BillRun field)`));
       }
     });
     // Set custom fields
@@ -89,7 +89,7 @@ const selectLinesFields = (customKeys) => {
         const title = fieldName === customKey ? sentenceCase(fieldName) : fieldName;
         optionsWithMutations.push(Immutable.Map({
           id: `uf.${customKey}`,
-          title: `${title} (CF)`,
+          title: `${title}`,
           filter: true,
           display: true,
         }));
