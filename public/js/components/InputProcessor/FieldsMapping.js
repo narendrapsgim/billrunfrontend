@@ -189,7 +189,7 @@ export default class FieldsMapping extends Component {
         <div className="form-group">
           <div className="col-lg-3">
             <label htmlFor="volume_field">Volume</label>
-            <p className="help-block">Amount calculated</p>
+            <p className="help-block">Amount calculated (multiple selection will sum fields)</p>
           </div>
           <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
