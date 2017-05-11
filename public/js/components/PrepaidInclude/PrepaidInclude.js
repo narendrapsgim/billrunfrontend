@@ -22,6 +22,7 @@ const PrepaidInclude = (props) => {
 
   const renderChargingBy = () => {
     if (editable) {
+      onSelectChange('charging_by_usaget')('total_cost');
       return (
         <Select disabled={true} value="All" />
       );
