@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { BarChart } from '../../Charts';
+import Immutable from 'immutable';
+import BarChart from './BarChart';
 import WidgetsHOC from './WidgetsHOC';
 
 class BarCompare extends Component {
@@ -7,7 +8,7 @@ class BarCompare extends Component {
   static propTypes = {
     width: PropTypes.number,
     height: PropTypes.number,
-    data: PropTypes.object,
+    data: PropTypes.instanceOf(Immutable.Map),
     parseXValue: PropTypes.func,
     parseYValue: PropTypes.func,
   };
@@ -15,10 +16,14 @@ class BarCompare extends Component {
   static defaultProps = {
     // width: 100,
     // height: 50,
-    data: {
-      x: [{ values: [] }],
-      y: [],
-    },
+    data: Immutable.Map({
+      x: Immutable.List([
+        Immutable.Map({
+          values: Immutable.List(),
+        }),
+      ]),
+      y: Immutable.List(),
+    }),
     parseXValue: value => value,
     parseYValue: label => label,
   };
@@ -81,13 +86,15 @@ class BarCompare extends Component {
         top: 0,
       },
     },
+    responsive: true,
+    maintainAspectRatio: false,
   });
 
   render() {
     const { data, width, height } = this.props;
     const options = this.getOptions();
     return (
-      <div className="BarCompare">
+      <div className="BarCompare" style={{ width: '100%', height: '100%' }}>
         <BarChart width={width} height={height} data={data} options={options} />
       </div>
     );
