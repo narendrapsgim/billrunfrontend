@@ -1,54 +1,76 @@
-import React from 'react';
-import {PolarArea} from 'react-chartjs';
-import {palitra} from './helpers';
+import React, { Component, PropTypes } from 'react';
+import { PolarArea } from 'react-chartjs-2';
+import { palitra } from './helpers';
 
 
-export default class PolarAreaChart extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+export default class PolarAreaChart extends Component {
 
-  getOptions(data, options = {}) {
-    let defaultOptions = {
+  static propTypes = {
+    width: PropTypes.number,
+    height: PropTypes.number,
+    data: PropTypes.oneOfType([
+      PropTypes.object,
+      null,
+    ]),
+    options: PropTypes.object,
+  };
+
+  static defaultProps = {
+    options: {},
+    data: null,
+  };
+
+  getOptions = () => {
+    const { data, options } = this.props;
+    const defaultOptions = {
       responsive: true,
       title: {
         display: (typeof data.title !== 'undefined'),
-        text: data.title
+        text: data.title,
       },
       legend: {
         display: (data.values.length > 1),
         position: 'right',
-        boxWidth: 20
+        boxWidth: 20,
       },
       scale: {
         ticks: {
-          beginAtZero: true
+          beginAtZero: true,
         },
-        reverse: false
+        reverse: false,
       },
     };
     return Object.assign(defaultOptions, options);
   }
 
-  prepareData(data) {
-    let chartData = {
+  prepareData = () => {
+    const { data } = this.props;
+    const chartData = {
       labels: data.labels,
       datasets: [
         {
           data: data.values,
-          backgroundColor: data.values.map((x, i) => palitra([i])),
-          hoverBackgroundColor: data.values.map((x, i) => palitra([i], 'light')),
-          borderWidth: 1
-        }
-      ]
+          backgroundColor: data.values.map((x, i) => palitra(i)),
+          hoverBackgroundColor: data.values.map((x, i) => palitra(i, 'light')),
+          borderWidth: 1,
+        },
+      ],
     };
     return chartData;
   }
 
   render() {
-    const {width, height, data, options} = this.props;
-    if (!data || !data.values) return null;
-    return (<PolarArea data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
+    const { width, height, data } = this.props;
+    if (!data || !data.values) {
+      return null;
+    }
+    return (
+      <PolarArea
+        data={this.prepareData()}
+        options={this.getOptions()}
+        width={width}
+        height={height}
+      />
+    );
   }
 }

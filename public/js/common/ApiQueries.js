@@ -495,3 +495,12 @@ export const getReportQuery = ({ query, page = 0, size = 10 }) => ({
     { size },
   ],
 });
+
+// Dashboard reports queries
+export const getDashboardQuery = action => ({
+  api: 'reports',
+  params: [
+    { action },
+  ],
+});
+// Dashboard reports queries - end

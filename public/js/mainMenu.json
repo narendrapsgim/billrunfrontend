@@ -2,11 +2,56 @@
   "dashboard": {
     "title": "Dashboard",
     "icon": "fa-dashboard",
-    "route": "dashboard",
+    "route": "",
     "show": true,
     "roles": [],
-    "order":0,
+    "order": 0,
     "parent": "root"
+  },
+  "overview_fake": {
+    "title": "Demo Data",
+    "icon": "",
+    "route": "dashboard/demo",
+    "show": false,
+    "roles": [],
+    "order": 1,
+    "parent":"dashboard"
+  },
+  "overview_dashboard": {
+    "title": "Overview",
+    "icon": "",
+    "route": "dashboard/overview",
+    "show": true,
+    "roles": [],
+    "order": 1,
+    "parent":"dashboard"
+  },
+  "revenue_dashboard": {
+    "title": "Revenue",
+    "icon": "",
+    "route": "dashboard/revenue",
+    "show": true,
+    "roles": [],
+    "order": 2,
+    "parent":"dashboard"
+  },
+  "commercial_dashboard": {
+    "title": "Commercial",
+    "icon": "",
+    "route": "dashboard/commercial",
+    "show": true,
+    "roles": [],
+    "order": 3,
+    "parent":"dashboard"
+  },
+  "customers_dashboard": {
+    "title": "Customers",
+    "icon": "",
+    "route": "dashboard/customers",
+    "show": false,
+    "roles": [],
+    "order": 4,
+    "parent":"dashboard"
   },
   "products": {
     "title": "Products",

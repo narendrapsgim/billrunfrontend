@@ -1,68 +1,90 @@
-import React from 'react';
-import {Line} from 'react-chartjs';
-import {palitra, hexToRgba, trend} from './helpers';
+import React, { Component, PropTypes } from 'react';
+import { Line } from 'react-chartjs-2';
+import { palitra, hexToRgba, trend } from './helpers';
 
 
-export default class LineAreaChart extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+export default class LineAreaChart extends Component {
 
-  getOptions(data, options = {}) {
-    let defaultOptions = {
+  static propTypes = {
+    width: PropTypes.number,
+    height: PropTypes.number,
+    data: PropTypes.oneOfType([
+      PropTypes.object,
+      null,
+    ]),
+    options: PropTypes.object,
+  };
+
+  static defaultProps = {
+    options: {},
+    data: null,
+  };
+
+  getOptions = () => {
+    const { data, options } = this.props;
+    const defaultOptions = {
       responsive: true,
       title: {
         display: (typeof data.title !== 'undefined'),
-        text: data.title
+        text: data.title,
       },
       legend: {
         display: (data.x.length > 1),
         position: 'bottom',
       },
       tooltips: {
-        mode: 'single'
+        mode: 'single',
       },
       hover: {
-        mode: 'single'
+        mode: 'single',
       },
       scales: {
         yAxes: [{
           ticks: {
-            beginAtZero:true
-          }
-        }]
-      }
+            beginAtZero: true,
+          },
+        }],
+      },
     };
     return Object.assign(defaultOptions, options);
   }
 
-  prepareData(data) {
-    let linesCount = data.x.length;
-    let chartData = {};
+  prepareData = () => {
+    const { data } = this.props;
+    const linesCount = data.x.length;
+    const chartData = {};
     chartData.labels = data.y || Array.from(new Array(data.x[0].values.length), (x, i) => i + 1);
     chartData.datasets = data.x.map((x, i) => {
-      let direction = x.values[x.values.length-1] - x.values[0];
+      const direction = x.values[x.values.length - 1] - x.values[0];
       return {
         label: x.label,
         data: x.values,
-        lineTension:0.2,
+        lineTension: 0.2,
         fill: true,
         borderWidth: 1,
-        borderColor: linesCount == 1 ? trend(direction) : palitra([i]),//palitra([i]),
-        backgroundColor: hexToRgba(( (linesCount == 1) ? trend(direction) : palitra([i], 'light') ), 0.5),
+        borderColor: linesCount === 1 ? trend(direction) : palitra(i),
+        backgroundColor: hexToRgba(((linesCount === 1) ? trend(direction) : palitra(i, 'light')), 0.5),
         pointBackgroundColor: 'white',
-        pointBorderColor: (linesCount == 1) ? trend(direction) : palitra([i]),
+        pointBorderColor: (linesCount === 1) ? trend(direction) : palitra(i),
         pointHoverBorderColor: 'white',
-        pointHoverBackgroundColor: (linesCount == 1) ? trend(direction) : palitra([i], 'dark'),
-      }
+        pointHoverBackgroundColor: (linesCount === 1) ? trend(direction) : palitra(i, 'dark'),
+      };
     });
     return chartData;
   }
 
   render() {
-    const {width, height, data, options} = this.props;
-    if (!data || !data.x || !data.y) return null;
-    return (<Line data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
+    const { width, height, data } = this.props;
+    if (!data || !data.x || !data.y) {
+      return null;
+    }
+    return (
+      <Line
+        data={this.prepareData()}
+        options={this.getOptions()}
+        width={width}
+        height={height}
+      />
+    );
   }
 }

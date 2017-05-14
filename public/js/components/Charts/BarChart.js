@@ -1,64 +1,82 @@
-import React from 'react';
-import {Bar} from 'react-chartjs';
-import {palitra, hexToRgba, trend} from './helpers';
+import React, { Component, PropTypes } from 'react';
+import Immutable from 'immutable';
+import { Bar } from 'react-chartjs-2';
+import { palitra, trend } from './helpers';
 
+export default class BarChart extends Component {
 
-export default class BarChart extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+  static propTypes = {
+    width: PropTypes.number,
+    height: PropTypes.number,
+    data: PropTypes.instanceOf(Immutable.Map),
+    options: PropTypes.object,
+  };
 
-  getOptions(data, options = {}) {
-    let defaultOptions = {
+  static defaultProps = {
+    options: {},
+    data: Immutable.Map(),
+  };
+
+  getOptions = () => {
+    const { data, options } = this.props;
+    const defaultOptions = {
       responsive: true,
       title: {
-        display: (typeof data.title !== 'undefined'),
-        text: data.title
+        display: (data.get('title', null) !== null),
+        text: data.get('title', ''),
       },
       legend: {
-        position: 'bottom'
+        position: 'bottom',
       },
       hover: {
-        mode: 'single'
+        mode: 'single',
       },
       tooltips: {
-        mode: 'single'
+        mode: 'single',
       },
       scales: {
         yAxes: [{
           ticks: {
-            beginAtZero:true
-          }
-        }]
-      }
+            beginAtZero: true,
+          },
+        }],
+      },
     };
     return Object.assign(defaultOptions, options);
   }
 
-  prepareData(data) {
-    let linesCount = data.x.length;
-    let chartData = {};
-    chartData.labels = data.y || Array.from(new Array(data.x[0].values.length), (x, i) => i + 1);
-    chartData.datasets = data.x.map((x, i) => {
-      let direction = x.values[x.values.length-1] - x.values[0];
-      return {
-        label: x.label,
-        data: x.values,
-        borderWidth: 1,
-        backgroundColor: hexToRgba(( (linesCount == 1) ? trend(direction) : palitra([i]) ), 1),
-        borderColor:  hexToRgba(( (linesCount == 1) ? trend(direction) : palitra([i]) ), 1),
-        hoverBorderWidth: 1,
-        hoverBackgroundColor: linesCount == 1 ? trend(direction) : palitra([i], 'light'),
-        hoverBorderColor: linesCount == 1 ? trend(direction) : palitra([i], 'dark'),
-      }
-    });
-    return chartData;
+  prepareData = () => {
+    const { data } = this.props;
+    const linesCount = data.get('x', Immutable.List()).size;
+    const valuesCount = data.getIn(['x', 0, 'values'], Immutable.List()).size;
+    const labels = data.get('y', Immutable.List(Array.from(new Array(valuesCount), (x, i) => i + 1)));
+    return {
+      labels: labels.toArray(),
+      datasets: data.get('x', Immutable.List()).map((dataset, i) => {
+        const direction = dataset.get('values', Immutable.List()).last() - dataset.get('values', Immutable.List()).first();
+        return {
+          label: dataset.get('label', ''),
+          data: dataset.get('values', Immutable.List()).toArray(),
+          borderWidth: 1,
+          backgroundColor: ((linesCount === 1) ? trend(direction) : palitra(i)),
+          borderColor: ((linesCount === 1) ? trend(direction) : palitra(i)),
+          hoverBorderWidth: 1,
+          hoverBackgroundColor: linesCount === 1 ? trend(direction) : palitra(i, 'light'),
+          hoverBorderColor: linesCount === 1 ? trend(direction) : palitra(i, 'dark'),
+        };
+      }).toArray(),
+    };
   }
 
   render() {
-    const {width, height, data, options} = this.props;
-    if (!data || !data.x) return null;
-    return (<Bar data={this.prepareData(data)} options={this.getOptions(data, options)} width={width} height={height}/>);
+    const { width, height } = this.props;
+    return (
+      <Bar
+        data={this.prepareData()}
+        options={this.getOptions()}
+        width={width}
+        height={height}
+      />
+    );
   }
 }

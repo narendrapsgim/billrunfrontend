@@ -1,9 +1,15 @@
 import React from 'react';
-import { Route, IndexRoute } from 'react-router';
+import { Route, IndexRoute, IndexRedirect } from 'react-router';
 
 import RequireAuth from '../containers/Authentication';
 import App from '../containers/App';
-import Dashboard from '../components/Dashboard';
+import {
+  RevenueDashboard,
+  OverviewDashboard,
+  CustomersDashboard,
+  CommercialDashboard,
+} from '../components/Dashboard';
+import FakeDataDashboard from '../components/Dashboard/FakeDataDashboard';
 import LoginPage from '../components/LoginPage';
 import WelcomePage from '../components/WelcomePage';
 import PageNotFound from '../components/PageNotFound';
@@ -47,7 +53,15 @@ import CustomFields from '../components/CustomFields';
 const routes = () => (
   <Route path="/" component={App}>
     <IndexRoute component={RequireAuth(WelcomePage)} title="" />
-    <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
+
+    <Route path="dashboard">
+      <Route path="overview" component={RequireAuth(OverviewDashboard)} title="Overview Dashboard" />
+      <Route path="revenue" component={RequireAuth(RevenueDashboard)} title="Revenue Dashboard" />
+      <Route path="commercial" component={RequireAuth(CommercialDashboard)} title="Commercial Dashboard" />
+      <Route path="customers" component={RequireAuth(CustomersDashboard)} title="Customers Dashboard" />
+      <Route path="demo" component={RequireAuth(FakeDataDashboard)} title="Demo Dashboard" />
+      <IndexRedirect to="overview" />
+    </Route>
 
     <Route path="plans">
       <IndexRoute component={RequireAuth(PlansList)} title="Plans" />
