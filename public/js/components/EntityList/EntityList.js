@@ -165,10 +165,16 @@ class EntityList extends Component {
     this.props.dispatch(setListState(itemsType, states));
   }
 
-  onClickItem = (item) => {
+  onClickEditItem = (item) => {
     const { itemsType, itemType } = this.props;
     const itemId = item.getIn(['_id', '$id']);
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
+  }
+
+  onClickViewItem = (item) => {
+    const { itemsType, itemType } = this.props;
+    const itemId = item.getIn(['_id', '$id']);
+    this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
   }
 
   buildQuery = (props) => {
@@ -291,11 +297,16 @@ class EntityList extends Component {
   getActions = () => {
     const { actions, showRevisionBy } = this.props;
     const editColumn = showRevisionBy ? 1 : 0;
-    const editAction = { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickItem, show: true, onClickColumn: editColumn };
+    const editAction = { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEditItem, show: true, onClickColumn: editColumn };
+    const viewAction = { type: 'view', showIcon: true, helpText: 'View', onClick: this.onClickViewItem, show: true, onClickColumn: editColumn };
 
-    return actions.map(action => (
-      action.type === 'edit' ? Object.assign(editAction, action) : action
-    ));
+    return actions.map((action) => {
+      switch (action.type) {
+        case 'edit': return Object.assign(editAction, action);
+        case 'view': return Object.assign(viewAction, action);
+        default: return action;
+      }
+    });
   }
 
   renderList = () => {

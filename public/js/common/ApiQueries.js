@@ -267,9 +267,9 @@ export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans',
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
-export const getProductsKeysQuery = (project = { key: 1 }) => getEntitesQuery('rates', project);
+export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => getEntitesQuery('rates', project);
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
-export const getPlansKeysQuery = () => getEntitesQuery('plans', { name: 1 });
+export const getPlansKeysQuery = (project = { name: 1, description: 1 }) => getEntitesQuery('plans', project);
 export const getUserKeysQuery = () => getEntitesQuery('users', { username: 1 });
 export const getAllGroupsQuery = () => ([
   getGroupsQuery('plans'),
@@ -280,6 +280,7 @@ export const fetchServiceByIdQuery = id => getEntityByIdQuery('services', id);
 export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
 export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
 export const fetchDiscountByIdQuery = id => getEntityByIdQuery('discounts', id);
+export const fetchReportByIdQuery = id => getEntityByIdQuery('reports', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
 export const fetchPrepaidGroupByIdQuery = id => getEntityByIdQuery('prepaidgroups', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);
@@ -482,6 +483,16 @@ export const getConfirmationOperationInvoiceQuery = invoiceId => ({
   params: [
     { action: 'confirm_cycle' },
     { filtration: invoiceId },
+  ],
+});
+
+export const getReportQuery = ({ query, page = 0, size = 10 }) => ({
+  api: 'report',
+  params: [
+    { action: 'generateReport' },
+    { query: JSON.stringify(query) },
+    { page },
+    { size },
   ],
 });
 

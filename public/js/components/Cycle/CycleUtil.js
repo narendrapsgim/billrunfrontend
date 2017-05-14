@@ -1,3 +1,5 @@
-export const getDateToDisplay = str => str.substr(0, str.indexOf(' '));
+import { getItemDateValue, getConfig } from '../../common/Util';
 
-export const getCycleName = cycle => `cycle of ${getDateToDisplay(cycle.get('start_date', ''))} - ${getDateToDisplay(cycle.get('end_date', ''))}`;
+export const getDateToDisplay = (cycle, field) => getItemDateValue(cycle, field).format(getConfig('dateFormat', 'DD/MM/YYYY'));
+
+export const getCycleName = cycle => `Cycle of ${getDateToDisplay(cycle, 'start_date')} - ${getDateToDisplay(cycle, 'end_date')}`;

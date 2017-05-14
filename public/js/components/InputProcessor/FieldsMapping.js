@@ -43,7 +43,7 @@ export default class FieldsMapping extends Component {
     this.setState({pattern: e.target.value});
   }
 
-  onChangeUsaget(val) {
+  changeUsaget(val, setStaticUsaget) {
     const { usageTypes } = this.props;
 
     const found = usageTypes.find(usaget => (usaget === val));
@@ -53,18 +53,26 @@ export default class FieldsMapping extends Component {
         (response) => {
           if (response.status) {
             this.setState({ usaget: val });
-            this.props.onSetStaticUsaget(val);
+            if (setStaticUsaget) {
+              this.props.onSetStaticUsaget(val);
+            }
           }
         }
       );
     } else {
       this.setState({ usaget: val });
-      this.props.onSetStaticUsaget(val);
+      if (setStaticUsaget) {
+        this.props.onSetStaticUsaget(val);
+      }
     }
   }
 
+  onChangeUsaget(val) {
+    this.changeUsaget(val, false);
+  }
+
   onChangeStaticUsaget(usaget) {
-    this.onChangeUsaget(usaget);
+    this.changeUsaget(usaget, true);
   }
 
   addUsagetMapping(e) {
@@ -101,7 +109,19 @@ export default class FieldsMapping extends Component {
     this.setState({separateTime: !this.state.separateTime});
   };
 
+  onChangeVolume = (volumes) => {
+    const volumesList = (volumes.length) ? volumes.split(',') : [];
+    const e = {
+      target: {
+        value: Immutable.List(volumesList),
+        id: 'volume_field',
+      },
+    };
+    this.props.onSetFieldMapping(e);
+  }
+
   render() {
+    const { separateTime } = this.state;
     const { settings,
             usageTypes,
             onSetFieldMapping } = this.props;
@@ -113,6 +133,14 @@ export default class FieldsMapping extends Component {
     const available_units = usageTypes.map((usaget, key) => {
       return {value: usaget, label: usaget};
     }).toJS();
+
+    const defaultUsaget = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_usaget'], '')
+    const volumeOptions = settings.get('fields', Immutable.List()).map(field => ({
+      label: field,
+      value: field,
+    })).toArray();
+    const volume = settings.getIn(['processor', 'volume_field'], Immutable.List());
+    const volumeList = (typeof volume === 'string') ? volume : volume.join(',');
 
     return (
       <form className="form-horizontal FieldsMapping">
@@ -141,7 +169,7 @@ export default class FieldsMapping extends Component {
               <div className="input-group">
                 <div className="input-group-addon">
                   <input type="checkbox"
-                         checked={this.state.separateTime}
+                         checked={separateTime}
                          onChange={this.onChangeSeparateTime}
                   />
                   <small style={{ verticalAlign: 'bottom' }}>&nbsp;Time in separate field</small>
@@ -149,7 +177,7 @@ export default class FieldsMapping extends Component {
                 <select id="time_field"
                         className="form-control"
                         onChange={onSetFieldMapping}
-                        disabled={!this.state.separateTime}
+                        disabled={!separateTime}
                         value={settings.getIn(['processor', 'time_field'], '')}>
                   { available_fields }
                 </select>
@@ -161,19 +189,20 @@ export default class FieldsMapping extends Component {
         <div className="form-group">
           <div className="col-lg-3">
             <label htmlFor="volume_field">Volume</label>
-            <p className="help-block">Amount calculated</p>
+            <p className="help-block">Amount calculated (multiple selection will sum fields)</p>
           </div>
           <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
             <div className="col-lg-9">
-              <select id="volume_field"
-                      className="form-control"
-                      onChange={onSetFieldMapping}
-                      value={settings.getIn(['processor', 'volume_field'], '')}>
-                { available_fields }
-              </select>
+              <Select
+                inputProps={{ id: 'volume_field' }}
+                multi={true}
+                value={volumeList}
+                options={volumeOptions}
+                onChange={this.onChangeVolume}
+              />
             </div>
           </div>
         </div>
@@ -201,7 +230,7 @@ export default class FieldsMapping extends Component {
                   id="unit"
                   options={available_units}
                   allowCreate={true}
-                  value={settings.getIn(['processor', 'default_usaget'], '')}
+                  value={defaultUsaget}
                   disabled={settings.get('usaget_type', '') !== "static"}
                   style={{marginTop: 3}}
                   onChange={this.onChangeStaticUsaget}

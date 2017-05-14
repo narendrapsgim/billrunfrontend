@@ -113,8 +113,6 @@ class CustomerSetup extends Component {
   componentWillUnmount() {
     this.props.dispatch(clearCustomer());
     this.props.dispatch(clearList('available_gateways'));
-    this.props.dispatch(clearList('available_plans'));
-    this.props.dispatch(clearList('available_services'));
   }
 
   fetchItem = (itemId = this.props.itemId) => {

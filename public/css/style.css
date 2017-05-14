@@ -466,6 +466,19 @@ ul.revision-history-list li.active .cycle {
      margin-left: 0;
 }
 
+.delimiter-select {
+  width: 150px;
+}
+
+/* Reports */
+.report-setup .CustomFilter .action button{
+  height: 39px;
+}
+.report-setup .CustomFilter .react-datepicker__input-container {
+  width: 100%;
+}
+/* ~Reports */
+
 /* Chart */
 .dashboard-chart-wrapper {
   height: 280px;

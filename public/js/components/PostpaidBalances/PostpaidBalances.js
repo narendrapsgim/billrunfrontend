@@ -9,6 +9,7 @@ import Pager from '../Pager';
 import { getSettings } from '../../actions/settingsActions';
 import { getList } from '../../actions/listActions';
 import { postpaidBalancesListQuery } from '../../common/ApiQueries';
+import { usageTypeSelector } from '../../selectors/settingsSelector';
 
 
 class PostpaidBalances extends Component {
@@ -100,9 +101,9 @@ class PostpaidBalances extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, props) => ({
   items: state.list.get('postpaid_balances'),
-  usageTypes: state.settings.get('usage_types'),
+  usageTypes: usageTypeSelector(state, props),
 });
 
 export default connect(mapStateToProps)(PostpaidBalances);

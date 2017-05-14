@@ -34,7 +34,11 @@ import {
   tabSelector,
   revisionsSelector,
 } from '../../selectors/entitySelector';
-import { chargingDaySelector } from '../../selectors/settingsSelector';
+import {
+  chargingDaySelector,
+  usageTypeSelector,
+} from '../../selectors/settingsSelector';
+
 import {
   buildPageTitle,
   getConfig,
@@ -265,7 +269,7 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'product'),
   activeTab: tabSelector(state, props, 'product'),
   revisions: revisionsSelector(state, props, 'product'),
-  usageTypes: state.settings.get('usage_types'),
+  usageTypes: usageTypeSelector(state, props),
   chargingDay: chargingDaySelector(state, props),
 });
 

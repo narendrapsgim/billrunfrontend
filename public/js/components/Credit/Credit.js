@@ -11,7 +11,10 @@ import { getProductsKeysQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { creditCharge } from '../../actions/creditActions';
-import { currencySelector } from '../../selectors/settingsSelector';
+import {
+  currencySelector,
+  usageTypeSelector,
+} from '../../selectors/settingsSelector';
 
 class Credit extends Component {
   static defaultProps = {
@@ -241,7 +244,7 @@ class Credit extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  usageTypes: state.settings.get('usage_types'),
+  usageTypes: usageTypeSelector(state, props),
   currency: currencySelector(state, props),
   allRates: state.list.get('all_rates'),
 });
