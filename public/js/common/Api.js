@@ -1,5 +1,6 @@
 import { dismissProgressIndicator, finishProgressIndicator } from '../actions/progressIndicatorActions';
 import { showDanger, showSuccess, showWarning } from '../actions/alertsActions';
+import { getConfig } from './Util';
 
 
 export const API_STATUS_SUCCESS = 1;
@@ -176,10 +177,12 @@ const promiseTimeout = (ms, promise, timeOutMessage = 'Request timeout') => new 
     });
   });
 
+export const buildRequestUrl = query => `${getConfig('serverUrl', '')}${buildApiString(query)}${buildQueryString(query.params)}`;
+
 // Send Http request
 const sendHttpRequest = (query, apiParams = {}) => {
   // Create Api URL
-  const url = globalSetting.serverUrl + buildApiString(query) + buildQueryString(query.params);
+  const url = buildRequestUrl(query, apiParams);
   const requestOptions = buildQueryOptions(query.options);
   const response = (query.name) ? { name: query.name } : {};
   const timeout = query.timeout || globalSetting.serverApiTimeOut;

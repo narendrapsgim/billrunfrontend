@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Panel, Col } from 'react-bootstrap';
+import { Panel, Col, Button } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import ReportDetails from './ReportDetails';
 import List from '../List';
@@ -13,6 +13,12 @@ import {
   getConfig,
   getItemId,
 } from '../../common/Util';
+import {
+  buildRequestUrl,
+} from '../../common/Api';
+import {
+  getReportQuery,
+ } from '../../common/ApiQueries';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import {
@@ -151,6 +157,7 @@ class ReportSetup extends Component {
   }
 
   onChangeFieldValue = (path, value) => {
+    this.props.dispatch(setReportDataListPage(0));
     this.props.dispatch(clearReportData());
     const stringPath = Array.isArray(path) ? path.join('.') : path;
     const deletePathOnEmptyValue = [];
@@ -255,14 +262,19 @@ class ReportSetup extends Component {
     this.getReportData();
   }
 
+  onClickExportCSV =() => {
+    const { item } = this.props;
+    const args = {
+      query: this.buildReportQuery(),
+      page: 0,
+      size: -1,
+    };
+    const downloadURL = `${buildRequestUrl(getReportQuery(args))}&file_name=${item.get('key', 'report')}&type=csv`;
+    window.open(downloadURL);
+  }
+
   getTableFields = () => {
     const { item, linesFileds } = this.props;
-    // const selectedFields = item.get('display', Immutable.List());
-    // return getConfig(['reports', 'fields', item.get('entity', '')], Immutable.List())
-    //   .filter(field => field.get('display', false))
-    //   .filter(field => selectedFields.includes(field.get('id', '')))
-    //   .toJS();
-
     const selectedFields = item.get('display', Immutable.List());
     const isGroupBy = !item.get('group_by_fields', Immutable.List()).isEmpty();
     const configFields = linesFileds;
@@ -311,6 +323,23 @@ class ReportSetup extends Component {
     this.fetchItem();
   }
 
+  renderPanelHeader = () => {
+    const { mode } = this.props;
+    if (mode === 'view') {
+      return (
+        <div>
+          Report
+          <div className="pull-right">
+            <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickExportCSV}>
+              <i className="fa fa-file-excel-o" />&nbsp;Export CSV
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }
+
   render() {
     const { progress } = this.state;
     const { item, mode, linesFileds, reportData, size, page, nextPage } = this.props;
@@ -322,7 +351,7 @@ class ReportSetup extends Component {
     const tableFields = this.getTableFields();
     return (
       <div className="report-setup">
-        <Panel>
+        <Panel header={this.renderPanelHeader()}>
           { allowEdit &&
             <ReportDetails
               report={item}
