@@ -46,7 +46,7 @@ export default class CalculatorMapping extends Component {
     const billrunFields = Immutable.fromJS(addBillrunFields ? ['type', 'usaget'] : []);
     const options = [
       (<option disabled value="" key={-3}>Select Field</option>),
-      ...(billrunFields.push(...settings.get('fields', []))).map((field, key) => (
+      ...(billrunFields.push(...settings.get('fields', []))).sortBy(field => field).map((field, key) => (
         <option value={field} key={key}>{field}</option>
       )),
     ];
