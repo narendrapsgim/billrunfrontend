@@ -7,10 +7,13 @@ const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
 
 const getPricing = (state, props) => // eslint-disable-line no-unused-vars
-    state.settings.getIn(['pricing']);
+  state.settings.getIn(['pricing']);
+
+const getUsageType = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.get('usage_types');
 
 const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
-      state.settings.get('billrun');
+  state.settings.get('billrun');
 
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
@@ -79,7 +82,7 @@ const selectLinesFields = (customKeys) => {
       } else {
         const fieldName = getFieldName(predefinedFiled.get('id', ''), 'lines');
         const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
-        optionsWithMutations.push(predefinedFiled.set('title', `${title} (BillRun field)`));
+        optionsWithMutations.push(predefinedFiled.set('title', title));
       }
     });
     // Set custom fields
@@ -142,4 +145,9 @@ export const chargingDaySelector = createSelector(
     const chargingDay = billrun.get('charging_day');
     return (isNaN(chargingDay)) ? chargingDay : Number(chargingDay);
   }
+);
+
+export const usageTypeSelector = createSelector(
+  getUsageType,
+  usageTypes => usageTypes
 );

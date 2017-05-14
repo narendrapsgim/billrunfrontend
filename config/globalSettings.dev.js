@@ -36,44 +36,45 @@ var globalSetting = {
         // Default settings \ Example
         // { id: [REQUIRED], type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
         //    inputType: 'select',
-        //    options: ['option1', 'option2'] / 'getExampleOptions', /* array or callback function */
+        //    options: ['option1', 'option2'] | [{value: 'val', label: 'Label'}, ...] /* array of values or objects */
+        //    callback: 'getExampleOptions', /* callback function + should be implementation */
         // } },
         { id: 'urt', type: 'date', filter: true, display: true, groupBy: true },
         { id: 'arate_key', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
           inputType: 'select',
-          options: 'products', /* products dropdown */
+          callback: 'getProductsOptions'
         } },
         { id: 'arategroup', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
           inputType: 'select',
-          options: 'groups', /* groups dropdown */
+          callback: 'getGroupsOptions',
         } },
         { id: 'lastname', type: 'string', filter: true, display: true, groupBy: false },
         { id: 'firstname', type: 'string', filter: true, display: true, groupBy: false },
         { id: 'stamp', type: 'string', filter: true, display: true, groupBy: false },
         { id: 'billrun', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
           inputType: 'select',
-          options: 'lastBillruns', /* last 12 billruns dropdown (like in cycle management) */
+          callback: 'getCyclesOptions',
         } },
         { id: 'in_group', type: 'number', filter: true, display: true, groupBy: false },
         { id: 'aprice', type: 'number', filter: true, display: true, groupBy: false },
         { id: 'file', type: 'string', filter: true, display: true, groupBy: true },
         { id: 'plan', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
           inputType: 'select',
-          options: 'plans', /* plans dropdown */
+          callback: 'getPlansOptions',
         } },
         { id: 'billsec', type: 'number', filter: true, display: true, groupBy: false },
         { id: 'sid', type: 'number', filter: true, display: true, groupBy: true },
         { id: 'over_group', type: 'number', filter: true, display: true, groupBy: false },
-        { id: 'usagev', type: 'number', filter: true, display: true, groupBy: false },
+        { id: 'usagev', type: 'number', filter: true, display: true, groupBy: true },
+        { id: 'usaget', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
+          inputType: 'select',
+          callback: 'getUsageTypesOptions',
+        } },
         { id: 'aid', type: 'number', filter: true, display: true, groupBy: true },
         { id: 'process_time', type: 'string', filter: true, display: true, groupBy: false },
         { id: 'usagesb', type: 'number', filter: true, display: true, groupBy: false },
         { id: 'session_id', type: 'string', filter: true, display: true, groupBy: true },
         { id: 'billrun_pretend', type: 'boolean', filter: true, display: false, groupBy: false },
-        // { id: 'connection_type', filter: true, display: false, inputConfig: {
-        //   inputType: 'select',
-        //   options: ['postpaid', 'prepaid'],
-        // } },
       ],
     },
     operators: [

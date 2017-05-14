@@ -38,7 +38,10 @@ import {
   tabSelector,
   revisionsSelector,
 } from '../../selectors/entitySelector';
-import { chargingDaySelector } from '../../selectors/settingsSelector';
+import {
+  chargingDaySelector,
+  usageTypeSelector,
+} from '../../selectors/settingsSelector';
 
 
 class PrepaidIncludeSetup extends Component {
@@ -286,7 +289,7 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'prepaid_include'),
   revisions: revisionsSelector(state, props, 'prepaid_include'),
   allRates: state.list.get('all_rates'),
-  usageTypes: state.settings.get('usage_types'),
+  usageTypes: usageTypeSelector(state, props),
   chargingDay: chargingDaySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PrepaidIncludeSetup));

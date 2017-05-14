@@ -267,9 +267,9 @@ export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans',
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
-export const getProductsKeysQuery = (project = { key: 1 }) => getEntitesQuery('rates', project);
+export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => getEntitesQuery('rates', project);
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
-export const getPlansKeysQuery = () => getEntitesQuery('plans', { name: 1 });
+export const getPlansKeysQuery = (project = { name: 1, description: 1 }) => getEntitesQuery('plans', project);
 export const getUserKeysQuery = () => getEntitesQuery('users', { username: 1 });
 export const getAllGroupsQuery = () => ([
   getGroupsQuery('plans'),

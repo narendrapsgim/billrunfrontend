@@ -1,7 +1,12 @@
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import {
   fetchReportByIdQuery,
   getReportQuery,
   getCyclesQuery,
+  getPlansKeysQuery,
+  getServicesKeysWithInfoQuery,
+  getProductsKeysQuery,
+  getAllGroupsQuery,
  } from '../common/ApiQueries';
 import {
   saveEntity,
@@ -19,7 +24,10 @@ import {
 } from './entityListActions';
 import {
   getList,
+  gotList,
+  addToList,
 } from './listActions';
+import { getSettings } from './settingsActions';
 
 export const setCloneReport = () => setCloneEntity('reports', 'report');
 
@@ -42,3 +50,24 @@ export const setReportDataListPage = num => dispatch => dispatch(setListPage('re
 export const setReportDataListSize = num => dispatch => dispatch(setListSize('reportData', num));
 
 export const getCyclesOptions = () => dispatch => dispatch(getList('cycles_list', getCyclesQuery()));
+
+export const getPlansOptions = () => dispatch => dispatch(getList('available_plans', getPlansKeysQuery()));
+
+export const getServicesOptions = () => dispatch => dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
+
+export const getProductsOptions = () => dispatch => dispatch(getList('all_rates', getProductsKeysQuery()));
+
+export const getUsageTypesOptions = () => dispatch => dispatch(getSettings('usage_types'));
+
+export const getGroupsOptions = () => dispatch => apiBillRun(getAllGroupsQuery())
+  .then((success) => {
+    try {
+      const collection = 'available_groups';
+      dispatch(gotList(collection, success.data[0].data.details));
+      dispatch(addToList(collection, success.data[1].data.details));
+      return dispatch(apiBillRunSuccessHandler(success));
+    } catch (e) {
+      throw new Error('Error retreiving list');
+    }
+  })
+  .catch(error => dispatch(apiBillRunErrorHandler(error, 'Network error - please refresh and try again')));

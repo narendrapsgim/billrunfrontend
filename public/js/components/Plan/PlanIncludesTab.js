@@ -8,6 +8,7 @@ import PlanIncludeGroupEdit from './components/PlanIncludeGroupEdit';
 import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 import { getAllGroup } from '../../actions/planActions';
 import { getSettings } from '../../actions/settingsActions';
+import { usageTypeSelector } from '../../selectors/settingsSelector';
 
 
 class PlanIncludesTab extends Component {
@@ -171,6 +172,6 @@ class PlanIncludesTab extends Component {
 
 const mapStateToProps = (state, props) => ({
   includeGroups: props.includeGroups || undefined,
-  usageTypes: state.settings.get('usage_types'),
+  usageTypes: usageTypeSelector(state, props),
 });
 export default connect(mapStateToProps)(PlanIncludesTab);

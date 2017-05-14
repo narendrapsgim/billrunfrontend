@@ -9,7 +9,7 @@ export const actions = {
   SET_NEXT_PAGE: 'SET_NEXT_PAGE',
 };
 
-const gotList = (collection, list) => ({
+export const gotList = (collection, list) => ({
   type: actions.GOT_LIST,
   collection,
   list,

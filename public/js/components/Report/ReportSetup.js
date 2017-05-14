@@ -26,13 +26,11 @@ import {
   clearReportData,
   setReportDataListPage,
   setReportDataListSize,
-  getCyclesOptions,
 } from '../../actions/reportsActions';
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
 import { modeSimpleSelector, itemSelector, idSelector } from '../../selectors/entitySelector';
 import { linesFiledsSelector } from '../../selectors/settingsSelector';
-import { cyclesOptions } from '../../selectors/listSelectors';
 
 
 class ReportSetup extends Component {
@@ -76,10 +74,6 @@ class ReportSetup extends Component {
     this.props.dispatch(getSettings('file_types'));
   }
 
-  // componentWillUnmount() {
-  //   this.props.dispatch(clearList('cycles_list'));
-  // }
-
   componentDidMount() {
     const { mode } = this.props;
     if (mode === 'create') {
@@ -87,7 +81,6 @@ class ReportSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     this.initDefaultValues();
-    this.props.dispatch(getCyclesOptions());
   }
 
   componentWillReceiveProps(nextProps) {
@@ -320,8 +313,7 @@ class ReportSetup extends Component {
 
   render() {
     const { progress } = this.state;
-    const { item, mode, linesFileds, reportData, size, page, nextPage, cyclesOptions } = this.props;
-    console.log('cycles: ', cyclesOptions);
+    const { item, mode, linesFileds, reportData, size, page, nextPage } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -399,7 +391,6 @@ const mapStateToProps = (state, props) => ({
   page: state.entityList.page.get('reportData'),
   nextPage: state.entityList.nextPage.get('reportData'),
   size: state.entityList.size.get('reportData'),
-  cyclesOptions: cyclesOptions(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ReportSetup));

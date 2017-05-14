@@ -1,4 +1,5 @@
 import React, { PropTypes, Component } from 'react';
+import { connect } from 'react-redux';
 import { Form, Button, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -9,19 +10,42 @@ import {
   parseConfigSelectOptions,
   formatSelectOptions,
 } from '../../common/Util';
+import {
+  getCyclesOptions,
+  getProductsOptions,
+  getPlansOptions,
+  getServicesOptions,
+  getGroupsOptions,
+  getUsageTypesOptions,
+} from '../../actions/reportsActions';
+import {
+  productsOptionsSelector,
+  cyclesOptionsSelector,
+  plansOptionsSelector,
+  groupsOptionsSelector,
+} from '../../selectors/listSelectors';
+import {
+  usageTypeSelector,
+} from '../../selectors/settingsSelector';
 
 
-export default class ReportDetails extends Component {
+class ReportDetails extends Component {
 
   static propTypes = {
     report: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
     operators: PropTypes.instanceOf(Immutable.List),
     groupByOperators: PropTypes.instanceOf(Immutable.List),
+    getCyclesOptions: PropTypes.instanceOf(Immutable.List),
+    getPlansOptions: PropTypes.instanceOf(Immutable.List),
+    getProductsOptions: PropTypes.instanceOf(Immutable.List),
+    getGroupsOptions: PropTypes.instanceOf(Immutable.List),
+    getUsageTypesOptions: PropTypes.instanceOf(Immutable.List),
     linesFileds: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
     onUpdate: PropTypes.func,
     onReset: PropTypes.func,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -29,11 +53,71 @@ export default class ReportDetails extends Component {
     mode: 'update',
     operators: getConfig(['reports', 'operators'], Immutable.List()),
     groupByOperators: getConfig(['reports', 'groupByOperators'], Immutable.List()),
+    getCyclesOptions: Immutable.List(),
+    getProductsOptions: Immutable.List(),
+    getPlansOptions: Immutable.List(),
+    getGroupsOptions: Immutable.List(),
+    getUsageTypesOptions: Immutable.List(),
     linesFileds: Immutable.List(),
     onFilter: () => {},
     onUpdate: () => {},
     onReset: () => {},
   };
+
+  componentDidMount() {
+    this.initFieldOptions();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { linesFileds } = this.props;
+    if (!Immutable.is(linesFileds, nextProps.linesFileds)) {
+      this.initFieldOptions();
+    }
+  }
+
+  initFieldOptions = () => {
+    const { linesFileds } = this.props;
+    linesFileds.forEach((lineFiled) => {
+      if (lineFiled.hasIn(['inputConfig', 'callback'])) {
+        const callback = lineFiled.getIn(['inputConfig', 'callback']);
+        switch (callback) {
+          case 'getCyclesOptions':
+            if (this.props.getCyclesOptions.isEmpty()) {
+              this.props.dispatch(getCyclesOptions());
+            }
+            break;
+          case 'getPlansOptions':
+            if (this.props.getPlansOptions.isEmpty()) {
+              this.props.dispatch(getPlansOptions());
+            }
+            break;
+          case 'getProductsOptions':
+            if (this.props.getProductsOptions.isEmpty()) {
+              this.props.dispatch(getProductsOptions());
+            }
+            break;
+          case 'getServicesOptions':
+            if (this.props.getServicesOptions.isEmpty()) {
+              this.props.dispatch(getServicesOptions());
+            }
+            break;
+          case 'getGroupsOptions':
+            if (this.props.getGroupsOptions.isEmpty()) {
+              this.props.dispatch(getGroupsOptions());
+            }
+            break;
+          case 'getUsageTypesOptions':
+            if (this.props.getUsageTypesOptions.isEmpty()) {
+              this.props.dispatch(getUsageTypesOptions());
+            }
+            break;
+          default:
+            console.log('unknown select options callback');
+            break;
+        }
+      }
+    });
+  }
 
   onClear = () => {
     const { mode } = this.props;
@@ -346,18 +430,21 @@ export default class ReportDetails extends Component {
         />
       );
     }
-
     if (config.get('type', 'string') === 'string' && config.getIn(['inputConfig', 'inputType']) === 'select') {
-      const options = config
-        .getIn(['inputConfig', 'options'])
+      const options = config.hasIn(['inputConfig', 'callback'])
+        ? this.props[config.getIn(['inputConfig', 'callback'], '')] || Immutable.List()
+        : config.getIn(['inputConfig', 'options'], Immutable.List());
+
+      const formatedOptions = options
         .map(formatSelectOptions)
         .toArray();
+
       const multi = filed.get('op', '') === 'in';
       return (
         <Select
           clearable={false}
           multi={multi}
-          options={options}
+          options={formatedOptions}
           value={filed.get('value', '')}
           onChange={onChangeSelect}
           disabled={disabled}
@@ -566,3 +653,13 @@ export default class ReportDetails extends Component {
     );
   }
 }
+
+const mapStateToProps = (state, props) => ({
+  getCyclesOptions: cyclesOptionsSelector(state, props),
+  getProductsOptions: productsOptionsSelector(state, props),
+  getPlansOptions: plansOptionsSelector(state, props),
+  getGroupsOptions: groupsOptionsSelector(state, props),
+  getUsageTypesOptions: usageTypeSelector(state, props)
+});
+
+export default connect(mapStateToProps)(ReportDetails);
