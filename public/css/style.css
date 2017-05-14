@@ -468,3 +468,12 @@ ul.revision-history-list li.active .cycle {
 .delimiter-select {
   width: 150px;
 }
+
+/* Reports */
+.report-setup .CustomFilter .action button{
+  height: 39px;
+}
+.report-setup .CustomFilter .react-datepicker__input-container {
+  width: 100%;
+}
+/* ~Reports */
