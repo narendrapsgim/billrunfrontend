@@ -96,9 +96,9 @@ class ReportSetup extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { page, size } = this.props;
-    const { page: oldPage, size: oldiSize } = prevProps;
-    if (page !== oldPage || size !== oldiSize) {
+    const { page, size, mode } = this.props;
+    const { page: oldPage, size: oldiSize, mode: oldMode } = prevProps;
+    if (page !== oldPage || size !== oldiSize || (mode !== oldMode && mode === 'view')) {
       this.getReportData();
     }
   }
@@ -170,7 +170,6 @@ class ReportSetup extends Component {
     if (response.status) {
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The report was ${action}`));
-      this.handleBack(true);
     }
   }
 
@@ -179,6 +178,11 @@ class ReportSetup extends Component {
     if (this.validate()) {
       this.setState({ progress: true });
       this.props.dispatch(saveReport(item, mode)).then(this.afterSave);
+      const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
+      const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
+      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
+      const itemId = item.getIn(['_id', '$id']);
+      this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
     }
   }
 
@@ -190,11 +194,8 @@ class ReportSetup extends Component {
     });
   }
 
-  handleBack = (itemWasChanged = false) => {
+  handleBack = () => {
     const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
-    if (itemWasChanged) {
-      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
-    }
     this.props.router.push(`/${itemsType}`);
   }
 
@@ -247,7 +248,6 @@ class ReportSetup extends Component {
         .filter(this.filterGroupBy)
         .reduce(this.buildGroupByQuery, Immutable.Map()),
     };
-    console.log('applyFilter: ', query);
     return query;
   }
 
@@ -323,14 +323,16 @@ class ReportSetup extends Component {
     return (
       <div className="report-setup">
         <Panel>
-          { allowEdit && <ReportDetails
-            report={item}
-            linesFileds={linesFileds}
-            mode={mode}
-            onUpdate={this.onChangeFieldValue}
-            onReset={this.fetchItem}
-            onFilter={this.applyFilter}
-          />}
+          { allowEdit &&
+            <ReportDetails
+              report={item}
+              linesFileds={linesFileds}
+              mode={mode}
+              onUpdate={this.onChangeFieldValue}
+              onReset={this.fetchItem}
+              onFilter={this.applyFilter}
+            />
+          }
 
           <List items={reportData} fields={tableFields} className="report-list" />
           <Pager
@@ -344,26 +346,24 @@ class ReportSetup extends Component {
 
           <div className="clearfix" />
           <hr className="mb0" />
-          <Col sm={12}>
-            <Col sm={6} className="text-left">
+          <Col sm={12} className="pl0 pr0">
+            <Col sm={6} className="text-left pl0">
               <ActionButtons
                 onClickCancel={this.handleBack}
                 onClickSave={this.handleSave}
                 hideSave={!allowEdit}
-                cancelLabel="Back"
+                cancelLabel="Back to list"
                 progress={progress}
                 disableCancel={progress}
               />
             </Col>
-            <Col sm={6} className="text-right">
+            <Col sm={6} className="text-right pr0">
               { allowEdit
                 ? <ActionButtons
                   cancelLabel="Reset"
                   onClickCancel={this.onReset}
-                  saveLabel="Search"
-                  onClickSave={this.applyFilter}
-                  disableSave={progress}
                   disableCancel={progress}
+                  hideSave={true}
                 />
                 : <ActionButtons
                   saveLabel="Edit"
@@ -371,7 +371,6 @@ class ReportSetup extends Component {
                   hideCancel={true}
                 />
               }
-
             </Col>
           </Col>
         </Panel>

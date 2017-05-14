@@ -624,6 +624,12 @@ class ReportDetails extends Component {
     );
   }
 
+  renderSearchButton = () => {
+    return (
+      <Button bsStyle="primary" onClick={this.onApplay} className="full-width mr10"><i className="fa fa-search" />&nbsp;Search</Button>
+    );
+  }
+
   render() {
     const { report } = this.props;
 
@@ -648,6 +654,9 @@ class ReportDetails extends Component {
           <Col sm={12}>{ this.renderGroupByActions() }</Col>
           <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
           <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
+          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
+          <Col sm={12}>{ this.renderSearchButton() }</Col>
+          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
         </Form>
       </div>
     );

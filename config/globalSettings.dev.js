@@ -30,7 +30,7 @@ var globalSetting = {
   logoMaxSize: 2,
   chargingBufferDays: 5,
   reports: {
-    entities: ['lines', 'subscription', 'customer'],
+    entities: ['lines'/*, 'subscription', 'customer'*/],
     fields: {
       lines: [
         // Default settings \ Example
@@ -79,7 +79,7 @@ var globalSetting = {
     },
     operators: [
       { id: 'eq', title: '==', types: ['string', 'number', 'boolean', 'date'] }, // 'Equals'
-      { id: 'ne', title: '!=', types: ['string', 'number', 'boolean', 'date'] }, // 'Not equals'
+      { id: 'ne', title: '!=', types: ['string', 'number', 'boolean'] }, // 'Not equals'
       { id: 'lt', title: '<', types: ['number', 'date'] }, // 'Less than'
       { id: 'lte', title: '<=', types: ['number', 'date'] }, // 'Less than or equals'
       { id: 'gt', title: '>', types: ['number', 'date'] }, // 'Greater than'
