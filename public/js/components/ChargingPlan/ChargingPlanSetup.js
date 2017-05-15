@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, Tabs, Tab, Panel } from 'react-bootstrap';
+import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
 import ChargingPlanDetails from './ChargingPlanDetails';
@@ -9,21 +9,27 @@ import ChargingPlanIncludes from './ChargingPlanIncludes';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
 import {
-  getPlan,
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
+import {
+  getPrepaidGroup,
   clearPlan,
-  savePlan,
+  savePrepaidGroup,
   onPlanFieldUpdate,
   addUsagetInclude,
   onPlanTariffAdd,
+  setClonePlan,
 } from '../../actions/planActions';
 import { getList } from '../../actions/listActions';
 import { showWarning, showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
-
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 class ChargingPlanSetup extends Component {
 
@@ -32,6 +38,7 @@ class ChargingPlanSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     prepaidIncludes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
@@ -55,16 +62,13 @@ class ChargingPlanSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
     this.initDefaultValues();
   }
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'charging_plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -73,19 +77,14 @@ class ChargingPlanSetup extends Component {
 
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const {
-      item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'charging_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -94,12 +93,10 @@ class ChargingPlanSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onPlanFieldUpdate(['from'], defaultFromValue));
-    }
-    if (mode === 'create') {
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'charging'));
@@ -107,15 +104,31 @@ class ChargingPlanSetup extends Component {
       this.props.dispatch(onPlanFieldUpdate(['price', 0, 'price'], 0));
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({ unit: 1, periodicity: 'month' })));
+      this.props.dispatch(onPlanFieldUpdate(['operation'], 'inc'));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePlan());
     }
   }
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
-      this.props.dispatch(getRevisions('plans', 'name', key));
+      this.props.dispatch(getRevisions('prepaidgroups', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getPrepaidGroup(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('prepaidgroups', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -134,38 +147,37 @@ class ChargingPlanSetup extends Component {
   onSelectPPInclude = (value) => {
     const { prepaidIncludes } = this.props;
     const ppInclude = prepaidIncludes.find(pp => pp.get('name') === value);
-    const usaget = ppInclude.get('charging_by_usaget');
-    if (this.props.item.getIn(['include', usaget])) {
-      this.props.dispatch(showWarning('Prepaid bucket already defined'));
-    } else {
-      const ppIncludesName = ppInclude.get('name');
-      const ppIncludesExternalId = ppInclude.get('external_id');
-      this.props.dispatch(addUsagetInclude(usaget, ppIncludesName, ppIncludesExternalId));
-    }
+    const ppIncludesName = ppInclude.get('name');
+    const ppIncludesExternalId = ppInclude.get('external_id');
+    this.props.dispatch(addUsagetInclude(ppIncludesName, ppIncludesExternalId));
   };
 
-  onUpdatePeriodField = (type, id, value) => {
-    this.props.dispatch(onPlanFieldUpdate(['include', type, 'period', id], value));
+  onUpdatePeriodField = (index, id, value) => {
+    this.props.dispatch(onPlanFieldUpdate(['include', index, 'period', id], value));
   };
 
-  onUpdateIncludeField = (usaget, id, value) => {
-    this.props.dispatch(onPlanFieldUpdate(['include', usaget, id], value));
+  onUpdateIncludeField = (index, id, value) => {
+    this.props.dispatch(onPlanFieldUpdate(['include', index, id], value));
+  };
+
+  onRemoveChargingPlan = (index) => {
+    const { item } = this.props;
+    this.props.dispatch(onPlanFieldUpdate(['include'], item.get('include').remove(index)));
   };
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
 
   handleSave = () => {
     const { item, mode } = this.props;
-    this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
+    this.props.dispatch(savePrepaidGroup(item, mode)).then(this.afterSave);
   };
 
   handleBack = (itemWasChanged = false) => {
@@ -181,7 +193,7 @@ class ChargingPlanSetup extends Component {
   }
 
   render() {
-    const { item, prepaidIncludes, mode, revisions } = this.props;
+    const { item, prepaidIncludes, mode, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -190,50 +202,53 @@ class ChargingPlanSetup extends Component {
       label: pp.get('name'),
       value: pp.get('name'),
     })).toJS();
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="ChargingPlanSetup">
-        <Col lg={12} md={12}>
 
-          <Panel>
-            <EntityRevisionDetails
-              revisions={revisions}
-              item={item}
-              mode={mode}
-              onChangeFrom={this.onChangeField}
-              itemName="charging_plan"
-              backToList={this.handleBack}
-            />
-          </Panel>
+        <Panel>
+          <EntityRevisionDetails
+            itemName="charging_plan"
+            revisions={revisions}
+            item={item}
+            mode={mode}
+            onChangeFrom={this.onChangeField}
+            backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
+          />
+        </Panel>
 
-          <Tabs defaultActiveKey={this.state.activeTab} id="ChargingPlan" animation={false} onSelect={this.handleSelectTab}>
+        <Tabs defaultActiveKey={this.state.activeTab} id="ChargingPlan" animation={false} onSelect={this.handleSelectTab}>
 
-            <Tab title="Details" eventKey={1}>
-              <Panel style={{ borderTop: 'none' }}>
-                <ChargingPlanDetails
-                  item={item}
-                  mode={mode}
-                  onChangeField={this.onChangeField}
-                />
-              </Panel>
-            </Tab>
+          <Tab title="Details" eventKey={1}>
+            <Panel style={{ borderTop: 'none' }}>
+              <ChargingPlanDetails
+                item={item}
+                mode={mode}
+                onChangeField={this.onChangeField}
+              />
+            </Panel>
+          </Tab>
 
-            <Tab title="Prepaid Buckets" eventKey={2}>
-              <Panel style={{ borderTop: 'none' }}>
-                <ChargingPlanIncludes
-                  mode={mode}
-                  includes={item.get('include', Immutable.Map())}
-                  prepaidIncludesOptions={prepaidIncludesOptions}
-                  onSelectPPInclude={this.onSelectPPInclude}
-                  onUpdatePeriodField={this.onUpdatePeriodField}
-                  onUpdateField={this.onUpdateIncludeField}
-                />
-              </Panel>
-            </Tab>
-          </Tabs>
+          <Tab title="Prepaid Buckets" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <ChargingPlanIncludes
+                mode={mode}
+                includes={item.get('include', Immutable.List())}
+                prepaidIncludesOptions={prepaidIncludesOptions}
+                onSelectPPInclude={this.onSelectPPInclude}
+                onUpdatePeriodField={this.onUpdatePeriodField}
+                onUpdateField={this.onUpdateIncludeField}
+                onRemoveChargingPlan={this.onRemoveChargingPlan}
+              />
+            </Panel>
+          </Tab>
+        </Tabs>
 
-          <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
+        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
 
-        </Col>
       </div>
     );
   }
@@ -245,7 +260,8 @@ const mapStateToProps = (state, props) => ({
   item: itemSelector(state, props, 'plan'),
   mode: modeSelector(state, props, 'plan'),
   activeTab: tabSelector(state, props, 'plan'),
-  revisions: revisionsSelector(state, props, 'plan'),
+  revisions: revisionsSelector(state, props, 'charging_plan'),
   prepaidIncludes: state.list.get('prepaid_includes'),
+  chargingDay: chargingDaySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(ChargingPlanSetup));

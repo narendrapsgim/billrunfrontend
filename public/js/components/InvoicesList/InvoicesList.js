@@ -9,6 +9,7 @@ import Filter from '../Filter';
 import List from '../List';
 /* ACTIONS */
 import { getList, clearList } from '../../actions/listActions';
+import { getConfig } from '../../common/Util';
 
 
 class InvoicesList extends Component {
@@ -41,7 +42,7 @@ class InvoicesList extends Component {
     const { collection } = this.props;
     const { page, size, filter, sort } = this.state;
 
-    const query = Object.assign({}, filter, { action: 'query_bills_invoices' });
+    const query = Object.assign({}, filter, { action: 'query_bills_invoices', type: 'inv' });
     if (query.aid) {
       query.aid = { $in: [query.aid] };
     }
@@ -79,7 +80,7 @@ class InvoicesList extends Component {
   }
 
   downloadURL = (aid, billrunKey, invoiceId) =>
-    `${globalSetting.serverUrl}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`
+    `${getConfig('serverUrl')}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`
 
   renderMainPanelTitle = () => (
     <div>
@@ -90,8 +91,12 @@ class InvoicesList extends Component {
   );
 
   parserPaidBy = (ent) => {
-    if (ent.get('paid_by')) {
+    let paid = ent.get('paid', false);
+    if ([true, '1'].includes(paid)) {
       return (<span style={{ color: '#3c763d' }}>Paid</span>);
+    }
+    else if (paid === '2') {
+      return (<span style={{ color: '#5b5e5b' }}>Pending</span>);
     }
     if (moment(ent.get('due_date')).isAfter(moment())) {
       return (<span style={{ color: '#8a6d3b' }}>Due</span>);
@@ -113,10 +118,10 @@ class InvoicesList extends Component {
 
   getTableFields = () => ([
     { id: 'invoice_id', title: 'Invoice Id', sort: true },
-    { id: 'invoice_date', title: 'Date', cssClass: 'short-date', sort: true, type: 'date' },
-    { id: 'due_date', title: 'Due', cssClass: 'short-date', sort: true, type: 'date' },
+    { id: 'invoice_date', title: 'Date', cssClass: 'short-date', sort: true, type: 'mongodate' },
+    { id: 'due_date', title: 'Due', cssClass: 'short-date', sort: true, type: 'mongodate' },
     { id: 'amount', title: 'Amount', sort: true },
-    { id: 'paid_by', title: 'Status', parser: this.parserPaidBy },
+    { id: 'paid', title: 'Status', parser: this.parserPaidBy },
     { id: 'billrun_key', title: 'Cycle', sort: true },
     { id: 'aid', title: 'Customer ID', sort: true },
     { id: 'payer_name', title: 'Name', sort: true },

@@ -4,6 +4,7 @@ import { Link, withRouter } from 'react-router';
 import Immutable from 'immutable';
 import classNames from 'classnames';
 import { NavDropdown, Button, MenuItem as BootstrapMenuItem } from 'react-bootstrap';
+import { toggleSideBar } from '../../actions/guiStateActions/menuActions';
 import { userDoLogout } from '../../actions/userActions';
 import MenuItem from './MenuItem';
 import SubMenu from './SubMenu';
@@ -16,6 +17,7 @@ class Navigator extends Component {
     userName: '',
     menuItems: Immutable.List(),
     userRoles: [],
+    collapseSideBar: false,
   };
 
   static propTypes = {
@@ -23,17 +25,18 @@ class Navigator extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     menuItems: PropTypes.instanceOf(Immutable.Iterable),
-    userDoLogout: PropTypes.func.isRequired,
     companyNeme: PropTypes.string,
     logo: PropTypes.string.isRequired,
     userName: PropTypes.string,
     userRoles: PropTypes.array,
+    collapseSideBar: PropTypes.bool,
+    dispatch: PropTypes.func.isRequired,
   };
 
   state = {
     showCollapseButton: false,
+    openSmallMenu: false,
     showFullMenu: true,
-    collapseSideBar: false,
     openSubMenu: [],
   };
 
@@ -61,7 +64,13 @@ class Navigator extends Component {
 
   onWindowResize = () => {
     const small = window.innerWidth < 768;
-    this.setState({ showCollapseButton: small, showFullMenu: !small });
+    if (this.state.showCollapseButton !== small) {
+      this.setState({
+        showCollapseButton: small,
+        openSmallMenu: !small,
+        showFullMenu: !small,
+      });
+    }
   }
 
   onToggleMenu = () => {
@@ -70,19 +79,25 @@ class Navigator extends Component {
   }
 
   onCollapseSidebar = () => {
-    this.setState({ collapseSideBar: !this.state.collapseSideBar });
+    this.props.dispatch(toggleSideBar());
   }
 
-  onSetActive = (id) => {
-    this.setState({ activeMenuItem: id });
+  onSetActive = () => {
+    this.setState({ openSmallMenu: false });
   };
-
 
   onToggleSubMenu = (id) => {
     const { openSubMenu } = this.state;
-    const toggleSubMenu = openSubMenu.includes(id) ? openSubMenu.filter(item => item != id) : [...openSubMenu, id];
-    this.setState({ openSubMenu: toggleSubMenu, collapseSideBar: false });
+    const toggleSubMenu = openSubMenu.includes(id)
+      ? openSubMenu.filter(item => item !== id)
+      : [...openSubMenu, id];
+    this.setState({ openSubMenu: toggleSubMenu });
+    this.props.dispatch(toggleSideBar(false));
   };
+
+  toggleSmallMenu = () => {
+    this.setState({ openSmallMenu: !this.state.openSmallMenu });
+  }
 
   resetMenuActive = () => {
     this.onSetActive('');
@@ -90,7 +105,7 @@ class Navigator extends Component {
 
   clickLogout = (e) => {
     e.preventDefault();
-    this.props.userDoLogout().then((res) => {
+    this.props.dispatch(userDoLogout()).then(() => {
       this.props.router.push('/');
     });
   };
@@ -159,24 +174,46 @@ class Navigator extends Component {
   }
 
   render() {
-    const { collapseSideBar } = this.state;
-    const { userName, companyNeme, menuItems, logo } = this.props;
+    const { showCollapseButton, openSmallMenu } = this.state;
+    const { userName, companyNeme, menuItems, logo, collapseSideBar } = this.props;
     const overallNavClassName = classNames({
       'navbar navbar-default navbar-fixed-top': true,
       'collapse-sizebar': collapseSideBar,
     });
 
+    const mainNavClassName = classNames({
+      'navbar-default sidebar main-menu': true,
+      smallScreenMenu: showCollapseButton && openSmallMenu,
+    });
     return (
       <nav className={overallNavClassName} id="top-nav" role="navigation">
+
+        { showCollapseButton &&
+          <button
+            type="button"
+            className="navbar-toggle"
+            onClick={this.toggleSmallMenu}
+            style={{ position: 'absolute', right: 0, top: 0 }}
+          >
+            <span className="sr-only">Toggle navigation</span>
+            <span className="icon-bar" />
+            <span className="icon-bar" />
+            <span className="icon-bar" />
+          </button>
+        }
+
+
         <div className="navbar-header">
           <Link to="/" className="navbar-brand" onClick={this.resetMenuActive}>
             <img src={logo} style={{ height: 22 }} alt="Logo" />
             <span className="brand-name">{ companyNeme }</span>
           </Link>
-          <Button bsSize="xsmall" id="btn-collapse-menu" onClick={this.onCollapseSidebar}>
-            <i className="fa fa-chevron-left" />
-            <i className="fa fa-chevron-left" />
-          </Button>
+          { !showCollapseButton &&
+            <Button bsSize="xsmall" id="btn-collapse-menu" onClick={this.onCollapseSidebar}>
+              <i className="fa fa-chevron-left" />
+              <i className="fa fa-chevron-left" />
+            </Button>
+          }
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
@@ -186,7 +223,9 @@ class Navigator extends Component {
               </BootstrapMenuItem>
           </NavDropdown>
         </ul>
-        <div className="navbar-default sidebar" role="navigation">
+
+        { (!showCollapseButton || (showCollapseButton && openSmallMenu)) &&
+        <div className={mainNavClassName} role="navigation">
           <div className="sidebar-nav navbar-collapse">
 
             <ul className="nav in" id="side-menu">
@@ -198,19 +237,19 @@ class Navigator extends Component {
             </ul>
           </div>
         </div>
+      }
       </nav>
     );
   }
 }
 
-const mapDispatchToProps = {
-  userDoLogout,
-};
+
 const mapStateToProps = state => ({
   companyNeme: state.settings.get('tenant', Immutable.Map()).get('name'),
-  userName: state.user.get('name'),
-  menuItems: state.guiState.menu.get('main', Immutable.List()),
-  userRoles: state.user.get('roles'),
-  logo: state.settings.getIn(['files', 'logo']),
+  userName: state.user.get('name') || undefined,
+  menuItems: state.guiState.menu.get('main') || undefined,
+  collapseSideBar: state.guiState.menu.get('collapseSideBar') || undefined,
+  userRoles: state.user.get('roles') || undefined,
+  logo: state.settings.getIn(['files', 'logo']) || undefined,
 });
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Navigator));
+export default withRouter(connect(mapStateToProps)(Navigator));

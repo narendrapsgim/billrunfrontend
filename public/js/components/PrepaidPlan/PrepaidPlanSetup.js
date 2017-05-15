@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import moment from 'moment';
 import Immutable from 'immutable';
-import { Tabs, Tab, Col, Panel } from 'react-bootstrap';
+import { Tabs, Tab, Panel } from 'react-bootstrap';
 import PrepaidPlanDetails from './PrepaidPlanDetails';
 import PlanNotifications from './PlanNotifications';
 import BlockedProducts from './BlockedProducts';
@@ -11,7 +11,12 @@ import Thresholds from './Thresholds';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
 import {
@@ -24,13 +29,22 @@ import {
   removeBlockProduct,
   addBalanceThreshold,
   changeBalanceThreshold,
+  removeBalanceThreshold,
 } from '../../actions/prepaidPlanActions';
 import { getList } from '../../actions/listActions';
 import { showWarning, showSuccess } from '../../actions/alertsActions';
-import { getPlan, savePlan, clearPlan, onPlanFieldUpdate, onPlanTariffAdd } from '../../actions/planActions';
+import {
+  getPlan,
+  savePlan,
+  clearPlan,
+  onPlanFieldUpdate,
+  onPlanTariffAdd,
+  setClonePlan,
+} from '../../actions/planActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class PrepaidPlanSetup extends Component {
@@ -40,6 +54,7 @@ class PrepaidPlanSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     ppIncludes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
@@ -63,15 +78,12 @@ class PrepaidPlanSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
   }
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'prepaid_plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -80,19 +92,14 @@ class PrepaidPlanSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const {
-      item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'prepaid_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -102,12 +109,10 @@ class PrepaidPlanSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onPlanFieldUpdate(['from'], defaultFromValue));
-    }
-    if (mode === 'create') {
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['charging_type'], 'prepaid'));
       this.props.dispatch(onPlanFieldUpdate(['type'], 'customer'));
@@ -115,15 +120,32 @@ class PrepaidPlanSetup extends Component {
       this.props.dispatch(onPlanFieldUpdate(['price', 0, 'price'], 0));
       this.props.dispatch(onPlanFieldUpdate(['upfront'], true));
       this.props.dispatch(onPlanFieldUpdate(['recurrence'], Immutable.Map({ unit: 1, periodicity: 'month' })));
+      this.props.dispatch(onPlanFieldUpdate(['prorated'], false)); // this is a temp hack, because prepaid plans should not have prorated field. needs to be fixed in BE
+      this.props.dispatch(onPlanFieldUpdate(['tax'], Immutable.Map({ service_code: ' ', product_code: ' ', safe_harbor_override_pct: ' ' }))); // this is a temp hack, because prepaid plans should not have tax fields. needs to be fixed in BE
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePlan());
     }
   }
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
       this.props.dispatch(getRevisions('plans', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -165,21 +187,18 @@ class PrepaidPlanSetup extends Component {
     this.props.dispatch(removeBalanceNotifications(balanceId));
   }
 
-  onSelectBlockProduct = (productKey) => {
-    const { item, dispatch } = this.props;
-    if (item.get('disallowed_rates', Immutable.List()).includes(productKey)) {
-      dispatch(showWarning(`${productKey} already blocked`));
-      return;
-    }
-    dispatch(blockProduct(productKey));
-  }
 
-  onRemoveBlockProduct = (productKey) => {
-    this.props.dispatch(removeBlockProduct(productKey));
+  onChangeBlockProduct = (productKeys) => {
+    const productKeysList = (productKeys.length) ? productKeys.split(',') : [];
+    this.props.dispatch(blockProduct(Immutable.List(productKeysList)));
   }
 
   onChangeThreshold = (balanceId, threshold) => {
     this.props.dispatch(changeBalanceThreshold(balanceId, threshold));
+  }
+
+  onRemoveThreshold = (balanceId) => {
+    this.props.dispatch(removeBalanceThreshold(balanceId));
   }
 
   onAddBalanceThreshold = (balanceId) => {
@@ -197,19 +216,18 @@ class PrepaidPlanSetup extends Component {
   }
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
 
   handleBack = (itemWasChanged = false) => {
     if (itemWasChanged) {
-      this.props.dispatch(clearItems('prepaid_plan')); // refetch items list because item was (changed in / added to) list
+      this.props.dispatch(clearItems('prepaid_plans')); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = getConfig(['systemItems', 'prepaid_plan', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
@@ -220,95 +238,97 @@ class PrepaidPlanSetup extends Component {
   }
 
   render() {
-    const { item, mode, ppIncludes, revisions } = this.props;
+    const { item, mode, ppIncludes, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const allowEdit = mode !== 'view';
     const planRates = item.get('rates', Immutable.Map());
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="PrepaidPlan">
-        <Col lg={12}>
 
-          <Panel>
-            <EntityRevisionDetails
-              revisions={revisions}
-              item={item}
-              mode={mode}
-              onChangeFrom={this.onChangePlanField}
-              itemName="prepaid_plan"
-              backToList={this.handleBack}
-            />
-          </Panel>
-
-          <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
-
-            <Tab title="Details" eventKey={1}>
-              <Panel style={{ borderTop: 'none' }}>
-                <PrepaidPlanDetails
-                  item={item}
-                  mode={mode}
-                  onChangePlanField={this.onChangePlanField}
-                />
-              </Panel>
-            </Tab>
-
-            <Tab title="Override Product Price" eventKey={2}>
-              <Panel style={{ borderTop: 'none' }}>
-                <PlanProductsPriceTab
-                  mode={mode}
-                  planRates={planRates}
-                  onChangeFieldValue={this.onChangePlanField}
-                />
-              </Panel>
-            </Tab>
-
-            <Tab title="Notifications" eventKey={3}>
-              <Panel style={{ borderTop: 'none' }}>
-                <PlanNotifications
-                  plan={item}
-                  mode={mode}
-                  ppIncludes={ppIncludes}
-                  onAddNotification={this.onAddNotification}
-                  onRemoveNotification={this.onRemoveNotification}
-                  onUpdateNotificationField={this.onUpdateNotificationField}
-                  onSelectBalance={this.onSelectBalance}
-                  onRemoveBalanceNotifications={this.onRemoveBalanceNotifications}
-                />
-              </Panel>
-            </Tab>
-
-            <Tab title="Blocked Products" eventKey={4}>
-              <Panel style={{ borderTop: 'none' }}>
-                <BlockedProducts
-                  plan={item}
-                  mode={mode}
-                  onSelectProduct={this.onSelectBlockProduct}
-                  onRemoveProduct={this.onRemoveBlockProduct}
-                />
-              </Panel>
-            </Tab>
-
-            <Tab title="Charging Limits" eventKey={5}>
-              <Panel style={{ borderTop: 'none' }}>
-                <Thresholds
-                  plan={item}
-                  mode={mode}
-                  ppIncludes={ppIncludes}
-                  onChangeThreshold={this.onChangeThreshold}
-                  onAddBalance={this.onAddBalanceThreshold}
-                />
-              </Panel>
-            </Tab>
-          </Tabs>
-          <ActionButtons
-            onClickCancel={this.handleBack}
-            onClickSave={this.handleSave}
-            hideSave={!allowEdit}
-            cancelLabel={allowEdit ? undefined : 'Back'}
+        <Panel>
+          <EntityRevisionDetails
+            itemName="prepaid_plan"
+            revisions={revisions}
+            item={item}
+            mode={mode}
+            onChangeFrom={this.onChangePlanField}
+            backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
-        </Col>
+        </Panel>
+
+        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
+
+          <Tab title="Details" eventKey={1}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PrepaidPlanDetails
+                item={item}
+                mode={mode}
+                onChangePlanField={this.onChangePlanField}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Override Product Price" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanProductsPriceTab
+                mode={mode}
+                planRates={planRates}
+                onChangeFieldValue={this.onChangePlanField}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Notifications" eventKey={3}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanNotifications
+                plan={item}
+                mode={mode}
+                ppIncludes={ppIncludes}
+                onAddNotification={this.onAddNotification}
+                onRemoveNotification={this.onRemoveNotification}
+                onUpdateNotificationField={this.onUpdateNotificationField}
+                onSelectBalance={this.onSelectBalance}
+                onRemoveBalanceNotifications={this.onRemoveBalanceNotifications}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Blocked Products" eventKey={4}>
+            <Panel style={{ borderTop: 'none' }}>
+              <BlockedProducts
+                plan={item}
+                mode={mode}
+                onChangeBlockProduct={this.onChangeBlockProduct}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Charging Limits" eventKey={5}>
+            <Panel style={{ borderTop: 'none' }}>
+              <Thresholds
+                plan={item}
+                mode={mode}
+                ppIncludes={ppIncludes}
+                onChangeThreshold={this.onChangeThreshold}
+                onRemoveThreshold={this.onRemoveThreshold}
+                onAddBalance={this.onAddBalanceThreshold}
+              />
+            </Panel>
+          </Tab>
+        </Tabs>
+        <ActionButtons
+          onClickCancel={this.handleBack}
+          onClickSave={this.handleSave}
+          hideSave={!allowEdit}
+          cancelLabel={allowEdit ? undefined : 'Back'}
+        />
       </div>
     );
   }
@@ -322,5 +342,6 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'plan'),
   ppIncludes: state.list.get('pp_includes'),
+  chargingDay: chargingDaySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PrepaidPlanSetup));

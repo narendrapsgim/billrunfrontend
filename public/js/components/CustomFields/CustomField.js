@@ -88,6 +88,13 @@ class CustomField extends Component {
           </FormGroup>
 
           <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Searchable</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="searchable" onChange={this.onChange} value={field.get('searchable', false)} fieldType="checkbox" />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Select list</Col>
             <Col sm={9}>
               <InputGroup>

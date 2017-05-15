@@ -20,7 +20,7 @@ export default class ChargingPlanDetails extends Component {
   static defaultProps = {
     errorMessages: {
       name: {
-        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
       },
     },
   };
@@ -29,12 +29,6 @@ export default class ChargingPlanDetails extends Component {
     errors: {
       name: '',
     },
-  }
-
-  componentDidMount() {
-    if (this.props.mode === 'create') {
-      this.setDefaultValues();
-    }
   }
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
@@ -69,10 +63,6 @@ export default class ChargingPlanDetails extends Component {
     this.props.onChangeField(['charging_value'], value);
   }
 
-  setDefaultValues = () => {
-    this.props.onChangeField(['operation'], 'inc');
-  }
-
   render() {
     const { errors } = this.state;
     const { item, mode } = this.props;
@@ -97,7 +87,7 @@ export default class ChargingPlanDetails extends Component {
             </Col>
           </FormGroup>
 
-          {mode === 'create' &&
+          {['clone', 'create'].includes(mode) &&
             <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
               <Col componentClass={ControlLabel} sm={3} lg={2}>
                 Key
@@ -125,7 +115,7 @@ export default class ChargingPlanDetails extends Component {
             <Col sm={4}>
               { editable
                 ? <Select options={operationOptions} value={item.get('operation', '')} onChange={this.onChangeOperation} />
-                : <div className="non-editble-field">{ item.get('operation', '') }</div>
+                : <div className="non-editable-field">{ item.get('operation', '') }</div>
               }
             </Col>
           </FormGroup>

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 
 const Action = (props) => {
-  const { type, label, data, actionStyle, showIcon } = props;
+  const { type, label, data, actionStyle, showIcon, actionSize, actionClass } = props;
 
   if ((typeof props.show === 'boolean' && !props.show)
     || (typeof props.show === 'function' && !props.show(data))) {
@@ -13,7 +13,7 @@ const Action = (props) => {
 
   const isEnable = (typeof props.enable === 'function') ? props.enable(data) : props.enable;
 
-  const iconClass = classNames('fa', {
+  const iconClass = classNames('fa fa-fw', {
     'fa-eye': type === 'view',
     'fa-pencil': type === 'edit',
     'fa-files-o': type === 'clone',
@@ -21,6 +21,8 @@ const Action = (props) => {
     'fa-trash-o': type === 'remove',
     'fa-toggle-off': type === 'enable',
     'fa-toggle-on': type === 'disable',
+    'fa-plus': type === 'add',
+    'fa-calendar': type === 'move',
   });
 
   const onClick = () => {
@@ -31,13 +33,19 @@ const Action = (props) => {
     <Tooltip id="tooltip">
       { (typeof props.helpText === 'string')
         ? props.helpText
-        : props.helpText(data)
+        : props.helpText(data, type)
       }
     </Tooltip>
   );
 
   const button = (
-    <Button onClick={onClick} bsStyle={actionStyle} disabled={!isEnable}>
+    <Button
+      onClick={onClick}
+      bsStyle={actionStyle}
+      bsSize={actionSize}
+      className={actionClass}
+      disabled={!isEnable}
+    >
       { showIcon && <i className={iconClass} /> }
       { showIcon && label.length > 0 && <span>&nbsp;</span> }
       { label.length > 0 && label}
@@ -60,6 +68,7 @@ Action.defaultProps = {
   label: '',
   helpText: '',
   actionStyle: 'link',
+  actionClass: '',
   showIcon: true,
   enable: true,
   show: true,
@@ -72,6 +81,8 @@ Action.propTypes = {
   label: PropTypes.string,
   showIcon: PropTypes.bool,
   actionStyle: PropTypes.string,
+  actionSize: PropTypes.string,
+  actionClass: PropTypes.string,
   helpText: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func,

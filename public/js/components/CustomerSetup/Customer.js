@@ -3,32 +3,52 @@ import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Form, FormGroup, Col, Button, ControlLabel } from 'react-bootstrap';
+import { Form, FormGroup, Col, Button, ControlLabel, Row } from 'react-bootstrap';
 import Select from 'react-select';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
+import classNames from 'classnames';
 import Field from '../Field';
+import { rebalanceAccount, getCollectionDebt } from '../../actions/customerActions';
+import ConfirmModal from '../../components/ConfirmModal';
+import { currencySelector } from '../../selectors/settingsSelector';
+import OfflinePayment from '../Payments/OfflinePayment';
+import CyclesSelector from '../Cycle/CyclesSelector';
 
 class Customer extends Component {
 
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     customer: PropTypes.instanceOf(Immutable.Map),
     supportedGateways: PropTypes.instanceOf(Immutable.List),
     onChangePaymentGateway: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
     action: PropTypes.string,
+    currency: PropTypes.string,
     fields: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
     action: 'create',
+    currency: '',
     customer: Immutable.Map(),
     fields: Immutable.List(),
     supportedGateways: Immutable.List(),
   };
 
+  state = {
+    showRebalanceConfirmation: false,
+    showOfflinePayement: false,
+    debt: null,
+    selectedCyclesNames: '',
+  };
+
   componentDidMount() {
     const { action } = this.props;
     if (action === 'create') {
-      this.initDefaultValues()
+      this.initDefaultValues();
+    }
+    if (action !== 'create') {
+      this.initDebt();
     }
   }
 
@@ -43,6 +63,17 @@ class Customer extends Component {
         this.props.onChange(e);
       }
     });
+  }
+
+  initDebt = () => {
+    const { customer } = this.props;
+    const aid = customer.get('aid', null);
+    this.props.dispatch(getCollectionDebt(aid))
+      .then((response) => {
+        if (response.status && response.data && response.data.balance) {
+          this.setState({ debt: response.data.balance.total });
+        }
+      });
   }
 
   onSelect = (value, field) => {
@@ -73,18 +104,43 @@ class Customer extends Component {
     const label = hasPaymentGateway ? this.renderPaymentGatewayLabel() : 'None';
     return (
       <FormGroup>
-        <Col componentClass={ControlLabel} md={2}>
-          Payment Gateway
-        </Col>
-        <Col sm={7}>
-          {label}
-          <Button onClick={this.onChangePaymentGateway} bsSize="xsmall" style={{ marginLeft: 10, minWidth: 80 }}>
-            <i className="fa fa-pencil" />
-            &nbsp;{hasPaymentGateway ? 'Change' : 'Add'}
-          </Button>
-        </Col>
+        <Row>
+          <Col componentClass={ControlLabel} md={2}>
+            Payment Gateway
+          </Col>
+          <Col sm={7}>
+            {label}
+            <Button onClick={this.onChangePaymentGateway} bsSize="xsmall" style={{ marginLeft: 10, minWidth: 80 }}>
+              <i className="fa fa-pencil" />
+              &nbsp;{hasPaymentGateway ? 'Change' : 'Add'}
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col componentClass={ControlLabel} md={2} />
+          <Col sm={7}>
+            { this.renderOfflinePaymentsButton() }
+          </Col>
+        </Row>
       </FormGroup>
     );
+  }
+
+  renderDebt = () => {
+    const { currency } = this.props;
+    const { debt } = this.state;
+    const debtClass = classNames('non-editable-field', {
+      'danger-red': debt < 0,
+    });
+    return debt !== null &&
+      (<FormGroup>
+        <Col componentClass={ControlLabel} md={2}>
+          Total Debt
+        </Col>
+        <Col sm={7}>
+          <div className={debtClass}>{debt}{getSymbolFromCurrency(currency)}</div>
+        </Col>
+      </FormGroup>);
   }
 
   renderInCollection = () => {
@@ -136,6 +192,92 @@ class Customer extends Component {
       .map(this.renderField);
   }
 
+  onClickRebalance = () => {
+    this.setState({ showRebalanceConfirmation: true });
+  }
+
+  onRebalanceConfirmationClose = () => {
+    this.setState({ showRebalanceConfirmation: false, selectedCyclesNames: '' });
+  }
+
+  onRebalanceConfirmationOk = () => {
+    const { customer } = this.props;
+    const { selectedCyclesNames } = this.state;
+    this.props.dispatch(rebalanceAccount(customer.get('aid'), selectedCyclesNames));
+    this.onRebalanceConfirmationClose();
+  }
+
+  onClickOfflinePayment = () => {
+    this.setState({ showOfflinePayement: true });
+  }
+
+  onCloseOfflinePayment = () => {
+    this.setState({ showOfflinePayement: false });
+    this.initDebt();
+  }
+
+  onChangeSelectedCycle = (selectedCyclesNames) => {
+    this.setState({ selectedCyclesNames });
+  }
+
+  renderRebalanceButton = () => {
+    const { customer } = this.props;
+    const { showRebalanceConfirmation, selectedCyclesNames } = this.state;
+    const confirmationTitle = `Are you sure you want to rebalance account ${customer.get('aid')}?`;
+    return (
+      <div>
+        <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickRebalance}>Rebalance</Button>
+        <ConfirmModal onOk={this.onRebalanceConfirmationOk} onCancel={this.onRebalanceConfirmationClose} show={showRebalanceConfirmation} message={confirmationTitle} labelOk="Yes">
+          <FormGroup>
+            <Row>
+              <Col sm={12} lg={12}>
+                Rebalance operation will send all customer billing lines
+                for recalculation price and bundles options.
+                It can take few hours to finish the recalculations.
+                Meanwhile lines pricing properties will be empty.
+                <br />
+                This operation is useful when an update is required with reference data
+                (plans, products, services, etc) that raised non-desired pricing results.
+                After fixing the reference data, the operation will recalculate the billing lines.
+                <br /><br />
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={3} lg={2} componentClass={ControlLabel} className={'non-editable-field'}>Select cycle/s</Col>
+              <Col sm={9} lg={8}>
+                <CyclesSelector
+                  onChange={this.onChangeSelectedCycle}
+                  statusesToDisplay={Immutable.List(['current', 'to_run'])}
+                  selectedCycles={selectedCyclesNames}
+                  multi={true}
+                />
+              </Col>
+            </Row>
+          </FormGroup>
+        </ConfirmModal>
+      </div>
+    );
+  }
+
+  renderOfflinePaymentsButton = () => {
+    const { customer } = this.props;
+    const { showOfflinePayement, debt } = this.state;
+    const payerName = `${customer.get('firstname', '')} ${customer.get('lastname', '')}`;
+    return (
+      <div>
+        <Button bsSize="xsmall" className="btn-primary" style={{ marginTop: 12 }} onClick={this.onClickOfflinePayment}>Offline Payment</Button>
+        { showOfflinePayement &&
+          (<OfflinePayment
+            aid={customer.get('aid')}
+            payerName={payerName}
+            debt={debt}
+            onClose={this.onCloseOfflinePayment}
+          />)
+        }
+      </div>
+    );
+  }
+
   render() {
     const { customer, action } = this.props;
     // in update mode wait for item before render edit screen
@@ -148,6 +290,7 @@ class Customer extends Component {
         <Form horizontal>
           { this.renderFields() }
           { (action !== 'create') && this.renderChangePaymentGateway() }
+          { (action !== 'create') && this.renderDebt() }
         </Form>
         {(action !== 'create') &&
           <div>
@@ -155,6 +298,7 @@ class Customer extends Component {
             { this.renderInCollection() }
             <p>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></p>
             <p>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link></p>
+            { this.renderRebalanceButton() }
           </div>
         }
       </div>
@@ -162,4 +306,8 @@ class Customer extends Component {
   }
 }
 
-export default connect()(Customer);
+const mapStateToProps = (state, props) => ({
+  currency: currencySelector(state, props),
+});
+
+export default connect(mapStateToProps)(Customer);

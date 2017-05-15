@@ -1,9 +1,15 @@
 import React from 'react';
-import { Route, IndexRoute } from 'react-router';
+import { Route, IndexRoute, IndexRedirect } from 'react-router';
 
 import RequireAuth from '../containers/Authentication';
 import App from '../containers/App';
-import Dashboard from '../components/Dashboard';
+import {
+  RevenueDashboard,
+  OverviewDashboard,
+  CustomersDashboard,
+  CommercialDashboard,
+} from '../components/Dashboard';
+import FakeDataDashboard from '../components/Dashboard/FakeDataDashboard';
 import LoginPage from '../components/LoginPage';
 import WelcomePage from '../components/WelcomePage';
 import PageNotFound from '../components/PageNotFound';
@@ -11,8 +17,12 @@ import CustomersList from '../components/CustomersList';
 import CustomerSetup from '../components/CustomerSetup';
 import ProductsList from '../components/ProductsList';
 import Product from '../components/Product';
+import ReportsList from '../components/ReportsList';
+import Report from '../components/Report';
 import PlansList from '../components/PlansList';
 import Plan from '../components/Plan';
+import DiscountsList from '../components/DiscountsList';
+import Discount from '../components/Discount';
 import ServicesList from '../components/ServicesList';
 import Service from '../components/Service';
 import InputProcessorsList from '../components/InputProcessorsList';
@@ -20,6 +30,7 @@ import ExportGenerator from '../components/ExportGenerator';
 import ExportGeneratorsList from '../components/ExportGeneratorsList';
 import InputProcessor from '../components/InputProcessor';
 import UsageList from '../components/UsageList';
+import RunCycle from '../components/Cycle';
 import QueueList from '../components/QueueList';
 import InvoicesList from '../components/InvoicesList';
 import Settings from '../components/Settings';
@@ -42,7 +53,15 @@ import CustomFields from '../components/CustomFields';
 const routes = () => (
   <Route path="/" component={App}>
     <IndexRoute component={RequireAuth(WelcomePage)} title="" />
-    <Route path="/dashboard" component={RequireAuth(Dashboard)} title="Dashboard" />
+
+    <Route path="dashboard">
+      <Route path="overview" component={RequireAuth(OverviewDashboard)} title="Overview Dashboard" />
+      <Route path="revenue" component={RequireAuth(RevenueDashboard)} title="Revenue Dashboard" />
+      <Route path="commercial" component={RequireAuth(CommercialDashboard)} title="Commercial Dashboard" />
+      <Route path="customers" component={RequireAuth(CustomersDashboard)} title="Customers Dashboard" />
+      <Route path="demo" component={RequireAuth(FakeDataDashboard)} title="Demo Dashboard" />
+      <IndexRedirect to="overview" />
+    </Route>
 
     <Route path="plans">
       <IndexRoute component={RequireAuth(PlansList)} title="Plans" />
@@ -54,6 +73,12 @@ const routes = () => (
       <IndexRoute component={RequireAuth(ServicesList)} title="Services" />
       <Route path="service/:itemId" component={RequireAuth(Service)} />
       <Route path="service" component={RequireAuth(Service)} />
+    </Route>
+
+    <Route path="discounts" >
+      <IndexRoute component={RequireAuth(DiscountsList)} title="Discounts" />
+      <Route path="discount/:itemId" component={RequireAuth(Discount)} />
+      <Route path="discount" component={RequireAuth(Discount)} />
     </Route>
 
     <Route path="products" >
@@ -92,11 +117,18 @@ const routes = () => (
       <Route path="user" component={RequireAuth(UserSetup)} />
     </Route>
 
+    <Route path="reports" >
+      <IndexRoute component={RequireAuth(ReportsList)} title="Reports" />
+      <Route path="report/:itemId" component={RequireAuth(Report)} />
+      <Route path="report" component={RequireAuth(Report)} />
+    </Route>
+
     <Route path="/input_processor" component={RequireAuth(InputProcessor)} />
     <Route path="/input_processors" component={RequireAuth(InputProcessorsList)} title="Input Processors" />
     <Route path="/export_generator" component={RequireAuth(ExportGenerator)} title="Export Generator" />
     <Route path="/export_generators" component={RequireAuth(ExportGeneratorsList)} title="Export Generators" />
     <Route path="/usage" component={RequireAuth(UsageList)} title="Usage" />
+    <Route path="/run_cycle" component={RequireAuth(RunCycle)} title="Billing Cycle" />
     <Route path="/queue" component={RequireAuth(QueueList)} title="Queue" />
     <Route path="/invoices" component={RequireAuth(InvoicesList)} title="Invoices" />
     <Route path="/settings" component={RequireAuth(Settings)} title="General Settings" />

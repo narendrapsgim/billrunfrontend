@@ -3,18 +3,23 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
+import { Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
-import { addGroup, removeGroup, getService, clearService, updateService, saveService } from '../../actions/serviceActions';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
+import { addGroup, removeGroup, getService, clearService, updateService, saveService, setCloneService } from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
-
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 class ServiceSetup extends Component {
 
@@ -23,6 +28,7 @@ class ServiceSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -41,18 +47,16 @@ class ServiceSetup extends Component {
 
   state = {
     activeTab: parseInt(this.props.activeTab),
+    progress: false,
   };
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
   }
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'service');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -60,18 +64,14 @@ class ServiceSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const { item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'service', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -89,18 +89,36 @@ class ServiceSetup extends Component {
 
   initDefaultValues = () => {
     const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(updateService(['from'], defaultFromValue));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setCloneService());
+    }
+    if (item.get('prorated', null) === null) {
+      this.props.dispatch(updateService(['prorated'], true));
     }
   }
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
       this.props.dispatch(getRevisions('services', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('services', key));// refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -112,8 +130,8 @@ class ServiceSetup extends Component {
     }
   }
 
-  onGroupAdd = (groupName, usage, value, shared, products) => {
-    this.props.dispatch(addGroup(groupName, usage, value, shared, products));
+  onGroupAdd = (groupName, usage, value, shared, pooled, products) => {
+    this.props.dispatch(addGroup(groupName, usage, value, shared, pooled, products));
   }
 
   onGroupRemove = (groupName) => {
@@ -125,12 +143,12 @@ class ServiceSetup extends Component {
   }
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
+    this.setState({ progress: false });
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('services', key)); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The service was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
@@ -149,31 +167,37 @@ class ServiceSetup extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
+    this.setState({ progress: true });
     this.props.dispatch(saveService(item, mode)).then(this.afterSave);
   }
 
   render() {
-    const { item, mode, revisions } = this.props;
+    const { progress, activeTab } = this.state;
+    const { item, mode, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const allowEdit = mode !== 'view';
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
-      <Col lg={12}>
+      <div className="ServiceSetup">
         <Panel>
           <EntityRevisionDetails
+            itemName="service"
             revisions={revisions}
             item={item}
             mode={mode}
             onChangeFrom={this.onUpdateItem}
-            itemName="service"
             backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
         </Panel>
 
-        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
+        <Tabs defaultActiveKey={activeTab} animation={false} id="ServiceTab" onSelect={this.handleSelectTab}>
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
@@ -199,8 +223,9 @@ class ServiceSetup extends Component {
           onClickSave={this.handleSave}
           hideSave={!allowEdit}
           cancelLabel={allowEdit ? undefined : 'Back'}
+          progress={progress}
         />
-      </Col>
+    </div>
     );
   }
 
@@ -213,6 +238,7 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'service'),
   activeTab: tabSelector(state, props, 'service'),
   revisions: revisionsSelector(state, props, 'service'),
+  chargingDay: chargingDaySelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ServiceSetup));

@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, Button, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
 import CreateButton from '../Elements/CreateButton';
@@ -33,7 +33,7 @@ export default class Product extends Component {
     product: Immutable.Map(),
     errorMessages: {
       name: {
-        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
       },
     },
   };
@@ -99,6 +99,11 @@ export default class Product extends Component {
   onChangeParamValues = (key, values) => {
     const paramPath = ['params', key];
     this.props.onFieldUpdate(paramPath, Immutable.List(values));
+  }
+
+  onChangePricingMethod = (e) => {
+    const { value } = e.target;
+    this.props.onFieldUpdate(['pricing_method'], value);
   }
 
   onRemoveParam = (paramKey) => {
@@ -178,7 +183,7 @@ export default class Product extends Component {
   }
 
   onChangeAdditionalField = (field, value) => {
-    this.props.onFieldUpdate([field], value);
+    this.props.onFieldUpdate(field, value);
   }
 
   renderPrices = () => {
@@ -224,8 +229,9 @@ export default class Product extends Component {
   render() {
     const { errors } = this.state;
     const { product, usaget, mode } = this.props;
-    const vatable = (product.get('vatable', false) === true);
+    const vatable = (product.get('vatable', true) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
+    const pricingMethod = product.get('pricing_method', 'tiered');
     const availablePrefix = [];
     const editable = (mode !== 'view');
 
@@ -244,13 +250,13 @@ export default class Product extends Component {
                 </Col>
               </FormGroup>
 
-              {mode === 'create' &&
+              { ['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
                     Key<Help contents={ProductDescription.key} />
                   </Col>
                   <Col sm={8} lg={9}>
-                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={mode !== 'create'} editable={editable} />
+                    <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={!['clone', 'create'].includes(mode)} editable={editable} />
                     { errors.name.length > 0 && <HelpBlock>{errors.name}</HelpBlock> }
                   </Col>
                 </FormGroup>
@@ -259,7 +265,7 @@ export default class Product extends Component {
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>External Code</Col>
                 <Col sm={8} lg={9}>
-                  <Field onChange={this.onChangeCode} value={product.get('code', '')} editable={editable}  />
+                  <Field onChange={this.onChangeCode} value={product.get('code', '')} editable={editable} />
                 </Col>
               </FormGroup>
 
@@ -277,7 +283,7 @@ export default class Product extends Component {
                         placeholder="Add Prefix..."
                       />
                     )
-                    : <div className="non-editble-field">{ prefixs }</div>
+                    : <div className="non-editable-field">{ prefixs }</div>
                   }
 
                 </Col>
@@ -290,13 +296,13 @@ export default class Product extends Component {
                     ? (
                       <Select
                         allowCreate
-                        disabled={mode !== 'create'}
+                        disabled={!['clone', 'create'].includes(mode)}
                         onChange={this.onChangeUsaget}
                         options={this.getUsageTypesOptions()}
                         value={usaget}
                       />
                     )
-                    : <div className="non-editble-field">{ usaget }</div>
+                    : <div className="non-editable-field">{ usaget }</div>
                   }
                 </Col>
               </FormGroup>
@@ -311,29 +317,76 @@ export default class Product extends Component {
             </Panel>
 
             <Panel header={<h3>Pricing</h3>}>
+              <FormGroup>
+                <Col sm={12}>
+                  { editable
+                    ? [(
+                      <Col sm={3} key="pricing-method-1">
+                        <div className="inline">
+                          <Field
+                            fieldType="radio"
+                            name="pricing-method"
+                            id="pricing-method-tiered"
+                            value="tiered"
+                            checked={pricingMethod === 'tiered'}
+                            onChange={this.onChangePricingMethod}
+                            label="Tiered pricing"
+                          />
+                        </div>
+                        &nbsp;<Help contents={ProductDescription.tieredPricing} />
+                      </Col>
+                    ),
+                    (
+                      <Col sm={3} key="pricing-method-2">
+                        <div className="inline">
+                          <Field
+                            fieldType="radio"
+                            name="pricing-method"
+                            id="pricing-method-volume"
+                            value="volume"
+                            checked={pricingMethod === 'volume'}
+                            onChange={this.onChangePricingMethod}
+                            label="Volume pricing"
+                          />
+                        </div>
+                        &nbsp;<Help contents={ProductDescription.volumePricing} />
+                      </Col>
+                    )]
+                    : (
+                      <div className="non-editble-field">
+                        { pricingMethod === 'tiered'
+                          ? 'Tiered pricing'
+                          : 'Volume pricing'
+                        }
+                      </div>
+                    )
+                  }
+                </Col>
+              </FormGroup>
+
+              { this.renderPrices() }
+              <br />
+              { editable && <CreateButton onClick={this.onProductRateAdd} label="Add New" />}
               <Col lg={12} md={12}>
                 <FormGroup>
                   { editable
                     ? (
                       <Checkbox checked={vatable} onChange={this.onChangeVatable}>
-                        This product is VAT rated
+                        This product is taxable
                       </Checkbox>
                     )
                     :
                     (
-                      <div className="non-editble-field">
+                      <div className="non-editable-field">
                         { vatable
-                          ? 'This product is VAT rated'
-                          : 'This product is not VAT rated'
+                          ? 'This product is taxable'
+                          : 'This product is not taxable'
                         }
                       </div>
                     )
                 }
                 </FormGroup>
               </Col>
-              { this.renderPrices() }
-              <br />
-              { editable && <CreateButton onClick={this.onProductRateAdd} label="Add New" />}
             </Panel>
 
             <Panel header={<h3>Additional Parameters</h3>}>

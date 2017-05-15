@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, Panel, Tabs, Tab } from 'react-bootstrap';
+import { Panel, Tabs, Tab } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
 import PlanTab from './PlanTab';
@@ -19,13 +19,20 @@ import {
   onPlanTariffRemove,
   onGroupAdd,
   onGroupRemove,
+  setClonePlan,
 } from '../../actions/planActions';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
+import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class PlanSetup extends Component {
@@ -35,6 +42,7 @@ class PlanSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -53,18 +61,16 @@ class PlanSetup extends Component {
 
   state = {
     activeTab: parseInt(this.props.activeTab),
+    progress: false,
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
   }
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -73,19 +79,14 @@ class PlanSetup extends Component {
 
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const {
-      item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, itemId, mode } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -104,21 +105,37 @@ class PlanSetup extends Component {
 
   initDefaultValues = () => {
     const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onPlanFieldUpdate(['from'], defaultFromValue));
-    }
-    if (mode === 'create') {
       this.props.dispatch(onPlanFieldUpdate(['connection_type'], 'postpaid'));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePlan());
+    }
+    if (item.get('prorated', null) === null) {
+      this.props.dispatch(onPlanFieldUpdate(['prorated'], 'true'));
     }
   }
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
       this.props.dispatch(getRevisions('plans', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -151,8 +168,8 @@ class PlanSetup extends Component {
     this.props.dispatch(onPlanTariffRemove(index));
   }
 
-  onGroupAdd = (groupName, usage, value, shared, products) => {
-    this.props.dispatch(onGroupAdd(groupName, usage, value, shared, products));
+  onGroupAdd = (groupName, usage, value, shared, pooled, products) => {
+    this.props.dispatch(onGroupAdd(groupName, usage, value, shared, pooled, products));
   }
 
   onGroupRemove = (groupName) => {
@@ -161,16 +178,17 @@ class PlanSetup extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
+    this.setState({ progress: true });
     this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
   }
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
+    this.setState({ progress: false });
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'create') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The plan was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
@@ -188,7 +206,8 @@ class PlanSetup extends Component {
   }
 
   render() {
-    const { item, mode, revisions } = this.props;
+    const { progress, activeTab } = this.state;
+    const { item, mode, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -196,21 +215,25 @@ class PlanSetup extends Component {
     const allowEdit = mode !== 'view';
     const planRates = item.get('rates', Immutable.Map());
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
-      <Col lg={12}>
+      <div className="PlanSetup">
 
         <Panel>
           <EntityRevisionDetails
+            itemName="plan"
             revisions={revisions}
             item={item}
             mode={mode}
             onChangeFrom={this.onChangeFieldValue}
-            itemName="plan"
             backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
         </Panel>
 
-        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="SettingsTab" onSelect={this.handleSelectTab}>
+        <Tabs defaultActiveKey={activeTab} animation={false} id="PlanTab" onSelect={this.handleSelectTab}>
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanTab
@@ -252,8 +275,9 @@ class PlanSetup extends Component {
           onClickSave={this.handleSave}
           hideSave={!allowEdit}
           cancelLabel={allowEdit ? undefined : 'Back'}
+          progress={progress}
         />
-      </Col>
+      </div>
     );
   }
 }
@@ -265,5 +289,6 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'plan'),
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'plan'),
+  chargingDay: chargingDaySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PlanSetup));

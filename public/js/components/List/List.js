@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { titleCase } from 'change-case';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 import { Button } from 'react-bootstrap';
 import Actions from '../Elements/Actions';
@@ -61,7 +62,7 @@ class List extends Component {
     if (!Immutable.Iterable.isIterable(entity)) {
       return this.printEntityField(Immutable.fromJS(entity), field);
     }
-    if (field.parser) { return field.parser(entity, field); }
+    if (field.parser) { return field.parser(entity); }
     if (field.type) { return this.displayByType(field, entity); }
     return entity.get(field.id);
   }
@@ -172,7 +173,7 @@ class List extends Component {
         arrow = (<i className={arrowClass} />);
       }
       if (!field.title && !field.placeholder) {
-        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{titlize(field.id)}{arrow}</th>);
+        return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{titleCase(field.id)}{arrow}</th>);
       }
       return (<th key={key} onClick={onclick} className={field.cssClass} style={style}>{field.title || field.placeholder}{arrow}</th>);
     });
@@ -201,7 +202,7 @@ class List extends Component {
     const table_body = items.size < 1 ?
                        (<tr><td colSpan={colSpan} style={{ textAlign: 'center' }}>No items found</td></tr>) :
                         items.map((entity, index) => (
-                          <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled'}>
+                          <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled disabled-bg'}>
                             {
                                 enableEnabled ?
                                   <td className="edit-tb">

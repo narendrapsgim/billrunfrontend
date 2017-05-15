@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Map } from 'immutable';
+import { List } from 'immutable';
 import { Panel } from 'react-bootstrap';
 import Select from 'react-select';
 import ChargingPlanInclude from './ChargingPlanInclude';
@@ -18,15 +18,16 @@ const ChargingPlanIncludes = (props) => {
       {
         props.includes
           .keySeq()
-          .filter(inc => inc !== 'cost')
-          .map((type, key) => (
+          .filter(inc => (inc !== 'cost' && inc !== 'groups'))
+          .map((index, key) => (
             <ChargingPlanInclude
               key={key}
               editable={editable}
-              include={props.includes.get(type)}
+              include={props.includes.get(index)}
               onUpdateField={props.onUpdateField}
               onUpdatePeriodField={props.onUpdatePeriodField}
-              type={type}
+              onRemove={props.onRemoveChargingPlan}
+              index={index}
             />
           ))
       }
@@ -35,16 +36,17 @@ const ChargingPlanIncludes = (props) => {
 };
 
 ChargingPlanIncludes.defaultProps = {
-  includes: Map(),
+  includes: List(),
   prepaidIncludesOptions: [],
   mode: 'create',
 };
 
 ChargingPlanIncludes.propTypes = {
-  includes: PropTypes.instanceOf(Map),
+  includes: PropTypes.instanceOf(List),
   prepaidIncludesOptions: PropTypes.array,
   onSelectPPInclude: PropTypes.func.isRequired,
   onUpdatePeriodField: PropTypes.func.isRequired,
+  onRemoveChargingPlan: PropTypes.func.isRequired,
   mode: PropTypes.string,
 };
 

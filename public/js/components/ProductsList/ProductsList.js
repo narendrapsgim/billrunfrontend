@@ -30,6 +30,10 @@ const ProductsList = () => {
     key: 1,
   };
 
+  const actions = [
+    { type: 'edit' },
+  ];
+
   return (
     <EntityList
       collection="rates"
@@ -39,6 +43,7 @@ const ProductsList = () => {
       tableFields={tableFields}
       projectFields={projectFields}
       showRevisionBy="key"
+      actions={actions}
     />
   );
 };

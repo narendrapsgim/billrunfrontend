@@ -3,11 +3,11 @@ import { startProgressIndicator } from './progressIndicatorActions';
 import { saveEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
 
-
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
 export const SAVE_SERVICE = 'SAVE_SERVICE';
 export const CLEAR_SERVICE = 'CLEAR_SERVICE';
+export const CLONE_RESET_SERVICE = 'CLONE_RESET_SERVICE';
 export const ADD_GROUP_SERVICE = 'ADD_GROUP_SERVICE';
 export const REMOVE_GROUP_SERVICE = 'REMOVE_GROUP_SERVICE';
 
@@ -27,18 +27,24 @@ export const updateService = (path, value) => ({
   value,
 });
 
-export const addGroup = (groupName, usage, value, shared, products) => ({
+export const addGroup = (groupName, usage, value, shared, pooled, products) => ({
   type: ADD_GROUP_SERVICE,
   groupName,
   usage,
   value,
   shared,
+  pooled,
   products,
 });
 
 export const removeGroup = groupName => ({
   type: REMOVE_GROUP_SERVICE,
   groupName,
+});
+
+export const setCloneService = () => ({
+  type: CLONE_RESET_SERVICE,
+  uniquefields: ['name'],
 });
 
 export const saveService = (service, action) => saveEntity('services', service, action);

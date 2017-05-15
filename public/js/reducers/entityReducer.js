@@ -1,14 +1,18 @@
 import Immutable from 'immutable';
 import { actions } from '../actions/entityActions';
 
-const defaultState = Immutable.fromJS({});
+const defaultState = Immutable.Map();
 
 export default function (state = defaultState, action) {
   const { collection, path, value, type, entity } = action;
   switch (type) {
 
-    case actions.GOT_ENTITY:
+    case actions.GOT_ENTITY: {
+      if (collection !== 'reports') {
+        entity.originalValue = entity.from;
+      }
       return state.set(collection, Immutable.fromJS(entity));
+    }
 
     case actions.UPDATE_ENTITY_FIELD:
       if (Array.isArray(path)) {
@@ -21,6 +25,20 @@ export default function (state = defaultState, action) {
         return state.deleteIn([collection, ...path]);
       }
       return state.deleteIn([collection, path]);
+
+    case actions.CLONE_RESET_ENTITY: {
+      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue'];
+      if (typeof action.uniquefields === 'string') {
+        keysToDeleteOnClone.push(action.uniquefields);
+      } else if (Array.isArray(action.uniquefields)) {
+        keysToDeleteOnClone.push(...action.uniquefields);
+      }
+      return state.withMutations((itemWithMutations) => {
+        keysToDeleteOnClone.forEach((keyToDelete) => {
+          itemWithMutations.deleteIn([collection, keyToDelete]);
+        });
+      });
+    }
 
     case actions.CLEAR_ENTITY:
       if (collection) {

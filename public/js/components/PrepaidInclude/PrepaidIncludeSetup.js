@@ -8,15 +8,40 @@ import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import PrepaidInclude from './PrepaidInclude';
 import LimitedDestinations from './LimitedDestinations';
 import { EntityRevisionDetails } from '../Entity';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 import { getProductsKeysQuery } from '../../common/ApiQueries';
 import { showDanger, showSuccess } from '../../actions/alertsActions';
 import { getList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { savePrepaidInclude, getPrepaidInclude, clearPrepaidInclude, updatePrepaidInclude } from '../../actions/prepaidIncludeActions';
+import {
+  savePrepaidInclude,
+  getPrepaidInclude,
+  clearPrepaidInclude,
+  updatePrepaidInclude,
+  setClonePrepaidInclude,
+} from '../../actions/prepaidIncludeActions';
 import { getSettings } from '../../actions/settingsActions';
-import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
-import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
+import {
+  clearItems,
+  getRevisions,
+  clearRevisions,
+} from '../../actions/entityListActions';
+import {
+  modeSelector,
+  itemSelector,
+  idSelector,
+  tabSelector,
+  revisionsSelector,
+} from '../../selectors/entitySelector';
+import {
+  chargingDaySelector,
+  usageTypeSelector,
+} from '../../selectors/settingsSelector';
 
 
 class PrepaidIncludeSetup extends Component {
@@ -26,6 +51,7 @@ class PrepaidIncludeSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     allRates: PropTypes.instanceOf(Immutable.List),
     usageTypes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
@@ -51,10 +77,7 @@ class PrepaidIncludeSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId } = this.props;
-    if (itemId) {
-      this.props.dispatch(getPrepaidInclude(itemId)).then(this.afterItemReceived);
-    }
+    this.fetchItem();
   }
 
   componentDidMount() {
@@ -69,19 +92,14 @@ class PrepaidIncludeSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const {
-      item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('name') !== item.get('name')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'prepaid_include', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getPrepaidInclude(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -90,23 +108,36 @@ class PrepaidIncludeSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.onChangeFieldValue(['from'], defaultFromValue);
-    }
-    if (mode === 'create') {
       this.onChangeFieldValue(['shared'], false);
       this.onChangeFieldValue(['unlimited'], false);
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setClonePrepaidInclude());
     }
   }
 
   initRevisions = () => {
     const { item, revisions } = this.props;
-    if (revisions.isEmpty() && item.getIn(['_id', '$id'], false)) {
+    if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('name', '');
       this.props.dispatch(getRevisions('prepaidincludes', 'name', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getPrepaidInclude(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('name', '');
+    this.props.dispatch(clearRevisions('prepaidincludes', key)); // refetch items list because item was (changed in / added to) list
   }
 
   afterItemReceived = (response) => {
@@ -127,9 +158,14 @@ class PrepaidIncludeSetup extends Component {
     this.onChangeFieldValue(id, value);
   };
 
-
   onChangeLimitedDestinations = (name, value) => {
     this.onChangeFieldValue(['allowed_in', name], value);
+  };
+
+  onRemoveLimitedDestinations = (name) => {
+    const { item } = this.props;
+    const allowedIn = item.get('allowed_in', Immutable.Map());
+    this.onChangeFieldValue(['allowed_in'], allowedIn.remove(name));
   };
 
   onSelectPlan = (name) => {
@@ -138,23 +174,32 @@ class PrepaidIncludeSetup extends Component {
       dispatch(showDanger('Plan already exists'));
       return;
     }
-    this.onChangeFieldValue(['allowed_in', name], Immutable.Map());
+    this.onChangeFieldValue(['allowed_in', name], Immutable.List());
   };
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('name', '');
-      this.props.dispatch(clearRevisions('prepaidincludes', key)); // refetch items list because item was (changed in / added to) list
-      const action = (mode === 'create') ? 'created' : 'updated';
-      this.props.dispatch(showSuccess(`The prepaid bucke was ${action}`));
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
+      this.props.dispatch(showSuccess(`The prepaid bucket was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
 
+  validatePrepaidBucket = () => {
+    const { item } = this.props;
+    const allowedIn = item.get('allowed_in', Immutable.Map());
+    return allowedIn.every(rates => rates.first());
+  }
+
   handleSave = () => {
     const { item, mode } = this.props;
-    this.props.dispatch(savePrepaidInclude(item, mode)).then(this.afterSave);
+    if (!this.validatePrepaidBucket()) {
+      this.props.dispatch(showDanger('Associate Products - cannot have plan without products in it'));
+    } else {
+      this.props.dispatch(savePrepaidInclude(item, mode)).then(this.afterSave);
+    }
   };
 
   handleBack = (itemWasChanged = false) => {
@@ -170,7 +215,7 @@ class PrepaidIncludeSetup extends Component {
   }
 
   render() {
-    const { item, mode, allRates, usageTypes, revisions } = this.props;
+    const { item, mode, allRates, usageTypes, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -185,18 +230,21 @@ class PrepaidIncludeSetup extends Component {
       value: rate.get('key'),
       label: rate.get('key'),
     })).toArray();
-
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
       <div className="PrepaidIncludeSetup">
 
         <Panel>
           <EntityRevisionDetails
+            itemName="prepaid_include"
             revisions={revisions}
             item={item}
             mode={mode}
             onChangeFrom={this.onChangeFieldValue}
-            itemName="prepaid_include"
             backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
+            minFrom={minFrom}
           />
         </Panel>
 
@@ -215,7 +263,7 @@ class PrepaidIncludeSetup extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Limited Products" eventKey={2}>
+          <Tab title="Associate Products" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <LimitedDestinations
                 mode={mode}
@@ -223,6 +271,7 @@ class PrepaidIncludeSetup extends Component {
                 allRates={allRatesOptions}
                 onSelectPlan={this.onSelectPlan}
                 onChange={this.onChangeLimitedDestinations}
+                onRemove={this.onRemoveLimitedDestinations}
               />
             </Panel>
           </Tab>
@@ -240,6 +289,7 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'prepaid_include'),
   revisions: revisionsSelector(state, props, 'prepaid_include'),
   allRates: state.list.get('all_rates'),
-  usageTypes: state.settings.get('usage_types'),
+  usageTypes: usageTypeSelector(state, props),
+  chargingDay: chargingDaySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PrepaidIncludeSetup));

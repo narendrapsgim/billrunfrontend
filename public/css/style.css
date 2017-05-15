@@ -27,7 +27,7 @@ fieldset[disabled] .btn {
 .movable {
     cursor: move;
 }
-.non-editble-field{
+.non-editable-field{
   line-height: 32px;
 }
 .actions button.btn-sm {
@@ -52,6 +52,7 @@ fieldset[disabled] .btn {
 .mb10{ margin-bottom: 10px!important; }
 .mr10{ margin-right: 10px!important; }
 .mr0{ margin-right: 0!important; }
+.mt0{ margin-top: 0!important; }
 
 .full-width{ width: 100%!important; }
 
@@ -59,6 +60,8 @@ fieldset[disabled] .btn {
 .danger-red { color: #d9534f; }
 .disabled {
   color: #6f6f6f;
+}
+.disabled-bg {
   background-color: #eeeeee;
 }
 /* ~Global */
@@ -85,6 +88,21 @@ fieldset[disabled] .btn {
   vertical-align: bottom;
   margin-left: 10px;
   line-height: 14px;
+}
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #888;
+}
+.navbar-default .navbar-toggle {
+    border-color: #ddd;
+}
+.main-menu {
+  min-height: 90%;
+  position: inherit;
+  overflow-y: auto;
+}
+.main-menu.smallScreenMenu {
+  position: static;
+  box-shadow: 0px 13px 20px 3px #888;
 }
 /* ~Main/Top menu */
 
@@ -139,6 +157,9 @@ fieldset[disabled] .btn {
   right: 0;
   padding: 5;
 }
+.alert-notifier-container .alert {
+  margin-bottom: 5px;
+}
 .alerts-enter {
   opacity: 0.01;
 }
@@ -170,7 +191,7 @@ fieldset[disabled] .btn {
 }
 .progressindicator-leave.progressindicator-leave-active {
   opacity: 0.01;
-  transition: opacity 1500ms ease-in;
+  transition: opacity 500ms ease-in;
 }
 
 @keyframes progressindicator-in-progress {
@@ -199,7 +220,7 @@ fieldset[disabled] .btn {
     height:2px;
     box-shadow: 1px 1px 1px rgba(0,0,0,0.4);
     animation-name: progressindicator-in-progress;
-    animation-duration: 1500ms;
+    animation-duration: 500ms;
 }
 /* ~System Progress Ingecator */
 
@@ -314,6 +335,27 @@ fieldset[disabled] .btn {
   margin: 0;
 }
 /* Entity Revision */
+.entity-revision-history-popover .popover-content{
+  padding: 10px 0 0 0;
+}
+.entity-revision-history-popover .popover-content ul.revision-history-list{
+  text-align: center;
+}
+.entity-revision-history-popover .popover-content hr{
+  margin: 7px 0 0 0;
+  border-color: #565656;
+}
+.entity-revision-history-popover .popover-content ul.revision-history-list li.active .date{
+  font-weight: bold;
+  color: white;
+}
+.entity-revision-history-popover .popover-content ul.revision-history-list li.active .cycle {
+  border-color: white;
+}
+
+.entity-revision-history-popover .popover-title {
+  border-bottom: 1px solid #565656;
+}
 .entity-revision-history-popover {
   max-width: none;
 }
@@ -360,6 +402,11 @@ ul.revision-history-list li.more::after {
   width: 15px;
   left: 23px;
 }
+ul.revision-history-list li.closed::after {
+  width: 34px;
+  left: -18px;
+  top: 8px;
+}
 ul.revision-history-list li.more.after::after {
   left: -15px;
 }
@@ -383,19 +430,152 @@ ul.revision-history-list li.last::after {
   width: 0;
   border-bottom: none;
 }
-
-.entity-revision-edit ul.revision-history-list li .date {
-  color: #6f6f6f;
-}
-.entity-revision-edit ul.revision-history-list li.active .date{
+ul.revision-history-list li.active .date{
   font-weight: bold;
   color: black;
 }
-.entity-revision-edit ul.revision-history-list li.active .cycle {
+ul.revision-history-list li.active .cycle {
   border-color: black;
+}
+.entity-revision-edit ul.revision-history-list li .date {
+  color: #6f6f6f;
 }
 .entity-revision-edit ul.revision-history-list li.more::after {
   top: 10px;
 }
 
+.move-modal ul.revision-history-list li {
+  opacity: 0.5;
+}
+.move-modal ul.revision-history-list li.active {
+  opacity: 1;
+}
 /* ~Entity Revision */
+
+.discount-setup .help-block {
+  margin-bottom: 0;
+}
+
+#move-entity .nav-tabs li,
+#move-entity .nav-pills li {
+  width: 50%;
+  text-align: center;
+  background-color: #eeeeee;
+}
+#move-entity .nav-pills>li+li {
+     margin-left: 0;
+}
+
+.delimiter-select {
+  width: 150px;
+}
+
+/* Reports */
+.report-setup .CustomFilter .action button{
+  height: 39px;
+}
+.report-setup .CustomFilter .react-datepicker__input-container {
+  width: 100%;
+}
+/* ~Reports */
+
+/* Chart */
+.dashboard-chart-wrapper {
+  height: 280px;
+  overflow: hidden;
+}
+.doughnut-wrapper {
+  position: relative;
+  height: 230px;
+}
+.chart-doughnut-details .details{
+  margin-top: -10px;
+}
+.doughnut-message {
+  position: absolute;
+  color: #7C7C7C;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.percentBarChart {
+  margin: 0 10px;
+}
+
+.percentBarChart .marker {
+  position: absolute;
+  color: white;
+  margin-top: 5px;
+  padding: 0 5px;
+  background-color: #388E3C;
+  opacity: .8;
+}
+.percentBarChart .marker.negative {
+  background-color: #D32F2F;
+}
+.percentBarChart .marker:after {
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-bottom-color: #388E3C;
+  border-width: 6px;
+  margin-left: -6px;
+}
+.percentBarChart .marker.negative:after {
+  border-bottom-color: #D32F2F;
+}
+.percentBarChart .diff {
+  color: #388E3C;
+}
+.percentBarChart .diff.negative {
+  color: #D32F2F;
+}
+.percentBarChart .legend {
+  background-color: black;
+  color: white;
+  padding: 1px 4px;
+  margin-right: 3px;
+}
+.percentBarChart .details {
+  position: relative;
+  height: 120px;
+  margin-top: 50px;
+}
+.chart-doughnut-details .details {
+  position: relative;
+}
+.percentBarChart .details-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+.percentBarChart .details-left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+.chart-doughnut-details .details-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-top: -15px;
+}
+.chart-doughnut-details .details-left  {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #7C7C7C;
+  margin-top: 0;
+}
+.percentBarChart .value {
+  color: #7C7C7C;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+/* ~Chart */

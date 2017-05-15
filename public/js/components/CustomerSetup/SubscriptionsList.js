@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
 import Immutable from 'immutable';
-import { Button } from 'react-bootstrap';
 import changeCase from 'change-case';
 import List from '../List';
+import { CreateButton } from '../Elements';
+import StateDetails from '../EntityList/StateDetails';
+import { getItemDateValue, getConfig } from '../../common/Util';
 
 
 export default class SubscriptionsList extends Component {
@@ -23,20 +24,27 @@ export default class SubscriptionsList extends Component {
   static defaultProps = {
     items: Immutable.List(),
     settings: Immutable.List(),
-    defaultListFields: ['sid', 'firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
+    defaultListFields: [],
     aid: '',
   };
 
 
   planActivationParser = (subscription) => {
-    const date = subscription.get('plan_activation', null);
-    return date ? moment(date).format(globalSetting.datetimeFormat) : '';
-  }
+    const date = getItemDateValue(subscription, 'plan_activation', false);
+    return date ? date.format(getConfig('dateFormat', 'DD/MM/YYYY')) : '';
+  };
 
-  servicesParser = subscription => subscription
-    .get('services', Immutable.List())
-    .map( service => service.get('name','') )
-    .join(', ');
+  servicesParser = (subscription) => {
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    return services
+      .map((service) => {
+        if (service.get('quantity', null) !== null) {
+          return `${service.get('name', '')} (${service.get('quantity', '')})`;
+        }
+        return service.get('name', '');
+      })
+      .join(', ');
+  }
 
   addressParser = (subscription) => {
     if (subscription.get('country', '').length > 0) {
@@ -58,7 +66,7 @@ export default class SubscriptionsList extends Component {
         const fieldname = field.get('field_name');
         switch (fieldname) {
           case 'plan_activation':
-            return { id: fieldname, parser: this.planActivationParser };
+            return { id: fieldname, parser: this.planActivationParser, cssClass: 'long-date text-center' };
           case 'services':
             return { id: fieldname, parser: this.servicesParser };
           case 'address':
@@ -79,14 +87,41 @@ export default class SubscriptionsList extends Component {
       .toArray();
   }
 
+  getListActions = () => [
+    { type: 'edit', helpText: 'Edit', onClick: this.props.onClickEdit, onClickColumn: 'sid' },
+  ]
+
+  onActionEdit = (item) => {
+    this.props.onClickEdit(item);
+  }
+
+  onActionClone = (item) => {
+    this.props.onClickEdit(item, 'subscription', 'clone');
+  }
+
+  parserState = item => (
+    <StateDetails
+      item={item}
+      itemName="subscription"
+      onActionEdit={this.onActionEdit}
+      onActionClone={this.onActionClone}
+    />
+  );
+
+  addStateColumn = fields => ([
+    { id: 'state', parser: this.parserState, cssClass: 'state' },
+    ...fields,
+  ])
+
   render() {
     const { items } = this.props;
-    const fields = this.getFields();
+    const fields = this.addStateColumn(this.getFields());
+    const actions = this.getListActions();
     return (
       <div className="row">
         <div className="col-lg-12">
-          <List items={items} fields={fields} edit={true} onClickEdit={this.props.onClickEdit} />
-          <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}><i className="fa fa-plus" />&nbsp;Add New Subscription</Button>
+          <List items={items} fields={fields} actions={actions} />
+          <CreateButton onClick={this.onClickNew} type="Subscription" />
         </div>
       </div>
     );

@@ -1,11 +1,12 @@
+import moment from 'moment';
+
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
-export const searchProductsByKeyAndUsagetQuery = (usaget, key, notKeys) => {
+export const searchProductsByKeyAndUsagetQuery = (usaget, notKeys) => {
   const query = {
     key: {
-      $nin: notKeys,
-      $regex: key,
-      $options: 'i',
+      $nin: [...notKeys, ''], // don't get broken products with empty key
     },
+    to: { $gt: moment().toISOString() }, // only active and future
   };
   if (usaget !== 'cost') {
     query[`rates.${usaget}`] = { $exists: true };
@@ -14,8 +15,8 @@ export const searchProductsByKeyAndUsagetQuery = (usaget, key, notKeys) => {
     api: 'find',
     params: [
       { collection: 'rates' },
-      { size: '20' },
-      { page: '0' },
+      { size: 99999 },
+      { page: 0 },
       { project: JSON.stringify({ key: 1 }) },
       { query: JSON.stringify(query) },
     ],
@@ -42,12 +43,40 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
+export const getUserLoginQuery = (username, password) => ({
+  api: 'auth',
+  params: [
+    { username },
+    { password },
+  ],
+});
+
+export const getUserLogoutQuery = () => ({
+  api: 'auth',
+  params: [
+    { action: 'logout' },
+  ],
+});
+
+export const getUserCheckLoginQuery = () => ({
+  api: 'auth',
+});
+
 export const getInputProcessorActionQuery = (fileType, action) => ({
   api: 'settings',
   params: [
     { category: 'file_types' },
     { action },
     { data: JSON.stringify({ file_type: fileType }) },
+  ],
+});
+
+export const getAddUsagetQuery = usaget => ({
+  api: 'settings',
+  params: [
+    { category: 'usage_types' },
+    { action: 'set' },
+    { data: [JSON.stringify(usaget)] },
   ],
 });
 
@@ -182,13 +211,14 @@ export const getGroupsQuery = collection => ({
   ],
 });
 
-export const getSubscribersByAidQuery = aid => ({
+export const getSubscriptionsByAidQuery = (aid, project = {}) => ({
   action: 'uniqueget',
   entity: 'subscribers',
   params: [
     { query: JSON.stringify({ aid }) },
     { page: 0 },
     { size: 9999 },
+    { project: JSON.stringify(project) },
   ],
 });
 
@@ -233,10 +263,13 @@ export const getDeleteLineQuery = id => ({
 
 
 // List
+export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
+export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
+export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
-export const getProductsKeysQuery = () => getEntitesQuery('rates', { key: 1 });
+export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => getEntitesQuery('rates', project);
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
-export const getPlansKeysQuery = () => getEntitesQuery('plans', { name: 1 });
+export const getPlansKeysQuery = (project = { name: 1, description: 1 }) => getEntitesQuery('plans', project);
 export const getUserKeysQuery = () => getEntitesQuery('users', { username: 1 });
 export const getAllGroupsQuery = () => ([
   getGroupsQuery('plans'),
@@ -246,7 +279,10 @@ export const getAllGroupsQuery = () => ([
 export const fetchServiceByIdQuery = id => getEntityByIdQuery('services', id);
 export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
 export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
+export const fetchDiscountByIdQuery = id => getEntityByIdQuery('discounts', id);
+export const fetchReportByIdQuery = id => getEntityByIdQuery('reports', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
+export const fetchPrepaidGroupByIdQuery = id => getEntityByIdQuery('prepaidgroups', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);
 
 export const getProductByKeyQuery = key => ({
@@ -270,7 +306,7 @@ export const searchProductsByKeyQuery = (key, project = {}) => ({
     { query: JSON.stringify({
       key: { $regex: key, $options: 'i' },
     }) },
-    { states: JSON.stringify([0]) },
+    { states: JSON.stringify([0, 1]) },
   ],
 });
 
@@ -289,33 +325,182 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
   ],
 });
 
-export const getProductsByKeysQuery = (keys, project = {}) => ({
+export const getEntitesByKeysQuery = (entity, keyField, keys, project = {}) => ({
   action: 'uniqueget',
-  entity: 'rates',
+  entity,
   params: [
     { page: 0 },
     { size: 9999 },
     { project: JSON.stringify(project) },
     { sort: JSON.stringify(project) },
     { query: JSON.stringify({
-      key: { $in: keys },
+      [keyField]: { $in: keys },
     }) },
+  ],
+});
+export const getServicesByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('services', 'name', keys, project);
+export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('rates', 'key', keys, project);
+
+export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => {
+  let query = {};
+  switch (collection) {
+    case 'subscribers':
+      query = { [revisionBy]: value };
+      break;
+    default: query = { [revisionBy]: { $regex: `^${value}$` } };
+  }
+  return ({
+    action: 'get',
+    entity: collection,
+    params: [
+      { sort: JSON.stringify({ from: -1 }) },
+      { query: JSON.stringify(query) },
+      { project: JSON.stringify({
+        from: 1,
+        to: 1,
+        description: 1,
+        [revisionBy]: 1,
+        revision_info: 1,
+      }) },
+      { page: 0 },
+      { size },
+      { state: JSON.stringify([0, 1, 2]) },
+    ],
+  });
+};
+
+export const getRebalanceAccountQuery = (aid, billrunKey = '') => {
+  const params = [{ aid }];
+  if (billrunKey !== '') {
+    params.push({ billrun_key: billrunKey });
+  }
+  return {
+    api: 'resetlines',
+    params,
+  };
+};
+
+export const getCyclesQuery = () => ({
+  api: 'billrun',
+  action: 'cycles',
+});
+
+export const getCycleQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'cycle',
+  params: [
+    { stamp: billrunKey },
   ],
 });
 
-export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => ({
-  action: 'get',
-  entity: collection,
+export const getRunCycleQuery = (billrunKey, rerun) => ({
+  api: 'billrun',
+  action: 'completecycle',
   params: [
-    { sort: JSON.stringify({ from: -1 }) },
-    { query: JSON.stringify({
-      [revisionBy]: {
-        $regex: `^${value}$`,
-      },
-    }) },
-    { project: JSON.stringify({ from: 1, to: 1, description: 1, [revisionBy]: 1 }) },
-    { page: 0 },
-    { size },
-    { state: JSON.stringify([0, 1, 2]) },
+    { stamp: billrunKey },
+    { rerun },
   ],
 });
+
+export const getConfirmCycleInvoiceQuery = (billrunKey, invoiceId) => ({
+  api: 'billrun',
+  action: 'confirmCycle',
+  params: [
+    { stamp: billrunKey },
+    { invoices: invoiceId },
+  ],
+});
+
+export const getConfirmCycleAllQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'confirmCycle',
+  params: [
+    { stamp: billrunKey },
+  ],
+});
+
+export const getChargeAllCycleQuery = () => ({
+  api: 'billrun',
+  action: 'chargeaccount',
+});
+
+export const getAllInvoicesQuery = billrunKey => ({
+  action: 'get',
+  entity: 'billrun',
+  params: [
+    { query: JSON.stringify({ billrun_key: billrunKey }) },
+    { project: JSON.stringify({ _id: 1 }) },
+  ],
+});
+
+export const getChargeStatusQuery = () => ({
+  api: 'billrun',
+  action: 'chargestatus',
+});
+
+export const getOperationsQuery = () => ({
+  api: 'operations',
+  params: [
+    { action: 'charge_account' },
+    { filtration: 'all' },
+  ],
+});
+
+export const getCollectionDebtQuery = aid => ({
+  api: 'bill',
+  params: [
+    { aid },
+  ],
+});
+
+export const getOfflinePaymentQuery = (method, aid, amount, payerName, chequeNo) => ({
+  api: 'pay',
+  params: [
+    { method },
+    { payments: JSON.stringify([{
+      amount,
+      aid,
+      payer_name: payerName,
+      dir: 'fc',
+      deposit_slip: '',
+      deposit_slip_bank: '',
+      cheque_no: chequeNo,
+      source: 'web',
+    }]) },
+  ],
+});
+
+export const getConfirmationOperationAllQuery = () => ({
+  api: 'operations',
+  params: [
+    { action: 'confirm_cycle' },
+    { filtration: 'all' },
+  ],
+});
+
+export const getConfirmationOperationInvoiceQuery = invoiceId => ({
+  api: 'operations',
+  params: [
+    { action: 'confirm_cycle' },
+    { filtration: invoiceId },
+  ],
+});
+
+export const getReportQuery = ({ query, page = 0, size = 10 }) => ({
+  api: 'report',
+  params: [
+    { action: 'generateReport' },
+    { query: JSON.stringify(query) },
+    { page },
+    { size },
+  ],
+});
+
+// Dashboard reports queries
+export const getDashboardQuery = action => ({
+  api: 'reports',
+  params: [
+    { action },
+  ],
+});
+// Dashboard reports queries - end

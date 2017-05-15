@@ -2,11 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Form, FormGroup, Button } from 'react-bootstrap';
-import DatePicker from 'react-datepicker';
+import { Form, FormGroup, Button, ControlLabel, Label } from 'react-bootstrap';
 import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getItemDateValue, getConfig } from '../../common/Util';
+import Field from '../Field';
+import { getItemDateValue, getConfig, getItemId, getRevisionStartIndex } from '../../common/Util';
 
 
 class EntityRevisionDetails extends Component {
@@ -14,9 +14,14 @@ class EntityRevisionDetails extends Component {
   static propTypes = {
     revisions: PropTypes.instanceOf(Immutable.List),
     item: PropTypes.instanceOf(Immutable.Map),
+    minFrom: PropTypes.instanceOf(moment),
     mode: PropTypes.string,
     onChangeFrom: PropTypes.func,
     backToList: PropTypes.func,
+    reLoadItem: PropTypes.func,
+    clearRevisions: PropTypes.func,
+    onActionEdit: PropTypes.func,
+    onActionClone: PropTypes.func,
     itemName: PropTypes.string.isRequired,
     revisionItemsInTimeLine: PropTypes.number,
     router: PropTypes.shape({
@@ -25,23 +30,39 @@ class EntityRevisionDetails extends Component {
   };
 
   static defaultProps = {
+    revisionItemsInTimeLine: 3,
     revisions: Immutable.List(),
     item: Immutable.Map(),
     mode: 'view',
+    minFrom: moment().add(1, 'days'), // default minFrom is tommorow
     onChangeFrom: () => {},
     backToList: () => {},
-    revisionItemsInTimeLine: 3,
+    reLoadItem: () => {},
+    clearRevisions: () => {},
   };
 
   state = {
     showList: false,
   }
 
+  componentDidMount() {
+    this.initFormDate();
+  }
+
   componentWillReceiveProps(nextProps) {
     const { item } = nextProps;
     const { item: oldItem } = this.props;
-    if (item.getIn(['_id', '$id'], '') !== oldItem.getIn(['_id', '$id'], '')) {
+    if (getItemId(item) !== getItemId(oldItem)) {
       this.hideManageRevisions();
+      this.initFormDate();
+    }
+  }
+
+  initFormDate = () => {
+    const { mode } = this.props;
+    if (['closeandnew'].includes(mode)) {
+      const tommorow = moment().add(1, 'day');
+      this.onChangeFrom(tommorow);
     }
   }
 
@@ -53,88 +74,83 @@ class EntityRevisionDetails extends Component {
     this.setState({ showList: false });
   }
 
-  onDeleteItem = (removedItem) => {
+  onDeleteItem = (removedItemId) => {
     const { item, revisions, itemName } = this.props;
     // if screen was with deleted item, go to prev revision or list
-    if (item.getIn(['_id', '$id'], '') === removedItem.getIn(['_id', '$id'], '')) {
-      const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
-      const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
-      if (revisions.size <= 1) { // only one revision
-        this.props.backToList(true);
-        return false;
-      }
-      const idx = revisions.findIndex(revision => revision.getIn(['_id', '$id'], false) === item.getIn(['_id', '$id'], false));
+    if (getItemId(item) === removedItemId) {
       if (revisions.size > 1) {
-        const prevItemId = (idx !== -1) ? revisions.getIn([idx + 1, '_id', '$id'], revisions.getIn([idx - 1, '_id', '$id'], '')) : revisions.getIn([0, '_id', '$id'], '');
-        this.props.router.push(`${itemsType}/${itemType}/${prevItemId}`);
-        return false;
+        const itemType = getConfig(['systemItems', itemName, 'itemType'], '');
+        const itemsType = getConfig(['systemItems', itemName, 'itemsType'], '');
+        const idx = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
+        const prevItem = (idx !== -1)
+          ? revisions.get(idx + 1, revisions.get(idx - 1, ''))
+          : revisions.get(0, '');
+        if (!this.props.onActionEdit) {
+          this.props.router.push(`${itemsType}/${itemType}/${getItemId(prevItem)}`);
+        } else {
+          this.props.onActionEdit(prevItem);
+        }
+      } else { // only one revision
+        this.props.backToList(true);
       }
+    } else {
+      // refresh current item because it may effect by deleted revision
+      // i.e active_with_future turn be editable
+      this.props.reLoadItem();
     }
-    return true;
+  }
+
+  onCloseItem = () => {
+    this.props.clearRevisions();
+    this.props.reLoadItem();
   }
 
   renderVerisionList = () => {
     const { itemName, revisions, item } = this.props;
     const { showList } = this.state;
     const revisionBy = getConfig(['systemItems', itemName, 'uniqueField'], '');
+    const title = `${item.get(revisionBy, '')} - Revision History`;
     return (
-      <ModalWrapper title={`${item.get(revisionBy, '')} - Revision History`} show={showList} onOk={this.hideManageRevisions} >
+      <ModalWrapper title={title} show={showList} onCancel={this.hideManageRevisions} onHide={this.hideManageRevisions} labelCancel="Close">
         <RevisionList
           items={revisions}
           itemName={itemName}
           onSelectItem={this.hideManageRevisions}
           onDeleteItem={this.onDeleteItem}
+          onCloseItem={this.onCloseItem}
+          onActionEdit={this.props.onActionEdit}
+          onActionClone={this.props.onActionClone}
         />
       </ModalWrapper>
     );
   }
 
-  getStartIndex = () => {
-    const { item, revisions } = this.props;
-    const index = revisions.findIndex(revision => revision.getIn(['_id', '$id'], '') === item.getIn(['_id', '$id'], ''));
-    if (index <= 0) {
-      return 0;
-    }
-    if (index + 1 === revisions.size) {
-      return ((index - 2) >= 0) ? index - 2 : 0;
-    }
-    return index - 1;
-  }
-
   onChangeFrom = (value) => {
     if (value) {
-      this.props.onChangeFrom(['from'], value.toISOString());
+      this.props.onChangeFrom(['from'], value.format('YYYY-MM-DD'));
     }
   }
 
-  renderDateFromfields = () => {
+  filterLegalFromDate = (date) => {
     const { item, mode } = this.props;
-    const from = getItemDateValue(item, 'from');
-    if (mode === 'view' || mode === 'update') {
-      return (
-        <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)}</p>
-      );
+    if (['clone', 'create'].includes(mode)) {
+      return true;
     }
-    const tommorow = moment().add(1, 'days');
-    return (
-      <DatePicker
-        className="form-control"
-        dateFormat={globalSetting.dateFormat}
-        selected={from}
-        onChange={this.onChangeFrom}
-        isClearable={false}
-        placeholderText="Select Date..."
-        minDate={tommorow}
-      />
-    );
+    const originDate = getItemDateValue(item, 'originalValue').isSame(date, 'day');
+    return originDate || this.filterLegalFromDateByMin(date);
+  }
+
+  filterLegalFromDateByMin = (date) => {
+    const { minFrom } = this.props;
+    return date.isSameOrAfter(minFrom, 'day');
   }
 
   renderRevisionsBlock = () => {
     const { item, revisions, revisionItemsInTimeLine, mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       return null;
     }
-    const start = this.getStartIndex();
+    const start = getRevisionStartIndex(item, revisions);
     return (
       <div className="inline pull-right">
         <div className="inline mr10">
@@ -156,70 +172,121 @@ class EntityRevisionDetails extends Component {
 
   renderDateViewBlock = () => {
     const { item } = this.props;
-    const from = getItemDateValue(item, 'originalValue');
-    const to = getItemDateValue(item, 'to');
+    const from = getItemDateValue(item, 'originalValue').format(getConfig('dateFormat', 'DD/MM/YYYY'));
+    const to = getItemDateValue(item, 'to').format(getConfig('dateFormat', 'DD/MM/YYYY'));
     return (
-      <div className="inline" style={{ width: 165, padding: 0, margin: '9px 20px 0 20px' }}>
-        <p style={{ lineHeight: '35px' }}>{ from.format(globalSetting.dateFormat)} - { to.format(globalSetting.dateFormat)}</p>
+      <div className="inline" style={{ width: 190, padding: 0, margin: '9px 10px 0 10px' }}>
+        <p style={{ lineHeight: '32px' }}>{`${from} - ${to}`}</p>
       </div>
     );
   }
 
-  renderDateSelectBlock = () => (
-    <div className="inline" style={{ width: 155, padding: 0, margin: '9px 25px 0 25px' }}>
-      <Form horizontal style={{ marginBottom: 0 }}>
-        <FormGroup style={{ marginBottom: 0 }}>
-          <div className="inline" style={{ verticalAlign: 'top', marginTop: 10, marginRight: 15 }}>
-            <label>From</label>
-          </div>
-          <div className="inline" style={{ padding: 0, width: 120 }}>
-            { this.renderDateFromfields() }
-          </div>
-        </FormGroup>
-      </Form>
-    </div>
-  )
+  onChangeToggleFrom = (newDate) => {
+    const { item } = this.props;
+    if (moment.isMoment(newDate) && newDate.isValid()) {
+      const tommorow = moment().add(1, 'day');
+      const from = getItemDateValue(item, 'from');
+      const selectedValue = newDate.isSame(from, 'day') ? tommorow : newDate;
+      this.onChangeFrom(selectedValue);
+    } else {
+      const originFrom = getItemDateValue(item, 'originalValue');
+      this.onChangeFrom(originFrom);
+    }
+  }
 
-  renderTitle = () => {
-    const { mode } = this.props;
-    if (mode === 'create') {
+  renderDateSelectBlock = () => {
+    const { item, mode } = this.props;
+    const editable = (['closeandnew', 'clone', 'create'].includes(mode));
+    const from = getItemDateValue(item, 'from');
+    const originFrom = getItemDateValue(item, 'originalValue');
+    const highlightDates = (mode === 'create') ? [moment()] : [originFrom, moment()];
+    const inputProps = {
+      fieldType: 'date',
+      dateFormat: getConfig('dateFormat', 'DD/MM/YYYY'),
+      isClearable: false,
+      placeholder: 'Select Date...',
+      filterDate: this.filterLegalFromDateByMin,
+      highlightDates,
+    };
+    if (['closeandnew'].includes(mode)) {
       return (
-        <div className="inline" style={{ verticalAlign: 'top', marginTop: 18, width: 110 }}>
-          &nbsp;
+        <div className="inline" style={{ width: 220, padding: 0, margin: '7px 7px 0' }}>
+          <Field
+            fieldType="toggeledInput"
+            value={from}
+            onChange={this.onChangeToggleFrom}
+            label="Change From"
+            editable={editable}
+            inputProps={inputProps}
+            disabledDisplayValue={originFrom}
+            disabledValue={originFrom}
+            compare={(a, b) => a.isSame(b, 'day')}
+          />
         </div>
       );
     }
+    // update / create / clone
     return (
-      <div className="inline" style={{ verticalAlign: 'top', marginTop: 18, width: 110 }}>
-        <label>Revisions History</label>
+      <div className="inline" style={{ width: 220, padding: 0, margin: 7 }}>
+        <Form horizontal style={{ marginBottom: 0 }}>
+          <FormGroup style={{ marginBottom: 0 }}>
+            <div className="inline" style={{ verticalAlign: 'top', marginRight: 15 }}>
+              <ControlLabel>From</ControlLabel>
+            </div>
+            <div className="inline" style={{ padding: 0, width: 200 }}>
+              <Field
+                fieldType="date"
+                value={from}
+                onChange={this.onChangeFrom}
+                editable={editable}
+                dateFormat={getConfig('dateFormat', 'DD/MM/YYYY')}
+                isClearable={false}
+                placeholder="Select Date..."
+                filterDate={this.filterLegalFromDate}
+                highlightDates={highlightDates}
+              />
+            </div>
+          </FormGroup>
+        </Form>
       </div>
     );
   }
 
-  renderEditMessage = () => {
+  renderTitle = () => {
+    const { mode } = this.props;
+    const title = (['clone', 'create'].includes(mode)) ? ' ' : 'Revisions History';
+    return (
+      <div className="inline" style={{ verticalAlign: 'top', marginTop: 16, width: 110 }}>
+        <p><small>{title}</small></p>
+      </div>
+    );
+  }
+
+  renderMessage = () => {
     const { mode, item } = this.props;
-    if (mode === 'view' && getItemDateValue(item, 'to').isAfter(moment())) {
+    if (mode === 'view' && ['active_with_future'].includes(item.getIn(['revision_info', 'status'], ''))) {
       return (
-        <small className="danger-red"> You cannot edit the current revision because a future revision exists.</small>
+        <Label bsStyle="warning">You cannot edit the current revision because a future revision exists.</Label>
       );
     }
     return null;
   }
 
   render() {
-    const { mode } = this.props;
+    const { mode, item } = this.props;
+    const earlyExpiration = item.getIn(['revision_info', 'early_expiration'], false);
     return (
       <div className="entity-revision-edit">
         <div>
           { this.renderTitle() }
-          { mode === 'view'
+          { (mode === 'view' || earlyExpiration)
             ? this.renderDateViewBlock()
             : this.renderDateSelectBlock()
           }
           { this.renderRevisionsBlock() }
           { this.renderVerisionList() }
         </div>
-        { this.renderEditMessage() }
+        { this.renderMessage() }
       </div>
     );
   }

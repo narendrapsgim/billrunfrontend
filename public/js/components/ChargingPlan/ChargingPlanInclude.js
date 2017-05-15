@@ -1,25 +1,26 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Map, List } from 'immutable';
+import { Map } from 'immutable';
 import { Panel, Col, FormGroup, Form, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
+import Actions from '../Elements/Actions';
 
 const ChargingPlanInclude = (props) => {
-  const { include, type } = props;
+  const { include, index } = props;
 
   const onUpdateField = (e) => {
     const { id, value } = e.target;
-    props.onUpdateField(type, id, value);
+    props.onUpdateField(index, id, value);
   };
 
   const onUpdatePeriodField = (e) => {
     const { id, value } = e.target;
-    props.onUpdatePeriodField(type, id, value);
+    props.onUpdatePeriodField(index, id, value);
   };
 
   const onSelectPeriodUnit = (value) => {
-    props.onUpdatePeriodField(type, 'unit', value);
+    props.onUpdatePeriodField(index, 'unit', value);
   };
 
   const unitOptions = [
@@ -27,8 +28,21 @@ const ChargingPlanInclude = (props) => {
     { value: 'months', label: 'Months' },
   ];
 
+  const onRemoveClick = () => {
+    props.onRemove(index);
+  };
+
+  const actions = [
+    { type: 'remove', showIcon: true, onClick: onRemoveClick },
+  ];
+
   const header = (
-    <h3>{ include.get('pp_includes_name', '') }</h3>
+    <div>
+      { include.get('pp_includes_name', '') }
+      <div className="pull-right" style={{ marginTop: -5 }}>
+        <Actions actions={actions} />
+      </div>
+    </div>
   );
 
   return (
@@ -49,7 +63,7 @@ const ChargingPlanInclude = (props) => {
               <Col md={6} style={{ paddingLeft: 0 }}>
                 { props.editable
                   ? <Field id="duration" value={include.getIn(['period', 'duration'], 0)} onChange={onUpdatePeriodField} fieldType="number" editable={props.editable} />
-                  : <div className="non-editble-field">{`${include.getIn(['period', 'duration'], 0)} ${include.getIn(['period', 'unit'], '')}`}</div>
+                  : <div className="non-editable-field">{`${include.getIn(['period', 'duration'], 0)} ${include.getIn(['period', 'unit'], '')}`}</div>
                 }
               </Col>
               <Col md={6}>
@@ -68,15 +82,16 @@ const ChargingPlanInclude = (props) => {
 
 ChargingPlanInclude.defaultProps = {
   include: Map(),
-  type: '',
+  index: 0,
   editable: true,
 };
 
 ChargingPlanInclude.propTypes = {
   include: PropTypes.instanceOf(Map),
-  type: PropTypes.string,
+  index: PropTypes.number,
   onUpdatePeriodField: PropTypes.func.isRequired,
   onUpdateField: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
   editable: PropTypes.bool,
 };
 

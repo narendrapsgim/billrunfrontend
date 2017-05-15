@@ -29,6 +29,10 @@ const ServicesList = () => {
     name: 1,
   };
 
+  const actions = [
+    { type: 'edit' },
+  ];
+
   return (
     <EntityList
       itemsType="services"
@@ -37,6 +41,7 @@ const ServicesList = () => {
       tableFields={tableFields}
       projectFields={projectFields}
       showRevisionBy="name"
+      actions={actions}
     />
   );
 };

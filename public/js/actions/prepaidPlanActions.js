@@ -6,7 +6,7 @@ export const REMOVE_BALANCE_NOTIFICATIONS = 'REMOVE_BALANCE_NOTIFICATIONS';
 export const BLOCK_PRODUCT = 'BLOCK_PRODUCT';
 export const ADD_BALANCE_THRESHOLD = 'ADD_BALANCE_THRESHOLD';
 export const CHANGE_BALANCE_THRESHOLD = 'CHANGE_BALANCE_THRESHOLD';
-export const REMOVE_BLOCK_PRODUCT = 'REMOVE_BLOCK_PRODUCT';
+export const REMOVE_BALANCE_THRESHOLD = 'REMOVE_BALANCE_THRESHOLD';
 
 export function addBalanceNotifications(balance) {
   return {
@@ -47,17 +47,10 @@ export function removeBalanceNotifications(balanceId) {
   };
 }
 
-export function blockProduct(rate) {
+export function blockProduct(rates) {
   return {
     type: BLOCK_PRODUCT,
-    rate,
-  };
-}
-
-export function removeBlockProduct(rate) {
-  return {
-    type: REMOVE_BLOCK_PRODUCT,
-    rate,
+    rates,
   };
 }
 
@@ -73,5 +66,12 @@ export function changeBalanceThreshold(balanceId, value) {
     type: CHANGE_BALANCE_THRESHOLD,
     balanceId,
     value,
+  };
+}
+
+export function removeBalanceThreshold(balanceId) {
+  return {
+    type: REMOVE_BALANCE_THRESHOLD,
+    balanceId,
   };
 }

@@ -2,11 +2,56 @@
   "dashboard": {
     "title": "Dashboard",
     "icon": "fa-dashboard",
-    "route": "dashboard",
+    "route": "",
     "show": true,
     "roles": [],
-    "order":0,
+    "order": 0,
     "parent": "root"
+  },
+  "overview_fake": {
+    "title": "Demo Data",
+    "icon": "",
+    "route": "dashboard/demo",
+    "show": false,
+    "roles": [],
+    "order": 1,
+    "parent":"dashboard"
+  },
+  "overview_dashboard": {
+    "title": "Overview",
+    "icon": "",
+    "route": "dashboard/overview",
+    "show": true,
+    "roles": [],
+    "order": 1,
+    "parent":"dashboard"
+  },
+  "revenue_dashboard": {
+    "title": "Revenue",
+    "icon": "",
+    "route": "dashboard/revenue",
+    "show": true,
+    "roles": [],
+    "order": 2,
+    "parent":"dashboard"
+  },
+  "commercial_dashboard": {
+    "title": "Commercial",
+    "icon": "",
+    "route": "dashboard/commercial",
+    "show": true,
+    "roles": [],
+    "order": 3,
+    "parent":"dashboard"
+  },
+  "customers_dashboard": {
+    "title": "Customers",
+    "icon": "",
+    "route": "dashboard/customers",
+    "show": false,
+    "roles": [],
+    "order": 4,
+    "parent":"dashboard"
   },
   "products": {
     "title": "Products",
@@ -35,19 +80,19 @@
     "order":0,
     "parent":"prepaid"
   },
-  "charging": {
-    "title": "Buckets Group",
+  "prepaid_includes": {
+    "title": "Buckets",
     "icon": "",
-    "route": "charging_plans",
+    "route": "prepaid_includes",
     "show": true,
     "roles": [],
     "order": 1,
     "parent":"prepaid"
   },
-  "prepaid_includes": {
-    "title": "Buckets",
+  "charging": {
+    "title": "Buckets Group",
     "icon": "",
-    "route": "prepaid_includes",
+    "route": "charging_plans",
     "show": true,
     "roles": [],
     "order": 2,
@@ -81,6 +126,15 @@
     "order": 1,
     "parent": "postpaid"
   },
+  "discounts": {
+    "title": "Discounts",
+    "icon": "",
+    "route": "discounts",
+    "show": true,
+    "roles": [],
+    "order": 2,
+    "parent": "postpaid"
+  },
   "customers": {
     "title": "Customers",
     "icon": "fa-users",
@@ -99,13 +153,40 @@
     "order": 5,
     "parent": "root"
   },
+  "cycle": {
+    "title": "Billing Cycle",
+    "icon": "fa-clock-o",
+    "route": "",
+    "show": true,
+    "roles": [],
+    "order":6,
+    "parent": "root"
+  },
+  "run_cycle": {
+    "title": "Run",
+    "icon": "",
+    "route": "run_cycle",
+    "show": true,
+    "roles": [],
+    "order":0,
+    "parent":"cycle"
+  },
   "invoices": {
     "title": "Invoices",
     "icon": "fa-file-text-o",
     "route": "invoices",
     "show": true,
     "roles": [],
-    "order": 6,
+    "order": 7,
+    "parent": "root"
+  },
+  "reports": {
+    "title": "Reports",
+    "icon": "fa-list-alt",
+    "route": "reports",
+    "show": true,
+    "roles": [],
+    "order": 7.5,
     "parent": "root"
   },
   "users": {
@@ -114,7 +195,7 @@
     "route": "users",
     "show": true,
     "roles": [],
-    "order": 7,
+    "order": 8,
     "parent": "root"
   },
   "audit_trail": {
@@ -123,7 +204,7 @@
     "route": "audit-trail",
     "show": true,
     "roles": [],
-    "order": 8,
+    "order": 9,
     "parent": "root"
   },
   "settings": {
@@ -132,7 +213,7 @@
     "route": "",
     "show": true,
     "roles": ["admin"],
-    "order": 9,
+    "order": 10,
     "parent": "root"
   },
   "settings_general": {

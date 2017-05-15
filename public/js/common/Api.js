@@ -1,5 +1,12 @@
 import { dismissProgressIndicator, finishProgressIndicator } from '../actions/progressIndicatorActions';
-import { showDanger, showSuccess } from '../actions/alertsActions';
+import { showDanger, showSuccess, showWarning } from '../actions/alertsActions';
+import { getConfig } from './Util';
+
+
+export const API_STATUS_SUCCESS = 1;
+export const API_STATUS_ERROR = 0;
+export const API_STATUS_WARNING = 2;
+
 
 // Helper function to simulate API response with delay
 export const delay = (sec = 2, success = true, mock = { success: true }) =>
@@ -24,7 +31,7 @@ const checkLogin = (response = {}) => {
 
 // Helper function to check response status OK
 const checkStatus = (response = null) => {
-  if (!response || !response.status) { // Check status OK
+  if (!response || response.status === API_STATUS_ERROR) { // Check status OK
     throw response;
   }
   return response;
@@ -53,6 +60,7 @@ const buildApiString = (params = {}) => {
     case 'savePPIncludes':
       return `/admin/${params.api}`;
     case 'paymentgateways':
+    case 'billrun':
       return `/${params.api}/${params.action}`;
     default:
       return `/api/${params.api}`;
@@ -81,6 +89,7 @@ const buildQueryString = (params = null) => {
 export const apiBillRunSuccessHandler = (success, message = false) => (dispatch) => {
   dispatch(finishProgressIndicator());
   let data;
+  let status = API_STATUS_SUCCESS;
   try {
     data = success.data[0].data.details;
     if (typeof data === 'undefined') {
@@ -96,13 +105,28 @@ export const apiBillRunSuccessHandler = (success, message = false) => (dispatch)
       data = null;
     }
   }
-  if (message) {
+  // Check for warning
+  if (success.data[0] && success.data[0].data && success.data[0].data.status === API_STATUS_WARNING) {
+    status = API_STATUS_WARNING;
+    let warningMessages = [];
+    try {
+      warningMessages = success.data[0].data.warnings;
+      if (!Array.isArray(warningMessages)) {
+        throw new Error();
+      }
+    } catch (e1) {
+      warningMessages = ['Warrning !'];
+    }
+    warningMessages.forEach((warningMessage) => {
+      dispatch(showWarning(warningMessage, 0));
+    });
+  }
+
+  if (message && status === 1) {
     dispatch(showSuccess(message));
   }
-  return ({
-    status: true,
-    data,
-  });
+
+  return ({ status, data });
 };
 
 // Handel API errors (ugly code to handle non standard API responses - should be improved with standard BillAPI)
@@ -129,18 +153,40 @@ export const apiBillRunErrorHandler = (error, defaultMessage = 'Error, please tr
   }
   dispatch(showDanger(errorMessage));
   return ({
-    status: false,
+    status: API_STATUS_ERROR,
     error,
   });
 };
 
+
+const promiseTimeout = (ms, promise, timeOutMessage = 'Request timeout') => new Promise(
+  (resolve, reject) => {
+    // create a timeout to reject promise if not resolved
+    const promiseTimeoutTimer = setTimeout(() => {
+      reject(new Error(timeOutMessage));
+    }, ms);
+
+    promise
+    .then((responce) => {
+      clearTimeout(promiseTimeoutTimer);
+      resolve(responce);
+    })
+    .catch((error) => {
+      clearTimeout(promiseTimeoutTimer);
+      reject(error);
+    });
+  });
+
+export const buildRequestUrl = query => `${getConfig('serverUrl', '')}${buildApiString(query)}${buildQueryString(query.params)}`;
+
 // Send Http request
-const sendHttpRequest = (query) => {
+const sendHttpRequest = (query, apiParams = {}) => {
   // Create Api URL
-  const url = globalSetting.serverUrl + buildApiString(query) + buildQueryString(query.params);
+  const url = buildRequestUrl(query, apiParams);
   const requestOptions = buildQueryOptions(query.options);
   const response = (query.name) ? { name: query.name } : {};
-  return fetch(url, requestOptions)
+  const timeout = query.timeout || globalSetting.serverApiTimeOut;
+  return promiseTimeout(timeout, fetch(url, requestOptions), apiParams.timeOutMessage)
     .then(res => res.json())
     .then(checkLogin)
     .then(checkStatus)
@@ -154,7 +200,7 @@ export const apiBillRun = (requests, params = {}) => {
   const apiParams = Object.assign({ requiredAllSuccess: true }, params);
   const apiRequests = Array.isArray(requests) ? requests : [requests];
   // Create Prommisses array from queries
-  const promiseRequests = apiRequests.map(request => sendHttpRequest(request));
+  const promiseRequests = apiRequests.map(request => sendHttpRequest(request, apiParams));
   // Send All prommisses
   return Promise.all(promiseRequests)
     .then((responses) => {

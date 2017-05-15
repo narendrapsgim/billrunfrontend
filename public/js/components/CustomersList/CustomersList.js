@@ -19,7 +19,7 @@ class CustomersList extends Component {
 
   static defaultProps = {
     accountFields: null,
-    accountAllwaysShownFields: Immutable.List(['firstname', 'lastname']),
+    accountAllwaysShownFields: Immutable.List(['aid', 'firstname', 'lastname']),
   };
 
   componentDidMount() {
@@ -42,9 +42,14 @@ class CustomersList extends Component {
         id: field.get('field_name'),
         placeholder: field.get('title', field.get('field_name')),
         sort: true,
+        type: field.get('field_name') === 'aid' ? 'number' : 'text',
       }))
       .toJS();
     fields.push({ id: 'to', placeholder: 'To', showFilter: false, display: false, type: 'datetime' });
+
+    const actions = [
+      { type: 'edit' },
+    ];
 
     return (
       <EntityList
@@ -53,6 +58,7 @@ class CustomersList extends Component {
         itemType="customer"
         tableFields={fields}
         filterFields={fields}
+        actions={actions}
       />
     );
   }

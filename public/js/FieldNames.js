@@ -17,7 +17,7 @@ const FieldNames = {
     clid: 'Full Calling ID',
     dst: 'Destination extension',
     charging_type: 'Subscriber type',
-    aprice: 'Record charge',
+    aprice: 'Charge before taxes',
     log_stamp: 'File unique ID',
     file: 'File name',
     plan: "Subscriber's plan name",
@@ -33,12 +33,12 @@ const FieldNames = {
     duration: 'Call duration',
     over_group: 'Deviation units',
     usagev: 'Activity volume',
-    urt: 'Unified record time',
+    urt: 'Record time',
     disposition: 'Disposition',
     accountcode: 'CDR account ID',
     type: 'Input processor name',
     source: 'Record source',
-    connection_type: 'Connection_type',
+    connection_type: 'Postpaid / Prepaid',
     end: 'End time',
     aid: 'Customer ID',
     process_time: 'Process time',
@@ -53,6 +53,7 @@ const FieldNames = {
     billrun_pretend: 'Pretend?',
     request_num: 'Request number',
     granted_return_code: 'Return code',
+    final_charge: 'Total charge'
   },
 
   queue: {
@@ -65,6 +66,10 @@ const FieldNames = {
     billrun_pretend: 'Pretend?',
     request_num: 'Request number',
     granted_return_code: 'Return code',
+  },
+  subscription: {
+    firstname: 'First Name',
+    lastname: 'Last Name',
   },
 };
 

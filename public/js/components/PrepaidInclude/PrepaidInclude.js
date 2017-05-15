@@ -22,12 +22,13 @@ const PrepaidInclude = (props) => {
 
   const renderChargingBy = () => {
     if (editable) {
+      onSelectChange('charging_by_usaget')('total_cost');
       return (
-        <Select disabled={true} value={prepaidInclude.get('charging_by', '')} />
+        <Select disabled={true} value="All" />
       );
     }
     return (
-      <div className="non-editble-field">{prepaidInclude.get('charging_by', '')}</div>
+      <div className="non-editable-field">All</div>
     );
   };
 
@@ -43,7 +44,7 @@ const PrepaidInclude = (props) => {
       );
     }
     return (
-      <div className="non-editble-field">{prepaidInclude.get('charging_by_usaget', '')}</div>
+      <div className="non-editable-field">{prepaidInclude.get('charging_by_usaget', '')}</div>
     );
   };
 
@@ -51,7 +52,7 @@ const PrepaidInclude = (props) => {
     <div className="PrepaidInclude">
       <Panel>
         <Form horizontal>
-          { mode === 'create' &&
+          { ['clone', 'create'].includes(mode) &&
             <FormGroup>
               <Col lg={2} md={2} componentClass={ControlLabel}>Name</Col>
               <Col lg={7} md={7}>
@@ -77,7 +78,7 @@ const PrepaidInclude = (props) => {
               {
                 editable
                 ? <Select name="charging_by" value={prepaidInclude.get('charging_by', '')} options={chargingByOptions} onChange={onSelectChange('charging_by')} />
-                : <div className="non-editble-field">{prepaidInclude.get('charging_by', '')}</div>
+                : <div className="non-editable-field">{prepaidInclude.get('charging_by', '')}</div>
               }
             </Col>
           </FormGroup>

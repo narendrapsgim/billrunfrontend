@@ -3,18 +3,48 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Col, Panel } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import { EntityRevisionDetails } from '../Entity';
 import Product from './Product';
-import { onRateAdd, onRateRemove, onFieldUpdate, onToUpdate, onUsagetUpdate, getProduct, saveProduct, clearProduct } from '../../actions/productActions';
+import {
+  onRateAdd,
+  onRateRemove,
+  onFieldUpdate,
+  onToUpdate,
+  onUsagetUpdate,
+  getProduct,
+  saveProduct,
+  clearProduct,
+  setCloneProduct,
+} from '../../actions/productActions';
 import { getSettings } from '../../actions/settingsActions';
 import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
-import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
-import { buildPageTitle, getItemDateValue, getConfig } from '../../common/Util';
+import {
+  clearItems,
+  getRevisions,
+  clearRevisions,
+} from '../../actions/entityListActions';
+import {
+  modeSelector,
+  itemSelector,
+  idSelector,
+  tabSelector,
+  revisionsSelector,
+} from '../../selectors/entitySelector';
+import {
+  chargingDaySelector,
+  usageTypeSelector,
+} from '../../selectors/settingsSelector';
+
+import {
+  buildPageTitle,
+  getConfig,
+  getItemId,
+  getItemMinFromDate,
+} from '../../common/Util';
 
 
 class ProductSetup extends Component {
@@ -24,6 +54,7 @@ class ProductSetup extends Component {
     itemId: PropTypes.string,
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    chargingDay: PropTypes.number,
     usageTypes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
@@ -47,10 +78,8 @@ class ProductSetup extends Component {
   }
 
   componentWillMount() {
-    const { itemId, usageTypes } = this.props;
-    if (itemId) {
-      this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
-    }
+    const { usageTypes } = this.props;
+    this.fetchItem();
     if (usageTypes.isEmpty()) {
       this.props.dispatch(getSettings('usage_types'));
     }
@@ -58,7 +87,7 @@ class ProductSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'product');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -66,18 +95,14 @@ class ProductSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId, revisions } = nextProps;
-    const { item: oldItem,
-      itemId: oldItemId,
-      mode: oldMode,
-      revisions: oldRevisions,
-    } = this.props;
-    if (mode !== oldMode || oldItem.get('key') !== item.get('key')) {
+    const { item, mode, itemId } = nextProps;
+    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'product', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || !Immutable.is(revisions, oldRevisions)) {
-      this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+      this.fetchItem(itemId);
     }
   }
 
@@ -94,10 +119,13 @@ class ProductSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode, item } = this.props;
-    if (mode === 'create' || (mode === 'closeandnew' && getItemDateValue(item, 'from').isBefore(moment()))) {
+    const { mode } = this.props;
+    if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onFieldUpdate(['from'], defaultFromValue));
+    }
+    if (mode === 'clone') {
+      this.props.dispatch(setCloneProduct());
     }
   }
 
@@ -107,6 +135,18 @@ class ProductSetup extends Component {
       const key = item.get('key', '');
       this.props.dispatch(getRevisions('rates', 'key', key));
     }
+  }
+
+  fetchItem = (itemId = this.props.itemId) => {
+    if (itemId) {
+      this.props.dispatch(getProduct(itemId)).then(this.afterItemReceived);
+    }
+  }
+
+  clearRevisions = () => {
+    const { item } = this.props;
+    const key = item.get('key', '');
+    this.props.dispatch(clearRevisions('rates', key));
   }
 
   onFieldUpdate = (path, value) => {
@@ -120,9 +160,17 @@ class ProductSetup extends Component {
   onUsagetUpdate = (path, oldUsaget, newUsaget) => {
     const { usageTypes } = this.props;
     if (newUsaget.length > 0 && !usageTypes.includes(newUsaget)) {
-      this.props.dispatch(addUsagetMapping(newUsaget));
+      this.props.dispatch(addUsagetMapping(newUsaget))
+      .then(
+        (response) => {
+          if (response.status) {
+            this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
+          }
+        }
+      );
+    } else {
+      this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
     }
-    this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
   }
 
   onProductRateAdd = (productPath) => {
@@ -143,12 +191,11 @@ class ProductSetup extends Component {
   }
 
   afterSave = (response) => {
-    const { mode, item } = this.props;
+    const { mode } = this.props;
     if (response.status) {
-      const key = item.get('key', '');
-      this.props.dispatch(clearRevisions('rates', key));
-      const action = (mode === 'create' || mode === 'closeandnew') ? 'created' : 'updated';
+      const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The product was ${action}`));
+      this.clearRevisions();
       this.handleBack(true);
     }
   }
@@ -160,21 +207,23 @@ class ProductSetup extends Component {
 
   handleBack = (itemWasChanged = false) => {
     if (itemWasChanged) {
-      this.props.dispatch(clearItems('product')); // refetch items list because item was (changed in / added to) list
+      this.props.dispatch(clearItems('products')); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = getConfig(['systemItems', 'product', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
   }
 
   render() {
-    const { item, usageTypes, mode, revisions } = this.props;
+    const { item, usageTypes, mode, revisions, chargingDay } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
+    const allowEdit = mode !== 'view';
     const usaget = item.get('rates', Immutable.Map()).keySeq().first();
+    const minFrom = getItemMinFromDate(item, chargingDay);
     return (
-      <Col lg={12}>
+      <div className="ProductSetup" >
 
         <Panel>
           <EntityRevisionDetails
@@ -184,6 +233,7 @@ class ProductSetup extends Component {
             onChangeFrom={this.onFieldUpdate}
             itemName="product"
             backToList={this.handleBack}
+            minFrom={minFrom}
           />
         </Panel>
 
@@ -201,8 +251,14 @@ class ProductSetup extends Component {
             usageTypes={usageTypes}
           />
         </Panel>
-        <ActionButtons onClickCancel={this.handleBack} onClickSave={this.handleSave} />
-      </Col>
+
+        <ActionButtons
+          onClickCancel={this.handleBack}
+          onClickSave={this.handleSave}
+          hideSave={!allowEdit}
+          cancelLabel={allowEdit ? undefined : 'Back'}
+        />
+      </div>
     );
   }
 }
@@ -213,7 +269,8 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'product'),
   activeTab: tabSelector(state, props, 'product'),
   revisions: revisionsSelector(state, props, 'product'),
-  usageTypes: state.settings.get('usage_types'),
+  usageTypes: usageTypeSelector(state, props),
+  chargingDay: chargingDaySelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ProductSetup));

@@ -24,7 +24,7 @@ export default class Plan extends Component {
   static defaultProps = {
     errorMessages: {
       name: {
-        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
       },
     },
   };
@@ -40,17 +40,6 @@ export default class Plan extends Component {
     const count = plan.get('price', Immutable.List()).size;
     if (count === 0) {
       this.props.onPlanTariffAdd();
-    }
-  }
-
-  componentDidMount() {
-    this.setDefaultValues();
-  }
-
-  setDefaultValues = () => {
-    const { plan } = this.props;
-    if (plan.get('prorated', null) === null) {
-      this.props.onChangeFieldValue(['prorated'], true);
     }
   }
 
@@ -112,7 +101,7 @@ export default class Plan extends Component {
   }
 
   onChangeAdditionalField = (field, value) => {
-    this.props.onChangeFieldValue([field], value);
+    this.props.onChangeFieldValue(field, value);
   }
 
   getPeriodicityOptions = () => {
@@ -196,7 +185,7 @@ export default class Plan extends Component {
                 </Col>
               </FormGroup>
 
-              {mode === 'create' &&
+              {['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
                     Key <Help contents={PlanDescription.name} />
@@ -226,7 +215,7 @@ export default class Plan extends Component {
                         { this.getPeriodicityOptions() }
                       </FormControl>
                     )
-                  : <div className="non-editble-field">{ periodicity }</div>
+                  : <div className="non-editable-field">{ periodicity }</div>
                   }
                 </Col>
               </FormGroup>
@@ -242,7 +231,7 @@ export default class Plan extends Component {
                         <option value={false}>Arrears</option>
                       </FormControl>
                     )
-                    : <div className="non-editble-field">{ upfront ? 'Upfront' : 'Arrears'}</div>
+                    : <div className="non-editable-field">{ upfront ? 'Upfront' : 'Arrears'}</div>
                   }
 
                 </Col>
@@ -250,8 +239,8 @@ export default class Plan extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-                <Col sm={4} style={{ padding: '10px' }}>
-                  <Field value={plan.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
+                <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+                  <Field value={plan.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" editable={editable} />
                 </Col>
               </FormGroup>
 
@@ -261,8 +250,6 @@ export default class Plan extends Component {
                 onChangeField={this.onChangeAdditionalField}
                 editable={editable}
               />
-
-
 
             </Panel>
 

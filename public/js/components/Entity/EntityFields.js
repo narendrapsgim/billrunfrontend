@@ -44,7 +44,8 @@ class EntityFields extends Component {
 
   renderField = (field, key) => {
     const { entity, editable } = this.props;
-    const fieldName = field.get('field_name');
+    const fieldName = field.get('field_name', '');
+    const fieldNamePath = fieldName.split('.');
     return (
       <FormGroup controlId={fieldName} key={key} >
         <Col componentClass={ControlLabel} sm={3} lg={2}>
@@ -52,7 +53,7 @@ class EntityFields extends Component {
         </Col>
         <Col sm={8} lg={9}>
           {editable
-            ? <Field onChange={this.onChangeField.bind(this, fieldName)} id={fieldName} value={entity.get(fieldName, '')} />
+            ? <Field onChange={this.onChangeField.bind(this, fieldNamePath)} id={fieldName} value={entity.getIn(fieldNamePath, '')} />
             : entity.get(fieldName, '')
           }
         </Col>

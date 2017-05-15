@@ -36,9 +36,10 @@ export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
-import { getInputProcessorActionQuery } from '../common/ApiQueries';
+import { getInputProcessorActionQuery, getAddUsagetQuery } from '../common/ApiQueries';
 import _ from 'lodash';
 import Immutable from 'immutable';
+import { getSettings } from './settingsActions';
 
 const convert = (settings) => {
   const { parser = {},
@@ -236,33 +237,16 @@ function addedUsagetMapping(usaget) {
   };
 }
 
-export function addUsagetMapping(usaget) {
-  const query = {
-    api: "settings",
-    params: [
-      { category: "usage_types" },
-      { action: "set" },
-      { data: [JSON.stringify(usaget)] }
-    ]
-  };
-
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    apiBillRun(query).then(
-      resp => {
-        dispatch(finishProgressIndicator());
-        if (!resp.data[0].data.status) {
-          dispatch(showDanger(resp.data.desc));
-        } else {
-	  dispatch(addedUsagetMapping(usaget));
-        }
-      }
-    ).catch(error => {
-      dispatch(finishProgressIndicator());
-      dispatch(showDanger(error.data.message));
-    });
-  };
-}
+export const addUsagetMapping = usaget => (dispatch) => { // eslint-disable-line import/prefer-default-export
+  dispatch(startProgressIndicator());
+  const query = getAddUsagetQuery(usaget);
+  return apiBillRun(query)
+    .then((success) => {
+      dispatch(getSettings('usage_types'));
+      return dispatch(apiBillRunSuccessHandler(success));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Illegal usage type')));
+};
 
 export function removeUsagetMapping(index) {
   return {
@@ -386,11 +370,12 @@ export function saveInputProcessorSettings(state, parts = []) {
     settings.rate_calculators = rate_calculators.toJS();
   }
   if (state.get('type') !== 'realtime' && receiver) {
+    const receiverType = receiver.get('receiver_type', 'ftp');
     settings.receiver = {
-      "type": "ftp",
-      "connections": [
-	receiver.toJS()
-      ]
+      type: receiverType,
+      connections: [
+        receiver.toJS(),
+      ],
     };
   }
   const defaultResponse = {

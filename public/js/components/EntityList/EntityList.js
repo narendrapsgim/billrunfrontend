@@ -10,6 +10,7 @@ import Pager from './Pager';
 import State from './State';
 import Filter from './Filter';
 import StateDetails from './StateDetails';
+import Actions from '../Elements/Actions';
 import {
   getList,
   clearList,
@@ -20,6 +21,8 @@ import {
   setListState,
   clearItem,
 } from '../../actions/entityListActions';
+import { getConfig } from '../../common/Util';
+
 
 class EntityList extends Component {
 
@@ -56,13 +59,19 @@ class EntityList extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    listActions: PropTypes.oneOfType([
+      PropTypes.bool,
+      PropTypes.arrayOf(PropTypes.object),
+    ]),
+    refreshString: PropTypes.string,
+    actions: PropTypes.arrayOf(PropTypes.object),
   }
 
   static defaultProps = {
     items: null,
     api: 'uniqueget',
     page: 0,
-    size: 5,
+    size: getConfig(['list', 'defaultItems'], 10),
     nextPage: false,
     editable: true,
     showRevisionBy: false,
@@ -75,6 +84,8 @@ class EntityList extends Component {
     sort: Immutable.Map(),
     filter: Immutable.Map(),
     state: Immutable.List([0, 1, 2]),
+    refreshString: '',
+    actions: [],
   }
 
   componentWillMount() {
@@ -85,7 +96,6 @@ class EntityList extends Component {
   }
 
   // shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
-  //   return !nextProps.inProgress;
   //   // return (
   //   //   this.props.page !== nextProps.page
   //   //   || this.props.nextPage !== nextProps.nextPage
@@ -102,7 +112,12 @@ class EntityList extends Component {
     const filterChanged = !Immutable.is(this.props.filter, nextProps.filter);
     const sortChanged = !Immutable.is(this.props.sort, nextProps.sort);
     const stateChanged = !Immutable.is(this.props.state, nextProps.state);
-    if (pageChanged || sizeChanged || filterChanged || sortChanged || stateChanged) {
+    const baseFilterMap = (Immutable.fromJS(this.props.baseFilter));
+    const baseFilterNextMap = (Immutable.fromJS(nextProps.baseFilter));
+    const baseFilterChanged = !Immutable.is(baseFilterMap, baseFilterNextMap);
+    const refreshStringChanged = this.props.refreshString !== nextProps.refreshString;
+    if (pageChanged || sizeChanged || filterChanged ||
+      sortChanged || stateChanged || baseFilterChanged || refreshStringChanged) {
       this.fetchItems(nextProps);
     }
   }
@@ -150,10 +165,16 @@ class EntityList extends Component {
     this.props.dispatch(setListState(itemsType, states));
   }
 
-  onClickItem = (item) => {
+  onClickEditItem = (item) => {
     const { itemsType, itemType } = this.props;
     const itemId = item.getIn(['_id', '$id']);
     this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
+  }
+
+  onClickViewItem = (item) => {
+    const { itemsType, itemType } = this.props;
+    const itemId = item.getIn(['_id', '$id']);
+    this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
   }
 
   buildQuery = (props) => {
@@ -169,7 +190,7 @@ class EntityList extends Component {
       api,
       showRevisionBy,
     } = props;
-    const project = showRevisionBy ? { ...projectFields, ...{ to: 1, from: 1 } } : projectFields;
+    const project = showRevisionBy ? { ...projectFields, ...{ to: 1, from: 1, revision_info: 1 } } : projectFields;
     const query = { ...filter.toObject(), ...baseFilter };
     const request = {
       action: api,
@@ -207,15 +228,32 @@ class EntityList extends Component {
     ...fields,
   ])
 
+  getListActions = () => {
+    const { listActions } = this.props;
+    if (typeof listActions === 'undefined') {
+      return [{
+        type: 'add',
+        label: 'Add New',
+        actionStyle: 'default',
+        showIcon: true,
+        onClick: this.onClickNew,
+        actionSize: 'xsmall',
+        actionClass: 'btn-primary',
+      }];
+    }
+    if (listActions === false) {
+      return [];
+    }
+    return listActions;
+  }
+
   renderPanelHeader = () => {
     const { itemsType } = this.props;
     return (
       <div>
         List of all available {changeCase.noCase(itemsType)}
         <div className="pull-right">
-          <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}>
-            <i className="fa fa-plus" />&nbsp;Add New
-          </Button>
+          <Actions actions={this.getListActions()} />
         </div>
       </div>
     );
@@ -236,7 +274,7 @@ class EntityList extends Component {
       return null;
     }
     return (
-      <div className="pull-right" style={{ marginRight: 30 }}>
+      <div className="pull-right">
         <State states={state} onChangeState={this.onStateChange} />
       </div>
     );
@@ -256,29 +294,44 @@ class EntityList extends Component {
     );
   }
 
+  getActions = () => {
+    const { actions, showRevisionBy } = this.props;
+    const editColumn = showRevisionBy ? 1 : 0;
+    const editAction = { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEditItem, show: true, onClickColumn: editColumn };
+    const viewAction = { type: 'view', showIcon: true, helpText: 'View', onClick: this.onClickViewItem, show: true, onClickColumn: editColumn };
+
+    return actions.map((action) => {
+      switch (action.type) {
+        case 'edit': return Object.assign(editAction, action);
+        case 'view': return Object.assign(viewAction, action);
+        default: return action;
+      }
+    });
+  }
+
   renderList = () => {
-    const { items, sort, tableFields, editable, showRevisionBy } = this.props;
+    const { items, sort, tableFields, showRevisionBy } = this.props;
+    const actions = this.getActions();
     const fields = (!showRevisionBy) ? tableFields : this.addStateColumn(tableFields);
     return (
       <List
         sort={sort}
         items={items}
         fields={fields}
-        edit={editable}
         onSort={this.onSort}
-        onClickEdit={this.onClickItem}
+        actions={actions}
       />
     );
   }
 
   render() {
-    const { items, inProgress } = this.props;
-    if (items === null || inProgress) {
+    const { items } = this.props;
+    if (items === null) {
       return (<LoadingItemPlaceholder />);
     }
     return (
       <Row>
-        <Col lg={12}>
+        <Col lg={12} >
           <Panel header={this.renderPanelHeader()}>
             { this.renderFilter() }
             { this.renderList() }

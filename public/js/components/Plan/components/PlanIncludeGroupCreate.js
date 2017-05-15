@@ -1,19 +1,21 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import Select from 'react-select';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import CreateButton from '../../Elements/CreateButton';
 import Help from '../../Help';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '../../Field';
-import Products from './Products';
 import { validateUnlimitedValue, validatePriceValue, validateKey } from '../../../common/Validators';
+import { currencySelector } from '../../../selectors/settingsSelector';
 
 
-export default class PlanIncludeGroupCreate extends Component {
+class PlanIncludeGroupCreate extends Component {
 
   static propTypes = {
     existinGrousNames: PropTypes.instanceOf(Immutable.List),
@@ -21,12 +23,14 @@ export default class PlanIncludeGroupCreate extends Component {
     usageTypes: PropTypes.instanceOf(Immutable.List),
     modalTitle: PropTypes.string,
     addGroup: PropTypes.func.isRequired,
+    currency: PropTypes.string,
   }
 
   static defaultProps = {
     modalTitle: 'Create New Group',
     allGroupsProductsKeys: Immutable.List(),
     existinGrousNames: Immutable.List(),
+    currency: 'USD',
   };
 
   defaultState = {
@@ -35,6 +39,7 @@ export default class PlanIncludeGroupCreate extends Component {
     include: '',
     products: Immutable.List(),
     shared: false,
+    pooled: false,
     error: '',
     stepIndex: 0,
     open: false,
@@ -53,7 +58,7 @@ export default class PlanIncludeGroupCreate extends Component {
     name: {
       required: 'Group name is required',
       exist: 'Group name already exist',
-      allowedCharacters: 'Group name contains illegal characters, name should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+      allowedCharacters: 'Group name contains illegal characters, name should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
     },
     usage: {
       required: 'Usage type is required',
@@ -149,7 +154,16 @@ export default class PlanIncludeGroupCreate extends Component {
 
   onChangeShared = (e) => {
     const { checked: shared } = e.target;
-    this.setState({ shared });
+    if (shared) {
+      this.setState({ shared });
+    } else {
+      this.setState({ shared, pooled: false });
+    }
+  }
+
+  onChangePooled = (e) => {
+    const { checked: pooled } = e.target;
+    this.setState({ pooled });
   }
 
   onChangeUsageType = (newValue) => {
@@ -167,14 +181,8 @@ export default class PlanIncludeGroupCreate extends Component {
     this.setState({ include: value, error });
   }
 
-  onAddProduct = (key) => {
-    const products = this.state.products.push(key);
-    this.setState({ products, error: '' });
-  }
-
-  onRemoveProduct = (key) => {
-    const products = this.state.products.filter(product => key !== product);
-    this.setState({ products, error: '' });
+  onChangeGroupRates = (keys) => {
+    this.setState({ products: Immutable.List(keys), error: '' });
   }
 
   handlePrev = () => {
@@ -202,9 +210,9 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   handleFinish = () => {
-    const { stepIndex, name, usage, include, products, shared } = this.state;
+    const { stepIndex, name, usage, include, products, shared, pooled } = this.state;
     if (this.validateStep(stepIndex)) {
-      this.props.addGroup(name, usage, include, shared, products);
+      this.props.addGroup(name, usage, include, shared, pooled, products);
       this.resetState(false);
     }
   };
@@ -241,10 +249,10 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
-    const { usedProducts, usageTypes } = this.props;
-    const { name, products, include, usage, shared, error, monetaryBased, steps } = this.state;
+    const { usedProducts, usageTypes, currency } = this.props;
+    const { name, products, include, usage, shared, pooled, error, monetaryBased, steps } = this.state;
     const existingProductsKeys = usedProducts.push(...products);
-    const setIncludesTitle = monetaryBased ? `Total ${globalSetting.currency} included` : changeCase.sentenceCase(`${usage} includes`);
+    const setIncludesTitle = monetaryBased ? `Total ${getSymbolFromCurrency(currency)} included` : changeCase.sentenceCase(`${usage} includes`);
 
     switch (stepIndex) {
 
@@ -314,8 +322,16 @@ export default class PlanIncludeGroupCreate extends Component {
           <FormGroup key={`${usage}_shared`}>
             <Col smOffset={3} sm={8}>
               <Checkbox checked={shared} onChange={this.onChangeShared}>
-                Share with all account&apos;s subscribers
+                {"Share with all account's subscribers"}
                 <Help contents={GroupsInclude.shared_desc} />
+              </Checkbox>
+            </Col>
+          </FormGroup>,
+          <FormGroup key={`${usage}_pooled`}>
+            <Col smOffset={3} sm={8}>
+              <Checkbox disabled={!shared} checked={pooled} onChange={this.onChangePooled}>
+                {'Includes is pooled?'}
+                <Help contents={GroupsInclude.pooled_desc} />
               </Checkbox>
             </Col>
           </FormGroup>,
@@ -329,15 +345,12 @@ export default class PlanIncludeGroupCreate extends Component {
               : <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`Products of type ${usage}`)}<Help contents={GroupsInclude.products} /></Col>
             }
             <Col sm={8}>
-              { products.size
-               ? <Products onRemoveProduct={this.onRemoveProduct} products={products} />
-               : <p style={{ marginTop: 8 }}>No products in group ...</p>
-              }
-              <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
+              <div style={{ marginTop: 10, minWidth: 250, width: '100%', minHeight: 42 }}>
                 <ProductSearchByUsagetype
+                  products={products}
                   usaget={usage}
-                  products={existingProductsKeys}
-                  addRatesToGroup={this.onAddProduct}
+                  onChangeGroupRates={this.onChangeGroupRates}
+                  existingProducts={existingProductsKeys}
                 />
               </div>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
@@ -360,7 +373,7 @@ export default class PlanIncludeGroupCreate extends Component {
   }
 
   render() {
-    const { stepIndex, open, name } = this.state;
+    const { stepIndex, open, name, steps } = this.state;
     let { modalTitle } = this.props;
     if (name.length) {
       modalTitle += ` - ${name}`;
@@ -391,7 +404,7 @@ export default class PlanIncludeGroupCreate extends Component {
 
           <Modal.Footer>
             <Button bsSize="small" onClick={this.handlePrev} style={{ marginRight: 9, minWidth: 90 }}><i className="fa fa-angle-left" />&nbsp;Back</Button>
-            { (stepIndex === 3)
+            { (stepIndex === steps.count() - 1)
               ? <Button bsSize="small" onClick={this.handleFinish} style={{ minWidth: 90 }} bsStyle="primary">Add</Button>
               : <Button bsSize="small" onClick={this.handleNext} style={{ minWidth: 90 }}>Next&nbsp;<i className="fa fa-angle-right" /></Button>
             }
@@ -401,3 +414,12 @@ export default class PlanIncludeGroupCreate extends Component {
     );
   }
 }
+
+const mapStateToProps = (state, props) => {
+  const currency = currencySelector(state, props);
+  return {
+    currency,
+  };
+};
+
+export default connect(mapStateToProps)(PlanIncludeGroupCreate);

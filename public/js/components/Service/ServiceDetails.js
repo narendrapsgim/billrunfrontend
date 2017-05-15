@@ -19,7 +19,7 @@ export default class ServiceDetails extends Component {
   static defaultProps = {
     errorMessages: {
       name: {
-        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscore(A-Z, 0-9, _)',
+        allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
       },
     },
   };
@@ -30,19 +30,8 @@ export default class ServiceDetails extends Component {
     },
   }
 
-  componentDidMount() {
-    this.setDefaultValues();
-  }
-
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
     return !Immutable.is(this.props.item, nextProps.item) || this.props.mode !== nextProps.mode;
-  }
-
-  setDefaultValues = () => {
-    const { item } = this.props;
-    if (item.get('prorated', null) === null) {
-      this.props.updateItem(['prorated'], true);
-    }
   }
 
   onChangeName = (e) => {
@@ -68,13 +57,18 @@ export default class ServiceDetails extends Component {
     this.props.updateItem(['prorated'], value);
   }
 
+  onChangeQuantitative = (e) => {
+    const { value } = e.target;
+    this.props.updateItem(['quantitative'], value);
+  }
+
   onChangeDescription = (e) => {
     const { value } = e.target;
     this.props.updateItem(['description'], value);
   }
 
   onChangeAdditionalField = (field, value) => {
-    this.props.updateItem([field], value);
+    this.props.updateItem(field, value);
   }
 
   render() {
@@ -95,7 +89,7 @@ export default class ServiceDetails extends Component {
           </Col>
         </FormGroup>
 
-        {mode === 'create' &&
+        {['clone', 'create'].includes(mode) &&
           <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
             <Col componentClass={ControlLabel} sm={3} lg={2}>
               Key <Help contents={ServiceDescription.name} />
@@ -123,8 +117,15 @@ export default class ServiceDetails extends Component {
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-          <Col sm={4} style={{ padding: '10px' }}>
-            <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" />
+          <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+            <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" editable={editable} />
+          </Col>
+        </FormGroup>
+
+        <FormGroup>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>Quantitative?</Col>
+          <Col sm={4} style={['clone', 'create'].includes(mode) ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+            <Field value={item.get('quantitative', '')} onChange={this.onChangeQuantitative} fieldType="checkbox" editable={['clone', 'create'].includes(mode)} />
           </Col>
         </FormGroup>
 
@@ -132,7 +133,7 @@ export default class ServiceDetails extends Component {
           entityName="services"
           entity={item}
           onChangeField={this.onChangeAdditionalField}
-          editable={true}
+          editable={editable}
         />
 
       </Form>

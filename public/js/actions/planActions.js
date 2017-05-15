@@ -1,6 +1,6 @@
 import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
-import { fetchPlanByIdQuery, getAllGroupsQuery } from '../common/ApiQueries';
+import { fetchPlanByIdQuery, getAllGroupsQuery, fetchPrepaidGroupByIdQuery } from '../common/ApiQueries';
 import { saveEntity } from '../actions/entityActions';
 
 export const PLAN_GOT = 'PLAN_GOT';
@@ -10,6 +10,7 @@ export const PLAN_REMOVE_TARIFF = 'PLAN_REMOVE_TARIFF';
 export const PLAN_UPDATE_PLAN_CYCLE = 'PLAN_UPDATE_PLAN_CYCLE';
 export const PLAN_UPDATE_FIELD_VALUE = 'PLAN_UPDATE_FIELD_VALUE';
 export const PLAN_REMOVE_FIELD = 'PLAN_REMOVE_FIELD';
+export const PLAN_CLONE_RESET = 'PLAN_CLONE_RESET';
 
 export const REMOVE_GROUP_PLAN = 'REMOVE_GROUP_PLAN';
 export const ADD_GROUP_PLAN = 'ADD_GROUP_PLAN';
@@ -37,12 +38,13 @@ export const onGroupRemove = groupName => ({
   groupName,
 });
 
-export const onGroupAdd = (groupName, usage, value, shared, products) => ({
+export const onGroupAdd = (groupName, usage, value, shared, pooled, products) => ({
   type: ADD_GROUP_PLAN,
   groupName,
   usage,
   value,
   shared,
+  pooled,
   products,
 });
 
@@ -109,14 +111,20 @@ export const onPlanTariffRemove = index => ({
   index,
 });
 
-export const addUsagetInclude = (usaget, ppIncludesName, ppIncludesExternalId) => ({
+export const setClonePlan = () => ({
+  type: PLAN_CLONE_RESET,
+  uniquefields: ['name'],
+});
+
+export const addUsagetInclude = (ppIncludesName, ppIncludesExternalId) => ({
   type: ADD_USAGET_INCLUDE,
-  usaget,
   ppIncludesName,
   ppIncludesExternalId,
 });
 
 export const savePlan = (plan, action) => saveEntity('plans', plan, action);
+
+export const savePrepaidGroup = (prepaidGroup, action) => saveEntity('prepaidgroups', prepaidGroup, action);
 
 export const getPlan = id => (dispatch) => {
   dispatch(startProgressIndicator());
@@ -129,6 +137,19 @@ export const getPlan = id => (dispatch) => {
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving plan')));
+};
+
+export const getPrepaidGroup = id => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = fetchPrepaidGroupByIdQuery(id);
+  return apiBillRun(query)
+    .then((response) => {
+      const item = response.data[0].data.details[0];
+      item.originalValue = item.from;
+      dispatch(gotItem(item));
+      return dispatch(apiBillRunSuccessHandler(response));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving prepaid group')));
 };
 
 export const getAllGroup = () => apiBillRun(getAllGroupsQuery());
