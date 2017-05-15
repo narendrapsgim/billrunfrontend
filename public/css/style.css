@@ -465,6 +465,9 @@ ul.revision-history-list li.active .cycle {
 #move-entity .nav-pills>li+li {
      margin-left: 0;
 }
+#move-entity .nav-pills li.disabled {
+  cursor: not-allowed;
+}
 
 .delimiter-select {
   width: 150px;

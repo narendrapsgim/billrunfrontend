@@ -1,6 +1,5 @@
-import moment from 'moment';
 import { createSelector } from 'reselect';
-import { getConfig, getItemId, getItemMode, getItemDateValue } from '../common/Util';
+import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector } from './settingsSelector';
 
 
@@ -58,15 +57,7 @@ const getItem = (state, props, entityName) => {
   }
 };
 
-const selectMaxFrom = (item = null, minDate = null) => {
-  if (minDate) {
-    if (item && getItemId(item, false)) {
-      return moment.max(minDate, getItemDateValue(item, 'originalValue', moment(0)));
-    }
-    return minDate;
-  }
-  return undefined;
-};
+const selectMaxFrom = (item = null, minDate = null) => getItemMinFromDate(item, minDate);
 
 const selectRevisions = (item, allRevisions, uniqueFiled) => {
   if (allRevisions && getItemId(item, false)) {
