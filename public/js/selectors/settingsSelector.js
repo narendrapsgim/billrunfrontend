@@ -15,6 +15,9 @@ const getUsageType = (state, props) => // eslint-disable-line no-unused-vars
 const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('billrun');
 
+const getEntityFields = (state, props) =>
+  state.settings.getIn([props.entityName, 'fields']);
+
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
   const defaultUsaget = inputProssesor.getIn(['processor', 'default_usaget'], '');
@@ -150,4 +153,9 @@ export const chargingDaySelector = createSelector(
 export const usageTypeSelector = createSelector(
   getUsageType,
   usageTypes => usageTypes
+);
+
+export const entityFieldSelector = createSelector(
+  getEntityFields,
+  fields => fields
 );
