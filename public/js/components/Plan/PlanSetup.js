@@ -8,6 +8,7 @@ import PlanTab from './PlanTab';
 import { EntityRevisionDetails } from '../Entity';
 import PlanProductsPriceTab from './PlanProductsPriceTab';
 import PlanIncludesTab from './PlanIncludesTab';
+import PlanIncludedServicesTab from './PlanIncludedServicesTab';
 import { LoadingItemPlaceholder, ActionButtons } from '../Elements';
 import {
   getPlan,
@@ -114,7 +115,7 @@ class PlanSetup extends Component {
       this.props.dispatch(setClonePlan());
     }
     if (item.get('prorated', null) === null) {
-      this.props.dispatch(onPlanFieldUpdate(['prorated'], 'true'));
+      this.props.dispatch(onPlanFieldUpdate(['prorated'], true));
     }
   }
 
@@ -214,6 +215,7 @@ class PlanSetup extends Component {
 
     const allowEdit = mode !== 'view';
     const planRates = item.get('rates', Immutable.Map());
+    const includedServices = item.getIn(['include', 'services'], Immutable.List());
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
     const minFrom = getItemMinFromDate(item, chargingDay);
     return (
@@ -257,7 +259,7 @@ class PlanSetup extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Plan Includes" eventKey={3}>
+          <Tab title="Included Products" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanIncludesTab
                 mode={mode}
@@ -265,6 +267,16 @@ class PlanSetup extends Component {
                 onChangeFieldValue={this.onChangeFieldValue}
                 onGroupAdd={this.onGroupAdd}
                 onGroupRemove={this.onGroupRemove}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Included Services" eventKey={4}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanIncludedServicesTab
+                mode={mode}
+                includedServices={includedServices}
+                onChangeFieldValue={this.onChangeFieldValue}
               />
             </Panel>
           </Tab>
