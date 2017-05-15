@@ -92,7 +92,7 @@ class CustomerSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     } else {
       this.props.dispatch(getList('available_gateways', getPaymentGatewaysQuery()));
-      this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
+      this.props.dispatch(getList('available_plans', getPlansKeysQuery({ name: 1, description: 1, 'include.services': 1 })));
       this.props.dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
     }
   }

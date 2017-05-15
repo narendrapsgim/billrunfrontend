@@ -213,6 +213,16 @@ class Subscription extends Component {
 
   getAvailablePlans = () => this.formatSelectOptions(this.props.allPlans);
 
+  getPlanIncludedServices = (planName) => {
+    if (planName === '') {
+      return '-';
+    }
+    const { allPlans } = this.props;
+    const selectedPlan = allPlans.find(plan => plan.get('name', '') === planName, null, Immutable.Map());
+    const includedServices = selectedPlan.getIn(['include', 'services'], Immutable.List());
+    return includedServices.size ? includedServices.join(', ') : '-';
+  }
+
   getAvailableServices = () => this.formatSelectOptions(this.props.allServices);
 
   filterCustomFields = (field) => {
@@ -249,6 +259,13 @@ class Subscription extends Component {
             />
             : <Field value={plan} editable={false} />
           }
+        </Col>
+      </FormGroup>
+    ), (
+      <FormGroup key="includedServices">
+        <Col componentClass={ControlLabel} sm={2}>Included Services</Col>
+        <Col sm={7}>
+          <Field value={this.getPlanIncludedServices(plan)} editable={false} />
         </Col>
       </FormGroup>
     ), (
