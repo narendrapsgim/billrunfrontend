@@ -14,11 +14,9 @@ import {
   getItemId,
   getFieldName,
   getItemMode,
-  getItemMinFromDate,
   getItemDateValue,
   buildPageTitle,
 } from '../../common/Util';
-import { chargingDaySelector } from '../../selectors/settingsSelector';
 
 
 class Subscription extends Component {
@@ -30,7 +28,6 @@ class Subscription extends Component {
     allPlans: PropTypes.instanceOf(Immutable.List),
     allServices: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
-    chargingDay: PropTypes.number,
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     clearRevisions: PropTypes.func.isRequired,
@@ -352,12 +349,11 @@ class Subscription extends Component {
 
   render() {
     const { progress, subscription } = this.state;
-    const { revisions, mode, chargingDay } = this.props;
+    const { revisions, mode } = this.props;
     const title = buildPageTitle(mode, 'subscription', this.props.subscription);
     const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
     const servisesQuentity = this.renderServisesQuentity(allowEdit);
-    const minFrom = getItemMinFromDate(subscription, chargingDay);
     return (
       <div className="Subscription">
         <Panel header={title}>
@@ -372,7 +368,6 @@ class Subscription extends Component {
             clearRevisions={this.clearRevisions}
             onActionEdit={this.props.getSubscription}
             onActionClone={this.props.getSubscription}
-            minFrom={minFrom}
           />
 
           <hr />
@@ -410,7 +405,6 @@ const mapStateToProps = (state, props) => {
   return ({
     revisions,
     mode,
-    chargingDay: chargingDaySelector(state, props),
   });
 };
 export default connect(mapStateToProps)(Subscription);
