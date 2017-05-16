@@ -4,6 +4,7 @@ import { HelpBlock } from 'react-bootstrap';
 import Immutable from 'immutable';
 /* COMPONENTS */
 import Field from '../Field';
+import { CreateButton } from '../Elements';
 import SelectDelimiter from './SampleCSV/SelectDelimiter';
 import SelectCSV from './SampleCSV/SelectCSV';
 import SelectJSON from './SampleCSV/SelectJSON';
@@ -97,7 +98,7 @@ class SampleCSV extends Component {
                       disabled={settings.get('fields', []).size < 1}
                       className="btn btn-default btn-xs"
                       onClick={this.removeAllFields}>
-                <i className="fa fa-trash-o" /> Remove all
+                <i className="fa fa-trash-o danger-red" /> Remove all
               </button>
             </div>
             { (settings.get('delimiter_type') === 'fixed') &&
@@ -109,11 +110,7 @@ class SampleCSV extends Component {
           { fieldsHTML }
           <div className="form-group">
             <div className="col-lg-2">
-              <button type="button"
-                      className="btn btn-primary btn-sm"
-                      onClick={onAddField}>
-                <i className="fa fa-plus"/> Add Field
-              </button>
+              <CreateButton onClick={onAddField} label="Add Field" />
             </div>
           </div>
         </div>
