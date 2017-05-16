@@ -87,9 +87,9 @@ export const getCreditChargeQuery = params => ({
 
 /* List Components queries*/
 export const usageListQuery = (query, page, sort, size) => ({
-  api: 'find',
+  entity: 'lines',
+  action: 'get',
   params: [
-    { collection: 'lines' },
     { size },
     { page },
     { sort: JSON.stringify(sort) },
