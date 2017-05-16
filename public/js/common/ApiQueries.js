@@ -109,9 +109,9 @@ export const queueListQuery = (query, page, sort, size) => ({
 });
 
 export const prepaidBalancesListQuery = (query, page, sort, size) => ({
-  api: 'find',
+  entity: 'balances',
+  action: 'get',
   params: [
-    { collection: 'balances' },
     { size },
     { page },
     { sort: JSON.stringify(sort) },
@@ -120,9 +120,9 @@ export const prepaidBalancesListQuery = (query, page, sort, size) => ({
 });
 
 export const postpaidBalancesListQuery = (query, page, sort, size) => ({
-  api: 'find',
+  entity: 'balances',
+  action: 'get',
   params: [
-    { collection: 'balances' },
     { size },
     { page },
     { sort: JSON.stringify(sort) },
