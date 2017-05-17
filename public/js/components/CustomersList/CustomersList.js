@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import EntityList from '../EntityList';
-import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
+import { LoadingItemPlaceholder, ModalWrapper } from '../Elements';
+import Importer from '../Importer';
 import { getSettings } from '../../actions/settingsActions';
 import { accountFieldsSelector } from '../../selectors/settingsSelector';
 import { getFieldName } from '../../common/Util';
@@ -24,6 +25,10 @@ class CustomersList extends Component {
     accountFields: null,
     accountAllwaysShownFields: Immutable.List(['aid', 'firstname', 'lastname']),
   };
+
+  state = {
+    showImport: false,
+  }
 
   componentDidMount() {
     const { accountFields } = this.props;
@@ -50,6 +55,14 @@ class CustomersList extends Component {
   }
 
   getListActions = () => [{
+    type: 'import',
+    label: 'Import',
+    actionStyle: 'default',
+    showIcon: true,
+    onClick: this.onClickImprt,
+    actionSize: 'xsmall',
+    actionClass: 'btn-primary',
+  }, {
     type: 'add',
     label: 'Add New',
     actionStyle: 'default',
@@ -57,15 +70,27 @@ class CustomersList extends Component {
     onClick: this.onClickNew,
     actionSize: 'xsmall',
     actionClass: 'btn-primary',
-  },
-  ];
+  }];
 
   getActions = () => [
     { type: 'edit' },
   ];
 
+  onCloseImprt = () => {
+    this.setState({
+      showImport: false,
+    });
+  }
+
+  onClickImprt = () => {
+    this.setState({
+      showImport: true,
+    });
+  }
+
   render() {
     const { accountFields } = this.props;
+    const { showImport } = this.state;
 
     if (accountFields === null) {
       return (<LoadingItemPlaceholder />);
@@ -75,15 +100,20 @@ class CustomersList extends Component {
     const listActions = this.getListActions();
     const actions = this.getActions();
     return (
-      <EntityList
-        collection="accounts"
-        itemsType="customers"
-        itemType="customer"
-        tableFields={fields}
-        filterFields={fields}
-        actions={actions}
-        listActions={listActions}
-      />
+      <div>
+        <EntityList
+          collection="accounts"
+          itemsType="customers"
+          itemType="customer"
+          tableFields={fields}
+          filterFields={fields}
+          actions={actions}
+          listActions={listActions}
+        />
+        <ModalWrapper show={showImport} title="Import Customers" onHide={this.onCloseImprt}>
+          <Importer />
+        </ModalWrapper>
+      </div>
     );
   }
 }
