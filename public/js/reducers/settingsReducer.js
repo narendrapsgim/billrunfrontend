@@ -1,13 +1,16 @@
 import Immutable from 'immutable';
 import {
   UPDATE_SETTING,
-         REMOVE_SETTING_FIELD,
-         GOT_SETTINGS,
-         PUSH_TO_SETTING,
-	 ADD_PAYMENT_GATEWAY,
-	 REMOVE_PAYMENT_GATEWAY,
-	 UPDATE_PAYMENT_GATEWAY,
+  REMOVE_SETTING_FIELD,
+  GOT_SETTINGS,
+  PUSH_TO_SETTING,
+  ADD_PAYMENT_GATEWAY,
+  REMOVE_PAYMENT_GATEWAY,
+  UPDATE_PAYMENT_GATEWAY,
   SET_FIELD_POSITION,
+  ADD_SHARED_SECRET,
+  REMOVE_SHARED_SECRET,
+  UPDATE_SHARED_SECRET,
 } from '../actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
 import { LOGOUT } from '../actions/userActions';
@@ -29,7 +32,7 @@ const defaultState = Immutable.fromJS({
 });
 
 export default function (state = defaultState, action) {
-  const { name, value, category, settings, gateway } = action;
+  const { name, value, category, settings, gateway, secret } = action;
 
   switch(action.type) {
     case LOGOUT:
@@ -82,6 +85,21 @@ export default function (state = defaultState, action) {
       const paymentgateway = state.get('payment_gateways').find(pg => pg.get('name') === gateway.name).set('params', gateway.params);
       const paymentgateways = state.get('payment_gateways').filterNot(pg => pg.get('name') === gateway.name).push(paymentgateway);
       return state.set('payment_gateways', paymentgateways);
+    }
+
+    case ADD_SHARED_SECRET: {
+      const added = state.get('shared_secret').filterNot(shared => shared.get('key') === secret.get('key')).push(Immutable.fromJS(secret));
+      return state.set('shared_secret', added);
+    }
+
+    case UPDATE_SHARED_SECRET: {
+      const sharedSecrets = state.get('shared_secret').filterNot(shared => shared.get('key') === secret.get('key')).push(Immutable.fromJS(secret));
+      return state.set('shared_secret', sharedSecrets);
+    }
+
+    case REMOVE_SHARED_SECRET: {
+      const removed = state.get('shared_secret').filterNot(shared => shared.get('key') === secret);
+      return state.set('shared_secret', removed);
     }
 
     case REMOVE_SETTING_FIELD: {

@@ -174,6 +174,25 @@ export const savePaymentGatewayQuery = gateway => ({
   ],
 });
 
+/* Settings API */
+export const saveSharedSecretQuery = secret => ({
+  api: 'settings',
+  params: [
+    { category: 'shared_secret' },
+    { action: 'set' },
+    { data: JSON.stringify(secret) },
+  ],
+});
+
+export const disableSharedSecretQuery = key => ({
+  api: 'settings',
+  params: [
+    { category: 'shared_secret' },
+    { action: 'unset' },
+    { data: JSON.stringify({ key }) },
+  ],
+});
+
 export const disablePaymentGatewayQuery = name => ({
   api: 'settings',
   params: [

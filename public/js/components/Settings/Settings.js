@@ -178,7 +178,7 @@ class Settings extends Component {
 
         </Tabs>
 
-        <ActionButtons onClickSave={this.onSave} hideCancel={true} hideSave={activeTab === 4} />
+        <ActionButtons onClickSave={this.onSave} hideCancel={true} hideSave={activeTab === 5} />
 
       </div>
     );

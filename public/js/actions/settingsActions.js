@@ -11,11 +11,35 @@ export const UPDATE_PAYMENT_GATEWAY = 'UPDATE_PAYMENT_GATEWAY';
 export const REMOVE_SETTING_FIELD = 'REMOVE_SETTING_FIELD';
 export const PUSH_TO_SETTING = 'PUSH_TO_SETTING';
 export const SET_FIELD_POSITION = 'SET_FIELD_POSITION';
+export const ADD_SHARED_SECRET = 'ADD_SHARED_SECRET';
+export const REMOVE_SHARED_SECRET = 'REMOVE_SHARED_SECRET';
+export const UPDATE_SHARED_SECRET = 'UPDATE_SHARED_SECRET';
 
 export function addPaymentGateway(gateway) {
   return {
     type: ADD_PAYMENT_GATEWAY,
     gateway,
+  };
+}
+
+export function addSharedSecret(secret) {
+  return {
+    type: ADD_SHARED_SECRET,
+    secret,
+  };
+}
+
+export function removeSharedSecret(secret) {
+  return {
+    type: REMOVE_SHARED_SECRET,
+    secret,
+  };
+}
+
+export function updateSharedSecret(secret) {
+  return {
+    type: UPDATE_SHARED_SECRET,
+    secret,
   };
 }
 

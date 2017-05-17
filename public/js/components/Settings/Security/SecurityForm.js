@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import { Form, FormControl, FormGroup, Col, ControlLabel } from 'react-bootstrap';
+import { Form, FormControl, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import { ModalWrapper } from '../../Elements';
 
 
@@ -69,6 +69,11 @@ class SecurityForm extends Component {
             </Col>
             <Col sm={6}>
               <FormControl type="text" name="key" value={item.get('key', '')} disabled={true} />
+              <HelpBlock>
+                { action === 'create'
+                  ? 'Secret will be available after saving'
+                  : '' }
+              </HelpBlock>
             </Col>
           </FormGroup>
 
