@@ -15,6 +15,12 @@ const getUsageType = (state, props) => // eslint-disable-line no-unused-vars
 const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('billrun');
 
+const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['subscribers', 'account', 'fields']);
+
+const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['subscribers', 'subscriber', 'fields']);
+
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
   const defaultUsaget = inputProssesor.getIn(['processor', 'default_usaget'], '');
@@ -150,4 +156,14 @@ export const chargingDaySelector = createSelector(
 export const usageTypeSelector = createSelector(
   getUsageType,
   usageTypes => usageTypes
+);
+
+export const accountFieldsSelector = createSelector(
+  getAccountFields,
+  accountFields => accountFields
+);
+
+export const subscriberFieldsSelector = createSelector(
+  getSubscriberFields,
+  subscriberFields => subscriberFields
 );

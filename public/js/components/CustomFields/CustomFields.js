@@ -8,6 +8,7 @@ import ActionButtons from '../Elements/ActionButtons';
 import CreateButton from '../Elements/CreateButton';
 import SortableFieldsContainer from './SortableFieldsContainer';
 import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
+import { accountFieldsSelector, subscriberFieldsSelector } from '../../selectors/settingsSelector';
 
 class CustomFields extends Component {
 
@@ -131,8 +132,8 @@ class CustomFields extends Component {
 }
 
 
-const mapStateToProps = state => ({
-  subscriber: state.settings.getIn(['subscribers', 'subscriber', 'fields']),
-  account: state.settings.getIn(['subscribers', 'account', 'fields']),
+const mapStateToProps = (state, props) => ({
+  subscriber: subscriberFieldsSelector(state, props),
+  account: accountFieldsSelector(state, props),
 });
 export default connect(mapStateToProps)(CustomFields);
