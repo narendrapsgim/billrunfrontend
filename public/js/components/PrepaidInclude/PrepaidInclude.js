@@ -63,7 +63,7 @@ const PrepaidInclude = (props) => {
           <FormGroup>
             <Col lg={2} md={2} componentClass={ControlLabel}>External ID</Col>
             <Col lg={7} md={7}>
-              <Field id="external_id" value={prepaidInclude.get('external_id', '')} onChange={props.onChangeField} fieldType="number" editable={editable} />
+              <Field id="external_id" value={prepaidInclude.get('external_id', '')} onChange={props.onChangeField} fieldType="number" editable={mode === 'create'} />
             </Col>
           </FormGroup>
           <FormGroup>
