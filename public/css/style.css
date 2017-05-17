@@ -579,3 +579,8 @@ ul.revision-history-list li.active .cycle {
   margin-bottom: 25px;
 }
 /* ~Chart */
+
+.StepUpload .delimiter_type label{
+  margin: 0!important;
+  padding: 0!important;
+}
