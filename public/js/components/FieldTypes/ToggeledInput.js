@@ -87,12 +87,15 @@ export default class ToggeledInput extends Component {
     return (
       <InputGroup>
         <InputGroup.Addon>
-          <input
-            checked={!off}
-            onChange={this.onChangedState}
-            type="checkbox"
-            disabled={disabled}
-          /><small style={{ verticalAlign: 'bottom' }}> {label}</small>
+          <label className="mb0">
+            <input
+              style={{ verticalAlign: 'bottom' }}
+              checked={!off}
+              onChange={this.onChangedState}
+              type="checkbox"
+              disabled={disabled}
+            /> {label}
+          </label>
         </InputGroup.Addon>
         <Field
           disabled={off || disabled}
