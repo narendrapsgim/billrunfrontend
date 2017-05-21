@@ -171,3 +171,11 @@ export const parseConfigSelectOptions = configOption => formatSelectOptions(
     ? Immutable.Map({ value: configOption.get('id'), label: configOption.get('title') })
     : configOption.get('id')
 );
+
+export const parseCsvHeadres = (fileContent, delimiter = ',', defaultValue = []) => {
+  const lines = fileContent.split('\n');
+  if (Array.isArray(lines) && lines[0]) {
+    return lines[0].split(delimiter);
+  }
+  return defaultValue;
+};
