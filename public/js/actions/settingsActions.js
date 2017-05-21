@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
-import { getCurrenciesQuery } from '../common/ApiQueries';
+import { getCurrenciesQuery, saveSharedSecretQuery, disableSharedSecretQuery } from '../common/ApiQueries';
 
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
@@ -11,35 +11,11 @@ export const UPDATE_PAYMENT_GATEWAY = 'UPDATE_PAYMENT_GATEWAY';
 export const REMOVE_SETTING_FIELD = 'REMOVE_SETTING_FIELD';
 export const PUSH_TO_SETTING = 'PUSH_TO_SETTING';
 export const SET_FIELD_POSITION = 'SET_FIELD_POSITION';
-export const ADD_SHARED_SECRET = 'ADD_SHARED_SECRET';
-export const REMOVE_SHARED_SECRET = 'REMOVE_SHARED_SECRET';
-export const UPDATE_SHARED_SECRET = 'UPDATE_SHARED_SECRET';
 
 export function addPaymentGateway(gateway) {
   return {
     type: ADD_PAYMENT_GATEWAY,
     gateway,
-  };
-}
-
-export function addSharedSecret(secret) {
-  return {
-    type: ADD_SHARED_SECRET,
-    secret,
-  };
-}
-
-export function removeSharedSecret(secret) {
-  return {
-    type: REMOVE_SHARED_SECRET,
-    secret,
-  };
-}
-
-export function updateSharedSecret(secret) {
-  return {
-    type: UPDATE_SHARED_SECRET,
-    secret,
   };
 }
 
@@ -246,4 +222,18 @@ export const getCurrencies = () => (dispatch) => {
       return data;
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving currencies')));
+};
+
+export const saveSharedSecret = (secret, mode) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = (mode === 'remove') ? disableSharedSecretQuery(secret) : saveSharedSecretQuery(secret);
+  return apiBillRun(query)
+    .then((success) => {
+      let action = (['create'].includes(mode)) ? 'created' : '';
+      if (action === '') {
+        action = (['remove'].includes(mode)) ? 'removed' : 'updated';
+      }
+      return dispatch(apiBillRunSuccessHandler(success, `The secret key was ${action}`));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Secret')));
 };

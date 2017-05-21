@@ -7,12 +7,8 @@ import { Panel, Col, Row, Button } from 'react-bootstrap';
 import List from '../../components/List';
 import { getItemDateValue, getConfig } from '../../common/Util';
 import { StateIcon, ConfirmModal } from '../Elements';
-import { addSharedSecret, getSettings, removeSharedSecret, updateSharedSecret } from '../../actions/settingsActions';
+import { getSettings, saveSharedSecret } from '../../actions/settingsActions';
 import SecurityForm from './Security/SecurityForm';
-import { saveSharedSecretQuery, disableSharedSecretQuery } from '../../common/ApiQueries';
-import { apiBillRun } from '../../common/Api';
-import { showSuccess, showDanger } from '../../actions/alertsActions';
-
 
 class Security extends Component {
 
@@ -64,56 +60,28 @@ class Security extends Component {
     this.setState({ currentItem: null });
   }
 
-  onSaveSecretParams = (secret, action) => {
-    apiBillRun(saveSharedSecretQuery(secret)).then(
-      (success) => { // eslint-disable-line no-unused-vars
-        if (action === 'create') {
-          this.props.dispatch(showSuccess('Secret was created successfully'));
-          this.props.dispatch(addSharedSecret(secret));
-        }
-        if (action === 'edit') {
-          this.props.dispatch(showSuccess('Secret was edited successfully'));
-          this.props.dispatch(updateSharedSecret(secret));
-        }
-        return true;
-      },
-      (failure) => { // eslint-disable-line no-unused-vars
-        this.props.dispatch(showDanger(failure.error[0].error.data.message));
-        return false;
-      }
-    ).then(
-      (status) => {
-        if (status) {
-          this.setState({ currentItem: null });
-          this.props.dispatch(getSettings(['shared_secret']));
-        }
-      }
-    ).catch(
-      (error) => { // eslint-disable-line no-unused-vars
-        this.props.dispatch(showDanger('Error saving secret - please try again'));
-      }
-    );
-  };
+  handleSave = (secret, action) => {
+    this.props.dispatch(saveSharedSecret(secret, action)).then(this.afterSave);
+  }
 
+  afterSave = (response) => {
+    if (response.status === 1) {
+      this.setState({ currentItem: null });
+      this.props.dispatch(getSettings(['shared_secret']));
+    }
+  }
 
   onClickRemoveOk = () => {
     const { itemToRemove } = this.state;
     const key = itemToRemove.get('key', '');
-    apiBillRun(disableSharedSecretQuery(key)).then(
-      (success) => { // eslint-disable-line no-unused-vars
-        this.props.dispatch(showSuccess('Secret disabled!'));
-        this.props.dispatch(removeSharedSecret(key));
-        this.setState({ showConfirmRemove: false, itemToRemove: null });
-      },
-      (failure) => {
-        this.props.dispatch(showDanger(failure.error[0].error.data.message));
-        this.setState({ showConfirmRemove: false, itemToRemove: null });
-      }
-    ).catch(
-      (error) => {
-        this.props.dispatch(showDanger('Network error - please try again'));
-      }
-    );
+    this.props.dispatch(saveSharedSecret(key, 'remove')).then(this.afterRemove);
+  }
+
+  afterRemove = (response) => {
+    if (response.status === 1) {
+      this.setState({ showConfirmRemove: false, itemToRemove: null });
+      this.props.dispatch(getSettings(['shared_secret']));
+    }
   }
 
   onClickNew = () => {
@@ -169,7 +137,7 @@ class Security extends Component {
             </Panel>
           </Col>
         </Row>
-        { currentItem !== null && <SecurityForm item={currentItem} show={true} onSave={this.onSaveSecretParams} onCancel={this.onCancel} /> }
+        { currentItem !== null && <SecurityForm item={currentItem} show={true} onSave={this.handleSave} onCancel={this.onCancel} /> }
       </div>
     );
   }
