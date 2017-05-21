@@ -119,7 +119,10 @@ class ProductSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode } = this.props;
+    const { mode, item } = this.props;
+    if (item.get('pricing_method', null) === null) {
+      this.props.dispatch(onFieldUpdate(['pricing_method'], 'tiered'));
+    }
     if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.props.dispatch(onFieldUpdate(['from'], defaultFromValue));
