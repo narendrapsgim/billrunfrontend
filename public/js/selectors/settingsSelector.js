@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import moment from 'moment';
 import { sentenceCase } from 'change-case';
 import { getFieldName, getConfig } from '../common/Util';
 
@@ -14,6 +15,12 @@ const getUsageType = (state, props) => // eslint-disable-line no-unused-vars
 
 const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('billrun');
+
+const getEntityFields = (state, props) =>
+  state.settings.getIn([props.entityName, 'fields']);
+
+const getMinEntityDate = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.get('minimum_entity_start_date');
 
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
@@ -134,6 +141,11 @@ export const billrunSelector = createSelector(
   billrun => billrun
 );
 
+export const minEntityDateSelector = createSelector(
+  getMinEntityDate,
+  minEntityDate => (minEntityDate ? moment.unix(minEntityDate) : minEntityDate)
+);
+
 export const currencySelector = createSelector(
   pricingSelector,
   (pricing = Immutable.Map()) => pricing.get('currency')
@@ -150,4 +162,9 @@ export const chargingDaySelector = createSelector(
 export const usageTypeSelector = createSelector(
   getUsageType,
   usageTypes => usageTypes
+);
+
+export const entityFieldSelector = createSelector(
+  getEntityFields,
+  fields => fields
 );

@@ -231,7 +231,7 @@ export default class Product extends Component {
     const { product, usaget, mode } = this.props;
     const vatable = (product.get('vatable', true) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
-    const pricingMethod = product.get('pricing_method', 'tiered');
+    const pricingMethod = product.get('pricing_method', '');
     const availablePrefix = [];
     const editable = (mode !== 'view');
 

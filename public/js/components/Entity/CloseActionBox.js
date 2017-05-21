@@ -8,6 +8,8 @@ import { ConfirmModal } from '../Elements';
 import { getItemDateValue, getItemId, getConfig, isItemClosed } from '../../common/Util';
 import { closeEntity } from '../../actions/entityActions';
 import { showSuccess } from '../../actions/alertsActions';
+import { entityMinFrom } from '../../selectors/entitySelector';
+import { getSettings } from '../../actions/settingsActions';
 
 
 class CloseActionBox extends Component {
@@ -30,6 +32,10 @@ class CloseActionBox extends Component {
     showConfirmClose: false,
     showCloseDetails: false,
     closeDate: isItemClosed(this.props.item) ? getItemDateValue(this.props.item, 'to', null) : null,
+  }
+
+  componentDidMount() {
+    this.props.dispatch(getSettings('minimum_entity_start_date'));
   }
 
   onClickCloseConfirm = () => {
@@ -122,4 +128,7 @@ class CloseActionBox extends Component {
   }
 }
 
-export default connect()(CloseActionBox);
+const mapStateToProps = (state, props) => ({
+  minDate: entityMinFrom(state, props),
+});
+export default connect(mapStateToProps)(CloseActionBox);
