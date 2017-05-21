@@ -127,15 +127,15 @@ export default class FieldsMapping extends Component {
             onSetFieldMapping } = this.props;
 
     const available_fields = [(<option disabled value="" key={-1}>Select Field...</option>),
-                              ...settings.get('fields', Immutable.List()).map((field, key) => (
+                              ...settings.get('fields', Immutable.List()).sortBy(field => field).map((field, key) => (
                                 <option value={field} key={key}>{field}</option>
                               ))];
-    const available_units = usageTypes.map((usaget, key) => {
+    const available_units = usageTypes.sortBy(usaget => usaget).map((usaget, key) => {
       return {value: usaget, label: usaget};
     }).toJS();
 
     const defaultUsaget = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_usaget'], '')
-    const volumeOptions = settings.get('fields', Immutable.List()).map(field => ({
+    const volumeOptions = settings.get('fields', Immutable.List()).sortBy(field => field).map(field => ({
       label: field,
       value: field,
     })).toArray();
