@@ -232,6 +232,8 @@ class ProductSetup extends Component {
             onChangeFrom={this.onFieldUpdate}
             itemName="product"
             backToList={this.handleBack}
+            reLoadItem={this.fetchItem}
+            clearRevisions={this.clearRevisions}
           />
         </Panel>
 
