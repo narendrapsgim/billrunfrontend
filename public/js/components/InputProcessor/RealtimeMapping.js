@@ -8,11 +8,11 @@ const RealtimeMapping = (props) => {
   const { onChange, onChangeDefault, settings } = props;
 
   const available_fields = [(<option disabled value="" key={-1}>Select Field...</option>),
-                            ...settings.get('fields', []).map((field, key) => (
+                            ...settings.get('fields', []).sortBy(field => field).map((field, key) => (
                               <option value={field} key={key}>{field}</option>
                             ))];
 
-  const multi_available_fields = settings.get('fields', []).map(field => {
+  const multi_available_fields = settings.get('fields', []).sortBy(field => field).map(field => {
     return { label: field, value: field }
   }).toJS();
 

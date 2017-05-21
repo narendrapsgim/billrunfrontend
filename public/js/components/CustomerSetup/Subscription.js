@@ -242,7 +242,6 @@ class Subscription extends Component {
               options={plansOptions}
               value={plan}
               onChange={this.onChangePlan}
-              allowCreate={true}
             />
             : <Field value={plan} editable={false} />
           }
