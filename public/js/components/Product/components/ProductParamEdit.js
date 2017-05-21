@@ -109,7 +109,6 @@ export default class ProductParamEdit extends Component {
                   multi={true}
                   value={editedData.values.join(',')}
                   onChange={this.onChangeParamValues}
-                  placeholder={`${addLabel} ${editedData.key}`}
                 />
               </Col>
             </FormGroup>
