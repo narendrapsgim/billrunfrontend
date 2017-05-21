@@ -63,6 +63,8 @@ class PostpaidBalances extends Component {
     this.setState({ sort }, this.fetchItems);
   }
 
+  parseTotalCost = ent => (ent.getIn(['balance', 'cost'], 0).toFixed(2));
+
   getTableFields = () => {
     const { usageTypes } = this.props;
     const usageFields = usageTypes.map(usaget => ({
@@ -76,6 +78,7 @@ class PostpaidBalances extends Component {
       { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
       { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
       { id: 'plan_description', placeholder: 'Plan' },
+      { id: 'balance.cost', placeholder: 'Total Cost', type: 'number', showFilter: false, parser: this.parseTotalCost },
       ...usageFields,
       { id: 'from', placeholder: 'From', showFilter: false, type: 'datetime' },
       { id: 'to', placeholder: 'To', showFilter: false, type: 'datetime' },
