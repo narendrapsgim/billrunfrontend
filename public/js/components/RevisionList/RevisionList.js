@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -13,13 +12,10 @@ import {
   getConfig,
   isItemClosed,
   getItemId,
-  getItemMinFromDate,
 } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity, moveEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
-import { chargingDaySelector } from '../../selectors/settingsSelector';
-
 
 class RevisionList extends Component {
 
@@ -29,7 +25,6 @@ class RevisionList extends Component {
     onDeleteItem: PropTypes.func,
     onCloseItem: PropTypes.func,
     itemName: PropTypes.string.isRequired,
-    chargingDay: PropTypes.number,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -234,13 +229,12 @@ class RevisionList extends Component {
   }
 
   render() {
-    const { items, itemName, chargingDay } = this.props;
+    const { items, itemName } = this.props;
     const { showConfirmRemove } = this.state;
     const fields = this.getListFields();
     const actions = this.getListActions();
     const activeItem = items.find(this.isItemActive);
     const removeConfirmMessage = 'Are you sure you want to remove this revision?';
-    const minDate = activeItem && getItemMinFromDate(activeItem.set('originalValue', activeItem.get('from')), chargingDay);
     return (
       <div>
         <List items={items} fields={fields} edit={false} actions={actions} />
@@ -249,7 +243,6 @@ class RevisionList extends Component {
             itemName={itemName}
             item={activeItem}
             onCloseItem={this.props.onCloseItem}
-            minDate={minDate}
           />
         }
         <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
@@ -259,7 +252,4 @@ class RevisionList extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  chargingDay: chargingDaySelector(state, props),
-});
-export default withRouter(connect(mapStateToProps)(RevisionList));
+export default withRouter(RevisionList);

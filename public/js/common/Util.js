@@ -133,20 +133,14 @@ export const getItemMode = (item, undefindItemStatus = 'create') => {
   return undefindItemStatus;
 };
 
-export const getClosestChargingDate = (chargingDay, now = moment()) => {
-  const bufferDays = getConfig('chargingBufferDays', 5);
-  const currentMonthChargingDate = now.clone().date(chargingDay);
-  const currentMonthChargingDateWihtBuffer = currentMonthChargingDate.clone().add(bufferDays, 'days');
-  if (currentMonthChargingDateWihtBuffer.isSameOrBefore(now, 'day')) {
-    return currentMonthChargingDate;
+export const getItemMinFromDate = (item, minDate) => {
+  if (minDate) {
+    if (item && getItemId(item, false)) {
+      return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
+    }
+    return minDate;
   }
-  return currentMonthChargingDate.add(-1, 'month');
-};
-
-export const getItemMinFromDate = (item, chargingDay, now = moment()) => {
-  const chargingDate = getClosestChargingDate(chargingDay, now);
-  const originFromDate = getItemDateValue(item, 'originalValue');
-  return moment.max(chargingDate, originFromDate);
+  return undefined;
 };
 
 export const getRevisionStartIndex = (item, revisions) => {
