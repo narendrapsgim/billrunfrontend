@@ -48,11 +48,14 @@ fieldset[disabled] .btn {
 
 .pl0{ padding-left: 0!important; }
 .pr0{ padding-right: 0!important; }
-.mb0{ margin-bottom: 0!important; }
-.mb10{ margin-bottom: 10px!important; }
+.mt10{ margin-top: 10px!important; }
 .mr10{ margin-right: 10px!important; }
-.mr0{ margin-right: 0!important; }
+.mb10{ margin-bottom: 10px!important; }
+.ml10{ margin-left: 10px!important; }
 .mt0{ margin-top: 0!important; }
+.mr0{ margin-right: 0!important; }
+.mb0{ margin-bottom: 0!important; }
+.ml0{ margin-left: 0!important; }
 
 .full-width{ width: 100%!important; }
 
