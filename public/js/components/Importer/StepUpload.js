@@ -1,100 +1,92 @@
 import React, { Component, PropTypes } from 'react';
-import { FormGroup, Col, InputGroup } from 'react-bootstrap';
+import Immutable from 'immutable';
+import { FormGroup, Col } from 'react-bootstrap';
 import Select from 'react-select';
-import Field from '../Field';
+import { readAsText } from 'promise-file-reader';
+
 
 class StepUpload extends Component {
 
-  state = {
-    delimiter: ',',
-    delimiterType: 'separator',
-    headers: [],
+  static propTypes = {
+    item: PropTypes.instanceOf(Immutable.Map),
+    delimiterOptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        value: PropTypes.string,
+        label: PropTypes.string
+      }),
+    ),
+    onChange: PropTypes.func,
+    onDelete: PropTypes.func,
+  };
+
+  static defaultProps = {
+    item: Immutable.Map(),
+    delimiterOptions: [
+      { value: '	', label: 'Tab' }, // eslint-disable-line no-tabs
+      { value: ' ', label: 'Space' },
+      { value: ',', label: 'Comma (,)' },
+    ],
+    onChange: () => {},
+    onDelete: () => {},
+  };
+
+  onfileReset = (e) => {
+    e.target.value = null;
   }
 
   onfileUpload = (e) => {
-    const { delimiter } = this.state;
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = ((evt) => {
-      if (evt.target.readyState === FileReader.DONE) {
-        /* Only need first line */
-        const lines = evt.target.result.split('\n');
-        const header = lines[0];
-        const headers = header
-          .split(delimiter)
-          .map(field => field.replace(/[^a-zA-Z_\d]/g, '_').toLowerCase());
-        this.setState({ headers });
-      }
-    });
-    const blob = file.slice(0, file.size - 1);
-    reader.readAsText(blob);
-  }
+    this.props.onChange('file', file);
+    readAsText(file)
+      .then((fileContent) => {
+        this.props.onChange('fileContent', fileContent);
+      })
+      .catch(() => {
+        this.props.onChange('fileContent', '');
+      });
+  };
 
-  onChangeDelimiterType = (e) => {
-    const { value: delimiterType } = e.target;
-    this.setState({ delimiterType });
-  }
-
-  onChangeDelimiter = (delimiter) => {
-    this.setState({ delimiter });
-  }
+  onChangeDelimiter = (value) => {
+    this.props.onChange('fileDelimiter', value);
+  };
 
   render() {
-    const { delimiter, delimiterType } = this.state;
-
-    const delimiterOptions = [
-      { value: '	', label: 'Tab' }, // eslint-disable-line no-tabs
-      { value: ' ', label: 'Space' },
-    ];
+    const { item, delimiterOptions } = this.props;
+    const delimiter = item.get('fileDelimiter', '');
 
     return (
       <Col md={12} className="StepUpload">
         <FormGroup>
-          <Col sm={3}>Delimiter</Col>
-          <Col sm={8}>
-            <InputGroup>
-              <InputGroup.Addon className="delimiter_type">
-                <Field
-                  className="delimiter_type"
-                  fieldType="radio"
-                  onChange={this.onChangeDelimiterType}
-                  name="delimiter_type"
-                  value="separator"
-                  label="By delimiter"
-                  checked={delimiterType === 'separator'}
-                />
-              </InputGroup.Addon>
-              <Select
-                id="separator"
-                className="delimiter-select"
-                allowCreate
-                onChange={this.onChangeDelimiter}
-                options={delimiterOptions}
-                value={delimiter}
-                placeholder="Select or type..."
-                addLabelText="{label}"
-              />
-            </InputGroup>
-            <Field
-              fieldType="radio"
-              onChange={this.onChangeDelimiterType}
-              name="delimiter_type"
-              value="fixed"
-              label="Fixed"
-              checked={delimiterType === 'fixed'}
+          <Col sm={3} style={{ marginTop: 7 }}>Delimiter</Col>
+          <Col sm={9}>
+            <Select
+              allowCreate
+              onChange={this.onChangeDelimiter}
+              options={delimiterOptions}
+              value={delimiter}
+              placeholder="Select or add new"
+              addLabelText="{label}"
             />
           </Col>
         </FormGroup>
         <FormGroup>
           <Col sm={3}>Upload CSV</Col>
-          <Col sm={8}>
-            <input type="file" onChange={this.onfileUpload} />
+          <Col sm={9}>
+            <input type="file" accept=".csv" onChange={this.onfileUpload} onClick={this.onfileReset} />
+          </Col>
+        </FormGroup>
+        <FormGroup>
+          <Col sm={3}>Headers</Col>
+          <Col sm={9}>
+            <ul>
+              {}
+            </ul>
           </Col>
         </FormGroup>
       </Col>
     );
   }
-}
 
+}
 
 export default StepUpload;

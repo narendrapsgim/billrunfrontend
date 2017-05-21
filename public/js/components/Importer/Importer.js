@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Form, Panel } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
@@ -6,19 +7,44 @@ import StepUpload from './StepUpload';
 import StepMapper from './StepMapper';
 import StepFinish from './StepFinish';
 import { ActionButtons } from '../Elements';
+import { itemSelector } from '../../selectors/entitySelector';
+import {
+  initImporter,
+  deleteImporter,
+  updateImporterValue,
+  deleteImporterValue,
+} from '../../actions/importerActions';
+
 
 class Importer extends Component {
 
   static propTypes = {
-    existinGrousNames: PropTypes.instanceOf(Immutable.List),
+    item: PropTypes.instanceOf(Immutable.Map),
+    dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    existinGrousNames: Immutable.List(),
+    item: Immutable.Map(),
   };
 
   state = {
     stepIndex: 0,
+  }
+
+  componentDidMount() {
+    this.props.dispatch(initImporter());
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(deleteImporter());
+  }
+
+  onChange = (path, value) => {
+    this.props.dispatch(updateImporterValue(path, value));
+  }
+
+  onDelete = (path) => {
+    this.props.dispatch(deleteImporterValue(path));
   }
 
   renderStepper = () => {
@@ -39,12 +65,25 @@ class Importer extends Component {
   }
 
   renderStepContent = () => {
+    const { item } = this.props;
     const { stepIndex } = this.state;
     switch (stepIndex) {
       case 0:
-        return (<StepUpload />);
+        return (
+          <StepUpload
+            item={item}
+            onChange={this.onChange}
+            onDelete={this.onDelete}
+          />
+        );
       case 1:
-        return (<StepMapper />);
+        return (
+          <StepMapper
+            item={item}
+            onChange={this.onChange}
+            onDelete={this.onDelete}
+          />
+        );
       case 2:
         return (<StepFinish />);
 
@@ -92,5 +131,8 @@ class Importer extends Component {
   }
 }
 
+const mapStateToProps = (state, props) => ({
+  item: itemSelector(state, props, 'importer'),
+});
 
-export default Importer;
+export default connect(mapStateToProps)(Importer);
