@@ -152,6 +152,15 @@ export const saveEntity = (collection, item, action) => (dispatch) => {
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
 };
 
+export const saveEntities = (collection, items) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const body = items.map(item => requestDataBuilder(collection, item, 'create'));
+  const query = apiEntityQuery(collection, 'create', body);
+  return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })
+    .then(success => dispatch(apiBillRunSuccessHandler(success)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
+};
+
 const fetchEntity = (collection, query) => (dispatch) => {
   dispatch(startProgressIndicator());
   return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })

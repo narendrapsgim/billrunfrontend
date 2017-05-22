@@ -14,16 +14,19 @@ import {
   updateImporterValue,
   deleteImporterValue,
 } from '../../actions/importerActions';
+import { accountFieldsOptionsSelector } from '../../selectors/settingsSelector';
 
 
 class Importer extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
+    accountFields: PropTypes.array,
     dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
+    accountFields: [],
     item: Immutable.Map(),
   };
 
@@ -65,7 +68,7 @@ class Importer extends Component {
   }
 
   renderStepContent = () => {
-    const { item } = this.props;
+    const { item, accountFields } = this.props;
     const { stepIndex } = this.state;
     switch (stepIndex) {
       case 0:
@@ -80,12 +83,13 @@ class Importer extends Component {
         return (
           <StepMapper
             item={item}
+            fields={accountFields}
             onChange={this.onChange}
             onDelete={this.onDelete}
           />
         );
       case 2:
-        return (<StepFinish />);
+        return (<StepFinish item={item} />);
 
       default:
         return (<p>Not valid Step</p>);
@@ -133,6 +137,7 @@ class Importer extends Component {
 
 const mapStateToProps = (state, props) => ({
   item: itemSelector(state, props, 'importer'),
+  accountFields: accountFieldsOptionsSelector(state, props),
 });
 
 export default connect(mapStateToProps)(Importer);

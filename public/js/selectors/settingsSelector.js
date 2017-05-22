@@ -175,3 +175,24 @@ export const subscriberFieldsSelector = createSelector(
   getSubscriberFields,
   subscriberFields => subscriberFields
 );
+
+const formatFieldOptions = (fields, type) => {
+  if (fields) {
+    return fields.map(field => ({
+      value: field.get('field_name', ''),
+      label: field.get('title', getFieldName(field.get('field_name', ''), type)),
+      editable: field.get('editable', true),
+      generated: field.get('generated', false),
+      unique: field.get('unique', false),
+      mandatory: field.get('mandatory', false),
+    }))
+    .toArray();
+  }
+  return undefined;
+};
+
+export const accountFieldsOptionsSelector = createSelector(
+  accountFieldsSelector,
+  () => 'account',
+  formatFieldOptions
+);
