@@ -5,15 +5,17 @@ import { Panel } from 'react-bootstrap';
 import LimitedDestination from './LimitedDestination';
 import PlanSearch from '../Elements/PlanSearch';
 
+
 const LimitedDestinations = (props) => {
   const { limitedDestinations, allRates, mode } = props;
   const editable = (mode !== 'view');
+  const selectedPlans = limitedDestinations.keySeq().toArray();
 
   return (
     <div className="LimitedDestinations">
       { editable &&
         <Panel>
-          <PlanSearch onSelectPlan={props.onSelectPlan} />
+          <PlanSearch onSelectPlan={props.onSelectPlan} selectedOptions={selectedPlans} />
         </Panel>
       }
       {

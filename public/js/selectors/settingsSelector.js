@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import moment from 'moment';
 import { sentenceCase } from 'change-case';
 import { getFieldName, getConfig } from '../common/Util';
 
@@ -17,6 +18,9 @@ const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
 
 const getEntityFields = (state, props) =>
   state.settings.getIn([props.entityName, 'fields']);
+
+const getMinEntityDate = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.get('minimum_entity_start_date');
 
 const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['subscribers', 'account', 'fields']);
@@ -141,6 +145,11 @@ export const pricingSelector = createSelector(
 export const billrunSelector = createSelector(
   getBillrun,
   billrun => billrun
+);
+
+export const minEntityDateSelector = createSelector(
+  getMinEntityDate,
+  minEntityDate => (minEntityDate ? moment.unix(minEntityDate) : minEntityDate)
 );
 
 export const currencySelector = createSelector(

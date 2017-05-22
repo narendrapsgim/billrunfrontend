@@ -4,9 +4,10 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { Form, FormGroup, Col, Tabs, Tab, Button } from 'react-bootstrap';
 import { ModalWrapper, RevisionTimeline, ConfirmModal } from '../Elements';
-import { getItemDateValue, getConfig, getRevisionStartIndex, getItemId, getClosestChargingDate } from '../../common/Util';
+import { getItemDateValue, getConfig, getRevisionStartIndex, getItemId, getItemMinFromDate } from '../../common/Util';
 import Field from '../Field';
-import { chargingDaySelector } from '../../selectors/settingsSelector';
+import { minEntityDateSelector } from '../../selectors/settingsSelector';
+import { getSettings } from '../../actions/settingsActions';
 
 
 class MoveActionBox extends Component {
@@ -16,9 +17,10 @@ class MoveActionBox extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     itemName: PropTypes.string.isRequired,
     revisions: PropTypes.instanceOf(Immutable.List),
-    chargingDay: PropTypes.number,
+    minStartDate: PropTypes.instanceOf(moment),
     onMoveItem: PropTypes.func,
     onCancelMoveItem: PropTypes.func,
+    dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -36,6 +38,10 @@ class MoveActionBox extends Component {
     progress: false,
     showEndConfirm: false,
     showStartConfirm: false,
+  }
+
+  componentDidMount() {
+    this.props.dispatch(getSettings('minimum_entity_start_date'));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -127,7 +133,7 @@ class MoveActionBox extends Component {
   }
 
   render() {
-    const { item, revisions, itemName, chargingDay } = this.props;
+    const { item, revisions, itemName, minStartDate } = this.props;
     const {
       startDate,
       endDate,
@@ -154,11 +160,9 @@ class MoveActionBox extends Component {
     const endConfirmMessage = `Are you sure you want to set end date to be  ${isEndDateUnlimited ? 'infinite' : endDate.format(dateFormat)} ?`;
     const revisionIndex = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
     const isLast = revisionIndex === 0;
-    const isFirst = revisionIndex === revisions.size - 1;
-    const closestChargingDate = getClosestChargingDate(chargingDay);
-    const minStart = !isFirst ? moment.max(getItemDateValue(revisions.get(revisionIndex + 1), 'from'), closestChargingDate) : closestChargingDate;
+    const minStart = getItemMinFromDate(revisions.get(revisionIndex + 1, null), minStartDate);
     const maxStart = getItemDateValue(item, 'to');
-    const minEnd = getItemDateValue(item, 'from');
+    const minEnd = getItemMinFromDate(item, minStartDate);
     const maxEnd = isLast ? moment().add(200, 'years') : getItemDateValue(revisions.get(revisionIndex - 1), 'to');
     const disableStartInput = !item.getIn(['revision_info', 'movable_from'], true);
     const disableEndInput = !item.getIn(['revision_info', 'movable_to'], true) || (isEndDateUnlimited && isLast);
@@ -234,7 +238,7 @@ class MoveActionBox extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  chargingDay: chargingDaySelector(state, props),
+  minStartDate: minEntityDateSelector(state, props),
   item: props.revisions.find(revision => getItemId(revision) === props.itemId),
 });
 export default connect(mapStateToProps)(MoveActionBox);

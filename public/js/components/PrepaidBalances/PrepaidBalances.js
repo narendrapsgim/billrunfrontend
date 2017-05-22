@@ -58,7 +58,7 @@ class PrepaidBalances extends Component {
     const usaget = ent.get('charging_by_usaget');
     const chargingBy = ent.get('charging_by');
     const balanceKey = (usaget === 'total_cost' ? ['cost'] : ['totals', usaget, chargingBy]);
-    return ent.getIn(['balance', ...balanceKey], '').toFixed(2);
+    return ent.getIn(['balance', ...balanceKey], 0).toFixed(2);
   }
 
   getTableFields = () => ([

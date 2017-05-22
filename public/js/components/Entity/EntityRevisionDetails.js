@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -7,6 +8,8 @@ import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
 import Field from '../Field';
 import { getItemDateValue, getConfig, getItemId, getRevisionStartIndex } from '../../common/Util';
+import { getSettings } from '../../actions/settingsActions';
+import { entityMinFrom } from '../../selectors/entitySelector';
 
 
 class EntityRevisionDetails extends Component {
@@ -27,6 +30,7 @@ class EntityRevisionDetails extends Component {
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -46,6 +50,7 @@ class EntityRevisionDetails extends Component {
   }
 
   componentDidMount() {
+    this.props.dispatch(getSettings('minimum_entity_start_date'));
     this.initFormDate();
   }
 
@@ -132,15 +137,6 @@ class EntityRevisionDetails extends Component {
   }
 
   filterLegalFromDate = (date) => {
-    const { item, mode } = this.props;
-    if (['clone', 'create'].includes(mode)) {
-      return true;
-    }
-    const originDate = getItemDateValue(item, 'originalValue').isSame(date, 'day');
-    return originDate || this.filterLegalFromDateByMin(date);
-  }
-
-  filterLegalFromDateByMin = (date) => {
     const { minFrom } = this.props;
     return date.isSameOrAfter(minFrom, 'day');
   }
@@ -205,7 +201,7 @@ class EntityRevisionDetails extends Component {
       dateFormat: getConfig('dateFormat', 'DD/MM/YYYY'),
       isClearable: false,
       placeholder: 'Select Date...',
-      filterDate: this.filterLegalFromDateByMin,
+      filterDate: this.filterLegalFromDate,
       highlightDates,
     };
     if (['closeandnew'].includes(mode)) {
@@ -293,4 +289,9 @@ class EntityRevisionDetails extends Component {
 
 }
 
-export default withRouter(EntityRevisionDetails);
+
+const mapStateToProps = (state, props) => ({
+  minFrom: entityMinFrom(state, props),
+});
+
+export default withRouter(connect(mapStateToProps)(EntityRevisionDetails));

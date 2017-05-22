@@ -1,6 +1,9 @@
 import { createSelector } from 'reselect';
-import { getConfig, getItemId, getItemMode } from '../common/Util';
+import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
+import { minEntityDateSelector } from './settingsSelector';
 
+
+const getPropsItem = (state, props) => props.item;
 
 const getUniqueFiled = (state, props, entityName) =>
   getConfig(['systemItems', entityName, 'uniqueField'], 'name');
@@ -54,6 +57,8 @@ const getItem = (state, props, entityName) => {
     }
   }
 };
+
+const selectMaxFrom = (item = null, minDate = null) => getItemMinFromDate(item, minDate);
 
 const selectRevisions = (item, allRevisions, uniqueFiled) => {
   if (allRevisions && getItemId(item, false)) {
@@ -138,4 +143,10 @@ export const modeSimpleSelector = createSelector(
   idSelector,
   itemSelector,
   selectSimpleMode,
+);
+
+export const entityMinFrom = createSelector(
+  getPropsItem,
+  minEntityDateSelector,
+  selectMaxFrom,
 );

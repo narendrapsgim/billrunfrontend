@@ -1,66 +1,105 @@
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { HelpBlock, FormGroup, Col, Button } from 'react-bootstrap';
+import Field from '../../Field';
+import { getConfig } from '../../../common/Util';
 
-export default connect()(class CSVFields extends Component {
-  constructor(props) {
-    super(props);
-  }
 
-  removeField = () => {
-    const { onRemoveField, index } = this.props;
-    onRemoveField(index);
+const CSVField = (props) => {
+  const { index, field, fixed, width, allowMoveUp, allowMoveDown } = props;
+  const { errorMessages: { name: { allowedCharacters } } } = props;
+  const errorFieldName = !getConfig('keyRegex', '').test(field) ? allowedCharacters : '';
+
+  const removeField = () => {
+    props.onRemoveField(index);
   };
 
-  onMoveFieldUp = () => {
-    const { onMoveFieldUp, index } = this.props;
-    onMoveFieldUp(index);
+  const onMoveFieldUp = () => {
+    props.onMoveFieldUp(index);
   };
 
-  onMoveFieldDown = () => {
-    const { onMoveFieldDown, index } = this.props;
-    onMoveFieldDown(index);
+  const onMoveFieldDown = () => {
+    props.onMoveFieldDown(index);
   };
 
-  onChange = (e) => {
-    const { onChange, index } = this.props;
+  const onChange = (e) => {
     const { value } = e.target;
-    onChange(index, value);
+    props.onChange(index, value);
   };
-  
-  render() {
-    const { field, fixed, onSetFieldWidth, disabled, width, allowMoveUp, allowMoveDown } = this.props;
-    return (
-      <div>
-        <div className="col-lg-4 col-md-4">
-          <input type="text"
-                 className="form-control"
-                 value={ field }
-                 onChange={this.onChange} />
-        </div>
-        <div className="col-lg-1 col-md-1">
-          { fixed ?
-            <input type="number"
-                   className="form-control"
-                   data-field={field}
-                   disabled={!fixed}
-                   min="0"
-                   onChange={onSetFieldWidth}
-                   value={width} /> :
-            null
+
+  return (
+    <Col lg={12} md={12}>
+      <FormGroup className="mb0" validationState={errorFieldName.length > 0 ? 'error' : null} >
+        <Col lg={4} md={4}>
+          <Field onChange={onChange} value={field} />
+        </Col>
+        <Col lg={1} md={1}>
+          { fixed &&
+            <input
+              type="number"
+              className="form-control"
+              data-field={field}
+              disabled={!fixed}
+              min="0"
+              onChange={props.onSetFieldWidth}
+              value={width}
+            />
           }
-        </div> 
-        <div className="col-lg-5 col-md-5">
-          <button type="button" style={{marginRight: 5}} disabled={!allowMoveUp} className="btn btn-default btn-sm" onClick={this.onMoveFieldUp}>
+        </Col>
+        <Col lg={5} md={5}>
+          <Button bsSize="small" disabled={!allowMoveUp} onClick={onMoveFieldUp}>
             <i className="fa fa-arrow-up" /> Move up
-          </button>
-          <button type="button" style={{marginRight: 5}} disabled={!allowMoveDown} className="btn btn-default btn-sm" onClick={this.onMoveFieldDown}>
+          </Button>
+          <Button bsSize="small" className="ml10" disabled={!allowMoveDown} onClick={onMoveFieldDown}>
             <i className="fa fa-arrow-down" /> Move down
-          </button>
-          <button type="button" className="btn btn-default btn-sm" onClick={this.removeField}>
+          </Button>
+          <Button bsSize="small" className="ml10" onClick={removeField}>
             <i className="fa fa-trash-o danger-red" /> Remove
-          </button>
-        </div>
-      </div>
-    );
-  }
-});
+          </Button>
+        </Col>
+        { errorFieldName.length > 0 && (
+          <Col lg={10} md={10}><HelpBlock>{errorFieldName}</HelpBlock></Col>
+        )}
+      </FormGroup>
+    </Col>
+  );
+};
+
+CSVField.propTypes = {
+  field: PropTypes.string,
+  index: PropTypes.number,
+  fixed: PropTypes.bool,
+  errorMessages: PropTypes.object,
+  allowMoveUp: PropTypes.bool,
+  allowMoveDown: PropTypes.bool,
+  width: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
+  onChange: PropTypes.func,
+  onRemoveField: PropTypes.func,
+  onMoveFieldUp: PropTypes.func,
+  onSetFieldWidth: PropTypes.func,
+  onMoveFieldDown: PropTypes.func,
+};
+
+CSVField.defaultProps = {
+  field: '',
+  index: 0,
+  fixed: false,
+  allowMoveUp: true,
+  allowMoveDown: true,
+  width: '',
+  errorMessages: {
+    name: {
+      allowedCharacters: 'Field name contains illegal characters, name should contain only alphabets, numbers and underscores (A-Z, a-z, 0-9, _)',
+    },
+  },
+  onChange: () => {},
+  onRemoveField: () => {},
+  onMoveFieldUp: () => {},
+  onSetFieldWidth: () => {},
+  onMoveFieldDown: () => {},
+};
+
+export default connect()(CSVField);

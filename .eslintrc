@@ -6,6 +6,7 @@
   },
   "rules": {
     "new-cap" : "off",
+    "react/no-array-index-key": "warn",
     "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
     "react/jsx-boolean-value": "off",
     "react/forbid-prop-types": "off",
@@ -28,9 +29,6 @@
       "ignoreTrailingComments": true,
     }],
   },
-  "plugins": [
-    "react"
-  ],
   "parser": "babel-eslint",
   "globals": {
       "globalSetting": false,

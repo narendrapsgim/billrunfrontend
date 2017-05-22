@@ -1,16 +1,35 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import Immutable from 'immutable';
 import Select from 'react-select';
-import { apiBillRun } from '../../common/Api';
-import { searchPlansByKeyQuery } from '../../common/ApiQueries';
+import {
+  plansOptionsSelector,
+} from '../../selectors/listSelectors';
+import { formatSelectOptions } from '../../common/Util';
+import { getList } from '../../actions/listActions';
+import { getPlansKeysQuery } from '../../common/ApiQueries';
 
 
-export default class PlanSearch extends Component {
+class PlanSearch extends Component {
 
   static propTypes = {
-    onSelectPlan: React.PropTypes.func.isRequired,
+    options: PropTypes.instanceOf(Immutable.List),
+    selectedOptions: PropTypes.array,
+    onSelectPlan: PropTypes.func,
+    dispatch: PropTypes.func.isRequired,
   }
 
+  static defaultProps = {
+    options: Immutable.List(),
+    selectedOptions: [],
+    onSelectPlan: () => {},
+  };
+
   state = { val: null }
+
+  componentDidMount() {
+    this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
+  }
 
   onSelectPlan = (planKey) => {
     if (planKey) {
@@ -19,27 +38,20 @@ export default class PlanSearch extends Component {
     this.setState({ val: null });
   }
 
-  getPlans = (input) => {
-    if (input && input.length) {
-      const key = input.toLowerCase();
-      const query = searchPlansByKeyQuery(key, { name: 1 });
-      return apiBillRun(query)
-        .then(success => ({ options: success.data[0].data.details }))
-        .catch(() => ({ options: [] }));
-    }
-    return Promise.resolve({ options: [] });
-  }
-
   render() {
+    const { options, selectedOptions } = this.props;
+
+    const formatedOptions = options
+      .filter(option => !selectedOptions.includes(option.get('value', '')))
+      .map(formatSelectOptions)
+      .toArray();
+
     return (
       <div className="PlanSearch">
         <Select
           value={this.state.val}
-          cacheAsyncResults={false}
           onChange={this.onSelectPlan}
-          asyncOptions={this.getPlans}
-          valueKey="name"
-          labelKey="name"
+          options={formatedOptions}
           placeholder="Search by plan name..."
           noResultsText="No plans found, please try another name"
         />
@@ -47,3 +59,8 @@ export default class PlanSearch extends Component {
     );
   }
 }
+
+const mapStateToProps = (state, props) => ({
+  options: plansOptionsSelector(state, props),
+});
+export default connect(mapStateToProps)(PlanSearch);
