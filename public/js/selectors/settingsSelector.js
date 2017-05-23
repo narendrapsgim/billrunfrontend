@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { sentenceCase } from 'change-case';
-import { getFieldName, getConfig } from '../common/Util';
+import { getFieldName, getFieldNameType, getConfig } from '../common/Util';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
@@ -118,43 +118,43 @@ const selectLinesFields = (customKeys) => {
 
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
-  selectCsiOptions
+  selectCsiOptions,
 );
 
 export const inputProssesorCustomKeysSelector = createSelector(
   getInputProssesors,
-  selectCustomKeys
+  selectCustomKeys,
 );
 
 export const linesFiledsSelector = createSelector(
   inputProssesorCustomKeysSelector,
-  selectLinesFields
+  selectLinesFields,
 );
 
 
 export const taxationSelector = createSelector(
   getTaxation,
-  taxation => taxation
+  taxation => taxation,
 );
 
 export const pricingSelector = createSelector(
   getPricing,
-  pricing => pricing
+  pricing => pricing,
 );
 
 export const billrunSelector = createSelector(
   getBillrun,
-  billrun => billrun
+  billrun => billrun,
 );
 
 export const minEntityDateSelector = createSelector(
   getMinEntityDate,
-  minEntityDate => (minEntityDate ? moment.unix(minEntityDate) : minEntityDate)
+  minEntityDate => (minEntityDate ? moment.unix(minEntityDate) : minEntityDate),
 );
 
 export const currencySelector = createSelector(
   pricingSelector,
-  (pricing = Immutable.Map()) => pricing.get('currency')
+  (pricing = Immutable.Map()) => pricing.get('currency'),
 );
 
 export const chargingDaySelector = createSelector(
@@ -162,30 +162,31 @@ export const chargingDaySelector = createSelector(
   (billrun = Immutable.Map()) => {
     const chargingDay = billrun.get('charging_day');
     return (isNaN(chargingDay)) ? chargingDay : Number(chargingDay);
-  }
+  },
 );
 
 export const usageTypeSelector = createSelector(
   getUsageType,
-  usageTypes => usageTypes
+  usageTypes => usageTypes,
 );
 
 export const entityFieldSelector = createSelector(
   getEntityFields,
-  fields => fields
+  fields => fields,
 );
 
 export const accountFieldsSelector = createSelector(
   getAccountFields,
-  accountFields => accountFields
+  accountFields => accountFields,
 );
 
 export const subscriberFieldsSelector = createSelector(
   getSubscriberFields,
-  subscriberFields => subscriberFields
+  subscriberFields => subscriberFields,
 );
 
-const formatFieldOptions = (fields, type) => {
+export const formatFieldOptions = (fields, item = Immutable.Map()) => {
+  const type = getFieldNameType(item.get('entity', ''));
   if (fields) {
     return fields.map(field => ({
       value: field.get('field_name', ''),
@@ -199,9 +200,3 @@ const formatFieldOptions = (fields, type) => {
   }
   return undefined;
 };
-
-export const accountFieldsOptionsSelector = createSelector(
-  accountFieldsSelector,
-  () => 'account',
-  formatFieldOptions
-);

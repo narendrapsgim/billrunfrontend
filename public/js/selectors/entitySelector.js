@@ -104,7 +104,7 @@ export const revisionsSelector = createSelector(
 
 export const tabSelector = createSelector(
   getTab,
-  tab => tab
+  tab => tab,
 );
 
 export const messageSelector = createSelector(
@@ -118,17 +118,17 @@ export const messageSelector = createSelector(
       }
     }
     return undefined;
-  }
+  },
 );
 
 export const itemSelector = createSelector(
   getItem,
-  item => item
+  item => item,
 );
 
 export const idSelector = createSelector(
   getId,
-  id => id
+  id => id,
 );
 
 export const modeSelector = createSelector(
