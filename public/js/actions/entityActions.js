@@ -88,6 +88,19 @@ const buildRequestData = (item, action) => {
       return formData;
     }
 
+    case 'import': {
+      const formData = new FormData();
+      const update = item.map((importedItem) => {
+        const newFrom = getItemDateValue(importedItem, 'from').format(globalSetting.apiDateTimeFormat);
+        return importedItem.withMutations((itemwithMutations) => {
+          itemwithMutations
+            .set('from', newFrom);
+        });
+      });
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
     case 'update': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
@@ -152,13 +165,13 @@ export const saveEntity = (collection, item, action) => (dispatch) => {
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
 };
 
-export const saveEntities = (collection, items) => (dispatch) => {
+export const importEntities = (collection, items) => (dispatch) => {
   dispatch(startProgressIndicator());
-  const body = items.map(item => requestDataBuilder(collection, item, 'create'));
-  const query = apiEntityQuery(collection, 'create', body);
+  const body = requestDataBuilder(collection, items, 'import');
+  const query = apiEntityQuery(collection, 'import', body);
   return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entities')));
 };
 
 const fetchEntity = (collection, query) => (dispatch) => {
