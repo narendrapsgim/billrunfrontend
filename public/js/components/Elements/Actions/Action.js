@@ -24,6 +24,7 @@ const Action = (props) => {
     'fa-plus': type === 'add',
     'fa-calendar': type === 'move',
     'fa-cloud-upload': type === 'import',
+    'fa-refresh': type === 'refresh',
   });
 
   const onClick = () => {

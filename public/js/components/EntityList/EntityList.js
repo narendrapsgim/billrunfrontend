@@ -134,6 +134,10 @@ class EntityList extends Component {
     this.props.router.push(`${itemsType}/${itemType}`);
   }
 
+  onClickRefresh = () => {
+    this.fetchItems(this.props);
+  }
+
   onSort = (sort) => {
     const { itemsType } = this.props;
     this.props.dispatch(setListPage(itemsType, 0));
@@ -229,6 +233,14 @@ class EntityList extends Component {
   getListActions = () => {
     const { listActions } = this.props;
     const defaultActions = [{
+      type: 'refresh',
+      label: 'Refresh',
+      actionStyle: 'default',
+      showIcon: true,
+      onClick: this.onClickRefresh,
+      actionSize: 'xsmall',
+      actionClass: 'btn-primary',
+    }, {
       type: 'add',
       label: 'Add New',
       actionStyle: 'default',
@@ -237,7 +249,16 @@ class EntityList extends Component {
       actionSize: 'xsmall',
       actionClass: 'btn-primary',
     }];
-    return (listActions === null) ? defaultActions : listActions;
+    if (listActions === null) {
+      return defaultActions;
+    }
+    return listActions.map((listAction) => {
+      const defaultAction = defaultActions.find(action => action.type === listAction.type);
+      if (defaultAction) {
+        return Object.assign(defaultAction, listAction);
+      }
+      return listAction;
+    }).reverse();
   }
 
   renderPanelHeader = () => {
