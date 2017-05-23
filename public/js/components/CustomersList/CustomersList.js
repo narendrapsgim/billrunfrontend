@@ -6,6 +6,7 @@ import EntityList from '../EntityList';
 import { LoadingItemPlaceholder, ModalWrapper } from '../Elements';
 import Importer from '../Importer';
 import { getSettings } from '../../actions/settingsActions';
+import { clearItems } from '../../actions/entityListActions';
 import { accountFieldsSelector } from '../../selectors/settingsSelector';
 import { getFieldName } from '../../common/Util';
 
@@ -37,10 +38,6 @@ class CustomersList extends Component {
     }
   }
 
-  onClickNew = () => {
-    this.props.router.push('customers/customer');
-  }
-
   getListFields = () => {
     const { accountFields, accountAllwaysShownFields } = this.props;
     return accountFields
@@ -55,19 +52,15 @@ class CustomersList extends Component {
   }
 
   getListActions = () => [{
+    type: 'add',
+  }, {
+    type: 'refresh',
+  }, {
     type: 'import',
     label: 'Import',
     actionStyle: 'default',
     showIcon: true,
     onClick: this.onClickImprt,
-    actionSize: 'xsmall',
-    actionClass: 'btn-primary',
-  }, {
-    type: 'add',
-    label: 'Add New',
-    actionStyle: 'default',
-    showIcon: true,
-    onClick: this.onClickNew,
     actionSize: 'xsmall',
     actionClass: 'btn-primary',
   }];
@@ -80,6 +73,8 @@ class CustomersList extends Component {
     this.setState({
       showImport: false,
     });
+    // TODO : refetch list items after import
+    // this.props.dispatch(clearItems('customers'));
   }
 
   onClickImprt = () => {
@@ -111,7 +106,7 @@ class CustomersList extends Component {
           listActions={listActions}
         />
         <ModalWrapper show={showImport} title="Import Customers" onHide={this.onCloseImprt}>
-          <Importer />
+          <Importer entity="customer" onFinish={this.onCloseImprt} />
         </ModalWrapper>
       </div>
     );
