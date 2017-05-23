@@ -5,7 +5,8 @@
     "node": true,
   },
   "rules": {
-    "new-cap" : "off",
+    "no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }],
+    "new-cap": "off",
     "react/no-array-index-key": "warn",
     "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
     "react/jsx-boolean-value": "off",
