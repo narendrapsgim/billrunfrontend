@@ -161,7 +161,7 @@ var globalSetting = {
       itemsType: 'subscriptions',
     },
     customer: {
-      collection: 'subscribers',
+      collection: 'accounts',
       uniqueField: 'aid',
       itemName: 'customer',
       itemType: 'customer',
