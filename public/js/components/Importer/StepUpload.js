@@ -6,8 +6,9 @@ import { readAsText } from 'promise-file-reader';
 
 
 const StepUpload = (props) => {
-  const { item, delimiterOptions } = props;
+  const { item, selectedEntity, delimiterOptions, entityOptions } = props;
   const delimiter = item.get('fileDelimiter', '');
+  const entity = item.get('entity', '');
 
   const onfileReset = (e) => {
     e.target.value = null;
@@ -32,9 +33,30 @@ const StepUpload = (props) => {
     }
   };
 
+  const onChangeEntity = (value) => {
+    if (value.length) {
+      props.onChange('entity', value);
+    } else {
+      props.onDelete('entity');
+    }
+  };
+
 
   return (
     <Col md={12} className="StepUpload">
+      { !selectedEntity && (
+        <FormGroup>
+          <Col sm={3} componentClass={ControlLabel}>Entity</Col>
+          <Col sm={9}>
+            <Select
+              onChange={onChangeEntity}
+              options={entityOptions}
+              value={entity}
+              placeholder="Select entity to import...."
+            />
+          </Col>
+        </FormGroup>
+      )}
       <FormGroup>
         <Col sm={3} componentClass={ControlLabel}>Delimiter</Col>
         <Col sm={9}>
@@ -60,10 +82,15 @@ const StepUpload = (props) => {
 
 StepUpload.defaultProps = {
   item: Immutable.Map(),
+  selectedEntity: false,
   delimiterOptions: [
     { value: '	', label: 'Tab' }, // eslint-disable-line no-tabs
     { value: ' ', label: 'Space' },
     { value: ',', label: 'Comma (,)' },
+  ],
+  entityOptions: [
+    { value: 'customer', label: 'Customers' }, // eslint-disable-line no-tabs
+    { value: 'subscription', label: 'Subscriptions' },
   ],
   onChange: () => {},
   onDelete: () => {},
@@ -71,10 +98,17 @@ StepUpload.defaultProps = {
 
 StepUpload.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
+  selectedEntity: PropTypes.bool,
   delimiterOptions: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string,
-      label: PropTypes.string
+      label: PropTypes.string,
+    }),
+  ),
+  entityOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
     }),
   ),
   onChange: PropTypes.func,

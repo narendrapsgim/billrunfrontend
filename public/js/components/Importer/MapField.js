@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { FormGroup, ControlLabel, Col } from 'react-bootstrap';
-
 import Select from 'react-select';
 
 

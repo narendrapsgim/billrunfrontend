@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Col } from 'react-bootstrap';
+import { Col, Label } from 'react-bootstrap';
 import { parseCsvHeadres } from '../../common/Util';
 import MapField from './MapField';
 
@@ -8,9 +8,16 @@ import MapField from './MapField';
 const StepMapper = (props) => {
   const { item, fields } = props;
   const delimiter = item.get('fileDelimiter', '');
-  const fileContent = item.get('fileContent', '');
   const mappedFields = item.get('map', Immutable.List());
+  const fileContent = item.get('fileContent', '');
+  if (fileContent.length === 0) {
+    return (<Label bsStyle="default">Please upload file.</Label>);
+  }
+
   const headers = parseCsvHeadres(fileContent, delimiter);
+  if (headers.length === 0) {
+    return (<Label bsStyle="default">No CSV headers was found, please check imported file.</Label>);
+  }
 
   return (
     <Col md={12} className="StepMapper">
@@ -33,14 +40,12 @@ StepMapper.defaultProps = {
   item: Immutable.Map(),
   fields: [],
   onChange: () => {},
-  onDelete: () => {},
 };
 
 StepMapper.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
   fields: PropTypes.array,
   onChange: PropTypes.func,
-  onDelete: PropTypes.func,
 };
 
 export default StepMapper;

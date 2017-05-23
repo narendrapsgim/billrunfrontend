@@ -5,7 +5,8 @@ import { Form, Panel } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import StepUpload from './StepUpload';
 import StepMapper from './StepMapper';
-import StepFinish from './StepFinish';
+import StepValidate from './StepValidate';
+import StepResult from './StepResult';
 import { ActionButtons } from '../Elements';
 import { itemSelector } from '../../selectors/entitySelector';
 import {
@@ -13,29 +14,54 @@ import {
   deleteImporter,
   updateImporterValue,
   deleteImporterValue,
+  sendImport,
 } from '../../actions/importerActions';
-import { accountFieldsOptionsSelector } from '../../selectors/settingsSelector';
+import { importFieldsOptionsSelector } from '../../selectors/multipleSelectors';
+import { getConfig } from '../../common/Util';
 
 
 class Importer extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
-    accountFields: PropTypes.array,
+    importFields: PropTypes.array,
+    predefinedValues: PropTypes.arrayOf(
+      PropTypes.shape({
+        key: PropTypes.string,
+        value: PropTypes.string,
+      }),
+    ),
+    defaultValues: PropTypes.arrayOf(
+      PropTypes.shape({
+        key: PropTypes.string,
+        value: PropTypes.string,
+      }),
+    ),
+    entity: PropTypes.oneOf(['', 'subscription', 'customer']),
+    onFinish: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    accountFields: [],
     item: Immutable.Map(),
+    entity: '',
+    importFields: [],
+    predefinedValues: [],
+    defaultValues: [],
+    onFinish: () => {},
   };
 
   state = {
+    status: 'create',
     stepIndex: 0,
   }
 
   componentDidMount() {
+    const { entity } = this.props;
     this.props.dispatch(initImporter());
+    if (entity !== '') {
+      this.onChange('entity', entity);
+    }
   }
 
   componentWillUnmount() {
@@ -50,6 +76,111 @@ class Importer extends Component {
     this.props.dispatch(deleteImporterValue(path));
   }
 
+  onFinish = () => {
+    this.props.onFinish();
+  }
+
+  onImport = () => {
+    const { item } = this.props;
+    const entity = item.get('entity', '');
+    const rows = this.getFormatedRows();
+    this.setState({ status: 'progress' });
+    const collection = getConfig(['systemItems', entity, 'collection'], '');
+    this.props.dispatch(sendImport(collection, rows)).then(this.afterImport);
+  }
+
+  onNextStep = () => {
+    const { stepIndex } = this.state;
+    this.setState({ stepIndex: stepIndex + 1 });
+  }
+
+  onPrevStep = () => {
+    const { stepIndex } = this.state;
+    this.setState({ stepIndex: stepIndex - 1 });
+  }
+
+  getOkButtonLable = () => {
+    const { stepIndex } = this.state;
+    switch (stepIndex) {
+      case 2:
+      case '2':
+        return 'Import';
+      case 3:
+      case '3':
+        return 'Close';
+      default:
+        return 'Next';
+    }
+  }
+
+  getOkButtonAction = () => {
+    const { stepIndex } = this.state;
+    switch (stepIndex) {
+      case 2:
+      case '2':
+        return this.onImport;
+      case 3:
+      case '3':
+        return this.onFinish;
+      default:
+        return this.onNextStep;
+    }
+  }
+
+  getFormatedRows = (limit = -1) => {
+    const { item, predefinedValues, defaultValues } = this.props;
+    const fileContent = item.get('fileContent', '');
+    const fileDelimiter = item.get('fileDelimiter', '');
+    const map = item.get('map', Immutable.List());
+
+    return Immutable.List().withMutations((rowsWithMutations) => {
+      const lines = fileContent.split('\n');
+      const linesToParse = limit === -1 ? lines.length - 1 : Math.min(limit + 1, lines.length - 1);
+      if (Array.isArray(lines)) {
+        // Ignore first (headers) and last (empty) lines
+        for (let idx = 1; idx < linesToParse; idx++) {
+          const row = Immutable.Map().withMutations((mapWithMutations) => {
+            const line = lines[idx].split(fileDelimiter);
+            map.forEach((fieldName, key) => {
+              if (fieldName && fieldName !== '') {
+                mapWithMutations.set(fieldName, line[key]);
+              }
+            });
+            // Set predefined values
+            predefinedValues.forEach((predefinedValue) => {
+              mapWithMutations.set(predefinedValue.key, predefinedValue.value);
+            });
+            // Set predefined values
+            defaultValues.forEach((defaultValue) => {
+              if (!mapWithMutations.has(defaultValue.key)) {
+                mapWithMutations.set(defaultValue.key, defaultValue.value);
+              }
+            });
+          });
+          rowsWithMutations.push(row);
+        }
+      }
+    });
+  }
+
+  afterImport = (response) => {
+    if ([1, 2].includes(response.status)) {
+      const result = response.data;
+      const allSuccess = result.every(status => status === true);
+      const allFails = result.every(status => status !== true);
+      if (allSuccess || (result.length > 0 && !allFails)) {
+        this.setState({ status: 'finish' });
+      } else {
+        this.setState({ status: 'create' });
+      }
+      this.onChange('result', result);
+      this.onNextStep();
+    } else {
+      this.onDelete('result');
+      this.setState({ status: 'create' });
+    }
+  }
+
   renderStepper = () => {
     const { stepIndex } = this.state;
     return (
@@ -61,6 +192,9 @@ class Importer extends Component {
           <StepLabel>Field Map</StepLabel>
         </Step>
         <Step key={2}>
+          <StepLabel>Validate</StepLabel>
+        </Step>
+        <Step key={3}>
           <StepLabel>Finish</StepLabel>
         </Step>
       </Stepper>
@@ -68,57 +202,43 @@ class Importer extends Component {
   }
 
   renderStepContent = () => {
-    const { item, accountFields } = this.props;
+    const { item, importFields: fields, entity } = this.props;
     const { stepIndex } = this.state;
     switch (stepIndex) {
-      case 0:
-        return (
-          <StepUpload
-            item={item}
-            onChange={this.onChange}
-            onDelete={this.onDelete}
-          />
-        );
-      case 1:
-        return (
-          <StepMapper
-            item={item}
-            fields={accountFields}
-            onChange={this.onChange}
-            onDelete={this.onDelete}
-          />
-        );
-      case 2:
-        return (<StepFinish item={item} />);
-
-      default:
-        return (<p>Not valid Step</p>);
+      case 0: return (
+        <StepUpload item={item} onChange={this.onChange} onDelete={this.onDelete} selectedEntity={entity !== ''} />
+      );
+      case 1: return (
+        <StepMapper item={item} onChange={this.onChange} onDelete={this.onDelete} fields={fields} />
+      );
+      case 2: return (
+        <StepValidate item={item} getFormatedRows={this.getFormatedRows} />
+      );
+      case 3: return (
+        <StepResult item={item} />
+      );
+      default: return (
+        <p>Not valid Step</p>
+      );
     }
   }
 
   renderActionButtons = () => {
-    const { stepIndex } = this.state;
+    const { stepIndex, status } = this.state;
+    const inProgress = status === 'progress';
+    const inFinish = status === 'finish';
+    console.log('status: ', status);
     return (
       <ActionButtons
-        cancelLabel="Next"
-        onClickCancel={this.nextStep}
-        disableCancel={stepIndex === 2}
+        cancelLabel={this.getOkButtonLable()}
+        onClickCancel={this.getOkButtonAction()}
+        disableCancel={inProgress}
         saveLabel="Back"
-        disableSave={stepIndex === 0}
-        onClickSave={this.prevStep}
+        disableSave={stepIndex === 0 || inProgress || inFinish}
+        onClickSave={this.onPrevStep}
         reversed={true}
       />
     );
-  }
-
-  nextStep = () => {
-    const { stepIndex } = this.state;
-    this.setState({ stepIndex: stepIndex + 1 });
-  }
-
-  prevStep = () => {
-    const { stepIndex } = this.state;
-    this.setState({ stepIndex: stepIndex - 1 });
   }
 
   render() {
@@ -137,7 +257,7 @@ class Importer extends Component {
 
 const mapStateToProps = (state, props) => ({
   item: itemSelector(state, props, 'importer'),
-  accountFields: accountFieldsOptionsSelector(state, props),
+  importFields: importFieldsOptionsSelector(state, props, 'importer'),
 });
 
 export default connect(mapStateToProps)(Importer);

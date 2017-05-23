@@ -4,7 +4,7 @@ import {
   clearEntity,
   updateEntityField,
   deleteEntityField,
-  saveEntities,
+  importEntities,
 } from './entityActions';
 
 const defaultImporter = Immutable.Map({
@@ -20,4 +20,4 @@ export const updateImporterValue = (path, value) => updateEntityField('importer'
 
 export const deleteImporterValue = path => deleteEntityField('importer', path);
 
-export const sendImport = (collection, items) => saveEntities(collection, items);
+export const sendImport = (collection, items) => importEntities(collection, items);
