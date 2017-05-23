@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
-import { Col, Row, Panel, Button } from 'react-bootstrap';
+import { Col, Row, Panel } from 'react-bootstrap';
 import List from '../List';
 import { LoadingItemPlaceholder } from '../Elements';
 import Pager from './Pager';
@@ -59,10 +59,7 @@ class EntityList extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
-    listActions: PropTypes.oneOfType([
-      PropTypes.bool,
-      PropTypes.arrayOf(PropTypes.object),
-    ]),
+    listActions: PropTypes.arrayOf(PropTypes.object),
     refreshString: PropTypes.string,
     actions: PropTypes.arrayOf(PropTypes.object),
   }
@@ -86,6 +83,7 @@ class EntityList extends Component {
     state: Immutable.List([0, 1, 2]),
     refreshString: '',
     actions: [],
+    listActions: null,
   }
 
   componentWillMount() {
@@ -134,6 +132,10 @@ class EntityList extends Component {
   onClickNew = () => {
     const { itemsType, itemType } = this.props;
     this.props.router.push(`${itemsType}/${itemType}`);
+  }
+
+  onClickRefresh = () => {
+    this.fetchItems(this.props);
   }
 
   onSort = (sort) => {
@@ -230,21 +232,33 @@ class EntityList extends Component {
 
   getListActions = () => {
     const { listActions } = this.props;
-    if (typeof listActions === 'undefined') {
-      return [{
-        type: 'add',
-        label: 'Add New',
-        actionStyle: 'default',
-        showIcon: true,
-        onClick: this.onClickNew,
-        actionSize: 'xsmall',
-        actionClass: 'btn-primary',
-      }];
+    const defaultActions = [{
+      type: 'refresh',
+      label: 'Refresh',
+      actionStyle: 'default',
+      showIcon: true,
+      onClick: this.onClickRefresh,
+      actionSize: 'xsmall',
+      actionClass: 'btn-primary',
+    }, {
+      type: 'add',
+      label: 'Add New',
+      actionStyle: 'default',
+      showIcon: true,
+      onClick: this.onClickNew,
+      actionSize: 'xsmall',
+      actionClass: 'btn-primary',
+    }];
+    if (listActions === null) {
+      return defaultActions;
     }
-    if (listActions === false) {
-      return [];
-    }
-    return listActions;
+    return listActions.map((listAction) => {
+      const defaultAction = defaultActions.find(action => action.type === listAction.type);
+      if (defaultAction) {
+        return Object.assign(defaultAction, listAction);
+      }
+      return listAction;
+    }).reverse();
   }
 
   renderPanelHeader = () => {
