@@ -29,6 +29,7 @@ var globalSetting = {
   queue_calculators: ['customer', 'rate', 'pricing'],
   mail_support: 'cloud_support@billrun.com',
   logoMaxSize: 2,
+  importMaxSize: 8,
   chargingBufferDays: 5,
   reports: {
     entities: ['lines'/*, 'subscription', 'customer'*/],

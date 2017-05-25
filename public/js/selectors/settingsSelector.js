@@ -28,6 +28,19 @@ const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
 const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['subscribers', 'subscriber', 'fields']);
 
+const selectSubscriberImportFields = (fields) => {
+  if (fields) {
+    return fields.push(Immutable.Map({
+      unique: true,
+      generated: false,
+      mandatory: true,
+      field_name: 'account_unique',
+      title: 'Account unique field',
+    }));
+  }
+  return fields;
+};
+
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
   const defaultUsaget = inputProssesor.getIn(['processor', 'default_usaget'], '');
@@ -183,6 +196,11 @@ export const accountFieldsSelector = createSelector(
 export const subscriberFieldsSelector = createSelector(
   getSubscriberFields,
   subscriberFields => subscriberFields,
+);
+
+export const subscriberImportFieldsSelector = createSelector(
+  subscriberFieldsSelector,
+  selectSubscriberImportFields,
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {

@@ -16,6 +16,7 @@ import {
   deleteImporterValue,
   sendImport,
 } from '../../actions/importerActions';
+import { showDanger } from '../../actions/alertsActions';
 import { importFieldsOptionsSelector } from '../../selectors/multipleSelectors';
 import { getConfig } from '../../common/Util';
 
@@ -25,29 +26,35 @@ class Importer extends Component {
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     importFields: PropTypes.array,
-    predefinedValues: PropTypes.arrayOf(
+    predefinedValues: PropTypes.object,
+    defaultValues: PropTypes.object,
+    entityOptions: PropTypes.arrayOf(
       PropTypes.shape({
-        key: PropTypes.string,
         value: PropTypes.string,
+        label: PropTypes.string,
       }),
     ),
-    defaultValues: PropTypes.arrayOf(
-      PropTypes.shape({
-        key: PropTypes.string,
-        value: PropTypes.string,
-      }),
-    ),
-    entity: PropTypes.oneOf(['', 'subscription', 'customer']),
     onFinish: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     item: Immutable.Map(),
-    entity: '',
     importFields: [],
-    predefinedValues: [],
-    defaultValues: [],
+    predefinedValues: {},
+    // predefinedValues={{ // example
+    //   customer: [{
+    //     key: 'type',
+    //     value: 'account',
+    //   }]
+    // }}
+    defaultValues: {},
+    // defaultValues={{ // example
+    //   customer: [{
+    //     key: 'company_name',
+    //     value: 'Def Com name',
+    //   }]
+    // }}
     onFinish: () => {},
   };
 
@@ -57,10 +64,11 @@ class Importer extends Component {
   }
 
   componentDidMount() {
-    const { entity } = this.props;
+    const { entityOptions } = this.props;
     this.props.dispatch(initImporter());
-    if (entity !== '') {
-      this.onChange('entity', entity);
+    const isSingleEntity = (entityOptions && entityOptions.length === 1);
+    if (isSingleEntity) {
+      this.onChange('entity', entityOptions[0].value);
     }
   }
 
@@ -84,9 +92,13 @@ class Importer extends Component {
     const { item } = this.props;
     const entity = item.get('entity', '');
     const rows = this.getFormatedRows();
-    this.setState({ status: 'progress' });
-    const collection = getConfig(['systemItems', entity, 'collection'], '');
-    this.props.dispatch(sendImport(collection, rows)).then(this.afterImport);
+    if (rows.size > 0 && entity !== '') {
+      this.setState({ status: 'progress' });
+      const collection = getConfig(['systemItems', entity, 'collection'], '');
+      this.props.dispatch(sendImport(collection, rows)).then(this.afterImport);
+    } else {
+      this.props.dispatch(showDanger('No Import data found'));
+    }
   }
 
   onNextStep = () => {
@@ -104,7 +116,7 @@ class Importer extends Component {
     switch (stepIndex) {
       case 2:
       case '2':
-        return 'Import';
+        return 'Confirm and Import';
       case 3:
       case '3':
         return 'Close';
@@ -129,33 +141,35 @@ class Importer extends Component {
 
   getFormatedRows = (limit = -1) => {
     const { item, predefinedValues, defaultValues } = this.props;
-    const fileContent = item.get('fileContent', '');
-    const fileDelimiter = item.get('fileDelimiter', '');
+    const lines = item.get('fileContent', []);
+    const entity = item.get('entity', []);
     const map = item.get('map', Immutable.List());
 
     return Immutable.List().withMutations((rowsWithMutations) => {
-      const lines = fileContent.split('\n');
-      const linesToParse = limit === -1 ? lines.length - 1 : Math.min(limit + 1, lines.length - 1);
       if (Array.isArray(lines)) {
-        // Ignore first (headers) and last (empty) lines
+        const linesToParse = (limit === -1) ? lines.length : Math.min(limit + 1, lines.length);
+        // Ignore first (headers) line
         for (let idx = 1; idx < linesToParse; idx++) {
           const row = Immutable.Map().withMutations((mapWithMutations) => {
-            const line = lines[idx].split(fileDelimiter);
-            map.forEach((fieldName, key) => {
-              if (fieldName && fieldName !== '') {
-                mapWithMutations.set(fieldName, line[key]);
+            map.forEach((csvFieldIndex, fieldName) => {
+              if (csvFieldIndex !== '') {
+                mapWithMutations.set(fieldName, lines[idx][csvFieldIndex]);
               }
             });
             // Set predefined values
-            predefinedValues.forEach((predefinedValue) => {
-              mapWithMutations.set(predefinedValue.key, predefinedValue.value);
-            });
+            if (predefinedValues.hasOwnProperty(entity)) {
+              predefinedValues[entity].forEach((predefinedValue) => {
+                mapWithMutations.set(predefinedValue.key, predefinedValue.value);
+              });
+            }
             // Set predefined values
-            defaultValues.forEach((defaultValue) => {
-              if (!mapWithMutations.has(defaultValue.key)) {
-                mapWithMutations.set(defaultValue.key, defaultValue.value);
-              }
-            });
+            if (defaultValues.hasOwnProperty(entity)) {
+              defaultValues[entity].forEach((defaultValue) => {
+                if (mapWithMutations.get(defaultValue.key, '') === '') {
+                  mapWithMutations.set(defaultValue.key, defaultValue.value);
+                }
+              });
+            }
           });
           rowsWithMutations.push(row);
         }
@@ -202,17 +216,23 @@ class Importer extends Component {
   }
 
   renderStepContent = () => {
-    const { item, importFields: fields, entity } = this.props;
+    const { item, importFields: fields, entityOptions } = this.props;
     const { stepIndex } = this.state;
+
     switch (stepIndex) {
       case 0: return (
-        <StepUpload item={item} onChange={this.onChange} onDelete={this.onDelete} selectedEntity={entity !== ''} />
+        <StepUpload
+          item={item}
+          onChange={this.onChange}
+          onDelete={this.onDelete}
+          entityOptions={entityOptions}
+        />
       );
       case 1: return (
         <StepMapper item={item} onChange={this.onChange} onDelete={this.onDelete} fields={fields} />
       );
       case 2: return (
-        <StepValidate item={item} getFormatedRows={this.getFormatedRows} />
+        <StepValidate fields={fields} getFormatedRows={this.getFormatedRows} />
       );
       case 3: return (
         <StepResult item={item} />
@@ -227,7 +247,6 @@ class Importer extends Component {
     const { stepIndex, status } = this.state;
     const inProgress = status === 'progress';
     const inFinish = status === 'finish';
-    console.log('status: ', status);
     return (
       <ActionButtons
         cancelLabel={this.getOkButtonLable()}
@@ -243,7 +262,7 @@ class Importer extends Component {
 
   render() {
     return (
-      <div>
+      <div className="Importer">
         <Panel header={this.renderStepper()}>
           <Form horizontal>
             {this.renderStepContent()}

@@ -587,27 +587,64 @@ ul.revision-history-list li.active .cycle {
 /* ~Chart */
 
 .scrollbox {
-	overflow: auto;
-	background:
-		/* Shadow covers */
-		linear-gradient(white 30%, rgba(255,255,255,0)),
-		linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,
+  overflow: auto;
+  background:
+    /* Shadow covers */
+    linear-gradient(white 30%, rgba(255,255,255,0)),
+    linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,
+    /* Shadows */
+    radial-gradient(50% 0, farthest-side, rgba(0,0,0,.2), rgba(0,0,0,0)),
+    radial-gradient(50% 100%,farthest-side, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+  background:
+    /* Shadow covers */
+    linear-gradient(white 30%, rgba(255,255,255,0)),
+    linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,
+    /* Shadows */
+    radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)),
+    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  /* Opera doesn't support this in the shorthand */
+  background-attachment: local, local, scroll, scroll;
+}
 
-		/* Shadows */
-		radial-gradient(50% 0, farthest-side, rgba(0,0,0,.2), rgba(0,0,0,0)),
-		radial-gradient(50% 100%,farthest-side, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
-	background:
-		/* Shadow covers */
-		linear-gradient(white 30%, rgba(255,255,255,0)),
-		linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,
-
-		/* Shadows */
-		radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)),
-		radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
-	background-repeat: no-repeat;
-	background-color: white;
-	background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
-
-	/* Opera doesn't support this in the shorthand */
-	background-attachment: local, local, scroll, scroll;
+.Importer .panel-body{
+  padding: 0;
+}
+.Importer .StepUpload {
+  padding: 25px;
+}
+.Importer .StepMapper {
+  max-height: 300px;
+  width: 100%;
+  padding: 25px;
+}
+.Importer .StepMapper .Select-control {
+  /* set select imput transparent to not hide wrapper div shadows */
+  background-color: transparent;
+}
+.Importer .StepValidate .row-fields {
+  max-height: 300px;
+  width: 100%;
+  margin: -21px 0 0 15px;
+  padding-right: 25px;
+  padding-top: 25px;
+}
+.Importer .StepUpload,
+.Importer .StepMapper,
+.Importer .StepValidate,
+.Importer .StepResult {
+  min-height: 200px;
+}
+.Importer .StepResult ol {
+  max-height: 200px;
+  width: 100%;
+  margin: 0 0 0 15px;
+  padding-right: 25px;
+  padding-bottom: 25px;
+  padding-top: 10px;
+}
+.Select-memu-outer {
+  background-color: blue!important;
 }

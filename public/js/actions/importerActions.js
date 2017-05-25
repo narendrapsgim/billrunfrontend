@@ -8,7 +8,7 @@ import {
 } from './entityActions';
 
 const defaultImporter = Immutable.Map({
-  map: Immutable.List(),
+  map: Immutable.Map(),
   fileDelimiter: ',',
 });
 

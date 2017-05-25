@@ -6,7 +6,7 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import { itemSelector } from './entitySelector';
-import { accountFieldsSelector, subscriberFieldsSelector, formatFieldOptions } from './settingsSelector';
+import { accountFieldsSelector, subscriberImportFieldsSelector, formatFieldOptions } from './settingsSelector';
 
 
 const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscriberFields) => {
@@ -23,7 +23,7 @@ const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscribe
 export const importFieldsSelector = createSelector(
   itemSelector,
   accountFieldsSelector,
-  subscriberFieldsSelector,
+  subscriberImportFieldsSelector,
   selectorFieldsByEntity,
 );
 

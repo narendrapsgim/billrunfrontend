@@ -105,8 +105,20 @@ class CustomersList extends Component {
           actions={actions}
           listActions={listActions}
         />
-        <ModalWrapper show={showImport} title="Import Customers" onHide={this.onCloseImprt}>
-          <Importer entity="customer" onFinish={this.onCloseImprt} />
+        <ModalWrapper show={showImport} title="Import" onHide={this.onCloseImprt}>
+          <Importer
+            entityOptions={[
+              { value: 'customer', label: 'Customers' },
+              { value: 'subscription', label: 'Subscriptions' },
+            ]}
+            onFinish={this.onCloseImprt}
+            predefinedValues={{
+              customer: [{
+                key: 'type',
+                value: 'account',
+              }]
+            }}
+          />
         </ModalWrapper>
       </div>
     );

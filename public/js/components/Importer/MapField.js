@@ -1,29 +1,50 @@
 import React, { PropTypes } from 'react';
-import Immutable from 'immutable';
-import { FormGroup, ControlLabel, Col } from 'react-bootstrap';
+import { FormGroup, ControlLabel, Col, Label, InputGroup } from 'react-bootstrap';
 import Select from 'react-select';
 
 
 const MapField = (props) => {
-  const { mapFrom, mappedTo, index, options, usedOptions } = props;
+  const { mapFrom, mappedTo, options } = props;
   const onChange = (value) => {
-    props.onChange(['map', index], value);
+    if (value !== '') {
+      const scvIndex = value - 1;// fix react-selet 0 as value
+      props.onChange(['map', mapFrom.value], scvIndex);
+    } else {
+      props.onDelete(['map', mapFrom.value]);
+    }
   };
-  const filteredOptions = options.filter(option => (
-    option.value === mappedTo
-    || (!usedOptions.includes(option.value) && !option.generated)
-  ));
 
+  const filteredOptions = options.map((option, key) => ({
+    label: option,
+    value: key + 1, // fix react-selet 0 as value
+  }));
+
+  const value = mappedTo === '' ? '' : mappedTo + 1; // fix react-selet 0 as value
+
+  const selectFiled = () => (
+    <Select
+      onChange={onChange}
+      options={filteredOptions}
+      value={value}
+      placeholder="Select field to map..."
+    />
+);
+
+  const mandatory = mapFrom.mandatory ? <span className="danger-red"> *</span> : '';
+  const unique = mapFrom.unique ? <Label bsStyle="info">Unique field</Label> : '';
   return (
     <FormGroup>
-      <Col sm={3} componentClass={ControlLabel}>{mapFrom}</Col>
+      <Col sm={3} componentClass={ControlLabel}>{mapFrom.label}{mandatory}</Col>
       <Col sm={9}>
-        <Select
-          onChange={onChange}
-          options={filteredOptions}
-          value={mappedTo}
-          placeholder="Select field to map..."
-        />
+        { unique === ''
+          ? selectFiled()
+          : (
+            <InputGroup>
+              {selectFiled()}
+              <InputGroup.Addon>{unique}</InputGroup.Addon>
+            </InputGroup>
+          )
+        }
       </Col>
     </FormGroup>
   );
@@ -33,22 +54,19 @@ MapField.defaultProps = {
   mapFrom: '',
   mappedTo: '',
   options: [],
-  usedOptions: Immutable.List(),
   onChange: () => {},
+  onDelete: () => {},
 };
 
 MapField.propTypes = {
-  index: PropTypes.number.isRequired,
-  mapFrom: PropTypes.string,
-  mappedTo: PropTypes.string,
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      value: PropTypes.string,
-      label: PropTypes.string
-    }),
-  ),
-  usedOptions: PropTypes.instanceOf(Immutable.List),
+  mapFrom: PropTypes.object,
+  mappedTo: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.oneOf(['']),
+  ]),
+  options: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
+  onDelete: PropTypes.func,
 };
 
 export default MapField;
