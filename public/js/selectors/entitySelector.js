@@ -27,6 +27,20 @@ const getMessage = (state, props) => {
   return undefined;
 };
 
+const getSignature = (state, props) => {
+  if (props.location && props.location.query && typeof props.location.query.sig !== 'undefined') {
+    return props.location.query.sig;
+  }
+  return undefined;
+};
+
+const getTimestamp = (state, props) => {
+  if (props.location && props.location.query && typeof props.location.query.t !== 'undefined') {
+    return props.location.query.t;
+  }
+  return undefined;
+};
+
 const getAction = (state, props) => {
   if (props.location && props.location.query && props.location.query.action) {
     return props.location.query.action.length > 0 ? props.location.query.action : null;
@@ -104,6 +118,16 @@ export const revisionsSelector = createSelector(
 export const tabSelector = createSelector(
   getTab,
   tab => tab
+);
+
+export const timestampSelector = createSelector(
+  getTimestamp,
+  timestamp => timestamp
+);
+
+export const sigSelector = createSelector(
+  getSignature,
+  signature => signature
 );
 
 export const messageSelector = createSelector(
