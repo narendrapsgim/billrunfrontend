@@ -1,12 +1,12 @@
 import Immutable from 'immutable';
 import {
   UPDATE_SETTING,
-         REMOVE_SETTING_FIELD,
-         GOT_SETTINGS,
-         PUSH_TO_SETTING,
-	 ADD_PAYMENT_GATEWAY,
-	 REMOVE_PAYMENT_GATEWAY,
-	 UPDATE_PAYMENT_GATEWAY,
+  REMOVE_SETTING_FIELD,
+  GOT_SETTINGS,
+  PUSH_TO_SETTING,
+  ADD_PAYMENT_GATEWAY,
+  REMOVE_PAYMENT_GATEWAY,
+  UPDATE_PAYMENT_GATEWAY,
   SET_FIELD_POSITION,
 } from '../actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '../actions/inputProcessorActions';
