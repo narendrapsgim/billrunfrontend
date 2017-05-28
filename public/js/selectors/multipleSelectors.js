@@ -4,32 +4,29 @@
  */
 
 import { createSelector } from 'reselect';
-import Immutable from 'immutable';
-import { itemSelector } from './entitySelector';
-import { accountFieldsSelector, subscriberImportFieldsSelector, formatFieldOptions } from './settingsSelector';
+import { compose } from 'redux';
 
 
-const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscriberFields) => {
-  switch (item.get('entity')) {
-    case 'customer':
-      return accountFields;
-    case 'subscription':
-      return subscriberFields;
-    default:
-      return undefined;
-  }
-};
-
-export const importFieldsSelector = createSelector(
+import {
   itemSelector,
+  selectorFieldsByEntity,
+} from './entitySelector';
+import {
   accountFieldsSelector,
   subscriberImportFieldsSelector,
-  selectorFieldsByEntity,
-);
+  formatFieldOptions,
+  addDefaultFieldOptions,
+} from './settingsSelector';
 
 
 export const importFieldsOptionsSelector = createSelector(
-  importFieldsSelector,
   itemSelector,
-  formatFieldOptions,
+  accountFieldsSelector,
+  subscriberImportFieldsSelector,
+  (item, accountFields, subscriberImportFields) => compose(
+    composedFields => (composedFields ? composedFields.toArray() : undefined),
+    addDefaultFieldOptions,
+    fieldsByEntity => formatFieldOptions(fieldsByEntity, item),
+    selectorFieldsByEntity,
+  )(item, accountFields, subscriberImportFields),
 );

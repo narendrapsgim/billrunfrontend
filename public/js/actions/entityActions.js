@@ -90,14 +90,7 @@ const buildRequestData = (item, action) => {
 
     case 'import': {
       const formData = new FormData();
-      const update = item.map((importedItem) => {
-        const newFrom = getItemDateValue(importedItem, 'from').format(globalSetting.apiDateTimeFormat);
-        return importedItem.withMutations((itemwithMutations) => {
-          itemwithMutations
-            .set('from', newFrom);
-        });
-      });
-      formData.append('update', JSON.stringify(update));
+      formData.append('update', JSON.stringify(item));
       return formData;
     }
 

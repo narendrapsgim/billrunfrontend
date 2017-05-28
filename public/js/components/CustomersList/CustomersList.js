@@ -2,13 +2,14 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
+import moment from 'moment';
 import EntityList from '../EntityList';
 import { LoadingItemPlaceholder, ModalWrapper } from '../Elements';
 import Importer from '../Importer';
 import { getSettings } from '../../actions/settingsActions';
 import { clearItems } from '../../actions/entityListActions';
 import { accountFieldsSelector } from '../../selectors/settingsSelector';
-import { getFieldName } from '../../common/Util';
+import { getFieldName, getConfig } from '../../common/Util';
 
 
 class CustomersList extends Component {
@@ -94,6 +95,8 @@ class CustomersList extends Component {
     const fields = this.getListFields();
     const listActions = this.getListActions();
     const actions = this.getActions();
+    const defaultFrom = moment().format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD'));
+		const defaultTo = moment().add(100, 'years').format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD'));
     return (
       <div>
         <EntityList
@@ -112,11 +115,31 @@ class CustomersList extends Component {
               { value: 'subscription', label: 'Subscriptions' },
             ]}
             onFinish={this.onCloseImprt}
+            defaultValues={{
+              customer: [{
+                key: 'from',
+                value: defaultFrom,
+              }, {
+                key: 'to',
+                value: defaultTo,
+              }],
+              subscription: [{
+                key: 'from',
+                value: defaultFrom,
+              }, {
+                key: 'to',
+                value: defaultTo,
+              }],
+            }}
             predefinedValues={{
               customer: [{
                 key: 'type',
                 value: 'account',
-              }]
+              }],
+              subscription: [{
+                key: 'type',
+                value: 'subscriber',
+              }],
             }}
           />
         </ModalWrapper>

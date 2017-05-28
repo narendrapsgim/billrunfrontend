@@ -26,8 +26,11 @@ const StepMapper = (props) => {
     return f1.label > f2.label ? 1 : -1;
   };
 
+  const filterFields = field => // filter : only Not generated and editabe fields
+    (!field.generated && field.editable);
+
   const renderFields = () => fields
-    .filter(option => !option.generated)
+    .filter(filterFields)
     .sort(soptFields)
     .map(field => (
       <MapField

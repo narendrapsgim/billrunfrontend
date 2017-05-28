@@ -213,8 +213,36 @@ export const formatFieldOptions = (fields, item = Immutable.Map()) => {
       generated: field.get('generated', false),
       unique: field.get('unique', false),
       mandatory: field.get('mandatory', false),
-    }))
-    .toArray();
+    }));
+  }
+  return undefined;
+};
+
+export const addDefaultFieldOptions = (formatedFields) => {
+  if (formatedFields) {
+    const defaultFieldsForAllEntities = [{
+      value: 'from',
+      label: 'From',
+      editable: true,
+      generated: false,
+      unique: false,
+      mandatory: true,
+    }, {
+      value: 'to',
+      label: 'To',
+      editable: true,
+      generated: false,
+      unique: false,
+      mandatory: true,
+    }];
+    return formatedFields.withMutations((fieldsWithMutations) => {
+      defaultFieldsForAllEntities
+        .filter(defaultField =>
+          formatedFields.findIndex(field => field.value === defaultField.value) === -1)
+        .forEach((defaultField) => {
+          fieldsWithMutations.push(defaultField);
+        });
+    });
   }
   return undefined;
 };

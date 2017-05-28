@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import Immutable from 'immutable';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector } from './settingsSelector';
 
@@ -55,6 +56,17 @@ const getItem = (state, props, entityName) => {
     default: {
       return state[entityName];
     }
+  }
+};
+
+export const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscriberFields) => {
+  switch (item.get('entity')) {
+    case 'customer':
+      return accountFields;
+    case 'subscription':
+      return subscriberFields;
+    default:
+      return undefined;
   }
 };
 

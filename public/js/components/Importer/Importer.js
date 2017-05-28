@@ -153,7 +153,8 @@ class Importer extends Component {
           const row = Immutable.Map().withMutations((mapWithMutations) => {
             map.forEach((csvFieldIndex, fieldName) => {
               if (csvFieldIndex !== '') {
-                mapWithMutations.set(fieldName, lines[idx][csvFieldIndex]);
+                const value = isNaN(csvFieldIndex) ? csvFieldIndex : lines[idx][csvFieldIndex];
+                mapWithMutations.set(fieldName, value);
               }
             });
             // Set predefined values

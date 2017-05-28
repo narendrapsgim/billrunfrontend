@@ -7,7 +7,7 @@ const MapField = (props) => {
   const { mapFrom, mappedTo, options } = props;
   const onChange = (value) => {
     if (value !== '') {
-      const scvIndex = value - 1;// fix react-selet 0 as value
+      const scvIndex = isNaN(value) ? value : value - 1;// fix react-selet 0 as value
       props.onChange(['map', mapFrom.value], scvIndex);
     } else {
       props.onDelete(['map', mapFrom.value]);
@@ -19,14 +19,16 @@ const MapField = (props) => {
     value: key + 1, // fix react-selet 0 as value
   }));
 
-  const value = mappedTo === '' ? '' : mappedTo + 1; // fix react-selet 0 as value
+  const value = (isNaN(mappedTo) || mappedTo === '') ? mappedTo : mappedTo + 1; // fix react-selet 0 as value
 
   const selectFiled = () => (
     <Select
+      allowCreate={true}
       onChange={onChange}
       options={filteredOptions}
       value={value}
-      placeholder="Select field to map..."
+      placeholder="Select CSV field or set default value..."
+      addLabelText={'Click to set default value "{label}" for all rows'}
     />
 );
 
@@ -62,7 +64,7 @@ MapField.propTypes = {
   mapFrom: PropTypes.object,
   mappedTo: PropTypes.oneOfType([
     PropTypes.number,
-    PropTypes.oneOf(['']),
+    PropTypes.string,
   ]),
   options: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
