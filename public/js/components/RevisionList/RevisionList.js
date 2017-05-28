@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -252,4 +253,4 @@ class RevisionList extends Component {
   }
 }
 
-export default withRouter(RevisionList);
+export default withRouter(connect()(RevisionList));
