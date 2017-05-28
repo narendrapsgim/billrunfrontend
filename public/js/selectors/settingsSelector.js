@@ -143,7 +143,7 @@ export const billrunSelector = createSelector(
 
 export const minEntityDateSelector = createSelector(
   getMinEntityDate,
-  minEntityDate => (minEntityDate ? moment.unix(minEntityDate) : minEntityDate)
+  minEntityDate => (minEntityDate ? moment.unix(minEntityDate) : moment(0))
 );
 
 export const currencySelector = createSelector(
