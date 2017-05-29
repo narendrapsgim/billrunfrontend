@@ -7,7 +7,8 @@ import { Col, Row, Panel } from 'react-bootstrap';
 import Pager from '../Pager';
 import { AdvancedFilter } from '../Filter';
 import List from '../List';
-import Queue from './Queue';import { queueListQuery } from '../../common/ApiQueries';
+import Queue from './Queue';
+import { queueListQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 
 
@@ -108,10 +109,17 @@ class QueueList extends Component {
     const filterQuery = Object.assign({}, filter);
 
     if (filterQuery.calc_name) {
-      filterQuery.calc_name = {
-        $regex: this.getPreviousCalculator(filterQuery.calc_name.$regex),
-        $options: 'i',
-      };
+      const prevCalcName = this.getPreviousCalculator(filterQuery.calc_name);
+      if (prevCalcName === false) {
+        filterQuery.calc_name = {
+          $in: [false],
+        };
+      } else {
+        filterQuery.calc_name = {
+          $regex: prevCalcName,
+          $options: 'i',
+        };
+      }
     }
 
     if (filterQuery.urt) {
