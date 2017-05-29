@@ -35,7 +35,7 @@ class CustomersList extends Component {
   componentDidMount() {
     const { accountFields } = this.props;
     if (accountFields === null || accountFields.isEmpty()) {
-      this.props.dispatch(getSettings('subscribers'));
+      this.props.dispatch(getSettings(['subscribers']));
     }
   }
 
@@ -96,7 +96,8 @@ class CustomersList extends Component {
     const listActions = this.getListActions();
     const actions = this.getActions();
     const defaultFrom = moment().format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD'));
-		const defaultTo = moment().add(100, 'years').format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD'));
+    const defaultTo = moment().add(100, 'years').format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD'));
+
     return (
       <div>
         <EntityList
@@ -110,10 +111,7 @@ class CustomersList extends Component {
         />
         <ModalWrapper show={showImport} title="Import" onHide={this.onCloseImprt}>
           <Importer
-            entityOptions={[
-              { value: 'customer', label: 'Customers' },
-              { value: 'subscription', label: 'Subscriptions' },
-            ]}
+            entityOptions={['customer', 'subscription']}
             onFinish={this.onCloseImprt}
             defaultValues={{
               customer: [{

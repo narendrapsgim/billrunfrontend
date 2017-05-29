@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { FormGroup, ControlLabel, Col, HelpBlock } from 'react-bootstrap';
+import { FormGroup, ControlLabel, Col, HelpBlock, Button } from 'react-bootstrap';
 import Select from 'react-select';
 import Papa from 'papaparse';
 import filesize from 'file-size';
+import { sentenceCase } from 'change-case';
 import { getConfig } from '../../common/Util';
 
 class StepUpload extends Component {
@@ -16,12 +17,7 @@ class StepUpload extends Component {
         label: PropTypes.string,
       }),
     ),
-    entityOptions: PropTypes.arrayOf(
-      PropTypes.shape({
-        value: PropTypes.string,
-        label: PropTypes.string,
-      }),
-    ),
+    entityOptions: PropTypes.arrayOf(PropTypes.string),
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
   }
@@ -33,10 +29,7 @@ class StepUpload extends Component {
       { value: ' ', label: 'Space' },
       { value: ',', label: 'Comma (,)' },
     ],
-    entityOptions: [
-      { value: 'customer', label: 'Customers' },
-      { value: 'subscription', label: 'Subscriptions' },
-    ],
+    entityOptions: ['customer', 'subscription'],
     onChange: () => {},
     onDelete: () => {},
   }
@@ -112,13 +105,19 @@ class StepUpload extends Component {
     return file.size <= maxBytesSize;
   };
 
+  createEntityTypeOptions = entityOptions => entityOptions.map(entityKey => ({
+    value: entityKey,
+    label: sentenceCase(getConfig(['systemItems', entityKey, 'itemName'], entityKey)),
+  }));
+
   render() {
     const { delimiterError, fileError } = this.state;
     const { item, delimiterOptions, entityOptions } = this.props;
     const delimiter = item.get('fileDelimiter', '');
     const entity = item.get('entity', '');
-
+    const fileName = item.get('fileName', '');
     const isSingleEntity = (entityOptions && entityOptions.length === 1);
+    const options = this.createEntityTypeOptions(entityOptions);
 
     return (
       <Col md={12} className="StepUpload">
@@ -128,7 +127,7 @@ class StepUpload extends Component {
             <Col sm={9}>
               <Select
                 onChange={this.onChangeEntity}
-                options={entityOptions}
+                options={options}
                 value={entity}
                 placeholder="Select entity to import...."
               />
@@ -152,8 +151,23 @@ class StepUpload extends Component {
         <FormGroup validationState={fileError === null ? null : 'error'}>
           <Col sm={3} componentClass={ControlLabel}>Upload CSV</Col>
           <Col sm={9}>
-            <input type="file" accept=".csv" onChange={this.onFileUpload} onClick={this.onFileReset} />
-            { fileError !== null && <HelpBlock>{fileError}.</HelpBlock>}
+            <div style={{ paddingTop: 5 }} >
+              {fileName !== ''
+                ? (<p style={{ margin: 0 }}>
+                  {fileName}
+                  <Button
+                    bsStyle="link"
+                    title="Remove file"
+                    onClick={this.onFileReset}
+                    style={{ padding: '0 0 0 10px', marginBottom: 1 }}
+                  >
+                    <i className="fa fa-minus-circle danger-red" />
+                  </Button>
+                </p>)
+                : <input type="file" accept=".csv" onChange={this.onFileUpload} onClick={this.onFileReset} />
+              }
+              {fileError !== null && <HelpBlock>{fileError}.</HelpBlock>}
+            </div>
           </Col>
         </FormGroup>
       </Col>

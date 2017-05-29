@@ -28,12 +28,7 @@ class Importer extends Component {
     importFields: PropTypes.array,
     predefinedValues: PropTypes.object,
     defaultValues: PropTypes.object,
-    entityOptions: PropTypes.arrayOf(
-      PropTypes.shape({
-        value: PropTypes.string,
-        label: PropTypes.string,
-      }),
-    ),
+    entityOptions: PropTypes.arrayOf(PropTypes.string),
     onFinish: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   }
@@ -68,7 +63,7 @@ class Importer extends Component {
     this.props.dispatch(initImporter());
     const isSingleEntity = (entityOptions && entityOptions.length === 1);
     if (isSingleEntity) {
-      this.onChange('entity', entityOptions[0].value);
+      this.onChange('entity', entityOptions[0]);
     }
   }
 
