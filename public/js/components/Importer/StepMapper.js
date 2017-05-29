@@ -5,7 +5,7 @@ import MapField from './MapField';
 
 
 const StepMapper = (props) => {
-  const { item, fields } = props;
+  const { item, fields, mapperPrefix } = props;
   const fileContent = item.get('fileContent', []) || [];
   const headers = fileContent[0];
 
@@ -36,8 +36,9 @@ const StepMapper = (props) => {
       <MapField
         key={`header_${field.value}`}
         mapFrom={field}
-        mappedTo={item.getIn(['map', field.value], '')}
+        mapTo={item.getIn(['map', field.value], '')}
         options={headers}
+        mapperPrefix={mapperPrefix}
         onChange={props.onChange}
         onDelete={props.onDelete}
       />
@@ -63,6 +64,7 @@ const StepMapper = (props) => {
 StepMapper.defaultProps = {
   item: Immutable.Map(),
   fields: [],
+  mapperPrefix: '',
   onChange: () => {},
   onDelete: () => {},
 };
@@ -70,6 +72,7 @@ StepMapper.defaultProps = {
 StepMapper.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
   fields: PropTypes.array,
+  mapperPrefix: PropTypes.string,
   onChange: PropTypes.func,
   onDelete: PropTypes.func,
 };

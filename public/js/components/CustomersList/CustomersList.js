@@ -129,16 +129,6 @@ class CustomersList extends Component {
                 value: defaultTo,
               }],
             }}
-            predefinedValues={{
-              customer: [{
-                key: 'type',
-                value: 'account',
-              }],
-              subscription: [{
-                key: 'type',
-                value: 'subscriber',
-              }],
-            }}
           />
         </ModalWrapper>
       </div>

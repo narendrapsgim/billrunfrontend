@@ -56,6 +56,7 @@ class Importer extends Component {
   state = {
     status: 'create',
     stepIndex: 0,
+    mapperPrefix: 'csvindex-',
   }
 
   componentDidMount() {
@@ -136,6 +137,7 @@ class Importer extends Component {
 
   getFormatedRows = (limit = -1) => {
     const { item, predefinedValues, defaultValues } = this.props;
+    const { mapperPrefix } = this.state;
     const lines = item.get('fileContent', []);
     const entity = item.get('entity', []);
     const map = item.get('map', Immutable.List());
@@ -146,10 +148,12 @@ class Importer extends Component {
         // Ignore first (headers) line
         for (let idx = 1; idx < linesToParse; idx++) {
           const row = Immutable.Map().withMutations((mapWithMutations) => {
-            map.forEach((csvFieldIndex, fieldName) => {
-              if (csvFieldIndex !== '') {
-                const value = isNaN(csvFieldIndex) ? csvFieldIndex : lines[idx][csvFieldIndex];
-                mapWithMutations.set(fieldName, value);
+            map.forEach((mapperValue, fieldName) => {
+              if (mapperValue.startsWith(mapperPrefix)) {
+                const csvIndex = mapperValue.substring(mapperPrefix.length);
+                mapWithMutations.set(fieldName, lines[idx][csvIndex]);
+              } else {
+                mapWithMutations.set(fieldName, mapperValue);
               }
             });
             // Set predefined values
@@ -213,7 +217,7 @@ class Importer extends Component {
 
   renderStepContent = () => {
     const { item, importFields: fields, entityOptions } = this.props;
-    const { stepIndex } = this.state;
+    const { stepIndex, mapperPrefix } = this.state;
 
     switch (stepIndex) {
       case 0: return (
@@ -225,7 +229,13 @@ class Importer extends Component {
         />
       );
       case 1: return (
-        <StepMapper item={item} onChange={this.onChange} onDelete={this.onDelete} fields={fields} />
+        <StepMapper
+          item={item}
+          onChange={this.onChange}
+          onDelete={this.onDelete}
+          fields={fields}
+          mapperPrefix={mapperPrefix}
+        />
       );
       case 2: return (
         <StepValidate fields={fields} getFormatedRows={this.getFormatedRows} />

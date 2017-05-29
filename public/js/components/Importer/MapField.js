@@ -4,11 +4,11 @@ import Select from 'react-select';
 
 
 const MapField = (props) => {
-  const { mapFrom, mappedTo, options } = props;
+  const { mapFrom, mapTo, options, mapperPrefix } = props;
+
   const onChange = (value) => {
     if (value !== '') {
-      const scvIndex = isNaN(value) ? value : value - 1;// fix react-selet 0 as value
-      props.onChange(['map', mapFrom.value], scvIndex);
+      props.onChange(['map', mapFrom.value], value);
     } else {
       props.onDelete(['map', mapFrom.value]);
     }
@@ -16,17 +16,15 @@ const MapField = (props) => {
 
   const filteredOptions = options.map((option, key) => ({
     label: option,
-    value: key + 1, // fix react-selet 0 as value
+    value: `${mapperPrefix}${key}`,
   }));
-
-  const value = (isNaN(mappedTo) || mappedTo === '') ? mappedTo : mappedTo + 1; // fix react-selet 0 as value
 
   const selectFiled = () => (
     <Select
       allowCreate={true}
       onChange={onChange}
       options={filteredOptions}
-      value={value}
+      value={mapTo}
       placeholder="Select CSV field or set default value..."
       addLabelText={'Click to set default value "{label}" for all rows'}
     />
@@ -54,18 +52,20 @@ const MapField = (props) => {
 
 MapField.defaultProps = {
   mapFrom: '',
-  mappedTo: '',
+  mapTo: '',
   options: [],
+  mapperPrefix: 'csvindex-',
   onChange: () => {},
   onDelete: () => {},
 };
 
 MapField.propTypes = {
   mapFrom: PropTypes.object,
-  mappedTo: PropTypes.oneOfType([
+  mapTo: PropTypes.oneOfType([
     PropTypes.number,
     PropTypes.string,
   ]),
+  mapperPrefix: PropTypes.string,
   options: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
   onDelete: PropTypes.func,
