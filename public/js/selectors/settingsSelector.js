@@ -28,15 +28,51 @@ const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
 const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['subscribers', 'subscriber', 'fields']);
 
-const selectSubscriberImportFields = (fields) => {
+const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
+    const importLinkers = accountfields.filter(field => (
+      field.get('unique', false)
+      && field.get('mandatory', false)
+      && !field.get('generated', false)
+      && field.get('editable', true)
+    ));
+    if (importLinkers.size > 0) {
+      return fields.withMutations((fieldsWithMutations) => {
+        importLinkers.forEach((importLinker) => {
+          fieldsWithMutations.push(Immutable.Map({
+            linker: true,
+            field_name: importLinker.get('field_name', 'linker'),
+            title: importLinker.get('title', importLinker.get('field_name', 'linker')),
+          }));
+        });
+      });
+    }
     return fields.push(Immutable.Map({
-      unique: true,
-      generated: false,
-      mandatory: true,
-      field_name: 'account_unique',
-      title: 'Account unique field',
+      linker: true,
+      field_name: 'account_import_id',
+      title: 'Account Import ID',
     }));
+  }
+  return fields;
+};
+
+const selectAccountImportFields = (fields) => {
+  if (fields) {
+    const existImportLinker = fields.findIndex(field => (
+      field.get('unique', false)
+      && field.get('mandatory', false)
+      && !field.get('generated', false)
+      && field.get('editable', true)
+    ));
+    return (existImportLinker === -1)
+      ? fields.push(Immutable.Map({
+          unique: true,
+          generated: false,
+          mandatory: true,
+          field_name: 'account_import_id',
+          title: 'Account Import ID (for subscriber import22)',
+        }))
+      : fields;
   }
   return fields;
 };
@@ -193,6 +229,11 @@ export const accountFieldsSelector = createSelector(
   accountFields => accountFields,
 );
 
+export const accountImportFieldsSelector = createSelector(
+  accountFieldsSelector,
+  selectAccountImportFields,
+);
+
 export const subscriberFieldsSelector = createSelector(
   getSubscriberFields,
   subscriberFields => subscriberFields,
@@ -200,6 +241,7 @@ export const subscriberFieldsSelector = createSelector(
 
 export const subscriberImportFieldsSelector = createSelector(
   subscriberFieldsSelector,
+  accountImportFieldsSelector,
   selectSubscriberImportFields,
 );
 
@@ -213,6 +255,7 @@ export const formatFieldOptions = (fields, item = Immutable.Map()) => {
       generated: field.get('generated', false),
       unique: field.get('unique', false),
       mandatory: field.get('mandatory', false),
+      linker: field.get('linker', false),
     }));
   }
   return undefined;

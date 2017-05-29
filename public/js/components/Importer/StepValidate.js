@@ -27,6 +27,7 @@ const StepValidate = ({ fields, getFormatedRows }) => {
       <div className="row-fields scrollbox">
         { rows
           .get(0, Immutable.Map())
+          .filter((value, fieldName) => fieldName !== '__LINKER__')
           .map(renderRow)
           .toArray()
         }

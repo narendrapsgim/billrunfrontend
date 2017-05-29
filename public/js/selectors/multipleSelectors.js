@@ -12,7 +12,7 @@ import {
   selectorFieldsByEntity,
 } from './entitySelector';
 import {
-  accountFieldsSelector,
+  accountImportFieldsSelector,
   subscriberImportFieldsSelector,
   formatFieldOptions,
   addDefaultFieldOptions,
@@ -21,7 +21,7 @@ import {
 
 export const importFieldsOptionsSelector = createSelector(
   itemSelector,
-  accountFieldsSelector,
+  accountImportFieldsSelector,
   subscriberImportFieldsSelector,
   (item, accountFields, subscriberImportFields) => compose(
     composedFields => (composedFields ? composedFields.toArray() : undefined),

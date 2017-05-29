@@ -1,13 +1,31 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Col, Label } from 'react-bootstrap';
+import { Col, Label, FormGroup, ControlLabel } from 'react-bootstrap';
+import Select from 'react-select';
 import MapField from './MapField';
 
 
 const StepMapper = (props) => {
   const { item, fields, mapperPrefix } = props;
   const fileContent = item.get('fileContent', []) || [];
+  const linkerField = item.getIn(['linker', 'field'], '') || '';
+  const linkerValue = item.getIn(['linker', 'value'], '') || '';
   const headers = fileContent[0];
+
+  const onChangeLinkerField = (value) => {
+    if (value !== '') {
+      props.onChange(['linker', 'field'], value);
+    } else {
+      props.onDelete(['linker', 'field']);
+    }
+  };
+  const onChangeLinkerValue = (value) => {
+    if (value !== '') {
+      props.onChange(['linker', 'value'], value);
+    } else {
+      props.onDelete(['linker', 'value']);
+    }
+  };
 
   const soptFields = (f1, f2) => {
     // Sort by : mandatory -> unique -> other by ABC
@@ -27,7 +45,52 @@ const StepMapper = (props) => {
   };
 
   const filterFields = field => // filter : only Not generated and editabe fields
-    (!field.generated && field.editable);
+    (!field.generated && field.editable && (!field.hasOwnProperty('linker') || !field.linker));
+
+  const renderLinkers = () => {
+    const linkersOptions = fields
+      .filter(field => (field.hasOwnProperty('linker') && field.linker))
+      .map(field => ({
+        value: field.value,
+        label: field.label,
+      }));
+
+    const csvFields = headers.map((option, index) => ({
+      label: option,
+      value: `${mapperPrefix}${index}`,
+    }));
+
+    if (linkersOptions.length === 0) {
+      return null;
+    }
+
+    return (
+      <div>
+        <FormGroup>
+          <Col sm={3} componentClass={ControlLabel}>Link to field</Col>
+          <Col sm={9}>
+            <Select
+              onChange={onChangeLinkerField}
+              options={linkersOptions}
+              value={linkerField}
+              placeholder="Select field to link..."
+            />
+          </Col>
+        </FormGroup>
+        <FormGroup>
+          <Col sm={3} componentClass={ControlLabel}>Link by value from</Col>
+          <Col sm={9}>
+            <Select
+              onChange={onChangeLinkerValue}
+              options={csvFields}
+              value={linkerValue}
+              placeholder="Select CSV field to link..."
+            />
+          </Col>
+        </FormGroup>
+      </div>
+    );
+  };
 
   const renderFields = () => fields
     .filter(filterFields)
@@ -51,7 +114,22 @@ const StepMapper = (props) => {
     if (headers.length === 0) {
       return (<Label bsStyle="default">No CSV headers was found, please check your file.</Label>);
     }
-    return renderFields();
+
+    const mapfields = renderFields();
+    const linkers = renderLinkers();
+
+    return (
+      <div>
+        <div>{mapfields}</div>
+        {linkers !== null && (
+          <div>
+            <hr />
+            <h4>Linker</h4>
+            {linkers}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (

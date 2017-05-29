@@ -139,6 +139,7 @@ class Importer extends Component {
     const { item, predefinedValues, defaultValues } = this.props;
     const { mapperPrefix } = this.state;
     const lines = item.get('fileContent', []);
+    const linker = item.get('linker', null);
     const entity = item.get('entity', []);
     const map = item.get('map', Immutable.List());
 
@@ -169,6 +170,14 @@ class Importer extends Component {
                   mapWithMutations.set(defaultValue.key, defaultValue.value);
                 }
               });
+            }
+            // Set linker for entities with parent<->child relationship 
+            if (linker !== null && linker.get('field', '') !== '' && linker.get('value', '') !== '') {
+              const csvIndex = linker.get('value', '').substring(mapperPrefix.length);
+              mapWithMutations.set('__LINKER__', Immutable.Map({
+                field: linker.get('field', ''),
+                value: lines[idx][csvIndex],
+              }));
             }
           });
           rowsWithMutations.push(row);
