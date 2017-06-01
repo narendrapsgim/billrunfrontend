@@ -171,7 +171,7 @@ class Importer extends Component {
                 }
               });
             }
-            // Set linker for entities with parent<->child relationship 
+            // Set linker for entities with parent<->child relationship
             if (linker !== null && linker.get('field', '') !== '' && linker.get('value', '') !== '') {
               const csvIndex = linker.get('value', '').substring(mapperPrefix.length);
               mapWithMutations.set('__LINKER__', Immutable.Map({

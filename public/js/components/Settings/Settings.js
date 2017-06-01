@@ -132,7 +132,7 @@ class Settings extends Component {
 
     const currency = settings.getIn(['pricing', 'currency'], '');
     const datetime = settings.get('billrun', Immutable.Map());
-    const sharedSecret = settings.get('shared_secret', Immutable.Map());
+    const sharedSecret = settings.get('shared_secret', Immutable.List());
     const tenant = settings.get('tenant', Immutable.Map());
     const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
     const mainMenu = prossessMenuTree(combineMenuOverrides(mainMenuOverrides), 'root');
@@ -178,7 +178,7 @@ class Settings extends Component {
 
         </Tabs>
 
-        <ActionButtons onClickSave={this.onSave} hideCancel={true} />
+        <ActionButtons onClickSave={this.onSave} hideCancel={true} hideSave={activeTab === 5} />
 
       </div>
     );

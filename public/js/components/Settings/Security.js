@@ -1,28 +1,146 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
+import moment from 'moment';
 import Immutable from 'immutable';
-import { Form, FormControl, FormGroup, Col, ControlLabel } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
+import { Panel, Col, Row, Button } from 'react-bootstrap';
+import List from '../../components/List';
+import { getItemDateValue, getConfig } from '../../common/Util';
+import { StateIcon, ConfirmModal } from '../Elements';
+import { getSettings, saveSharedSecret } from '../../actions/settingsActions';
+import SecurityForm from './Security/SecurityForm';
 
-const Security = ({ data }) => (
-  <div className="Security">
-    <Form horizontal>
-      <FormGroup controlId="security-key" key="security-key">
-        <Col componentClass={ControlLabel} md={2}>
-          Secret Key
-        </Col>
-        <Col sm={6}>
-          <FormControl type="text" name="security-key" disabled={true} value={data.get('key', '')} />
-        </Col>
-      </FormGroup>
-    </Form>
-  </div>
-);
+class Security extends Component {
 
-Security.defaultProps = {
-  data: Immutable.Map(),
-};
+  static propTypes = {
+    data: PropTypes.instanceOf(Immutable.List),
+    dispatch: PropTypes.func.isRequired,
+  };
 
-Security.propTypes = {
-  data: PropTypes.instanceOf(Immutable.Map),
-};
+  static defaultProps = {
+    data: Immutable.List(),
+  };
+  state = {
+    showConfirmRemove: false,
+    itemToRemove: null,
+    currentItem: null,
+  }
 
-export default Security;
+  parseDate = (item, field) => {
+    const date = getItemDateValue(item, field.id, false);
+    return date ? date.format(getConfig('dateFormat', 'DD/MM/YYYY')) : '';
+  }
+
+  parserState = item => (
+    <StateIcon
+      from={getItemDateValue(item, 'from', moment(0)).toISOString()}
+      to={getItemDateValue(item, 'to', moment(0)).toISOString()}
+    />
+  );
+
+  onClickEdit = (item) => {
+    this.setState({ currentItem: item });
+  };
+
+  onClickRemove = (item) => {
+    this.setState({
+      showConfirmRemove: true,
+      itemToRemove: item,
+    });
+  }
+
+  onClickRemoveClose = () => {
+    this.setState({
+      showConfirmRemove: false,
+      itemToRemove: null,
+    });
+  }
+
+  onCancel = () => {
+    this.setState({ currentItem: null });
+  }
+
+  handleSave = (secret, action) => {
+    this.props.dispatch(saveSharedSecret(secret, action)).then(this.afterSave);
+  }
+
+  afterSave = (response) => {
+    if (response.status === 1) {
+      this.setState({ currentItem: null });
+      this.props.dispatch(getSettings(['shared_secret']));
+    }
+  }
+
+  onClickRemoveOk = () => {
+    const { itemToRemove } = this.state;
+    const key = itemToRemove.get('key', '');
+    this.props.dispatch(saveSharedSecret(key, 'remove')).then(this.afterRemove);
+  }
+
+  afterRemove = (response) => {
+    if (response.status === 1) {
+      this.setState({ showConfirmRemove: false, itemToRemove: null });
+      this.props.dispatch(getSettings(['shared_secret']));
+    }
+  }
+
+  onClickNew = () => {
+    this.setState({ currentItem: Immutable.Map() });
+  }
+
+  renderPanelHeader = () => {
+    return (
+      <div>
+        List of all available keys
+        <div className="pull-right">
+          <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}>
+            <i className="fa fa-plus" />&nbsp;Add New
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  renderList = () => {
+    const { data } = this.props;
+    const fields = this.getListFields();
+    const actions = this.getListActions();
+    return (
+      <List items={data} fields={fields} edit={false} actions={actions} />
+    );
+  }
+
+  getListFields = () => [
+    { id: 'state', title: 'Status', parser: this.parserState, cssClass: 'state' },
+    { id: 'name', title: 'Name' },
+    { id: 'key', title: 'Secret Key' },
+    { id: 'from', title: 'Creation Date', parser: this.parseDate, cssClass: 'short-date' },
+    { id: 'to', title: 'Expiration Date', parser: this.parseDate, cssClass: 'short-date' },
+  ]
+
+  getListActions = () => [
+    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEdit },
+    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove },
+  ]
+
+  render() {
+    const { showConfirmRemove, currentItem } = this.state;
+    const removeConfirmMessage = 'Are you sure you want to remove this key ?';
+
+    return (
+      <div>
+        <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
+        <Row>
+          <Col lg={12}>
+            <Panel header={this.renderPanelHeader()}>
+              { this.renderList() }
+            </Panel>
+          </Col>
+        </Row>
+        { currentItem !== null && <SecurityForm item={currentItem} show={true} onSave={this.handleSave} onCancel={this.onCancel} /> }
+      </div>
+    );
+  }
+}
+
+export default withRouter(connect()(Security));

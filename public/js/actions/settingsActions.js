@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
-import { getCurrenciesQuery } from '../common/ApiQueries';
+import { getCurrenciesQuery, saveSharedSecretQuery, disableSharedSecretQuery } from '../common/ApiQueries';
 
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
@@ -222,4 +222,18 @@ export const getCurrencies = () => (dispatch) => {
       return data;
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving currencies')));
+};
+
+export const saveSharedSecret = (secret, mode) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = (mode === 'remove') ? disableSharedSecretQuery(secret) : saveSharedSecretQuery(secret);
+  return apiBillRun(query)
+    .then((success) => {
+      let action = (['create'].includes(mode)) ? 'created' : '';
+      if (action === '') {
+        action = (['remove'].includes(mode)) ? 'removed' : 'updated';
+      }
+      return dispatch(apiBillRunSuccessHandler(success, `The secret key was ${action}`));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Secret')));
 };
