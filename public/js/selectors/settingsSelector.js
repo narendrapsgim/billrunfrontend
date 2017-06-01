@@ -256,25 +256,29 @@ export const formatFieldOptions = (fields, item = Immutable.Map()) => {
   return undefined;
 };
 
-export const addDefaultFieldOptions = (formatedFields) => {
+export const addDefaultFieldOptions = (formatedFields, item = Immutable.Map()) => {
   if (formatedFields) {
-    const defaultFieldsForAllEntities = [{
-      value: 'from',
-      label: 'From',
-      editable: true,
-      generated: false,
-      unique: false,
-      mandatory: true,
-    }, {
-      value: 'to',
-      label: 'To',
-      editable: true,
-      generated: false,
-      unique: false,
-      mandatory: true,
-    }];
+    const entity = item.get('entity', '');
+    const defaultFieldsByEntity = {
+      subscription: [{
+        value: 'from',
+        label: 'From',
+        editable: true,
+        generated: false,
+        unique: false,
+        mandatory: true,
+      }, {
+        value: 'to',
+        label: 'To',
+        editable: true,
+        generated: false,
+        unique: false,
+        mandatory: true,
+      }],
+    };
     return formatedFields.withMutations((fieldsWithMutations) => {
-      defaultFieldsForAllEntities
+      const defaultFields = defaultFieldsByEntity[entity] || [];
+      defaultFields
         .filter(defaultField =>
           formatedFields.findIndex(field => field.value === defaultField.value) === -1)
         .forEach((defaultField) => {

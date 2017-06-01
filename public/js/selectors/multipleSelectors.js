@@ -25,7 +25,7 @@ export const importFieldsOptionsSelector = createSelector(
   subscriberImportFieldsSelector,
   (item, accountFields, subscriberImportFields) => compose(
     composedFields => (composedFields ? composedFields.toArray() : undefined),
-    addDefaultFieldOptions,
+    fieldsByEntity => addDefaultFieldOptions(fieldsByEntity, item),
     fieldsByEntity => formatFieldOptions(fieldsByEntity, item),
     selectorFieldsByEntity,
   )(item, accountFields, subscriberImportFields),
