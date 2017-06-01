@@ -37,10 +37,34 @@ class CustomFields extends Component {
 
   state = {
     tab: 0,
+    subscriber: Immutable.List(),
+    account: Immutable.List(),
   };
 
   componentDidMount() {
+    this.fetchFields();
+  }
+
+  componentWillUnmount() {
+    // reset unsaved fields changes
     this.props.dispatch(getSettings('subscribers'));
+  }
+
+  fetchFields = () => {
+    this.props.dispatch(getSettings('subscribers')).then(this.afterReceiveSettings);
+  }
+
+  afterSave = (response) => {
+    if (response) {
+      this.fetchFields();
+    }
+  }
+
+  afterReceiveSettings = (response) => {
+    const { account, subscriber } = this.props;
+    if (response) {
+      this.setState({ account, subscriber });
+    }
   }
 
   onChangeField = (entity, index, id, value) => {
@@ -65,7 +89,7 @@ class CustomFields extends Component {
   }
 
   onClickSave = () => {
-    this.props.dispatch(saveSettings('subscribers'));
+    this.props.dispatch(saveSettings('subscribers')).then(this.afterSave);
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
@@ -80,21 +104,27 @@ class CustomFields extends Component {
   };
 
   renderFieldsTab = (entity, key) => {
+    const existingEntityFields = this.state[entity];
+    const entityFields = this.props[entity];
     const defaultDisabledFields = this.props.defaultDisabledFields[entity];
     const defaultHiddenFields = this.props.defaultHiddenFields[entity];
-    const entityFields = this.props[entity];
     const fields = [];
     entityFields.forEach((field, index) => {
       if (!field.get('generated', false) && !defaultHiddenFields.includes(field.get('field_name', ''))) {
+        const existing = existingEntityFields.findIndex(existingEntityField =>
+          existingEntityField.get('field_name', '') === field.get('field_name', '')
+        ) !== -1;
         const editable = !field.get('system', false) && !defaultDisabledFields.includes(field.get('field_name', ''));
+        const fieldKey = existing ? `item-${entity}-${field.get('field_name', index)}` : `item-${entity}-${index}`
         fields.push(
           <CustomField
-            key={`item-${index}`}
+            key={fieldKey}
             index={index}
             idx={index}
             field={field}
             entity={entity}
             editable={editable}
+            existing={existing}
             onChange={this.onChangeField}
             onRemove={this.onRemoveField}
           />
