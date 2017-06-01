@@ -2,7 +2,12 @@ import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { sentenceCase } from 'change-case';
-import { getFieldName, getFieldNameType, getConfig } from '../common/Util';
+import {
+  getFieldName,
+  getFieldNameType,
+  getConfig,
+  isLinkerField,
+} from '../common/Util';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
@@ -30,12 +35,7 @@ const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-v
 
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
-    const importLinkers = accountfields.filter(field => (
-      field.get('unique', false)
-      && field.get('mandatory', false)
-      && !field.get('generated', false)
-      && field.get('editable', true)
-    ));
+    const importLinkers = accountfields.filter(isLinkerField);
     if (importLinkers.size > 0) {
       return fields.withMutations((fieldsWithMutations) => {
         importLinkers.forEach((importLinker) => {
@@ -58,20 +58,16 @@ const selectSubscriberImportFields = (fields, accountfields) => {
 
 const selectAccountImportFields = (fields) => {
   if (fields) {
-    const existImportLinker = fields.findIndex(field => (
-      field.get('unique', false) === true
-      && field.get('generated', false) === false
-      && field.get('editable', true) === true
-    ));
-    return (existImportLinker === -1)
-      ? fields.push(Immutable.Map({
+    const existImportLinker = fields.findIndex(isLinkerField);
+    return (existImportLinker !== -1)
+      ? fields
+      : fields.push(Immutable.Map({
         unique: true,
         generated: false,
         mandatory: true,
         field_name: 'account_import_id',
         title: 'Account Import ID (for subscriber import)',
-      }))
-      : fields;
+      }));
   }
   return fields;
 };

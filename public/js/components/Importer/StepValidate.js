@@ -6,6 +6,21 @@ import Field from '../Field';
 const StepValidate = ({ fields, getFormatedRows }) => {
   const rows = getFormatedRows(1);
 
+  const renderLinker = linker => (
+    <div key="linker-validate">
+      <hr />
+      <h5>Linker</h5>
+      <FormGroup>
+        <Col sm={3} componentClass={ControlLabel}>
+          { linker.get('field', '') }
+        </Col>
+        <Col sm={9}>
+          <Field value={linker.get('value', '')} disabled={true} />
+        </Col>
+      </FormGroup>
+    </div>
+  );
+
   const renderRow = (value, fieldName) => {
     const curField = fields.find(field => field.value === fieldName);
     return (
@@ -31,6 +46,13 @@ const StepValidate = ({ fields, getFormatedRows }) => {
           .map(renderRow)
           .toArray()
         }
+        { rows
+          .get(0, Immutable.Map())
+          .filter((value, fieldName) => fieldName === '__LINKER__')
+          .map(renderLinker)
+          .toArray()
+        }
+
       </div>
     </Col>
   );

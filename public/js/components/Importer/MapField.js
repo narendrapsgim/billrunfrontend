@@ -4,7 +4,7 @@ import Select from 'react-select';
 
 
 const MapField = (props) => {
-  const { mapFrom, mapTo, options, mapperPrefix } = props;
+  const { mapFrom, mapTo, options } = props;
 
   const onChange = (value) => {
     if (value !== '') {
@@ -14,16 +14,11 @@ const MapField = (props) => {
     }
   };
 
-  const filteredOptions = options.map((option, key) => ({
-    label: option,
-    value: `${mapperPrefix}${key}`,
-  }));
-
   const selectFiled = () => (
     <Select
       allowCreate={true}
       onChange={onChange}
-      options={filteredOptions}
+      options={options}
       value={mapTo}
       placeholder="Select CSV field or set default value..."
       addLabelText={'Click to set default value "{label}" for all rows'}
@@ -54,7 +49,6 @@ MapField.defaultProps = {
   mapFrom: '',
   mapTo: '',
   options: [],
-  mapperPrefix: 'csvindex-',
   onChange: () => {},
   onDelete: () => {},
 };
@@ -65,8 +59,12 @@ MapField.propTypes = {
     PropTypes.number,
     PropTypes.string,
   ]),
-  mapperPrefix: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.string),
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
+    }),
+  ),
   onChange: PropTypes.func,
   onDelete: PropTypes.func,
 };

@@ -26,6 +26,7 @@ class Importer extends Component {
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     importFields: PropTypes.array,
+    ignoredHeaders: PropTypes.array,
     predefinedValues: PropTypes.object,
     defaultValues: PropTypes.object,
     entityOptions: PropTypes.arrayOf(PropTypes.string),
@@ -50,13 +51,17 @@ class Importer extends Component {
     //     value: 'Def Com name',
     //   }]
     // }}
+    ignoredHeaders: [
+      'import_error_message',
+      'import_error_row',
+    ], // csv comuns that will not shown as option
     onFinish: () => {},
   };
 
   state = {
     status: 'create',
     stepIndex: 0,
-    mapperPrefix: 'csvindex-',
+    mapperPrefix: '__csvindex__',
   }
 
   componentDidMount() {
@@ -225,7 +230,7 @@ class Importer extends Component {
   }
 
   renderStepContent = () => {
-    const { item, importFields: fields, entityOptions } = this.props;
+    const { item, importFields: fields, entityOptions, ignoredHeaders } = this.props;
     const { stepIndex, mapperPrefix } = this.state;
 
     switch (stepIndex) {
@@ -243,6 +248,7 @@ class Importer extends Component {
           onChange={this.onChange}
           onDelete={this.onDelete}
           fields={fields}
+          ignoredHeaders={ignoredHeaders}
           mapperPrefix={mapperPrefix}
         />
       );

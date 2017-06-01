@@ -6,11 +6,11 @@ import MapField from './MapField';
 
 
 const StepMapper = (props) => {
-  const { item, fields, mapperPrefix } = props;
+  const { item, fields, ignoredHeaders, mapperPrefix } = props;
   const fileContent = item.get('fileContent', []) || [];
   const linkerField = item.getIn(['linker', 'field'], '') || '';
   const linkerValue = item.getIn(['linker', 'value'], '') || '';
-  const headers = fileContent[0];
+  const headers = fileContent[0] || [];
 
   const onChangeLinkerField = (value) => {
     if (value !== '') {
@@ -41,11 +41,21 @@ const StepMapper = (props) => {
     if (!f1.unique && f2.unique) {
       return 1;
     }
-    return f1.label > f2.label ? 1 : -1;
+
+    const indexf1 = fields.findIndex(field => field.value === f1.value);
+    const indexf2 = fields.findIndex(field => field.value === f2.value);
+    return indexf1 > indexf2 ? 1 : -1;
   };
 
   const filterFields = field => // filter : only Not generated and editabe fields
     (!field.generated && field.editable && (!field.hasOwnProperty('linker') || !field.linker));
+
+  const csvHeaders = headers
+    .map((header, key) => ({
+      label: header,
+      value: `${mapperPrefix}${key}`,
+    }))
+    .filter(option => !ignoredHeaders.includes(option.label));
 
   const renderLinkers = () => {
     const linkersOptions = fields
@@ -54,11 +64,6 @@ const StepMapper = (props) => {
         value: field.value,
         label: field.label,
       }));
-
-    const csvFields = headers.map((option, index) => ({
-      label: option,
-      value: `${mapperPrefix}${index}`,
-    }));
 
     if (linkersOptions.length === 0) {
       return null;
@@ -82,7 +87,7 @@ const StepMapper = (props) => {
           <Col sm={9}>
             <Select
               onChange={onChangeLinkerValue}
-              options={csvFields}
+              options={csvHeaders}
               value={linkerValue}
               placeholder="Select CSV field to link..."
             />
@@ -100,7 +105,7 @@ const StepMapper = (props) => {
         key={`header_${field.value}`}
         mapFrom={field}
         mapTo={item.getIn(['map', field.value], '')}
-        options={headers}
+        options={csvHeaders}
         mapperPrefix={mapperPrefix}
         onChange={props.onChange}
         onDelete={props.onDelete}
@@ -142,6 +147,7 @@ const StepMapper = (props) => {
 StepMapper.defaultProps = {
   item: Immutable.Map(),
   fields: [],
+  ignoredHeaders: [],
   mapperPrefix: '',
   onChange: () => {},
   onDelete: () => {},
@@ -150,6 +156,7 @@ StepMapper.defaultProps = {
 StepMapper.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
   fields: PropTypes.array,
+  ignoredHeaders: PropTypes.array,
   mapperPrefix: PropTypes.string,
   onChange: PropTypes.func,
   onDelete: PropTypes.func,

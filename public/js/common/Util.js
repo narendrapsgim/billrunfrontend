@@ -176,3 +176,9 @@ export const parseConfigSelectOptions = configOption => formatSelectOptions(
     ? Immutable.Map({ value: configOption.get('id'), label: configOption.get('title') })
     : configOption.get('id')
 );
+
+export const isLinkerField = (field = Immutable.Map()) => (
+  field.get('unique', false) &&
+  !field.get('generated', false) &&
+  field.get('editable', true)
+);
