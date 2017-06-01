@@ -29,6 +29,10 @@ class UserSetup extends Component {
     user: Immutable.Map(),
   };
 
+  state = {
+    username: '',
+  };
+
   componentDidMount() {
     const { itemId, mode } = this.props;
     if (itemId) {
@@ -42,10 +46,13 @@ class UserSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    const { username } = this.state;
     const { item, mode } = nextProps;
-    const { item: olditem } = this.props;
-    if (mode === 'update' && olditem.get('username', '') !== item.get('username', '')) {
-      this.props.dispatch(setPageTitle(`Edit user - ${item.get('username', '')}`));
+    if (username === '') {
+      this.setState({ username: item.get('username', '') });
+    }
+    if (mode === 'update' && username !== '') {
+      this.props.dispatch(setPageTitle(`Edit user - ${username}`));
     }
   }
 
