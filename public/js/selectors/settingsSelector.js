@@ -59,19 +59,18 @@ const selectSubscriberImportFields = (fields, accountfields) => {
 const selectAccountImportFields = (fields) => {
   if (fields) {
     const existImportLinker = fields.findIndex(field => (
-      field.get('unique', false)
-      && field.get('mandatory', false)
-      && !field.get('generated', false)
-      && field.get('editable', true)
+      field.get('unique', false) === true
+      && field.get('generated', false) === false
+      && field.get('editable', true) === true
     ));
     return (existImportLinker === -1)
       ? fields.push(Immutable.Map({
-          unique: true,
-          generated: false,
-          mandatory: true,
-          field_name: 'account_import_id',
-          title: 'Account Import ID (for subscriber import22)',
-        }))
+        unique: true,
+        generated: false,
+        mandatory: true,
+        field_name: 'account_import_id',
+        title: 'Account Import ID (for subscriber import)',
+      }))
       : fields;
   }
   return fields;
