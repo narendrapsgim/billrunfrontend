@@ -1,10 +1,10 @@
 import React, { PropTypes } from 'react';
-import { FormGroup, ControlLabel, Col, Label, InputGroup } from 'react-bootstrap';
+import { FormGroup, ControlLabel, Col, Label, InputGroup, HelpBlock } from 'react-bootstrap';
 import Select from 'react-select';
 
 
 const MapField = (props) => {
-  const { mapFrom, mapTo, options } = props;
+  const { mapFrom, mapTo, defaultValue, options } = props;
 
   const onChange = (value) => {
     if (value !== '') {
@@ -25,7 +25,7 @@ const MapField = (props) => {
     />
 );
 
-  const mandatory = mapFrom.mandatory ? <span className="danger-red"> *</span> : '';
+  const mandatory = (mapFrom.mandatory && defaultValue.length === 0) ? <span className="danger-red"> *</span> : '';
   const unique = mapFrom.unique ? <Label bsStyle="info">Unique field</Label> : '';
   return (
     <FormGroup>
@@ -40,6 +40,7 @@ const MapField = (props) => {
             </InputGroup>
           )
         }
+        {defaultValue.length > 0 && <HelpBlock>Default value if no value is selected: <Label bsStyle="primary">{defaultValue}</Label></HelpBlock>}
       </Col>
     </FormGroup>
   );
@@ -48,6 +49,7 @@ const MapField = (props) => {
 MapField.defaultProps = {
   mapFrom: '',
   mapTo: '',
+  defaultValue: '',
   options: [],
   onChange: () => {},
   onDelete: () => {},
@@ -59,6 +61,7 @@ MapField.propTypes = {
     PropTypes.number,
     PropTypes.string,
   ]),
+  defaultValue: PropTypes.string,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string,

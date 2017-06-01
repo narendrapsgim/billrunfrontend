@@ -230,8 +230,11 @@ class Importer extends Component {
   }
 
   renderStepContent = () => {
-    const { item, importFields: fields, entityOptions, ignoredHeaders } = this.props;
+    const { item, importFields: fields, entityOptions, ignoredHeaders, defaultValues } = this.props;
     const { stepIndex, mapperPrefix } = this.state;
+
+    const entity = item.get('entity', '');
+    const defaultFieldsValues = defaultValues[entity] || [];
 
     switch (stepIndex) {
       case 0: return (
@@ -248,6 +251,7 @@ class Importer extends Component {
           onChange={this.onChange}
           onDelete={this.onDelete}
           fields={fields}
+          defaultFieldsValues={defaultFieldsValues}
           ignoredHeaders={ignoredHeaders}
           mapperPrefix={mapperPrefix}
         />

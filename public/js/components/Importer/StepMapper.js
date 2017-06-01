@@ -6,7 +6,7 @@ import MapField from './MapField';
 
 
 const StepMapper = (props) => {
-  const { item, fields, ignoredHeaders, mapperPrefix } = props;
+  const { item, fields, ignoredHeaders, mapperPrefix, defaultFieldsValues } = props;
   const fileContent = item.get('fileContent', []) || [];
   const linkerField = item.getIn(['linker', 'field'], '') || '';
   const linkerValue = item.getIn(['linker', 'value'], '') || '';
@@ -100,17 +100,21 @@ const StepMapper = (props) => {
   const renderFields = () => fields
     .filter(filterFields)
     .sort(soptFields)
-    .map(field => (
-      <MapField
-        key={`header_${field.value}`}
-        mapFrom={field}
-        mapTo={item.getIn(['map', field.value], '')}
-        options={csvHeaders}
-        mapperPrefix={mapperPrefix}
-        onChange={props.onChange}
-        onDelete={props.onDelete}
-      />
-  ));
+    .map((field) => {
+      const defaultValue = defaultFieldsValues.find(def => def.key === field.value);
+      return (
+        <MapField
+          key={`header_${field.value}`}
+          defaultValue={defaultValue ? defaultValue.value : undefined}
+          mapFrom={field}
+          mapTo={item.getIn(['map', field.value], '')}
+          options={csvHeaders}
+          mapperPrefix={mapperPrefix}
+          onChange={props.onChange}
+          onDelete={props.onDelete}
+        />
+      );
+    });
 
   const renderContent = () => {
     if (fileContent.length === 0) {
@@ -147,6 +151,7 @@ const StepMapper = (props) => {
 StepMapper.defaultProps = {
   item: Immutable.Map(),
   fields: [],
+  defaultFieldsValues: [],
   ignoredHeaders: [],
   mapperPrefix: '',
   onChange: () => {},
@@ -156,6 +161,12 @@ StepMapper.defaultProps = {
 StepMapper.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
   fields: PropTypes.array,
+  defaultFieldsValues: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string,
+      value: PropTypes.string,
+    }),
+  ),
   ignoredHeaders: PropTypes.array,
   mapperPrefix: PropTypes.string,
   onChange: PropTypes.func,
