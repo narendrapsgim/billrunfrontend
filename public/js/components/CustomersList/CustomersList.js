@@ -30,6 +30,7 @@ class CustomersList extends Component {
 
   state = {
     showImport: false,
+    refreshString: '',
   }
 
   componentDidMount() {
@@ -73,9 +74,8 @@ class CustomersList extends Component {
   onCloseImprt = () => {
     this.setState({
       showImport: false,
+      refreshString: moment().format(), //refetch list items after import
     });
-    // TODO : refetch list items after import
-    // this.props.dispatch(clearItems('customers'));
   }
 
   onClickImprt = () => {
@@ -86,7 +86,7 @@ class CustomersList extends Component {
 
   render() {
     const { accountFields } = this.props;
-    const { showImport } = this.state;
+    const { showImport, refreshString } = this.state;
 
     if (accountFields === null) {
       return (<LoadingItemPlaceholder />);
@@ -108,6 +108,7 @@ class CustomersList extends Component {
           filterFields={fields}
           actions={actions}
           listActions={listActions}
+          refreshString={refreshString}
         />
         <ModalWrapper show={showImport} title="Import" onHide={this.onCloseImprt}>
           <Importer
