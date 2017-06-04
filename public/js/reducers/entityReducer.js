@@ -27,7 +27,7 @@ export default function (state = defaultState, action) {
       return state.deleteIn([collection, path]);
 
     case actions.CLONE_RESET_ENTITY: {
-      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue'];
+      const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', 'revision_info'];
       if (typeof action.uniquefields === 'string') {
         keysToDeleteOnClone.push(action.uniquefields);
       } else if (Array.isArray(action.uniquefields)) {
