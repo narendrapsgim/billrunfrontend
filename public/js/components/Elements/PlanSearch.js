@@ -7,7 +7,7 @@ import {
 } from '../../selectors/listSelectors';
 import { formatSelectOptions } from '../../common/Util';
 import { getList } from '../../actions/listActions';
-import { getPlansKeysQuery } from '../../common/ApiQueries';
+import { getPlansByTypeQuery } from '../../common/ApiQueries';
 
 
 class PlanSearch extends Component {
@@ -16,6 +16,7 @@ class PlanSearch extends Component {
     options: PropTypes.instanceOf(Immutable.List),
     selectedOptions: PropTypes.array,
     onSelectPlan: PropTypes.func,
+    planType: PropTypes.oneOf(['prepaid', 'postpaid', '']),
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -23,12 +24,14 @@ class PlanSearch extends Component {
     options: Immutable.List(),
     selectedOptions: [],
     onSelectPlan: () => {},
+    planType: '',
   };
 
   state = { val: null }
 
   componentDidMount() {
-    this.props.dispatch(getList('available_plans', getPlansKeysQuery()));
+    const { planType } = this.props;
+    this.props.dispatch(getList('available_plans', getPlansByTypeQuery(planType)));
   }
 
   onSelectPlan = (planKey) => {

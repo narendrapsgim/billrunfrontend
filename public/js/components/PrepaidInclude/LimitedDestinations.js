@@ -15,7 +15,7 @@ const LimitedDestinations = (props) => {
     <div className="LimitedDestinations">
       { editable &&
         <Panel>
-          <PlanSearch onSelectPlan={props.onSelectPlan} selectedOptions={selectedPlans} />
+          <PlanSearch onSelectPlan={props.onSelectPlan} selectedOptions={selectedPlans} planType="prepaid" />
         </Panel>
       }
       {

@@ -251,7 +251,7 @@ export const getEntityByIdQuery = (collection, id) => ({
   ],
 });
 
-export const getEntitesQuery = (collection, project = {}) => {
+export const getEntitesQuery = (collection, project = {}, query = {}) => {
   let action;
   switch (collection) {
     case 'users':
@@ -266,10 +266,23 @@ export const getEntitesQuery = (collection, project = {}) => {
     params: [
       { page: 0 },
       { size: 9999 },
+      { query: JSON.stringify(query) },
       { project: JSON.stringify(project) },
       { sort: JSON.stringify(project) },
     ],
   });
+};
+
+export const getPlansByTypeQuery = (type, project = { name: 1, description: 1 }) => {
+  const query = {
+    connection_type: {
+      $exists: true,
+    },
+  };
+  if (type !== '') {
+    query.connection_type.$eq = type;
+  }
+  return getEntitesQuery('plans', project, query);
 };
 
 export const getDeleteLineQuery = id => ({
