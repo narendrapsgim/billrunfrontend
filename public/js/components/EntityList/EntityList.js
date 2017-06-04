@@ -42,6 +42,7 @@ class EntityList extends Component {
     page: PropTypes.number,
     nextPage: PropTypes.bool,
     editable: PropTypes.bool,
+    allowManageRevisions: PropTypes.bool,
     showRevisionBy: PropTypes.oneOfType([
       PropTypes.bool,
       PropTypes.string,
@@ -71,6 +72,7 @@ class EntityList extends Component {
     size: getConfig(['list', 'defaultItems'], 10),
     nextPage: false,
     editable: true,
+    allowManageRevisions: true,
     showRevisionBy: false,
     inProgress: false,
     forceRefetchItems: false,
@@ -219,9 +221,9 @@ class EntityList extends Component {
   }
 
   parserState = (item) => {
-    const { itemType } = this.props;
+    const { itemType, allowManageRevisions } = this.props;
     return (
-      <StateDetails item={item} itemName={itemType} />
+      <StateDetails item={item} itemName={itemType} allowManageRevisions={allowManageRevisions} />
     );
   };
 
