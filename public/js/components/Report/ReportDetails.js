@@ -590,7 +590,7 @@ class ReportDetails extends Component {
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} sm={3}>
-          Display
+          Display Fields
         </Col>
         <Col sm={7}>
           <Select
