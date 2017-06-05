@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { Form, Button, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Form, Button, FormGroup, Col, Row, ControlLabel, HelpBlock, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
 import changeCase from 'change-case';
@@ -126,6 +126,7 @@ class ReportDetails extends Component {
       this.onChangefilter('entity', '');
       this.onChangefilter('filters', Immutable.List());
       this.onChangefilter('display', Immutable.List());
+      this.onChangefilter('sort', Immutable.List());
       this.onChangefilter('group_by', Immutable.List());
       this.onChangefilter('group_by_fields', Immutable.List());
     } else {
@@ -207,6 +208,7 @@ class ReportDetails extends Component {
     const displayFields = report.get('display', Immutable.List())
       .filter(display => display !== groupByFieldLabel);
     this.onChangefilter('display', displayFields);
+    this.removeSortOnDisplayChange(displayFields);
   }
 
   onGroupByAdd = () => {
@@ -220,6 +222,42 @@ class ReportDetails extends Component {
     this.onChangefilter('group_by', groupBy);
   }
 
+  onChangeSortOperator = (idx, value) => {
+    const { report } = this.props;
+    const sort = report
+      .get('sort', Immutable.List())
+      .setIn([idx, 'op'], value);
+    this.onChangefilter('sort', sort);
+  }
+
+  onChangeSortField = (idx, value) => {
+    const { report } = this.props;
+    const sort = report
+      .get('sort', Immutable.List())
+      .setIn([idx, 'field'], value)
+      .setIn([idx, 'op'], '');
+    this.onChangefilter('sort', sort);
+  }
+
+  onSortAdd = () => {
+    const { report } = this.props;
+    const sort = report
+      .get('sort', Immutable.List())
+      .push(Immutable.Map({
+        field: '',
+        order: 1,
+      }));
+    this.onChangefilter('sort', sort);
+  }
+
+  onSortRemove = (index) => {
+    const { report } = this.props;
+    const sort = report
+      .get('sort', Immutable.List())
+      .delete(index);
+    this.onChangefilter('sort', sort);
+  }
+
   onChangeGroupByFields = (fields) => {
     const { report } = this.props;
     const isGroupByEmpty = report.get('group_by_fields', Immutable.List()).isEmpty();
@@ -227,9 +265,10 @@ class ReportDetails extends Component {
     if (groupByFields.length === 0) {
       this.onChangefilter('group_by', Immutable.List());
     }
-    // Empty display values if group_by_fields was cleared or was init
+    // Empty display/sort values if group_by_fields was cleared or was init
     if (isGroupByEmpty || groupByFields.length === 0) {
       this.onChangefilter('display', Immutable.List());
+      this.onChangefilter('sort', Immutable.List());
     }
     this.onChangefilter('group_by_fields', Immutable.List(groupByFields));
   }
@@ -238,11 +277,22 @@ class ReportDetails extends Component {
     this.onChangefilter('entity', val);
     this.onChangefilter('filters', Immutable.List());
     this.onChangefilter('display', Immutable.List());
+    this.onChangefilter('sort', Immutable.List());
   }
 
   onChangeDisplayFields = (fields) => {
     const fieldsList = (fields.length) ? fields.split(',') : [];
-    this.onChangefilter('display', Immutable.List(fieldsList));
+    const displayFields = Immutable.List(fieldsList);
+    this.onChangefilter('display', displayFields);
+    this.removeSortOnDisplayChange(displayFields);
+  }
+
+  removeSortOnDisplayChange = (displayFields) => {
+    const { report } = this.props;
+    const sort = report
+      .get('sort', Immutable.List())
+      .filter(sortField => displayFields.includes(sortField.get('field', '')));
+    this.onChangefilter('sort', sort);
   }
 
   onChangeReportKey = (e) => {
@@ -328,8 +378,59 @@ class ReportDetails extends Component {
           { this.renderValue(filter, confField, index, disabled) }
         </Col>
 
-        <Col sm={3} className="action">
-          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} >
+        <Col sm={2} className="action">
+          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} block>
+            <i className="fa fa-trash-o danger-red" />&nbsp;Remove
+          </Button>
+        </Col>
+      </FormGroup>
+    );
+  }
+
+  renderSortInputs = (sort, index) => {
+    const { mode, report } = this.props;
+    const display = report.get('display', Immutable.List());
+    const usedFields = report.get('sort', Immutable.List()).map(reportSort => reportSort.get('field', ''));
+
+    const disabled = mode === 'view';
+
+    const onRemove = (e) => { this.onSortRemove(index, e); };
+    const onChangeField = (e) => { this.onChangeSortField(index, e); };
+    const onChangeOperator = (e) => { this.onChangeSortOperator(index, e); };
+
+    const fieldOptions = display
+      .filter(fieldOption => !usedFields.includes(fieldOption) || sort.get('field', '') === fieldOption)
+      .map(formatSelectOptions)
+      .toArray();
+    const opOptions = [{
+      value: 1,
+      label: 'Ascending',
+    }, {
+      value: -1,
+      label: 'Descending',
+    }];
+
+    return (
+      <FormGroup className="form-inner-edit-row" key={index}>
+        <Col sm={5}>
+          <Select
+            options={fieldOptions}
+            value={sort.get('field', '')}
+            onChange={onChangeField}
+            disabled={disabled}
+          />
+        </Col>
+        <Col sm={3}>
+          <Select
+            clearable={false}
+            options={opOptions}
+            value={sort.get('op', '')}
+            onChange={onChangeOperator}
+            disabled={disabled}
+          />
+        </Col>
+        <Col sm={2} className="action">
+          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} block>
             <i className="fa fa-trash-o danger-red" />&nbsp;Remove
           </Button>
         </Col>
@@ -376,8 +477,8 @@ class ReportDetails extends Component {
             disabled={disabled}
           />
         </Col>
-        <Col sm={3} className="action">
-          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} >
+        <Col sm={2} className="action">
+          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} block>
             <i className="fa fa-trash-o danger-red" />&nbsp;Remove
           </Button>
         </Col>
@@ -484,7 +585,24 @@ class ReportDetails extends Component {
     return (
       <div style={{ height: 40 }}>
         <Button bsStyle="link" onClick={this.onAddFilter} className="pull-left" disabled={disabled} >
-          <i className="fa fa-plus" />&nbsp;Add Filter
+          <i className="fa fa-plus" />&nbsp;Add Condition
+        </Button>
+      </div>
+    );
+  }
+
+  renderSortActions = () => {
+    const { mode, report } = this.props;
+    const display = report.get('display', Immutable.List());
+
+    const disabled = mode === 'view' || display.isEmpty();
+    if (mode === 'view') {
+      return null;
+    }
+    return (
+      <div style={{ height: 40 }}>
+        <Button bsStyle="link" onClick={this.onSortAdd} className="pull-left" disabled={disabled} >
+          <i className="fa fa-plus" />&nbsp;Add Sort
         </Button>
       </div>
     );
@@ -633,7 +751,7 @@ class ReportDetails extends Component {
 
   renderSearchButton = () => {
     return (
-      <Button bsStyle="primary" onClick={this.onApplay} className="full-width mr10"><i className="fa fa-search" />&nbsp;Search</Button>
+      <Button bsStyle="primary" onClick={this.onApplay} className="full-width mr10"><i className="fa fa-search" />&nbsp;Preview</Button>
     );
   }
 
@@ -646,25 +764,39 @@ class ReportDetails extends Component {
     const groupBy = report.get('group_by', Immutable.List());
     const groupByInputs = groupBy.map(this.renderGroupByInputs);
 
+    const sort = report.get('sort', Immutable.List());
+    const sortInputs = sort.map(this.renderSortInputs);
+
     return (
       <div className="CustomFilter">
         <Form horizontal>
-          <Col sm={12}>{ this.renderEntityName() }</Col>
-          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
-          <Col sm={12}>{ this.renderEntitySelector() }</Col>
-          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
-          <Col sm={12}>{ filtersInputs }</Col>
-          <Col sm={12}>{ this.renderFilterActions() }</Col>
-          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
-          <Col sm={12}>{ this.renderGroupByFieldsSelector() }</Col>
-          <Col sm={12}>{ groupByInputs }</Col>
-          <Col sm={12}>{ this.renderGroupByActions() }</Col>
-          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
-          <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
-          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
-          <Col sm={12}>{ this.renderSearchButton() }</Col>
-          <Col sm={12}><hr style={{ marginTop: 0 }} /></Col>
+          <Panel header="Basic Details">
+            <Col sm={12}>{ this.renderEntityName() }</Col>
+            <Col sm={12}>{ this.renderEntitySelector() }</Col>
+          </Panel>
+          <Panel header="Conditions (optional)">
+            <Col sm={12}>{ filtersInputs }</Col>
+            <Col sm={12}>{ this.renderFilterActions() }</Col>
+          </Panel>
+          <Panel header="Grouping (optional)"> {/* collabsed if empty */}
+            <Col sm={12}>{ this.renderGroupByFieldsSelector() }</Col>
+          </Panel>
+          <Panel header="Grouping Operations (optional)"> {/* collabsed if empty */}
+            <Col sm={12}>{ groupByInputs }</Col>
+            <Col sm={12}>{ this.renderGroupByActions() }</Col>
+          </Panel>
+          <Panel header="Display options">
+            <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
+          </Panel>
+          <Panel header="Sort">
+            <Col sm={12}>{ sortInputs }</Col>
+            <Col sm={12}>{ this.renderSortActions() }</Col>
+          </Panel>
         </Form>
+        <Row>
+          <Col sm={12}>{ this.renderSearchButton() }</Col>
+          <Col sm={12}>&nbsp;</Col>
+        </Row>
       </div>
     );
   }

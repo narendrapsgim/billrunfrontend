@@ -242,6 +242,10 @@ class ReportSetup extends Component {
     return acc.set(`${field}_${op}`, value);
   }
 
+  filterSort = val => this.filterGroupBy(val);
+
+  buildSortQuery = (acc, val) => acc.set(val.get('field', ''), val.get('op', ''));
+
   buildReportQuery = () => {
     const { item } = this.props;
     const entityType = item.get('entity', '');
@@ -255,6 +259,9 @@ class ReportSetup extends Component {
       groupBy: item.get('group_by', Immutable.List())
         .filter(this.filterGroupBy)
         .reduce(this.buildGroupByQuery, Immutable.Map()),
+      sort: item.get('sort', Immutable.List())
+        .filter(this.filterSort)
+        .reduce(this.buildSortQuery, Immutable.Map()),
     };
     return query;
   }
