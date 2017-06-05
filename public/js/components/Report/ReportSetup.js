@@ -244,8 +244,9 @@ class ReportSetup extends Component {
 
   buildReportQuery = () => {
     const { item } = this.props;
+    const entityType = item.get('entity', '');
     const query = {
-      collection: item.get('entity', ''),
+      collection: getConfig(['systemItems', entityType, 'collection'], entityType),
       project: item.get('display', Immutable.List()).reduce((acc, val) => acc.set(val, 1), Immutable.Map()),
       query: item.get('filters', Immutable.List())
         .filter(this.filterQuery)
