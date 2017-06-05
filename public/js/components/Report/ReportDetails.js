@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Form, Button, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
+import changeCase from 'change-case';
 import Select from 'react-select';
 import Field from '../Field';
 import {
@@ -275,7 +276,7 @@ class ReportDetails extends Component {
   getEntityFields = () => {
     const { report, linesFileds } = this.props;
     switch (report.get('entity', '')) {
-      case 'lines':
+      case 'usage':
         return linesFileds;
       default:
         return Immutable.List();
@@ -509,7 +510,13 @@ class ReportDetails extends Component {
     const { mode, report } = this.props;
     const entity = report.get('entity', '');
     const disabled = mode === 'view';
-    const options = getConfig(['reports', 'entities'], Immutable.List()).map(formatSelectOptions).toArray();
+    const options = getConfig(['reports', 'entities'], Immutable.List())
+      .map(option => Immutable.Map({
+        value: option,
+        label: changeCase.titleCase(getConfig(['systemItems', option, 'itemName'], option)),
+      }))
+      .map(formatSelectOptions)
+      .toArray();
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} sm={3}>
@@ -668,7 +675,7 @@ const mapStateToProps = (state, props) => ({
   getProductsOptions: productsOptionsSelector(state, props),
   getPlansOptions: plansOptionsSelector(state, props),
   getGroupsOptions: groupsOptionsSelector(state, props),
-  getUsageTypesOptions: usageTypeSelector(state, props)
+  getUsageTypesOptions: usageTypeSelector(state, props),
 });
 
 export default connect(mapStateToProps)(ReportDetails);

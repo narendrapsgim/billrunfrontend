@@ -27,9 +27,9 @@ var globalSetting = {
   logoMaxSize: 2,
   chargingBufferDays: 5,
   reports: {
-    entities: ['lines'/*, 'subscription', 'customer'*/],
+    entities: ['usage'/* , 'subscription', 'customer'*/],
     fields: {
-      lines: [
+      usage: [
         // Default settings \ Example
         // { id: [REQUIRED], type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
         //    inputType: 'select',
@@ -169,6 +169,13 @@ var globalSetting = {
       itemName: 'report',
       itemType: 'report',
       itemsType: 'reports',
+    },
+    usage: {
+      collection: 'lines',
+      uniqueField: 'stamp',
+      itemName: 'usage',
+      itemType: 'usage',
+      itemsType: 'usages',
     },
   },
 };

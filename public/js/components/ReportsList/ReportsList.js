@@ -5,10 +5,11 @@ import EntityList from '../EntityList';
 const ReportsList = () => {
   const filterFields = [
     { id: 'key', placeholder: 'Name' },
+    { id: 'user', placeholder: 'User' },
   ];
 
   const tableFields = [
-    { id: 'key', title: 'Title', sort: true },
+    { id: 'key', title: 'Name', sort: true },
     { id: 'user', title: 'User', sort: true },
     { id: 'created', title: 'created', type: 'mongodatetime', cssClass: 'long-date', sort: true },
     { id: 'modified', title: 'Modified', type: 'mongodatetime', cssClass: 'long-date', sort: true },

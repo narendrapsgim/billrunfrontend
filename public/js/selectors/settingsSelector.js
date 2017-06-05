@@ -80,7 +80,7 @@ const sortFieldOption = (optionsA, optionB) => {
 };
 
 const selectLinesFields = (customKeys) => {
-  const predefinedFileds = getConfig(['reports', 'fields', 'lines'], Immutable.List());
+  const predefinedFileds = getConfig(['reports', 'fields', 'usage'], Immutable.List());
   return Immutable.List().withMutations((optionsWithMutations) => {
     // Set predefined fields
     predefinedFileds.forEach((predefinedFiled) => {
