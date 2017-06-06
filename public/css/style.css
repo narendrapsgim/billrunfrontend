@@ -585,3 +585,9 @@ ul.revision-history-list li.active .cycle {
   margin-bottom: 25px;
 }
 /* ~Chart */
+
+/* Importer */
+.ReportEditor .form-inner-edit-row:last-child {
+    margin-bottom: 0;
+}
+/* ~Importer */

@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Panel, Col } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 import { ActionButtons, Actions, LoadingItemPlaceholder } from '../Elements';
-import ReportDetails from './ReportDetails';
+import ReportEditor from './ReportEditor';
 import ReportList from './ReportList';
 import {
   buildPageTitle,
@@ -74,7 +74,8 @@ class ReportSetup extends Component {
     super(props);
     this.state = {
       progress: false,
-      listActins: this.getListActions(),
+      listActions: this.getListActions(),
+      editActions: this.getEditActions(),
     };
   }
 
@@ -334,7 +335,7 @@ class ReportSetup extends Component {
   }
 
   getListActions = () => [{
-    type: 'export_csv', // fa-file-excel-o
+    type: 'export_csv',
     label: 'Export CSV',
     actionStyle: 'default',
     showIcon: true,
@@ -351,20 +352,26 @@ class ReportSetup extends Component {
     actionClass: 'btn-primary',
   }];
 
+  getEditActions = () => [{
+    type: 'reset',
+    label: 'Reset',
+    actionStyle: 'default',
+    showIcon: false,
+    onClick: this.onReset,
+    actionSize: 'xsmall',
+    actionClass: 'btn-primary',
+  }];
+
   renderPanelHeader = () => {
-    const { listActins } = this.state;
+    const { listActions, editActions } = this.state;
     const { mode } = this.props;
-    if (mode === 'view') {
-      return (
-        <div>
-          Report
-          <div className="pull-right">
-            <Actions actions={listActins} />
-          </div>
+    return (
+      <div>&nbsp;
+        <div className="pull-right">
+          <Actions actions={(mode === 'view') ? listActions : editActions} />
         </div>
-      );
-    }
-    return null;
+      </div>
+    );
   }
 
   render() {
@@ -380,7 +387,7 @@ class ReportSetup extends Component {
       <div className="report-setup">
         <Panel header={this.renderPanelHeader()}>
           { allowEdit &&
-            <ReportDetails
+            <ReportEditor
               report={item}
               linesFileds={linesFileds}
               mode={mode}
@@ -402,28 +409,15 @@ class ReportSetup extends Component {
 
           <div className="clearfix" />
           <hr className="mb0" />
-          <Col sm={12} className="pl0 pr0">
-            <Col sm={6} className="text-left pl0">
-              <ActionButtons
-                onClickCancel={this.handleBack}
-                onClickSave={this.handleSave}
-                hideSave={!allowEdit}
-                cancelLabel="Back to list"
-                progress={progress}
-                disableCancel={progress}
-              />
-            </Col>
-            <Col sm={6} className="text-right pr0">
-              { allowEdit
-                && <ActionButtons
-                  cancelLabel="Reset"
-                  onClickCancel={this.onReset}
-                  disableCancel={progress}
-                  hideSave={true}
-                />
-              }
-            </Col>
-          </Col>
+
+          <ActionButtons
+            onClickCancel={this.handleBack}
+            onClickSave={this.handleSave}
+            hideSave={!allowEdit}
+            progress={progress}
+            disableCancel={progress}
+          />
+
         </Panel>
       </div>
     );

@@ -1,52 +1,29 @@
 import React, { PropTypes, Component } from 'react';
-import { connect } from 'react-redux';
-import { Form, Button, FormGroup, Col, Row, ControlLabel, HelpBlock, Panel } from 'react-bootstrap';
+import { Form, Button, FormGroup, Col, Row, ControlLabel, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
-import moment from 'moment';
 import changeCase from 'change-case';
 import Select from 'react-select';
 import Field from '../Field';
+import { CreateButton } from '../Elements';
+import EditorFilterRow from './EditorFilterRow';
 import {
   getConfig,
   parseConfigSelectOptions,
   formatSelectOptions,
 } from '../../common/Util';
-import {
-  getCyclesOptions,
-  getProductsOptions,
-  getPlansOptions,
-  getServicesOptions,
-  getGroupsOptions,
-  getUsageTypesOptions,
-} from '../../actions/reportsActions';
-import {
-  productsOptionsSelector,
-  cyclesOptionsSelector,
-  plansOptionsSelector,
-  groupsOptionsSelector,
-} from '../../selectors/listSelectors';
-import {
-  usageTypeSelector,
-} from '../../selectors/settingsSelector';
 
 
-class ReportDetails extends Component {
+class ReportEditor extends Component {
 
   static propTypes = {
     report: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
     operators: PropTypes.instanceOf(Immutable.List),
     groupByOperators: PropTypes.instanceOf(Immutable.List),
-    getCyclesOptions: PropTypes.instanceOf(Immutable.List),
-    getPlansOptions: PropTypes.instanceOf(Immutable.List),
-    getProductsOptions: PropTypes.instanceOf(Immutable.List),
-    getGroupsOptions: PropTypes.instanceOf(Immutable.List),
-    getUsageTypesOptions: PropTypes.instanceOf(Immutable.List),
     linesFileds: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
     onUpdate: PropTypes.func,
     onReset: PropTypes.func,
-    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -54,71 +31,11 @@ class ReportDetails extends Component {
     mode: 'update',
     operators: getConfig(['reports', 'operators'], Immutable.List()),
     groupByOperators: getConfig(['reports', 'groupByOperators'], Immutable.List()),
-    getCyclesOptions: Immutable.List(),
-    getProductsOptions: Immutable.List(),
-    getPlansOptions: Immutable.List(),
-    getGroupsOptions: Immutable.List(),
-    getUsageTypesOptions: Immutable.List(),
     linesFileds: Immutable.List(),
     onFilter: () => {},
     onUpdate: () => {},
     onReset: () => {},
   };
-
-  componentDidMount() {
-    this.initFieldOptions();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { linesFileds } = this.props;
-    if (!Immutable.is(linesFileds, nextProps.linesFileds)) {
-      this.initFieldOptions();
-    }
-  }
-
-  initFieldOptions = () => {
-    const { linesFileds } = this.props;
-    linesFileds.forEach((lineFiled) => {
-      if (lineFiled.hasIn(['inputConfig', 'callback'])) {
-        const callback = lineFiled.getIn(['inputConfig', 'callback']);
-        switch (callback) {
-          case 'getCyclesOptions':
-            if (this.props.getCyclesOptions.isEmpty()) {
-              this.props.dispatch(getCyclesOptions());
-            }
-            break;
-          case 'getPlansOptions':
-            if (this.props.getPlansOptions.isEmpty()) {
-              this.props.dispatch(getPlansOptions());
-            }
-            break;
-          case 'getProductsOptions':
-            if (this.props.getProductsOptions.isEmpty()) {
-              this.props.dispatch(getProductsOptions());
-            }
-            break;
-          case 'getServicesOptions':
-            if (this.props.getServicesOptions.isEmpty()) {
-              this.props.dispatch(getServicesOptions());
-            }
-            break;
-          case 'getGroupsOptions':
-            if (this.props.getGroupsOptions.isEmpty()) {
-              this.props.dispatch(getGroupsOptions());
-            }
-            break;
-          case 'getUsageTypesOptions':
-            if (this.props.getUsageTypesOptions.isEmpty()) {
-              this.props.dispatch(getUsageTypesOptions());
-            }
-            break;
-          default:
-            console.log('unknown select options callback');
-            break;
-        }
-      }
-    });
-  }
 
   onClear = () => {
     const { mode } = this.props;
@@ -334,57 +251,26 @@ class ReportDetails extends Component {
     }
   }
 
-  renderInputs = (filter, index) => {
-    const { mode, operators } = this.props;
-    const fieldConfig = this.getEntityFields();
-    const confField = fieldConfig.find(conf => conf.get('id', '') === filter.get('field', ''), null, Immutable.Map());
-
+  renderInputs = () => {
+    const { report, mode, operators } = this.props;
+    const fieldsConfig = this.getEntityFields();
     const disabled = mode === 'view';
-    const fieldOptions = fieldConfig
-      .filter(filed => filed.get('filter', true))
-      .map(parseConfigSelectOptions)
-      .toArray();
-    const opOptions = operators
-      .filter(opt => this.filterOptionByFieldType(opt, confField))
-      .map(parseConfigSelectOptions)
-      .toArray();
-
-    const onChangeField = (e) => { this.onChangeFilterField(index, e); };
-    const onChangeOperator = (e) => { this.onChangeFilterOperator(index, e); };
-    const onRemove = (e) => { this.onFilterRemove(index, e); };
-
-    return (
-      <FormGroup className="form-inner-edit-row" key={index}>
-        <Col sm={3}>
-          <Select
-            options={fieldOptions}
-            value={filter.get('field', '')}
-            onChange={onChangeField}
-            disabled={disabled}
-          />
-        </Col>
-
-        <Col sm={2}>
-          <Select
-            clearable={false}
-            options={opOptions}
-            value={filter.get('op', '')}
-            onChange={onChangeOperator}
-            disabled={disabled}
-          />
-        </Col>
-
-        <Col sm={3}>
-          { this.renderValue(filter, confField, index, disabled) }
-        </Col>
-
-        <Col sm={2} className="action">
-          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} block>
-            <i className="fa fa-trash-o danger-red" />&nbsp;Remove
-          </Button>
-        </Col>
-      </FormGroup>
-    );
+    return report
+      .get('filters', Immutable.List())
+      .map((filter, index) => (
+        <EditorFilterRow
+          key={index}
+          item={filter}
+          index={index}
+          fieldsConfig={fieldsConfig}
+          operators={operators}
+          disabled={disabled}
+          onChangeField={this.onChangeFilterField}
+          onChangeOperator={this.onChangeFilterOperator}
+          onChangeValue={this.onChangeFilterValue}
+          onRemove={this.onFilterRemove}
+        />
+      ));
   }
 
   renderSortInputs = (sort, index) => {
@@ -486,141 +372,37 @@ class ReportDetails extends Component {
     );
   }
 
-  renderValue = (filed, config, index, disabled) => {
-    const onChangeSelect = (value) => {
-      this.onChangeFilterValue(index, value);
-    };
-
-    const onChangeText = (e) => {
-      const { value } = e.target;
-      this.onChangeFilterValue(index, value);
-    };
-
-    const onChangeBoolean = (value) => {
-      const bool = value === '' ? '' : value === 'yes';
-      this.onChangeFilterValue(index, bool);
-    };
-
-    const onChangeNumber = (e) => {
-      const { value } = e.target;
-      const number = Number(value);
-      if (!isNaN(number)) {
-        this.onChangeFilterValue(index, number);
-      } else {
-        this.onChangeFilterValue(index, value);
-      }
-    };
-
-    const onChangeDate = (date) => {
-      if (moment.isMoment(date) && date.isValid()) {
-        this.onChangeFilterValue(index, date.toISOString());
-      } else {
-        this.onChangeFilterValue(index, null);
-      }
-    };
-
-    if (filed.get('op', null) === 'exists') {
-      const value = filed.get('value', '') === '' ? '' : (filed.get('value', '') ? 'yes' : 'no');
-      const options = ['yes', 'no'].map(formatSelectOptions);
-      return (
-        <Select
-          clearable={false}
-          options={options}
-          value={value}
-          onChange={onChangeBoolean}
-          disabled={disabled}
-        />
-      );
-    }
-    if (config.get('type', 'string') === 'string' && config.getIn(['inputConfig', 'inputType']) === 'select') {
-      const options = config.hasIn(['inputConfig', 'callback'])
-        ? this.props[config.getIn(['inputConfig', 'callback'], '')] || Immutable.List()
-        : config.getIn(['inputConfig', 'options'], Immutable.List());
-
-      const formatedOptions = options
-        .map(formatSelectOptions)
-        .toArray();
-
-      const multi = filed.get('op', '') === 'in';
-      return (
-        <Select
-          clearable={false}
-          multi={multi}
-          options={formatedOptions}
-          value={filed.get('value', '')}
-          onChange={onChangeSelect}
-          disabled={disabled}
-        />
-      );
-    }
-
-    if (config.get('type', '') === 'number' && !filed.get('op', '') === 'in') {
-      return (
-        <Field value={filed.get('value', '')} onChange={onChangeNumber} fieldType="number" disabled={disabled} />
-      );
-    }
-
-    if (config.get('type', '') === 'date') {
-      const value = moment(filed.get('value', null));
-      return (
-        <Field value={value} onChange={onChangeDate} fieldType="date" disabled={disabled} />
-      );
-    }
-
-    // 'string'
-    return (
-      <div>
-        <Field value={filed.get('value', '')} onChange={onChangeText} disabled={disabled} />
-        {filed.get('op', null) === 'in' && <HelpBlock>comma separated values</HelpBlock>}
-      </div>
-    );
-  }
-
   renderFilterActions = () => {
     const { mode } = this.props;
-    const disabled = mode === 'view';
-    if (disabled) {
+    if (mode === 'view') {
       return null;
     }
     return (
-      <div style={{ height: 40 }}>
-        <Button bsStyle="link" onClick={this.onAddFilter} className="pull-left" disabled={disabled} >
-          <i className="fa fa-plus" />&nbsp;Add Condition
-        </Button>
-      </div>
+      <CreateButton onClick={this.onAddFilter} label="Add Condition" />
     );
   }
 
   renderSortActions = () => {
     const { mode, report } = this.props;
-    const display = report.get('display', Immutable.List());
-
-    const disabled = mode === 'view' || display.isEmpty();
     if (mode === 'view') {
       return null;
     }
+    const display = report.get('display', Immutable.List());
+    const disabled = mode === 'view' || display.isEmpty();
     return (
-      <div style={{ height: 40 }}>
-        <Button bsStyle="link" onClick={this.onSortAdd} className="pull-left" disabled={disabled} >
-          <i className="fa fa-plus" />&nbsp;Add Sort
-        </Button>
-      </div>
+      <CreateButton onClick={this.onSortAdd} label="Add Sort" disabled={disabled} />
     );
   }
 
   renderGroupByActions = () => {
     const { mode, report } = this.props;
-    const isGroupBy = report.get('group_by_fields', Immutable.List()).isEmpty();
-    const disabled = mode === 'view' || isGroupBy;
     if (mode === 'view') {
       return null;
     }
+    const isGroupBy = report.get('group_by_fields', Immutable.List()).isEmpty();
+    const disabled = mode === 'view' || isGroupBy;
     return (
-      <div style={{ height: 40 }}>
-        <Button bsStyle="link" onClick={this.onGroupByAdd} className="pull-left" disabled={disabled} >
-          <i className="fa fa-plus" />&nbsp;Add Group By Operator
-        </Button>
-      </div>
+      <CreateButton onClick={this.onGroupByAdd} label="Add Group By Operator" disabled={disabled} />
     );
   }
 
@@ -749,17 +531,9 @@ class ReportDetails extends Component {
     );
   }
 
-  renderSearchButton = () => {
-    return (
-      <Button bsStyle="primary" onClick={this.onApplay} className="full-width mr10"><i className="fa fa-search" />&nbsp;Preview</Button>
-    );
-  }
-
   render() {
     const { report } = this.props;
 
-    const filters = report.get('filters', Immutable.List());
-    const filtersInputs = filters.map(this.renderInputs);
 
     const groupBy = report.get('group_by', Immutable.List());
     const groupByInputs = groupBy.map(this.renderGroupByInputs);
@@ -768,14 +542,14 @@ class ReportDetails extends Component {
     const sortInputs = sort.map(this.renderSortInputs);
 
     return (
-      <div className="CustomFilter">
+      <div className="ReportEditor">
         <Form horizontal>
           <Panel header="Basic Details">
             <Col sm={12}>{ this.renderEntityName() }</Col>
             <Col sm={12}>{ this.renderEntitySelector() }</Col>
           </Panel>
           <Panel header="Conditions (optional)">
-            <Col sm={12}>{ filtersInputs }</Col>
+            <Col sm={12}>{ this.renderInputs() }</Col>
             <Col sm={12}>{ this.renderFilterActions() }</Col>
           </Panel>
           <Panel header="Grouping (optional)"> {/* collabsed if empty */}
@@ -794,7 +568,11 @@ class ReportDetails extends Component {
           </Panel>
         </Form>
         <Row>
-          <Col sm={12}>{ this.renderSearchButton() }</Col>
+          <Col sm={12}>
+            <Button bsStyle="primary" onClick={this.onApplay} className="full-width mr10">
+              <i className="fa fa-search" />&nbsp;Preview
+            </Button>
+          </Col>
           <Col sm={12}>&nbsp;</Col>
         </Row>
       </div>
@@ -802,12 +580,4 @@ class ReportDetails extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  getCyclesOptions: cyclesOptionsSelector(state, props),
-  getProductsOptions: productsOptionsSelector(state, props),
-  getPlansOptions: plansOptionsSelector(state, props),
-  getGroupsOptions: groupsOptionsSelector(state, props),
-  getUsageTypesOptions: usageTypeSelector(state, props),
-});
-
-export default connect(mapStateToProps)(ReportDetails);
+export default ReportEditor;
