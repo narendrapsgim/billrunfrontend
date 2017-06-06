@@ -31,7 +31,8 @@ fieldset[disabled] .btn {
   line-height: 32px;
 }
 .actions button.btn-sm {
-    padding: 9px 12px;
+  height: 39px;
+  padding: 9px 12px;
 }
 .inline {
   display: inline-block;;
