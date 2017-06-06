@@ -3,11 +3,10 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Panel, Col, Button } from 'react-bootstrap';
-import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
+import { Panel, Col } from 'react-bootstrap';
+import { ActionButtons, Actions, LoadingItemPlaceholder } from '../Elements';
 import ReportDetails from './ReportDetails';
-import List from '../List';
-import Pager from '../EntityList/Pager';
+import ReportList from './ReportList';
 import {
   buildPageTitle,
   getConfig,
@@ -71,8 +70,12 @@ class ReportSetup extends Component {
     nextPage: false,
   }
 
-  state = {
-    progress: false,
+  constructor(props) {
+    super(props);
+    this.state = {
+      progress: false,
+      listActins: this.getListActions(),
+    };
   }
 
   componentWillMount() {
@@ -281,6 +284,19 @@ class ReportSetup extends Component {
     window.open(downloadURL);
   }
 
+  onPageChange = (page) => {
+    this.props.dispatch(setReportDataListPage(page));
+  }
+
+  onSizeChange = (size) => {
+    this.props.dispatch(setReportDataListPage(0));
+    this.props.dispatch(setReportDataListSize(size));
+  }
+
+  onReset = () => {
+    this.fetchItem();
+  }
+
   getTableFields = () => {
     const { item, linesFileds } = this.props;
     const selectedFields = item.get('display', Immutable.List());
@@ -314,33 +330,36 @@ class ReportSetup extends Component {
           listWithMutations.push(field);
         }
       });
-    })
-    .toJS();
+    });
   }
 
-  onPageChange = (page) => {
-    this.props.dispatch(setReportDataListPage(page));
-  }
-
-  onSizeChange = (size) => {
-    this.props.dispatch(setReportDataListPage(0));
-    this.props.dispatch(setReportDataListSize(size));
-  }
-
-  onReset = () => {
-    this.fetchItem();
-  }
+  getListActions = () => [{
+    type: 'export_csv', // fa-file-excel-o
+    label: 'Export CSV',
+    actionStyle: 'default',
+    showIcon: true,
+    onClick: this.onClickExportCSV,
+    actionSize: 'xsmall',
+    actionClass: 'btn-primary',
+  }, {
+    type: 'edit',
+    label: 'Edit Report',
+    actionStyle: 'default',
+    showIcon: true,
+    onClick: this.handleEdit,
+    actionSize: 'xsmall',
+    actionClass: 'btn-primary',
+  }];
 
   renderPanelHeader = () => {
+    const { listActins } = this.state;
     const { mode } = this.props;
     if (mode === 'view') {
       return (
         <div>
           Report
           <div className="pull-right">
-            <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickExportCSV}>
-              <i className="fa fa-file-excel-o" />&nbsp;Export CSV
-            </Button>
+            <Actions actions={listActins} />
           </div>
         </div>
       );
@@ -371,11 +390,11 @@ class ReportSetup extends Component {
             />
           }
 
-          <List items={reportData} fields={tableFields} className="report-list" />
-          <Pager
+          <ReportList
+            items={reportData}
+            fields={tableFields}
             page={page}
             size={size}
-            count={reportData.size}
             nextPage={nextPage}
             onChangePage={this.onPageChange}
             onChangeSize={this.onSizeChange}
@@ -396,16 +415,11 @@ class ReportSetup extends Component {
             </Col>
             <Col sm={6} className="text-right pr0">
               { allowEdit
-                ? <ActionButtons
+                && <ActionButtons
                   cancelLabel="Reset"
                   onClickCancel={this.onReset}
                   disableCancel={progress}
                   hideSave={true}
-                />
-                : <ActionButtons
-                  saveLabel="Edit"
-                  onClickSave={this.handleEdit}
-                  hideCancel={true}
                 />
               }
             </Col>
