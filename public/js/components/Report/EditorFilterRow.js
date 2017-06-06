@@ -98,7 +98,7 @@ class EditorFilterRow extends Component {
     const disableOp = disabled || item.get('field', '') === '';
     const disableVal = disabled || item.get('op', '') === '' || disableOp;
     return (
-      <FormGroup className="form-inner-edit-row" key={index}>
+      <FormGroup className="form-inner-edit-row">
         <Col sm={3}>
           <Select
             options={fieldOptions}
