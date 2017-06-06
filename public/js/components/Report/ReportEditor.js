@@ -6,6 +6,7 @@ import Select from 'react-select';
 import Field from '../Field';
 import { CreateButton } from '../Elements';
 import EditorFilterRow from './EditorFilterRow';
+import EditorSortRow from './EditorSortRow';
 import {
   getConfig,
   parseConfigSelectOptions,
@@ -273,55 +274,29 @@ class ReportEditor extends Component {
       ));
   }
 
-  renderSortInputs = (sort, index) => {
+  renderSortInputs = () => {
     const { mode, report } = this.props;
     const display = report.get('display', Immutable.List());
-    const usedFields = report.get('sort', Immutable.List()).map(reportSort => reportSort.get('field', ''));
-
+    const usedFields = report
+      .get('sort', Immutable.List())
+      .filter(reportSort => reportSort.get('field', '') !== '')
+      .map(reportSort => reportSort.get('field', ''));
     const disabled = mode === 'view';
-
-    const onRemove = (e) => { this.onSortRemove(index, e); };
-    const onChangeField = (e) => { this.onChangeSortField(index, e); };
-    const onChangeOperator = (e) => { this.onChangeSortOperator(index, e); };
-
-    const fieldOptions = display
-      .filter(fieldOption => !usedFields.includes(fieldOption) || sort.get('field', '') === fieldOption)
-      .map(formatSelectOptions)
-      .toArray();
-    const opOptions = [{
-      value: 1,
-      label: 'Ascending',
-    }, {
-      value: -1,
-      label: 'Descending',
-    }];
-
-    return (
-      <FormGroup className="form-inner-edit-row" key={index}>
-        <Col sm={5}>
-          <Select
-            options={fieldOptions}
-            value={sort.get('field', '')}
-            onChange={onChangeField}
-            disabled={disabled}
-          />
-        </Col>
-        <Col sm={3}>
-          <Select
-            clearable={false}
-            options={opOptions}
-            value={sort.get('op', '')}
-            onChange={onChangeOperator}
-            disabled={disabled}
-          />
-        </Col>
-        <Col sm={2} className="action">
-          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} block>
-            <i className="fa fa-trash-o danger-red" />&nbsp;Remove
-          </Button>
-        </Col>
-      </FormGroup>
-    );
+    return report
+      .get('sort', Immutable.List())
+      .map((sort, index) => (
+        <EditorSortRow
+          key={index}
+          item={sort}
+          index={index}
+          disabled={disabled}
+          display={display}
+          usedFields={usedFields}
+          onChangeField={this.onChangeSortField}
+          onChangeOperator={this.onChangeSortOperator}
+          onRemove={this.onSortRemove}
+        />
+      ));
   }
 
   renderGroupByInputs = (filter, index) => {
@@ -538,8 +513,6 @@ class ReportEditor extends Component {
     const groupBy = report.get('group_by', Immutable.List());
     const groupByInputs = groupBy.map(this.renderGroupByInputs);
 
-    const sort = report.get('sort', Immutable.List());
-    const sortInputs = sort.map(this.renderSortInputs);
 
     return (
       <div className="ReportEditor">
@@ -563,7 +536,7 @@ class ReportEditor extends Component {
             <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
           </Panel>
           <Panel header="Sort">
-            <Col sm={12}>{ sortInputs }</Col>
+            <Col sm={12}>{ this.renderSortInputs() }</Col>
             <Col sm={12}>{ this.renderSortActions() }</Col>
           </Panel>
         </Form>
