@@ -6,6 +6,7 @@ import RevisionTimeline from './RevisionTimeline';
 import ModalWrapper from './ModalWrapper';
 import ConfirmModal from './ConfirmModal';
 import CreateButton from './CreateButton';
+import Actions from './Actions';
 
 export {
   ActionButtons,
@@ -16,4 +17,5 @@ export {
   ModalWrapper,
   ConfirmModal,
   CreateButton,
+  Actions,
 };
