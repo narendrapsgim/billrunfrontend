@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { Col } from 'react-bootstrap';
+import { Col, FormGroup } from 'react-bootstrap';
 import EditorSortRow from './SortRow';
 import { CreateButton } from '../../Elements';
 
@@ -69,6 +69,12 @@ class Sort extends Component {
     const sortRows = sort.map((sortRow, index) => this.renderSortRow(sortRow, index, usedOptions));
     return (
       <div>
+        <Col sm={12}>
+          <FormGroup className="form-inner-edit-row">
+            <Col sm={5}><label htmlFor="field_field">Field</label></Col>
+            <Col sm={3}><label htmlFor="order_field">Order</label></Col>
+          </FormGroup>
+        </Col>
         <Col sm={12}>{ sortRows }</Col>
         { mode !== 'view' && (
           <Col sm={12}>

@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { Col } from 'react-bootstrap';
+import { Col, FormGroup } from 'react-bootstrap';
 import {
   getConfig,
 } from '../../../common/Util';
@@ -68,6 +68,13 @@ class Filter extends Component {
     const filtersRows = filters.map(this.renderRow);
     return (
       <div>
+        <Col sm={12}>
+          <FormGroup className="form-inner-edit-row">
+            <Col sm={3}><label htmlFor="field_field">Field</label></Col>
+            <Col sm={2}><label htmlFor="operator_field">Operator</label></Col>
+            <Col sm={3}><label htmlFor="value_field">Value</label></Col>
+          </FormGroup>
+        </Col>
         <Col sm={12}>{ filtersRows }</Col>
         { mode !== 'view' && (
           <Col sm={12}>
