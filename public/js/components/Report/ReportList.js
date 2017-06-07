@@ -40,7 +40,6 @@ class ReportList extends Component {
 
   render() {
     const { items, size, page, nextPage, fields } = this.props;
-
     return (
       <div className="report-list">
         <List

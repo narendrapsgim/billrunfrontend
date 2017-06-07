@@ -2,9 +2,7 @@ import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import { Button, FormGroup, Col } from 'react-bootstrap';
-import {
-  parseConfigSelectOptions,
-} from '../../common/Util';
+import { parseConfigSelectOptions } from '../../common/Util';
 import EditorFilterValue from './EditorFilterValue';
 
 
@@ -88,10 +86,7 @@ class EditorFilterRow extends Component {
   }
 
   render() {
-    const { item, index, disabled } = this.props;
-
-    console.log('render filter row: ', index);
-
+    const { item, disabled } = this.props;
     const config = this.getConfig();
     const fieldOptions = this.getFieldOptions();
     const opOptions = this.getOpOptions();

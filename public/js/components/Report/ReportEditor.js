@@ -1,16 +1,14 @@
 import React, { PropTypes, Component } from 'react';
 import { Form, Button, FormGroup, Col, Row, ControlLabel, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
-import changeCase from 'change-case';
 import Select from 'react-select';
-import Field from '../Field';
 import { CreateButton } from '../Elements';
-import EditorFilterRow from './EditorFilterRow';
-import EditorSortRow from './EditorSortRow';
+import EditorBasic from './EditorBasic';
+import EditorFilters from './EditorFilters';
+import EditorSort from './EditorSort';
 import {
   getConfig,
   parseConfigSelectOptions,
-  formatSelectOptions,
 } from '../../common/Util';
 
 
@@ -19,7 +17,6 @@ class ReportEditor extends Component {
   static propTypes = {
     report: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
-    operators: PropTypes.instanceOf(Immutable.List),
     groupByOperators: PropTypes.instanceOf(Immutable.List),
     linesFileds: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
@@ -30,7 +27,6 @@ class ReportEditor extends Component {
   static defaultProps = {
     report: Immutable.Map(),
     mode: 'update',
-    operators: getConfig(['reports', 'operators'], Immutable.List()),
     groupByOperators: getConfig(['reports', 'groupByOperators'], Immutable.List()),
     linesFileds: Immutable.List(),
     onFilter: () => {},
@@ -191,7 +187,7 @@ class ReportEditor extends Component {
     this.onChangefilter('group_by_fields', Immutable.List(groupByFields));
   }
 
-  onChangeEntity = (val) => {
+  onChangeReportEntity = (val) => {
     this.onChangefilter('entity', val);
     this.onChangefilter('filters', Immutable.List());
     this.onChangefilter('display', Immutable.List());
@@ -213,8 +209,7 @@ class ReportEditor extends Component {
     this.onChangefilter('sort', sort);
   }
 
-  onChangeReportKey = (e) => {
-    const { value } = e.target;
+  onChangeReportKey = (value) => {
     this.onChangefilter('key', value);
   };
 
@@ -250,53 +245,6 @@ class ReportEditor extends Component {
         return Immutable.List();
 
     }
-  }
-
-  renderInputs = () => {
-    const { report, mode, operators } = this.props;
-    const fieldsConfig = this.getEntityFields();
-    const disabled = mode === 'view';
-    return report
-      .get('filters', Immutable.List())
-      .map((filter, index) => (
-        <EditorFilterRow
-          key={index}
-          item={filter}
-          index={index}
-          fieldsConfig={fieldsConfig}
-          operators={operators}
-          disabled={disabled}
-          onChangeField={this.onChangeFilterField}
-          onChangeOperator={this.onChangeFilterOperator}
-          onChangeValue={this.onChangeFilterValue}
-          onRemove={this.onFilterRemove}
-        />
-      ));
-  }
-
-  renderSortInputs = () => {
-    const { mode, report } = this.props;
-    const display = report.get('display', Immutable.List());
-    const usedFields = report
-      .get('sort', Immutable.List())
-      .filter(reportSort => reportSort.get('field', '') !== '')
-      .map(reportSort => reportSort.get('field', ''));
-    const disabled = mode === 'view';
-    return report
-      .get('sort', Immutable.List())
-      .map((sort, index) => (
-        <EditorSortRow
-          key={index}
-          item={sort}
-          index={index}
-          disabled={disabled}
-          display={display}
-          usedFields={usedFields}
-          onChangeField={this.onChangeSortField}
-          onChangeOperator={this.onChangeSortOperator}
-          onRemove={this.onSortRemove}
-        />
-      ));
   }
 
   renderGroupByInputs = (filter, index) => {
@@ -347,28 +295,6 @@ class ReportEditor extends Component {
     );
   }
 
-  renderFilterActions = () => {
-    const { mode } = this.props;
-    if (mode === 'view') {
-      return null;
-    }
-    return (
-      <CreateButton onClick={this.onAddFilter} label="Add Condition" />
-    );
-  }
-
-  renderSortActions = () => {
-    const { mode, report } = this.props;
-    if (mode === 'view') {
-      return null;
-    }
-    const display = report.get('display', Immutable.List());
-    const disabled = mode === 'view' || display.isEmpty();
-    return (
-      <CreateButton onClick={this.onSortAdd} label="Add Sort" disabled={disabled} />
-    );
-  }
-
   renderGroupByActions = () => {
     const { mode, report } = this.props;
     if (mode === 'view') {
@@ -378,50 +304,6 @@ class ReportEditor extends Component {
     const disabled = mode === 'view' || isGroupBy;
     return (
       <CreateButton onClick={this.onGroupByAdd} label="Add Group By Operator" disabled={disabled} />
-    );
-  }
-
-  renderEntitySelector = () => {
-    const { mode, report } = this.props;
-    const entity = report.get('entity', '');
-    const disabled = mode === 'view';
-    const options = getConfig(['reports', 'entities'], Immutable.List())
-      .map(option => Immutable.Map({
-        value: option,
-        label: changeCase.titleCase(getConfig(['systemItems', option, 'itemName'], option)),
-      }))
-      .map(formatSelectOptions)
-      .toArray();
-    return (
-      <FormGroup>
-        <Col componentClass={ControlLabel} sm={3}>
-          Entity
-        </Col>
-        <Col sm={7}>
-          <Select
-            options={options}
-            value={entity}
-            onChange={this.onChangeEntity}
-            disabled={disabled}
-          />
-        </Col>
-      </FormGroup>
-    );
-  }
-
-  renderEntityName = () => {
-    const { mode, report } = this.props;
-    const key = report.get('key', '');
-    const disabled = mode === 'view';
-    return (
-      <FormGroup>
-        <Col componentClass={ControlLabel} sm={3}>
-          Name
-        </Col>
-        <Col sm={7}>
-          <Field onChange={this.onChangeReportKey} value={key} disabled={disabled} />
-        </Col>
-      </FormGroup>
     );
   }
 
@@ -507,37 +389,52 @@ class ReportEditor extends Component {
   }
 
   render() {
-    const { report } = this.props;
-
+    const { mode, report } = this.props;
+    const fieldsConfig = this.getEntityFields();
 
     const groupBy = report.get('group_by', Immutable.List());
     const groupByInputs = groupBy.map(this.renderGroupByInputs);
-
 
     return (
       <div className="ReportEditor">
         <Form horizontal>
           <Panel header="Basic Details">
-            <Col sm={12}>{ this.renderEntityName() }</Col>
-            <Col sm={12}>{ this.renderEntitySelector() }</Col>
+            <EditorBasic
+              mode={mode}
+              title={report.get('key', '')}
+              entity={report.get('entity', '')}
+              onChangeKey={this.onChangeReportKey}
+              onChangeEntity={this.onChangeReportEntity}
+            />
           </Panel>
           <Panel header="Conditions (optional)">
-            <Col sm={12}>{ this.renderInputs() }</Col>
-            <Col sm={12}>{ this.renderFilterActions() }</Col>
+            <EditorFilters
+              mode={mode}
+              filters={report.get('filters', Immutable.List())}
+              options={fieldsConfig}
+              onRemove={this.onFilterRemove}
+              onAdd={this.onAddFilter}
+              onChangeField={this.onChangeFilterField}
+              onChangeOperator={this.onChangeFilterOperator}
+              onChangeValue={this.onChangeFilterValue}
+            />
           </Panel>
-          <Panel header="Grouping (optional)"> {/* collabsed if empty */}
+          <Panel header="Fields">
             <Col sm={12}>{ this.renderGroupByFieldsSelector() }</Col>
-          </Panel>
-          <Panel header="Grouping Operations (optional)"> {/* collabsed if empty */}
             <Col sm={12}>{ groupByInputs }</Col>
             <Col sm={12}>{ this.renderGroupByActions() }</Col>
-          </Panel>
-          <Panel header="Display options">
             <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
           </Panel>
           <Panel header="Sort">
-            <Col sm={12}>{ this.renderSortInputs() }</Col>
-            <Col sm={12}>{ this.renderSortActions() }</Col>
+            <EditorSort
+              mode={mode}
+              sort={report.get('sort', Immutable.List())}
+              options={report.get('display', Immutable.List())}
+              onChangeField={this.onChangeSortField}
+              onChangeOperator={this.onChangeSortOperator}
+              onRemove={this.onSortRemove}
+              onAdd={this.onSortAdd}
+            />
           </Panel>
         </Form>
         <Row>

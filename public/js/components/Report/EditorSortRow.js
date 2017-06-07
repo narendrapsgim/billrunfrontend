@@ -2,9 +2,8 @@ import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import { Button, FormGroup, Col } from 'react-bootstrap';
-import {
-  formatSelectOptions,
-} from '../../common/Util';
+import { formatSelectOptions } from '../../common/Util';
+
 
 class EditorSortRow extends Component {
 
@@ -12,8 +11,8 @@ class EditorSortRow extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     index: PropTypes.number,
     disabled: PropTypes.bool,
-    display: PropTypes.instanceOf(Immutable.List),
-    usedFields: PropTypes.instanceOf(Immutable.List),
+    options: PropTypes.instanceOf(Immutable.List),
+    usedOptions: PropTypes.instanceOf(Immutable.List),
     onChangeField: PropTypes.func,
     onChangeOperator: PropTypes.func,
     onRemove: PropTypes.func,
@@ -23,19 +22,19 @@ class EditorSortRow extends Component {
     item: Immutable.Map(),
     index: 0,
     disabled: false,
-    display: Immutable.List(),
-    usedFields: Immutable.List(),
+    options: Immutable.List(),
+    usedOptions: Immutable.List(),
     onChangeField: () => {},
     onChangeOperator: () => {},
     onRemove: () => {},
   }
 
   shouldComponentUpdate(nextProps) {
-    const { item, index, disabled, display, usedFields } = this.props;
+    const { item, index, disabled, options, usedOptions } = this.props;
     return (
       !Immutable.is(item, nextProps.item)
-      || !Immutable.is(display, nextProps.display)
-      || !Immutable.is(usedFields, nextProps.usedFields)
+      || !Immutable.is(options, nextProps.options)
+      || !Immutable.is(usedOptions, nextProps.usedOptions)
       || index !== nextProps.index
       || disabled !== nextProps.disabled
     );
@@ -58,9 +57,9 @@ class EditorSortRow extends Component {
   }
 
   getFieldOptions = () => {
-    const { item, display, usedFields } = this.props;
-    return display
-      .filter(fieldOption => !usedFields.includes(fieldOption) || item.get('field', '') === fieldOption)
+    const { item, options, usedOptions } = this.props;
+    return options
+      .filter(option => !usedOptions.includes(option) || item.get('field', '') === option)
       .map(formatSelectOptions)
       .toArray();
   }
@@ -74,9 +73,7 @@ class EditorSortRow extends Component {
   }];
 
   render() {
-    const { item, disabled, index } = this.props;
-    console.log('render select:', index);
-
+    const { item, disabled } = this.props;
     const fieldOptions = this.getFieldOptions();
     const opOptions = this.getOpOptions();
     return (
