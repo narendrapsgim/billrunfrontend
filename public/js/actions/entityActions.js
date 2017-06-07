@@ -120,6 +120,15 @@ const buildRequestData = (item, action) => {
       return formData;
     }
 
+    case 'reopen': {
+      const formData = new FormData();
+      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      const update = { from: item.get('from', 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
     default:
       return new FormData();
   }
@@ -186,4 +195,12 @@ export const moveEntity = (collection, item, type) => (dispatch) => {
     }
   });
   return dispatch(saveEntity(collection, hackedItem, 'move'));
+};
+
+export const reopenEntity = (collection, item, from) => (dispatch) => {
+  const itemToReopen = Immutable.Map({
+    _id: item.get('_id'),
+    from,
+  });
+  return dispatch(saveEntity(collection, itemToReopen, 'reopen'));
 };

@@ -116,6 +116,11 @@ export const isItemClosed = (item) => {
   return toTime.isAfter(moment()) && toTime.isBefore(moment().add(50, 'years'));
 };
 
+export const isItemExpired = (item, toField = 'to') => {
+  const toTime = getItemDateValue(item, toField);
+  return toTime.isBefore(moment().add(50, 'years'));
+};
+
 export const getItemMode = (item, undefindItemStatus = 'create') => {
   if (Immutable.Map.isMap(item)) {
     if (getItemId(item, null) === null) {

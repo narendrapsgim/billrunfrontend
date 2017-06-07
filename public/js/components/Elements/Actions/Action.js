@@ -23,6 +23,7 @@ const Action = (props) => {
     'fa-toggle-on': type === 'disable',
     'fa-plus': type === 'add',
     'fa-calendar': type === 'move',
+    'fa-repeat': type === 'reopen',
   });
 
   const onClick = () => {
