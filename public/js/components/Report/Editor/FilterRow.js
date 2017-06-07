@@ -2,11 +2,11 @@ import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import { Button, FormGroup, Col } from 'react-bootstrap';
-import { parseConfigSelectOptions } from '../../common/Util';
-import EditorFilterValue from './EditorFilterValue';
+import { parseConfigSelectOptions } from '../../../common/Util';
+import FilterRowValue from './FilterRowValue';
 
 
-class EditorFilterRow extends Component {
+class FilterRow extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
@@ -114,7 +114,7 @@ class EditorFilterRow extends Component {
         </Col>
 
         <Col sm={3}>
-          <EditorFilterValue
+          <FilterRowValue
             filed={item}
             config={config}
             disabled={disableVal}
@@ -133,4 +133,4 @@ class EditorFilterRow extends Component {
 
 }
 
-export default EditorFilterRow;
+export default FilterRow;

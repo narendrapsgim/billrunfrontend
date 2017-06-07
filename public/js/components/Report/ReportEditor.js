@@ -1,10 +1,10 @@
 import React, { PropTypes, Component } from 'react';
 import { Form, Button, Col, Row, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
-import EditorBasic from './EditorBasic';
-import EditorFilters from './EditorFilters';
-import ReportFields from './ReportFields';
-import EditorSort from './EditorSort';
+import EditorDetails from './Editor/Details';
+import EditorFilter from './Editor/Filter';
+import EditorDisplay from './Editor/Display';
+import EditorSort from './Editor/Sort';
 
 
 class ReportEditor extends Component {
@@ -240,7 +240,7 @@ class ReportEditor extends Component {
       <div className="ReportEditor">
         <Form horizontal>
           <Panel header="Basic Details">
-            <EditorBasic
+            <EditorDetails
               mode={mode}
               title={report.get('key', '')}
               entity={report.get('entity', '')}
@@ -249,7 +249,7 @@ class ReportEditor extends Component {
             />
           </Panel>
           <Panel header="Conditions (optional)">
-            <EditorFilters
+            <EditorFilter
               mode={mode}
               filters={report.get('filters', Immutable.List())}
               options={fieldsConfig}
@@ -261,7 +261,7 @@ class ReportEditor extends Component {
             />
           </Panel>
           <Panel header="Fields">
-            <ReportFields
+            <EditorDisplay
               mode={mode}
               item={report}
               fieldsConfig={fieldsConfig}

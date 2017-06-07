@@ -2,10 +2,10 @@ import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import { Button, FormGroup, Col } from 'react-bootstrap';
-import { formatSelectOptions } from '../../common/Util';
+import { formatSelectOptions } from '../../../common/Util';
 
 
-class EditorSortRow extends Component {
+class SortRow extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
@@ -106,4 +106,4 @@ class EditorSortRow extends Component {
 
 }
 
-export default EditorSortRow;
+export default SortRow;

@@ -3,12 +3,12 @@ import Immutable from 'immutable';
 import { Col } from 'react-bootstrap';
 import {
   getConfig,
-} from '../../common/Util';
-import { CreateButton } from '../Elements';
-import EditorFilterRow from './EditorFilterRow';
+} from '../../../common/Util';
+import { CreateButton } from '../../Elements';
+import EditorFilterRow from './FilterRow';
 
 
-class EditorFilters extends Component {
+class Filter extends Component {
 
   static propTypes = {
     filters: PropTypes.instanceOf(Immutable.List),
@@ -80,4 +80,4 @@ class EditorFilters extends Component {
 
 }
 
-export default EditorFilters;
+export default Filter;

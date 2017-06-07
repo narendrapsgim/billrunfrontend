@@ -4,19 +4,19 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import Select from 'react-select';
 import { HelpBlock } from 'react-bootstrap';
-import Field from '../Field';
+import Field from '../../Field';
 import {
   formatSelectOptions,
-} from '../../common/Util';
+} from '../../../common/Util';
 import {
   productsOptionsSelector,
   cyclesOptionsSelector,
   plansOptionsSelector,
   groupsOptionsSelector,
-} from '../../selectors/listSelectors';
+} from '../../../selectors/listSelectors';
 import {
   usageTypeSelector,
-} from '../../selectors/settingsSelector';
+} from '../../../selectors/settingsSelector';
 import {
   getCyclesOptions,
   getProductsOptions,
@@ -24,10 +24,10 @@ import {
   getServicesOptions,
   getGroupsOptions,
   getUsageTypesOptions,
-} from '../../actions/reportsActions';
+} from '../../../actions/reportsActions';
 
 
-class EditorFilterValue extends Component {
+class FilterRowValue extends Component {
 
   static propTypes = {
     filed: PropTypes.instanceOf(Immutable.Map),
@@ -216,4 +216,4 @@ const mapStateToProps = (state, props) => ({
   }),
 });
 
-export default connect(mapStateToProps)(EditorFilterValue);
+export default connect(mapStateToProps)(FilterRowValue);

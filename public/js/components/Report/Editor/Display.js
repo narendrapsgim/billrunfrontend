@@ -2,13 +2,13 @@ import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { ControlLabel, FormGroup, Col, Button } from 'react-bootstrap';
 import Select from 'react-select';
-import { CreateButton } from '../Elements';
+import { CreateButton } from '../../Elements';
 import {
   getConfig,
   parseConfigSelectOptions,
-} from '../../common/Util';
+} from '../../../common/Util';
 
-class ReportFields extends Component {
+class Display extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
@@ -195,4 +195,4 @@ class ReportFields extends Component {
 
 }
 
-export default ReportFields;
+export default Display;

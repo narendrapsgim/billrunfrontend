@@ -3,13 +3,13 @@ import Immutable from 'immutable';
 import { ControlLabel, FormGroup, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import Select from 'react-select';
-import Field from '../Field';
+import Field from '../../Field';
 import {
   getConfig,
   formatSelectOptions,
-} from '../../common/Util';
+} from '../../../common/Util';
 
-class EditorBasic extends Component {
+class Details extends Component {
 
   static propTypes = {
     title: PropTypes.string,
@@ -94,4 +94,4 @@ class EditorBasic extends Component {
 
 }
 
-export default EditorBasic;
+export default Details;

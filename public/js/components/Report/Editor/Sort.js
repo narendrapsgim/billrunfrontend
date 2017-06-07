@@ -1,11 +1,11 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { Col } from 'react-bootstrap';
-import EditorSortRow from './EditorSortRow';
-import { CreateButton } from '../Elements';
+import EditorSortRow from './SortRow';
+import { CreateButton } from '../../Elements';
 
 
-class EditorSort extends Component {
+class Sort extends Component {
 
   static propTypes = {
     sort: PropTypes.instanceOf(Immutable.List),
@@ -81,4 +81,4 @@ class EditorSort extends Component {
 
 }
 
-export default EditorSort;
+export default Sort;
