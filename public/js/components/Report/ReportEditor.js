@@ -1,15 +1,10 @@
 import React, { PropTypes, Component } from 'react';
-import { Form, Button, FormGroup, Col, Row, ControlLabel, Panel } from 'react-bootstrap';
+import { Form, Button, Col, Row, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
-import Select from 'react-select';
-import { CreateButton } from '../Elements';
 import EditorBasic from './EditorBasic';
 import EditorFilters from './EditorFilters';
+import ReportFields from './ReportFields';
 import EditorSort from './EditorSort';
-import {
-  getConfig,
-  parseConfigSelectOptions,
-} from '../../common/Util';
 
 
 class ReportEditor extends Component {
@@ -17,7 +12,6 @@ class ReportEditor extends Component {
   static propTypes = {
     report: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
-    groupByOperators: PropTypes.instanceOf(Immutable.List),
     linesFileds: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
     onUpdate: PropTypes.func,
@@ -27,7 +21,6 @@ class ReportEditor extends Component {
   static defaultProps = {
     report: Immutable.Map(),
     mode: 'update',
-    groupByOperators: getConfig(['reports', 'groupByOperators'], Immutable.List()),
     linesFileds: Immutable.List(),
     onFilter: () => {},
     onUpdate: () => {},
@@ -229,13 +222,6 @@ class ReportEditor extends Component {
     this.props.onUpdate(type, value);
   }
 
-  filterOptionByFieldType = (option, field) => {
-    if (!field) {
-      return false;
-    }
-    return option.get('types', Immutable.List()).includes(field.get('type', 'string'));
-  }
-
   getEntityFields = () => {
     const { report, linesFileds } = this.props;
     switch (report.get('entity', '')) {
@@ -247,154 +233,9 @@ class ReportEditor extends Component {
     }
   }
 
-  renderGroupByInputs = (filter, index) => {
-    const { mode, groupByOperators } = this.props;
-    const fieldConfig = this.getEntityFields();
-    const confField = fieldConfig.find(conf => conf.get('id', '') === filter.get('field', ''), null, Immutable.Map());
-
-    const disabled = mode === 'view';
-
-    const fieldOptions = fieldConfig
-      .filter(filed => filed.get('groupBy', true))
-      .map(parseConfigSelectOptions)
-      .toArray();
-    const opOptions = groupByOperators
-      .filter(opt => this.filterOptionByFieldType(opt, confField))
-      .map(parseConfigSelectOptions)
-      .toArray();
-
-    const onChangeField = (e) => { this.onChangeBroupByField(index, e); };
-    const onChangeOperator = (e) => { this.onChangeGroupByOperator(index, e); };
-    const onRemove = (e) => { this.onGroupByRemove(index, e); };
-
-    return (
-      <FormGroup className="form-inner-edit-row" key={index}>
-        <Col sm={5}>
-          <Select
-            options={fieldOptions}
-            value={filter.get('field', '')}
-            onChange={onChangeField}
-            disabled={disabled}
-          />
-        </Col>
-        <Col sm={3}>
-          <Select
-            clearable={false}
-            options={opOptions}
-            value={filter.get('op', '')}
-            onChange={onChangeOperator}
-            disabled={disabled}
-          />
-        </Col>
-        <Col sm={2} className="action">
-          <Button onClick={onRemove} bsSize="small" className="pull-left" disabled={disabled} block>
-            <i className="fa fa-trash-o danger-red" />&nbsp;Remove
-          </Button>
-        </Col>
-      </FormGroup>
-    );
-  }
-
-  renderGroupByActions = () => {
-    const { mode, report } = this.props;
-    if (mode === 'view') {
-      return null;
-    }
-    const isGroupBy = report.get('group_by_fields', Immutable.List()).isEmpty();
-    const disabled = mode === 'view' || isGroupBy;
-    return (
-      <CreateButton onClick={this.onGroupByAdd} label="Add Group By Operator" disabled={disabled} />
-    );
-  }
-
-  renderDisplayFieldsSelector = () => {
-    const { mode, report, groupByOperators } = this.props;
-    const isGroupBy = !report.get('group_by_fields', Immutable.List()).isEmpty();
-    const fieldConfig = this.getEntityFields();
-    const disabled = mode === 'view';// || isGroupBy;
-    const display = report.get('display', Immutable.List());
-    const displayFieldsValues = display.join(',');
-
-    let options = [];
-    if (isGroupBy) {
-      options = Immutable.List().withMutations((listWithMutations) => {
-        report.get('group_by_fields', Immutable.List()).forEach((groupByField) => {
-          const field = fieldConfig.find(conf => conf.get('id', '') === groupByField, null, Immutable.Map());
-          listWithMutations.push(Immutable.Map({
-            id: groupByField,
-            title: field.get('title', groupByField),
-          }));
-        });
-        report.get('group_by', Immutable.List()).forEach((groupBy) => {
-          if (groupBy.get('field', '') !== '' && groupBy.get('op', '') !== '') {
-            const field = fieldConfig.find(conf => conf.get('id', '') === groupBy.get('field', ''), null, Immutable.Map());
-            const operator = groupByOperators.find(op => op.get('id', '') === groupBy.get('op', ''), null, Immutable.Map());
-            listWithMutations.push(Immutable.Map({
-              id: `${groupBy.get('field', '')}_${groupBy.get('op', '')}`,
-              title: `${field.get('title', '')} (${operator.get('title', groupBy.get('op', ''))})`,
-            }));
-          }
-        });
-      })
-      .map(parseConfigSelectOptions)
-      .toArray();
-    } else {
-      options = this.getEntityFields()
-      .filter(field => field.get('display', true))
-      .map(parseConfigSelectOptions).toArray();
-    }
-
-    return (
-      <FormGroup>
-        <Col componentClass={ControlLabel} sm={3}>
-          Display Fields
-        </Col>
-        <Col sm={7}>
-          <Select
-            multi={true}
-            options={options}
-            value={displayFieldsValues}
-            onChange={this.onChangeDisplayFields}
-            disabled={disabled}
-          />
-        </Col>
-      </FormGroup>
-    );
-  }
-
-  renderGroupByFieldsSelector = () => {
-    const { mode, report } = this.props;
-    const disabled = mode === 'view';
-    const groupBy = report.get('group_by_fields', Immutable.List());
-    const groupByFieldsValues = groupBy.join(',');
-    const options = this.getEntityFields()
-      .filter(field => field.get('display', true))
-      .map(parseConfigSelectOptions).toArray();
-    return (
-      <FormGroup>
-        <Col componentClass={ControlLabel} sm={3}>
-          Group By
-        </Col>
-        <Col sm={7}>
-          <Select
-            multi={true}
-            options={options}
-            value={groupByFieldsValues}
-            onChange={this.onChangeGroupByFields}
-            disabled={disabled}
-          />
-        </Col>
-      </FormGroup>
-    );
-  }
-
   render() {
     const { mode, report } = this.props;
     const fieldsConfig = this.getEntityFields();
-
-    const groupBy = report.get('group_by', Immutable.List());
-    const groupByInputs = groupBy.map(this.renderGroupByInputs);
-
     return (
       <div className="ReportEditor">
         <Form horizontal>
@@ -420,10 +261,17 @@ class ReportEditor extends Component {
             />
           </Panel>
           <Panel header="Fields">
-            <Col sm={12}>{ this.renderGroupByFieldsSelector() }</Col>
-            <Col sm={12}>{ groupByInputs }</Col>
-            <Col sm={12}>{ this.renderGroupByActions() }</Col>
-            <Col sm={12}>{ this.renderDisplayFieldsSelector() }</Col>
+            <ReportFields
+              mode={mode}
+              item={report}
+              fieldsConfig={fieldsConfig}
+              onGroupByAdd={this.onGroupByAdd}
+              onGroupByRemove={this.onGroupByRemove}
+              onChangeBroupByField={this.onChangeBroupByField}
+              onChangeGroupByOperator={this.onChangeGroupByOperator}
+              onChangeGroupByFields={this.onChangeGroupByFields}
+              onChangeDisplayFields={this.onChangeDisplayFields}
+            />
           </Panel>
           <Panel header="Sort">
             <EditorSort
