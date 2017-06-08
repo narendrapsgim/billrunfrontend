@@ -219,6 +219,7 @@ class RevisionList extends Component {
   afterReopen = (response) => {
     if (response.status) {
       this.props.dispatch(showSuccess('Revision was reopened'));
+      this.onClickReopenClose();
       this.props.onCloseItem();
     }
   }
