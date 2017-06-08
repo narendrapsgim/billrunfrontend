@@ -116,6 +116,16 @@ export const isItemClosed = (item) => {
   return toTime.isAfter(moment()) && toTime.isBefore(moment().add(50, 'years'));
 };
 
+export const isItemReopened = (item, prevItem) => {
+  const currentFrom = getItemDateValue(item, 'from', false);
+  const prevTo = getItemDateValue(prevItem, 'to', false);
+  if (!currentFrom || !prevTo) {
+    return false;
+  }
+
+  return currentFrom.isAfter(prevTo.add(1, 'days'));
+};
+
 export const isItemExpired = (item, toField = 'to') => {
   const toTime = getItemDateValue(item, toField);
   return toTime.isBefore(moment().add(50, 'years'));

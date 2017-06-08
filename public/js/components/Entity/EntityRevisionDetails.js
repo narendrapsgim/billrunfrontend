@@ -7,7 +7,7 @@ import { Form, FormGroup, Button, ControlLabel, Label } from 'react-bootstrap';
 import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
 import Field from '../Field';
-import { getItemDateValue, getConfig, getItemId, getRevisionStartIndex } from '../../common/Util';
+import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import { getSettings } from '../../actions/settingsActions';
 import { entityMinFrom } from '../../selectors/entitySelector';
 
@@ -146,7 +146,7 @@ class EntityRevisionDetails extends Component {
     if (['clone', 'create'].includes(mode)) {
       return null;
     }
-    const start = getRevisionStartIndex(item, revisions);
+
     return (
       <div className="inline pull-right">
         <div className="inline mr10">
@@ -154,7 +154,6 @@ class EntityRevisionDetails extends Component {
             revisions={revisions}
             item={item}
             size={revisionItemsInTimeLine}
-            start={start}
           />
         </div>
         <div className="inline">

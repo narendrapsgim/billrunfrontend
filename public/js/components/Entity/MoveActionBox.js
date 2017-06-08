@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import { Form, FormGroup, Col, Tabs, Tab, Button } from 'react-bootstrap';
 import { ModalWrapper, RevisionTimeline, ConfirmModal } from '../Elements';
-import { getItemDateValue, getConfig, getRevisionStartIndex, getItemId, getItemMinFromDate } from '../../common/Util';
+import { getItemDateValue, getConfig, getItemId, getItemMinFromDate } from '../../common/Util';
 import Field from '../Field';
 import { minEntityDateSelector } from '../../selectors/settingsSelector';
 import { getSettings } from '../../actions/settingsActions';
@@ -147,7 +147,6 @@ class MoveActionBox extends Component {
       return null;
     }
 
-    const start = getRevisionStartIndex(item, revisions);
     const revisionBy = getConfig(['systemItems', itemName, 'uniqueField'], '');
     const title = `${item.get(revisionBy, '')} - Move`;
     const btnStyle = { marginLeft: 5, verticalAlign: 'bottom' };
@@ -174,7 +173,6 @@ class MoveActionBox extends Component {
             revisions={revisions}
             item={item}
             size={10}
-            start={start}
           />
           <Form horizontal style={formStyle}>
             <FormGroup>
