@@ -2,9 +2,8 @@ import moment from 'moment';
 import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getItemDateValue, getConfig } from '../common/Util';
+import { getItemDateValue, getConfig, getItemId } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
-
 
 const apiTimeOutMessage = 'Oops! Something went wrong. Please try again in a few moments.';
 
@@ -122,7 +121,7 @@ const buildRequestData = (item, action) => {
 
     case 'reopen': {
       const formData = new FormData();
-      const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
+      const query = { _id: getItemId(item, 'undefined') };
       const update = { from: item.get('from', 'undefined') };
       formData.append('query', JSON.stringify(query));
       formData.append('update', JSON.stringify(update));
