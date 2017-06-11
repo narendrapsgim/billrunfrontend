@@ -150,6 +150,11 @@ fieldset[disabled] .btn {
   background-color: #eeeeee!important;
   color: #222222!important;
 }
+.Select-menu-outer .Select-option.is-selected {
+    font-weight: bolder;
+    background-color: #eeeeee!important;
+    color: #222222!important;
+}
 /* ~React-Select */
 
 /* System Alerts */
