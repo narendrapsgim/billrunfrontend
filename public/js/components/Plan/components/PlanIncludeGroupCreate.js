@@ -57,12 +57,12 @@ class PlanIncludeGroupCreate extends Component {
   errors = {
     name: {
       required: 'Group name is required',
-      exist: 'Group name already exist',
+      exist: 'Group name already exists',
       allowedCharacters: 'Group name contains illegal characters, name should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
     },
     usage: {
       required: 'Usage type is required',
-      exist: 'Group with same name and usage type already exist',
+      exist: 'Group with same name and usage type already exists',
     },
     include: {
       required: 'Include is required',

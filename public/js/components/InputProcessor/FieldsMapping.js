@@ -86,10 +86,6 @@ export default class FieldsMapping extends Component {
       onError("Please input a value and unit type");
       return;
     }
-    if (pattern.match(/[^a-zA-Z0-9_]/g)) {
-      onError("Only alphanumeric and underscore characters are allowed");
-      return;
-    }
     this.props.onAddUsagetMapping.call(this, {usaget, pattern});
     this.setState({pattern: "", usaget: ""});
   }

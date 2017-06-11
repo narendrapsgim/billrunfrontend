@@ -351,7 +351,7 @@ export function saveInputProcessorSettings(state, parts = []) {
 						processor.get('usaget_mapping').map(usaget => {
 						  return {
 						    "src_field": processor.get('src_field'),
-						    "pattern": `/^${usaget.get('pattern')}$/`,
+						    "pattern": usaget.get('pattern'),
 						    "usaget": usaget.get('usaget')
 						  }
 						}).toJS() };
