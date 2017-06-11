@@ -59,7 +59,7 @@ class SortRow extends Component {
   getFieldOptions = () => {
     const { item, options, usedOptions } = this.props;
     return options
-      .filter(option => !usedOptions.includes(option) || item.get('field', '') === option)
+      .filter(option => !usedOptions.includes(option.get('value', '')) || item.get('field', '') === option.get('value', ''))
       .map(formatSelectOptions)
       .toArray();
   }
@@ -78,7 +78,7 @@ class SortRow extends Component {
     const opOptions = this.getOpOptions();
     return (
       <FormGroup className="form-inner-edit-row">
-        <Col sm={5}>
+        <Col sm={6}>
           <Select
             options={fieldOptions}
             value={item.get('field', '')}
@@ -86,7 +86,7 @@ class SortRow extends Component {
             disabled={disabled}
           />
         </Col>
-        <Col sm={3}>
+        <Col sm={4}>
           <Select
             clearable={false}
             options={opOptions}
@@ -96,7 +96,7 @@ class SortRow extends Component {
           />
         </Col>
         <Col sm={2} className="actions">
-          <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled} block>
+          <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled}>
             <i className="fa fa-trash-o danger-red" />&nbsp;Remove
           </Button>
         </Col>

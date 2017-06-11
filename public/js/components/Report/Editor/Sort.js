@@ -43,38 +43,42 @@ class Sort extends Component {
       .map(sortRow => sortRow.get('field', ''));
   }
 
-  renderSortRow = (sortRow, index, usedOptions) => {
-    const { options, mode } = this.props;
-    const disabled = mode === 'view';
-    return (
-      <EditorSortRow
-        key={index}
-        item={sortRow}
-        index={index}
-        disabled={disabled}
-        options={options}
-        usedOptions={usedOptions}
-        onChangeField={this.props.onChangeField}
-        onChangeOperator={this.props.onChangeOperator}
-        onRemove={this.props.onRemove}
-      />
-    );
-  }
+  renderSortRow = (sortRow, index, fieldOptions, usedOptions, disabled) => (
+    <EditorSortRow
+      key={index}
+      item={sortRow}
+      index={index}
+      disabled={disabled}
+      options={fieldOptions}
+      usedOptions={usedOptions}
+      onChangeField={this.props.onChangeField}
+      onChangeOperator={this.props.onChangeOperator}
+      onRemove={this.props.onRemove}
+    />
+  );
 
   render() {
     const { sort, options, mode } = this.props;
     const disabled = mode === 'view';
     const disableCreateNew = disabled || options.isEmpty();
     const usedOptions = this.getUsedOptions();
-    const sortRows = sort.map((sortRow, index) => this.renderSortRow(sortRow, index, usedOptions));
+    const fieldOptions = options.map(option => Immutable.Map({
+      value: option.get('op', '') === 'group' ? option.get('field', '') : option.get('key', ''),
+      label: option.get('label', ''),
+    }));
+    const sortRows = sort.map((sortRow, index) =>
+      this.renderSortRow(sortRow, index, fieldOptions, usedOptions, disabled),
+    );
     return (
       <div>
-        <Col sm={12}>
-          <FormGroup className="form-inner-edit-row">
-            <Col sm={5}><label htmlFor="field_field">Field</label></Col>
-            <Col sm={3}><label htmlFor="order_field">Order</label></Col>
-          </FormGroup>
-        </Col>
+        { !sortRows.isEmpty() && (
+          <Col sm={12}>
+            <FormGroup className="form-inner-edit-row">
+              <Col sm={6}><label htmlFor="field_field">Field</label></Col>
+              <Col sm={4}><label htmlFor="order_field">Order</label></Col>
+            </FormGroup>
+          </Col>
+        )}
         <Col sm={12}>{ sortRows }</Col>
         { mode !== 'view' && (
           <Col sm={12}>

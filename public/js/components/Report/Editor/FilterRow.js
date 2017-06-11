@@ -94,8 +94,9 @@ class FilterRow extends Component {
     const disableVal = disabled || item.get('op', '') === '' || disableOp;
     return (
       <FormGroup className="form-inner-edit-row">
-        <Col sm={3}>
+        <Col sm={4}>
           <Select
+            clearable={false}
             options={fieldOptions}
             value={item.get('field', '')}
             onChange={this.onChangeField}
@@ -113,7 +114,7 @@ class FilterRow extends Component {
           />
         </Col>
 
-        <Col sm={3}>
+        <Col sm={4}>
           <FilterRowValue
             filed={item}
             config={config}
@@ -123,7 +124,7 @@ class FilterRow extends Component {
         </Col>
 
         <Col sm={2} className="actions">
-          <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled} block>
+          <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled}>
             <i className="fa fa-trash-o danger-red" />&nbsp;Remove
           </Button>
         </Col>

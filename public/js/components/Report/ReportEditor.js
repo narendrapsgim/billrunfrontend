@@ -5,6 +5,7 @@ import EditorDetails from './Editor/Details';
 import EditorFilter from './Editor/Filter';
 import EditorDisplay from './Editor/Display';
 import EditorSort from './Editor/Sort';
+import { getConfig } from '../../common/Util';
 
 
 class ReportEditor extends Component {
@@ -13,6 +14,8 @@ class ReportEditor extends Component {
     report: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
     linesFileds: PropTypes.instanceOf(Immutable.List),
+    groupByOperators: PropTypes.instanceOf(Immutable.List),
+    filterOperators: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
     onUpdate: PropTypes.func,
     onReset: PropTypes.func,
@@ -22,6 +25,8 @@ class ReportEditor extends Component {
     report: Immutable.Map(),
     mode: 'update',
     linesFileds: Immutable.List(),
+    groupByOperators: getConfig(['reports', 'groupByOperators'], Immutable.List()),
+    filterOperators: getConfig(['reports', 'operators'], Immutable.List()),
     onFilter: () => {},
     onUpdate: () => {},
     onReset: () => {},
@@ -59,8 +64,14 @@ class ReportEditor extends Component {
     const { report } = this.props;
     const newFilters = report
       .get('filters', Immutable.List())
-      .setIn([idx, 'op'], value)
-      .setIn([idx, 'value'], '');
+      .update(idx, Immutable.Map(), (filter) => {
+        if (value === 'exists' || filter.get('op', '') === 'exists') {
+          return filter
+            .set('op', value)
+            .set('value', '');
+        }
+        return filter.set('op', value);
+      });
     this.onChangefilter('filters', newFilters);
   }
 
@@ -233,9 +244,78 @@ class ReportEditor extends Component {
     }
   }
 
-  render() {
-    const { mode, report } = this.props;
+  parseFields = () => {
+    const { report, groupByOperators } = this.props;
     const fieldsConfig = this.getEntityFields();
+    return Immutable.List().withMutations((fieldsWithMutations) => {
+      report.get('group_by_fields', Immutable.List()).forEach((groupByField) => {
+        const key = `${groupByField}_group`;
+        const field = Immutable.Map({
+          field: groupByField,
+          op: 'group',
+          key,
+        });
+        fieldsWithMutations.push(field);
+      });
+
+      report.get('group_by', Immutable.List()).forEach((groupBy) => {
+        const key = `${groupBy.get('field', '')}_${groupBy.get('op', '')}`;
+        const foundIndex = fieldsWithMutations.findIndex(
+          fieldWithMutation => fieldWithMutation.get('key', '') === key,
+        );
+        if (foundIndex === -1) {
+          const field = Immutable.Map({
+            field: groupBy.get('field', ''),
+            op: groupBy.get('op', ''),
+            key,
+          });
+          fieldsWithMutations.push(field);
+        }
+      });
+
+      report.get('display', Immutable.List()).forEach((display) => {
+        const foundIndex = fieldsWithMutations.findIndex(
+          fieldWithMutation => (
+            fieldWithMutation.get('key', '') === display
+            || fieldWithMutation.get('key', '') === `${display}_group`
+          ),
+        );
+        if (foundIndex === -1) {
+          const field = Immutable.Map({
+            field: display,
+            op: '',
+            key: display,
+          });
+          fieldsWithMutations.push(field);
+        }
+      });
+      fieldsWithMutations.forEach((fieldWithMutation, idx) => {
+        let label = fieldsConfig
+          .find(
+            conf => conf.get('id', '') === fieldWithMutation.get('field', ''),
+            null,
+            Immutable.Map())
+          .get('title', fieldWithMutation.get('field', ''));
+
+        const op = fieldWithMutation.get('op', '');
+        if (op !== '' && op !== 'group') {
+          const operator = groupByOperators
+            .find(
+              groupByOperator => groupByOperator.get('id', '') === op,
+              null,
+              Immutable.Map())
+            .get('title', op);
+          label += ` (${operator})`;
+        }
+        fieldsWithMutations.setIn([idx, 'label'], label);
+      });
+    });
+  }
+
+  render() {
+    const { mode, report, groupByOperators, filterOperators } = this.props;
+    const fieldsConfig = this.getEntityFields();
+    const fields = this.parseFields();
     return (
       <div className="ReportEditor">
         <Form horizontal>
@@ -252,7 +332,8 @@ class ReportEditor extends Component {
             <EditorFilter
               mode={mode}
               filters={report.get('filters', Immutable.List())}
-              options={fieldsConfig}
+              fieldsOptions={fieldsConfig}
+              operators={filterOperators}
               onRemove={this.onFilterRemove}
               onAdd={this.onAddFilter}
               onChangeField={this.onChangeFilterField}
@@ -263,8 +344,9 @@ class ReportEditor extends Component {
           <Panel header="Fields">
             <EditorDisplay
               mode={mode}
-              item={report}
+              fields={fields}
               fieldsConfig={fieldsConfig}
+              groupByOperators={groupByOperators}
               onGroupByAdd={this.onGroupByAdd}
               onGroupByRemove={this.onGroupByRemove}
               onChangeBroupByField={this.onChangeBroupByField}
@@ -277,7 +359,7 @@ class ReportEditor extends Component {
             <EditorSort
               mode={mode}
               sort={report.get('sort', Immutable.List())}
-              options={report.get('display', Immutable.List())}
+              options={fields}
               onChangeField={this.onChangeSortField}
               onChangeOperator={this.onChangeSortOperator}
               onRemove={this.onSortRemove}

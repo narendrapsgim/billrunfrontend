@@ -128,9 +128,9 @@ class FilterRowValue extends Component {
     //  operator 'EXIST' boolean
     if (filed.get('op', null) === 'exists') {
       let value = '';
-      if (filed.get('value', false)) {
+      if (filed.get('value', false) === true) {
         value = 'yes';
-      } else if (!filed.get('value', true)) {
+      } else if (!filed.get('value', true) === false) {
         value = 'no';
       }
       const options = ['yes', 'no'].map(formatSelectOptions);
