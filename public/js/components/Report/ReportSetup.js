@@ -36,6 +36,7 @@ import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
 import { modeSimpleSelector, itemSelector, idSelector } from '../../selectors/entitySelector';
 import { linesFiledsSelector } from '../../selectors/settingsSelector';
+import { itemsSelector, pageSelector, nextPageSelector, sizeSelector } from '../../selectors/entityListSelectors';
 
 
 class ReportSetup extends Component {
@@ -431,10 +432,10 @@ const mapStateToProps = (state, props) => ({
   item: itemSelector(state, props, 'reports'),
   mode: modeSimpleSelector(state, props, 'reports'),
   linesFileds: linesFiledsSelector(state, props, 'reports'),
-  reportData: state.entityList.items.get('reportData'),
-  page: state.entityList.page.get('reportData'),
-  nextPage: state.entityList.nextPage.get('reportData'),
-  size: state.entityList.size.get('reportData'),
+  reportData: itemsSelector(state, props, 'reportData'),
+  page: pageSelector(state, props, 'reportData'),
+  nextPage: nextPageSelector(state, props, 'reportData'),
+  size: sizeSelector(state, props, 'reportData'),
 });
 
 export default withRouter(connect(mapStateToProps)(ReportSetup));
