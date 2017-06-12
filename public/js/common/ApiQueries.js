@@ -98,9 +98,9 @@ export const usageListQuery = (query, page, sort, size) => ({
 });
 
 export const queueListQuery = (query, page, sort, size) => ({
-  api: 'find',
+  entity: 'queue',
+  action: 'get',
   params: [
-    { collection: 'queue' },
     { size },
     { page },
     { sort: JSON.stringify(sort) },
