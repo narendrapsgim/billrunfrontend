@@ -230,17 +230,6 @@ export const getGroupsQuery = collection => ({
   ],
 });
 
-export const getSubscriptionsByAidQuery = (aid, project = {}) => ({
-  action: 'uniqueget',
-  entity: 'subscribers',
-  params: [
-    { query: JSON.stringify({ aid }) },
-    { page: 0 },
-    { size: 9999 },
-    { project: JSON.stringify(project) },
-  ],
-});
-
 export const getEntityByIdQuery = (collection, id) => ({
   action: 'get',
   entity: collection,

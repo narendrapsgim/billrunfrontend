@@ -9,7 +9,6 @@ export default class Subscriptions extends Component {
 
   static propTypes = {
     aid: PropTypes.number.isRequired,
-    items: PropTypes.instanceOf(Immutable.List),
     settings: PropTypes.instanceOf(Immutable.List),
     allPlans: PropTypes.instanceOf(Immutable.List),
     allServices: PropTypes.instanceOf(Immutable.List),
@@ -20,7 +19,6 @@ export default class Subscriptions extends Component {
   };
 
   static defaultProps = {
-    items: Immutable.List(),
     settings: Immutable.List(),
     allPlans: Immutable.List(),
     allServices: Immutable.List(),
@@ -59,12 +57,11 @@ export default class Subscriptions extends Component {
   }
 
   render() {
-    const { aid, items, settings, allPlans, allServices, defaultListFields } = this.props;
+    const { aid, settings, allPlans, allServices, defaultListFields } = this.props;
     const { subscription } = this.state;
     if (!subscription) {
       return (
         <SubscriptionsList
-          items={items}
           settings={settings}
           aid={aid}
           onNew={this.onClickNew}
