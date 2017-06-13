@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import Field from '../Field';
 
-export default class ChargingDay extends Component {
+export default class Invoicing extends Component {
 
   static propTypes = {
     onChange: React.PropTypes.func.isRequired,
