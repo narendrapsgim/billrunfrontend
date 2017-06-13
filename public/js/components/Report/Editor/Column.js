@@ -72,7 +72,6 @@ class Column extends Component {
   getoperators = () => {
     const { operators } = this.props;
     return operators
-      .push(Immutable.Map({ value: 'none', title: 'None' }))
       .map(parseConfigSelectOptions)
       .toArray();
   }

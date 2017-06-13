@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { Panel } from 'react-bootstrap';
-import { ActionButtons, Actions, LoadingItemPlaceholder } from '../Elements';
+import { ActionButtons, Actions, LoadingItemPlaceholder, ConfirmModal } from '../Elements';
 import ReportEditor from './ReportEditor';
 import ReportList from './ReportList';
 import {
@@ -22,6 +22,7 @@ import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import {
   saveReport,
+  deleteReport,
   getReport,
   clearReport,
   updateReport,
@@ -66,6 +67,7 @@ class ReportSetup extends Component {
     reportFileds: Immutable.Map(),
     reportData: Immutable.List(),
     userName: 'Unknown',
+    mode: 'loading',
     page: 0,
     size: getConfig(['list', 'defaultItems'], 10),
     nextPage: false,
@@ -75,6 +77,8 @@ class ReportSetup extends Component {
     super(props);
     this.state = {
       progress: false,
+      showConfirmReset: false,
+      showConfirmDelete: false,
       listActions: this.getListActions(),
       editActions: this.getEditActions(),
     };
@@ -120,19 +124,19 @@ class ReportSetup extends Component {
 
   initDefaultValues = () => {
     const { mode, userName } = this.props;
+    const now = moment().toISOString();
     if (mode === 'create') {
-      const defaultCreatedValue = moment().toISOString();
       this.onChangeReportValue(['user'], userName);
-      this.onChangeReportValue(['created'], defaultCreatedValue);
-      this.onChangeReportValue(['modified'], defaultCreatedValue);
+      this.onChangeReportValue(['created'], now);
       this.onChangeReportValue(['type'], reportTypes.SIMPLE);
     }
     if (mode === 'update') {
-      const nowDateValue = moment().toISOString();
-      this.onChangeReportValue(['modified'], nowDateValue);
+      this.onChangeReportValue(['from'], now);
     }
     if (mode === 'clone') {
       this.props.dispatch(setCloneReport());
+      this.onChangeReportValue(['created'], now);
+      this.onChangeReportValue(['from'], now);
     }
   }
 
@@ -177,12 +181,37 @@ class ReportSetup extends Component {
     }
   }
 
-  afterSave = (response) => {
+  handleDelete = () => {
+    const { item } = this.props;
+    this.setState({ progress: true });
+    this.props.dispatch(deleteReport(item)).then(this.afterDelete);
+  }
+
+  afterDelete = (response) => {
     this.setState({ progress: false });
-    const { mode } = this.props;
+    if (response.status) {
+      const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
+      this.props.dispatch(showSuccess('The report was deleted'));
+      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
+      this.handleBack();
+    }
+  }
+
+  afterSave = (response) => {
+    const { item, mode } = this.props;
+    this.setState({ progress: false });
     if (response.status) {
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
+      const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
       this.props.dispatch(showSuccess(`The report was ${action}`));
+      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
+      if (mode === 'update') {
+        const itemId = item.getIn(['_id', '$id']);
+        const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
+        this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
+      } else {
+        this.handleBack();
+      }
     }
   }
 
@@ -191,11 +220,6 @@ class ReportSetup extends Component {
     if (this.validate()) {
       this.setState({ progress: true });
       this.props.dispatch(saveReport(item, mode)).then(this.afterSave);
-      const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
-      const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
-      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
-      const itemId = item.getIn(['_id', '$id']);
-      this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
     }
   }
 
@@ -296,8 +320,37 @@ class ReportSetup extends Component {
     this.props.dispatch(setReportDataListSize(size));
   }
 
-  onReset = () => {
-    this.fetchItem();
+
+  onAskDelete = () => {
+    this.setState({ showConfirmDelete: true });
+  }
+
+  onDeleteClose = () => {
+    this.setState({ showConfirmDelete: false });
+  }
+
+  onDeleteOk = () => {
+    this.onDeleteClose();
+    this.handleDelete();
+  }
+
+  onAskReset = () => {
+    this.setState({ showConfirmReset: true });
+  }
+
+  onResetClose = () => {
+    this.setState({ showConfirmReset: false });
+  }
+
+  onResetOk = () => {
+    const { mode } = this.props;
+    this.onResetClose();
+    if (mode === 'create') {
+      this.props.dispatch(clearReport());
+      this.initDefaultValues();
+    } else {
+      this.fetchItem();
+    }
   }
 
   getTableFields = () => {
@@ -339,29 +392,33 @@ class ReportSetup extends Component {
   getListActions = () => [{
     type: 'export_csv',
     label: 'Export CSV',
-    actionStyle: 'default',
     showIcon: true,
     onClick: this.onClickExportCSV,
+    actionStyle: 'primary',
     actionSize: 'xsmall',
-    actionClass: 'btn-primary',
+  }, {
+    type: 'remove',
+    label: 'Delete Report',
+    showIcon: true,
+    onClick: this.onAskDelete,
+    actionStyle: 'danger',
+    actionSize: 'xsmall',
   }, {
     type: 'edit',
     label: 'Edit Report',
-    actionStyle: 'default',
     showIcon: true,
     onClick: this.handleEdit,
+    actionStyle: 'primary',
     actionSize: 'xsmall',
-    actionClass: 'btn-primary',
   }];
 
   getEditActions = () => [{
     type: 'reset',
     label: 'Reset',
-    actionStyle: 'default',
+    actionStyle: 'primary',
     showIcon: false,
-    onClick: this.onReset,
+    onClick: this.onAskReset,
     actionSize: 'xsmall',
-    actionClass: 'btn-primary',
   }];
 
   renderPanelHeader = () => {
@@ -377,12 +434,14 @@ class ReportSetup extends Component {
   }
 
   render() {
-    const { progress } = this.state;
+    const { progress, showConfirmReset, showConfirmDelete } = this.state;
     const { item, mode, reportFileds, reportData, size, page, nextPage } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
+    const confirmResetMessage = 'Are you sure you want to reset report ?';
+    const confirmDeleteMessage = 'Are you sure you want to delete report ?';
     const allowEdit = mode !== 'view';
     const tableFields = this.getTableFields();
     return (
@@ -394,7 +453,6 @@ class ReportSetup extends Component {
               reportFileds={reportFileds}
               mode={mode}
               onUpdate={this.onChangeReportValue}
-              onReset={this.fetchItem}
               onFilter={this.applyFilter}
             />
           }
@@ -421,6 +479,20 @@ class ReportSetup extends Component {
           />
 
         </Panel>
+        <ConfirmModal
+          onOk={this.onResetOk}
+          onCancel={this.onResetClose}
+          show={showConfirmReset}
+          message={confirmResetMessage}
+          labelOk="Yes"
+        />
+        <ConfirmModal
+          onOk={this.onDeleteOk}
+          onCancel={this.onDeleteClose}
+          show={showConfirmDelete}
+          message={confirmDeleteMessage}
+          labelOk="Yes"
+        />
       </div>
     );
   }

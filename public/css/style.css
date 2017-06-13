@@ -62,6 +62,7 @@ fieldset[disabled] .btn {
 
 /* General colors */
 .danger-red { color: #d9534f; }
+.btn-danger .danger-red { color: #ffffff; }
 .disabled {
   color: #6f6f6f;
 }

@@ -21,7 +21,6 @@ class ReportEditor extends Component {
     sortOperators: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
     onUpdate: PropTypes.func,
-    onReset: PropTypes.func,
   };
 
   static defaultProps = {
@@ -36,7 +35,6 @@ class ReportEditor extends Component {
     ]),
     onFilter: () => {},
     onUpdate: () => {},
-    onReset: () => {},
   };
 
 
@@ -46,18 +44,6 @@ class ReportEditor extends Component {
 
   updateReport = (type, value) => {
     this.props.onUpdate(type, value);
-  }
-
-  onClear = () => {
-    const { mode } = this.props;
-    if (mode === 'create') {
-      this.updateReport('entity', '');
-      this.updateReport('conditions', Immutable.List());
-      this.updateReport('columns', Immutable.List());
-      this.updateReport('type', reportTypes.SIMPLE);
-    } else {
-      this.props.onReset();
-    }
   }
 
   onChangeReportEntity = (val) => {
