@@ -41,6 +41,13 @@ const getTimestamp = (state, props) => {
   return undefined;
 };
 
+const getUsername = (state, props) => {
+  if (props.location && props.location.query && typeof props.location.query.u !== 'undefined') {
+    return props.location.query.u;
+  }
+  return undefined;
+};
+
 const getAction = (state, props) => {
   if (props.location && props.location.query && props.location.query.action) {
     return props.location.query.action.length > 0 ? props.location.query.action : null;
@@ -123,6 +130,11 @@ export const tabSelector = createSelector(
 export const timestampSelector = createSelector(
   getTimestamp,
   timestamp => timestamp
+);
+
+export const usernameSelector = createSelector(
+  getUsername,
+  username => username
 );
 
 export const sigSelector = createSelector(

@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { Col, FormGroup, HelpBlock, ControlLabel, Row, Form, Panel, Button } from 'react-bootstrap';
 import { savePassword } from '../../actions/userActions';
-import { showWarning, showSuccess, showDanger } from '../../actions/alertsActions';
-import { idSelector, sigSelector, timestampSelector } from '../../selectors/entitySelector';
+import { showWarning } from '../../actions/alertsActions';
+import { idSelector, sigSelector, timestampSelector, usernameSelector } from '../../selectors/entitySelector';
 
 
 class ChangePassword extends Component {
@@ -13,6 +13,7 @@ class ChangePassword extends Component {
     itemId: PropTypes.string,
     signature: PropTypes.string,
     timestamp: PropTypes.string,
+    username: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
@@ -23,6 +24,7 @@ class ChangePassword extends Component {
     itemId: '',
     signature: '',
     timestamp: '',
+    username: '',
   };
 
   state = {
@@ -78,7 +80,7 @@ class ChangePassword extends Component {
       this.setState({ sending: true });
       this.props.dispatch(savePassword(itemId, signature, timestamp, password, 'changepassword')).then(this.afterSave);
     } else {
-      this.props.dispatch(showWarning("Passwords doesn't much or empty"));
+      this.props.dispatch(showWarning("Passwords don't match or empty"));
     }
   }
 
@@ -88,11 +90,13 @@ class ChangePassword extends Component {
 
   renderChangePassword = () => {
     const { password, password1, errors, sending } = this.state;
+    const { username } = this.props;
     const hasError = errors.password.length > 0 || errors.password1.length > 0;
+    const title = `Choose New Password for ${username}`;
 
     return (
       <Col md={4} mdOffset={4}>
-        <Panel header="Choose New Password">
+        <Panel header={title}>
           <span>
             <FormGroup validationState={hasError ? 'error' : null} >
               <Col componentClass={ControlLabel} sm={3} lg={2}>Password</Col>
@@ -135,6 +139,7 @@ const mapStateToProps = (state, props) => ({
   itemId: idSelector(state, props),
   signature: sigSelector(state, props),
   timestamp: timestampSelector(state, props),
+  username: usernameSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ChangePassword));
