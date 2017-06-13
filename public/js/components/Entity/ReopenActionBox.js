@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, Col, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, Col, HelpBlock, ControlLabel } from 'react-bootstrap';
 import { ModalWrapper } from '../Elements';
 import { getConfig, getItemDateValue } from '../../common/Util';
 import Field from '../Field';
@@ -65,6 +65,9 @@ class ReopenActionBox extends Component {
         <div className="text-center reopen-modal">
           <Form horizontal style={formStyle}>
             <FormGroup validationState={fromError.length > 0 ? 'error' : null}>
+              <Col componentClass={ControlLabel} sm={4}>
+                Reopen From Date
+              </Col>
               <Col sm={6} className="pr0">
                 <Field
                   fieldType="date"
