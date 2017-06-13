@@ -31,20 +31,20 @@ import {
   clearReportData,
   setReportDataListPage,
   setReportDataListSize,
+  reportTypes,
 } from '../../actions/reportsActions';
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
 import { modeSimpleSelector, itemSelector, idSelector } from '../../selectors/entitySelector';
-import { linesFiledsSelector } from '../../selectors/settingsSelector';
+import { reportFieldsSelector } from '../../selectors/settingsSelector';
 import { itemsSelector, pageSelector, nextPageSelector, sizeSelector } from '../../selectors/entityListSelectors';
-
 
 class ReportSetup extends Component {
 
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
-    linesFileds: PropTypes.instanceOf(Immutable.List),
+    reportFileds: PropTypes.instanceOf(Immutable.Map),
     reportData: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     userName: PropTypes.string,
@@ -63,7 +63,7 @@ class ReportSetup extends Component {
 
   static defaultProps = {
     item: Immutable.Map(),
-    linesFileds: Immutable.List(),
+    reportFileds: Immutable.Map(),
     reportData: Immutable.List(),
     userName: 'Unknown',
     page: 0,
@@ -82,7 +82,7 @@ class ReportSetup extends Component {
 
   componentWillMount() {
     this.fetchItem();
-    this.props.dispatch(getSettings('file_types'));
+    this.props.dispatch(getSettings(['file_types', 'subscribers.subscriber', 'subscribers.account']));
   }
 
   componentDidMount() {
@@ -122,13 +122,14 @@ class ReportSetup extends Component {
     const { mode, userName } = this.props;
     if (mode === 'create') {
       const defaultCreatedValue = moment().toISOString();
-      this.onChangeFieldValue(['user'], userName);
-      this.onChangeFieldValue(['created'], defaultCreatedValue);
-      this.onChangeFieldValue(['modified'], defaultCreatedValue);
+      this.onChangeReportValue(['user'], userName);
+      this.onChangeReportValue(['created'], defaultCreatedValue);
+      this.onChangeReportValue(['modified'], defaultCreatedValue);
+      this.onChangeReportValue(['type'], reportTypes.SIMPLE);
     }
     if (mode === 'update') {
       const nowDateValue = moment().toISOString();
-      this.onChangeFieldValue(['modified'], nowDateValue);
+      this.onChangeReportValue(['modified'], nowDateValue);
     }
     if (mode === 'clone') {
       this.props.dispatch(setCloneReport());
@@ -161,7 +162,7 @@ class ReportSetup extends Component {
     this.props.dispatch(getReportData({ query, page, size }));
   }
 
-  onChangeFieldValue = (path, value) => {
+  onChangeReportValue = (path, value) => {
     this.props.dispatch(setReportDataListPage(0));
     this.props.dispatch(clearReportData());
     const stringPath = Array.isArray(path) ? path.join('.') : path;
@@ -300,10 +301,10 @@ class ReportSetup extends Component {
   }
 
   getTableFields = () => {
-    const { item, linesFileds } = this.props;
+    const { item, reportFileds } = this.props;
     const selectedFields = item.get('display', Immutable.List());
     const isGroupBy = !item.get('group_by_fields', Immutable.List()).isEmpty();
-    const configFields = linesFileds;
+    const configFields = reportFileds;
     const groupByOperators = getConfig(['reports', 'groupByOperators'], Immutable.List());
 
 
@@ -377,7 +378,7 @@ class ReportSetup extends Component {
 
   render() {
     const { progress } = this.state;
-    const { item, mode, linesFileds, reportData, size, page, nextPage } = this.props;
+    const { item, mode, reportFileds, reportData, size, page, nextPage } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -390,9 +391,9 @@ class ReportSetup extends Component {
           { allowEdit &&
             <ReportEditor
               report={item}
-              linesFileds={linesFileds}
+              reportFileds={reportFileds}
               mode={mode}
-              onUpdate={this.onChangeFieldValue}
+              onUpdate={this.onChangeReportValue}
               onReset={this.fetchItem}
               onFilter={this.applyFilter}
             />
@@ -431,7 +432,7 @@ const mapStateToProps = (state, props) => ({
   itemId: idSelector(state, props, 'reports'),
   item: itemSelector(state, props, 'reports'),
   mode: modeSimpleSelector(state, props, 'reports'),
-  linesFileds: linesFiledsSelector(state, props, 'reports'),
+  reportFileds: reportFieldsSelector(state, props, 'reports'),
   reportData: itemsSelector(state, props, 'reportData'),
   page: pageSelector(state, props, 'reportData'),
   nextPage: nextPageSelector(state, props, 'reportData'),

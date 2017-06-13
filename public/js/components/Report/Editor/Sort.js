@@ -1,94 +1,113 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { Col, FormGroup } from 'react-bootstrap';
-import EditorSortRow from './SortRow';
-import { CreateButton } from '../../Elements';
-
+import Select from 'react-select';
+import { Button, FormGroup, Col } from 'react-bootstrap';
+import { SortableElement } from 'react-sortable-hoc';
+import { DragHandle } from '../../Elements';
+import { formatSelectOptions } from '../../../common/Util';
 
 class Sort extends Component {
 
   static propTypes = {
-    sort: PropTypes.instanceOf(Immutable.List),
+    item: PropTypes.instanceOf(Immutable.Map),
+    idx: PropTypes.number,
+    disabled: PropTypes.bool,
     options: PropTypes.instanceOf(Immutable.List),
-    mode: PropTypes.string,
+    sortOperators: PropTypes.instanceOf(Immutable.List),
     onChangeField: PropTypes.func,
     onChangeOperator: PropTypes.func,
     onRemove: PropTypes.func,
-    onAdd: PropTypes.func,
   }
 
   static defaultProps = {
-    sort: Immutable.List(),
+    item: Immutable.Map(),
+    idx: 0,
+    disabled: false,
     options: Immutable.List(),
-    mode: 'update',
+    sortOperators: Immutable.List(),
     onChangeField: () => {},
     onChangeOperator: () => {},
     onRemove: () => {},
-    onAdd: () => {},
   }
 
   shouldComponentUpdate(nextProps) {
-    const { sort, options, mode } = this.props;
+    const { item, idx, disabled, options, sortOperators } = this.props;
     return (
-      !Immutable.is(sort, nextProps.sort)
+      !Immutable.is(item, nextProps.item)
       || !Immutable.is(options, nextProps.options)
-      || mode !== nextProps.mode
+      || !Immutable.is(sortOperators, nextProps.sortOperators)
+      || idx !== nextProps.idx
+      || disabled !== nextProps.disabled
     );
   }
 
-  getUsedOptions = () => {
-    const { sort } = this.props;
-    return sort
-      .filter(sortRow => sortRow.get('field', '') !== '')
-      .map(sortRow => sortRow.get('field', ''));
+
+  onRemove = (e) => {
+    const { idx } = this.props;
+    this.props.onRemove(idx, e);
   }
 
-  renderSortRow = (sortRow, index, fieldOptions, usedOptions, disabled) => (
-    <EditorSortRow
-      key={index}
-      item={sortRow}
-      index={index}
-      disabled={disabled}
-      options={fieldOptions}
-      usedOptions={usedOptions}
-      onChangeField={this.props.onChangeField}
-      onChangeOperator={this.props.onChangeOperator}
-      onRemove={this.props.onRemove}
-    />
-  );
+  onChangeField = (e) => {
+    const { idx } = this.props;
+    this.props.onChangeField(idx, e);
+  }
+
+  onChangeOperator = (e) => {
+    const { idx } = this.props;
+    this.props.onChangeOperator(idx, e);
+  }
+
+  getFieldOptions = () => {
+    const { options } = this.props;
+    return options
+      .map(formatSelectOptions)
+      .toArray();
+  }
+
+  getOpOptions = () => {
+    const { sortOperators } = this.props;
+    return sortOperators
+      .map(formatSelectOptions)
+      .toArray();
+  }
 
   render() {
-    const { sort, options, mode } = this.props;
-    const disabled = mode === 'view';
-    const disableCreateNew = disabled || options.isEmpty();
-    const usedOptions = this.getUsedOptions();
-    const fieldOptions = options.map(option => Immutable.Map({
-      value: option.get('op', '') === 'group' ? option.get('field', '') : option.get('key', ''),
-      label: option.get('label', ''),
-    }));
-    const sortRows = sort.map((sortRow, index) =>
-      this.renderSortRow(sortRow, index, fieldOptions, usedOptions, disabled),
-    );
+    const { item, disabled } = this.props;
+    const fieldOptions = this.getFieldOptions();
+    const opOptions = this.getOpOptions();
+    const disableOp = disabled || item.get('field', '') === '';
     return (
-      <div>
-        { !sortRows.isEmpty() && (
-          <Col sm={12}>
-            <FormGroup className="form-inner-edit-row">
-              <Col sm={6}><label htmlFor="field_field">Field</label></Col>
-              <Col sm={4}><label htmlFor="order_field">Order</label></Col>
-            </FormGroup>
-          </Col>
-        )}
-        <Col sm={12}>{ sortRows }</Col>
-        { mode !== 'view' && (
-          <Col sm={12}>
-            <CreateButton onClick={this.props.onAdd} label="Add Sort" disabled={disableCreateNew} />
-          </Col>
-        )}
-      </div>
+      <FormGroup className="form-inner-edit-row">
+        <Col sm={1} className="text-center">
+          <DragHandle />
+        </Col>
+        <Col sm={5}>
+          <Select
+            clearable={false}
+            options={fieldOptions}
+            value={item.get('field', '')}
+            onChange={this.onChangeField}
+            disabled={disabled}
+          />
+        </Col>
+        <Col sm={4}>
+          <Select
+            clearable={false}
+            options={opOptions}
+            value={item.get('op', '')}
+            onChange={this.onChangeOperator}
+            disabled={disableOp}
+          />
+        </Col>
+        <Col sm={2} className="actions">
+          <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled}>
+            <i className="fa fa-trash-o danger-red" />&nbsp;Remove
+          </Button>
+        </Col>
+      </FormGroup>
     );
   }
 
 }
 
-export default Sort;
+export default SortableElement(Sort);

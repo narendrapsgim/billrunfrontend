@@ -2,19 +2,21 @@ import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import { Button, FormGroup, Col } from 'react-bootstrap';
-import { formatSelectOptions } from '../../../common/Util';
+import { parseConfigSelectOptions } from '../../../common/Util';
+import ConditionValue from './ConditionValue';
 
 
-class SortRow extends Component {
+class Condition extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     index: PropTypes.number,
     disabled: PropTypes.bool,
-    options: PropTypes.instanceOf(Immutable.List),
-    usedOptions: PropTypes.instanceOf(Immutable.List),
+    operators: PropTypes.instanceOf(Immutable.List),
+    fieldsConfig: PropTypes.instanceOf(Immutable.List),
     onChangeField: PropTypes.func,
     onChangeOperator: PropTypes.func,
+    onChangeValue: PropTypes.func,
     onRemove: PropTypes.func,
   }
 
@@ -22,79 +24,105 @@ class SortRow extends Component {
     item: Immutable.Map(),
     index: 0,
     disabled: false,
-    options: Immutable.List(),
-    usedOptions: Immutable.List(),
+    fieldsConfig: Immutable.List(),
+    operators: Immutable.List(),
     onChangeField: () => {},
     onChangeOperator: () => {},
+    onChangeValue: () => {},
     onRemove: () => {},
   }
 
   shouldComponentUpdate(nextProps) {
-    const { item, index, disabled, options, usedOptions } = this.props;
+    const { item, index, disabled, fieldsConfig, operators } = this.props;
     return (
       !Immutable.is(item, nextProps.item)
-      || !Immutable.is(options, nextProps.options)
-      || !Immutable.is(usedOptions, nextProps.usedOptions)
+      || !Immutable.is(fieldsConfig, nextProps.fieldsConfig)
+      || !Immutable.is(operators, nextProps.operators)
       || index !== nextProps.index
       || disabled !== nextProps.disabled
     );
   }
 
-
-  onRemove = (e) => {
-    const { index } = this.props;
-    this.props.onRemove(index, e);
-  }
-
   onChangeField = (e) => {
     const { index } = this.props;
     this.props.onChangeField(index, e);
-  }
+  };
 
   onChangeOperator = (e) => {
     const { index } = this.props;
     this.props.onChangeOperator(index, e);
+  };
+
+  onChangeValue = (e) => {
+    const { index } = this.props;
+    this.props.onChangeValue(index, e);
+  };
+
+  onRemove = (e) => {
+    const { index } = this.props;
+    this.props.onRemove(index, e);
+  };
+
+  getConfig = () => {
+    const { item, fieldsConfig } = this.props;
+    return fieldsConfig.find(conf => conf.get('id', '') === item.get('field', ''), null, Immutable.Map());
   }
 
   getFieldOptions = () => {
-    const { item, options, usedOptions } = this.props;
-    return options
-      .filter(option => !usedOptions.includes(option.get('value', '')) || item.get('field', '') === option.get('value', ''))
-      .map(formatSelectOptions)
+    const { fieldsConfig } = this.props;
+    return fieldsConfig
+      .filter(filed => filed.get('filter', true))
+      .map(parseConfigSelectOptions)
       .toArray();
   }
 
-  getOpOptions = () => [{
-    value: 1,
-    label: 'Ascending',
-  }, {
-    value: -1,
-    label: 'Descending',
-  }];
+  getOpOptions = () => {
+    const { operators } = this.props;
+    const config = this.getConfig();
+    return operators
+      .filter(option => option.get('types', Immutable.List()).includes(config.get('type', 'string')))
+      .map(parseConfigSelectOptions)
+      .toArray();
+  }
 
   render() {
     const { item, disabled } = this.props;
+    const config = this.getConfig();
     const fieldOptions = this.getFieldOptions();
     const opOptions = this.getOpOptions();
+    const disableOp = disabled || item.get('field', '') === '';
+    const disableVal = disabled || item.get('op', '') === '' || disableOp;
     return (
       <FormGroup className="form-inner-edit-row">
-        <Col sm={6}>
+        <Col sm={4}>
           <Select
+            clearable={false}
             options={fieldOptions}
             value={item.get('field', '')}
             onChange={this.onChangeField}
             disabled={disabled}
           />
         </Col>
-        <Col sm={4}>
+
+        <Col sm={2}>
           <Select
             clearable={false}
             options={opOptions}
             value={item.get('op', '')}
             onChange={this.onChangeOperator}
-            disabled={disabled}
+            disabled={disableOp}
           />
         </Col>
+
+        <Col sm={4}>
+          <ConditionValue
+            filed={item}
+            config={config}
+            disabled={disableVal}
+            onChange={this.onChangeValue}
+          />
+        </Col>
+
         <Col sm={2} className="actions">
           <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled}>
             <i className="fa fa-trash-o danger-red" />&nbsp;Remove
@@ -106,4 +134,4 @@ class SortRow extends Component {
 
 }
 
-export default SortRow;
+export default Condition;

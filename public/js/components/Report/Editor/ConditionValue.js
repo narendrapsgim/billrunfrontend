@@ -27,7 +27,7 @@ import {
 } from '../../../actions/reportsActions';
 
 
-class FilterRowValue extends Component {
+class ConditionValue extends Component {
 
   static propTypes = {
     filed: PropTypes.instanceOf(Immutable.Map),
@@ -216,4 +216,4 @@ const mapStateToProps = (state, props) => ({
   }),
 });
 
-export default connect(mapStateToProps)(FilterRowValue);
+export default connect(mapStateToProps)(ConditionValue);

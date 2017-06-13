@@ -3,7 +3,10 @@ import Immutable from 'immutable';
 import { ControlLabel, FormGroup, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import Select from 'react-select';
+import { ReportDescription } from '../../../FieldDescriptions';
+import Help from '../../Help';
 import Field from '../../Field';
+import { reportTypes } from '../../../actions/reportsActions';
 import {
   getConfig,
   formatSelectOptions,
@@ -14,25 +17,30 @@ class Details extends Component {
   static propTypes = {
     title: PropTypes.string,
     entity: PropTypes.string,
+    type: PropTypes.number,
     mode: PropTypes.string,
     onChangeKey: PropTypes.func,
     onChangeEntity: PropTypes.func,
+    onChangeType: PropTypes.func,
   }
 
   static defaultProps = {
     title: '',
     entity: '',
+    type: 0,
     mode: 'update',
     onChangeKey: () => {},
     onChangeEntity: () => {},
+    onChangeType: () => {},
   }
 
   shouldComponentUpdate(nextProps) {
-    const { title, entity, mode } = this.props;
+    const { title, entity, mode, type } = this.props;
     return (
       title !== nextProps.title
       || entity !== nextProps.entity
       || mode !== nextProps.mode
+      || type !== nextProps.type
     );
   }
 
@@ -53,10 +61,19 @@ class Details extends Component {
     .map(formatSelectOptions)
     .toArray();
 
+  onChangeTypeGropped = () => {
+    this.props.onChangeType(reportTypes.GROPPED);
+  }
+
+  onChangeTypeSimple = () => {
+    this.props.onChangeType(reportTypes.SIMPLE);
+  }
+
   render() {
-    const { title, entity, mode } = this.props;
+    const { title, entity, type, mode } = this.props;
     const disabled = mode === 'view';
     const entityOptions = this.getEntityOptions();
+    const isGrouped = type === reportTypes.GROPPED;
     return (
       <div>
         <Col sm={12}>
@@ -85,6 +102,41 @@ class Details extends Component {
                 onChange={this.onChangeEntity}
                 disabled={disabled}
               />
+            </Col>
+          </FormGroup>
+        </Col>
+        <Col sm={12}>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>
+              Report Type
+            </Col>
+            <Col sm={3} key="pricing-method-1">
+              <div className="inline">
+                <Field
+                  fieldType="radio"
+                  name="report-method"
+                  id="report-method-simple"
+                  value="simple"
+                  checked={!isGrouped}
+                  onChange={this.onChangeTypeSimple}
+                  label="Simple"
+                />
+              </div>
+              &nbsp;<Help contents={ReportDescription.method_simple} />
+            </Col>
+            <Col sm={3} key="pricing-method-2">
+              <div className="inline">
+                <Field
+                  fieldType="radio"
+                  name="report-method"
+                  id="report-method-grouped"
+                  value="grouped"
+                  checked={isGrouped}
+                  onChange={this.onChangeTypeGropped}
+                  label="Grouped"
+                />
+              </div>
+              &nbsp;<Help contents={ReportDescription.method_grouped} />
             </Col>
           </FormGroup>
         </Col>
