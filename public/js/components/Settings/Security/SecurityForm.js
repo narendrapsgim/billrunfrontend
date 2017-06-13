@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import { Form, FormControl, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import { ModalWrapper } from '../../Elements';
+import { getConfig } from '../../../common/Util';
 
 
 class SecurityForm extends Component {
@@ -32,13 +33,15 @@ class SecurityForm extends Component {
 
   onChangeDateFrom = (momentFromDate) => {
     const { item } = this.state;
-    const fromValue = momentFromDate ? momentFromDate.toISOString() : '';
+    const apiFormat = getConfig('apiDateTimeFormat', '"YYYY-MM-DD"');
+    const fromValue = momentFromDate ? momentFromDate.format(apiFormat) : '';
     this.setState({ item: item.set('from', fromValue) });
   }
 
   onChangeDateTo = (momentFromDate) => {
     const { item } = this.state;
-    const fromValue = momentFromDate ? momentFromDate.toISOString() : '';
+    const apiFormat = getConfig('apiDateTimeFormat', '"YYYY-MM-DD"');
+    const fromValue = momentFromDate ? momentFromDate.format(apiFormat) : '';
     this.setState({ item: item.set('to', fromValue) });
   }
 
