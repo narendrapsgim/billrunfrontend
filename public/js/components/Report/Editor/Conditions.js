@@ -65,31 +65,25 @@ class Conditions extends Component {
     const conditionsRows = conditions.map(this.renderRow);
     const disableAdd = fieldsOptions.isEmpty();
     return (
-      <div>
+      <Row>
         { !conditionsRows.isEmpty() && (
-          <Row>
-            <Col sm={12}>
-              <FormGroup className="form-inner-edit-row">
-                <Col sm={4}><label htmlFor="field_field">Field</label></Col>
-                <Col sm={2}><label htmlFor="operator_field">Operator</label></Col>
-                <Col sm={4}><label htmlFor="value_field">Value</label></Col>
-              </FormGroup>
-            </Col>
-          </Row>
-        )}
-        <Row>
           <Col sm={12}>
-            { conditionsRows }
+            <FormGroup className="form-inner-edit-row">
+              <Col sm={4}><label htmlFor="field_field">Field</label></Col>
+              <Col sm={2}><label htmlFor="operator_field">Operator</label></Col>
+              <Col sm={4}><label htmlFor="value_field">Value</label></Col>
+            </FormGroup>
           </Col>
-        </Row>
-        { mode !== 'view' && (
-          <Row>
-            <Col sm={12}>
-              <CreateButton onClick={this.props.onAdd} label="Add Condition" disabled={disableAdd} />
-            </Col>
-          </Row>
         )}
-      </div>
+        <Col sm={12}>
+          { conditionsRows }
+        </Col>
+        { mode !== 'view' && (
+          <Col sm={12}>
+            <CreateButton onClick={this.props.onAdd} label="Add Condition" disabled={disableAdd} />
+          </Col>
+        )}
+      </Row>
     );
   }
 

@@ -83,37 +83,31 @@ class Sorts extends Component {
     const disableCreateNew = disabled || options.isEmpty();
     const sortRows = sorts.map(this.renderSortRow);
     return (
-      <div>
+      <Row>
         { !sortRows.isEmpty() && (
-          <Row>
-            <Col sm={12}>
-              <FormGroup className="form-inner-edit-row">
-                <Col sm={1}>&nbsp;</Col>
-                <Col sm={6}><label htmlFor="field_field">Field</label></Col>
-                <Col sm={4}><label htmlFor="order_field">Order</label></Col>
-              </FormGroup>
-            </Col>
-          </Row>
-        )}
-        <Row>
           <Col sm={12}>
-            <SortableFieldsContainer
-              lockAxis="y"
-              helperClass="draggable-row"
-              useDragHandle={true}
-              items={sortRows.toArray()}
-              onSortEnd={this.onMoveEnd}
-            />
+            <FormGroup className="form-inner-edit-row">
+              <Col sm={1}>&nbsp;</Col>
+              <Col sm={6}><label htmlFor="field_field">Field</label></Col>
+              <Col sm={4}><label htmlFor="order_field">Order</label></Col>
+            </FormGroup>
           </Col>
-        </Row>
-        { mode !== 'view' && (
-          <Row>
-            <Col sm={12}>
-              <CreateButton onClick={this.props.onAdd} label="Add Sort" disabled={disableCreateNew} />
-            </Col>
-          </Row>
         )}
-      </div>
+        <Col sm={12}>
+          <SortableFieldsContainer
+            lockAxis="y"
+            helperClass="draggable-row"
+            useDragHandle={true}
+            items={sortRows.toArray()}
+            onSortEnd={this.onMoveEnd}
+          />
+        </Col>
+        { mode !== 'view' && (
+          <Col sm={12}>
+            <CreateButton onClick={this.props.onAdd} label="Add Sort" disabled={disableCreateNew} />
+          </Col>
+        )}
+      </Row>
     );
   }
 
