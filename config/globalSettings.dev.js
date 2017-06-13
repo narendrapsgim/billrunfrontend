@@ -31,54 +31,56 @@ var globalSetting = {
   logoMaxSize: 2,
   chargingBufferDays: 5,
   reports: {
-    entities: ['usage'/* , 'subscription', 'customer' */],
+    entities: ['usage', 'subscription', 'customer'],
     fields: {
       usage: [
         // Default settings \ Example
-        // { id: [REQUIRED], type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
+        // { id: [REQUIRED], type: 'string', searchable: true, aggregatable: true, inputConfig: {
         //    inputType: 'select',
         //    options: ['option1', 'option2'] | [{value: 'val', label: 'Label'}, ...] /* array of values or objects */
         //    callback: 'getExampleOptions', /* callback function + should be implementation */
         // } },
-        { id: 'urt', type: 'date', filter: true, display: true, groupBy: true },
-        { id: 'arate_key', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
+        { id: 'urt', type: 'date', searchable: true, aggregatable: false },
+        { id: 'lastname', type: 'string', searchable: true, aggregatable: false },
+        { id: 'firstname', type: 'string', searchable: true, aggregatable: false },
+        { id: 'stamp', type: 'string', searchable: true, aggregatable: false },
+        { id: 'in_group', type: 'number', searchable: true, aggregatable: false },
+        { id: 'aprice', type: 'number', searchable: true, aggregatable: false },
+        { id: 'file', type: 'string', searchable: true, aggregatable: true },
+        { id: 'billsec', type: 'number', searchable: true, aggregatable: false },
+        { id: 'sid', type: 'number', searchable: true, aggregatable: true },
+        { id: 'over_group', type: 'number', searchable: true, aggregatable: false },
+        { id: 'usagev', type: 'number', searchable: true, aggregatable: true },
+        { id: 'aid', type: 'number', searchable: true, aggregatable: true },
+        { id: 'process_time', type: 'string', searchable: true, aggregatable: false },
+        { id: 'usagesb', type: 'number', searchable: true, aggregatable: false },
+        { id: 'session_id', type: 'string', searchable: true, aggregatable: true },
+        { id: 'billrun_pretend', type: 'boolean', searchable: true, display: false, aggregatable: false },
+        { id: 'arate_key', type: 'string', searchable: true, aggregatable: true, inputConfig: {
           inputType: 'select',
           callback: 'getProductsOptions'
         } },
-        { id: 'arategroup', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
+        { id: 'arategroup', type: 'string', searchable: true, aggregatable: true, inputConfig: {
           inputType: 'select',
           callback: 'getGroupsOptions',
         } },
-        { id: 'lastname', type: 'string', filter: true, display: true, groupBy: false },
-        { id: 'firstname', type: 'string', filter: true, display: true, groupBy: false },
-        { id: 'stamp', type: 'string', filter: true, display: true, groupBy: false },
-        { id: 'billrun', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
+        { id: 'billrun', type: 'string', searchable: true, aggregatable: true, inputConfig: {
           inputType: 'select',
           callback: 'getCyclesOptions',
         } },
-        { id: 'in_group', type: 'number', filter: true, display: true, groupBy: false },
-        { id: 'aprice', type: 'number', filter: true, display: true, groupBy: false },
-        { id: 'file', type: 'string', filter: true, display: true, groupBy: true },
-        { id: 'plan', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
+        { id: 'plan', type: 'string', searchable: true, aggregatable: true, inputConfig: {
           inputType: 'select',
           callback: 'getPlansOptions',
         } },
-        { id: 'billsec', type: 'number', filter: true, display: true, groupBy: false },
-        { id: 'sid', type: 'number', filter: true, display: true, groupBy: true },
-        { id: 'over_group', type: 'number', filter: true, display: true, groupBy: false },
-        { id: 'usagev', type: 'number', filter: true, display: true, groupBy: true },
-        { id: 'usaget', type: 'string', filter: true, display: true, groupBy: true, inputConfig: {
+        { id: 'usaget', type: 'string', searchable: true, aggregatable: true, inputConfig: {
           inputType: 'select',
           callback: 'getUsageTypesOptions',
         } },
-        { id: 'aid', type: 'number', filter: true, display: true, groupBy: true },
-        { id: 'process_time', type: 'string', filter: true, display: true, groupBy: false },
-        { id: 'usagesb', type: 'number', filter: true, display: true, groupBy: false },
-        { id: 'session_id', type: 'string', filter: true, display: true, groupBy: true },
-        { id: 'billrun_pretend', type: 'boolean', filter: true, display: false, groupBy: false },
       ],
+      subscribers: [],
+      account: [],
     },
-    operators: [
+    conditionsOperators: [
       { id: 'eq', title: '=', types: ['string', 'number', 'boolean', 'date'] }, // 'Equals'
       { id: 'ne', title: '!=', types: ['string', 'number', 'boolean'] }, // 'Not equals'
       { id: 'lt', title: '<', types: ['number', 'date'] }, // 'Less than'
@@ -91,7 +93,8 @@ var globalSetting = {
       { id: 'exists', title: 'Exists', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'in', title: 'In', types: ['string', 'number'] },
     ],
-    groupByOperators: [
+    aggregateOperators: [
+      { id: 'group', title: 'Group', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'sum', title: 'Sum', types: ['number'] },
       { id: 'avg', title: 'Average', types: ['number'] },
       { id: 'first', title: 'First', types: ['string', 'number', 'boolean', 'date'] },
@@ -101,6 +104,7 @@ var globalSetting = {
       { id: 'push', title: 'List', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'addToSet', title: 'Unique List', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'count', title: 'Count', types: ['string', 'number', 'boolean', 'date'] },
+      { id: 'none', title: 'None', types: ['string', 'number', 'boolean', 'date'] },
     ],
   },
   systemItems: {

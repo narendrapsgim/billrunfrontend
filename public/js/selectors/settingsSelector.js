@@ -22,6 +22,12 @@ const getEntityFields = (state, props) =>
 const getMinEntityDate = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('minimum_entity_start_date');
 
+const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['subscribers', 'account', 'fields']);
+
+const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['subscribers', 'subscriber', 'fields']);
+
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
   const defaultUsaget = inputProssesor.getIn(['processor', 'default_usaget'], '');
@@ -100,8 +106,8 @@ const selectLinesFields = (customKeys) => {
         optionsWithMutations.push(Immutable.Map({
           id: `uf.${customKey}`,
           title: `${title}`,
-          filter: true,
-          display: true,
+          searchable: true,
+          aggregatable: true,
         }));
       }
     });
@@ -167,4 +173,93 @@ export const usageTypeSelector = createSelector(
 export const entityFieldSelector = createSelector(
   getEntityFields,
   fields => fields
+);
+
+export const accountFieldsSelector = createSelector(
+  getAccountFields,
+  (fields) => {
+    if (fields) {
+      return fields.map(field => (
+        field.get('title', '') !== ''
+        ? field
+        : field.set('title', getFieldName(field.get('field_name', ''), 'account'))
+      ));
+    }
+    return undefined;
+  },
+);
+
+export const subscriberFieldsSelector = createSelector(
+  getSubscriberFields,
+  (fields) => {
+    if (fields) {
+      return fields.map(field => (
+        field.get('title', '') !== ''
+        ? field
+        : field.set('title', getFieldName(field.get('field_name', ''), 'subscription'))
+      ));
+    }
+    return undefined;
+  },
+);
+
+const formatReportFields = (fields) => {
+  if (!fields) {
+    return undefined;
+  }
+  return fields.map(field => Immutable.Map({
+    id: field.get('field_name', ''),
+    title: field.get('title', ''),
+    aggregatable: true,
+    searchable: field.get('searchable', true),
+  }));
+};
+
+const concatJoinFields = (fields, joinFields = Immutable.Map()) => {
+  if (!fields) {
+    return Immutable.List();
+  }
+  return fields.withMutations((fieldsWithMutations) => {
+    joinFields.forEach((entityfields, entity) => {
+      const entityLabel = sentenceCase(getConfig(['systemItems', entity, 'itemName'], entity));
+      if (!entityfields.isEmpty()) {
+        entityfields.forEach((entityfield) => {
+          const joinId = `$${entity}.${entityfield.get('id', '')}`;
+          const joinTitle = `${entityLabel}: ${entityfield.get('title', entityfield.get('id', ''))}`;
+          const joinField = entityfield.set('id', joinId).set('title', joinTitle);
+          fieldsWithMutations.push(joinField);
+        });
+      }
+    });
+  });
+};
+
+const selectReportFields = (subscriberFields, accountFields, linesFileds) => {
+  const usage = concatJoinFields(linesFileds, Immutable.Map({
+    subscription: subscriberFields, customer: accountFields,
+  }));
+  const subscription = concatJoinFields(subscriberFields, Immutable.Map({
+    customer: accountFields, usage: linesFileds,
+  }));
+  const customer = concatJoinFields(accountFields, Immutable.Map({
+    subscription: subscriberFields, usage: linesFileds,
+  }));
+  return Immutable.Map({ usage, subscription, customer });
+};
+
+const reportSubscriberFieldsSelector = createSelector(
+  subscriberFieldsSelector,
+  formatReportFields,
+);
+
+const reportAccountFieldsSelector = createSelector(
+  accountFieldsSelector,
+  formatReportFields,
+);
+
+export const reportFieldsSelector = createSelector(
+  reportSubscriberFieldsSelector,
+  reportAccountFieldsSelector,
+  linesFiledsSelector,
+  selectReportFields,
 );

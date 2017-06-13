@@ -7,6 +7,8 @@ import ModalWrapper from './ModalWrapper';
 import ConfirmModal from './ConfirmModal';
 import CreateButton from './CreateButton';
 import Actions from './Actions';
+import SortableFieldsContainer from './SortableFieldsContainer';
+import DragHandle from './DragHandle';
 
 export {
   ActionButtons,
@@ -18,4 +20,6 @@ export {
   ConfirmModal,
   CreateButton,
   Actions,
+  SortableFieldsContainer,
+  DragHandle,
 };

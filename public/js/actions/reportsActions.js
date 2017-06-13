@@ -29,6 +29,12 @@ import {
 } from './listActions';
 import { getSettings } from './settingsActions';
 
+
+export const reportTypes = {
+  SIMPLE: 0,
+  GROPPED: 1,
+};
+
 export const setCloneReport = () => setCloneEntity('reports', 'report');
 
 export const clearReport = () => clearEntity('reports');
