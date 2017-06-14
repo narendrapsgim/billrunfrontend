@@ -20,6 +20,7 @@ class StateDetails extends Component {
     collection: PropTypes.string.isRequired,
     revisionBy: PropTypes.string.isRequired,
     size: PropTypes.number,
+    allowManageRevisions: PropTypes.bool,
     onActionEdit: PropTypes.func,
     onActionClone: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
@@ -29,6 +30,7 @@ class StateDetails extends Component {
     item: Immutable.Map(),
     revisions: undefined,
     size: 5,
+    allowManageRevisions: true,
   };
 
   state = {
@@ -60,7 +62,7 @@ class StateDetails extends Component {
   }
 
   renderRevisionTooltip = () => {
-    const { item, revisions, size, revisionBy } = this.props;
+    const { item, revisions, size, revisionBy, allowManageRevisions } = this.props;
     const title = `${item.get(revisionBy, '')} - Revision History`;
     if (!revisions) {
       return (
@@ -75,7 +77,7 @@ class StateDetails extends Component {
       <Popover id={`${getItemId(item, '')}-revisions`} title={title} className="entity-revision-history-popover">
         <RevisionTimeline revisions={revisions} item={item} size={size} />
         <hr style={{ margin: 0, borderColor: '#3A3A3A', borderWidth: 2 }} />
-        <Button bsStyle="link" style={{ color: '#fff' }} onClick={this.showManageRevisions}>Manage Revisions</Button>
+        {allowManageRevisions && (<Button bsStyle="link" style={{ color: '#fff' }} onClick={this.showManageRevisions}>Manage Revisions</Button>)}
       </Popover>
     );
   }
