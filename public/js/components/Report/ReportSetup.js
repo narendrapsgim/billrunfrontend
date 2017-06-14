@@ -206,6 +206,7 @@ class ReportSetup extends Component {
       if (mode === 'update') {
         const itemId = item.getIn(['_id', '$id']);
         const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
+        this.fetchItem();
         this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
       } else {
         this.handleBack();
@@ -217,7 +218,8 @@ class ReportSetup extends Component {
     const { item, mode } = this.props;
     if (this.validate()) {
       this.setState({ progress: true });
-      this.props.dispatch(saveReport(item, mode)).then(this.afterSave);
+      const filteredItem = this.filterReport(item);
+      this.props.dispatch(saveReport(filteredItem, mode)).then(this.afterSave);
     }
   }
 
@@ -240,58 +242,34 @@ class ReportSetup extends Component {
       this.props.dispatch(showDanger('Please enter name'));
       return false;
     }
-
     return true;
   }
 
-  filterQuery = val => [
-    val.get('op', ''),
-    val.get('field', ''),
-    val.get('value', ''),
+  filterReport = (report = Immutable.Map()) => report.withMutations((mapWithMutations) => {
+    mapWithMutations
+      .set('conditions', report.get('conditions', Immutable.List()).filter(this.filterConditions))
+      .set('columns', report.get('columns', Immutable.List()).filter(this.filterColumns))
+      .set('sorts', report.get('sorts', Immutable.List()).filter(this.filterSort));
+  })
+
+  filterConditions = row => [
+    row.get('field', ''),
+    row.get('op', ''),
+    row.get('value', ''),
   ].every(param => param !== '');
 
-  filterGroupBy = val => [
-    val.get('op', ''),
-    val.get('field', ''),
+  filterSort = row => [
+    row.get('op', ''),
+    row.get('field', ''),
   ].every(param => param !== '');
 
-  buildQuery = (acc, val) => acc.push(Immutable.Map({
-    [val.get('field', '')]: Immutable.Map({
-      [`${val.get('op', '')}`]: val.get('value', ''),
-    }),
-  }));
-
-  buildGroupByQuery = (acc, val) => {
-    const op = val.get('op');
-    const field = val.get('field');
-    const value = Immutable.Map({
-      [`${op}`]: field,
-    });
-    return acc.set(`${field}_${op}`, value);
-  }
-
-  filterSort = val => this.filterGroupBy(val);
-
-  buildSortQuery = (acc, val) => acc.set(val.get('field', ''), val.get('op', ''));
+  filterColumns = row => [
+    row.get('filed_name', ''),
+  ].every(param => param !== '');
 
   buildReportQuery = () => {
     const { item } = this.props;
-    const entityType = item.get('entity', '');
-    const query = {
-      collection: getConfig(['systemItems', entityType, 'collection'], entityType),
-      project: item.get('display', Immutable.List()).reduce((acc, val) => acc.set(val, 1), Immutable.Map()),
-      query: item.get('filters', Immutable.List())
-        .filter(this.filterQuery)
-        .reduce(this.buildQuery, Immutable.List()),
-      groupByFields: item.get('group_by_fields', Immutable.List()),
-      groupBy: item.get('group_by', Immutable.List())
-        .filter(this.filterGroupBy)
-        .reduce(this.buildGroupByQuery, Immutable.Map()),
-      sort: item.get('sort', Immutable.List())
-        .filter(this.filterSort)
-        .reduce(this.buildSortQuery, Immutable.Map()),
-    };
-    return query;
+    return this.filterReport(item);
   }
 
   applyFilter = () => {
