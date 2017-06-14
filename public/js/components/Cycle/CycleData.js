@@ -223,20 +223,14 @@ class CycleData extends Component {
   downloadTaxURL = (billrunKey) =>
     `${getConfig('serverUrl')}/api/report?action=taxationReport&query={"billrun_key":"${billrunKey}"}&type=csv`;
 
-  parseTaxDownload = (props) => {
+  parseTaxDownload = (entity) => {
     const { billrunKey } =  this.props
     const downloadUrl = this.downloadTaxURL( billrunKey );
     return (
-      <form method="post" style="margin:0;" action={downloadUrl} target="_blank">
-        <button
-          class={props.actionClass}
-          disabled={!props.isEnable}
-          type="submit"
-        >
-          { props.showIcon && <i className={props.iconClass} /> }
-          { props.showIcon && label.length > 0 && <span>&nbsp;</span> }
-          { label.length > 0 && props.label}
-        </button>
+      <form method="post" action={downloadUrl} target="_blank">
+        <Button className={entity.actionClass} bsStyle={entity.actionStyle} bsSize={entity.actionSize} type="submit">
+            {entity.label}
+        </Button>
       </form>
     );
   };
