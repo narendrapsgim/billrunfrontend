@@ -114,7 +114,7 @@ class CycleData extends Component {
               this.setState({ confirmingAll: false });
             }
           }
-        }
+        },
       );
   }
 
@@ -136,7 +136,7 @@ class CycleData extends Component {
               this.autoRefreshConfirmationStatus, 10000);
             }
           }
-        }
+        },
       );
   }
 
@@ -155,7 +155,7 @@ class CycleData extends Component {
             setTimeout(this.props.reloadCycleData, 1000);
             setTimeout(this.autoRefreshConfirmationStatus, 1000);
           }
-        }
+        },
       );
   }
 
@@ -186,7 +186,7 @@ class CycleData extends Component {
             setTimeout(this.props.reloadCycleData, 1000);
             setTimeout(this.autoRefreshConfirmationStatus, 1000);
           }
-        }
+        },
       );
   }
 
@@ -222,15 +222,17 @@ class CycleData extends Component {
 
   getListActions = () => {
     const { showConfirmAllButton } = this.props;
-    return showConfirmAllButton &&
-      [{
-        label: 'Confirm All',
-        actionStyle: 'default',
-        showIcon: false,
-        onClick: this.onClickConfirmAll,
-        actionSize: 'xsmall',
-        actionClass: 'btn-primary',
-      }];
+    if (!showConfirmAllButton) {
+      return [];
+    }
+    return [{
+      label: 'Confirm All',
+      actionStyle: 'default',
+      showIcon: false,
+      onClick: this.onClickConfirmAll,
+      actionSize: 'xsmall',
+      actionClass: 'btn-primary',
+    }];
   }
 
   onCloseConfirmationModal = () => {

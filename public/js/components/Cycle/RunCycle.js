@@ -163,7 +163,7 @@ class RunCycle extends Component {
         if (response.status) {
           this.refreshAfterRun = setTimeout(this.reloadCycleData, 1000);
         }
-      }
+      },
     );
   }
 
@@ -321,7 +321,7 @@ class RunCycle extends Component {
           <Col sm={6} lg={6}>
             {field.renderFunc()}
           </Col>
-        </FormGroup>)
+        </FormGroup>),
     )
   );
 
