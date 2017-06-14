@@ -55,8 +55,8 @@ const Action = (props) => {
   return (
     <span className="action-button">
       { (typeof props.helpText === 'string' && props.helpText !== '')
-        ? <OverlayTrigger overlay={editTooltip} placement="top">{ button }</OverlayTrigger>
-        : button
+        ? <OverlayTrigger overlay={editTooltip} placement="top">{ props.renderFunc ? props.renderFunc(props) : button }</OverlayTrigger>
+        : ( props.renderFunc ? props.renderFunc(props) : button )
       }
     </span>
   );

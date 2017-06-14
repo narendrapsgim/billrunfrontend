@@ -220,17 +220,48 @@ class CycleData extends Component {
     return (<Button onClick={onClick}>confirm</Button>);
   };
 
+  downloadTaxURL = (billrunKey) =>
+    `${getConfig('serverUrl')}/api/report?action=taxationReport&query={"billrun_key":"${billrunKey}"}&type=csv`;
+
+  parseTaxDownload = (props) => {
+    const { billrunKey } =  this.props
+    const downloadUrl = this.downloadTaxURL( billrunKey );
+    return (
+      <form method="post" style="margin:0;" action={downloadUrl} target="_blank">
+        <button
+          class={props.actionClass}
+          disabled={!props.isEnable}
+          type="submit"
+        >
+          { props.showIcon && <i className={props.iconClass} /> }
+          { props.showIcon && label.length > 0 && <span>&nbsp;</span> }
+          { label.length > 0 && props.label}
+        </button>
+      </form>
+    );
+  };
+
   getListActions = () => {
     const { showConfirmAllButton } = this.props;
-    return showConfirmAllButton &&
-      [{
+    return [{
         label: 'Confirm All',
         actionStyle: 'default',
+        show :showConfirmAllButton,
         showIcon: false,
         onClick: this.onClickConfirmAll,
         actionSize: 'xsmall',
         actionClass: 'btn-primary',
-      }];
+      },
+      {
+        label: 'Download Taxation complience report',
+        actionStyle: 'default',
+        show : !showConfirmAllButton,
+        showIcon: false,
+        renderFunc : this.parseTaxDownload,
+        actionSize: 'xsmall',
+        actionClass: 'btn-primary',
+      }
+    ];
   }
 
   onCloseConfirmationModal = () => {
