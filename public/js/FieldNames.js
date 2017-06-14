@@ -11,7 +11,7 @@ const FieldNames = {
     start: 'Start time',
     channel: 'Calling channel',
     stamp: 'Record unique ID',
-    billrun: 'Billing cycle key',
+    billrun: 'Billing cycle',
     src: 'Calling ID',
     in_group: 'Campaign inclusive units',
     clid: 'Full Calling ID',
