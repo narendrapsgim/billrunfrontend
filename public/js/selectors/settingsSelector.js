@@ -234,18 +234,20 @@ const concatJoinFields = (fields, joinFields = Immutable.Map()) => {
   });
 };
 
-const selectReportFields = (subscriberFields, accountFields, linesFileds) => {
-  const usage = concatJoinFields(linesFileds, Immutable.Map({
-    subscription: subscriberFields, customer: accountFields,
-  }));
-  const subscription = concatJoinFields(subscriberFields, Immutable.Map({
-    customer: accountFields, usage: linesFileds,
-  }));
-  const customer = concatJoinFields(accountFields, Immutable.Map({
-    subscription: subscriberFields, usage: linesFileds,
-  }));
-  return Immutable.Map({ usage, subscription, customer });
-};
+const selectReportFields = (subscriberFields, accountFields, linesFileds) => Immutable.Map({
+  usage: linesFileds,
+  // usage: concatJoinFields(linesFileds, Immutable.Map({
+  //   subscription: subscriberFields, customer: accountFields,
+  // }),
+  subscription: subscriberFields,
+  // subscription = concatJoinFields(subscriberFields, Immutable.Map({
+  //   customer: accountFields, usage: linesFileds,
+  // })),
+  customer: accountFields,
+  // customer = concatJoinFields(accountFields, Immutable.Map({
+  //   subscription: subscriberFields, usage: linesFileds,
+  // })),
+});
 
 const reportSubscriberFieldsSelector = createSelector(
   subscriberFieldsSelector,
