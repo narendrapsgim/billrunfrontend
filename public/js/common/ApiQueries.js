@@ -98,9 +98,9 @@ export const usageListQuery = (query, page, sort, size) => ({
 });
 
 export const queueListQuery = (query, page, sort, size) => ({
-  api: 'find',
+  entity: 'queue',
+  action: 'get',
   params: [
-    { collection: 'queue' },
     { size },
     { page },
     { sort: JSON.stringify(sort) },
@@ -227,17 +227,6 @@ export const getGroupsQuery = collection => ({
     }) },
     { page: 0 },
     { size: 9999 },
-  ],
-});
-
-export const getSubscriptionsByAidQuery = (aid, project = {}) => ({
-  action: 'uniqueget',
-  entity: 'subscribers',
-  params: [
-    { query: JSON.stringify({ aid }) },
-    { page: 0 },
-    { size: 9999 },
-    { project: JSON.stringify(project) },
   ],
 });
 
