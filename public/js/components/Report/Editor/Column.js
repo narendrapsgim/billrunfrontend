@@ -88,7 +88,7 @@ class Column extends Component {
     const fieldOptions = this.getfieldsConfig();
     const opOptions = this.getoperators();
     const disableOp = disabled || item.get('filed_name', '') === '';
-    const disableLabel = disabled || item.get('filed_name', '') === ''/* || (item.get('op', '') === '' && type === reportTypes.GROPPED)*/;
+    const disableLabel = disabled || item.get('filed_name', '') === '';
     const opValue = item.get('op', '') === '' ? 'none' : item.get('op', 'none');
 
     return (

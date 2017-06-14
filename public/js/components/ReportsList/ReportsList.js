@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { titleCase } from 'change-case';
 import EntityList from '../EntityList';
 import { ConfirmModal } from '../Elements';
-import { getConfig } from '../../common/Util';
+import { getConfig, getFieldName } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { clearItems } from '../../actions/entityListActions';
 import { deleteReport } from '../../actions/reportsActions';
@@ -23,6 +24,13 @@ class ReportsList extends Component {
     itemToDelete: null,
   }
 
+  parseEntityName = (item) => {
+    const entity = item.get('entity', '');
+    return titleCase(getConfig(['systemItems', entity, 'itemName'], 'entity'));
+  }
+
+  parseEntityType = item => getFieldName(`report_type_${item.get('type')}`, 'report');
+
   getFilterFields = () => ([
     { id: 'key', placeholder: 'Name' },
     { id: 'user', placeholder: 'User' },
@@ -30,16 +38,18 @@ class ReportsList extends Component {
 
   getTableFields = () => ([
     { id: 'key', title: 'Name', sort: true },
+    { id: 'entity', title: 'Entity', sort: true, parser: this.parseEntityName },
+    { id: 'type', title: 'Type', sort: true, parser: this.parseEntityType },
     { id: 'user', title: 'User', sort: true },
-    { id: 'created', title: 'created', type: 'mongodatetime', cssClass: 'long-date', sort: true },
-    { id: 'from', title: 'Modified', type: 'mongodatetime', cssClass: 'long-date', sort: true },
+    { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
   ]);
 
   getProjectFields = () => ({
     key: 1,
+    entity: 1,
     user: 1,
-    created: 1,
     from: 1,
+    type: 1,
   });
 
   onAskDelete = (item) => {

@@ -71,6 +71,10 @@ const FieldNames = {
     firstname: 'First Name',
     lastname: 'Last Name',
   },
+  report: {
+    report_type_0: 'Simple',
+    report_type_1: 'Gropped',
+  },
 };
 
 export default FieldNames;

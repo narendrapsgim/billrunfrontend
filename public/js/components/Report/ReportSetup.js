@@ -126,18 +126,16 @@ class ReportSetup extends Component {
     const { mode, userName } = this.props;
     const now = moment().toISOString();
     if (mode === 'create') {
-      this.onChangeReportValue(['user'], userName);
-      this.onChangeReportValue(['created'], now);
       this.onChangeReportValue(['type'], reportTypes.SIMPLE);
     }
     if (mode === 'update') {
-      this.onChangeReportValue(['from'], now);
+      // Set update default values
     }
     if (mode === 'clone') {
       this.props.dispatch(setCloneReport());
-      this.onChangeReportValue(['created'], now);
-      this.onChangeReportValue(['from'], now);
     }
+    this.onChangeReportValue(['user'], userName);
+    this.onChangeReportValue(['from'], now);
   }
 
   fetchItem = (itemId = this.props.itemId) => {

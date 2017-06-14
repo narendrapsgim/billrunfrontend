@@ -1,7 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { ControlLabel, FormGroup, Col } from 'react-bootstrap';
-import changeCase from 'change-case';
+import { titleCase } from 'change-case';
 import Select from 'react-select';
 import { ReportDescription } from '../../../FieldDescriptions';
 import Help from '../../Help';
@@ -9,6 +9,7 @@ import Field from '../../Field';
 import { reportTypes } from '../../../actions/reportsActions';
 import {
   getConfig,
+  getFieldName,
   formatSelectOptions,
 } from '../../../common/Util';
 
@@ -56,7 +57,7 @@ class Details extends Component {
   getEntityOptions = () => getConfig(['reports', 'entities'], Immutable.List())
     .map(option => Immutable.Map({
       value: option,
-      label: changeCase.titleCase(getConfig(['systemItems', option, 'itemName'], option)),
+      label: titleCase(getConfig(['systemItems', option, 'itemName'], option)),
     }))
     .map(formatSelectOptions)
     .toArray();
@@ -119,7 +120,7 @@ class Details extends Component {
                   value="simple"
                   checked={!isGrouped}
                   onChange={this.onChangeTypeSimple}
-                  label="Simple"
+                  label={getFieldName(`report_type_${reportTypes.SIMPLE}`, 'report')}
                 />
               </div>
               &nbsp;<Help contents={ReportDescription.method_simple} />
@@ -133,7 +134,7 @@ class Details extends Component {
                   value="grouped"
                   checked={isGrouped}
                   onChange={this.onChangeTypeGropped}
-                  label="Grouped"
+                  label={getFieldName(`report_type_${reportTypes.GROPPED}`, 'report')}
                 />
               </div>
               &nbsp;<Help contents={ReportDescription.method_grouped} />
