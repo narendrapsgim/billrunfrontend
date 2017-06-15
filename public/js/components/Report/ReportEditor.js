@@ -50,7 +50,7 @@ class ReportEditor extends Component {
     this.updateReport('entity', val);
     this.updateReport('conditions', Immutable.List());
     this.updateReport('columns', Immutable.List());
-    this.updateReport('type', reportTypes.SIMPLE);
+    this.updateReport('sorts', Immutable.List());
   }
 
   onChangeReportType = (value) => {

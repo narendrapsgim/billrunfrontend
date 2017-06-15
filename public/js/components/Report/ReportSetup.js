@@ -159,9 +159,9 @@ class ReportSetup extends Component {
   }
 
   getReportData = () => {
-    const { size, page } = this.props;
-    const query = this.buildReportQuery();
-    this.props.dispatch(getReportData({ query, page, size }));
+    const { item, size, page } = this.props;
+    const report = this.preperReport(item);
+    this.props.dispatch(getReportData({ report, page, size }));
   }
 
   onChangeReportValue = (path, value) => {
@@ -218,7 +218,7 @@ class ReportSetup extends Component {
     const { item, mode } = this.props;
     if (this.validate()) {
       this.setState({ progress: true });
-      const filteredItem = this.filterReport(item);
+      const filteredItem = this.preperReport(item);
       this.props.dispatch(saveReport(filteredItem, mode)).then(this.afterSave);
     }
   }
@@ -245,32 +245,39 @@ class ReportSetup extends Component {
     return true;
   }
 
-  filterReport = (report = Immutable.Map()) => report.withMutations((mapWithMutations) => {
-    mapWithMutations
-      .set('conditions', report.get('conditions', Immutable.List()).filter(this.filterConditions))
-      .set('columns', report.get('columns', Immutable.List()).filter(this.filterColumns))
-      .set('sorts', report.get('sorts', Immutable.List()).filter(this.filterSort));
-  })
+  preperReport = (report = Immutable.Map()) =>
+    report.withMutations((mapWithMutations) => {
+      mapWithMutations
+        .set('conditions', report.get('conditions', Immutable.List())
+          .filter(this.filterConditionsEmptyRows),
+        )
+        .set('columns', report.get('columns', Immutable.List())
+          .filter(this.filterColumnsEmptyRows)
+          // Remove OP (aggregate function) if reoprt is simple
+          .update(columns => (report.get('type', reportTypes.SIMPLE) === reportTypes.SIMPLE
+            ? columns.map(column => column.set('op', ''))
+            : columns
+          )),
+        )
+        .set('sorts', report.get('sorts', Immutable.List())
+          .filter(this.filterSortEmptyRows),
+        );
+    });
 
-  filterConditions = row => [
+  filterConditionsEmptyRows = row => [
     row.get('field', ''),
     row.get('op', ''),
     row.get('value', ''),
   ].every(param => param !== '');
 
-  filterSort = row => [
+  filterSortEmptyRows = row => [
     row.get('op', ''),
     row.get('field', ''),
   ].every(param => param !== '');
 
-  filterColumns = row => [
+  filterColumnsEmptyRows = row => [
     row.get('filed_name', ''),
   ].every(param => param !== '');
-
-  buildReportQuery = () => {
-    const { item } = this.props;
-    return this.filterReport(item);
-  }
 
   applyFilter = () => {
     this.getReportData();
@@ -279,7 +286,7 @@ class ReportSetup extends Component {
   onClickExportCSV =() => {
     const { item } = this.props;
     const args = {
-      query: this.buildReportQuery(),
+      report: this.preperReport(item),
       page: 0,
       size: -1,
     };
@@ -329,41 +336,15 @@ class ReportSetup extends Component {
     }
   }
 
-  getTableFields = () => {
-    const { item, reportFileds } = this.props;
-    const selectedFields = item.get('display', Immutable.List());
-    const isGroupBy = !item.get('group_by_fields', Immutable.List()).isEmpty();
-    const configFields = reportFileds;
-    const groupByOperators = getConfig(['reports', 'groupByOperators'], Immutable.List());
-
-
-    const allFieldsConfig = Immutable.List().withMutations((listWithMutations) => {
-      configFields.forEach((configField) => {
-        listWithMutations.push(configField);
-      });
-      if (isGroupBy) {
-        item.get('group_by', Immutable.List()).forEach((groupBy) => {
-          const field = configFields.find(conf => conf.get('id', '') === groupBy.get('field', ''), null, Immutable.Map());
-          const operator = groupByOperators.find(op => op.get('id', '') === groupBy.get('op', ''), null, Immutable.Map());
-          listWithMutations.push(Immutable.Map({
-            id: `${groupBy.get('field', '')}_${groupBy.get('op', '')}`,
-            title: `${field.get('title', '')} (${operator.get('title', groupBy.get('op', ''))})`,
-          }));
-        });
-      }
+  getTableFields = () => Immutable.List().withMutations((columnsWithMutations) => {
+    const { item } = this.props;
+    item.get('columns', Immutable.List()).forEach((column) => {
+      columnsWithMutations.push(Immutable.Map({
+        id: column.get('key', ''),
+        title: column.get('label', ''),
+      }));
     });
-
-    return Immutable.List().withMutations((listWithMutations) => {
-      selectedFields.forEach((selectedField) => {
-        const field = allFieldsConfig.find(
-          configField => configField.get('id', '') === selectedField,
-        );
-        if (field) {
-          listWithMutations.push(field);
-        }
-      });
-    });
-  }
+  });
 
   getListActions = () => [{
     type: 'export_csv',
