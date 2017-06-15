@@ -1,9 +1,11 @@
-import { apiBillRun } from '../common/Api';
+import { apiBillRun, apiBillRunSuccessHandler, apiBillRunErrorHandler } from '../common/Api';
 import {
   fetchUserByIdQuery,
   getUserLoginQuery,
   getUserCheckLoginQuery,
   getUserLogoutQuery,
+  sendResetMailQuery,
+  changePasswordQuery,
 } from '../common/ApiQueries';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 import { saveEntity, getEntity, actions } from './entityActions';
@@ -102,4 +104,20 @@ export const userDoLogout = () => (dispatch) => {
       dispatch(finishProgressIndicator());
       return error;
     });
+};
+
+export const sendResetMail = email => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = sendResetMailQuery(email);
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'The email was sent successfuly')))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error sending email')));
+};
+
+export const savePassword = (itemId, signature, timestamp, password) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = changePasswordQuery(itemId, signature, timestamp, password);
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'The password was changed successfuly')))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error changing password')));
 };

@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Form, FormGroup, FormControl, InputGroup, Button, Alert, Panel, Col, Row } from 'react-bootstrap';
 import { Conflict_409 as Conflict409 } from '../Errors';
-import { userDoLogin } from '../../actions/userActions';
+import { userDoLogin, sendResetMail } from '../../actions/userActions';
+import ResetPassword from '../LoginForm/ResetPassword';
 
 class LoginForm extends Component {
 
@@ -22,6 +23,8 @@ class LoginForm extends Component {
     password: '',
     error: '',
     progress: false,
+    resetPassword: false,
+    sending: false,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -47,6 +50,10 @@ class LoginForm extends Component {
       });
   }
 
+  clickResetPassword = () => {
+    this.setState({ resetPassword: true });
+  }
+
   onChangeUsername = (e) => {
     const { value } = e.target;
     this.setState({ username: value, error: '' });
@@ -57,8 +64,25 @@ class LoginForm extends Component {
     this.setState({ password: value, error: '' });
   }
 
+  onCancel = () => {
+    this.setState({ resetPassword: false });
+  }
+
+  updateSending = (sending) => {
+    this.setState({ sending });
+  }
+
+  onResetPass = (email) => {
+    this.props.dispatch(sendResetMail(email)).then(this.afterSendingMail);
+  }
+
+  afterSendingMail = () => {
+    this.setState({ sending: false });
+    this.setState({ resetPassword: false });
+  }
+
   renderLoginForm = () => {
-    const { error, progress } = this.state;
+    const { error, progress, resetPassword, sending } = this.state;
     return (
       <Col md={4} mdOffset={4}>
         <Panel header="Please Sign In" className="login-panel">
@@ -92,10 +116,14 @@ class LoginForm extends Component {
                 { progress && (<span><i className="fa fa-spinner fa-pulse" /> &nbsp;&nbsp;&nbsp;</span>) }
                 Login
               </Button>
-            </fieldset>
+            </fieldset>&nbsp;&nbsp;&nbsp;&nbsp;
+            <Button type="button" bsStyle="link" bsSize="small" block onClick={this.clickResetPassword} disabled={progress}>
+              Forgot Your Password?
+            </Button>
           </Form>
           { (error.length > 0) ? <Alert bsStyle="danger">{error}</Alert> : ''}
         </Panel>
+        { <ResetPassword show={resetPassword} sending={sending} updateSending={this.updateSending} onCancel={this.onCancel} onResetPass={this.onResetPass} /> }
       </Col>
     );
   }
