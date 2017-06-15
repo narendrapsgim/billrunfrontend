@@ -179,9 +179,9 @@ class ReportEditor extends Component {
     const columns = report
       .get('columns', Immutable.List())
       .update(index, Immutable.Map(), (column) => {
-        const newColumn = column.set('filed_name', value);
+        const newColumn = column.set('field_name', value);
         const label = column.get('label', '');
-        const fieldName = column.get('filed_name', '');
+        const fieldName = column.get('field_name', '');
         const op = column.get('op', '');
         const newLabel = this.getColumnNewLabel(label, fieldName, op, value, op);
         return newColumn.set('label', newLabel);
@@ -196,7 +196,7 @@ class ReportEditor extends Component {
       .update(index, Immutable.Map(), (column) => {
         const newColumn = column.set('op', value);
         const label = column.get('label', '');
-        const fieldName = column.get('filed_name', '');
+        const fieldName = column.get('field_name', '');
         const op = column.get('op', '');
         const newLabel = this.getColumnNewLabel(label, fieldName, op, fieldName, value);
         return newColumn.set('label', newLabel);
@@ -218,7 +218,7 @@ class ReportEditor extends Component {
       .get('columns', Immutable.List())
       .map((column) => {
         const label = column.get('label', '');
-        const fieldName = column.get('filed_name', '');
+        const fieldName = column.get('field_name', '');
         const op = column.get('op', '');
         const oldOp = (value === reportTypes.GROPPED) ? '' : op;
         const newOp = (value === reportTypes.GROPPED) ? op : '';
@@ -242,7 +242,7 @@ class ReportEditor extends Component {
     const { report } = this.props;
     const newColumn = Immutable.Map({
       key: uuid.v4(),
-      filed_name: '',
+      field_name: '',
       label: '',
       op: '',
     });

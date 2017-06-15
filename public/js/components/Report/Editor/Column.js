@@ -87,9 +87,8 @@ class Column extends Component {
     const { item, disabled, type } = this.props;
     const fieldOptions = this.getfieldsConfig();
     const opOptions = this.getoperators();
-    const disableOp = disabled || item.get('filed_name', '') === '';
-    const disableLabel = disabled || item.get('filed_name', '') === '';
-    const opValue = item.get('op', '') === '' ? 'none' : item.get('op', 'none');
+    const disableOp = disabled || item.get('field_name', '') === '';
+    const disableLabel = disabled || item.get('field_name', '') === '';
 
     return (
       <FormGroup className="form-inner-edit-row">
@@ -100,7 +99,7 @@ class Column extends Component {
           <Select
             clearable={false}
             options={fieldOptions}
-            value={item.get('filed_name', '')}
+            value={item.get('field_name', '')}
             onChange={this.onChangeField}
             disabled={disabled}
           />
@@ -111,7 +110,7 @@ class Column extends Component {
             <Select
               clearable={false}
               options={opOptions}
-              value={opValue}
+              value={item.get('op', '')}
               onChange={this.onChangeOperator}
               disabled={disableOp}
             />

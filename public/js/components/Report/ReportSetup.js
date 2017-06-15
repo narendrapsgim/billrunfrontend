@@ -236,10 +236,25 @@ class ReportSetup extends Component {
     this.props.router.push(`/${itemsType}`);
   }
 
+  validateEmptyAggregateOp = column => (
+    column.get('field_name', '') !== ''
+    && column.get('op', '') === ''
+  )
+
   validate = () => {
     const { item } = this.props;
     if (item.get('key', '') === '') {
       this.props.dispatch(showDanger('Please enter name'));
+      return false;
+    }
+    if (item.get('entity', '') === '') {
+      this.props.dispatch(showDanger('Please select entity'));
+      return false;
+    }
+    if (item.get('type', reportTypes.SIMPLE) === reportTypes.GROPPED
+      && item.get('columns', Immutable.List()).some(this.validateEmptyAggregateOp)
+    ) {
+      this.props.dispatch(showDanger('Please select column function'));
       return false;
     }
     return true;
@@ -276,17 +291,19 @@ class ReportSetup extends Component {
   ].every(param => param !== '');
 
   filterColumnsEmptyRows = row => [
-    row.get('filed_name', ''),
+    row.get('field_name', ''),
   ].every(param => param !== '');
 
   applyFilter = () => {
-    this.getReportData();
+    if (this.validate()) {
+      this.getReportData();
+    }
   }
 
   onClickExportCSV =() => {
     const { item } = this.props;
     const headers = item.get('columns', Immutable.List()).reduce(
-      (acc, column) => acc.set(column.get('key', ''), column.get('label', column.get('filed_name', ''))),
+      (acc, column) => acc.set(column.get('key', ''), column.get('label', column.get('field_name', ''))),
       Immutable.Map(),
     );
     const csvParams = [

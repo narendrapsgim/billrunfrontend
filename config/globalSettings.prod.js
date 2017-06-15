@@ -100,7 +100,6 @@ var globalSetting = {
       { id: 'push', title: 'List', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'addToSet', title: 'Unique List', types: ['string', 'number', 'boolean', 'date'] },
       { id: 'count', title: 'Count', types: ['string', 'number', 'boolean', 'date'] },
-      { id: 'none', title: 'None', types: ['string', 'number', 'boolean', 'date'] },
     ],
   },
   systemItems: {
