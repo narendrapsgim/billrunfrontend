@@ -3830,6 +3830,10 @@ pako@~0.2.0:
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/pako/-/pako-0.2.9.tgz#f3f7522f4ef782348da8161bad9ecfd51bf83a75"
 
+papaparse@^4.3.2:
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-4.3.2.tgz#9aff2146e200ccb56cc0fb28df80092857f38efd"
+
 param-case@2.1.x, param-case@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/param-case/-/param-case-2.1.0.tgz#2619f90fd6c829ed0b958f1c84ed03a745a6d70a"
@@ -4389,6 +4393,10 @@ react-chartjs-2@^2.0.5:
   resolved "https://registry.yarnpkg.com/react-chartjs-2/-/react-chartjs-2-2.0.5.tgz#4cee4c9bff0f13637a770a0c740b48cf94d0a83f"
   dependencies:
     lodash.isequal "^4.4.0"
+
+react-csv@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/react-csv/-/react-csv-1.0.8.tgz#92bacdb5edbc52cd2ed50f31bbd1d946e8e32acf"
 
 react-datamaps@^0.3.0:
   version "0.3.0"

@@ -16,6 +16,7 @@ class CustomField extends Component {
     entity: PropTypes.string.isRequired,
     idx: PropTypes.number.isRequired,
     editable: PropTypes.bool,
+    existing: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
   };
@@ -23,6 +24,7 @@ class CustomField extends Component {
   static defaultProps = {
     field: Immutable.Map(),
     editable: true,
+    existing: false,
   };
 
   state = {
@@ -113,14 +115,14 @@ class CustomField extends Component {
   }
 
   renderField = () => {
-    const { field, editable } = this.props;
+    const { field, editable, existing } = this.props;
     return (
       <Row>
         <Col lg={1} md={1} style={{ paddingTop: 10 }}><DragHandle /></Col>
         <Col lg={2} md={2}>
           <FormGroup>
             <ControlLabel>Field Name</ControlLabel>
-            <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!editable} />
+            <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!editable || existing} />
           </FormGroup>
         </Col>
         <Col lg={2} md={2}>

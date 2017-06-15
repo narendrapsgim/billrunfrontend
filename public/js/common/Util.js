@@ -23,6 +23,17 @@ export const getFieldName = (field, category) => {
   return FieldNames[field] || field;
 };
 
+export const getFieldNameType = (type) => {
+  switch (type) {
+    case 'customer':
+      return 'account';
+    case 'subscription':
+      return 'subscription';
+    default:
+      return '';
+  }
+};
+
 export const getZiroTimeDate = (date = moment()) => {
   const dateWithoutTime = moment(date).utcOffset(0);
   dateWithoutTime.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
@@ -164,4 +175,10 @@ export const parseConfigSelectOptions = configOption => formatSelectOptions(
   configOption.has('title')
     ? Immutable.Map({ value: configOption.get('id'), label: configOption.get('title') })
     : configOption.get('id')
+);
+
+export const isLinkerField = (field = Immutable.Map()) => (
+  field.get('unique', false) &&
+  !field.get('generated', false) &&
+  field.get('editable', true)
 );

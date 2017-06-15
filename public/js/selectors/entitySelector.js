@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import Immutable from 'immutable';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector } from './settingsSelector';
 
@@ -48,12 +49,24 @@ const getItem = (state, props, entityName) => {
     case 'subscription':
     case 'discount':
     case 'reports':
+    case 'importer':
       return state.entity.get(entityName);
     case 'charging_plan':
       return state.plan;
     default: {
       return state[entityName];
     }
+  }
+};
+
+export const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscriberFields) => {
+  switch (item.get('entity')) {
+    case 'customer':
+      return accountFields;
+    case 'subscription':
+      return subscriberFields;
+    default:
+      return undefined;
   }
 };
 
@@ -103,7 +116,7 @@ export const revisionsSelector = createSelector(
 
 export const tabSelector = createSelector(
   getTab,
-  tab => tab
+  tab => tab,
 );
 
 export const messageSelector = createSelector(
@@ -117,17 +130,17 @@ export const messageSelector = createSelector(
       }
     }
     return undefined;
-  }
+  },
 );
 
 export const itemSelector = createSelector(
   getItem,
-  item => item
+  item => item,
 );
 
 export const idSelector = createSelector(
   getId,
-  id => id
+  id => id,
 );
 
 export const modeSelector = createSelector(
