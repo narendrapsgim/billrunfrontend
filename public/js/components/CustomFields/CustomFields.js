@@ -8,6 +8,7 @@ import ActionButtons from '../Elements/ActionButtons';
 import CreateButton from '../Elements/CreateButton';
 import SortableFieldsContainer from './SortableFieldsContainer';
 import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
+import { accountFieldsSelector, subscriberFieldsSelector } from '../../selectors/settingsSelector';
 
 class CustomFields extends Component {
 
@@ -25,21 +26,45 @@ class CustomFields extends Component {
     account: Immutable.List(),
     defaultDisabledFields: {
       account: ['first_name', 'last_name', 'firstname', 'lastname', 'address'],
-      subscriber: ['firstname', 'lastname', 'plan'],
+      subscriber: ['firstname', 'lastname', 'plan', 'services'],
     },
     defaultHiddenFields: {
       account: ['aid', 'payment_gateway'],
-      subscriber: ['sid', 'aid', 'plan_activation', 'services'],
+      subscriber: ['sid', 'aid', 'plan_activation'],
     },
     tabs: ['account', 'subscriber'],
   };
 
   state = {
     tab: 0,
+    subscriber: Immutable.List(),
+    account: Immutable.List(),
   };
 
   componentDidMount() {
+    this.fetchFields();
+  }
+
+  componentWillUnmount() {
+    // reset unsaved fields changes
     this.props.dispatch(getSettings('subscribers'));
+  }
+
+  fetchFields = () => {
+    this.props.dispatch(getSettings('subscribers')).then(this.afterReceiveSettings);
+  }
+
+  afterSave = (response) => {
+    if (response) {
+      this.fetchFields();
+    }
+  }
+
+  afterReceiveSettings = (response) => {
+    const { account, subscriber } = this.props;
+    if (response) {
+      this.setState({ account, subscriber });
+    }
   }
 
   onChangeField = (entity, index, id, value) => {
@@ -64,7 +89,7 @@ class CustomFields extends Component {
   }
 
   onClickSave = () => {
-    this.props.dispatch(saveSettings('subscribers'));
+    this.props.dispatch(saveSettings('subscribers')).then(this.afterSave);
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
@@ -79,21 +104,27 @@ class CustomFields extends Component {
   };
 
   renderFieldsTab = (entity, key) => {
+    const existingEntityFields = this.state[entity];
+    const entityFields = this.props[entity];
     const defaultDisabledFields = this.props.defaultDisabledFields[entity];
     const defaultHiddenFields = this.props.defaultHiddenFields[entity];
-    const entityFields = this.props[entity];
     const fields = [];
     entityFields.forEach((field, index) => {
       if (!field.get('generated', false) && !defaultHiddenFields.includes(field.get('field_name', ''))) {
+        const existing = existingEntityFields.findIndex(existingEntityField =>
+          existingEntityField.get('field_name', '') === field.get('field_name', '')
+        ) !== -1;
         const editable = !field.get('system', false) && !defaultDisabledFields.includes(field.get('field_name', ''));
+        const fieldKey = existing ? `item-${entity}-${field.get('field_name', index)}` : `item-${entity}-${index}`
         fields.push(
           <CustomField
-            key={`item-${index}`}
+            key={fieldKey}
             index={index}
             idx={index}
             field={field}
             entity={entity}
             editable={editable}
+            existing={existing}
             onChange={this.onChangeField}
             onRemove={this.onRemoveField}
           />
@@ -131,8 +162,8 @@ class CustomFields extends Component {
 }
 
 
-const mapStateToProps = state => ({
-  subscriber: state.settings.getIn(['subscribers', 'subscriber', 'fields']),
-  account: state.settings.getIn(['subscribers', 'account', 'fields']),
+const mapStateToProps = (state, props) => ({
+  subscriber: subscriberFieldsSelector(state, props),
+  account: accountFieldsSelector(state, props),
 });
 export default connect(mapStateToProps)(CustomFields);
