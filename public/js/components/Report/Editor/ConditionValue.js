@@ -32,6 +32,7 @@ class ConditionValue extends Component {
   static propTypes = {
     filed: PropTypes.instanceOf(Immutable.Map),
     config: PropTypes.instanceOf(Immutable.Map),
+    operator: PropTypes.instanceOf(Immutable.Map),
     selectOptions: PropTypes.instanceOf(Immutable.Map),
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
@@ -41,6 +42,7 @@ class ConditionValue extends Component {
   static defaultProps = {
     filed: Immutable.Map(),
     config: Immutable.Map(),
+    operator: Immutable.Map(),
     selectOptions: Immutable.Map(),
     disabled: false,
     onChange: () => {},
@@ -59,11 +61,12 @@ class ConditionValue extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { filed, config, selectOptions, disabled } = this.props;
+    const { filed, config, operator, selectOptions, disabled } = this.props;
     return (
       !Immutable.is(filed, nextProps.filed)
       || !Immutable.is(config, nextProps.config)
       || !Immutable.is(selectOptions, nextProps.selectOptions)
+      || !Immutable.is(operator, nextProps.operator)
       || disabled !== nextProps.disabled
     );
   }
@@ -100,7 +103,8 @@ class ConditionValue extends Component {
   };
 
   onChangeBoolean = (value) => {
-    const bool = value === '' ? '' : value === 'yes';
+    const trueValues = [1, '1', 'true', true, 'yes', 'on'];
+    const bool = value === '' ? '' : trueValues.includes(value);
     this.props.onChange(bool);
   };
 
@@ -122,22 +126,26 @@ class ConditionValue extends Component {
     }
   };
 
+  getOptionsValues = (defaultOptions = Immutable.List()) => this.props.operator
+    .get('options', defaultOptions)
+    .map(formatSelectOptions)
+    .toArray();
+
   render() {
     const { filed, disabled, config, selectOptions } = this.props;
-
-    //  operator 'EXIST' boolean
-    if (filed.get('op', null) === 'exists') {
+    //  operator 'EXIST' or boolean type
+    if (filed.get('op', null) === 'exists' || config.get('type', '') === 'boolean') {
       let value = '';
       if (filed.get('value', false) === true) {
         value = 'yes';
       } else if (!filed.get('value', true) === false) {
         value = 'no';
       }
-      const options = ['yes', 'no'].map(formatSelectOptions);
+      const booleanOptions = this.getOptionsValues(Immutable.List(['yes', 'no']));
       return (
         <Select
           clearable={false}
-          options={options}
+          options={booleanOptions}
           value={value}
           onChange={this.onChangeBoolean}
           disabled={disabled}

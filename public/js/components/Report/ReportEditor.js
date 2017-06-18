@@ -75,10 +75,12 @@ class ReportEditor extends Component {
 
   onChangeConditionOperator = (idx, value) => {
     const { report } = this.props;
+    const resetValueOnOpsChange = ['exists', 'billrun_status'];
     const newFilters = report
       .get('conditions', Immutable.List())
       .update(idx, Immutable.Map(), (filter) => {
-        if (value === 'exists' || filter.get('op', '') === 'exists') {
+        // was or become operator with predefined values
+        if (resetValueOnOpsChange.includes(value) || resetValueOnOpsChange.includes(filter.get('op', ''))) {
           return filter
             .set('op', value)
             .set('value', '');

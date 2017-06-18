@@ -65,7 +65,7 @@ class Conditions extends Component {
     const conditionsRows = conditions.map(this.renderRow);
     const disableAdd = fieldsOptions.isEmpty();
     return (
-      <Row>
+      <Row className="report-editor-conditions">
         { !conditionsRows.isEmpty() && (
           <Col sm={12}>
             <FormGroup className="form-inner-edit-row">

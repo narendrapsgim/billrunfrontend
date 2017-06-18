@@ -43,6 +43,15 @@ class Condition extends Component {
     );
   }
 
+  componentDidUpdate(prevProps, prevState) { // eslint-disable-line no-unused-vars
+    const { item, index } = this.props;
+    const fieldOps = this.getOpOptions() || [];
+    // If only one option avalibale, auto set it.
+    if (fieldOps.length === 1 && item.get('op', '') === '') {
+      this.props.onChangeOperator(index, fieldOps[0].value);
+    }
+  }
+
   onChangeField = (e) => {
     const { index } = this.props;
     this.props.onChangeField(index, e);
@@ -68,6 +77,14 @@ class Condition extends Component {
     return fieldsConfig.find(conf => conf.get('id', '') === item.get('field', ''), null, Immutable.Map());
   }
 
+  getOperator = () => {
+    const { item, operators } = this.props;
+    return operators.find(
+      operator => operator.get('id', '') === item.get('op', ''),
+      null, Immutable.Map(),
+    );
+  }
+
   getFieldOptions = () => {
     const { fieldsConfig } = this.props;
     return fieldsConfig
@@ -80,7 +97,16 @@ class Condition extends Component {
     const { operators } = this.props;
     const config = this.getConfig();
     return operators
-      .filter(option => option.get('types', Immutable.List()).includes(config.get('type', 'string')))
+      .filter((option) => {
+        const optionFieldTypes = option.get('types', Immutable.List());
+        const optionFieldExclude = option.get('exclude', Immutable.List());
+        const fieldName = `fieldid:${config.get('id', '')}`;
+        const fieldType = config.get('type', 'string');
+        return (
+          !optionFieldExclude.includes(fieldName)
+          && (optionFieldTypes.includes(fieldType) || optionFieldTypes.includes(fieldName))
+        );
+      })
       .map(parseConfigSelectOptions)
       .toArray();
   }
@@ -88,6 +114,7 @@ class Condition extends Component {
   render() {
     const { item, disabled } = this.props;
     const config = this.getConfig();
+    const operator = this.getOperator();
     const fieldOptions = this.getFieldOptions();
     const opOptions = this.getOpOptions();
     const disableOp = disabled || item.get('field', '') === '';
@@ -118,6 +145,7 @@ class Condition extends Component {
           <ConditionValue
             filed={item}
             config={config}
+            operator={operator}
             disabled={disableVal}
             onChange={this.onChangeValue}
           />

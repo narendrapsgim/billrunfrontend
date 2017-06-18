@@ -51,10 +51,14 @@ class Columns extends Component {
     this.props.onMove(oldIndex, newIndex);
   };
 
+  getFieldsOptions = fieldsConfig => fieldsConfig.filter(
+    config => config.get('aggregatable', true),
+  );
 
   renderRows = () => {
     const { mode, columns, fieldsConfig, aggregateOperators, type } = this.props;
     const disabled = mode === 'view';
+    const fieldsOptions = this.getFieldsOptions(fieldsConfig);
     return columns.map((column, index) => (
       <Column
         key={column.get('key', index)}
@@ -63,7 +67,7 @@ class Columns extends Component {
         index={index}
         disabled={disabled}
         type={type}
-        fieldsConfig={fieldsConfig}
+        fieldsConfig={fieldsOptions}
         operators={aggregateOperators}
         onChangeField={this.props.onChangeField}
         onChangeOperator={this.props.onChangeOperator}

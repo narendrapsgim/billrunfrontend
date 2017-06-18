@@ -490,10 +490,7 @@ ul.revision-history-list li.active .cycle {
 }
 
 /* Reports */
-.report-setup .CustomFilter .action button{
-  height: 39px;
-}
-.report-setup .CustomFilter .react-datepicker__input-container {
+.report-setup .report-editor-conditions .react-datepicker__input-container {
   width: 100%;
 }
 /* ~Reports */
