@@ -31,10 +31,10 @@ class Settings extends Component {
     location: PropTypes.shape({
       pathname: PropTypes.string,
       query: PropTypes.object,
-    }),
+    }).isRequired,
     csiOptions: PropTypes.instanceOf(Immutable.Iterable),
     taxation: PropTypes.instanceOf(Immutable.Map),
-    router: PropTypes.object,
+    router: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -73,7 +73,7 @@ class Settings extends Component {
             mainMenuOverridesWithMutations.set(key, orderField);
           }
         });
-      }
+      },
     );
     this.props.dispatch(updateSetting('menu', path, mainMenuOverrides));
   }
@@ -113,7 +113,7 @@ class Settings extends Component {
               this.props.dispatch(fetchFile({ filename: settings.getIn(['tenant', 'logo'], '') }, 'logo'));
             }
           }
-        }
+        },
       );
     }
   }
@@ -150,7 +150,11 @@ class Settings extends Component {
           <Tab title="Locale" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <DateTime onChange={this.onChangeFieldValue} data={datetime} />
-              <Currency onChange={this.onChangeFieldValue} data={currency} currencies={currencyOptions} />
+              <Currency
+                onChange={this.onChangeFieldValue}
+                data={currency}
+                currencies={currencyOptions}
+              />
             </Panel>
           </Tab>
 

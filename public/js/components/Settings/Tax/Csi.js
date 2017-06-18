@@ -50,9 +50,10 @@ class Csi extends Component {
 
   renderProviderOptions = () => {
     const { csi } = this.props;
-    return csi.get('available_providers',Immutable.Map({})).map((name, key) => (
-      <option key={key} value={key}>{name}</option>
-    ));
+    return csi
+      .get('available_providers', Immutable.Map())
+      .map((name, key) => (<option key={key} value={key}>{name}</option>))
+      .toArray();
   }
 
   onChangeTaxationMapping = (fileType, usaget, filed, value) => {
@@ -82,7 +83,7 @@ class Csi extends Component {
       .find(taxationMap => (
           taxationMap.get('file_type', '') === fileType.get('fileType', '')
           && taxationMap.get('usaget', '') === fileType.get('usageType', '')
-        ), null, Immutable.Map()
+        ), null, Immutable.Map(),
       );
   }
 
