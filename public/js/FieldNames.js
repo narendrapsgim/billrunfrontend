@@ -67,9 +67,16 @@ const FieldNames = {
     request_num: 'Request number',
     granted_return_code: 'Return code',
   },
+  account: {
+    firstname: 'First Name',
+    lastname: 'Last Name',
+    aid: 'Customer ID',
+  },
   subscription: {
     firstname: 'First Name',
     lastname: 'Last Name',
+    aid: 'Subscription ID',
+    sid: 'Customer ID',
   },
   report: {
     report_type_0: 'Simple',

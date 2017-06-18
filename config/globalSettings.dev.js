@@ -29,6 +29,7 @@ var globalSetting = {
   queue_calculators: ['customer', 'rate', 'pricing'],
   mail_support: 'cloud_support@billrun.com',
   logoMaxSize: 2,
+  importMaxSize: 8,
   chargingBufferDays: 5,
   reports: {
     entities: ['usage', 'subscription', 'customer'],
@@ -164,7 +165,7 @@ var globalSetting = {
       itemsType: 'subscriptions',
     },
     customer: {
-      collection: 'subscribers',
+      collection: 'accounts',
       uniqueField: 'aid',
       itemName: 'customer',
       itemType: 'customer',

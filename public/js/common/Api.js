@@ -118,7 +118,7 @@ export const apiBillRunSuccessHandler = (success, message = false) => (dispatch)
       warningMessages = ['Warrning !'];
     }
     warningMessages.forEach((warningMessage) => {
-      dispatch(showWarning(warningMessage, 0));
+      dispatch(showWarning(warningMessage, 15000));
     });
   }
 

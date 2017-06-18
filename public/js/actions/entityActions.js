@@ -88,6 +88,12 @@ const buildRequestData = (item, action) => {
       return formData;
     }
 
+    case 'import': {
+      const formData = new FormData();
+      formData.append('update', JSON.stringify(item));
+      return formData;
+    }
+
     case 'update': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
@@ -150,6 +156,15 @@ export const saveEntity = (collection, item, action) => (dispatch) => {
   return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
+};
+
+export const importEntities = (collection, items) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const body = requestDataBuilder(collection, items, 'import');
+  const query = apiEntityQuery(collection, 'import', body);
+  return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })
+    .then(success => dispatch(apiBillRunSuccessHandler(success)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entities')));
 };
 
 const fetchEntity = (collection, query) => (dispatch) => {

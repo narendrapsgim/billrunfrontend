@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { Button } from 'react-bootstrap';
 
 const ActionButtons = (props) => {
-  const { hide, progress, progressLabel } = props;
+  const { hide, progress, progressLabel, reversed } = props;
   const { saveLabel, hideSave, disableSave, onClickSave } = props;
   const { cancelLabel, hideCancel, disableCancel, onClickCancel } = props;
   if (hide) {
@@ -11,7 +11,7 @@ const ActionButtons = (props) => {
   return (
     <div style={{ marginTop: 12 }}>
       {!hideSave && (
-        <Button onClick={onClickSave} bsStyle="primary" disabled={progress || disableSave} style={{ minWidth: 90, marginRight: 10 }}>
+        <Button onClick={onClickSave} bsStyle={reversed ? 'default' : 'primary'} disabled={progress || disableSave} style={{ minWidth: 90, marginRight: 10 }}>
           { progress && (<span><i className="fa fa-spinner fa-pulse" />&nbsp;&nbsp;</span>) }
           { progress && progressLabel !== null
             ? progressLabel
@@ -20,7 +20,7 @@ const ActionButtons = (props) => {
         </Button>
       )}
       {!hideCancel && (
-        <Button onClick={onClickCancel} bsStyle="default" disabled={disableCancel} style={{ minWidth: 90 }}>
+        <Button onClick={onClickCancel} bsStyle={reversed ? 'primary' : 'default'} disabled={disableCancel} style={{ minWidth: 90 }}>
           {cancelLabel}
         </Button>
       )}
@@ -40,23 +40,25 @@ ActionButtons.defaultProps = {
   cancelLabel: 'Cancel',
   saveLabel: 'Save',
   progressLabel: null,
+  reversed: false,
   onClickCancel: () => {},
   onClickSave: () => {},
 };
 
 ActionButtons.propTypes = {
-  children: React.PropTypes.element,
-  cancelLabel: React.PropTypes.string,
-  hide: React.PropTypes.bool,
-  hideCancel: React.PropTypes.bool,
-  hideSave: React.PropTypes.bool,
-  progress: React.PropTypes.bool,
-  disableSave: React.PropTypes.bool,
-  disableCancel: React.PropTypes.bool,
-  onClickCancel: React.PropTypes.func,
-  onClickSave: React.PropTypes.func,
-  saveLabel: React.PropTypes.string,
-  progressLabel: React.PropTypes.string,
+  children: PropTypes.element,
+  cancelLabel: PropTypes.string,
+  hide: PropTypes.bool,
+  hideCancel: PropTypes.bool,
+  hideSave: PropTypes.bool,
+  progress: PropTypes.bool,
+  disableSave: PropTypes.bool,
+  disableCancel: PropTypes.bool,
+  reversed: PropTypes.bool,
+  onClickCancel: PropTypes.func,
+  onClickSave: PropTypes.func,
+  saveLabel: PropTypes.string,
+  progressLabel: PropTypes.string,
 };
 
 export default ActionButtons;

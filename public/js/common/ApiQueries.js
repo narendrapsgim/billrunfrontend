@@ -507,6 +507,25 @@ export const getConfirmationOperationInvoiceQuery = invoiceId => ({
   ],
 });
 
+export const sendResetMailQuery = email => ({
+  api: 'passwordretrieval',
+  params: [
+    { action: 'sendForm' },
+    { email },
+  ],
+});
+
+export const changePasswordQuery = (itemId, signature, timestamp, password) => ({
+  action: 'changepassword',
+  entity: 'users',
+  params: [
+    { query: JSON.stringify({ _id: itemId }) },
+    { update: JSON.stringify({ password }) },
+    { _sig_: signature },
+    { _t_: timestamp },
+  ],
+});
+
 export const getReportQuery = ({ report, page = 0, size = 10 }) => ({
   api: 'report',
   params: [
