@@ -23,7 +23,6 @@ export default class DateTime extends Component {
     // const dateFormatOptions = ['dd-mm-yy', 'mm-dd-yy'].map(this.renderOption);
     // const timeFormatOptions = ['12-hour', '24-hour'].map(this.renderOption);
     const timeZoneOptions = moment.tz.names().map(this.renderOption);
-    const billingDayOptions = [...Array(28)].map((_, i) => this.renderOption((i + 1), i));
     const timezone = data.get('timezone', '').length !== 0 ? data.get('timezone', '') : moment.tz.guess();
 
     return (
@@ -36,19 +35,6 @@ export default class DateTime extends Component {
             <Col sm={6}>
               <select id="timezone" name="timezone" value={timezone} onChange={this.onChange} className="form-control">
                 { timeZoneOptions }
-              </select>
-            </Col>
-          </FormGroup>
-          <FormGroup controlId="charging_day" key="charging_day">
-            <Col componentClass={ControlLabel} md={2}>
-              Charging Day
-            </Col>
-            <Col sm={6}>
-              <select id="charging_day" name="charging_day" value={data.get('charging_day', '')} onChange={this.onChange} className="form-control">
-                {[
-                  <option value="" key="select_charging_day">Select charging day...</option>,
-                  ...billingDayOptions,
-                ]}
               </select>
             </Col>
           </FormGroup>
