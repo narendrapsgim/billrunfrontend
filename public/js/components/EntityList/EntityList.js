@@ -196,6 +196,7 @@ class EntityList extends Component {
     } = props;
     const project = showRevisionBy ? { ...projectFields, ...{ to: 1, from: 1, revision_info: 1 } } : projectFields;
     const query = { ...filter.toObject(), ...baseFilter };
+    const options = { query_method: 'or' };
     const request = {
       action: api,
       entity: collection,
@@ -205,6 +206,7 @@ class EntityList extends Component {
         { project: JSON.stringify(project) },
         { page },
         { size },
+        { options: JSON.stringify(options) },
       ],
     };
     if (showRevisionBy) {
