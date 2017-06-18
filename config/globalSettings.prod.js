@@ -79,7 +79,9 @@ var globalSetting = {
     },
     conditionsOperators: [
       { id: 'eq', title: '=', types: ['string', 'number', 'boolean', 'date'] }, // 'Equals'
+      { id: 'in', title: '= (multi)', types: ['string', 'number'] },
       { id: 'ne', title: '!=', types: ['string', 'number', 'boolean'] }, // 'Not equals'
+      { id: 'nin', title: '!= (multi)', types: ['string', 'number'] },
       { id: 'lt', title: '<', types: ['number', 'date'] }, // 'Less than'
       { id: 'lte', title: '<=', types: ['number', 'date'] }, // 'Less than or equals'
       { id: 'gt', title: '>', types: ['number', 'date'] }, // 'Greater than'
@@ -88,7 +90,6 @@ var globalSetting = {
       { id: 'starts_with', title: 'Starts with', types: ['string'] },
       { id: 'ends_with', title: 'Ends with', types: ['string'] },
       { id: 'exists', title: 'Exists', types: ['string', 'number', 'boolean', 'date'] },
-      { id: 'in', title: 'In', types: ['string', 'number'] },
     ],
     aggregateOperators: [
       { id: 'group', title: 'Group', types: ['string', 'number', 'boolean', 'date'] },

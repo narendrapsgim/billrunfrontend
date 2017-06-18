@@ -154,7 +154,7 @@ class ConditionValue extends Component {
         .map(formatSelectOptions)
         .toArray();
 
-      const multi = filed.get('op', '') === 'in';
+      const multi = ['nin', 'in'].includes(filed.get('op', ''));
       return (
         <Select
           clearable={false}
@@ -167,7 +167,7 @@ class ConditionValue extends Component {
       );
     }
     // 'Number'
-    if (config.get('type', '') === 'number' && filed.get('op', '') !== 'in') {
+    if (config.get('type', '') === 'number' && !['nin', 'in'].includes(filed.get('op', ''))) {
       return (
         <Field
           fieldType="number"
@@ -199,7 +199,9 @@ class ConditionValue extends Component {
           onChange={this.onChangeText}
           disabled={disabled}
         />
-        {filed.get('op', null) === 'in' && <HelpBlock>comma separated values</HelpBlock>}
+        {['nin', 'in'].includes(filed.get('op', null)) && (
+          <HelpBlock>comma separated values</HelpBlock>
+        )}
       </div>
     );
   }
