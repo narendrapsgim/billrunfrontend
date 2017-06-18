@@ -5,6 +5,7 @@ import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import DateTime from './DateTime';
 import Currency from './Currency';
+import Invoicing from './Invoicing';
 import Tax from './Tax';
 import Tenant from './Tenant';
 import Security from './Security';
@@ -173,6 +174,12 @@ class Settings extends Component {
           <Tab title="Security" eventKey={5}>
             <Panel style={{ borderTop: 'none' }}>
               <Security data={sharedSecret} />
+            </Panel>
+          </Tab>
+
+          <Tab title="Invoicing" eventKey={6}>
+            <Panel style={{ borderTop: 'none' }}>
+              <Invoicing onChange={this.onChangeFieldValue} data={datetime} />
             </Panel>
           </Tab>
 
