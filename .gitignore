@@ -1,5 +1,6 @@
 node_modules/*
 dist/*
+backup/*
 public/build/*
 public/vendors/
 public/app.js
