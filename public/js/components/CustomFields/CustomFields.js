@@ -8,13 +8,15 @@ import ActionButtons from '../Elements/ActionButtons';
 import CreateButton from '../Elements/CreateButton';
 import SortableFieldsContainer from './SortableFieldsContainer';
 import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
-import { accountFieldsSelector, subscriberFieldsSelector } from '../../selectors/settingsSelector';
+import { accountFieldsSelector, subscriberFieldsSelector, productFieldsSelector } from '../../selectors/settingsSelector';
 
 class CustomFields extends Component {
 
   static propTypes = {
     subscriber: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     account: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
+    product: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
+    keys: PropTypes.object,
     defaultDisabledFields: PropTypes.object,
     defaultHiddenFields: PropTypes.object,
     tabs: PropTypes.arrayOf(PropTypes.string),
@@ -24,55 +26,94 @@ class CustomFields extends Component {
   static defaultProps = {
     subscriber: Immutable.List(),
     account: Immutable.List(),
+    product: Immutable.List(),
+    keys: {
+      account: 'subscribers.account',
+      subscriber: 'subscribers.subscriber',
+      product: 'rates',
+    },
     defaultDisabledFields: {
       account: ['first_name', 'last_name', 'firstname', 'lastname', 'address'],
       subscriber: ['firstname', 'lastname', 'plan', 'services'],
+      product: [],
     },
     defaultHiddenFields: {
       account: ['aid', 'payment_gateway'],
       subscriber: ['sid', 'aid', 'plan_activation'],
+      product: [],
     },
-    tabs: ['account', 'subscriber'],
+    tabs: ['account', 'subscriber', 'product'],
   };
 
   state = {
     tab: 0,
     subscriber: Immutable.List(),
     account: Immutable.List(),
+    product: Immutable.List(),
   };
 
   componentDidMount() {
-    this.fetchFields();
+    this.fetchFields(this.afterReceiveSettings);
   }
 
   componentWillUnmount() {
     // reset unsaved fields changes
-    this.props.dispatch(getSettings('subscribers'));
+    this.fetchFields();
   }
 
-  fetchFields = () => {
-    this.props.dispatch(getSettings('subscribers')).then(this.afterReceiveSettings);
+  getSettingDistinctKeys = () => {
+    const { tabs } = this.props;
+    const settingKeys = tabs.map(this.getSettingsKey);
+    return [...new Set(settingKeys)];
+  }
+
+  fetchFields = (callback) => {
+    this.getSettingDistinctKeys().forEach((settingKey) => {
+      if (!callback) {
+        this.props.dispatch(getSettings(settingKey));
+      } else {
+        this.props.dispatch(getSettings(settingKey)).then(callback);
+      }
+    });
   }
 
   afterSave = (response) => {
     if (response) {
-      this.fetchFields();
+      this.fetchFields(this.afterReceiveSettings);
     }
   }
 
   afterReceiveSettings = (response) => {
-    const { account, subscriber } = this.props;
+    const { account, subscriber, product } = this.props;
     if (response) {
-      this.setState({ account, subscriber });
+      this.setState({ account, subscriber, product });
     }
   }
 
+  getSettingsKey = (entity) => {
+    const { keys } = this.props;
+    return (typeof keys[entity] === 'undefined' ? entity : keys[entity].split('.')[0]);
+  }
+
+  getSettingsPath = (entity, path) => {
+    const { keys } = this.props;
+    if (typeof keys[entity] === 'undefined') {
+      return path;
+    }
+
+    const keysArr = keys[entity].split('.');
+    if (typeof keysArr[1] !== 'undefined') {
+      path.unshift(keysArr[1]);
+    }
+    return path;
+  }
+
   onChangeField = (entity, index, id, value) => {
-    this.props.dispatch(updateSetting('subscribers', [entity, 'fields', index, id], value));
+    this.props.dispatch(updateSetting(this.getSettingsKey(entity), this.getSettingsPath(entity, ['fields', index, id]), value));
   };
 
   onRemoveField = (entity, index) => {
-    this.props.dispatch(removeSettingField('subscribers', [entity, 'fields', index]));
+    this.props.dispatch(removeSettingField(this.getSettingsKey(entity), this.getSettingsPath(entity, ['fields', index])));
   };
 
   onAddNewField = () => {
@@ -81,22 +122,25 @@ class CustomFields extends Component {
     const entity = tabs[tab];
     const size = this.props[entity].size;
     const newField = Immutable.Map();
-    this.props.dispatch(updateSetting('subscribers', [entity, 'fields', size], newField));
+    this.props.dispatch(updateSetting(this.getSettingsKey(entity), this.getSettingsPath(entity, ['fields', size]), newField));
   };
 
   onClickCancel = () => {
-    this.props.dispatch(getSettings('subscribers'));
+    this.fetchFields();
   }
 
   onClickSave = () => {
-    this.props.dispatch(saveSettings('subscribers')).then(this.afterSave);
+    this.props.dispatch(saveSettings(this.getSettingDistinctKeys())).then(this.afterSave);
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
     const { tab } = this.state;
     const { tabs } = this.props;
     const entity = tabs[tab];
-    this.props.dispatch(setFieldPosition(oldIndex, newIndex, ['subscribers', entity, 'fields']));
+    const key = this.getSettingsKey(entity);
+    const path = this.getSettingsPath(entity, ['fields']);
+    path.unshift(key);
+    this.props.dispatch(setFieldPosition(oldIndex, newIndex, path));
   };
 
   onSelectTab = (tab) => {
@@ -133,7 +177,7 @@ class CustomFields extends Component {
     });
 
     return (
-      <Tab key={key} title={`${ucFirst(entity)} Fields`} eventKey={key}>
+      <Tab key={key} title={ucFirst(entity)} eventKey={key}>
         <Panel style={{ borderTop: 'none' }}>
           <SortableFieldsContainer
             lockAxis="y"
@@ -165,5 +209,6 @@ class CustomFields extends Component {
 const mapStateToProps = (state, props) => ({
   subscriber: subscriberFieldsSelector(state, props),
   account: accountFieldsSelector(state, props),
+  product: productFieldsSelector(state, props),
 });
 export default connect(mapStateToProps)(CustomFields);

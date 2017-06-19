@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
+import Select from 'react-select';
 import Field from '../Field';
 import { getSettings } from '../../actions/settingsActions';
 import { entityFieldSelector } from '../../selectors/settingsSelector';
@@ -32,7 +33,7 @@ class EntityFields extends Component {
     }
   }
 
-  filterPrinableFields = field => (field.get('display', false) !== false && field.get('editable', false) !== false);
+  filterPrintableFields = field => (field.get('display', false) !== false && field.get('editable', false) !== false);
 
   onChangeField = (field, e) => {
     const { value } = e.target;
@@ -43,17 +44,37 @@ class EntityFields extends Component {
     const { entity, editable } = this.props;
     const fieldName = field.get('field_name', '');
     const fieldNamePath = fieldName.split('.');
-    const value = entity.getIn(fieldNamePath, '');
+    const multiple = field.get('multiple', false);
+    const selectList = field.get('select_list', false);
+    const multipleOptions = !selectList ? [] : field.get('select_options', '').split(',').map(option => ({ value: option, label: option }));
+    const hasOptions = multipleOptions.length > 0;
+    const isSelect = multiple || hasOptions;
+    const sm = isSelect ? 4 : 8;
+    const lg = isSelect ? 4 : 9;
+    const value = isSelect ? entity.getIn(fieldNamePath, []).join(',') : entity.getIn(fieldNamePath, '');
     const onChange = (e) => {
       this.onChangeField(fieldNamePath, e);
+    };
+    const onChangeSelect = (val) => {
+      this.props.onChangeField(fieldNamePath, val.split(','));
     };
     return (
       <FormGroup controlId={fieldName} key={key} >
         <Col componentClass={ControlLabel} sm={3} lg={2}>
           { field.get('title', fieldName) }
         </Col>
-        <Col sm={8} lg={9}>
-          <Field onChange={onChange} id={fieldName} value={value} editable={editable} />
+        <Col sm={sm} lg={lg}>
+          {isSelect && editable
+            ? (<Select
+              id={fieldName}
+              multi={multiple}
+              value={value}
+              onChange={onChangeSelect}
+              options={multipleOptions}
+              allowCreate={!hasOptions}
+            />)
+            : (<Field onChange={onChange} id={fieldName} value={value} editable={editable} />)
+          }
         </Col>
       </FormGroup>
     );
@@ -62,7 +83,7 @@ class EntityFields extends Component {
   renderFields = () => {
     const { fields } = this.props;
     return fields
-      .filter(this.filterPrinableFields)
+      .filter(this.filterPrintableFields)
       .map(this.renderField);
   }
 

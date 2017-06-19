@@ -97,6 +97,13 @@ class CustomField extends Component {
           </FormGroup>
 
           <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Multiple</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', false)} fieldType="checkbox" />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Select list</Col>
             <Col sm={9}>
               <InputGroup>

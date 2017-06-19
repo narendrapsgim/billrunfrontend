@@ -33,6 +33,9 @@ const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
 const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['subscribers', 'subscriber', 'fields']);
 
+const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['rates', 'fields']);
+
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
     const importLinkers = accountfields.filter(isLinkerField);
@@ -238,6 +241,11 @@ export const subscriberImportFieldsSelector = createSelector(
   subscriberFieldsSelector,
   accountImportFieldsSelector,
   selectSubscriberImportFields,
+);
+
+export const productFieldsSelector = createSelector(
+  getProductFields,
+  productFields => productFields,
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {
