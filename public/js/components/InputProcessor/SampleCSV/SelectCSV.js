@@ -4,6 +4,10 @@ import { connect } from 'react-redux';
 const SelectCSV = (props) => {
   const { settings, onSelectSampleCSV } = props;
 
+  const onFileReset = (e) => {
+    e.target.value = null;
+  };
+
   return (
     <div className="form-group">
       <div className="col-lg-3">
@@ -16,6 +20,8 @@ const SelectCSV = (props) => {
         </div>
         <div className="col-lg-9">
           <input type="file" id="sample_csv"
+                 accept=".csv"
+                 onClick={onFileReset}
                  onChange={onSelectSampleCSV}
                  disabled={!settings.get('file_type') || !settings.get('delimiter_type') ||
                            settings.get('delimiter_type') !== "separator" || settings.get('delimiter') === ''} />

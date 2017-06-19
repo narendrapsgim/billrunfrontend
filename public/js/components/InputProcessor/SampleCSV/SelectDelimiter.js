@@ -14,6 +14,7 @@ export default connect()(class SelectDelimiter extends Component {
   delimiterOptions = [
     { value: '	', label: 'Tab' }, // eslint-disable-line no-tabs
     { value: ' ', label: 'Space' },
+    { value: ',', label: 'Comma (,)' },
   ];
 
   render() {
