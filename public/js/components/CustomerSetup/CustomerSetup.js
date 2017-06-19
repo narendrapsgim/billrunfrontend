@@ -264,6 +264,7 @@ class CustomerSetup extends Component {
                       defaultListFields={defaultSubsctiptionListFields}
                       getSubscription={this.getSubscription}
                       clearRevisions={this.clearSubscriptionRevisions}
+                      clearList={this.clearSubscriptions}
                     />
                   </Panel>
                 </Tab>

@@ -16,6 +16,7 @@ export default class Subscriptions extends Component {
     onSaveSubscription: PropTypes.func.isRequired,
     getSubscription: PropTypes.func.isRequired,
     clearRevisions: PropTypes.func.isRequired,
+    clearList: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -77,6 +78,7 @@ export default class Subscriptions extends Component {
         allPlans={allPlans}
         allServices={allServices}
         clearRevisions={this.props.clearRevisions}
+        clearList={this.props.clearList}
         getSubscription={this.fetchSubscription}
         onSave={this.onClickSave}
         onCancel={this.onClickCancel}
