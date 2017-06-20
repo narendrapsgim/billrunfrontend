@@ -53,6 +53,11 @@ $page-wrapper-transition: margin 200ms linear;
   }
 
   .sidebar-nav {
+
+    > .nav {
+      padding-bottom: 30px;
+    }
+
     .nav-second-level {
       display: none;
     }
@@ -117,6 +122,10 @@ $page-wrapper-transition: margin 200ms linear;
       width: 50px;
     }
     .sidebar-nav {
+      
+      > .nav {
+        padding-bottom: 0;
+      }
 
       > .nav > li {
         width: 50px;
