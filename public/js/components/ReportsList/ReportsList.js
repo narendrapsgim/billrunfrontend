@@ -56,6 +56,7 @@ class ReportsList extends Component {
     this.setState({
       showConfirmDelete: true,
       itemToDelete: item,
+      confirmDeleteMessage: `Are you sure you want to delete "${item.get('key', '')}" report ?`,
     });
   }
 
@@ -63,6 +64,7 @@ class ReportsList extends Component {
     this.setState({
       showConfirmDelete: false,
       itemToDelete: null,
+      confirmDeleteMessage: '',
     });
   }
 
@@ -88,8 +90,7 @@ class ReportsList extends Component {
   ]);
 
   render() {
-    const { showConfirmDelete } = this.state;
-    const confirmDeleteMessage = 'Are you sure you want to delete report ?';
+    const { showConfirmDelete, confirmDeleteMessage } = this.state;
     const filterFields = this.getFilterFields();
     const tableFields = this.getTableFields();
     const actions = this.getActions();

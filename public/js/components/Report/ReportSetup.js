@@ -375,7 +375,7 @@ class ReportSetup extends Component {
 
   getListActions = () => [{
     type: 'export_csv',
-    label: 'Export CSV',
+    label: 'Export to CSV',
     showIcon: true,
     onClick: this.onClickExportCSV,
     actionStyle: 'primary',
