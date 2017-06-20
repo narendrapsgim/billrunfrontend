@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import _ from 'lodash';
+import Papa from 'papaparse';
+import filesize from 'file-size';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
@@ -48,7 +50,7 @@ import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-
+import { getConfig } from '../../common/Util';
 
 class InputProcessor extends Component {
 
@@ -219,20 +221,32 @@ class InputProcessor extends Component {
   };
 
   onSelectSampleCSV = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    if (!this.props.settings.get('delimiter')) return;
-    reader.onloadend = ((evt) => {
-      if (evt.target.readyState === FileReader.DONE) {
-        /* Only need first line */
-        const lines = evt.target.result.split('\n');
-        const header = lines[0];
-        const fields = header.split(this.props.settings.get('delimiter')).map(field => field.replace(/[^a-zA-Z_\d]/g, '_').toLowerCase());
-        this.props.dispatch(setFields(fields));
-      }
+    const { settings } = this.props;
+    const { files } = e.target;
+    const delimiter = settings.get('delimiter', ',');
+    Papa.parse(files[0], {
+      dynamicTyping: false,
+      skipEmptyLines: true,
+      delimiter,
+      header: true,
+      complete: this.onParseScvComplete,
+      error: this.onParseScvError,
     });
-    const blob = file.slice(0, file.size - 1);
-    reader.readAsText(blob);
+  }
+
+  onParseScvError = (error, file) => { // eslint-disable-line no-unused-vars
+    this.props.dispatch(showDanger('Error in CSV file'));
+  }
+
+  onParseScvComplete = (results) => {
+    if (results.meta && results.meta.fields && results.meta.fields.length > 0) {
+      this.props.dispatch(setFields([])); // empty existing fields
+      const whiteListCharacters = new RegExp('[^A-Za-z0-9_]', 'g');
+      const cleanFields = results.meta.fields.map(field => field.replace(whiteListCharacters, '_'));
+      this.props.dispatch(setFields(cleanFields));
+    } else {
+      this.props.dispatch(showDanger('Error in CSV file, no headers found.'));
+    }
   }
 
   onAddField = (val, e) => { // eslint-disable-line no-unused-vars

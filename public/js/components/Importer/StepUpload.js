@@ -27,7 +27,7 @@ class StepUpload extends Component {
     delimiterOptions: [
       { value: '	', label: 'Tab' }, // eslint-disable-line no-tabs
       { value: ' ', label: 'Space' },
-      { value: ',', label: 'Comma (,)' },
+      { value: ',', label: 'Comma' },
     ],
     entityOptions: ['customer', 'subscription'],
     onChange: () => {},
