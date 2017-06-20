@@ -425,7 +425,7 @@ class ReportSetup extends Component {
     }
 
     const confirmResetMessage = 'Are you sure you want to reset report ?';
-    const confirmDeleteMessage = 'Are you sure you want to delete report ?';
+    const confirmDeleteMessage = `Are you sure you want to delete "${item.get('key', '')}" report ?`;
     const allowEdit = mode !== 'view';
     const tableFields = this.getTableFields();
     return (
