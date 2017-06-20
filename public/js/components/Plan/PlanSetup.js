@@ -111,7 +111,7 @@ class PlanSetup extends Component {
       this.props.dispatch(setClonePlan());
     }
     if (item.get('prorated', null) === null) {
-      this.props.dispatch(onPlanFieldUpdate(['prorated'], 'true'));
+      this.props.dispatch(onPlanFieldUpdate(['prorated'], true));
     }
   }
 
