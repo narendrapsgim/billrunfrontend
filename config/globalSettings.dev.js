@@ -58,6 +58,7 @@ var globalSetting = {
         { id: 'session_id', type: 'string' },
         { id: 'billrun_pretend', type: 'boolean' },
         { id: 'billrun_status',
+          title: 'Billing cycle status',
           aggregatable: false,
           inputConfig: {
             inputType: 'select',

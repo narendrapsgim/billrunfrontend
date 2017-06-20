@@ -62,7 +62,7 @@ class Details extends Component {
     .map(formatSelectOptions)
     .toArray();
 
-  onChangeTypeGropped = () => {
+  onChangeTypeGrouped = () => {
     this.props.onChangeType(reportTypes.GROPPED);
   }
 
@@ -133,7 +133,7 @@ class Details extends Component {
                   id="report-method-grouped"
                   value="grouped"
                   checked={isGrouped}
-                  onChange={this.onChangeTypeGropped}
+                  onChange={this.onChangeTypeGrouped}
                   label={getFieldName(`report_type_${reportTypes.GROPPED}`, 'report')}
                 />
               </div>
