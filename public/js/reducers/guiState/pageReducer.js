@@ -1,9 +1,15 @@
 import Immutable from 'immutable';
-import { SET_PAGE_TITLE, SYSTEM_REQUIREMENTS_LOADING_COMPLETE } from '../../actions/guiStateActions/pageActions';
+import {
+  SET_PAGE_TITLE,
+  SYSTEM_REQUIREMENTS_LOADING_COMPLETE,
+  SHOW_ON_BOARDING,
+  TOGGLE_BOARDING,
+} from '../../actions/guiStateActions/pageActions';
 
 const defaultState = Immutable.Map({
   title: ' ',
   systemRequirementsLoad: false,
+  onBoarding: false,
 });
 
 const pageReducer = (state = defaultState, action) => {
@@ -16,6 +22,15 @@ const pageReducer = (state = defaultState, action) => {
     case SYSTEM_REQUIREMENTS_LOADING_COMPLETE: {
       return state.set('systemRequirementsLoad', true);
     }
+
+    case SHOW_ON_BOARDING: {
+      return state.set('onBoarding', action.show);
+    }
+
+    case TOGGLE_BOARDING: {
+      return state.set('onBoarding', !state.get('onBoarding', true));
+    }
+
     default:
       return state;
   }

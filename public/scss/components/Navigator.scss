@@ -39,13 +39,19 @@ $page-wrapper-transition: margin 200ms linear;
       margin-right: -2px;
     }
   }
-
-  #nav-user-menu {
-    padding: 15px;
-  }
 }
 
 #top-nav {
+
+  ul.navbar-top-links {
+    > li {
+    display: inline-block;
+      > a {
+        padding: 15px;
+      }
+    }
+  }
+
   .sidebar-nav {
     .nav-second-level {
       display: none;

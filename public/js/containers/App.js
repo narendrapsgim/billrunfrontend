@@ -8,6 +8,7 @@ import BraasTheme from '../theme';
 import ProgressIndicator from '../components/ProgressIndicator';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
+import OnBoarding from '../components/OnBoarding';
 import Footer from '../components/Footer';
 import { userCheckLogin } from '../actions/userActions';
 import { setPageTitle, systemRequirementsLoadingComplete } from '../actions/guiStateActions/pageActions';
@@ -140,6 +141,7 @@ class App extends Component {
       <div id="wrapper" style={{ height: '100%' }}>
         <ProgressIndicator />
         <Alerts />
+        <OnBoarding />
         <Navigator />
         <div id="page-wrapper" className="page-wrapper" style={{ minHeight: this.state.Height }}>
           <Row>

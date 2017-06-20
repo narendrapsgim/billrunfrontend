@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { NavDropdown, Button, MenuItem as BootstrapMenuItem } from 'react-bootstrap';
 import { toggleSideBar } from '../../actions/guiStateActions/menuActions';
 import { userDoLogout } from '../../actions/userActions';
+import { toggleOnBoarding } from '../../actions/guiStateActions/pageActions';
 import MenuItem from './MenuItem';
 import SubMenu from './SubMenu';
 
@@ -72,6 +73,10 @@ class Navigator extends Component {
       });
     }
   }
+  toggleOnBoarding = () => {
+    this.props.dispatch(toggleOnBoarding());
+  }
+
 
   onToggleMenu = () => {
     const { showFullMenu } = this.state;
@@ -217,10 +222,13 @@ class Navigator extends Component {
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
+          <BootstrapMenuItem eventKey="1" onClick={this.toggleOnBoarding}>
+            <i className="fa fa-question fa-fw" /> Help
+            </BootstrapMenuItem>
           <NavDropdown id="nav-user-menu" title={<span><i className="fa fa-user fa-fw" />{ userName }</span>}>
             <BootstrapMenuItem eventKey="4" onClick={this.clickLogout}>
               <i className="fa fa-sign-out fa-fw" /> Logout
-              </BootstrapMenuItem>
+            </BootstrapMenuItem>
           </NavDropdown>
         </ul>
 
