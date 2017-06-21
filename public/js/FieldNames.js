@@ -68,15 +68,18 @@ const FieldNames = {
     granted_return_code: 'Return code',
   },
   account: {
+    aid: 'Customer ID',
     firstname: 'First Name',
     lastname: 'Last Name',
-    aid: 'Customer ID',
   },
   subscription: {
-    firstname: 'First Name',
-    lastname: 'Last Name',
     aid: 'Subscription ID',
     sid: 'Customer ID',
+    firstname: 'First Name',
+    lastname: 'Last Name',
+    services: 'Services',
+    plan: 'Plan',
+    plan_activation: 'Plan activation date',
   },
   report: {
     report_type_0: 'Simple',

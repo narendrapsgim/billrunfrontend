@@ -22,6 +22,7 @@ class ReportsList extends Component {
   state = {
     showConfirmDelete: false,
     itemToDelete: null,
+    confirmDeleteMessage: '',
   }
 
   parseEntityName = (item) => {

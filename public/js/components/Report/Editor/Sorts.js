@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { Row, Col, FormGroup } from 'react-bootstrap';
+import { Row, Col, FormGroup, HelpBlock } from 'react-bootstrap';
+import { ReportDescription } from '../../../FieldDescriptions';
 import Sort from './Sort';
 import { CreateButton, SortableFieldsContainer } from '../../Elements';
 
@@ -81,18 +82,21 @@ class Sorts extends Component {
     const { sorts, options, mode } = this.props;
     const disabled = mode === 'view';
     const disableCreateNew = disabled || options.isEmpty();
+    const disableCreateNewtitle = disableCreateNew && options.isEmpty() ? ReportDescription.add_sort_disabled_no_fields : '';
     const sortRows = sorts.map(this.renderSortRow);
     return (
       <Row>
-        { !sortRows.isEmpty() && (
-          <Col sm={12}>
+        <Col sm={12}>
+          { !sortRows.isEmpty() ? (
             <FormGroup className="form-inner-edit-row">
               <Col sm={1}>&nbsp;</Col>
               <Col sm={6}><label htmlFor="field_field">Field</label></Col>
               <Col sm={4}><label htmlFor="order_field">Order</label></Col>
             </FormGroup>
-          </Col>
-        )}
+          ) : (
+            <HelpBlock>{ReportDescription.block_sort}</HelpBlock>
+          )}
+        </Col>
         <Col sm={12}>
           <SortableFieldsContainer
             lockAxis="y"
@@ -104,7 +108,12 @@ class Sorts extends Component {
         </Col>
         { mode !== 'view' && (
           <Col sm={12}>
-            <CreateButton onClick={this.props.onAdd} label="Add Sort" disabled={disableCreateNew} />
+            <CreateButton
+              onClick={this.props.onAdd}
+              label="Add Sort"
+              disabled={disableCreateNew}
+              title={disableCreateNewtitle}
+            />
           </Col>
         )}
       </Row>

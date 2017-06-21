@@ -76,6 +76,7 @@ class ReportSetup extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      showPreview: false,
       progress: false,
       showConfirmReset: false,
       showConfirmDelete: false,
@@ -164,9 +165,12 @@ class ReportSetup extends Component {
     this.props.dispatch(getReportData({ report, page, size }));
   }
 
-  onChangeReportValue = (path, value) => {
-    this.props.dispatch(setReportDataListPage(0));
-    this.props.dispatch(clearReportData());
+  onChangeReportValue = (path, value, needRefetchData = false) => {
+    if (needRefetchData) {
+      this.props.dispatch(setReportDataListPage(0));
+      this.props.dispatch(clearReportData());
+      this.setState({ showPreview: false });
+    }
     const stringPath = Array.isArray(path) ? path.join('.') : path;
     const deletePathOnEmptyValue = [];
     const deletePathOnNullValue = [];
@@ -241,14 +245,18 @@ class ReportSetup extends Component {
     && column.get('op', '') === ''
   )
 
-  validate = () => {
+  validate = (isPreview = false) => {
     const { item } = this.props;
-    if (item.get('key', '') === '') {
+    if (!isPreview && item.get('key', '') === '') {
       this.props.dispatch(showDanger('Please enter name'));
       return false;
     }
     if (item.get('entity', '') === '') {
       this.props.dispatch(showDanger('Please select entity'));
+      return false;
+    }
+    if (item.get('columns', Immutable.List()).filter(this.filterColumnsEmptyRows).isEmpty()) {
+      this.props.dispatch(showDanger('Please select at least one column'));
       return false;
     }
     if (item.get('type', reportTypes.SIMPLE) === reportTypes.GROPPED
@@ -295,7 +303,8 @@ class ReportSetup extends Component {
   ].every(param => param !== '');
 
   applyFilter = () => {
-    if (this.validate()) {
+    if (this.validate(true)) {
+      this.setState({ showPreview: true });
       this.getReportData();
     }
   }
@@ -420,16 +429,16 @@ class ReportSetup extends Component {
   }
 
   render() {
-    const { progress, showConfirmReset, showConfirmDelete } = this.state;
+    const { progress, showConfirmReset, showConfirmDelete, showPreview } = this.state;
     const { item, mode, reportFileds, reportData, size, page, nextPage } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
-
     const confirmResetMessage = 'Are you sure you want to reset report ?';
     const confirmDeleteMessage = `Are you sure you want to delete "${item.get('key', '')}" report ?`;
     const allowEdit = mode !== 'view';
     const tableFields = this.getTableFields();
+    const onlyHeaders = allowEdit && (!showPreview || tableFields.isEmpty());
     return (
       <div className="report-setup">
         <Panel header={this.renderPanelHeader()}>
@@ -448,6 +457,7 @@ class ReportSetup extends Component {
             fields={tableFields}
             page={page}
             size={size}
+            onlyHeaders={onlyHeaders}
             nextPage={nextPage}
             onChangePage={this.onPageChange}
             onChangeSize={this.onSizeChange}

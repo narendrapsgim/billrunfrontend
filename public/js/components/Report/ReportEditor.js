@@ -38,12 +38,12 @@ class ReportEditor extends Component {
   };
 
 
-  onApplay = () => {
+  onPreview = () => {
     this.props.onFilter();
   }
 
-  updateReport = (type, value) => {
-    this.props.onUpdate(type, value);
+  updateReport = (type, value, needRefetchData = true) => {
+    this.props.onUpdate(type, value, needRefetchData);
   }
 
   onChangeReportEntity = (val) => {
@@ -157,10 +157,11 @@ class ReportEditor extends Component {
 
   onRemoveSortByKey = (key) => {
     const { report } = this.props;
-    const sorts = report
-      .get('sorts', Immutable.List())
-      .filter(sort => sort.get('field', '') !== key);
-    this.updateReport('sorts', sorts);
+    const sorts = report.get('sorts', Immutable.List());
+    const keyIndex = sorts.findIndex((sort => sort.get('field', '') === key));
+    if (keyIndex > -1) {
+      this.updateReport('sorts', sorts.delete(keyIndex));
+    }
   }
 
   onAddSort = () => {
@@ -211,7 +212,7 @@ class ReportEditor extends Component {
     const columns = report
       .get('columns', Immutable.List())
       .setIn([index, 'label'], value);
-    this.updateReport('columns', columns);
+    this.updateReport('columns', columns, false);
   }
 
   updateColumnsByReportType = (value) => {
@@ -261,7 +262,7 @@ class ReportEditor extends Component {
     const columns = report
       .get('columns', Immutable.List())
       .delete(index);
-    this.updateReport('columns', columns);
+    this.updateReport('columns', columns, false);
   }
   /* ~Columns */
 
@@ -283,11 +284,11 @@ class ReportEditor extends Component {
     const { mode, report, aggregateOperators, conditionsOperators, sortOperators } = this.props;
     const fieldsConfig = this.getEntityFields();
     const columns = report.get('columns', Immutable.List());
-
+    const mandatory = <span className="danger-red"> *</span>;
     return (
       <div className="ReportEditor">
         <Form horizontal>
-          <Panel header="Basic Details">
+          <Panel header={<span>Basic Details</span>}>
             <EditorDetails
               mode={mode}
               title={report.get('key', '')}
@@ -298,7 +299,7 @@ class ReportEditor extends Component {
               onChangeType={this.onChangeReportType}
             />
           </Panel>
-          <Panel header="Conditions (optional)">
+          <Panel header={<span>Conditions</span>}>
             <EditorConditions
               mode={mode}
               conditions={report.get('conditions', Immutable.List())}
@@ -311,7 +312,7 @@ class ReportEditor extends Component {
               onChangeValue={this.onChangeConditionValue}
             />
           </Panel>
-          <Panel header="Columns">
+          <Panel header={<span>Columns {mandatory}</span>}>
             <EditorColumns
               mode={mode}
               columns={columns}
@@ -326,7 +327,7 @@ class ReportEditor extends Component {
               onMove={this.onMoveColumn}
             />
           </Panel>
-          <Panel header="Sort">
+          <Panel header={<span>Sort</span>}>
             <EditorSorts
               mode={mode}
               sorts={report.get('sorts', Immutable.List())}
@@ -342,7 +343,7 @@ class ReportEditor extends Component {
         </Form>
         <Row>
           <Col sm={12}>
-            <Button bsStyle="primary" onClick={this.onApplay} className="full-width mr10">
+            <Button bsStyle="primary" onClick={this.onPreview} block>
               <i className="fa fa-search" />&nbsp;Preview
             </Button>
           </Col>

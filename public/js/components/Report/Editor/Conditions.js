@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { Row, Col, FormGroup } from 'react-bootstrap';
+import { Row, Col, FormGroup, HelpBlock } from 'react-bootstrap';
+import { ReportDescription } from '../../../FieldDescriptions';
 import { CreateButton } from '../../Elements';
 import Condition from './Condition';
 
@@ -64,23 +65,32 @@ class Conditions extends Component {
     const { conditions, mode, fieldsOptions } = this.props;
     const conditionsRows = conditions.map(this.renderRow);
     const disableAdd = fieldsOptions.isEmpty();
+    const disableCreateNewtitle = disableAdd ? ReportDescription.add_conditions_disabled_no_entity : '';
     return (
       <Row className="report-editor-conditions">
-        { !conditionsRows.isEmpty() && (
-          <Col sm={12}>
+        <Col sm={12}>
+          { !conditionsRows.isEmpty() ? (
             <FormGroup className="form-inner-edit-row">
               <Col sm={4}><label htmlFor="field_field">Field</label></Col>
               <Col sm={2}><label htmlFor="operator_field">Operator</label></Col>
               <Col sm={4}><label htmlFor="value_field">Value</label></Col>
             </FormGroup>
-          </Col>
-        )}
+          ) : (
+            <HelpBlock>{ReportDescription.block_conditions}</HelpBlock>
+          )}
+        </Col>
+
         <Col sm={12}>
           { conditionsRows }
         </Col>
         { mode !== 'view' && (
           <Col sm={12}>
-            <CreateButton onClick={this.props.onAdd} label="Add Condition" disabled={disableAdd} />
+            <CreateButton
+              onClick={this.props.onAdd}
+              label="Add Condition"
+              disabled={disableAdd}
+              title={disableCreateNewtitle}
+            />
           </Col>
         )}
       </Row>

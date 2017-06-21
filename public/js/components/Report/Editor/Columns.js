@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { FormGroup, Row, Col } from 'react-bootstrap';
+import { FormGroup, Row, Col, HelpBlock } from 'react-bootstrap';
+import { ReportDescription } from '../../../FieldDescriptions';
 import { CreateButton, SortableFieldsContainer } from '../../Elements';
 import Column from './Column';
 import { reportTypes } from '../../../actions/reportsActions';
@@ -81,18 +82,24 @@ class Columns extends Component {
     const { mode, type, fieldsConfig } = this.props;
     const columnsRows = this.renderRows();
     const disableAdd = fieldsConfig.isEmpty();
+    const emptyHelpText = (type === reportTypes.GROPPED)
+      ? ReportDescription.block_columns_grouped
+      : ReportDescription.block_columns_simple;
+    const disableCreateNewtitle = disableAdd ? ReportDescription.add_columns_disabled_no_entity : '';
     return (
       <Row>
-        { !columnsRows.isEmpty() && (
-          <Col sm={12}>
+        <Col sm={12}>
+          { !columnsRows.isEmpty() ? (
             <FormGroup className="form-inner-edit-row">
               <Col sm={1}>&nbsp;</Col>
               <Col sm={4}><label htmlFor="field_field">Field</label></Col>
               <Col sm={2}><label htmlFor="operator_field">{type !== reportTypes.SIMPLE && 'Function'}</label></Col>
               <Col sm={3}><label htmlFor="value_field">Label</label></Col>
             </FormGroup>
-          </Col>
-        )}
+          ) : (
+            <HelpBlock>{ emptyHelpText }</HelpBlock>
+          )}
+        </Col>
         <Col sm={12}>
           <SortableFieldsContainer
             lockAxis="y"
@@ -104,7 +111,12 @@ class Columns extends Component {
         </Col>
         { mode !== 'view' && (
           <Col sm={12}>
-            <CreateButton onClick={this.props.onAdd} label="Add Column" disabled={disableAdd} />
+            <CreateButton
+              onClick={this.props.onAdd}
+              label="Add Column"
+              disabled={disableAdd}
+              title={disableCreateNewtitle}
+            />
           </Col>
         )}
       </Row>
