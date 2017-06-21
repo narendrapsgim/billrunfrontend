@@ -5,6 +5,8 @@ import {
   SHOW_ON_BOARDING,
   TOGGLE_BOARDING,
 } from '../../actions/guiStateActions/pageActions';
+import { LOGIN } from '../../actions/userActions';
+
 
 const defaultState = Immutable.Map({
   title: ' ',
@@ -27,6 +29,12 @@ const pageReducer = (state = defaultState, action) => {
       return state.set('onBoarding', action.show);
     }
 
+    case LOGIN: {
+      if (action.data && action.data.last_login === null) {
+        return state.set('onBoarding', true);
+      }
+      return state;
+    }
     case TOGGLE_BOARDING: {
       return state.set('onBoarding', !state.get('onBoarding', true));
     }
