@@ -94,7 +94,7 @@ const routes = () => (
     </Route>
 
     <Route path="charging_plans" >
-      <IndexRoute component={RequireAuth(ChargingPlansList)} title="Buckets Group" />
+      <IndexRoute component={RequireAuth(ChargingPlansList)} title="Buckets Groups" />
       <Route path="charging_plan/:itemId" component={RequireAuth(ChargingPlanSetup)} />
       <Route path="charging_plan" component={RequireAuth(ChargingPlanSetup)} />
     </Route>
