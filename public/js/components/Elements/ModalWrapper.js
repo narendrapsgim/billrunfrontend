@@ -32,7 +32,7 @@ const ModalWrapper = props => (
 );
 
 ModalWrapper.defaultProps = {
-  title: 'Edit',
+  title: '',
   show: false,
   progress: false,
   labelOk: 'OK',
