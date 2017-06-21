@@ -69,9 +69,16 @@ class Column extends Component {
     this.props.onRemove(idx);
   }
 
+  getConfig = () => {
+    const { item, fieldsConfig } = this.props;
+    return fieldsConfig.find(conf => conf.get('id', '') === item.get('field_name', ''), null, Immutable.Map());
+  }
+
   getoperators = () => {
     const { operators } = this.props;
+    const config = this.getConfig();
     return operators
+      .filter(operator => operator.get('types', Immutable.List()).includes(config.get('type', 'string')))
       .map(parseConfigSelectOptions)
       .toArray();
   }
