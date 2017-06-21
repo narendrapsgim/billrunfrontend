@@ -648,3 +648,15 @@ ul.revision-history-list li.active .cycle {
 .Select-memu-outer {
   background-color: blue!important;
 }
+
+.minimized {
+  transform: scale(.5)!important;
+}
+
+.on-boarding-wrapper {
+  background: #fff;
+  position: fixed;
+  z-index: 9999;
+  width: 80%;
+  box-shadow: 1px 1px 20px 2px rgba(0, 0, 0, .125);
+}
