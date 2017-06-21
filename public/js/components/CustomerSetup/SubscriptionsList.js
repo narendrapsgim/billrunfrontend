@@ -117,7 +117,6 @@ export default class SubscriptionsList extends Component {
         fieldsWithMutations.set(defaultSubsctiptionListField, 1);
       });
       settings
-        .getIn(['subscriber', 'fields'], Immutable.List())
         .filter(field => field.get('show_in_list', false))
         .forEach((field) => {
           fieldsWithMutations.set(field.get('field_name', ''), 1);
