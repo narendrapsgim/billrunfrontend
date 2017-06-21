@@ -52,7 +52,7 @@ class EntityFields extends Component {
     const sm = isSelect ? 4 : 8;
     const lg = isSelect ? 4 : 9;
     const fieldVal = entity.getIn(fieldNamePath, '');
-    const value = isSelect && Array.isArray(fieldVal) ? fieldVal.join(',') : fieldVal;
+    const value = (Array.isArray(fieldVal) || Immutable.List.isList(fieldVal)) ? fieldVal.join(',') : fieldVal;
     const onChange = (e) => {
       this.onChangeField(fieldNamePath, e);
     };
