@@ -221,7 +221,7 @@ class CycleData extends Component {
   };
 
   downloadTaxURL = (billrunKey) =>
-    `${getConfig('serverUrl')}/api/report?action=taxationReport&query={"billrun_key":"${billrunKey}"}&type=csv`;
+    `${getConfig('serverUrl')}/api/report?action=taxationReport&report={"billrun_key":"${billrunKey}"}&type=csv`;
 
   parseTaxDownload = (entity) => {
     const { billrunKey } =  this.props
