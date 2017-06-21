@@ -365,12 +365,14 @@ class ReportSetup extends Component {
 
   getTableFields = () => Immutable.List().withMutations((columnsWithMutations) => {
     const { item } = this.props;
-    item.get('columns', Immutable.List()).forEach((column) => {
-      columnsWithMutations.push(Immutable.Map({
-        id: column.get('key', ''),
-        title: column.get('label', ''),
-      }));
-    });
+    item.get('columns', Immutable.List())
+      .filter(this.filterColumnsEmptyRows)
+      .forEach((column) => {
+        columnsWithMutations.push(Immutable.Map({
+          id: column.get('key', ''),
+          title: column.get('label', ''),
+        }));
+      });
   });
 
   getListActions = () => [{
