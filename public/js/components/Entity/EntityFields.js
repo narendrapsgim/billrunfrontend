@@ -14,6 +14,7 @@ class EntityFields extends Component {
     entity: PropTypes.instanceOf(Immutable.Map),
     entityName: PropTypes.string.isRequired,
     fields: PropTypes.instanceOf(Immutable.List),
+    fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
     onChangeField: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
@@ -22,6 +23,7 @@ class EntityFields extends Component {
   static defaultProps = {
     entity: Immutable.Map(),
     fields: Immutable.List(),
+    fieldsFilter: null,
     editable: true,
     onChangeField: () => {},
   }
@@ -82,9 +84,10 @@ class EntityFields extends Component {
   };
 
   renderFields = () => {
-    const { fields } = this.props;
+    const { fields, fieldsFilter } = this.props;
+    const fieldFilterFunction = fieldsFilter !== null ? fieldsFilter : this.filterPrintableFields;
     return fields
-      .filter(this.filterPrintableFields)
+      .filter(fieldFilterFunction)
       .map(this.renderField);
   }
 

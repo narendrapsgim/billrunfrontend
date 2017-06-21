@@ -36,6 +36,7 @@ import {
 } from '../../selectors/entitySelector';
 import {
   usageTypeSelector,
+  inputProssesorRatingParamsSelector,
 } from '../../selectors/settingsSelector';
 
 import {
@@ -53,6 +54,7 @@ class ProductSetup extends Component {
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     usageTypes: PropTypes.instanceOf(Immutable.List),
+    ratingParams: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -67,6 +69,7 @@ class ProductSetup extends Component {
     item: Immutable.Map(),
     revisions: Immutable.List(),
     usageTypes: Immutable.List(),
+    ratingParams: Immutable.List(),
     activeTab: 1,
   };
 
@@ -78,7 +81,7 @@ class ProductSetup extends Component {
     const { usageTypes } = this.props;
     this.fetchItem();
     if (usageTypes.isEmpty()) {
-      this.props.dispatch(getSettings('usage_types'));
+      this.props.dispatch(getSettings(['usage_types', 'file_types']));
     }
   }
 
@@ -214,7 +217,7 @@ class ProductSetup extends Component {
   }
 
   render() {
-    const { item, usageTypes, mode, revisions } = this.props;
+    const { item, usageTypes, ratingParams, mode, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -249,6 +252,7 @@ class ProductSetup extends Component {
             product={item}
             usaget={usaget}
             usageTypes={usageTypes}
+            ratingParams={ratingParams}
           />
         </Panel>
 
@@ -270,6 +274,7 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'product'),
   revisions: revisionsSelector(state, props, 'product'),
   usageTypes: usageTypeSelector(state, props),
+  ratingParams: inputProssesorRatingParamsSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ProductSetup));

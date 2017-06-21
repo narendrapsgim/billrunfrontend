@@ -120,6 +120,20 @@ const selectCustomKeys = (inputProssesors) => {
   return options.toList();
 };
 
+const selectRatingParams = (inputProssesors) => {
+  let options = Immutable.Set();
+  inputProssesors.forEach((inputProssesor) => {
+    const ratingCalculators = inputProssesor.get('rate_calculators', Immutable.Map());
+    ratingCalculators.forEach((fields) => {
+      const currentFields = fields
+      .filter(field => field.get('rate_key', '').startsWith('params.'))
+      .map(field => field.get('rate_key', ''));
+      options = options.concat(currentFields);
+    });
+  });
+  return options.toList();
+};
+
 const sortFieldOption = (optionsA, optionB) => {
   const a = optionsA.get('title', '').toUpperCase(); // ignore upper and lowercase
   const b = optionB.get('title', '').toUpperCase(); // ignore upper and lowercase
@@ -171,6 +185,11 @@ export const inputProssesorCsiOptionsSelector = createSelector(
 export const inputProssesorCustomKeysSelector = createSelector(
   getInputProssesors,
   selectCustomKeys,
+);
+
+export const inputProssesorRatingParamsSelector = createSelector(
+  getInputProssesors,
+  selectRatingParams,
 );
 
 export const linesFiledsSelector = createSelector(

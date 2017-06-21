@@ -18,6 +18,7 @@ export default class Product extends Component {
     usaget: PropTypes.string,
     planName: PropTypes.string,
     usageTypes: PropTypes.object.isRequired,
+    ratingParams: PropTypes.object.isRequired,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
     onProductRateAdd: PropTypes.func.isRequired,
@@ -122,6 +123,13 @@ export default class Product extends Component {
     this.props.onFieldUpdate(field, value);
   }
 
+  filterCustomFields = (field) => {
+    const { ratingParams } = this.props;
+    const fieldName = field.get('field_name', '');
+    const usedAsRatingField = ratingParams.includes(fieldName);
+    return (!fieldName.startsWith('params.') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
+  };
+
   renderPrices = () => {
     const { product, planName, usaget, mode } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
@@ -203,6 +211,7 @@ export default class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
+                fieldsFilter={this.filterCustomFields}
                 editable={editable}
               />
 
