@@ -199,46 +199,47 @@ class List extends Component {
       <Tooltip id="tooltip">{ editText || 'Edit'}</Tooltip>
     );
 
-    const table_body = items.size < 1 ?
-                       (<tr><td colSpan={colSpan} style={{ textAlign: 'center' }}>No items found</td></tr>) :
-                        items.map((entity, index) => (
-                          <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled disabled-bg'}>
-                            {
-                                enableEnabled ?
-                                  <td className="edit-tb">
-                                    <input type="checkbox" checked={entity.get('enabled', true)} onChange={onClickEnabled.bind(this, entity)} />
-                                  </td>
-                                : null
-                              }
-                              { this.buildRow(entity, fields) }
-                              {
-                                edit &&
-                                  <td className="edit-tb">
-                                    <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
-                                      { editText ?
-                                        editText :
-                                        <OverlayTrigger overlay={editTooltip} placement="left">
-                                          <i className="fa fa-pencil" />
-                                        </OverlayTrigger>
-                                      }
-                                    </button>
-                                  </td>
-                              }
-                              {
-                                enableRemove &&
-                                  <td className="edit-tb">
-                                    <Button onClick={onClickRemove.bind(this, entity)} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
-                                  </td>
-                              }
-                              {
-                                actions.length > 0 &&
-                                  <td className="td-actions">
-                                    <Actions actions={actions} data={entity} />
-                                  </td>
-                              }
-                            </tr>
-                          )
-                        );
+    const table_body = !items
+      ? null
+      : (items.size < 1
+        ? (<tr><td colSpan={colSpan} style={{ textAlign: 'center' }}>No items found</td></tr>)
+        : items.map((entity, index) => (
+            <tr key={index} className={entity.get('enabled', true) ? '' : 'disabled disabled-bg'}>
+              { enableEnabled && (
+                <td className="edit-tb">
+                  <input type="checkbox" checked={entity.get('enabled', true)} onChange={onClickEnabled.bind(this, entity)} />
+                </td>
+              )}
+              { this.buildRow(entity, fields) }
+              { edit && (
+                <td className="edit-tb">
+                  <button className="btn btn-link" onClick={onClickEdit.bind(this, entity)}>
+                    { editText
+                      ? editText
+                      : (
+                        <OverlayTrigger overlay={editTooltip} placement="left">
+                          <i className="fa fa-pencil" />
+                        </OverlayTrigger>
+                    )}
+                  </button>
+                </td>
+              )}
+              { enableRemove && (
+                <td className="edit-tb">
+                  <Button onClick={onClickRemove.bind(this, entity)} bsSize="small" className="pull-left" >
+                    <i className="fa fa-trash-o danger-red" />&nbsp;Remove
+                  </Button>
+                </td>
+              )}
+              { actions.length > 0 && (
+                <td className="td-actions">
+                  <Actions actions={actions} data={entity} />
+                </td>
+              )}
+            </tr>
+          ),
+        )
+      );
 
     return (
       <div className={`List row ${className}`}>
