@@ -54,7 +54,7 @@ class List extends Component {
         return moment.unix(entity.get(field.id, 0)).format(globalSetting.datetimeFormat);
       case 'text':
       default:
-        return entity.get(field.id);
+        return entity.get(field.id, '');
     }
   }
 
@@ -62,9 +62,10 @@ class List extends Component {
     if (!Immutable.Iterable.isIterable(entity)) {
       return this.printEntityField(Immutable.fromJS(entity), field);
     }
-    if (field.parser) { return field.parser(entity, field); }
-    if (field.type) { return this.displayByType(field, entity); }
-    return entity.get(field.id);
+    if (field.parser) {
+      return field.parser(entity, field);
+    }
+    return this.displayByType(field, entity);
   }
 
   getRowAction = (row, idx, entity) => {
