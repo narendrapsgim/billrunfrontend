@@ -182,3 +182,25 @@ export const isLinkerField = (field = Immutable.Map()) => (
   !field.get('generated', false) &&
   field.get('editable', true)
 );
+
+export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldField, oldOp, newField, newOp) => {
+  const oldFieldLabel = oldField === '' ? '' : fieldsOptions.find(
+    fieldConfig => fieldConfig.get('id') === oldField, null, Immutable.Map(),
+  ).get('title', '');
+  const newFieldLabel = oldField === newField ? oldFieldLabel : fieldsOptions.find(
+    fieldConfig => fieldConfig.get('id') === newField, null, Immutable.Map(),
+  ).get('title', '');
+
+  const oldOpLabel = oldOp === '' ? '' : opOptions.find(
+    groupByOperator => groupByOperator.get('id') === oldOp, null, Immutable.Map(),
+  ).get('title', '');
+  const newOpLabel = oldOp === newOp ? oldOpLabel : opOptions.find(
+    groupByOperator => groupByOperator.get('id') === newOp, null, Immutable.Map(),
+  ).get('title', '');
+  // Check if label is empty or was NOT changed by user
+  const oldLabel = oldOpLabel === '' || oldOp === 'group' ? oldFieldLabel : `${oldFieldLabel} (${oldOpLabel})`;
+  if (label === '' || label === oldLabel) {
+    return newOpLabel === '' || newOp === 'group' ? newFieldLabel : `${newFieldLabel} (${newOpLabel})`;
+  }
+  return label;
+};

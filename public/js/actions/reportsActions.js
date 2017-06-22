@@ -10,6 +10,7 @@ import {
  } from '../common/ApiQueries';
 import {
   saveEntity,
+  deleteEntity,
   getEntity,
   clearEntity,
   updateEntityField,
@@ -29,11 +30,19 @@ import {
 } from './listActions';
 import { getSettings } from './settingsActions';
 
+
+export const reportTypes = {
+  SIMPLE: 0,
+  GROPPED: 1,
+};
+
 export const setCloneReport = () => setCloneEntity('reports', 'report');
 
 export const clearReport = () => clearEntity('reports');
 
 export const saveReport = (item, action) => dispatch => dispatch(saveEntity('reports', item, action));
+
+export const deleteReport = item => dispatch => dispatch(deleteEntity('reports', item));
 
 export const updateReport = (path, value) => updateEntityField('reports', path, value);
 

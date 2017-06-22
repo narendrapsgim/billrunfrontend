@@ -31,7 +31,8 @@ fieldset[disabled] .btn {
   line-height: 32px;
 }
 .actions button.btn-sm {
-    padding: 9px 12px;
+  height: 39px;
+  padding: 9px 12px;
 }
 .inline {
   display: inline-block;;
@@ -61,8 +62,12 @@ fieldset[disabled] .btn {
 
 /* General colors */
 .danger-red { color: #d9534f; }
+.btn-danger .danger-red { color: #ffffff; }
 .disabled {
   color: #6f6f6f;
+}
+.active-blue {
+  color: #008cba;
 }
 .disabled-bg {
   background-color: #eeeeee;
@@ -148,6 +153,11 @@ fieldset[disabled] .btn {
 .Select-item:hover,.Select-item:focus{
   background-color: #eeeeee!important;
   color: #222222!important;
+}
+.Select-menu-outer .Select-option.is-selected {
+    font-weight: bolder;
+    background-color: #eeeeee!important;
+    color: #222222!important;
 }
 /* ~React-Select */
 
@@ -328,9 +338,12 @@ fieldset[disabled] .btn {
   float: left;
 }
 
-.draggable-menu{
+.draggable-row{
   background-color: #eee;
   opacity: .7;
+  min-height: 47px!important;
+  padding-top: 4px!important;
+  padding-bottom: 4px!important;
 }
 
 .panel-no-border {
@@ -477,10 +490,7 @@ ul.revision-history-list li.active .cycle {
 }
 
 /* Reports */
-.report-setup .CustomFilter .action button{
-  height: 39px;
-}
-.report-setup .CustomFilter .react-datepicker__input-container {
+.report-setup .report-editor-conditions .react-datepicker__input-container {
   width: 100%;
 }
 /* ~Reports */

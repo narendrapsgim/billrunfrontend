@@ -130,7 +130,7 @@ const sortFieldOption = (optionsA, optionB) => {
 };
 
 const selectLinesFields = (customKeys) => {
-  const predefinedFileds = getConfig(['reports', 'fields', 'lines'], Immutable.List());
+  const predefinedFileds = getConfig(['reports', 'fields', 'usage'], Immutable.List());
   return Immutable.List().withMutations((optionsWithMutations) => {
     // Set predefined fields
     predefinedFileds.forEach((predefinedFiled) => {
@@ -150,8 +150,8 @@ const selectLinesFields = (customKeys) => {
         optionsWithMutations.push(Immutable.Map({
           id: `uf.${customKey}`,
           title: `${title}`,
-          filter: true,
-          display: true,
+          searchable: true,
+          aggregatable: true,
         }));
       }
     });
@@ -193,7 +193,7 @@ export const billrunSelector = createSelector(
 
 export const minEntityDateSelector = createSelector(
   getMinEntityDate,
-  minEntityDate => (minEntityDate ? moment.unix(minEntityDate) : minEntityDate),
+  minEntityDate => (minEntityDate && !isNaN(minEntityDate) ? moment.unix(minEntityDate) : moment(0)),
 );
 
 export const currencySelector = createSelector(
@@ -221,7 +221,16 @@ export const entityFieldSelector = createSelector(
 
 export const accountFieldsSelector = createSelector(
   getAccountFields,
-  accountFields => accountFields,
+  (fields) => {
+    if (fields) {
+      return fields.map(field => (
+        field.get('title', '') !== ''
+        ? field
+        : field.set('title', getFieldName(field.get('field_name', ''), 'account'))
+      ));
+    }
+    return undefined;
+  },
 );
 
 export const accountImportFieldsSelector = createSelector(
@@ -231,7 +240,16 @@ export const accountImportFieldsSelector = createSelector(
 
 export const subscriberFieldsSelector = createSelector(
   getSubscriberFields,
-  subscriberFields => subscriberFields,
+  (fields) => {
+    if (fields) {
+      return fields.map(field => (
+        field.get('title', '') !== ''
+        ? field
+        : field.set('title', getFieldName(field.get('field_name', ''), 'subscription'))
+      ));
+    }
+    return undefined;
+  },
 );
 
 export const subscriberImportFieldsSelector = createSelector(
@@ -255,6 +273,69 @@ export const formatFieldOptions = (fields, item = Immutable.Map()) => {
   }
   return undefined;
 };
+
+const formatReportFields = (fields) => {
+  if (!fields) {
+    return undefined;
+  }
+  return fields.map(field => Immutable.Map({
+    id: field.get('field_name', ''),
+    title: field.get('title', ''),
+    aggregatable: true,
+    searchable: field.get('searchable', true),
+  }));
+};
+
+const concatJoinFields = (fields, joinFields = Immutable.Map()) => {
+  if (!fields) {
+    return Immutable.List();
+  }
+  return fields.withMutations((fieldsWithMutations) => {
+    joinFields.forEach((entityfields, entity) => {
+      const entityLabel = sentenceCase(getConfig(['systemItems', entity, 'itemName'], entity));
+      if (!entityfields.isEmpty()) {
+        entityfields.forEach((entityfield) => {
+          const joinId = `$${entity}.${entityfield.get('id', '')}`;
+          const joinTitle = `${entityLabel}: ${entityfield.get('title', entityfield.get('id', ''))}`;
+          const joinField = entityfield.set('id', joinId).set('title', joinTitle);
+          fieldsWithMutations.push(joinField);
+        });
+      }
+    });
+  });
+};
+
+const selectReportFields = (subscriberFields, accountFields, linesFileds) => Immutable.Map({
+  usage: linesFileds,
+  // usage: concatJoinFields(linesFileds, Immutable.Map({
+  //   subscription: subscriberFields, customer: accountFields,
+  // }),
+  subscription: subscriberFields,
+  // subscription = concatJoinFields(subscriberFields, Immutable.Map({
+  //   customer: accountFields, usage: linesFileds,
+  // })),
+  customer: accountFields,
+  // customer = concatJoinFields(accountFields, Immutable.Map({
+  //   subscription: subscriberFields, usage: linesFileds,
+  // })),
+});
+
+const reportSubscriberFieldsSelector = createSelector(
+  subscriberFieldsSelector,
+  formatReportFields,
+);
+
+const reportAccountFieldsSelector = createSelector(
+  accountFieldsSelector,
+  formatReportFields,
+);
+
+export const reportFieldsSelector = createSelector(
+  reportSubscriberFieldsSelector,
+  reportAccountFieldsSelector,
+  linesFiledsSelector,
+  selectReportFields,
+);
 
 export const addDefaultFieldOptions = (formatedFields, item = Immutable.Map()) => {
   if (formatedFields) {
@@ -288,3 +369,4 @@ export const addDefaultFieldOptions = (formatedFields, item = Immutable.Map()) =
   }
   return undefined;
 };
+

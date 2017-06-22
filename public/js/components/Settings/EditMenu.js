@@ -80,7 +80,7 @@ export default class EditMenu extends Component {
     return (
       <SortableMenuList
         lockAxis="y"
-        helperClass="draggable-menu"
+        helperClass="draggable-row"
         key={depth}
         onSortEnd={this.onDragEnd}
         useDragHandle={true}
