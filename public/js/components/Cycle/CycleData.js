@@ -22,6 +22,7 @@ class CycleData extends Component {
     baseFilter: PropTypes.object,
     reloadCycleData: PropTypes.func,
     showConfirmAllButton: PropTypes.bool,
+    isCycleConfirmed: PropTypes.bool,
     currency: PropTypes.string,
     invoicesNum: PropTypes.number,
   };
@@ -30,6 +31,7 @@ class CycleData extends Component {
     reloadCycleData: () => {},
     baseFilter: {},
     showConfirmAllButton: true,
+    isCycleConfirmed:false,
     currency: '',
     invoicesNum: 0,
   };
@@ -236,7 +238,7 @@ class CycleData extends Component {
   };
 
   getListActions = () => {
-    const { showConfirmAllButton } = this.props;
+    const { showConfirmAllButton, isCycleConfirmed } = this.props;
     return [{
  	label: 'Confirm All',
         actionStyle: 'default',
@@ -249,7 +251,7 @@ class CycleData extends Component {
       {
         label: 'Download Taxation complience report',
         actionStyle: 'default',
-        show : !showConfirmAllButton,
+        show : isCycleConfirmed,
         showIcon: false,
         renderFunc : this.parseTaxDownload,
         actionSize: 'xsmall',
