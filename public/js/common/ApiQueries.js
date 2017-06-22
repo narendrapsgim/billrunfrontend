@@ -536,6 +536,16 @@ export const getReportQuery = ({ report, page = 0, size = 10 }) => ({
   ],
 });
 
+export const getExpectedInvoiceQuery = ( aid, billrunKey ) => ({
+  api: 'accountinvoices',
+  params: [
+    { action: 'expected_invoice' },
+    { aid },
+    { billrun_key: billrunKey },
+  ],
+});
+
+
 // Dashboard reports queries
 export const getDashboardQuery = action => ({
   api: 'reports',

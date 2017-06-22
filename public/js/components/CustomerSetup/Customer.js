@@ -13,6 +13,8 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { currencySelector } from '../../selectors/settingsSelector';
 import OfflinePayment from '../Payments/OfflinePayment';
 import CyclesSelector from '../Cycle/CyclesSelector';
+import { getExpectedInvoiceQuery } from '../../common/ApiQueries'
+import { buildRequestUrl } from '../../common/Api'
 
 class Customer extends Component {
 
@@ -220,6 +222,14 @@ class Customer extends Component {
     this.setState({ selectedCyclesNames });
   }
 
+  onClickExpectedInvoice = () => {
+    const { customer } = this.props;
+    const { selectedCyclesNames } = this.state;
+    let query = getExpectedInvoiceQuery(customer.get('aid'),selectedCyclesNames);
+    window.open(buildRequestUrl(query))
+  }
+
+
   renderRebalanceButton = () => {
     const { customer } = this.props;
     const { showRebalanceConfirmation, selectedCyclesNames } = this.state;
@@ -278,6 +288,25 @@ class Customer extends Component {
     );
   }
 
+  renderExpectedInvoiceButton = () => {
+    const { customer } = this.props;
+    const { selectedCyclesNames } = this.state;
+
+    return (
+      <span  className="inline">
+        , Or generate expected invoices for : <span  className="inline" style={{ verticalAlign:"middle", minWidth:290, marginLeft: 5, marginRight: 5}} >
+                                              <CyclesSelector className="inline"
+                                                  onChange={this.onChangeSelectedCycle}
+                                                  statusesToDisplay={Immutable.List(['current', 'to_run'])}
+                                                  selectedCycles={selectedCyclesNames}
+                                                  multi={false}
+                                                />
+                                            </span>
+        <Button bsSize="small" className="btn-primary inline" disabled={!selectedCyclesNames} onClick={this.onClickExpectedInvoice}>Generate expected invoice</Button>
+      </span>
+    );
+  }
+
   render() {
     const { customer, action } = this.props;
     // in update mode wait for item before render edit screen
@@ -296,9 +325,10 @@ class Customer extends Component {
           <div>
             <hr />
             { this.renderInCollection() }
-            <p>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></p>
-            <p>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link></p>
+            <div>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></div>
+            <div>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link> { this.renderExpectedInvoiceButton() }</div>
             { this.renderRebalanceButton() }
+
           </div>
         }
       </div>
