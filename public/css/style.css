@@ -118,6 +118,33 @@ fieldset[disabled] .btn {
     background-color: #eeeeee!important;
     color: #222222!important;
 }
+
+/* React-tags */
+.react-tagsinput-input {
+  margin: 0;
+  padding: 3px 4px;
+  margin-bottom: 8px;
+}
+.react-tagsinput--focused {
+  border-color: #dddddd!important;
+}
+.react-tagsinput-tag {
+  color: #6f6f6f!important;
+  background-color: #e7e7e7!important;
+  border-color: #dddddd!important;
+  border-radius: 0!important;
+  font-size: 0.9em;
+  padding: 3px 5px;
+}
+.react-tagsinput-tag:hover, .react-tagsinput-tag:focus {
+  background-color: #eeeeee!important;
+  color: #222222!important;
+}
+.react-tagsinput-remove {
+  padding-right: 6px;
+}
+/* ~React-tags */
+
 /* React-Select */
 .Select-menu-outer{
   z-index: 5!important;
@@ -139,7 +166,9 @@ fieldset[disabled] .btn {
   border-radius: 0!important;
 }
 .Select-item-icon{
-  border-right: none!important;
+  padding: 3px;
+  font-weight: bold;
+  border: none;
 }
 .Select-item-icon:hover, .Select-item-icon:focus {
     background-color: #eeeeee!important;
