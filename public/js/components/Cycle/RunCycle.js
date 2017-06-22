@@ -117,6 +117,7 @@ class RunCycle extends Component {
 
   runAutoRefresh = () => {
     const { cycleAdditionalData } = this.props;
+    this.props.dispatch(clearItems('billruns'));
     if (cycleAdditionalData.get('cycle_status', '') !== 'running') {
       this.unsetAutoRefresh();
       this.setState({ autoRefreshRunning: false });

@@ -3,11 +3,10 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { Panel, Col, Button } from 'react-bootstrap';
-import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
-import ReportDetails from './ReportDetails';
-import List from '../List';
-import Pager from '../EntityList/Pager';
+import { Panel } from 'react-bootstrap';
+import { ActionButtons, Actions, LoadingItemPlaceholder, ConfirmModal } from '../Elements';
+import ReportEditor from './ReportEditor';
+import ReportList from './ReportList';
 import {
   buildPageTitle,
   getConfig,
@@ -23,6 +22,7 @@ import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import {
   saveReport,
+  deleteReport,
   getReport,
   clearReport,
   updateReport,
@@ -32,19 +32,20 @@ import {
   clearReportData,
   setReportDataListPage,
   setReportDataListSize,
+  reportTypes,
 } from '../../actions/reportsActions';
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
 import { modeSimpleSelector, itemSelector, idSelector } from '../../selectors/entitySelector';
-import { linesFiledsSelector } from '../../selectors/settingsSelector';
-
+import { reportFieldsSelector } from '../../selectors/settingsSelector';
+import { itemsSelector, pageSelector, nextPageSelector, sizeSelector } from '../../selectors/entityListSelectors';
 
 class ReportSetup extends Component {
 
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
-    linesFileds: PropTypes.instanceOf(Immutable.List),
+    reportFileds: PropTypes.instanceOf(Immutable.Map),
     reportData: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     userName: PropTypes.string,
@@ -63,21 +64,30 @@ class ReportSetup extends Component {
 
   static defaultProps = {
     item: Immutable.Map(),
-    linesFileds: Immutable.List(),
+    reportFileds: Immutable.Map(),
     reportData: Immutable.List(),
     userName: 'Unknown',
+    mode: 'loading',
     page: 0,
     size: getConfig(['list', 'defaultItems'], 10),
     nextPage: false,
   }
 
-  state = {
-    progress: false,
+  constructor(props) {
+    super(props);
+    this.state = {
+      showPreview: false,
+      progress: false,
+      showConfirmReset: false,
+      showConfirmDelete: false,
+      listActions: this.getListActions(),
+      editActions: this.getEditActions(),
+    };
   }
 
   componentWillMount() {
     this.fetchItem();
-    this.props.dispatch(getSettings('file_types'));
+    this.props.dispatch(getSettings(['file_types', 'subscribers.subscriber', 'subscribers.account']));
   }
 
   componentDidMount() {
@@ -115,19 +125,18 @@ class ReportSetup extends Component {
 
   initDefaultValues = () => {
     const { mode, userName } = this.props;
+    const now = moment().toISOString();
     if (mode === 'create') {
-      const defaultCreatedValue = moment().toISOString();
-      this.onChangeFieldValue(['user'], userName);
-      this.onChangeFieldValue(['created'], defaultCreatedValue);
-      this.onChangeFieldValue(['modified'], defaultCreatedValue);
+      this.onChangeReportValue(['type'], reportTypes.SIMPLE);
     }
     if (mode === 'update') {
-      const nowDateValue = moment().toISOString();
-      this.onChangeFieldValue(['modified'], nowDateValue);
+      // Set update default values
     }
     if (mode === 'clone') {
       this.props.dispatch(setCloneReport());
     }
+    this.onChangeReportValue(['user'], userName);
+    this.onChangeReportValue(['from'], now);
   }
 
   fetchItem = (itemId = this.props.itemId) => {
@@ -151,14 +160,17 @@ class ReportSetup extends Component {
   }
 
   getReportData = () => {
-    const { size, page } = this.props;
-    const query = this.buildReportQuery();
-    this.props.dispatch(getReportData({ query, page, size }));
+    const { item, size, page } = this.props;
+    const report = this.preperReport(item);
+    this.props.dispatch(getReportData({ report, page, size }));
   }
 
-  onChangeFieldValue = (path, value) => {
-    this.props.dispatch(setReportDataListPage(0));
-    this.props.dispatch(clearReportData());
+  onChangeReportValue = (path, value, needRefetchData = false) => {
+    if (needRefetchData) {
+      this.props.dispatch(setReportDataListPage(0));
+      this.props.dispatch(clearReportData());
+      this.setState({ showPreview: false });
+    }
     const stringPath = Array.isArray(path) ? path.join('.') : path;
     const deletePathOnEmptyValue = [];
     const deletePathOnNullValue = [];
@@ -171,12 +183,38 @@ class ReportSetup extends Component {
     }
   }
 
-  afterSave = (response) => {
+  handleDelete = () => {
+    const { item } = this.props;
+    this.setState({ progress: true });
+    this.props.dispatch(deleteReport(item)).then(this.afterDelete);
+  }
+
+  afterDelete = (response) => {
     this.setState({ progress: false });
-    const { mode } = this.props;
+    if (response.status) {
+      const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
+      this.props.dispatch(showSuccess('The report was deleted'));
+      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
+      this.handleBack();
+    }
+  }
+
+  afterSave = (response) => {
+    const { item, mode } = this.props;
+    this.setState({ progress: false });
     if (response.status) {
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
+      const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
       this.props.dispatch(showSuccess(`The report was ${action}`));
+      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
+      if (mode === 'update') {
+        const itemId = item.getIn(['_id', '$id']);
+        const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
+        this.fetchItem();
+        this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
+      } else {
+        this.handleBack();
+      }
     }
   }
 
@@ -184,12 +222,8 @@ class ReportSetup extends Component {
     const { item, mode } = this.props;
     if (this.validate()) {
       this.setState({ progress: true });
-      this.props.dispatch(saveReport(item, mode)).then(this.afterSave);
-      const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
-      const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
-      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
-      const itemId = item.getIn(['_id', '$id']);
-      this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
+      const filteredItem = this.preperReport(item);
+      this.props.dispatch(saveReport(filteredItem, mode)).then(this.afterSave);
     }
   }
 
@@ -206,108 +240,94 @@ class ReportSetup extends Component {
     this.props.router.push(`/${itemsType}`);
   }
 
-  validate = () => {
+  validateEmptyAggregateOp = column => (
+    column.get('field_name', '') !== ''
+    && column.get('op', '') === ''
+  )
+
+  validate = (isPreview = false) => {
     const { item } = this.props;
-    if (item.get('key', '') === '') {
+    if (!isPreview && item.get('key', '') === '') {
       this.props.dispatch(showDanger('Please enter name'));
       return false;
     }
-
+    if (item.get('entity', '') === '') {
+      this.props.dispatch(showDanger('Please select entity'));
+      return false;
+    }
+    if (item.get('columns', Immutable.List()).filter(this.filterColumnsEmptyRows).isEmpty()) {
+      this.props.dispatch(showDanger('Please select at least one column'));
+      return false;
+    }
+    if (item.get('type', reportTypes.SIMPLE) === reportTypes.GROPPED
+      && item.get('columns', Immutable.List()).some(this.validateEmptyAggregateOp)
+    ) {
+      this.props.dispatch(showDanger('Please select column function'));
+      return false;
+    }
     return true;
   }
 
-  filterQuery = val => [
-    val.get('op', ''),
-    val.get('field', ''),
-    val.get('value', ''),
-  ].every(param => param !== '');
-
-  filterGroupBy = val => [
-    val.get('op', ''),
-    val.get('field', ''),
-  ].every(param => param !== '');
-
-  buildQuery = (acc, val) => acc.push(Immutable.Map({
-    [val.get('field', '')]: Immutable.Map({
-      [`${val.get('op', '')}`]: val.get('value', ''),
-    }),
-  }));
-
-  buildGroupByQuery = (acc, val) => {
-    const op = val.get('op');
-    const field = val.get('field');
-    const value = Immutable.Map({
-      [`${op}`]: field,
+  preperReport = (report = Immutable.Map()) =>
+    report.withMutations((mapWithMutations) => {
+      mapWithMutations
+        .set('conditions', report.get('conditions', Immutable.List())
+          .filter(this.filterConditionsEmptyRows),
+        )
+        .set('columns', report.get('columns', Immutable.List())
+          .filter(this.filterColumnsEmptyRows)
+          // Remove OP (aggregate function) if reoprt is simple
+          .update(columns => (report.get('type', reportTypes.SIMPLE) === reportTypes.SIMPLE
+            ? columns.map(column => column.set('op', ''))
+            : columns
+          )),
+        )
+        .set('sorts', report.get('sorts', Immutable.List())
+          .filter(this.filterSortEmptyRows),
+        );
     });
-    return acc.set(`${field}_${op}`, value);
-  }
 
-  buildReportQuery = () => {
-    const { item } = this.props;
-    const query = {
-      collection: item.get('entity', ''),
-      project: item.get('display', Immutable.List()).reduce((acc, val) => acc.set(val, 1), Immutable.Map()),
-      query: item.get('filters', Immutable.List())
-        .filter(this.filterQuery)
-        .reduce(this.buildQuery, Immutable.List()),
-      groupByFields: item.get('group_by_fields', Immutable.List()),
-      groupBy: item.get('group_by', Immutable.List())
-        .filter(this.filterGroupBy)
-        .reduce(this.buildGroupByQuery, Immutable.Map()),
-    };
-    return query;
-  }
+  filterConditionsEmptyRows = row => [
+    row.get('field', ''),
+    row.get('op', ''),
+    row.get('value', ''),
+  ].every(param => param !== '');
+
+  filterSortEmptyRows = row => [
+    row.get('op', ''),
+    row.get('field', ''),
+  ].every(param => param !== '');
+
+  filterColumnsEmptyRows = row => [
+    row.get('field_name', ''),
+  ].every(param => param !== '');
 
   applyFilter = () => {
-    this.getReportData();
+    if (this.validate(true)) {
+      this.setState({ showPreview: true });
+      this.getReportData();
+    }
   }
 
   onClickExportCSV =() => {
     const { item } = this.props;
-    const args = {
-      query: this.buildReportQuery(),
+    const headers = item.get('columns', Immutable.List()).reduce(
+      (acc, column) => acc.set(column.get('key', ''), column.get('label', column.get('field_name', ''))),
+      Immutable.Map(),
+    );
+    const csvParams = [
+      { headers: JSON.stringify(headers) },
+      { type: 'csv' },
+      { file_name: item.get('key', 'report') },
+    ];
+    const reportParams = {
+      report: this.preperReport(item),
       page: 0,
       size: -1,
     };
-    const downloadURL = `${buildRequestUrl(getReportQuery(args))}&file_name=${item.get('key', 'report')}&type=csv`;
-    window.open(downloadURL);
-  }
-
-  getTableFields = () => {
-    const { item, linesFileds } = this.props;
-    const selectedFields = item.get('display', Immutable.List());
-    const isGroupBy = !item.get('group_by_fields', Immutable.List()).isEmpty();
-    const configFields = linesFileds;
-    const groupByOperators = getConfig(['reports', 'groupByOperators'], Immutable.List());
-
-
-    const allFieldsConfig = Immutable.List().withMutations((listWithMutations) => {
-      configFields.forEach((configField) => {
-        listWithMutations.push(configField);
-      });
-      if (isGroupBy) {
-        item.get('group_by', Immutable.List()).forEach((groupBy) => {
-          const field = configFields.find(conf => conf.get('id', '') === groupBy.get('field', ''), null, Immutable.Map());
-          const operator = groupByOperators.find(op => op.get('id', '') === groupBy.get('op', ''), null, Immutable.Map());
-          listWithMutations.push(Immutable.Map({
-            id: `${groupBy.get('field', '')}_${groupBy.get('op', '')}`,
-            title: `${field.get('title', '')} (${operator.get('title', groupBy.get('op', ''))})`,
-          }));
-        });
-      }
-    });
-
-    return Immutable.List().withMutations((listWithMutations) => {
-      selectedFields.forEach((selectedField) => {
-        const field = allFieldsConfig.find(
-          configField => configField.get('id', '') === selectedField,
-        );
-        if (field) {
-          listWithMutations.push(field);
-        }
-      });
-    })
-    .toJS();
+    const csvQuery = getReportQuery(reportParams);
+    csvQuery.params.push(...csvParams);
+    window.open(buildRequestUrl(csvQuery));
   }
 
   onPageChange = (page) => {
@@ -319,55 +339,125 @@ class ReportSetup extends Component {
     this.props.dispatch(setReportDataListSize(size));
   }
 
-  onReset = () => {
-    this.fetchItem();
+
+  onAskDelete = () => {
+    this.setState({ showConfirmDelete: true });
   }
 
-  renderPanelHeader = () => {
+  onDeleteClose = () => {
+    this.setState({ showConfirmDelete: false });
+  }
+
+  onDeleteOk = () => {
+    this.onDeleteClose();
+    this.handleDelete();
+  }
+
+  onAskReset = () => {
+    this.setState({ showConfirmReset: true });
+  }
+
+  onResetClose = () => {
+    this.setState({ showConfirmReset: false });
+  }
+
+  onResetOk = () => {
     const { mode } = this.props;
-    if (mode === 'view') {
-      return (
-        <div>
-          Report
-          <div className="pull-right">
-            <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickExportCSV}>
-              <i className="fa fa-file-excel-o" />&nbsp;Export CSV
-            </Button>
-          </div>
-        </div>
-      );
+    this.onResetClose();
+    if (mode === 'create') {
+      this.props.dispatch(clearReport());
+      this.initDefaultValues();
+    } else {
+      this.fetchItem();
     }
-    return null;
+  }
+
+  getTableFields = () => Immutable.List().withMutations((columnsWithMutations) => {
+    const { item } = this.props;
+    item.get('columns', Immutable.List())
+      .filter(this.filterColumnsEmptyRows)
+      .forEach((column) => {
+        columnsWithMutations.push(Immutable.Map({
+          id: column.get('key', ''),
+          title: column.get('label', ''),
+        }));
+      });
+  });
+
+  getListActions = () => [{
+    type: 'export_csv',
+    label: 'Export to CSV',
+    showIcon: true,
+    onClick: this.onClickExportCSV,
+    actionStyle: 'primary',
+    actionSize: 'xsmall',
+  }, {
+    type: 'remove',
+    label: 'Delete Report',
+    showIcon: true,
+    onClick: this.onAskDelete,
+    actionStyle: 'danger',
+    actionSize: 'xsmall',
+  }, {
+    type: 'edit',
+    label: 'Edit Report',
+    showIcon: true,
+    onClick: this.handleEdit,
+    actionStyle: 'primary',
+    actionSize: 'xsmall',
+  }];
+
+  getEditActions = () => [{
+    type: 'reset',
+    label: 'Reset',
+    actionStyle: 'primary',
+    showIcon: false,
+    onClick: this.onAskReset,
+    actionSize: 'xsmall',
+  }];
+
+  renderPanelHeader = () => {
+    const { listActions, editActions } = this.state;
+    const { mode } = this.props;
+    return (
+      <div>&nbsp;
+        <div className="pull-right">
+          <Actions actions={(mode === 'view') ? listActions : editActions} />
+        </div>
+      </div>
+    );
   }
 
   render() {
-    const { progress } = this.state;
-    const { item, mode, linesFileds, reportData, size, page, nextPage } = this.props;
+    const { progress, showConfirmReset, showConfirmDelete, showPreview } = this.state;
+    const { item, mode, reportFileds, reportData, size, page, nextPage } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
-
+    const confirmResetMessage = 'Are you sure you want to reset report ?';
+    const confirmDeleteMessage = `Are you sure you want to delete "${item.get('key', '')}" report ?`;
     const allowEdit = mode !== 'view';
     const tableFields = this.getTableFields();
+    const onlyHeaders = allowEdit && (!showPreview || tableFields.isEmpty());
     return (
       <div className="report-setup">
         <Panel header={this.renderPanelHeader()}>
           { allowEdit &&
-            <ReportDetails
+            <ReportEditor
               report={item}
-              linesFileds={linesFileds}
+              reportFileds={reportFileds}
               mode={mode}
-              onUpdate={this.onChangeFieldValue}
-              onReset={this.fetchItem}
+              onUpdate={this.onChangeReportValue}
               onFilter={this.applyFilter}
             />
           }
 
-          <List items={reportData} fields={tableFields} className="report-list" />
-          <Pager
+          <ReportList
+            items={reportData}
+            fields={tableFields}
             page={page}
             size={size}
-            count={reportData.size}
+            onlyHeaders={onlyHeaders}
             nextPage={nextPage}
             onChangePage={this.onPageChange}
             onChangeSize={this.onSizeChange}
@@ -375,34 +465,30 @@ class ReportSetup extends Component {
 
           <div className="clearfix" />
           <hr className="mb0" />
-          <Col sm={12} className="pl0 pr0">
-            <Col sm={6} className="text-left pl0">
-              <ActionButtons
-                onClickCancel={this.handleBack}
-                onClickSave={this.handleSave}
-                hideSave={!allowEdit}
-                cancelLabel="Back to list"
-                progress={progress}
-                disableCancel={progress}
-              />
-            </Col>
-            <Col sm={6} className="text-right pr0">
-              { allowEdit
-                ? <ActionButtons
-                  cancelLabel="Reset"
-                  onClickCancel={this.onReset}
-                  disableCancel={progress}
-                  hideSave={true}
-                />
-                : <ActionButtons
-                  saveLabel="Edit"
-                  onClickSave={this.handleEdit}
-                  hideCancel={true}
-                />
-              }
-            </Col>
-          </Col>
+
+          <ActionButtons
+            onClickCancel={this.handleBack}
+            onClickSave={this.handleSave}
+            hideSave={!allowEdit}
+            progress={progress}
+            disableCancel={progress}
+          />
+
         </Panel>
+        <ConfirmModal
+          onOk={this.onResetOk}
+          onCancel={this.onResetClose}
+          show={showConfirmReset}
+          message={confirmResetMessage}
+          labelOk="Yes"
+        />
+        <ConfirmModal
+          onOk={this.onDeleteOk}
+          onCancel={this.onDeleteClose}
+          show={showConfirmDelete}
+          message={confirmDeleteMessage}
+          labelOk="Yes"
+        />
       </div>
     );
   }
@@ -414,11 +500,11 @@ const mapStateToProps = (state, props) => ({
   itemId: idSelector(state, props, 'reports'),
   item: itemSelector(state, props, 'reports'),
   mode: modeSimpleSelector(state, props, 'reports'),
-  linesFileds: linesFiledsSelector(state, props, 'reports'),
-  reportData: state.entityList.items.get('reportData'),
-  page: state.entityList.page.get('reportData'),
-  nextPage: state.entityList.nextPage.get('reportData'),
-  size: state.entityList.size.get('reportData'),
+  reportFileds: reportFieldsSelector(state, props, 'reports'),
+  reportData: itemsSelector(state, props, 'reportData'),
+  page: pageSelector(state, props, 'reportData'),
+  nextPage: nextPageSelector(state, props, 'reportData'),
+  size: sizeSelector(state, props, 'reportData'),
 });
 
 export default withRouter(connect(mapStateToProps)(ReportSetup));

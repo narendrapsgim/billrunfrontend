@@ -46,6 +46,10 @@ class CustomField extends Component {
     this.setState({ showAdvancedEdit: false });
   };
 
+  onOpenModal = () => {
+    this.setState({ showAdvancedEdit: true });
+  };
+
   renderAdvancedEdit = () => {
     const { field } = this.props;
     const { showAdvancedEdit } = this.state;
@@ -114,57 +118,33 @@ class CustomField extends Component {
     );
   }
 
-  renderField = () => {
+  render() {
     const { field, editable, existing } = this.props;
     return (
-      <Row>
-        <Col lg={1} md={1} style={{ paddingTop: 10 }}><DragHandle /></Col>
-        <Col lg={2} md={2}>
-          <FormGroup>
-            <ControlLabel>Field Name</ControlLabel>
-            <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!editable || existing} />
-          </FormGroup>
+      <FormGroup className="CustomField form-inner-edit-row">
+        <Col sm={1} className="text-center">
+          <DragHandle />
         </Col>
-        <Col lg={2} md={2}>
-          <FormGroup>
-            <ControlLabel>Title</ControlLabel>
-            <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={!editable} />
-          </FormGroup>
+        <Col sm={3}>
+          <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!editable || existing} />
         </Col>
-        <Col lg={2} md={2}>
-          <FormGroup>
-            <ControlLabel>Default Value</ControlLabel>
-            <Field id="default_value" onChange={this.onChange} value={field.get('default_value', '')} disabled={!editable} />
-          </FormGroup>
+        <Col sm={2}>
+          <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={!editable} />
         </Col>
-        <Col lg={3} md={3}>
-          <FormGroup>
-            <ControlLabel>&nbsp;</ControlLabel>
-            <div className="text-center">
-              {editable && <button className="btn btn-link" onClick={() => this.setState({ showAdvancedEdit: true })}> Advanced </button> }
-            </div>
-          </FormGroup>
+        <Col sm={2}>
+          <Field id="default_value" onChange={this.onChange} value={field.get('default_value', '')} disabled={!editable} />
         </Col>
-        <Col lg={2} md={2}>
-          <FormGroup>
-            <ControlLabel>&nbsp;</ControlLabel>
-            <div>
-              {editable && <Button onClick={this.onRemove} bsSize="small"><i className="fa fa-trash-o danger-red" /> Remove </Button> }
-            </div>
-          </FormGroup>
-        </Col>
-      </Row>
+        {editable && (
+          <Col sm={4} className="actions">
+            <Button onClick={this.onOpenModal} bsSize="small"><i className="fa fa-pencil active-blue" /> Advanced </Button>
+            <Button onClick={this.onRemove} bsSize="small"><i className="fa fa-trash-o danger-red" /> Remove </Button>
+          </Col>
+        )}
+        { this.renderAdvancedEdit() }
+      </FormGroup>
     );
   }
 
-  render() {
-    return (
-      <div className="CustomField" style={{ borderTop: '1px solid #eee', borderBottom: '1px solid #eee', paddingTop: 10 }}>
-        { this.renderField() }
-        { this.renderAdvancedEdit() }
-      </div>
-    );
-  }
 }
 
 export default connect()(SortableElement(CustomField));

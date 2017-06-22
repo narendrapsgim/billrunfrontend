@@ -365,7 +365,6 @@ export default class Product extends Component {
               </FormGroup>
 
               { this.renderPrices() }
-              <br />
               { editable && <CreateButton onClick={this.onProductRateAdd} label="Add New" />}
               <Col lg={12} md={12}>
                 <FormGroup>
@@ -391,7 +390,6 @@ export default class Product extends Component {
 
             <Panel header={<h3>Additional Parameters</h3>}>
               { this.renderParameters() }
-              <br />
               { editable && <CreateButton onClick={this.onProductParamAdd} label="Add New" />}
             </Panel>
 
