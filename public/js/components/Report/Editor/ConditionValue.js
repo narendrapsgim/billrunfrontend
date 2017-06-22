@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
 import Select from 'react-select';
-import { HelpBlock } from 'react-bootstrap';
 import Field from '../../Field';
 import {
   formatSelectOptions,
+  getConfig,
 } from '../../../common/Util';
 import {
   productsOptionsSelector,
@@ -118,9 +118,17 @@ class ConditionValue extends Component {
     }
   };
 
+  onChangeMultiValues = (e) => {
+    if (Array.isArray(e)) {
+      this.props.onChange(e.join(','));
+    } else {
+      this.props.onChange('');
+    }
+  };
+
   onChangeDate = (date) => {
     if (moment.isMoment(date) && date.isValid()) {
-      this.props.onChange(date.toISOString());
+      this.props.onChange(date.format(getConfig('dateFormat', 'DD/MM/YYYY')));
     } else {
       this.props.onChange(null);
     }
@@ -131,9 +139,37 @@ class ConditionValue extends Component {
     .map(formatSelectOptions)
     .toArray();
 
+
+  renderCustomInputDate = ({ addTag, disabled }) => {
+    const onChange = (date) => {
+      addTag(date.format(getConfig('dateFormat', 'DD/MM/YYYY')));
+    };
+    return (
+      <span className="custom-field-input">
+        <Field
+          fieldType="date"
+          value={null}
+          onChange={onChange}
+          disabled={disabled}
+        />
+      </span>
+    );
+  }
+
+  renderCustomInputNumber =({ addTag, onChange, value, ...other }) => (
+    <span className="custom-field-input">
+      <Field
+        fieldType="number"
+        onChange={onChange}
+        value={value}
+        {...other}
+      />
+    </span>
+  );
+
   render() {
     const { filed, disabled, config, selectOptions } = this.props;
-    //  operator 'EXIST' or boolean type
+    //  Boolean + operator 'EXIST'
     if (filed.get('op', null) === 'exists' || config.get('type', '') === 'boolean') {
       let value = '';
       if (filed.get('value', false) === true) {
@@ -152,7 +188,8 @@ class ConditionValue extends Component {
         />
       );
     }
-    // operator 'IN'
+
+    // String-select
     if (config.get('type', 'string') === 'string' && config.getIn(['inputConfig', 'inputType']) === 'select') {
       const options = config.hasIn(['inputConfig', 'callback'])
         ? selectOptions.get(config.getIn(['inputConfig', 'callback'], ''), Immutable.List())
@@ -174,8 +211,21 @@ class ConditionValue extends Component {
         />
       );
     }
+
     // 'Number'
-    if (config.get('type', '') === 'number' && !['nin', 'in'].includes(filed.get('op', ''))) {
+    if (config.get('type', '') === 'number') {
+      if (['nin', 'in'].includes(filed.get('op', ''))) {
+        const value = filed.get('value', '').split(',').filter(val => val !== '');
+        return (
+          <Field
+            fieldType="tags"
+            value={value}
+            onChange={this.onChangeMultiValues}
+            disabled={disabled}
+            renderInput={this.renderCustomInputNumber}
+          />
+        );
+      }
       return (
         <Field
           fieldType="number"
@@ -188,7 +238,19 @@ class ConditionValue extends Component {
 
     // 'Date'
     if (config.get('type', '') === 'date') {
-      const value = moment(filed.get('value', null));
+      if (['nin', 'in'].includes(filed.get('op', ''))) {
+        const value = filed.get('value', '').split(',').filter(val => val !== '');
+        return (
+          <Field
+            fieldType="tags"
+            value={value}
+            onChange={this.onChangeMultiValues}
+            disabled={disabled}
+            renderInput={this.renderCustomInputDate}
+          />
+        );
+      }
+      const value = moment(filed.get('value', null), getConfig('dateFormat', 'DD/MM/YYYY'));
       return (
         <Field
           fieldType="date"
@@ -200,17 +262,23 @@ class ConditionValue extends Component {
     }
 
     // 'String'
-    return (
-      <div>
+    if (['nin', 'in'].includes(filed.get('op', ''))) {
+      const value = filed.get('value', '').split(',').filter(val => val !== '');
+      return (
         <Field
-          value={filed.get('value', '')}
-          onChange={this.onChangeText}
+          fieldType="tags"
+          value={value}
+          onChange={this.onChangeMultiValues}
           disabled={disabled}
         />
-        {['nin', 'in'].includes(filed.get('op', null)) && (
-          <HelpBlock>comma separated values</HelpBlock>
-        )}
-      </div>
+      );
+    }
+    return (
+      <Field
+        value={filed.get('value', '')}
+        onChange={this.onChangeText}
+        disabled={disabled}
+      />
     );
   }
 
