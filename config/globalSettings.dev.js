@@ -82,7 +82,7 @@ var globalSetting = {
     },
     conditionsOperators: [
       { id: 'eq', title: 'Equals', types: ['date', 'boolean', 'fieldid:billrun_status'] }, // 'Equals'
-      { id: 'in', title: 'Equals', types: ['string', 'number', 'date'], exclude: ['fieldid:billrun_status'] },
+      { id: 'in', title: 'Equals', types: ['string', 'number'], exclude: ['fieldid:billrun_status'] },
       { id: 'ne', title: 'Does Not equal', types: ['boolean'] }, // 'Not equals'
       { id: 'nin', title: 'Does Not equal', types: ['string', 'number'], exclude: ['fieldid:billrun_status'] },
       { id: 'lt', title: '<', types: ['number', 'date', 'fieldid:billrun'] }, // 'Less than'

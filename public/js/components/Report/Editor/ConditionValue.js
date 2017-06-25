@@ -140,9 +140,11 @@ class ConditionValue extends Component {
     .toArray();
 
 
+  renderDateTag = value => moment(value).format(getConfig('dateFormat', 'DD/MM/YYYY'));
+
   renderCustomInputDate = ({ addTag, disabled }) => {
     const onChange = (date) => {
-      addTag(date.format(getConfig('dateFormat', 'DD/MM/YYYY')));
+      addTag(date.toISOString());
     };
     return (
       <span className="custom-field-input">
@@ -247,6 +249,7 @@ class ConditionValue extends Component {
             onChange={this.onChangeMultiValues}
             disabled={disabled}
             renderInput={this.renderCustomInputDate}
+            getTagDisplayValue={this.renderDateTag}
           />
         );
       }
