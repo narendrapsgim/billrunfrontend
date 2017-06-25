@@ -46,7 +46,7 @@ class Segmentation extends Component {
               <Segments options={options} index={index} segment={entity} onSelectField={this.onSelectField} onDelete={this.onDelete} key={index}/>
             ))
 	  }
-          <a onClick={this.props.addSegmentation}  className="btn-link">
+          <a onClick={this.props.addSegmentation}  className="btn-link" style={{ marginTop: 15 }}>
             <i className="fa fa-plus"></i>&nbsp;Add Segment
 	  </a>
         </Panel>
@@ -71,4 +71,3 @@ function mapStateToProps(state, props) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Segmentation);
-
