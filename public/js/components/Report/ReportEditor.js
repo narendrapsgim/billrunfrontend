@@ -65,11 +65,19 @@ class ReportEditor extends Component {
   /* Conditions */
   onChangeConditionField = (idx, value) => {
     const { report } = this.props;
+    const entityField = this.getEntityFields().find(
+      reportFiled => reportFiled.get('id', '') === value,
+      null, Immutable.Map(),
+    );
+    const condition = Immutable.Map({
+      field: value,
+      op: '',
+      value: '',
+      type: entityField.get('type', 'string'),
+    });
     const newFilters = report
       .get('conditions', Immutable.List())
-      .setIn([idx, 'field'], value)
-      .setIn([idx, 'op'], '')
-      .setIn([idx, 'value'], '');
+      .set(idx, condition);
     this.updateReport('conditions', newFilters);
   }
 

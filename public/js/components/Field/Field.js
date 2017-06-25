@@ -7,6 +7,7 @@ import FieldSettings from '../../FieldSettings';
 import Number from '../FieldTypes/Number';
 import Price from '../FieldTypes/Price';
 import Date from '../FieldTypes/Date';
+import Tags from '../FieldTypes/Tags';
 import Address from '../FieldTypes/Address';
 import Text from '../FieldTypes/Text';
 import TextArea from '../FieldTypes/TextArea';
@@ -54,6 +55,8 @@ class Field extends React.Component {
         return (<Price {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'date':
         return (<Date {...otherProps} onChange={onChange} value={value} editable={editable} disabled={disabled} />);
+      case 'tags':
+        return (<Tags {...otherProps} onChange={onChange} value={value} editable={editable} disabled={disabled} />);
       case 'address':
         return (<Address onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'textarea':

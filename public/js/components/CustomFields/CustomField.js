@@ -53,7 +53,7 @@ class CustomField extends Component {
   renderAdvancedEdit = () => {
     const { field } = this.props;
     const { showAdvancedEdit } = this.state;
-    const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'filed')} Details`);
+    const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'field')} Details`);
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
