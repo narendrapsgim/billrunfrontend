@@ -526,11 +526,11 @@ export const changePasswordQuery = (itemId, signature, timestamp, password) => (
   ],
 });
 
-export const getReportQuery = ({ query, page = 0, size = 10 }) => ({
+export const getReportQuery = ({ report, page = 0, size = 10 }) => ({
   api: 'report',
   params: [
     { action: 'generateReport' },
-    { query: JSON.stringify(query) },
+    { report: JSON.stringify(report) },
     { page },
     { size },
   ],

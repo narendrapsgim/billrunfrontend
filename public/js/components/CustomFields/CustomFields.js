@@ -1,12 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Tabs, Tab, Panel } from 'react-bootstrap';
+import { Form, Tabs, Tab, Panel, Col, FormGroup, ControlLabel, Row } from 'react-bootstrap';
 import { ucFirst } from 'change-case';
 import CustomField from './CustomField';
-import ActionButtons from '../Elements/ActionButtons';
-import CreateButton from '../Elements/CreateButton';
-import SortableFieldsContainer from './SortableFieldsContainer';
+import { ActionButtons, CreateButton, SortableFieldsContainer } from '../Elements';
 import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
 import { accountFieldsSelector, subscriberFieldsSelector, productFieldsSelector } from '../../selectors/settingsSelector';
 
@@ -179,14 +177,28 @@ class CustomFields extends Component {
     return (
       <Tab key={key} title={ucFirst(entity)} eventKey={key}>
         <Panel style={{ borderTop: 'none' }}>
-          <SortableFieldsContainer
-            lockAxis="y"
-            helperClass="draggable-menu"
-            useDragHandle={true}
-            items={fields}
-            onSortEnd={this.onSortEnd}
-          />
-          <CreateButton onClick={this.onAddNewField} type="Field" style={{ marginTop: 15 }} />
+          <Row>
+            <Col sm={12}>
+              <FormGroup className="form-inner-edit-row">
+                <Col sm={1}>&nbsp;</Col>
+                <Col sm={3}><ControlLabel>Field Name</ControlLabel></Col>
+                <Col sm={2}><ControlLabel>Title</ControlLabel></Col>
+                <Col sm={2}><ControlLabel>Default Value</ControlLabel></Col>
+              </FormGroup>
+            </Col>
+            <Col sm={12}>
+              <SortableFieldsContainer
+                lockAxis="y"
+                helperClass="draggable-row"
+                useDragHandle={true}
+                items={fields}
+                onSortEnd={this.onSortEnd}
+              />
+            </Col>
+            <Col sm={12}>
+              <CreateButton onClick={this.onAddNewField} type="Field" />
+            </Col>
+          </Row>
         </Panel>
       </Tab>
     );
@@ -196,10 +208,12 @@ class CustomFields extends Component {
     const { tabs } = this.props;
     return (
       <div className="CustomFields">
-        <Tabs id="CustomFieldsTabs" animation={false} onSelect={this.onSelectTab}>
-          { tabs.map(this.renderFieldsTab) }
-        </Tabs>
-        <ActionButtons onClickSave={this.onClickSave} onClickCancel={this.onClickCancel} cancelLabel="Reset changes" />
+        <Form horizontal>
+          <Tabs id="CustomFieldsTabs" animation={false} onSelect={this.onSelectTab}>
+            { tabs.map(this.renderFieldsTab) }
+          </Tabs>
+          <ActionButtons onClickSave={this.onClickSave} onClickCancel={this.onClickCancel} cancelLabel="Reset changes" />
+        </Form>
       </div>
     );
   }
