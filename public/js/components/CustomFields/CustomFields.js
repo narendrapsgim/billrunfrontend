@@ -7,6 +7,7 @@ import CustomField from './CustomField';
 import { ActionButtons, CreateButton, SortableFieldsContainer } from '../Elements';
 import { getSettings, updateSetting, removeSettingField, saveSettings, setFieldPosition } from '../../actions/settingsActions';
 import { accountFieldsSelector, subscriberFieldsSelector, productFieldsSelector } from '../../selectors/settingsSelector';
+import { getSettingsKey, getSettingsPath } from '../../common/Util';
 
 class CustomFields extends Component {
 
@@ -14,7 +15,6 @@ class CustomFields extends Component {
     subscriber: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     account: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     product: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
-    keys: PropTypes.object,
     defaultDisabledFields: PropTypes.object,
     defaultHiddenFields: PropTypes.object,
     tabs: PropTypes.arrayOf(PropTypes.string),
@@ -25,11 +25,6 @@ class CustomFields extends Component {
     subscriber: Immutable.List(),
     account: Immutable.List(),
     product: Immutable.List(),
-    keys: {
-      account: 'subscribers.account',
-      subscriber: 'subscribers.subscriber',
-      product: 'rates',
-    },
     defaultDisabledFields: {
       account: ['first_name', 'last_name', 'firstname', 'lastname', 'address'],
       subscriber: ['firstname', 'lastname', 'plan', 'services'],
@@ -61,7 +56,7 @@ class CustomFields extends Component {
 
   getSettingDistinctKeys = () => {
     const { tabs } = this.props;
-    const settingKeys = tabs.map(this.getSettingsKey);
+    const settingKeys = tabs.map(getSettingsKey);
     return [...new Set(settingKeys)];
   }
 
@@ -88,30 +83,12 @@ class CustomFields extends Component {
     }
   }
 
-  getSettingsKey = (entity) => {
-    const { keys } = this.props;
-    return (typeof keys[entity] === 'undefined' ? entity : keys[entity].split('.')[0]);
-  }
-
-  getSettingsPath = (entity, path) => {
-    const { keys } = this.props;
-    if (typeof keys[entity] === 'undefined') {
-      return path;
-    }
-
-    const keysArr = keys[entity].split('.');
-    if (typeof keysArr[1] !== 'undefined') {
-      path.unshift(keysArr[1]);
-    }
-    return path;
-  }
-
   onChangeField = (entity, index, id, value) => {
-    this.props.dispatch(updateSetting(this.getSettingsKey(entity), this.getSettingsPath(entity, ['fields', index, id]), value));
+    this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', index, id]), value));
   };
 
   onRemoveField = (entity, index) => {
-    this.props.dispatch(removeSettingField(this.getSettingsKey(entity), this.getSettingsPath(entity, ['fields', index])));
+    this.props.dispatch(removeSettingField(getSettingsKey(entity), getSettingsPath(entity, ['fields', index])));
   };
 
   onAddNewField = () => {
@@ -120,7 +97,7 @@ class CustomFields extends Component {
     const entity = tabs[tab];
     const size = this.props[entity].size;
     const newField = Immutable.Map();
-    this.props.dispatch(updateSetting(this.getSettingsKey(entity), this.getSettingsPath(entity, ['fields', size]), newField));
+    this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', size]), newField));
   };
 
   onClickCancel = () => {
@@ -135,8 +112,8 @@ class CustomFields extends Component {
     const { tab } = this.state;
     const { tabs } = this.props;
     const entity = tabs[tab];
-    const key = this.getSettingsKey(entity);
-    const path = this.getSettingsPath(entity, ['fields']);
+    const key = getSettingsKey(entity);
+    const path = getSettingsPath(entity, ['fields']);
     path.unshift(key);
     this.props.dispatch(setFieldPosition(oldIndex, newIndex, path));
   };

@@ -184,6 +184,7 @@ var globalSetting = {
       itemName: 'product',
       itemType: 'product',
       itemsType: 'products',
+      settingsKey: 'rates',
     },
     discount: {
       collection: 'discounts',
@@ -198,6 +199,7 @@ var globalSetting = {
       itemName: 'subscription',
       itemType: 'subscription',
       itemsType: 'subscriptions',
+      settingsKey: 'subscribers.subscriber',
     },
     customer: {
       collection: 'accounts',
@@ -205,6 +207,7 @@ var globalSetting = {
       itemName: 'customer',
       itemType: 'customer',
       itemsType: 'customers',
+      settingsKey: 'subscribers.account',
     },
     report: {
       collection: 'reports',
