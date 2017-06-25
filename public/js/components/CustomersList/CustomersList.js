@@ -95,8 +95,9 @@ class CustomersList extends Component {
     const fields = this.getListFields();
     const listActions = this.getListActions();
     const actions = this.getActions();
-    const defaultFrom = moment().format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD'));
-    const defaultTo = moment().add(100, 'years').format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD'));
+    const apiDateFormat = getConfig('apiDateFormat', 'YYYY-MM-DD');
+    const defaultFrom = moment().format(apiDateFormat);
+    const defaultTo = moment().add(100, 'years').format(apiDateFormat);
 
     return (
       <div>

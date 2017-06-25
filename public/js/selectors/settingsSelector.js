@@ -129,37 +129,6 @@ const sortFieldOption = (optionsA, optionB) => {
   return 0;
 };
 
-const selectLinesFields = (customKeys) => {
-  const predefinedFileds = getConfig(['reports', 'fields', 'usage'], Immutable.List());
-  return Immutable.List().withMutations((optionsWithMutations) => {
-    // Set predefined fields
-    predefinedFileds.forEach((predefinedFiled) => {
-      if (predefinedFiled.has('title')) {
-        optionsWithMutations.push(predefinedFiled);
-      } else {
-        const fieldName = getFieldName(predefinedFiled.get('id', ''), 'lines');
-        const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
-        optionsWithMutations.push(predefinedFiled.set('title', title));
-      }
-    });
-    // Set custom fields
-    customKeys.forEach((customKey) => {
-      if (predefinedFileds.findIndex(predefinedFiled => predefinedFiled.get('id', '') === customKey) === -1) {
-        const fieldName = getFieldName(customKey, 'lines');
-        const title = fieldName === customKey ? sentenceCase(fieldName) : fieldName;
-        optionsWithMutations.push(Immutable.Map({
-          id: `uf.${customKey}`,
-          title: `${title}`,
-          searchable: true,
-          aggregatable: true,
-        }));
-      }
-    });
-  })
-  .sort(sortFieldOption);
-};
-
-
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
   selectCsiOptions,
@@ -169,12 +138,6 @@ export const inputProssesorCustomKeysSelector = createSelector(
   getInputProssesors,
   selectCustomKeys,
 );
-
-export const linesFiledsSelector = createSelector(
-  inputProssesorCustomKeysSelector,
-  selectLinesFields,
-);
-
 
 export const taxationSelector = createSelector(
   getTaxation,
@@ -320,20 +283,76 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds) => Imm
   // })),
 });
 
+const mergeEntityAndReportConfigFields = (fields, type) => { // 'account' 'subscribers'
+  const predefinedFileds = getConfig(['reports', 'fields', type], Immutable.List());
+  const entityFields = formatReportFields(fields);
+  return predefinedFileds.withMutations((fieldsWithMutations) => {
+    predefinedFileds.forEach((predefinedFiled, idx) => {
+      if (!predefinedFiled.has('title')) {
+        const fieldName = getFieldName(predefinedFiled.get('id', ''), getFieldNameType(type));
+        const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
+        fieldsWithMutations.setIn([idx, 'title'], title);
+      }
+    });
+
+    entityFields.forEach((entityField) => {
+      if (predefinedFileds.findIndex(predefinedFiled => predefinedFiled.get('id', '') === entityField.get('id', '')) === -1) {
+        fieldsWithMutations.push(entityField);
+      }
+    });
+  })
+  .sort(sortFieldOption);
+};
+
+const selectReportLinesFields = (customKeys) => {
+  const predefinedFileds = getConfig(['reports', 'fields', 'usage'], Immutable.List());
+  return Immutable.List().withMutations((optionsWithMutations) => {
+    // Set predefined fields
+    predefinedFileds.forEach((predefinedFiled) => {
+      if (predefinedFiled.has('title')) {
+        optionsWithMutations.push(predefinedFiled);
+      } else {
+        const fieldName = getFieldName(predefinedFiled.get('id', ''), 'lines');
+        const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
+        optionsWithMutations.push(predefinedFiled.set('title', title));
+      }
+    });
+    // Set custom fields
+    customKeys.forEach((customKey) => {
+      if (predefinedFileds.findIndex(predefinedFiled => predefinedFiled.get('id', '') === customKey) === -1) {
+        const fieldName = getFieldName(customKey, 'lines');
+        const title = fieldName === customKey ? sentenceCase(fieldName) : fieldName;
+        optionsWithMutations.push(Immutable.Map({
+          id: `uf.${customKey}`,
+          title: `${title}`,
+          searchable: true,
+          aggregatable: true,
+        }));
+      }
+    });
+  })
+  .sort(sortFieldOption);
+};
+
 const reportSubscriberFieldsSelector = createSelector(
   subscriberFieldsSelector,
-  formatReportFields,
+  fields => mergeEntityAndReportConfigFields(fields, 'subscribers'),
 );
 
 const reportAccountFieldsSelector = createSelector(
   accountFieldsSelector,
-  formatReportFields,
+  fields => mergeEntityAndReportConfigFields(fields, 'account'),
+);
+
+const reportLinesFieldsSelector = createSelector(
+  inputProssesorCustomKeysSelector,
+  selectReportLinesFields,
 );
 
 export const reportFieldsSelector = createSelector(
   reportSubscriberFieldsSelector,
   reportAccountFieldsSelector,
-  linesFiledsSelector,
+  reportLinesFieldsSelector,
   selectReportFields,
 );
 
