@@ -30,7 +30,7 @@ import {
 class ConditionValue extends Component {
 
   static propTypes = {
-    filed: PropTypes.instanceOf(Immutable.Map),
+    field: PropTypes.instanceOf(Immutable.Map),
     config: PropTypes.instanceOf(Immutable.Map),
     operator: PropTypes.instanceOf(Immutable.Map),
     selectOptions: PropTypes.instanceOf(Immutable.Map),
@@ -40,7 +40,7 @@ class ConditionValue extends Component {
   }
 
   static defaultProps = {
-    filed: Immutable.Map(),
+    field: Immutable.Map(),
     config: Immutable.Map(),
     operator: Immutable.Map(),
     selectOptions: Immutable.Map(),
@@ -61,9 +61,9 @@ class ConditionValue extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { filed, config, operator, selectOptions, disabled } = this.props;
+    const { field, config, operator, selectOptions, disabled } = this.props;
     return (
-      !Immutable.is(filed, nextProps.filed)
+      !Immutable.is(field, nextProps.field)
       || !Immutable.is(config, nextProps.config)
       || !Immutable.is(selectOptions, nextProps.selectOptions)
       || !Immutable.is(operator, nextProps.operator)
@@ -168,13 +168,13 @@ class ConditionValue extends Component {
   );
 
   render() {
-    const { filed, disabled, config, selectOptions } = this.props;
+    const { field, disabled, config, selectOptions } = this.props;
     //  Boolean + operator 'EXIST'
-    if (filed.get('op', null) === 'exists' || config.get('type', '') === 'boolean') {
+    if (field.get('op', null) === 'exists' || config.get('type', '') === 'boolean') {
       let value = '';
-      if (filed.get('value', false) === true) {
+      if (field.get('value', false) === true) {
         value = 'yes';
-      } else if (!filed.get('value', true) === false) {
+      } else if (!field.get('value', true) === false) {
         value = 'no';
       }
       const booleanOptions = this.getOptionsValues(Immutable.List(['yes', 'no']));
@@ -199,13 +199,13 @@ class ConditionValue extends Component {
         .map(formatSelectOptions)
         .toArray();
 
-      const multi = ['nin', 'in'].includes(filed.get('op', ''));
+      const multi = ['nin', 'in'].includes(field.get('op', ''));
       return (
         <Select
           clearable={false}
           multi={multi}
           options={formatedOptions}
-          value={filed.get('value', '')}
+          value={field.get('value', '')}
           onChange={this.onChangeSelect}
           disabled={disabled}
         />
@@ -214,8 +214,8 @@ class ConditionValue extends Component {
 
     // 'Number'
     if (config.get('type', '') === 'number') {
-      if (['nin', 'in'].includes(filed.get('op', ''))) {
-        const value = filed.get('value', '').split(',').filter(val => val !== '');
+      if (['nin', 'in'].includes(field.get('op', ''))) {
+        const value = field.get('value', '').split(',').filter(val => val !== '');
         return (
           <Field
             fieldType="tags"
@@ -229,7 +229,7 @@ class ConditionValue extends Component {
       return (
         <Field
           fieldType="number"
-          value={filed.get('value', '')}
+          value={field.get('value', '')}
           onChange={this.onChangeNumber}
           disabled={disabled}
         />
@@ -238,8 +238,8 @@ class ConditionValue extends Component {
 
     // 'Date'
     if (config.get('type', '') === 'date') {
-      if (['nin', 'in'].includes(filed.get('op', ''))) {
-        const value = filed.get('value', '').split(',').filter(val => val !== '');
+      if (['nin', 'in'].includes(field.get('op', ''))) {
+        const value = field.get('value', '').split(',').filter(val => val !== '');
         return (
           <Field
             fieldType="tags"
@@ -250,7 +250,7 @@ class ConditionValue extends Component {
           />
         );
       }
-      const value = moment(filed.get('value', null), getConfig('dateFormat', 'DD/MM/YYYY'));
+      const value = moment(field.get('value', null), getConfig('dateFormat', 'DD/MM/YYYY'));
       return (
         <Field
           fieldType="date"
@@ -262,8 +262,8 @@ class ConditionValue extends Component {
     }
 
     // 'String'
-    if (['nin', 'in'].includes(filed.get('op', ''))) {
-      const value = filed.get('value', '').split(',').filter(val => val !== '');
+    if (['nin', 'in'].includes(field.get('op', ''))) {
+      const value = field.get('value', '').split(',').filter(val => val !== '');
       return (
         <Field
           fieldType="tags"
@@ -275,7 +275,7 @@ class ConditionValue extends Component {
     }
     return (
       <Field
-        value={filed.get('value', '')}
+        value={field.get('value', '')}
         onChange={this.onChangeText}
         disabled={disabled}
       />
