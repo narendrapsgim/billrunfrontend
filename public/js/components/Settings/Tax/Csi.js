@@ -56,7 +56,7 @@ class Csi extends Component {
       .toArray();
   }
 
-  onChangeTaxationMapping = (fileType, usaget, filed, value) => {
+  onChangeTaxationMapping = (fileType, usaget, field, value) => {
     const { csi } = this.props;
     const newCSI = csi.update('taxation_mapping', Immutable.List(), (list) => {
       const taxationMapIndex = list.findIndex(taxationMap => (
@@ -67,11 +67,11 @@ class Csi extends Component {
         const newTaxationMap = Immutable.Map({
           usaget,
           file_type: fileType,
-          [filed]: value,
+          [field]: value,
         });
         return list.push(newTaxationMap);
       }
-      return list.setIn([taxationMapIndex, filed], value);
+      return list.setIn([taxationMapIndex, field], value);
     });
     this.props.onChange(newCSI);
   }

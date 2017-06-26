@@ -47,6 +47,7 @@ export const clearEntity = collection => ({
 });
 
 const buildRequestData = (item, action) => {
+  const apiDateFormat = getConfig('apiDateFormat', 'YYYY-MM-DD');
   switch (action) {
 
     case 'move': {
@@ -54,8 +55,8 @@ const buildRequestData = (item, action) => {
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
       formData.append('query', JSON.stringify(query));
       const update = (item.has('from'))
-        ? { from: getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat) }
-        : { to: getItemDateValue(item, 'to').format(globalSetting.apiDateTimeFormat) };
+        ? { from: getItemDateValue(item, 'from').format(apiDateFormat) }
+        : { to: getItemDateValue(item, 'to').format(apiDateFormat) };
       formData.append('update', JSON.stringify(update));
       return formData;
     }
@@ -64,7 +65,7 @@ const buildRequestData = (item, action) => {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
       formData.append('query', JSON.stringify(query));
-      const update = { to: getItemDateValue(item, 'to').format(globalSetting.apiDateTimeFormat) };
+      const update = { to: getItemDateValue(item, 'to').format(apiDateFormat) };
       formData.append('update', JSON.stringify(update));
       return formData;
     }
@@ -78,7 +79,7 @@ const buildRequestData = (item, action) => {
 
     case 'create': {
       const formData = new FormData();
-      const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
+      const newFrom = getItemDateValue(item, 'from').format(apiDateFormat);
       const update = item.withMutations((itemwithMutations) => {
         itemwithMutations
           .set('from', newFrom)
