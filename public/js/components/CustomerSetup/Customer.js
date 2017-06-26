@@ -229,8 +229,8 @@ class Customer extends Component {
 
   onClickExpectedInvoice = () => {
     const { customer } = this.props;
-    const { selectedCyclesNames } = this.state;
-    let query = getExpectedInvoiceQuery(customer.get('aid'),selectedCyclesNames);
+    const { expectedCyclesNames } = this.state;
+    let query = getExpectedInvoiceQuery(customer.get('aid'),expectedCyclesNames);
     window.open(buildRequestUrl(query))
   }
 
