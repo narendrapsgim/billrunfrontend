@@ -401,10 +401,20 @@ export const getRebalanceAccountQuery = (aid, billrunKey = '') => {
   };
 };
 
-export const getCyclesQuery = () => ({
-  api: 'billrun',
-  action: 'cycles',
-});
+export const getCyclesQuery = (from, to) => {
+  const params = {
+    api: 'billrun',
+    action: 'cycles',
+    params:[]
+  }
+  if(from) {
+      params['params'].push({from});
+  }
+  if(to) {
+      params['params'].push({to});
+  }
+  return params;
+};
 
 export const getCycleQuery = billrunKey => ({
   api: 'billrun',
