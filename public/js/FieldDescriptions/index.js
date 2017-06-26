@@ -3,6 +3,7 @@ import ServiceDescription from './Service';
 import GroupsInclude from './GroupsInclude';
 import ProductDescription from './Product';
 import DiscountDescription from './Discount';
+import ReportDescription from './Report';
 
 export {
   PlanDescription,
@@ -10,4 +11,5 @@ export {
   ProductDescription,
   GroupsInclude,
   DiscountDescription,
+  ReportDescription,
 };
