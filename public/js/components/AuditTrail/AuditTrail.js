@@ -36,9 +36,9 @@ class AuditTrail extends Component {
 
 
   componentDidMount() {
-    this.fetchItems();
     this.fetchUser();
     this.fetchEnityTypes();
+    this.fetchItems();
   }
 
   componentWillUnmount() {
