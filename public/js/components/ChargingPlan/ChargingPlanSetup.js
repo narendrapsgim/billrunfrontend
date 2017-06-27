@@ -143,11 +143,18 @@ class ChargingPlanSetup extends Component {
   };
 
   onSelectPPInclude = (value) => {
-    const { prepaidIncludes } = this.props;
+    const { prepaidIncludes, item } = this.props;
+    if (value === '') {
+      return;
+    }
     const ppInclude = prepaidIncludes.find(pp => pp.get('name') === value);
     const ppIncludesName = ppInclude.get('name');
     const ppIncludesExternalId = ppInclude.get('external_id');
-    this.props.dispatch(addUsagetInclude(ppIncludesName, ppIncludesExternalId));
+    const includes = item.get('include', Immutable.List());
+    const alreadyExists = includes.find(include => include.get('pp_includes_name', '') === value) !== undefined;
+    if (!alreadyExists) {
+      this.props.dispatch(addUsagetInclude(ppIncludesName, ppIncludesExternalId));
+    }
   };
 
   onUpdatePeriodField = (index, id, value) => {

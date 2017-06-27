@@ -17,6 +17,7 @@ const Action = (props) => {
     'fa-eye': type === 'view',
     'fa-pencil': type === 'edit',
     'fa-files-o': type === 'clone',
+    'fa-file-excel-o': type === 'export_csv',
     'danger-red': type === 'remove' || type === 'enable',
     'fa-trash-o': type === 'remove',
     'fa-toggle-off': type === 'enable',

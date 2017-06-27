@@ -90,7 +90,7 @@
     "parent":"prepaid"
   },
   "charging": {
-    "title": "Buckets Group",
+    "title": "Buckets Groups",
     "icon": "",
     "route": "charging_plans",
     "show": true,

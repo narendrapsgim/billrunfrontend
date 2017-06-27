@@ -105,7 +105,7 @@ class PrepaidIncludeSetup extends Component {
   }
 
   initDefaultValues = () => {
-    const { mode } = this.props;
+    const { mode, item } = this.props;
     if (mode === 'create') {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.onChangeFieldValue(['from'], defaultFromValue);
@@ -114,6 +114,11 @@ class PrepaidIncludeSetup extends Component {
     }
     if (mode === 'clone') {
       this.props.dispatch(setClonePrepaidInclude());
+    }
+
+    const allowedIn = item.get('allowed_in', Immutable.Map());
+    if (!Immutable.Map.isMap(allowedIn)) {
+      this.onChangeFieldValue(['allowed_in'], Immutable.Map());
     }
   }
 
@@ -227,6 +232,11 @@ class PrepaidIncludeSetup extends Component {
       value: rate.get('key'),
       label: rate.get('key'),
     })).toArray();
+
+    let limitedDestinations = item.get('allowed_in', Immutable.Map());
+    if (!Immutable.Map.isMap(limitedDestinations)) {
+      limitedDestinations = Immutable.Map();
+    }
     return (
       <div className="PrepaidIncludeSetup">
 
@@ -262,7 +272,7 @@ class PrepaidIncludeSetup extends Component {
             <Panel style={{ borderTop: 'none' }}>
               <LimitedDestinations
                 mode={mode}
-                limitedDestinations={item.get('allowed_in', Immutable.Map())}
+                limitedDestinations={limitedDestinations}
                 allRates={allRatesOptions}
                 onSelectPlan={this.onSelectPlan}
                 onChange={this.onChangeLimitedDestinations}
