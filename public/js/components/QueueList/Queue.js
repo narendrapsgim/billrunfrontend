@@ -34,7 +34,12 @@ export default class Queue extends Component {
             <div className="panel panel-default">
               <div className="panel-body">
                 {line.keySeq().map((field, key) => {
-                  const formattedValue = (field === 'calc_time') ? moment.unix(line.get(field)).format(globalSetting.datetimeFormat) : line.get(field);
+                  let formattedValue = line.get(field);
+                  if (field === 'calc_time') {
+                    formattedValue = moment.unix(line.get(field)).format(globalSetting.datetimeFormat);
+                  } else if (field === 'urt') {
+                    formattedValue = moment.unix(line.getIn([field, 'sec'])).format(globalSetting.fullDate);
+                  }
                   if (hiddenFields.includes(field)) return (null);
                   return (
                     <div className="form-group" key={key}>

@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
+import moment from 'moment';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Button } from 'react-bootstrap';
 import changeCase from 'change-case';
 import { getFieldName } from '../../common/Util';
@@ -24,7 +25,12 @@ const Usage = ({ line, onClickCancel, hiddenFields, cancelLabel, enableRemove, o
   const renderFields = (data) => {
     const fields = [];
     data.forEach((value, key) => {
-      const formattedValue = (key === 'connection_type') ? changeCase.upperCaseFirst(value) : value;
+      let formattedValue = value;
+      if (key === 'connection_type') {
+        formattedValue = changeCase.upperCaseFirst(value);
+      } else if (key === 'urt') {
+        formattedValue = moment.unix(value.get('sec')).format(globalSetting.fullDate);
+      }
       if (!hiddenFields.includes(key)) {
         fields.push(
           <FormGroup key={key}>

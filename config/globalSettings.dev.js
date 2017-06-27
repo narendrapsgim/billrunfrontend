@@ -12,6 +12,7 @@ var globalSetting = {
   dateFormat: "DD/MM/YYYY",
   timeFormat: "HH:mm",
   apiDateFormat: "YYYY-MM-DD",
+  fullDate: "DD/MM/YYYY HH:mm:ss",
   apiDateTimeFormat: "YYYY-MM-DD[T]HH:mm:ss.SSS[Z]",
   currency: '$',
   list: {
