@@ -7,8 +7,6 @@ import Field from '../Field';
 import CreateButton from '../Elements/CreateButton';
 import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
-import ProductParam from './components/ProductParam';
-import ProductParamEdit from './components/ProductParamEdit';
 import EntityFields from '../Entity/EntityFields';
 
 
@@ -20,6 +18,7 @@ export default class Product extends Component {
     usaget: PropTypes.string,
     planName: PropTypes.string,
     usageTypes: PropTypes.object.isRequired,
+    ratingParams: PropTypes.object.isRequired,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
     onProductRateAdd: PropTypes.func.isRequired,
@@ -42,7 +41,6 @@ export default class Product extends Component {
     errors: {
       name: '',
     },
-    newProductParam: false,
   }
 
   componentDidMount() {
@@ -84,70 +82,9 @@ export default class Product extends Component {
     this.props.onFieldUpdate(['vatable'], checked);
   }
 
-  onChangePrefix = (prefixes) => {
-    const prefixesList = (prefixes.length) ? prefixes.split(',') : [];
-    this.props.onFieldUpdate(['params', 'prefix'], Immutable.Set(prefixesList));
-  }
-
-  onChangeParamKey = (oldKey, newKey) => {
-    const { product } = this.props;
-    const paramValues = product.getIn(['params', oldKey], Immutable.List());
-    const updatedParams = product.get('params', Immutable.Map()).delete(oldKey).set(newKey, paramValues);
-    this.props.onFieldUpdate(['params'], updatedParams);
-  }
-
-  onChangeParamValues = (key, values) => {
-    const paramPath = ['params', key];
-    this.props.onFieldUpdate(paramPath, Immutable.List(values));
-  }
-
   onChangePricingMethod = (e) => {
     const { value } = e.target;
     this.props.onFieldUpdate(['pricing_method'], value);
-  }
-
-  onRemoveParam = (paramKey) => {
-    const { product } = this.props;
-    const updatedParams = product.get('params', Immutable.Map()).delete(paramKey);
-    this.props.onFieldUpdate(['params'], updatedParams);
-  }
-
-  onProductParamSave = (key, oldKey, values, newParam) => {
-    if (!newParam && oldKey !== key) {
-      this.onChangeParamKey(oldKey, key);
-    }
-    this.onChangeParamValues(key, values);
-  }
-
-  onProductParamAdd = () => {
-    this.setState({ newProductParam: true });
-  }
-
-  onParamEditClose = () => {
-    this.setState({ newProductParam: false });
-  }
-
-  getExistingParamKeys = () => {
-    const { product } = this.props;
-    const params = product.get('params', Immutable.Map());
-    return params.keySeq().toList();
-  }
-
-  renderNewProductParam = () => {
-    const { newProductParam } = this.state;
-    if (newProductParam) {
-      return (
-        <ProductParamEdit
-          newParam={true}
-          onParamSave={this.onProductParamSave}
-          onParamEditClose={this.onParamEditClose}
-          paramKey={''}
-          paramValues={[]}
-          existingKeys={this.getExistingParamKeys()}
-        />
-      );
-    }
-    return null;
   }
 
   onProductRateUpdate = (index, fieldName, value) => {
@@ -186,6 +123,13 @@ export default class Product extends Component {
     this.props.onFieldUpdate(field, value);
   }
 
+  filterCustomFields = (field) => {
+    const { ratingParams } = this.props;
+    const fieldName = field.get('field_name', '');
+    const usedAsRatingField = ratingParams.includes(fieldName);
+    return (!fieldName.startsWith('params.') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
+  };
+
   renderPrices = () => {
     const { product, planName, usaget, mode } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
@@ -204,35 +148,11 @@ export default class Product extends Component {
     );
   }
 
-  renderParameters = () => {
-    const { product, mode } = this.props;
-    const params = product.get('params', Immutable.Map());
-    const mainParams = Immutable.List(['prefix']);
-    let index = 0;
-    const editable = (mode !== 'view');
-
-    return params
-      .filter((paramValues, paramKey) => !mainParams.includes(paramKey))
-      .map((paramValues, paramKey) =>
-        <ProductParam
-          key={index++}
-          editable={editable}
-          paramKey={paramKey}
-          paramValues={paramValues.toJS()}
-          existingKeys={this.getExistingParamKeys()}
-          onProductParamSave={this.onProductParamSave}
-          onRemoveParam={this.onRemoveParam}
-        />
-    ).toList();
-  }
-
   render() {
     const { errors } = this.state;
     const { product, usaget, mode } = this.props;
     const vatable = (product.get('vatable', true) === true);
-    const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
     const pricingMethod = product.get('pricing_method', '');
-    const availablePrefix = [];
     const editable = (mode !== 'view');
 
     return (
@@ -270,26 +190,6 @@ export default class Product extends Component {
               </FormGroup>
 
               <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>Prefixes</Col>
-                <Col sm={8} lg={9}>
-                  { editable
-                    ? (
-                      <Select
-                        allowCreate
-                        multi={true}
-                        value={prefixs}
-                        options={availablePrefix}
-                        onChange={this.onChangePrefix}
-                        placeholder="Add Prefix..."
-                      />
-                    )
-                    : <div className="non-editable-field">{ prefixs }</div>
-                  }
-
-                </Col>
-              </FormGroup>
-
-              <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
                 <Col sm={4}>
                   { editable
@@ -311,6 +211,7 @@ export default class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
+                fieldsFilter={this.filterCustomFields}
                 editable={editable}
               />
 
@@ -388,14 +289,6 @@ export default class Product extends Component {
                 </FormGroup>
               </Col>
             </Panel>
-
-            <Panel header={<h3>Additional Parameters</h3>}>
-              { this.renderParameters() }
-              <br />
-              { editable && <CreateButton onClick={this.onProductParamAdd} label="Add New" />}
-            </Panel>
-
-            {this.renderNewProductParam()}
 
           </Form>
         </Col>

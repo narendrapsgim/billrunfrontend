@@ -117,6 +117,7 @@ class RunCycle extends Component {
 
   runAutoRefresh = () => {
     const { cycleAdditionalData } = this.props;
+    this.props.dispatch(clearItems('billruns'));
     if (cycleAdditionalData.get('cycle_status', '') !== 'running') {
       this.unsetAutoRefresh();
       this.setState({ autoRefreshRunning: false });
@@ -163,7 +164,7 @@ class RunCycle extends Component {
         if (response.status) {
           this.refreshAfterRun = setTimeout(this.reloadCycleData, 1000);
         }
-      }
+      },
     );
   }
 
@@ -321,7 +322,7 @@ class RunCycle extends Component {
           <Col sm={6} lg={6}>
             {field.renderFunc()}
           </Col>
-        </FormGroup>)
+        </FormGroup>),
     )
   );
 

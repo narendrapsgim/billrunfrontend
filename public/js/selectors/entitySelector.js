@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import Immutable from 'immutable';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector } from './settingsSelector';
 
@@ -27,6 +28,27 @@ const getMessage = (state, props) => {
   return undefined;
 };
 
+const getSignature = (state, props) => {
+  if (props.location && props.location.query && typeof props.location.query.sig !== 'undefined') {
+    return props.location.query.sig;
+  }
+  return undefined;
+};
+
+const getTimestamp = (state, props) => {
+  if (props.location && props.location.query && typeof props.location.query.t !== 'undefined') {
+    return props.location.query.t;
+  }
+  return undefined;
+};
+
+const getUsername = (state, props) => {
+  if (props.location && props.location.query && typeof props.location.query.u !== 'undefined') {
+    return props.location.query.u;
+  }
+  return undefined;
+};
+
 const getAction = (state, props) => {
   if (props.location && props.location.query && props.location.query.action) {
     return props.location.query.action.length > 0 ? props.location.query.action : null;
@@ -48,12 +70,24 @@ const getItem = (state, props, entityName) => {
     case 'subscription':
     case 'discount':
     case 'reports':
+    case 'importer':
       return state.entity.get(entityName);
     case 'charging_plan':
       return state.plan;
     default: {
       return state[entityName];
     }
+  }
+};
+
+export const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscriberFields) => {
+  switch (item.get('entity')) {
+    case 'customer':
+      return accountFields;
+    case 'subscription':
+      return subscriberFields;
+    default:
+      return undefined;
   }
 };
 
@@ -103,7 +137,22 @@ export const revisionsSelector = createSelector(
 
 export const tabSelector = createSelector(
   getTab,
-  tab => tab
+  tab => tab,
+);
+
+export const timestampSelector = createSelector(
+  getTimestamp,
+  timestamp => timestamp
+);
+
+export const usernameSelector = createSelector(
+  getUsername,
+  username => username
+);
+
+export const sigSelector = createSelector(
+  getSignature,
+  signature => signature
 );
 
 export const messageSelector = createSelector(
@@ -117,17 +166,17 @@ export const messageSelector = createSelector(
       }
     }
     return undefined;
-  }
+  },
 );
 
 export const itemSelector = createSelector(
   getItem,
-  item => item
+  item => item,
 );
 
 export const idSelector = createSelector(
   getId,
-  id => id
+  id => id,
 );
 
 export const modeSelector = createSelector(

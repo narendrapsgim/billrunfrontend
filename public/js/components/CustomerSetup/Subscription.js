@@ -31,6 +31,7 @@ class Subscription extends Component {
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     clearRevisions: PropTypes.func.isRequired,
+    clearList: PropTypes.func.isRequired,
     getSubscription: PropTypes.func.isRequired,
   }
 
@@ -137,7 +138,7 @@ class Subscription extends Component {
   onChangeService = (services) => {
     const { subscription } = this.state;
     const servicesList = (services.length) ? services.split(',') : [];
-    const from = getItemDateValue(subscription, 'from').toISOString();
+    const from = getItemDateValue(subscription, 'from').format('YYYY-MM-DD');
     const to = getItemDateValue(subscription, 'to', moment().add(100, 'years')).toISOString();
     const newServices = this.updateServicesDates(servicesList, from, to);
     this.updateSubscriptionField(['services'], newServices);
@@ -344,6 +345,7 @@ class Subscription extends Component {
   clearRevisions = () => {
     const { subscription } = this.state;
     this.props.clearRevisions(subscription);
+    this.props.clearList();
   }
 
   render() {

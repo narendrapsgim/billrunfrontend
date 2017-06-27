@@ -3,7 +3,10 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import _ from 'lodash';
+import Papa from 'papaparse';
+import filesize from 'file-size';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import changeCase from 'change-case';
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -44,11 +47,11 @@ import {
   addRatingField,
   removeRatingField,
  } from '../../actions/inputProcessorActions';
-import { getSettings } from '../../actions/settingsActions';
+import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-
+import { getConfig } from '../../common/Util';
 
 class InputProcessor extends Component {
 
@@ -56,6 +59,7 @@ class InputProcessor extends Component {
     settings: PropTypes.instanceOf(Immutable.Map),
     usageTypes: PropTypes.instanceOf(Immutable.List),
     subscriberFields: PropTypes.instanceOf(Immutable.List),
+    customRatingFields: PropTypes.instanceOf(Immutable.List),
     inputProcessorsExitNames: PropTypes.instanceOf(Immutable.List),
     dispatch: PropTypes.func.isRequired,
     router: PropTypes.shape({
@@ -71,6 +75,7 @@ class InputProcessor extends Component {
   static defaultProps = {
     settings: Immutable.Map(),
     subscriberFields: Immutable.List(),
+    customRatingFields: Immutable.List(),
     inputProcessorsExitNames: Immutable.List(),
     usageTypes: Immutable.List(),
     fileType: '',
@@ -150,7 +155,7 @@ class InputProcessor extends Component {
       this.props.dispatch(getProcessorSettings(fileType));
       pageTitle = 'Edit Input Processor';
     }
-    this.props.dispatch(getSettings(['usage_types', 'subscribers.subscriber.fields']));
+    this.props.dispatch(getSettings(['usage_types', 'subscribers.subscriber.fields', 'rates.fields']));
     this.props.dispatch(setPageTitle(pageTitle));
   }
 
@@ -219,20 +224,32 @@ class InputProcessor extends Component {
   };
 
   onSelectSampleCSV = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    if (!this.props.settings.get('delimiter')) return;
-    reader.onloadend = ((evt) => {
-      if (evt.target.readyState === FileReader.DONE) {
-        /* Only need first line */
-        const lines = evt.target.result.split('\n');
-        const header = lines[0];
-        const fields = header.split(this.props.settings.get('delimiter')).map(field => field.replace(/[^a-zA-Z_\d]/g, '_').toLowerCase());
-        this.props.dispatch(setFields(fields));
-      }
+    const { settings } = this.props;
+    const { files } = e.target;
+    const delimiter = settings.get('delimiter', ',');
+    Papa.parse(files[0], {
+      dynamicTyping: false,
+      skipEmptyLines: true,
+      delimiter,
+      header: true,
+      complete: this.onParseScvComplete,
+      error: this.onParseScvError,
     });
-    const blob = file.slice(0, file.size - 1);
-    reader.readAsText(blob);
+  }
+
+  onParseScvError = (error, file) => { // eslint-disable-line no-unused-vars
+    this.props.dispatch(showDanger('Error in CSV file'));
+  }
+
+  onParseScvComplete = (results) => {
+    if (results.meta && results.meta.fields && results.meta.fields.length > 0) {
+      this.props.dispatch(setFields([])); // empty existing fields
+      const whiteListCharacters = new RegExp('[^A-Za-z0-9_]', 'g');
+      const cleanFields = results.meta.fields.map(field => field.replace(whiteListCharacters, '_'));
+      this.props.dispatch(setFields(cleanFields));
+    } else {
+      this.props.dispatch(showDanger('Error in CSV file, no headers found.'));
+    }
   }
 
   onAddField = (val, e) => { // eslint-disable-line no-unused-vars
@@ -274,7 +291,12 @@ class InputProcessor extends Component {
   }
 
   onSetRating = (e) => {
-    const { dataset: { usaget, rate_key, index }, value } = e.target;
+    const { customRatingFields } = this.props;
+    const { dataset: { usaget, rate_key, index }, value, custom } = e.target;
+    const isNewField = custom && (rate_key !== '') && customRatingFields.find(field => field.get('field_name', '') === rate_key) === undefined;
+    if (isNewField) {
+      this.addNewRatingCustomField(rate_key, value);
+    }
     this.props.dispatch(setRatingField(usaget, parseInt(index, 10), rate_key, value));
   }
 
@@ -349,6 +371,18 @@ class InputProcessor extends Component {
     this.props.dispatch(addUsagetMapping(val))
   );
 
+  addNewRatingCustomField = (fieldName, type) => {
+    const { customRatingFields } = this.props;
+    this.props.dispatch(updateSetting('rates', ['fields'], customRatingFields.push(Immutable.Map({
+      field_name: `params.${changeCase.snakeCase(fieldName)}`,
+      title: fieldName,
+      multiple: type === 'longestPrefix',
+      display: true,
+      editable: true,
+    }))));
+    return this.props.dispatch(saveSettings('rates'));
+  };
+
   goBack = () => {
     this.props.router.push('/input_processors');
   }
@@ -399,7 +433,7 @@ class InputProcessor extends Component {
   }
 
   getStepContent = () => {
-    const { settings, usageTypes, subscriberFields, action, type, format } = this.props;
+    const { settings, usageTypes, subscriberFields, customRatingFields, action, type, format } = this.props;
     const { stepIndex, errors, steps } = this.state;
 
     switch (stepIndex) {
@@ -445,6 +479,7 @@ class InputProcessor extends Component {
         <CalculatorMapping
           settings={settings}
           subscriberFields={subscriberFields}
+          customRatingFields={customRatingFields}
           onSetRating={this.onSetRating}
           onSetLineKey={this.onSetLineKey}
           onSetCustomerMapping={this.onSetCustomerMapping}
@@ -527,6 +562,7 @@ const mapStateToProps = (state, props) => {
     settings: state.inputProcessor,
     usageTypes: state.settings.get('usage_types', Immutable.List()),
     subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
+    customRatingFields: state.settings.getIn(['rates', 'fields'], Immutable.List()),
     fileType,
     action,
     template,

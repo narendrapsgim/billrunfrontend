@@ -1,16 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
-import List from '../List';
-import { CreateButton } from '../Elements';
-import StateDetails from '../EntityList/StateDetails';
+import EntityList from '../EntityList';
 import { getItemDateValue, getConfig } from '../../common/Util';
 
 
 export default class SubscriptionsList extends Component {
 
   static propTypes = {
-    items: PropTypes.instanceOf(Immutable.Iterable),
     settings: PropTypes.instanceOf(Immutable.List),
     aid: PropTypes.oneOfType([
       PropTypes.string,
@@ -22,12 +19,10 @@ export default class SubscriptionsList extends Component {
   };
 
   static defaultProps = {
-    items: Immutable.List(),
     settings: Immutable.List(),
     defaultListFields: [],
     aid: '',
   };
-
 
   planActivationParser = (subscription) => {
     const date = getItemDateValue(subscription, 'plan_activation', false);
@@ -72,7 +67,7 @@ export default class SubscriptionsList extends Component {
           case 'address':
             return { id: fieldname, parser: this.addressParser };
           case 'sid':
-            return { id: fieldname, title: 'ID' };
+            return { id: fieldname, title: 'ID', type: 'number', sort: true };
           default: {
             let title = fieldname;
             if (fieldname === 'firstname') {
@@ -87,9 +82,16 @@ export default class SubscriptionsList extends Component {
       .toArray();
   }
 
-  getListActions = () => [
+  getActions = () => [
     { type: 'edit', helpText: 'Edit', onClick: this.props.onClickEdit, onClickColumn: 'sid' },
   ]
+
+  getListActions = () => [{
+    type: 'add',
+    onClick: this.onClickNew,
+  }, {
+    type: 'refresh',
+  }]
 
   onActionEdit = (item) => {
     this.props.onClickEdit(item);
@@ -99,29 +101,51 @@ export default class SubscriptionsList extends Component {
     this.props.onClickEdit(item, 'subscription', 'clone');
   }
 
-  parserState = item => (
-    <StateDetails
-      item={item}
-      itemName="subscription"
-      onActionEdit={this.onActionEdit}
-      onActionClone={this.onActionClone}
-    />
-  );
+  filterFields = () => [
+    { id: 'sid', placeholder: 'ID' },
+    { id: 'firstname', placeholder: 'First Name' },
+    { id: 'lastname', placeholder: 'Last Name' },
+  ];
 
-  addStateColumn = fields => ([
-    { id: 'state', parser: this.parserState, cssClass: 'state' },
-    ...fields,
-  ])
+  getSubsctiptionListProject = () => {
+    const { settings, defaultListFields } = this.props;
+    return Immutable.Map().withMutations((fieldsWithMutations) => {
+      fieldsWithMutations.set('from', 1);
+      fieldsWithMutations.set('to', 1);
+      fieldsWithMutations.set('revision_info', 1);
+      defaultListFields.forEach((defaultSubsctiptionListField) => {
+        fieldsWithMutations.set(defaultSubsctiptionListField, 1);
+      });
+      settings
+        .filter(field => field.get('show_in_list', false))
+        .forEach((field) => {
+          fieldsWithMutations.set(field.get('field_name', ''), 1);
+        });
+    }).toJS();
+  }
 
   render() {
-    const { items } = this.props;
-    const fields = this.addStateColumn(this.getFields());
-    const actions = this.getListActions();
+    const { aid } = this.props;
+    const fields = this.getFields();
+    const actions = this.getActions();
+    const listActions = this.getListActions();
+    const projectFields = this.getSubsctiptionListProject();
+    const baseFilter = { aid, type: 'subscriber' };
     return (
       <div className="row">
         <div className="col-lg-12">
-          <List items={items} fields={fields} actions={actions} />
-          <CreateButton onClick={this.onClickNew} type="Subscription" />
+          <EntityList
+            itemsType="subscribers"
+            itemType="subscription"
+            filterFields={this.filterFields()}
+            tableFields={fields}
+            projectFields={projectFields}
+            showRevisionBy={true}
+            actions={actions}
+            listActions={listActions}
+            baseFilter={baseFilter}
+            allowManageRevisions={false}
+          />
         </div>
       </div>
     );

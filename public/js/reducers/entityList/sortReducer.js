@@ -6,7 +6,7 @@ const defaultState = Immutable.Map();
 const sortReducer = (state = defaultState, action) => {
   switch (action.type) {
 
-    case actions.CLEAR_LIST: {
+    case actions.CLEAR_ENTITY_LIST: {
       if (action.collection && action.collection.length > 0) {
         return state.delete(action.collection);
       }

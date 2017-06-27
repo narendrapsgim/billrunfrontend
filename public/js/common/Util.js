@@ -23,6 +23,22 @@ export const getFieldName = (field, category) => {
   return FieldNames[field] || field;
 };
 
+export const getFieldNameType = (type) => {
+  switch (type) {
+    case 'account':
+    case 'customer':
+      return 'account';
+    case 'subscription':
+    case 'subscriptions':
+      return 'subscription';
+    case 'lines':
+    case 'usage':
+      return 'lines';
+    default:
+      return '';
+  }
+};
+
 export const getZiroTimeDate = (date = moment()) => {
   const dateWithoutTime = moment(date).utcOffset(0);
   dateWithoutTime.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
@@ -180,3 +196,59 @@ export const parseConfigSelectOptions = configOption => formatSelectOptions(
     ? Immutable.Map({ value: configOption.get('id'), label: configOption.get('title') })
     : configOption.get('id')
 );
+
+export const isLinkerField = (field = Immutable.Map()) => (
+  field.get('unique', false) &&
+  !field.get('generated', false) &&
+  field.get('editable', true)
+);
+
+export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldField, oldOp, newField, newOp) => {
+  const oldFieldLabel = oldField === '' ? '' : fieldsOptions.find(
+    fieldConfig => fieldConfig.get('id') === oldField, null, Immutable.Map(),
+  ).get('title', '');
+  const newFieldLabel = oldField === newField ? oldFieldLabel : fieldsOptions.find(
+    fieldConfig => fieldConfig.get('id') === newField, null, Immutable.Map(),
+  ).get('title', '');
+
+  const oldOpLabel = oldOp === '' ? '' : opOptions.find(
+    groupByOperator => groupByOperator.get('id') === oldOp, null, Immutable.Map(),
+  ).get('title', '');
+  const newOpLabel = oldOp === newOp ? oldOpLabel : opOptions.find(
+    groupByOperator => groupByOperator.get('id') === newOp, null, Immutable.Map(),
+  ).get('title', '');
+  // Check if label is empty or was NOT changed by user
+  const oldLabel = oldOpLabel === '' || oldOp === 'group' ? oldFieldLabel : `${oldFieldLabel} (${oldOpLabel})`;
+  if (label === '' || label === oldLabel) {
+    return newOpLabel === '' || newOp === 'group' ? newFieldLabel : `${newFieldLabel} (${newOpLabel})`;
+  }
+  return label;
+};
+
+export const getEntitySettingsName = (entityName) => {
+  if (entityName === 'account') {
+    return 'customer';
+  }
+  if (entityName === 'subscriber') {
+    return 'subscription';
+  }
+  return entityName;
+};
+
+export const getSettingsKey = (entityName) => {
+  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey']);
+  return (key ? key.split('.')[0] : entityName);
+};
+
+export const getSettingsPath = (entityName, path) => {
+  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey']);
+  if (!key) {
+    return path;
+  }
+
+  const keysArr = key.split('.');
+  if (typeof keysArr[1] !== 'undefined') {
+    path.unshift(keysArr[1]);
+  }
+  return path;
+};

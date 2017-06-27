@@ -11,7 +11,7 @@ const FieldNames = {
     start: 'Start time',
     channel: 'Calling channel',
     stamp: 'Record unique ID',
-    billrun: 'Billing cycle key',
+    billrun: 'Billing cycle',
     src: 'Calling ID',
     in_group: 'Campaign inclusive units',
     clid: 'Full Calling ID',
@@ -67,9 +67,23 @@ const FieldNames = {
     request_num: 'Request number',
     granted_return_code: 'Return code',
   },
-  subscription: {
+  account: {
+    aid: 'Customer ID',
     firstname: 'First Name',
     lastname: 'Last Name',
+  },
+  subscription: {
+    aid: 'Subscription ID',
+    sid: 'Customer ID',
+    firstname: 'First Name',
+    lastname: 'Last Name',
+    services: 'Services',
+    plan: 'Plan',
+    plan_activation: 'Plan activation date',
+  },
+  report: {
+    report_type_0: 'Simple',
+    report_type_1: 'Grouped',
   },
 };
 

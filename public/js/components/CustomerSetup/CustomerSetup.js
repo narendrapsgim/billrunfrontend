@@ -10,7 +10,6 @@ import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import PostpaidBalances from '../PostpaidBalances';
 import PrepaidBalances from '../PrepaidBalances';
 import {
-  getSubscriptionsByAidQuery,
   getPlansKeysQuery,
   getServicesKeysWithInfoQuery,
   getPaymentGatewaysQuery,
@@ -24,8 +23,8 @@ import {
   getSubscription,
   setCloneSubscription,
 } from '../../actions/customerActions';
-import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
-import { getList, clearList } from '../../actions/listActions';
+import { clearItems, getRevisions, clearRevisions, clearList } from '../../actions/entityListActions';
+import { getList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { showSuccess, showAlert } from '../../actions/alertsActions';
@@ -42,7 +41,6 @@ class CustomerSetup extends Component {
     customer: PropTypes.instanceOf(Immutable.Map),
     subscription: PropTypes.instanceOf(Immutable.Map),
     settings: PropTypes.instanceOf(Immutable.Map),
-    subscriptions: PropTypes.instanceOf(Immutable.List),
     plans: PropTypes.instanceOf(Immutable.List),
     services: PropTypes.instanceOf(Immutable.List),
     gateways: PropTypes.instanceOf(Immutable.List),
@@ -70,7 +68,6 @@ class CustomerSetup extends Component {
     customer: Immutable.Map(),
     subscription: Immutable.Map(),
     settings: Immutable.Map(),
-    subscriptions: Immutable.List(),
     gateways: Immutable.List(),
     plans: Immutable.List(),
     services: Immutable.List(),
@@ -78,12 +75,12 @@ class CustomerSetup extends Component {
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['subscribers']))
-      .then(() => this.fetchItem());
+    this.fetchItem();
   }
 
   componentDidMount() {
     const { mode, message } = this.props;
+    this.props.dispatch(getSettings(['subscribers']));
     if (message) {
       this.props.dispatch(showAlert(message.content, message.type));
     }
@@ -112,7 +109,7 @@ class CustomerSetup extends Component {
 
   componentWillUnmount() {
     this.props.dispatch(clearCustomer());
-    this.props.dispatch(clearList('available_gateways'));
+    this.clearSubscriptions();
   }
 
   fetchItem = (itemId = this.props.itemId) => {
@@ -123,15 +120,10 @@ class CustomerSetup extends Component {
 
   afterItemReceived = (response) => {
     if (response.status) {
-      this.getSubscriptions(this.props.aid);
+      //
     } else {
       this.handleBack();
     }
-  }
-
-  getSubscriptions = (aid) => {
-    const listFields = this.getSubsctiptionListProject();
-    this.props.dispatch(getList('subscriptions', getSubscriptionsByAidQuery(aid, listFields)));
   }
 
   onChangeCustomerField = (e) => {
@@ -165,12 +157,11 @@ class CustomerSetup extends Component {
 
 
   afterSaveSubscription = (response) => {
-    const { aid } = this.props;
     if (response.status) {
       const action = (['clone', 'create'].includes(response.action)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The subscription was ${action}`));
       this.clearSubscriptionRevisions(response.subscription);
-      this.getSubscriptions(aid);
+      this.clearSubscriptions();
       return true;
     }
     return false;
@@ -179,6 +170,10 @@ class CustomerSetup extends Component {
   clearSubscriptionRevisions = (subscription) => {
     const key = subscription.get('sid', '');
     this.props.dispatch(clearRevisions('subscribers', key));// refetch items list because item was (changed in / added to) list
+  }
+
+  clearSubscriptions = () => {
+    this.props.dispatch(clearList('subscribers'));
   }
 
   handleBack = (itemWasChanged = false) => {
@@ -203,24 +198,6 @@ class CustomerSetup extends Component {
       return null;
     });
 
-  getSubsctiptionListProject = () => {
-    const { settings, defaultSubsctiptionListFields } = this.props;
-    return Immutable.Map().withMutations((fieldsWithMutations) => {
-      fieldsWithMutations.set('from', 1);
-      fieldsWithMutations.set('to', 1);
-      fieldsWithMutations.set('revision_info', 1);
-      defaultSubsctiptionListFields.forEach((defaultSubsctiptionListField) => {
-        fieldsWithMutations.set(defaultSubsctiptionListField, 1);
-      });
-      settings
-        .getIn(['subscriber', 'fields'], Immutable.List())
-        .filter(field => field.get('show_in_list', false))
-        .forEach((field) => {
-          fieldsWithMutations.set(field.get('field_name', ''), 1);
-        });
-    }).toJS();
-  }
-
   getReturnUrl = () => {
     const { itemId } = this.props;
     return `${window.location.origin}/#/customers/customer/${itemId}?tab=2`;
@@ -237,7 +214,6 @@ class CustomerSetup extends Component {
   render() {
     const {
       customer,
-      subscriptions,
       defaultSubsctiptionListFields,
       settings,
       plans,
@@ -280,7 +256,6 @@ class CustomerSetup extends Component {
                 <Tab title="Subscriptions" eventKey={2}>
                   <Panel style={{ borderTop: 'none' }}>
                     <Subscriptions
-                      items={subscriptions}
                       aid={aid}
                       settings={subscriberFields}
                       allPlans={plans}
@@ -289,6 +264,7 @@ class CustomerSetup extends Component {
                       defaultListFields={defaultSubsctiptionListFields}
                       getSubscription={this.getSubscription}
                       clearRevisions={this.clearSubscriptionRevisions}
+                      clearList={this.clearSubscriptions}
                     />
                   </Panel>
                 </Tab>
@@ -327,7 +303,6 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props),
   aid: state.entity.getIn(['customer', 'aid']) || undefined,
   settings: state.settings.get('subscribers') || undefined,
-  subscriptions: state.list.get('subscriptions') || undefined,
   plans: state.list.get('available_plans') || undefined,
   services: state.list.get('available_services') || undefined,
   gateways: state.list.get('available_gateways') || undefined,
