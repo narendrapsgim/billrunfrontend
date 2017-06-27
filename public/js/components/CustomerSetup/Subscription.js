@@ -31,6 +31,7 @@ class Subscription extends Component {
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     clearRevisions: PropTypes.func.isRequired,
+    clearList: PropTypes.func.isRequired,
     getSubscription: PropTypes.func.isRequired,
   }
 
@@ -344,6 +345,7 @@ class Subscription extends Component {
   clearRevisions = () => {
     const { subscription } = this.state;
     this.props.clearRevisions(subscription);
+    this.props.clearList();
   }
 
   render() {

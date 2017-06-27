@@ -128,7 +128,7 @@ fieldset[disabled] .btn {
 .react-tagsinput-input {
   margin: 0;
   padding: 3px 4px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .react-tagsinput--focused {
   border-color: #dddddd!important;
@@ -138,7 +138,7 @@ fieldset[disabled] .btn {
   background-color: #e7e7e7!important;
   border-color: #dddddd!important;
   border-radius: 0!important;
-  font-size: 0.9em;
+  font-size: 13px;
   padding: 3px 5px;
 }
 .react-tagsinput-tag:hover, .react-tagsinput-tag:focus {
@@ -169,6 +169,7 @@ fieldset[disabled] .btn {
   background-color: #e7e7e7!important;
   border-color: #dddddd!important;
   border-radius: 0!important;
+  font-size: 13px;
 }
 .Select-item-icon{
   padding: 3px;
@@ -176,19 +177,41 @@ fieldset[disabled] .btn {
   border: none;
 }
 .Select-item-icon:hover, .Select-item-icon:focus {
-    background-color: #eeeeee!important;
-    color: #222222!important;
+  background-color: #eeeeee!important;
+  color: #222222!important;
 }
 .Select-item:hover,.Select-item:focus{
   background-color: #eeeeee!important;
   color: #222222!important;
 }
 .Select-menu-outer .Select-option.is-selected {
-    font-weight: bolder;
-    background-color: #eeeeee!important;
-    color: #222222!important;
+  font-weight: bolder;
+  background-color: #eeeeee!important;
+  color: #222222!important;
 }
 /* ~React-Select */
+
+/* Custom field input */
+.custom-field-input .Field {
+  display: inline-block;
+}
+.custom-field-input .form-control{
+  margin: 0 0 7px 0;
+  padding: 3px 4px;
+  background: transparent;
+  border: 0;
+  color: #777;
+  font-family: sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  width: 80px;
+  height: auto;
+  box-shadow: none;
+}
+.custom-field-input .form-control:focus{
+  box-shadow: none;
+}
+/* ~Custom field input */
 
 /* System Alerts */
 .alert-notifier-container{

@@ -16,6 +16,7 @@ export default class EditMenu extends Component {
 
   static defaultProps = {
     disallowEditShow: Immutable.List(['dashboard', 'settings', 'settings_general', 'input_processors', 'custom_fields']),
+    data: Immutable.Map(),
   };
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars

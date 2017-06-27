@@ -11,7 +11,8 @@ var globalSetting = {
   datetimeFormat: "DD/MM/YYYY HH:mm",
   dateFormat: "DD/MM/YYYY",
   timeFormat: "HH:mm",
-  apiDateTimeFormat: "YYYY-MM-DD",
+  apiDateFormat: "YYYY-MM-DD",
+  apiDateTimeFormat: "YYYY-MM-DD[T]HH:mm:ss.SSS[Z]",
   currency: '$',
   list: {
     maxItems: 100,
