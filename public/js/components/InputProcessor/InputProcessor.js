@@ -48,6 +48,7 @@ import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { usageTypeSelector } from '../../selectors/settingsSelector';
 
 
 class InputProcessor extends Component {
@@ -525,7 +526,7 @@ const mapStateToProps = (state, props) => {
   return {
     inputProcessorsExitNames: state.list.get('all_input_processors', Immutable.List()).map(ip => ip.get('file_type', '')),
     settings: state.inputProcessor,
-    usageTypes: state.settings.get('usage_types', Immutable.List()),
+    usageTypes: usageTypeSelector(state, props),
     subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
     fileType,
     action,

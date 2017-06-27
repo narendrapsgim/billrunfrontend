@@ -18,6 +18,9 @@ const getPricing = (state, props) => // eslint-disable-line no-unused-vars
 const getUsageType = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('usage_types');
 
+const getPropertyTypes = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.get('property_types');
+
 const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('billrun');
 
@@ -159,6 +162,13 @@ const selectLinesFields = (customKeys) => {
   .sort(sortFieldOption);
 };
 
+const selectUsageTypes = (usageTypes) => {
+  if (!usageTypes) {
+    return undefined;
+  }
+  return usageTypes.map(usageType => usageType.get('usage_type', ''));
+};
+
 
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
@@ -211,7 +221,17 @@ export const chargingDaySelector = createSelector(
 
 export const usageTypeSelector = createSelector(
   getUsageType,
+  selectUsageTypes,
+);
+
+export const usageTypesDataSelector = createSelector(
+  getUsageType,
   usageTypes => usageTypes,
+);
+
+export const propertyTypeSelector = createSelector(
+  getPropertyTypes,
+  propertyTypes => propertyTypes,
 );
 
 export const entityFieldSelector = createSelector(
