@@ -5,6 +5,7 @@ import Immutable from 'immutable';
 import _ from 'lodash';
 import Papa from 'papaparse';
 import filesize from 'file-size';
+import changeCase from 'change-case';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
@@ -50,14 +51,14 @@ import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { getConfig } from '../../common/Util';
-import { usageTypeSelector } from '../../selectors/settingsSelector';
+import { usageTypeSelector, usageTypesDataSelector } from '../../selectors/settingsSelector';
 
 class InputProcessor extends Component {
 
   static propTypes = {
     settings: PropTypes.instanceOf(Immutable.Map),
     usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
     subscriberFields: PropTypes.instanceOf(Immutable.List),
     inputProcessorsExitNames: PropTypes.instanceOf(Immutable.List),
     dispatch: PropTypes.func.isRequired,
@@ -76,6 +77,7 @@ class InputProcessor extends Component {
     subscriberFields: Immutable.List(),
     inputProcessorsExitNames: Immutable.List(),
     usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
     fileType: '',
     action: 'new',
     template: null,
@@ -153,7 +155,7 @@ class InputProcessor extends Component {
       this.props.dispatch(getProcessorSettings(fileType));
       pageTitle = 'Edit Input Processor';
     }
-    this.props.dispatch(getSettings(['usage_types', 'subscribers.subscriber.fields']));
+    this.props.dispatch(getSettings(['usage_types', 'property_types', 'subscribers.subscriber.fields']));
     this.props.dispatch(setPageTitle(pageTitle));
   }
 
@@ -360,9 +362,13 @@ class InputProcessor extends Component {
     return field;
   };
 
-  addUsagetMapping = val => (
-    this.props.dispatch(addUsagetMapping(val))
-  );
+  addUsagetMapping = (val) => {
+    const { usageTypesData } = this.props;
+    return this.props.dispatch(addUsagetMapping(usageTypesData.push(Immutable.Map({
+      usage_type: changeCase.snakeCase(val),
+      label: val,
+    }))));
+  };
 
   goBack = () => {
     this.props.router.push('/input_processors');
@@ -541,6 +547,7 @@ const mapStateToProps = (state, props) => {
     inputProcessorsExitNames: state.list.get('all_input_processors', Immutable.List()).map(ip => ip.get('file_type', '')),
     settings: state.inputProcessor,
     usageTypes: usageTypeSelector(state, props),
+    usageTypesData: usageTypesDataSelector(state, props),
     subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
     fileType,
     action,

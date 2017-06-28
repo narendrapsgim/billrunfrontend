@@ -82,7 +82,9 @@ const convert = (settings) => {
       usaget_mapping = processor.usaget_mapping.map(usaget => {
 	return {
 	  usaget: usaget.usaget,
-	  pattern: usaget.pattern.replace("/^", "").replace("$/", "")
+	  pattern: usaget.pattern.replace("/^", "").replace("$/", ""),
+    property_type: usaget.property_type,
+    unit: usaget.unit,
 	}
       })
     } else {
@@ -345,16 +347,21 @@ export function saveInputProcessorSettings(state, parts = []) {
   }
 
   if (processor) {
-    const processor_settings = state.get('usaget_type') === "static" ?
-			       { default_usaget: processor.get('default_usaget') } :
-			       { usaget_mapping:
-						processor.get('usaget_mapping').map(usaget => {
-						  return {
-						    "src_field": processor.get('src_field'),
-						    "pattern": usaget.get('pattern'),
-						    "usaget": usaget.get('usaget')
-						  }
-						}).toJS() };
+    const processor_settings = state.get('usaget_type') === "static"
+    ? {
+      default_usaget: processor.get('default_usaget'),
+      default_property_type: processor.get('default_property_type'),
+      default_unit: processor.get('default_unit'),
+    }
+    : {
+      usaget_mapping: processor.get('usaget_mapping').map(usaget => ({
+        src_field: processor.get('src_field'),
+        pattern: usaget.get('pattern'),
+        usaget: usaget.get('usaget'),
+        property_type: usaget.get('property_type'),
+        unit: usaget.get('unit'),
+      })).toJS(),
+    };
     settings.processor = {
       type: (settings.type === 'realtime' ? 'Realtime' : 'Usage'),
       "date_field": processor.get('date_field'),

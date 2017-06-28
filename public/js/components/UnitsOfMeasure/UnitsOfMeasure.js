@@ -1,29 +1,30 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
-import { Col, ControlLabel } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import { propertyTypeSelector } from '../../selectors/settingsSelector';
 
 class UnitsOfMeasure extends Component {
 
   static propTypes = {
-    dispatch: PropTypes.func.isRequired,
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     propertyType: PropTypes.string,
+    propertyTypeFieldName: PropTypes.string,
     unit: PropTypes.string,
+    unitFieldName: PropTypes.string,
     onChange: PropTypes.func,
-    propertyTypeLabel: PropTypes.string,
-    unitLabel: PropTypes.string,
+    disabled: PropTypes.bool,
   };
 
   static defaultProps = {
     propertyTypes: Immutable.List(),
     propertyType: '',
+    propertyTypeFieldName: 'property_type',
     unit: '',
+    unitFieldName: 'unit',
     onChange: () => {},
-    propertyTypeLabel: 'Property Type',
-    unitLabel: 'Unit',
+    disabled: false,
   };
 
   getAvailablePropertyTypes = () => {
@@ -38,40 +39,34 @@ class UnitsOfMeasure extends Component {
   };
 
   onChangePropertyType = (value) => {
-    this.props.onChange('property_type', value);
+    const { propertyTypeFieldName } = this.props;
+    this.props.onChange(propertyTypeFieldName, value);
+    this.onChangeUnit('');
   }
 
   onChangeUnit = (value) => {
-    this.props.onChange('unit', value);
+    const { unitFieldName } = this.props;
+    this.props.onChange(unitFieldName, value);
   }
 
   render() {
-    const { propertyType, unit, propertyTypeLabel, unitLabel } = this.props;
+    const { propertyType, unit, disabled } = this.props;
 
     return (
-      <div>
-        <Col componentClass={ControlLabel} md={4}>
-          {propertyTypeLabel}
-        </Col>
-        <Col sm={5}>
-          <Select
-            onChange={this.onChange}
-            value={propertyType}
-            options={this.getAvailablePropertyTypes()}
-          />
-        </Col>
-
-        <Col componentClass={ControlLabel} md={4}>
-          {unitLabel}
-        </Col>
-        <Col sm={5}>
-          <Select
-            onChange={this.onChange}
-            value={unit}
-            options={this.getAvailableUnitsOfMeasure()}
-          />
-        </Col>
-      </div>
+      <InputGroup>
+        <Select
+          onChange={this.onChangePropertyType}
+          value={propertyType}
+          options={this.getAvailablePropertyTypes()}
+          disabled={disabled}
+        />
+        <Select
+          onChange={this.onChangeUnit}
+          value={unit}
+          options={this.getAvailableUnitsOfMeasure()}
+          disabled={disabled}
+        />
+      </InputGroup>
     );
   }
 }
