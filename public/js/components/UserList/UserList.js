@@ -1,34 +1,98 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import moment from 'moment';
 import EntityList from '../EntityList';
+import { ConfirmModal } from '../Elements';
+import { showSuccess } from '../../actions/alertsActions';
+import { deleteUser } from '../../actions/userActions';
 
-const UserList = () => {
-  const parseRoles = item => item.get('roles').join(', ');
+class UserList extends Component {
 
-  const fields = [
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+  }
+
+  state = {
+    showConfirmDelete: false,
+    itemToDelete: null,
+    confirmDeleteMessage: '',
+    refreshString: '',
+  }
+
+  getActions = () => ([
+    { type: 'edit' },
+    { type: 'remove', showIcon: true, onClick: this.onAskDelete, helpText: 'Remove' },
+  ]);
+
+  getFields = () => ([
     { id: 'username', placeholder: 'User Name', sort: true },
-    { id: 'roles', placeholder: 'Roles', parser: parseRoles },
-  ];
+    { id: 'roles', placeholder: 'Roles', parser: this.parseRoles },
+  ]);
 
-  const projectFields = {
+  getProjectFields = () => ({
     username: 1,
     roles: 1,
-  };
+  });
 
-  const actions = [
-    { type: 'edit' },
-  ];
+  onAskDelete = (item) => {
+    this.setState({
+      showConfirmDelete: true,
+      itemToDelete: item,
+      confirmDeleteMessage: `Are you sure you want to delete "${item.get('username', '')}" user ?`,
+    });
+  }
 
-  return (
-    <EntityList
-      api="get"
-      itemType="user"
-      itemsType="users"
-      filterFields={fields}
-      tableFields={fields}
-      projectFields={projectFields}
-      actions={actions}
-    />
-  );
-};
+  onDeleteClose = () => {
+    this.setState({
+      showConfirmDelete: false,
+      itemToDelete: null,
+      confirmDeleteMessage: '',
+    });
+  }
 
-export default UserList;
+  onDeleteOk = () => {
+    const { itemToDelete } = this.state;
+    this.setState({ progress: true, refreshString: moment().format() });
+    this.props.dispatch(deleteUser(itemToDelete)).then(this.afterDelete);
+  }
+
+  afterDelete = (response) => {
+    this.onDeleteClose();
+    if (response.status) {
+      this.props.dispatch(showSuccess('User was deleted'));
+    }
+  }
+
+  parseRoles = item => item.get('roles').join(', ');
+
+
+  render() {
+    const { showConfirmDelete, confirmDeleteMessage, refreshString } = this.state;
+    const fields = this.getFields();
+    const actions = this.getActions();
+    const projectFields = this.getProjectFields();
+    return (
+      <div>
+        <EntityList
+          api="get"
+          itemType="user"
+          itemsType="users"
+          filterFields={fields}
+          tableFields={fields}
+          projectFields={projectFields}
+          actions={actions}
+          refreshString={refreshString}
+        />
+        <ConfirmModal
+          onOk={this.onDeleteOk}
+          onCancel={this.onDeleteClose}
+          show={showConfirmDelete}
+          message={confirmDeleteMessage}
+          labelOk="Yes"
+        />
+      </div>
+    );
+  }
+}
+
+export default connect()(UserList);
