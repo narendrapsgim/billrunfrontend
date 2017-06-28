@@ -53,7 +53,7 @@ class List extends Component {
       case 'timestamp':
         return moment.unix(entity.get(field.id, 0)).format(globalSetting.datetimeFormat);
       case 'fullDate':
-        return moment.unix(entity.getIn([field.id, 'sec'])).format(globalSetting.fullDate);
+        return moment.unix(entity.getIn([field.id, 'sec'])).format(globalSetting.datetimeLongFormat);
       case 'text':
       default:
         return entity.get(field.id, '');

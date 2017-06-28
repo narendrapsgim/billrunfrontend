@@ -29,7 +29,7 @@ const Usage = ({ line, onClickCancel, hiddenFields, cancelLabel, enableRemove, o
       if (key === 'connection_type') {
         formattedValue = changeCase.upperCaseFirst(value);
       } else if (key === 'urt') {
-        formattedValue = moment.unix(value.get('sec')).format(globalSetting.fullDate);
+        formattedValue = moment.unix(value.get('sec')).format(globalSetting.datetimeLongFormat);
       }
       if (!hiddenFields.includes(key)) {
         fields.push(

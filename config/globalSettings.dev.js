@@ -9,10 +9,10 @@ var globalSetting = {
   serverApiDebug: false,
   serverApiDebugQueryString: 'XDEBUG_SESSION_START=netbeans-xdebug',
   datetimeFormat: "DD/MM/YYYY HH:mm",
+  datetimeLongFormat: "DD/MM/YYYY HH:mm:ss",
   dateFormat: "DD/MM/YYYY",
   timeFormat: "HH:mm",
   apiDateFormat: "YYYY-MM-DD",
-  fullDate: "DD/MM/YYYY HH:mm:ss",
   apiDateTimeFormat: "YYYY-MM-DD[T]HH:mm:ss.SSS[Z]",
   currency: '$',
   list: {
