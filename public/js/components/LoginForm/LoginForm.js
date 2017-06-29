@@ -116,14 +116,20 @@ class LoginForm extends Component {
                 { progress && (<span><i className="fa fa-spinner fa-pulse" /> &nbsp;&nbsp;&nbsp;</span>) }
                 Login
               </Button>
-            </fieldset>&nbsp;&nbsp;&nbsp;&nbsp;
-            <Button type="button" bsStyle="link" bsSize="small" block onClick={this.clickResetPassword} disabled={progress}>
-              Forgot Your Password?
-            </Button>
+            </fieldset>
           </Form>
           { (error.length > 0) ? <Alert bsStyle="danger">{error}</Alert> : ''}
+          <Button type="button" bsStyle="link" bsSize="small" block onClick={this.clickResetPassword} disabled={progress}>
+            Forgot Your Password?
+          </Button>
         </Panel>
-        { <ResetPassword show={resetPassword} sending={sending} updateSending={this.updateSending} onCancel={this.onCancel} onResetPass={this.onResetPass} /> }
+        <ResetPassword
+          show={resetPassword}
+          sending={sending}
+          updateSending={this.updateSending}
+          onCancel={this.onCancel}
+          onResetPass={this.onResetPass}
+        />
       </Col>
     );
   }

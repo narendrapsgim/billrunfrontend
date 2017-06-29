@@ -1,15 +1,17 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Col, FormGroup, HelpBlock, ControlLabel, Row, Form, Panel, Button } from 'react-bootstrap';
+import { Col, FormGroup, HelpBlock, InputGroup, Form, Panel, Button } from 'react-bootstrap';
 import { savePassword } from '../../actions/userActions';
-import { showWarning } from '../../actions/alertsActions';
+import { showDanger } from '../../actions/alertsActions';
 import { idSelector, sigSelector, timestampSelector, usernameSelector } from '../../selectors/entitySelector';
+import Field from '../../components/Field';
 
 
 class ChangePassword extends Component {
 
   static propTypes = {
+    auth: PropTypes.bool,
     itemId: PropTypes.string,
     signature: PropTypes.string,
     timestamp: PropTypes.string,
@@ -21,6 +23,7 @@ class ChangePassword extends Component {
   };
 
   static defaultProps = {
+    auth: false,
     itemId: '',
     signature: '',
     timestamp: '',
@@ -35,6 +38,12 @@ class ChangePassword extends Component {
       password1: '',
     },
     sending: false,
+  }
+
+  componentWillMount() {
+    if (this.props.auth === true) {
+      this.props.router.push('/');
+    }
   }
 
   onPasswordChange = (e) => {
@@ -72,67 +81,65 @@ class ChangePassword extends Component {
     });
   };
 
-  onSavePassword = () => {
+  onSavePassword = (e) => {
+    e.preventDefault();
     const { itemId, signature, timestamp } = this.props;
     const { password } = this.state;
 
     if (this.validate()) {
       this.setState({ sending: true });
       this.props.dispatch(savePassword(itemId, signature, timestamp, password, 'changepassword')).then(this.afterSave);
-    } else {
-      this.props.dispatch(showWarning("Passwords don't match or empty"));
     }
   }
 
-  afterSave = () => {
-    this.props.router.push('/login');
+  afterSave = (response) => {
+    this.setState({ sending: false });
+    if (response.status === 1) {
+      this.props.router.push('/login');
+    }
   }
 
-  renderChangePassword = () => {
+  render() {
     const { password, password1, errors, sending } = this.state;
     const { username } = this.props;
     const hasError = errors.password.length > 0 || errors.password1.length > 0;
-    const title = `Choose New Password for ${username}`;
 
     return (
       <Col md={4} mdOffset={4}>
-        <Panel header={title}>
-          <span>
-            <FormGroup validationState={hasError ? 'error' : null} >
-              <Col componentClass={ControlLabel} sm={3} lg={2}>Password</Col>
-              <Col sm={8} lg={9}>
-                <input onChange={this.onPasswordChange} value={password} className="form-control" id="password" type="password" disabled={sending} />
+        <Panel header="Resset Password" className="login-panel">
+          <Form>
+            <fieldset>
+              <FormGroup>
+                <InputGroup>
+                  <InputGroup.Addon><i className="fa fa-user fa-fw" /></InputGroup.Addon>
+                  <Field value={username} disabled={true} />
+                </InputGroup>
+              </FormGroup>
+              <FormGroup validationState={hasError ? 'error' : null} >
+                <InputGroup>
+                  <InputGroup.Addon><i className="fa fa-key fa-fw" /></InputGroup.Addon>
+                  <Field onChange={this.onPasswordChange} value={password} type="password" disabled={sending} placeholder="New password" />
+                </InputGroup>
                 { errors.password.length > 0 && <HelpBlock>{errors.password}</HelpBlock> }
-              </Col>
-            </FormGroup>
-            <FormGroup validationState={errors.password1.length > 0 ? 'error' : null} >
-              <Col componentClass={ControlLabel} sm={3} lg={2}>Confirm</Col>
-              <Col sm={8} lg={9}>
-                <input onChange={this.onPassword1Change} value={password1} className="form-control" id="password1" type="password" disabled={sending} />
+              </FormGroup>
+              <FormGroup validationState={errors.password1.length > 0 ? 'error' : null} >
+                <InputGroup>
+                  <InputGroup.Addon><i className="fa fa-key fa-fw" /></InputGroup.Addon>
+                  <Field onChange={this.onPassword1Change} value={password1} type="password" disabled={sending} placeholder="Confirm new password" />
+                </InputGroup>
                 { errors.password1.length > 0 && <HelpBlock>{errors.password1}</HelpBlock> }
-              </Col>
-            </FormGroup>
-            <Button bsStyle="primary" bsSize="lg" block onClick={this.onSavePassword} disabled={sending}>
+              </FormGroup>
+            </fieldset>
+            <Button type="submit" bsStyle="primary" bsSize="lg" block onClick={this.onSavePassword} disabled={sending}>
               { sending && (<span><i className="fa fa-spinner fa-pulse" /> &nbsp;</span>) }
               Save
             </Button>
-          </span>
+          </Form>
         </Panel>
       </Col>
     );
   }
 
-  render() {
-    return (
-      <Row>
-        <Col lg={12}>
-          <Form horizontal>
-            {this.renderChangePassword()}
-          </Form>
-        </Col>
-      </Row>
-    );
-  }
 }
 
 const mapStateToProps = (state, props) => ({
@@ -140,6 +147,7 @@ const mapStateToProps = (state, props) => ({
   signature: sigSelector(state, props),
   timestamp: timestampSelector(state, props),
   username: usernameSelector(state, props),
+  auth: state.user.get('auth'),
 });
 
 export default withRouter(connect(mapStateToProps)(ChangePassword));
