@@ -9,6 +9,10 @@ import { userDoLogout } from '../../actions/userActions';
 import { toggleOnBoarding } from '../../actions/guiStateActions/pageActions';
 import MenuItem from './MenuItem';
 import SubMenu from './SubMenu';
+import {
+  onBoardingShowSelector,
+  onBoardingIsRunnigSelector,
+} from '../../selectors/guiSelectors';
 
 
 class Navigator extends Component {
@@ -19,18 +23,24 @@ class Navigator extends Component {
     menuItems: Immutable.List(),
     userRoles: [],
     collapseSideBar: false,
+    showOnBoarding: false,
+    runOnBoarding: false,
+    routes: [],
   };
 
   static propTypes = {
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    routes: PropTypes.array,
     menuItems: PropTypes.instanceOf(Immutable.Iterable),
     companyNeme: PropTypes.string,
     logo: PropTypes.string.isRequired,
     userName: PropTypes.string,
     userRoles: PropTypes.array,
     collapseSideBar: PropTypes.bool,
+    showOnBoarding: PropTypes.bool,
+    runOnBoarding: PropTypes.bool,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -47,6 +57,23 @@ class Navigator extends Component {
   }
 
   componentDidMount() {
+    this.setOpenMenusItems();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { routes, collapseSideBar } = this.props;
+    const oldpath = prevProps.routes[prevProps.routes.length - 1].path;
+    const newpath = routes[routes.length - 1].path;
+    if (!collapseSideBar && oldpath !== newpath) {
+      this.setOpenMenusItems();
+    }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onWindowResize);
+  }
+
+  setOpenMenusItems = () => {
     const { router, menuItems } = this.props;
     const { openSubMenu } = this.state;
     menuItems
@@ -59,10 +86,6 @@ class Navigator extends Component {
       });
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.onWindowResize);
-  }
-
   onWindowResize = () => {
     const small = window.innerWidth < 768;
     if (this.state.showCollapseButton !== small) {
@@ -73,10 +96,10 @@ class Navigator extends Component {
       });
     }
   }
+
   toggleOnBoarding = () => {
     this.props.dispatch(toggleOnBoarding());
   }
-
 
   onToggleMenu = () => {
     const { showFullMenu } = this.state;
@@ -132,13 +155,19 @@ class Navigator extends Component {
   }
 
   renderSubMenu = (item, key) => {
+    const { router } = this.props;
     const { openSubMenu } = this.state;
     const id = item.get('id', '');
     const icon = item.get('icon', '');
     const title = item.get('title', '');
-    const subMenus = item.get('subMenus', Immutable.List());
+    const subMenus = item
+      .get('subMenus', Immutable.List())
+      .filter(this.filterEnabledMenu)
+      .filter(this.filterPermission);
+    const isSubmenuActive = subMenus.reduce((acc, subMenu) => (acc || router.isActive(subMenu.get('route', ''))), false);
     return (
       <SubMenu
+        active={isSubmenuActive}
         icon={`fa ${icon} fa-fw`}
         id={id}
         key={key}
@@ -146,11 +175,7 @@ class Navigator extends Component {
         open={openSubMenu.includes(id)}
         title={title}
       >
-        { subMenus
-            .filter(this.filterEnabledMenu)
-            .filter(this.filterPermission)
-            .map(this.renderMenu)
-        }
+        {subMenus.map(this.renderMenu)}
       </SubMenu>
     );
   }
@@ -180,15 +205,12 @@ class Navigator extends Component {
 
   render() {
     const { showCollapseButton, openSmallMenu } = this.state;
-    const { userName, companyNeme, menuItems, logo, collapseSideBar } = this.props;
-    const overallNavClassName = classNames({
-      'navbar navbar-default navbar-fixed-top': true,
+    const { userName, companyNeme, menuItems, logo, collapseSideBar, showOnBoarding, runOnBoarding } = this.props;
+    const overallNavClassName = classNames('navbar', 'navbar-default', 'navbar-fixed-top', {
       'collapse-sizebar': collapseSideBar,
     });
-
-    const mainNavClassName = classNames({
-      'navbar-default sidebar main-menu': true,
-      smallScreenMenu: showCollapseButton && openSmallMenu,
+    const mainNavClassName = classNames('navbar-default', 'sidebar', 'main-menu', {
+      'small-screen-menu': showCollapseButton && openSmallMenu,
     });
     return (
       <nav className={overallNavClassName} id="top-nav" role="navigation">
@@ -207,7 +229,6 @@ class Navigator extends Component {
           </button>
         }
 
-
         <div className="navbar-header">
           <Link to="/" className="navbar-brand" onClick={this.resetMenuActive}>
             <img src={logo} style={{ height: 22 }} alt="Logo" />
@@ -222,9 +243,12 @@ class Navigator extends Component {
         </div>
 
         <ul className="nav navbar-top-links navbar-right">
-          <BootstrapMenuItem eventKey="1" onClick={this.toggleOnBoarding}>
-            <i className="fa fa-question fa-fw" /> Help
-            </BootstrapMenuItem>
+          <BootstrapMenuItem eventKey="1" className={runOnBoarding ? 'running' : ''} onClick={this.toggleOnBoarding} active={showOnBoarding}>
+            {runOnBoarding && !showOnBoarding
+              ? 'Continue Tour'
+              : 'Start Tour'
+            }
+          </BootstrapMenuItem>
           <NavDropdown id="nav-user-menu" title={<span><i className="fa fa-user fa-fw" />{ userName }</span>}>
             <BootstrapMenuItem eventKey="4" onClick={this.clickLogout}>
               <i className="fa fa-sign-out fa-fw" /> Logout
@@ -259,5 +283,7 @@ const mapStateToProps = state => ({
   collapseSideBar: state.guiState.menu.get('collapseSideBar') || undefined,
   userRoles: state.user.get('roles') || undefined,
   logo: state.settings.getIn(['files', 'logo']) || undefined,
+  showOnBoarding: onBoardingShowSelector(state),
+  runOnBoarding: onBoardingIsRunnigSelector(state),
 });
 export default withRouter(connect(mapStateToProps)(Navigator));

@@ -1,7 +1,16 @@
 export const SET_PAGE_TITLE = 'SET_PAGE_TITLE';
 export const SYSTEM_REQUIREMENTS_LOADING_COMPLETE = 'SYSTEM_REQUIREMENTS_LOADING_COMPLETE';
-export const SHOW_ON_BOARDING = 'SHOW_ON_BOARDING';
-export const TOGGLE_BOARDING = 'TOGGLE_BOARDING';
+export const ONBOARDING_SHOW = 'SHOW_ON_BOARDING';
+export const ONBOARDING_TOGGLE = 'TOGGLE_BOARDING';
+export const ONBOARDING_SET_STEP = 'SET_ON_BOARDING_STEP';
+export const ONBOARDING_SET_STATE = 'SET_ON_BOARDING_STATE';
+
+
+export const onBoardingStates = {
+  READY: 'READY',
+  RUNNING: 'RUNNING',
+  FINISHED: 'FINISHED',
+};
 
 export function setPageTitle(title) {
   return {
@@ -23,10 +32,20 @@ export function systemRequirementsLoadingComplete() {
 }
 
 export const showOnBoarding = (show = false) => ({
-  type: SHOW_ON_BOARDING,
+  type: ONBOARDING_SHOW,
   show,
 });
 
-export const toggleOnBoarding = (show = false) => ({
-  type: TOGGLE_BOARDING,
+export const toggleOnBoarding = () => ({
+  type: ONBOARDING_TOGGLE,
+});
+
+export const setOnBoardingStep = (step = 0) => ({
+  type: ONBOARDING_SET_STEP,
+  step,
+});
+
+export const setOnBoardingState = (state = onBoardingStates.READY) => ({
+  type: ONBOARDING_SET_STATE,
+  state,
 });

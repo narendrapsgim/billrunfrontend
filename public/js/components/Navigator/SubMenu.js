@@ -1,31 +1,54 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {Link, withRouter} from 'react-router';
-import classNames from "classnames";
-import { NavDropdown, Button } from "react-bootstrap";
+import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
+import classNames from 'classnames';
 
-const SubMenu = (props) =>{
-    const { id, open, icon, title, children} = props;
+const SubMenu = (props) => {
+  const { id, open, active, icon, title, children } = props;
 
-    const onClick = (e) => {
-        e.preventDefault();
-        props.onClick(id);
-    };
+  const onClick = (e) => {
+    e.preventDefault();
+    props.onClick(id);
+  };
 
+  const liClass = classNames('sub-menu', {
+    open,
+  });
 
-    return  (
-        <li className={open?"open" :""}>
-            <a href  id={id} onClick={onClick}>
-                <i className={icon} /><span>{title}</span>
-                <span className="fa arrow"></span>
-            </a>
-            {/*<ul className={classNames({'nav nav-second-level': true, 'collapse': this.state.uiOpenSetting})}>*/}
-            <ul className="nav nav-second-level">
-                { children}
-            </ul>
-        </li>
-    );
+  const aClass = classNames({
+    active,
+  });
+
+  return (
+    <li className={liClass}>
+      <a href id={id} onClick={onClick} className={aClass}>
+        <i className={icon} /><span>{title}</span>
+        <span className="fa arrow" />
+      </a>
+      <ul className="nav nav-second-level">
+        { children }
+      </ul>
+    </li>
+  );
+};
+
+SubMenu.defaultProps = {
+  children: null,
+  id: '',
+  title: '',
+  icon: '',
+  open: false,
+  active: false,
+  onClick: () => {},
+};
+
+SubMenu.propTypes = {
+  children: PropTypes.node,
+  id: PropTypes.string,
+  title: PropTypes.string,
+  icon: PropTypes.string,
+  open: PropTypes.bool,
+  active: PropTypes.bool,
+  onClick: PropTypes.func,
 };
 
 export default connect()(SubMenu);

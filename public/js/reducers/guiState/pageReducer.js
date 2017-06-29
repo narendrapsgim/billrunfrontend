@@ -2,8 +2,11 @@ import Immutable from 'immutable';
 import {
   SET_PAGE_TITLE,
   SYSTEM_REQUIREMENTS_LOADING_COMPLETE,
-  SHOW_ON_BOARDING,
-  TOGGLE_BOARDING,
+  ONBOARDING_SHOW,
+  ONBOARDING_TOGGLE,
+  ONBOARDING_SET_STEP,
+  ONBOARDING_SET_STATE,
+  onBoardingStates,
 } from '../../actions/guiStateActions/pageActions';
 import { LOGIN } from '../../actions/userActions';
 
@@ -11,7 +14,11 @@ import { LOGIN } from '../../actions/userActions';
 const defaultState = Immutable.Map({
   title: ' ',
   systemRequirementsLoad: false,
-  onBoarding: false,
+  onBoarding: Immutable.Map({
+    show: false,
+    step: 0,
+    state: onBoardingStates.READY,
+  }),
 });
 
 const pageReducer = (state = defaultState, action) => {
@@ -25,18 +32,26 @@ const pageReducer = (state = defaultState, action) => {
       return state.set('systemRequirementsLoad', true);
     }
 
-    case SHOW_ON_BOARDING: {
-      return state.set('onBoarding', action.show);
+    case ONBOARDING_SHOW: {
+      return state.setIn(['onBoarding', 'show'], action.show);
+    }
+
+    case ONBOARDING_SET_STEP: {
+      return state.setIn(['onBoarding', 'step'], action.step);
+    }
+
+    case ONBOARDING_SET_STATE: {
+      return state.setIn(['onBoarding', 'state'], action.state);
     }
 
     case LOGIN: {
       if (action.data && action.data.last_login === null) {
-        return state.set('onBoarding', true);
+        return state.setIn(['onBoarding', 'show'], true);
       }
       return state;
     }
-    case TOGGLE_BOARDING: {
-      return state.set('onBoarding', !state.get('onBoarding', true));
+    case ONBOARDING_TOGGLE: {
+      return state.setIn(['onBoarding', 'show'], !state.getIn(['onBoarding', 'show'], true));
     }
 
     default:
