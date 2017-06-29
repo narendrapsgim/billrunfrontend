@@ -2,13 +2,17 @@ import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
-import Field from '../../Field';
-import { ModalWrapper } from '../../Elements';
+import changeCase from 'change-case';
+import Field from '../Field';
+import { ModalWrapper } from '../Elements';
 
-const UsageTypeForm = ({ item, onCancel, onSave, onUpdateItem, propertyTypes }) => {
+const UsageTypeForm = (props) => {
+  const { item, onCancel, onSave, onUpdateItem, propertyTypes, selectUoms } = props;
   const onChangeField = (e) => {
     const { id, value } = e.target;
-    onUpdateItem(id, value);
+    const keys = (id === 'label' ? ['usage_type', 'label'] : [id]);
+    const values = (id === 'label' ? [changeCase.snakeCase(value), value] : [value]);
+    onUpdateItem(keys, values);
   };
 
   const onChangePropertyType = (value) => {
@@ -35,21 +39,12 @@ const UsageTypeForm = ({ item, onCancel, onSave, onUpdateItem, propertyTypes }) 
   const uom = getAvailableUom();
 
   return (
-    <ModalWrapper title="Edit Usage Type" show={true} onOk={onSave} onCancel={onCancel} labelOk="Save" >
+    <ModalWrapper title="Usage Type" show={true} onOk={onSave} onCancel={onCancel} labelOk="Save" >
       <Form horizontal>
 
         <FormGroup>
           <Col componentClass={ControlLabel} md={4}>
             Usage Type
-          </Col>
-          <Col sm={5}>
-            <Field id="usage_type" onChange={onChangeField} value={item.get('usage_type', '')} />
-          </Col>
-        </FormGroup>
-
-        <FormGroup>
-          <Col componentClass={ControlLabel} md={4}>
-            Label
           </Col>
           <Col sm={5}>
             <Field id="label" onChange={onChangeField} value={item.get('label', '')} />
@@ -70,33 +65,34 @@ const UsageTypeForm = ({ item, onCancel, onSave, onUpdateItem, propertyTypes }) 
           </Col>
         </FormGroup>
 
-        <FormGroup>
-          <Col componentClass={ControlLabel} md={4}>
-            Invoice Unit of Measure
-          </Col>
-          <Col sm={5}>
-            <Select
-              id="invoice_uom"
-              onChange={onChangeInvoiceUom}
-              value={item.get('invoice_uom', '')}
-              options={uom}
-            />
-          </Col>
-        </FormGroup>
-
-        <FormGroup>
-          <Col componentClass={ControlLabel} md={4}>
-            Default Unit of Measure
-          </Col>
-          <Col sm={5}>
-            <Select
-              id="input_uom"
-              onChange={onChangeInputUom}
-              value={item.get('input_uom', '')}
-              options={uom}
-            />
-          </Col>
-        </FormGroup>
+        {selectUoms &&
+          [(<FormGroup>
+            <Col componentClass={ControlLabel} md={4}>
+              Invoice Unit of Measure
+            </Col>
+            <Col sm={5}>
+              <Select
+                id="invoice_uom"
+                onChange={onChangeInvoiceUom}
+                value={item.get('invoice_uom', '')}
+                options={uom}
+              />
+            </Col>
+          </FormGroup>),
+          (<FormGroup>
+            <Col componentClass={ControlLabel} md={4}>
+              Default Unit of Measure
+            </Col>
+            <Col sm={5}>
+              <Select
+                id="input_uom"
+                onChange={onChangeInputUom}
+                value={item.get('input_uom', '')}
+                options={uom}
+              />
+            </Col>
+          </FormGroup>)]
+      }
 
       </Form>
     </ModalWrapper>
@@ -109,11 +105,13 @@ UsageTypeForm.propTypes = {
   onSave: PropTypes.func.isRequired,
   onUpdateItem: PropTypes.func.isRequired,
   propertyTypes: PropTypes.instanceOf(Immutable.List),
+  selectUoms: PropTypes.bool,
 };
 
 UsageTypeForm.defaultProps = {
   item: Immutable.Map(),
   propertyTypes: Immutable.List(),
+  selectUoms: false,
 };
 
 export default UsageTypeForm;

@@ -83,7 +83,6 @@ const convert = (settings) => {
 	return {
 	  usaget: usaget.usaget,
 	  pattern: usaget.pattern.replace("/^", "").replace("$/", ""),
-    property_type: usaget.property_type,
     unit: usaget.unit,
 	}
       })
@@ -350,7 +349,6 @@ export function saveInputProcessorSettings(state, parts = []) {
     const processor_settings = state.get('usaget_type') === "static"
     ? {
       default_usaget: processor.get('default_usaget'),
-      default_property_type: processor.get('default_property_type'),
       default_unit: processor.get('default_unit'),
     }
     : {
@@ -358,7 +356,6 @@ export function saveInputProcessorSettings(state, parts = []) {
         src_field: processor.get('src_field'),
         pattern: usaget.get('pattern'),
         usaget: usaget.get('usaget'),
-        property_type: usaget.get('property_type'),
         unit: usaget.get('unit'),
       })).toJS(),
     };
