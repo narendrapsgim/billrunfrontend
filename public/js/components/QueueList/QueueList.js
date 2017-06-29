@@ -148,7 +148,7 @@ class QueueList extends Component {
     { id: 'type', title: 'Type' },
     { id: 'calc_time', title: 'Last Calculation Time', sort: true, parser: this.parseCalcTime, cssClass: 'long-date' },
     { id: 'calc_name', title: 'Calculator Stage', sort: true, parser: this.parseCalcName },
-    { id: 'urt', title: 'Time', type: 'datetime', cssClass: 'long-date' },
+    { id: 'urt', title: 'Time', type: 'datetime', cssClass: 'long-date', sort: true },
   ]);
 
   renderPanelTitle = () => (
