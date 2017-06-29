@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
+import Select from 'react-select';
 import Field from '../Field';
 import { getSettings } from '../../actions/settingsActions';
 import { entityFieldSelector } from '../../selectors/settingsSelector';
@@ -13,6 +14,7 @@ class EntityFields extends Component {
     entity: PropTypes.instanceOf(Immutable.Map),
     entityName: PropTypes.string.isRequired,
     fields: PropTypes.instanceOf(Immutable.List),
+    fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
     onChangeField: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
@@ -21,6 +23,7 @@ class EntityFields extends Component {
   static defaultProps = {
     entity: Immutable.Map(),
     fields: Immutable.List(),
+    fieldsFilter: null,
     editable: true,
     onChangeField: () => {},
   }
@@ -32,37 +35,74 @@ class EntityFields extends Component {
     }
   }
 
-  filterPrinableFields = field => (field.get('display', false) !== false && field.get('editable', false) !== false);
-
-  onChangeField = (field, e) => {
-    const { value } = e.target;
-    this.props.onChangeField(field, value);
-  }
+  filterPrintableFields = field => (field.get('display', false) !== false && field.get('editable', false) !== false);
 
   renderField = (field, key) => {
     const { entity, editable } = this.props;
     const fieldName = field.get('field_name', '');
     const fieldNamePath = fieldName.split('.');
-    const value = entity.getIn(fieldNamePath, '');
+    const multiple = field.get('multiple', false);
+    const selectList = field.get('select_list', false);
+    const multipleOptions = !selectList ? [] : field.get('select_options', '').split(',').map(option => ({ value: option, label: option }));
+    const hasOptions = multipleOptions.length > 0;
+    const isSelect = multiple && hasOptions;
+    const isTags = multiple && !hasOptions;
+    const sm = isSelect ? 4 : 8;
+    const lg = isSelect ? 4 : 9;
     const onChange = (e) => {
-      this.onChangeField(fieldNamePath, e);
+      const { value } = e.target;
+      this.props.onChangeField(fieldNamePath, value);
+    };
+    const onChangeSelect = (val) => {
+      this.props.onChangeField(fieldNamePath, val.split(','));
+    };
+    const onChangeTags = (val) => {
+      this.props.onChangeField(fieldNamePath, val);
+    };
+    const getFieldValue = () => {
+      const fieldVal = entity.getIn(fieldNamePath, []);
+      if (isTags && editable) {
+        return Immutable.List.isList(fieldVal) ? fieldVal.toArray() : fieldVal;
+      }
+      return (Array.isArray(fieldVal) || Immutable.List.isList(fieldVal)) ? fieldVal.join(',') : fieldVal;
+    };
+    const renderField = () => {
+      const value = getFieldValue();
+      if (isSelect && editable) {
+        return (<Select
+          id={fieldName}
+          multi={multiple}
+          value={value}
+          onChange={onChangeSelect}
+          options={multipleOptions}
+        />);
+      }
+      if (isTags && editable) {
+        return (<Field
+          fieldType="tags"
+          value={value}
+          onChange={onChangeTags}
+        />);
+      }
+      return (<Field onChange={onChange} id={fieldName} value={value} editable={editable} />);
     };
     return (
       <FormGroup controlId={fieldName} key={key} >
         <Col componentClass={ControlLabel} sm={3} lg={2}>
           { field.get('title', fieldName) }
         </Col>
-        <Col sm={8} lg={9}>
-          <Field onChange={onChange} id={fieldName} value={value} editable={editable} />
+        <Col sm={sm} lg={lg}>
+          {renderField()}
         </Col>
       </FormGroup>
     );
   };
 
   renderFields = () => {
-    const { fields } = this.props;
+    const { fields, fieldsFilter } = this.props;
+    const fieldFilterFunction = fieldsFilter !== null ? fieldsFilter : this.filterPrintableFields;
     return fields
-      .filter(this.filterPrinableFields)
+      .filter(fieldFilterFunction)
       .map(this.renderField);
   }
 
