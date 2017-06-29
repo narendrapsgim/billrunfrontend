@@ -3,10 +3,9 @@ import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { Panel, Col, Row, Button } from 'react-bootstrap';
 import List from '../../components/List';
-import { ConfirmModal } from '../Elements';
-import { getSettings, updateSetting, removeSettingField } from '../../actions/settingsActions';
+import { getSettings, updateSetting } from '../../actions/settingsActions';
 import { usageTypesDataSelector, propertyTypeSelector } from '../../selectors/settingsSelector';
-import UsageTypeForm from './UsageTypes/UsageTypeForm';
+import UsageTypeForm from '../UsageTypes/UsageTypeForm';
 
 class UsageTypes extends Component {
 
@@ -22,8 +21,6 @@ class UsageTypes extends Component {
   };
 
   state = {
-    showConfirmRemove: false,
-    itemToRemove: null,
     currentItem: null,
     index: -1,
   }
@@ -44,20 +41,6 @@ class UsageTypes extends Component {
     });
   };
 
-  onClickRemove = (item) => {
-    this.setState({
-      showConfirmRemove: true,
-      itemToRemove: item,
-    });
-  }
-
-  onClickRemoveClose = () => {
-    this.setState({
-      showConfirmRemove: false,
-      itemToRemove: null,
-    });
-  }
-
   onCancel = () => {
     this.setState({ currentItem: null });
   }
@@ -74,18 +57,10 @@ class UsageTypes extends Component {
     const values = Array.isArray(fieldValues) ? fieldValues : [fieldValues];
     this.setState({
       currentItem: currentItem.withMutations((itemwithMutations) => {
-        for (let i = 0; i < keys.length; i++) {
-          itemwithMutations.set(keys[i], values[i]);
-        }
+        keys.forEach((key, index) => itemwithMutations.set(key, values[index]));
       }),
     });
   };
-
-  onClickRemoveOk = () => {
-    const { itemToRemove } = this.state;
-    this.setState({ showConfirmRemove: false, itemToRemove: null });
-    this.props.dispatch(removeSettingField('usage_types', this.getItemIndex(itemToRemove)));
-  }
 
   onClickNew = () => {
     const { usageTypes } = this.props;
@@ -125,17 +100,14 @@ class UsageTypes extends Component {
 
   getListActions = () => [
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEdit },
-    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove },
   ]
 
   render() {
     const { propertyTypes } = this.props;
-    const { showConfirmRemove, currentItem, itemToRemove } = this.state;
-    const removeConfirmMessage = `Are you sure you want to remove usage type ${itemToRemove ? itemToRemove.get('usage_type', '') : ''}?`;
+    const { currentItem } = this.state;
 
     return (
       <div>
-        <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
         <Row>
           <Col lg={12}>
             <Panel header={this.renderPanelHeader()}>
@@ -151,6 +123,7 @@ class UsageTypes extends Component {
             onUpdateItem={this.onUpdateItem}
             onSave={this.handleSave}
             onCancel={this.onCancel}
+            selectUoms
           />
         }
       </div>
