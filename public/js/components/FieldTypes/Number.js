@@ -17,7 +17,7 @@ const Number = (props) => {
   }
 
   return (
-    <div className="non-editable-field">(<span>{parseFloat(value)}</span>);</div>
+    <div className="non-editable-field"><span>{parseFloat(value)}</span></div>
   );
 };
 
