@@ -206,6 +206,7 @@ export default class Product extends Component {
         index={i}
         item={price}
         key={i}
+        unit={this.getUnit()}
         onProductEditRate={this.onProductRateUpdate}
         onProductRemoveRate={this.onProductRateRemove}
       />
@@ -234,10 +235,15 @@ export default class Product extends Component {
     ).toList();
   }
 
+  getUnit = () => {
+    const { product, usaget } = this.props;
+    return product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'range_unit'], '');
+  }
+
   render() {
     const { errors } = this.state;
     const { product, usaget, mode } = this.props;
-    const unit = product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'range_unit'], '');
+    const unit = this.getUnit();
     const vatable = (product.get('vatable', true) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
     const pricingMethod = product.get('pricing_method', '');

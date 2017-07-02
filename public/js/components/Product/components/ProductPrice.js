@@ -10,6 +10,7 @@ export default class ProductPrice extends Component {
     count: PropTypes.number.isRequired,
     item: PropTypes.object.isRequired,
     mode: PropTypes.string,
+    unit: PropTypes.string,
     productUnlimitedValue: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -21,6 +22,7 @@ export default class ProductPrice extends Component {
   static defaultProps = {
     productUnlimitedValue: globalSetting.productUnlimitedValue,
     mode: 'create',
+    unit: '',
   };
 
   state = { fromError: '', toError: '', intervalError: '', priceError: '' }
@@ -103,7 +105,7 @@ export default class ProductPrice extends Component {
   }
 
   render() {
-    const { item, index, count, productUnlimitedValue, mode } = this.props;
+    const { item, index, count, productUnlimitedValue, mode, unit } = this.props;
     const isFirst = index === 0;
     const isLast = ((count === 0) || (count - 1 === index));
     const from = Number(item.get('from', 0));
@@ -116,7 +118,7 @@ export default class ProductPrice extends Component {
       <Row className="form-inner-edit-row">
         <Col lg={2} md={2} sm={2} xs={5} >
           <FormGroup validationState={this.state.fromError.length > 0 ? 'error' : null} style={{ margin: 0 }}>
-            {isFirst && <ControlLabel>From</ControlLabel>}
+            {isFirst && <ControlLabel>{`From (${unit})`}</ControlLabel>}
             <Field value={fromDisplayValue} disabled={true} editable={editable} />
             { this.state.fromError.length > 0 ? <HelpBlock>{this.state.fromError}</HelpBlock> : ''}
           </FormGroup>
@@ -124,7 +126,7 @@ export default class ProductPrice extends Component {
 
         <Col lg={2} md={2} sm={2} xs={5} >
           <FormGroup validationState={this.state.toError.length > 0 ? 'error' : null} style={{ margin: 0 }}>
-            { isFirst && <ControlLabel>To</ControlLabel> }
+            { isFirst && <ControlLabel>{`To (${unit})`}</ControlLabel> }
             { (to === productUnlimitedValue)
               ? <Field value={toDisplayValue} disabled={true} editable={editable} />
               : <Field value={toDisplayValue} onChange={this.onEditTo} fieldType="number" min={0} editable={editable} />
@@ -135,7 +137,7 @@ export default class ProductPrice extends Component {
 
         <Col lg={2} md={2} sm={2} xs={5} >
           <FormGroup validationState={this.state.intervalError.length > 0 ? 'error' : null} style={{ margin: 0 }}>
-            {isFirst && <ControlLabel>Interval</ControlLabel>}
+            {isFirst && <ControlLabel>{`Interval (${unit})`}</ControlLabel>}
             <Field value={item.get('interval', '')} onChange={this.onEditInterval} fieldType="number" min={0} editable={editable} />
             { this.state.intervalError.length > 0 ? <HelpBlock>{this.state.intervalError}</HelpBlock> : ''}
           </FormGroup>
