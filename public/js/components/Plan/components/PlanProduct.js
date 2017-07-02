@@ -99,6 +99,7 @@ export default class PlanProduct extends Component {
 
   render() {
     const { item, prices, usaget, mode } = this.props;
+    const unit = prices.getIn([0, 'range_unit'], '');
     const editable = (mode !== 'view');
     const priceCount = prices.size;
     const header = (
@@ -118,6 +119,7 @@ export default class PlanProduct extends Component {
             index={i}
             mode={mode}
             count={priceCount}
+            unit={unit}
             onProductEditRate={this.onProductEditRate}
             onProductRemoveRate={this.onProductRemoveRate}
           />
