@@ -44,6 +44,7 @@ var globalSetting = {
         { id: 'stamp' },
         { id: 'in_group', type: 'number' },
         { id: 'aprice', type: 'number' },
+        { id: 'final_charge', type: 'number' },
         { id: 'file' },
         { id: 'billsec', type: 'number' },
         { id: 'sid', type: 'number' },
