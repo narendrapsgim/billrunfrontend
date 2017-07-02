@@ -50,8 +50,9 @@ class UsageTypesSelector extends Component {
   }
 
   onChangeUsaget = (usaget) => {
-    this.setState({ selectedUsaget: usaget });
-    this.props.onChangeUsaget(usaget.get('usage_type', ''));
+    const usageType = usaget || Immutable.Map();
+    this.setState({ selectedUsaget: usageType });
+    this.props.onChangeUsaget(usageType.get('usage_type', ''));
     this.onChangeUnit('');
   }
 

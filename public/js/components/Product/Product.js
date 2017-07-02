@@ -10,6 +10,7 @@ import ProductPrice from './components/ProductPrice';
 import ProductParam from './components/ProductParam';
 import ProductParamEdit from './components/ProductParamEdit';
 import EntityFields from '../Entity/EntityFields';
+import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
 
 
 export default class Product extends Component {
@@ -19,7 +20,6 @@ export default class Product extends Component {
     mode: PropTypes.string.isRequired,
     usaget: PropTypes.string,
     planName: PropTypes.string,
-    usageTypes: PropTypes.object.isRequired,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
     onProductRateAdd: PropTypes.func.isRequired,
@@ -31,6 +31,7 @@ export default class Product extends Component {
   static defaultProps = {
     planName: 'BASE',
     product: Immutable.Map(),
+    usaget: '',
     errorMessages: {
       name: {
         allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
@@ -77,6 +78,18 @@ export default class Product extends Component {
   onChangeUsaget = (value) => {
     const { usaget } = this.props;
     this.props.onUsagetUpdate(['rates'], usaget, value);
+  }
+
+  onChangeUnit = (unit) => {
+    const { product, planName, usaget } = this.props;
+    const ratePath = ['rates', usaget, planName, 'rate'];
+    const rates = product.getIn(ratePath, Immutable.List());
+    rates.forEach((rate, index) => {
+      const rangeUnitsPath = [...ratePath, index, 'range_unit'];
+      const intervalUnitsPath = [...ratePath, index, 'interval_unit'];
+      this.props.onFieldUpdate(rangeUnitsPath, unit);
+      this.props.onFieldUpdate(intervalUnitsPath, unit);
+    });
   }
 
   onChangeVatable = (e) => {
@@ -177,11 +190,6 @@ export default class Product extends Component {
     this.props.onProductRateRemove(productPath, index);
   }
 
-  getUsageTypesOptions = () => {
-    const { usageTypes } = this.props;
-    return usageTypes.map(usaget => ({ value: usaget, label: usaget })).toJS();
-  }
-
   onChangeAdditionalField = (field, value) => {
     this.props.onFieldUpdate(field, value);
   }
@@ -229,6 +237,7 @@ export default class Product extends Component {
   render() {
     const { errors } = this.state;
     const { product, usaget, mode } = this.props;
+    const unit = product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'range_unit'], '');
     const vatable = (product.get('vatable', true) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
     const pricingMethod = product.get('pricing_method', '');
@@ -292,17 +301,16 @@ export default class Product extends Component {
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
                 <Col sm={4}>
-                  { editable
+                  { editable && ['clone', 'create'].includes(mode)
                     ? (
-                      <Select
-                        allowCreate
-                        disabled={!['clone', 'create'].includes(mode)}
-                        onChange={this.onChangeUsaget}
-                        options={this.getUsageTypesOptions()}
-                        value={usaget}
+                      <UsageTypesSelector
+                        usaget={usaget}
+                        unit={unit}
+                        onChangeUsaget={this.onChangeUsaget}
+                        onChangeUnit={this.onChangeUnit}
                       />
                     )
-                    : <div className="non-editable-field">{ usaget }</div>
+                    : <div className="non-editable-field">{ `${usaget} (${unit})` }</div>
                   }
                 </Col>
               </FormGroup>

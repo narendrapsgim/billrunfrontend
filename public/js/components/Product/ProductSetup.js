@@ -214,7 +214,7 @@ class ProductSetup extends Component {
   }
 
   render() {
-    const { item, usageTypes, mode, revisions } = this.props;
+    const { item, mode, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -248,7 +248,6 @@ class ProductSetup extends Component {
             planName="BASE"
             product={item}
             usaget={usaget}
-            usageTypes={usageTypes}
           />
         </Panel>
 
