@@ -103,7 +103,9 @@ class UsageTypesSelector extends Component {
     const { propertyTypes } = this.props;
     const { selectedUsaget } = this.state;
     const uom = (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
-    return uom.map(unit => ({ value: unit.get('name', ''), label: unit.get('label', '') })).toArray();
+    return uom
+      .filter(unit => unit.get('unit', false) !== false)
+      .map(unit => ({ value: unit.get('name', ''), label: unit.get('label', '') })).toArray();
   }
 
   renderUsageTypeSelect = () => {
