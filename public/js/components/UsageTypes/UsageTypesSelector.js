@@ -18,6 +18,7 @@ class UsageTypesSelector extends Component {
     onChangeUsaget: PropTypes.func,
     onChangeUnit: PropTypes.func,
     enabled: PropTypes.bool,
+    showUnits: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -28,31 +29,19 @@ class UsageTypesSelector extends Component {
     onChangeUsaget: () => {},
     onChangeUnit: () => {},
     enabled: true,
+    showUnits: true,
   };
 
   state = {
     currentItem: null,
-    selectedUsaget: Immutable.Map(),
   }
 
   componentWillMount() {
     this.props.dispatch(getSettings(['usage_types', 'property_types']));
   }
 
-  componentDidMount() {
-    this.loadSelectedUsaget();
-  }
-
-  loadSelectedUsaget = () => {
-    const { usageTypes, usaget } = this.props;
-    const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
-    this.setState({ selectedUsaget });
-  }
-
   onChangeUsaget = (usaget) => {
-    const usageType = usaget || Immutable.Map();
-    this.setState({ selectedUsaget: usageType });
-    this.props.onChangeUsaget(usageType.get('usage_type', ''));
+    this.props.onChangeUsaget(usaget);
     this.onChangeUnit('');
   }
 
@@ -67,10 +56,7 @@ class UsageTypesSelector extends Component {
   onSaveNewUsageType = () => {
     const { usageTypes } = this.props;
     const { currentItem } = this.state;
-    this.setState({
-      currentItem: null,
-      selectedUsaget: currentItem,
-    });
+    this.setState({ currentItem: null });
     this.props.dispatch(updateSetting('usage_types', usageTypes.size, currentItem));
     this.props.dispatch(saveSettings('usage_types'));
     this.props.onChangeUsaget(currentItem.get('usage_type', ''));
@@ -94,14 +80,14 @@ class UsageTypesSelector extends Component {
   getAvailableUsageTypes = () => {
     const { usageTypes } = this.props;
     return usageTypes.map(usaget => ({
-      value: usaget,
+      value: usaget.get('usage_type', ''),
       label: usaget.get('label', ''),
     })).toJS();
   }
 
   getAvailableUnits = () => {
-    const { propertyTypes } = this.props;
-    const { selectedUsaget } = this.state;
+    const { propertyTypes, usageTypes, usaget } = this.props;
+    const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
     const uom = (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
     return uom
       .filter(unit => unit.get('unit', false) !== false)
@@ -151,9 +137,10 @@ class UsageTypesSelector extends Component {
   };
 
   render() {
+    const { showUnits } = this.props;
     return (
-      <Col md={12}>
-        <Col md={6}>
+      <span>
+        <Col md={7}>
           <FormGroup>
             <InputGroup>
               <InputGroup.Button>
@@ -163,11 +150,11 @@ class UsageTypesSelector extends Component {
             </InputGroup>
           </FormGroup>
         </Col>
-        <Col md={4}>
-          {this.renderUnitSelect()}
+        <Col md={5}>
+          {showUnits && this.renderUnitSelect()}
         </Col>
         {this.renderNewUsageTypeForm()}
-      </Col>
+      </span>
     );
   }
 }
