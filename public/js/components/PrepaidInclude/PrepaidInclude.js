@@ -9,6 +9,10 @@ const PrepaidInclude = (props) => {
   const { usageTypes, prepaidInclude, chargingByOptions, mode } = props;
 
   const onSelectChange = id => (value) => {
+    if (id === 'charging_by') {
+      const val = (value === 'total_cost' ? 'total_cost' : '');
+      onSelectChange('charging_by_usaget')(val);
+    }
     props.onChangeField({ target: { id, value } });
   };
 
@@ -22,7 +26,6 @@ const PrepaidInclude = (props) => {
 
   const renderChargingBy = () => {
     if (editable) {
-      onSelectChange('charging_by_usaget')('total_cost');
       return (
         <Select disabled={true} value="All" />
       );
