@@ -99,7 +99,7 @@ export default class PlanProduct extends Component {
 
   render() {
     const { item, prices, usaget, mode } = this.props;
-    const unit = prices.getIn([0, 'range_unit'], '');
+    const unit = prices.getIn([0, 'uom_display', 'range'], '');
     const editable = (mode !== 'view');
     const priceCount = prices.size;
     const header = (

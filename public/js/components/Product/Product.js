@@ -85,8 +85,8 @@ export default class Product extends Component {
     const ratePath = ['rates', usaget, planName, 'rate'];
     const rates = product.getIn(ratePath, Immutable.List());
     rates.forEach((rate, index) => {
-      const rangeUnitsPath = [...ratePath, index, 'range_unit'];
-      const intervalUnitsPath = [...ratePath, index, 'interval_unit'];
+      const rangeUnitsPath = [...ratePath, index, 'uom_display', 'range'];
+      const intervalUnitsPath = [...ratePath, index, 'uom_display', 'interval'];
       this.props.onFieldUpdate(rangeUnitsPath, unit);
       this.props.onFieldUpdate(intervalUnitsPath, unit);
     });
@@ -237,7 +237,7 @@ export default class Product extends Component {
 
   getUnit = () => {
     const { product, usaget } = this.props;
-    return product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'range_unit'], '');
+    return product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
   }
 
   render() {
