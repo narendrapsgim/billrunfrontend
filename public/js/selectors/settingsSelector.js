@@ -33,6 +33,9 @@ const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
 const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['subscribers', 'subscriber', 'fields']);
 
+const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['rates', 'fields']);
+
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
     const importLinkers = accountfields.filter(isLinkerField);
@@ -117,6 +120,20 @@ const selectCustomKeys = (inputProssesors) => {
   return options.toList();
 };
 
+const selectRatingParams = (inputProssesors) => {
+  let options = Immutable.Set();
+  inputProssesors.forEach((inputProssesor) => {
+    const ratingCalculators = inputProssesor.get('rate_calculators', Immutable.Map());
+    ratingCalculators.forEach((fields) => {
+      const currentFields = fields
+      .filter(field => field.get('rate_key', '').startsWith('params.'))
+      .map(field => field.get('rate_key', ''));
+      options = options.concat(currentFields);
+    });
+  });
+  return options.toList();
+};
+
 const sortFieldOption = (optionsA, optionB) => {
   const a = optionsA.get('title', '').toUpperCase(); // ignore upper and lowercase
   const b = optionB.get('title', '').toUpperCase(); // ignore upper and lowercase
@@ -129,6 +146,37 @@ const sortFieldOption = (optionsA, optionB) => {
   return 0;
 };
 
+const selectLinesFields = (customKeys) => {
+  const predefinedFileds = getConfig(['reports', 'fields', 'usage'], Immutable.List());
+  return Immutable.List().withMutations((optionsWithMutations) => {
+    // Set predefined fields
+    predefinedFileds.forEach((predefinedFiled) => {
+      if (predefinedFiled.has('title')) {
+        optionsWithMutations.push(predefinedFiled);
+      } else {
+        const fieldName = getFieldName(predefinedFiled.get('id', ''), 'lines');
+        const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
+        optionsWithMutations.push(predefinedFiled.set('title', title));
+      }
+    });
+    // Set custom fields
+    customKeys.forEach((customKey) => {
+      if (predefinedFileds.findIndex(predefinedFiled => predefinedFiled.get('id', '') === customKey) === -1) {
+        const fieldName = getFieldName(customKey, 'lines');
+        const title = fieldName === customKey ? sentenceCase(fieldName) : fieldName;
+        optionsWithMutations.push(Immutable.Map({
+          id: `uf.${customKey}`,
+          title: `${title}`,
+          searchable: true,
+          aggregatable: true,
+        }));
+      }
+    });
+  })
+  .sort(sortFieldOption);
+};
+
+
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
   selectCsiOptions,
@@ -138,6 +186,17 @@ export const inputProssesorCustomKeysSelector = createSelector(
   getInputProssesors,
   selectCustomKeys,
 );
+
+export const inputProssesorRatingParamsSelector = createSelector(
+  getInputProssesors,
+  selectRatingParams,
+);
+
+export const linesFiledsSelector = createSelector(
+  inputProssesorCustomKeysSelector,
+  selectLinesFields,
+);
+
 
 export const taxationSelector = createSelector(
   getTaxation,
@@ -219,6 +278,11 @@ export const subscriberImportFieldsSelector = createSelector(
   subscriberFieldsSelector,
   accountImportFieldsSelector,
   selectSubscriberImportFields,
+);
+
+export const productFieldsSelector = createSelector(
+  getProductFields,
+  productFields => productFields,
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {

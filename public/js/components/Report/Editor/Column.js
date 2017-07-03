@@ -14,6 +14,7 @@ class Column extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     idx: PropTypes.number,
     disabled: PropTypes.bool,
+    isCountColumn: PropTypes.bool,
     type: PropTypes.number,
     fieldsConfig: PropTypes.instanceOf(Immutable.List),
     operators: PropTypes.instanceOf(Immutable.List),
@@ -27,6 +28,7 @@ class Column extends Component {
     item: Immutable.Map(),
     idx: 0,
     disabled: false,
+    isCountColumn: false,
     type: reportTypes.SIMPLE,
     fieldsConfig: Immutable.List(),
     operators: Immutable.List(),
@@ -78,7 +80,16 @@ class Column extends Component {
     const { operators } = this.props;
     const config = this.getConfig();
     return operators
-      .filter(operator => operator.get('types', Immutable.List()).includes(config.get('type', 'string')))
+      .filter((option) => {
+        const optionFieldTypes = option.get('types', Immutable.List());
+        const optionFieldExclude = option.get('exclude', Immutable.List());
+        const fieldName = `fieldid:${config.get('id', '')}`;
+        const fieldType = config.get('type', 'string');
+        return (
+          !optionFieldExclude.includes(fieldName)
+          && (optionFieldTypes.includes(fieldType) || optionFieldTypes.includes(fieldName))
+        );
+      })
       .map(parseConfigSelectOptions)
       .toArray();
   }
@@ -91,9 +102,10 @@ class Column extends Component {
   }
 
   render() {
-    const { item, disabled, type } = this.props;
+    const { item, disabled, type, isCountColumn } = this.props;
     const fieldOptions = this.getfieldsConfig();
     const opOptions = this.getoperators();
+    const disableField = disabled || isCountColumn;
     const disableOp = disabled || item.get('field_name', '') === '';
     const disableLabel = disabled || item.get('field_name', '') === '';
 
@@ -103,13 +115,15 @@ class Column extends Component {
           <DragHandle />
         </Col>
         <Col sm={4}>
-          <Select
-            clearable={false}
-            options={fieldOptions}
-            value={item.get('field_name', '')}
-            onChange={this.onChangeField}
-            disabled={disabled}
-          />
+          {!isCountColumn && (
+            <Select
+              clearable={false}
+              options={fieldOptions}
+              value={item.get('field_name', '')}
+              onChange={this.onChangeField}
+              disabled={disableField}
+            />
+          )}
         </Col>
 
         <Col sm={2}>
