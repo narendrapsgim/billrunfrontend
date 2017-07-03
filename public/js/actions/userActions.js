@@ -84,7 +84,7 @@ export const userDoLogin = (username, password) => (dispatch) => {
       return success;
     })
     .catch((error) => { // eslint-disable-line no-unused-vars
-      const message = 'Incorrect user name or password, please try again.';
+      const message = 'Incorrect username or password, please try again.';
       dispatch(loginError(message));
       dispatch(finishProgressIndicator());
       return error;
