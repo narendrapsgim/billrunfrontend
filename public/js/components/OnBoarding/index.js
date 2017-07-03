@@ -1,2 +1,7 @@
 import OnBoarding from './OnBoarding';
-export default OnBoarding;
+import OnBoardingNavigation from './OnBoardingNavigation';
+
+export {
+  OnBoarding as default,
+  OnBoardingNavigation,
+};

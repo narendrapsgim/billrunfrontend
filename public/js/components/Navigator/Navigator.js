@@ -6,13 +6,9 @@ import classNames from 'classnames';
 import { NavDropdown, Button, MenuItem as BootstrapMenuItem } from 'react-bootstrap';
 import { toggleSideBar } from '../../actions/guiStateActions/menuActions';
 import { userDoLogout } from '../../actions/userActions';
-import { toggleOnBoarding } from '../../actions/guiStateActions/pageActions';
 import MenuItem from './MenuItem';
 import SubMenu from './SubMenu';
-import {
-  onBoardingShowSelector,
-  onBoardingIsRunnigSelector,
-} from '../../selectors/guiSelectors';
+import { OnBoardingNavigation } from '../OnBoarding';
 
 
 class Navigator extends Component {
@@ -23,8 +19,6 @@ class Navigator extends Component {
     menuItems: Immutable.List(),
     userRoles: [],
     collapseSideBar: false,
-    showOnBoarding: false,
-    runOnBoarding: false,
     routes: [],
   };
 
@@ -39,15 +33,12 @@ class Navigator extends Component {
     userName: PropTypes.string,
     userRoles: PropTypes.array,
     collapseSideBar: PropTypes.bool,
-    showOnBoarding: PropTypes.bool,
-    runOnBoarding: PropTypes.bool,
     dispatch: PropTypes.func.isRequired,
   };
 
   state = {
     showCollapseButton: false,
     openSmallMenu: false,
-    showFullMenu: true,
     openSubMenu: [],
   };
 
@@ -92,18 +83,8 @@ class Navigator extends Component {
       this.setState({
         showCollapseButton: small,
         openSmallMenu: !small,
-        showFullMenu: !small,
       });
     }
-  }
-
-  toggleOnBoarding = () => {
-    this.props.dispatch(toggleOnBoarding());
-  }
-
-  onToggleMenu = () => {
-    const { showFullMenu } = this.state;
-    this.setState({ showFullMenu: !showFullMenu });
   }
 
   onCollapseSidebar = () => {
@@ -205,12 +186,17 @@ class Navigator extends Component {
 
   render() {
     const { showCollapseButton, openSmallMenu } = this.state;
-    const { userName, companyNeme, menuItems, logo, collapseSideBar, showOnBoarding, runOnBoarding } = this.props;
+    const { userName, companyNeme, menuItems, logo, collapseSideBar } = this.props;
     const overallNavClassName = classNames('navbar', 'navbar-default', 'navbar-fixed-top', {
       'collapse-sizebar': collapseSideBar,
+      'small-screen-menu': showCollapseButton,
     });
-    const mainNavClassName = classNames('navbar-default', 'sidebar', 'main-menu', {
+    const mainNavClassName = classNames('navbar-default', 'sidebar', 'main-menu', 'scrollbox', {
       'small-screen-menu': showCollapseButton && openSmallMenu,
+    });
+
+    const topNavClassName = classNames('nav', 'navbar-top-links', 'navbar-right', {
+      'small-screen-menu': showCollapseButton,
     });
     return (
       <nav className={overallNavClassName} id="top-nav" role="navigation">
@@ -242,15 +228,10 @@ class Navigator extends Component {
           }
         </div>
 
-        <ul className="nav navbar-top-links navbar-right">
-          <BootstrapMenuItem eventKey="1" className={runOnBoarding ? 'running' : ''} onClick={this.toggleOnBoarding} active={showOnBoarding}>
-            {runOnBoarding && !showOnBoarding
-              ? 'Continue Tour'
-              : 'Start Tour'
-            }
-          </BootstrapMenuItem>
-          <NavDropdown id="nav-user-menu" title={<span><i className="fa fa-user fa-fw" />{ userName }</span>}>
-            <BootstrapMenuItem eventKey="4" onClick={this.clickLogout}>
+        <ul className={topNavClassName}>
+          <OnBoardingNavigation eventKeyBase={2} />
+          <NavDropdown id="nav-user-menu" eventKey={1} title={<span><i className="fa fa-user fa-fw" />{ userName }</span>}>
+            <BootstrapMenuItem eventKey={1.2} onClick={this.clickLogout}>
               <i className="fa fa-sign-out fa-fw" /> Logout
             </BootstrapMenuItem>
           </NavDropdown>
@@ -283,7 +264,5 @@ const mapStateToProps = state => ({
   collapseSideBar: state.guiState.menu.get('collapseSideBar') || undefined,
   userRoles: state.user.get('roles') || undefined,
   logo: state.settings.getIn(['files', 'logo']) || undefined,
-  showOnBoarding: onBoardingShowSelector(state),
-  runOnBoarding: onBoardingIsRunnigSelector(state),
 });
 export default withRouter(connect(mapStateToProps)(Navigator));

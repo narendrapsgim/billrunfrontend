@@ -6,7 +6,7 @@ import './assests/style/invoice.scss';
 import './assests/style/font.scss';
 
 const Invoice = () => (
-  <div className="scale70">
+  <div className="">
     <div className="invoice-help">
       <div dangerouslySetInnerHTML={{ __html: htmlHeader }} />
       <div dangerouslySetInnerHTML={{ __html: htmlSummary }} />

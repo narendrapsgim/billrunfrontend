@@ -5,6 +5,9 @@ export const ONBOARDING_TOGGLE = 'TOGGLE_BOARDING';
 export const ONBOARDING_SET_STEP = 'SET_ON_BOARDING_STEP';
 export const ONBOARDING_SET_STATE = 'SET_ON_BOARDING_STATE';
 
+export const CONFIRM_SHOW = 'CONFIRM_SHOW';
+export const CONFIRM_HIDE = 'CONFIRM_HIDE';
+
 
 export const onBoardingStates = {
   READY: 'READY',
@@ -48,4 +51,18 @@ export const setOnBoardingStep = (step = 0) => ({
 export const setOnBoardingState = (state = onBoardingStates.READY) => ({
   type: ONBOARDING_SET_STATE,
   state,
+});
+
+export const stopOnBoarding = () => ({
+  type: ONBOARDING_SET_STATE,
+  state: onBoardingStates.FINISHED,
+});
+
+export const showConfirm = confirm => ({
+  type: CONFIRM_SHOW,
+  confirm,
+});
+
+export const hideConfirm = () => ({
+  type: CONFIRM_HIDE,
 });

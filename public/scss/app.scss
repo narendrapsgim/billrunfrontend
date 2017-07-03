@@ -25,7 +25,7 @@
 
 @media all and (max-width: 768px) {
   body {
-    margin-top: 90px;
+    margin-top: 0;
   }
   #footer {
       margin-left: 0!important;
@@ -37,3 +37,16 @@
     margin-left: 0!important;
   }
 }
+
+// $baseZIndex: 2000;
+// $modalsDepth: 5;
+// @for $i from 1 through $modalsDepth {
+//   body:nth-child(#{$i}) {
+//     & .modal-backdrop.fade.in {
+//       z-index: #{$i * 10 + $baseZIndex};
+//     }
+//     & .fade.in.modal{
+//       z-index: #{$i * 10 + $baseZIndex + 1};
+//     }
+//   }
+// }

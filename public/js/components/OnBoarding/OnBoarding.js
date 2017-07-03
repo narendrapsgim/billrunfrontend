@@ -1,8 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { PageHeader, Col, Row, Button, ButtonGroup } from 'react-bootstrap';
+import { withRouter } from 'react-router';
+import { Col, Row, Button } from 'react-bootstrap';
 import Joyride from 'react-joyride';
 import { Link } from 'react-router';
+import ModalWrapper from '../Elements/ModalWrapper';
 import {
   showOnBoarding,
   setOnBoardingStep,
@@ -15,7 +17,6 @@ import {
   onBoardingStepSelector,
   onBoardingIsRunnigSelector,
   onBoardingIsFinishedSelector,
-  onBoardingIsReadySelector,
 } from '../../selectors/guiSelectors';
 
 
@@ -25,8 +26,10 @@ class OnBoarding extends Component {
     show: PropTypes.bool,
     isRunnig: PropTypes.bool,
     isFinished: PropTypes.bool,
-    isReady: PropTypes.bool,
     step: PropTypes.number,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -35,11 +38,14 @@ class OnBoarding extends Component {
     step: 0,
     isRunnig: false,
     isFinished: false,
-    isReady: true,
   };
 
   state = {
+    // Ugly workaround https://github.com/gilbarbara/react-joyride/issues/223
+    // Joyride set stepIndex only in componentWillReceiveProps if it was changed!
+    // startIndex var need to trigget change in value from 0 to real step.
     startIndex: 0,
+    showInvoce: true,
   }
 
   componentDidMount() {
@@ -53,11 +59,6 @@ class OnBoarding extends Component {
     if (!nextProps.show) {
       this.setState({ startIndex: 0 });
     }
-  }
-
-  onCloseHelp = () => {
-    this.setState({ startIndex: 0 });
-    this.props.dispatch(showOnBoarding(false));
   }
 
   getSteps = () => ([
@@ -79,18 +80,33 @@ class OnBoarding extends Component {
     },
   ]);
 
-  callback = (tourState) => {
+  callback = (e) => {
     const { step } = this.props;
-    // console.log('tourState: ', tourState);
-    if (step !== 0 && tourState.action === 'start') {
+    console.log(e);
+    if (e.action === 'close') {
       this.setState({ startIndex: step });
+      // this.props.dispatch(showOnBoarding(false));
+    } else if (e.action === 'start') {
+      if (step !== 0) {
+        this.setState({ startIndex: step, showInvoce: true });
+      } else {
+        this.setState({ showInvoce: true });
+      }
+    } else if (e.action === 'next' && e.type === 'step:before') {
+      this.props.dispatch(setOnBoardingStep(e.index));
+    } else if (e.action === 'back' && e.type === 'step:after') {
+      this.props.dispatch(setOnBoardingStep(e.index - 1));
     }
-    if (tourState.type === 'finished') {
-      this.setState({ finished: true });
+
+    if (e.type === 'error:target_not_found') {
+      const skiptedIndex = (e.action === 'next') ? e.index + 1 : e.index - 1;
+      this.setState({ showInvoce: true });
+      this.setState({ startIndex: skiptedIndex });
+      this.props.dispatch(setOnBoardingStep(skiptedIndex));
+    }
+
+    if (!['close'].includes(e.action) && e.type === 'finished') {
       this.props.dispatch(setOnBoardingState(onBoardingStates.FINISHED));
-    }
-    if (tourState.type === 'step:before' && ['next', 'back'].includes(tourState.action)) {
-      this.props.dispatch(setOnBoardingStep(tourState.index));
     }
   }
 
@@ -103,7 +119,8 @@ class OnBoarding extends Component {
   }
 
   stopTour = () => {
-    this.props.dispatch(setOnBoardingState(onBoardingStates.READY));
+    this.props.dispatch(setOnBoardingState(onBoardingStates.FINISHED));
+    this.props.dispatch(showOnBoarding(false));
   }
 
   closeTour = () => {
@@ -111,34 +128,84 @@ class OnBoarding extends Component {
     this.onCloseHelp();
   }
 
+  onCloseHelp = () => {
+    this.setState({ startIndex: 0, showInvoce: false });
+    this.props.dispatch(showOnBoarding(false));
+  }
+
+  renderIsReadyContent = () => (
+    <div>
+      <br /><br />
+      <p>Start Your Tour Description</p>
+      <br /><br />
+      <Row>
+        <Col smPush={1} sm={10}>
+          <Button onClick={this.startTour} bsStyle="success" block>
+            Start Tour
+          </Button>
+        </Col>
+      </Row>
+      <br /><br />
+    </div>
+  );
+
+  renderIsFinishedContent = () => (
+    <div>
+      <br /><br />
+      <p>Thank you</p>
+      <br /><br />
+      <Row>
+        <Col sm={6}>
+          <Button onClick={this.startTour} block>
+            Start Tour Again
+          </Button>
+        </Col>
+        <Col sm={6}>
+          <Button onClick={this.stopTour} bsStyle="success" block>
+            Start Using Billrun !
+          </Button>
+        </Col>
+      </Row>
+      <br /><br />
+    </div>
+  )
+
   render() {
-    const { show, isRunnig, isReady, isFinished } = this.props;
-    const { startIndex } = this.state;
+    const { show, isRunnig, isFinished } = this.props;
+    const { startIndex, showInvoce } = this.state;
     if (!show) {
       return null;
     }
-    const autoStart = false;
+    if (!isRunnig) {
+      return (
+        <ModalWrapper
+          show={true}
+          title="Welcome To BillRun Cloud"
+          labelOk="Do it leter"
+          onOk={!isFinished ? this.closeTour : null}
+          labelCancel="Close"
+          onCancel={!isFinished ? this.stopTour : null}
+          onHide={this.closeTour}
+        >
+          <div className="text-center">
+            {isFinished
+              ? this.renderIsFinishedContent()
+              : this.renderIsReadyContent()
+            }
+          </div>
+        </ModalWrapper>
+      );
+    }
+    const autoStart = true;
     const tourSteps = this.getSteps();
     return (
-      <div id="page-wrapper" className="page-wrapper">
-        <Row>
-          <Col lg={12}><PageHeader>We will take you to a tour...</PageHeader></Col>
-        </Row>
-        <div>
-          <ButtonGroup>
-            <Button onClick={this.startTour} disabled={isRunnig} style={{ minWidth: 90 }}>
-              {isFinished ? 'Start Again' : 'Start'}
-            </Button>
-            <Button onClick={this.stopTour} disabled={isReady} style={{ minWidth: 90 }}>
-              Stop
-            </Button>
-            <Button onClick={this.closeTour} style={{ minWidth: 90 }}>
-              Exit
-            </Button>
-          </ButtonGroup>
+      <div className="OnBoarding" style={{ position: 'absolute', zIndex: 1029, paddingLeft: 260 }}>
+        <div style={{ display: showInvoce ? 'block' : 'none' }}>
+          <Invoice />
         </div>
-        <Invoice />
         <Joyride
+          disableOverlay={true}
+          showOverlay={true}
           steps={tourSteps}
           stepIndex={startIndex}
           run={isRunnig}
@@ -157,8 +224,7 @@ const mapStateToProps = state => ({
   show: onBoardingShowSelector(state),
   isRunnig: onBoardingIsRunnigSelector(state),
   isFinished: onBoardingIsFinishedSelector(state),
-  isReady: onBoardingIsReadySelector(state),
   step: onBoardingStepSelector(state),
 });
 
-export default connect(mapStateToProps)(OnBoarding);
+export default withRouter(connect(mapStateToProps)(OnBoarding));

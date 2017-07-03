@@ -64,6 +64,9 @@ $page-wrapper-transition: margin 200ms linear;
         font-weight: bold;
       }
     }
+    > li ul li > a {
+      padding: 10px 20px;
+    }
   }
 
   .sidebar-nav {
