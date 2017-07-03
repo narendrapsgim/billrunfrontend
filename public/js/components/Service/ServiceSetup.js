@@ -127,8 +127,8 @@ class ServiceSetup extends Component {
     }
   }
 
-  onGroupAdd = (groupName, usage, value, shared, pooled, products) => {
-    this.props.dispatch(addGroup(groupName, usage, value, shared, pooled, products));
+  onGroupAdd = (groupName, usage, unit, value, shared, pooled, products) => {
+    this.props.dispatch(addGroup(groupName, usage, unit, value, shared, pooled, products));
   }
 
   onGroupRemove = (groupName) => {

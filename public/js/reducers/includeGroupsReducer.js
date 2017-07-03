@@ -9,6 +9,7 @@ const includeGroupsReducer = (state = DefaultState, action) => {
     case ADD_GROUP: {
       const group = Immutable.Map({
         [action.usage]: action.value,
+        unit: action.unit,
         account_shared: action.shared,
         account_pool: action.pooled,
         rates: Immutable.List(action.products),

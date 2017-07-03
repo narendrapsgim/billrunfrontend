@@ -63,13 +63,13 @@ class PlanIncludesTab extends Component {
     });
   }
 
-  onGroupAdd = (groupName, usage, include, shared, pooled, products) => {
+  onGroupAdd = (groupName, usage, unit, include, shared, pooled, products) => {
     const { usedProducts, existingGroups } = this.state;
     this.setState({
       usedProducts: usedProducts.push(...products),
       existingGroups: existingGroups.push(groupName),
     });
-    this.props.onGroupAdd(groupName, usage, include, shared, pooled, products);
+    this.props.onGroupAdd(groupName, usage, unit, include, shared, pooled, products);
   }
 
   onGroupRemove = (groupName, groupProducts) => {
@@ -136,7 +136,7 @@ class PlanIncludesTab extends Component {
   );
 
   render() {
-    const { usageTypes, mode } = this.props;
+    const { mode } = this.props;
     const { existingGroups, usedProducts } = this.state;
     const allowCreate = mode !== 'view';
 
@@ -156,7 +156,6 @@ class PlanIncludesTab extends Component {
           </Panel>
           { allowCreate &&
             <PlanIncludeGroupCreate
-              usageTypes={usageTypes}
               existinGrousNames={existingGroups}
               usedProducts={usedProducts}
               addGroup={this.onGroupAdd}

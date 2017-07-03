@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
-import Select from 'react-select';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { getSymbolFromCurrency } from 'currency-symbol-map';
 import { GroupsInclude } from '../../../FieldDescriptions';
@@ -13,6 +12,7 @@ import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '../../Field';
 import { validateUnlimitedValue, validatePriceValue, validateKey } from '../../../common/Validators';
 import { currencySelector } from '../../../selectors/settingsSelector';
+import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
 
 
 class PlanIncludeGroupCreate extends Component {
@@ -20,22 +20,23 @@ class PlanIncludeGroupCreate extends Component {
   static propTypes = {
     existinGrousNames: PropTypes.instanceOf(Immutable.List),
     usedProducts: PropTypes.instanceOf(Immutable.List),
-    usageTypes: PropTypes.instanceOf(Immutable.List),
     modalTitle: PropTypes.string,
     addGroup: PropTypes.func.isRequired,
     currency: PropTypes.string,
   }
 
   static defaultProps = {
+    usedProducts: Immutable.List(),
     modalTitle: 'Create New Group',
     allGroupsProductsKeys: Immutable.List(),
     existinGrousNames: Immutable.List(),
     currency: 'USD',
   };
 
-  defaultState = {
+  state = {
     name: '',
     usage: '',
+    unit: '',
     include: '',
     products: Immutable.List(),
     shared: false,
@@ -52,8 +53,6 @@ class PlanIncludeGroupCreate extends Component {
     }),
   }
 
-  state = Object.assign({}, this.defaultState);
-
   errors = {
     name: {
       required: 'Group name is required',
@@ -63,6 +62,9 @@ class PlanIncludeGroupCreate extends Component {
     usage: {
       required: 'Usage type is required',
       exist: 'Group with same name and usage type already exists',
+    },
+    unit: {
+      required: 'Unit is required',
     },
     include: {
       required: 'Include is required',
@@ -99,11 +101,15 @@ class PlanIncludeGroupCreate extends Component {
       }
 
       case steps.get('SetUsageType', { index: -1 }).index: {
-        const { usage: usageErrors } = this.errors;
-        const { usage } = this.state;
+        const { usage: usageErrors, unit: unitErrors } = this.errors;
+        const { usage, unit } = this.state;
 
         if (usage === '') {
           this.setState({ error: usageErrors.required });
+          return false;
+        }
+        if (unit === '') {
+          this.setState({ error: unitErrors.required });
           return false;
         }
         return true;
@@ -167,7 +173,11 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   onChangeUsageType = (newValue) => {
-    this.setState({ usage: newValue, products: Immutable.List(), error: '' });
+    this.setState({ usage: newValue, unit: '', products: Immutable.List(), error: '' });
+  }
+
+  onChangeUnit = (newValue) => {
+    this.setState({ unit: newValue, error: '' });
   }
 
   onChangeInclud = (newValue) => {
@@ -210,9 +220,9 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   handleFinish = () => {
-    const { stepIndex, name, usage, include, products, shared, pooled } = this.state;
+    const { stepIndex, name, usage, unit, include, products, shared, pooled } = this.state;
     if (this.validateStep(stepIndex)) {
-      this.props.addGroup(name, usage, include, shared, pooled, products);
+      this.props.addGroup(name, usage, unit, include, shared, pooled, products);
       this.resetState(false);
     }
   };
@@ -245,14 +255,25 @@ class PlanIncludeGroupCreate extends Component {
         SetProducts: { index: 3, label: 'Set Products' },
       });
     }
-    this.setState({ monetaryBased, steps, usage, products: Immutable.List(), error: '' });
+    this.setState({ monetaryBased, steps, usage, unit: '', products: Immutable.List(), error: '' });
   }
 
   getStepContent = (stepIndex) => {
-    const { usedProducts, usageTypes, currency } = this.props;
-    const { name, products, include, usage, shared, pooled, error, monetaryBased, steps } = this.state;
+    const { usedProducts, currency } = this.props;
+    const {
+      name,
+      products,
+      include,
+      usage,
+      unit,
+      shared,
+      pooled,
+      error,
+      monetaryBased,
+      steps,
+    } = this.state;
     const existingProductsKeys = usedProducts.push(...products);
-    const setIncludesTitle = monetaryBased ? `Total ${getSymbolFromCurrency(currency)} included` : changeCase.sentenceCase(`${usage} includes`);
+    const setIncludesTitle = monetaryBased ? `Total ${getSymbolFromCurrency(currency)} included` : `${changeCase.sentenceCase(`${usage} includes`)} (${unit})`;
 
     switch (stepIndex) {
 
@@ -293,12 +314,11 @@ class PlanIncludeGroupCreate extends Component {
           <FormGroup validationState={error.length > 0 ? 'error' : null}>
             <Col componentClass={ControlLabel} sm={3}>Unit Type</Col>
             <Col sm={8}>
-              <Select
-                name="field-name"
-                value={usage}
-                options={usageTypes.map(key => ({ value: key, label: key })).toJS()}
-                onChange={this.onChangeUsageType}
-                Clearable={false}
+              <UsageTypesSelector
+                usaget={usage}
+                unit={unit}
+                onChangeUsaget={this.onChangeUsageType}
+                onChangeUnit={this.onChangeUnit}
               />
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
             </Col>
@@ -308,10 +328,10 @@ class PlanIncludeGroupCreate extends Component {
       case steps.get('SetIncludes', { index: -1 }).index:
         return ([
           <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usage}_includes`}>
-            <Col componentClass={ControlLabel} sm={3}>
+            <Col componentClass={ControlLabel} sm={4}>
               {setIncludesTitle}
             </Col>
-            <Col sm={8}>
+            <Col sm={7}>
               {monetaryBased
                 ? <Field onChange={this.onChangeIncludeMonetaryBased} value={include} fieldType="text" />
                 : <Field onChange={this.onChangeInclud} value={include} fieldType="unlimited" />
