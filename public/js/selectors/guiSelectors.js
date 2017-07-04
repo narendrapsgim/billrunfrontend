@@ -33,3 +33,9 @@ export const onBoardingIsReadySelector = createSelector(
   onBoardingStateSelector,
   state => state === onBoardingStates.READY,
 );
+
+const getConfirm = state => state.guiState.page.getIn(['confirm']);
+export const confirmSelector = createSelector(
+  getConfirm,
+  confirm => confirm,
+);

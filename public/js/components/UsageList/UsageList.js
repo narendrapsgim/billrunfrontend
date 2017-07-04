@@ -9,7 +9,7 @@ import List from '../List';
 import Usage from './Usage';
 import { usageListQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
-import ConfirmModal from '../ConfirmModal';
+import { ConfirmModal } from '../Elements';
 import { deleteLine } from '../../actions/linesActions';
 
 

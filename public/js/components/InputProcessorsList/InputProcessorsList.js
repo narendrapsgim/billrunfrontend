@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { Button } from 'react-bootstrap';
 import List from '../List';
-import ConfirmModal from '../ConfirmModal';
+import { ConfirmModal } from '../Elements';
 
 import { getList, clearList } from '../../actions/listActions';
 import { deleteInputProcessor, updateInputProcessorEnabled } from '../../actions/inputProcessorActions';

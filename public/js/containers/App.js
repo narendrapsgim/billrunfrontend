@@ -6,6 +6,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import BraasTheme from '../theme';
 import ProgressIndicator from '../components/ProgressIndicator';
+import ReduxConfirmModal from '../components/ReduxConfirmModal';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
 import OnBoarding from '../components/OnBoarding';
@@ -14,14 +15,12 @@ import { userCheckLogin } from '../actions/userActions';
 import { setPageTitle, systemRequirementsLoadingComplete } from '../actions/guiStateActions/pageActions';
 import { initMainMenu } from '../actions/guiStateActions/menuActions';
 import { getSettings, fetchFile } from '../actions/settingsActions';
-import { onBoardingShowSelector } from '../selectors/guiSelectors';
 
 
 class App extends Component {
 
   static propTypes = {
     auth: PropTypes.bool,
-    showOnBoarding: PropTypes.bool,
     systemRequirementsLoad: PropTypes.bool,
     routes: PropTypes.array,
     children: PropTypes.element,
@@ -41,7 +40,6 @@ class App extends Component {
   static defaultProps = {
     mainMenuOverrides: null,
     auth: null,
-    showOnBoarding: false,
     title: '',
     logoName: '',
     systemRequirementsLoad: false,
@@ -138,20 +136,21 @@ class App extends Component {
   );
 
   renderWithLayout = () => {
-    const { title, children, showOnBoarding, routes } = this.props;
+    const { title, children, routes } = this.props;
     return (
       <div id="wrapper" style={{ height: '100%' }}>
         <ProgressIndicator />
         <Alerts />
         <Navigator routes={routes} />
         <OnBoarding />
-        <div id="page-wrapper" className="page-wrapper" style={{ display: !showOnBoarding ? 'block' : 'none' }}>
+        <div id="page-wrapper" className="page-wrapper">
           <Row>
             <Col lg={12}>{title && <PageHeader>{title}</PageHeader> }</Col>
           </Row>
           <div>{children}</div>
         </div>
         <Footer />
+        <ReduxConfirmModal />
       </div>
     );
   }
@@ -173,7 +172,6 @@ const mapStateToProps = state => ({
   mainMenuOverrides: state.settings.getIn(['menu', 'main']),
   logo: state.settings.getIn(['files', 'logo']),
   logoName: state.settings.getIn(['tenant', 'logo']),
-  showOnBoarding: onBoardingShowSelector(state),
 });
 
 export default connect(mapStateToProps)(App);

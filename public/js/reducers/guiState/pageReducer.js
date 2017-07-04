@@ -6,6 +6,8 @@ import {
   ONBOARDING_TOGGLE,
   ONBOARDING_SET_STEP,
   ONBOARDING_SET_STATE,
+  CONFIRM_SHOW,
+  CONFIRM_HIDE,
   onBoardingStates,
 } from '../../actions/guiStateActions/pageActions';
 import { LOGIN } from '../../actions/userActions';
@@ -19,6 +21,7 @@ const defaultState = Immutable.Map({
     step: 0,
     state: onBoardingStates.READY,
   }),
+  confirm: Immutable.Map({}),
 });
 
 const pageReducer = (state = defaultState, action) => {
@@ -50,8 +53,17 @@ const pageReducer = (state = defaultState, action) => {
       }
       return state;
     }
+
     case ONBOARDING_TOGGLE: {
       return state.setIn(['onBoarding', 'show'], !state.getIn(['onBoarding', 'show'], true));
+    }
+
+    case CONFIRM_SHOW: {
+      return state.setIn(['confirm'], Immutable.Map({ ...action.confirm, show: true }));
+    }
+
+    case CONFIRM_HIDE: {
+      return state.setIn(['confirm'], Immutable.Map());
     }
 
     default:

@@ -9,7 +9,7 @@ import { getSymbolFromCurrency } from 'currency-symbol-map';
 import classNames from 'classnames';
 import Field from '../Field';
 import { rebalanceAccount, getCollectionDebt } from '../../actions/customerActions';
-import ConfirmModal from '../../components/ConfirmModal';
+import { ConfirmModal } from '../../components/Elements';
 import { currencySelector } from '../../selectors/settingsSelector';
 import OfflinePayment from '../Payments/OfflinePayment';
 import CyclesSelector from '../Cycle/CyclesSelector';

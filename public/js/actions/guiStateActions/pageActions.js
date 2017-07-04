@@ -58,11 +58,11 @@ export const stopOnBoarding = () => ({
   state: onBoardingStates.FINISHED,
 });
 
-export const showConfirm = confirm => ({
+export const showConfirmModal = confirm => ({
   type: CONFIRM_SHOW,
   confirm,
 });
 
-export const hideConfirm = () => ({
+export const hideConfirmModal = () => ({
   type: CONFIRM_HIDE,
 });

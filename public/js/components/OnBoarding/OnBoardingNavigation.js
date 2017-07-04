@@ -5,7 +5,7 @@ import {
   toggleOnBoarding,
   stopOnBoarding,
   showOnBoarding,
-  showConfirm,
+  showConfirmModal,
 } from '../../actions/guiStateActions/pageActions';
 import {
   onBoardingIsRunnigSelector,
@@ -23,11 +23,12 @@ const OnBoardingNavigation = ({ isRunnig, isReady, isShow, eventKeyBase, dispatc
   const askStop = () => {
     const confirm = {
       message: 'Are you sure you want to end the tour ?',
-      onCancel: stop,
-      labelOk: 'No',
-      labelCancel: 'Yes',
+      onOk: stop,
+      labelOk: 'End tour',
+      labelCancel: 'Continue tour',
+      type: 'delete',
     };
-    dispatch(showConfirm(confirm));
+    dispatch(showConfirmModal(confirm));
   };
 
   const toggle = () => {
