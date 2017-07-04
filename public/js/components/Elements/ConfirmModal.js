@@ -13,27 +13,32 @@ const ConfirmModal = props => (
       </Modal.Body>
     }
     <Modal.Footer>
-      <Button bsSize="small" style={{ minWidth: 90, marginRight: 5 }} onClick={props.onCancel} >{props.labelCancel}</Button>
-      <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onOk} bsStyle="primary" >{props.labelOk}</Button>
+      {props.type !== 'alert' && (
+        <Button bsSize="small" style={{ minWidth: 90, marginRight: 5 }} onClick={props.onCancel} >{props.labelCancel}</Button>
+      )}
+      <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onOk} bsStyle={props.type === 'delete' ? 'danger' : 'primary'} >{props.labelOk}</Button>
     </Modal.Footer>
   </Modal>
 );
 
 ConfirmModal.defaultProps = {
+  show: false,
+  type: 'confirm',
   children: null,
   labelCancel: 'Cancel',
   labelOk: 'Ok',
-  show: false,
+  onCancel: null,
 };
 
 ConfirmModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  message: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['confirm', 'delete', 'alert']),
   children: PropTypes.element,
   labelCancel: PropTypes.string,
   labelOk: PropTypes.string,
-  message: PropTypes.string.isRequired,
-  onCancel: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
   onOk: PropTypes.func.isRequired,
-  show: PropTypes.bool.isRequired,
 };
 
 export default ConfirmModal;
