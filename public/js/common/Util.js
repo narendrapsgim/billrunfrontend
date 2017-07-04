@@ -209,3 +209,9 @@ export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldFiel
   }
   return label;
 };
+
+export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
+  const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
+  const uom = (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
+  return (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('label', '');
+};

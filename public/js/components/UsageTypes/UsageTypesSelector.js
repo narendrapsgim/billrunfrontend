@@ -27,7 +27,7 @@ class UsageTypesSelector extends Component {
     usaget: '',
     unit: '',
     onChangeUsaget: () => {},
-    onChangeUnit: () => {},
+    onChangeUnit: () => () => {},
     enabled: true,
     showUnits: true,
   };
@@ -42,11 +42,11 @@ class UsageTypesSelector extends Component {
 
   onChangeUsaget = (usaget) => {
     this.props.onChangeUsaget(usaget);
-    this.onChangeUnit('');
+    this.onChangeUnit(usaget)('');
   }
 
-  onChangeUnit = (unit) => {
-    this.props.onChangeUnit(unit);
+  onChangeUnit = usaget => (unit) => {
+    this.props.onChangeUnit(unit, usaget);
   }
 
   onCancelNewUsageType = () => {
@@ -113,10 +113,10 @@ class UsageTypesSelector extends Component {
   );
 
   renderUnitSelect = () => {
-    const { enabled, unit } = this.props;
+    const { enabled, unit, usaget } = this.props;
     return (
       <Select
-        onChange={this.onChangeUnit}
+        onChange={this.onChangeUnit(usaget)}
         value={unit}
         options={this.getAvailableUnits()}
         disabled={!enabled}

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
+import { connect } from 'react-redux';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
@@ -11,11 +12,15 @@ import ProductParam from './components/ProductParam';
 import ProductParamEdit from './components/ProductParamEdit';
 import EntityFields from '../Entity/EntityFields';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
+import { getUnitLabel } from '../../common/Util';
+import { usageTypesDataSelector, propertyTypeSelector } from '../../selectors/settingsSelector';
 
 
-export default class Product extends Component {
+class Product extends Component {
 
   static propTypes = {
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
     product: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
     usaget: PropTypes.string,
@@ -29,9 +34,11 @@ export default class Product extends Component {
   }
 
   static defaultProps = {
+    usageTypes: Immutable.List(),
+    propertyTypes: Immutable.List(),
     planName: 'BASE',
     product: Immutable.Map(),
-    usaget: '',
+    usaget: undefined,
     errorMessages: {
       name: {
         allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
@@ -44,6 +51,7 @@ export default class Product extends Component {
       name: '',
     },
     newProductParam: false,
+    unit: null,
   }
 
   componentDidMount() {
@@ -80,10 +88,12 @@ export default class Product extends Component {
     this.props.onUsagetUpdate(['rates'], usaget, value);
   }
 
-  onChangeUnit = (unit) => {
+  onChangeUnit = (unit, usageType) => {
     const { product, planName, usaget } = this.props;
-    const ratePath = ['rates', usaget, planName, 'rate'];
+    const usageTypeForRate = usageType || usaget;
+    const ratePath = ['rates', usageTypeForRate, planName, 'rate'];
     const rates = product.getIn(ratePath, Immutable.List());
+    this.setState({ unit });
     rates.forEach((rate, index) => {
       const rangeUnitsPath = [...ratePath, index, 'uom_display', 'range'];
       const intervalUnitsPath = [...ratePath, index, 'uom_display', 'interval'];
@@ -206,7 +216,7 @@ export default class Product extends Component {
         index={i}
         item={price}
         key={i}
-        unit={this.getUnit()}
+        unit={this.getUnitLabel()}
         onProductEditRate={this.onProductRateUpdate}
         onProductRemoveRate={this.onProductRateRemove}
       />
@@ -237,13 +247,20 @@ export default class Product extends Component {
 
   getUnit = () => {
     const { product, usaget } = this.props;
-    return product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+    const { unit } = this.state;
+    return unit || product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+  }
+
+  getUnitLabel = () => {
+    const { propertyTypes, usageTypes, usaget } = this.props;
+    return getUnitLabel(propertyTypes, usageTypes, usaget, this.getUnit());
   }
 
   render() {
     const { errors } = this.state;
     const { product, usaget, mode } = this.props;
     const unit = this.getUnit();
+    const unitLabel = this.getUnitLabel();
     const vatable = (product.get('vatable', true) === true);
     const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
     const pricingMethod = product.get('pricing_method', '');
@@ -306,7 +323,7 @@ export default class Product extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
-                <Col sm={4}>
+                <Col sm={8}>
                   { editable && ['clone', 'create'].includes(mode)
                     ? (
                       <UsageTypesSelector
@@ -316,7 +333,7 @@ export default class Product extends Component {
                         onChangeUnit={this.onChangeUnit}
                       />
                     )
-                    : <div className="non-editable-field">{ `${usaget} (${unit})` }</div>
+                    : <div className="non-editable-field">{ `${usaget} (${unitLabel})` }</div>
                   }
                 </Col>
               </FormGroup>
@@ -416,3 +433,10 @@ export default class Product extends Component {
   }
 
 }
+
+const mapStateToProps = (state, props) => ({
+  usageTypes: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
+});
+
+export default connect(mapStateToProps)(Product);

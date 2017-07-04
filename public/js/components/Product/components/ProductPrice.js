@@ -28,14 +28,15 @@ export default class ProductPrice extends Component {
   state = { fromError: '', toError: '', intervalError: '', priceError: '' }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { item, mode } = this.props;
+    const { item, mode, unit } = this.props;
     // const fromError = nextState.fromError !== this.state.fromError;
     // const toError = nextState.toError !== this.state.toError;
     // const intervalError = nextState.intervalError !== this.state.intervalError;
     // const priceError = nextState.priceError !== this.state.priceError;
-    const modeChnaged = mode !== nextProps.mode
+    const modeChnaged = mode !== nextProps.mode;
+    const unitChanged = unit !== nextProps.unit;
     const itemChanged = !Immutable.is(item, nextProps.item);
-    return itemChanged || modeChnaged; // ||fromError || toError || intervalError || priceError
+    return itemChanged || modeChnaged || unitChanged; // ||fromError || toError || intervalError || priceError
   }
 
   onEditFrom = (e) => {

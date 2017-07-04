@@ -23,10 +23,10 @@ const DefaultRate = Immutable.Record({
   to: PRODUCT_UNLIMITED,
   interval: '',
   price: '',
-  uom_display: {
+  uom_display: Immutable.Map({
     range: '',
     interval: '',
-  },
+  }),
 });
 
 
