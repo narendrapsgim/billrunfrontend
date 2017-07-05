@@ -2,11 +2,14 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
+import { getUnitLabel } from '../../common/Util';
 
 export default class FieldsMapping extends Component {
 
   static propTypes = {
     usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
     addUsagetMapping: PropTypes.func,
     onSetStaticUsaget: PropTypes.func,
     onSetFieldMapping: PropTypes.func,
@@ -14,6 +17,8 @@ export default class FieldsMapping extends Component {
 
   static defaultProps = {
     usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
     addUsagetMapping: () => {},
     onSetStaticUsaget: () => {},
     onSetFieldMapping: () => {},
@@ -138,6 +143,8 @@ export default class FieldsMapping extends Component {
     const { separateTime, usaget, unit } = this.state;
     const { settings,
             usageTypes,
+            usageTypesData,
+            propertyTypes,
             onSetFieldMapping } = this.props;
 
     const available_fields = [(<option disabled value="" key={-1}>Select Field...</option>),
@@ -299,7 +306,7 @@ export default class FieldsMapping extends Component {
                     <div className="col-lg-offset-1 col-lg-10">
                       <div className="col-lg-3">{usage_t.get('pattern', '')}</div>
                       <div className="col-lg-3">{usage_t.get('usaget', '')}</div>
-                      <div className="col-lg-3"> {usage_t.get('unit', '')}</div>
+                      <div className="col-lg-3"> {getUnitLabel(propertyTypes, usageTypesData, usage_t.get('usaget', ''), usage_t.get('unit', ''))}</div>
                       <div className="col-lg-2">
                         <button type="button"
                                 className="btn btn-default btn-sm"
