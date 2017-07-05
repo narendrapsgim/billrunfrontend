@@ -11,8 +11,13 @@ import Help from '../../Help';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '../../Field';
 import { validateUnlimitedValue, validatePriceValue, validateKey } from '../../../common/Validators';
-import { currencySelector } from '../../../selectors/settingsSelector';
+import {
+  currencySelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../../../selectors/settingsSelector';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
+import { getUnitLabel } from '../../../common/Util';
 
 
 class PlanIncludeGroupCreate extends Component {
@@ -23,6 +28,8 @@ class PlanIncludeGroupCreate extends Component {
     modalTitle: PropTypes.string,
     addGroup: PropTypes.func.isRequired,
     currency: PropTypes.string,
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
@@ -31,6 +38,8 @@ class PlanIncludeGroupCreate extends Component {
     allGroupsProductsKeys: Immutable.List(),
     existinGrousNames: Immutable.List(),
     currency: 'USD',
+    usageTypes: Immutable.List(),
+    propertyTypes: Immutable.List(),
   };
 
   state = {
@@ -259,7 +268,7 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
-    const { usedProducts, currency } = this.props;
+    const { usedProducts, currency, propertyTypes, usageTypes } = this.props;
     const {
       name,
       products,
@@ -273,7 +282,9 @@ class PlanIncludeGroupCreate extends Component {
       steps,
     } = this.state;
     const existingProductsKeys = usedProducts.push(...products);
-    const setIncludesTitle = monetaryBased ? `Total ${getSymbolFromCurrency(currency)} included` : `${changeCase.sentenceCase(`${usage} includes`)} (${unit})`;
+    const setIncludesTitle = monetaryBased
+      ? `Total ${getSymbolFromCurrency(currency)} included`
+      : `${changeCase.sentenceCase(`${usage} includes`)} (${getUnitLabel(propertyTypes, usageTypes, usage, unit)})`;
 
     switch (stepIndex) {
 
@@ -439,6 +450,8 @@ const mapStateToProps = (state, props) => {
   const currency = currencySelector(state, props);
   return {
     currency,
+    usageTypes: usageTypesDataSelector(state, props),
+    propertyTypes: propertyTypeSelector(state, props),
   };
 };
 
