@@ -5,6 +5,7 @@ import Immutable from 'immutable';
 import Help from '../../Help';
 import CreateButton from '../../Elements/CreateButton';
 import ProductPrice from '../../Product/components/ProductPrice';
+import { getUnitLabel } from '../../../common/Util';
 
 export default class PlanProduct extends Component {
 
@@ -20,11 +21,15 @@ export default class PlanProduct extends Component {
     usaget: PropTypes.string.isRequired,
     item: PropTypes.instanceOf(Immutable.Map),
     prices: PropTypes.instanceOf(Immutable.List),
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
     item: Immutable.Map(),
     prices: Immutable.List(),
+    usageTypes: Immutable.List(),
+    propertyTypes: Immutable.List(),
     mode: 'create',
   };
 
@@ -34,8 +39,11 @@ export default class PlanProduct extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
-    const { prices, mode } = this.props;
-    return !Immutable.is(prices, nextProps.prices) || mode !== nextProps.mode;
+    const { prices, mode, usageTypes, propertyTypes } = this.props;
+    return !Immutable.is(prices, nextProps.prices)
+      || mode !== nextProps.mode
+      || !Immutable.is(usageTypes, nextProps.usageTypes)
+      || !Immutable.is(propertyTypes, nextProps.propertyTypes);
   }
 
   componentWillUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
@@ -98,7 +106,7 @@ export default class PlanProduct extends Component {
   }
 
   render() {
-    const { item, prices, usaget, mode } = this.props;
+    const { item, prices, usaget, mode, propertyTypes, usageTypes } = this.props;
     const unit = prices.getIn([0, 'uom_display', 'range'], '');
     const editable = (mode !== 'view');
     const priceCount = prices.size;
@@ -119,7 +127,7 @@ export default class PlanProduct extends Component {
             index={i}
             mode={mode}
             count={priceCount}
-            unit={unit}
+            unit={getUnitLabel(propertyTypes, usageTypes, usaget, unit)}
             onProductEditRate={this.onProductEditRate}
             onProductRemoveRate={this.onProductRemoveRate}
           />
