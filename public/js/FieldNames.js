@@ -84,6 +84,7 @@ const FieldNames = {
   report: {
     report_type_0: 'Simple',
     report_type_1: 'Grouped',
+    count_group: 'Count',
   },
 };
 

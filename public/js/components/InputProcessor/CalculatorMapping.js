@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, Col, Row, Panel, Button } from 'react-bootstrap';
+import Select from 'react-select';
 import { getFieldName } from '../../common/Util';
 import Help from '../Help';
 
@@ -13,9 +14,12 @@ export default class CalculatorMapping extends Component {
     onRemoveRating: PropTypes.func.isRequired,
     settings: PropTypes.instanceOf(Immutable.Map),
     subscriberFields: PropTypes.instanceOf(Immutable.List),
+    customRatingFields: PropTypes.instanceOf(Immutable.List),
   }
   static defaultProps = {
     settings: Immutable.Map(),
+    subscriberFields: Immutable.List(),
+    customRatingFields: Immutable.List(),
   };
 
   componentDidMount = () => {
@@ -29,12 +33,39 @@ export default class CalculatorMapping extends Component {
     });
   };
 
-  onChangeAdditionalParamRating = (e) => {
-    const { value } = e.target;
-    const eModified = Object.assign({}, e);
-    eModified.target.dataset.rate_key = `params.${value}`;
-    eModified.target.value = 'match';
+  getCustomRatingFields = () => {
+    const { customRatingFields } = this.props;
+    return customRatingFields
+      .filter(field => (field.get('field_name', '').startsWith('params.')))
+      .map(field => ({
+        value: field.get('field_name', ''),
+        label: field.get('title', ''),
+      }))
+      .toJS();
+  }
+
+  getRatingTypes = () => ([
+    { value: 'match', label: 'Equals' },
+    { value: 'longestPrefix', label: 'Longest Prefix' },
+  ]);
+
+  onChangeAdditionalParamRating = (usaget, index, type, value) => {
+    const eModified = {
+      target: {
+        dataset: {
+          rate_key: value,
+          usaget,
+          index,
+        },
+        value: type,
+        custom: true,
+      },
+    };
     this.props.onSetRating(eModified);
+  }
+
+  onChangeAdditionalParamRatingType = (value, usaget, index, type) => {
+    this.onChangeAdditionalParamRating(usaget, index, type, value);
   }
 
   onSetCustomerMapping = (index, e) => {
@@ -67,10 +98,8 @@ export default class CalculatorMapping extends Component {
     const { onSetLineKey, onSetRating, onRemoveRating } = this.props;
     const availableFields = this.getAvailableFields(true);
     return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => {
-      let selectedRadio = 4;
-      if (calc.get('type', '') === 'longestPrefix') {
-        selectedRadio = 3;
-      } else if (calc.get('rate_key', '') === 'key') {
+      let selectedRadio = 3;
+      if (calc.get('rate_key', '') === 'key') {
         selectedRadio = 1;
       } else if (calc.get('rate_key', '') === 'usaget') {
         selectedRadio = 2;
@@ -124,21 +153,6 @@ export default class CalculatorMapping extends Component {
                 <label htmlFor={`${usaget}-${calcKey}-by-rate-usaget`} style={{ verticalAlign: 'middle' }}>By product unit type</label>
               </FormGroup>
 
-              <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
-                <input
-                  type="radio"
-                  name={`${usaget}-${calcKey}-type`}
-                  id={`${usaget}-${calcKey}-longest-prefix`}
-                  value="longestPrefix"
-                  data-usaget={usaget}
-                  checked={selectedRadio === 3}
-                  data-rate_key="params.prefix"
-                  data-index={calcKey}
-                  onChange={onSetRating}
-                />&nbsp;
-                <label htmlFor={`${usaget}-${calcKey}-longest-prefix`} style={{ verticalAlign: 'middle' }}>By longest prefix</label>
-              </FormGroup>
-
               <FormGroup style={{ margin: 0 }}>
                 <div className="input-group">
                   <div className="input-group-addon">
@@ -148,23 +162,26 @@ export default class CalculatorMapping extends Component {
                       id={`${usaget}-${calcKey}-by-param`}
                       value="match"
                       data-usaget={usaget}
-                      checked={selectedRadio === 4}
-                      data-rate_key="params."
+                      checked={selectedRadio === 3}
+                      data-rate_key=""
                       data-index={calcKey}
                       onChange={onSetRating}
                     />&nbsp;
                     <label htmlFor={`${usaget}-${calcKey}-by-param`} style={{ verticalAlign: 'middle' }}>By product param</label>
                     <Help contents="This field needs to be configured in the 'Additional Parameters' of a Product" />
                   </div>
-                  <input
-                    type="text"
-                    className="form-control"
+                  <Select
                     id={`${usaget}-${calcKey}-by-param-name`}
-                    data-usaget={usaget}
-                    data-index={calcKey}
-                    checked={selectedRadio !== 4}
-                    value={selectedRadio !== 4 ? '' : calc.get('rate_key', '').replace('params.', '')}
-                    onChange={this.onChangeAdditionalParamRating}
+                    onChange={this.onChangeAdditionalParamRating.bind(this, usaget, calcKey, calc.get('type', ''))}
+                    value={selectedRadio !== 3 ? '' : calc.get('rate_key', '')}
+                    options={this.getCustomRatingFields()}
+                    allowCreate
+                  />
+                  <Select
+                    id={`${usaget}-${calcKey}-by-param-name-type`}
+                    onChange={this.onChangeAdditionalParamRatingType.bind(this, calc.get('rate_key', ''), usaget, calcKey)}
+                    value={selectedRadio !== 3 ? '' : calc.get('type', '')}
+                    options={this.getRatingTypes()}
                   />
                 </div>
               </FormGroup>

@@ -210,6 +210,34 @@ export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldFiel
   return label;
 };
 
+export const getEntitySettingsName = (entityName) => {
+  if (entityName === 'account') {
+    return 'customer';
+  }
+  if (entityName === 'subscriber') {
+    return 'subscription';
+  }
+  return entityName;
+};
+
+export const getSettingsKey = (entityName) => {
+  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey']);
+  return (key ? key.split('.')[0] : entityName);
+};
+
+export const getSettingsPath = (entityName, path) => {
+  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey']);
+  if (!key) {
+    return path;
+  }
+
+  const keysArr = key.split('.');
+  if (typeof keysArr[1] !== 'undefined') {
+    path.unshift(keysArr[1]);
+  }
+  return path;
+};
+
 export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
   const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
   const uom = (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());

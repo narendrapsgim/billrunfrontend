@@ -36,6 +36,9 @@ const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
 const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['subscribers', 'subscriber', 'fields']);
 
+const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['rates', 'fields']);
+
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
     const importLinkers = accountfields.filter(isLinkerField);
@@ -120,6 +123,20 @@ const selectCustomKeys = (inputProssesors) => {
   return options.toList();
 };
 
+const selectRatingParams = (inputProssesors) => {
+  let options = Immutable.Set();
+  inputProssesors.forEach((inputProssesor) => {
+    const ratingCalculators = inputProssesor.get('rate_calculators', Immutable.Map());
+    ratingCalculators.forEach((fields) => {
+      const currentFields = fields
+      .filter(field => field.get('rate_key', '').startsWith('params.'))
+      .map(field => field.get('rate_key', ''));
+      options = options.concat(currentFields);
+    });
+  });
+  return options.toList();
+};
+
 const sortFieldOption = (optionsA, optionB) => {
   const a = optionsA.get('title', '').toUpperCase(); // ignore upper and lowercase
   const b = optionB.get('title', '').toUpperCase(); // ignore upper and lowercase
@@ -133,7 +150,7 @@ const sortFieldOption = (optionsA, optionB) => {
 };
 
 const selectLinesFields = (customKeys) => {
-  const predefinedFileds = getConfig(['reports', 'fields', 'lines'], Immutable.List());
+  const predefinedFileds = getConfig(['reports', 'fields', 'usage'], Immutable.List());
   return Immutable.List().withMutations((optionsWithMutations) => {
     // Set predefined fields
     predefinedFileds.forEach((predefinedFiled) => {
@@ -153,8 +170,8 @@ const selectLinesFields = (customKeys) => {
         optionsWithMutations.push(Immutable.Map({
           id: `uf.${customKey}`,
           title: `${title}`,
-          filter: true,
-          display: true,
+          searchable: true,
+          aggregatable: true,
         }));
       }
     });
@@ -178,6 +195,11 @@ export const inputProssesorCsiOptionsSelector = createSelector(
 export const inputProssesorCustomKeysSelector = createSelector(
   getInputProssesors,
   selectCustomKeys,
+);
+
+export const inputProssesorRatingParamsSelector = createSelector(
+  getInputProssesors,
+  selectRatingParams,
 );
 
 export const linesFiledsSelector = createSelector(
@@ -276,6 +298,11 @@ export const subscriberImportFieldsSelector = createSelector(
   subscriberFieldsSelector,
   accountImportFieldsSelector,
   selectSubscriberImportFields,
+);
+
+export const productFieldsSelector = createSelector(
+  getProductFields,
+  productFields => productFields,
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {

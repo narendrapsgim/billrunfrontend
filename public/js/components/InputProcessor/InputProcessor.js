@@ -5,8 +5,8 @@ import Immutable from 'immutable';
 import _ from 'lodash';
 import Papa from 'papaparse';
 import filesize from 'file-size';
-import changeCase from 'change-case';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import changeCase from 'change-case';
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -47,11 +47,12 @@ import {
   addRatingField,
   removeRatingField,
  } from '../../actions/inputProcessorActions';
-import { getSettings } from '../../actions/settingsActions';
+import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { usageTypeSelector, usageTypesDataSelector } from '../../selectors/settingsSelector';
+import { getConfig } from '../../common/Util';
 
 class InputProcessor extends Component {
 
@@ -60,6 +61,7 @@ class InputProcessor extends Component {
     usageTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     subscriberFields: PropTypes.instanceOf(Immutable.List),
+    customRatingFields: PropTypes.instanceOf(Immutable.List),
     inputProcessorsExitNames: PropTypes.instanceOf(Immutable.List),
     dispatch: PropTypes.func.isRequired,
     router: PropTypes.shape({
@@ -75,6 +77,7 @@ class InputProcessor extends Component {
   static defaultProps = {
     settings: Immutable.Map(),
     subscriberFields: Immutable.List(),
+    customRatingFields: Immutable.List(),
     inputProcessorsExitNames: Immutable.List(),
     usageTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
@@ -155,7 +158,7 @@ class InputProcessor extends Component {
       this.props.dispatch(getProcessorSettings(fileType));
       pageTitle = 'Edit Input Processor';
     }
-    this.props.dispatch(getSettings(['usage_types', 'property_types', 'subscribers.subscriber.fields']));
+    this.props.dispatch(getSettings(['usage_types', 'property_types', 'subscribers.subscriber.fields', 'rates.fields']));
     this.props.dispatch(setPageTitle(pageTitle));
   }
 
@@ -291,8 +294,16 @@ class InputProcessor extends Component {
   }
 
   onSetRating = (e) => {
-    const { dataset: { usaget, rate_key, index }, value } = e.target;
-    this.props.dispatch(setRatingField(usaget, parseInt(index, 10), rate_key, value));
+    const { customRatingFields } = this.props;
+    const { dataset: { usaget, rate_key, index }, value, custom } = e.target;
+    let rateKey = rate_key;
+    const isNewField = custom && (rateKey !== '') && customRatingFields.find(field => field.get('field_name', '') === rateKey) === undefined;
+    if (isNewField) {
+      const title = rateKey;
+      rateKey = `params.${changeCase.snakeCase(title)}`;
+      this.addNewRatingCustomField(rateKey, title, value);
+    }
+    this.props.dispatch(setRatingField(usaget, parseInt(index), rateKey, value));
   }
 
   onAddRating = (e) => {
@@ -362,12 +373,20 @@ class InputProcessor extends Component {
     return field;
   };
 
-  addUsagetMapping = (val) => {
-    const { usageTypesData } = this.props;
-    return this.props.dispatch(addUsagetMapping(usageTypesData.push(Immutable.Map({
-      usage_type: changeCase.snakeCase(val),
-      label: val,
+  addUsagetMapping = val => (
+    this.props.dispatch(addUsagetMapping(val))
+  );
+
+  addNewRatingCustomField = (fieldName, title, type) => {
+    const { customRatingFields } = this.props;
+    this.props.dispatch(updateSetting('rates', ['fields'], customRatingFields.push(Immutable.Map({
+      field_name: fieldName,
+      title,
+      multiple: type === 'longestPrefix',
+      display: true,
+      editable: true,
     }))));
+    return this.props.dispatch(saveSettings('rates'));
   };
 
   goBack = () => {
@@ -420,7 +439,7 @@ class InputProcessor extends Component {
   }
 
   getStepContent = () => {
-    const { settings, usageTypes, subscriberFields, action, type, format } = this.props;
+    const { settings, usageTypes, subscriberFields, customRatingFields, action, type, format } = this.props;
     const { stepIndex, errors, steps } = this.state;
 
     switch (stepIndex) {
@@ -466,6 +485,7 @@ class InputProcessor extends Component {
         <CalculatorMapping
           settings={settings}
           subscriberFields={subscriberFields}
+          customRatingFields={customRatingFields}
           onSetRating={this.onSetRating}
           onSetLineKey={this.onSetLineKey}
           onSetCustomerMapping={this.onSetCustomerMapping}
@@ -549,6 +569,7 @@ const mapStateToProps = (state, props) => {
     usageTypes: usageTypeSelector(state, props),
     usageTypesData: usageTypesDataSelector(state, props),
     subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
+    customRatingFields: state.settings.getIn(['rates', 'fields'], Immutable.List()),
     fileType,
     action,
     template,
