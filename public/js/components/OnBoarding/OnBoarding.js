@@ -1,15 +1,15 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
+import { Link } from 'react-router';
 import { Col, Row, Button } from 'react-bootstrap';
 import Joyride from 'react-joyride';
-import { Link } from 'react-router';
 import ModalWrapper from '../Elements/ModalWrapper';
 import {
   showOnBoarding,
   setOnBoardingStep,
   setOnBoardingState,
   onBoardingStates,
+  showConfirmModal,
 } from '../../actions/guiStateActions/pageActions';
 import Invoice from './Invoice';
 import {
@@ -27,9 +27,6 @@ class OnBoarding extends Component {
     isRunnig: PropTypes.bool,
     isFinished: PropTypes.bool,
     step: PropTypes.number,
-    router: PropTypes.shape({
-      push: PropTypes.func.isRequired,
-    }).isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -45,7 +42,9 @@ class OnBoarding extends Component {
     // Joyride set stepIndex only in componentWillReceiveProps if it was changed!
     // startIndex var need to trigget change in value from 0 to real step.
     startIndex: 0,
-    showInvoce: true,
+    autoStart: false,
+    run: false,
+    steps: [],
   }
 
   componentDidMount() {
@@ -63,50 +62,49 @@ class OnBoarding extends Component {
 
   getSteps = () => ([
     {
-      title: 'Account details',
-      text: <p><Link to={{ pathname: '/settings', query: { tab: 1 } }} onClick={this.onCloseHelp}>Account name, Account Setting number & address....</Link></p>,
+      title: '1. Account details',
+      text: <p>Account name, Account Setting number & address....<br /><Link to={{ pathname: '/plans/plan', query: {} }} onClick={this.onCloseHelp}>Click to set Name</Link></p>,
       selector: '.table-info',
-      type: 'hover',
+      type: 'click',
+      isFixed: true,
     }, {
-      title: 'Plan',
+      title: '2. Plan',
       text: 'Plan name & rate from invoice summary row. If it\'s not possible to highlight them two, switch between "Qty" and "Rate"',
       selector: '.step-plan',
-      type: 'hover',
+      type: 'click',
+      isFixed: true,
     }, {
       title: 'Service',
       text: 'Service name & rate from invoice summary row',
       selector: '.step-service',
-      type: 'hover',
+      type: 'click',
+      isFixed: true,
     },
   ]);
 
   callback = (e) => {
     const { step } = this.props;
-    console.log(e);
-    if (e.action === 'close') {
-      this.setState({ startIndex: step });
+    // console.log(e);
+
+    if (!['close'].includes(e.action) && e.type === 'finished') {
+      this.props.dispatch(setOnBoardingState(onBoardingStates.FINISHED));
+    } else if (e.type === 'error:target_not_found') {
+      const skiptedIndex = (e.action === 'next') ? e.index + 1 : e.index - 1;
+      this.setState({ startIndex: skiptedIndex });
+      this.props.dispatch(setOnBoardingStep(skiptedIndex));
+    } else if (e.action === 'close' && e.type === 'finished') {
+      // return;
+      // this.joyride.reset(true);
+      this.setState({ startIndex: 0 });
       // this.props.dispatch(showOnBoarding(false));
     } else if (e.action === 'start') {
       if (step !== 0) {
-        this.setState({ startIndex: step, showInvoce: true });
-      } else {
-        this.setState({ showInvoce: true });
+        this.setState({ startIndex: step });
       }
     } else if (e.action === 'next' && e.type === 'step:before') {
       this.props.dispatch(setOnBoardingStep(e.index));
     } else if (e.action === 'back' && e.type === 'step:after') {
       this.props.dispatch(setOnBoardingStep(e.index - 1));
-    }
-
-    if (e.type === 'error:target_not_found') {
-      const skiptedIndex = (e.action === 'next') ? e.index + 1 : e.index - 1;
-      this.setState({ showInvoce: true });
-      this.setState({ startIndex: skiptedIndex });
-      this.props.dispatch(setOnBoardingStep(skiptedIndex));
-    }
-
-    if (!['close'].includes(e.action) && e.type === 'finished') {
-      this.props.dispatch(setOnBoardingState(onBoardingStates.FINISHED));
     }
   }
 
@@ -116,6 +114,7 @@ class OnBoarding extends Component {
       this.props.dispatch(setOnBoardingStep(0));
     }
     this.props.dispatch(setOnBoardingState(onBoardingStates.RUNNING));
+    this.startTourSteps();
   }
 
   stopTour = () => {
@@ -129,8 +128,25 @@ class OnBoarding extends Component {
   }
 
   onCloseHelp = () => {
-    this.setState({ startIndex: 0, showInvoce: false });
+    this.setState({ startIndex: 0 });
     this.props.dispatch(showOnBoarding(false));
+  }
+
+  askStop = () => {
+    const confirm = {
+      message: 'Are you sure you want to end the tour ?',
+      onOk: this.stopTour,
+      labelOk: 'End tour',
+      labelCancel: 'Continue tour',
+      type: 'delete',
+    };
+    this.props.dispatch(showConfirmModal(confirm));
+  };
+
+  startTourSteps = () => {
+    // console.log('starting !');
+    this.setState({ run: true });
+    // this.joyride.reset(true);
   }
 
   renderIsReadyContent = () => (
@@ -172,7 +188,7 @@ class OnBoarding extends Component {
 
   render() {
     const { show, isRunnig, isFinished } = this.props;
-    const { startIndex, showInvoce } = this.state;
+    const { startIndex, autoStart, steps, run } = this.state;
     if (!show) {
       return null;
     }
@@ -183,7 +199,7 @@ class OnBoarding extends Component {
           title="Welcome To BillRun Cloud"
           labelOk="Do it leter"
           onOk={!isFinished ? this.closeTour : null}
-          labelCancel="Close"
+          labelCancel="Skip Tour"
           onCancel={!isFinished ? this.stopTour : null}
           onHide={this.closeTour}
         >
@@ -196,25 +212,37 @@ class OnBoarding extends Component {
         </ModalWrapper>
       );
     }
-    const autoStart = true;
-    const tourSteps = this.getSteps();
     return (
-      <div className="OnBoarding" style={{ position: 'absolute', zIndex: 1029, paddingLeft: 260 }}>
-        <div style={{ display: showInvoce ? 'block' : 'none' }}>
-          <Invoice />
-        </div>
-        <Joyride
-          disableOverlay={true}
-          showOverlay={true}
-          steps={tourSteps}
-          stepIndex={startIndex}
-          run={isRunnig}
-          showStepsProgress={true}
-          autoStart={autoStart}
-          debug={false}
-          callback={this.callback}
-          type="continuous"
-        />
+      <div className="OnBoarding">
+
+        <ModalWrapper
+          title="Example Invoice"
+          show={true}
+          modalSize="large"
+          onHide={this.onCloseHelp}
+          labelCancel="End Tour"
+          onCancel={this.askStop}
+          labelOk="Pause Tour"
+          onOk={this.onCloseHelp}
+        >
+          <span>
+            <Invoice />
+            <Joyride
+              type="continuous"
+              ref={(j) => { this.joyride = j; }}
+              showStepsProgress={false}
+              scrollToFirstStep={true}
+              disableOverlay={true}
+              showOverlay={true}
+              debug={false}
+              stepIndex={startIndex}
+              steps={this.getSteps()}
+              run={run}
+              autoStart={autoStart}
+              callback={this.callback}
+            />
+          </span>
+        </ModalWrapper>
       </div>
     );
   }
@@ -227,4 +255,4 @@ const mapStateToProps = state => ({
   step: onBoardingStepSelector(state),
 });
 
-export default withRouter(connect(mapStateToProps)(OnBoarding));
+export default connect(mapStateToProps)(OnBoarding);

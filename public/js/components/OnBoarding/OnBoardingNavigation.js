@@ -37,7 +37,7 @@ const OnBoardingNavigation = ({ isRunnig, isReady, isShow, eventKeyBase, dispatc
 
   if (isReady) {
     return (
-      <MenuItem key="tour-start" eventKey={eventKeyBase} onClick={toggle} active={false}>
+      <MenuItem eventKey={eventKeyBase} onClick={toggle} active={false}>
         Start Tour
       </MenuItem>
     );
@@ -45,32 +45,13 @@ const OnBoardingNavigation = ({ isRunnig, isReady, isShow, eventKeyBase, dispatc
 
   if (isRunnig) {
     return (
-      <NavDropdown
-        id="tour-nav"
-        eventKey={eventKeyBase}
-        className="running active"
-        title={
-          <span>
-            {isShow ? (
-              <i className="fa fa-play-circle fa-fw" />
-            ) : (
-              <i className="fa fa-pause-circle fa-fw" />
-            )}
-            Tour
-          </span>
-        }
-      >
-        <MenuItem key="tour-stop" eventKey={parseFloat(`${eventKeyBase}.1`)} onClick={askStop}>
-          <i className="fa fa-stop fa-fw" /> Stop Tour
-        </MenuItem>
-        <MenuItem key="tour-start" eventKey={parseFloat(`${eventKeyBase}.2`)} onClick={toggle}>
-          {isShow ? (
-            <span><i className="fa fa-pause fa-fw" /> Pause Tour</span>
-          ) : (
-            <span><i className="fa fa-play fa-fw" /> Resume Tour</span>
-          )}
-        </MenuItem>
-      </NavDropdown>
+      <MenuItem eventKey={eventKeyBase} onClick={toggle} className="running" active={true}>
+        {isShow ? (
+          <span>You are in  Tour</span>
+        ) : (
+          <span><i className="fa fa-play fa-fw" /> Resume Tour</span>
+        )}
+      </MenuItem>
     );
   }
 

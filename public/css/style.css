@@ -742,3 +742,7 @@ ul.revision-history-list li.active .cycle {
   width: 80%;
   box-shadow: 1px 1px 20px 2px rgba(0, 0, 0, .125);
 }
+.joyride {
+  z-index: 99999;
+  position: absolute;
+}
