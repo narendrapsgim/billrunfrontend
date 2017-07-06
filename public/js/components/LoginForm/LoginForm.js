@@ -94,7 +94,7 @@ class LoginForm extends Component {
                   <FormControl
                     autoFocus
                     type="text"
-                    placeholder="User Name"
+                    placeholder="Email address"
                     value={this.state.username}
                     onChange={this.onChangeUsername}
                   />
