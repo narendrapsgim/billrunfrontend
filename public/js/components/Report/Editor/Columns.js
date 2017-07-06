@@ -5,6 +5,7 @@ import { ReportDescription } from '../../../FieldDescriptions';
 import { CreateButton, SortableFieldsContainer } from '../../Elements';
 import Column from './Column';
 import { reportTypes } from '../../../actions/reportsActions';
+import { getFieldName } from '../../../common/Util';
 
 
 class Columns extends Component {
@@ -21,6 +22,7 @@ class Columns extends Component {
     onAdd: PropTypes.func,
     onRemove: PropTypes.func,
     onMove: PropTypes.func,
+    onAddCount: PropTypes.func,
   }
 
   static defaultProps = {
@@ -35,6 +37,7 @@ class Columns extends Component {
     onAdd: () => {},
     onRemove: () => {},
     onMove: () => {},
+    onAddCount: () => {},
   }
 
   shouldComponentUpdate(nextProps) {
@@ -56,30 +59,70 @@ class Columns extends Component {
     config => config.get('aggregatable', true),
   );
 
+  getColumnFieldsOptions = () => {
+    const key = this.getCountColumnKey();
+    return Immutable.Map({
+      aggregatable: true,
+      searchable: true,
+      id: key,
+      title: getFieldName(key, 'report'),
+    });
+  }
+
+  isCountColumn = column => column.get('key', '') === this.getCountColumnKey();
+
+  getCountColumnKey = () => 'count_group';
+
+  isCountColumnExist = columns => columns.findIndex(
+    column => column.get('key', '') === this.getCountColumnKey(),
+  ) > -1;
+
+  onAddCount = () => {
+    const key = this.getCountColumnKey();
+    const column = Immutable.Map({
+      key,
+      field_name: key,
+      label: getFieldName(key, 'report'),
+      op: 'count',
+    });
+    this.props.onAdd(column);
+  }
+
+  onAdd = (e) => { // eslint-disable-line no-unused-vars
+    this.props.onAdd();
+  }
+
   renderRows = () => {
     const { mode, columns, fieldsConfig, aggregateOperators, type } = this.props;
     const disabled = mode === 'view';
     const fieldsOptions = this.getFieldsOptions(fieldsConfig);
-    return columns.map((column, index) => (
-      <Column
-        key={column.get('key', index)}
-        item={column}
-        idx={index}
-        index={index}
-        disabled={disabled}
-        type={type}
-        fieldsConfig={fieldsOptions}
-        operators={aggregateOperators}
-        onChangeField={this.props.onChangeField}
-        onChangeOperator={this.props.onChangeOperator}
-        onChangeLabel={this.props.onChangeLabel}
-        onRemove={this.props.onRemove}
-      />
-    ));
+    return columns.map((column, index) => {
+      const isCountColumn = this.isCountColumn(column);
+      const columOptions = isCountColumn
+        ? fieldsOptions.push(this.getColumnFieldsOptions())
+        : fieldsOptions;
+      return (
+        <Column
+          key={column.get('key', index)}
+          item={column}
+          idx={index}
+          index={index}
+          disabled={disabled}
+          type={type}
+          isCountColumn={isCountColumn}
+          fieldsConfig={columOptions}
+          operators={aggregateOperators}
+          onChangeField={this.props.onChangeField}
+          onChangeOperator={this.props.onChangeOperator}
+          onChangeLabel={this.props.onChangeLabel}
+          onRemove={this.props.onRemove}
+        />
+      );
+    });
   }
 
   render() {
-    const { mode, type, fieldsConfig } = this.props;
+    const { mode, type, fieldsConfig, columns } = this.props;
     const columnsRows = this.renderRows();
     const disableAdd = fieldsConfig.isEmpty();
     const emptyHelpText = (type === reportTypes.GROPPED)
@@ -112,11 +155,21 @@ class Columns extends Component {
         { mode !== 'view' && (
           <Col sm={12}>
             <CreateButton
-              onClick={this.props.onAdd}
+              onClick={this.onAdd}
               label="Add Column"
               disabled={disableAdd}
               title={disableCreateNewtitle}
             />
+            { type !== reportTypes.SIMPLE && (
+              <span style={{ marginLeft: 10 }}>
+                <CreateButton
+                  onClick={this.onAddCount}
+                  label="Add Count Column"
+                  disabled={this.isCountColumnExist(columns)}
+                  title="Add Column to gount grpup fields"
+                />
+              </span>
+            )}
           </Col>
         )}
       </Row>
