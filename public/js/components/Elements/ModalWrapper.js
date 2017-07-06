@@ -3,8 +3,8 @@ import { Modal, Button } from 'react-bootstrap';
 
 
 const ModalWrapper = props => (
-  <Modal show={props.show}>
-    <Modal.Header closeButton={props.onHide ? true : false} onHide={props.onHide}>
+  <Modal show={props.show} bsSize={props.modalSize}>
+    <Modal.Header closeButton={props.onHide !== null} onHide={props.onHide}>
       <Modal.Title>{ props.title }</Modal.Title>
     </Modal.Header>
     <Modal.Body>
@@ -32,12 +32,17 @@ const ModalWrapper = props => (
 );
 
 ModalWrapper.defaultProps = {
+  children: null,
   title: '',
   show: false,
   progress: false,
   labelOk: 'OK',
   labelCancel: 'Cancel',
   labelProgress: null,
+  modalSize: undefined,
+  onHide: null,
+  onOk: null,
+  onCancel: null,
 };
 
 ModalWrapper.propTypes = {
@@ -49,6 +54,7 @@ ModalWrapper.propTypes = {
   show: PropTypes.bool.isRequired,
   progress: PropTypes.bool,
   labelProgress: PropTypes.string,
+  modalSize: PropTypes.oneOf(['large', 'small', undefined]),
   title: PropTypes.string.isRequired,
   onHide: PropTypes.func,
 };
