@@ -16,6 +16,8 @@ class CyclesSelector extends Component {
     onChange: PropTypes.func,
     id: PropTypes.string,
     multi: PropTypes.bool,
+    from:PropTypes.string,
+    to:PropTypes.string,
   };
 
   static defaultProps = {
@@ -25,10 +27,12 @@ class CyclesSelector extends Component {
     onChange: () => {},
     id: 'cycle',
     multi: false,
+    from:"",
+    to:""
   };
 
   componentDidMount() {
-    this.props.dispatch(getList('cycles_list', getCyclesQuery()));
+    this.props.dispatch(getList('cycles_list', getCyclesQuery(this.props.from,this.props.to)));
   }
 
   componentWillUnmount() {
