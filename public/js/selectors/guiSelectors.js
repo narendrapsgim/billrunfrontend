@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { onBoardingStates } from '../actions/guiStateActions/pageActions'
+import { onBoardingStates } from '../actions/guiStateActions/pageActions';
 
 const getOnBoardingShow = state => state.guiState.page.getIn(['onBoarding', 'show']);
 export const onBoardingShowSelector = createSelector(
