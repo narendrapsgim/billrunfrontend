@@ -1,6 +1,9 @@
 lib/*
+backup/*
 dist/*
 build/*
 **/build/*
+vendors/*
+**/vendors/*
 node_modules/*
 **/node_modules/*
