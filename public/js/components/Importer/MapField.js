@@ -40,7 +40,14 @@ const MapField = (props) => {
             </InputGroup>
           )
         }
-        {defaultValue.length > 0 && <HelpBlock>Default value if no value is selected: <Label bsStyle="primary">{defaultValue}</Label></HelpBlock>}
+        {defaultValue.length > 0 && (
+          <HelpBlock className="mb0 mt0">
+            Default value if no value is selected:&nbsp;
+            <Label bsStyle="primary" style={{ padding: '1px 6px', fontWeight: 'bold' }} >
+              {defaultValue}
+            </Label>
+          </HelpBlock>
+        )}
       </Col>
     </FormGroup>
   );

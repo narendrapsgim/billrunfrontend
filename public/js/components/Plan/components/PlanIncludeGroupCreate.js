@@ -257,15 +257,18 @@ class PlanIncludeGroupCreate extends Component {
     switch (stepIndex) {
 
       case steps.get('SetNameAndType', { index: -1 }).index:
-        return (
-          <FormGroup validationState={error.length > 0 ? 'error' : null}>
+        return ([
+          <FormGroup key="group_name" validationState={error.length > 0 ? 'error' : null} className="mb10">
             <Col componentClass={ControlLabel} sm={3}>
               Name<Help contents={GroupsInclude.name} />
             </Col>
             <Col sm={8}>
               <FormControl type="text" placeholder="Enter Group Name.." value={name} onChange={this.onChangeGroupName} />
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
-
+            </Col>
+          </FormGroup>,
+          <FormGroup key="group_type" validationState={error.length > 0 ? 'error' : null} style={{ marginBottom: 8 }}>
+            <Col smOffset={3} sm={8}>
               <Field
                 fieldType="radio"
                 name="based-on"
@@ -285,8 +288,8 @@ class PlanIncludeGroupCreate extends Component {
                 label="&nbsp;Monetary based"
               />
             </Col>
-          </FormGroup>
-        );
+          </FormGroup>,
+        ]);
 
       case steps.get('SetUsageType', { index: -1 }).index:
         return (
@@ -307,7 +310,7 @@ class PlanIncludeGroupCreate extends Component {
 
       case steps.get('SetIncludes', { index: -1 }).index:
         return ([
-          <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usage}_includes`}>
+          <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usage}_includes`} className="mb10">
             <Col componentClass={ControlLabel} sm={3}>
               {setIncludesTitle}
             </Col>
@@ -319,15 +322,13 @@ class PlanIncludeGroupCreate extends Component {
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
             </Col>
           </FormGroup>,
-          <FormGroup key={`${usage}_shared`}>
+          <FormGroup key={`${usage}_shared`} className="mb10">
             <Col smOffset={3} sm={8}>
               <Checkbox checked={shared} onChange={this.onChangeShared}>
                 {"Share with all account's subscribers"}
                 <Help contents={GroupsInclude.shared_desc} />
               </Checkbox>
             </Col>
-          </FormGroup>,
-          <FormGroup key={`${usage}_pooled`}>
             <Col smOffset={3} sm={8}>
               <Checkbox disabled={!shared} checked={pooled} onChange={this.onChangePooled}>
                 {'Includes is pooled?'}
@@ -341,11 +342,11 @@ class PlanIncludeGroupCreate extends Component {
         return (
           <FormGroup validationState={error.length > 0 ? 'error' : null}>
             {monetaryBased
-              ? <Col componentClass={ControlLabel} sm={3} />
-              : <Col componentClass={ControlLabel} sm={3}>{changeCase.sentenceCase(`Products of type ${usage}`)}<Help contents={GroupsInclude.products} /></Col>
+              ? <Col componentClass={ControlLabel} sm={3}>Products</Col>
+              : <Col componentClass={ControlLabel} sm={3} style={{ paddingTop: 2 }}>Products of type <br />{changeCase.sentenceCase(usage)}<Help contents={GroupsInclude.products} /></Col>
             }
             <Col sm={8}>
-              <div style={{ marginTop: 10, minWidth: 250, width: '100%', minHeight: 42 }}>
+              <div style={{ width: '100%' }}>
                 <ProductSearchByUsagetype
                   products={products}
                   usaget={usage}
@@ -378,7 +379,7 @@ class PlanIncludeGroupCreate extends Component {
     if (name.length) {
       modalTitle += ` - ${name}`;
     }
-    const styleStepper = { height: 20, marginLeft: -15, marginTop: 15 };
+    const styleStepper = { height: 20 };
 
     return (
       <div>
@@ -388,18 +389,17 @@ class PlanIncludeGroupCreate extends Component {
           <Modal.Header closeButton onHide={this.handleCancel}>
             <Modal.Title>
               {modalTitle}
-              <Stepper activeStep={stepIndex} style={styleStepper}>
-                {this.renderSteps()}
-              </Stepper>
             </Modal.Title>
           </Modal.Header>
 
-          <Modal.Body>
-            <div style={{ marginTop: 25, marginBottom: 25 }}>
-              <Form horizontal>
-                {this.getStepContent(stepIndex)}
-              </Form>
-            </div>
+          <Modal.Body style={{ minHeight: 235 }}>
+            <Stepper activeStep={stepIndex} style={styleStepper}>
+              {this.renderSteps()}
+            </Stepper>
+            <hr style={{ margin: '20px -20px 35px -20px' }} />
+            <Form horizontal className="mb0">
+              {this.getStepContent(stepIndex)}
+            </Form>
           </Modal.Body>
 
           <Modal.Footer>

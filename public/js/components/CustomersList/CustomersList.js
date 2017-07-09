@@ -4,10 +4,9 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
 import EntityList from '../EntityList';
-import { LoadingItemPlaceholder, ModalWrapper } from '../Elements';
+import { LoadingItemPlaceholder, ModalWrapper, ConfirmModal } from '../Elements';
 import Importer from '../Importer';
 import { getSettings } from '../../actions/settingsActions';
-import { clearItems } from '../../actions/entityListActions';
 import { accountFieldsSelector } from '../../selectors/settingsSelector';
 import { getFieldName, getConfig } from '../../common/Util';
 
@@ -30,6 +29,7 @@ class CustomersList extends Component {
 
   state = {
     showImport: false,
+    showCloseImportConfirm: false,
     refreshString: '',
   }
 
@@ -71,9 +71,10 @@ class CustomersList extends Component {
     { type: 'edit' },
   ];
 
-  onCloseImprt = () => {
+  onCloseImport = () => {
     this.setState({
       showImport: false,
+      showCloseImportConfirm: false,
       refreshString: moment().format(), //refetch list items after import
     });
   }
@@ -84,9 +85,21 @@ class CustomersList extends Component {
     });
   }
 
+  onClickAskCloseImport = () => {
+    this.setState({
+      showCloseImportConfirm: true,
+    });
+  }
+
+  onClickCancelCloseConfirm = () => {
+    this.setState({
+      showCloseImportConfirm: false,
+    });
+  }
+
   render() {
     const { accountFields } = this.props;
-    const { showImport, refreshString } = this.state;
+    const { showImport, refreshString, showCloseImportConfirm } = this.state;
 
     if (accountFields === null) {
       return (<LoadingItemPlaceholder />);
@@ -98,6 +111,7 @@ class CustomersList extends Component {
     const apiDateFormat = getConfig('apiDateFormat', 'YYYY-MM-DD');
     const defaultFrom = moment().format(apiDateFormat);
     const defaultTo = moment().add(100, 'years').format(apiDateFormat);
+    const closeImportConfirmMessage = 'Are you sure you want to close import ?';
 
     return (
       <div>
@@ -111,10 +125,10 @@ class CustomersList extends Component {
           listActions={listActions}
           refreshString={refreshString}
         />
-        <ModalWrapper show={showImport} title="Import" onHide={this.onCloseImprt}>
+        <ModalWrapper show={showImport} title="Import" onHide={this.onClickAskCloseImport}>
           <Importer
             entityOptions={['customer', 'subscription']}
-            onFinish={this.onCloseImprt}
+            onFinish={this.onCloseImport}
             defaultValues={{
               customer: [{
                 key: 'from',
@@ -133,6 +147,7 @@ class CustomersList extends Component {
             }}
           />
         </ModalWrapper>
+        <ConfirmModal onOk={this.onCloseImport} onCancel={this.onClickCancelCloseConfirm} show={showCloseImportConfirm} message={closeImportConfirmMessage} labelOk="Yes" />
       </div>
     );
   }

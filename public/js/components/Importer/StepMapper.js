@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Col, Label, FormGroup, ControlLabel } from 'react-bootstrap';
+import { Col, Label, FormGroup, ControlLabel, Panel } from 'react-bootstrap';
 import Select from 'react-select';
 import MapField from './MapField';
 
@@ -131,11 +131,9 @@ const StepMapper = (props) => {
       <div>
         <div>{mapfields}</div>
         {linkers !== null && (
-          <div>
-            <hr />
-            <h4>Linker</h4>
+          <Panel header="Linker" className="mb0">
             {linkers}
-          </div>
+          </Panel>
         )}
       </div>
     );
