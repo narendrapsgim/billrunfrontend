@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import changeCase from 'change-case';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import Help from '../../Help';
-import ConfirmModal from '../../ConfirmModal';
+import { ConfirmModal } from '../../Elements';
 import Field from '../../Field';
 import Actions from '../../Elements/Actions';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';

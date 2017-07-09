@@ -6,8 +6,10 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import BraasTheme from '../theme';
 import ProgressIndicator from '../components/ProgressIndicator';
+import ReduxConfirmModal from '../components/ReduxConfirmModal';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
+import OnBoarding from '../components/OnBoarding';
 import Footer from '../components/Footer';
 import { userCheckLogin } from '../actions/userActions';
 import { setPageTitle, systemRequirementsLoadingComplete } from '../actions/guiStateActions/pageActions';
@@ -45,7 +47,6 @@ class App extends Component {
 
   componentWillMount() {
     this.props.dispatch(userCheckLogin());
-    this.setState({ Height: '100%' });
   }
 
   componentDidMount() {
@@ -135,19 +136,21 @@ class App extends Component {
   );
 
   renderWithLayout = () => {
-    const { title, children } = this.props;
+    const { title, children, routes } = this.props;
     return (
       <div id="wrapper" style={{ height: '100%' }}>
         <ProgressIndicator />
         <Alerts />
-        <Navigator />
-        <div id="page-wrapper" className="page-wrapper" style={{ minHeight: this.state.Height }}>
+        <Navigator routes={routes} />
+        <OnBoarding />
+        <div id="page-wrapper" className="page-wrapper">
           <Row>
             <Col lg={12}>{title && <PageHeader>{title}</PageHeader> }</Col>
           </Row>
           <div>{children}</div>
         </div>
         <Footer />
+        <ReduxConfirmModal />
       </div>
     );
   }

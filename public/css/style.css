@@ -1,5 +1,5 @@
 body {
-    margin-top: 50px;
+  padding-top: 50px;
 }
 html {
     font-size: 12px;
@@ -20,6 +20,9 @@ textarea {
 .btn[disabled],
 fieldset[disabled] .btn {
   opacity: 0.3;
+}
+.modal {
+  z-index: 2000;
 }
 .clickable {
   cursor: pointer;
@@ -103,12 +106,21 @@ fieldset[disabled] .btn {
 .navbar-default .navbar-toggle {
     border-color: #ddd;
 }
+
+.navbar-default .navbar-collapse {
+  border-top-color: #e0e0e0;
+}
+.navbar-top-links.small-screen-menu{
+  position: absolute;
+  top: 0;
+  right: 50;
+}
 .main-menu {
-  min-height: 90%;
+  min-height: 92%;
   position: inherit;
   overflow-y: auto;
 }
-.main-menu.smallScreenMenu {
+.main-menu.small-screen-menu {
   position: static;
   box-shadow: 0px 13px 20px 3px #888;
 }
@@ -357,14 +369,22 @@ fieldset[disabled] .btn {
     border-bottom: 1px solid #e7e7e7;
     background-color: white;
 }
+
+.navbar.navbar-default.navbar-fixed-top.small-screen-menu{
+  padding-bottom: 4px;
+}
 /* AdvancedFilter Date picker */
 .AdvancedFilter .react-datepicker__input-container{
   width: 100%
 }
 /* ~AdvancedFilter Date picker */
+/*#wrapper{
+  padding-top: 50px;
+}*/
 #page-wrapper{
   margin-bottom: -30px;
   padding-bottom: 40px;
+  min-height: 100%;
 }
 #footer {
   height: 30px;
@@ -709,4 +729,20 @@ ul.revision-history-list li.active .cycle {
 }
 .Select-memu-outer {
   background-color: blue!important;
+}
+
+.minimized {
+  transform: scale(.5)!important;
+}
+
+.on-boarding-wrapper {
+  background: #fff;
+  position: fixed;
+  z-index: 9999;
+  width: 80%;
+  box-shadow: 1px 1px 20px 2px rgba(0, 0, 0, .125);
+}
+.joyride {
+  z-index: 99999;
+  position: absolute;
 }

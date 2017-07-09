@@ -9,7 +9,7 @@ import EntityList from '../EntityList';
 import { getList } from '../../actions/listActions';
 import { getConfig } from '../../common/Util';
 import { confirmCycleInvoice, confirmCycle, getConfirmationAllStatus, getConfirmationInvoicesStatus } from '../../actions/cycleActions';
-import ConfirmModal from '../../components/ConfirmModal';
+import { ConfirmModal } from '../../components/Elements';
 import { currencySelector } from '../../selectors/settingsSelector';
 import { getDateToDisplay } from './CycleUtil';
 

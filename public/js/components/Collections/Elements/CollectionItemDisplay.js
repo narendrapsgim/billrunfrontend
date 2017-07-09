@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
-import ConfirmModal from '../../ConfirmModal';
+import { ConfirmModal } from '../../Elements';
 
 
 export default class CollectionItemDisplay extends Component {
