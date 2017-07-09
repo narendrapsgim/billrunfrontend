@@ -145,7 +145,10 @@ class OnBoarding extends Component {
 
   startTourSteps = () => {
     // console.log('starting !');
-    this.setState({ run: true });
+    setInterval(() => {
+      this.setState({ run: true });
+    }, 3000);
+
     // this.joyride.reset(true);
   }
 
