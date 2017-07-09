@@ -690,28 +690,20 @@ ul.revision-history-list li.active .cycle {
   /* Opera doesn't support this in the shorthand */
   background-attachment: local, local, scroll, scroll;
 }
-
-.Importer .panel-body{
-  padding: 0;
+/* Importer */
+.Importer .form-group{
+  margin-left: 0;
+  margin-right: 0;
 }
-.Importer .StepUpload {
-  padding: 25px;
-}
-.Importer .StepMapper {
-  max-height: 300px;
-  width: 100%;
-  padding: 25px;
-}
-.Importer .StepMapper .Select-control {
-  /* set select imput transparent to not hide wrapper div shadows */
+.Importer .panel,
+.Importer .Select-control {
+  /* set select input transparent to not hide wrapper div shadows */
   background-color: transparent;
 }
-.Importer .StepValidate .row-fields {
-  max-height: 300px;
-  width: 100%;
-  margin: -21px 0 0 15px;
-  padding-right: 25px;
-  padding-top: 25px;
+.Importer .StepUpload,
+.Importer .StepMapper,
+.Importer .StepValidate .row-fields{
+  padding: 25px;
 }
 .Importer .StepUpload,
 .Importer .StepMapper,
@@ -719,29 +711,21 @@ ul.revision-history-list li.active .cycle {
 .Importer .StepResult {
   min-height: 200px;
 }
+.Importer .StepMapper {
+  max-height: 258px;
+}
+.Importer .StepValidate .row-fields {
+  max-height: 300px;
+  margin: 0;
+}
 .Importer .StepResult ol {
   max-height: 200px;
-  width: 100%;
-  margin: 0 0 0 15px;
-  padding-right: 25px;
-  padding-bottom: 25px;
+  margin: 0;
+  padding-bottom: 10px;
   padding-top: 10px;
 }
-.Select-memu-outer {
-  background-color: blue!important;
-}
+/* ~Importer */
 
-.minimized {
-  transform: scale(.5)!important;
-}
-
-.on-boarding-wrapper {
-  background: #fff;
-  position: fixed;
-  z-index: 9999;
-  width: 80%;
-  box-shadow: 1px 1px 20px 2px rgba(0, 0, 0, .125);
-}
 .joyride {
   z-index: 99999;
   position: absolute;

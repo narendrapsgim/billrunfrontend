@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Col, Label } from 'react-bootstrap';
+import { Label } from 'react-bootstrap';
 import { CSVLink } from 'react-csv';
 
 
@@ -29,23 +29,20 @@ const StepResult = (props) => {
     return rows;
   };
 
-  const rendeDetails = () => {
-    const style = { maxHeight: 150, width: '100%' };
-    return (
-      <ol className="scrollbox" style={style}>
-        { result.map((status, key) => {
-          const error = status !== true;
-          const label = error ? status : 'Success';
-          const bsStyle = error ? 'danger' : 'success';
-          return (
-            <li key={key}>
-              <Label bsStyle={bsStyle}>{label}</Label>
-            </li>
-          );
-        })}
-      </ol>
-    );
-  };
+  const rendeDetails = () => (
+    <ol className="scrollbox">
+      { result.map((status, key) => {
+        const error = status !== true;
+        const label = error ? status : 'Success';
+        const bsStyle = error ? 'danger' : 'success';
+        return (
+          <li key={key}>
+            <Label bsStyle={bsStyle}>{label}</Label>
+          </li>
+        );
+      })}
+    </ol>
+  );
 
   const renderStatus = () => {
     // No resolts -> no imports
@@ -103,11 +100,10 @@ const StepResult = (props) => {
   };
 
   return (
-    <Col md={12} className="StepResult">
+    <div className="StepResult">
       <h4>Import status</h4>
-      <hr style={{ marginTop: 10 }} />
       {renderStatus()}
-    </Col>
+    </div>
   );
 };
 
