@@ -401,10 +401,20 @@ export const getRebalanceAccountQuery = (aid, billrunKey = '') => {
   };
 };
 
-export const getCyclesQuery = () => ({
-  api: 'billrun',
-  action: 'cycles',
-});
+export const getCyclesQuery = (from, to) => {
+  const params = {
+    api: 'billrun',
+    action: 'cycles',
+    params:[]
+  }
+  if(from) {
+      params['params'].push({from});
+  }
+  if(to) {
+      params['params'].push({to});
+  }
+  return params;
+};
 
 export const getCycleQuery = billrunKey => ({
   api: 'billrun',
@@ -535,6 +545,16 @@ export const getReportQuery = ({ report, page = 0, size = 10 }) => ({
     { size },
   ],
 });
+
+export const getExpectedInvoiceQuery = ( aid, billrunKey ) => ({
+  api: 'accountinvoices',
+  params: [
+    { action: 'expected_invoice' },
+    { aid },
+    { billrun_key: billrunKey },
+  ],
+});
+
 
 // Dashboard reports queries
 export const getDashboardQuery = action => ({
