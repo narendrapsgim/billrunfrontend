@@ -52,13 +52,13 @@ class UserList extends Component {
 
   onDeleteOk = () => {
     const { itemToDelete } = this.state;
-    this.setState({ progress: true, refreshString: moment().format() });
     this.props.dispatch(deleteUser(itemToDelete)).then(this.afterDelete);
   }
 
   afterDelete = (response) => {
     this.onDeleteClose();
     if (response.status) {
+      this.setState({ refreshString: moment().format() });
       this.props.dispatch(showSuccess('User was deleted'));
     }
   }
