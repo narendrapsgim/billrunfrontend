@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, Panel } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import StepUpload from './StepUpload';
 import StepMapper from './StepMapper';
@@ -212,7 +212,7 @@ class Importer extends Component {
   renderStepper = () => {
     const { stepIndex } = this.state;
     return (
-      <Stepper activeStep={stepIndex}>
+      <Stepper activeStep={stepIndex} style={{ height: 20 }}>
         <Step key={0}>
           <StepLabel>Upload File</StepLabel>
         </Step>
@@ -288,11 +288,13 @@ class Importer extends Component {
   render() {
     return (
       <div className="Importer">
-        <Panel header={this.renderStepper()}>
-          <Form horizontal>
-            {this.renderStepContent()}
-          </Form>
-        </Panel>
+        {this.renderStepper()}
+        <hr style={{ margin: '20px -20px 0 -20px' }} />
+        <Form horizontal className="mb0">
+          {this.renderStepContent()}
+        </Form>
+        <div className="clearfix" />
+        <hr className="mt0" />
         {this.renderActionButtons()}
       </div>
     );
