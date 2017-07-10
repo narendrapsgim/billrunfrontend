@@ -221,7 +221,7 @@ function apendImporterControlers() {
               <span class="glyphicon glyphicon-download-alt" aria-hidden="true" /></span>&nbsp;
               Download
             </button>
-            <h4 class="list-group-item-heading">Subscriptions</h4>
+            <h4 class="list-group-item-heading">Subscribers</h4>
             <p class="list-group-item-text">
             </p>
           </li>

@@ -53,7 +53,7 @@ const selectSubscriberImportFields = (fields, accountfields) => {
     return fields.push(Immutable.Map({
       linker: true,
       field_name: 'account_import_id',
-      title: 'Account Import ID',
+      title: 'Customer Import ID',
     }));
   }
   return fields;
@@ -69,7 +69,7 @@ const selectAccountImportFields = (fields) => {
         generated: false,
         mandatory: true,
         field_name: 'account_import_id',
-        title: 'Account Import ID (for subscriber import)',
+        title: 'Customer Import ID (for subscriber import)',
       }));
   }
   return fields;
