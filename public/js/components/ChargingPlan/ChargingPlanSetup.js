@@ -4,6 +4,7 @@ import { withRouter } from 'react-router';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
 import ChargingPlanDetails from './ChargingPlanDetails';
 import ChargingPlanIncludes from './ChargingPlanIncludes';
 import { EntityRevisionDetails } from '../Entity';
@@ -13,6 +14,7 @@ import {
   buildPageTitle,
   getConfig,
   getItemId,
+  getUnitLabel,
 } from '../../common/Util';
 import {
   getPrepaidGroup,
@@ -23,6 +25,11 @@ import {
   onPlanTariffAdd,
   setClonePlan,
 } from '../../actions/planActions';
+import {
+  currencySelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../../selectors/settingsSelector';
 import { getList } from '../../actions/listActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -46,6 +53,9 @@ class ChargingPlanSetup extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    currency: PropTypes.string,
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
@@ -53,6 +63,9 @@ class ChargingPlanSetup extends Component {
     revisions: Immutable.List(),
     prepaidIncludes: Immutable.List(),
     activeTab: 1,
+    currency: PropTypes.string,
+    usageTypes: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
   };
 
   state = {
@@ -143,17 +156,22 @@ class ChargingPlanSetup extends Component {
   };
 
   onSelectPPInclude = (value) => {
-    const { prepaidIncludes, item } = this.props;
+    const { prepaidIncludes, item, propertyTypes, usageTypes, currency } = this.props;
     if (value === '') {
       return;
     }
     const ppInclude = prepaidIncludes.find(pp => pp.get('name') === value);
     const ppIncludesName = ppInclude.get('name');
     const ppIncludesExternalId = ppInclude.get('external_id');
+    const unit = ppInclude.get('charging_by_usaget_unit', false);
+    const usaget = ppInclude.get('charging_by_usaget', '');
+    const unitLabel = unit
+      ? `Volume (${getUnitLabel(propertyTypes, usageTypes, usaget, unit)})`
+      : `Cost (${getSymbolFromCurrency(currency)})`;
     const includes = item.get('include', Immutable.List());
     const alreadyExists = includes.find(include => include.get('pp_includes_name', '') === value) !== undefined;
     if (!alreadyExists) {
-      this.props.dispatch(addUsagetInclude(ppIncludesName, ppIncludesExternalId));
+      this.props.dispatch(addUsagetInclude(ppIncludesName, ppIncludesExternalId, unitLabel));
     }
   };
 
@@ -265,5 +283,8 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'charging_plan'),
   prepaidIncludes: state.list.get('prepaid_includes'),
+  currency: currencySelector(state, props),
+  usageTypes: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(ChargingPlanSetup));

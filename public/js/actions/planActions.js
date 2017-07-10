@@ -117,10 +117,11 @@ export const setClonePlan = () => ({
   uniquefields: ['name'],
 });
 
-export const addUsagetInclude = (ppIncludesName, ppIncludesExternalId) => ({
+export const addUsagetInclude = (ppIncludesName, ppIncludesExternalId, unitLabel) => ({
   type: ADD_USAGET_INCLUDE,
   ppIncludesName,
   ppIncludesExternalId,
+  unitLabel,
 });
 
 export const savePlan = (plan, action) => saveEntity('plans', plan, action);
