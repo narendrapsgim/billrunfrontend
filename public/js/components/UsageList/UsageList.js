@@ -74,7 +74,7 @@ class UsageList extends Component {
       { id: 'aid', placeholder: 'Customer ID', type: 'number', sort: true, showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'aid') },
       { id: 'sid', placeholder: 'Subscription ID', type: 'number', sort: true, showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'sid') },
       { id: 'plan', placeholder: 'Plan', showFilter: !Object.prototype.hasOwnProperty.call(baseFilter, 'plan') },
-      { id: 'urt', placeholder: 'Time', type: 'datetime', cssClass: 'long-date', showFilter: false, sort: true },
+      { id: 'urt', placeholder: 'Time', type: 'fullDate', cssClass: 'long-date', showFilter: false, sort: true },
     ]);
   }
 
