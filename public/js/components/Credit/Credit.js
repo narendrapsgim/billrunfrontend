@@ -14,12 +14,17 @@ import { creditCharge } from '../../actions/creditActions';
 import {
   currencySelector,
   usageTypeSelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
 } from '../../selectors/settingsSelector';
+import { getUnitLabel } from '../../common/Util';
 
 class Credit extends Component {
   static defaultProps = {
     allRates: List(),
     currency: '',
+    usageTypesData: List(),
+    propertyTypes: List(),
     sid: false,
   };
 
@@ -27,6 +32,8 @@ class Credit extends Component {
     dispatch: PropTypes.func.isRequired,
     allRates: PropTypes.instanceOf(List),
     currency: PropTypes.string,
+    usageTypesData: PropTypes.instanceOf(List),
+    propertyTypes: PropTypes.instanceOf(List),
     onClose: PropTypes.func.isRequired,
     sid: PropTypes.number,
     aid: PropTypes.number.isRequired,
@@ -154,6 +161,14 @@ class Credit extends Component {
     return allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
   }
 
+  getRateUnit = (rateKey) => {
+    const { allRates, propertyTypes, usageTypesData } = this.props;
+    const selectedRate = allRates.find(rate => rate.get('key', '') === rateKey) || Map();
+    const usaget = selectedRate.get('rates', Map()).keySeq().first() || '';
+    const unit = selectedRate.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+    return getUnitLabel(propertyTypes, usageTypesData, usaget, unit);
+  }
+
   render() {
     const { rateBy, aprice, usagev, rate, validationErrors, helperMsg, progress } = this.state;
     const availableRates = this.getAvailableRates();
@@ -214,7 +229,7 @@ class Credit extends Component {
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? 'Volume' : 'Quantity'}</Col>
+            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? `Volume (${this.getRateUnit(rate)})` : 'Quantity'}</Col>
             <Col sm={10}>
               <Field
                 onChange={this.onChangeCreditUsagevValue.bind(this, 'usagev')}
@@ -246,6 +261,8 @@ class Credit extends Component {
 const mapStateToProps = (state, props) => ({
   usageTypes: usageTypeSelector(state, props),
   currency: currencySelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
   allRates: state.list.get('all_rates'),
 });
 
