@@ -17,7 +17,6 @@ const defaultState = Immutable.Map({
   title: ' ',
   systemRequirementsLoad: false,
   onBoarding: Immutable.Map({
-    show: false,
     step: 0,
     state: onBoardingStates.READY,
   }),
@@ -33,10 +32,6 @@ const pageReducer = (state = defaultState, action) => {
 
     case SYSTEM_REQUIREMENTS_LOADING_COMPLETE: {
       return state.set('systemRequirementsLoad', true);
-    }
-
-    case ONBOARDING_SHOW: {
-      return state.setIn(['onBoarding', 'show'], action.show);
     }
 
     case ONBOARDING_SET_STEP: {

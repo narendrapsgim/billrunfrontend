@@ -1,7 +1,9 @@
 import OnBoarding from './OnBoarding';
-import OnBoardingNavigation from './OnBoardingNavigation';
+import OnBoardingNavigation from './OnBoardingNavigationContainer';
+import ExampleInvoice from './ExampleInvoiceContainer';
 
 export {
-  OnBoarding as default,
+  OnBoarding as Tour,
   OnBoardingNavigation,
+  ExampleInvoice,
 };

@@ -1,11 +1,6 @@
 import { createSelector } from 'reselect';
 import { onBoardingStates } from '../actions/guiStateActions/pageActions';
 
-const getOnBoardingShow = state => state.guiState.page.getIn(['onBoarding', 'show']);
-export const onBoardingShowSelector = createSelector(
-  getOnBoardingShow,
-  show => show,
-);
 
 const getOnBoardingState = state => state.guiState.page.getIn(['onBoarding', 'state']);
 export const onBoardingStateSelector = createSelector(
@@ -32,6 +27,16 @@ export const onBoardingIsFinishedSelector = createSelector(
 export const onBoardingIsReadySelector = createSelector(
   onBoardingStateSelector,
   state => state === onBoardingStates.READY,
+);
+
+export const onBoardingIsPausedSelector = createSelector(
+  onBoardingStateSelector,
+  state => state === onBoardingStates.PAUSED,
+);
+
+export const onBoardingIsStartingSelector = createSelector(
+  onBoardingStateSelector,
+  state => state === onBoardingStates.STARTING,
 );
 
 const getConfirm = state => state.guiState.page.getIn(['confirm']);

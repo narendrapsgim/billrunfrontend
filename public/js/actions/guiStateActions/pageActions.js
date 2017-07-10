@@ -13,6 +13,9 @@ export const onBoardingStates = {
   READY: 'READY',
   RUNNING: 'RUNNING',
   FINISHED: 'FINISHED',
+  STARTING: 'STARTING',
+  PAUSED: 'PAUSED',
+  CANCELED: 'CANCELED',
 };
 
 export function setPageTitle(title) {
@@ -34,28 +37,39 @@ export function systemRequirementsLoadingComplete() {
   };
 }
 
-export const showOnBoarding = (show = false) => ({
-  type: ONBOARDING_SHOW,
-  show,
-});
-
-export const toggleOnBoarding = () => ({
-  type: ONBOARDING_TOGGLE,
-});
-
 export const setOnBoardingStep = (step = 0) => ({
   type: ONBOARDING_SET_STEP,
   step,
 });
 
-export const setOnBoardingState = (state = onBoardingStates.READY) => ({
+export const pendingOnBoarding = () => ({
   type: ONBOARDING_SET_STATE,
-  state,
+  state: onBoardingStates.READY,
 });
 
-export const stopOnBoarding = () => ({
+export const pauseOnBoarding = () => ({
+  type: ONBOARDING_SET_STATE,
+  state: onBoardingStates.PAUSED,
+});
+
+export const startOnBoarding = () => ({
+  type: ONBOARDING_SET_STATE,
+  state: onBoardingStates.STARTING,
+});
+
+export const runOnBoarding = () => ({
+  type: ONBOARDING_SET_STATE,
+  state: onBoardingStates.RUNNING,
+});
+
+export const finishOnBoarding = () => ({
   type: ONBOARDING_SET_STATE,
   state: onBoardingStates.FINISHED,
+});
+
+export const cancelOnBoarding = () => ({
+  type: ONBOARDING_SET_STATE,
+  state: onBoardingStates.CANCELED,
 });
 
 export const showConfirmModal = confirm => ({
