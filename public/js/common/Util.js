@@ -238,8 +238,18 @@ export const getSettingsPath = (entityName, path) => {
   return path;
 };
 
-export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
+export const getUom = (propertyTypes, usageTypes, usaget) => {
   const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
-  const uom = (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
+  return (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
+};
+
+export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
+  const uom = getUom(propertyTypes, usageTypes, usaget);
   return (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('label', '');
+};
+
+export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value) => {
+  const uom = getUom(propertyTypes, usageTypes, usaget);
+  const u = (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('unit', 1);
+  return value * u;
 };
