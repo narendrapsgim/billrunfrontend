@@ -13,6 +13,8 @@ import { ConfirmModal } from '../../components/Elements';
 import { currencySelector } from '../../selectors/settingsSelector';
 import OfflinePayment from '../Payments/OfflinePayment';
 import CyclesSelector from '../Cycle/CyclesSelector';
+import { getExpectedInvoiceQuery } from '../../common/ApiQueries'
+import { buildRequestUrl } from '../../common/Api'
 
 class Customer extends Component {
 
@@ -40,6 +42,7 @@ class Customer extends Component {
     showOfflinePayement: false,
     debt: null,
     selectedCyclesNames: '',
+    expectedCyclesNames :'',
   };
 
   componentDidMount() {
@@ -220,6 +223,18 @@ class Customer extends Component {
     this.setState({ selectedCyclesNames });
   }
 
+  onChangeExpectedCycle = (expectedCyclesNames) => {
+    this.setState({ expectedCyclesNames });
+  }
+
+  onClickExpectedInvoice = () => {
+    const { customer } = this.props;
+    const { expectedCyclesNames } = this.state;
+    let query = getExpectedInvoiceQuery(customer.get('aid'),expectedCyclesNames);
+    window.open(buildRequestUrl(query))
+  }
+
+
   renderRebalanceButton = () => {
     const { customer } = this.props;
     const { showRebalanceConfirmation, selectedCyclesNames } = this.state;
@@ -278,6 +293,27 @@ class Customer extends Component {
     );
   }
 
+  renderExpectedInvoiceButton = () => {
+    const { customer } = this.props;
+    const { expectedCyclesNames } = this.state;
+
+    return (
+      <span  className="inline">
+        , Or generate expected invoices for : <span  className="inline" style={{ verticalAlign:"middle", minWidth:290, marginLeft: 5, marginRight: 5}} >
+                                              <CyclesSelector className="inline"
+                                                  onChange={this.onChangeExpectedCycle}
+                                                  statusesToDisplay={Immutable.List(['current', 'to_run','future'])}
+                                                  selectedCycles={expectedCyclesNames}
+                                                  multi={false}
+                                                  from={moment().subtract(6,'month').format(globalSetting.apiDateTimeFormat)}
+                                                  to={moment().add(6,'month').format(globalSetting.apiDateTimeFormat)}
+                                                />
+                                            </span>
+        <Button bsSize="small" className="btn-primary inline" disabled={!expectedCyclesNames} onClick={this.onClickExpectedInvoice}>Generate expected invoice</Button>
+      </span>
+    );
+  }
+
   render() {
     const { customer, action } = this.props;
     // in update mode wait for item before render edit screen
@@ -296,9 +332,10 @@ class Customer extends Component {
           <div>
             <hr />
             { this.renderInCollection() }
-            <p>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></p>
-            <p>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link></p>
+            <div>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></div>
+            <div>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link> { this.renderExpectedInvoiceButton() }</div>
             { this.renderRebalanceButton() }
+
           </div>
         }
       </div>

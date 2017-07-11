@@ -39,21 +39,24 @@ class StepUpload extends Component {
     delimiterError: null,
   }
 
+  resetFile = () => {
+    this.props.onChange('fileContent', '');
+    this.props.onChange('fileName', '');
+  }
+
   onParseScvComplete = (results, file) => {
     if (results.errors.length === 0) {
       this.props.onChange('fileContent', results.data);
       this.props.onChange('fileName', file.name);
     } else {
       this.setState({ fileError: 'Error in CSV file' });
-      this.props.onChange('fileContent', '');
-      this.props.onChange('fileName', '');
+      this.resetFile();
     }
   }
 
   onParseScvError = (error, file) => { // eslint-disable-line no-unused-vars
     this.setState({ fileError: 'Error in CSV file' });
-    this.props.onChange('fileContent', '');
-    this.props.onChange('fileName', '');
+    this.resetFile();
   }
 
   onFileUpload = (e) => {
@@ -77,14 +80,14 @@ class StepUpload extends Component {
 
   onFileReset = (e) => {
     e.target.value = null;
-    this.props.onChange('fileContent', '');
-    this.props.onChange('fileName', '');
+    this.resetFile();
   }
 
   onChangeDelimiter = (value) => {
     if (value.length) {
       this.props.onChange('fileDelimiter', value);
       this.setState({ delimiterError: null });
+      // this.resetFile(); can be called to programmatically remove file
     } else {
       this.props.onDelete('fileDelimiter');
       this.setState({ delimiterError: 'Delimiter is required' });
@@ -118,9 +121,10 @@ class StepUpload extends Component {
     const fileName = item.get('fileName', '');
     const isSingleEntity = (entityOptions && entityOptions.length === 1);
     const options = this.createEntityTypeOptions(entityOptions);
+    const fileParsed = fileName !== '';
 
     return (
-      <Col md={12} className="StepUpload">
+      <div className="StepUpload">
         { !isSingleEntity && (
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Entity</Col>
@@ -130,6 +134,7 @@ class StepUpload extends Component {
                 options={options}
                 value={entity}
                 placeholder="Select entity to import...."
+                clearable={false}
               />
             </Col>
           </FormGroup>
@@ -144,8 +149,11 @@ class StepUpload extends Component {
               value={delimiter}
               placeholder="Select or add new"
               addLabelText="{label}"
+              clearable={false}
+              disabled={fileParsed}
             />
             { delimiterError !== null && <HelpBlock>{delimiterError}.</HelpBlock>}
+            { fileParsed && <HelpBlock className="mb0">To change delimiter please remove CSV file.</HelpBlock>}
           </Col>
         </FormGroup>
         <FormGroup validationState={fileError === null ? null : 'error'}>
@@ -170,7 +178,7 @@ class StepUpload extends Component {
             </div>
           </Col>
         </FormGroup>
-      </Col>
+      </div>
     );
   }
 }

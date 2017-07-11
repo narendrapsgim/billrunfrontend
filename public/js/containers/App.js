@@ -9,19 +9,20 @@ import ProgressIndicator from '../components/ProgressIndicator';
 import ReduxConfirmModal from '../components/ReduxConfirmModal';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
-import OnBoarding from '../components/OnBoarding';
+import { Tour, ExampleInvoice } from '../components/OnBoarding';
 import Footer from '../components/Footer';
 import { userCheckLogin } from '../actions/userActions';
 import { setPageTitle, systemRequirementsLoadingComplete } from '../actions/guiStateActions/pageActions';
 import { initMainMenu } from '../actions/guiStateActions/menuActions';
 import { getSettings, fetchFile } from '../actions/settingsActions';
-
+import { onBoardingIsRunnigSelector } from '../selectors/guiSelectors';
 
 class App extends Component {
 
   static propTypes = {
     auth: PropTypes.bool,
     systemRequirementsLoad: PropTypes.bool,
+    isTourRunnig: PropTypes.bool,
     routes: PropTypes.array,
     children: PropTypes.element,
     title: PropTypes.string,
@@ -43,6 +44,7 @@ class App extends Component {
     title: '',
     logoName: '',
     systemRequirementsLoad: false,
+    isTourRunnig: false,
   };
 
   componentWillMount() {
@@ -136,14 +138,15 @@ class App extends Component {
   );
 
   renderWithLayout = () => {
-    const { title, children, routes } = this.props;
+    const { title, children, routes, isTourRunnig } = this.props;
     return (
       <div id="wrapper" style={{ height: '100%' }}>
         <ProgressIndicator />
         <Alerts />
+        <Tour />
         <Navigator routes={routes} />
-        <OnBoarding />
         <div id="page-wrapper" className="page-wrapper">
+          { isTourRunnig && <ExampleInvoice />}
           <Row>
             <Col lg={12}>{title && <PageHeader>{title}</PageHeader> }</Col>
           </Row>
@@ -172,6 +175,7 @@ const mapStateToProps = state => ({
   mainMenuOverrides: state.settings.getIn(['menu', 'main']),
   logo: state.settings.getIn(['files', 'logo']),
   logoName: state.settings.getIn(['tenant', 'logo']),
+  isTourRunnig: onBoardingIsRunnigSelector(state),
 });
 
 export default connect(mapStateToProps)(App);

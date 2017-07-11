@@ -84,7 +84,7 @@ export const userDoLogin = (username, password) => (dispatch) => {
       return success;
     })
     .catch((error) => { // eslint-disable-line no-unused-vars
-      const message = 'Incorrect user name or password, please try again.';
+      const message = 'Incorrect username or password, please try again.';
       dispatch(loginError(message));
       dispatch(finishProgressIndicator());
       return error;
@@ -119,5 +119,5 @@ export const savePassword = (itemId, signature, timestamp, password) => (dispatc
   const query = changePasswordQuery(itemId, signature, timestamp, password);
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success, 'The password was changed successfuly')))
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error changing password')));
+    .catch(error => dispatch(apiBillRunErrorHandler(error)));
 };
