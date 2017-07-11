@@ -44,7 +44,7 @@ class OnBoarding extends Component {
       <span>
         Welcome to BillRun
         <i className="fa fa-registered" style={{ fontSize: 12, verticalAlign: 'text-top' }} />
-         Cloud!
+        &nbsp;Cloud!
       </span>
     ),
   };
