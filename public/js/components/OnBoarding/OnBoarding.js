@@ -52,10 +52,15 @@ class OnBoarding extends Component {
     run: false,
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps, nextState) {
     const { isPaused, isRunnig } = this.props;
+    const { autoStart } = this.state;
     if ((isPaused && !nextProps.isPaused) || (!isRunnig && nextProps.isRunnig)) {
-      this.setState({ startIndex: 0, run: true });
+      if (autoStart || nextState.autoStart) {
+        setTimeout(this.switchToRun, 500); // fix first step position - let invoce HTML to load before first step start
+      } else {
+        this.switchToRun();
+      }
     }
     if (!nextProps.isRunnig) {
       this.setState({ startIndex: 0 });
@@ -90,6 +95,10 @@ class OnBoarding extends Component {
 
   onStepChanged = (newStep) => {
     this.props.dispatch(setOnBoardingStep(newStep));
+  }
+
+  switchToRun = () => {
+    this.setState({ run: true });
   }
 
   askCancel = () => {
@@ -134,7 +143,7 @@ class OnBoarding extends Component {
       this.setState({ startIndex: skiptedIndex });
       this.onStepChanged(skiptedIndex);
     } else if (e.action === 'close' && e.type === 'finished') {
-      const lastStep = e.steps.length - 2;
+      const lastStep = Math.max(e.steps.length - 2, 0);
       this.setState({ startIndex: lastStep, run: true, autoStart: false });
     } else if (e.action === 'start') {
       if (step !== 0) {

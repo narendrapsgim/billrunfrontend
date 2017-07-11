@@ -758,7 +758,7 @@ ul.revision-history-list li.active .cycle {
   position: absolute;
   z-index: 1039;
   background: white;
-  padding: 25px 50px;
+  padding: 25px;
   margin-bottom: 60px;
   left: 50%;
   top: 60px;

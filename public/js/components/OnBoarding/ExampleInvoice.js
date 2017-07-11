@@ -12,7 +12,7 @@ const ExampleInvoice = ({ onPause, onStop }) => (
         <div className="pull-left"><h4 style={{ margin: 0 }}>Example Invoice</h4></div>
         <div className="pull-right">
           <Button bsStyle="link" onClick={onPause} className="close">
-            <i className="fa fa-times fa-lg" style={{ color: '#222222', fontSize: 16 }} />
+            <i className="fa fa-times" style={{ color: '#222222', fontSize: 16, marginTop: -10, marginRight: -10 }} />
           </Button>
         </div>
       </div>
