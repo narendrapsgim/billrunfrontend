@@ -165,6 +165,42 @@ class OnBoarding extends Component {
     style: { beacon: { offsetY: -25 } },
     selector: '.step-discount',
     type: 'click',
+  }, {
+    title: '8.a. Company details',
+    text: (
+      <span>Your company name and log appear at the invoice header
+        <br />
+        <Link to={{ pathname: '/settings', query: { tab: 1 } }} onClick={this.onPause}>Set up your company details here</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -25 } },
+    selector: '.step-company-details-header',
+    type: 'click',
+  }, {
+    title: '8.b. Company details',
+    text: (
+      <span>Your company details appear at the invoice footer
+        <br />
+        <Link to={{ pathname: '/settings', query: { tab: 1 } }} onClick={this.onPause}>Set up your company details here</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -25 } },
+    selector: '.step-company-details-footer',
+    type: 'click',
+  }, {
+    title: '9. Billing cycle management',
+    text: (
+      <span>You are in full control of the billing cycle run. See the billing cycle run progress
+         as it runs and watch invoices as soon as they&apos;re created. Confirm or reset the
+         cycle after reviewing it and charge your customers, all functionalities available
+         from one screen!
+        <br />
+        <Link to="run_cycle" onClick={this.onPause}>Go to billing cycle management screen</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -65 } },
+    selector: '.step-period',
+    type: 'click',
   }]);
 
   joyrideEventHandler = (e) => {
@@ -196,10 +232,9 @@ class OnBoarding extends Component {
            by examining a sample BillRun invoice and guiding you how to
            do it yourself with just a few clicks.
         </p>
-        <p>Ready?</p>
       </Col>
       <Col smPush={1} sm={10}>
-        <Button onClick={this.onStart} bsStyle="success" block>
+        <Button onClick={this.onStart} bsStyle="success">
           Let&apos;s start the tour!
         </Button>
       </Col>
@@ -213,7 +248,7 @@ class OnBoarding extends Component {
         <p>Thank you for taking the tour!</p>
       </Col>
       <Col smPush={1} sm={10}>
-        <Button onClick={this.onPending} bsStyle="success" block>
+        <Button onClick={this.onPending} bsStyle="success">
           Start Using Billrun!
         </Button>
       </Col>
