@@ -216,9 +216,8 @@ class OnBoarding extends Component {
         <ModalWrapper
           show={true}
           title={mobalTitle}
-          labelOk="Maybe later"
-          onOk={this.onPending}
-          styleCancel="danger"
+          labelCancel="Maybe later"
+          onCancel={this.onPending}
           onHide={this.onPending}
         >
           <div className="text-center">
