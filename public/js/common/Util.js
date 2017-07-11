@@ -238,6 +238,12 @@ export const getSettingsPath = (entityName, path) => {
   return path;
 };
 
+export const getRateByKey = (rates, rateKey) => rates.find(rate => rate.get('key', '') === rateKey) || Immutable.Map();
+
+export const getRateUsaget = rate => rate.get('rates', Immutable.Map()).keySeq().first() || '';
+
+export const getRateUnit = (rate, usaget) => rate.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+
 export const getUom = (propertyTypes, usageTypes, usaget) => {
   const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
   return (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());

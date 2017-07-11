@@ -17,7 +17,13 @@ import {
   usageTypesDataSelector,
   propertyTypeSelector,
 } from '../../selectors/settingsSelector';
-import { getUnitLabel } from '../../common/Util';
+import {
+  getRateByKey,
+  getRateUsaget,
+  getRateUnit,
+  getUnitLabel,
+  getValueByUnit,
+} from '../../common/Util';
 
 class Credit extends Component {
   static defaultProps = {
@@ -129,11 +135,12 @@ class Credit extends Component {
   }
 
   onCreditCharge = () => {
-    const { aid, sid } = this.props;
+    const { aid, sid, propertyTypes, usageTypesData } = this.props;
     const { rateBy, aprice, usagev, rate, validationErrors } = this.state;
     if (validationErrors.valueSeq().includes('required')) {
       return;
     }
+
     let params = [
       { aid },
       { sid },
@@ -143,7 +150,12 @@ class Credit extends Component {
     if (rateBy === 'fix') {
       params = [...params, { aprice }, { usagev }];
     } else {
-      params = [...params, { usagev }];
+      const selectedRate = this.getSelectedRate(rate);
+      const usaget = getRateUsaget(selectedRate);
+      const unit = getRateUnit(selectedRate, usaget);
+      params = [...params,
+        { usagev: getValueByUnit(propertyTypes, usageTypesData, usaget, unit, usagev) },
+      ];
     }
     this.setState({ progress: true });
     this.props.dispatch(creditCharge(params)).then(this.afterCharge);
@@ -161,11 +173,13 @@ class Credit extends Component {
     return allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
   }
 
-  getRateUnit = (rateKey) => {
-    const { allRates, propertyTypes, usageTypesData } = this.props;
-    const selectedRate = allRates.find(rate => rate.get('key', '') === rateKey) || Map();
-    const usaget = selectedRate.get('rates', Map()).keySeq().first() || '';
-    const unit = selectedRate.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+  getSelectedRate = rateKey => getRateByKey(this.props.allRates, rateKey);
+
+  getRateUnitLabel = (rateKey) => {
+    const { propertyTypes, usageTypesData } = this.props;
+    const selectedRate = this.getSelectedRate(rateKey);
+    const usaget = getRateUsaget(selectedRate);
+    const unit = getRateUnit(selectedRate, usaget);
     return getUnitLabel(propertyTypes, usageTypesData, usaget, unit);
   }
 
@@ -229,7 +243,7 @@ class Credit extends Component {
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? `Volume (${this.getRateUnit(rate)})` : 'Quantity'}</Col>
+            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? `Volume (${this.getRateUnitLabel(rate)})` : 'Quantity'}</Col>
             <Col sm={10}>
               <Field
                 onChange={this.onChangeCreditUsagevValue.bind(this, 'usagev')}
