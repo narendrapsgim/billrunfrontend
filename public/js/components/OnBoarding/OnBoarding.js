@@ -193,17 +193,10 @@ class OnBoarding extends Component {
         <p>We&apos;re done!</p>
         <p>Thank you for taking the tour!</p>
       </Col>
-      <Col smPush={1} sm={10} className="mt10 mb10">
-        <Col sm={6}>
-          <Button onClick={this.onRestart} block>
-            Start Tour Again
-          </Button>
-        </Col>
-        <Col sm={6}>
-          <Button onClick={this.onPending} bsStyle="success" block>
-            Start Using Billrun!
-          </Button>
-        </Col>
+      <Col smPush={1} sm={10}>
+        <Button onClick={this.onPending} bsStyle="success" block>
+          Start Using Billrun!
+        </Button>
       </Col>
     </Row>
   )
@@ -248,7 +241,13 @@ class OnBoarding extends Component {
 
     if (isFinished) {
       return (
-        <ModalWrapper show={true} title={mobalTitle} onHide={this.onCancel}>
+        <ModalWrapper
+          show={true}
+          title={mobalTitle}
+          labelCancel="Start Tour Again"
+          onCancel={this.onRestart}
+          onHide={this.onPending}
+        >
           <div className="text-center">
             { this.renderIsFinishedContent()}
           </div>
