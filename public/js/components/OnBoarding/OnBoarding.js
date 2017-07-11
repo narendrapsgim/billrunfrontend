@@ -30,7 +30,7 @@ class OnBoarding extends Component {
     isStarting: PropTypes.bool,
     isPaused: PropTypes.bool,
     step: PropTypes.number,
-    mobalTitle: PropTypes.string,
+    mobalTitle: PropTypes.element,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -40,7 +40,13 @@ class OnBoarding extends Component {
     isFinished: false,
     isStarting: false,
     isPaused: false,
-    mobalTitle: 'Welcome To BillRun Cloud',
+    mobalTitle: (
+      <span>
+        Welcome to BillRun
+        <i className="fa fa-registered" style={{ fontSize: 12, verticalAlign: 'text-top' }} />
+         Cloud!
+      </span>
+    ),
   };
 
   state = {
@@ -76,11 +82,14 @@ class OnBoarding extends Component {
   }
 
   onFinish = () => {
+    this.onStepChanged(0);
     this.props.dispatch(finishOnBoarding());
   }
 
   onPending = () => {
+    this.onStepChanged(0);
     this.props.dispatch(pendingOnBoarding());
+    this.setState({ autoStart: true });
   }
 
   onStart = () => {
@@ -88,7 +97,7 @@ class OnBoarding extends Component {
   }
 
   onRestart = () => {
-    this.props.dispatch(setOnBoardingStep(0));
+    this.onStepChanged(0);
     this.onStart();
     this.setState({ autoStart: true });
   }
@@ -122,6 +131,11 @@ class OnBoarding extends Component {
     text: 'Plan name & rate from invoice summary row. If it\'s not possible to highlight them two, switch between "Qty" and "Rate"',
     selector: '.step-plan',
     type: 'click',
+    style: {
+      beacon: {
+        offsetY: -25,
+      },
+    },
   }, {
     title: 'Service',
     text: 'Service name & rate from invoice summary row',
@@ -157,40 +171,41 @@ class OnBoarding extends Component {
   }
 
   renderIsReadyContent = () => (
-    <div>
-      <br /><br />
-      <p>Start Your Tour Description</p>
-      <br /><br />
-      <Row>
-        <Col smPush={1} sm={10}>
-          <Button onClick={this.onStart} bsStyle="success" block>
-            Start Tour
-          </Button>
-        </Col>
-      </Row>
-      <br /><br />
-    </div>
+    <Row>
+      <Col smPush={1} sm={10}>
+        <p>In this short tutorial we will walk you through the main features of BillRun
+           by examining a sample BillRun invoice and guiding you how to
+           do it yourself with just a few clicks.
+        </p>
+        <p>Ready?</p>
+      </Col>
+      <Col smPush={1} sm={10}>
+        <Button onClick={this.onStart} bsStyle="success" block>
+          Let&apos;s start the tour!
+        </Button>
+      </Col>
+    </Row>
   );
 
   renderIsFinishedContent = () => (
-    <div>
-      <br /><br />
-      <p>Thank you</p>
-      <br /><br />
-      <Row>
+    <Row>
+      <Col smPush={1} sm={10}>
+        <p>We&apos;re done!</p>
+        <p>Thank you for taking the tour!</p>
+      </Col>
+      <Col smPush={1} sm={10} className="mt10 mb10">
         <Col sm={6}>
           <Button onClick={this.onRestart} block>
             Start Tour Again
           </Button>
         </Col>
         <Col sm={6}>
-          <Button onClick={this.onCancel} bsStyle="success" block>
-            Start Using Billrun !
+          <Button onClick={this.onPending} bsStyle="success" block>
+            Start Using Billrun!
           </Button>
         </Col>
-      </Row>
-      <br /><br />
-    </div>
+      </Col>
+    </Row>
   )
 
   render() {
@@ -201,10 +216,8 @@ class OnBoarding extends Component {
         <ModalWrapper
           show={true}
           title={mobalTitle}
-          labelOk="Do it leter"
+          labelOk="Maybe later"
           onOk={this.onPending}
-          labelCancel="Skip Tour"
-          onCancel={this.askCancel}
           styleCancel="danger"
           onHide={this.onPending}
         >

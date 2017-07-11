@@ -2,8 +2,6 @@ import Immutable from 'immutable';
 import {
   SET_PAGE_TITLE,
   SYSTEM_REQUIREMENTS_LOADING_COMPLETE,
-  ONBOARDING_SHOW,
-  ONBOARDING_TOGGLE,
   ONBOARDING_SET_STEP,
   ONBOARDING_SET_STATE,
   CONFIRM_SHOW,
@@ -44,13 +42,9 @@ const pageReducer = (state = defaultState, action) => {
 
     case LOGIN: {
       if (action.data && action.data.last_login === null) {
-        return state.setIn(['onBoarding', 'show'], true);
+        return state.setIn(['onBoarding', 'state'], onBoardingStates.STARTING);
       }
       return state;
-    }
-
-    case ONBOARDING_TOGGLE: {
-      return state.setIn(['onBoarding', 'show'], !state.getIn(['onBoarding', 'show'], true));
     }
 
     case CONFIRM_SHOW: {
