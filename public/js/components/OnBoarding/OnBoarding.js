@@ -121,30 +121,49 @@ class OnBoarding extends Component {
   };
 
   getSteps = () => ([{
-    title: '1. Account details',
-    text: <p>Account name, Account Setting number & address....<br /><Link to={{ pathname: '/plans/plan', query: {} }} onClick={this.onPause}>Click to set Name</Link></p>,
+    title: '1. Customer details',
+    text: (
+      <span>Customer name, id and address. Invoices are generated per customer.
+        <br />
+        <Link to="customers/customer" onClick={this.onPause}>Click here to create a customer</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -75 } },
     selector: '.table-info',
-
     type: 'click',
   }, {
-    title: '2. Plan',
-    text: 'Plan name & rate from invoice summary row. If it\'s not possible to highlight them two, switch between "Qty" and "Rate"',
+    title: '2. Plans',
+    text: (
+      <span>A customer can have multiple subscriptions, each one tied to exactly one
+        plan with recurring charges.
+        <br />
+        <Link to="plans/plan" onClick={this.onPause}>New postpaid plan</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -25 } },
     selector: '.step-plan',
     type: 'click',
-    style: {
-      beacon: {
-        offsetY: -25,
-      },
-    },
   }, {
-    title: 'Service',
-    text: 'Service name & rate from invoice summary row',
+    title: '3. Services',
+    text: (
+      <span>Every subscription can register to extra services that are charged periodically.
+        <br />
+        <Link to="services/service" onClick={this.onPause}>Click here to create a service</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -25 } },
     selector: '.step-service',
     type: 'click',
   }, {
-    title: 'Total',
-    text: 'Total account',
-    selector: '.grand-total',
+    title: '4. Discounts',
+    text: (
+      <span>Build automatic discounts based on various combinations on subscription plans / services.
+        <br />
+        <Link to="discounts/discount" onClick={this.onPause}>Click here to create a discount</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -25 } },
+    selector: '.step-discount',
     type: 'click',
   }]);
 
