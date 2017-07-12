@@ -15,6 +15,7 @@ import {
   buildPageTitle,
   getConfig,
   getItemId,
+  getPlanConvertedRates,
 } from '../../common/Util';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
@@ -42,6 +43,10 @@ import {
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
+import {
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../../selectors/settingsSelector';
 
 
 class PrepaidPlanSetup extends Component {
@@ -60,6 +65,8 @@ class PrepaidPlanSetup extends Component {
       push: React.PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
@@ -67,6 +74,8 @@ class PrepaidPlanSetup extends Component {
     revisions: Immutable.List(),
     ppIncludes: Immutable.List(),
     activeTab: 1,
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
   };
 
   state = {
@@ -102,6 +111,12 @@ class PrepaidPlanSetup extends Component {
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
     this.props.dispatch(clearEntity('planOriginal'));
+  }
+
+  initRatesValues = () => {
+    const { propertyTypes, usageTypesData, item } = this.props;
+    const convertedRates = getPlanConvertedRates(propertyTypes, usageTypesData, item, false);
+    this.props.dispatch(onPlanFieldUpdate(['rates'], convertedRates));
   }
 
   initDefaultValues = () => {
@@ -148,6 +163,7 @@ class PrepaidPlanSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
+      this.initRatesValues();
       this.props.dispatch(gotEntity('planOriginal', response.data[0]));
     } else {
       this.handleBack();
@@ -206,9 +222,15 @@ class PrepaidPlanSetup extends Component {
     }
   }
 
+  getItemToSave = () => {
+    const { propertyTypes, usageTypesData, item } = this.props;
+    const rates = getPlanConvertedRates(propertyTypes, usageTypesData, item, true);
+    return item.set('rates', rates);
+  }
+
   handleSave = () => {
-    const { item, mode } = this.props;
-    this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
+    const { mode } = this.props;
+    this.props.dispatch(savePlan(this.getItemToSave(), mode)).then(this.afterSave);
   }
 
   afterSave = (response) => {
@@ -336,5 +358,7 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'plan'),
   ppIncludes: state.list.get('pp_includes'),
+  usageTypesData: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PrepaidPlanSetup));

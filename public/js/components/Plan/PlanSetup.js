@@ -25,12 +25,17 @@ import {
   buildPageTitle,
   getConfig,
   getItemId,
+  getPlanConvertedRates,
 } from '../../common/Util';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
+import {
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../../selectors/settingsSelector';
 
 
 class PlanSetup extends Component {
@@ -48,12 +53,16 @@ class PlanSetup extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
     item: Immutable.Map(),
     revisions: Immutable.List(),
     activeTab: 1,
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
   };
 
   state = {
@@ -100,6 +109,12 @@ class PlanSetup extends Component {
     this.props.dispatch(clearEntity('planOriginal'));
   }
 
+  initRatesValues = () => {
+    const { propertyTypes, usageTypesData, item } = this.props;
+    const convertedRates = getPlanConvertedRates(propertyTypes, usageTypesData, item, false);
+    this.props.dispatch(onPlanFieldUpdate(['rates'], convertedRates));
+  }
+
   initDefaultValues = () => {
     const { mode, item } = this.props;
     if (mode === 'create') {
@@ -139,6 +154,7 @@ class PlanSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
+      this.initRatesValues();
       this.props.dispatch(gotEntity('planOriginal', response.data[0]));
     } else {
       this.handleBack();
@@ -173,10 +189,16 @@ class PlanSetup extends Component {
     this.props.dispatch(onGroupRemove(groupName));
   }
 
+  getItemToSave = () => {
+    const { propertyTypes, usageTypesData, item } = this.props;
+    const rates = getPlanConvertedRates(propertyTypes, usageTypesData, item, true);
+    return item.set('rates', rates);
+  }
+
   handleSave = () => {
-    const { item, mode } = this.props;
+    const { mode } = this.props;
     this.setState({ progress: true });
-    this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
+    this.props.dispatch(savePlan(this.getItemToSave(), mode)).then(this.afterSave);
   }
 
   afterSave = (response) => {
@@ -284,5 +306,7 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'plan'),
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'plan'),
+  usageTypesData: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PlanSetup));

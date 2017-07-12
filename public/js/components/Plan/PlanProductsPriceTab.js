@@ -23,6 +23,9 @@ import {
   usageTypesDataSelector,
   propertyTypeSelector,
 } from '../../selectors/settingsSelector';
+import {
+  getProductConvertedRates,
+} from '../../common/Util';
 
 
 class PlanProductsPriceTab extends Component {
@@ -74,13 +77,14 @@ class PlanProductsPriceTab extends Component {
   }
 
   addNewProductToPlan = (newProducts) => {
-    const { products } = this.props;
+    const { products, propertyTypes, usageTypes } = this.props;
     newProducts.forEach((product) => {
       const newProduct = products.find(planProd => planProd.get('key', '') === product.key);
       if (newProduct) {
         const usaget = newProduct.get('rates', Immutable.Map()).keySeq().first();
         const productPath = ['rates', newProduct.get('key', ''), usaget, 'rate'];
-        this.props.dispatch(planProductsRateInit(newProduct, productPath));
+        const newRates = getProductConvertedRates(propertyTypes, usageTypes, newProduct, false);
+        this.props.dispatch(planProductsRateInit(newProduct.set('rates', newRates), productPath));
       }
     });
   }
