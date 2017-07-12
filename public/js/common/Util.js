@@ -289,3 +289,36 @@ const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type
 export const getProductConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit = true) => getItemConvertedRates(propertyTypes, usageTypes, item, toBaseUnit, 'product');
 
 export const getPlanConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit = true) => getItemConvertedRates(propertyTypes, usageTypes, item, toBaseUnit, 'plan');
+
+export const getPlanConvertedPpThresholds = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
+  const convertedPpThresholds = item.get('pp_threshold', Immutable.Map()).withMutations((ppThresholdsWithMutations) => {
+    ppThresholdsWithMutations.forEach((value, ppId) => {
+      const ppInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId)) || Immutable.Map();
+      const unit = ppInclude.get('charging_by_usaget_unit', false);
+      if (unit) {
+        const usaget = ppInclude.get('charging_by_usaget', '');
+        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+        ppThresholdsWithMutations.set(ppId, parseFloat(newValue));
+      }
+    });
+  });
+  return convertedPpThresholds;
+};
+
+export const getPlanConvertedNotificationThresholds = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
+  const convertedPpThresholds = item.get('notifications_threshold', Immutable.Map()).withMutations((notificationThresholdsWithMutations) => {
+    notificationThresholdsWithMutations.forEach((notifications, ppId) => {
+      const ppInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId)) || Immutable.Map();
+      const unit = ppInclude.get('charging_by_usaget_unit', false);
+      if (unit) {
+        const usaget = ppInclude.get('charging_by_usaget', '');
+        notifications.forEach((notification, index) => {
+          const value = notification.get('value', '');
+          const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit); // eslint-disable-line max-len
+          notificationThresholdsWithMutations.setIn([ppId, index, 'value'], parseFloat(newValue));
+        });
+      }
+    });
+  });
+  return convertedPpThresholds;
+};

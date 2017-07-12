@@ -16,6 +16,8 @@ import {
   getConfig,
   getItemId,
   getPlanConvertedRates,
+  getPlanConvertedPpThresholds,
+  getPlanConvertedNotificationThresholds,
 } from '../../common/Util';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
@@ -100,13 +102,18 @@ class PrepaidPlanSetup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId } = nextProps;
-    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    const { item, mode, itemId, ppIncludes } = nextProps;
+    const {
+      item: oldItem,
+      itemId: oldItemId,
+      mode: oldMode,
+      ppIncludes: oldPpIncludes,
+    } = this.props;
     if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'prepaid_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone') || !Immutable.is(ppIncludes, oldPpIncludes)) {
       this.fetchItem(itemId);
     }
   }
@@ -116,10 +123,14 @@ class PrepaidPlanSetup extends Component {
     this.props.dispatch(clearEntity('planOriginal'));
   }
 
-  initRatesValues = () => {
-    const { propertyTypes, usageTypesData, item } = this.props;
+  initUnitConvertedValues = () => {
+    const { propertyTypes, usageTypesData, ppIncludes, item } = this.props;
     const convertedRates = getPlanConvertedRates(propertyTypes, usageTypesData, item, false);
+    const ppThresholds = getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, item, false); // eslint-disable-line max-len
+    const notificationsThresholds = getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, item, false); // eslint-disable-line max-len
     this.props.dispatch(onPlanFieldUpdate(['rates'], convertedRates));
+    this.props.dispatch(onPlanFieldUpdate(['pp_threshold'], ppThresholds));
+    this.props.dispatch(onPlanFieldUpdate(['notifications_threshold'], notificationsThresholds));
   }
 
   initDefaultValues = () => {
@@ -166,7 +177,7 @@ class PrepaidPlanSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
-      this.initRatesValues();
+      this.initUnitConvertedValues();
       this.props.dispatch(gotEntity('planOriginal', response.data[0]));
     } else {
       this.handleBack();
@@ -226,9 +237,15 @@ class PrepaidPlanSetup extends Component {
   }
 
   getItemToSave = () => {
-    const { propertyTypes, usageTypesData, item } = this.props;
+    const { propertyTypes, usageTypesData, ppIncludes, item } = this.props;
     const rates = getPlanConvertedRates(propertyTypes, usageTypesData, item, true);
-    return item.set('rates', rates);
+    const ppThresholds = getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, item, true); // eslint-disable-line max-len
+    const notificationsThresholds = getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, item, true); // eslint-disable-line max-len
+    return item.withMutations((itemWithMutations) => {
+      itemWithMutations.set('rates', rates);
+      itemWithMutations.set('pp_threshold', ppThresholds);
+      itemWithMutations.set('notifications_threshold', notificationsThresholds);
+    });
   }
 
   handleSave = () => {
