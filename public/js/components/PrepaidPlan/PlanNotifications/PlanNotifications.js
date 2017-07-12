@@ -3,18 +3,18 @@ import { List, Map } from 'immutable';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 import { Row, Col, Form, Panel } from 'react-bootstrap';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
 import Notifications from './Notifications';
-
+import {
+  getUnitLabel,
+} from '../../../common/Util';
 
 const PlanNotifications = (props) => {
-  const { plan, ppIncludes, mode } = props;
+  const { plan, ppIncludes, mode, usageTypesData, propertyTypes, currency } = props;
 
   const editable = (mode !== 'view');
 
-  const getPpIncludeName = (ppId) => {
-    const PpInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId), Map());
-    return (PpInclude) ? PpInclude.get('name', '') : '';
-  };
+  const getPpInclude = ppId => ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId)) || Map();
 
   const onSelectBalance = (ppIncludeId) => {
     props.onSelectBalance(ppIncludeId.toString());
@@ -38,7 +38,13 @@ const PlanNotifications = (props) => {
 
   const notificationsEl = (ppId, i) => {
     const data = plan.getIn(['notifications_threshold', ppId], List());
-    const name = getPpIncludeName(ppId);
+    const ppInclude = getPpInclude(ppId);
+    const name = ppInclude.get('name', '');
+    const unit = ppInclude.get('charging_by_usaget_unit', false);
+    const usaget = ppInclude.get('charging_by_usaget', '');
+    const unitLabel = unit
+      ? `Volume (${getUnitLabel(propertyTypes, usageTypesData, usaget, unit)})`
+      : `Cost (${getSymbolFromCurrency(currency)})`;
     return (
       data.size ?
         <Notifications
@@ -51,6 +57,7 @@ const PlanNotifications = (props) => {
           name={name}
           pp_id={ppId}
           key={i}
+          unitLabel={unitLabel}
         /> :
       null
     );
@@ -98,6 +105,9 @@ PlanNotifications.defaultProps = {
   plan: Map(),
   ppIncludes: List(),
   mode: 'create',
+  usageTypesData: List(),
+  propertyTypes: List(),
+  currency: '',
 };
 
 PlanNotifications.propTypes = {
@@ -109,6 +119,9 @@ PlanNotifications.propTypes = {
   onSelectBalance: PropTypes.func.isRequired,
   onRemoveBalanceNotifications: PropTypes.func.isRequired,
   mode: PropTypes.string,
+  usageTypesData: PropTypes.instanceOf(List),
+  propertyTypes: PropTypes.instanceOf(List),
+  currency: PropTypes.string,
 };
 
 export default connect()(PlanNotifications);

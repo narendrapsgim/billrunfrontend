@@ -63,9 +63,9 @@ class ChargingPlanSetup extends Component {
     revisions: Immutable.List(),
     prepaidIncludes: Immutable.List(),
     activeTab: 1,
-    currency: PropTypes.string,
-    usageTypes: PropTypes.instanceOf(Immutable.List),
-    propertyTypes: PropTypes.instanceOf(Immutable.List),
+    currency: '',
+    usageTypes: Immutable.List(),
+    propertyTypes: Immutable.List(),
   };
 
   state = {

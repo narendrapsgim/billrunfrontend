@@ -5,7 +5,7 @@ import Field from '../../Field';
 
 
 const Notification = (props) => {
-  const { notification, first, last, index, editable } = props;
+  const { notification, first, last, index, editable, unitLabel } = props;
 
   const onRemove = () => {
     props.onRemove(index);
@@ -21,7 +21,7 @@ const Notification = (props) => {
       <Row>
         <Col lg={2} md={2} sm={2}>
           <FormGroup style={{ margin: 0 }}>
-            {first && <ControlLabel>Value</ControlLabel>}
+            {first && <ControlLabel>{unitLabel}</ControlLabel>}
             <Field
               id="value" value={notification.get('value', '')}
               onChange={onUpdateField}

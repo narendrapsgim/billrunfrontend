@@ -44,6 +44,7 @@ import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
 import {
+  currencySelector,
   usageTypesDataSelector,
   propertyTypeSelector,
 } from '../../selectors/settingsSelector';
@@ -65,6 +66,7 @@ class PrepaidPlanSetup extends Component {
       push: React.PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    currency: PropTypes.string,
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
   }
@@ -74,6 +76,7 @@ class PrepaidPlanSetup extends Component {
     revisions: Immutable.List(),
     ppIncludes: Immutable.List(),
     activeTab: 1,
+    currency: '',
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
   };
@@ -256,7 +259,7 @@ class PrepaidPlanSetup extends Component {
   }
 
   render() {
-    const { item, mode, ppIncludes, revisions } = this.props;
+    const { item, mode, ppIncludes, revisions, propertyTypes, usageTypesData, currency } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -307,6 +310,9 @@ class PrepaidPlanSetup extends Component {
                 plan={item}
                 mode={mode}
                 ppIncludes={ppIncludes}
+                propertyTypes={propertyTypes}
+                usageTypesData={usageTypesData}
+                currency={currency}
                 onAddNotification={this.onAddNotification}
                 onRemoveNotification={this.onRemoveNotification}
                 onUpdateNotificationField={this.onUpdateNotificationField}
@@ -360,5 +366,6 @@ const mapStateToProps = (state, props) => ({
   ppIncludes: state.list.get('pp_includes'),
   usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),
+  currency: currencySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PrepaidPlanSetup));
