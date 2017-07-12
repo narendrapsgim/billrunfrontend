@@ -242,6 +242,8 @@ export const getRateByKey = (rates, rateKey) => rates.find(rate => rate.get('key
 
 export const getRateUsaget = rate => rate.get('rates', Immutable.Map()).keySeq().first() || '';
 
+export const getRateUsagetByKey = (rates, rateKey) => getRateUsaget(getRateByKey(rates, rateKey));
+
 export const getRateUnit = (rate, usaget) => rate.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
 
 export const getUom = (propertyTypes, usageTypes, usaget) => {
@@ -254,8 +256,36 @@ export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
   return (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('label', '');
 };
 
-export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value) => {
+export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value, toBaseUnit = true) => {
   const uom = getUom(propertyTypes, usageTypes, usaget);
   const u = (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('unit', 1);
-  return value * u;
+  return toBaseUnit ? (value * u) : (value / u);
 };
+
+const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type) => {
+  const convertedRates = item.get('rates', Immutable.Map()).withMutations((ratesWithMutations) => {
+    ratesWithMutations.forEach((rates, usagetOrPlan) => {
+      rates.forEach((rate, planOrUsaget) => {
+        const usaget = (type === 'product' ? usagetOrPlan : planOrUsaget);
+        const plan = (type === 'product' ? planOrUsaget : usagetOrPlan);
+        rate.get('rate', Immutable.List()).forEach((rateStep, index) => {
+          const rangeUnit = rateStep.getIn(['uom_display', 'range'], 'counter');
+          const intervalUnit = rateStep.getIn(['uom_display', 'interval'], 'counter');
+          const convertedFrom = getValueByUnit(propertyTypes, usageTypes, usaget, rangeUnit, rateStep.get('from'), toBaseUnit);
+          const to = rateStep.get('to');
+          const convertedTo = (to === 'UNLIMITED' ? 'UNLIMITED' : getValueByUnit(propertyTypes, usageTypes, usaget, rangeUnit, to, toBaseUnit));
+          const convertedInterval = getValueByUnit(propertyTypes, usageTypes, usaget, intervalUnit, rateStep.get('interval'), toBaseUnit);
+          const ratePath = (type === 'product' ? [usaget, plan, 'rate', index] : [plan, usaget, 'rate', index]);
+          ratesWithMutations.setIn([...ratePath, 'from'], convertedFrom);
+          ratesWithMutations.setIn([...ratePath, 'to'], convertedTo);
+          ratesWithMutations.setIn([...ratePath, 'interval'], convertedInterval);
+        });
+      });
+    });
+  });
+  return convertedRates;
+};
+
+export const getProductConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit = true) => getItemConvertedRates(propertyTypes, usageTypes, item, toBaseUnit, 'product');
+
+export const getPlanConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit = true) => getItemConvertedRates(propertyTypes, usageTypes, item, toBaseUnit, 'plan');
