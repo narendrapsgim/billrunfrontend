@@ -338,6 +338,9 @@ class PrepaidPlanSetup extends Component {
                 plan={item}
                 mode={mode}
                 ppIncludes={ppIncludes}
+                propertyTypes={propertyTypes}
+                usageTypesData={usageTypesData}
+                currency={currency}
                 onChangeThreshold={this.onChangeThreshold}
                 onRemoveThreshold={this.onRemoveThreshold}
                 onAddBalance={this.onAddBalanceThreshold}
