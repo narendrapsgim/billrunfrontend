@@ -249,7 +249,7 @@ class CycleData extends Component {
         actionClass: 'btn-primary',
       },
       {
-        label: 'Download Taxation complience report',
+        label: 'Download Taxation compliance report',
         actionStyle: 'default',
         show : isCycleConfirmed,
         showIcon: false,
