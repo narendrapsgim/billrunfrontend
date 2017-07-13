@@ -191,7 +191,7 @@ class InputProcessor extends Component {
     const { errors } = this.state;
     const { value } = e.target;
     if (inputProcessorsExitNames.includes(value)) {
-      this.setState({ errors: errors.setIn(['sampleCSV', 'name'], `Name ${value} already exist`) });
+      this.setState({ errors: errors.setIn(['sampleCSV', 'name'], `Name ${value} already exists`) });
     } else {
       this.setState({ errors: errors.deleteIn(['sampleCSV', 'name']) });
     }
