@@ -9,7 +9,6 @@ import DevTools from './DevTools';
 import 'react-bootstrap-multiselect/css/bootstrap-multiselect.css';
 import 'react-select/dist/react-select.css';
 import 'react-tagsinput/react-tagsinput.css'
-import 'react-joyride/lib/react-joyride.scss'
 import 'react-datepicker/dist/react-datepicker.css';
 import 'font-awesome/css/font-awesome.css';
 import 'css/normalize.css';

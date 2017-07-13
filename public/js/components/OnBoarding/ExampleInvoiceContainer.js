@@ -1,7 +1,8 @@
 import { connect } from 'react-redux';
 import ExampleInvoice from './ExampleInvoice';
 import {
-  cancelOnBoarding,
+  setOnBoardingStep,
+  pendingOnBoarding,
   pauseOnBoarding,
   showConfirmModal,
 } from '../../actions/guiStateActions/pageActions';
@@ -12,7 +13,8 @@ const mapDispatchToProps = dispatch => ({
   },
   onStop: () => {
     const onStop = () => {
-      dispatch(cancelOnBoarding());
+      dispatch(setOnBoardingStep(0));
+      dispatch(pendingOnBoarding());
     };
     const confirm = {
       message: 'Are you sure you want to end the tour ?',
