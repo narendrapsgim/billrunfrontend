@@ -256,7 +256,7 @@ export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
   return (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('label', '');
 };
 
-export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value, toBaseUnit = true) => {
+export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value, toBaseUnit = true) => { // eslint-disable-line max-len
   const uom = getUom(propertyTypes, usageTypes, usaget);
   const u = (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('unit', 1);
   return toBaseUnit ? (value * u) : (value / u);
