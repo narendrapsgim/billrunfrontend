@@ -322,3 +322,20 @@ export const getPlanConvertedNotificationThresholds = (propertyTypes, usageTypes
   });
   return convertedPpThresholds;
 };
+
+export const getPlanConvertedPpIncludes = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
+  const convertedIncludes = item.get('include', Immutable.Map()).withMutations((includesWithMutations) => {
+    includesWithMutations.forEach((include, index) => {
+      const ppId = include.get('pp_includes_external_id', '');
+      const ppInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId)) || Immutable.Map();
+      const unit = ppInclude.get('charging_by_usaget_unit', false);
+      if (unit) {
+        const usaget = ppInclude.get('charging_by_usaget', '');
+        const value = include.get('usagev');
+        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+        includesWithMutations.setIn([index, 'usagev'], parseFloat(newValue));
+      }
+    });
+  });
+  return convertedIncludes;
+};

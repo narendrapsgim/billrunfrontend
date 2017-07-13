@@ -15,6 +15,7 @@ import {
   getConfig,
   getItemId,
   getUnitLabel,
+  getPlanConvertedPpIncludes,
 } from '../../common/Util';
 import {
   getPrepaidGroup,
@@ -54,7 +55,7 @@ class ChargingPlanSetup extends Component {
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
     currency: PropTypes.string,
-    usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
   };
 
@@ -64,7 +65,7 @@ class ChargingPlanSetup extends Component {
     prepaidIncludes: Immutable.List(),
     activeTab: 1,
     currency: '',
-    usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
   };
 
@@ -88,19 +89,30 @@ class ChargingPlanSetup extends Component {
 
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId } = nextProps;
-    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    const { item, mode, itemId, prepaidIncludes } = nextProps;
+    const {
+      item: oldItem,
+      itemId: oldItemId,
+      mode: oldMode,
+      prepaidIncludes: oldPrepaidIncludes,
+    } = this.props;
     if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'charging_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone') || !Immutable.is(prepaidIncludes, oldPrepaidIncludes)) {
       this.fetchItem(itemId);
     }
   }
 
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
+  }
+
+  initUnitConvertedValues = () => {
+    const { propertyTypes, usageTypesData, prepaidIncludes, item } = this.props;
+    const convertedIncludes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, item, false); // eslint-disable-line max-len
+    this.props.dispatch(onPlanFieldUpdate(['include'], convertedIncludes));
   }
 
   initDefaultValues = () => {
@@ -146,6 +158,7 @@ class ChargingPlanSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
+      this.initUnitConvertedValues();
     } else {
       this.handleBack();
     }
@@ -156,7 +169,7 @@ class ChargingPlanSetup extends Component {
   };
 
   onSelectPPInclude = (value) => {
-    const { prepaidIncludes, item, propertyTypes, usageTypes, currency } = this.props;
+    const { prepaidIncludes, item, propertyTypes, usageTypesData, currency } = this.props;
     if (value === '') {
       return;
     }
@@ -166,7 +179,7 @@ class ChargingPlanSetup extends Component {
     const unit = ppInclude.get('charging_by_usaget_unit', false);
     const usaget = ppInclude.get('charging_by_usaget', '');
     const unitLabel = unit
-      ? `Volume (${getUnitLabel(propertyTypes, usageTypes, usaget, unit)})`
+      ? `Volume (${getUnitLabel(propertyTypes, usageTypesData, usaget, unit)})`
       : `Cost (${getSymbolFromCurrency(currency)})`;
     const includes = item.get('include', Immutable.List());
     const alreadyExists = includes.find(include => include.get('pp_includes_name', '') === value) !== undefined;
@@ -198,9 +211,17 @@ class ChargingPlanSetup extends Component {
     }
   }
 
+  getItemToSave = () => {
+    const { propertyTypes, usageTypesData, prepaidIncludes, item } = this.props;
+    const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, item, true); // eslint-disable-line max-len
+    return item.withMutations((itemWithMutations) => {
+      itemWithMutations.set('include', includes);
+    });
+  }
+
   handleSave = () => {
-    const { item, mode } = this.props;
-    this.props.dispatch(savePrepaidGroup(item, mode)).then(this.afterSave);
+    const { mode } = this.props;
+    this.props.dispatch(savePrepaidGroup(this.getItemToSave(), mode)).then(this.afterSave);
   };
 
   handleBack = (itemWasChanged = false) => {
@@ -284,7 +305,7 @@ const mapStateToProps = (state, props) => ({
   revisions: revisionsSelector(state, props, 'charging_plan'),
   prepaidIncludes: state.list.get('prepaid_includes'),
   currency: currencySelector(state, props),
-  usageTypes: usageTypesDataSelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(ChargingPlanSetup));
