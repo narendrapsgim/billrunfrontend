@@ -11,12 +11,12 @@ class UsageTypes extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
-    usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
   };
 
@@ -30,8 +30,8 @@ class UsageTypes extends Component {
   }
 
   getItemIndex = (item) => {
-    const { usageTypes } = this.props;
-    return usageTypes.indexOf(item);
+    const { usageTypesData } = this.props;
+    return usageTypesData.indexOf(item);
   }
 
   onClickEdit = (item) => {
@@ -63,10 +63,10 @@ class UsageTypes extends Component {
   };
 
   onClickNew = () => {
-    const { usageTypes } = this.props;
+    const { usageTypesData } = this.props;
     this.setState({
       currentItem: Immutable.Map(),
-      index: usageTypes.size,
+      index: usageTypesData.size,
     });
   }
 
@@ -82,11 +82,11 @@ class UsageTypes extends Component {
   );
 
   renderList = () => {
-    const { usageTypes } = this.props;
+    const { usageTypesData } = this.props;
     const fields = this.getListFields();
     const actions = this.getListActions();
     return (
-      <List items={usageTypes} fields={fields} actions={actions} />
+      <List items={usageTypesData} fields={fields} actions={actions} />
     );
   }
 
@@ -132,7 +132,7 @@ class UsageTypes extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  usageTypes: usageTypesDataSelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),
 });
 

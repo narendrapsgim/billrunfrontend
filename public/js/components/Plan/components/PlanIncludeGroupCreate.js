@@ -28,7 +28,7 @@ class PlanIncludeGroupCreate extends Component {
     modalTitle: PropTypes.string,
     addGroup: PropTypes.func.isRequired,
     currency: PropTypes.string,
-    usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
   }
 
@@ -38,7 +38,7 @@ class PlanIncludeGroupCreate extends Component {
     allGroupsProductsKeys: Immutable.List(),
     existinGrousNames: Immutable.List(),
     currency: 'USD',
-    usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
   };
 
@@ -268,7 +268,7 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
-    const { usedProducts, currency, propertyTypes, usageTypes } = this.props;
+    const { usedProducts, currency, propertyTypes, usageTypesData } = this.props;
     const {
       name,
       products,
@@ -284,7 +284,7 @@ class PlanIncludeGroupCreate extends Component {
     const existingProductsKeys = usedProducts.push(...products);
     const setIncludesTitle = monetaryBased
       ? `Total ${getSymbolFromCurrency(currency)} included`
-      : `${changeCase.sentenceCase(`${usage} includes`)} (${getUnitLabel(propertyTypes, usageTypes, usage, unit)})`;
+      : `${changeCase.sentenceCase(`${usage} includes`)} (${getUnitLabel(propertyTypes, usageTypesData, usage, unit)})`;
 
     switch (stepIndex) {
 
@@ -450,7 +450,7 @@ const mapStateToProps = (state, props) => {
   const currency = currencySelector(state, props);
   return {
     currency,
-    usageTypes: usageTypesDataSelector(state, props),
+    usageTypesData: usageTypesDataSelector(state, props),
     propertyTypes: propertyTypeSelector(state, props),
   };
 };

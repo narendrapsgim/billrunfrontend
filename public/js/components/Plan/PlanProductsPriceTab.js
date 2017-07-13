@@ -32,7 +32,7 @@ class PlanProductsPriceTab extends Component {
 
   static propTypes = {
     planRates: PropTypes.instanceOf(Immutable.Map),
-    usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     originalRates: PropTypes.instanceOf(Immutable.Map),
@@ -43,7 +43,7 @@ class PlanProductsPriceTab extends Component {
 
   static defaultProps = {
     planRates: Immutable.Map(),
-    usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
     mode: 'create',
     originalRates: Immutable.Map(),
@@ -77,13 +77,13 @@ class PlanProductsPriceTab extends Component {
   }
 
   addNewProductToPlan = (newProducts) => {
-    const { products, propertyTypes, usageTypes } = this.props;
+    const { products, propertyTypes, usageTypesData } = this.props;
     newProducts.forEach((product) => {
       const newProduct = products.find(planProd => planProd.get('key', '') === product.key);
       if (newProduct) {
         const usaget = newProduct.get('rates', Immutable.Map()).keySeq().first();
         const productPath = ['rates', newProduct.get('key', ''), usaget, 'rate'];
-        const newRates = getProductConvertedRates(propertyTypes, usageTypes, newProduct, false);
+        const newRates = getProductConvertedRates(propertyTypes, usageTypesData, newProduct, false);
         this.props.dispatch(planProductsRateInit(newProduct.set('rates', newRates), productPath));
       }
     });
@@ -179,7 +179,7 @@ class PlanProductsPriceTab extends Component {
   }
 
   renderItems = () => {
-    const { products, planRates, usageTypes, propertyTypes, mode } = this.props;
+    const { products, planRates, usageTypesData, propertyTypes, mode } = this.props;
     return planRates
       .reverse()
       .map((productUsageTypes, productKey) => {
@@ -203,7 +203,7 @@ class PlanProductsPriceTab extends Component {
             onProductEditRateTo={this.onProductEditRateTo}
             onProductRemove={this.onProductRemove}
             onProductRestore={this.onProductRestore}
-            usageTypes={usageTypes}
+            usageTypes={usageTypesData}
             propertyTypes={propertyTypes}
           />
         );
@@ -245,7 +245,7 @@ class PlanProductsPriceTab extends Component {
 const mapStateToProps = (state, props) => ({
   originalRates: state.entity.getIn(['planOriginal', 'rates']),
   products: state.list.get('plan_products'),
-  usageTypes: usageTypesDataSelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),
 });
 export default connect(mapStateToProps)(PlanProductsPriceTab);

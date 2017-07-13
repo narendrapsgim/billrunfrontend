@@ -19,7 +19,7 @@ import {
 class Product extends Component {
 
   static propTypes = {
-    usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     ratingParams: PropTypes.instanceOf(Immutable.List),
     product: PropTypes.instanceOf(Immutable.Map),
@@ -35,7 +35,7 @@ class Product extends Component {
   }
 
   static defaultProps = {
-    usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
     ratingParams: Immutable.List(),
     planName: 'BASE',
@@ -177,8 +177,8 @@ class Product extends Component {
   }
 
   getUnitLabel = () => {
-    const { propertyTypes, usageTypes, usaget } = this.props;
-    return getUnitLabel(propertyTypes, usageTypes, usaget, this.getUnit());
+    const { propertyTypes, usageTypesData, usaget } = this.props;
+    return getUnitLabel(propertyTypes, usageTypesData, usaget, this.getUnit());
   }
 
   render() {
@@ -332,7 +332,7 @@ class Product extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  usageTypes: usageTypesDataSelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),
 });
 

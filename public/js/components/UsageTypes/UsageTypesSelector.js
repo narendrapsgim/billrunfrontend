@@ -11,7 +11,7 @@ class UsageTypesSelector extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usaget: PropTypes.string,
     unit: PropTypes.string,
@@ -22,7 +22,7 @@ class UsageTypesSelector extends Component {
   };
 
   static defaultProps = {
-    usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
     usaget: '',
     unit: '',
@@ -54,10 +54,10 @@ class UsageTypesSelector extends Component {
   }
 
   onSaveNewUsageType = () => {
-    const { usageTypes } = this.props;
+    const { usageTypesData } = this.props;
     const { currentItem } = this.state;
     this.setState({ currentItem: null });
-    this.props.dispatch(updateSetting('usage_types', usageTypes.size, currentItem));
+    this.props.dispatch(updateSetting('usage_types', usageTypesData.size, currentItem));
     this.props.dispatch(saveSettings('usage_types'));
     this.props.onChangeUsaget(currentItem.get('usage_type', ''));
   }
@@ -78,16 +78,16 @@ class UsageTypesSelector extends Component {
   }
 
   getAvailableUsageTypes = () => {
-    const { usageTypes } = this.props;
-    return usageTypes.map(usaget => ({
+    const { usageTypesData } = this.props;
+    return usageTypesData.map(usaget => ({
       value: usaget.get('usage_type', ''),
       label: usaget.get('label', ''),
     })).toJS();
   }
 
   getAvailableUnits = () => {
-    const { propertyTypes, usageTypes, usaget } = this.props;
-    const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
+    const { propertyTypes, usageTypesData, usaget } = this.props;
+    const selectedUsaget = usageTypesData.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
     const uom = (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
     return uom
       .filter(unit => unit.get('unit', false) !== false)
@@ -160,7 +160,7 @@ class UsageTypesSelector extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  usageTypes: usageTypesDataSelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),
 });
 
