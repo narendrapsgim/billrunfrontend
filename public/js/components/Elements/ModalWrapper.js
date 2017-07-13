@@ -57,7 +57,7 @@ ModalWrapper.propTypes = {
   progress: PropTypes.bool,
   labelProgress: PropTypes.string,
   modalSize: PropTypes.oneOf(['large', 'small', undefined]),
-  title: PropTypes.string.isRequired,
+  title: PropTypes.node,
   onHide: PropTypes.func,
   styleOk: PropTypes.string,
   styleCancel: PropTypes.string,
