@@ -253,7 +253,7 @@ class CustomerSetup extends Component {
               }
 
               { (mode !== 'create') && !subscriberFields.isEmpty() &&
-                <Tab title="Subscriptions" eventKey={2}>
+                <Tab title="Subscribers" eventKey={2}>
                   <Panel style={{ borderTop: 'none' }}>
                     <Subscriptions
                       aid={aid}

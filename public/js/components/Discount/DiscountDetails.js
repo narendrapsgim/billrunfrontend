@@ -136,7 +136,7 @@ export default class DiscountDetails extends Component {
         service.get('name', '') === key
         && service.get('quantitative', false) === true
       ));
-      const info = isQuantitative !== -1 ? 'Amount will be multiplied by the subscription service quantity' : '';
+      const info = isQuantitative !== -1 ? 'Amount will be multiplied by the subscriber\'s service quantity' : '';
       const label = this.getLabel(availableServices, key);
       return this.renderDiscountValue(key, value, label, this.onChangeServiceDiscountValue, info);
     });

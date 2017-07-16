@@ -203,7 +203,7 @@ var globalSetting = {
     subscription: {
       collection: 'subscribers',
       uniqueField: 'sid',
-      itemName: 'subscription',
+      itemName: 'subscriber',
       itemType: 'subscription',
       itemsType: 'subscriptions',
       settingsKey: 'subscribers.subscriber',
