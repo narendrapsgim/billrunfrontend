@@ -123,7 +123,8 @@ class OnBoarding extends Component {
   getSteps = () => ([{
     title: '1. Customer details',
     text: (
-      <span>Customer name, id and address. Invoices are generated per customer.
+      <span>
+        Customer name, id and address. Invoices are generated per customer.
         <br />
         <Link to="customers/customer" onClick={this.onPause}>Click here to create a customer</Link>
       </span>
@@ -134,10 +135,11 @@ class OnBoarding extends Component {
   }, {
     title: '2. Plans',
     text: (
-      <span>A customer can have multiple subscriptions, each one tied to exactly one
+      <span>
+        A customer can have multiple subscriptions, each one tied to exactly one
         plan with recurring charges.
         <br />
-        <Link to="plans/plan" onClick={this.onPause}>New postpaid plan</Link>
+        <Link to="plans/plan" onClick={this.onPause}>Click here to create a plan</Link>
       </span>
     ),
     style: { beacon: { offsetY: -25 } },
@@ -146,7 +148,8 @@ class OnBoarding extends Component {
   }, {
     title: '3. Services',
     text: (
-      <span>Every subscription can register to extra services that are charged periodically.
+      <span>
+        Every subscription can register to extra services that are charged periodically.
         <br />
         <Link to="services/service" onClick={this.onPause}>Click here to create a service</Link>
       </span>
@@ -157,7 +160,8 @@ class OnBoarding extends Component {
   }, {
     title: '4. Discounts',
     text: (
-      <span>Build automatic discounts based on various combinations on subscription plans / services.
+      <span>
+        Build automatic discounts based on various combinations on subscription plans / services.
         <br />
         <Link to="discounts/discount" onClick={this.onPause}>Click here to create a discount</Link>
       </span>
@@ -166,9 +170,47 @@ class OnBoarding extends Component {
     selector: '.step-discount',
     type: 'click',
   }, {
-    title: '8.a. Company details',
+    title: '5. Subscription details',
     text: (
-      <span>Your company name and log appear at the invoice header
+      <span>
+        This section appears for every subscription of the customer and shows aggregated
+        amounts in the subscription level.
+      </span>
+    ),
+    style: { beacon: { offsetY: -25 } },
+    selector: '.step-subscription-details',
+    type: 'click',
+  }, {
+    title: '6. Usage details',
+    text: (
+      <span>
+        If billing also by usage, the usage details can be included in the invoice (optional).<br />
+        BillRun&apos;s input processors can receive events either in online (HTTP request)
+        or offline (files) mode.
+        <br />
+        <Link to={{ pathname: '/select_input_processor_template', query: { action: 'new' } }} onClick={this.onPause}>Click here to set up an input processor</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -25 } },
+    selector: '.step-usage-details',
+    type: 'click',
+  }, {
+    title: '7. Products',
+    text: (
+      <span>
+        You can create different products which define pricing rules based on various usage events.
+        <br />
+        <Link to="/products/product" onClick={this.onPause}>Click here to create a product</Link>
+      </span>
+    ),
+    style: { beacon: { offsetY: -25 } },
+    selector: '.step-products',
+    type: 'click',
+  }, {
+    title: '8. Company details',
+    text: (
+      <span>
+        Your company name and log appear at the invoice header.
         <br />
         <Link to={{ pathname: '/settings', query: { tab: 1 } }} onClick={this.onPause}>Set up your company details here</Link>
       </span>
@@ -177,9 +219,10 @@ class OnBoarding extends Component {
     selector: '.step-company-details-header',
     type: 'click',
   }, {
-    title: '8.b. Company details',
+    title: '9. Company details',
     text: (
-      <span>Your company details appear at the invoice footer
+      <span>
+        Your company details appear at the invoice footer.
         <br />
         <Link to={{ pathname: '/settings', query: { tab: 1 } }} onClick={this.onPause}>Set up your company details here</Link>
       </span>
@@ -188,9 +231,10 @@ class OnBoarding extends Component {
     selector: '.step-company-details-footer',
     type: 'click',
   }, {
-    title: '9. Billing cycle management',
+    title: '10. Billing cycle management',
     text: (
-      <span>You are in full control of the billing cycle run. See the billing cycle run progress
+      <span>
+        You are in full control of the billing cycle run. See the billing cycle run progress
          as it runs and watch invoices as soon as they&apos;re created. Confirm or reset the
          cycle after reviewing it and charge your customers, all functionalities available
          from one screen!
