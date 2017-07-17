@@ -7,7 +7,7 @@ import { Col, FormGroup, HelpBlock, Form, ControlLabel } from 'react-bootstrap';
 import { getSymbolFromCurrency } from 'currency-symbol-map';
 import ModalWrapper from '../Elements/ModalWrapper';
 import Field from '../Field';
-import { getProductsKeysQuery } from '../../common/ApiQueries';
+import { getProductsWithRatesQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { creditCharge } from '../../actions/creditActions';
@@ -63,7 +63,7 @@ class Credit extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getList('all_rates', getProductsKeysQuery()));
+    this.props.dispatch(getList('all_rates', getProductsWithRatesQuery()));
     this.props.dispatch(getSettings('usage_types'));
   }
 
