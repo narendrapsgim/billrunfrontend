@@ -8,6 +8,7 @@ import {
   getPlanConvertedPpIncludes,
   getPlanConvertedPpThresholds,
   getPlanConvertedNotificationThresholds,
+  getPlanConvertedIncludes,
 } from '../common/Util';
 import {
   usageTypesDataSelector,
@@ -135,38 +136,51 @@ export const addUsagetInclude = (ppIncludesName, ppIncludesExternalId, unitLabel
   unitLabel,
 });
 
-export const savePlan = (plan, action) => (dispatch, getState) => {
+const convertPlan = (getState, plan, convertToBaseUnit) => {
   const isPrepaidPlan = plan.get('connection_type', '') === 'prepaid';
   const state = getState();
   const usageTypesData = usageTypesDataSelector(state);
   const propertyTypes = propertyTypeSelector(state);
   const ppIncludes = state.list.get('pp_includes');
-  const rates = getPlanConvertedRates(propertyTypes, usageTypesData, plan, true);
+  const rates = getPlanConvertedRates(propertyTypes, usageTypesData, plan, convertToBaseUnit);
   const ppThresholds = isPrepaidPlan
-    ? getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, plan, true)
+    ? getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, plan, convertToBaseUnit) // eslint-disable-line max-len
     : null;
   const notificationsThresholds = isPrepaidPlan
-    ? getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, plan, true)
+    ? getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, plan, convertToBaseUnit) // eslint-disable-line max-len
     : null;
-  const convertedPlan = plan.withMutations((itemWithMutations) => {
+  const planIncludes = !isPrepaidPlan
+    ? getPlanConvertedIncludes(propertyTypes, usageTypesData, plan, convertToBaseUnit)
+    : null;
+  return plan.withMutations((itemWithMutations) => {
     itemWithMutations.set('rates', rates);
     if (isPrepaidPlan) {
       itemWithMutations.set('pp_threshold', ppThresholds);
       itemWithMutations.set('notifications_threshold', notificationsThresholds);
+    } else {
+      itemWithMutations.set('include', planIncludes);
     }
   });
+};
+
+const convertPrepaidGroup = (getState, prepaidGroup, convertToBaseUnit) => {
+  const state = getState();
+  const usageTypesData = usageTypesDataSelector(state);
+  const propertyTypes = propertyTypeSelector(state);
+  const prepaidIncludes = state.list.get('pp_includes');
+  const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, prepaidGroup, convertToBaseUnit); // eslint-disable-line max-len
+  return prepaidGroup.withMutations((itemWithMutations) => {
+    itemWithMutations.set('include', includes);
+  });
+};
+
+export const savePlan = (plan, action) => (dispatch, getState) => {
+  const convertedPlan = convertPlan(getState, plan, true);
   return dispatch(saveEntity('plans', convertedPlan, action));
 };
 
 export const savePrepaidGroup = (prepaidGroup, action) => (dispatch, getState) => {
-  const state = getState();
-  const usageTypesData = usageTypesDataSelector(state);
-  const propertyTypes = propertyTypeSelector(state);
-  const prepaidIncludes = state.list.get('prepaid_includes');
-  const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, prepaidGroup, true); // eslint-disable-line max-len
-  const convertedPrepaidGroup = prepaidGroup.withMutations((itemWithMutations) => {
-    itemWithMutations.set('include', includes);
-  });
+  const convertedPrepaidGroup = convertPrepaidGroup(getState, prepaidGroup, true);
   return dispatch(saveEntity('prepaidgroups', convertedPrepaidGroup, action));
 };
 
@@ -177,26 +191,8 @@ export const getPlan = id => (dispatch, getState) => {
     .then((response) => {
       const item = response.data[0].data.details[0];
       item.originalValue = item.from;
-      const state = getState();
-      const usageTypesData = usageTypesDataSelector(state);
-      const propertyTypes = propertyTypeSelector(state);
-      const ppIncludes = state.list.get('pp_includes');
       const plan = Immutable.fromJS(item);
-      const isPrepaidPlan = plan.get('connection_type', '') === 'prepaid';
-      const rates = getPlanConvertedRates(propertyTypes, usageTypesData, plan, false);
-      const ppThresholds = isPrepaidPlan
-        ? getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, plan, false)
-        : null;
-      const notificationsThresholds = isPrepaidPlan
-        ? getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, plan, false) // eslint-disable-line max-len
-        : null;
-      const convertedPlan = plan.withMutations((itemWithMutations) => {
-        itemWithMutations.set('rates', rates);
-        if (isPrepaidPlan) {
-          itemWithMutations.set('pp_threshold', ppThresholds);
-          itemWithMutations.set('notifications_threshold', notificationsThresholds);
-        }
-      }).toJS();
+      const convertedPlan = convertPlan(getState, plan, false).toJS();
       dispatch(gotItem(convertedPlan));
       return dispatch(apiBillRunSuccessHandler(response));
     })
@@ -210,15 +206,8 @@ export const getPrepaidGroup = id => (dispatch, getState) => {
     .then((response) => {
       const item = response.data[0].data.details[0];
       item.originalValue = item.from;
-      const state = getState();
-      const usageTypesData = usageTypesDataSelector(state);
-      const propertyTypes = propertyTypeSelector(state);
-      const prepaidIncludes = state.list.get('prepaid_includes');
       const prepaidGroup = Immutable.fromJS(item);
-      const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, prepaidGroup, false); // eslint-disable-line max-len
-      const convertedPrepaidGroup = prepaidGroup.withMutations((itemWithMutations) => {
-        itemWithMutations.set('include', includes);
-      }).toJS();
+      const convertedPrepaidGroup = convertPrepaidGroup(getState, prepaidGroup, false).toJS();
       dispatch(gotItem(convertedPrepaidGroup));
       return dispatch(apiBillRunSuccessHandler(response));
     })

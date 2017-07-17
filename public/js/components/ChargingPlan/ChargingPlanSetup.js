@@ -73,6 +73,7 @@ class ChargingPlanSetup extends Component {
   }
 
   componentWillMount() {
+    this.props.dispatch(getList('pp_includes', getPrepaidIncludesQuery()));
     this.fetchItem();
     this.initDefaultValues();
   }
@@ -83,7 +84,6 @@ class ChargingPlanSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'charging_plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    this.props.dispatch(getList('prepaid_includes', getPrepaidIncludesQuery()));
   }
 
 
@@ -287,7 +287,7 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'plan'),
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'charging_plan'),
-  prepaidIncludes: state.list.get('prepaid_includes'),
+  prepaidIncludes: state.list.get('pp_includes'),
   currency: currencySelector(state, props),
   usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),

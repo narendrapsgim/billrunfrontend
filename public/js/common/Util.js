@@ -339,3 +339,27 @@ export const getPlanConvertedPpIncludes = (propertyTypes, usageTypes, ppIncludes
   });
   return convertedIncludes;
 };
+
+export const getGroupUsaget = (group) => {
+  const groupNotUsagetKeys = ['unit', 'account_shared', 'account_pool', 'rates'];
+  const keys = group.keySeq().toArray().filter(key => !groupNotUsagetKeys.includes(key));
+  if (keys.length) {
+    return keys[0];
+  }
+  return false;
+};
+
+export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBaseUnit = true) => {
+  const convertedIncludes = item.get('include', Immutable.Map()).withMutations((includesWithMutations) => {
+    includesWithMutations.get('groups', Immutable.Map()).forEach((include, group) => {
+      const unit = include.get('unit', false);
+      const usaget = getGroupUsaget(include);
+      if (unit && usaget) {
+        const value = include.get(usaget);
+        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+        includesWithMutations.setIn(['groups', group, usaget], parseFloat(newValue));
+      }
+    });
+  });
+  return convertedIncludes;
+};

@@ -1,7 +1,15 @@
+import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
 import { saveEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
+import {
+  getPlanConvertedIncludes,
+} from '../common/Util';
+import {
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../selectors/settingsSelector';
 
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
@@ -48,9 +56,22 @@ export const setCloneService = () => ({
   uniquefields: ['name'],
 });
 
-export const saveService = (service, action) => saveEntity('services', service, action);
+const convertService = (getState, service, convertToBaseUnit) => {
+  const state = getState();
+  const usageTypesData = usageTypesDataSelector(state);
+  const propertyTypes = propertyTypeSelector(state);
+  const serviceIncludes = getPlanConvertedIncludes(propertyTypes, usageTypesData, service, convertToBaseUnit); // eslint-disable-line max-len
+  return service.withMutations((itemWithMutations) => {
+    itemWithMutations.set('include', serviceIncludes);
+  });
+};
 
-export const getService = id => (dispatch) => {
+export const saveService = (service, action) => (dispatch, getState) => {
+  const convertedService = convertService(getState, service, true);
+  return dispatch(saveEntity('services', convertedService, action));
+};
+
+export const getService = id => (dispatch, getState) => {
   dispatch(startProgressIndicator());
   const query = fetchServiceByIdQuery(id);
   return apiBillRun(query)
@@ -65,7 +86,9 @@ export const getService = id => (dispatch) => {
         }];
       }
       item.originalValue = item.from;
-      dispatch(gotItem(item));
+      const service = Immutable.fromJS(item);
+      const convertedService = convertService(getState, service, false).toJS();
+      dispatch(gotItem(convertedService));
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));
