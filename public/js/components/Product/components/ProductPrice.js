@@ -110,7 +110,6 @@ export default class ProductPrice extends Component {
     const isFirst = index === 0;
     const isLast = ((count === 0) || (count - 1 === index));
     const from = Number(item.get('from', 0));
-    const fromDisplayValue = (from > 0 ? from + 1 : from);
     const to = item.get('to', '');
     const toDisplayValue = (to === productUnlimitedValue) ? 'Infinite' : to;
     const editable = (mode !== 'view');
@@ -120,7 +119,7 @@ export default class ProductPrice extends Component {
         <Col lg={2} md={2} sm={2} xs={5} >
           <FormGroup validationState={this.state.fromError.length > 0 ? 'error' : null} style={{ margin: 0 }}>
             {isFirst && <ControlLabel>{`From (${unit})`}</ControlLabel>}
-            <Field value={fromDisplayValue} disabled={true} editable={editable} />
+            <Field value={from} disabled={true} editable={editable} />
             { this.state.fromError.length > 0 ? <HelpBlock>{this.state.fromError}</HelpBlock> : ''}
           </FormGroup>
         </Col>
