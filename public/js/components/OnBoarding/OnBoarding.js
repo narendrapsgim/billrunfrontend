@@ -192,7 +192,7 @@ class OnBoarding extends Component {
       </span>
     ),
     style: { beacon: { offsetY: -25 } },
-    selector: '.step-usage-details',
+    selector: '.table-usage',
     type: 'click',
   }, {
     title: '7. Products',
@@ -210,7 +210,7 @@ class OnBoarding extends Component {
     title: '8. Company details',
     text: (
       <span>
-        Your company name and log appear at the invoice header.
+        Your company logo, name, address, etc. appear at the invoice header & footer.
         <br />
         <Link to={{ pathname: '/settings', query: { tab: 1 } }} onClick={this.onPause}>Set up your company details here</Link>
       </span>
@@ -219,19 +219,7 @@ class OnBoarding extends Component {
     selector: '.step-company-details-header',
     type: 'click',
   }, {
-    title: '9. Company details',
-    text: (
-      <span>
-        Your company details appear at the invoice footer.
-        <br />
-        <Link to={{ pathname: '/settings', query: { tab: 1 } }} onClick={this.onPause}>Set up your company details here</Link>
-      </span>
-    ),
-    style: { beacon: { offsetY: -25 } },
-    selector: '.step-company-details-footer',
-    type: 'click',
-  }, {
-    title: '10. Billing cycle management',
+    title: '9. Billing cycle management',
     text: (
       <span>
         You are in full control of the billing cycle run. See the billing cycle run progress
