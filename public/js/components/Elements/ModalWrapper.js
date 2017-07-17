@@ -3,8 +3,8 @@ import { Modal, Button } from 'react-bootstrap';
 
 
 const ModalWrapper = props => (
-  <Modal show={props.show}>
-    <Modal.Header closeButton={props.onHide ? true : false} onHide={props.onHide}>
+  <Modal show={props.show} bsSize={props.modalSize}>
+    <Modal.Header closeButton={props.onHide !== null} onHide={props.onHide}>
       <Modal.Title>{ props.title }</Modal.Title>
     </Modal.Header>
     <Modal.Body>
@@ -13,12 +13,12 @@ const ModalWrapper = props => (
     { (props.onCancel || props.onOk) &&
       <Modal.Footer>
         { props.onCancel && (
-          <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onCancel}>
+          <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onCancel} bsStyle={props.styleCancel}>
             { props.labelCancel }
           </Button>
         ) }
         { props.onOk && (
-          <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onOk} bsStyle="primary" disabled={props.progress}>
+          <Button bsSize="small" style={{ minWidth: 90 }} onClick={props.onOk} bsStyle={props.styleOk} disabled={props.progress}>
             { props.progress && (<span><i className="fa fa-spinner fa-pulse" />&nbsp;&nbsp;</span>) }
             { (props.progress && props.labelProgress !== null)
               ? props.labelProgress
@@ -32,12 +32,19 @@ const ModalWrapper = props => (
 );
 
 ModalWrapper.defaultProps = {
-  title: 'Edit',
+  children: null,
+  title: '',
   show: false,
   progress: false,
   labelOk: 'OK',
   labelCancel: 'Cancel',
   labelProgress: null,
+  modalSize: undefined,
+  onHide: null,
+  onOk: null,
+  onCancel: null,
+  styleOk: 'primary',
+  styleCancel: undefined,
 };
 
 ModalWrapper.propTypes = {
@@ -49,8 +56,11 @@ ModalWrapper.propTypes = {
   show: PropTypes.bool.isRequired,
   progress: PropTypes.bool,
   labelProgress: PropTypes.string,
-  title: PropTypes.string.isRequired,
+  modalSize: PropTypes.oneOf(['large', 'small', undefined]),
+  title: PropTypes.node,
   onHide: PropTypes.func,
+  styleOk: PropTypes.string,
+  styleCancel: PropTypes.string,
 };
 
 export default ModalWrapper;

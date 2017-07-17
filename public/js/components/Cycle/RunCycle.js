@@ -6,7 +6,7 @@ import { getCycleQuery, getChargeStatusQuery, getOperationsQuery } from '../../c
 import { getList, clearList } from '../../actions/listActions';
 import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
 import { clearItems } from '../../actions/entityListActions';
-import ConfirmModal from '../../components/ConfirmModal';
+import { ConfirmModal } from '../../components/Elements';
 import CycleData from './CycleData';
 import CyclesSelector from './CyclesSelector';
 import { getCycleName } from './CycleUtil';

@@ -13,7 +13,7 @@ class CustomFields extends Component {
 
   static propTypes = {
     subscriber: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
-    account: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
+    customer: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     product: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     defaultDisabledFields: PropTypes.object,
     defaultHiddenFields: PropTypes.object,
@@ -23,25 +23,25 @@ class CustomFields extends Component {
 
   static defaultProps = {
     subscriber: Immutable.List(),
-    account: Immutable.List(),
+    customer: Immutable.List(),
     product: Immutable.List(),
     defaultDisabledFields: {
-      account: ['first_name', 'last_name', 'firstname', 'lastname', 'address'],
+      customer: ['first_name', 'last_name', 'firstname', 'lastname', 'address'],
       subscriber: ['firstname', 'lastname', 'plan', 'services'],
       product: [],
     },
     defaultHiddenFields: {
-      account: ['aid', 'payment_gateway'],
+      customer: ['aid', 'payment_gateway'],
       subscriber: ['sid', 'aid', 'plan_activation'],
       product: [],
     },
-    tabs: ['account', 'subscriber', 'product'],
+    tabs: ['customer', 'subscriber', 'product'],
   };
 
   state = {
     tab: 0,
     subscriber: Immutable.List(),
-    account: Immutable.List(),
+    customer: Immutable.List(),
     product: Immutable.List(),
   };
 
@@ -77,9 +77,9 @@ class CustomFields extends Component {
   }
 
   afterReceiveSettings = (response) => {
-    const { account, subscriber, product } = this.props;
+    const { customer, subscriber, product } = this.props;
     if (response) {
-      this.setState({ account, subscriber, product });
+      this.setState({ customer, subscriber, product });
     }
   }
 
@@ -199,7 +199,7 @@ class CustomFields extends Component {
 
 const mapStateToProps = (state, props) => ({
   subscriber: subscriberFieldsSelector(state, props),
-  account: accountFieldsSelector(state, props),
+  customer: accountFieldsSelector(state, props),
   product: productFieldsSelector(state, props),
 });
 export default connect(mapStateToProps)(CustomFields);

@@ -75,8 +75,8 @@ class PostpaidBalances extends Component {
     })).toJS();
 
     return ([
-      { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
-      { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
+      { id: 'aid', placeholder: 'Customer', type: 'number', sort: true, showFilter: false, display: false },
+      { id: 'sid', placeholder: 'Subscriber', type: 'number', sort: true },
       { id: 'plan_description', placeholder: 'Plan' },
       { id: 'balance.cost', placeholder: 'Total Cost', type: 'number', showFilter: false, parser: this.parseTotalCost },
       ...usageFields,

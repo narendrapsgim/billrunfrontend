@@ -73,7 +73,7 @@ const FieldNames = {
     lastname: 'Last Name',
   },
   subscription: {
-    aid: 'Subscription ID',
+    aid: 'Subscriber ID',
     sid: 'Customer ID',
     firstname: 'First Name',
     lastname: 'Last Name',

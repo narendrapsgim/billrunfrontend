@@ -30,7 +30,7 @@ export const getSubscription = id => (dispatch) => {
       dispatch(gotEntity('subscription', item));
       return dispatch(apiBillRunSuccessHandler(response));
     })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving subscription')));
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving subscriber')));
 };
 
 export const saveCustomer = (customer, action) => saveEntity('accounts', customer, action);
@@ -62,8 +62,8 @@ export const rebalanceAccount = (aid, billrunKeys) => (dispatch) => {
   }
 
   return apiBillRun(queries)
-    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Rebalance account request sent')))
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error rebalancing account')));
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Customer rebalance request sent')))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error rebalancing customer')));
 };
 
 export const getCollectionDebt = aid => (dispatch) => {

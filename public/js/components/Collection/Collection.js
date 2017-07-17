@@ -6,7 +6,7 @@ import { Form, FormGroup, Col, FormControl, ControlLabel, InputGroup } from 'rea
 import Help from '../Help';
 import Field from '../Field';
 import ActionButtons from '../Elements/ActionButtons';
-import ConfirmModal from '../../components/ConfirmModal';
+import { ConfirmModal } from '../../components/Elements';
 import MailEditorRich from '../MailEditor/MailEditorRich';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
