@@ -1,7 +1,18 @@
+import Immutable from 'immutable';
 import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { fetchPlanByIdQuery, getAllGroupsQuery, fetchPrepaidGroupByIdQuery } from '../common/ApiQueries';
 import { saveEntity } from '../actions/entityActions';
+import {
+  getPlanConvertedRates,
+  getPlanConvertedPpIncludes,
+  getPlanConvertedPpThresholds,
+  getPlanConvertedNotificationThresholds,
+} from '../common/Util';
+import {
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../selectors/settingsSelector';
 
 export const PLAN_GOT = 'PLAN_GOT';
 export const PLAN_CLEAR = 'PLAN_CLEAR';
@@ -124,31 +135,91 @@ export const addUsagetInclude = (ppIncludesName, ppIncludesExternalId, unitLabel
   unitLabel,
 });
 
-export const savePlan = (plan, action) => saveEntity('plans', plan, action);
+export const savePlan = (plan, action) => (dispatch, getState) => {
+  const isPrepaidPlan = plan.get('connection_type', '') === 'prepaid';
+  const state = getState();
+  const usageTypesData = usageTypesDataSelector(state);
+  const propertyTypes = propertyTypeSelector(state);
+  const ppIncludes = state.list.get('pp_includes');
+  const rates = getPlanConvertedRates(propertyTypes, usageTypesData, plan, true);
+  const ppThresholds = isPrepaidPlan
+    ? getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, plan, true)
+    : null;
+  const notificationsThresholds = isPrepaidPlan
+    ? getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, plan, true)
+    : null;
+  const convertedPlan = plan.withMutations((itemWithMutations) => {
+    itemWithMutations.set('rates', rates);
+    if (isPrepaidPlan) {
+      itemWithMutations.set('pp_threshold', ppThresholds);
+      itemWithMutations.set('notifications_threshold', notificationsThresholds);
+    }
+  });
+  return dispatch(saveEntity('plans', convertedPlan, action));
+};
 
-export const savePrepaidGroup = (prepaidGroup, action) => saveEntity('prepaidgroups', prepaidGroup, action);
+export const savePrepaidGroup = (prepaidGroup, action) => (dispatch, getState) => {
+  const state = getState();
+  const usageTypesData = usageTypesDataSelector(state);
+  const propertyTypes = propertyTypeSelector(state);
+  const prepaidIncludes = state.list.get('prepaid_includes');
+  const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, prepaidGroup, true); // eslint-disable-line max-len
+  const convertedPrepaidGroup = prepaidGroup.withMutations((itemWithMutations) => {
+    itemWithMutations.set('include', includes);
+  });
+  return dispatch(saveEntity('prepaidgroups', convertedPrepaidGroup, action));
+};
 
-export const getPlan = id => (dispatch) => {
+export const getPlan = id => (dispatch, getState) => {
   dispatch(startProgressIndicator());
   const query = fetchPlanByIdQuery(id);
   return apiBillRun(query)
     .then((response) => {
       const item = response.data[0].data.details[0];
       item.originalValue = item.from;
-      dispatch(gotItem(item));
+      const state = getState();
+      const usageTypesData = usageTypesDataSelector(state);
+      const propertyTypes = propertyTypeSelector(state);
+      const ppIncludes = state.list.get('pp_includes');
+      const plan = Immutable.fromJS(item);
+      const isPrepaidPlan = plan.get('connection_type', '') === 'prepaid';
+      const rates = getPlanConvertedRates(propertyTypes, usageTypesData, plan, false);
+      const ppThresholds = isPrepaidPlan
+        ? getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, plan, false)
+        : null;
+      const notificationsThresholds = isPrepaidPlan
+        ? getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, plan, false) // eslint-disable-line max-len
+        : null;
+      const convertedPlan = plan.withMutations((itemWithMutations) => {
+        itemWithMutations.set('rates', rates);
+        if (isPrepaidPlan) {
+          itemWithMutations.set('pp_threshold', ppThresholds);
+          itemWithMutations.set('notifications_threshold', notificationsThresholds);
+        }
+      }).toJS();
+      dispatch(gotItem(convertedPlan));
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving plan')));
 };
 
-export const getPrepaidGroup = id => (dispatch) => {
+export const getPrepaidGroup = id => (dispatch, getState) => {
   dispatch(startProgressIndicator());
   const query = fetchPrepaidGroupByIdQuery(id);
   return apiBillRun(query)
     .then((response) => {
       const item = response.data[0].data.details[0];
       item.originalValue = item.from;
-      dispatch(gotItem(item));
+      const state = getState();
+      const usageTypesData = usageTypesDataSelector(state);
+      const propertyTypes = propertyTypeSelector(state);
+      const prepaidIncludes = state.list.get('prepaid_includes');
+      const prepaidGroup = Immutable.fromJS(item);
+      const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, prepaidGroup, false); // eslint-disable-line max-len
+      const convertedPrepaidGroup = prepaidGroup.withMutations((itemWithMutations) => {
+        itemWithMutations.set('include', includes);
+      }).toJS();
+      dispatch(gotItem(convertedPrepaidGroup));
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving prepaid group')));

@@ -37,8 +37,6 @@ import {
 } from '../../selectors/entitySelector';
 import {
   inputProssesorRatingParamsSelector,
-  usageTypesDataSelector,
-  propertyTypeSelector,
 } from '../../selectors/settingsSelector';
 
 import {
@@ -46,7 +44,6 @@ import {
   getConfig,
   getItemId,
   getRateUsaget,
-  getProductConvertedRates,
 } from '../../common/Util';
 
 
@@ -66,8 +63,6 @@ class ProductSetup extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
-    usageTypesData: PropTypes.instanceOf(Immutable.List),
-    propertyTypes: PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
@@ -75,8 +70,6 @@ class ProductSetup extends Component {
     revisions: Immutable.List(),
     ratingParams: Immutable.List(),
     activeTab: 1,
-    usageTypesData: Immutable.List(),
-    propertyTypes: Immutable.List(),
   };
 
   state = {
@@ -119,12 +112,6 @@ class ProductSetup extends Component {
 
   componentWillUnmount() {
     this.props.dispatch(clearProduct());
-  }
-
-  initRatesValues = () => {
-    const { propertyTypes, usageTypesData, item } = this.props;
-    const rates = getProductConvertedRates(propertyTypes, usageTypesData, item, false);
-    this.props.dispatch(onFieldUpdate(['rates'], rates));
   }
 
   initDefaultValues = () => {
@@ -185,7 +172,6 @@ class ProductSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
-      this.initRatesValues();
     } else {
       this.handleBack();
     }
@@ -201,15 +187,9 @@ class ProductSetup extends Component {
     }
   }
 
-  getItemToSave = () => {
-    const { propertyTypes, usageTypesData, item } = this.props;
-    const rates = getProductConvertedRates(propertyTypes, usageTypesData, item, true);
-    return item.set('rates', rates);
-  }
-
   handleSave = () => {
-    const { mode } = this.props;
-    this.props.dispatch(saveProduct(this.getItemToSave(), mode)).then(this.afterSave);
+    const { item, mode } = this.props;
+    this.props.dispatch(saveProduct(item, mode)).then(this.afterSave);
   }
 
   handleBack = (itemWasChanged = false) => {
@@ -277,8 +257,6 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'product'),
   revisions: revisionsSelector(state, props, 'product'),
   ratingParams: inputProssesorRatingParamsSelector(state, props),
-  usageTypesData: usageTypesDataSelector(state, props),
-  propertyTypes: propertyTypeSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ProductSetup));

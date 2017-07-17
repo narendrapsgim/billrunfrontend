@@ -123,16 +123,6 @@ class PrepaidPlanSetup extends Component {
     this.props.dispatch(clearEntity('planOriginal'));
   }
 
-  initUnitConvertedValues = () => {
-    const { propertyTypes, usageTypesData, ppIncludes, item } = this.props;
-    const convertedRates = getPlanConvertedRates(propertyTypes, usageTypesData, item, false);
-    const ppThresholds = getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, item, false); // eslint-disable-line max-len
-    const notificationsThresholds = getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, item, false); // eslint-disable-line max-len
-    this.props.dispatch(onPlanFieldUpdate(['rates'], convertedRates));
-    this.props.dispatch(onPlanFieldUpdate(['pp_threshold'], ppThresholds));
-    this.props.dispatch(onPlanFieldUpdate(['notifications_threshold'], notificationsThresholds));
-  }
-
   initDefaultValues = () => {
     const { mode } = this.props;
     if (mode === 'create') {
@@ -177,7 +167,6 @@ class PrepaidPlanSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
-      this.initUnitConvertedValues();
       this.props.dispatch(gotEntity('planOriginal', response.data[0]));
     } else {
       this.handleBack();
@@ -236,21 +225,9 @@ class PrepaidPlanSetup extends Component {
     }
   }
 
-  getItemToSave = () => {
-    const { propertyTypes, usageTypesData, ppIncludes, item } = this.props;
-    const rates = getPlanConvertedRates(propertyTypes, usageTypesData, item, true);
-    const ppThresholds = getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, item, true); // eslint-disable-line max-len
-    const notificationsThresholds = getPlanConvertedNotificationThresholds(propertyTypes, usageTypesData, ppIncludes, item, true); // eslint-disable-line max-len
-    return item.withMutations((itemWithMutations) => {
-      itemWithMutations.set('rates', rates);
-      itemWithMutations.set('pp_threshold', ppThresholds);
-      itemWithMutations.set('notifications_threshold', notificationsThresholds);
-    });
-  }
-
   handleSave = () => {
-    const { mode } = this.props;
-    this.props.dispatch(savePlan(this.getItemToSave(), mode)).then(this.afterSave);
+    const { item, mode } = this.props;
+    this.props.dispatch(savePlan(item, mode)).then(this.afterSave);
   }
 
   afterSave = (response) => {

@@ -15,7 +15,6 @@ import {
   getConfig,
   getItemId,
   getUnitLabel,
-  getPlanConvertedPpIncludes,
 } from '../../common/Util';
 import {
   getPrepaidGroup,
@@ -109,12 +108,6 @@ class ChargingPlanSetup extends Component {
     this.props.dispatch(clearPlan());
   }
 
-  initUnitConvertedValues = () => {
-    const { propertyTypes, usageTypesData, prepaidIncludes, item } = this.props;
-    const convertedIncludes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, item, false); // eslint-disable-line max-len
-    this.props.dispatch(onPlanFieldUpdate(['include'], convertedIncludes));
-  }
-
   initDefaultValues = () => {
     const { mode } = this.props;
     if (mode === 'create') {
@@ -158,7 +151,6 @@ class ChargingPlanSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
-      this.initUnitConvertedValues();
     } else {
       this.handleBack();
     }
@@ -211,17 +203,9 @@ class ChargingPlanSetup extends Component {
     }
   }
 
-  getItemToSave = () => {
-    const { propertyTypes, usageTypesData, prepaidIncludes, item } = this.props;
-    const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, item, true); // eslint-disable-line max-len
-    return item.withMutations((itemWithMutations) => {
-      itemWithMutations.set('include', includes);
-    });
-  }
-
   handleSave = () => {
-    const { mode } = this.props;
-    this.props.dispatch(savePrepaidGroup(this.getItemToSave(), mode)).then(this.afterSave);
+    const { item, mode } = this.props;
+    this.props.dispatch(savePrepaidGroup(item, mode)).then(this.afterSave);
   };
 
   handleBack = (itemWasChanged = false) => {
