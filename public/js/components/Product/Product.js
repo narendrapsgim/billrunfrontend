@@ -185,7 +185,8 @@ class Product extends Component {
     const { errors } = this.state;
     const { product, usaget, mode, ratingParams } = this.props;
     const unit = this.getUnit();
-    const unitLabel = this.getUnitLabel();
+    const unitTxt = this.getUnitLabel();
+    const unitLabel = unitTxt !== '' ? `(${unitTxt})` : '';
     const vatable = (product.get('vatable', true) === true);
     const pricingMethod = product.get('pricing_method', '');
     const editable = (mode !== 'view');
@@ -236,7 +237,7 @@ class Product extends Component {
                         onChangeUnit={this.onChangeUnit}
                       />
                     )
-                    : <div className="non-editable-field">{ `${usaget} (${unitLabel})` }</div>
+                    : <div className="non-editable-field">{ `${usaget} ${unitLabel}` }</div>
                   }
                 </Col>
               </FormGroup>

@@ -113,12 +113,13 @@ export default class ProductPrice extends Component {
     const to = item.get('to', '');
     const toDisplayValue = (to === productUnlimitedValue) ? 'Infinite' : to;
     const editable = (mode !== 'view');
+    const unitLabel = unit !== '' ? `(${unit})` : '';
 
     return (
       <Row className="form-inner-edit-row">
         <Col lg={2} md={2} sm={2} xs={5} >
           <FormGroup validationState={this.state.fromError.length > 0 ? 'error' : null} style={{ margin: 0 }}>
-            {isFirst && <ControlLabel>{`From (${unit})`}</ControlLabel>}
+            {isFirst && <ControlLabel>{`From ${unitLabel}`}</ControlLabel>}
             <Field value={from} disabled={true} editable={editable} />
             { this.state.fromError.length > 0 ? <HelpBlock>{this.state.fromError}</HelpBlock> : ''}
           </FormGroup>
@@ -126,7 +127,7 @@ export default class ProductPrice extends Component {
 
         <Col lg={2} md={2} sm={2} xs={5} >
           <FormGroup validationState={this.state.toError.length > 0 ? 'error' : null} style={{ margin: 0 }}>
-            { isFirst && <ControlLabel>{`To (${unit})`}</ControlLabel> }
+            { isFirst && <ControlLabel>{`To ${unitLabel}`}</ControlLabel> }
             { (to === productUnlimitedValue)
               ? <Field value={toDisplayValue} disabled={true} editable={editable} />
               : <Field value={toDisplayValue} onChange={this.onEditTo} fieldType="number" min={0} editable={editable} />
@@ -137,7 +138,7 @@ export default class ProductPrice extends Component {
 
         <Col lg={2} md={2} sm={2} xs={5} >
           <FormGroup validationState={this.state.intervalError.length > 0 ? 'error' : null} style={{ margin: 0 }}>
-            {isFirst && <ControlLabel>{`Interval (${unit})`}</ControlLabel>}
+            {isFirst && <ControlLabel>{`Interval ${unitLabel}`}</ControlLabel>}
             <Field value={item.get('interval', '')} onChange={this.onEditInterval} fieldType="number" min={0} editable={editable} />
             { this.state.intervalError.length > 0 ? <HelpBlock>{this.state.intervalError}</HelpBlock> : ''}
           </FormGroup>

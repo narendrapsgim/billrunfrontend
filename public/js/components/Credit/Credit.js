@@ -180,7 +180,8 @@ class Credit extends Component {
     const selectedRate = this.getSelectedRate(rateKey);
     const usaget = getRateUsaget(selectedRate);
     const unit = getRateUnit(selectedRate, usaget);
-    return getUnitLabel(propertyTypes, usageTypesData, usaget, unit);
+    const unitLabel = getUnitLabel(propertyTypes, usageTypesData, usaget, unit);
+    return unitLabel !== '' ? `(${unitLabel})` : '';
   }
 
   render() {
@@ -243,7 +244,7 @@ class Credit extends Component {
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? `Volume (${this.getRateUnitLabel(rate)})` : 'Quantity'}</Col>
+            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? `Volume ${this.getRateUnitLabel(rate)}` : 'Quantity'}</Col>
             <Col sm={10}>
               <Field
                 onChange={this.onChangeCreditUsagevValue.bind(this, 'usagev')}
