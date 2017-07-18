@@ -28,6 +28,7 @@ export default class PlanIncludeGroupEdit extends Component {
     onChangeGroupProducts: PropTypes.func.isRequired,
     mode: PropTypes.string,
     onGroupRemove: PropTypes.func.isRequired,
+    unit: PropTypes.string,
   }
 
   static defaultProps = {
@@ -36,6 +37,7 @@ export default class PlanIncludeGroupEdit extends Component {
     shared: false,
     pooled: false,
     mode: 'create',
+    unit: '',
   };
 
   state = {
@@ -187,7 +189,7 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   render() {
-    const { name, value, usaget, shared, pooled, products } = this.props;
+    const { name, value, usaget, shared, pooled, products, unit } = this.props;
     const { showConfirm } = this.state;
     const confirmMessage = `Are you sure you want to remove ${name} group?`;
     const sharedLabel = shared ? 'Yes' : 'No';
@@ -202,6 +204,7 @@ export default class PlanIncludeGroupEdit extends Component {
         <td className="td-ellipsis">{name}</td>
         <td className="td-ellipsis">{usaget}</td>
         <td className="td-ellipsis">{valueLabel}</td>
+        <td className="td-ellipsis">{unit}</td>
         <td className="td-ellipsis">
           <OverlayTrigger placement="left" overlay={tooltip}>
             <span>{productsLabels}</span>

@@ -4,6 +4,7 @@ import { withRouter } from 'react-router';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
+import { getSymbolFromCurrency } from 'currency-symbol-map';
 import ChargingPlanDetails from './ChargingPlanDetails';
 import ChargingPlanIncludes from './ChargingPlanIncludes';
 import { EntityRevisionDetails } from '../Entity';
@@ -13,6 +14,7 @@ import {
   buildPageTitle,
   getConfig,
   getItemId,
+  getUnitLabel,
 } from '../../common/Util';
 import {
   getPrepaidGroup,
@@ -23,6 +25,11 @@ import {
   onPlanTariffAdd,
   setClonePlan,
 } from '../../actions/planActions';
+import {
+  currencySelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../../selectors/settingsSelector';
 import { getList } from '../../actions/listActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -46,6 +53,9 @@ class ChargingPlanSetup extends Component {
       push: PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    currency: PropTypes.string,
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
@@ -53,6 +63,9 @@ class ChargingPlanSetup extends Component {
     revisions: Immutable.List(),
     prepaidIncludes: Immutable.List(),
     activeTab: 1,
+    currency: '',
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
   };
 
   state = {
@@ -60,6 +73,7 @@ class ChargingPlanSetup extends Component {
   }
 
   componentWillMount() {
+    this.props.dispatch(getList('pp_includes', getPrepaidIncludesQuery()));
     this.fetchItem();
     this.initDefaultValues();
   }
@@ -70,18 +84,22 @@ class ChargingPlanSetup extends Component {
       const pageTitle = buildPageTitle(mode, 'charging_plan');
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    this.props.dispatch(getList('prepaid_includes', getPrepaidIncludesQuery()));
   }
 
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId } = nextProps;
-    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    const { item, mode, itemId, prepaidIncludes } = nextProps;
+    const {
+      item: oldItem,
+      itemId: oldItemId,
+      mode: oldMode,
+      prepaidIncludes: oldPrepaidIncludes,
+    } = this.props;
     if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'charging_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone') || !Immutable.is(prepaidIncludes, oldPrepaidIncludes)) {
       this.fetchItem(itemId);
     }
   }
@@ -143,17 +161,22 @@ class ChargingPlanSetup extends Component {
   };
 
   onSelectPPInclude = (value) => {
-    const { prepaidIncludes, item } = this.props;
+    const { prepaidIncludes, item, propertyTypes, usageTypesData, currency } = this.props;
     if (value === '') {
       return;
     }
     const ppInclude = prepaidIncludes.find(pp => pp.get('name') === value);
     const ppIncludesName = ppInclude.get('name');
     const ppIncludesExternalId = ppInclude.get('external_id');
+    const unit = ppInclude.get('charging_by_usaget_unit', false);
+    const usaget = ppInclude.get('charging_by_usaget', '');
+    const unitLabel = unit
+      ? `Volume (${getUnitLabel(propertyTypes, usageTypesData, usaget, unit)})`
+      : `Cost (${getSymbolFromCurrency(currency)})`;
     const includes = item.get('include', Immutable.List());
     const alreadyExists = includes.find(include => include.get('pp_includes_name', '') === value) !== undefined;
     if (!alreadyExists) {
-      this.props.dispatch(addUsagetInclude(ppIncludesName, ppIncludesExternalId));
+      this.props.dispatch(addUsagetInclude(ppIncludesName, ppIncludesExternalId, unitLabel));
     }
   };
 
@@ -264,6 +287,9 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'plan'),
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'charging_plan'),
-  prepaidIncludes: state.list.get('prepaid_includes'),
+  prepaidIncludes: state.list.get('pp_includes'),
+  currency: currencySelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(ChargingPlanSetup));

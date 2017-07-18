@@ -121,8 +121,8 @@ export default function (state = defaultState, action) {
     }
 
     case MAP_USAGET: {
-      const { pattern, usaget } = action.mapping;
-      const newMap = Immutable.fromJS({ pattern, usaget });
+      const { pattern, usaget, unit } = action.mapping;
+      const newMap = Immutable.fromJS({ pattern, usaget, unit });
       const regex = new RegExp(`^${usaget}$`).toString();
       const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], regex);
       return state

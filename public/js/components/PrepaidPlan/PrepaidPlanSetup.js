@@ -42,6 +42,11 @@ import {
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { gotEntity, clearEntity } from '../../actions/entityActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
+import {
+  currencySelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../../selectors/settingsSelector';
 
 
 class PrepaidPlanSetup extends Component {
@@ -60,6 +65,9 @@ class PrepaidPlanSetup extends Component {
       push: React.PropTypes.func.isRequired,
     }).isRequired,
     dispatch: PropTypes.func.isRequired,
+    currency: PropTypes.string,
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
@@ -67,6 +75,9 @@ class PrepaidPlanSetup extends Component {
     revisions: Immutable.List(),
     ppIncludes: Immutable.List(),
     activeTab: 1,
+    currency: '',
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
   };
 
   state = {
@@ -74,6 +85,7 @@ class PrepaidPlanSetup extends Component {
   }
 
   componentWillMount() {
+    this.props.dispatch(getList('pp_includes', getPrepaidIncludesQuery()));
     this.fetchItem();
   }
 
@@ -84,17 +96,21 @@ class PrepaidPlanSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     this.initDefaultValues();
-    this.props.dispatch(getList('pp_includes', getPrepaidIncludesQuery()));
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item, mode, itemId } = nextProps;
-    const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
+    const { item, mode, itemId, ppIncludes } = nextProps;
+    const {
+      item: oldItem,
+      itemId: oldItemId,
+      mode: oldMode,
+      ppIncludes: oldPpIncludes,
+    } = this.props;
     if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
       const pageTitle = buildPageTitle(mode, 'prepaid_plan', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
-    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
+    if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone') || !Immutable.is(ppIncludes, oldPpIncludes)) {
       this.fetchItem(itemId);
     }
   }
@@ -234,7 +250,7 @@ class PrepaidPlanSetup extends Component {
   }
 
   render() {
-    const { item, mode, ppIncludes, revisions } = this.props;
+    const { item, mode, ppIncludes, revisions, propertyTypes, usageTypesData, currency } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -285,6 +301,9 @@ class PrepaidPlanSetup extends Component {
                 plan={item}
                 mode={mode}
                 ppIncludes={ppIncludes}
+                propertyTypes={propertyTypes}
+                usageTypesData={usageTypesData}
+                currency={currency}
                 onAddNotification={this.onAddNotification}
                 onRemoveNotification={this.onRemoveNotification}
                 onUpdateNotificationField={this.onUpdateNotificationField}
@@ -310,6 +329,9 @@ class PrepaidPlanSetup extends Component {
                 plan={item}
                 mode={mode}
                 ppIncludes={ppIncludes}
+                propertyTypes={propertyTypes}
+                usageTypesData={usageTypesData}
+                currency={currency}
                 onChangeThreshold={this.onChangeThreshold}
                 onRemoveThreshold={this.onRemoveThreshold}
                 onAddBalance={this.onAddBalanceThreshold}
@@ -336,5 +358,8 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'plan'),
   revisions: revisionsSelector(state, props, 'plan'),
   ppIncludes: state.list.get('pp_includes'),
+  usageTypesData: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
+  currency: currencySelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PrepaidPlanSetup));

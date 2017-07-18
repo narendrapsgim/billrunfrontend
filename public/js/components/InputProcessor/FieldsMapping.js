@@ -1,19 +1,27 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
+import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
+import { getUnitLabel } from '../../common/Util';
 
 export default class FieldsMapping extends Component {
 
   static propTypes = {
     usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
     addUsagetMapping: PropTypes.func,
     onSetStaticUsaget: PropTypes.func,
+    onSetFieldMapping: PropTypes.func,
   };
 
   static defaultProps = {
     usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
     addUsagetMapping: () => {},
     onSetStaticUsaget: () => {},
+    onSetFieldMapping: () => {},
   };
 
   constructor(props) {
@@ -29,6 +37,7 @@ export default class FieldsMapping extends Component {
     this.state = {
       pattern: "",
       usaget: "",
+      unit: '',
       separateTime: false
     };
   }
@@ -46,7 +55,7 @@ export default class FieldsMapping extends Component {
   changeUsaget(val, setStaticUsaget) {
     const { usageTypes } = this.props;
 
-    const found = usageTypes.find(usaget => (usaget === val));
+    const found = (val === '' || usageTypes.find(usaget => (usaget === val)));
     if (!found) {
       this.props.addUsagetMapping(val)
       .then(
@@ -75,19 +84,33 @@ export default class FieldsMapping extends Component {
     this.changeUsaget(usaget, true);
   }
 
+  onChangeStaticUom = (value) => {
+    const e = {
+      target: {
+        id: 'default_unit',
+        value,
+      },
+    };
+    this.props.onSetFieldMapping(e);
+  }
+
+  onChangeUom = (unit) => {
+    this.setState({ unit });
+  }
+
   addUsagetMapping(e) {
-    const { usaget, pattern } = this.state;
+    const { usaget, pattern, unit } = this.state;
     const { onError } = this.props;
     if (!this.props.settings.getIn(['processor', 'src_field'])) {
       onError("Please select usage type field");
       return;
     }
-    if (!usaget || !pattern){
-      onError("Please input a value and unit type");
+    if (!usaget || !pattern || !unit) {
+      onError('Please input a value, usage type and unit');
       return;
     }
-    this.props.onAddUsagetMapping.call(this, {usaget, pattern});
-    this.setState({pattern: "", usaget: ""});
+    this.props.onAddUsagetMapping.call(this, { usaget, pattern, unit });
+    this.setState({ pattern: '', usaget: '', unit: '' });
   }
 
   removeUsagetMapping(index, e) {
@@ -117,9 +140,11 @@ export default class FieldsMapping extends Component {
   }
 
   render() {
-    const { separateTime } = this.state;
+    const { separateTime, usaget, unit } = this.state;
     const { settings,
             usageTypes,
+            usageTypesData,
+            propertyTypes,
             onSetFieldMapping } = this.props;
 
     const available_fields = [(<option disabled value="" key={-1}>Select Field...</option>),
@@ -130,7 +155,8 @@ export default class FieldsMapping extends Component {
       return {value: usaget, label: usaget};
     }).toJS();
 
-    const defaultUsaget = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_usaget'], '')
+    const defaultUsaget = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_usaget'], '');
+    const defaultUsagetUnit = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_unit'], '');
     const volumeOptions = settings.get('fields', Immutable.List()).sortBy(field => field).map(field => ({
       label: field,
       value: field,
@@ -221,15 +247,14 @@ export default class FieldsMapping extends Component {
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
-            <div className="col-lg-9">
-              <Select
-                  id="unit"
-                  options={available_units}
-                  allowCreate={true}
-                  value={defaultUsaget}
-                  disabled={settings.get('usaget_type', '') !== "static"}
-                  style={{marginTop: 3}}
-                  onChange={this.onChangeStaticUsaget}
+
+            <div className="col-lg-10">
+              <UsageTypesSelector
+                usaget={defaultUsaget}
+                unit={defaultUsagetUnit}
+                onChangeUsaget={this.onChangeStaticUsaget}
+                onChangeUnit={this.onChangeStaticUom}
+                enabled={settings.get('usaget_type', '') === 'static'}
               />
             </div>
           </div>
@@ -262,11 +287,14 @@ export default class FieldsMapping extends Component {
         <div className="form-group">
           <div className="col-lg-offset-3 col-lg-7">
             <div className="col-lg-offset-1 col-lg-10">
-              <div className="col-lg-5">
+              <div className="col-lg-3">
                 <strong>Input Value</strong>
               </div>
-              <div className="col-lg-5">
+              <div className="col-lg-3">
                 <strong>Usage Type</strong>
+              </div>
+              <div className="col-lg-4">
+                <strong>Unit</strong>
               </div>
             </div>
           </div>
@@ -276,8 +304,9 @@ export default class FieldsMapping extends Component {
                 <div className="form-group" key={key}>
                   <div className="col-lg-offset-3 col-lg-7">
                     <div className="col-lg-offset-1 col-lg-10">
-                      <div className="col-lg-5">{usage_t.get('pattern', '')}</div>
-                      <div className="col-lg-5">{usage_t.get('usaget', '')}</div>
+                      <div className="col-lg-3">{usage_t.get('pattern', '')}</div>
+                      <div className="col-lg-3">{usage_t.get('usaget', '')}</div>
+                      <div className="col-lg-3"> {getUnitLabel(propertyTypes, usageTypesData, usage_t.get('usaget', ''), usage_t.get('unit', ''))}</div>
                       <div className="col-lg-2">
                         <button type="button"
                                 className="btn btn-default btn-sm"
@@ -293,25 +322,23 @@ export default class FieldsMapping extends Component {
             }
         <div className="form-group">
           <div className="col-lg-offset-3 col-lg-7">
-            <div className="col-lg-offset-1 col-lg-10">
-              <div className="col-lg-5">
+            <div className="col-lg-offset-1 col-lg-12">
+              <div className="col-lg-3">
                 <input className="form-control"
                        onChange={this.onChangePattern}
                        disabled={settings.get('usaget_type', '') !== "dynamic"}
                        value={this.state.pattern} />
               </div>
-              <div className="col-lg-5">
-                <Select
-                    id="unit"
-                    options={available_units}
-                    allowCreate={true}
-                    value={this.state.usaget}
-                    style={{marginTop: 3}}
-                    disabled={settings.get('usaget_type', '') !== "dynamic"}
-                    onChange={this.onChangeUsaget}
+              <div className="col-lg-8">
+                <UsageTypesSelector
+                  usaget={usaget}
+                  unit={unit}
+                  onChangeUsaget={this.onChangeUsaget}
+                  onChangeUnit={this.onChangeUom}
+                  enabled={settings.get('usaget_type', '') === 'dynamic'}
                 />
               </div>
-              <div className="col-lg-2">
+              <div className="col-lg-1">
                 <button type="button"
                         className="btn btn-primary btn-sm"
                         onClick={this.addUsagetMapping}>

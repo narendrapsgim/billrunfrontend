@@ -7,19 +7,30 @@ import { Col, FormGroup, HelpBlock, Form, ControlLabel } from 'react-bootstrap';
 import { getSymbolFromCurrency } from 'currency-symbol-map';
 import ModalWrapper from '../Elements/ModalWrapper';
 import Field from '../Field';
-import { getProductsKeysQuery } from '../../common/ApiQueries';
+import { getProductsWithRatesQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { creditCharge } from '../../actions/creditActions';
 import {
   currencySelector,
   usageTypeSelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
 } from '../../selectors/settingsSelector';
+import {
+  getRateByKey,
+  getRateUsaget,
+  getRateUnit,
+  getUnitLabel,
+  getValueByUnit,
+} from '../../common/Util';
 
 class Credit extends Component {
   static defaultProps = {
     allRates: List(),
     currency: '',
+    usageTypesData: List(),
+    propertyTypes: List(),
     sid: false,
   };
 
@@ -27,6 +38,8 @@ class Credit extends Component {
     dispatch: PropTypes.func.isRequired,
     allRates: PropTypes.instanceOf(List),
     currency: PropTypes.string,
+    usageTypesData: PropTypes.instanceOf(List),
+    propertyTypes: PropTypes.instanceOf(List),
     onClose: PropTypes.func.isRequired,
     sid: PropTypes.number,
     aid: PropTypes.number.isRequired,
@@ -50,7 +63,7 @@ class Credit extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getList('all_rates', getProductsKeysQuery()));
+    this.props.dispatch(getList('all_rates', getProductsWithRatesQuery()));
     this.props.dispatch(getSettings('usage_types'));
   }
 
@@ -122,11 +135,12 @@ class Credit extends Component {
   }
 
   onCreditCharge = () => {
-    const { aid, sid } = this.props;
+    const { aid, sid, propertyTypes, usageTypesData } = this.props;
     const { rateBy, aprice, usagev, rate, validationErrors } = this.state;
     if (validationErrors.valueSeq().includes('required')) {
       return;
     }
+
     let params = [
       { aid },
       { sid },
@@ -136,7 +150,12 @@ class Credit extends Component {
     if (rateBy === 'fix') {
       params = [...params, { aprice }, { usagev }];
     } else {
-      params = [...params, { usagev }];
+      const selectedRate = this.getSelectedRate(rate);
+      const usaget = getRateUsaget(selectedRate);
+      const unit = getRateUnit(selectedRate, usaget);
+      params = [...params,
+        { usagev: getValueByUnit(propertyTypes, usageTypesData, usaget, unit, usagev) },
+      ];
     }
     this.setState({ progress: true });
     this.props.dispatch(creditCharge(params)).then(this.afterCharge);
@@ -152,6 +171,16 @@ class Credit extends Component {
   getAvailableRates = () => {
     const { allRates } = this.props;
     return allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
+  }
+
+  getSelectedRate = rateKey => getRateByKey(this.props.allRates, rateKey);
+
+  getRateUnitLabel = (rateKey) => {
+    const { propertyTypes, usageTypesData } = this.props;
+    const selectedRate = this.getSelectedRate(rateKey);
+    const usaget = getRateUsaget(selectedRate);
+    const unit = getRateUnit(selectedRate, usaget);
+    return getUnitLabel(propertyTypes, usageTypesData, usaget, unit);
   }
 
   render() {
@@ -214,7 +243,7 @@ class Credit extends Component {
           </FormGroup>
 
           <FormGroup validationState={validationErrors.get('usagev', '').length > 0 ? 'error' : null}>
-            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? 'Volume' : 'Quantity'}</Col>
+            <Col sm={2} componentClass={ControlLabel}>{rateBy === 'usagev' ? `Volume (${this.getRateUnitLabel(rate)})` : 'Quantity'}</Col>
             <Col sm={10}>
               <Field
                 onChange={this.onChangeCreditUsagevValue.bind(this, 'usagev')}
@@ -246,6 +275,8 @@ class Credit extends Component {
 const mapStateToProps = (state, props) => ({
   usageTypes: usageTypeSelector(state, props),
   currency: currencySelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
   allRates: state.list.get('all_rates'),
 });
 

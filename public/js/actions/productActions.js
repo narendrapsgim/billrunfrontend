@@ -1,7 +1,15 @@
+import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { fetchProductByIdQuery } from '../common/ApiQueries';
 import { startProgressIndicator } from './progressIndicatorActions';
 import { saveEntity } from './entityActions';
+import {
+  getProductConvertedRates,
+} from '../common/Util';
+import {
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../selectors/settingsSelector';
 
 
 export const PRODUCT_GOT = 'PRODUCT_GOT';
@@ -60,16 +68,33 @@ export const setCloneProduct = () => ({
   uniquefields: ['key'],
 });
 
-export const saveProduct = (product, action) => saveEntity('rates', product, action);
+export const saveProduct = (product, action) => (dispatch, getState) => {
+  const state = getState();
+  const usageTypesData = usageTypesDataSelector(state);
+  const propertyTypes = propertyTypeSelector(state);
+  const rates = getProductConvertedRates(propertyTypes, usageTypesData, product, true);
+  const convertedProduct = product.withMutations((itemWithMutations) => {
+    itemWithMutations.set('rates', rates);
+  });
+  return dispatch(saveEntity('rates', convertedProduct, action));
+};
 
-export const getProduct = id => (dispatch) => {
+export const getProduct = id => (dispatch, getState) => {
   dispatch(startProgressIndicator());
   const query = fetchProductByIdQuery(id);
   return apiBillRun(query)
     .then((response) => {
       const item = response.data[0].data.details[0];
       item.originalValue = item.from;
-      dispatch(gotItem(item));
+      const state = getState();
+      const usageTypesData = usageTypesDataSelector(state);
+      const propertyTypes = propertyTypeSelector(state);
+      const product = Immutable.fromJS(item);
+      const rates = getProductConvertedRates(propertyTypes, usageTypesData, product, false);
+      const convertedProduct = product.withMutations((itemWithMutations) => {
+        itemWithMutations.set('rates', rates);
+      }).toJS();
+      dispatch(gotItem(convertedProduct));
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving product')));

@@ -51,6 +51,7 @@ import { getSettings, updateSetting, saveSettings } from '../../actions/settings
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { usageTypeSelector, usageTypesDataSelector, propertyTypeSelector } from '../../selectors/settingsSelector';
 import { getConfig } from '../../common/Util';
 
 class InputProcessor extends Component {
@@ -58,6 +59,8 @@ class InputProcessor extends Component {
   static propTypes = {
     settings: PropTypes.instanceOf(Immutable.Map),
     usageTypes: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
     subscriberFields: PropTypes.instanceOf(Immutable.List),
     customRatingFields: PropTypes.instanceOf(Immutable.List),
     inputProcessorsExitNames: PropTypes.instanceOf(Immutable.List),
@@ -78,6 +81,8 @@ class InputProcessor extends Component {
     customRatingFields: Immutable.List(),
     inputProcessorsExitNames: Immutable.List(),
     usageTypes: Immutable.List(),
+    propertyTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
     fileType: '',
     action: 'new',
     template: null,
@@ -155,7 +160,7 @@ class InputProcessor extends Component {
       this.props.dispatch(getProcessorSettings(fileType));
       pageTitle = 'Edit Input Processor';
     }
-    this.props.dispatch(getSettings(['usage_types', 'subscribers.subscriber.fields', 'rates.fields']));
+    this.props.dispatch(getSettings(['usage_types', 'property_types', 'subscribers.subscriber.fields', 'rates.fields']));
     this.props.dispatch(setPageTitle(pageTitle));
   }
 
@@ -293,11 +298,14 @@ class InputProcessor extends Component {
   onSetRating = (e) => {
     const { customRatingFields } = this.props;
     const { dataset: { usaget, rate_key, index }, value, custom } = e.target;
-    const isNewField = custom && (rate_key !== '') && customRatingFields.find(field => field.get('field_name', '') === rate_key) === undefined;
+    let rateKey = rate_key;
+    const isNewField = custom && (rateKey !== '') && customRatingFields.find(field => field.get('field_name', '') === rateKey) === undefined;
     if (isNewField) {
-      this.addNewRatingCustomField(rate_key, value);
+      const title = rateKey;
+      rateKey = `params.${changeCase.snakeCase(title)}`;
+      this.addNewRatingCustomField(rateKey, title, value);
     }
-    this.props.dispatch(setRatingField(usaget, parseInt(index, 10), rate_key, value));
+    this.props.dispatch(setRatingField(usaget, parseInt(index), rateKey, value));
   }
 
   onAddRating = (e) => {
@@ -371,11 +379,11 @@ class InputProcessor extends Component {
     this.props.dispatch(addUsagetMapping(val))
   );
 
-  addNewRatingCustomField = (fieldName, type) => {
+  addNewRatingCustomField = (fieldName, title, type) => {
     const { customRatingFields } = this.props;
     this.props.dispatch(updateSetting('rates', ['fields'], customRatingFields.push(Immutable.Map({
-      field_name: `params.${changeCase.snakeCase(fieldName)}`,
-      title: fieldName,
+      field_name: fieldName,
+      title,
       multiple: type === 'longestPrefix',
       display: true,
       editable: true,
@@ -433,7 +441,7 @@ class InputProcessor extends Component {
   }
 
   getStepContent = () => {
-    const { settings, usageTypes, subscriberFields, customRatingFields, action, type, format } = this.props;
+    const { settings, usageTypes, usageTypesData, propertyTypes, subscriberFields, customRatingFields, action, type, format } = this.props;
     const { stepIndex, errors, steps } = this.state;
 
     switch (stepIndex) {
@@ -464,6 +472,8 @@ class InputProcessor extends Component {
         <FieldsMapping
           settings={settings}
           usageTypes={usageTypes}
+          usageTypesData={usageTypesData}
+          propertyTypes={propertyTypes}
           onError={this.onError}
           unsetField={this.unsetField}
           setUsagetType={this.setUsagetType}
@@ -560,7 +570,9 @@ const mapStateToProps = (state, props) => {
   return {
     inputProcessorsExitNames: state.list.get('all_input_processors', Immutable.List()).map(ip => ip.get('file_type', '')),
     settings: state.inputProcessor,
-    usageTypes: state.settings.get('usage_types', Immutable.List()),
+    usageTypes: usageTypeSelector(state, props),
+    propertyTypes: propertyTypeSelector(state, props),
+    usageTypesData: usageTypesDataSelector(state, props),
     subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
     customRatingFields: state.settings.getIn(['rates', 'fields'], Immutable.List()),
     fileType,

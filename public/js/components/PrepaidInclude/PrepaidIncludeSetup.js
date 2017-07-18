@@ -37,9 +37,6 @@ import {
   tabSelector,
   revisionsSelector,
 } from '../../selectors/entitySelector';
-import {
-  usageTypeSelector,
-} from '../../selectors/settingsSelector';
 
 
 class PrepaidIncludeSetup extends Component {
@@ -50,7 +47,6 @@ class PrepaidIncludeSetup extends Component {
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     allRates: PropTypes.instanceOf(Immutable.List),
-    usageTypes: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -65,7 +61,6 @@ class PrepaidIncludeSetup extends Component {
     item: Immutable.Map(),
     revisions: Immutable.List(),
     allRates: Immutable.List(),
-    usageTypes: Immutable.List(),
     activeTab: 1,
   };
 
@@ -217,7 +212,7 @@ class PrepaidIncludeSetup extends Component {
   }
 
   render() {
-    const { item, mode, allRates, usageTypes, revisions } = this.props;
+    const { item, mode, allRates, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -260,7 +255,6 @@ class PrepaidIncludeSetup extends Component {
               <PrepaidInclude
                 mode={mode}
                 prepaidInclude={item}
-                usageTypes={usageTypes}
                 chargingByOptions={chargingByOptions}
                 onChangeField={this.onChangeField}
                 onChangeSelectField={this.onChangeSelectField}
@@ -294,6 +288,5 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props, 'prepaid_include'),
   revisions: revisionsSelector(state, props, 'prepaid_include'),
   allRates: state.list.get('all_rates'),
-  usageTypes: usageTypeSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(PrepaidIncludeSetup));

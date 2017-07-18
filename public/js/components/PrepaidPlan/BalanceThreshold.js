@@ -5,7 +5,7 @@ import Field from '../Field';
 import Actions from '../Elements/Actions';
 
 const BalanceThreshold = (props) => {
-  const { name, ppId, value, editable } = props;
+  const { name, unitLabel, ppId, value, editable } = props;
 
   const onChange = (e) => {
     props.onChange(ppId, e.target.value);
@@ -26,7 +26,7 @@ const BalanceThreshold = (props) => {
   return (
     <FormGroup>
       <Col componentClass={ControlLabel} md={2}>
-        { name }
+        { `${name} (${unitLabel})` }
       </Col>
       <Col md={7}>
         <Field fieldType="number" onChange={onChange} value={value} editable={editable} />
@@ -41,6 +41,7 @@ const BalanceThreshold = (props) => {
 
 BalanceThreshold.defaultProps = {
   name: '',
+  unitLabel: '',
   value: '',
   ppId: '',
   editable: true,
@@ -48,6 +49,7 @@ BalanceThreshold.defaultProps = {
 
 BalanceThreshold.propTypes = {
   name: PropTypes.string,
+  unitLabel: PropTypes.string,
   editable: PropTypes.bool,
   value: PropTypes.oneOfType([
     PropTypes.string,

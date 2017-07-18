@@ -10,6 +10,7 @@ import Tax from './Tax';
 import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
+import UsageTypes from './UsageTypes';
 import { ActionButtons } from '../Elements';
 import { getSettings, updateSetting, saveSettings, fetchFile, getCurrencies } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
@@ -101,6 +102,9 @@ class Settings extends Component {
     if (settings.has('taxation')) {
       categoryToSave.push('taxation');
     }
+    if (settings.has('usage_types')) {
+      categoryToSave.push('usage_types');
+    }
     if (categoryToSave.length) {
       this.props.dispatch(saveSettings(categoryToSave)).then(
         (status) => {
@@ -184,6 +188,12 @@ class Settings extends Component {
           <Tab title="Invoicing" eventKey={6}>
             <Panel style={{ borderTop: 'none' }}>
               <Invoicing onChange={this.onChangeFieldValue} data={datetime} />
+            </Panel>
+          </Tab>
+
+          <Tab title="Usage Types" eventKey={7}>
+            <Panel style={{ borderTop: 'none' }}>
+              <UsageTypes />
             </Panel>
           </Tab>
 

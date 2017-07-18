@@ -50,7 +50,7 @@ class Field extends React.Component {
 
     switch(fieldType) {
       case 'number':
-        return (<Number {...otherProps} onChange={onChange} ref={id} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Number {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'price':
         return (<Price {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
       case 'date':

@@ -237,3 +237,129 @@ export const getSettingsPath = (entityName, path) => {
   }
   return path;
 };
+
+export const getRateByKey = (rates, rateKey) => rates.find(rate => rate.get('key', '') === rateKey) || Immutable.Map();
+
+export const getRateUsaget = rate => rate.get('rates', Immutable.Map()).keySeq().first() || '';
+
+export const getRateUsagetByKey = (rates, rateKey) => getRateUsaget(getRateByKey(rates, rateKey));
+
+export const getRateUnit = (rate, usaget) => rate.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+
+export const getUom = (propertyTypes, usageTypes, usaget) => {
+  const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
+  return (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
+};
+
+export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
+  const uom = getUom(propertyTypes, usageTypes, usaget);
+  return (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('label', '');
+};
+
+export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value, toBaseUnit = true) => { // eslint-disable-line max-len
+  const uom = getUom(propertyTypes, usageTypes, usaget);
+  const u = (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('unit', 1);
+  return toBaseUnit ? (value * u) : (value / u);
+};
+
+const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type) => {
+  const convertedRates = item.get('rates', Immutable.Map()).withMutations((ratesWithMutations) => {
+    ratesWithMutations.forEach((rates, usagetOrPlan) => {
+      rates.forEach((rate, planOrUsaget) => {
+        const usaget = (type === 'product' ? usagetOrPlan : planOrUsaget);
+        const plan = (type === 'product' ? planOrUsaget : usagetOrPlan);
+        rate.get('rate', Immutable.List()).forEach((rateStep, index) => {
+          const rangeUnit = rateStep.getIn(['uom_display', 'range'], 'counter');
+          const intervalUnit = rateStep.getIn(['uom_display', 'interval'], 'counter');
+          const convertedFrom = getValueByUnit(propertyTypes, usageTypes, usaget, rangeUnit, rateStep.get('from'), toBaseUnit);
+          const to = rateStep.get('to');
+          const convertedTo = (to === 'UNLIMITED' ? 'UNLIMITED' : getValueByUnit(propertyTypes, usageTypes, usaget, rangeUnit, to, toBaseUnit));
+          const convertedInterval = getValueByUnit(propertyTypes, usageTypes, usaget, intervalUnit, rateStep.get('interval'), toBaseUnit);
+          const ratePath = (type === 'product' ? [usaget, plan, 'rate', index] : [plan, usaget, 'rate', index]);
+          ratesWithMutations.setIn([...ratePath, 'from'], convertedFrom);
+          ratesWithMutations.setIn([...ratePath, 'to'], convertedTo);
+          ratesWithMutations.setIn([...ratePath, 'interval'], convertedInterval);
+        });
+      });
+    });
+  });
+  return convertedRates;
+};
+
+export const getProductConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit = true) => getItemConvertedRates(propertyTypes, usageTypes, item, toBaseUnit, 'product');
+
+export const getPlanConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit = true) => getItemConvertedRates(propertyTypes, usageTypes, item, toBaseUnit, 'plan');
+
+export const getPlanConvertedPpThresholds = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
+  const convertedPpThresholds = item.get('pp_threshold', Immutable.Map()).withMutations((ppThresholdsWithMutations) => {
+    ppThresholdsWithMutations.forEach((value, ppId) => {
+      const ppInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId)) || Immutable.Map();
+      const unit = ppInclude.get('charging_by_usaget_unit', false);
+      if (unit) {
+        const usaget = ppInclude.get('charging_by_usaget', '');
+        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+        ppThresholdsWithMutations.set(ppId, parseFloat(newValue));
+      }
+    });
+  });
+  return convertedPpThresholds;
+};
+
+export const getPlanConvertedNotificationThresholds = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
+  const convertedPpThresholds = item.get('notifications_threshold', Immutable.Map()).withMutations((notificationThresholdsWithMutations) => {
+    notificationThresholdsWithMutations.forEach((notifications, ppId) => {
+      const ppInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId)) || Immutable.Map();
+      const unit = ppInclude.get('charging_by_usaget_unit', false);
+      if (unit) {
+        const usaget = ppInclude.get('charging_by_usaget', '');
+        notifications.forEach((notification, index) => {
+          const value = notification.get('value', '');
+          const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit); // eslint-disable-line max-len
+          notificationThresholdsWithMutations.setIn([ppId, index, 'value'], parseFloat(newValue));
+        });
+      }
+    });
+  });
+  return convertedPpThresholds;
+};
+
+export const getPlanConvertedPpIncludes = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
+  const convertedIncludes = item.get('include', Immutable.Map()).withMutations((includesWithMutations) => {
+    includesWithMutations.forEach((include, index) => {
+      const ppId = include.get('pp_includes_external_id', '');
+      const ppInclude = ppIncludes.find(pp => pp.get('external_id', '') === parseInt(ppId)) || Immutable.Map();
+      const unit = ppInclude.get('charging_by_usaget_unit', false);
+      if (unit) {
+        const usaget = ppInclude.get('charging_by_usaget', '');
+        const value = include.get('usagev');
+        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+        includesWithMutations.setIn([index, 'usagev'], parseFloat(newValue));
+      }
+    });
+  });
+  return convertedIncludes;
+};
+
+export const getGroupUsaget = (group) => {
+  const groupNotUsagetKeys = ['unit', 'account_shared', 'account_pool', 'rates'];
+  const keys = group.keySeq().toArray().filter(key => !groupNotUsagetKeys.includes(key));
+  if (keys.length) {
+    return keys[0];
+  }
+  return false;
+};
+
+export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBaseUnit = true) => {
+  const convertedIncludes = item.get('include', Immutable.Map()).withMutations((includesWithMutations) => {
+    includesWithMutations.get('groups', Immutable.Map()).forEach((include, group) => {
+      const unit = include.get('unit', false);
+      const usaget = getGroupUsaget(include);
+      if (unit && usaget) {
+        const value = include.get(usaget);
+        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+        includesWithMutations.setIn(['groups', group, usaget], parseFloat(newValue));
+      }
+    });
+  });
+  return convertedIncludes;
+};
