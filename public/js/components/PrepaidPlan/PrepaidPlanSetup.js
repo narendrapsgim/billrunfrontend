@@ -15,9 +15,6 @@ import {
   buildPageTitle,
   getConfig,
   getItemId,
-  getPlanConvertedRates,
-  getPlanConvertedPpThresholds,
-  getPlanConvertedNotificationThresholds,
 } from '../../common/Util';
 import { modeSelector, itemSelector, idSelector, tabSelector, revisionsSelector } from '../../selectors/entitySelector';
 import { getPrepaidIncludesQuery } from '../../common/ApiQueries';
@@ -88,6 +85,7 @@ class PrepaidPlanSetup extends Component {
   }
 
   componentWillMount() {
+    this.props.dispatch(getList('pp_includes', getPrepaidIncludesQuery()));
     this.fetchItem();
   }
 
@@ -98,7 +96,6 @@ class PrepaidPlanSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     }
     this.initDefaultValues();
-    this.props.dispatch(getList('pp_includes', getPrepaidIncludesQuery()));
   }
 
   componentWillReceiveProps(nextProps) {
