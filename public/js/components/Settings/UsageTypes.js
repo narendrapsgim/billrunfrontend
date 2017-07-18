@@ -105,6 +105,7 @@ class UsageTypes extends Component {
   render() {
     const { propertyTypes } = this.props;
     const { currentItem } = this.state;
+    const newMode = Immutable.is(currentItem, Immutable.Map());
 
     return (
       <div>
@@ -124,6 +125,7 @@ class UsageTypes extends Component {
             onSave={this.handleSave}
             onCancel={this.onCancel}
             selectUoms
+            editBase={newMode}
           />
         }
       </div>

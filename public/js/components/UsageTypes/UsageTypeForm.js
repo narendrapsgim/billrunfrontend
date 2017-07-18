@@ -7,7 +7,7 @@ import Field from '../Field';
 import { ModalWrapper } from '../Elements';
 
 const UsageTypeForm = (props) => {
-  const { item, onCancel, onSave, onUpdateItem, propertyTypes, selectUoms } = props;
+  const { item, onCancel, onSave, onUpdateItem, propertyTypes, selectUoms, editBase } = props;
   const onChangeField = (e) => {
     const { id, value } = e.target;
     const keys = (id === 'label' ? ['usage_type', 'label'] : [id]);
@@ -47,7 +47,7 @@ const UsageTypeForm = (props) => {
             Usage Type
           </Col>
           <Col sm={5}>
-            <Field id="label" onChange={onChangeField} value={item.get('label', '')} />
+            <Field id="label" onChange={onChangeField} value={item.get('label', '')} disabled={!editBase} />
           </Col>
         </FormGroup>
 
@@ -61,6 +61,7 @@ const UsageTypeForm = (props) => {
               onChange={onChangePropertyType}
               value={item.get('property_type', '')}
               options={getAvailablePropertyTypes()}
+              disabled={!editBase}
             />
           </Col>
         </FormGroup>
@@ -106,12 +107,14 @@ UsageTypeForm.propTypes = {
   onUpdateItem: PropTypes.func.isRequired,
   propertyTypes: PropTypes.instanceOf(Immutable.List),
   selectUoms: PropTypes.bool,
+  editBase: PropTypes.bool,
 };
 
 UsageTypeForm.defaultProps = {
   item: Immutable.Map(),
   propertyTypes: Immutable.List(),
   selectUoms: false,
+  editBase: true,
 };
 
 export default UsageTypeForm;
