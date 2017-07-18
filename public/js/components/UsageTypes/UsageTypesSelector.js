@@ -119,7 +119,7 @@ class UsageTypesSelector extends Component {
         onChange={this.onChangeUnit(usaget)}
         value={unit}
         options={this.getAvailableUnits()}
-        disabled={!enabled}
+        disabled={!enabled || !usaget}
       />);
   }
 
