@@ -2,9 +2,8 @@ import moment from 'moment';
 import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getItemDateValue, getConfig } from '../common/Util';
+import { getItemDateValue, getConfig, getItemId } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
-
 
 const apiTimeOutMessage = 'Oops! Something went wrong. Please try again in a few moments.';
 
@@ -127,6 +126,15 @@ const buildRequestData = (item, action) => {
       return formData;
     }
 
+    case 'reopen': {
+      const formData = new FormData();
+      const query = { _id: getItemId(item, 'undefined') };
+      const update = { from: item.get('from', 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      formData.append('update', JSON.stringify(update));
+      return formData;
+    }
+
     default:
       return new FormData();
   }
@@ -202,4 +210,12 @@ export const moveEntity = (collection, item, type) => (dispatch) => {
     }
   });
   return dispatch(saveEntity(collection, hackedItem, 'move'));
+};
+
+export const reopenEntity = (collection, item, from) => (dispatch) => {
+  const itemToReopen = Immutable.Map({
+    _id: item.get('_id'),
+    from,
+  });
+  return dispatch(saveEntity(collection, itemToReopen, 'reopen'));
 };

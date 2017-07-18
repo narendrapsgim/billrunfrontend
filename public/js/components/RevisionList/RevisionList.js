@@ -7,15 +7,17 @@ import { lowerCase, sentenceCase } from 'change-case';
 import { ConfirmModal, StateIcon } from '../Elements';
 import CloseActionBox from '../Entity/CloseActionBox';
 import MoveActionBox from '../Entity/MoveActionBox';
+import ReopenActionBox from '../Entity/ReopenActionBox';
 import List from '../../components/List';
 import {
   getItemDateValue,
   getConfig,
   isItemClosed,
   getItemId,
+  isItemExpired,
 } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
-import { deleteEntity, moveEntity } from '../../actions/entityActions';
+import { deleteEntity, moveEntity, reopenEntity } from '../../actions/entityActions';
 import { getRevisions } from '../../actions/entityListActions';
 
 class RevisionList extends Component {
@@ -46,6 +48,7 @@ class RevisionList extends Component {
     itemToRemove: null,
     showMoveModal: false,
     itemToMove: null,
+    itemToReopen: null,
   }
 
   isItemEditable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
@@ -57,6 +60,17 @@ class RevisionList extends Component {
 
   isItemMovable = item => item.getIn(['revision_info', 'movable_from'], true) || item.getIn(['revision_info', 'movable_to'], true);
 
+  isItemReopenable = (item) => {
+    const { items } = this.props;
+    const index = items.indexOf(item);
+    const nextRevision = items.get(index - 1, Immutable.Map());
+    const lastRevision = items.first();
+    // can only reopen last expired entity, that the last revision of it is not unlimited
+    return ['expired'].includes(item.getIn(['revision_info', 'status'], ''))
+    && !['expired'].includes(nextRevision.getIn(['revision_info', 'status'], ''))
+    && isItemExpired(lastRevision);
+  }
+
   isItemActive = item => ['active'].includes(item.getIn(['revision_info', 'status'], ''));
 
   parseEditShow = item => this.isItemEditable(item);
@@ -66,6 +80,8 @@ class RevisionList extends Component {
   parseRemoveEnable = item => this.isItemRemovable(item);
 
   parseMoveEnable = item => this.isItemMovable(item);
+
+  parseReopenEnable = item => this.isItemReopenable(item);
 
   parserState = item => (<StateIcon status={item.getIn(['revision_info', 'status'], '')} />);
 
@@ -180,6 +196,34 @@ class RevisionList extends Component {
     }
   }
 
+  onClickReopen = (item) => {
+    this.setState({
+      showReopenModal: true,
+      itemToReopen: item,
+    });
+  }
+
+  onClickReopenClose = () => {
+    this.setState({
+      showReopenModal: false,
+      itemToReopen: null,
+    });
+  }
+
+  onClickReopenOk = (item, fromDate) => {
+    const { itemName } = this.props;
+    const collection = getConfig(['systemItems', itemName, 'collection'], '');
+    this.props.dispatch(reopenEntity(collection, item, fromDate)).then(this.afterReopen);
+  }
+
+  afterReopen = (response) => {
+    if (response.status) {
+      this.props.dispatch(showSuccess('Revision was reopened'));
+      this.onClickReopenClose();
+      this.props.onCloseItem();
+    }
+  }
+
   getActionHelpText = (type) => {
     const { itemName } = this.props;
     switch (lowerCase(type)) {
@@ -193,6 +237,8 @@ class RevisionList extends Component {
         return 'View revision details';
       case 'move':
         return 'Move revision in time';
+      case 'reopen':
+        return 'Reopen revision';
       default:
         return sentenceCase(type);
     }
@@ -209,6 +255,7 @@ class RevisionList extends Component {
     { type: 'edit', helpText: this.getActionHelpText('edit'), onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
     { type: 'clone', helpText: this.getActionHelpText('clone'), onClick: this.onClickClone },
     { type: 'move', helpText: this.getActionHelpText('move'), onClick: this.onClickMove, enable: this.parseMoveEnable },
+    { type: 'reopen', helpText: this.getActionHelpText('reopen'), onClick: this.onClickReopen, enable: this.parseReopenEnable },
     { type: 'remove', helpText: this.getActionHelpText('remove'), onClick: this.onClickRemove, enable: this.parseRemoveEnable },
   ]
 
@@ -223,6 +270,23 @@ class RevisionList extends Component {
           revisions={items}
           onMoveItem={this.onClickMoveOk}
           onCancelMoveItem={this.onClickMoveClose}
+        />
+      );
+    }
+    return null;
+  }
+
+  renderReopenModal = () => {
+    const { items, itemName } = this.props;
+    const { showReopenModal, itemToReopen } = this.state;
+    if (showReopenModal) {
+      return (
+        <ReopenActionBox
+          item={itemToReopen}
+          itemName={itemName}
+          revisions={items}
+          onReopenItem={this.onClickReopenOk}
+          onCancelReopenItem={this.onClickReopenClose}
         />
       );
     }
@@ -248,6 +312,7 @@ class RevisionList extends Component {
         }
         <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveClose} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
         { this.renderMoveModal() }
+        { this.renderReopenModal() }
       </div>
     );
   }
