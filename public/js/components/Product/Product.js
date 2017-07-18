@@ -173,7 +173,10 @@ class Product extends Component {
   getUnit = () => {
     const { product, usaget } = this.props;
     const { unit } = this.state;
-    return unit || product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+    if (unit === null) {
+      return product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+    }
+    return unit;
   }
 
   getUnitLabel = () => {
