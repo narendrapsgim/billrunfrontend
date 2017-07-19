@@ -1,12 +1,12 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
-class MailEditorRich extends React.Component {
+
+class TextEditor extends React.Component {
 
   static defaultProps = {
     fields: [],
     value: '',
-    configPath: 'config-br-mails.js',
+    configName: '',
     editorHeight: 250,
   };
 
@@ -15,7 +15,7 @@ class MailEditorRich extends React.Component {
     onChange: React.PropTypes.func.isRequired,
     value: React.PropTypes.string,
     editorName: React.PropTypes.string.isRequired,
-    configPath: React.PropTypes.string,
+    configName: React.PropTypes.string,
     editorHeight: React.PropTypes.number,
   };
 
@@ -27,12 +27,12 @@ class MailEditorRich extends React.Component {
     this.initEditor();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {  // eslint-disable-line no-unused-vars
     const { value } = this.props;
     return value !== nextProps.value;
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) { // eslint-disable-line no-unused-vars
     this.initEditor();
   }
 
@@ -44,8 +44,8 @@ class MailEditorRich extends React.Component {
     }
   }
 
-
   toggleEditor = (editor, editorName, configPath) => {
+    console.log(configPath);
     const { fields, editorHeight } = this.props;
     if (editor) {
       editor.destroy(true);
@@ -55,12 +55,14 @@ class MailEditorRich extends React.Component {
       toolbar: 'Basic',
       // width: 870,
       height: editorHeight,
-      extraPlugins: 'preview,placeholder,placeholder_select,tableresize,sourcedialog,btgrid',
       placeholder_select: {
         placeholders: fields,
       },
     };
+
     window.CKEDITOR.replace(editorName, ckeditorConfig);
+    window.CKEDITOR.dtd.$removeEmpty.i = 0;
+    window.CKEDITOR.dtd.$removeEmpty.span = false;
 
 /*    window.CKEDITOR.instances[editorName].on('blur', () => {
       const data = window.CKEDITOR.instances[editorName].getData();
@@ -76,17 +78,16 @@ class MailEditorRich extends React.Component {
   }
 
   initEditor = () => {
-    const { configPath, editorName } = this.props;
+    const { configName, editorName } = this.props;
     const editor = CKEDITOR && CKEDITOR.instances[editorName];
 
+    const configPath = (configName.length) ? `br/config/${configName}.js` : '';
     if (!this.state.showWYSIWYG) {
       window.setTimeout(() => this.toggleEditor(editor, editorName, configPath), 100);
-    } else {
-      if (editor) {
-        const editorData = window.CKEDITOR.instances[editorName].getData();
-        if (editorData !== unescape(this.props.value)) {
-          window.setTimeout(() => this.toggleEditor(editor, editorName, configPath), 100);
-        }
+    } else if (editor) {
+      const editorData = window.CKEDITOR.instances[editorName].getData();
+      if (editorData !== unescape(this.props.value)) {
+        window.setTimeout(() => this.toggleEditor(editor, editorName, configPath), 100);
       }
     }
   }
@@ -96,11 +97,11 @@ class MailEditorRich extends React.Component {
     const editorContent = unescape(value || '');
 
     return (
-      <div className="MailEditorRich">
+      <div className="TextEditor">
         <textarea name={editorName} cols="100" rows="6" value={editorContent} />
       </div>
     );
   }
 }
 
-export default connect()(MailEditorRich);
+export default TextEditor;
