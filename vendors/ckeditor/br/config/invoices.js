@@ -14,13 +14,15 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// The toolbar groups arrangement, optimized for two toolbar rows.
 	config.toolbarGroups = [
-		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-		{ name: 'paragraph', groups: [ 'list', 'indent','BidiLtr', 'BidiRtl'] },
-		{ name: 'styles', groups: [ 'Format', 'FontSize' ] },
+			{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+		{ name: 'paragraph',   groups: [ 'list', 'indent', /*'blocks',*/ 'align', 'BidiLtr', 'BidiRtl'] },
+		{ name: 'styles' },
 		{ name: 'colors' },
 		// { name: 'about' },
 		'/',
 		{ name: 'others' },
+		{ name: 'insert', groups: [ 'insert' ] },
+
 		{ name: 'document',	   groups: [ 'mode'/*, 'document', 'doctools'*/ ] },
 		// { name: 'document', items: [ 'Source'] },
 		{ name: 'tools', groups: [ 'Maximize' ] }
@@ -28,13 +30,21 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
-	config.removeButtons = 'Subscript,Superscript,ShowBlocks,Save,NewPage,Preview,Print,Font,Styles';
+	config.removeButtons = 'Subscript,Superscript,ShowBlocks,Save,NewPage,Print,Placeholder,Smiley,PageBreak,Iframe,Flash';
 
 
 
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;pre';
 
+  config.allowedContent = true;
+
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
+  config.extraPlugins = 'placeholder_select,pastebase64,base64image';
+  config.contentsCss = [
+    'vendors/ckeditor/br/css/font-awesome.min.css',
+    'vendors/ckeditor/br/css/invoice.css',
+  ];
+  config.entities_latin = false;
 };
