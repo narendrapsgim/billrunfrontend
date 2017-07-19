@@ -71,7 +71,7 @@ class CustomFields extends Component {
   }
 
   afterSave = (response) => {
-    if (response) {
+    if (response && response.status === 1) {
       this.fetchFields(this.afterReceiveSettings);
     }
   }
@@ -131,10 +131,10 @@ class CustomFields extends Component {
     entityFields.forEach((field, index) => {
       if (!field.get('generated', false) && !defaultHiddenFields.includes(field.get('field_name', ''))) {
         const existing = existingEntityFields.findIndex(existingEntityField =>
-          existingEntityField.get('field_name', '') === field.get('field_name', '')
+          existingEntityField.get('field_name', '') === field.get('field_name', ''),
         ) !== -1;
         const editable = !field.get('system', false) && !defaultDisabledFields.includes(field.get('field_name', ''));
-        const fieldKey = existing ? `item-${entity}-${field.get('field_name', index)}` : `item-${entity}-${index}`
+        const fieldKey = existing ? `item-${entity}-${field.get('field_name', index)}-${index}` : `item-${entity}-${index}`;
         fields.push(
           <CustomField
             key={fieldKey}
