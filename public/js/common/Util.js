@@ -298,7 +298,9 @@ const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type
       });
     });
   });
-  return convertedRates;
+  return !Immutable.is(convertedRates, Immutable.List())
+    ? convertedRates
+    : Immutable.Map();
 };
 
 export const getProductConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit = true) => getItemConvertedRates(propertyTypes, usageTypes, item, toBaseUnit, 'product');
@@ -317,7 +319,9 @@ export const getPlanConvertedPpThresholds = (propertyTypes, usageTypes, ppInclud
       }
     });
   });
-  return convertedPpThresholds;
+  return !Immutable.is(convertedPpThresholds, Immutable.List())
+    ? convertedPpThresholds
+    : Immutable.Map();
 };
 
 export const getPlanConvertedNotificationThresholds = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
@@ -335,7 +339,9 @@ export const getPlanConvertedNotificationThresholds = (propertyTypes, usageTypes
       }
     });
   });
-  return convertedPpThresholds;
+  return !Immutable.is(convertedPpThresholds, Immutable.List())
+    ? convertedPpThresholds
+    : Immutable.Map();
 };
 
 export const getPlanConvertedPpIncludes = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
