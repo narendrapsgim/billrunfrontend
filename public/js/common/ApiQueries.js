@@ -62,6 +62,54 @@ export const getUserCheckLoginQuery = () => ({
   api: 'auth',
 });
 
+export const saveFileQuery = (file, metadata) => {
+  const formData = new FormData();
+  formData.append('action', 'save');
+  formData.append('metadata', JSON.stringify(metadata));
+  formData.append('query', JSON.stringify({ filename: 'file' }));
+  formData.append('file', file);
+  return ({
+    api: 'files',
+    name: 'saveFile',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
+
+export const getFileQuery = query => ({
+  api: 'files',
+  params: [
+    { action: 'read' },
+    { query: JSON.stringify(query) },
+  ],
+});
+
+export const saveSettingsQuery = (data, category) => {
+  const formData = new FormData();
+  formData.append('category', category);
+  formData.append('action', 'set');
+  formData.append('data', JSON.stringify(data));
+  return ({
+    api: 'settings',
+    name: category,
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
+
+export const getSettingsQuery = category => ({
+  api: 'settings',
+  name: category,
+  params: [
+    { category },
+    { data: JSON.stringify({}) },
+  ],
+});
+
 export const getInputProcessorActionQuery = (fileType, action) => ({
   api: 'settings',
   params: [
