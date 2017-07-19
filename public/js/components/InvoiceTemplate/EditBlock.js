@@ -1,6 +1,6 @@
 import React from 'react';
 import { Panel, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
-import MailEditorRich from '../MailEditor/MailEditorRich';
+import Field from '../Field';
 
 const EditBlock = (props) => {
   const loadTemplate = (index) => {
@@ -32,11 +32,12 @@ const EditBlock = (props) => {
 
   return (
     <Panel header={panelHeader}>
-      <MailEditorRich
+      <Field
+        fieldType="textEditor"
         value={props.content}
         editorName={`editor-${props.name}`}
         name={props.name}
-        configPath="config-br-invoices.js"
+        configName="invoices"
         editorHeight={150}
         fields={props.fields}
         onChange={onChange}

@@ -45,7 +45,6 @@ class TextEditor extends React.Component {
   }
 
   toggleEditor = (editor, editorName, configPath) => {
-    console.log(configPath);
     const { fields, editorHeight } = this.props;
     if (editor) {
       editor.destroy(true);
