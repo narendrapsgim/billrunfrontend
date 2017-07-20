@@ -97,7 +97,7 @@ class TextEditor extends React.Component {
 
     return (
       <div className="TextEditor">
-        <textarea name={editorName} cols="100" rows="6" value={editorContent} />
+        <textarea name={editorName} cols="100" rows="6" defaultValue={editorContent} />
       </div>
     );
   }
