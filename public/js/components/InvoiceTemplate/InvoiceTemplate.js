@@ -1,93 +1,85 @@
-import React, { Component } from 'react';
+import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { connect } from 'react-redux';
 import { Form } from 'react-bootstrap';
-import { ConfirmModal } from '../Elements';
 import ActionButtons from '../Elements/ActionButtons';
 import EditBlock from './EditBlock';
-import { getSettings, saveSettings, updateSetting } from '../../actions/settingsActions';
 
 
 class InvoiceTemplate extends Component {
 
   static propTypes = {
-    settings: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-    dispatch: React.PropTypes.func.isRequired,
-    confirmMessage: React.PropTypes.string,
+    header: PropTypes.string,
+    footer: PropTypes.string,
+    suggestions: PropTypes.instanceOf(Immutable.List),
+    templates: PropTypes.instanceOf(Immutable.Map),
+    getData: PropTypes.func,
+    onChange: PropTypes.func,
+    onSave: PropTypes.func,
+    onCancel: PropTypes.func,
   };
 
   static defaultProps = {
-    settings: Immutable.Map(),
-    confirmMessage: 'Are you sure you want to discard editing Invoice Template?',
+    header: null,
+    footer: null,
+    suggestions: Immutable.List(),
+    templates: Immutable.Map(),
+    onChange: () => {},
+    onSave: () => {},
+    onCancel: () => {},
+    getData: () => {},
   };
 
-  state = {
-    showConfirm: false,
-  }
-
   componentDidMount() {
-    this.props.dispatch(getSettings('invoice_export'));
-  }
-
-  onChange = (name, content) => {
-    this.props.dispatch(updateSetting('invoice_export', name, content));
-  }
-
-  onSave = () => {
-    this.props.dispatch(saveSettings('invoice_export'));
-  }
-
-  onCancel = () => {
-    this.setState({ showConfirm: true });
-  }
-
-  onConfirmCancel = () => {
-    this.setState({ showConfirm: false });
-  }
-
-  onConfirmOk = () => {
-    this.props.dispatch(getSettings('invoice_export'));
-    this.setState({ showConfirm: false });
+    this.props.getData();
   }
 
   loadTemplate = (name, index) => {
-    const { settings } = this.props;
-    const newContent = settings.getIn(['templates', name, index, 'content']);
-    this.props.dispatch(updateSetting('invoice_export', name, newContent));
+    const { templates } = this.props;
+    const newContent = templates.getIn([name, index, 'content']);
+    this.props.onChange(name, newContent);
   }
 
   render() {
-    const { settings, confirmMessage } = this.props;
-    const { showConfirm } = this.state;
-    const header = settings.get('header', '');
-    const footer = settings.get('footer', '');
-
-    if (!settings.has('header') || !settings.has('footer')) {
+    const { header, footer, suggestions, templates } = this.props;
+    if (header === null && footer === null) {
       return (<p>loading...</p>);
     }
 
-    const fieldsList = settings.get('html_translation', Immutable.List()).toArray();
-    const headerTemplates = settings.getIn(['templates', 'header'], Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
-    const footerTemplates = settings.getIn(['templates', 'footer'], Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
-
+    const fieldsList = suggestions.toArray();
+    const headerTemplates = templates.get('header', Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
+    const footerTemplates = templates.get('footer', Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
     return (
       <div>
         <div className="row">
           <div className="col-lg-12">
             <Form horizontal>
-              <EditBlock key="1" loadTemplate={this.loadTemplate} onChange={this.onChange} fields={fieldsList} templates={headerTemplates} name="header" content={header} />
-              <EditBlock key="2" loadTemplate={this.loadTemplate} onChange={this.onChange} fields={fieldsList} templates={footerTemplates} name="footer" content={footer} />
+              { header !== null && (
+                <EditBlock
+                  name="header"
+                  content={header}
+                  onChange={this.props.onChange}
+                  fields={fieldsList}
+                  templates={headerTemplates}
+                  loadTemplate={this.loadTemplate}
+                />
+              )}
+              { footer !== null && (
+                <EditBlock
+                  name="footer"
+                  content={footer}
+                  onChange={this.props.onChange}
+                  fields={fieldsList}
+                  templates={footerTemplates}
+                  loadTemplate={this.loadTemplate}
+                />
+              )}
             </Form>
           </div>
         </div>
-        <ActionButtons onClickSave={this.onSave} onClickCancel={this.onCancel} />
-        <ConfirmModal onOk={this.onConfirmOk} onCancel={this.onConfirmCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
+        <ActionButtons onClickSave={this.props.onSave} onClickCancel={this.props.onCancel} />
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  settings: state.settings.get('invoice_export'),
-});
-export default connect(mapStateToProps)(InvoiceTemplate);
+export default InvoiceTemplate;

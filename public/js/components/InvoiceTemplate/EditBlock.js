@@ -4,9 +4,7 @@ import Field from '../Field';
 
 const EditBlock = (props) => {
   const loadTemplate = (index) => {
-    if (typeof props.loadTemplate === 'function') {
-      props.loadTemplate(props.name, index);
-    }
+    props.loadTemplate(props.name, index);
   };
 
   const onChange = (content) => {
@@ -15,7 +13,7 @@ const EditBlock = (props) => {
 
   const loadTemplateBtn = (
     <ButtonToolbar>
-      <DropdownButton bsSize="xsmall" title={props.loadTemplateLabel} id="dropdown-size-medium" onSelect={loadTemplate}>
+      <DropdownButton bsSize="xsmall" title="Load default" id="dropdown-size-medium" onSelect={loadTemplate}>
         { props.templates.map((name, key) => <MenuItem key={key} eventKey={key}>{name}</MenuItem>) }
       </DropdownButton>
     </ButtonToolbar>
@@ -23,10 +21,9 @@ const EditBlock = (props) => {
 
   const panelHeader = (
     <span>{`Invoice ${props.name}`}
-      { props.loadTemplate && props.templates.length > 0 &&
-        <span className="pull-right">{loadTemplateBtn}
-        </span>
-      }
+      { props.loadTemplate && props.templates.length > 0 && (
+        <span className="pull-right">{loadTemplateBtn}</span>
+      )}
     </span>
   );
 
@@ -50,18 +47,16 @@ EditBlock.defaultProps = {
   content: '',
   fields: [],
   templates: [],
-  loadTemplate: null,
-  loadTemplateLabel: 'Load default',
+  loadTemplate: () => {},
 };
 
 EditBlock.propTypes = {
   content: React.PropTypes.string,
-  loadTemplateLabel: React.PropTypes.string,
   fields: React.PropTypes.array,
   templates: React.PropTypes.array,
-  loadTemplate: React.PropTypes.func,
   name: React.PropTypes.string.isRequired,
   onChange: React.PropTypes.func.isRequired,
+  loadTemplate: React.PropTypes.func,
 };
 
 export default EditBlock;
