@@ -1,5 +1,5 @@
 import React from 'react';
-
+import debounce from 'lodash.debounce';
 
 class TextEditor extends React.Component {
 
@@ -44,7 +44,23 @@ class TextEditor extends React.Component {
     }
   }
 
-  toggleEditor = (editor, editorName, configPath) => {
+  initEditor = () => {
+    const { configName, editorName } = this.props;
+    const editor = CKEDITOR && CKEDITOR.instances[editorName];
+
+    const configPath = (configName.length) ? `br/config/${configName}.js` : '';
+    if (!this.state.showWYSIWYG) {
+      window.setTimeout(() => this.toggleEditor(editor, configPath), 100);
+    } else if (editor) {
+      const editorData = window.CKEDITOR.instances[editorName].getData();
+      if (editorData !== unescape(this.props.value)) {
+        window.setTimeout(() => this.toggleEditor(editor, configPath), 100);
+      }
+    }
+  }
+
+  toggleEditor = (editor, configPath) => {
+    const { editorName } = this.props;
     const { fields, editorHeight } = this.props;
     if (editor) {
       editor.destroy(true);
@@ -52,7 +68,6 @@ class TextEditor extends React.Component {
     const ckeditorConfig = {
       customConfig: configPath,
       toolbar: 'Basic',
-      // width: 870,
       height: editorHeight,
       placeholder_select: {
         placeholders: fields,
@@ -63,41 +78,28 @@ class TextEditor extends React.Component {
     window.CKEDITOR.dtd.$removeEmpty.i = 0;
     window.CKEDITOR.dtd.$removeEmpty.span = false;
 
-/*    window.CKEDITOR.instances[editorName].on('blur', () => {
-      const data = window.CKEDITOR.instances[editorName].getData();
-      this.props.onChange(data, self.props.name);
-    });
-*/
-    window.CKEDITOR.instances[editorName].on('change', () => {
-      const data = window.CKEDITOR.instances[editorName].getData();
-      this.props.onChange(data);
-    });
-
+    // window.CKEDITOR.instances[editorName].on('blur', this.onChange);
+    window.CKEDITOR.instances[editorName].on('change', this.onChange);
     this.setState({ showWYSIWYG: true });
   }
 
-  initEditor = () => {
-    const { configName, editorName } = this.props;
-    const editor = CKEDITOR && CKEDITOR.instances[editorName];
-
-    const configPath = (configName.length) ? `br/config/${configName}.js` : '';
-    if (!this.state.showWYSIWYG) {
-      window.setTimeout(() => this.toggleEditor(editor, editorName, configPath), 100);
-    } else if (editor) {
-      const editorData = window.CKEDITOR.instances[editorName].getData();
-      if (editorData !== unescape(this.props.value)) {
-        window.setTimeout(() => this.toggleEditor(editor, editorName, configPath), 100);
-      }
-    }
-  }
+  onChange = debounce(() => {
+    const { editorName } = this.props;
+    const data = window.CKEDITOR.instances[editorName].getData();
+    this.props.onChange(data);
+  }, 250)
 
   render() {
-    const { value, editorName } = this.props;
+    const { value, editorName, editorHeight } = this.props;
     const editorContent = unescape(value || '');
-
     return (
       <div className="TextEditor">
-        <textarea name={editorName} cols="100" rows="6" defaultValue={editorContent} />
+        <textarea
+          name={editorName}
+          value={editorContent}
+          style={{ width: '100%', height: editorHeight }}
+          onChange={() => { /* CKEDITOR will handle onChange event */ }}
+        />
       </div>
     );
   }
