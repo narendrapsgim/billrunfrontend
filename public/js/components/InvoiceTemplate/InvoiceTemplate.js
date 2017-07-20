@@ -19,8 +19,8 @@ class InvoiceTemplate extends Component {
   };
 
   static defaultProps = {
-    header: null,
-    footer: null,
+    header: '',
+    footer: '',
     suggestions: Immutable.List(),
     templates: Immutable.Map(),
     onChange: () => {},
@@ -41,10 +41,6 @@ class InvoiceTemplate extends Component {
 
   render() {
     const { header, footer, suggestions, templates } = this.props;
-    if (header === null && footer === null) {
-      return (<p>loading...</p>);
-    }
-
     const fieldsList = suggestions.toArray();
     const headerTemplates = templates.get('header', Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
     const footerTemplates = templates.get('footer', Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
