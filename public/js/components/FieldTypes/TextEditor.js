@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import debounce from 'lodash.debounce';
 
-class TextEditor extends React.Component {
+class TextEditor extends Component {
 
   static defaultProps = {
     fields: [],
     value: '',
     configName: '',
     editorHeight: 250,
+    disabled: false,
   };
 
   static propTypes = {
-    fields: React.PropTypes.array,
-    onChange: React.PropTypes.func.isRequired,
-    value: React.PropTypes.string,
-    editorName: React.PropTypes.string.isRequired,
-    configName: React.PropTypes.string,
-    editorHeight: React.PropTypes.number,
+    fields: PropTypes.array,
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.string,
+    editorName: PropTypes.string.isRequired,
+    configName: PropTypes.string,
+    editorHeight: PropTypes.number,
+    disabled: PropTypes.bool,
   };
 
   state = {
@@ -60,12 +62,13 @@ class TextEditor extends React.Component {
   }
 
   toggleEditor = (editor, configPath) => {
-    const { editorName } = this.props;
+    const { editorName, disabled } = this.props;
     const { fields, editorHeight } = this.props;
     if (editor) {
       editor.destroy(true);
     }
     const ckeditorConfig = {
+      readOnly: disabled,
       customConfig: configPath,
       toolbar: 'Basic',
       height: editorHeight,
@@ -90,7 +93,7 @@ class TextEditor extends React.Component {
   }, 250)
 
   render() {
-    const { value, editorName, editorHeight } = this.props;
+    const { value, editorName, editorHeight, disabled } = this.props;
     const editorContent = unescape(value || '');
     return (
       <div className="TextEditor">
@@ -99,6 +102,7 @@ class TextEditor extends React.Component {
           value={editorContent}
           style={{ width: '100%', height: editorHeight }}
           onChange={() => { /* CKEDITOR will handle onChange event */ }}
+          disabled={disabled}
         />
       </div>
     );
