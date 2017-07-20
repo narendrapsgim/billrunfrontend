@@ -106,16 +106,16 @@ export const saveSettings = (categories = [], messages = {}) => (dispatch, getSt
   } = messages;
   dispatch(startProgressIndicator());
   const { settings } = getState();
-  const categoriesArray = Array.isArray(categories) ? categories : [categories];
-  const multipleCategories = categoriesArray.length > 1;
-  const categoryData = categoriesArray.map((category) => {
+  const categoriesToSave = Array.isArray(categories) ? categories : [categories];
+  const multipleCategories = categoriesToSave.length > 1;
+  const categoryData = categoriesToSave.map((category) => {
     let data = settings.getIn(category.split('.'));
     if (category === 'taxation') {
       data = data.set('vat', data.get('vat') / 100);
     }
     return (multipleCategories) ? { [category]: data } : data;
   });
-  const category = multipleCategories ? 'ROOT' : categories[0];
+  const category = multipleCategories ? 'ROOT' : categoriesToSave[0];
   const data = multipleCategories ? categoryData : categoryData[0];
   const queries = saveSettingsQuery(data, category);
 
@@ -125,8 +125,8 @@ export const saveSettings = (categories = [], messages = {}) => (dispatch, getSt
 };
 
 export const getSettings = (categories = []) => (dispatch) => {
-  const categoriesArray = (Array.isArray(categories)) ? categories : [categories];
-  const queries = categoriesArray.map(category => getSettingsQuery(category));
+  const categoriesToSave = Array.isArray(categories) ? categories : [categories];
+  const queries = categoriesToSave.map(category => getSettingsQuery(category));
   return apiBillRun(queries)
     .then((success) => {
       dispatch(gotSettings(success.data));
