@@ -494,3 +494,8 @@ export const invoiceTemplateTemplatesSelector = createSelector(
   getInvoiceExport,
   (invoiceExport = Immutable.Map()) => invoiceExport.get('templates'),
 );
+
+export const invoiceTemplateStatusSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('status'),
+);

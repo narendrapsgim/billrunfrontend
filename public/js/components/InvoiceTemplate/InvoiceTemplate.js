@@ -12,10 +12,12 @@ class InvoiceTemplate extends Component {
     footer: PropTypes.string,
     suggestions: PropTypes.instanceOf(Immutable.List),
     templates: PropTypes.instanceOf(Immutable.Map),
+    status: PropTypes.instanceOf(Immutable.Map),
     getData: PropTypes.func,
     onChange: PropTypes.func,
     onSave: PropTypes.func,
     onCancel: PropTypes.func,
+    onChangeStatus: PropTypes.func,
   };
 
   static defaultProps = {
@@ -23,10 +25,12 @@ class InvoiceTemplate extends Component {
     footer: '',
     suggestions: Immutable.List(),
     templates: Immutable.Map(),
+    status: Immutable.Map(),
     onChange: () => {},
     onSave: () => {},
     onCancel: () => {},
     getData: () => {},
+    onChangeStatus: () => {},
   };
 
   componentDidMount() {
@@ -40,10 +44,12 @@ class InvoiceTemplate extends Component {
   }
 
   render() {
-    const { header, footer, suggestions, templates } = this.props;
+    const { header, footer, suggestions, templates, status } = this.props;
     const fieldsList = suggestions.toArray();
-    const headerTemplates = templates.get('header', Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
-    const footerTemplates = templates.get('footer', Immutable.Map()).map(template => template.get('lable', 'Template')).toArray();
+    const headerTemplates = templates.get('header', Immutable.List()).map(template => template.get('label', 'Template')).toArray();
+    const footerTemplates = templates.get('footer', Immutable.List()).map(template => template.get('label', 'Template')).toArray();
+    const headerStatus = status.get('header', false);
+    const footerStatus = status.get('footer', false);
     return (
       <div>
         <div className="row">
@@ -57,6 +63,8 @@ class InvoiceTemplate extends Component {
                   fields={fieldsList}
                   templates={headerTemplates}
                   loadTemplate={this.loadTemplate}
+                  enabled={headerStatus}
+                  onChangeStatus={this.props.onChangeStatus}
                 />
               )}
               { footer !== null && (
@@ -67,6 +75,8 @@ class InvoiceTemplate extends Component {
                   fields={fieldsList}
                   templates={footerTemplates}
                   loadTemplate={this.loadTemplate}
+                  enabled={footerStatus}
+                  onChangeStatus={this.props.onChangeStatus}
                 />
               )}
             </Form>

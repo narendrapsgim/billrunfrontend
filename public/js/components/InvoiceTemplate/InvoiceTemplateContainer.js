@@ -6,14 +6,16 @@ import {
   invoiceTemplateFooterSelector,
   invoiceTemplateSuggestionsSelector,
   invoiceTemplateTemplatesSelector,
+  invoiceTemplateStatusSelector,
 } from '../../selectors/settingsSelector';
-import InvoceBlock from './InvoiceTemplate';
+import InvoiceTemplate from './InvoiceTemplate';
 
 const mapStateToProps = (state, props) => ({
   header: invoiceTemplateHeaderSelector(state, props),
   footer: invoiceTemplateFooterSelector(state, props),
   suggestions: invoiceTemplateSuggestionsSelector(state),
   templates: invoiceTemplateTemplatesSelector(state),
+  status: invoiceTemplateStatusSelector(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -22,6 +24,10 @@ const mapDispatchToProps = dispatch => ({
   },
   onChange: (templateName, content) => {
     dispatch(updateSetting('invoice_export', templateName, content));
+  },
+  onChangeStatus: (templateName, status) => {
+    console.log('container onChangeStatus : ', templateName, status);
+    dispatch(updateSetting('invoice_export', ['status', templateName], status));
   },
   onSave: () => {
     const afterSave = (response) => {
@@ -43,4 +49,4 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(InvoceBlock);
+export default connect(mapStateToProps, mapDispatchToProps)(InvoiceTemplate);
