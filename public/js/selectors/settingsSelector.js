@@ -24,8 +24,10 @@ const getPropertyTypes = (state, props) => // eslint-disable-line no-unused-vars
 const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('billrun');
 
-const getEntityFields = (state, props) =>
-  state.settings.getIn([props.entityName, 'fields']);
+const getEntityFields = (state, props) => {
+  const entityName = Array.isArray(props.entityName) ? props.entityName : [props.entityName];
+  return state.settings.getIn([...entityName, 'fields']);
+};
 
 const getMinEntityDate = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('minimum_entity_start_date');
@@ -472,4 +474,3 @@ export const addDefaultFieldOptions = (formatedFields, item = Immutable.Map()) =
   }
   return undefined;
 };
-

@@ -21,11 +21,12 @@ const Tags = (props) => {
     placeholder: placeholderText,
   };
   const tagInputProps = Object.assign(defautlInputProps, inputProps);
+  const valueArr = Array.isArray(value) ? value : [value];
   return (
     <TagsInput
       {...otherProps}
       addOnBlur={true}
-      value={value}
+      value={valueArr}
       onChange={onChange}
       inputProps={tagInputProps}
       disabled={disabled}
@@ -35,6 +36,7 @@ const Tags = (props) => {
 };
 
 Tags.defaultProps = {
+  value: [],
   required: false,
   disabled: false,
   editable: true,
@@ -45,7 +47,10 @@ Tags.defaultProps = {
 };
 
 Tags.propTypes = {
-  value: PropTypes.array,
+  value: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.string,
+  ]),
   disabled: PropTypes.bool,
   editable: PropTypes.bool,
   placeholder: PropTypes.string,
