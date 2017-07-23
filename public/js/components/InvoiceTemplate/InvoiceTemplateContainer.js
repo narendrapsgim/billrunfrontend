@@ -26,7 +26,6 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateSetting('invoice_export', templateName, content));
   },
   onChangeStatus: (templateName, status) => {
-    console.log('container onChangeStatus : ', templateName, status);
     dispatch(updateSetting('invoice_export', ['status', templateName], status));
   },
   onSave: () => {

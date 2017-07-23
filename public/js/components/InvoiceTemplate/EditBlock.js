@@ -1,85 +1,90 @@
-import React, { PropTypes } from 'react';
+import React, { PureComponent, PropTypes } from 'react';
 import { Panel, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
-import { Actions } from '../Elements';
 import Field from '../Field';
 
-const EditBlock = (props) => {
-  const loadTemplate = (index) => {
-    props.loadTemplate(props.name, index);
+
+class EditBlock extends PureComponent {
+
+  static propTypes = {
+    content: PropTypes.string,
+    fields: PropTypes.array,
+    templates: PropTypes.array,
+    enabled: PropTypes.bool,
+    name: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    loadTemplate: PropTypes.func,
+    onChangeStatus: PropTypes.func,
   };
 
-  const onChange = (content) => {
-    props.onChange(props.name, content);
+  static defaultProps = {
+    content: '',
+    fields: [],
+    templates: [],
+    enabled: false,
+    loadTemplate: () => {},
+    onChangeStatus: () => {},
   };
 
-  const onClickEnabled = () => {
-    console.log('onClickEnabled', props.name);
-    props.onChangeStatus(props.name, true);
+  loadTemplate = (index) => {
+    const { name } = this.props;
+    this.props.loadTemplate(name, index);
   };
 
-  const onClickDisabled = () => {
-    console.log('onClickDisabled', props.name);
-    props.onChangeStatus(props.name, false);
+  onChange = (content) => {
+    const { name } = this.props;
+    this.props.onChange(name, content);
   };
 
-  const getListActions = () => ([
-    { type: 'enable', helpText: 'Enable', onClick: onClickEnabled, show: !props.enabled },
-    { type: 'disable', helpText: 'Disable', onClick: onClickDisabled, show: props.enabled },
-  ]);
+  onChangeStatus = (e) => {
+    const { value } = e.target;
+    const { name } = this.props;
+    this.props.onChangeStatus(name, value);
+  };
 
-  const panelHeader = (
-    <span>{`Invoice ${props.name}`}
-      <div className="pull-right" style={{ marginTop: -5 }}>
-        { props.loadTemplate && props.templates.length > 0 && (
-          <ButtonToolbar className="inline" style={{ verticalAlign: 'middle' }}>
-            <DropdownButton bsSize="xsmall" title="Load default" id="dropdown-size-medium" onSelect={loadTemplate}>
-              { props.templates.map((name, key) =>
-                <MenuItem key={key} eventKey={key}>{name}</MenuItem>)
-              }
-            </DropdownButton>
-          </ButtonToolbar>
-        )}
-        <div className="inline">
-          <Actions actions={getListActions()} />
+  renderPanelHeader = () => {
+    const { name, templates, enabled } = this.props;
+    return (
+      <span>{`Invoice ${name}`}
+        <div className="pull-right">
+          { templates.length > 0 && (
+            <ButtonToolbar className="inline" style={{ verticalAlign: 'middle' }}>
+              <DropdownButton bsSize="xsmall" title="Load default" id="dropdown-size-medium" onSelect={this.loadTemplate}>
+                { templates.map((template, key) => (
+                  <MenuItem key={key} eventKey={key}>{template}</MenuItem>
+                ))}
+              </DropdownButton>
+            </ButtonToolbar>
+          )}
+          <div className="inline" style={{ marginLeft: (templates.length) ? 10 : 0 }}>
+            <Field
+              fieldType="checkbox"
+              value={enabled}
+              onChange={this.onChangeStatus}
+              label="Enable"
+            />
+          </div>
         </div>
-      </div>
-    </span>
-  );
+      </span>
+    );
+  }
 
-  return (
-    <Panel header={panelHeader}>
-      <Field
-        fieldType="textEditor"
-        value={props.content}
-        editorName={`editor-${props.name}`}
-        name={props.name}
-        configName="invoices"
-        editorHeight={150}
-        fields={props.fields}
-        onChange={onChange}
-      />
-    </Panel>
-  );
-};
-
-EditBlock.defaultProps = {
-  content: '',
-  fields: [],
-  templates: [],
-  enabled: false,
-  loadTemplate: () => {},
-  onChangeStatus: () => {},
-};
-
-EditBlock.propTypes = {
-  content: PropTypes.string,
-  fields: PropTypes.array,
-  templates: PropTypes.array,
-  enabled: PropTypes.bool,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  loadTemplate: PropTypes.func,
-  onChangeStatus: PropTypes.func,
-};
+  render() {
+    const { name, content, fields } = this.props;
+    return (
+      <Panel header={this.renderPanelHeader()}>
+        <Field
+          fieldType="textEditor"
+          value={content}
+          editorName={`editor-${name}`}
+          name={name}
+          configName="invoices"
+          editorHeight={150}
+          fields={fields}
+          onChange={this.onChange}
+        />
+      </Panel>
+    );
+  }
+}
 
 export default EditBlock;

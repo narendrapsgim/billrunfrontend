@@ -3,6 +3,10 @@ import Immutable from 'immutable';
 import { Form } from 'react-bootstrap';
 import ActionButtons from '../Elements/ActionButtons';
 import EditBlock from './EditBlock';
+import {
+  templateSelector,
+  suggestionsSelector,
+} from './invoiceTemplateSelector';
 
 
 class InvoiceTemplate extends Component {
@@ -45,9 +49,9 @@ class InvoiceTemplate extends Component {
 
   render() {
     const { header, footer, suggestions, templates, status } = this.props;
-    const fieldsList = suggestions.toArray();
-    const headerTemplates = templates.get('header', Immutable.List()).map(template => template.get('label', 'Template')).toArray();
-    const footerTemplates = templates.get('footer', Immutable.List()).map(template => template.get('label', 'Template')).toArray();
+    const fieldsList = suggestionsSelector(suggestions);
+    const headerTemplates = templateSelector(templates, 'header');
+    const footerTemplates = templateSelector(templates, 'footer');
     const headerStatus = status.get('header', false);
     const footerStatus = status.get('footer', false);
     return (
@@ -82,7 +86,11 @@ class InvoiceTemplate extends Component {
             </Form>
           </div>
         </div>
-        <ActionButtons onClickSave={this.props.onSave} onClickCancel={this.props.onCancel} />
+        <ActionButtons
+          onClickSave={this.props.onSave}
+          cancelLabel="Rollback"
+          onClickCancel={this.props.onCancel}
+        />
       </div>
     );
   }

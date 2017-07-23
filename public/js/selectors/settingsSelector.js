@@ -493,6 +493,15 @@ export const invoiceTemplateSuggestionsSelector = createSelector(
 export const invoiceTemplateTemplatesSelector = createSelector(
   getInvoiceExport,
   (invoiceExport = Immutable.Map()) => invoiceExport.get('templates'),
+  // (invoiceExport = Immutable.Map()) => {
+  //   const defaultTamplates = Immutable.Map({
+  //     header: Immutable.List([
+  //       Immutable.Map({ label: 'Empty', content: '<p>Empty</p>' }),
+  //       Immutable.Map({ label: 'Default', content: '<p>default</p>' }),
+  //     ]),
+  //   });
+  //   return invoiceExport.get('templates', defaultTamplates);
+  // },
 );
 
 export const invoiceTemplateStatusSelector = createSelector(
