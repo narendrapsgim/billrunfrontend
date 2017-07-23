@@ -165,7 +165,7 @@ class CycleData extends Component {
     confirmationModalData.show = true;
     confirmationModalData.title = 'Confirm all invoices';
     confirmationModalData.message = `Are you sure you want to confirm all the invoices for the cycle of
-      ${getDateToDisplay(selectedCycle.get('start_date', ''))} - ${getDateToDisplay(selectedCycle.get('end_date', ''))}?
+      ${getDateToDisplay(selectedCycle, 'start_date')} - ${getDateToDisplay(selectedCycle, 'end_date')}?
       ${invoicesNum} invoices will be confirmed after this action`;
     confirmationModalData.onClick = this.onClickConfirmAllConfirm;
     this.setState({ confirmationModalData });
