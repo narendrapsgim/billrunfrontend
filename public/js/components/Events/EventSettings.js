@@ -37,7 +37,7 @@ class EventSettings extends Component {
   decoderOptions = [{ value: 'json', label: 'JSON' }, { value: 'xml', label: 'XML' }];
   fields = Immutable.List([
     Immutable.Map({ field_name: 'url', title: 'Url', info: 'URL to send the requests to' }),
-    Immutable.Map({ field_name: 'num_of_tries', title: 'Number Of Retries', type: 'number', info: 'Number of times to try and send each event' }),
+    Immutable.Map({ field_name: 'num_of_tries', title: 'Number of retries', type: 'number', info: 'Number of times to try and send each event' }),
     Immutable.Map({ field_name: 'method', title: 'Method', info: 'HTTP method', options: this.methodOptions }),
     Immutable.Map({ field_name: 'decoder', title: 'Decoder', info: 'Method to decode HTTP response', options: this.decoderOptions }),
   ]);
