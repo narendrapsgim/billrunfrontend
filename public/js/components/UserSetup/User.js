@@ -157,7 +157,7 @@ export default class User extends Component {
         <Col lg={12}>
           <Form horizontal>
             <FormGroup>
-              <Col componentClass={ControlLabel} sm={3} lg={2}>User Name</Col>
+              <Col componentClass={ControlLabel} sm={3} lg={2}>User Name (email)</Col>
               <Col sm={8} lg={9}>
                 <Field onChange={this.onUserNameChange} value={user.get('username', '')} />
               </Col>
