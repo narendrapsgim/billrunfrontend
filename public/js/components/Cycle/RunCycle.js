@@ -413,6 +413,7 @@ class RunCycle extends Component {
     const billrunKey = selectedCycle.get('billrun_key', '');
     const shouldDisplayBillrunData = List(['running', 'finished', 'confirmed']).contains(this.getSelectedCycleStatus());
     const showConfirmAllButton = this.getSelectedCycleStatus() === 'finished';
+    const isCycleConfirmed = this.getSelectedCycleStatus() === 'confirmed';
     const baseFilter = {
       billrun_key: billrunKey,
     };
@@ -449,6 +450,7 @@ class RunCycle extends Component {
                   baseFilter={baseFilter}
                   reloadCycleData={this.reloadCycleData}
                   showConfirmAllButton={showConfirmAllButton}
+                  isCycleConfirmed = {isCycleConfirmed}
                 />
             }
 

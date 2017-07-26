@@ -39,6 +39,9 @@ const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-v
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['rates', 'fields']);
 
+const getInvoiceExport = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.get('invoice_export');
+
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
     const importLinkers = accountfields.filter(isLinkerField);
@@ -473,3 +476,35 @@ export const addDefaultFieldOptions = (formatedFields, item = Immutable.Map()) =
   return undefined;
 };
 
+export const invoiceTemplateHeaderSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('header'),
+);
+export const invoiceTemplateFooterSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('footer'),
+);
+
+export const invoiceTemplateSuggestionsSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('html_translation'),
+);
+
+export const invoiceTemplateTemplatesSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('templates'),
+  // (invoiceExport = Immutable.Map()) => {
+  //   const defaultTamplates = Immutable.Map({
+  //     header: Immutable.List([
+  //       Immutable.Map({ label: 'Empty', content: '<p>Empty</p>' }),
+  //       Immutable.Map({ label: 'Default', content: '<p>default</p>' }),
+  //     ]),
+  //   });
+  //   return invoiceExport.get('templates', defaultTamplates);
+  // },
+);
+
+export const invoiceTemplateStatusSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('status'),
+);

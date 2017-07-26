@@ -106,21 +106,23 @@ export const apiBillRunSuccessHandler = (success, message = false) => (dispatch)
     }
   }
   // Check for warning
-  if (success.data[0] && success.data[0].data && success.data[0].data.status === API_STATUS_WARNING) {
-    status = API_STATUS_WARNING;
-    let warningMessages = [];
-    try {
-      warningMessages = success.data[0].data.warnings;
-      if (!Array.isArray(warningMessages)) {
-        throw new Error();
+  try {
+    if (success.data[0] && success.data[0].data && success.data[0].data.status === API_STATUS_WARNING) {
+      status = API_STATUS_WARNING;
+      let warningMessages = [];
+      try {
+        warningMessages = success.data[0].data.warnings;
+        if (!Array.isArray(warningMessages)) {
+          throw new Error();
+        }
+      } catch (e1) {
+        warningMessages = ['Warrning !'];
       }
-    } catch (e1) {
-      warningMessages = ['Warrning !'];
+      warningMessages.forEach((warningMessage) => {
+        dispatch(showWarning(warningMessage, 15000));
+      });
     }
-    warningMessages.forEach((warningMessage) => {
-      dispatch(showWarning(warningMessage, 15000));
-    });
-  }
+  } catch (e3) { /* No success object or status */ }
 
   if (message && status === 1) {
     dispatch(showSuccess(message));
@@ -133,25 +135,28 @@ export const apiBillRunSuccessHandler = (success, message = false) => (dispatch)
 export const apiBillRunErrorHandler = (error, defaultMessage = 'Error, please try again...') => (dispatch) => {
   console.log('Api Error Handler, error: ', error); // eslint-disable-line  no-console
   dispatch(dismissProgressIndicator());
-  let errorMessage;
-  if (typeof error.message === 'string') {
-    errorMessage = error.message;
-  } else {
-    try {
-      errorMessage = error.error[0].error.data.message;
-    } catch (e1) {
+  if (defaultMessage !== false) {
+    let errorMessage;
+    if (typeof error.message === 'string') {
+      errorMessage = error.message;
+    } else {
       try {
-        errorMessage = error.error[0].error.message;
-      } catch (e2) {
+        errorMessage = error.error[0].error.data.message;
+      } catch (e1) {
         try {
-          errorMessage = error.error.error[0].error.message;
-        } catch (e3) {
-          errorMessage = defaultMessage;
+          errorMessage = error.error[0].error.message;
+        } catch (e2) {
+          try {
+            errorMessage = error.error.error[0].error.message;
+          } catch (e3) {
+            errorMessage = defaultMessage;
+          }
         }
       }
     }
+
+    dispatch(showDanger(errorMessage || defaultMessage));
   }
-  dispatch(showDanger(errorMessage));
   return ({
     status: API_STATUS_ERROR,
     error,
