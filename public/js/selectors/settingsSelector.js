@@ -39,6 +39,9 @@ const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-v
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['rates', 'fields']);
 
+const getEventsSettings = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['events', 'settings']);
+
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
     const importLinkers = accountfields.filter(isLinkerField);
@@ -305,6 +308,11 @@ export const productFieldsSelector = createSelector(
   productFields => productFields,
 );
 
+export const eventsSettingsSelector = createSelector(
+  getEventsSettings,
+  eventSettings => eventSettings,
+);
+
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {
   const type = getFieldNameType(item.get('entity', ''));
   if (fields) {
@@ -472,4 +480,3 @@ export const addDefaultFieldOptions = (formatedFields, item = Immutable.Map()) =
   }
   return undefined;
 };
-
