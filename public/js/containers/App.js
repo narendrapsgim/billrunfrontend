@@ -6,20 +6,23 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import BraasTheme from '../theme';
 import ProgressIndicator from '../components/ProgressIndicator';
+import ReduxConfirmModal from '../components/ReduxConfirmModal';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
+import { Tour, ExampleInvoice } from '../components/OnBoarding';
 import Footer from '../components/Footer';
 import { userCheckLogin } from '../actions/userActions';
 import { setPageTitle, systemRequirementsLoadingComplete } from '../actions/guiStateActions/pageActions';
 import { initMainMenu } from '../actions/guiStateActions/menuActions';
 import { getSettings, fetchFile } from '../actions/settingsActions';
-
+import { onBoardingIsRunnigSelector } from '../selectors/guiSelectors';
 
 class App extends Component {
 
   static propTypes = {
     auth: PropTypes.bool,
     systemRequirementsLoad: PropTypes.bool,
+    isTourRunnig: PropTypes.bool,
     routes: PropTypes.array,
     children: PropTypes.element,
     title: PropTypes.string,
@@ -41,11 +44,11 @@ class App extends Component {
     title: '',
     logoName: '',
     systemRequirementsLoad: false,
+    isTourRunnig: false,
   };
 
   componentWillMount() {
     this.props.dispatch(userCheckLogin());
-    this.setState({ Height: '100%' });
   }
 
   componentDidMount() {
@@ -70,7 +73,7 @@ class App extends Component {
     }
     if (auth !== true && nextProps.auth === true) { // user did success login
       // get global system settings
-      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu', 'billrun']))
+      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu', 'billrun', 'usage_types', 'property_types']))
         .then(responce => ((responce) ? this.props.logoName : ''))
         .then((logoFileName) => {
           if (logoFileName && logoFileName.length > 0) {
@@ -135,19 +138,22 @@ class App extends Component {
   );
 
   renderWithLayout = () => {
-    const { title, children } = this.props;
+    const { title, children, routes, isTourRunnig } = this.props;
     return (
       <div id="wrapper" style={{ height: '100%' }}>
         <ProgressIndicator />
         <Alerts />
-        <Navigator />
-        <div id="page-wrapper" className="page-wrapper" style={{ minHeight: this.state.Height }}>
+        <Tour />
+        <Navigator routes={routes} />
+        <div id="page-wrapper" className="page-wrapper">
+          { isTourRunnig && <ExampleInvoice />}
           <Row>
             <Col lg={12}>{title && <PageHeader>{title}</PageHeader> }</Col>
           </Row>
           <div>{children}</div>
         </div>
         <Footer />
+        <ReduxConfirmModal />
       </div>
     );
   }
@@ -169,6 +175,7 @@ const mapStateToProps = state => ({
   mainMenuOverrides: state.settings.getIn(['menu', 'main']),
   logo: state.settings.getIn(['files', 'logo']),
   logoName: state.settings.getIn(['tenant', 'logo']),
+  isTourRunnig: onBoardingIsRunnigSelector(state),
 });
 
 export default connect(mapStateToProps)(App);

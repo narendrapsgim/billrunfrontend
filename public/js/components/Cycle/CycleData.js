@@ -9,7 +9,7 @@ import EntityList from '../EntityList';
 import { getList } from '../../actions/listActions';
 import { getConfig } from '../../common/Util';
 import { confirmCycleInvoice, confirmCycle, getConfirmationAllStatus, getConfirmationInvoicesStatus } from '../../actions/cycleActions';
-import ConfirmModal from '../../components/ConfirmModal';
+import { ConfirmModal } from '../../components/Elements';
 import { currencySelector } from '../../selectors/settingsSelector';
 import { getDateToDisplay } from './CycleUtil';
 
@@ -167,7 +167,7 @@ class CycleData extends Component {
     confirmationModalData.show = true;
     confirmationModalData.title = 'Confirm all invoices';
     confirmationModalData.message = `Are you sure you want to confirm all the invoices for the cycle of
-      ${getDateToDisplay(selectedCycle.get('start_date', ''))} - ${getDateToDisplay(selectedCycle.get('end_date', ''))}?
+      ${getDateToDisplay(selectedCycle, 'start_date')} - ${getDateToDisplay(selectedCycle, 'end_date')}?
       ${invoicesNum} invoices will be confirmed after this action`;
     confirmationModalData.onClick = this.onClickConfirmAllConfirm;
     this.setState({ confirmationModalData });
@@ -300,7 +300,7 @@ class CycleData extends Component {
       { id: 'attributes.firstname', title: 'Customer First Name', sort: true, parser: this.parseCycleDataFirstName },
       { id: 'attributes.lastname', title: 'Customer Last Name', sort: true, parser: this.parseCycleDataLastName },
       { id: 'totals.after_vat_rounded', title: 'Invoice Total', parser: this.parseCycleDataInvoiceTotal },
-      { id: 'subss', title: '# of Subscriptions', parser: this.parseCycleDataSubscriptionNum },
+      { id: 'subss', title: '# of Subscribers', parser: this.parseCycleDataSubscriptionNum },
       { id: 'download', title: 'Invoice', parser: this.parseCycleDataDownload },
       { id: 'confirm', title: 'Confirm', parser: this.parseCycleDataConfirm },
     ];

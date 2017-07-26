@@ -6,7 +6,7 @@ import { getCycleQuery, getChargeStatusQuery, getOperationsQuery } from '../../c
 import { getList, clearList } from '../../actions/listActions';
 import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
 import { clearItems } from '../../actions/entityListActions';
-import ConfirmModal from '../../components/ConfirmModal';
+import { ConfirmModal } from '../../components/Elements';
 import CycleData from './CycleData';
 import CyclesSelector from './CyclesSelector';
 import { getCycleName } from './CycleUtil';
@@ -372,8 +372,9 @@ class RunCycle extends Component {
   }
 
   renderRerunConfirmationModal = () => {
-    const { showRerunConfirm, selectedCycle } = this.state;
-    const confirmMessage = `Are you sure you want to re-run ${getCycleName(selectedCycle)}?`;
+    const { showRerunConfirm } = this.state;
+    const { cycleAdditionalData } = this.props;
+    const confirmMessage = `Are you sure you want to re-run ${getCycleName(cycleAdditionalData)}?`;
     const warningMessage = 'Cycle data will be reset (except for confirmed invoices)';
     return (
       <ConfirmModal onOk={this.onRerunOk} onCancel={this.onRerunCancel} show={showRerunConfirm} message={confirmMessage} labelOk="Yes">
@@ -408,6 +409,7 @@ class RunCycle extends Component {
 
   render() {
     const { selectedCycle } = this.state;
+    const { cycleAdditionalData } = this.props;
     const billrunKey = selectedCycle.get('billrun_key', '');
     const shouldDisplayBillrunData = List(['running', 'finished', 'confirmed']).contains(this.getSelectedCycleStatus());
     const showConfirmAllButton = this.getSelectedCycleStatus() === 'finished';
@@ -444,7 +446,7 @@ class RunCycle extends Component {
                 shouldDisplayBillrunData &&
                 <CycleData
                   billrunKey={billrunKey}
-                  selectedCycle={selectedCycle}
+                  selectedCycle={cycleAdditionalData}
                   baseFilter={baseFilter}
                   reloadCycleData={this.reloadCycleData}
                   showConfirmAllButton={showConfirmAllButton}

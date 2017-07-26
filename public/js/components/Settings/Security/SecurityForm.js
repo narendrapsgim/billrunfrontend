@@ -33,14 +33,14 @@ class SecurityForm extends Component {
 
   onChangeDateFrom = (momentFromDate) => {
     const { item } = this.state;
-    const apiFormat = getConfig('apiDateTimeFormat', '"YYYY-MM-DD"');
+    const apiFormat = getConfig('apiDateFormat', 'YYYY-MM-DD');
     const fromValue = momentFromDate ? momentFromDate.format(apiFormat) : '';
     this.setState({ item: item.set('from', fromValue) });
   }
 
   onChangeDateTo = (momentFromDate) => {
     const { item } = this.state;
-    const apiFormat = getConfig('apiDateTimeFormat', '"YYYY-MM-DD"');
+    const apiFormat = getConfig('apiDateFormat', 'YYYY-MM-DD');
     const fromValue = momentFromDate ? momentFromDate.format(apiFormat) : '';
     this.setState({ item: item.set('to', fromValue) });
   }

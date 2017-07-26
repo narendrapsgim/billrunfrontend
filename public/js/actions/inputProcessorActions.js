@@ -61,6 +61,8 @@ const convert = (settings) => {
     file_type: settings.file_type,
     delimiter_type: parser.type,
     delimiter: parser.separator,
+    csv_has_header: parser.csv_has_header,
+    csv_has_footer: parser.csv_has_footer,
     usaget_type,
     type: settings.type,
     fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
@@ -82,7 +84,8 @@ const convert = (settings) => {
       usaget_mapping = processor.usaget_mapping.map(usaget => {
 	return {
 	  usaget: usaget.usaget,
-	  pattern: usaget.pattern.replace("/^", "").replace("$/", "")
+	  pattern: usaget.pattern.replace("/^", "").replace("$/", ""),
+    unit: usaget.unit,
 	}
       })
     } else {
@@ -345,16 +348,19 @@ export function saveInputProcessorSettings(state, parts = []) {
   }
 
   if (processor) {
-    const processor_settings = state.get('usaget_type') === "static" ?
-			       { default_usaget: processor.get('default_usaget') } :
-			       { usaget_mapping:
-						processor.get('usaget_mapping').map(usaget => {
-						  return {
-						    "src_field": processor.get('src_field'),
-						    "pattern": usaget.get('pattern'),
-						    "usaget": usaget.get('usaget')
-						  }
-						}).toJS() };
+    const processor_settings = state.get('usaget_type') === "static"
+    ? {
+      default_usaget: processor.get('default_usaget'),
+      default_unit: processor.get('default_unit'),
+    }
+    : {
+      usaget_mapping: processor.get('usaget_mapping').map(usaget => ({
+        src_field: processor.get('src_field'),
+        pattern: usaget.get('pattern'),
+        usaget: usaget.get('usaget'),
+        unit: usaget.get('unit'),
+      })).toJS(),
+    };
     settings.processor = {
       type: (settings.type === 'realtime' ? 'Realtime' : 'Usage'),
       "date_field": processor.get('date_field'),

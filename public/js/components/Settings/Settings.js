@@ -10,6 +10,7 @@ import Tax from './Tax';
 import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
+import UsageTypes from './UsageTypes';
 import { ActionButtons } from '../Elements';
 import { getSettings, updateSetting, saveSettings, fetchFile, getCurrencies } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
@@ -32,10 +33,10 @@ class Settings extends Component {
     location: PropTypes.shape({
       pathname: PropTypes.string,
       query: PropTypes.object,
-    }),
+    }).isRequired,
     csiOptions: PropTypes.instanceOf(Immutable.Iterable),
     taxation: PropTypes.instanceOf(Immutable.Map),
-    router: PropTypes.object,
+    router: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -74,7 +75,7 @@ class Settings extends Component {
             mainMenuOverridesWithMutations.set(key, orderField);
           }
         });
-      }
+      },
     );
     this.props.dispatch(updateSetting('menu', path, mainMenuOverrides));
   }
@@ -101,6 +102,9 @@ class Settings extends Component {
     if (settings.has('taxation')) {
       categoryToSave.push('taxation');
     }
+    if (settings.has('usage_types')) {
+      categoryToSave.push('usage_types');
+    }
     if (categoryToSave.length) {
       this.props.dispatch(saveSettings(categoryToSave)).then(
         (status) => {
@@ -114,7 +118,7 @@ class Settings extends Component {
               this.props.dispatch(fetchFile({ filename: settings.getIn(['tenant', 'logo'], '') }, 'logo'));
             }
           }
-        }
+        },
       );
     }
   }
@@ -151,7 +155,11 @@ class Settings extends Component {
           <Tab title="Locale" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <DateTime onChange={this.onChangeFieldValue} data={datetime} />
-              <Currency onChange={this.onChangeFieldValue} data={currency} currencies={currencyOptions} />
+              <Currency
+                onChange={this.onChangeFieldValue}
+                data={currency}
+                currencies={currencyOptions}
+              />
             </Panel>
           </Tab>
 
@@ -180,6 +188,12 @@ class Settings extends Component {
           <Tab title="Invoicing" eventKey={6}>
             <Panel style={{ borderTop: 'none' }}>
               <Invoicing onChange={this.onChangeFieldValue} data={datetime} />
+            </Panel>
+          </Tab>
+
+          <Tab title="Usage Types" eventKey={7}>
+            <Panel style={{ borderTop: 'none' }}>
+              <UsageTypes />
             </Panel>
           </Tab>
 

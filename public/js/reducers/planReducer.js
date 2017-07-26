@@ -208,6 +208,7 @@ export default function (state = defaultState, action) {
         },
         pp_includes_name: action.ppIncludesName,
         pp_includes_external_id: action.ppIncludesExternalId,
+        unit_label: action.unitLabel,
       });
       const included = state.get('include', Immutable.List());
       return state.set('include', included.push(newInclude));

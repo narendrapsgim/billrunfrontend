@@ -18,8 +18,6 @@ import {
   clearProduct,
   setCloneProduct,
 } from '../../actions/productActions';
-import { getSettings } from '../../actions/settingsActions';
-import { addUsagetMapping } from '../../actions/inputProcessorActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import {
@@ -28,6 +26,9 @@ import {
   clearRevisions,
 } from '../../actions/entityListActions';
 import {
+  getSettings,
+} from '../../actions/settingsActions';
+import {
   modeSelector,
   itemSelector,
   idSelector,
@@ -35,13 +36,14 @@ import {
   revisionsSelector,
 } from '../../selectors/entitySelector';
 import {
-  usageTypeSelector,
+  inputProssesorRatingParamsSelector,
 } from '../../selectors/settingsSelector';
 
 import {
   buildPageTitle,
   getConfig,
   getItemId,
+  getRateUsaget,
 } from '../../common/Util';
 
 
@@ -52,7 +54,7 @@ class ProductSetup extends Component {
     itemId: PropTypes.string,
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
-    usageTypes: PropTypes.instanceOf(Immutable.List),
+    ratingParams: PropTypes.instanceOf(Immutable.List),
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -66,7 +68,7 @@ class ProductSetup extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     revisions: Immutable.List(),
-    usageTypes: Immutable.List(),
+    ratingParams: Immutable.List(),
     activeTab: 1,
   };
 
@@ -75,15 +77,12 @@ class ProductSetup extends Component {
   }
 
   componentWillMount() {
-    const { usageTypes } = this.props;
     this.fetchItem();
-    if (usageTypes.isEmpty()) {
-      this.props.dispatch(getSettings('usage_types'));
-    }
   }
 
   componentDidMount() {
     const { mode } = this.props;
+    this.props.dispatch(getSettings(['usage_types', 'file_types', 'property_types', 'subscribers.subscriber.fields', 'rates.fields']));
     if (['clone', 'create'].includes(mode)) {
       const pageTitle = buildPageTitle(mode, 'product');
       this.props.dispatch(setPageTitle(pageTitle));
@@ -158,19 +157,7 @@ class ProductSetup extends Component {
   }
 
   onUsagetUpdate = (path, oldUsaget, newUsaget) => {
-    const { usageTypes } = this.props;
-    if (newUsaget.length > 0 && !usageTypes.includes(newUsaget)) {
-      this.props.dispatch(addUsagetMapping(newUsaget))
-      .then(
-        (response) => {
-          if (response.status) {
-            this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
-          }
-        }
-      );
-    } else {
-      this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
-    }
+    this.props.dispatch(onUsagetUpdate(path, oldUsaget, newUsaget));
   }
 
   onProductRateAdd = (productPath) => {
@@ -214,13 +201,13 @@ class ProductSetup extends Component {
   }
 
   render() {
-    const { item, usageTypes, mode, revisions } = this.props;
+    const { item, ratingParams, mode, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
 
     const allowEdit = mode !== 'view';
-    const usaget = item.get('rates', Immutable.Map()).keySeq().first();
+    const usaget = getRateUsaget(item);
     return (
       <div className="ProductSetup" >
 
@@ -248,7 +235,7 @@ class ProductSetup extends Component {
             planName="BASE"
             product={item}
             usaget={usaget}
-            usageTypes={usageTypes}
+            ratingParams={ratingParams}
           />
         </Panel>
 
@@ -269,7 +256,7 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'product'),
   activeTab: tabSelector(state, props, 'product'),
   revisions: revisionsSelector(state, props, 'product'),
-  usageTypes: usageTypeSelector(state, props),
+  ratingParams: inputProssesorRatingParamsSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ProductSetup));

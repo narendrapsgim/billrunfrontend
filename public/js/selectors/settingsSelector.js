@@ -18,6 +18,9 @@ const getPricing = (state, props) => // eslint-disable-line no-unused-vars
 const getUsageType = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('usage_types');
 
+const getPropertyTypes = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.get('property_types');
+
 const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('billrun');
 
@@ -32,6 +35,9 @@ const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
 
 const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['subscribers', 'subscriber', 'fields']);
+
+const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['rates', 'fields']);
 
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
@@ -50,7 +56,7 @@ const selectSubscriberImportFields = (fields, accountfields) => {
     return fields.push(Immutable.Map({
       linker: true,
       field_name: 'account_import_id',
-      title: 'Account Import ID',
+      title: 'Customer Import ID',
     }));
   }
   return fields;
@@ -66,7 +72,7 @@ const selectAccountImportFields = (fields) => {
         generated: false,
         mandatory: true,
         field_name: 'account_import_id',
-        title: 'Account Import ID (for subscriber import)',
+        title: 'Customer Import ID (for subscriber import)',
       }));
   }
   return fields;
@@ -117,6 +123,20 @@ const selectCustomKeys = (inputProssesors) => {
   return options.toList();
 };
 
+const selectRatingParams = (inputProssesors) => {
+  let options = Immutable.Set();
+  inputProssesors.forEach((inputProssesor) => {
+    const ratingCalculators = inputProssesor.get('rate_calculators', Immutable.Map());
+    ratingCalculators.forEach((fields) => {
+      const currentFields = fields
+      .filter(field => field.get('rate_key', '').startsWith('params.'))
+      .map(field => field.get('rate_key', ''));
+      options = options.concat(currentFields);
+    });
+  });
+  return options.toList();
+};
+
 const sortFieldOption = (optionsA, optionB) => {
   const a = optionsA.get('title', '').toUpperCase(); // ignore upper and lowercase
   const b = optionB.get('title', '').toUpperCase(); // ignore upper and lowercase
@@ -159,6 +179,13 @@ const selectLinesFields = (customKeys) => {
   .sort(sortFieldOption);
 };
 
+const selectUsageTypes = (usageTypes) => {
+  if (!usageTypes) {
+    return undefined;
+  }
+  return usageTypes.map(usageType => usageType.get('usage_type', ''));
+};
+
 
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
@@ -168,6 +195,11 @@ export const inputProssesorCsiOptionsSelector = createSelector(
 export const inputProssesorCustomKeysSelector = createSelector(
   getInputProssesors,
   selectCustomKeys,
+);
+
+export const inputProssesorRatingParamsSelector = createSelector(
+  getInputProssesors,
+  selectRatingParams,
 );
 
 export const linesFiledsSelector = createSelector(
@@ -211,7 +243,17 @@ export const chargingDaySelector = createSelector(
 
 export const usageTypeSelector = createSelector(
   getUsageType,
+  selectUsageTypes,
+);
+
+export const usageTypesDataSelector = createSelector(
+  getUsageType,
   usageTypes => usageTypes,
+);
+
+export const propertyTypeSelector = createSelector(
+  getPropertyTypes,
+  propertyTypes => propertyTypes,
 );
 
 export const entityFieldSelector = createSelector(
@@ -256,6 +298,11 @@ export const subscriberImportFieldsSelector = createSelector(
   subscriberFieldsSelector,
   accountImportFieldsSelector,
   selectSubscriberImportFields,
+);
+
+export const productFieldsSelector = createSelector(
+  getProductFields,
+  productFields => productFields,
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {
@@ -320,20 +367,76 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds) => Imm
   // })),
 });
 
+const mergeEntityAndReportConfigFields = (fields, type) => { // 'account' 'subscribers'
+  const predefinedFileds = getConfig(['reports', 'fields', type], Immutable.List());
+  const entityFields = formatReportFields(fields);
+  return predefinedFileds.withMutations((fieldsWithMutations) => {
+    predefinedFileds.forEach((predefinedFiled, idx) => {
+      if (!predefinedFiled.has('title')) {
+        const fieldName = getFieldName(predefinedFiled.get('id', ''), getFieldNameType(type));
+        const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
+        fieldsWithMutations.setIn([idx, 'title'], title);
+      }
+    });
+
+    entityFields.forEach((entityField) => {
+      if (predefinedFileds.findIndex(predefinedFiled => predefinedFiled.get('id', '') === entityField.get('id', '')) === -1) {
+        fieldsWithMutations.push(entityField);
+      }
+    });
+  })
+  .sort(sortFieldOption);
+};
+
+const selectReportLinesFields = (customKeys) => {
+  const predefinedFileds = getConfig(['reports', 'fields', 'usage'], Immutable.List());
+  return Immutable.List().withMutations((optionsWithMutations) => {
+    // Set predefined fields
+    predefinedFileds.forEach((predefinedFiled) => {
+      if (predefinedFiled.has('title')) {
+        optionsWithMutations.push(predefinedFiled);
+      } else {
+        const fieldName = getFieldName(predefinedFiled.get('id', ''), 'lines');
+        const title = fieldName === predefinedFiled.get('id', '') ? sentenceCase(fieldName) : fieldName;
+        optionsWithMutations.push(predefinedFiled.set('title', title));
+      }
+    });
+    // Set custom fields
+    customKeys.forEach((customKey) => {
+      if (predefinedFileds.findIndex(predefinedFiled => predefinedFiled.get('id', '') === customKey) === -1) {
+        const fieldName = getFieldName(customKey, 'lines');
+        const title = fieldName === customKey ? sentenceCase(fieldName) : fieldName;
+        optionsWithMutations.push(Immutable.Map({
+          id: `uf.${customKey}`,
+          title: `${title}`,
+          searchable: true,
+          aggregatable: true,
+        }));
+      }
+    });
+  })
+  .sort(sortFieldOption);
+};
+
 const reportSubscriberFieldsSelector = createSelector(
   subscriberFieldsSelector,
-  formatReportFields,
+  fields => mergeEntityAndReportConfigFields(fields, 'subscribers'),
 );
 
 const reportAccountFieldsSelector = createSelector(
   accountFieldsSelector,
-  formatReportFields,
+  fields => mergeEntityAndReportConfigFields(fields, 'account'),
+);
+
+const reportLinesFieldsSelector = createSelector(
+  inputProssesorCustomKeysSelector,
+  selectReportLinesFields,
 );
 
 export const reportFieldsSelector = createSelector(
   reportSubscriberFieldsSelector,
   reportAccountFieldsSelector,
-  linesFiledsSelector,
+  reportLinesFieldsSelector,
   selectReportFields,
 );
 

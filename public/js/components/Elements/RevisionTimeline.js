@@ -2,19 +2,38 @@ import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import classNames from 'classnames';
 import StateIcon from './StateIcon';
-import { getItemDateValue, isItemClosed, getItemId } from '../../common/Util';
+import { getItemDateValue, isItemClosed, isItemReopened, getItemId } from '../../common/Util';
 
 
 const RevisionTimeline = ({ revisions, size, item, start }) => {
-  const index = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
-  const from = revisions.size <= size ? 0 : start;
-  const lastItem = revisions
-      .slice(from, from + 1)
-      .reverse()
-      .get(0, Immutable.Map());
-  const addClosedIcon = isItemClosed(lastItem) && ((index !== revisions.size - 1 && size <= revisions.size) || size > revisions.size);
-  const more = (revisions.size > size && (from + size < revisions.size)) || (addClosedIcon && revisions.size >= size);
-  const end = addClosedIcon ? ((from + size) - 1) : from + size;
+  const revisionsToDisplay = Immutable.List().withMutations((listWithMutations) => {
+    let nextRevision = Immutable.Map();
+    revisions.forEach((revision) => {
+      const dummyClosedRevision = Immutable.Map({
+        closed: true,
+        to: revision.get('to', ''),
+      });
+      if (isItemClosed(revision) || isItemReopened(nextRevision, revision)) {
+        listWithMutations.push(dummyClosedRevision);
+      }
+      listWithMutations.push(revision);
+      nextRevision = revision;
+    });
+  }).reverse();
+
+  const index = start !== null
+    ? start
+    : revisionsToDisplay.findIndex(revision => getItemId(revision) === getItemId(item));
+  const revisionsFromLeft = Math.floor((size - 1) / 2);
+  let from = Math.max(index - revisionsFromLeft, 0);
+  let end = from + size;
+  if (end >= revisionsToDisplay.size) {
+    end = revisionsToDisplay.size;
+    from = Math.max(end - size, 0);
+  }
+  const moreAfter = revisionsToDisplay.size > size && (end < revisionsToDisplay.size);
+  const moreBefore = revisionsToDisplay.size > size && from > 0;
+
   const renderMore = type => (
     <li key={`${getItemId(item, '')}-more-${type}`} className={`more ${type}`}>
       <div style={{ lineHeight: '12px' }}>&nbsp;</div>
@@ -24,7 +43,27 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
       </div>
     </li>
   );
+
+  const renderClosedRevision = (closedRevision) => {
+    const to = getItemDateValue(closedRevision, 'to');
+    return (
+      <li key={`${getItemId(closedRevision, '')}-closed`} className="closed">
+        <div>
+          <div><i style={{ fontSize: 19 }} className="fa fa-times-circle" /></div>
+          <small className="date">
+            { to.format('MMM DD')}
+            <br />
+            { to.format('YYYY')}
+          </small>
+        </div>
+      </li>
+    );
+  };
+
   const renderRevision = (revision, key, list) => {
+    if (revision.get('closed', false)) {
+      return renderClosedRevision(revision);
+    }
     const fromDate = getItemDateValue(revision, 'from');
     const isActive = getItemId(revision, '') === getItemId(item, '');
     const activeClass = classNames('revision', {
@@ -48,34 +87,14 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
     );
   };
 
-  const renderClosedRevision = () => {
-    const to = getItemDateValue(lastItem, 'to');
-    return (
-      <li key={`${getItemId(lastItem, '')}-closed`} className="closed">
-        <div>
-          <div><i style={{ fontSize: 19 }} className="fa fa-times-circle" /></div>
-          <small className="date">
-            { to.format('MMM DD')}
-            <br />
-            { to.format('YYYY')}
-          </small>
-        </div>
-      </li>
-    );
-  };
-
   return (
     <ul className="revision-history-list">
-      { more && renderMore('before') }
-      { revisions
+      { moreBefore && renderMore('before') }
+      { revisionsToDisplay
         .slice(from, end)
-        .reverse()
         .map(renderRevision)
       }
-      { addClosedIcon
-        ? renderClosedRevision()
-        : (from > 0 || (!addClosedIcon && isItemClosed(lastItem))) && renderMore('after')
-      }
+      { moreAfter && renderMore('after') }
     </ul>
   );
 };
@@ -85,7 +104,7 @@ RevisionTimeline.defaultProps = {
   revisions: Immutable.List(),
   item: Immutable.Map(),
   size: 5,
-  start: 0,
+  start: null,
 };
 
 RevisionTimeline.propTypes = {

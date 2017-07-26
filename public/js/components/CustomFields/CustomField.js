@@ -53,7 +53,7 @@ class CustomField extends Component {
   renderAdvancedEdit = () => {
     const { field } = this.props;
     const { showAdvancedEdit } = this.state;
-    const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'filed')} Details`);
+    const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'field')} Details`);
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
@@ -97,6 +97,13 @@ class CustomField extends Component {
             <Col sm={3} componentClass={ControlLabel}>Searchable</Col>
             <Col sm={9} style={checkboxStyle}>
               <Field id="searchable" onChange={this.onChange} value={field.get('searchable', false)} fieldType="checkbox" />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Multiple</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', false)} fieldType="checkbox" />
             </Col>
           </FormGroup>
 

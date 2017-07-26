@@ -8,7 +8,7 @@ import {
   changePasswordQuery,
 } from '../common/ApiQueries';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
-import { saveEntity, getEntity, actions } from './entityActions';
+import { saveEntity, getEntity, actions, deleteEntity } from './entityActions';
 
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
@@ -19,6 +19,8 @@ export const CLEAR_LOGIN_ERROR = 'CLEAR_LOGIN_ERROR';
 export const getUser = id => getEntity('users', fetchUserByIdQuery(id));
 
 export const saveUser = (user, action) => saveEntity('users', user, action);
+
+export const deleteUser = item => dispatch => dispatch(deleteEntity('users', item));
 
 export const updateUserField = (path, value) => ({
   type: actions.UPDATE_ENTITY_FIELD,
@@ -84,7 +86,7 @@ export const userDoLogin = (username, password) => (dispatch) => {
       return success;
     })
     .catch((error) => { // eslint-disable-line no-unused-vars
-      const message = 'Incorrect user name or password, please try again.';
+      const message = 'Incorrect username or password, please try again.';
       dispatch(loginError(message));
       dispatch(finishProgressIndicator());
       return error;
@@ -119,5 +121,5 @@ export const savePassword = (itemId, signature, timestamp, password) => (dispatc
   const query = changePasswordQuery(itemId, signature, timestamp, password);
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success, 'The password was changed successfuly')))
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error changing password')));
+    .catch(error => dispatch(apiBillRunErrorHandler(error)));
 };

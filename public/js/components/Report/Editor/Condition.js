@@ -88,7 +88,7 @@ class Condition extends Component {
   getFieldOptions = () => {
     const { fieldsConfig } = this.props;
     return fieldsConfig
-      .filter(filed => filed.get('filter', true))
+      .filter(field => field.get('filter', true))
       .map(parseConfigSelectOptions)
       .toArray();
   }
@@ -143,7 +143,7 @@ class Condition extends Component {
 
         <Col sm={4}>
           <ConditionValue
-            filed={item}
+            field={item}
             config={config}
             operator={operator}
             disabled={disableVal}

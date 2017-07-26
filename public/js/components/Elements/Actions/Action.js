@@ -24,6 +24,7 @@ const Action = (props) => {
     'fa-toggle-on': type === 'disable',
     'fa-plus': type === 'add',
     'fa-calendar': type === 'move',
+    'fa-repeat': type === 'reopen',
     'fa-cloud-upload': type === 'import',
     'fa-refresh': type === 'refresh',
   });

@@ -1,20 +1,24 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Map, List } from 'immutable';
+import { Map } from 'immutable';
 import { Col, Form, Panel, FormGroup, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
+import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
 
 const PrepaidInclude = (props) => {
-  const { usageTypes, prepaidInclude, chargingByOptions, mode } = props;
+  const { prepaidInclude, chargingByOptions, mode } = props;
 
   const onSelectChange = id => (value) => {
+    if (id === 'charging_by') {
+      const usaget = (value === 'total_cost' ? 'total_cost' : '');
+      onSelectChange('charging_by_usaget')(usaget);
+      if (value !== 'usagev') {
+        onSelectChange('charging_by_usaget_unit')('');
+      }
+    }
     props.onChangeField({ target: { id, value } });
   };
-
-  const usageTypesOptions = usageTypes
-    .map(key => ({ value: key, label: key }))
-    .toArray();
 
   const checkboxStyle = { marginTop: 10 };
 
@@ -22,7 +26,6 @@ const PrepaidInclude = (props) => {
 
   const renderChargingBy = () => {
     if (editable) {
-      onSelectChange('charging_by_usaget')('total_cost');
       return (
         <Select disabled={true} value="All" />
       );
@@ -35,11 +38,12 @@ const PrepaidInclude = (props) => {
   const renderChargingByUsaget = () => {
     if (editable) {
       return (
-        <Select
-          value={prepaidInclude.get('charging_by_usaget', '')}
-          options={usageTypesOptions}
-          onChange={onSelectChange('charging_by_usaget')}
-          searchable={false}
+        <UsageTypesSelector
+          usaget={prepaidInclude.get('charging_by_usaget', '')}
+          unit={prepaidInclude.get('charging_by_usaget_unit', '')}
+          onChangeUsaget={onSelectChange('charging_by_usaget')}
+          onChangeUnit={onSelectChange('charging_by_usaget_unit')}
+          showUnits={prepaidInclude.get('charging_by', '') === 'usagev'}
         />
       );
     }
@@ -112,14 +116,12 @@ const PrepaidInclude = (props) => {
 PrepaidInclude.defaultProps = {
   prepaidInclude: Map(),
   chargingByOptions: [],
-  usageTypes: List(),
   mode: 'create',
 };
 
 PrepaidInclude.propTypes = {
   onChangeField: React.PropTypes.func.isRequired,
   prepaidInclude: PropTypes.instanceOf(Map),
-  usageTypes: PropTypes.instanceOf(List),
   chargingByOptions: PropTypes.array,
   mode: PropTypes.string,
 };

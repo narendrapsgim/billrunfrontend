@@ -9,7 +9,7 @@ import { getSymbolFromCurrency } from 'currency-symbol-map';
 import classNames from 'classnames';
 import Field from '../Field';
 import { rebalanceAccount, getCollectionDebt } from '../../actions/customerActions';
-import ConfirmModal from '../../components/ConfirmModal';
+import { ConfirmModal } from '../../components/Elements';
 import { currencySelector } from '../../selectors/settingsSelector';
 import OfflinePayment from '../Payments/OfflinePayment';
 import CyclesSelector from '../Cycle/CyclesSelector';
@@ -42,6 +42,7 @@ class Customer extends Component {
     showOfflinePayement: false,
     debt: null,
     selectedCyclesNames: '',
+    expectedCyclesNames :'',
   };
 
   componentDidMount() {
@@ -222,10 +223,14 @@ class Customer extends Component {
     this.setState({ selectedCyclesNames });
   }
 
+  onChangeExpectedCycle = (expectedCyclesNames) => {
+    this.setState({ expectedCyclesNames });
+  }
+
   onClickExpectedInvoice = () => {
     const { customer } = this.props;
-    const { selectedCyclesNames } = this.state;
-    let query = getExpectedInvoiceQuery(customer.get('aid'),selectedCyclesNames);
+    const { expectedCyclesNames } = this.state;
+    let query = getExpectedInvoiceQuery(customer.get('aid'),expectedCyclesNames);
     window.open(buildRequestUrl(query))
   }
 
@@ -290,19 +295,21 @@ class Customer extends Component {
 
   renderExpectedInvoiceButton = () => {
     const { customer } = this.props;
-    const { selectedCyclesNames } = this.state;
+    const { expectedCyclesNames } = this.state;
 
     return (
       <span  className="inline">
         , Or generate expected invoices for : <span  className="inline" style={{ verticalAlign:"middle", minWidth:290, marginLeft: 5, marginRight: 5}} >
                                               <CyclesSelector className="inline"
-                                                  onChange={this.onChangeSelectedCycle}
-                                                  statusesToDisplay={Immutable.List(['current', 'to_run'])}
-                                                  selectedCycles={selectedCyclesNames}
+                                                  onChange={this.onChangeExpectedCycle}
+                                                  statusesToDisplay={Immutable.List(['current', 'to_run','future'])}
+                                                  selectedCycles={expectedCyclesNames}
                                                   multi={false}
+                                                  from={moment().subtract(6,'month').format(globalSetting.apiDateTimeFormat)}
+                                                  to={moment().add(6,'month').format(globalSetting.apiDateTimeFormat)}
                                                 />
                                             </span>
-        <Button bsSize="small" className="btn-primary inline" disabled={!selectedCyclesNames} onClick={this.onClickExpectedInvoice}>Generate expected invoice</Button>
+        <Button bsSize="small" className="btn-primary inline" disabled={!expectedCyclesNames} onClick={this.onClickExpectedInvoice}>Generate expected invoice</Button>
       </span>
     );
   }

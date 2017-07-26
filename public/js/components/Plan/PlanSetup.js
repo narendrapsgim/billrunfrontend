@@ -111,7 +111,7 @@ class PlanSetup extends Component {
       this.props.dispatch(setClonePlan());
     }
     if (item.get('prorated', null) === null) {
-      this.props.dispatch(onPlanFieldUpdate(['prorated'], 'true'));
+      this.props.dispatch(onPlanFieldUpdate(['prorated'], true));
     }
   }
 
@@ -165,8 +165,8 @@ class PlanSetup extends Component {
     this.props.dispatch(onPlanTariffRemove(index));
   }
 
-  onGroupAdd = (groupName, usage, value, shared, pooled, products) => {
-    this.props.dispatch(onGroupAdd(groupName, usage, value, shared, pooled, products));
+  onGroupAdd = (groupName, usage, unit, value, shared, pooled, products) => {
+    this.props.dispatch(onGroupAdd(groupName, usage, unit, value, shared, pooled, products));
   }
 
   onGroupRemove = (groupName) => {

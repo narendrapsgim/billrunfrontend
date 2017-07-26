@@ -62,8 +62,8 @@ class PrepaidBalances extends Component {
   }
 
   getTableFields = () => ([
-    { id: 'aid', placeholder: 'Account', type: 'number', sort: true, showFilter: false, display: false },
-    { id: 'sid', placeholder: 'Subscription', type: 'number', sort: true },
+    { id: 'aid', placeholder: 'Customer', type: 'number', sort: true, showFilter: false, display: false },
+    { id: 'sid', placeholder: 'Subscriber', type: 'number', sort: true },
     { id: 'pp_includes_name', placeholder: 'Bucket', sort: true },
     { id: 'charging_by_usaget', placeholder: 'Usage Type Name', sort: true, showFilter: false, parser: this.parserUsageTypeName },
     { id: 'usaget_type_value', placeholder: 'Usage Type Value', sort: true, showFilter: false, parser: this.parserUsageTypeValue },

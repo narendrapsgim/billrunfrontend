@@ -34,6 +34,7 @@ const Notifications = (props) => {
         onUpdateField={onUpdateField}
         index={i}
         key={i}
+        unitLabel={props.unitLabel}
       />
     );
   };

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { Form } from 'react-bootstrap';
-import ConfirmModal from '../ConfirmModal';
+import { ConfirmModal } from '../Elements';
 import ActionButtons from '../Elements/ActionButtons';
 import EditBlock from './EditBlock';
 import { getSettings, saveSettings, updateSetting } from '../../actions/settingsActions';

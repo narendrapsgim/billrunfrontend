@@ -56,6 +56,7 @@ class ReportEditor extends Component {
   onChangeReportType = (value) => {
     this.updateReport('type', value);
     this.updateColumnsByReportType(value);
+    this.updateSortByReportType(value);
   };
 
   onChangeReportKey = (value) => {
@@ -65,11 +66,19 @@ class ReportEditor extends Component {
   /* Conditions */
   onChangeConditionField = (idx, value) => {
     const { report } = this.props;
+    const entityField = this.getEntityFields().find(
+      reportFiled => reportFiled.get('id', '') === value,
+      null, Immutable.Map(),
+    );
+    const condition = Immutable.Map({
+      field: value,
+      op: '',
+      value: '',
+      type: entityField.get('type', 'string'),
+    });
     const newFilters = report
       .get('conditions', Immutable.List())
-      .setIn([idx, 'field'], value)
-      .setIn([idx, 'op'], '')
-      .setIn([idx, 'value'], '');
+      .set(idx, condition);
     this.updateReport('conditions', newFilters);
   }
 
@@ -227,9 +236,28 @@ class ReportEditor extends Component {
         const newOp = (value === reportTypes.GROPPED) ? op : '';
         const newLabel = this.getColumnNewLabel(label, fieldName, oldOp, fieldName, newOp);
         return column.set('label', newLabel);
+      })
+      .update((cols) => {
+        if (value === reportTypes.SIMPLE) {
+          return cols.filter(column => column.get('key', '') !== 'count_group');
+        }
+        return cols;
       });
     this.updateReport('columns', columns);
   };
+
+  updateSortByReportType = (value) => {
+    const { report } = this.props;
+    const sorts = report
+      .get('sorts', Immutable.List())
+      .update((cols) => {
+        if (value === reportTypes.SIMPLE) {
+          return cols.filter(column => column.get('field', '') !== 'count_group');
+        }
+        return cols;
+      });
+    this.updateReport('sorts', sorts);
+  }
 
   onMoveColumn = (oldIndex, newIndex) => {
     const { report } = this.props;
@@ -241,9 +269,9 @@ class ReportEditor extends Component {
     this.updateReport('columns', columns);
   }
 
-  onAddColumn = () => {
+  onAddColumn = (column = null) => {
     const { report } = this.props;
-    const newColumn = Immutable.Map({
+    const newColumn = column || Immutable.Map({
       key: uuid.v4(),
       field_name: '',
       label: '',

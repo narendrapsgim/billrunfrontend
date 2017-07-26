@@ -8,7 +8,12 @@ import PlanIncludeGroupEdit from './components/PlanIncludeGroupEdit';
 import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 import { getAllGroup } from '../../actions/planActions';
 import { getSettings } from '../../actions/settingsActions';
-import { usageTypeSelector } from '../../selectors/settingsSelector';
+import { getUnitLabel } from '../../common/Util';
+import {
+  usageTypeSelector,
+  propertyTypeSelector,
+  usageTypesDataSelector,
+} from '../../selectors/settingsSelector';
 
 
 class PlanIncludesTab extends Component {
@@ -16,6 +21,8 @@ class PlanIncludesTab extends Component {
   static propTypes = {
     includeGroups: PropTypes.instanceOf(Immutable.Map),
     usageTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
     onChangeFieldValue: PropTypes.func.isRequired,
     onGroupAdd: PropTypes.func.isRequired,
     onGroupRemove: PropTypes.func.isRequired,
@@ -26,6 +33,8 @@ class PlanIncludesTab extends Component {
   static defaultProps = {
     includeGroups: Immutable.Map(),
     usageTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
     mode: 'create',
   };
 
@@ -63,13 +72,13 @@ class PlanIncludesTab extends Component {
     });
   }
 
-  onGroupAdd = (groupName, usage, include, shared, pooled, products) => {
+  onGroupAdd = (groupName, usage, unit, include, shared, pooled, products) => {
     const { usedProducts, existingGroups } = this.state;
     this.setState({
       usedProducts: usedProducts.push(...products),
       existingGroups: existingGroups.push(groupName),
     });
-    this.props.onGroupAdd(groupName, usage, include, shared, pooled, products);
+    this.props.onGroupAdd(groupName, usage, unit, include, shared, pooled, products);
   }
 
   onGroupRemove = (groupName, groupProducts) => {
@@ -92,7 +101,7 @@ class PlanIncludesTab extends Component {
 
   renderGroups = () => {
     const { usedProducts } = this.state;
-    const { includeGroups, mode } = this.props;
+    const { includeGroups, mode, usageTypesData, propertyTypes } = this.props;
 
     if (includeGroups.isEmpty()) {
       return (<tr><td colSpan="6" className="text-center">No Groups</td></tr>);
@@ -103,6 +112,7 @@ class PlanIncludesTab extends Component {
       const pooled = include.get('account_pool', false);
       const products = include.get('rates', Immutable.List());
       const usaget = include.findKey(prop => (prop !== 'account_shared' && prop !== 'rates'), '');
+      const unit = getUnitLabel(propertyTypes, usageTypesData, usaget, include.get('unit', ''));
       const value = include.get(usaget, '');
       return (
         <PlanIncludeGroupEdit
@@ -111,6 +121,7 @@ class PlanIncludesTab extends Component {
           name={groupName}
           value={value}
           usaget={usaget}
+          unit={unit}
           shared={shared}
           pooled={pooled}
           products={products}
@@ -128,6 +139,7 @@ class PlanIncludesTab extends Component {
       <th style={{ width: 150 }}>Name</th>
       <th style={{ width: 100 }}>Unit Type</th>
       <th style={{ width: 100 }}>Include</th>
+      <th style={{ width: 100 }}>Unit</th>
       <th>Products</th>
       <th className="text-center" style={{ width: 80 }}>Shared</th>
       <th className="text-center" style={{ width: 80 }}>Pooled</th>
@@ -136,7 +148,7 @@ class PlanIncludesTab extends Component {
   );
 
   render() {
-    const { usageTypes, mode } = this.props;
+    const { mode } = this.props;
     const { existingGroups, usedProducts } = this.state;
     const allowCreate = mode !== 'view';
 
@@ -156,7 +168,6 @@ class PlanIncludesTab extends Component {
           </Panel>
           { allowCreate &&
             <PlanIncludeGroupCreate
-              usageTypes={usageTypes}
               existinGrousNames={existingGroups}
               usedProducts={usedProducts}
               addGroup={this.onGroupAdd}
@@ -169,9 +180,10 @@ class PlanIncludesTab extends Component {
 
 }
 
-
 const mapStateToProps = (state, props) => ({
   includeGroups: props.includeGroups || undefined,
   usageTypes: usageTypeSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
 });
 export default connect(mapStateToProps)(PlanIncludesTab);

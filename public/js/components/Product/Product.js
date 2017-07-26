@@ -1,25 +1,31 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import Select from 'react-select';
+import { connect } from 'react-redux';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
 import CreateButton from '../Elements/CreateButton';
 import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
-import ProductParam from './components/ProductParam';
-import ProductParamEdit from './components/ProductParamEdit';
 import EntityFields from '../Entity/EntityFields';
+import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
+import { getUnitLabel } from '../../common/Util';
+import {
+  usageTypesDataSelector,
+  propertyTypeSelector,
+} from '../../selectors/settingsSelector';
 
 
-export default class Product extends Component {
+class Product extends Component {
 
   static propTypes = {
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
+    ratingParams: PropTypes.instanceOf(Immutable.List),
     product: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
     usaget: PropTypes.string,
     planName: PropTypes.string,
-    usageTypes: PropTypes.object.isRequired,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
     onProductRateAdd: PropTypes.func.isRequired,
@@ -29,8 +35,12 @@ export default class Product extends Component {
   }
 
   static defaultProps = {
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
+    ratingParams: Immutable.List(),
     planName: 'BASE',
     product: Immutable.Map(),
+    usaget: undefined,
     errorMessages: {
       name: {
         allowedCharacters: 'Key contains illegal characters, key should contain only alphabets, numbers and underscores (A-Z, 0-9, _)',
@@ -43,6 +53,7 @@ export default class Product extends Component {
       name: '',
     },
     newProductParam: false,
+    unit: null,
   }
 
   componentDidMount() {
@@ -79,75 +90,28 @@ export default class Product extends Component {
     this.props.onUsagetUpdate(['rates'], usaget, value);
   }
 
+  onChangeUnit = (unit, usageType) => {
+    const { product, planName, usaget } = this.props;
+    const usageTypeForRate = usageType || usaget;
+    const ratePath = ['rates', usageTypeForRate, planName, 'rate'];
+    const rates = product.getIn(ratePath, Immutable.List());
+    this.setState({ unit });
+    rates.forEach((rate, index) => {
+      const rangeUnitsPath = [...ratePath, index, 'uom_display', 'range'];
+      const intervalUnitsPath = [...ratePath, index, 'uom_display', 'interval'];
+      this.props.onFieldUpdate(rangeUnitsPath, unit);
+      this.props.onFieldUpdate(intervalUnitsPath, unit);
+    });
+  }
+
   onChangeVatable = (e) => {
     const { checked } = e.target;
     this.props.onFieldUpdate(['vatable'], checked);
   }
 
-  onChangePrefix = (prefixes) => {
-    const prefixesList = (prefixes.length) ? prefixes.split(',') : [];
-    this.props.onFieldUpdate(['params', 'prefix'], Immutable.Set(prefixesList));
-  }
-
-  onChangeParamKey = (oldKey, newKey) => {
-    const { product } = this.props;
-    const paramValues = product.getIn(['params', oldKey], Immutable.List());
-    const updatedParams = product.get('params', Immutable.Map()).delete(oldKey).set(newKey, paramValues);
-    this.props.onFieldUpdate(['params'], updatedParams);
-  }
-
-  onChangeParamValues = (key, values) => {
-    const paramPath = ['params', key];
-    this.props.onFieldUpdate(paramPath, Immutable.List(values));
-  }
-
   onChangePricingMethod = (e) => {
     const { value } = e.target;
     this.props.onFieldUpdate(['pricing_method'], value);
-  }
-
-  onRemoveParam = (paramKey) => {
-    const { product } = this.props;
-    const updatedParams = product.get('params', Immutable.Map()).delete(paramKey);
-    this.props.onFieldUpdate(['params'], updatedParams);
-  }
-
-  onProductParamSave = (key, oldKey, values, newParam) => {
-    if (!newParam && oldKey !== key) {
-      this.onChangeParamKey(oldKey, key);
-    }
-    this.onChangeParamValues(key, values);
-  }
-
-  onProductParamAdd = () => {
-    this.setState({ newProductParam: true });
-  }
-
-  onParamEditClose = () => {
-    this.setState({ newProductParam: false });
-  }
-
-  getExistingParamKeys = () => {
-    const { product } = this.props;
-    const params = product.get('params', Immutable.Map());
-    return params.keySeq().toList();
-  }
-
-  renderNewProductParam = () => {
-    const { newProductParam } = this.state;
-    if (newProductParam) {
-      return (
-        <ProductParamEdit
-          newParam={true}
-          onParamSave={this.onProductParamSave}
-          onParamEditClose={this.onParamEditClose}
-          paramKey={''}
-          paramValues={[]}
-          existingKeys={this.getExistingParamKeys()}
-        />
-      );
-    }
-    return null;
   }
 
   onProductRateUpdate = (index, fieldName, value) => {
@@ -177,14 +141,15 @@ export default class Product extends Component {
     this.props.onProductRateRemove(productPath, index);
   }
 
-  getUsageTypesOptions = () => {
-    const { usageTypes } = this.props;
-    return usageTypes.map(usaget => ({ value: usaget, label: usaget })).toJS();
-  }
-
   onChangeAdditionalField = (field, value) => {
     this.props.onFieldUpdate(field, value);
   }
+
+  filterCustomFields = ratingParams => (field) => {
+    const fieldName = field.get('field_name', '');
+    const usedAsRatingField = ratingParams.includes(fieldName);
+    return (!fieldName.startsWith('params.') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
+  };
 
   renderPrices = () => {
     const { product, planName, usaget, mode } = this.props;
@@ -198,41 +163,35 @@ export default class Product extends Component {
         index={i}
         item={price}
         key={i}
+        unit={this.getUnitLabel()}
         onProductEditRate={this.onProductRateUpdate}
         onProductRemoveRate={this.onProductRateRemove}
       />
     );
   }
 
-  renderParameters = () => {
-    const { product, mode } = this.props;
-    const params = product.get('params', Immutable.Map());
-    const mainParams = Immutable.List(['prefix']);
-    let index = 0;
-    const editable = (mode !== 'view');
+  getUnit = () => {
+    const { product, usaget } = this.props;
+    const { unit } = this.state;
+    if (unit === null) {
+      return product.getIn(['rates', usaget, 'BASE', 'rate', 0, 'uom_display', 'range'], '');
+    }
+    return unit;
+  }
 
-    return params
-      .filter((paramValues, paramKey) => !mainParams.includes(paramKey))
-      .map((paramValues, paramKey) =>
-        <ProductParam
-          key={index++}
-          editable={editable}
-          paramKey={paramKey}
-          paramValues={paramValues.toJS()}
-          existingKeys={this.getExistingParamKeys()}
-          onProductParamSave={this.onProductParamSave}
-          onRemoveParam={this.onRemoveParam}
-        />
-    ).toList();
+  getUnitLabel = () => {
+    const { propertyTypes, usageTypesData, usaget } = this.props;
+    return getUnitLabel(propertyTypes, usageTypesData, usaget, this.getUnit());
   }
 
   render() {
     const { errors } = this.state;
-    const { product, usaget, mode } = this.props;
+    const { product, usaget, mode, ratingParams } = this.props;
+    const unit = this.getUnit();
+    const unitTxt = this.getUnitLabel();
+    const unitLabel = unitTxt !== '' ? `(${unitTxt})` : '';
     const vatable = (product.get('vatable', true) === true);
-    const prefixs = product.getIn(['params', 'prefix'], Immutable.List()).join(',');
     const pricingMethod = product.get('pricing_method', '');
-    const availablePrefix = [];
     const editable = (mode !== 'view');
 
     return (
@@ -270,39 +229,18 @@ export default class Product extends Component {
               </FormGroup>
 
               <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>Prefixes</Col>
-                <Col sm={8} lg={9}>
-                  { editable
-                    ? (
-                      <Select
-                        allowCreate
-                        multi={true}
-                        value={prefixs}
-                        options={availablePrefix}
-                        onChange={this.onChangePrefix}
-                        placeholder="Add Prefix..."
-                      />
-                    )
-                    : <div className="non-editable-field">{ prefixs }</div>
-                  }
-
-                </Col>
-              </FormGroup>
-
-              <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
-                <Col sm={4}>
-                  { editable
+                <Col sm={8}>
+                  { editable && ['clone', 'create'].includes(mode)
                     ? (
-                      <Select
-                        allowCreate
-                        disabled={!['clone', 'create'].includes(mode)}
-                        onChange={this.onChangeUsaget}
-                        options={this.getUsageTypesOptions()}
-                        value={usaget}
+                      <UsageTypesSelector
+                        usaget={usaget}
+                        unit={unit}
+                        onChangeUsaget={this.onChangeUsaget}
+                        onChangeUnit={this.onChangeUnit}
                       />
                     )
-                    : <div className="non-editable-field">{ usaget }</div>
+                    : <div className="non-editable-field">{ `${usaget} ${unitLabel}` }</div>
                   }
                 </Col>
               </FormGroup>
@@ -311,6 +249,7 @@ export default class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
+                fieldsFilter={this.filterCustomFields(ratingParams)}
                 editable={editable}
               />
 
@@ -388,13 +327,6 @@ export default class Product extends Component {
               </Col>
             </Panel>
 
-            <Panel header={<h3>Additional Parameters</h3>}>
-              { this.renderParameters() }
-              { editable && <CreateButton onClick={this.onProductParamAdd} label="Add New" />}
-            </Panel>
-
-            {this.renderNewProductParam()}
-
           </Form>
         </Col>
       </Row>
@@ -402,3 +334,10 @@ export default class Product extends Component {
   }
 
 }
+
+const mapStateToProps = (state, props) => ({
+  usageTypesData: usageTypesDataSelector(state, props),
+  propertyTypes: propertyTypeSelector(state, props),
+});
+
+export default connect(mapStateToProps)(Product);

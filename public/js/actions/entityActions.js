@@ -2,9 +2,8 @@ import moment from 'moment';
 import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
-import { getItemDateValue, getConfig } from '../common/Util';
+import { getItemDateValue, getConfig, getItemId } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
-
 
 const apiTimeOutMessage = 'Oops! Something went wrong. Please try again in a few moments.';
 
@@ -47,6 +46,7 @@ export const clearEntity = collection => ({
 });
 
 const buildRequestData = (item, action) => {
+  const apiDateFormat = getConfig('apiDateFormat', 'YYYY-MM-DD');
   switch (action) {
 
     case 'move': {
@@ -54,8 +54,8 @@ const buildRequestData = (item, action) => {
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
       formData.append('query', JSON.stringify(query));
       const update = (item.has('from'))
-        ? { from: getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat) }
-        : { to: getItemDateValue(item, 'to').format(globalSetting.apiDateTimeFormat) };
+        ? { from: getItemDateValue(item, 'from').format(apiDateFormat) }
+        : { to: getItemDateValue(item, 'to').format(apiDateFormat) };
       formData.append('update', JSON.stringify(update));
       return formData;
     }
@@ -64,7 +64,7 @@ const buildRequestData = (item, action) => {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
       formData.append('query', JSON.stringify(query));
-      const update = { to: getItemDateValue(item, 'to').format(globalSetting.apiDateTimeFormat) };
+      const update = { to: getItemDateValue(item, 'to').format(apiDateFormat) };
       formData.append('update', JSON.stringify(update));
       return formData;
     }
@@ -78,7 +78,7 @@ const buildRequestData = (item, action) => {
 
     case 'create': {
       const formData = new FormData();
-      const newFrom = getItemDateValue(item, 'from').format(globalSetting.apiDateTimeFormat);
+      const newFrom = getItemDateValue(item, 'from').format(apiDateFormat);
       const update = item.withMutations((itemwithMutations) => {
         itemwithMutations
           .set('from', newFrom)
@@ -123,6 +123,15 @@ const buildRequestData = (item, action) => {
       formData.append('update', JSON.stringify(update));
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
       formData.append('query', JSON.stringify(query));
+      return formData;
+    }
+
+    case 'reopen': {
+      const formData = new FormData();
+      const query = { _id: getItemId(item, 'undefined') };
+      const update = { from: item.get('from', 'undefined') };
+      formData.append('query', JSON.stringify(query));
+      formData.append('update', JSON.stringify(update));
       return formData;
     }
 
@@ -201,4 +210,12 @@ export const moveEntity = (collection, item, type) => (dispatch) => {
     }
   });
   return dispatch(saveEntity(collection, hackedItem, 'move'));
+};
+
+export const reopenEntity = (collection, item, from) => (dispatch) => {
+  const itemToReopen = Immutable.Map({
+    _id: item.get('_id'),
+    from,
+  });
+  return dispatch(saveEntity(collection, itemToReopen, 'reopen'));
 };
