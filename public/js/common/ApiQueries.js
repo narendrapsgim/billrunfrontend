@@ -403,7 +403,7 @@ export const getRebalanceAccountQuery = (aid, billrunKey = '') => {
   };
 };
 
-export const getCyclesQuery = (from, to) => {
+export const getCyclesQuery = (from, to, newestFirst = true) => {
   const params = {
     api: 'billrun',
     action: 'cycles',
@@ -415,6 +415,7 @@ export const getCyclesQuery = (from, to) => {
   if(to) {
       params['params'].push({to});
   }
+  params['params'].push({newestFirst: newestFirst? 1 : 0});
   return params;
 };
 
