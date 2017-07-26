@@ -30,7 +30,7 @@ class CyclesSelector extends Component {
     multi: false,
     from:"",
     to:"",
-		newestFirst: true
+    newestFirst: true
   };
 
   componentDidMount() {

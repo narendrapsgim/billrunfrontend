@@ -307,7 +307,7 @@ class Customer extends Component {
                                                   multi={false}
                                                   from={moment().subtract(6,'month').format(globalSetting.apiDateTimeFormat)}
                                                   to={moment().add(6,'month').format(globalSetting.apiDateTimeFormat)}
-																									newestFirst={false}
+                                                  newestFirst={false}
                                                 />
                                             </span>
         <Button bsSize="small" className="btn-primary inline" disabled={!expectedCyclesNames} onClick={this.onClickExpectedInvoice}>Generate expected invoice</Button>
