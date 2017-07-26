@@ -32,7 +32,7 @@ export default class Root extends Component {
           <Router history={hashHistory}>
             {routes}
           </Router>
-          { process.env.NODE_ENV !== 'production' && <DevTools /> }
+          { !_PRODUCTION_ && <DevTools /> }
         </div>
       </Provider>
     );

@@ -106,22 +106,27 @@ class Settings extends Component {
       categoryToSave.push('usage_types');
     }
     if (categoryToSave.length) {
-      this.props.dispatch(saveSettings(categoryToSave)).then(
-        (status) => {
-          if (status === true) { // settings successfully saved
-            // Reload Menu
-            const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
-            this.props.dispatch(initMainMenu(mainMenuOverrides));
-            // Update logo
-            if (categoryToSave.includes('tenant') && settings.getIn(['tenant', 'logo'], '').length > 0) {
-              localStorage.removeItem('logo');
-              this.props.dispatch(fetchFile({ filename: settings.getIn(['tenant', 'logo'], '') }, 'logo'));
-            }
-          }
-        },
-      );
+      this.props.dispatch(saveSettings(categoryToSave))
+        .then((response) => {
+          this.afterSave(response, categoryToSave);
+        });
     }
   }
+
+  afterSave = (response, categoryToSave) => {
+    const { settings } = this.props;
+    if (response && response.status === 1) { // settings successfully saved
+      // Reload Menu
+      const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
+      this.props.dispatch(initMainMenu(mainMenuOverrides));
+      // Update logo
+      if (categoryToSave.includes('tenant') && settings.getIn(['tenant', 'logo'], '').length > 0) {
+        localStorage.removeItem('logo');
+        this.props.dispatch(fetchFile({ filename: settings.getIn(['tenant', 'logo'], '') }, 'logo'));
+      }
+    }
+  };
+
 
   handleSelectTab = (tab) => {
     const { pathname, query } = this.props.location;

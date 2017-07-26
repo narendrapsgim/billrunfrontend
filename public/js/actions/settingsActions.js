@@ -1,7 +1,16 @@
 import moment from 'moment';
-import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
-import { getCurrenciesQuery, saveSharedSecretQuery, disableSharedSecretQuery } from '../common/ApiQueries';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import {
+  saveSettingsQuery,
+  getSettingsQuery,
+  saveFileQuery,
+  getFileQuery,
+  getCurrenciesQuery,
+  saveSharedSecretQuery,
+  disableSharedSecretQuery,
+} from '../common/ApiQueries';
+
 
 export const UPDATE_SETTING = 'UPDATE_SETTING';
 export const GOT_SETTINGS = 'GOT_SETTINGS';
@@ -12,198 +21,122 @@ export const REMOVE_SETTING_FIELD = 'REMOVE_SETTING_FIELD';
 export const PUSH_TO_SETTING = 'PUSH_TO_SETTING';
 export const SET_FIELD_POSITION = 'SET_FIELD_POSITION';
 
-export function addPaymentGateway(gateway) {
-  return {
-    type: ADD_PAYMENT_GATEWAY,
-    gateway,
-  };
-}
+export const addPaymentGateway = gateway => ({
+  type: ADD_PAYMENT_GATEWAY,
+  gateway,
+});
 
-export function removePaymentGateway(gateway) {
-  return {
-    type: REMOVE_PAYMENT_GATEWAY,
-    gateway,
-  };
-}
+export const removePaymentGateway = gateway => ({
+  type: REMOVE_PAYMENT_GATEWAY,
+  gateway,
+});
 
-export function updatePaymentGateway(gateway) {
-  return {
-    type: UPDATE_PAYMENT_GATEWAY,
-    gateway,
-  };
-}
+export const updatePaymentGateway = gateway => ({
+  type: UPDATE_PAYMENT_GATEWAY,
+  gateway,
+});
 
-export function updateSetting(category, name, value) {
-  return {
-    type: UPDATE_SETTING,
-    category,
-    name,
-    value,
-  };
-}
+export const updateSetting = (category, name, value) => ({
+  type: UPDATE_SETTING,
+  category,
+  name,
+  value,
+});
 
-export function pushToSetting(category, value, path = null) {
-  return {
-    type: PUSH_TO_SETTING,
-    category,
-    path,
-    value,
-  };
-}
+export const pushToSetting = (category, value, path = null) => ({
+  type: PUSH_TO_SETTING,
+  category,
+  path,
+  value,
+});
 
-export function removeSettingField(category, name) {
-  return {
-    type: REMOVE_SETTING_FIELD,
-    category,
-    name
-  };
-}
+export const removeSettingField = (category, name) => ({
+  type: REMOVE_SETTING_FIELD,
+  category,
+  name,
+});
 
-function gotSettings(settings) {
-  return {
-    type: GOT_SETTINGS,
-    settings,
-  };
-}
+const gotSettings = settings => ({
+  type: GOT_SETTINGS,
+  settings,
+});
 
-function gotFile(fileData, path) {
-  return {
-    type: UPDATE_SETTING,
-    category: 'files',
-    name: path,
-    value: `data:image/png;base64,${fileData}`,
-  };
-}
+const gotFile = (fileData, path) => {
+  const value = `data:image/png;base64,${fileData}`;
+  return updateSetting('files', path, value);
+};
 
-function fetchSettings(categories) {
-  const queries = categories.map(category => ({
-    api: 'settings',
-    name: category,
-    params: [{ category }, { data: JSON.stringify({}) }],
-  }));
+export const setFieldPosition = (oldIndex, newIndex, path) => ({
+  type: SET_FIELD_POSITION,
+  oldIndex,
+  newIndex,
+  path,
+});
 
-  return dispatch => apiBillRun(queries).then(
-    (success) => {
-      dispatch(gotSettings(success.data));
-      return true;
-    }).catch((error) => {
-      dispatch(apiBillRunErrorHandler(error));
-      return false;
-    });
-}
-
-export function saveFile(file, metadata = {}) {
-  const formData = new FormData();
-  formData.append('action', 'save');
-  formData.append('metadata', JSON.stringify(metadata));
-  formData.append('query', JSON.stringify({ filename: 'file' }));
-  formData.append('file', file);
-
-  const query = {
-    api: 'files',
-    name: 'saveFile',
-    options: {
-      method: 'POST',
-      body: formData,
-    },
-  };
+export const saveFile = (file, metadata = {}) => {
+  const query = saveFileQuery(file, metadata);
   return apiBillRun(query);
-}
+};
 
-export function fetchFile(query, path = 'file') {
+export const fetchFile = (query, path = 'file') => (dispatch) => {
   const dataImage = localStorage.getItem(path);
   if (dataImage) {
-    return dispatch => dispatch(gotFile(dataImage, path));
+    return dispatch(gotFile(dataImage, path));
   }
-
-  const apiQuery = {
-    api: 'files',
-    params: [
-      { action: 'read' },
-      { query: JSON.stringify(query) },
-    ],
-  };
-  return dispatch => apiBillRun(apiQuery).then(
-    (success) => {
+  const apiQuery = getFileQuery(query);
+  return apiBillRun(apiQuery)
+    .then((success) => {
       if (success.data && success.data[0] && success.data[0].data && success.data[0].data.desc) {
         localStorage.setItem(path, success.data[0].data.desc);
         dispatch(gotFile(success.data[0].data.desc, path));
         return true;
       }
       return success;
-    }).catch((error) => {
+    })
+    .catch((error) => {
       dispatch(apiBillRunErrorHandler(error));
       return error;
     });
-}
+};
 
-function saveSettingsToDB(categories, settings) {
-  const multipleCategories = categories.length > 1;
-  const categoryData = categories.map((category) => {
+export const saveSettings = (categories = [], messages = {}) => (dispatch, getState) => {
+  const {
+    success: successMessage = 'Settings saved successfuly!',
+    error: errorMessage = 'Error saving settings',
+  } = messages;
+  dispatch(startProgressIndicator());
+  const { settings } = getState();
+  const categoriesToSave = Array.isArray(categories) ? categories : [categories];
+  const multipleCategories = categoriesToSave.length > 1;
+  const categoryData = categoriesToSave.map((category) => {
     let data = settings.getIn(category.split('.'));
     if (category === 'taxation') {
       data = data.set('vat', data.get('vat') / 100);
     }
-    if (multipleCategories) {
-      return ({ [category]: data });
-    }
-    return data;
+    return (multipleCategories) ? { [category]: data } : data;
   });
-
-  const category = multipleCategories ? 'ROOT' : categories[0];
+  const category = multipleCategories ? 'ROOT' : categoriesToSave[0];
   const data = multipleCategories ? categoryData : categoryData[0];
+  const queries = saveSettingsQuery(data, category);
 
-  const queries = ({
-    api: 'settings',
-    name: categories.join(','),
-    params: [
-      { category },
-      { action: 'set' },
-      { data: JSON.stringify(data) },
-    ],
-  });
+  return apiBillRun(queries)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, successMessage)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, errorMessage)));
+};
 
-  return (dispatch) => {
-    dispatch(startProgressIndicator());
-    return apiBillRun(queries).then(
-      (success) => {
-        dispatch(apiBillRunSuccessHandler(success, 'Settings saved successfuly!'));
-        return true;
-      }
-    ).catch((error) => {
-      dispatch(apiBillRunErrorHandler(error, 'Error saving settings'));
+export const getSettings = (categories = []) => (dispatch) => {
+  const categoriesToSave = Array.isArray(categories) ? categories : [categories];
+  const queries = categoriesToSave.map(category => getSettingsQuery(category));
+  return apiBillRun(queries)
+    .then((success) => {
+      dispatch(gotSettings(success.data));
+      return true;
+    })
+    .catch((error) => {
+      dispatch(apiBillRunErrorHandler(error));
       return false;
     });
-  };
-}
-
-export function getSettings(categories = []) {
-  if (!Array.isArray(categories)) {
-    categories = [categories];
-  }
-  return (dispatch) => {
-    return dispatch(fetchSettings(categories));
-  };
-}
-
-export function saveSettings(categories = []) {
-  if (!Array.isArray(categories)) {
-    categories = [categories];
-  }
-  return (dispatch, getState) => {
-    const { settings } = getState();
-    return dispatch(saveSettingsToDB(categories, settings));
-  };
-}
-
-export function setFieldPosition(oldIndex, newIndex, path) {
-  return {
-    type: SET_FIELD_POSITION,
-    oldIndex,
-    newIndex,
-    path,
-  };
-}
+};
 
 export const getCurrencies = () => (dispatch) => {
   const now = moment();
