@@ -1,59 +1,29 @@
-import React, { Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
-import { Tabs, Tab, Panel } from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Tab, Panel } from 'react-bootstrap';
+import TabsWrapper from '../Elements/TabsWrapper';
 import EventSettings from './EventSettings';
-import { tabSelector } from '../../selectors/entitySelector';
 
 
-class Events extends Component {
+const Events = ({ location }) => (
+  <div>
+    <TabsWrapper id="EventsTab" location={location}>
 
-  static defaultProps = {
-    activeTab: 1,
-  };
+      <Tab title="Events" eventKey={1}>
+        <Panel style={{ borderTop: 'none' }} />
+      </Tab>
 
-  static propTypes = {
-    activeTab: PropTypes.number,
-    location: PropTypes.shape({
-      pathname: PropTypes.string,
-      query: PropTypes.object,
-    }).isRequired,
-    router: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired,
-  };
+      <Tab title="Settings" eventKey={2}>
+        <Panel style={{ borderTop: 'none' }}>
+          <EventSettings />
+        </Panel>
+      </Tab>
 
-  handleSelectTab = (tab) => {
-    const { pathname, query } = this.props.location;
-    this.props.router.push({
-      pathname,
-      query: Object.assign({}, query, { tab }),
-    });
-  }
+    </TabsWrapper>
+  </div>
+);
 
-  render() {
-    const { activeTab } = this.props;
+Events.propTypes = {
+  location: PropTypes.object.isRequired,
+};
 
-    return (
-      <div>
-        <Tabs defaultActiveKey={activeTab} animation={false} id="EventsTab" onSelect={this.handleSelectTab}>
-
-          <Tab title="Events" eventKey={1}>
-            <Panel style={{ borderTop: 'none' }} />
-          </Tab>
-
-          <Tab title="Settings" eventKey={2}>
-            <Panel style={{ borderTop: 'none' }}>
-              <EventSettings />
-            </Panel>
-          </Tab>
-
-        </Tabs>
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = (state, props) => ({
-  activeTab: tabSelector(state, props, 'settings'),
-});
-export default withRouter(connect(mapStateToProps)(Events));
+export default Events;
