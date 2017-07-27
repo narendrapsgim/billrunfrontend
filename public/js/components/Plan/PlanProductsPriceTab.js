@@ -84,7 +84,8 @@ class PlanProductsPriceTab extends Component {
         const usaget = newProduct.get('rates', Immutable.Map()).keySeq().first();
         const productPath = ['rates', newProduct.get('key', ''), usaget, 'rate'];
         const newRates = getProductConvertedRates(propertyTypes, usageTypesData, newProduct, false);
-        this.props.dispatch(planProductsRateInit(newProduct.set('rates', newRates), productPath));
+        const newProductWithRates = !newRates.isEmpty() ? newProduct.set('rates', newRates) : newProduct;
+        this.props.dispatch(planProductsRateInit(newProductWithRates, productPath));
       }
     });
   }
