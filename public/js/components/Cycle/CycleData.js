@@ -22,6 +22,7 @@ class CycleData extends Component {
     baseFilter: PropTypes.object,
     reloadCycleData: PropTypes.func,
     showConfirmAllButton: PropTypes.bool,
+    isCycleConfirmed: PropTypes.bool,
     currency: PropTypes.string,
     invoicesNum: PropTypes.number,
   };
@@ -30,6 +31,7 @@ class CycleData extends Component {
     reloadCycleData: () => {},
     baseFilter: {},
     showConfirmAllButton: true,
+    isCycleConfirmed:false,
     currency: '',
     invoicesNum: 0,
   };
@@ -220,19 +222,42 @@ class CycleData extends Component {
     return (<Button onClick={onClick}>confirm</Button>);
   };
 
+  downloadTaxURL = (billrunKey) =>
+    `${getConfig('serverUrl')}/api/report?action=taxationReport&report={"billrun_key":"${billrunKey}"}&type=csv`;
+
+  parseTaxDownload = (entity) => {
+    const { billrunKey } =  this.props
+    const downloadUrl = this.downloadTaxURL( billrunKey );
+    return (
+      <form method="post" action={downloadUrl} target="_blank">
+        <Button className={entity.actionClass} bsStyle={entity.actionStyle} bsSize={entity.actionSize} type="submit">
+            {entity.label}
+        </Button>
+      </form>
+    );
+  };
+
   getListActions = () => {
-    const { showConfirmAllButton } = this.props;
-    if (!showConfirmAllButton) {
-      return [];
-    }
+    const { showConfirmAllButton, isCycleConfirmed } = this.props;
     return [{
-      label: 'Confirm All',
-      actionStyle: 'default',
-      showIcon: false,
-      onClick: this.onClickConfirmAll,
-      actionSize: 'xsmall',
-      actionClass: 'btn-primary',
-    }];
+ 	label: 'Confirm All',
+        actionStyle: 'default',
+        show :showConfirmAllButton,
+        showIcon: false,
+        onClick: this.onClickConfirmAll,
+        actionSize: 'xsmall',
+        actionClass: 'btn-primary',
+      },
+      {
+        label: 'Download Taxation compliance report',
+        actionStyle: 'default',
+        show : isCycleConfirmed,
+        showIcon: false,
+        renderFunc : this.parseTaxDownload,
+        actionSize: 'xsmall',
+        actionClass: 'btn-primary',
+      }
+    ];
   }
 
   onCloseConfirmationModal = () => {

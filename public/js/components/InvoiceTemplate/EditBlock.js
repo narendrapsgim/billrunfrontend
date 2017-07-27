@@ -1,66 +1,90 @@
-import React from 'react';
+import React, { PureComponent, PropTypes } from 'react';
 import { Panel, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
-import MailEditorRich from '../MailEditor/MailEditorRich';
+import Field from '../Field';
 
-const EditBlock = (props) => {
-  const loadTemplate = (index) => {
-    if (typeof props.loadTemplate === 'function') {
-      props.loadTemplate(props.name, index);
-    }
+
+class EditBlock extends PureComponent {
+
+  static propTypes = {
+    content: PropTypes.string,
+    fields: PropTypes.array,
+    templates: PropTypes.array,
+    enabled: PropTypes.bool,
+    name: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    loadTemplate: PropTypes.func,
+    onChangeStatus: PropTypes.func,
   };
 
-  const onChange = (content) => {
-    props.onChange(props.name, content);
+  static defaultProps = {
+    content: '',
+    fields: [],
+    templates: [],
+    enabled: false,
+    loadTemplate: () => {},
+    onChangeStatus: () => {},
   };
 
-  const loadTemplateBtn = (
-    <ButtonToolbar>
-      <DropdownButton bsSize="xsmall" title={props.loadTemplateLabel} id="dropdown-size-medium" onSelect={loadTemplate}>
-        { props.templates.map((name, key) => <MenuItem key={key} eventKey={key}>{name}</MenuItem>) }
-      </DropdownButton>
-    </ButtonToolbar>
-  );
+  loadTemplate = (index) => {
+    const { name } = this.props;
+    this.props.loadTemplate(name, index);
+  };
 
-  const panelHeader = (
-    <span>{`Invoice ${props.name}`}
-      { props.loadTemplate && props.templates.length > 0 &&
-        <span className="pull-right">{loadTemplateBtn}
-        </span>
-      }
-    </span>
-  );
+  onChange = (content) => {
+    const { name } = this.props;
+    this.props.onChange(name, content);
+  };
 
-  return (
-    <Panel header={panelHeader}>
-      <MailEditorRich
-        value={props.content}
-        editorName={`editor-${props.name}`}
-        name={props.name}
-        configPath="config-br-invoices.js"
-        editorHeight={150}
-        fields={props.fields}
-        onChange={onChange}
-      />
-    </Panel>
-  );
-};
+  onChangeStatus = (e) => {
+    const { value } = e.target;
+    const { name } = this.props;
+    this.props.onChangeStatus(name, value);
+  };
 
-EditBlock.defaultProps = {
-  content: '',
-  fields: [],
-  templates: [],
-  loadTemplate: null,
-  loadTemplateLabel: 'Load default',
-};
+  renderPanelHeader = () => {
+    const { name, templates, enabled } = this.props;
+    return (
+      <span>{`Invoice ${name}`}
+        <div className="pull-right">
+          { templates.length > 0 && (
+            <ButtonToolbar className="inline" style={{ verticalAlign: 'middle' }}>
+              <DropdownButton bsSize="xsmall" title="Load default" id="dropdown-size-medium" onSelect={this.loadTemplate}>
+                { templates.map((template, key) => (
+                  <MenuItem key={key} eventKey={key}>{template}</MenuItem>
+                ))}
+              </DropdownButton>
+            </ButtonToolbar>
+          )}
+          <div className="inline" style={{ marginLeft: (templates.length) ? 10 : 0 }}>
+            <Field
+              fieldType="checkbox"
+              value={enabled}
+              onChange={this.onChangeStatus}
+              label="Enable"
+            />
+          </div>
+        </div>
+      </span>
+    );
+  }
 
-EditBlock.propTypes = {
-  content: React.PropTypes.string,
-  loadTemplateLabel: React.PropTypes.string,
-  fields: React.PropTypes.array,
-  templates: React.PropTypes.array,
-  loadTemplate: React.PropTypes.func,
-  name: React.PropTypes.string.isRequired,
-  onChange: React.PropTypes.func.isRequired,
-};
+  render() {
+    const { name, content, fields } = this.props;
+    return (
+      <Panel header={this.renderPanelHeader()}>
+        <Field
+          fieldType="textEditor"
+          value={content}
+          editorName={`editor-${name}`}
+          name={name}
+          configName="invoices"
+          editorHeight={150}
+          fields={fields}
+          onChange={this.onChange}
+        />
+      </Panel>
+    );
+  }
+}
 
 export default EditBlock;

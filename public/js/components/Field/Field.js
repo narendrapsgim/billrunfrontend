@@ -16,6 +16,7 @@ import Checkbox from '../FieldTypes/Checkbox';
 import Radio from '../FieldTypes/Radio';
 import Salutation from '../FieldTypes/Salutation';
 import ToggeledInput from '../FieldTypes/ToggeledInput';
+import TextEditor from '../FieldTypes/TextEditor';
 
 class Field extends React.Component {
   constructor(props) {
@@ -71,6 +72,8 @@ class Field extends React.Component {
         return (<Radio onChange={onChange} id={id} name={name} value={value} editable={editable} disabled={disabled} checked={checked} label={label} />);
       case 'salutation':
         return (<Salutation {...this.props} />);
+      case 'textEditor':
+        return (<TextEditor {...otherProps} onChange={onChange} value={value} editable={editable} disabled={disabled} />);
       default:
         return (<Text {...otherProps} onChange={onChange} id={id} value={value} editable={editable} required={required} disabled={disabled} />);
     }
