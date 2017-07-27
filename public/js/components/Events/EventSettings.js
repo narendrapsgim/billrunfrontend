@@ -1,9 +1,10 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
-import { Panel, Col, Row, Form, FormGroup, ControlLabel } from 'react-bootstrap';
+import { Panel, Col, Form, FormGroup, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
-import { updateSetting } from '../../actions/settingsActions';
+import { ActionButtons } from '../Elements';
+import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
 import { eventsSettingsSelector } from '../../selectors/settingsSelector';
 import Field from '../Field';
 import Help from '../Help';
@@ -19,9 +20,8 @@ class EventSettings extends Component {
     eventsSettings: Immutable.Map(),
   };
 
-  state = {
-    currentItem: null,
-    index: -1,
+  componentWillMount() {
+    this.props.dispatch(getSettings(['events']));
   }
 
   onChange = eventNotifier => (e) => {
@@ -31,6 +31,10 @@ class EventSettings extends Component {
 
   onChangeSelect = (eventNotifier, id) => (value) => {
     this.props.dispatch(updateSetting('events', ['settings', eventNotifier, id], value));
+  }
+
+  onSave = () => {
+    this.props.dispatch(saveSettings(['events']));
   }
 
   methodOptions = [{ value: 'post', label: 'POST' }, { value: 'get', label: 'GET' }];
@@ -86,14 +90,17 @@ class EventSettings extends Component {
     )).toList();
   }
 
+  renderSaveButton = () => (<ActionButtons onClickSave={this.onSave} hideCancel={true} />);
+
   render() {
     return (
       <div>
-        <Row>
-          <Col sm={12}>
-            { this.renderSettings() }
-          </Col>
-        </Row>
+        <Col sm={12}>
+          { this.renderSettings() }
+        </Col>
+        <Col sm={12}>
+          { this.renderSaveButton() }
+        </Col>
       </div>
     );
   }

@@ -3,8 +3,6 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import EventSettings from './EventSettings';
-import { ActionButtons } from '../Elements';
-import { getSettings, saveSettings } from '../../actions/settingsActions';
 import { tabSelector } from '../../selectors/entitySelector';
 
 
@@ -24,20 +22,12 @@ class Events extends Component {
     dispatch: PropTypes.func.isRequired,
   };
 
-  componentWillMount() {
-    this.props.dispatch(getSettings(['events']));
-  }
-
   handleSelectTab = (tab) => {
     const { pathname, query } = this.props.location;
     this.props.router.push({
       pathname,
       query: Object.assign({}, query, { tab }),
     });
-  }
-
-  onSave = () => {
-    this.props.dispatch(saveSettings(['events']));
   }
 
   render() {
@@ -58,9 +48,6 @@ class Events extends Component {
           </Tab>
 
         </Tabs>
-
-        <ActionButtons onClickSave={this.onSave} hideCancel={true} hideSave={activeTab === 5} />
-
       </div>
     );
   }
