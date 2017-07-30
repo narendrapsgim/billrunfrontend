@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import Immutable from 'immutable';
 import { onBoardingStates } from '../actions/guiStateActions/pageActions';
 
 
@@ -43,4 +44,25 @@ const getConfirm = state => state.guiState.page.getIn(['confirm']);
 export const confirmSelector = createSelector(
   getConfirm,
   confirm => confirm,
+);
+
+const getMainMenu = state => state.guiState.menu.getIn(['main']);
+export const permissionsSelector = createSelector(
+  getMainMenu,
+  (mainMenu = Immutable.Map()) => mainMenu
+    .reduce((acc, menuItem) => {
+      if (!menuItem.get('subMenus', Immutable.List()).isEmpty()) {
+        return acc.push(...menuItem.get('subMenus', Immutable.List()))
+      }
+      return acc;
+    }, mainMenu)
+    .reduce((acc, menuItem) => {
+      if (menuItem.get('route', '') !== '') {
+        const routePermission = Immutable.Map({
+          'view':  menuItem.get('roles', Immutable.List())
+        });
+        return acc.set(menuItem.get('route', '-'), routePermission)
+      }
+      return acc;
+    }, Immutable.Map())
 );
