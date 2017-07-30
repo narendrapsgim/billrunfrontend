@@ -79,7 +79,10 @@ var globalSetting = {
         { id: 'plan', inputConfig: { inputType: 'select', callback: 'getPlansOptions' } },
         { id: 'usaget', inputConfig: { inputType: 'select', callback: 'getUsageTypesOptions' } },
       ],
-      subscribers: [],
+      subscribers: [
+        { id: 'plan_activation', type:'date' },
+        { id: 'deactivation_date', type:'date' },
+      ],
       account: [],
     },
     conditionsOperators: [
