@@ -298,7 +298,9 @@ const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type
       });
     });
   });
-  return convertedRates;
+  return !convertedRates.isEmpty()
+    ? convertedRates
+    : Immutable.Map();
 };
 
 export const getProductConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit = true) => getItemConvertedRates(propertyTypes, usageTypes, item, toBaseUnit, 'product');
@@ -317,7 +319,9 @@ export const getPlanConvertedPpThresholds = (propertyTypes, usageTypes, ppInclud
       }
     });
   });
-  return convertedPpThresholds;
+  return !convertedPpThresholds.isEmpty()
+    ? convertedPpThresholds
+    : Immutable.Map();
 };
 
 export const getPlanConvertedNotificationThresholds = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
@@ -335,7 +339,9 @@ export const getPlanConvertedNotificationThresholds = (propertyTypes, usageTypes
       }
     });
   });
-  return convertedPpThresholds;
+  return !convertedPpThresholds.isEmpty()
+    ? convertedPpThresholds
+    : Immutable.Map();
 };
 
 export const getPlanConvertedPpIncludes = (propertyTypes, usageTypes, ppIncludes, item, toBaseUnit = true) => { // eslint-disable-line max-len
@@ -352,7 +358,9 @@ export const getPlanConvertedPpIncludes = (propertyTypes, usageTypes, ppIncludes
       }
     });
   });
-  return convertedIncludes;
+  return !convertedIncludes.isEmpty()
+    ? convertedIncludes
+    : Immutable.Map();
 };
 
 export const getGroupUsaget = (group) => {
@@ -376,5 +384,7 @@ export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBase
       }
     });
   });
-  return convertedIncludes;
+  return !convertedIncludes.isEmpty()
+    ? convertedIncludes
+    : Immutable.Map();
 };

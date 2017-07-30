@@ -1,2 +1,3 @@
-import InvoiceTemplate from './InvoiceTemplate';
+import InvoiceTemplate from './InvoiceTemplateContainer';
+
 export default InvoiceTemplate;

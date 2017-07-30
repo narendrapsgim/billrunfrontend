@@ -74,7 +74,9 @@ export const saveProduct = (product, action) => (dispatch, getState) => {
   const propertyTypes = propertyTypeSelector(state);
   const rates = getProductConvertedRates(propertyTypes, usageTypesData, product, true);
   const convertedProduct = product.withMutations((itemWithMutations) => {
-    itemWithMutations.set('rates', rates);
+    if (!rates.isEmpty()) {
+      itemWithMutations.set('rates', rates);
+    }
   });
   return dispatch(saveEntity('rates', convertedProduct, action));
 };
@@ -92,7 +94,9 @@ export const getProduct = id => (dispatch, getState) => {
       const product = Immutable.fromJS(item);
       const rates = getProductConvertedRates(propertyTypes, usageTypesData, product, false);
       const convertedProduct = product.withMutations((itemWithMutations) => {
-        itemWithMutations.set('rates', rates);
+        if (!rates.isEmpty()) {
+          itemWithMutations.set('rates', rates);
+        }
       }).toJS();
       dispatch(gotItem(convertedProduct));
       return dispatch(apiBillRunSuccessHandler(response));

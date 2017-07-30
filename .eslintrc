@@ -34,5 +34,6 @@
   "globals": {
       "globalSetting": false,
       "CKEDITOR": false,
+      "_PRODUCTION_": false,
     }
 }

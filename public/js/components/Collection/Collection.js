@@ -7,7 +7,6 @@ import Help from '../Help';
 import Field from '../Field';
 import ActionButtons from '../Elements/ActionButtons';
 import { ConfirmModal } from '../../components/Elements';
-import MailEditorRich from '../MailEditor/MailEditorRich';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { getSettings } from '../../actions/settingsActions';
@@ -227,7 +226,14 @@ class Collection extends Component {
                   </FormGroup>
 
                   <div>
-                    <MailEditorRich value={item.getIn(['content', 'body'])} editorName="editor" fields={fieldsList} onChange={this.onChangeBody} />
+                    <Field
+                      fieldType="textEditor"
+                      value={item.getIn(['content', 'body'])}
+                      editorName="editor"
+                      fields={fieldsList}
+                      onChange={this.onChangeBody}
+                      configName="mails"
+                    />
                   </div>
                 </div>
               </div>
