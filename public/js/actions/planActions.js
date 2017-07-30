@@ -153,11 +153,17 @@ const convertPlan = (getState, plan, convertToBaseUnit) => {
     ? getPlanConvertedIncludes(propertyTypes, usageTypesData, plan, convertToBaseUnit)
     : null;
   return plan.withMutations((itemWithMutations) => {
-    itemWithMutations.set('rates', rates);
+    if (!rates.isEmpty()) {
+      itemWithMutations.set('rates', rates);
+    }
     if (isPrepaidPlan) {
-      itemWithMutations.set('pp_threshold', ppThresholds);
-      itemWithMutations.set('notifications_threshold', notificationsThresholds);
-    } else {
+      if (!ppThresholds.isEmpty()) {
+        itemWithMutations.set('pp_threshold', ppThresholds);
+      }
+      if (!notificationsThresholds.isEmpty()) {
+        itemWithMutations.set('notifications_threshold', notificationsThresholds);
+      }
+    } else if (!planIncludes.isEmpty()) {
       itemWithMutations.set('include', planIncludes);
     }
   });
@@ -170,7 +176,9 @@ const convertPrepaidGroup = (getState, prepaidGroup, convertToBaseUnit) => {
   const prepaidIncludes = state.list.get('pp_includes');
   const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, prepaidGroup, convertToBaseUnit); // eslint-disable-line max-len
   return prepaidGroup.withMutations((itemWithMutations) => {
-    itemWithMutations.set('include', includes);
+    if (!includes.isEmpty()) {
+      itemWithMutations.set('include', includes);
+    }
   });
 };
 
