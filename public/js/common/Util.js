@@ -1,27 +1,44 @@
 import Immutable from 'immutable';
 import moment from 'moment';
 import changeCase from 'change-case';
-import FieldNames from '../FieldNames';
+import fieldNamesConfig from '../config/fieldNames.json';
+import reportConfig from '../config/report'
+import systemItemsConfig from '../config/entities.json'
+import mainMenu from '../config/mainMenu.json';
 
 /**
- * Get data from globalSettings.js file
- * @param  {[String/Array of strings]} key/path in globalSettings
+ * Get data from config files
+ * @param  {[String/Array of strings]} key/path in config
  * @param  {[Any]} [defaultValue=null] If key/Path not exist
- * @return {[Any]} Value from globalSettings.js or default value if key/path not exist
+ * @return {[Any]} Value from config or default value if key/path not exist
  */
+
+let configCache = Immutable.Map();
 export const getConfig = (key, defaultValue = null) => {
   const path = Array.isArray(key) ? key : [key];
-  return Immutable.fromJS(globalSetting).getIn(path, defaultValue);
+  if (configCache.isEmpty()) {
+    configCache = Immutable.fromJS(globalSetting)
+  }
+  if(!configCache.has(path[0])) {
+    switch (path[0]) {
+      case 'reports': configCache = configCache.set('reports', Immutable.fromJS(reportConfig));
+        break;
+      case 'fieldNames': configCache = configCache.set('fieldNames', Immutable.fromJS(fieldNamesConfig));
+        break;
+      case 'systemItems': configCache = configCache.set('systemItems', Immutable.fromJS(systemItemsConfig));
+        break;
+      case 'mainMenu': configCache = configCache.set('mainMenu', Immutable.fromJS(mainMenu));
+        break;
+      default: console.log(`Config caregory not exists ${path}`);
+    }
+  }
+  return configCache.getIn(path, defaultValue);
 };
 
 export const titlize = str => changeCase.upperCaseFirst(str);
 
-export const getFieldName = (field, category) => {
-  if (FieldNames[category]) {
-    return FieldNames[category][field] || field;
-  }
-  return FieldNames[field] || field;
-};
+export const getFieldName = (field, category) =>
+  getConfig(['fieldNames', category,field], getConfig(['fieldNames', field], field));
 
 export const getFieldNameType = (type) => {
   switch (type) {
@@ -30,6 +47,7 @@ export const getFieldNameType = (type) => {
       return 'account';
     case 'subscription':
     case 'subscriptions':
+    case 'subscribers':
       return 'subscription';
     case 'lines':
     case 'usage':
