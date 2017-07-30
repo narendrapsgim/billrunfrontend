@@ -18,6 +18,7 @@ class Details extends Component {
   static propTypes = {
     title: PropTypes.string,
     entity: PropTypes.string,
+    entities: PropTypes.instanceOf(Immutable.List),
     type: PropTypes.number,
     mode: PropTypes.string,
     onChangeKey: PropTypes.func,
@@ -28,6 +29,7 @@ class Details extends Component {
   static defaultProps = {
     title: '',
     entity: '',
+    entities: Immutable.List(),
     type: 0,
     mode: 'update',
     onChangeKey: () => {},
@@ -54,13 +56,15 @@ class Details extends Component {
     this.props.onChangeEntity(e);
   };
 
-  getEntityOptions = () => getConfig(['reports', 'entities'], Immutable.List())
-    .map(option => Immutable.Map({
+  getEntityOptions = () => {
+    const { entities } = this.props;
+    return entities.map(option => Immutable.Map({
       value: option,
       label: titleCase(getConfig(['systemItems', option, 'itemName'], option)),
     }))
     .map(formatSelectOptions)
     .toArray();
+  }
 
   onChangeTypeGrouped = () => {
     this.props.onChangeType(reportTypes.GROPPED);
