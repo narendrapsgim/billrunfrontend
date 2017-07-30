@@ -62,7 +62,9 @@ const convertService = (getState, service, convertToBaseUnit) => {
   const propertyTypes = propertyTypeSelector(state);
   const serviceIncludes = getPlanConvertedIncludes(propertyTypes, usageTypesData, service, convertToBaseUnit); // eslint-disable-line max-len
   return service.withMutations((itemWithMutations) => {
-    itemWithMutations.set('include', serviceIncludes);
+    if (!serviceIncludes.isEmpty()) {
+      itemWithMutations.set('include', serviceIncludes);
+    }
   });
 };
 

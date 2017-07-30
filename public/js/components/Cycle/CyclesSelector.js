@@ -18,6 +18,7 @@ class CyclesSelector extends Component {
     multi: PropTypes.bool,
     from:PropTypes.string,
     to:PropTypes.string,
+    newestFirst: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -28,11 +29,12 @@ class CyclesSelector extends Component {
     id: 'cycle',
     multi: false,
     from:"",
-    to:""
+    to:"",
+    newestFirst: true
   };
 
   componentDidMount() {
-    this.props.dispatch(getList('cycles_list', getCyclesQuery(this.props.from,this.props.to)));
+    this.props.dispatch(getList('cycles_list', getCyclesQuery(this.props.from,this.props.to,this.props.newestFirst)));
   }
 
   componentWillUnmount() {

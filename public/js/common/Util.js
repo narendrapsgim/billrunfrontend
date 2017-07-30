@@ -316,7 +316,7 @@ const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type
       });
     });
   });
-  return !Immutable.is(convertedRates, Immutable.List())
+  return !convertedRates.isEmpty()
     ? convertedRates
     : Immutable.Map();
 };
@@ -337,7 +337,7 @@ export const getPlanConvertedPpThresholds = (propertyTypes, usageTypes, ppInclud
       }
     });
   });
-  return !Immutable.is(convertedPpThresholds, Immutable.List())
+  return !convertedPpThresholds.isEmpty()
     ? convertedPpThresholds
     : Immutable.Map();
 };
@@ -357,7 +357,7 @@ export const getPlanConvertedNotificationThresholds = (propertyTypes, usageTypes
       }
     });
   });
-  return !Immutable.is(convertedPpThresholds, Immutable.List())
+  return !convertedPpThresholds.isEmpty()
     ? convertedPpThresholds
     : Immutable.Map();
 };
@@ -376,7 +376,9 @@ export const getPlanConvertedPpIncludes = (propertyTypes, usageTypes, ppIncludes
       }
     });
   });
-  return convertedIncludes;
+  return !convertedIncludes.isEmpty()
+    ? convertedIncludes
+    : Immutable.Map();
 };
 
 export const getGroupUsaget = (group) => {
@@ -400,5 +402,7 @@ export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBase
       }
     });
   });
-  return convertedIncludes;
+  return !convertedIncludes.isEmpty()
+    ? convertedIncludes
+    : Immutable.Map();
 };

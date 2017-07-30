@@ -12,7 +12,10 @@ class EntityFields extends Component {
 
   static propTypes = {
     entity: PropTypes.instanceOf(Immutable.Map),
-    entityName: PropTypes.string.isRequired,
+    entityName: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.string),
+    ]).isRequired,
     fields: PropTypes.instanceOf(Immutable.List),
     fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
