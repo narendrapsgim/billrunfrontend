@@ -10,6 +10,7 @@ import Actions from '../Elements/Actions';
 import Field from '../Field';
 import Credit from '../Credit/Credit';
 import { EntityRevisionDetails } from '../Entity';
+import EntityFields from '../Entity/EntityFields';
 import {
   getConfig,
   getItemId,
@@ -47,12 +48,10 @@ class Subscription extends Component {
 
   constructor(props) {
     super(props);
-    const customFields = this.initCustomFields(props.settings);
     this.state = {
       subscription: props.subscription,
       showCreditCharge: false,
       progress: false,
-      customFields,
     };
   }
 
@@ -60,37 +59,6 @@ class Subscription extends Component {
     if (!Immutable.is(this.props.subscription, nextProps.subscription)) {
       this.setState({ subscription: nextProps.subscription });
     }
-    if (!Immutable.is(this.props.settings, nextProps.settings)) {
-      const customFields = this.initCustomFields(nextProps.settings);
-      this.setState({ customFields });
-    }
-  }
-
-  initCustomFields = (settings) => {
-    if (!Immutable.List.isList(settings)) {
-      return Immutable.List();
-    }
-    const FieldData = Immutable.Record({
-      fieldName: '',
-      value: '',
-      type: 'text',
-      label: '',
-      params: null,
-    });
-
-    return Immutable.Map().withMutations((customFieldsWithMutations) => {
-      settings
-        .filter(this.filterCustomFields)
-        .forEach((field) => {
-          const fieldData = new FieldData({
-            fieldName: field.get('field_name'),
-            type: field.get('select_list', false) ? 'select' : 'text',
-            label: field.get('title', ''),
-            params: field.get('select_list', false) ? field.get('select_options', '').split(',') : null,
-          });
-          customFieldsWithMutations.set(field.get('field_name', 'defaultFieldName'), fieldData);
-        });
-    });
   }
 
   onSave = () => {
@@ -177,15 +145,6 @@ class Subscription extends Component {
     });
   }
 
-  onChangeCustomFields = (e) => {
-    const { value, id } = e.target;
-    this.updateSubscriptionField([id], value);
-  }
-
-  onChangeCustomFieldsSelect = id => (value) => {
-    this.updateSubscriptionField([id], value);
-  }
-
   onShowCreditCharge = () => {
     this.setState({ showCreditCharge: true });
   }
@@ -199,11 +158,6 @@ class Subscription extends Component {
     const newSubscription = subscription.setIn(path, value);
     this.setState({ subscription: newSubscription });
   }
-
-  getSelectValues = options => options.map(option => ({
-    value: option,
-    label: option,
-  }))
 
   formatSelectOptions = items => items.map(item => ({
     value: item.get('name', ''),
@@ -265,39 +219,6 @@ class Subscription extends Component {
         </Col>
       </FormGroup>
     )]);
-  }
-
-  renderCustomFields = (editable) => {
-    const { subscription, customFields } = this.state;
-    return customFields.map((fieldData, key) => {
-      const { label, params, type, fieldName } = fieldData;
-      return (
-        <FormGroup key={key}>
-          <Col componentClass={ControlLabel} sm={2}>
-            { label.length > 0 ? label : titleCase(getFieldName(key, 'subscription')) }
-          </Col>
-          <Col sm={7}>
-            { type === 'select' && editable
-              ? (
-                <Select
-                  options={this.getSelectValues(params)}
-                  value={subscription.get(fieldName, '')}
-                  onChange={this.onChangeCustomFieldsSelect(key)}
-                />
-                )
-              : (
-                <Field
-                  value={subscription.get(fieldName, '')}
-                  onChange={this.onChangeCustomFields}
-                  id={key}
-                  editable={editable}
-                />
-              )
-            }
-          </Col>
-        </FormGroup>
-      );
-    }).toArray();
   }
 
   renderServisesQuentity = (editable) => {
@@ -399,7 +320,13 @@ class Subscription extends Component {
             { servisesQuentity.length > 0 && <hr />}
             { servisesQuentity.length > 0 && servisesQuentity }
             <hr />
-            { this.renderCustomFields(allowEdit) }
+            <EntityFields
+              entityName={['subscribers', 'subscriber']}
+              entity={subscription}
+              onChangeField={this.updateSubscriptionField}
+              fieldsFilter={this.filterCustomFields}
+              editable={allowEdit}
+            />
             { allowAddCredit && <hr /> }
             { allowAddCredit && this.renderCreditCharge() }
           </Form>

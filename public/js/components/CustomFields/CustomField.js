@@ -78,7 +78,7 @@ class CustomField extends Component {
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Editable</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="editable" onChange={this.onChange} value={field.get('editable', false)} fieldType="checkbox" />
+              <Field id="editable" onChange={this.onChange} value={field.get('editable', true)} fieldType="checkbox" />
             </Col>
           </FormGroup>
 

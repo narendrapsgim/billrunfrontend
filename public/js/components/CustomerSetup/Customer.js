@@ -4,10 +4,8 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { Form, FormGroup, Col, Button, ControlLabel, Row } from 'react-bootstrap';
-import Select from 'react-select';
 import { getSymbolFromCurrency } from 'currency-symbol-map';
 import classNames from 'classnames';
-import Field from '../Field';
 import { rebalanceAccount, getCollectionDebt } from '../../actions/customerActions';
 import { ConfirmModal } from '../../components/Elements';
 import { currencySelector } from '../../selectors/settingsSelector';
@@ -15,6 +13,7 @@ import OfflinePayment from '../Payments/OfflinePayment';
 import CyclesSelector from '../Cycle/CyclesSelector';
 import { getExpectedInvoiceQuery } from '../../common/ApiQueries'
 import { buildRequestUrl } from '../../common/Api'
+import EntityFields from '../Entity/EntityFields';
 
 class Customer extends Component {
 
@@ -79,18 +78,16 @@ class Customer extends Component {
       });
   }
 
-  onSelect = (value, field) => {
-    const e = { target: { id: field[0].field, value } };
-    this.props.onChange(e);
-  };
-
   onChangePaymentGateway = () => {
     const { customer } = this.props;
     const aid = customer.get('aid', null);
     this.props.onChangePaymentGateway(aid);
   }
 
-  filterPrinableFields = field => (field.get('display') !== false && field.get('editable') !== false);
+  onChangeCustomField = (fieldPath, value) => {
+    const e = { target: { id: fieldPath, value } };
+    this.props.onChange(e);
+  };
 
   renderPaymentGatewayLabel = () => {
     const { customer, supportedGateways } = this.props;
@@ -153,46 +150,6 @@ class Customer extends Component {
       return (<p className="danger-red">In collection from {fromDate}</p>);
     }
     return null;
-  }
-
-  renderSelectInput = (field) => {
-    const { customer } = this.props;
-    const fieldName = field.get('field_name');
-    const options = field.get('select_options', '')
-      .split(',')
-      .map(val => ({
-        field: field.get('field_name'),
-        value: val,
-        label: val,
-      }));
-    return (
-      <Select id={fieldName} onChange={this.onSelect} options={options} value={customer.get(fieldName, '')} />
-    );
-  }
-
-  renderField = (field, key) => {
-    const { customer, onChange } = this.props;
-    const fieldName = field.get('field_name');
-    return (
-      <FormGroup controlId={fieldName} key={key} >
-        <Col componentClass={ControlLabel} md={2}>
-          { field.get('title', fieldName) }
-        </Col>
-        <Col sm={7}>
-          { field.get('select_list', false)
-            ? this.renderSelectInput(field)
-            : <Field onChange={onChange} id={fieldName} value={customer.get(fieldName, '')} />
-          }
-        </Col>
-      </FormGroup>
-    );
-  }
-
-  renderFields = () => {
-    const { fields } = this.props;
-    return fields
-      .filter(this.filterPrinableFields)
-      .map(this.renderField);
   }
 
   onClickRebalance = () => {
@@ -307,6 +264,7 @@ class Customer extends Component {
                                                   multi={false}
                                                   from={moment().subtract(6,'month').format(globalSetting.apiDateTimeFormat)}
                                                   to={moment().add(6,'month').format(globalSetting.apiDateTimeFormat)}
+                                                  newestFirst={false}
                                                 />
                                             </span>
         <Button bsSize="small" className="btn-primary inline" disabled={!expectedCyclesNames} onClick={this.onClickExpectedInvoice}>Generate expected invoice</Button>
@@ -324,7 +282,11 @@ class Customer extends Component {
     return (
       <div className="Customer">
         <Form horizontal>
-          { this.renderFields() }
+          <EntityFields
+            entityName={['subscribers', 'account']}
+            entity={customer}
+            onChangeField={this.onChangeCustomField}
+          />
           { (action !== 'create') && this.renderChangePaymentGateway() }
           { (action !== 'create') && this.renderDebt() }
         </Form>
