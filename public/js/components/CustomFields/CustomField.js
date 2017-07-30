@@ -35,6 +35,9 @@ class CustomField extends Component {
     const { entity, idx } = this.props;
     const { id, value } = e.target;
     this.props.onChange(entity, idx, id, value);
+    if (id === 'unique' && value === true) {
+      this.props.onChange(entity, idx, 'mandatory', true);
+    }
   };
 
   onRemove = () => {
@@ -68,14 +71,14 @@ class CustomField extends Component {
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Mandatory</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', false)} fieldType="checkbox" />
+              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', false)} fieldType="checkbox" disabled={field.get('unique', false)} />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Editable</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="editable" onChange={this.onChange} value={field.get('editable', false)} fieldType="checkbox" />
+              <Field id="editable" onChange={this.onChange} value={field.get('editable', true)} fieldType="checkbox" />
             </Col>
           </FormGroup>
 

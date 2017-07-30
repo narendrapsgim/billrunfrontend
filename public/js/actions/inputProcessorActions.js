@@ -61,6 +61,8 @@ const convert = (settings) => {
     file_type: settings.file_type,
     delimiter_type: parser.type,
     delimiter: parser.separator,
+    csv_has_header: parser.csv_has_header,
+    csv_has_footer: parser.csv_has_footer,
     usaget_type,
     type: settings.type,
     fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),

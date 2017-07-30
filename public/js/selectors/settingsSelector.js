@@ -24,8 +24,10 @@ const getPropertyTypes = (state, props) => // eslint-disable-line no-unused-vars
 const getBillrun = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('billrun');
 
-const getEntityFields = (state, props) =>
-  state.settings.getIn([props.entityName, 'fields']);
+const getEntityFields = (state, props) => {
+  const entityName = Array.isArray(props.entityName) ? props.entityName : [props.entityName];
+  return state.settings.getIn([...entityName, 'fields']);
+};
 
 const getMinEntityDate = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('minimum_entity_start_date');
@@ -38,6 +40,9 @@ const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-v
 
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['rates', 'fields']);
+
+const getInvoiceExport = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.get('invoice_export');
 
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
@@ -304,24 +309,24 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
   return fields
     .filter(field => !excludeFields.get('base', Immutable.List()).includes(field.get('id', '')))
     .withMutations((fieldsWithMutations) => {
-      joinFields.forEach((entityfields, entity) => {
-        const entityLabel = sentenceCase(getConfig(['systemItems', entity, 'itemName'], entity));
-        if (!entityfields.isEmpty()) {
-          entityfields.forEach((entityfield) => {
+    joinFields.forEach((entityfields, entity) => {
+      const entityLabel = sentenceCase(getConfig(['systemItems', entity, 'itemName'], entity));
+      if (!entityfields.isEmpty()) {
+        entityfields.forEach((entityfield) => {
             if (!excludeFields.get(entity, Immutable.List()).includes(entityfield.get('id', ''))) {
-              const joinId = `$${entity}.${entityfield.get('id', '')}`;
-              const joinTitle = `${entityLabel}: ${entityfield.get('title', entityfield.get('id', ''))}`;
+          const joinId = `$${entity}.${entityfield.get('id', '')}`;
+          const joinTitle = `${entityLabel}: ${entityfield.get('title', entityfield.get('id', ''))}`;
               const joinField = entityfield.withMutations(field => field
                 .set('id', joinId)
                 .set('title', joinTitle)
                 .set('entity', entity),
               );
-              fieldsWithMutations.push(joinField);
+          fieldsWithMutations.push(joinField);
             }
-          });
-        }
-      });
+        });
+      }
     });
+  });
 };
 
 const selectReportFields = (subscriberFields, accountFields, linesFileds) => {
@@ -334,8 +339,8 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds) => {
     base: Immutable.List(['firstname', 'lastname']),
   });
   const usage = concatJoinFields(linesFileds, Immutable.Map({
-    subscription: subscriberFields,
-    customer: accountFields,
+  subscription: subscriberFields,
+  customer: accountFields,
   }), usageExcludeIds);
 
   // const subscription = subscriberFields;
@@ -343,7 +348,7 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds) => {
     customer: Immutable.List(['aid', 'type']),
     usage: Immutable.List(['firstname', 'lastname', 'sid', 'aid', 'plan']),
     base: Immutable.List([]),
-  });
+});
   const subscription = concatJoinFields(subscriberFields, Immutable.Map({
     customer: accountFields,
     usage: linesFileds,
@@ -368,11 +373,11 @@ const mergeEntityAndReportConfigFields = (fields, type) => { // 'account' 'subsc
   const defaultField = Immutable.Map({
     searchable: true,
     aggregatable: true,
-  });
+    });
   return Immutable.List().withMutations((fieldsWithMutations) => {
     //Push all fields from Billrun config
     entityFields.forEach((entityField) => {
-      fieldsWithMutations.push(entityField);
+        fieldsWithMutations.push(entityField);
     });
     // Push report config fields or overide if exist
     predefinedFileds.forEach((predefinedFiled) => {
@@ -389,8 +394,8 @@ const mergeEntityAndReportConfigFields = (fields, type) => { // 'account' 'subsc
          const configTitle = getFieldName(field.get('id', ''), getFieldNameType(type));
          const title = configTitle === field.get('id', '') ? sentenceCase(configTitle) : configTitle;
          fieldsWithMutations.setIn([index, 'title'], title);
-       }
-     });
+      }
+    });
   })
   .sort(sortFieldOption);
 };
@@ -479,3 +484,36 @@ export const addDefaultFieldOptions = (formatedFields, item = Immutable.Map()) =
   }
   return undefined;
 };
+
+export const invoiceTemplateHeaderSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('header'),
+);
+export const invoiceTemplateFooterSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('footer'),
+);
+
+export const invoiceTemplateSuggestionsSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('html_translation'),
+);
+
+export const invoiceTemplateTemplatesSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('templates'),
+  // (invoiceExport = Immutable.Map()) => {
+  //   const defaultTamplates = Immutable.Map({
+  //     header: Immutable.List([
+  //       Immutable.Map({ label: 'Empty', content: '<p>Empty</p>' }),
+  //       Immutable.Map({ label: 'Default', content: '<p>default</p>' }),
+  //     ]),
+  //   });
+  //   return invoiceExport.get('templates', defaultTamplates);
+  // },
+);
+
+export const invoiceTemplateStatusSelector = createSelector(
+  getInvoiceExport,
+  (invoiceExport = Immutable.Map()) => invoiceExport.get('status'),
+);
