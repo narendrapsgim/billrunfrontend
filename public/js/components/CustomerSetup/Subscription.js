@@ -6,6 +6,7 @@ import Select from 'react-select';
 import moment from 'moment';
 import { titleCase } from 'change-case';
 import ActionButtons from '../Elements/ActionButtons';
+import Actions from '../Elements/Actions';
 import Field from '../Field';
 import Credit from '../Credit/Credit';
 import { EntityRevisionDetails } from '../Entity';
@@ -348,16 +349,36 @@ class Subscription extends Component {
     this.props.clearList();
   }
 
+  getActions = () => [{
+    type: 'back',
+    label: 'Back To List',
+    onClick: this.props.onCancel,
+    actionStyle: 'primary',
+    actionSize: 'xsmall',
+  }];
+
+  renderPanelTitle = () => {
+    const { mode, subscription } = this.props;
+    const title = buildPageTitle(mode, 'subscription', subscription);
+    return (
+      <div>
+        { title }
+        <div className="pull-right">
+          <Actions actions={this.getActions()} />
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const { progress, subscription } = this.state;
     const { revisions, mode } = this.props;
-    const title = buildPageTitle(mode, 'subscription', this.props.subscription);
     const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
     const servisesQuentity = this.renderServisesQuentity(allowEdit);
     return (
       <div className="Subscription">
-        <Panel header={title}>
+        <Panel header={this.renderPanelTitle()}>
           <EntityRevisionDetails
             itemName="subscription"
             revisions={revisions}
