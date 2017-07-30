@@ -16,7 +16,7 @@ import {
   buildRequestUrl,
 } from '../../common/Api';
 import {
-  getReportQuery,
+  getReportCSVQuery,
  } from '../../common/ApiQueries';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import {
@@ -312,22 +312,7 @@ class ReportSetup extends Component {
 
   onClickExportCSV =() => {
     const { item } = this.props;
-    const headers = item.get('columns', Immutable.List()).reduce(
-      (acc, column) => acc.set(column.get('key', ''), column.get('label', column.get('field_name', ''))),
-      Immutable.Map(),
-    );
-    const csvParams = [
-      { headers: JSON.stringify(headers) },
-      { type: 'csv' },
-      { file_name: item.get('key', 'report') },
-    ];
-    const reportParams = {
-      report: this.preperReport(item),
-      page: 0,
-      size: -1,
-    };
-    const csvQuery = getReportQuery(reportParams);
-    csvQuery.params.push(...csvParams);
+    const csvQuery = getReportCSVQuery(item.get('key', ''));
     window.open(buildRequestUrl(csvQuery));
   }
 
