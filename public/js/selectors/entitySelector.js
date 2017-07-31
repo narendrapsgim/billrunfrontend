@@ -198,3 +198,8 @@ export const entityMinFrom = createSelector(
   minEntityDateSelector,
   selectMaxFrom,
 );
+
+export const actionSelector = createSelector(
+  getAction,
+  action => action || undefined
+);
