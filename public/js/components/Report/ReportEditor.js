@@ -76,7 +76,7 @@ class ReportEditor extends Component {
       op: '',
       value: '',
       type: entityField.get('type', 'string'),
-      entity: entityField.get('entity',  report.get('entity', '')),
+      entity: entityField.get('entity', report.get('entity', '')),
     });
     const newFilters = report
       .get('conditions', Immutable.List())
@@ -223,7 +223,7 @@ class ReportEditor extends Component {
         return column.withMutations(columnWithMutations =>
           columnWithMutations
             .set('op', value)
-            .set('label', newLabel)
+            .set('label', newLabel),
         );
       });
     this.updateReport('columns', columns);
