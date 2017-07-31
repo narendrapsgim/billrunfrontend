@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import { titleCase } from 'change-case';
 import EntityList from '../EntityList';
-import { ConfirmModal } from '../Elements';
 import { getConfig, getFieldName } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
-import { clearItems } from '../../actions/entityListActions';
 import { deleteReport } from '../../actions/reportsActions';
+import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 
 
 class ReportsList extends Component {
@@ -15,22 +15,18 @@ class ReportsList extends Component {
     dispatch: PropTypes.func.isRequired,
   }
 
-  static defaultProps = {
-
-  }
+  static defaultProps = {}
 
   state = {
-    showConfirmDelete: false,
     itemToDelete: null,
-    confirmDeleteMessage: '',
+    refreshString: '',
   }
 
-  parseEntityName = (item) => {
-    const entity = item.get('entity', '');
-    return titleCase(getConfig(['systemItems', entity, 'itemName'], 'entity'));
-  }
+  parseEntityName = item => titleCase(getConfig(['systemItems', item.get('entity', ''), 'itemName'], 'entity'));
 
   parseEntityType = item => getFieldName(`report_type_${item.get('type')}`, 'report');
+
+  parseUserName = item => titleCase(item.get('user', '-'));
 
   getFilterFields = () => ([
     { id: 'key', placeholder: 'Name' },
@@ -41,7 +37,7 @@ class ReportsList extends Component {
     { id: 'key', title: 'Name', sort: true },
     { id: 'entity', title: 'Entity', sort: true, parser: this.parseEntityName },
     { id: 'type', title: 'Type', sort: true, parser: this.parseEntityType },
-    { id: 'user', title: 'User', sort: true },
+    { id: 'user', title: 'User', sort: true, parser: this.parseUserName },
     { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
   ]);
 
@@ -54,33 +50,35 @@ class ReportsList extends Component {
   });
 
   onAskDelete = (item) => {
+    const confirm = {
+      message: `Are you sure you want to delete "${item.get('key', '')}" report ?`,
+      onOk: this.onDeleteOk,
+      labelOk: 'Delete',
+      type: 'delete',
+      onCancel: this.onDeleteClose,
+    };
+    this.props.dispatch(showConfirmModal(confirm));
     this.setState({
-      showConfirmDelete: true,
       itemToDelete: item,
-      confirmDeleteMessage: `Are you sure you want to delete "${item.get('key', '')}" report ?`,
     });
   }
 
   onDeleteClose = () => {
-    this.setState({
-      showConfirmDelete: false,
-      itemToDelete: null,
-      confirmDeleteMessage: '',
-    });
+    this.setState({ itemToDelete: null });
   }
 
   onDeleteOk = () => {
     const { itemToDelete } = this.state;
-    this.setState({ progress: true });
     this.props.dispatch(deleteReport(itemToDelete)).then(this.afterDelete);
   }
 
   afterDelete = (response) => {
     this.onDeleteClose();
     if (response.status) {
-      const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
       this.props.dispatch(showSuccess('The report was deleted'));
-      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
+      this.setState({
+        refreshString: moment().format(), //refetch list items after import
+      });
     }
   }
 
@@ -91,31 +89,23 @@ class ReportsList extends Component {
   ]);
 
   render() {
-    const { showConfirmDelete, confirmDeleteMessage } = this.state;
+    const { refreshString } = this.state;
     const filterFields = this.getFilterFields();
     const tableFields = this.getTableFields();
     const actions = this.getActions();
     const projectFields = this.getProjectFields();
     return (
-      <div>
-        <EntityList
-          collection="reports"
-          itemType="report"
-          itemsType="reports"
-          api="get"
-          filterFields={filterFields}
-          tableFields={tableFields}
-          projectFields={projectFields}
-          actions={actions}
-        />
-        <ConfirmModal
-          onOk={this.onDeleteOk}
-          onCancel={this.onDeleteClose}
-          show={showConfirmDelete}
-          message={confirmDeleteMessage}
-          labelOk="Yes"
-        />
-      </div>
+      <EntityList
+        collection="reports"
+        itemType="report"
+        itemsType="reports"
+        api="get"
+        filterFields={filterFields}
+        tableFields={tableFields}
+        projectFields={projectFields}
+        actions={actions}
+        refreshString={refreshString}
+      />
     );
   }
 

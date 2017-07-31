@@ -597,6 +597,14 @@ export const getReportQuery = ({ report, page = 0, size = 10 }) => ({
   ],
 });
 
+export const getReportCSVQuery = name => ({
+  api: 'report',
+  params: [
+    { action: 'exportCSV' },
+    { report: name },
+  ],
+});
+
 export const getExpectedInvoiceQuery = ( aid, billrunKey ) => ({
   api: 'accountinvoices',
   params: [
