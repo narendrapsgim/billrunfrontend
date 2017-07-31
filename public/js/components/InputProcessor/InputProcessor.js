@@ -173,6 +173,19 @@ class InputProcessor extends Component {
     }
   }
 
+  componentWillUpdate(nextProps, nextState) {
+    const { settings, action, template } = this.props;
+    const { stepIndex } = this.state;
+    const name = settings.get('file_type', '');
+    const newName = nextProps.settings.get('file_type', '');
+    // show name only from second step.
+    if (action === 'new' && ((newName !== name && stepIndex >= 1) || (nextState.stepIndex >= 1 && stepIndex === 0))) {
+      const templateName = template ? ` - ${template}` : '';
+      const inputProcessorName = newName.length > 0 ? ` - ${newName}` : '';
+      this.props.dispatch(setPageTitle(`Create New Input Processor${templateName}${inputProcessorName}`));
+    }
+  }
+
   componentWillUnmount() {
     this.props.dispatch(clearInputProcessor());
     this.props.dispatch(clearList('all_input_processors'));
