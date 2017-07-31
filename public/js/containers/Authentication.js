@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import LoginForm from '../components/LoginForm';
-import { Forbidden_403 } from '../components/Errors';
+import { Forbidden403 } from '../components/Errors';
 import { permissionsSelector } from '../selectors/guiSelectors';
 import { actionSelector } from '../selectors/entitySelector';
 
@@ -15,29 +15,21 @@ export default function (ComposedComponent) {
       roles: null,
       permissions: Immutable.Map(),
       action: 'view',
-      openLoginPopup: () => {},
     };
 
     static propTypes = {
-      auth: React.PropTypes.oneOfType([
-        PropTypes.bool,
-        null,
-      ]),
-      roles: React.PropTypes.oneOfType([
-        PropTypes.array,
-        null,
-      ]),
+      auth: PropTypes.bool,
+      roles: PropTypes.array,
       permissions: PropTypes.instanceOf(Immutable.Map),
       action: PropTypes.string,
-      openLoginPopup: PropTypes.func,
+      location: PropTypes.shape({
+        pathname: PropTypes.string,
+        query: PropTypes.object,
+      }).isRequired,
     };
 
-    handleOpenLogin = () => {
-      this.props.openLoginPopup();
-    }
-
     render() {
-      const { auth, roles, permissions, action } = this.props;
+      const { auth, roles, permissions, action, location, ...composedComponentProps } = this.props;
       // If user is not authorized -> return login
       if (!roles || !auth) {
         return (<LoginForm />);
@@ -48,20 +40,20 @@ export default function (ComposedComponent) {
       }
       // If user admin -> return true
       if (roles.includes('admin')) {
-        return (<ComposedComponent {...this.props} />);
+        return (<ComposedComponent {...composedComponentProps} location={location} />);
       }
-      const pageRoute = this.props.location.pathname.substr(1);
+      const pageRoute = location.pathname.substr(1);
       const perms = permissions.getIn([pageRoute, action], Immutable.List());
       // If no permissions required -> return true
       if (perms.size === 0) {
-        return (<ComposedComponent {...this.props} />);
+        return (<ComposedComponent {...composedComponentProps} location={location} />);
       }
       // Check if user has permissions
       const permissionDenied = perms.toSet().intersect(roles).size === 0;
       if (permissionDenied) {
-        return (<Forbidden_403 />);
+        return (<Forbidden403 location={location} />);
       }
-      return (<ComposedComponent {...this.props} />);
+      return (<ComposedComponent {...composedComponentProps} location={location} />);
     }
   }
 
