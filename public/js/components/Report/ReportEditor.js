@@ -18,6 +18,7 @@ class ReportEditor extends Component {
     reportFileds: PropTypes.instanceOf(Immutable.Map),
     aggregateOperators: PropTypes.instanceOf(Immutable.List),
     conditionsOperators: PropTypes.instanceOf(Immutable.List),
+    entities: PropTypes.instanceOf(Immutable.List),
     sortOperators: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
     onUpdate: PropTypes.func,
@@ -29,6 +30,7 @@ class ReportEditor extends Component {
     reportFileds: Immutable.Map(),
     aggregateOperators: getConfig(['reports', 'aggregateOperators'], Immutable.List()),
     conditionsOperators: getConfig(['reports', 'conditionsOperators'], Immutable.List()),
+    entities: getConfig(['reports', 'entities'], Immutable.List()),
     sortOperators: Immutable.List([
       Immutable.Map({ value: 1, label: 'Ascending' }),
       Immutable.Map({ value: -1, label: 'Descending' }),
@@ -36,7 +38,6 @@ class ReportEditor extends Component {
     onFilter: () => {},
     onUpdate: () => {},
   };
-
 
   onPreview = () => {
     this.props.onFilter();
@@ -75,6 +76,7 @@ class ReportEditor extends Component {
       op: '',
       value: '',
       type: entityField.get('type', 'string'),
+      entity: entityField.get('entity',  report.get('entity', '')),
     });
     const newFilters = report
       .get('conditions', Immutable.List())
@@ -188,15 +190,23 @@ class ReportEditor extends Component {
   /* Columns */
   onChangeColumnField = (index, value) => {
     const { report } = this.props;
+    const entityField = this.getEntityFields().find(
+      reportFiled => reportFiled.get('id', '') === value,
+      null, Immutable.Map(),
+    );
     const columns = report
       .get('columns', Immutable.List())
       .update(index, Immutable.Map(), (column) => {
-        const newColumn = column.set('field_name', value);
         const label = column.get('label', '');
         const fieldName = column.get('field_name', '');
         const op = column.get('op', '');
         const newLabel = this.getColumnNewLabel(label, fieldName, op, value, op);
-        return newColumn.set('label', newLabel);
+        return column.withMutations(columnWithMutations =>
+          columnWithMutations
+            .set('field_name', value)
+            .set('label', newLabel)
+            .set('entity', entityField.get('entity', report.get('entity', '')))
+        );
       });
     this.updateReport('columns', columns);
   }
@@ -206,12 +216,15 @@ class ReportEditor extends Component {
     const columns = report
       .get('columns', Immutable.List())
       .update(index, Immutable.Map(), (column) => {
-        const newColumn = column.set('op', value);
         const label = column.get('label', '');
         const fieldName = column.get('field_name', '');
         const op = column.get('op', '');
         const newLabel = this.getColumnNewLabel(label, fieldName, op, fieldName, value);
-        return newColumn.set('label', newLabel);
+        return column.withMutations(columnWithMutations =>
+          columnWithMutations
+            .set('op', value)
+            .set('label', newLabel)
+        );
       });
     this.updateReport('columns', columns);
   }
@@ -309,7 +322,9 @@ class ReportEditor extends Component {
   }
 
   render() {
-    const { mode, report, aggregateOperators, conditionsOperators, sortOperators } = this.props;
+    const {
+      mode, report, aggregateOperators, conditionsOperators, sortOperators, entities,
+    } = this.props;
     const fieldsConfig = this.getEntityFields();
     const columns = report.get('columns', Immutable.List());
     const mandatory = <span className="danger-red"> *</span>;
@@ -321,6 +336,7 @@ class ReportEditor extends Component {
               mode={mode}
               title={report.get('key', '')}
               entity={report.get('entity', '')}
+              entities={entities}
               type={report.get('type', reportTypes.SIMPLE)}
               onChangeKey={this.onChangeReportKey}
               onChangeEntity={this.onChangeReportEntity}
