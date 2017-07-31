@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Form, FormGroup, FormControl, InputGroup, Button, Alert, Panel, Col, Row } from 'react-bootstrap';
-import { Conflict_409 as Conflict409 } from '../Errors';
+import { Conflict409 } from '../Errors';
 import { userDoLogin, sendResetMail } from '../../actions/userActions';
 import ResetPassword from '../LoginForm/ResetPassword';
 

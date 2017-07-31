@@ -1,5 +1,5 @@
 import Immutable from 'immutable';
-import mainMenu from '../../mainMenu.json';
+import { getConfig } from '../../common/Util';
 
 
 export const PREPARE_MAIN_MENU_STRUCTURE = 'PREPARE_MAIN_MENU_STRUCTURE';
@@ -17,7 +17,7 @@ export const initMainMenu = (mainMenuOverrides = {}) => ({
 });
 
 export const combineMenuOverrides = overrides => (
-  Immutable.fromJS(mainMenu).withMutations((mainMenuTreeWithMutations) => {
+  getConfig('mainMenu', Immutable.Map()).withMutations((mainMenuTreeWithMutations) => {
     if (overrides && overrides.size) {
       overrides.forEach((menuData, menuKey) => {
         if (mainMenuTreeWithMutations.has(menuKey)) {
