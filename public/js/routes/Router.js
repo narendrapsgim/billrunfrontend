@@ -12,7 +12,7 @@ import {
 import FakeDataDashboard from '../components/Dashboard/FakeDataDashboard';
 import LoginPage from '../components/LoginPage';
 import WelcomePage from '../components/WelcomePage';
-import PageNotFound from '../components/PageNotFound';
+import { PageNotFound404 } from '../components/Errors';
 import CustomersList from '../components/CustomersList';
 import CustomerSetup from '../components/CustomerSetup';
 import ProductsList from '../components/ProductsList';
@@ -142,7 +142,7 @@ const routes = () => (
     <Route path="/custom_fields" component={RequireAuth(CustomFields)} title="Custom Fields" />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="/changepassword(/:itemId)" component={ChangePassword} title="Change Password" />
-    <Route path="*" component={PageNotFound} />
+    <Route path="*" component={PageNotFound404} title=" " />
   </Route>
 );
 
