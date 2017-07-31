@@ -27,6 +27,7 @@ const Action = (props) => {
     'fa-repeat': type === 'reopen',
     'fa-cloud-upload': type === 'import',
     'fa-refresh': type === 'refresh',
+    'fa-arrow-left': type === 'back',
   });
 
   const onClick = () => {

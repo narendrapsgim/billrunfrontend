@@ -5,9 +5,9 @@ const Tags = (props) => {
   const { editable, value, disabled, placeholder, onChange, inputProps, ...otherProps } = props;
 
   const renderTag = (args) => {
-    const { tag, key, disabled: allowRemove, onRemove, classNameRemove, ...other } = args;
+    const { tag, key, disabled: allowRemove, onRemove, classNameRemove, getTagDisplayValue, ...other } = args;
     const remove = () => { onRemove(key); };
-    const renderDisplayValue = props.getTagDisplayValue || args.getTagDisplayValue;
+    const renderDisplayValue = props.getTagDisplayValue || getTagDisplayValue;
     return (
       <span key={key} {...other}>
         {!allowRemove && (<span className={classNameRemove} onClick={remove}>×</span>)}
