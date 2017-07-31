@@ -331,7 +331,7 @@ class ReportEditor extends Component {
     return (
       <div className="ReportEditor">
         <Form horizontal>
-          <Panel header={<span>Basic Details</span>}>
+          <Panel header={<span>Basic Details</span>} collapsible={mode === 'update'} className="collapsible">
             <EditorDetails
               mode={mode}
               title={report.get('key', '')}
