@@ -9,7 +9,7 @@ const StateIcon = ({ from, to, status }) => {
     stateClass = classNames('cycle', {
       expired: status === 'expired',
       future: status === 'future',
-      active: status === 'active_with_future' || status === 'active',
+      active: status === 'active',
     });
   } else {
     const fromTime = moment(from);

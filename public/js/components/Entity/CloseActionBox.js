@@ -111,9 +111,9 @@ class CloseActionBox extends Component {
   render() {
     const { item, itemName } = this.props;
     const { showCloseDetails, showConfirmClose } = this.state;
-    const statusSupportCloseAction = ['active'].includes(item.getIn(['revision_info', 'status'], ''));
     const closeConfirmMessage = 'Are you sure you want to close the revision?';
-    if (statusSupportCloseAction) {
+    const allowCloseAction = item.getIn(['revision_info', 'status'], '') === 'active' && item.getIn(['revision_info', 'is_last'], false);
+    if (allowCloseAction) {
       return (
         <div>
           <Button bsStyle="link" onClick={this.toggleCloseAction} style={{ verticalAlign: 'bottom', lineHeight: '24px' }}>

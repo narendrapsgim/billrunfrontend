@@ -160,7 +160,7 @@ export const isItemReopened = (item, prevItem) => {
   return currentFrom.isAfter(prevTo.add(1, 'days'));
 };
 
-export const isItemExpired = (item, toField = 'to') => {
+export const isItemFinite = (item, toField = 'to') => {
   const toTime = getItemDateValue(item, toField);
   return toTime.isBefore(moment().add(50, 'years'));
 };
@@ -171,7 +171,8 @@ export const getItemMode = (item, undefindItemStatus = 'create') => {
       return 'create';
     }
     const status = item.getIn(['revision_info', 'status'], '');
-    if (['expired', 'active_with_future'].includes(status)) {
+    const isLast = item.getIn(['revision_info', 'is_last'], true);
+    if (['expired'].includes(status) || (status === 'active' && !isLast)) {
       return 'view';
     }
     if (['future'].includes(status) || isItemClosed(item)) {

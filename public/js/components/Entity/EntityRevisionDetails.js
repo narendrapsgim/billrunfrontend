@@ -100,7 +100,7 @@ class EntityRevisionDetails extends Component {
       }
     } else {
       // refresh current item because it may effect by deleted revision
-      // i.e active_with_future turn be editable
+      // i.e active_wis_last turn be editable
       this.props.reLoadItem();
     }
   }
@@ -259,7 +259,7 @@ class EntityRevisionDetails extends Component {
 
   renderMessage = () => {
     const { mode, item } = this.props;
-    if (mode === 'view' && ['active_with_future'].includes(item.getIn(['revision_info', 'status'], ''))) {
+    if (mode === 'view' && item.getIn(['revision_info', 'status'], '') === 'active' && !item.getIn(['revision_info', 'is_last'], true)) {
       return (
         <Label bsStyle="warning">You cannot edit the current revision because a future revision exists.</Label>
       );
