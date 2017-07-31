@@ -343,19 +343,6 @@ class ReportEditor extends Component {
               onChangeType={this.onChangeReportType}
             />
           </Panel>
-          <Panel header={<span>Conditions</span>}>
-            <EditorConditions
-              mode={mode}
-              conditions={report.get('conditions', Immutable.List())}
-              fieldsOptions={fieldsConfig}
-              operators={conditionsOperators}
-              onRemove={this.onRemoveCondition}
-              onAdd={this.onAddCondition}
-              onChangeField={this.onChangeConditionField}
-              onChangeOperator={this.onChangeConditionOperator}
-              onChangeValue={this.onChangeConditionValue}
-            />
-          </Panel>
           <Panel header={<span>Columns {mandatory}</span>}>
             <EditorColumns
               mode={mode}
@@ -371,7 +358,20 @@ class ReportEditor extends Component {
               onMove={this.onMoveColumn}
             />
           </Panel>
-          <Panel header={<span>Sort</span>}>
+          <Panel header={<span>Conditions</span>} collapsible className="collapsible">
+            <EditorConditions
+              mode={mode}
+              conditions={report.get('conditions', Immutable.List())}
+              fieldsOptions={fieldsConfig}
+              operators={conditionsOperators}
+              onRemove={this.onRemoveCondition}
+              onAdd={this.onAddCondition}
+              onChangeField={this.onChangeConditionField}
+              onChangeOperator={this.onChangeConditionOperator}
+              onChangeValue={this.onChangeConditionValue}
+            />
+          </Panel>
+          <Panel header={<span>Sort</span>} collapsible className="collapsible">
             <EditorSorts
               mode={mode}
               sorts={report.get('sorts', Immutable.List())}
