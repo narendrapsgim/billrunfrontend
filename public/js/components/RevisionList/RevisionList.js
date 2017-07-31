@@ -14,7 +14,7 @@ import {
   getConfig,
   isItemClosed,
   getItemId,
-  isItemExpired,
+  isItemFinite,
 } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity, moveEntity, reopenEntity } from '../../actions/entityActions';
@@ -51,7 +51,10 @@ class RevisionList extends Component {
     itemToReopen: null,
   }
 
-  isItemEditable = item => ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''));
+  isItemLast = item => item.getIn(['revision_info', 'is_last'], true);
+
+  isItemEditable = item => ['future'].includes(item.getIn(['revision_info', 'status'], ''))
+    || (this.isItemActive(item) && this.isItemLast(item));
 
   isItemRemovable = item => (
     item.getIn(['revision_info', 'removable'], true) // if removable flag not exist, check status
@@ -63,15 +66,17 @@ class RevisionList extends Component {
   isItemReopenable = (item) => {
     const { items } = this.props;
     const index = items.indexOf(item);
-    const nextRevision = items.get(index - 1, Immutable.Map());
+    const nextRevision = index > 0 ? items.get(index - 1, Immutable.Map()) : Immutable.Map();
     const lastRevision = items.first();
     // can only reopen last expired entity, that the last revision of it is not unlimited
     return ['expired'].includes(item.getIn(['revision_info', 'status'], ''))
     && !['expired'].includes(nextRevision.getIn(['revision_info', 'status'], ''))
-    && isItemExpired(lastRevision);
+    && isItemFinite(lastRevision);
   }
 
   isItemActive = item => ['active'].includes(item.getIn(['revision_info', 'status'], ''));
+
+  isItemExpired = item => ['expired'].includes(item.getIn(['revision_info', 'status'], ''));
 
   parseEditShow = item => this.isItemEditable(item);
 
@@ -95,8 +100,9 @@ class RevisionList extends Component {
 
   parseToDate = (item) => {
     const toDate = getItemDateValue(item, 'to', null);
-    const statusWithToDate = ['expired', 'active_with_future'].includes(item.getIn(['revision_info', 'status'], ''));
-    if (moment.isMoment(toDate) && (isItemClosed(item) || statusWithToDate)) {
+    const statusWithTwoDate = this.isItemExpired(item)
+      || (this.isItemActive(item) && !this.isItemLast(item));
+    if (moment.isMoment(toDate) && (isItemClosed(item) || statusWithTwoDate)) {
       return toDate.format(globalSetting.dateFormat);
     }
     return '-';
