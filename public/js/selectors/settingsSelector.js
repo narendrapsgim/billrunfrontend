@@ -182,6 +182,11 @@ export const taxationSelector = createSelector(
   taxation => taxation,
 );
 
+export const taxationTypeSelector = createSelector(
+  taxationSelector,
+  (taxation = Immutable.Map()) => taxation.get('tax_type'),
+);
+
 export const pricingSelector = createSelector(
   getPricing,
   pricing => pricing,
