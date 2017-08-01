@@ -1,81 +1,70 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import _ from 'lodash';
+import React, { PureComponent, PropTypes } from 'react';
+import Number from './types/Number';
+import Price from './types/Price';
+import Date from './types/Date';
+import Tags from './types/Tags';
+import Address from './types/Address';
+import Text from './types/Text';
+import TextArea from './types/TextArea';
+import Unlimitd from './types/UnlimitedInput';
+import Checkbox from './types/Checkbox';
+import Radio from './types/Radio';
+import Salutation from './types/Salutation';
+import ToggeledInput from './types/ToggeledInput';
+import TextEditor from './types/TextEditor';
 
-import FieldSettings from '../../FieldSettings';
 
-import Number from '../FieldTypes/Number';
-import Price from '../FieldTypes/Price';
-import Date from '../FieldTypes/Date';
-import Tags from '../FieldTypes/Tags';
-import Address from '../FieldTypes/Address';
-import Text from '../FieldTypes/Text';
-import TextArea from '../FieldTypes/TextArea';
-import Unlimitd from '../FieldTypes/UnlimitedInput';
-import Checkbox from '../FieldTypes/Checkbox';
-import Radio from '../FieldTypes/Radio';
-import Salutation from '../FieldTypes/Salutation';
-import ToggeledInput from '../FieldTypes/ToggeledInput';
-import TextEditor from '../FieldTypes/TextEditor';
+class Field extends PureComponent {
 
-class Field extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.createInput = this.createInput.bind(this);
+  static propTypes = {
+    value: PropTypes.any,
+    required: PropTypes.bool,
+    disabled: PropTypes.bool,
+    editable: PropTypes.bool,
+    fieldType: PropTypes.string,
+    label: PropTypes.string,
+    onChange: PropTypes.func,
   }
 
-  getFieldType(id, coll) {
-    let c = coll ? coll.toLowerCase() : coll;
-    let i = id ? id.toLowerCase() : id;
-    if (_.result(FieldSettings, `${c}.${i}`))
-      return FieldSettings[c][i];
-    return FieldSettings[i];
+  static defaultProps = {
+    value: undefined,
+    required: false,
+    disabled: false,
+    editable: true,
+    fieldType: 'text',
+    label: '',
+    onChange: () => {},
   }
 
-  createInput() {
-    let { onChange,
-          id,
-          name,
-          value,
-          coll,
-          tooltip,
-          fieldType = this.getFieldType(id, coll),
-          required = false,
-          disabled = false,
-          checked = false,
-          editable = true,
-          dispatch,
-          label = '',
-          ...otherProps } = this.props;
-
-    switch(fieldType) {
+  createInput = () => {
+    const { fieldType, required, label, ...inputProps } = this.props;
+    switch (fieldType) {
       case 'number':
-        return (<Number {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Number {...inputProps} />);
       case 'price':
-        return (<Price {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Price {...inputProps} />);
       case 'date':
-        return (<Date {...otherProps} onChange={onChange} value={value} editable={editable} disabled={disabled} />);
+        return (<Date {...inputProps} />);
       case 'tags':
-        return (<Tags {...otherProps} onChange={onChange} value={value} editable={editable} disabled={disabled} />);
+        return (<Tags {...inputProps} />);
       case 'address':
-        return (<Address onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Address {...inputProps} />);
       case 'textarea':
-        return (<TextArea onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<TextArea {...inputProps} />);
       case 'unlimited':
-        return (<Unlimitd {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} />);
+        return (<Unlimitd {...inputProps} />);
       case 'toggeledInput':
-        return (<ToggeledInput {...otherProps} onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} label={label} />);
+        return (<ToggeledInput {...inputProps} label={label} />);
       case 'checkbox':
-        return (<Checkbox onChange={onChange} id={id} value={value} editable={editable} disabled={disabled} label={label} />);
+        return (<Checkbox {...inputProps} label={label} />);
       case 'radio':
-        return (<Radio onChange={onChange} id={id} name={name} value={value} editable={editable} disabled={disabled} checked={checked} label={label} />);
+        return (<Radio {...inputProps}label={label} />);
       case 'salutation':
-        return (<Salutation {...this.props} />);
+        return (<Salutation {...inputProps} />);
       case 'textEditor':
-        return (<TextEditor {...otherProps} onChange={onChange} value={value} editable={editable} disabled={disabled} />);
+        return (<TextEditor {...inputProps} />);
       default:
-        return (<Text {...otherProps} onChange={onChange} id={id} value={value} editable={editable} required={required} disabled={disabled} />);
+        return (<Text {...inputProps} required={required} />);
     }
   }
 
@@ -88,4 +77,4 @@ class Field extends React.Component {
   }
 }
 
-export default connect()(Field);
+export default Field;
