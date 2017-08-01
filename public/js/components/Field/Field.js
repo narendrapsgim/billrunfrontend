@@ -58,7 +58,7 @@ class Field extends PureComponent {
       case 'checkbox':
         return (<Checkbox {...inputProps} label={label} />);
       case 'radio':
-        return (<Radio {...inputProps}label={label} />);
+        return (<Radio {...inputProps} label={label} />);
       case 'salutation':
         return (<Salutation {...inputProps} />);
       case 'textEditor':
