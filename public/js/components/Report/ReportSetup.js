@@ -163,7 +163,12 @@ class ReportSetup extends Component {
   getReportData = () => {
     const { item, size, page } = this.props;
     const report = this.preperReport(item);
-    this.props.dispatch(getReportData({ report, page, size }));
+    this.setState({ progress: true });
+    this.props.dispatch(getReportData({ report, page, size })).then(this.afterReportDataReceived);
+  }
+
+  afterReportDataReceived = () => {
+    this.setState({ progress: false });
   }
 
   onChangeReportValue = (path, value, needRefetchData = false) => {
@@ -443,6 +448,7 @@ class ReportSetup extends Component {
               mode={mode}
               onUpdate={this.onChangeReportValue}
               onFilter={this.applyFilter}
+              progress={progress}
             />
           }
 
