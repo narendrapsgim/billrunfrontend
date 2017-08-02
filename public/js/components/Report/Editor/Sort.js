@@ -82,7 +82,7 @@ class Sort extends Component {
           <DragHandle />
         </Col>
 
-        <Col smHidden mdHidden lgHidden xlHidden>
+        <Col smHidden mdHidden lgHidden>
           <label htmlFor="field_field">Field</label>
         </Col>
         <Col sm={5}>
@@ -95,7 +95,7 @@ class Sort extends Component {
           />
         </Col>
 
-        <Col smHidden mdHidden lgHidden xlHidden>
+        <Col smHidden mdHidden lgHidden>
           <label htmlFor="order_field">Order</label>
         </Col>
         <Col sm={4}>

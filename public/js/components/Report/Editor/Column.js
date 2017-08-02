@@ -115,7 +115,7 @@ class Column extends Component {
           <DragHandle />
         </Col>
 
-        <Col smHidden mdHidden lgHidden xlHidden>
+        <Col smHidden mdHidden lgHidden>
           <label htmlFor="field_field">Field</label>
         </Col>
         <Col sm={4}>
@@ -130,7 +130,7 @@ class Column extends Component {
           )}
         </Col>
 
-        <Col smHidden mdHidden lgHidden xlHidden>
+        <Col smHidden mdHidden lgHidden>
           {type !== reportTypes.SIMPLE && (
             <label htmlFor="operator_field">Function</label>
           )}
@@ -147,7 +147,7 @@ class Column extends Component {
           )}
         </Col>
 
-        <Col smHidden mdHidden lgHidden xlHidden>
+        <Col smHidden mdHidden lgHidden>
           <label htmlFor="label_field">Label</label>
         </Col>
         <Col sm={3}>

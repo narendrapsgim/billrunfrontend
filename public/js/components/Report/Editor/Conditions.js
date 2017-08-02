@@ -71,8 +71,8 @@ class Conditions extends Component {
         <Col sm={12}>
           { !conditionsRows.isEmpty() ? (
             <FormGroup className="form-inner-edit-row">
-              <Col sm={4} xsHidden><label htmlFor="field_field">Field</label></Col>
-              <Col sm={2} xsHidden><label htmlFor="operator_field">Operator</label></Col>
+              <Col sm={3} xsHidden><label htmlFor="field_field">Field</label></Col>
+              <Col sm={3} xsHidden><label htmlFor="operator_field">Operator</label></Col>
               <Col sm={4} xsHidden><label htmlFor="value_field">Value</label></Col>
             </FormGroup>
           ) : (

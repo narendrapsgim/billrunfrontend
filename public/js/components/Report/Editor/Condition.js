@@ -121,10 +121,10 @@ class Condition extends Component {
     const disableVal = disabled || item.get('op', '') === '' || disableOp;
     return (
       <FormGroup className="form-inner-edit-row">
-        <Col smHidden mdHidden lgHidden xlHidden>
+        <Col smHidden mdHidden lgHidden>
           <label htmlFor="field_field">Field</label>
         </Col>
-        <Col sm={4}>
+        <Col sm={3}>
           <Select
             clearable={false}
             options={fieldOptions}
@@ -134,10 +134,10 @@ class Condition extends Component {
           />
         </Col>
 
-        <Col smHidden mdHidden lgHidden xlHidden>
+        <Col smHidden mdHidden lgHidden>
           <label htmlFor="operator_field">Operator</label>
         </Col>
-        <Col sm={2}>
+        <Col sm={3}>
           <Select
             clearable={false}
             options={opOptions}
@@ -147,7 +147,7 @@ class Condition extends Component {
           />
         </Col>
 
-        <Col smHidden mdHidden lgHidden xlHidden>
+        <Col smHidden mdHidden lgHidden>
           <label htmlFor="value_field">Value</label>
         </Col>
         <Col sm={4}>
