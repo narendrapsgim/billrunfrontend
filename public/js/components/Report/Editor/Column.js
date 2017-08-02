@@ -114,6 +114,10 @@ class Column extends Component {
         <Col sm={1} className="text-center">
           <DragHandle />
         </Col>
+
+        <Col smHidden mdHidden lgHidden xlHidden>
+          <label htmlFor="field_field">Field</label>
+        </Col>
         <Col sm={4}>
           {!isCountColumn && (
             <Select
@@ -126,6 +130,11 @@ class Column extends Component {
           )}
         </Col>
 
+        <Col smHidden mdHidden lgHidden xlHidden>
+          {type !== reportTypes.SIMPLE && (
+            <label htmlFor="operator_field">Function</label>
+          )}
+        </Col>
         <Col sm={2}>
           {type !== reportTypes.SIMPLE && (
             <Select
@@ -138,6 +147,9 @@ class Column extends Component {
           )}
         </Col>
 
+        <Col smHidden mdHidden lgHidden xlHidden>
+          <label htmlFor="label_field">Label</label>
+        </Col>
         <Col sm={3}>
           <Field
             value={item.get('label', '')}
