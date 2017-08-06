@@ -143,8 +143,8 @@ class EventSettings extends Component {
     return (
       <ModalWrapper title={title} show={!event.isEmpty()} onCancel={this.onHideConditionsList} onHide={this.onHideConditionsList} labelCancel="OK">
         <div>
-          {event.get('conditions', Immutable.List()).map(condition => (
-            <span>
+          {event.get('conditions', Immutable.List()).map((condition, index) => (
+            <span key={`condition-${index}`}>
               {this.getConditionDescription(condition)}
               <br />
             </span>

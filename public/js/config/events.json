@@ -14,6 +14,6 @@
 		{ "key": "has_changed_from", "title": "Has Changed From" }
 	],
 	"entities": [
-		{ "key": "balance", "title": "Buckets" }
+		{ "key": "balance", "title": "Balances" }
 	]
 }
