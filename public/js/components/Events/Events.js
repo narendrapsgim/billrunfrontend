@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Tab, Panel } from 'react-bootstrap';
 import TabsWrapper from '../Elements/TabsWrapper';
 import EventSettings from './EventSettings';
+import EventsList from './EventsList';
 
 
 const Events = ({ location }) => (
@@ -9,7 +10,9 @@ const Events = ({ location }) => (
     <TabsWrapper id="EventsTab" location={location}>
 
       <Tab title="Events" eventKey={1}>
-        <Panel style={{ borderTop: 'none' }} />
+        <Panel style={{ borderTop: 'none' }}>
+          <EventsList />
+        </Panel>
       </Tab>
 
       <Tab title="Settings" eventKey={2}>

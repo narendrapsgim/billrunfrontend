@@ -44,8 +44,8 @@ const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
 const getInvoiceExport = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.get('invoice_export');
 
-const getEventsSettings = (state, props) => // eslint-disable-line no-unused-vars
-    state.settings.getIn(['events', 'settings']);
+const getEvents = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['events']);
 
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
@@ -314,8 +314,13 @@ export const productFieldsSelector = createSelector(
 );
 
 export const eventsSettingsSelector = createSelector(
-  getEventsSettings,
-  eventSettings => eventSettings,
+  getEvents,
+  events => (events ? events.get('settings', Immutable.Map()) : undefined),
+);
+
+export const eventsSelector = createSelector(
+  getEvents,
+  events => (events ? events.filter((event, eventType) => eventType !== 'settings') : undefined),
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {
