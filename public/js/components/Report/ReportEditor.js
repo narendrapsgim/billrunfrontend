@@ -7,6 +7,7 @@ import EditorDetails from './Editor/Details';
 import EditorConditions from './Editor/Conditions';
 import EditorColumns from './Editor/Columns';
 import EditorSorts from './Editor/Sorts';
+import EditorFormatters from './Editor/Formatters';
 import { getConfig, createReportColumnLabel } from '../../common/Util';
 import { reportTypes } from '../../actions/reportsActions';
 
@@ -16,12 +17,14 @@ class ReportEditor extends Component {
   static propTypes = {
     report: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
+    taxType: PropTypes.string,
     progress: PropTypes.bool,
     reportFileds: PropTypes.instanceOf(Immutable.Map),
     aggregateOperators: PropTypes.instanceOf(Immutable.List),
     conditionsOperators: PropTypes.instanceOf(Immutable.List),
     entities: PropTypes.instanceOf(Immutable.List),
     sortOperators: PropTypes.instanceOf(Immutable.List),
+    outputFormats: PropTypes.instanceOf(Immutable.List),
     onFilter: PropTypes.func,
     onUpdate: PropTypes.func,
   };
@@ -29,6 +32,7 @@ class ReportEditor extends Component {
   static defaultProps = {
     report: Immutable.Map(),
     mode: 'update',
+    taxType: 'vat',
     progress: false,
     reportFileds: Immutable.Map(),
     aggregateOperators: getConfig(['reports', 'aggregateOperators'], Immutable.List()),
@@ -38,6 +42,7 @@ class ReportEditor extends Component {
       Immutable.Map({ value: 1, label: 'Ascending' }),
       Immutable.Map({ value: -1, label: 'Descending' }),
     ]),
+    outputFormats: getConfig(['reports', 'outputFormats'], Immutable.List()),
     onFilter: () => {},
     onUpdate: () => {},
   };
@@ -194,6 +199,74 @@ class ReportEditor extends Component {
   }
   /* ~Sort */
 
+  /* Format  */
+  onChangeFormatField = (idx, value) => {
+    const { report } = this.props;
+    const formats = report
+      .get('formats', Immutable.List())
+      .setIn([idx, 'field'], value)
+      .setIn([idx, 'op'], '')
+      .setIn([idx, 'value'], '');
+    this.updateReport('formats', formats);
+  }
+
+  onChangeFormatOperator = (idx, value) => {
+    const { report } = this.props;
+    const formats = report
+      .get('formats', Immutable.List())
+      .setIn([idx, 'op'], value)
+      .setIn([idx, 'value'], '');
+    this.updateReport('formats', formats);
+  }
+
+  onChangeFormatValue = (idx, value) => {
+    const { report } = this.props;
+    const formats = report
+      .get('formats', Immutable.List())
+      .setIn([idx, 'value'], value);
+    this.updateReport('formats', formats);
+  }
+
+  onRemoveFormat = (index) => {
+    const { report } = this.props;
+    const formats = report
+      .get('formats', Immutable.List())
+      .delete(index);
+    this.updateReport('formats', formats);
+  }
+
+  onRemoveFormatByKey = (key) => {
+    const { report } = this.props;
+    const formats = report.get('formats', Immutable.List());
+    const formatsWithoutKey = formats.filter(format => format.get('field', '') !== key);
+    if (!Immutable.is(formatsWithoutKey, formats)) {
+      this.updateReport('formats', formatsWithoutKey);
+    }
+  }
+
+  onAddFormat = () => {
+    const { report } = this.props;
+    const formats = report
+      .get('formats', Immutable.List())
+      .push(Immutable.Map({
+        field: '',
+        op: '',
+        value: '',
+      }));
+    this.updateReport('formats', formats);
+  }
+
+  onMoveFormat = (oldIndex, newIndex) => {
+    const { report } = this.props;
+    const curr = report.getIn(['formats', oldIndex]);
+    const formats = report
+      .get('formats', Immutable.List())
+      .delete(oldIndex)
+      .insert(newIndex, curr);
+    this.updateReport('formats', formats);
+  }
+  /* ~Format */
+
   /* Columns */
   onChangeColumnField = (index, value) => {
     const { report } = this.props;
@@ -212,7 +285,7 @@ class ReportEditor extends Component {
           columnWithMutations
             .set('field_name', value)
             .set('label', newLabel)
-            .set('entity', entityField.get('entity', report.get('entity', '')))
+            .set('entity', entityField.get('entity', report.get('entity', ''))),
         );
       });
     this.updateReport('columns', columns);
@@ -230,7 +303,7 @@ class ReportEditor extends Component {
         return column.withMutations(columnWithMutations =>
           columnWithMutations
             .set('op', value)
-            .set('label', newLabel)
+            .set('label', newLabel),
         );
       });
     this.updateReport('columns', columns);
@@ -307,6 +380,7 @@ class ReportEditor extends Component {
     const { report } = this.props;
     const keyToRemove = report.getIn(['columns', index, 'key'], '');
     this.onRemoveSortByKey(keyToRemove);
+    this.onRemoveFormatByKey(keyToRemove);
     const columns = report
       .get('columns', Immutable.List())
       .delete(index);
@@ -328,6 +402,11 @@ class ReportEditor extends Component {
     return reportFileds.get(report.get('entity', ''), Immutable.List());
   }
 
+  getOutputFormats = () => {
+    const { taxType, outputFormats } = this.props;
+    return taxType === 'vat' ? outputFormats : outputFormats.filter(format => format.get('id', '') !== 'vat_format');
+  }
+
   render() {
     const {
       mode, report, aggregateOperators, conditionsOperators, sortOperators, entities, progress,
@@ -335,6 +414,7 @@ class ReportEditor extends Component {
     const fieldsConfig = this.getEntityFields();
     const columns = report.get('columns', Immutable.List());
     const mandatory = <span className="danger-red"> *</span>;
+    const outputFormats = this.getOutputFormats();
     const previewBtnClass = classNames('fa', {
       'fa-search': !progress,
       'fa-spinner fa-pulse': progress,
@@ -342,7 +422,7 @@ class ReportEditor extends Component {
     return (
       <div className="ReportEditor">
         <Form horizontal>
-          <Panel header={<span>Basic Details</span>}>
+          <Panel header={<span>Basic Details</span>} collapsible={mode === 'update'} className="collapsible">
             <EditorDetails
               mode={mode}
               title={report.get('key', '')}
@@ -352,19 +432,6 @@ class ReportEditor extends Component {
               onChangeKey={this.onChangeReportKey}
               onChangeEntity={this.onChangeReportEntity}
               onChangeType={this.onChangeReportType}
-            />
-          </Panel>
-          <Panel header={<span>Conditions</span>}>
-            <EditorConditions
-              mode={mode}
-              conditions={report.get('conditions', Immutable.List())}
-              fieldsOptions={fieldsConfig}
-              operators={conditionsOperators}
-              onRemove={this.onRemoveCondition}
-              onAdd={this.onAddCondition}
-              onChangeField={this.onChangeConditionField}
-              onChangeOperator={this.onChangeConditionOperator}
-              onChangeValue={this.onChangeConditionValue}
             />
           </Panel>
           <Panel header={<span>Columns {mandatory}</span>}>
@@ -382,7 +449,20 @@ class ReportEditor extends Component {
               onMove={this.onMoveColumn}
             />
           </Panel>
-          <Panel header={<span>Sort</span>}>
+          <Panel header={<span>Conditions</span>} collapsible className="collapsible">
+            <EditorConditions
+              mode={mode}
+              conditions={report.get('conditions', Immutable.List())}
+              fieldsOptions={fieldsConfig}
+              operators={conditionsOperators}
+              onRemove={this.onRemoveCondition}
+              onAdd={this.onAddCondition}
+              onChangeField={this.onChangeConditionField}
+              onChangeOperator={this.onChangeConditionOperator}
+              onChangeValue={this.onChangeConditionValue}
+            />
+          </Panel>
+          <Panel header={<span>Sort</span>} collapsible className="collapsible">
             <EditorSorts
               mode={mode}
               sorts={report.get('sorts', Immutable.List())}
@@ -393,6 +473,20 @@ class ReportEditor extends Component {
               onRemove={this.onRemoveSort}
               onAdd={this.onAddSort}
               onMove={this.onMoveSort}
+            />
+          </Panel>
+          <Panel header={<span>Formatting Style</span>} collapsible className="collapsible">
+            <EditorFormatters
+              mode={mode}
+              formats={report.get('formats', Immutable.List())}
+              options={columns}
+              formatOperators={outputFormats}
+              onChangeField={this.onChangeFormatField}
+              onChangeOperator={this.onChangeFormatOperator}
+              onChangeValue={this.onChangeFormatValue}
+              onRemove={this.onRemoveFormat}
+              onAdd={this.onAddFormat}
+              onMove={this.onMoveFormat}
             />
           </Panel>
         </Form>

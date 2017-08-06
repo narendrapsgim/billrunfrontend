@@ -124,4 +124,33 @@ export default {
     { id: 'addToSet', title: 'Unique List', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group'] },
     { id: 'count', title: 'Count', include: ['fieldid:count_group'] },
   ],
+  outputFormats: [
+    { id: 'date_format', title: 'Date', options: [
+      { value: 'c', label: 'ISO 8601' },
+      { value: 'd/m/Y', label: '31/12/2017' },
+      { value: 'm/d/Y', label: '12/31/2017' },
+    ]},
+    { id: 'datetime_format', title: 'Date time', options: [
+      { value: 'd/m/Y H:i', label: '31/12/2017 22:05' },
+      { value: 'd/m/Y H:i:s', label: '31/12/2017 22:05:59' },
+      { value: 'm/d/Y h:i A', label: '12/31/2017 10:05 PM' },
+      { value: 'm/d/Y h:i:s A', label: '12/31/2017 10:05:59 PM' },
+    ]},
+    { id: 'time_format', title: 'Time', options: [
+      { value: 'H:i', label: '22:05' },
+      { value: 'H:i:s', label: '22:05:59' },
+      { value: 'h:i A', label: '10:05 PM' },
+      { value: 'h:i:s A', label: '10:05:59 PM' },
+    ]},
+    { id: 'multiplication', title: 'Multiply by a number'},
+    { id: 'default_empty', title: 'Default empty value'},
+    { id: 'vat_format', title: 'Vat', options: [
+      { value: 'add_tax', label: 'Add Vat' },
+      { value: 'remove_tax', label: 'Remove Vat' },
+    ] },
+    { id: 'corrency_format', title: 'Corrency', options: [
+      { value: 'suffix', label: '1234$' },
+      { value: 'prefix', label: '$1234' },
+    ] },
+  ],
 };

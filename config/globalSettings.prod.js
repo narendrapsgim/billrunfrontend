@@ -1,5 +1,5 @@
 var globalSetting = {
-  storageVersion: 'v0.1',
+  storageVersion: '0.0.1',
   serverUrl: "",
   serverApiTimeOut: 300000, // 5 minutes
   serverApiDebug: false,

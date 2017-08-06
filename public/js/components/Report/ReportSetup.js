@@ -40,7 +40,7 @@ import {
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
 import { modeSimpleSelector, itemSelector, idSelector } from '../../selectors/entitySelector';
-import { reportFieldsSelector } from '../../selectors/settingsSelector';
+import { reportFieldsSelector, taxationTypeSelector } from '../../selectors/settingsSelector';
 import { itemsSelector, pageSelector, nextPageSelector, sizeSelector } from '../../selectors/entityListSelectors';
 
 class ReportSetup extends Component {
@@ -55,13 +55,14 @@ class ReportSetup extends Component {
     page: PropTypes.number,
     nextPage: PropTypes.bool,
     size: PropTypes.number,
+    taxType: PropTypes.string,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
     location: PropTypes.shape({
       pathname: PropTypes.string,
       query: PropTypes.object,
-    }),
+    }).isRequired,
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -73,6 +74,7 @@ class ReportSetup extends Component {
     mode: 'loading',
     page: 0,
     size: getConfig(['list', 'defaultItems'], 10),
+    taxType: 'vat',
     nextPage: false,
   }
 
@@ -88,7 +90,7 @@ class ReportSetup extends Component {
 
   componentWillMount() {
     this.fetchItem();
-    this.props.dispatch(getSettings(['file_types', 'subscribers.subscriber', 'subscribers.account']));
+    this.props.dispatch(getSettings(['file_types', 'subscribers.subscriber', 'subscribers.account', 'taxation']));
   }
 
   componentDidMount() {
@@ -290,6 +292,9 @@ class ReportSetup extends Component {
         )
         .set('sorts', report.get('sorts', Immutable.List())
           .filter(this.filterSortEmptyRows),
+        )
+        .set('formats', report.get('formats', Immutable.List())
+          .filter(this.filterFormatsEmptyRows),
         );
     });
 
@@ -302,6 +307,12 @@ class ReportSetup extends Component {
   filterSortEmptyRows = row => [
     row.get('op', ''),
     row.get('field', ''),
+  ].every(param => param !== '');
+
+  filterFormatsEmptyRows = row => [
+    row.get('field', ''),
+    row.get('op', ''),
+    row.get('value', ''),
   ].every(param => param !== '');
 
   filterColumnsEmptyRows = row => [
@@ -431,7 +442,7 @@ class ReportSetup extends Component {
 
   render() {
     const { progress, showPreview } = this.state;
-    const { item, mode, reportFileds, reportData, size, page, nextPage } = this.props;
+    const { item, mode, reportFileds, reportData, size, page, nextPage, taxType } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -446,6 +457,7 @@ class ReportSetup extends Component {
               report={item}
               reportFileds={reportFileds}
               mode={mode}
+              taxType={taxType}
               onUpdate={this.onChangeReportValue}
               onFilter={this.applyFilter}
               progress={progress}
@@ -490,6 +502,7 @@ const mapStateToProps = (state, props) => ({
   page: pageSelector(state, props, 'reportData'),
   nextPage: nextPageSelector(state, props, 'reportData'),
   size: sizeSelector(state, props, 'reportData'),
+  taxType: taxationTypeSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ReportSetup));
