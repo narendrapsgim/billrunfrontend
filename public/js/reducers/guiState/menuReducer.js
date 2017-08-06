@@ -2,7 +2,7 @@ import Immutable from 'immutable';
 import { PREPARE_MAIN_MENU_STRUCTURE, TOGGLE_SIDE_BAR, prossessMenuTree, combineMenuOverrides } from '../../actions/guiStateActions/menuActions';
 
 const defaultState = Immutable.Map({
-  main: null,
+  main: Immutable.Map(),
   collapseSideBar: false,
 });
 

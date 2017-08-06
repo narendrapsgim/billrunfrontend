@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { Panel } from 'react-bootstrap';
-import { ActionButtons, Actions, LoadingItemPlaceholder, ConfirmModal } from '../Elements';
+import { ActionButtons, Actions, LoadingItemPlaceholder } from '../Elements';
 import ReportEditor from './ReportEditor';
 import ReportList from './ReportList';
 import {
@@ -16,10 +16,13 @@ import {
   buildRequestUrl,
 } from '../../common/Api';
 import {
-  getReportQuery,
+  getReportCSVQuery,
  } from '../../common/ApiQueries';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
-import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import {
+  setPageTitle,
+  showConfirmModal,
+} from '../../actions/guiStateActions/pageActions';
 import {
   saveReport,
   deleteReport,
@@ -37,7 +40,7 @@ import {
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
 import { modeSimpleSelector, itemSelector, idSelector } from '../../selectors/entitySelector';
-import { reportFieldsSelector } from '../../selectors/settingsSelector';
+import { reportFieldsSelector, taxationTypeSelector } from '../../selectors/settingsSelector';
 import { itemsSelector, pageSelector, nextPageSelector, sizeSelector } from '../../selectors/entityListSelectors';
 
 class ReportSetup extends Component {
@@ -52,13 +55,14 @@ class ReportSetup extends Component {
     page: PropTypes.number,
     nextPage: PropTypes.bool,
     size: PropTypes.number,
+    taxType: PropTypes.string,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
     location: PropTypes.shape({
       pathname: PropTypes.string,
       query: PropTypes.object,
-    }),
+    }).isRequired,
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -70,6 +74,7 @@ class ReportSetup extends Component {
     mode: 'loading',
     page: 0,
     size: getConfig(['list', 'defaultItems'], 10),
+    taxType: 'vat',
     nextPage: false,
   }
 
@@ -78,8 +83,6 @@ class ReportSetup extends Component {
     this.state = {
       showPreview: false,
       progress: false,
-      showConfirmReset: false,
-      showConfirmDelete: false,
       listActions: this.getListActions(),
       editActions: this.getEditActions(),
     };
@@ -87,7 +90,7 @@ class ReportSetup extends Component {
 
   componentWillMount() {
     this.fetchItem();
-    this.props.dispatch(getSettings(['file_types', 'subscribers.subscriber', 'subscribers.account']));
+    this.props.dispatch(getSettings(['file_types', 'subscribers.subscriber', 'subscribers.account', 'taxation']));
   }
 
   componentDidMount() {
@@ -284,6 +287,9 @@ class ReportSetup extends Component {
         )
         .set('sorts', report.get('sorts', Immutable.List())
           .filter(this.filterSortEmptyRows),
+        )
+        .set('formats', report.get('formats', Immutable.List())
+          .filter(this.filterFormatsEmptyRows),
         );
     });
 
@@ -296,6 +302,12 @@ class ReportSetup extends Component {
   filterSortEmptyRows = row => [
     row.get('op', ''),
     row.get('field', ''),
+  ].every(param => param !== '');
+
+  filterFormatsEmptyRows = row => [
+    row.get('field', ''),
+    row.get('op', ''),
+    row.get('value', ''),
   ].every(param => param !== '');
 
   filterColumnsEmptyRows = row => [
@@ -311,22 +323,7 @@ class ReportSetup extends Component {
 
   onClickExportCSV =() => {
     const { item } = this.props;
-    const headers = item.get('columns', Immutable.List()).reduce(
-      (acc, column) => acc.set(column.get('key', ''), column.get('label', column.get('field_name', ''))),
-      Immutable.Map(),
-    );
-    const csvParams = [
-      { headers: JSON.stringify(headers) },
-      { type: 'csv' },
-      { file_name: item.get('key', 'report') },
-    ];
-    const reportParams = {
-      report: this.preperReport(item),
-      page: 0,
-      size: -1,
-    };
-    const csvQuery = getReportQuery(reportParams);
-    csvQuery.params.push(...csvParams);
+    const csvQuery = getReportCSVQuery(item.get('key', ''));
     window.open(buildRequestUrl(csvQuery));
   }
 
@@ -341,29 +338,33 @@ class ReportSetup extends Component {
 
 
   onAskDelete = () => {
-    this.setState({ showConfirmDelete: true });
-  }
-
-  onDeleteClose = () => {
-    this.setState({ showConfirmDelete: false });
+    const { item } = this.props;
+    const confirm = {
+      message: `Are you sure you want to delete "${item.get('key', '')}" report ?`,
+      onOk: this.onDeleteOk,
+      labelOk: 'Delete',
+      type: 'delete',
+    };
+    this.props.dispatch(showConfirmModal(confirm));
   }
 
   onDeleteOk = () => {
-    this.onDeleteClose();
     this.handleDelete();
   }
 
   onAskReset = () => {
-    this.setState({ showConfirmReset: true });
-  }
-
-  onResetClose = () => {
-    this.setState({ showConfirmReset: false });
+    const { mode } = this.props;
+    const action = (mode === 'create') ? 'reset report' : 'revert report changes';
+    const confirm = {
+      message: `Are you sure you want to ${action} ?`,
+      onOk: this.onResetOk,
+      labelOk: 'Yes',
+    };
+    this.props.dispatch(showConfirmModal(confirm));
   }
 
   onResetOk = () => {
     const { mode } = this.props;
-    this.onResetClose();
     if (mode === 'create') {
       this.props.dispatch(clearReport());
       this.initDefaultValues();
@@ -386,35 +387,41 @@ class ReportSetup extends Component {
 
   getListActions = () => [{
     type: 'export_csv',
-    label: 'Export to CSV',
+    label: 'Export',
+    helpText: 'Export Report to CSV',
     showIcon: true,
     onClick: this.onClickExportCSV,
     actionStyle: 'primary',
     actionSize: 'xsmall',
   }, {
     type: 'remove',
-    label: 'Delete Report',
+    label: 'Delete',
+    helpText: 'Delete Report',
     showIcon: true,
     onClick: this.onAskDelete,
     actionStyle: 'danger',
     actionSize: 'xsmall',
   }, {
     type: 'edit',
-    label: 'Edit Report',
+    label: 'Edit',
+    helpText: 'Edit Report',
     showIcon: true,
     onClick: this.handleEdit,
     actionStyle: 'primary',
     actionSize: 'xsmall',
   }];
 
-  getEditActions = () => [{
-    type: 'reset',
-    label: 'Reset',
-    actionStyle: 'primary',
-    showIcon: false,
-    onClick: this.onAskReset,
-    actionSize: 'xsmall',
-  }];
+  getEditActions = () => {
+    const { mode } = this.props;
+    return [{
+      type: 'reset',
+      label: mode === 'create' ? 'Reset' : 'Revert Changes',
+      actionStyle: 'primary',
+      showIcon: false,
+      onClick: this.onAskReset,
+      actionSize: 'xsmall',
+    }];
+  }
 
   renderPanelHeader = () => {
     const { listActions, editActions } = this.state;
@@ -429,13 +436,11 @@ class ReportSetup extends Component {
   }
 
   render() {
-    const { progress, showConfirmReset, showConfirmDelete, showPreview } = this.state;
-    const { item, mode, reportFileds, reportData, size, page, nextPage } = this.props;
+    const { progress, showPreview } = this.state;
+    const { item, mode, reportFileds, reportData, size, page, nextPage, taxType } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
-    const confirmResetMessage = 'Are you sure you want to reset report ?';
-    const confirmDeleteMessage = `Are you sure you want to delete "${item.get('key', '')}" report ?`;
     const allowEdit = mode !== 'view';
     const tableFields = this.getTableFields();
     const onlyHeaders = allowEdit && (!showPreview || tableFields.isEmpty());
@@ -447,6 +452,7 @@ class ReportSetup extends Component {
               report={item}
               reportFileds={reportFileds}
               mode={mode}
+              taxType={taxType}
               onUpdate={this.onChangeReportValue}
               onFilter={this.applyFilter}
             />
@@ -473,22 +479,7 @@ class ReportSetup extends Component {
             progress={progress}
             disableCancel={progress}
           />
-
         </Panel>
-        <ConfirmModal
-          onOk={this.onResetOk}
-          onCancel={this.onResetClose}
-          show={showConfirmReset}
-          message={confirmResetMessage}
-          labelOk="Yes"
-        />
-        <ConfirmModal
-          onOk={this.onDeleteOk}
-          onCancel={this.onDeleteClose}
-          show={showConfirmDelete}
-          message={confirmDeleteMessage}
-          labelOk="Yes"
-        />
       </div>
     );
   }
@@ -505,6 +496,7 @@ const mapStateToProps = (state, props) => ({
   page: pageSelector(state, props, 'reportData'),
   nextPage: nextPageSelector(state, props, 'reportData'),
   size: sizeSelector(state, props, 'reportData'),
+  taxType: taxationTypeSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ReportSetup));
