@@ -1,5 +1,5 @@
 var globalSetting = {
-  storageVersion: 'v0.1',
+  storageVersion: '0.0.1',
   //serverUrl : "http://10.162.20.191:1337", // Roman
   //serverUrl : "http://10.162.20.86", // Eran
   // serverUrl : "http://10.162.20.247", // Shani
