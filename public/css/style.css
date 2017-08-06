@@ -380,6 +380,21 @@ fieldset[disabled] .btn {
     padding: 2px 4px;
 }
 
+.panel.collapsible .panel-heading .panel-title > a{
+  cursor: pointer;
+  text-decoration: none;
+}
+.panel.collapsible .panel-heading .panel-title > a:before {
+    font-family: "FontAwesome";
+    content: "\f107";
+    margin-right: 10px;
+    color: grey;
+}
+.panel.collapsible .panel-heading .panel-title > a.collapsed:before {
+    content: "\f105";
+    padding: 0 3px 0 2px
+}
+
 .navbar.navbar-default.navbar-fixed-top {
     margin-bottom: 0px;
     border-bottom: 1px solid #e7e7e7;
