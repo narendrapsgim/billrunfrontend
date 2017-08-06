@@ -97,7 +97,9 @@ fieldset[disabled] .btn {
 .navbar-default .dropdown-menu {
   background-color: #EEEEEE;
 }
-.navbar-default .dropdown-menu>li>a, .navbar-default .dropdown-menu>li>a:focus {
+.navbar-default .dropdown-menu>li>a,
+.navbar-default .dropdown-menu>li>a:hover,
+.navbar-default .dropdown-menu>li>a:focus {
   color: #008cba;
 }
 .navbar-default .dropdown-menu>li>a:hover,
