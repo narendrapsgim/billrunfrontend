@@ -1,0 +1,19 @@
+{
+	"conditions": [
+		{ "key": "is", "title": "Is" },
+		{ "key": "in", "title": "In" },
+		{ "key": "is_not", "title": "Is Not" },
+		{ "key": "is_less_than", "title": "Is Less Than", "available_types": ["int"] },
+		{ "key": "is_less_than_or_equal", "title": "Is Less Than Or Equal", "available_types": ["int"] },
+		{ "key": "is_greater_than", "title": "Is Greater Than", "available_types": ["int"] },
+		{ "key": "is_greater_than_or_equal", "title": "Is Greater Than Or Equal", "available_types": ["int"] },
+		{ "key": "reached_constant", "title": "Reached Constant", "available_types": ["int"] },
+		{ "key": "reached_constant_recurring", "title": "Reached Constant (Recurring)", "available_types": ["int"] },
+		{ "key": "has_changed", "title": "Has Changed", "extra_field": false },
+		{ "key": "has_changed_to", "title": "Has Changed To" },
+		{ "key": "has_changed_from", "title": "Has Changed From" }
+	],
+	"entities": [
+		{ "key": "balance", "title": "Balances" }
+	]
+}

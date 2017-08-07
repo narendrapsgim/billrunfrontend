@@ -278,5 +278,14 @@
     "roles": ["admin"],
     "order": 6,
     "parent": "settings"
+  },
+  "events": {
+    "title": "Events",
+    "icon": "",
+    "route": "events",
+    "show": true,
+    "roles": ["admin"],
+    "order": 7,
+    "parent": "settings"
   }
 }
