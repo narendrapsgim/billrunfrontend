@@ -239,7 +239,7 @@ class Navigator extends Component {
 
         { (!showCollapseButton || (showCollapseButton && openSmallMenu)) &&
         <div className={mainNavClassName} role="navigation">
-          <div className="sidebar-nav navbar-collapse">
+          <div className="sidebar-nav">
 
             <ul className="nav in" id="side-menu">
               { menuItems

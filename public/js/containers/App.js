@@ -140,8 +140,9 @@ class App extends Component {
   renderWithLayout = () => {
     const { title, children, routes, isTourRunnig } = this.props;
     return (
-      <div id="wrapper" style={{ height: '100%' }}>
+      <div id="wrapper">
         <ProgressIndicator />
+        <ReduxConfirmModal />
         <Alerts />
         <Tour />
         <Navigator routes={routes} />
@@ -151,9 +152,9 @@ class App extends Component {
             <Col lg={12}>{title && <PageHeader>{title}</PageHeader> }</Col>
           </Row>
           <div>{children}</div>
+          <div id="footer-push" />
         </div>
         <Footer />
-        <ReduxConfirmModal />
       </div>
     );
   }
