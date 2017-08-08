@@ -210,7 +210,7 @@ export const getRevisionStartIndex = (item, revisions) => {
 export const formatSelectOptions = option => (
   Immutable.Map.isMap(option)
     ? { value: option.get('value', ''), label: option.get('label', '') }
-    : { value: changeCase.snakeCase(option), label: changeCase.sentenceCase(option) }
+    : { value: option, label: changeCase.sentenceCase(option) }
 );
 
 export const parseConfigSelectOptions = configOption => formatSelectOptions(
