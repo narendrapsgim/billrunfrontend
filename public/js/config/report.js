@@ -23,7 +23,7 @@ export default {
       { id: 'aid', type: 'number' },
       { id: 'process_time', type: 'string' },
       { id: 'usagesb', type: 'number' },
-      { id: 'type', title: 'File Type', inputConfig: {
+      { id: 'type', title: 'Input Processor', inputConfig: {
          inputType: 'select',
          callback: 'getFileTypeOptions',
       }},
