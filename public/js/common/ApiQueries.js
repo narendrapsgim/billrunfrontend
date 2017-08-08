@@ -396,19 +396,24 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
   ],
 });
 
-export const getEntitesByKeysQuery = (entity, keyField, keys, project = {}) => ({
-  action: 'uniqueget',
-  entity,
-  params: [
-    { page: 0 },
-    { size: 9999 },
-    { project: JSON.stringify(project) },
-    { sort: JSON.stringify(project) },
-    { query: JSON.stringify({
-      [keyField]: { $in: keys },
-    }) },
-  ],
-});
+export const getEntitesByKeysQuery = (entity, keyField, keys, project = {}) => {
+  const formData = new FormData();
+  formData.append('page', 0);
+  formData.append('size', 9999);
+  formData.append('project', JSON.stringify(project));
+  formData.append('sort', JSON.stringify(project));
+  formData.append('query', JSON.stringify({
+    [keyField]: { $in: keys },
+  }));
+  return ({
+    action: 'uniqueget',
+    entity,
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+}
 export const getServicesByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('services', 'name', keys, project);
 export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('rates', 'key', keys, project);
 
