@@ -23,6 +23,10 @@ export default {
       { id: 'aid', type: 'number' },
       { id: 'process_time', type: 'string' },
       { id: 'usagesb', type: 'number' },
+      { id: 'type', title: 'File Type', inputConfig: {
+         inputType: 'select',
+         callback: 'getFileTypeOptions',
+      }},
       { id: 'session_id', type: 'string' },
       { id: 'billrun_pretend', type: 'boolean' },
       { id: 'billrun_status',

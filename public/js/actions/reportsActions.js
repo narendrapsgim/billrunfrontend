@@ -68,6 +68,8 @@ export const getProductsOptions = () => dispatch => dispatch(getList('all_rates'
 
 export const getUsageTypesOptions = () => dispatch => dispatch(getSettings('usage_types'));
 
+export const getFileTypesOptions = () => dispatch => dispatch(getSettings('file_types'));
+
 export const getGroupsOptions = () => dispatch => apiBillRun(getAllGroupsQuery())
   .then((success) => {
     try {
