@@ -91,17 +91,19 @@ class CloseActionBox extends Component {
     const highlightDates = [moment()];
     return (
       <div className="inline">
-        <DatePicker
-          className="form-control inline"
-          dateFormat={globalSetting.dateFormat}
-          selected={closeDate}
-          onChange={this.onChangeFrom}
-          isClearable={true}
-          placeholderText="Select Date..."
-          minDate={minDate}
-          highlightDates={highlightDates}
-        />
-        <Button onClick={this.toggleCloseConfirm} style={btnStyle} disabled={disableSubmit} bsStyle="primary">
+        <div className="inline">
+          <DatePicker
+            className="form-control inline"
+            dateFormat={globalSetting.dateFormat}
+            selected={closeDate}
+            onChange={this.onChangeFrom}
+            isClearable={true}
+            placeholderText="Select Date..."
+            minDate={minDate}
+            highlightDates={highlightDates}
+          />
+        </div>
+        <Button onClick={this.toggleCloseConfirm} style={btnStyle} disabled={disableSubmit} bsStyle="primary" className="inline">
           OK
         </Button>
       </div>
