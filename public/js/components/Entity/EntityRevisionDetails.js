@@ -201,7 +201,8 @@ class EntityRevisionDetails extends Component {
   confirmSelectedDate = (newDate, oldDate) => {
     const dateString = newDate.format(getConfig('dateFormat', 'DD/MM/YYYY'));
     const confirm = {
-      message: `Billing cycle for the date you have chosen is already over.<br/> Are you sure you want to use ${dateString}?`,
+      message: 'Billing cycle for the date you have chosen is already over.',
+      children: `Are you sure you want to use ${dateString}?`,
       onOk: () => { this.onChangeFrom(newDate); },
       onCancel: () => { this.onChangeFrom(oldDate); },
     };
