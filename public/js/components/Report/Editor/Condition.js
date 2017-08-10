@@ -93,20 +93,25 @@ class Condition extends Component {
       .toArray();
   }
 
+  isInBlackList = (option, config) => {
+    const blackList = option.get('exclude', Immutable.List());
+    const fieldKey = `fieldid:${config.get('id', '')}`;
+    const fieldType = config.get('type', 'string');
+    return blackList.includes(fieldKey) || blackList.includes(fieldType);
+  }
+
+  isInWhiteList = (option, config) => {
+    const whiteList = option.get('include', Immutable.List());
+    const fieldKey = `fieldid:${config.get('id', '')}`;
+    const fieldType = config.get('type', 'string');
+    return whiteList.includes(fieldType) || whiteList.includes(fieldKey);
+  }
+
   getOpOptions = () => {
     const { operators } = this.props;
     const config = this.getConfig();
     return operators
-      .filter((option) => {
-        const optionFieldTypes = option.get('types', Immutable.List());
-        const optionFieldExclude = option.get('exclude', Immutable.List());
-        const fieldName = `fieldid:${config.get('id', '')}`;
-        const fieldType = config.get('type', 'string');
-        return (
-          !optionFieldExclude.includes(fieldName)
-          && (optionFieldTypes.includes(fieldType) || optionFieldTypes.includes(fieldName))
-        );
-      })
+      .filter(option => (!this.isInBlackList(option, config) && this.isInWhiteList(option, config)))
       .map(parseConfigSelectOptions)
       .toArray();
   }
@@ -121,7 +126,10 @@ class Condition extends Component {
     const disableVal = disabled || item.get('op', '') === '' || disableOp;
     return (
       <FormGroup className="form-inner-edit-row">
-        <Col sm={4}>
+        <Col smHidden mdHidden lgHidden>
+          <label htmlFor="field_field">Field</label>
+        </Col>
+        <Col sm={3}>
           <Select
             clearable={false}
             options={fieldOptions}
@@ -131,7 +139,10 @@ class Condition extends Component {
           />
         </Col>
 
-        <Col sm={2}>
+        <Col smHidden mdHidden lgHidden>
+          <label htmlFor="operator_field">Operator</label>
+        </Col>
+        <Col sm={3}>
           <Select
             clearable={false}
             options={opOptions}
@@ -141,6 +152,9 @@ class Condition extends Component {
           />
         </Col>
 
+        <Col smHidden mdHidden lgHidden>
+          <label htmlFor="value_field">Value</label>
+        </Col>
         <Col sm={4}>
           <ConditionValue
             field={item}

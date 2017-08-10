@@ -40,31 +40,31 @@ export const setCloneReport = () => setCloneEntity('reports', 'report');
 
 export const clearReport = () => clearEntity('reports');
 
-export const saveReport = (item, action) => dispatch => dispatch(saveEntity('reports', item, action));
+export const saveReport = (item, action) => saveEntity('reports', item, action);
 
-export const deleteReport = item => dispatch => dispatch(deleteEntity('reports', item));
+export const deleteReport = item => deleteEntity('reports', item);
 
 export const updateReport = (path, value) => updateEntityField('reports', path, value);
 
 export const deleteReportValue = path => deleteEntityField('reports', path);
 
-export const getReport = id => dispatch => dispatch(getEntity('reports', fetchReportByIdQuery(id)));
+export const getReport = id => getEntity('reports', fetchReportByIdQuery(id));
 
-export const getReportData = data => dispatch => dispatch(getEntityList('reportData', getReportQuery(data)));
+export const getReportData = data => getEntityList('reportData', getReportQuery(data));
 
-export const clearReportData = () => dispatch => dispatch(clearItems('reportData'));
+export const clearReportData = () => clearItems('reportData');
 
-export const setReportDataListPage = num => dispatch => dispatch(setListPage('reportData', num));
+export const setReportDataListPage = num => setListPage('reportData', num);
 
-export const setReportDataListSize = num => dispatch => dispatch(setListSize('reportData', num));
+export const setReportDataListSize = num => setListSize('reportData', num);
 
-export const getCyclesOptions = () => dispatch => dispatch(getList('cycles_list', getCyclesQuery()));
+export const getCyclesOptions = () => getList('cycles_list', getCyclesQuery());
 
-export const getPlansOptions = () => dispatch => dispatch(getList('available_plans', getPlansKeysQuery()));
+export const getPlansOptions = () => getList('available_plans', getPlansKeysQuery());
 
-export const getServicesOptions = () => dispatch => dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
+export const getServicesOptions = () => getList('available_services', getServicesKeysWithInfoQuery());
 
-export const getProductsOptions = () => dispatch => dispatch(getList('all_rates', getProductsKeysQuery()));
+export const getProductsOptions = () => getList('all_rates', getProductsKeysQuery());
 
 export const getUsageTypesOptions = () => dispatch => dispatch(getSettings('usage_types'));
 

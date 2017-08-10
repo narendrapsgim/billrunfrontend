@@ -2,6 +2,7 @@ import React, { PropTypes, Component } from 'react';
 import { Form, Button, Col, Row, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import uuid from 'uuid';
+import classNames from 'classnames';
 import EditorDetails from './Editor/Details';
 import EditorConditions from './Editor/Conditions';
 import EditorColumns from './Editor/Columns';
@@ -17,6 +18,7 @@ class ReportEditor extends Component {
     report: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
     taxType: PropTypes.string,
+    progress: PropTypes.bool,
     reportFileds: PropTypes.instanceOf(Immutable.Map),
     aggregateOperators: PropTypes.instanceOf(Immutable.List),
     conditionsOperators: PropTypes.instanceOf(Immutable.List),
@@ -31,6 +33,7 @@ class ReportEditor extends Component {
     report: Immutable.Map(),
     mode: 'update',
     taxType: 'vat',
+    progress: false,
     reportFileds: Immutable.Map(),
     aggregateOperators: getConfig(['reports', 'aggregateOperators'], Immutable.List()),
     conditionsOperators: getConfig(['reports', 'conditionsOperators'], Immutable.List()),
@@ -81,7 +84,7 @@ class ReportEditor extends Component {
       op: '',
       value: '',
       type: entityField.get('type', 'string'),
-      entity: entityField.get('entity', report.get('entity', '')),
+      entity: entityField.get('entity',  report.get('entity', '')),
     });
     const newFilters = report
       .get('conditions', Immutable.List())
@@ -90,13 +93,17 @@ class ReportEditor extends Component {
   }
 
   onChangeConditionOperator = (idx, value) => {
-    const { report } = this.props;
-    const resetValueOnOpsChange = ['exists', 'billrun_status'];
+    const { report, conditionsOperators } = this.props;
+    const oldValue = report.getIn(['conditions', idx, 'op'], '');
+    const oldOp = conditionsOperators.find(cond => cond.get('id', '') === oldValue, null, Immutable.Map());
+    const newOp = conditionsOperators.find(cond => cond.get('id', '') === value, null, Immutable.Map());
     const newFilters = report
       .get('conditions', Immutable.List())
       .update(idx, Immutable.Map(), (filter) => {
-        // was or become operator with predefined values
-        if (resetValueOnOpsChange.includes(value) || resetValueOnOpsChange.includes(filter.get('op', ''))) {
+        // reset value if new operator type or options are not the same
+        if (oldOp.get('type', '') !== newOp.get('type', '')
+          || !Immutable.is(oldOp.get('options', Immutable.List()), newOp.get('options', Immutable.List()))
+        ) {
           return filter
             .set('op', value)
             .set('value', '');
@@ -402,12 +409,16 @@ class ReportEditor extends Component {
 
   render() {
     const {
-      mode, report, aggregateOperators, conditionsOperators, sortOperators, entities,
+      mode, report, aggregateOperators, conditionsOperators, sortOperators, entities, progress,
     } = this.props;
     const fieldsConfig = this.getEntityFields();
     const columns = report.get('columns', Immutable.List());
     const mandatory = <span className="danger-red"> *</span>;
     const outputFormats = this.getOutputFormats();
+    const previewBtnClass = classNames('fa', {
+      'fa-search': !progress,
+      'fa-spinner fa-pulse': progress,
+    });
     return (
       <div className="ReportEditor">
         <Form horizontal>
@@ -481,8 +492,8 @@ class ReportEditor extends Component {
         </Form>
         <Row>
           <Col sm={12}>
-            <Button bsStyle="primary" onClick={this.onPreview} block>
-              <i className="fa fa-search" />&nbsp;Preview
+            <Button bsStyle="primary" onClick={this.onPreview} block disabled={progress}>
+              <i className={previewBtnClass} />&nbsp;Preview
             </Button>
           </Col>
           <Col sm={12}>&nbsp;</Col>
