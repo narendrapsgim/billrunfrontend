@@ -164,6 +164,9 @@ fieldset[disabled] .btn {
 /* ~Main/Top menu */
 
 /* react-datepicker */
+.react-datepicker__close-icon {
+  display: block;
+}
 .react-datepicker__close-icon::after{
   color: #6f6f6f!important;
   background-color: #e7e7e7!important;
