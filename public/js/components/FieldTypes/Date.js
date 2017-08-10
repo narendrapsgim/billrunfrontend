@@ -4,7 +4,7 @@ import moment from 'moment';
 import { getConfig } from '../../common/Util';
 
 const Date = (props) => {
-  const { editable, value, disabled, placeholder, onChange, dateFormat, ...otherProps } = props;
+  const { editable, value, disabled, placeholder, onChange, dateFormat, message, ...otherProps } = props;
   const format = dateFormat || getConfig('dateFormat', 'DD/MM/YYYY');
   if (!editable) {
     const displayValue = (moment.isMoment(value) && value.isValid()) ? value.format(format) : value;
@@ -23,7 +23,9 @@ const Date = (props) => {
       onChange={onChange}
       disabled={disabled}
       placeholderText={placeholderText}
-    />
+    >
+      {message}
+    </DatePicker>
   );
 };
 
@@ -32,6 +34,7 @@ Date.defaultProps = {
   disabled: false,
   editable: true,
   placeholder: '',
+  message: null,
   onChange: () => {},
 };
 
@@ -44,6 +47,7 @@ Date.propTypes = {
   editable: PropTypes.bool,
   placeholder: PropTypes.string,
   dateFormat: PropTypes.string,
+  message: PropTypes.node,
   onChange: PropTypes.func,
 };
 
