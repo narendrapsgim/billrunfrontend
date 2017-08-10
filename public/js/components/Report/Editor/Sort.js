@@ -81,6 +81,10 @@ class Sort extends Component {
         <Col sm={1} className="text-center">
           <DragHandle />
         </Col>
+
+        <Col smHidden mdHidden lgHidden>
+          <label htmlFor="field_field">Field</label>
+        </Col>
         <Col sm={5}>
           <Select
             clearable={false}
@@ -89,6 +93,10 @@ class Sort extends Component {
             onChange={this.onChangeField}
             disabled={disabled}
           />
+        </Col>
+
+        <Col smHidden mdHidden lgHidden>
+          <label htmlFor="order_field">Order</label>
         </Col>
         <Col sm={4}>
           <Select
@@ -99,6 +107,7 @@ class Sort extends Component {
             disabled={disableOp}
           />
         </Col>
+
         <Col sm={2} className="actions">
           <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled}>
             <i className="fa fa-trash-o danger-red" />&nbsp;Remove

@@ -28,4 +28,23 @@
      }
   }
 
+  @media (max-width: 767px) {
+    > div {
+      padding-left: 0;
+      margin-bottom: 5px;
+
+      label {
+        padding: 0;
+        margin: 0;
+      }
+    }
+    > div.actions {
+      padding-left: 0;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      display: inline-block;
+      float: right;
+    }
+  }
+
 }
