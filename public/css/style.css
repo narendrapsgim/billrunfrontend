@@ -172,6 +172,15 @@ fieldset[disabled] .btn {
     background-color: #eeeeee!important;
     color: #222222!important;
 }
+.input-group .react-datepicker__input-container {
+  display: block;
+}
+.input-group .react-datepicker-wrapper {
+  display: block;
+}
+.input-group .react-datepicker-popper {
+  margin-top: 47px;
+}
 
 /* React-tags */
 .react-tagsinput-input {
