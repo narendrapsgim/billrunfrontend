@@ -9,7 +9,9 @@ import RevisionList from '../RevisionList';
 import Field from '../Field';
 import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import { getSettings } from '../../actions/settingsActions';
+import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 import { entityMinFrom } from '../../selectors/entitySelector';
+import { minEntityDateSelector } from '../../selectors/settingsSelector';
 
 
 class EntityRevisionDetails extends Component {
@@ -18,6 +20,7 @@ class EntityRevisionDetails extends Component {
     revisions: PropTypes.instanceOf(Immutable.List),
     item: PropTypes.instanceOf(Immutable.Map),
     minFrom: PropTypes.instanceOf(moment),
+    dangerousFrom: PropTypes.instanceOf(moment),
     mode: PropTypes.string,
     onChangeFrom: PropTypes.func,
     backToList: PropTypes.func,
@@ -38,7 +41,8 @@ class EntityRevisionDetails extends Component {
     revisions: Immutable.List(),
     item: Immutable.Map(),
     mode: 'view',
-    minFrom: moment().add(1, 'days'), // default minFrom is tommorow
+    minFrom: moment(0), // default minFrom is tommorow
+    dangerousFrom: moment(0), // default dangerousFrom no date so it set to 1970
     onChangeFrom: () => {},
     backToList: () => {},
     reLoadItem: () => {},
@@ -131,8 +135,13 @@ class EntityRevisionDetails extends Component {
   }
 
   onChangeFrom = (value) => {
+    const { item, dangerousFrom } = this.props;
     if (value) {
       this.props.onChangeFrom(['from'], value.format('YYYY-MM-DD'));
+      if (value.isBefore(dangerousFrom) && !value.isSame(getItemDateValue(item, 'originalValue'), 'day')) {
+        const from = getItemDateValue(item, 'from');
+        this.confirmSelectedDate(value, from);
+      }
     }
   }
 
@@ -189,8 +198,27 @@ class EntityRevisionDetails extends Component {
     }
   }
 
+  confirmSelectedDate = (newDate, oldDate) => {
+    const dateString = newDate.format(getConfig('dateFormat', 'DD/MM/YYYY'));
+    const confirm = {
+      message: `Billing cycle for the date you have chosen is already over.<br/> Are you sure you want to use ${dateString}?`,
+      onOk: () => { this.onChangeFrom(newDate); },
+      onCancel: () => { this.onChangeFrom(oldDate); },
+    };
+    this.props.dispatch(showConfirmModal(confirm));
+  }
+
+  dayDateClass = (day) => {
+    const { item, minFrom, dangerousFrom } = this.props;
+    const originFrom = getItemDateValue(item, 'originalValue');
+    if (day.isBetween(minFrom, dangerousFrom) && !day.isSame(originFrom)) {
+      return 'danger-red';
+    }
+    return undefined;
+  }
+
   renderDateSelectBlock = () => {
-    const { item, mode } = this.props;
+    const { item, mode, minFrom } = this.props;
     const editable = (['closeandnew', 'clone', 'create'].includes(mode));
     const from = getItemDateValue(item, 'from');
     const originFrom = getItemDateValue(item, 'originalValue');
@@ -200,8 +228,9 @@ class EntityRevisionDetails extends Component {
       dateFormat: getConfig('dateFormat', 'DD/MM/YYYY'),
       isClearable: false,
       placeholder: 'Select Date...',
-      filterDate: this.filterLegalFromDate,
+      minDate: minFrom,
       highlightDates,
+      dayClassName: this.dayDateClass,
     };
     if (['closeandnew'].includes(mode)) {
       return (
@@ -220,7 +249,7 @@ class EntityRevisionDetails extends Component {
         </div>
       );
     }
-    // update / create / clone
+    // create / clone
     return (
       <div className="inline" style={{ width: 220, padding: 0, margin: 7 }}>
         <Form horizontal style={{ marginBottom: 0 }}>
@@ -237,8 +266,9 @@ class EntityRevisionDetails extends Component {
                 dateFormat={getConfig('dateFormat', 'DD/MM/YYYY')}
                 isClearable={false}
                 placeholder="Select Date..."
-                filterDate={this.filterLegalFromDate}
+                minDate={minFrom}
                 highlightDates={highlightDates}
+                dayClassName={this.dayDateClass}
               />
             </div>
           </FormGroup>
@@ -291,6 +321,7 @@ class EntityRevisionDetails extends Component {
 
 const mapStateToProps = (state, props) => ({
   minFrom: entityMinFrom(state, props),
+  dangerousFrom: minEntityDateSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(EntityRevisionDetails));

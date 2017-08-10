@@ -188,18 +188,18 @@ export const getItemMode = (item, undefindItemStatus = 'create') => {
 
 export const getItemMinFromDate = (item, minDate) => {
   // item and minDate
-  if (minDate && item && getItemId(item, false)) {
+  if (minDate && getItemId(item, false)) {
     return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
   }
   // only item
-  if(item && getItemId(item, false)) {
+  if(getItemId(item, false)) {
     return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)))
   }
   // only minDate
   if (minDate) {
     return minDate;
   }
-
+  // allow component set default value if no item and minDate exist
   return undefined;
 };
 
