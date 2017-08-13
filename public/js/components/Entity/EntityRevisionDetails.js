@@ -41,8 +41,8 @@ class EntityRevisionDetails extends Component {
     revisions: Immutable.List(),
     item: Immutable.Map(),
     mode: 'view',
-    minFrom: moment(0), // default minFrom is tommorow
-    dangerousFrom: moment(0), // default dangerousFrom no date so it set to 1970
+    minFrom: moment(0), // default no limit so it set to 1970
+    dangerousFrom: moment(0), // default dangerousFrom - no limit so it set to 1970
     onChangeFrom: () => {},
     backToList: () => {},
     reLoadItem: () => {},
