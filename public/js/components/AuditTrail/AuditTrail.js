@@ -10,6 +10,11 @@ import { AdvancedFilter } from '../Filter';
 import DetailsParser from './DetailsParser';
 import { getUserKeysQuery, auditTrailEntityTypesQuery, auditTrailListQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
+import {
+  userNamesSelector,
+  auditlogSelector,
+  auditEntityTypesSelector,
+} from '../../selectors/listSelectors';
 
 class AuditTrail extends Component {
 
@@ -143,18 +148,10 @@ class AuditTrail extends Component {
 }
 
 // TODO: use reselect
-const mapStateToProps = (state) => {
-  const items = state.list.get('log');
-  const userNames = state.list.get('autocompleteUser', Immutable.List())
-    .map(user => user.get('username'));
-  const auditTrailEntityTypes = state.list
-    .get('autocompleteAuditTrailEntityTypes', Immutable.List())
-    .map(type => ({
-      key: type.get('name', ''),
-      val: changeCase.sentenceCase(type.get('name', '')),
-    }));
-
-  return { items, userNames, auditTrailEntityTypes };
-};
+const mapStateToProps = state => ({
+  items: auditlogSelector(state),
+  userNames: userNamesSelector(state),
+  auditTrailEntityTypes: auditEntityTypesSelector(state),
+});
 
 export default connect(mapStateToProps)(AuditTrail);

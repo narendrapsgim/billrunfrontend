@@ -1,9 +1,16 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import { sentenceCase } from 'change-case';
 import { getCycleName } from '../components/Cycle/CycleUtil';
 
 
 const getCyclesOptions = state => state.list.get('cycles_list', null);
+
+const getUserNamesOptions = state => state.list.get('autocompleteUser', null);
+
+const getAuditEntityTypesOptions = state => state.list.get('autocompleteAuditTrailEntityTypes', null);
+
+const getAuditLogs = state => state.list.get('log');
 
 const selectCyclesOptions = (options) => {
   if (options === null) {
@@ -24,6 +31,24 @@ const selectProductsOptions = (options) => {
   return options.map(option => Immutable.Map({
     label: `${option.get('description', '')} (${option.get('key', '')})`,
     value: option.get('key', ''),
+  }));
+};
+
+const selectUserNamesOptions = (options) => {
+  if (options === null) {
+    return undefined;
+  }
+  return options.map(user => user.get('username'));
+};
+
+const selectEntityTypesOptions = (options) => {
+  if (options === null) {
+    return undefined;
+  }
+
+  return options.map(type => ({
+    key: type.get('name', ''),
+    val: sentenceCase(type.get('name', '')),
   }));
 };
 
@@ -74,4 +99,19 @@ export const plansOptionsSelector = createSelector(
 export const groupsOptionsSelector = createSelector(
   getGroupsOptions,
   selectGroupsOptions,
+);
+
+export const auditlogSelector = createSelector(
+  getAuditLogs,
+  log => log
+);
+
+export const userNamesSelector = createSelector(
+  getUserNamesOptions,
+  selectUserNamesOptions,
+);
+
+export const auditEntityTypesSelector = createSelector(
+  getAuditEntityTypesOptions,
+  selectEntityTypesOptions,
 );
