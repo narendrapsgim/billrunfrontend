@@ -43,6 +43,7 @@ const defaultState = Immutable.fromJS({
   },
   customer_identification_fields: [],
   rate_calculators: {},
+  unify: {},
   /* receiver: {
    *   passive: false,
    *   delete_received: false
@@ -64,6 +65,7 @@ export default function (state = defaultState, action) {
   let field_to_move;
   switch (action.type) {
     case GOT_PROCESSOR_SETTINGS:
+      console.log(action.settings);
       return Immutable.fromJS(action.settings);
 
     case SET_NAME:

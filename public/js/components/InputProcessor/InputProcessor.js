@@ -122,13 +122,13 @@ class InputProcessor extends Component {
       steps = steps.set('realtimeMapping', {
         idx: 3,
         label: 'Realtime Mapping',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response', 'unify'],
       });
     } else {
       steps = steps.set('receiver', {
         idx: 3,
         label: 'Receiver',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver', 'unify'],
       });
     }
 
