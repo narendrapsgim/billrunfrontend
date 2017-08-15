@@ -88,6 +88,8 @@ class AuditTrail extends Component {
 
   collectionParser = item => changeCase.sentenceCase(item.get('collection', ''));
 
+  keyParser = item => (item.get('type', '') === 'login' ? '' : item.get('key', ''));
+
   detailsParser = item => <DetailsParser item={item} />
 
   urtQueryBuilder = (date) => {
@@ -110,7 +112,7 @@ class AuditTrail extends Component {
     { id: 'urt', title: 'Date', type: 'datetime', cssClass: 'long-date', sort: true },
     { id: 'user.name', title: 'User', parser: this.userParser, sort: true },
     { id: 'collection', title: 'Module Type', parser: this.collectionParser, sort: true },
-    { id: 'key', title: 'Module Key', sort: true },
+    { id: 'key', title: 'Module Key', parser: this.keyParser, sort: true },
     { title: 'Details', parser: this.detailsParser },
   ]);
 
