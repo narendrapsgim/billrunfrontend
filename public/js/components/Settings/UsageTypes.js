@@ -22,6 +22,7 @@ class UsageTypes extends Component {
 
   state = {
     currentItem: null,
+    createNew: false,
     index: -1,
   }
 
@@ -37,17 +38,24 @@ class UsageTypes extends Component {
   onClickEdit = (item) => {
     this.setState({
       currentItem: item,
+      createNew: false,
       index: this.getItemIndex(item),
     });
   };
 
   onCancel = () => {
-    this.setState({ currentItem: null });
+    this.setState({
+      currentItem: null,
+      createNew: false,
+    });
   }
 
   handleSave = () => {
     const { index, currentItem } = this.state;
-    this.setState({ currentItem: null });
+    this.setState({
+      currentItem: null,
+      createNew: false,
+    });
     this.props.dispatch(updateSetting('usage_types', index, currentItem));
   }
 
@@ -66,6 +74,7 @@ class UsageTypes extends Component {
     const { usageTypesData } = this.props;
     this.setState({
       currentItem: Immutable.Map(),
+      createNew: true,
       index: usageTypesData.size,
     });
   }
@@ -104,8 +113,7 @@ class UsageTypes extends Component {
 
   render() {
     const { propertyTypes } = this.props;
-    const { currentItem } = this.state;
-    const newMode = Immutable.is(currentItem, Immutable.Map());
+    const { currentItem, createNew } = this.state;
 
     return (
       <div>
@@ -125,7 +133,7 @@ class UsageTypes extends Component {
             onSave={this.handleSave}
             onCancel={this.onCancel}
             selectUoms
-            editBase={newMode}
+            editBase={createNew}
           />
         }
       </div>
