@@ -4,9 +4,9 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import changeCase from 'change-case';
 import { Col, Row, Panel } from 'react-bootstrap';
-import List from '../List';
-import Pager from '../Pager';
-import { AdvancedFilter } from '../Filter';
+import List from '../List'; //TODO: move to entityList
+import Pager from '../Pager'; //TODO: move to entityListPager
+import { AdvancedFilter } from '../Filter';  //TODO: move to entityListFilter
 import DetailsParser from './DetailsParser';
 import { getUserKeysQuery, auditTrailEntityTypesQuery, auditTrailListQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
@@ -86,6 +86,11 @@ class AuditTrail extends Component {
     if (query.urt) {
       query.urt = this.urtQueryBuilder(query.urt);
     }
+    if (!isNaN(query.key)) {
+      query.key = { $in: [query.key, Number(query.key)] };
+    } else if (query.key) {
+      query.key = { $regex: query.key, $options: 'i' };
+    }
     return auditTrailListQuery(query, page, fields, sort, size);
   }
 
@@ -147,7 +152,7 @@ class AuditTrail extends Component {
   }
 }
 
-// TODO: use reselect
+
 const mapStateToProps = state => ({
   items: auditlogSelector(state),
   userNames: userNamesSelector(state),
