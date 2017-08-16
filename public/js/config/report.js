@@ -1,5 +1,5 @@
 export default {
-  entities: ['usage', 'subscription', 'customer'],
+  entities: ['usage', 'subscription', 'customer', 'logFile'],
   fields: {
     usage: [
       // Default settings \ Example
@@ -47,21 +47,40 @@ export default {
     subscribers: [
       { id: 'aid', type: 'number' },
       { id: 'sid', type: 'number' },
-      { id: 'plan_activation', type:'date' },
-      { id: 'deactivation_date', type:'date' },
+      { id: 'plan_activation', type: 'date' },
+      { id: 'deactivation_date', type: 'date' },
     ],
     account: [
       { id: 'aid', type: 'number' },
     ],
+    logFile: [
+      { id: 'file_name', title: 'File name' },
+      { id: 'stamp', title: 'Record unique ID' },
+      { id: 'fetching_time', type: 'date' },
+      { id: 'start_process_time', type: 'date' },
+      { id: 'received_time', type: 'date' },
+      { id: 'process_time', type: 'date' },
+      { id: 'logfile_status',
+        columnable: false,
+        title: 'Status',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: 'received', label: 'Received' },
+            { value: 'not_received', label: 'Not received' },
+          ],
+        },
+      },
+    ],
   },
   conditionsOperators: [
-    { id: 'last_days', title: 'Last (days)', include: ['fieldid:urt'], type:'number', suffix:"Days"},
-    { id: 'last_days_include_today', title: 'Last (days including today)', include: ['fieldid:urt'], type:'number', suffix:"Days" },
-    { id: 'last_hours', title: 'Last (hours)', include: ['fieldid:urt'], type:'number', suffix:"Hours" },
-    { id: 'eq', title: 'Equals', include: ['date', 'boolean', 'fieldid:billrun_status'] }, // 'Equals'
-    { id: 'in', title: 'Equals', include: ['string', 'number'], exclude: ['fieldid:billrun_status'] },
+    { id: 'last_days', title: 'Last (days)', include: ['fieldid:urt'], type: 'number', suffix: 'Days' },
+    { id: 'last_days_include_today', title: 'Last (days including today)', include: ['fieldid:urt'], type: 'number', suffix: 'Days' },
+    { id: 'last_hours', title: 'Last (hours)', include: ['fieldid:urt'], type: 'number', suffix: 'Hours' },
+    { id: 'eq', title: 'Equals', include: ['date', 'boolean', 'fieldid:billrun_status', 'fieldid:logfile_status'] }, // 'Equals'
+    { id: 'in', title: 'Equals', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
     { id: 'ne', title: 'Does Not equal', include: ['boolean'], exclude: [] }, // 'Not equals'
-    { id: 'nin', title: 'Does Not equal', include: ['string', 'number'], exclude: ['fieldid:billrun_status'] },
+    { id: 'nin', title: 'Does Not equal', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
     { id: 'lt', title: '<', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Less than'
     { id: 'lte', title: '<=', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
     { id: 'gt', title: '>', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
@@ -76,6 +95,7 @@ export default {
         'fieldid:arategroup',
         'fieldid:plan',
         'fieldid:usaget',
+        'fieldid:logfile_status',
       ],
     },
     { id: 'starts_with',
@@ -88,6 +108,7 @@ export default {
         'fieldid:arategroup',
         'fieldid:plan',
         'fieldid:usaget',
+        'fieldid:logfile_status',
       ],
     },
     { id: 'ends_with',
@@ -100,14 +121,16 @@ export default {
         'fieldid:arategroup',
         'fieldid:plan',
         'fieldid:usaget',
+        'fieldid:logfile_status',
       ],
     },
     { id: 'exists',
       title: 'Exists',
       include: ['string', 'number', 'boolean', 'date'],
-      type:'boolean',
+      type: 'boolean',
       exclude: [
         'fieldid:billrun_status',
+        'fieldid:logfile_status',
       ],
       options: ['yes', 'no'],
     },
