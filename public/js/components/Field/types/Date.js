@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import { getConfig } from '../../common/Util';
+import { getConfig } from '../../../common/Util';
 
 const Date = (props) => {
   const { editable, value, disabled, placeholder, onChange, dateFormat, ...otherProps } = props;

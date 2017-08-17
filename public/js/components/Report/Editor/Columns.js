@@ -134,10 +134,10 @@ class Columns extends Component {
         <Col sm={12}>
           { !columnsRows.isEmpty() ? (
             <FormGroup className="form-inner-edit-row">
-              <Col sm={1}>&nbsp;</Col>
-              <Col sm={4}><label htmlFor="field_field">Field</label></Col>
-              <Col sm={2}><label htmlFor="operator_field">{type !== reportTypes.SIMPLE && 'Function'}</label></Col>
-              <Col sm={3}><label htmlFor="value_field">Label</label></Col>
+              <Col sm={1} xsHidden>&nbsp;</Col>
+              <Col sm={4} xsHidden><label htmlFor="field_field">Field</label></Col>
+              <Col sm={2} xsHidden><label htmlFor="operator_field">{type !== reportTypes.SIMPLE && 'Function'}</label></Col>
+              <Col sm={3} xsHidden><label htmlFor="value_field">Label</label></Col>
             </FormGroup>
           ) : (
             <HelpBlock>{ emptyHelpText }</HelpBlock>

@@ -109,6 +109,7 @@ class PrepaidIncludeSetup extends Component {
     }
     if (mode === 'clone') {
       this.props.dispatch(setClonePrepaidInclude());
+      this.handleSelectTab(1);
     }
 
     const allowedIn = item.get('allowed_in', Immutable.Map());
@@ -212,6 +213,7 @@ class PrepaidIncludeSetup extends Component {
   }
 
   render() {
+    const { activeTab } = this.state;
     const { item, mode, allRates, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -248,7 +250,7 @@ class PrepaidIncludeSetup extends Component {
           />
         </Panel>
 
-        <Tabs defaultActiveKey={this.state.activeTab} id="PrepaidInclude" animation={false} onSelect={this.handleSelectTab}>
+        <Tabs activeKey={activeTab} id="PrepaidInclude" animation={false} onSelect={this.handleSelectTab}>
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>

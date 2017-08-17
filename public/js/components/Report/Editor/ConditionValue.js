@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
 import Select from 'react-select';
+import { InputGroup } from 'react-bootstrap';
 import Field from '../../Field';
 import {
   formatSelectOptions,
@@ -132,7 +133,7 @@ class ConditionValue extends Component {
 
   onChangeDate = (date) => {
     if (moment.isMoment(date) && date.isValid()) {
-      this.props.onChange(date.format(getConfig('dateFormat', 'DD/MM/YYYY')));
+      this.props.onChange(date.toISOString());
     } else {
       this.props.onChange(null);
     }
@@ -163,20 +164,15 @@ class ConditionValue extends Component {
   }
 
   renderCustomInputNumber =({ addTag, onChange, value, ...other }) => (
-    <span className="custom-field-input">
-      <Field
-        fieldType="number"
-        onChange={onChange}
-        value={value}
-        {...other}
-      />
-    </span>
+    <input type="number" onChange={onChange} value={value} {...other} />
   );
 
-  render() {
-    const { field, disabled, config, selectOptions } = this.props;
+  renderInput = () => {
+    const { field, disabled, config, selectOptions, operator } = this.props;
+
+    // console.log('operator: ', operator);
     //  Boolean + operator 'EXIST'
-    if (field.get('op', null) === 'exists' || config.get('type', '') === 'boolean') {
+    if ([config.get('type', ''), operator.get('type', '')].includes('boolean')) {
       let value = '';
       if (field.get('value', false) === true) {
         value = 'yes';
@@ -196,10 +192,11 @@ class ConditionValue extends Component {
     }
 
     // String-select
-    if (config.get('type', 'string') === 'string' && config.getIn(['inputConfig', 'inputType']) === 'select') {
+    if ([config.get('type', 'string'), operator.get('type', '')].includes('string')
+      && (config.getIn(['inputConfig', 'inputType']) === 'select' || operator.has('options'))) {
       const options = config.hasIn(['inputConfig', 'callback'])
         ? selectOptions.get(config.getIn(['inputConfig', 'callback'], ''), Immutable.List())
-        : config.getIn(['inputConfig', 'options'], Immutable.List());
+        : config.getIn(['inputConfig', 'options'], operator.get('options', Immutable.List()));
 
       const formatedOptions = options
         .map(formatSelectOptions)
@@ -219,7 +216,7 @@ class ConditionValue extends Component {
     }
 
     // 'Number'
-    if (config.get('type', '') === 'number') {
+    if ([config.get('type', ''), operator.get('type', '')].includes('number')) {
       if (['nin', 'in'].includes(field.get('op', ''))) {
         const value = field.get('value', '').split(',').filter(val => val !== '');
         return (
@@ -243,7 +240,7 @@ class ConditionValue extends Component {
     }
 
     // 'Date'
-    if (config.get('type', '') === 'date') {
+    if ([config.get('type', ''), operator.get('type', '')].includes('date')) {
       if (['nin', 'in'].includes(field.get('op', ''))) {
         const value = field.get('value', '').split(',').filter(val => val !== '');
         return (
@@ -257,7 +254,7 @@ class ConditionValue extends Component {
           />
         );
       }
-      const value = moment(field.get('value', null), getConfig('dateFormat', 'DD/MM/YYYY'));
+      const value = moment(field.get('value', null));
       return (
         <Field
           fieldType="date"
@@ -287,6 +284,28 @@ class ConditionValue extends Component {
         disabled={disabled}
       />
     );
+  }
+
+  render() {
+    const { operator } = this.props;
+    const input = this.renderInput();
+    if (operator.has('prefix')) {
+      return (
+        <InputGroup>
+          <InputGroup.Addon>{operator.get('prefix', '')}</InputGroup.Addon>
+          {input}
+        </InputGroup>
+      );
+    }
+    if (operator.has('suffix')) {
+      return (
+        <InputGroup>
+          {input}
+          <InputGroup.Addon>{operator.get('suffix', '')}</InputGroup.Addon>
+        </InputGroup>
+      );
+    }
+    return (input);
   }
 
 }

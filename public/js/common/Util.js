@@ -187,14 +187,22 @@ export const getItemMode = (item, undefindItemStatus = 'create') => {
 };
 
 export const getItemMinFromDate = (item, minDate) => {
+  // item and minDate
+  if (minDate && item && getItemId(item, false)) {
+    return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
+  }
+  // only item
+  if(item && getItemId(item, false)) {
+    return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)))
+  }
+  // only minDate
   if (minDate) {
-    if (item && getItemId(item, false)) {
-      return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
-    }
     return minDate;
   }
+
   return undefined;
 };
+
 
 export const getRevisionStartIndex = (item, revisions) => {
   const index = revisions.findIndex(revision => getItemId(revision) === getItemId(item));

@@ -76,20 +76,25 @@ class Column extends Component {
     return fieldsConfig.find(conf => conf.get('id', '') === item.get('field_name', ''), null, Immutable.Map());
   }
 
+  isInBlackList = (option, config) => {
+    const blackList = option.get('exclude', Immutable.List());
+    const fieldKey = `fieldid:${config.get('id', '')}`;
+    const fieldType = config.get('type', 'string');
+    return blackList.includes(fieldKey) || blackList.includes(fieldType);
+  }
+
+  isInWhiteList = (option, config) => {
+    const whiteList = option.get('include', Immutable.List());
+    const fieldKey = `fieldid:${config.get('id', '')}`;
+    const fieldType = config.get('type', 'string');
+    return whiteList.includes(fieldType) || whiteList.includes(fieldKey);
+  }
+
   getoperators = () => {
     const { operators } = this.props;
     const config = this.getConfig();
     return operators
-      .filter((option) => {
-        const optionFieldTypes = option.get('types', Immutable.List());
-        const optionFieldExclude = option.get('exclude', Immutable.List());
-        const fieldName = `fieldid:${config.get('id', '')}`;
-        const fieldType = config.get('type', 'string');
-        return (
-          !optionFieldExclude.includes(fieldName)
-          && (optionFieldTypes.includes(fieldType) || optionFieldTypes.includes(fieldName))
-        );
-      })
+      .filter(option => (!this.isInBlackList(option, config) && this.isInWhiteList(option, config)))
       .map(parseConfigSelectOptions)
       .toArray();
   }
@@ -114,6 +119,10 @@ class Column extends Component {
         <Col sm={1} className="text-center">
           <DragHandle />
         </Col>
+
+        <Col smHidden mdHidden lgHidden>
+          <label htmlFor="field_field">Field</label>
+        </Col>
         <Col sm={4}>
           {!isCountColumn && (
             <Select
@@ -126,6 +135,11 @@ class Column extends Component {
           )}
         </Col>
 
+        <Col smHidden mdHidden lgHidden>
+          {type !== reportTypes.SIMPLE && (
+            <label htmlFor="operator_field">Function</label>
+          )}
+        </Col>
         <Col sm={2}>
           {type !== reportTypes.SIMPLE && (
             <Select
@@ -138,6 +152,9 @@ class Column extends Component {
           )}
         </Col>
 
+        <Col smHidden mdHidden lgHidden>
+          <label htmlFor="label_field">Label</label>
+        </Col>
         <Col sm={3}>
           <Field
             value={item.get('label', '')}
