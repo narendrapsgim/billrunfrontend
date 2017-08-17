@@ -56,7 +56,6 @@ export default {
     logFile: [
       { id: 'file_name', title: 'File name' },
       { id: 'stamp', title: 'Record unique ID' },
-      { id: 'fetching_time', type: 'date' },
       { id: 'start_process_time', type: 'date' },
       { id: 'received_time', type: 'date' },
       { id: 'process_time', type: 'date' },
