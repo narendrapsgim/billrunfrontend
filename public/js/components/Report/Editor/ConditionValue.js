@@ -160,14 +160,7 @@ class ConditionValue extends Component {
   }
 
   renderCustomInputNumber =({ addTag, onChange, value, ...other }) => (
-    <span className="custom-field-input">
-      <Field
-        fieldType="number"
-        onChange={onChange}
-        value={value}
-        {...other}
-      />
-    </span>
+    <input type="number" onChange={onChange} value={value} {...other} />
   );
 
   renderInput = () => {

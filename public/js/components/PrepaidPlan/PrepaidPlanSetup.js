@@ -137,6 +137,7 @@ class PrepaidPlanSetup extends Component {
     }
     if (mode === 'clone') {
       this.props.dispatch(setClonePlan());
+      this.handleSelectTab(1);
     }
   }
 
@@ -250,6 +251,7 @@ class PrepaidPlanSetup extends Component {
   }
 
   render() {
+    const { activeTab } = this.state;
     const { item, mode, ppIncludes, revisions, propertyTypes, usageTypesData, currency } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -273,7 +275,7 @@ class PrepaidPlanSetup extends Component {
           />
         </Panel>
 
-        <Tabs defaultActiveKey={this.state.activeTab} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
+        <Tabs activeKey={activeTab} animation={false} id="PrepaidPlan" onSelect={this.handleSelectTab}>
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>

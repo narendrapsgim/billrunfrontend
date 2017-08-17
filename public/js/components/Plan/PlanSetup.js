@@ -109,6 +109,7 @@ class PlanSetup extends Component {
     }
     if (mode === 'clone') {
       this.props.dispatch(setClonePlan());
+      this.handleSelectTab(1);
     }
     if (item.get('prorated', null) === null) {
       this.props.dispatch(onPlanFieldUpdate(['prorated'], true));
@@ -228,7 +229,7 @@ class PlanSetup extends Component {
           />
         </Panel>
 
-        <Tabs defaultActiveKey={activeTab} animation={false} id="PlanTab" onSelect={this.handleSelectTab}>
+        <Tabs activeKey={activeTab} animation={false} id="PlanTab" onSelect={this.handleSelectTab}>
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanTab

@@ -92,6 +92,7 @@ class ServiceSetup extends Component {
     }
     if (mode === 'clone') {
       this.props.dispatch(setCloneService());
+      this.handleSelectTab(1);
     }
     if (item.get('prorated', null) === null) {
       this.props.dispatch(updateService(['prorated'], true));
@@ -192,7 +193,7 @@ class ServiceSetup extends Component {
           />
         </Panel>
 
-        <Tabs defaultActiveKey={activeTab} animation={false} id="ServiceTab" onSelect={this.handleSelectTab}>
+        <Tabs activeKey={activeTab} animation={false} id="ServiceTab" onSelect={this.handleSelectTab}>
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
