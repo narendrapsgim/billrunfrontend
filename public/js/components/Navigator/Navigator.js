@@ -186,7 +186,7 @@ class Navigator extends Component {
 
   render() {
     const { showCollapseButton, openSmallMenu } = this.state;
-    const { userName, companyNeme, menuItems, logo, collapseSideBar } = this.props;
+    const { userName, companyNeme, menuItems, logo, collapseSideBar, router } = this.props;
     const overallNavClassName = classNames('navbar', 'navbar-default', 'navbar-fixed-top', {
       'collapse-sizebar': collapseSideBar,
       'small-screen-menu': showCollapseButton,
@@ -231,6 +231,9 @@ class Navigator extends Component {
         <ul className={topNavClassName}>
           <OnBoardingNavigation eventKeyBase={2} />
           <NavDropdown id="nav-user-menu" eventKey={1} title={<span><i className="fa fa-user fa-fw" />{ userName }</span>}>
+            <BootstrapMenuItem eventKey={1.1} href="#about" active={router.isActive('about')}>
+              <i className="fa fa-question-circle fa-fw" /> About
+            </BootstrapMenuItem>
             <BootstrapMenuItem eventKey={1.2} onClick={this.clickLogout}>
               <i className="fa fa-sign-out fa-fw" /> Logout
             </BootstrapMenuItem>
