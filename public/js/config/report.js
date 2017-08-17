@@ -23,10 +23,17 @@ export default {
       { id: 'aid', type: 'number' },
       { id: 'process_time', type: 'string' },
       { id: 'usagesb', type: 'number' },
-      { id: 'type', title: 'Input Processor', inputConfig: {
-         inputType: 'select',
-         callback: 'getFileTypeOptions',
-      }},
+      { id: 'type', title: 'Input processor name / BillRun type', inputConfig: {
+        inputType: 'select',
+        callback: 'getFileTypeOptions',
+        options: [
+          { value: 'flat', label: 'Subscription' },
+          'service',
+          { value: 'credit', label: 'Charge / Refund' },
+          'discount',
+          'all',
+        ],
+      } },
       { id: 'session_id', type: 'string' },
       { id: 'billrun_pretend', type: 'boolean' },
       { id: 'billrun_status',
