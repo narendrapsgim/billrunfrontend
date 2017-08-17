@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { InputGroup } from 'react-bootstrap';
-import Field from '../Field';
+import Field from '../';
 
 
 export default class ToggeledInput extends Component {
