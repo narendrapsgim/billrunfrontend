@@ -68,6 +68,7 @@ export default {
           options: [
             { value: 'received', label: 'Received' },
             { value: 'not_received', label: 'Not received' },
+            { value: 'stuck', label: 'Stuck' },
           ],
         },
       },
