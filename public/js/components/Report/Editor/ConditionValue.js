@@ -194,11 +194,24 @@ class ConditionValue extends Component {
     // String-select
     if ([config.get('type', 'string'), operator.get('type', '')].includes('string')
       && (config.getIn(['inputConfig', 'inputType']) === 'select' || operator.has('options'))) {
-      const options = config.hasIn(['inputConfig', 'callback'])
-        ? selectOptions.get(config.getIn(['inputConfig', 'callback'], ''), Immutable.List())
-        : config.getIn(['inputConfig', 'options'], operator.get('options', Immutable.List()));
-
-      const formatedOptions = options
+      const options = Immutable.List()
+        .withMutations((optionsWithMutations) => {
+          if (config.hasIn(['inputConfig', 'callback'])) {
+            selectOptions.get(config.getIn(['inputConfig', 'callback'], ''), Immutable.List()).forEach((selectOption) => {
+              optionsWithMutations.push(selectOption);
+            });
+          }
+          if (config.hasIn(['inputConfig', 'options'])) {
+            config.getIn(['inputConfig', 'options'], Immutable.List()).forEach((selectOption) => {
+              optionsWithMutations.push(selectOption);
+            });
+          }
+          if (operator.has('options')) {
+            operator.get('options', Immutable.List()).forEach((selectOption) => {
+              optionsWithMutations.push(selectOption);
+            });
+          }
+        })
         .map(formatSelectOptions)
         .toArray();
 
@@ -207,7 +220,7 @@ class ConditionValue extends Component {
         <Select
           clearable={false}
           multi={multi}
-          options={formatedOptions}
+          options={options}
           value={field.get('value', '')}
           onChange={this.onChangeSelect}
           disabled={disabled}
