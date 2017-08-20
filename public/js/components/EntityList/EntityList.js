@@ -55,6 +55,7 @@ class EntityList extends Component {
     ]),
     filter: PropTypes.instanceOf(Immutable.Map),
     sort: PropTypes.instanceOf(Immutable.Map),
+    defaultSort: PropTypes.instanceOf(Immutable.Map),
     state: PropTypes.instanceOf(Immutable.List),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
@@ -81,6 +82,7 @@ class EntityList extends Component {
     filterFields: [],
     projectFields: {},
     sort: Immutable.Map(),
+    defaultSort: Immutable.Map(),
     filter: Immutable.Map(),
     state: Immutable.List([0, 1, 2]),
     refreshString: '',
@@ -89,9 +91,12 @@ class EntityList extends Component {
   }
 
   componentWillMount() {
-    const { forceRefetchItems, items } = this.props;
+    const { forceRefetchItems, items, sort, defaultSort, itemsType } = this.props;
     if (forceRefetchItems || items == null || items.isEmpty()) {
       this.fetchItems(this.props);
+    }
+    if (sort.isEmpty() && !defaultSort.isEmpty()) {
+      this.props.dispatch(setListSort(itemsType, defaultSort));
     }
   }
 
