@@ -51,7 +51,7 @@ class Radio extends PureComponent {
 
   render() {
     const { id } = this.state;
-    const { value, editable, label } = this.props;
+    const { value, editable, label, disabled } = this.props;
 
     if (!editable) {
       return (<span>{ value }</span>);
@@ -60,7 +60,7 @@ class Radio extends PureComponent {
     const inputField = this.renderInput();
     if (label.length) {
       return (
-        <label htmlFor={id} style={{ paddingTop: '10px' }}>
+        <label htmlFor={id} style={{ paddingTop: '10px' }} className={disabled ? 'disabled' : ''}>
           {inputField}
           &nbsp;
           {label}
