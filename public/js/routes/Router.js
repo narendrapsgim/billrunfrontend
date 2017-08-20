@@ -11,7 +11,7 @@ import {
 } from '../components/Dashboard';
 import FakeDataDashboard from '../components/Dashboard/FakeDataDashboard';
 import LoginPage from '../components/LoginPage';
-import WelcomePage from '../components/WelcomePage';
+import { Welcome, About } from '../components/StaticPages';
 import { PageNotFound404 } from '../components/Errors';
 import CustomersList from '../components/CustomersList';
 import CustomerSetup from '../components/CustomerSetup';
@@ -54,7 +54,7 @@ import ChangePassword from '../components/LoginForm/ChangePassword';
 
 const routes = () => (
   <Route path="/" component={App}>
-    <IndexRoute component={RequireAuth(WelcomePage)} title="" />
+    <IndexRoute component={RequireAuth(Welcome)} title="" />
 
     <Route path="dashboard">
       <Route path="overview" component={RequireAuth(OverviewDashboard)} title="Overview Dashboard" />
@@ -143,6 +143,7 @@ const routes = () => (
     <Route path="/custom_fields" component={RequireAuth(CustomFields)} title="Custom Fields" />
     <Route path="/events" component={RequireAuth(Events)} title="Events" />
     <Route path="/login" component={LoginPage} title="Login" />
+    <Route path="/about" component={About} title="About" />
     <Route path="/changepassword(/:itemId)" component={ChangePassword} title="Change Password" />
     <Route path="*" component={PageNotFound404} title=" " />
   </Route>

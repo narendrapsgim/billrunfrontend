@@ -124,6 +124,7 @@ class ChargingPlanSetup extends Component {
     }
     if (mode === 'clone') {
       this.props.dispatch(setClonePlan());
+      this.handleSelectTab(1);
     }
   }
 
@@ -221,6 +222,7 @@ class ChargingPlanSetup extends Component {
   }
 
   render() {
+    const { activeTab } = this.state;
     const { item, prepaidIncludes, mode, revisions } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -246,7 +248,7 @@ class ChargingPlanSetup extends Component {
           />
         </Panel>
 
-        <Tabs defaultActiveKey={this.state.activeTab} id="ChargingPlan" animation={false} onSelect={this.handleSelectTab}>
+        <Tabs activeKey={activeTab} id="ChargingPlan" animation={false} onSelect={this.handleSelectTab}>
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>

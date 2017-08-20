@@ -64,49 +64,49 @@ class CustomField extends Component {
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Unique</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="unique" onChange={this.onChange} value={field.get('unique', false)} fieldType="checkbox" />
+              <Field id="unique" onChange={this.onChange} value={field.get('unique', '')} fieldType="checkbox" />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Mandatory</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', false)} fieldType="checkbox" disabled={field.get('unique', false)} />
+              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', '')} fieldType="checkbox" disabled={field.get('unique', false)} />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Editable</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="editable" onChange={this.onChange} value={field.get('editable', true)} fieldType="checkbox" />
+              <Field id="editable" onChange={this.onChange} value={field.get('editable', '')} fieldType="checkbox" />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Display</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="display" onChange={this.onChange} value={field.get('display', false)} fieldType="checkbox" />
+              <Field id="display" onChange={this.onChange} value={field.get('display', '')} fieldType="checkbox" />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Show in list</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="show_in_list" onChange={this.onChange} value={field.get('show_in_list', false)} fieldType="checkbox" />
+              <Field id="show_in_list" onChange={this.onChange} value={field.get('show_in_list', '')} fieldType="checkbox" />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Searchable</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="searchable" onChange={this.onChange} value={field.get('searchable', false)} fieldType="checkbox" />
+              <Field id="searchable" onChange={this.onChange} value={field.get('searchable', '')} fieldType="checkbox" />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Multiple</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', false)} fieldType="checkbox" />
+              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', '')} fieldType="checkbox" />
             </Col>
           </FormGroup>
 
@@ -115,7 +115,7 @@ class CustomField extends Component {
             <Col sm={9}>
               <InputGroup>
                 <InputGroup.Addon>
-                  <Field id="select_list" onChange={this.onChange} value={field.get('select_list', false)} fieldType="checkbox" />
+                  <Field id="select_list" onChange={this.onChange} value={field.get('select_list', '')} fieldType="checkbox" />
                 </InputGroup.Addon>
                 <Field id="select_options" onChange={this.onChange} value={field.get('select_options', '')} disabled={!field.get('select_list', false)} />
               </InputGroup>
