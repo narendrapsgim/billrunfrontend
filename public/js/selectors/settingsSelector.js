@@ -357,7 +357,7 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
   })
 );
 
-const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields) => {
+const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, eventFields) => {
   // usage: linesFileds,
 	// duplicate fields list by join (same fields from different collections)
 	// that will be removed frm UI.
@@ -367,8 +367,8 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
     base: Immutable.List(['firstname', 'lastname']),
   });
   const usage = concatJoinFields(linesFileds, Immutable.Map({
-  subscription: subscriberFields,
-  customer: accountFields,
+    subscription: subscriberFields,
+    customer: accountFields,
   }), usageExcludeIds);
 
   // const subscription = subscriberFields;
@@ -376,7 +376,7 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
     customer: Immutable.List(['aid', 'type']),
     usage: Immutable.List(['firstname', 'lastname', 'sid', 'aid', 'plan']),
     base: Immutable.List([]),
-});
+  });
   const subscription = concatJoinFields(subscriberFields, Immutable.Map({
     customer: accountFields,
     usage: linesFileds,
@@ -394,7 +394,8 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
   // }), customerExcludeIds);
 
   const logFile = logFileFields;
-  return Immutable.Map({ usage, subscription, customer, logFile });
+  const event = eventFields;
+  return Immutable.Map({ usage, subscription, customer, logFile, event });
 };
 
 const getReportConfigFields = type => getConfig(['reports', 'fields', type], Immutable.List());
@@ -482,6 +483,13 @@ const reportlogFileFieldsSelector = createSelector(
   mergeEntityAndReportConfigFields,
 );
 
+const reportEventFileFieldsSelector = createSelector(
+  () => getReportConfigFields('event'),
+  () => Immutable.List(),
+  () => 'event',
+  mergeEntityAndReportConfigFields,
+);
+
 const reportLinesFieldsSelector = createSelector(
   inputProssesorCustomKeysSelector,
   selectReportLinesFields,
@@ -492,6 +500,7 @@ export const reportFieldsSelector = createSelector(
   reportAccountFieldsSelector,
   reportLinesFieldsSelector,
   reportlogFileFieldsSelector,
+  reportEventFileFieldsSelector,
   selectReportFields,
 );
 
