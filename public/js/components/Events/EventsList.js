@@ -2,8 +2,9 @@ import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { Panel, Col, Form, Button } from 'react-bootstrap';
-import { ActionButtons, ModalWrapper } from '../Elements';
-import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
+import { ActionButtons } from '../Elements';
+import { getSettings, saveSettings } from '../../actions/settingsActions';
+import { saveEvent } from '../../actions/eventActions';
 import { eventsSelector } from '../../selectors/settingsSelector';
 import EventForm from './EventForm';
 import List from '../../components/List';
@@ -21,7 +22,6 @@ class EventSettings extends Component {
   };
 
   state = {
-    event: Immutable.Map(),
     editedEvent: null,
   };
 
@@ -62,7 +62,7 @@ class EventSettings extends Component {
   onSaveEvent = () => {
     const { editedEvent } = this.state;
     this.setState({ editedEvent: null });
-    this.props.dispatch(updateSetting('events', [editedEvent.get('entityType'), editedEvent.get('index')], editedEvent.get('item')));
+    this.props.dispatch(saveEvent(editedEvent.get('entityType'), editedEvent.get('index'), editedEvent.get('item')));
   }
 
   onCancelEventForm = () => {
@@ -74,32 +74,8 @@ class EventSettings extends Component {
     this.setState({ editedEvent: editedEvent.setIn(['item', ...fieldPath], value) });
   }
 
-  getConditionName = conditionKey => (
-    (getConfig('events', Immutable.Map).get('conditions', Immutable.List()).find(condition => condition.get('key', '') === conditionKey) || Immutable.Map).get('title', '')
-  )
-
-  getConditionPath = conditionPath => (
-    conditionPath
-  );
-
-  getConditionDescription = condition =>
-    `${this.getConditionPath(condition.get('path', ''))} ${this.getConditionName(condition.get('type', ''))} ${condition.get('value', '')}`;
-
-  onShowConditionsList = event => () => {
-    this.setState({ event });
-  }
-
-  onHideConditionsList = () => {
-    this.setState({ event: Immutable.Map() });
-  }
-
-  conditionsParser = event => (
-    <Button bsStyle="link" onClick={this.onShowConditionsList(event)} style={{ verticalAlign: 'bottom' }}>conditions</Button>
-  );
-
   getListFields = () => [
     { id: 'event_code', title: 'Event Code' },
-    { id: 'conditions', title: 'Conditions', parser: this.conditionsParser },
   ]
 
   getListActions = entityType => [
@@ -137,23 +113,6 @@ class EventSettings extends Component {
     )).toList();
   }
 
-  renderConditionsListPopup = () => {
-    const { event } = this.state;
-    const title = `Conditions for event ${event.get('event_code', '')}`;
-    return (
-      <ModalWrapper title={title} show={!event.isEmpty()} onCancel={this.onHideConditionsList} onHide={this.onHideConditionsList} labelCancel="OK">
-        <div>
-          {event.get('conditions', Immutable.List()).map((condition, index) => (
-            <span key={`condition-${index}`}>
-              {this.getConditionDescription(condition)}
-              <br />
-            </span>
-          ))}
-        </div>
-      </ModalWrapper>
-    );
-  }
-
   renderEventForm = () => {
     const { editedEvent } = this.state;
     return editedEvent !== null &&
@@ -172,7 +131,6 @@ class EventSettings extends Component {
       <div>
         <Col sm={12}>
           { this.renderEvents() }
-          { this.renderConditionsListPopup() }
           { this.renderEventForm() }
         </Col>
         <Col sm={12}>

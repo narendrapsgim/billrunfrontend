@@ -1,130 +1,179 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, Col, ControlLabel, Button } from 'react-bootstrap';
-import Select from 'react-select';
+import { connect } from 'react-redux';
+import { Form, FormGroup, Col, ControlLabel, Button, Panel } from 'react-bootstrap';
+import { getConditionDescription } from './EventsUtil';
 import Field from '../Field';
 import { ModalWrapper } from '../Elements';
-import { getConfig } from '../../common/Util';
+import ConditionBalance from './ConditionsTypes/ConditionBalance';
+import { usageTypesDataSelector, propertyTypeSelector, currencySelector } from '../../selectors/settingsSelector';
 
-const EventForm = (props) => {
-  const { item, onCancel, onSave, onUpdateField } = props;
+class EventForm extends Component {
 
-  const onChangeField = path => (e) => {
+  static propTypes = {
+    item: PropTypes.instanceOf(Immutable.Map),
+    onCancel: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
+    onUpdateField: PropTypes.func.isRequired,
+    conditionType: PropTypes.string,
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    currency: PropTypes.string,
+  };
+
+  static defaultProps = {
+    item: Immutable.Map(),
+    conditionType: 'balance',
+    propertyTypes: Immutable.List(),
+    usageTypesData: Immutable.List(),
+    currency: '',
+  };
+
+  state = {
+    editedConditionIndex: -1,
+  };
+
+  onChangeField = path => (e) => {
     const { value } = e.target;
-    onUpdateField(path, value);
+    this.props.onUpdateField(path, value);
   };
 
-  const onChangeSelectField = path => (value) => {
-    onUpdateField(path, value);
-  };
-
-  const getConditionTypes = () => (getConfig(['events', 'conditions'], Immutable.Map()).map(condType => (
-    { value: condType.get('key', ''), label: condType.get('title', '') })).toArray()
-  );
-
-  const addCondition = () => {
+  addCondition = () => {
+    const { item } = this.props;
     const conditions = item.get('conditions', Immutable.List()).push(Immutable.Map());
-    onUpdateField(['conditions'], conditions);
+    this.props.onUpdateField(['conditions'], conditions);
+    this.setState({
+      editedConditionIndex: conditions.size - 1,
+    });
   };
 
-  const removeCondition = index => () => {
+  editCondition = index => () => {
+    this.setState({
+      editedConditionIndex: index,
+    });
+  }
+
+  hideEditCondition = () => {
+    this.setState({
+      editedConditionIndex: -1,
+    });
+  }
+
+  removeCondition = index => () => {
+    const { item } = this.props;
     const conditions = item.get('conditions', Immutable.List()).delete(index);
-    onUpdateField(['conditions'], conditions);
+    this.props.onUpdateField(['conditions'], conditions);
   };
 
-  const renderCondition = (condition, index) => (
+  renderConditionEditForm = (condition, index) => {
+    const { conditionType, propertyTypes, usageTypesData } = this.props;
+    switch (conditionType) {
+      case 'balance':
+      default:
+        return (
+          <ConditionBalance
+            item={condition}
+            index={index}
+            onChangeField={this.props.onUpdateField}
+            propertyTypes={propertyTypes}
+            usageTypesData={usageTypesData}
+          />
+        );
+    }
+  }
+
+  renderCondition = (condition, index) => (
     <FormGroup className="form-inner-edit-row" key={index}>
-      <Col sm={4}>
-        <Field
-          id={`cond-path-${index}`}
-          onChange={onChangeField(['conditions', index, 'path'])}
-          value={condition.get('path', '')}
-        />
+      <Col sm={10}>
+        {
+          getConditionDescription(this.props.conditionType, condition, {
+            propertyTypes: this.props.propertyTypes,
+            usageTypesData: this.props.usageTypesData,
+            currency: this.props.currency,
+            activityType: 'counter',
+          })
+        }
       </Col>
-      <Col sm={4}>
-        <Select
-          id={`cond-type-${index}`}
-          onChange={onChangeSelectField(['conditions', index, 'type'])}
-          value={condition.get('type', '')}
-          options={getConditionTypes()}
-        />
+      <Col sm={1} hidden={this.state.editedConditionIndex === index}>
+        <Button onClick={this.editCondition(index)} bsStyle="link">
+          <i className="fa fa-fw fa-pencil" />
+        </Button>
       </Col>
-      <Col sm={3}>
-        <Field
-          id={`cond-value-${index}`}
-          onChange={onChangeField(['conditions', index, 'value'])}
-          value={condition.get('value', '')}
-        />
+      <Col sm={1} hidden={this.state.editedConditionIndex !== index}>
+        <Button onClick={this.hideEditCondition} bsStyle="link">
+          <i className="fa fa-fw fa-minus" />
+        </Button>
       </Col>
       <Col sm={1}>
-        <Button onClick={removeCondition(index)} bsStyle="link">
+        <Button onClick={this.removeCondition(index)} bsStyle="link">
           <i className="fa fa-fw danger-red fa-trash-o" />
         </Button>
       </Col>
+      <Col sm={12}>
+        <Panel collapsible expanded={this.state.editedConditionIndex === index}>
+          { this.renderConditionEditForm(condition, index) }
+        </Panel>
+      </Col>
     </FormGroup>
   );
 
-  const renderAddConditionButton = () => (
-    <Button className="btn-primary" onClick={addCondition}><i className="fa fa-plus" />&nbsp;Add New Condition</Button>
+  renderAddConditionButton = () => (
+    <Button className="btn-primary" onClick={this.addCondition}><i className="fa fa-plus" />&nbsp;Add New Condition</Button>
   );
 
-  const renderConditions = () => (
-    item.get('conditions', Immutable.List()).map(renderCondition).toArray()
+  renderConditions = () => (
+    this.props.item.get('conditions', Immutable.List()).map(this.renderCondition).toArray()
   );
 
-  const renderConditionsHeader = () => (
+  renderConditionsHeader = () => (
     <FormGroup className="form-inner-edit-row">
-      <Col sm={4}>
-        <strong>Path</strong>
-      </Col>
-      <Col sm={4}>
-        <strong>Type</strong>
-      </Col>
-      <Col sm={3}>
-        <strong>Value</strong>
+      <Col sm={12}>
+        <strong>Conditions</strong>
       </Col>
     </FormGroup>
   );
 
-  return (
-    <ModalWrapper title={`Event ${item.get('event_code', '')}`} show={true} onOk={onSave} onCancel={onCancel} labelOk="Save" >
-      <Form horizontal>
+  onSaveEvent = () => {
 
-        <FormGroup>
-          <Col componentClass={ControlLabel} md={4}>
-            Event Code
-          </Col>
-          <Col sm={5}>
-            <Field id="label" onChange={onChangeField(['event_code'])} value={item.get('event_code', '')} />
-          </Col>
-        </FormGroup>
+  };
 
-        <FormGroup>
-          <Col sm={12}>
-            { renderConditionsHeader() }
-          </Col>
-          <Col sm={12}>
-            { renderConditions() }
-          </Col>
-          <Col sm={12}>
-            { renderAddConditionButton() }
-          </Col>
-        </FormGroup>
+  render() {
+    const { item, onSave, onCancel } = this.props;
+    return (
+      <ModalWrapper title={`Event ${item.get('event_code', '')}`} show={true} onOk={onSave} onCancel={onCancel} labelOk="Save" >
+        <Form horizontal>
 
-      </Form>
-    </ModalWrapper>
-  );
-};
+          <FormGroup>
+            <Col componentClass={ControlLabel} md={4}>
+              Event Code
+            </Col>
+            <Col sm={5}>
+              <Field id="label" onChange={this.onChangeField(['event_code'])} value={item.get('event_code', '')} />
+            </Col>
+          </FormGroup>
 
-EventForm.propTypes = {
-  item: PropTypes.instanceOf(Immutable.Map),
-  onCancel: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  onUpdateField: PropTypes.func.isRequired,
-};
+          <FormGroup>
+            <Col sm={12}>
+              { this.renderConditionsHeader() }
+            </Col>
+            <Col sm={12}>
+              { this.renderConditions() }
+            </Col>
+            <Col sm={12}>
+              { this.renderAddConditionButton() }
+            </Col>
+          </FormGroup>
 
-EventForm.defaultProps = {
-  item: Immutable.Map(),
-};
+        </Form>
+      </ModalWrapper>
+    );
+  }
+}
 
-export default EventForm;
+const mapStateToProps = (state, props) => ({
+  propertyTypes: propertyTypeSelector(state, props),
+  usageTypesData: usageTypesDataSelector(state, props),
+  currency: currencySelector(state, props),
+});
+
+export default connect(mapStateToProps)(EventForm);
