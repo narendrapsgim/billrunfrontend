@@ -48,7 +48,7 @@ export default class ProductPrice extends Component {
     } else if (Number.isInteger(Number(value)) && Number(value) > 0) {
       value = Number(value);
     } else {
-      fromError = 'Must be positive integer';
+      fromError = 'Must be a positive integer';
     }
     this.setState({ fromError });
     this.props.onProductEditRate(index, 'from', value);
@@ -66,7 +66,7 @@ export default class ProductPrice extends Component {
         toError = 'Must be greater than "From"';
       }
     } else {
-      toError = 'Must be positive integer';
+      toError = 'Must be a positive integer';
     }
     this.setState({ toError });
     this.props.onProductEditRate(index, 'to', value);
@@ -81,7 +81,7 @@ export default class ProductPrice extends Component {
     } else if (Number.isInteger(Number(value)) && Number(value) > 0) {
       value = Number(value);
     } else {
-      intervalError = 'Must be positive integer';
+      intervalError = 'Must be a positive integer';
     }
     this.setState({ intervalError });
     this.props.onProductEditRate(index, 'interval', value);
