@@ -58,8 +58,8 @@ export default {
     subscribers: [
       { id: 'aid', type: 'number' },
       { id: 'sid', type: 'number' },
-      { id: 'plan_activation', type:'date' },
-      { id: 'deactivation_date', type:'date' },
+      { id: 'plan_activation', type: 'date' },
+      { id: 'deactivation_date', type: 'date' },
     ],
     account: [
       { id: 'aid', type: 'number' },
@@ -71,6 +71,14 @@ export default {
           options: ['is', 'in', 'is_not', 'is_less_than', 'is_less_than_or_equal', 'is_greater_than', 'is_greater_than_or_equal', 'reached_constant', 'reached_constant_recurring', 'has_changed', 'has_changed_to', 'has_changed_from'],
         },
       },
+      { id: 'aid', type: 'number' },
+      { id: 'sid', type: 'number' },
+      { id: 'creation_time', type: 'date' },
+      { id: 'notify_time', type: 'date' },
+      { id: 'value' },
+      { id: 'stamp' },
+      { id: 'event_code' },
+      { id: 'returned_value', searchable: false },
     ],
     logFile: [
       { id: 'file_name', title: 'File name' },
