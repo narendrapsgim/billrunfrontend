@@ -172,7 +172,7 @@ export default {
       { value: 'add_tax', label: 'Add Vat' },
       { value: 'remove_tax', label: 'Remove Vat' },
     ] },
-    { id: 'corrency_format', title: 'Corrency', options: [
+    { id: 'currency_format', title: 'Currency', options: [
       { value: 'suffix', label: '1234$' },
       { value: 'prefix', label: '$1234' },
     ] },
