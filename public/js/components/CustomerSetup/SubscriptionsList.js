@@ -102,7 +102,7 @@ export default class SubscriptionsList extends Component {
   }
 
   filterFields = () => [
-    { id: 'sid', placeholder: 'ID' },
+    { id: 'sid', placeholder: 'ID', type: 'number' },
     { id: 'firstname', placeholder: 'First Name' },
     { id: 'lastname', placeholder: 'Last Name' },
   ];
