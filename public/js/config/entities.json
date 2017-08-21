@@ -85,5 +85,12 @@
     "itemName": "received files",
     "itemType": "logFile",
     "itemsType": "logFiles"
+  },
+  "event": {
+    "collection": "events",
+    "uniqueField": "stamp",
+    "itemName": "event",
+    "itemType": "event",
+    "itemsType": "events"
   }
 }

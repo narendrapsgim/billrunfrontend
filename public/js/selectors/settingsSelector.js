@@ -335,22 +335,22 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
 ((!fields)
   ? Immutable.List()
   : fields
-  .filter(field => !excludeFields.get('base', Immutable.List()).includes(field.get('id', '')))
-  .withMutations((fieldsWithMutations) => {
+    .filter(field => !excludeFields.get('base', Immutable.List()).includes(field.get('id', '')))
+    .withMutations((fieldsWithMutations) => {
     joinFields.forEach((entityfields, entity) => {
       const entityLabel = sentenceCase(getConfig(['systemItems', entity, 'itemName'], entity));
       if (!entityfields.isEmpty()) {
         entityfields.forEach((entityfield) => {
-          if (!excludeFields.get(entity, Immutable.List()).includes(entityfield.get('id', ''))) {
-            const joinId = `$${entity}.${entityfield.get('id', '')}`;
-            const joinTitle = `${entityLabel}: ${entityfield.get('title', entityfield.get('id', ''))}`;
-            const joinField = entityfield.withMutations(field => field
-              .set('id', joinId)
-              .set('title', joinTitle)
-              .set('entity', entity),
-            );
-            fieldsWithMutations.push(joinField);
-          }
+            if (!excludeFields.get(entity, Immutable.List()).includes(entityfield.get('id', ''))) {
+          const joinId = `$${entity}.${entityfield.get('id', '')}`;
+          const joinTitle = `${entityLabel}: ${entityfield.get('title', entityfield.get('id', ''))}`;
+              const joinField = entityfield.withMutations(field => field
+                .set('id', joinId)
+                .set('title', joinTitle)
+                .set('entity', entity),
+              );
+          fieldsWithMutations.push(joinField);
+            }
         });
       }
     });
@@ -359,16 +359,16 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
 
 const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields) => {
   // usage: linesFileds,
-  // duplicate fields list by join (same fields from different collections)
-  // that will be removed frm UI.
+	// duplicate fields list by join (same fields from different collections)
+	// that will be removed frm UI.
   const usageExcludeIds = Immutable.Map({
     subscription: Immutable.List(['sid', 'aid']),
     customer: Immutable.List(['aid']),
     base: Immutable.List(['firstname', 'lastname']),
   });
   const usage = concatJoinFields(linesFileds, Immutable.Map({
-    subscription: subscriberFields,
-    customer: accountFields,
+  subscription: subscriberFields,
+  customer: accountFields,
   }), usageExcludeIds);
 
   // const subscription = subscriberFields;
@@ -376,7 +376,7 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
     customer: Immutable.List(['aid', 'type']),
     usage: Immutable.List(['firstname', 'lastname', 'sid', 'aid', 'plan']),
     base: Immutable.List([]),
-  });
+});
   const subscription = concatJoinFields(subscriberFields, Immutable.Map({
     customer: accountFields,
     usage: linesFileds,
@@ -404,27 +404,27 @@ const mergeEntityAndReportConfigFields = (reportConfigFields, billrunConfigField
   const defaultField = Immutable.Map({
     searchable: true,
     aggregatable: true,
-  });
+    });
   return Immutable.List().withMutations((fieldsWithMutations) => {
-    // Push all fields from Billrun config
+    //Push all fields from Billrun config
     entityFields.forEach((entityField) => {
-      fieldsWithMutations.push(entityField);
+        fieldsWithMutations.push(entityField);
     });
     // Push report config fields or overide if exist
     reportConfigFields.forEach((predefinedFiled) => {
       const index = fieldsWithMutations.findIndex(field => field.get('id', '') === predefinedFiled.get('id', ''));
-      if (index === -1) {
+      if (index === -1 ) {
         fieldsWithMutations.push(defaultField.merge(predefinedFiled));
       } else {
         fieldsWithMutations.update(index, Immutable.Map(), field => field.merge(predefinedFiled));
       }
     });
-    // Set title if not exist
-    fieldsWithMutations.forEach((field, index) => {
-      if (!field.has('title')) {
-        const configTitle = getFieldName(field.get('id', ''), getFieldNameType(type));
-        const title = configTitle === field.get('id', '') ? sentenceCase(configTitle) : configTitle;
-        fieldsWithMutations.setIn([index, 'title'], title);
+     // Set title if not exist
+     fieldsWithMutations.forEach((field, index) => {
+       if (!field.has('title')) {
+         const configTitle = getFieldName(field.get('id', ''), getFieldNameType(type));
+         const title = configTitle === field.get('id', '') ? sentenceCase(configTitle) : configTitle;
+         fieldsWithMutations.setIn([index, 'title'], title);
       }
     });
   })

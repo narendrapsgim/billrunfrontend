@@ -1,5 +1,5 @@
 export default {
-  entities: ['usage', 'subscription', 'customer', 'logFile'],
+  entities: ['usage', 'subscription', 'customer', 'logFile', 'event'],
   fields: {
     usage: [
       // Default settings \ Example
@@ -58,11 +58,19 @@ export default {
     subscribers: [
       { id: 'aid', type: 'number' },
       { id: 'sid', type: 'number' },
-      { id: 'plan_activation', type: 'date' },
-      { id: 'deactivation_date', type: 'date' },
+      { id: 'plan_activation', type:'date' },
+      { id: 'deactivation_date', type:'date' },
     ],
     account: [
       { id: 'aid', type: 'number' },
+    ],
+    event: [
+      { id: 'type',
+        inputConfig: {
+          inputType: 'select',
+          options: ['is', 'in', 'is_not', 'is_less_than', 'is_less_than_or_equal', 'is_greater_than', 'is_greater_than_or_equal', 'reached_constant', 'reached_constant_recurring', 'has_changed', 'has_changed_to', 'has_changed_from'],
+        },
+      },
     ],
     logFile: [
       { id: 'file_name', title: 'File name' },
@@ -138,7 +146,7 @@ export default {
     { id: 'exists',
       title: 'Exists',
       include: ['string', 'number', 'boolean', 'date'],
-      type: 'boolean',
+      type:'boolean',
       exclude: [
         'fieldid:billrun_status',
         'fieldid:logfile_status',
@@ -163,22 +171,22 @@ export default {
       { value: 'd/m/Y', label: '31/12/2017' },
       { value: 'm/d/Y', label: '12/31/2017' },
       { value: 'Y-m-d', label: '2017-12-31' },
-    ] },
+    ]},
     { id: 'datetime_format', title: 'Date time', options: [
       { value: 'd/m/Y H:i', label: '31/12/2017 22:05' },
       { value: 'd/m/Y H:i:s', label: '31/12/2017 22:05:59' },
       { value: 'm/d/Y h:i A', label: '12/31/2017 10:05 PM' },
       { value: 'm/d/Y h:i:s A', label: '12/31/2017 10:05:59 PM' },
       { value: 'c', label: 'ISO 8601' },
-    ] },
+    ]},
     { id: 'time_format', title: 'Time', options: [
       { value: 'H:i', label: '22:05' },
       { value: 'H:i:s', label: '22:05:59' },
       { value: 'h:i A', label: '10:05 PM' },
       { value: 'h:i:s A', label: '10:05:59 PM' },
-    ] },
-    { id: 'multiplication', title: 'Multiply by a number' },
-    { id: 'default_empty', title: 'Default empty value' },
+    ]},
+    { id: 'multiplication', title: 'Multiply by a number'},
+    { id: 'default_empty', title: 'Default empty value'},
     { id: 'vat_format', title: 'Vat', options: [
       { value: 'add_tax', label: 'Add Vat' },
       { value: 'remove_tax', label: 'Remove Vat' },
