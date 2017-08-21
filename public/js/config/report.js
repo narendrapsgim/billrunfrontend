@@ -77,7 +77,10 @@ export default {
       { id: 'notify_time', type: 'date' },
       { id: 'value' },
       { id: 'stamp' },
-      { id: 'event_code' },
+      { id: 'event_code', inputConfig: {
+         inputType: 'select',
+         callback: 'getEventCodeOptions', /* callback function + should be implementation */
+      } },
       { id: 'returned_value', searchable: false },
     ],
     logFile: [
