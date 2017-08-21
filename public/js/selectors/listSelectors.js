@@ -81,6 +81,20 @@ const selectGroupsOptions = (options) => {
   }).toList();
 };
 
+const selectGroupsData = (options) => {
+  if (options === null) {
+    return undefined;
+  }
+  return Immutable.Map().withMutations((groupsWithMutations) => {
+    options.forEach((option) => {
+      option.getIn(['include', 'groups'], Immutable.Map())
+        .forEach((groupData, groupName) => {
+          groupsWithMutations.set(groupName, groupData);
+        });
+    });
+  });
+};
+
 export const cyclesOptionsSelector = createSelector(
   getCyclesOptions,
   selectCyclesOptions,
@@ -114,4 +128,9 @@ export const userNamesSelector = createSelector(
 export const auditEntityTypesSelector = createSelector(
   getAuditEntityTypesOptions,
   selectEntityTypesOptions,
+);
+
+export const groupsDataSelector = createSelector(
+  getGroupsOptions,
+  selectGroupsData,
 );
