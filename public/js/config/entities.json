@@ -89,7 +89,7 @@
   "event": {
     "collection": "events",
     "uniqueField": "stamp",
-    "itemName": "event",
+    "itemName": "events",
     "itemType": "event",
     "itemsType": "events"
   }
