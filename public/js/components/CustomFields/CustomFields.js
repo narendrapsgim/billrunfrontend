@@ -96,7 +96,10 @@ class CustomFields extends Component {
     const { tabs } = this.props;
     const entity = tabs[tab];
     const size = this.props[entity].size;
-    const newField = Immutable.Map();
+    const newField = Immutable.Map({
+      editable: true,
+      display: true,
+    });
     this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', size]), newField));
   };
 
