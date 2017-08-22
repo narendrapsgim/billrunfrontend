@@ -24,6 +24,8 @@ import { SET_NAME,
          SET_USAGET_TYPE,
          SET_STATIC_USAGET,
          SET_LINE_KEY,
+         SET_COMPUTED_LINE_KEY,
+         UNSET_COMPUTED_LINE_KEY,
          SET_INPUT_PROCESSOR_TEMPLATE,
          MOVE_CSV_FIELD_DOWN,
          MOVE_CSV_FIELD_UP,
@@ -188,6 +190,12 @@ export default function (state = defaultState, action) {
     case SET_LINE_KEY:
       var { value, usaget } = action;
       return state.setIn(['rate_calculators', usaget, index, 'line_key'], value);
+
+    case SET_COMPUTED_LINE_KEY:
+      return state.setIn(['rate_calculators', ...action.path], action.value);
+
+    case UNSET_COMPUTED_LINE_KEY:
+      return state.deleteIn(['rate_calculators', action.usaget, action.index, 'computed']);
 
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
