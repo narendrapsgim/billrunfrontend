@@ -255,7 +255,7 @@ class RunCycle extends Component {
     return (
       <CyclesSelector
         onChange={this.onChangeSelectedCycle}
-        statusesToDisplay={List(['running', 'to_run', 'finished', 'confirmed'])}
+        statusesToDisplay={List(['running', 'to_run', 'finished', 'confirmed', 'to_rerun'])}
         selectedCycles={selectedCycleName}
       />
     );
@@ -264,6 +264,7 @@ class RunCycle extends Component {
   getStatusStyle = (status) => {
     switch (status) {
       case 'to_run':
+      case 'to_rerun':
         return 'info';
       case 'running':
       case 'current':
@@ -350,7 +351,7 @@ class RunCycle extends Component {
   )
 
   renderRerunButton = () => (
-    this.getSelectedCycleStatus() === 'finished' &&
+    (this.getSelectedCycleStatus() === 'finished' || this.getSelectedCycleStatus() === 'to_rerun') &&
       (<Button onClick={this.onClickRerun}>Re-run</Button>)
   )
 
@@ -457,7 +458,7 @@ class RunCycle extends Component {
     const { selectedCycle } = this.state;
     const { cycleAdditionalData } = this.props;
     const billrunKey = selectedCycle.get('billrun_key', '');
-    const shouldDisplayBillrunData = List(['running', 'finished', 'confirmed']).contains(this.getSelectedCycleStatus());
+    const shouldDisplayBillrunData = List(['running', 'finished', 'confirmed', 'to_rerun']).contains(this.getSelectedCycleStatus());
     const showConfirmAllButton = this.getSelectedCycleStatus() === 'finished';
     const isCycleConfirmed = this.getSelectedCycleStatus() === 'confirmed';
     const baseFilter = {
