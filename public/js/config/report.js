@@ -1,7 +1,7 @@
 export default {
-  entities: ['usage', 'subscription', 'customer', 'logFile'],
+  entities: ['usage', 'subscription', 'customer', 'logFile', 'queue'],
   fields: {
-    usage: [
+    usage: [ // changes to usage will effect on queue
       // Default settings \ Example
       // { id: [REQUIRED], type: 'string', searchable: true, aggregatable: true, inputConfig: {
       //    inputType: 'select',
@@ -82,6 +82,11 @@ export default {
           ],
         },
       },
+    ],
+    queue: [
+      // use all usage fields
+      { id: 'calc_name' },
+      { id: 'in_queue_since', type: 'date' },
     ],
   },
   conditionsOperators: [

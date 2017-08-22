@@ -373,7 +373,7 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
   })
 );
 
-const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields) => {
+const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, queueFields) => {
   // usage: linesFileds,
   // duplicate fields list by join (same fields from different collections)
   // that will be removed frm UI.
@@ -410,13 +410,14 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
   // }), customerExcludeIds);
 
   const logFile = logFileFields;
-  return Immutable.Map({ usage, subscription, customer, logFile });
+  const queue = queueFields;
+  return Immutable.Map({ usage, subscription, customer, logFile, queue });
 };
 
 const getReportConfigFields = type => getConfig(['reports', 'fields', type], Immutable.List());
 
 const mergeEntityAndReportConfigFields = (reportConfigFields, billrunConfigFields, type) => {
-  const entityFields = formatReportFields(billrunConfigFields);
+  const entityFields = (type === 'queue') ? billrunConfigFields : formatReportFields(billrunConfigFields);
   const defaultField = Immutable.Map({
     searchable: true,
     aggregatable: true,
@@ -503,11 +504,19 @@ const reportLinesFieldsSelector = createSelector(
   selectReportLinesFields,
 );
 
+const reportQueueFieldsSelector = createSelector(
+  () => getReportConfigFields('queue'),
+  reportLinesFieldsSelector,
+  () => 'queue',
+  mergeEntityAndReportConfigFields,
+);
+
 export const reportFieldsSelector = createSelector(
   reportSubscriberFieldsSelector,
   reportAccountFieldsSelector,
   reportLinesFieldsSelector,
   reportlogFileFieldsSelector,
+  reportQueueFieldsSelector,
   selectReportFields,
 );
 
