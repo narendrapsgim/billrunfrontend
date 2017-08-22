@@ -85,7 +85,13 @@ export default {
     ],
     queue: [
       // use all usage fields
-      { id: 'calc_name' },
+      { id: 'calc_name',
+        title: 'Calculator Name',
+        inputConfig: {
+          inputType: 'select',
+          callback: 'getCalcNameOptions',
+        },
+      },
       { id: 'in_queue_since', type: 'date' },
     ],
   },

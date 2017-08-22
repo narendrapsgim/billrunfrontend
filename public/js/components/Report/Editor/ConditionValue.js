@@ -14,6 +14,7 @@ import {
   cyclesOptionsSelector,
   plansOptionsSelector,
   groupsOptionsSelector,
+  calcNameSelector,
 } from '../../../selectors/listSelectors';
 import {
   usageTypeSelector,
@@ -330,6 +331,7 @@ const mapStateToProps = (state, props) => ({
     getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
     getFileTypeOptions: fileTypeSelector(state, props) || Immutable.List(),
+    getCalcNameOptions: calcNameSelector(state, props) || Immutable.List(),
   }),
 });
 
