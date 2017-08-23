@@ -324,8 +324,6 @@ export default class CalculatorMapping extends Component {
 
   onChangeComputedLineKey = path => (value) => {
     const { computedLineKey } = this.state;
-    console.log('path', path);
-    console.log('computedLineKey', computedLineKey);
     this.setState({
       computedLineKey: computedLineKey.setIn(path, value),
     });
