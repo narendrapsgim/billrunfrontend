@@ -60,11 +60,6 @@ export default class Plan extends Component {
     this.props.onChangeFieldValue(['name'], value);
   }
 
-  onChangePlanCode = (e) => {
-    const { value } = e.target;
-    this.props.onChangeFieldValue(['code'], value);
-  }
-
   onChangeProrated = (e) => {
     const { value } = e.target;
     this.props.onChangeFieldValue(['prorated'], value);
@@ -196,15 +191,6 @@ export default class Plan extends Component {
                   </Col>
                 </FormGroup>
               }
-
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  External Code<Help contents={PlanDescription.code} />
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field onChange={this.onChangePlanCode} value={plan.get('code', '')} editable={editable} />
-                </Col>
-              </FormGroup>
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Billing Frequency</Col>

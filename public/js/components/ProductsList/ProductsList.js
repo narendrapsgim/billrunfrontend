@@ -17,7 +17,6 @@ const ProductsList = () => {
     { id: 'description', title: 'Title', sort: true },
     { id: 'key', title: 'Key', sort: true },
     { id: 'unit_type', title: 'Unit Type', parser: parserUsegt },
-    { id: 'code', title: 'External Code', sort: true },
     { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
   ];
 
@@ -26,7 +25,6 @@ const ProductsList = () => {
     unit_type: 1,
     rates: 1,
     from: 1,
-    code: 1,
     key: 1,
   };
 
