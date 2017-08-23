@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, Col, Row, Panel, Button } from 'react-bootstrap';
+import { Form, FormGroup, Col, Row, Panel, Button, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import { ModalWrapper } from '../Elements';
 import { getFieldName, getConfig } from '../../common/Util';
 import Help from '../Help';
+import Field from '../Field';
 
 export default class CalculatorMapping extends Component {
   static propTypes = {
@@ -130,7 +131,7 @@ export default class CalculatorMapping extends Component {
       computedLineKey: Immutable.Map({
         usaget,
         index,
-        line_keys: calc.getIn(['computed', 'line_keys'], []),
+        line_keys: calc.getIn(['computed', 'line_keys'], Immutable.List()),
         operator: calc.getIn(['computed', 'operator'], ''),
       }),
     });
@@ -145,7 +146,7 @@ export default class CalculatorMapping extends Component {
     return (
       <h4>
         <small>
-          {`${calc.getIn(['computed', 'line_keys', 0], '')} ${opLabel} ${calc.getIn(['computed', 'line_keys', 1], '')}`}
+          {`${calc.getIn(['computed', 'line_keys', 0, 'key'], '')} ${opLabel} ${calc.getIn(['computed', 'line_keys', 1, 'key'], '')}`}
           <Button onClick={this.onEditComputedLineKey(calc, usaget, index)} bsStyle="link">
             <i className="fa fa-fw fa-pencil" />
           </Button>
@@ -312,7 +313,7 @@ export default class CalculatorMapping extends Component {
 
   onSaveComputedLineKey = () => {
     const { computedLineKey } = this.state;
-    this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'line_keys'], computedLineKey.get('line_keys', []));
+    this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'line_keys'], computedLineKey.get('line_keys', Immutable.List()));
     this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'operator'], computedLineKey.get('operator', ''));
     this.setState({ computedLineKey: null });
   }
@@ -323,6 +324,8 @@ export default class CalculatorMapping extends Component {
 
   onChangeComputedLineKey = path => (value) => {
     const { computedLineKey } = this.state;
+    console.log('path', path);
+    console.log('computedLineKey', computedLineKey);
     this.setState({
       computedLineKey: computedLineKey.setIn(path, value),
     });
@@ -334,32 +337,68 @@ export default class CalculatorMapping extends Component {
       return null;
     }
     const title = 'Computed Rate Key';
+    const regexHelper = 'In case you want to run a regular expression on the computed field before calculating the rate';
     const lineKeyOptions = this.getAvailableFields(false, false).toJS();
     return (
       <ModalWrapper title={title} show={true} onOk={this.onSaveComputedLineKey} onHide={this.onHideComputedLineKey} labelOk="OK">
-        <FormGroup className="form-inner-edit-row">
-          <Col sm={4}>
-            <Select
-              onChange={this.onChangeComputedLineKey(['line_keys', 0])}
-              value={computedLineKey.getIn(['line_keys', 0], '')}
-              options={lineKeyOptions}
-            />
-          </Col>
-          <Col sm={3}>
-            <Select
-              onChange={this.onChangeComputedLineKey(['operator'])}
-              value={computedLineKey.get('operator', '')}
-              options={this.getRateConditions()}
-            />
-          </Col>
-          <Col sm={4}>
-            <Select
-              onChange={this.onChangeComputedLineKey(['line_keys', 1])}
-              value={computedLineKey.getIn(['line_keys', 1], '')}
-              options={lineKeyOptions}
-            />
-          </Col>
-        </FormGroup>
+        <Form horizontal>
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>First Field</Col>
+            <Col sm={4}>
+              <Select
+                onChange={this.onChangeComputedLineKey(['line_keys', 0, 'key'])}
+                value={computedLineKey.getIn(['line_keys', 0, 'key'], '')}
+                options={lineKeyOptions}
+              />
+            </Col>
+            <Col sm={4}>
+              <Field
+                value={computedLineKey.getIn(['line_keys', 0, 'regex'], '')}
+                disabledValue={''}
+                onChange={this.onChangeComputedLineKey(['line_keys', 0, 'regex'])}
+                disabled={computedLineKey.getIn(['line_keys', 0, 'key'], '') === ''}
+                label="Regex"
+                fieldType="toggeledInput"
+              />
+            </Col>
+            <Col sm={1}>
+              <Help contents={regexHelper} />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Operator</Col>
+            <Col sm={4}>
+              <Select
+                onChange={this.onChangeComputedLineKey(['operator'])}
+                value={computedLineKey.get('operator', '')}
+                options={this.getRateConditions()}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Second Field</Col>
+            <Col sm={4}>
+              <Select
+                onChange={this.onChangeComputedLineKey(['line_keys', 1, 'key'])}
+                value={computedLineKey.getIn(['line_keys', 1, 'key'], '')}
+                options={lineKeyOptions}
+              />
+            </Col>
+            <Col sm={4}>
+              <Field
+                value={computedLineKey.getIn(['line_keys', 1, 'regex'], '')}
+                disabledValue={''}
+                onChange={this.onChangeComputedLineKey(['line_keys', 1, 'regex'])}
+                disabled={computedLineKey.getIn(['line_keys', 1, 'key'], '') === ''}
+                label="Regex"
+                fieldType="toggeledInput"
+              />
+            </Col>
+            <Col sm={1}>
+              <Help contents={regexHelper} />
+            </Col>
+          </FormGroup>
+        </Form>
       </ModalWrapper>
     );
   }
