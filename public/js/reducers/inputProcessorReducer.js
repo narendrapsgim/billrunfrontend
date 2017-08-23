@@ -169,7 +169,7 @@ export default function (state = defaultState, action) {
         type: value,
         rate_key,
         line_key: state.getIn(['rate_calculators', usaget, index, 'line_key']),
-        computed: state.getIn(['rate_calculators', usaget, index, 'computed'], Immutable.Map()),
+        computed: state.getIn(['rate_calculators', usaget, index, 'computed'], {}),
       });
       return state.setIn(['rate_calculators', usaget, index], new_rating);
 
