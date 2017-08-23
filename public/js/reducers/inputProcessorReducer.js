@@ -168,7 +168,8 @@ export default function (state = defaultState, action) {
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: state.getIn(['rate_calculators', usaget, index, 'line_key'])
+        line_key: state.getIn(['rate_calculators', usaget, index, 'line_key']),
+        computed: state.getIn(['rate_calculators', usaget, index, 'computed'], Immutable.Map()),
       });
       return state.setIn(['rate_calculators', usaget, index], new_rating);
 
