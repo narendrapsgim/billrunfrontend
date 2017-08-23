@@ -36,7 +36,7 @@ export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
-import { getInputProcessorActionQuery, getAddUsagetQuery } from '../common/ApiQueries';
+import { getInputProcessorActionQuery } from '../common/ApiQueries';
 import _ from 'lodash';
 import Immutable from 'immutable';
 import { getSettings } from './settingsActions';
@@ -239,17 +239,6 @@ function addedUsagetMapping(usaget) {
     usaget
   };
 }
-
-export const addUsagetMapping = usaget => (dispatch) => { // eslint-disable-line import/prefer-default-export
-  dispatch(startProgressIndicator());
-  const query = getAddUsagetQuery(usaget);
-  return apiBillRun(query)
-    .then((success) => {
-      dispatch(getSettings('usage_types'));
-      return dispatch(apiBillRunSuccessHandler(success));
-    })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Illegal usage type')));
-};
 
 export function removeUsagetMapping(index) {
   return {

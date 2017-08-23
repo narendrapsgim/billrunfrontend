@@ -26,7 +26,6 @@ import {
   setFieldMapping,
   setFieldWidth,
   addCSVField,
-  addUsagetMapping,
   setCustomerMapping,
   setRatingField,
   setReceiverField,
@@ -388,10 +387,6 @@ class InputProcessor extends Component {
     return field;
   };
 
-  addUsagetMapping = val => (
-    this.props.dispatch(addUsagetMapping(val))
-  );
-
   addNewRatingCustomField = (fieldName, title, type) => {
     const { customRatingFields } = this.props;
     this.props.dispatch(updateSetting('rates', ['fields'], customRatingFields.push(Immutable.Map({
@@ -490,7 +485,6 @@ class InputProcessor extends Component {
           onError={this.onError}
           unsetField={this.unsetField}
           setUsagetType={this.setUsagetType}
-          addUsagetMapping={this.addUsagetMapping}
           onSetStaticUsaget={this.onSetStaticUsaget}
           onSetFieldMapping={this.onSetFieldMapping}
           onAddUsagetMapping={this.onAddUsagetMapping}
