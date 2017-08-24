@@ -302,6 +302,9 @@ export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
 };
 
 export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value, toBaseUnit = true) => { // eslint-disable-line max-len
+  if (value === 'UNLIMITED') {
+    return 'UNLIMITED';
+  }
   const uom = getUom(propertyTypes, usageTypes, usaget);
   const u = (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('unit', 1);
   return toBaseUnit ? (value * u) : (value / u);
@@ -410,7 +413,8 @@ export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBase
       if (unit && usaget) {
         const value = include.get(usaget);
         const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
-        includesWithMutations.setIn(['groups', group, usaget], parseFloat(newValue));
+        const newConvertedValue = (newValue === 'UNLIMITED') ? newValue : parseFloat(newValue);
+        includesWithMutations.setIn(['groups', group, usaget], newConvertedValue);
       }
     });
   });
