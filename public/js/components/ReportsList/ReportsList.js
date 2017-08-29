@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import moment from 'moment';
 import Immutable from 'immutable';
 import { titleCase } from 'change-case';
 import EntityList from '../EntityList';
-import { getConfig, getFieldName } from '../../common/Util';
+import { getConfig, getItemId, getFieldName } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteReport } from '../../actions/reportsActions';
 import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
@@ -13,6 +14,9 @@ import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 class ReportsList extends Component {
 
   static propTypes = {
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -83,10 +87,23 @@ class ReportsList extends Component {
     }
   }
 
+  onClone = (item) => {
+    const itemId = getItemId(item, '');
+    const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
+    const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
+    this.props.router.push({
+      pathname: `${itemsType}/${itemType}/${itemId}`,
+      query: {
+        action: 'clone',
+      },
+    });
+  }
+
   getActions = () => ([
     { type: 'view' },
     { type: 'edit', onClickColumn: null },
-    { type: 'remove', showIcon: true, onClick: this.onAskDelete },
+    { type: 'clone', showIcon: true, onClick: this.onClone, helpText: 'Clone' },
+    { type: 'remove', showIcon: true, onClick: this.onAskDelete, helpText: 'Remove' },
   ]);
 
   getDefaultSort = () => Immutable.Map({
@@ -118,4 +135,4 @@ class ReportsList extends Component {
 
 }
 
-export default connect()(ReportsList);
+export default withRouter(connect()(ReportsList));
