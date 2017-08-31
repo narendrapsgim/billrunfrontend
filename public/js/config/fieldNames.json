@@ -53,7 +53,15 @@
     "billrun_pretend": "Pretend?",
     "request_num": "Request number",
     "granted_return_code": "Return code",
-    "final_charge": "Total charge"
+    "final_charge": "Total charge",
+    "pp_includes_name": "Bucket name",
+    "charging_usaget": "Charging activity type",
+    "balance_before": "Balance before",
+    "source_ref": "Update source reference",
+    "balance_ref": "Balance reference",
+    "balance_after": "Balance after",
+    "balance_normalized": "Balance normalized",
+    "pp_includes_external_id": "Bucket external ID"
   },
   "queue": {
     "calc_name": "Calculator stage",

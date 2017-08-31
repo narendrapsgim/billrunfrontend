@@ -70,6 +70,28 @@ const selectGroupsData = (options) => {
   });
 };
 
+const getBucketsOptions = state => state.list.get('pp_includes', null);
+
+const selectBucketsNames = (options) => {
+  if (options === null) {
+    return undefined;
+  }
+  return options.map(option => Immutable.Map({
+    label: option.get('name', ''),
+    value: option.get('name', ''),
+  }));
+};
+
+const selectBucketsExternalIds = (options) => {
+  if (options === null) {
+    return undefined;
+  }
+  return options.map(option => Immutable.Map({
+    label: option.get('external_id', ''),
+    value: option.get('external_id', ''),
+  }));
+};
+
 export const cyclesOptionsSelector = createSelector(
   getCyclesOptions,
   selectCyclesOptions,
@@ -93,4 +115,14 @@ export const groupsOptionsSelector = createSelector(
 export const groupsDataSelector = createSelector(
   getGroupsOptions,
   selectGroupsData,
+);
+
+export const bucketsNamesSelector = createSelector(
+  getBucketsOptions,
+  selectBucketsNames,
+);
+
+export const bucketsExternalIdsSelector = createSelector(
+  getBucketsOptions,
+  selectBucketsExternalIds,
 );

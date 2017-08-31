@@ -14,6 +14,8 @@ import {
   cyclesOptionsSelector,
   plansOptionsSelector,
   groupsOptionsSelector,
+  bucketsNamesSelector,
+  bucketsExternalIdsSelector,
 } from '../../../selectors/listSelectors';
 import {
   usageTypeSelector,
@@ -25,6 +27,7 @@ import {
   getServicesOptions,
   getGroupsOptions,
   getUsageTypesOptions,
+  getBucketsOptions,
 } from '../../../actions/reportsActions';
 
 
@@ -87,6 +90,10 @@ class ConditionValue extends Component {
         case 'getGroupsOptions': this.props.dispatch(getGroupsOptions());
           break;
         case 'getUsageTypesOptions': this.props.dispatch(getUsageTypesOptions());
+          break;
+        case 'getBucketsOptions':
+        case 'getBucketsExternalIdsOptions':
+          this.props.dispatch(getBucketsOptions());
           break;
         default: console.log('unsuported select options callback');
           break;
@@ -313,6 +320,8 @@ const mapStateToProps = (state, props) => ({
     getPlansOptions: plansOptionsSelector(state, props) || Immutable.List(),
     getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
+    getBucketsOptions: bucketsNamesSelector(state, props) || Immutable.List(),
+    getBucketsExternalIdsOptions: bucketsExternalIdsSelector(state, props) || Immutable.List(),
   }),
 });
 
