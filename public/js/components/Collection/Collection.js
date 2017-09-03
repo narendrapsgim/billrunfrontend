@@ -189,10 +189,9 @@ class Collection extends Component {
                   <FormGroup>
                     <Col componentClass={ControlLabel} sm={3} lg={2}>Trigger after</Col>
                     <Col sm={4}>
-
                       <InputGroup>
                         <Field onChange={this.onChangeDays} value={item.get('do_after_days', '')} fieldType="number" min="1" />
-                        <InputGroup.Addon>Days</InputGroup.Addon>
+                        <span style={{ fontSize: 12 }}>(Days since entering debt collection process) </span>
                       </InputGroup>
                     </Col>
                   </FormGroup>
