@@ -8,6 +8,7 @@ import {
   getConfig,
   isLinkerField,
 } from '../common/Util';
+import { getEventConvertedConditions } from '../components/Events/EventsUtil';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
@@ -282,6 +283,19 @@ export const productFieldsSelector = createSelector(
   productFields => productFields,
 );
 
+const selectEvents = (events, usageTypesData, propertyTypes) => {
+  if (!events) {
+    return undefined;
+  }
+  return events
+    .filter((event, eventType) => eventType !== 'settings')
+    .map(eventsList =>
+      eventsList.map(event =>
+        event.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, false)),
+      ),
+    );
+};
+
 export const eventsSettingsSelector = createSelector(
   getEvents,
   events => (events ? events.get('settings', Immutable.Map()) : undefined),
@@ -289,7 +303,9 @@ export const eventsSettingsSelector = createSelector(
 
 export const eventsSelector = createSelector(
   getEvents,
-  events => (events ? events.filter((event, eventType) => eventType !== 'settings') : undefined),
+  usageTypesDataSelector,
+  propertyTypeSelector,
+  selectEvents,
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {

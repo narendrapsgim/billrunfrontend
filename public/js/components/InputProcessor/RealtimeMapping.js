@@ -21,6 +21,11 @@ const RealtimeMapping = (props) => {
     onChange(e);
   };
 
+  const onChangeRebalance = (values) => {
+    const e = { target: { id: 'used_usagev_field', value: values.split(',') } };
+    onChange(e);
+  };
+
   const onChangePostpayCharge = (e) => {
     onChange({ target: { id: 'postpay_charge', value: (e.target.value === 'true') } });
   };
@@ -103,7 +108,7 @@ const RealtimeMapping = (props) => {
 
         <div className="form-group">
           <div className="col-lg-3">
-            <label htmlFor="used_usagev_field">Rebalance field</label>
+            <label htmlFor="used_usagev_field">Rebalance fields</label>
             <p className="help-block"></p>
           </div>
           <div className="col-lg-9">
@@ -112,14 +117,37 @@ const RealtimeMapping = (props) => {
             </div>
             <div className="col-lg-9">
               <div className="col-lg-6">
-                <select
-                    id="used_usagev_field"
-                    className="form-control"
-                    onChange={ onChange }
-                    disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
-                    value={settings.getIn(['realtime', 'used_usagev_field'], '')}>
-                  { available_fields }>
-                </select>
+                <Select
+                  id="used_usagev_field"
+                  options={multi_available_fields}
+                  onChange={onChangeRebalance}
+                  disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
+                  multi={true}
+                  value={settings.getIn(['realtime', 'used_usagev_field'], List()).join(',')}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <div className="col-lg-3">
+            <label htmlFor="used_usagev_field">Cumulative volume</label>
+            <p className="help-block" />
+          </div>
+          <div className="col-lg-9">
+            <div className="col-lg-1" style={{ marginTop: 8 }}>
+              <i className="fa fa-long-arrow-right" />
+            </div>
+            <div className="col-lg-9">
+              <div className="col-lg-6">
+                <Field
+                  id="used_usagev_accumulative"
+                  value={settings.getIn(['realtime', 'used_usagev_accumulative'], false)}
+                  disabled={settings.getIn(['realtime', 'postpay_charge'], false)}
+                  onChange={onChange}
+                  fieldType="checkbox"
+                />
               </div>
             </div>
           </div>

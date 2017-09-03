@@ -1,14 +1,18 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, Col, Row, Panel, Button } from 'react-bootstrap';
+import { Form, FormGroup, Col, Row, Panel, Button, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
-import { getFieldName } from '../../common/Util';
+import { ModalWrapper } from '../Elements';
+import { getFieldName, getConfig } from '../../common/Util';
 import Help from '../Help';
+import Field from '../Field';
 
 export default class CalculatorMapping extends Component {
   static propTypes = {
     onSetCustomerMapping: PropTypes.func.isRequired,
     onSetLineKey: PropTypes.func.isRequired,
+    onSetComputedLineKey: PropTypes.func.isRequired,
+    onUnsetComputedLineKey: PropTypes.func.isRequired,
     onAddRating: PropTypes.func.isRequired,
     onSetRating: PropTypes.func.isRequired,
     onRemoveRating: PropTypes.func.isRequired,
@@ -20,6 +24,10 @@ export default class CalculatorMapping extends Component {
     settings: Immutable.Map(),
     subscriberFields: Immutable.List(),
     customRatingFields: Immutable.List(),
+  };
+
+  state = {
+    computedLineKey: null,
   };
 
   componentDidMount = () => {
@@ -72,17 +80,29 @@ export default class CalculatorMapping extends Component {
     const { value, id } = e.target;
     this.props.onSetCustomerMapping(id, value, index);
   }
-  getAvailableFields = (addBillrunFields) => {
+
+  getAvailableFields = (addBillrunFields, addComputedField) => {
     const { settings } = this.props;
-    const billrunFields = Immutable.fromJS(addBillrunFields ? ['type', 'usaget'] : []);
-    const options = [
-      (<option disabled value="" key={-3}>Select Field</option>),
-      ...(billrunFields.push(...settings.get('fields', []))).sortBy(field => field).map((field, key) => (
-        <option value={field} key={key}>{field}</option>
-      )),
-    ];
-    return options;
+    const billrunFields = Immutable.fromJS(addBillrunFields ? [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }] : []);
+    const fields = settings.get('fields', []).map(field => (Immutable.Map({ value: field, label: field }))).sortBy(field => field.get('value', ''));
+    const computedField = Immutable.fromJS(addComputedField ? [{ value: 'computed', label: 'Computed' }] : []);
+    return billrunFields.concat(fields, computedField);
   }
+
+  getCustomerIdentificationFields = () =>
+    this.getAvailableFields(false, false).map((field, key) => (
+      <option value={field.get('value', '')} key={key}>{field.get('label', '')}</option>
+    ));
+
+  getRateCalculatorFields = () =>
+    this.getAvailableFields(true, true).map((field, key) => (
+      <option value={field.get('value', '')} key={key}>{field.get('label', '')}</option>
+    ));
+
+  getRateConditions = () => (getConfig(['rates', 'conditions'], Immutable.Map()).map(condType => (
+    { value: condType.get('key', ''), label: condType.get('title', '') })).toArray()
+  );
+
   getAvailableTargetFields = () => {
     const { subscriberFields } = this.props;
     const optionsKeys = subscriberFields
@@ -94,9 +114,50 @@ export default class CalculatorMapping extends Component {
     ];
     return options;
   }
+
+  onChangeLineKey = (e) => {
+    const { dataset: { usaget, index }, value } = e.target;
+    if (value === 'computed') {
+      this.setState({ computedLineKey: Immutable.Map({ usaget, index }) });
+    } else {
+      this.setState({ computedLineKey: null });
+      this.props.onUnsetComputedLineKey(usaget, index);
+    }
+    this.props.onSetLineKey(e);
+  }
+
+  onEditComputedLineKey = (calc, usaget, index) => () => {
+    this.setState({
+      computedLineKey: Immutable.Map({
+        usaget,
+        index,
+        line_keys: calc.getIn(['computed', 'line_keys'], Immutable.List()),
+        operator: calc.getIn(['computed', 'operator'], ''),
+      }),
+    });
+  }
+
+  renderComputedLineKeyDesc = (calc, usaget, index) => {
+    if (calc.get('line_key', '') !== 'computed') {
+      return null;
+    }
+    const op = calc.getIn(['computed', 'operator'], '');
+    const opLabel = (getConfig(['rates', 'conditions'], Immutable.Map()).find(cond => cond.get('key', '') === op) || Immutable.Map()).get('title', '');
+    return (
+      <h4>
+        <small>
+          {`${calc.getIn(['computed', 'line_keys', 0, 'key'], '')} ${opLabel} ${calc.getIn(['computed', 'line_keys', 1, 'key'], '')}`}
+          <Button onClick={this.onEditComputedLineKey(calc, usaget, index)} bsStyle="link">
+            <i className="fa fa-fw fa-pencil" />
+          </Button>
+        </small>
+      </h4>
+    );
+  }
+
   getRateCalculators = (usaget) => {
-    const { onSetLineKey, onSetRating, onRemoveRating } = this.props;
-    const availableFields = this.getAvailableFields(true);
+    const { onSetRating, onRemoveRating } = this.props;
+    const availableFields = this.getRateCalculatorFields();
     return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => {
       let selectedRadio = 3;
       if (calc.get('rate_key', '') === 'key') {
@@ -112,13 +173,14 @@ export default class CalculatorMapping extends Component {
                 <select
                   className="form-control"
                   id={usaget}
-                  onChange={onSetLineKey}
+                  onChange={this.onChangeLineKey}
                   data-usaget={usaget}
                   data-index={calcKey}
                   value={calc.get('line_key', '')}
                 >
                   { availableFields }
                 </select>
+                { this.renderComputedLineKeyDesc(calc, usaget, calcKey) }
               </FormGroup>
             </Col>
 
@@ -210,7 +272,7 @@ export default class CalculatorMapping extends Component {
 
   renderCustomerIdentification = () => {
     const { settings } = this.props;
-    const availableFields = this.getAvailableFields(false);
+    const availableFields = this.getCustomerIdentificationFields();
     const availableTargetFields = this.getAvailableTargetFields();
     const availableUsagetypes = settings.get('customer_identification_fields', Immutable.List());
     return availableUsagetypes.map((usaget, key) => {
@@ -247,6 +309,96 @@ export default class CalculatorMapping extends Component {
         </div>
       );
     });
+  }
+
+  onSaveComputedLineKey = () => {
+    const { computedLineKey } = this.state;
+    this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'line_keys'], computedLineKey.get('line_keys', Immutable.List()));
+    this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'operator'], computedLineKey.get('operator', ''));
+    this.setState({ computedLineKey: null });
+  }
+
+  onHideComputedLineKey = () => {
+    this.setState({ computedLineKey: null });
+  }
+
+  onChangeComputedLineKey = path => (value) => {
+    const { computedLineKey } = this.state;
+    this.setState({
+      computedLineKey: computedLineKey.setIn(path, value),
+    });
+  }
+
+  renderComputedRatePopup = () => {
+    const { computedLineKey } = this.state;
+    if (!computedLineKey) {
+      return null;
+    }
+    const title = 'Computed Rate Key';
+    const regexHelper = 'In case you want to run a regular expression on the computed field before calculating the rate';
+    const lineKeyOptions = this.getAvailableFields(false, false).toJS();
+    return (
+      <ModalWrapper title={title} show={true} onOk={this.onSaveComputedLineKey} onHide={this.onHideComputedLineKey} labelOk="OK">
+        <Form horizontal>
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>First Field</Col>
+            <Col sm={4}>
+              <Select
+                onChange={this.onChangeComputedLineKey(['line_keys', 0, 'key'])}
+                value={computedLineKey.getIn(['line_keys', 0, 'key'], '')}
+                options={lineKeyOptions}
+              />
+            </Col>
+            <Col sm={4}>
+              <Field
+                value={computedLineKey.getIn(['line_keys', 0, 'regex'], '')}
+                disabledValue={''}
+                onChange={this.onChangeComputedLineKey(['line_keys', 0, 'regex'])}
+                disabled={computedLineKey.getIn(['line_keys', 0, 'key'], '') === ''}
+                label="Regex"
+                fieldType="toggeledInput"
+              />
+            </Col>
+            <Col sm={1}>
+              <Help contents={regexHelper} />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Operator</Col>
+            <Col sm={4}>
+              <Select
+                onChange={this.onChangeComputedLineKey(['operator'])}
+                value={computedLineKey.get('operator', '')}
+                options={this.getRateConditions()}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Second Field</Col>
+            <Col sm={4}>
+              <Select
+                onChange={this.onChangeComputedLineKey(['line_keys', 1, 'key'])}
+                value={computedLineKey.getIn(['line_keys', 1, 'key'], '')}
+                options={lineKeyOptions}
+              />
+            </Col>
+            <Col sm={4}>
+              <Field
+                value={computedLineKey.getIn(['line_keys', 1, 'regex'], '')}
+                disabledValue={''}
+                onChange={this.onChangeComputedLineKey(['line_keys', 1, 'regex'])}
+                disabled={computedLineKey.getIn(['line_keys', 1, 'key'], '') === ''}
+                label="Regex"
+                fieldType="toggeledInput"
+              />
+            </Col>
+            <Col sm={1}>
+              <Help contents={regexHelper} />
+            </Col>
+          </FormGroup>
+        </Form>
+      </ModalWrapper>
+    );
   }
 
   render() {
@@ -291,6 +443,7 @@ export default class CalculatorMapping extends Component {
             </div>
           </div>
          ))}
+        { this.renderComputedRatePopup()}
       </Form>
     );
   }

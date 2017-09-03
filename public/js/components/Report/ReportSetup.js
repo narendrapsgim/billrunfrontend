@@ -243,6 +243,14 @@ class ReportSetup extends Component {
     });
   }
 
+  handleClone = () => {
+    const { pathname, query } = this.props.location;
+    this.props.router.push({
+      pathname,
+      query: Object.assign({}, query, { action: 'clone' }),
+    });
+  }
+
   handleBack = () => {
     const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
     this.props.router.push(`/${itemsType}`);
@@ -405,6 +413,14 @@ class ReportSetup extends Component {
     showIcon: true,
     onClick: this.onAskDelete,
     actionStyle: 'danger',
+    actionSize: 'xsmall',
+  }, {
+    type: 'clone',
+    label: 'Clone',
+    helpText: 'Clone Report',
+    showIcon: true,
+    onClick: this.handleClone,
+    actionStyle: 'primary',
     actionSize: 'xsmall',
   }, {
     type: 'edit',

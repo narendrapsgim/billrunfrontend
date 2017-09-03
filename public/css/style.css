@@ -34,7 +34,7 @@ fieldset[disabled] .btn {
 .modal {
   z-index: 2000;
 }
-.modal .in.tooltip{
+.tooltip{
   z-index: 2001;
 }
 .clickable {

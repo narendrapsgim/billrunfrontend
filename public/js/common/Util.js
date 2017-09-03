@@ -6,6 +6,7 @@ import reportConfig from '../config/report'
 import systemItemsConfig from '../config/entities.json'
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
+import ratesConfig from '../config/rates.json';
 
 /**
  * Get data from config files
@@ -31,6 +32,8 @@ export const getConfig = (key, defaultValue = null) => {
       case 'mainMenu': configCache = configCache.set('mainMenu', Immutable.fromJS(mainMenu));
         break;
       case 'events': configCache = configCache.set('events', Immutable.fromJS(eventsConfig));
+        break;
+      case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
         break;
       default: console.log(`Config caregory not exists ${path}`);
     }
@@ -302,6 +305,9 @@ export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
 };
 
 export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value, toBaseUnit = true) => { // eslint-disable-line max-len
+  if (value === 'UNLIMITED') {
+    return 'UNLIMITED';
+  }
   const uom = getUom(propertyTypes, usageTypes, usaget);
   const u = (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('unit', 1);
   return toBaseUnit ? (value * u) : (value / u);
@@ -410,7 +416,8 @@ export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBase
       if (unit && usaget) {
         const value = include.get(usaget);
         const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
-        includesWithMutations.setIn(['groups', group, usaget], parseFloat(newValue));
+        const newConvertedValue = (newValue === 'UNLIMITED') ? newValue : parseFloat(newValue);
+        includesWithMutations.setIn(['groups', group, usaget], newConvertedValue);
       }
     });
   });

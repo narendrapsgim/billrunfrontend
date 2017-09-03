@@ -27,7 +27,7 @@ class UsageTypesSelector extends Component {
     usaget: '',
     unit: '',
     onChangeUsaget: () => {},
-    onChangeUnit: () => () => {},
+    onChangeUnit: () => {},
     enabled: true,
     showUnits: true,
   };
@@ -40,9 +40,14 @@ class UsageTypesSelector extends Component {
     this.props.dispatch(getSettings(['usage_types', 'property_types']));
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.usaget !== nextProps.usaget) {
+      this.onChangeUnit(nextProps.usaget)('');
+    }
+  }
+
   onChangeUsaget = (usaget) => {
     this.props.onChangeUsaget(usaget);
-    this.onChangeUnit(usaget)('');
   }
 
   onChangeUnit = usaget => (unit) => {

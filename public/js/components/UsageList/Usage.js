@@ -28,7 +28,7 @@ const Usage = ({ line, onClickCancel, hiddenFields, cancelLabel, enableRemove, o
       let formattedValue = value;
       if (key === 'connection_type') {
         formattedValue = changeCase.upperCaseFirst(value);
-      } else if (key === 'urt') {
+      } else if (key === 'urt' || key === 'process_time' || key === 'rebalance') {
         formattedValue = moment.unix(value.get('sec')).format(globalSetting.datetimeLongFormat);
       }
       if (!hiddenFields.includes(key)) {
