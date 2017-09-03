@@ -10,6 +10,7 @@ import { ActionButtons } from '../Elements';
 import {
   getConfig,
   getFieldName,
+  buildPageTitle,
 } from '../../common/Util';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { showSuccess } from '../../actions/alertsActions';
@@ -62,8 +63,9 @@ class AutoRenewSetup extends Component {
   }
 
   componentDidMount() {
+    const { mode } = this.props;
     this.initDefaultValues();
-    const pageTitle = this.getPageTitle();
+    const pageTitle = buildPageTitle(mode, 'auto_renew');
     this.props.dispatch(setPageTitle(pageTitle));
   }
 
@@ -85,12 +87,6 @@ class AutoRenewSetup extends Component {
       this.props.dispatch(updateAutoRenew('immediate', false));
     }
   }
-
-  getPageTitle = () => {
-    const { mode } = this.props;
-    const pref = (mode === 'create' ? 'Create New' : 'Edit');
-    return `${pref} Recurring Charge`;
-  };
 
   fetchItem = (itemId = this.props.itemId) => {
     if (itemId) {

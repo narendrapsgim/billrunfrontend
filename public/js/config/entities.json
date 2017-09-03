@@ -81,7 +81,7 @@
   },
   "auto_renew": {
     "collection": "autorenew",
-    "itemName": "auto_renew",
+    "itemName": "recurring charge",
     "itemType": "auto_renew",
     "itemsType": "auto_renews"
   }
