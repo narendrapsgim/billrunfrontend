@@ -13,6 +13,7 @@ import {
   productsOptionsSelector,
   cyclesOptionsSelector,
   plansOptionsSelector,
+  servicesOptionsSelector,
   groupsOptionsSelector,
 } from '../../../selectors/listSelectors';
 import {
@@ -311,6 +312,7 @@ const mapStateToProps = (state, props) => ({
     getCyclesOptions: cyclesOptionsSelector(state, props) || Immutable.List(),
     getProductsOptions: productsOptionsSelector(state, props) || Immutable.List(),
     getPlansOptions: plansOptionsSelector(state, props) || Immutable.List(),
+    getServicesOptions: servicesOptionsSelector(state, props) || Immutable.List(),
     getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
   }),
