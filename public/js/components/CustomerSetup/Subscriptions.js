@@ -43,7 +43,10 @@ export default class Subscriptions extends Component {
     this.setState({ subscription: Immutable.Map({ aid }) });
   }
 
-  onClickCancel = () => {
+  onClickCancel = (itemWasChanged = false) => {
+    if (itemWasChanged === true) {
+      this.props.clearList();
+    }
     this.setState({ subscription: null });
   }
 
