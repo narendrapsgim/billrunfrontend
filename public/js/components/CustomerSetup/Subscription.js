@@ -161,7 +161,7 @@ class Subscription extends Component {
 
   formatSelectOptions = items => items.map(item => ({
     value: item.get('name', ''),
-    label: item.get('name', ''),
+    label: item.get('description', item.get('name', '')),
   }));
 
   getAvailablePlans = () => this.formatSelectOptions(this.props.allPlans);
