@@ -165,6 +165,12 @@ const selectUsageTypes = (usageTypes) => {
   return usageTypes.map(usageType => usageType.get('usage_type', ''));
 };
 
+const selectFileType = (fileTypes) => {
+  if (!fileTypes) {
+    return undefined;
+  }
+  return fileTypes.map(fileType => fileType.get('file_type', ''));
+}
 
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
@@ -217,6 +223,11 @@ export const chargingDaySelector = createSelector(
     const chargingDay = billrun.get('charging_day');
     return (isNaN(chargingDay)) ? chargingDay : Number(chargingDay);
   },
+);
+
+export const fileTypeSelector = createSelector(
+  getInputProssesors,
+  selectFileType
 );
 
 export const usageTypeSelector = createSelector(
