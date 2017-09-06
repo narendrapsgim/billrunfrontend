@@ -56,7 +56,7 @@ export const setCloneService = () => ({
   uniquefields: ['name'],
 });
 
-const convertService = (getState, service, convertToBaseUnit) => {
+const convertService = (getState, service, convertToBaseUnit, toSend) => {
   const state = getState();
   const usageTypesData = usageTypesDataSelector(state);
   const propertyTypes = propertyTypeSelector(state);
@@ -65,11 +65,32 @@ const convertService = (getState, service, convertToBaseUnit) => {
     if (!serviceIncludes.isEmpty()) {
       itemWithMutations.set('include', serviceIncludes);
     }
+    if (toSend) { // convert item before send to server
+      if (itemWithMutations.getIn(['balance_period', 'type'], '') === 'custom_period') {
+        const unit = itemWithMutations.getIn(['balance_period', 'unit'], '');
+        const value = itemWithMutations.getIn(['balance_period', 'value'], 1);
+        const balancePeriod = (unit === 'days') ? `tomorrow +${value - 1} days` : `+${value} ${unit}`;
+        itemWithMutations.set('balance_period', balancePeriod);
+        itemWithMutations.setIn(['price', 0, 'to'], 0);
+      } else {
+        itemWithMutations.set('balance_period', 'default');
+      }
+    } else { // convert item resived from server
+      if (['', 'default'].includes(itemWithMutations.get('balance_period', 'default'))) {
+        itemWithMutations.set('balance_period', { type: 'default', unit: '', value: '' });
+      } else {
+        const balancePeriodArray = itemWithMutations.get('balance_period', '').split(' ');
+        const unit = balancePeriodArray[balancePeriodArray.length - 1];
+        const value = Number(balancePeriodArray[balancePeriodArray.length - 2]);
+        const type = 'custom_period';
+        itemWithMutations.set('balance_period', { type, unit, value: (unit === 'days') ? value + 1 : value });
+      }
+    }
   });
 };
 
 export const saveService = (service, action) => (dispatch, getState) => {
-  const convertedService = convertService(getState, service, true);
+  const convertedService = convertService(getState, service, true, true);
   return dispatch(saveEntity('services', convertedService, action));
 };
 
@@ -89,7 +110,7 @@ export const getService = id => (dispatch, getState) => {
       }
       item.originalValue = item.from;
       const service = Immutable.fromJS(item);
-      const convertedService = convertService(getState, service, false).toJS();
+      const convertedService = convertService(getState, service, false, false).toJS();
       dispatch(gotItem(convertedService));
       return dispatch(apiBillRunSuccessHandler(response));
     })

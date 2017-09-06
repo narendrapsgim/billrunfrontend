@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, HelpBlock, Col } from 'react-bootstrap';
+import { titleCase } from 'change-case';
+import { Form, FormGroup, ControlLabel, HelpBlock, Col, InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import { ServiceDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
@@ -71,12 +72,28 @@ export default class ServiceDetails extends Component {
     this.props.updateItem(field, value);
   }
 
+  onChangeServicePeriodType = (e) => {
+    const { value } = e.target;
+    this.props.updateItem(['balance_period', 'type'], value);
+  }
+
+  onSelectPeriodUnit = (unit) => {
+    this.props.updateItem(['balance_period', 'unit'], unit);
+  }
+
+  onChangeBalancePeriod = (e) => {
+    const { value } = e.target;
+    this.props.updateItem(['balance_period', 'value'], value);
+  }
+
   render() {
     const { errors } = this.state;
     const { item, mode } = this.props;
     const serviceCycleUnlimitedValue = globalSetting.serviceCycleUnlimitedValue;
     const editable = (mode !== 'view');
-
+    const balancePeriodUnit = item.getIn(['balance_period', 'unit'], '');
+    const balancePeriodUnitTitle = (balancePeriodUnit === '') ? 'Select unit...' : titleCase(balancePeriodUnit);
+    const isByCycles = item.getIn(['balance_period', 'type'], 'default') === 'default';
     return (
       <Form horizontal>
 
@@ -101,17 +118,90 @@ export default class ServiceDetails extends Component {
           </FormGroup>
         }
 
+        {['clone', 'create'].includes(mode) &&
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>
+              Type <span className="danger-red"> *</span>
+            </Col>
+            <Col sm={8} lg={9}>
+              <span style={{ display: 'inline-block', marginRight: 20 }}>
+                <Field
+                  fieldType="radio"
+                  onChange={this.onChangeServicePeriodType}
+                  name="service_period_type"
+                  value="default"
+                  label="Cycles"
+                  checked={isByCycles}
+                />
+              </span>
+              <span style={{ display: 'inline-block' }}>
+                <Field
+                  fieldType="radio"
+                  onChange={this.onChangeServicePeriodType}
+                  name="service_period_type"
+                  value="custom_period"
+                  label="Custom Period"
+                  checked={!isByCycles}
+                />
+              </span>
+            </Col>
+          </FormGroup>
+        }
+
+        {(!isByCycles) &&
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2} >
+              {!['clone', 'create'].includes(mode) && 'Custom Period'}
+            </Col>
+            <Col sm={6}>
+              <InputGroup>
+                <Field
+                  disabled={isByCycles}
+                  fieldType="number"
+                  min="1"
+                  step="1"
+                  value={item.getIn(['balance_period', 'value'], '')}
+                  onChange={this.onChangeBalancePeriod}
+                  editable={editable}
+                />
+                <DropdownButton
+                  id="balance-period-unit"
+                  componentClass={InputGroup.Button}
+                  title={balancePeriodUnitTitle}
+                  disabled={isByCycles}
+                >
+                  <MenuItem eventKey="days" onSelect={this.onSelectPeriodUnit}>Days</MenuItem>
+                  <MenuItem eventKey="weeks" onSelect={this.onSelectPeriodUnit}>Weeks</MenuItem>
+                  <MenuItem eventKey="months" onSelect={this.onSelectPeriodUnit}>Months</MenuItem>
+                  <MenuItem eventKey="years" onSelect={this.onSelectPeriodUnit}>Years</MenuItem>
+                </DropdownButton>
+              </InputGroup>
+            </Col>
+          </FormGroup>
+        }
+
+        {(isByCycles) &&
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2} >{!['clone', 'create'].includes(mode) && 'Cycles'}</Col>
+            <Col sm={6}>
+              <Field
+                disabled={!isByCycles}
+                value={item.getIn(['price', 0, 'to'], '')}
+                onChange={this.onChangeCycle}
+                fieldType="unlimited"
+                unlimitedValue={serviceCycleUnlimitedValue}
+                unlimitedLabel="Infinite"
+                editable={editable}
+                suffix="Cycles"
+              />
+            </Col>
+          </FormGroup>
+        }
+
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Price</Col>
           <Col sm={4}>
             <Field value={item.getIn(['price', 0, 'price'], '')} onChange={this.onChangePrice} fieldType="price" editable={editable} />
-          </Col>
-        </FormGroup>
-
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3} lg={2}>Cycles</Col>
-          <Col sm={4}>
-            <Field value={item.getIn(['price', 0, 'to'], '')} onChange={this.onChangeCycle} fieldType="unlimited" unlimitedValue={serviceCycleUnlimitedValue} unlimitedLabel="Infinite" editable={editable} />
           </Col>
         </FormGroup>
 
