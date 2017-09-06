@@ -26,7 +26,6 @@ import {
   setFieldMapping,
   setFieldWidth,
   addCSVField,
-  addUsagetMapping,
   setCustomerMapping,
   setRatingField,
   setReceiverField,
@@ -122,13 +121,13 @@ class InputProcessor extends Component {
       steps = steps.set('realtimeMapping', {
         idx: 3,
         label: 'Realtime Mapping',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response', 'unify'],
       });
     } else {
       steps = steps.set('receiver', {
         idx: 3,
         label: 'Receiver',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver', 'unify'],
       });
     }
 
@@ -388,10 +387,6 @@ class InputProcessor extends Component {
     return field;
   };
 
-  addUsagetMapping = val => (
-    this.props.dispatch(addUsagetMapping(val))
-  );
-
   addNewRatingCustomField = (fieldName, title, type) => {
     const { customRatingFields } = this.props;
     this.props.dispatch(updateSetting('rates', ['fields'], customRatingFields.push(Immutable.Map({
@@ -490,7 +485,6 @@ class InputProcessor extends Component {
           onError={this.onError}
           unsetField={this.unsetField}
           setUsagetType={this.setUsagetType}
-          addUsagetMapping={this.addUsagetMapping}
           onSetStaticUsaget={this.onSetStaticUsaget}
           onSetFieldMapping={this.onSetFieldMapping}
           onAddUsagetMapping={this.onAddUsagetMapping}

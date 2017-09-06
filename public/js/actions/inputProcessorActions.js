@@ -36,7 +36,7 @@ export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
-import { getInputProcessorActionQuery, getAddUsagetQuery } from '../common/ApiQueries';
+import { getInputProcessorActionQuery } from '../common/ApiQueries';
 import _ from 'lodash';
 import Immutable from 'immutable';
 import { getSettings } from './settingsActions';
@@ -49,6 +49,7 @@ const convert = (settings) => {
           receiver = {},
           realtime = {},
           response = {},
+          unify = {},
         } = settings;
 
   const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
@@ -69,6 +70,7 @@ const convert = (settings) => {
     field_widths,
     customer_identification_fields,
     rate_calculators,
+    unify,
   };
 
   if (settings.type !== 'realtime') {
@@ -240,17 +242,6 @@ function addedUsagetMapping(usaget) {
   };
 }
 
-export const addUsagetMapping = usaget => (dispatch) => { // eslint-disable-line import/prefer-default-export
-  dispatch(startProgressIndicator());
-  const query = getAddUsagetQuery(usaget);
-  return apiBillRun(query)
-    .then((success) => {
-      dispatch(getSettings('usage_types'));
-      return dispatch(apiBillRunSuccessHandler(success));
-    })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Illegal usage type')));
-};
-
 export function removeUsagetMapping(index) {
   return {
     type: REMOVE_USAGET_MAPPING,
@@ -327,6 +318,7 @@ export function saveInputProcessorSettings(state, parts = []) {
   const action = (parts.length === 0) ? 'set' : 'validate';
   const processor = state.get('processor'),
         customer_identification_fields = state.get('customer_identification_fields'),
+        unify = state.get('unify', Immutable.Map()),
         rate_calculators = state.get('rate_calculators'),
         receiver = state.get('receiver'),
         realtime = state.get('realtime', Immutable.Map()),
@@ -374,6 +366,9 @@ export function saveInputProcessorSettings(state, parts = []) {
   }
   if (rate_calculators) {
     settings.rate_calculators = rate_calculators.toJS();
+  }
+  if (unify) {
+    settings.unify = unify.toJS();
   }
   if (state.get('type') !== 'realtime' && receiver) {
     const receiverType = receiver.get('receiver_type', 'ftp');
