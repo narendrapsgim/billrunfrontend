@@ -388,7 +388,7 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
   })
 );
 
-const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, queueFields, eventField) => {
+const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, queueFields, eventFields) => {
   // usage: linesFileds,
   // duplicate fields list by join (same fields from different collections)
   // that will be removed frm UI.
