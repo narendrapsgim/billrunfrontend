@@ -267,6 +267,10 @@ class Subscription extends Component {
   clearRevisions = () => {
     const { subscription } = this.state;
     this.props.clearRevisions(subscription);
+    this.clearItemsList();
+  }
+
+  clearItemsList = () => {
     this.props.clearList();
   }
 
@@ -311,6 +315,7 @@ class Subscription extends Component {
             clearRevisions={this.clearRevisions}
             onActionEdit={this.props.getSubscription}
             onActionClone={this.props.getSubscription}
+            clearList={this.clearItemsList}
           />
 
           <hr />

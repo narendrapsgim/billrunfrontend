@@ -26,6 +26,7 @@ class EntityRevisionDetails extends Component {
     backToList: PropTypes.func,
     reLoadItem: PropTypes.func,
     clearRevisions: PropTypes.func,
+    clearList: PropTypes.func,
     onActionEdit: PropTypes.func,
     onActionClone: PropTypes.func,
     itemName: PropTypes.string.isRequired,
@@ -47,6 +48,7 @@ class EntityRevisionDetails extends Component {
     backToList: () => {},
     reLoadItem: () => {},
     clearRevisions: () => {},
+    clearList: () => {},
   };
 
   state = {
@@ -111,6 +113,7 @@ class EntityRevisionDetails extends Component {
 
   onCloseItem = () => {
     this.props.clearRevisions();
+    this.props.clearList();
     this.props.reLoadItem();
   }
 
