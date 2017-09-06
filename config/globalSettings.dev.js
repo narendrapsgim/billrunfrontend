@@ -5,7 +5,7 @@ var globalSetting = {
   // serverUrl : "http://10.162.20.247", // Shani
   serverUrl: "http://billrun",
   //serverUrl: "",
-  serverApiVersion: '5.6.2',
+  serverApiVersion: '5.6.8',
   serverApiTimeOut: 300000,  // 5 minutes
   serverApiDebug: false,
   serverApiDebugQueryString: 'XDEBUG_SESSION_START=netbeans-xdebug',
@@ -24,7 +24,7 @@ var globalSetting = {
   planCycleUnlimitedValue: 'UNLIMITED',
   serviceCycleUnlimitedValue: 'UNLIMITED',
   productUnlimitedValue: 'UNLIMITED',
-  keyUppercaseRegex: /^[A-Z0-9_]*$/,
+  keyUppercaseRegex: /^[A-Z0-9_]+$/,
   keyRegex: /^[A-Za-z0-9_]*$/,
   defaultLogo: 'billRun-cloud-logo.png',
   billrunCloudLogo: 'billRun-cloud-logo.png',

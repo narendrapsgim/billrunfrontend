@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import moment from 'moment';
+import Immutable from 'immutable';
 import { titleCase } from 'change-case';
 import EntityList from '../EntityList';
-import { getConfig, getFieldName } from '../../common/Util';
+import { getConfig, getItemId, getFieldName } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteReport } from '../../actions/reportsActions';
 import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
@@ -12,6 +14,9 @@ import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 class ReportsList extends Component {
 
   static propTypes = {
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -38,7 +43,7 @@ class ReportsList extends Component {
     { id: 'entity', title: 'Entity', sort: true, parser: this.parseEntityName },
     { id: 'type', title: 'Type', sort: true, parser: this.parseEntityType },
     { id: 'user', title: 'User', sort: true, parser: this.parseUserName },
-    { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
+    { id: 'from', title: 'Modified', type: 'date', cssClass: 'short-date', sort: true },
   ]);
 
   getProjectFields = () => ({
@@ -82,11 +87,28 @@ class ReportsList extends Component {
     }
   }
 
+  onClone = (item) => {
+    const itemId = getItemId(item, '');
+    const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
+    const itemsType = getConfig(['systemItems', 'report', 'itemsType'], '');
+    this.props.router.push({
+      pathname: `${itemsType}/${itemType}/${itemId}`,
+      query: {
+        action: 'clone',
+      },
+    });
+  }
+
   getActions = () => ([
     { type: 'view' },
     { type: 'edit', onClickColumn: null },
-    { type: 'remove', showIcon: true, onClick: this.onAskDelete },
+    { type: 'clone', showIcon: true, onClick: this.onClone, helpText: 'Clone' },
+    { type: 'remove', showIcon: true, onClick: this.onAskDelete, helpText: 'Remove' },
   ]);
+
+  getDefaultSort = () => Immutable.Map({
+    creation_time: -1,
+  });
 
   render() {
     const { refreshString } = this.state;
@@ -94,6 +116,7 @@ class ReportsList extends Component {
     const tableFields = this.getTableFields();
     const actions = this.getActions();
     const projectFields = this.getProjectFields();
+    const defaultSort = this.getDefaultSort();
     return (
       <EntityList
         collection="reports"
@@ -105,10 +128,11 @@ class ReportsList extends Component {
         projectFields={projectFields}
         actions={actions}
         refreshString={refreshString}
+        defaultSort={defaultSort}
       />
     );
   }
 
 }
 
-export default connect()(ReportsList);
+export default withRouter(connect()(ReportsList));

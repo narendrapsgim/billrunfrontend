@@ -9,13 +9,13 @@ import {
   getAllGroupsQuery,
  } from '../common/ApiQueries';
 import {
+  actions as entityActions,
   saveEntity,
   deleteEntity,
   getEntity,
   clearEntity,
   updateEntityField,
   deleteEntityField,
-  setCloneEntity,
 } from './entityActions';
 import {
   getList as getEntityList,
@@ -36,7 +36,11 @@ export const reportTypes = {
   GROPPED: 1,
 };
 
-export const setCloneReport = () => setCloneEntity('reports', 'report');
+export const setCloneReport = () => ({
+  type: entityActions.CLONE_RESET_ENTITY,
+  collection: 'reports',
+  uniquefields: ['key', 'user', 'creation_time'],
+});
 
 export const clearReport = () => clearEntity('reports');
 
@@ -69,6 +73,8 @@ export const getProductsOptions = () => getList('all_rates', getProductsKeysQuer
 export const getUsageTypesOptions = () => dispatch => dispatch(getSettings('usage_types'));
 
 export const getFileTypesOptions = () => dispatch => dispatch(getSettings('file_types'));
+
+export const getEventCodeOptions = () => dispatch => dispatch(getSettings('events'));
 
 export const getGroupsOptions = () => dispatch => apiBillRun(getAllGroupsQuery())
   .then((success) => {

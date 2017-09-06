@@ -26,7 +26,6 @@ import {
   setFieldMapping,
   setFieldWidth,
   addCSVField,
-  addUsagetMapping,
   setCustomerMapping,
   setRatingField,
   setReceiverField,
@@ -37,6 +36,8 @@ import {
   removeUsagetMapping,
   setUsagetType,
   setLineKey,
+  setComputedLineKey,
+  unsetComputedLineKey,
   setStaticUsaget,
   moveCSVFieldUp,
   moveCSVFieldDown,
@@ -122,13 +123,13 @@ class InputProcessor extends Component {
       steps = steps.set('realtimeMapping', {
         idx: 3,
         label: 'Realtime Mapping',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response', 'unify'],
       });
     } else {
       steps = steps.set('receiver', {
         idx: 3,
         label: 'Receiver',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver', 'unify'],
       });
     }
 
@@ -336,6 +337,14 @@ class InputProcessor extends Component {
     this.props.dispatch(setLineKey(usaget, parseInt(index, 10), value));
   }
 
+  onSetComputedLineKey = (path, value) => {
+    this.props.dispatch(setComputedLineKey(path, value));
+  }
+
+  onUnsetComputedLineKey = (usaget, index) => {
+    this.props.dispatch(unsetComputedLineKey(usaget, index));
+  }
+
   onSetReceiverField = (e) => {
     const { id, value } = e.target;
     this.props.dispatch(setReceiverField(id, value));
@@ -387,10 +396,6 @@ class InputProcessor extends Component {
     }
     return field;
   };
-
-  addUsagetMapping = val => (
-    this.props.dispatch(addUsagetMapping(val))
-  );
 
   addNewRatingCustomField = (fieldName, title, type) => {
     const { customRatingFields } = this.props;
@@ -490,7 +495,6 @@ class InputProcessor extends Component {
           onError={this.onError}
           unsetField={this.unsetField}
           setUsagetType={this.setUsagetType}
-          addUsagetMapping={this.addUsagetMapping}
           onSetStaticUsaget={this.onSetStaticUsaget}
           onSetFieldMapping={this.onSetFieldMapping}
           onAddUsagetMapping={this.onAddUsagetMapping}
@@ -505,6 +509,8 @@ class InputProcessor extends Component {
           customRatingFields={customRatingFields}
           onSetRating={this.onSetRating}
           onSetLineKey={this.onSetLineKey}
+          onSetComputedLineKey={this.onSetComputedLineKey}
+          onUnsetComputedLineKey={this.onUnsetComputedLineKey}
           onSetCustomerMapping={this.onSetCustomerMapping}
           onAddRating={this.onAddRating}
           onRemoveRating={this.onRemoveRating}

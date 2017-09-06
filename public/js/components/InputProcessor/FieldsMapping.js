@@ -10,7 +10,6 @@ export default class FieldsMapping extends Component {
     usageTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
-    addUsagetMapping: PropTypes.func,
     onSetStaticUsaget: PropTypes.func,
     onSetFieldMapping: PropTypes.func,
   };
@@ -19,7 +18,6 @@ export default class FieldsMapping extends Component {
     usageTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
-    addUsagetMapping: () => {},
     onSetStaticUsaget: () => {},
     onSetFieldMapping: () => {},
   };
@@ -53,26 +51,9 @@ export default class FieldsMapping extends Component {
   }
 
   changeUsaget(val, setStaticUsaget) {
-    const { usageTypes } = this.props;
-
-    const found = (val === '' || usageTypes.find(usaget => (usaget === val)));
-    if (!found) {
-      this.props.addUsagetMapping(val)
-      .then(
-        (response) => {
-          if (response.status) {
-            this.setState({ usaget: val });
-            if (setStaticUsaget) {
-              this.props.onSetStaticUsaget(val);
-            }
-          }
-        }
-      );
-    } else {
-      this.setState({ usaget: val });
-      if (setStaticUsaget) {
-        this.props.onSetStaticUsaget(val);
-      }
+    this.setState({ usaget: val });
+    if (setStaticUsaget) {
+      this.props.onSetStaticUsaget(val);
     }
   }
 

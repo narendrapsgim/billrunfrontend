@@ -119,15 +119,6 @@ export const getInputProcessorActionQuery = (fileType, action) => ({
   ],
 });
 
-export const getAddUsagetQuery = usaget => ({
-  api: 'settings',
-  params: [
-    { category: 'usage_types' },
-    { action: 'set' },
-    { data: [JSON.stringify(usaget)] },
-  ],
-});
-
 export const getCreditChargeQuery = params => ({
   api: 'credit',
   params,
@@ -321,7 +312,7 @@ export const getDeleteLineQuery = id => ({
 // List
 export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
-export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
+export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => getEntitesQuery('rates', project);
 export const getProductsWithRatesQuery = () =>
@@ -333,6 +324,7 @@ export const getAllGroupsQuery = () => ([
   getGroupsQuery('plans'),
   getGroupsQuery('services'),
 ]);
+export const getBucketGroupsQuery = () => getEntitesQuery('prepaidgroups');
 // By ID
 export const fetchServiceByIdQuery = id => getEntityByIdQuery('services', id);
 export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
@@ -342,6 +334,7 @@ export const fetchReportByIdQuery = id => getEntityByIdQuery('reports', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
 export const fetchPrepaidGroupByIdQuery = id => getEntityByIdQuery('prepaidgroups', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);
+export const fetchAutoRenewByIdQuery = id => getEntityByIdQuery('autorenew', id);
 
 export const getProductByKeyQuery = key => ({
   action: 'uniqueget',

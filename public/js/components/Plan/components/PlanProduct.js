@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Panel, Button } from 'react-bootstrap';
+import { Panel, Button, FormGroup, ControlLabel } from 'react-bootstrap';
 import classNames from 'classnames';
 import Immutable from 'immutable';
 import Help from '../../Help';
@@ -110,6 +110,7 @@ export default class PlanProduct extends Component {
     const unit = prices.getIn([0, 'uom_display', 'range'], '');
     const editable = (mode !== 'view');
     const priceCount = prices.size;
+    const pricingMethod = (item.get('pricing_method', 'Tiered') === 'volume') ? 'Volume' : 'Tiered';
     const header = (
       <h3>
         { `${item.get('key')} (${usaget}) `} <i>{item.get('code')}</i><Help contents={item.get('description')} />
@@ -120,6 +121,10 @@ export default class PlanProduct extends Component {
 
     return (
       <Panel header={header}>
+        <FormGroup style={{ margin: 0 }}>
+          {<ControlLabel>{`${pricingMethod} Pricing`}</ControlLabel>}
+        </FormGroup>
+
         { prices.map((price, i) =>
           <ProductPrice
             key={i}

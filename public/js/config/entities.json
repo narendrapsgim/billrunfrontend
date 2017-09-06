@@ -92,5 +92,18 @@
     "itemName": "received files",
     "itemType": "logFile",
     "itemsType": "logFiles"
+  },
+  "event": {
+    "collection": "events",
+    "uniqueField": "stamp",
+    "itemName": "events",
+    "itemType": "event",
+    "itemsType": "events"
+  },
+  "auto_renew": {
+    "collection": "autorenew",
+    "itemName": "recurring charge",
+    "itemType": "auto_renew",
+    "itemsType": "auto_renews"
   }
 }

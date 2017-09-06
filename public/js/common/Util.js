@@ -6,6 +6,7 @@ import reportConfig from '../config/report'
 import systemItemsConfig from '../config/entities.json'
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
+import ratesConfig from '../config/rates.json';
 
 /**
  * Get data from config files
@@ -32,6 +33,8 @@ export const getConfig = (key, defaultValue = null) => {
         break;
       case 'events': configCache = configCache.set('events', Immutable.fromJS(eventsConfig));
         break;
+      case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
+        break;
       default: console.log(`Config caregory not exists ${path}`);
     }
   }
@@ -41,7 +44,7 @@ export const getConfig = (key, defaultValue = null) => {
 export const titlize = str => changeCase.upperCaseFirst(str);
 
 export const getFieldName = (field, category) =>
-  getConfig(['fieldNames', category,field], getConfig(['fieldNames', field], field));
+  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], field));
 
 export const getFieldNameType = (type) => {
   switch (type) {
@@ -56,7 +59,7 @@ export const getFieldNameType = (type) => {
     case 'usage':
       return 'lines';
     default:
-      return '';
+      return type;
   }
 };
 
@@ -91,6 +94,8 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
           return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
         } else if (entityName === 'subscription') {
           return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        } else if (entityName === 'auto_renew') {
+          return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))}`;
         }
         return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
@@ -188,18 +193,18 @@ export const getItemMode = (item, undefindItemStatus = 'create') => {
 
 export const getItemMinFromDate = (item, minDate) => {
   // item and minDate
-  if (minDate && item && getItemId(item, false)) {
+  if (minDate && getItemId(item, false)) {
     return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
   }
   // only item
-  if(item && getItemId(item, false)) {
+  if(getItemId(item, false)) {
     return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)))
   }
   // only minDate
   if (minDate) {
     return minDate;
   }
-
+  // allow component set default value if no item and minDate exist
   return undefined;
 };
 
@@ -302,6 +307,9 @@ export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
 };
 
 export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value, toBaseUnit = true) => { // eslint-disable-line max-len
+  if (value === 'UNLIMITED') {
+    return 'UNLIMITED';
+  }
   const uom = getUom(propertyTypes, usageTypes, usaget);
   const u = (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('unit', 1);
   return toBaseUnit ? (value * u) : (value / u);
@@ -410,7 +418,8 @@ export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBase
       if (unit && usaget) {
         const value = include.get(usaget);
         const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
-        includesWithMutations.setIn(['groups', group, usaget], parseFloat(newValue));
+        const newConvertedValue = (newValue === 'UNLIMITED') ? newValue : parseFloat(newValue);
+        includesWithMutations.setIn(['groups', group, usaget], newConvertedValue);
       }
     });
   });

@@ -37,7 +37,7 @@ export default class Queue extends Component {
                   let formattedValue = line.get(field);
                   if (field === 'calc_time') {
                     formattedValue = moment.unix(line.get(field)).format(globalSetting.datetimeFormat);
-                  } else if (field === 'urt') {
+                  } else if (field === 'urt' || field === 'process_time') {
                     formattedValue = moment.unix(line.getIn([field, 'sec'])).format(globalSetting.datetimeLongFormat);
                   }
                   if (hiddenFields.includes(field)) return (null);

@@ -19,6 +19,9 @@ const getPricing = (state, props) => // eslint-disable-line no-unused-vars
 const getUsageType = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('usage_types');
 
+const getEventCode = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['events', 'balance']);
+
 const getPropertyTypes = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('property_types');
 
@@ -165,12 +168,19 @@ const selectUsageTypes = (usageTypes) => {
   return usageTypes.map(usageType => usageType.get('usage_type', ''));
 };
 
+const selectEventCode = (events) => {
+  if (!events) {
+    return undefined;
+  }
+  return events.map(event => event.get('event_code', ''));
+};
+
 const selectFileType = (fileTypes) => {
   if (!fileTypes) {
     return undefined;
   }
   return fileTypes.map(fileType => fileType.get('file_type', ''));
-}
+};
 
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
@@ -209,7 +219,7 @@ export const billrunSelector = createSelector(
 
 export const minEntityDateSelector = createSelector(
   getMinEntityDate,
-  minEntityDate => moment(0),//(minEntityDate && !isNaN(minEntityDate) ? moment.unix(minEntityDate) : moment(0)),
+  minEntityDate => (minEntityDate && !isNaN(minEntityDate) ? moment.unix(minEntityDate) : moment(0)),
 );
 
 export const currencySelector = createSelector(
@@ -227,12 +237,17 @@ export const chargingDaySelector = createSelector(
 
 export const fileTypeSelector = createSelector(
   getInputProssesors,
-  selectFileType
+  selectFileType,
 );
 
 export const usageTypeSelector = createSelector(
   getUsageType,
   selectUsageTypes,
+);
+
+export const eventCodeSelector = createSelector(
+  getEventCode,
+  selectEventCode,
 );
 
 export const usageTypesDataSelector = createSelector(
@@ -373,7 +388,7 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
   })
 );
 
-const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, queueFields) => {
+const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, queueFields, eventField) => {
   // usage: linesFileds,
   // duplicate fields list by join (same fields from different collections)
   // that will be removed frm UI.
@@ -411,7 +426,8 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
 
   const logFile = logFileFields;
   const queue = queueFields;
-  return Immutable.Map({ usage, subscription, customer, logFile, queue });
+  const event = eventFields;
+  return Immutable.Map({ usage, subscription, customer, logFile, queue, event });
 };
 
 const getReportConfigFields = type => getConfig(['reports', 'fields', type], Immutable.List());
@@ -499,6 +515,13 @@ const reportlogFileFieldsSelector = createSelector(
   mergeEntityAndReportConfigFields,
 );
 
+const reportEventFileFieldsSelector = createSelector(
+  () => getReportConfigFields('event'),
+  () => Immutable.List(),
+  () => 'event',
+  mergeEntityAndReportConfigFields,
+);
+
 const reportLinesFieldsSelector = createSelector(
   inputProssesorCustomKeysSelector,
   selectReportLinesFields,
@@ -517,6 +540,7 @@ export const reportFieldsSelector = createSelector(
   reportLinesFieldsSelector,
   reportlogFileFieldsSelector,
   reportQueueFieldsSelector,
+  reportEventFileFieldsSelector,
   selectReportFields,
 );
 

@@ -1,5 +1,5 @@
 export default {
-  entities: ['usage', 'subscription', 'customer', 'logFile', 'queue'],
+  entities: ['usage', 'subscription', 'customer', 'logFile', 'queue', 'event'],
   fields: {
     usage: [ // changes to usage will effect on queue
       // Default settings \ Example
@@ -64,6 +64,25 @@ export default {
     account: [
       { id: 'aid', type: 'number' },
     ],
+    event: [
+      { id: 'type',
+        inputConfig: {
+          inputType: 'select',
+          options: ['is', 'in', 'is_not', 'is_less_than', 'is_less_than_or_equal', 'is_greater_than', 'is_greater_than_or_equal', 'reached_constant', 'reached_constant_recurring', 'has_changed', 'has_changed_to', 'has_changed_from'],
+        },
+      },
+      { id: 'aid', type: 'number' },
+      { id: 'sid', type: 'number' },
+      { id: 'creation_time', type: 'date' },
+      { id: 'notify_time', type: 'date' },
+      { id: 'value' },
+      { id: 'stamp' },
+      { id: 'event_code', inputConfig: {
+         inputType: 'select',
+         callback: 'getEventCodeOptions', /* callback function + should be implementation */
+      } },
+      { id: 'returned_value', searchable: false },
+    ],
     logFile: [
       { id: 'file_name', title: 'File name' },
       { id: 'stamp', title: 'Record unique ID' },
@@ -76,9 +95,10 @@ export default {
         inputConfig: {
           inputType: 'select',
           options: [
-            { value: 'received', label: 'Received' },
-            { value: 'not_received', label: 'Not received' },
-            { value: 'stuck', label: 'Stuck' },
+            { value: 'not_processed', label: 'Received' },
+            { value: 'processing', label: 'Processing' },
+            { value: 'processed', label: 'Processed' },
+            { value: 'crashed', label: 'Crashed' },
           ],
         },
       },
