@@ -8,7 +8,7 @@ export default function (state = defaultState, action) {
   switch (action.type) {
 
     case SHOW_ALERT:
-      return state.push(action.alert);
+      return state.insert(0, action.alert);
 
     case DISMISS_ALERT:
       return state.filter(alert => alert.get('id') !== action.id);

@@ -43,6 +43,7 @@ const defaultState = Immutable.fromJS({
   },
   customer_identification_fields: [],
   rate_calculators: {},
+  unify: {},
   /* receiver: {
    *   passive: false,
    *   delete_received: false

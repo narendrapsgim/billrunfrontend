@@ -4,7 +4,7 @@
   },
   "lines": {
     "arate": "Product reference",
-    "arate_key": "Product name",
+    "arate_key": "Product key",
     "arategroup": "Campaign name",
     "lastname": "Subscriber's surname",
     "firstname": "Subscriber's first name",
@@ -20,7 +20,7 @@
     "aprice": "Charge before taxes",
     "log_stamp": "File unique ID",
     "file": "File name",
-    "plan": "Subscriber's plan name",
+    "plan": "Subscriber's plan key",
     "plan_ref": "Plan reference",
     "billsec": "Billing duration",
     "dcontext": "Destination context",
@@ -94,5 +94,15 @@
     "returned_value": "Response"
   },
   "aid": "Customer ID",
-  "sid": "Subscriber ID"
+  "sid": "Subscriber ID",
+  "autorenew": {
+    "aid": "Customer ID",
+    "sid": "Subscriber ID",
+    "bucket_group": "Bucket Group",
+    "cycles": "Total Cycles",
+    "cycles_remaining": "Remaining Cycles",
+    "next_renew": "Next Renew",
+    "last_renew": "Last Renew",
+    "interval": "Interval"
+  }
 }

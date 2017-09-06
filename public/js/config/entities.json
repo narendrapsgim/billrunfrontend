@@ -92,5 +92,11 @@
     "itemName": "events",
     "itemType": "event",
     "itemsType": "events"
+  },
+  "auto_renew": {
+    "collection": "autorenew",
+    "itemName": "recurring charge",
+    "itemType": "auto_renew",
+    "itemsType": "auto_renews"
   }
 }
