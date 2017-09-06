@@ -18,6 +18,7 @@ import {
 import {
   usageTypeSelector,
   fileTypeSelector,
+  eventCodeSelector,
 } from '../../../selectors/settingsSelector';
 import {
   getCyclesOptions,
@@ -27,6 +28,7 @@ import {
   getGroupsOptions,
   getUsageTypesOptions,
   getFileTypesOptions,
+  getEventCodeOptions,
 } from '../../../actions/reportsActions';
 
 
@@ -91,6 +93,8 @@ class ConditionValue extends Component {
         case 'getUsageTypesOptions': this.props.dispatch(getUsageTypesOptions());
           break;
         case 'getFileTypeOptions': this.props.dispatch(getFileTypesOptions());
+          break;
+        case 'getEventCodeOptions': this.props.dispatch(getEventCodeOptions());
           break;
         default: console.log('unsuported select options callback');
           break;
@@ -330,6 +334,7 @@ const mapStateToProps = (state, props) => ({
     getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
     getFileTypeOptions: fileTypeSelector(state, props) || Immutable.List(),
+    getEventCodeOptions: eventCodeSelector(state, props) || Immutable.List(),
   }),
 });
 

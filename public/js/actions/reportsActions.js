@@ -74,6 +74,8 @@ export const getUsageTypesOptions = () => dispatch => dispatch(getSettings('usag
 
 export const getFileTypesOptions = () => dispatch => dispatch(getSettings('file_types'));
 
+export const getEventCodeOptions = () => dispatch => dispatch(getSettings('events'));
+
 export const getGroupsOptions = () => dispatch => apiBillRun(getAllGroupsQuery())
   .then((success) => {
     try {

@@ -44,7 +44,7 @@ export const getConfig = (key, defaultValue = null) => {
 export const titlize = str => changeCase.upperCaseFirst(str);
 
 export const getFieldName = (field, category) =>
-  getConfig(['fieldNames', category,field], getConfig(['fieldNames', field], field));
+  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], field));
 
 export const getFieldNameType = (type) => {
   switch (type) {
@@ -59,7 +59,7 @@ export const getFieldNameType = (type) => {
     case 'usage':
       return 'lines';
     default:
-      return '';
+      return type;
   }
 };
 
