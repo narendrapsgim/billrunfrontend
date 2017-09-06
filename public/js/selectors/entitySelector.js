@@ -196,7 +196,7 @@ export const modeSimpleSelector = createSelector(
 
 export const entityMinFrom = createSelector(
   getPropsItem,
-  minEntityDateSelector,
+  // minEntityDateSelector,
   selectMaxFrom,
 );
 
