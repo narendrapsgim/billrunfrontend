@@ -4,12 +4,17 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import changeCase from 'change-case';
 import { Col, Row, Panel } from 'react-bootstrap';
-import List from '../List';
-import Pager from '../Pager';
-import { AdvancedFilter } from '../Filter';
+import List from '../List'; //TODO: move to entityList
+import Pager from '../Pager'; //TODO: move to entityListPager
+import { AdvancedFilter } from '../Filter';  //TODO: move to entityListFilter
 import DetailsParser from './DetailsParser';
 import { getUserKeysQuery, auditTrailEntityTypesQuery, auditTrailListQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
+import {
+  userNamesSelector,
+  auditlogSelector,
+  auditEntityTypesSelector,
+} from '../../selectors/listSelectors';
 
 class AuditTrail extends Component {
 
@@ -38,7 +43,12 @@ class AuditTrail extends Component {
   componentDidMount() {
     this.fetchUser();
     this.fetchEnityTypes();
-    this.fetchItems();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!Immutable.is(this.props.userNames, nextProps.userNames)) {
+      this.fetchItems();
+    }
   }
 
   componentWillUnmount() {
@@ -81,12 +91,19 @@ class AuditTrail extends Component {
     if (query.urt) {
       query.urt = this.urtQueryBuilder(query.urt);
     }
+    if (!isNaN(query.key)) {
+      query.key = { $in: [query.key, Number(query.key)] };
+    } else if (query.key) {
+      query.key = { $regex: query.key, $options: 'i' };
+    }
     return auditTrailListQuery(query, page, fields, sort, size);
   }
 
   userParser = item => item.getIn(['user', 'name'], '');
 
   collectionParser = item => changeCase.sentenceCase(item.get('collection', ''));
+
+  keyParser = item => (item.get('type', '') === 'login' ? '' : item.get('key', ''));
 
   detailsParser = item => <DetailsParser item={item} />
 
@@ -110,7 +127,7 @@ class AuditTrail extends Component {
     { id: 'urt', title: 'Date', type: 'datetime', cssClass: 'long-date', sort: true },
     { id: 'user.name', title: 'User', parser: this.userParser, sort: true },
     { id: 'collection', title: 'Module Type', parser: this.collectionParser, sort: true },
-    { id: 'key', title: 'Module Key', sort: true },
+    { id: 'key', title: 'Module Key', parser: this.keyParser, sort: true },
     { title: 'Details', parser: this.detailsParser },
   ]);
 
@@ -140,19 +157,11 @@ class AuditTrail extends Component {
   }
 }
 
-// TODO: use reselect
-const mapStateToProps = (state) => {
-  const items = state.list.get('log');
-  const userNames = state.list.get('autocompleteUser', Immutable.List())
-    .map(user => user.get('username'));
-  const auditTrailEntityTypes = state.list
-    .get('autocompleteAuditTrailEntityTypes', Immutable.List())
-    .map(type => ({
-      key: type.get('name', ''),
-      val: changeCase.sentenceCase(type.get('name', '')),
-    }));
 
-  return { items, userNames, auditTrailEntityTypes };
-};
+const mapStateToProps = state => ({
+  items: auditlogSelector(state),
+  userNames: userNamesSelector(state),
+  auditTrailEntityTypes: auditEntityTypesSelector(state),
+});
 
 export default connect(mapStateToProps)(AuditTrail);
