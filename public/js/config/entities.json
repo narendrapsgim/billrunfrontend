@@ -86,4 +86,10 @@
     "itemType": "logFile",
     "itemsType": "logFiles"
   }
+  "auto_renew": {
+    "collection": "autorenew",
+    "itemName": "recurring charge",
+    "itemType": "auto_renew",
+    "itemsType": "auto_renews"
+  }
 }

@@ -98,6 +98,15 @@
     "order": 2,
     "parent":"prepaid"
   },
+  "recurring": {
+    "title": "Recurring Charges",
+    "icon": "",
+    "route": "auto_renews",
+    "show": true,
+    "roles": [],
+    "order": 3,
+    "parent":"prepaid"
+  },
   "postpaid": {
     "title": "Postpaid",
     "icon": "fa-puzzle-piece",

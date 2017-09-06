@@ -48,6 +48,8 @@ import PrepaidIncludesList from '../components/PrepaidIncludesList';
 import PrepaidIncludeSetup from '../components/PrepaidInclude';
 import ChargingPlansList from '../components/ChargingPlansList';
 import ChargingPlanSetup from '../components/ChargingPlan';
+import AutoRenewsList from '../components/AutoRenew/AutoRenewsList';
+import AutoRenewSetup from '../components/AutoRenew/AutoRenewSetup';
 import CustomFields from '../components/CustomFields';
 import Events from '../components/Events';
 import ChangePassword from '../components/LoginForm/ChangePassword';
@@ -99,6 +101,12 @@ const routes = () => (
       <IndexRoute component={RequireAuth(ChargingPlansList)} title="Buckets Groups" />
       <Route path="charging_plan/:itemId" component={RequireAuth(ChargingPlanSetup)} />
       <Route path="charging_plan" component={RequireAuth(ChargingPlanSetup)} />
+    </Route>
+
+    <Route path="auto_renews" >
+      <IndexRoute component={RequireAuth(AutoRenewsList)} title="Recurring Charges" />
+      <Route path="auto_renew/:itemId" component={RequireAuth(AutoRenewSetup)} />
+      <Route path="auto_renew" component={RequireAuth(AutoRenewSetup)} />
     </Route>
 
     <Route path="prepaid_includes" >
