@@ -337,6 +337,7 @@ export const getAllGroupsQuery = () => ([
   getGroupsQuery('plans'),
   getGroupsQuery('services'),
 ]);
+export const getBucketGroupsQuery = () => getEntitesQuery('prepaidgroups');
 // By ID
 export const fetchServiceByIdQuery = id => getEntityByIdQuery('services', id);
 export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
@@ -346,6 +347,7 @@ export const fetchReportByIdQuery = id => getEntityByIdQuery('reports', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
 export const fetchPrepaidGroupByIdQuery = id => getEntityByIdQuery('prepaidgroups', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);
+export const fetchAutoRenewByIdQuery = id => getEntityByIdQuery('autorenew', id);
 
 export const getProductByKeyQuery = key => ({
   action: 'uniqueget',
