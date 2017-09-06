@@ -8,13 +8,14 @@ import { getSymbolFromCurrency } from 'currency-symbol-map';
 import classNames from 'classnames';
 import { rebalanceAccount, getCollectionDebt } from '../../actions/customerActions';
 import { ConfirmModal } from '../../components/Elements';
-import { currencySelector } from '../../selectors/settingsSelector';
+import { currencySelector, paymentGatewaysSelector } from '../../selectors/settingsSelector';
 import OfflinePayment from '../Payments/OfflinePayment';
 import CyclesSelector from '../Cycle/CyclesSelector';
-import { getExpectedInvoiceQuery } from '../../common/ApiQueries'
-import { buildRequestUrl } from '../../common/Api'
+import { getExpectedInvoiceQuery, getSettingsQuery } from '../../common/ApiQueries'
+import { buildRequestUrl, apiBillRun } from '../../common/Api'
 import EntityFields from '../Entity/EntityFields';
-
+import { getSettings } from '../../actions/settingsActions';
+import { getList } from '../../actions/listActions';
 class Customer extends Component {
 
   static propTypes = {
@@ -26,6 +27,7 @@ class Customer extends Component {
     action: PropTypes.string,
     currency: PropTypes.string,
     fields: PropTypes.instanceOf(Immutable.List),
+    payment_gateways: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -34,6 +36,7 @@ class Customer extends Component {
     customer: Immutable.Map(),
     fields: Immutable.List(),
     supportedGateways: Immutable.List(),
+    payment_gateways: undefined,
   };
 
   state = {
@@ -52,6 +55,7 @@ class Customer extends Component {
     if (action !== 'create') {
       this.initDebt();
     }
+    this.props.dispatch(getSettings('payment_gateways'));
   }
 
   initDefaultValues = () => {
@@ -99,9 +103,10 @@ class Customer extends Component {
   }
 
   renderChangePaymentGateway = () => {
-    const { customer } = this.props;
+    const { customer, payment_gateways } = this.props;
     const hasPaymentGateway = !(customer.getIn(['payment_gateway', 'active'], Immutable.Map()).isEmpty());
     const label = hasPaymentGateway ? this.renderPaymentGatewayLabel() : 'None';
+    const noAvailablePaymentGateways = payment_gateways.isEmpty() ? 'go to setting to enable payment gateways' : '';
     return (
       <FormGroup>
         <Row>
@@ -110,10 +115,11 @@ class Customer extends Component {
           </Col>
           <Col sm={7}>
             {label}
-            <Button onClick={this.onChangePaymentGateway} bsSize="xsmall" style={{ marginLeft: 10, minWidth: 80 }}>
+            <Button onClick={this.onChangePaymentGateway} disabled={payment_gateways.isEmpty() === true}bsSize="xsmall" style={{ marginLeft: 10, minWidth: 80 }}>
               <i className="fa fa-pencil" />
               &nbsp;{hasPaymentGateway ? 'Change' : 'Add'}
             </Button>
+            &nbsp;{noAvailablePaymentGateways}
           </Col>
         </Row>
         <Row>
@@ -307,6 +313,7 @@ class Customer extends Component {
 
 const mapStateToProps = (state, props) => ({
   currency: currencySelector(state, props),
+  payment_gateways: paymentGatewaysSelector(state, props),
 });
 
 export default connect(mapStateToProps)(Customer);
