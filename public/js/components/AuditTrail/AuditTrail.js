@@ -38,7 +38,12 @@ class AuditTrail extends Component {
   componentDidMount() {
     this.fetchUser();
     this.fetchEnityTypes();
-    this.fetchItems();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!Immutable.is(this.props.userNames, nextProps.userNames)) {
+      this.fetchItems();
+    }
   }
 
   componentWillUnmount() {
