@@ -95,9 +95,10 @@ export default {
         inputConfig: {
           inputType: 'select',
           options: [
-            { value: 'received', label: 'Received' },
-            { value: 'not_received', label: 'Not received' },
-            { value: 'stuck', label: 'Stuck' },
+            { value: 'not_processed', label: 'Received' },
+            { value: 'processing', label: 'Processing' },
+            { value: 'processed', label: 'Processed' },
+            { value: 'crashed', label: 'Crashed' },
           ],
         },
       },

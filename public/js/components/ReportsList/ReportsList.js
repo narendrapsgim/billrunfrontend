@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import moment from 'moment';
+import Immutable from 'immutable';
 import { titleCase } from 'change-case';
 import EntityList from '../EntityList';
 import { getConfig, getItemId, getFieldName } from '../../common/Util';
@@ -42,7 +43,7 @@ class ReportsList extends Component {
     { id: 'entity', title: 'Entity', sort: true, parser: this.parseEntityName },
     { id: 'type', title: 'Type', sort: true, parser: this.parseEntityType },
     { id: 'user', title: 'User', sort: true, parser: this.parseUserName },
-    { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
+    { id: 'from', title: 'Modified', type: 'date', cssClass: 'short-date', sort: true },
   ]);
 
   getProjectFields = () => ({
@@ -105,12 +106,17 @@ class ReportsList extends Component {
     { type: 'remove', showIcon: true, onClick: this.onAskDelete, helpText: 'Remove' },
   ]);
 
+  getDefaultSort = () => Immutable.Map({
+    creation_time: -1,
+  });
+
   render() {
     const { refreshString } = this.state;
     const filterFields = this.getFilterFields();
     const tableFields = this.getTableFields();
     const actions = this.getActions();
     const projectFields = this.getProjectFields();
+    const defaultSort = this.getDefaultSort();
     return (
       <EntityList
         collection="reports"
@@ -122,6 +128,7 @@ class ReportsList extends Component {
         projectFields={projectFields}
         actions={actions}
         refreshString={refreshString}
+        defaultSort={defaultSort}
       />
     );
   }
