@@ -102,6 +102,7 @@ class Column extends Component {
   getfieldsConfig = () => {
     const { fieldsConfig } = this.props;
     return fieldsConfig
+      .filter(fieldConfig => fieldConfig.get('columnable', true))
       .map(parseConfigSelectOptions)
       .toArray();
   }

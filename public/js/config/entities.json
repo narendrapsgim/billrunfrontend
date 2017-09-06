@@ -79,6 +79,13 @@
     "itemType": "usage",
     "itemsType": "usages"
   },
+  "logFile": {
+    "collection": "log",
+    "uniqueField": "stamp",
+    "itemName": "received files",
+    "itemType": "logFile",
+    "itemsType": "logFiles"
+  }
   "auto_renew": {
     "collection": "autorenew",
     "itemName": "recurring charge",

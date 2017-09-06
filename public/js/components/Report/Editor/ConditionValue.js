@@ -170,13 +170,12 @@ class ConditionValue extends Component {
   renderInput = () => {
     const { field, disabled, config, selectOptions, operator } = this.props;
 
-    // console.log('operator: ', operator);
     //  Boolean + operator 'EXIST'
     if ([config.get('type', ''), operator.get('type', '')].includes('boolean')) {
       let value = '';
       if (field.get('value', false) === true) {
         value = 'yes';
-      } else if (!field.get('value', true) === false) {
+      } else if (field.get('value', true) === false) {
         value = 'no';
       }
       const booleanOptions = this.getOptionsValues(Immutable.List(['yes', 'no']));

@@ -68,6 +68,10 @@ class DetailsParser extends Component {
 
   renderMessage = () => {
     const { item } = this.props;
+    if (item.get('type', '') === 'login') {
+      return (<p>IP: {item.get('ip', '')}</p>);
+    }
+
     return (
       <p>
         { this.getActionLabel(item.get('type', '')) }
