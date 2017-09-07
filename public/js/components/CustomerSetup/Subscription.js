@@ -231,7 +231,7 @@ class Subscription extends Component {
     )]);
   }
 
-  renderServisesQuentity = (editable) => {
+  renderServicesQuentity = (editable) => {
     const { subscription } = this.state;
     const { allServices } = this.props;
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
@@ -271,7 +271,7 @@ class Subscription extends Component {
     }
   }
 
-  renderServisesByPeriod = (editable) => {
+  renderServicesByPeriod = (editable) => {
     const { subscription } = this.state;
     const { allServices } = this.props;
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
@@ -364,8 +364,8 @@ class Subscription extends Component {
     const { revisions, mode } = this.props;
     const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
-    const servisesQuentity = this.renderServisesQuentity(allowEdit);
-    const servisesByPeriod = this.renderServisesByPeriod(allowEdit);
+    const servicesQuentity = this.renderServicesQuentity(allowEdit);
+    const servicesByPeriod = this.renderServicesByPeriod(allowEdit);
     return (
       <div className="Subscription">
         <Panel header={this.renderPanelTitle()}>
@@ -387,11 +387,11 @@ class Subscription extends Component {
 
           <Form horizontal>
             { this.renderSystemFields(allowEdit) }
-            { (servisesQuentity.length + servisesByPeriod.length > 0) ? (
+            { (servicesQuentity.length + servicesByPeriod.length > 0) ? (
               <Panel header="Services Details">
-                {servisesQuentity}
-                {servisesQuentity.length > 0 && servisesByPeriod.length > 0 && <hr />}
-                {servisesByPeriod}
+                {servicesQuentity}
+                {servicesQuentity.length > 0 && servicesByPeriod.length > 0 && <hr />}
+                {servicesByPeriod}
               </Panel>
               ) : (<hr />)
             }
