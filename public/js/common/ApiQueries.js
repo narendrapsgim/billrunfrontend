@@ -1,15 +1,16 @@
 import moment from 'moment';
 
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
-export const searchProductsByKeyAndUsagetQuery = (usaget, notKeys) => {
+export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
+  const usagesToQuery = Array.isArray(usages) ? usages : [usages];
   const query = {
     key: {
       $nin: [...notKeys, ''], // don't get broken products with empty key
     },
     to: { $gt: moment().toISOString() }, // only active and future
   };
-  if (usaget !== 'cost') {
-    query[`rates.${usaget}`] = { $exists: true };
+  if (usagesToQuery[0] !== 'cost') {
+    query.$or = usagesToQuery.map(usage => ({ [`rates.${usage}`]: { $exists: true } }));
   }
   return {
     api: 'find',
