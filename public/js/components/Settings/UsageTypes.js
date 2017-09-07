@@ -81,7 +81,7 @@ class UsageTypes extends Component {
 
   renderPanelHeader = () => (
     <div>
-      List of all usage types
+      List of all activity types
       <div className="pull-right">
         <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNew}>
           <i className="fa fa-plus" />&nbsp;Add New

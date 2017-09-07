@@ -6,6 +6,7 @@ import reportConfig from '../config/report'
 import systemItemsConfig from '../config/entities.json'
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
+import ratesConfig from '../config/rates.json';
 
 /**
  * Get data from config files
@@ -32,6 +33,8 @@ export const getConfig = (key, defaultValue = null) => {
         break;
       case 'events': configCache = configCache.set('events', Immutable.fromJS(eventsConfig));
         break;
+      case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
+        break;
       default: console.log(`Config caregory not exists ${path}`);
     }
   }
@@ -41,7 +44,7 @@ export const getConfig = (key, defaultValue = null) => {
 export const titlize = str => changeCase.upperCaseFirst(str);
 
 export const getFieldName = (field, category) =>
-  getConfig(['fieldNames', category,field], getConfig(['fieldNames', field], field));
+  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], field));
 
 export const getFieldNameType = (type) => {
   switch (type) {
@@ -56,7 +59,7 @@ export const getFieldNameType = (type) => {
     case 'usage':
       return 'lines';
     default:
-      return '';
+      return type;
   }
 };
 
@@ -190,18 +193,18 @@ export const getItemMode = (item, undefindItemStatus = 'create') => {
 
 export const getItemMinFromDate = (item, minDate) => {
   // item and minDate
-  if (minDate && item && getItemId(item, false)) {
+  if (minDate && getItemId(item, false)) {
     return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
   }
   // only item
-  if(item && getItemId(item, false)) {
+  if(getItemId(item, false)) {
     return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)))
   }
   // only minDate
   if (minDate) {
     return minDate;
   }
-
+  // allow component set default value if no item and minDate exist
   return undefined;
 };
 
@@ -220,7 +223,7 @@ export const getRevisionStartIndex = (item, revisions) => {
 export const formatSelectOptions = option => (
   Immutable.Map.isMap(option)
     ? { value: option.get('value', ''), label: option.get('label', '') }
-    : { value: changeCase.snakeCase(option), label: changeCase.sentenceCase(option) }
+    : { value: option, label: changeCase.sentenceCase(option) }
 );
 
 export const parseConfigSelectOptions = configOption => formatSelectOptions(

@@ -169,19 +169,6 @@ export const postpaidBalancesListQuery = (query, page, sort, size) => ({
   ],
 });
 
-export const auditTrailListQuery = (query, page, fields, sort, size) => ({
-  api: 'find',
-  params: [
-    { collection: 'log' },
-    { size },
-    { page },
-    { project: JSON.stringify(fields) },
-    { sort: JSON.stringify(sort) },
-    { query: JSON.stringify(query) },
-  ],
-});
-
-
 /* Aggregate API */
 export const auditTrailEntityTypesQuery = () => {
   const revenueQuery = [{
@@ -325,7 +312,7 @@ export const getDeleteLineQuery = id => ({
 // List
 export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
-export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
+export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => getEntitesQuery('rates', project);
 export const getProductsWithRatesQuery = () =>
@@ -386,6 +373,18 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
       name: { $regex: name, $options: 'i' },
     }) },
     { states: JSON.stringify([0]) },
+  ],
+});
+
+export const auditTrailListQuery = (query, page, fields, sort, size) => ({
+  action: 'get',
+  entity: 'log',
+  params: [
+    { size },
+    { page },
+    { project: JSON.stringify(fields) },
+    { sort: JSON.stringify(sort) },
+    { query: JSON.stringify(query) },
   ],
 });
 

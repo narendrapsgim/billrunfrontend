@@ -36,6 +36,8 @@ import {
   removeUsagetMapping,
   setUsagetType,
   setLineKey,
+  setComputedLineKey,
+  unsetComputedLineKey,
   setStaticUsaget,
   moveCSVFieldUp,
   moveCSVFieldDown,
@@ -335,6 +337,14 @@ class InputProcessor extends Component {
     this.props.dispatch(setLineKey(usaget, parseInt(index, 10), value));
   }
 
+  onSetComputedLineKey = (path, value) => {
+    this.props.dispatch(setComputedLineKey(path, value));
+  }
+
+  onUnsetComputedLineKey = (usaget, index) => {
+    this.props.dispatch(unsetComputedLineKey(usaget, index));
+  }
+
   onSetReceiverField = (e) => {
     const { id, value } = e.target;
     this.props.dispatch(setReceiverField(id, value));
@@ -499,6 +509,8 @@ class InputProcessor extends Component {
           customRatingFields={customRatingFields}
           onSetRating={this.onSetRating}
           onSetLineKey={this.onSetLineKey}
+          onSetComputedLineKey={this.onSetComputedLineKey}
+          onUnsetComputedLineKey={this.onUnsetComputedLineKey}
           onSetCustomerMapping={this.onSetCustomerMapping}
           onAddRating={this.onAddRating}
           onRemoveRating={this.onRemoveRating}

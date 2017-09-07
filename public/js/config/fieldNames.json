@@ -93,6 +93,16 @@
     "report_type_1": "Grouped",
     "count_group": "Count"
   },
+  "event": {
+    "type": "Event Type",
+    "notify_time": "Notify Time",
+    "creation_time": "Creation Time",
+    "value": "Value",
+    "stamp": "Record unique ID",
+    "returned_value": "Response"
+  },
+  "aid": "Customer ID",
+  "sid": "Subscriber ID",
   "autorenew": {
     "aid": "Customer ID",
     "sid": "Subscriber ID",

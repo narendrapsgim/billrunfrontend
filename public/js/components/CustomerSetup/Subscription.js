@@ -161,7 +161,7 @@ class Subscription extends Component {
 
   formatSelectOptions = items => items.map(item => ({
     value: item.get('name', ''),
-    label: item.get('name', ''),
+    label: item.get('description', item.get('name', '')),
   }));
 
   getAvailablePlans = () => this.formatSelectOptions(this.props.allPlans);
@@ -267,6 +267,10 @@ class Subscription extends Component {
   clearRevisions = () => {
     const { subscription } = this.state;
     this.props.clearRevisions(subscription);
+    this.clearItemsList();
+  }
+
+  clearItemsList = () => {
     this.props.clearList();
   }
 
@@ -311,6 +315,7 @@ class Subscription extends Component {
             clearRevisions={this.clearRevisions}
             onActionEdit={this.props.getSubscription}
             onActionClone={this.props.getSubscription}
+            clearList={this.clearItemsList}
           />
 
           <hr />
