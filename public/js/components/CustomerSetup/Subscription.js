@@ -233,9 +233,10 @@ class Subscription extends Component {
           null,
           Immutable.Map(),
         ).get('description', service.get('name', ''));
-        const onChangeBind = (e) => { this.onChangeServiceQuantity(serviceName, e); };
+        const serviceKey = service.get('name', '');
+        const onChangeBind = (e) => { this.onChangeServiceQuantity(serviceKey, e); };
         return (
-          <FormGroup key={key}>
+          <FormGroup key={`quentity_${key}`}>
             <Col componentClass={ControlLabel} sm={3} lg={2}>
               {serviceName}
             </Col>
