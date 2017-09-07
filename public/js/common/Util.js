@@ -44,7 +44,7 @@ export const getConfig = (key, defaultValue = null) => {
 export const titlize = str => changeCase.upperCaseFirst(str);
 
 export const getFieldName = (field, category) =>
-  getConfig(['fieldNames', category,field], getConfig(['fieldNames', field], field));
+  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], field));
 
 export const getFieldNameType = (type) => {
   switch (type) {
@@ -59,7 +59,7 @@ export const getFieldNameType = (type) => {
     case 'usage':
       return 'lines';
     default:
-      return '';
+      return type;
   }
 };
 
@@ -94,6 +94,8 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
           return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
         } else if (entityName === 'subscription') {
           return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        } else if (entityName === 'auto_renew') {
+          return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))}`;
         }
         return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
@@ -191,18 +193,18 @@ export const getItemMode = (item, undefindItemStatus = 'create') => {
 
 export const getItemMinFromDate = (item, minDate) => {
   // item and minDate
-  if (minDate && item && getItemId(item, false)) {
+  if (minDate && getItemId(item, false)) {
     return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
   }
   // only item
-  if(item && getItemId(item, false)) {
+  if(getItemId(item, false)) {
     return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)))
   }
   // only minDate
   if (minDate) {
     return minDate;
   }
-
+  // allow component set default value if no item and minDate exist
   return undefined;
 };
 

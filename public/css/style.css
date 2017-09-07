@@ -166,6 +166,9 @@ fieldset[disabled] .btn {
 /* ~Main/Top menu */
 
 /* react-datepicker */
+.react-datepicker__close-icon {
+  display: block;
+}
 .react-datepicker__close-icon::after{
   color: #6f6f6f!important;
   background-color: #e7e7e7!important;
@@ -173,6 +176,15 @@ fieldset[disabled] .btn {
 .react-datepicker__close-icon:hover::after {
     background-color: #eeeeee!important;
     color: #222222!important;
+}
+.input-group .react-datepicker__input-container {
+  display: block;
+}
+.input-group .react-datepicker-wrapper {
+  display: block;
+}
+.input-group .react-datepicker-popper {
+  margin-top: 47px;
 }
 
 /* React-tags */

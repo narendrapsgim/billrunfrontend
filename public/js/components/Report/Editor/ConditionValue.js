@@ -14,10 +14,13 @@ import {
   cyclesOptionsSelector,
   plansOptionsSelector,
   groupsOptionsSelector,
+  bucketsNamesSelector,
+  bucketsExternalIdsSelector,
 } from '../../../selectors/listSelectors';
 import {
   usageTypeSelector,
   fileTypeSelector,
+  eventCodeSelector,
 } from '../../../selectors/settingsSelector';
 import {
   getCyclesOptions,
@@ -26,7 +29,9 @@ import {
   getServicesOptions,
   getGroupsOptions,
   getUsageTypesOptions,
+  getBucketsOptions,
   getFileTypesOptions,
+  getEventCodeOptions,
 } from '../../../actions/reportsActions';
 
 
@@ -90,7 +95,12 @@ class ConditionValue extends Component {
           break;
         case 'getUsageTypesOptions': this.props.dispatch(getUsageTypesOptions());
           break;
+	case 'getBucketsOptions':
+        case 'getBucketsExternalIdsOptions':
+          this.props.dispatch(getBucketsOptions());
         case 'getFileTypeOptions': this.props.dispatch(getFileTypesOptions());
+          break;
+        case 'getEventCodeOptions': this.props.dispatch(getEventCodeOptions());
           break;
         default: console.log('unsuported select options callback');
           break;
@@ -170,13 +180,12 @@ class ConditionValue extends Component {
   renderInput = () => {
     const { field, disabled, config, selectOptions, operator } = this.props;
 
-    // console.log('operator: ', operator);
     //  Boolean + operator 'EXIST'
     if ([config.get('type', ''), operator.get('type', '')].includes('boolean')) {
       let value = '';
       if (field.get('value', false) === true) {
         value = 'yes';
-      } else if (!field.get('value', true) === false) {
+      } else if (field.get('value', true) === false) {
         value = 'no';
       }
       const booleanOptions = this.getOptionsValues(Immutable.List(['yes', 'no']));
@@ -330,7 +339,10 @@ const mapStateToProps = (state, props) => ({
     getPlansOptions: plansOptionsSelector(state, props) || Immutable.List(),
     getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
+    getBucketsOptions: bucketsNamesSelector(state, props) || Immutable.List(),
+    getBucketsExternalIdsOptions: bucketsExternalIdsSelector(state, props) || Immutable.List(),
     getFileTypeOptions: fileTypeSelector(state, props) || Immutable.List(),
+    getEventCodeOptions: eventCodeSelector(state, props) || Immutable.List(),
   }),
 });
 
