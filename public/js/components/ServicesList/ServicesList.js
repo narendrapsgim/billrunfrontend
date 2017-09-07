@@ -1,14 +1,23 @@
 import React from 'react';
+import pluralize from 'pluralize';
+import { titleCase } from 'change-case';
 import EntityList from '../EntityList';
-
+import {
+  getConfig,
+  convertServiceBalancePeriodToObject,
+} from '../../common/Util';
 
 const ServicesList = () => {
   const parserPrice = item => item.getIn(['price', 0, 'price'], '');
 
-  const parserCycles = (item) => {
-    const unlimited = globalSetting.serviceCycleUnlimitedValue;
-    const cycle = item.getIn(['price', 0, 'to'], '');
-    return cycle === unlimited ? 'Infinite' : cycle;
+  const parserPeriod = (item) => {
+    const period = convertServiceBalancePeriodToObject(item);
+    if (period.type === 'default') {
+      const unlimited = getConfig('serviceCycleUnlimitedValue', 'UNLIMITED');
+      const cycle = item.getIn(['price', 0, 'to'], '');
+      return cycle === unlimited ? 'Infinite' : `${cycle} ${titleCase(pluralize('cycle', Number(cycle)))}`;
+    }
+    return `${period.value} ${titleCase(pluralize(period.unit, Number(period.value)))}`;
   };
 
   const filterFields = [
@@ -20,13 +29,14 @@ const ServicesList = () => {
     { id: 'description', title: 'Title', sort: true },
     { id: 'name', title: 'Key', sort: true },
     { title: 'Price', parser: parserPrice, sort: true },
-    { title: 'Cycles', parser: parserCycles, sort: true },
+    { title: 'Period', parser: parserPeriod, sort: true },
   ];
 
   const projectFields = {
     description: 1,
     price: 1,
     name: 1,
+    balance_period: 1,
   };
 
   const actions = [
