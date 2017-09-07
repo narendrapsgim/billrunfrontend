@@ -5,6 +5,8 @@ import { saveEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
 import {
   getPlanConvertedIncludes,
+  convertServiceBalancePeriodToObject,
+  convertServiceBalancePeriodToString,
 } from '../common/Util';
 import {
   usageTypesDataSelector,
@@ -67,24 +69,13 @@ const convertService = (getState, service, convertToBaseUnit, toSend) => {
     }
     if (toSend) { // convert item before send to server
       if (itemWithMutations.getIn(['balance_period', 'type'], '') === 'custom_period') {
-        const unit = itemWithMutations.getIn(['balance_period', 'unit'], '');
-        const value = itemWithMutations.getIn(['balance_period', 'value'], 1);
-        const balancePeriod = (unit === 'days') ? `tomorrow +${value - 1} days` : `+${value} ${unit}`;
-        itemWithMutations.set('balance_period', balancePeriod);
         itemWithMutations.setIn(['price', 0, 'to'], 0);
-      } else {
-        itemWithMutations.set('balance_period', 'default');
       }
+      const balancePeriod = convertServiceBalancePeriodToString(itemWithMutations);
+      itemWithMutations.set('balance_period', balancePeriod);
     } else { // convert item resived from server
-      if (['', 'default'].includes(itemWithMutations.get('balance_period', 'default'))) {
-        itemWithMutations.set('balance_period', { type: 'default', unit: '', value: '' });
-      } else {
-        const balancePeriodArray = itemWithMutations.get('balance_period', '').split(' ');
-        const unit = balancePeriodArray[balancePeriodArray.length - 1];
-        const value = Number(balancePeriodArray[balancePeriodArray.length - 2]);
-        const type = 'custom_period';
-        itemWithMutations.set('balance_period', { type, unit, value: (unit === 'days') ? value + 1 : value });
-      }
+      const balancePeriod = convertServiceBalancePeriodToObject(itemWithMutations);
+      itemWithMutations.set('balance_period', balancePeriod);
     }
   });
 };
