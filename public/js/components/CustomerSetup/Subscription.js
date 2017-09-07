@@ -139,6 +139,16 @@ class Subscription extends Component {
             ).get('quantity', 1);
             service = service.set('quantity', quantity);
           }
+          // if service is by 'custom_period' -> don't reset the 'from' date to Subscriber 'from' date
+          if (serviceOption.get('balance_period', 'default') !== 'default') {
+            const currentServices = currentSubscription.get('services', Immutable.List()) || Immutable.List();
+            const originFrom = currentServices.find(
+              currentService => currentService.get('name') === name,
+              null,
+              Immutable.Map(),
+            ).get('from', from);
+            service = service.set('from', originFrom);
+          }
           servicesWithMutations.push(service);
         });
       }
@@ -252,6 +262,54 @@ class Subscription extends Component {
       .toArray();
   }
 
+  onChangePeriodStartDate = (name, newDate) => {
+    const { subscription } = this.state;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const serviceIndex = services.findIndex(service => service.get('name', '') === name);
+    if (serviceIndex !== -1) {
+      this.updateSubscriptionField(['services', serviceIndex, 'from'], newDate.toISOString());
+    }
+  }
+
+  renderServisesByPeriod = (editable) => {
+    const { subscription } = this.state;
+    const { allServices } = this.props;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    return services
+      .map((service) => {
+        const serviceBalancePeriod = allServices.find(
+          allService => allService.get('name', '') === service.get('name', ''),
+          null,
+          Immutable.Map(),
+        ).get('balance_period', 'default');
+        return service.set('balance_period', serviceBalancePeriod);
+      })
+      .filter(service => service.get('balance_period', 'default') !== 'default')
+      .map((service, key) => {
+        const serviceName = allServices.find(
+          allService => allService.get('name', '') === service.get('name', ''),
+          null,
+          Immutable.Map(),
+        ).get('description', service.get('name', ''));
+        const serviceKey = service.get('name', '');
+        const onChangeBind = (e) => { this.onChangePeriodStartDate(serviceKey, e); };
+        return (
+          <FormGroup key={`byPeriod_${key}`}>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>
+              {serviceName}
+            </Col>
+            <Col sm={8} lg={9}>
+              <InputGroup>
+                <InputGroup.Addon>Start Date</InputGroup.Addon>
+                <Field fieldType="date" min={1} value={moment(service.get('from', ''))} onChange={onChangeBind} editable={editable} />
+              </InputGroup>
+            </Col>
+          </FormGroup>
+        );
+      })
+      .toArray();
+  }
+
   renderCreditCharge = () => {
     const { subscription } = this.props;
     const { showCreditCharge } = this.state;
@@ -307,6 +365,7 @@ class Subscription extends Component {
     const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
     const servisesQuentity = this.renderServisesQuentity(allowEdit);
+    const servisesByPeriod = this.renderServisesByPeriod(allowEdit);
     return (
       <div className="Subscription">
         <Panel header={this.renderPanelTitle()}>
@@ -328,11 +387,13 @@ class Subscription extends Component {
 
           <Form horizontal>
             { this.renderSystemFields(allowEdit) }
-            { servisesQuentity.length === 0 && <hr />}
-            { servisesQuentity.length > 0 &&
+            { (servisesQuentity.length + servisesByPeriod.length > 0) ? (
               <Panel header="Services Details">
                 {servisesQuentity}
+                {servisesQuentity.length > 0 && servisesByPeriod.length > 0 && <hr />}
+                {servisesByPeriod}
               </Panel>
+              ) : (<hr />)
             }
             <EntityFields
               entityName={['subscribers', 'subscriber']}
