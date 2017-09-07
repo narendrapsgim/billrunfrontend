@@ -118,10 +118,17 @@ export default class ServiceDetails extends Component {
           </FormGroup>
         }
 
+        <FormGroup>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>Price</Col>
+          <Col sm={4}>
+            <Field value={item.getIn(['price', 0, 'price'], '')} onChange={this.onChangePrice} fieldType="price" editable={editable} />
+          </Col>
+        </FormGroup>
+
         {['clone', 'create'].includes(mode) &&
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2}>
-              Type <span className="danger-red"> *</span>
+              Align to <span className="danger-red"> *</span>
             </Col>
             <Col sm={8} lg={9}>
               <span style={{ display: 'inline-block', marginRight: 20 }}>
@@ -130,7 +137,7 @@ export default class ServiceDetails extends Component {
                   onChange={this.onChangeServicePeriodType}
                   name="service_period_type"
                   value="default"
-                  label="Cycles"
+                  label="Cycle"
                   checked={isByCycles}
                 />
               </span>
@@ -153,7 +160,7 @@ export default class ServiceDetails extends Component {
             <Col componentClass={ControlLabel} sm={3} lg={2} >
               {!['clone', 'create'].includes(mode) && 'Custom Period'}
             </Col>
-            <Col sm={6}>
+            <Col sm={4}>
               <InputGroup>
                 <Field
                   disabled={isByCycles}
@@ -183,7 +190,7 @@ export default class ServiceDetails extends Component {
         {(isByCycles) &&
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2} >{!['clone', 'create'].includes(mode) && 'Cycles'}</Col>
-            <Col sm={6}>
+            <Col sm={4}>
               <Field
                 disabled={!isByCycles}
                 value={item.getIn(['price', 0, 'to'], '')}
@@ -192,33 +199,40 @@ export default class ServiceDetails extends Component {
                 unlimitedValue={serviceCycleUnlimitedValue}
                 unlimitedLabel="Infinite"
                 editable={editable}
-                suffix="Cycles"
               />
             </Col>
           </FormGroup>
         }
 
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3} lg={2}>Price</Col>
-          <Col sm={4}>
-            <Field value={item.getIn(['price', 0, 'price'], '')} onChange={this.onChangePrice} fieldType="price" editable={editable} />
-          </Col>
-        </FormGroup>
+        {(['clone', 'create'].includes(mode) || (!['clone', 'create'].includes(mode) && isByCycles)) &&
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
+            <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+              <Field
+                fieldType="checkbox"
+                value={!isByCycles ? false : item.get('prorated', '')}
+                onChange={this.onChangeProrated}
+                editable={editable}
+                disabled={!isByCycles}
+              />
+            </Col>
+          </FormGroup>
+        }
 
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-          <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
-            <Field value={item.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" editable={editable} />
-          </Col>
-        </FormGroup>
-
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3} lg={2}>Quantitative?</Col>
-          <Col sm={4} style={['clone', 'create'].includes(mode) ? { padding: '10px 15px' } : { paddingTop: 5 }}>
-            <Field value={item.get('quantitative', '')} onChange={this.onChangeQuantitative} fieldType="checkbox" editable={['clone', 'create'].includes(mode)} />
-          </Col>
-        </FormGroup>
-
+        {(['clone', 'create'].includes(mode) || (!['clone', 'create'].includes(mode) && isByCycles)) &&
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>Quantitative?</Col>
+            <Col sm={4} style={['clone', 'create'].includes(mode) ? { padding: '10px 15px' } : { paddingTop: 5 }}>
+              <Field
+                fieldType="checkbox"
+                value={!isByCycles ? false : item.get('quantitative', '')}
+                onChange={this.onChangeQuantitative}
+                editable={['clone', 'create'].includes(mode)}
+                disabled={!isByCycles}
+              />
+            </Col>
+          </FormGroup>
+        }
         <EntityFields
           entityName="services"
           entity={item}
