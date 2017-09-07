@@ -118,7 +118,7 @@ class LoginForm extends Component {
               </Button>
             </fieldset>
           </Form>
-          { (error.length > 0) ? <Alert bsStyle="danger">{error}</Alert> : ''}
+          {(error.length > 0) && <Alert bsStyle="danger" style={{ marginTop: 15 }} className="mb0">{error}</Alert>}
           <Button type="button" bsStyle="link" bsSize="small" block onClick={this.clickResetPassword} disabled={progress}>
             Forgot Your Password?
           </Button>
