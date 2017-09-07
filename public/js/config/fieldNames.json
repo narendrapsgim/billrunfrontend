@@ -92,5 +92,15 @@
     "report_type_0": "Simple",
     "report_type_1": "Grouped",
     "count_group": "Count"
+  },
+  "autorenew": {
+    "aid": "Customer ID",
+    "sid": "Subscriber ID",
+    "bucket_group": "Bucket Group",
+    "cycles": "Total Cycles",
+    "cycles_remaining": "Remaining Cycles",
+    "next_renew": "Next Renew",
+    "last_renew": "Last Renew",
+    "interval": "Interval"
   }
 }
