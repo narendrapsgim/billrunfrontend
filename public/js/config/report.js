@@ -54,6 +54,12 @@ export default {
       { id: 'billrun', inputConfig: { inputType: 'select', callback: 'getCyclesOptions' } },
       { id: 'plan', inputConfig: { inputType: 'select', callback: 'getPlansOptions' } },
       { id: 'usaget', inputConfig: { inputType: 'select', callback: 'getUsageTypesOptions' } },
+      { id: 'pp_includes_name', inputConfig: { inputType: 'select', callback: 'getBucketsOptions' } },
+      { id: 'pp_includes_external_id', inputConfig: { inputType: 'select', callback: 'getBucketsExternalIdsOptions' } },
+      { id: 'charging_usaget', inputConfig: { inputType: 'select', callback: 'getUsageTypesOptions' } },
+      { id: 'balance_before', type: 'number' },
+      { id: 'balance_after', type: 'number' },
+      { id: 'balance_normalized', type: 'number' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },

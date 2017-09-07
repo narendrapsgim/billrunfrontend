@@ -7,6 +7,7 @@ import {
   getServicesKeysWithInfoQuery,
   getProductsKeysQuery,
   getAllGroupsQuery,
+  getPrepaidIncludesQuery,
  } from '../common/ApiQueries';
 import {
   actions as entityActions,
@@ -71,6 +72,8 @@ export const getServicesOptions = () => getList('available_services', getService
 export const getProductsOptions = () => getList('all_rates', getProductsKeysQuery());
 
 export const getUsageTypesOptions = () => dispatch => dispatch(getSettings('usage_types'));
+
+export const getBucketsOptions = () => getList('pp_includes', getPrepaidIncludesQuery());
 
 export const getFileTypesOptions = () => dispatch => dispatch(getSettings('file_types'));
 
