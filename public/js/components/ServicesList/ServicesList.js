@@ -10,6 +10,8 @@ import {
 const ServicesList = () => {
   const parserPrice = item => item.getIn(['price', 0, 'price'], '');
 
+  const parserQuantitative = item => (item.get('quantitative', false) ? 'Yes' : 'No');
+
   const parserPeriod = (item) => {
     const period = convertServiceBalancePeriodToObject(item);
     if (period.type === 'default') {
@@ -29,6 +31,7 @@ const ServicesList = () => {
     { id: 'description', title: 'Title', sort: true },
     { id: 'name', title: 'Key', sort: true },
     { title: 'Price', parser: parserPrice, sort: true },
+    { title: 'Quantitative', parser: parserQuantitative, sort: true },
     { title: 'Period', parser: parserPeriod, sort: true },
   ];
 
@@ -37,6 +40,7 @@ const ServicesList = () => {
     price: 1,
     name: 1,
     balance_period: 1,
+    quantitative: 1,
   };
 
   const actions = [
