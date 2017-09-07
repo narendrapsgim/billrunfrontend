@@ -238,12 +238,12 @@ export default class FieldsMapping extends Component {
                   fieldType="toggeledInput"
                   value={aprice}
                   onChange={this.onChangeApriceExists}
-                  label="Pre-rated"
+                  label="Pre priced"
                   inputProps={apriceInputProps}
                 />
               </div>
               <div className="col-lg-1">
-                <Help contents="In case the CDR is already rated, the price will not be calculated" />
+                <Help contents="In case the or pre-priced, the price will not be calculated" />
               </div>
             </div>
           </div>
