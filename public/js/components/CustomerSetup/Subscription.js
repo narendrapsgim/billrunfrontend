@@ -191,8 +191,8 @@ class Subscription extends Component {
     const plan = subscription.get('plan', '');
     return ([(
       <FormGroup key="plan">
-        <Col componentClass={ControlLabel} sm={2}>Plan</Col>
-        <Col sm={7}>
+        <Col componentClass={ControlLabel}sm={3} lg={2}>Plan <span className="danger-red"> *</span></Col>
+        <Col sm={8} lg={9}>
           { editable
             ? <Select
               options={plansOptions}
@@ -205,8 +205,8 @@ class Subscription extends Component {
       </FormGroup>
     ), (
       <FormGroup key="services">
-        <Col componentClass={ControlLabel} sm={2}>Services</Col>
-        <Col sm={7}>
+        <Col componentClass={ControlLabel} sm={3} lg={2}>Services</Col>
+        <Col sm={8} lg={9}>
           { editable
             ? <Select
               multi={true}
@@ -223,18 +223,23 @@ class Subscription extends Component {
 
   renderServisesQuentity = (editable) => {
     const { subscription } = this.state;
+    const { allServices } = this.props;
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     return services
       .filter(service => service.get('quantity', null) !== null)
       .map((service, key) => {
-        const serviceName = service.get('name', '');
+        const serviceName = allServices.find(
+          allService => allService.get('name', '') === service.get('name', ''),
+          null,
+          Immutable.Map(),
+        ).get('description', service.get('name', ''));
         const onChangeBind = (e) => { this.onChangeServiceQuantity(serviceName, e); };
         return (
           <FormGroup key={key}>
-            <Col componentClass={ControlLabel} sm={2}>
-              { `Service ${serviceName}` }
+            <Col componentClass={ControlLabel} sm={3} lg={2}>
+              {serviceName}
             </Col>
-            <Col sm={7}>
+            <Col sm={8} lg={9}>
               <InputGroup>
                 <Field fieldType="number" min={1} value={service.get('quantity', '')} onChange={onChangeBind} editable={editable} />
                 <InputGroup.Addon>quantity</InputGroup.Addon>
@@ -322,9 +327,12 @@ class Subscription extends Component {
 
           <Form horizontal>
             { this.renderSystemFields(allowEdit) }
-            { servisesQuentity.length > 0 && <hr />}
-            { servisesQuentity.length > 0 && servisesQuentity }
-            <hr />
+            { servisesQuentity.length === 0 && <hr />}
+            { servisesQuentity.length > 0 &&
+              <Panel header="Services Details">
+                {servisesQuentity}
+              </Panel>
+            }
             <EntityFields
               entityName={['subscribers', 'subscriber']}
               entity={subscription}
