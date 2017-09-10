@@ -29,14 +29,30 @@ class CustomField extends Component {
 
   state = {
     showAdvancedEdit: false,
+    cachedSelectOption: '',
   }
 
   onChange = (e) => {
-    const { entity, idx } = this.props;
+    const { entity, idx, field } = this.props;
     const { id, value } = e.target;
     this.props.onChange(entity, idx, id, value);
     if (id === 'unique' && value === true) {
       this.props.onChange(entity, idx, 'mandatory', true);
+    }
+    if (id === 'boolean' && value === true) {
+      this.props.onChange(entity, idx, 'unique', false);
+      this.props.onChange(entity, idx, 'mandatory', false);
+      this.props.onChange(entity, idx, 'multiple', false);
+      this.props.onChange(entity, idx, 'select_list', false);
+      this.props.onChange(entity, idx, 'select_options', '');
+    }
+    if (id === 'select_list' && value === false) {
+      const cachedSelectOption = field.get('select_options', '');
+      this.setState({ cachedSelectOption });
+      this.props.onChange(entity, idx, 'select_options', '');
+    }
+    if (id === 'select_list' && value === true) {
+      this.props.onChange(entity, idx, 'select_options', this.state.cachedSelectOption);
     }
   };
 
@@ -58,20 +74,27 @@ class CustomField extends Component {
     const { showAdvancedEdit } = this.state;
     const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'field')} Details`);
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
+
+    const disableUnique = field.get('boolean', false);
+    const disableMandatory = field.get('boolean', false) || field.get('unique', false);
+    const disableBoolean = field.get('select_list', false) || field.get('unique', false);
+    const disableMultiple = field.get('boolean', false);
+    const disableSelectList = field.get('boolean', false);
+
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
         <Form horizontal>
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Unique</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="unique" onChange={this.onChange} value={field.get('unique', '')} fieldType="checkbox" />
+              <Field id="unique" onChange={this.onChange} value={field.get('unique', '')} fieldType="checkbox" disabled={disableUnique} />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Mandatory</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', '')} fieldType="checkbox" disabled={field.get('unique', false)} />
+              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', '')} fieldType="checkbox" disabled={disableMandatory} />
             </Col>
           </FormGroup>
 
@@ -104,9 +127,16 @@ class CustomField extends Component {
           </FormGroup>
 
           <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Boolean</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field id="boolean" onChange={this.onChange} value={field.get('boolean', '')} fieldType="checkbox" disabled={disableBoolean} />
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Multiple</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', '')} fieldType="checkbox" />
+              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', '')} fieldType="checkbox" disabled={disableMultiple} />
             </Col>
           </FormGroup>
 
@@ -115,7 +145,7 @@ class CustomField extends Component {
             <Col sm={9}>
               <InputGroup>
                 <InputGroup.Addon>
-                  <Field id="select_list" onChange={this.onChange} value={field.get('select_list', '')} fieldType="checkbox" />
+                  <Field id="select_list" onChange={this.onChange} value={field.get('select_list', '')} fieldType="checkbox" disabled={disableSelectList} />
                 </InputGroup.Addon>
                 <Field id="select_options" onChange={this.onChange} value={field.get('select_options', '')} disabled={!field.get('select_list', false)} />
               </InputGroup>
@@ -130,6 +160,7 @@ class CustomField extends Component {
 
   render() {
     const { field, editable, existing } = this.props;
+    const isBoolean = field.get('boolean', false);
     return (
       <FormGroup className="CustomField form-inner-edit-row">
         <Col sm={1} className="text-center">
@@ -142,7 +173,13 @@ class CustomField extends Component {
           <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={!editable} />
         </Col>
         <Col sm={2}>
-          <Field id="default_value" onChange={this.onChange} value={field.get('default_value', '')} disabled={!editable} />
+          <Field
+            id="default_value"
+            onChange={this.onChange}
+            value={field.get('default_value', '')}
+            disabled={!editable}
+            fieldType={isBoolean ? 'checkbox' : 'text'}
+          />
         </Col>
         {editable && (
           <Col sm={4} className="actions">

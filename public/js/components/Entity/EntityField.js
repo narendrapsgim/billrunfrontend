@@ -80,8 +80,11 @@ class EntityField extends Component {
   }
 
   getFieldValue = () => {
-    const { fieldPath, isFieldTags } = this.state;
+    const { fieldPath, isFieldTags, isFieldBoolean } = this.state;
     const { entity, editable } = this.props;
+    if (isFieldBoolean) {
+      return entity.getIn(fieldPath, '');
+    }
     const fieldVal = entity.getIn(fieldPath, []);
     if (isFieldTags && editable) {
       return Immutable.List.isList(fieldVal) ? fieldVal.toArray() : fieldVal;
@@ -91,8 +94,14 @@ class EntityField extends Component {
 
   renderField = () => {
     const { editable, field } = this.props;
-    const { isFieldTags, isFieldSelect } = this.state;
+    const { isFieldTags, isFieldSelect, isFieldBoolean } = this.state;
     const value = this.getFieldValue();
+    if (isFieldBoolean) {
+      const checkboxStyle = { height: 29, marginTop: 8 };
+      return (
+        <Field onChange={this.onChange} value={value} fieldType="checkbox" editable={editable} style={checkboxStyle} />
+      );
+    }
     if (isFieldSelect && editable) {
       const multi = field.get('multiple', false);
       const options = this.getFieldOptios(field);
