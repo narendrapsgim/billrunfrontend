@@ -15,6 +15,8 @@ import {
   plansOptionsSelector,
   groupsOptionsSelector,
   calcNameSelector,
+  bucketsNamesSelector,
+  bucketsExternalIdsSelector
 } from '../../../selectors/listSelectors';
 import {
   usageTypeSelector,
@@ -28,6 +30,7 @@ import {
   getServicesOptions,
   getGroupsOptions,
   getUsageTypesOptions,
+  getBucketsOptions,
   getFileTypesOptions,
   getEventCodeOptions,
 } from '../../../actions/reportsActions';
@@ -93,6 +96,9 @@ class ConditionValue extends Component {
           break;
         case 'getUsageTypesOptions': this.props.dispatch(getUsageTypesOptions());
           break;
+	case 'getBucketsOptions':
+        case 'getBucketsExternalIdsOptions':
+          this.props.dispatch(getBucketsOptions());
         case 'getFileTypeOptions': this.props.dispatch(getFileTypesOptions());
           break;
         case 'getEventCodeOptions': this.props.dispatch(getEventCodeOptions());
@@ -334,6 +340,8 @@ const mapStateToProps = (state, props) => ({
     getPlansOptions: plansOptionsSelector(state, props) || Immutable.List(),
     getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
+    getBucketsOptions: bucketsNamesSelector(state, props) || Immutable.List(),
+    getBucketsExternalIdsOptions: bucketsExternalIdsSelector(state, props) || Immutable.List(),
     getFileTypeOptions: fileTypeSelector(state, props) || Immutable.List(),
     getCalcNameOptions: calcNameSelector(state, props) || Immutable.List(),
     getEventCodeOptions: eventCodeSelector(state, props) || Immutable.List(),
