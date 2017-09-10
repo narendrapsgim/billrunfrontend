@@ -161,6 +161,7 @@ class CustomField extends Component {
   render() {
     const { field, editable, existing } = this.props;
     const isBoolean = field.get('boolean', false);
+    const checkboxStyle = { textAlign: 'center', marginTop: 10 };
     return (
       <FormGroup className="CustomField form-inner-edit-row">
         <Col sm={1} className="text-center">
@@ -179,6 +180,7 @@ class CustomField extends Component {
             value={field.get('default_value', '')}
             disabled={!editable}
             fieldType={isBoolean ? 'checkbox' : 'text'}
+            style={isBoolean ? checkboxStyle : undefined}
           />
         </Col>
         {editable && (
