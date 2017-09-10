@@ -75,11 +75,6 @@ class Product extends Component {
     this.props.onFieldUpdate(['key'], value);
   }
 
-  onChangeCode = (e) => {
-    const { value } = e.target;
-    this.props.onFieldUpdate(['code'], value);
-  }
-
   onChangeDescription = (e) => {
     const { value } = e.target;
     this.props.onFieldUpdate(['description'], value);
@@ -220,13 +215,6 @@ class Product extends Component {
                   </Col>
                 </FormGroup>
               }
-
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>External Code</Col>
-                <Col sm={8} lg={9}>
-                  <Field onChange={this.onChangeCode} value={product.get('code', '')} editable={editable} />
-                </Col>
-              </FormGroup>
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
