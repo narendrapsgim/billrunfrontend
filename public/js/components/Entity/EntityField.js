@@ -25,7 +25,33 @@ class EntityField extends Component {
   state = {
     isFieldTags: this.props.field.get('multiple', false) && !this.props.field.get('select_list', false),
     isFieldSelect: this.props.field.get('select_list', false),
+    isFieldBoolean: this.props.field.get('boolean', false),
     fieldPath: this.props.field.get('field_name', '').split('.'),
+  }
+
+  componentDidMount() {
+    this.initDefaultValues();
+  }
+
+  initDefaultValues = () => {
+    const { fieldPath } = this.state;
+    const { field, entity } = this.props;
+    if (entity.getIn(fieldPath, null) === null) {
+      const noDefaultValueVal = this.getNoDefaultValueVal();
+      const defaultValue = field.get('default_value', noDefaultValueVal);
+      this.props.onChange(fieldPath, defaultValue);
+    }
+  }
+
+  getNoDefaultValueVal = () => {
+    const { isFieldBoolean, isFieldTags, isFieldSelect } = this.state;
+    if (isFieldBoolean) {
+      return false;
+    }
+    if (isFieldTags || isFieldSelect) {
+      return [];
+    }
+    return '';
   }
 
   getFieldOptios = field => field

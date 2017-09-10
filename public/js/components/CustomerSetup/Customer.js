@@ -46,25 +46,9 @@ class Customer extends Component {
 
   componentDidMount() {
     const { action } = this.props;
-    if (action === 'create') {
-      this.initDefaultValues();
-    }
     if (action !== 'create') {
       this.initDebt();
     }
-  }
-
-  initDefaultValues = () => {
-    const { fields } = this.props;
-    fields.forEach((field) => {
-      if (field.has('default_value')) {
-        const e = { target: {
-          id: field.get('field_name', ''),
-          value: field.get('default_value', ''),
-        } };
-        this.props.onChange(e);
-      }
-    });
   }
 
   initDebt = () => {
