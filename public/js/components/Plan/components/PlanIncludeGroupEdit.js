@@ -170,7 +170,7 @@ export default class PlanIncludeGroupEdit extends Component {
             <FormGroup>
               <Col componentClass={ControlLabel} sm={3}>Products</Col>
               <Col sm={8}>
-                <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
+                <div style={{ marginTop: 10, minWidth: 250, width: '100%', minHeight: 42 }}>
                   <ProductSearchByUsagetype
                     products={products}
                     usages={usages}

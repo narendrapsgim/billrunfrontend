@@ -12,15 +12,20 @@ export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
   if (usagesToQuery[0] !== 'cost') {
     query.$or = usagesToQuery.map(usage => ({ [`rates.${usage}`]: { $exists: true } }));
   }
+
+  const formData = new FormData();
+  formData.append('collection', 'rates');
+  formData.append('size', 99999);
+  formData.append('page', 0);
+  formData.append('project', JSON.stringify({ key: 1 }));
+  formData.append('query', JSON.stringify(query));
+
   return {
     api: 'find',
-    params: [
-      { collection: 'rates' },
-      { size: 99999 },
-      { page: 0 },
-      { project: JSON.stringify({ key: 1 }) },
-      { query: JSON.stringify(query) },
-    ],
+    options: {
+      method: 'POST',
+      body: formData,
+    },
   };
 };
 
