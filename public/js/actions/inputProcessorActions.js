@@ -375,6 +375,7 @@ export function saveInputProcessorSettings(state, parts = []) {
       type: (settings.type === 'realtime' ? 'Realtime' : 'Usage'),
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
+      "aprice_field": processor.get('aprice_field'),
       ...processor_settings
     };
     if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');

@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
+import Field from '../Field';
+import Help from '../Help';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
 import { getUnitLabel } from '../../common/Util';
 
@@ -120,6 +122,20 @@ export default class FieldsMapping extends Component {
     this.props.onSetFieldMapping(e);
   }
 
+  onChangeApriceField = (value) => {
+    const e = {
+      target: {
+        value,
+        id: 'aprice_field',
+      },
+    };
+    this.props.onSetFieldMapping(e);
+  }
+
+  onChangeApriceExists = () => {
+    this.onChangeApriceField(undefined);
+  }
+
   render() {
     const { separateTime, usaget, unit } = this.state;
     const { settings,
@@ -144,6 +160,13 @@ export default class FieldsMapping extends Component {
     })).toArray();
     const volume = settings.getIn(['processor', 'volume_field'], Immutable.List());
     const volumeList = (typeof volume === 'string') ? volume : volume.join(',');
+    const aprice = settings.getIn(['processor', 'aprice_field'], null);
+    const apriceInputProps = {
+      fieldType: 'select',
+      placeholder: 'Select price field...',
+      options: volumeOptions,
+      onChange: this.onChangeApriceField,
+    };
 
     return (
       <form className="form-horizontal FieldsMapping">
@@ -206,6 +229,22 @@ export default class FieldsMapping extends Component {
                 options={volumeOptions}
                 onChange={this.onChangeVolume}
               />
+            </div>
+          </div>
+          <div className="form-group">
+            <div className="col-lg-offset-3 col-lg-9">
+              <div className="col-lg-offset-1 col-lg-9">
+                <Field
+                  fieldType="toggeledInput"
+                  value={aprice}
+                  onChange={this.onChangeApriceExists}
+                  label="Pre priced"
+                  inputProps={apriceInputProps}
+                />
+              </div>
+              <div className="col-lg-1">
+                <Help contents="In case the or pre-priced, the price will not be calculated" />
+              </div>
             </div>
           </div>
         </div>
