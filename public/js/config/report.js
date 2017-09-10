@@ -64,8 +64,10 @@ export default {
     subscribers: [
       { id: 'aid', type: 'number' },
       { id: 'sid', type: 'number' },
-      { id: 'plan_activation', type: 'date' },
-      { id: 'deactivation_date', type: 'date' },
+      { id: 'plan', inputConfig: { inputType: 'select', callback: 'getPlansOptions' } },
+      { id: 'services', inputConfig: { inputType: 'select', callback: 'getServicesOptions' } },
+      { id: 'plan_activation', type:'date' },
+      { id: 'deactivation_date', type:'date' },
     ],
     account: [
       { id: 'aid', type: 'number' },

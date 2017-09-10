@@ -23,6 +23,18 @@ const selectCyclesOptions = (options) => {
   }));
 };
 
+const getServicesOptions = state => state.list.get('available_services', null);
+
+const selectServicesOptions = (options) => {
+  if (options === null) {
+    return undefined;
+  }
+  return options.map(option => Immutable.Map({
+    label: `${option.get('description', '')} (${option.get('name', '')})`,
+    value: option.get('name', ''),
+  }));
+};
+
 const getProductsOptions = state => state.list.get('all_rates', null);
 
 const selectProductsOptions = (options) => {
@@ -126,6 +138,11 @@ export const cyclesOptionsSelector = createSelector(
 export const productsOptionsSelector = createSelector(
   getProductsOptions,
   selectProductsOptions,
+);
+
+export const servicesOptionsSelector = createSelector(
+  getServicesOptions,
+  selectServicesOptions,
 );
 
 export const plansOptionsSelector = createSelector(
