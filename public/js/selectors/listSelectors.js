@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import { sentenceCase } from 'change-case';
 import { getCycleName } from '../components/Cycle/CycleUtil';
+import { getConfig } from '../common/Util';
 
 
 const getCyclesOptions = state => state.list.get('cycles_list', null);
@@ -167,5 +168,14 @@ export const groupsDataSelector = createSelector(
   selectGroupsData,
 );
 
-
-
+export const calcNameSelector = createSelector(
+  () => getConfig('queue_calculators'),
+  (calculators) => {
+    const values = [false, ...calculators];
+    return calculators
+      .map((calculator, i) => Immutable.Map({
+        label: sentenceCase(calculator),
+        value: values[i],
+      }));
+  },
+);
