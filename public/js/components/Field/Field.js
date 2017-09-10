@@ -23,6 +23,7 @@ class Field extends PureComponent {
     editable: PropTypes.bool,
     fieldType: PropTypes.string,
     label: PropTypes.string,
+    style: PropTypes.object,
     onChange: PropTypes.func,
   }
 
@@ -33,6 +34,7 @@ class Field extends PureComponent {
     editable: true,
     fieldType: 'text',
     label: '',
+    style: {},
     onChange: () => {},
   }
 
@@ -69,8 +71,9 @@ class Field extends PureComponent {
   }
 
   render() {
+    const { style } = this.props;
     return (
-      <div className="Field">
+      <div className="Field" style={style}>
         { this.createInput() }
       </div>
     );
