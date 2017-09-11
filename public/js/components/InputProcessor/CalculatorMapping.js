@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { Form, FormGroup, Col, Row, Panel, Button, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import { ModalWrapper } from '../Elements';
-import { getFieldName, getConfig } from '../../common/Util';
+import { getFieldName, getConfig, formatSelectOptions } from '../../common/Util';
 import Help from '../Help';
 import Field from '../Field';
 
@@ -131,9 +131,22 @@ export default class CalculatorMapping extends Component {
       computedLineKey: Immutable.Map({
         usaget,
         index,
-        type: calc.getIn(['computed', 'type'], ''),
+        type: calc.getIn(['computed', 'type'], 'regex'),
         line_keys: calc.getIn(['computed', 'line_keys'], Immutable.List()),
         operator: calc.getIn(['computed', 'operator'], ''),
+        must_met: calc.getIn(['computed', 'must_met'], false),
+        projection: Immutable.Map({
+          on_true: Immutable.Map({
+            key: calc.getIn(['computed', 'projection', 'on_true', 'key'], 'condition_result'),
+            regex: calc.getIn(['computed', 'projection', 'on_true', 'regex'], ''),
+            value: calc.getIn(['computed', 'projection', 'on_true', 'value'], ''),
+          }),
+          on_false: Immutable.Map({
+            key: calc.getIn(['computed', 'projection', 'on_false', 'key'], 'condition_result'),
+            regex: calc.getIn(['computed', 'projection', 'on_false', 'regex'], ''),
+            value: calc.getIn(['computed', 'projection', 'on_false', 'value'], ''),
+          }),
+        }),
       }),
     });
   }
@@ -314,9 +327,21 @@ export default class CalculatorMapping extends Component {
 
   onSaveComputedLineKey = () => {
     const { computedLineKey } = this.state;
-    this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'line_keys'], computedLineKey.get('line_keys', Immutable.List()));
-    this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'operator'], computedLineKey.get('operator', ''));
-    this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'type'], computedLineKey.get('type', ''));
+    const paths = [
+      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'line_keys'],
+      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'operator'],
+      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'type'],
+      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'must_met'],
+      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'projection'],
+    ];
+    const values = [
+      computedLineKey.get('line_keys', Immutable.List()),
+      computedLineKey.get('operator', ''),
+      computedLineKey.get('type', ''),
+      computedLineKey.get('must_met', false),
+      computedLineKey.get('projection', Immutable.Map()),
+    ];
+    this.props.onSetComputedLineKey(paths, values);
     this.setState({ computedLineKey: null });
   }
 
@@ -326,8 +351,32 @@ export default class CalculatorMapping extends Component {
 
   onChangeComputedLineKey = path => (value) => {
     const { computedLineKey } = this.state;
+    const newComputedLineKey = computedLineKey.withMutations((computedLineKeyWithMutations) => {
+      computedLineKeyWithMutations.setIn(path, value);
+      const key = path[1];
+      if (value === 'hard_coded') {
+        computedLineKeyWithMutations.deleteIn(['projection', key, 'value']);
+      } else if (value === 'condition_result') {
+        computedLineKeyWithMutations.deleteIn(['projection', key, 'value']);
+        computedLineKeyWithMutations.deleteIn(['projection', key, 'regex']);
+      }
+    });
     this.setState({
-      computedLineKey: computedLineKey.setIn(path, value),
+      computedLineKey: newComputedLineKey,
+    });
+  }
+
+  onChangeComputedMustMet = (e) => {
+    const { value } = e.target;
+    const { computedLineKey } = this.state;
+    const newComputedLineKey = computedLineKey.withMutations((computedLineKeyWithMutations) => {
+      computedLineKeyWithMutations.set('must_met', value);
+      if (value) {
+        computedLineKeyWithMutations.setIn(['projection', 'on_false'], Immutable.Map());
+      }
+    });
+    this.setState({
+      computedLineKey: newComputedLineKey,
     });
   }
 
@@ -338,11 +387,23 @@ export default class CalculatorMapping extends Component {
       computedLineKeyWithMutations.set('type', value);
       computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
       computedLineKeyWithMutations.delete('operator');
+      computedLineKeyWithMutations.delete('must_met');
+      computedLineKeyWithMutations.delete('projection');
     });
     this.setState({
       computedLineKey: newComputedLineKey,
     });
   }
+
+  onChangeHardCodedValue = path => (e) => {
+    const { value } = e.target;
+    this.onChangeComputedLineKey(path)(value);
+  }
+
+  getConditionResultProjectOptions = () => [
+    'condition_result',
+    'hard_coded',
+  ].map(formatSelectOptions);
 
   renderComputedRatePopup = () => {
     const { computedLineKey } = this.state;
@@ -351,8 +412,11 @@ export default class CalculatorMapping extends Component {
     }
     const title = 'Computed Rate Key';
     const regexHelper = 'In case you want to run a regular expression on the computed field before calculating the rate';
+    const mustMetHelper = 'This means than in case the condition is not met - a rate will not be found';
     const lineKeyOptions = this.getAvailableFields(false, false).toJS();
     const computedTypeRegex = computedLineKey.get('type', 'regex') === 'regex';
+    const checkboxStyle = { marginTop: 10 };
+    const conditionOption = this.getConditionResultProjectOptions().concat(lineKeyOptions);
     return (
       <ModalWrapper title={title} show={true} onOk={this.onSaveComputedLineKey} onHide={this.onHideComputedLineKey} labelOk="OK">
         <Form horizontal>
@@ -388,7 +452,7 @@ export default class CalculatorMapping extends Component {
             </Col>
           </FormGroup>
           <div className="separator" />
-          <FormGroup key="computed-field-2">
+          <FormGroup key="computed-field-1">
             <Col sm={3} componentClass={ControlLabel}>{computedTypeRegex ? 'Field' : 'First Field' }</Col>
             <Col sm={4}>
               <Select
@@ -444,6 +508,87 @@ export default class CalculatorMapping extends Component {
               <Col sm={1}>
                 <Help contents={regexHelper} />
               </Col>
+            </FormGroup>),
+            (<FormGroup key="computed-must-met">
+              <Col componentClass={ControlLabel} sm={3}>
+                Must met?
+                <Help contents={mustMetHelper} />
+              </Col>
+              <Col sm={3} style={checkboxStyle}>
+                <div className="inline">
+                  <Field
+                    fieldType="checkbox"
+                    id="computed-must-met"
+                    value={computedLineKey.get('must_met', false)}
+                    onChange={this.onChangeComputedMustMet}
+                  />
+                </div>
+              </Col>
+            </FormGroup>),
+            (<FormGroup key="computed-cond-project-true">
+              <Col sm={3} componentClass={ControlLabel}>Value when True</Col>
+              <Col sm={4}>
+                <Select
+                  onChange={this.onChangeComputedLineKey(['projection', 'on_true', 'key'])}
+                  value={computedLineKey.getIn(['projection', 'on_true', 'key'], 'condition_result')}
+                  options={conditionOption}
+                />
+              </Col>
+              {
+                ['hard_coded'].includes(computedLineKey.getIn(['projection', 'on_true', 'key'], '')) &&
+                (<Col sm={4}>
+                  <Field
+                    value={computedLineKey.getIn(['projection', 'on_true', 'value'], '')}
+                    onChange={this.onChangeHardCodedValue(['projection', 'on_true', 'value'])}
+                  />
+                </Col>)
+              }
+              {
+              !['', 'hard_coded', 'condition_result'].includes(computedLineKey.getIn(['projection', 'on_true', 'key'], '')) &&
+              (<Col sm={4}>
+                <Field
+                  value={computedLineKey.getIn(['projection', 'on_true', 'regex'], '')}
+                  disabledValue={''}
+                  onChange={this.onChangeComputedLineKey(['projection', 'on_true', 'regex'])}
+                  disabled={computedLineKey.getIn(['projection', 'on_true', 'key'], '') === ''}
+                  label="Regex"
+                  fieldType="toggeledInput"
+                />
+              </Col>)
+              }
+            </FormGroup>),
+            (<FormGroup key="computed-cond-project-false">
+              <Col sm={3} componentClass={ControlLabel}>Value when False</Col>
+              <Col sm={4}>
+                <Select
+                  onChange={this.onChangeComputedLineKey(['projection', 'on_false', 'key'])}
+                  value={computedLineKey.getIn(['projection', 'on_false', 'key'], 'condition_result')}
+                  options={conditionOption}
+                  disabled={computedLineKey.get('must_met', false)}
+                />
+              </Col>
+              {
+                ['hard_coded'].includes(computedLineKey.getIn(['projection', 'on_false', 'key'], '')) &&
+                (<Col sm={4}>
+                  <Field
+                    value={computedLineKey.getIn(['projection', 'on_false', 'value'], '')}
+                    onChange={this.onChangeHardCodedValue(['projection', 'on_false', 'value'])}
+                  />
+                </Col>)
+              }
+              {
+              !['', 'hard_coded', 'condition_result'].includes(computedLineKey.getIn(['projection', 'on_false', 'key'], '')) &&
+              (<Col sm={4}>
+                <Field
+                  value={computedLineKey.getIn(['projection', 'on_false', 'regex'], '')}
+                  disabledValue={''}
+                  onChange={this.onChangeComputedLineKey(['projection', 'on_false', 'regex'])}
+                  disabled={computedLineKey.getIn(['projection', 'on_false', 'key'], '') === ''}
+                  label="Regex"
+                  fieldType="toggeledInput"
+                />
+              </Col>)
+              }
             </FormGroup>)]
         }
         </Form>
