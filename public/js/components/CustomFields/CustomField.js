@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
-import { Form, InputGroup, Row, Col, FormGroup, ControlLabel, Button, HelpBlock } from 'react-bootstrap';
+import { Form, InputGroup, Col, FormGroup, ControlLabel, Button, HelpBlock } from 'react-bootstrap';
 import { SortableElement } from 'react-sortable-hoc';
 import ModalWrapper from '../Elements/ModalWrapper';
 import DragHandle from '../Elements/DragHandle';
@@ -35,7 +35,11 @@ class CustomField extends Component {
   onChange = (e) => {
     const { entity, idx, field } = this.props;
     const { id, value } = e.target;
-    this.props.onChange(entity, idx, id, value);
+    if (id === 'boolean') {
+      this.props.onChange(entity, idx, 'type', value ? 'boolean' : '');
+    } else {
+      this.props.onChange(entity, idx, id, value);
+    }
     if (id === 'unique' && value === true) {
       this.props.onChange(entity, idx, 'mandatory', true);
     }
@@ -69,17 +73,21 @@ class CustomField extends Component {
     this.setState({ showAdvancedEdit: true });
   };
 
+  isBoolean = field => field.get('type', '') === 'boolean';
+
   renderAdvancedEdit = () => {
     const { field } = this.props;
     const { showAdvancedEdit } = this.state;
     const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'field')} Details`);
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
+    const isBoolean = this.isBoolean(field);
 
-    const disableUnique = field.get('boolean', false);
-    const disableMandatory = field.get('boolean', false) || field.get('unique', false);
+    const disableUnique = isBoolean;
+    const disableMandatory = isBoolean || field.get('unique', false);
     const disableBoolean = field.get('select_list', false) || field.get('unique', false);
-    const disableMultiple = field.get('boolean', false);
-    const disableSelectList = field.get('boolean', false);
+    const disableMultiple = isBoolean;
+    const disableSearchable = isBoolean;
+    const disableSelectList = isBoolean;
 
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
@@ -87,14 +95,23 @@ class CustomField extends Component {
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Unique</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="unique" onChange={this.onChange} value={field.get('unique', '')} fieldType="checkbox" disabled={disableUnique} />
+              <Field id="unique" onChange={this.onChange} value={field.get('unique', '')} fieldType="checkbox" disabled={disableUnique} className="inline mr10" />
+              {disableUnique && (
+                <small style={{ color: '#626262' }}>Unique field can not be boolean</small>
+              )}
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Mandatory</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', '')} fieldType="checkbox" disabled={disableMandatory} />
+              <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', '')} fieldType="checkbox" disabled={disableMandatory} className="inline mr10" />
+              {disableMandatory && (
+                <small style={{ color: '#626262' }}>{ field.get('mandatory', '')
+                  ? 'Unique field must be mandatory'
+                  : 'Mandatory field can not be boolean'
+                }</small>
+              )}
             </Col>
           </FormGroup>
 
@@ -122,21 +139,27 @@ class CustomField extends Component {
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Searchable</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="searchable" onChange={this.onChange} value={field.get('searchable', '')} fieldType="checkbox" />
+              <Field id="searchable" onChange={this.onChange} value={field.get('searchable', '')} fieldType="checkbox" className="inline mr10" />
+              {disableSearchable && (
+                <small style={{ color: '#626262' }}>Boolean field can not be searchable</small>
+              )}
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Boolean</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="boolean" onChange={this.onChange} value={field.get('boolean', '')} fieldType="checkbox" disabled={disableBoolean} />
+              <Field id="boolean" onChange={this.onChange} value={isBoolean} fieldType="checkbox" disabled={disableBoolean} />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Multiple</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', '')} fieldType="checkbox" disabled={disableMultiple} />
+              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', '')} fieldType="checkbox" disabled={disableMultiple} className="inline mr10" />
+              {disableMultiple && (
+                <small style={{ color: '#626262' }}>Boolean field can not be multiple</small>
+              )}
             </Col>
           </FormGroup>
 
@@ -160,7 +183,7 @@ class CustomField extends Component {
 
   render() {
     const { field, editable, existing } = this.props;
-    const isBoolean = field.get('boolean', false);
+    const isBoolean = this.isBoolean(field);
     const checkboxStyle = { textAlign: 'center', marginTop: 10 };
     return (
       <FormGroup className="CustomField form-inner-edit-row">

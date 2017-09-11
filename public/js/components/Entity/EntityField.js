@@ -25,7 +25,7 @@ class EntityField extends Component {
   state = {
     isFieldTags: this.props.field.get('multiple', false) && !this.props.field.get('select_list', false),
     isFieldSelect: this.props.field.get('select_list', false),
-    isFieldBoolean: this.props.field.get('boolean', false),
+    isFieldBoolean: this.props.field.get('type', '') === 'boolean',
     fieldPath: this.props.field.get('field_name', '').split('.'),
   }
 
