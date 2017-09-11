@@ -19,7 +19,7 @@ export default class PlanIncludeGroupEdit extends Component {
       PropTypes.string,
       PropTypes.number,
     ]).isRequired,
-    usaget: PropTypes.string.isRequired,
+    usages: PropTypes.instanceOf(Immutable.List).isRequired,
     shared: PropTypes.bool,
     pooled: PropTypes.bool,
     products: PropTypes.instanceOf(Immutable.List),
@@ -58,11 +58,11 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   isMonetaryBased = () => (
-    this.props.usaget === 'cost'
+    this.props.usages.get(0, '') === 'cost'
   );
 
   onChangeInclud = (value) => {
-    const { name, usaget } = this.props;
+    const { name } = this.props;
     let errorInclude = '';
     if (value === '') {
       errorInclude = this.errors.include.required;
@@ -71,7 +71,8 @@ export default class PlanIncludeGroupEdit extends Component {
     } else if (!this.isMonetaryBased() && !validateUnlimitedValue(value)) {
       errorInclude = this.errors.include.allowedCharacters;
     }
-    this.props.onChangeFieldValue(['include', 'groups', name, usaget], value);
+    const valueField = this.isMonetaryBased() ? 'cost' : 'value';
+    this.props.onChangeFieldValue(['include', 'groups', name, valueField], value);
     this.setState({ errorInclude });
   }
 
@@ -96,8 +97,8 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   onChangeGroupRates = (productKey) => {
-    const { name, usaget } = this.props;
-    this.props.onChangeGroupProducts(name, usaget, productKey);
+    const { name } = this.props;
+    this.props.onChangeGroupProducts(name, productKey);
   }
 
   onGroupRemoveAsk = () => {
@@ -134,12 +135,12 @@ export default class PlanIncludeGroupEdit extends Component {
   )
 
   renderEdit = () => {
-    const { name, value, usaget, shared, pooled, products, usedProducts } = this.props;
+    const { name, value, usages, shared, pooled, products, usedProducts } = this.props;
     const { isEditMode, errorInclude } = this.state;
     return (
       <Modal show={isEditMode}>
         <Modal.Header closeButton={false}>
-          <Modal.Title>Edit {name} <i>{usaget}</i></Modal.Title>
+          <Modal.Title>Edit {name} <i>{usages.join(', ')}</i></Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form horizontal style={{ marginBottom: 0 }}>
@@ -169,10 +170,10 @@ export default class PlanIncludeGroupEdit extends Component {
             <FormGroup>
               <Col componentClass={ControlLabel} sm={3}>Products</Col>
               <Col sm={8}>
-                <div style={{ marginTop: 10, minWidth: 250, width: '100%', height: 42 }}>
+                <div style={{ marginTop: 10, minWidth: 250, width: '100%', minHeight: 42 }}>
                   <ProductSearchByUsagetype
                     products={products}
-                    usaget={usaget}
+                    usages={usages}
                     existingProducts={usedProducts.toList()}
                     onChangeGroupRates={this.onChangeGroupRates}
                   />
@@ -189,7 +190,7 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   render() {
-    const { name, value, usaget, shared, pooled, products, unit } = this.props;
+    const { name, value, usages, shared, pooled, products, unit } = this.props;
     const { showConfirm } = this.state;
     const confirmMessage = `Are you sure you want to remove ${name} group?`;
     const sharedLabel = shared ? 'Yes' : 'No';
@@ -202,7 +203,7 @@ export default class PlanIncludeGroupEdit extends Component {
     return (
       <tr className="List">
         <td className="td-ellipsis">{name}</td>
-        <td className="td-ellipsis">{usaget}</td>
+        <td className="td-ellipsis">{usages.join(', ')}</td>
         <td className="td-ellipsis">{valueLabel}</td>
         <td className="td-ellipsis">{unit}</td>
         <td className="td-ellipsis">

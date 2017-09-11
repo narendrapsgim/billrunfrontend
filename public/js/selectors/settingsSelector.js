@@ -19,6 +19,9 @@ const getPricing = (state, props) => // eslint-disable-line no-unused-vars
 const getUsageType = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('usage_types');
 
+const getEventCode = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['events', 'balance']);
+
 const getPropertyTypes = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('property_types');
 
@@ -168,6 +171,19 @@ const selectUsageTypes = (usageTypes) => {
   return usageTypes.map(usageType => usageType.get('usage_type', ''));
 };
 
+const selectEventCode = (events) => {
+  if (!events) {
+    return undefined;
+  }
+  return events.map(event => event.get('event_code', ''));
+};
+
+const selectFileType = (fileTypes) => {
+  if (!fileTypes) {
+    return undefined;
+  }
+  return fileTypes.map(fileType => fileType.get('file_type', ''));
+};
 
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
@@ -206,7 +222,7 @@ export const billrunSelector = createSelector(
 
 export const minEntityDateSelector = createSelector(
   getMinEntityDate,
-  minEntityDate => moment(0),//(minEntityDate && !isNaN(minEntityDate) ? moment.unix(minEntityDate) : moment(0)),
+  minEntityDate => (minEntityDate && !isNaN(minEntityDate) ? moment.unix(minEntityDate) : moment(0)),
 );
 
 export const currencySelector = createSelector(
@@ -222,9 +238,19 @@ export const chargingDaySelector = createSelector(
   },
 );
 
+export const fileTypeSelector = createSelector(
+  getInputProssesors,
+  selectFileType,
+);
+
 export const usageTypeSelector = createSelector(
   getUsageType,
   selectUsageTypes,
+);
+
+export const eventCodeSelector = createSelector(
+  getEventCode,
+  selectEventCode,
 );
 
 export const usageTypesDataSelector = createSelector(
@@ -339,45 +365,44 @@ const formatReportFields = (fields) => {
   }));
 };
 
-const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = Immutable.Map()) => {
-  if (!fields) {
-    return Immutable.List();
-  }
-  return fields
-    .filter(field => !excludeFields.get('base', Immutable.List()).includes(field.get('id', '')))
-    .withMutations((fieldsWithMutations) => {
+const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = Immutable.Map()) =>
+((!fields)
+  ? Immutable.List()
+  : fields
+  .filter(field => !excludeFields.get('base', Immutable.List()).includes(field.get('id', '')))
+  .withMutations((fieldsWithMutations) => {
     joinFields.forEach((entityfields, entity) => {
       const entityLabel = sentenceCase(getConfig(['systemItems', entity, 'itemName'], entity));
       if (!entityfields.isEmpty()) {
         entityfields.forEach((entityfield) => {
-            if (!excludeFields.get(entity, Immutable.List()).includes(entityfield.get('id', ''))) {
-          const joinId = `$${entity}.${entityfield.get('id', '')}`;
-          const joinTitle = `${entityLabel}: ${entityfield.get('title', entityfield.get('id', ''))}`;
-              const joinField = entityfield.withMutations(field => field
-                .set('id', joinId)
-                .set('title', joinTitle)
-                .set('entity', entity),
-              );
-          fieldsWithMutations.push(joinField);
-            }
+          if (!excludeFields.get(entity, Immutable.List()).includes(entityfield.get('id', ''))) {
+            const joinId = `$${entity}.${entityfield.get('id', '')}`;
+            const joinTitle = `${entityLabel}: ${entityfield.get('title', entityfield.get('id', ''))}`;
+            const joinField = entityfield.withMutations(field => field
+              .set('id', joinId)
+              .set('title', joinTitle)
+              .set('entity', entity),
+            );
+            fieldsWithMutations.push(joinField);
+          }
         });
       }
     });
-  });
-};
+  })
+);
 
-const selectReportFields = (subscriberFields, accountFields, linesFileds) => {
+const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, queueFields, eventFields) => {
   // usage: linesFileds,
-	// duplicate fields list by join (same fields from different collections)
-	// that will be removed frm UI.
+  // duplicate fields list by join (same fields from different collections)
+  // that will be removed frm UI.
   const usageExcludeIds = Immutable.Map({
     subscription: Immutable.List(['sid', 'aid']),
     customer: Immutable.List(['aid']),
     base: Immutable.List(['firstname', 'lastname']),
   });
   const usage = concatJoinFields(linesFileds, Immutable.Map({
-  subscription: subscriberFields,
-  customer: accountFields,
+    subscription: subscriberFields,
+    customer: accountFields,
   }), usageExcludeIds);
 
   // const subscription = subscriberFields;
@@ -385,7 +410,7 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds) => {
     customer: Immutable.List(['aid', 'type']),
     usage: Immutable.List(['firstname', 'lastname', 'sid', 'aid', 'plan']),
     base: Immutable.List([]),
-});
+  });
   const subscription = concatJoinFields(subscriberFields, Immutable.Map({
     customer: accountFields,
     usage: linesFileds,
@@ -401,36 +426,41 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds) => {
   //   subscription: subscriberFields,
   //   usage: linesFileds,
   // }), customerExcludeIds);
-  return Immutable.Map({ usage, subscription, customer });
+
+  const logFile = logFileFields;
+  const queue = queueFields;
+  const event = eventFields;
+  return Immutable.Map({ usage, subscription, customer, logFile, queue, event });
 };
 
-const mergeEntityAndReportConfigFields = (fields, type) => { // 'account' 'subscribers'
-  const predefinedFileds = getConfig(['reports', 'fields', type], Immutable.List());
-  const entityFields = formatReportFields(fields);
+const getReportConfigFields = type => getConfig(['reports', 'fields', type], Immutable.List());
+
+const mergeEntityAndReportConfigFields = (reportConfigFields, billrunConfigFields, type) => {
+  const entityFields = (type === 'queue') ? billrunConfigFields : formatReportFields(billrunConfigFields);
   const defaultField = Immutable.Map({
     searchable: true,
     aggregatable: true,
-    });
+  });
   return Immutable.List().withMutations((fieldsWithMutations) => {
-    //Push all fields from Billrun config
+    // Push all fields from Billrun config
     entityFields.forEach((entityField) => {
-        fieldsWithMutations.push(entityField);
+      fieldsWithMutations.push(entityField);
     });
     // Push report config fields or overide if exist
-    predefinedFileds.forEach((predefinedFiled) => {
+    reportConfigFields.forEach((predefinedFiled) => {
       const index = fieldsWithMutations.findIndex(field => field.get('id', '') === predefinedFiled.get('id', ''));
-      if (index === -1 ) {
+      if (index === -1) {
         fieldsWithMutations.push(defaultField.merge(predefinedFiled));
       } else {
         fieldsWithMutations.update(index, Immutable.Map(), field => field.merge(predefinedFiled));
       }
     });
-     // Set title if not exist
-     fieldsWithMutations.forEach((field, index) => {
-       if (!field.has('title')) {
-         const configTitle = getFieldName(field.get('id', ''), getFieldNameType(type));
-         const title = configTitle === field.get('id', '') ? sentenceCase(configTitle) : configTitle;
-         fieldsWithMutations.setIn([index, 'title'], title);
+    // Set title if not exist
+    fieldsWithMutations.forEach((field, index) => {
+      if (!field.has('title')) {
+        const configTitle = getFieldName(field.get('id', ''), getFieldNameType(type));
+        const title = configTitle === field.get('id', '') ? sentenceCase(configTitle) : configTitle;
+        fieldsWithMutations.setIn([index, 'title'], title);
       }
     });
   })
@@ -468,13 +498,31 @@ const selectReportLinesFields = (customKeys) => {
 };
 
 const reportSubscriberFieldsSelector = createSelector(
+  () => getReportConfigFields('subscribers'),
   subscriberFieldsSelector,
-  fields => mergeEntityAndReportConfigFields(fields, 'subscribers'),
+  () => 'subscribers',
+  mergeEntityAndReportConfigFields,
 );
 
 const reportAccountFieldsSelector = createSelector(
+  () => getReportConfigFields('account'),
   accountFieldsSelector,
-  fields => mergeEntityAndReportConfigFields(fields, 'account'),
+  () => 'account',
+  mergeEntityAndReportConfigFields,
+);
+
+const reportlogFileFieldsSelector = createSelector(
+  () => getReportConfigFields('logFile'),
+  () => Immutable.List(),
+  () => 'logFile',
+  mergeEntityAndReportConfigFields,
+);
+
+const reportEventFileFieldsSelector = createSelector(
+  () => getReportConfigFields('event'),
+  () => Immutable.List(),
+  () => 'event',
+  mergeEntityAndReportConfigFields,
 );
 
 const reportLinesFieldsSelector = createSelector(
@@ -482,10 +530,20 @@ const reportLinesFieldsSelector = createSelector(
   selectReportLinesFields,
 );
 
+const reportQueueFieldsSelector = createSelector(
+  () => getReportConfigFields('queue'),
+  reportLinesFieldsSelector,
+  () => 'queue',
+  mergeEntityAndReportConfigFields,
+);
+
 export const reportFieldsSelector = createSelector(
   reportSubscriberFieldsSelector,
   reportAccountFieldsSelector,
   reportLinesFieldsSelector,
+  reportlogFileFieldsSelector,
+  reportQueueFieldsSelector,
+  reportEventFileFieldsSelector,
   selectReportFields,
 );
 

@@ -17,7 +17,7 @@ import {
   propertyTypeSelector,
 } from '../../../selectors/settingsSelector';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
-import { getUnitLabel } from '../../../common/Util';
+import { getUnitLabel, getUsagePropertyType } from '../../../common/Util';
 
 
 class PlanIncludeGroupCreate extends Component {
@@ -44,7 +44,8 @@ class PlanIncludeGroupCreate extends Component {
 
   defaultState = {
     name: '',
-    usage: '',
+    usages: Immutable.List(['']),
+    usagesPropertyType: '',
     unit: '',
     include: '',
     products: Immutable.List(),
@@ -113,9 +114,9 @@ class PlanIncludeGroupCreate extends Component {
 
       case steps.get('SetUsageType', { index: -1 }).index: {
         const { usage: usageErrors, unit: unitErrors } = this.errors;
-        const { usage, unit } = this.state;
+        const { usages, unit } = this.state;
 
-        if (usage === '') {
+        if (usages.includes('')) {
           this.setState({ error: usageErrors.required });
           return false;
         }
@@ -183,10 +184,6 @@ class PlanIncludeGroupCreate extends Component {
     this.setState({ pooled });
   }
 
-  onChangeUsageType = (newValue) => {
-    this.setState({ usage: newValue, unit: '', products: Immutable.List(), error: '' });
-  }
-
   onChangeUnit = (newValue) => {
     this.setState({ unit: newValue, error: '' });
   }
@@ -231,9 +228,18 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   handleFinish = () => {
-    const { stepIndex, name, usage, unit, include, products, shared, pooled } = this.state;
+    const {
+      stepIndex,
+      name,
+      usages,
+      unit,
+      include,
+      products,
+      shared,
+      pooled,
+    } = this.state;
     if (this.validateStep(stepIndex)) {
-      this.props.addGroup(name, usage, unit, include, shared, pooled, products);
+      this.props.addGroup(name, usages, unit, include, shared, pooled, products);
       this.resetState(false);
     }
   };
@@ -247,6 +253,7 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   onChangeBasedOn = (e) => {
+    const { usageTypesData } = this.props;
     const { value } = e.target;
     const monetaryBased = (value === 'monetary');
     let usage = '';
@@ -266,7 +273,39 @@ class PlanIncludeGroupCreate extends Component {
         SetProducts: { index: 3, label: 'Set Products' },
       });
     }
-    this.setState({ monetaryBased, steps, usage, unit: '', products: Immutable.List(), error: '' });
+    this.setState({ monetaryBased, steps, usages: Immutable.List([usage]), usagesPropertyType: getUsagePropertyType(usageTypesData, usage), unit: '', products: Immutable.List(), error: '' });
+  }
+
+  onClickAddUnitType = () => {
+    const { usages } = this.state;
+    this.setState({ usages: usages.push('') });
+  }
+
+  onRemoveUnitType = index => () => {
+    const { usages } = this.state;
+    this.setState({ usages: usages.delete(index) });
+  }
+
+  onChangeUnitType = index => (usaget) => {
+    const { usageTypesData } = this.props;
+    const { usages } = this.state;
+    if (index === 0) {
+      const usagesPropertyType = getUsagePropertyType(usageTypesData, usaget);
+      this.setState({ usages: Immutable.List([usaget]), usagesPropertyType, unit: '', products: Immutable.List(), error: '' });
+    } else {
+      this.setState({ usages: usages.set(index, usaget), error: '' });
+    }
+  }
+
+  filterUsageTypes = index => (usaget) => {
+    const { usages, usagesPropertyType } = this.state;
+    return [-1, index].includes(usages.findIndex(usage => usage === usaget.get('usage_type', ''))) &&
+      (usagesPropertyType === '' || usaget.get('property_type', '') === usagesPropertyType);
+  }
+
+  getUsagesLabel = () => {
+    const { usages } = this.state;
+    return usages.map(usage => changeCase.sentenceCase(usage)).join(', ');
   }
 
   getStepContent = (stepIndex) => {
@@ -275,7 +314,7 @@ class PlanIncludeGroupCreate extends Component {
       name,
       products,
       include,
-      usage,
+      usages,
       unit,
       shared,
       pooled,
@@ -286,7 +325,7 @@ class PlanIncludeGroupCreate extends Component {
     const existingProductsKeys = usedProducts.push(...products);
     const setIncludesTitle = monetaryBased
       ? `Total ${getSymbolFromCurrency(currency)} included`
-      : `${changeCase.sentenceCase(`${usage} includes`)} (${getUnitLabel(propertyTypes, usageTypesData, usage, unit)})`;
+      : `${getUnitLabel(propertyTypes, usageTypesData, usages.get(0, ''), unit)} includes (${this.getUsagesLabel()})`;
 
     switch (stepIndex) {
 
@@ -327,23 +366,44 @@ class PlanIncludeGroupCreate extends Component {
 
       case steps.get('SetUsageType', { index: -1 }).index:
         return (
-          <FormGroup validationState={error.length > 0 ? 'error' : null}>
-            <Col componentClass={ControlLabel} sm={3}>Unit Type</Col>
-            <Col sm={8}>
-              <UsageTypesSelector
-                usaget={usage}
-                unit={unit}
-                onChangeUsaget={this.onChangeUsageType}
-                onChangeUnit={this.onChangeUnit}
-              />
-              { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
-            </Col>
-          </FormGroup>
+          <div>
+            {
+              usages.map((usaget, index) => (
+                <FormGroup validationState={error.length > 0 ? 'error' : null} key={`usages_${usaget}_${index}`}>
+                  <Col componentClass={ControlLabel} sm={3}>{index === 0 ? 'Unit Type/s' : ''}</Col>
+                  <Col sm={7}>
+                    <UsageTypesSelector
+                      usaget={usaget}
+                      unit={unit}
+                      onChangeUsaget={this.onChangeUnitType(index)}
+                      onChangeUnit={this.onChangeUnit}
+                      showUnits={index === 0}
+                      showAddButton={index === 0}
+                      usagetFilter={this.filterUsageTypes(index)}
+                    />
+                  </Col>
+                  { index !== 0 &&
+                    <Col sm={1}>
+                      <Button onClick={this.onRemoveUnitType(index)} bsStyle="link">
+                        <i className="fa fa-fw danger-red fa-trash-o" />
+                      </Button>
+                    </Col>
+                }
+                </FormGroup>
+              ))
+            }
+            <FormGroup>
+              <Col sm={3} />
+              <Col sm={8}>
+                <CreateButton onClick={this.onClickAddUnitType} label="Additional" disabled={usages.get(0, '') === ''} />
+              </Col>
+            </FormGroup>
+          </div>
         );
 
       case steps.get('SetIncludes', { index: -1 }).index:
         return ([
-          <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usage}_includes`} className="mb10">
+          <FormGroup validationState={error.length > 0 ? 'error' : null} key={`${usages.get(0, '')}_includes`} className="mb10">
             <Col componentClass={ControlLabel} sm={4}>
               {setIncludesTitle}
             </Col>
@@ -355,7 +415,7 @@ class PlanIncludeGroupCreate extends Component {
               { error.length > 0 && <HelpBlock>{error}</HelpBlock> }
             </Col>
           </FormGroup>,
-          <FormGroup key={`${usage}_shared`} className="mb10">
+          <FormGroup key={`${usages.get(0, '')}_shared`} className="mb10">
             <Col smOffset={3} sm={8}>
               <Checkbox checked={shared} onChange={this.onChangeShared}>
                 {"Share with all account's subscribers"}
@@ -376,13 +436,16 @@ class PlanIncludeGroupCreate extends Component {
           <FormGroup validationState={error.length > 0 ? 'error' : null}>
             {monetaryBased
               ? <Col componentClass={ControlLabel} sm={3}>Products</Col>
-              : <Col componentClass={ControlLabel} sm={3} style={{ paddingTop: 2 }}>Products of type <br />{changeCase.sentenceCase(usage)}<Help contents={GroupsInclude.products} /></Col>
+              : <Col componentClass={ControlLabel} sm={3} style={{ paddingTop: 2 }}>
+                Products of type/s <br />{this.getUsagesLabel()}
+                <Help contents={GroupsInclude.products} />
+              </Col>
             }
             <Col sm={8}>
               <div style={{ width: '100%' }}>
                 <ProductSearchByUsagetype
                   products={products}
-                  usaget={usage}
+                  usages={usages}
                   onChangeGroupRates={this.onChangeGroupRates}
                   existingProducts={existingProductsKeys}
                 />

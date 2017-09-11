@@ -119,6 +119,10 @@ class ServiceSetup extends Component {
     this.props.dispatch(clearRevisions('services', key));// refetch items list because item was (changed in / added to) list
   }
 
+  clearItemsList = () => {
+    this.props.dispatch(clearItems('services'));
+  }
+
   afterItemReceived = (response) => {
     if (response.status) {
       this.initRevisions();
@@ -128,8 +132,8 @@ class ServiceSetup extends Component {
     }
   }
 
-  onGroupAdd = (groupName, usage, unit, value, shared, pooled, products) => {
-    this.props.dispatch(addGroup(groupName, usage, unit, value, shared, pooled, products));
+  onGroupAdd = (groupName, usages, unit, value, shared, pooled, products) => {
+    this.props.dispatch(addGroup(groupName, usages, unit, value, shared, pooled, products));
   }
 
   onGroupRemove = (groupName) => {
@@ -157,7 +161,7 @@ class ServiceSetup extends Component {
 
   handleBack = (itemWasChanged = false) => {
     if (itemWasChanged) {
-      this.props.dispatch(clearItems('services')); // refetch items list because item was (changed in / added to) list
+      this.clearItemsList(); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = getConfig(['systemItems', 'service', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
@@ -190,6 +194,7 @@ class ServiceSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            clearList={this.clearItemsList}
           />
         </Panel>
 

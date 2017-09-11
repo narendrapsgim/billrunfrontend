@@ -44,7 +44,7 @@ export const getConfig = (key, defaultValue = null) => {
 export const titlize = str => changeCase.upperCaseFirst(str);
 
 export const getFieldName = (field, category) =>
-  getConfig(['fieldNames', category,field], getConfig(['fieldNames', field], field));
+  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], field));
 
 export const getFieldNameType = (type) => {
   switch (type) {
@@ -59,7 +59,7 @@ export const getFieldNameType = (type) => {
     case 'usage':
       return 'lines';
     default:
-      return '';
+      return type;
   }
 };
 
@@ -193,18 +193,18 @@ export const getItemMode = (item, undefindItemStatus = 'create') => {
 
 export const getItemMinFromDate = (item, minDate) => {
   // item and minDate
-  if (minDate && item && getItemId(item, false)) {
+  if (minDate && getItemId(item, false)) {
     return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
   }
   // only item
-  if(item && getItemId(item, false)) {
+  if(getItemId(item, false)) {
     return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)))
   }
   // only minDate
   if (minDate) {
     return minDate;
   }
-
+  // allow component set default value if no item and minDate exist
   return undefined;
 };
 
@@ -223,7 +223,7 @@ export const getRevisionStartIndex = (item, revisions) => {
 export const formatSelectOptions = option => (
   Immutable.Map.isMap(option)
     ? { value: option.get('value', ''), label: option.get('label', '') }
-    : { value: changeCase.snakeCase(option), label: changeCase.sentenceCase(option) }
+    : { value: option, label: changeCase.sentenceCase(option) }
 );
 
 export const parseConfigSelectOptions = configOption => formatSelectOptions(
@@ -300,6 +300,9 @@ export const getUom = (propertyTypes, usageTypes, usaget) => {
   const selectedUsaget = usageTypes.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
   return (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
 };
+
+export const getUsagePropertyType = (usageTypesData, usage) =>
+  (usageTypesData.find(usaget => usaget.get('usage_type', '') === usage) || Immutable.Map()).get('property_type', '');
 
 export const getUnitLabel = (propertyTypes, usageTypes, usaget, unit) => {
   const uom = getUom(propertyTypes, usageTypes, usaget);
@@ -401,25 +404,34 @@ export const getPlanConvertedPpIncludes = (propertyTypes, usageTypes, ppIncludes
     : Immutable.Map();
 };
 
-export const getGroupUsaget = (group) => {
-  const groupNotUsagetKeys = ['unit', 'account_shared', 'account_pool', 'rates'];
-  const keys = group.keySeq().toArray().filter(key => !groupNotUsagetKeys.includes(key));
-  if (keys.length) {
-    return keys[0];
-  }
-  return false;
-};
+export const getGroupUsaget = group => (group.get('cost', false) !== false
+  ? 'cost'
+  : group.get('usage_types', Immutable.Map()).keySeq().get(0, false));
+
+export const isGroupMonetaryBased = group => getGroupUsaget(group) === 'cost';
+
+export const getGroupValue = group => (isGroupMonetaryBased(group)
+  ? group.get('cost', '')
+  : group.get('value', ''));
+
+export const getGroupUsages = group => (isGroupMonetaryBased(group)
+  ? Immutable.List(['cost'])
+  : Immutable.List(group.get('usage_types', Immutable.Map()).keySeq().toArray()));
+
+export const getGroupUnit = group => (isGroupMonetaryBased(group)
+  ? 'cost'
+  : group.get('usage_types', Immutable.Map()).valueSeq().get(0, Immutable.Map()).get('unit', false));
 
 export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBaseUnit = true) => {
   const convertedIncludes = item.get('include', Immutable.Map()).withMutations((includesWithMutations) => {
     includesWithMutations.get('groups', Immutable.Map()).forEach((include, group) => {
-      const unit = include.get('unit', false);
+      const unit = getGroupUnit(include);
       const usaget = getGroupUsaget(include);
-      if (unit && usaget) {
-        const value = include.get(usaget);
+      if (unit && usaget && !isGroupMonetaryBased(include)) {
+        const value = getGroupValue(include);
         const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
         const newConvertedValue = (newValue === 'UNLIMITED') ? newValue : parseFloat(newValue);
-        includesWithMutations.setIn(['groups', group, usaget], newConvertedValue);
+        includesWithMutations.setIn(['groups', group, 'value'], newConvertedValue);
       }
     });
   });

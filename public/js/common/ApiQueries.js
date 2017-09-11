@@ -1,25 +1,31 @@
 import moment from 'moment';
 
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
-export const searchProductsByKeyAndUsagetQuery = (usaget, notKeys) => {
+export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
+  const usagesToQuery = Array.isArray(usages) ? usages : [usages];
   const query = {
     key: {
       $nin: [...notKeys, ''], // don't get broken products with empty key
     },
     to: { $gt: moment().toISOString() }, // only active and future
   };
-  if (usaget !== 'cost') {
-    query[`rates.${usaget}`] = { $exists: true };
+  if (usagesToQuery[0] !== 'cost') {
+    query.$or = usagesToQuery.map(usage => ({ [`rates.${usage}`]: { $exists: true } }));
   }
+
+  const formData = new FormData();
+  formData.append('collection', 'rates');
+  formData.append('size', 99999);
+  formData.append('page', 0);
+  formData.append('project', JSON.stringify({ key: 1 }));
+  formData.append('query', JSON.stringify(query));
+
   return {
     api: 'find',
-    params: [
-      { collection: 'rates' },
-      { size: 99999 },
-      { page: 0 },
-      { project: JSON.stringify({ key: 1 }) },
-      { query: JSON.stringify(query) },
-    ],
+    options: {
+      method: 'POST',
+      body: formData,
+    },
   };
 };
 
@@ -169,19 +175,6 @@ export const postpaidBalancesListQuery = (query, page, sort, size) => ({
   ],
 });
 
-export const auditTrailListQuery = (query, page, fields, sort, size) => ({
-  api: 'find',
-  params: [
-    { collection: 'log' },
-    { size },
-    { page },
-    { project: JSON.stringify(fields) },
-    { sort: JSON.stringify(sort) },
-    { query: JSON.stringify(query) },
-  ],
-});
-
-
 /* Aggregate API */
 export const auditTrailEntityTypesQuery = () => {
   const revenueQuery = [{
@@ -325,7 +318,7 @@ export const getDeleteLineQuery = id => ({
 // List
 export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
-export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, quantitative: 1 });
+export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, quantitative: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => getEntitesQuery('rates', project);
 export const getProductsWithRatesQuery = () =>
@@ -386,6 +379,18 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
       name: { $regex: name, $options: 'i' },
     }) },
     { states: JSON.stringify([0]) },
+  ],
+});
+
+export const auditTrailListQuery = (query, page, fields, sort, size) => ({
+  action: 'get',
+  entity: 'log',
+  params: [
+    { size },
+    { page },
+    { project: JSON.stringify(fields) },
+    { sort: JSON.stringify(sort) },
+    { query: JSON.stringify(query) },
   ],
 });
 

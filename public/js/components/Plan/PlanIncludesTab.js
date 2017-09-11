@@ -8,7 +8,13 @@ import PlanIncludeGroupEdit from './components/PlanIncludeGroupEdit';
 import PlanIncludeGroupCreate from './components/PlanIncludeGroupCreate';
 import { getAllGroup } from '../../actions/planActions';
 import { getSettings } from '../../actions/settingsActions';
-import { getUnitLabel } from '../../common/Util';
+import {
+  getUnitLabel,
+  getGroupUsaget,
+  getGroupUnit,
+  getGroupUsages,
+  getGroupValue,
+} from '../../common/Util';
 import {
   usageTypeSelector,
   propertyTypeSelector,
@@ -72,13 +78,13 @@ class PlanIncludesTab extends Component {
     });
   }
 
-  onGroupAdd = (groupName, usage, unit, include, shared, pooled, products) => {
+  onGroupAdd = (groupName, usages, unit, include, shared, pooled, products) => {
     const { usedProducts, existingGroups } = this.state;
     this.setState({
       usedProducts: usedProducts.push(...products),
       existingGroups: existingGroups.push(groupName),
     });
-    this.props.onGroupAdd(groupName, usage, unit, include, shared, pooled, products);
+    this.props.onGroupAdd(groupName, usages, unit, include, shared, pooled, products);
   }
 
   onGroupRemove = (groupName, groupProducts) => {
@@ -90,7 +96,7 @@ class PlanIncludesTab extends Component {
     this.props.onGroupRemove(groupName);
   }
 
-  onChangeGroupProducts = (groupName, usaget, productKeys) => {
+  onChangeGroupProducts = (groupName, productKeys) => {
     const { usedProducts } = this.state;
     this.setState({
       usedProducts: usedProducts.push(...productKeys),
@@ -111,16 +117,17 @@ class PlanIncludesTab extends Component {
       const shared = include.get('account_shared', false);
       const pooled = include.get('account_pool', false);
       const products = include.get('rates', Immutable.List());
-      const usaget = include.findKey(prop => (prop !== 'account_shared' && prop !== 'rates'), '');
-      const unit = getUnitLabel(propertyTypes, usageTypesData, usaget, include.get('unit', ''));
-      const value = include.get(usaget, '');
+      const usages = getGroupUsages(include);
+      const unit =
+        getUnitLabel(propertyTypes, usageTypesData, getGroupUsaget(include), getGroupUnit(include));
+      const value = getGroupValue(include);
       return (
         <PlanIncludeGroupEdit
-          key={`${groupName}_${usaget}`}
+          key={groupName}
           mode={mode}
           name={groupName}
           value={value}
-          usaget={usaget}
+          usages={usages}
           unit={unit}
           shared={shared}
           pooled={pooled}
@@ -137,7 +144,7 @@ class PlanIncludesTab extends Component {
   renderHeader = () => (
     <tr>
       <th style={{ width: 150 }}>Name</th>
-      <th style={{ width: 100 }}>Unit Type</th>
+      <th style={{ width: 100 }}>Unit Type/s</th>
       <th style={{ width: 100 }}>Include</th>
       <th style={{ width: 100 }}>Unit</th>
       <th>Products</th>

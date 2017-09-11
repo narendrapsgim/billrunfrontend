@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import { Form, FormGroup, Col, FormControl, ControlLabel, InputGroup } from 'react-bootstrap';
+import { Form, FormGroup, Col, FormControl, ControlLabel, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
 import ActionButtons from '../Elements/ActionButtons';
@@ -189,11 +189,8 @@ class Collection extends Component {
                   <FormGroup>
                     <Col componentClass={ControlLabel} sm={3} lg={2}>Trigger after</Col>
                     <Col sm={4}>
-
-                      <InputGroup>
-                        <Field onChange={this.onChangeDays} value={item.get('do_after_days', '')} fieldType="number" min="1" />
-                        <InputGroup.Addon>Days</InputGroup.Addon>
-                      </InputGroup>
+                      <Field onChange={this.onChangeDays} value={item.get('do_after_days', '')} fieldType="number" min="1" style={{ minWidth: 50 }} />
+                      <HelpBlock>Days since entering debt collection process</HelpBlock>
                     </Col>
                   </FormGroup>
 
