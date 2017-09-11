@@ -13,9 +13,11 @@ import {
   productsOptionsSelector,
   cyclesOptionsSelector,
   plansOptionsSelector,
+  servicesOptionsSelector,
   groupsOptionsSelector,
+  calcNameSelector,
   bucketsNamesSelector,
-  bucketsExternalIdsSelector,
+  bucketsExternalIdsSelector
 } from '../../../selectors/listSelectors';
 import {
   usageTypeSelector,
@@ -337,11 +339,13 @@ const mapStateToProps = (state, props) => ({
     getCyclesOptions: cyclesOptionsSelector(state, props) || Immutable.List(),
     getProductsOptions: productsOptionsSelector(state, props) || Immutable.List(),
     getPlansOptions: plansOptionsSelector(state, props) || Immutable.List(),
+    getServicesOptions: servicesOptionsSelector(state, props) || Immutable.List(),
     getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
     getBucketsOptions: bucketsNamesSelector(state, props) || Immutable.List(),
     getBucketsExternalIdsOptions: bucketsExternalIdsSelector(state, props) || Immutable.List(),
     getFileTypeOptions: fileTypeSelector(state, props) || Immutable.List(),
+    getCalcNameOptions: calcNameSelector(state, props) || Immutable.List(),
     getEventCodeOptions: eventCodeSelector(state, props) || Immutable.List(),
   }),
 });

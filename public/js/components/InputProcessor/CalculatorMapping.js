@@ -131,6 +131,7 @@ export default class CalculatorMapping extends Component {
       computedLineKey: Immutable.Map({
         usaget,
         index,
+        type: calc.getIn(['computed', 'type'], ''),
         line_keys: calc.getIn(['computed', 'line_keys'], Immutable.List()),
         operator: calc.getIn(['computed', 'operator'], ''),
       }),
@@ -315,6 +316,7 @@ export default class CalculatorMapping extends Component {
     const { computedLineKey } = this.state;
     this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'line_keys'], computedLineKey.get('line_keys', Immutable.List()));
     this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'operator'], computedLineKey.get('operator', ''));
+    this.props.onSetComputedLineKey([computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'type'], computedLineKey.get('type', ''));
     this.setState({ computedLineKey: null });
   }
 
@@ -329,6 +331,19 @@ export default class CalculatorMapping extends Component {
     });
   }
 
+  onChangeComputedLineKeyType = (e) => {
+    const { value } = e.target;
+    const { computedLineKey } = this.state;
+    const newComputedLineKey = computedLineKey.withMutations((computedLineKeyWithMutations) => {
+      computedLineKeyWithMutations.set('type', value);
+      computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
+      computedLineKeyWithMutations.delete('operator');
+    });
+    this.setState({
+      computedLineKey: newComputedLineKey,
+    });
+  }
+
   renderComputedRatePopup = () => {
     const { computedLineKey } = this.state;
     if (!computedLineKey) {
@@ -337,11 +352,44 @@ export default class CalculatorMapping extends Component {
     const title = 'Computed Rate Key';
     const regexHelper = 'In case you want to run a regular expression on the computed field before calculating the rate';
     const lineKeyOptions = this.getAvailableFields(false, false).toJS();
+    const computedTypeRegex = computedLineKey.get('type', 'regex') === 'regex';
     return (
       <ModalWrapper title={title} show={true} onOk={this.onSaveComputedLineKey} onHide={this.onHideComputedLineKey} labelOk="OK">
         <Form horizontal>
           <FormGroup>
-            <Col sm={3} componentClass={ControlLabel}>First Field</Col>
+            <Col componentClass={ControlLabel} sm={3}>
+              Computation Type
+            </Col>
+            <Col sm={3}>
+              <div className="inline">
+                <Field
+                  fieldType="radio"
+                  name="computed-type"
+                  id="computed-type-regex"
+                  value="regex"
+                  checked={computedTypeRegex}
+                  onChange={this.onChangeComputedLineKeyType}
+                  label="Regex"
+                />
+              </div>
+            </Col>
+            <Col sm={3}>
+              <div className="inline">
+                <Field
+                  fieldType="radio"
+                  name="computed-type"
+                  id="computed-type-condition"
+                  value="condition"
+                  checked={!computedTypeRegex}
+                  onChange={this.onChangeComputedLineKeyType}
+                  label="Condition"
+                />
+              </div>
+            </Col>
+          </FormGroup>
+          <div className="separator" />
+          <FormGroup key="computed-field-2">
+            <Col sm={3} componentClass={ControlLabel}>{computedTypeRegex ? 'Field' : 'First Field' }</Col>
             <Col sm={4}>
               <Select
                 onChange={this.onChangeComputedLineKey(['line_keys', 0, 'key'])}
@@ -363,39 +411,41 @@ export default class CalculatorMapping extends Component {
               <Help contents={regexHelper} />
             </Col>
           </FormGroup>
-          <FormGroup>
-            <Col sm={3} componentClass={ControlLabel}>Operator</Col>
-            <Col sm={4}>
-              <Select
-                onChange={this.onChangeComputedLineKey(['operator'])}
-                value={computedLineKey.get('operator', '')}
-                options={this.getRateConditions()}
-              />
-            </Col>
-          </FormGroup>
-          <FormGroup>
-            <Col sm={3} componentClass={ControlLabel}>Second Field</Col>
-            <Col sm={4}>
-              <Select
-                onChange={this.onChangeComputedLineKey(['line_keys', 1, 'key'])}
-                value={computedLineKey.getIn(['line_keys', 1, 'key'], '')}
-                options={lineKeyOptions}
-              />
-            </Col>
-            <Col sm={4}>
-              <Field
-                value={computedLineKey.getIn(['line_keys', 1, 'regex'], '')}
-                disabledValue={''}
-                onChange={this.onChangeComputedLineKey(['line_keys', 1, 'regex'])}
-                disabled={computedLineKey.getIn(['line_keys', 1, 'key'], '') === ''}
-                label="Regex"
-                fieldType="toggeledInput"
-              />
-            </Col>
-            <Col sm={1}>
-              <Help contents={regexHelper} />
-            </Col>
-          </FormGroup>
+          { !computedTypeRegex &&
+            [(<FormGroup key="computed-operator">
+              <Col sm={3} componentClass={ControlLabel}>Operator</Col>
+              <Col sm={4}>
+                <Select
+                  onChange={this.onChangeComputedLineKey(['operator'])}
+                  value={computedLineKey.get('operator', '')}
+                  options={this.getRateConditions()}
+                />
+              </Col>
+            </FormGroup>),
+            (<FormGroup key="computed-field-2">
+              <Col sm={3} componentClass={ControlLabel}>Second Field</Col>
+              <Col sm={4}>
+                <Select
+                  onChange={this.onChangeComputedLineKey(['line_keys', 1, 'key'])}
+                  value={computedLineKey.getIn(['line_keys', 1, 'key'], '')}
+                  options={lineKeyOptions}
+                />
+              </Col>
+              <Col sm={4}>
+                <Field
+                  value={computedLineKey.getIn(['line_keys', 1, 'regex'], '')}
+                  disabledValue={''}
+                  onChange={this.onChangeComputedLineKey(['line_keys', 1, 'regex'])}
+                  disabled={computedLineKey.getIn(['line_keys', 1, 'key'], '') === ''}
+                  label="Regex"
+                  fieldType="toggeledInput"
+                />
+              </Col>
+              <Col sm={1}>
+                <Help contents={regexHelper} />
+              </Col>
+            </FormGroup>)]
+        }
         </Form>
       </ModalWrapper>
     );

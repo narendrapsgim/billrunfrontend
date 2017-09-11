@@ -7,13 +7,23 @@ const includeGroupsReducer = (state = DefaultState, action) => {
   switch (action.type) {
 
     case ADD_GROUP: {
-      const group = Immutable.Map({
-        [action.usage]: action.value,
-        unit: action.unit,
-        account_shared: action.shared,
-        account_pool: action.pooled,
-        rates: Immutable.List(action.products),
+      const group = Immutable.Map({}).withMutations((groupWithMutations) => {
+        groupWithMutations.set('account_shared', action.shared);
+        groupWithMutations.set('account_pool', action.pooled);
+        groupWithMutations.set('rates', Immutable.List(action.products));
+        if (action.usages.get(0, '') === 'cost') {
+          groupWithMutations.set('cost', action.value);
+        } else {
+          const usageTypes = Immutable.Map().withMutations((usageTypesWithMutations) => {
+            action.usages.forEach((usage) => {
+              usageTypesWithMutations.set(usage, Immutable.Map({ unit: action.unit }));
+            });
+          });
+          groupWithMutations.set('value', action.value);
+          groupWithMutations.set('usage_types', usageTypes);
+        }
       });
+
       return state
         // if groups is empty, server return it as empty array instead of empty object
         // in this case ImmutableJS will fail to set new group at key XYZ on list

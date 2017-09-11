@@ -79,6 +79,13 @@
     "itemType": "usage",
     "itemsType": "usages"
   },
+  "queue": {
+    "collection": "queue",
+    "uniqueField": "stamp",
+    "itemName": "queue",
+    "itemType": "queue",
+    "itemsType": "queues"
+  },
   "logFile": {
     "collection": "log",
     "uniqueField": "stamp",

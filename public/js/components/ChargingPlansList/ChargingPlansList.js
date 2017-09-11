@@ -10,7 +10,6 @@ const ChargingPlansList = () => {
   const tableFields = [
     { id: 'description', title: 'Title', sort: true },
     { id: 'name', title: 'Key', sort: true },
-    { id: 'code', title: 'External Code', sort: true },
     { id: 'operation', title: 'Operation', sort: true },
     { id: 'charging_value', title: 'Charging value', sort: true },
   ];
@@ -20,7 +19,6 @@ const ChargingPlansList = () => {
     description: 1,
     operation: 1,
     name: 1,
-    code: 1,
   };
 
   const actions = [
