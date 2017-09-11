@@ -106,7 +106,6 @@ class Customer extends Component {
     const { customer, payment_gateways } = this.props;
     const hasPaymentGateway = !(customer.getIn(['payment_gateway', 'active'], Immutable.Map()).isEmpty());
     const label = hasPaymentGateway ? this.renderPaymentGatewayLabel() : 'None';
-    const noAvailablePaymentGateways = payment_gateways.isEmpty() ? 'go to setting to enable payment gateways' : '';
     return (
       <FormGroup>
         <Row>
@@ -119,7 +118,6 @@ class Customer extends Component {
               <i className="fa fa-pencil" />
               &nbsp;{hasPaymentGateway ? 'Change' : 'Add'}
             </Button>
-            &nbsp;{noAvailablePaymentGateways}
           </Col>
         </Row>
         <Row>
