@@ -48,11 +48,6 @@ export default class PrepaidPlanDetails extends Component {
     this.props.onChangePlanField(['description'], value);
   }
 
-  onChangeCode = (e) => {
-    const { value } = e.target;
-    this.props.onChangePlanField(['code'], value);
-  }
-
   render() {
     const { errors } = this.state;
     const { item, mode } = this.props;
@@ -83,16 +78,6 @@ export default class PrepaidPlanDetails extends Component {
               </Col>
             </FormGroup>
           }
-
-          <FormGroup>
-            <Col componentClass={ControlLabel} sm={3} lg={2}>
-              External Code
-              <Help contents={PlanDescription.code} />
-            </Col>
-            <Col sm={8} lg={9}>
-              <Field onChange={this.onChangeCode} value={item.get('code', '')} editable={editable} />
-            </Col>
-          </FormGroup>
 
         </Form>
       </div>

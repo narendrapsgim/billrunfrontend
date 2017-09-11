@@ -78,6 +78,7 @@ class CycleData extends Component {
   parseCycleDataLastName = entity => entity.getIn(['attributes', 'lastname'], '');
   parseCycleDataInvoiceTotal = entity => entity.getIn(['totals', 'after_vat_rounded'], '');
   parseCycleDataSubscriptionNum = entity => entity.get('subs', List()).size;
+  parseCycleDataInvoiceId = entity => entity.get('invoice_id');
 
   downloadURL = (aid, billrunKey, invoiceId) =>
     `${getConfig('serverUrl')}/api/accountinvoices?action=download&aid=${aid}&billrun_key=${billrunKey}&iid=${invoiceId}`;
@@ -301,6 +302,7 @@ class CycleData extends Component {
       { id: 'attributes.lastname', title: 'Customer Last Name', sort: true, parser: this.parseCycleDataLastName },
       { id: 'totals.after_vat_rounded', title: 'Invoice Total', parser: this.parseCycleDataInvoiceTotal },
       { id: 'subss', title: '# of Subscribers', parser: this.parseCycleDataSubscriptionNum },
+      { id: 'invoice_id', title: 'Invoice ID', parser: this.parseCycleDataInvoiceId },
       { id: 'download', title: 'Invoice', parser: this.parseCycleDataDownload },
       { id: 'confirm', title: 'Confirm', parser: this.parseCycleDataConfirm },
     ];

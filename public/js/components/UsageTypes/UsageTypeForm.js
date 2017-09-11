@@ -39,7 +39,7 @@ const UsageTypeForm = (props) => {
   const uom = getAvailableUom();
 
   return (
-    <ModalWrapper title="Activity Type" show={true} onOk={onSave} onCancel={onCancel} labelOk="Save" >
+    <ModalWrapper title="Activity Type" show={true} onOk={onSave} onCancel={onCancel} labelOk="OK" >
       <Form horizontal>
 
         <FormGroup>

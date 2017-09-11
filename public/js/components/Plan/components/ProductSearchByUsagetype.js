@@ -11,20 +11,21 @@ export default class ProductSearchByUsagetype extends Component {
     disabled: false,
     existingProducts: Immutable.List(),
     products: Immutable.List(),
+    usages: Immutable.List(),
   }
 
   static propTypes = {
     onChangeGroupRates: React.PropTypes.func.isRequired,
-    usaget: React.PropTypes.string.isRequired,
+    usages: React.PropTypes.instanceOf(Immutable.List),
     disabled: React.PropTypes.bool,
     existingProducts: React.PropTypes.instanceOf(Immutable.List),
     products: React.PropTypes.instanceOf(Immutable.List),
   }
 
   shouldComponentUpdate(nextProps) {
-    const { disabled, usaget, existingProducts, products } = this.props;
+    const { disabled, usages, existingProducts, products } = this.props;
     return (nextProps.disabled !== disabled
-          || nextProps.usaget !== usaget
+          || !Immutable.is(nextProps.usages, usages)
           || !Immutable.is(nextProps.existingProducts, existingProducts)
           || nextProps.products !== products
     );
@@ -36,9 +37,9 @@ export default class ProductSearchByUsagetype extends Component {
   }
 
   findGroupRates = () => {
-    const { usaget, existingProducts } = this.props;
+    const { usages, existingProducts } = this.props;
     const notKeys = existingProducts.toArray();
-    const query = searchProductsByKeyAndUsagetQuery(usaget, notKeys);
+    const query = searchProductsByKeyAndUsagetQuery(usages.toArray(), notKeys);
     return apiBillRun(query)
       .then((success) => {
         const uniqueKeys = [...new Set(success.data[0].data.details.map(option => option.key))];
@@ -54,8 +55,8 @@ export default class ProductSearchByUsagetype extends Component {
   }
 
   render() {
-    const { disabled, usaget, products } = this.props;
-    if (typeof usaget === 'undefined') {
+    const { disabled, usages, products } = this.props;
+    if (typeof usages === 'undefined') {
       return null;
     }
     const product = products.join(',');

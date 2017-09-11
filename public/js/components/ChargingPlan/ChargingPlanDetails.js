@@ -49,11 +49,6 @@ export default class ChargingPlanDetails extends Component {
     this.props.onChangeField(['description'], value);
   }
 
-  onChangeCode = (e) => {
-    const { value } = e.target;
-    this.props.onChangeField(['code'], value);
-  }
-
   onChangeOperation = (value) => {
     this.props.onChangeField(['operation'], value);
   }
@@ -99,16 +94,6 @@ export default class ChargingPlanDetails extends Component {
               </Col>
             </FormGroup>
           }
-
-          <FormGroup>
-            <Col componentClass={ControlLabel} sm={3} lg={2}>
-              External Code
-              <Help contents={PlanDescription.code} />
-            </Col>
-            <Col sm={8} lg={9}>
-              <Field onChange={this.onChangeCode} value={item.get('code', '')} editable={editable} />
-            </Col>
-          </FormGroup>
 
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2}>Operation</Col>
