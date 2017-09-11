@@ -306,28 +306,32 @@ export default class FieldsMapping extends Component {
         </div>
         <div className="form-group">
           <div className="col-lg-offset-3 col-lg-7">
-            <div className="col-lg-offset-1 col-lg-10">
+            <div className="col-lg-offset-1 col-lg-12">
               <div className="col-lg-3">
                 <strong>Input Value</strong>
               </div>
-              <div className="col-lg-3">
-                <strong>Usage Type</strong>
-              </div>
-              <div className="col-lg-4">
-                <strong>Unit</strong>
+              <div className="col-lg-8 pl0 pr0">
+                <div className="col-lg-7">
+                  <strong>Usage Type</strong>
+                </div>
+                <div className="col-lg-5">
+                  <strong>Unit</strong>
+                </div>
               </div>
             </div>
           </div>
         </div>
-            {
+        {
               settings.getIn(['processor', 'usaget_mapping'], Immutable.List()).map((usage_t, key) => (
                 <div className="form-group" key={key}>
                   <div className="col-lg-offset-3 col-lg-7">
-                    <div className="col-lg-offset-1 col-lg-10">
+                    <div className="col-lg-offset-1 col-lg-12">
                       <div className="col-lg-3">{usage_t.get('pattern', '')}</div>
-                      <div className="col-lg-3">{usage_t.get('usaget', '')}</div>
-                      <div className="col-lg-3"> {getUnitLabel(propertyTypes, usageTypesData, usage_t.get('usaget', ''), usage_t.get('unit', ''))}</div>
-                      <div className="col-lg-2">
+                      <div className="col-lg-8">
+                        <div className="col-lg-7 pl0 pr0">{usage_t.get('usaget', '')}</div>
+                        <div className="col-lg-5"> {getUnitLabel(propertyTypes, usageTypesData, usage_t.get('usaget', ''), usage_t.get('unit', ''))}</div>
+                      </div>
+                      <div className="col-lg-1">
                         <button type="button"
                                 className="btn btn-default btn-sm"
                                 disabled={settings.get('usaget_type', '') !== "dynamic"}
@@ -346,7 +350,7 @@ export default class FieldsMapping extends Component {
               <div className="col-lg-3">
                 <input className="form-control"
                        onChange={this.onChangePattern}
-                       disabled={settings.get('usaget_type', '') !== "dynamic"}
+                       disabled={settings.get('usaget_type', '') !== 'dynamic'}
                        value={this.state.pattern} />
               </div>
               <div className="col-lg-8">
