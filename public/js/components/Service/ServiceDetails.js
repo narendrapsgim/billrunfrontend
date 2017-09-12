@@ -137,7 +137,7 @@ export default class ServiceDetails extends Component {
                   onChange={this.onChangeServicePeriodType}
                   name="service_period_type"
                   value="default"
-                  label="Cycle"
+                  label="Cycle (Periodic)"
                   checked={isByCycles}
                 />
               </span>
@@ -147,7 +147,7 @@ export default class ServiceDetails extends Component {
                   onChange={this.onChangeServicePeriodType}
                   name="service_period_type"
                   value="custom_period"
-                  label="Custom Period"
+                  label="Custom Period (Specific)"
                   checked={!isByCycles}
                 />
               </span>
@@ -158,7 +158,7 @@ export default class ServiceDetails extends Component {
         {(!isByCycles) &&
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2} >
-              {!['clone', 'create'].includes(mode) && 'Custom Period'}
+              {!['clone', 'create'].includes(mode) && 'Custom Period (Specific)'}
             </Col>
             <Col sm={4}>
               <InputGroup>
@@ -189,7 +189,7 @@ export default class ServiceDetails extends Component {
 
         {(isByCycles) &&
           <FormGroup>
-            <Col componentClass={ControlLabel} sm={3} lg={2} >{!['clone', 'create'].includes(mode) && 'Cycles'}</Col>
+            <Col componentClass={ControlLabel} sm={3} lg={2} >{!['clone', 'create'].includes(mode) && 'Cycle (Periodic)'}</Col>
             <Col sm={4}>
               <Field
                 disabled={!isByCycles}
