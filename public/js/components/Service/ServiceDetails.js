@@ -128,7 +128,7 @@ export default class ServiceDetails extends Component {
         {['clone', 'create'].includes(mode) &&
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2}>
-              Align to <span className="danger-red"> *</span>
+              Eligibility Period <span className="danger-red"> *</span>
             </Col>
             <Col sm={8} lg={9}>
               <span style={{ display: 'inline-block', marginRight: 20 }}>
@@ -137,7 +137,7 @@ export default class ServiceDetails extends Component {
                   onChange={this.onChangeServicePeriodType}
                   name="service_period_type"
                   value="default"
-                  label="Cycle (Periodic)"
+                  label="No. of Cycles"
                   checked={isByCycles}
                 />
               </span>
@@ -147,7 +147,7 @@ export default class ServiceDetails extends Component {
                   onChange={this.onChangeServicePeriodType}
                   name="service_period_type"
                   value="custom_period"
-                  label="Custom Period (Specific)"
+                  label="Custom"
                   checked={!isByCycles}
                 />
               </span>
@@ -158,7 +158,7 @@ export default class ServiceDetails extends Component {
         {(!isByCycles) &&
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2} >
-              {!['clone', 'create'].includes(mode) && 'Custom Period (Specific)'}
+              {!['clone', 'create'].includes(mode) && 'Custom Period'}
             </Col>
             <Col sm={4}>
               <InputGroup>
@@ -189,7 +189,9 @@ export default class ServiceDetails extends Component {
 
         {(isByCycles) &&
           <FormGroup>
-            <Col componentClass={ControlLabel} sm={3} lg={2} >{!['clone', 'create'].includes(mode) && 'Cycle (Periodic)'}</Col>
+            <Col componentClass={ControlLabel} sm={3} lg={2} >
+              {!['clone', 'create'].includes(mode) && 'No. of Cycles'}
+            </Col>
             <Col sm={4}>
               <Field
                 disabled={!isByCycles}
