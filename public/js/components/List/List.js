@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { titleCase } from 'change-case';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 import { Button } from 'react-bootstrap';
-import Actions from '../Elements/Actions';
+import { Actions, ZoneDate }  from '../Elements';
 
 /* ACTIONS */
 import { titlize } from '../../common/Util';
@@ -39,7 +39,7 @@ class List extends Component {
   displayByType(field, entity) {
     switch (field.type) {
       case 'date':
-        return moment(entity.get(field.id, 0)).format(globalSetting.dateFormat);
+        return <ZoneDate value={moment(entity.get(field.id, 0))} format={globalSetting.dateFormat} />;
       case 'time':
         return moment(entity.get(field.id, 0)).format(globalSetting.timeFormat);
       case 'datetime':
