@@ -46,6 +46,8 @@ import {
   setRealtimeField,
   setRealtimeDefaultField,
   addRatingField,
+  addRatingPriorityField,
+  removeRatingPriorityField,
   removeRatingField,
  } from '../../actions/inputProcessorActions';
 import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
@@ -311,7 +313,7 @@ class InputProcessor extends Component {
 
   onSetRating = (e) => {
     const { customRatingFields } = this.props;
-    const { dataset: { usaget, rate_key, index }, value, custom } = e.target;
+    const { dataset: { usaget, rate_key, priority, index }, value, custom } = e.target;
     let rateKey = rate_key;
     const isNewField = custom && (rateKey !== '') && customRatingFields.find(field => field.get('field_name', '') === rateKey) === undefined;
     if (isNewField) {
@@ -319,30 +321,38 @@ class InputProcessor extends Component {
       rateKey = `params.${changeCase.snakeCase(title)}`;
       this.addNewRatingCustomField(rateKey, title, value);
     }
-    this.props.dispatch(setRatingField(usaget, parseInt(index), rateKey, value));
+    this.props.dispatch(setRatingField(usaget, priority, parseInt(index), rateKey, value));
   }
 
   onAddRating = (e) => {
-    const { dataset: { usaget } } = e.target;
-    this.props.dispatch(addRatingField(usaget));
+    const { dataset: { usaget, priority } } = e.target;
+    this.props.dispatch(addRatingField(usaget, priority));
+  }
+
+  onAddRatingPriority = (usaget) => {
+    this.props.dispatch(addRatingPriorityField(usaget));
+  }
+
+  onRemoveRatingPriority = (usaget, priority) => {
+    this.props.dispatch(removeRatingPriorityField(usaget, priority));
   }
 
   onRemoveRating = (e) => {
-    const { dataset: { usaget, index } } = e.target;
-    this.props.dispatch(removeRatingField(usaget, parseInt(index, 10)));
+    const { dataset: { usaget, priority, index } } = e.target;
+    this.props.dispatch(removeRatingField(usaget, priority, index));
   }
 
   onSetLineKey = (e) => {
-    const { dataset: { usaget, index }, value } = e.target;
-    this.props.dispatch(setLineKey(usaget, parseInt(index, 10), value));
+    const { dataset: { usaget, index, priority }, value } = e.target;
+    this.props.dispatch(setLineKey(usaget, priority, index, value));
   }
 
   onSetComputedLineKey = (paths, values) => {
     this.props.dispatch(setComputedLineKey(paths, values));
   }
 
-  onUnsetComputedLineKey = (usaget, index) => {
-    this.props.dispatch(unsetComputedLineKey(usaget, index));
+  onUnsetComputedLineKey = (usaget, priority, index) => {
+    this.props.dispatch(unsetComputedLineKey(usaget, priority, index));
   }
 
   onSetReceiverField = (e) => {
@@ -513,6 +523,8 @@ class InputProcessor extends Component {
           onUnsetComputedLineKey={this.onUnsetComputedLineKey}
           onSetCustomerMapping={this.onSetCustomerMapping}
           onAddRating={this.onAddRating}
+          onAddRatingPriority={this.onAddRatingPriority}
+          onRemoveRatingPriority={this.onRemoveRatingPriority}
           onRemoveRating={this.onRemoveRating}
         />
       );

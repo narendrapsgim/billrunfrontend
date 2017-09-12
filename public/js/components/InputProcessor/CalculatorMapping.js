@@ -14,6 +14,8 @@ export default class CalculatorMapping extends Component {
     onSetComputedLineKey: PropTypes.func.isRequired,
     onUnsetComputedLineKey: PropTypes.func.isRequired,
     onAddRating: PropTypes.func.isRequired,
+    onAddRatingPriority: PropTypes.func.isRequired,
+    onRemoveRatingPriority: PropTypes.func.isRequired,
     onSetRating: PropTypes.func.isRequired,
     onRemoveRating: PropTypes.func.isRequired,
     settings: PropTypes.instanceOf(Immutable.Map),
@@ -28,6 +30,7 @@ export default class CalculatorMapping extends Component {
 
   state = {
     computedLineKey: null,
+    openRateCalculators: [0],
   };
 
   componentDidMount = () => {
@@ -57,12 +60,13 @@ export default class CalculatorMapping extends Component {
     { value: 'longestPrefix', label: 'Longest Prefix' },
   ]);
 
-  onChangeAdditionalParamRating = (usaget, index, type, value) => {
+  onChangeAdditionalParamRating = (usaget, priority, index, type, value) => {
     const eModified = {
       target: {
         dataset: {
           rate_key: value,
           usaget,
+          priority,
           index,
         },
         value: type,
@@ -72,8 +76,8 @@ export default class CalculatorMapping extends Component {
     this.props.onSetRating(eModified);
   }
 
-  onChangeAdditionalParamRatingType = (value, usaget, index, type) => {
-    this.onChangeAdditionalParamRating(usaget, index, type, value);
+  onChangeAdditionalParamRatingType = (value, usaget, priority, index, type) => {
+    this.onChangeAdditionalParamRating(usaget, priority, index, type, value);
   }
 
   onSetCustomerMapping = (index, e) => {
@@ -116,20 +120,21 @@ export default class CalculatorMapping extends Component {
   }
 
   onChangeLineKey = (e) => {
-    const { dataset: { usaget, index }, value } = e.target;
+    const { dataset: { usaget, index, priority }, value } = e.target;
     if (value === 'computed') {
-      this.setState({ computedLineKey: Immutable.Map({ usaget, index }) });
+      this.setState({ computedLineKey: Immutable.Map({ usaget, priority, index }) });
     } else {
       this.setState({ computedLineKey: null });
-      this.props.onUnsetComputedLineKey(usaget, index);
+      this.props.onUnsetComputedLineKey(usaget, priority, index);
     }
     this.props.onSetLineKey(e);
   }
 
-  onEditComputedLineKey = (calc, usaget, index) => () => {
+  onEditComputedLineKey = (calc, usaget, priority, index) => () => {
     this.setState({
       computedLineKey: Immutable.Map({
         usaget,
+        priority,
         index,
         type: calc.getIn(['computed', 'type'], 'regex'),
         line_keys: calc.getIn(['computed', 'line_keys'], Immutable.List()),
@@ -151,7 +156,7 @@ export default class CalculatorMapping extends Component {
     });
   }
 
-  renderComputedLineKeyDesc = (calc, usaget, index) => {
+  renderComputedLineKeyDesc = (calc, usaget, priority, index) => {
     if (calc.get('line_key', '') !== 'computed') {
       return null;
     }
@@ -161,7 +166,7 @@ export default class CalculatorMapping extends Component {
       <h4>
         <small>
           {`${calc.getIn(['computed', 'line_keys', 0, 'key'], '')} ${opLabel} ${calc.getIn(['computed', 'line_keys', 1, 'key'], '')}`}
-          <Button onClick={this.onEditComputedLineKey(calc, usaget, index)} bsStyle="link">
+          <Button onClick={this.onEditComputedLineKey(calc, usaget, priority, index)} bsStyle="link">
             <i className="fa fa-fw fa-pencil" />
           </Button>
         </small>
@@ -169,10 +174,63 @@ export default class CalculatorMapping extends Component {
     );
   }
 
+  openRateCalculator = priority => () => {
+    const { openRateCalculators } = this.state;
+    openRateCalculators.push(priority);
+    this.setState({ openRateCalculators });
+  }
+
+  closeRateCalculator = priority => () => {
+    const { openRateCalculators } = this.state;
+    openRateCalculators.splice(openRateCalculators.indexOf(priority), 1);
+    this.setState({ openRateCalculators });
+  }
+
+  onAddRatingPriority = usaget => () => {
+    this.openRateCalculator(this.rateCalculatorsForUsaget(usaget).size)();
+    this.props.onAddRatingPriority(usaget);
+  }
+
+  onRemoveRatingPriority = (usaget, priority) => () => {
+    this.props.onRemoveRatingPriority(usaget, priority);
+  }
+
   getRateCalculators = (usaget) => {
+    const { openRateCalculators } = this.state;
+    const noRemoveStyle = { paddingLeft: 45 };
+    return this.rateCalculatorsForUsaget(usaget).map((calcs, priority) => {
+      const showRemove = priority > 0;
+      const actionsStyle = showRemove ? {} : noRemoveStyle;
+      return (
+        <div key={`rate-calculator-${usaget}-${priority}`}>
+          <Row>
+            <Col sm={10} />
+            <Col sm={2} style={actionsStyle}>
+              { showRemove && this.getRemoveRatingPriorityButton(usaget, priority) }
+              {
+                openRateCalculators.includes(priority)
+                ? (<Button onClick={this.closeRateCalculator(priority)} bsStyle="link">
+                  <i className="fa fa-fw fa-minus" />
+                </Button>)
+                : (<Button onClick={this.openRateCalculator(priority)} bsStyle="link">
+                  <i className="fa fa-fw fa-plus" />
+                </Button>)
+              }
+            </Col>
+          </Row>
+          <Panel collapsible expanded={this.state.openRateCalculators.includes(priority)}>
+            { this.getRateCalculatorsForPriority(usaget, priority, calcs) }
+            { this.getAddRatingButton(usaget, priority) }
+          </Panel>
+        </div>
+      );
+    }).toArray();
+  }
+
+  getRateCalculatorsForPriority = (usaget, priority, calcs) => {
     const { onSetRating, onRemoveRating } = this.props;
     const availableFields = this.getRateCalculatorFields();
-    return this.rateCalculatorsForUsaget(usaget).map((calc, calcKey) => {
+    return calcs.map((calc, calcKey) => {
       let selectedRadio = 3;
       if (calc.get('rate_key', '') === 'key') {
         selectedRadio = 1;
@@ -190,11 +248,12 @@ export default class CalculatorMapping extends Component {
                   onChange={this.onChangeLineKey}
                   data-usaget={usaget}
                   data-index={calcKey}
+                  data-priority={priority}
                   value={calc.get('line_key', '')}
                 >
                   { availableFields }
                 </select>
-                { this.renderComputedLineKeyDesc(calc, usaget, calcKey) }
+                { this.renderComputedLineKeyDesc(calc, usaget, priority, calcKey) }
               </FormGroup>
             </Col>
 
@@ -202,31 +261,33 @@ export default class CalculatorMapping extends Component {
               <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
                 <input
                   type="radio"
-                  name={`${usaget}-${calcKey}-type`}
-                  id={`${usaget}-${calcKey}-by-rate-key`}
+                  name={`${usaget}-${priority}-${calcKey}-type`}
+                  id={`${usaget}-${priority}-${calcKey}-by-rate-key`}
                   value="match"
                   data-usaget={usaget}
                   data-rate_key="key"
                   data-index={calcKey}
+                  data-priority={priority}
                   checked={selectedRadio === 1}
                   onChange={onSetRating}
                 />&nbsp;
-                <label htmlFor={`${usaget}-${calcKey}-by-rate-key`} style={{ verticalAlign: 'middle' }}>By product key</label>
+                <label htmlFor={`${usaget}-${priority}-${calcKey}-by-rate-key`} style={{ verticalAlign: 'middle' }}>By product key</label>
               </FormGroup>
 
               <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
                 <input
                   type="radio"
-                  name={`${usaget}-${calcKey}-type`}
-                  id={`${usaget}-${calcKey}-by-rate-usaget`}
+                  name={`${usaget}-${priority}-${calcKey}-type`}
+                  id={`${usaget}-${priority}-${calcKey}-by-rate-usaget`}
                   value="match"
                   data-usaget={usaget}
                   data-rate_key="usaget"
                   data-index={calcKey}
+                  data-priority={priority}
                   checked={selectedRadio === 2}
                   onChange={onSetRating}
                 />&nbsp;
-                <label htmlFor={`${usaget}-${calcKey}-by-rate-usaget`} style={{ verticalAlign: 'middle' }}>By product unit type</label>
+                <label htmlFor={`${usaget}-${priority}-${calcKey}-by-rate-usaget`} style={{ verticalAlign: 'middle' }}>By product unit type</label>
               </FormGroup>
 
               <FormGroup style={{ margin: 0 }}>
@@ -234,28 +295,29 @@ export default class CalculatorMapping extends Component {
                   <div className="input-group-addon">
                     <input
                       type="radio"
-                      name={`${usaget}-${calcKey}-type`}
-                      id={`${usaget}-${calcKey}-by-param`}
+                      name={`${usaget}-${priority}-${calcKey}-type`}
+                      id={`${usaget}-${priority}-${calcKey}-by-param`}
                       value="match"
                       data-usaget={usaget}
                       checked={selectedRadio === 3}
                       data-rate_key=""
                       data-index={calcKey}
+                      data-priority={priority}
                       onChange={onSetRating}
                     />&nbsp;
-                    <label htmlFor={`${usaget}-${calcKey}-by-param`} style={{ verticalAlign: 'middle' }}>By product param</label>
+                    <label htmlFor={`${usaget}-${priority}-${calcKey}-by-param`} style={{ verticalAlign: 'middle' }}>By product param</label>
                     <Help contents="This field needs to be configured in the 'Additional Parameters' of a Product" />
                   </div>
                   <Select
-                    id={`${usaget}-${calcKey}-by-param-name`}
-                    onChange={this.onChangeAdditionalParamRating.bind(this, usaget, calcKey, calc.get('type', ''))}
+                    id={`${usaget}-${priority}-${calcKey}-by-param-name`}
+                    onChange={this.onChangeAdditionalParamRating.bind(this, usaget, priority, calcKey, calc.get('type', ''))}
                     value={selectedRadio !== 3 ? '' : calc.get('rate_key', '')}
                     options={this.getCustomRatingFields()}
                     allowCreate
                   />
                   <Select
-                    id={`${usaget}-${calcKey}-by-param-name-type`}
-                    onChange={this.onChangeAdditionalParamRatingType.bind(this, calc.get('rate_key', ''), usaget, calcKey)}
+                    id={`${usaget}-${priority}-${calcKey}-by-param-name-type`}
+                    onChange={this.onChangeAdditionalParamRatingType.bind(this, calc.get('rate_key', ''), usaget, priority, calcKey)}
                     value={selectedRadio !== 3 ? '' : calc.get('type', '')}
                     options={this.getRatingTypes()}
                   />
@@ -269,7 +331,7 @@ export default class CalculatorMapping extends Component {
               { calcKey > 0 &&
                 <FormGroup style={{ margin: 0 }}>
                   <div style={{ width: '100%', height: 39 }}>
-                    <Button onClick={onRemoveRating} data-usaget={usaget} data-index={calcKey} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+                    <Button onClick={onRemoveRating} data-usaget={usaget} data-index={calcKey} data-priority={priority} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
                   </div>
                 </FormGroup>
               }
@@ -281,7 +343,38 @@ export default class CalculatorMapping extends Component {
     });
   }
 
-  getAddRatingButton = usaget => (<Button bsSize="xsmall" className="btn-primary" data-usaget={usaget} onClick={this.props.onAddRating}><i className="fa fa-plus" />&nbsp;Add</Button>);
+  getAddRatingButton = (usaget, priority) => (
+    <Button
+      bsSize="xsmall"
+      className="btn-primary"
+      data-usaget={usaget}
+      data-priority={priority}
+      onClick={this.props.onAddRating}
+    >
+      <i className="fa fa-plus" />&nbsp;Add
+    </Button>
+  );
+
+  getAddRatingPriorityButton = usaget => (
+    <Button
+      bsSize="xsmall"
+      className="btn-primary"
+      onClick={this.onAddRatingPriority(usaget)}
+    >
+      <i className="fa fa-plus" />&nbsp;Add Next Rating
+    </Button>
+  );
+
+  getRemoveRatingPriorityButton = (usaget, priority) => (
+    <Button
+      bsStyle="link"
+      bsSize="xsmall"
+      onClick={this.onRemoveRatingPriority(usaget, priority)}
+    >
+      <i className="fa fa-fw fa-trash-o danger-red" />
+    </Button>
+  );
+
   rateCalculatorsForUsaget = usaget => (this.props.settings.getIn(['rate_calculators', usaget], Immutable.List()));
 
   renderCustomerIdentification = () => {
@@ -327,12 +420,13 @@ export default class CalculatorMapping extends Component {
 
   onSaveComputedLineKey = () => {
     const { computedLineKey } = this.state;
+    const basePath = [computedLineKey.get('usaget'), computedLineKey.get('priority'), computedLineKey.get('index'), 'computed'];
     const paths = [
-      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'line_keys'],
-      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'operator'],
-      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'type'],
-      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'must_met'],
-      [computedLineKey.get('usaget'), computedLineKey.get('index'), 'computed', 'projection'],
+      [...basePath, 'line_keys'],
+      [...basePath, 'operator'],
+      [...basePath, 'type'],
+      [...basePath, 'must_met'],
+      [...basePath, 'projection'],
     ];
     const values = [
       computedLineKey.get('line_keys', Immutable.List()),
@@ -629,10 +723,8 @@ export default class CalculatorMapping extends Component {
                   <i className="fa fa-long-arrow-right" />
                 </div>
                 <div className="col-lg-11">
-                  <Panel>
-                    { this.getRateCalculators(usaget) }
-                    { this.getAddRatingButton(usaget) }
-                  </Panel>
+                  { this.getRateCalculators(usaget) }
+                  { this.getAddRatingPriorityButton(usaget) }
                 </div>
               </div>
             </div>
