@@ -9,18 +9,20 @@ class ZoneDate extends Component {
 
   static propTypes = {
     value: PropTypes.object.isRequired,
-    format:PropTypes.string
+    format:PropTypes.string,
+    emptyValue: PropTypes.node,
   };
 
   static defaultProps = {
     value: moment(),
     format: globalSetting.dateFormat,
+    emptyValue: '-',
   };
 
   render( ) {
-    const { value, format, timezone } = this.props;
+    const { value, format, timezone, emptyValue } = this.props;
 
-    const date =  !value ?  '-' : moment(value).tz(timezone).format(format)
+    const date =  !value ? emptyValue : moment(value).tz(timezone).format(format)
     return (
     <span>
       {date}
