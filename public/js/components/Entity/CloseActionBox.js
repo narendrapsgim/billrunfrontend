@@ -128,7 +128,7 @@ class CloseActionBox extends Component {
             onChange={this.onChangeFrom}
             isClearable={true}
             placeholderText="Select Date..."
-            minDate={minDate}
+            minDate={minDate.add(1,'days')}
             highlightDates={highlightDates}
             dayClassName={this.dayDateClass}
           />

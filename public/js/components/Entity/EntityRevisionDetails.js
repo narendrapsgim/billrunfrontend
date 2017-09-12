@@ -11,6 +11,7 @@ import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
 import { getSettings } from '../../actions/settingsActions';
 import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 import { entityMinFrom } from '../../selectors/entitySelector';
+import { ZoneDate } from '../Elements';
 import { minEntityDateSelector } from '../../selectors/settingsSelector';
 
 
@@ -178,12 +179,14 @@ class EntityRevisionDetails extends Component {
   }
 
   renderDateViewBlock = () => {
-    const { item } = this.props;
-    const from = getItemDateValue(item, 'originalValue').format(getConfig('dateFormat', 'DD/MM/YYYY'));
-    const to = getItemDateValue(item, 'to').format(getConfig('dateFormat', 'DD/MM/YYYY'));
+    const { item, timezone } = this.props;
+
+    const from = getItemDateValue(item, 'originalValue');
+    const to = getItemDateValue(item, 'to').subtract(1,'seconds');
+    const format = getConfig('dateFormat', 'DD/MM/YYYY');
     return (
       <div className="inline" style={{ width: 190, padding: 0, margin: '9px 10px 0 10px' }}>
-        <p style={{ lineHeight: '32px' }}>{`${from} - ${to}`}</p>
+        <p style={{ lineHeight: '32px' }}><ZoneDate value={from} format={format} /> - <ZoneDate value={to} format={format} /></p>
       </div>
     );
   }
@@ -192,11 +195,11 @@ class EntityRevisionDetails extends Component {
     const { item } = this.props;
     if (moment.isMoment(newDate) && newDate.isValid()) {
       const tommorow = moment().add(1, 'day');
-      const from = getItemDateValue(item, 'from');
+      const from = getItemDateBaseValue(item, 'from');
       const selectedValue = newDate.isSame(from, 'day') ? tommorow : newDate;
       this.onChangeFrom(selectedValue);
     } else {
-      const originFrom = getItemDateValue(item, 'originalValue');
+      const originFrom = getItemDateBaseValue(item, 'originalValue');
       this.onChangeFrom(originFrom);
     }
   }
@@ -326,6 +329,7 @@ class EntityRevisionDetails extends Component {
 const mapStateToProps = (state, props) => ({
   minFrom: entityMinFrom(state, props),
   dangerousFrom: minEntityDateSelector(state, props),
+  timezone: state.settings.getIn([ 'billrun','timezone'])
 });
 
 export default withRouter(connect(mapStateToProps)(EntityRevisionDetails));
