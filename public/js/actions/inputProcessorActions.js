@@ -21,6 +21,8 @@ export const REMOVE_CSV_FIELD = 'REMOVE_CSV_FIELD';
 export const REMOVE_USAGET_MAPPING = 'REMOVE_USAGET_MAPPING';
 export const SET_USAGET_TYPE = 'SET_USAGET_TYPE';
 export const SET_LINE_KEY = 'SET_LINE_KEY';
+export const SET_COMPUTED_LINE_KEY = 'SET_COMPUTED_LINE_KEY';
+export const UNSET_COMPUTED_LINE_KEY = 'UNSET_COMPUTED_LINE_KEY';
 export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
 export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
 export const SET_INPUT_PROCESSOR_TEMPLATE = 'SET_INPUT_PROCESSOR_TEMPLATE';
@@ -306,6 +308,22 @@ export function setLineKey(usaget, index, value) {
   };
 }
 
+export function setComputedLineKey(path, value) {
+  return {
+    type: SET_COMPUTED_LINE_KEY,
+    path,
+    value,
+  };
+}
+
+export function unsetComputedLineKey(usaget, index) {
+  return {
+    type: UNSET_COMPUTED_LINE_KEY,
+    usaget,
+    index,
+  };
+}
+
 export function setReceiverField(field, mapping) {
   return {
     type: SET_RECEIVER_FIELD,
@@ -357,6 +375,7 @@ export function saveInputProcessorSettings(state, parts = []) {
       type: (settings.type === 'realtime' ? 'Realtime' : 'Usage'),
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
+      "aprice_field": processor.get('aprice_field'),
       ...processor_settings
     };
     if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');

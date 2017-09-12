@@ -196,7 +196,7 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Usage Types" eventKey={7}>
+          <Tab title="Activity Types" eventKey={7}>
             <Panel style={{ borderTop: 'none' }}>
               <UsageTypes />
             </Panel>

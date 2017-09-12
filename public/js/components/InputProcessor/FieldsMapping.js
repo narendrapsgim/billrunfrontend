@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Select from 'react-select';
+import Field from '../Field';
+import Help from '../Help';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
 import { getUnitLabel } from '../../common/Util';
 
@@ -120,6 +122,20 @@ export default class FieldsMapping extends Component {
     this.props.onSetFieldMapping(e);
   }
 
+  onChangeApriceField = (value) => {
+    const e = {
+      target: {
+        value,
+        id: 'aprice_field',
+      },
+    };
+    this.props.onSetFieldMapping(e);
+  }
+
+  onChangeApriceExists = () => {
+    this.onChangeApriceField(undefined);
+  }
+
   render() {
     const { separateTime, usaget, unit } = this.state;
     const { settings,
@@ -144,6 +160,13 @@ export default class FieldsMapping extends Component {
     })).toArray();
     const volume = settings.getIn(['processor', 'volume_field'], Immutable.List());
     const volumeList = (typeof volume === 'string') ? volume : volume.join(',');
+    const aprice = settings.getIn(['processor', 'aprice_field'], null);
+    const apriceInputProps = {
+      fieldType: 'select',
+      placeholder: 'Select price field...',
+      options: volumeOptions,
+      onChange: this.onChangeApriceField,
+    };
 
     return (
       <form className="form-horizontal FieldsMapping">
@@ -208,6 +231,22 @@ export default class FieldsMapping extends Component {
               />
             </div>
           </div>
+          <div className="form-group">
+            <div className="col-lg-offset-3 col-lg-9">
+              <div className="col-lg-offset-1 col-lg-9">
+                <Field
+                  fieldType="toggeledInput"
+                  value={aprice}
+                  onChange={this.onChangeApriceExists}
+                  label="Pre priced"
+                  inputProps={apriceInputProps}
+                />
+              </div>
+              <div className="col-lg-1">
+                <Help contents="In case the or pre-priced, the price will not be calculated" />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="separator" />
         <div className="form-group">
@@ -267,28 +306,32 @@ export default class FieldsMapping extends Component {
         </div>
         <div className="form-group">
           <div className="col-lg-offset-3 col-lg-7">
-            <div className="col-lg-offset-1 col-lg-10">
+            <div className="col-lg-offset-1 col-lg-12">
               <div className="col-lg-3">
                 <strong>Input Value</strong>
               </div>
-              <div className="col-lg-3">
-                <strong>Usage Type</strong>
-              </div>
-              <div className="col-lg-4">
-                <strong>Unit</strong>
+              <div className="col-lg-8 pl0 pr0">
+                <div className="col-lg-7">
+                  <strong>Usage Type</strong>
+                </div>
+                <div className="col-lg-5">
+                  <strong>Unit</strong>
+                </div>
               </div>
             </div>
           </div>
         </div>
-            {
+        {
               settings.getIn(['processor', 'usaget_mapping'], Immutable.List()).map((usage_t, key) => (
                 <div className="form-group" key={key}>
                   <div className="col-lg-offset-3 col-lg-7">
-                    <div className="col-lg-offset-1 col-lg-10">
+                    <div className="col-lg-offset-1 col-lg-12">
                       <div className="col-lg-3">{usage_t.get('pattern', '')}</div>
-                      <div className="col-lg-3">{usage_t.get('usaget', '')}</div>
-                      <div className="col-lg-3"> {getUnitLabel(propertyTypes, usageTypesData, usage_t.get('usaget', ''), usage_t.get('unit', ''))}</div>
-                      <div className="col-lg-2">
+                      <div className="col-lg-8">
+                        <div className="col-lg-7 pl0 pr0">{usage_t.get('usaget', '')}</div>
+                        <div className="col-lg-5"> {getUnitLabel(propertyTypes, usageTypesData, usage_t.get('usaget', ''), usage_t.get('unit', ''))}</div>
+                      </div>
+                      <div className="col-lg-1">
                         <button type="button"
                                 className="btn btn-default btn-sm"
                                 disabled={settings.get('usaget_type', '') !== "dynamic"}
@@ -307,7 +350,7 @@ export default class FieldsMapping extends Component {
               <div className="col-lg-3">
                 <input className="form-control"
                        onChange={this.onChangePattern}
-                       disabled={settings.get('usaget_type', '') !== "dynamic"}
+                       disabled={settings.get('usaget_type', '') !== 'dynamic'}
                        value={this.state.pattern} />
               </div>
               <div className="col-lg-8">

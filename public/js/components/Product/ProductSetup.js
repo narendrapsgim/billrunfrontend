@@ -148,6 +148,10 @@ class ProductSetup extends Component {
     this.props.dispatch(clearRevisions('rates', key));
   }
 
+  clearItemsList = () => {
+    this.props.dispatch(clearItems('products'));
+  }
+
   onFieldUpdate = (path, value) => {
     this.props.dispatch(onFieldUpdate(path, value));
   }
@@ -194,7 +198,7 @@ class ProductSetup extends Component {
 
   handleBack = (itemWasChanged = false) => {
     if (itemWasChanged) {
-      this.props.dispatch(clearItems('products')); // refetch items list because item was (changed in / added to) list
+      this.clearItemsList(); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = getConfig(['systemItems', 'product', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
@@ -221,6 +225,7 @@ class ProductSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            clearList={this.clearItemsList}
           />
         </Panel>
 

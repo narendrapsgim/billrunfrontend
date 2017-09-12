@@ -1,4 +1,5 @@
 import React, { PureComponent, PropTypes } from 'react';
+import Select from 'react-select';
 import Number from './types/Number';
 import Price from './types/Price';
 import Date from './types/Date';
@@ -63,6 +64,8 @@ class Field extends PureComponent {
         return (<Salutation {...inputProps} />);
       case 'textEditor':
         return (<TextEditor {...inputProps} />);
+      case 'select':
+        return (<Select {...inputProps} />);
       default:
         return (<Text {...inputProps} required={required} />);
     }

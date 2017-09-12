@@ -128,6 +128,11 @@ class DiscountSetup extends Component {
     this.props.dispatch(clearRevisions('discounts', key)); // refetch items list because item was (changed in / added to) list
   }
 
+  clearItemsList = () => {
+    const itemsType = getConfig(['systemItems', 'discount', 'itemsType'], '');
+    this.props.dispatch(clearItems(itemsType));
+  }
+
   afterItemReceived = (response) => {
     if (response.status) {
       this.initRevisions();
@@ -172,7 +177,7 @@ class DiscountSetup extends Component {
   handleBack = (itemWasChanged = false) => {
     const itemsType = getConfig(['systemItems', 'discount', 'itemsType'], '');
     if (itemWasChanged) {
-      this.props.dispatch(clearItems(itemsType)); // refetch items list because item was (changed in / added to) list
+      this.clearItemsList(); // refetch items list because item was (changed in / added to) list
     }
     this.props.router.push(`/${itemsType}`);
   }
@@ -224,6 +229,7 @@ class DiscountSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            clearList={this.clearItemsList}
           />
         </Panel>
 

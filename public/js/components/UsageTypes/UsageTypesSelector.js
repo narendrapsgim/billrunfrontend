@@ -19,6 +19,9 @@ class UsageTypesSelector extends Component {
     onChangeUnit: PropTypes.func,
     enabled: PropTypes.bool,
     showUnits: PropTypes.bool,
+    showAddButton: PropTypes.bool,
+    usagetFilter: PropTypes.func,
+    unitFilter: PropTypes.func,
   };
 
   static defaultProps = {
@@ -30,6 +33,9 @@ class UsageTypesSelector extends Component {
     onChangeUnit: () => {},
     enabled: true,
     showUnits: true,
+    showAddButton: true,
+    usagetFilter: () => true,
+    unitFilter: () => true,
   };
 
   state = {
@@ -83,19 +89,23 @@ class UsageTypesSelector extends Component {
   }
 
   getAvailableUsageTypes = () => {
-    const { usageTypesData } = this.props;
-    return usageTypesData.map(usaget => ({
-      value: usaget.get('usage_type', ''),
-      label: usaget.get('label', ''),
-    })).toJS();
+    const { usageTypesData, usagetFilter } = this.props;
+    return usageTypesData
+      .filter(usagetFilter)
+      .map(usaget => ({
+        value: usaget.get('usage_type', ''),
+        label: usaget.get('label', ''),
+      }))
+      .toJS();
   }
 
   getAvailableUnits = () => {
-    const { propertyTypes, usageTypesData, usaget } = this.props;
+    const { propertyTypes, usageTypesData, usaget, unitFilter } = this.props;
     const selectedUsaget = usageTypesData.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
     const uom = (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
     return uom
       .filter(unit => unit.get('unit', false) !== false)
+      .filter(unitFilter)
       .map(unit => ({ value: unit.get('name', ''), label: unit.get('label', '') })).toArray();
   }
 
@@ -142,17 +152,23 @@ class UsageTypesSelector extends Component {
   };
 
   render() {
-    const { showUnits } = this.props;
+    const { showUnits, showAddButton } = this.props;
     return (
       <span>
         <Col md={7}>
           <FormGroup>
-            <InputGroup>
-              <InputGroup.Button>
-                {this.renderAddUsageTypeButton()}
-              </InputGroup.Button>
-              {this.renderUsageTypeSelect()}
-            </InputGroup>
+            {
+              showAddButton
+              ? (
+                <InputGroup>
+                  <InputGroup.Button>
+                    {this.renderAddUsageTypeButton()}
+                  </InputGroup.Button>
+                  {this.renderUsageTypeSelect()}
+                </InputGroup>
+              )
+              : this.renderUsageTypeSelect()
+            }
           </FormGroup>
         </Col>
         <Col md={5}>

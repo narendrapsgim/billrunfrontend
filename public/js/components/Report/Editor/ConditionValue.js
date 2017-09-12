@@ -13,10 +13,16 @@ import {
   productsOptionsSelector,
   cyclesOptionsSelector,
   plansOptionsSelector,
+  servicesOptionsSelector,
   groupsOptionsSelector,
+  calcNameSelector,
+  bucketsNamesSelector,
+  bucketsExternalIdsSelector
 } from '../../../selectors/listSelectors';
 import {
   usageTypeSelector,
+  fileTypeSelector,
+  eventCodeSelector,
 } from '../../../selectors/settingsSelector';
 import {
   getCyclesOptions,
@@ -25,6 +31,9 @@ import {
   getServicesOptions,
   getGroupsOptions,
   getUsageTypesOptions,
+  getBucketsOptions,
+  getFileTypesOptions,
+  getEventCodeOptions,
 } from '../../../actions/reportsActions';
 
 
@@ -87,6 +96,13 @@ class ConditionValue extends Component {
         case 'getGroupsOptions': this.props.dispatch(getGroupsOptions());
           break;
         case 'getUsageTypesOptions': this.props.dispatch(getUsageTypesOptions());
+          break;
+	case 'getBucketsOptions':
+        case 'getBucketsExternalIdsOptions':
+          this.props.dispatch(getBucketsOptions());
+        case 'getFileTypeOptions': this.props.dispatch(getFileTypesOptions());
+          break;
+        case 'getEventCodeOptions': this.props.dispatch(getEventCodeOptions());
           break;
         default: console.log('unsuported select options callback');
           break;
@@ -166,13 +182,12 @@ class ConditionValue extends Component {
   renderInput = () => {
     const { field, disabled, config, selectOptions, operator } = this.props;
 
-    // console.log('operator: ', operator);
     //  Boolean + operator 'EXIST'
     if ([config.get('type', ''), operator.get('type', '')].includes('boolean')) {
       let value = '';
       if (field.get('value', false) === true) {
         value = 'yes';
-      } else if (!field.get('value', true) === false) {
+      } else if (field.get('value', true) === false) {
         value = 'no';
       }
       const booleanOptions = this.getOptionsValues(Immutable.List(['yes', 'no']));
@@ -190,11 +205,24 @@ class ConditionValue extends Component {
     // String-select
     if ([config.get('type', 'string'), operator.get('type', '')].includes('string')
       && (config.getIn(['inputConfig', 'inputType']) === 'select' || operator.has('options'))) {
-      const options = config.hasIn(['inputConfig', 'callback'])
-        ? selectOptions.get(config.getIn(['inputConfig', 'callback'], ''), Immutable.List())
-        : config.getIn(['inputConfig', 'options'], operator.get('options', Immutable.List()));
-
-      const formatedOptions = options
+      const options = Immutable.List()
+        .withMutations((optionsWithMutations) => {
+          if (config.hasIn(['inputConfig', 'callback'])) {
+            selectOptions.get(config.getIn(['inputConfig', 'callback'], ''), Immutable.List()).forEach((selectOption) => {
+              optionsWithMutations.push(selectOption);
+            });
+          }
+          if (config.hasIn(['inputConfig', 'options'])) {
+            config.getIn(['inputConfig', 'options'], Immutable.List()).forEach((selectOption) => {
+              optionsWithMutations.push(selectOption);
+            });
+          }
+          if (operator.has('options')) {
+            operator.get('options', Immutable.List()).forEach((selectOption) => {
+              optionsWithMutations.push(selectOption);
+            });
+          }
+        })
         .map(formatSelectOptions)
         .toArray();
 
@@ -203,7 +231,7 @@ class ConditionValue extends Component {
         <Select
           clearable={false}
           multi={multi}
-          options={formatedOptions}
+          options={options}
           value={field.get('value', '')}
           onChange={this.onChangeSelect}
           disabled={disabled}
@@ -311,8 +339,14 @@ const mapStateToProps = (state, props) => ({
     getCyclesOptions: cyclesOptionsSelector(state, props) || Immutable.List(),
     getProductsOptions: productsOptionsSelector(state, props) || Immutable.List(),
     getPlansOptions: plansOptionsSelector(state, props) || Immutable.List(),
+    getServicesOptions: servicesOptionsSelector(state, props) || Immutable.List(),
     getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
+    getBucketsOptions: bucketsNamesSelector(state, props) || Immutable.List(),
+    getBucketsExternalIdsOptions: bucketsExternalIdsSelector(state, props) || Immutable.List(),
+    getFileTypeOptions: fileTypeSelector(state, props) || Immutable.List(),
+    getCalcNameOptions: calcNameSelector(state, props) || Immutable.List(),
+    getEventCodeOptions: eventCodeSelector(state, props) || Immutable.List(),
   }),
 });
 

@@ -8,8 +8,10 @@ import { ConfirmModal } from '../Elements';
 import { getItemDateValue, getItemId, getConfig, isItemClosed } from '../../common/Util';
 import { closeEntity } from '../../actions/entityActions';
 import { showSuccess } from '../../actions/alertsActions';
+import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 import { entityMinFrom } from '../../selectors/entitySelector';
 import { getSettings } from '../../actions/settingsActions';
+import { minEntityDateSelector } from '../../selectors/settingsSelector';
 
 
 class CloseActionBox extends Component {
@@ -19,12 +21,14 @@ class CloseActionBox extends Component {
     itemName: PropTypes.string.isRequired,
     onCloseItem: PropTypes.func,
     minDate: PropTypes.instanceOf(moment),
+    dangerousFrom: PropTypes.instanceOf(moment),
     dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     item: Immutable.Map(),
-    minDate: moment().add(1, 'days'), // default minDate is tommorow
+    minDate: moment(0), // default no date so it set to 1970
+    dangerousFrom: moment(0), // default no date so it set to 1970
     onCloseItem: () => {},
   }
 
@@ -78,7 +82,32 @@ class CloseActionBox extends Component {
   }
 
   onChangeFrom = (date) => {
-    this.setState({ closeDate: date });
+    const { closeDate } = this.state;
+    const { dangerousFrom } = this.props;
+    if (date.isBefore(dangerousFrom)) {
+      this.confirmSelectedDate(date, closeDate);
+    } else {
+      this.setState({ closeDate: date });
+    }
+  }
+
+  confirmSelectedDate = (newDate, oldDate) => {
+    const dateString = newDate.format(getConfig('dateFormat', 'DD/MM/YYYY'));
+    const confirm = {
+      message: 'Billing cycle for the date you have chosen is already over.',
+      children: `Are you sure you want to use ${dateString}?`,
+      onOk: () => { this.setState({ closeDate: newDate }); },
+      onCancel: () => { this.setState({ closeDate: oldDate }); },
+    };
+    this.props.dispatch(showConfirmModal(confirm));
+  }
+
+  dayDateClass = (day) => {
+    const { minDate, dangerousFrom } = this.props;
+    if (day.isBetween(minDate, dangerousFrom)) {
+      return 'danger-red';
+    }
+    return undefined;
   }
 
   renderDateFromfields = () => {
@@ -101,6 +130,7 @@ class CloseActionBox extends Component {
             placeholderText="Select Date..."
             minDate={minDate.add(1,'days')}
             highlightDates={highlightDates}
+            dayClassName={this.dayDateClass}
           />
         </div>
         <Button onClick={this.toggleCloseConfirm} style={btnStyle} disabled={disableSubmit} bsStyle="primary" className="inline">
@@ -132,5 +162,6 @@ class CloseActionBox extends Component {
 
 const mapStateToProps = (state, props) => ({
   minDate: entityMinFrom(state, props),
+  dangerousFrom: minEntityDateSelector(state, props),
 });
 export default connect(mapStateToProps)(CloseActionBox);

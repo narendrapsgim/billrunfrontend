@@ -39,12 +39,12 @@ const UsageTypeForm = (props) => {
   const uom = getAvailableUom();
 
   return (
-    <ModalWrapper title="Usage Type" show={true} onOk={onSave} onCancel={onCancel} labelOk="Save" >
+    <ModalWrapper title="Activity Type" show={true} onOk={onSave} onCancel={onCancel} labelOk="OK" >
       <Form horizontal>
 
         <FormGroup>
           <Col componentClass={ControlLabel} md={4}>
-            Usage Type
+            Activity Type
           </Col>
           <Col sm={5}>
             <Field id="label" onChange={onChangeField} value={item.get('label', '')} disabled={!editBase} />

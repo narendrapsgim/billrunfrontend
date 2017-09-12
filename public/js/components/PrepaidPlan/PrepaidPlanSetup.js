@@ -161,6 +161,10 @@ class PrepaidPlanSetup extends Component {
     this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
   }
 
+  clearItemsList = () => {
+    this.props.dispatch(clearItems('prepaid_plans'));
+  }
+
   afterItemReceived = (response) => {
     if (response.status) {
       this.initRevisions();
@@ -240,7 +244,7 @@ class PrepaidPlanSetup extends Component {
 
   handleBack = (itemWasChanged = false) => {
     if (itemWasChanged) {
-      this.props.dispatch(clearItems('prepaid_plans')); // refetch items list because item was (changed in / added to) list
+      this.clearItemsList(); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = getConfig(['systemItems', 'prepaid_plan', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
@@ -272,6 +276,7 @@ class PrepaidPlanSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            clearList={this.clearItemsList}
           />
         </Panel>
 

@@ -136,6 +136,10 @@ class PlanSetup extends Component {
     this.props.dispatch(clearRevisions('plans', key)); // refetch items list because item was (changed in / added to) list
   }
 
+  clearItemsList = () => {
+    this.props.dispatch(clearItems('plans'));
+  }
+
   afterItemReceived = (response) => {
     if (response.status) {
       this.initRevisions();
@@ -166,8 +170,8 @@ class PlanSetup extends Component {
     this.props.dispatch(onPlanTariffRemove(index));
   }
 
-  onGroupAdd = (groupName, usage, unit, value, shared, pooled, products) => {
-    this.props.dispatch(onGroupAdd(groupName, usage, unit, value, shared, pooled, products));
+  onGroupAdd = (groupName, usages, unit, value, shared, pooled, products) => {
+    this.props.dispatch(onGroupAdd(groupName, usages, unit, value, shared, pooled, products));
   }
 
   onGroupRemove = (groupName) => {
@@ -193,7 +197,7 @@ class PlanSetup extends Component {
 
   handleBack = (itemWasChanged = false) => {
     if (itemWasChanged) {
-      this.props.dispatch(clearItems('plans')); // refetch items list because item was (changed in / added to) list
+      this.clearItemsList(); // refetch items list because item was (changed in / added to) list
     }
     const listUrl = getConfig(['systemItems', 'plan', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
@@ -226,6 +230,7 @@ class PlanSetup extends Component {
             backToList={this.handleBack}
             reLoadItem={this.fetchItem}
             clearRevisions={this.clearRevisions}
+            clearList={this.clearItemsList}
           />
         </Panel>
 
