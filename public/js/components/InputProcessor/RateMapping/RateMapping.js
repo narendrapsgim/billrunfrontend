@@ -465,7 +465,7 @@ class RateMapping extends Component {
           return (
             <div key={`rate-calculator-${usaget}-${priority}`}>
               <Row>
-                <Col sm={10} />
+                <Col sm={10}>{`Priority ${priority + 1}`}</Col>
                 <Col sm={2} style={actionsStyle}>
                   { showRemove && this.getRemoveRatingPriorityButton(usaget, priority) }
                   {
