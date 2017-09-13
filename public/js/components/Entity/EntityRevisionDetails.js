@@ -195,11 +195,11 @@ class EntityRevisionDetails extends Component {
     const { item } = this.props;
     if (moment.isMoment(newDate) && newDate.isValid()) {
       const tommorow = moment().add(1, 'day');
-      const from = getItemDateBaseValue(item, 'from');
+      const from = getItemDateValue(item, 'from');
       const selectedValue = newDate.isSame(from, 'day') ? tommorow : newDate;
       this.onChangeFrom(selectedValue);
     } else {
-      const originFrom = getItemDateBaseValue(item, 'originalValue');
+      const originFrom = getItemDateValue(item, 'originalValue');
       this.onChangeFrom(originFrom);
     }
   }
