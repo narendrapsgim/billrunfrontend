@@ -1563,9 +1563,9 @@ csso@~2.2.1:
     clap "^1.0.9"
     source-map "^0.5.3"
 
-currency-symbol-map@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/currency-symbol-map/-/currency-symbol-map-3.1.0.tgz#b2b42c53e80d205bb508ca80eafc7816c9628d5b"
+currency-symbol-map@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/currency-symbol-map/-/currency-symbol-map-4.0.2.tgz#884be96168da41bfb0fcbbb6e37dc3c2349a2c65"
 
 currently-unhandled@^0.4.1:
   version "0.4.1"
@@ -4045,9 +4045,9 @@ pluralize@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-1.2.1.tgz#d1a21483fd22bb41e58a12fa3421823140897c45"
 
-pluralize@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-4.0.0.tgz#59b708c1c0190a2f692f1c7618c446b052fd1762"
+pluralize@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
 
 popper.js@^1.10.8:
   version "1.11.1"

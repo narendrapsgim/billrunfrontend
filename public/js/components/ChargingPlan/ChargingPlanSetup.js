@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import ChargingPlanDetails from './ChargingPlanDetails';
 import ChargingPlanIncludes from './ChargingPlanIncludes';
 import { EntityRevisionDetails } from '../Entity';

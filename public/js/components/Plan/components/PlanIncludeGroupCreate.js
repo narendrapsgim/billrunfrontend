@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import CreateButton from '../../Elements/CreateButton';
 import Help from '../../Help';

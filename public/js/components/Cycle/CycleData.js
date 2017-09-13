@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Label, Button, FormGroup, HelpBlock } from 'react-bootstrap';
 import { List, Map } from 'immutable';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import moment from 'moment';
 import { getAllInvoicesQuery } from '../../common/ApiQueries';
 import EntityList from '../EntityList';

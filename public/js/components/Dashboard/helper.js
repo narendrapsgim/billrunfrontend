@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import countries from './countries.json';
 
 export const getCountryKeyByCountryName = (name, notSetValue = null) => {
