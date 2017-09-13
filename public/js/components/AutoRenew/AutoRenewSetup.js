@@ -132,8 +132,8 @@ class AutoRenewSetup extends Component {
   }
 
   handleSave = () => {
-    const { item } = this.props;
-    this.props.dispatch(saveAutoRenew(item)).then(this.afterSave);
+    const { item, mode } = this.props;
+    this.props.dispatch(saveAutoRenew(item, mode)).then(this.afterSave);
   };
 
   handleBack = (itemWasChanged = false) => {

@@ -7,7 +7,7 @@ import {
 } from './entityActions';
 import { fetchAutoRenewByIdQuery } from '../common/ApiQueries';
 
-export const saveAutoRenew = item => saveEntity('autorenew', item, 'create');
+export const saveAutoRenew = (item, mode) => saveEntity('autorenew', item, mode);
 
 export const deleteAutoRenew = item => deleteEntity('autorenew', item);
 
