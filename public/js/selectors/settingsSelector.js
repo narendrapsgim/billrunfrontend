@@ -139,11 +139,13 @@ const selectRatingParams = (inputProssesors) => {
   let options = Immutable.Set();
   inputProssesors.forEach((inputProssesor) => {
     const ratingCalculators = inputProssesor.get('rate_calculators', Immutable.Map());
-    ratingCalculators.forEach((fields) => {
-      const currentFields = fields
-      .filter(field => field.get('rate_key', '').startsWith('params.'))
-      .map(field => field.get('rate_key', ''));
-      options = options.concat(currentFields);
+    ratingCalculators.forEach((ratingCalculatorsPriority) => {
+      ratingCalculatorsPriority.forEach((fields) => {
+        const currentFields = fields
+        .filter(field => field.get('rate_key', '').startsWith('params.'))
+        .map(field => field.get('rate_key', ''));
+        options = options.concat(currentFields);
+      });
     });
   });
   return options.toList();
