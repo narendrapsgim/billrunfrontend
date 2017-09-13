@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import { Map, List } from 'immutable';
 import { Col, FormGroup, HelpBlock, Form, ControlLabel } from 'react-bootstrap';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import ModalWrapper from '../Elements/ModalWrapper';
 import Field from '../Field';
 import { getProductsWithRatesQuery } from '../../common/ApiQueries';

@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
 import Select from 'react-select';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import { getFieldName, getConfig } from '../../common/Util';
 import Help from '../Help';
