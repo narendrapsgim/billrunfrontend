@@ -337,8 +337,8 @@ class InputProcessor extends Component {
     this.props.dispatch(setLineKey(usaget, parseInt(index, 10), value));
   }
 
-  onSetComputedLineKey = (path, value) => {
-    this.props.dispatch(setComputedLineKey(path, value));
+  onSetComputedLineKey = (paths, values) => {
+    this.props.dispatch(setComputedLineKey(paths, values));
   }
 
   onUnsetComputedLineKey = (usaget, index) => {

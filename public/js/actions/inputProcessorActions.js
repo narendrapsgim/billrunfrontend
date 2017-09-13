@@ -308,11 +308,11 @@ export function setLineKey(usaget, index, value) {
   };
 }
 
-export function setComputedLineKey(path, value) {
+export function setComputedLineKey(paths, values) {
   return {
     type: SET_COMPUTED_LINE_KEY,
-    path,
-    value,
+    paths,
+    values,
   };
 }
 

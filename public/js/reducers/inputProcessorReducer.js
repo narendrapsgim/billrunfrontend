@@ -170,7 +170,7 @@ export default function (state = defaultState, action) {
         type: value,
         rate_key,
         line_key: state.getIn(['rate_calculators', usaget, index, 'line_key']),
-        computed: state.getIn(['rate_calculators', usaget, index, 'computed'], {}),
+        computed: state.getIn(['rate_calculators', usaget, index, 'computed'], Immutable.Map()),
       });
       return state.setIn(['rate_calculators', usaget, index], new_rating);
 
@@ -194,7 +194,11 @@ export default function (state = defaultState, action) {
       return state.setIn(['rate_calculators', usaget, index, 'line_key'], value);
 
     case SET_COMPUTED_LINE_KEY:
-      return state.setIn(['rate_calculators', ...action.path], action.value);
+      return state.withMutations((stateWithMutations) => {
+        action.paths.forEach((path, i) => {
+          stateWithMutations.setIn(['rate_calculators', ...path], action.values[i]);
+        });
+      });
 
     case UNSET_COMPUTED_LINE_KEY:
       return state.deleteIn(['rate_calculators', action.usaget, action.index, 'computed']);
