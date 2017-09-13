@@ -14,6 +14,10 @@ const ChargingPlanInclude = (props) => {
     props.onUpdateField(index, id, value);
   };
 
+  const onUpdateOperation = (value) => {
+    props.onUpdateField(index, 'operation', value);
+  };
+
   const onUpdatePeriodField = (e) => {
     const { id, value } = e.target;
     props.onUpdatePeriodField(index, id, value);
@@ -36,6 +40,13 @@ const ChargingPlanInclude = (props) => {
     { type: 'remove', showIcon: true, onClick: onRemoveClick },
   ];
 
+  const operationOptions = [
+    { value: 'default', label: 'Default' },
+    { value: 'new', label: 'New' },
+    { value: 'inc', label: 'Increment' },
+    { value: 'set', label: 'Set' },
+  ];
+
   const header = (
     <div>
       { include.get('pp_includes_name', '') }
@@ -49,6 +60,16 @@ const ChargingPlanInclude = (props) => {
     <div className="ChargingPlanInclude">
       <Form horizontal>
         <Panel header={header}>
+
+          <FormGroup>
+            <Col componentClass={ControlLabel} md={2}> Operation </Col>
+            <Col sm={4}>
+              { props.editable
+                ? <Select options={operationOptions} value={include.get('operation', 'default')} onChange={onUpdateOperation} />
+                : <div className="non-editable-field">{ include.get('operation', '') }</div>
+              }
+            </Col>
+          </FormGroup>
 
           <FormGroup>
             <Col componentClass={ControlLabel} md={2}>{include.get('unit_label', 'Volume')}</Col>
