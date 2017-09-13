@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { lowerCase, sentenceCase } from 'change-case';
-import { ConfirmModal, StateIcon } from '../Elements';
+import { ConfirmModal, StateIcon, ZoneDate } from '../Elements';
 import CloseActionBox from '../Entity/CloseActionBox';
 import MoveActionBox from '../Entity/MoveActionBox';
 import ReopenActionBox from '../Entity/ReopenActionBox';
@@ -93,7 +93,7 @@ class RevisionList extends Component {
   parseFromDate = (item) => {
     const fromDate = getItemDateValue(item, 'from', null);
     if (moment.isMoment(fromDate)) {
-      return fromDate.format(globalSetting.dateFormat);
+      return <ZoneDate value={fromDate}  format={globalSetting.dateFormat} />;
     }
     return '-';
   };
@@ -103,7 +103,7 @@ class RevisionList extends Component {
     const statusWithTwoDate = this.isItemExpired(item)
       || (this.isItemActive(item) && !this.isItemLast(item));
     if (moment.isMoment(toDate) && (isItemClosed(item) || statusWithTwoDate)) {
-      return toDate.format(globalSetting.dateFormat);
+      return <ZoneDate value={toDate.subtract(1,'seconds')}  format={globalSetting.dateFormat} />;
     }
     return '-';
   };

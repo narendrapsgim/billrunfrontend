@@ -9,6 +9,7 @@ import CreateButton from './CreateButton';
 import Actions from './Actions';
 import SortableFieldsContainer from './SortableFieldsContainer';
 import DragHandle from './DragHandle';
+import ZoneDate from './ZoneDate';
 
 export {
   ActionButtons,
@@ -22,4 +23,5 @@ export {
   Actions,
   SortableFieldsContainer,
   DragHandle,
+  ZoneDate,
 };

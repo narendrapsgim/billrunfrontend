@@ -1,4 +1,5 @@
 import React, { PureComponent, PropTypes } from 'react';
+import classNames from 'classnames';
 import Select from 'react-select';
 import Number from './types/Number';
 import Price from './types/Price';
@@ -24,6 +25,12 @@ class Field extends PureComponent {
     editable: PropTypes.bool,
     fieldType: PropTypes.string,
     label: PropTypes.string,
+    style: PropTypes.object,
+    className: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array,
+      PropTypes.object,
+    ]),
     onChange: PropTypes.func,
   }
 
@@ -34,11 +41,13 @@ class Field extends PureComponent {
     editable: true,
     fieldType: 'text',
     label: '',
+    style: {},
+    className: undefined,
     onChange: () => {},
   }
 
   createInput = () => {
-    const { fieldType, required, label, ...inputProps } = this.props;
+    const { fieldType, required, label, style, className,  ...inputProps } = this.props;
     switch (fieldType) {
       case 'number':
         return (<Number {...inputProps} />);
@@ -72,8 +81,9 @@ class Field extends PureComponent {
   }
 
   render() {
+    const { style, className } = this.props;
     return (
-      <div className="Field">
+      <div className={classNames('Field', className)} style={style}>
         { this.createInput() }
       </div>
     );
