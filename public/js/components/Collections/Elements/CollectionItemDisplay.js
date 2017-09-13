@@ -58,7 +58,7 @@ export default class CollectionItemDisplay extends Component {
       <div className="col-md-3 collections-item-display">
         <div className="panel panel-default ">
           <div className="panel-heading">
-            {typeIcon}&nbsp;{item.get('name')}
+            <div className="one-line" title={item.get('name')}>{typeIcon}&nbsp;{item.get('name')}</div>
           </div>
           <div className={item.get('active') ? 'panel-body' : 'panel-body dis-active'}>
             { (item.get('active'))
