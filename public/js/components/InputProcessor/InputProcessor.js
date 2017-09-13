@@ -4,9 +4,7 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import _ from 'lodash';
 import Papa from 'papaparse';
-import filesize from 'file-size';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-import changeCase from 'change-case';
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
@@ -27,7 +25,6 @@ import {
   setFieldWidth,
   addCSVField,
   setCustomerMapping,
-  setRatingField,
   setReceiverField,
   saveInputProcessorSettings,
   removeCSVField,
@@ -35,9 +32,6 @@ import {
   mapUsaget,
   removeUsagetMapping,
   setUsagetType,
-  setLineKey,
-  setComputedLineKey,
-  unsetComputedLineKey,
   setStaticUsaget,
   moveCSVFieldUp,
   moveCSVFieldDown,
@@ -45,17 +39,12 @@ import {
   unsetField,
   setRealtimeField,
   setRealtimeDefaultField,
-  addRatingField,
-  addRatingPriorityField,
-  removeRatingPriorityField,
-  removeRatingField,
  } from '../../actions/inputProcessorActions';
 import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { usageTypeSelector, usageTypesDataSelector, propertyTypeSelector } from '../../selectors/settingsSelector';
-import { getConfig } from '../../common/Util';
 
 class InputProcessor extends Component {
 
@@ -311,50 +300,6 @@ class InputProcessor extends Component {
     this.props.dispatch(setCustomerMapping(field, mapping, index));
   }
 
-  onSetRating = (e) => {
-    const { customRatingFields } = this.props;
-    const { dataset: { usaget, rate_key, priority, index }, value, custom } = e.target;
-    let rateKey = rate_key;
-    const isNewField = custom && (rateKey !== '') && customRatingFields.find(field => field.get('field_name', '') === rateKey) === undefined;
-    if (isNewField) {
-      const title = rateKey;
-      rateKey = `params.${changeCase.snakeCase(title)}`;
-      this.addNewRatingCustomField(rateKey, title, value);
-    }
-    this.props.dispatch(setRatingField(usaget, priority, parseInt(index), rateKey, value));
-  }
-
-  onAddRating = (e) => {
-    const { dataset: { usaget, priority } } = e.target;
-    this.props.dispatch(addRatingField(usaget, priority));
-  }
-
-  onAddRatingPriority = (usaget) => {
-    this.props.dispatch(addRatingPriorityField(usaget));
-  }
-
-  onRemoveRatingPriority = (usaget, priority) => {
-    this.props.dispatch(removeRatingPriorityField(usaget, priority));
-  }
-
-  onRemoveRating = (e) => {
-    const { dataset: { usaget, priority, index } } = e.target;
-    this.props.dispatch(removeRatingField(usaget, priority, index));
-  }
-
-  onSetLineKey = (e) => {
-    const { dataset: { usaget, index, priority }, value } = e.target;
-    this.props.dispatch(setLineKey(usaget, priority, index, value));
-  }
-
-  onSetComputedLineKey = (paths, values) => {
-    this.props.dispatch(setComputedLineKey(paths, values));
-  }
-
-  onUnsetComputedLineKey = (usaget, priority, index) => {
-    this.props.dispatch(unsetComputedLineKey(usaget, priority, index));
-  }
-
   onSetReceiverField = (e) => {
     const { id, value } = e.target;
     this.props.dispatch(setReceiverField(id, value));
@@ -517,15 +462,7 @@ class InputProcessor extends Component {
           settings={settings}
           subscriberFields={subscriberFields}
           customRatingFields={customRatingFields}
-          onSetRating={this.onSetRating}
-          onSetLineKey={this.onSetLineKey}
-          onSetComputedLineKey={this.onSetComputedLineKey}
-          onUnsetComputedLineKey={this.onUnsetComputedLineKey}
           onSetCustomerMapping={this.onSetCustomerMapping}
-          onAddRating={this.onAddRating}
-          onAddRatingPriority={this.onAddRatingPriority}
-          onRemoveRatingPriority={this.onRemoveRatingPriority}
-          onRemoveRating={this.onRemoveRating}
         />
       );
 
