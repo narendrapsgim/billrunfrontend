@@ -457,6 +457,7 @@ fieldset[disabled] .btn {
 }
 #footer-push{
   height: 30px;
+  margin-top: 10px;
 }
 #footer {
   height: 30px;
