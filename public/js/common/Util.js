@@ -439,3 +439,8 @@ export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBase
     ? convertedIncludes
     : Immutable.Map();
 };
+
+export const getAvailableFields = (settings, additionalFields = []) => {
+  const fields = settings.get('fields', []).map(field => (Immutable.Map({ value: field, label: field }))).sortBy(field => field.get('value', ''));
+  return fields.concat(Immutable.fromJS(additionalFields));
+};

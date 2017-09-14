@@ -9,6 +9,8 @@ export const ADD_USAGET_MAPPING = 'ADD_USAGET_MAPPING';
 export const SET_CUSTOMER_MAPPING = 'SET_CUSTOMER_MAPPING';
 export const SET_RATING_FIELD = 'SET_RATING_FIELD';
 export const ADD_RATING_FIELD = 'ADD_RATING_FIELD';
+export const ADD_RATING_PRIORITY = 'ADD_RATING_PRIORITY';
+export const REMOVE_RATING_PRIORITY = 'REMOVE_RATING_PRIORITY';
 export const REMOVE_RATING_FIELD = 'REMOVE_RATING_FIELD';
 export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
@@ -274,52 +276,72 @@ export function setCustomerMapping(field, mapping, index) {
   };
 }
 
-export function setRatingField(usaget, index, rate_key, value) {
+export function setRatingField(usaget, priority, index, rate_key, value) {
   return {
     type: SET_RATING_FIELD,
     usaget,
+    priority,
     index,
     rate_key,
     value
   };
 }
 
-export function addRatingField(usaget) {
+export function addRatingField(usaget, priority) {
   return {
     type: ADD_RATING_FIELD,
+    usaget,
+    priority,
+  };
+}
+
+export function addRatingPriorityField(usaget) {
+  return {
+    type: ADD_RATING_PRIORITY,
     usaget,
   };
 }
 
-export function removeRatingField(usaget, index) {
+export function removeRatingPriorityField(usaget, priority) {
+  return {
+    type: REMOVE_RATING_PRIORITY,
+    usaget,
+    priority,
+  };
+}
+
+export function removeRatingField(usaget, priority, index) {
   return {
     type: REMOVE_RATING_FIELD,
     usaget,
+    priority,
     index,
   };
 }
 
-export function setLineKey(usaget, index, value) {
+export function setLineKey(usaget, priority, index, value) {
   return {
     type: SET_LINE_KEY,
     usaget,
+    priority,
     index,
     value
   };
 }
 
-export function setComputedLineKey(path, value) {
+export function setComputedLineKey(paths, values) {
   return {
     type: SET_COMPUTED_LINE_KEY,
-    path,
-    value,
+    paths,
+    values,
   };
 }
 
-export function unsetComputedLineKey(usaget, index) {
+export function unsetComputedLineKey(usaget, priority, index) {
   return {
     type: UNSET_COMPUTED_LINE_KEY,
     usaget,
+    priority,
     index,
   };
 }
