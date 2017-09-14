@@ -440,6 +440,27 @@ export const getPlanConvertedIncludes = (propertyTypes, usageTypes, item, toBase
     : Immutable.Map();
 };
 
+export const convertServiceBalancePeriodToObject = (item) => {
+  if (['', 'default'].includes(item.get('balance_period', 'default'))) {
+    return { type: 'default', unit: '', value: '' };
+  }
+  const balancePeriodArray = item.get('balance_period', '').split(' ');
+  const unit = balancePeriodArray[balancePeriodArray.length - 1];
+  const value = Number(balancePeriodArray[balancePeriodArray.length - 2]);
+  const type = 'custom_period';
+  return { type, unit, value: (unit === 'days') ? value + 1 : value };
+};
+
+export const convertServiceBalancePeriodToString = (item) => {
+  if (['', 'default'].includes(item.getIn(['balance_period', 'type'], 'default'))) {
+    return 'default';
+  }
+  const unit = item.getIn(['balance_period', 'unit'], '');
+  const value = item.getIn(['balance_period', 'value'], 1);
+  const balancePeriod = (unit === 'days') ? `tomorrow +${value - 1} days` : `+${value} ${unit}`;
+  return balancePeriod;
+};
+
 export const getAvailableFields = (settings, additionalFields = []) => {
   const fields = settings.get('fields', []).map(field => (Immutable.Map({ value: field, label: field }))).sortBy(field => field.get('value', ''));
   return fields.concat(Immutable.fromJS(additionalFields));

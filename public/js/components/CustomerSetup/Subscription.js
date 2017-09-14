@@ -139,6 +139,16 @@ class Subscription extends Component {
             ).get('quantity', 1);
             service = service.set('quantity', quantity);
           }
+          // if service is by 'custom_period' -> don't reset the 'from' date to Subscriber 'from' date
+          if (serviceOption.get('balance_period', 'default') !== 'default') {
+            const currentServices = currentSubscription.get('services', Immutable.List()) || Immutable.List();
+            const originFrom = currentServices.find(
+              currentService => currentService.get('name') === name,
+              null,
+              Immutable.Map(),
+            ).get('from', from);
+            service = service.set('from', originFrom);
+          }
           servicesWithMutations.push(service);
         });
       }
@@ -191,8 +201,8 @@ class Subscription extends Component {
     const plan = subscription.get('plan', '');
     return ([(
       <FormGroup key="plan">
-        <Col componentClass={ControlLabel} sm={2}>Plan</Col>
-        <Col sm={7}>
+        <Col componentClass={ControlLabel}sm={3} lg={2}>Plan <span className="danger-red"> *</span></Col>
+        <Col sm={8} lg={9}>
           { editable
             ? <Select
               options={plansOptions}
@@ -205,8 +215,8 @@ class Subscription extends Component {
       </FormGroup>
     ), (
       <FormGroup key="services">
-        <Col componentClass={ControlLabel} sm={2}>Services</Col>
-        <Col sm={7}>
+        <Col componentClass={ControlLabel} sm={3} lg={2}>Services</Col>
+        <Col sm={8} lg={9}>
           { editable
             ? <Select
               multi={true}
@@ -221,23 +231,77 @@ class Subscription extends Component {
     )]);
   }
 
-  renderServisesQuentity = (editable) => {
+  renderServicesQuentity = (editable) => {
     const { subscription } = this.state;
+    const { allServices } = this.props;
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     return services
       .filter(service => service.get('quantity', null) !== null)
       .map((service, key) => {
-        const serviceName = service.get('name', '');
-        const onChangeBind = (e) => { this.onChangeServiceQuantity(serviceName, e); };
+        const serviceName = allServices.find(
+          allService => allService.get('name', '') === service.get('name', ''),
+          null,
+          Immutable.Map(),
+        ).get('description', service.get('name', ''));
+        const serviceKey = service.get('name', '');
+        const onChangeBind = (e) => { this.onChangeServiceQuantity(serviceKey, e); };
         return (
-          <FormGroup key={key}>
-            <Col componentClass={ControlLabel} sm={2}>
-              { `Service ${serviceName}` }
+          <FormGroup key={`quentity_${key}`}>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>
+              {serviceName}
             </Col>
-            <Col sm={7}>
+            <Col sm={8} lg={9}>
               <InputGroup>
                 <Field fieldType="number" min={1} value={service.get('quantity', '')} onChange={onChangeBind} editable={editable} />
                 <InputGroup.Addon>quantity</InputGroup.Addon>
+              </InputGroup>
+            </Col>
+          </FormGroup>
+        );
+      })
+      .toArray();
+  }
+
+  onChangePeriodStartDate = (name, newDate) => {
+    const { subscription } = this.state;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const serviceIndex = services.findIndex(service => service.get('name', '') === name);
+    if (serviceIndex !== -1) {
+      this.updateSubscriptionField(['services', serviceIndex, 'from'], newDate.toISOString());
+    }
+  }
+
+  renderServicesByPeriod = (editable) => {
+    const { subscription } = this.state;
+    const { allServices } = this.props;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    return services
+      .map((service) => {
+        const serviceBalancePeriod = allServices.find(
+          allService => allService.get('name', '') === service.get('name', ''),
+          null,
+          Immutable.Map(),
+        ).get('balance_period', 'default');
+        return service.set('balance_period', serviceBalancePeriod);
+      })
+      .filter(service => service.get('balance_period', 'default') !== 'default')
+      .map((service, key) => {
+        const serviceName = allServices.find(
+          allService => allService.get('name', '') === service.get('name', ''),
+          null,
+          Immutable.Map(),
+        ).get('description', service.get('name', ''));
+        const serviceKey = service.get('name', '');
+        const onChangeBind = (e) => { this.onChangePeriodStartDate(serviceKey, e); };
+        return (
+          <FormGroup key={`byPeriod_${key}`}>
+            <Col componentClass={ControlLabel} sm={3} lg={2}>
+              {serviceName}
+            </Col>
+            <Col sm={8} lg={9}>
+              <InputGroup>
+                <InputGroup.Addon>Start Date</InputGroup.Addon>
+                <Field fieldType="date" min={1} value={moment(service.get('from', ''))} onChange={onChangeBind} editable={editable} />
               </InputGroup>
             </Col>
           </FormGroup>
@@ -300,7 +364,8 @@ class Subscription extends Component {
     const { revisions, mode } = this.props;
     const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
-    const servisesQuentity = this.renderServisesQuentity(allowEdit);
+    const servicesQuentity = this.renderServicesQuentity(allowEdit);
+    const servicesByPeriod = this.renderServicesByPeriod(allowEdit);
     return (
       <div className="Subscription">
         <Panel header={this.renderPanelTitle()}>
@@ -322,9 +387,14 @@ class Subscription extends Component {
 
           <Form horizontal>
             { this.renderSystemFields(allowEdit) }
-            { servisesQuentity.length > 0 && <hr />}
-            { servisesQuentity.length > 0 && servisesQuentity }
-            <hr />
+            { (servicesQuentity.length + servicesByPeriod.length > 0) ? (
+              <Panel header="Services Details">
+                {servicesQuentity}
+                {servicesQuentity.length > 0 && servicesByPeriod.length > 0 && <hr />}
+                {servicesByPeriod}
+              </Panel>
+              ) : (<hr />)
+            }
             <EntityFields
               entityName={['subscribers', 'subscriber']}
               entity={subscription}

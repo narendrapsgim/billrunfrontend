@@ -5,6 +5,8 @@ import { saveEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
 import {
   getPlanConvertedIncludes,
+  convertServiceBalancePeriodToObject,
+  convertServiceBalancePeriodToString,
 } from '../common/Util';
 import {
   usageTypesDataSelector,
@@ -56,7 +58,7 @@ export const setCloneService = () => ({
   uniquefields: ['name'],
 });
 
-const convertService = (getState, service, convertToBaseUnit) => {
+const convertService = (getState, service, convertToBaseUnit, toSend) => {
   const state = getState();
   const usageTypesData = usageTypesDataSelector(state);
   const propertyTypes = propertyTypeSelector(state);
@@ -65,11 +67,23 @@ const convertService = (getState, service, convertToBaseUnit) => {
     if (!serviceIncludes.isEmpty()) {
       itemWithMutations.set('include', serviceIncludes);
     }
+    if (toSend) { // convert item before send to server
+      if (itemWithMutations.getIn(['balance_period', 'type'], '') === 'custom_period') {
+        itemWithMutations.setIn(['price', 0, 'to'], 1);
+        itemWithMutations.set('quantitative', false);
+        itemWithMutations.set('prorated', false);
+      }
+      const balancePeriod = convertServiceBalancePeriodToString(itemWithMutations);
+      itemWithMutations.set('balance_period', balancePeriod);
+    } else { // convert item resived from server
+      const balancePeriod = convertServiceBalancePeriodToObject(itemWithMutations);
+      itemWithMutations.set('balance_period', balancePeriod);
+    }
   });
 };
 
 export const saveService = (service, action) => (dispatch, getState) => {
-  const convertedService = convertService(getState, service, true);
+  const convertedService = convertService(getState, service, true, true);
   return dispatch(saveEntity('services', convertedService, action));
 };
 
@@ -89,7 +103,7 @@ export const getService = id => (dispatch, getState) => {
       }
       item.originalValue = item.from;
       const service = Immutable.fromJS(item);
-      const convertedService = convertService(getState, service, false).toJS();
+      const convertedService = convertService(getState, service, false, false).toJS();
       dispatch(gotItem(convertedService));
       return dispatch(apiBillRunSuccessHandler(response));
     })

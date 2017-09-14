@@ -166,6 +166,9 @@ fieldset[disabled] .btn {
 /* ~Main/Top menu */
 
 /* react-datepicker */
+.react-datepicker-popper {
+    z-index: 4;
+}
 .react-datepicker__close-icon {
   display: block;
 }
