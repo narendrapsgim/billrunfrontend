@@ -16,6 +16,8 @@ import { SET_NAME,
          SET_CUSETOMER_MAPPING,
          SET_RATING_FIELD,
          ADD_RATING_FIELD,
+         ADD_RATING_PRIORITY,
+         REMOVE_RATING_PRIORITY,
          REMOVE_RATING_FIELD,
          SET_RECEIVER_FIELD,
          SET_FIELD_WIDTH,
@@ -63,7 +65,7 @@ const defaultCustomerIdentification = Immutable.fromJS({
 });
 
 export default function (state = defaultState, action) {
-  const { field, mapping, width, index } = action;
+  const { field, mapping, width, index, priority } = action;
   let field_to_move;
   switch (action.type) {
     case GOT_PROCESSOR_SETTINGS:
@@ -169,10 +171,10 @@ export default function (state = defaultState, action) {
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: state.getIn(['rate_calculators', usaget, index, 'line_key']),
-        computed: state.getIn(['rate_calculators', usaget, index, 'computed'], {}),
+        line_key: state.getIn(['rate_calculators', usaget, priority, index, 'line_key']),
+        computed: state.getIn(['rate_calculators', usaget, priority, index, 'computed'], Immutable.Map()),
       });
-      return state.setIn(['rate_calculators', usaget, index], new_rating);
+      return state.setIn(['rate_calculators', usaget, priority, index], new_rating);
 
     case ADD_RATING_FIELD: {
       const { usaget } = action;
@@ -181,23 +183,42 @@ export default function (state = defaultState, action) {
         rate_key: '',
         line_key: '',
       });
-      return state.updateIn(['rate_calculators', usaget], list => list.push(newRating));
+      return state.updateIn(['rate_calculators', usaget, priority], list => list.push(newRating));
+    }
+
+    case ADD_RATING_PRIORITY: {
+      const { usaget } = action;
+      const newRating = Immutable.fromJS({
+        type: '',
+        rate_key: '',
+        line_key: '',
+      });
+      return state.updateIn(['rate_calculators', usaget], list => list.push(Immutable.List([newRating])));
+    }
+
+    case REMOVE_RATING_PRIORITY: {
+      const { usaget } = action;
+      return state.updateIn(['rate_calculators', usaget], list => list.remove(priority));
     }
 
     case REMOVE_RATING_FIELD: {
       const { usaget } = action;
-      return state.updateIn(['rate_calculators', usaget], list => list.remove(index));
+      return state.updateIn(['rate_calculators', usaget, priority], list => list.remove(index));
     }
 
     case SET_LINE_KEY:
       var { value, usaget } = action;
-      return state.setIn(['rate_calculators', usaget, index, 'line_key'], value);
+      return state.setIn(['rate_calculators', usaget, priority, index, 'line_key'], value);
 
     case SET_COMPUTED_LINE_KEY:
-      return state.setIn(['rate_calculators', ...action.path], action.value);
+      return state.withMutations((stateWithMutations) => {
+        action.paths.forEach((path, i) => {
+          stateWithMutations.setIn(['rate_calculators', ...path], action.values[i]);
+        });
+      });
 
     case UNSET_COMPUTED_LINE_KEY:
-      return state.deleteIn(['rate_calculators', action.usaget, action.index, 'computed']);
+      return state.deleteIn(['rate_calculators', action.usaget, action.priority, action.index, 'computed']);
 
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);

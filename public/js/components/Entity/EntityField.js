@@ -25,7 +25,33 @@ class EntityField extends Component {
   state = {
     isFieldTags: this.props.field.get('multiple', false) && !this.props.field.get('select_list', false),
     isFieldSelect: this.props.field.get('select_list', false),
+    isFieldBoolean: this.props.field.get('type', '') === 'boolean',
     fieldPath: this.props.field.get('field_name', '').split('.'),
+  }
+
+  componentDidMount() {
+    this.initDefaultValues();
+  }
+
+  initDefaultValues = () => {
+    const { fieldPath } = this.state;
+    const { field, entity } = this.props;
+    if (entity.getIn(fieldPath, null) === null) {
+      const noDefaultValueVal = this.getNoDefaultValueVal();
+      const defaultValue = field.get('default_value', noDefaultValueVal);
+      this.props.onChange(fieldPath, defaultValue);
+    }
+  }
+
+  getNoDefaultValueVal = () => {
+    const { isFieldBoolean, isFieldTags, isFieldSelect } = this.state;
+    if (isFieldBoolean) {
+      return false;
+    }
+    if (isFieldTags || isFieldSelect) {
+      return [];
+    }
+    return '';
   }
 
   getFieldOptios = field => field
@@ -54,8 +80,11 @@ class EntityField extends Component {
   }
 
   getFieldValue = () => {
-    const { fieldPath, isFieldTags } = this.state;
+    const { fieldPath, isFieldTags, isFieldBoolean } = this.state;
     const { entity, editable } = this.props;
+    if (isFieldBoolean) {
+      return entity.getIn(fieldPath, '');
+    }
     const fieldVal = entity.getIn(fieldPath, []);
     if (isFieldTags && editable) {
       return Immutable.List.isList(fieldVal) ? fieldVal.toArray() : fieldVal;
@@ -65,8 +94,14 @@ class EntityField extends Component {
 
   renderField = () => {
     const { editable, field } = this.props;
-    const { isFieldTags, isFieldSelect } = this.state;
+    const { isFieldTags, isFieldSelect, isFieldBoolean } = this.state;
     const value = this.getFieldValue();
+    if (isFieldBoolean) {
+      const checkboxStyle = { height: 29, marginTop: 8 };
+      return (
+        <Field onChange={this.onChange} value={value} fieldType="checkbox" editable={editable} style={checkboxStyle} />
+      );
+    }
     if (isFieldSelect && editable) {
       const multi = field.get('multiple', false);
       const options = this.getFieldOptios(field);

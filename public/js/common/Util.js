@@ -460,3 +460,8 @@ export const convertServiceBalancePeriodToString = (item) => {
   const balancePeriod = (unit === 'days') ? `tomorrow +${value - 1} days` : `+${value} ${unit}`;
   return balancePeriod;
 };
+
+export const getAvailableFields = (settings, additionalFields = []) => {
+  const fields = settings.get('fields', []).map(field => (Immutable.Map({ value: field, label: field }))).sortBy(field => field.get('value', ''));
+  return fields.concat(Immutable.fromJS(additionalFields));
+};

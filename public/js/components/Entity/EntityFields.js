@@ -45,7 +45,7 @@ class EntityFields extends Component {
     const { entity, editable, onChangeField } = this.props;
     return (
       <EntityField
-        key={key}
+        key={`key_${field.get('field_name', key)}`}
         field={field}
         entity={entity}
         editable={editable}
