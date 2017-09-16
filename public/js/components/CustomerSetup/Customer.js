@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
 import { Form, FormGroup, Col, Button, ControlLabel, Row } from 'react-bootstrap';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import classNames from 'classnames';
 import { rebalanceAccount, getCollectionDebt } from '../../actions/customerActions';
 import { ConfirmModal } from '../../components/Elements';

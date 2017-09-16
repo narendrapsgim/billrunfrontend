@@ -1,4 +1,5 @@
 import moment from 'moment';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import countries from './countries.json';
 
 export const getCountryKeyByCountryName = (name, notSetValue = null) => {
@@ -10,23 +11,37 @@ export const getCountryKeyByCountryName = (name, notSetValue = null) => {
   return notSetValue;
 };
 
-export const parseCurrencyValue = (value, currency) =>
-  Number(value).toLocaleString('en-US', { style: 'currency', currency });
+export const parseCurrencyValue = (value, currency) => {
+  const currencySymbol = getSymbolFromCurrency(currency);
+  const lacaleNumber = isNaN(value) ? 0 : Number(value).toLocaleString('en-US');
+  return `${lacaleNumber}${currencySymbol}`;
+};
 
-export const parseCurrencyThousandValue = (value, currency) =>
-  Number(value).toLocaleString('en-US', { style: 'currency', currency, maximumFractionDigits: 0 });
+export const parseCurrencyThousandValue = (value, currency) => {
+  const currencySymbol = getSymbolFromCurrency(currency);
+  const lacaleNumber = isNaN(value) ? 0 : Number(value).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  return `${lacaleNumber}${currencySymbol}`;
+};
 
-export const parseCountValue = value =>
-  Number(value).toLocaleString('en-US');
+export const parseCountValue = (value) => {
+  if (isNaN(value)) {
+    return 0;
+  }
+  return Number(value).toLocaleString('en-US');
+};
 
-export const parseIntegerValue = value =>
-  Number(value).toLocaleString('en-US', { maximumFractionDigits: 0 });
+export const parseIntegerValue = (value) => {
+  if (isNaN(value)) {
+    return 0;
+  }
+  return Number(value).toLocaleString('en-US', { maximumFractionDigits: 0 });
+};
 
-export const parseDateValue = value =>
-  moment(value).format('MMM YYYY');
+export const parseDateValue = value => moment(value).format('MMM YYYY');
 
-export const parseMonthValue = value =>
-  moment(value).format('MMM');
+export const parseMonthValue = value => moment(value).format('MMM');
 
-export const parsePercent = value =>
-  Number(value).toLocaleString('en-US', { style: 'percent', maximumFractionDigits: 2 });
+export const parsePercent = (value) => {
+  const percent = isNaN(value) ? 0 : value;
+  return Number(percent).toLocaleString('en-US', { style: 'percent', maximumFractionDigits: 2 });
+};

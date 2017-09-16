@@ -1,5 +1,5 @@
 import Immutable from 'immutable';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import { getConfig, getUnitLabel, getValueByUnit } from '../../common/Util';
 
 export const getConditionTypes = () => (getConfig(['events', 'conditions'], Immutable.Map()).map(condType => (

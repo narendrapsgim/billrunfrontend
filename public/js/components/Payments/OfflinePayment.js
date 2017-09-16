@@ -3,7 +3,7 @@ import Select from 'react-select';
 import { connect } from 'react-redux';
 import { List, Map } from 'immutable';
 import { Col, FormGroup, Form, ControlLabel, HelpBlock, InputGroup } from 'react-bootstrap';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import Field from '../Field';
 import ModalWrapper from '../Elements/ModalWrapper';
 import { currencySelector } from '../../selectors/settingsSelector';

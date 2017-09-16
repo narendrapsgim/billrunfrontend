@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
 import { Form, Panel } from 'react-bootstrap';
 import Select from 'react-select';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import BalanceThreshold from './BalanceThreshold';
 import {
   getUnitLabel,

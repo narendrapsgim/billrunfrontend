@@ -3,7 +3,7 @@ import { List, Map } from 'immutable';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 import { Row, Col, Form, Panel } from 'react-bootstrap';
-import { getSymbolFromCurrency } from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import Notifications from './Notifications';
 import {
   getUnitLabel,
