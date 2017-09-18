@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { sentenceCase } from 'change-case';
-import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
+import { FormGroup, Col, ControlLabel, InputGroup, Button } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
 
@@ -27,6 +27,7 @@ class EntityField extends Component {
     isFieldSelect: this.props.field.get('select_list', false),
     isFieldBoolean: this.props.field.get('type', '') === 'boolean',
     fieldPath: this.props.field.get('field_name', '').split('.'),
+    isRemoveField: ['params'].includes(this.props.field.get('field_name', '').split('.')[0]),
   }
 
   componentDidMount() {
@@ -39,14 +40,19 @@ class EntityField extends Component {
     if (entity.getIn(fieldPath, null) === null) {
       const noDefaultValueVal = this.getNoDefaultValueVal();
       const defaultValue = field.get('default_value', noDefaultValueVal);
-      this.props.onChange(fieldPath, defaultValue);
+      if (defaultValue !== null) {
+        this.props.onChange(fieldPath, defaultValue);
+      }
     }
   }
 
-  getNoDefaultValueVal = () => {
+  getNoDefaultValueVal = (byConfig = true) => {
     const { isFieldBoolean, isFieldTags, isFieldSelect } = this.state;
     if (isFieldBoolean) {
       return false;
+    }
+    if (!byConfig) {
+      return null;
     }
     if (isFieldTags || isFieldSelect) {
       return [];
@@ -92,6 +98,27 @@ class EntityField extends Component {
     return (Array.isArray(fieldVal) || Immutable.List.isList(fieldVal)) ? fieldVal.join(',') : fieldVal;
   }
 
+  onClickRemoveInput = () => {
+    const { entity } = this.props;
+    const { fieldPath } = this.state;
+    if (fieldPath.length > 1) {
+      const lastElement = fieldPath.splice(fieldPath.length - 1, 1);
+      const withoutField = entity.getIn(fieldPath).delete(...lastElement);
+      this.props.onChange(fieldPath, withoutField);
+    }
+  }
+
+  renderRemovableField = input => (
+    <InputGroup>
+      {input}
+      <InputGroup.Button>
+        <Button onClick={this.onClickRemoveInput}>
+          <i className="fa fa-fw fa-trash-o danger-red" />
+        </Button>
+      </InputGroup.Button>
+    </InputGroup>
+  );
+
   renderField = () => {
     const { editable, field } = this.props;
     const { isFieldTags, isFieldSelect, isFieldBoolean } = this.state;
@@ -120,8 +147,11 @@ class EntityField extends Component {
   }
 
   render() {
-    const { field } = this.props;
+    const { field, editable } = this.props;
+    const { isRemoveField } = this.state;
     const fieldName = field.get('field_name', '');
+    const fieldInput = this.renderField();
+
     return (
       <FormGroup controlId={fieldName}>
         <Col componentClass={ControlLabel} sm={3} lg={2}>
@@ -129,7 +159,7 @@ class EntityField extends Component {
           { field.get('mandatory', false) && (<span className="danger-red"> *</span>)}
         </Col>
         <Col sm={8} lg={9}>
-          {this.renderField()}
+          { isRemoveField && editable ? this.renderRemovableField(fieldInput) : fieldInput }
         </Col>
       </FormGroup>
     );
