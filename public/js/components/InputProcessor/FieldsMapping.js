@@ -243,7 +243,7 @@ export default class FieldsMapping extends Component {
                 />
               </div>
               <div className="col-lg-1">
-                <Help contents="In case the or pre-priced, the price will not be calculated" />
+                <Help contents="When chceked, the price will be taken directly from the record instead of being calculated" />
               </div>
             </div>
           </div>
