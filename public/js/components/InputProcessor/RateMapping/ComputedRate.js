@@ -29,9 +29,18 @@ export default class ComputedRate extends Component {
     'hard_coded',
   ].map(formatSelectOptions);
 
-  getRateConditions = () => (getConfig(['rates', 'conditions'], Immutable.Map()).map(condType => (
-    { value: condType.get('key', ''), label: condType.get('title', '') })).toArray()
-  );
+  getRateConditions = () => getConfig(['rates', 'conditions'], Immutable.Map())
+    .map(condType => ({
+      value: condType.get('key', ''),
+      label: condType.get('title', ''),
+    }))
+    .toArray();
+
+  onChangeComputedLineKeyHardCodedKey = (e) => {
+    const { value } = e.target;
+    const callback = this.props.onChangeComputedLineKey(['line_keys', 1, 'key']);
+    callback(value);
+  }
 
   render() {
     const { computedLineKey, settings } = this.props;
@@ -85,20 +94,18 @@ export default class ComputedRate extends Component {
               onChange={this.props.onChangeComputedLineKey(['line_keys', 0, 'key'])}
               value={computedLineKey.getIn(['line_keys', 0, 'key'], '')}
               options={lineKeyOptions}
+              allowCreate={true}
             />
           </Col>
-          <Col sm={4}>
+          <Col sm={5}>
             <Field
               value={computedLineKey.getIn(['line_keys', 0, 'regex'], '')}
               disabledValue={''}
               onChange={this.props.onChangeComputedLineKey(['line_keys', 0, 'regex'])}
               disabled={computedLineKey.getIn(['line_keys', 0, 'key'], '') === ''}
-              label="Regex"
+              label={<span>Regex<Help contents={regexHelper} /></span>}
               fieldType="toggeledInput"
             />
-          </Col>
-          <Col sm={1}>
-            <Help contents={regexHelper} />
           </Col>
         </FormGroup>
         { !computedTypeRegex &&
@@ -115,24 +122,32 @@ export default class ComputedRate extends Component {
           (<FormGroup key="computed-field-2">
             <Col sm={3} componentClass={ControlLabel}>Second Field</Col>
             <Col sm={4}>
-              <Select
-                onChange={this.props.onChangeComputedLineKey(['line_keys', 1, 'key'])}
-                value={computedLineKey.getIn(['line_keys', 1, 'key'], '')}
-                options={lineKeyOptions}
-              />
+              { computedLineKey.get('operator', '') === '$regex'
+                ? (
+                  <Field
+                    value={computedLineKey.getIn(['line_keys', 1, 'key'], '')}
+                    onChange={this.onChangeComputedLineKeyHardCodedKey}
+                  />
+                )
+                : (
+                  <Select
+                    onChange={this.props.onChangeComputedLineKey(['line_keys', 1, 'key'])}
+                    value={computedLineKey.getIn(['line_keys', 1, 'key'], '')}
+                    options={lineKeyOptions}
+                  />
+              )}
+
+
             </Col>
-            <Col sm={4}>
+            <Col sm={5}>
               <Field
                 value={computedLineKey.getIn(['line_keys', 1, 'regex'], '')}
                 disabledValue={''}
                 onChange={this.props.onChangeComputedLineKey(['line_keys', 1, 'regex'])}
-                disabled={computedLineKey.getIn(['line_keys', 1, 'key'], '') === ''}
-                label="Regex"
+                disabled={computedLineKey.getIn(['line_keys', 1, 'key'], '') === '' || computedLineKey.get('operator', '') === '$regex'}
+                label={<span>Regex<Help contents={regexHelper} /></span>}
                 fieldType="toggeledInput"
               />
-            </Col>
-            <Col sm={1}>
-              <Help contents={regexHelper} />
             </Col>
           </FormGroup>),
           (<FormGroup key="computed-must-met">
