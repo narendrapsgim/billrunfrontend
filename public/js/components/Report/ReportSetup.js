@@ -512,21 +512,18 @@ class ReportSetup extends Component {
 }
 
 
-const mapStateToProps = (state, props) => {
-  const availableReportEntities = reportEntitiesSelector(state, props);
-  return ({
-    userName: state.user.get('name'),
-    itemId: idSelector(state, props, 'reports'),
-    item: itemSelector(state, props, 'reports'),
-    mode: modeSimpleSelector(state, props, 'reports'),
-    reportFileds: reportEntitiesFieldsSelector(state, props, availableReportEntities),
-    reportEntities: availableReportEntities || undefined,
-    reportData: itemsSelector(state, props, 'reportData'),
-    page: pageSelector(state, props, 'reportData'),
-    nextPage: nextPageSelector(state, props, 'reportData'),
-    size: sizeSelector(state, props, 'reportData'),
-    taxType: taxationTypeSelector(state, props),
-  });
-};
+const mapStateToProps = (state, props) => ({
+  userName: state.user.get('name'),
+  itemId: idSelector(state, props, 'reports'),
+  item: itemSelector(state, props, 'reports'),
+  mode: modeSimpleSelector(state, props, 'reports'),
+  reportFileds: reportEntitiesFieldsSelector(state, props),
+  reportEntities: reportEntitiesSelector(state, props),
+  reportData: itemsSelector(state, props, 'reportData'),
+  page: pageSelector(state, props, 'reportData'),
+  nextPage: nextPageSelector(state, props, 'reportData'),
+  size: sizeSelector(state, props, 'reportData'),
+  taxType: taxationTypeSelector(state, props),
+});
 
 export default withRouter(connect(mapStateToProps)(ReportSetup));
