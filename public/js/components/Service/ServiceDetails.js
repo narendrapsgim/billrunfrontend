@@ -137,7 +137,12 @@ export default class ServiceDetails extends Component {
                   onChange={this.onChangeServicePeriodType}
                   name="service_period_type"
                   value="default"
-                  label="No. of Cycles"
+                  label={
+                    <span>
+                      No. of Cycles
+                      <Help contents={ServiceDescription.service_period_type_cycle} />
+                    </span>
+                  }
                   checked={isByCycles}
                 />
               </span>
@@ -147,7 +152,12 @@ export default class ServiceDetails extends Component {
                   onChange={this.onChangeServicePeriodType}
                   name="service_period_type"
                   value="custom_period"
-                  label="Custom"
+                  label={
+                    <span>
+                      Custom
+                      <Help contents={ServiceDescription.service_period_type_custom_period} />
+                    </span>
+                  }
                   checked={!isByCycles}
                 />
               </span>

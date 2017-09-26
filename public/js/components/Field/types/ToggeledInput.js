@@ -20,7 +20,7 @@ export default class ToggeledInput extends Component {
     value: PropTypes.any,
     disabledValue: PropTypes.any,
     disabledDisplayValue: PropTypes.any,
-    label: PropTypes.string,
+    label: PropTypes.node,
     disabled: PropTypes.bool,
     editable: PropTypes.bool,
     inputProps: PropTypes.object,
