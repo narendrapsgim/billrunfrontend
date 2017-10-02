@@ -7,7 +7,7 @@ class Radio extends PureComponent {
   static propTypes = {
     name: PropTypes.string.isRequired,
     id: PropTypes.string,
-    label: PropTypes.string,
+    label: PropTypes.node,
     value: PropTypes.string,
     editable: PropTypes.bool,
     checked: PropTypes.bool,
@@ -17,7 +17,7 @@ class Radio extends PureComponent {
 
   static defaultProps = {
     id: undefined,
-    label: '',
+    label: null,
     value: '',
     editable: true,
     checked: false,
@@ -58,7 +58,7 @@ class Radio extends PureComponent {
     }
 
     const inputField = this.renderInput();
-    if (label.length) {
+    if (label !== null) {
       return (
         <label htmlFor={id} style={{ paddingTop: '10px' }} className={disabled ? 'disabled' : ''}>
           {inputField}

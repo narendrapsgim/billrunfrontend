@@ -24,7 +24,7 @@ class Field extends PureComponent {
     disabled: PropTypes.bool,
     editable: PropTypes.bool,
     fieldType: PropTypes.string,
-    label: PropTypes.string,
+    label: PropTypes.node,
     style: PropTypes.object,
     className: PropTypes.oneOfType([
       PropTypes.string,
@@ -47,7 +47,7 @@ class Field extends PureComponent {
   }
 
   createInput = () => {
-    const { fieldType, required, label, style, className,  ...inputProps } = this.props;
+    const { fieldType, required, label, style, className, ...inputProps } = this.props;
     switch (fieldType) {
       case 'number':
         return (<Number {...inputProps} />);
