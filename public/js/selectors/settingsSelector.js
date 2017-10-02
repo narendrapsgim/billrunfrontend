@@ -42,6 +42,9 @@ const getAccountFields = (state, props) => // eslint-disable-line no-unused-vars
 const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['subscribers', 'subscriber', 'fields']);
 
+const getLinesFields = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['lines', 'fields']);
+
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['rates', 'fields']);
 
@@ -283,6 +286,27 @@ export const subscriberFieldsSelector = createSelector(
         ? field
         : field.set('title', getFieldName(field.get('field_name', ''), 'subscription'))
       ));
+    }
+    return undefined;
+  },
+);
+
+export const linesFieldsSelector = createSelector(
+  getLinesFields,
+  (fields) => {
+    if (fields) {
+      return fields.map((field) => {
+        if (field.get('title', '') !== '') {
+          return field;
+        }
+        if (field.has('foreign')) {
+          const x = getFieldName(field.getIn(['foreign', 'field'], ''));
+          const y = getFieldNameType(field.getIn(['foreign', 'entity'], ''));
+          console.log(x, " - ", y);
+          return field.set('title', getFieldName(field.getIn(['foreign', 'field'], ''), getFieldNameType(field.getIn(['foreign', 'entity'], ''))));
+        }
+        return field.set('title', getFieldName(field.get('field_name', ''), 'lines'));
+      });
     }
     return undefined;
   },

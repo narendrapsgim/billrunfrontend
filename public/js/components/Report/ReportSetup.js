@@ -93,7 +93,13 @@ class ReportSetup extends Component {
 
   componentWillMount() {
     this.fetchItem();
-    this.props.dispatch(getSettings(['file_types', 'subscribers.subscriber', 'subscribers.account', 'taxation']));
+    this.props.dispatch(getSettings([
+      'file_types',
+      'subscribers.subscriber',
+      'subscribers.account',
+      'taxation',
+      'lines',
+    ]));
   }
 
   componentDidMount() {

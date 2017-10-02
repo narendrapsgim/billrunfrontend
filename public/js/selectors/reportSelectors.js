@@ -10,6 +10,7 @@ import {
   subscriberFieldsSelector,
   inputProssesorCustomKeysSelector,
   accountFieldsSelector,
+  linesFieldsSelector,
 } from './settingsSelector';
 
 
@@ -41,14 +42,20 @@ const formatReportFields = (fields) => {
   }));
 };
 
-const selectReportLinesFields = customKeys =>
+const selectReportLinesFields = (customKeys = Immutable.List(), billrunFields = Immutable.List()) =>
   Immutable.List().withMutations((optionsWithMutations) => {
+    // set fields from IP
     customKeys.forEach((customKey) => {
       const fieldName = getFieldName(customKey, 'lines');
       optionsWithMutations.push(Immutable.Map({
         field_name: `uf.${customKey}`,
         title: (fieldName === customKey) ? sentenceCase(fieldName) : fieldName,
       }));
+    });
+
+    // Set fields from billrun settings
+    billrunFields.forEach((billrunField) => {
+      optionsWithMutations.push(billrunField);
     });
   });
 
@@ -154,6 +161,7 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
 
 const reportLinesFieldsSelector = createSelector(
   inputProssesorCustomKeysSelector,
+  linesFieldsSelector,
   selectReportLinesFields,
 );
 
