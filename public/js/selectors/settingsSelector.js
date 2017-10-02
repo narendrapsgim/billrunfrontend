@@ -300,9 +300,6 @@ export const linesFieldsSelector = createSelector(
           return field;
         }
         if (field.has('foreign')) {
-          const x = getFieldName(field.getIn(['foreign', 'field'], ''));
-          const y = getFieldNameType(field.getIn(['foreign', 'entity'], ''));
-          console.log(x, " - ", y);
           return field.set('title', getFieldName(field.getIn(['foreign', 'field'], ''), getFieldNameType(field.getIn(['foreign', 'entity'], ''))));
         }
         return field.set('title', getFieldName(field.get('field_name', ''), 'lines'));
