@@ -3,12 +3,13 @@ import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { Panel, Col, Form, Button } from 'react-bootstrap';
 import { ActionButtons } from '../Elements';
-import { getSettings, saveSettings } from '../../actions/settingsActions';
+import { getSettings, saveSettings, removeSettingField } from '../../actions/settingsActions';
 import { saveEvent } from '../../actions/eventActions';
 import { eventsSelector } from '../../selectors/settingsSelector';
 import EventForm from './EventForm';
 import List from '../../components/List';
 import { getConfig } from '../../common/Util';
+import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 
 class EventSettings extends Component {
 
@@ -59,6 +60,23 @@ class EventSettings extends Component {
     });
   }
 
+  onDeleteOk = (entityType, index) => {
+    this.props.dispatch(removeSettingField('events', [entityType, index]));
+  }
+
+  renderConfirmModal = entityType => (event) => {
+    const onDelete = () => {
+      this.onDeleteOk(entityType, this.getEventIndex(entityType, event));
+    };
+    const confirm = {
+      message: 'Are you sure you want to delete this event?',
+      onOk: onDelete,
+      labelOk: 'Delete',
+      type: 'delete',
+    };
+    this.props.dispatch(showConfirmModal(confirm));
+  }
+
   onSaveEvent = () => {
     const { editedEvent } = this.state;
     this.setState({ editedEvent: null });
@@ -80,7 +98,8 @@ class EventSettings extends Component {
 
   getListActions = entityType => [
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEditEvent(entityType) },
-  ]
+    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.renderConfirmModal(entityType) },
+  ];
 
   renderPanelHeader = eventEntity => (
     <div>

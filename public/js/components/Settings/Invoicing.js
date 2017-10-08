@@ -28,7 +28,7 @@ export default class Invoicing extends Component {
     const billingDayOptions = [...Array(28)].map((_, i) => this.renderOption((i + 1), i));
 
     return (
-      <div className="DateTime">
+      <div className="Invoicing">
         <Form horizontal>
           <FormGroup controlId="charging_day" key="charging_day">
             <Col componentClass={ControlLabel} md={2}>
