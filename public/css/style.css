@@ -53,6 +53,11 @@ fieldset[disabled] .btn {
 .inline {
   display: inline-block;;
 }
+.one-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .td-ellipsis{
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -455,6 +460,7 @@ fieldset[disabled] .btn {
 }
 #footer-push{
   height: 30px;
+  margin-top: 10px;
 }
 #footer {
   height: 30px;
