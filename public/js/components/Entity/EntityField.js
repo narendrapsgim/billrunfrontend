@@ -44,11 +44,12 @@ class EntityField extends Component {
   }
 
   getNoDefaultValueVal = () => {
+    const { field } = this.props;
     const { isFieldBoolean, isFieldTags, isFieldSelect } = this.state;
     if (isFieldBoolean) {
       return false;
     }
-    if (isFieldTags || isFieldSelect) {
+    if (isFieldTags || (isFieldSelect && field.get('multiple', false))) {
       return [];
     }
     return '';
@@ -70,8 +71,14 @@ class EntityField extends Component {
   }
 
   onChangeSelect = (val) => {
+    const { field } = this.props;
     const { fieldPath } = this.state;
-    this.props.onChange(fieldPath, val.split(','));
+    const multi = field.get('multiple', false);
+    if (multi) {
+      this.props.onChange(fieldPath, val.split(','));
+    } else {
+      this.props.onChange(fieldPath, val);
+    }
   }
 
   onChangeTags = (val) => {
