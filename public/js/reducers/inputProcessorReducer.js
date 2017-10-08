@@ -172,8 +172,11 @@ export default function (state = defaultState, action) {
         type: value,
         rate_key,
         line_key: state.getIn(['rate_calculators', usaget, priority, index, 'line_key']),
-        computed: state.getIn(['rate_calculators', usaget, priority, index, 'computed'], Immutable.Map()),
       });
+      const computed = state.getIn(['rate_calculators', usaget, priority, index, 'computed']);
+      if (computed && !computed.isEmpty()) {
+        new_rating.set('computed', computed);
+      }
       return state.setIn(['rate_calculators', usaget, priority, index], new_rating);
 
     case ADD_RATING_FIELD: {
