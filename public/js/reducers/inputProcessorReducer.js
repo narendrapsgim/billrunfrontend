@@ -186,7 +186,7 @@ export default function (state = defaultState, action) {
         rate_key: '',
         line_key: '',
       });
-      return state.updateIn(['rate_calculators', usaget, priority], list => list.push(newRating));
+      return state.updateIn(['rate_calculators', usaget, priority], list => (list ? list.push(newRating) : Immutable.List([newRating])));
     }
 
     case ADD_RATING_PRIORITY: {
