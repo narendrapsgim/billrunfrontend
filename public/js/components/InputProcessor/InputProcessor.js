@@ -40,7 +40,7 @@ import {
   setRealtimeField,
   setRealtimeDefaultField,
  } from '../../actions/inputProcessorActions';
-import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
+import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
@@ -350,18 +350,6 @@ class InputProcessor extends Component {
       return nested.map(n => `${field}.${n}`);
     }
     return field;
-  };
-
-  addNewRatingCustomField = (fieldName, title, type) => {
-    const { customRatingFields } = this.props;
-    this.props.dispatch(updateSetting('rates', ['fields'], customRatingFields.push(Immutable.Map({
-      field_name: fieldName,
-      title,
-      multiple: type === 'longestPrefix',
-      display: true,
-      editable: true,
-    }))));
-    return this.props.dispatch(saveSettings('rates'));
   };
 
   goBack = () => {
