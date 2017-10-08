@@ -7,6 +7,7 @@ import changeCase from 'change-case';
 import ComputedRate from './ComputedRate';
 import Help from '../../Help';
 import { getConfig, getAvailableFields } from '../../../common/Util';
+import { updateSetting, saveSettings } from '../../../actions/settingsActions';
 import { ModalWrapper } from '../../Elements';
 import {
   setRatingField,
@@ -90,6 +91,18 @@ class RateMapping extends Component {
     .map((field, key) => (
       <option value={field.get('value', '')} key={key}>{field.get('label', '')}</option>
     ));
+
+  addNewRatingCustomField = (fieldName, title, type) => {
+    const { customRatingFields } = this.props;
+    this.props.dispatch(updateSetting('rates', ['fields'], customRatingFields.push(Immutable.Map({
+      field_name: fieldName,
+      title,
+      multiple: type === 'longestPrefix',
+      display: true,
+      editable: true,
+    }))));
+    return this.props.dispatch(saveSettings('rates'));
+  };
 
   onSetRating = (e) => {
     const { customRatingFields } = this.props;

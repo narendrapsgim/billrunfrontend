@@ -13,6 +13,9 @@ import { getEventConvertedConditions } from '../components/Events/EventsUtil';
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
 
+const getSystemSettings = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['system']);
+
 const getPricing = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['pricing']);
 
@@ -212,6 +215,16 @@ export const taxationTypeSelector = createSelector(
 export const pricingSelector = createSelector(
   getPricing,
   pricing => pricing,
+);
+
+export const systemSettingsSelector = createSelector(
+  getSystemSettings,
+  system => system,
+);
+
+export const closedCycleChangesSelector = createSelector(
+  systemSettingsSelector,
+  (system = Immutable.Map()) => system.get('closed_cycle_changes'),
 );
 
 export const billrunSelector = createSelector(
