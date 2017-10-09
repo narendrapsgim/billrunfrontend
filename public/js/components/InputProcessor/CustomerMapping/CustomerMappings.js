@@ -54,6 +54,7 @@ export default class CustomerMappings extends Component {
                   </div>
                 </div>
               </div>
+              { key < availableUsagetypes.size - 1 ? <div className="separator" /> : null }
             </div>
           );
         }).toArray()}

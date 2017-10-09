@@ -71,13 +71,15 @@ const Templates = {
       }
     ],
     "rate_calculators" : {
-      "call" : [
-	{
-	  "type" : "longestPrefix",
-	  "rate_key" : "params.prefix",
-	  "line_key" : "dst"
-	}
-      ]
+      "retail": {
+        "call" : [[
+  	{
+  	  "type" : "longestPrefix",
+  	  "rate_key" : "params.prefix",
+  	  "line_key" : "dst"
+  	}
+  ]]
+      }
     }
   },
   UK_Standard_CDR_v3: {
@@ -206,13 +208,15 @@ const Templates = {
       }
     ],
     "rate_calculators" : {
-      "GPRS Data" : [
-	{
-	  "type" : "match",
-	  "rate_key" : "key",
-	  "line_key" : "apn"
-	}
-      ]
+      "retail": {
+        "GPRS Data" : [[
+  	{
+  	  "type" : "match",
+  	  "rate_key" : "key",
+  	  "line_key" : "apn"
+  	}
+      ]]
+      }
     }
   },
   FreeSWITCH_CDR: {
@@ -281,13 +285,15 @@ const Templates = {
       }
     ],
     "rate_calculators" : {
-      "call" : [
-	{
-	  "type" : "longestPrefix",
-	  "rate_key" : "params.prefix",
-	  "line_key" : "caller_id_number"
-	}
-      ]
+      "retail": {
+        "call" : [[
+  	{
+  	  "type" : "longestPrefix",
+  	  "rate_key" : "params.prefix",
+  	  "line_key" : "caller_id_number"
+  	}
+      ]]
+      }
     }
   },
   Cisco_CDR: {
@@ -540,13 +546,15 @@ const Templates = {
       }
     ],
     "rate_calculators" : {
-      "NA" : [
-	{
-	  "type" : "longestPrefix",
-	  "rate_key" : "params.prefix",
-	  "line_key" : "originalcalledpartynumber"
-	}
-      ]
+      "retail": {
+        "NA" : [[
+  	{
+  	  "type" : "longestPrefix",
+  	  "rate_key" : "params.prefix",
+  	  "line_key" : "originalcalledpartynumber"
+  	}
+      ]]
+      }
     }
   }
 };
