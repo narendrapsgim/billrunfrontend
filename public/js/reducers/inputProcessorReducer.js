@@ -93,7 +93,7 @@ export default function (state = defaultState, action) {
       return state.set('fields', Immutable.fromJS(action.fields));
 
     case SET_FIELD_WIDTH:
-      return state.setIn(['field_widths', field], parseInt(width, 10));
+      return state.setIn(['field_widths', index], width);
 
     case SET_FIELD_MAPPING:
       return state.setIn(['processor', field], mapping);
@@ -186,7 +186,7 @@ export default function (state = defaultState, action) {
         rate_key: '',
         line_key: '',
       });
-      return state.updateIn(['rate_calculators', usaget, priority], list => list.push(newRating));
+      return state.updateIn(['rate_calculators', usaget, priority], list => (list ? list.push(newRating) : Immutable.List([newRating])));
     }
 
     case ADD_RATING_PRIORITY: {
