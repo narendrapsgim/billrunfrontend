@@ -70,7 +70,7 @@ const convert = (settings) => {
     csv_has_footer: parser.csv_has_footer,
     usaget_type,
     type: settings.type,
-    fields: (parser.type === ("fixed" && parser.structure) ? parser.structure.map(struct => struct.name) : parser.structure),
+    fields: parser.structure ? parser.structure.map(struct => struct.name) : [],
     field_widths,
     customer_identification_fields,
     rate_calculators,
@@ -370,13 +370,13 @@ export function saveInputProcessorSettings(state, parts = []) {
     "parser": {
       "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
-      structure: state.get('delimiter_type') === 'fixed'
-        ? state.get('fields').reduce((acc, field, idx) => acc.push(Immutable.Map({
-          name: field,
-          width: state.getIn(['field_widths', idx], ''),
-        })), Immutable.List())
-        : state.get('fields'),
-    }
+      structure: state.get('fields').reduce((acc, name, idx) => {
+        const struct = (state.get('delimiter_type') === 'fixed')
+          ? Immutable.Map({ name, width: state.getIn(['field_widths', idx], '') })
+          : Immutable.Map({ name });
+        return acc.push(struct);
+      }, Immutable.List()),
+    },
   };
 
   if (state.get('delimiter') !== 'json') {
