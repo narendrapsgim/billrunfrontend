@@ -38,7 +38,7 @@ const CSVField = (props) => {
             <input
               type="number"
               className="form-control"
-              data-field={field}
+              data-field={index}
               disabled={!fixed}
               min="0"
               onChange={props.onSetFieldWidth}

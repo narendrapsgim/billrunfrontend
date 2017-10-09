@@ -57,7 +57,7 @@ const convert = (settings) => {
         } = settings;
 
   const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
-  const field_widths = parser.type === "fixed" ? parser.structure : {};
+  const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : {};
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
                       "static" :
                       "dynamic";
@@ -70,7 +70,7 @@ const convert = (settings) => {
     csv_has_footer: parser.csv_has_footer,
     usaget_type,
     type: settings.type,
-    fields: (parser.type === "fixed" ? Object.keys(parser.structure) : parser.structure),
+    fields: (parser.type === ("fixed" && parser.structure) ? parser.structure.map(struct => struct.name) : parser.structure),
     field_widths,
     customer_identification_fields,
     rate_calculators,
@@ -203,10 +203,10 @@ export function setFields(fields) {
   };
 }
 
-export function setFieldWidth(field, width) {
+export function setFieldWidth(index, width) {
   return {
     type: SET_FIELD_WIDTH,
-    field,
+    index,
     width
   };
 }
@@ -370,7 +370,12 @@ export function saveInputProcessorSettings(state, parts = []) {
     "parser": {
       "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
-      "structure": state.get('delimiter_type') === "fixed" ? state.get('field_widths') : state.get('fields'),
+      structure: state.get('delimiter_type') === 'fixed'
+        ? state.get('fields').reduce((acc, field, idx) => acc.push(Immutable.Map({
+          name: field,
+          width: state.getIn(['field_widths', idx], ''),
+        })), Immutable.List())
+        : state.get('fields'),
     }
   };
 
