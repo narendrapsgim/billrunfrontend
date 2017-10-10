@@ -57,19 +57,15 @@ const Templates = {
       "default_usaget" : "call",
       "orphan_files_time" : "6 hours"
     },
-    "customer_identification_fields" : [
-      {
-	"target_key" : "sid",
-	"conditions" : [
-	  {
-	    "field" : "usaget",
-	    "regex" : "/^call$/"
-	  }
-	],
-	"clear_regex" : "//",
-	"src_key" : "src"
-      }
-    ],
+    "customer_identification_fields" : {
+      "call": [
+        {
+          "target_key" : "sid",
+          "clear_regex" : "//",
+          "src_key" : "src"
+        }
+      ]
+    },
     "rate_calculators" : {
       "call" : [
 	{
@@ -192,19 +188,15 @@ const Templates = {
       ],
       "orphan_files_time" : "6 hours"
     },
-    "customer_identification_fields" : [
-      {
-	"target_key" : "sid",
-	"conditions" : [
-	  {
-	    "field" : "usaget",
-	    "regex" : "/^GPRS Data$/"
-	  }
-	],
-	"clear_regex" : "//",
-	"src_key" : "customer_identifier"
-      }
-    ],
+    "customer_identification_fields" : {
+      "GPRS Data": [
+        {
+          "target_key" : "sid",
+          "clear_regex" : "//",
+          "src_key" : "customer_identifier"
+        }
+      ]
+    },
     "rate_calculators" : {
       "GPRS Data" : [
 	{
@@ -267,19 +259,15 @@ const Templates = {
       "default_usaget" : "call",
       "orphan_files_time" : "6 hours"
     },
-    "customer_identification_fields" : [
-      {
-	"target_key" : "sid",
-	"conditions" : [
-	  {
-	    "field" : "usaget",
-	    "regex" : "/^call$/"
-	  }
-	],
-	"clear_regex" : "//",
-	"src_key" : "caller_id_number"
-      }
-    ],
+    "customer_identification_fields" : {
+      "call": [
+        {
+          "target_key" : "sid",
+          "clear_regex" : "//",
+        	"src_key" : "caller_id_number"
+        }
+      ]
+    },
     "rate_calculators" : {
       "call" : [
 	{
@@ -526,19 +514,15 @@ const Templates = {
       ],
       "orphan_files_time" : "6 hours"
     },
-    "customer_identification_fields" : [
-      {
-	"target_key" : "sid",
-	"conditions" : [
-	  {
-	    "field" : "usaget",
-	    "regex" : "/^NA$/"
-	  }
-	],
-	"clear_regex" : "//",
-	"src_key" : "callingpartynumber"
-      }
-    ],
+    "customer_identification_fields" : {
+      "NA": [
+        {
+          "target_key" : "sid",
+          "clear_regex" : "//",
+        	"src_key" : "callingpartynumber"
+        }
+      ]
+    },
     "rate_calculators" : {
       "NA" : [
 	{

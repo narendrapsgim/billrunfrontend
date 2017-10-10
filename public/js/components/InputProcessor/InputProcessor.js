@@ -8,7 +8,8 @@ import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import Templates from '../../Templates';
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
-import CalculatorMapping from './CalculatorMapping';
+import CustomerMappings from './CustomerMapping/CustomerMappings';
+import RateMappings from './RateMapping/RateMappings';
 import Receiver from './Receiver';
 import RealtimeMapping from './RealtimeMapping';
 import {
@@ -106,19 +107,24 @@ class InputProcessor extends Component {
       },
       customer_identification_fields: {
         idx: 2,
-        label: 'Calculator Mapping',
+        label: 'Customer Mapping',
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields'],
+      },
+      rate_calculators: {
+        idx: 3,
+        label: 'Rate Mapping',
         parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators'],
       },
     });
     if (props.type === 'api') {
       steps = steps.set('realtimeMapping', {
-        idx: 3,
+        idx: 4,
         label: 'Realtime Mapping',
         parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response', 'unify'],
       });
     } else {
       steps = steps.set('receiver', {
-        idx: 3,
+        idx: 4,
         label: 'Receiver',
         parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver', 'unify'],
       });
@@ -296,8 +302,8 @@ class InputProcessor extends Component {
     this.props.dispatch(removeUsagetMapping(index));
   }
 
-  onSetCustomerMapping = (field, mapping, index) => {
-    this.props.dispatch(setCustomerMapping(field, mapping, index));
+  onSetCustomerMapping = (field, mapping, usaget, index) => {
+    this.props.dispatch(setCustomerMapping(field, mapping, usaget, index));
   }
 
   onSetReceiverField = (e) => {
@@ -446,11 +452,17 @@ class InputProcessor extends Component {
       );
 
       case steps.get('customer_identification_fields', {}).idx: return (
-        <CalculatorMapping
+        <CustomerMappings
           settings={settings}
           subscriberFields={subscriberFields}
-          customRatingFields={customRatingFields}
           onSetCustomerMapping={this.onSetCustomerMapping}
+        />
+      );
+
+      case steps.get('rate_calculators', {}).idx: return (
+        <RateMappings
+          settings={settings}
+          customRatingFields={customRatingFields}
         />
       );
 
