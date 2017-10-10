@@ -9,6 +9,7 @@ import { getUnitLabel } from '../../common/Util';
 export default class FieldsMapping extends Component {
 
   static propTypes = {
+    settings: PropTypes.instanceOf(Immutable.Map),
     usageTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
@@ -17,6 +18,7 @@ export default class FieldsMapping extends Component {
   };
 
   static defaultProps = {
+    settings: Immutable.Map(),
     usageTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
@@ -151,6 +153,69 @@ export default class FieldsMapping extends Component {
     this.onChangeApriceMult(e);
   }
 
+  getVolumeOptions = () => this.props.settings.get('fields', Immutable.List()).sortBy(field => field).map(field => ({
+    label: field,
+    value: field,
+  })).toArray();
+
+  renderPrice = () => {
+    const { settings } = this.props;
+    const aprice = settings.getIn(['processor', 'aprice_field'], null);
+    const apriceInputProps = {
+      fieldType: 'select',
+      placeholder: 'Select price field...',
+      options: this.getVolumeOptions(),
+      onChange: this.onChangeApriceField,
+    };
+    const apriceMult = settings.getIn(['processor', 'aprice_mult']) || '';
+    const apriceMultInputProps = {
+      fieldType: 'number',
+      id: 'aprice_mult',
+      onChange: this.onChangeApriceMult,
+    };
+    return (
+      <div>
+        <div className="separator" />
+        <div className="form-group">
+          <div className="col-lg-3">
+            <label htmlFor="volume_field">Price</label>
+            <p className="help-block">When checked, the price will be taken directly from the record instead of being calculated</p>
+          </div>
+          <div className="col-lg-9">
+            <div className="col-lg-1" style={{ marginTop: 8 }}>
+              <i className="fa fa-long-arrow-right" />
+            </div>
+
+            <div className="col-lg-9 form-inner-edit-row">
+              <Field
+                fieldType="toggeledInput"
+                value={aprice}
+                onChange={this.onChangeApriceExists}
+                label="Pre priced"
+                inputProps={apriceInputProps}
+              />
+            </div>
+
+            <div className="col-lg-9 col-lg-offset-1 form-inner-edit-row">
+              <Field
+                fieldType="toggeledInput"
+                value={apriceMult}
+                disabledValue=""
+                disabled={aprice === null || aprice === undefined}
+                onChange={this.onChangeApriceMultExists}
+                label="Multiply by constant"
+                inputProps={apriceMultInputProps}
+              />
+            </div>
+            <div className="col-lg-1">
+              <Help contents="When checked, the price taken will be multiply by the constant entered" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const { separateTime, usaget, unit } = this.state;
     const { settings,
@@ -169,25 +234,6 @@ export default class FieldsMapping extends Component {
 
     const defaultUsaget = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_usaget'], '');
     const defaultUsagetUnit = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_unit'], '');
-    const volumeOptions = settings.get('fields', Immutable.List()).sortBy(field => field).map(field => ({
-      label: field,
-      value: field,
-    })).toArray();
-    const volume = settings.getIn(['processor', 'volume_field'], Immutable.List());
-    const volumeList = (typeof volume === 'string') ? volume : volume.join(',');
-    const aprice = settings.getIn(['processor', 'aprice_field'], null);
-    const apriceInputProps = {
-      fieldType: 'select',
-      placeholder: 'Select price field...',
-      options: volumeOptions,
-      onChange: this.onChangeApriceField,
-    };
-    const apriceMult = settings.getIn(['processor', 'aprice_mult']) || '';
-    const apriceMultInputProps = {
-      fieldType: 'number',
-      id: 'aprice_mult',
-      onChange: this.onChangeApriceMult,
-    };
 
     return (
       <form className="form-horizontal FieldsMapping">
@@ -228,61 +274,6 @@ export default class FieldsMapping extends Component {
                         value={settings.getIn(['processor', 'time_field'], '')}>
                   { available_fields }
                 </select>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="separator" />
-        <div className="form-group">
-          <div className="col-lg-3">
-            <label htmlFor="volume_field">Volume</label>
-            <p className="help-block">Amount calculated (multiple selection will sum fields)</p>
-          </div>
-          <div className="col-lg-9">
-            <div className="col-lg-1" style={{marginTop: 8}}>
-              <i className="fa fa-long-arrow-right"></i>
-            </div>
-            <div className="col-lg-9">
-              <Select
-                inputProps={{ id: 'volume_field' }}
-                multi={true}
-                value={volumeList}
-                options={volumeOptions}
-                onChange={this.onChangeVolume}
-              />
-            </div>
-          </div>
-          <div className="form-group">
-            <div className="col-lg-offset-3 col-lg-9">
-              <div className="col-lg-offset-1 col-lg-9">
-                <Field
-                  fieldType="toggeledInput"
-                  value={aprice}
-                  onChange={this.onChangeApriceExists}
-                  label="Pre priced"
-                  inputProps={apriceInputProps}
-                />
-              </div>
-              <div className="col-lg-1">
-                <Help contents="When checked, the price will be taken directly from the record instead of being calculated" />
-              </div>
-            </div>
-          </div>
-          <div className="form-group">
-            <div className="col-lg-offset-3 col-lg-9">
-              <div className="col-lg-offset-1 col-lg-9">
-                <Field
-                  fieldType="toggeledInput"
-                  value={apriceMult}
-                  disabledValue=""
-                  disabled={aprice === null || aprice === undefined}
-                  onChange={this.onChangeApriceMultExists}
-                  label="Multiply by constant"
-                  inputProps={apriceMultInputProps}
-                />
-              </div>
-              <div className="col-lg-1">
-                <Help contents="When checked, the price taken will be multiply by the constant entered" />
               </div>
             </div>
           </div>
@@ -411,6 +402,8 @@ export default class FieldsMapping extends Component {
             </div>
           </div>
         </div>
+
+        { this.renderPrice() }
       </form>
     );
   }
