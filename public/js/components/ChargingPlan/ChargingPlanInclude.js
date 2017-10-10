@@ -72,7 +72,7 @@ const ChargingPlanInclude = (props) => {
           </FormGroup>
 
           <FormGroup>
-            <Col componentClass={ControlLabel} md={2}>{include.get('unit_label', 'Volume')}</Col>
+            <Col componentClass={ControlLabel} md={2}>{include.get('unit_label', 'Value')}</Col>
             <Col md={9}>
               <Field id="usagev" value={include.get('usagev', 0)} onChange={onUpdateField} fieldType="number" editable={props.editable} />
             </Col>
