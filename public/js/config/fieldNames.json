@@ -10,7 +10,7 @@
     "firstname": "Subscriber's first name",
     "start": "Start time",
     "channel": "Calling channel",
-    "stamp": "Record unique ID",
+    "stamp": "Unique record ID",
     "billrun": "Billing cycle",
     "src": "Calling ID",
     "in_group": "Campaign inclusive units",
@@ -98,7 +98,7 @@
     "notify_time": "Notify Time",
     "creation_time": "Creation Time",
     "value": "Value",
-    "stamp": "Record unique ID",
+    "stamp": "Unique record ID",
     "returned_value": "Response"
   },
   "aid": "Customer ID",
