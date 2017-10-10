@@ -282,7 +282,7 @@ export default class FieldsMapping extends Component {
                 />
               </div>
               <div className="col-lg-1">
-                <Help contents="When checked, the price taken will be multiply by the constant entered" />
+                <Help contents="When checked, the price taken will be multiplied by the constant entered" />
               </div>
             </div>
           </div>
