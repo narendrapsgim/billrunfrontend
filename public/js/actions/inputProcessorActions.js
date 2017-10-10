@@ -403,6 +403,7 @@ export function saveInputProcessorSettings(state, parts = []) {
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
       "aprice_field": processor.get('aprice_field'),
+      "aprice_mult": processor.get('aprice_mult'),
       ...processor_settings
     };
     if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');
