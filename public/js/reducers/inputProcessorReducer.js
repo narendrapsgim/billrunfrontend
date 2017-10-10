@@ -14,6 +14,8 @@ import { SET_NAME,
          ADD_CSV_FIELD,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
+         ADD_CUSTOMER_MAPPING,
+         REMOVE_CUSTOMER_MAPPING,
          SET_RATING_FIELD,
          ADD_RATING_FIELD,
          ADD_RATING_PRIORITY,
@@ -45,7 +47,7 @@ const defaultState = Immutable.fromJS({
   processor: {
     usaget_mapping: [],
   },
-  customer_identification_fields: [],
+  customer_identification_fields: {},
   rate_calculators: {},
   unify: {},
   /* receiver: {
@@ -57,10 +59,6 @@ const defaultState = Immutable.fromJS({
 const defaultCustomerIdentification = Immutable.fromJS({
   target_key: 'sid',
   src_key: '',
-  conditions: [{
-    field: 'usaget',
-    regex: "/.*/",
-  }],
   clear_regex: '//',
 });
 
@@ -110,35 +108,26 @@ export default function (state = defaultState, action) {
     case SET_USAGET_TYPE:
       return state
         .set('usaget_type', action.usaget_type)
-        .set('customer_identification_fields', Immutable.List())
+        .set('customer_identification_fields', Immutable.Map())
         .setIn(['processor', 'usaget_mapping'], Immutable.List())
         .setIn(['processor', 'default_usaget'], '')
         .setIn(['processor', 'src_field'], '')
         .setIn(['rate_calculators'], Immutable.Map());
 
     case SET_STATIC_USAGET: {
-      const regex = new RegExp(`^${action.usaget}$`).toString();
-      const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], regex);
       return state
         .setIn(['processor', 'default_usaget'], action.usaget)
         .update('rate_calculators', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.List()))
-        .update('customer_identification_fields', Immutable.List(), list => list.clear().push(customerIdentification));
+        .update('customer_identification_fields', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.List()));
     }
 
     case MAP_USAGET: {
       const { pattern, usaget, unit } = action.mapping;
       const newMap = Immutable.fromJS({ pattern, usaget, unit });
-      const regex = new RegExp(`^${usaget}$`).toString();
-      const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], regex);
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.push(newMap))
         .update('rate_calculators', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.List()) : map))
-        .update('customer_identification_fields', Immutable.List(), (list) => {
-          if (list.find(identification => identification.getIn(['conditions', 0, 'regex']) === regex)) {
-            return list;
-          }
-          return list.push(customerIdentification);
-        });
+        .update('customer_identification_fields', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.List()) : map));
     }
 
     case REMOVE_USAGET_MAPPING: {
@@ -149,11 +138,11 @@ export default function (state = defaultState, action) {
         .countBy(key => (key === usaget ? 'found' : 'notfound')).get('found', 0);
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index))
-        .updateIn(['customer_identification_fields'], (list) => {
+        .updateIn(['customer_identification_fields'], Immutable.Map(), (customerCalc) => {
           if (countUsaget === 1) {
-            return list.remove(action.index);
+            return customerCalc.delete(usaget);
           }
-          return list;
+          return customerCalc;
         })
         .updateIn(['rate_calculators'], Immutable.Map(), (rateCalc) => {
           if (countUsaget === 1) {
@@ -164,7 +153,13 @@ export default function (state = defaultState, action) {
     }
 
     case SET_CUSETOMER_MAPPING:
-      return state.setIn(['customer_identification_fields', action.index, field], mapping);
+      return state.setIn(['customer_identification_fields', action.usaget, action.index, field], mapping);
+
+    case ADD_CUSTOMER_MAPPING:
+      return state.updateIn(['customer_identification_fields', action.usaget], list => (list ? list.push(defaultCustomerIdentification) : Immutable.List([defaultCustomerIdentification])));
+
+    case REMOVE_CUSTOMER_MAPPING:
+      return state.updateIn(['customer_identification_fields', action.usaget], list => list.remove(priority));
 
     case SET_RATING_FIELD:
       var { rate_key, value, usaget } = action;
@@ -186,7 +181,7 @@ export default function (state = defaultState, action) {
         rate_key: '',
         line_key: '',
       });
-      return state.updateIn(['rate_calculators', usaget, priority], list => list.push(newRating));
+      return state.updateIn(['rate_calculators', usaget, priority], list => (list ? list.push(newRating) : Immutable.List([newRating])));
     }
 
     case ADD_RATING_PRIORITY: {
