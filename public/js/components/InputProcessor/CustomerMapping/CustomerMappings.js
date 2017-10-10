@@ -1,10 +1,14 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
+import classNames from 'classnames';
 import CustomerMapping from './CustomerMapping';
+import { addCustomerMapping, removeCustomerMapping } from '../../../actions/inputProcessorActions';
 
-export default class CustomerMappings extends Component {
+class CustomerMappings extends Component {
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     settings: PropTypes.instanceOf(Immutable.Map),
     onSetCustomerMapping: PropTypes.func.isRequired,
     subscriberFields: PropTypes.instanceOf(Immutable.List),
@@ -15,9 +19,37 @@ export default class CustomerMappings extends Component {
     subscriberFields: Immutable.List(),
   };
 
+  onAddCustomerMapping = usaget => () => {
+    this.props.dispatch(addCustomerMapping(usaget));
+  }
+
+  onRemoveCustomerMapping = (usaget, priority) => () => {
+    this.props.dispatch(removeCustomerMapping(usaget, priority));
+  }
+
+  renderAddCustomerMappingButton = usaget => (
+    <Button
+      bsSize="xsmall"
+      className="btn-primary"
+      onClick={this.onAddCustomerMapping(usaget)}
+    >
+      <i className="fa fa-plus" />&nbsp;Add
+    </Button>
+  );
+
+  renderRemoveCustomerMappingButton = (usaget, priority) => (
+    <Button
+      bsStyle="link"
+      bsSize="xsmall"
+      onClick={this.onRemoveCustomerMapping(usaget, priority)}
+    >
+      <i className="fa fa-fw fa-trash-o danger-red" />
+    </Button>
+  );
+
   render() {
-    const { settings, onSetCustomerMapping, subscriberFields } = this.props;
-    const availableUsagetypes = settings.get('customer_identification_fields', Immutable.List());
+    const { settings, subscriberFields } = this.props;
+    const customerMappings = settings.get('customer_identification_fields', Immutable.Map());
     return (
       <Form horizontal className="customerMappings">
         <div className="form-group">
@@ -28,36 +60,59 @@ export default class CustomerMappings extends Component {
             </h4>
           </div>
         </div>
-        {availableUsagetypes.map((usaget, key) => {
-          const regex = usaget.getIn(['conditions', 0, 'regex'], '');
-          const label = regex.substring(2, regex.length - 2);
-          return (
-            <div key={key}>
-              <div className="form-group">
-                <div className="col-lg-3">
-                  <label htmlFor={label}>{ label }</label>
+        {customerMappings.map((mappings, usaget) => (
+          <div key={`customer-mapping-${usaget}`}>
+            <div className="form-group">
+              <div className="col-lg-3">
+                <label htmlFor={usaget}>{ usaget }</label>
+              </div>
+              <div className="col-lg-9">
+                <div className="col-lg-1" style={{ marginTop: 8 }}>
+                  <i className="fa fa-long-arrow-right" />
                 </div>
-                <div className="col-lg-9">
-                  <div className="col-lg-1" style={{ marginTop: 8 }}>
-                    <i className="fa fa-long-arrow-right" />
-                  </div>
-                  <div className="col-lg-9">
-                    <div className="row">
-                      <CustomerMapping
-                        usaget={usaget}
-                        index={key}
-                        onSetCustomerMapping={onSetCustomerMapping}
-                        subscriberFields={subscriberFields}
-                        settings={settings}
-                      />
+                {mappings.map((mapping, priority) => {
+                  const lineClass = classNames('form-inner-edit-row', 'col-lg-9', {
+                    'col-lg-offset-1': priority > 0,
+                  });
+                  return (
+                    <div className={lineClass} key={`customer-mapping-${usaget}-${priority}`}>
+                      <div className="row">
+                        <div className="col-lg-11">
+                          <CustomerMapping
+                            usaget={usaget}
+                            mapping={mapping}
+                            priority={priority}
+                            onSetCustomerMapping={this.props.onSetCustomerMapping}
+                            subscriberFields={subscriberFields}
+                            settings={settings}
+                          />
+                        </div>
+                        <div className="col-lg-1">
+                          {
+                            priority > 0 &&
+                            this.renderRemoveCustomerMappingButton(usaget, priority)
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div className="col-lg-9 col-lg-offset-1">
+                  <div className="row">
+                    <div className="col-lg-11">
+                      <div className="col-lg-4">
+                        { this.renderAddCustomerMappingButton(usaget) }
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          );
-        }).toArray()}
+          </div>
+        )).toArray()}
       </Form>
     );
   }
 }
+
+export default connect()(CustomerMappings);

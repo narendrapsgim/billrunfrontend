@@ -1,12 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
+import Field from '../../Field';
 import { getFieldName, getAvailableFields } from '../../../common/Util';
 
 export default class CustomerMapping extends Component {
   static propTypes = {
     settings: PropTypes.instanceOf(Immutable.Map),
-    usaget: PropTypes.instanceOf(Immutable.Map).isRequired,
-    index: PropTypes.number.isRequired,
+    usaget: PropTypes.string.isRequired,
+    mapping: PropTypes.instanceOf(Immutable.Map).isRequired,
+    priority: PropTypes.number.isRequired,
     onSetCustomerMapping: PropTypes.func.isRequired,
     subscriberFields: PropTypes.instanceOf(Immutable.List),
   }
@@ -17,9 +19,14 @@ export default class CustomerMapping extends Component {
   };
 
   onSetCustomerMapping = (e) => {
-    const { index } = this.props;
+    const { usaget, priority } = this.props;
     const { value, id } = e.target;
-    this.props.onSetCustomerMapping(id, value, index);
+    this.props.onSetCustomerMapping(id, value, usaget, priority);
+  }
+
+  onChangeClearRegex = (value) => {
+    const { usaget, priority } = this.props;
+    this.props.onSetCustomerMapping('clear_regex', value, usaget, priority);
   }
 
   getCustomerIdentificationFields = () =>
@@ -41,19 +48,30 @@ export default class CustomerMapping extends Component {
   }
 
   render() {
-    const { usaget } = this.props;
-    const targetKey = usaget.getIn(['target_key'], 'sid');
-    const srcKey = usaget.getIn(['src_key'], '');
+    const { mapping } = this.props;
+    const targetKey = mapping.getIn(['target_key'], 'sid');
+    const srcKey = mapping.getIn(['src_key'], '');
+    const clearRegex = mapping.getIn(['clear_regex'], '');
     const availableFields = this.getCustomerIdentificationFields();
     const availableTargetFields = this.getAvailableTargetFields();
     return (
       <div>
-        <div className="col-lg-6">
+        <div className="col-lg-4">
           <select id="src_key" className="form-control" onChange={this.onSetCustomerMapping} value={srcKey} >
             { availableFields }
           </select>
         </div>
-        <div className="col-lg-6">
+        <div className="col-lg-4">
+          <Field
+            value={clearRegex}
+            id="clear_regex"
+            disabledValue={'//'}
+            onChange={this.onChangeClearRegex}
+            label="Regex"
+            fieldType="toggeledInput"
+          />
+        </div>
+        <div className="col-lg-4">
           <select id="target_key" className="form-control" onChange={this.onSetCustomerMapping} value={targetKey}>
             { availableTargetFields }
           </select>

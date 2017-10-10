@@ -13,6 +13,8 @@ export const ADD_RATING_PRIORITY = 'ADD_RATING_PRIORITY';
 export const REMOVE_RATING_PRIORITY = 'REMOVE_RATING_PRIORITY';
 export const REMOVE_RATING_FIELD = 'REMOVE_RATING_FIELD';
 export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
+export const ADD_CUSTOMER_MAPPING = 'ADD_CUSTOMER_MAPPING';
+export const REMOVE_CUSTOMER_MAPPING = 'REMOVE_CUSTOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
@@ -48,7 +50,7 @@ import { getSettings } from './settingsActions';
 const convert = (settings) => {
   const { parser = {},
           processor = {},
-          customer_identification_fields = [],
+          customer_identification_fields = {},
           rate_calculators = {},
           receiver = {},
           realtime = {},
@@ -102,19 +104,24 @@ const convert = (settings) => {
       src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
     });
     if (!rate_calculators) {
-      if (usaget_type === "dynamic") {
-	ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
-	  acc[mapping.usaget] = [];
-	  return acc;
-	}, {});
+      if (usaget_type === 'dynamic') {
+        ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
+          acc[mapping.usaget] = [];
+          return acc;
+        }, {});
       } else {
-	ret.rate_calculators = {[processor.default_usaget]: []};
+        ret.rate_calculators = { [processor.default_usaget]: [] };
       }
     }
     if (!customer_identification_fields) {
-      ret.customer_identification_fields = [
-	{target_key: "sid"}
-      ];
+      if (usaget_type === 'dynamic') {
+        ret.customer_identification_fields = _.reduce(processor.usaget_mapping, (acc, mapping) => {
+          acc[mapping.usaget] = [];
+          return acc;
+        }, {});
+      } else {
+        ret.customer_identification_fields = { [processor.default_usaget]: [] };
+      }
     }
   } else {
     ret.processor = {
@@ -267,12 +274,28 @@ export function mapUsaget(mapping) {
   };
 }
 
-export function setCustomerMapping(field, mapping, index) {
+export function setCustomerMapping(field, mapping, usaget, index) {
   return {
     type: SET_CUSETOMER_MAPPING,
     field,
     mapping,
+    usaget,
     index,
+  };
+}
+
+export function addCustomerMapping(usaget) {
+  return {
+    type: ADD_CUSTOMER_MAPPING,
+    usaget,
+  };
+}
+
+export function removeCustomerMapping(usaget, priority) {
+  return {
+    type: REMOVE_CUSTOMER_MAPPING,
+    usaget,
+    priority,
   };
 }
 

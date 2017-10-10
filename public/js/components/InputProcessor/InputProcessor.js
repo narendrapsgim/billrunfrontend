@@ -302,8 +302,8 @@ class InputProcessor extends Component {
     this.props.dispatch(removeUsagetMapping(index));
   }
 
-  onSetCustomerMapping = (field, mapping, index) => {
-    this.props.dispatch(setCustomerMapping(field, mapping, index));
+  onSetCustomerMapping = (field, mapping, usaget, index) => {
+    this.props.dispatch(setCustomerMapping(field, mapping, usaget, index));
   }
 
   onSetReceiverField = (e) => {
