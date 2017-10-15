@@ -134,6 +134,21 @@ export default class FieldsMapping extends Component {
 
   onChangeApriceExists = () => {
     this.onChangeApriceField(undefined);
+    this.onChangeApriceMultExists();
+  }
+
+  onChangeApriceMult = (e) => {
+    this.props.onSetFieldMapping(e);
+  }
+
+  onChangeApriceMultExists = () => {
+    const e = {
+      target: {
+        value: undefined,
+        id: 'aprice_mult',
+      },
+    };
+    this.onChangeApriceMult(e);
   }
 
   render() {
@@ -166,6 +181,12 @@ export default class FieldsMapping extends Component {
       placeholder: 'Select price field...',
       options: volumeOptions,
       onChange: this.onChangeApriceField,
+    };
+    const apriceMult = settings.getIn(['processor', 'aprice_mult']) || '';
+    const apriceMultInputProps = {
+      fieldType: 'number',
+      id: 'aprice_mult',
+      onChange: this.onChangeApriceMult,
     };
 
     return (
@@ -243,7 +264,25 @@ export default class FieldsMapping extends Component {
                 />
               </div>
               <div className="col-lg-1">
-                <Help contents="When chceked, the price will be taken directly from the record instead of being calculated" />
+                <Help contents="When checked, the price will be taken directly from the record instead of being calculated" />
+              </div>
+            </div>
+          </div>
+          <div className="form-group">
+            <div className="col-lg-offset-3 col-lg-9">
+              <div className="col-lg-offset-1 col-lg-9">
+                <Field
+                  fieldType="toggeledInput"
+                  value={apriceMult}
+                  disabledValue=""
+                  disabled={aprice === null || aprice === undefined}
+                  onChange={this.onChangeApriceMultExists}
+                  label="Multiply by constant"
+                  inputProps={apriceMultInputProps}
+                />
+              </div>
+              <div className="col-lg-1">
+                <Help contents="When checked, the price taken will be multiplied by the constant entered" />
               </div>
             </div>
           </div>
