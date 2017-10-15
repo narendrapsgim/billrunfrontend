@@ -240,10 +240,10 @@ export const isLinkerField = (field = Immutable.Map()) => (
 
 export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldField, oldOp, newField, newOp) => {
   const oldFieldLabel = oldField === '' ? '' : fieldsOptions.find(
-    fieldConfig => fieldConfig.get('id') === oldField, null, Immutable.Map(),
+    fieldConfig => fieldConfig.get('id') === oldField, null, Immutable.Map({ title: newField }),
   ).get('title', '');
   const newFieldLabel = oldField === newField ? oldFieldLabel : fieldsOptions.find(
-    fieldConfig => fieldConfig.get('id') === newField, null, Immutable.Map(),
+    fieldConfig => fieldConfig.get('id') === newField, null, Immutable.Map({ title: newField }),
   ).get('title', '');
 
   const oldOpLabel = oldOp === '' ? '' : opOptions.find(
