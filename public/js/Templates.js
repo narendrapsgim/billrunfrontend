@@ -53,7 +53,8 @@ const Templates = {
     "processor" : {
       "type" : "Usage",
       "date_field" : "answer",
-      "volume_field" : "duration",
+      "default_volume_type" : "field",
+      "default_volume_src" : ["duration"],
       "default_usaget" : "call",
       "orphan_files_time" : "6 hours"
     },
@@ -178,12 +179,13 @@ const Templates = {
     "processor" : {
       "type" : "Usage",
       "date_field" : "call_date",
-      "volume_field" : "duration",
       "usaget_mapping" : [
 	{
 	  "src_field" : "call_type",
 	  "pattern" : "/^G$/",
-	  "usaget" : "GPRS Data"
+	  "usaget" : "GPRS Data",
+    "volume_type": "field",
+    "volume_src": ["duration"]
 	}
       ],
       "orphan_files_time" : "6 hours"
@@ -255,7 +257,8 @@ const Templates = {
     "processor" : {
       "type" : "Usage",
       "date_field" : "answer_stamp",
-      "volume_field" : "billsec",
+      "default_volume_type" : "field",
+      "default_volume_src" : ["billsec"],
       "default_usaget" : "call",
       "orphan_files_time" : "6 hours"
     },
@@ -504,12 +507,13 @@ const Templates = {
     "processor" : {
       "type" : "Usage",
       "date_field" : "datetimeconnect",
-      "volume_field" : "duration",
       "usaget_mapping" : [
 	{
 	  "src_field" : "calledpartypatternusage",
 	  "pattern" : "/^NA$/",
-	  "usaget" : "NA"
+	  "usaget" : "NA",
+    "volume_type": "field",
+    "volume_src": ["duration"]
 	}
       ],
       "orphan_files_time" : "6 hours"

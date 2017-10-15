@@ -94,6 +94,8 @@ const convert = (settings) => {
 	  usaget: usaget.usaget,
 	  pattern: usaget.pattern.replace("/^", "").replace("$/", ""),
     unit: usaget.unit,
+    volume_type: usaget.volume_type,
+    volume_src: usaget.volume_src,
 	}
       })
     } else {
@@ -412,6 +414,8 @@ export function saveInputProcessorSettings(state, parts = []) {
     ? {
       default_usaget: processor.get('default_usaget'),
       default_unit: processor.get('default_unit'),
+      default_volume_type: processor.get('default_volume_type'),
+      default_volume_src: processor.get('default_volume_src'),
     }
     : {
       usaget_mapping: processor.get('usaget_mapping').map(usaget => ({
@@ -419,12 +423,13 @@ export function saveInputProcessorSettings(state, parts = []) {
         pattern: usaget.get('pattern'),
         usaget: usaget.get('usaget'),
         unit: usaget.get('unit'),
+        volume_type: usaget.get('volume_type'),
+        volume_src: usaget.get('volume_src'),
       })).toJS(),
     };
     settings.processor = {
       type: (settings.type === 'realtime' ? 'Realtime' : 'Usage'),
       "date_field": processor.get('date_field'),
-      "volume_field": processor.get('volume_field'),
       "aprice_field": processor.get('aprice_field'),
       "aprice_mult": processor.get('aprice_mult'),
       ...processor_settings

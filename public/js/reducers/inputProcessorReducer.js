@@ -122,8 +122,14 @@ export default function (state = defaultState, action) {
     }
 
     case MAP_USAGET: {
-      const { pattern, usaget, unit } = action.mapping;
-      const newMap = Immutable.fromJS({ pattern, usaget, unit });
+      const { pattern, usaget, unit, volumeType, volumeSrc } = action.mapping;
+      const newMap = Immutable.fromJS({
+        pattern,
+        usaget,
+        unit,
+        volume_type: volumeType,
+        volume_src: volumeSrc,
+      });
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.push(newMap))
         .update('rate_calculators', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.List()) : map))
