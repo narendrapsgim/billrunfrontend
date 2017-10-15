@@ -324,6 +324,10 @@ export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => ge
 export const getProductsWithRatesQuery = () =>
   getProductsKeysQuery({ key: 1, description: 1, rates: 1 });
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
+export const getIncludedServicesKeysQuery = () => getEntitesQuery('services', { name: 1 }, {
+  quantitative: { $ne: true },
+  balance_period: { $exists: false },
+});
 export const getPlansKeysQuery = (project = { name: 1, description: 1 }) => getEntitesQuery('plans', project);
 export const getUserKeysQuery = () => getEntitesQuery('users', { username: 1 });
 export const getAllGroupsQuery = () => ([
