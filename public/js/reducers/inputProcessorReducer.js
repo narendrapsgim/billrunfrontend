@@ -43,7 +43,7 @@ const defaultState = Immutable.fromJS({
   usaget_type: 'static',
   delimiter: '',
   fields: [],
-  field_widths: {},
+  field_widths: [],
   processor: {
     usaget_mapping: [],
   },
@@ -64,7 +64,7 @@ const defaultCustomerIdentification = Immutable.fromJS({
 
 export default function (state = defaultState, action) {
   const { field, mapping, width, index, priority } = action;
-  let field_to_move;
+  let field_to_move, fieldWidthToMove;
   switch (action.type) {
     case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
@@ -235,11 +235,17 @@ export default function (state = defaultState, action) {
 
     case MOVE_CSV_FIELD_UP:
       field_to_move = field ? field : state.getIn(['fields', index]);
-      return state.update('fields', list => list.delete(index).insert(index-1, field_to_move));
+      fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
+      return state
+        .update('fields', list => list.delete(index).insert(index - 1, field_to_move))
+        .update('field_widths', list => list.delete(index).insert(index - 1, fieldWidthToMove));
 
     case MOVE_CSV_FIELD_DOWN:
       field_to_move = field ? field : state.getIn(['fields', index]);
-      return state.update('fields', list => list.delete(index).insert(index+1, field_to_move));
+      fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
+      return state
+        .update('fields', list => list.delete(index).insert(index + 1, field_to_move))
+        .update('field_widths', list => list.delete(index).insert(index + 1, fieldWidthToMove));
 
     case CHANGE_CSV_FIELD:
       return state.update('fields', list => list.set(index, action.value));

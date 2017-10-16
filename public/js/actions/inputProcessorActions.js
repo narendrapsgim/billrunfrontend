@@ -59,7 +59,7 @@ const convert = (settings) => {
         } = settings;
 
   const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
-  const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : {};
+  const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : [];
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
                       "static" :
                       "dynamic";
