@@ -43,7 +43,7 @@ const defaultState = Immutable.fromJS({
   usaget_type: 'static',
   delimiter: '',
   fields: [],
-  field_widths: {},
+  field_widths: [],
   processor: {
     usaget_mapping: [],
   },
