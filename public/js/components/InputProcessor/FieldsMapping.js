@@ -475,7 +475,7 @@ export default class FieldsMapping extends Component {
                     </div>
                     <div className="col-lg-4">
                       {
-                        usageType.get('volumeType', 'field') === 'field'
+                        usageType.get('volume_type', 'field') === 'field'
                         ? usageType.get('volume_src', []).join(', ')
                         : usageType.get('volume_src', '')
                       }
