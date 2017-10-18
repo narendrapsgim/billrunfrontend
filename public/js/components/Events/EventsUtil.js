@@ -12,7 +12,7 @@ export const getConditionData = conditionName =>
 export const buildBalanceConditionPath = (trigger, limitation, params = {}) => {
   switch (limitation) {
     case 'group':
-      return `balance.totals.groups.${params.groupName}.${trigger}`;
+      return `balance.groups.${params.groupName}.${trigger}`;
     case 'activity_type':
       return `balance.totals.${params.activityType}.${trigger}`;
     case 'none':
