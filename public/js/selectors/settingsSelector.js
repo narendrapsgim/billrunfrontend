@@ -54,6 +54,9 @@ const getInvoiceExport = (state, props) => // eslint-disable-line no-unused-vars
 const getEvents = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['events']);
 
+const getPaymentGateways = (state, props) =>
+    state.settings.getIn(['payment_gateways']);
+
 const selectSubscriberImportFields = (fields, accountfields) => {
   if (fields) {
     const importLinkers = accountfields.filter(isLinkerField);
@@ -623,4 +626,9 @@ export const invoiceTemplateTemplatesSelector = createSelector(
 export const invoiceTemplateStatusSelector = createSelector(
   getInvoiceExport,
   (invoiceExport = Immutable.Map()) => invoiceExport.get('status'),
+);
+
+export const paymentGatewaysSelector = createSelector(
+  getPaymentGateways,
+  availablePaymentGateways => availablePaymentGateways,
 );
