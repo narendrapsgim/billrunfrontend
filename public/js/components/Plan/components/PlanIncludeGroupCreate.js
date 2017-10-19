@@ -252,6 +252,13 @@ class PlanIncludeGroupCreate extends Component {
     this.setState({ open: !this.state.open });
   }
 
+  noMoreOptions = () => {
+    const { usagesPropertyType, usages } = this.state;
+    const { usageTypesData } = this.props;
+    const relevantOptions = usageTypesData.filter(usagetype => usagesPropertyType === usagetype.get('property_type', ''));
+    return usages.size >= relevantOptions.size;
+  }
+
   onChangeBasedOn = (e) => {
     const { usageTypesData } = this.props;
     const { value } = e.target;
@@ -395,7 +402,7 @@ class PlanIncludeGroupCreate extends Component {
             <FormGroup>
               <Col sm={3} />
               <Col sm={8}>
-                <CreateButton onClick={this.onClickAddUnitType} label="Additional" disabled={usages.get(0, '') === ''} />
+                <CreateButton onClick={this.onClickAddUnitType} label="Additional" disabled={usages.get(0, '') === '' || this.noMoreOptions()} />
               </Col>
             </FormGroup>
           </div>
