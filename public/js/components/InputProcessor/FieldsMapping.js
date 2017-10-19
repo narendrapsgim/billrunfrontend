@@ -189,6 +189,34 @@ export default class FieldsMapping extends Component {
     this.onChangeApriceMult(e);
   }
 
+  onChangeDateFormat = (e) => {
+    this.props.onSetFieldMapping(e);
+  }
+
+  onChangeDateFormatExists = () => {
+    const e = {
+      target: {
+        value: undefined,
+        id: 'date_format',
+      },
+    };
+    this.onChangeDateFormat(e);
+  }
+
+  onChangeTimeFormat = (e) => {
+    this.props.onSetFieldMapping(e);
+  }
+
+  onChangeTimeFormatExists = () => {
+    const e = {
+      target: {
+        value: undefined,
+        id: 'time_format',
+      },
+    };
+    this.onChangeTimeFormat(e);
+  }
+
   getVolumeOptions = () => this.props.settings.get('fields', Immutable.List()).sortBy(field => field).map(field => ({
     label: field,
     value: field,
@@ -282,6 +310,23 @@ export default class FieldsMapping extends Component {
     const defaultVolumeSrc = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_volume_src'], []);
     const volumeOptions = this.getVolumeOptions();
 
+
+    const dateFormat = settings.getIn(['processor', 'date_format']) || '';
+
+    const dateFormatProps = {
+      fieldType: 'text',
+      id: 'date_format',
+      onChange: this.onChangeDateFormat,
+    };
+
+    const timeFormat = settings.getIn(['processor', 'time_format']) || '';
+
+    const timeFormatProps = {
+      fieldType: 'text',
+      id: 'time_format',
+      onChange: this.onChangeTimeFormat,
+    };
+
     return (
       <form className="form-horizontal FieldsMapping">
         <div className="form-group">
@@ -303,6 +348,26 @@ export default class FieldsMapping extends Component {
             </div>
           </div>
         </div>
+
+        <div className="form-group">
+          <div className="col-lg-offset-3 col-lg-9">
+            <div className="col-lg-offset-1 col-lg-9">
+              <Field
+                fieldType="toggeledInput"
+                value={dateFormat}
+                disabledValue=""
+                disabled={dateFormat === null || dateFormat === undefined}
+                onChange={this.onChangeDateFormatExists}
+                label={this.state.separateTime === true ? 'Date format' : 'Date and time format'}
+                inputProps={dateFormatProps}
+              />
+            </div>
+            <div className="col-lg-1">
+              <Help contents="If not checked, default format is mm/dd/yy" />
+            </div>
+          </div>
+        </div>
+
         <div className="form-group">
           <div className="col-lg-offset-3 col-lg-9">
             <div className="col-lg-offset-1 col-lg-9">
@@ -325,6 +390,26 @@ export default class FieldsMapping extends Component {
             </div>
           </div>
         </div>
+
+        <div className="form-group">
+          <div className="col-lg-offset-3 col-lg-9">
+            <div className="col-lg-offset-1 col-lg-9">
+              <Field
+                fieldType="toggeledInput"
+                value={timeFormat}
+                disabledValue=""
+                disabled={!this.state.separateTime || dateFormat === ''}
+                onChange={this.onChangeTimeFormatExists}
+                label="Time format"
+                inputProps={timeFormatProps}
+              />
+            </div>
+            <div className="col-lg-1">
+              <Help contents="To enable, enter date format" />
+            </div>
+          </div>
+        </div>
+
         <div className="separator" />
         <div className="form-group">
           <div className="col-lg-3">
