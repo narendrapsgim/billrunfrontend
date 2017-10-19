@@ -141,7 +141,10 @@ export default class FieldsMapping extends Component {
 
   onChangeSeparateTime = (e) => {
     const { checked } = e.target;
-    if (!checked) this.props.unsetField(['processor', 'time_field']);
+    if (!checked) {
+      this.props.unsetField(['processor', 'time_field']);
+      this.onChangeTimeFormatExists();
+    }
     this.setState({separateTime: !this.state.separateTime});
   };
 
