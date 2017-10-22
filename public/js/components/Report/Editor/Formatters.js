@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { Row, Col, FormGroup, HelpBlock } from 'react-bootstrap';
+import { Row, Col, FormGroup, HelpBlock, Label } from 'react-bootstrap';
 import { ReportDescription } from '../../../FieldDescriptions';
 import Formatter from './Formatter';
 import { CreateButton, SortableFieldsContainer } from '../../Elements';
@@ -15,6 +15,7 @@ class Formatters extends Component {
     onChangeField: PropTypes.func,
     onChangeOperator: PropTypes.func,
     onChangeValue: PropTypes.func,
+    onChangeValueType: PropTypes.func,
     onMove: PropTypes.func,
     onRemove: PropTypes.func,
     onAdd: PropTypes.func,
@@ -28,6 +29,7 @@ class Formatters extends Component {
     onChangeField: () => {},
     onChangeOperator: () => {},
     onChangeValue: () => {},
+    onChangeValueType: () => {},
     onMove: () => {},
     onRemove: () => {},
     onAdd: () => {},
@@ -68,6 +70,7 @@ class Formatters extends Component {
         onChangeField={this.props.onChangeField}
         onChangeOperator={this.props.onChangeOperator}
         onChangeValue={this.props.onChangeValue}
+        onChangeValueType={this.props.onChangeValueType}
         onRemove={this.props.onRemove}
       />
     );
@@ -83,6 +86,7 @@ class Formatters extends Component {
     const disableCreateNew = disabled || options.isEmpty();
     const disableCreateNewtitle = disableCreateNew && options.isEmpty() ? ReportDescription.add_formatter_disabled_no_fields : '';
     const formatRows = formats.map(this.renderformaterRow);
+    const showDateOverrideWarning = formats.findIndex(format => format.get('op', '') === 'date_override') > -1;
     return (
       <Row>
         <Col sm={12}>
@@ -114,6 +118,13 @@ class Formatters extends Component {
               disabled={disableCreateNew}
               title={disableCreateNewtitle}
             />
+          </Col>
+        )}
+        { showDateOverrideWarning && (
+          <Col sm={12}>
+            <Label bsStyle="warning">
+              * Subtract / Add time styling should be applied before other format
+            </Label>
           </Col>
         )}
       </Row>
