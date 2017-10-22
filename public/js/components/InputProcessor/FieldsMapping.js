@@ -341,7 +341,7 @@ export default class FieldsMapping extends Component {
             <div className="col-lg-1" style={{marginTop: 8}}>
               <i className="fa fa-long-arrow-right"></i>
             </div>
-            <div className="col-lg-9">
+            <div className="col-lg-4 form-inner-edit-row">
               <select id="date_field"
                       className="form-control"
                       onChange={onSetFieldMapping}
@@ -349,12 +349,7 @@ export default class FieldsMapping extends Component {
                 { available_fields }
               </select>
             </div>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <div className="col-lg-offset-3 col-lg-9">
-            <div className="col-lg-offset-1 col-lg-9">
+            <div className="col-lg-5 form-inner-edit-row">
               <Field
                 fieldType="toggeledInput"
                 value={dateFormat}
@@ -369,11 +364,9 @@ export default class FieldsMapping extends Component {
               <Help contents="If not checked, default format is mm/dd/yy" />
             </div>
           </div>
-        </div>
 
-        <div className="form-group">
           <div className="col-lg-offset-3 col-lg-9">
-            <div className="col-lg-offset-1 col-lg-9">
+            <div className="col-lg-offset-1 col-lg-4">
               <div className="input-group">
                 <div className="input-group-addon">
                   <input type="checkbox"
@@ -391,12 +384,7 @@ export default class FieldsMapping extends Component {
                 </select>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <div className="col-lg-offset-3 col-lg-9">
-            <div className="col-lg-offset-1 col-lg-9">
+            <div className="col-lg-5">
               <Field
                 fieldType="toggeledInput"
                 value={timeFormat}
