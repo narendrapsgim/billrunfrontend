@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { escapeRegExp } from './Util';
 
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
 export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
@@ -421,11 +422,12 @@ export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQu
 
 export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => {
   let query = {};
+  const escapedValue = escapeRegExp(value);
   switch (collection) {
     case 'subscribers':
-      query = { [revisionBy]: value };
+      query = { [revisionBy]: escapedValue };
       break;
-    default: query = { [revisionBy]: { $regex: `^${value}$` } };
+    default: query = { [revisionBy]: { $regex: `^${escapedValue}$` } };
   }
   return ({
     action: 'get',

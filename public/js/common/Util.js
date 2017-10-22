@@ -465,3 +465,7 @@ export const getAvailableFields = (settings, additionalFields = []) => {
   const fields = settings.get('fields', []).map(field => (Immutable.Map({ value: field, label: field }))).sortBy(field => field.get('value', ''));
   return fields.concat(Immutable.fromJS(additionalFields));
 };
+
+export const escapeRegExp = (text) => {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+};
