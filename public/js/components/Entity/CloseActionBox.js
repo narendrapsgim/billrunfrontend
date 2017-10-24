@@ -39,7 +39,7 @@ class CloseActionBox extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(getSettings('minimum_entity_start_date'));
+    this.props.dispatch(getSettings(['minimum_entity_start_date', 'system']));
   }
 
   onClickCloseConfirm = () => {

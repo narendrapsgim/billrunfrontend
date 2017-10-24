@@ -7,6 +7,7 @@ import changeCase from 'change-case';
 import ComputedRate from './ComputedRate';
 import Help from '../../Help';
 import { getConfig, getAvailableFields } from '../../../common/Util';
+import { updateSetting, saveSettings } from '../../../actions/settingsActions';
 import { ModalWrapper } from '../../Elements';
 import { updateSetting, saveSettings } from '../../../actions/settingsActions';
 import {

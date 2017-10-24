@@ -97,7 +97,7 @@ export default function (state = defaultState, action) {
       return state.set('fields', Immutable.fromJS(action.fields));
 
     case SET_FIELD_WIDTH:
-      return state.setIn(['field_widths', field], parseInt(width, 10));
+      return state.setIn(['field_widths', index], width);
 
     case SET_FIELD_MAPPING:
       return state.setIn(['processor', field], mapping);

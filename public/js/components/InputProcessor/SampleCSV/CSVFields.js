@@ -21,7 +21,7 @@ const CSVFields = (props) => {
           onMoveFieldDown={props.onMoveFieldDown}
           onMoveFieldUp={props.onMoveFieldUp}
           onChange={props.onChangeCSVField}
-          width={settings.getIn(['field_widths', field], '')}
+          width={settings.getIn(['field_widths', index], '')}
         />
       </div>
       <div className="separator" />

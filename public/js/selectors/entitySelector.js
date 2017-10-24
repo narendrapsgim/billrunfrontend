@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
-import { minEntityDateSelector } from './settingsSelector';
+import { minEntityDateSelector, closedCycleChangesSelector } from './settingsSelector';
 
 
 const getPropsItem = (state, props) => props.item;
@@ -194,9 +194,22 @@ export const modeSimpleSelector = createSelector(
   selectSimpleMode,
 );
 
+const selectDangerousDate = (closedCycleChanges, minEntityDate) => {
+  if (closedCycleChanges) {
+    return null;
+  }
+  return minEntityDate;
+};
+
+export const dangerousDateSelector = createSelector(
+  closedCycleChangesSelector,
+  minEntityDateSelector,
+  selectDangerousDate,
+);
+
 export const entityMinFrom = createSelector(
   getPropsItem,
-  // minEntityDateSelector,
+  dangerousDateSelector,
   selectMaxFrom,
 );
 

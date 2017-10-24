@@ -53,6 +53,11 @@ fieldset[disabled] .btn {
 .inline {
   display: inline-block;;
 }
+.one-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .td-ellipsis{
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -191,6 +196,9 @@ fieldset[disabled] .btn {
 }
 
 /* React-tags */
+.react-tagsinput {
+  padding-bottom: 2px;
+}
 .react-tagsinput-input {
   margin: 0;
   padding: 3px 4px;
@@ -205,7 +213,7 @@ fieldset[disabled] .btn {
   border-color: #dddddd!important;
   border-radius: 0!important;
   font-size: 13px;
-  padding: 3px 5px;
+  padding: 2px 5px;
 }
 .react-tagsinput-tag:hover, .react-tagsinput-tag:focus {
   background-color: #eeeeee!important;
@@ -455,6 +463,7 @@ fieldset[disabled] .btn {
 }
 #footer-push{
   height: 30px;
+  margin-top: 10px;
 }
 #footer {
   height: 30px;

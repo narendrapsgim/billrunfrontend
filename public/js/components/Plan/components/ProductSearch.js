@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import Select from 'react-select';
 import { apiBillRun } from '../../../common/Api';
 import { getProductsKeysQuery } from '../../../common/ApiQueries';
@@ -7,8 +7,14 @@ import { getProductsKeysQuery } from '../../../common/ApiQueries';
 export default class ProductSearch extends Component {
 
   static propTypes = {
-    onSelectProduct: React.PropTypes.func.isRequired,
+    onSelectProduct: PropTypes.func.isRequired,
+    searchFunction: PropTypes.func,
   }
+
+  static defaultProps = {
+    searchFunction: getProductsKeysQuery({ key: 1, description: 1 }),
+  };
+
 
   state = { val: '' }
 
@@ -19,7 +25,7 @@ export default class ProductSearch extends Component {
     this.setState({ val: '' });
   }
 
-  getProducts = () => apiBillRun(getProductsKeysQuery({ key: 1, description: 1 }))
+  getProducts = () => apiBillRun(this.props.searchFunction)
     .then(success => ({
       options: success.data[0].data.details.map(option => ({
         value: option.key,

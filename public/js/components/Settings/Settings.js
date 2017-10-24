@@ -11,11 +11,16 @@ import Tenant from './Tenant';
 import Security from './Security';
 import EditMenu from './EditMenu';
 import UsageTypes from './UsageTypes';
+import System from './System';
 import { ActionButtons } from '../Elements';
 import { getSettings, updateSetting, saveSettings, fetchFile, getCurrencies } from '../../actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '../../actions/guiStateActions/menuActions';
 import { tabSelector } from '../../selectors/entitySelector';
-import { inputProssesorCsiOptionsSelector, taxationSelector } from '../../selectors/settingsSelector';
+import {
+  inputProssesorCsiOptionsSelector,
+  taxationSelector,
+  systemSettingsSelector,
+} from '../../selectors/settingsSelector';
 
 
 class Settings extends Component {
@@ -25,6 +30,7 @@ class Settings extends Component {
     settings: Immutable.Map(),
     csiOptions: Immutable.List(),
     taxation: Immutable.Map(),
+    system: Immutable.Map(),
   };
 
   static propTypes = {
@@ -36,6 +42,7 @@ class Settings extends Component {
     }).isRequired,
     csiOptions: PropTypes.instanceOf(Immutable.Iterable),
     taxation: PropTypes.instanceOf(Immutable.Map),
+    system: PropTypes.instanceOf(Immutable.Map),
     router: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
@@ -45,7 +52,7 @@ class Settings extends Component {
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types']));
+    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types', 'system']));
     this.props.dispatch(getCurrencies()).then(this.initCurrencyOptions);
   }
 
@@ -105,6 +112,12 @@ class Settings extends Component {
     if (settings.has('usage_types')) {
       categoryToSave.push('usage_types');
     }
+    if (settings.has('entity_config')) {
+      categoryToSave.push('usage_types');
+    }
+    if (settings.has('system')) {
+      categoryToSave.push('system');
+    }
     if (categoryToSave.length) {
       this.props.dispatch(saveSettings(categoryToSave))
         .then((response) => {
@@ -137,7 +150,7 @@ class Settings extends Component {
   }
 
   render() {
-    const { settings, activeTab, csiOptions, taxation } = this.props;
+    const { settings, activeTab, csiOptions, taxation, system } = this.props;
     const { currencyOptions } = this.state;
 
     const currency = settings.getIn(['pricing', 'currency'], '');
@@ -202,6 +215,12 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
+          <Tab title="System" eventKey={8}>
+            <Panel style={{ borderTop: 'none' }}>
+              <System onChange={this.onChangeFieldValue} data={system} />
+            </Panel>
+          </Tab>
+
         </Tabs>
 
         <ActionButtons onClickSave={this.onSave} hideCancel={true} hideSave={activeTab === 5} />
@@ -216,5 +235,6 @@ const mapStateToProps = (state, props) => ({
   settings: state.settings,
   csiOptions: inputProssesorCsiOptionsSelector(state, props),
   taxation: taxationSelector(state, props),
+  system: systemSettingsSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(Settings));
