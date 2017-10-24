@@ -9,6 +9,7 @@ import Help from '../../Help';
 import { getConfig, getAvailableFields } from '../../../common/Util';
 import { updateSetting, saveSettings } from '../../../actions/settingsActions';
 import { ModalWrapper } from '../../Elements';
+import { updateSetting, saveSettings } from '../../../actions/settingsActions';
 import {
   setRatingField,
   setLineKey,
@@ -24,6 +25,7 @@ class RateMapping extends Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     usaget: PropTypes.string.isRequired,
+    rateCategory: PropTypes.string.isRequired,
     settings: PropTypes.instanceOf(Immutable.Map),
     customRatingFields: PropTypes.instanceOf(Immutable.List),
     rateCalculators: PropTypes.instanceOf(Immutable.List),
@@ -40,12 +42,12 @@ class RateMapping extends Component {
   };
 
   componentDidMount = () => {
-    const { settings } = this.props;
-    const availableUsagetypes = settings.get('rate_calculators', Immutable.Map()).keySeq().map(usaget => (usaget));
+    const { settings, rateCategory } = this.props;
+    const availableUsagetypes = settings.getIn(['rate_calculators', rateCategory], Immutable.Map()).keySeq().map(usaget => (usaget));
     availableUsagetypes.forEach((usaget) => {
-      const calcs = settings.getIn(['rate_calculators', usaget], Immutable.List());
+      const calcs = settings.getIn(['rate_calculators', rateCategory, usaget], Immutable.List());
       if (calcs.size === 0) {
-        this.onAddRating({ target: { dataset: { usaget } } });
+        this.onAddRating({ target: { dataset: { ratecategory: rateCategory, usaget } } });
       }
     });
   };
@@ -66,11 +68,12 @@ class RateMapping extends Component {
     { value: 'longestPrefix', label: 'Longest Prefix' },
   ]);
 
-  onChangeAdditionalParamRating = (usaget, priority, index, type) => (value) => {
+  onChangeAdditionalParamRating = (rateCategory, usaget, priority, index, type) => (value) => {
     const eModified = {
       target: {
         dataset: {
           rate_key: value,
+          ratecategory: rateCategory,
           usaget,
           priority,
           index,
@@ -82,8 +85,8 @@ class RateMapping extends Component {
     this.onSetRating(eModified);
   }
 
-  onChangeAdditionalParamRatingType = (value, usaget, priority, index) => (type) => {
-    this.onChangeAdditionalParamRating(usaget, priority, index, type)(value);
+  onChangeAdditionalParamRatingType = (value, rateCategory, usaget, priority, index) => (type) => {
+    this.onChangeAdditionalParamRating(rateCategory, usaget, priority, index, type)(value);
   }
 
   getRateCalculatorFields = () =>
@@ -106,7 +109,7 @@ class RateMapping extends Component {
 
   onSetRating = (e) => {
     const { customRatingFields } = this.props;
-    const { dataset: { usaget, priority, index }, value, custom } = e.target;
+    const { dataset: { ratecategory, usaget, priority, index }, value, custom } = e.target;
     let { dataset: { rate_key: rateKey } } = e.target;
     const isNewField = custom && (rateKey !== '') && customRatingFields.find(field => field.get('field_name', '') === rateKey) === undefined;
     if (isNewField) {
@@ -114,80 +117,83 @@ class RateMapping extends Component {
       rateKey = `params.${changeCase.snakeCase(title)}`;
       this.addNewRatingCustomField(rateKey, title, value);
     }
-    this.props.dispatch(setRatingField(usaget, priority, parseInt(index), rateKey, value));
+    this.props.dispatch(setRatingField(ratecategory, usaget, priority, parseInt(index), rateKey, value));
   }
 
   onAddRating = (e) => {
-    const { dataset: { usaget, priority } } = e.target;
-    this.props.dispatch(addRatingField(usaget, priority));
+    const { dataset: { ratecategory, usaget, priority } } = e.target;
+    this.props.dispatch(addRatingField(ratecategory, usaget, priority));
   }
 
   onRemoveRating = (e) => {
-    const { dataset: { usaget, priority, index } } = e.target;
-    this.props.dispatch(removeRatingField(usaget, priority, index));
+    const { dataset: { ratecategory, usaget, priority, index } } = e.target;
+    this.props.dispatch(removeRatingField(ratecategory, usaget, priority, index));
   }
 
-  onRemoveRatingPriority = (usaget, priority) => () => {
-    this.props.dispatch(removeRatingPriorityField(usaget, priority));
+  onRemoveRatingPriority = (rateCategory, usaget, priority) => () => {
+    this.props.dispatch(removeRatingPriorityField(rateCategory, usaget, priority));
   }
 
   onSetLineKey = (e) => {
-    const { dataset: { usaget, index, priority }, value } = e.target;
-    this.props.dispatch(setLineKey(usaget, priority, index, value));
+    const { dataset: { ratecategory, usaget, index, priority }, value } = e.target;
+    this.props.dispatch(setLineKey(ratecategory, usaget, priority, index, value));
   }
 
   onSetComputedLineKey = (paths, values) => {
     this.props.dispatch(setComputedLineKey(paths, values));
   }
 
-  onUnsetComputedLineKey = (usaget, priority, index) => {
-    this.props.dispatch(unsetComputedLineKey(usaget, priority, index));
+  onUnsetComputedLineKey = (rateCategory, usaget, priority, index) => {
+    this.props.dispatch(unsetComputedLineKey(rateCategory, usaget, priority, index));
   }
 
-  getComputedLineKeyObject = (usaget, priority, index, calc = Immutable.Map()) => (Immutable.Map({
-    usaget,
-    priority,
-    index,
-    type: calc.getIn(['computed', 'type'], 'regex'),
-    line_keys: calc.getIn(['computed', 'line_keys'], Immutable.List()),
-    operator: calc.getIn(['computed', 'operator'], ''),
-    must_met: calc.getIn(['computed', 'must_met'], false),
-    projection: Immutable.Map({
-      on_true: Immutable.Map({
-        key: calc.getIn(['computed', 'projection', 'on_true', 'key'], 'condition_result'),
-        regex: calc.getIn(['computed', 'projection', 'on_true', 'regex'], ''),
-        value: calc.getIn(['computed', 'projection', 'on_true', 'value'], ''),
+  getComputedLineKeyObject = (rateCategory, usaget, priority, index, calc = Immutable.Map()) => (
+    Immutable.Map({
+      rateCategory,
+      usaget,
+      priority,
+      index,
+      type: calc.getIn(['computed', 'type'], 'regex'),
+      line_keys: calc.getIn(['computed', 'line_keys'], Immutable.List()),
+      operator: calc.getIn(['computed', 'operator'], ''),
+      must_met: calc.getIn(['computed', 'must_met'], false),
+      projection: Immutable.Map({
+        on_true: Immutable.Map({
+          key: calc.getIn(['computed', 'projection', 'on_true', 'key'], 'condition_result'),
+          regex: calc.getIn(['computed', 'projection', 'on_true', 'regex'], ''),
+          value: calc.getIn(['computed', 'projection', 'on_true', 'value'], ''),
+        }),
+        on_false: Immutable.Map({
+          key: calc.getIn(['computed', 'projection', 'on_false', 'key'], 'condition_result'),
+          regex: calc.getIn(['computed', 'projection', 'on_false', 'regex'], ''),
+          value: calc.getIn(['computed', 'projection', 'on_false', 'value'], ''),
+        }),
       }),
-      on_false: Immutable.Map({
-        key: calc.getIn(['computed', 'projection', 'on_false', 'key'], 'condition_result'),
-        regex: calc.getIn(['computed', 'projection', 'on_false', 'regex'], ''),
-        value: calc.getIn(['computed', 'projection', 'on_false', 'value'], ''),
-      }),
-    }),
-  }));
+    })
+  );
 
   onChangeLineKey = (e) => {
-    const { dataset: { usaget, index, priority }, value } = e.target;
+    const { dataset: { ratecategory, usaget, index, priority }, value } = e.target;
     if (value === 'computed') {
       this.setState({
-        computedLineKey: this.getComputedLineKeyObject(usaget, priority, index),
+        computedLineKey: this.getComputedLineKeyObject(ratecategory, usaget, priority, index),
       });
     } else {
       this.setState({ computedLineKey: null });
-      this.onUnsetComputedLineKey(usaget, priority, index);
+      this.onUnsetComputedLineKey(ratecategory, usaget, priority, index);
     }
     this.onSetLineKey(e);
   }
 
-  onEditComputedLineKey = (calc, usaget, priority, index) => () => {
+  onEditComputedLineKey = (calc, rateCategory, usaget, priority, index) => () => {
     this.setState({
-      computedLineKey: this.getComputedLineKeyObject(usaget, priority, index, calc),
+      computedLineKey: this.getComputedLineKeyObject(rateCategory, usaget, priority, index, calc),
     });
   }
 
   onSaveComputedLineKey = () => {
     const { computedLineKey } = this.state;
-    const basePath = [computedLineKey.get('usaget'), computedLineKey.get('priority'), computedLineKey.get('index'), 'computed'];
+    const basePath = [computedLineKey.get('rateCategory'), computedLineKey.get('usaget'), computedLineKey.get('priority'), computedLineKey.get('index'), 'computed'];
     const paths = [
       [...basePath, 'line_keys'],
       [...basePath, 'operator'],
@@ -261,7 +267,7 @@ class RateMapping extends Component {
     this.setState({ computedLineKey: null });
   }
 
-  renderComputedLineKeyDesc = (calc, usaget, priority, index) => {
+  renderComputedLineKeyDesc = (calc, rateCategory, usaget, priority, index) => {
     if (calc.get('line_key', '') !== 'computed') {
       return null;
     }
@@ -271,7 +277,7 @@ class RateMapping extends Component {
       <h4>
         <small>
           {`${calc.getIn(['computed', 'line_keys', 0, 'key'], '')} ${opLabel} ${calc.getIn(['computed', 'line_keys', 1, 'key'], '')}`}
-          <Button onClick={this.onEditComputedLineKey(calc, usaget, priority, index)} bsStyle="link">
+          <Button onClick={this.onEditComputedLineKey(calc, rateCategory, usaget, priority, index)} bsStyle="link">
             <i className="fa fa-fw fa-pencil" />
           </Button>
         </small>
@@ -291,13 +297,13 @@ class RateMapping extends Component {
     this.setState({ openRateCalculators });
   }
 
-  onAddRatingPriority = usaget => () => {
+  onAddRatingPriority = (rateCategory, usaget) => () => {
     const { rateCalculators } = this.props;
     this.openRateCalculator(rateCalculators.size)();
-    this.props.dispatch(addRatingPriorityField(usaget));
+    this.props.dispatch(addRatingPriorityField(rateCategory, usaget));
   }
 
-  getRateCalculatorsForPriority = (usaget, priority, calcs) => {
+  getRateCalculatorsForPriority = (rateCategory, usaget, priority, calcs) => {
     const availableFields = this.getRateCalculatorFields();
     return calcs.map((calc, calcKey) => {
       let selectedRadio = 3;
@@ -307,14 +313,15 @@ class RateMapping extends Component {
         selectedRadio = 2;
       }
       return (
-        <div key={`rate-calc-${priority}-${calcKey}`}>
-          <Row key={`rate-calc-row-${priority}-${calcKey}`}>
+        <div key={`rate-calc-${rateCategory}-${priority}-${calcKey}`}>
+          <Row key={`rate-calc-row-${rateCategory}-${priority}-${calcKey}`}>
             <Col lg={3} md={3} style={{ paddingRight: 0 }}>
               <FormGroup style={{ margin: 0 }}>
                 <select
                   className="form-control"
                   id={usaget}
                   onChange={this.onChangeLineKey}
+                  data-rateCategory={rateCategory}
                   data-usaget={usaget}
                   data-index={calcKey}
                   data-priority={priority}
@@ -322,7 +329,7 @@ class RateMapping extends Component {
                 >
                   { availableFields }
                 </select>
-                { this.renderComputedLineKeyDesc(calc, usaget, priority, calcKey) }
+                { this.renderComputedLineKeyDesc(calc, rateCategory, usaget, priority, calcKey) }
               </FormGroup>
             </Col>
 
@@ -330,9 +337,10 @@ class RateMapping extends Component {
               <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
                 <input
                   type="radio"
-                  name={`${usaget}-${priority}-${calcKey}-type`}
-                  id={`${usaget}-${priority}-${calcKey}-by-rate-key`}
+                  name={`${rateCategory}-${usaget}-${priority}-${calcKey}-type`}
+                  id={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-rate-key`}
                   value="match"
+                  data-rateCategory={rateCategory}
                   data-usaget={usaget}
                   data-rate_key="key"
                   data-index={calcKey}
@@ -340,15 +348,16 @@ class RateMapping extends Component {
                   checked={selectedRadio === 1}
                   onChange={this.onSetRating}
                 />&nbsp;
-                <label htmlFor={`${usaget}-${priority}-${calcKey}-by-rate-key`} style={{ verticalAlign: 'middle' }}>By product key</label>
+                <label htmlFor={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-rate-key`} style={{ verticalAlign: 'middle' }}>By product key</label>
               </FormGroup>
 
               <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
                 <input
                   type="radio"
-                  name={`${usaget}-${priority}-${calcKey}-type`}
-                  id={`${usaget}-${priority}-${calcKey}-by-rate-usaget`}
+                  name={`${rateCategory}-${usaget}-${priority}-${calcKey}-type`}
+                  id={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-rate-usaget`}
                   value="match"
+                  data-rateCategory={rateCategory}
                   data-usaget={usaget}
                   data-rate_key="usaget"
                   data-index={calcKey}
@@ -356,7 +365,7 @@ class RateMapping extends Component {
                   checked={selectedRadio === 2}
                   onChange={this.onSetRating}
                 />&nbsp;
-                <label htmlFor={`${usaget}-${priority}-${calcKey}-by-rate-usaget`} style={{ verticalAlign: 'middle' }}>By product unit type</label>
+                <label htmlFor={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-rate-usaget`} style={{ verticalAlign: 'middle' }}>By product unit type</label>
               </FormGroup>
 
               <FormGroup style={{ margin: 0 }}>
@@ -364,9 +373,10 @@ class RateMapping extends Component {
                   <div className="input-group-addon">
                     <input
                       type="radio"
-                      name={`${usaget}-${priority}-${calcKey}-type`}
-                      id={`${usaget}-${priority}-${calcKey}-by-param`}
+                      name={`${rateCategory}-${usaget}-${priority}-${calcKey}-type`}
+                      id={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-param`}
                       value="match"
+                      data-rateCategory={rateCategory}
                       data-usaget={usaget}
                       checked={selectedRadio === 3}
                       data-rate_key=""
@@ -374,19 +384,19 @@ class RateMapping extends Component {
                       data-priority={priority}
                       onChange={this.onSetRating}
                     />&nbsp;
-                    <label htmlFor={`${usaget}-${priority}-${calcKey}-by-param`} style={{ verticalAlign: 'middle' }}>By product param</label>
+                    <label htmlFor={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-param`} style={{ verticalAlign: 'middle' }}>By product param</label>
                     <Help contents="This field needs to be configured in the 'Additional Parameters' of a Product" />
                   </div>
                   <Select
-                    id={`${usaget}-${priority}-${calcKey}-by-param-name`}
-                    onChange={this.onChangeAdditionalParamRating(usaget, priority, calcKey, calc.get('type', ''))}
+                    id={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-param-name`}
+                    onChange={this.onChangeAdditionalParamRating(rateCategory, usaget, priority, calcKey, calc.get('type', ''))}
                     value={selectedRadio !== 3 ? '' : calc.get('rate_key', '')}
                     options={this.getCustomRatingFields()}
                     allowCreate
                   />
                   <Select
-                    id={`${usaget}-${priority}-${calcKey}-by-param-name-type`}
-                    onChange={this.onChangeAdditionalParamRatingType(calc.get('rate_key', ''), usaget, priority, calcKey)}
+                    id={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-param-name-type`}
+                    onChange={this.onChangeAdditionalParamRatingType(calc.get('rate_key', ''), rateCategory, usaget, priority, calcKey)}
                     value={selectedRadio !== 3 ? '' : calc.get('type', '')}
                     options={this.getRatingTypes()}
                   />
@@ -400,7 +410,7 @@ class RateMapping extends Component {
               { calcKey > 0 &&
                 <FormGroup style={{ margin: 0 }}>
                   <div style={{ width: '100%', height: 39 }}>
-                    <Button onClick={this.onRemoveRating} data-usaget={usaget} data-index={calcKey} data-priority={priority} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
+                    <Button onClick={this.onRemoveRating} data-rateCategory={rateCategory} data-usaget={usaget} data-index={calcKey} data-priority={priority} bsSize="small" className="pull-left" ><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
                   </div>
                 </FormGroup>
               }
@@ -412,10 +422,11 @@ class RateMapping extends Component {
     }).toArray();
   }
 
-  getAddRatingButton = (usaget, priority) => (
+  getAddRatingButton = (rateCategory, usaget, priority) => (
     <Button
       bsSize="xsmall"
       className="btn-primary"
+      data-rateCategory={rateCategory}
       data-usaget={usaget}
       data-priority={priority}
       onClick={this.onAddRating}
@@ -424,21 +435,21 @@ class RateMapping extends Component {
     </Button>
   );
 
-  getAddRatingPriorityButton = usaget => (
+  getAddRatingPriorityButton = (rateCategory, usaget) => (
     <Button
       bsSize="xsmall"
       className="btn-primary"
-      onClick={this.onAddRatingPriority(usaget)}
+      onClick={this.onAddRatingPriority(rateCategory, usaget)}
     >
       <i className="fa fa-plus" />&nbsp;Add Next Rating
     </Button>
   );
 
-  getRemoveRatingPriorityButton = (usaget, priority) => (
+  getRemoveRatingPriorityButton = (rateCategory, usaget, priority) => (
     <Button
       bsStyle="link"
       bsSize="xsmall"
-      onClick={this.onRemoveRatingPriority(usaget, priority)}
+      onClick={this.onRemoveRatingPriority(rateCategory, usaget, priority)}
     >
       <i className="fa fa-fw fa-trash-o danger-red" />
     </Button>
@@ -466,7 +477,7 @@ class RateMapping extends Component {
   }
 
   render() {
-    const { usaget, rateCalculators } = this.props;
+    const { rateCategory, usaget, rateCalculators } = this.props;
     const { openRateCalculators } = this.state;
     const noRemoveStyle = { paddingLeft: 45 };
     return (
@@ -480,7 +491,9 @@ class RateMapping extends Component {
               <Row>
                 <Col sm={10}>{`Priority ${priority + 1}`}</Col>
                 <Col sm={2} style={actionsStyle}>
-                  { showRemove && this.getRemoveRatingPriorityButton(usaget, priority) }
+                  {
+                    showRemove && this.getRemoveRatingPriorityButton(rateCategory, usaget, priority)
+                  }
                   {
                     openRateCalculators.includes(priority)
                     ? (<Button onClick={this.closeRateCalculator(priority)} bsStyle="link">
@@ -493,19 +506,19 @@ class RateMapping extends Component {
                 </Col>
               </Row>
               <Panel collapsible expanded={this.state.openRateCalculators.includes(priority)}>
-                { this.getRateCalculatorsForPriority(usaget, priority, calcs) }
-                { this.getAddRatingButton(usaget, priority) }
+                { this.getRateCalculatorsForPriority(rateCategory, usaget, priority, calcs) }
+                { this.getAddRatingButton(rateCategory, usaget, priority) }
               </Panel>
             </div>
           );
         }) }
-        { this.getAddRatingPriorityButton(usaget) }
+        { this.getAddRatingPriorityButton(rateCategory, usaget) }
       </div>);
   }
 }
 
 const mapStateToProps = (state, props) => ({
-  rateCalculators: props.settings.getIn(['rate_calculators', props.usaget]),
+  rateCalculators: props.settings.getIn(['rate_calculators', props.rateCategory, props.usaget]),
 });
 
 export default connect(mapStateToProps)(RateMapping);

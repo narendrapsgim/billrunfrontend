@@ -14,6 +14,8 @@ import { SET_NAME,
          ADD_CSV_FIELD,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
+         ADD_RATE_CATEGORY,
+         REMOVE_RATE_CATEGORY,
          SET_RATING_FIELD,
          ADD_RATING_FIELD,
          ADD_RATING_PRIORITY,
@@ -46,7 +48,9 @@ const defaultState = Immutable.fromJS({
     usaget_mapping: [],
   },
   customer_identification_fields: [],
-  rate_calculators: {},
+  rate_calculators: {
+    retail: {},
+  },
   unify: {},
   /* receiver: {
    *   passive: false,
@@ -114,14 +118,15 @@ export default function (state = defaultState, action) {
         .setIn(['processor', 'usaget_mapping'], Immutable.List())
         .setIn(['processor', 'default_usaget'], '')
         .setIn(['processor', 'src_field'], '')
-        .setIn(['rate_calculators'], Immutable.Map());
+        .setIn(['rate_calculators'], Immutable.Map({ retail: Immutable.Map() }));
 
     case SET_STATIC_USAGET: {
       const regex = new RegExp(`^${action.usaget}$`).toString();
       const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], regex);
+      const rateCalculators = state.get('rate_calculators', Immutable.Map()).map(() => Immutable.Map({ [action.usaget]: Immutable.List() }));
       return state
         .setIn(['processor', 'default_usaget'], action.usaget)
-        .update('rate_calculators', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.List()))
+        .set('rate_calculators', rateCalculators)
         .update('customer_identification_fields', Immutable.List(), list => list.clear().push(customerIdentification));
     }
 
@@ -130,9 +135,10 @@ export default function (state = defaultState, action) {
       const newMap = Immutable.fromJS({ pattern, usaget, unit });
       const regex = new RegExp(`^${usaget}$`).toString();
       const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], regex);
+      const rateCalculators = state.get('rate_calculators', Immutable.Map()).map(calc => ((!calc.has(usaget)) ? calc.set(usaget, Immutable.List()) : calc));
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.push(newMap))
-        .update('rate_calculators', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.List()) : map))
+        .set('rate_calculators', rateCalculators)
         .update('customer_identification_fields', Immutable.List(), (list) => {
           if (list.find(identification => identification.getIn(['conditions', 0, 'regex']) === regex)) {
             return list;
@@ -147,6 +153,13 @@ export default function (state = defaultState, action) {
         .getIn(['processor', 'usaget_mapping'])
         .map(usagetMap => usagetMap.get('usaget'))
         .countBy(key => (key === usaget ? 'found' : 'notfound')).get('found', 0);
+      const rateCalculators = state.get('rate_calculators', Immutable.Map()).map((calc, category) =>
+        calc.updateIn(['rate_calculators'], Immutable.Map(), (rateCalc) => {
+          if (countUsaget === 1) {
+            return rateCalc.deleteIn([category, usaget]);
+          }
+          return rateCalc;
+        }));
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index))
         .updateIn(['customer_identification_fields'], (list) => {
@@ -155,63 +168,69 @@ export default function (state = defaultState, action) {
           }
           return list;
         })
-        .updateIn(['rate_calculators'], Immutable.Map(), (rateCalc) => {
-          if (countUsaget === 1) {
-            return rateCalc.delete(usaget);
-          }
-          return rateCalc;
-        });
+        .set('rate_calculators', rateCalculators);
     }
 
     case SET_CUSETOMER_MAPPING:
       return state.setIn(['customer_identification_fields', action.index, field], mapping);
 
+    case ADD_RATE_CATEGORY: {
+      const { rateCategory } = action;
+      const rate = state.get('rate_calculators', Immutable.Map()).first().map(() => Immutable.List());
+      return state.setIn(['rate_calculators', rateCategory], rate);
+    }
+
+    case REMOVE_RATE_CATEGORY: {
+      const { rateCategory } = action;
+      return state.deleteIn(['rate_calculators', rateCategory]);
+    }
+
     case SET_RATING_FIELD:
-      var { rate_key, value, usaget } = action;
+      var { rate_key, value, rateCategory, usaget } = action;
       let new_rating = Immutable.fromJS({
         type: value,
         rate_key,
-        line_key: state.getIn(['rate_calculators', usaget, priority, index, 'line_key']),
+        line_key: state.getIn(['rate_calculators', rateCategory, usaget, priority, index, 'line_key']),
       });
-      const computed = state.getIn(['rate_calculators', usaget, priority, index, 'computed']);
+      const computed = state.getIn(['rate_calculators', rateCategory, usaget, priority, index, 'computed']);
       if (computed && !computed.isEmpty()) {
         new_rating.set('computed', computed);
       }
-      return state.setIn(['rate_calculators', usaget, priority, index], new_rating);
+      return state.setIn(['rate_calculators', rateCategory, usaget, priority, index], new_rating);
 
     case ADD_RATING_FIELD: {
-      const { usaget } = action;
+      const { rateCategory, usaget } = action;
       const newRating = Immutable.fromJS({
         type: '',
         rate_key: '',
         line_key: '',
       });
-      return state.updateIn(['rate_calculators', usaget, priority], list => (list ? list.push(newRating) : Immutable.List([newRating])));
+      return state.updateIn(['rate_calculators', rateCategory, usaget, priority], list => (list ? list.push(newRating) : Immutable.List([newRating])));
     }
 
     case ADD_RATING_PRIORITY: {
-      const { usaget } = action;
+      const { rateCategory, usaget } = action;
       const newRating = Immutable.fromJS({
         type: '',
         rate_key: '',
         line_key: '',
       });
-      return state.updateIn(['rate_calculators', usaget], list => list.push(Immutable.List([newRating])));
+      return state.updateIn(['rate_calculators', rateCategory, usaget], list => list.push(Immutable.List([newRating])));
     }
 
     case REMOVE_RATING_PRIORITY: {
-      const { usaget } = action;
-      return state.updateIn(['rate_calculators', usaget], list => list.remove(priority));
+      const { rateCategory, usaget } = action;
+      return state.updateIn(['rate_calculators', rateCategory, usaget], list => list.remove(priority));
     }
 
     case REMOVE_RATING_FIELD: {
-      const { usaget } = action;
-      return state.updateIn(['rate_calculators', usaget, priority], list => list.remove(index));
+      const { rateCategory, usaget } = action;
+      return state.updateIn(['rate_calculators', rateCategory, usaget, priority], list => list.remove(index));
     }
 
     case SET_LINE_KEY:
-      var { value, usaget } = action;
-      return state.setIn(['rate_calculators', usaget, priority, index, 'line_key'], value);
+      var { value, rateCategory, usaget } = action;
+      return state.setIn(['rate_calculators', rateCategory, usaget, priority, index, 'line_key'], value);
 
     case SET_COMPUTED_LINE_KEY:
       return state.withMutations((stateWithMutations) => {
@@ -221,7 +240,7 @@ export default function (state = defaultState, action) {
       });
 
     case UNSET_COMPUTED_LINE_KEY:
-      return state.deleteIn(['rate_calculators', action.usaget, action.priority, action.index, 'computed']);
+      return state.deleteIn(['rate_calculators', action.rateCategory, action.usaget, action.priority, action.index, 'computed']);
 
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);

@@ -93,6 +93,16 @@ const selectAccountImportFields = (fields) => {
   return fields;
 };
 
+const selectRateCategories = (fields) => {
+  if (fields) {
+    const categoriesField = fields.find(field => field.get('field_name', '') === 'tariff_category');
+    if (categoriesField) {
+      return Immutable.List(categoriesField.get('select_options', '').split(','));
+    }
+  }
+  return undefined;
+};
+
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
   const defaultUsaget = inputProssesor.getIn(['processor', 'default_usaget'], '');
@@ -322,6 +332,11 @@ export const subscriberImportFieldsSelector = createSelector(
 export const productFieldsSelector = createSelector(
   getProductFields,
   productFields => productFields,
+);
+
+export const rateCategoriesSelector = createSelector(
+  getProductFields,
+  selectRateCategories,
 );
 
 const selectEvents = (events, usageTypesData, propertyTypes) => {
