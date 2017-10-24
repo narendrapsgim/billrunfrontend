@@ -33,7 +33,7 @@ class System extends Component {
                 fieldType="checkbox"
                 value={data.get('closed_cycle_changes', '')}
                 onChange={this.onToggleClosedCycleChanges}
-                label="Allow make make changes to entities after closed cycles"
+                label="Allow making changes to entities in closed billing cycles"
               />
             </Col>
           </FormGroup>
