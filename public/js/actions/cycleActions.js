@@ -9,9 +9,9 @@ import {
 } from '../common/ApiQueries';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 
-export const runBillingCycle = (billrunKey, rerun = false) => (dispatch) => { // eslint-disable-line import/prefer-default-export
+export const runBillingCycle = (billrunKey, rerun = false, generatePdf = true) => (dispatch) => { // eslint-disable-line import/prefer-default-export
   dispatch(startProgressIndicator());
-  const query = getRunCycleQuery(billrunKey, rerun);
+  const query = getRunCycleQuery(billrunKey, rerun, generatePdf);
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success, 'Cycle started successfully!')))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error running cycle')));

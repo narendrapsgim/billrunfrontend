@@ -482,12 +482,13 @@ export const getCycleQuery = billrunKey => ({
   ],
 });
 
-export const getRunCycleQuery = (billrunKey, rerun) => ({
+export const getRunCycleQuery = (billrunKey, rerun, generatePdf) => ({
   api: 'billrun',
   action: 'completecycle',
   params: [
     { stamp: billrunKey },
     { rerun },
+    { generate_pdf: generatePdf },
   ],
 });
 
