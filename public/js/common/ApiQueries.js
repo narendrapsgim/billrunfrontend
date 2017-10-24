@@ -116,6 +116,20 @@ export const getSettingsQuery = category => ({
   ],
 });
 
+export const setInputProcessorQuery = (data, action) => {
+  const formData = new FormData();
+  formData.append('category', 'file_types');
+  formData.append('action', action);
+  formData.append('data', JSON.stringify(data));
+  return ({
+    api: 'settings',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
+
 export const getInputProcessorActionQuery = (fileType, action) => ({
   api: 'settings',
   params: [
