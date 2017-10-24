@@ -40,7 +40,8 @@ import {
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
 import { modeSimpleSelector, itemSelector, idSelector } from '../../selectors/entitySelector';
-import { reportFieldsSelector, taxationTypeSelector } from '../../selectors/settingsSelector';
+import { reportEntitiesFieldsSelector, reportEntitiesSelector } from '../../selectors/reportSelectors';
+import { taxationTypeSelector } from '../../selectors/settingsSelector';
 import { itemsSelector, pageSelector, nextPageSelector, sizeSelector } from '../../selectors/entityListSelectors';
 
 class ReportSetup extends Component {
@@ -50,6 +51,7 @@ class ReportSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     reportFileds: PropTypes.instanceOf(Immutable.Map),
     reportData: PropTypes.instanceOf(Immutable.List),
+    reportEntities: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     userName: PropTypes.string,
     page: PropTypes.number,
@@ -70,6 +72,7 @@ class ReportSetup extends Component {
     item: Immutable.Map(),
     reportFileds: Immutable.Map(),
     reportData: Immutable.List(),
+    reportEntities: Immutable.List(),
     userName: 'Unknown',
     mode: 'loading',
     page: 0,
@@ -90,7 +93,13 @@ class ReportSetup extends Component {
 
   componentWillMount() {
     this.fetchItem();
-    this.props.dispatch(getSettings(['file_types', 'subscribers.subscriber', 'subscribers.account', 'taxation']));
+    this.props.dispatch(getSettings([
+      'file_types',
+      'subscribers.subscriber',
+      'subscribers.account',
+      'taxation',
+      'lines',
+    ]));
   }
 
   componentDidMount() {
@@ -458,7 +467,7 @@ class ReportSetup extends Component {
 
   render() {
     const { progress, showPreview } = this.state;
-    const { item, mode, reportFileds, reportData, size, page, nextPage, taxType } = this.props;
+    const { item, mode, reportFileds, reportEntities, reportData, size, page, nextPage, taxType } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
@@ -472,6 +481,7 @@ class ReportSetup extends Component {
             <ReportEditor
               report={item}
               reportFileds={reportFileds}
+              entities={reportEntities}
               mode={mode}
               taxType={taxType}
               onUpdate={this.onChangeReportValue}
@@ -513,7 +523,8 @@ const mapStateToProps = (state, props) => ({
   itemId: idSelector(state, props, 'reports'),
   item: itemSelector(state, props, 'reports'),
   mode: modeSimpleSelector(state, props, 'reports'),
-  reportFileds: reportFieldsSelector(state, props, 'reports'),
+  reportFileds: reportEntitiesFieldsSelector(state, props),
+  reportEntities: reportEntitiesSelector(state, props),
   reportData: itemsSelector(state, props, 'reportData'),
   page: pageSelector(state, props, 'reportData'),
   nextPage: nextPageSelector(state, props, 'reportData'),

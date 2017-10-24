@@ -37,7 +37,7 @@ class ReportEditor extends Component {
     reportFileds: Immutable.Map(),
     aggregateOperators: getConfig(['reports', 'aggregateOperators'], Immutable.List()),
     conditionsOperators: getConfig(['reports', 'conditionsOperators'], Immutable.List()),
-    entities: getConfig(['reports', 'entities'], Immutable.List()),
+    entities: Immutable.List(),
     sortOperators: Immutable.List([
       Immutable.Map({ value: 1, label: 'Ascending' }),
       Immutable.Map({ value: -1, label: 'Descending' }),

@@ -54,6 +54,7 @@ export const getFieldNameType = (type) => {
     case 'subscription':
     case 'subscriptions':
     case 'subscribers':
+    case 'subscriber':
       return 'subscription';
     case 'lines':
     case 'usage':
