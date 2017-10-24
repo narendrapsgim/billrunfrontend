@@ -1,49 +1,98 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import changeCase from 'change-case';
 import EntityList from '../EntityList';
+import { LoadingItemPlaceholder } from '../Elements';
+import {
+  getSettings,
+} from '../../actions/settingsActions';
 
+class ProductsList extends Component {
 
-const ProductsList = () => {
-  const parserUsegt = (item) => {
+  static propTypes = {
+    fields: PropTypes.instanceOf(Immutable.List),
+    defaultListFields: PropTypes.arrayOf(PropTypes.string),
+    dispatch: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    fields: null,
+    defaultListFields: ['description', 'key', 'rates'],
+  }
+
+  componentWillMount() {
+    this.props.dispatch(getSettings('rates.fields'));
+  }
+
+  parserUsegt = (item) => {
     const usegt = item.get('rates', Immutable.Map()).keySeq().first();
     return (typeof usegt !== 'undefined') ? usegt : '';
   };
 
-  const filterFields = [
+  // TODO: get values field.get('searchable', false) when it will be ready
+  // depend on database index
+  filterFields = () => ([
     { id: 'key', placeholder: 'Key' },
-  ];
+  ]);
 
-  const tableFields = [
-    { id: 'description', title: 'Title', sort: true },
-    { id: 'key', title: 'Key', sort: true },
-    { id: 'unit_type', title: 'Unit Type', parser: parserUsegt },
-    { id: 'from', title: 'Modified', type: 'datetime', cssClass: 'long-date', sort: true },
-  ];
-
-  const projectFields = {
-    description: 1,
-    unit_type: 1,
-    rates: 1,
-    from: 1,
-    key: 1,
+  getProjectFields = () => {
+    const { fields, defaultListFields } = this.props;
+    return fields
+      .filter(field => (field.get('show_in_list', false) || defaultListFields.includes(field.get('field_name', ''))))
+      .reduce((acc, field) => acc.set(field.get('field_name'), 1), Immutable.Map({}))
+      .toJS();
   };
 
-  const actions = [
+  getActions = () => ([
     { type: 'edit' },
-  ];
+  ]);
 
-  return (
-    <EntityList
-      collection="rates"
-      itemType="product"
-      itemsType="products"
-      filterFields={filterFields}
-      tableFields={tableFields}
-      projectFields={projectFields}
-      showRevisionBy="key"
-      actions={actions}
-    />
-  );
-};
+  getFields = () => {
+    const { fields, defaultListFields } = this.props;
+    return fields
+      .filter(field => (field.get('show_in_list', false) || defaultListFields.includes(field.get('field_name', ''))))
+      .map((field) => {
+        const fieldname = field.get('field_name');
+        switch (fieldname) {
+          case 'rates':
+            return { id: 'unit_type', parser: this.parserUsegt };
+          case 'description':
+            return { id: fieldname, title: 'Title', sort: true };
+          case 'key':
+            return { id: fieldname, title: 'Key', sort: true };
+          default: {
+            const title = field.get('title', field.get('field_name', ''));
+            return { id: fieldname, title: changeCase.sentenceCase(title) };
+          }
+        }
+      })
+      .toArray();
+  };
 
-export default ProductsList;
+  render() {
+    const { fields } = this.props;
+    if (fields === null) {
+      return (<LoadingItemPlaceholder />);
+    }
+    return (
+      <EntityList
+        collection="rates"
+        itemType="product"
+        itemsType="products"
+        filterFields={this.filterFields()}
+        tableFields={this.getFields()}
+        projectFields={this.getProjectFields()}
+        showRevisionBy="key"
+        actions={this.getActions()}
+      />
+    );
+  }
+
+}
+
+const mapStateToProps = (state, props) => ({
+  fields: state.settings.getIn(['rates', 'fields']) || undefined,
+});
+
+export default connect(mapStateToProps)(ProductsList);
