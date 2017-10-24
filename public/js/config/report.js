@@ -226,5 +226,9 @@ export default {
       { value: 'suffix', label: '1234$' },
       { value: 'prefix', label: '$1234' },
     ] },
+    { id: 'billing_cycle', title: 'Billing cycle', options: [
+      { value: 'start', label: 'Start Date' },
+      { value: 'end', label: 'End Date' },
+    ] },
   ],
 };
