@@ -210,6 +210,15 @@ export default {
       { value: 'm/d/Y h:i:s A', label: '12/31/2017 10:05:59 PM' },
       { value: 'c', label: 'ISO 8601' },
     ] },
+    { id: 'date_override', title: 'Subtract / Add time', type: "number", valueTypes: [
+      { value: 'seconds', label: 'Seconds' },
+      { value: 'minutes', label: 'Minutes' },
+      { value: 'hours', label: 'Hours' },
+      { value: 'days', label: 'Days' },
+      { value: 'weeks', label: 'Weeks' },
+      { value: 'months', label: 'Months' },
+      { value: 'years', label: 'Years' },
+    ] },
     { id: 'time_format', title: 'Time', options: [
       { value: 'H:i', label: '22:05' },
       { value: 'H:i:s', label: '22:05:59' },

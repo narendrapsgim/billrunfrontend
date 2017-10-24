@@ -311,7 +311,17 @@ class ReportSetup extends Component {
           .filter(this.filterSortEmptyRows),
         )
         .set('formats', report.get('formats', Immutable.List())
-          .filter(this.filterFormatsEmptyRows),
+          .filter(this.filterFormatsEmptyRows)
+          .map((row) => {
+            if (row.has('type')) {
+              return Immutable.Map({
+                field: row.get('field'),
+                op: row.get('op'),
+                value: `${row.get('value')} ${row.get('type')}`,
+              });
+            }
+            return row;
+          }),
         );
     });
 

@@ -227,6 +227,14 @@ class ReportEditor extends Component {
     this.updateReport('formats', formats);
   }
 
+  onChangeFormatValueType = (idx, value) => {
+    const { report } = this.props;
+    const formats = report
+      .get('formats', Immutable.List())
+      .setIn([idx, 'type'], value);
+    this.updateReport('formats', formats);
+  }
+
   onRemoveFormat = (index) => {
     const { report } = this.props;
     const formats = report
@@ -484,6 +492,7 @@ class ReportEditor extends Component {
               onChangeField={this.onChangeFormatField}
               onChangeOperator={this.onChangeFormatOperator}
               onChangeValue={this.onChangeFormatValue}
+              onChangeValueType={this.onChangeFormatValueType}
               onRemove={this.onRemoveFormat}
               onAdd={this.onAddFormat}
               onMove={this.onMoveFormat}
