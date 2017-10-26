@@ -312,7 +312,7 @@ export default class FieldsMapping extends Component {
                          checked={separateTime}
                          onChange={this.onChangeSeparateTime}
                   />
-                  <small style={{ verticalAlign: 'bottom' }}>&nbsp;Time in separate field</small>
+                  <small style={{ verticalAlign: 'bottom' }}>&nbsp;Time in a separate field</small>
                 </div>
                 <select id="time_field"
                         className="form-control"
