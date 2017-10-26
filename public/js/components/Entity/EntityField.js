@@ -60,6 +60,12 @@ class EntityField extends Component {
     return '';
   }
 
+  pasteSplit = (data) => {
+    console.log('data', data);
+    const separators = [',', ';', '\\(', '\\)', '\\*', '/', ':', '\\?', '\n', '\r', '\t'];
+    return data.split(new RegExp(separators.join('|'))).map(d => d.trim());
+  }
+
   getFieldOptios = field => field
     .get('select_options', '')
     .split(',')
@@ -138,7 +144,7 @@ class EntityField extends Component {
     }
     if (isFieldTags && editable) {
       return (
-        <Field fieldType="tags" value={value} onChange={this.onChangeTags} />
+        <Field fieldType="tags" value={value} onChange={this.onChangeTags} addOnPaste pasteSplit={this.pasteSplit} />
       );
     }
     return (
