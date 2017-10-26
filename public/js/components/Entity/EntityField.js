@@ -61,7 +61,6 @@ class EntityField extends Component {
   }
 
   pasteSplit = (data) => {
-    console.log('data', data);
     const separators = [',', ';', '\\(', '\\)', '\\*', '/', ':', '\\?', '\n', '\r', '\t'];
     return data.split(new RegExp(separators.join('|'))).map(d => d.trim());
   }
