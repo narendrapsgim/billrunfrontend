@@ -438,6 +438,12 @@ export function saveInputProcessorSettings(state, parts = []) {
       ...processor_settings
     };
     if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');
+    if (processor.get('date_format', false)) {
+      settings.processor['date_format'] = processor.get('date_format');
+    }
+    if (processor.get('time_format', false)) {
+      settings.processor['time_format'] = processor.get('time_format');
+    }
   }
   if (customer_identification_fields) {
     settings.customer_identification_fields = customer_identification_fields.toJS();
