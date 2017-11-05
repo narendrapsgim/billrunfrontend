@@ -42,7 +42,10 @@ export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
-import { getInputProcessorActionQuery } from '../common/ApiQueries';
+import {
+  getInputProcessorActionQuery,
+  setInputProcessorQuery,
+} from '../common/ApiQueries';
 import _ from 'lodash';
 import Immutable from 'immutable';
 import { getSettings } from './settingsActions';
@@ -482,28 +485,19 @@ export function saveInputProcessorSettings(state, parts = []) {
   } else {
     parts.forEach((part) => { settingsToSave[part] = settings[part]; });
   }
-  const query = {
-    api: 'settings',
-    params: [
-      { category: 'file_types' },
-      { action },
-      { data: JSON.stringify(settingsToSave) },
-    ],
-  };
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    return apiBillRun(query).then(
-      (success) => {
+    const query = setInputProcessorQuery(settingsToSave, action);
+    return apiBillRun(query)
+      .then((success) => {
         dispatch(finishProgressIndicator());
         return success;
-      }
-    ).catch(
-      (error) => {
+      })
+      .catch((error) => {
         dispatch(finishProgressIndicator());
         dispatch(apiBillRunErrorHandler(error, 'Error saving input processor'));
         return false;
-      }
-    );
+      });
   };
 }
 
