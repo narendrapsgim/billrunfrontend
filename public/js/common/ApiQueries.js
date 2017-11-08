@@ -49,13 +49,18 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
-export const getUserLoginQuery = (username, password) => ({
-  api: 'auth',
-  params: [
-    { username },
-    { password },
-  ],
-});
+export const getUserLoginQuery = (username, password) => {
+  const formData = new FormData();
+  formData.append('username', username);
+  formData.append('password', password);
+  return ({
+    api: 'auth',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
 
 export const getUserLogoutQuery = () => ({
   api: 'auth',

@@ -61,6 +61,8 @@ class DetailsParser extends Component {
         return 'Created';
       case 'close':
         return 'Closed';
+      case 'move':
+        return 'Moved';
       default:
         return '';
     }
