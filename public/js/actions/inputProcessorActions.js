@@ -382,6 +382,15 @@ export function setReceiverField(field, mapping) {
   };
 }
 
+export const cancelKeyAuth = fileType => (dispatch) => {
+  const query = getInputProcessorActionQuery(fileType, 'cancel_key_auth');
+  dispatch(startProgressIndicator());
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Authorization with key was canceled')))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error occured while trying to delete input processor')));
+};
+
+
 export function saveInputProcessorSettings(state, parts = []) {
   const action = (parts.length === 0) ? 'set' : 'validate';
   const processor = state.get('processor'),

@@ -1,12 +1,19 @@
-import React, { Component } from 'react';
-import { Col } from 'react-bootstrap';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { Col, Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 import Field from '../Field';
+import { showSuccess, showDanger } from '../../actions/alertsActions';
 
-export default class Receiver extends Component {
+class Receiver extends Component {
+
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+  };
 
   state = {
     receiverType: 'ftp',
+    currentFile: null,
   };
 
   componentDidMount() {
@@ -51,6 +58,44 @@ export default class Receiver extends Component {
       receiverType: value,
     });
     this.props.onSetReceiverField({ target: { value, id: 'receiver_type' } });
+  }
+
+  onUploadKey = (e) => {
+    e.preventDefault();
+    const { currentFile } = this.state;
+    const formData = new FormData();
+    formData.append('file', currentFile, currentFile.name);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://billrun/api/uploadedfile', true);
+    xhr.withCredentials = true;
+    xhr.addEventListener('load', () => {
+      const res = JSON.parse(xhr.responseText);
+      this.afterUpload(res);
+    });
+
+    xhr.send(formData);
+  }
+
+  afterUpload = (res) => {
+    if (res.desc === 'success') {
+      this.props.dispatch(showSuccess(res.details.message));
+      this.props.onSetReceiverField({ target: { value: res.details.path, id: 'key' } });
+    } else {
+      this.props.dispatch(showDanger(res.details.message));
+    }
+  }
+
+  onChangeFileSelect = (e) => {
+    const { files } = e.target;
+    this.setState({ currentFile: files[0] });
+  }
+
+  onClickFileSelect = (e) => {
+    e.target.value = null;
+  };
+
+  onCancelKeyAuth = () => {
+    this.props.onCancelKeyAuth();
   }
 
   renderReceiverType = (name, type) => {
@@ -142,6 +187,17 @@ export default class Receiver extends Component {
               </select>
             </div>
           </div>
+          {receiverType !== 'ftp' &&
+          <div className="form-group">
+            <label htmlFor="uploadFile" className="col-xs-2 control-label">Key</label>
+            <div className="col-xs-3">
+              <input name="file" type="file" id="file" onClick={this.onClickFileSelect} onChange={this.onChangeFileSelect} />
+              <input type="submit" name="submitBtn" id="key" value="Upload" onClick={this.onUploadKey} />
+            </div>
+            <div>
+              <Button bsSize="xsmall" className="btn-danger" style={{ marginRight: 200 }} onClick={this.onCancelKeyAuth}>Cancel Key Auth</Button>
+            </div>
+          </div>}
           <div className="form-group">
             <label htmlFor="delete_received" className="col-xs-2 control-label">Delete on retrieve</label>
             <div className="col-xs-4">
@@ -170,3 +226,5 @@ export default class Receiver extends Component {
     );
   }
 }
+
+export default connect()(Receiver);
