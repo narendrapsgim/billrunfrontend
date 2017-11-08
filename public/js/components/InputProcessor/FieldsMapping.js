@@ -335,7 +335,10 @@ export default class FieldsMapping extends Component {
         <div className="form-group">
           <div className="col-lg-3">
             <label htmlFor="date_field">Date Time</label>
-            <p className="help-block">Date and time of record creation</p>
+            <p className="help-block">
+              Date and time of record creation<br />
+              <a target="_blank" href="http://php.net/manual/en/function.date.php#refsect1-function.date-parameters">Formatting info</a>
+            </p>
           </div>
           <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
@@ -396,7 +399,7 @@ export default class FieldsMapping extends Component {
               />
             </div>
             <div className="col-lg-1">
-              <Help contents="To enable, enter date format" />
+              <Help contents="To enable, enter date format. For formatting info please check the link on the left" />
             </div>
           </div>
         </div>
