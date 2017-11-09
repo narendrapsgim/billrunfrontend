@@ -64,6 +64,7 @@ class Receiver extends Component {
   onUploadKey = (e) => {
     e.preventDefault();
     const { currentFile } = this.state;
+    const { fileType } = this.props;
     if (currentFile.size >= 1048576) {
       this.props.dispatch(showDanger('Please choose file smaller than 1MB'));
       return;
@@ -71,6 +72,7 @@ class Receiver extends Component {
     const formData = new FormData();
     formData.append('file', currentFile, currentFile.name);
     formData.append('category', 'key');
+    formData.append('file_type', fileType);
     const xhr = new XMLHttpRequest();
     const query = { api: 'uploadedfile' };
     const uploadFileApiUrl = buildRequestUrl(query);
