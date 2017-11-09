@@ -37,7 +37,7 @@ class ReportEditor extends Component {
     reportFileds: Immutable.Map(),
     aggregateOperators: getConfig(['reports', 'aggregateOperators'], Immutable.List()),
     conditionsOperators: getConfig(['reports', 'conditionsOperators'], Immutable.List()),
-    entities: getConfig(['reports', 'entities'], Immutable.List()),
+    entities: Immutable.List(),
     sortOperators: Immutable.List([
       Immutable.Map({ value: 1, label: 'Ascending' }),
       Immutable.Map({ value: -1, label: 'Descending' }),
@@ -224,6 +224,14 @@ class ReportEditor extends Component {
     const formats = report
       .get('formats', Immutable.List())
       .setIn([idx, 'value'], value);
+    this.updateReport('formats', formats);
+  }
+
+  onChangeFormatValueType = (idx, value) => {
+    const { report } = this.props;
+    const formats = report
+      .get('formats', Immutable.List())
+      .setIn([idx, 'type'], value);
     this.updateReport('formats', formats);
   }
 
@@ -484,6 +492,7 @@ class ReportEditor extends Component {
               onChangeField={this.onChangeFormatField}
               onChangeOperator={this.onChangeFormatOperator}
               onChangeValue={this.onChangeFormatValue}
+              onChangeValueType={this.onChangeFormatValueType}
               onRemove={this.onRemoveFormat}
               onAdd={this.onAddFormat}
               onMove={this.onMoveFormat}

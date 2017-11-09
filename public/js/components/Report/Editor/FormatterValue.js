@@ -1,4 +1,5 @@
 import React, { PropTypes, Component } from 'react';
+import { InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 import Select from 'react-select';
 import Field from '../../Field';
@@ -14,6 +15,7 @@ class FormatterValue extends Component {
     config: PropTypes.instanceOf(Immutable.Map),
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
+    onChangeValueType: PropTypes.func,
   }
 
   static defaultProps = {
@@ -21,6 +23,7 @@ class FormatterValue extends Component {
     config: Immutable.Map(),
     disabled: false,
     onChange: () => {},
+    onChangeValueType: () => {},
   }
 
   componentWillReceiveProps(nextProps) {
@@ -50,9 +53,49 @@ class FormatterValue extends Component {
     this.props.onChange(value);
   };
 
+  onSelectOptionType = (type) => {
+    this.props.onChangeValueType(type);
+  }
+
   render() {
     const { field, disabled, config } = this.props;
     const disabledInput = disabled || config.isEmpty();
+    if (config.has('valueTypes')) {
+      const selectedUnit = config
+        .get('valueTypes', Immutable.List())
+        .find(type => type.get('value', '') === field.get('type', ''), null, Immutable.Map({}))
+        .get('label', 'Select unit...');
+      const valueOptions = config
+        .get('valueTypes', Immutable.List())
+        .map(option => (
+          <MenuItem
+            eventKey={option.get('value', '-')}
+            key={option.get('value', '-')}
+            onSelect={this.onSelectOptionType}
+          >
+            {option.get('label', '-')}
+          </MenuItem>
+        ))
+        .toArray();
+      return (
+        <InputGroup>
+          <Field
+            fieldType={config.get('type', 'text')}
+            value={field.get('value', '')}
+            onChange={this.onChangeText}
+            disabled={disabledInput}
+          />
+          <DropdownButton
+            id="balance-period-unit"
+            componentClass={InputGroup.Button}
+            title={selectedUnit}
+            disabled={disabledInput}
+          >
+            { valueOptions }
+          </DropdownButton>
+        </InputGroup>
+      );
+    }
 
     if (config.has('options')) {
       // Not Input value
