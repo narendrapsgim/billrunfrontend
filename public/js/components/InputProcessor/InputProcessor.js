@@ -40,6 +40,7 @@ import {
   unsetField,
   setRealtimeField,
   setRealtimeDefaultField,
+  cancelKeyAuth,
  } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
@@ -311,6 +312,10 @@ class InputProcessor extends Component {
     this.props.dispatch(setReceiverField(id, value));
   }
 
+  onCancelKeyAuth = () => {
+    this.props.dispatch(cancelKeyAuth('key'));
+  }
+
   onSetReceiverCheckboxField = (e) => {
     const { id, checked } = e.target;
     this.props.dispatch(setReceiverField(id, checked));
@@ -480,6 +485,7 @@ class InputProcessor extends Component {
           settings={settings.get('receiver', Immutable.Map())}
           onSetReceiverField={this.onSetReceiverField}
           onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}
+          onCancelKeyAuth={this.onCancelKeyAuth}
         />
       );
 

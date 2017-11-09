@@ -22,6 +22,7 @@ import { SET_NAME,
          REMOVE_RATING_PRIORITY,
          REMOVE_RATING_FIELD,
          SET_RECEIVER_FIELD,
+         CANCEL_KEY_AUTH,
          SET_FIELD_WIDTH,
          CLEAR_INPUT_PROCESSOR,
          REMOVE_USAGET_MAPPING,
@@ -226,6 +227,9 @@ export default function (state = defaultState, action) {
 
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
+
+    case CANCEL_KEY_AUTH:
+      return state.deleteIn(['receiver', 'key']);
 
     case CLEAR_INPUT_PROCESSOR:
       return defaultState;
