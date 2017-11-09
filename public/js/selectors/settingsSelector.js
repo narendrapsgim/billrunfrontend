@@ -48,6 +48,9 @@ const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-v
 const getLinesFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['lines', 'fields']);
 
+const getServiceFields = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['services', 'fields']);
+
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['rates', 'fields']);
 
@@ -334,6 +337,11 @@ export const subscriberImportFieldsSelector = createSelector(
 export const productFieldsSelector = createSelector(
   getProductFields,
   productFields => productFields,
+);
+
+export const seriveceFieldsSelector = createSelector(
+  getServiceFields,
+  serviceFields => serviceFields,
 );
 
 const selectEvents = (events, usageTypesData, propertyTypes) => {
