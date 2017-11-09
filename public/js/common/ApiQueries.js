@@ -49,13 +49,18 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
-export const getUserLoginQuery = (username, password) => ({
-  api: 'auth',
-  params: [
-    { username },
-    { password },
-  ],
-});
+export const getUserLoginQuery = (username, password) => {
+  const formData = new FormData();
+  formData.append('username', username);
+  formData.append('password', password);
+  return ({
+    api: 'auth',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
 
 export const getUserLogoutQuery = () => ({
   api: 'auth',
@@ -115,6 +120,20 @@ export const getSettingsQuery = category => ({
     { data: JSON.stringify({}) },
   ],
 });
+
+export const setInputProcessorQuery = (data, action) => {
+  const formData = new FormData();
+  formData.append('category', 'file_types');
+  formData.append('action', action);
+  formData.append('data', JSON.stringify(data));
+  return ({
+    api: 'settings',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
 
 export const getInputProcessorActionQuery = (fileType, action) => ({
   api: 'settings',

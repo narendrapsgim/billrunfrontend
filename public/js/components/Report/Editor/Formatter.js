@@ -18,6 +18,7 @@ class Formatter extends Component {
     onChangeField: PropTypes.func,
     onChangeOperator: PropTypes.func,
     onChangeValue: PropTypes.func,
+    onChangeValueType: PropTypes.func,
     onRemove: PropTypes.func,
   }
 
@@ -30,6 +31,7 @@ class Formatter extends Component {
     onChangeField: () => {},
     onChangeOperator: () => {},
     onChangeValue: () => {},
+    onChangeValueType: () => {},
     onRemove: () => {},
   }
 
@@ -62,6 +64,11 @@ class Formatter extends Component {
   onChangeValue = (e) => {
     const { idx } = this.props;
     this.props.onChangeValue(idx, e);
+  }
+
+  onChangeValueType = (e) => {
+    const { idx } = this.props;
+    this.props.onChangeValueType(idx, e);
   }
 
   getFieldOptions = () => {
@@ -108,7 +115,12 @@ class Formatter extends Component {
           />
         </Col>
         <Col sm={3}>
-          <FormatterValue onChange={this.onChangeValue} field={item} config={selectedOp} />
+          <FormatterValue
+            onChange={this.onChangeValue}
+            onChangeValueType={this.onChangeValueType}
+            field={item}
+            config={selectedOp}
+          />
         </Col>
         <Col sm={2} className="actions">
           <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled}>

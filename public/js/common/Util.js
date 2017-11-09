@@ -54,6 +54,7 @@ export const getFieldNameType = (type) => {
     case 'subscription':
     case 'subscriptions':
     case 'subscribers':
+    case 'subscriber':
       return 'subscription';
     case 'lines':
     case 'usage':
@@ -75,6 +76,8 @@ export const getLastName = item => item.get('last_name', item.get('lastname', ''
 
 export const getCustomerId = item => item.get('aid', '');
 
+export const getSubscriberId = item => item.get('sid', '');
+
 export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
   switch (mode) {
     case 'clone':
@@ -93,7 +96,7 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
         if (entityName === 'customer') {
           return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
         } else if (entityName === 'subscription') {
-          return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+          return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getSubscriberId(item)}]`;
         } else if (entityName === 'auto_renew') {
           return `Edit ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))}`;
         }
