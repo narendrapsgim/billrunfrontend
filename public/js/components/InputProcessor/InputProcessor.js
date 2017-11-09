@@ -413,7 +413,7 @@ class InputProcessor extends Component {
   }
 
   getStepContent = () => {
-    const { settings, usageTypes, usageTypesData, propertyTypes, subscriberFields, customRatingFields, action, type, format } = this.props;
+    const { settings, usageTypes, usageTypesData, propertyTypes, subscriberFields, customRatingFields, action, type, format, fileType } = this.props;
     const { stepIndex, errors, steps } = this.state;
 
     switch (stepIndex) {
@@ -486,6 +486,7 @@ class InputProcessor extends Component {
           onSetReceiverField={this.onSetReceiverField}
           onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}
           onCancelKeyAuth={this.onCancelKeyAuth}
+          fileType={fileType}
         />
       );
 
