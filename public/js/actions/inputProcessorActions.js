@@ -16,6 +16,7 @@ export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
 export const ADD_CUSTOMER_MAPPING = 'ADD_CUSTOMER_MAPPING';
 export const REMOVE_CUSTOMER_MAPPING = 'REMOVE_CUSTOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
+export const CANCEL_KEY_AUTH = 'CANCEL_KEY_AUTH';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
 export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
@@ -382,13 +383,13 @@ export function setReceiverField(field, mapping) {
   };
 }
 
-export const cancelKeyAuth = fileType => (dispatch) => {
-  const query = getInputProcessorActionQuery(fileType, 'cancel_key_auth');
-  dispatch(startProgressIndicator());
-  return apiBillRun(query)
-    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Authorization with key was canceled')))
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error occured while trying to delete input processor')));
-};
+
+export function cancelKeyAuth(field) {
+  return {
+    type: CANCEL_KEY_AUTH,
+    field,
+  };
+}
 
 
 export function saveInputProcessorSettings(state, parts = []) {

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Col, Button } from 'react-bootstrap';
 import Immutable from 'immutable';
+import { buildRequestUrl } from '../../common/Api'
 import Field from '../Field';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 
@@ -63,10 +64,17 @@ class Receiver extends Component {
   onUploadKey = (e) => {
     e.preventDefault();
     const { currentFile } = this.state;
+    if (currentFile.size >= 1048576) {
+      this.props.dispatch(showDanger('Please choose file smaller than 1MB'));
+      return;
+    }
     const formData = new FormData();
     formData.append('file', currentFile, currentFile.name);
+    formData.append('category', 'key');
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://billrun/api/uploadedfile', true);
+    const query = { api: 'uploadedfile' };
+    const uploadFileApiUrl = buildRequestUrl(query);
+    xhr.open('POST', uploadFileApiUrl, true);
     xhr.withCredentials = true;
     xhr.addEventListener('load', () => {
       const res = JSON.parse(xhr.responseText);

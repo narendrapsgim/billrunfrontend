@@ -313,8 +313,7 @@ class InputProcessor extends Component {
   }
 
   onCancelKeyAuth = () => {
-    const { fileType } = this.props;
-    this.props.dispatch(cancelKeyAuth(fileType));
+    this.props.dispatch(cancelKeyAuth('key'));
   }
 
   onSetReceiverCheckboxField = (e) => {
