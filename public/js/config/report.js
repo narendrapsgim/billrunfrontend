@@ -13,7 +13,7 @@ export default {
       { id: 'firstname' },
       { id: 'stamp' },
       { id: 'in_group', type: 'number' },
-      { id: 'full_price', type: 'number', title: 'Plan / Servive Full Price' },
+      { id: 'full_price', type: 'number', title: 'Plan / Service Full Price' },
       { id: 'aprice', type: 'number' },
       { id: 'final_charge', type: 'number' },
       { id: 'file' },
