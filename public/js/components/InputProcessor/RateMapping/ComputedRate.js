@@ -40,7 +40,7 @@ export default class ComputedRate extends Component {
     }
     const regexHelper = 'In case you want to run a regular expression on the computed field before calculating the rate';
     const mustMetHelper = 'This means than in case the condition is not met - a rate will not be found';
-    const lineKeyOptions = getAvailableFields(settings).toJS();
+    const lineKeyOptions = getAvailableFields(settings, [{ value: 'file', label: 'File name' }]).toJS();
     const computedTypeRegex = computedLineKey.get('type', 'regex') === 'regex';
     const checkboxStyle = { marginTop: 10 };
     const conditionOption = this.getConditionResultProjectOptions().concat(lineKeyOptions);
