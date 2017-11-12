@@ -87,7 +87,7 @@ class RateMapping extends Component {
   }
 
   getRateCalculatorFields = () =>
-    getAvailableFields(this.props.settings, [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'computed', label: 'Computed' }])
+    getAvailableFields(this.props.settings, [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'computed', label: 'Computed' }, { value: 'file', label: 'File Name' }])
     .map((field, key) => (
       <option value={field.get('value', '')} key={key}>{field.get('label', '')}</option>
     ));
@@ -430,7 +430,7 @@ class RateMapping extends Component {
       className="btn-primary"
       onClick={this.onAddRatingPriority(usaget)}
     >
-      <i className="fa fa-plus" />&nbsp;Add Next Priority
+      <i className="fa fa-plus" />&nbsp;Add Next Rating
     </Button>
   );
 
