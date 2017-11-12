@@ -430,7 +430,7 @@ class RateMapping extends Component {
       className="btn-primary"
       onClick={this.onAddRatingPriority(usaget)}
     >
-      <i className="fa fa-plus" />&nbsp;Add Next Rating
+      <i className="fa fa-plus" />&nbsp;Add Next Priority
     </Button>
   );
 
