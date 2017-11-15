@@ -163,35 +163,6 @@ export default class FieldsMapping extends Component {
     this.setState({ volumeFields });
   }
 
-  onChangeApriceField = (value) => {
-    const e = {
-      target: {
-        value,
-        id: 'aprice_field',
-      },
-    };
-    this.props.onSetFieldMapping(e);
-  }
-
-  onChangeApriceExists = () => {
-    this.onChangeApriceField(undefined);
-    this.onChangeApriceMultExists();
-  }
-
-  onChangeApriceMult = (e) => {
-    this.props.onSetFieldMapping(e);
-  }
-
-  onChangeApriceMultExists = () => {
-    const e = {
-      target: {
-        value: undefined,
-        id: 'aprice_mult',
-      },
-    };
-    this.onChangeApriceMult(e);
-  }
-
   onChangeDateFormat = (e) => {
     this.props.onSetFieldMapping(e);
   }
@@ -224,64 +195,6 @@ export default class FieldsMapping extends Component {
     label: field,
     value: field,
   })).toArray();
-
-  renderPrice = () => {
-    const { settings } = this.props;
-    const aprice = settings.getIn(['processor', 'aprice_field'], null);
-    const apriceInputProps = {
-      fieldType: 'select',
-      placeholder: 'Select price field...',
-      options: this.getVolumeOptions(),
-      onChange: this.onChangeApriceField,
-    };
-    const apriceMult = settings.getIn(['processor', 'aprice_mult']) || '';
-    const apriceMultInputProps = {
-      fieldType: 'number',
-      id: 'aprice_mult',
-      onChange: this.onChangeApriceMult,
-    };
-    return (
-      <div>
-        <div className="separator" />
-        <div className="form-group">
-          <div className="col-lg-3">
-            <label htmlFor="price_field">Price</label>
-            <p className="help-block">When checked, the price will be taken directly from the record instead of being calculated</p>
-          </div>
-          <div className="col-lg-9">
-            <div className="col-lg-1" style={{ marginTop: 8 }}>
-              <i className="fa fa-long-arrow-right" />
-            </div>
-
-            <div className="col-lg-9 form-inner-edit-row">
-              <Field
-                fieldType="toggeledInput"
-                value={aprice}
-                onChange={this.onChangeApriceExists}
-                label="Pre priced"
-                inputProps={apriceInputProps}
-              />
-            </div>
-
-            <div className="col-lg-9 col-lg-offset-1 form-inner-edit-row">
-              <Field
-                fieldType="toggeledInput"
-                value={apriceMult}
-                disabledValue=""
-                disabled={aprice === null || aprice === undefined}
-                onChange={this.onChangeApriceMultExists}
-                label="Multiply by constant"
-                inputProps={apriceMultInputProps}
-              />
-            </div>
-            <div className="col-lg-1">
-              <Help contents="When checked, the price taken will be multiply by the constant entered" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   render() {
     const {
@@ -636,8 +549,6 @@ export default class FieldsMapping extends Component {
             </div>)
           }
         </div>
-
-        { this.renderPrice() }
       </form>
     );
   }

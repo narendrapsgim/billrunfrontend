@@ -14,6 +14,7 @@ import { SET_NAME,
          ADD_CSV_FIELD,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
+         SET_PRICING_MAPPING,
          ADD_CUSTOMER_MAPPING,
          REMOVE_CUSTOMER_MAPPING,
          SET_RATING_FIELD,
@@ -50,6 +51,7 @@ const defaultState = Immutable.fromJS({
   },
   customer_identification_fields: {},
   rate_calculators: {},
+  pricing: {},
   unify: {},
   /* receiver: {
    *   passive: false,
@@ -110,6 +112,7 @@ export default function (state = defaultState, action) {
       return state
         .set('usaget_type', action.usaget_type)
         .set('customer_identification_fields', Immutable.Map())
+        .set('pricing', Immutable.Map())
         .setIn(['processor', 'usaget_mapping'], Immutable.List())
         .setIn(['processor', 'default_usaget'], '')
         .setIn(['processor', 'src_field'], '')
@@ -119,6 +122,7 @@ export default function (state = defaultState, action) {
       return state
         .setIn(['processor', 'default_usaget'], action.usaget)
         .update('rate_calculators', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.List()))
+        .update('pricing', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.Map()))
         .update('customer_identification_fields', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.List()));
     }
 
@@ -134,6 +138,7 @@ export default function (state = defaultState, action) {
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.push(newMap))
         .update('rate_calculators', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.List()) : map))
+        .update('pricing', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.Map()) : map))
         .update('customer_identification_fields', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.List()) : map));
     }
 
@@ -151,6 +156,12 @@ export default function (state = defaultState, action) {
           }
           return customerCalc;
         })
+        .updateIn(['pricing'], Immutable.Map(), (priceCalc) => {
+          if (countUsaget === 1) {
+            return priceCalc.delete(usaget);
+          }
+          return priceCalc;
+        })
         .updateIn(['rate_calculators'], Immutable.Map(), (rateCalc) => {
           if (countUsaget === 1) {
             return rateCalc.delete(usaget);
@@ -161,6 +172,9 @@ export default function (state = defaultState, action) {
 
     case SET_CUSETOMER_MAPPING:
       return state.setIn(['customer_identification_fields', action.usaget, action.index, field], mapping);
+
+    case SET_PRICING_MAPPING:
+      return state.setIn(['pricing', action.usaget, field], mapping);
 
     case ADD_CUSTOMER_MAPPING:
       return state.updateIn(['customer_identification_fields', action.usaget], list => (list ? list.push(defaultCustomerIdentification) : Immutable.List([defaultCustomerIdentification])));
