@@ -10,6 +10,7 @@ import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
 import CustomerMappings from './CustomerMapping/CustomerMappings';
 import RateMappings from './RateMapping/RateMappings';
+import PricingMappings from './PricingMapping/PricingMappings';
 import Receiver from './Receiver';
 import RealtimeMapping from './RealtimeMapping';
 import {
@@ -26,6 +27,7 @@ import {
   setFieldWidth,
   addCSVField,
   setCustomerMapping,
+  setPricingMapping,
   setReceiverField,
   saveInputProcessorSettings,
   removeCSVField,
@@ -116,18 +118,23 @@ class InputProcessor extends Component {
         label: 'Rate Mapping',
         parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators'],
       },
+      pricing: {
+        idx: 4,
+        label: 'Pricing',
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing'],
+      },
     });
     if (props.type === 'api') {
       steps = steps.set('realtimeMapping', {
-        idx: 4,
+        idx: 5,
         label: 'Realtime Mapping',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'realtime', 'response', 'unify'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing', 'realtime', 'response', 'unify'],
       });
     } else {
       steps = steps.set('receiver', {
-        idx: 4,
+        idx: 5,
         label: 'Receiver',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'receiver', 'unify'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing', 'receiver', 'unify'],
       });
     }
 
@@ -307,6 +314,10 @@ class InputProcessor extends Component {
     this.props.dispatch(setCustomerMapping(field, mapping, usaget, index));
   }
 
+  onSetPricingMapping = (field, mapping, usaget) => {
+    this.props.dispatch(setPricingMapping(field, mapping, usaget));
+  }
+
   onSetReceiverField = (e) => {
     const { id, value } = e.target;
     this.props.dispatch(setReceiverField(id, value));
@@ -468,6 +479,13 @@ class InputProcessor extends Component {
         <RateMappings
           settings={settings}
           customRatingFields={customRatingFields}
+        />
+      );
+
+      case steps.get('pricing', {}).idx: return (
+        <PricingMappings
+          settings={settings}
+          onSetPricingMapping={this.onSetPricingMapping}
         />
       );
 
