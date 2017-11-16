@@ -135,11 +135,18 @@ const convert = (settings) => {
     if (!pricing) {
       if (usaget_type === 'dynamic') {
         ret.pricing = _.reduce(processor.usaget_mapping, (acc, mapping) => {
-          acc[mapping.usaget] = [];
+          acc[mapping.usaget] = {};
           return acc;
         }, {});
       } else {
-        ret.pricing = { [processor.default_usaget]: [] };
+        ret.pricing = { [processor.default_usaget]: {} };
+      }
+    }
+
+    for (var key in ret.pricing) {
+      var obj = ret.pricing[key];
+      if (obj.length === 0) {
+        ret.pricing[key] = {};
       }
     }
   } else {
