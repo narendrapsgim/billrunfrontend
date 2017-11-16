@@ -23,7 +23,7 @@ class PricingMappings extends Component {
           <div className="col-lg-12">
             <h4>
               Pre-Pricing
-              <p className="help-block">When checked, the price will be taken directly from the record instead of being calculated</p>
+              <p className="help-block">When Pre priced is checked, the price will be taken directly from the record instead of being calculated</p>
             </h4>
           </div>
         </div>
