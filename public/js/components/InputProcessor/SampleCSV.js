@@ -137,7 +137,7 @@ class SampleCSV extends Component {
       ? (null)
       : (<div className="form-group">
         <div className="col-lg-3">
-          <label htmlFor="file_type">CSV has header?</label>
+          <label htmlFor="file_type">Skip CSV header?</label>
         </div>
         <div className="col-lg-9">
           <div className="col-lg-1" style={{ marginTop: 8 }}>
@@ -155,7 +155,7 @@ class SampleCSV extends Component {
       ? (null)
       : (<div className="form-group">
         <div className="col-lg-3">
-          <label htmlFor="file_type">CSV has footer?</label>
+          <label htmlFor="file_type">Skip CSV footer?</label>
         </div>
         <div className="col-lg-9">
           <div className="col-lg-1" style={{ marginTop: 8 }}>
