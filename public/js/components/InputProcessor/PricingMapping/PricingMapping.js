@@ -57,14 +57,14 @@ export default class PricingMapping extends Component {
 
   renderPrice = () => {
     const { mapping } = this.props;
-    const aprice = (mapping === 'undefined') ? undefined : mapping.getIn(['aprice_field'], null);
+    const aprice = mapping.getIn(['aprice_field'], null);
     const apriceInputProps = {
       fieldType: 'select',
       placeholder: 'Select price field...',
       options: this.getVolumeOptions(),
       onChange: this.onChangeApriceField,
     };
-    const apriceMult = (mapping === 'undefined') ? undefined : mapping.getIn(['aprice_mult'], null);
+    const apriceMult = mapping.getIn(['aprice_mult']) || '';
     const apriceMultInputProps = {
       fieldType: 'number',
       id: 'aprice_mult',
