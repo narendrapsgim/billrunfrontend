@@ -512,6 +512,14 @@ export const getRunCycleQuery = (billrunKey, rerun) => ({
   ],
 });
 
+export const getResetCycleQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'resetcycle',
+  params: [
+    { stamp: billrunKey },
+  ],
+});
+
 export const getConfirmCycleInvoiceQuery = (billrunKey, invoiceId) => ({
   api: 'billrun',
   action: 'confirmCycle',
