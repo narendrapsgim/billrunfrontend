@@ -141,7 +141,7 @@ const convertPlan = (getState, plan, convertToBaseUnit) => {
   const state = getState();
   const usageTypesData = usageTypesDataSelector(state);
   const propertyTypes = propertyTypeSelector(state);
-  const ppIncludes = state.list.get('pp_includes');
+  const ppIncludes = state.list.get('pp_includes', Immutable.List());
   const rates = getPlanConvertedRates(propertyTypes, usageTypesData, plan, convertToBaseUnit);
   const ppThresholds = isPrepaidPlan
     ? getPlanConvertedPpThresholds(propertyTypes, usageTypesData, ppIncludes, plan, convertToBaseUnit) // eslint-disable-line max-len
@@ -173,7 +173,7 @@ const convertPrepaidGroup = (getState, prepaidGroup, convertToBaseUnit) => {
   const state = getState();
   const usageTypesData = usageTypesDataSelector(state);
   const propertyTypes = propertyTypeSelector(state);
-  const prepaidIncludes = state.list.get('pp_includes');
+  const prepaidIncludes = state.list.get('pp_includes', Immutable.List());
   const includes = getPlanConvertedPpIncludes(propertyTypes, usageTypesData, prepaidIncludes, prepaidGroup, convertToBaseUnit); // eslint-disable-line max-len
   return prepaidGroup.withMutations((itemWithMutations) => {
     if (!includes.isEmpty()) {

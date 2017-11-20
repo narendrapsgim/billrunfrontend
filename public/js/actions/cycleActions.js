@@ -1,6 +1,7 @@
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import {
   getRunCycleQuery,
+  getResetCycleQuery,
   getConfirmCycleInvoiceQuery,
   getConfirmCycleAllQuery,
   getChargeAllCycleQuery,
@@ -15,6 +16,14 @@ export const runBillingCycle = (billrunKey, rerun = false, generatePdf = true) =
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success, 'Cycle started successfully!')))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error running cycle')));
+};
+
+export const runResetCycle = billrunKey => (dispatch) => { // eslint-disable-line import/prefer-default-export
+  dispatch(startProgressIndicator());
+  const query = getResetCycleQuery(billrunKey);
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, 'Cycle reseted successfully!')))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error resetting cycle')));
 };
 
 export const confirmCycleInvoice = (billrunKey, invoiceId) => (dispatch) => {

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { escapeRegExp } from './Util';
 
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
 export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
@@ -49,13 +50,18 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
-export const getUserLoginQuery = (username, password) => ({
-  api: 'auth',
-  params: [
-    { username },
-    { password },
-  ],
-});
+export const getUserLoginQuery = (username, password) => {
+  const formData = new FormData();
+  formData.append('username', username);
+  formData.append('password', password);
+  return ({
+    api: 'auth',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
 
 export const getUserLogoutQuery = () => ({
   api: 'auth',
@@ -115,6 +121,20 @@ export const getSettingsQuery = category => ({
     { data: JSON.stringify({}) },
   ],
 });
+
+export const setInputProcessorQuery = (data, action) => {
+  const formData = new FormData();
+  formData.append('category', 'file_types');
+  formData.append('action', action);
+  formData.append('data', JSON.stringify(data));
+  return ({
+    api: 'settings',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
 
 export const getInputProcessorActionQuery = (fileType, action) => ({
   api: 'settings',
@@ -421,11 +441,12 @@ export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQu
 
 export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => {
   let query = {};
+  const escapedValue = escapeRegExp(value);
   switch (collection) {
     case 'subscribers':
-      query = { [revisionBy]: value };
+      query = { [revisionBy]: escapedValue };
       break;
-    default: query = { [revisionBy]: { $regex: `^${value}$` } };
+    default: query = { [revisionBy]: { $regex: `^${escapedValue}$` } };
   }
   return ({
     action: 'get',
@@ -489,6 +510,14 @@ export const getRunCycleQuery = (billrunKey, rerun, generatePdf) => ({
     { stamp: billrunKey },
     { rerun },
     { generate_pdf: generatePdf },
+  ],
+});
+
+export const getResetCycleQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'resetcycle',
+  params: [
+    { stamp: billrunKey },
   ],
 });
 
