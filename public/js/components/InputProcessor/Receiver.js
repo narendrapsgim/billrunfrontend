@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Col, Button } from 'react-bootstrap';
+import { Col, Button, Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
 import { buildRequestUrl } from '../../common/Api'
 import Field from '../Field';
@@ -14,7 +14,7 @@ class Receiver extends Component {
 
   state = {
     receiverType: 'ftp',
-    currentFile: null,
+    showRemoveKey: false,
   };
 
   componentDidMount() {
@@ -24,6 +24,7 @@ class Receiver extends Component {
 
   initDefaultValues = () => {
     const { settings } = this.props;
+    let show = false;
     if (settings.get('passive', null) === null) {
       const passive = {
         target: {
@@ -42,9 +43,12 @@ class Receiver extends Component {
       };
       this.props.onSetReceiverCheckboxField(deletReceived);
     }
-
+    if (settings.get('key', false)) {
+      show = true;
+    }
     this.setState({
       receiverType: settings.get('receiver_type', 'ftp'),
+      showRemoveKey: show,
     });
   }
 
@@ -61,10 +65,22 @@ class Receiver extends Component {
     this.props.onSetReceiverField({ target: { value, id: 'receiver_type' } });
   }
 
-  onUploadKey = (e) => {
-    e.preventDefault();
-    const { currentFile } = this.state;
+  afterUpload = (res, fileName) => {
+    if (res.desc === 'success') {
+      this.props.dispatch(showSuccess(res.details.message));
+      this.props.onSetReceiverField({ target: { value: res.details.path, id: 'key' } });
+      this.props.onSetReceiverField({ target: { value: fileName, id: 'key_label' } });
+      this.props.OnChangeUploadingFile();
+      this.setState({ showRemoveKey: true });
+    } else {
+      this.props.dispatch(showDanger(res.details.message));
+    }
+  }
+
+  onChangeFileSelect = (e) => {
+    const { files } = e.target;
     const { fileType } = this.props;
+    const currentFile = files[0];
     if (currentFile.size >= 1048576) {
       this.props.dispatch(showDanger('Please choose file smaller than 1MB'));
       return;
@@ -76,28 +92,14 @@ class Receiver extends Component {
     const xhr = new XMLHttpRequest();
     const query = { api: 'uploadedfile' };
     const uploadFileApiUrl = buildRequestUrl(query);
+    this.props.OnChangeUploadingFile();
     xhr.open('POST', uploadFileApiUrl, true);
     xhr.withCredentials = true;
     xhr.addEventListener('load', () => {
       const res = JSON.parse(xhr.responseText);
-      this.afterUpload(res);
+      this.afterUpload(res, currentFile.name);
     });
-
     xhr.send(formData);
-  }
-
-  afterUpload = (res) => {
-    if (res.desc === 'success') {
-      this.props.dispatch(showSuccess(res.details.message));
-      this.props.onSetReceiverField({ target: { value: res.details.path, id: 'key' } });
-    } else {
-      this.props.dispatch(showDanger(res.details.message));
-    }
-  }
-
-  onChangeFileSelect = (e) => {
-    const { files } = e.target;
-    this.setState({ currentFile: files[0] });
   }
 
   onClickFileSelect = (e) => {
@@ -106,6 +108,8 @@ class Receiver extends Component {
 
   onCancelKeyAuth = () => {
     this.props.onCancelKeyAuth();
+    this.props.dispatch(showSuccess('Key was removed successfuly'));
+    this.setState({ showRemoveKey: false });
   }
 
   renderReceiverType = (name, type) => {
@@ -128,11 +132,21 @@ class Receiver extends Component {
     this.receiverTypes.map((name, type) => this.renderReceiverType(name, type)).toArray()
   );
 
+  renderPanelHeader = (keyLabel) => (
+    <div>
+      {keyLabel}
+      <div className="pull-right">
+        <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.onCancelKeyAuth}><span aria-hidden="true">&times;</span></button>
+      </div>
+    </div>
+  );
   render() {
     const { settings,
             onSetReceiverField,
-            onSetReceiverCheckboxField } = this.props;
-    const { receiverType } = this.state;
+            onSetReceiverCheckboxField,
+            keyValue,
+            keyLabel} = this.props;
+    const { receiverType, showRemoveKey } = this.state;
 
     const period_options = [{min: 1, label: "1 Minute"},
                             {min: 15, label: "15 Minutes"},
@@ -200,12 +214,15 @@ class Receiver extends Component {
           {receiverType !== 'ftp' &&
           <div className="form-group">
             <label htmlFor="uploadFile" className="col-xs-2 control-label">Key</label>
-            <div className="col-xs-3">
+            <div className="col-xs-2">
               <input name="file" type="file" id="file" onClick={this.onClickFileSelect} onChange={this.onChangeFileSelect} />
-              <input type="submit" name="submitBtn" id="key" value="Upload" onClick={this.onUploadKey} />
             </div>
-            <div>
-              <Button bsSize="xsmall" className="btn-danger" style={{ marginRight: 200 }} onClick={this.onCancelKeyAuth}>Cancel Key Auth</Button>
+            <div className="col-xs-2">
+              <form>
+                <div>
+                  {showRemoveKey && (<Panel header={this.renderPanelHeader(keyLabel)} />)}
+                </div>
+              </form>
             </div>
           </div>}
           <div className="form-group">

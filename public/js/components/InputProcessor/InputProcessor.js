@@ -142,6 +142,7 @@ class InputProcessor extends Component {
       stepIndex: 0,
       errors,
       steps,
+      uploadingFile: false,
     };
   }
 
@@ -423,9 +424,16 @@ class InputProcessor extends Component {
     return !hasEroor;
   }
 
+  changeUploadingFile = () => {
+    const { uploadingFile } = this.state;
+    this.setState({ uploadingFile: !uploadingFile });
+  }
+
   getStepContent = () => {
     const { settings, usageTypes, usageTypesData, propertyTypes, subscriberFields, customRatingFields, action, type, format, fileType } = this.props;
     const { stepIndex, errors, steps } = this.state;
+    const keyValue = settings.getIn(['receiver', 'key'], null);
+    const keyLabel = settings.getIn(['receiver', 'key_label'], settings.get('file_type'));
 
     switch (stepIndex) {
       case steps.get('parser', {}).idx: return (
@@ -505,6 +513,9 @@ class InputProcessor extends Component {
           onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}
           onCancelKeyAuth={this.onCancelKeyAuth}
           fileType={fileType}
+          OnChangeUploadingFile={this.changeUploadingFile}
+          keyValue={keyValue}
+          keyLabel={keyLabel}
         />
       );
 
@@ -529,7 +540,7 @@ class InputProcessor extends Component {
   }
 
   render() {
-    const { stepIndex, steps } = this.state;
+    const { stepIndex, steps, uploadingFile } = this.state;
     const isValidForm = this.isValidForm();
     return (
       <div>
@@ -547,7 +558,7 @@ class InputProcessor extends Component {
               <div style={{ marginTop: 12, float: 'right' }}>
                 <button className="btn btn-default" onClick={this.handleCancel} style={{ marginRight: 12 }} > Cancel </button>
                 { (stepIndex > 0) && <button className="btn btn-default" onClick={this.handlePrev} style={{ marginRight: 12 }} > Back </button>}
-                <button disabled={!isValidForm} className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (steps.size - 1) ? 'Finish' : 'Next' }</button>
+                <button disabled={!isValidForm || uploadingFile} className="btn btn-primary" onClick={this.handleNext} > { stepIndex === (steps.size - 1) ? 'Finish' : 'Next' }</button>
               </div>
             </div>
           </div>
