@@ -470,5 +470,5 @@ export const getAvailableFields = (settings, additionalFields = []) => {
 };
 
 export const escapeRegExp = (text) => {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  return text.toString().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 };
