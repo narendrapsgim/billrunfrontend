@@ -133,7 +133,7 @@ class Receiver extends Component {
   );
 
   renderPanelHeader = (keyLabel) => (
-    <div>
+    <div style={{ fontSize: 12, fontWeight: 'bold' }}>
       {keyLabel}
       <div className="pull-right">
         <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.onCancelKeyAuth}><span aria-hidden="true">&times;</span></button>
