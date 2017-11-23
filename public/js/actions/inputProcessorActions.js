@@ -62,6 +62,7 @@ const convert = (settings) => {
           realtime = {},
           response = {},
           unify = {},
+          enabled = {},
         } = settings;
 
   const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
@@ -84,6 +85,7 @@ const convert = (settings) => {
     rate_calculators,
     pricing,
     unify,
+    enabled,
   };
 
   if (settings.type !== 'realtime') {
@@ -430,8 +432,8 @@ export function saveInputProcessorSettings(state, parts = []) {
         pricing = state.get('pricing'),
         receiver = state.get('receiver'),
         realtime = state.get('realtime', Immutable.Map()),
-        response = state.get('response', Immutable.Map());
-
+        response = state.get('response', Immutable.Map()),
+        enabled = state.get('enabled');
   const settings = {
     "file_type": state.get('file_type'),
     "type": state.get('type'),
@@ -451,7 +453,6 @@ export function saveInputProcessorSettings(state, parts = []) {
     settings.parser.csv_has_header = state.get('csv_has_header', false);
     settings.parser.csv_has_footer = state.get('csv_has_footer', false);
   }
-
   if (processor) {
     const processor_settings = state.get('usaget_type') === "static"
     ? {
@@ -497,6 +498,7 @@ export function saveInputProcessorSettings(state, parts = []) {
   if (unify) {
     settings.unify = unify.toJS();
   }
+  settings.enabled = enabled !== undefined ? enabled : 'true';
   if (state.get('type') !== 'realtime' && receiver) {
     const receiverType = receiver.get('receiver_type', 'ftp');
     settings.receiver = {
