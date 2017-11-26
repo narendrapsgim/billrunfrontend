@@ -111,6 +111,13 @@ export default {
           ],
         },
       },
+      { id: 'source',
+        title: 'Source',
+        inputConfig: {
+          inputType: 'select',
+          callback: 'getFileTypeOptions',
+        }
+      },
     ],
     queue: [
       // use all usage fields
@@ -145,7 +152,6 @@ export default {
         'fieldid:arate_key',
         'fieldid:arategroup',
         'fieldid:plan',
-        'fieldid:usaget',
         'fieldid:logfile_status',
       ],
     },
