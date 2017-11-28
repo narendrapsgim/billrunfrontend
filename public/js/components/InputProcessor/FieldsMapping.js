@@ -274,7 +274,7 @@ export default class FieldsMapping extends Component {
               />
             </div>
             <div className="col-lg-1">
-              <Help contents="If not checked, default format is mm/dd/yy" />
+              <Help contents="Check to force a custom format. If not checked, default format is mm/dd/yy" />
             </div>
           </div>
 

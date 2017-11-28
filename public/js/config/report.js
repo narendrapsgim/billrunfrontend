@@ -14,6 +14,7 @@ export default {
       { id: 'stamp' },
       { id: 'in_group', type: 'number' },
       { id: 'full_price', type: 'number', title: 'Plan / Service Full Price' },
+      { id: 'name', type: 'string', title: 'Plan / Service / Discount key' },
       { id: 'aprice', type: 'number' },
       { id: 'final_charge', type: 'number' },
       { id: 'file' },
