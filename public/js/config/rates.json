@@ -5,6 +5,6 @@
 		{ "key": "$lte", "title": "Is Less Than Or Equal" },
 		{ "key": "$gt", "title": "Is Greater Than" },
 		{ "key": "$gte", "title": "Is Greater Than Or Equal" },
-		{ "key": "$regex", "title": "Regex" }
+		{ "key": "$regex", "title": "Matches regular expression" }
 	]
 }
