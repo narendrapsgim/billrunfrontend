@@ -15,7 +15,11 @@ export const ADD_RATING_PRIORITY = 'ADD_RATING_PRIORITY';
 export const REMOVE_RATING_PRIORITY = 'REMOVE_RATING_PRIORITY';
 export const REMOVE_RATING_FIELD = 'REMOVE_RATING_FIELD';
 export const SET_CUSETOMER_MAPPING = 'SET_CUSETOMER_MAPPING';
+export const SET_PRICING_MAPPING = 'SET_PRICING_MAPPING';
+export const ADD_CUSTOMER_MAPPING = 'ADD_CUSTOMER_MAPPING';
+export const REMOVE_CUSTOMER_MAPPING = 'REMOVE_CUSTOMER_MAPPING';
 export const SET_RECEIVER_FIELD = 'SET_RECEIVER_FIELD';
+export const CANCEL_KEY_AUTH = 'CANCEL_KEY_AUTH';
 export const GOT_PROCESSOR_SETTINGS = 'GOT_PROCESSOR_SETTINGS';
 export const GOT_INPUT_PROCESSORS = 'GOT_INPUT_PROCESSORS';
 export const SET_FIELD_WIDTH = 'SET_FIELD_WIDTH';
@@ -42,7 +46,10 @@ export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator, finishProgressIndicator, dismissProgressIndicator} from './progressIndicatorActions';
-import { getInputProcessorActionQuery } from '../common/ApiQueries';
+import {
+  getInputProcessorActionQuery,
+  setInputProcessorQuery,
+} from '../common/ApiQueries';
 import _ from 'lodash';
 import Immutable from 'immutable';
 import { getSettings } from './settingsActions';
@@ -50,8 +57,9 @@ import { getSettings } from './settingsActions';
 const convert = (settings) => {
   const { parser = {},
           processor = {},
-          customer_identification_fields = [],
+          customer_identification_fields = {},
           rate_calculators = {},
+          pricing = {},
           receiver = {},
           realtime = {},
           response = {},
@@ -59,7 +67,7 @@ const convert = (settings) => {
         } = settings;
 
   const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
-  const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : {};
+  const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : [];
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
                       "static" :
                       "dynamic";
@@ -76,6 +84,7 @@ const convert = (settings) => {
     field_widths,
     customer_identification_fields,
     rate_calculators,
+    pricing,
     unify,
   };
 
@@ -94,6 +103,8 @@ const convert = (settings) => {
 	  usaget: usaget.usaget,
 	  pattern: usaget.pattern.replace("/^", "").replace("$/", ""),
     unit: usaget.unit,
+    volume_type: usaget.volume_type,
+    volume_src: usaget.volume_src,
 	}
       })
     } else {
@@ -104,19 +115,41 @@ const convert = (settings) => {
       src_field: usaget_type === "dynamic" ? processor.usaget_mapping[0].src_field : ""
     });
     if (!rate_calculators) {
-      if (usaget_type === "dynamic") {
-	ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
+      if (usaget_type === 'dynamic') {
+        ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
 	  acc['retail'][mapping.usaget] = [];
-	  return acc;
-	}, {});
+          return acc;
+        }, {});
       } else {
 	ret.rate_calculators = { retail: { [processor.default_usaget]: [] } };
       }
     }
     if (!customer_identification_fields) {
-      ret.customer_identification_fields = [
-	{target_key: "sid"}
-      ];
+      if (usaget_type === 'dynamic') {
+        ret.customer_identification_fields = _.reduce(processor.usaget_mapping, (acc, mapping) => {
+          acc[mapping.usaget] = [];
+          return acc;
+        }, {});
+      } else {
+        ret.customer_identification_fields = { [processor.default_usaget]: [] };
+      }
+    }
+    if (!pricing) {
+      if (usaget_type === 'dynamic') {
+        ret.pricing = _.reduce(processor.usaget_mapping, (acc, mapping) => {
+          acc[mapping.usaget] = {};
+          return acc;
+        }, {});
+      } else {
+        ret.pricing = { [processor.default_usaget]: {} };
+      }
+    }
+
+    for (var key in ret.pricing) {
+      var obj = ret.pricing[key];
+      if (obj.length === 0) {
+        ret.pricing[key] = {};
+      }
     }
   } else {
     ret.processor = {
@@ -269,12 +302,37 @@ export function mapUsaget(mapping) {
   };
 }
 
-export function setCustomerMapping(field, mapping, index) {
+export function setCustomerMapping(field, mapping, usaget, index) {
   return {
     type: SET_CUSETOMER_MAPPING,
     field,
     mapping,
+    usaget,
     index,
+  };
+}
+
+export function setPricingMapping(field, mapping, usaget) {
+  return {
+    type: SET_PRICING_MAPPING,
+    field,
+    mapping,
+    usaget,
+  };
+}
+
+export function addCustomerMapping(usaget) {
+  return {
+    type: ADD_CUSTOMER_MAPPING,
+    usaget,
+  };
+}
+
+export function removeCustomerMapping(usaget, priority) {
+  return {
+    type: REMOVE_CUSTOMER_MAPPING,
+    usaget,
+    priority,
   };
 }
 
@@ -377,12 +435,22 @@ export function setReceiverField(field, mapping) {
   };
 }
 
+
+export function cancelKeyAuth(field) {
+  return {
+    type: CANCEL_KEY_AUTH,
+    field,
+  };
+}
+
+
 export function saveInputProcessorSettings(state, parts = []) {
   const action = (parts.length === 0) ? 'set' : 'validate';
   const processor = state.get('processor'),
         customer_identification_fields = state.get('customer_identification_fields'),
         unify = state.get('unify', Immutable.Map()),
         rate_calculators = state.get('rate_calculators'),
+        pricing = state.get('pricing'),
         receiver = state.get('receiver'),
         realtime = state.get('realtime', Immutable.Map()),
         response = state.get('response', Immutable.Map());
@@ -412,6 +480,8 @@ export function saveInputProcessorSettings(state, parts = []) {
     ? {
       default_usaget: processor.get('default_usaget'),
       default_unit: processor.get('default_unit'),
+      default_volume_type: processor.get('default_volume_type'),
+      default_volume_src: processor.get('default_volume_src'),
     }
     : {
       usaget_mapping: processor.get('usaget_mapping').map(usaget => ({
@@ -419,6 +489,8 @@ export function saveInputProcessorSettings(state, parts = []) {
         pattern: usaget.get('pattern'),
         usaget: usaget.get('usaget'),
         unit: usaget.get('unit'),
+        volume_type: usaget.get('volume_type'),
+        volume_src: usaget.get('volume_src'),
       })).toJS(),
     };
     settings.processor = {
@@ -426,15 +498,25 @@ export function saveInputProcessorSettings(state, parts = []) {
       "date_field": processor.get('date_field'),
       "volume_field": processor.get('volume_field'),
       "aprice_field": processor.get('aprice_field'),
+      "aprice_mult": processor.get('aprice_mult'),
       ...processor_settings
     };
     if (processor.get('time_field', false)) settings.processor['time_field'] = processor.get('time_field');
+    if (processor.get('date_format', false)) {
+      settings.processor['date_format'] = processor.get('date_format');
+    }
+    if (processor.get('time_format', false)) {
+      settings.processor['time_format'] = processor.get('time_format');
+    }
   }
   if (customer_identification_fields) {
     settings.customer_identification_fields = customer_identification_fields.toJS();
   }
   if (rate_calculators) {
     settings.rate_calculators = rate_calculators.toJS();
+  }
+  if (pricing) {
+    settings.pricing = pricing.toJS();
   }
   if (unify) {
     settings.unify = unify.toJS();
@@ -470,28 +552,19 @@ export function saveInputProcessorSettings(state, parts = []) {
   } else {
     parts.forEach((part) => { settingsToSave[part] = settings[part]; });
   }
-  const query = {
-    api: 'settings',
-    params: [
-      { category: 'file_types' },
-      { action },
-      { data: JSON.stringify(settingsToSave) },
-    ],
-  };
   return (dispatch) => {
     dispatch(startProgressIndicator());
-    return apiBillRun(query).then(
-      (success) => {
+    const query = setInputProcessorQuery(settingsToSave, action);
+    return apiBillRun(query)
+      .then((success) => {
         dispatch(finishProgressIndicator());
         return success;
-      }
-    ).catch(
-      (error) => {
+      })
+      .catch((error) => {
         dispatch(finishProgressIndicator());
         dispatch(apiBillRunErrorHandler(error, 'Error saving input processor'));
         return false;
-      }
-    );
+      });
   };
 }
 

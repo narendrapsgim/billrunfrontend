@@ -190,10 +190,10 @@ class PlanProductsPriceTab extends Component {
       .map((productUsageTypes, productKey) => {
         const usaget = productUsageTypes.keySeq().first();
         const prices = productUsageTypes.getIn([usaget, 'rate'], Immutable.List());
-        const prod = products.find(planProduct => planProduct.get('key', '') === productKey);
-        if (!prod) {
-          return null;
-        }
+        const prod = products.find(planProduct => planProduct.get('key', '') === productKey,
+          null,
+          Immutable.Map({ key: productKey }),
+        );
         return (
           <PlanProduct
             key={prod.getIn(['_id', '$id'])}
@@ -217,12 +217,8 @@ class PlanProductsPriceTab extends Component {
   }
 
   render() {
-    const { products, planRates, mode } = this.props;
+    const { planRates, mode } = this.props;
     const editable = (mode !== 'view');
-
-    if (!planRates.isEmpty() && products.isEmpty()) {
-      return (<LoadingItemPlaceholder />);
-    }
 
     const panelTitle = (
       <h3>Select Products to Override Price <Help contents={PlanDescription.add_product} /></h3>
