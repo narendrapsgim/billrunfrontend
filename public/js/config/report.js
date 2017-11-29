@@ -13,6 +13,8 @@ export default {
       { id: 'firstname' },
       { id: 'stamp' },
       { id: 'in_group', type: 'number' },
+      { id: 'full_price', type: 'number', title: 'Plan / Service Full Price' },
+      { id: 'name', type: 'string', title: 'Plan / Service / Discount key' },
       { id: 'aprice', type: 'number' },
       { id: 'final_charge', type: 'number' },
       { id: 'file' },
@@ -110,6 +112,13 @@ export default {
           ],
         },
       },
+      { id: 'source',
+        title: 'Source',
+        inputConfig: {
+          inputType: 'select',
+          callback: 'getFileTypeOptions',
+        }
+      },
     ],
     queue: [
       // use all usage fields
@@ -144,7 +153,6 @@ export default {
         'fieldid:arate_key',
         'fieldid:arategroup',
         'fieldid:plan',
-        'fieldid:usaget',
         'fieldid:logfile_status',
       ],
     },
@@ -210,6 +218,15 @@ export default {
       { value: 'm/d/Y h:i:s A', label: '12/31/2017 10:05:59 PM' },
       { value: 'c', label: 'ISO 8601' },
     ] },
+    { id: 'date_override', title: 'Subtract / Add time', type: "number", valueTypes: [
+      { value: 'seconds', label: 'Seconds' },
+      { value: 'minutes', label: 'Minutes' },
+      { value: 'hours', label: 'Hours' },
+      { value: 'days', label: 'Days' },
+      { value: 'weeks', label: 'Weeks' },
+      { value: 'months', label: 'Months' },
+      { value: 'years', label: 'Years' },
+    ] },
     { id: 'time_format', title: 'Time', options: [
       { value: 'H:i', label: '22:05' },
       { value: 'H:i:s', label: '22:05:59' },
@@ -225,6 +242,10 @@ export default {
     { id: 'currency_format', title: 'Currency', options: [
       { value: 'suffix', label: '1234$' },
       { value: 'prefix', label: '$1234' },
+    ] },
+    { id: 'billing_cycle', title: 'Billing cycle', options: [
+      { value: 'start', label: 'Start Date' },
+      { value: 'end', label: 'End Date' },
     ] },
   ],
 };

@@ -108,13 +108,14 @@ class EntityFields extends Component {
   }
 
   render() {
+    const { editable } = this.props;
     const entityfields = this.renderFields();
     const paramsOptions = this.getParamsOptions();
     if (!entityfields.isEmpty() || !paramsOptions.isEmpty()) {
       return (
         <div className="EntityFields">
           { entityfields }
-          { !paramsOptions.isEmpty() && this.renderAddParamButton(paramsOptions) }
+          { (!paramsOptions.isEmpty() && editable) && this.renderAddParamButton(paramsOptions) }
         </div>
       );
     }

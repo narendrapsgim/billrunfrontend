@@ -89,8 +89,14 @@ export default function (state = defaultState, action) {
       });
     }
 
-    case PRODUCT_GOT:
-      return Immutable.fromJS(action.product);
+    case PRODUCT_GOT: {
+      const prod = Immutable.fromJS(action.product);
+      // fix problem when empty object converted to array
+      if (prod.get('params', Immutable.Map()).isEmpty()) {
+        return prod.set('params', Immutable.Map());
+      }
+      return prod;
+    }
 
     case PRODUCT_CLEAR:
       return defaultState;

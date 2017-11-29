@@ -74,7 +74,11 @@ const convertService = (getState, service, convertToBaseUnit, toSend) => {
         itemWithMutations.set('prorated', false);
       }
       const balancePeriod = convertServiceBalancePeriodToString(itemWithMutations);
-      itemWithMutations.set('balance_period', balancePeriod);
+      if (['', 'default'].includes(balancePeriod)) {
+        itemWithMutations.delete('balance_period');
+      } else {
+        itemWithMutations.set('balance_period', balancePeriod);
+      }
     } else { // convert item resived from server
       const balancePeriod = convertServiceBalancePeriodToObject(itemWithMutations);
       itemWithMutations.set('balance_period', balancePeriod);

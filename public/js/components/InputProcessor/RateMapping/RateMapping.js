@@ -90,7 +90,7 @@ class RateMapping extends Component {
   }
 
   getRateCalculatorFields = () =>
-    getAvailableFields(this.props.settings, [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'computed', label: 'Computed' }])
+    getAvailableFields(this.props.settings, [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'file', label: 'File name' }, { value: 'computed', label: 'Computed' }])
     .map((field, key) => (
       <option value={field.get('value', '')} key={key}>{field.get('label', '')}</option>
     ));
@@ -236,6 +236,13 @@ class RateMapping extends Component {
     const newComputedLineKey = computedLineKey.withMutations((computedLineKeyWithMutations) => {
       computedLineKeyWithMutations.setIn(path, value);
       const key = path[1];
+      if (path[0] === 'operator') {
+        const changeFromRegex = computedLineKey.get('operator', '') === '$regex' && value !== '$regex';
+        const changeToRegex = computedLineKey.get('operator', '') !== '$regex' && value === '$regex';
+        if (changeFromRegex || changeToRegex) {
+          computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
+        }
+      }
       if (value === 'hard_coded') {
         computedLineKeyWithMutations.deleteIn(['projection', key, 'value']);
       } else if (value === 'condition_result') {
@@ -441,7 +448,7 @@ class RateMapping extends Component {
       className="btn-primary"
       onClick={this.onAddRatingPriority(rateCategory, usaget)}
     >
-      <i className="fa fa-plus" />&nbsp;Add Next Rating
+      <i className="fa fa-plus" />&nbsp;Add Next Priority
     </Button>
   );
 

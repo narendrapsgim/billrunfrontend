@@ -16,12 +16,16 @@ import { SET_NAME,
          SET_CUSETOMER_MAPPING,
          ADD_RATE_CATEGORY,
          REMOVE_RATE_CATEGORY,
+         SET_PRICING_MAPPING,
+         ADD_CUSTOMER_MAPPING,
+         REMOVE_CUSTOMER_MAPPING,
          SET_RATING_FIELD,
          ADD_RATING_FIELD,
          ADD_RATING_PRIORITY,
          REMOVE_RATING_PRIORITY,
          REMOVE_RATING_FIELD,
          SET_RECEIVER_FIELD,
+         CANCEL_KEY_AUTH,
          SET_FIELD_WIDTH,
          CLEAR_INPUT_PROCESSOR,
          REMOVE_USAGET_MAPPING,
@@ -43,14 +47,15 @@ const defaultState = Immutable.fromJS({
   usaget_type: 'static',
   delimiter: '',
   fields: [],
-  field_widths: {},
+  field_widths: [],
   processor: {
     usaget_mapping: [],
   },
-  customer_identification_fields: [],
+  customer_identification_fields: {},
   rate_calculators: {
     retail: {},
   },
+  pricing: {},
   unify: {},
   /* receiver: {
    *   passive: false,
@@ -70,7 +75,7 @@ const defaultCustomerIdentification = Immutable.fromJS({
 
 export default function (state = defaultState, action) {
   const { field, mapping, width, index, priority } = action;
-  let field_to_move;
+  let field_to_move, fieldWidthToMove;
   switch (action.type) {
     case GOT_PROCESSOR_SETTINGS:
       return Immutable.fromJS(action.settings);
@@ -114,7 +119,8 @@ export default function (state = defaultState, action) {
     case SET_USAGET_TYPE:
       return state
         .set('usaget_type', action.usaget_type)
-        .set('customer_identification_fields', Immutable.List())
+        .set('customer_identification_fields', Immutable.Map())
+        .set('pricing', Immutable.Map())
         .setIn(['processor', 'usaget_mapping'], Immutable.List())
         .setIn(['processor', 'default_usaget'], '')
         .setIn(['processor', 'src_field'], '')
@@ -127,24 +133,25 @@ export default function (state = defaultState, action) {
       return state
         .setIn(['processor', 'default_usaget'], action.usaget)
         .set('rate_calculators', rateCalculators)
-        .update('customer_identification_fields', Immutable.List(), list => list.clear().push(customerIdentification));
+        .update('pricing', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.Map()))
+        .update('customer_identification_fields', Immutable.Map(), map => map.clear().set(action.usaget, Immutable.List()));
     }
 
     case MAP_USAGET: {
-      const { pattern, usaget, unit } = action.mapping;
-      const newMap = Immutable.fromJS({ pattern, usaget, unit });
-      const regex = new RegExp(`^${usaget}$`).toString();
-      const customerIdentification = defaultCustomerIdentification.setIn(['conditions', 0, 'regex'], regex);
+      const { pattern, usaget, unit, volumeType, volumeSrc } = action.mapping;
+      const newMap = Immutable.fromJS({
+        pattern,
+        usaget,
+        unit,
+        volume_type: volumeType,
+        volume_src: volumeSrc,
+      });
       const rateCalculators = state.get('rate_calculators', Immutable.Map()).map(calc => ((!calc.has(usaget)) ? calc.set(usaget, Immutable.List()) : calc));
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.push(newMap))
         .set('rate_calculators', rateCalculators)
-        .update('customer_identification_fields', Immutable.List(), (list) => {
-          if (list.find(identification => identification.getIn(['conditions', 0, 'regex']) === regex)) {
-            return list;
-          }
-          return list.push(customerIdentification);
-        });
+        .update('pricing', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.Map()) : map))
+        .update('customer_identification_fields', Immutable.Map(), map => ((!map.has(usaget)) ? map.set(usaget, Immutable.List()) : map));
     }
 
     case REMOVE_USAGET_MAPPING: {
@@ -162,17 +169,32 @@ export default function (state = defaultState, action) {
         }));
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index))
-        .updateIn(['customer_identification_fields'], (list) => {
+        .updateIn(['customer_identification_fields'], Immutable.Map(), (customerCalc) => {
           if (countUsaget === 1) {
-            return list.remove(action.index);
+            return customerCalc.delete(usaget);
           }
-          return list;
+          return customerCalc;
         })
-        .set('rate_calculators', rateCalculators);
+        .updateIn(['pricing'], Immutable.Map(), (priceCalc) => {
+          if (countUsaget === 1) {
+            return priceCalc.delete(usaget);
+          }
+          return priceCalc;
+        })
+        .set('rate_calculators', rateCalculators);;
     }
 
     case SET_CUSETOMER_MAPPING:
-      return state.setIn(['customer_identification_fields', action.index, field], mapping);
+      return state.setIn(['customer_identification_fields', action.usaget, action.index, field], mapping);
+
+    case SET_PRICING_MAPPING:
+      return state.setIn(['pricing', action.usaget, field], mapping);
+
+    case ADD_CUSTOMER_MAPPING:
+      return state.updateIn(['customer_identification_fields', action.usaget], list => (list ? list.push(defaultCustomerIdentification) : Immutable.List([defaultCustomerIdentification])));
+
+    case REMOVE_CUSTOMER_MAPPING:
+      return state.updateIn(['customer_identification_fields', action.usaget], list => list.remove(priority));
 
     case ADD_RATE_CATEGORY: {
       const { rateCategory } = action;
@@ -245,6 +267,9 @@ export default function (state = defaultState, action) {
     case SET_RECEIVER_FIELD:
       return state.setIn(['receiver', field], mapping);
 
+    case CANCEL_KEY_AUTH:
+      return state.deleteIn(['receiver', 'key']);
+
     case CLEAR_INPUT_PROCESSOR:
       return defaultState;
 
@@ -253,11 +278,17 @@ export default function (state = defaultState, action) {
 
     case MOVE_CSV_FIELD_UP:
       field_to_move = field ? field : state.getIn(['fields', index]);
-      return state.update('fields', list => list.delete(index).insert(index-1, field_to_move));
+      fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
+      return state
+        .update('fields', list => list.delete(index).insert(index - 1, field_to_move))
+        .update('field_widths', list => list.delete(index).insert(index - 1, fieldWidthToMove));
 
     case MOVE_CSV_FIELD_DOWN:
       field_to_move = field ? field : state.getIn(['fields', index]);
-      return state.update('fields', list => list.delete(index).insert(index+1, field_to_move));
+      fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
+      return state
+        .update('fields', list => list.delete(index).insert(index + 1, field_to_move))
+        .update('field_widths', list => list.delete(index).insert(index + 1, fieldWidthToMove));
 
     case CHANGE_CSV_FIELD:
       return state.update('fields', list => list.set(index, action.value));

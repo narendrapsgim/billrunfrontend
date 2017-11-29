@@ -132,6 +132,7 @@ class Column extends Component {
               value={item.get('field_name', '')}
               onChange={this.onChangeField}
               disabled={disableField}
+              allowCreate={true}
             />
           )}
         </Col>

@@ -5,7 +5,7 @@ import { List } from 'immutable';
 import Select from 'react-select';
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
-import { getServicesKeysQuery } from '../../common/ApiQueries';
+import { getIncludedServicesKeysQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 
 
@@ -26,7 +26,7 @@ class PlanIncludedServicesTab extends Component {
   };
 
   componentWillMount() {
-    this.props.dispatch(getList('services_keys', getServicesKeysQuery()));
+    this.props.dispatch(getList('services_keys', getIncludedServicesKeysQuery()));
   }
 
   onChangeServices = (services) => {
