@@ -111,6 +111,7 @@ class CustomFields extends Component {
     const newField = Immutable.Map({
       editable: true,
       display: true,
+      new: true,
     });
     this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', size]), newField));
   };
@@ -120,6 +121,7 @@ class CustomFields extends Component {
   }
 
   onClickSave = () => {
+    this.removeFlags();
     this.props.dispatch(saveSettings(this.getSettingDistinctKeys())).then(this.afterSave);
   };
 
@@ -137,18 +139,27 @@ class CustomFields extends Component {
     this.setState({ tab });
   };
 
+  removeFlags = () => {
+    const { tab } = this.state;
+    const { tabs } = this.props;
+    const entity = tabs[tab];
+    const entityFields = this.props[entity];
+    entityFields.map((field, idx) => {
+      const retField = field.delete('new');
+      this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', idx]), retField));
+      return field;
+    });
+  }
+
   renderFieldsTab = (entity, key) => {
     const { defaultDisabledFields, defaultHiddenFields } = this.props;
-    const existingEntityFields = this.state[entity];
     const entityFields = this.props[entity];
     const defaultEntityDisabledFields = defaultDisabledFields.get(entity, Immutable.List());
     const defaultEntityHiddenFields = defaultHiddenFields.get(entity, Immutable.List());
     const fields = [];
     entityFields.forEach((field, index) => {
       if (!field.get('generated', false) && !defaultEntityHiddenFields.includes(field.get('field_name', ''))) {
-        const existing = existingEntityFields.findIndex(existingEntityField =>
-          existingEntityField.get('field_name', '') === field.get('field_name', ''),
-        ) !== -1;
+        const existing = field.get('new') === undefined;
         const editable = !field.get('system', false) && !defaultEntityDisabledFields.includes(field.get('field_name', ''));
         const fieldKey = existing ? `item-${entity}-${field.get('field_name', index)}-${index}` : `item-${entity}-${index}`;
         fields.push(
