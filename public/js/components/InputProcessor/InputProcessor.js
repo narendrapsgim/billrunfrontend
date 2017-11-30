@@ -101,40 +101,40 @@ class InputProcessor extends Component {
       parser: {
         idx: 0,
         label: 'CDR Fields',
-        parts: ['file_type', 'parser'],
+        parts: ['file_type', 'parser', 'filters'],
       },
       processor: {
         idx: 1,
         label: 'Field Mapping',
-        parts: ['file_type', 'parser', 'processor'],
+        parts: ['file_type', 'parser', 'processor', 'filters'],
       },
       customer_identification_fields: {
         idx: 2,
         label: 'Customer Mapping',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'filters'],
       },
       rate_calculators: {
         idx: 3,
         label: 'Rate Mapping',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'filters'],
       },
       pricing: {
         idx: 4,
         label: 'Pricing',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing', 'filters'],
       },
     });
     if (props.type === 'api') {
       steps = steps.set('realtimeMapping', {
         idx: 5,
         label: 'Realtime Mapping',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing', 'realtime', 'response', 'unify'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing', 'realtime', 'response', 'unify', 'filters'],
       });
     } else {
       steps = steps.set('receiver', {
         idx: 5,
         label: 'Receiver',
-        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing', 'receiver', 'unify'],
+        parts: ['file_type', 'parser', 'processor', 'customer_identification_fields', 'rate_calculators', 'pricing', 'receiver', 'unify', 'filters'],
       });
     }
 
