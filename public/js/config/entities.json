@@ -4,7 +4,8 @@
     "uniqueField": "name",
     "itemName": "service",
     "itemType": "service",
-    "itemsType": "services"
+    "itemsType": "services",
+    "settingsKey": "services"
   },
   "plan": {
     "collection": "plans",

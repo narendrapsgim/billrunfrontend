@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { escapeRegExp } from './Util';
 
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
 export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
@@ -49,13 +50,18 @@ export const getPaymentGatewaysQuery = () => ({
   action: 'list',
 });
 
-export const getUserLoginQuery = (username, password) => ({
-  api: 'auth',
-  params: [
-    { username },
-    { password },
-  ],
-});
+export const getUserLoginQuery = (username, password) => {
+  const formData = new FormData();
+  formData.append('username', username);
+  formData.append('password', password);
+  return ({
+    api: 'auth',
+    options: {
+      method: 'POST',
+      body: formData,
+    },
+  });
+};
 
 export const getUserLogoutQuery = () => ({
   api: 'auth',
@@ -435,11 +441,12 @@ export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQu
 
 export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => {
   let query = {};
+  const escapedValue = escapeRegExp(value);
   switch (collection) {
     case 'subscribers':
-      query = { [revisionBy]: value };
+      query = { [revisionBy]: escapedValue };
       break;
-    default: query = { [revisionBy]: { $regex: `^${value}$` } };
+    default: query = { [revisionBy]: { $regex: `^${escapedValue}$` } };
   }
   return ({
     action: 'get',
@@ -502,6 +509,14 @@ export const getRunCycleQuery = (billrunKey, rerun) => ({
   params: [
     { stamp: billrunKey },
     { rerun },
+  ],
+});
+
+export const getResetCycleQuery = billrunKey => ({
+  api: 'billrun',
+  action: 'resetcycle',
+  params: [
+    { stamp: billrunKey },
   ],
 });
 

@@ -54,6 +54,7 @@ export const getFieldNameType = (type) => {
     case 'subscription':
     case 'subscriptions':
     case 'subscribers':
+    case 'subscriber':
       return 'subscription';
     case 'lines':
     case 'usage':
@@ -466,4 +467,8 @@ export const convertServiceBalancePeriodToString = (item) => {
 export const getAvailableFields = (settings, additionalFields = []) => {
   const fields = settings.get('fields', []).map(field => (Immutable.Map({ value: field, label: field }))).sortBy(field => field.get('value', ''));
   return fields.concat(Immutable.fromJS(additionalFields));
+};
+
+export const escapeRegExp = (text) => {
+  return text.toString().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 };

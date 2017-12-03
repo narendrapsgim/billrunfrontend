@@ -1,4 +1,6 @@
+import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { startProgressIndicator } from './progressIndicatorActions';
 import {
   fetchReportByIdQuery,
   getReportQuery,
@@ -13,10 +15,10 @@ import {
   actions as entityActions,
   saveEntity,
   deleteEntity,
-  getEntity,
   clearEntity,
   updateEntityField,
   deleteEntityField,
+  gotEntity,
 } from './entityActions';
 import {
   getList as getEntityList,
@@ -30,6 +32,7 @@ import {
   addToList,
 } from './listActions';
 import { getSettings } from './settingsActions';
+import { getConfig } from '../common/Util';
 
 
 export const reportTypes = {
@@ -53,7 +56,33 @@ export const updateReport = (path, value) => updateEntityField('reports', path, 
 
 export const deleteReportValue = path => deleteEntityField('reports', path);
 
-export const getReport = id => getEntity('reports', fetchReportByIdQuery(id));
+export const getReport = id => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const query = fetchReportByIdQuery(id);
+  return apiBillRun(query)
+    .then((response) => {
+      const item = response.data[0].data.details[0];
+      const outputFormats = getConfig(['reports', 'outputFormats'], Immutable.List());
+      if (item.formats) {
+        const convertedFormats = item.formats.map((format) => {
+          if (outputFormats.find(outputFormat => outputFormat.get('id') === format.op, null, Immutable.Map()).has('valueTypes')) {
+            return ({
+              field: format.field,
+              op: format.op,
+              value: format.value.substr(0, format.value.indexOf(' ')),
+              type: format.value.substr(format.value.indexOf(' ') + 1),
+            }); 
+          }
+          return format;
+        });
+        item.formats = convertedFormats;
+      }
+      dispatch(gotEntity('reports', item));
+      return dispatch(apiBillRunSuccessHandler(response));
+    })
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving report')));
+};
+
 
 export const getReportData = data => getEntityList('reportData', getReportQuery(data));
 

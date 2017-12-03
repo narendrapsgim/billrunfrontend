@@ -4,7 +4,7 @@ import { Col, Row, Panel, Form, FormGroup, ControlLabel, Label, Button, HelpBloc
 import { Map, List } from 'immutable';
 import { getCycleQuery, getChargeStatusQuery, getOperationsQuery } from '../../common/ApiQueries';
 import { getList, clearList } from '../../actions/listActions';
-import { runBillingCycle, chargeAllCycle } from '../../actions/cycleActions';
+import { runBillingCycle, runResetCycle, chargeAllCycle } from '../../actions/cycleActions';
 import { clearItems } from '../../actions/entityListActions';
 import { ConfirmModal } from '../../components/Elements';
 import CycleData from './CycleData';
@@ -43,6 +43,7 @@ class RunCycle extends Component {
     selectedCycle: Map(),
     selectedCycleName: '',
     showRerunConfirm: false,
+    showResetConfirm: false,
     showChargeAllConfirm: false,
     autoRefreshRunning: false,
     autoRefreshStep: 0,
@@ -168,12 +169,29 @@ class RunCycle extends Component {
     );
   }
 
+  resetCycle = () => {
+    this.props.dispatch(clearItems('billruns'));
+    const { selectedCycle } = this.state;
+    this.props.dispatch(runResetCycle(selectedCycle.get('billrun_key', '')))
+    .then(
+      (response) => {
+        if (response.status) {
+          this.refreshAfterRun = setTimeout(this.reloadCycleData, 1000);
+        }
+      },
+    );
+  }
+
   onClickRun = () => {
     this.runCycle();
   }
 
   onClickRerun = () => {
     this.setState({ showRerunConfirm: true });
+  }
+
+  onClickReset = () => {
+    this.setState({ showResetConfirm: true });
   }
 
   onClickChargeAll = () => {
@@ -237,7 +255,7 @@ class RunCycle extends Component {
     return (
       <CyclesSelector
         onChange={this.onChangeSelectedCycle}
-        statusesToDisplay={List(['running', 'to_run', 'finished', 'confirmed'])}
+        statusesToDisplay={List(['running', 'to_run', 'finished', 'confirmed', 'to_rerun'])}
         selectedCycles={selectedCycleName}
       />
     );
@@ -246,6 +264,7 @@ class RunCycle extends Component {
   getStatusStyle = (status) => {
     switch (status) {
       case 'to_run':
+      case 'to_rerun':
         return 'info';
       case 'running':
       case 'current':
@@ -332,8 +351,13 @@ class RunCycle extends Component {
   )
 
   renderRerunButton = () => (
-    this.getSelectedCycleStatus() === 'finished' &&
+    (this.getSelectedCycleStatus() === 'finished' || this.getSelectedCycleStatus() === 'to_rerun') &&
       (<Button onClick={this.onClickRerun}>Re-run</Button>)
+  )
+
+  renderResetButton = () => (
+    this.getSelectedCycleStatus() === 'finished' &&
+      (<Button onClick={this.onClickReset}>Reset</Button>)
   )
 
   isChargingStatusProcessing = () => {
@@ -366,9 +390,18 @@ class RunCycle extends Component {
     this.setState({ showRerunConfirm: false });
   }
 
+  onResetCancel = () => {
+    this.setState({ showResetConfirm: false });
+  }
+
   onRerunOk = () => {
     this.runCycle(true);
     this.setState({ showRerunConfirm: false });
+  }
+
+  onResetOk = () => {
+    this.resetCycle();
+    this.setState({ showResetConfirm: false });
   }
 
   renderRerunConfirmationModal = () => {
@@ -378,6 +411,20 @@ class RunCycle extends Component {
     const warningMessage = 'Cycle data will be reset (except for confirmed invoices)';
     return (
       <ConfirmModal onOk={this.onRerunOk} onCancel={this.onRerunCancel} show={showRerunConfirm} message={confirmMessage} labelOk="Yes">
+        <FormGroup validationState="error">
+          <HelpBlock>{warningMessage}</HelpBlock>
+        </FormGroup>
+      </ConfirmModal>
+    );
+  }
+
+  renderResetConfirmationModal = () => {
+    const { showResetConfirm } = this.state;
+    const { cycleAdditionalData } = this.props;
+    const confirmMessage = `Are you sure you want to reset ${getCycleName(cycleAdditionalData)}?`;
+    const warningMessage = 'Cycle data will be reset (except for confirmed invoices) without doing a re-run';
+    return (
+      <ConfirmModal onOk={this.onResetOk} onCancel={this.onResetCancel} show={showResetConfirm} message={confirmMessage} labelOk="Yes">
         <FormGroup validationState="error">
           <HelpBlock>{warningMessage}</HelpBlock>
         </FormGroup>
@@ -411,7 +458,7 @@ class RunCycle extends Component {
     const { selectedCycle } = this.state;
     const { cycleAdditionalData } = this.props;
     const billrunKey = selectedCycle.get('billrun_key', '');
-    const shouldDisplayBillrunData = List(['running', 'finished', 'confirmed']).contains(this.getSelectedCycleStatus());
+    const shouldDisplayBillrunData = List(['running', 'finished', 'confirmed', 'to_rerun']).contains(this.getSelectedCycleStatus());
     const showConfirmAllButton = this.getSelectedCycleStatus() === 'finished';
     const isCycleConfirmed = this.getSelectedCycleStatus() === 'confirmed';
     const baseFilter = {
@@ -438,6 +485,7 @@ class RunCycle extends Component {
                   <Col sm={6} lg={6}>
                     {this.renderRunButton()}
                     {this.renderRerunButton()}
+                    {this.renderResetButton()}
                   </Col>
                 </FormGroup>
               </Form>
@@ -450,11 +498,12 @@ class RunCycle extends Component {
                   baseFilter={baseFilter}
                   reloadCycleData={this.reloadCycleData}
                   showConfirmAllButton={showConfirmAllButton}
-                  isCycleConfirmed = {isCycleConfirmed}
+                  isCycleConfirmed={isCycleConfirmed}
                 />
             }
 
               {this.renderRerunConfirmationModal()}
+              {this.renderResetConfirmationModal()}
               {this.renderChargeAllConfirmationModal()}
             </Panel>
           </Col>
