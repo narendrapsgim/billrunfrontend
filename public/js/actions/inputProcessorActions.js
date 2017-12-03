@@ -7,6 +7,8 @@ export const SET_FIELD_MAPPING = 'SET_FIELD_MAPPING';
 export const ADD_CSV_FIELD = 'ADD_CSV_FIELD';
 export const ADD_USAGET_MAPPING = 'ADD_USAGET_MAPPING';
 export const SET_CUSTOMER_MAPPING = 'SET_CUSTOMER_MAPPING';
+export const ADD_RATE_CATEGORY = 'ADD_RATE_CATEGORY';
+export const REMOVE_RATE_CATEGORY = 'REMOVE_RATE_CATEGORY';
 export const SET_RATING_FIELD = 'SET_RATING_FIELD';
 export const ADD_RATING_FIELD = 'ADD_RATING_FIELD';
 export const ADD_RATING_PRIORITY = 'ADD_RATING_PRIORITY';
@@ -117,11 +119,11 @@ const convert = (settings) => {
     if (!rate_calculators) {
       if (usaget_type === 'dynamic') {
         ret.rate_calculators = _.reduce(processor.usaget_mapping, (acc, mapping) => {
-          acc[mapping.usaget] = [];
+	  acc['retail'][mapping.usaget] = [];
           return acc;
         }, {});
       } else {
-        ret.rate_calculators = { [processor.default_usaget]: [] };
+	ret.rate_calculators = { retail: { [processor.default_usaget]: [] } };
       }
     }
     if (!customer_identification_fields) {
@@ -336,52 +338,72 @@ export function removeCustomerMapping(usaget, priority) {
   };
 }
 
-export function setRatingField(usaget, priority, index, rate_key, value) {
+export function addRateCategory(rateCategory) {
+  return {
+    type: ADD_RATE_CATEGORY,
+    rateCategory,
+  };
+}
+
+export function removeRateCategory(rateCategory) {
+  return {
+    type: REMOVE_RATE_CATEGORY,
+    rateCategory,
+  };
+}
+
+export function setRatingField(rateCategory, usaget, priority, index, rate_key, value) {
   return {
     type: SET_RATING_FIELD,
+    rateCategory,
     usaget,
     priority,
     index,
     rate_key,
-    value
+    value,
   };
 }
 
-export function addRatingField(usaget, priority) {
+export function addRatingField(rateCategory, usaget, priority) {
   return {
     type: ADD_RATING_FIELD,
+    rateCategory,
     usaget,
     priority,
   };
 }
 
-export function addRatingPriorityField(usaget) {
+export function addRatingPriorityField(rateCategory, usaget) {
   return {
     type: ADD_RATING_PRIORITY,
+    rateCategory,
     usaget,
   };
 }
 
-export function removeRatingPriorityField(usaget, priority) {
+export function removeRatingPriorityField(rateCategory, usaget, priority) {
   return {
     type: REMOVE_RATING_PRIORITY,
+    rateCategory,
     usaget,
     priority,
   };
 }
 
-export function removeRatingField(usaget, priority, index) {
+export function removeRatingField(rateCategory, usaget, priority, index) {
   return {
     type: REMOVE_RATING_FIELD,
+    rateCategory,
     usaget,
     priority,
     index,
   };
 }
 
-export function setLineKey(usaget, priority, index, value) {
+export function setLineKey(rateCategory, usaget, priority, index, value) {
   return {
     type: SET_LINE_KEY,
+    rateCategory,
     usaget,
     priority,
     index,
@@ -397,9 +419,10 @@ export function setComputedLineKey(paths, values) {
   };
 }
 
-export function unsetComputedLineKey(usaget, priority, index) {
+export function unsetComputedLineKey(rateCategory, usaget, priority, index) {
   return {
     type: UNSET_COMPUTED_LINE_KEY,
+    rateCategory,
     usaget,
     priority,
     index,
@@ -476,6 +499,7 @@ export function saveInputProcessorSettings(state, parts = []) {
     settings.processor = {
       type: (settings.type === 'realtime' ? 'Realtime' : 'Usage'),
       "date_field": processor.get('date_field'),
+      "volume_field": processor.get('volume_field'),
       "aprice_field": processor.get('aprice_field'),
       "aprice_mult": processor.get('aprice_mult'),
       ...processor_settings
