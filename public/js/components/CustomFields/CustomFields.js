@@ -102,12 +102,12 @@ class CustomFields extends Component {
 
   onRemoveField = (entity, index) => {
     const entityFields = this.props[entity];
-    const fieldName = entityFields.getIn([index, 'title'], entityFields.getIn([index, 'field_name']));
+    const fieldName = ` ${entityFields.getIn([index, 'title'], entityFields.getIn([index, 'field_name'], ''))}`;
     const removeField = () => {
       this.props.dispatch(removeSettingField(getSettingsKey(entity), getSettingsPath(entity, ['fields', index])));
     };
     const confirm = {
-      message: `Are you sure you want to delete ${fieldName} field ?`,
+      message: `Are you sure you want to delete${fieldName} field ?`,
       onOk: removeField,
       labelOk: 'Delete',
       type: 'delete',
