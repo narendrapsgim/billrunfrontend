@@ -39,7 +39,7 @@ export default function (state = defaultState, action) {
       return state.set('segments', segments);
 
     case ADD_SEGMENTATION:
-      let newSegment = Immutable.fromJS({field: null, from: null, to: null});
+      const newSegment = Immutable.fromJS({field: null, from: null, to: null});
       return state.update('segments', segments => segments.push(newSegment)); //state.set('segments', state.get('segments').push(newSegment));
 
     case DELETE_SEGMENTATION:
@@ -51,7 +51,7 @@ export default function (state = defaultState, action) {
     case SET_FTP_FIELD:
       /* TODO: Change 'receive' name most likely... */
       return state.setIn(['receiver', action.field], action.value);
-      
+
     default:
       return state;
   }
