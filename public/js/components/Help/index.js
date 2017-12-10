@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import HelpOutline from 'material-ui/svg-icons/action/help-outline';
-import Popover from 'material-ui/Popover';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import _ from 'lodash';
 
 class Help extends Component {
   constructor(props) {
@@ -22,20 +22,18 @@ class Help extends Component {
   }
 
   render() {
+    const { contents } = this.props;
+    if (!contents || _.isEmpty(contents)) return (null);
+
+    const tooltip = (
+      <Tooltip id="tooltip">{contents}</Tooltip>
+    );
+
     return (
-      <span>
-        <HelpOutline
-            onTouchTap={this.handleTouchTap}
-            style={{cursor: "pointer", fill: "#333"}} />
-        <Popover
-            open={this.state.open}
-            anchorEl={this.state.anchorEl}
-            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-            targetOrigin={{horizontal: 'left', vertical: 'top'}}
-            onRequestClose={this.handleRequestClose}
-            style={{padding: "10px"}}>
-          {this.props.contents}
-        </Popover>
+      <span style={{margin: 5}}>
+        <OverlayTrigger placement="top" overlay={tooltip}>
+          <i className="fa fa-question-circle" style={{cursor: "pointer"}}></i>
+        </OverlayTrigger>
       </span>
     );
   }
