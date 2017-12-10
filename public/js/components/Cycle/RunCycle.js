@@ -422,7 +422,7 @@ class RunCycle extends Component {
     const { showResetConfirm } = this.state;
     const { cycleAdditionalData } = this.props;
     const confirmMessage = `Are you sure you want to reset ${getCycleName(cycleAdditionalData)}?`;
-    const warningMessage = 'Cycle data will be reset (except for confirmed invoices) without doing a re-run';
+    const warningMessage = 'Cycle data will be reset (except for confirmed invoices)';
     return (
       <ConfirmModal onOk={this.onResetOk} onCancel={this.onResetCancel} show={showResetConfirm} message={confirmMessage} labelOk="Yes">
         <FormGroup validationState="error">
