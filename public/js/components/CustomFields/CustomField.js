@@ -281,7 +281,8 @@ class CustomField extends Component {
         {editable && this.hasEditableField() && (
           <Col sm={4} className="actions">
             <Button onClick={this.onOpenModal} bsSize="small"><i className="fa fa-pencil active-blue" /> Advanced </Button>
-            <Button onClick={this.onRemove} bsSize="small"><i className="fa fa-trash-o danger-red" /> Remove </Button>
+            <Button onClick={this.onRemove} bsSize="small" disabled={!this.hasEditableField('delete')}>
+              <i className="fa fa-trash-o danger-red" /> Remove </Button>
           </Col>
         )}
         { this.renderAdvancedEdit() }
