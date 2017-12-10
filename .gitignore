@@ -1,3 +1,19 @@
 node_modules/*
-**/*.log
-public/dist/*
+dist/*
+backup/*
+public/build/*
+public/vendors/
+public/app.js
+public/app.js.map
+public/index.html
+public/globalSettings.js
+public/*.hot-update.*
+public/favicon.ico
+
+# local config files
+.idea/*
+.importjs.json
+.tern-project
+completions.json
+npm-debug.log.*
+npm-debug.log

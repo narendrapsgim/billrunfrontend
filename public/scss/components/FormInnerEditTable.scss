@@ -1,0 +1,50 @@
+.form-inner-edit-row {
+  margin-bottom: 10px;
+  padding: 0 15px;
+
+   > div.actions {
+    padding-left: 10px;
+
+    > button {
+      margin-right: 3px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+   }
+
+
+   > div {
+    padding-right: 0;
+    padding-left: 5px;
+
+     &:first-child {
+       padding-left: 0;
+     }
+
+     label {
+       padding: 0 0 0 5px;
+     }
+  }
+
+  @media (max-width: 767px) {
+    > div {
+      padding-left: 0;
+      margin-bottom: 5px;
+
+      label {
+        padding: 0;
+        margin: 0;
+      }
+    }
+    > div.actions {
+      padding-left: 0;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      display: inline-block;
+      float: right;
+    }
+  }
+
+}

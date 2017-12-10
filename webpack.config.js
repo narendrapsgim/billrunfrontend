@@ -1,54 +1,113 @@
 var webpack = require('webpack');
-var path = require('path');
-//var css = require('css!./file.css');
+var path = require( 'path' );
+var chalk = require( 'chalk' );
+var copyWebpackPlugin = require('copy-webpack-plugin');
+var env = process.env.NODE_ENV || 'dev';
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var isProd = (env === 'production');
 
-var env = process.env.MIX_ENV || 'dev';
-var isProduction = (env === 'prod');
-
-var plugins = [
-//  new ExtractTextPlugin('app.css'),
-];
-
-// This is necessary to get the sass @import's working
-var stylePathResolves = (
-  'includePaths[]=' + path.resolve('./') + '&' +
-    'includePaths[]=' + path.resolve('./node_modules')
-);
-
-if (isProduction) {
-  plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}));
+if(isProd) {
+  console.log(chalk.bgYellow('Node env is : ', env));
+} else {
+  console.log(chalk.bgGreen('Node env is : ', env));
 }
 
-module.exports = {
-  entry: './public/js/index.js',
 
-  output: {
-    path: require("path").resolve('./public/dist'),
-    filename: 'bundle.js'
+/**
+ * This is the Webpack configuration file
+ * For more information, see: http://webpack.github.io/docs/configuration.html
+ */
+module.exports = {
+
+  // Efficiently evaluate modules with source maps
+  // devtool: "eval",
+  // devtool: "source-map",
+
+  // Set entry point to ./src/main and include necessary files for hot load
+  entry: {
+    app: './public/js/index.js',
+    vendor: [
+      'material-ui',
+      'immutable',
+      'moment',
+      'moment-timezone',
+      'lodash',
+      'react-select',
+      'react-datepicker',
+      'uuid',
+      'change-case',
+      'file-size',
+      'classnames',
+
+
+    ],
   },
 
+  // This will not actually create a bundle.js file in ./build. It is used
+  // by the dev server for dynamic hot loading.
+  output: {
+    path: __dirname + (isProd ? '/dist/' : '/public/build/'),
+    filename: 'bundle.[name].js'
+  },
+
+  // Necessary plugins
+  plugins: [
+    new webpack.DefinePlugin({
+      '_PRODUCTION_': JSON.stringify(isProd),
+      'process.env': {
+        'NODE_ENV': JSON.stringify(env)
+      }
+    }),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+    }),
+    new ExtractTextPlugin('bundle.css'),
+    new HtmlWebpackPlugin({
+      filename: isProd ? "../dist/index.html" : "../index.html",
+      hash: true,
+      template: 'index.tmpl.html',
+      inject: true
+    }),
+    new copyWebpackPlugin([
+      {
+        from: 'vendors',
+        to: isProd ? 'vendors' : "../vendors"
+      }, {
+        from: isProd ? 'config/globalSettings.prod.js' : 'config/globalSettings.dev.js',
+        to: isProd ? 'globalSettings.js' : "../globalSettings.js"
+      },
+    ])
+  ],
+
+  // Transform source code using Babel and React Hot Loader
   module: {
     loaders: [
-      {
-        test: /\.jsx?$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: 'babel',
-        query: {
-          presets: ['es2015', 'react']
-        }
-      },
-      // {
-      //   test: /\.scss$/,
-      //   loader: ExtractTextPlugin.extract(
-      //     'style',
-      //     'css' + '!sass?outputStyle=expanded&' + stylePathResolves
-      //   ),
-      // }
-      {test: /\.css$/, loader: "style-loader!css-loader"},
-      {test: /\.csv$/, loader: 'dsv-loader' } //will load all .csv files with dsv-loader by default
+      { test: /\.jsx?$/, loader: 'babel', exclude: /node_modules/ },
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader?sourceMap', 'css-loader?sourceMap') },
+      { test: /\.less$/, loader: 'style!css!less' },
+      { test: /\.scss$/, loader: 'style!css!sass' },
+      { test: /\.(png|jpg|jpe|woff|woff2|eot|ttf|svg)(\?.*$|$)/, loader: 'url-loader?limit=100000' },
+      { test: /\.json$/, loader: 'json-loader', include: /\.json$/ },
+      { test: /\.html$/, loader: 'html-loader' },
     ]
   },
 
-  plugins: plugins
+  // Automatically transform files with these extensions
+  resolve: {
+    alias: {
+      img: path.resolve(__dirname, 'public', 'img'),
+      css: path.resolve(__dirname, 'public', 'css'),
+    },
+    extensions: ['', '.js', '.jsx', '.css'],
+  },
+
+  // Additional plugins for CSS post processing using postcss-loader
+  postcss: [
+//    require('autoprefixer'), // Automatically include vendor prefixes
+//    require('postcss-nested') // Enable nested rules, like in Sass
+  ]
+
 };

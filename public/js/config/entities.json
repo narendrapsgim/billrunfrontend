@@ -1,0 +1,110 @@
+{
+  "service": {
+    "collection": "services",
+    "uniqueField": "name",
+    "itemName": "service",
+    "itemType": "service",
+    "itemsType": "services",
+    "settingsKey": "services"
+  },
+  "plan": {
+    "collection": "plans",
+    "uniqueField": "name",
+    "itemName": "plan",
+    "itemType": "plan",
+    "itemsType": "plans"
+  },
+  "charging_plan": {
+    "collection": "prepaidgroups",
+    "uniqueField": "name",
+    "itemName": "buckets group",
+    "itemType": "charging_plan",
+    "itemsType": "charging_plans"
+  },
+  "prepaid_plan": {
+    "collection": "plans",
+    "uniqueField": "name",
+    "itemName": "prepaid plan",
+    "itemType": "prepaid_plan",
+    "itemsType": "prepaid_plans"
+  },
+  "prepaid_include": {
+    "collection": "prepaidincludes",
+    "uniqueField": "name",
+    "itemName": "prepaid bucket",
+    "itemType": "prepaid_include",
+    "itemsType": "prepaid_includes"
+  },
+  "product": {
+    "collection": "rates",
+    "uniqueField": "key",
+    "itemName": "product",
+    "itemType": "product",
+    "itemsType": "products",
+    "settingsKey": "rates"
+  },
+  "discount": {
+    "collection": "discounts",
+    "uniqueField": "key",
+    "itemName": "discount",
+    "itemType": "discount",
+    "itemsType": "discounts"
+  },
+  "subscription": {
+    "collection": "subscribers",
+    "uniqueField": "sid",
+    "itemName": "subscriber",
+    "itemType": "subscription",
+    "itemsType": "subscriptions",
+    "settingsKey": "subscribers.subscriber"
+  },
+  "customer": {
+    "collection": "accounts",
+    "uniqueField": "aid",
+    "itemName": "customer",
+    "itemType": "customer",
+    "itemsType": "customers",
+    "settingsKey": "subscribers.account"
+  },
+  "report": {
+    "collection": "reports",
+    "uniqueField": "key",
+    "itemName": "report",
+    "itemType": "report",
+    "itemsType": "reports"
+  },
+  "usage": {
+    "collection": "lines",
+    "uniqueField": "stamp",
+    "itemName": "usage",
+    "itemType": "usage",
+    "itemsType": "usages"
+  },
+  "queue": {
+    "collection": "queue",
+    "uniqueField": "stamp",
+    "itemName": "queue",
+    "itemType": "queue",
+    "itemsType": "queues"
+  },
+  "logFile": {
+    "collection": "log",
+    "uniqueField": "stamp",
+    "itemName": "received files",
+    "itemType": "logFile",
+    "itemsType": "logFiles"
+  },
+  "event": {
+    "collection": "events",
+    "uniqueField": "stamp",
+    "itemName": "events",
+    "itemType": "event",
+    "itemsType": "events"
+  },
+  "auto_renew": {
+    "collection": "autorenew",
+    "itemName": "recurring charge",
+    "itemType": "auto_renew",
+    "itemsType": "auto_renews"
+  }
+}
