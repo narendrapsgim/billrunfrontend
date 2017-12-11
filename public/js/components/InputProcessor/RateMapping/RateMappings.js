@@ -46,8 +46,10 @@ class RateMappings extends Component {
 
   onAddNewRateCategory = () => {
     const { newCategory } = this.state;
-    this.props.dispatch(addRateCategory(newCategory));
-    this.setState({ newCategory: '' });
+    if (newCategory !== '') {
+      this.props.dispatch(addRateCategory(newCategory));
+      this.setState({ newCategory: '' });
+    }
   }
 
   onRemoveRateCategory = rateCategory => () => {
