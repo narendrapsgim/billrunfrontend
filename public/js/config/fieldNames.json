@@ -61,7 +61,8 @@
     "balance_ref": "Balance reference",
     "balance_after": "Balance after",
     "balance_normalized": "Balance normalized",
-    "pp_includes_external_id": "Bucket external ID"
+    "pp_includes_external_id": "Bucket external ID",
+	"usagev_unit": "Original volume units"
   },
   "queue": {
     "calc_name": "Calculator stage",

@@ -62,6 +62,7 @@ export default {
       { id: 'balance_before', type: 'number' },
       { id: 'balance_after', type: 'number' },
       { id: 'balance_normalized', type: 'number' },
+			{ id: 'usagev_unit', type: 'string' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
