@@ -70,7 +70,7 @@ class RateMappings extends Component {
     const { newCategory } = this.state;
     return (
       <Row>
-        <Col sm={2} componentClass={ControlLabel}>Add new rate category</Col>
+        <Col sm={2} componentClass={ControlLabel}>Add new tariff category</Col>
         <Col sm={4}>
           <Select
             id="newRateCategory"
