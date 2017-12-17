@@ -35,7 +35,7 @@ class Segmentation extends Component {
         Please add segments filters for Export generator.
         <br/>
         <br/>
-        <Panel header={<h3>Segments <Help contents="Each Segment should has a field and ranges value" /></h3>}>
+        <Panel header={<h3>Segments <Help contents="Each Segment should have a field and ranges value" /></h3>}>
           <div className="form-group row form-inner-edit-row">
             <div className="col-lg-6"><label htmlFor="date_field">Field</label></div>
             <div className="col-lg-2"><label htmlFor="date_field">From</label></div>

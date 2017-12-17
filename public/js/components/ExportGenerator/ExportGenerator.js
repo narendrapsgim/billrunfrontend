@@ -120,7 +120,7 @@ class ExportGenerator extends Component {
           } else {
             const firstSegment = settings.get('segments').first();
             if (!firstSegment.get('field') || (!firstSegment.get('from') && firstSegment.get('to'))) {
-              err.push('Generator should has at last one valid segment');
+              err.push('Generator should have at least one valid segment');
             }
           }
           break;
