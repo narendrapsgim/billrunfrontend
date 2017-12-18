@@ -10,6 +10,7 @@ import { ConfirmModal } from '../../components/Elements';
 import CycleData from './CycleData';
 import CyclesSelector from './CyclesSelector';
 import { getCycleName } from './CycleUtil';
+import Field from '../Field';
 
 class RunCycle extends Component {
 
@@ -50,6 +51,7 @@ class RunCycle extends Component {
     autoRefreshIterations: 0,
     showRefreshButton: false,
     ChargedAllClicked: false,
+    generatePdf: null,
   }
 
   componentDidMount() {
@@ -158,8 +160,8 @@ class RunCycle extends Component {
 
   runCycle = (rerun = false) => {
     this.props.dispatch(clearItems('billruns'));
-    const { selectedCycle } = this.state;
-    this.props.dispatch(runBillingCycle(selectedCycle.get('billrun_key', ''), rerun))
+    const { selectedCycle, generatePdf } = this.state;
+    this.props.dispatch(runBillingCycle(selectedCycle.get('billrun_key', ''), rerun, generatePdf))
     .then(
       (response) => {
         if (response.status) {
@@ -354,6 +356,23 @@ class RunCycle extends Component {
     (this.getSelectedCycleStatus() === 'finished' || this.getSelectedCycleStatus() === 'to_rerun') &&
       (<Button onClick={this.onClickRerun}>Re-run</Button>)
   )
+  onTogglePdf = (e) => {
+    const { value } = e.target;
+    this.setState({ generatePdf: value });
+  }
+
+  renderGeneratePdfCheckbox = () => {
+    let { generatePdf } = this.state;
+    const { cycleAdditionalData } = this.props;
+    if (generatePdf === null) {
+      generatePdf = cycleAdditionalData.get('generate_pdf', true);
+    }
+    if ((this.getSelectedCycleStatus() === 'finished' ||
+    this.getSelectedCycleStatus() === 'to_run')) {
+      return (<Field fieldType="checkbox" value={generatePdf} onChange={this.onTogglePdf} label="Generate PDF invoices" />);
+    }
+    return null;
+  }
 
   renderResetButton = () => (
     this.getSelectedCycleStatus() === 'finished' &&
@@ -486,6 +505,9 @@ class RunCycle extends Component {
                     {this.renderRunButton()}
                     {this.renderRerunButton()}
                     {this.renderResetButton()}
+                    <div className="pull-right" style={{ paddingBottom: 10 }}>
+                      {this.renderGeneratePdfCheckbox()}
+                    </div>
                   </Col>
                 </FormGroup>
               </Form>
