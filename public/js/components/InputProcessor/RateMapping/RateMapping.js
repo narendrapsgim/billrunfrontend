@@ -8,6 +8,7 @@ import ComputedRate from './ComputedRate';
 import Help from '../../Help';
 import { getConfig, getAvailableFields } from '../../../common/Util';
 import { updateSetting, saveSettings } from '../../../actions/settingsActions';
+import { showWarning } from '../../../actions/alertsActions';
 import { ModalWrapper } from '../../Elements';
 import {
   setRatingField,
@@ -110,11 +111,22 @@ class RateMapping extends Component {
     const { customRatingFields } = this.props;
     const { dataset: { ratecategory, usaget, priority, index }, value, custom } = e.target;
     let { dataset: { rate_key: rateKey } } = e.target;
-    const isNewField = custom && (rateKey !== '') && customRatingFields.find(field => field.get('field_name', '') === rateKey) === undefined;
+    let newRateKey = changeCase.snakeCase(rateKey);
+    newRateKey = newRateKey.replace('params.', '');
+    newRateKey = newRateKey.replace('params_', '');
+    const isNewField = custom && (rateKey !== '') && !(customRatingFields.find(field => field.get('field_name', '') === newRateKey || field.get('field_name', '') === `params.${newRateKey}`));
+    newRateKey = `params.${newRateKey}`;
     if (isNewField) {
-      const title = rateKey;
-      rateKey = `params.${changeCase.snakeCase(title)}`;
-      this.addNewRatingCustomField(rateKey, title, value);
+      this.addNewRatingCustomField(newRateKey, rateKey, value);
+    } else {
+      let rateExists = customRatingFields.find(field => field.get('field_name', '') === newRateKey);
+      if (rateExists) {
+        rateExists = rateExists.get('title');
+        if (custom && rateKey !== '' && rateKey !== rateExists && rateKey !== newRateKey) {
+          this.props.dispatch(showWarning(`Product param ${rateKey} already exists as custom field ${newRateKey}`));
+          rateKey = rateExists;
+        }
+      }
     }
     this.props.dispatch(setRatingField(ratecategory, usaget, priority, parseInt(index), rateKey, value));
   }
