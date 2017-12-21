@@ -234,8 +234,7 @@ export default {
       { value: 'h:i:s A', label: '10:05:59 PM' },
     ] },
     { id: 'multiplication', title: 'Multiply by a number' },
-    { id: 'default_hard_coded', title: 'Default Hard-coded value' },
-    { id: 'default_empty', title: 'Default Value', opgtions: [
+    { id: 'default_empty', title: 'Default Value', addOption: true, options: [
       { value: 'current_time', label: 'Current Time' },
     ] },
     { id: 'vat_format', title: 'Vat', options: [
