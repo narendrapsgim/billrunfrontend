@@ -341,7 +341,7 @@ export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans',
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, quantitative: 1, balance_period: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
-export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => getEntitesQuery('rates', project);
+export const getProductsKeysQuery = (project = { key: 1, description: 1 }, query = {}) => getEntitesQuery('rates', project, query);
 export const getRetailProductsKeysQuery = (project = { key: 1, description: 1 }) => {
   const query = { tariff_category: 'retail' };
   return getEntitesQuery('rates', project, query);

@@ -5,13 +5,29 @@ import {
   getFieldName,
   getFieldNameType,
   getConfig,
+  createRateListNameByArgs,
 } from '../common/Util';
 import {
   subscriberFieldsSelector,
   inputProssesorCustomKeysSelector,
   accountFieldsSelector,
   linesFieldsSelector,
+  rateCategoriesSelector,
+  usageTypeSelector,
+  fileTypeSelector,
+  eventCodeSelector,
 } from './settingsSelector';
+import {
+  listByNameSelector,
+  productsOptionsSelector,
+  cyclesOptionsSelector,
+  plansOptionsSelector,
+  servicesOptionsSelector,
+  groupsOptionsSelector,
+  calcNameSelector,
+  bucketsNamesSelector,
+  bucketsExternalIdsSelector,
+} from './listSelectors';
 
 
 const sortFieldOption = (optionsA, optionB) => {
@@ -37,12 +53,14 @@ const formatReportFields = (fields) => {
   return fields.map(field => Immutable.Map({
     id: field.get('field_name', ''),
     title: field.get('title', ''),
+    type: field.get('type', 'string'),
     aggregatable: true,
     searchable: field.get('searchable', true),
+    inputConfig: field.get('inputConfig', null),
   }));
 };
 
-const selectReportLinesFields = (customKeys = Immutable.List(), billrunFields = Immutable.List()) =>
+const selectReportLinesFields = (customKeys = Immutable.List(), billrunFields = Immutable.List(), categoryFields = Immutable.List()) =>
   Immutable.List().withMutations((optionsWithMutations) => {
     // set fields from IP
     customKeys.forEach((customKey) => {
@@ -50,6 +68,25 @@ const selectReportLinesFields = (customKeys = Immutable.List(), billrunFields = 
       optionsWithMutations.push(Immutable.Map({
         field_name: `uf.${customKey}`,
         title: (fieldName === customKey) ? sentenceCase(fieldName) : fieldName,
+      }));
+    });
+    categoryFields.forEach((customKey) => {
+      const fieldLabel = getFieldName(customKey, 'lines', sentenceCase(customKey));
+      const chargeLabel = getFieldName('charge', 'lines', sentenceCase('charge'));
+      const productKeyLabel = getFieldName('product_key', 'lines', sentenceCase('product_key'));
+      optionsWithMutations.push(Immutable.Map({
+        field_name: `rates.${customKey}.charge`,
+        title: `${fieldLabel} ${chargeLabel}`,
+        type: 'number',
+      }));
+      optionsWithMutations.push(Immutable.Map({
+        field_name: `rates.${customKey}.product_key`,
+        title: `${fieldLabel} ${productKeyLabel}`,
+        inputConfig: Immutable.Map({
+          inputType: 'select',
+          callback: 'getProductsOptions',
+          callbackArgument: Immutable.Map({ tariff_category: customKey }),
+        }),
       }));
     });
 
@@ -162,6 +199,7 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
 const reportLinesFieldsSelector = createSelector(
   inputProssesorCustomKeysSelector,
   linesFieldsSelector,
+  rateCategoriesSelector,
   selectReportLinesFields,
 );
 
@@ -214,4 +252,34 @@ export const reportEntitiesFieldsSelector = createSelector(
   reportQueueFieldsSelector,
   reportEventFileFieldsSelector,
   selectReportFields,
+);
+
+const getOptionCallback = (state, props) => {
+  const callback = props.config.getIn(['inputConfig', 'callback']);
+  switch (callback) {
+    case 'getCyclesOptions': return cyclesOptionsSelector(state, props);
+    case 'getProductsOptions': {
+      const callbackArgument = props.config.getIn(['inputConfig', 'callbackArgument'], Immutable.Map());
+      if (!callbackArgument.isEmpty()) {
+        const listName = createRateListNameByArgs(callbackArgument);
+        return listByNameSelector(state, props, listName);
+      }
+      return productsOptionsSelector(state, props);
+    }
+    case 'getPlansOptions': return plansOptionsSelector(state, props);
+    case 'getServicesOptions': return servicesOptionsSelector(state, props);
+    case 'getGroupsOptions': return groupsOptionsSelector(state, props);
+    case 'getUsageTypesOptions': return usageTypeSelector(state, props);
+    case 'getBucketsOptions': return bucketsNamesSelector(state, props);
+    case 'getBucketsExternalIdsOptions': return bucketsExternalIdsSelector(state, props);
+    case 'getFileTypeOptions': return fileTypeSelector(state, props);
+    case 'getCalcNameOptions': return calcNameSelector(state, props);
+    case 'getEventCodeOptions': return eventCodeSelector(state, props);
+    default: return () => {};
+  }
+};
+
+export const selectOptionSelector = createSelector(
+  getOptionCallback,
+  options => options,
 );

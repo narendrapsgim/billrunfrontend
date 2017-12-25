@@ -3,10 +3,11 @@ export default {
   fields: {
     usage: [ // changes to usage will effect on queue
       // Default settings \ Example
-      // { id: [REQUIRED], type: 'string', searchable: true, aggregatable: true, inputConfig: {
+      // { id: [REQUIRED],  title: 'Demo field', type: 'string', searchable: true, aggregatable: true, inputConfig: {
       //    inputType: 'select',
       //    options: ['option1', 'option2'] | [{value: 'val', label: 'Label'}, ...] /* array of values or objects */
       //    callback: 'getExampleOptions', /* callback function + should be implementation */
+      //    callbackArgument: { 'demo': true },
       // } },
       { id: 'urt', type: 'date' },
       { id: 'lastname' },
