@@ -72,15 +72,16 @@ const selectReportLinesFields = (customKeys = Immutable.List(), billrunFields = 
     });
     categoryFields.forEach((customKey) => {
       const fieldLabel = getFieldName(customKey, 'lines', sentenceCase(customKey));
-      const chargeLabel = getFieldName('charge', 'lines', sentenceCase('charge'));
+      const chargeLabel = getFieldName('charge‎', 'lines', sentenceCase('charge‎'));
       const productKeyLabel = getFieldName('product_key', 'lines', sentenceCase('product_key'));
+      const fieldsPreffix = `rates.tariff_category.${customKey}`;
       optionsWithMutations.push(Immutable.Map({
-        field_name: `rates.${customKey}.charge`,
+        field_name: `${fieldsPreffix}.pricing.charge`,
         title: `${fieldLabel} ${chargeLabel}`,
         type: 'number',
       }));
       optionsWithMutations.push(Immutable.Map({
-        field_name: `rates.${customKey}.product_key`,
+        field_name: `${fieldsPreffix}.key`,
         title: `${fieldLabel} ${productKeyLabel}`,
         inputConfig: Immutable.Map({
           inputType: 'select',
