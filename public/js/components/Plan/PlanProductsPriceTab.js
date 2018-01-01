@@ -8,7 +8,11 @@ import PlanProductRemoved from './components/PlanProductRemoved';
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import ProductSearch from './components/ProductSearch';
-import { getProductsByKeysQuery, getProductByKeyQuery } from '../../common/ApiQueries';
+import {
+  getProductsByKeysQuery,
+  getProductByKeyQuery,
+  getRetailProductsKeysQuery,
+} from '../../common/ApiQueries';
 import { showSuccess, showWarning, showInfo } from '../../actions/alertsActions';
 import { getList, clearList, pushToList } from '../../actions/listActions';
 import {
@@ -225,7 +229,10 @@ class PlanProductsPriceTab extends Component {
           <Form>
             { editable &&
               <Panel header={panelTitle}>
-                <ProductSearch onSelectProduct={this.onSelectProduct} />
+                <ProductSearch
+                  onSelectProduct={this.onSelectProduct}
+                  searchFunction={getRetailProductsKeysQuery()}
+                />
               </Panel>
             }
             { this.renderRemovedItems() }

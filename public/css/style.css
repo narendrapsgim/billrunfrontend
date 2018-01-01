@@ -830,3 +830,7 @@ ul.revision-history-list li.active .cycle {
   transform: translate(-50%, 0);
 }
 /* ~Tour */
+
+#rate-mapping .nav-tabs>li {
+  min-width: 150px;
+}

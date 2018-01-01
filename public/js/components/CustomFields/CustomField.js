@@ -82,12 +82,13 @@ class CustomField extends Component {
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
     const isBoolean = this.isBoolean(field);
 
-    const disableUnique = isBoolean;
-    const disableMandatory = isBoolean || field.get('unique', false);
+    const disableUnique = isBoolean || !this.hasEditableField('unique');
+    const disableMandatory = isBoolean || field.get('unique', false) || !this.hasEditableField('mandatory');
     const disableBoolean = field.get('select_list', false) || field.get('unique', false);
-    const disableMultiple = isBoolean;
+    const disableMultiple = isBoolean || !this.hasEditableField('multiple');
     const disableSearchable = isBoolean;
-    const disableSelectList = isBoolean;
+    const disableSelectList = isBoolean || !this.hasEditableField('select_list');
+    const disableSelectOptions = !field.get('select_list', false) || !this.hasEditableField('select_options');
 
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
@@ -95,7 +96,14 @@ class CustomField extends Component {
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Unique</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="unique" onChange={this.onChange} value={field.get('unique', '')} fieldType="checkbox" disabled={disableUnique} className="inline mr10" />
+              <Field
+                id="unique"
+                onChange={this.onChange}
+                value={field.get('unique', '')}
+                fieldType="checkbox"
+                disabled={disableUnique}
+                className="inline mr10"
+              />
               {disableUnique && (
                 <small style={{ color: '#626262' }}>Unique field can not be boolean</small>
               )}
@@ -118,28 +126,53 @@ class CustomField extends Component {
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Editable</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="editable" onChange={this.onChange} value={field.get('editable', '')} fieldType="checkbox" />
+              <Field
+                fieldType="checkbox"
+                id="editable"
+                onChange={this.onChange}
+                value={field.get('editable', '')}
+                disabled={!this.hasEditableField('editable')}
+              />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Display</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="display" onChange={this.onChange} value={field.get('display', '')} fieldType="checkbox" />
+              <Field
+                fieldType="checkbox"
+                id="display"
+                onChange={this.onChange}
+                value={field.get('display', '')}
+                disabled={!this.hasEditableField('display')}
+              />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Show in list</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="show_in_list" onChange={this.onChange} value={field.get('show_in_list', '')} fieldType="checkbox" />
+              <Field
+                fieldType="checkbox"
+                id="show_in_list"
+                onChange={this.onChange}
+                value={field.get('show_in_list', '')}
+                disabled={!this.hasEditableField('show_in_list')}
+              />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Searchable</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="searchable" onChange={this.onChange} value={field.get('searchable', '')} fieldType="checkbox" className="inline mr10" />
+              <Field
+                fieldType="checkbox"
+                id="searchable"
+                className="inline mr10"
+                onChange={this.onChange}
+                value={field.get('searchable', '')}
+                disabled={!this.hasEditableField('searchable')}
+              />
               {disableSearchable && (
                 <small style={{ color: '#626262' }}>Boolean field can not be searchable</small>
               )}
@@ -149,14 +182,27 @@ class CustomField extends Component {
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Boolean</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="boolean" onChange={this.onChange} value={isBoolean} fieldType="checkbox" disabled={disableBoolean} />
+              <Field
+                fieldType="checkbox"
+                id="boolean"
+                onChange={this.onChange}
+                value={isBoolean}
+                disabled={disableBoolean}
+              />
             </Col>
           </FormGroup>
 
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Multiple</Col>
             <Col sm={9} style={checkboxStyle}>
-              <Field id="multiple" onChange={this.onChange} value={field.get('multiple', '')} fieldType="checkbox" disabled={disableMultiple} className="inline mr10" />
+              <Field
+                id="multiple"
+                onChange={this.onChange}
+                value={field.get('multiple', '')}
+                fieldType="checkbox"
+                disabled={disableMultiple}
+                className="inline mr10"
+              />
               {disableMultiple && (
                 <small style={{ color: '#626262' }}>Boolean field can not be multiple</small>
               )}
@@ -168,9 +214,20 @@ class CustomField extends Component {
             <Col sm={9}>
               <InputGroup>
                 <InputGroup.Addon>
-                  <Field id="select_list" onChange={this.onChange} value={field.get('select_list', '')} fieldType="checkbox" disabled={disableSelectList} />
+                  <Field
+                    id="select_list"
+                    onChange={this.onChange}
+                    value={field.get('select_list', '')}
+                    fieldType="checkbox"
+                    disabled={disableSelectList}
+                  />
                 </InputGroup.Addon>
-                <Field id="select_options" onChange={this.onChange} value={field.get('select_options', '')} disabled={!field.get('select_list', false)} />
+                <Field
+                  id="select_options"
+                  onChange={this.onChange}
+                  value={field.get('select_options', '')}
+                  disabled={disableSelectOptions}
+                />
               </InputGroup>
               { field.get('select_list', false) && <HelpBlock style={{ marginLeft: 40 }}>Select Options <small>(comma-separated list)</small></HelpBlock>}
             </Col>
@@ -179,6 +236,21 @@ class CustomField extends Component {
         </Form>
       </ModalWrapper>
     );
+  }
+
+  hasEditableField = (propName = '') => {
+    const { field, editable } = this.props;
+    if (!editable) {
+      return false;
+    }
+    const changeableProps = field.get('changeable_props', null);
+    if (changeableProps === null) {
+      return !field.get('system', false);
+    }
+    if (propName === '') {
+      return !changeableProps.isEmpty();
+    }
+    return changeableProps.includes(propName);
   }
 
   render() {
@@ -191,25 +263,26 @@ class CustomField extends Component {
           <DragHandle />
         </Col>
         <Col sm={3}>
-          <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!editable || existing} />
+          <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!this.hasEditableField('field_name') || existing} />
         </Col>
         <Col sm={2}>
-          <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={!editable} />
+          <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={!this.hasEditableField('title')} />
         </Col>
         <Col sm={2}>
           <Field
             id="default_value"
             onChange={this.onChange}
             value={field.get('default_value', '')}
-            disabled={!editable}
+            disabled={!this.hasEditableField('default_value')}
             fieldType={isBoolean ? 'checkbox' : 'text'}
             style={isBoolean ? checkboxStyle : undefined}
           />
         </Col>
-        {editable && (
+        {editable && this.hasEditableField() && (
           <Col sm={4} className="actions">
             <Button onClick={this.onOpenModal} bsSize="small"><i className="fa fa-pencil active-blue" /> Advanced </Button>
-            <Button onClick={this.onRemove} bsSize="small"><i className="fa fa-trash-o danger-red" /> Remove </Button>
+            <Button onClick={this.onRemove} bsSize="small" disabled={!this.hasEditableField('delete')}>
+              <i className="fa fa-trash-o danger-red" /> Remove </Button>
           </Col>
         )}
         { this.renderAdvancedEdit() }

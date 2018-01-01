@@ -102,6 +102,16 @@ const selectAccountImportFields = (fields) => {
   return fields;
 };
 
+const selectRateCategories = (fields) => {
+  if (fields) {
+    const categoriesField = fields.find(field => field.get('field_name', '') === 'tariff_category');
+    if (categoriesField) {
+      return Immutable.List(categoriesField.get('select_options', '').split(','));
+    }
+  }
+  return undefined;
+};
+
 const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
   let usageTypes = Immutable.Set();
   const defaultUsaget = inputProssesor.getIn(['processor', 'default_usaget'], '');
@@ -151,12 +161,14 @@ const selectRatingParams = (inputProssesors) => {
   let options = Immutable.Set();
   inputProssesors.forEach((inputProssesor) => {
     const ratingCalculators = inputProssesor.get('rate_calculators', Immutable.Map());
-    ratingCalculators.forEach((ratingCalculatorsPriority) => {
-      ratingCalculatorsPriority.forEach((fields) => {
-        const currentFields = fields
-        .filter(field => field.get('rate_key', '').startsWith('params.'))
-        .map(field => field.get('rate_key', ''));
-        options = options.concat(currentFields);
+    ratingCalculators.forEach((ratingCalculatorsInCategory) => {
+      ratingCalculatorsInCategory.forEach((ratingCalculatorsPriority) => {
+        ratingCalculatorsPriority.forEach((fields) => {
+          const currentFields = fields
+          .filter(field => field.get('rate_key', '').startsWith('params.'))
+          .map(field => field.get('rate_key', ''));
+          options = options.concat(currentFields);
+        });
       });
     });
   });
@@ -337,6 +349,11 @@ export const subscriberImportFieldsSelector = createSelector(
 export const productFieldsSelector = createSelector(
   getProductFields,
   productFields => productFields,
+);
+
+export const rateCategoriesSelector = createSelector(
+  getProductFields,
+  selectRateCategories,
 );
 
 export const seriveceFieldsSelector = createSelector(

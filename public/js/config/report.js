@@ -14,6 +14,7 @@ export default {
       { id: 'stamp' },
       { id: 'in_group', type: 'number' },
       { id: 'full_price', type: 'number', title: 'Plan / Service Full Price' },
+      { id: 'name', type: 'string', title: 'Plan / Service / Discount key' },
       { id: 'aprice', type: 'number' },
       { id: 'final_charge', type: 'number' },
       { id: 'file' },
@@ -111,6 +112,13 @@ export default {
           ],
         },
       },
+      { id: 'source',
+        title: 'Source',
+        inputConfig: {
+          inputType: 'select',
+          callback: 'getFileTypeOptions',
+        }
+      },
     ],
     queue: [
       // use all usage fields
@@ -145,7 +153,6 @@ export default {
         'fieldid:arate_key',
         'fieldid:arategroup',
         'fieldid:plan',
-        'fieldid:usaget',
         'fieldid:logfile_status',
       ],
     },
