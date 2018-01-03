@@ -290,7 +290,7 @@ class EventFormBalance extends Component {
           </FormGroup>)
       }
 
-      {
+        {
         selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') === 'tags' &&
         (<FormGroup>
           <Col sm={3} componentClass={ControlLabel}>
@@ -301,7 +301,7 @@ class EventFormBalance extends Component {
               fieldType="tags"
               id={`cond-value-${index}`}
               onChange={this.onChangeMultiValues}
-              value={item.get('value', '').split(',').filter(val => val !== '')}
+              value={String(item.get('value', '')).split(',').filter(val => val !== '')}
               renderInput={this.renderCustomInputNumber}
             />
           </Col>
