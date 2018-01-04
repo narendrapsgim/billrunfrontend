@@ -114,6 +114,7 @@ class FormatterValue extends Component {
           value={field.get('value', '')}
           onChange={this.onChangeSelect}
           disabled={disabledInput}
+          allowCreate={config.get('addOption', false)}
         />
       );
     }

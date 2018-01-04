@@ -235,7 +235,9 @@ export default {
       { value: 'h:i:s A', label: '10:05:59 PM' },
     ] },
     { id: 'multiplication', title: 'Multiply by a number' },
-    { id: 'default_empty', title: 'Default empty value' },
+    { id: 'default_empty', title: 'Default Value', addOption: true, options: [
+      { value: 'current_time', label: 'Current Time' },
+    ] },
     { id: 'vat_format', title: 'Vat', options: [
       { value: 'add_tax', label: 'Add Vat' },
       { value: 'remove_tax', label: 'Remove Vat' },
