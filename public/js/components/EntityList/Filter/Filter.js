@@ -35,7 +35,7 @@ export default class Filter extends Component {
       filter_by = props.filter.keySeq().toArray();
       const firstFilter = props.filter.first();
 
-      if (firstFilter === null) {
+      if (firstFilter === null || isNaN(firstFilter)) {
         string = '';
       } else if (firstFilter && !Immutable.Map.isMap(firstFilter)) {
         string = firstFilter;
