@@ -24,6 +24,7 @@ export default {
       { id: 'usagev', type: 'number' },
       { id: 'aid', type: 'number' },
       { id: 'process_time', type: 'string' },
+      { id: 'in_queue', type: 'boolean' },
       { id: 'usagesb', type: 'number' },
       { id: 'type', title: 'Input processor name / BillRun type', inputConfig: {
         inputType: 'select',
