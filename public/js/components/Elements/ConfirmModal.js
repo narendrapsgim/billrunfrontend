@@ -34,7 +34,7 @@ ConfirmModal.propTypes = {
   show: PropTypes.bool.isRequired,
   message: PropTypes.string.isRequired,
   type: PropTypes.oneOf(['confirm', 'delete', 'alert']),
-  children: PropTypes.element,
+  children: PropTypes.node,
   labelCancel: PropTypes.string,
   labelOk: PropTypes.string,
   onCancel: PropTypes.func,
