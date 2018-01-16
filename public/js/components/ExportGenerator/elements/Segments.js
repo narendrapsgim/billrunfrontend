@@ -31,28 +31,37 @@ class Segments extends Component {
   }
 
   render() {
+    const { segment, options } = this.props;
+    const fieldName = (segment.getIn(['field', 'name']) === undefined) ? '' : segment.getIn(['field', 'name']);
+
     return (
       <div className="form-group row form-inner-edit-row">
         <div className="col-lg-6">
           <Select
-              name="field-name"
-              value={this.props.segment.get('field', '')}
-              options={this.props.options}
-              onChange={this.onFieldChange}
-              Clearable={false}
+            name="field-name"
+            value={fieldName}
+            options={options}
+            onChange={this.onFieldChange}
+            Clearable={false}
           />
         </div>
 
         <div className="col-lg-2">
-          <input name="from" className="form-control" onChange={this.onValueChange}
-                 value={this.props.segment.get('from', '')}
-                 disabled={!this.props.segment.get('field')}/>
+          <input
+            name="from"
+            className="form-control"
+            onChange={this.onValueChange}
+            value={(segment.get('from') === null) ? '' : segment.get('from')}
+            disabled={!fieldName} />
         </div>
 
         <div className="col-lg-2">
-          <input name="to" className="form-control" onChange={this.onValueChange}
-                 value={this.props.segment.get('to', '')}
-                 disabled={!this.props.segment.get('field')}/>
+          <input
+            name="to"
+            className="form-control"
+            onChange={this.onValueChange}
+            value={(segment.get('to') === null) ? '' : segment.get('to')}
+            disabled={!fieldName} />
         </div>
 
         <div className="col-lg-2 actions">
@@ -65,4 +74,3 @@ class Segments extends Component {
 }
 
 export default Segments;
-
