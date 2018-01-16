@@ -28,23 +28,22 @@ class Segmentation extends Component {
   render() {
     const { fields, segments } = this.props;
     const options =
-      fields.map((val, key) => ({ value: val, label: val })).toJS();
-      
+      fields.map((val, key) => ({value: val, label: val.get('name')})).toJS();
     return (
       <div className="Segmentation">
         Please add segments filters for Export generator.
         <br/>
         <br/>
-        <Panel header={<h3>Segments <Help contents="Each Segment should has a field and ranges value" /></h3>}>
+        <Panel header={<h3>Segments <Help contents="Each Segment should have a field and ranges value" /></h3>}>
           <div className="form-group row form-inner-edit-row">
             <div className="col-lg-6"><label htmlFor="date_field">Field</label></div>
             <div className="col-lg-2"><label htmlFor="date_field">From</label></div>
             <div className="col-lg-2"><label htmlFor="date_field">To</label></div>
           </div>
           {segments.map((entity, index) => (
-            <Segments options={options} index={index} segment={entity} onSelectField={this.onSelectField} onDelete={this.onDelete} key={index}/>
+              <Segments options={options} index={index} segment={entity} onSelectField={this.onSelectField} onDelete={this.onDelete} key={index}/>
             ))
-          }
+	  }
           <a onClick={this.props.addSegmentation} className="btn-link" style={{ marginTop: 15 }}>
             <i className="fa fa-plus"></i>&nbsp;Add Segment
 	  </a>
