@@ -9,6 +9,7 @@ export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
       $nin: [...notKeys, ''], // don't get broken products with empty key
     },
     to: { $gt: moment().toISOString() }, // only active and future
+    tariff_category: 'retail', // only retail products
   };
   if (usagesToQuery[0] !== 'cost') {
     query.$or = usagesToQuery.map(usage => ({ [`rates.${usage}`]: { $exists: true } }));
@@ -341,6 +342,12 @@ export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('serv
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, quantitative: 1, balance_period: 1 });
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = (project = { key: 1, description: 1 }) => getEntitesQuery('rates', project);
+export const getRetailProductsKeysQuery = (project = { key: 1, description: 1 }) => {
+  const query = { tariff_category: 'retail' };
+  return getEntitesQuery('rates', project, query);
+};
+export const getRetailProductsWithRatesQuery = () =>
+  getRetailProductsKeysQuery({ key: 1, description: 1, rates: 1 });
 export const getProductsWithRatesQuery = () =>
   getProductsKeysQuery({ key: 1, description: 1, rates: 1 });
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
@@ -503,12 +510,13 @@ export const getCycleQuery = billrunKey => ({
   ],
 });
 
-export const getRunCycleQuery = (billrunKey, rerun) => ({
+export const getRunCycleQuery = (billrunKey, rerun, generatePdf) => ({
   api: 'billrun',
   action: 'completecycle',
   params: [
     { stamp: billrunKey },
     { rerun },
+    { generate_pdf: generatePdf },
   ],
 });
 
