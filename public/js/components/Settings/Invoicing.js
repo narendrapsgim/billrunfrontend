@@ -20,6 +20,11 @@ export default class Invoicing extends Component {
     this.props.onChange('billrun', 'detailed_invoices', value);
   }
 
+  onToggleGeneratePdf = (e) => {
+    const { value } = e.target;
+    this.props.onChange('billrun', 'generate_pdf', value);
+  }
+
   renderOption = (value, key) => <option value={value} key={key}>{value}</option>;
 
   render() {
@@ -48,7 +53,15 @@ export default class Invoicing extends Component {
               Detailed Invoices
             </Col>
             <Col sm={6} style={checkboxStyle}>
-              <Field fieldType="checkbox" value={data.get('detailed_invoices', false)} onChange={this.onToggleDetailedInvoices} />
+              <Field fieldType="checkbox" value={data.get('detailed_invoices', false)} onChange={this.onToggleDetailedInvoices} disabled={!data.get('generate_pdf', true)} />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} md={2}>
+              Billing cycle generates PDF invoices
+            </Col>
+            <Col sm={6} style={checkboxStyle}>
+              <Field fieldType="checkbox" value={data.get('generate_pdf', true)} onChange={this.onToggleGeneratePdf} />
             </Col>
           </FormGroup>
         </Form>

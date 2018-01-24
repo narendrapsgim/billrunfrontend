@@ -114,6 +114,11 @@ class EventFormBalance extends Component {
     onChangeField(['conditions', index, 'value'], value);
   };
 
+  onChangeTagValue = (e) => {
+    const { onChangeField, index } = this.props;
+    onChangeField(['conditions', index, 'value'], e);
+  };
+
   onChangeUnit = (unit) => {
     const { onChangeField, index } = this.props;
     onChangeField(['conditions', index, 'unit'], unit);
@@ -133,6 +138,17 @@ class EventFormBalance extends Component {
   getGroupUnit = group => this.props.groupsData.getIn([group, 'unit'], '');
   getGroupActivityType = group => getGroupUsaget(this.props.groupsData.get(group, Immutable.Map()));
 
+  onChangeMultiValues = (e) => {
+    if (Array.isArray(e)) {
+      this.onChangeTagValue(e.join(','));
+    } else {
+      this.onChangeTagValue('');
+    }
+  };
+  renderCustomInputNumber =({ addTag, onChange, value, ...other }) => (
+    <input type="number" onChange={onChange} value={value} {...other} />
+  );
+
   render() {
     const {
       item,
@@ -149,7 +165,6 @@ class EventFormBalance extends Component {
     const usaget = (limitation === 'group' ? item.get('usaget', '') : activityType);
     const unitLabel = getUnitTitle(item.get('unit', ''), trigger, usaget, propertyTypes, usageTypesData, currency);
     const selectedConditionData = getConditionData(item.get('type', ''));
-
     return (
       <div>
 
@@ -259,7 +274,7 @@ class EventFormBalance extends Component {
         </FormGroup>
 
         {
-          selectedConditionData.get('extra_field', true) &&
+          selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') !== 'tags' &&
           (<FormGroup>
             <Col sm={3} componentClass={ControlLabel}>
               Value { unitLabel !== '' ? `(${unitLabel})` : '' }
@@ -273,6 +288,24 @@ class EventFormBalance extends Component {
               />
             </Col>
           </FormGroup>)
+      }
+
+        {
+        selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') === 'tags' &&
+        (<FormGroup>
+          <Col sm={3} componentClass={ControlLabel}>
+            Value { unitLabel !== '' ? `(${unitLabel})` : '' }
+          </Col>
+          <Col sm={9}>
+            <Field
+              fieldType="tags"
+              id={`cond-value-${index}`}
+              onChange={this.onChangeMultiValues}
+              value={String(item.get('value', '')).split(',').filter(val => val !== '')}
+              renderInput={this.renderCustomInputNumber}
+            />
+          </Col>
+        </FormGroup>)
       }
 
       </div>

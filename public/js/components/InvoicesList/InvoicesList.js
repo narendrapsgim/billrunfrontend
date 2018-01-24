@@ -107,6 +107,7 @@ class InvoicesList extends Component {
   parserDownload = (ent) => {
     const downloadUrl = this.downloadURL(ent.get('aid'), ent.get('billrun_key'), ent.get('invoice_id'));
     return (
+      ent.get('invoice_file', false) &&
       <form method="post" action={downloadUrl} target="_blank">
         <input type="hidden" name="a" value="a" />
         <button className="btn btn-link" type="submit">

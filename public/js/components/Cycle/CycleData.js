@@ -86,6 +86,7 @@ class CycleData extends Component {
   parseCycleDataDownload = (entity) => {
     const downloadUrl = this.downloadURL(entity.get('aid'), entity.get('billrun_key'), entity.get('invoice_id'));
     return (
+      entity.get('invoice_file', false) &&
       <form method="post" action={downloadUrl} target="_blank">
         <button className="btn btn-link" type="submit">
           <i className="fa fa-download" /> Download
