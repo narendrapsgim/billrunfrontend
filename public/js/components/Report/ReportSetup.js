@@ -99,6 +99,7 @@ class ReportSetup extends Component {
       'subscribers.account',
       'taxation',
       'lines',
+      'rates.fields',
     ]));
   }
 

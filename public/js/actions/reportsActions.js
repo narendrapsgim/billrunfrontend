@@ -32,7 +32,10 @@ import {
   addToList,
 } from './listActions';
 import { getSettings } from './settingsActions';
-import { getConfig } from '../common/Util';
+import {
+  getConfig,
+  createRateListNameByArgs,
+} from '../common/Util';
 
 
 export const reportTypes = {
@@ -98,7 +101,13 @@ export const getPlansOptions = () => getList('available_plans', getPlansKeysQuer
 
 export const getServicesOptions = () => getList('available_services', getServicesKeysWithInfoQuery());
 
-export const getProductsOptions = () => getList('all_rates', getProductsKeysQuery());
+export const getProductsOptions = (query = Immutable.Map()) => {
+  if (query.isEmpty()) {
+    return getList('all_rates', getProductsKeysQuery());
+  }
+  const listName = createRateListNameByArgs(query);
+  return getList(listName, getProductsKeysQuery({ key: 1, description: 1 }, query));
+};
 
 export const getUsageTypesOptions = () => dispatch => dispatch(getSettings('usage_types'));
 
