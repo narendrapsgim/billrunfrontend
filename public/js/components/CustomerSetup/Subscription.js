@@ -164,9 +164,7 @@ class Subscription extends Component {
   }
 
   updateSubscriptionField = (path, value) => {
-    const { subscription } = this.state;
-    const newSubscription = subscription.setIn(path, value);
-    this.setState({ subscription: newSubscription });
+    this.setState(prevState => ({ subscription: prevState.subscription.setIn(path, value) }));
   }
 
   formatSelectOptions = items => items.map(item => ({

@@ -43,8 +43,8 @@ export const getConfig = (key, defaultValue = null) => {
 
 export const titlize = str => changeCase.upperCaseFirst(str);
 
-export const getFieldName = (field, category) =>
-  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], field));
+export const getFieldName = (field, category, defaultValue = null) =>
+  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], defaultValue !== null ? defaultValue : field));
 
 export const getFieldNameType = (type) => {
   switch (type) {
@@ -472,3 +472,5 @@ export const getAvailableFields = (settings, additionalFields = []) => {
 export const escapeRegExp = (text) => {
   return text.toString().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 };
+
+export const createRateListNameByArgs = (query = Immutable.Map()) => query.reduce((acc, value, key) => `${acc}.${key}.${value}`, 'rates');
