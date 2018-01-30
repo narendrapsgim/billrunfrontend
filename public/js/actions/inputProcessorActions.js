@@ -64,7 +64,7 @@ const convert = (settings) => {
           realtime = {},
           response = {},
           unify = {},
-          enabled = {},
+          enabled = true,
           filters = []
         } = settings;
 
@@ -526,7 +526,7 @@ export function saveInputProcessorSettings(state, parts = []) {
   if (unify) {
     settings.unify = unify.toJS();
   }
-  settings.enabled = enabled !== undefined ? enabled : 'true';
+  settings.enabled = enabled !== undefined ? enabled : true;
   if (filters) {
     settings.filters = filters.toJS();
   }
