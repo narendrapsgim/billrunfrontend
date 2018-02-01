@@ -143,7 +143,7 @@ class Product extends Component {
   filterCustomFields = ratingParams => (field) => {
     const fieldName = field.get('field_name', '');
     const usedAsRatingField = ratingParams.includes(fieldName);
-    return (!fieldName.startsWith('params.') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
+    return ((!fieldName.startsWith('params.') && field.get('title', '') !== 'Tariff category') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
   };
 
   renderPrices = () => {
@@ -215,6 +215,14 @@ class Product extends Component {
                   </Col>
                 </FormGroup>
               }
+
+              <EntityFields
+                entityName="rates"
+                entity={product}
+                onChangeField={this.onChangeAdditionalField}
+                fieldsFilter={this.filterCustomFields('tariff_category')}
+                editable={editable}
+              />
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
