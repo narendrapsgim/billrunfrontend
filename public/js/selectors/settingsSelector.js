@@ -5,6 +5,7 @@ import {
   getFieldName,
   getFieldNameType,
   isLinkerField,
+  setFieldTitle,
 } from '../common/Util';
 import { getEventConvertedConditions } from '../components/Events/EventsUtil';
 
@@ -349,7 +350,7 @@ export const subscriberImportFieldsSelector = createSelector(
 
 export const productFieldsSelector = createSelector(
   getProductFields,
-  productFields => productFields,
+  (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'product')),
 );
 
 export const rateCategoriesSelector = createSelector(
@@ -359,12 +360,12 @@ export const rateCategoriesSelector = createSelector(
 
 export const seriveceFieldsSelector = createSelector(
   getServiceFields,
-  serviceFields => serviceFields,
+  (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'service')),
 );
 
 export const planFieldsSelector = createSelector(
   getPlanFields,
-  planFields => planFields,
+  (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'plan')),
 );
 
 const selectEvents = (events, usageTypesData, propertyTypes) => {

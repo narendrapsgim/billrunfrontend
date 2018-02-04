@@ -16,6 +16,7 @@ class CustomField extends Component {
     entity: PropTypes.string.isRequired,
     idx: PropTypes.number.isRequired,
     editable: PropTypes.bool,
+    sortable: PropTypes.bool,
     existing: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
@@ -25,6 +26,7 @@ class CustomField extends Component {
     field: Immutable.Map(),
     editable: true,
     existing: false,
+    sortable: true,
   };
 
   state = {
@@ -254,13 +256,13 @@ class CustomField extends Component {
   }
 
   render() {
-    const { field, editable, existing } = this.props;
+    const { field, editable, existing, sortable } = this.props;
     const isBoolean = this.isBoolean(field);
     const checkboxStyle = { textAlign: 'center', marginTop: 10 };
     return (
       <FormGroup className="CustomField form-inner-edit-row">
         <Col sm={1} className="text-center">
-          <DragHandle />
+          <DragHandle disabled={!sortable} />
         </Col>
         <Col sm={3}>
           <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!this.hasEditableField('field_name') || existing} />

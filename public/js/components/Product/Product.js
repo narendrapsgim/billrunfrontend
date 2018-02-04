@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
+import { sentenceCase } from 'change-case';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
@@ -9,7 +10,11 @@ import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
 import EntityFields from '../Entity/EntityFields';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
-import { getUnitLabel } from '../../common/Util';
+import {
+  getUnitLabel,
+  getFieldName,
+  getFieldNameType,
+} from '../../common/Util';
 import {
   usageTypesDataSelector,
   propertyTypeSelector,
@@ -197,7 +202,8 @@ class Product extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Title<Help contents={ProductDescription.description} />
+                  { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
+                  <Help contents={ProductDescription.description} />
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field onChange={this.onChangeDescription} value={product.get('description', '')} editable={editable} />
@@ -207,7 +213,7 @@ class Product extends Component {
               { ['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    Key<Help contents={ProductDescription.key} />
+                    { getFieldName('key', getFieldNameType('service'), sentenceCase('key'))}<Help contents={ProductDescription.key} />
                   </Col>
                   <Col sm={8} lg={9}>
                     <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={!['clone', 'create'].includes(mode)} editable={editable} />

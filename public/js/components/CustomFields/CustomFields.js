@@ -32,6 +32,7 @@ class CustomFields extends Component {
     plan: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     defaultDisabledFields: PropTypes.instanceOf(Immutable.Map),
     defaultHiddenFields: PropTypes.instanceOf(Immutable.Map),
+    unReorderFields: PropTypes.instanceOf(Immutable.Map),
     tabs: PropTypes.arrayOf(PropTypes.string),
     dispatch: PropTypes.func.isRequired,
   };
@@ -49,6 +50,14 @@ class CustomFields extends Component {
     defaultHiddenFields: Immutable.Map({
       customer: Immutable.List(['aid', 'payment_gateway']),
       subscriber: Immutable.List(['sid', 'aid', 'plan_activation']),
+      product: Immutable.List(['from', 'to']),
+      service: Immutable.List(['from', 'to', 'include']),
+      plan: Immutable.List(['from', 'to']),
+    }),
+    unReorderFields: Immutable.Map({
+      product: Immutable.List(['key', 'description', 'rates']),
+      service: Immutable.List(['name', 'description', 'price']),
+      plan: Immutable.List(['name', 'description', 'price', 'upfront']),
     }),
     tabs: ['customer', 'subscriber', 'product', 'service', 'plan'],
   };
@@ -58,7 +67,7 @@ class CustomFields extends Component {
   };
 
   componentDidMount() {
-    this.fetchFields(this.afterReceiveSettings);
+    this.fetchFields();
   }
 
   componentWillUnmount() {
@@ -156,7 +165,7 @@ class CustomFields extends Component {
   };
 
   renderFieldsTab = (entity, key) => {
-    const { defaultDisabledFields, defaultHiddenFields } = this.props;
+    const { defaultDisabledFields, defaultHiddenFields, unReorderFields } = this.props;
     const entityFields = this.props[entity];
     const defaultEntityDisabledFields = defaultDisabledFields.get(entity, Immutable.List());
     const defaultEntityHiddenFields = defaultHiddenFields.get(entity, Immutable.List());
@@ -166,12 +175,15 @@ class CustomFields extends Component {
         const existing = field.get('new') === undefined;
         const editable = !field.get('system', false) && !defaultEntityDisabledFields.includes(field.get('field_name', ''));
         const fieldKey = existing ? `item-${entity}-${field.get('field_name', index)}-${index}` : `item-${entity}-${index}`;
+        const sortable = !unReorderFields.get(entity, Immutable.List()).includes(field.get('field_name', ''));
         fields.push(
           <CustomField
             key={fieldKey}
             index={index}
             idx={index}
             field={field}
+            disabled={!sortable}
+            sortable={sortable}
             entity={entity}
             editable={editable}
             existing={existing}

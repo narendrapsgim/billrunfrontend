@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
+import { sentenceCase } from 'change-case';
 import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
@@ -7,7 +8,10 @@ import Field from '../Field';
 import CreateButton from '../Elements/CreateButton';
 import PlanPrice from './components/PlanPrice';
 import EntityFields from '../Entity/EntityFields';
-
+import {
+  getFieldName,
+  getFieldNameType,
+} from '../../common/Util';
 
 export default class Plan extends Component {
 
@@ -173,7 +177,8 @@ export default class Plan extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Title<Help contents={PlanDescription.description} />
+                  { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
+                  <Help contents={PlanDescription.description} />
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field value={plan.get('description', '')} onChange={this.onChangePlanDescription} editable={editable} />
@@ -183,7 +188,7 @@ export default class Plan extends Component {
               {['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    Key <Help contents={PlanDescription.name} />
+                    { getFieldName('name', getFieldNameType('service'), sentenceCase('key'))} <Help contents={PlanDescription.name} />
                   </Col>
                   <Col sm={8} lg={9}>
                     <Field id="PlanName" onChange={this.onChangePlanName} value={plan.get('name', '')} required={true} editable={editable} />
