@@ -55,11 +55,6 @@ class CustomFields extends Component {
 
   state = {
     tab: 0,
-    subscriber: Immutable.List(),
-    customer: Immutable.List(),
-    product: Immutable.List(),
-    service: Immutable.List(),
-    plan: Immutable.List(),
   };
 
   componentDidMount() {
@@ -89,14 +84,7 @@ class CustomFields extends Component {
 
   afterSave = (response) => {
     if (response && response.status === 1) {
-      this.fetchFields(this.afterReceiveSettings);
-    }
-  }
-
-  afterReceiveSettings = (response) => {
-    const { customer, subscriber, product, service, plan } = this.props;
-    if (response) {
-      this.setState({ customer, subscriber, product, service, plan });
+      this.fetchFields();
     }
   }
 
@@ -156,16 +144,16 @@ class CustomFields extends Component {
   };
 
   removeFlags = () => {
-    const { tab } = this.state;
     const { tabs } = this.props;
-    const entity = tabs[tab];
-    const entityFields = this.props[entity];
-    entityFields.map((field, idx) => {
-      const retField = field.delete('new');
-      this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', idx]), retField));
-      return field;
+    tabs.forEach((entity) => {
+      this.props[entity].forEach((field, idx) => {
+        if (field.has('new')) {
+          const retField = field.delete('new');
+          this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', idx]), retField));
+        }
+      });
     });
-  }
+  };
 
   renderFieldsTab = (entity, key) => {
     const { defaultDisabledFields, defaultHiddenFields } = this.props;
