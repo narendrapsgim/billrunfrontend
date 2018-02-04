@@ -2,8 +2,8 @@ import Immutable from 'immutable';
 import moment from 'moment';
 import changeCase from 'change-case';
 import fieldNamesConfig from '../config/fieldNames.json';
-import reportConfig from '../config/report'
-import systemItemsConfig from '../config/entities.json'
+import reportConfig from '../config/report';
+import systemItemsConfig from '../config/entities.json';
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
@@ -19,9 +19,9 @@ let configCache = Immutable.Map();
 export const getConfig = (key, defaultValue = null) => {
   const path = Array.isArray(key) ? key : [key];
   if (configCache.isEmpty()) {
-    configCache = Immutable.fromJS(globalSetting)
+    configCache = Immutable.fromJS(globalSetting);
   }
-  if(!configCache.has(path[0])) {
+  if (!configCache.has(path[0])) {
     switch (path[0]) {
       case 'reports': configCache = configCache.set('reports', Immutable.fromJS(reportConfig));
         break;
@@ -200,8 +200,8 @@ export const getItemMinFromDate = (item, minDate) => {
     return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
   }
   // only item
-  if(getItemId(item, false)) {
-    return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)))
+  if (getItemId(item, false)) {
+    return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)));
   }
   // only minDate
   if (minDate) {
@@ -469,8 +469,7 @@ export const getAvailableFields = (settings, additionalFields = []) => {
   return fields.concat(Immutable.fromJS(additionalFields));
 };
 
-export const escapeRegExp = (text) => {
-  return text.toString().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-};
+export const escapeRegExp = text =>
+  text.toString().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 
 export const createRateListNameByArgs = (query = Immutable.Map()) => query.reduce((acc, value, key) => `${acc}.${key}.${value}`, 'rates');

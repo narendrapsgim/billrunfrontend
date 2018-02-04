@@ -1,11 +1,9 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { sentenceCase } from 'change-case';
 import {
   getFieldName,
   getFieldNameType,
-  getConfig,
   isLinkerField,
 } from '../common/Util';
 import { getEventConvertedConditions } from '../components/Events/EventsUtil';
@@ -63,7 +61,7 @@ const getInvoiceExport = (state, props) => // eslint-disable-line no-unused-vars
 const getEvents = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['events']);
 
-const getPaymentGateways = (state, props) =>
+const getPaymentGateways = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['payment_gateways']);
 
 const selectSubscriberImportFields = (fields, accountfields) => {
