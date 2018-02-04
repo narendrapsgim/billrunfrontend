@@ -54,6 +54,9 @@ const getServiceFields = (state, props) => // eslint-disable-line no-unused-vars
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['rates', 'fields']);
 
+const getPlanFields = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['plans', 'fields']);
+
 const getInvoiceExport = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.get('invoice_export');
 
@@ -359,6 +362,11 @@ export const rateCategoriesSelector = createSelector(
 export const seriveceFieldsSelector = createSelector(
   getServiceFields,
   serviceFields => serviceFields,
+);
+
+export const planFieldsSelector = createSelector(
+  getPlanFields,
+  planFields => planFields,
 );
 
 const selectEvents = (events, usageTypesData, propertyTypes) => {

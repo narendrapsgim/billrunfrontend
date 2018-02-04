@@ -18,6 +18,7 @@ import {
   subscriberFieldsSelector,
   productFieldsSelector,
   seriveceFieldsSelector,
+  planFieldsSelector,
 } from '../../selectors/settingsSelector';
 import { getSettingsKey, getSettingsPath } from '../../common/Util';
 
@@ -28,6 +29,7 @@ class CustomFields extends Component {
     customer: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     product: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     service: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
+    plan: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     defaultDisabledFields: PropTypes.instanceOf(Immutable.Map),
     defaultHiddenFields: PropTypes.instanceOf(Immutable.Map),
     tabs: PropTypes.arrayOf(PropTypes.string),
@@ -39,6 +41,7 @@ class CustomFields extends Component {
     customer: Immutable.List(),
     product: Immutable.List(),
     service: Immutable.List(),
+    plan: Immutable.List(),
     defaultDisabledFields: Immutable.Map({
       customer: Immutable.List(['first_name', 'last_name', 'firstname', 'lastname', 'address']),
       subscriber: Immutable.List(['firstname', 'lastname', 'plan', 'services']),
@@ -47,7 +50,7 @@ class CustomFields extends Component {
       customer: Immutable.List(['aid', 'payment_gateway']),
       subscriber: Immutable.List(['sid', 'aid', 'plan_activation']),
     }),
-    tabs: ['customer', 'subscriber', 'product', 'service'],
+    tabs: ['customer', 'subscriber', 'product', 'service', 'plan'],
   };
 
   state = {
@@ -56,6 +59,7 @@ class CustomFields extends Component {
     customer: Immutable.List(),
     product: Immutable.List(),
     service: Immutable.List(),
+    plan: Immutable.List(),
   };
 
   componentDidMount() {
@@ -90,9 +94,9 @@ class CustomFields extends Component {
   }
 
   afterReceiveSettings = (response) => {
-    const { customer, subscriber, product, service } = this.props;
+    const { customer, subscriber, product, service, plan } = this.props;
     if (response) {
-      this.setState({ customer, subscriber, product, service });
+      this.setState({ customer, subscriber, product, service, plan });
     }
   }
 
@@ -241,5 +245,6 @@ const mapStateToProps = (state, props) => ({
   customer: accountFieldsSelector(state, props),
   product: productFieldsSelector(state, props),
   service: seriveceFieldsSelector(state, props),
+  plan: planFieldsSelector(state, props),
 });
 export default connect(mapStateToProps)(CustomFields);
