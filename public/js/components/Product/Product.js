@@ -143,7 +143,7 @@ class Product extends Component {
   filterCustomFields = ratingParams => (field) => {
     const fieldName = field.get('field_name', '');
     const usedAsRatingField = ratingParams.includes(fieldName);
-    return ((!fieldName.startsWith('params.') && field.get('title', '') !== 'Tariff category') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
+    return ((!fieldName.startsWith('params.') && field.get('field_name', '') !== 'tariff_category') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
   };
 
   renderPrices = () => {
