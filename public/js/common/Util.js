@@ -21,7 +21,7 @@ export const getConfig = (key, defaultValue = null) => {
   if (configCache.isEmpty()) {
     configCache = Immutable.fromJS(globalSetting);
   }
-  if (!configCache.has(path[0])) {
+  if(!configCache.has(path[0])) {
     switch (path[0]) {
       case 'reports': configCache = configCache.set('reports', Immutable.fromJS(reportConfig));
         break;
@@ -117,8 +117,10 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'view': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        if (['subscription', 'customer'].includes(entityName)) {
-          return `${titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        if (entityName === 'customer') {
+          return `${titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
+        } else if (entityName === 'subscription') {
+          return `${titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getSubscriberId(item)}]`;
         }
         return `${titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
@@ -128,8 +130,10 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'update': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        if (['subscription', 'customer'].includes(entityName)) {
-          return `Update ${titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        if (entityName === 'customer') {
+          return `Update ${titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
+        } else if (entityName === 'subscription') {
+          return `Update ${titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getSubscriberId(item)}]`;
         }
         return `Update ${titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
@@ -209,7 +213,7 @@ export const getItemMinFromDate = (item, minDate) => {
     return moment.max(minDate, getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0))));
   }
   // only item
-  if (getItemId(item, false)) {
+  if(getItemId(item, false)) {
     return getItemDateValue(item, 'originalValue', getItemDateValue(item, 'from', moment(0)));
   }
   // only minDate
