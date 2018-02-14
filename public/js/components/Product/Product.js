@@ -140,6 +140,7 @@ class Product extends Component {
     this.props.onFieldUpdate(field, value);
   }
 
+  //BRCD-1337 - Not in use,  Display all parameters that are not used by any input processor should still be displayed.
   filterCustomFields = ratingParams => (field) => {
     const fieldName = field.get('field_name', '');
     const usedAsRatingField = ratingParams.includes(fieldName);
@@ -151,7 +152,7 @@ class Product extends Component {
     const productPath = ['rates', usaget, planName, 'rate'];
     const prices = product.getIn(productPath, Immutable.List());
 
-    return prices.map((price, i) =>
+    return prices.map((price, i) => (
       <ProductPrice
         mode={mode}
         count={prices.size}
@@ -162,7 +163,7 @@ class Product extends Component {
         onProductEditRate={this.onProductRateUpdate}
         onProductRemoveRate={this.onProductRateRemove}
       />
-    );
+    ));
   }
 
   getUnit = () => {
@@ -237,7 +238,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
-                fieldsFilter={this.filterCustomFields(ratingParams)}
+                highlightPramas={ratingParams}
                 editable={editable}
               />
 

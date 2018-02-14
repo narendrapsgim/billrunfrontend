@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
+import classNames from 'classnames';
 import { titleCase } from 'change-case';
 import EntityField from './EntityField';
 import { getSettings } from '../../actions/settingsActions';
@@ -17,6 +18,7 @@ class EntityFields extends Component {
       PropTypes.arrayOf(PropTypes.string),
     ]).isRequired,
     fields: PropTypes.instanceOf(Immutable.List),
+    highlightPramas: PropTypes.instanceOf(Immutable.List),
     fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
     onChangeField: PropTypes.func,
@@ -26,6 +28,7 @@ class EntityFields extends Component {
   static defaultProps = {
     entity: Immutable.Map(),
     fields: Immutable.List(),
+    highlightPramas: Immutable.List(),
     fieldsFilter: null,
     editable: true,
     onChangeField: () => {},
@@ -93,16 +96,22 @@ class EntityFields extends Component {
   }
 
   renderAddParamButton = (options) => {
+    const { highlightPramas } = this.props;
     const menuItems = options.map((option) => {
+      const highlight = highlightPramas.includes(`params.${option.value}`);
+      const menuItemClass = classNames({
+        disabled: !highlight,
+        'label-text': highlight,
+      });
       const onSelect = () => { this.onAddParam(option.value); };
       return (
         <MenuItem key={option.value} eventKey={option.value} onSelect={onSelect}>
-          {option.label}
+          <span className={menuItemClass}>{option.label}</span>
         </MenuItem>
       );
     });
     return (
-      <DropdownButton id="add-param-input" componentClass={InputGroup.Button} className="btn-primary btn btn-xs btn-default" title="Add Param" >
+      <DropdownButton id="add-param-input" componentClass={InputGroup.Button} className="btn-primary btn btn-xs btn-default" title="Add parameter" >
         { menuItems }
       </DropdownButton>
     );
