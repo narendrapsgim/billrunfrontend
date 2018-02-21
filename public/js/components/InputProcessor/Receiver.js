@@ -188,7 +188,7 @@ class Receiver extends Component {
           <div className="form-group">
             <label htmlFor="password" className="col-xs-2 control-label">Password</label>
             <div className="col-xs-4">
-              <input className="form-control" id="password" onChange={onSetReceiverField} value={settings.get('password', '')} />
+              <input type="password" className="form-control" id="password" onChange={onSetReceiverField} value={settings.get('password', '')} />
             </div>
           </div>
           <div className="form-group">
