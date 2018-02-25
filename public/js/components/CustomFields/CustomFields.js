@@ -18,6 +18,7 @@ import {
   subscriberFieldsSelector,
   productFieldsSelector,
   seriveceFieldsSelector,
+  planFieldsSelector,
 } from '../../selectors/settingsSelector';
 import { getSettingsKey, getSettingsPath } from '../../common/Util';
 
@@ -28,8 +29,10 @@ class CustomFields extends Component {
     customer: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     product: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     service: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
+    plan: PropTypes.instanceOf(Immutable.List), // eslint-disable-line react/no-unused-prop-types
     defaultDisabledFields: PropTypes.instanceOf(Immutable.Map),
     defaultHiddenFields: PropTypes.instanceOf(Immutable.Map),
+    unReorderFields: PropTypes.instanceOf(Immutable.Map),
     tabs: PropTypes.arrayOf(PropTypes.string),
     dispatch: PropTypes.func.isRequired,
   };
@@ -39,6 +42,7 @@ class CustomFields extends Component {
     customer: Immutable.List(),
     product: Immutable.List(),
     service: Immutable.List(),
+    plan: Immutable.List(),
     defaultDisabledFields: Immutable.Map({
       customer: Immutable.List(['first_name', 'last_name', 'firstname', 'lastname', 'address']),
       subscriber: Immutable.List(['firstname', 'lastname', 'plan', 'services']),
@@ -46,20 +50,24 @@ class CustomFields extends Component {
     defaultHiddenFields: Immutable.Map({
       customer: Immutable.List(['aid', 'payment_gateway']),
       subscriber: Immutable.List(['sid', 'aid', 'plan_activation']),
+      product: Immutable.List(['from', 'to']),
+      service: Immutable.List(['from', 'to', 'include']),
+      plan: Immutable.List(['from', 'to']),
     }),
-    tabs: ['customer', 'subscriber', 'product', 'service'],
+    unReorderFields: Immutable.Map({
+      product: Immutable.List(['key', 'description', 'rates']),
+      service: Immutable.List(['name', 'description', 'price']),
+      plan: Immutable.List(['name', 'description', 'price', 'upfront']),
+    }),
+    tabs: ['customer', 'subscriber', 'product', 'service', 'plan'],
   };
 
   state = {
     tab: 0,
-    subscriber: Immutable.List(),
-    customer: Immutable.List(),
-    product: Immutable.List(),
-    service: Immutable.List(),
   };
 
   componentDidMount() {
-    this.fetchFields(this.afterReceiveSettings);
+    this.fetchFields();
   }
 
   componentWillUnmount() {
@@ -85,14 +93,7 @@ class CustomFields extends Component {
 
   afterSave = (response) => {
     if (response && response.status === 1) {
-      this.fetchFields(this.afterReceiveSettings);
-    }
-  }
-
-  afterReceiveSettings = (response) => {
-    const { customer, subscriber, product, service } = this.props;
-    if (response) {
-      this.setState({ customer, subscriber, product, service });
+      this.fetchFields();
     }
   }
 
@@ -152,19 +153,19 @@ class CustomFields extends Component {
   };
 
   removeFlags = () => {
-    const { tab } = this.state;
     const { tabs } = this.props;
-    const entity = tabs[tab];
-    const entityFields = this.props[entity];
-    entityFields.map((field, idx) => {
-      const retField = field.delete('new');
-      this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', idx]), retField));
-      return field;
+    tabs.forEach((entity) => {
+      this.props[entity].forEach((field, idx) => {
+        if (field.has('new')) {
+          const retField = field.delete('new');
+          this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', idx]), retField));
+        }
+      });
     });
-  }
+  };
 
   renderFieldsTab = (entity, key) => {
-    const { defaultDisabledFields, defaultHiddenFields } = this.props;
+    const { defaultDisabledFields, defaultHiddenFields, unReorderFields } = this.props;
     const entityFields = this.props[entity];
     const defaultEntityDisabledFields = defaultDisabledFields.get(entity, Immutable.List());
     const defaultEntityHiddenFields = defaultHiddenFields.get(entity, Immutable.List());
@@ -174,12 +175,15 @@ class CustomFields extends Component {
         const existing = field.get('new') === undefined;
         const editable = !field.get('system', false) && !defaultEntityDisabledFields.includes(field.get('field_name', ''));
         const fieldKey = existing ? `item-${entity}-${field.get('field_name', index)}-${index}` : `item-${entity}-${index}`;
+        const sortable = !unReorderFields.get(entity, Immutable.List()).includes(field.get('field_name', ''));
         fields.push(
           <CustomField
             key={fieldKey}
             index={index}
             idx={index}
             field={field}
+            disabled={!sortable}
+            sortable={sortable}
             entity={entity}
             editable={editable}
             existing={existing}
@@ -241,5 +245,6 @@ const mapStateToProps = (state, props) => ({
   customer: accountFieldsSelector(state, props),
   product: productFieldsSelector(state, props),
   service: seriveceFieldsSelector(state, props),
+  plan: planFieldsSelector(state, props),
 });
 export default connect(mapStateToProps)(CustomFields);
