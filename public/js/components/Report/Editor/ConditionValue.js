@@ -10,20 +10,8 @@ import {
   getConfig,
 } from '../../../common/Util';
 import {
-  productsOptionsSelector,
-  cyclesOptionsSelector,
-  plansOptionsSelector,
-  servicesOptionsSelector,
-  groupsOptionsSelector,
-  calcNameSelector,
-  bucketsNamesSelector,
-  bucketsExternalIdsSelector
-} from '../../../selectors/listSelectors';
-import {
-  usageTypeSelector,
-  fileTypeSelector,
-  eventCodeSelector,
-} from '../../../selectors/settingsSelector';
+  selectOptionSelector,
+} from '../../../selectors/reportSelectors';
 import {
   getCyclesOptions,
   getProductsOptions,
@@ -43,7 +31,7 @@ class ConditionValue extends Component {
     field: PropTypes.instanceOf(Immutable.Map),
     config: PropTypes.instanceOf(Immutable.Map),
     operator: PropTypes.instanceOf(Immutable.Map),
-    selectOptions: PropTypes.instanceOf(Immutable.Map),
+    selectOptions: PropTypes.instanceOf(Immutable.List),
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
@@ -53,7 +41,7 @@ class ConditionValue extends Component {
     field: Immutable.Map(),
     config: Immutable.Map(),
     operator: Immutable.Map(),
-    selectOptions: Immutable.Map(),
+    selectOptions: Immutable.List(),
     disabled: false,
     onChange: () => {},
   }
@@ -82,14 +70,16 @@ class ConditionValue extends Component {
   }
 
   initFieldOptions = (config, selectOptions) => {
-    if (config.hasIn(['inputConfig', 'callback']) && selectOptions.get(config.getIn(['inputConfig', 'callback']), Immutable.List()).isEmpty()) {
+    if (config.hasIn(['inputConfig', 'callback']) && selectOptions.isEmpty()) {
       const callback = config.getIn(['inputConfig', 'callback']);
       switch (callback) {
         case 'getCyclesOptions': this.props.dispatch(getCyclesOptions());
           break;
         case 'getPlansOptions': this.props.dispatch(getPlansOptions());
           break;
-        case 'getProductsOptions': this.props.dispatch(getProductsOptions());
+        case 'getProductsOptions': this.props.dispatch(getProductsOptions(
+          config.getIn(['inputConfig', 'callbackArgument'], Immutable.Map())),
+        );
           break;
         case 'getServicesOptions': this.props.dispatch(getServicesOptions());
           break;
@@ -97,9 +87,10 @@ class ConditionValue extends Component {
           break;
         case 'getUsageTypesOptions': this.props.dispatch(getUsageTypesOptions());
           break;
-	case 'getBucketsOptions':
+        case 'getBucketsOptions':
         case 'getBucketsExternalIdsOptions':
           this.props.dispatch(getBucketsOptions());
+          break;
         case 'getFileTypeOptions': this.props.dispatch(getFileTypesOptions());
           break;
         case 'getEventCodeOptions': this.props.dispatch(getEventCodeOptions());
@@ -208,7 +199,7 @@ class ConditionValue extends Component {
       const options = Immutable.List()
         .withMutations((optionsWithMutations) => {
           if (config.hasIn(['inputConfig', 'callback'])) {
-            selectOptions.get(config.getIn(['inputConfig', 'callback'], ''), Immutable.List()).forEach((selectOption) => {
+            selectOptions.forEach((selectOption) => {
               optionsWithMutations.push(selectOption);
             });
           }
@@ -335,19 +326,7 @@ class ConditionValue extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  selectOptions: Immutable.Map({
-    getCyclesOptions: cyclesOptionsSelector(state, props) || Immutable.List(),
-    getProductsOptions: productsOptionsSelector(state, props) || Immutable.List(),
-    getPlansOptions: plansOptionsSelector(state, props) || Immutable.List(),
-    getServicesOptions: servicesOptionsSelector(state, props) || Immutable.List(),
-    getGroupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
-    getUsageTypesOptions: usageTypeSelector(state, props) || Immutable.List(),
-    getBucketsOptions: bucketsNamesSelector(state, props) || Immutable.List(),
-    getBucketsExternalIdsOptions: bucketsExternalIdsSelector(state, props) || Immutable.List(),
-    getFileTypeOptions: fileTypeSelector(state, props) || Immutable.List(),
-    getCalcNameOptions: calcNameSelector(state, props) || Immutable.List(),
-    getEventCodeOptions: eventCodeSelector(state, props) || Immutable.List(),
-  }),
+  selectOptions: selectOptionSelector(state, props),
 });
 
 export default connect(mapStateToProps)(ConditionValue);

@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import _ from 'lodash';
 import {Panel, Button} from 'react-bootstrap';
-import {setSegmentation, addSegmentation, deleteSegmentation} from '../../../actions/exportGeneratorActions';
+import { setSegmentation, addSegmentation, deleteSegmentation } from '../../../actions/exportGeneratorActions';
 import Help from '../../Help';
 import Segments from './Segments';
 
@@ -26,10 +26,9 @@ class Segmentation extends Component {
   }
 
   render() {
-    const { fields } = this.props;
+    const { fields, segments } = this.props;
     const options =
-      fields.map((val, key) => ({value: val, label: val})).toJS();
-
+      fields.map((val, key) => ({value: val, label: val.get('name')})).toJS();
     return (
       <div className="Segmentation">
         Please add segments filters for Export generator.
@@ -41,12 +40,11 @@ class Segmentation extends Component {
             <div className="col-lg-2"><label htmlFor="date_field">From</label></div>
             <div className="col-lg-2"><label htmlFor="date_field">To</label></div>
           </div>
-          {
-	    this.props.segments.toArray().map((entity, index) => (
+          {segments.map((entity, index) => (
               <Segments options={options} index={index} segment={entity} onSelectField={this.onSelectField} onDelete={this.onDelete} key={index}/>
             ))
 	  }
-          <a onClick={this.props.addSegmentation}  className="btn-link" style={{ marginTop: 15 }}>
+          <a onClick={this.props.addSegmentation} className="btn-link" style={{ marginTop: 15 }}>
             <i className="fa fa-plus"></i>&nbsp;Add Segment
 	  </a>
         </Panel>
@@ -65,7 +63,7 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state, props) {
   return {
-    fields:   state.exportGenerator.getIn(['inputProcess', 'parser', 'structure']), //.toObject(),
+    fields: state.exportGenerator.getIn(['inputProcess', 'parser', 'structure']), //.toObject(),
     segments: state.exportGenerator.get('segments')
   };
 }

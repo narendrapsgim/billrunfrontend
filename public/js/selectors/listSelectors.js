@@ -37,6 +37,8 @@ const selectServicesOptions = (options) => {
 
 const getProductsOptions = state => state.list.get('all_rates', null);
 
+const getOptionsByListName = (state, props, listName = '') => state.list.get(listName, null);
+
 const selectProductsOptions = (options) => {
   if (options === null) {
     return undefined;
@@ -137,6 +139,11 @@ export const cyclesOptionsSelector = createSelector(
 
 export const productsOptionsSelector = createSelector(
   getProductsOptions,
+  selectProductsOptions,
+);
+
+export const listByNameSelector = createSelector(
+  getOptionsByListName,
   selectProductsOptions,
 );
 

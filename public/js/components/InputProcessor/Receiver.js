@@ -188,7 +188,7 @@ class Receiver extends Component {
           <div className="form-group">
             <label htmlFor="password" className="col-xs-2 control-label">Password</label>
             <div className="col-xs-4">
-              <input className="form-control" id="password" onChange={onSetReceiverField} value={settings.get('password', '')} />
+              <input type="password" className="form-control" id="password" onChange={onSetReceiverField} value={settings.get('password', '')} />
             </div>
           </div>
           <div className="form-group">
@@ -226,7 +226,7 @@ class Receiver extends Component {
             </div>
           </div>}
           <div className="form-group">
-            <label htmlFor="delete_received" className="col-xs-2 control-label">Delete on retrieve</label>
+            <label htmlFor="delete_received" className="col-xs-2 control-label">Delete received files from remote</label>
             <div className="col-xs-4">
               <input type="checkbox" id="delete_received" style={{ marginTop: 12 }}
                      onChange={onSetReceiverCheckboxField}

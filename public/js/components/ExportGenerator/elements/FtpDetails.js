@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import Field from '../../Field';
 
 class FtpDetials extends Component {
-  render() {
-    const { settings, onChangeField } = this.props;
 
+  render() {
+    const { settings, onChangeField, onChangeCheckboxField } = this.props;
     const period_options = [{min: 1, label: "1 Minute"},
                             {min: 15, label: "15 Minutes"},
                             {min: 30, label: "30 Minutes"},
@@ -26,7 +26,7 @@ class FtpDetials extends Component {
             <div className="col-xs-4">
               <Field id="name"
                      onChange={onChangeField}
-                     value={ settings.get('name', '') } />
+                     value={settings.get('name', '')} />
             </div>
           </div>
           <div className="form-group">
@@ -66,7 +66,7 @@ class FtpDetials extends Component {
             <div className="col-xs-4">
               <Field id="filename_regex"
                      onChange={onChangeField}
-                     value={settings.get('filename_regex')} />
+                     value={settings.get('filename_regex', '')} />
             </div>
           </div>
           <div className="form-group">
@@ -77,24 +77,17 @@ class FtpDetials extends Component {
               </select>
             </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="delete_received" className="col-xs-2 control-label">Delete on retrieve</label>
-            <div className="col-xs-4">
-              <Field id="delete_received"
-                     onChange={onChangeField}
-                     checked={settings.get('delete_received', false)}
-                     fieldType="checkbox"
-                     value="1" />
-            </div>
-          </div>
+
           <div className="form-group">
             <label htmlFor="passive" className="col-xs-2 control-label">Passive</label>
             <div className="col-xs-4">
-              <Field id="passive"
-                     onChange={onChangeField}
-                     checked={settings.get('passive', false)}
-                     fieldType="checkbox"
-                     value="1" />
+              <input
+                type="checkbox"
+                id="passive"
+                onChange={onChangeCheckboxField}
+                checked={settings.get('passive', false)}
+                value="1"
+              />
             </div>
           </div>
         </form>

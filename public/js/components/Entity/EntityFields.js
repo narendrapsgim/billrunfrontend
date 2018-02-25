@@ -36,7 +36,8 @@ class EntityFields extends Component {
     if (fields.isEmpty()) {
       this.props.dispatch(getSettings(entityName));
     }
-    if (Immutable.is(entity.get('params', Immutable.List()), Immutable.List())) {
+    // fix problem when empty params object converted to array
+    if (entity.has('params') && Immutable.is(entity.get('params', Immutable.List()), Immutable.List())) {
       this.props.onChangeField(['params'], Immutable.Map());
     }
   }
