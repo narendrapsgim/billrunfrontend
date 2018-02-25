@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Map } from 'immutable';
 import { showDanger } from '../../actions/alertsActions';
 import { getExportGenerator, clearExportGenerator, saveExportGenerator, setFtpField } from '../../actions/exportGeneratorActions';
-import { Map } from 'immutable';
 import { getSettings } from '../../actions/settingsActions';
 import Steps from './elements/ExportGeneratorSteps';
 import SelectInputProcessor from './elements/SelectInputProcessor';
@@ -17,10 +17,10 @@ class ExportGenerator extends Component {
       stepIndex: 0,
       finished: 0,
       steps: [
-        "select_input",
-        "segmentation",
-        "ftpDetails"
-      ]
+        'select_input',
+        'segmentation',
+        'ftpDetails',
+      ],
     };
 
     this.handleNext = this.handleNext.bind(this);
@@ -34,15 +34,15 @@ class ExportGenerator extends Component {
     dispatch(getSettings(['export_generators']));
 
     // Should be deal with edit
-    if (action !== "new") dispatch(getExportGenerator(name));
+    if (action !== 'new') dispatch(getExportGenerator(name));
   }
 
   goBack() {
     this.context.router.push({
-      pathname: "export_generators"
+      pathname: 'export_generators',
     });
   }
-  
+
   handleNext() {
     const { stepIndex } = this.state || 0;
     const totalSteps = this.state.steps.length - 1;
@@ -61,8 +61,8 @@ class ExportGenerator extends Component {
 
   handlePrev() {
     const { stepIndex } = this.state;
-    if (stepIndex > 0) return this.setState({stepIndex: stepIndex - 1, finished: 0});
-    let r = confirm("are you sure you want to stop editing Export Generator?");
+    if (stepIndex > 0) return this.setState({ stepIndex: stepIndex - 1, finished: 0 });
+    const r = confirm("are you sure you want to stop editing Export Generator?");
     if (r) {
       this.props.dispatch(clearExportGenerator());
       this.goBack();
@@ -70,8 +70,8 @@ class ExportGenerator extends Component {
   }
 
   handleCancel() {
-    let r = confirm("are you sure you want to stop editing Export Generator?");
-    const { dispatch, fileType } = this.props;
+    const r = confirm('are you sure you want to stop editing Export Generator?');
+    const { dispatch, fileType, settings } = this.props;
     if (r) {
       if (fileType !== true) {
         dispatch(clearExportGenerator());
@@ -79,54 +79,55 @@ class ExportGenerator extends Component {
       } else {
         const cb = (err) => {
           if (err) {
-            dispatch(showDanger("Please try again"));
+            dispatch(showDanger('Please try again'));
             return;
           }
           dispatch(clearExportGenerator());
           this.goBack();
         };
         // need to handle
-        dispatch(clearExportGenerator(this.props.settings.get('file_type'), cb));
+        dispatch(clearExportGenerator(settings.get('file_type', ''), cb));
       }
     }
   }
 
-  validateSteps (cb) {
+  validateSteps(cb) {
     const { stepIndex, finished } = this.state || 0;
-    let err = [];
+    const { settings } = this.props;
+    const err = [];
 
     if (finished) {
       this.props.dispatch(saveExportGenerator());
-    } else {      
+    } else {
       switch (stepIndex) {
         case 0:
           // check name
-          if (this.props.settings.get('name').length === 0) {
-            err.push ('Export Process name is mandatory.');
+          if (settings.get('name', '').length === 0) {
+            err.push('Export Process name is mandatory.');
           }
 
           //check input processor selected
-          if (this.props.settings.get('inputProcess').size === 0) {
-            err.push ('Please select Input Processor.');
+          if (settings.get('inputProcess', 0).size === 0) {
+            err.push('Please select Input Processor.');
           }
           break;
 
         case 1:
           // check at last one segment with from/to is selected
           // let segment = this.props.settings.get('segments').get(0);
-          if (this.props.settings.get('segments').size === 0) {
-            err.push ('Please select at least one segment');
+          if (settings.get('segments', 0).size === 0) {
+            err.push('Please select at least one segment');
           } else {
-            let firstSegment = this.props.settings.get('segments').first();
-            if (!firstSegment.get('field') || ( !firstSegment.get('from') && firstSegment.get('to') )) {
-              err.push ('Generator should have at least one valid segment');
+            const firstSegment = settings.get('segments').first();
+            if (!firstSegment.get('field') || (!firstSegment.get('from') && firstSegment.get('to'))) {
+              err.push('Generator should have at least one valid segment');
             }
           }
           break;
       }
 
-      if (err.length > 0 ) {
-        this.props.dispatch(showDanger(err.join("\n\n")));
+      if (err.length > 0) {
+        this.props.dispatch(showDanger(err.join('\n\n')));
 
         cb(true);
         return;
@@ -142,19 +143,21 @@ class ExportGenerator extends Component {
     this.props.dispatch(setFtpField(id, value));
   };
 
+  onChangeCheckboxField = (e) => {
+    const { id, checked } = e.target;
+    this.props.dispatch(setFtpField(id, checked));
+  };
+
   render() {
-    let { stepIndex } = this.state;
+    const { stepIndex } = this.state;
     const { settings } = this.props;
 
     const steps = [
       (<SelectInputProcessor onNext={this.handleNext.bind(this)} settings={settings} />),
       (<Segmentation onNext={this.handleNext.bind(this)} settings={settings} />),
-      (<FtpDetails onNext={this.handleNext.bind(this)} settings={ settings.get('receiver', Map()) } onChangeField={ this.onChangeFTPField } />)
+      (<FtpDetails onNext={this.handleNext.bind(this)} settings={settings.get('receiver', Map())} onChangeField={this.onChangeFTPField} onChangeCheckboxField={this.onChangeCheckboxField} />)
     ];
 
-    const { action } = this.props.location.query;
-    const title = action === 'new' ? "New export generator" : `Edit input processor - ${settings.get('file_type')}`;
-    
     return (
       <div>
         <div className="row">
@@ -168,39 +171,36 @@ class ExportGenerator extends Component {
                 </div>
               </div>
               <div className="panel-body">
-                {/*<div className="row">
-                  <div className="col-lg-6 col-lg-offset-4">
-                    <Steps stepIndex={stepIndex} />
-                  </div>
-                </div>*/}
-
-                <div className="contents bordered-container" style={{minHeight: '250px'}}>
+                <div className="contents bordered-container" style={{ minHeight: '250px' }}>
                   { steps[stepIndex] }
                 </div>
 
               </div>
-              <div style={{marginTop: 12}} className="pull-left">
-                <button className="btn btn-default"
-                        onClick={this.handleCancel}
-                        style={{marginRight: 12}}>
+              <div style={{ marginTop: 12 }} className="pull-left">
+                <button
+                  className="btn btn-default"
+                  onClick={this.handleCancel}
+                  style={{ marginRight: 12 }}>
                   Cancel
                 </button>
               </div>
-              <div style={{marginTop: 12}} className="pull-right">
+              <div style={{ marginTop: 12 }} className="pull-right">
                 {(() => {
                   if (stepIndex > 0) {
                     return (
-                      <button className="btn btn-default"
-                              onClick={this.handlePrev}
-                              style={{marginRight: 12}}>
+                      <button
+                        className="btn btn-default"
+                        onClick={this.handlePrev}
+                        style={{ marginRight: 12 }}>
                         Back
                       </button>
                     );
                   }
                 })()}
-                <button className="btn btn-primary"
-                        onClick={this.handleNext}>
-                  { stepIndex === (steps.length - 1) ? "Finish" : "Next" }
+                <button
+                  className="btn btn-primary"
+                  onClick={this.handleNext}>
+                  { stepIndex === (steps.length - 1) ? 'Finish' : 'Next' }
                 </button>
               </div>
             </div>

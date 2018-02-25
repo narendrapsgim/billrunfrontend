@@ -64,7 +64,7 @@ const convert = (settings) => {
           realtime = {},
           response = {},
           unify = {},
-          enabled = {},
+          enabled = true,
           filters = []
         } = settings;
 
@@ -105,7 +105,7 @@ const convert = (settings) => {
       usaget_mapping = processor.usaget_mapping.map(usaget => {
 	return {
 	  usaget: usaget.usaget,
-	  pattern: usaget.pattern.replace("/^", "").replace("$/", ""),
+	  pattern: usaget.pattern,
     unit: usaget.unit,
     volume_type: usaget.volume_type,
     volume_src: usaget.volume_src,
@@ -526,7 +526,7 @@ export function saveInputProcessorSettings(state, parts = []) {
   if (unify) {
     settings.unify = unify.toJS();
   }
-  settings.enabled = enabled !== undefined ? enabled : 'true';
+  settings.enabled = enabled !== undefined ? enabled : true;
   if (filters) {
     settings.filters = filters.toJS();
   }

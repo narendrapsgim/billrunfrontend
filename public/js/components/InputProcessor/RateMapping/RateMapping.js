@@ -409,12 +409,14 @@ class RateMapping extends Component {
                     id={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-param-name`}
                     onChange={this.onChangeAdditionalParamRating(rateCategory, usaget, priority, calcKey, calc.get('type', ''))}
                     value={selectedRadio !== 3 ? '' : calc.get('rate_key', '')}
+                    disabled={selectedRadio !== 3}
                     options={this.getCustomRatingFields()}
                     allowCreate
                   />
                   <Select
                     id={`${rateCategory}-${usaget}-${priority}-${calcKey}-by-param-name-type`}
                     onChange={this.onChangeAdditionalParamRatingType(calc.get('rate_key', ''), rateCategory, usaget, priority, calcKey)}
+                    disabled={selectedRadio !== 3}
                     value={selectedRadio !== 3 ? '' : calc.get('type', '')}
                     options={this.getRatingTypes()}
                   />

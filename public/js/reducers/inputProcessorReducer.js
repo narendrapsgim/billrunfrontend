@@ -160,13 +160,12 @@ export default function (state = defaultState, action) {
         .getIn(['processor', 'usaget_mapping'])
         .map(usagetMap => usagetMap.get('usaget'))
         .countBy(key => (key === usaget ? 'found' : 'notfound')).get('found', 0);
-      const rateCalculators = state.get('rate_calculators', Immutable.Map()).map((calc, category) =>
-        calc.updateIn(['rate_calculators'], Immutable.Map(), (rateCalc) => {
-          if (countUsaget === 1) {
-            return rateCalc.deleteIn([category, usaget]);
-          }
-          return rateCalc;
-        }));
+      const rateCalculators = state.get('rate_calculators', Immutable.Map()).map((calc) => {
+        if (countUsaget === 1) {
+          return calc.delete(usaget);
+        }
+        return calc;
+      });
       return state
         .updateIn(['processor', 'usaget_mapping'], list => list.remove(action.index))
         .updateIn(['customer_identification_fields'], Immutable.Map(), (customerCalc) => {

@@ -43,8 +43,8 @@ export const getConfig = (key, defaultValue = null) => {
 
 export const titlize = str => changeCase.upperCaseFirst(str);
 
-export const getFieldName = (field, category) =>
-  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], field));
+export const getFieldName = (field, category, defaultValue = null) =>
+  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], defaultValue !== null ? defaultValue : field));
 
 export const getFieldNameType = (type) => {
   switch (type) {
@@ -108,8 +108,10 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'view': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        if (['subscription', 'customer'].includes(entityName)) {
-          return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        if (entityName === 'customer') {
+          return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
+        } else if (entityName === 'subscription') {
+          return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getSubscriberId(item)}]`;
         }
         return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
@@ -119,8 +121,10 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'update': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        if (['subscription', 'customer'].includes(entityName)) {
-          return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        if (entityName === 'customer') {
+          return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
+        } else if (entityName === 'subscription') {
+          return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getSubscriberId(item)}]`;
         }
         return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
@@ -472,3 +476,5 @@ export const getAvailableFields = (settings, additionalFields = []) => {
 export const escapeRegExp = (text) => {
   return text.toString().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 };
+
+export const createRateListNameByArgs = (query = Immutable.Map()) => query.reduce((acc, value, key) => `${acc}.${key}.${value}`, 'rates');
