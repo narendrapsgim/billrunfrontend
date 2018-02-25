@@ -105,7 +105,7 @@ const convert = (settings) => {
       usaget_mapping = processor.usaget_mapping.map(usaget => {
 	return {
 	  usaget: usaget.usaget,
-	  pattern: usaget.pattern.replace("/^", "").replace("$/", ""),
+	  pattern: usaget.pattern,
     unit: usaget.unit,
     volume_type: usaget.volume_type,
     volume_src: usaget.volume_src,
