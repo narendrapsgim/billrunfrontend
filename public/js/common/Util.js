@@ -108,8 +108,10 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'view': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        if (['subscription', 'customer'].includes(entityName)) {
-          return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        if (entityName === 'customer') {
+          return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
+        } else if (entityName === 'subscription') {
+          return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getSubscriberId(item)}]`;
         }
         return `${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
@@ -119,8 +121,10 @@ export const buildPageTitle = (mode, entityName, item = Immutable.Map()) => {
     case 'update': {
       const entitySettings = getConfig(['systemItems', entityName]);
       if (entitySettings) {
-        if (['subscription', 'customer'].includes(entityName)) {
-          return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)}`;
+        if (entityName === 'customer') {
+          return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getCustomerId(item)}]`;
+        } else if (entityName === 'subscription') {
+          return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${getFirstName(item)} ${getLastName(item)} [${getSubscriberId(item)}]`;
         }
         return `Update ${changeCase.titleCase(entitySettings.get('itemName', entitySettings.get('itemType', '')))} - ${item.get(entitySettings.get('uniqueField', ''), '')}`;
       }
