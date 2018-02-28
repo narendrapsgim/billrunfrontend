@@ -1,11 +1,15 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { titleCase } from 'change-case';
+import { titleCase, sentenceCase } from 'change-case';
 import { Form, FormGroup, ControlLabel, HelpBlock, Col, InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import { ServiceDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
 import EntityFields from '../Entity/EntityFields';
+import {
+  getFieldName,
+  getFieldNameType,
+} from '../../common/Util';
 
 
 export default class ServiceDetails extends Component {
@@ -99,7 +103,8 @@ export default class ServiceDetails extends Component {
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
-            Title<Help contents={ServiceDescription.description} />
+            { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
+            <Help contents={ServiceDescription.description} />
           </Col>
           <Col sm={8} lg={9}>
             <Field value={item.get('description', '')} onChange={this.onChangeDescription} editable={editable} />
@@ -109,7 +114,8 @@ export default class ServiceDetails extends Component {
         {['clone', 'create'].includes(mode) &&
           <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
             <Col componentClass={ControlLabel} sm={3} lg={2}>
-              Key <Help contents={ServiceDescription.name} />
+              { getFieldName('name', getFieldNameType('service'), sentenceCase('key'))}
+              <Help contents={ServiceDescription.name} />
             </Col>
             <Col sm={8} lg={9}>
               <Field value={item.get('name', '')} onChange={this.onChangeName} editable={editable} />
@@ -119,7 +125,9 @@ export default class ServiceDetails extends Component {
         }
 
         <FormGroup>
-          <Col componentClass={ControlLabel} sm={3} lg={2}>Price</Col>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>
+            { getFieldName('price', getFieldNameType('service'), sentenceCase('price'))}
+          </Col>
           <Col sm={4}>
             <Field value={item.getIn(['price', 0, 'price'], '')} onChange={this.onChangePrice} fieldType="price" editable={editable} />
           </Col>
@@ -128,7 +136,8 @@ export default class ServiceDetails extends Component {
         {['clone', 'create'].includes(mode) &&
           <FormGroup>
             <Col componentClass={ControlLabel} sm={3} lg={2}>
-              Eligibility Period <span className="danger-red"> *</span>
+              { getFieldName('period_type', getFieldNameType('service'), 'Eligibility Period')}
+              <span className="danger-red"> *</span>
             </Col>
             <Col sm={8} lg={9}>
               <span style={{ display: 'inline-block', marginRight: 20 }}>
@@ -154,7 +163,7 @@ export default class ServiceDetails extends Component {
                   value="custom_period"
                   label={
                     <span>
-                      Custom
+                      { getFieldName('custom_period_type', getFieldNameType('service'), 'Custom')}
                       <Help contents={ServiceDescription.service_period_type_custom_period} />
                     </span>
                   }

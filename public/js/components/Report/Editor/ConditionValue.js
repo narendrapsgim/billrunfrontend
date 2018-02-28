@@ -195,7 +195,9 @@ class ConditionValue extends Component {
 
     // String-select
     if ([config.get('type', 'string'), operator.get('type', '')].includes('string')
-      && (config.getIn(['inputConfig', 'inputType']) === 'select' || operator.has('options'))) {
+      && (config.getIn(['inputConfig', 'inputType']) === 'select' || operator.has('options'))
+      && ['eq', 'ne', 'nin', 'in'].includes(field.get('op', ''))
+    ) {
       const options = Immutable.List()
         .withMutations((optionsWithMutations) => {
           if (config.hasIn(['inputConfig', 'callback'])) {
