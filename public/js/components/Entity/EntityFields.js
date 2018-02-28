@@ -46,7 +46,7 @@ class EntityFields extends Component {
   }
 
   getParamsOptions = () => {
-    const { fields, fieldsFilter } = this.props;
+    const { fields, fieldsFilter, highlightPramas } = this.props;
     const fieldFilterFunction = fieldsFilter !== null ? fieldsFilter : this.filterPrintableFields;
     return fields
       .filter(fieldFilterFunction)
@@ -55,7 +55,8 @@ class EntityFields extends Component {
         label: titleCase(field.get('title', '')),
         value: field.get('field_name', '').split('.')[1],
       }),
-    );
+      )
+      .sort((a, b) => (highlightPramas.includes(`params.${a.value}`) ? -1 : 1));
   }
 
   onAddParam = (key) => {
