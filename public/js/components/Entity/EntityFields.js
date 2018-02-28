@@ -54,9 +54,8 @@ class EntityFields extends Component {
       .map(field => ({
         label: titleCase(field.get('title', '')),
         value: field.get('field_name', '').split('.')[1],
-      }),
-      )
-      .sort((a, b) => (highlightPramas.includes(`params.${a.value}`) ? -1 : 1));
+      }))
+      .sort(a => (highlightPramas.includes(`params.${a.value}`) ? -1 : 1));
   }
 
   onAddParam = (key) => {
