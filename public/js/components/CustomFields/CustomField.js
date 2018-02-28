@@ -34,23 +34,29 @@ class CustomField extends Component {
     cachedSelectOption: '',
   }
 
-  onChange = (e) => {
-    const { entity, idx, field } = this.props;
-    const { id, value } = e.target;
-    if (id === 'boolean') {
-      this.props.onChange(entity, idx, 'type', value ? 'boolean' : '');
+  onChangeType = (value) => {
+    const { entity, idx } = this.props;
+    if (value === 'text') {
+      this.props.onChange(entity, idx, 'type', '');
     } else {
-      this.props.onChange(entity, idx, id, value);
+      this.props.onChange(entity, idx, 'type', value);
     }
-    if (id === 'unique' && value === true) {
-      this.props.onChange(entity, idx, 'mandatory', true);
-    }
-    if (id === 'boolean' && value === true) {
+
+    if (value === 'boolean') {
       this.props.onChange(entity, idx, 'unique', false);
       this.props.onChange(entity, idx, 'mandatory', false);
       this.props.onChange(entity, idx, 'multiple', false);
       this.props.onChange(entity, idx, 'select_list', false);
       this.props.onChange(entity, idx, 'select_options', '');
+    }
+  }
+
+  onChange = (e) => {
+    const { entity, idx, field } = this.props;
+    const { id, value } = e.target;
+    this.props.onChange(entity, idx, id, value);
+    if (id === 'unique' && value === true) {
+      this.props.onChange(entity, idx, 'mandatory', true);
     }
     if (id === 'select_list' && value === false) {
       const cachedSelectOption = field.get('select_options', '');
@@ -75,7 +81,8 @@ class CustomField extends Component {
     this.setState({ showAdvancedEdit: true });
   };
 
-  isBoolean = field => field.get('type', '') === 'boolean';
+  getFieldType = field => (field.get('type', '') === '' ? 'text' : field.get('type', ''));
+  isBoolean = field => this.getFieldType(field) === 'boolean';
 
   renderAdvancedEdit = () => {
     const { field } = this.props;
@@ -88,10 +95,14 @@ class CustomField extends Component {
     const disableMandatory = isBoolean || field.get('unique', false) || !this.hasEditableField('mandatory');
     const disableBoolean = field.get('select_list', false) || field.get('unique', false);
     const disableMultiple = isBoolean || !this.hasEditableField('multiple');
-    const disableSearchable = isBoolean;
+    const disableSearchable = isBoolean || !this.hasEditableField('searchable');
     const disableSelectList = isBoolean || !this.hasEditableField('select_list');
     const disableSelectOptions = !field.get('select_list', false) || !this.hasEditableField('select_options');
-
+    const fieldTypesOptions = [
+      { value: 'text', label: 'Text' }, //must be first
+      { value: 'boolean', label: 'Boolean' },
+      { value: 'textarea', label: 'Text Area' },
+    ];
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
         <Form horizontal>
@@ -173,7 +184,7 @@ class CustomField extends Component {
                 className="inline mr10"
                 onChange={this.onChange}
                 value={field.get('searchable', '')}
-                disabled={!this.hasEditableField('searchable')}
+                disabled={disableSearchable}
               />
               {disableSearchable && (
                 <small style={{ color: '#626262' }}>Boolean field can not be searchable</small>
@@ -182,14 +193,15 @@ class CustomField extends Component {
           </FormGroup>
 
           <FormGroup>
-            <Col sm={3} componentClass={ControlLabel}>Boolean</Col>
+            <Col sm={3} componentClass={ControlLabel}>Field Type</Col>
             <Col sm={9} style={checkboxStyle}>
               <Field
-                fieldType="checkbox"
-                id="boolean"
-                onChange={this.onChange}
-                value={isBoolean}
+                fieldType="select"
+                options={fieldTypesOptions}
+                onChange={this.onChangeType}
+                value={this.getFieldType(field)}
                 disabled={disableBoolean}
+                clearable={false}
               />
             </Col>
           </FormGroup>
