@@ -49,6 +49,11 @@ class CustomField extends Component {
       this.props.onChange(entity, idx, 'select_list', false);
       this.props.onChange(entity, idx, 'select_options', '');
     }
+    if (value === 'textarea') {
+      this.props.onChange(entity, idx, 'multiple', false);
+      this.props.onChange(entity, idx, 'select_list', false);
+      this.props.onChange(entity, idx, 'select_options', '');
+    }
   }
 
   onChange = (e) => {
@@ -94,12 +99,12 @@ class CustomField extends Component {
     const disableUnique = isBoolean || !this.hasEditableField('unique');
     const disableMandatory = isBoolean || field.get('unique', false) || !this.hasEditableField('mandatory');
     const disableBoolean = field.get('select_list', false) || field.get('unique', false);
-    const disableMultiple = isBoolean || !this.hasEditableField('multiple');
+    const disableMultiple = this.getFieldType(field) !== 'text' || !this.hasEditableField('multiple');
     const disableSearchable = isBoolean || !this.hasEditableField('searchable');
-    const disableSelectList = isBoolean || !this.hasEditableField('select_list');
+    const disableSelectList = this.getFieldType(field) !== 'text' || !this.hasEditableField('select_list');
     const disableSelectOptions = !field.get('select_list', false) || !this.hasEditableField('select_options');
     const fieldTypesOptions = [
-      { value: 'text', label: 'Text' }, //must be first
+      { value: 'text', label: 'Text' }, // must be first because text is default option
       { value: 'boolean', label: 'Boolean' },
       { value: 'textarea', label: 'Text Area' },
     ];
@@ -218,7 +223,7 @@ class CustomField extends Component {
                 className="inline mr10"
               />
               {disableMultiple && (
-                <small style={{ color: '#626262' }}>Boolean field can not be multiple</small>
+                <small style={{ color: '#626262' }}>Only field of type Text can be multiple</small>
               )}
             </Col>
           </FormGroup>
