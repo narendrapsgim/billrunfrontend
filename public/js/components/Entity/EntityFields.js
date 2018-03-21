@@ -100,8 +100,7 @@ class EntityFields extends Component {
     const menuItems = options.map((option) => {
       const highlight = highlightPramas.includes(`params.${option.value}`);
       const menuItemClass = classNames({
-        disabled: !highlight,
-        'label-text': highlight,
+        'disable-label': !highlight,
       });
       const onSelect = () => { this.onAddParam(option.value); };
       return (
