@@ -152,6 +152,8 @@ class Product extends Component {
     return ((!fieldName.startsWith('params.') && field.get('field_name', '') !== 'tariff_category') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
   };
 
+  filterTariffCategory = field => (field.get('field_name', '') === 'tariff_category' && field.get('display', false) !== false && field.get('editable', false) !== false);
+
   renderPrices = () => {
     const { product, planName, usaget, mode } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
@@ -227,7 +229,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
-                fieldsFilter={this.filterCustomFields('tariff_category')}
+                fieldsFilter={this.filterTariffCategory}
                 editable={editable}
               />
 
