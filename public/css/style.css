@@ -90,6 +90,9 @@ fieldset[disabled] .btn {
 .active-blue {
   color: #008cba;
 }
+.label-text {
+  color: #222222;
+}
 .disabled-bg {
   background-color: #eeeeee;
 }
