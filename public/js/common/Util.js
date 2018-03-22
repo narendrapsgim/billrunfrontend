@@ -331,8 +331,7 @@ export const getValueByUnit = (propertyTypes, usageTypes, usaget, unit, value, t
   }
   const uom = getUom(propertyTypes, usageTypes, usaget);
   const u = (uom.find(propertyType => propertyType.get('name', '') === unit) || Immutable.Map()).get('unit', 1);
-  const returnedVal = value.split(',').map(val => (toBaseUnit ? (val * u) : (val / u))).join();
-  return returnedVal;
+  return (value.toString().split(',').map(val => (toBaseUnit ? (val * u) : (val / u))).join());
 };
 
 const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type) => {

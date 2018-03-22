@@ -316,6 +316,7 @@ class EventFormBalance extends Component {
               onChange={this.onChangeMultiValues}
               value={String(item.get('value', '')).split(',').filter(val => val !== '')}
               renderInput={this.renderCustomInputNumber}
+              onlyUnique={selectedConditionData.get('type', '') === 'tags'}
             />
           </Col>
         </FormGroup>)
