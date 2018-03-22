@@ -114,17 +114,17 @@ class RateMapping extends Component {
     let newRateKey = changeCase.snakeCase(rateKey);
     newRateKey = newRateKey.replace('params.', '');
     newRateKey = newRateKey.replace('params_', '');
-    const isNewField = custom && (rateKey !== '') && !(customRatingFields.find(field => field.get('field_name', '') === newRateKey || field.get('field_name', '') === `params.${newRateKey}`));
     newRateKey = `params.${newRateKey}`;
+    const isNewField = custom && (rateKey !== '') && !(customRatingFields.find(field => field.get('field_name', '') === newRateKey));
     if (isNewField) {
       this.addNewRatingCustomField(newRateKey, rateKey, value);
+      rateKey = newRateKey;
     } else {
-      let rateExists = customRatingFields.find(field => field.get('field_name', '') === newRateKey);
+      const rateExists = customRatingFields.find(field => field.get('field_name', '') === newRateKey);
       if (rateExists) {
-        rateExists = rateExists.get('title');
-        if (custom && rateKey !== '' && rateKey !== rateExists && rateKey !== newRateKey) {
+        if (custom && rateKey !== '' && rateKey !== rateExists.title && rateKey !== newRateKey) {
           this.props.dispatch(showWarning(`Product param ${rateKey} already exists as custom field ${newRateKey}`));
-          rateKey = rateExists;
+          rateKey = rateExists.title;
         }
       }
     }
