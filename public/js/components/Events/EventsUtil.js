@@ -88,7 +88,7 @@ export const getEventConvertedConditions = (propertyTypes, usageTypes, item, toB
       if (unit !== '' && usaget !== '') {
         const value = cond.get('value', 0);
         const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
-        conditionsWithMutations.setIn([index, 'value'], parseFloat(newValue));
+        conditionsWithMutations.setIn([index, 'value'], newValue);
       }
     });
   });
