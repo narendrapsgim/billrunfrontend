@@ -65,6 +65,7 @@ class EntityFields extends Component {
   filterPrintableFields = field => (
     field.get('display', false) !== false
     && field.get('editable', false) !== false
+    && field.get('field_name', '') !== 'tariff_category'
   );
 
   filterParamsFields = (field) => {
