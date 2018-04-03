@@ -276,7 +276,7 @@ const getOptionCallback = (state, props) => {
     case 'getFileTypeOptions': return fileTypeSelector(state, props);
     case 'getCalcNameOptions': return calcNameSelector(state, props);
     case 'getEventCodeOptions': return eventCodeSelector(state, props);
-    default: return () => {};
+    default: return undefined;
   }
 };
 
