@@ -9,6 +9,7 @@ import Field from '../../Field';
 import Actions from '../../Elements/Actions';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import { validateUnlimitedValue, validatePriceValue } from '../../../common/Validators';
+import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
 
 
 export default class PlanIncludeGroupEdit extends Component {
@@ -29,6 +30,8 @@ export default class PlanIncludeGroupEdit extends Component {
     mode: PropTypes.string,
     onGroupRemove: PropTypes.func.isRequired,
     unit: PropTypes.string,
+    usaget: PropTypes.string,
+    usageTypes: PropTypes.instanceOf(Immutable.List),
   }
 
   static defaultProps = {
@@ -38,12 +41,16 @@ export default class PlanIncludeGroupEdit extends Component {
     pooled: false,
     mode: 'create',
     unit: '',
+    usaget: '',
+    usageTypes: Immutable.List(),
   };
 
   state = {
     isEditMode: false,
     showConfirm: false,
     errorInclude: '',
+    errorUoM: '',
+    unit: '',
   }
 
   errors = {
@@ -54,6 +61,9 @@ export default class PlanIncludeGroupEdit extends Component {
     },
     products: {
       required: 'Products is required',
+    },
+    uom: {
+      required: 'Units are required',
     },
   }
 
@@ -101,6 +111,13 @@ export default class PlanIncludeGroupEdit extends Component {
     this.props.onChangeGroupProducts(name, productKey);
   }
 
+  onChangeUnit = (uom) => {
+    const { name, usageTypes } = this.props;
+    const errorUoM = uom === '' ? this.errors.uom.required : '';
+    this.setState({ unit: uom, errorUoM });
+    usageTypes.forEach(usaget => this.props.onChangeFieldValue(['include', 'groups', name, 'usage_types', usaget, 'unit'], uom));
+  }
+
   onGroupRemoveAsk = () => {
     this.setState({ showConfirm: true });
   }
@@ -116,7 +133,10 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   toggleBoby = () => {
-    this.setState({ isEditMode: !this.state.isEditMode });
+    const { errorInclude, errorUoM } = this.state;
+    if (errorInclude === '' && errorUoM === '') {
+      this.setState({ isEditMode: !this.state.isEditMode });
+    }
   }
 
   getListActions = () => {
@@ -135,8 +155,8 @@ export default class PlanIncludeGroupEdit extends Component {
   )
 
   renderEdit = () => {
-    const { name, value, usages, shared, pooled, products, usedProducts } = this.props;
-    const { isEditMode, errorInclude } = this.state;
+    const { name, value, usages, shared, pooled, products, usedProducts, usaget, unit } = this.props;
+    const { isEditMode, errorInclude, errorUoM } = this.state;
     return (
       <Modal show={isEditMode}>
         <Modal.Header closeButton={false}>
@@ -144,14 +164,25 @@ export default class PlanIncludeGroupEdit extends Component {
         </Modal.Header>
         <Modal.Body>
           <Form horizontal style={{ marginBottom: 0 }}>
-            <FormGroup validationState={errorInclude.length > 0 ? 'error' : null}>
+            <FormGroup validationState={errorInclude.length > 0 || errorUoM.length > 0 ? 'error' : null}>
               <Col componentClass={ControlLabel} sm={3}>Include</Col>
-              <Col sm={8}>
+              <Col sm={5}>
                 {this.isMonetaryBased()
                   ? <Field onChange={this.onChangeIncludeMonetaryBased} value={value} fieldType="text" />
                   : <Field onChange={this.onChangeInclud} value={value} fieldType="unlimited" />
                 }
                 { errorInclude.length > 0 && <HelpBlock>{errorInclude}</HelpBlock> }
+              </Col>
+              <Col sm={3}>
+                <UsageTypesSelector
+                  showSelectTypes={false}
+                  showUnits={true}
+                  enabled={true}
+                  usaget={usaget}
+                  onChangeUnit={this.onChangeUnit}
+                  unit={unit}
+                />
+                { errorUoM.length > 0 && <HelpBlock>{errorUoM}</HelpBlock> }
               </Col>
             </FormGroup>
 
