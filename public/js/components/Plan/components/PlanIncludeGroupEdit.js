@@ -173,17 +173,18 @@ export default class PlanIncludeGroupEdit extends Component {
                 }
                 { errorInclude.length > 0 && <HelpBlock>{errorInclude}</HelpBlock> }
               </Col>
-              <Col sm={3}>
-                <UsageTypesSelector
-                  showSelectTypes={false}
-                  showUnits={true}
-                  enabled={true}
-                  usaget={usaget}
-                  onChangeUnit={this.onChangeUnit}
-                  unit={unit}
-                />
-                { errorUoM.length > 0 && <HelpBlock>{errorUoM}</HelpBlock> }
-              </Col>
+              {!this.isMonetaryBased() &&
+                <Col sm={3}>
+                  <UsageTypesSelector
+                    showSelectTypes={false}
+                    showUnits={true}
+                    enabled={true}
+                    usaget={usaget}
+                    onChangeUnit={this.onChangeUnit}
+                    unit={unit}
+                  />
+                  { errorUoM.length > 0 && <HelpBlock>{errorUoM}</HelpBlock> }
+                </Col>}
             </FormGroup>
 
             <FormGroup>
