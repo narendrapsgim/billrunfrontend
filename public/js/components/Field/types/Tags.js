@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import TagsInput from 'react-tagsinput';
 
 const Tags = (props) => {
-  const { editable, value, disabled, placeholder, onChange, inputProps, ...otherProps } = props;
+  const { editable, value, disabled, placeholder, onChange, inputProps, onlyUnique, ...otherProps } = props;
 
   const renderTag = (args) => {
     const { tag, key, disabled: allowRemove, onRemove, classNameRemove, getTagDisplayValue, ...other } = args;
@@ -31,6 +31,7 @@ const Tags = (props) => {
       inputProps={tagInputProps}
       disabled={disabled}
       renderTag={renderTag}
+      onlyUnique={onlyUnique}
     />
   );
 };
@@ -44,6 +45,7 @@ Tags.defaultProps = {
   inputProps: {},
   onChange: () => {},
   getTagDisplayValue: null,
+  onlyUnique: false,
 };
 
 Tags.propTypes = {
@@ -57,6 +59,7 @@ Tags.propTypes = {
   inputProps: PropTypes.object,
   onChange: PropTypes.func,
   getTagDisplayValue: PropTypes.func,
+  onlyUnique: PropTypes.bool,
 };
 
 export default Tags;

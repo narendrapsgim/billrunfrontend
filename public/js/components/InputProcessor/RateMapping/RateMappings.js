@@ -9,6 +9,7 @@ import { ConfirmModal } from '../../../components/Elements';
 import { addRateCategory, removeRateCategory } from '../../../actions/inputProcessorActions';
 import { rateCategoriesSelector } from '../../../selectors/settingsSelector';
 import { formatSelectOptions } from '../../../common/Util';
+import { showDanger } from '../../../actions/alertsActions';
 
 class RateMappings extends Component {
   static propTypes = {
@@ -46,7 +47,11 @@ class RateMappings extends Component {
 
   onAddNewRateCategory = () => {
     const { newCategory } = this.state;
-    this.props.dispatch(addRateCategory(newCategory));
+    if (newCategory === undefined || newCategory === '') {
+      this.props.dispatch(showDanger('Please choose rate category'));
+    } else {
+      this.props.dispatch(addRateCategory(newCategory));
+    }
     this.setState({ newCategory: '' });
   }
 
