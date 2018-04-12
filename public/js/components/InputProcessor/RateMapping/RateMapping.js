@@ -250,8 +250,10 @@ class RateMapping extends Component {
       if (path[0] === 'operator') {
         const changeFromRegex = computedLineKey.get('operator', '') === '$regex' && value !== '$regex';
         const changeToRegex = computedLineKey.get('operator', '') !== '$regex' && value === '$regex';
-        if (changeFromRegex || changeToRegex) {
+        const operatorExists = value === '$exists' || value === '$existsFalse';
+        if (changeFromRegex || changeToRegex || operatorExists) {
           computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
+          computedLineKeyWithMutations.deleteIn(['line_keys', 0, 'regex']);
         }
       }
       if (value === 'hard_coded') {
