@@ -1,6 +1,8 @@
 {
 	"conditions": [
 		{ "key": "$eq", "title": "Equal" },
+		{ "key": "$exists", "title": "Exists" },
+		{ "key": "$existsFalse", "title": "Does Not Exist" },
 		{ "key": "$lt", "title": "Is Less Than" },
 		{ "key": "$lte", "title": "Is Less Than Or Equal" },
 		{ "key": "$gt", "title": "Is Greater Than" },
