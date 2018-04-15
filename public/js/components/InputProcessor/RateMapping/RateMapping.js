@@ -273,10 +273,12 @@ class RateMapping extends Component {
     const { computedLineKey } = this.state;
     const newComputedLineKey = computedLineKey.withMutations((computedLineKeyWithMutations) => {
       computedLineKeyWithMutations.set('type', value);
-      computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
-      computedLineKeyWithMutations.delete('operator');
-      computedLineKeyWithMutations.delete('must_met');
-      computedLineKeyWithMutations.delete('projection');
+      if (value === 'regex') {
+        computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
+        computedLineKeyWithMutations.delete('operator');
+        computedLineKeyWithMutations.delete('must_met');
+        computedLineKeyWithMutations.delete('projection');
+      }
     });
     this.setState({
       computedLineKey: newComputedLineKey,

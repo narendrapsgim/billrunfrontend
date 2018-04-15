@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Button, Panel, InputGroup } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Button, Panel } from 'react-bootstrap';
 import Select from 'react-select';
 import moment from 'moment';
-import { titleCase } from 'change-case';
+import SubscriptionServicesDetails from './SubscriptionServicesDetails';
 import ActionButtons from '../Elements/ActionButtons';
 import Actions from '../Elements/Actions';
 import Field from '../Field';
@@ -14,7 +15,6 @@ import EntityFields from '../Entity/EntityFields';
 import {
   getConfig,
   getItemId,
-  getFieldName,
   getItemMode,
   getItemDateValue,
   buildPageTitle,
@@ -64,22 +64,62 @@ class Subscription extends Component {
   onSave = () => {
     const { subscription } = this.state;
     const { mode } = this.props;
-    this.props.onSave(subscription, mode);
+    // prosses subscriber before save
+    const subscriptionToSave = compose(
+      this.removeServiceUiFlags,
+      // Now update services dates runs of sub. From field change,
+      // can be uncommet to be shure that servises date are correct if bugs will be found
+      // this.updateServicesDates,
+    )(subscription);
+
+    this.props.onSave(subscriptionToSave, mode);
   }
+
+  updateServicesDates = (subscription, newFrom = null) => {
+    const { subscription: originSubscription } = this.props;
+    const originServices = originSubscription.get('services', Immutable.List()) || Immutable.List();
+    // const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const from = newFrom || getItemDateValue(subscription, 'from').toISOString();
+
+    return subscription.update('services', Immutable.List(), (services) => {
+      if (!services) {
+        return Immutable.List();
+      }
+      return services.map((service) => {
+        const serviceType = this.getServiceType(service); // 'normal', 'quantitative', 'balance_period'
+        const existingService = originServices.find(originService => originService.get('service_id', '') === service.get('service_id', ''));
+        const newService = service.get('service_id', '') === '';
+
+        switch (serviceType) {
+          case 'normal': // New -> update to SUB from.
+            return (newService) ? service.set('from', from) : service;
+
+          case 'quantitative': { // New or Existing with change -> update to SUB from.
+            const existingServiceWithChange = existingService && existingService.get('quantity', '') !== service.get('quantity', '');
+            return (newService || existingServiceWithChange) ? service.set('from', from) : service;
+          }
+
+          case 'balance_period': {
+            const existingServiceWithChange = existingService && !moment(existingService.get('from', '')).isSame(moment(service.get('from', '')), 'days');
+            const incorrectForm = moment(service.get('from', '')).isBefore(from, 'days');
+            // New or Existing with change and incorrect FROM -> Update from to SUB from
+            return ((newService || existingServiceWithChange) && incorrectForm) ? service.set('from', from) : service;
+          }
+
+          default:
+            return service;
+        }
+      });
+    });
+  }
+
+  removeServiceUiFlags = subscription => subscription.update('services', Immutable.List(),
+    services => (services ? services.map(service => service.delete('ui_flags')) : Immutable.List()),
+  );
 
   onChangeFrom = (path, value) => {
     const { subscription } = this.state;
-    // update FROM field to added services
-    const services = subscription.get('services', Immutable.List()) || Immutable.List();
-    const servicesList = services.map(service => service.get('name', '')).toArray();
-    const to = getItemDateValue(subscription, 'to', moment().add(100, 'years')).toISOString();
-    const from = moment(value).toISOString();
-    const newServices = this.updateServicesDates(servicesList, from, to);
-    const newSubscription = subscription.withMutations(subscriptionWithMutations =>
-      subscriptionWithMutations
-        .setIn(path, value)
-        .set('services', newServices)
-    );
+    const newSubscription = this.updateServicesDates(subscription.setIn(path, value));
     this.setState({ subscription: newSubscription });
   }
 
@@ -87,72 +127,90 @@ class Subscription extends Component {
     this.updateSubscriptionField(['plan'], plan);
   }
 
-  onChangeServiceQuantity = (serviceName, e) => {
-    const { value } = e.target;
+  onChangeServiceDetails = (index, key, value) => {
+    const path = Array.isArray(key) ? key : [key];
+    this.updateSubscriptionField(['services', index, ...path], value);
+  }
+
+  onRemoveService = (index) => {
     const { subscription } = this.state;
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
-    const serviceIndex = services.findIndex(service => service.get('name', '') === serviceName);
-    if (serviceIndex > -1) {
-      const fixedValue = value > 1 ? value : 1; // not possible to add 0 for quantity service
-      const newService = services.get(serviceIndex, Immutable.Map())
-        .withMutations((servicesWithMutations) => {
-          servicesWithMutations
-            .set('quantity', fixedValue)
-            .set('from', getItemDateValue(subscription, 'from').toISOString());
-        });
-      this.updateSubscriptionField(['services', serviceIndex], newService);
+    const newServices = services.delete(index);
+    this.updateSubscriptionField(['services'], newServices);
+  }
+
+  getServiceType = (service) => {
+    const { allServices } = this.props;
+    const serviceName = (Immutable.Map.isMap(service)) ? service.get('name', '') : service;
+    const serviceOption = allServices.find(option => option.get('name', '') === serviceName);
+    if (!serviceOption) {
+      return null;
+    }
+    if (serviceOption.get('quantitative', false)) {
+      return 'quantitative';
+    }
+    if (serviceOption.get('balance_period', 'default') !== 'default') {
+      return 'balance_period';
+    }
+    return 'normal';
+  }
+
+  onAddService = (name) => {
+    const { subscription } = this.state;
+    const newService = this.initService(name);
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const newServices = services.push(newService);
+    this.updateSubscriptionField(['services'], newServices);
+  }
+
+  initService = (serviceName) => {
+    const { subscription: originSubscription } = this.props;
+    const { subscription } = this.state;
+    const type = this.getServiceType(serviceName);
+    const from = getItemDateValue(subscription, 'from').format('YYYY-MM-DD');
+    const to = getItemDateValue(subscription, 'to', moment().add(100, 'years')).toISOString();
+    const newService = Immutable.Map({ name: serviceName, from, to });
+    const originServices = originSubscription.get('services', Immutable.List()) || Immutable.List();
+    const existingService = originServices.find(originService => originService.get('name', '') === serviceName);
+
+    switch (type) {
+      case 'quantitative': {
+        return (existingService && existingService.get('quantity', '') === 1) ? existingService : newService.set('quantity', 1);
+      }
+      case 'balance_period': {
+        return newService.setIn(['ui_flags', 'balance_period'], true);
+      }
+      default: {
+        return existingService || newService;
+      }
     }
   }
 
   onChangeService = (services) => {
     const { subscription } = this.state;
-    const servicesList = (services.length) ? services.split(',') : [];
-    const from = getItemDateValue(subscription, 'from').format('YYYY-MM-DD');
-    const to = getItemDateValue(subscription, 'to', moment().add(100, 'years')).toISOString();
-    const newServices = this.updateServicesDates(servicesList, from, to);
-    this.updateSubscriptionField(['services'], newServices);
-  }
-
-  updateServicesDates = (servicesNames, from, to) => {
-    const { subscription, allServices } = this.props;
-    const { subscription: currentSubscription } = this.state;
+    if (!services.length) {
+      this.updateSubscriptionField(['services'], Immutable.List());
+      return;
+    }
+    const servicesNames = Immutable.Set(services.split(','));
     const originServices = subscription.get('services', Immutable.List()) || Immutable.List();
-    return Immutable.List().withMutations((servicesWithMutations) => {
-      if (servicesNames.length) {
-        servicesNames.forEach((name) => {
-          // get existting or create new
-          let service = originServices.find(
-            originService => originService.get('name') === name,
-            null,
-            Immutable.Map({ name, from, to })
-          );
-          // if service type quantitative,
-          // for new -> set default quantity.
-          // for existing -> set existing quantity.
-          const serviceOption = allServices.find(option => option.get('name', '') === name);
-          if (serviceOption.get('quantitative', false) === true) {
-            const currentServices = currentSubscription.get('services', Immutable.List()) || Immutable.List();
-            const quantity = currentServices.find(
-              currentService => currentService.get('name') === name,
-              null,
-              Immutable.Map()
-            ).get('quantity', 1);
-            service = service.set('quantity', quantity);
+    const originServicesNames = Immutable.Set(originServices.map(originServic => originServic.get('name', '')));
+
+    const addedServices = servicesNames.filter(item => !originServicesNames.has(item));
+    const removedServices = originServicesNames.filter(item => !servicesNames.has(item));
+
+    if (addedServices.size) {
+      addedServices.forEach((newServiceName) => { this.onAddService(newServiceName); });
+    }
+    if (removedServices.size) {
+      removedServices.forEach((removeService) => {
+        originServices.forEach((originService, index) => {
+          if (originService.get('name', '') === removeService) {
+            this.onRemoveService(index);
           }
-          // if service is by 'custom_period' -> don't reset the 'from' date to Subscriber 'from' date
-          if (serviceOption.get('balance_period', 'default') !== 'default') {
-            const currentServices = currentSubscription.get('services', Immutable.List()) || Immutable.List();
-            const originFrom = currentServices.find(
-              currentService => currentService.get('name') === name,
-              null,
-              Immutable.Map(),
-            ).get('from', from);
-            service = service.set('from', originFrom);
-          }
-          servicesWithMutations.push(service);
         });
-      }
-    });
+      });
+    }
   }
 
   onShowCreditCharge = () => {
@@ -205,7 +263,7 @@ class Subscription extends Component {
     const plansOptions = this.getAvailablePlans().toJS();
     const servicesOptions = this.getAvailableServices().toJS();
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
-    const servicesList = services.map(service => service.get('name', '')).join(',');
+    const servicesList = Immutable.Set(services.map(service => service.get('name', ''))).join(',');
     const plan = subscription.get('plan', '');
     return ([(
       <FormGroup key="plan">
@@ -223,7 +281,7 @@ class Subscription extends Component {
       </FormGroup>
     ), (
       <FormGroup key="includedServices">
-        <Col componentClass={ControlLabel} sm={2}>Included Services</Col>
+        <Col componentClass={ControlLabel} sm={3} lg={2}>Included Services</Col>
         <Col sm={7}>
           <Field value={this.getPlanIncludedServices(plan)} editable={false} />
         </Col>
@@ -238,91 +296,13 @@ class Subscription extends Component {
               value={servicesList}
               options={servicesOptions}
               onChange={this.onChangeService}
+              clearable={false}
             />
-            : <Field value={servicesList} editable={false} />
+          : <Field value={servicesList.replace(/,/g, ', ')} editable={false} />
           }
         </Col>
       </FormGroup>
     )]);
-  }
-
-  renderServicesQuentity = (editable) => {
-    const { subscription } = this.state;
-    const { allServices } = this.props;
-    const services = subscription.get('services', Immutable.List()) || Immutable.List();
-    return services
-      .filter(service => service.get('quantity', null) !== null)
-      .map((service, key) => {
-        const serviceName = allServices.find(
-          allService => allService.get('name', '') === service.get('name', ''),
-          null,
-          Immutable.Map(),
-        ).get('description', service.get('name', ''));
-        const serviceKey = service.get('name', '');
-        const onChangeBind = (e) => { this.onChangeServiceQuantity(serviceKey, e); };
-        return (
-          <FormGroup key={`quentity_${key}`}>
-            <Col componentClass={ControlLabel} sm={3} lg={2}>
-              {serviceName}
-            </Col>
-            <Col sm={8} lg={9}>
-              <InputGroup>
-                <Field fieldType="number" min={1} value={service.get('quantity', '')} onChange={onChangeBind} editable={editable} />
-                <InputGroup.Addon>quantity</InputGroup.Addon>
-              </InputGroup>
-            </Col>
-          </FormGroup>
-        );
-      })
-      .toArray();
-  }
-
-  onChangePeriodStartDate = (name, newDate) => {
-    const { subscription } = this.state;
-    const services = subscription.get('services', Immutable.List()) || Immutable.List();
-    const serviceIndex = services.findIndex(service => service.get('name', '') === name);
-    if (serviceIndex !== -1) {
-      this.updateSubscriptionField(['services', serviceIndex, 'from'], newDate.toISOString());
-    }
-  }
-
-  renderServicesByPeriod = (editable) => {
-    const { subscription } = this.state;
-    const { allServices } = this.props;
-    const services = subscription.get('services', Immutable.List()) || Immutable.List();
-    return services
-      .map((service) => {
-        const serviceBalancePeriod = allServices.find(
-          allService => allService.get('name', '') === service.get('name', ''),
-          null,
-          Immutable.Map(),
-        ).get('balance_period', 'default');
-        return service.set('balance_period', serviceBalancePeriod);
-      })
-      .filter(service => service.get('balance_period', 'default') !== 'default')
-      .map((service, key) => {
-        const serviceName = allServices.find(
-          allService => allService.get('name', '') === service.get('name', ''),
-          null,
-          Immutable.Map(),
-        ).get('description', service.get('name', ''));
-        const serviceKey = service.get('name', '');
-        const onChangeBind = (e) => { this.onChangePeriodStartDate(serviceKey, e); };
-        return (
-          <FormGroup key={`byPeriod_${key}`}>
-            <Col componentClass={ControlLabel} sm={3} lg={2}>
-              {serviceName}
-            </Col>
-            <Col sm={8} lg={9}>
-              <InputGroup>
-                <InputGroup.Addon>Start Date</InputGroup.Addon>
-                <Field fieldType="date" min={1} value={moment(service.get('from', ''))} onChange={onChangeBind} editable={editable} />
-              </InputGroup>
-            </Col>
-          </FormGroup>
-        );
-      })
-      .toArray();
   }
 
   renderCreditCharge = () => {
@@ -376,11 +356,13 @@ class Subscription extends Component {
 
   render() {
     const { progress, subscription } = this.state;
-    const { revisions, mode } = this.props;
+    const { revisions, mode, allServices, subscription: originSubscription } = this.props;
     const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
-    const servicesQuentity = this.renderServicesQuentity(allowEdit);
-    const servicesByPeriod = this.renderServicesByPeriod(allowEdit);
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const subscriptionFrom = getItemDateValue(subscription, 'from');
+    const originServices = originSubscription.get('services', Immutable.List()) || Immutable.List();
+
     return (
       <div className="Subscription">
         <Panel header={this.renderPanelTitle()}>
@@ -402,14 +384,16 @@ class Subscription extends Component {
 
           <Form horizontal>
             { this.renderSystemFields(allowEdit) }
-            { (servicesQuentity.length + servicesByPeriod.length > 0) ? (
-              <Panel header="Services Details">
-                {servicesQuentity}
-                {servicesQuentity.length > 0 && servicesByPeriod.length > 0 && <hr />}
-                {servicesByPeriod}
-              </Panel>
-              ) : (<hr />)
-            }
+            <SubscriptionServicesDetails
+              subscriptionServices={services}
+              originSubscriptionServices={originServices}
+              servicesOptions={allServices}
+              editable={allowEdit}
+              subscriptionFrom={subscriptionFrom}
+              onChangeService={this.onChangeServiceDetails}
+              onRemoveService={this.onRemoveService}
+              onAddService={this.onAddService}
+            />
             <EntityFields
               entityName={['subscribers', 'subscriber']}
               entity={subscription}
