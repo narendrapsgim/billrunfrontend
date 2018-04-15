@@ -136,7 +136,8 @@ class ConditionValue extends Component {
 
   onChangeDate = (date) => {
     if (moment.isMoment(date) && date.isValid()) {
-      this.props.onChange(date.toISOString());
+      const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD');
+      this.props.onChange(date.format(apiDateTimeFormat));
     } else {
       this.props.onChange(null);
     }
@@ -151,8 +152,9 @@ class ConditionValue extends Component {
   renderDateTag = value => moment(value).format(getConfig('dateFormat', 'DD/MM/YYYY'));
 
   renderCustomInputDate = ({ addTag, disabled }) => {
+    const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD');
     const onChange = (date) => {
-      addTag(date.toISOString());
+      addTag(date.format(apiDateTimeFormat));
     };
     return (
       <span className="custom-field-input">
