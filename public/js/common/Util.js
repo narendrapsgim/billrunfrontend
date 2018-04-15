@@ -424,6 +424,10 @@ export const getGroupUsaget = group => (group.get('cost', false) !== false
   ? 'cost'
   : group.get('usage_types', Immutable.Map()).keySeq().get(0, false));
 
+export const getGroupUsageTypes = group => (group.get('cost', false) !== false
+  ? 'cost'
+  : Immutable.List(group.get('usage_types', Immutable.Map()).keySeq().toArray()));
+
 export const isGroupMonetaryBased = group => getGroupUsaget(group) === 'cost';
 
 export const getGroupValue = group => (isGroupMonetaryBased(group)
