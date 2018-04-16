@@ -14,12 +14,13 @@ export default class GatewayParamsModal extends Component {
       },
       connections: [],
       activeTab: 1,
+      connection: {},
     };
   }
 
   componentWillReceiveProps(nextProps) {
     const { gateway, settings } = nextProps;
-    if (gateway) return this.setState({gateway: gateway.toJS()});
+    if (gateway) return this.setState({ connection: gateway.getIn(['receiver', 'connections', 0]).toJS(), gateway: gateway.toJS()});
     return this.setState({gateway: {name: settings.get('name'), params: {}}});
   }
 
@@ -40,8 +41,7 @@ export default class GatewayParamsModal extends Component {
 
   onChangeReceiverValue = (e) => {
     const { id, value } = e.target;
-    const { gateway, connections } = this.state;
-    const connection = {};
+    const { gateway, connections, connection } = this.state;
 
     connection[id] = value;
     if (connections.length > 0) {
@@ -50,13 +50,12 @@ export default class GatewayParamsModal extends Component {
       connections.push(connection);
     }
 
-    this.setState({ gateway: Object.assign({}, gateway, {
-      receiver: Object.assign({}, gateway.receiver, {
-        connections,
-      }),
-    }) });
-
-
+    this.setState({ connection,
+      gateway: Object.assign({}, gateway, {
+        receiver: Object.assign({}, gateway.receiver, {
+          connections,
+        }),
+      }) });
   };
 
   onChangeExportValue = (e) => {
