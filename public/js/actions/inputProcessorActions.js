@@ -42,6 +42,8 @@ export const SET_PARSER_SETTING = 'SET_PARSER_SETTING';
 export const SET_PROCESSOR_TYPE = 'SET_PROCESSOR_TYPE';
 export const SET_REALTIME_FIELD = 'SET_REALTIME_FIELD';
 export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
+export const REMOVE_RECEIVER = 'REMOVE_RECEIVER'
+export const ADD_RECEIVER = 'ADD_RECEIVER'
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
@@ -68,7 +70,7 @@ const convert = (settings) => {
           filters = []
         } = settings;
 
-  const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
+  const connections = receiver ? (receiver.connections ? receiver.connections: {}) : {};
   const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : [];
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
                       "static" :
@@ -402,6 +404,22 @@ export function removeRatingField(rateCategory, usaget, priority, index) {
   };
 }
 
+export function removeReceiver(receiver, index) {
+  return {
+    type: REMOVE_RECEIVER,
+    receiver,
+    index,
+  };
+}
+
+export function addReceiver(receiver, index) {
+  return {
+    type: ADD_RECEIVER,
+    receiver,
+    index,
+  };
+}
+
 export function setLineKey(rateCategory, usaget, priority, index, value) {
   return {
     type: SET_LINE_KEY,
@@ -431,11 +449,12 @@ export function unsetComputedLineKey(rateCategory, usaget, priority, index) {
   };
 }
 
-export function setReceiverField(field, mapping) {
+export function setReceiverField(field, mapping, index) {
   return {
     type: SET_RECEIVER_FIELD,
     field,
-    mapping
+    mapping,
+    index,
   };
 }
 

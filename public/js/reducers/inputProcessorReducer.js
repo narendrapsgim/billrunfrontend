@@ -40,7 +40,9 @@ import { SET_NAME,
          CHANGE_CSV_FIELD,
 	 UNSET_FIELD,
          SET_REALTIME_FIELD,
-         SET_REALTIME_DEFAULT_FIELD } from '../actions/inputProcessorActions';
+         SET_REALTIME_DEFAULT_FIELD,
+         REMOVE_RECEIVER,
+         ADD_RECEIVER } from '../actions/inputProcessorActions';
 
 const defaultState = Immutable.fromJS({
   file_type: '',
@@ -249,6 +251,16 @@ export default function (state = defaultState, action) {
       return state.updateIn(['rate_calculators', rateCategory, usaget, priority], list => list.remove(index));
     }
 
+    case REMOVE_RECEIVER: {
+      const { index } = action;
+      return state.update('receiver', list => list.remove(index));
+    }
+
+    case ADD_RECEIVER: {
+      const newReceiver = Immutable.fromJS({});
+      return state.update('receiver', list => list.push(newReceiver));
+    }
+
     case SET_LINE_KEY:
       var { value, rateCategory, usaget } = action;
       return state.setIn(['rate_calculators', rateCategory, usaget, priority, index, 'line_key'], value);
@@ -264,7 +276,7 @@ export default function (state = defaultState, action) {
       return state.deleteIn(['rate_calculators', action.rateCategory, action.usaget, action.priority, action.index, 'computed']);
 
     case SET_RECEIVER_FIELD:
-      return state.setIn(['receiver', field], mapping);
+      return state.setIn(['receiver', index, field], mapping);
 
     case CANCEL_KEY_AUTH:
       return state.deleteIn(['receiver', 'key']);

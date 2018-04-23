@@ -11,7 +11,7 @@ import FieldsMapping from './FieldsMapping';
 import CustomerMappings from './CustomerMapping/CustomerMappings';
 import RateMappings from './RateMapping/RateMappings';
 import PricingMappings from './PricingMapping/PricingMappings';
-import Receiver from './Receiver';
+import Receiver from './Receiver/Receiver';
 import RealtimeMapping from './RealtimeMapping';
 import {
   setProcessorType,
@@ -319,18 +319,16 @@ class InputProcessor extends Component {
     this.props.dispatch(setPricingMapping(field, mapping, usaget));
   }
 
-  onSetReceiverField = (e) => {
-    const { id, value } = e.target;
-    this.props.dispatch(setReceiverField(id, value));
+  onSetReceiverField = (id, value, index) => {
+    this.props.dispatch(setReceiverField(id, value, index));
   }
 
   onCancelKeyAuth = () => {
     this.props.dispatch(cancelKeyAuth('key'));
   }
 
-  onSetReceiverCheckboxField = (e) => {
-    const { id, checked } = e.target;
-    this.props.dispatch(setReceiverField(id, checked));
+  onSetReceiverCheckboxField = (id, checked, index) => {
+    this.props.dispatch(setReceiverField(id, checked, index));
   }
 
   onMoveFieldUp = (index) => {
@@ -508,7 +506,7 @@ class InputProcessor extends Component {
       case steps.get('receiver', {}).idx: return (
         <Receiver
           action={action}
-          settings={settings.get('receiver', Immutable.Map())}
+          settings={settings}
           onSetReceiverField={this.onSetReceiverField}
           onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}
           onCancelKeyAuth={this.onCancelKeyAuth}
