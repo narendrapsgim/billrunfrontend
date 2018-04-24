@@ -10,8 +10,10 @@ import Actions from './Actions';
 import SortableFieldsContainer from './SortableFieldsContainer';
 import DragHandle from './DragHandle';
 import ZoneDate from './ZoneDate';
+import WithEntityLink from './WithEntityLink';
 
 export {
+  WithEntityLink,
   ActionButtons,
   DiffModal,
   LoadingItemPlaceholder,
