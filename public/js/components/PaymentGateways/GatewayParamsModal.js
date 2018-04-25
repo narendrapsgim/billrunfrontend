@@ -20,7 +20,9 @@ export default class GatewayParamsModal extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { gateway, settings } = nextProps;
-    if (gateway) return this.setState({ connection: gateway.getIn(['receiver', 'connections', 0]).toJS(), gateway: gateway.toJS()});
+    const currentConnection = gateway.getIn(['receiver', 'connections', 0]) === undefined ? {} :
+      gateway.getIn(['receiver', 'connections', 0]).toJS();
+    if (gateway) return this.setState({ connection: currentConnection, gateway: gateway.toJS()});
     return this.setState({gateway: {name: settings.get('name'), params: {}}});
   }
 
@@ -113,25 +115,7 @@ export default class GatewayParamsModal extends Component {
           </Panel>
         </Tab>
 
-        <Tab title="File Based Receiver" eventKey={2}>
-          <Panel style={{ borderTop: 'none' }}>
-            <form className="form-horizontal">
-              {settings.get('receiver').keySeq().map((param, paramKey) => (
-                <div className="form-group" key={paramKey}>
-                  <label className="col-lg-3 control-label">{param}</label>
-                  <div className="col-lg-4">
-                    <input type="text"
-                      id={param}
-                      onChange={this.onChangeReceiverValue}
-                      className="form-control"
-                      value={connection[param]} />
-                  </div>
-                </div>
-              ))}
-            </form>
-          </Panel>
-        </Tab>
-        <Tab title="File Based Export" eventKey={3}>
+        <Tab title="File Based Export" eventKey={2}>
           <Panel style={{ borderTop: 'none' }}>
             <form className="form-horizontal">
               {settings.get('export').keySeq().map((param, paramKey) => (
@@ -143,6 +127,25 @@ export default class GatewayParamsModal extends Component {
                       onChange={this.onChangeExportValue}
                       className="form-control"
                       value={exportValue[param]} />
+                  </div>
+                </div>
+              ))}
+            </form>
+          </Panel>
+        </Tab>
+
+        <Tab title="File Based Receiver" eventKey={3}>
+          <Panel style={{ borderTop: 'none' }}>
+            <form className="form-horizontal">
+              {settings.get('receiver').keySeq().map((param, paramKey) => (
+                <div className="form-group" key={paramKey}>
+                  <label className="col-lg-3 control-label">{param}</label>
+                  <div className="col-lg-4">
+                    <input type="text"
+                      id={param}
+                      onChange={this.onChangeReceiverValue}
+                      className="form-control"
+                      value={connection[param]} />
                   </div>
                 </div>
               ))}
