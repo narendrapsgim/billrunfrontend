@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import Field from '../Field';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import ActionButtons from '../Elements/ActionButtons';
@@ -53,14 +54,25 @@ class EmailTemplate extends Component {
     this.props.dispatch(getSettings('email_templates'));
   }
 
-  onChange = (content) => {
+  onChangeContent = (content) => {
     const { name } = this.props;
     this.props.dispatch(updateSetting('email_templates', [name, 'content'], content));
+  }
+
+  onChangeSubject = (e) => {
+    const { value } = e.target;
+    const { name } = this.props;
+    this.props.dispatch(updateSetting('email_templates', [name, 'subject'], value));
   }
 
   getContent = () => {
     const { name, emailTemplates } = this.props;
     return emailTemplates.getIn([name, 'content'], '');
+  }
+
+  getSubject = () => {
+    const { name, emailTemplates } = this.props;
+    return emailTemplates.getIn([name, 'subject'], '');
   }
 
   getFields = () => {
@@ -77,23 +89,40 @@ class EmailTemplate extends Component {
     }
 
     return (
-      <div>
-        <Field
-          fieldType="textEditor"
-          value={this.getContent()}
-          editorName={`editor-${name}`}
-          name={name}
-          configName="invoices"
-          editorHeight={150}
-          fields={this.getFields()}
-          onChange={this.onChange}
-        />
-        <ActionButtons
-          onClickSave={this.onSave}
-          cancelLabel="Rollback"
-          onClickCancel={this.onCancel}
-        />
-      </div>
+      <Form horizontal>
+        <FormGroup>
+          <Col componentClass={ControlLabel} sm={1}>Subject</Col>
+          <Col sm={8}>
+            <Field
+              onChange={this.onChangeSubject}
+              value={this.getSubject()}
+            />
+          </Col>
+        </FormGroup>
+        <FormGroup>
+          <Col sm={12}>
+            <Field
+              fieldType="textEditor"
+              value={this.getContent()}
+              editorName={`editor-${name}`}
+              name={name}
+              configName="invoices"
+              editorHeight={150}
+              fields={this.getFields()}
+              onChange={this.onChangeContent}
+            />
+          </Col>
+        </FormGroup>
+        <FormGroup>
+          <Col sm={12}>
+            <ActionButtons
+              onClickSave={this.onSave}
+              cancelLabel="Rollback"
+              onClickCancel={this.onCancel}
+            />
+          </Col>
+        </FormGroup>
+      </Form>
     );
   }
 }
