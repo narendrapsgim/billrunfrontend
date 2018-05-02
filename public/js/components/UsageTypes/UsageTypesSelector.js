@@ -22,6 +22,7 @@ class UsageTypesSelector extends Component {
     showAddButton: PropTypes.bool,
     usagetFilter: PropTypes.func,
     unitFilter: PropTypes.func,
+    showSelectTypes: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -36,6 +37,7 @@ class UsageTypesSelector extends Component {
     showAddButton: true,
     usagetFilter: () => true,
     unitFilter: () => true,
+    showSelectTypes: true,
   };
 
   state = {
@@ -110,9 +112,9 @@ class UsageTypesSelector extends Component {
   }
 
   renderUsageTypeSelect = () => {
-    const { enabled, usaget } = this.props;
-    return (
-      <Select
+    const { enabled, usaget, showSelectTypes } = this.props;
+    return showSelectTypes &&
+      (<Select
         options={this.getAvailableUsageTypes()}
         value={usaget}
         style={{ marginTop: 3 }}
@@ -152,28 +154,36 @@ class UsageTypesSelector extends Component {
   };
 
   render() {
-    const { showUnits, showAddButton } = this.props;
+    const { showUnits, showAddButton, showSelectTypes } = this.props;
+    if (showSelectTypes) {
+      return (
+        <span>
+          <Col md={7}>
+            <FormGroup>
+              {
+                showAddButton
+                ? (
+                  <InputGroup>
+                    <InputGroup.Button>
+                      {this.renderAddUsageTypeButton()}
+                    </InputGroup.Button>
+                    {this.renderUsageTypeSelect()}
+                  </InputGroup>
+                )
+                : this.renderUsageTypeSelect()
+              }
+            </FormGroup>
+          </Col>
+          <Col md={5}>
+            {showUnits && this.renderUnitSelect()}
+          </Col>
+          {this.renderNewUsageTypeForm()}
+        </span>
+      );
+    }
     return (
       <span>
-        <Col md={7}>
-          <FormGroup>
-            {
-              showAddButton
-              ? (
-                <InputGroup>
-                  <InputGroup.Button>
-                    {this.renderAddUsageTypeButton()}
-                  </InputGroup.Button>
-                  {this.renderUsageTypeSelect()}
-                </InputGroup>
-              )
-              : this.renderUsageTypeSelect()
-            }
-          </FormGroup>
-        </Col>
-        <Col md={5}>
-          {showUnits && this.renderUnitSelect()}
-        </Col>
+        {showUnits && this.renderUnitSelect()}
         {this.renderNewUsageTypeForm()}
       </span>
     );

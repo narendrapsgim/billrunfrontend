@@ -100,8 +100,8 @@ class ReportsList extends Component {
   }
 
   getActions = () => ([
-    { type: 'view' },
-    { type: 'edit', onClickColumn: null },
+    { type: 'view', onClickColumn: null },
+    { type: 'edit' },
     { type: 'clone', showIcon: true, onClick: this.onClone, helpText: 'Clone' },
     { type: 'remove', showIcon: true, onClick: this.onAskDelete, helpText: 'Remove' },
   ]);

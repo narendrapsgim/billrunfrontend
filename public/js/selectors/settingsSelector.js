@@ -1,12 +1,11 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import moment from 'moment';
-import { sentenceCase } from 'change-case';
 import {
   getFieldName,
   getFieldNameType,
-  getConfig,
   isLinkerField,
+  setFieldTitle,
 } from '../common/Util';
 import { getEventConvertedConditions } from '../components/Events/EventsUtil';
 
@@ -54,13 +53,16 @@ const getServiceFields = (state, props) => // eslint-disable-line no-unused-vars
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['rates', 'fields']);
 
+const getPlanFields = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['plans', 'fields']);
+
 const getInvoiceExport = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.get('invoice_export');
 
 const getEvents = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['events']);
 
-const getPaymentGateways = (state, props) =>
+const getPaymentGateways = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['payment_gateways']);
 
 const selectSubscriberImportFields = (fields, accountfields) => {
@@ -348,7 +350,7 @@ export const subscriberImportFieldsSelector = createSelector(
 
 export const productFieldsSelector = createSelector(
   getProductFields,
-  productFields => productFields,
+  (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'product')),
 );
 
 export const rateCategoriesSelector = createSelector(
@@ -358,7 +360,12 @@ export const rateCategoriesSelector = createSelector(
 
 export const seriveceFieldsSelector = createSelector(
   getServiceFields,
-  serviceFields => serviceFields,
+  (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'service')),
+);
+
+export const planFieldsSelector = createSelector(
+  getPlanFields,
+  (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'plan')),
 );
 
 const selectEvents = (events, usageTypesData, propertyTypes) => {

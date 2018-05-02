@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
+import uuid from 'uuid';
 import SubscriptionsList from './SubscriptionsList';
 import Subscription from './Subscription';
 import { getItemId } from '../../common/Util';
@@ -31,10 +32,28 @@ export default class Subscriptions extends Component {
   }
 
   fetchSubscription = (subscription, name, action) => {
+    const { allServices } = this.props;
     const id = getItemId(subscription, null);
     if (id !== null) {
       this.props.getSubscription(id, action).then((newSubscription) => {
-        this.setState({ subscription: newSubscription });
+        const newSubscriptionWithServiceId = newSubscription.update('services', Immutable.List(),
+          (services) => {
+            if (services) {
+              return services.map((service) => {
+                const isBalancePeriod = allServices.find(
+                  allService => allService.get('name', '') === service.get('name', ''),
+                  null,
+                  Immutable.Map(),
+                ).get('balance_period', 'default') !== 'default';
+                const uiFlags = Immutable.Map({
+                  balance_period: isBalancePeriod,
+                });
+                return service.set('ui_flags', uiFlags);
+              });
+            }
+            return Immutable.List();
+          });
+        this.setState({ subscription: newSubscriptionWithServiceId });
       });
     }
   }

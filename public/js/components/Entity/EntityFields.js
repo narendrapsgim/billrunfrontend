@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
+import classNames from 'classnames';
 import { titleCase } from 'change-case';
 import EntityField from './EntityField';
 import { getSettings } from '../../actions/settingsActions';
@@ -17,6 +18,7 @@ class EntityFields extends Component {
       PropTypes.arrayOf(PropTypes.string),
     ]).isRequired,
     fields: PropTypes.instanceOf(Immutable.List),
+    highlightPramas: PropTypes.instanceOf(Immutable.List),
     fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
     onChangeField: PropTypes.func,
@@ -26,6 +28,7 @@ class EntityFields extends Component {
   static defaultProps = {
     entity: Immutable.Map(),
     fields: Immutable.List(),
+    highlightPramas: Immutable.List(),
     fieldsFilter: null,
     editable: true,
     onChangeField: () => {},
@@ -43,7 +46,7 @@ class EntityFields extends Component {
   }
 
   getParamsOptions = () => {
-    const { fields, fieldsFilter } = this.props;
+    const { fields, fieldsFilter, highlightPramas } = this.props;
     const fieldFilterFunction = fieldsFilter !== null ? fieldsFilter : this.filterPrintableFields;
     return fields
       .filter(fieldFilterFunction)
@@ -51,8 +54,8 @@ class EntityFields extends Component {
       .map(field => ({
         label: titleCase(field.get('title', '')),
         value: field.get('field_name', '').split('.')[1],
-      }),
-    );
+      }))
+      .sort(a => (highlightPramas.includes(`params.${a.value}`) ? -1 : 1));
   }
 
   onAddParam = (key) => {
@@ -62,6 +65,7 @@ class EntityFields extends Component {
   filterPrintableFields = field => (
     field.get('display', false) !== false
     && field.get('editable', false) !== false
+    && field.get('field_name', '') !== 'tariff_category'
   );
 
   filterParamsFields = (field) => {
@@ -93,16 +97,21 @@ class EntityFields extends Component {
   }
 
   renderAddParamButton = (options) => {
+    const { highlightPramas } = this.props;
     const menuItems = options.map((option) => {
+      const highlight = highlightPramas.includes(`params.${option.value}`);
+      const menuItemClass = classNames({
+        'disable-label': !highlight,
+      });
       const onSelect = () => { this.onAddParam(option.value); };
       return (
         <MenuItem key={option.value} eventKey={option.value} onSelect={onSelect}>
-          {option.label}
+          <span className={menuItemClass}>{option.label}</span>
         </MenuItem>
       );
     });
     return (
-      <DropdownButton id="add-param-input" componentClass={InputGroup.Button} className="btn-primary btn btn-xs btn-default" title="Add Param" >
+      <DropdownButton id="add-param-input" componentClass={InputGroup.Button} className="btn-primary btn btn-xs btn-default" title="Add parameter" >
         { menuItems }
       </DropdownButton>
     );
