@@ -114,17 +114,17 @@ class RateMapping extends Component {
     let newRateKey = changeCase.snakeCase(rateKey);
     newRateKey = newRateKey.replace('params.', '');
     newRateKey = newRateKey.replace('params_', '');
-    const isNewField = custom && (rateKey !== '') && !(customRatingFields.find(field => field.get('field_name', '') === newRateKey || field.get('field_name', '') === `params.${newRateKey}`));
     newRateKey = `params.${newRateKey}`;
+    const isNewField = custom && (rateKey !== '') && !(customRatingFields.find(field => field.get('field_name', '') === newRateKey));
     if (isNewField) {
       this.addNewRatingCustomField(newRateKey, rateKey, value);
+      rateKey = newRateKey;
     } else {
-      let rateExists = customRatingFields.find(field => field.get('field_name', '') === newRateKey);
+      const rateExists = customRatingFields.find(field => field.get('field_name', '') === newRateKey);
       if (rateExists) {
-        rateExists = rateExists.get('title');
-        if (custom && rateKey !== '' && rateKey !== rateExists && rateKey !== newRateKey) {
+        if (custom && rateKey !== '' && rateKey !== rateExists.title && rateKey !== newRateKey) {
           this.props.dispatch(showWarning(`Product param ${rateKey} already exists as custom field ${newRateKey}`));
-          rateKey = rateExists;
+          rateKey = rateExists.title;
         }
       }
     }
@@ -250,8 +250,10 @@ class RateMapping extends Component {
       if (path[0] === 'operator') {
         const changeFromRegex = computedLineKey.get('operator', '') === '$regex' && value !== '$regex';
         const changeToRegex = computedLineKey.get('operator', '') !== '$regex' && value === '$regex';
-        if (changeFromRegex || changeToRegex) {
+        const operatorExists = value === '$exists' || value === '$existsFalse';
+        if (changeFromRegex || changeToRegex || operatorExists) {
           computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
+          computedLineKeyWithMutations.deleteIn(['line_keys', 0, 'regex']);
         }
       }
       if (value === 'hard_coded') {
@@ -271,10 +273,12 @@ class RateMapping extends Component {
     const { computedLineKey } = this.state;
     const newComputedLineKey = computedLineKey.withMutations((computedLineKeyWithMutations) => {
       computedLineKeyWithMutations.set('type', value);
-      computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
-      computedLineKeyWithMutations.delete('operator');
-      computedLineKeyWithMutations.delete('must_met');
-      computedLineKeyWithMutations.delete('projection');
+      if (value === 'regex') {
+        computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
+        computedLineKeyWithMutations.delete('operator');
+        computedLineKeyWithMutations.delete('must_met');
+        computedLineKeyWithMutations.delete('projection');
+      }
     });
     this.setState({
       computedLineKey: newComputedLineKey,

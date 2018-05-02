@@ -153,8 +153,9 @@ class EntityField extends Component {
         <Field fieldType="tags" value={value} onChange={this.onChangeTags} addOnPaste pasteSplit={this.pasteSplit} />
       );
     }
+    const fieldType = field.get('type', '') === '' ? 'text' : field.get('type', '');
     return (
-      <Field onChange={this.onChange} value={value} editable={editable} />
+      <Field fieldType={fieldType} onChange={this.onChange} value={value} editable={editable} />
     );
   }
 

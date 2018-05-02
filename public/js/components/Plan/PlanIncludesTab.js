@@ -14,6 +14,7 @@ import {
   getGroupUnit,
   getGroupUsages,
   getGroupValue,
+  getGroupUsageTypes,
 } from '../../common/Util';
 import {
   usageTypeSelector,
@@ -121,6 +122,8 @@ class PlanIncludesTab extends Component {
       const unit =
         getUnitLabel(propertyTypes, usageTypesData, getGroupUsaget(include), getGroupUnit(include));
       const value = getGroupValue(include);
+      const usageTypes = getGroupUsageTypes(include);
+      const usaget = getGroupUsaget(include);
       return (
         <PlanIncludeGroupEdit
           key={groupName}
@@ -136,6 +139,8 @@ class PlanIncludesTab extends Component {
           onChangeFieldValue={this.props.onChangeFieldValue}
           onGroupRemove={this.onGroupRemove}
           onChangeGroupProducts={this.onChangeGroupProducts}
+          usaget={usaget}
+          usageTypes={usageTypes}
         />
       );
     }).toArray();

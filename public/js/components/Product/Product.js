@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
+import { sentenceCase } from 'change-case';
 import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, HelpBlock } from 'react-bootstrap';
 import Help from '../Help';
 import Field from '../Field';
@@ -9,7 +10,11 @@ import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
 import EntityFields from '../Entity/EntityFields';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
-import { getUnitLabel } from '../../common/Util';
+import {
+  getUnitLabel,
+  getFieldName,
+  getFieldNameType,
+} from '../../common/Util';
 import {
   usageTypesDataSelector,
   propertyTypeSelector,
@@ -140,18 +145,21 @@ class Product extends Component {
     this.props.onFieldUpdate(field, value);
   }
 
+  //BRCD-1337 - Not in use,  Display all parameters that are not used by any input processor should still be displayed.
   filterCustomFields = ratingParams => (field) => {
     const fieldName = field.get('field_name', '');
     const usedAsRatingField = ratingParams.includes(fieldName);
-    return (!fieldName.startsWith('params.') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
+    return ((!fieldName.startsWith('params.') && field.get('field_name', '') !== 'tariff_category') || usedAsRatingField) && field.get('display', false) !== false && field.get('editable', false) !== false;
   };
+
+  filterTariffCategory = field => (field.get('field_name', '') === 'tariff_category' && field.get('display', false) !== false && field.get('editable', false) !== false);
 
   renderPrices = () => {
     const { product, planName, usaget, mode } = this.props;
     const productPath = ['rates', usaget, planName, 'rate'];
     const prices = product.getIn(productPath, Immutable.List());
 
-    return prices.map((price, i) =>
+    return prices.map((price, i) => (
       <ProductPrice
         mode={mode}
         count={prices.size}
@@ -162,7 +170,7 @@ class Product extends Component {
         onProductEditRate={this.onProductRateUpdate}
         onProductRemoveRate={this.onProductRateRemove}
       />
-    );
+    ));
   }
 
   getUnit = () => {
@@ -197,7 +205,8 @@ class Product extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Title<Help contents={ProductDescription.description} />
+                  { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
+                  <Help contents={ProductDescription.description} />
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field onChange={this.onChangeDescription} value={product.get('description', '')} editable={editable} />
@@ -207,7 +216,7 @@ class Product extends Component {
               { ['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    Key<Help contents={ProductDescription.key} />
+                    { getFieldName('key', getFieldNameType('service'), sentenceCase('key'))}<Help contents={ProductDescription.key} />
                   </Col>
                   <Col sm={8} lg={9}>
                     <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={!['clone', 'create'].includes(mode)} editable={editable} />
@@ -215,6 +224,14 @@ class Product extends Component {
                   </Col>
                 </FormGroup>
               }
+
+              <EntityFields
+                entityName="rates"
+                entity={product}
+                onChangeField={this.onChangeAdditionalField}
+                fieldsFilter={this.filterTariffCategory}
+                editable={editable}
+              />
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
@@ -237,7 +254,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
-                fieldsFilter={this.filterCustomFields(ratingParams)}
+                highlightPramas={ratingParams}
                 editable={editable}
               />
 

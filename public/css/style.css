@@ -84,11 +84,17 @@ fieldset[disabled] .btn {
 /* General colors */
 .danger-red { color: #d9534f; }
 .btn-danger .danger-red { color: #ffffff; }
+.disable-label {
+  opacity: 0.3;
+}
 .disabled {
   color: #6f6f6f;
 }
 .active-blue {
   color: #008cba;
+}
+.label-text {
+  color: #222222;
 }
 .disabled-bg {
   background-color: #eeeeee;

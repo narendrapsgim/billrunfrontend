@@ -199,7 +199,6 @@ class EventFormBalance extends Component {
         </FormGroup>
 
         <FormGroup>
-          <Col sm={2} />
           <Col sm={4}>
             <Field
               fieldType="radio"
@@ -214,7 +213,6 @@ class EventFormBalance extends Component {
           </Col>
         </FormGroup>
         <FormGroup>
-          <Col sm={2} />
           <Col sm={4}>
             <Field
               fieldType="radio"
@@ -226,18 +224,31 @@ class EventFormBalance extends Component {
               label="Limit to Group"
             />
           </Col>
-          <Col sm={6}>
-            <Select
-              id={`condition-limitation-group_name-${index}`}
-              onChange={this.onChangeGroupName}
-              value={groupName}
-              options={this.getGroupNamesOptions()}
-              disabled={limitation !== 'group'}
-            />
+          <Col sm={8}>
+            <Col sm={7}>
+              <Select
+                id={`condition-limitation-group_name-${index}`}
+                onChange={this.onChangeGroupName}
+                value={groupName}
+                options={this.getGroupNamesOptions()}
+                disabled={limitation !== 'group'}
+              />
+            </Col>
+            <Col sm={5}>
+              <UsageTypesSelector
+                usaget={usaget}
+                unit={item.get('unit', '')}
+                onChangeUsaget={this.onChangeActivityType}
+                onChangeUnit={this.onChangeUnit}
+                enabled={limitation === 'group'}
+                showUnits={trigger === 'usagev' && limitation === 'group'}
+                showAddButton={false}
+                showSelectTypes={false}
+              />
+            </Col>
           </Col>
         </FormGroup>
         <FormGroup>
-          <Col sm={2} />
           <Col sm={4}>
             <Field
               fieldType="radio"
@@ -249,15 +260,17 @@ class EventFormBalance extends Component {
               label="Limit to Activity Type"
             />
           </Col>
-          <Col sm={6}>
-            <UsageTypesSelector
-              usaget={activityType}
-              unit={item.get('unit', '')}
-              onChangeUsaget={this.onChangeActivityType}
-              onChangeUnit={this.onChangeUnit}
-              enabled={limitation === 'activity_type'}
-              showUnits={trigger === 'usagev' && limitation === 'activity_type'}
-            />
+          <Col sm={8}>
+            <Col sm={12}>
+              <UsageTypesSelector
+                usaget={activityType}
+                unit={item.get('unit', '')}
+                onChangeUsaget={this.onChangeActivityType}
+                onChangeUnit={this.onChangeUnit}
+                enabled={limitation === 'activity_type'}
+                showUnits={trigger === 'usagev' && limitation === 'activity_type'}
+              />
+            </Col>
           </Col>
         </FormGroup>
 
@@ -303,6 +316,7 @@ class EventFormBalance extends Component {
               onChange={this.onChangeMultiValues}
               value={String(item.get('value', '')).split(',').filter(val => val !== '')}
               renderInput={this.renderCustomInputNumber}
+              onlyUnique={selectedConditionData.get('type', '') === 'tags'}
             />
           </Col>
         </FormGroup>)
