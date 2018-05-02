@@ -101,8 +101,6 @@
     "stamp": "Unique record ID",
     "returned_value": "Response"
   },
-  "aid": "Customer ID",
-  "sid": "Subscriber ID",
   "autorenew": {
     "aid": "Customer ID",
     "sid": "Subscriber ID",
@@ -112,5 +110,22 @@
     "next_renew": "Next Renew",
     "last_renew": "Last Renew",
     "interval": "Interval"
-  }
+  },
+  "service": {
+    "description": "Title",
+    "name": "Key",
+    "period_type": "Eligibility Period",
+    "custom_period_type": "Custom"
+  },
+  "plan": {
+    "description": "Title",
+    "name": "Key",
+    "upfront": "Charging Mode"
+  },
+  "product": {
+    "description": "Title",
+    "key": "Key"
+  },
+  "aid": "Customer ID",
+  "sid": "Subscriber ID"
 }

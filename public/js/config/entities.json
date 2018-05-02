@@ -12,7 +12,8 @@
     "uniqueField": "name",
     "itemName": "plan",
     "itemType": "plan",
-    "itemsType": "plans"
+    "itemsType": "plans",
+    "settingsKey": "plans"
   },
   "charging_plan": {
     "collection": "prepaidgroups",

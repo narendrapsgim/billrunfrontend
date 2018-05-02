@@ -51,6 +51,7 @@ export default class ComputedRate extends Component {
     const mustMetHelper = 'This means than in case the condition is not met - a rate will not be found';
     const lineKeyOptions = getAvailableFields(settings, [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'file', label: 'File name' }]).toJS();
     const computedTypeRegex = computedLineKey.get('type', 'regex') === 'regex';
+    const operatorExists = computedLineKey.get('operator', '') === '$exists' || computedLineKey.get('operator', '') === '$existsFalse';
     const checkboxStyle = { marginTop: 10 };
     const conditionOption = this.getConditionResultProjectOptions().concat(lineKeyOptions);
     return (
@@ -102,7 +103,7 @@ export default class ComputedRate extends Component {
               value={computedLineKey.getIn(['line_keys', 0, 'regex'], '')}
               disabledValue={''}
               onChange={this.props.onChangeComputedLineKey(['line_keys', 0, 'regex'])}
-              disabled={computedLineKey.getIn(['line_keys', 0, 'key'], '') === ''}
+              disabled={computedLineKey.getIn(['line_keys', 0, 'key'], '') === '' || operatorExists}
               label={<span>Regex<Help contents={regexHelper} /></span>}
               fieldType="toggeledInput"
             />
@@ -134,6 +135,7 @@ export default class ComputedRate extends Component {
                     onChange={this.props.onChangeComputedLineKey(['line_keys', 1, 'key'])}
                     value={computedLineKey.getIn(['line_keys', 1, 'key'], '')}
                     options={lineKeyOptions}
+                    disabled={operatorExists}
                   />
               )}
 
