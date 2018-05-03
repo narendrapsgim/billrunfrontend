@@ -155,7 +155,7 @@ class EntityRevisionDetails extends Component {
   }
 
   renderRevisionsBlock = () => {
-    const { item, revisions, revisionItemsInTimeLine, mode } = this.props;
+    const { item, revisions, revisionItemsInTimeLine, mode, itemName } = this.props;
     if (['clone', 'create'].includes(mode)) {
       return null;
     }
@@ -166,6 +166,7 @@ class EntityRevisionDetails extends Component {
           <RevisionTimeline
             revisions={revisions}
             item={item}
+            itemName={itemName}
             size={revisionItemsInTimeLine}
           />
         </div>

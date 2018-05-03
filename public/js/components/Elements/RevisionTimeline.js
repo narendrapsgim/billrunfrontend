@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import classNames from 'classnames';
-import StateIcon from './StateIcon';
+import { StateIcon, WithEntityLink } from '../Elements';
 import { getItemDateValue, isItemClosed, isItemReopened, getItemId } from '../../common/Util';
 
 
-const RevisionTimeline = ({ revisions, size, item, start }) => {
+const RevisionTimeline = ({ revisions, size, item, start, itemName }) => {
   const revisionsToDisplay = Immutable.List().withMutations((listWithMutations) => {
     let nextRevision = Immutable.Map();
     revisions.forEach((revision) => {
@@ -75,7 +75,9 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
       <li key={`${getItemId(revision, '')}`} className={activeClass}>
         <div>
           <div>
-            <StateIcon status={revision.getIn(['revision_info', 'status'], '')} />
+            <WithEntityLink item={revision} itemName={itemName} type="edit">
+              <StateIcon status={revision.getIn(['revision_info', 'status'], '')} />
+            </WithEntityLink>
           </div>
           <small className="date">
             { fromDate.format('MMM DD')}
@@ -103,6 +105,7 @@ const RevisionTimeline = ({ revisions, size, item, start }) => {
 RevisionTimeline.defaultProps = {
   revisions: Immutable.List(),
   item: Immutable.Map(),
+  itemName: '',
   size: 5,
   start: null,
 };
@@ -110,6 +113,7 @@ RevisionTimeline.defaultProps = {
 RevisionTimeline.propTypes = {
   revisions: PropTypes.instanceOf(Immutable.List),
   item: PropTypes.instanceOf(Immutable.Map),
+  itemName: PropTypes.string,
   size: PropTypes.number,
   start: PropTypes.number,
 };
