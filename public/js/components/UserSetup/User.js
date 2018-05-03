@@ -17,7 +17,7 @@ export default class User extends Component {
 
   static defaultProps = {
     user: Immutable.Map(),
-    availableRoles: ['admin', 'read', 'write'],
+    availableRoles: ['admin', 'read', 'write', 'reports'],
     action: 'create',
   };
 
