@@ -41,6 +41,7 @@ import SelectTemplate from '../components/InputProcessor/SelectTemplate';
 import Collections from '../components/Collections/Collections';
 import Collection from '../components/Collection/Collection';
 import InvoiceTemplate from '../components/InvoiceTemplate';
+import EmailTemplates from '../components/EmailTemplates';
 import PrepaidPlansList from '../components/PrepaidPlansList';
 import PrepaidPlan from '../components/PrepaidPlan';
 import AuditTrail from '../components/AuditTrail';
@@ -152,6 +153,7 @@ const routes = () => (
     <Route path="/events" component={RequireAuth(Events)} title="Events" />
     <Route path="/login" component={LoginPage} title="Login" />
     <Route path="/about" component={About} title="About" />
+    <Route path="/email_templates" component={RequireAuth(EmailTemplates)} title="Email Templates" />
     <Route path="/changepassword(/:itemId)" component={ChangePassword} title="Change Password" />
     <Route path="*" component={PageNotFound404} title=" " />
   </Route>

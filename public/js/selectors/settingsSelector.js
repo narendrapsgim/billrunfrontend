@@ -59,6 +59,9 @@ const getPlanFields = (state, props) => // eslint-disable-line no-unused-vars
 const getInvoiceExport = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.get('invoice_export');
 
+const getEmailTemplates = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.get('email_templates');
+
 const getEvents = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['events']);
 
@@ -84,6 +87,13 @@ const selectSubscriberImportFields = (fields, accountfields) => {
       field_name: 'account_import_id',
       title: 'Customer Import ID',
     }));
+  }
+  return fields;
+};
+
+const selectFieldNames = (fields) => {
+  if (fields) {
+    return fields.map(field => field.get('field_name', ''));
   }
   return fields;
 };
@@ -305,6 +315,11 @@ export const accountFieldsSelector = createSelector(
   },
 );
 
+export const accountFieldNamesSelector = createSelector(
+  accountFieldsSelector,
+  selectFieldNames,
+);
+
 export const accountImportFieldsSelector = createSelector(
   accountFieldsSelector,
   selectAccountImportFields,
@@ -478,4 +493,9 @@ export const invoiceTemplateStatusSelector = createSelector(
 export const paymentGatewaysSelector = createSelector(
   getPaymentGateways,
   availablePaymentGateways => availablePaymentGateways,
+);
+
+export const emailTemplatesSelector = createSelector(
+  getEmailTemplates,
+  emailTemplates => emailTemplates,
 );

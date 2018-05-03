@@ -17,6 +17,7 @@ class CycleData extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
+    settings: PropTypes.instanceOf(Map),
     selectedCycle: PropTypes.instanceOf(Map).isRequired,
     billrunKey: PropTypes.string.isRequired,
     baseFilter: PropTypes.object,
@@ -28,6 +29,7 @@ class CycleData extends Component {
   };
 
   static defaultProps = {
+    settings: Map(),
     reloadCycleData: () => {},
     baseFilter: {},
     showConfirmAllButton: true,
@@ -224,6 +226,14 @@ class CycleData extends Component {
     return (<Button onClick={onClick}>confirm</Button>);
   };
 
+  parseCycleDataEmailSent = (entity) => {
+    const sentDate = entity.getIn(['email_sent', 'sec'], false);
+    if (!sentDate) {
+      return 'Not Sent';
+    }
+    return moment.unix(sentDate).format(globalSetting.datetimeFormat);
+  };
+
   downloadTaxURL = (billrunKey) =>
     `${getConfig('serverUrl')}/api/report?action=taxationReport&report={"billrun_key":"${billrunKey}"}&type=csv`;
 
@@ -288,8 +298,9 @@ class CycleData extends Component {
   }
 
   render() {
-    const { baseFilter } = this.props;
+    const { baseFilter, settings } = this.props;
     const { refreshString } = this.state;
+    const displayEmailSent = settings.get('billrun', Map()).get('email_after_confirmation', false);
 
     const filterFields = [
       { id: 'aid', placeholder: 'Customer Number', type: 'number' },
@@ -306,6 +317,7 @@ class CycleData extends Component {
       { id: 'invoice_id', title: 'Invoice ID', parser: this.parseCycleDataInvoiceId },
       { id: 'download', title: 'Invoice', parser: this.parseCycleDataDownload },
       { id: 'confirm', title: 'Confirm', parser: this.parseCycleDataConfirm },
+      { id: 'email_sent', title: 'Email Sent', sort: true, parser: this.parseCycleDataEmailSent, display: displayEmailSent },
     ];
 
     return (
@@ -330,6 +342,7 @@ class CycleData extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
+  settings: state.settings,
   currency: currencySelector(state, props),
   invoicesNum: state.list.get('billrunInvoices', List()).size,
 });
