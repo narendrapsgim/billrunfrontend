@@ -505,7 +505,6 @@ class InputProcessor extends Component {
 
       case steps.get('receiver', {}).idx: return (
         <Receiver
-          action={action}
           settings={settings}
           onSetReceiverField={this.onSetReceiverField}
           onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}

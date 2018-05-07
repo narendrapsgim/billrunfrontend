@@ -4,8 +4,7 @@ import Immutable from 'immutable';
 import { Col, Row, Panel, Button } from 'react-bootstrap';
 import Field from '../../Field';
 import { buildRequestUrl } from '../../../common/Api';
-import { updateSetting, saveSettings } from '../../../actions/settingsActions';
-import { showWarning, showSuccess, showDanger } from '../../../actions/alertsActions';
+import { showSuccess, showDanger } from '../../../actions/alertsActions';
 import { addReceiver, removeReceiver } from '../../../actions/inputProcessorActions';
 
 class Connection extends Component {
@@ -14,17 +13,48 @@ class Connection extends Component {
     index: PropTypes.number.isRequired,
     receiver: PropTypes.instanceOf(Immutable.Map).isRequired,
     settings: PropTypes.instanceOf(Immutable.Map),
-    rateCalculators: PropTypes.instanceOf(Immutable.List),
+    onSetReceiverField: PropTypes.func.isRequired,
+    onSetReceiverCheckboxField: PropTypes.func.isRequired,
+    OnChangeUploadingFile: PropTypes.func.isRequired,
+    onCancelKeyAuth: PropTypes.func.isRequired,
   }
+
   static defaultProps = {
     settings: Immutable.Map(),
-    rateCalculators: Immutable.List(),
   };
 
   state = {
     showRemoveKey: false,
     openReceivers: [0],
   };
+
+  componentDidMount() {
+    const { receivers } = this.props;
+    receivers.forEach((receiver, key) => this.initDefaultValues(receiver, key));
+  }
+
+  initDefaultValues = (receiver, key) => {
+    let show = false;
+    if (receiver.get('receiver_type', null) === null) {
+      const receiverType = { target: { value: 'ftp', id: `receiver_type-${key}` } };
+      this.props.onSetReceiverField(receiverType, key);
+    }
+    if (receiver.get('passive', null) === null) {
+      const passive = { target: { checked: false, id: `passive-${key}` } };
+      this.props.onSetReceiverCheckboxField(passive, key);
+    }
+    if (receiver.get('delete_received', null) === null) {
+      const deleteReceived = { target: { checked: false, id: `delete_received-${key}` } };
+      this.props.onSetReceiverCheckboxField(deleteReceived, key);
+    }
+    if (receiver.get('key', false)) {
+      show = true;
+    }
+
+    this.setState({
+      showRemoveKey: show,
+    });
+  }
 
   onRemoveReceiver = (receiver, index) => () => {
     this.props.dispatch(removeReceiver(receiver, index));
@@ -47,23 +77,13 @@ class Connection extends Component {
     this.props.dispatch(addReceiver(receiver, index));
   }
 
-
-
-
-
-
-
-
-
-
-
   afterUpload = (res, fileName) => {
     const { index } = this.props;
 
     if (res.desc === 'success') {
       this.props.dispatch(showSuccess(res.details.message));
-      this.props.onSetReceiverField({ target: { value: res.details.path, id: 'key' } }, index);
-      this.props.onSetReceiverField({ target: { value: fileName, id: 'key_label' } }, index);
+      this.props.onSetReceiverField({ target: { value: res.details.path, id: `key-${index}` } }, index);
+      this.props.onSetReceiverField({ target: { value: fileName, id: `key_label-${index}` } }, index);
       this.props.OnChangeUploadingFile();
       this.setState({ showRemoveKey: true });
     } else {
@@ -106,14 +126,6 @@ class Connection extends Component {
     this.setState({ showRemoveKey: false });
   }
 
-
-
-
-
-
-
-
-
   onChangeReceiverType = (e) => {
     const { value } = e.target;
     const { index } = this.props;
@@ -148,7 +160,7 @@ class Connection extends Component {
     ssh: 'SFTP',
   });
 
-  renderPanelHeader = (keyLabel) => (
+  renderPanelHeader = keyLabel => (
     <div style={{ fontSize: 12, fontWeight: 'bold' }}>
       {keyLabel}
       <div className="pull-right">

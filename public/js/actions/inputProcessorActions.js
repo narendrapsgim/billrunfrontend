@@ -553,9 +553,7 @@ export function saveInputProcessorSettings(state, parts = []) {
     const receiverType = receiver.get('receiver_type', 'ftp');
     settings.receiver = {
       type: receiverType,
-      connections: [
-        receiver.toJS(),
-      ],
+      connections: receiver,
     };
   }
   const defaultResponse = {

@@ -1,16 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
-import changeCase from 'change-case';
-import { Form, Tabs, Tab, Button } from 'react-bootstrap';
+import { Form, Tabs } from 'react-bootstrap';
 import Connection from './Connection';
-import { ConfirmModal } from '../../../components/Elements';
-import { addRateCategory, removeRateCategory } from '../../../actions/inputProcessorActions';
 
 class Receiver extends Component {
   static propTypes = {
-    dispatch: PropTypes.func.isRequired,
     settings: PropTypes.instanceOf(Immutable.Map),
+    onSetReceiverField: PropTypes.func.isRequired,
+    onSetReceiverCheckboxField: PropTypes.func.isRequired,
+    onCancelKeyAuth: PropTypes.func.isRequired,
+    OnChangeUploadingFile: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -32,7 +32,6 @@ class Receiver extends Component {
   renderReceivers = () => {
     const { settings, fileType, keyValue, keyLabel } = this.props;
     const receivers = settings.get('receiver', Immutable.Map());
-    console.log('receivers', receivers);
     return (
       <div>
         {receivers.map((receiver, key) => (
@@ -43,7 +42,6 @@ class Receiver extends Component {
                   <Connection
                     receiver={receiver}
                     index={key}
-                    usaget={String(key)}
                     settings={settings}
                     onSetReceiverField={this.onSetReceiverField}
                     onSetReceiverCheckboxField={this.onSetReceiverCheckboxField}
