@@ -37,6 +37,8 @@ export default class FieldsMapping extends Component {
     this.onSetType = this.onSetType.bind(this);
     this.onChangeStaticUsaget = this.onChangeStaticUsaget.bind(this);
     this.addFieldCondition = this.addFieldCondition.bind(this);
+    this.onChangeFieldName = this.onChangeFieldName.bind(this);
+    this.onRemoveCondition = this.onRemoveCondition.bind(this);
 
     this.state = {
       fieldName: '',
@@ -57,8 +59,12 @@ export default class FieldsMapping extends Component {
     }
   }
 
-  onChangePattern(e) {
-    this.setState({pattern: e.target.value});
+  onChangePattern(index, e) {
+    const { conditions } = this.state;
+    const { value } = e.target;
+
+    conditions[index].pattern = value;
+    this.setState({ pattern: value, conditions });
   }
 
   changeUsaget(val, setStaticUsaget) {
@@ -117,9 +123,11 @@ export default class FieldsMapping extends Component {
     this.setState({ unit });
   }
 
-  onChangeFieldName = (e) => {
+  onChangeFieldName = (index, e) => {
+    const { conditions } = this.state;
     const { value } = e.target;
-    this.setState({ fieldName: value });
+    conditions[index].src_field = value;
+    this.setState({ fieldName: value, conditions });
   }
 
   addUsagetMapping(e) {
@@ -134,9 +142,9 @@ export default class FieldsMapping extends Component {
       onError('Please input a value, usage type, unit and volume field/value');
       return;
     }
-    //if (conditions.length === 0) {
-      conditions.unshift({ src_field: fieldName, pattern });
-  //  }
+    if (conditions.length === 0) {
+      conditions.push({ src_field: fieldName, pattern });
+    }
 
     this.props.onAddUsagetMapping.call(this, { usaget, pattern, unit, volumeType, volumeSrc, fieldName, conditions });
     this.setState({ pattern: '', usaget: '', unit: '', volumeType: 'field', volumeFields: [], volumeHardCodedValue: '', fieldName: '', conditions: [] });
@@ -150,8 +158,8 @@ export default class FieldsMapping extends Component {
       onError('Please input a field name and a value');
       return;
     }
-    conditions.unshift({ src_field: fieldName, pattern });
-    this.setState({ fieldName: '', pattern: '' });
+    conditions.push({ src_field: '', pattern: '' });
+    this.setState({ conditions });
   }
 
   removeUsagetMapping(index, e) {
@@ -220,6 +228,13 @@ export default class FieldsMapping extends Component {
     value: field,
   })).toArray();
 
+  onRemoveCondition = (index) => {
+    const { conditions } = this.state;
+
+    conditions.splice(index, 1);
+    this.setState({ conditions });
+  }
+
   render() {
     const {
       separateTime,
@@ -271,7 +286,7 @@ export default class FieldsMapping extends Component {
     };
 
     if (conditions.length === 0) {
-      conditions.unshift({ src_field: fieldName, pattern });
+      conditions.push({ src_field: fieldName, pattern });
     }
 
     return (
@@ -405,8 +420,6 @@ export default class FieldsMapping extends Component {
                 </Row>
                 <Row>
                   <div className="col-lg-7">
-                    <Help contents="Check to force a custom format. If not checked, default format is mm/dd/yy" />
-
                     <UsageTypesSelector
                       usaget={defaultUsaget}
                       unit={defaultUsagetUnit}
@@ -525,25 +538,29 @@ export default class FieldsMapping extends Component {
                 <div className="col-lg-4">
                   {
                     conditions.map((condition, key) => (
-                      <div className="row-lg-4">
+                      <div className="row-lg-12 form-inner-edit-row row">
                         <div className="col-lg-7">
                           <select
                             id="src_field"
                             className="form-control"
-                            onChange={this.onChangeFieldName}
-                            value={condition.src_field === '' ? this.state.fieldName : condition.src_field}
-                            disabled={settings.get('usaget_type', '') !== 'dynamic' || condition.src_field !== ''}
+                            onChange={this.onChangeFieldName.bind(this, key)}
+                            value={condition.src_field === '' ? '' : condition.src_field}
+                            disabled={settings.get('usaget_type', '') !== 'dynamic'}
                           >
                               { available_fields }
                           </select>
                         </div>
-                        <div className="col-lg-5">
+                        <div className="col-lg-4">
                           <input
                             className="form-control"
-                            onChange={this.onChangePattern}
-                            disabled={settings.get('usaget_type', '') !== 'dynamic' || condition.pattern !== ''}
-                            value={condition.pattern === '' ? this.state.pattern : condition.pattern}
+                            onChange={this.onChangePattern.bind(this, key)}
+                            disabled={settings.get('usaget_type', '') !== 'dynamic'}
+                            value={condition.pattern === '' ? '' : condition.pattern}
                           />
+                        </div>
+                        <div className="col-lg-1">
+                          {conditions.length > 1 &&
+                          <button type="button" className="btn btn-link" data-dismiss="alert" aria-label="Close" onClick={this.onRemoveCondition.bind(this, key)}><i className="fa fa-trash-o danger-red" /></button>}
                         </div>
                       </div>
                     ))
@@ -607,7 +624,7 @@ export default class FieldsMapping extends Component {
                   </div>
                 </div>
               </div>
-              <div className="col-lg-1" style={{ marginLeft: 18 }}>
+              <div className="col-lg-1">
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
