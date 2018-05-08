@@ -143,7 +143,7 @@ export default class FieldsMapping extends Component {
       return;
     }
     if (conditions.length === 0) {
-      conditions.push({ src_field: fieldName, pattern });
+      conditions.push({ src_field: fieldName, pattern, op: '$eq' });
     }
 
     this.props.onAddUsagetMapping.call(this, { usaget, pattern, unit, volumeType, volumeSrc, fieldName, conditions });
@@ -158,7 +158,7 @@ export default class FieldsMapping extends Component {
       onError('Please input a field name and a value');
       return;
     }
-    conditions.push({ src_field: '', pattern: '' });
+    conditions.push({ src_field: '', pattern: '', op: '$eq' });
     this.setState({ conditions });
   }
 
@@ -286,7 +286,7 @@ export default class FieldsMapping extends Component {
     };
 
     if (conditions.length === 0) {
-      conditions.push({ src_field: fieldName, pattern });
+      conditions.push({ src_field: fieldName, pattern, op: '$eq' });
     }
 
     return (
