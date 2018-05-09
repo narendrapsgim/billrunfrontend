@@ -22,14 +22,16 @@ const Usage = ({ line, onClickCancel, hiddenFields, cancelLabel, enableRemove, o
     </Panel>
   );
 
-  const renderFields = (data) => {
+  const renderFields = (data, fieldsOrigin) => {
     const fields = [];
     data.forEach((value, key) => {
       let formattedValue = value;
-      if (key === 'connection_type') {
-        formattedValue = changeCase.upperCaseFirst(value);
-      } else if (key === 'urt' || key === 'process_time' || key === 'rebalance') {
-        formattedValue = moment.unix(value.get('sec')).format(globalSetting.datetimeLongFormat);
+      if (fieldsOrigin === 'billrunFields') {
+        if (key === 'connection_type') {
+          formattedValue = changeCase.upperCaseFirst(value);
+        } else if (key === 'urt' || key === 'process_time' || key === 'rebalance') {
+          formattedValue = moment.unix(value.get('sec')).format(globalSetting.datetimeLongFormat);
+        }
       }
       if (!hiddenFields.includes(key)) {
         fields.push(
@@ -52,10 +54,10 @@ const Usage = ({ line, onClickCancel, hiddenFields, cancelLabel, enableRemove, o
           <Panel header={renderMainPanelTitle()}>
             { renderRemove() }
             <Panel header={<h3>BillRun fields</h3>}>
-              { renderFields(line) }
+              { renderFields(line, 'billrunFields') }
             </Panel>
             <Panel header={<h3>User fields</h3>}>
-              { renderFields(line.get('uf', Immutable.Map())) }
+              { renderFields(line.get('uf', Immutable.Map()), 'userFields') }
             </Panel>
             <Button onClick={onClickCancel}>{cancelLabel}</Button>
           </Panel>
