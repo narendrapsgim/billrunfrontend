@@ -5,14 +5,13 @@ import { Col, Row, Panel, Button } from 'react-bootstrap';
 import Field from '../../Field';
 import { buildRequestUrl } from '../../../common/Api';
 import { showSuccess, showDanger } from '../../../actions/alertsActions';
-import { addReceiver, removeReceiver } from '../../../actions/inputProcessorActions';
+import { removeReceiver } from '../../../actions/inputProcessorActions';
 
 class Connection extends Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
     receiver: PropTypes.instanceOf(Immutable.Map).isRequired,
-    settings: PropTypes.instanceOf(Immutable.Map),
     onSetReceiverField: PropTypes.func.isRequired,
     onSetReceiverCheckboxField: PropTypes.func.isRequired,
     OnChangeUploadingFile: PropTypes.func.isRequired,
@@ -70,11 +69,6 @@ class Connection extends Component {
     const { openReceivers } = this.state;
     openReceivers.splice(openReceivers.indexOf(priority), 1);
     this.setState({ openReceivers });
-  }
-
-  onAddReceiver = (receiver, index) => () => {
-    this.openReceiver(receiver.size)();
-    this.props.dispatch(addReceiver(receiver, index));
   }
 
   afterUpload = (res, fileName) => {
@@ -288,16 +282,6 @@ class Connection extends Component {
     );
   }
 
-  getAddReceiverButton = (receiver, index) => (
-    <Button
-      bsSize="xsmall"
-      className="btn-primary"
-      onClick={this.onAddReceiver(receiver, index)}
-    >
-      <i className="fa fa-plus" />&nbsp;Add Receiver
-    </Button>
-  );
-
   getRemoveReceiverButton = (receiver, index) => (
     <Button
       bsStyle="link"
@@ -339,7 +323,6 @@ class Connection extends Component {
             { this.getReceiver(receiver, index) }
           </Panel>
         </div>
-        { this.getAddReceiverButton(receiver, index) }
       </div>);
   }
 }

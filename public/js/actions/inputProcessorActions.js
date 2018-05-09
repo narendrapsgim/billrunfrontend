@@ -412,11 +412,9 @@ export function removeReceiver(receiver, index) {
   };
 }
 
-export function addReceiver(receiver, index) {
+export function addReceiver() {
   return {
     type: ADD_RECEIVER,
-    receiver,
-    index,
   };
 }
 

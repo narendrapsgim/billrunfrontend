@@ -1,11 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
-import { Form, Tabs } from 'react-bootstrap';
+import { Form, Tabs, Button } from 'react-bootstrap';
 import Connection from './Connection';
+import { addReceiver } from '../../../actions/inputProcessorActions';
 
 class Receiver extends Component {
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     settings: PropTypes.instanceOf(Immutable.Map),
     onSetReceiverField: PropTypes.func.isRequired,
     onSetReceiverCheckboxField: PropTypes.func.isRequired,
@@ -27,6 +29,20 @@ class Receiver extends Component {
     const { id, checked } = e.target;
     const fieldName = id.split('-')[0];
     this.props.onSetReceiverCheckboxField(fieldName, checked, index);
+  }
+
+  getAddReceiverButton = () => (
+    <Button
+      bsSize="xsmall"
+      className="btn-primary"
+      onClick={this.onAddReceiver()}
+    >
+      <i className="fa fa-plus" />&nbsp;Add Receiver
+    </Button>
+  );
+
+  onAddReceiver = () => () => {
+    this.props.dispatch(addReceiver());
   }
 
   renderReceivers = () => {
@@ -67,6 +83,7 @@ class Receiver extends Component {
         <Tabs id="receiver">
           { this.renderReceivers() }
         </Tabs>
+        { this.getAddReceiverButton() }
       </Form>
     );
   }
