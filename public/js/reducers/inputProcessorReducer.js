@@ -217,7 +217,7 @@ export default function (state = defaultState, action) {
       });
       const computed = state.getIn(['rate_calculators', rateCategory, usaget, priority, index, 'computed']);
       if (computed && !computed.isEmpty()) {
-        new_rating.set('computed', computed);
+        new_rating = new_rating.set('computed', computed);
       }
       return state.setIn(['rate_calculators', rateCategory, usaget, priority, index], new_rating);
 
