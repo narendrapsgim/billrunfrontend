@@ -97,7 +97,7 @@ class ReportSetup extends Component {
       'file_types',
       'subscribers.subscriber',
       'subscribers.account',
-      'taxation',
+      'taxation.tax_type',
       'lines',
       'rates.fields',
     ]));
