@@ -513,6 +513,9 @@ export function saveInputProcessorSettings(state, parts = []) {
     if (processor.get('time_format', false)) {
       settings.processor['time_format'] = processor.get('time_format');
     }
+    if (processor.get('timezone', false)) {
+      settings.processor['timezone'] = processor.get('timezone');
+    }
   }
   if (customer_identification_fields) {
     settings.customer_identification_fields = customer_identification_fields.toJS();
