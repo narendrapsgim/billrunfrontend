@@ -2,14 +2,13 @@ import React, { Component, PropTypes } from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Button, Panel } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Panel } from 'react-bootstrap';
 import Select from 'react-select';
 import moment from 'moment';
 import SubscriptionServicesDetails from './SubscriptionServicesDetails';
 import ActionButtons from '../Elements/ActionButtons';
 import Actions from '../Elements/Actions';
 import Field from '../Field';
-import Credit from '../Credit/Credit';
 import { EntityRevisionDetails } from '../Entity';
 import EntityFields from '../Entity/EntityFields';
 import {
@@ -50,7 +49,6 @@ class Subscription extends Component {
     super(props);
     this.state = {
       subscription: props.subscription,
-      showCreditCharge: false,
       progress: false,
     };
   }
@@ -213,14 +211,6 @@ class Subscription extends Component {
     }
   }
 
-  onShowCreditCharge = () => {
-    this.setState({ showCreditCharge: true });
-  }
-
-  onCloseCreditCharge = () => {
-    this.setState({ showCreditCharge: false });
-  }
-
   updateSubscriptionField = (path, value) => {
     this.setState(prevState => ({ subscription: prevState.subscription.setIn(path, value) }));
   }
@@ -305,19 +295,6 @@ class Subscription extends Component {
     )]);
   }
 
-  renderCreditCharge = () => {
-    const { subscription } = this.props;
-    const { showCreditCharge } = this.state;
-    const sid = subscription.get('sid', '');
-    const aid = subscription.get('aid', '');
-    return (
-      <div>
-        <Button bsSize="xsmall" className="btn-primary" onClick={this.onShowCreditCharge}>Manual charge / refund</Button>
-        { showCreditCharge && (<Credit aid={aid} sid={sid} onClose={this.onCloseCreditCharge} />) }
-      </div>
-    );
-  }
-
   fetchItem = () => {
     const { subscription } = this.state;
     this.props.getSubscription(subscription);
@@ -357,7 +334,6 @@ class Subscription extends Component {
   render() {
     const { progress, subscription } = this.state;
     const { revisions, mode, allServices, subscription: originSubscription } = this.props;
-    const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     const subscriptionFrom = getItemDateValue(subscription, 'from');
@@ -401,8 +377,6 @@ class Subscription extends Component {
               fieldsFilter={this.filterCustomFields}
               editable={allowEdit}
             />
-            { allowAddCredit && <hr /> }
-            { allowAddCredit && this.renderCreditCharge() }
           </Form>
         </Panel>
 

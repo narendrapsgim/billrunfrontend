@@ -7,7 +7,7 @@ import { Col, FormGroup, HelpBlock, Form, ControlLabel } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import ModalWrapper from '../Elements/ModalWrapper';
 import Field from '../Field';
-import { getRetailProductsWithRatesQuery } from '../../common/ApiQueries';
+import { getRetailProductsWithRatesQuery, getSubscribersQuery } from '../../common/ApiQueries';
 import { getList } from '../../actions/listActions';
 import { getSettings } from '../../actions/settingsActions';
 import { creditCharge } from '../../actions/creditActions';
@@ -31,7 +31,7 @@ class Credit extends Component {
     currency: '',
     usageTypesData: List(),
     propertyTypes: List(),
-    sid: false,
+    subscribers: List(),
   };
 
   static propTypes = {
@@ -41,8 +41,8 @@ class Credit extends Component {
     usageTypesData: PropTypes.instanceOf(List),
     propertyTypes: PropTypes.instanceOf(List),
     onClose: PropTypes.func.isRequired,
-    sid: PropTypes.number,
     aid: PropTypes.number.isRequired,
+    subscribers: PropTypes.instanceOf(List),
   };
 
   state = {
@@ -50,6 +50,7 @@ class Credit extends Component {
       aprice: 'required',
       usagev: '',
       rate: 'required',
+      subscriber: 'required',
     }),
     helperMsg: Map({
       aprice: '',
@@ -60,11 +61,15 @@ class Credit extends Component {
     usagev: 1,
     rate: '',
     progress: false,
+    subscriber: '',
   }
 
   componentDidMount() {
+    const { aid } = this.props;
+
     this.props.dispatch(getList('all_retail_rates', getRetailProductsWithRatesQuery()));
     this.props.dispatch(getSettings('usage_types'));
+    this.props.dispatch(getList('subscribers_for_aid', getSubscribersQuery(aid)));
   }
 
   onChangeValue = (field, value) => {
@@ -111,6 +116,10 @@ class Credit extends Component {
     this.onChangeValue('rate', value);
   }
 
+  onChangeSubscriberValue = (value) => {
+    this.onChangeValue('subscriber', value);
+  }
+
   onChangeCreditBy = (e) => {
     const { value } = e.target;
     const { validationErrors, helperMsg } = this.state;
@@ -135,11 +144,12 @@ class Credit extends Component {
   }
 
   onCreditCharge = () => {
-    const { aid, sid, propertyTypes, usageTypesData } = this.props;
-    const { rateBy, aprice, usagev, rate, validationErrors } = this.state;
+    const { aid, propertyTypes, usageTypesData } = this.props;
+    const { rateBy, aprice, usagev, rate, validationErrors, subscriber } = this.state;
     if (validationErrors.valueSeq().includes('required')) {
       return;
     }
+    const sid = (subscriber === 'account_level') ? 0 : subscriber;
 
     let params = [
       { aid },
@@ -173,6 +183,12 @@ class Credit extends Component {
     return allRates.map(rate => ({ value: rate.get('key'), label: rate.get('key') })).toArray();
   }
 
+  getSubscribersBySid = () => {
+    const { subscribers } = this.props;
+    const sidsArray = subscribers.map(subscriber => ({ value: subscriber.get('sid'), label: subscriber.get('sid').toString() })).toArray();
+    return [{ value: 'account_level', label: 'account level' }, ...sidsArray];
+  }
+
   getSelectedRate = rateKey => getRateByKey(this.props.allRates, rateKey);
 
   getRateUnitLabel = (rateKey) => {
@@ -185,8 +201,10 @@ class Credit extends Component {
   }
 
   render() {
-    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg, progress } = this.state;
+    const { rateBy, aprice, usagev, rate, validationErrors, helperMsg, progress, subscriber } = this.state;
     const availableRates = this.getAvailableRates();
+    const subscribersForAid = this.getSubscribersBySid();
+
     return (
       <ModalWrapper
         show={true}
@@ -223,6 +241,19 @@ class Credit extends Component {
                   label="Volume"
                 />
               </Col>
+            </Col>
+          </FormGroup>
+
+          <FormGroup validationState={validationErrors.get('subscriber', '').length > 0 ? 'error' : null}>
+            <Col sm={2} componentClass={ControlLabel}>Subscriber</Col>
+            <Col sm={10}>
+              <Select
+                id="subscriber"
+                onChange={this.onChangeSubscriberValue}
+                value={subscriber}
+                options={subscribersForAid}
+              />
+              { validationErrors.get('subscriber', '').length > 0 ? <HelpBlock>{validationErrors.get('subscriber', '')}</HelpBlock> : ''}
             </Col>
           </FormGroup>
 
@@ -279,6 +310,7 @@ const mapStateToProps = (state, props) => ({
   usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),
   allRates: state.list.get('all_retail_rates'),
+  subscribers: state.list.get('subscribers_for_aid'),
 });
 
 export default connect(mapStateToProps)(Credit);
