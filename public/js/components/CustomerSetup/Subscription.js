@@ -87,8 +87,8 @@ class Subscription extends Component {
       }
       return services.map((service) => {
         const serviceType = this.getServiceType(service); // 'normal', 'quantitative', 'balance_period'
-        const existingService = originServices.find(originService => originService.get('service_id', '') === service.get('service_id', ''));
-        const newService = service.get('service_id', '') === '';
+        const existingService = originServices.find(originService => originService.getIn(['ui_flags', 'serviceId'], '') === service.getIn(['ui_flags', 'serviceId'], ''));
+        const newService = service.getIn(['ui_flags', 'serviceId'], '') === '';
 
         switch (serviceType) {
           case 'normal': // New -> update to SUB from.

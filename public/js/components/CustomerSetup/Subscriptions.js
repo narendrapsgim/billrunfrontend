@@ -47,6 +47,7 @@ export default class Subscriptions extends Component {
                 ).get('balance_period', 'default') !== 'default';
                 const uiFlags = Immutable.Map({
                   balance_period: isBalancePeriod,
+                  serviceId: uuid.v4(),
                 });
                 return service.set('ui_flags', uiFlags);
               });
