@@ -83,7 +83,6 @@ class RateMapping extends Component {
         custom: true,
       },
     };
-    console.log(eModified);
     this.onSetRating(eModified);
   }
 
