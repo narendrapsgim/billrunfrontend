@@ -65,6 +65,7 @@ class RateMapping extends Component {
 
   getRatingTypes = () => ([
     { value: 'match', label: 'Equals' },
+    { value: 'equalFalse', label: 'Does Not Equal' },
     { value: 'longestPrefix', label: 'Longest Prefix' },
   ]);
 
@@ -82,6 +83,7 @@ class RateMapping extends Component {
         custom: true,
       },
     };
+    console.log(eModified);
     this.onSetRating(eModified);
   }
 
