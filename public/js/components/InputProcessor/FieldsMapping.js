@@ -58,7 +58,7 @@ export default class FieldsMapping extends Component {
     if (this.props.settings.getIn(['processor', 'time_field'])) {
       this.setState({separateTime: true});
     }
-    if (this.props.settings.getIn(['processor', 'timezone'])) {
+    if (this.props.settings.getIn(['processor', 'timezone_field'])) {
       this.setState({ separateTimeZone: true });
     }
   }
@@ -187,7 +187,7 @@ export default class FieldsMapping extends Component {
   onChangeSeparateTimeZone = (e) => {
     const { checked } = e.target;
     if (!checked) {
-      this.props.unsetField(['processor', 'timezone']);
+      this.props.unsetField(['processor', 'timezone_field']);
       this.onChangeTimeZoneExists();
     }
     this.setState({ separateTimeZone: !this.state.separateTimeZone });
@@ -244,7 +244,7 @@ export default class FieldsMapping extends Component {
     const e = {
       target: {
         value: undefined,
-        id: 'timezone',
+        id: 'timezone_field',
       },
     };
     this.onChangeTimeZoneFormat(e);
@@ -406,7 +406,7 @@ export default class FieldsMapping extends Component {
                   className="form-control"
                   onChange={onSetFieldMapping}
                   disabled={!separateTimeZone}
-                  value={settings.getIn(['processor', 'timezone'], '')}
+                  value={settings.getIn(['processor', 'timezone_field'], '')}
                 >
                   { available_fields }
                 </select>

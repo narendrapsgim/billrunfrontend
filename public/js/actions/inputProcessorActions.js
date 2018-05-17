@@ -516,8 +516,8 @@ export function saveInputProcessorSettings(state, parts = []) {
     if (processor.get('time_format', false)) {
       settings.processor['time_format'] = processor.get('time_format');
     }
-    if (processor.get('timezone', false)) {
-      settings.processor['timezone'] = processor.get('timezone');
+    if (processor.get('timezone_field', false)) {
+      settings.processor['timezone_field'] = processor.get('timezone_field');
     }
   }
   if (customer_identification_fields) {
