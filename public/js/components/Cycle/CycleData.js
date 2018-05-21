@@ -314,7 +314,7 @@ class CycleData extends Component {
       { id: 'attributes.lastname', title: 'Customer Last Name', sort: true, parser: this.parseCycleDataLastName },
       { id: 'totals.after_vat_rounded', title: 'Invoice Total', sort: true, parser: this.parseCycleDataInvoiceTotal },
       { id: 'subss', title: '# of Subscribers', parser: this.parseCycleDataSubscriptionNum },
-      { id: 'invoice_id', title: 'Invoice ID', parser: this.parseCycleDataInvoiceId },
+      { id: 'invoice_id', title: 'Invoice ID', 'sort': true, parser: this.parseCycleDataInvoiceId },
       { id: 'download', title: 'Invoice', parser: this.parseCycleDataDownload },
       { id: 'confirm', title: 'Confirm', parser: this.parseCycleDataConfirm },
       { id: 'email_sent', title: 'Email Sent', sort: true, parser: this.parseCycleDataEmailSent, display: displayEmailSent },
