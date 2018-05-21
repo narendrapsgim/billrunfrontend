@@ -64,6 +64,8 @@ export default {
       { id: 'balance_before', type: 'number' },
       { id: 'balance_after', type: 'number' },
       { id: 'balance_normalized', type: 'number' },
+      { id: 'start', title: 'Proration start date', type: 'date' },
+      { id: 'end', title: 'Proration end date', type: 'date' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
