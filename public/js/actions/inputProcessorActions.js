@@ -105,7 +105,7 @@ const convert = (settings) => {
       usaget_mapping = processor.usaget_mapping.map(usaget => {
 	return {
     src_field: usaget.src_field,
-    conditions: usaget.conditions,
+    conditions: usaget.conditions !== undefined ? usaget.conditions : [ {src_field: usaget.src_field, pattern: usaget.pattern} ],
 	  usaget: usaget.usaget,
 	  pattern: usaget.pattern,
     unit: usaget.unit,
