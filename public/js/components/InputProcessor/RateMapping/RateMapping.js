@@ -65,6 +65,7 @@ class RateMapping extends Component {
 
   getRatingTypes = () => ([
     { value: 'match', label: 'Equals' },
+    { value: 'equalFalse', label: 'Does Not Equal' },
     { value: 'longestPrefix', label: 'Longest Prefix' },
   ]);
 
