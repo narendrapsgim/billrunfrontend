@@ -46,6 +46,7 @@ export default class FieldsMapping extends Component {
       usaget: "",
       unit: '',
       separateTime: false,
+      separateTimeZone: false,
       volumeType: 'field',
       volumeFields: [],
       volumeHardCodedValue: '',
@@ -56,6 +57,9 @@ export default class FieldsMapping extends Component {
   componentWillMount() {
     if (this.props.settings.getIn(['processor', 'time_field'])) {
       this.setState({separateTime: true});
+    }
+    if (this.props.settings.getIn(['processor', 'timezone_field'])) {
+      this.setState({ separateTimeZone: true });
     }
   }
 
@@ -180,6 +184,15 @@ export default class FieldsMapping extends Component {
     this.setState({separateTime: !this.state.separateTime});
   };
 
+  onChangeSeparateTimeZone = (e) => {
+    const { checked } = e.target;
+    if (!checked) {
+      this.props.unsetField(['processor', 'timezone_field']);
+      this.onChangeTimeZoneExists();
+    }
+    this.setState({ separateTimeZone: !this.state.separateTimeZone });
+  };
+
   onChangeDynamicUsagetVolumeType = (e) => {
     const { value } = e.target;
     this.setState({ volumeType: value, volumeHardCodedValue: '', volumeFields: [] });
@@ -213,6 +226,10 @@ export default class FieldsMapping extends Component {
     this.props.onSetFieldMapping(e);
   }
 
+  onChangeTimeZoneFormat = (e) => {
+    this.props.onSetFieldMapping(e);
+  }
+
   onChangeTimeFormatExists = () => {
     const e = {
       target: {
@@ -221,6 +238,16 @@ export default class FieldsMapping extends Component {
       },
     };
     this.onChangeTimeFormat(e);
+  }
+
+  onChangeTimeZoneExists = () => {
+    const e = {
+      target: {
+        value: undefined,
+        id: 'timezone_field',
+      },
+    };
+    this.onChangeTimeZoneFormat(e);
   }
 
   getVolumeOptions = () => this.props.settings.get('fields', Immutable.List()).sortBy(field => field).map(field => ({
@@ -238,6 +265,7 @@ export default class FieldsMapping extends Component {
   render() {
     const {
       separateTime,
+      separateTimeZone,
       usaget,
       unit,
       volumeType,
@@ -359,6 +387,30 @@ export default class FieldsMapping extends Component {
             </div>
             <div className="col-lg-1">
               <Help contents="To enable, enter date format. For formatting info please check the link on the left" />
+            </div>
+          </div>
+
+          <div className="col-lg-offset-3 col-lg-9" style={{ marginTop: 30 }}>
+            <div className="col-lg-offset-1 col-lg-4">
+              <div className="input-group">
+                <div className="input-group-addon">
+                  <input
+                    type="checkbox"
+                    checked={separateTimeZone}
+                    onChange={this.onChangeSeparateTimeZone}
+                  />
+                  <small>&nbsp;Timezone in a separate field</small>
+                </div>
+                <select
+                  id="timezone"
+                  className="form-control"
+                  onChange={onSetFieldMapping}
+                  disabled={!separateTimeZone}
+                  value={settings.getIn(['processor', 'timezone_field'], '')}
+                >
+                  { available_fields }
+                </select>
+              </div>
             </div>
           </div>
         </div>
