@@ -402,7 +402,7 @@ export default class FieldsMapping extends Component {
                   <small>&nbsp;Timezone in a separate field</small>
                 </div>
                 <select
-                  id="timezone"
+                  id="timezone_field"
                   className="form-control"
                   onChange={onSetFieldMapping}
                   disabled={!separateTimeZone}
