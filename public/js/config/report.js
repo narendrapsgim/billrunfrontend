@@ -200,6 +200,12 @@ export default {
     { id: 'multiplication', title: 'Multiply by a number' },
     { id: 'default_empty', title: 'Default Value', addOption: true, options: [
       { value: 'current_time', label: 'Current Time' },
+      { value: 'current_start', label: 'Current Billing Cycle Start' },
+      { value: 'current_end', label: 'Current Billing Cycle End' },
+      { value: 'first_unconfirmed_start', label: 'First Unconfirmed Billing Cycle Start' },
+      { value: 'first_unconfirmed_end', label: 'First Unconfirmed Cycle End' },
+      { value: 'last_confirmed_start', label: 'Last Confirmed Billing Cycle Start' },
+      { value: 'last_confirmed_end', label: 'Last Confirmed Billing Cycle End' },
     ] },
     { id: 'vat_format', title: 'Vat', options: [
       { value: 'add_tax', label: 'Add Vat' },
