@@ -702,21 +702,26 @@ export default class FieldsMapping extends Component {
               </div>
             </div>)
           }
-
-          <div className="form-group" style={{ marginRight: 60 }}>
-            <div className="col-lg-offset-1 col-lg-10" style={{ padding: 16 }} >
-              <div className="separator" />
+          {
+            settings.get('usaget_type', '') === 'dynamic' &&
+            <div className="form-group" style={{ marginRight: 60 }}>
+              <div className="col-lg-offset-1 col-lg-10" style={{ padding: 16 }} >
+                <div className="separator" />
+              </div>
             </div>
-          </div>
-          <div className="col-lg-offset-10 col-lg-1" style={{ marginLeft: 600 }}>
-            <button
-              type="button"
-              className="btn btn-primary btn-sm"
-              onClick={this.addUsagetMapping}
-            >
-              <i className="fa fa-plus" /> Add Mapping
-            </button>
-          </div>
+          }
+          {
+            settings.get('usaget_type', '') === 'dynamic' &&
+            <div className="col-lg-offset-10 col-lg-1" style={{ marginLeft: 600 }}>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={this.addUsagetMapping}
+              >
+                <i className="fa fa-plus" /> Add Mapping
+                </button>
+              </div>
+        }
         </div>
       </form>
     );
