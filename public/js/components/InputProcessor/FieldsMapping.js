@@ -478,6 +478,7 @@ export default class FieldsMapping extends Component {
                       onChangeUsaget={this.onChangeStaticUsaget}
                       onChangeUnit={this.onChangeStaticUom}
                       enabled={settings.get('usaget_type', '') === 'static'}
+                      showDisplayUnits={true}
                     />
                   </div>
                   <div className="col-lg-1">
@@ -627,6 +628,7 @@ export default class FieldsMapping extends Component {
                       onChangeUsaget={this.onChangeUsaget}
                       onChangeUnit={this.onChangeUom}
                       enabled={settings.get('usaget_type', '') === 'dynamic'}
+                      showDisplayUnits={true}
                     />
                   </div>
                   <div className="col-lg-2">

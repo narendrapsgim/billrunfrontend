@@ -23,6 +23,7 @@ class UsageTypesSelector extends Component {
     usagetFilter: PropTypes.func,
     unitFilter: PropTypes.func,
     showSelectTypes: PropTypes.bool,
+    showDisplayUnits: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -38,6 +39,7 @@ class UsageTypesSelector extends Component {
     usagetFilter: () => true,
     unitFilter: () => true,
     showSelectTypes: true,
+    showDisplayUnits: false,
   };
 
   state = {
@@ -102,11 +104,11 @@ class UsageTypesSelector extends Component {
   }
 
   getAvailableUnits = () => {
-    const { propertyTypes, usageTypesData, usaget, unitFilter } = this.props;
+    const { propertyTypes, usageTypesData, usaget, unitFilter, showDisplayUnits } = this.props;
     const selectedUsaget = usageTypesData.find(usageType => usageType.get('usage_type', '') === usaget) || Immutable.Map();
     const uom = (propertyTypes.find(prop => prop.get('type', '') === selectedUsaget.get('property_type', '')) || Immutable.Map()).get('uom', Immutable.List());
     return uom
-      .filter(unit => unit.get('unit', false) !== false)
+      .filter(unit => unit.get('unit', false) !== false || (showDisplayUnits && unit.get('convertFunction', false) !== false))
       .filter(unitFilter)
       .map(unit => ({ value: unit.get('name', ''), label: unit.get('label', '') })).toArray();
   }
