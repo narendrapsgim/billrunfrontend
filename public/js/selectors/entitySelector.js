@@ -2,7 +2,10 @@ import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector, closedCycleChangesSelector } from './settingsSelector';
+import { PLAN_SOURCE } from '../reducers/planReducer';
 
+
+const getSourcePlan = (state, props) => state.entity.get(PLAN_SOURCE);
 
 const getPropsItem = (state, props) => props.item;
 
@@ -216,4 +219,9 @@ export const entityMinFrom = createSelector(
 export const actionSelector = createSelector(
   getAction,
   action => action || undefined
+);
+
+export const sourcePlanRatesSelector = createSelector(
+  getSourcePlan,
+  (sourcePlan = Immutable.Map()) => sourcePlan.get('rates'),
 );

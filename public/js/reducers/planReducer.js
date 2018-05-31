@@ -46,6 +46,7 @@ import {
   REMOVE_BALANCE_THRESHOLD,
 } from '../actions/prepaidPlanActions';
 
+export const PLAN_SOURCE = 'planSource';
 
 const PLAN_CYCLE_UNLIMITED = globalSetting.planCycleUnlimitedValue;
 const defaultState = Immutable.Map();

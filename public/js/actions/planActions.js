@@ -2,7 +2,7 @@ import Immutable from 'immutable';
 import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { fetchPlanByIdQuery, getAllGroupsQuery, fetchPrepaidGroupByIdQuery } from '../common/ApiQueries';
-import { saveEntity, gotEntity } from '../actions/entityActions';
+import { saveEntity, gotEntity, clearEntity } from '../actions/entityActions';
 import {
   getPlanConvertedRates,
   getPlanConvertedPpIncludes,
@@ -14,6 +14,7 @@ import {
   usageTypesDataSelector,
   propertyTypeSelector,
 } from '../selectors/settingsSelector';
+import { PLAN_SOURCE } from '../reducers/planReducer';
 
 export const PLAN_GOT = 'PLAN_GOT';
 export const PLAN_CLEAR = 'PLAN_CLEAR';
@@ -44,6 +45,8 @@ const gotItem = plan => ({
 export const clearPlan = () => ({
   type: PLAN_CLEAR,
 });
+
+export const clearSourcePlan = () => dispatch => dispatch(clearEntity(PLAN_SOURCE));
 
 export const onGroupRemove = groupName => ({
   type: REMOVE_GROUP_PLAN,
@@ -190,7 +193,7 @@ export const savePrepaidGroup = (prepaidGroup, action) => (dispatch, getState) =
   return dispatch(saveEntity('prepaidgroups', convertedPrepaidGroup, action));
 };
 
-export const getPlan = (id, setOrigin = false) => (dispatch, getState) => {
+export const getPlan = (id, setSource = false) => (dispatch, getState) => {
   dispatch(startProgressIndicator());
   const query = fetchPlanByIdQuery(id);
   return apiBillRun(query)
@@ -200,8 +203,8 @@ export const getPlan = (id, setOrigin = false) => (dispatch, getState) => {
       const plan = Immutable.fromJS(item);
       const convertedPlan = convertPlan(getState, plan, false).toJS();
       dispatch(gotItem(convertedPlan));
-      if (setOrigin) {
-        dispatch(gotEntity('planOriginal', convertedPlan));
+      if (setSource) {
+        dispatch(gotEntity(PLAN_SOURCE, convertedPlan));
       }
       return dispatch(apiBillRunSuccessHandler(response));
     })
