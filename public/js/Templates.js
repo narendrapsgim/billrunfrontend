@@ -459,7 +459,7 @@ Bandwidth_CDR: {
 	{
 	  "src_field" : "call_type",
 	  "pattern" : "/^G$/",
-	  "usaget" : "GPRS Data",
+	  "usaget" : "GPRS_Data",
     "volume_type": "field",
     "volume_src": ["duration"]
 	}
@@ -467,7 +467,7 @@ Bandwidth_CDR: {
       "orphan_files_time" : "6 hours"
     },
     "customer_identification_fields" : {
-      "GPRS Data": [
+      "GPRS_Data": [
         {
           "target_key" : "sid",
           "clear_regex" : "//",
@@ -477,7 +477,7 @@ Bandwidth_CDR: {
     },
     "rate_calculators" : {
       "retail": {
-        "GPRS Data" : [[
+        "GPRS_Data" : [[
   	{
   	  "type" : "match",
   	  "rate_key" : "key",
@@ -487,7 +487,7 @@ Bandwidth_CDR: {
       }
     },
     "pricing": {
-      "GPRS Data": {
+      "GPRS_Data": {
       }
     }
   },
