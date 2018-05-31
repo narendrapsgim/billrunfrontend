@@ -127,7 +127,7 @@ class PlanSetup extends Component {
 
   fetchItem = (itemId = this.props.itemId) => {
     if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+      this.props.dispatch(getPlan(itemId, true)).then(this.afterItemReceived);
     }
   }
 
@@ -145,7 +145,6 @@ class PlanSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
-      this.props.dispatch(gotEntity('planOriginal', response.data[0]));
     } else {
       this.handleBack();
     }
