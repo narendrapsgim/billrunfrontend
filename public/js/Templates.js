@@ -1,274 +1,4 @@
 const Templates = {
-  Voip_Ms_CDR: {
-"file_type": "Voip_Ms_CDR",
-      "parser": {
-        "type": "separator",
-        "separator": ",",
-        "structure": [
-          {"name": "Date"},
-          {"name": "CallerID"},
-          {"name": "Originator"},
-          {"name": "Destination"},
-          {"name": "CallType"},
-          {"name": "Duration"},
-          {"name": "PricePerMinute"},
-          {"name": "FinalCharge"}
-        ],
-        "csv_has_header": false,
-        "csv_has_footer": false,
-        "custom_keys": [
-          "Date",
-          "CallerID",
-          "Originator",
-          "Destination",
-          "CallType",
-          "Duration",
-          "PricePerMinute",
-          "FinalCharge"
-        ],
-        "line_types": {
-          "H": "/^none$/",
-          "D": "//",
-          "T": "/^none$/"
-        }
-      },
-      "processor": {
-        "type": "Usage",
-        "date_field": "Date",
-        "usaget_mapping": [
-          {
-            "src_field": "CallType",
-            "pattern": "/^Inbound*/",
-            "usaget": "inbound_call",
-            "unit": "seconds",
-            "volume_type": "field",
-            "volume_src": ["Duration"]
-          },
-          {
-            "src_field": "CallType",
-            "pattern": "/^(?!Inbound).*$/",
-            "usaget": "outbound_call",
-            "unit": "seconds",
-            "volume_type": "field",
-            "volume_src": ["Duration"]
-          }
-        ],
-        "date_format": "m/d/Y H:i",
-        "orphan_files_time": "6 hours"
-      },
-      "customer_identification_fields": {
-        "inbound_call": [
-          {
-            "target_key": "phone",
-            "src_key": "Destination",
-            "conditions": [
-              {
-                "field": "usaget",
-                "regex": "/.*/"
-              }
-            ],
-            "clear_regex": "//"
-          }
-        ],
-        "outbound_call": [
-          {
-            "target_key": "phone",
-            "src_key": "Originator",
-            "conditions": [
-              {
-                "field": "usaget",
-                "regex": "/.*/"
-              }
-            ],
-            "clear_regex": "/.*<|\\D/"
-          }
-        ]
-      },
-      "rate_calculators": {
-        "retail": {
-          "inbound_call": [
-            [
-              {
-                "type": "longestPrefix",
-                "rate_key": "prefix",
-                "line_key": "computed"
-              }
-            ]
-          ],
-          "outbound_call": [
-            [
-              {
-                "type": "longestPrefix",
-                "rate_key": "params.prefix",
-                "line_key": "Destination"
-              }
-            ]
-          ]
-        }
-      },
-      "pricing": {
-        "inbound_call": {
-        },
-        "outbound_call": {
-        }
-      }
-},
-Bandwidth_CDR: {
-"file_type": "Bandwidth_CDR",
-      "parser": {
-        "type": "separator",
-        "separator": "|",
-        "structure": [
-          {"name": "AccountNumber"},
-          {"name": "CallStartDateTime"},
-          {"name": "CallEndDateTime"},
-          {"name": "CallType"},
-          {"name": "CallSource"},
-          {"name": "CallDestination"},
-          {"name": "Duration"},
-          {"name": "PerMinRate"},
-          {"name": "Amount"},
-          {"name": "TierType"},
-          {"name": "SourceCountry"},
-          {"name": "SourceState"},
-          {"name": "SourceLATA"},
-          {"name": "SourceRateCenter"},
-          {"name": "DestinationCountry"},
-          {"name": "DestinationState"},
-          {"name": "DestinationLATA"},
-          {"name": "DesinationRateCenter"},
-          {"name": "CallID"},
-          {"name": "BdrID"},
-          {"name": "SourceIP"},
-          {"name": "DestinationIP"},
-          {"name": "RateAttempts"},
-          {"name": "LRN"},
-          {"name": "LocationID"},
-          {"name": "SubAccountID"},
-          {"name": "LocationName"},
-          {"name": "SubAccountName____"}
-        ],
-        "csv_has_header": true,
-        "csv_has_footer": false,
-        "custom_keys": [
-          "AccountNumber",
-          "CallStartDateTime",
-          "CallEndDateTime",
-          "CallType",
-          "CallSource",
-          "CallDestination",
-          "Duration",
-          "PerMinRate",
-          "Amount",
-          "TierType",
-          "SourceCountry",
-          "SourceState",
-          "SourceLATA",
-          "SourceRateCenter",
-          "DestinationCountry",
-          "DestinationState",
-          "DestinationLATA",
-          "DesinationRateCenter",
-          "CallID",
-          "BdrID",
-          "SourceIP",
-          "DestinationIP",
-          "RateAttempts",
-          "LRN",
-          "LocationID",
-          "SubAccountID",
-          "LocationName",
-          "SubAccountName____"
-        ],
-        "line_types": {
-          "H": "/^none$/",
-          "D": "//",
-          "T": "/^none$/"
-        }
-      },
-      "processor": {
-        "type": "Usage",
-        "date_field": "CallStartDateTime",
-        "usaget_mapping": [
-          {
-            "src_field": "CallType",
-            "pattern": "WVO",
-            "usaget": "inbound_call",
-            "unit": "seconds",
-            "volume_type": "field",
-            "volume_src": ["Duration"]
-          },
-          {
-            "src_field": "CallType",
-            "pattern": "/^(?!WVO).*$/",
-            "usaget": "outbound_call",
-            "unit": "seconds",
-            "volume_type": "field",
-            "volume_src": ["Duration"]
-          }
-        ],
-        "date_format": "m/d/Y H:i:s A",
-        "orphan_files_time": "6 hours"
-      },
-      "customer_identification_fields": {
-        "inbound_call": [
-          {
-            "target_key": "phone",
-            "src_key": "CallDestination",
-            "conditions": [
-              {
-                "field": "usaget",
-                "regex": "/.*/"
-              }
-            ],
-            "clear_regex": "//"
-          }
-        ],
-        "outbound_call": [
-          {
-            "target_key": "phone",
-            "src_key": "CallSource",
-            "conditions": [
-              {
-                "field": "usaget",
-                "regex": "/.*/"
-              }
-            ],
-            "clear_regex": "//"
-          }
-        ]
-      },
-      "rate_calculators": {
-        "retail": {
-          "inbound_call": [
-            [
-              {
-                "type": "longestPrefix",
-                "rate_key": "params.prefix",
-                "line_key": "CallSource"
-              }
-            ]
-          ],
-          "outbound_call": [
-            [
-              {
-                "type": "longestPrefix",
-                "rate_key": "params.prefix",
-                "line_key": "CallDestination"
-              }
-            ]
-          ]
-        }
-      },
-      "pricing": {
-        "inbound_call": {
-          "aprice_field": "Amount"
-        },
-        "outbound_call": {
-          "aprice_field": "Amount"
-        }
-      }
-},
   Asterisk_CDR: {
     "file_type" : "Asterisk_CDR",
     "parser" : {
@@ -830,6 +560,276 @@ Bandwidth_CDR: {
       "retail": {
       }
     }
+  },
+	Voip_Ms_CDR: {
+      "file_type": "Voip_Ms_CDR",
+      "parser": {
+        "type": "separator",
+        "separator": ",",
+        "structure": [
+          {"name": "Date"},
+          {"name": "CallerID"},
+          {"name": "Originator"},
+          {"name": "Destination"},
+          {"name": "CallType"},
+          {"name": "Duration"},
+          {"name": "PricePerMinute"},
+          {"name": "FinalCharge"}
+        ],
+        "csv_has_header": false,
+        "csv_has_footer": false,
+        "custom_keys": [
+          "Date",
+          "CallerID",
+          "Originator",
+          "Destination",
+          "CallType",
+          "Duration",
+          "PricePerMinute",
+          "FinalCharge"
+        ],
+        "line_types": {
+          "H": "/^none$/",
+          "D": "//",
+          "T": "/^none$/"
+        }
+      },
+      "processor": {
+        "type": "Usage",
+        "date_field": "Date",
+        "usaget_mapping": [
+          {
+            "src_field": "CallType",
+            "pattern": "/^Inbound*/",
+            "usaget": "inbound_call",
+            "unit": "seconds",
+            "volume_type": "field",
+            "volume_src": ["Duration"]
+          },
+          {
+            "src_field": "CallType",
+            "pattern": "/^(?!Inbound).*$/",
+            "usaget": "outbound_call",
+            "unit": "seconds",
+            "volume_type": "field",
+            "volume_src": ["Duration"]
+          }
+        ],
+        "date_format": "m/d/Y H:i",
+        "orphan_files_time": "6 hours"
+      },
+      "customer_identification_fields": {
+        "inbound_call": [
+          {
+            "target_key": "phone",
+            "src_key": "Destination",
+            "conditions": [
+              {
+                "field": "usaget",
+                "regex": "/.*/"
+              }
+            ],
+            "clear_regex": "//"
+          }
+        ],
+        "outbound_call": [
+          {
+            "target_key": "phone",
+            "src_key": "Originator",
+            "conditions": [
+              {
+                "field": "usaget",
+                "regex": "/.*/"
+              }
+            ],
+            "clear_regex": "/.*<|\\D/"
+          }
+        ]
+      },
+      "rate_calculators": {
+        "retail": {
+          "inbound_call": [
+            [
+              {
+                "type": "longestPrefix",
+                "rate_key": "prefix",
+                "line_key": "computed"
+              }
+            ]
+          ],
+          "outbound_call": [
+            [
+              {
+                "type": "longestPrefix",
+                "rate_key": "params.prefix",
+                "line_key": "Destination"
+              }
+            ]
+          ]
+        }
+      },
+      "pricing": {
+        "inbound_call": {
+        },
+        "outbound_call": {
+        }
+      }
+  },
+  Bandwidth_CDR: {
+      "file_type": "Bandwidth_CDR",
+      "parser": {
+        "type": "separator",
+        "separator": "|",
+        "structure": [
+          {"name": "AccountNumber"},
+          {"name": "CallStartDateTime"},
+          {"name": "CallEndDateTime"},
+          {"name": "CallType"},
+          {"name": "CallSource"},
+          {"name": "CallDestination"},
+          {"name": "Duration"},
+          {"name": "PerMinRate"},
+          {"name": "Amount"},
+          {"name": "TierType"},
+          {"name": "SourceCountry"},
+          {"name": "SourceState"},
+          {"name": "SourceLATA"},
+          {"name": "SourceRateCenter"},
+          {"name": "DestinationCountry"},
+          {"name": "DestinationState"},
+          {"name": "DestinationLATA"},
+          {"name": "DesinationRateCenter"},
+          {"name": "CallID"},
+          {"name": "BdrID"},
+          {"name": "SourceIP"},
+          {"name": "DestinationIP"},
+          {"name": "RateAttempts"},
+          {"name": "LRN"},
+          {"name": "LocationID"},
+          {"name": "SubAccountID"},
+          {"name": "LocationName"},
+          {"name": "SubAccountName____"}
+        ],
+        "csv_has_header": true,
+        "csv_has_footer": false,
+        "custom_keys": [
+          "AccountNumber",
+          "CallStartDateTime",
+          "CallEndDateTime",
+          "CallType",
+          "CallSource",
+          "CallDestination",
+          "Duration",
+          "PerMinRate",
+          "Amount",
+          "TierType",
+          "SourceCountry",
+          "SourceState",
+          "SourceLATA",
+          "SourceRateCenter",
+          "DestinationCountry",
+          "DestinationState",
+          "DestinationLATA",
+          "DesinationRateCenter",
+          "CallID",
+          "BdrID",
+          "SourceIP",
+          "DestinationIP",
+          "RateAttempts",
+          "LRN",
+          "LocationID",
+          "SubAccountID",
+          "LocationName",
+          "SubAccountName____"
+        ],
+        "line_types": {
+          "H": "/^none$/",
+          "D": "//",
+          "T": "/^none$/"
+        }
+      },
+      "processor": {
+        "type": "Usage",
+        "date_field": "CallStartDateTime",
+        "usaget_mapping": [
+          {
+            "src_field": "CallType",
+            "pattern": "WVO",
+            "usaget": "inbound_call",
+            "unit": "seconds",
+            "volume_type": "field",
+            "volume_src": ["Duration"]
+          },
+          {
+            "src_field": "CallType",
+            "pattern": "/^(?!WVO).*$/",
+            "usaget": "outbound_call",
+            "unit": "seconds",
+            "volume_type": "field",
+            "volume_src": ["Duration"]
+          }
+        ],
+        "date_format": "m/d/Y H:i:s A",
+        "orphan_files_time": "6 hours"
+      },
+      "customer_identification_fields": {
+        "inbound_call": [
+          {
+            "target_key": "phone",
+            "src_key": "CallDestination",
+            "conditions": [
+              {
+                "field": "usaget",
+                "regex": "/.*/"
+              }
+            ],
+            "clear_regex": "//"
+          }
+        ],
+        "outbound_call": [
+          {
+            "target_key": "phone",
+            "src_key": "CallSource",
+            "conditions": [
+              {
+                "field": "usaget",
+                "regex": "/.*/"
+              }
+            ],
+            "clear_regex": "//"
+          }
+        ]
+      },
+      "rate_calculators": {
+        "retail": {
+          "inbound_call": [
+            [
+              {
+                "type": "longestPrefix",
+                "rate_key": "params.prefix",
+                "line_key": "CallSource"
+              }
+            ]
+          ],
+          "outbound_call": [
+            [
+              {
+                "type": "longestPrefix",
+                "rate_key": "params.prefix",
+                "line_key": "CallDestination"
+              }
+            ]
+          ]
+        }
+      },
+      "pricing": {
+        "inbound_call": {
+          "aprice_field": "Amount"
+        },
+        "outbound_call": {
+          "aprice_field": "Amount"
+        }
+      }
   }
 };
 
