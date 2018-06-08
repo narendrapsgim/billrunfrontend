@@ -43,6 +43,7 @@ import {
   setRealtimeField,
   setRealtimeDefaultField,
   cancelKeyAuth,
+  setCheckedField,
  } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
@@ -359,6 +360,10 @@ class InputProcessor extends Component {
     this.props.dispatch(showDanger(message));
   }
 
+  onCheckedField = (index, checked, field) => {
+    this.props.dispatch(setCheckedField(index, checked, field));
+  }
+
   setUsagetType = (val) => {
     this.props.dispatch(setUsagetType(val));
   }
@@ -456,6 +461,7 @@ class InputProcessor extends Component {
           onRemoveAllFields={this.onRemoveAllFields}
           onSetDelimiterType={this.onSetDelimiterType}
           onChangeInputProcessorField={this.onChangeInputProcessorField}
+          onCheckedField={this.onCheckedField}
         />
       );
 

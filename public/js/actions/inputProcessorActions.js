@@ -42,6 +42,7 @@ export const SET_PARSER_SETTING = 'SET_PARSER_SETTING';
 export const SET_PROCESSOR_TYPE = 'SET_PROCESSOR_TYPE';
 export const SET_REALTIME_FIELD = 'SET_REALTIME_FIELD';
 export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
+export const SET_CHECKED_FIELD = 'SET_CHECKED_FIELD';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
@@ -82,7 +83,12 @@ const convert = (settings) => {
     csv_has_footer: parser.csv_has_footer,
     usaget_type,
     type: settings.type,
-    fields: parser.structure ? parser.structure.map(struct => struct.name) : [],
+    unfiltered_fields: parser.structure ?
+                      Immutable.list(parser.structure) :
+                      Immutable.List(),
+    fields: parser.structure ?
+            Immutable.list(parser.structure.filter(struct => struct.checked === true).map(struct => struct.name)) :
+            Immutable.List(),
     field_widths,
     customer_identification_fields,
     rate_calculators,
@@ -267,10 +273,11 @@ export function addCSVField(field) {
   };
 }
 
-export function removeCSVField(index) {
+export function removeCSVField(index, field) {
   return {
     type: REMOVE_CSV_FIELD,
-    index
+    index,
+    field,
   };
 }
 
@@ -462,17 +469,16 @@ export function saveInputProcessorSettings(state, parts = []) {
         response = state.get('response', Immutable.Map()),
         enabled = state.get('enabled'),
         filters = state.get('filters');
-
   const settings = {
-    "file_type": state.get('file_type'),
-    "type": state.get('type'),
-    "parser": {
-      "type": state.get('delimiter_type'),
-      "separator": state.get('delimiter'),
-      structure: state.get('fields').reduce((acc, name, idx) => {
+    file_type: state.get('file_type'),
+    type: state.get('type'),
+    parser: {
+      type: state.get('delimiter_type'),
+      separator: state.get('delimiter'),
+      structure: state.get('unfiltered_fields').reduce((acc, field, idx) => {
         const struct = (state.get('delimiter_type') === 'fixed')
-          ? Immutable.Map({ name, width: state.getIn(['field_widths', idx], '') })
-          : Immutable.Map({ name });
+          ? Immutable.Map({ name: field.name, checked: field.checked, width: state.getIn(['field_widths', idx], '') })
+          : Immutable.Map({ name: field.name, checked: field.checked });
         return acc.push(struct);
       }, Immutable.List()),
     },
@@ -661,7 +667,7 @@ export function changeCSVField(index, value) {
   return {
     type: CHANGE_CSV_FIELD,
     index,
-    value
+    value,
   };
 }
 
@@ -694,5 +700,14 @@ export function setRealtimeDefaultField(name, value) {
     type: SET_REALTIME_DEFAULT_FIELD,
     name,
     value
+  };
+}
+
+export function setCheckedField(index, checked, field) {
+  return {
+    type: SET_CHECKED_FIELD,
+    index,
+    checked,
+    field,
   };
 }

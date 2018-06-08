@@ -29,6 +29,7 @@ class SampleCSV extends Component {
     onChangeCSVField: PropTypes.func.isRequired,
     onAddField: PropTypes.func.isRequired,
     onChangeInputProcessorField: PropTypes.func.isRequired,
+    onCheckedField: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -74,7 +75,8 @@ class SampleCSV extends Component {
           onMoveFieldUp,
           onMoveFieldDown,
           onChangeCSVField,
-          onAddField } = this.props;
+          onAddField,
+          onCheckedField } = this.props;
 
     const selectDelimiterHTML =
       type === 'api'
@@ -83,7 +85,7 @@ class SampleCSV extends Component {
                           onSetDelimiterType={onSetDelimiterType}
                           onChangeDelimiter={onChangeDelimiter} />);
 
-    const fieldsHTML = (<CSVFields onMoveFieldUp={onMoveFieldUp} onMoveFieldDown={onMoveFieldDown} onChangeCSVField={onChangeCSVField} onRemoveField={onRemoveField} settings={settings} onSetFieldWidth={onSetFieldWidth} />);
+    const fieldsHTML = (<CSVFields onMoveFieldUp={onMoveFieldUp} onMoveFieldDown={onMoveFieldDown} onChangeCSVField={onChangeCSVField} onRemoveField={onRemoveField} settings={settings} onSetFieldWidth={onSetFieldWidth} onCheckedField={onCheckedField} />);
 
     const setFieldsHTML = (
       <div className="panel panel-default">
@@ -95,7 +97,7 @@ class SampleCSV extends Component {
             <div className="col-lg-4">
               <label>Field name</label>&nbsp;&nbsp;
               <button type="button"
-                      disabled={settings.get('fields', []).size < 1}
+                      disabled={settings.get('unfiltered_fields', []).size < 1}
                       className="btn btn-default btn-xs"
                       onClick={this.removeAllFields}>
                 <i className="fa fa-trash-o danger-red" /> Remove all

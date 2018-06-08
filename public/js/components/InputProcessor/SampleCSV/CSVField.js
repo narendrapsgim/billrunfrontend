@@ -1,17 +1,15 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { HelpBlock, FormGroup, Col, Button } from 'react-bootstrap';
-import Field from '../../Field';
+import { HelpBlock, FormGroup, Col, Button, InputGroup, FormControl, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { getConfig } from '../../../common/Util';
 
-
 const CSVField = (props) => {
-  const { index, field, fixed, width, allowMoveUp, allowMoveDown } = props;
+  const { index, field, fixed, width, allowMoveUp, allowMoveDown, onCheckedField, isChecked } = props;
   const { errorMessages: { name: { allowedCharacters } } } = props;
   const errorFieldName = !getConfig('keyRegex', '').test(field) ? allowedCharacters : '';
 
   const removeField = () => {
-    props.onRemoveField(index);
+    props.onRemoveField(index, field);
   };
 
   const onMoveFieldUp = () => {
@@ -24,14 +22,34 @@ const CSVField = (props) => {
 
   const onChange = (e) => {
     const { value } = e.target;
+    console.log('value: ', value);
+    console.log('isChecked: ', isChecked);
     props.onChange(index, value);
   };
+
+  const CheckedField = (e) => {
+    const { checked } = e.target;
+    onCheckedField(index, checked, field);
+  };
+
+  const tooltip = (
+    <Tooltip id="tooltip">
+      Only checked fields will be available in next stages
+    </Tooltip>
+  );
 
   return (
     <Col lg={12} md={12}>
       <FormGroup className="mb0" validationState={errorFieldName.length > 0 ? 'error' : null} >
         <Col lg={4} md={4}>
-          <Field onChange={onChange} value={field} />
+          <InputGroup>
+            <OverlayTrigger placement="top" overlay={tooltip}>
+              <InputGroup.Addon>
+                <input type="checkbox" checked={isChecked} aria-label={index} onChange={CheckedField} />
+              </InputGroup.Addon>
+            </OverlayTrigger>
+            <FormControl type="text" onChange={onChange} value={field.name} />
+          </InputGroup>
         </Col>
         <Col lg={1} md={1}>
           { fixed &&
@@ -76,11 +94,13 @@ CSVField.propTypes = {
     PropTypes.string,
     PropTypes.number,
   ]),
+  isChecked: PropTypes.bool,
   onChange: PropTypes.func,
   onRemoveField: PropTypes.func,
   onMoveFieldUp: PropTypes.func,
   onSetFieldWidth: PropTypes.func,
   onMoveFieldDown: PropTypes.func,
+  onCheckedField: PropTypes.func,
 };
 
 CSVField.defaultProps = {
@@ -90,6 +110,7 @@ CSVField.defaultProps = {
   allowMoveUp: true,
   allowMoveDown: true,
   width: '',
+  isChecked: true,
   errorMessages: {
     name: {
       allowedCharacters: 'Field name contains illegal characters, name should contain only alphabets, numbers and underscores (A-Z, a-z, 0-9, _)',
@@ -100,6 +121,7 @@ CSVField.defaultProps = {
   onMoveFieldUp: () => {},
   onSetFieldWidth: () => {},
   onMoveFieldDown: () => {},
+  onCheckedField: () => {},
 };
 
 export default connect()(CSVField);

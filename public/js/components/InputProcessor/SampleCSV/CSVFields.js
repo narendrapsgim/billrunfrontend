@@ -7,21 +7,23 @@ import CSVField from './CSVField';
 const CSVFields = (props) => {
   const { settings } = props;
   const fixed = settings.get('delimiter_type', '') === 'fixed';
-  const fields = settings.get('fields', Immutable.List()).map((field, index) => (
+  const fields = settings.get('unfiltered_fields', Immutable.List()).map((field, index) => (
     <div key={index}>
       <div className="form-group">
         <CSVField
           index={index}
           onRemoveField={props.onRemoveField}
-          field={field}
+          field={field.name}
           onSetFieldWidth={props.onSetFieldWidth}
           fixed={fixed}
+          isChecked={settings.getIn(['unfiltered_fields', index, 'checked'], true)}
           allowMoveUp={index !== 0}
-          allowMoveDown={index !== settings.get('fields', Immutable.List()).size - 1}
+          allowMoveDown={index !== settings.get('unfiltered_fields', Immutable.List()).size - 1}
           onMoveFieldDown={props.onMoveFieldDown}
           onMoveFieldUp={props.onMoveFieldUp}
           onChange={props.onChangeCSVField}
           width={settings.getIn(['field_widths', index], '')}
+          onCheckedField={props.onCheckedField}
         />
       </div>
       <div className="separator" />
@@ -39,6 +41,7 @@ CSVFields.defaultProps = {
   onMoveFieldUp: () => {},
   onMoveFieldDown: () => {},
   onChangeCSVField: () => {},
+  onCheckedField: () => {},
 };
 
 CSVFields.propTypes = {
@@ -48,6 +51,7 @@ CSVFields.propTypes = {
   onMoveFieldUp: PropTypes.func,
   onMoveFieldDown: PropTypes.func,
   onChangeCSVField: PropTypes.func,
+  onCheckedField: PropTypes.func,
 };
 
 export default connect()(CSVFields);

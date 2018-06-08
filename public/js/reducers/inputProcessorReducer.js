@@ -38,15 +38,17 @@ import { SET_NAME,
          MOVE_CSV_FIELD_DOWN,
          MOVE_CSV_FIELD_UP,
          CHANGE_CSV_FIELD,
-	 UNSET_FIELD,
+         UNSET_FIELD,
          SET_REALTIME_FIELD,
-         SET_REALTIME_DEFAULT_FIELD } from '../actions/inputProcessorActions';
+         SET_REALTIME_DEFAULT_FIELD,
+         SET_CHECKED_FIELD } from '../actions/inputProcessorActions';
 
 const defaultState = Immutable.fromJS({
   file_type: '',
   usaget_type: 'static',
   delimiter: '',
   fields: [],
+  unfiltered_fields: [],
   field_widths: [],
   processor: {
     usaget_mapping: [],
@@ -96,10 +98,10 @@ export default function (state = defaultState, action) {
       return state.set('delimiter', action.delimiter);
 
     case SET_FIELDS:
-      if (state.get('fields').size > 0) {
-        return state.update('fields', list => [...list, ...action.fields]);
+      if (state.get('unfiltered_fields').size > 0) {
+        return state.update('unfiltered_fields', list => [...list, ...action.fields]);
       }
-      return state.set('fields', Immutable.fromJS(action.fields));
+      return state.set('unfiltered_fields', Immutable.fromJS(action.fields));
 
     case SET_FIELD_WIDTH:
       return state.setIn(['field_widths', index], width);
@@ -107,14 +109,17 @@ export default function (state = defaultState, action) {
     case SET_FIELD_MAPPING:
       return state.setIn(['processor', field], mapping);
 
-    case ADD_CSV_FIELD:
-      return state.update('fields', list => list.push(action.field));
+    case ADD_CSV_FIELD: {
+      const fieldToAdd = Immutable.Map({ name: field, checked: true });
+      console.log(state.get('unfiltered_fields'));
+      return state.update('unfiltered_fields', list => list.push(fieldToAdd));
+    }
 
     case REMOVE_CSV_FIELD:
-      return state.update('fields', list => list.remove(action.index));
+      return state.update('unfiltered_fields', list => list.remove(list.indexOf(field)));
 
     case REMOVE_ALL_CSV_FIELDS:
-      return state.set('fields', Immutable.List());
+      return state.set('unfiltered_fields', Immutable.List());
 
     case SET_USAGET_TYPE:
       return state
@@ -278,21 +283,24 @@ export default function (state = defaultState, action) {
       return Immutable.fromJS(action.template);
 
     case MOVE_CSV_FIELD_UP:
-      field_to_move = field ? field : state.getIn(['fields', index]);
+      field_to_move = field ? field : state.getIn(['unfiltered_fields', index]);
       fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
       return state
-        .update('fields', list => list.delete(index).insert(index - 1, field_to_move))
+        .update('unfiltered_fields', list => list.delete(index).insert(index - 1, field_to_move))
         .update('field_widths', list => list.delete(index).insert(index - 1, fieldWidthToMove));
 
     case MOVE_CSV_FIELD_DOWN:
-      field_to_move = field ? field : state.getIn(['fields', index]);
+      field_to_move = field ? field : state.getIn(['unfiltered_fields', index]);
+      console.log(field_to_move);
       fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
       return state
-        .update('fields', list => list.delete(index).insert(index + 1, field_to_move))
+        .update('unfiltered_fields', list => list.delete(index).insert(index + 1, field_to_move))
         .update('field_widths', list => list.delete(index).insert(index + 1, fieldWidthToMove));
 
-    case CHANGE_CSV_FIELD:
-      return state.update('fields', list => list.set(index, action.value));
+    case CHANGE_CSV_FIELD: {
+      const { value } = action;
+      return state.updateIn(['unfiltered_fields', index], sctruct => sctruct.set('name', value));
+    }
 
     case UNSET_FIELD:
       return state.deleteIn(action.path);
@@ -305,6 +313,15 @@ export default function (state = defaultState, action) {
 
     case SET_REALTIME_DEFAULT_FIELD:
       return state.setIn(['realtime', 'default_values', action.name], action.value);
+
+    case SET_CHECKED_FIELD: {
+      const { checked } = action;
+      // const struct = Immutable.Map({
+      //   name: field.name,
+      //   checked,
+      // });
+      return state.updateIn(['unfiltered_fields', index], struct => struct.set('checked', checked));
+    }
 
     default:
       return state;
