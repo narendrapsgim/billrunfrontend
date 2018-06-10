@@ -10,7 +10,10 @@ class TabsWrapper extends Component {
 
   static propTypes = {
     id: PropTypes.string,
-    children: PropTypes.arrayOf(PropTypes.element),
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.element),
+      PropTypes.element,
+    ]),
     activeTab: PropTypes.number,
     location: PropTypes.shape({
       pathname: PropTypes.string,

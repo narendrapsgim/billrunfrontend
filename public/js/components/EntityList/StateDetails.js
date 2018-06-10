@@ -62,7 +62,7 @@ class StateDetails extends Component {
   }
 
   renderRevisionTooltip = () => {
-    const { item, revisions, size, revisionBy, allowManageRevisions } = this.props;
+    const { item, revisions, size, revisionBy, allowManageRevisions, itemName } = this.props;
     const title = `${item.get(revisionBy, '')} - Revision History`;
     if (!revisions) {
       return (
@@ -75,7 +75,7 @@ class StateDetails extends Component {
     }
     return (
       <Popover id={`${getItemId(item, '')}-revisions`} title={title} className="entity-revision-history-popover">
-        <RevisionTimeline revisions={revisions} item={item} size={size} />
+        <RevisionTimeline revisions={revisions} item={item} size={size} itemName={itemName} />
         <hr style={{ margin: 0, borderColor: '#3A3A3A', borderWidth: 2 }} />
         {allowManageRevisions && (<Button bsStyle="link" style={{ color: '#fff' }} onClick={this.showManageRevisions}>Manage Revisions</Button>)}
       </Popover>

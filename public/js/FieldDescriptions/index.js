@@ -4,6 +4,7 @@ import GroupsInclude from './GroupsInclude';
 import ProductDescription from './Product';
 import DiscountDescription from './Discount';
 import ReportDescription from './Report';
+import SettingsDescription from './Settings';
 
 export {
   PlanDescription,
@@ -12,4 +13,5 @@ export {
   GroupsInclude,
   DiscountDescription,
   ReportDescription,
+  SettingsDescription,
 };

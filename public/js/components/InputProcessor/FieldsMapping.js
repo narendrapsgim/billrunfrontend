@@ -36,15 +36,21 @@ export default class FieldsMapping extends Component {
     this.onChangeUsaget = this.onChangeUsaget.bind(this);
     this.onSetType = this.onSetType.bind(this);
     this.onChangeStaticUsaget = this.onChangeStaticUsaget.bind(this);
+    this.addFieldCondition = this.addFieldCondition.bind(this);
+    this.onChangeFieldName = this.onChangeFieldName.bind(this);
+    this.onRemoveCondition = this.onRemoveCondition.bind(this);
 
     this.state = {
+      fieldName: '',
       pattern: "",
       usaget: "",
       unit: '',
       separateTime: false,
+      separateTimeZone: false,
       volumeType: 'field',
       volumeFields: [],
       volumeHardCodedValue: '',
+      conditions: [],
     };
   }
 
@@ -52,10 +58,17 @@ export default class FieldsMapping extends Component {
     if (this.props.settings.getIn(['processor', 'time_field'])) {
       this.setState({separateTime: true});
     }
+    if (this.props.settings.getIn(['processor', 'timezone_field'])) {
+      this.setState({ separateTimeZone: true });
+    }
   }
 
-  onChangePattern(e) {
-    this.setState({pattern: e.target.value});
+  onChangePattern(index, e) {
+    const { conditions } = this.state;
+    const { value } = e.target;
+
+    conditions[index].pattern = value;
+    this.setState({ pattern: value, conditions });
   }
 
   changeUsaget(val, setStaticUsaget) {
@@ -114,11 +127,18 @@ export default class FieldsMapping extends Component {
     this.setState({ unit });
   }
 
+  onChangeFieldName = (index, e) => {
+    const { conditions } = this.state;
+    const { value } = e.target;
+    conditions[index].src_field = value;
+    this.setState({ fieldName: value, conditions });
+  }
+
   addUsagetMapping(e) {
-    const { usaget, pattern, unit, volumeType, volumeFields, volumeHardCodedValue } = this.state;
+    const { usaget, pattern, unit, volumeType, volumeFields, volumeHardCodedValue, fieldName, conditions } = this.state;
     const volumeSrc = (volumeType === 'field' ? volumeFields : volumeHardCodedValue);
     const { onError } = this.props;
-    if (!this.props.settings.getIn(['processor', 'src_field'])) {
+    if (!fieldName) {
       onError("Please select usage type field");
       return;
     }
@@ -126,8 +146,24 @@ export default class FieldsMapping extends Component {
       onError('Please input a value, usage type, unit and volume field/value');
       return;
     }
-    this.props.onAddUsagetMapping.call(this, { usaget, pattern, unit, volumeType, volumeSrc });
-    this.setState({ pattern: '', usaget: '', unit: '', volumeType: 'field', volumeFields: [], volumeHardCodedValue: '' });
+    if (conditions.length === 0) {
+      conditions.push({ src_field: fieldName, pattern, op: '$eq' });
+    }
+
+    this.props.onAddUsagetMapping.call(this, { usaget, pattern, unit, volumeType, volumeSrc, fieldName, conditions });
+    this.setState({ pattern: '', usaget: '', unit: '', volumeType: 'field', volumeFields: [], volumeHardCodedValue: '', fieldName: '', conditions: [] });
+  }
+
+  addFieldCondition(e) {
+    const { fieldName, pattern, conditions } = this.state;
+    const { onError } = this.props;
+
+    if (!pattern || !fieldName) {
+      onError('Please input a field name and a value');
+      return;
+    }
+    conditions.push({ src_field: '', pattern: '', op: '$eq' });
+    this.setState({ conditions });
   }
 
   removeUsagetMapping(index, e) {
@@ -146,6 +182,15 @@ export default class FieldsMapping extends Component {
       this.onChangeTimeFormatExists();
     }
     this.setState({separateTime: !this.state.separateTime});
+  };
+
+  onChangeSeparateTimeZone = (e) => {
+    const { checked } = e.target;
+    if (!checked) {
+      this.props.unsetField(['processor', 'timezone_field']);
+      this.onChangeTimeZoneExists();
+    }
+    this.setState({ separateTimeZone: !this.state.separateTimeZone });
   };
 
   onChangeDynamicUsagetVolumeType = (e) => {
@@ -181,6 +226,10 @@ export default class FieldsMapping extends Component {
     this.props.onSetFieldMapping(e);
   }
 
+  onChangeTimeZoneFormat = (e) => {
+    this.props.onSetFieldMapping(e);
+  }
+
   onChangeTimeFormatExists = () => {
     const e = {
       target: {
@@ -191,19 +240,40 @@ export default class FieldsMapping extends Component {
     this.onChangeTimeFormat(e);
   }
 
+  onChangeTimeZoneExists = () => {
+    const e = {
+      target: {
+        value: undefined,
+        id: 'timezone_field',
+      },
+    };
+    this.onChangeTimeZoneFormat(e);
+  }
+
   getVolumeOptions = () => this.props.settings.get('fields', Immutable.List()).sortBy(field => field).map(field => ({
     label: field,
     value: field,
   })).toArray();
 
+  onRemoveCondition = (index) => {
+    const { conditions } = this.state;
+
+    conditions.splice(index, 1);
+    this.setState({ conditions });
+  }
+
   render() {
     const {
       separateTime,
+      separateTimeZone,
       usaget,
       unit,
       volumeType,
       volumeFields,
       volumeHardCodedValue,
+      conditions,
+      fieldName,
+      pattern,
     } = this.state;
     const { settings,
             usageTypes,
@@ -242,6 +312,10 @@ export default class FieldsMapping extends Component {
       id: 'time_format',
       onChange: this.onChangeTimeFormat,
     };
+
+    if (conditions.length === 0) {
+      conditions.push({ src_field: fieldName, pattern, op: '$eq' });
+    }
 
     return (
       <form className="form-horizontal FieldsMapping">
@@ -315,13 +389,35 @@ export default class FieldsMapping extends Component {
               <Help contents="To enable, enter date format. For formatting info please check the link on the left" />
             </div>
           </div>
-        </div>
 
+          <div className="col-lg-offset-3 col-lg-9" style={{ marginTop: 30 }}>
+            <div className="col-lg-offset-1 col-lg-4">
+              <div className="input-group">
+                <div className="input-group-addon">
+                  <input
+                    type="checkbox"
+                    checked={separateTimeZone}
+                    onChange={this.onChangeSeparateTimeZone}
+                  />
+                  <small>&nbsp;Timezone in a separate field</small>
+                </div>
+                <select
+                  id="timezone_field"
+                  className="form-control"
+                  onChange={onSetFieldMapping}
+                  disabled={!separateTimeZone}
+                  value={settings.getIn(['processor', 'timezone_field'], '')}
+                >
+                  { available_fields }
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="separator" />
         <div className="form-group">
           <div className="col-lg-3">
             <label>Usage types / volumes</label>
-            <p className="help-block">Types of usages and volumes</p>
           </div>
           <div className="col-lg-9">
             <div className="col-lg-1" style={{marginTop: 8}}>
@@ -382,6 +478,7 @@ export default class FieldsMapping extends Component {
                       onChangeUsaget={this.onChangeStaticUsaget}
                       onChangeUnit={this.onChangeStaticUom}
                       enabled={settings.get('usaget_type', '') === 'static'}
+                      showDisplayUnits={true}
                     />
                   </div>
                   <div className="col-lg-1">
@@ -427,21 +524,10 @@ export default class FieldsMapping extends Component {
           {
             settings.get('usaget_type', '') === 'dynamic' &&
             (<div className="col-lg-12 form-inner-edit-row">
-              <Row>
-                <div className="form-inner-edit-row col-lg-6">
-                  <select
-                    id="src_field"
-                    className="form-control"
-                    onChange={onSetFieldMapping}
-                    value={settings.getIn(['processor', 'src_field'], '')}
-                    disabled={settings.get('usaget_type', '') !== 'dynamic'}
-                  >
-                      { available_fields }
-                  </select>
-                </div>
-              </Row>
-
               <div className="form-group">
+                <div className="col-lg-2">
+                  <strong>Field Name</strong>
+                </div>
                 <div className="col-lg-2">
                   <strong>Input Value</strong>
                 </div>
@@ -459,95 +545,147 @@ export default class FieldsMapping extends Component {
               </div>
               {
                 settings.getIn(['processor', 'usaget_mapping'], Immutable.List()).map((usageType, key) => (
-                  <div className="form-group" key={key}>
-                    <div className="col-lg-2">{usageType.get('pattern', '')}</div>
-                    <div className="col-lg-4 pl0 pr0">
-                      <div className="col-lg-7">{usageType.get('usaget', '')}</div>
-                      <div className="col-lg-5"> {getUnitLabel(propertyTypes, usageTypesData, usageType.get('usaget', ''), usageType.get('unit', ''))}</div>
-                    </div>
-                    <div className="col-lg-4">
+                  <div className="form-group" key={key} style={{ marginRight: 60 }}>
+                    <div className="col-lg-5">
                       {
-                        usageType.get('volume_type', 'field') === 'field'
-                        ? usageType.get('volume_src', []).join(', ')
-                        : usageType.get('volume_src', '')
+                        settings.getIn(['processor', 'usaget_mapping', key, 'conditions'],
+                        Immutable.List()).map((condition, value) => (
+                          <div className="row-lg-12">
+                            <div className="col-lg-6" style={{ marginLeft: -14 }}>{condition.get('src_field')}</div>
+                            <div className="col-lg-6" style={{ marginLeft: -30 }}>{condition.get('pattern')}</div>
+                          </div>
+                        ))
                       }
                     </div>
-                    <div className="col-lg-1">
-                      <button
-                        type="button"
-                        className="btn btn-default btn-sm"
-                        disabled={settings.get('usaget_type', '') !== 'dynamic'}
-                        onClick={this.removeUsagetMapping.bind(this, key)}
-                      >
-                        <i className="fa fa-trash-o danger-red" /> Remove
-                      </button>
+                    <div className="col-lg-7">
+                      <div className="col-lg-6 pl0 pr0">
+                        <div className="col-lg-7" style={{ marginLeft: -100 }}>{usageType.get('usaget', '')}</div>
+                        <div className="col-lg-5" style={{ marginLeft: 44 }}> {getUnitLabel(propertyTypes, usageTypesData, usageType.get('usaget', ''), usageType.get('unit', ''))}</div>
+                      </div>
+                      <div className="col-lg-3" style={{ marginLeft: 18 }}>
+                        {
+                          usageType.get('volume_type', 'field') === 'field'
+                          ? usageType.get('volume_src', []).join(', ')
+                          : usageType.get('volume_src', '')
+                        }
+                      </div>
+                      <div className="col-lg-1">
+                        <button
+                          type="button"
+                          className="btn btn-default btn-sm"
+                          disabled={settings.get('usaget_type', '') !== 'dynamic'}
+                          onClick={this.removeUsagetMapping.bind(this, key)}
+                        >
+                          <i className="fa fa-trash-o danger-red" /> Remove
+                        </button>
+                      </div>
+                    </div>
+                    <div className="col-lg-offset-1 col-lg-10" style={{ padding: 16 }} >
+                      <div className="separator" />
                     </div>
                   </div>
                 ))
               }
+
               <div className="form-group">
-                <div className="col-lg-2">
-                  <input
-                    className="form-control"
-                    onChange={this.onChangePattern}
-                    disabled={settings.get('usaget_type', '') !== 'dynamic'}
-                    value={this.state.pattern}
-                  />
-                </div>
                 <div className="col-lg-4">
-                  <UsageTypesSelector
-                    usaget={usaget}
-                    unit={unit}
-                    onChangeUsaget={this.onChangeUsaget}
-                    onChangeUnit={this.onChangeUom}
-                    enabled={settings.get('usaget_type', '') === 'dynamic'}
-                  />
-                </div>
-                <div className="col-lg-1">
-                  <Field
-                    fieldType="radio"
-                    name="dynamic-usaget-volume-type"
-                    id="dynamic-usaget-volume-type-field"
-                    value="field"
-                    checked={volumeType === 'field'}
-                    onChange={this.onChangeDynamicUsagetVolumeType}
-                    label="By field"
-                  />
-                  <Field
-                    fieldType="radio"
-                    name="dynamic-usaget-volume-type"
-                    id="dynamic-usaget-volume-type-value"
-                    value="value"
-                    checked={volumeType === 'value'}
-                    onChange={this.onChangeDynamicUsagetVolumeType}
-                    label="By value"
-                  />
-                </div>
-                <div className="col-lg-3">
                   {
-                    volumeType === 'field'
-                    ? (<Select
-                      multi={true}
-                      value={volumeFields}
-                      options={volumeOptions}
-                      onChange={this.onChangeDynamicUsagetVolumeField}
-                    />)
-                    : (<Field
-                      fieldType="number"
-                      value={volumeHardCodedValue}
-                      onChange={this.onChangeDynamicUsagetHardCodedVolume}
-                    />)
+                    conditions.map((condition, key) => (
+                      <div className="row-lg-12 form-inner-edit-row row">
+                        <div className="col-lg-7">
+                          <select
+                            id="src_field"
+                            className="form-control"
+                            onChange={this.onChangeFieldName.bind(this, key)}
+                            value={condition.src_field === '' ? '' : condition.src_field}
+                            disabled={settings.get('usaget_type', '') !== 'dynamic'}
+                          >
+                              { available_fields }
+                          </select>
+                        </div>
+                        <div className="col-lg-4">
+                          <input
+                            className="form-control"
+                            onChange={this.onChangePattern.bind(this, key)}
+                            disabled={settings.get('usaget_type', '') !== 'dynamic'}
+                            value={condition.pattern === '' ? '' : condition.pattern}
+                          />
+                        </div>
+                        <div className="col-lg-1">
+                          {conditions.length > 1 &&
+                          <button type="button" className="btn btn-link" data-dismiss="alert" aria-label="Close" onClick={this.onRemoveCondition.bind(this, key)}><i className="fa fa-trash-o danger-red" /></button>}
+                        </div>
+                      </div>
+                    ))
+
                   }
                 </div>
-                <div className="col-lg-1">
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={this.addUsagetMapping}
-                  >
-                    <i className="fa fa-plus" /> Add Mapping
-                  </button>
+                <div className="col-lg-8">
+                  <div className="col-lg-5">
+                    <UsageTypesSelector
+                      usaget={usaget}
+                      unit={unit}
+                      onChangeUsaget={this.onChangeUsaget}
+                      onChangeUnit={this.onChangeUom}
+                      enabled={settings.get('usaget_type', '') === 'dynamic'}
+                      showDisplayUnits={true}
+                    />
+                  </div>
+                  <div className="col-lg-2">
+                    <Field
+                      fieldType="radio"
+                      name="dynamic-usaget-volume-type"
+                      id="dynamic-usaget-volume-type-field"
+                      value="field"
+                      checked={volumeType === 'field'}
+                      onChange={this.onChangeDynamicUsagetVolumeType}
+                      label="By field"
+                    />
+                    <Field
+                      fieldType="radio"
+                      name="dynamic-usaget-volume-type"
+                      id="dynamic-usaget-volume-type-value"
+                      value="value"
+                      checked={volumeType === 'value'}
+                      onChange={this.onChangeDynamicUsagetVolumeType}
+                      label="By value"
+                    />
+                  </div>
+                  <div className="col-lg-3">
+                    {
+                      volumeType === 'field'
+                      ? (<Select
+                        multi={true}
+                        value={volumeFields}
+                        options={volumeOptions}
+                        onChange={this.onChangeDynamicUsagetVolumeField}
+                      />)
+                      : (<Field
+                        fieldType="number"
+                        value={volumeHardCodedValue}
+                        onChange={this.onChangeDynamicUsagetHardCodedVolume}
+                      />)
+                    }
+                  </div>
+                  <div className="col-lg-1">
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={this.addUsagetMapping}
+                    >
+                      <i className="fa fa-plus" /> Add Mapping
+                    </button>
+                  </div>
                 </div>
+              </div>
+              <div className="col-lg-1">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={this.addFieldCondition}
+                >
+                  <i className="fa fa-plus" /> Add Field
+                </button>
               </div>
             </div>)
           }

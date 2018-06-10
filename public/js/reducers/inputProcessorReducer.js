@@ -138,13 +138,15 @@ export default function (state = defaultState, action) {
     }
 
     case MAP_USAGET: {
-      const { pattern, usaget, unit, volumeType, volumeSrc } = action.mapping;
+      const { usaget, pattern, unit, volumeType, volumeSrc, fieldName, conditions } = action.mapping;
       const newMap = Immutable.fromJS({
-        pattern,
         usaget,
+        pattern,
         unit,
         volume_type: volumeType,
         volume_src: volumeSrc,
+        src_field: fieldName,
+        conditions,
       });
       const rateCalculators = state.get('rate_calculators', Immutable.Map()).map(calc => ((!calc.has(usaget)) ? calc.set(usaget, Immutable.List()) : calc));
       return state
@@ -215,7 +217,7 @@ export default function (state = defaultState, action) {
       });
       const computed = state.getIn(['rate_calculators', rateCategory, usaget, priority, index, 'computed']);
       if (computed && !computed.isEmpty()) {
-        new_rating.set('computed', computed);
+        new_rating = new_rating.set('computed', computed);
       }
       return state.setIn(['rate_calculators', rateCategory, usaget, priority, index], new_rating);
 

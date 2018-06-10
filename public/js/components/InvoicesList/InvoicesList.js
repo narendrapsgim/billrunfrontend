@@ -15,6 +15,7 @@ import { getConfig } from '../../common/Util';
 class InvoicesList extends Component {
 
   static propTypes = {
+    settings: PropTypes.instanceOf(Immutable.Map),
     items: PropTypes.instanceOf(Immutable.List),
     collection: PropTypes.string,
     baseFilter: PropTypes.object,
@@ -22,6 +23,7 @@ class InvoicesList extends Component {
   }
 
   static defaultProps = {
+    settings: Immutable.Map(),
     items: Immutable.List(),
     baseFilter: {},
     collection: 'bills',
@@ -77,6 +79,7 @@ class InvoicesList extends Component {
 
   fetchItems = () => {
     this.props.dispatch(getList('invoices', this.buildQuery()));
+    this.props.dispatch(getList('billrun', this.buildQuery()));
   }
 
   downloadURL = (aid, billrunKey, invoiceId) =>
@@ -117,6 +120,14 @@ class InvoicesList extends Component {
     );
   };
 
+  parseCycleDataEmailSent = (entity) => {
+    const sentDate = entity.getIn(['email_sent', 'sec'], false);
+    if (!sentDate) {
+      return 'Not Sent';
+    }
+    return moment.unix(sentDate).format(globalSetting.datetimeFormat);
+  };
+
   getTableFields = () => ([
     { id: 'invoice_id', title: 'Invoice Id', sort: true },
     { id: 'invoice_date', title: 'Date', cssClass: 'short-date', sort: true, type: 'mongodate' },
@@ -127,6 +138,7 @@ class InvoicesList extends Component {
     { id: 'aid', title: 'Customer ID', sort: true },
     { id: 'payer_name', title: 'Name', sort: true },
     { title: 'Download', parser: this.parserDownload },
+    { id: 'email_sent', title: 'Email Sent', sort: true, parser: this.parseCycleDataEmailSent, display: this.props.settings.get('billrun', Immutable.Map()).get('email_after_confirmation', false) },
   ]);
 
   getFilterFields = () => {
@@ -159,6 +171,7 @@ class InvoicesList extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
+  settings: state.settings,
   baseFilter: props.location.query.base ? JSON.parse(props.location.query.base) : {},
   items: state.list.get('invoices'),
 });

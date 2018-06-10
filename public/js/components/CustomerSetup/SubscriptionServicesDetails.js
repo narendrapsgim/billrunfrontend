@@ -69,10 +69,10 @@ export default class SubscriptionServicesDetails extends Component {
   renderServiceBadge = (service, type) => {
     const { originSubscriptionServices } = this.props;
 
-    if (!service.has('service_id')) {
+    if (!service.hasIn(['ui_flags', 'serviceId'])) {
       return (<Badge>new</Badge>);
     }
-    const existingService = originSubscriptionServices.find(originService => originService.get('service_id', '') === service.get('service_id', ''));
+    const existingService = originSubscriptionServices.find(originService => originService.getIn(['ui_flags', 'serviceId'], '') === service.getIn(['ui_flags', 'serviceId'], ''));
     if (type === 'byPeriod' && !moment(existingService.get('from', '')).isSame(moment(service.get('from', '')), 'days')) {
       return (<Badge>updated</Badge>);
     }
@@ -172,7 +172,7 @@ export default class SubscriptionServicesDetails extends Component {
     const onChangeBind = (e) => { this.onChangePeriodStartDate(serviceKey, e); };
     const onRemoveBind = (e) => { this.onClickRemoveCloneService(serviceKey, e); };
     const existingService = originSubscriptionServices.find(originService => originService.get('name', '') === service.get('name', ''));
-    const originFrom = (service.has('service_id') && existingService) ? existingService.get('from', null) : null;
+    const originFrom = (service.hasIn(['ui_flags', 'serviceId']) && existingService) ? existingService.get('from', null) : null;
     const filterServiseDate = e => this.filterServiceStartDate(originFrom, e);
     const badge = this.renderServiceBadge(service, 'byPeriod');
     return (
