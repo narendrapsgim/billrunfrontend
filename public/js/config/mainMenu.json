@@ -189,6 +189,33 @@
     "order": 7,
     "parent": "root"
   },
+  "templates": {
+    "title": "Templates",
+    "icon": "fa-newspaper-o",
+    "route": "",
+    "show": true,
+    "roles": [],
+    "order":7.3,
+    "parent": "root"
+  },
+  "invoice_template": {
+    "title": "Invoice Template",
+    "icon": "",
+    "route": "invoice-template",
+    "show": true,
+    "roles": ["admin"],
+    "order":0,
+    "parent":"templates"
+  },
+  "email_templates": {
+    "title": "Email Templates",
+    "icon": "",
+    "route": "email_templates",
+    "show": true,
+    "roles": ["admin"],
+    "order":1,
+    "parent":"templates"
+  },
   "reports": {
     "title": "Reports",
     "icon": "fa-list-alt",
@@ -268,15 +295,6 @@
     "show": true,
     "roles": ["admin"],
     "order": 4,
-    "parent": "settings"
-  },
-  "invoice_template": {
-    "title": "Invoice Template",
-    "icon": "",
-    "route": "invoice-template",
-    "show": true,
-    "roles": ["admin"],
-    "order": 5,
     "parent": "settings"
   },
   "custom_fields": {

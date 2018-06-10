@@ -104,6 +104,8 @@ const convert = (settings) => {
     if (usaget_type === "dynamic") {
       usaget_mapping = processor.usaget_mapping.map(usaget => {
 	return {
+    src_field: usaget.src_field,
+    conditions: usaget.conditions !== undefined ? usaget.conditions : [ {src_field: usaget.src_field, pattern: usaget.pattern} ],
 	  usaget: usaget.usaget,
 	  pattern: usaget.pattern,
     unit: usaget.unit,
@@ -490,7 +492,8 @@ export function saveInputProcessorSettings(state, parts = []) {
     }
     : {
       usaget_mapping: processor.get('usaget_mapping').map(usaget => ({
-        src_field: processor.get('src_field'),
+        src_field: usaget.get('src_field'),
+        conditions: usaget.get('conditions'),
         pattern: usaget.get('pattern'),
         usaget: usaget.get('usaget'),
         unit: usaget.get('unit'),
@@ -512,6 +515,9 @@ export function saveInputProcessorSettings(state, parts = []) {
     }
     if (processor.get('time_format', false)) {
       settings.processor['time_format'] = processor.get('time_format');
+    }
+    if (processor.get('timezone_field', false)) {
+      settings.processor['timezone_field'] = processor.get('timezone_field');
     }
   }
   if (customer_identification_fields) {

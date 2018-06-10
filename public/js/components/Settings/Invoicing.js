@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import Field from '../Field';
+import Help from '../Help';
+import { SettingsDescription } from '../../FieldDescriptions';
 
 export default class Invoicing extends Component {
 
@@ -18,6 +20,11 @@ export default class Invoicing extends Component {
   onToggleDetailedInvoices = (e) => {
     const { value } = e.target;
     this.props.onChange('billrun', 'detailed_invoices', value);
+  }
+
+  onToggleEmailAfterConfirmation = (e) => {
+    const { value } = e.target;
+    this.props.onChange('billrun', 'email_after_confirmation', value);
   }
 
   onToggleGeneratePdf = (e) => {
@@ -50,6 +57,14 @@ export default class Invoicing extends Component {
           </FormGroup>
           <FormGroup>
             <Col componentClass={ControlLabel} md={2}>
+              Billing cycle generates PDF invoices
+            </Col>
+            <Col sm={6} style={checkboxStyle}>
+              <Field fieldType="checkbox" value={data.get('generate_pdf', true)} onChange={this.onToggleGeneratePdf} />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} md={2}>
               Detailed Invoices
             </Col>
             <Col sm={6} style={checkboxStyle}>
@@ -58,10 +73,11 @@ export default class Invoicing extends Component {
           </FormGroup>
           <FormGroup>
             <Col componentClass={ControlLabel} md={2}>
-              Billing cycle generates PDF invoices
+              Send invoices to customers by email
+              &nbsp;<Help contents={SettingsDescription.email_after_confirmation} />
             </Col>
             <Col sm={6} style={checkboxStyle}>
-              <Field fieldType="checkbox" value={data.get('generate_pdf', true)} onChange={this.onToggleGeneratePdf} />
+              <Field fieldType="checkbox" value={data.get('email_after_confirmation', false)} onChange={this.onToggleEmailAfterConfirmation} disabled={!data.get('generate_pdf', true)} />
             </Col>
           </FormGroup>
         </Form>

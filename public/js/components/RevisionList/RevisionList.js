@@ -56,11 +56,6 @@ class RevisionList extends Component {
   isItemEditable = item => ['future'].includes(item.getIn(['revision_info', 'status'], ''))
     || (this.isItemActive(item) && this.isItemLast(item));
 
-  isItemRemovable = item => (
-    item.getIn(['revision_info', 'removable'], true) // if removable flag not exist, check status
-    && ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''))
-  );
-
   isItemMovable = item => item.getIn(['revision_info', 'movable_from'], true) || item.getIn(['revision_info', 'movable_to'], true);
 
   isItemReopenable = (item) => {
@@ -81,8 +76,6 @@ class RevisionList extends Component {
   parseEditShow = item => this.isItemEditable(item);
 
   parseViewShow = item => !this.isItemEditable(item);
-
-  parseRemoveEnable = item => this.isItemRemovable(item);
 
   parseMoveEnable = item => this.isItemMovable(item);
 
@@ -262,7 +255,7 @@ class RevisionList extends Component {
     { type: 'clone', helpText: this.getActionHelpText('clone'), onClick: this.onClickClone },
     { type: 'move', helpText: this.getActionHelpText('move'), onClick: this.onClickMove, enable: this.parseMoveEnable },
     { type: 'reopen', helpText: this.getActionHelpText('reopen'), onClick: this.onClickReopen, enable: this.parseReopenEnable },
-    { type: 'remove', helpText: this.getActionHelpText('remove'), onClick: this.onClickRemove, enable: this.parseRemoveEnable },
+    { type: 'remove', helpText: this.getActionHelpText('remove'), onClick: this.onClickRemove },
   ]
 
   renderMoveModal = () => {
