@@ -44,6 +44,7 @@ import {
   setRealtimeDefaultField,
   cancelKeyAuth,
   setCheckedField,
+  setFilteredFields,
  } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
@@ -271,7 +272,8 @@ class InputProcessor extends Component {
     if (results.meta && results.meta.fields && results.meta.fields.length > 0) {
       this.props.dispatch(setFields([])); // empty existing fields
       const whiteListCharacters = new RegExp('[^A-Za-z0-9_]', 'g');
-      const cleanFields = results.meta.fields.map(field => field.replace(whiteListCharacters, '_'));
+      const cleanFields = results.meta.fields.map(field => field.replace(whiteListCharacters, '_'))
+                                              .map(field => ({ name: field, checked: true }));
       this.props.dispatch(setFields(cleanFields));
     } else {
       this.props.dispatch(showDanger('Error in CSV file, no headers found.'));

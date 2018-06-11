@@ -13,10 +13,10 @@ const CSVFields = (props) => {
         <CSVField
           index={index}
           onRemoveField={props.onRemoveField}
-          field={field.name}
+          field={field.get('name', '')}
           onSetFieldWidth={props.onSetFieldWidth}
           fixed={fixed}
-          isChecked={settings.getIn(['unfiltered_fields', index, 'checked'], true)}
+          isChecked={field.get('checked', true)}
           allowMoveUp={index !== 0}
           allowMoveDown={index !== settings.get('unfiltered_fields', Immutable.List()).size - 1}
           onMoveFieldDown={props.onMoveFieldDown}

@@ -43,6 +43,7 @@ export const SET_PROCESSOR_TYPE = 'SET_PROCESSOR_TYPE';
 export const SET_REALTIME_FIELD = 'SET_REALTIME_FIELD';
 export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 export const SET_CHECKED_FIELD = 'SET_CHECKED_FIELD';
+export const SET_FILTERED_FIELDS = 'SET_FILTERED_FIELDS';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
@@ -84,11 +85,8 @@ const convert = (settings) => {
     usaget_type,
     type: settings.type,
     unfiltered_fields: parser.structure ?
-                      Immutable.list(parser.structure) :
-                      Immutable.List(),
-    fields: parser.structure ?
-            Immutable.list(parser.structure.filter(struct => struct.checked === true).map(struct => struct.name)) :
-            Immutable.List(),
+      Immutable.List(parser.structure).map(struct => Immutable.Map({ name: struct.name, checked: struct.checked ? struct.checked : true })) :
+      Immutable.List(),
     field_widths,
     customer_identification_fields,
     rate_calculators,
@@ -97,6 +95,8 @@ const convert = (settings) => {
     enabled,
     filters
   };
+
+  ret.fields = ret.unfiltered_fields.filter(field => field.get('checked') === true).map(field => Immutable.Map({ name: field.get('name') }));
 
   if (settings.type !== 'realtime') {
     ret.receiver = connections;
@@ -477,8 +477,8 @@ export function saveInputProcessorSettings(state, parts = []) {
       separator: state.get('delimiter'),
       structure: state.get('unfiltered_fields').reduce((acc, field, idx) => {
         const struct = (state.get('delimiter_type') === 'fixed')
-          ? Immutable.Map({ name: field.name, checked: field.checked, width: state.getIn(['field_widths', idx], '') })
-          : Immutable.Map({ name: field.name, checked: field.checked });
+          ? Immutable.Map({ name: field.get('name'), checked: field.get('checked'), width: state.getIn(['field_widths', idx], '') })
+          : Immutable.Map({ name: field.get('name'), checked: field.get('checked') });
         return acc.push(struct);
       }, Immutable.List()),
     },
@@ -709,5 +709,12 @@ export function setCheckedField(index, checked, field) {
     index,
     checked,
     field,
+  };
+}
+
+export function setFilteredFields(fields) {
+  return {
+    type: SET_FILTERED_FIELDS,
+    fields,
   };
 }

@@ -22,8 +22,6 @@ const CSVField = (props) => {
 
   const onChange = (e) => {
     const { value } = e.target;
-    console.log('value: ', value);
-    console.log('isChecked: ', isChecked);
     props.onChange(index, value);
   };
 
@@ -48,7 +46,7 @@ const CSVField = (props) => {
                 <input type="checkbox" checked={isChecked} aria-label={index} onChange={CheckedField} />
               </InputGroup.Addon>
             </OverlayTrigger>
-            <FormControl type="text" onChange={onChange} value={field.name} />
+            <FormControl type="text" onChange={onChange} value={field} />
           </InputGroup>
         </Col>
         <Col lg={1} md={1}>
