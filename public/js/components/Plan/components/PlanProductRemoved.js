@@ -26,7 +26,8 @@ export default class PlanProductRemoved extends Component {
     const { item, usaget } = this.props;
     const header = (
       <h3 className="product-removed">
-        {item.get('key')} ({usaget}) <i>{item.get('code')}</i><Help contents={item.get('description')} />
+        {item.get('key', '')} ({usaget}) <i>{item.get('code', '')}</i>
+        <Help contents={item.get('description', '')} />
         <Button onClick={this.onProductUndoRemove} bsSize="xsmall" className="pull-right" style={{ minWidth: 80 }}><i className="fa fa-mail-reply" />&nbsp;Undo</Button>
       </h3>
     );

@@ -667,3 +667,11 @@ export const getDashboardQuery = action => ({
   ],
 });
 // Dashboard reports queries - end
+
+export const getSubscribersQuery = aid => ({
+  action: 'get',
+  entity: 'subscribers',
+  params: [
+    { query: JSON.stringify({ aid, type: 'subscriber' }) },
+  ],
+});

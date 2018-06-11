@@ -44,8 +44,6 @@ export const SET_REALTIME_FIELD = 'SET_REALTIME_FIELD';
 export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
 export const SET_CHECKED_FIELD = 'SET_CHECKED_FIELD';
 export const SET_FILTERED_FIELDS = 'SET_FILTERED_FIELDS';
-export const REMOVE_RECEIVER = 'REMOVE_RECEIVER';
-export const ADD_RECEIVER = 'ADD_RECEIVER';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
@@ -486,14 +484,13 @@ export function saveInputProcessorSettings(state, parts = []) {
         response = state.get('response', Immutable.Map()),
         enabled = state.get('enabled'),
         filters = state.get('filters');
-
   const settings = {
-    "file_type": state.get('file_type'),
-    "type": state.get('type'),
-    "parser": {
-      "type": state.get('delimiter_type'),
-      "separator": state.get('delimiter'),
-      structure: state.get('fields').reduce((acc, name, idx) => {
+    file_type: state.get('file_type'),
+    type: state.get('type'),
+    parser: {
+      type: state.get('delimiter_type'),
+      separator: state.get('delimiter'),
+      structure: state.get('unfiltered_fields').reduce((acc, field, idx) => {
         const struct = (state.get('delimiter_type') === 'fixed')
           ? Immutable.Map({ name: field.get('name'), checked: field.get('checked'), width: state.getIn(['field_widths', idx], '') })
           : Immutable.Map({ name: field.get('name'), checked: field.get('checked') });
@@ -683,7 +680,7 @@ export function changeCSVField(index, value) {
   return {
     type: CHANGE_CSV_FIELD,
     index,
-    value
+    value,
   };
 }
 

@@ -173,11 +173,14 @@ class PlanProductsPriceTab extends Component {
     const { products, originalRates } = this.props;
     const removedProductKeys = this.getRemovedProductKeys();
     return removedProductKeys.map((productKey) => {
-      const prod = products.find(planProduct => planProduct.get('key', '') === productKey);
+      const prod = products.find(planProduct => planProduct.get('key', '') === productKey,
+        null,
+        Immutable.Map({ key: productKey }),
+      );
       const usaget = originalRates.get(productKey).keySeq().first();
       return (
         <PlanProductRemoved
-          key={prod.getIn(['_id', '$id'], '')}
+          key={prod.getIn(['_id', '$id'], prod.get('key', productKey))}
           usaget={usaget}
           item={prod}
           onProductUndoRemove={this.onProductUndoRemove}
