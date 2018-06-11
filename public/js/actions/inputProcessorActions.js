@@ -87,7 +87,7 @@ const convert = (settings) => {
     usaget_type,
     type: settings.type,
     unfiltered_fields: parser.structure ?
-      Immutable.List(parser.structure).map(struct => Immutable.Map({ name: struct.name, checked: struct.checked ? struct.checked : true })) :
+      Immutable.List(parser.structure).map(struct => Immutable.Map({ name: struct.name, checked: typeof struct.checked !== 'undefined' ? struct.checked : true })) :
       Immutable.List(),
     field_widths,
     customer_identification_fields,
@@ -98,7 +98,7 @@ const convert = (settings) => {
     filters
   };
 
-  ret.fields = ret.unfiltered_fields.filter(field => field.get('checked') === true).map(field => Immutable.Map({ name: field.get('name') }));
+  ret.fields = ret.unfiltered_fields.filter(field => field.get('checked') === true).map(field => field.get('name'));
 
   if (settings.type !== 'realtime') {
     ret.receiver = connections;
@@ -493,7 +493,7 @@ export function saveInputProcessorSettings(state, parts = []) {
     "parser": {
       "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
-      structure: state.get('fields').reduce((acc, name, idx) => {
+      structure: state.get('unfiltered_fields').reduce((acc, field, idx) => {
         const struct = (state.get('delimiter_type') === 'fixed')
           ? Immutable.Map({ name: field.get('name'), checked: field.get('checked'), width: state.getIn(['field_widths', idx], '') })
           : Immutable.Map({ name: field.get('name'), checked: field.get('checked') });
