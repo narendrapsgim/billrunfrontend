@@ -346,7 +346,11 @@ export default function (state = defaultState, action) {
       const newState = state.updateIn(['unfiltered_fields', index], struct => struct.set('checked', checked));
       return newState.update('fields', list => {
         if (checked === false) {
-          return list.delete(list.findIndex(field => field === fieldName));
+          const indexToChange = list.findIndex(field => field === fieldName);
+          if (indexToChange !== -1) {
+            return list.delete(indexToChange);
+          }
+          return list;
         }
         return list.push(fieldName);
       });

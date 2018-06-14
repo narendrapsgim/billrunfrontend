@@ -98,7 +98,7 @@ const convert = (settings) => {
     filters
   };
 
-  ret.fields = ret.unfiltered_fields.filter(field => field.get('checked') === true).map(field => field.get('name'));
+  ret.fields = Immutable.List(ret.unfiltered_fields.filter(field => field.get('checked') === true).map(field => field.get('name')));
 
   if (settings.type !== 'realtime') {
     ret.receiver = connections;
