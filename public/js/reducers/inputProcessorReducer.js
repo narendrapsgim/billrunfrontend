@@ -102,9 +102,13 @@ export default function (state = defaultState, action) {
 
     case SET_FIELDS:
       if (state.get('unfiltered_fields').size > 0) {
-        return state.update('unfiltered_fields', list => [...list, ...action.fields]);
+        return state.update('unfiltered_fields', list => [...list, ...action.fields])
+                    .set('fields', Immutable.List(state.get('unfiltered_fields')
+                      .filter(field => field.get('checked') === true)
+                      .map(field => field.get('name'))));
       }
-      return state.set('unfiltered_fields', Immutable.fromJS(action.fields));
+      return state.set('unfiltered_fields', Immutable.fromJS(action.fields))
+                  .set('fields', Immutable.fromJS(action.fields).map(field => field.get('name')));
 
     case SET_FIELD_WIDTH:
       return state.setIn(['field_widths', index], width);
