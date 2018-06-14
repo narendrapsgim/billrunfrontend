@@ -316,7 +316,6 @@ export default function (state = defaultState, action) {
     case MOVE_CSV_FIELD_DOWN:
       field_to_move = field ? field : state.getIn(['unfiltered_fields', index]);
       fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
-      const fields = state.getIn('unfiltered_fields', Immutable.Map(), list => list)
       return state
         .update('unfiltered_fields', list => list.delete(index).insert(index + 1, field_to_move))
         .update('field_widths', list => list.delete(index).insert(index + 1, fieldWidthToMove));
@@ -358,11 +357,6 @@ export default function (state = defaultState, action) {
         }
         return list.push(fieldName);
       });
-    }
-
-    case SET_FILTERED_FIELDS: {
-      const { fields } = action;
-      return state.set('fields', fields);
     }
 
     default:

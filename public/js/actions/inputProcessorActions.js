@@ -727,10 +727,3 @@ export function setCheckedField(index, checked, field) {
     field,
   };
 }
-
-export function setFilteredFields(fields) {
-  return {
-    type: SET_FILTERED_FIELDS,
-    fields,
-  };
-}

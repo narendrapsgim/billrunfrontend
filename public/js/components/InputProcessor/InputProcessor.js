@@ -44,7 +44,6 @@ import {
   setRealtimeDefaultField,
   cancelKeyAuth,
   setCheckedField,
-  setFilteredFields,
  } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
