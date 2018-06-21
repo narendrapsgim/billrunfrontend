@@ -30,6 +30,7 @@ class SampleCSV extends Component {
     onAddField: PropTypes.func.isRequired,
     onChangeInputProcessorField: PropTypes.func.isRequired,
     onCheckedField: PropTypes.func.isRequired,
+    checkAllFields: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -87,6 +88,8 @@ class SampleCSV extends Component {
 
     const fieldsHTML = (<CSVFields onMoveFieldUp={onMoveFieldUp} onMoveFieldDown={onMoveFieldDown} onChangeCSVField={onChangeCSVField} onRemoveField={onRemoveField} settings={settings} onSetFieldWidth={onSetFieldWidth} onCheckedField={onCheckedField} />);
 
+    const check = settings.get('unfiltered_fields', Immutable.List()).reduce((acc, curr) => acc && curr.get('checked') === true, true) === true ? 'Uncheck' : 'Check';
+
     const setFieldsHTML = (
       <div className="panel panel-default">
         <div className="panel-heading">
@@ -94,14 +97,20 @@ class SampleCSV extends Component {
         </div>
         <div className="panel-body">
           <div className="form-group">
-            <div className="col-lg-4">
-              <label>Field name</label>&nbsp;&nbsp;
+            <div className="col-lg-6">
+            <input type="checkbox" style={{ marginLeft: 14 }}
+            disabled={settings.get('unfiltered_fields', []).size < 1}
+            className="btn btn-default btn-xs"
+            onClick={this.props.checkAllFields}
+            checked={check === 'Uncheck'} />
+            <label> &nbsp;{check} All</label> &nbsp;&nbsp;
               <button type="button"
                       disabled={settings.get('unfiltered_fields', []).size < 1}
                       className="btn btn-default btn-xs"
                       onClick={this.removeAllFields}>
-                <i className="fa fa-trash-o danger-red" /> Remove all
+                <i className="fa fa-trash-o danger-red" /> Remove All
               </button>
+              <label>&nbsp;&nbsp;Field name</label>
             </div>
             { (settings.get('delimiter_type') === 'fixed') &&
               <div className="col-lg-2">

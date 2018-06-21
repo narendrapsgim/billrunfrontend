@@ -32,6 +32,7 @@ import {
   saveInputProcessorSettings,
   removeCSVField,
   removeAllCSVFields,
+  checkAllFields,
   mapUsaget,
   removeUsagetMapping,
   setUsagetType,
@@ -291,6 +292,11 @@ class InputProcessor extends Component {
     this.props.dispatch(removeAllCSVFields());
   }
 
+  onCheckAllFields = (e) => {
+    const { checked } = e.target;
+    this.props.dispatch(checkAllFields(checked));
+  }
+
   onSetFieldMapping = (e) => {
     const { value: mapping, id: field } = e.target;
     this.props.dispatch(setFieldMapping(field, mapping));
@@ -461,6 +467,7 @@ class InputProcessor extends Component {
           onSetDelimiterType={this.onSetDelimiterType}
           onChangeInputProcessorField={this.onChangeInputProcessorField}
           onCheckedField={this.onCheckedField}
+          checkAllFields={this.onCheckAllFields}
         />
       );
 

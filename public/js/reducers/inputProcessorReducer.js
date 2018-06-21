@@ -11,6 +11,7 @@ import { SET_NAME,
          SET_FIELD_MAPPING,
          REMOVE_CSV_FIELD,
          REMOVE_ALL_CSV_FIELDS,
+         CHECK_ALL_FIELDS,
          ADD_CSV_FIELD,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
@@ -134,6 +135,14 @@ export default function (state = defaultState, action) {
 
     case REMOVE_ALL_CSV_FIELDS:
       return state.set('unfiltered_fields', Immutable.List()).set('fields', Immutable.List());
+
+    case CHECK_ALL_FIELDS: {
+      const { checked } = action;
+      if (checked === true) {
+        return state.update('unfiltered_fields', Immutable.List(), list => list.map(field => field.set('checked', true)));
+      }
+      return state.update('unfiltered_fields', Immutable.List(), list => list.map(field => field.set('checked', false)));
+    }
 
     case SET_USAGET_TYPE:
       return state

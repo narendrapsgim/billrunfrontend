@@ -32,6 +32,7 @@ export const SET_LINE_KEY = 'SET_LINE_KEY';
 export const SET_COMPUTED_LINE_KEY = 'SET_COMPUTED_LINE_KEY';
 export const UNSET_COMPUTED_LINE_KEY = 'UNSET_COMPUTED_LINE_KEY';
 export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
+export const CHECK_ALL_FIELDS = 'CHECK_ALL_FIELDS';
 export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
 export const SET_INPUT_PROCESSOR_TEMPLATE = 'SET_INPUT_PROCESSOR_TEMPLATE';
 export const MOVE_CSV_FIELD_UP = 'MOVE_CSV_FIELD_UP';
@@ -286,6 +287,13 @@ export function removeCSVField(index, field) {
 export function removeAllCSVFields() {
   return {
     type: REMOVE_ALL_CSV_FIELDS
+  };
+}
+
+export function checkAllFields(checked) {
+  return {
+    type: CHECK_ALL_FIELDS,
+    checked,
   };
 }
 
