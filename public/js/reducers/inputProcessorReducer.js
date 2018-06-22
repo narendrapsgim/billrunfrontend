@@ -138,10 +138,7 @@ export default function (state = defaultState, action) {
 
     case CHECK_ALL_FIELDS: {
       const { checked } = action;
-      if (checked === true) {
-        return state.update('unfiltered_fields', Immutable.List(), list => list.map(field => field.set('checked', true)));
-      }
-      return state.update('unfiltered_fields', Immutable.List(), list => list.map(field => field.set('checked', false)));
+      return state.update('unfiltered_fields', Immutable.List(), list => list.map(field => field.set('checked', checked === true)));
     }
 
     case SET_USAGET_TYPE:
