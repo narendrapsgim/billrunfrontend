@@ -97,20 +97,30 @@ class SampleCSV extends Component {
         </div>
         <div className="panel-body">
           <div className="form-group">
-            <div className="col-lg-6">
-            <input type="checkbox" style={{ marginLeft: 14 }}
-            disabled={settings.get('unfiltered_fields', []).size < 1}
-            className="btn btn-default btn-xs"
-            onClick={this.props.checkAllFields}
-            checked={check === 'Uncheck'} />
-            <label> &nbsp;{check} All</label> &nbsp;&nbsp;
+            <div className="col-lg-1">
+              <label>&nbsp;&nbsp;Field name</label>
+            </div>
+            <div className="col-lg-4">
+              <p className="help-block">Notice: Only checked fields will be saved in the system</p>
+            </div>
+          </div>
+          <div className="form-group">
+            <div className="col-lg-4">
+              <label style={{ border: 2 }}>
+                <input type="checkbox" style={{ marginLeft: 14 }}
+                  disabled={settings.get('unfiltered_fields', []).size < 1}
+                  className="btn btn-default btn-xs"
+                  onClick={this.props.checkAllFields}
+                  checked={check === 'Uncheck'}
+                />
+                &nbsp;{check} All &nbsp;&nbsp;
+              </label>
               <button type="button"
                       disabled={settings.get('unfiltered_fields', []).size < 1}
                       className="btn btn-default btn-xs"
                       onClick={this.removeAllFields}>
                 <i className="fa fa-trash-o danger-red" /> Remove All
               </button>
-              <label>&nbsp;&nbsp;Field name</label>
             </div>
             { (settings.get('delimiter_type') === 'fixed') &&
               <div className="col-lg-2">
