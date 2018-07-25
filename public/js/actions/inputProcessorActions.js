@@ -166,6 +166,21 @@ const convert = (settings) => {
         ret.pricing[key] = {};
       }
     }
+
+    if (filters) {
+      for (var key in ret.filters) {
+        const filter = ret.filters[key];
+        if (typeof filter.conditions !== 'undefined') {
+          for (var condition in filter.conditions) {
+            condition = filter.conditions[condition];
+            if (typeof condition.value.regex !== 'undefined') {
+              condition.value = new RegExp(`${condition.value.regex}`).toString();
+            }
+          }
+        }
+      }
+    }
+
   } else {
     ret.processor = {
       usaget_mapping: []
