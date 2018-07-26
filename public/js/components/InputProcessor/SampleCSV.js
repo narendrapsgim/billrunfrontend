@@ -104,7 +104,7 @@ class SampleCSV extends Component {
                           onChangeDelimiter={onChangeDelimiter} />);
 
     const fieldsHTML = (<CSVFields onMoveFieldUp={onMoveFieldUp} onMoveFieldDown={onMoveFieldDown} onChangeCSVField={onChangeCSVField} onRemoveField={onRemoveField} settings={settings} onSetFieldWidth={onSetFieldWidth} onCheckedField={onCheckedField} />);
-    const check = allChecked ? 'Uncheck' : 'Check';
+    const check = allChecked ? 'Uncheck All' : 'Check All';
     const setFieldsHTML = (
       <div className="panel panel-default">
         <div className="panel-heading">
@@ -112,36 +112,35 @@ class SampleCSV extends Component {
         </div>
         <div className="panel-body">
           <div className="form-group">
-            <div className="col-lg-1">
-              <label>&nbsp;&nbsp;Field name</label>
-            </div>
             <div className="col-lg-4">
-              <p className="help-block">Notice: Only checked fields will be saved in the system</p>
+              <label>&nbsp;&nbsp;Field name - Only checked fields will be saved in the system</label>
             </div>
           </div>
           <div className="form-group">
             <div className="col-lg-4">
-              <label style={{ border: 2 }}>
-                <input type="checkbox" style={{ marginLeft: 14 }}
+              <label title={check} className="btn btn-default btn-sm" style={{ borderRadius: 3, backgroundColor: '#eeeeee'}}>
+                <input type="checkbox"
                   disabled={settings.get('unfiltered_fields', []).size < 1}
                   className="btn btn-default btn-xs"
                   onChange={this.toggleCheckAllFields}
-                  checked={check === 'Uncheck'}
+                  checked={check === 'Uncheck All'}
                 />
-                &nbsp;{check} All &nbsp;&nbsp;
               </label>
-              <button type="button"
-                      disabled={settings.get('unfiltered_fields', []).size < 1}
-                      className="btn btn-default btn-xs"
-                      onClick={this.removeAllFields}>
-                <i className="fa fa-trash-o danger-red" /> Remove All
-              </button>
             </div>
+
             { (settings.get('delimiter_type') === 'fixed') &&
-              <div className="col-lg-2">
+              <div className="col-lg-2" style={{ marginLeft: 35 }}>
                 <label>Width</label>
               </div>
             }
+            <div className="col-lg-3" style={{ marginLeft: 30 }}>
+              <button type="button"
+                disabled={settings.get('unfiltered_fields', []).size < 1}
+                className="btn btn-default btn-sm"
+                onClick={this.removeAllFields}>
+                <i className="fa fa-trash-o danger-red" /> Remove All
+              </button>
+            </div>
           </div>
           { fieldsHTML }
           <div className="form-group">
