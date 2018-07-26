@@ -292,8 +292,7 @@ class InputProcessor extends Component {
     this.props.dispatch(removeAllCSVFields());
   }
 
-  onCheckAllFields = (e) => {
-    const { checked } = e.target;
+  onCheckAllFields = (checked) => {
     this.props.dispatch(checkAllFields(checked));
   }
 

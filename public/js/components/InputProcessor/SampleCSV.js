@@ -6,9 +6,11 @@ import Immutable from 'immutable';
 import Field from '../Field';
 import { CreateButton } from '../Elements';
 import SelectDelimiter from './SampleCSV/SelectDelimiter';
+import { allCheckedSelector } from '../../selectors/inputProcessorSelector';
 import SelectCSV from './SampleCSV/SelectCSV';
 import SelectJSON from './SampleCSV/SelectJSON';
 import CSVFields from './SampleCSV/CSVFields';
+import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 
 class SampleCSV extends Component {
 
@@ -31,11 +33,13 @@ class SampleCSV extends Component {
     onChangeInputProcessorField: PropTypes.func.isRequired,
     onCheckedField: PropTypes.func.isRequired,
     checkAllFields: PropTypes.func.isRequired,
+    allChecked: PropTypes.bool,
   }
 
   static defaultProps = {
     type: '',
     errors: Immutable.Map(),
+    allChecked: false,
   }
 
   removeAllFields = () => {
@@ -43,6 +47,18 @@ class SampleCSV extends Component {
     if (r) {
       this.props.onRemoveAllFields.call(this);
     }
+  }
+
+  toggleCheckAllFields = (e) => {
+    const { checked } = e.target;
+    const { allChecked } = this.props;
+    const check = allChecked ? 'uncheck' : 'check';
+    const confirm = {
+      message: `Are you sure you want to ${check} all fields?`,
+      onOk: () => this.props.checkAllFields(checked),
+      type: 'confirm',
+    };
+    this.props.dispatch(showConfirmModal(confirm));
   }
 
   componentDidMount() {
@@ -77,7 +93,8 @@ class SampleCSV extends Component {
           onMoveFieldDown,
           onChangeCSVField,
           onAddField,
-          onCheckedField } = this.props;
+          onCheckedField,
+          allChecked } = this.props;
 
     const selectDelimiterHTML =
       type === 'api'
@@ -87,9 +104,7 @@ class SampleCSV extends Component {
                           onChangeDelimiter={onChangeDelimiter} />);
 
     const fieldsHTML = (<CSVFields onMoveFieldUp={onMoveFieldUp} onMoveFieldDown={onMoveFieldDown} onChangeCSVField={onChangeCSVField} onRemoveField={onRemoveField} settings={settings} onSetFieldWidth={onSetFieldWidth} onCheckedField={onCheckedField} />);
-
-    const check = settings.get('unfiltered_fields', Immutable.List()).reduce((acc, curr) => acc && curr.get('checked') === true, true) === true ? 'Uncheck' : 'Check';
-
+    const check = allChecked ? 'Uncheck' : 'Check';
     const setFieldsHTML = (
       <div className="panel panel-default">
         <div className="panel-heading">
@@ -110,7 +125,7 @@ class SampleCSV extends Component {
                 <input type="checkbox" style={{ marginLeft: 14 }}
                   disabled={settings.get('unfiltered_fields', []).size < 1}
                   className="btn btn-default btn-xs"
-                  onClick={this.props.checkAllFields}
+                  onChange={this.toggleCheckAllFields}
                   checked={check === 'Uncheck'}
                 />
                 &nbsp;{check} All &nbsp;&nbsp;
@@ -215,4 +230,7 @@ class SampleCSV extends Component {
   }
 }
 
-export default connect()(SampleCSV);
+const mapStateToProps = (state, props) => ({
+  allChecked: allCheckedSelector(state, props),
+});
+export default connect(mapStateToProps)(SampleCSV);
