@@ -20,11 +20,11 @@ export default class GatewayParamsModal extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { gateway, settings } = nextProps;
-    console.log('settings: ', settings);
-    console.log('gateway: ', gateway);
-    const currentConnection = gateway.getIn(['receiver', 'connections', 0]) === undefined ? {} :
-      gateway.getIn(['receiver', 'connections', 0]).toJS();
-    if (gateway) return this.setState({ connection: currentConnection, gateway: gateway.toJS()});
+    if (gateway) {
+      const currentConnection = gateway.getIn(['receiver', 'connections', 0]) === undefined ? {} :
+        gateway.getIn(['receiver', 'connections', 0]).toJS();
+      return this.setState({ connection: currentConnection, gateway: gateway.toJS()});
+    }
     return this.setState({gateway: {name: settings.get('name'), params: {}}});
   }
 
