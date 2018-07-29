@@ -27,7 +27,7 @@ import {
   propertyTypeSelector,
 } from '../../selectors/settingsSelector';
 import {
-  sourcePlanRatesSelector,
+  sourceEntityRatesSelector,
 } from '../../selectors/entitySelector';
 import {
   getProductConvertedRates,
@@ -259,7 +259,7 @@ class PlanProductsPriceTab extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  originalRates: sourcePlanRatesSelector(state, props),
+  originalRates: sourceEntityRatesSelector(state, props)(state, props),
   products: state.list.get('plan_products'),
   usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),

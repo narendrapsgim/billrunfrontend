@@ -3,9 +3,12 @@ import Immutable from 'immutable';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector, closedCycleChangesSelector } from './settingsSelector';
 import { PLAN_SOURCE } from '../reducers/planReducer';
+import { SERVICE_SOURCE } from '../reducers/serviceReducer';
 
 
 const getSourcePlan = (state, props) => state.entity.get(PLAN_SOURCE);
+
+const getSourceService = (state, props) => state.entity.get(SERVICE_SOURCE);
 
 const getPropsItem = (state, props) => props.item;
 
@@ -132,6 +135,8 @@ const selectSimpleMode = (action, id, item) => {
   return 'loading';
 };
 
+const selectEntityRates = (entity = Immutable.Map()) => entity.get('rates');
+
 export const revisionsSelector = createSelector(
   getItem,
   getRevisions,
@@ -223,5 +228,21 @@ export const actionSelector = createSelector(
 
 export const sourcePlanRatesSelector = createSelector(
   getSourcePlan,
-  (sourcePlan = Immutable.Map()) => sourcePlan.get('rates'),
+  selectEntityRates,
+);
+
+export const sourceServiceRatesSelector = createSelector(
+  getSourceService,
+  selectEntityRates,
+);
+
+export const sourceEntityRatesSelector = createSelector(
+  (state, props) => props.itemName,
+  (itemName) => {
+    switch (itemName) {
+      case 'plan': return sourcePlanRatesSelector;
+      case 'service': return sourceServiceRatesSelector;
+      default: return () => {};
+    }
+  },
 );

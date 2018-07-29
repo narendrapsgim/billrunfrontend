@@ -110,7 +110,7 @@ class ServiceSetup extends Component {
 
   fetchItem = (itemId = this.props.itemId) => {
     if (itemId) {
-      this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
+      this.props.dispatch(getService(itemId, true)).then(this.afterItemReceived);
     }
   }
 

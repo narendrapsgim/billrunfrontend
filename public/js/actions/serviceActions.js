@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
-import { saveEntity } from './entityActions';
+import { saveEntity, gotEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
 import {
   getPlanConvertedIncludes,
@@ -12,6 +12,8 @@ import {
   usageTypesDataSelector,
   propertyTypeSelector,
 } from '../selectors/settingsSelector';
+
+import { SERVICE_SOURCE } from '../reducers/serviceReducer';
 
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
@@ -97,7 +99,7 @@ export const saveService = (service, action) => (dispatch, getState) => {
   return dispatch(saveEntity('services', convertedService, action));
 };
 
-export const getService = id => (dispatch, getState) => {
+export const getService = (id, setSource = false) => (dispatch, getState) => {
   dispatch(startProgressIndicator());
   const query = fetchServiceByIdQuery(id);
   return apiBillRun(query)
@@ -115,6 +117,9 @@ export const getService = id => (dispatch, getState) => {
       const service = Immutable.fromJS(item);
       const convertedService = convertService(getState, service, false, false).toJS();
       dispatch(gotItem(convertedService));
+      if (setSource) {
+        dispatch(gotEntity(SERVICE_SOURCE, convertedService));
+      }
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));

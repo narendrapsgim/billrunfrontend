@@ -17,6 +17,8 @@ import {
 
 import entityProductsReducer from './entityProductsReducer';
 
+export const SERVICE_SOURCE = 'serviceSource';
+
 const DefaultState = Immutable.fromJS({
   description: '',
   name: '',
