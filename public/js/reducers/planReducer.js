@@ -8,7 +8,6 @@ import {
 
 import {
   PLAN_PRODUCTS_REMOVE,
-  PLAN_PRODUCTS_UNDO_REMOVE,
   PLAN_PRODUCTS_RATE_UPDATE_TO,
   PLAN_PRODUCTS_RATE_UPDATE,
   PLAN_PRODUCTS_RATE_REMOVE,
@@ -64,9 +63,6 @@ const defaultNotification = Immutable.Map({
 
 export default function (state = defaultState, action) {
   switch (action.type) {
-
-    case PLAN_PRODUCTS_UNDO_REMOVE:
-      return state.setIn([...action.path, action.price]);
 
     case PLAN_PRODUCTS_REMOVE:
       return state.deleteIn([...action.path, action.name]);
