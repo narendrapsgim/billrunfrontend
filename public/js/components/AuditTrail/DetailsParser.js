@@ -65,6 +65,8 @@ class DetailsParser extends Component {
         return 'Moved';
       case 'permanentchange':
         return 'Updated';
+      case 'reopen':
+        return 'Reopened';
       default:
         return '';
     }

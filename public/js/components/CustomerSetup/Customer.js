@@ -121,7 +121,7 @@ class Customer extends Component {
     const { currency } = this.props;
     const { debt } = this.state;
     const debtClass = classNames('non-editable-field', {
-      'danger-red': debt < 0,
+      'danger-red': debt > 0,
     });
     return debt !== null &&
       (<FormGroup>
