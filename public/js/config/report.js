@@ -1,5 +1,5 @@
 export default {
-  entities: ['usage', 'subscription', 'customer', 'logFile', 'queue', 'event'],
+  entities: ['usage', 'subscription', 'customer', 'logFile', 'queue', 'event', 'bills'],
   fields: {
     usage: [ // changes to usage will effect on queue
       // Default settings \ Example
@@ -134,6 +134,26 @@ export default {
         },
       },
       { id: 'in_queue_since', type: 'date' },
+    ],
+    bills: [
+      { id: 'type',
+        inputConfig: {
+          inputType: 'select',
+          options: ['invoice', 'payment'],
+        },
+      },
+      { id: 'canceled',
+        type: 'boolean',
+      },
+      { id: 'cancellation',
+        type: 'boolean',
+      },
+      { id: 'rejected',
+        type: 'boolean',
+      },
+      { id: 'rejection',
+        type: 'boolean',
+      },
     ],
   },
   conditionsOperators: [
