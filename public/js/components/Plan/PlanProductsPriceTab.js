@@ -15,13 +15,13 @@ import {
 import { showSuccess, showWarning, showInfo } from '../../actions/alertsActions';
 import { getList, clearList, pushToList } from '../../actions/listActions';
 import {
-  planProductRemove,
-  planProductsRateRemove,
-  planProductsRateAdd,
-  planProductsRateUpdate,
-  planProductsRateUpdateTo,
-  planProductsRateInit,
-} from '../../actions/planActions';
+  entityProductRemove,
+  entityProductsRateRemove,
+  entityProductsRateAdd,
+  entityProductsRateUpdate,
+  entityProductsRateUpdateTo,
+  entityProductsRateInit,
+} from '../../actions/entityProductsActions';
 import {
   usageTypesDataSelector,
   propertyTypeSelector,
@@ -41,6 +41,7 @@ class PlanProductsPriceTab extends Component {
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    itemName: PropTypes.string,
     originalRates: PropTypes.instanceOf(Immutable.Map),
     products: PropTypes.instanceOf(Immutable.List),
     onChangeFieldValue: PropTypes.func.isRequired,
@@ -52,6 +53,7 @@ class PlanProductsPriceTab extends Component {
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
     mode: 'create',
+    itemName: 'plan',
     originalRates: Immutable.Map(),
     products: Immutable.List(),
   };
@@ -83,7 +85,7 @@ class PlanProductsPriceTab extends Component {
   }
 
   addNewProductToPlan = (newProducts) => {
-    const { products, propertyTypes, usageTypesData } = this.props;
+    const { products, propertyTypes, usageTypesData, itemName } = this.props;
     newProducts.forEach((product) => {
       const newProduct = products.find(planProd => planProd.get('key', '') === product.key);
       if (newProduct) {
@@ -91,7 +93,7 @@ class PlanProductsPriceTab extends Component {
         const productPath = ['rates', newProduct.get('key', ''), usaget, 'rate'];
         const newRates = getProductConvertedRates(propertyTypes, usageTypesData, newProduct, false);
         const newProductWithRates = !newRates.isEmpty() ? newProduct.set('rates', newRates) : newProduct;
-        this.props.dispatch(planProductsRateInit(newProductWithRates, productPath));
+        this.props.dispatch(entityProductsRateInit(itemName, newProductWithRates, productPath));
       }
     });
   }
@@ -111,7 +113,7 @@ class PlanProductsPriceTab extends Component {
   }
 
   onProductRestore = (product, productPath) => {
-    const { originalRates } = this.props;
+    const { originalRates, itemName } = this.props;
     const productName = product.get('key');
     const originalKeys = originalRates.keySeq();
     if (originalKeys.includes(productName)) {
@@ -119,13 +121,14 @@ class PlanProductsPriceTab extends Component {
       this.props.onChangeFieldValue(['rates', productName], prices);
       this.props.dispatch(showInfo(`Product ${productName} prices for this plan restored to origin state`));
     } else {
-      this.props.dispatch(planProductsRateInit(product, productPath));
+      this.props.dispatch(entityProductsRateInit(itemName, product, productPath));
       this.props.dispatch(showInfo(`Product ${productName} prices for this plan restored to BASE state`));
     }
   }
 
   onProductRemove = (productPath, productName) => {
-    this.props.dispatch(planProductRemove(productPath, productName));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductRemove(itemName, productPath, productName));
   }
 
   onProductUndoRemove = (productName) => {
@@ -136,23 +139,28 @@ class PlanProductsPriceTab extends Component {
   }
 
   onProductRemoveRate = (productPath, index) => {
-    this.props.dispatch(planProductsRateRemove(productPath, index));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateRemove(itemName, productPath, index));
   }
 
   onProductEditRate = (productPath, value) => {
-    this.props.dispatch(planProductsRateUpdate(productPath, value));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateUpdate(itemName, productPath, value));
   }
 
   onProductEditRateTo = (productPath, index, value) => {
-    this.props.dispatch(planProductsRateUpdateTo(productPath, index, value));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateUpdateTo(itemName, productPath, index, value));
   }
 
   onProductAddRate = (productPath) => {
-    this.props.dispatch(planProductsRateAdd(productPath));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateAdd(itemName, productPath));
   }
 
   onProductInitRate = (product, productPath) => {
-    this.props.dispatch(planProductsRateInit(product, productPath));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateInit(itemName, product, productPath));
   }
 
   renderNoItems = () => (<Col lg={12}> No overridden prices for this plan </Col>)

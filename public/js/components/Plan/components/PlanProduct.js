@@ -125,7 +125,7 @@ export default class PlanProduct extends Component {
         </FormGroup>
         { prices.map((price, i) => (
           <ProductPrice
-            key={i}
+            key={`${item.get('key')}_${i}`}
             item={price}
             index={i}
             mode={mode}
