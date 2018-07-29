@@ -41,9 +41,9 @@ class PlanProductsPriceTab extends Component {
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
-    itemName: PropTypes.string,
     originalRates: PropTypes.instanceOf(Immutable.Map),
     products: PropTypes.instanceOf(Immutable.List),
+    itemName: PropTypes.string.isRequired,
     onChangeFieldValue: PropTypes.func.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
@@ -53,7 +53,6 @@ class PlanProductsPriceTab extends Component {
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
     mode: 'create',
-    itemName: 'plan',
     originalRates: Immutable.Map(),
     products: Immutable.List(),
   };
