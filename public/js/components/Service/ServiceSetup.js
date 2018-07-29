@@ -6,6 +6,7 @@ import moment from 'moment';
 import { Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
+import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import {

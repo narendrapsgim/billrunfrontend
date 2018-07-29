@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Panel, Form, Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
-import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import PlanProduct from './components/PlanProduct';
 import PlanProductRemoved from './components/PlanProductRemoved';
 import { PlanDescription } from '../../FieldDescriptions';
@@ -71,7 +70,7 @@ class PlanProductsPriceTab extends Component {
     if (!Immutable.is(planRates, oldPlanRates)) {
       const newProductsKeys = planRates.keySeq().filter(planRateKey =>
         // Get all products that exist in plan but not fetched from server
-        (products.findIndex(product => product.get('key', '') === planRateKey) === -1)
+        (products.findIndex(product => product.get('key', '') === planRateKey) === -1),
       );
       if (!newProductsKeys.isEmpty()) {
         this.props.dispatch(pushToList('plan_products', getProductsByKeysQuery(newProductsKeys.toArray())));
