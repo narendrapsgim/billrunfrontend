@@ -2,12 +2,20 @@ import Immutable from 'immutable';
 import includeGroupsReducer from './includeGroupsReducer';
 import { ADD_GROUP, REMOVE_GROUP } from '../actions/includeGroupsActions';
 import {
+  SERVICE_PRODUCTS_REMOVE,
+  SERVICE_PRODUCTS_RATE_UPDATE_TO,
+  SERVICE_PRODUCTS_RATE_UPDATE,
+  SERVICE_PRODUCTS_RATE_REMOVE,
+  SERVICE_PRODUCTS_RATE_ADD,
+  SERVICE_PRODUCTS_RATE_INIT,
   GOT_SERVICE,
   CLONE_RESET_SERVICE,
   CLEAR_SERVICE,
   UPDATE_SERVICE,
   ADD_GROUP_SERVICE,
   REMOVE_GROUP_SERVICE } from '../actions/serviceActions';
+
+import entityProductsReducer from './entityProductsReducer';
 
 const DefaultState = Immutable.fromJS({
   description: '',
@@ -48,6 +56,14 @@ const serviceReducer = (state = DefaultState, action) => {
       const includeGroupsAction = Object.assign({}, action, { type: REMOVE_GROUP });
       return includeGroupsReducer(state, includeGroupsAction);
     }
+
+    case SERVICE_PRODUCTS_REMOVE:
+    case SERVICE_PRODUCTS_RATE_UPDATE_TO:
+    case SERVICE_PRODUCTS_RATE_UPDATE:
+    case SERVICE_PRODUCTS_RATE_REMOVE:
+    case SERVICE_PRODUCTS_RATE_ADD:
+    case SERVICE_PRODUCTS_RATE_INIT:
+      return entityProductsReducer(state, action);
 
     default:
       return state;

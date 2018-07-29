@@ -183,6 +183,7 @@ class ServiceSetup extends Component {
 
     const allowEdit = mode !== 'view';
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
+    const planRates = item.get('rates', Immutable.Map());
     return (
       <div className="ServiceSetup">
         <Panel>
@@ -207,7 +208,18 @@ class ServiceSetup extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Service Includes" eventKey={2}>
+          <Tab title="Override Product Price" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanProductsPriceTab
+                itemName="service"
+                mode={mode}
+                planRates={planRates}
+                onChangeFieldValue={this.onUpdateItem}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Service Includes" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanIncludesTab
                 includeGroups={includeGroups}
