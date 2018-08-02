@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
+import isNumber from 'is-number';
 import { Button, FormGroup, Col, Row, ControlLabel, HelpBlock } from 'react-bootstrap';
 import Field from '../../Field';
 
@@ -93,11 +94,12 @@ export default class ProductPrice extends Component {
     let priceError = '';
     if (value === '') {
       priceError = 'Required';
-    } else if (isNaN(value)) {
+    } else if (!isNumber(value)) {
       priceError = 'Must be number';
     }
     this.setState({ priceError });
-    this.props.onProductEditRate(index, 'price', value);
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.props.onProductEditRate(index, 'price', newValue);
   }
 
   onRemoveItem = () => {
