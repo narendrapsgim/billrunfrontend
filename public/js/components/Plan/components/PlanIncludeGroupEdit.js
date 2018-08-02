@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Modal, Col, Button, Form, FormGroup, ControlLabel, Checkbox, Tooltip, OverlayTrigger, HelpBlock } from 'react-bootstrap';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
+import isNumber from 'is-number';
 import { GroupsInclude } from '../../../FieldDescriptions';
 import Help from '../../Help';
 import { ConfirmModal } from '../../Elements';
@@ -82,7 +83,8 @@ export default class PlanIncludeGroupEdit extends Component {
       errorInclude = this.errors.include.allowedCharacters;
     }
     const valueField = this.isMonetaryBased() ? 'cost' : 'value';
-    this.props.onChangeFieldValue(['include', 'groups', name, valueField], value);
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.props.onChangeFieldValue(['include', 'groups', name, valueField], newValue);
     this.setState({ errorInclude });
   }
 
