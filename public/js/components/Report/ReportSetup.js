@@ -229,7 +229,7 @@ class ReportSetup extends Component {
         const itemId = item.getIn(['_id', '$id']);
         const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
         this.fetchItem();
-        this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
+        this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
       } else {
         this.handleBack();
       }
