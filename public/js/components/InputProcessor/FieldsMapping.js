@@ -56,9 +56,10 @@ export default class FieldsMapping extends Component {
 
   componentWillMount() {
     if (this.props.settings.getIn(['processor', 'time_field'])) {
-      this.setState({separateTime: true});
+      this.setState({ separateTime: true });
     }
-    if (this.props.settings.getIn(['processor', 'timezone_field'])) {
+    const timeZone = this.props.settings.getIn(['processor', 'timezone_field']);
+    if (this.props.settings.get('fields').includes(timeZone)) {
       this.setState({ separateTimeZone: true });
     }
   }
