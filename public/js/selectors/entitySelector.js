@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import { upperCaseFirst } from 'change-case';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector, closedCycleChangesSelector } from './settingsSelector';
 import { PLAN_SOURCE } from '../reducers/planReducer';
@@ -67,6 +68,9 @@ const getId = (state, props) => {
 };
 
 const getItem = (state, props, entityName) => {
+  if (entityName && entityName.startsWith('source')) {
+    return state.entity.get(entityName);
+  }
   switch (entityName) {
     case 'prepaid_include':
     case 'autorenew':
@@ -83,6 +87,8 @@ const getItem = (state, props, entityName) => {
     }
   }
 };
+
+const getItemSource = (state, props, entityName) => getItem(state, props, `source${upperCaseFirst(entityName)}`);
 
 export const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscriberFields) => {
   switch (item.get('entity')) {
@@ -171,6 +177,11 @@ export const messageSelector = createSelector(
     }
     return undefined;
   },
+);
+
+export const itemSourceSelector = createSelector(
+  getItemSource,
+  item => item,
 );
 
 export const itemSelector = createSelector(
