@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import { Panel, Button, FormGroup, ControlLabel } from 'react-bootstrap';
-import classNames from 'classnames';
 import Immutable from 'immutable';
 import Help from '../../Help';
 import CreateButton from '../../Elements/CreateButton';
@@ -79,21 +78,21 @@ export default class PlanProduct extends Component {
 
   onProductAddRate = () => {
     const { item, usaget } = this.props;
-    const productKey  = item.get('key');
+    const productKey = item.get('key');
     const productPath = ['rates', productKey, usaget, 'rate'];
     this.props.onProductAddRate(productPath);
   }
 
   onProductRemoveRate = (index) => {
     const { item, usaget } = this.props;
-    const productKey  = item.get('key');
+    const productKey = item.get('key');
     const productPath = ['rates', productKey, usaget, 'rate'];
     this.props.onProductRemoveRate(productPath, index);
   }
 
   onProductRemove = () => {
     const { item } = this.props;
-    const productKey  = item.get('key');
+    const productKey = item.get('key');
     const productPath = ['rates'];
     this.props.onProductRemove(productPath, productKey);
   }
@@ -124,10 +123,9 @@ export default class PlanProduct extends Component {
         <FormGroup style={{ margin: 0 }}>
           {<ControlLabel>{`${pricingMethod} Pricing`}</ControlLabel>}
         </FormGroup>
-
-        { prices.map((price, i) =>
+        { prices.map((price, i) => (
           <ProductPrice
-            key={i}
+            key={`${item.get('key')}_${i}`}
             item={price}
             index={i}
             mode={mode}
@@ -136,7 +134,7 @@ export default class PlanProduct extends Component {
             onProductEditRate={this.onProductEditRate}
             onProductRemoveRate={this.onProductRemoveRate}
           />
-        )}
+        ))}
         { editable && <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
       </Panel>
     );
