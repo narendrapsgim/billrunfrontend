@@ -146,6 +146,7 @@ export default {
         },
       },
       { id: 'cancelled', type: 'boolean', title: 'Cancelled' },
+      { id: 'cancel', type: 'boolean', title: 'Cancel' },
       { id: 'cancellation', type: 'boolean', title: 'Cancellation' },
       { id: 'rejected', type: 'boolean', title: 'Rejected' },
       { id: 'rejection', type: 'boolean', title: 'Rejection' },
