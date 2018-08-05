@@ -6,6 +6,7 @@ import moment from 'moment';
 import { Panel, Tabs, Tab } from 'react-bootstrap';
 import ServiceDetails from './ServiceDetails';
 import PlanIncludesTab from '../Plan/PlanIncludesTab';
+import PlanProductsPriceTab from '../Plan/PlanProductsPriceTab';
 import { EntityRevisionDetails } from '../Entity';
 import { ActionButtons, LoadingItemPlaceholder } from '../Elements';
 import {
@@ -109,7 +110,7 @@ class ServiceSetup extends Component {
 
   fetchItem = (itemId = this.props.itemId) => {
     if (itemId) {
-      this.props.dispatch(getService(itemId)).then(this.afterItemReceived);
+      this.props.dispatch(getService(itemId, true)).then(this.afterItemReceived);
     }
   }
 
@@ -182,6 +183,7 @@ class ServiceSetup extends Component {
 
     const allowEdit = mode !== 'view';
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
+    const planRates = item.get('rates', Immutable.Map());
     return (
       <div className="ServiceSetup">
         <Panel>
@@ -206,7 +208,18 @@ class ServiceSetup extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Service Includes" eventKey={2}>
+          <Tab title="Override Product Price" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <PlanProductsPriceTab
+                itemName="service"
+                mode={mode}
+                planRates={planRates}
+                onChangeFieldValue={this.onUpdateItem}
+              />
+            </Panel>
+          </Tab>
+
+          <Tab title="Service Includes" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanIncludesTab
                 includeGroups={includeGroups}

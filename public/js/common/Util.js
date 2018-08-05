@@ -224,6 +224,13 @@ export const getItemMinFromDate = (item, minDate) => {
   return undefined;
 };
 
+export const labelUserFields = (option) => {
+  const labeledOption = option;
+  if (option.value.startsWith('uf.')) {
+    labeledOption.label = labeledOption.label.concat(' (user field)');
+  }
+  return labeledOption;
+}
 
 export const getRevisionStartIndex = (item, revisions) => {
   const index = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
@@ -236,11 +243,12 @@ export const getRevisionStartIndex = (item, revisions) => {
   return index - 1;
 };
 
-export const formatSelectOptions = option => (
-  Immutable.Map.isMap(option)
+export const formatSelectOptions = (option) => {
+  const formattedOption = Immutable.Map.isMap(option)
     ? { value: option.get('value', ''), label: option.get('label', '') }
-    : { value: option, label: sentenceCase(option) }
-);
+    : { value: option, label: sentenceCase(option) };
+  return labelUserFields(formattedOption);
+};
 
 export const parseConfigSelectOptions = configOption => formatSelectOptions(
   configOption.has('title')

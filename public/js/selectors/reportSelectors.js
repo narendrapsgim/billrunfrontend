@@ -9,7 +9,7 @@ import {
 } from '../common/Util';
 import {
   subscriberFieldsSelector,
-  inputProssesorCustomKeysSelector,
+  inputProssesorfilteredFieldsSelector,
   accountFieldsSelector,
   linesFieldsSelector,
   rateCategoriesSelector,
@@ -199,7 +199,7 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
 };
 
 const reportLinesFieldsSelector = createSelector(
-  inputProssesorCustomKeysSelector,
+  inputProssesorfilteredFieldsSelector,
   linesFieldsSelector,
   rateCategoriesSelector,
   selectReportLinesFields,

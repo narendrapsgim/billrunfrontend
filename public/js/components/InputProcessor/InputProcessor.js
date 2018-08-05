@@ -32,6 +32,7 @@ import {
   saveInputProcessorSettings,
   removeCSVField,
   removeAllCSVFields,
+  checkAllFields,
   mapUsaget,
   removeUsagetMapping,
   setUsagetType,
@@ -43,6 +44,7 @@ import {
   setRealtimeField,
   setRealtimeDefaultField,
   cancelKeyAuth,
+  setCheckedField,
  } from '../../actions/inputProcessorActions';
 import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
@@ -270,7 +272,8 @@ class InputProcessor extends Component {
     if (results.meta && results.meta.fields && results.meta.fields.length > 0) {
       this.props.dispatch(setFields([])); // empty existing fields
       const whiteListCharacters = new RegExp('[^A-Za-z0-9_]', 'g');
-      const cleanFields = results.meta.fields.map(field => field.replace(whiteListCharacters, '_'));
+      const cleanFields = results.meta.fields.map(field => field.replace(whiteListCharacters, '_'))
+                                              .map(field => ({ name: field, checked: true }));
       this.props.dispatch(setFields(cleanFields));
     } else {
       this.props.dispatch(showDanger('Error in CSV file, no headers found.'));
@@ -287,6 +290,10 @@ class InputProcessor extends Component {
 
   onRemoveAllFields = () => {
     this.props.dispatch(removeAllCSVFields());
+  }
+
+  onCheckAllFields = (checked) => {
+    this.props.dispatch(checkAllFields(checked));
   }
 
   onSetFieldMapping = (e) => {
@@ -355,6 +362,10 @@ class InputProcessor extends Component {
 
   onError = (message) => {
     this.props.dispatch(showDanger(message));
+  }
+
+  onCheckedField = (index, checked, field) => {
+    this.props.dispatch(setCheckedField(index, checked, field));
   }
 
   setUsagetType = (val) => {
@@ -454,6 +465,8 @@ class InputProcessor extends Component {
           onRemoveAllFields={this.onRemoveAllFields}
           onSetDelimiterType={this.onSetDelimiterType}
           onChangeInputProcessorField={this.onChangeInputProcessorField}
+          onCheckedField={this.onCheckedField}
+          checkAllFields={this.onCheckAllFields}
         />
       );
 
