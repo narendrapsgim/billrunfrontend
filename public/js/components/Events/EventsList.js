@@ -47,7 +47,7 @@ class EventSettings extends Component {
 
   getEventIndex = (entityType, event) => {
     const { events } = this.props;
-    return events.get(entityType, Immutable.List()).findIndex(e => e.get('event_code', '') === event.get('event_code'));
+    return events.get(entityType, Immutable.List()).findIndex(e => e.equals(event));
   }
 
   onClickEditEvent = entityType => (item) => {
