@@ -489,10 +489,11 @@ export function setReceiverField(field, mapping, index) {
 }
 
 
-export function cancelKeyAuth(field) {
+export function cancelKeyAuth(field, index) {
   return {
     type: CANCEL_KEY_AUTH,
     field,
+    index,
   };
 }
 

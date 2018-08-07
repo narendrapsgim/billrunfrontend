@@ -115,7 +115,8 @@ class Connection extends Component {
   };
 
   onCancelKeyAuth = () => {
-    this.props.onCancelKeyAuth();
+    const { index } = this.props;
+    this.props.onCancelKeyAuth(index);
     this.props.dispatch(showSuccess('Key was removed successfuly'));
     this.setState({ showRemoveKey: false });
   }
@@ -222,7 +223,7 @@ class Connection extends Component {
         <div className="form-group">
           <label htmlFor="remote_directory" className="col-xs-2 control-label">Directory</label>
           <div className="col-xs-4">
-            <input className="fgetReceiverorm-control" id={`remote_directory-${index}`} onChange={this.onChangeReceiverField} value={receiver.get('remote_directory', '')} />
+            <input className="form-control" id={`remote_directory-${index}`} onChange={this.onChangeReceiverField} value={receiver.get('remote_directory', '')} />
           </div>
         </div>
         <div className="form-group">
