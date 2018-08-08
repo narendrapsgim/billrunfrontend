@@ -84,7 +84,7 @@ class CloseActionBox extends Component {
   onChangeFrom = (date) => {
     const { closeDate } = this.state;
     const { dangerousFrom } = this.props;
-    if (date.isBefore(dangerousFrom)) {
+    if (date && date.isBefore(dangerousFrom)) {
       this.confirmSelectedDate(date, closeDate);
     } else {
       this.setState({ closeDate: date });
