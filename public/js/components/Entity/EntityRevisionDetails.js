@@ -110,6 +110,9 @@ class EntityRevisionDetails extends Component {
       // i.e active_wis_last turn be editable
       this.props.reLoadItem();
     }
+    // removed revision may present in list
+    // for example: 2 revisions, current + future, after removing current future should be displayed in list
+    this.props.clearList();
   }
 
   onCloseItem = () => {
