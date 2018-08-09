@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import { toImmutableList } from '../../common/Util';
 import { actions } from '../../actions/entityListActions';
 
 const defaultState = Immutable.Map();
@@ -9,7 +10,8 @@ const revisionsReducer = (state = defaultState, action) => {
     case actions.CLEAR_REVISIONS: {
       const { collection = null, key = null } = action;
       if (collection && key) {
-        return state.deleteIn([action.collection, action.key]);
+        const keys = toImmutableList(key).join('_');
+        return state.deleteIn([collection, keys]);
       }
       if (collection && !key) {
         return state.delete(action.collection);
@@ -21,7 +23,8 @@ const revisionsReducer = (state = defaultState, action) => {
       const { collection = null, key = null, revisions = [] } = action;
       const items = Immutable.fromJS(revisions).toList();
       if (collection && key) {
-        return state.setIn([collection, key], items);
+        const keys = toImmutableList(key).join('_');
+        return state.setIn([collection, keys], items);
       }
       return state;
     }

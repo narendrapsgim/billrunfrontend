@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { Popover, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { ModalWrapper, StateIcon, RevisionTimeline } from '../Elements';
 import RevisionList from '../RevisionList';
-import { getConfig, getItemId } from '../../common/Util';
+import { getConfig, getItemId, toImmutableList } from '../../common/Util';
 import { getRevisions } from '../../actions/entityListActions';
 
 
@@ -18,7 +18,11 @@ class StateDetails extends Component {
       null,
     ]),
     collection: PropTypes.string.isRequired,
-    revisionBy: PropTypes.string.isRequired,
+    revisionBy: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array,
+      PropTypes.instanceOf(Immutable.List),
+    ]).isRequired,
     size: PropTypes.number,
     allowManageRevisions: PropTypes.bool,
     onActionEdit: PropTypes.func,
@@ -40,14 +44,14 @@ class StateDetails extends Component {
   onEnter = () => {
     const { collection, item, revisionBy, revisions } = this.props;
     if (!revisions) {
-      const key = item.get(revisionBy, '');
+      const key = toImmutableList(revisionBy).map(revisionByfield => item.get(revisionByfield, ''));
       this.props.dispatch(getRevisions(collection, revisionBy, key));
     }
   }
 
   onCloseItem = () => {
     const { collection, item, revisionBy } = this.props;
-    const key = item.get(revisionBy, '');
+    const key = toImmutableList(revisionBy).map(revisionByfield => item.get(revisionByfield, ''));
     this.props.dispatch(getRevisions(collection, revisionBy, key));
   }
 
@@ -63,7 +67,8 @@ class StateDetails extends Component {
 
   renderRevisionTooltip = () => {
     const { item, revisions, size, revisionBy, allowManageRevisions, itemName } = this.props;
-    const title = `${item.get(revisionBy, '')} - Revision History`;
+    const revisionByField = toImmutableList(revisionBy).get(0, '');
+    const title = `${item.get(revisionByField, '')} - Revision History`;
     if (!revisions) {
       return (
         <Popover id={`${getItemId(item, '')}-loading`} title={title} className="entity-revision-history-popover">
@@ -85,7 +90,8 @@ class StateDetails extends Component {
   renderVerisionList = () => {
     const { item, itemName, revisions, revisionBy } = this.props;
     const { showList } = this.state;
-    const title = `${item.get(revisionBy, '')} - Revision History`;
+    const revisionByField = toImmutableList(revisionBy).get(0, '');
+    const title = `${item.get(revisionByField, '')} - Revision History`;
     return (
       <ModalWrapper title={title} show={showList} onCancel={this.hideManageRevisions} onHide={this.hideManageRevisions} labelCancel="Close">
         <RevisionList
@@ -128,7 +134,7 @@ class StateDetails extends Component {
 const mapStateToProps = (state, props) => {
   const revisionBy = getConfig(['systemItems', props.itemName, 'uniqueField'], '');
   const collection = getConfig(['systemItems', props.itemName, 'collection'], '');
-  const key = props.item.get(revisionBy, '');
+  const key = toImmutableList(revisionBy).map(uniqueField => props.item.get(uniqueField, '')).join('_');
   const revisions = state.entityList.revisions.getIn([collection, key]);
   return ({ revisions, collection, revisionBy });
 };

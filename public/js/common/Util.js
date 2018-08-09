@@ -502,3 +502,16 @@ export const createRateListNameByArgs = (query = Immutable.Map()) => query.reduc
 export const setFieldTitle = (field, entity) => (field.has('title')
     ? field
     : field.set('title', getFieldName(field.get('field_name', ''), getFieldNameType(entity), sentenceCase(field.get('field_name', '')))));
+
+export const toImmutableList = (value) => {
+  if ([undefined, null].includes(value)) {
+    return Immutable.List();
+  }
+  if (Array.isArray(value)) {
+    return Immutable.List([...value]);
+  }
+  if (Immutable.Iterable.isIterable(value)) {
+    return value.toList();
+  }
+  return Immutable.List([value]);
+};
