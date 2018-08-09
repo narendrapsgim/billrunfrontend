@@ -113,6 +113,7 @@ export default class SubscriptionsList extends Component {
       fieldsWithMutations.set('from', 1);
       fieldsWithMutations.set('to', 1);
       fieldsWithMutations.set('revision_info', 1);
+      fieldsWithMutations.set('aid', 1);
       defaultListFields.forEach((defaultSubsctiptionListField) => {
         fieldsWithMutations.set(defaultSubsctiptionListField, 1);
       });

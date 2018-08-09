@@ -168,8 +168,9 @@ class CustomerSetup extends Component {
   }
 
   clearSubscriptionRevisions = (subscription) => {
-    const key = subscription.get('sid', '');
-    this.props.dispatch(clearRevisions('subscribers', key));// refetch items list because item was (changed in / added to) list
+    const sid = subscription.get('sid', '');
+    const aid = subscription.get('aid', '');
+    this.props.dispatch(clearRevisions('subscribers', [sid, aid]));// refetch items list because item was (changed in / added to) list
   }
 
   clearSubscriptions = () => {
@@ -191,8 +192,9 @@ class CustomerSetup extends Component {
           this.props.dispatch(setCloneSubscription());
           return this.props.subscription;
         }
-        const key = this.props.subscription.get('sid', '');
-        this.props.dispatch(getRevisions('subscribers', 'sid', key));
+        const sid = this.props.subscription.get('sid', '');
+        const aid = this.props.subscription.get('aid', '');
+        this.props.dispatch(getRevisions('subscribers', ['sid', 'aid'], [sid, aid]));
         return this.props.subscription;
       }
       return null;
