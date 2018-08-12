@@ -1,2 +1,3 @@
-import ExportGenerator from './ExportGenerator';
-export default ExportGenerator;
+import Collection from './Collection';
+
+export default Collection;
