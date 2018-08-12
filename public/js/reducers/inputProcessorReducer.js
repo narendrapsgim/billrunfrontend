@@ -61,6 +61,7 @@ const defaultState = Immutable.fromJS({
   rate_calculators: {
     retail: {},
   },
+  receiver: [],
   pricing: {},
   unify: {},
   /* receiver: {
