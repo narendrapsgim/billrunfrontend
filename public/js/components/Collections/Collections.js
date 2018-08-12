@@ -68,7 +68,7 @@ class Collections extends Component {
         </Panel>
         <Panel header={<span>Steps</span>}>
           { collections.sort(this.sortCollections).map(this.renderCollection) }
-          <CollectionItemAdd onClickNew={this.onClickNew} addLabel="Add collection step"/>
+          <CollectionItemAdd onClickNew={this.onClickNew} addLabel="Add collection step" />
         </Panel>
       </div>
     );

@@ -32,8 +32,10 @@ class CollectionItemDisplay extends Component {
   onRemoveAsk = () => {
     const { item } = this.props;
     const confirm = {
-      message: `Are you sure you want to remove ${item.get('name')} ?`,
+      message: `Are you sure you want to delete "${item.get('name')}" step?`,
       onOk: this.onRemoveOk,
+      type: 'delete',
+      labelOk: 'Delete',
     };
     this.props.dispatch(showConfirmModal(confirm));
   }

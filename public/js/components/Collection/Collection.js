@@ -133,8 +133,10 @@ class Collection extends Component {
 
   onCancelAsk = () => {
     const confirm = {
-      message: 'Are you sure you want to stop editing Collection?',
+      message: 'Are you sure you want to stop editing step?',
       onOk: this.onCancelOk,
+      labelOk: 'Yes',
+      labelCancel: 'No',
     };
     this.props.dispatch(showConfirmModal(confirm));
   }
@@ -183,7 +185,6 @@ class Collection extends Component {
                       <HelpBlock>Days since entering debt collection process</HelpBlock>
                     </Col>
                   </FormGroup>
-
 
                   <FormGroup>
                     <Col componentClass={ControlLabel} sm={3} lg={2}>{'Active?'}</Col>
