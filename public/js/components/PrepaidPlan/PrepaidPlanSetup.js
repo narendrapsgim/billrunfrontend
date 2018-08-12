@@ -295,6 +295,7 @@ class PrepaidPlanSetup extends Component {
           <Tab title="Override Product Price" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanProductsPriceTab
+                itemName="plan"
                 mode={mode}
                 planRates={planRates}
                 onChangeFieldValue={this.onChangePlanField}

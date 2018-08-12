@@ -64,42 +64,6 @@ export const onGroupAdd = (groupName, usages, unit, value, shared, pooled, produ
   products,
 });
 
-export const planProductRemove = (path, name) => ({
-  type: PLAN_PRODUCTS_REMOVE,
-  path,
-  name,
-});
-
-export const planProductsRateUpdateTo = (path, index, value) => ({
-  type: PLAN_PRODUCTS_RATE_UPDATE_TO,
-  path,
-  index,
-  value,
-});
-
-export const planProductsRateUpdate = (path, value) => ({
-  type: PLAN_PRODUCTS_RATE_UPDATE,
-  path,
-  value,
-});
-
-export const planProductsRateInit = (product, path) => ({
-  type: PLAN_PRODUCTS_RATE_INIT,
-  product,
-  path,
-});
-
-export const planProductsRateAdd = path => ({
-  type: PLAN_PRODUCTS_RATE_ADD,
-  path,
-});
-
-export const planProductsRateRemove = (path, index) => ({
-  type: PLAN_PRODUCTS_RATE_REMOVE,
-  path,
-  index,
-});
-
 export const onPlanFieldUpdate = (path, value) => ({
   type: PLAN_UPDATE_FIELD_VALUE,
   path,

@@ -160,11 +160,13 @@ const selectCsiOptions = (inputProssesors) => {
   return options;
 };
 
-const selectCustomKeys = (inputProssesors) => {
+const selectFielteredFields = (inputProssesors) => {
   let options = Immutable.Set();
   inputProssesors.forEach((inputProssesor) => {
-    const customKeys = inputProssesor.getIn(['parser', 'custom_keys'], Immutable.List());
-    options = options.concat(customKeys);
+    const filteredFields = inputProssesor.getIn(['parser', 'structure'], Immutable.List())
+                                          .filter(field => field.get('checked', true) === true)
+                                          .map(field => field.get('name', ''));
+    options = options.concat(filteredFields);
   });
   return options.toList();
 };
@@ -213,9 +215,9 @@ export const inputProssesorCsiOptionsSelector = createSelector(
   selectCsiOptions,
 );
 
-export const inputProssesorCustomKeysSelector = createSelector(
+export const inputProssesorfilteredFieldsSelector = createSelector(
   getInputProssesors,
-  selectCustomKeys,
+  selectFielteredFields,
 );
 
 export const inputProssesorRatingParamsSelector = createSelector(
