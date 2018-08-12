@@ -1,24 +1,22 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
-import { ConfirmModal } from '../../Elements';
+import { showConfirmModal } from '../../../actions/guiStateActions/pageActions';
 
 
-export default class CollectionItemDisplay extends Component {
+class CollectionItemDisplay extends Component {
 
   static propTypes = {
     item: React.PropTypes.instanceOf(Immutable.Map).isRequired,
     onRemove: PropTypes.func.isRequired,
     onEdit: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
-  state = {
-    showConfirm: false,
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    const { props: { item }, state: { showConfirm } } = this;
-    return !Immutable.is(item, nextProps.item) || showConfirm !== nextState.showConfirm;
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
+    const { item } = this.props;
+    return !Immutable.is(item, nextProps.item);
   }
 
   onClickEdit = () => {
@@ -26,18 +24,18 @@ export default class CollectionItemDisplay extends Component {
     this.props.onEdit(item.get('id'));
   }
 
-  onRemoveAsk = () => {
-    this.setState({ showConfirm: true });
-  }
-
   onRemoveOk = () => {
     const { item } = this.props;
     this.props.onRemove(item.get('id'));
-    this.setState({ showConfirm: false });
   }
 
-  onRemoveCancel = () => {
-    this.setState({ showConfirm: false });
+  onRemoveAsk = () => {
+    const { item } = this.props;
+    const confirm = {
+      message: `Are you sure you want to remove ${item.get('name')} ?`,
+      onOk: this.onRemoveOk,
+    };
+    this.props.dispatch(showConfirmModal(confirm));
   }
 
   getCollectionTypeIcon = (type) => {
@@ -49,11 +47,8 @@ export default class CollectionItemDisplay extends Component {
   }
 
   render() {
-    const { showConfirm } = this.state;
     const { item } = this.props;
-    const confirmMessage = `Are you sure you want to remove ${item.get('name')} ?`;
     const typeIcon = this.getCollectionTypeIcon(item.get('type'));
-
     return (
       <div className="col-md-3 collections-item-display">
         <div className="panel panel-default ">
@@ -67,10 +62,11 @@ export default class CollectionItemDisplay extends Component {
             }
             <Button className="btn btn-default pull-left" bsSize="xsmall" onClick={this.onClickEdit}><i className="fa fa-pencil" />&nbsp;Edit</Button>
             <Button className="btn btn-default pull-right" bsSize="xsmall" onClick={this.onRemoveAsk}><i className="fa fa-trash-o danger-red" />&nbsp;Remove</Button>
-            <ConfirmModal onOk={this.onRemoveOk} onCancel={this.onRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
           </div>
         </div>
       </div>
     );
   }
 }
+
+export default connect()(CollectionItemDisplay);

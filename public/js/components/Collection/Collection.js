@@ -6,11 +6,11 @@ import { Form, FormGroup, Col, FormControl, ControlLabel, HelpBlock } from 'reac
 import Help from '../Help';
 import Field from '../Field';
 import ActionButtons from '../Elements/ActionButtons';
-import { ConfirmModal } from '../../components/Elements';
 import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
-import { setPageTitle } from '../../actions/guiStateActions/pageActions';
+import { setPageTitle, showConfirmModal } from '../../actions/guiStateActions/pageActions';
 import { getSettings } from '../../actions/settingsActions';
 import { getCollection, saveCollection, updateCollectionSteps, updateNewCollection, clearNewCollection, pushNewCollection, resetCollectionEdited, setCollectionEdited } from '../../actions/collectionsActions';
+
 
 class Collection extends Component {
 
@@ -34,10 +34,6 @@ class Collection extends Component {
     wasChanged: false,
   };
 
-  state = {
-    showConfirm: false,
-  }
-
   componentDidMount() {
     const { mode } = this.props;
     if (mode === 'new') {
@@ -56,11 +52,10 @@ class Collection extends Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    const { props: { item, templateToken, wasChanged }, state: { showConfirm } } = this;
+  shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
+    const { item, templateToken, wasChanged } = this.props;
     return !Immutable.is(item, nextProps.item)
             || !Immutable.is(templateToken, nextProps.templateToken)
-            || showConfirm !== nextState.showConfirm
             || wasChanged !== nextProps.wasChanged;
   }
 
@@ -126,11 +121,6 @@ class Collection extends Component {
     }
   }
 
-
-  onCancelAsk = () => {
-    this.setState({ showConfirm: true });
-  }
-
   onCancelOk = () => {
     const { mode } = this.props;
     if (mode === 'new') {
@@ -141,8 +131,12 @@ class Collection extends Component {
     this.backToList();
   }
 
-  onCancelCancel = () => {
-    this.setState({ showConfirm: false });
+  onCancelAsk = () => {
+    const confirm = {
+      message: 'Are you sure you want to stop editing Collection?',
+      onOk: this.onCancelOk,
+    };
+    this.props.dispatch(showConfirmModal(confirm));
   }
 
   backToList = () => {
@@ -157,16 +151,12 @@ class Collection extends Component {
     const fieldsList = [];
     templateToken
       .filter((tokens, type) => tokensCategories.includes(type))
-      .forEach((tokens, type) =>
-        tokens.forEach(token => fieldsList.push(`${type}::${token}`))
+      .forEach((tokens, type) => tokens.forEach(token => fieldsList.push(`${type}::${token}`)),
     );
 
     if (!item.get('id', null)) {
       return (<LoadingItemPlaceholder onClick={this.backToList} />);
     }
-
-    const { showConfirm } = this.state;
-    const confirmMessage = 'Are you sure you want to stop editing Collection?';
 
     return (
       <div>
@@ -242,7 +232,6 @@ class Collection extends Component {
           onClickCancel={wasChanged ? this.onCancelAsk : this.backToList}
           cancelLabel={wasChanged ? 'Cancel' : 'Back'}
         />
-        <ConfirmModal onOk={this.onCancelOk} onCancel={this.onCancelCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
       </div>
     );
   }
