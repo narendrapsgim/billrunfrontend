@@ -33,14 +33,14 @@ class CollectionDetails extends Component {
     return (
       <div>
         <FormGroup>
-          <Col componentClass={ControlLabel} sm={3} lg={2}>Title</Col>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>Title<span className="danger-red"> *</span></Col>
           <Col sm={8} lg={9}>
             <Field onChange={this.onChangeName} value={item.get('name', '')} />
           </Col>
         </FormGroup>
 
         <FormGroup>
-          <Col componentClass={ControlLabel} sm={3} lg={2}>Trigger after</Col>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>Trigger after<span className="danger-red"> *</span></Col>
           <Col sm={4}>
             <InputGroup>
               <Field onChange={this.onChangeDays} value={item.get('do_after_days', '')} fieldType="number" min="1" style={{ minWidth: 50 }} />
