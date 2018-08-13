@@ -73,6 +73,7 @@ Action.defaultProps = {
   label: '',
   helpText: '',
   actionStyle: 'link',
+  actionSize: undefined,
   actionClass: '',
   showIcon: true,
   enable: true,
@@ -85,8 +86,8 @@ Action.propTypes = {
   data: PropTypes.any,
   label: PropTypes.string,
   showIcon: PropTypes.bool,
-  actionStyle: PropTypes.string,
-  actionSize: PropTypes.string,
+  actionStyle: PropTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger', 'link']),
+  actionSize: PropTypes.oneOf(['large', 'small', 'xsmall']),
   actionClass: PropTypes.string,
   helpText: PropTypes.oneOfType([
     PropTypes.string,
