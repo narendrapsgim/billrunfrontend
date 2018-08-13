@@ -65,6 +65,12 @@ const getEmailTemplates = (state, props) => // eslint-disable-line no-unused-var
 const getEvents = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['events']);
 
+const getCollections = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['collection']);
+
+const getTemplateTokens = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['template_token']);
+
 const getPaymentGateways = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['payment_gateways']);
 
@@ -397,6 +403,21 @@ const selectEvents = (events, usageTypesData, propertyTypes) => {
       ),
     );
 };
+
+export const templateTokenSettingsSelector = createSelector(
+  getTemplateTokens,
+  templateTokens => templateTokens,
+);
+
+export const collectionSettingsSelector = createSelector(
+  getCollections,
+  collection => (collection ? collection.get('settings', Immutable.Map()) : undefined),
+);
+
+export const collectionStepsSelector = createSelector(
+  getCollections,
+  collection => (collection ? collection.get('steps', Immutable.List()) : undefined),
+);
 
 export const eventsSettingsSelector = createSelector(
   getEvents,

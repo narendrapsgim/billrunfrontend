@@ -7,6 +7,7 @@ import systemItemsConfig from '../config/entities.json';
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
+import collectionsConfig from '../config/collections.json';
 
 /**
  * Get data from config files
@@ -21,7 +22,7 @@ export const getConfig = (key, defaultValue = null) => {
   if (configCache.isEmpty()) {
     configCache = Immutable.fromJS(globalSetting);
   }
-  if(!configCache.has(path[0])) {
+  if (!configCache.has(path[0])) {
     switch (path[0]) {
       case 'reports': configCache = configCache.set('reports', Immutable.fromJS(reportConfig));
         break;
@@ -34,6 +35,8 @@ export const getConfig = (key, defaultValue = null) => {
       case 'events': configCache = configCache.set('events', Immutable.fromJS(eventsConfig));
         break;
       case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
+        break;
+      case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
         break;
       default: console.log(`Config caregory not exists ${path}`);
     }
