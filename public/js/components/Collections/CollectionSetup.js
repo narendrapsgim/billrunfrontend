@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form } from 'react-bootstrap';
 import CollectionDetails from './Elements/CollectionDetails';
-import CollectionTypeMail from './Elements/CollectionTypeMail';
+import CollectionTypeMessage from './Elements/CollectionTypeMessage';
 
 
 class CollectionSetup extends Component {
@@ -21,9 +21,12 @@ class CollectionSetup extends Component {
   }
 
   renderStepByType = (item) => {
+    const content = item.get('content');
     switch (item.get('type', '')) {
       case 'mail':
-        return (<CollectionTypeMail content={item.get('content')} onChange={this.onChangeContent} />);
+        return (<CollectionTypeMessage content={content} onChange={this.onChangeContent} editor="mails" />);
+      case 'sms':
+        return (<CollectionTypeMessage content={content} onChange={this.onChangeContent} editor="sms" />);
       default:
         return (<p />);
     }
