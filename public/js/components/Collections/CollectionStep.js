@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import { Form } from 'react-bootstrap';
 import CollectionDetails from './Elements/CollectionDetails';
 import CollectionTypeMessage from './Elements/CollectionTypeMessage';
+import CollectionTypeHttp from './Elements/CollectionTypeHttp';
 
 
 class CollectionStep extends Component {
@@ -29,6 +30,8 @@ class CollectionStep extends Component {
         return (<CollectionTypeMessage content={content} onChange={this.onChangeContent} editor="mails" />);
       case 'sms':
         return (<CollectionTypeMessage content={content} onChange={this.onChangeContent} editor="sms" />);
+      case 'http':
+        return (<CollectionTypeHttp content={content} onChange={this.onChangeContent} />);
       default:
         return (<p />);
     }
