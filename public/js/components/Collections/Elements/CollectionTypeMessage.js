@@ -2,17 +2,17 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
-import Help from '../../Help';
 import Field from '../../Field';
 import { templateTokenSettingsSelector } from '../../../selectors/settingsSelector';
 
 
-class CollectionTypeMail extends Component {
+class CollectionTypeMessage extends Component {
 
   static propTypes = {
     content: PropTypes.instanceOf(Immutable.Map),
     templateToken: PropTypes.instanceOf(Immutable.Map),
     tokensCategories: PropTypes.arrayOf(React.PropTypes.string),
+    editor: PropTypes.string,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -20,6 +20,7 @@ class CollectionTypeMail extends Component {
     content: Immutable.Map(),
     templateToken: Immutable.Map(),
     tokensCategories: ['general', 'account', 'collection'],
+    editor: 'mails'
   };
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
@@ -37,12 +38,8 @@ class CollectionTypeMail extends Component {
     this.props.onChange(['body'], value);
   }
 
-  panelTitel = () => (
-    <span>Email Template <Help contents={'Template for email that will be send to customer'} /></span>
-  );
-
   render() {
-    const { content, templateToken, tokensCategories } = this.props;
+    const { content, templateToken, tokensCategories, editor } = this.props;
     const fieldsList = templateToken
       .filter((tokens, type) => tokensCategories.includes(type))
       .reduce((acc, tokens, type) =>
@@ -66,7 +63,7 @@ class CollectionTypeMail extends Component {
             editorName="editor"
             fields={fieldsList}
             onChange={this.onChangeBody}
-            configName="mails"
+            configName={editor}
           />
         </div>
       </div>
@@ -79,4 +76,4 @@ const mapStateToProps = (state, props) => ({
   templateToken: templateTokenSettingsSelector(state, props),
 });
 
-export default connect(mapStateToProps)(CollectionTypeMail);
+export default connect(mapStateToProps)(CollectionTypeMessage);
