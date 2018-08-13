@@ -1,27 +1,25 @@
 import React, { PropTypes, Component } from 'react';
-import Immutable from 'immutable';
 import { connect } from 'react-redux';
+import Immutable from 'immutable';
 import { Panel, Col } from 'react-bootstrap';
-import CollectionSetup from './CollectionSetup';
-import { ActionButtons, Actions, StateIcon, ModalWrapper } from '../Elements';
-import { collectionStepsSelector } from '../../selectors/settingsSelector';
+import { ActionButtons, Actions, StateIcon } from '../Elements';
 import List from '../../components/List';
+import { getConfig } from '../../common/Util';
 import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
-import { getSettings } from '../../actions/settingsActions';
 import {
   removeCollectionStep,
-  updateCollectionSteps,
-  addCollectionSteps,
   getCollectionSteps,
   saveCollectionSteps,
 } from '../../actions/collectionsActions';
-import { getConfig } from '../../common/Util';
+import { collectionStepsSelectorForList } from '../../selectors/settingsSelector';
 
 
 class CollectionsList extends Component {
 
   static propTypes = {
     items: PropTypes.instanceOf(Immutable.List),
+    onAddStep: PropTypes.func.isRequired,
+    onClickEdit: PropTypes.func.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -29,75 +27,30 @@ class CollectionsList extends Component {
     items: Immutable.List(),
   };
 
-  state = {
-    editedItem: null,
-  };
-
   componentWillMount() {
     this.props.dispatch(getCollectionSteps());
-    this.props.dispatch(getSettings('template_token'));
   }
 
   onSaveCollectionsSteps = () => {
     this.props.dispatch(saveCollectionSteps()).then(this.afterSaveCollectionsSteps);
   }
 
-  onCloseEditStep = () => {
-    this.setState(() => ({ editedItem: null }));
-  }
-
-  onChangeEditStep = (path, value) => {
-    this.setState(prevState => ({ editedItem: prevState.editedItem.setIn(path, value) }));
-  }
-
-  onSaveEditStep = () => {
-    const { items } = this.props;
-    const { editedItem } = this.state;
-    const index = items.findIndex(step => step.get('id', '') === editedItem.get('id', ''));
-    if (index === -1) {
-      this.props.dispatch(addCollectionSteps(editedItem));
-    } else {
-      this.props.dispatch(updateCollectionSteps(index, editedItem));
-    }
-    this.onCloseEditStep();
-  }
-
   afterSaveCollectionsSteps = () => {
     this.props.dispatch(getCollectionSteps());
   }
 
-  onClickEdit = (item) => {
-    this.setState(() => ({ editedItem: item }));
-  }
-
-  onRemoveCancel = () => {
-    this.onCloseEditStep();
-  }
-
   onRemoveOk = (item) => {
-    const { items } = this.props;
-    const index = items.findIndex(step => step.get('id', '') === item.get('id', ''));
-    if (index !== -1) {
-      this.props.dispatch(removeCollectionStep(index));
-    }
+    this.props.dispatch(removeCollectionStep(item));
   }
 
   onClickRemove = (item) => {
     const confirm = {
       message: `Are you sure you want to delete "${item.get('name')}" step?`,
       onOk: () => this.onRemoveOk(item),
-      onCancel: () => this.onRemoveCancel(item),
       type: 'delete',
       labelOk: 'Delete',
     };
     this.props.dispatch(showConfirmModal(confirm));
-  }
-
-  onAddStep = type => () => {
-    const active = getConfig(['collections', 'default_new_step_status'], false);
-    this.setState(() => ({
-      editedItem: Immutable.Map({ type, active }),
-    }));
   }
 
   parserStatus = item => (<StateIcon status={item.get('active', false) ? 'active' : 'expired'} />);
@@ -120,39 +73,9 @@ class CollectionsList extends Component {
   ]
 
   getListActions = () => [
-    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEdit },
+    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.props.onClickEdit },
     { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove },
   ];
-
-  getListSortedItems = () => {
-    const { items } = this.props;
-    return items.sortBy(item => parseFloat(item.get('do_after_days', 0)));
-  };
-
-  renderEventForm = () => {
-    const { editedItem } = this.state;
-    const { items } = this.props;
-
-    if (editedItem === null) {
-      return null;
-    }
-    const item = items.find(step => step.get('id', '') === editedItem.get('id', ''));
-    const title = item
-      ? `Edit "${item.get('name', '')}" step`
-      : (<span>Create {getConfig(['collections', 'step_types', editedItem.get('type', ''), 'label'], '')} Step</span>);
-    return (
-      <ModalWrapper
-        title={title}
-        show={true}
-        onOk={this.onSaveEditStep}
-        onCancel={this.onCloseEditStep}
-        labelOk="Save"
-        modalSize="large"
-      >
-        <CollectionSetup item={editedItem} onChange={this.onChangeEditStep} />
-      </ModalWrapper>
-    );
-  }
 
   renderPanelHeader = () => {
     const actions = getConfig(['collections', 'step_types'], Immutable.Map())
@@ -162,7 +85,7 @@ class CollectionsList extends Component {
         actionStyle: 'primary',
         actionSize: 'xsmall',
         label: `Add new ${getConfig(['collections', 'step_types', type, 'label'], '')} step`,
-        onClick: this.onAddStep(type),
+        onClick: this.props.onAddStep(type),
       }))
       .toArray();
 
@@ -174,15 +97,15 @@ class CollectionsList extends Component {
     );
   }
   render() {
+    const { items } = this.props;
     const fields = this.getListFields();
     const actions = this.getListActions();
-    const sortedItems = this.getListSortedItems();
     return (
       <div>
         <Col sm={12}>
           <Panel header={this.renderPanelHeader()}>
             <List
-              items={sortedItems}
+              items={items}
               fields={fields}
               actions={actions}
             />
@@ -191,14 +114,14 @@ class CollectionsList extends Component {
         <Col sm={12}>
           <ActionButtons onClickSave={this.onSaveCollectionsSteps} hideCancel={true} />
         </Col>
-        {this.renderEventForm()}
       </div>
     );
   }
 }
 
+
 const mapStateToProps = (state, props) => ({
-  items: collectionStepsSelector(state, props),
+  items: collectionStepsSelectorForList(state, props),
 });
 
 export default connect(mapStateToProps)(CollectionsList);

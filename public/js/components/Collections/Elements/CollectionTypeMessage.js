@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import Field from '../../Field';
-import { templateTokenSettingsSelector } from '../../../selectors/settingsSelector';
+import { templateTokenSettingsSelectorForEditor } from '../../../selectors/settingsSelector';
 
 
 class CollectionTypeMessage extends Component {
@@ -11,7 +11,6 @@ class CollectionTypeMessage extends Component {
   static propTypes = {
     content: PropTypes.instanceOf(Immutable.Map),
     templateToken: PropTypes.instanceOf(Immutable.Map),
-    tokensCategories: PropTypes.arrayOf(React.PropTypes.string),
     editor: PropTypes.string,
     onChange: PropTypes.func.isRequired,
   };
@@ -19,7 +18,6 @@ class CollectionTypeMessage extends Component {
   static defaultProps = {
     content: Immutable.Map(),
     templateToken: Immutable.Map(),
-    tokensCategories: ['general', 'account', 'collection'],
     editor: 'mails',
   };
 
@@ -39,15 +37,7 @@ class CollectionTypeMessage extends Component {
   }
 
   render() {
-    const { content, templateToken, tokensCategories, editor } = this.props;
-    const fieldsList = templateToken
-      .filter((tokens, type) => tokensCategories.includes(type))
-      .reduce((acc, tokens, type) =>
-        Immutable.List([...acc, ...tokens.map(token => `${type}::${token}`)]),
-        Immutable.List(),
-      )
-      .toArray();
-
+    const { content, templateToken, editor } = this.props;
     return (
       <div>
         <FormGroup>
@@ -61,7 +51,7 @@ class CollectionTypeMessage extends Component {
             fieldType="textEditor"
             value={content.get('body')}
             editorName="editor"
-            fields={fieldsList}
+            fields={templateToken.toArray()}
             onChange={this.onChangeBody}
             configName={editor}
           />
@@ -73,7 +63,7 @@ class CollectionTypeMessage extends Component {
 
 
 const mapStateToProps = (state, props) => ({
-  templateToken: templateTokenSettingsSelector(state, props),
+  templateToken: templateTokenSettingsSelectorForEditor(state, props, ['general', 'account', 'collection']),
 });
 
 export default connect(mapStateToProps)(CollectionTypeMessage);

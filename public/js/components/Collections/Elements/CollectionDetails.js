@@ -8,11 +8,13 @@ class CollectionDetails extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
+    errors: PropTypes.instanceOf(Immutable.Map),
     onChange: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     item: Immutable.Map(),
+    errors: Immutable.Map(),
   };
 
   onChangeDays = (e) => {
@@ -29,17 +31,18 @@ class CollectionDetails extends Component {
   }
 
   render() {
-    const { item } = this.props;
+    const { item, errors } = this.props;
     return (
       <div>
-        <FormGroup>
+        <FormGroup validationState={errors.has('name') ? 'error' : null}>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Title<span className="danger-red"> *</span></Col>
           <Col sm={8} lg={9}>
             <Field onChange={this.onChangeName} value={item.get('name', '')} />
+            { errors.has('name') && <HelpBlock>{errors.get('name', '')}</HelpBlock> }
           </Col>
         </FormGroup>
 
-        <FormGroup>
+        <FormGroup validationState={errors.has('do_after_days') ? 'error' : null}>
           <Col componentClass={ControlLabel} sm={3} lg={2}>Trigger after<span className="danger-red"> *</span></Col>
           <Col sm={4}>
             <InputGroup>
@@ -47,6 +50,7 @@ class CollectionDetails extends Component {
               <InputGroup.Addon>Days</InputGroup.Addon>
             </InputGroup>
             <HelpBlock className="mb0">Days since entering debt collection process</HelpBlock>
+            { errors.has('do_after_days') && <HelpBlock>{errors.get('do_after_days', '')}</HelpBlock> }
           </Col>
         </FormGroup>
 

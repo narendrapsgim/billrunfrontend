@@ -5,15 +5,17 @@ import CollectionDetails from './Elements/CollectionDetails';
 import CollectionTypeMessage from './Elements/CollectionTypeMessage';
 
 
-class CollectionSetup extends Component {
+class CollectionStep extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
+    errors: PropTypes.instanceOf(Immutable.Map),
     onChange: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     item: Immutable.Map(),
+    errors: Immutable.Map(),
   };
 
   onChangeContent = (path, value) => {
@@ -33,12 +35,12 @@ class CollectionSetup extends Component {
   }
 
   render() {
-    const { item } = this.props;
+    const { item, errors } = this.props;
     return (
       <div className="row">
         <div className="col-lg-12">
           <Form horizontal>
-            <CollectionDetails item={item} onChange={this.props.onChange} />
+            <CollectionDetails item={item} onChange={this.props.onChange} errors={errors} />
             <hr />
             {this.renderStepByType(item)}
           </Form>
@@ -48,4 +50,4 @@ class CollectionSetup extends Component {
   }
 }
 
-export default CollectionSetup;
+export default CollectionStep;
