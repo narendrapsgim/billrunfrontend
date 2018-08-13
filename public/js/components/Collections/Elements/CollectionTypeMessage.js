@@ -20,7 +20,7 @@ class CollectionTypeMessage extends Component {
     content: Immutable.Map(),
     templateToken: Immutable.Map(),
     tokensCategories: ['general', 'account', 'collection'],
-    editor: 'mails'
+    editor: 'mails',
   };
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
