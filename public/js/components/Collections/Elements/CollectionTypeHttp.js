@@ -1,17 +1,21 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { TextWithButton } from '../../Elements';
 import Field from '../../Field';
+import { showWarning } from '../../../actions/alertsActions';
 
 
 class CollectionTypeHttp extends Component {
 
   static propTypes = {
     content: PropTypes.instanceOf(Immutable.Map),
-    methodOptions: PropTypes.instanceOf(Immutable.Map),
-    decoderOptions: PropTypes.instanceOf(Immutable.Map),
+    methodOptions: PropTypes.instanceOf(Immutable.List),
+    decoderOptions: PropTypes.instanceOf(Immutable.List),
     errors: PropTypes.instanceOf(Immutable.Map),
     onChange: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -43,6 +47,54 @@ class CollectionTypeHttp extends Component {
   onChangeUrl = (e) => {
     const { value } = e.target;
     this.props.onChange(['url'], value);
+  }
+
+  onChangeCustomParameter = field => (value) => {
+    this.props.onChange(['custom_parameter', field], value);
+  }
+
+  onAddCustomParameter = (field) => {
+    const { content } = this.props;
+    if (!content.hasIn(['custom_parameter', field])) {
+      this.props.onChange(['custom_parameter', field], '');
+    } else {
+      this.props.dispatch(showWarning(`Custom Parameter ${field} already exists`));
+    }
+  }
+
+  onRemoveCustomParameter = field => () => {
+    const { content } = this.props;
+    if (content.hasIn(['custom_parameter', field])) {
+      const newContent = content
+        .get('custom_parameter', Immutable.Map())
+        .filter((value, key) => key !== field);
+      this.props.onChange(['custom_parameter'], newContent);
+    } else {
+      this.props.dispatch(showWarning(`Custom Parameter ${field} not exists`));
+    }
+  }
+
+  renderCustomParameters = () => {
+    const { content, errors } = this.props;
+    return content.get('custom_parameter', Immutable.Map())
+      .map((value, field) => (
+        <FormGroup validationState={errors.has(field) ? 'error' : null} key={`custom_parameter_${field}`}>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>
+            {field}
+          </Col>
+          <Col sm={8} lg={9}>
+            <TextWithButton
+              key={`custom_parameter_${field}`}
+              onChange={this.onChangeCustomParameter(field)}
+              onAction={this.onRemoveCustomParameter(field)}
+              actionType="remove"
+              value={value}
+            />
+            { errors.has(field) && <HelpBlock>{errors.get(field, '')}</HelpBlock> }
+          </Col>
+        </FormGroup>
+      ))
+      .toArray();
   }
 
   render() {
@@ -87,9 +139,23 @@ class CollectionTypeHttp extends Component {
             { errors.has('decoder') && <HelpBlock>{errors.get('decoder', '')}</HelpBlock> }
           </Col>
         </FormGroup>
+        { this.renderCustomParameters() }
+        <hr />
+        <FormGroup validationState={errors.has('decoder') ? 'error' : null}>
+          <Col sm={3} lg={2}>
+            &nbsp;
+          </Col>
+          <Col componentClass={ControlLabel} sm={8} lg={9}>
+            <TextWithButton
+              onAction={this.onAddCustomParameter}
+              actionLabel="Add custom parameter"
+              clearAfterAction={true}
+            />
+          </Col>
+        </FormGroup>
       </div>
     );
   }
 }
 
-export default CollectionTypeHttp;
+export default connect(null)(CollectionTypeHttp);
