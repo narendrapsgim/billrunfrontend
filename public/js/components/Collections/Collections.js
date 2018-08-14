@@ -106,24 +106,24 @@ class Collections extends Component {
   render() {
     const { location } = this.props;
     return (
-      <TabsWrapper id="CollectionsTab" location={location}>
-
-        <Tab title="Steps" eventKey={1}>
-          <Panel style={{ borderTop: 'none' }}>
-            <CollectionsList
-              onAddStep={this.onAddStep}
-              onClickEdit={this.onClickEdit}
-            />
-          </Panel>
-        </Tab>
-
-        <Tab title="Settings" eventKey={2}>
-          <Panel style={{ borderTop: 'none' }}>
-            <CollectionSettings />
-          </Panel>
-        </Tab>
+      <div>
+        <TabsWrapper id="CollectionsTab" location={location}>
+          <Tab title="Steps" eventKey={1}>
+            <Panel style={{ borderTop: 'none' }}>
+              <CollectionsList
+                onAddStep={this.onAddStep}
+                onClickEdit={this.onClickEdit}
+              />
+            </Panel>
+          </Tab>
+          <Tab title="Settings" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <CollectionSettings />
+            </Panel>
+          </Tab>
+        </TabsWrapper>
         {this.renderEventForm()}
-      </TabsWrapper>
+      </div>
     );
   }
 }
