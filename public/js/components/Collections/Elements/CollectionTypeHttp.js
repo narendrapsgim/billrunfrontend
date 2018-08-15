@@ -5,14 +5,18 @@ import { FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import { TextWithButton } from '../../Elements';
 import Field from '../../Field';
 import { showWarning } from '../../../actions/alertsActions';
+import {
+  getConfig,
+  formatSelectOptions,
+} from '../../../common/Util';
 
 
 class CollectionTypeHttp extends Component {
 
   static propTypes = {
     content: PropTypes.instanceOf(Immutable.Map),
-    methodOptions: PropTypes.instanceOf(Immutable.List),
-    decoderOptions: PropTypes.instanceOf(Immutable.List),
+    httpMethods: PropTypes.instanceOf(Immutable.List),
+    httpDecoders: PropTypes.instanceOf(Immutable.List),
     errors: PropTypes.instanceOf(Immutable.Map),
     onChange: PropTypes.func.isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -21,14 +25,8 @@ class CollectionTypeHttp extends Component {
   static defaultProps = {
     content: Immutable.Map(),
     errors: Immutable.Map(),
-    methodOptions: Immutable.List([
-      { value: 'get', label: 'GET' },
-      { value: 'post', label: 'POST' },
-    ]),
-    decoderOptions: Immutable.List([
-      { value: 'json', label: 'JSON' },
-      { value: 'xml', label: 'XML' },
-    ]),
+    httpMethods: getConfig(['collections', 'http', 'mthods'], Immutable.List()),
+    httpDecoders: getConfig(['collections', 'http', 'decoders'], Immutable.List()),
   };
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
@@ -98,7 +96,9 @@ class CollectionTypeHttp extends Component {
   }
 
   render() {
-    const { content, methodOptions, decoderOptions, errors } = this.props;
+    const { content, httpMethods, httpDecoders, errors } = this.props;
+    const methodOptions = httpMethods.map(formatSelectOptions).toArray();
+    const decoderOptions = httpDecoders.map(formatSelectOptions).toArray();
     return (
       <div>
         <FormGroup validationState={errors.has('url') ? 'error' : null}>
@@ -112,12 +112,12 @@ class CollectionTypeHttp extends Component {
         </FormGroup>
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
-            HTTP Method<span className="danger-red"> *</span>
+            HTTP Method
           </Col>
           <Col sm={4}>
             <Field
               fieldType="select"
-              options={methodOptions.toArray()}
+              options={methodOptions}
               onChange={this.onChangeMethod}
               value={content.get('method', '')}
               clearable={false}
@@ -126,12 +126,12 @@ class CollectionTypeHttp extends Component {
         </FormGroup>
         <FormGroup validationState={errors.has('decoder') ? 'error' : null}>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
-            Decoder<span className="danger-red"> *</span>
+            Decoder
           </Col>
           <Col sm={4}>
             <Field
               fieldType="select"
-              options={decoderOptions.toArray()}
+              options={decoderOptions}
               onChange={this.onChangeDcoder}
               value={content.get('decoder', '')}
               clearable={false}
