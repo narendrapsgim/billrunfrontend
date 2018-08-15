@@ -16,5 +16,9 @@
       "icon": "fa-link",
       "enable": true
     }
+  },
+  "http":{
+    "mthods": ["get","post"],
+    "decoders": ["json", "xml"]
   }
 }
