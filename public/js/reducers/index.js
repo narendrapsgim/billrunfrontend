@@ -12,7 +12,6 @@ import user from './userReducer';
 import plan from './planReducer';
 import exportGenerator from './exportGeneratorReducer';
 import service from './serviceReducer';
-import collections from './collections';
 import guiState from './guiState';
 import pager from './pager';
 
@@ -30,7 +29,6 @@ export default combineReducers({
   plan,
   exportGenerator,
   service,
-  collections,
   guiState,
   pager,
 });

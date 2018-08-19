@@ -7,11 +7,11 @@ const Action = (props) => {
   const { type, label, data, actionStyle, showIcon, actionSize, actionClass } = props;
 
   if ((typeof props.show === 'boolean' && !props.show)
-    || (typeof props.show === 'function' && !props.show(data))) {
+    || (typeof props.show === 'function' && !props.show(data, type))) {
     return null;
   }
 
-  const isEnable = (typeof props.enable === 'function') ? props.enable(data) : props.enable;
+  const isEnable = (typeof props.enable === 'function') ? props.enable(data, type) : props.enable;
 
   const iconClass = classNames('fa fa-fw', {
     'fa-eye': type === 'view',
@@ -31,7 +31,7 @@ const Action = (props) => {
   });
 
   const onClick = () => {
-    props.onClick(data);
+    props.onClick(data, type);
   };
 
   const editTooltip = (
@@ -73,6 +73,7 @@ Action.defaultProps = {
   label: '',
   helpText: '',
   actionStyle: 'link',
+  actionSize: undefined,
   actionClass: '',
   showIcon: true,
   enable: true,
@@ -85,8 +86,8 @@ Action.propTypes = {
   data: PropTypes.any,
   label: PropTypes.string,
   showIcon: PropTypes.bool,
-  actionStyle: PropTypes.string,
-  actionSize: PropTypes.string,
+  actionStyle: PropTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger', 'link']),
+  actionSize: PropTypes.oneOf(['large', 'small', 'xsmall']),
   actionClass: PropTypes.string,
   helpText: PropTypes.oneOfType([
     PropTypes.string,
