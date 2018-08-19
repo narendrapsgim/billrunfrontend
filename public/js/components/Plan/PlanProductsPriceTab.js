@@ -10,7 +10,7 @@ import ProductSearch from './components/ProductSearch';
 import {
   getProductsByKeysQuery,
   getProductByKeyQuery,
-  getRetailProductsKeysQuery,
+  getProductsKeysQuery,
 } from '../../common/ApiQueries';
 import { showSuccess, showWarning, showInfo } from '../../actions/alertsActions';
 import { getList, clearList, pushToList } from '../../actions/listActions';
@@ -243,7 +243,7 @@ class PlanProductsPriceTab extends Component {
               <Panel header={panelTitle}>
                 <ProductSearch
                   onSelectProduct={this.onSelectProduct}
-                  searchFunction={getRetailProductsKeysQuery()}
+                  searchFunction={getProductsKeysQuery()}
                 />
               </Panel>
             }
