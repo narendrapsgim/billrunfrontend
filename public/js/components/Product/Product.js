@@ -164,7 +164,6 @@ class Product extends Component {
     const category = tariffCategory === null
       ? product.get('tariff_category')
       : tariffCategory;
-    console.log('category', category);
     return category === 'retail';
   }
 
