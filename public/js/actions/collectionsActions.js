@@ -8,11 +8,11 @@ import {
 
 import { toImmutableList } from '../common/Util';
 
-/* Collection Steps */
-const updateCollectionSteps = (path, value) => ({
+/* Collection Step */
+const updateCollectionStepByIndex = (index, path, value) => ({
   type: settingsActions.UPDATE_SETTING,
   category: 'collection',
-  name: ['steps', ...toImmutableList(path)],
+  name: ['steps', index, ...toImmutableList(path)],
   value,
 });
 
@@ -22,16 +22,12 @@ const removeCollectionStepByIndex = index => ({
   name: ['steps', index],
 });
 
-const addCollectionSteps = value => ({
+const addCollectionStep = value => ({
   type: settingsActions.PUSH_TO_SETTING,
   category: 'collection',
   path: 'steps',
   value,
 });
-
-export const saveCollectionSteps = () => saveSettings(['collection.steps']);
-
-export const getCollectionSteps = () => getSettings(['collection.steps']);
 
 export const removeCollectionStep = editedItem => (dispatch, getState) => {
   const steps = collectionStepsSelector(getState());
@@ -42,17 +38,33 @@ export const removeCollectionStep = editedItem => (dispatch, getState) => {
   return false;
 };
 
-export const saveCollectionStep = step => (dispatch, getState) => {
-  if (!step.has('id')) {
-    return dispatch(addCollectionSteps(step.set('id', uuid.v4())));
-  }
-  const existingSteps = collectionStepsSelector(getState());
-  const index = existingSteps.findIndex(existingStep => existingStep.get('id', '') === step.get('id', ''));
+export const updateCollectionStep = (item, path, value) => (dispatch, getState) => {
+  const steps = collectionStepsSelector(getState());
+  const index = steps.findIndex(step => step.get('id', '') === item.get('id', ''));
   if (index !== -1) {
-    return dispatch(updateCollectionSteps(index, step));
+    return dispatch(updateCollectionStepByIndex(index, path, value));
   }
   return false;
 };
+
+export const saveCollectionStep = step => (dispatch, getState) => {
+  // If step is new, add it
+  if (!step.has('id')) {
+    return dispatch(addCollectionStep(step.set('id', uuid.v4())));
+  }
+  // If step is existing, replace step with new step data
+  const existingSteps = collectionStepsSelector(getState());
+  const index = existingSteps.findIndex(existingStep => existingStep.get('id', '') === step.get('id', ''));
+  if (index !== -1) {
+    return dispatch(updateCollectionStep(step, [], step));
+  }
+  return false;
+};
+
+/* Collection Steps array */
+export const saveCollectionSteps = () => saveSettings(['collection.steps']);
+
+export const getCollectionSteps = () => getSettings(['collection.steps']);
 
 /* Collection Settings */
 export const saveCollectionSettings = () => saveSettings(['collection.settings']);
