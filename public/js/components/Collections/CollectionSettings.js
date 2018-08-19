@@ -56,7 +56,6 @@ class CollectionSettings extends Component {
     const minDebt = settings.get('min_debt', '');
     const changeStateUrl = settings.get('change_state_url', '');
     const changeStateMethod = settings.get('change_state_method', '');
-    const changeStateDecoder = settings.get('change_state_decoder', '');
     const methodOptions = httpMethods.map(formatSelectOptions).toArray();
     return (
       <div>
@@ -77,7 +76,8 @@ class CollectionSettings extends Component {
           <Panel header={
             <h4>CollectionState Change<br />
               <small>
-                HTTP requests will be triggered to this URL when a customer enters / exits from collection
+                HTTP requests will be triggered to this URL when a customer
+                enters / exits from collection
               </small>
             </h4>}
           >
