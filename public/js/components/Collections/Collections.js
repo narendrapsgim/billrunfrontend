@@ -69,7 +69,7 @@ class Collections extends Component {
   onClickClone = (item) => {
     this.onClickEdit(item.delete('id'));
     this.setState(() => ({
-      editedItemName: "",
+      editedItemName: '',
     }));
   }
 
