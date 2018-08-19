@@ -66,6 +66,13 @@ class Collections extends Component {
     }));
   }
 
+  onClickClone = (item) => {
+    this.onClickEdit(item.delete('id'));
+    this.setState(() => ({
+      editedItemName: "",
+    }));
+  }
+
 
   validateStep = (item) => {
     let hasError = false;
@@ -113,6 +120,7 @@ class Collections extends Component {
               <CollectionsList
                 onAddStep={this.onAddStep}
                 onClickEdit={this.onClickEdit}
+                onClickClone={this.onClickClone}
               />
             </Panel>
           </Tab>

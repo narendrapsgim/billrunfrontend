@@ -20,6 +20,7 @@ class CollectionsList extends Component {
     items: PropTypes.instanceOf(Immutable.List),
     onAddStep: PropTypes.func.isRequired,
     onClickEdit: PropTypes.func.isRequired,
+    onClickClone: PropTypes.func.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -74,6 +75,7 @@ class CollectionsList extends Component {
 
   getListActions = () => [
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.props.onClickEdit },
+    { type: 'clone', showIcon: true, helpText: 'Clone', onClick: this.props.onClickClone },
     { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove },
   ];
 
