@@ -159,7 +159,14 @@ class Product extends Component {
     this.props.onFieldUpdate(field, value);
   }
 
-  isRetailRate = tariffCategory => (tariffCategory === 'retail');
+  isRetailRate = (tariffCategory = null) => {
+    const { product } = this.props;
+    const category = tariffCategory === null
+      ? product.get('tariff_category')
+      : tariffCategory;
+    console.log('category', category);
+    return category === 'retail';
+  }
 
   setRetailRate = (value = true) => {
     this.onChangeAddToRetail({ target: { value } });
@@ -253,20 +260,22 @@ class Product extends Component {
                 editable={editable}
               />
 
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('add_to_retail', getFieldNameType('product'), sentenceCase('add to retail'))}
-                  <Help contents={ProductDescription.addToRetail} />
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="checkbox"
-                    onChange={this.onChangeAddToRetail}
-                    value={product.get('add_to_retail', false)}
-                    editable={editable && !this.isRetailRate(product.get('tariff_category'))}
-                  />
-                </Col>
-              </FormGroup>
+              { !this.isRetailRate() &&
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('add_to_retail', getFieldNameType('product'), sentenceCase('add to retail'))}
+                    <Help contents={ProductDescription.addToRetail} />
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="checkbox"
+                      onChange={this.onChangeAddToRetail}
+                      value={product.get('add_to_retail', false)}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+              }
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
