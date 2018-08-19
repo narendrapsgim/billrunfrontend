@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import { titleCase } from 'change-case';
 import { Panel, Col } from 'react-bootstrap';
 import { ActionButtons, Actions, StateIcon } from '../Elements';
 import List from '../../components/List';
@@ -10,6 +11,7 @@ import {
   removeCollectionStep,
   getCollectionSteps,
   saveCollectionSteps,
+  updateCollectionStep,
 } from '../../actions/collectionsActions';
 import { collectionStepsSelectorForList } from '../../selectors/settingsSelector';
 
@@ -44,12 +46,28 @@ class CollectionsList extends Component {
     this.props.dispatch(removeCollectionStep(item));
   }
 
+  onToggleOk = (item, action) => {
+    const enable = (action === 'enable');
+    this.props.dispatch(updateCollectionStep(item, ['active'], enable));
+  }
+
   onClickRemove = (item) => {
     const confirm = {
       message: `Are you sure you want to delete "${item.get('name')}" step?`,
       onOk: () => this.onRemoveOk(item),
       type: 'delete',
       labelOk: 'Delete',
+    };
+    this.props.dispatch(showConfirmModal(confirm));
+  }
+
+  onClickToggle = (item, type) => {
+    const actionName = (type === 'disable') ? 'disable' : 'enable';
+    const confirm = {
+      message: `Are you sure you want to ${actionName} "${item.get('name')}" step?`,
+      onOk: () => this.onToggleOk(item, type),
+      type: (type === 'enable') ? 'confirm' : 'delete',
+      labelOk: titleCase(actionName),
     };
     this.props.dispatch(showConfirmModal(confirm));
   }
@@ -66,8 +84,12 @@ class CollectionsList extends Component {
 
   parserTriger = item => `Within ${item.get('do_after_days', '')} days`;
 
+  parseShowEnable = item => !item.get('active', true);
+
+  parseShowDisable = item => !(this.parseShowEnable(item));
+
   getListFields = () => [
-    { id: 'active', title: 'Status', parser: this.parserStatus },
+    { id: 'active', title: 'Status', parser: this.parserStatus, cssClass: 'state' },
     { id: 'do_after_days', title: 'Trigger after', parser: this.parserTriger },
     { id: 'name', title: 'Step Name' },
     { id: 'type', title: 'Type', parser: this.parserType },
@@ -75,6 +97,8 @@ class CollectionsList extends Component {
 
   getListActions = () => [
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.props.onClickEdit },
+    { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.onClickToggle, show: this.parseShowEnable },
+    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickToggle, show: this.parseShowDisable },
     { type: 'clone', showIcon: true, helpText: 'Clone', onClick: this.props.onClickClone },
     { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove },
   ];
