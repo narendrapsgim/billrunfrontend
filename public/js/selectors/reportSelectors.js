@@ -64,10 +64,9 @@ const selectReportLinesFields = (customKeys = Immutable.List(), billrunFields = 
   Immutable.List().withMutations((optionsWithMutations) => {
     // set fields from IP
     customKeys.forEach((customKey) => {
-      const fieldName = getFieldName(customKey, 'lines');
       optionsWithMutations.push(Immutable.Map({
         field_name: `uf.${customKey}`,
-        title: (fieldName === customKey) ? sentenceCase(fieldName) : fieldName,
+        title: `${getFieldName(customKey, 'lines', sentenceCase(customKey))} (User field)`,
       }));
     });
     categoryFields.forEach((customKey) => {
