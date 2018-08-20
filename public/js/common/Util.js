@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import moment from 'moment';
+import isNumber from 'is-number';
 import { titleCase, sentenceCase, upperCaseFirst } from 'change-case';
 import fieldNamesConfig from '../config/fieldNames.json';
 import reportConfig from '../config/report';
@@ -343,13 +344,16 @@ const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type
           const rangeUnit = rateStep.getIn(['uom_display', 'range'], 'counter');
           const intervalUnit = rateStep.getIn(['uom_display', 'interval'], 'counter');
           const convertedFrom = getValueByUnit(propertyTypes, usageTypes, usaget, rangeUnit, rateStep.get('from'), toBaseUnit);
+          const newFrom = isNumber(convertedFrom) ? parseFloat(convertedFrom) : convertedFrom;
           const to = rateStep.get('to');
           const convertedTo = (to === 'UNLIMITED' ? 'UNLIMITED' : getValueByUnit(propertyTypes, usageTypes, usaget, rangeUnit, to, toBaseUnit));
+          const newTo = isNumber(convertedTo) ? parseFloat(convertedTo) : convertedTo;
           const convertedInterval = getValueByUnit(propertyTypes, usageTypes, usaget, intervalUnit, rateStep.get('interval'), toBaseUnit);
+          const newInterval = isNumber(convertedInterval) ? parseFloat(convertedInterval) : convertedInterval;
           const ratePath = (type === 'product' ? [usaget, plan, 'rate', index] : [plan, usaget, 'rate', index]);
-          ratesWithMutations.setIn([...ratePath, 'from'], convertedFrom);
-          ratesWithMutations.setIn([...ratePath, 'to'], convertedTo);
-          ratesWithMutations.setIn([...ratePath, 'interval'], convertedInterval);
+          ratesWithMutations.setIn([...ratePath, 'from'], newFrom);
+          ratesWithMutations.setIn([...ratePath, 'to'], newTo);
+          ratesWithMutations.setIn([...ratePath, 'interval'], newInterval);
         });
       });
     });

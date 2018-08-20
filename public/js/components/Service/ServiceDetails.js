@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { titleCase, sentenceCase } from 'change-case';
+import isNumber from 'is-number';
 import { Form, FormGroup, ControlLabel, HelpBlock, Col, InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import { ServiceDescription } from '../../FieldDescriptions';
 import Help from '../Help';
@@ -50,11 +51,13 @@ export default class ServiceDetails extends Component {
 
   onChangePrice = (e) => {
     const { value } = e.target;
-    this.props.updateItem(['price', 0, 'price'], value);
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.props.updateItem(['price', 0, 'price'], newValue);
   }
 
   onChangeCycle = (value) => {
-    this.props.updateItem(['price', 0, 'to'], value);
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.props.updateItem(['price', 0, 'to'], newValue);
   }
 
   onChangeProrated = (e) => {
@@ -87,7 +90,8 @@ export default class ServiceDetails extends Component {
 
   onChangeBalancePeriod = (e) => {
     const { value } = e.target;
-    this.props.updateItem(['balance_period', 'value'], value);
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.props.updateItem(['balance_period', 'value'], newValue);
   }
 
   render() {
