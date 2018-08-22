@@ -19,6 +19,7 @@ import {
   updateEntityField,
   deleteEntityField,
   gotEntity,
+  gotEntitySource,
 } from './entityActions';
 import {
   getList as getEntityList,
@@ -74,13 +75,14 @@ export const getReport = id => (dispatch) => {
               op: format.op,
               value: format.value.substr(0, format.value.indexOf(' ')),
               type: format.value.substr(format.value.indexOf(' ') + 1),
-            }); 
+            });
           }
           return format;
         });
         item.formats = convertedFormats;
       }
       dispatch(gotEntity('reports', item));
+      dispatch(gotEntitySource('reports', item));
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving report')));

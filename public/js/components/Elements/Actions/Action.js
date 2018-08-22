@@ -43,7 +43,9 @@ const Action = (props) => {
     </Tooltip>
   );
 
-  const button = (
+  const button = props.renderFunc
+  ? props.renderFunc(props)
+  : (
     <Button
       onClick={onClick}
       bsStyle={actionStyle}
@@ -59,9 +61,9 @@ const Action = (props) => {
 
   return (
     <span className="action-button">
-      { (typeof props.helpText === 'string' && props.helpText !== '')
-        ? <OverlayTrigger overlay={editTooltip} placement="top">{ props.renderFunc ? props.renderFunc(props) : button }</OverlayTrigger>
-        : ( props.renderFunc ? props.renderFunc(props) : button )
+      { (props.helpText !== '')
+        ? (<OverlayTrigger overlay={editTooltip} placement="top">{ button }</OverlayTrigger>)
+        : button
       }
     </span>
   );
@@ -73,10 +75,12 @@ Action.defaultProps = {
   label: '',
   helpText: '',
   actionStyle: 'link',
+  actionSize: undefined,
   actionClass: '',
   showIcon: true,
   enable: true,
   show: true,
+  renderFunc: null,
   onClick: () => {},
 };
 
@@ -100,7 +104,8 @@ Action.propTypes = {
     PropTypes.bool,
     PropTypes.func,
   ]),
-  onClick: () => {},
+  renderFunc: PropTypes.func,
+  onClick: PropTypes.func,
 };
 
 export default Action;

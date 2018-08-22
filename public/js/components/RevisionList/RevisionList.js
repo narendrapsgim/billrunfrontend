@@ -223,7 +223,7 @@ class RevisionList extends Component {
     }
   }
 
-  getActionHelpText = (type) => {
+  getActionHelpText = (item, type) => {
     const { itemName } = this.props;
     switch (lowerCase(type)) {
       case 'clone':
@@ -250,12 +250,12 @@ class RevisionList extends Component {
   ]
 
   getListActions = () => [
-    { type: 'view', helpText: this.getActionHelpText('view'), onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
-    { type: 'edit', helpText: this.getActionHelpText('edit'), onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
-    { type: 'clone', helpText: this.getActionHelpText('clone'), onClick: this.onClickClone },
-    { type: 'move', helpText: this.getActionHelpText('move'), onClick: this.onClickMove, enable: this.parseMoveEnable },
-    { type: 'reopen', helpText: this.getActionHelpText('reopen'), onClick: this.onClickReopen, enable: this.parseReopenEnable },
-    { type: 'remove', helpText: this.getActionHelpText('remove'), onClick: this.onClickRemove },
+    { type: 'view', helpText: this.getActionHelpText, onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
+    { type: 'edit', helpText: this.getActionHelpText, onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
+    { type: 'clone', helpText: this.getActionHelpText, onClick: this.onClickClone },
+    { type: 'move', helpText: this.getActionHelpText, onClick: this.onClickMove, enable: this.parseMoveEnable },
+    { type: 'reopen', helpText: this.getActionHelpText, onClick: this.onClickReopen, enable: this.parseReopenEnable },
+    { type: 'remove', helpText: this.getActionHelpText, onClick: this.onClickRemove },
   ]
 
   renderMoveModal = () => {

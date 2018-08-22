@@ -1,5 +1,6 @@
 import moment from 'moment';
 import Immutable from 'immutable';
+import { upperCaseFirst } from 'change-case';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery } from '../common/ApiQueries';
 import { getItemDateValue, getConfig, getItemId } from '../common/Util';
@@ -31,6 +32,12 @@ export const deleteEntityField = (collection, path) => ({
 export const gotEntity = (collection, entity) => ({
   type: actions.GOT_ENTITY,
   collection,
+  entity,
+});
+
+export const gotEntitySource = (collection, entity) => ({
+  type: actions.GOT_ENTITY,
+  collection: `source${upperCaseFirst(collection)}`,
   entity,
 });
 

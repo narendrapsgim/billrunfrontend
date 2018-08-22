@@ -39,7 +39,7 @@ import {
 } from '../../actions/reportsActions';
 import { clearItems } from '../../actions/entityListActions';
 import { getSettings } from '../../actions/settingsActions';
-import { modeSimpleSelector, itemSelector, idSelector } from '../../selectors/entitySelector';
+import { modeSimpleSelector, itemSelector, idSelector, itemSourceSelector } from '../../selectors/entitySelector';
 import { reportEntitiesFieldsSelector, reportEntitiesSelector } from '../../selectors/reportSelectors';
 import { taxationTypeSelector } from '../../selectors/settingsSelector';
 import { itemsSelector, pageSelector, nextPageSelector, sizeSelector } from '../../selectors/entityListSelectors';
@@ -49,6 +49,7 @@ class ReportSetup extends Component {
   static propTypes = {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
+    itemSource: PropTypes.instanceOf(Immutable.Map),
     reportFileds: PropTypes.instanceOf(Immutable.Map),
     reportData: PropTypes.instanceOf(Immutable.List),
     reportEntities: PropTypes.instanceOf(Immutable.List),
@@ -70,6 +71,7 @@ class ReportSetup extends Component {
 
   static defaultProps = {
     item: Immutable.Map(),
+    itemSource: Immutable.Map(),
     reportFileds: Immutable.Map(),
     reportData: Immutable.List(),
     reportEntities: Immutable.List(),
@@ -229,7 +231,7 @@ class ReportSetup extends Component {
         const itemId = item.getIn(['_id', '$id']);
         const itemType = getConfig(['systemItems', 'report', 'itemType'], '');
         this.fetchItem();
-        this.props.router.push(`${itemsType}/${itemType}/${itemId}?action=view`);
+        this.props.router.push(`${itemsType}/${itemType}/${itemId}`);
       } else {
         this.handleBack();
       }
@@ -354,7 +356,26 @@ class ReportSetup extends Component {
     }
   }
 
-  onClickExportCSV =() => {
+  isExportEnable = () => {
+    const { itemId, item, itemSource } = this.props;
+    // dont allow to export new unsevaed reort
+    if (!itemId || itemId === '') {
+      return false;
+    }
+    // Allow export only if report was not changed
+    return Immutable.is(item.delete('from').delete('user'), itemSource.delete('from').delete('user'));
+  }
+
+  getExportReportHelpText = () => {
+    if (this.isExportEnable()) {
+      return 'Export Report to CSV';
+    }
+    // due the bug too, tip will not show on disabled button
+    // https://github.com/react-bootstrap/react-bootstrap/issues/1588
+    return 'Reports was changed, please save report before export.';
+  }
+
+  onClickExportCSV = () => {
     const { item } = this.props;
     const csvQuery = getReportCSVQuery(item.get('key', ''));
     window.open(buildRequestUrl(csvQuery));
@@ -455,6 +476,15 @@ class ReportSetup extends Component {
   getEditActions = () => {
     const { mode } = this.props;
     return [{
+      type: 'export_csv',
+      label: 'Export',
+      helpText: this.getExportReportHelpText,
+      showIcon: true,
+      onClick: this.onClickExportCSV,
+      actionStyle: 'primary',
+      actionSize: 'xsmall',
+      enable: this.isExportEnable,
+    }, {
       type: 'reset',
       label: mode === 'create' ? 'Reset' : 'Revert Changes',
       actionStyle: 'primary',
@@ -533,6 +563,7 @@ const mapStateToProps = (state, props) => ({
   userName: state.user.get('name'),
   itemId: idSelector(state, props, 'reports'),
   item: itemSelector(state, props, 'reports'),
+  itemSource: itemSourceSelector(state, props, 'reports'),
   mode: modeSimpleSelector(state, props, 'reports'),
   reportFileds: reportEntitiesFieldsSelector(state, props),
   reportEntities: reportEntitiesSelector(state, props),
