@@ -5,6 +5,7 @@ import { saveEntity, gotEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
 import {
   getPlanConvertedIncludes,
+  getPlanConvertedRates,
   convertServiceBalancePeriodToObject,
   convertServiceBalancePeriodToString,
 } from '../common/Util';
@@ -90,6 +91,11 @@ const convertService = (getState, service, convertToBaseUnit, toSend) => {
     } else { // convert item resived from server
       const balancePeriod = convertServiceBalancePeriodToObject(itemWithMutations);
       itemWithMutations.set('balance_period', balancePeriod);
+    }
+    // convert product price override by usage-type
+    const rates = getPlanConvertedRates(propertyTypes, usageTypesData, service, toSend);
+    if (!rates.isEmpty()) {
+      itemWithMutations.set('rates', rates);
     }
   });
 };
