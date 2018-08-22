@@ -35,7 +35,6 @@ import {
   getPlan,
   savePlan,
   clearPlan,
-  clearSourcePlan,
   onPlanFieldUpdate,
   onPlanTariffAdd,
   setClonePlan,
@@ -118,7 +117,6 @@ class PrepaidPlanSetup extends Component {
 
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
-    this.props.dispatch(clearSourcePlan());
   }
 
   initDefaultValues = () => {
