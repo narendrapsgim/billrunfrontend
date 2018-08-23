@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 
 import { Button } from 'react-bootstrap';
 import List from '../List';
-import { ConfirmModal } from '../Elements';
-
+import { ConfirmModal, Actions } from '../Elements';
 import { getList, clearList } from '../../actions/listActions';
 import { deleteInputProcessor, updateInputProcessorEnabled } from '../../actions/inputProcessorActions';
 import { showDanger } from '../../actions/alertsActions';
@@ -169,19 +168,37 @@ class InputProcessorsList extends Component {
     });
   }
 
-  parseShowEnable = item => !item.get('enabled', true);
+  parseShowEnable = item => !item.get('receive_enabled', true);
   parseShowDisable = item => !(this.parseShowEnable(item));
 
   getListActions = () => [
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickInputProcessor, show: true, onClickColumn: 'file_type' },
-    { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.onClickEnabled, show: this.parseShowEnable },
-    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickDisabled, show: this.parseShowDisable },
     { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove, show: true },
   ];
+/**
+     type, label, data, actionStyle, showIcon, actionSize, actionClass
+ */
+  parseInputProcessorReceiveStatus = (item) => {
+    const receiveEnabled = item.get('receive_enabled', true) ? 'enable' : 'disable';
+    const actions = [
+      { type: 'enable', showIcon: true, helpText: 'Enable Receive', onClick: this.onClickEnabled, show: this.parseShowEnable },
+      { type: 'disable', showIcon: true, helpText: 'Disable Receive', onClick: this.onClickDisabled, show: this.parseShowDisable },
+    ];
+    return (
+      <Actions actions={actions} data={item} />
+    );
+  }
 
-  parseInputProcessorStatus = item => (
-    item.get('enabled', true) ? 'Enabled' : 'Disabled'
-  );
+  parseInputProcessorProcessStatus = item => {
+    const processEnabled = item.get('process_enabled', true) ? 'enabled' : 'disabled';
+    const actions = [
+      { type: 'enable', showIcon: true, helpText: 'Enable Process', onClick: this.onClickEnabled, show: this.parseShowEnable },
+      { type: 'disable', showIcon: true, helpText: 'Disable Process', onClick: this.onClickDisabled, show: this.parseShowDisable },
+    ];
+    return (
+      <Actions actions={actions} data={item} />
+    );
+  };
 
   render() {
     const { inputProcessors } = this.props;
@@ -192,7 +209,8 @@ class InputProcessorsList extends Component {
     const disableConfirmMessage = `Are you sure you want to disable input processor "${inputProcessorName}"?`;
     const fields = [
       { id: 'file_type', title: 'Name' },
-      { id: 'enabled', title: 'Status', parser: this.parseInputProcessorStatus, cssClass: 'list-status-col' },
+      { id: 'enabled', title: 'Receive Status', parser: this.parseInputProcessorReceiveStatus, cssClass: 'list-status-col-2' },
+      { id: 'enabled', title: 'Process Status', parser: this.parseInputProcessorProcessStatus, cssClass: 'list-status-col-2' },
     ];
     const actions = this.getListActions();
 
