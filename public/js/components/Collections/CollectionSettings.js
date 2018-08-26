@@ -60,7 +60,7 @@ class CollectionSettings extends Component {
     return (
       <div>
         <Col sm={12}>
-          <Panel header="&nbsp;">
+          <Panel header="General settings">
             <Form horizontal>
               <FormGroup>
                 <Col sm={2} componentClass={ControlLabel}>
@@ -74,7 +74,7 @@ class CollectionSettings extends Component {
           </Panel>
 
           <Panel header={
-            <h4>CollectionState Change<br />
+            <h4>Collection State Change<br />
               <small>
                 HTTP requests will be triggered to this URL when a customer
                 enters / exits from collection
