@@ -654,16 +654,16 @@ export function clearInputProcessor() {
 }
 
 export const deleteInputProcessor = fileType => (dispatch) => {
-  const query = getInputProcessorActionQuery(fileType, 'unset');
+  const query = getInputProcessorActionQuery(fileType, 'unset', null);
   dispatch(startProgressIndicator());
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error occured while trying to delete input processor')));
 };
 
-export const updateInputProcessorEnabled = (fileType, enabled) => (dispatch) => {
+export const updateInputProcessorEnabled = (fileType, part, enabled) => (dispatch) => {
   const action = (enabled ? 'enable' : 'disable');
-  const query = getInputProcessorActionQuery(fileType, action);
+  const query = getInputProcessorActionQuery(fileType, action, part);
   dispatch(startProgressIndicator());
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))

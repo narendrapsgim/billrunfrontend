@@ -20,8 +20,10 @@ class InputProcessorsList extends Component {
     this.state = {
       sort: '',
       showConfirmRemove: false,
-      showConfirmEnable: false,
-      showConfirmDisable: false,
+      showConfirmReceiverEnable: false,
+      showConfirmProcessorEnable: false,
+      showConfirmReceiverDisable: false,
+      showConfirmProcessorDisable: false,
       inputProcessor: null,
     };
   }
@@ -95,55 +97,113 @@ class InputProcessorsList extends Component {
     );
   }
 
-  onClickEnabled = (inputProcessor) => {
+  onClickProcessorEnabled = (inputProcessor) => {
     this.setState({
-      showConfirmEnable: true,
+      showConfirmProcessorEnable: true,
       inputProcessor,
     });
   }
 
-  onClickEnableCancel = () => {
+  onClickReceiverEnabled = (inputProcessor) => {
     this.setState({
-      showConfirmEnable: false,
-      inputProcessor: null,
-    });
-  }
-
-  onClickEnableOk = () => {
-    const { inputProcessor } = this.state;
-    this.setState({
-      showConfirmEnable: false,
-      inputProcessor: null,
-    });
-    this.updateEnabled(inputProcessor, true);
-  }
-
-  onClickDisabled = (inputProcessor) => {
-    this.setState({
-      showConfirmDisable: true,
+      showConfirmReceiverEnable: true,
       inputProcessor,
     });
   }
 
-  onClickDisableCancel = () => {
+  onClickEnableProcessorCancel = () => {
     this.setState({
-      showConfirmDisable: false,
+      showConfirmProcessorEnable: false,
       inputProcessor: null,
     });
   }
 
-  onClickDisableOk = () => {
+  onClickEnableReceiverCancel = () => {
+    this.setState({
+      showConfirmReceiverEnable: false,
+      inputProcessor: null,
+    });
+  }
+
+  onClickEnableProcessorOk = () => {
     const { inputProcessor } = this.state;
     this.setState({
-      showConfirmDisable: false,
+      showConfirmProcessorEnable: false,
       inputProcessor: null,
     });
-    this.updateEnabled(inputProcessor, false);
+    this.updateProcessorEnabled(inputProcessor, true);
   }
 
-  updateEnabled = (inputProcessor, enabled) => {
+  onClickEnableReceiverOk = () => {
+    const { inputProcessor } = this.state;
+    this.setState({
+      showConfirmReceiverEnable: false,
+      inputProcessor: null,
+    });
+    this.updateReceiverEnabled(inputProcessor, true);
+  }
+
+  onClickProcessorDisabled = (inputProcessor) => {
+    this.setState({
+      showConfirmProcessorDisable: true,
+      inputProcessor,
+    });
+  }
+
+  onClickReceiverDisabled = (inputProcessor) => {
+    this.setState({
+      showConfirmReceiverDisable: true,
+      inputProcessor,
+    });
+  }
+
+  onClickDisableProcessorCancel = () => {
+    this.setState({
+      showConfirmProcessorDisable: false,
+      inputProcessor: null,
+    });
+  }
+
+  onClickDisableReceiverCancel = () => {
+    this.setState({
+      showConfirmReceiverDisable: false,
+      inputProcessor: null,
+    });
+  }
+
+  onClickDisableProcessorOk = () => {
+    const { inputProcessor } = this.state;
+    this.setState({
+      showConfirmProcessorDisable: false,
+      inputProcessor: null,
+    });
+    this.updateProcessorEnabled(inputProcessor, false);
+  }
+
+  onClickDisableReceiverOk = () => {
+    const { inputProcessor } = this.state;
+    this.setState({
+      showConfirmReceiverDisable: false,
+      inputProcessor: null,
+    });
+    this.updateReceiverEnabled(inputProcessor, false);
+  }
+
+  updateProcessorEnabled = (inputProcessor, enabled) => {
     const fileType = inputProcessor.get('file_type', '');
-    this.props.dispatch(updateInputProcessorEnabled(fileType, enabled))
+    this.props.dispatch(updateInputProcessorEnabled(fileType, 'processor', enabled))
+    .then(
+      (response) => {
+        if (response.status) {
+          this.props.dispatch(getList('input_processors', this.buildQuery()));
+        }
+      }
+    );
+  }
+
+  updateReceiverEnabled = (inputProcessor, enabled) => {
+    const fileType = inputProcessor.get('file_type', '');
+    this.props.dispatch(updateInputProcessorEnabled(fileType, 'receiver', enabled))
     .then(
       (response) => {
         if (response.status) {
@@ -168,32 +228,31 @@ class InputProcessorsList extends Component {
     });
   }
 
-  parseShowEnable = item => !item.get('receive_enabled', true);
-  parseShowDisable = item => !(this.parseShowEnable(item));
+  parseShowReceiverEnable = item => !item.get('receiver_enabled', true);
+  parseShowReceiverDisable = item => !(this.parseShowReceiverEnable(item));
+
+  parseShowProcessorEnable = item => !item.get('processor_enabled', true);
+  parseShowProcessorDisable = item => !(this.parseShowProcessorEnable(item));
 
   getListActions = () => [
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickInputProcessor, show: true, onClickColumn: 'file_type' },
     { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove, show: true },
   ];
-/**
-     type, label, data, actionStyle, showIcon, actionSize, actionClass
- */
+
   parseInputProcessorReceiveStatus = (item) => {
-    const receiveEnabled = item.get('receive_enabled', true) ? 'enable' : 'disable';
     const actions = [
-      { type: 'enable', showIcon: true, helpText: 'Enable Receive', onClick: this.onClickEnabled, show: this.parseShowEnable },
-      { type: 'disable', showIcon: true, helpText: 'Disable Receive', onClick: this.onClickDisabled, show: this.parseShowDisable },
+      { type: 'enable', showIcon: true, helpText: 'Enable Receive', onClick: this.onClickReceiverEnabled, show: this.parseShowReceiverEnable },
+      { type: 'disable', showIcon: true, helpText: 'Disable Receive', onClick: this.onClickReceiverDisabled, show: this.parseShowReceiverDisable },
     ];
     return (
       <Actions actions={actions} data={item} />
     );
   }
 
-  parseInputProcessorProcessStatus = item => {
-    const processEnabled = item.get('process_enabled', true) ? 'enabled' : 'disabled';
+  parseInputProcessorProcessStatus = (item) => {
     const actions = [
-      { type: 'enable', showIcon: true, helpText: 'Enable Process', onClick: this.onClickEnabled, show: this.parseShowEnable },
-      { type: 'disable', showIcon: true, helpText: 'Disable Process', onClick: this.onClickDisabled, show: this.parseShowDisable },
+      { type: 'enable', showIcon: true, helpText: 'Enable Process', onClick: this.onClickProcessorEnabled, show: this.parseShowProcessorEnable },
+      { type: 'disable', showIcon: true, helpText: 'Disable Process', onClick: this.onClickProcessorDisabled, show: this.parseShowProcessorDisable },
     ];
     return (
       <Actions actions={actions} data={item} />
@@ -202,15 +261,17 @@ class InputProcessorsList extends Component {
 
   render() {
     const { inputProcessors } = this.props;
-    const { showConfirmRemove, showConfirmEnable, showConfirmDisable, inputProcessor } = this.state;
+    const { showConfirmRemove, showConfirmReceiverEnable, showConfirmProcessorEnable, showConfirmReceiverDisable, showConfirmProcessorDisable, inputProcessor } = this.state;
     const inputProcessorName = inputProcessor ? inputProcessor.get('file_type') : '';
     const removeConfirmMessage = `Are you sure you want to remove input processor "${inputProcessorName}"?`;
-    const enableConfirmMessage = `Are you sure you want to enable input processor "${inputProcessorName}"?`;
-    const disableConfirmMessage = `Are you sure you want to disable input processor "${inputProcessorName}"?`;
+    const enableReceiverConfirmMessage = `Are you sure you want to enable receiver for input processor "${inputProcessorName}"?`;
+    const disableReceiverConfirmMessage = `Are you sure you want to disable receiver for input processor "${inputProcessorName}"?`;
+    const enableProcessorConfirmMessage = `Are you sure you want to enable processor for input processor "${inputProcessorName}"?`;
+    const disableProcessorConfirmMessage = `Are you sure you want to disable processor for input processor "${inputProcessorName}"?`;
     const fields = [
       { id: 'file_type', title: 'Name' },
-      { id: 'enabled', title: 'Receive Status', parser: this.parseInputProcessorReceiveStatus, cssClass: 'list-status-col-2' },
-      { id: 'enabled', title: 'Process Status', parser: this.parseInputProcessorProcessStatus, cssClass: 'list-status-col-2' },
+      { id: 'enabled', title: 'Receiver Status', parser: this.parseInputProcessorReceiveStatus, cssClass: 'list-status-col-2' },
+      { id: 'enabled', title: 'Processor Status', parser: this.parseInputProcessorProcessStatus, cssClass: 'list-status-col-2' },
     ];
     const actions = this.getListActions();
 
@@ -229,8 +290,10 @@ class InputProcessorsList extends Component {
               <div className="panel-body">
                 <List items={inputProcessors} fields={fields} onSort={this.onSort} actions={actions} />
                 <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveCancel} show={showConfirmRemove} message={removeConfirmMessage} labelOk="Yes" />
-                <ConfirmModal onOk={this.onClickEnableOk} onCancel={this.onClickEnableCancel} show={showConfirmEnable} message={enableConfirmMessage} labelOk="Yes" />
-                <ConfirmModal onOk={this.onClickDisableOk} onCancel={this.onClickDisableCancel} show={showConfirmDisable} message={disableConfirmMessage} labelOk="Yes" />
+                <ConfirmModal onOk={this.onClickEnableProcessorOk} onCancel={this.onClickEnableProcessorCancel} show={showConfirmProcessorEnable} message={enableProcessorConfirmMessage} labelOk="Yes" />
+                <ConfirmModal onOk={this.onClickDisableProcessorOk} onCancel={this.onClickDisableProcessorCancel} show={showConfirmProcessorDisable} message={disableProcessorConfirmMessage} labelOk="Yes" />
+                <ConfirmModal onOk={this.onClickEnableReceiverOk} onCancel={this.onClickEnableReceiverCancel} show={showConfirmReceiverEnable} message={enableReceiverConfirmMessage} labelOk="Yes" />
+                <ConfirmModal onOk={this.onClickDisableReceiverOk} onCancel={this.onClickDisableReceiverCancel} show={showConfirmReceiverDisable} message={disableReceiverConfirmMessage} labelOk="Yes" />
               </div>
             </div>
           </div>

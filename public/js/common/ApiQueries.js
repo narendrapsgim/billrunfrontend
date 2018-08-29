@@ -137,12 +137,12 @@ export const setInputProcessorQuery = (data, action) => {
   });
 };
 
-export const getInputProcessorActionQuery = (fileType, action) => ({
+export const getInputProcessorActionQuery = (fileType, action, part) => ({
   api: 'settings',
   params: [
     { category: 'file_types' },
     { action },
-    { data: JSON.stringify({ file_type: fileType }) },
+    { data: JSON.stringify({ file_type: fileType, part }) },
   ],
 });
 
