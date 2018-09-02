@@ -15,6 +15,7 @@ import {
   isItemClosed,
   getItemId,
   isItemFinite,
+  toImmutableList,
 } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity, moveEntity, reopenEntity } from '../../actions/entityActions';
@@ -186,10 +187,10 @@ class RevisionList extends Component {
     if (response.status) {
       this.props.dispatch(showSuccess('Revision was removed'));
       const collection = getConfig(['systemItems', itemName, 'collection'], '');
-      const uniqueField = getConfig(['systemItems', itemName, 'uniqueField'], '');
-      const key = itemToRemove.get(uniqueField, '');
+      const uniqueFields = toImmutableList(getConfig(['systemItems', itemName, 'uniqueField'], Immutable.List()));
+      const keys = uniqueFields.map(uniqueField => itemToRemove.get(uniqueField, ''));
       const removedRevisionId = getItemId(itemToRemove);
-      this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
+      this.props.dispatch(getRevisions(collection, uniqueFields, keys)); // refetch revision list because item was (changed in / added to) list
       this.onClickRemoveClose();
       this.props.onDeleteItem(removedRevisionId);
     }

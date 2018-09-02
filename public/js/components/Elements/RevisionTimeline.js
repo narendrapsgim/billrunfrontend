@@ -36,7 +36,7 @@ const RevisionTimeline = ({ revisions, size, item, start, itemName }) => {
 
   const renderMore = type => (
     <li key={`${getItemId(item, '')}-more-${type}`} className={`more ${type}`}>
-      <div style={{ lineHeight: '12px' }}>&nbsp;</div>
+      <div style={{ height: '22px' }}>&nbsp;</div>
       <div>
         <div>&nbsp;</div>
         <div>&nbsp;</div>
