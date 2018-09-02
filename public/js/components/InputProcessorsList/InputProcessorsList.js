@@ -251,8 +251,8 @@ class InputProcessorsList extends Component {
 
   parseInputProcessorProcessStatus = (item) => {
     const actions = [
-      { type: 'enable', showIcon: true, helpText: 'Enable Process', onClick: this.onClickProcessorEnabled, show: this.parseShowProcessorEnable },
-      { type: 'disable', showIcon: true, helpText: 'Disable Process', onClick: this.onClickProcessorDisabled, show: this.parseShowProcessorDisable },
+      { type: 'enable', helpText: 'Enable Process', onClick: this.onClickProcessorEnabled, show: this.parseShowProcessorEnable },
+      { type: 'disable', helpText: 'Disable Process', onClick: this.onClickProcessorDisabled, show: this.parseShowProcessorDisable },
     ];
     return (
       <Actions actions={actions} data={item} />
@@ -270,8 +270,8 @@ class InputProcessorsList extends Component {
     const disableProcessorConfirmMessage = `Are you sure you want to disable processor for input processor "${inputProcessorName}"?`;
     const fields = [
       { id: 'file_type', title: 'Name' },
-      { id: 'enabled', title: 'Receiver', parser: this.parseInputProcessorReceiveStatus, cssClass: 'list-status-col' },
-      { id: 'enabled', title: 'Processor', parser: this.parseInputProcessorProcessStatus, cssClass: 'list-status-col' },
+      { id: 'enabled', title: 'Receiver', parser: this.parseInputProcessorReceiveStatus, cssClass: 'td-actions' },
+      { id: 'enabled', title: 'Processor', parser: this.parseInputProcessorProcessStatus, cssClass: 'td-actions' },
     ];
     const actions = this.getListActions();
 
