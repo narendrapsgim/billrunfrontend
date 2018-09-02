@@ -38,8 +38,7 @@ import PaymentGateways from '../components/PaymentGateways';
 import UserList from '../components/UserList';
 import UserSetup from '../components/UserSetup';
 import SelectTemplate from '../components/InputProcessor/SelectTemplate';
-import Collections from '../components/Collections/Collections';
-import Collection from '../components/Collection/Collection';
+import Collections from '../components/Collections';
 import InvoiceTemplate from '../components/InvoiceTemplate';
 import EmailTemplates from '../components/EmailTemplates';
 import PrepaidPlansList from '../components/PrepaidPlansList';
@@ -146,7 +145,6 @@ const routes = () => (
     <Route path="/payment_gateways" component={RequireAuth(PaymentGateways)} title="Payment Gateways" />
     <Route path="/select_input_processor_template" component={RequireAuth(SelectTemplate)} title="Create New Input Processor" />
     <Route path="/collections" component={RequireAuth(Collections)} title="Collection" />
-    <Route path="/collection(/:itemId)(/:action)" component={RequireAuth(Collection)} />
     <Route path="/invoice-template" component={RequireAuth(InvoiceTemplate)} title="Invoice Template" />
     <Route path="/audit-trail" component={RequireAuth(AuditTrail)} title="Audit Trail" />
     <Route path="/custom_fields" component={RequireAuth(CustomFields)} title="Custom Fields" />

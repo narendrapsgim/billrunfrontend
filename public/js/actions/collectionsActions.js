@@ -1,82 +1,79 @@
-import { saveSettings, getSettings,
-  UPDATE_SETTING, REMOVE_SETTING_FIELD, PUSH_TO_SETTING } from './settingsActions';
+import uuid from 'uuid';
+import { collectionStepsSelector } from '../selectors/settingsSelector';
+import {
+  saveSettings,
+  getSettings,
+  actions as settingsActions,
+} from './settingsActions';
 
-export const UPDATE_COLLECTION = 'UPDATE_COLLECTION';
-export const CLEAR_COLLECTION = 'CLEAR_COLLECTION';
-export const RESET_COLLECTION_EDITED = 'RESET_COLLECTION_EDITED';
-export const SET_COLLECTION_EDITED = 'SET_COLLECTION_EDITED';
+import { toImmutableList } from '../common/Util';
 
-export function resetCollectionEdited() {
-  return {
-    type: RESET_COLLECTION_EDITED,
-  };
-}
-export function setCollectionEdited() {
-  return {
-    type: SET_COLLECTION_EDITED,
-  };
-}
+/* Collection Step */
+const updateCollectionStepByIndex = (index, path, value) => ({
+  type: settingsActions.UPDATE_SETTING,
+  category: 'collection',
+  name: ['steps', index, ...toImmutableList(path)],
+  value,
+});
 
-export function saveCollection(subCategories = 'steps') {
-  const saveCategories = Array.isArray(subCategories)
-    ? subCategories.map(subCategorie => `collection.${subCategorie}`)
-    : [`collection.${subCategories}`];
-  return saveSettings(saveCategories);
-}
+const removeCollectionStepByIndex = index => ({
+  type: settingsActions.REMOVE_SETTING_FIELD,
+  category: 'collection',
+  name: ['steps', index],
+});
 
-export function getCollection(subCategories = 'steps') {
-  const getCategories = Array.isArray(subCategories)
-    ? subCategories.map(subCategorie => `collection.${subCategorie}`)
-    : [`collection.${subCategories}`];
-  return getSettings(getCategories);
-}
+const addCollectionStep = value => ({
+  type: settingsActions.PUSH_TO_SETTING,
+  category: 'collection',
+  path: 'steps',
+  value,
+});
 
-export function updateCollectionSteps(path, value) {
-  return {
-    type: UPDATE_SETTING,
-    category: 'collection',
-    name: ['steps', ...path],
-    value,
-  };
-}
+export const removeCollectionStep = editedItem => (dispatch, getState) => {
+  const steps = collectionStepsSelector(getState());
+  const index = steps.findIndex(step => step.get('id', '') === editedItem.get('id', ''));
+  if (index !== -1) {
+    return dispatch(removeCollectionStepByIndex(index));
+  }
+  return false;
+};
 
-export function updateCollectionSettings(path, value) {
-  const pathArray = Array.isArray(path) ? path : [path];
-  return {
-    type: UPDATE_SETTING,
-    category: 'collection',
-    name: [...pathArray],
-    value,
-  };
-}
+export const updateCollectionStep = (item, path, value) => (dispatch, getState) => {
+  const steps = collectionStepsSelector(getState());
+  const index = steps.findIndex(step => step.get('id', '') === item.get('id', ''));
+  if (index !== -1) {
+    return dispatch(updateCollectionStepByIndex(index, path, value));
+  }
+  return false;
+};
 
-export function removeCollectionStep(index) {
-  return {
-    type: REMOVE_SETTING_FIELD,
-    category: 'collection',
-    name: ['steps', index],
-  };
-}
+export const saveCollectionStep = step => (dispatch, getState) => {
+  // If step is new, add it
+  if (!step.has('id')) {
+    return dispatch(addCollectionStep(step.set('id', uuid.v4())));
+  }
+  // If step is existing, replace step with new step data
+  const existingSteps = collectionStepsSelector(getState());
+  const index = existingSteps.findIndex(existingStep => existingStep.get('id', '') === step.get('id', ''));
+  if (index !== -1) {
+    return dispatch(updateCollectionStep(step, [], step));
+  }
+  return false;
+};
 
-export function updateNewCollection(path, value) {
-  return {
-    type: UPDATE_COLLECTION,
-    path,
-    value,
-  };
-}
+/* Collection Steps array */
+export const saveCollectionSteps = () => saveSettings(['collection.steps']);
 
-export function clearNewCollection() {
-  return {
-    type: CLEAR_COLLECTION,
-  };
-}
+export const getCollectionSteps = () => getSettings(['collection.steps']);
 
-export function pushNewCollection(value) {
-  return {
-    type: PUSH_TO_SETTING,
-    category: 'collection',
-    value,
-    path: 'steps',
-  };
-}
+/* Collection Settings */
+export const saveCollectionSettings = () => saveSettings(['collection.settings']);
+
+export const getCollectionSettings = () => getSettings(['collection.settings']);
+
+export const updateCollectionSettings = (path, value) => ({
+  type: settingsActions.UPDATE_SETTING,
+  category: 'collection',
+  name: ['settings', ...toImmutableList(path)],
+  value,
+});

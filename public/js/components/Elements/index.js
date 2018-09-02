@@ -11,6 +11,7 @@ import SortableFieldsContainer from './SortableFieldsContainer';
 import DragHandle from './DragHandle';
 import ZoneDate from './ZoneDate';
 import WithEntityLink from './WithEntityLink';
+import TextWithButton from './TextWithButton';
 
 export {
   WithEntityLink,
@@ -26,4 +27,5 @@ export {
   SortableFieldsContainer,
   DragHandle,
   ZoneDate,
+  TextWithButton,
 };
