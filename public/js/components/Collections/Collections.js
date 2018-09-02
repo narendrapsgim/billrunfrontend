@@ -1,82 +1,139 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
-import { Panel } from 'react-bootstrap';
 import Immutable from 'immutable';
-import CollectionItemDisplay from './Elements/CollectionItemDisplay';
-import CollectionItemAdd from './Elements/CollectionItemAdd';
-import CollectionSettings from './Elements/CollectionSettings';
-import { removeCollectionStep, getCollection, saveCollection } from '../../actions/collectionsActions';
+import { Tab, Panel } from 'react-bootstrap';
+import TabsWrapper from '../Elements/TabsWrapper';
+import CollectionSettings from './CollectionSettings';
+import CollectionsList from './CollectionsList';
+import CollectionStep from './CollectionStep';
+import { ModalWrapper } from '../Elements';
+import { getSettings } from '../../actions/settingsActions';
+import { saveCollectionStep } from '../../actions/collectionsActions';
+import { getConfig } from '../../common/Util';
 
 
 class Collections extends Component {
 
-  static defaultProps = {
-    collections: Immutable.List(),
+  static propTypes = {
+    location: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
-  static propTypes = {
-    collections: PropTypes.instanceOf(Immutable.List),
-    dispatch: PropTypes.func.isRequired,
-    router: PropTypes.shape({
-      push: PropTypes.func.isRequired,
-    }).isRequired,
-  }
+  static defaultProps = {
+  };
 
   state = {
-    edit: false,
+    editedItem: null,
+    editedItemName: '',
+    errors: Immutable.Map(),
+  };
+
+  componentWillMount() {
+    this.props.dispatch(getSettings('template_token'));
   }
 
-  componentDidMount() {
-    this.props.dispatch(getCollection('steps'));
+  onCloseEditStep = () => {
+    this.setState(() => ({ editedItem: null, editedItemName: '', errors: Immutable.Map() }));
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return !Immutable.is(this.props.collections, nextProps.collections)
-            || this.state.edit !== nextState.edit;
+  onChangeEditStep = (path, value) => {
+    this.setState(prevState => ({
+      editedItem: prevState.editedItem.setIn(path, value),
+      errors: prevState.errors.deleteIn(path),
+    }));
   }
 
-  onRemove = (id) => {
-    const { collections } = this.props;
-    const index = collections.findIndex(item => item.get('id') === id);
-    if (index > -1) {
-      this.props.dispatch(removeCollectionStep(index));
-      this.props.dispatch(saveCollection('steps'));
+  onAddStep = type => () => {
+    const active = getConfig(['collections', 'default_new_step_status'], false);
+    this.setState(() => ({
+      editedItem: Immutable.Map({ type, active }),
+    }));
+  }
+
+  onSaveEditStep = () => {
+    const { editedItem } = this.state;
+    if (!this.validateStep(editedItem)) {
+      this.props.dispatch(saveCollectionStep(editedItem));
+      this.onCloseEditStep();
     }
   }
 
-  onClickNew = () => {
-    this.props.router.push('/collection');
+  onClickEdit = (item) => {
+    this.setState(() => ({
+      editedItem: item,
+      editedItemName: item.get('name', ''),
+      errors: Immutable.Map(),
+    }));
   }
 
-  onClickEdit = (id) => {
-    this.props.router.push(`/collection/${id}`);
+  onClickClone = (item) => {
+    this.onClickEdit(item.delete('id'));
+    this.setState(() => ({
+      editedItemName: '',
+    }));
   }
 
-  sortCollections = (collectionA, collectionB) => collectionA.get('do_after_days') > collectionB.get('do_after_days')
 
-  renderCollection = item => (
-    <CollectionItemDisplay item={item} key={item.get('id')} onRemove={this.onRemove} onEdit={this.onClickEdit} />
-  )
+  validateStep = (item) => {
+    let hasError = false;
+    if (['', null].includes(item.get('name', ''))) {
+      this.setState(prevState => ({ errors: prevState.errors.setIn(['name'], 'Title field is required') }));
+      hasError = true;
+    }
+    if (['', null].includes(item.get('do_after_days', ''))) {
+      this.setState(prevState => ({ errors: prevState.errors.setIn(['do_after_days'], 'Trigger after field is required') }));
+      hasError = true;
+    }
+    return hasError;
+  }
+
+
+  renderEventForm = () => {
+    const { editedItem, editedItemName, errors } = this.state;
+    if (editedItem === null) {
+      return null;
+    }
+    const title = editedItemName !== ''
+      ? `Edit "${editedItemName}" step`
+      : (<span>Create {getConfig(['collections', 'step_types', editedItem.get('type', ''), 'label'], '')} Step</span>);
+    return (
+      <ModalWrapper
+        title={title}
+        show={true}
+        onOk={this.onSaveEditStep}
+        onCancel={this.onCloseEditStep}
+        labelOk="Save"
+        modalSize="large"
+      >
+        <CollectionStep item={editedItem} onChange={this.onChangeEditStep} errors={errors} />
+      </ModalWrapper>
+    );
+  }
 
   render() {
-    const { collections } = this.props;
+    const { location } = this.props;
     return (
-      <div className="row collections-list col-lg-12 clearfix">
-        <Panel header={<span>Settings</span>}>
-          <CollectionSettings />
-        </Panel>
-        <Panel header={<span>Steps</span>}>
-          { collections.sort(this.sortCollections).map(this.renderCollection) }
-          <CollectionItemAdd onClickNew={this.onClickNew} addLabel="Add collection step"/>
-        </Panel>
+      <div>
+        <TabsWrapper id="CollectionsTab" location={location}>
+          <Tab title="Steps" eventKey={1}>
+            <Panel style={{ borderTop: 'none' }}>
+              <CollectionsList
+                onAddStep={this.onAddStep}
+                onClickEdit={this.onClickEdit}
+                onClickClone={this.onClickClone}
+              />
+            </Panel>
+          </Tab>
+          <Tab title="Settings" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <CollectionSettings />
+            </Panel>
+          </Tab>
+        </TabsWrapper>
+        {this.renderEventForm()}
       </div>
     );
   }
 }
 
-
-const mapStateToProps = state => ({
-  collections: state.settings.getIn(['collection', 'steps']),
-});
-export default withRouter(connect(mapStateToProps)(Collections));
+export default connect(null)(Collections);
