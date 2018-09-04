@@ -252,22 +252,20 @@ class CycleData extends Component {
   getListActions = () => {
     const { showConfirmAllButton, isCycleConfirmed } = this.props;
     return [{
- 	label: 'Confirm All',
-        actionStyle: 'default',
+        label: 'Confirm All',
+        actionStyle: 'primary',
         show :showConfirmAllButton,
         showIcon: false,
         onClick: this.onClickConfirmAll,
         actionSize: 'xsmall',
-        actionClass: 'btn-primary',
       },
       {
         label: 'Download Taxation compliance report',
-        actionStyle: 'default',
+        actionStyle: 'primary',
         show : isCycleConfirmed,
         showIcon: false,
         renderFunc : this.parseTaxDownload,
         actionSize: 'xsmall',
-        actionClass: 'btn-primary',
       }
     ];
   }

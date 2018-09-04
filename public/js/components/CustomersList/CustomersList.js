@@ -60,11 +60,10 @@ class CustomersList extends Component {
   }, {
     type: 'import',
     label: 'Import',
-    actionStyle: 'default',
+    actionStyle: 'primary',
     showIcon: true,
     onClick: this.onClickImprt,
     actionSize: 'xsmall',
-    actionClass: 'btn-primary',
   }];
 
   getActions = () => [
