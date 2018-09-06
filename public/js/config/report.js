@@ -210,20 +210,20 @@ export default {
     { id: 'last_days', title: 'Last (days)', include: ['fieldid:urt'], type: 'number', suffix: 'Days' },
     { id: 'last_days_include_today', title: 'Last (days including today)', include: ['fieldid:urt'], type: 'number', suffix: 'Days' },
     { id: 'last_hours', title: 'Last (hours)', include: ['fieldid:urt'], type: 'number', suffix: 'Hours' },
-    { id: 'eq', title: 'Equals', include: ['date', 'boolean', 'fieldid:billrun_status', 'fieldid:logfile_status'] }, // 'Equals'
+    { id: 'eq', title: 'Equals', include: ['date', 'datetime', 'boolean', 'fieldid:billrun_status', 'fieldid:logfile_status'] }, // 'Equals'
     { id: 'in', title: 'Equals', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
     { id: 'ne', title: 'Does Not equal', include: ['boolean'], exclude: [] }, // 'Not equals'
     { id: 'nin', title: 'Does Not equal', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
-    { id: 'lt', title: '<', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Less than'
-    { id: 'lte', title: '<=', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
-    { id: 'gt', title: '>', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
-    { id: 'gte', title: '>=', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Greater than or equals'
+    { id: 'lt', title: '<', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Less than'
+    { id: 'lte', title: '<=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
+    { id: 'gt', title: '>', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
+    { id: 'gte', title: '>=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than or equals'
     { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status'] },
     { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status'] },
     { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status'] },
     { id: 'exists', title: 'Exists', type: 'boolean',
-      include: ['string', 'number', 'boolean', 'date'],
-      exclude: [ 'fieldid:billrun_status', 'fieldid:logfile_status'],
+      include: ['string', 'number', 'boolean', 'date', 'datetime'],
+      exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'],
       options: ['yes', 'no'],
     },
   ],
