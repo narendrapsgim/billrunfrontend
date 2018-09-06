@@ -9,7 +9,7 @@ export default {
       //    callback: 'getExampleOptions', /* callback function + should be implementation */
       //    callbackArgument: { 'demo': true },
       // } },
-      { id: 'urt', type: 'date' },
+      { id: 'urt', type: 'datetime' },
       { id: 'lastname' },
       { id: 'firstname' },
       { id: 'stamp' },
@@ -24,7 +24,7 @@ export default {
       { id: 'over_group', type: 'number' },
       { id: 'usagev', type: 'number' },
       { id: 'aid', type: 'number' },
-      { id: 'process_time', type: 'string' },
+      { id: 'process_time', type: 'datetime' },
       { id: 'in_queue', type: 'boolean' },
       { id: 'usagesb', type: 'number' },
       { id: 'type', title: 'Input processor name / BillRun type', inputConfig: {
@@ -64,8 +64,8 @@ export default {
       { id: 'balance_before', type: 'number' },
       { id: 'balance_after', type: 'number' },
       { id: 'balance_normalized', type: 'number' },
-      { id: 'start', title: 'Proration start date', type: 'date' },
-      { id: 'end', title: 'Proration end date', type: 'date' },
+      { id: 'start', title: 'Proration start date', type: 'datetime' },
+      { id: 'end', title: 'Proration end date', type: 'datetime' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
