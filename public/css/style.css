@@ -840,3 +840,12 @@ ul.revision-history-list li.active .cycle {
 #rate-mapping .nav-tabs>li {
   min-width: 150px;
 }
+/* Temporary fix for react-datepicker time position
+ * https://github.com/Hacker0x01/react-datepicker/issues/1398
+ */
+ul.react-datepicker__time-list {
+  padding: 0;
+}
+.react-datepicker {
+  width: 253px;
+}
