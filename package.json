@@ -80,7 +80,7 @@
     "react-close-on-escape": "^2.0.0",
     "react-csv": "^1.0.8",
     "react-datamaps": "^0.3.0",
-    "react-datepicker": "^0.52.0",
+    "react-datepicker": "^1.6.0",
     "react-diff": "0.0.7",
     "react-dom": "^15.3.1",
     "react-joyride": "^1.10.1",
