@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Form, FormGroup, Col, HelpBlock, ControlLabel } from 'react-bootstrap';
 import { ModalWrapper } from '../Elements';
-import { getConfig, getItemDateValue } from '../../common/Util';
+import { getConfig, getItemDateValue, toImmutableList } from '../../common/Util';
 import Field from '../Field';
 
 class ReopenActionBox extends Component {
@@ -55,7 +55,7 @@ class ReopenActionBox extends Component {
 
     const lastRevision = revisions.first();
     const minFrom = getItemDateValue(lastRevision, 'to');
-    const revisionBy = getConfig(['systemItems', itemName, 'uniqueField'], '');
+    const revisionBy = toImmutableList(getConfig(['systemItems', itemName, 'uniqueField'], Immutable.List())).get(0, '');
     const title = `${item.get(revisionBy, '')} - Reopen`;
     const formStyle = { padding: '35px 50px 0 50px' };
     const fromError = validationErrors.get('from', '');

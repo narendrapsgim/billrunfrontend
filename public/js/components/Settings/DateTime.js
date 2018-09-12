@@ -23,7 +23,7 @@ export default class DateTime extends Component {
     // const dateFormatOptions = ['dd-mm-yy', 'mm-dd-yy'].map(this.renderOption);
     // const timeFormatOptions = ['12-hour', '24-hour'].map(this.renderOption);
     const timeZoneOptions = moment.tz.names().map(this.renderOption);
-    const timezone = data.get('timezone_field', '').length !== 0 ? data.get('timezone_field', '') : moment.tz.guess();
+    const timezone = data.get('timezone', '').length !== 0 ? data.get('timezone', '') : moment.tz.guess();
 
     return (
       <div className="DateTime">

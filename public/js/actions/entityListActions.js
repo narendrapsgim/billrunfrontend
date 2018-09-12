@@ -1,5 +1,6 @@
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { getEntityRevisionsQuery } from '../common/ApiQueries';
+import { toImmutableList } from '../common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 export const actions = {
@@ -98,7 +99,9 @@ export const getList = (collection, params) => (dispatch) => {
 };
 
 export const getRevisions = (collection, uniqueField, key) => (dispatch) => {
-  const query = getEntityRevisionsQuery(collection, uniqueField, key);
+  const keys = toImmutableList(key);
+  const uniqueFields = toImmutableList(uniqueField);
+  const query = getEntityRevisionsQuery(collection, uniqueFields, keys);
   return apiBillRun(query)
   .then((success) => {
     try {

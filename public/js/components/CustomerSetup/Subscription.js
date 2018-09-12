@@ -17,6 +17,7 @@ import {
   getItemMode,
   getItemDateValue,
   buildPageTitle,
+  toImmutableList,
 } from '../../common/Util';
 
 
@@ -394,9 +395,10 @@ class Subscription extends Component {
 
 const mapStateToProps = (state, props) => {
   const { subscription } = props;
-  const revisionBy = getConfig(['systemItems', 'subscription', 'uniqueField'], '');
   const collection = getConfig(['systemItems', 'subscription', 'collection'], '');
-  const key = subscription.get(revisionBy, '');
+  const key = toImmutableList(getConfig(['systemItems', 'subscription', 'uniqueField'], ''))
+    .map(revisionBy => subscription.get(revisionBy, ''))
+    .join('_');
   const revisions = state.entityList.revisions.getIn([collection, key]);
   const mode = (!subscription || !getItemId(subscription, false)) ? 'create' : getItemMode(subscription);
   return ({

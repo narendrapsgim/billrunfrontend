@@ -7,7 +7,7 @@ import { Form, FormGroup, Button, ControlLabel, Label } from 'react-bootstrap';
 import { RevisionTimeline, ModalWrapper } from '../Elements';
 import RevisionList from '../RevisionList';
 import Field from '../Field';
-import { getItemDateValue, getConfig, getItemId } from '../../common/Util';
+import { getItemDateValue, getConfig, getItemId, toImmutableList } from '../../common/Util';
 import { getSettings } from '../../actions/settingsActions';
 import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 import { entityMinFrom } from '../../selectors/entitySelector';
@@ -110,6 +110,9 @@ class EntityRevisionDetails extends Component {
       // i.e active_wis_last turn be editable
       this.props.reLoadItem();
     }
+    // removed revision may present in list
+    // for example: 2 revisions, current + future, after removing current future should be displayed in list
+    this.props.clearList();
   }
 
   onCloseItem = () => {
@@ -121,7 +124,7 @@ class EntityRevisionDetails extends Component {
   renderVerisionList = () => {
     const { itemName, revisions, item } = this.props;
     const { showList } = this.state;
-    const revisionBy = getConfig(['systemItems', itemName, 'uniqueField'], '');
+    const revisionBy = toImmutableList(getConfig(['systemItems', itemName, 'uniqueField'], '')).get(0, '');
     const title = `${item.get(revisionBy, '')} - Revision History`;
     return (
       <ModalWrapper title={title} show={showList} onCancel={this.hideManageRevisions} onHide={this.hideManageRevisions} labelCancel="Close">
