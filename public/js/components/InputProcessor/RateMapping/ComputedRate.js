@@ -1,15 +1,21 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import { withRouter } from 'react-router';
 import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
+import { titleCase } from 'change-case';
 import Help from '../../Help';
 import Field from '../../Field';
 import { getConfig, formatSelectOptions, getAvailableFields } from '../../../common/Util';
+import { getSettings } from '../../../actions/settingsActions';
+import { linesFieldsSelector } from '../../../selectors/settingsSelector';
 
-export default class ComputedRate extends Component {
+class ComputedRate extends Component {
   static propTypes = {
     computedLineKey: PropTypes.instanceOf(Immutable.Map),
     settings: PropTypes.instanceOf(Immutable.Map),
+    foreignFields: PropTypes.instanceOf(Immutable.List),
     onChangeComputedLineKeyType: PropTypes.func,
     onChangeComputedLineKey: PropTypes.func,
     onChangeComputedMustMet: PropTypes.func,
@@ -18,11 +24,18 @@ export default class ComputedRate extends Component {
   static defaultProps = {
     computedLineKey: Immutable.Map(),
     settings: Immutable.Map(),
+    foreignFields: Immutable.List(),
     onChangeComputedLineKeyType: () => {},
     onChangeComputedLineKey: () => {},
     onChangeComputedMustMet: () => {},
     onChangeHardCodedValue: () => {},
   };
+
+  componentWillMount() {
+    this.props.dispatch(getSettings([
+      'lines',
+    ]));
+  }
 
   getConditionResultProjectOptions = () => [
     'condition_result',
@@ -43,13 +56,17 @@ export default class ComputedRate extends Component {
   }
 
   render() {
-    const { computedLineKey, settings } = this.props;
+    const { computedLineKey, settings, foreignFields } = this.props;
     if (!computedLineKey) {
       return null;
     }
     const regexHelper = 'In case you want to run a regular expression on the computed field before calculating the rate';
     const mustMetHelper = 'This means than in case the condition is not met - a rate will not be found';
-    const lineKeyOptions = getAvailableFields(settings, [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'file', label: 'File name' }]).toJS();
+    const additionalFields = foreignFields.filter(field => field.get('available_from', '') === 'rate').map((filteredField) => {
+      const fieldName = filteredField.getIn(['foreign', 'entity'], '');
+      return { value: fieldName, label: `${titleCase(fieldName)} (foreign field)` };
+    }).toArray().concat([{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'file', label: 'File name' }]);
+    const lineKeyOptions = getAvailableFields(settings, additionalFields).toJS();
     const computedTypeRegex = computedLineKey.get('type', 'regex') === 'regex';
     const operatorExists = computedLineKey.get('operator', '') === '$exists' || computedLineKey.get('operator', '') === '$existsFalse';
     const checkboxStyle = { marginTop: 10 };
@@ -238,3 +255,9 @@ export default class ComputedRate extends Component {
     );
   }
 }
+
+const mapStateToProps = (state, props) => ({
+  foreignFields: linesFieldsSelector(state, props),
+});
+
+export default withRouter(connect(mapStateToProps)(ComputedRate));
