@@ -8,7 +8,7 @@ export default class ProductSearch extends Component {
 
   static propTypes = {
     onSelectProduct: PropTypes.func.isRequired,
-    searchFunction: PropTypes.func,
+    searchFunction: PropTypes.object,
   }
 
   static defaultProps = {

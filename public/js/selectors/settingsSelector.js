@@ -65,6 +65,12 @@ const getEmailTemplates = (state, props) => // eslint-disable-line no-unused-var
 const getEvents = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['events']);
 
+const getCollections = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['collection']);
+
+const getTemplateTokens = (state, props) => // eslint-disable-line no-unused-vars
+    state.settings.getIn(['template_token']);
+
 const getPaymentGateways = (state, props) => // eslint-disable-line no-unused-vars
     state.settings.getIn(['payment_gateways']);
 
@@ -160,11 +166,13 @@ const selectCsiOptions = (inputProssesors) => {
   return options;
 };
 
-const selectCustomKeys = (inputProssesors) => {
+const selectFielteredFields = (inputProssesors) => {
   let options = Immutable.Set();
   inputProssesors.forEach((inputProssesor) => {
-    const customKeys = inputProssesor.getIn(['parser', 'custom_keys'], Immutable.List());
-    options = options.concat(customKeys);
+    const filteredFields = inputProssesor.getIn(['parser', 'structure'], Immutable.List())
+                                          .filter(field => field.get('checked', true) === true)
+                                          .map(field => field.get('name', ''));
+    options = options.concat(filteredFields);
   });
   return options.toList();
 };
@@ -213,9 +221,9 @@ export const inputProssesorCsiOptionsSelector = createSelector(
   selectCsiOptions,
 );
 
-export const inputProssesorCustomKeysSelector = createSelector(
+export const inputProssesorfilteredFieldsSelector = createSelector(
   getInputProssesors,
-  selectCustomKeys,
+  selectFielteredFields,
 );
 
 export const inputProssesorRatingParamsSelector = createSelector(
@@ -395,6 +403,39 @@ const selectEvents = (events, usageTypesData, propertyTypes) => {
       ),
     );
 };
+
+export const templateTokenSettingsSelector = createSelector(
+  getTemplateTokens,
+  templateTokens => templateTokens,
+);
+
+export const templateTokenSettingsSelectorForEditor = createSelector(
+  templateTokenSettingsSelector,
+  (state, props, types) => types,
+  (templateTokens, types) => templateTokens
+    .filter((tokens, type) => types.includes(type))
+    .reduce((acc, tokens, type) =>
+      Immutable.List([...acc, ...tokens.map(token => `${type}::${token}`)]),
+      Immutable.List(),
+    ),
+);
+
+export const collectionSettingsSelector = createSelector(
+  getCollections,
+  collection => (collection ? collection.get('settings', Immutable.Map()) : undefined),
+);
+
+export const collectionStepsSelector = createSelector(
+  getCollections,
+  collection => (collection ? collection.get('steps', Immutable.List()) : undefined),
+);
+
+export const collectionStepsSelectorForList = createSelector(
+  collectionStepsSelector,
+  steps => (steps
+    ? steps.sortBy(item => parseFloat(item.get('do_after_days', 0)))
+    : undefined),
+);
 
 export const eventsSettingsSelector = createSelector(
   getEvents,

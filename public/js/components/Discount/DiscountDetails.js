@@ -4,6 +4,7 @@ import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock } from 'react
 import Select from 'react-select';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
+import isNumber from 'is-number';
 import { getFieldName, getConfig } from '../../common/Util';
 import Help from '../Help';
 import Field from '../Field';
@@ -57,11 +58,13 @@ export default class DiscountDetails extends Component {
   }
 
   onChangeCycles = (value) => {
-    this.props.onFieldUpdate(['cycles'], value);
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.props.onFieldUpdate(['cycles'], newValue);
   }
 
   onChangeLimit = (value) => {
-    this.props.onFieldUpdate(['limit'], value);
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.props.onFieldUpdate(['limit'], newValue);
   }
 
   onChangeAdditionalField = (field, value) => {
@@ -109,7 +112,8 @@ export default class DiscountDetails extends Component {
     if (value === null) { // removed discount
       discounts = discounts.filter((val, name) => name !== key);
     } else { // added discount
-      discounts = discounts.set(key, value);
+      const newValue = isNumber(value) ? parseFloat(value) : value;
+      discounts = discounts.set(key, newValue);
     }
     this.props.onFieldUpdate(['discount_subject', type], discounts);
   }

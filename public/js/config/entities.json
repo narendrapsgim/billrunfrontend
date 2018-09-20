@@ -53,7 +53,7 @@
   },
   "subscription": {
     "collection": "subscribers",
-    "uniqueField": "sid",
+    "uniqueField": ["sid", "aid"],
     "itemName": "subscriber",
     "itemType": "subscription",
     "itemsType": "subscriptions",

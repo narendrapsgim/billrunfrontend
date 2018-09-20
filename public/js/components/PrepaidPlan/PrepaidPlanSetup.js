@@ -35,6 +35,7 @@ import {
   getPlan,
   savePlan,
   clearPlan,
+  clearSourcePlan,
   onPlanFieldUpdate,
   onPlanTariffAdd,
   setClonePlan,
@@ -117,7 +118,7 @@ class PrepaidPlanSetup extends Component {
 
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
-    this.props.dispatch(clearEntity('planOriginal'));
+    this.props.dispatch(clearSourcePlan());
   }
 
   initDefaultValues = () => {
@@ -151,7 +152,7 @@ class PrepaidPlanSetup extends Component {
 
   fetchItem = (itemId = this.props.itemId) => {
     if (itemId) {
-      this.props.dispatch(getPlan(itemId)).then(this.afterItemReceived);
+      this.props.dispatch(getPlan(itemId, true)).then(this.afterItemReceived);
     }
   }
 
@@ -169,7 +170,6 @@ class PrepaidPlanSetup extends Component {
     if (response.status) {
       this.initRevisions();
       this.initDefaultValues();
-      this.props.dispatch(gotEntity('planOriginal', response.data[0]));
     } else {
       this.handleBack();
     }
@@ -295,6 +295,7 @@ class PrepaidPlanSetup extends Component {
           <Tab title="Override Product Price" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
               <PlanProductsPriceTab
+                itemName="plan"
                 mode={mode}
                 planRates={planRates}
                 onChangeFieldValue={this.onChangePlanField}

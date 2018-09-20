@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import moment from 'moment';
 import { escapeRegExp } from './Util';
 
@@ -446,28 +447,37 @@ export const getEntitesByKeysQuery = (entity, keyField, keys, project = {}) => {
 export const getServicesByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('services', 'name', keys, project);
 export const getProductsByKeysQuery = (keys, project = {}) => getEntitesByKeysQuery('rates', 'key', keys, project);
 
-export const getEntityRevisionsQuery = (collection, revisionBy, value, size = 9999) => {
-  let query = {};
-  const escapedValue = escapeRegExp(value);
-  switch (collection) {
-    case 'subscribers':
-      query = { [revisionBy]: escapedValue };
-      break;
-    default: query = { [revisionBy]: { $regex: `^${escapedValue}$` } };
-  }
+export const getEntityRevisionsQuery = (collection, revisionByFields, values, size = 9999) => {
+  const query = revisionByFields.reduce((queryObj, revisionByField, idx) => {
+    let value = values.get(idx, '');
+    if (typeof value === 'string') {
+      value = escapeRegExp(value);
+    }
+    switch (collection) {
+      case 'subscribers':
+        return queryObj.set(revisionByField, value);
+      default: {
+        return queryObj.set(revisionByField, { $regex: `^${value}$` });
+      }
+    }
+  }, Immutable.Map({}));
+
+  const baseProject = {
+    from: 1,
+    to: 1,
+    description: 1,
+    revision_info: 1,
+  };
+  const project = revisionByFields.reduce((projectObj, revisionByField) =>
+    projectObj.set(revisionByField, 1), Immutable.Map(baseProject));
+
   return ({
     action: 'get',
     entity: collection,
     params: [
       { sort: JSON.stringify({ from: -1 }) },
       { query: JSON.stringify(query) },
-      { project: JSON.stringify({
-        from: 1,
-        to: 1,
-        description: 1,
-        [revisionBy]: 1,
-        revision_info: 1,
-      }) },
+      { project: JSON.stringify(project) },
       { page: 0 },
       { size },
       { state: JSON.stringify([0, 1, 2]) },
@@ -667,3 +677,11 @@ export const getDashboardQuery = action => ({
   ],
 });
 // Dashboard reports queries - end
+
+export const getSubscribersQuery = aid => ({
+  action: 'get',
+  entity: 'subscribers',
+  params: [
+    { query: JSON.stringify({ aid, type: 'subscriber' }) },
+  ],
+});

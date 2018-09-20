@@ -1,8 +1,15 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import { upperCaseFirst } from 'change-case';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector, closedCycleChangesSelector } from './settingsSelector';
+import { PLAN_SOURCE } from '../reducers/planReducer';
+import { SERVICE_SOURCE } from '../reducers/serviceReducer';
 
+
+const getSourcePlan = (state, props) => state.entity.get(PLAN_SOURCE);
+
+const getSourceService = (state, props) => state.entity.get(SERVICE_SOURCE);
 
 const getPropsItem = (state, props) => props.item;
 
@@ -64,6 +71,9 @@ const getId = (state, props) => {
 };
 
 const getItem = (state, props, entityName) => {
+  if (entityName && entityName.startsWith('source')) {
+    return state.entity.get(entityName);
+  }
   switch (entityName) {
     case 'prepaid_include':
     case 'autorenew':
@@ -80,6 +90,8 @@ const getItem = (state, props, entityName) => {
     }
   }
 };
+
+const getItemSource = (state, props, entityName) => getItem(state, props, `source${upperCaseFirst(entityName)}`);
 
 export const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscriberFields) => {
   switch (item.get('entity')) {
@@ -129,6 +141,8 @@ const selectSimpleMode = (action, id, item) => {
   return 'loading';
 };
 
+const selectEntityRates = (entity = Immutable.Map()) => entity.get('rates');
+
 export const revisionsSelector = createSelector(
   getItem,
   getRevisions,
@@ -168,6 +182,11 @@ export const messageSelector = createSelector(
     }
     return undefined;
   },
+);
+
+export const itemSourceSelector = createSelector(
+  getItemSource,
+  item => item,
 );
 
 export const itemSelector = createSelector(
@@ -216,4 +235,25 @@ export const entityMinFrom = createSelector(
 export const actionSelector = createSelector(
   getAction,
   action => action || undefined
+);
+
+export const sourcePlanRatesSelector = createSelector(
+  getSourcePlan,
+  selectEntityRates,
+);
+
+export const sourceServiceRatesSelector = createSelector(
+  getSourceService,
+  selectEntityRates,
+);
+
+export const sourceEntityRatesSelector = createSelector(
+  (state, props) => props.itemName,
+  (itemName) => {
+    switch (itemName) {
+      case 'plan': return sourcePlanRatesSelector;
+      case 'service': return sourceServiceRatesSelector;
+      default: return () => {};
+    }
+  },
 );

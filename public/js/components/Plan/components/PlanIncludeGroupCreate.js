@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
+import isNumber from 'is-number';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { GroupsInclude } from '../../../FieldDescriptions';
@@ -188,15 +189,17 @@ class PlanIncludeGroupCreate extends Component {
     this.setState({ unit: newValue, error: '' });
   }
 
-  onChangeInclud = (newValue) => {
-    const error = !validateUnlimitedValue(newValue) ? this.errors.include.allowedCharacters : '';
+  onChangeInclud = (value) => {
+    const error = !validateUnlimitedValue(value) ? this.errors.include.allowedCharacters : '';
+    const newValue = isNumber(value) ? parseFloat(value) : value;
     this.setState({ include: newValue, error });
   }
 
   onChangeIncludeMonetaryBased = (e) => {
     const { value } = e.target;
     const error = !validatePriceValue(value) ? this.errors.include.allowedCharactersMonetary : '';
-    this.setState({ include: value, error });
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.setState({ include: newValue, error });
   }
 
   onChangeGroupRates = (keys) => {

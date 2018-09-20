@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import moment from 'moment';
+import isNumber from 'is-number';
 import { titleCase, sentenceCase, upperCaseFirst } from 'change-case';
 import fieldNamesConfig from '../config/fieldNames.json';
 import reportConfig from '../config/report';
@@ -7,6 +8,7 @@ import systemItemsConfig from '../config/entities.json';
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
+import collectionsConfig from '../config/collections.json';
 
 /**
  * Get data from config files
@@ -21,7 +23,7 @@ export const getConfig = (key, defaultValue = null) => {
   if (configCache.isEmpty()) {
     configCache = Immutable.fromJS(globalSetting);
   }
-  if(!configCache.has(path[0])) {
+  if (!configCache.has(path[0])) {
     switch (path[0]) {
       case 'reports': configCache = configCache.set('reports', Immutable.fromJS(reportConfig));
         break;
@@ -34,6 +36,8 @@ export const getConfig = (key, defaultValue = null) => {
       case 'events': configCache = configCache.set('events', Immutable.fromJS(eventsConfig));
         break;
       case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
+        break;
+      case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
         break;
       default: console.log(`Config caregory not exists ${path}`);
     }
@@ -224,7 +228,6 @@ export const getItemMinFromDate = (item, minDate) => {
   return undefined;
 };
 
-
 export const getRevisionStartIndex = (item, revisions) => {
   const index = revisions.findIndex(revision => getItemId(revision) === getItemId(item));
   if (index <= 0) {
@@ -238,8 +241,8 @@ export const getRevisionStartIndex = (item, revisions) => {
 
 export const formatSelectOptions = option => (
   Immutable.Map.isMap(option)
-    ? { value: option.get('value', ''), label: option.get('label', '') }
-    : { value: option, label: sentenceCase(option) }
+    ? ({ value: option.get('value', ''), label: option.get('label', '') })
+    : ({ value: option, label: sentenceCase(option) })
 );
 
 export const parseConfigSelectOptions = configOption => formatSelectOptions(
@@ -344,13 +347,16 @@ const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type
           const rangeUnit = rateStep.getIn(['uom_display', 'range'], 'counter');
           const intervalUnit = rateStep.getIn(['uom_display', 'interval'], 'counter');
           const convertedFrom = getValueByUnit(propertyTypes, usageTypes, usaget, rangeUnit, rateStep.get('from'), toBaseUnit);
+          const newFrom = isNumber(convertedFrom) ? parseFloat(convertedFrom) : convertedFrom;
           const to = rateStep.get('to');
           const convertedTo = (to === 'UNLIMITED' ? 'UNLIMITED' : getValueByUnit(propertyTypes, usageTypes, usaget, rangeUnit, to, toBaseUnit));
+          const newTo = isNumber(convertedTo) ? parseFloat(convertedTo) : convertedTo;
           const convertedInterval = getValueByUnit(propertyTypes, usageTypes, usaget, intervalUnit, rateStep.get('interval'), toBaseUnit);
+          const newInterval = isNumber(convertedInterval) ? parseFloat(convertedInterval) : convertedInterval;
           const ratePath = (type === 'product' ? [usaget, plan, 'rate', index] : [plan, usaget, 'rate', index]);
-          ratesWithMutations.setIn([...ratePath, 'from'], convertedFrom);
-          ratesWithMutations.setIn([...ratePath, 'to'], convertedTo);
-          ratesWithMutations.setIn([...ratePath, 'interval'], convertedInterval);
+          ratesWithMutations.setIn([...ratePath, 'from'], newFrom);
+          ratesWithMutations.setIn([...ratePath, 'to'], newTo);
+          ratesWithMutations.setIn([...ratePath, 'interval'], newInterval);
         });
       });
     });
@@ -494,3 +500,16 @@ export const createRateListNameByArgs = (query = Immutable.Map()) => query.reduc
 export const setFieldTitle = (field, entity) => (field.has('title')
     ? field
     : field.set('title', getFieldName(field.get('field_name', ''), getFieldNameType(entity), sentenceCase(field.get('field_name', '')))));
+
+export const toImmutableList = (value) => {
+  if ([undefined, null].includes(value)) {
+    return Immutable.List();
+  }
+  if (Array.isArray(value)) {
+    return Immutable.List([...value]);
+  }
+  if (Immutable.Iterable.isIterable(value)) {
+    return value.toList();
+  }
+  return Immutable.List([value]);
+};

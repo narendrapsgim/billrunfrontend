@@ -1,6 +1,6 @@
 import Immutable from 'immutable';
 import includeGroupsReducer from './includeGroupsReducer';
-import productReduser from './productReducer';
+import entityProductsReducer from './entityProductsReducer';
 
 import {
   ADD_GROUP, REMOVE_GROUP,
@@ -8,7 +8,6 @@ import {
 
 import {
   PLAN_PRODUCTS_REMOVE,
-  PLAN_PRODUCTS_UNDO_REMOVE,
   PLAN_PRODUCTS_RATE_UPDATE_TO,
   PLAN_PRODUCTS_RATE_UPDATE,
   PLAN_PRODUCTS_RATE_REMOVE,
@@ -28,13 +27,6 @@ import {
 } from '../actions/planActions';
 
 import {
-  PRODUCT_UPDATE_FIELD_VALUE,
-  PRODUCT_UPDATE_TO_VALUE,
-  PRODUCT_ADD_RATE,
-  PRODUCT_REMOVE_RATE,
-} from '../actions/productActions';
-
-import {
   ADD_BALANCE_NOTIFICATIONS,
   ADD_NOTIFICATION,
   REMOVE_NOTIFICATION,
@@ -46,6 +38,7 @@ import {
   REMOVE_BALANCE_THRESHOLD,
 } from '../actions/prepaidPlanActions';
 
+export const PLAN_SOURCE = 'planSource';
 
 const PLAN_CYCLE_UNLIMITED = globalSetting.planCycleUnlimitedValue;
 const defaultState = Immutable.Map();
@@ -64,36 +57,13 @@ const defaultNotification = Immutable.Map({
 export default function (state = defaultState, action) {
   switch (action.type) {
 
-    case PLAN_PRODUCTS_UNDO_REMOVE:
-      return state.setIn([...action.path, action.price]);
-
     case PLAN_PRODUCTS_REMOVE:
-      return state.deleteIn([...action.path, action.name]);
-
-    case PLAN_PRODUCTS_RATE_UPDATE_TO: {
-      const productAction = Object.assign(action, { type: PRODUCT_UPDATE_TO_VALUE });
-      return productReduser(state, productAction);
-    }
-
-    case PLAN_PRODUCTS_RATE_UPDATE: {
-      const productAction = Object.assign(action, { type: PRODUCT_UPDATE_FIELD_VALUE });
-      return productReduser(state, productAction);
-    }
-
-    case PLAN_PRODUCTS_RATE_REMOVE: {
-      const productAction = Object.assign(action, { type: PRODUCT_REMOVE_RATE });
-      return productReduser(state, productAction);
-    }
-
-    case PLAN_PRODUCTS_RATE_ADD: {
-      const productAction = Object.assign(action, { type: PRODUCT_ADD_RATE });
-      return productReduser(state, productAction);
-    }
-
-    case PLAN_PRODUCTS_RATE_INIT: {
-      const usaget = action.product.get('rates', Immutable.Map()).keySeq().first();
-      return state.setIn(action.path, action.product.getIn(['rates', usaget, 'BASE', 'rate']));
-    }
+    case PLAN_PRODUCTS_RATE_UPDATE_TO:
+    case PLAN_PRODUCTS_RATE_UPDATE:
+    case PLAN_PRODUCTS_RATE_REMOVE:
+    case PLAN_PRODUCTS_RATE_ADD:
+    case PLAN_PRODUCTS_RATE_INIT:
+      return entityProductsReducer(state, action);
 
     case REMOVE_GROUP_PLAN: {
       const includeGroupsAction = Object.assign({}, action, { type: REMOVE_GROUP });

@@ -15,6 +15,7 @@ import {
   isItemClosed,
   getItemId,
   isItemFinite,
+  toImmutableList,
 } from '../../common/Util';
 import { showSuccess } from '../../actions/alertsActions';
 import { deleteEntity, moveEntity, reopenEntity } from '../../actions/entityActions';
@@ -56,11 +57,6 @@ class RevisionList extends Component {
   isItemEditable = item => ['future'].includes(item.getIn(['revision_info', 'status'], ''))
     || (this.isItemActive(item) && this.isItemLast(item));
 
-  isItemRemovable = item => (
-    item.getIn(['revision_info', 'removable'], true) // if removable flag not exist, check status
-    && ['future', 'active'].includes(item.getIn(['revision_info', 'status'], ''))
-  );
-
   isItemMovable = item => item.getIn(['revision_info', 'movable_from'], true) || item.getIn(['revision_info', 'movable_to'], true);
 
   isItemReopenable = (item) => {
@@ -81,8 +77,6 @@ class RevisionList extends Component {
   parseEditShow = item => this.isItemEditable(item);
 
   parseViewShow = item => !this.isItemEditable(item);
-
-  parseRemoveEnable = item => this.isItemRemovable(item);
 
   parseMoveEnable = item => this.isItemMovable(item);
 
@@ -193,10 +187,10 @@ class RevisionList extends Component {
     if (response.status) {
       this.props.dispatch(showSuccess('Revision was removed'));
       const collection = getConfig(['systemItems', itemName, 'collection'], '');
-      const uniqueField = getConfig(['systemItems', itemName, 'uniqueField'], '');
-      const key = itemToRemove.get(uniqueField, '');
+      const uniqueFields = toImmutableList(getConfig(['systemItems', itemName, 'uniqueField'], Immutable.List()));
+      const keys = uniqueFields.map(uniqueField => itemToRemove.get(uniqueField, ''));
       const removedRevisionId = getItemId(itemToRemove);
-      this.props.dispatch(getRevisions(collection, uniqueField, key)); // refetch revision list because item was (changed in / added to) list
+      this.props.dispatch(getRevisions(collection, uniqueFields, keys)); // refetch revision list because item was (changed in / added to) list
       this.onClickRemoveClose();
       this.props.onDeleteItem(removedRevisionId);
     }
@@ -230,7 +224,7 @@ class RevisionList extends Component {
     }
   }
 
-  getActionHelpText = (type) => {
+  getActionHelpText = (item, type) => {
     const { itemName } = this.props;
     switch (lowerCase(type)) {
       case 'clone':
@@ -257,12 +251,12 @@ class RevisionList extends Component {
   ]
 
   getListActions = () => [
-    { type: 'view', helpText: this.getActionHelpText('view'), onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
-    { type: 'edit', helpText: this.getActionHelpText('edit'), onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
-    { type: 'clone', helpText: this.getActionHelpText('clone'), onClick: this.onClickClone },
-    { type: 'move', helpText: this.getActionHelpText('move'), onClick: this.onClickMove, enable: this.parseMoveEnable },
-    { type: 'reopen', helpText: this.getActionHelpText('reopen'), onClick: this.onClickReopen, enable: this.parseReopenEnable },
-    { type: 'remove', helpText: this.getActionHelpText('remove'), onClick: this.onClickRemove, enable: this.parseRemoveEnable },
+    { type: 'view', helpText: this.getActionHelpText, onClick: this.onClickEdit, show: this.parseViewShow, onClickColumn: 'from' },
+    { type: 'edit', helpText: this.getActionHelpText, onClick: this.onClickEdit, show: this.parseEditShow, onClickColumn: 'from' },
+    { type: 'clone', helpText: this.getActionHelpText, onClick: this.onClickClone },
+    { type: 'move', helpText: this.getActionHelpText, onClick: this.onClickMove, enable: this.parseMoveEnable },
+    { type: 'reopen', helpText: this.getActionHelpText, onClick: this.onClickReopen, enable: this.parseReopenEnable },
+    { type: 'remove', helpText: this.getActionHelpText, onClick: this.onClickRemove },
   ]
 
   renderMoveModal = () => {

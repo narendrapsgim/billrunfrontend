@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
-import { saveEntity } from './entityActions';
+import { saveEntity, gotEntity } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
 import {
   getPlanConvertedIncludes,
@@ -13,6 +13,8 @@ import {
   propertyTypeSelector,
 } from '../selectors/settingsSelector';
 
+import { SERVICE_SOURCE } from '../reducers/serviceReducer';
+
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
 export const SAVE_SERVICE = 'SAVE_SERVICE';
@@ -20,6 +22,12 @@ export const CLEAR_SERVICE = 'CLEAR_SERVICE';
 export const CLONE_RESET_SERVICE = 'CLONE_RESET_SERVICE';
 export const ADD_GROUP_SERVICE = 'ADD_GROUP_SERVICE';
 export const REMOVE_GROUP_SERVICE = 'REMOVE_GROUP_SERVICE';
+export const SERVICE_PRODUCTS_REMOVE = 'SERVICE_PRODUCTS_REMOVE';
+export const SERVICE_PRODUCTS_RATE_UPDATE_TO = 'SERVICE_PRODUCTS_RATE_UPDATE_TO';
+export const SERVICE_PRODUCTS_RATE_UPDATE = 'SERVICE_PRODUCTS_RATE_UPDATE';
+export const SERVICE_PRODUCTS_RATE_REMOVE = 'SERVICE_PRODUCTS_RATE_REMOVE';
+export const SERVICE_PRODUCTS_RATE_ADD = 'SERVICE_PRODUCTS_RATE_ADD';
+export const SERVICE_PRODUCTS_RATE_INIT = 'SERVICE_PRODUCTS_RATE_INIT';
 
 
 const gotItem = item => ({
@@ -91,7 +99,7 @@ export const saveService = (service, action) => (dispatch, getState) => {
   return dispatch(saveEntity('services', convertedService, action));
 };
 
-export const getService = id => (dispatch, getState) => {
+export const getService = (id, setSource = false) => (dispatch, getState) => {
   dispatch(startProgressIndicator());
   const query = fetchServiceByIdQuery(id);
   return apiBillRun(query)
@@ -109,6 +117,9 @@ export const getService = id => (dispatch, getState) => {
       const service = Immutable.fromJS(item);
       const convertedService = convertService(getState, service, false, false).toJS();
       dispatch(gotItem(convertedService));
+      if (setSource) {
+        dispatch(gotEntity(SERVICE_SOURCE, convertedService));
+      }
       return dispatch(apiBillRunSuccessHandler(response));
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));

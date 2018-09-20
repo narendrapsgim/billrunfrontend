@@ -12,52 +12,55 @@ import {
 } from '../common/ApiQueries';
 
 
-export const UPDATE_SETTING = 'UPDATE_SETTING';
-export const GOT_SETTINGS = 'GOT_SETTINGS';
-export const ADD_PAYMENT_GATEWAY = 'ADD_PAYMENT_GATEWAY';
-export const REMOVE_PAYMENT_GATEWAY = 'REMOVE_PAYMENT_GATEWAY';
-export const UPDATE_PAYMENT_GATEWAY = 'UPDATE_PAYMENT_GATEWAY';
-export const REMOVE_SETTING_FIELD = 'REMOVE_SETTING_FIELD';
-export const PUSH_TO_SETTING = 'PUSH_TO_SETTING';
-export const SET_FIELD_POSITION = 'SET_FIELD_POSITION';
+export const actions = {
+  UPDATE_SETTING: 'UPDATE_SETTING',
+  GOT_SETTINGS: 'GOT_SETTINGS',
+  ADD_PAYMENT_GATEWAY: 'ADD_PAYMENT_GATEWAY',
+  REMOVE_PAYMENT_GATEWAY: 'REMOVE_PAYMENT_GATEWAY',
+  UPDATE_PAYMENT_GATEWAY: 'UPDATE_PAYMENT_GATEWAY',
+  REMOVE_SETTING_FIELD: 'REMOVE_SETTING_FIELD',
+  PUSH_TO_SETTING: 'PUSH_TO_SETTING',
+  SET_FIELD_POSITION: 'SET_FIELD_POSITION',
+};
+
 
 export const addPaymentGateway = gateway => ({
-  type: ADD_PAYMENT_GATEWAY,
+  type: actions.ADD_PAYMENT_GATEWAY,
   gateway,
 });
 
 export const removePaymentGateway = gateway => ({
-  type: REMOVE_PAYMENT_GATEWAY,
+  type: actions.REMOVE_PAYMENT_GATEWAY,
   gateway,
 });
 
 export const updatePaymentGateway = gateway => ({
-  type: UPDATE_PAYMENT_GATEWAY,
+  type: actions.UPDATE_PAYMENT_GATEWAY,
   gateway,
 });
 
 export const updateSetting = (category, name, value) => ({
-  type: UPDATE_SETTING,
+  type: actions.UPDATE_SETTING,
   category,
   name,
   value,
 });
 
 export const pushToSetting = (category, value, path = null) => ({
-  type: PUSH_TO_SETTING,
+  type: actions.PUSH_TO_SETTING,
   category,
   path,
   value,
 });
 
 export const removeSettingField = (category, name) => ({
-  type: REMOVE_SETTING_FIELD,
+  type: actions.REMOVE_SETTING_FIELD,
   category,
   name,
 });
 
 const gotSettings = settings => ({
-  type: GOT_SETTINGS,
+  type: actions.GOT_SETTINGS,
   settings,
 });
 
@@ -67,7 +70,7 @@ const gotFile = (fileData, path) => {
 };
 
 export const setFieldPosition = (oldIndex, newIndex, path) => ({
-  type: SET_FIELD_POSITION,
+  type: actions.SET_FIELD_POSITION,
   oldIndex,
   newIndex,
   path,

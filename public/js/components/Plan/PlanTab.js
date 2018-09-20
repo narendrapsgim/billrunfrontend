@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { sentenceCase } from 'change-case';
+import isNumber from 'is-number';
 import { Form, FormGroup, ControlLabel, FormControl, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
 import { PlanDescription } from '../../FieldDescriptions';
 import Help from '../Help';
@@ -86,7 +87,8 @@ export default class Plan extends Component {
   }
 
   onPlanPriceUpdate = (index, value) => {
-    this.props.onChangeFieldValue(['price', index, 'price'], value);
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    this.props.onChangeFieldValue(['price', index, 'price'], newValue);
   }
 
   onChangeUpfront = (e) => {

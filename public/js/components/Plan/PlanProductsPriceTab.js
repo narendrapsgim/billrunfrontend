@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Panel, Form, Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
-import LoadingItemPlaceholder from '../Elements/LoadingItemPlaceholder';
 import PlanProduct from './components/PlanProduct';
 import PlanProductRemoved from './components/PlanProductRemoved';
 import { PlanDescription } from '../../FieldDescriptions';
@@ -11,22 +10,25 @@ import ProductSearch from './components/ProductSearch';
 import {
   getProductsByKeysQuery,
   getProductByKeyQuery,
-  getRetailProductsKeysQuery,
+  getProductsKeysQuery,
 } from '../../common/ApiQueries';
 import { showSuccess, showWarning, showInfo } from '../../actions/alertsActions';
 import { getList, clearList, pushToList } from '../../actions/listActions';
 import {
-  planProductRemove,
-  planProductsRateRemove,
-  planProductsRateAdd,
-  planProductsRateUpdate,
-  planProductsRateUpdateTo,
-  planProductsRateInit,
-} from '../../actions/planActions';
+  entityProductRemove,
+  entityProductsRateRemove,
+  entityProductsRateAdd,
+  entityProductsRateUpdate,
+  entityProductsRateUpdateTo,
+  entityProductsRateInit,
+} from '../../actions/entityProductsActions';
 import {
   usageTypesDataSelector,
   propertyTypeSelector,
 } from '../../selectors/settingsSelector';
+import {
+  sourceEntityRatesSelector,
+} from '../../selectors/entitySelector';
 import {
   getProductConvertedRates,
 } from '../../common/Util';
@@ -41,6 +43,7 @@ class PlanProductsPriceTab extends Component {
     mode: PropTypes.string,
     originalRates: PropTypes.instanceOf(Immutable.Map),
     products: PropTypes.instanceOf(Immutable.List),
+    itemName: PropTypes.string.isRequired,
     onChangeFieldValue: PropTypes.func.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
@@ -68,7 +71,7 @@ class PlanProductsPriceTab extends Component {
     if (!Immutable.is(planRates, oldPlanRates)) {
       const newProductsKeys = planRates.keySeq().filter(planRateKey =>
         // Get all products that exist in plan but not fetched from server
-        (products.findIndex(product => product.get('key', '') === planRateKey) === -1)
+        (products.findIndex(product => product.get('key', '') === planRateKey) === -1),
       );
       if (!newProductsKeys.isEmpty()) {
         this.props.dispatch(pushToList('plan_products', getProductsByKeysQuery(newProductsKeys.toArray())));
@@ -81,7 +84,7 @@ class PlanProductsPriceTab extends Component {
   }
 
   addNewProductToPlan = (newProducts) => {
-    const { products, propertyTypes, usageTypesData } = this.props;
+    const { products, propertyTypes, usageTypesData, itemName } = this.props;
     newProducts.forEach((product) => {
       const newProduct = products.find(planProd => planProd.get('key', '') === product.key);
       if (newProduct) {
@@ -89,7 +92,7 @@ class PlanProductsPriceTab extends Component {
         const productPath = ['rates', newProduct.get('key', ''), usaget, 'rate'];
         const newRates = getProductConvertedRates(propertyTypes, usageTypesData, newProduct, false);
         const newProductWithRates = !newRates.isEmpty() ? newProduct.set('rates', newRates) : newProduct;
-        this.props.dispatch(planProductsRateInit(newProductWithRates, productPath));
+        this.props.dispatch(entityProductsRateInit(itemName, newProductWithRates, productPath));
       }
     });
   }
@@ -109,7 +112,7 @@ class PlanProductsPriceTab extends Component {
   }
 
   onProductRestore = (product, productPath) => {
-    const { originalRates } = this.props;
+    const { originalRates, itemName } = this.props;
     const productName = product.get('key');
     const originalKeys = originalRates.keySeq();
     if (originalKeys.includes(productName)) {
@@ -117,13 +120,14 @@ class PlanProductsPriceTab extends Component {
       this.props.onChangeFieldValue(['rates', productName], prices);
       this.props.dispatch(showInfo(`Product ${productName} prices for this plan restored to origin state`));
     } else {
-      this.props.dispatch(planProductsRateInit(product, productPath));
+      this.props.dispatch(entityProductsRateInit(itemName, product, productPath));
       this.props.dispatch(showInfo(`Product ${productName} prices for this plan restored to BASE state`));
     }
   }
 
   onProductRemove = (productPath, productName) => {
-    this.props.dispatch(planProductRemove(productPath, productName));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductRemove(itemName, productPath, productName));
   }
 
   onProductUndoRemove = (productName) => {
@@ -134,23 +138,28 @@ class PlanProductsPriceTab extends Component {
   }
 
   onProductRemoveRate = (productPath, index) => {
-    this.props.dispatch(planProductsRateRemove(productPath, index));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateRemove(itemName, productPath, index));
   }
 
   onProductEditRate = (productPath, value) => {
-    this.props.dispatch(planProductsRateUpdate(productPath, value));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateUpdate(itemName, productPath, value));
   }
 
   onProductEditRateTo = (productPath, index, value) => {
-    this.props.dispatch(planProductsRateUpdateTo(productPath, index, value));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateUpdateTo(itemName, productPath, index, value));
   }
 
   onProductAddRate = (productPath) => {
-    this.props.dispatch(planProductsRateAdd(productPath));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateAdd(itemName, productPath));
   }
 
   onProductInitRate = (product, productPath) => {
-    this.props.dispatch(planProductsRateInit(product, productPath));
+    const { itemName } = this.props;
+    this.props.dispatch(entityProductsRateInit(itemName, product, productPath));
   }
 
   renderNoItems = () => (<Col lg={12}> No overridden prices for this plan </Col>)
@@ -170,11 +179,14 @@ class PlanProductsPriceTab extends Component {
     const { products, originalRates } = this.props;
     const removedProductKeys = this.getRemovedProductKeys();
     return removedProductKeys.map((productKey) => {
-      const prod = products.find(planProduct => planProduct.get('key', '') === productKey);
+      const prod = products.find(planProduct => planProduct.get('key', '') === productKey,
+        null,
+        Immutable.Map({ key: productKey }),
+      );
       const usaget = originalRates.get(productKey).keySeq().first();
       return (
         <PlanProductRemoved
-          key={prod.getIn(['_id', '$id'], '')}
+          key={prod.getIn(['_id', '$id'], prod.get('key', productKey))}
           usaget={usaget}
           item={prod}
           onProductUndoRemove={this.onProductUndoRemove}
@@ -196,7 +208,7 @@ class PlanProductsPriceTab extends Component {
         );
         return (
           <PlanProduct
-            key={prod.getIn(['_id', '$id'])}
+            key={prod.getIn(['_id', '$id'], prod.get('key'))}
             item={prod}
             prices={prices}
             usaget={usaget}
@@ -231,7 +243,7 @@ class PlanProductsPriceTab extends Component {
               <Panel header={panelTitle}>
                 <ProductSearch
                   onSelectProduct={this.onSelectProduct}
-                  searchFunction={getRetailProductsKeysQuery()}
+                  searchFunction={getProductsKeysQuery()}
                 />
               </Panel>
             }
@@ -247,7 +259,7 @@ class PlanProductsPriceTab extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  originalRates: state.entity.getIn(['planOriginal', 'rates']),
+  originalRates: sourceEntityRatesSelector(state, props)(state, props),
   products: state.list.get('plan_products'),
   usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),

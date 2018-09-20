@@ -16,6 +16,8 @@ import { buildRequestUrl, apiBillRun } from '../../common/Api'
 import EntityFields from '../Entity/EntityFields';
 import { getSettings } from '../../actions/settingsActions';
 import { getList } from '../../actions/listActions';
+import Credit from '../Credit/Credit';
+
 class Customer extends Component {
 
   static propTypes = {
@@ -44,7 +46,8 @@ class Customer extends Component {
     showOfflinePayement: false,
     debt: null,
     selectedCyclesNames: '',
-    expectedCyclesNames :'',
+    expectedCyclesNames: '',
+    showCreditCharge: false,
   };
 
   componentDidMount() {
@@ -118,7 +121,7 @@ class Customer extends Component {
     const { currency } = this.props;
     const { debt } = this.state;
     const debtClass = classNames('non-editable-field', {
-      'danger-red': debt < 0,
+      'danger-red': debt > 0,
     });
     return debt !== null &&
       (<FormGroup>
@@ -260,6 +263,28 @@ class Customer extends Component {
     );
   }
 
+  renderCreditCharge = () => {
+    const { customer } = this.props;
+    const { showCreditCharge } = this.state;
+    const aid = customer.get('aid', null);
+
+    return (
+      <div>
+        <Button bsSize="xsmall" className="btn-primary" onClick={this.onShowCreditCharge}>Manual charge / refund</Button>
+        { showCreditCharge && (<Credit aid={aid} onClose={this.onCloseCreditCharge} />) }
+      </div>
+    );
+  }
+
+  onShowCreditCharge = () => {
+    this.setState({ showCreditCharge: true });
+  }
+
+  onCloseCreditCharge = () => {
+    this.setState({ showCreditCharge: false });
+  }
+
+
   render() {
     const { customer, action } = this.props;
     // in update mode wait for item before render edit screen
@@ -285,7 +310,8 @@ class Customer extends Component {
             <div>See Customer <Link to={`/usage?base={"aid": ${customer.get('aid')}}`}>Usage</Link></div>
             <div>See Customer <Link to={`/invoices?base={"aid": ${customer.get('aid')}}`}>Invoices</Link> { this.renderExpectedInvoiceButton() }</div>
             { this.renderRebalanceButton() }
-
+            { <hr /> }
+            { this.renderCreditCharge() }
           </div>
         }
       </div>

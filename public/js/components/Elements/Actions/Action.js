@@ -7,11 +7,11 @@ const Action = (props) => {
   const { type, label, data, actionStyle, showIcon, actionSize, actionClass } = props;
 
   if ((typeof props.show === 'boolean' && !props.show)
-    || (typeof props.show === 'function' && !props.show(data))) {
+    || (typeof props.show === 'function' && !props.show(data, type))) {
     return null;
   }
 
-  const isEnable = (typeof props.enable === 'function') ? props.enable(data) : props.enable;
+  const isEnable = (typeof props.enable === 'function') ? props.enable(data, type) : props.enable;
 
   const iconClass = classNames('fa fa-fw', {
     'fa-eye': type === 'view',
@@ -31,7 +31,7 @@ const Action = (props) => {
   });
 
   const onClick = () => {
-    props.onClick(data);
+    props.onClick(data, type);
   };
 
   const editTooltip = (
@@ -43,7 +43,9 @@ const Action = (props) => {
     </Tooltip>
   );
 
-  const button = (
+  const button = props.renderFunc
+  ? props.renderFunc(props)
+  : (
     <Button
       onClick={onClick}
       bsStyle={actionStyle}
@@ -59,9 +61,9 @@ const Action = (props) => {
 
   return (
     <span className="action-button">
-      { (typeof props.helpText === 'string' && props.helpText !== '')
-        ? <OverlayTrigger overlay={editTooltip} placement="top">{ props.renderFunc ? props.renderFunc(props) : button }</OverlayTrigger>
-        : ( props.renderFunc ? props.renderFunc(props) : button )
+      { (props.helpText !== '')
+        ? (<OverlayTrigger overlay={editTooltip} placement="top">{ button }</OverlayTrigger>)
+        : button
       }
     </span>
   );
@@ -73,10 +75,12 @@ Action.defaultProps = {
   label: '',
   helpText: '',
   actionStyle: 'link',
+  actionSize: undefined,
   actionClass: '',
   showIcon: true,
   enable: true,
   show: true,
+  renderFunc: null,
   onClick: () => {},
 };
 
@@ -85,8 +89,8 @@ Action.propTypes = {
   data: PropTypes.any,
   label: PropTypes.string,
   showIcon: PropTypes.bool,
-  actionStyle: PropTypes.string,
-  actionSize: PropTypes.string,
+  actionStyle: PropTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger', 'link']),
+  actionSize: PropTypes.oneOf(['large', 'small', 'xsmall']),
   actionClass: PropTypes.string,
   helpText: PropTypes.oneOfType([
     PropTypes.string,
@@ -100,7 +104,8 @@ Action.propTypes = {
     PropTypes.bool,
     PropTypes.func,
   ]),
-  onClick: () => {},
+  renderFunc: PropTypes.func,
+  onClick: PropTypes.func,
 };
 
 export default Action;

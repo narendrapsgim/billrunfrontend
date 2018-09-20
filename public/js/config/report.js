@@ -1,5 +1,5 @@
 export default {
-  entities: ['usage', 'subscription', 'customer', 'logFile', 'queue', 'event'],
+  entities: ['usage', 'subscription', 'customer', 'logFile', 'queue', 'event', 'bills'],
   fields: {
     usage: [ // changes to usage will effect on queue
       // Default settings \ Example
@@ -64,6 +64,8 @@ export default {
       { id: 'balance_before', type: 'number' },
       { id: 'balance_after', type: 'number' },
       { id: 'balance_normalized', type: 'number' },
+      { id: 'start', title: 'Proration start date', type: 'date' },
+      { id: 'end', title: 'Proration end date', type: 'date' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
@@ -133,6 +135,76 @@ export default {
       },
       { id: 'in_queue_since', type: 'date' },
     ],
+    bills: [
+      { id: 'type',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: 'inv', label: 'Invoice' },
+            { value: 'rec', label: 'Payment / Transaction' },
+          ],
+        },
+        title: 'Type',
+      },
+      { id: 'cancelled', type: 'boolean', title: 'Cancelled Payment?' },
+      { id: 'cancel', type: 'string', title: 'Cancelled BillRun Transaction ID' },
+      { id: 'cancellation', type: 'boolean', title: 'Cancellation Transaction?' },
+      { id: 'rejected', type: 'boolean', title: 'Rejected Payment?' },
+      { id: 'rejection', type: 'boolean', title: 'Rejection Transaction?' },
+      { id: 'aid', type: 'number', title: 'Customer ID' },
+      { id: 'invoice_id', type: 'number', title: 'Invoice ID' },
+      { id: 'due_date', type: 'date', title: 'Due Date' },
+      { id: 'due', type: 'number', title: 'Original Due Date' },
+      { id: 'payer_name', type: 'string', title: 'Payer Name' },
+      { id: 'amount', type: 'number', title: 'Original Absolute Due Amount' },
+      { id: 'lastname', type: 'string', title: 'Customer\'s Last Name' },
+      { id: 'firstname', type: 'string', title: 'Customer\'s First Name' },
+      { id: 'payment_method', type: 'string', title: 'Payment Method' },
+      { id: 'urt', type: 'date', title: 'Creation Time' },
+      { id: 'invoice_date', type: 'date', title: 'Invoice Date' },
+      { id: 'total_paid', type: 'number', title: 'Total Paid Amount' },
+      { id: 'left_to_pay', type: 'number', title: 'Bill Unpaid Amount' },
+      { id: 'vatable_left_to_pay', type: 'number', title: 'Bill Vatable Left Amount' },
+      { id: 'waiting_payments', type: 'number', title: 'Pending BillRun\'s Transaction ID' },
+      { id: 'paid',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: '0', label: 'Unpaid' },
+            { value: '1', label: 'Paid' },
+            { value: '2', label: 'Awaiting Payment' },
+          ],
+        },
+        title: 'Status',
+      },
+      { id: 'payment_gateway.name',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: 'CreditGuard', label: 'CreditGuard' },
+          ],
+        },
+        title: 'Payment Gateway',
+      },
+      { id: 'dir',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: 'fc', label: 'From Customer' },
+            { value: 'tc', label: 'To Customer' },
+          ],
+        },
+        title: 'Direction',
+      },
+      { id: 'gateway_details.four_digits', type: 'string', title: 'Last 4 Digits' },
+      { id: 'left', type: 'number', title: 'Bill Reserved Amount' },
+      { id: 'waiting_for_confirmation', type: 'boolean', title: 'Waiting For Confirmation?' },
+      { id: 'txid', type: 'string', title: 'BillRun Transaction ID' },
+      { id: 'vendor_response.status', type: 'string', title: 'Vendor Response Status' },
+      { id: 'last_checked_pending', type: 'date', title: 'Last Status Check' },
+      { id: 'original_txid', type: 'string', title: 'Original BillRun Transaction ID' },
+      { id: 'rejection_code', type: 'string', title: 'Rejection Code' },
+    ],
   },
   conditionsOperators: [
     { id: 'last_days', title: 'Last (days)', include: ['fieldid:urt'], type: 'number', suffix: 'Days' },
@@ -198,6 +270,12 @@ export default {
     { id: 'multiplication', title: 'Multiply by a number' },
     { id: 'default_empty', title: 'Default Value', addOption: true, options: [
       { value: 'current_time', label: 'Current Time' },
+      { value: 'current_start', label: 'Current Billing Cycle Start' },
+      { value: 'current_end', label: 'Current Billing Cycle End' },
+      { value: 'first_unconfirmed_start', label: 'First Unconfirmed Billing Cycle Start' },
+      { value: 'first_unconfirmed_end', label: 'First Unconfirmed Cycle End' },
+      { value: 'last_confirmed_start', label: 'Last Confirmed Billing Cycle Start' },
+      { value: 'last_confirmed_end', label: 'Last Confirmed Billing Cycle End' },
     ] },
     { id: 'vat_format', title: 'Vat', options: [
       { value: 'add_tax', label: 'Add Vat' },

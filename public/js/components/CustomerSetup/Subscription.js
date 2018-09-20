@@ -2,14 +2,13 @@ import React, { Component, PropTypes } from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Button, Panel } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Panel } from 'react-bootstrap';
 import Select from 'react-select';
 import moment from 'moment';
 import SubscriptionServicesDetails from './SubscriptionServicesDetails';
 import ActionButtons from '../Elements/ActionButtons';
 import Actions from '../Elements/Actions';
 import Field from '../Field';
-import Credit from '../Credit/Credit';
 import { EntityRevisionDetails } from '../Entity';
 import EntityFields from '../Entity/EntityFields';
 import {
@@ -18,6 +17,7 @@ import {
   getItemMode,
   getItemDateValue,
   buildPageTitle,
+  toImmutableList,
 } from '../../common/Util';
 
 
@@ -50,7 +50,6 @@ class Subscription extends Component {
     super(props);
     this.state = {
       subscription: props.subscription,
-      showCreditCharge: false,
       progress: false,
     };
   }
@@ -87,8 +86,8 @@ class Subscription extends Component {
       }
       return services.map((service) => {
         const serviceType = this.getServiceType(service); // 'normal', 'quantitative', 'balance_period'
-        const existingService = originServices.find(originService => originService.get('service_id', '') === service.get('service_id', ''));
-        const newService = service.get('service_id', '') === '';
+        const existingService = originServices.find(originService => originService.getIn(['ui_flags', 'serviceId'], '') === service.getIn(['ui_flags', 'serviceId'], ''));
+        const newService = service.getIn(['ui_flags', 'serviceId'], '') === '';
 
         switch (serviceType) {
           case 'normal': // New -> update to SUB from.
@@ -213,14 +212,6 @@ class Subscription extends Component {
     }
   }
 
-  onShowCreditCharge = () => {
-    this.setState({ showCreditCharge: true });
-  }
-
-  onCloseCreditCharge = () => {
-    this.setState({ showCreditCharge: false });
-  }
-
   updateSubscriptionField = (path, value) => {
     this.setState(prevState => ({ subscription: prevState.subscription.setIn(path, value) }));
   }
@@ -305,19 +296,6 @@ class Subscription extends Component {
     )]);
   }
 
-  renderCreditCharge = () => {
-    const { subscription } = this.props;
-    const { showCreditCharge } = this.state;
-    const sid = subscription.get('sid', '');
-    const aid = subscription.get('aid', '');
-    return (
-      <div>
-        <Button bsSize="xsmall" className="btn-primary" onClick={this.onShowCreditCharge}>Manual charge / refund</Button>
-        { showCreditCharge && (<Credit aid={aid} sid={sid} onClose={this.onCloseCreditCharge} />) }
-      </div>
-    );
-  }
-
   fetchItem = () => {
     const { subscription } = this.state;
     this.props.getSubscription(subscription);
@@ -357,7 +335,6 @@ class Subscription extends Component {
   render() {
     const { progress, subscription } = this.state;
     const { revisions, mode, allServices, subscription: originSubscription } = this.props;
-    const allowAddCredit = ['update', 'view', 'closeandnew'].includes(mode);
     const allowEdit = ['update', 'clone', 'closeandnew', 'create'].includes(mode);
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     const subscriptionFrom = getItemDateValue(subscription, 'from');
@@ -401,8 +378,6 @@ class Subscription extends Component {
               fieldsFilter={this.filterCustomFields}
               editable={allowEdit}
             />
-            { allowAddCredit && <hr /> }
-            { allowAddCredit && this.renderCreditCharge() }
           </Form>
         </Panel>
 
@@ -420,9 +395,10 @@ class Subscription extends Component {
 
 const mapStateToProps = (state, props) => {
   const { subscription } = props;
-  const revisionBy = getConfig(['systemItems', 'subscription', 'uniqueField'], '');
   const collection = getConfig(['systemItems', 'subscription', 'collection'], '');
-  const key = subscription.get(revisionBy, '');
+  const key = toImmutableList(getConfig(['systemItems', 'subscription', 'uniqueField'], ''))
+    .map(revisionBy => subscription.get(revisionBy, ''))
+    .join('_');
   const revisions = state.entityList.revisions.getIn([collection, key]);
   const mode = (!subscription || !getItemId(subscription, false)) ? 'create' : getItemMode(subscription);
   return ({

@@ -85,6 +85,11 @@ class Product extends Component {
     this.props.onFieldUpdate(['description'], value);
   }
 
+  onChangeAddToRetail = (e) => {
+    const { value } = e.target;
+    this.props.onFieldUpdate(['add_to_retail'], value);
+  }
+
   onChangeUsaget = (value) => {
     const { usaget } = this.props;
     this.props.onUsagetUpdate(['rates'], usaget, value);
@@ -141,8 +146,29 @@ class Product extends Component {
     this.props.onProductRateRemove(productPath, index);
   }
 
+  onChangeTariffCategory = (field, value) => {
+    if (this.isRetailRate(value)) {
+      this.setRetailRate();
+    } else {
+      this.setRetailRate(false);
+    }
+    this.onChangeAdditionalField(field, value);
+  }
+
   onChangeAdditionalField = (field, value) => {
     this.props.onFieldUpdate(field, value);
+  }
+
+  isRetailRate = (tariffCategory = null) => {
+    const { product } = this.props;
+    const category = tariffCategory === null
+      ? product.get('tariff_category')
+      : tariffCategory;
+    return category === 'retail';
+  }
+
+  setRetailRate = (value = true) => {
+    this.onChangeAddToRetail({ target: { value } });
   }
 
   //BRCD-1337 - Not in use,  Display all parameters that are not used by any input processor should still be displayed.
@@ -228,10 +254,27 @@ class Product extends Component {
               <EntityFields
                 entityName="rates"
                 entity={product}
-                onChangeField={this.onChangeAdditionalField}
+                onChangeField={this.onChangeTariffCategory}
                 fieldsFilter={this.filterTariffCategory}
                 editable={editable}
               />
+
+              { !this.isRetailRate() &&
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('add_to_retail', getFieldNameType('product'), sentenceCase('add to retail'))}
+                    <Help contents={ProductDescription.addToRetail} />
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="checkbox"
+                      onChange={this.onChangeAddToRetail}
+                      value={product.get('add_to_retail', false)}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+              }
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>

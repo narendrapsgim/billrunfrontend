@@ -11,6 +11,7 @@ import { SET_NAME,
          SET_FIELD_MAPPING,
          REMOVE_CSV_FIELD,
          REMOVE_ALL_CSV_FIELDS,
+         CHECK_ALL_FIELDS,
          ADD_CSV_FIELD,
          MAP_USAGET,
          SET_CUSETOMER_MAPPING,
@@ -38,15 +39,20 @@ import { SET_NAME,
          MOVE_CSV_FIELD_DOWN,
          MOVE_CSV_FIELD_UP,
          CHANGE_CSV_FIELD,
-	 UNSET_FIELD,
+	       UNSET_FIELD,
          SET_REALTIME_FIELD,
-         SET_REALTIME_DEFAULT_FIELD } from '../actions/inputProcessorActions';
+         SET_REALTIME_DEFAULT_FIELD,
+         SET_CHECKED_FIELD,
+         SET_FILTERED_FIELDS,
+	       REMOVE_RECEIVER,
+         ADD_RECEIVER } from '../actions/inputProcessorActions';
 
 const defaultState = Immutable.fromJS({
   file_type: '',
   usaget_type: 'static',
   delimiter: '',
   fields: [],
+  unfiltered_fields: [],
   field_widths: [],
   processor: {
     usaget_mapping: [],
@@ -55,6 +61,7 @@ const defaultState = Immutable.fromJS({
   rate_calculators: {
     retail: {},
   },
+  receiver: [],
   pricing: {},
   unify: {},
   /* receiver: {
@@ -96,10 +103,14 @@ export default function (state = defaultState, action) {
       return state.set('delimiter', action.delimiter);
 
     case SET_FIELDS:
-      if (state.get('fields').size > 0) {
-        return state.update('fields', list => [...list, ...action.fields]);
+      if (state.get('unfiltered_fields').size > 0) {
+        return state.update('unfiltered_fields', list => [...list, ...action.fields])
+                    .set('fields', Immutable.List(state.get('unfiltered_fields')
+                      .filter(field => field.get('checked') === true)
+                      .map(field => field.get('name'))));
       }
-      return state.set('fields', Immutable.fromJS(action.fields));
+      return state.set('unfiltered_fields', Immutable.fromJS(action.fields))
+                  .set('fields', Immutable.fromJS(action.fields).map(field => field.get('name')));
 
     case SET_FIELD_WIDTH:
       return state.setIn(['field_widths', index], width);
@@ -107,14 +118,30 @@ export default function (state = defaultState, action) {
     case SET_FIELD_MAPPING:
       return state.setIn(['processor', field], mapping);
 
-    case ADD_CSV_FIELD:
-      return state.update('fields', list => list.push(action.field));
+    case ADD_CSV_FIELD: {
+      const fieldToAdd = Immutable.Map({ name: field, checked: true });
+      return state.update('unfiltered_fields', list => list.push(fieldToAdd))
+                  .update('fields', list => list.push(field));
+    }
 
-    case REMOVE_CSV_FIELD:
-      return state.update('fields', list => list.remove(action.index));
+    case REMOVE_CSV_FIELD: {
+      const fieldName = state.getIn(['unfiltered_fields', index, 'name']);
+      const newState = state.update('unfiltered_fields', list => list.delete(index));
+      const indexToRemove = newState.get('fields').findIndex(field => field === fieldName);
+      if (indexToRemove !== -1) {
+        return newState.update('fields', list => list.delete(indexToRemove));
+      }
+      return newState;
+    }
 
     case REMOVE_ALL_CSV_FIELDS:
-      return state.set('fields', Immutable.List());
+      return state.set('unfiltered_fields', Immutable.List()).set('fields', Immutable.List());
+
+    case CHECK_ALL_FIELDS: {
+      const { checked } = action;
+      return state.update('unfiltered_fields', Immutable.List(), list => list.map(field => field.set('checked', checked === true)))
+                  .update('fields', Immutable.List(), list => checked ? state.get('unfiltered_fields').map(field => field.get('name')) : Immutable.List());
+    }
 
     case SET_USAGET_TYPE:
       return state
@@ -217,7 +244,7 @@ export default function (state = defaultState, action) {
       });
       const computed = state.getIn(['rate_calculators', rateCategory, usaget, priority, index, 'computed']);
       if (computed && !computed.isEmpty()) {
-        new_rating.set('computed', computed);
+        new_rating = new_rating.set('computed', computed);
       }
       return state.setIn(['rate_calculators', rateCategory, usaget, priority, index], new_rating);
 
@@ -251,6 +278,16 @@ export default function (state = defaultState, action) {
       return state.updateIn(['rate_calculators', rateCategory, usaget, priority], list => list.remove(index));
     }
 
+    case REMOVE_RECEIVER: {
+      const { index } = action;
+      return state.update('receiver', list => list.remove(index));
+    }
+
+    case ADD_RECEIVER: {
+      const newReceiver = Immutable.fromJS({});
+      return state.update('receiver', list => list.push(newReceiver));
+    }
+
     case SET_LINE_KEY:
       var { value, rateCategory, usaget } = action;
       return state.setIn(['rate_calculators', rateCategory, usaget, priority, index, 'line_key'], value);
@@ -266,7 +303,7 @@ export default function (state = defaultState, action) {
       return state.deleteIn(['rate_calculators', action.rateCategory, action.usaget, action.priority, action.index, 'computed']);
 
     case SET_RECEIVER_FIELD:
-      return state.setIn(['receiver', field], mapping);
+      return state.setIn(['receiver', index, field], mapping);
 
     case CANCEL_KEY_AUTH:
       return state.deleteIn(['receiver', 'key']);
@@ -278,21 +315,29 @@ export default function (state = defaultState, action) {
       return Immutable.fromJS(action.template);
 
     case MOVE_CSV_FIELD_UP:
-      field_to_move = field ? field : state.getIn(['fields', index]);
+      field_to_move = field ? field : state.getIn(['unfiltered_fields', index]);
       fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
       return state
-        .update('fields', list => list.delete(index).insert(index - 1, field_to_move))
+        .update('unfiltered_fields', list => list.delete(index).insert(index - 1, field_to_move))
         .update('field_widths', list => list.delete(index).insert(index - 1, fieldWidthToMove));
 
     case MOVE_CSV_FIELD_DOWN:
-      field_to_move = field ? field : state.getIn(['fields', index]);
+      field_to_move = field ? field : state.getIn(['unfiltered_fields', index]);
       fieldWidthToMove = width ? width : state.getIn(['field_widths', index]);
       return state
-        .update('fields', list => list.delete(index).insert(index + 1, field_to_move))
+        .update('unfiltered_fields', list => list.delete(index).insert(index + 1, field_to_move))
         .update('field_widths', list => list.delete(index).insert(index + 1, fieldWidthToMove));
 
-    case CHANGE_CSV_FIELD:
-      return state.update('fields', list => list.set(index, action.value));
+    case CHANGE_CSV_FIELD: {
+      const { value } = action;
+      const oldValue = state.getIn(['unfiltered_fields', index, 'name']);
+      const newState = state.updateIn(['unfiltered_fields', index], struct => struct.set('name', value));
+      const indexToChange = newState.get('fields').findIndex(field => field === oldValue);
+      if (indexToChange !== -1) {
+        return newState.update('fields', list => list.set(indexToChange, value));
+      }
+      return newState;
+    }
 
     case UNSET_FIELD:
       return state.deleteIn(action.path);
@@ -305,6 +350,22 @@ export default function (state = defaultState, action) {
 
     case SET_REALTIME_DEFAULT_FIELD:
       return state.setIn(['realtime', 'default_values', action.name], action.value);
+
+    case SET_CHECKED_FIELD: {
+      const { checked } = action;
+      const fieldName = state.getIn(['unfiltered_fields', index, 'name']);
+      const newState = state.updateIn(['unfiltered_fields', index], struct => struct.set('checked', checked));
+      return newState.update('fields', list => {
+        if (checked === false) {
+          const indexToChange = list.findIndex(field => field === fieldName);
+          if (indexToChange !== -1) {
+            return list.delete(indexToChange);
+          }
+          return list;
+        }
+        return list.push(fieldName);
+      });
+    }
 
     default:
       return state;

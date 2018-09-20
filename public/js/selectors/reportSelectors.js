@@ -9,7 +9,7 @@ import {
 } from '../common/Util';
 import {
   subscriberFieldsSelector,
-  inputProssesorCustomKeysSelector,
+  inputProssesorfilteredFieldsSelector,
   accountFieldsSelector,
   linesFieldsSelector,
   rateCategoriesSelector,
@@ -64,10 +64,9 @@ const selectReportLinesFields = (customKeys = Immutable.List(), billrunFields = 
   Immutable.List().withMutations((optionsWithMutations) => {
     // set fields from IP
     customKeys.forEach((customKey) => {
-      const fieldName = getFieldName(customKey, 'lines');
       optionsWithMutations.push(Immutable.Map({
         field_name: `uf.${customKey}`,
-        title: (fieldName === customKey) ? sentenceCase(fieldName) : fieldName,
+        title: `${getFieldName(customKey, 'lines', sentenceCase(customKey))} (User field)`,
       }));
     });
     categoryFields.forEach((customKey) => {
@@ -155,7 +154,7 @@ const mergeEntityAndReportConfigFields = (billrunConfigFields, type) => {
   .sort(sortFieldOption);
 };
 
-const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, queueFields, eventFields) => {
+const selectReportFields = (subscriberFields, accountFields, linesFileds, logFileFields, queueFields, eventFields, billsFields) => {
   // usage: linesFileds,
   // duplicate fields list by join (same fields from different collections)
   // that will be removed frm UI.
@@ -194,11 +193,12 @@ const selectReportFields = (subscriberFields, accountFields, linesFileds, logFil
   const logFile = logFileFields;
   const queue = queueFields;
   const event = eventFields;
-  return Immutable.Map({ usage, subscription, customer, logFile, queue, event });
+  const bills = billsFields;
+  return Immutable.Map({ usage, subscription, customer, logFile, queue, event, bills });
 };
 
 const reportLinesFieldsSelector = createSelector(
-  inputProssesorCustomKeysSelector,
+  inputProssesorfilteredFieldsSelector,
   linesFieldsSelector,
   rateCategoriesSelector,
   selectReportLinesFields,
@@ -240,6 +240,12 @@ const reportQueueFieldsSelector = createSelector(
   mergeEntityAndReportConfigFields,
 );
 
+const reportBillsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'bills',
+  mergeEntityAndReportConfigFields,
+);
+
 export const reportEntitiesSelector = createSelector(
   getReportEntities,
   entities => entities,
@@ -252,6 +258,7 @@ export const reportEntitiesFieldsSelector = createSelector(
   reportlogFileFieldsSelector,
   reportQueueFieldsSelector,
   reportEventFileFieldsSelector,
+  reportBillsSelector,
   selectReportFields,
 );
 

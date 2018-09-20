@@ -32,6 +32,7 @@ export const SET_LINE_KEY = 'SET_LINE_KEY';
 export const SET_COMPUTED_LINE_KEY = 'SET_COMPUTED_LINE_KEY';
 export const UNSET_COMPUTED_LINE_KEY = 'UNSET_COMPUTED_LINE_KEY';
 export const REMOVE_ALL_CSV_FIELDS = 'REMOVE_ALL_CSV_FIELDS';
+export const CHECK_ALL_FIELDS = 'CHECK_ALL_FIELDS';
 export const SET_STATIC_USAGET = 'SET_STATIC_USAGET';
 export const SET_INPUT_PROCESSOR_TEMPLATE = 'SET_INPUT_PROCESSOR_TEMPLATE';
 export const MOVE_CSV_FIELD_UP = 'MOVE_CSV_FIELD_UP';
@@ -42,6 +43,10 @@ export const SET_PARSER_SETTING = 'SET_PARSER_SETTING';
 export const SET_PROCESSOR_TYPE = 'SET_PROCESSOR_TYPE';
 export const SET_REALTIME_FIELD = 'SET_REALTIME_FIELD';
 export const SET_REALTIME_DEFAULT_FIELD = 'SET_REALTIME_DEFAULT_FIELD';
+export const SET_CHECKED_FIELD = 'SET_CHECKED_FIELD';
+export const SET_FILTERED_FIELDS = 'SET_FILTERED_FIELDS';
+export const REMOVE_RECEIVER = 'REMOVE_RECEIVER';
+export const ADD_RECEIVER = 'ADD_RECEIVER';
 
 import { showSuccess, showDanger } from './alertsActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
@@ -101,7 +106,7 @@ const convert = (settings) => {
           filters = []
         } = settings;
 
-  const connections = receiver ? (receiver.connections ? receiver.connections[0] : {}) : {};
+  const connections = receiver ? (receiver.connections ? receiver.connections: {}) : {};
   const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : [];
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
                       "static" :
@@ -115,7 +120,9 @@ const convert = (settings) => {
     csv_has_footer: parser.csv_has_footer,
     usaget_type,
     type: settings.type,
-    fields: parser.structure ? parser.structure.map(struct => struct.name) : [],
+    unfiltered_fields: parser.structure ?
+      Immutable.List(parser.structure).map(struct => Immutable.Map({ name: struct.name, checked: typeof struct.checked !== 'undefined' ? struct.checked : true })) :
+      Immutable.List(),
     field_widths,
     customer_identification_fields,
     rate_calculators,
@@ -124,6 +131,8 @@ const convert = (settings) => {
     enabled,
     filters
   };
+
+  ret.fields = Immutable.List(ret.unfiltered_fields.filter(field => field.get('checked') === true).map(field => field.get('name')));
 
   if (settings.type !== 'realtime') {
     ret.receiver = connections;
@@ -138,7 +147,11 @@ const convert = (settings) => {
       usaget_mapping = processor.usaget_mapping.map(usaget => {
 	return {
     src_field: usaget.src_field,
+<<<<<<< HEAD
     conditions: usaget.conditions !== undefined ? getMappingConditions(usaget) : [ {src_field: usaget.src_field, pattern: usaget.pattern} ],
+=======
+    conditions: usaget.conditions !== undefined ? usaget.conditions : [ {src_field: usaget.src_field, pattern: usaget.pattern} ],
+>>>>>>> dev
 	  usaget: usaget.usaget,
 	  pattern: usaget.pattern,
     unit: usaget.unit,
@@ -190,6 +203,21 @@ const convert = (settings) => {
         ret.pricing[key] = {};
       }
     }
+
+    if (filters) {
+      for (var key in ret.filters) {
+        const filter = ret.filters[key];
+        if (typeof filter.conditions !== 'undefined') {
+          for (var condition in filter.conditions) {
+            condition = filter.conditions[condition];
+            if (typeof condition.value.regex !== 'undefined') {
+              condition.value = new RegExp(`${condition.value.regex}`).toString();
+            }
+          }
+        }
+      }
+    }
+
   } else {
     ret.processor = {
       usaget_mapping: []
@@ -300,16 +328,24 @@ export function addCSVField(field) {
   };
 }
 
-export function removeCSVField(index) {
+export function removeCSVField(index, field) {
   return {
     type: REMOVE_CSV_FIELD,
-    index
+    index,
+    field,
   };
 }
 
 export function removeAllCSVFields() {
   return {
     type: REMOVE_ALL_CSV_FIELDS
+  };
+}
+
+export function checkAllFields(checked) {
+  return {
+    type: CHECK_ALL_FIELDS,
+    checked,
   };
 }
 
@@ -437,6 +473,20 @@ export function removeRatingField(rateCategory, usaget, priority, index) {
   };
 }
 
+export function removeReceiver(receiver, index) {
+  return {
+    type: REMOVE_RECEIVER,
+    receiver,
+    index,
+  };
+}
+
+export function addReceiver() {
+  return {
+    type: ADD_RECEIVER,
+  };
+}
+
 export function setLineKey(rateCategory, usaget, priority, index, value) {
   return {
     type: SET_LINE_KEY,
@@ -466,11 +516,12 @@ export function unsetComputedLineKey(rateCategory, usaget, priority, index) {
   };
 }
 
-export function setReceiverField(field, mapping) {
+export function setReceiverField(field, mapping, index) {
   return {
     type: SET_RECEIVER_FIELD,
     field,
-    mapping
+    mapping,
+    index,
   };
 }
 
@@ -501,10 +552,10 @@ export function saveInputProcessorSettings(state, parts = []) {
     "parser": {
       "type": state.get('delimiter_type'),
       "separator": state.get('delimiter'),
-      structure: state.get('fields').reduce((acc, name, idx) => {
+      structure: state.get('unfiltered_fields').reduce((acc, field, idx) => {
         const struct = (state.get('delimiter_type') === 'fixed')
-          ? Immutable.Map({ name, width: state.getIn(['field_widths', idx], '') })
-          : Immutable.Map({ name });
+          ? Immutable.Map({ name: field.get('name'), checked: field.get('checked'), width: state.getIn(['field_widths', idx], '') })
+          : Immutable.Map({ name: field.get('name'), checked: field.get('checked') });
         return acc.push(struct);
       }, Immutable.List()),
     },
@@ -548,6 +599,9 @@ export function saveInputProcessorSettings(state, parts = []) {
     if (processor.get('time_format', false)) {
       settings.processor['time_format'] = processor.get('time_format');
     }
+    if (processor.get('timezone_field', false)) {
+      settings.processor['timezone_field'] = processor.get('timezone_field');
+    }
   }
   if (customer_identification_fields) {
     settings.customer_identification_fields = customer_identification_fields.toJS();
@@ -569,9 +623,7 @@ export function saveInputProcessorSettings(state, parts = []) {
     const receiverType = receiver.get('receiver_type', 'ftp');
     settings.receiver = {
       type: receiverType,
-      connections: [
-        receiver.toJS(),
-      ],
+      connections: receiver,
     };
   }
   const defaultResponse = {
@@ -723,5 +775,14 @@ export function setRealtimeDefaultField(name, value) {
     type: SET_REALTIME_DEFAULT_FIELD,
     name,
     value
+  };
+}
+
+export function setCheckedField(index, checked, field) {
+  return {
+    type: SET_CHECKED_FIELD,
+    index,
+    checked,
+    field,
   };
 }
