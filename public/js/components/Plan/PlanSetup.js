@@ -14,7 +14,6 @@ import {
   getPlan,
   savePlan,
   clearPlan,
-  clearSourcePlan,
   onPlanFieldUpdate,
   onPlanCycleUpdate,
   onPlanTariffAdd,
@@ -99,7 +98,6 @@ class PlanSetup extends Component {
 
   componentWillUnmount() {
     this.props.dispatch(clearPlan());
-    this.props.dispatch(clearSourcePlan());
   }
 
   initDefaultValues = () => {
