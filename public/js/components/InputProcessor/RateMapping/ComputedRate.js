@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { withRouter } from 'react-router';
 import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import { titleCase } from 'change-case';
