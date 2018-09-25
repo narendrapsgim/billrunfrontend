@@ -259,7 +259,7 @@ class PlanProductsPriceTab extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  originalRates: sourceEntityRatesSelector(state, props)(state, props),
+  originalRates: sourceEntityRatesSelector(state, props, props.itemName),
   products: state.list.get('plan_products'),
   usageTypesData: usageTypesDataSelector(state, props),
   propertyTypes: propertyTypeSelector(state, props),
