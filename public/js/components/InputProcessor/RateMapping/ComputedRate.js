@@ -260,4 +260,4 @@ const mapStateToProps = (state, props) => ({
   foreignFields: linesFieldsSelector(state, props),
 });
 
-export default withRouter(connect(mapStateToProps)(ComputedRate));
+export default connect(mapStateToProps)(ComputedRate);
