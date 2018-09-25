@@ -1,10 +1,11 @@
 import Immutable from 'immutable';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { startProgressIndicator } from './progressIndicatorActions';
-import { saveEntity, gotEntity } from './entityActions';
+import { saveEntity, gotEntitySource } from './entityActions';
 import { fetchServiceByIdQuery } from '../common/ApiQueries';
 import {
   getPlanConvertedIncludes,
+  getPlanConvertedRates,
   convertServiceBalancePeriodToObject,
   convertServiceBalancePeriodToString,
 } from '../common/Util';
@@ -12,8 +13,6 @@ import {
   usageTypesDataSelector,
   propertyTypeSelector,
 } from '../selectors/settingsSelector';
-
-import { SERVICE_SOURCE } from '../reducers/serviceReducer';
 
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
@@ -91,6 +90,11 @@ const convertService = (getState, service, convertToBaseUnit, toSend) => {
       const balancePeriod = convertServiceBalancePeriodToObject(itemWithMutations);
       itemWithMutations.set('balance_period', balancePeriod);
     }
+    // convert product price override by usage-type
+    const rates = getPlanConvertedRates(propertyTypes, usageTypesData, service, toSend);
+    if (!rates.isEmpty()) {
+      itemWithMutations.set('rates', rates);
+    }
   });
 };
 
@@ -118,7 +122,7 @@ export const getService = (id, setSource = false) => (dispatch, getState) => {
       const convertedService = convertService(getState, service, false, false).toJS();
       dispatch(gotItem(convertedService));
       if (setSource) {
-        dispatch(gotEntity(SERVICE_SOURCE, convertedService));
+        dispatch(gotEntitySource('service', convertedService));
       }
       return dispatch(apiBillRunSuccessHandler(response));
     })
