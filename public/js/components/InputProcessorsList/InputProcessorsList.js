@@ -270,8 +270,8 @@ class InputProcessorsList extends Component {
     const disableProcessorConfirmMessage = `Are you sure you want to disable processor for input processor "${inputProcessorName}"?`;
     const fields = [
       { id: 'file_type', title: 'Name' },
-      { id: 'enabled', title: 'Receiver Status', parser: this.parseInputProcessorReceiveStatus, cssClass: 'list-status-col-2' },
-      { id: 'enabled', title: 'Processor Status', parser: this.parseInputProcessorProcessStatus, cssClass: 'list-status-col-2' },
+      { id: 'enabled', title: 'Receiver', parser: this.parseInputProcessorReceiveStatus, cssClass: 'list-status-col' },
+      { id: 'enabled', title: 'Processor', parser: this.parseInputProcessorProcessStatus, cssClass: 'list-status-col' },
     ];
     const actions = this.getListActions();
 

@@ -73,7 +73,6 @@ const convert = (settings) => {
           processor_enabled = true,
           filters = []
         } = settings;
-console.log('settings: ', settings);
   const connections = receiver ? (receiver.connections ? receiver.connections: {}) : {};
   const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : [];
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
