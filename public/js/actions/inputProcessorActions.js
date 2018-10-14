@@ -59,6 +59,39 @@ import _ from 'lodash';
 import Immutable from 'immutable';
 import { getSettings } from './settingsActions';
 
+function adjustCondition(condition) {
+  const op = condition.op;
+  const pattern = condition.pattern;
+
+  const adjustedCondition = condition;
+  if ((op === '$in' || op === '$nin') && (typeof pattern === 'object')) {
+    adjustedCondition.pattern = pattern.join();
+  }
+
+  return adjustedCondition;
+}
+
+function adjustPatternStructure(condition) {
+  const op = condition.get('op', false);
+  const pattern = condition.get('pattern', false);
+
+  let adjustedCondition = condition;
+  if ((op === '$in' || op === '$nin') && (typeof pattern === 'string')) {
+    adjustedCondition = condition.set('pattern', pattern.split(','));
+  }
+  return adjustedCondition;
+}
+
+function getMappingConditions(usaget) {
+  const conditions = usaget.conditions;
+  return conditions.map(condition => adjustCondition(condition));
+}
+
+function getConditionsToSave(usaget) {
+  const conditions = usaget.get('conditions');
+  return conditions.map(condition => adjustPatternStructure(condition));
+}
+
 const convert = (settings) => {
   const { parser = {},
           processor = {},
@@ -114,7 +147,7 @@ const convert = (settings) => {
       usaget_mapping = processor.usaget_mapping.map(usaget => {
 	return {
     src_field: usaget.src_field,
-    conditions: usaget.conditions !== undefined ? usaget.conditions : [ {src_field: usaget.src_field, pattern: usaget.pattern} ],
+    conditions: usaget.conditions !== undefined ? getMappingConditions(usaget) : [ {src_field: usaget.src_field, pattern: usaget.pattern} ],
 	  usaget: usaget.usaget,
 	  pattern: usaget.pattern,
     unit: usaget.unit,
@@ -496,7 +529,6 @@ export function cancelKeyAuth(field) {
   };
 }
 
-
 export function saveInputProcessorSettings(state, parts = []) {
   const action = (parts.length === 0) ? 'set' : 'validate';
   const processor = state.get('processor'),
@@ -540,7 +572,7 @@ export function saveInputProcessorSettings(state, parts = []) {
     : {
       usaget_mapping: processor.get('usaget_mapping').map(usaget => ({
         src_field: usaget.get('src_field'),
-        conditions: usaget.get('conditions'),
+        conditions: getConditionsToSave(usaget),
         pattern: usaget.get('pattern'),
         usaget: usaget.get('usaget'),
         unit: usaget.get('unit'),
