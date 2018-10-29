@@ -8,6 +8,7 @@
 		{ "key": "$lte", "title": "Is Less Than Or Equal" },
 		{ "key": "$gt", "title": "Is Greater Than" },
 		{ "key": "$gte", "title": "Is Greater Than Or Equal" },
+		{ "key": "$in", "title": "Is Included In" },
 		{ "key": "$regex", "title": "Matches regular expression" }
 	]
 }
