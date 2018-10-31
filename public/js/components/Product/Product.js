@@ -288,7 +288,20 @@ class Product extends Component {
                         onChangeUnit={this.onChangeUnit}
                       />
                     )
-                    : <div className="non-editable-field">{ `${usaget} ${unitLabel}` }</div>
+                    : (
+                      <div>
+                        <Col sm={1} style={{ paddingTop: 7 }}>{usaget}</Col>
+                        <Col sm={2} componentClass={ControlLabel}>Units of Measure</Col>
+                        <Col sm={2}>
+                          <UsageTypesSelector
+                            usaget={usaget}
+                            unit={unit}
+                            onChangeUsaget={this.onChangeUsaget}
+                            onChangeUnit={this.onChangeUnit}
+                            showSelectTypes={false}
+                          />
+                        </Col>
+                      </div>)
                   }
                 </Col>
               </FormGroup>
