@@ -67,6 +67,7 @@ class CustomFields extends Component {
   };
 
   componentDidMount() {
+    this.props.dispatch(getSettings(['plays']));
     this.fetchFields();
   }
 

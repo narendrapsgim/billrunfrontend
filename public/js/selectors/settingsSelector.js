@@ -259,6 +259,11 @@ export const playsSettingsSelector = createSelector(
   plays => plays,
 );
 
+export const availablePlaysSettingsSelector = createSelector(
+  getPlaysSettings,
+  plays => (plays ? plays.filter(play => play.get('enabled', true)) : undefined),
+);
+
 export const closedCycleChangesSelector = createSelector(
   systemSettingsSelector,
   (system = Immutable.Map()) => system.get('closed_cycle_changes'),
