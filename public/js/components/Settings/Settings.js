@@ -6,6 +6,7 @@ import { Tabs, Tab, Panel } from 'react-bootstrap';
 import DateTime from './DateTime';
 import Currency from './Currency';
 import Invoicing from './Invoicing';
+import Plays from './Plays';
 import Tax from './Tax';
 import Tenant from './Tenant';
 import Security from './Security';
@@ -20,6 +21,7 @@ import {
   inputProssesorCsiOptionsSelector,
   taxationSelector,
   systemSettingsSelector,
+  playsSettingsSelector,
 } from '../../selectors/settingsSelector';
 
 
@@ -31,6 +33,7 @@ class Settings extends Component {
     csiOptions: Immutable.List(),
     taxation: Immutable.Map(),
     system: Immutable.Map(),
+    plays: Immutable.List(),
   };
 
   static propTypes = {
@@ -43,6 +46,7 @@ class Settings extends Component {
     csiOptions: PropTypes.instanceOf(Immutable.Iterable),
     taxation: PropTypes.instanceOf(Immutable.Map),
     system: PropTypes.instanceOf(Immutable.Map),
+    plays: PropTypes.instanceOf(Immutable.List),
     router: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
@@ -52,7 +56,7 @@ class Settings extends Component {
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types', 'system']));
+    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types', 'system', 'plays']));
     this.props.dispatch(getCurrencies()).then(this.initCurrencyOptions);
   }
 
@@ -118,6 +122,9 @@ class Settings extends Component {
     if (settings.has('system')) {
       categoryToSave.push('system');
     }
+    if (settings.has('plays')) {
+      categoryToSave.push('plays');
+    }
     if (categoryToSave.length) {
       this.props.dispatch(saveSettings(categoryToSave))
         .then((response) => {
@@ -150,7 +157,7 @@ class Settings extends Component {
   }
 
   render() {
-    const { settings, activeTab, csiOptions, taxation, system } = this.props;
+    const { settings, activeTab, csiOptions, taxation, system, plays } = this.props;
     const { currencyOptions } = this.state;
 
     const currency = settings.getIn(['pricing', 'currency'], '');
@@ -209,13 +216,19 @@ class Settings extends Component {
             </Panel>
           </Tab>
 
-          <Tab title="Activity Types" eventKey={7}>
+          <Tab title="Plays" eventKey={7}>
+            <Panel style={{ borderTop: 'none' }}>
+              <Plays onChange={this.onChangeFieldValue} data={plays} />
+            </Panel>
+          </Tab>
+
+          <Tab title="Activity Types" eventKey={8}>
             <Panel style={{ borderTop: 'none' }}>
               <UsageTypes />
             </Panel>
           </Tab>
 
-          <Tab title="System" eventKey={8}>
+          <Tab title="System" eventKey={9}>
             <Panel style={{ borderTop: 'none' }}>
               <System onChange={this.onChangeFieldValue} data={system} />
             </Panel>
@@ -236,5 +249,6 @@ const mapStateToProps = (state, props) => ({
   csiOptions: inputProssesorCsiOptionsSelector(state, props),
   taxation: taxationSelector(state, props),
   system: systemSettingsSelector(state, props),
+  plays: playsSettingsSelector(state, props),
 });
 export default withRouter(connect(mapStateToProps)(Settings));
