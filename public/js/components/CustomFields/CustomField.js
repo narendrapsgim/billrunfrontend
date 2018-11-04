@@ -110,7 +110,8 @@ class CustomField extends Component {
     const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'field')} Details`);
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
     const isBoolean = this.isBoolean(field);
-    const showPlays = ['subscriber'].includes(entity);
+    const playsOptions = this.getPlayOptions();
+    const showPlays = ['subscriber'].includes(entity) && playsOptions.length > 1;
     const plays = field.get('plays', []).join(',');
 
     const disableUnique = isBoolean || !this.hasEditableField('unique');
@@ -133,7 +134,7 @@ class CustomField extends Component {
             <Col sm={9} style={checkboxStyle}>
               <Field
                 fieldType="select"
-                options={this.getPlayOptions()}
+                options={playsOptions}
                 onChange={this.onChangePlay}
                 value={plays}
                 multi={true}
