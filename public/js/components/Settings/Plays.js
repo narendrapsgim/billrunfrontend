@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { Form, Button, Table } from 'react-bootstrap';
 import Field from '../Field';
-import { Actions }  from '../Elements';
+import { Actions } from '../Elements';
 
 export default class Plays extends Component {
 
@@ -25,15 +25,14 @@ export default class Plays extends Component {
     this.props.onChange('plays', [index, 'label'], value);
   }
 
-  onChangePlayDefault = index => (e) => {
+  onChangePlayDefault = index => () => {
     const { data } = this.props;
-    const { value } = e.target;
     data.forEach((play, i) => {
       if (play.get('default', true)) {
         this.props.onChange('plays', [i, 'default'], false);
       }
     });
-    this.props.onChange('plays', [index, 'default'], value);
+    this.props.onChange('plays', [index, 'default'], true);
   }
 
   onAddPlay = () => {
@@ -64,6 +63,17 @@ export default class Plays extends Component {
     { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickDisable(index), show: this.parseShowDisable },
   ];
 
+  getDefaultIndex = () => {
+    const { data } = this.props;
+    let ret = 0;
+    data.forEach((play, i) => {
+      if (play.get('default', true)) {
+        ret = i;
+      }
+    });
+    return ret;
+  }
+
   renderPlay = (play, index) => (<tr key={index}>
     <td>
       { play.get('can_edit_name', false)
@@ -88,9 +98,10 @@ export default class Plays extends Component {
     </td>
     <td>
       <Field
-        fieldType="checkbox"
+        fieldType="radio"
+        name="default-play"
         onChange={this.onChangePlayDefault(index)}
-        value={play.get('default', true)}
+        checked={this.getDefaultIndex() === index}
       />
     </td>
   </tr>);
