@@ -16,7 +16,12 @@ export default class Plays extends Component {
 
   onChangePlayName = index => (e) => {
     const { value } = e.target;
-    this.props.onChange('plays', [index, 'name'], value);
+    this.props.onChange('plays', [index, 'name'], value.toUpperCase().replace(globalSetting.keyUppercaseCleanRegex, ''));
+  }
+
+  onChangePlayLabel = index => (e) => {
+    const { value } = e.target;
+    this.props.onChange('plays', [index, 'label'], value);
   }
 
   onChangePlayEnabled = index => (e) => {
@@ -39,17 +44,28 @@ export default class Plays extends Component {
     const { data } = this.props;
     const newPlay = Immutable.Map({
       name: '',
+      label: '',
       enabled: true,
       default: false,
+      can_edit_name: true,
     });
     this.props.onChange('plays', data.size, newPlay);
   }
 
   renderPlay = (play, index) => (<tr key={index}>
     <td>
+      { play.get('can_edit_name', false)
+        ? (<Field
+          onChange={this.onChangePlayName(index)}
+          value={play.get('name', '')}
+        />)
+        : play.get('name', '')
+    }
+    </td>
+    <td>
       <Field
-        onChange={this.onChangePlayName(index)}
-        value={play.get('name', '')}
+        onChange={this.onChangePlayLabel(index)}
+        value={play.get('label', '')}
       />
     </td>
     <td>
@@ -78,6 +94,7 @@ export default class Plays extends Component {
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Label</th>
                 <th>Enabled</th>
                 <th>Default</th>
               </tr>

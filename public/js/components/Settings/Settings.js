@@ -123,6 +123,8 @@ class Settings extends Component {
       categoryToSave.push('system');
     }
     if (settings.has('plays')) {
+      const playsToSave = settings.get('plays').map(play => play.remove('can_edit_name'));
+      this.props.dispatch(updateSetting('plays', [], playsToSave));
       categoryToSave.push('plays');
     }
     if (categoryToSave.length) {
