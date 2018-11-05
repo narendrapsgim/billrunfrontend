@@ -276,7 +276,7 @@ class Subscription extends Component {
 
   getPlayOptions = () => (this.props.availablePlays.map(play => ({
     value: play.get('name', ''),
-    label: play.get('name', ''),
+    label: play.get('label', play.get('name', '')),
   })).toArray());
 
   renderPlays = (editable) => {
