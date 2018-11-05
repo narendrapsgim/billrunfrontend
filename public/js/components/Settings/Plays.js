@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { Form, Button, Table } from 'react-bootstrap';
 import Field from '../Field';
+import { Actions }  from '../Elements';
 
 export default class Plays extends Component {
 
@@ -22,11 +23,6 @@ export default class Plays extends Component {
   onChangePlayLabel = index => (e) => {
     const { value } = e.target;
     this.props.onChange('plays', [index, 'label'], value);
-  }
-
-  onChangePlayEnabled = index => (e) => {
-    const { value } = e.target;
-    this.props.onChange('plays', [index, 'enabled'], value);
   }
 
   onChangePlayDefault = index => (e) => {
@@ -52,6 +48,22 @@ export default class Plays extends Component {
     this.props.onChange('plays', data.size, newPlay);
   }
 
+  onClickEnable = index => () => {
+    this.props.onChange('plays', [index, 'enabled'], true);
+  }
+
+  onClickDisable = index => () => {
+    this.props.onChange('plays', [index, 'enabled'], false);
+  }
+
+  parseShowEnable = play => !play.get('enabled', true);
+  parseShowDisable = play => !this.parseShowEnable(play);
+
+  getListActions = index => [
+    { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.onClickEnable(index), show: this.parseShowEnable },
+    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickDisable(index), show: this.parseShowDisable },
+  ];
+
   renderPlay = (play, index) => (<tr key={index}>
     <td>
       { play.get('can_edit_name', false)
@@ -69,10 +81,9 @@ export default class Plays extends Component {
       />
     </td>
     <td>
-      <Field
-        fieldType="checkbox"
-        onChange={this.onChangePlayEnabled(index)}
-        value={play.get('enabled', true)}
+      <Actions
+        actions={this.getListActions(index)}
+        data={play}
       />
     </td>
     <td>
