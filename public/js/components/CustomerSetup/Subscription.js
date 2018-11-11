@@ -252,7 +252,7 @@ class Subscription extends Component {
 
   filterCustomFields = (field) => {
     const { subscription } = this.state;
-    const hiddenFields = ['plan', 'services'];
+    const hiddenFields = ['plan', 'services', 'play'];
     const isCustomField = !hiddenFields.includes(field.get('field_name'));
     const isEditable = field.get('editable', false);
     const isMandatory = field.get('mandatory', false);
