@@ -102,10 +102,10 @@ const convert = (settings) => {
           realtime = {},
           response = {},
           unify = {},
-          enabled = true,
+          receiver_enabled = true,
+          processor_enabled = true,
           filters = []
         } = settings;
-
   const connections = receiver ? (receiver.connections ? receiver.connections: {}) : {};
   const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : [];
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
@@ -128,7 +128,8 @@ const convert = (settings) => {
     rate_calculators,
     pricing,
     unify,
-    enabled,
+    receiver_enabled: settings.receiver_enabled,
+    processor_enabled: settings.processor_enabled,
     filters
   };
 
@@ -539,7 +540,8 @@ export function saveInputProcessorSettings(state, parts = []) {
         receiver = state.get('receiver'),
         realtime = state.get('realtime', Immutable.Map()),
         response = state.get('response', Immutable.Map()),
-        enabled = state.get('enabled'),
+        receiver_enabled = state.get('receiver_enabled', true),
+        processor_enabled = state.get('processor_enabled', true),
         filters = state.get('filters');
 
   const settings = {
@@ -555,6 +557,8 @@ export function saveInputProcessorSettings(state, parts = []) {
         return acc.push(struct);
       }, Immutable.List()),
     },
+    receiver_enabled: state.get('receiver_enabled', true),
+    processor_enabled: state.get('processor_enabled', true),
   };
 
   if (state.get('delimiter') !== 'json') {
@@ -611,7 +615,6 @@ export function saveInputProcessorSettings(state, parts = []) {
   if (unify) {
     settings.unify = unify.toJS();
   }
-  settings.enabled = enabled !== undefined ? enabled : true;
   if (filters) {
     settings.filters = filters.toJS();
   }
@@ -686,16 +689,16 @@ export function clearInputProcessor() {
 }
 
 export const deleteInputProcessor = fileType => (dispatch) => {
-  const query = getInputProcessorActionQuery(fileType, 'unset');
+  const query = getInputProcessorActionQuery(fileType, 'unset', null);
   dispatch(startProgressIndicator());
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error occured while trying to delete input processor')));
 };
 
-export const updateInputProcessorEnabled = (fileType, enabled) => (dispatch) => {
+export const updateInputProcessorEnabled = (fileType, part, enabled) => (dispatch) => {
   const action = (enabled ? 'enable' : 'disable');
-  const query = getInputProcessorActionQuery(fileType, action);
+  const query = getInputProcessorActionQuery(fileType, action, part);
   dispatch(startProgressIndicator());
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
