@@ -23,6 +23,9 @@ import {
   systemSettingsSelector,
   playsSettingsSelector,
 } from '../../selectors/settingsSelector';
+import {
+  getPlaysInUse,
+} from '../../actions/customerActions';
 
 
 class Settings extends Component {
@@ -53,11 +56,13 @@ class Settings extends Component {
 
   state = {
     currencyOptions: [],
+    playsInUse: Immutable.List(),
   };
 
   componentWillMount() {
     this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types', 'system', 'plays']));
     this.props.dispatch(getCurrencies()).then(this.initCurrencyOptions);
+    this.props.dispatch(getPlaysInUse()).then(this.initPlaysInUse);
   }
 
   initCurrencyOptions = (response) => {
@@ -67,6 +72,12 @@ class Settings extends Component {
         value: currency.get('code', ''),
       })).toArray();
       this.setState({ currencyOptions });
+    }
+  }
+
+  initPlaysInUse = (response) => {
+    if (response.status) {
+      this.setState({ playsInUse: Immutable.List(response.data) });
     }
   }
 
@@ -160,7 +171,7 @@ class Settings extends Component {
 
   render() {
     const { settings, activeTab, csiOptions, taxation, system, plays } = this.props;
-    const { currencyOptions } = this.state;
+    const { currencyOptions, playsInUse } = this.state;
 
     const currency = settings.getIn(['pricing', 'currency'], '');
     const datetime = settings.get('billrun', Immutable.Map());
@@ -220,7 +231,7 @@ class Settings extends Component {
 
           <Tab title="Plays" eventKey={7}>
             <Panel style={{ borderTop: 'none' }}>
-              <Plays onChange={this.onChangeFieldValue} data={plays} />
+              <Plays onChange={this.onChangeFieldValue} data={plays} inUse={playsInUse} />
             </Panel>
           </Tab>
 

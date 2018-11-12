@@ -2,18 +2,25 @@ import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { Form, Button, Table } from 'react-bootstrap';
 import Field from '../Field';
-import { Actions } from '../Elements';
+import { Actions, ConfirmModal } from '../Elements';
 
 export default class Plays extends Component {
 
   static propTypes = {
     data: React.PropTypes.instanceOf(Immutable.List),
+    inUse: React.PropTypes.instanceOf(Immutable.List),
     onChange: React.PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     data: Immutable.List(),
+    inUse: Immutable.List(),
   };
+
+  state = {
+    indexToRemove: null,
+    indexToDisable: null,
+  }
 
   onChangePlayName = index => (e) => {
     const { value } = e.target;
@@ -52,15 +59,47 @@ export default class Plays extends Component {
   }
 
   onClickDisable = index => () => {
-    this.props.onChange('plays', [index, 'enabled'], false);
+    this.setState({ indexToDisable: index });
   }
+
+  onClickRemove = index => () => {
+    this.setState({ indexToRemove: index });
+  }
+
+  onClickRemoveOk = () => {
+    const { data } = this.props;
+    const { indexToRemove } = this.state;
+    this.setState({ indexToRemove: null });
+    this.props.onChange('plays', [], data.delete(indexToRemove));
+  }
+
+  onClickRemoveCancel = () => {
+    this.setState({ indexToRemove: null });
+  }
+
+  onClickDisableOk = () => {
+    const { indexToDisable } = this.state;
+    this.setState({ indexToDisable: null });
+    this.props.onChange('plays', [indexToDisable, 'enabled'], false);
+  }
+
+  onClickDisableCancel = () => {
+    this.setState({ indexToDisable: null });
+  }
+
+  isPlayInUse = play => this.props.inUse.contains(play.get('name', ''));
 
   parseShowEnable = play => !play.get('enabled', true);
   parseShowDisable = play => !this.parseShowEnable(play);
+  parseShowRemove = play => !this.isPlayInUse(play);
 
-  getListActions = index => [
+  getListEnabledActions = index => [
     { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.onClickEnable(index), show: this.parseShowEnable },
-    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickDisable(index), show: this.parseShowDisable },
+    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickDisable(index), show: this.parseShowDisable, enable: this.parseShowRemove },
+  ];
+
+  getListRemoveActions = index => [
+    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove(index), enable: this.parseShowRemove },
   ];
 
   getDefaultIndex = () => {
@@ -92,7 +131,7 @@ export default class Plays extends Component {
     </td>
     <td>
       <Actions
-        actions={this.getListActions(index)}
+        actions={this.getListEnabledActions(index)}
         data={play}
       />
     </td>
@@ -104,10 +143,19 @@ export default class Plays extends Component {
         checked={this.getDefaultIndex() === index}
       />
     </td>
+    <td>
+      <Actions
+        actions={this.getListRemoveActions(index)}
+        data={play}
+      />
+    </td>
   </tr>);
 
   render() {
     const { data } = this.props;
+    const { indexToRemove, indexToDisable } = this.state;
+    const removeConfirmMessage = `Are you sure you want to remove Play "${data.getIn([indexToRemove, 'name'], '')}"?`;
+    const disableConfirmMessage = `Are you sure you want to disable Play "${data.getIn([indexToDisable, 'name'], '')}"?`;
 
     return (
       <div className="Plays">
@@ -119,12 +167,16 @@ export default class Plays extends Component {
                 <th>Label</th>
                 <th>Enabled</th>
                 <th>Default</th>
+                <th>Remove</th>
               </tr>
             </thead>
             <tbody>
               { data.map(this.renderPlay) }
             </tbody>
           </Table>
+
+          <ConfirmModal onOk={this.onClickRemoveOk} onCancel={this.onClickRemoveCancel} show={indexToRemove !== null} message={removeConfirmMessage} labelOk="Yes" />
+          <ConfirmModal onOk={this.onClickDisableOk} onCancel={this.onClickDisableCancel} show={indexToDisable !== null} message={disableConfirmMessage} labelOk="Yes" />
 
           <Button bsSize="xsmall" className="btn-primary" onClick={this.onAddPlay}>
             <i className="fa fa-plus" />&nbsp;Add New Play
