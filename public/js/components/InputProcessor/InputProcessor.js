@@ -330,8 +330,8 @@ class InputProcessor extends Component {
     this.props.dispatch(setReceiverField(id, value, index));
   }
 
-  onCancelKeyAuth = () => {
-    this.props.dispatch(cancelKeyAuth('key'));
+  onCancelKeyAuth = (index) => {
+    this.props.dispatch(cancelKeyAuth('key', index));
   }
 
   onSetReceiverCheckboxField = (id, checked, index) => {
