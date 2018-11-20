@@ -14,6 +14,9 @@ export const buildBalanceConditionPath = (trigger, limitation, params = {}) => {
     case 'group':
       return `balance.groups.${params.groupName}.${trigger}`;
     case 'activity_type':
+      if (params.hasOwnProperty('overGroup') && params.overGroup === 'over_group') {
+        return `balance.totals.${params.activityType}.over_group.${trigger}`;
+      }
       return `balance.totals.${params.activityType}.${trigger}`;
     case 'none':
     default:
@@ -33,17 +36,33 @@ export const getLimitationFromBalanceConditionPath = (path) => {
   return 'none';
 };
 
-export const getActivityTypeFromBalanceConditionPath = (path, limitation) =>
-  (limitation === 'activity_type' ? path.substring(path.lastIndexOf('.totals.') + 8, path.lastIndexOf('.')) : '');
+export const getOverGroupFromBalanceConditionPath = (path) => {
+  if (path.indexOf('.over_group.') !== -1) {
+    return 'over_group';
+  }
+  return 'none';
+};
+
+export const getActivityTypeFromBalanceConditionPath = (path, limitation) => {
+  if (limitation !== 'activity_type') {
+    return '';
+  }
+  const limit = getOverGroupFromBalanceConditionPath(path) === 'over_group'
+    ? path.lastIndexOf('.over_group')
+    : path.lastIndexOf('.');
+  return path.substring(path.lastIndexOf('.totals.') + 8, limit);
+};
 
 export const getGroupFromBalanceConditionPath = (path, limitation) =>
   (limitation === 'group' ? path.substring(path.lastIndexOf('.groups.') + 8, path.lastIndexOf('.')) : '');
 
 export const getPathParams = (path) => {
   const limitation = getLimitationFromBalanceConditionPath(path);
+  const overGroup = getOverGroupFromBalanceConditionPath(path);
   return {
     trigger: getTriggerFromBalanceConditionPath(path),
     limitation,
+    overGroup,
     activityType: getActivityTypeFromBalanceConditionPath(path, limitation),
     groupName: getGroupFromBalanceConditionPath(path, limitation),
   };
@@ -68,7 +87,10 @@ export const getConditionValue = (condition, params) => {
 
 export const getConditionDescription = (conditionType, condition, params) => {
   const { trigger, limitation, activityType, groupName } = getPathParams(condition.get('path', ''));
-  const pref = trigger === 'usagev' ? 'Usage' : 'Cost';
+  let pref = trigger === 'usagev' ? 'Usage' : 'Cost';
+  if (condition && condition.get('path', '').indexOf('over_group') !== -1) {
+    pref = `Exceeding ${pref.toLowerCase()}`;
+  }
   switch (limitation) {
     case 'group':
       return `${pref} of group ${groupName} ${getConditionName(condition)} ${getConditionValue(condition, params)}`;

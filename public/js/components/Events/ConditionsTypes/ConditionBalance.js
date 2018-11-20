@@ -28,6 +28,7 @@ class EventFormBalance extends Component {
     limitation: PropTypes.string,
     activityType: PropTypes.string,
     groupName: PropTypes.string,
+    overGroup: PropTypes.string,
     groupsOptions: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
@@ -43,6 +44,7 @@ class EventFormBalance extends Component {
     limitation: '',
     activityType: '',
     groupName: '',
+    overGroup: 'none',
     groupsOptions: Immutable.List(),
     propertyTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
@@ -62,7 +64,7 @@ class EventFormBalance extends Component {
     const { onChangeField, item, index, limitation } = this.props;
     const { value } = e.target;
     const limitationToSave = (value === 'usagev' && limitation === 'none' ? 'group' : limitation);
-    const path = buildBalanceConditionPath(value, limitationToSave, { activityType: '', groupName: '' });
+    const path = buildBalanceConditionPath(value, limitationToSave, { activityType: '', groupName: '', overGroup: '' });
     const condition = item.withMutations((itemWithMutation) => {
       itemWithMutation.set('path', path);
       itemWithMutation.set('unit', '');
@@ -71,16 +73,23 @@ class EventFormBalance extends Component {
     onChangeField(['conditions', index], condition);
   };
 
+  onChangeOverGroup = (e) => {
+    const { onChangeField, index, trigger, activityType, groupName, limitation } = this.props;
+    const { value } = e.target;
+    const path = buildBalanceConditionPath(trigger, limitation, { activityType, groupName, overGroup: value });
+    onChangeField(['conditions', index, 'path'], path);
+  }
+
   onChangeLimitation = (e) => {
     const { onChangeField, index, trigger, activityType, groupName } = this.props;
     const { value } = e.target;
-    const path = buildBalanceConditionPath(trigger, value, { activityType, groupName });
+    const path = buildBalanceConditionPath(trigger, value, { activityType, groupName, overGroup: '' });
     onChangeField(['conditions', index, 'path'], path);
   };
 
   onChangeActivityType = (value) => {
-    const { onChangeField, item, index, trigger, limitation } = this.props;
-    const path = buildBalanceConditionPath(trigger, limitation, { activityType: value, groupName: '' });
+    const { onChangeField, item, index, trigger, limitation, overGroup } = this.props;
+    const path = buildBalanceConditionPath(trigger, limitation, { activityType: value, groupName: '', overGroup });
     const condition = item.withMutations((itemWithMutation) => {
       itemWithMutation.set('path', path);
       itemWithMutation.set('unit', '');
@@ -157,6 +166,7 @@ class EventFormBalance extends Component {
       limitation,
       activityType,
       groupName,
+      overGroup,
       propertyTypes,
       usageTypesData,
       currency,
@@ -272,6 +282,34 @@ class EventFormBalance extends Component {
               />
             </Col>
           </Col>
+          { trigger === 'usagev' && limitation === 'activity_type' && (
+            <Col sm={8} smOffset={4}>
+              <Col sm={6}>
+                <Field
+                  fieldType="radio"
+                  name={`condition-over-group-${index}`}
+                  id={`condition-over-group-all-units-${index}`}
+                  value="none"
+                  checked={overGroup !== 'over_group'}
+                  onChange={this.onChangeOverGroup}
+                  label="All units"
+                  enabled={limitation === 'activity_type'}
+                />
+              </Col>
+              <Col sm={6}>
+                <Field
+                  fieldType="radio"
+                  name={`condition-over-group-${index}`}
+                  id={`condition-over-group-exceeding-units-${index}`}
+                  value="over_group"
+                  checked={overGroup === 'over_group'}
+                  onChange={this.onChangeOverGroup}
+                  label="Exceeding units"
+                  disabled={limitation !== 'activity_type'}
+                />
+              </Col>
+            </Col>
+          )}
         </FormGroup>
 
         <FormGroup>
@@ -328,12 +366,13 @@ class EventFormBalance extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const { trigger, limitation, activityType, groupName } = getPathParams(props.item.get('path', ''));
+  const { trigger, limitation, activityType, groupName, overGroup } = getPathParams(props.item.get('path', ''));
   return {
     trigger,
     limitation,
     activityType,
     groupName,
+    overGroup,
     groupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     groupsData: groupsDataSelector(state, props) || Immutable.Map(),
     currency: currencySelector(state, props),
