@@ -52,6 +52,7 @@ class PlanIncludeGroupCreate extends Component {
     products: Immutable.List(),
     shared: false,
     pooled: false,
+    quantityEffected: false,
     error: '',
     stepIndex: 0,
     open: false,
@@ -176,13 +177,22 @@ class PlanIncludeGroupCreate extends Component {
     if (shared) {
       this.setState({ shared });
     } else {
-      this.setState({ shared, pooled: false });
+      this.setState({ shared, pooled: false, quantityEffected: false });
     }
   }
 
   onChangePooled = (e) => {
     const { checked: pooled } = e.target;
-    this.setState({ pooled });
+    if (pooled) {
+      this.setState({ pooled });
+    } else {
+      this.setState({ pooled, quantityEffected: false });
+    }
+  }
+
+  onChangeQuantityEffected = (e) => {
+    const { checked: quantityEffected } = e.target;
+    this.setState({ quantityEffected });
   }
 
   onChangeUnit = (newValue) => {
@@ -240,9 +250,10 @@ class PlanIncludeGroupCreate extends Component {
       products,
       shared,
       pooled,
+      quantityEffected,
     } = this.state;
     if (this.validateStep(stepIndex)) {
-      this.props.addGroup(name, usages, unit, include, shared, pooled, products);
+      this.props.addGroup(name, usages, unit, include, shared, pooled, quantityEffected, products);
       this.resetState(false);
     }
   };
@@ -328,6 +339,7 @@ class PlanIncludeGroupCreate extends Component {
       unit,
       shared,
       pooled,
+      quantityEffected,
       error,
       monetaryBased,
       steps,
@@ -436,6 +448,12 @@ class PlanIncludeGroupCreate extends Component {
               <Checkbox disabled={!shared} checked={pooled} onChange={this.onChangePooled}>
                 {'Includes is pooled?'}
                 <Help contents={GroupsInclude.pooled_desc} />
+              </Checkbox>
+            </Col>
+            <Col smOffset={3} sm={8}>
+              <Checkbox disabled={!pooled} checked={quantityEffected} onChange={this.onChangeQuantityEffected}>
+                {'Multiply by Service Quantity'}
+                <Help contents={GroupsInclude.quantityEffected_desc} />
               </Checkbox>
             </Col>
           </FormGroup>,

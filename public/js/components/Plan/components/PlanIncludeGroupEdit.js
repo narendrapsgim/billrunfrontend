@@ -24,6 +24,7 @@ export default class PlanIncludeGroupEdit extends Component {
     usages: PropTypes.instanceOf(Immutable.List).isRequired,
     shared: PropTypes.bool,
     pooled: PropTypes.bool,
+    quantityEffected: PropTypes.bool,
     products: PropTypes.instanceOf(Immutable.List),
     usedProducts: PropTypes.instanceOf(Immutable.List),
     onChangeFieldValue: PropTypes.func.isRequired,
@@ -40,6 +41,7 @@ export default class PlanIncludeGroupEdit extends Component {
     usedProducts: Immutable.List(),
     shared: false,
     pooled: false,
+    quantityEffected: false,
     mode: 'create',
     unit: '',
     usaget: '',
@@ -99,6 +101,7 @@ export default class PlanIncludeGroupEdit extends Component {
     this.props.onChangeFieldValue(['include', 'groups', name, 'account_shared'], checked);
     if (!checked) {
       this.props.onChangeFieldValue(['include', 'groups', name, 'account_pool'], false);
+      this.props.onChangeFieldValue(['include', 'groups', name, 'quantity_effected'], false);
     }
   }
 
@@ -106,6 +109,15 @@ export default class PlanIncludeGroupEdit extends Component {
     const { checked } = e.target;
     const { name } = this.props;
     this.props.onChangeFieldValue(['include', 'groups', name, 'account_pool'], checked);
+    if (!checked) {
+      this.props.onChangeFieldValue(['include', 'groups', name, 'quantity_effected'], false);
+    }
+  }
+
+  onChangeQuantityEffected = (e) => {
+    const { checked } = e.target;
+    const { name } = this.props;
+    this.props.onChangeFieldValue(['include', 'groups', name, 'quantity_effected'], checked);
   }
 
   onChangeGroupRates = (productKey) => {
@@ -157,7 +169,7 @@ export default class PlanIncludeGroupEdit extends Component {
   )
 
   renderEdit = () => {
-    const { name, value, usages, shared, pooled, products, usedProducts, usaget, unit } = this.props;
+    const { name, value, usages, shared, pooled, quantityEffected, products, usedProducts, usaget, unit } = this.props;
     const { isEditMode, errorInclude, errorUoM } = this.state;
     return (
       <Modal show={isEditMode}>
@@ -202,6 +214,12 @@ export default class PlanIncludeGroupEdit extends Component {
             </FormGroup>
 
             <FormGroup>
+              <Col smOffset={3} sm={8}>
+                <Checkbox disabled={!pooled} checked={quantityEffected} onChange={this.onChangeQuantityEffected}>{'Multiply by Service Quantity'}<Help contents={GroupsInclude.quantityEffected_desc} /></Checkbox>
+              </Col>
+            </FormGroup>
+
+            <FormGroup>
               <Col componentClass={ControlLabel} sm={3}>Products</Col>
               <Col sm={8}>
                 <div style={{ marginTop: 10, minWidth: 250, width: '100%', minHeight: 42 }}>
@@ -224,11 +242,12 @@ export default class PlanIncludeGroupEdit extends Component {
   }
 
   render() {
-    const { name, value, usages, shared, pooled, products, unit } = this.props;
+    const { name, value, usages, shared, pooled, quantityEffected, products, unit } = this.props;
     const { showConfirm } = this.state;
     const confirmMessage = `Are you sure you want to remove ${name} group?`;
     const sharedLabel = shared ? 'Yes' : 'No';
     const pooledLabel = pooled ? 'Yes' : 'No';
+    const quantityEffectedLabel = quantityEffected ? 'Yes' : 'No';
     const productsLabels = products.join(', ');
     const valueLabel = changeCase.titleCase(value);
     const tooltip = this.renderProductsTooltip(productsLabels);
@@ -247,6 +266,7 @@ export default class PlanIncludeGroupEdit extends Component {
         </td>
         <td className="td-ellipsis text-center">{sharedLabel}</td>
         <td className="td-ellipsis text-center">{pooledLabel}</td>
+        <td className="td-ellipsis text-center">{quantityEffectedLabel}</td>
         <td className="text-right row" style={{ paddingRight: 0, paddingLeft: 0 }}>
           <Actions actions={actions} />
           <ConfirmModal onOk={this.onGroupRemoveOk} onCancel={this.onGroupRemoveCancel} show={showConfirm} message={confirmMessage} labelOk="Yes" />
