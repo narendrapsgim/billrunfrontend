@@ -1,32 +1,20 @@
 import React, { PropTypes } from 'react';
-import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { ModalWrapper } from '../Elements';
-import {
-  hideFormModal,
-  setFormModalItem,
-  updateFormModalItemField,
-  removeFormModalItemField,
-} from '../../actions/guiStateActions/pageActions';
-import {
-  formModalShowStateSelector,
-  formModalItemSelector,
-  formModalComponentSelector,
-  formModalConfigSelector,
-} from '../../selectors/guiSelectors';
 
+const form = (WrappedComponent, item, setItem, updateField, removeField) => (
+  <WrappedComponent
+    item={item}
+    setItem={setItem}
+    updateField={updateField}
+    removeField={removeField}
+  />
+);
 
-const ReduxFormModal = ({ show, item, component, config, dispatch }) => {
+const ReduxFormModal = ({ show, item, component, config, hideModal, ...props }) => {
   if (!show || !component) {
     return null;
   }
-
-  const hideModal = callback => (params) => {
-    if (callback && typeof callback === 'function') {
-      callback(params);
-    }
-    dispatch(hideFormModal());
-  };
 
   const title = config.get('title');
   const labelOk = config.get('labelOk', 'Save');
@@ -34,39 +22,16 @@ const ReduxFormModal = ({ show, item, component, config, dispatch }) => {
   const labelCancel = config.get('labelCancel', 'Cancel');
   const onCancel = hideModal(config.get('onCancel'));
 
-  const onClickOk = () => {
-    onOk(item);
-  };
-  const form = (WrappedItemFormComponent) => {
-    const setItem = (newItem) => {
-      dispatch(setFormModalItem(newItem));
-    };
-    const updateField = (path, value) => {
-      dispatch(updateFormModalItemField(path, value));
-    };
-    const removeField = (path) => {
-      dispatch(removeFormModalItemField(path));
-    };
-    return (
-      <WrappedItemFormComponent
-        item={item}
-        setItem={setItem}
-        updateField={updateField}
-        removeField={removeField}
-      />
-    );
-  };
-
   return (
     <ModalWrapper
       show={true}
       title={title}
-      onOk={onClickOk}
+      onOk={() => { onOk(item); }}
       labelOk={labelOk}
       onCancel={onCancel}
       labelCancel={labelCancel}
     >
-      {form(component)}
+      {form(component, item, props.setItem, props.updateField, props.removeField)}
     </ModalWrapper>
   );
 };
@@ -86,15 +51,10 @@ ReduxFormModal.propTypes = {
     PropTypes.func,
   ]),
   config: PropTypes.instanceOf(Immutable.Map),
-  dispatch: PropTypes.func.isRequired,
+  hideModal: PropTypes.func.isRequired,
+  setItem: PropTypes.func.isRequired,
+  updateField: PropTypes.func.isRequired,
+  removeField: PropTypes.func.isRequired,
 };
 
-
-const mapStateToProps = state => ({
-  show: formModalShowStateSelector(state),
-  item: formModalItemSelector(state),
-  component: formModalComponentSelector(state),
-  config: formModalConfigSelector(state),
-});
-
-export default connect(mapStateToProps)(ReduxFormModal);
+export default ReduxFormModal;

@@ -1,3 +1,3 @@
-import ReduxFormModal from './ReduxFormModal';
+import ReduxFormModal from './ReduxFormModalContainer';
 
 export default ReduxFormModal;
