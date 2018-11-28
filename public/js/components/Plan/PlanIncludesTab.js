@@ -79,13 +79,13 @@ class PlanIncludesTab extends Component {
     });
   }
 
-  onGroupAdd = (groupName, usages, unit, include, shared, pooled, quantityEffected, products) => {
+  onGroupAdd = (groupName, usages, unit, include, shared, pooled, quantityAffected, products) => {
     const { usedProducts, existingGroups } = this.state;
     this.setState({
       usedProducts: usedProducts.push(...products),
       existingGroups: existingGroups.push(groupName),
     });
-    this.props.onGroupAdd(groupName, usages, unit, include, shared, pooled, quantityEffected, products);
+    this.props.onGroupAdd(groupName, usages, unit, include, shared, pooled, quantityAffected, products);
   }
 
   onGroupRemove = (groupName, groupProducts) => {
@@ -117,7 +117,7 @@ class PlanIncludesTab extends Component {
     return includeGroups.map((include, groupName) => {
       const shared = include.get('account_shared', false);
       const pooled = include.get('account_pool', false);
-      const quantityEffected = include.get('quantity_effected', false);
+      const quantityAffected = include.get('quantity_affected', false);
       const products = include.get('rates', Immutable.List());
       const usages = getGroupUsages(include);
       const unit =
@@ -135,7 +135,7 @@ class PlanIncludesTab extends Component {
           unit={unit}
           shared={shared}
           pooled={pooled}
-          quantityEffected={quantityEffected}
+          quantityAffected={quantityAffected}
           products={products}
           usedProducts={usedProducts.toList()}
           onChangeFieldValue={this.props.onChangeFieldValue}
@@ -143,6 +143,7 @@ class PlanIncludesTab extends Component {
           onChangeGroupProducts={this.onChangeGroupProducts}
           usaget={usaget}
           usageTypes={usageTypes}
+          type={this.props.type}
         />
       );
     }).toArray();
@@ -185,6 +186,7 @@ class PlanIncludesTab extends Component {
               existinGrousNames={existingGroups}
               usedProducts={usedProducts}
               addGroup={this.onGroupAdd}
+              type={this.props.type}
             />
           }
         </Col>
