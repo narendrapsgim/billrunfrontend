@@ -179,7 +179,7 @@ class PlanIncludeGroupCreate extends Component {
     if (shared) {
       this.setState({ shared });
     } else {
-      this.setState({ shared, pooled: false, quantityAffected: false });
+      this.setState({ shared, pooled: false });
     }
   }
 
@@ -188,7 +188,7 @@ class PlanIncludeGroupCreate extends Component {
     if (pooled) {
       this.setState({ pooled });
     } else {
-      this.setState({ pooled, quantityAffected: false });
+      this.setState({ pooled });
     }
   }
 
