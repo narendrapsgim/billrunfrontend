@@ -12,8 +12,11 @@ const form = (WrappedComponent, item, setItem, updateField, removeField) => (
 );
 
 const ReduxFormModal = ({ show, item, component, config, hideModal, ...props }) => {
-  if (!show || !component) {
+  if (!show) {
     return null;
+  }
+  if (show && !component) {
+    throw new Error('ReduxFormModal require component parameter');
   }
 
   const title = config.get('title');
