@@ -1,24 +1,32 @@
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import EventsList from './EventsList';
-import EventBalanceForm from './EventBalanceForm';
 import {
   showConfirmModal,
   showFormModal,
 } from '../../actions/guiStateActions/pageActions';
 import {
   removeEvent,
-  addEvent,
   updateEvent,
   saveEvents,
+  saveEvent,
   getEvents,
 } from '../../actions/eventActions';
 import {
-  eventsSelectorForList,
+  showSuccess,
+} from '../../actions/alertsActions';
+import {
+  eventsSelector,
 } from '../../selectors/settingsSelector';
 
+
+const Components = {
+  balance: require('./EventBalanceForm.js').default,
+};
+
+
 const mapStateToProps = (state, props) => ({
-  items: eventsSelectorForList(state, props),
+  items: eventsSelector(state, props),
 });
 
 const mapDispatchToProps = (dispatch, props) => ({
@@ -26,7 +34,7 @@ const mapDispatchToProps = (dispatch, props) => ({
   onRemove: (item) => {
     const onOk = () => {
       dispatch(removeEvent(props.eventType, item));
-      dispatch(saveEvents(props.eventType))
+      return dispatch(saveEvents(props.eventType))
         .then(() => dispatch(getEvents(props.eventType)));
     };
     const confirm = {
@@ -41,48 +49,48 @@ const mapDispatchToProps = (dispatch, props) => ({
   onEdit: (item) => {
     const onOk = (editedItem) => {
       dispatch(updateEvent(props.eventType, editedItem));
-      dispatch(saveEvents(props.eventType))
+      return dispatch(saveEvents(props.eventType))
         .then(() => dispatch(getEvents(props.eventType)));
     };
     const config = {
       title: `Edit "${item.get('event_code')}" event`,
       onOk,
     };
-    return dispatch(showFormModal(item, EventBalanceForm, config));
+    return dispatch(showFormModal(item, Components[props.eventType], config));
   },
 
   onClone: (item) => {
     const clone = item.delete(['ui_flags', 'id']);
-    const onOk = (editedItem) => {
-      dispatch(addEvent(props.eventType, editedItem));
-      dispatch(saveEvents(props.eventType))
-        .then(() => dispatch(getEvents(props.eventType)));
-    };
+    const onOk = editedItem => dispatch(saveEvent(props.eventType, editedItem))
+      .then(success => (success.status ? true : Promise.reject()))
+      .then(() => dispatch(showSuccess(`New event ${editedItem.get('event_code', '')} saved successfuly`)))
+      .then(() => dispatch(getEvents(props.eventType)))
+      .catch(() => Promise.reject());
     const config = {
       title: `Clone "${item.get('event_code')}" event`,
       onOk,
     };
-    return dispatch(showFormModal(clone, EventBalanceForm, config));
+    return dispatch(showFormModal(clone, Components[props.eventType], config));
   },
 
   onNew: () => {
-    const onOk = (editedItem) => {
-      dispatch(addEvent(props.eventType, editedItem));
-      dispatch(saveEvents(props.eventType))
-        .then(() => dispatch(getEvents(props.eventType)));
-    };
+    const onOk = editedItem => dispatch(saveEvent(props.eventType, editedItem))
+      .then(success => (success.status ? true : Promise.reject()))
+      .then(() => dispatch(showSuccess(`New event ${editedItem.get('event_code', '')} saved successfuly`)))
+      .then(() => dispatch(getEvents(props.eventType)))
+      .catch(() => Promise.reject());
     const config = {
       title: 'Create new event',
       onOk,
     };
-    return dispatch(showFormModal(Immutable.Map(), EventBalanceForm, config));
+    return dispatch(showFormModal(Immutable.Map(), Components[props.eventType], config));
   },
 
   onEnable: (item) => {
     const onOk = () => {
       const editedItem = item.set('active', true);
       dispatch(updateEvent(props.eventType, editedItem));
-      dispatch(saveEvents(props.eventType))
+      return dispatch(saveEvents(props.eventType))
         .then(() => dispatch(getEvents(props.eventType)));
     };
     const confirm = {
@@ -98,7 +106,7 @@ const mapDispatchToProps = (dispatch, props) => ({
     const onOk = () => {
       const editedItem = item.set('active', false);
       dispatch(updateEvent(props.eventType, editedItem));
-      dispatch(saveEvents(props.eventType))
+      return dispatch(saveEvents(props.eventType))
         .then(() => dispatch(getEvents(props.eventType)));
     };
     const confirm = {

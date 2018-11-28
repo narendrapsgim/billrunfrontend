@@ -393,19 +393,6 @@ export const planFieldsSelector = createSelector(
   (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'plan')),
 );
 
-const selectEvents = (events, usageTypesData, propertyTypes) => {
-  if (!events) {
-    return undefined;
-  }
-  return events
-    .filter((event, eventType) => eventType !== 'settings')
-    .map(eventsList =>
-      eventsList.map(event =>
-        event.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, false)),
-      ),
-    );
-};
-
 export const templateTokenSettingsSelector = createSelector(
   getTemplateTokens,
   templateTokens => templateTokens,
@@ -442,13 +429,6 @@ export const collectionStepsSelectorForList = createSelector(
 export const eventsSettingsSelector = createSelector(
   getEvents,
   events => (events ? events.get('settings', Immutable.Map()) : undefined),
-);
-
-export const eventsSelector = createSelector(
-  getEvents,
-  usageTypesDataSelector,
-  propertyTypeSelector,
-  selectEvents,
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {
@@ -543,7 +523,7 @@ export const emailTemplatesSelector = createSelector(
   emailTemplates => emailTemplates,
 );
 
-export const eventsSelectorForList = createSelector(
+export const eventsSelector = createSelector(
   getEvents,
   getEventType,
   (events = Immutable.Map(), type) => events.get(type),

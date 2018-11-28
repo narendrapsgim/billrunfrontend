@@ -11,19 +11,27 @@ import {
 import {
   usageTypesDataSelector,
   propertyTypeSelector,
-  eventsSelectorForList,
+  eventsSelector,
 } from '../selectors/settingsSelector';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import {
+  saveSettingsQuery,
+} from '../common/ApiQueries';
 
 
-const convertFromApiToUi = event => event.withMutations((eventWithMutations) => {
+const convertFromApiToUi = (event, params) => event.withMutations((eventWithMutations) => {
+  const { propertyTypes, usageTypesData } = params;
   const uiFlags = Immutable.Map({
     id: uuid.v4(),
   });
+  eventWithMutations.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, false));
   eventWithMutations.set('ui_flags', uiFlags);
 });
 
-const convertFromUiToApi = event => event.withMutations((eventWithMutations) => {
+const convertFromUiToApi = (event, params) => event.withMutations((eventWithMutations) => {
+  const { propertyTypes, usageTypesData } = params;
   eventWithMutations.delete('ui_flags');
+  eventWithMutations.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, true));
 });
 
 export const getEvents = (eventCategory = '') => (dispatch, getState) => {
@@ -31,10 +39,13 @@ export const getEvents = (eventCategory = '') => (dispatch, getState) => {
   return dispatch(getSettings(settingsPath)).then(() => {
     // Add local ID to events
     const state = getState();
+    const usageTypesData = usageTypesDataSelector(state);
+    const propertyTypes = propertyTypeSelector(state);
+    const params = ({ usageTypesData, propertyTypes });
     const settingsEvents = state.settings.get('events', Immutable.List());
     settingsEvents.forEach((events, eventType) => {
       if (!['settings'].includes(eventType) && (eventCategory === '' || eventCategory === eventType)) {
-        const eventsWithId = events.map(event => convertFromApiToUi(event));
+        const eventsWithId = events.map(event => convertFromApiToUi(event, params));
         dispatch(updateSetting('events', eventType, eventsWithId));
       }
     });
@@ -44,10 +55,13 @@ export const getEvents = (eventCategory = '') => (dispatch, getState) => {
 export const saveEvents = (eventCategory = '') => (dispatch, getState) => {
   // remove local ID to events
   const state = getState();
+  const usageTypesData = usageTypesDataSelector(state);
+  const propertyTypes = propertyTypeSelector(state);
   const settingsEvents = state.settings.get('events', Immutable.List());
+  const params = ({ usageTypesData, propertyTypes });
   settingsEvents.forEach((events, eventType) => {
     if (!['settings'].includes(eventType) && (eventCategory === '' || eventCategory === eventType)) {
-      const eventsWithId = events.map(event => convertFromUiToApi(event));
+      const eventsWithId = events.map(event => convertFromUiToApi(event, params));
       dispatch(updateSetting('events', eventType, eventsWithId));
     }
   });
@@ -55,14 +69,12 @@ export const saveEvents = (eventCategory = '') => (dispatch, getState) => {
   return dispatch(saveSettings([settingsPath]));
 };
 
-export const saveEvent = (entityType, index, event) => (dispatch, getState) => { // eslint-disable-line import/prefer-default-export
-  const state = getState();
-  const usageTypesData = usageTypesDataSelector(state);
-  const propertyTypes = propertyTypeSelector(state);
-  const convertedEvent = event.withMutations((eventWithMutations) => {
-    eventWithMutations.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, true));
-  });
-  return dispatch(updateSetting('events', [entityType, index], convertedEvent));
+export const saveEvent = (eventCategory, event) => (dispatch) => {
+  const category = `event.${eventCategory}`;
+  const queries = saveSettingsQuery(event, category);
+  return apiBillRun(queries)
+    .then(success => dispatch(apiBillRunSuccessHandler(success)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error)));
 };
 
 export const addEvent = (eventType, event) => (dispatch) => {
@@ -71,16 +83,16 @@ export const addEvent = (eventType, event) => (dispatch) => {
 };
 
 export const updateEvent = (eventType, event) => (dispatch, getState) => {
-  const events = eventsSelectorForList(getState(), { eventType });
+  const events = eventsSelector(getState(), { eventType });
   const index = events.findIndex(e => e.getIn(['ui_flags', 'id'], '') === event.getIn(['ui_flags', 'id'], ''));
   if (index !== -1) {
     return dispatch(updateSetting('events', [eventType, index], event));
   }
-  return false;
+  return Promise.reject();
 };
 
 export const removeEvent = (eventType, event) => (dispatch, getState) => {
-  const events = eventsSelectorForList(getState(), { eventType });
+  const events = eventsSelector(getState(), { eventType });
   const index = events.findIndex(e => e.getIn(['ui_flags', 'id'], '') === event.getIn(['ui_flags', 'id'], ''));
   if (index !== -1) {
     return dispatch(removeSettingField('events', [eventType, index]));
