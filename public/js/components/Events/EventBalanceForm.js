@@ -4,17 +4,14 @@ import { connect } from 'react-redux';
 import { Form, FormGroup, Col, ControlLabel, Button, Panel } from 'react-bootstrap';
 import { getConditionDescription } from './EventsUtil';
 import Field from '../Field';
-import { ModalWrapper } from '../Elements';
 import ConditionBalance from './ConditionsTypes/ConditionBalance';
 import { usageTypesDataSelector, propertyTypeSelector, currencySelector } from '../../selectors/settingsSelector';
 
-class EventForm extends Component {
+class EventBalanceForm extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
-    onCancel: PropTypes.func.isRequired,
-    onSave: PropTypes.func.isRequired,
-    onUpdateField: PropTypes.func.isRequired,
+    updateField: PropTypes.func.isRequired,
     conditionType: PropTypes.string,
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
@@ -35,13 +32,13 @@ class EventForm extends Component {
 
   onChangeField = path => (e) => {
     const { value } = e.target;
-    this.props.onUpdateField(path, value);
+    this.props.updateField(path, value);
   };
 
   addCondition = () => {
     const { item } = this.props;
     const conditions = item.get('conditions', Immutable.List()).push(Immutable.Map());
-    this.props.onUpdateField(['conditions'], conditions);
+    this.props.updateField(['conditions'], conditions);
     this.setState({
       editedConditionIndex: conditions.size - 1,
     });
@@ -62,7 +59,7 @@ class EventForm extends Component {
   removeCondition = index => () => {
     const { item } = this.props;
     const conditions = item.get('conditions', Immutable.List()).delete(index);
-    this.props.onUpdateField(['conditions'], conditions);
+    this.props.updateField(['conditions'], conditions);
   };
 
   renderConditionEditForm = (condition, index) => {
@@ -74,7 +71,7 @@ class EventForm extends Component {
           <ConditionBalance
             item={condition}
             index={index}
-            onChangeField={this.props.onUpdateField}
+            onChangeField={this.props.updateField}
             propertyTypes={propertyTypes}
             usageTypesData={usageTypesData}
           />
@@ -133,39 +130,31 @@ class EventForm extends Component {
     </FormGroup>
   );
 
-  onSaveEvent = () => {
-
-  };
-
   render() {
-    const { item, onSave, onCancel } = this.props;
+    const { item } = this.props;
     return (
-      <ModalWrapper title={`Event ${item.get('event_code', '')}`} show={true} onOk={onSave} onCancel={onCancel} labelOk="Save" >
-        <Form horizontal>
+      <Form horizontal>
+        <FormGroup>
+          <Col componentClass={ControlLabel} md={4}>
+            Event Code
+          </Col>
+          <Col sm={5}>
+            <Field id="label" onChange={this.onChangeField(['event_code'])} value={item.get('event_code', '')} />
+          </Col>
+        </FormGroup>
 
-          <FormGroup>
-            <Col componentClass={ControlLabel} md={4}>
-              Event Code
-            </Col>
-            <Col sm={5}>
-              <Field id="label" onChange={this.onChangeField(['event_code'])} value={item.get('event_code', '')} />
-            </Col>
-          </FormGroup>
-
-          <FormGroup>
-            <Col sm={12}>
-              { this.renderConditionsHeader() }
-            </Col>
-            <Col sm={12}>
-              { this.renderConditions() }
-            </Col>
-            <Col sm={12}>
-              { this.renderAddConditionButton() }
-            </Col>
-          </FormGroup>
-
-        </Form>
-      </ModalWrapper>
+        <FormGroup>
+          <Col sm={12}>
+            { this.renderConditionsHeader() }
+          </Col>
+          <Col sm={12}>
+            { this.renderConditions() }
+          </Col>
+          <Col sm={12}>
+            { this.renderAddConditionButton() }
+          </Col>
+        </FormGroup>
+      </Form>
     );
   }
 }
@@ -176,4 +165,4 @@ const mapStateToProps = (state, props) => ({
   currency: currencySelector(state, props),
 });
 
-export default connect(mapStateToProps)(EventForm);
+export default connect(mapStateToProps)(EventBalanceForm);

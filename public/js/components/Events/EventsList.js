@@ -1,167 +1,79 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
-import { connect } from 'react-redux';
-import { Panel, Col, Form, Button } from 'react-bootstrap';
-import { ActionButtons } from '../Elements';
-import { getSettings, saveSettings, removeSettingField } from '../../actions/settingsActions';
-import { saveEvent } from '../../actions/eventActions';
-import { eventsSelector } from '../../selectors/settingsSelector';
-import EventForm from './EventForm';
+import { Panel, Col } from 'react-bootstrap';
+import { Actions, StateIcon } from '../Elements';
 import List from '../../components/List';
-import { getConfig } from '../../common/Util';
-import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 
-class EventSettings extends Component {
+
+class EventsList extends Component {
 
   static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    events: PropTypes.instanceOf(Immutable.Map),
+    items: PropTypes.instanceOf(Immutable.List),
+    eventType: PropTypes.string.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    onEdit: PropTypes.func.isRequired,
+    onClone: PropTypes.func.isRequired,
+    onNew: PropTypes.func.isRequired,
+    onDisable: PropTypes.func.isRequired,
+    onEnable: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    events: Immutable.Map(),
+    items: Immutable.List(),
   };
 
-  state = {
-    editedEvent: null,
-  };
+  parseShowEnable = item => !item.get('active', true);
 
-  componentWillMount() {
-    this.props.dispatch(getSettings(['events']));
-  }
+  parseShowDisable = item => !(this.parseShowEnable(item));
 
-  onSave = () => {
-    this.props.dispatch(saveSettings(['events']));
-  }
-
-  onClickNewEvent = entityType => () => {
-    const { events } = this.props;
-    this.setState({
-      editedEvent: Immutable.Map({
-        item: Immutable.Map(),
-        index: events.get(entityType, Immutable.List()).size,
-        entityType,
-      }),
-    });
-  }
-
-  getEventIndex = (entityType, event) => {
-    const { events } = this.props;
-    return events.get(entityType, Immutable.List()).findIndex(e => e.equals(event));
-  }
-
-  onClickEditEvent = entityType => (item) => {
-    this.setState({
-      editedEvent: Immutable.Map({
-        item,
-        index: this.getEventIndex(entityType, item),
-        entityType,
-      }),
-    });
-  }
-
-  onDeleteOk = (entityType, index) => {
-    this.props.dispatch(removeSettingField('events', [entityType, index]));
-  }
-
-  renderConfirmModal = entityType => (event) => {
-    const onDelete = () => {
-      this.onDeleteOk(entityType, this.getEventIndex(entityType, event));
-    };
-    const confirm = {
-      message: 'Are you sure you want to delete this event?',
-      onOk: onDelete,
-      labelOk: 'Delete',
-      type: 'delete',
-    };
-    this.props.dispatch(showConfirmModal(confirm));
-  }
-
-  onSaveEvent = () => {
-    const { editedEvent } = this.state;
-    this.setState({ editedEvent: null });
-    this.props.dispatch(saveEvent(editedEvent.get('entityType'), editedEvent.get('index'), editedEvent.get('item')));
-  }
-
-  onCancelEventForm = () => {
-    this.setState({ editedEvent: null });
-  }
-
-  onUpdateEventField = (fieldPath, value) => {
-    const { editedEvent } = this.state;
-    this.setState({ editedEvent: editedEvent.setIn(['item', ...fieldPath], value) });
-  }
+  parserStatus = item => (<StateIcon status={item.get('active', true) ? 'active' : 'expired'} />);
 
   getListFields = () => [
+    // { id: 'active', title: 'Status', parser: this.parserStatus, cssClass: 'state' },
     { id: 'event_code', title: 'Event Code' },
   ]
 
-  getListActions = entityType => [
-    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.onClickEditEvent(entityType) },
-    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.renderConfirmModal(entityType) },
+  getListActions = () => [
+    // { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.props.onEnable, show: this.parseShowEnable },
+    // { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.props.onDisable, show: this.parseShowDisable },
+    { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.props.onEdit },
+    { type: 'clone', showIcon: true, helpText: 'Clone', onClick: this.props.onClone },
+    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.props.onRemove },
   ];
 
-  renderPanelHeader = eventEntity => (
+  getPanelActions = () => [{
+    type: 'add',
+    actionStyle: 'primary',
+    actionSize: 'xsmall',
+    label: 'Add new',
+    onClick: this.props.onNew,
+  }];
+
+  renderPanelHeader = () => (
     <div>
-      {eventEntity.get('title', '')}
-      <div className="pull-right">
-        <Button bsSize="xsmall" className="btn-primary" onClick={this.onClickNewEvent(eventEntity.get('key', ''))}>
-          <i className="fa fa-plus" />&nbsp;Add New
-        </Button>
-      </div>
+      &nbsp;
+      <div className="pull-right"><Actions actions={this.getPanelActions()} /></div>
     </div>
   );
 
-  renderEntityEvents = (entity) => {
-    const { events } = this.props;
-    const fields = this.getListFields();
-    const actions = this.getListActions(entity);
-    return (
-      <List items={events.get(entity, Immutable.List())} fields={fields} actions={actions} />
-    );
-  }
-
-  renderEvents = () => {
-    const eventEntities = getConfig('events', Immutable.Map()).get('entities', Immutable.Map());
-    return eventEntities.map(eventEntity => (
-      <Panel header={this.renderPanelHeader(eventEntity)} key={eventEntity.get('key', '')}>
-        <Form horizontal>
-          {this.renderEntityEvents(eventEntity.get('key', ''))}
-        </Form>
-      </Panel>
-    )).toList();
-  }
-
-  renderEventForm = () => {
-    const { editedEvent } = this.state;
-    return editedEvent !== null &&
-      (<EventForm
-        item={editedEvent.get('item', Immutable.Map())}
-        onUpdateField={this.onUpdateEventField}
-        onSave={this.onSaveEvent}
-        onCancel={this.onCancelEventForm}
-      />);
-  }
-
-  renderSaveButton = () => (<ActionButtons onClickSave={this.onSave} hideCancel={true} />);
-
   render() {
+    const { items } = this.props;
+    const fields = this.getListFields();
+    const actions = this.getListActions();
     return (
       <div>
         <Col sm={12}>
-          { this.renderEvents() }
-          { this.renderEventForm() }
-        </Col>
-        <Col sm={12}>
-          { this.renderSaveButton() }
+          <Panel header={this.renderPanelHeader()}>
+            <List
+              items={items}
+              fields={fields}
+              actions={actions}
+            />
+          </Panel>
         </Col>
       </div>
     );
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  events: eventsSelector(state, props),
-});
-
-export default connect(mapStateToProps)(EventSettings);
+export default EventsList;

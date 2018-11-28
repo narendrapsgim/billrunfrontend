@@ -35,6 +35,8 @@ const getEntityFields = (state, props) => {
   return state.settings.getIn([...entityName, 'fields']);
 };
 
+const getEventType = (state, props) => props.eventType;
+
 const getMinEntityDate = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('minimum_entity_start_date');
 
@@ -539,4 +541,10 @@ export const paymentGatewaysSelector = createSelector(
 export const emailTemplatesSelector = createSelector(
   getEmailTemplates,
   emailTemplates => emailTemplates,
+);
+
+export const eventsSelectorForList = createSelector(
+  getEvents,
+  getEventType,
+  (events = Immutable.Map(), type) => events.get(type),
 );
