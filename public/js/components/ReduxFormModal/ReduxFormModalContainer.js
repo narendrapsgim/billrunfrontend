@@ -24,9 +24,18 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   hideModal: callback => (params) => {
     if (callback && typeof callback === 'function') {
-      callback(params);
+      const result = callback(params);
+      if (result && result.then && typeof result.then === 'function') { // if Promise
+        return result
+          .then(() => { dispatch(hideFormModal()); })
+          .catch(() => {});
+      }
+      if (result !== false) {
+        return dispatch(hideFormModal());
+      }
+      return false;
     }
-    dispatch(hideFormModal());
+    return dispatch(hideFormModal());
   },
   setItem: (newItem) => {
     dispatch(setFormModalItem(newItem));
