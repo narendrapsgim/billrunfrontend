@@ -55,12 +55,13 @@ const mapDispatchToProps = (dispatch, props) => ({
     const config = {
       title: `Edit "${item.get('event_code')}" event`,
       onOk,
+      mode: 'edit',
     };
     return dispatch(showFormModal(item, Components[props.eventType], config));
   },
 
   onClone: (item) => {
-    const clone = item.delete(['ui_flags', 'id']);
+    const clone = item.deleteIn(['ui_flags', 'id']);
     const onOk = editedItem => dispatch(saveEvent(props.eventType, editedItem))
       .then(success => (success.status ? true : Promise.reject()))
       .then(() => dispatch(showSuccess(`New event ${editedItem.get('event_code', '')} saved successfuly`)))
