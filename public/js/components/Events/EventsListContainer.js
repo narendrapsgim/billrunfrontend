@@ -70,6 +70,7 @@ const mapDispatchToProps = (dispatch, props) => ({
     const config = {
       title: `Clone "${item.get('event_code')}" event`,
       onOk,
+      mode: 'clone',
     };
     return dispatch(showFormModal(clone, Components[props.eventType], config));
   },
@@ -83,8 +84,10 @@ const mapDispatchToProps = (dispatch, props) => ({
     const config = {
       title: 'Create new event',
       onOk,
+      mode: 'create',
     };
-    return dispatch(showFormModal(Immutable.Map(), Components[props.eventType], config));
+    const item = defaultNewEvent[props.eventType];
+    return dispatch(showFormModal(item, Components[props.eventType], config));
   },
 
   onEnable: (item) => {
