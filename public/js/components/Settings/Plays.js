@@ -57,6 +57,7 @@ class Plays extends Component {
 
   onClickEnable = index => () => {
     this.props.onChange('plays', [index, 'enabled'], true);
+    this.props.dispatch(saveSettings(['plays']));
   }
 
   onClickDisable = index => () => {
