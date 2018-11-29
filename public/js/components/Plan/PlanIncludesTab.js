@@ -35,6 +35,7 @@ class PlanIncludesTab extends Component {
     onGroupRemove: PropTypes.func.isRequired,
     mode: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
+    type: PropTypes.string,
   }
 
   static defaultProps = {
@@ -43,6 +44,7 @@ class PlanIncludesTab extends Component {
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
     mode: 'create',
+    type: '',
   };
 
   constructor(props) {
@@ -158,6 +160,7 @@ class PlanIncludesTab extends Component {
       <th>Products</th>
       <th className="text-center" style={{ width: 80 }}>Shared</th>
       <th className="text-center" style={{ width: 80 }}>Pooled</th>
+      <th className="text-center" style={{ width: 80 }}>Quantitative</th>
       <th style={{ width: 60 }} />
     </tr>
   );
