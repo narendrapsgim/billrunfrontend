@@ -69,9 +69,14 @@ export const saveEvents = (eventCategory = '') => (dispatch, getState) => {
   return dispatch(saveSettings([settingsPath]));
 };
 
-export const saveEvent = (eventCategory, event) => (dispatch) => {
+export const saveEvent = (eventCategory, event) => (dispatch, getState) => {
+  const state = getState();
+  const usageTypesData = usageTypesDataSelector(state);
+  const propertyTypes = propertyTypeSelector(state);
+  const params = ({ usageTypesData, propertyTypes });
+  const convertedEvent = convertFromUiToApi(event, params);
   const category = `event.${eventCategory}`;
-  const queries = saveSettingsQuery(event, category);
+  const queries = saveSettingsQuery(convertedEvent, category);
   return apiBillRun(queries)
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
     .catch(error => dispatch(apiBillRunErrorHandler(error)));
