@@ -74,20 +74,3 @@ export const getCollectionDebt = aid => (dispatch) => {
     .then(response => dispatch(apiBillRunSuccessHandler(response)))
     .catch(error => dispatch(apiBillRunErrorHandler(error)));
 };
-
-export const getPlaysInUse = () => (dispatch) => {
-  dispatch(startProgressIndicator());
-  const query = getPlaysQuery();
-  return apiBillRun(query)
-    .then((response) => {
-      const playsInUse = [];
-      response.data[0].data.details.forEach((sub) => {
-        if (typeof sub.play !== 'undefined' && !playsInUse.includes(sub.play)) {
-          playsInUse.push(sub.play);
-        }
-      });
-      dispatch(finishProgressIndicator());
-      return ({ status: 1, data: playsInUse });
-    })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving plays in use')));
-};

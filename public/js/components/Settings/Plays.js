@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Form, Button, Table } from 'react-bootstrap';
 import Field from '../Field';
 import { Actions, ConfirmModal } from '../Elements';
+import { saveSettings } from '../../actions/settingsActions';
 
-export default class Plays extends Component {
+class Plays extends Component {
 
   static propTypes = {
+    dispatch: React.PropTypes.func.isRequired,
     data: React.PropTypes.instanceOf(Immutable.List),
-    inUse: React.PropTypes.instanceOf(Immutable.List),
     onChange: React.PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     data: Immutable.List(),
-    inUse: Immutable.List(),
   };
 
   state = {
@@ -71,6 +72,12 @@ export default class Plays extends Component {
     const { indexToRemove } = this.state;
     this.setState({ indexToRemove: null });
     this.props.onChange('plays', [], data.delete(indexToRemove));
+    this.props.dispatch(saveSettings(['plays']))
+      .then((response) => {
+        if (!response || !response.status) {
+          this.props.onChange('plays', [], data);
+        }
+      });
   }
 
   onClickRemoveCancel = () => {
@@ -81,25 +88,28 @@ export default class Plays extends Component {
     const { indexToDisable } = this.state;
     this.setState({ indexToDisable: null });
     this.props.onChange('plays', [indexToDisable, 'enabled'], false);
+    this.props.dispatch(saveSettings(['plays']))
+      .then((response) => {
+        if (!response || !response.status) {
+          this.props.onChange('plays', [indexToDisable, 'enabled'], true);
+        }
+      });
   }
 
   onClickDisableCancel = () => {
     this.setState({ indexToDisable: null });
   }
 
-  isPlayInUse = play => this.props.inUse.contains(play.get('name', ''));
-
   parseShowEnable = play => !play.get('enabled', true);
   parseShowDisable = play => !this.parseShowEnable(play);
-  parseShowRemove = play => !this.isPlayInUse(play);
 
   getListEnabledActions = index => [
     { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.onClickEnable(index), show: this.parseShowEnable },
-    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickDisable(index), show: this.parseShowDisable, enable: this.parseShowRemove },
+    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.onClickDisable(index), show: this.parseShowDisable },
   ];
 
   getListRemoveActions = index => [
-    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove(index), enable: this.parseShowRemove },
+    { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.onClickRemove(index) },
   ];
 
   getDefaultIndex = () => {
@@ -186,3 +196,4 @@ export default class Plays extends Component {
     );
   }
 }
+export default connect()(Plays);

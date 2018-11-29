@@ -23,9 +23,6 @@ import {
   systemSettingsSelector,
   playsSettingsSelector,
 } from '../../selectors/settingsSelector';
-import {
-  getPlaysInUse,
-} from '../../actions/customerActions';
 
 
 class Settings extends Component {
@@ -56,13 +53,12 @@ class Settings extends Component {
 
   state = {
     currencyOptions: [],
-    playsInUse: Immutable.List(),
+    playsBeforeSave: Immutable.List(),
   };
 
   componentWillMount() {
     this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types', 'system', 'plays']));
     this.props.dispatch(getCurrencies()).then(this.initCurrencyOptions);
-    this.props.dispatch(getPlaysInUse()).then(this.initPlaysInUse);
   }
 
   initCurrencyOptions = (response) => {
@@ -72,12 +68,6 @@ class Settings extends Component {
         value: currency.get('code', ''),
       })).toArray();
       this.setState({ currencyOptions });
-    }
-  }
-
-  initPlaysInUse = (response) => {
-    if (response.status) {
-      this.setState({ playsInUse: Immutable.List(response.data) });
     }
   }
 
@@ -134,6 +124,7 @@ class Settings extends Component {
       categoryToSave.push('system');
     }
     if (settings.has('plays')) {
+      this.setState({ playsBeforeSave: settings.get('plays') });
       const playsToSave = settings.get('plays').map(play => play.remove('can_edit_name'));
       this.props.dispatch(updateSetting('plays', [], playsToSave));
       categoryToSave.push('plays');
@@ -157,6 +148,10 @@ class Settings extends Component {
         localStorage.removeItem('logo');
         this.props.dispatch(fetchFile({ filename: settings.getIn(['tenant', 'logo'], '') }, 'logo'));
       }
+    } else {
+      // reloads Plays in case error occured and Plays were not saved
+      const { playsBeforeSave } = this.state;
+      this.props.dispatch(updateSetting('plays', [], playsBeforeSave));
     }
   };
 
@@ -171,7 +166,7 @@ class Settings extends Component {
 
   render() {
     const { settings, activeTab, csiOptions, taxation, system, plays } = this.props;
-    const { currencyOptions, playsInUse } = this.state;
+    const { currencyOptions } = this.state;
 
     const currency = settings.getIn(['pricing', 'currency'], '');
     const datetime = settings.get('billrun', Immutable.Map());
@@ -231,7 +226,7 @@ class Settings extends Component {
 
           <Tab title="Plays" eventKey={7}>
             <Panel style={{ borderTop: 'none' }}>
-              <Plays onChange={this.onChangeFieldValue} data={plays} inUse={playsInUse} />
+              <Plays onChange={this.onChangeFieldValue} data={plays} />
             </Panel>
           </Tab>
 
