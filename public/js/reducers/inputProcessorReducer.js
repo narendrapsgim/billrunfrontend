@@ -306,7 +306,7 @@ export default function (state = defaultState, action) {
       return state.setIn(['receiver', index, field], mapping);
 
     case CANCEL_KEY_AUTH:
-      return state.deleteIn(['receiver', 'key']);
+      return state.deleteIn(['receiver', index, field]);
 
     case CLEAR_INPUT_PROCESSOR:
       return defaultState;
