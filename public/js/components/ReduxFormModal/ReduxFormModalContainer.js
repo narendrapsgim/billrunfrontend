@@ -11,6 +11,7 @@ import {
   setFormModalItem,
   updateFormModalItemField,
   removeFormModalItemField,
+  showConfirmModal,
 } from '../../actions/guiStateActions/pageActions';
 
 
@@ -22,6 +23,16 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  closeModal: () => {
+    const onOk = () => dispatch(hideFormModal());
+    const confirm = {
+      message: 'Are you sure you want to close form and discard all changes?',
+      labelOk: 'Yes',
+      type: 'delete',
+      onOk,
+    };
+    return dispatch(showConfirmModal(confirm));
+  },
   hideModal: callback => (params) => {
     if (callback && typeof callback === 'function') {
       const result = callback(params);
