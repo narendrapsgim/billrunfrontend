@@ -46,7 +46,7 @@ export default class SubscriptionServicesDetails extends Component {
   onChangeServiceQuantity = (index, e) => {
     const { subscriptionFrom, originSubscriptionServices, subscriptionServices } = this.props;
     const { value } = e.target;
-    const fixedValue = value > 1 ? value : 1; // not possible to add 0 for quantity service
+    const fixedValue = value > 1 ? Number(value) : 1; // not possible to add 0 for quantity service
     const service = subscriptionServices.get(index, null);
     if (service) {
       const existingService = originSubscriptionServices.find(originService => originService.get('name', '') === service.get('name', ''));
