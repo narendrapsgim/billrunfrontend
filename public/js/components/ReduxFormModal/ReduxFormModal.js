@@ -25,7 +25,7 @@ const ReduxFormModal = (props) => {
     throw new Error('ReduxFormModal require component parameter');
   }
   const {
-    title, labelOk, onOk, labelCancel, onCancel, ...configOtherProps
+    title, labelOk = 'Save', onOk, labelCancel = 'Cancel', onCancel, modalSize = 'large', ...configOtherProps
   } = config.toJS();
   const onOkWithHide = () => {
     const callback = hideModal(onOk);
@@ -41,6 +41,7 @@ const ReduxFormModal = (props) => {
       onCancel={onCancelWithHide}
       labelCancel={labelCancel}
       onHide={closeModal}
+      modalSize={modalSize}
     >
       {form(
         component,

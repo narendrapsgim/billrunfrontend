@@ -26,7 +26,7 @@ const mapDispatchToProps = dispatch => ({
   closeModal: () => {
     const onOk = () => dispatch(hideFormModal());
     const confirm = {
-      message: 'Are you sure you want to close form and discard all changes?',
+      message: 'Are you sure you want to close and discard all changes?',
       labelOk: 'Yes',
       type: 'delete',
       onOk,
