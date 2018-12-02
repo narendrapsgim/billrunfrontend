@@ -23,7 +23,7 @@ class Connection extends Component {
   };
 
   state = {
-    showRemoveKey: false,
+    showRemoveKey: [],
     openReceivers: [0],
   };
 
@@ -33,7 +33,7 @@ class Connection extends Component {
   }
 
   initDefaultValues = (receiver, key) => {
-    let show = false;
+    const { showRemoveKey } = this.state;
     if (receiver.get('receiver_type', null) === null) {
       const receiverType = { target: { value: 'ftp', id: `receiver_type-${key}` } };
       this.props.onSetReceiverField(receiverType, key);
@@ -47,12 +47,11 @@ class Connection extends Component {
       this.props.onSetReceiverCheckboxField(deleteReceived, key);
     }
     if (receiver.get('key', false)) {
-      show = true;
+      showRemoveKey.push(true);
+    } else {
+      showRemoveKey.push(false);
     }
-
-    this.setState({
-      showRemoveKey: show,
-    });
+    this.setState({ showRemoveKey });
   }
 
   onRemoveReceiver = (receiver, index) => () => {
@@ -73,13 +72,15 @@ class Connection extends Component {
 
   afterUpload = (res, fileName) => {
     const { index } = this.props;
+    const { showRemoveKey } = this.state;
 
     if (res.desc === 'success') {
       this.props.dispatch(showSuccess(res.details.message));
       this.props.onSetReceiverField({ target: { value: res.details.path, id: `key-${index}` } }, index);
       this.props.onSetReceiverField({ target: { value: fileName, id: `key_label-${index}` } }, index);
       this.props.OnChangeUploadingFile();
-      this.setState({ showRemoveKey: true });
+      showRemoveKey[index] = true;
+      this.setState({ showRemoveKey });
     } else {
       this.props.dispatch(showDanger(res.details.message));
     }
@@ -115,9 +116,12 @@ class Connection extends Component {
   };
 
   onCancelKeyAuth = () => {
-    this.props.onCancelKeyAuth();
+    const { index } = this.props;
+    const { showRemoveKey } = this.state;
+    this.props.onCancelKeyAuth(index);
     this.props.dispatch(showSuccess('Key was removed successfuly'));
-    this.setState({ showRemoveKey: false });
+    showRemoveKey[index] = false;
+    this.setState({ showRemoveKey });
   }
 
   onChangeReceiverType = (e) => {
@@ -222,7 +226,7 @@ class Connection extends Component {
         <div className="form-group">
           <label htmlFor="remote_directory" className="col-xs-2 control-label">Directory</label>
           <div className="col-xs-4">
-            <input className="fgetReceiverorm-control" id={`remote_directory-${index}`} onChange={this.onChangeReceiverField} value={receiver.get('remote_directory', '')} />
+            <input className="form-control" id={`remote_directory-${index}`} onChange={this.onChangeReceiverField} value={receiver.get('remote_directory', '')} />
           </div>
         </div>
         <div className="form-group">
@@ -247,7 +251,7 @@ class Connection extends Component {
           </div>
           <div className="col-xs-2">
             <div>
-              {showRemoveKey && (<Panel header={this.renderPanelHeader(keyLabel)} />)}
+              {showRemoveKey[index] && (<Panel header={this.renderPanelHeader(keyLabel)} />)}
             </div>
           </div>
         </div>}
