@@ -1,19 +1,21 @@
 {
-	"conditions": [
-		{ "key": "is", "title": "Is" },
-		{ "key": "in", "title": "In" },
-		{ "key": "is_not", "title": "Is Not" },
-		{ "key": "is_less_than", "title": "Is Less Than", "type": "number" },
-		{ "key": "is_less_than_or_equal", "title": "Is Less Than Or Equal", "type": "number" },
-		{ "key": "is_greater_than", "title": "Is Greater Than", "type": "number" },
-		{ "key": "is_greater_than_or_equal", "title": "Is Greater Than Or Equal", "type": "number" },
-		{ "key": "reached_constant", "title": "Reached Constant", "type": "tags" },
-		{ "key": "reached_constant_recurring", "title": "Reached Constant (Recurring)", "type": "number" },
-		{ "key": "has_changed", "title": "Has Changed", "extra_field": false },
-		{ "key": "has_changed_to", "title": "Has Changed To" },
-		{ "key": "has_changed_from", "title": "Has Changed From" }
+	"conditionsOperators": [
+    { "id": "in", "title": "In", "include": ["balance", "fraud"] },
+    { "id": "not_in", "title": "In", "include": ["fraud"] },
+		{ "id": "is", "title": "Is", "include": ["balance"] },
+		{ "id": "is_not", "title": "Is Not", "include": ["balance", "fraud"]  },
+		{ "id": "is_less_than", "title": "Is Less Than", "type": "number", "include": ["balance"] },
+		{ "id": "is_less_than_or_equal", "title": "Is Less Than Or Equal", "type": "number", "include": ["balance"] },
+		{ "id": "is_greater_than", "title": "Is Greater Than", "type": "number", "include": ["balance"] },
+		{ "id": "is_greater_than_or_equal", "title": "Is Greater Than Or Equal", "type": "number", "include": ["balance"] },
+		{ "id": "reached_constant", "title": "Reached Constant", "type": "tags", "include": ["balance"] },
+		{ "id": "reached_constant_recurring", "title": "Reached Constant (Recurring)", "type": "number", "include": ["balance"] },
+		{ "id": "has_changed", "title": "Has Changed", "extra_field": false, "include": ["balance"] },
+		{ "id": "has_changed_to", "title": "Has Changed To", "include": ["balance"] },
+		{ "id": "has_changed_from", "title": "Has Changed From", "include": ["balance"] }
 	],
-	"entities": [
-		{ "key": "balance", "title": "Balances" }
-	]
+	"entities": {
+		"balance": { "title": "balance", "listTitle": "balances" },
+		"fraud": { "title": "fraud", "title": "fraud" }
+	}
 }

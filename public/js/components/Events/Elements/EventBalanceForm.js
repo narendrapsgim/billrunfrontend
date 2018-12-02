@@ -2,10 +2,10 @@ import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { Form, FormGroup, Col, ControlLabel, Button, Panel } from 'react-bootstrap';
-import { getConditionDescription } from './EventsUtil';
-import Field from '../Field';
-import ConditionBalance from './ConditionsTypes/ConditionBalance';
-import { usageTypesDataSelector, propertyTypeSelector, currencySelector } from '../../selectors/settingsSelector';
+import { getConditionDescription } from './../EventsUtil';
+import Field from '../../Field';
+import BalanceEventCondition from './BalanceEventCondition';
+import { usageTypesDataSelector, propertyTypeSelector, currencySelector } from '../../../selectors/settingsSelector';
 
 class EventBalanceForm extends Component {
 
@@ -68,7 +68,7 @@ class EventBalanceForm extends Component {
       case 'balance':
       default:
         return (
-          <ConditionBalance
+          <BalanceEventCondition
             item={condition}
             index={index}
             onChangeField={this.props.updateField}

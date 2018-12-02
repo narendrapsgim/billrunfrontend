@@ -5,19 +5,21 @@ import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../../Field';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
-import { groupsOptionsSelector, groupsDataSelector } from '../../../selectors/listSelectors';
 import { getGroupsOptions } from '../../../actions/reportsActions';
+import { groupsOptionsSelector, groupsDataSelector } from '../../../selectors/listSelectors';
+import { currencySelector } from '../../../selectors/settingsSelector';
 import {
-  getConditionTypes,
+  eventConditionsOperatorsSelectOptionsSelector,
+} from '../../../selectors/eventSelectors';
+import {
   getConditionData,
   getPathParams,
   buildBalanceConditionPath,
   getUnitTitle,
  } from '../EventsUtil';
 import { getGroupUsaget } from '../../../common/Util';
-import { currencySelector } from '../../../selectors/settingsSelector';
 
-class EventFormBalance extends Component {
+class BalanceEventCondition extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
@@ -29,6 +31,7 @@ class EventFormBalance extends Component {
     activityType: PropTypes.string,
     groupName: PropTypes.string,
     overGroup: PropTypes.string,
+    conditionsOperators: PropTypes.instanceOf(Immutable.List),
     groupsOptions: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
@@ -45,6 +48,7 @@ class EventFormBalance extends Component {
     activityType: '',
     groupName: '',
     overGroup: 'none',
+    conditionsOperators: Immutable.List(),
     groupsOptions: Immutable.List(),
     propertyTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
@@ -162,6 +166,7 @@ class EventFormBalance extends Component {
     const {
       item,
       index,
+      conditionsOperators,
       trigger,
       limitation,
       activityType,
@@ -319,7 +324,7 @@ class EventFormBalance extends Component {
               id={`cond-type-${index}`}
               onChange={this.onChangeType}
               value={item.get('type', '')}
-              options={getConditionTypes()}
+              options={conditionsOperators}
             />
           </Col>
         </FormGroup>
@@ -376,7 +381,8 @@ const mapStateToProps = (state, props) => {
     groupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     groupsData: groupsDataSelector(state, props) || Immutable.Map(),
     currency: currencySelector(state, props),
+    conditionsOperators: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'balance' }),
   };
 };
 
-export default connect(mapStateToProps)(EventFormBalance);
+export default connect(mapStateToProps)(BalanceEventCondition);

@@ -2,12 +2,17 @@ import Immutable from 'immutable';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { getConfig, getUnitLabel, getValueByUnit } from '../../common/Util';
 
-export const getConditionTypes = () => (getConfig(['events', 'conditions'], Immutable.Map()).map(condType => (
-  { value: condType.get('key', ''), label: condType.get('title', '') })).toArray()
-);
+// export const getConditionTypes = eventType => getConfig(['events', 'conditions'], Immutable.List())
+//   .filter(cond => cond.get('include', Immutable.List()).includes(eventType))
+//   .map(cond => ({
+//     value: cond.get('id', ''),
+//     label: cond.get('title', ''),
+//   }))
+//   .toArray()
+// ;
 
 export const getConditionData = conditionName =>
-  (getConfig(['events', 'conditions'], Immutable.Map()).find(condType => condType.get('key', '') === conditionName) || Immutable.Map());
+  getConfig(['events', 'conditionsOperators', conditionName], Immutable.Map());
 
 export const buildBalanceConditionPath = (trigger, limitation, params = {}) => {
   switch (limitation) {
@@ -69,7 +74,7 @@ export const getPathParams = (path) => {
 };
 
 export const getConditionName = condition => (
-  (getConfig('events', Immutable.Map).get('conditions', Immutable.List()).find(cond => cond.get('key', '') === condition.get('type', '')) || Immutable.Map()).get('title', '')
+  (getConfig('events', Immutable.Map).get('conditionsOperators', Immutable.List()).find(cond => cond.get('id', '') === condition.get('type', '')) || Immutable.Map()).get('title', '')
 );
 
 export const getConditionPath = condition => (

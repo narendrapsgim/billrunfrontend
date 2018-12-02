@@ -7,7 +7,6 @@ import {
   isLinkerField,
   setFieldTitle,
 } from '../common/Util';
-import { getEventConvertedConditions } from '../components/Events/EventsUtil';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);

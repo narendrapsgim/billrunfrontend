@@ -1,6 +1,8 @@
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import EventsList from './EventsList';
+import EventBalanceForm from './Elements/EventBalanceForm';
+import EventFraudForm from './Elements/EventFraudForm';
 import {
   showConfirmModal,
   showFormModal,
@@ -18,10 +20,19 @@ import {
 import {
   eventsSelector,
 } from '../../selectors/settingsSelector';
+import {
+  getConfig,
+} from '../../common/Util';
 
 
 const Components = {
-  balance: require('./EventBalanceForm.js').default,
+  balance: EventBalanceForm,
+  fraud: EventFraudForm,
+};
+
+const defaultNewEvent = {
+  balance: Immutable.Map(),
+  fraud: Immutable.Map({ lines_overlap: true }),
 };
 
 
@@ -76,13 +87,14 @@ const mapDispatchToProps = (dispatch, props) => ({
   },
 
   onNew: () => {
+    const eventType = getConfig(['events', 'entities', props.eventType, 'title'], props.eventType);
     const onOk = editedItem => dispatch(saveEvent(props.eventType, editedItem))
       .then(success => (success.status ? true : Promise.reject()))
       .then(() => dispatch(showSuccess(`New event ${editedItem.get('event_code', '')} saved successfuly`)))
       .then(() => dispatch(getEvents(props.eventType)))
       .catch(() => Promise.reject());
     const config = {
-      title: 'Create new event',
+      title: `Create new ${eventType} event`,
       onOk,
       mode: 'create',
     };
