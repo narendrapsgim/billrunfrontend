@@ -1,9 +1,9 @@
 {
 	"conditionsOperators": [
     { "id": "in", "title": "In", "include": ["balance", "fraud"] },
-    { "id": "not_in", "title": "In", "include": ["fraud"] },
+    { "id": "not_in", "title": "Not In", "include": ["fraud"] },
 		{ "id": "is", "title": "Is", "include": ["balance"] },
-		{ "id": "is_not", "title": "Is Not", "include": ["balance", "fraud"]  },
+		{ "id": "is_not", "title": "Is Not", "include": ["balance"]  },
 		{ "id": "is_less_than", "title": "Is Less Than", "type": "number", "include": ["balance"] },
 		{ "id": "is_less_than_or_equal", "title": "Is Less Than Or Equal", "type": "number", "include": ["balance"] },
 		{ "id": "is_greater_than", "title": "Is Greater Than", "type": "number", "include": ["balance"] },
