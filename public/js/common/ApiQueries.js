@@ -284,6 +284,19 @@ export const getGroupsQuery = collection => ({
   ],
 });
 
+export const getPlaysQuery = () => ({
+  action: 'uniqueget',
+  entity: 'subscribers',
+  params: [
+    { query: JSON.stringify({}) },
+    { project: JSON.stringify({
+      play: 1,
+    }) },
+    { page: 0 },
+    { size: 9999 },
+  ],
+});
+
 export const getEntityByIdQuery = (collection, id) => ({
   action: 'get',
   entity: collection,

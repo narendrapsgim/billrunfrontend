@@ -15,6 +15,9 @@ const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
 const getSystemSettings = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['system']);
 
+const getPlaysSettings = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['plays']);
+
 const getPricing = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['pricing']);
 
@@ -249,6 +252,16 @@ export const pricingSelector = createSelector(
 export const systemSettingsSelector = createSelector(
   getSystemSettings,
   system => system,
+);
+
+export const playsSettingsSelector = createSelector(
+  getPlaysSettings,
+  plays => plays,
+);
+
+export const availablePlaysSettingsSelector = createSelector(
+  getPlaysSettings,
+  plays => (plays ? plays.filter(play => play.get('enabled', true)) : undefined),
 );
 
 export const closedCycleChangesSelector = createSelector(
