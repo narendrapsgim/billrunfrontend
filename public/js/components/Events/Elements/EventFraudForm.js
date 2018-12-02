@@ -21,7 +21,7 @@ class EventFraudForm extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     updateField: PropTypes.func.isRequired,
     mode: PropTypes.string,
-    conditionsOperators: PropTypes.instanceOf(Immutable.List),
+    conditionsOperators: PropTypes.array,
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     currency: PropTypes.string,
@@ -65,12 +65,6 @@ class EventFraudForm extends Component {
     this.props.updateField(['conditions'], conditions);
   }
 
-  // onChangeActivityTypes = (activityTypes) => {
-  //   const { item } = this.props;
-  //   const activityTypesList = Immutable.List((activityTypes.length) ? activityTypes.split(',') : []);
-  //   console.log("onChangeActivityTypes: ", activityTypesList);
-  // }
-
   onChangeFields = (fields) => {
     const { item } = this.props;
     const fieldsList = Immutable.List((fields.length) ? fields.split(',') : []);
@@ -101,10 +95,6 @@ class EventFraudForm extends Component {
       { value: 'rate', label: 'Product' },
       { value: 'inpu_processor', label: 'Input Processor' },
     ];
-    // const conditionOperatorOptions = [
-    //   { value: '$in', label: 'Contains' },
-    //   { value: '$nin', label: 'Not Contains' },
-    // ];
     return (
       <FormGroup className="form-inner-edit-row">
         <Col smHidden mdHidden lgHidden>
@@ -377,7 +367,7 @@ const mapStateToProps = (state, props) => ({
   propertyTypes: propertyTypeSelector(state, props),
   usageTypesData: usageTypesDataSelector(state, props),
   currency: currencySelector(state, props),
-  conditionsOperators: eventConditionsOperatorsSelectOptionsSelector(state, props),
+  conditionsOperators: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
 });
 
 export default connect(mapStateToProps)(EventFraudForm);
