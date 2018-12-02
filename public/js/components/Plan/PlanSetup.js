@@ -169,8 +169,8 @@ class PlanSetup extends Component {
     this.props.dispatch(onPlanTariffRemove(index));
   }
 
-  onGroupAdd = (groupName, usages, unit, value, shared, pooled, products) => {
-    this.props.dispatch(onGroupAdd(groupName, usages, unit, value, shared, pooled, products));
+  onGroupAdd = (groupName, usages, unit, value, shared, pooled, quantityAffected, products) => {
+    this.props.dispatch(onGroupAdd(groupName, usages, unit, value, shared, pooled, quantityAffected, products));
   }
 
   onGroupRemove = (groupName) => {
