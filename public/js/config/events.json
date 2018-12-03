@@ -50,7 +50,7 @@
         ]
       }
     },
-    { "id": "plan", "entity": "line", "inputConfig": { "inputType": "select", "callback": "getPlansOptions" } },
+    { "id": "subscriber.plan", "entity": "line", "inputConfig": { "inputType": "select", "callback": "getPlansOptions" } },
     { "id": "arate_key", "entity": "line", "inputConfig": { "inputType": "select", "callback": "getProductsOptions" } }
   ],
   "thresholdFields": [
