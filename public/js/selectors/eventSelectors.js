@@ -1,22 +1,22 @@
 import { createSelector } from 'reselect';
-import { titleCase, sentenceCase, upperCaseFirst } from 'change-case';
+// import { titleCase, sentenceCase, upperCaseFirst } from 'change-case';
 import Immutable from 'immutable';
 import {
   getConfig,
-  getFieldName,
-  getFieldNameType,
-  getUnitLabel,
-  getValueByUnit,
+  // getFieldName,
+  // getFieldNameType,
+  // getUnitLabel,
+  // getValueByUnit,
   parseConfigSelectOptions,
   sortFieldOption,
   setFieldTitle,
 } from '../common/Util';
 import {
   // subscriberFieldsSelector,
-  inputProssesorfilteredFieldsSelector,
+  // inputProssesorfilteredFieldsSelector,
   // accountFieldsSelector,
   linesFieldsSelector,
-  getLinesFields
+  // getLinesFields
   // rateCategoriesSelector,
   // usageTypeSelector,
   // fileTypeSelector,
@@ -37,7 +37,6 @@ const formatEventConditionsFilter = (evetntConfigFields = Immutable.List(), bill
         optionsWithMutations.push(billrunFieldWithMutations);
       });
     });
-
     // set fields from event config
     evetntConfigFields.forEach((evetntConfigField) => {
       optionsWithMutations.push(setFieldTitle(evetntConfigField, null, 'id'));
@@ -84,13 +83,14 @@ export const eventConditionsFieldsSelectOptionsSelector = createSelector(
 
 export const eventThresholdOperatorsSelector = createSelector(
   getEventConfig,
-  (config = Immutable.Map()) => config.get('thresholdOperators', Immutable.List()),
+  (state, props) => props.eventType,
+  (config = Immutable.Map(), eventType) => config
+    .get('thresholdOperators', Immutable.List())
+    .filter(operator => operator.get('include', Immutable.List()).includes(eventType)),
 );
 export const eventThresholdOperatorsSelectOptionsSelector = createSelector(
   eventThresholdOperatorsSelector,
-  (state, props) => props.eventType,
-  (operators = Immutable.Map(), eventType) => operators
-    .filter(operator => operator.get('include', Immutable.List()).includes(eventType))
+  (operators = Immutable.Map()) => operators
     .map(parseConfigSelectOptions)
     .toArray(),
 );
@@ -99,7 +99,7 @@ export const eventTresholdFieldsSelector = createSelector(
   getEventConfig,
   (config = Immutable.Map()) => config.get('thresholdFields', Immutable.List()),
 );
-export const eventthresholdFieldsSelectOptionsSelector = createSelector(
+export const eventThresholdFieldsSelectOptionsSelector = createSelector(
   eventTresholdFieldsSelector,
   (operators = Immutable.Map()) => operators
     .map(field => setFieldTitle(field, null, 'id'))

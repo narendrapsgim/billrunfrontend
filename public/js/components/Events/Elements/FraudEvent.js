@@ -10,14 +10,17 @@ import {
   propertyTypeSelector,
   currencySelector,
 } from '../../../selectors/settingsSelector';
+import ConditionValue from '../../Report/Editor/ConditionValue';
+
 import {
+  eventConditionsFilterOptionsSelector,
   eventConditionsOperatorsSelectOptionsSelector,
   eventConditionsFieldsSelectOptionsSelector,
+  eventThresholdOperatorsSelector,
   eventThresholdOperatorsSelectOptionsSelector,
-  eventthresholdFieldsSelectOptionsSelector
+  eventThresholdFieldsSelectOptionsSelector,
 } from '../../../selectors/eventSelectors';
 import { getSettings } from '../../../actions/settingsActions';
-
 
 class FraudEvent extends Component {
 
@@ -25,10 +28,12 @@ class FraudEvent extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     updateField: PropTypes.func.isRequired,
     mode: PropTypes.string,
-    conditionsFiltersOptions: PropTypes.array,
-    conditionsOperatorsOptions: PropTypes.array,
-    thresholdFieldsOptions: PropTypes.array,
-    thresholdOperatorsOptions: PropTypes.array,
+    conditionsFieldSelectOptions: PropTypes.array,
+    conditionsOperatorsSelectOptions: PropTypes.array,
+    thresholdFieldsSelectOptions: PropTypes.array,
+    thresholdOperatorsSelectOptions: PropTypes.array,
+    conditionsFields: PropTypes.instanceOf(Immutable.List),
+    conditionsOperators: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     currency: PropTypes.string,
@@ -38,10 +43,12 @@ class FraudEvent extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     mode: 'create',
-    conditionsOperatorsOptions: Immutable.List(),
-    thresholdOperatorsOptions: Immutable.List(),
-    conditionsFiltersOptions: Immutable.List(),
-    thresholdFieldsOptions: Immutable.List(),
+    conditionsOperatorsSelectOptions: Immutable.List(),
+    thresholdOperatorsSelectOptions: Immutable.List(),
+    conditionsFieldSelectOptions: Immutable.List(),
+    thresholdFieldsSelectOptions: Immutable.List(),
+    conditionsFields: Immutable.List(),
+    conditionsOperators: Immutable.List(),
     propertyTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
     currency: '',
@@ -58,6 +65,15 @@ class FraudEvent extends Component {
 
   onChangeSelect = path => (value) => {
     this.props.updateField(path, value);
+  }
+
+  onChangeConditionsField = index => (field) => {
+    const condition = Immutable.Map({
+      field,
+      op: '',
+      value: '',
+    });
+    this.props.updateField(['conditions', index], condition);
   }
 
   onChangePeriod = path => (value) => {
@@ -105,7 +121,19 @@ class FraudEvent extends Component {
   }
 
   renderCondition = (condition, index) => {
-    const { item, conditionsOperatorsOptions, conditionsFiltersOptions } = this.props;
+    const {
+      item,
+      conditionsOperatorsSelectOptions,
+      conditionsFieldSelectOptions,
+      conditionsFields,
+      conditionsOperators,
+    } = this.props;
+    const field = item.getIn(['conditions', index, 'field'], '');
+    const operator = item.getIn(['conditions', index, 'op'], '');
+    const disableOp = field === '';
+    const disableVal = operator === '' || disableOp;
+    const conditionField = conditionsFields.find(condField => condField.get('id', '') === field, null, Immutable.Map());
+    const conditionOperator = conditionsOperators.find(condOp => condOp.get('id', '') === operator, null, Immutable.Map());
     return (
       <FormGroup className="form-inner-edit-row" key={`fraud_condition_${index}`}>
         <Col smHidden mdHidden lgHidden>
@@ -115,33 +143,36 @@ class FraudEvent extends Component {
           <Field
             id="condition_field"
             fieldType="select"
-            options={conditionsFiltersOptions}
-            onChange={this.onChangeSelect(['conditions', index, 'field'])}
-            value={item.getIn(['conditions', index, 'field'], '')}
+            options={conditionsFieldSelectOptions}
+            onChange={this.onChangeConditionsField(index)}
+            value={field}
           />
         </Col>
 
         <Col smHidden mdHidden lgHidden>
           <label htmlFor="condition_operator">Operator</label>
         </Col>
-        <Col sm={3}>
+        <Col sm={2}>
           <Field
             id="condition_operator"
             fieldType="select"
-            options={conditionsOperatorsOptions}
+            options={conditionsOperatorsSelectOptions}
             onChange={this.onChangeSelect(['conditions', index, 'op'])}
             value={item.getIn(['conditions', index, 'op'], '')}
+            disabled={disableOp}
           />
         </Col>
 
         <Col smHidden mdHidden lgHidden>
           <label htmlFor="condition_value">Value</label>
         </Col>
-        <Col sm={3}>
-          <Field
-            id="condition_value"
-            onChange={this.onChangeText(['conditions', index, 'value'])}
-            value={item.getIn(['conditions', index, 'value'], '')}
+        <Col sm={4}>
+          <ConditionValue
+            field={item.getIn(['conditions', index])}
+            config={conditionField}
+            operator={conditionOperator}
+            disabled={disableVal}
+            onChange={this.onChangeSelect(['conditions', index, 'value'])}
           />
         </Col>
         <Col sm={2} className="actions">
@@ -164,8 +195,8 @@ class FraudEvent extends Component {
           { !conditionsRows.isEmpty() ? (
             <FormGroup className="form-inner-edit-row">
               <Col sm={4} xsHidden><label htmlFor="field_field">Filter</label></Col>
-              <Col sm={3} xsHidden><label htmlFor="operator_field">Operator</label></Col>
-              <Col sm={3} xsHidden><label htmlFor="value_field">Value</label></Col>
+              <Col sm={2} xsHidden><label htmlFor="operator_field">Operator</label></Col>
+              <Col sm={4} xsHidden><label htmlFor="value_field">Value</label></Col>
             </FormGroup>
           ) : (
             <HelpBlock>Please add at least one condition</HelpBlock>
@@ -187,8 +218,7 @@ class FraudEvent extends Component {
   }
 
   renderThreshold = () => {
-    const { item, thresholdOperatorsOptions, thresholdFieldsOptions } = this.props;
-    console.log(thresholdFieldsOptions);
+    const { item, thresholdOperatorsSelectOptions, thresholdFieldsSelectOptions } = this.props;
     const thresholdUomOptions = [
       { value: 'min', label: 'Minutes' },
       { value: 'sec', label: 'Seconds' },
@@ -209,7 +239,7 @@ class FraudEvent extends Component {
             <Field
               id="threshold_field"
               fieldType="select"
-              options={thresholdFieldsOptions}
+              options={thresholdFieldsSelectOptions}
               onChange={this.onChangeSelect(['threshold_conditions', 0, 'field'])}
               value={item.getIn(['threshold_conditions', 0, 'field'], '')}
             />
@@ -222,7 +252,7 @@ class FraudEvent extends Component {
             <Field
               id="threshold_operator"
               fieldType="select"
-              options={thresholdOperatorsOptions}
+              options={thresholdOperatorsSelectOptions}
               onChange={this.onChangeSelect(['threshold_conditions', 0, 'op'])}
               value={item.getIn(['threshold_conditions', 0, 'op'], '')}
             />
@@ -371,10 +401,12 @@ const mapStateToProps = (state, props) => ({
   propertyTypes: propertyTypeSelector(state, props),
   usageTypesData: usageTypesDataSelector(state, props),
   currency: currencySelector(state, props),
-  conditionsOperatorsOptions: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
-  conditionsFiltersOptions: eventConditionsFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
-  thresholdOperatorsOptions: eventThresholdOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
-  thresholdFieldsOptions: eventthresholdFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
+  conditionsFields: eventConditionsFilterOptionsSelector(state, { eventType: 'fraud' }),
+  conditionsOperators: eventThresholdOperatorsSelector(state, { eventType: 'fraud' }),
+  conditionsOperatorsSelectOptions: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
+  conditionsFieldSelectOptions: eventConditionsFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
+  thresholdOperatorsSelectOptions: eventThresholdOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
+  thresholdFieldsSelectOptions: eventThresholdFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
 });
 
 export default connect(mapStateToProps)(FraudEvent);
