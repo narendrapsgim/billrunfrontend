@@ -10,6 +10,8 @@ import {
   parseConfigSelectOptions,
   sortFieldOption,
   setFieldTitle,
+  onlyLineForeignFields,
+  foreignFieldWithoutDates,
 } from '../common/Util';
 import {
   // subscriberFieldsSelector,
@@ -58,14 +60,15 @@ export const eventConditionsOperatorsSelectOptionsSelector = createSelector(
     .toArray(),
 );
 
-
 export const eventConditionsConfigFieldsSelector = createSelector(
   getEventConfig,
   (config = Immutable.Map()) => config.get('conditionsFields', Immutable.List()),
 );
 export const foreignLinesFieldsSelector = createSelector(
   linesFieldsSelector,
-  (lineFields = Immutable.List()) => lineFields.filter(lineField => lineField.has('foreign')),
+  (lineFields = Immutable.List()) => lineFields
+    .filter(onlyLineForeignFields)
+    .filter(foreignFieldWithoutDates),
 );
 export const eventConditionsFilterOptionsSelector = createSelector(
   eventConditionsConfigFieldsSelector,
