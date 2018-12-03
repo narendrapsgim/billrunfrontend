@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import EventsList from './EventsList';
-import EventBalanceForm from './Elements/EventBalanceForm';
-import EventFraudForm from './Elements/EventFraudForm';
+import BalanceEvent from './Elements/BalanceEvent';
+import FraudEvent from './Elements/FraudEvent';
 import {
   showConfirmModal,
   showFormModal,
@@ -26,13 +26,19 @@ import {
 
 
 const Components = {
-  balance: EventBalanceForm,
-  fraud: EventFraudForm,
+  balance: BalanceEvent,
+  fraud: FraudEvent,
 };
+
 
 const defaultNewEvent = {
   balance: Immutable.Map(),
-  fraud: Immutable.Map({ lines_overlap: true }),
+  fraud: Immutable.Map({
+    date_range: Immutable.Map({ type: 'hourly' }),
+    recurrence: Immutable.Map({ type: 'hourly' }),
+    lines_overlap: true,
+  }),
+
 };
 
 

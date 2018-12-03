@@ -7,7 +7,7 @@ import Field from '../../Field';
 import BalanceEventCondition from './BalanceEventCondition';
 import { usageTypesDataSelector, propertyTypeSelector, currencySelector } from '../../../selectors/settingsSelector';
 
-class EventBalanceForm extends Component {
+class BalanceEvent extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
@@ -165,4 +165,4 @@ const mapStateToProps = (state, props) => ({
   currency: currencySelector(state, props),
 });
 
-export default connect(mapStateToProps)(EventBalanceForm);
+export default connect(mapStateToProps)(BalanceEvent);
