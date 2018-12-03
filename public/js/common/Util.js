@@ -532,3 +532,7 @@ export const sortFieldOption = (optionsA, optionB) => {
   }
   return 0;
 };
+
+export const onlyLineForeignFields = lineField => lineField.has('foreign');
+
+export const foreignFieldWithoutDates = foreignField => foreignField.getIn(['foreign', 'translate', 'type'], '') !== 'unixTimeToString';
