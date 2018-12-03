@@ -1,21 +1,56 @@
 {
-	"conditionsOperators": [
+  "entities": {
+    "balance": { "title": "balance", "listTitle": "balances" },
+    "fraud": { "title": "fraud", "title": "fraud" }
+  },
+  "conditionsOperators": [
     { "id": "in", "title": "In", "include": ["balance", "fraud"] },
-    { "id": "not_in", "title": "Not In", "include": ["fraud"] },
-		{ "id": "is", "title": "Is", "include": ["balance"] },
-		{ "id": "is_not", "title": "Is Not", "include": ["balance"]  },
-		{ "id": "is_less_than", "title": "Is Less Than", "type": "number", "include": ["balance"] },
-		{ "id": "is_less_than_or_equal", "title": "Is Less Than Or Equal", "type": "number", "include": ["balance"] },
-		{ "id": "is_greater_than", "title": "Is Greater Than", "type": "number", "include": ["balance"] },
-		{ "id": "is_greater_than_or_equal", "title": "Is Greater Than Or Equal", "type": "number", "include": ["balance"] },
-		{ "id": "reached_constant", "title": "Reached Constant", "type": "tags", "include": ["balance"] },
-		{ "id": "reached_constant_recurring", "title": "Reached Constant (Recurring)", "type": "number", "include": ["balance"] },
-		{ "id": "has_changed", "title": "Has Changed", "extra_field": false, "include": ["balance"] },
-		{ "id": "has_changed_to", "title": "Has Changed To", "include": ["balance"] },
-		{ "id": "has_changed_from", "title": "Has Changed From", "include": ["balance"] }
-	],
-	"entities": {
-		"balance": { "title": "balance", "listTitle": "balances" },
-		"fraud": { "title": "fraud", "title": "fraud" }
-	}
+    { "id": "not_in", "title": "Is Not", "include": ["fraud"] },
+    { "id": "is", "title": "Is", "include": ["balance"] },
+    { "id": "is_not", "title": "Is Not", "include": ["balance"]  },
+    { "id": "is_less_than", "title": "Is Less Than", "type": "number", "include": ["balance"] },
+    { "id": "is_less_than_or_equal", "title": "Is Less Than Or Equal", "type": "number", "include": ["balance"] },
+    { "id": "is_greater_than", "title": "Is Greater Than", "type": "number", "include": ["balance"] },
+    { "id": "is_greater_than_or_equal", "title": "Is Greater Than Or Equal", "type": "number", "include": ["balance"] },
+    { "id": "reached_constant", "title": "Reached Constant", "type": "tags", "include": ["balance"] },
+    { "id": "reached_constant_recurring", "title": "Reached Constant (Recurring)", "type": "number", "include": ["balance"] },
+    { "id": "has_changed", "title": "Has Changed", "extra_field": false, "include": ["balance"] },
+    { "id": "has_changed_to", "title": "Has Changed To", "include": ["balance"] },
+    { "id": "has_changed_from", "title": "Has Changed From", "include": ["balance"] }
+  ],
+  "conditionsFields": [
+    { "id": "usaget", "entity": "line", "inputConfig":
+      { "inputType": "select", "callback": "getUsageTypesOptions" }
+    },
+    { "id": "type", "title": "Input processor name / BillRun type", "inputConfig": {
+        "inputType": "select",
+        "callback": "getFileTypeOptions",
+        "options": [
+          { "value": "flat", "label": "Subscription" },
+          "service",
+          { "value": "credit", "label": "Charge / Refund" },
+          "discount",
+          "all"
+        ]
+      }
+    },
+    { "id": "plan", "entity": "line", "inputConfig": { "inputType": "select", "callback": "getPlansOptions" } },
+    { "id": "arate_key", "entity": "line", "inputConfig": { "inputType": "select", "callback": "getProductsOptions" } }
+  ],
+  "thresholdOperators": [
+    { "id": "in", "title": "In", "include": ["fraud"] },
+    { "id": "not_in", "title": "Is Not", "include": ["fraud"] },
+    { "id": "is_greater_than", "title": "Is Greater Than", "type": "number", "include": ["fraud"] },
+    { "id": "is_greater_than_or_equal", "title": "Is Greater Than Or Equal", "type": "number", "include": ["fraud"] },
+    { "id": "is_less_than", "title": "Is Less Than", "type": "number", "include": ["fraud"] },
+    { "id": "is_less_than_or_equal", "title": "Is Less Than Or Equal", "type": "number", "include": ["fraud"] }
+  ],
+  "thresholdFields": [
+    { "id": "usagev", "entity": "line" },
+    { "id": "aprice", "entity": "line" },
+    { "id": "final_charge", "entity": "line"},
+    { "id": "in_group", "entity": "line"},
+    { "id": "over_group", "entity": "line"},
+    { "id": "out_group", "title": "Out Group" }
+  ]
 }

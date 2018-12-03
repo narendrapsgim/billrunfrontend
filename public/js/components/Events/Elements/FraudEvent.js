@@ -11,10 +11,10 @@ import {
   currencySelector,
 } from '../../../selectors/settingsSelector';
 import {
-  eventConditionsFilterOptionsSelectOptionsSelector,
   eventConditionsOperatorsSelectOptionsSelector,
-  eventThresholdFieldsSelectOptionsSelector,
-  eventThresholdOperatorOptionsSelectOptionsSelector,
+  eventConditionsFieldsSelectOptionsSelector,
+  eventThresholdOperatorsSelectOptionsSelector,
+  eventthresholdFieldsSelectOptionsSelector
 } from '../../../selectors/eventSelectors';
 import { getSettings } from '../../../actions/settingsActions';
 
@@ -188,10 +188,7 @@ class FraudEvent extends Component {
 
   renderThreshold = () => {
     const { item, thresholdOperatorsOptions, thresholdFieldsOptions } = this.props;
-    // const thresholdOptions = [
-    //   { value: 'usagev', label: 'Usagev' },
-    //   { value: 'aprice', label: 'Aprice' },
-    // ];
+    console.log(thresholdFieldsOptions);
     const thresholdUomOptions = [
       { value: 'min', label: 'Minutes' },
       { value: 'sec', label: 'Seconds' },
@@ -375,9 +372,9 @@ const mapStateToProps = (state, props) => ({
   usageTypesData: usageTypesDataSelector(state, props),
   currency: currencySelector(state, props),
   conditionsOperatorsOptions: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
-  conditionsFiltersOptions: eventConditionsFilterOptionsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
-  thresholdOperatorsOptions: eventThresholdOperatorOptionsSelectOptionsSelector(null, { eventType: 'fraud' }),
-  thresholdFieldsOptions: eventThresholdFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
+  conditionsFiltersOptions: eventConditionsFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
+  thresholdOperatorsOptions: eventThresholdOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
+  thresholdFieldsOptions: eventthresholdFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
 });
 
 export default connect(mapStateToProps)(FraudEvent);
