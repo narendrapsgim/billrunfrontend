@@ -498,9 +498,15 @@ export const escapeRegExp = text =>
 
 export const createRateListNameByArgs = (query = Immutable.Map()) => query.reduce((acc, value, key) => `${acc}.${key}.${value}`, 'rates');
 
-export const setFieldTitle = (field, entity) => (field.has('title')
-    ? field
-    : field.set('title', getFieldName(field.get('field_name', ''), getFieldNameType(entity), sentenceCase(field.get('field_name', '')))));
+export const setFieldTitle = (field, entity, keyProperty = 'field_name') => {
+  if (field.has('title')) {
+    return field;
+  }
+  const entityName = getFieldNameType(!entity && field.has('entity') ? field.get('entity') : entity);
+  const key = field.get(keyProperty, '');
+  const defaultLable = sentenceCase(field.get(keyProperty, ''));
+  return field.set('title', getFieldName(key, entityName, defaultLable));
+};
 
 export const toImmutableList = (value) => {
   if ([undefined, null].includes(value)) {
