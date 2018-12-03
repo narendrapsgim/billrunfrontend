@@ -48,13 +48,12 @@ const getEventConfig = () => getConfig('events', Immutable.Map());
 
 export const eventConditionsOperatorsSelector = createSelector(
   getEventConfig,
-  (config = Immutable.Map()) => config.get('conditionsOperators', Immutable.List()),
+  (state, props) => props.eventType,
+  (config = Immutable.Map(), eventType) => config.getIn(['operators', eventType, 'conditions'], Immutable.List()),
 );
 export const eventConditionsOperatorsSelectOptionsSelector = createSelector(
   eventConditionsOperatorsSelector,
-  (state, props) => props.eventType,
-  (operators = Immutable.Map(), eventType) => operators
-    .filter(operator => operator.get('include', Immutable.List()).includes(eventType))
+  (operators = Immutable.Map()) => operators
     .map(parseConfigSelectOptions)
     .toArray(),
 );
@@ -84,9 +83,7 @@ export const eventConditionsFieldsSelectOptionsSelector = createSelector(
 export const eventThresholdOperatorsSelector = createSelector(
   getEventConfig,
   (state, props) => props.eventType,
-  (config = Immutable.Map(), eventType) => config
-    .get('thresholdOperators', Immutable.List())
-    .filter(operator => operator.get('include', Immutable.List()).includes(eventType)),
+  (config = Immutable.Map(), eventType) => config.getIn(['operators', eventType, 'threshold'], Immutable.List()),
 );
 export const eventThresholdOperatorsSelectOptionsSelector = createSelector(
   eventThresholdOperatorsSelector,

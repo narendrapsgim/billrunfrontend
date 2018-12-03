@@ -71,9 +71,14 @@ class FraudEvent extends Component {
     const condition = Immutable.Map({
       field,
       op: '',
-      value: '',
+      value: Immutable.List(),
     });
-    this.props.updateField(['conditions', index], condition);
+    this.props.updateField(['conditions', 0, index], condition);
+  }
+
+  onChangeConditionsValue = index => (value) => {
+    const values = Immutable.List((value.length) ? value.split(',') : []);
+    this.props.updateField(['conditions', 0, index, 'value'], values);
   }
 
   onChangePeriod = path => (value) => {
@@ -83,31 +88,28 @@ class FraudEvent extends Component {
 
   onRemoveCondition = index => () => {
     const { item } = this.props;
-    const conditions = item.get('conditions', Immutable.List()).delete(index);
-    this.props.updateField(['conditions'], conditions);
+    const conditions = item.getIn(['conditions', 0], Immutable.List()).delete(index);
+    this.props.updateField(['conditions', 0], conditions);
   }
 
   onAddCondition = () => {
     const { item } = this.props;
     const conditions = Immutable.List([
-      ...item.get('conditions', Immutable.List()),
-      Immutable.Map({ field: '', op: '', value: '' }),
+      ...item.getIn(['conditions', 0], Immutable.List()),
+      Immutable.Map({ field: '', op: '', value: Immutable.List() }),
     ]);
-    this.props.updateField(['conditions'], conditions);
+    this.props.updateField(['conditions', 0], conditions);
   }
 
-  onChangeFields = (fields) => {
-    const { item } = this.props;
-    const fieldsList = Immutable.List((fields.length) ? fields.split(',') : []);
-    if (fieldsList.isEmpty()) {
-      return this.props.updateField('conditions', Immutable.List());
+  gitPeriodLabel = (value) => {
+    switch (value) {
+      case 'minutely':
+        return 'Minutes';
+      case 'hourly':
+        return 'Hours';
+      default:
+        return 'Select unit...';
     }
-    const curentFields = item.getIn(['conditions'], Immutable.List()).map(condition => condition.get('field'));
-    const newConditions = fieldsList.map(condition => (curentFields.includes(condition)
-      ? item.getIn(['conditions']).find(cond => cond.get('field', '') === condition)
-      : Immutable.Map({ field: condition, op: '' })
-    ));
-    return this.props.updateField(['conditions'], newConditions);
   }
 
   gitTimeOptions = (value) => {
@@ -122,18 +124,18 @@ class FraudEvent extends Component {
 
   renderCondition = (condition, index) => {
     const {
-      item,
       conditionsOperatorsSelectOptions,
       conditionsFieldSelectOptions,
       conditionsFields,
       conditionsOperators,
     } = this.props;
-    const field = item.getIn(['conditions', index, 'field'], '');
-    const operator = item.getIn(['conditions', index, 'op'], '');
+    const field = condition.getIn(['field'], '');
+    const operator = condition.getIn(['op'], '');
     const disableOp = field === '';
     const disableVal = operator === '' || disableOp;
     const conditionField = conditionsFields.find(condField => condField.get('id', '') === field, null, Immutable.Map());
     const conditionOperator = conditionsOperators.find(condOp => condOp.get('id', '') === operator, null, Immutable.Map());
+    const conditionForValue = condition.set('value', condition.get('value', Immutable.List()).join(','));
     return (
       <FormGroup className="form-inner-edit-row" key={`fraud_condition_${index}`}>
         <Col smHidden mdHidden lgHidden>
@@ -157,8 +159,8 @@ class FraudEvent extends Component {
             id="condition_operator"
             fieldType="select"
             options={conditionsOperatorsSelectOptions}
-            onChange={this.onChangeSelect(['conditions', index, 'op'])}
-            value={item.getIn(['conditions', index, 'op'], '')}
+            onChange={this.onChangeSelect(['conditions', 0, index, 'op'])}
+            value={condition.getIn(['op'], '')}
             disabled={disableOp}
           />
         </Col>
@@ -168,11 +170,11 @@ class FraudEvent extends Component {
         </Col>
         <Col sm={4}>
           <ConditionValue
-            field={item.getIn(['conditions', index])}
+            field={conditionForValue}
             config={conditionField}
             operator={conditionOperator}
             disabled={disableVal}
-            onChange={this.onChangeSelect(['conditions', index, 'value'])}
+            onChange={this.onChangeConditionsValue(index)}
           />
         </Col>
         <Col sm={2} className="actions">
@@ -186,7 +188,7 @@ class FraudEvent extends Component {
 
   renderConditions = () => {
     const { item } = this.props;
-    const conditionsRows = item.get('conditions', Immutable.List()).map(this.renderCondition);
+    const conditionsRows = item.getIn(['conditions', 0], Immutable.List()).map(this.renderCondition);
     const disableAdd = false; // fieldsOptions.isEmpty();
     const disableCreateNewtitle = disableAdd ? 'No more filter options' : '';
     return (
@@ -223,6 +225,7 @@ class FraudEvent extends Component {
       { value: 'min', label: 'Minutes' },
       { value: 'sec', label: 'Seconds' },
     ];
+    const threshold = item.getIn(['threshold_conditions', 0, 0], Immutable.Map());
     return (
       <Col sm={12}>
         <FormGroup className="form-inner-edit-row">
@@ -240,8 +243,8 @@ class FraudEvent extends Component {
               id="threshold_field"
               fieldType="select"
               options={thresholdFieldsSelectOptions}
-              onChange={this.onChangeSelect(['threshold_conditions', 0, 'field'])}
-              value={item.getIn(['threshold_conditions', 0, 'field'], '')}
+              onChange={this.onChangeSelect(['threshold_conditions', 0, 0, 'field'])}
+              value={threshold.getIn(['field'], '')}
             />
           </Col>
 
@@ -253,8 +256,8 @@ class FraudEvent extends Component {
               id="threshold_operator"
               fieldType="select"
               options={thresholdOperatorsSelectOptions}
-              onChange={this.onChangeSelect(['threshold_conditions', 0, 'op'])}
-              value={item.getIn(['threshold_conditions', 0, 'op'], '')}
+              onChange={this.onChangeSelect(['threshold_conditions', 0, 0, 'op'])}
+              value={threshold.getIn(['op'], '')}
             />
           </Col>
 
@@ -264,8 +267,8 @@ class FraudEvent extends Component {
           <Col sm={4}>
             <Field
               id="threshold_value"
-              onChange={this.onChangeText(['threshold_conditions', 0, 'value'])}
-              value={item.getIn(['threshold_conditions', 0, 'value'], '')}
+              onChange={this.onChangeText(['threshold_conditions', 0, 0, 'value'])}
+              value={threshold.getIn(['value'], '')}
             />
           </Col>
 
@@ -277,8 +280,8 @@ class FraudEvent extends Component {
               id="threshold_uom"
               fieldType="select"
               options={thresholdUomOptions}
-              onChange={this.onChangeSelect(['threshold_conditions', 0, 'uom'])}
-              value={item.getIn(['threshold_conditions', 0, 'uom'], '')}
+              onChange={this.onChangeSelect(['threshold_conditions', 0, 0, 'uom'])}
+              value={threshold.getIn(['uom'], '')}
             />
           </Col>
         </FormGroup>
@@ -290,14 +293,10 @@ class FraudEvent extends Component {
   renderDetails = () => {
     const { item } = this.props;
     const recurrenceUnit = item.getIn(['recurrence', 'type'], '');
-    const recurrenceUnitTitle = (recurrenceUnit === '')
-      ? 'Select unit...'
-      : titleCase(recurrenceUnit);
+    const recurrenceUnitTitle = this.gitPeriodLabel(recurrenceUnit);
     const recurrenceOptions = this.gitTimeOptions(recurrenceUnit);
     const dateRangeUnit = item.getIn(['date_range', 'type'], '');
-    const dateRangeUnitTitle = (dateRangeUnit === '')
-      ? 'Select unit...'
-      : titleCase(dateRangeUnit);
+    const dateRangeUnitTitle = this.gitPeriodLabel(dateRangeUnit);
     const dateRangeOptions = this.gitTimeOptions(dateRangeUnit);
     return (
       <Col sm={12}>
