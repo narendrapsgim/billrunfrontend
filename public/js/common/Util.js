@@ -514,3 +514,15 @@ export const toImmutableList = (value) => {
   }
   return Immutable.List([value]);
 };
+
+export const sortFieldOption = (optionsA, optionB) => {
+  const a = optionsA.get('title', '').toUpperCase(); // ignore upper and lowercase
+  const b = optionB.get('title', '').toUpperCase(); // ignore upper and lowercase
+  if (a < b) {
+    return -1;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return 0;
+};

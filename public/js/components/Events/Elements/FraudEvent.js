@@ -11,30 +11,45 @@ import {
   currencySelector,
 } from '../../../selectors/settingsSelector';
 import {
+  eventConditionsFilterOptionsSelectOptionsSelector,
   eventConditionsOperatorsSelectOptionsSelector,
+  eventThresholdFieldsSelectOptionsSelector,
+  eventThresholdOperatorOptionsSelectOptionsSelector,
 } from '../../../selectors/eventSelectors';
+import { getSettings } from '../../../actions/settingsActions';
 
 
-class EventFraudForm extends Component {
+class FraudEvent extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     updateField: PropTypes.func.isRequired,
     mode: PropTypes.string,
-    conditionsOperators: PropTypes.array,
+    conditionsFiltersOptions: PropTypes.array,
+    conditionsOperatorsOptions: PropTypes.array,
+    thresholdFieldsOptions: PropTypes.array,
+    thresholdOperatorsOptions: PropTypes.array,
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     currency: PropTypes.string,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     item: Immutable.Map(),
     mode: 'create',
-    conditionsOperators: Immutable.List(),
+    conditionsOperatorsOptions: Immutable.List(),
+    thresholdOperatorsOptions: Immutable.List(),
+    conditionsFiltersOptions: Immutable.List(),
+    thresholdFieldsOptions: Immutable.List(),
     propertyTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
     currency: '',
   };
+
+  componentDidMount() {
+    this.props.dispatch(getSettings(['lines.fields']));
+  }
 
   onChangeText = path => (e) => {
     const { value } = e.target;
@@ -90,13 +105,9 @@ class EventFraudForm extends Component {
   }
 
   renderCondition = (condition, index) => {
-    const { item, conditionsOperators } = this.props;
-    const conditionFilterOptions = [
-      { value: 'rate', label: 'Product' },
-      { value: 'inpu_processor', label: 'Input Processor' },
-    ];
+    const { item, conditionsOperatorsOptions, conditionsFiltersOptions } = this.props;
     return (
-      <FormGroup className="form-inner-edit-row">
+      <FormGroup className="form-inner-edit-row" key={`fraud_condition_${index}`}>
         <Col smHidden mdHidden lgHidden>
           <label htmlFor="condition_filter">Filter</label>
         </Col>
@@ -104,7 +115,7 @@ class EventFraudForm extends Component {
           <Field
             id="condition_field"
             fieldType="select"
-            options={conditionFilterOptions}
+            options={conditionsFiltersOptions}
             onChange={this.onChangeSelect(['conditions', index, 'field'])}
             value={item.getIn(['conditions', index, 'field'], '')}
           />
@@ -117,7 +128,7 @@ class EventFraudForm extends Component {
           <Field
             id="condition_operator"
             fieldType="select"
-            options={conditionsOperators}
+            options={conditionsOperatorsOptions}
             onChange={this.onChangeSelect(['conditions', index, 'op'])}
             value={item.getIn(['conditions', index, 'op'], '')}
           />
@@ -176,15 +187,11 @@ class EventFraudForm extends Component {
   }
 
   renderThreshold = () => {
-    const { item } = this.props;
-    const thresholdOptions = [
-      { value: 'usagev', label: 'Usagev' },
-      { value: 'aprice', label: 'Aprice' },
-    ];
-    const thresholdOperatorOptions = [
-      { value: '$gt', label: 'Greater then' },
-      { value: '$gte', label: 'Greater then or equal' },
-    ];
+    const { item, thresholdOperatorsOptions, thresholdFieldsOptions } = this.props;
+    // const thresholdOptions = [
+    //   { value: 'usagev', label: 'Usagev' },
+    //   { value: 'aprice', label: 'Aprice' },
+    // ];
     const thresholdUomOptions = [
       { value: 'min', label: 'Minutes' },
       { value: 'sec', label: 'Seconds' },
@@ -195,7 +202,7 @@ class EventFraudForm extends Component {
           <Col sm={3} xsHidden><label htmlFor="threshold_field">Field</label></Col>
           <Col sm={3} xsHidden><label htmlFor="threshold_operator">Operator</label></Col>
           <Col sm={4} xsHidden><label htmlFor="threshold_value">Value</label></Col>
-          <Col sm={2} xsHidden><label htmlFor="threshold_uof">UOM</label></Col>
+          <Col sm={2} xsHidden><label htmlFor="threshold_uof">Unit of measure</label></Col>
         </FormGroup>
         <FormGroup className="form-inner-edit-row">
           <Col smHidden mdHidden lgHidden>
@@ -205,7 +212,7 @@ class EventFraudForm extends Component {
             <Field
               id="threshold_field"
               fieldType="select"
-              options={thresholdOptions}
+              options={thresholdFieldsOptions}
               onChange={this.onChangeSelect(['threshold_conditions', 0, 'field'])}
               value={item.getIn(['threshold_conditions', 0, 'field'], '')}
             />
@@ -218,7 +225,7 @@ class EventFraudForm extends Component {
             <Field
               id="threshold_operator"
               fieldType="select"
-              options={thresholdOperatorOptions}
+              options={thresholdOperatorsOptions}
               onChange={this.onChangeSelect(['threshold_conditions', 0, 'op'])}
               value={item.getIn(['threshold_conditions', 0, 'op'], '')}
             />
@@ -236,7 +243,7 @@ class EventFraudForm extends Component {
           </Col>
 
           <Col smHidden mdHidden lgHidden>
-            <label htmlFor="threshold_operator">UOM</label>
+            <label htmlFor="threshold_operator">Unit of measure</label>
           </Col>
           <Col sm={2}>
             <Field
@@ -285,20 +292,20 @@ class EventFraudForm extends Component {
           </Col>
           <Col sm={7}>
             <InputGroup>
-              <DropdownButton
-                id="balance-period-unit"
-                componentClass={InputGroup.Button}
-                title={recurrenceUnitTitle}
-              >
-                <MenuItem eventKey="minutely" onSelect={this.onChangePeriod(['recurrence'])}>Minutely</MenuItem>
-                <MenuItem eventKey="hourly" onSelect={this.onChangePeriod(['recurrence'])}>Hourly</MenuItem>
-              </DropdownButton>
               <Field
                 fieldType="select"
                 options={recurrenceOptions}
                 value={item.getIn(['recurrence', 'value'], '')}
                 onChange={this.onChangeSelect(['recurrence', 'value'])}
               />
+              <DropdownButton
+                id="balance-period-unit"
+                componentClass={InputGroup.Button}
+                title={recurrenceUnitTitle}
+              >
+                <MenuItem eventKey="minutely" onSelect={this.onChangePeriod(['recurrence'])}>Minutes</MenuItem>
+                <MenuItem eventKey="hourly" onSelect={this.onChangePeriod(['recurrence'])}>Hours</MenuItem>
+              </DropdownButton>
             </InputGroup>
           </Col>
         </FormGroup>
@@ -308,6 +315,12 @@ class EventFraudForm extends Component {
           </Col>
           <Col sm={7}>
             <InputGroup>
+              <Field
+                fieldType="select"
+                options={dateRangeOptions}
+                value={item.getIn(['date_range', 'value'], '')}
+                onChange={this.onChangeSelect(['date_range', 'value'])}
+              />
               <DropdownButton
                 id="balance-period-unit"
                 componentClass={InputGroup.Button}
@@ -316,12 +329,6 @@ class EventFraudForm extends Component {
                 <MenuItem eventKey="minutely" onSelect={this.onChangePeriod(['date_range'])}>Minutely</MenuItem>
                 <MenuItem eventKey="hourly" onSelect={this.onChangePeriod(['date_range'])}>Hourly</MenuItem>
               </DropdownButton>
-              <Field
-                fieldType="select"
-                options={dateRangeOptions}
-                value={item.getIn(['date_range', 'value'], '')}
-                onChange={this.onChangeSelect(['date_range', 'value'])}
-              />
             </InputGroup>
           </Col>
         </FormGroup>
@@ -367,7 +374,10 @@ const mapStateToProps = (state, props) => ({
   propertyTypes: propertyTypeSelector(state, props),
   usageTypesData: usageTypesDataSelector(state, props),
   currency: currencySelector(state, props),
-  conditionsOperators: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
+  conditionsOperatorsOptions: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
+  conditionsFiltersOptions: eventConditionsFilterOptionsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
+  thresholdOperatorsOptions: eventThresholdOperatorOptionsSelectOptionsSelector(null, { eventType: 'fraud' }),
+  thresholdFieldsOptions: eventThresholdFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
 });
 
-export default connect(mapStateToProps)(EventFraudForm);
+export default connect(mapStateToProps)(FraudEvent);
