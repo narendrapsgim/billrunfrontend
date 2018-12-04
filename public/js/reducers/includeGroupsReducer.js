@@ -10,6 +10,7 @@ const includeGroupsReducer = (state = DefaultState, action) => {
       const group = Immutable.Map({}).withMutations((groupWithMutations) => {
         groupWithMutations.set('account_shared', action.shared);
         groupWithMutations.set('account_pool', action.pooled);
+        groupWithMutations.set('quantity_affected', action.quantityAffected);
         groupWithMutations.set('rates', Immutable.List(action.products));
         if (action.usages.get(0, '') === 'cost') {
           groupWithMutations.set('cost', action.value);

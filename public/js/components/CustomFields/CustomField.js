@@ -7,6 +7,9 @@ import { SortableElement } from 'react-sortable-hoc';
 import ModalWrapper from '../Elements/ModalWrapper';
 import DragHandle from '../Elements/DragHandle';
 import Field from '../Field';
+import {
+  availablePlaysSettingsSelector,
+} from '../../selectors/settingsSelector';
 
 
 class CustomField extends Component {
@@ -20,6 +23,7 @@ class CustomField extends Component {
     existing: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
+    availablePlays: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
@@ -27,6 +31,7 @@ class CustomField extends Component {
     editable: true,
     existing: false,
     sortable: true,
+    availablePlays: Immutable.List(),
   };
 
   state = {
@@ -73,6 +78,11 @@ class CustomField extends Component {
     }
   };
 
+  onChangePlay = (plays) => {
+    const { entity, idx } = this.props;
+    this.props.onChange(entity, idx, 'plays', Immutable.List(plays.split(',')));
+  }
+
   onRemove = () => {
     const { entity, idx } = this.props;
     this.props.onRemove(entity, idx);
@@ -89,12 +99,20 @@ class CustomField extends Component {
   getFieldType = field => (field.get('type', '') === '' ? 'text' : field.get('type', ''));
   isBoolean = field => this.getFieldType(field) === 'boolean';
 
+  getPlayOptions = () => (this.props.availablePlays.map(play => ({
+    value: play.get('name', ''),
+    label: play.get('label', play.get('name', '')),
+  })).toArray());
+
   renderAdvancedEdit = () => {
-    const { field } = this.props;
+    const { field, entity } = this.props;
     const { showAdvancedEdit } = this.state;
     const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'field')} Details`);
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
     const isBoolean = this.isBoolean(field);
+    const playsOptions = this.getPlayOptions();
+    const showPlays = ['subscriber'].includes(entity) && playsOptions.length > 1;
+    const plays = field.get('plays', []).join(',');
 
     const disableUnique = isBoolean || !this.hasEditableField('unique');
     const disableMandatory = isBoolean || field.get('unique', false) || !this.hasEditableField('mandatory');
@@ -111,6 +129,20 @@ class CustomField extends Component {
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
         <Form horizontal>
+          {showPlays && (<FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Play</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field
+                fieldType="select"
+                options={playsOptions}
+                onChange={this.onChangePlay}
+                value={plays}
+                multi={true}
+                clearable={true}
+              />
+            </Col>
+          </FormGroup>)}
+
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Unique</Col>
             <Col sm={9} style={checkboxStyle}>
@@ -313,4 +345,8 @@ class CustomField extends Component {
 
 }
 
-export default connect()(SortableElement(CustomField));
+const mapStateToProps = (state, props) => ({
+  availablePlays: availablePlaysSettingsSelector(state, props),
+});
+
+export default connect(mapStateToProps)(SortableElement(CustomField));
