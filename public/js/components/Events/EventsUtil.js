@@ -1,18 +1,11 @@
 import Immutable from 'immutable';
 import getSymbolFromCurrency from 'currency-symbol-map';
-import { getConfig, getUnitLabel, getValueByUnit } from '../../common/Util';
+import { getConfig, getUnitLabel } from '../../common/Util';
 
-// export const getConditionTypes = eventType => getConfig(['events', 'conditions'], Immutable.List())
-//   .filter(cond => cond.get('include', Immutable.List()).includes(eventType))
-//   .map(cond => ({
-//     value: cond.get('id', ''),
-//     label: cond.get('title', ''),
-//   }))
-//   .toArray()
-// ;
 
-export const getConditionData = conditionName =>
-  getConfig(['events', 'conditionsOperators', conditionName], Immutable.Map());
+export const getBalanceConditionData = conditionName =>
+  getConfig(['events', 'operators', 'balance', 'conditions'], Immutable.Map())
+    .find(condType => condType.get('id', '') === conditionName, null, Immutable.Map());
 
 export const buildBalanceConditionPath = (trigger, limitation, params = {}) => {
   switch (limitation) {
@@ -41,12 +34,8 @@ export const getLimitationFromBalanceConditionPath = (path) => {
   return 'none';
 };
 
-export const getOverGroupFromBalanceConditionPath = (path) => {
-  if (path.indexOf('.over_group.') !== -1) {
-    return 'over_group';
-  }
-  return 'none';
-};
+export const getOverGroupFromBalanceConditionPath = path =>
+  (path.indexOf('.over_group.') !== -1 ? 'over_group' : 'none');
 
 export const getActivityTypeFromBalanceConditionPath = (path, limitation) => {
   if (limitation !== 'activity_type') {
@@ -73,13 +62,8 @@ export const getPathParams = (path) => {
   };
 };
 
-export const getConditionName = condition => (
-  (getConfig('events', Immutable.Map).get('conditionsOperators', Immutable.List()).find(cond => cond.get('id', '') === condition.get('type', '')) || Immutable.Map()).get('title', '')
-);
-
-export const getConditionPath = condition => (
-  condition.get('path', '')
-);
+export const getBalanceConditionName = condition =>
+  getBalanceConditionData(condition.get('type', '')).get('title', '');
 
 export const getUnitTitle = (unit, trigger, usaget, propertyTypes, usageTypesData, currency) => // eslint-disable-line max-len
   (trigger === 'usagev' || unit !== '' ? getUnitLabel(propertyTypes, usageTypesData, usaget, unit) : getSymbolFromCurrency(currency));
@@ -98,28 +82,11 @@ export const getConditionDescription = (conditionType, condition, params) => {
   }
   switch (limitation) {
     case 'group':
-      return `${pref} of group ${groupName} ${getConditionName(condition)} ${getConditionValue(condition, params)}`;
+      return `${pref} of group ${groupName} ${getBalanceConditionName(condition)} ${getConditionValue(condition, params)}`;
     case 'activity_type':
-      return `${pref} of ${activityType} activity ${getConditionName(condition)} ${getConditionValue(condition, params)}`;
+      return `${pref} of ${activityType} activity ${getBalanceConditionName(condition)} ${getConditionValue(condition, params)}`;
     case 'none':
     default:
-      return `Total cost ${getConditionName(condition)} ${getConditionValue(condition, params)}`;
+      return `Total cost ${getBalanceConditionName(condition)} ${getConditionValue(condition, params)}`;
   }
-};
-
-export const getEventConvertedConditions = (propertyTypes, usageTypes, item, toBaseUnit = true) => {
-  const convertedConditions = item.get('conditions', Immutable.List()).withMutations((conditionsWithMutations) => {
-    conditionsWithMutations.forEach((cond, index) => {
-      const unit = cond.get('unit', '');
-      const usaget = cond.get('usaget', '');
-      if (unit !== '' && usaget !== '') {
-        const value = cond.get('value', 0);
-        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
-        conditionsWithMutations.setIn([index, 'value'], newValue);
-      }
-    });
-  });
-  return !convertedConditions.isEmpty()
-    ? convertedConditions
-    : Immutable.List();
 };

@@ -12,7 +12,7 @@ import {
   eventConditionsOperatorsSelectOptionsSelector,
 } from '../../../selectors/eventSelectors';
 import {
-  getConditionData,
+  getBalanceConditionData,
   getPathParams,
   buildBalanceConditionPath,
   getUnitTitle,
@@ -179,7 +179,7 @@ class BalanceEventCondition extends Component {
 
     const usaget = (limitation === 'group' ? item.get('usaget', '') : activityType);
     const unitLabel = getUnitTitle(item.get('unit', ''), trigger, usaget, propertyTypes, usageTypesData, currency);
-    const selectedConditionData = getConditionData(item.get('type', ''));
+    const selectedConditionData = getBalanceConditionData(item.get('type', ''));
     return (
       <div>
 

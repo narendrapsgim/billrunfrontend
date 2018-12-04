@@ -1,6 +1,5 @@
 import Immutable from 'immutable';
 import uuid from 'uuid';
-import { getEventConvertedConditions } from '../components/Events/EventsUtil';
 import {
   saveSettings,
   updateSetting,
@@ -17,7 +16,25 @@ import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '..
 import {
   saveSettingsQuery,
 } from '../common/ApiQueries';
+import { getValueByUnit } from '../common/Util';
 
+
+const getEventConvertedConditions = (propertyTypes, usageTypes, item, toBaseUnit = true) => {
+  const convertedConditions = item.get('conditions', Immutable.List()).withMutations((conditionsWithMutations) => {
+    conditionsWithMutations.forEach((cond, index) => {
+      const unit = cond.get('unit', '');
+      const usaget = cond.get('usaget', '');
+      if (unit !== '' && usaget !== '') {
+        const value = cond.get('value', 0);
+        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+        conditionsWithMutations.setIn([index, 'value'], newValue);
+      }
+    });
+  });
+  return !convertedConditions.isEmpty()
+    ? convertedConditions
+    : Immutable.List();
+};
 
 const convertFromApiToUi = (event, params) => event.withMutations((eventWithMutations) => {
   const { propertyTypes, usageTypesData } = params;
