@@ -67,7 +67,12 @@ const mapDispatchToProps = (dispatch, props) => ({
     const onOk = (editedItem) => {
       dispatch(updateEvent(props.eventType, editedItem));
       return dispatch(saveEvents(props.eventType))
-        .then(() => dispatch(getEvents(props.eventType)));
+        .then(success => (success.status ? true : Promise.reject()))
+        .then(() => dispatch(getEvents(props.eventType)))
+        .catch(() => {
+          dispatch(getEvents(props.eventType));
+          return Promise.reject();
+        });
     };
     const config = {
       title: `Edit "${item.get('event_code')}" event`,
