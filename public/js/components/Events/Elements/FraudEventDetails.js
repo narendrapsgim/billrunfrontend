@@ -38,6 +38,10 @@ const FraudEventDetails = ({ item, onUpdate }) => {
   const onChangeDateRangeValue = (value) => {
     onUpdate(['date_range', 'value'], value);
   };
+  const onChangeActive = (e) => {
+    const { value } = e.target;
+    onUpdate(['active'], value === 'yes');
+  };
   return (
     <Col sm={12}>
       <FormGroup>
@@ -95,6 +99,33 @@ const FraudEventDetails = ({ item, onUpdate }) => {
               <MenuItem eventKey="hourly" onSelect={onChangeDateRangeType}>Hourly</MenuItem>
             </DropdownButton>
           </InputGroup>
+        </Col>
+      </FormGroup>
+      <FormGroup>
+        <Col componentClass={ControlLabel} sm={3} lg={2}>Status</Col>
+        <Col sm={4}>
+          <span>
+            <span style={{ display: 'inline-block', marginRight: 20 }}>
+              <Field
+                fieldType="radio"
+                onChange={onChangeActive}
+                name="step-active-status"
+                value="yes"
+                label="Active"
+                checked={item.get('active', true)}
+              />
+            </span>
+            <span style={{ display: 'inline-block' }}>
+              <Field
+                fieldType="radio"
+                onChange={onChangeActive}
+                name="step-active-status"
+                value="no"
+                label="Not Active"
+                checked={!item.get('active', true)}
+              />
+            </span>
+          </span>
         </Col>
       </FormGroup>
       <FormGroup>
