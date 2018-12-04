@@ -90,3 +90,24 @@ export const getConditionDescription = (conditionType, condition, params) => {
       return `Total cost ${getBalanceConditionName(condition)} ${getConditionValue(condition, params)}`;
   }
 };
+
+export const gitPeriodLabel = (value) => {
+  switch (value) {
+    case 'minutely':
+      return 'Minutes';
+    case 'hourly':
+      return 'Hours';
+    default:
+      return 'Select unit...';
+  }
+};
+
+export const gitTimeOptions = (value) => {
+  if (value === 'minutely') {
+    return [{ value: 15, label: '15' }, { value: 30, label: '30' }];
+  }
+  if (value === 'hourly') {
+    return Array.from(new Array(24), (v, k) => k + 1).map(v => ({ value: v, label: v }));
+  }
+  return [];
+};

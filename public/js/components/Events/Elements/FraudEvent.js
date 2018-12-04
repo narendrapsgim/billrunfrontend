@@ -1,14 +1,14 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, FormGroup, Row, Col, HelpBlock, ControlLabel, Panel, InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Form, FormGroup, Row, Col, HelpBlock, Panel } from 'react-bootstrap';
 import { CreateButton } from '../../Elements';
-import Field from '../../Field';
 // import {
 //   usageTypesDataSelector,
 //   propertyTypeSelector,
 //   currencySelector,
 // } from '../../../selectors/settingsSelector';
+import FraudEventDetails from './FraudEventDetails';
 import FraudEventCondition from './FraudEventCondition';
 import FraudEventThreshold from './FraudEventThreshold';
 import { getSettings } from '../../../actions/settingsActions';
@@ -51,11 +51,6 @@ class FraudEvent extends Component {
     this.props.updateField(path, value);
   }
 
-  onChangePeriod = path => (value) => {
-    this.props.updateField([...path, 'type'], value);
-    this.props.updateField([...path, 'value'], '');
-  }
-
   onRemoveCondition = (index) => {
     const { item } = this.props;
     const conditions = item.getIn(['conditions', 0], Immutable.List()).delete(index);
@@ -69,27 +64,6 @@ class FraudEvent extends Component {
       Immutable.Map({ field: '', op: '', value: Immutable.List() }),
     ]);
     this.props.updateField(['conditions', 0], conditions);
-  }
-
-  gitPeriodLabel = (value) => {
-    switch (value) {
-      case 'minutely':
-        return 'Minutes';
-      case 'hourly':
-        return 'Hours';
-      default:
-        return 'Select unit...';
-    }
-  }
-
-  gitTimeOptions = (value) => {
-    if (value === 'minutely') {
-      return [{ value: 15, label: '15' }, { value: 30, label: '30' }];
-    }
-    if (value === 'hourly') {
-      return Array.from(new Array(24), (v, k) => k + 1).map(v => ({ value: v, label: v }));
-    }
-    return [];
   }
 
   renderConditions = () => {
@@ -154,98 +128,12 @@ class FraudEvent extends Component {
     );
   }
 
-
-  renderDetails = () => {
-    const { item } = this.props;
-    const recurrenceUnit = item.getIn(['recurrence', 'type'], '');
-    const recurrenceUnitTitle = this.gitPeriodLabel(recurrenceUnit);
-    const recurrenceOptions = this.gitTimeOptions(recurrenceUnit);
-    const dateRangeUnit = item.getIn(['date_range', 'type'], '');
-    const dateRangeUnitTitle = this.gitPeriodLabel(dateRangeUnit);
-    const dateRangeOptions = this.gitTimeOptions(dateRangeUnit);
-    return (
-      <Col sm={12}>
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3}>
-            Event Code
-          </Col>
-          <Col sm={7}>
-            <Field
-              onChange={this.onChangeText(['event_code'])}
-              value={item.get('event_code', '')}
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3}>
-            Run every
-          </Col>
-          <Col sm={7}>
-            <InputGroup>
-              <Field
-                fieldType="select"
-                options={recurrenceOptions}
-                value={item.getIn(['recurrence', 'value'], '')}
-                onChange={this.onChangeSelect(['recurrence', 'value'])}
-              />
-              <DropdownButton
-                id="balance-period-unit"
-                componentClass={InputGroup.Button}
-                title={recurrenceUnitTitle}
-              >
-                <MenuItem eventKey="minutely" onSelect={this.onChangePeriod(['recurrence'])}>Minutes</MenuItem>
-                <MenuItem eventKey="hourly" onSelect={this.onChangePeriod(['recurrence'])}>Hours</MenuItem>
-              </DropdownButton>
-            </InputGroup>
-          </Col>
-        </FormGroup>
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3}>
-            For the previous
-          </Col>
-          <Col sm={7}>
-            <InputGroup>
-              <Field
-                fieldType="select"
-                options={dateRangeOptions}
-                value={item.getIn(['date_range', 'value'], '')}
-                onChange={this.onChangeSelect(['date_range', 'value'])}
-              />
-              <DropdownButton
-                id="balance-period-unit"
-                componentClass={InputGroup.Button}
-                title={dateRangeUnitTitle}
-              >
-                <MenuItem eventKey="minutely" onSelect={this.onChangePeriod(['date_range'])}>Minutely</MenuItem>
-                <MenuItem eventKey="hourly" onSelect={this.onChangePeriod(['date_range'])}>Hourly</MenuItem>
-              </DropdownButton>
-            </InputGroup>
-          </Col>
-        </FormGroup>
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3}>
-            &nbsp;
-          </Col>
-          <Col sm={7} style={{ marginTop: 10, paddingLeft: 18 }}>
-            <Field
-              fieldType="checkbox"
-              id="computed-must-met"
-              value={item.get('lines_overlap', '')}
-              onChange={this.onChangeText(['lines_overlap'])}
-              label={'Events\' lines overlap is allowed'}
-            />
-          </Col>
-        </FormGroup>
-      </Col>
-    );
-  }
-
   render() {
-    const { mode } = this.props;
+    const { mode, item } = this.props;
     return (
       <Form horizontal>
         <Panel header={<span>Details</span>}>
-          { this.renderDetails() }
+          <FraudEventDetails item={item} onUpdate={this.props.updateField} />
         </Panel>
         <Panel header={<span>Conditions</span>} collapsible defaultExpanded={['create', 'clone'].includes(mode)} className="collapsible">
           { this.renderConditions() }
