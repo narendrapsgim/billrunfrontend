@@ -29,13 +29,13 @@ class EventsList extends Component {
   parserStatus = item => (<StateIcon status={item.get('active', true) ? 'active' : 'expired'} />);
 
   getListFields = () => [
-    // { id: 'active', title: 'Status', parser: this.parserStatus, cssClass: 'state' },
+    { id: 'active', title: 'Status', parser: this.parserStatus, cssClass: 'state' },
     { id: 'event_code', title: 'Event Code' },
   ]
 
   getListActions = () => [
-    // { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.props.onEnable, show: this.parseShowEnable },
-    // { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.props.onDisable, show: this.parseShowDisable },
+    { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.props.onEnable, show: this.parseShowEnable },
+    { type: 'disable', showIcon: true, helpText: 'Disable', onClick: this.props.onDisable, show: this.parseShowDisable },
     { type: 'edit', showIcon: true, helpText: 'Edit', onClick: this.props.onEdit },
     { type: 'clone', showIcon: true, helpText: 'Clone', onClick: this.props.onClone },
     { type: 'remove', showIcon: true, helpText: 'Remove', onClick: this.props.onRemove },
