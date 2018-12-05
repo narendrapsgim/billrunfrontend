@@ -7,7 +7,7 @@ import { CreateButton } from '../../Elements';
 //   usageTypesDataSelector,
 //   propertyTypeSelector,
 //   currencySelector,
-} from '../../../selectors/settingsSelector';
+// } from '../../../selectors/settingsSelector';
 import FraudEventDetails from './FraudEventDetails';
 import FraudEventCondition from './FraudEventCondition';
 import FraudEventThreshold from './FraudEventThreshold';
@@ -59,6 +59,10 @@ class FraudEvent extends Component {
 
   onUpdateCondition = (path, value) => {
     this.props.updateField(['conditions', 0, ...path], value);
+  }
+
+  onChangeThreshold = (path, value) => {
+    this.props.updateField(['threshold_conditions', 0, ...path], value);
   }
 
   onAddCondition = () => {
@@ -126,7 +130,7 @@ class FraudEvent extends Component {
         <FraudEventThreshold
           threshold={threshold}
           index={index}
-          onUpdate={this.props.updateField}
+          onUpdate={this.onChangeThreshold}
         />
       </Col>
     );

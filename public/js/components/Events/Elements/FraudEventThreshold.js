@@ -21,17 +21,17 @@ const FraudEventThreshold = (props) => {
     { value: 'sec', label: 'Seconds' },
   ];
   const onChangeThresholdField = (value) => {
-    onUpdate(['threshold_conditions', 0, index, 'field'], value);
+    onUpdate([index, 'field'], value);
   };
   const onChangeThresholdOperator = (value) => {
-    onUpdate(['threshold_conditions', 0, index, 'op'], value);
+    onUpdate([index, 'op'], value);
   };
   const onChangeThresholdValue = (e) => {
     const { value } = e.target;
-    onUpdate(['threshold_conditions', 0, index, 'value'], value);
+    onUpdate([index, 'value'], value);
   };
   const onChangeThresholdUnit = (value) => {
-    onUpdate(['threshold_conditions', 0, index, 'unit'], value);
+    onUpdate([index, 'unit'], value);
   };
   return (
     <FormGroup className="form-inner-edit-row">
