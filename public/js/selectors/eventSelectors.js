@@ -97,12 +97,12 @@ export const eventThresholdOperatorsSelectOptionsSelector = createSelector(
 
 export const eventTresholdFieldsSelector = createSelector(
   getEventConfig,
-  (config = Immutable.Map()) => config.get('thresholdFields', Immutable.List()),
+  (config = Immutable.Map()) => config.get('thresholdFields', Immutable.List())
+    .map(field => setFieldTitle(field, null, 'id')),
 );
 export const eventThresholdFieldsSelectOptionsSelector = createSelector(
   eventTresholdFieldsSelector,
   (operators = Immutable.Map()) => operators
-    .map(field => setFieldTitle(field, null, 'id'))
     .sort(sortFieldOption)
     .map(parseConfigSelectOptions)
     .toArray(),

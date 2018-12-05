@@ -21,6 +21,9 @@ import {
   eventsSelector,
 } from '../../selectors/settingsSelector';
 import {
+  eventTresholdFieldsSelector,
+} from '../../selectors/eventSelectors';
+import {
   getConfig,
 } from '../../common/Util';
 
@@ -44,6 +47,7 @@ const defaultNewEvent = {
 
 const mapStateToProps = (state, props) => ({
   items: eventsSelector(state, props),
+  thresholdFields: eventTresholdFieldsSelector(null, { eventType: 'fraud' }),
 });
 
 const mapDispatchToProps = (dispatch, props) => ({

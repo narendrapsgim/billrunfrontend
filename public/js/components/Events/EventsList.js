@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { Panel, Col } from 'react-bootstrap';
+import { sentenceCase } from 'change-case';
 import { Actions, StateIcon } from '../Elements';
 import List from '../../components/List';
 
@@ -10,6 +11,7 @@ class EventsList extends Component {
   static propTypes = {
     items: PropTypes.instanceOf(Immutable.List),
     eventType: PropTypes.string.isRequired,
+    thresholdFields: PropTypes.instanceOf(Immutable.List),
     onRemove: PropTypes.func.isRequired,
     onEdit: PropTypes.func.isRequired,
     onClone: PropTypes.func.isRequired,
@@ -20,6 +22,7 @@ class EventsList extends Component {
 
   static defaultProps = {
     items: Immutable.List(),
+    thresholdFields: Immutable.List(),
   };
 
   parseShowEnable = item => !item.get('active', true);
@@ -28,10 +31,31 @@ class EventsList extends Component {
 
   parserStatus = item => (<StateIcon status={item.get('active', true) ? 'active' : 'expired'} />);
 
-  getListFields = () => [
-    { id: 'active', title: 'Status', parser: this.parserStatus, cssClass: 'state' },
-    { id: 'event_code', title: 'Event Code' },
-  ]
+  parserThreshold = (item) => {
+    const { thresholdFields } = this.props;
+    return item
+      .getIn(['threshold_conditions', 0], Immutable.List())
+      .map(threshold => threshold.get('field', ''))
+      .map(name => thresholdFields
+        .find(op => op.get('id', '') === name, null, Immutable.Map())
+        .get('title', sentenceCase(name)),
+      )
+      .join(', ');
+  }
+
+  getListFields = () => {
+    const { eventType } = this.props;
+    const fields = [
+      { id: 'active', title: 'Status', parser: this.parserStatus, cssClass: 'state' },
+      { id: 'event_code', title: 'Event Code' },
+    ];
+    if (eventType === 'fraud') {
+      fields.push(
+        { id: 'threshold', title: 'Threshold', parser: this.parserThreshold },
+      );
+    }
+    return fields;
+  };
 
   getListActions = () => [
     { type: 'enable', showIcon: true, helpText: 'Enable', onClick: this.props.onEnable, show: this.parseShowEnable },
