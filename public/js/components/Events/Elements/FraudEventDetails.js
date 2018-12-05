@@ -102,8 +102,8 @@ const FraudEventDetails = ({ item, onUpdate }) => {
         </Col>
       </FormGroup>
       <FormGroup>
-        <Col componentClass={ControlLabel} sm={3} lg={2}>Status</Col>
-        <Col sm={4}>
+        <Col componentClass={ControlLabel} sm={3}>Status</Col>
+        <Col sm={7}>
           <span>
             <span style={{ display: 'inline-block', marginRight: 20 }}>
               <Field

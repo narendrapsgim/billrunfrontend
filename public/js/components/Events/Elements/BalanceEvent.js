@@ -35,6 +35,11 @@ class BalanceEvent extends Component {
     this.props.updateField(path, value);
   };
 
+  onChangeActive = (e) => {
+    const { value } = e.target;
+    this.props.updateField(['active'], value === 'yes');
+  };
+
   addCondition = () => {
     const { item } = this.props;
     const conditions = item.get('conditions', Immutable.List()).push(Immutable.Map());
@@ -140,6 +145,33 @@ class BalanceEvent extends Component {
           </Col>
           <Col sm={5}>
             <Field id="label" onChange={this.onChangeField(['event_code'])} value={item.get('event_code', '')} />
+          </Col>
+        </FormGroup>
+        <FormGroup>
+          <Col componentClass={ControlLabel} md={4}>Status</Col>
+          <Col sm={5}>
+            <span>
+              <span style={{ display: 'inline-block', marginRight: 20 }}>
+                <Field
+                  fieldType="radio"
+                  onChange={this.onChangeActive}
+                  name="step-active-status"
+                  value="yes"
+                  label="Active"
+                  checked={item.get('active', true)}
+                />
+              </span>
+              <span style={{ display: 'inline-block' }}>
+                <Field
+                  fieldType="radio"
+                  onChange={this.onChangeActive}
+                  name="step-active-status"
+                  value="no"
+                  label="Not Active"
+                  checked={!item.get('active', true)}
+                />
+              </span>
+            </span>
           </Col>
         </FormGroup>
 
