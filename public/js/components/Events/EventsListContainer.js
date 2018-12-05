@@ -35,8 +35,11 @@ const Components = {
 
 
 const defaultNewEvent = {
-  balance: Immutable.Map(),
+  balance: Immutable.Map({
+    active: false,
+  }),
   fraud: Immutable.Map({
+    active: false,
     date_range: Immutable.Map({ type: 'hourly' }),
     recurrence: Immutable.Map({ type: 'hourly' }),
     lines_overlap: true,
@@ -87,7 +90,10 @@ const mapDispatchToProps = (dispatch, props) => ({
   },
 
   onClone: (item) => {
-    const clone = item.deleteIn(['ui_flags', 'id']);
+    const clone = item.withMutations((itemWithMutations) => {
+      itemWithMutations.deleteIn(['ui_flags', 'id']);
+      itemWithMutations.set('active', false);
+    });
     const onOk = editedItem => dispatch(saveEvent(props.eventType, editedItem))
       .then(success => (success.status ? true : Promise.reject()))
       .then(() => dispatch(showSuccess(`New event ${editedItem.get('event_code', '')} saved successfuly`)))
