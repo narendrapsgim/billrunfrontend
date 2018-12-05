@@ -20,6 +20,10 @@ const FraudEventDetails = ({ item, onUpdate }) => {
     const { value } = e.target;
     onUpdate(['event_code'], value);
   };
+  const onChaneEventDescription = (e) => {
+    const { value } = e.target;
+    onUpdate(['event_description'], value);
+  };
   const onChangeLinesOverlap = (e) => {
     const { value } = e.target;
     onUpdate(['lines_overlap'], value);
@@ -52,6 +56,17 @@ const FraudEventDetails = ({ item, onUpdate }) => {
           <Field
             onChange={onChaneEventCode}
             value={item.get('event_code', '')}
+          />
+        </Col>
+      </FormGroup>
+      <FormGroup>
+        <Col componentClass={ControlLabel} sm={3}>
+          Description
+        </Col>
+        <Col sm={7}>
+          <Field
+            onChange={onChaneEventDescription}
+            value={item.get('event_description', '')}
           />
         </Col>
       </FormGroup>

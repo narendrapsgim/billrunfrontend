@@ -148,6 +148,14 @@ class BalanceEvent extends Component {
           </Col>
         </FormGroup>
         <FormGroup>
+          <Col componentClass={ControlLabel} md={4}>
+            Description
+          </Col>
+          <Col sm={5}>
+            <Field id="description" onChange={this.onChangeField(['event_description'])} value={item.get('event_description', '')} />
+          </Col>
+        </FormGroup>
+        <FormGroup>
           <Col componentClass={ControlLabel} md={4}>Status</Col>
           <Col sm={5}>
             <span>

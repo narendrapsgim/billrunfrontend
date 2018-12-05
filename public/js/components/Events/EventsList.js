@@ -48,6 +48,7 @@ class EventsList extends Component {
     const fields = [
       { id: 'active', title: 'Status', parser: this.parserStatus, cssClass: 'state' },
       { id: 'event_code', title: 'Event Code' },
+      { id: 'event_description', title: 'Description' },
     ];
     if (eventType === 'fraud') {
       fields.push(
