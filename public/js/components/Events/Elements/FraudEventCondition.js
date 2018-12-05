@@ -22,21 +22,22 @@ const FraudEventCondition = (props) => {
     onUpdate,
     onRemove,
   } = props;
+
   const onChangeConditionsField = (field) => {
     const resetCondition = Immutable.Map({
       field,
       op: '',
       value: Immutable.List(),
     });
-    onUpdate(['conditions', 0, index], resetCondition);
+    onUpdate([index], resetCondition);
   };
 
   const onChangeConditionsOperator = (value) => {
-    onUpdate(['conditions', 0, index, 'op'], value);
+    onUpdate([index, 'op'], value);
   };
   const onChangeConditionsValue = (value) => {
     const values = Immutable.List((value.length) ? value.split(',') : []);
-    onUpdate(['conditions', 0, index, 'value'], values);
+    onUpdate([index, 'value'], values);
   };
   const onRemoveCondition = () => {
     onRemove(index);

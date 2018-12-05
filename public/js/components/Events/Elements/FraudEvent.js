@@ -7,7 +7,7 @@ import { CreateButton } from '../../Elements';
 //   usageTypesDataSelector,
 //   propertyTypeSelector,
 //   currencySelector,
-// } from '../../../selectors/settingsSelector';
+} from '../../../selectors/settingsSelector';
 import FraudEventDetails from './FraudEventDetails';
 import FraudEventCondition from './FraudEventCondition';
 import FraudEventThreshold from './FraudEventThreshold';
@@ -57,6 +57,10 @@ class FraudEvent extends Component {
     this.props.updateField(['conditions', 0], conditions);
   }
 
+  onUpdateCondition = (path, value) => {
+    this.props.updateField(['conditions', 0, ...path], value);
+  }
+
   onAddCondition = () => {
     const { item } = this.props;
     const conditions = Immutable.List([
@@ -73,7 +77,7 @@ class FraudEvent extends Component {
         key={`condition_0_${index}`}
         condition={condition}
         index={index}
-        onUpdate={this.props.updateField}
+        onUpdate={this.onUpdateCondition}
         onRemove={this.onRemoveCondition}
       />
     ));
