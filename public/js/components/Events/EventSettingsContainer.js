@@ -4,9 +4,11 @@ import {
   saveEventSettings,
   updateEventSettings,
 } from '../../actions/eventActions';
+import {
+  showConfirmModal,
+} from '../../actions/guiStateActions/pageActions';
 import { eventsSettingsSelector } from '../../selectors/settingsSelector';
 import EventSettings from './EventSettings';
-
 
 const mapStateToProps = (state, props) => ({
   eventsSettings: eventsSettingsSelector(state, props),
@@ -14,7 +16,17 @@ const mapStateToProps = (state, props) => ({
 
 const mapDispatchToProps = dispatch => ({
   onCancel: () => {
-    dispatch(getEventSettings());
+    const onOk = () => {
+      dispatch(getEventSettings());
+    };
+    const confirm = {
+      message: 'Are you sure you want to cancel event settings changes?',
+      onOk,
+      labelOk: 'Yes',
+      labelCancel: 'No',
+      type: 'delete',
+    };
+    return dispatch(showConfirmModal(confirm));
   },
   onEdit: (eventNotifier, field, value) => {
     dispatch(updateEventSettings([eventNotifier, field], value));
