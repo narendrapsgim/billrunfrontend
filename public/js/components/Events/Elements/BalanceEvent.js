@@ -127,73 +127,66 @@ class BalanceEvent extends Component {
     this.props.item.get('conditions', Immutable.List()).map(this.renderCondition).toArray()
   );
 
-  renderConditionsHeader = () => (
-    <FormGroup className="form-inner-edit-row">
-      <Col sm={12}>
-        <strong>Conditions</strong>
-      </Col>
-    </FormGroup>
-  );
-
   render() {
     const { item } = this.props;
     return (
       <Form horizontal>
-        <FormGroup>
-          <Col componentClass={ControlLabel} md={4}>
-            Event Code
-          </Col>
-          <Col sm={5}>
-            <Field id="label" onChange={this.onChangeField(['event_code'])} value={item.get('event_code', '')} />
-          </Col>
-        </FormGroup>
-        <FormGroup>
-          <Col componentClass={ControlLabel} md={4}>
-            Description
-          </Col>
-          <Col sm={5}>
-            <Field id="description" onChange={this.onChangeField(['event_description'])} value={item.get('event_description', '')} />
-          </Col>
-        </FormGroup>
-        <FormGroup>
-          <Col componentClass={ControlLabel} md={4}>Status</Col>
-          <Col sm={5}>
-            <span>
-              <span style={{ display: 'inline-block', marginRight: 20 }}>
-                <Field
-                  fieldType="radio"
-                  onChange={this.onChangeActive}
-                  name="step-active-status"
-                  value="yes"
-                  label="Active"
-                  checked={item.get('active', true)}
-                />
+        <Panel header={<span>Details</span>}>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>
+              Event Code
+            </Col>
+            <Col sm={7}>
+              <Field id="label" onChange={this.onChangeField(['event_code'])} value={item.get('event_code', '')} />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>
+              Description
+            </Col>
+            <Col sm={7}>
+              <Field id="description" onChange={this.onChangeField(['event_description'])} value={item.get('event_description', '')} />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>Status</Col>
+            <Col sm={7}>
+              <span>
+                <span style={{ display: 'inline-block', marginRight: 20 }}>
+                  <Field
+                    fieldType="radio"
+                    onChange={this.onChangeActive}
+                    name="step-active-status"
+                    value="yes"
+                    label="Active"
+                    checked={item.get('active', true)}
+                  />
+                </span>
+                <span style={{ display: 'inline-block' }}>
+                  <Field
+                    fieldType="radio"
+                    onChange={this.onChangeActive}
+                    name="step-active-status"
+                    value="no"
+                    label="Not Active"
+                    checked={!item.get('active', true)}
+                  />
+                </span>
               </span>
-              <span style={{ display: 'inline-block' }}>
-                <Field
-                  fieldType="radio"
-                  onChange={this.onChangeActive}
-                  name="step-active-status"
-                  value="no"
-                  label="Not Active"
-                  checked={!item.get('active', true)}
-                />
-              </span>
-            </span>
-          </Col>
-        </FormGroup>
+            </Col>
+          </FormGroup>
+        </Panel>
 
-        <FormGroup>
-          <Col sm={12}>
-            { this.renderConditionsHeader() }
-          </Col>
-          <Col sm={12}>
-            { this.renderConditions() }
-          </Col>
-          <Col sm={12}>
-            { this.renderAddConditionButton() }
-          </Col>
-        </FormGroup>
+        <Panel header={<span>Conditions</span>}>
+          <FormGroup>
+            <Col sm={12}>
+              { this.renderConditions() }
+            </Col>
+            <Col sm={12}>
+              { this.renderAddConditionButton() }
+            </Col>
+          </FormGroup>
+        </Panel>
       </Form>
     );
   }
