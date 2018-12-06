@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
-import { FormGroup, Col, ControlLabel } from 'react-bootstrap';
+import { FormGroup, Col, ControlLabel, InputGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../../Field';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
@@ -317,52 +317,68 @@ class BalanceEventCondition extends Component {
           )}
         </FormGroup>
 
-        <FormGroup>
-          <Col sm={3} componentClass={ControlLabel}>Type</Col>
-          <Col sm={9}>
-            <Select
-              id={`cond-type-${index}`}
-              onChange={this.onChangeType}
-              value={item.get('type', '')}
-              options={conditionsOperators}
-            />
-          </Col>
-        </FormGroup>
+        <Col sm={12}>
+          <FormGroup>
+            <Col sm={5} componentClass={ControlLabel}>Type</Col>
+            <Col sm={5}>
+              <Select
+                id={`cond-type-${index}`}
+                onChange={this.onChangeType}
+                value={item.get('type', '')}
+                options={conditionsOperators}
+              />
+            </Col>
+          </FormGroup>
+        </Col>
 
         {
           selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') !== 'tags' &&
-          (<FormGroup>
-            <Col sm={3} componentClass={ControlLabel}>
-              Value { unitLabel !== '' ? `(${unitLabel})` : '' }
-            </Col>
-            <Col sm={9}>
-              <Field
-                id={`cond-value-${index}`}
-                onChange={this.onChangeValue}
-                value={item.get('value', '')}
-                fieldType={selectedConditionData.get('type', 'text')}
-              />
-            </Col>
-          </FormGroup>)
+          (<Col sm={12}>
+            <FormGroup>
+              <Col sm={5} componentClass={ControlLabel}>
+                Value
+              </Col>
+              <Col sm={5}>
+                <InputGroup style={{ width: '100%' }}>
+                  <Field
+                    id={`cond-value-${index}`}
+                    onChange={this.onChangeValue}
+                    value={item.get('value', '')}
+                    fieldType={selectedConditionData.get('type', 'text')}
+                  />
+                  { unitLabel !== '' && (
+                    <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
+                  )}
+                </InputGroup>
+              </Col>
+            </FormGroup>
+          </Col>)
       }
 
         {
         selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') === 'tags' &&
-        (<FormGroup>
-          <Col sm={3} componentClass={ControlLabel}>
-            Value { unitLabel !== '' ? `(${unitLabel})` : '' }
-          </Col>
-          <Col sm={9}>
-            <Field
-              fieldType="tags"
-              id={`cond-value-${index}`}
-              onChange={this.onChangeMultiValues}
-              value={String(item.get('value', '')).split(',').filter(val => val !== '')}
-              renderInput={this.renderCustomInputNumber}
-              onlyUnique={selectedConditionData.get('type', '') === 'tags'}
-            />
-          </Col>
-        </FormGroup>)
+        (<Col sm={12}>
+          <FormGroup>
+            <Col sm={5} componentClass={ControlLabel}>
+              Value
+            </Col>
+            <Col sm={5}>
+              <InputGroup>
+                <Field
+                  fieldType="tags"
+                  id={`cond-value-${index}`}
+                  onChange={this.onChangeMultiValues}
+                  value={String(item.get('value', '')).split(',').filter(val => val !== '')}
+                  renderInput={this.renderCustomInputNumber}
+                  onlyUnique={selectedConditionData.get('type', '') === 'tags'}
+                />
+                { unitLabel !== '' && (
+                  <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
+                )}
+              </InputGroup>
+            </Col>
+          </FormGroup>
+        </Col>)
       }
 
       </div>
