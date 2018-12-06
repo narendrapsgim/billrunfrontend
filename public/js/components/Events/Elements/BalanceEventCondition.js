@@ -184,167 +184,196 @@ class BalanceEventCondition extends Component {
       <div>
 
         <FormGroup>
-          <Col sm={3} componentClass={ControlLabel}>Condition Trigger</Col>
-          <Col sm={4}>
-            <Field
-              fieldType="radio"
-              name={`condition-trigger-${index}`}
-              id={`condition-trigger-monetary-${index}`}
-              value="cost"
-              checked={trigger === 'cost'}
-              onChange={this.onChangeTrigger}
-              label="Monetary"
-            />
-          </Col>
-          <Col sm={4}>
-            <Field
-              fieldType="radio"
-              name={`condition-trigger-${index}`}
-              id={`condition-trigger-usagev-${index}`}
-              value="usagev"
-              checked={trigger === 'usagev'}
-              onChange={this.onChangeTrigger}
-              label="Usage"
-            />
-          </Col>
-        </FormGroup>
-
-        <FormGroup>
-          <Col sm={3} componentClass={ControlLabel}>Condition Limitations</Col>
-        </FormGroup>
-
-        <FormGroup>
-          <Col sm={4}>
-            <Field
-              fieldType="radio"
-              name={`condition-limitation-${index}`}
-              id={`condition-limitation-none-${index}`}
-              value="none"
-              checked={limitation === 'none'}
-              onChange={this.onChangeLimitation}
-              disabled={trigger === 'usagev'}
-              label="Total Amount"
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup>
-          <Col sm={4}>
-            <Field
-              fieldType="radio"
-              name={`condition-limitation-${index}`}
-              id={`condition-limitation-group-${index}`}
-              value="group"
-              checked={limitation === 'group'}
-              onChange={this.onChangeLimitation}
-              label="Limit to Group"
-            />
-          </Col>
-          <Col sm={8}>
-            <Col sm={7}>
-              <Select
-                id={`condition-limitation-group_name-${index}`}
-                onChange={this.onChangeGroupName}
-                value={groupName}
-                options={this.getGroupNamesOptions()}
-                disabled={limitation !== 'group'}
+          <Col sm={3} smOffset={1} style={{ textAlign: 'left' }} componentClass={ControlLabel}>Condition Trigger: </Col>
+          <Col sm={7}>
+            <Col sm={4}>
+              <Field
+                fieldType="radio"
+                name={`condition-trigger-${index}`}
+                id={`condition-trigger-monetary-${index}`}
+                value="cost"
+                checked={trigger === 'cost'}
+                onChange={this.onChangeTrigger}
+                label="Monetary"
               />
             </Col>
-            <Col sm={5}>
-              <UsageTypesSelector
-                usaget={usaget}
-                unit={item.get('unit', '')}
-                onChangeUsaget={this.onChangeActivityType}
-                onChangeUnit={this.onChangeUnit}
-                enabled={limitation === 'group'}
-                showUnits={trigger === 'usagev' && limitation === 'group'}
-                showAddButton={false}
-                showSelectTypes={false}
+            <Col sm={4}>
+              <Field
+                fieldType="radio"
+                name={`condition-trigger-${index}`}
+                id={`condition-trigger-usagev-${index}`}
+                value="usagev"
+                checked={trigger === 'usagev'}
+                onChange={this.onChangeTrigger}
+                label="Usage"
               />
             </Col>
           </Col>
         </FormGroup>
-        <FormGroup>
-          <Col sm={4}>
-            <Field
-              fieldType="radio"
-              name={`condition-limitation-${index}`}
-              id={`condition-limitation-activity-${index}`}
-              value="activity_type"
-              checked={limitation === 'activity_type'}
-              onChange={this.onChangeLimitation}
-              label="Limit to Activity Type"
-            />
-          </Col>
-          <Col sm={8}>
-            <Col sm={12}>
-              <UsageTypesSelector
-                usaget={activityType}
-                unit={item.get('unit', '')}
-                onChangeUsaget={this.onChangeActivityType}
-                onChangeUnit={this.onChangeUnit}
-                enabled={limitation === 'activity_type'}
-                showUnits={trigger === 'usagev' && limitation === 'activity_type'}
-              />
-            </Col>
-          </Col>
-          { trigger === 'usagev' && limitation === 'activity_type' && (
-            <Col sm={8} smOffset={4}>
-              <Col sm={6}>
-                <Field
-                  fieldType="radio"
-                  name={`condition-over-group-${index}`}
-                  id={`condition-over-group-all-units-${index}`}
-                  value="none"
-                  checked={overGroup !== 'over_group'}
-                  onChange={this.onChangeOverGroup}
-                  label="All units"
-                  enabled={limitation === 'activity_type'}
-                />
-              </Col>
-              <Col sm={6}>
-                <Field
-                  fieldType="radio"
-                  name={`condition-over-group-${index}`}
-                  id={`condition-over-group-exceeding-units-${index}`}
-                  value="over_group"
-                  checked={overGroup === 'over_group'}
-                  onChange={this.onChangeOverGroup}
-                  label="Exceeding units"
-                  disabled={limitation !== 'activity_type'}
-                />
-              </Col>
-            </Col>
-          )}
-        </FormGroup>
 
+        <FormGroup>
+          <Col sm={3} smOffset={1} style={{ textAlign: 'left' }} componentClass={ControlLabel}>Condition Limitations: </Col>
+        </FormGroup>
         <Col sm={12}>
+
           <FormGroup>
-            <Col sm={5} componentClass={ControlLabel}>Type</Col>
-            <Col sm={5}>
-              <Select
-                id={`cond-type-${index}`}
-                onChange={this.onChangeType}
-                value={item.get('type', '')}
-                options={conditionsOperators}
+            <Col sm={3} smOffset={1}>
+              <Field
+                fieldType="radio"
+                name={`condition-limitation-${index}`}
+                id={`condition-limitation-none-${index}`}
+                value="none"
+                checked={limitation === 'none'}
+                onChange={this.onChangeLimitation}
+                disabled={trigger === 'usagev'}
+                label="Total Amount"
               />
             </Col>
           </FormGroup>
-        </Col>
+          <FormGroup>
+            <Col sm={3} smOffset={1}>
+              <Field
+                fieldType="radio"
+                name={`condition-limitation-${index}`}
+                id={`condition-limitation-group-${index}`}
+                value="group"
+                checked={limitation === 'group'}
+                onChange={this.onChangeLimitation}
+                label="Limit to Group"
+              />
+            </Col>
+            <Col sm={8}>
+              <Col sm={7} style={{ paddingRight: 0 }}>
+                <Select
+                  id={`condition-limitation-group_name-${index}`}
+                  onChange={this.onChangeGroupName}
+                  value={groupName}
+                  options={this.getGroupNamesOptions()}
+                  disabled={limitation !== 'group'}
+                />
+              </Col>
+              <Col sm={5}>
+                <UsageTypesSelector
+                  usaget={usaget}
+                  unit={item.get('unit', '')}
+                  onChangeUsaget={this.onChangeActivityType}
+                  onChangeUnit={this.onChangeUnit}
+                  enabled={limitation === 'group'}
+                  showUnits={trigger === 'usagev' && limitation === 'group'}
+                  showAddButton={false}
+                  showSelectTypes={false}
+                />
+              </Col>
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col sm={3} smOffset={1}>
+              <Field
+                fieldType="radio"
+                name={`condition-limitation-${index}`}
+                id={`condition-limitation-activity-${index}`}
+                value="activity_type"
+                checked={limitation === 'activity_type'}
+                onChange={this.onChangeLimitation}
+                label="Limit to Activity Type"
+              />
+            </Col>
+            <Col sm={8}>
+              <Col sm={12}>
+                <UsageTypesSelector
+                  usaget={activityType}
+                  unit={item.get('unit', '')}
+                  onChangeUsaget={this.onChangeActivityType}
+                  onChangeUnit={this.onChangeUnit}
+                  enabled={limitation === 'activity_type'}
+                  showUnits={trigger === 'usagev' && limitation === 'activity_type'}
+                />
+              </Col>
+            </Col>
+            { trigger === 'usagev' && limitation === 'activity_type' && (
+              <Col sm={6} smOffset={4}>
+                <Col sm={6}>
+                  <Field
+                    fieldType="radio"
+                    name={`condition-over-group-${index}`}
+                    id={`condition-over-group-all-units-${index}`}
+                    value="none"
+                    checked={overGroup !== 'over_group'}
+                    onChange={this.onChangeOverGroup}
+                    label="All units"
+                    enabled={limitation === 'activity_type'}
+                  />
+                </Col>
+                <Col sm={6}>
+                  <Field
+                    fieldType="radio"
+                    name={`condition-over-group-${index}`}
+                    id={`condition-over-group-exceeding-units-${index}`}
+                    value="over_group"
+                    checked={overGroup === 'over_group'}
+                    onChange={this.onChangeOverGroup}
+                    label="Exceeding units"
+                    disabled={limitation !== 'activity_type'}
+                  />
+                </Col>
+              </Col>
+            )}
+          </FormGroup>
 
-        {
-          selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') !== 'tags' &&
+          <Col sm={12}>
+            <FormGroup>
+              <Col sm={5} componentClass={ControlLabel}>Type</Col>
+              <Col sm={4}>
+                <Select
+                  id={`cond-type-${index}`}
+                  onChange={this.onChangeType}
+                  value={item.get('type', '')}
+                  options={conditionsOperators}
+                />
+              </Col>
+            </FormGroup>
+          </Col>
+
+          {
+            selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') !== 'tags' &&
+            (<Col sm={12}>
+              <FormGroup>
+                <Col sm={5} componentClass={ControlLabel}>
+                  Value
+                </Col>
+                <Col sm={4}>
+                  <InputGroup style={{ width: '100%' }}>
+                    <Field
+                      id={`cond-value-${index}`}
+                      onChange={this.onChangeValue}
+                      value={item.get('value', '')}
+                      fieldType={selectedConditionData.get('type', 'text')}
+                    />
+                    { unitLabel !== '' && (
+                      <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
+                    )}
+                  </InputGroup>
+                </Col>
+              </FormGroup>
+            </Col>)
+        }
+
+          {
+          selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') === 'tags' &&
           (<Col sm={12}>
             <FormGroup>
               <Col sm={5} componentClass={ControlLabel}>
                 Value
               </Col>
-              <Col sm={5}>
-                <InputGroup style={{ width: '100%' }}>
+              <Col sm={4}>
+                <InputGroup>
                   <Field
+                    fieldType="tags"
                     id={`cond-value-${index}`}
-                    onChange={this.onChangeValue}
-                    value={item.get('value', '')}
-                    fieldType={selectedConditionData.get('type', 'text')}
+                    onChange={this.onChangeMultiValues}
+                    value={String(item.get('value', '')).split(',').filter(val => val !== '')}
+                    renderInput={this.renderCustomInputNumber}
+                    onlyUnique={selectedConditionData.get('type', '') === 'tags'}
                   />
                   { unitLabel !== '' && (
                     <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
@@ -353,34 +382,8 @@ class BalanceEventCondition extends Component {
               </Col>
             </FormGroup>
           </Col>)
-      }
-
-        {
-        selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') === 'tags' &&
-        (<Col sm={12}>
-          <FormGroup>
-            <Col sm={5} componentClass={ControlLabel}>
-              Value
-            </Col>
-            <Col sm={5}>
-              <InputGroup>
-                <Field
-                  fieldType="tags"
-                  id={`cond-value-${index}`}
-                  onChange={this.onChangeMultiValues}
-                  value={String(item.get('value', '')).split(',').filter(val => val !== '')}
-                  renderInput={this.renderCustomInputNumber}
-                  onlyUnique={selectedConditionData.get('type', '') === 'tags'}
-                />
-                { unitLabel !== '' && (
-                  <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
-                )}
-              </InputGroup>
-            </Col>
-          </FormGroup>
-        </Col>)
-      }
-
+        }
+        </Col>
       </div>
     );
   }
