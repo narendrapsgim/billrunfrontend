@@ -54,7 +54,7 @@ const FraudEventCondition = (props) => {
     if (effectOnUsagetField) {
       setEventUsageType(eventUsageTypes.set(field, values));
       if (field === 'arate_key') {
-        const newRates = values.filter(val => !eventUsageTypes.get('arate_key').includes(val));
+        const newRates = values.filter(val => !eventUsageTypes.get('arate_key', Immutable.List()).includes(val));
         getEventRates(newRates);
       }
     }
