@@ -76,8 +76,10 @@ class FraudEvent extends Component {
 
   renderConditions = () => {
     const { item } = this.props;
+    const usedFields = item.getIn(['conditions', 0], Immutable.List()).map(condition => condition.get('field', ''));
     const conditionsRows = item.getIn(['conditions', 0], Immutable.List()).map((condition, index) => (
       <FraudEventCondition
+        usedFields={usedFields}
         key={`condition_0_${index}`}
         condition={condition}
         index={index}

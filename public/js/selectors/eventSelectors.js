@@ -77,7 +77,13 @@ export const eventConditionsFilterOptionsSelector = createSelector(
 );
 export const eventConditionsFieldsSelectOptionsSelector = createSelector(
   eventConditionsFilterOptionsSelector,
-  (conditionsFilter = Immutable.List()) => conditionsFilter
+  (state, props) => props.condition.get('field'),
+  (state, props) => props.usedFields,
+  (conditionsFilter = Immutable.List(), conditionIndexField, usedFields) => conditionsFilter
+    .filter(fieldOption => (fieldOption.get('id', '') === conditionIndexField
+      ? true // parsing current selected option for index
+      : !usedFields.includes(fieldOption.get('id', ''))
+    ))
     .sort(sortFieldOption)
     .map(parseConfigSelectOptions)
     .toArray(),
