@@ -41,9 +41,25 @@ const getEventConvertedConditions = (propertyTypes, usageTypes, item, toBaseUnit
     : Immutable.List();
 };
 
+const getEventConvertedThreshold = (propertyTypes, usageTypes, item, toBaseUnit = true) => {
+  const convertedThreshold = item.getIn(['threshold_conditions', 0], Immutable.List()).withMutations((thresholdWithMutations) => {
+    thresholdWithMutations.forEach((threshold, index) => {
+      const unit = threshold.get('unit', '');
+      const usaget = threshold.get('usaget', '');
+      if (unit !== '' && usaget !== '') {
+        const value = threshold.get('value', 0);
+        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+        thresholdWithMutations.setIn([index, 'value'], newValue);
+      }
+    });
+  });
+  return !convertedThreshold.isEmpty()
+    ? convertedThreshold
+    : Immutable.List();
+};
+
 const convertFromApiToUi = (event, eventType, params) => event.withMutations((eventWithMutations) => {
   const { propertyTypes, usageTypesData, effectOnUsagetFields } = params;
-
   const eventUsageTypeFromEvent = Immutable.Map().withMutations((eventUsageTypeWithMutations) => {
     if (eventType === 'fraud') {
       event.getIn(['conditions', 0]).forEach((cond) => {
@@ -58,6 +74,7 @@ const convertFromApiToUi = (event, eventType, params) => event.withMutations((ev
     eventUsageType: eventUsageTypeFromEvent,
   });
   eventWithMutations.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, false));
+  eventWithMutations.setIn(['threshold_conditions', 0], getEventConvertedThreshold(propertyTypes, usageTypesData, event, false));
   eventWithMutations.set('ui_flags', uiFlags);
 });
 
@@ -71,6 +88,7 @@ const convertFromUiToApi = (event, eventType, params) =>
       eventWithMutations.setIn(['conditions', 0], withoutEmptyConditions);
     }
     eventWithMutations.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, eventWithMutations, true));
+    eventWithMutations.setIn(['threshold_conditions', 0], getEventConvertedThreshold(propertyTypes, usageTypesData, eventWithMutations, true));
   });
 
 export const getEvents = (eventCategory = '') => (dispatch, getState) => {

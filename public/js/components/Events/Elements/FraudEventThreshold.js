@@ -47,8 +47,9 @@ class FraudEventThreshold extends Component {
   }
 
   onChangeThresholdUnit = (value) => {
-    const { index } = this.props;
+    const { index, eventUsaget } = this.props;
     this.props.onUpdate([index, 'unit'], value);
+    this.props.onUpdate([index, 'usaget'], eventUsaget.first());
   }
 
   render() {
