@@ -43,6 +43,7 @@ const defaultNewEvent = {
     date_range: Immutable.Map({ type: 'hourly' }),
     recurrence: Immutable.Map({ type: 'hourly' }),
     lines_overlap: true,
+    notify_by_email: Immutable.Map({ notify: false }),
   }),
 
 };

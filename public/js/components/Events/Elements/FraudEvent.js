@@ -8,6 +8,7 @@ import {
   eventThresholdOperatorsSelectOptionsSelector,
   eventThresholdFieldsSelectOptionsSelector,
 } from '../../../selectors/eventSelectors';
+import { eventsSettingsSelector } from '../../../selectors/settingsSelector';
 import FraudEventDetails from './FraudEventDetails';
 import FraudEventCondition from './FraudEventCondition';
 import FraudEventThreshold from './FraudEventThreshold';
@@ -19,6 +20,7 @@ class FraudEvent extends Component {
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
+    eventsSettings: PropTypes.instanceOf(Immutable.Map),
     eventUsaget: PropTypes.instanceOf(Immutable.Set),
     thresholdFieldsSelectOptions: PropTypes.array,
     thresholdOperatorsSelectOptions: PropTypes.array,
@@ -29,6 +31,7 @@ class FraudEvent extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     mode: 'create',
+    eventsSettings: Immutable.Map(),
     eventUsaget: Immutable.Set(),
     thresholdFieldsSelectOptions: [],
     thresholdOperatorsSelectOptions: [],
@@ -160,11 +163,15 @@ class FraudEvent extends Component {
   }
 
   render() {
-    const { mode, item } = this.props;
+    const { mode, item, eventsSettings } = this.props;
     return (
       <Form horizontal>
         <Panel header={<span>Details</span>}>
-          <FraudEventDetails item={item} onUpdate={this.props.updateField} />
+          <FraudEventDetails
+            item={item}
+            eventsSettings={eventsSettings}
+            onUpdate={this.props.updateField}
+          />
         </Panel>
         <Panel header={<span>Conditions</span>} collapsible defaultExpanded={['create', 'clone'].includes(mode)} className="collapsible">
           { this.renderConditions() }
@@ -181,6 +188,7 @@ const mapStateToProps = (state, props) => ({
   eventUsaget: eventUsageTypesSelector(state, props),
   thresholdFieldsSelectOptions: eventThresholdFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
   thresholdOperatorsSelectOptions: eventThresholdOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
+  eventsSettings: eventsSettingsSelector(state, props),
 });
 
 export default connect(mapStateToProps)(FraudEvent);

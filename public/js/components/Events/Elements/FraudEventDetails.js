@@ -8,7 +8,7 @@ import {
 } from '../EventsUtil';
 
 
-const FraudEventDetails = ({ item, onUpdate }) => {
+const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
   const recurrenceUnit = item.getIn(['recurrence', 'type'], '');
   const recurrenceUnitTitle = gitPeriodLabel(recurrenceUnit);
   const recurrenceOptions = gitTimeOptions(recurrenceUnit);
@@ -46,6 +46,40 @@ const FraudEventDetails = ({ item, onUpdate }) => {
     const { value } = e.target;
     onUpdate(['active'], value === 'yes');
   };
+
+  const onChangeNotifyByEmailAdresses = (emails) => {
+    const emailsList = Immutable.List((emails.length) ? emails.split(',') : []);
+    if (emailsList.includes('global')) {
+      onUpdate(['notify_by_email', 'use_global_addresses'], true);
+    } else {
+      onUpdate(['notify_by_email', 'use_global_addresses'], false);
+    }
+    const globalIndex = emailsList.findIndex(email => email === 'global');
+    const emailsListWithoutGlobal = (globalIndex === -1)
+      ? emailsList
+      : emailsList.remove(globalIndex);
+    onUpdate(['notify_by_email', 'additional_addresses'], emailsListWithoutGlobal);
+  };
+
+  const onChangeNotifyByEmailStatus = (e) => {
+    const { value } = e.target;
+    onUpdate(['notify_by_email', 'notify'], value);
+    onUpdate(['notify_by_email', 'use_global_addresses'], value);
+    if (!value) {
+      onUpdate(['notify_by_email', 'additional_addresses'], Immutable.List());
+    }
+  };
+
+  const globalAddresses = eventsSettings.getIn(['email', 'global_addresses'], Immutable.List()).join(', ');
+  const emailAddressesSelectOptions = [
+    { value: 'global', label: `Global emails (${globalAddresses})` },
+  ];
+  const isNotifyByEmail = item.getIn(['notify_by_email', 'notify'], false);
+  const emailAdderssesValue = item.getIn(['notify_by_email', 'additional_addresses'], Immutable.List()).toArray();
+  const useGlobalAddresses = item.getIn(['notify_by_email', 'use_global_addresses'], false);
+  if (useGlobalAddresses) {
+    emailAdderssesValue.push('global');
+  }
   return (
     <Col sm={12}>
       <FormGroup>
@@ -68,6 +102,37 @@ const FraudEventDetails = ({ item, onUpdate }) => {
             onChange={onChaneEventDescription}
             value={item.get('event_description', '')}
           />
+        </Col>
+      </FormGroup>
+      <FormGroup>
+        <Col componentClass={ControlLabel} sm={3}>
+          Notify also by email
+        </Col>
+        <Col sm={7}>
+          <InputGroup>
+            <InputGroup.Addon>
+              <Field
+                fieldType="checkbox"
+                id="computed-must-met"
+                value={isNotifyByEmail}
+                onChange={onChangeNotifyByEmailStatus}
+                label=""
+              />
+            </InputGroup.Addon>
+            <Field
+              allowCreate={true}
+              multi={true}
+              placeholder={isNotifyByEmail ? 'Select or add new email address' : 'No'}
+              addLabelText="Add {label}?"
+              noResultsText="Type email address..."
+              clearable={true}
+              fieldType="select"
+              options={emailAddressesSelectOptions}
+              value={emailAdderssesValue}
+              onChange={onChangeNotifyByEmailAdresses}
+              disabled={!isNotifyByEmail}
+            />
+          </InputGroup>
         </Col>
       </FormGroup>
       <FormGroup>
@@ -163,11 +228,13 @@ const FraudEventDetails = ({ item, onUpdate }) => {
 
 FraudEventDetails.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
+  eventsSettings: PropTypes.instanceOf(Immutable.Map),
   onUpdate: PropTypes.func.isRequired,
 };
 
 FraudEventDetails.defaultProps = {
   item: Immutable.Map(),
+  eventsSettings: Immutable.Map(),
 };
 
 
