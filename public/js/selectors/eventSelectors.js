@@ -3,10 +3,6 @@ import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import {
   getConfig,
-  // getFieldName,
-  // getFieldNameType,
-  // getUnitLabel,
-  // getValueByUnit,
   parseConfigSelectOptions,
   sortFieldOption,
   setFieldTitle,
@@ -14,16 +10,12 @@ import {
   foreignFieldWithoutDates,
 } from '../common/Util';
 import {
-  // subscriberFieldsSelector,
-  // inputProssesorfilteredFieldsSelector,
-  // accountFieldsSelector,
   linesFieldsSelector,
-  // getLinesFields
-  // rateCategoriesSelector,
-  // usageTypeSelector,
-  // fileTypeSelector,
-  // eventCodeSelector,
+  inputProssesorUsageTypesOptionsSelector,
 } from './settingsSelector';
+import {
+  getPropsItem,
+} from './entitySelector';
 
 
 /* Helpers */
@@ -97,8 +89,8 @@ export const eventThresholdOperatorsSelector = createSelector(
 export const eventThresholdOperatorsSelectOptionsSelector = createSelector(
   eventThresholdOperatorsSelector,
   (operators = Immutable.Map()) => operators
-    .map(parseConfigSelectOptions)
-    .toArray(),
+      .map(parseConfigSelectOptions)
+      .toArray(),
 );
 
 export const eventTresholdFieldsSelector = createSelector(
@@ -106,9 +98,63 @@ export const eventTresholdFieldsSelector = createSelector(
   (config = Immutable.Map()) => config.get('thresholdFields', Immutable.List())
     .map(field => setFieldTitle(field, null, 'id')),
 );
+
+export const effectOnEventUsagetFieldsSelector = createSelector(
+  eventConditionsFilterOptionsSelector,
+  (fields = Immutable.Map()) => fields
+    .filter(field => field.get('effectOnUsaget', false))
+    .map(field => field.get('id', '')),
+);
+
+export const getItemEventUsageType = createSelector(
+  getPropsItem,
+  (item = Immutable.Map()) => item.getIn(['ui_flags', 'eventUsageType'], Immutable.Map()),
+);
+
+export const eventUsagetFieldUsateTypesSelector = createSelector(
+  getItemEventUsageType,
+  (eventUsageType = Immutable.Map()) => eventUsageType.get('usaget', Immutable.List()),
+);
+
+export const eventTypeFieldUsateTypesSelector = createSelector(
+  getItemEventUsageType,
+  inputProssesorUsageTypesOptionsSelector,
+  (types = Immutable.List(), inputProssesorUsageTypes = Immutable.List()) => Immutable.Set()
+    .withMutations((allTypeWithMutations) => {
+      inputProssesorUsageTypes
+        .filter((ip, name) => types.includes(name))
+        .forEach((ipTypes) => { allTypeWithMutations.union(ipTypes); });
+    }),
+);
+
+export const eventUsateTypesSelector = createSelector(
+  eventTypeFieldUsateTypesSelector,
+  eventUsagetFieldUsateTypesSelector,
+  () => Immutable.List(),
+  (type = Immutable.List(), usaget = Immutable.List(), arate_key = Immutable.List()) =>
+    Immutable.Set().withMutations((allTypeWithMutations) => {
+      allTypeWithMutations.union(type); // field type
+      allTypeWithMutations.union(usaget); // field usaget
+    }),
+);
+
 export const eventThresholdFieldsSelectOptionsSelector = createSelector(
   eventTresholdFieldsSelector,
-  (operators = Immutable.Map()) => operators
+  eventUsateTypesSelector,
+  (fields = Immutable.Map(), usateTypes = Immutable.set()) => fields
+    .filter((field) => {
+      const fieldUsageList = field.get('allowedWithUsage', Immutable.List());
+      if (fieldUsageList.isEmpty()) { // ["multiple", "empty", "single"]
+        return true;
+      }
+      if (usateTypes.isEmpty()) {
+        return fieldUsageList.includes('empty');
+      }
+      if (usateTypes.size === 1) {
+        return fieldUsageList.includes('single');
+      }
+      return fieldUsageList.includes('multiple');
+    })
     .sort(sortFieldOption)
     .map(parseConfigSelectOptions)
     .toArray(),

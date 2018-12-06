@@ -10,7 +10,7 @@
         { "id": "nin", "title": "Is Not In"}
       ],
       "threshold": [
-        { "id": "in", "title": "In" },
+        { "id": "in", "title": "Is" },
         { "id": "nin", "title": "Is Not" },
         { "id": "gt", "title": "Is Greater Than", "type": "number" },
         { "id": "gte", "title": "Is Greater Than Or Equal", "type": "number" },
@@ -37,30 +37,23 @@
     }
   },
   "conditionsFields": [
-    { "id": "usaget", "entity": "line", "inputConfig":
+    { "id": "usaget", "entity": "line", "effectOnUsaget": true, "inputConfig":
       { "inputType": "select", "callback": "getUsageTypesOptions" }
     },
-    { "id": "type", "title": "Input processor name / BillRun type", "inputConfig": {
+    { "id": "type", "title": "Input processor name / BillRun type", "effectOnUsaget": true, "inputConfig": {
         "inputType": "select",
-        "callback": "getFileTypeOptions",
-        "options": [
-          { "value": "flat", "label": "Subscription" },
-          "service",
-          { "value": "credit", "label": "Charge / Refund" },
-          "discount",
-          "all"
-        ]
+        "callback": "getFileTypeOptions"
       }
     },
     { "id": "subscriber.plan", "entity": "line", "inputConfig": { "inputType": "select", "callback": "getPlansOptions" } },
-    { "id": "arate_key", "entity": "line", "inputConfig": { "inputType": "select", "callback": "getProductsOptions" } }
+    { "id": "arate_key", "entity": "line", "effectOnUsaget": true, "inputConfig": { "inputType": "select", "callback": "getProductsOptions" } }
   ],
   "thresholdFields": [
-    { "id": "usagev", "entity": "line" },
-    { "id": "aprice", "entity": "line" },
-    { "id": "final_charge", "entity": "line"},
-    { "id": "in_group", "entity": "line"},
-    { "id": "over_group", "entity": "line"},
-    { "id": "out_group", "title": "Out Group" }
+    { "id": "usagev", "entity": "line", "allowedWithUsage": ["single"] },
+    { "id": "aprice", "entity": "line", "allowedWithUsage": ["multiple", "empty"] },
+    { "id": "final_charge", "entity": "line", "allowedWithUsage": ["multiple", "empty"] },
+    { "id": "in_group", "entity": "line", "allowedWithUsage": ["single"] },
+    { "id": "over_group", "entity": "line", "allowedWithUsage": ["single"] },
+    { "id": "out_group", "title": "Out Group", "allowedWithUsage": ["single"]  }
   ]
 }

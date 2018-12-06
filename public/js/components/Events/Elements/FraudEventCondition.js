@@ -9,11 +9,14 @@ import {
   eventConditionsOperatorsSelectOptionsSelector,
   eventConditionsFieldsSelectOptionsSelector,
   eventConditionsOperatorsSelector,
+  effectOnEventUsagetFieldsSelector,
 } from '../../../selectors/eventSelectors';
 
 const FraudEventCondition = (props) => {
   const {
     condition,
+    eventUsageTypes,
+    effectOnUsagetFields,
     index,
     conditionField,
     conditionsFieldSelectOptions,
@@ -21,11 +24,19 @@ const FraudEventCondition = (props) => {
     conditionsOperatorsSelectOptions,
     onUpdate,
     onRemove,
+    setEventUsageType,
   } = props;
 
-  const onChangeConditionsField = (field) => {
+  const field = condition.getIn(['field'], '');
+  const operator = condition.getIn(['op'], '');
+  const effectOnUsagetField = effectOnUsagetFields.includes(field);
+  const disableOp = field === '';
+  const disableVal = operator === '' || disableOp;
+  const conditionForValue = condition.set('value', condition.get('value', Immutable.List()).join(','));
+
+  const onChangeConditionsField = (fieldId) => {
     const resetCondition = Immutable.Map({
-      field,
+      field: fieldId,
       op: '',
       value: Immutable.List(),
     });
@@ -35,18 +46,19 @@ const FraudEventCondition = (props) => {
   const onChangeConditionsOperator = (value) => {
     onUpdate([index, 'op'], value);
   };
+
   const onChangeConditionsValue = (value) => {
     const values = Immutable.List((value.length) ? value.split(',') : []);
     onUpdate([index, 'value'], values);
+    if (effectOnUsagetField) {
+      setEventUsageType(eventUsageTypes.set(field, values));
+    }
   };
+
   const onRemoveCondition = () => {
     onRemove(index);
   };
-  const field = condition.getIn(['field'], '');
-  const operator = condition.getIn(['op'], '');
-  const disableOp = field === '';
-  const disableVal = operator === '' || disableOp;
-  const conditionForValue = condition.set('value', condition.get('value', Immutable.List()).join(','));
+
   return (
     <FormGroup className="form-inner-edit-row" key={`fraud_condition_${index}`}>
       <Col smHidden mdHidden lgHidden>
@@ -100,16 +112,21 @@ const FraudEventCondition = (props) => {
 FraudEventCondition.propTypes = {
   condition: PropTypes.instanceOf(Immutable.Map),
   index: PropTypes.number.isRequired,
+  eventUsageTypes: PropTypes.instanceOf(Immutable.Map),
+  effectOnUsagetFields: PropTypes.instanceOf(Immutable.List),
   conditionField: PropTypes.instanceOf(Immutable.Map),
   conditionsFieldSelectOptions: PropTypes.array,
   conditionOperator: PropTypes.instanceOf(Immutable.Map),
   conditionsOperatorsSelectOptions: PropTypes.array,
   onUpdate: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
+  setEventUsageType: PropTypes.func.isRequired,
 };
 
 FraudEventCondition.defaultProps = {
   condition: Immutable.Map(),
+  eventUsageTypes: Immutable.Map(),
+  effectOnUsagetFields: Immutable.List(),
   conditionField: Immutable.Map(),
   conditionsFieldSelectOptions: [],
   conditionOperator: Immutable.Map(),
@@ -123,6 +140,7 @@ const mapStateToProps = (state, props) => ({
   conditionOperator: eventConditionsOperatorsSelector(state, { eventType: 'fraud' })
     .find(condOp => condOp.get('id', '') === props.condition.getIn(['op'], ''), null, Immutable.Map()),
   conditionsOperatorsSelectOptions: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
+  effectOnUsagetFields: effectOnEventUsagetFieldsSelector(state, { eventType: 'fraud' }),
 });
 
 export default connect(mapStateToProps)(FraudEventCondition);

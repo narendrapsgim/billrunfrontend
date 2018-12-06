@@ -12,6 +12,9 @@ import {
   propertyTypeSelector,
   eventsSelector,
 } from '../selectors/settingsSelector';
+import {
+  effectOnEventUsagetFieldsSelector,
+} from '../selectors/eventSelectors';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import {
   saveSettingsQuery,
@@ -36,20 +39,37 @@ const getEventConvertedConditions = (propertyTypes, usageTypes, item, toBaseUnit
     : Immutable.List();
 };
 
-const convertFromApiToUi = (event, params) => event.withMutations((eventWithMutations) => {
-  const { propertyTypes, usageTypesData } = params;
+const convertFromApiToUi = (event, eventType, params) => event.withMutations((eventWithMutations) => {
+  const { propertyTypes, usageTypesData, effectOnUsagetFields } = params;
+
+  const eventUsageTypeFromEvent = Immutable.Map().withMutations((eventUsageTypeWithMutations) => {
+    if (eventType === 'fraud') {
+      event.getIn(['conditions', 0]).forEach((cond) => {
+        if (effectOnUsagetFields.includes(cond.get('field', ''))) {
+          eventUsageTypeWithMutations.set(cond.get('field', ''), cond.get('value', Immutable.List()));
+        }
+      });
+    }
+  });
   const uiFlags = Immutable.Map({
     id: uuid.v4(),
+    eventUsageType: eventUsageTypeFromEvent,
   });
   eventWithMutations.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, false));
   eventWithMutations.set('ui_flags', uiFlags);
 });
 
-const convertFromUiToApi = (event, params) => event.withMutations((eventWithMutations) => {
-  const { propertyTypes, usageTypesData } = params;
-  eventWithMutations.delete('ui_flags');
-  eventWithMutations.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, true));
-});
+const convertFromUiToApi = (event, eventType, params) =>
+  event.withMutations((eventWithMutations) => {
+    const { propertyTypes, usageTypesData } = params;
+    eventWithMutations.delete('ui_flags');
+    if (eventType === 'fraud') {
+      const withoutEmptyConditions = eventWithMutations.getIn(['conditions', 0], Immutable.List())
+        .filter(cond => (cond.get('field', '') !== '' && cond.get('op', '')));
+      eventWithMutations.setIn(['conditions', 0], withoutEmptyConditions);
+    }
+    eventWithMutations.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, eventWithMutations, true));
+  });
 
 export const getEvents = (eventCategory = '') => (dispatch, getState) => {
   const settingsPath = (eventCategory === '') ? 'events' : `events.${eventCategory}`;
@@ -58,11 +78,12 @@ export const getEvents = (eventCategory = '') => (dispatch, getState) => {
     const state = getState();
     const usageTypesData = usageTypesDataSelector(state);
     const propertyTypes = propertyTypeSelector(state);
-    const params = ({ usageTypesData, propertyTypes });
+    const effectOnUsagetFields = effectOnEventUsagetFieldsSelector(state, { eventType: 'fraud' });
+    const params = ({ usageTypesData, propertyTypes, effectOnUsagetFields });
     const settingsEvents = state.settings.get('events', Immutable.List());
     settingsEvents.forEach((events, eventType) => {
       if (!['settings'].includes(eventType) && (eventCategory === '' || eventCategory === eventType)) {
-        const eventsWithId = events.map(event => convertFromApiToUi(event, params));
+        const eventsWithId = events.map(event => convertFromApiToUi(event, eventType, params));
         dispatch(updateSetting('events', eventType, eventsWithId));
       }
     });
@@ -78,7 +99,7 @@ export const saveEvents = (eventCategory = '') => (dispatch, getState) => {
   const params = ({ usageTypesData, propertyTypes });
   settingsEvents.forEach((events, eventType) => {
     if (!['settings'].includes(eventType) && (eventCategory === '' || eventCategory === eventType)) {
-      const eventsWithId = events.map(event => convertFromUiToApi(event, params));
+      const eventsWithId = events.map(event => convertFromUiToApi(event, eventType, params));
       dispatch(updateSetting('events', eventType, eventsWithId));
     }
   });
@@ -91,7 +112,7 @@ export const saveEvent = (eventCategory, event) => (dispatch, getState) => {
   const usageTypesData = usageTypesDataSelector(state);
   const propertyTypes = propertyTypeSelector(state);
   const params = ({ usageTypesData, propertyTypes });
-  const convertedEvent = convertFromUiToApi(event, params);
+  const convertedEvent = convertFromUiToApi(event, eventCategory, params);
   const category = `event.${eventCategory}`;
   const queries = saveSettingsQuery(convertedEvent, category);
   return apiBillRun(queries)

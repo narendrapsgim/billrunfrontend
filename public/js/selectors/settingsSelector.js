@@ -152,7 +152,7 @@ const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
 };
 
 const getInputProssesors = (state, props) =>  // eslint-disable-line no-unused-vars
-  state.settings.get('file_types', Immutable.Map());
+  state.settings.get('file_types', Immutable.List());
 
 const selectCsiOptions = (inputProssesors) => {
   let options = Immutable.List();
@@ -223,6 +223,17 @@ const selectFileType = (fileTypes) => {
 export const inputProssesorCsiOptionsSelector = createSelector(
   getInputProssesors,
   selectCsiOptions,
+);
+
+export const inputProssesorUsageTypesOptionsSelector = createSelector(
+  getInputProssesors,
+  (inputProssesors = Immutable.List()) => Immutable.Map()
+    .withMutations((nputProssesorUsageTypesWithMutations) => {
+      inputProssesors.forEach((inputProssesor) => {
+        const types = getUniqueUsageTypesFormInputProssesors(inputProssesor);
+        nputProssesorUsageTypesWithMutations.set(inputProssesor.get('file_type'), types);
+      });
+    }),
 );
 
 export const inputProssesorfilteredFieldsSelector = createSelector(
