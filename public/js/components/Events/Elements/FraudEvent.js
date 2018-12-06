@@ -108,14 +108,12 @@ class FraudEvent extends Component {
     return (
       <Row className="report-editor-conditions">
         <Col sm={12}>
-          { !conditionsRows.isEmpty() ? (
+          { !conditionsRows.isEmpty() && (
             <FormGroup className="form-inner-edit-row">
               <Col sm={4} xsHidden><label htmlFor="field_field">Filter</label></Col>
               <Col sm={2} xsHidden><label htmlFor="operator_field">Operator</label></Col>
               <Col sm={4} xsHidden><label htmlFor="value_field">Value</label></Col>
             </FormGroup>
-          ) : (
-            <HelpBlock>Please add at least one condition</HelpBlock>
           )}
         </Col>
         <Col sm={12}>
