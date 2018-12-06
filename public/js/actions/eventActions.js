@@ -7,6 +7,7 @@ import {
   pushToSetting,
   getSettings,
 } from './settingsActions';
+import { pushToList } from './listActions';
 import {
   usageTypesDataSelector,
   propertyTypeSelector,
@@ -17,6 +18,7 @@ import {
 } from '../selectors/eventSelectors';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import {
+  getProductsByKeysQuery,
   saveSettingsQuery,
 } from '../common/ApiQueries';
 import { getValueByUnit } from '../common/Util';
@@ -148,3 +150,6 @@ export const saveEventSettings = () => dispatch => dispatch(saveSettings(['event
 export const updateEventSettings = (path, value) => dispatch => dispatch(updateSetting('events', ['settings', ...path], value));
 
 export const getEventSettings = () => dispatch => dispatch(getSettings(['events.settings']));
+
+export const getEventRates = eventRatesKeys => dispatch =>
+  dispatch(pushToList('event_products', getProductsByKeysQuery(eventRatesKeys.toArray(), { key: 1, rates: 1 })));

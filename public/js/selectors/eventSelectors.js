@@ -16,6 +16,9 @@ import {
 import {
   getPropsItem,
 } from './entitySelector';
+import {
+  eventRatesSelector,
+} from './listSelectors';
 
 
 /* Helpers */
@@ -116,23 +119,49 @@ export const eventUsagetFieldUsateTypesSelector = createSelector(
   (eventUsageType = Immutable.Map()) => eventUsageType.get('usaget', Immutable.List()),
 );
 
+export const eventArateKeyFieldRatesSelector = createSelector(
+  getItemEventUsageType,
+  (eventUsageType = Immutable.Map()) => eventUsageType.get('arate_key', Immutable.List()),
+);
+
 export const eventTypeFieldUsateTypesSelector = createSelector(
   getItemEventUsageType,
   inputProssesorUsageTypesOptionsSelector,
   (types = Immutable.List(), inputProssesorUsageTypes = Immutable.List()) => Immutable.Set()
     .withMutations((allTypeWithMutations) => {
       inputProssesorUsageTypes
-        .filter((ip, name) => types.includes(name))
-        .forEach((ipTypes) => { allTypeWithMutations.union(ipTypes); });
+        .filter((ip, name) => types.get('type', Immutable.List()).includes(name))
+        .forEach((ipTypes) => {
+          allTypeWithMutations.union(ipTypes);
+        });
     }),
 );
 
-export const eventUsateTypesSelector = createSelector(
+export const eventRatesUsateTypesSelector = createSelector(
+  eventRatesSelector,
+  (rates = Immutable.List()) => Immutable.Map()
+    .withMutations((ratesUsageswithMutations) => {
+      rates.forEach((rate) => {
+        const usage = rate.get('rates', Immutable.Map()).keySeq().first();
+        ratesUsageswithMutations.set(rate.get('key', ''), usage);
+      });
+    }),
+);
+
+export const eventArateKeyFieldUsateTypesSelector = createSelector(
+  eventArateKeyFieldRatesSelector,
+  eventRatesUsateTypesSelector,
+  (item = Immutable.Map(), rates = Immutable.Map()) => item
+    .reduce((acc, name) => acc.push(rates.get(name, '')), Immutable.List()),
+);
+
+export const eventUsageTypesSelector = createSelector(
   eventTypeFieldUsateTypesSelector,
   eventUsagetFieldUsateTypesSelector,
-  () => Immutable.List(),
-  (type = Immutable.List(), usaget = Immutable.List(), arate_key = Immutable.List()) =>
+  eventArateKeyFieldUsateTypesSelector,
+  (type = Immutable.List(), usaget = Immutable.List(), arateKey = Immutable.List()) =>
     Immutable.Set().withMutations((allTypeWithMutations) => {
+      allTypeWithMutations.union(arateKey); // field arate_key
       allTypeWithMutations.union(type); // field type
       allTypeWithMutations.union(usaget); // field usaget
     }),
@@ -140,8 +169,8 @@ export const eventUsateTypesSelector = createSelector(
 
 export const eventThresholdFieldsSelectOptionsSelector = createSelector(
   eventTresholdFieldsSelector,
-  eventUsateTypesSelector,
-  (fields = Immutable.Map(), usateTypes = Immutable.set()) => fields
+  eventUsageTypesSelector,
+  (fields = Immutable.Map(), usateTypes = Immutable.Set()) => fields
     .filter((field) => {
       const fieldUsageList = field.get('allowedWithUsage', Immutable.List());
       if (fieldUsageList.isEmpty()) { // ["multiple", "empty", "single"]

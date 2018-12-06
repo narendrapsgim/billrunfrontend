@@ -25,6 +25,7 @@ const FraudEventCondition = (props) => {
     onUpdate,
     onRemove,
     setEventUsageType,
+    getEventRates,
   } = props;
 
   const field = condition.getIn(['field'], '');
@@ -52,10 +53,17 @@ const FraudEventCondition = (props) => {
     onUpdate([index, 'value'], values);
     if (effectOnUsagetField) {
       setEventUsageType(eventUsageTypes.set(field, values));
+      if (field === 'arate_key') {
+        const newRates = values.filter(val => !eventUsageTypes.get('arate_key').includes(val));
+        getEventRates(newRates);
+      }
     }
   };
 
   const onRemoveCondition = () => {
+    if (effectOnUsagetField) {
+      setEventUsageType(eventUsageTypes.set(field, Immutable.List()));
+    }
     onRemove(index);
   };
 
@@ -121,6 +129,7 @@ FraudEventCondition.propTypes = {
   onUpdate: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   setEventUsageType: PropTypes.func.isRequired,
+  getEventRates: PropTypes.func.isRequired,
 };
 
 FraudEventCondition.defaultProps = {

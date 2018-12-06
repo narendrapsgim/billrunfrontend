@@ -10,7 +10,7 @@ class FraudEventThreshold extends Component {
   static propTypes = {
     threshold: PropTypes.instanceOf(Immutable.Map),
     index: PropTypes.number.isRequired,
-    eventUsaget: PropTypes.instanceOf(Immutable.Sat),
+    eventUsaget: PropTypes.instanceOf(Immutable.Set),
     thresholdFieldsSelectOptions: PropTypes.array,
     thresholdOperatorsSelectOptions: PropTypes.array,
     onUpdate: PropTypes.func.isRequired,

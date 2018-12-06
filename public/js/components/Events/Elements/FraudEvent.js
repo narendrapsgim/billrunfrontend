@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { Form, FormGroup, Row, Col, HelpBlock, Panel } from 'react-bootstrap';
 import { CreateButton } from '../../Elements';
 import {
-  eventUsateTypesSelector,
+  eventUsageTypesSelector,
   eventThresholdOperatorsSelectOptionsSelector,
   eventThresholdFieldsSelectOptionsSelector,
 } from '../../../selectors/eventSelectors';
@@ -12,6 +12,7 @@ import FraudEventDetails from './FraudEventDetails';
 import FraudEventCondition from './FraudEventCondition';
 import FraudEventThreshold from './FraudEventThreshold';
 import { getSettings } from '../../../actions/settingsActions';
+import { getEventRates } from '../../../actions/eventActions';
 
 class FraudEvent extends Component {
 
@@ -34,7 +35,16 @@ class FraudEvent extends Component {
   };
 
   componentDidMount() {
+    const { item } = this.props;
+    const eventRates = item.getIn(['ui_flags', 'eventUsageType', 'arate_key'], Immutable.List());
+    this.getEventRates(eventRates);
     this.props.dispatch(getSettings(['lines.fields']));
+  }
+
+  getEventRates = (eventRates) => {
+    if (!eventRates.isEmpty()) {
+      this.props.dispatch(getEventRates(eventRates));
+    }
   }
 
   onChangeText = path => (e) => {
@@ -87,6 +97,7 @@ class FraudEvent extends Component {
         onUpdate={this.onUpdateCondition}
         onRemove={this.onRemoveCondition}
         setEventUsageType={this.setEventUsageType}
+        getEventRates={this.getEventRates}
       />
     ));
     const disableAdd = false; // fieldsOptions.isEmpty();
@@ -167,7 +178,7 @@ class FraudEvent extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  eventUsaget: eventUsateTypesSelector(state, props),
+  eventUsaget: eventUsageTypesSelector(state, props),
   thresholdFieldsSelectOptions: eventThresholdFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
   thresholdOperatorsSelectOptions: eventThresholdOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
 });
