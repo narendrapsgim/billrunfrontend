@@ -17,6 +17,15 @@ const EventSettings = ({ eventsSettings, methodOptions, decoderOptions, ...props
     props.onEdit(eventNotifier, id, value);
   };
 
+  const pasteSplit = (data) => {
+    const separators = [',', ';', '\\(', '\\)', '\\*', '/', ':', '\\?', '\n', '\r', '\t'];
+    return data.split(new RegExp(separators.join('|'))).map(d => d.trim());
+  };
+
+  const onChangeGlobalMail = (val) => {
+    props.onEdit('email', 'global_addresses', Immutable.List(val));
+  };
+
   return (
     <Form horizontal>
       <Col sm={12}>
@@ -52,6 +61,22 @@ const EventSettings = ({ eventsSettings, methodOptions, decoderOptions, ...props
                 value={eventsSettings.getIn(['http', 'decoder'], '')}
                 onChange={onChangeSelect('http', 'decoder')}
                 options={decoderOptions}
+              />
+            </Col>
+          </FormGroup>
+        </Panel>
+        <Panel header="Mail" key="mail">
+          <FormGroup>
+            <Col sm={2} componentClass={ControlLabel}>
+              Mails <Help contents="Send events to the following email addresses (For supported events)" />
+            </Col>
+            <Col sm={6}>
+              <Field
+                fieldType="tags"
+                value={eventsSettings.getIn(['email', 'global_addresses'], Immutable.List()).toArray()}
+                onChange={onChangeGlobalMail}
+                addOnPaste
+                pasteSplit={pasteSplit}
               />
             </Col>
           </FormGroup>
