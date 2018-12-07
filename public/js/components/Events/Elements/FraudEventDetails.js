@@ -70,16 +70,21 @@ const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
     }
   };
 
+  const prepareEmailAddressesValue = () => {
+    const emails = item.getIn(['notify_by_email', 'additional_addresses'], Immutable.List());
+    const useGlobalAddresses = item.getIn(['notify_by_email', 'use_global_addresses'], false);
+    if (useGlobalAddresses) {
+      return emails.insert(0, 'global').toArray();
+    }
+    return emails.toArray();
+  };
+
   const globalAddresses = eventsSettings.getIn(['email', 'global_addresses'], Immutable.List()).join(', ');
   const emailAddressesSelectOptions = [
     { value: 'global', label: `Global emails (${globalAddresses})` },
   ];
+  const emailAdderssesValue = prepareEmailAddressesValue();
   const isNotifyByEmail = item.getIn(['notify_by_email', 'notify'], false);
-  const emailAdderssesValue = item.getIn(['notify_by_email', 'additional_addresses'], Immutable.List()).toArray();
-  const useGlobalAddresses = item.getIn(['notify_by_email', 'use_global_addresses'], false);
-  if (useGlobalAddresses) {
-    emailAdderssesValue.push('global');
-  }
   return (
     <Col sm={12}>
       <FormGroup>

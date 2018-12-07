@@ -1,7 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, FormGroup, Row, Col, HelpBlock, Panel } from 'react-bootstrap';
+import { Form, FormGroup, Row, Col, Panel } from 'react-bootstrap';
 import { CreateButton } from '../../Elements';
 import {
   eventUsageTypesSelector,
