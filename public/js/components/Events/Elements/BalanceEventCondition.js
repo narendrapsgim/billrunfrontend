@@ -181,32 +181,34 @@ class BalanceEventCondition extends Component {
     const unitLabel = getUnitTitle(item.get('unit', ''), trigger, usaget, propertyTypes, usageTypesData, currency);
     const selectedConditionData = getBalanceConditionData(item.get('type', ''));
     return (
-      <div>
+      <Col sm={12}>
 
         <FormGroup>
           <Col sm={3} smOffset={1} style={{ textAlign: 'left' }} componentClass={ControlLabel}>Condition Trigger: </Col>
-          <Col sm={7}>
-            <Col sm={4}>
-              <Field
-                fieldType="radio"
-                name={`condition-trigger-${index}`}
-                id={`condition-trigger-monetary-${index}`}
-                value="cost"
-                checked={trigger === 'cost'}
-                onChange={this.onChangeTrigger}
-                label="Monetary"
-              />
-            </Col>
-            <Col sm={4}>
-              <Field
-                fieldType="radio"
-                name={`condition-trigger-${index}`}
-                id={`condition-trigger-usagev-${index}`}
-                value="usagev"
-                checked={trigger === 'usagev'}
-                onChange={this.onChangeTrigger}
-                label="Usage"
-              />
+          <Col sm={8}>
+            <Col sm={12}>
+              <span style={{ display: 'inline-block', marginRight: 20 }}>
+                <Field
+                  fieldType="radio"
+                  name={`condition-trigger-${index}`}
+                  id={`condition-trigger-monetary-${index}`}
+                  value="cost"
+                  checked={trigger === 'cost'}
+                  onChange={this.onChangeTrigger}
+                  label="Monetary"
+                />
+              </span>
+              <span style={{ display: 'inline-block', marginRight: 20 }}>
+                <Field
+                  fieldType="radio"
+                  name={`condition-trigger-${index}`}
+                  id={`condition-trigger-usagev-${index}`}
+                  value="usagev"
+                  checked={trigger === 'usagev'}
+                  onChange={this.onChangeTrigger}
+                  label="Usage"
+                />
+              </span>
             </Col>
           </Col>
         </FormGroup>
@@ -291,30 +293,32 @@ class BalanceEventCondition extends Component {
               </Col>
             </Col>
             { trigger === 'usagev' && limitation === 'activity_type' && (
-              <Col sm={6} smOffset={4}>
-                <Col sm={6}>
-                  <Field
-                    fieldType="radio"
-                    name={`condition-over-group-${index}`}
-                    id={`condition-over-group-all-units-${index}`}
-                    value="none"
-                    checked={overGroup !== 'over_group'}
-                    onChange={this.onChangeOverGroup}
-                    label="All units"
-                    enabled={limitation === 'activity_type'}
-                  />
-                </Col>
-                <Col sm={6}>
-                  <Field
-                    fieldType="radio"
-                    name={`condition-over-group-${index}`}
-                    id={`condition-over-group-exceeding-units-${index}`}
-                    value="over_group"
-                    checked={overGroup === 'over_group'}
-                    onChange={this.onChangeOverGroup}
-                    label="Exceeding units"
-                    disabled={limitation !== 'activity_type'}
-                  />
+              <Col sm={8} smOffset={4}>
+                <Col sm={12}>
+                  <span style={{ display: 'inline-block', marginRight: 20 }}>
+                    <Field
+                      fieldType="radio"
+                      name={`condition-over-group-${index}`}
+                      id={`condition-over-group-all-units-${index}`}
+                      value="none"
+                      checked={overGroup !== 'over_group'}
+                      onChange={this.onChangeOverGroup}
+                      label="All units"
+                      enabled={limitation === 'activity_type'}
+                    />
+                  </span>
+                  <span style={{ display: 'inline-block' }}>
+                    <Field
+                      fieldType="radio"
+                      name={`condition-over-group-${index}`}
+                      id={`condition-over-group-exceeding-units-${index}`}
+                      value="over_group"
+                      checked={overGroup === 'over_group'}
+                      onChange={this.onChangeOverGroup}
+                      label="Exceeding units"
+                      disabled={limitation !== 'activity_type'}
+                    />
+                  </span>
                 </Col>
               </Col>
             )}
@@ -384,7 +388,7 @@ class BalanceEventCondition extends Component {
           </Col>)
         }
         </Col>
-      </div>
+      </Col>
     );
   }
 }

@@ -86,30 +86,32 @@ class BalanceEvent extends Component {
 
   renderCondition = (condition, index) => (
     <FormGroup className="form-inner-edit-row" key={index}>
-      <Col sm={10}>
-        {
-          getConditionDescription(this.props.conditionType, condition, {
-            propertyTypes: this.props.propertyTypes,
-            usageTypesData: this.props.usageTypesData,
-            currency: this.props.currency,
-            activityType: 'counter',
-          })
-        }
-      </Col>
-      <Col sm={1} hidden={this.state.editedConditionIndex === index}>
-        <Button onClick={this.editCondition(index)} bsStyle="link">
-          <i className="fa fa-fw fa-pencil" />
-        </Button>
-      </Col>
-      <Col sm={1} hidden={this.state.editedConditionIndex !== index}>
-        <Button onClick={this.hideEditCondition} bsStyle="link">
-          <i className="fa fa-fw fa-minus" />
-        </Button>
-      </Col>
-      <Col sm={1}>
-        <Button onClick={this.removeCondition(index)} bsStyle="link">
-          <i className="fa fa-fw danger-red fa-trash-o" />
-        </Button>
+      <Col sm={12}>
+        <div style={{ paddingRight: 100, display: 'inline-block' }}>
+          {
+            getConditionDescription(this.props.conditionType, condition, {
+              propertyTypes: this.props.propertyTypes,
+              usageTypesData: this.props.usageTypesData,
+              currency: this.props.currency,
+              activityType: 'counter',
+            })
+          }
+        </div>
+        <span style={{ float: 'right', marginLeft: -100 }} >
+          {this.state.editedConditionIndex !== index && (
+            <Button onClick={this.editCondition(index)} bsStyle="link" className="pt0">
+              <i className="fa fa-fw fa-pencil" />
+            </Button>
+          )}
+          {this.state.editedConditionIndex === index && (
+            <Button onClick={this.hideEditCondition} bsStyle="link" className="pt0">
+              <i className="fa fa-fw fa-minus" />
+            </Button>
+          )}
+          <Button onClick={this.removeCondition(index)} bsStyle="link" className="pt0">
+            <i className="fa fa-fw danger-red fa-trash-o" />
+          </Button>
+        </span>
       </Col>
       <Col sm={12}>
         <Panel collapsible expanded={this.state.editedConditionIndex === index}>
