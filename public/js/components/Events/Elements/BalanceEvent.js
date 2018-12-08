@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Form, FormGroup, Col, ControlLabel, Button, Panel } from 'react-bootstrap';
 import { getConditionDescription } from './../EventsUtil';
 import Field from '../../Field';
+import { Actions } from '../../Elements';
 import BalanceEventCondition from './BalanceEventCondition';
 import { usageTypesDataSelector, propertyTypeSelector, currencySelector } from '../../../selectors/settingsSelector';
 
@@ -84,42 +85,39 @@ class BalanceEvent extends Component {
     }
   }
 
-  renderCondition = (condition, index) => (
-    <FormGroup className="form-inner-edit-row" key={index}>
-      <Col sm={12}>
-        <div style={{ paddingRight: 100, display: 'inline-block' }}>
-          {
-            getConditionDescription(this.props.conditionType, condition, {
-              propertyTypes: this.props.propertyTypes,
-              usageTypesData: this.props.usageTypesData,
-              currency: this.props.currency,
-              activityType: 'counter',
-            })
-          }
-        </div>
-        <span style={{ float: 'right', marginLeft: -100 }} >
-          {this.state.editedConditionIndex !== index && (
-            <Button onClick={this.editCondition(index)} bsStyle="link" className="pt0">
-              <i className="fa fa-fw fa-pencil" />
-            </Button>
-          )}
-          {this.state.editedConditionIndex === index && (
-            <Button onClick={this.hideEditCondition} bsStyle="link" className="pt0">
-              <i className="fa fa-fw fa-minus" />
-            </Button>
-          )}
-          <Button onClick={this.removeCondition(index)} bsStyle="link" className="pt0">
-            <i className="fa fa-fw danger-red fa-trash-o" />
-          </Button>
-        </span>
-      </Col>
-      <Col sm={12}>
-        <Panel collapsible expanded={this.state.editedConditionIndex === index}>
-          { this.renderConditionEditForm(condition, index) }
-        </Panel>
-      </Col>
-    </FormGroup>
-  );
+  showConditionDetails = (index) => {
+    const { editedConditionIndex } = this.state;
+    return editedConditionIndex === index;
+  }
+
+  getConditionActions = index => [
+    { type: 'edit', onClick: this.editCondition(index), show: !this.showConditionDetails(index) },
+    { type: 'collapse', onClick: this.hideEditCondition, show: this.showConditionDetails(index) },
+    { type: 'remove', onClick: this.removeCondition(index) },
+  ];
+
+  renderCondition = (condition, index) => {
+    const { conditionType, propertyTypes, usageTypesData, currency } = this.props;
+    const activityType = 'counter';
+    const params = ({ propertyTypes, usageTypesData, currency, activityType });
+    return (
+      <FormGroup key={index} className="mb0">
+        <Col sm={12}>
+          <div style={{ paddingRight: 100, display: 'inline-block' }}>
+            { getConditionDescription(conditionType, condition, params) }
+          </div>
+          <span style={{ marginLeft: -100, paddingRight: 15 }} className="pull-right List row">
+            <Actions actions={this.getConditionActions(index)} />
+          </span>
+        </Col>
+        <Col sm={12}>
+          <Panel collapsible expanded={this.state.editedConditionIndex === index}>
+            { this.renderConditionEditForm(condition, index) }
+          </Panel>
+        </Col>
+      </FormGroup>
+    );
+  }
 
   renderAddConditionButton = () => (
     <Button className="btn-primary" onClick={this.addCondition}><i className="fa fa-plus" />&nbsp;Add New Condition</Button>
