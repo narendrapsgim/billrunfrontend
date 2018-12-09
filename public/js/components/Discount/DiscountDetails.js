@@ -205,7 +205,6 @@ export default class DiscountDetails extends Component {
         <Col lg={12}>
           <Form horizontal>
             <Panel>
-
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('Title', 'discounts')}<Help contents={DiscountDescription.description} />
@@ -256,54 +255,54 @@ export default class DiscountDetails extends Component {
                   <Field value={discount.get('cycles', '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
                 </Col>
               </FormGroup>
+            </Panel>
 
-              <EntityFields
-                entityName="discounts"
-                entity={discount}
-                onChangeField={this.onChangeAdditionalField}
-                editable={editable}
-              />
+            <EntityFields
+              entityName="discounts"
+              entity={discount}
+              onChangeField={this.onChangeAdditionalField}
+              editable={editable}
+            />
 
-              <Panel header={<h3>Discount Conditions</h3>}>
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    { getFieldName('Plan', 'discounts')}
-                  </Col>
-                  <Col sm={8} lg={9}>
-                    { editable
-                      ? <Select options={plansOptions} value={discount.getIn(['params', 'plan'], '')} onChange={this.onChangePlan} />
-                      : <div className="non-editable-field">{ discount.getIn(['params', 'plan'], '') }</div>
-                    }
-                  </Col>
-                </FormGroup>
+            <Panel header={<h3>Discount Conditions</h3>}>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  { getFieldName('Plan', 'discounts')}
+                </Col>
+                <Col sm={8} lg={9}>
+                  { editable
+                    ? <Select options={plansOptions} value={discount.getIn(['params', 'plan'], '')} onChange={this.onChangePlan} />
+                    : <div className="non-editable-field">{ discount.getIn(['params', 'plan'], '') }</div>
+                  }
+                </Col>
+              </FormGroup>
 
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    { getFieldName('Services', 'discounts')}
-                  </Col>
-                  <Col sm={8} lg={9}>
-                    { editable
-                      ? <Select multi={true} value={services} options={servicesOptions} onChange={this.onChangeService} />
-                      : <div className="non-editable-field">{ discount.getIn(['params', 'service'], Immutable.List()).join(', ') }</div>
-                    }
-                  </Col>
-                </FormGroup>
-              </Panel>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  { getFieldName('Services', 'discounts')}
+                </Col>
+                <Col sm={8} lg={9}>
+                  { editable
+                    ? <Select multi={true} value={services} options={servicesOptions} onChange={this.onChangeService} />
+                    : <div className="non-editable-field">{ discount.getIn(['params', 'service'], Immutable.List()).join(', ') }</div>
+                  }
+                </Col>
+              </FormGroup>
+            </Panel>
 
-              <Panel header={<h3>Discount Values</h3>}>
-                { this.renderPlanDiscountValues() }
-                { (discount.getIn(['params', 'plan'], '').length > 0) && <hr /> }
-                { this.renderServivesDiscountValues() }
-                { (!discount.getIn(['params', 'service'], Immutable.List()).isEmpty()) && <hr /> }
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    { getFieldName('Overall Limit', 'discounts')}
-                  </Col>
-                  <Col sm={8} lg={9}>
-                    <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
-                  </Col>
-                </FormGroup>
-              </Panel>
+            <Panel header={<h3>Discount Values</h3>}>
+              { this.renderPlanDiscountValues() }
+              { (discount.getIn(['params', 'plan'], '').length > 0) && <hr /> }
+              { this.renderServivesDiscountValues() }
+              { (!discount.getIn(['params', 'service'], Immutable.List()).isEmpty()) && <hr /> }
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  { getFieldName('Overall Limit', 'discounts')}
+                </Col>
+                <Col sm={8} lg={9}>
+                  <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
+                </Col>
+              </FormGroup>
             </Panel>
           </Form>
         </Col>
