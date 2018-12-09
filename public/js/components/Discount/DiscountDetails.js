@@ -5,10 +5,11 @@ import Select from 'react-select';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import isNumber from 'is-number';
-import { getFieldName, getConfig } from '../../common/Util';
+import ServiceDiscountValue from './Elements/ServiceDiscountValue';
 import Help from '../Help';
 import Field from '../Field';
 import EntityFields from '../Entity/EntityFields';
+import { getFieldName, getConfig } from '../../common/Util';
 import { DiscountDescription } from '../../FieldDescriptions';
 
 
@@ -132,17 +133,23 @@ export default class DiscountDetails extends Component {
   })
 
   renderServivesDiscountValues = () => {
-    const { discount, availableServices } = this.props;
+    const { discount, availableServices, mode, currency } = this.props;
     const discountSubject = discount.getIn(['params', 'service'], Immutable.List());
-    return discountSubject.map((key) => {
-      const value = discount.getIn(['discount_subject', 'service', key], null);
-      const isQuantitative = availableServices.findIndex(service => (
-        service.get('name', '') === key
-        && service.get('quantitative', false) === true
-      ));
-      const info = isQuantitative !== -1 ? 'Amount will be multiplied by the subscriber\'s service quantity' : '';
-      const label = this.getLabel(availableServices, key);
-      return this.renderDiscountValue(key, value, label, this.onChangeServiceDiscountValue, info);
+    return discountSubject.map((serviceName) => {
+      const label = this.getLabel(availableServices, serviceName);
+      return (
+        <ServiceDiscountValue
+          key={`${paramCase(serviceName)}-discount-value`}
+          name={serviceName}
+          label={label}
+          discount={discount}
+          mode={mode}
+          currency={currency}
+          availableServices={availableServices}
+          onChange={this.onChangeServiceDiscountValue}
+          getLabel={this.getLabel}
+        />
+      );
     });
   }
 
@@ -150,43 +157,35 @@ export default class DiscountDetails extends Component {
     .find(item => item.get('name') === key, null, Immutable.Map())
     .get('description', key);
 
-  renderPlanDiscountValues = () => {
-    const { discount, availablePlans } = this.props;
-    const key = discount.getIn(['params', 'plan'], '');
-    if (key && key.length) {
-      const label = this.getLabel(availablePlans, key);
-      const value = discount.getIn(['discount_subject', 'plan', key], null);
-      return this.renderDiscountValue(key, value, label, this.onChangePlanDiscountValue);
+  renderPlanDiscountValue = () => {
+    const { discount, availablePlans, mode, currency } = this.props;
+    const planName = discount.getIn(['params', 'plan'], '');
+    if (planName === '') {
+      return null;
     }
-    return null;
-  }
-
-  renderDiscountValue = (key, value, label, onChange, info = '') => {
-    const { discount, mode, currency } = this.props;
     const editable = (mode !== 'view');
+    const value = discount.getIn(['discount_subject', 'plan', planName], null);
     if (!editable && value === null) {
       return null;
     }
-    const isPercentaget = discount.get('discount_type', '') === 'percentage';
+    const label = this.getLabel(availablePlans, planName);
+    const isPercentaget = (discount.get('discount_type', '') === 'percentage');
     const suffix = isPercentaget ? <i className="fa fa-percent" /> : getSymbolFromCurrency(currency);
-    const onChangeBind = (val) => { onChange(key, val); };
-    const showHelpText = info.length > 0 && editable;
     return (
-      <FormGroup key={`${paramCase(key)}-discount-value`}>
+      <FormGroup key={`${paramCase(planName)}-discount-value`}>
         <Col componentClass={ControlLabel} sm={3} lg={2}>
           { label }
         </Col>
         <Col sm={8} lg={9}>
           <Field
             value={value}
-            onChange={onChangeBind}
+            onChange={(val) => { this.onChangePlanDiscountValue(planName, val); }}
             label="Discount by"
             fieldType="toggeledInput"
             editable={editable}
             suffix={suffix}
             inputProps={{ fieldType: 'number' }}
           />
-          { showHelpText && <HelpBlock>{ info }</HelpBlock> }
         </Col>
       </FormGroup>
     );
@@ -291,7 +290,7 @@ export default class DiscountDetails extends Component {
             </Panel>
 
             <Panel header={<h3>Discount Values</h3>}>
-              { this.renderPlanDiscountValues() }
+              { this.renderPlanDiscountValue() }
               { (discount.getIn(['params', 'plan'], '').length > 0) && <hr /> }
               { this.renderServivesDiscountValues() }
               { (!discount.getIn(['params', 'service'], Immutable.List()).isEmpty()) && <hr /> }

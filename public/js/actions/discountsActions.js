@@ -23,7 +23,12 @@ export const saveDiscount = (item, action) => (dispatch) => {
         .get('discount_subject', Immutable.Map())
         .forEach((subject, subjectName) => {
           subject.forEach((value, name) => {
-            if (value && !isNaN(value)) {
+            if (Immutable.Map.isMap(itemWithMutations.getIn(['discount_subject', subjectName, name], ''))) {
+              const objVal = itemWithMutations.getIn(['discount_subject', subjectName, name, 'value'], '');
+              if (objVal && !isNaN(objVal)) {
+                itemWithMutations.setIn(['discount_subject', subjectName, name, 'value'], objVal / 100);
+              }
+            } else if (value && !isNaN(value)) {
               itemWithMutations.setIn(['discount_subject', subjectName, name], value / 100);
             }
           });
@@ -53,6 +58,9 @@ export const getDiscount = id => (dispatch) => {
               if (!isNaN(item.discount_subject[subjectType][subjectName])) {
                 const percentage = Number(item.discount_subject[subjectType][subjectName]) * 100;
                 item.discount_subject[subjectType][subjectName] = parseFloat(percentage.toFixed(2));
+              } else if (!isNaN(item.discount_subject[subjectType][subjectName].value)) {
+                const percentage = Number(item.discount_subject[subjectType][subjectName].value) * 100;
+                item.discount_subject[subjectType][subjectName].value = parseFloat(percentage.toFixed(2));
               }
             });
           });
