@@ -244,7 +244,7 @@ class EntityList extends Component {
     const defaultActions = [{
       type: 'refresh',
       label: 'Refresh',
-      actionStyle: 'default',
+      actionStyle: 'primary',
       showIcon: true,
       onClick: this.onClickRefresh,
       actionSize: 'xsmall',
@@ -252,7 +252,7 @@ class EntityList extends Component {
     }, {
       type: 'add',
       label: 'Add New',
-      actionStyle: 'default',
+      actionStyle: 'primary',
       showIcon: true,
       onClick: this.onClickNew,
       actionSize: 'xsmall',
