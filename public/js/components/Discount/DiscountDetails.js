@@ -137,17 +137,20 @@ export default class DiscountDetails extends Component {
     const discountSubject = discount.getIn(['params', 'service'], Immutable.List());
     return discountSubject.map((serviceName) => {
       const label = this.getLabel(availableServices, serviceName);
+      const isQuantitative = (availableServices.findIndex(service => (
+        service.get('name', '') === serviceName
+        && service.get('quantitative', false) === true
+      )) !== -1);
       return (
         <ServiceDiscountValue
           key={`${paramCase(serviceName)}-discount-value`}
+          mode={mode}
+          discount={discount}
           name={serviceName}
           label={label}
-          discount={discount}
-          mode={mode}
+          isQuantitative={isQuantitative}
           currency={currency}
-          availableServices={availableServices}
           onChange={this.onChangeServiceDiscountValue}
-          getLabel={this.getLabel}
         />
       );
     });

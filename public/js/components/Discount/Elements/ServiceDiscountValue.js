@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import isNumber from 'is-number';
 import { Form, FormGroup, ControlLabel, Col, HelpBlock, Button } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { ModalWrapper } from '../../Elements';
@@ -15,7 +15,6 @@ class ServiceDiscountValue extends Component {
     isQuantitative: PropTypes.bool.isRequired,
     mode: PropTypes.string.isRequired,
     currency: PropTypes.string,
-    availableServices: PropTypes.instanceOf(Immutable.List),
     onChange: PropTypes.func.isRequired,
   };
 
@@ -23,73 +22,81 @@ class ServiceDiscountValue extends Component {
     name: '',
     label: '',
     discount: Immutable.Map(),
+    isQuantitative: false,
     currency: '',
-    availableServices: Immutable.List(),
   };
 
   state = {
     showAdvancedEdit: false,
   }
 
-  onChangeValue = (value) => {
+  isOldStructure = () => {
     const { name, discount } = this.props;
     const serviceDiscoun = discount.getIn(['discount_subject', 'service', name], Immutable.Map());
-    if (Immutable.Map.isMap(serviceDiscoun)) {
-      const updatedDiscount = serviceDiscoun.set('value', value);
-      this.props.onChange(name, updatedDiscount);
-    } else {
-      const newValue = Immutable.Map({
-        value,
-      });
-      this.props.onChange(name, newValue);
-    }
+    return !Immutable.Map.isMap(serviceDiscoun);
+  }
+
+  onChangeValue = (val) => {
+    const { name, discount } = this.props;
+    const value = isNumber(val) ? parseFloat(val) : val;
+    const serviceDiscoun = discount.getIn(['discount_subject', 'service', name], Immutable.Map());
+    const newValue = this.isOldStructure()
+      ? Immutable.Map({ value })
+      : serviceDiscoun.set('value', value);
+    this.props.onChange(name, newValue);
   }
 
   onChangeAmount = (e) => {
-    const { value } = e.target;
-    const newValue = Immutable.Map({
+    const { discount, name } = this.props;
+    let { value } = e.target;
+    value = isNumber(value) ? parseFloat(value) : value;
+
+    const newParam = Immutable.Map({
       name: 'quantity',
       value,
     });
-    const newoperation = Immutable.Map({
+    const newOperation = Immutable.Map({
       name: 'recurring_by_quantity',
-      params: Immutable.List([
-        newValue,
-      ]),
+      params: Immutable.List([newParam]),
     });
-    const newService = Immutable.Map({
+    const newServiceValue = Immutable.Map({
       value: '',
-      operations: Immutable.List([
-        newoperation,
-      ]),
+      operations: Immutable.List([newOperation]),
     });
 
-    const { discount, name } = this.props;
-    let updatedDiscount = false;
-    const serviceDiscoun = discount.getIn(['discount_subject', 'service', name], Immutable.Map());
-    if (!Immutable.Map.isMap(serviceDiscoun)) {
-      updatedDiscount = discount.updateIn(['discount_subject', 'service', name], val => newService.set('value', val));
-    } else {
-      const operations = discount.getIn(['discount_subject', 'service', name, 'operations'], Immutable.List());
-      const recurringByQuantityIdx = operations.findIndex(operation => operation.get('name') === 'recurring_by_quantity');
-      if (recurringByQuantityIdx !== -1) {
-        const params = operations.getIn([recurringByQuantityIdx, 'params'], Immutable.List());
-        const quantityIdx = params.findIndex(param => param.get('name', '') === 'quantity');
-        if (quantityIdx !== -1) {
-          updatedDiscount = discount.updateIn(
-            ['discount_subject', 'service', name, 'operations', recurringByQuantityIdx, 'params', quantityIdx],
-            Immutable.Map(),
-            param => param.set('value', value),
-          );
-        } else {
-          updatedDiscount = discount.updateIn(['discount_subject', 'service', name, 'operations', recurringByQuantityIdx], Immutable.List(), list => list.push(newValue));
-        }
-      } else {
-        updatedDiscount = discount.updateIn(['discount_subject', 'service', name, 'operations'], Immutable.List(), list => list.push(newoperation));
-      }
+    const currentDiscountValue = discount.getIn(['discount_subject', 'service', name], '');
+    if (this.isOldStructure()) { // No value Or Old structure
+      this.props.onChange(name, newServiceValue.set('value', currentDiscountValue));
+      return;
     }
-    const setValue = updatedDiscount.getIn(['discount_subject', 'service', name], Immutable.Map());
-    this.props.onChange(name, setValue);
+    const operations = currentDiscountValue.get('operations', Immutable.List());
+    const recurringByQuantityIdx = operations.findIndex(operation => operation.get('name') === 'recurring_by_quantity');
+    if (recurringByQuantityIdx === -1) { // No operations - recurring_by_quantity
+      const withNewOperation = currentDiscountValue.updateIn(
+        ['operations'],
+        Immutable.List(),
+        ops => ops.push(newOperation),
+      );
+      this.props.onChange(name, withNewOperation);
+      return;
+    }
+    const params = operations.getIn([recurringByQuantityIdx, 'params'], Immutable.List());
+    const quantityIdx = params.findIndex(param => param.get('name', '') === 'quantity');
+    if (quantityIdx === -1) { // No param - quantity
+      const withQuantity = currentDiscountValue.updateIn(
+        ['operations', recurringByQuantityIdx, 'params'],
+        Immutable.List(),
+        list => list.push(newParam),
+      );
+      this.props.onChange(name, withQuantity);
+      return;
+    }
+    const withQuantity = currentDiscountValue.updateIn(
+      ['operations', recurringByQuantityIdx, 'params', quantityIdx],
+      Immutable.Map(),
+      param => param.set('value', value),
+    );
+    this.props.onChange(name, withQuantity);
   }
 
   onCloseModal = () => {
@@ -102,10 +109,10 @@ class ServiceDiscountValue extends Component {
 
   getDiscountValue = () => {
     const { name, discount } = this.props;
-    if (Immutable.Map.isMap(discount.getIn(['discount_subject', 'service', name], ''))) {
-      return discount.getIn(['discount_subject', 'service', name, 'value'], '');
+    if (this.isOldStructure()) {
+      return discount.getIn(['discount_subject', 'service', name], '');
     }
-    return discount.getIn(['discount_subject', 'service', name], '');
+    return discount.getIn(['discount_subject', 'service', name, 'value'], '');
   }
 
   getDiscountAmount = () => {
@@ -132,13 +139,13 @@ class ServiceDiscountValue extends Component {
         <Form horizontal>
           <FormGroup>
             <Col sm={12}>
-              Apply discount value {discountValue} for every
-              &nbsp;<Field
+              Apply discount value {discountValue} for every &nbsp;
+              <Field
                 style={{ width: 50, display: 'inline-block' }}
                 onChange={this.onChangeAmount}
                 value={discountAmount}
-              />&nbsp;
-             units
+              />
+             &nbsp;units
             </Col>
           </FormGroup>
         </Form>
@@ -153,11 +160,12 @@ class ServiceDiscountValue extends Component {
     }
     const editable = (mode !== 'view');
     const discountAmount = this.getDiscountAmount();
-    let info = 'Amount will be multiplied by the subscriber\'s service quantity';
-    if (discountAmount > 1) {
-      const discountValue = this.getDiscountValue();
-      info = `Apply discount value ${discountValue} for every ${discountAmount} units`;
-    }
+    const discountValue = this.getDiscountValue();
+
+    const details = ([1, '1'].includes(discountAmount))
+      ? 'Amount will be multiplied by the subscriber\'s service quantity'
+      : `Apply discount value ${discountValue} for every ${discountAmount} units`;
+
     return (
       <HelpBlock>
         { editable && (
@@ -165,7 +173,7 @@ class ServiceDiscountValue extends Component {
             <i className="fa fa-cog fa-fw active-blue" />
           </Button>
         )}
-        { info }
+        { details }
       </HelpBlock>
     );
   }
@@ -212,11 +220,4 @@ class ServiceDiscountValue extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  isQuantitative: (props.availableServices.findIndex(service => (
-    service.get('name', '') === props.name
-    && service.get('quantitative', false) === true
-  )) !== -1),
-});
-
-export default connect(mapStateToProps)(ServiceDiscountValue);
+export default ServiceDiscountValue;
