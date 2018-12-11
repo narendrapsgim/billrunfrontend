@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import { FormGroup, Col } from 'react-bootstrap';
+import isNumber from 'is-number';
 import Field from '../../Field';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
 
@@ -43,7 +44,8 @@ class FraudEventThreshold extends Component {
   onChangeThresholdValue = (e) => {
     const { index } = this.props;
     const { value } = e.target;
-    this.props.onUpdate([index, 'value'], value);
+    const val = isNumber(value) ? parseFloat(value) : value;
+    this.props.onUpdate([index, 'value'], val);
   }
 
   onChangeThresholdUnit = (value) => {
@@ -92,6 +94,7 @@ class FraudEventThreshold extends Component {
         </Col>
         <Col sm={4}>
           <Field
+            fieldType="number"
             id="threshold_value"
             onChange={this.onChangeThresholdValue}
             value={threshold.getIn(['value'], '')}
