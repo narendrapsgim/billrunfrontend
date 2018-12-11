@@ -41,6 +41,9 @@ const FraudEventCondition = (props) => {
       op: '',
       value: Immutable.List(),
     });
+    if (effectOnUsagetField) {
+      setEventUsageType(eventUsageTypes.set(field, Immutable.List()));
+    }
     onUpdate([index], resetCondition);
   };
 
