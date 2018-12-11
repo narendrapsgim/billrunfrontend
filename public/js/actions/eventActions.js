@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import uuid from 'uuid';
+import isNumber from 'is-number';
 import {
   saveSettings,
   updateSetting,
@@ -49,7 +50,8 @@ const getEventConvertedThreshold = (propertyTypes, usageTypes, item, toBaseUnit 
       if (unit !== '' && usaget !== '') {
         const value = threshold.get('value', 0);
         const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
-        thresholdWithMutations.setIn([index, 'value'], newValue);
+        const val = isNumber(newValue) ? parseFloat(newValue) : newValue;
+        thresholdWithMutations.setIn([index, 'value'], val);
       }
     });
   });
