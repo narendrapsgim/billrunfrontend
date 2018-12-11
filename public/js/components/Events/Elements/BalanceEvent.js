@@ -1,10 +1,10 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
-import { Form, FormGroup, Col, ControlLabel, Button, Panel } from 'react-bootstrap';
+import { Form, FormGroup, Col, ControlLabel, Panel } from 'react-bootstrap';
 import { getConditionDescription } from './../EventsUtil';
 import Field from '../../Field';
-import { Actions } from '../../Elements';
+import { Actions, CreateButton } from '../../Elements';
 import BalanceEventCondition from './BalanceEventCondition';
 import { usageTypesDataSelector, propertyTypeSelector, currencySelector } from '../../../selectors/settingsSelector';
 
@@ -119,10 +119,6 @@ class BalanceEvent extends Component {
     );
   }
 
-  renderAddConditionButton = () => (
-    <Button className="btn-primary" onClick={this.addCondition}><i className="fa fa-plus" />&nbsp;Add New Condition</Button>
-  );
-
   renderConditions = () => (
     this.props.item.get('conditions', Immutable.List()).map(this.renderCondition).toArray()
   );
@@ -183,7 +179,7 @@ class BalanceEvent extends Component {
               { this.renderConditions() }
             </Col>
             <Col sm={12}>
-              { this.renderAddConditionButton() }
+              <CreateButton onClick={this.addCondition} label="Add New Condition" />
             </Col>
           </FormGroup>
         </Panel>
