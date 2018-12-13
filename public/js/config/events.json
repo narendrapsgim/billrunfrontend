@@ -50,7 +50,7 @@
   ],
   "thresholdFields": [
     { "id": "usagev", "entity": "line", "allowedWithUsage": ["single"] },
-    { "id": "aprice", "entity": "line", "allowedWithUsage": ["multiple", "empty"] },
+    { "id": "aprice", "entity": "line", "allowedWithUsage": ["single", "multiple", "empty"] },
     { "id": "final_charge", "entity": "line", "allowedWithUsage": ["multiple", "empty"] },
     { "id": "in_group", "entity": "line", "allowedWithUsage": ["single"] },
     { "id": "over_group", "entity": "line", "allowedWithUsage": ["single"] },
