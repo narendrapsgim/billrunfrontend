@@ -181,9 +181,9 @@ export const eventPropertyTypesSelector = createSelector(
       return Immutable.Set();
     }
     if (intersect.size === 1) {
-      return intersect.first();
+      return Immutable.Set(intersect.first());
     }
-    return intersect.reduce((a, b) => a.filter(c => b.includes(c)));
+    return Immutable.Set(intersect.reduce((a, b) => a.filter(c => b.includes(c))));
   },
 );
 
