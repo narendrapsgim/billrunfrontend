@@ -159,17 +159,24 @@ export const eventUsageTypesSelector = createSelector(
   eventTypeFieldUsateTypesSelector,
   eventUsagetFieldUsateTypesSelector,
   eventArateKeyFieldUsateTypesSelector,
-  (type = Immutable.List(), usaget = Immutable.List(), arateKey = Immutable.List()) =>
-    Immutable.Set().withMutations((allTypeWithMutations) => {
-      allTypeWithMutations.union(arateKey); // field arate_key
-      allTypeWithMutations.union(type); // field type
-      allTypeWithMutations.union(usaget); // field usaget
-    }),
+  (type = Immutable.List(), usaget = Immutable.List(), arateKey = Immutable.List()) => {
+    const intersect = [];
+    if (!type.isEmpty()) {
+      intersect.push(type);
+    }
+    if (!usaget.isEmpty()) {
+      intersect.push(usaget);
+    }
+    if (!arateKey.isEmpty()) {
+      intersect.push(arateKey);
+    }
+    return intersect.reduce((a, b) => a.filter(c => b.includes(c)));
+  },
 );
 
 export const eventThresholdFieldsSelectOptionsSelector = createSelector(
   eventTresholdFieldsSelector,
-  eventUsageTypesSelector,
+    eventUsageTypesSelector,
   (fields = Immutable.Map(), usateTypes = Immutable.Set()) => fields
     .filter((field) => {
       const fieldUsageList = field.get('allowedWithUsage', Immutable.List());
