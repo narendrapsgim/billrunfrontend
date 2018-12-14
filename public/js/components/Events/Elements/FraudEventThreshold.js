@@ -4,11 +4,15 @@ import Immutable from 'immutable';
 import { FormGroup, Col } from 'react-bootstrap';
 import isNumber from 'is-number';
 import Field from '../../Field';
+import ConditionValue from '../../Report/Editor/ConditionValue';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
 import {
   currencySelector,
   usageTypesDataSelector,
 } from '../../../selectors/settingsSelector';
+import {
+  eventTresholdFieldsSelector,
+} from '../../../selectors/eventSelectors';
 
 
 class FraudEventThreshold extends Component {
@@ -20,7 +24,8 @@ class FraudEventThreshold extends Component {
     thresholdFieldsSelectOptions: PropTypes.array,
     thresholdOperatorsSelectOptions: PropTypes.array,
     currency: PropTypes.string,
-    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    usaget: PropTypes.string,
+    thresholdFields: PropTypes.instanceOf(Immutable.List),
     onUpdate: PropTypes.func.isRequired,
   }
 
@@ -28,9 +33,10 @@ class FraudEventThreshold extends Component {
     threshold: Immutable.Map(),
     eventPropertyType: Immutable.Set(),
     thresholdFieldsSelectOptions: [],
+    thresholdFields: Immutable.List(),
     thresholdOperatorsSelectOptions: [],
     currency: '',
-    usageTypesData: Immutable.List(),
+    usaget: '',
   }
 
   componentWillReceiveProps(nextProps) {
@@ -46,37 +52,57 @@ class FraudEventThreshold extends Component {
   }
 
   onChangeThresholdOperator = (value) => {
-    const { index } = this.props;
+    const { index, threshold } = this.props;
     this.props.onUpdate([index, 'op'], value);
+    if (['in', 'nin'].includes(value) && !['in', 'nin'].includes(threshold.getIn(['op'], ''))) {
+      this.props.onUpdate([index, 'value'], Immutable.List());
+    }
+    if (!['in', 'nin'].includes(value) && ['in', 'nin'].includes(threshold.getIn(['op'], ''))) {
+      this.props.onUpdate([index, 'value'], '');
+    }
   }
 
-  onChangeThresholdValue = (e) => {
-    const { index } = this.props;
-    const { value } = e.target;
+  onChangeThresholdValue = (value) => {
+    const { index, threshold } = this.props;
+    if (['in', 'nin'].includes(threshold.getIn(['op'], ''))) {
+      const values = Immutable.List((value.length) ? value.split(',') : [])
+        .map(val => (isNumber(val) ? parseFloat(val) : val));
+      this.props.onUpdate([index, 'value'], values);
+      return;
+    }
     const val = isNumber(value) ? parseFloat(value) : value;
     this.props.onUpdate([index, 'value'], val);
   }
 
   onChangeThresholdUnit = (value) => {
-    const { index, eventPropertyType } = this.props;
+    const { index, usaget } = this.props;
     this.props.onUpdate([index, 'unit'], value);
-    this.props.onUpdate([index, 'usaget'], eventPropertyType.first());
+    this.props.onUpdate([index, 'usaget'], usaget);
   }
 
   render() {
     const {
       threshold,
       eventPropertyType,
+      thresholdFields,
       thresholdFieldsSelectOptions,
       thresholdOperatorsSelectOptions,
-      usageTypesData,
+      usaget,
+      currency,
     } = this.props;
-    const usaget = eventPropertyType.size === 1
-      ? usageTypesData.find(
-          usageTypeData => usageTypeData.get('property_type', '') === eventPropertyType.first(),
-          null, Immutable.Map(),
-        ).get('usage_type', '')
-      : '';
+    const value = threshold.get('value', Immutable.List());
+    const thresholdForValue = Immutable.List.isList(value) || Array.isArray(value)
+      ? threshold.set('value', value.join(','))
+      : threshold;
+
+    const field = threshold.getIn(['field'], '');
+    const operator = threshold.getIn(['op'], '');
+    const disableOp = field === '';
+    const disableVal = operator === '' || disableOp;
+    const thresholdField = thresholdFields.find(thresholdF => thresholdF.get('id') === field, null, Immutable.Map());
+    const conditionValueOperator = ['aprice', 'final_charge'].includes(field)
+      ? Immutable.Map({ suffix: currency })
+      : Immutable.Map();
     return (
       <FormGroup className="form-inner-edit-row">
         <Col smHidden mdHidden lgHidden>
@@ -101,6 +127,7 @@ class FraudEventThreshold extends Component {
             fieldType="select"
             options={thresholdOperatorsSelectOptions}
             onChange={this.onChangeThresholdOperator}
+            disabled={disableOp}
             value={threshold.getIn(['op'], '')}
           />
         </Col>
@@ -109,11 +136,12 @@ class FraudEventThreshold extends Component {
           <label htmlFor="threshold_value">Value</label>
         </Col>
         <Col sm={4}>
-          <Field
-            fieldType="number"
-            id="threshold_value"
+          <ConditionValue
+            field={thresholdForValue}
+            config={thresholdField}
+            operator={conditionValueOperator}
+            disabled={disableVal}
             onChange={this.onChangeThresholdValue}
-            value={threshold.getIn(['value'], '')}
           />
         </Col>
 
@@ -139,9 +167,18 @@ class FraudEventThreshold extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  currency: currencySelector(state, props),
-  usageTypesData: usageTypesDataSelector(state, props),
-});
+const mapStateToProps = (state, props) => {
+  const usageTypesData = usageTypesDataSelector(state, props);
+  return ({
+    currency: currencySelector(state, props),
+    thresholdFields: eventTresholdFieldsSelector(null, { eventType: 'fraud' }),
+    usaget: props.eventPropertyType.size === 1
+      ? usageTypesData.find(
+          usageTypeData => usageTypeData.get('property_type', '') === props.eventPropertyType.first(),
+          null, Immutable.Map(),
+        ).get('usage_type', '')
+      : '',
+  });
+};
 
 export default connect(mapStateToProps)(FraudEventThreshold);

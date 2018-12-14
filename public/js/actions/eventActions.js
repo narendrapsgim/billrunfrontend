@@ -47,11 +47,25 @@ const getEventConvertedThreshold = (propertyTypes, usageTypes, item, toBaseUnit 
     thresholdWithMutations.forEach((threshold, index) => {
       const unit = threshold.get('unit', '');
       const usaget = threshold.get('usaget', '');
+      const value = threshold.get('value', 0);
       if (unit !== '' && usaget !== '') {
-        const value = threshold.get('value', 0);
-        const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
-        const val = isNumber(newValue) ? parseFloat(newValue) : newValue;
-        thresholdWithMutations.setIn([index, 'value'], val);
+        if (Immutable.List.isList(value) || Array.isArray(value)) {
+          const arrayVal = value.map((val) => {
+            const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, val, toBaseUnit);
+            return isNumber(newValue) ? parseFloat(newValue) : newValue;
+          });
+          thresholdWithMutations.setIn([index, 'value'], arrayVal);
+        } else {
+          const newValue = getValueByUnit(propertyTypes, usageTypes, usaget, unit, value, toBaseUnit);
+          const val = isNumber(newValue) ? parseFloat(newValue) : newValue;
+          thresholdWithMutations.setIn([index, 'value'], val);
+        }
+      }
+      if (!toBaseUnit && Immutable.Iterable.isIterable(value)) {
+        thresholdWithMutations.setIn([index, 'value'], value.toList());
+      }
+      if (!toBaseUnit && !Immutable.Iterable.isIterable(value) && ['in', 'nin'].includes(threshold.get('op', ''))) {
+        thresholdWithMutations.setIn([index, 'value'], Immutable.List([value]));
       }
     });
   });
