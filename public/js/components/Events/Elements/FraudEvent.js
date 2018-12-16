@@ -1,8 +1,8 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, FormGroup, Row, Col, Panel } from 'react-bootstrap';
-import { CreateButton } from '../../Elements';
+import { Form, FormGroup, Row, Col, Panel, Label } from 'react-bootstrap';
+import { CreateButton, LoadingItemPlaceholder } from '../../Elements';
 import {
   eventPropertyTypesSelector,
   eventThresholdOperatorsSelectOptionsSelector,
@@ -37,11 +37,35 @@ class FraudEvent extends Component {
     thresholdOperatorsSelectOptions: [],
   };
 
+  state = {
+    status: 'loading', // one of [done, loadin, error]
+  };
+
   componentDidMount() {
+    this.initEvent();
+  }
+
+  initEvent = () => {
+    this.props.dispatch(getSettings(['lines.fields']))
+      .then(this.initEventRates)
+      .then(this.setStatusDone)
+      .catch(this.setStatusError);
+  }
+
+  initEventRates = () => {
     const { item } = this.props;
-    const eventRates = item.getIn(['ui_flags', 'eventUsageType', 'arate_key'], Immutable.List());
-    this.getEventRates(eventRates);
-    this.props.dispatch(getSettings(['lines.fields']));
+    const ratesToFetch = item.getIn(['ui_flags', 'eventUsageType', 'arate_key'], Immutable.List());
+    return (!ratesToFetch.isEmpty())
+      ? this.props.dispatch(getEventRates(ratesToFetch))
+      : Promise.resolve();
+  }
+
+  setStatusDone = () => {
+    this.setState(() => ({ status: 'done' }));
+  }
+
+  setStatusError = () => {
+    this.setState(() => ({ status: 'error' }));
   }
 
   getEventRates = (eventRates) => {
@@ -161,7 +185,14 @@ class FraudEvent extends Component {
   }
 
   render() {
+    const { status } = this.state;
     const { mode, item, eventsSettings } = this.props;
+    if (status === 'loading') {
+      return (<LoadingItemPlaceholder />);
+    }
+    if (status === 'error') {
+      return (<Label bsStyle="danger">Oops! Something went wrong, please try again.</Label>);
+    }
     return (
       <Form horizontal>
         <Panel header={<span>Details</span>}>
