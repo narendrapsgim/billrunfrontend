@@ -5,7 +5,7 @@ import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common
 import { minEntityDateSelector, closedCycleChangesSelector } from './settingsSelector';
 
 
-const getPropsItem = (state, props) => props.item;
+export const getPropsItem = (state, props) => props.item;
 
 const getUniqueFiled = (state, props, entityName) =>
   getConfig(['systemItems', entityName, 'uniqueField'], 'name');

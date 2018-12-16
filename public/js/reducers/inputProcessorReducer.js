@@ -279,13 +279,12 @@ export default function (state = defaultState, action) {
     }
 
     case REMOVE_RECEIVER: {
-      const { index } = action;
-      return state.update('receiver', list => list.remove(index));
+      return state.update('receiver', Immutable.List(), list => list.remove(index));
     }
 
     case ADD_RECEIVER: {
       const newReceiver = Immutable.fromJS({});
-      return state.update('receiver', list => list.push(newReceiver));
+      return state.update('receiver', Immutable.List(), list => list.push(newReceiver));
     }
 
     case SET_LINE_KEY:

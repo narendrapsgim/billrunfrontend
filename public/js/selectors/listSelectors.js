@@ -5,6 +5,8 @@ import { getCycleName } from '../components/Cycle/CycleUtil';
 import { getConfig } from '../common/Util';
 
 
+const getEventRates = state => state.list.get('event_products', null);
+
 const getCyclesOptions = state => state.list.get('cycles_list', null);
 
 const getUserNamesOptions = state => state.list.get('autocompleteUser', null);
@@ -135,6 +137,11 @@ const selectBucketsExternalIds = (options) => {
 export const cyclesOptionsSelector = createSelector(
   getCyclesOptions,
   selectCyclesOptions,
+);
+
+export const eventRatesSelector = createSelector(
+  getEventRates,
+  rates => (rates === null ? undefined : rates),
 );
 
 export const productsOptionsSelector = createSelector(
