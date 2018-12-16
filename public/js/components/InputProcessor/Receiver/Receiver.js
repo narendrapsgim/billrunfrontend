@@ -37,7 +37,7 @@ class Receiver extends Component {
   }
 
   renderReceivers = () => {
-    const { settings, fileType, keyValue, keyLabel } = this.props;
+    const { settings, fileType } = this.props;
     const receivers = settings.get('receiver', Immutable.List());
     return receivers.map((receiver, key) => (
       <Connection
@@ -50,8 +50,6 @@ class Receiver extends Component {
         onCancelKeyAuth={this.props.onCancelKeyAuth}
         fileType={fileType}
         OnChangeUploadingFile={this.props.OnChangeUploadingFile}
-        keyValue={keyValue}
-        keyLabel={keyLabel}
       />
     )).toArray();
   }

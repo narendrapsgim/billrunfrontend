@@ -139,16 +139,20 @@ class Connection extends Component {
     return receiverTypes.map((name, type) => this.renderReceiverType(name, type)).toArray();
   }
 
-  renderPanelHeader = keyLabel => (
-    <div style={{ fontSize: 12, fontWeight: 'bold' }}>
-      {keyLabel}
-      <div className="pull-right">
-        <Button onClick={this.onCancelKeyAuth} bsSize="small" bsStyle="link" style={{ padding: 0 }} >
-          <i className="fa fa-trash-o danger-red" />
-        </Button>
+  renderPanelHeader = () => {
+    const { receiver, fileType } = this.props;
+    const keyLabel = receiver.get('key_label', fileType);
+    return (
+      <div style={{ fontSize: 12, fontWeight: 'bold' }}>
+        {keyLabel}
+        <div className="pull-right">
+          <Button onClick={this.onCancelKeyAuth} bsSize="small" bsStyle="link" style={{ padding: 0 }} >
+            <i className="fa fa-trash-o danger-red" />
+          </Button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   onChangeReceiverField = (e) => {
     const { index } = this.props;
@@ -161,7 +165,7 @@ class Connection extends Component {
   }
 
   renderReceiver = () => {
-    const { keyLabel, index, receiver } = this.props;
+    const { index, receiver } = this.props;
 
     const periodOptions = [{ min: 1, label: '1 Minute' },
                             { min: 15, label: '15 Minutes' },
@@ -233,7 +237,7 @@ class Connection extends Component {
               <input name="file" type="file" onClick={this.onClickFileSelect} onChange={this.onChangeFileSelect} />
             )}
             { receiver.get('key', false) !== false && (
-              <Panel header={this.renderPanelHeader(keyLabel)} className="mb0" />
+              <Panel header={this.renderPanelHeader()} className="mb0" />
             )}
           </div>
         </div>}
