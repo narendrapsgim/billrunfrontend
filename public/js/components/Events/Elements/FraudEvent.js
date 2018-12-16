@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { Form, FormGroup, Row, Col, Panel } from 'react-bootstrap';
 import { CreateButton } from '../../Elements';
 import {
-  eventUsageTypesSelector,
+  eventPropertyTypesSelector,
   eventThresholdOperatorsSelectOptionsSelector,
   eventThresholdFieldsSelectOptionsSelector,
 } from '../../../selectors/eventSelectors';
@@ -21,7 +21,7 @@ class FraudEvent extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string,
     eventsSettings: PropTypes.instanceOf(Immutable.Map),
-    eventUsaget: PropTypes.instanceOf(Immutable.Set),
+    eventPropertyType: PropTypes.instanceOf(Immutable.Set),
     thresholdFieldsSelectOptions: PropTypes.array,
     thresholdOperatorsSelectOptions: PropTypes.array,
     updateField: PropTypes.func.isRequired,
@@ -32,7 +32,7 @@ class FraudEvent extends Component {
     item: Immutable.Map(),
     mode: 'create',
     eventsSettings: Immutable.Map(),
-    eventUsaget: Immutable.Set(),
+    eventPropertyType: Immutable.Set(),
     thresholdFieldsSelectOptions: [],
     thresholdOperatorsSelectOptions: [],
   };
@@ -134,7 +134,7 @@ class FraudEvent extends Component {
   renderThreshold = () => {
     const {
       item,
-      eventUsaget,
+      eventPropertyType,
       thresholdFieldsSelectOptions,
       thresholdOperatorsSelectOptions,
     } = this.props;
@@ -146,12 +146,12 @@ class FraudEvent extends Component {
           <Col sm={3} xsHidden><label htmlFor="threshold_field">Field</label></Col>
           <Col sm={3} xsHidden><label htmlFor="threshold_operator">Operator</label></Col>
           <Col sm={4} xsHidden><label htmlFor="threshold_value">Value</label></Col>
-          {eventUsaget.size === 1 && (<Col sm={2} xsHidden><label htmlFor="threshold_uof">Unit of measure</label></Col>)}
+          {eventPropertyType.size === 1 && (<Col sm={2} xsHidden><label htmlFor="threshold_uof">Unit of measure</label></Col>)}
         </FormGroup>
         <FraudEventThreshold
           threshold={threshold}
           index={index}
-          eventUsaget={eventUsaget}
+          eventPropertyType={eventPropertyType}
           thresholdFieldsSelectOptions={thresholdFieldsSelectOptions}
           thresholdOperatorsSelectOptions={thresholdOperatorsSelectOptions}
           onUpdate={this.onChangeThreshold}
@@ -183,7 +183,7 @@ class FraudEvent extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  eventUsaget: eventUsageTypesSelector(state, props),
+  eventPropertyType: eventPropertyTypesSelector(state, props),
   thresholdFieldsSelectOptions: eventThresholdFieldsSelectOptionsSelector(state, { ...props, eventType: 'fraud' }),
   thresholdOperatorsSelectOptions: eventThresholdOperatorsSelectOptionsSelector(null, { eventType: 'fraud' }),
   eventsSettings: eventsSettingsSelector(state, props),

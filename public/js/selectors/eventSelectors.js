@@ -12,6 +12,7 @@ import {
 import {
   linesFieldsSelector,
   inputProssesorUsageTypesOptionsSelector,
+  usageTypesDataSelector,
 } from './settingsSelector';
 import {
   getPropsItem,
@@ -155,21 +156,40 @@ export const eventArateKeyFieldUsateTypesSelector = createSelector(
     .reduce((acc, name) => acc.push(rates.get(name, '')), Immutable.List()),
 );
 
-export const eventUsageTypesSelector = createSelector(
+export const eventPropertyTypesSelector = createSelector(
+  usageTypesDataSelector,
   eventTypeFieldUsateTypesSelector,
   eventUsagetFieldUsateTypesSelector,
   eventArateKeyFieldUsateTypesSelector,
-  (type = Immutable.List(), usaget = Immutable.List(), arateKey = Immutable.List()) =>
-    Immutable.Set().withMutations((allTypeWithMutations) => {
-      allTypeWithMutations.union(arateKey); // field arate_key
-      allTypeWithMutations.union(type); // field type
-      allTypeWithMutations.union(usaget); // field usaget
-    }),
+  (
+    usageTypesData = Immutable.List(),
+    type = Immutable.List(),
+    usaget = Immutable.List(),
+    arateKey = Immutable.List()) => {
+    const intersect = Immutable.List().withMutations((intersectwithMutations) => {
+      [type, usaget, arateKey].forEach((list) => {
+        if (!list.isEmpty()) {
+          const propertyTypes = list.map(uaset => usageTypesData.find(
+              usageTypes => usageTypes.get('usage_type', '') === uaset,
+              null, Immutable.Map(),
+          ).get('property_type', ''));
+          intersectwithMutations.push(propertyTypes.filter(propertyType => propertyType !== ''));
+        }
+      });
+    });
+    if (intersect.isEmpty()) {
+      return Immutable.Set();
+    }
+    if (intersect.size === 1) {
+      return Immutable.Set(intersect.first());
+    }
+    return Immutable.Set(intersect.reduce((a, b) => a.filter(c => b.includes(c))));
+  },
 );
 
 export const eventThresholdFieldsSelectOptionsSelector = createSelector(
   eventTresholdFieldsSelector,
-  eventUsageTypesSelector,
+  eventPropertyTypesSelector,
   (fields = Immutable.Map(), usateTypes = Immutable.Set()) => fields
     .filter((field) => {
       const fieldUsageList = field.get('allowedWithUsage', Immutable.List());

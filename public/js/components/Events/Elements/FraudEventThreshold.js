@@ -1,9 +1,18 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { FormGroup, Col } from 'react-bootstrap';
 import isNumber from 'is-number';
 import Field from '../../Field';
+import ConditionValue from '../../Report/Editor/ConditionValue';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
+import {
+  currencySelector,
+  usageTypesDataSelector,
+} from '../../../selectors/settingsSelector';
+import {
+  eventTresholdFieldsSelector,
+} from '../../../selectors/eventSelectors';
 
 
 class FraudEventThreshold extends Component {
@@ -11,22 +20,28 @@ class FraudEventThreshold extends Component {
   static propTypes = {
     threshold: PropTypes.instanceOf(Immutable.Map),
     index: PropTypes.number.isRequired,
-    eventUsaget: PropTypes.instanceOf(Immutable.Set),
+    eventPropertyType: PropTypes.instanceOf(Immutable.Set),
     thresholdFieldsSelectOptions: PropTypes.array,
     thresholdOperatorsSelectOptions: PropTypes.array,
+    currency: PropTypes.string,
+    usaget: PropTypes.string,
+    thresholdFields: PropTypes.instanceOf(Immutable.List),
     onUpdate: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     threshold: Immutable.Map(),
-    eventUsaget: Immutable.Set(),
+    eventPropertyType: Immutable.Set(),
     thresholdFieldsSelectOptions: [],
+    thresholdFields: Immutable.List(),
     thresholdOperatorsSelectOptions: [],
+    currency: '',
+    usaget: '',
   }
 
   componentWillReceiveProps(nextProps) {
-    const { index, eventUsaget } = this.props;
-    if (!Immutable.is(eventUsaget, nextProps.eventUsaget)) {
+    const { index, eventPropertyType } = this.props;
+    if (!Immutable.is(eventPropertyType, nextProps.eventPropertyType)) {
       this.props.onUpdate([index], Immutable.Map());
     }
   }
@@ -37,30 +52,57 @@ class FraudEventThreshold extends Component {
   }
 
   onChangeThresholdOperator = (value) => {
-    const { index } = this.props;
+    const { index, threshold } = this.props;
     this.props.onUpdate([index, 'op'], value);
+    if (['in', 'nin'].includes(value) && !['in', 'nin'].includes(threshold.getIn(['op'], ''))) {
+      this.props.onUpdate([index, 'value'], Immutable.List());
+    }
+    if (!['in', 'nin'].includes(value) && ['in', 'nin'].includes(threshold.getIn(['op'], ''))) {
+      this.props.onUpdate([index, 'value'], '');
+    }
   }
 
-  onChangeThresholdValue = (e) => {
-    const { index } = this.props;
-    const { value } = e.target;
+  onChangeThresholdValue = (value) => {
+    const { index, threshold } = this.props;
+    if (['in', 'nin'].includes(threshold.getIn(['op'], ''))) {
+      const values = Immutable.List((value.length) ? value.split(',') : [])
+        .map(val => (isNumber(val) ? parseFloat(val) : val));
+      this.props.onUpdate([index, 'value'], values);
+      return;
+    }
     const val = isNumber(value) ? parseFloat(value) : value;
     this.props.onUpdate([index, 'value'], val);
   }
 
   onChangeThresholdUnit = (value) => {
-    const { index, eventUsaget } = this.props;
+    const { index, usaget } = this.props;
     this.props.onUpdate([index, 'unit'], value);
-    this.props.onUpdate([index, 'usaget'], eventUsaget.first());
+    this.props.onUpdate([index, 'usaget'], usaget);
   }
 
   render() {
     const {
       threshold,
-      eventUsaget,
+      eventPropertyType,
+      thresholdFields,
       thresholdFieldsSelectOptions,
       thresholdOperatorsSelectOptions,
+      usaget,
+      currency,
     } = this.props;
+    const value = threshold.get('value', Immutable.List());
+    const thresholdForValue = Immutable.List.isList(value) || Array.isArray(value)
+      ? threshold.set('value', value.join(','))
+      : threshold;
+
+    const field = threshold.getIn(['field'], '');
+    const operator = threshold.getIn(['op'], '');
+    const disableOp = field === '';
+    const disableVal = operator === '' || disableOp;
+    const thresholdField = thresholdFields.find(thresholdF => thresholdF.get('id') === field, null, Immutable.Map());
+    const conditionValueOperator = ['aprice', 'final_charge'].includes(field)
+      ? Immutable.Map({ suffix: currency })
+      : Immutable.Map();
     return (
       <FormGroup className="form-inner-edit-row">
         <Col smHidden mdHidden lgHidden>
@@ -85,6 +127,7 @@ class FraudEventThreshold extends Component {
             fieldType="select"
             options={thresholdOperatorsSelectOptions}
             onChange={this.onChangeThresholdOperator}
+            disabled={disableOp}
             value={threshold.getIn(['op'], '')}
           />
         </Col>
@@ -93,22 +136,23 @@ class FraudEventThreshold extends Component {
           <label htmlFor="threshold_value">Value</label>
         </Col>
         <Col sm={4}>
-          <Field
-            fieldType="number"
-            id="threshold_value"
+          <ConditionValue
+            field={thresholdForValue}
+            config={thresholdField}
+            operator={conditionValueOperator}
+            disabled={disableVal}
             onChange={this.onChangeThresholdValue}
-            value={threshold.getIn(['value'], '')}
           />
         </Col>
 
-        {eventUsaget.size === 1 && (
+        {eventPropertyType.size === 1 && (
           <span>
             <Col smHidden mdHidden lgHidden>
               <label htmlFor="threshold_operator">Unit of measure</label>
             </Col>
             <Col sm={2}>
               <UsageTypesSelector
-                usaget={eventUsaget.first()}
+                usaget={usaget}
                 unit={threshold.get('unit', '')}
                 onChangeUnit={this.onChangeThresholdUnit}
                 enabled={true}
@@ -123,4 +167,18 @@ class FraudEventThreshold extends Component {
   }
 }
 
-export default FraudEventThreshold;
+const mapStateToProps = (state, props) => {
+  const usageTypesData = usageTypesDataSelector(state, props);
+  return ({
+    currency: currencySelector(state, props),
+    thresholdFields: eventTresholdFieldsSelector(null, { eventType: 'fraud' }),
+    usaget: props.eventPropertyType.size === 1
+      ? usageTypesData.find(
+          usageTypeData => usageTypeData.get('property_type', '') === props.eventPropertyType.first(),
+          null, Immutable.Map(),
+        ).get('usage_type', '')
+      : '',
+  });
+};
+
+export default connect(mapStateToProps)(FraudEventThreshold);

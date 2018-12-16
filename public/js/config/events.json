@@ -49,11 +49,11 @@
     { "id": "arate_key", "entity": "line", "effectOnUsaget": true, "inputConfig": { "inputType": "select", "callback": "getProductsOptions" } }
   ],
   "thresholdFields": [
-    { "id": "usagev", "entity": "line", "allowedWithUsage": ["single"] },
-    { "id": "aprice", "entity": "line", "allowedWithUsage": ["multiple", "empty"] },
-    { "id": "final_charge", "entity": "line", "allowedWithUsage": ["multiple", "empty"] },
-    { "id": "in_group", "entity": "line", "allowedWithUsage": ["single"] },
-    { "id": "over_group", "entity": "line", "allowedWithUsage": ["single"] },
-    { "id": "out_group", "title": "Out Group", "allowedWithUsage": ["single"]  }
+    { "id": "usagev", "entity": "line", "allowedWithUsage": ["single"], "type": "number" },
+    { "id": "aprice", "entity": "line", "allowedWithUsage": ["single", "multiple", "empty"], "type": "number" },
+    { "id": "final_charge", "entity": "line", "allowedWithUsage": ["multiple", "empty"], "type": "number" },
+    { "id": "in_group", "entity": "line", "allowedWithUsage": ["single"], "type": "number" },
+    { "id": "over_group", "entity": "line", "allowedWithUsage": ["single"], "type": "number" },
+    { "id": "out_group", "title": "Out Group", "allowedWithUsage": ["single"], "type": "number"  }
   ]
 }
