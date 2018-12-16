@@ -441,8 +441,6 @@ class InputProcessor extends Component {
   getStepContent = () => {
     const { settings, usageTypes, usageTypesData, propertyTypes, subscriberFields, customRatingFields, action, type, format, fileType } = this.props;
     const { stepIndex, errors, steps } = this.state;
-    const keyValue = settings.getIn(['receiver', 'key'], null);
-    const keyLabel = settings.getIn(['receiver', 'key_label'], settings.get('file_type'));
 
     switch (stepIndex) {
       case steps.get('parser', {}).idx: return (
@@ -524,8 +522,6 @@ class InputProcessor extends Component {
           onCancelKeyAuth={this.onCancelKeyAuth}
           fileType={fileType}
           OnChangeUploadingFile={this.changeUploadingFile}
-          keyValue={keyValue}
-          keyLabel={keyLabel}
         />
       );
 
