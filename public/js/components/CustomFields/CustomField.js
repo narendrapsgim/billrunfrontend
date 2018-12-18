@@ -97,6 +97,7 @@ class CustomField extends Component {
   };
 
   getFieldType = field => (field.get('type', '') === '' ? 'text' : field.get('type', ''));
+
   isBoolean = field => this.getFieldType(field) === 'boolean';
 
   getPlayOptions = () => (this.props.availablePlays.map(play => ({
@@ -114,10 +115,10 @@ class CustomField extends Component {
     const showPlays = ['subscriber'].includes(entity) && playsOptions.length > 1;
     const plays = field.get('plays', []).join(',');
 
-    const disableUnique = isBoolean || !this.hasEditableField('unique');
+    const disableUnique = ['boolean', 'ranges'].includes(this.getFieldType(field)) || !this.hasEditableField('unique');
     const disableMandatory = isBoolean || field.get('unique', false) || !this.hasEditableField('mandatory');
     const disableBoolean = field.get('select_list', false) || field.get('unique', false);
-    const disableMultiple = this.getFieldType(field) !== 'text' || !this.hasEditableField('multiple');
+    const disableMultiple = ['boolean', 'textarea'].includes(this.getFieldType(field)) || !this.hasEditableField('multiple');
     const disableSearchable = isBoolean || !this.hasEditableField('searchable');
     const disableSelectList = this.getFieldType(field) !== 'text' || !this.hasEditableField('select_list');
     const disableSelectOptions = !field.get('select_list', false) || !this.hasEditableField('select_options');
@@ -125,6 +126,7 @@ class CustomField extends Component {
       { value: 'text', label: 'Text' }, // must be first because text is default option
       { value: 'boolean', label: 'Boolean' },
       { value: 'textarea', label: 'Text Area' },
+      { value: 'ranges', label: 'Range' },
     ];
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
@@ -155,7 +157,7 @@ class CustomField extends Component {
                 className="inline mr10"
               />
               {disableUnique && (
-                <small style={{ color: '#626262' }}>Unique field can not be boolean</small>
+                <small style={{ color: '#626262' }}>Unique field can not be boolean or of type range</small>
               )}
             </Col>
           </FormGroup>

@@ -14,6 +14,7 @@ import Radio from './types/Radio';
 import Salutation from './types/Salutation';
 import ToggeledInput from './types/ToggeledInput';
 import TextEditor from './types/TextEditor';
+import Ranges from './types/Ranges';
 
 
 class Field extends PureComponent {
@@ -47,7 +48,7 @@ class Field extends PureComponent {
   }
 
   createInput = () => {
-    const { fieldType, required, label, style, className, ...inputProps } = this.props;
+    const { fieldType, style, className, ...inputProps } = this.props;
     switch (fieldType) {
       case 'number':
         return (<Number {...inputProps} />);
@@ -64,19 +65,21 @@ class Field extends PureComponent {
       case 'unlimited':
         return (<Unlimitd {...inputProps} />);
       case 'toggeledInput':
-        return (<ToggeledInput {...inputProps} label={label} />);
+        return (<ToggeledInput {...inputProps} />);
       case 'checkbox':
-        return (<Checkbox {...inputProps} label={label} />);
+        return (<Checkbox {...inputProps} />);
       case 'radio':
-        return (<Radio {...inputProps} label={label} />);
+        return (<Radio {...inputProps} />);
       case 'salutation':
         return (<Salutation {...inputProps} />);
       case 'textEditor':
         return (<TextEditor {...inputProps} />);
       case 'select':
         return (<Select {...inputProps} />);
+      case 'ranges':
+        return (<Ranges {...inputProps} />);
       default:
-        return (<Text {...inputProps} required={required} />);
+        return (<Text {...inputProps} />);
     }
   }
 
