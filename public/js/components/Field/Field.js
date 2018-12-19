@@ -15,6 +15,7 @@ import Salutation from './types/Salutation';
 import ToggeledInput from './types/ToggeledInput';
 import TextEditor from './types/TextEditor';
 import Ranges from './types/Ranges';
+import Range from './types/Range';
 
 
 class Field extends PureComponent {
@@ -78,6 +79,8 @@ class Field extends PureComponent {
         return (<Select {...inputProps} />);
       case 'ranges':
         return (<Ranges {...inputProps} />);
+      case 'range':
+        return (<Range {...inputProps} />);
       default:
         return (<Text {...inputProps} />);
     }
