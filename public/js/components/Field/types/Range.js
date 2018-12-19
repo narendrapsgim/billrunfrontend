@@ -9,6 +9,7 @@ class Range extends PureComponent {
     value: PropTypes.instanceOf(Immutable.Map),
     inputProps: PropTypes.object,
     editable: PropTypes.bool,
+    compact: PropTypes.bool,
     placeholder: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.shape({
@@ -24,6 +25,7 @@ class Range extends PureComponent {
     placeholder: { from: '', to: '' },
     inputProps: {},
     editable: true,
+    compact: false,
     onChange: () => {},
   };
 
@@ -56,6 +58,7 @@ class Range extends PureComponent {
       value,
       placeholder,
       editable,
+      compact,
       inputProps: { fieldType = 'text' },
       ...otherProps
     } = this.props;
@@ -63,30 +66,37 @@ class Range extends PureComponent {
     const valueTo = Immutable.Map.isMap(value) ? value.get('to', '') : '';
     const placeholderFrom = typeof placeholder['from'] !== 'undefined' ? placeholder.from : '';
     const placeholderTo = typeof placeholder['to'] !== 'undefined' ? placeholder.to : '';
-    if (editable) {
+    if (!editable) {
       return (
-        <InputGroup style={{ width: '100%' }}>
-          <InputGroup.Addon><small>From</small></InputGroup.Addon>
-          <Field
-            {...otherProps}
-            fieldType={fieldType}
-            value={valueFrom}
-            onChange={this.onChangeFrom}
-            placeholder={placeholderFrom}
-          />
-          <InputGroup.Addon><small>To</small></InputGroup.Addon>
-          <Field
-            {...otherProps}
-            fieldType={fieldType}
-            value={valueTo}
-            onChange={this.onChangeTo}
-            placeholder={placeholderTo}
-          />
-        </InputGroup>
+        <span className="non-editable-field">{`${valueFrom} - ${valueTo}`}</span>
       );
     }
     return (
-      <span className="non-editable-field">{`${valueFrom} - ${valueTo}`}</span>
+      <InputGroup style={{ width: '100%' }}>
+        {!compact && (
+          <InputGroup.Addon><small>From</small></InputGroup.Addon>
+        )}
+        <Field
+          {...otherProps}
+          fieldType={fieldType}
+          value={valueFrom}
+          onChange={this.onChangeFrom}
+          placeholder={placeholderFrom}
+        />
+        {!compact && (
+          <InputGroup.Addon><small>To</small></InputGroup.Addon>
+        )}
+        {compact && (
+          <InputGroup.Addon><small>-</small></InputGroup.Addon>
+        )}
+        <Field
+          {...otherProps}
+          fieldType={fieldType}
+          value={valueTo}
+          onChange={this.onChangeTo}
+          placeholder={placeholderTo}
+        />
+      </InputGroup>
     );
   }
 
