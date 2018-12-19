@@ -124,6 +124,7 @@ const convert = (settings) => {
       Immutable.List(parser.structure).map(struct => Immutable.Map({ name: struct.name, checked: typeof struct.checked !== 'undefined' ? struct.checked : true })) :
       Immutable.List(),
     field_widths,
+    line_types: parser.line_types,
     customer_identification_fields,
     rate_calculators,
     pricing,
@@ -548,6 +549,7 @@ export function saveInputProcessorSettings(state, parts = []) {
     "type": state.get('type'),
     "parser": {
       "type": state.get('delimiter_type'),
+      "line_types": state.get('line_types'),
       "separator": state.get('delimiter'),
       structure: state.get('unfiltered_fields').reduce((acc, field, idx) => {
         const struct = (state.get('delimiter_type') === 'fixed')
