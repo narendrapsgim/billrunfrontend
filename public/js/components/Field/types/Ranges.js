@@ -67,7 +67,10 @@ class Ranges extends PureComponent {
       return (
         <span>
           {value.map((rangeValue, index) => (
-            <Range key={`range_${id}_${index}`} value={rangeValue} editable={false} />
+            <span key={`range_${id}_${index}`}>
+              {index > 0 && ", "}
+              <Range value={rangeValue} editable={false} />
+            </span>
           ))}
         </span>
       );

@@ -7,16 +7,6 @@ class Range extends PureComponent {
 
   static propTypes = {
     value: PropTypes.instanceOf(Immutable.Map),
-    // value: PropTypes.shape({
-    //   from: PropTypes.oneOfType([
-    //     PropTypes.string,
-    //     PropTypes.number,
-    //   ]),
-    //   to: PropTypes.oneOfType([
-    //     PropTypes.string,
-    //     PropTypes.number,
-    //   ]),
-    // }),
     inputProps: PropTypes.object,
     editable: PropTypes.bool,
     placeholder: PropTypes.oneOfType([
@@ -96,7 +86,7 @@ class Range extends PureComponent {
       );
     }
     return (
-      <div className="non-editable-field">{ `${valueFrom} - ${valueTo}` }</div>
+      <span className="non-editable-field">{`${valueFrom} - ${valueTo}`}</span>
     );
   }
 
