@@ -1,0 +1,33 @@
+[
+  {
+    "id": "text",
+    "title": "Text",
+    "unique": true,
+    "mandatory": true,
+    "editable": true,
+    "display": true,
+    "showInList": true,
+    "searchable": true,
+    "multiple": true,
+    "selectOptions": true
+  }, {
+    "id": "boolean",
+    "title": "Boolean",
+    "unique": false,
+    "mandatory": false,
+    "searchable": false,
+    "multiple": false,
+    "selectOptions": false
+  }, {
+    "id": "textarea",
+    "title": "Text Area",
+    "multiple": false,
+    "selectOptions": false
+  }, {
+    "id": "ranges",
+    "title": "Range",
+    "unique": false,
+    "selectOptions": false,
+    "include": ["subscriber"]
+  }
+]

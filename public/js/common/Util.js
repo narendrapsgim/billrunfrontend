@@ -9,6 +9,7 @@ import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
 import collectionsConfig from '../config/collections.json';
+import customFieldsConfig from '../config/customFields.json';
 
 /**
  * Get data from config files
@@ -38,6 +39,8 @@ export const getConfig = (key, defaultValue = null) => {
       case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
         break;
       case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
+        break;
+      case 'customFields': configCache = configCache.set('customFields', Immutable.fromJS(customFieldsConfig));
         break;
       default: console.log(`Config caregory not exists ${path}`);
     }

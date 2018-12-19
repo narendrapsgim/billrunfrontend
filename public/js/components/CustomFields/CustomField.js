@@ -10,6 +10,10 @@ import Field from '../Field';
 import {
   availablePlaysSettingsSelector,
 } from '../../selectors/settingsSelector';
+import {
+  getConfig,
+  parseConfigSelectOptions,
+} from '../../common/Util';
 
 
 class CustomField extends Component {
@@ -24,6 +28,7 @@ class CustomField extends Component {
     onChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
     availablePlays: PropTypes.instanceOf(Immutable.List),
+    customFieldsConfig: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
@@ -32,6 +37,7 @@ class CustomField extends Component {
     existing: false,
     sortable: true,
     availablePlays: Immutable.List(),
+    customFieldsConfig: getConfig(['customFields'], Immutable.List()),
   };
 
   state = {
@@ -105,8 +111,24 @@ class CustomField extends Component {
     label: play.get('label', play.get('name', '')),
   })).toArray());
 
+  inBlackList = (option, entity) => {
+    const blackList = option.get('exclude', Immutable.List());
+    if (blackList.isEmpty()) {
+      return false;
+    }
+    return blackList.includes(entity);
+  }
+
+  inWhiteList = (option, entity) => {
+    const whiteList = option.get('include', Immutable.List());
+    if (whiteList.isEmpty()) {
+      return true;
+    }
+    return whiteList.includes(entity);
+  }
+
   renderAdvancedEdit = () => {
-    const { field, entity } = this.props;
+    const { field, entity, customFieldsConfig } = this.props;
     const { showAdvancedEdit } = this.state;
     const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'field')} Details`);
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
@@ -122,12 +144,10 @@ class CustomField extends Component {
     const disableSearchable = isBoolean || !this.hasEditableField('searchable');
     const disableSelectList = this.getFieldType(field) !== 'text' || !this.hasEditableField('select_list');
     const disableSelectOptions = !field.get('select_list', false) || !this.hasEditableField('select_options');
-    const fieldTypesOptions = [
-      { value: 'text', label: 'Text' }, // must be first because text is default option
-      { value: 'boolean', label: 'Boolean' },
-      { value: 'textarea', label: 'Text Area' },
-      { value: 'ranges', label: 'Range' },
-    ];
+    const fieldTypesOptions = customFieldsConfig
+      .filter(option => (!this.inBlackList(option, entity) && this.inWhiteList(option, entity)))
+      .map(parseConfigSelectOptions)
+      .toArray();
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
         <Form horizontal>
