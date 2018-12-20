@@ -106,7 +106,7 @@ const convert = (settings) => {
           filters = []
         } = settings;
 
-  const connections = receiver ? (receiver.connections ? receiver.connections: {}) : {};
+  const connections = receiver ? (receiver.connections ? receiver.connections: []) : [];
   const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : [];
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
                       "static" :
@@ -469,10 +469,9 @@ export function removeRatingField(rateCategory, usaget, priority, index) {
   };
 }
 
-export function removeReceiver(receiver, index) {
+export function removeReceiver(index) {
   return {
     type: REMOVE_RECEIVER,
-    receiver,
     index,
   };
 }
