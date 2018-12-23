@@ -4,7 +4,7 @@
     "title": "Text",
     "unique": true,
     "mandatory": true,
-      "editable": true,
+    "editable": true,
     "display": true,
     "showInList": true,
     "searchable": true,
@@ -26,7 +26,6 @@
   }, {
     "id": "ranges",
     "title": "Range",
-    "unique": false,
     "selectOptions": false,
     "include": ["subscriber"]
   }
