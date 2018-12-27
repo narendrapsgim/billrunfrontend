@@ -754,6 +754,10 @@ ul.revision-history-list li.active .cycle {
 }
 /* ~Chart */
 
+.screen-height-70 {
+  max-height: 70vh;
+}
+
 .scrollbox {
   overflow: auto;
   background:
