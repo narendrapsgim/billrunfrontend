@@ -1,112 +1,107 @@
-import React, { PropTypes, Component } from 'react';
+import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { connect } from 'react-redux';
 import { Panel, Col, Form, FormGroup, ControlLabel } from 'react-bootstrap';
 import Select from 'react-select';
 import { ActionButtons } from '../Elements';
-import { getSettings, updateSetting, saveSettings } from '../../actions/settingsActions';
-import { eventsSettingsSelector } from '../../selectors/settingsSelector';
 import Field from '../Field';
 import Help from '../Help';
 
-class EventSettings extends Component {
 
-  static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    eventsSettings: PropTypes.instanceOf(Immutable.Map),
-  };
-
-  static defaultProps = {
-    eventsSettings: Immutable.Map(),
-  };
-
-  componentWillMount() {
-    this.props.dispatch(getSettings(['events']));
-  }
-
-  onChange = eventNotifier => (e) => {
+const EventSettings = ({ eventsSettings, methodOptions, decoderOptions, ...props }) => {
+  const onChange = eventNotifier => (e) => {
     const { value, id } = e.target;
-    this.props.dispatch(updateSetting('events', ['settings', eventNotifier, id], value));
-  }
+    props.onEdit(eventNotifier, id, value);
+  };
 
-  onChangeSelect = (eventNotifier, id) => (value) => {
-    this.props.dispatch(updateSetting('events', ['settings', eventNotifier, id], value));
-  }
+  const onChangeSelect = (eventNotifier, id) => (value) => {
+    props.onEdit(eventNotifier, id, value);
+  };
 
-  onSave = () => {
-    this.props.dispatch(saveSettings(['events']));
-  }
+  const pasteSplit = (data) => {
+    const separators = [',', ';', '\\(', '\\)', '\\*', '/', ':', '\\?', '\n', '\r', '\t'];
+    return data.split(new RegExp(separators.join('|'))).map(d => d.trim());
+  };
 
-  methodOptions = [{ value: 'post', label: 'POST' }, { value: 'get', label: 'GET' }];
-  decoderOptions = [{ value: 'json', label: 'JSON' }, { value: 'xml', label: 'XML' }];
-  fields = Immutable.List([
-    Immutable.Map({ field_name: 'url', title: 'Url', info: 'URL to send the requests to' }),
-    Immutable.Map({ field_name: 'method', title: 'Method', info: 'HTTP method', options: this.methodOptions }),
-    Immutable.Map({ field_name: 'decoder', title: 'Decoder', info: 'Method to decode HTTP response', options: this.decoderOptions }),
-  ]);
+  const onChangeGlobalMail = (val) => {
+    props.onEdit('email', 'global_addresses', Immutable.List(val));
+  };
 
-  renderEventSettingFields = (eventSettings, eventNotifier) => (
-    this.fields.map((field) => {
-      const fieldName = field.get('field_name', '');
-      const fieldInfo = field.get('info', '');
-      const fieldOptions = field.get('options', []);
-      return (
-        <FormGroup key={fieldName}>
-          <Col sm={2} componentClass={ControlLabel}>
-            {field.get('title', fieldName)}
-            {fieldInfo !== '' && (<Help contents={fieldInfo} />)}
-          </Col>
-          <Col sm={6}>
-            {
-              fieldOptions.length
-              ? (<Select
-                id={fieldName}
-                value={eventSettings.get(fieldName, '')}
-                onChange={this.onChangeSelect(eventNotifier, fieldName)}
-                options={fieldOptions}
-              />)
-              : (<Field
-                id={fieldName}
-                value={eventSettings.get(fieldName, '')}
-                onChange={this.onChange(eventNotifier)}
-                fieldType={field.get('type', 'text')}
-              />)
-            }
-          </Col>
-        </FormGroup>
-      );
-    })
+  return (
+    <Form horizontal>
+      <Col sm={12}>
+        <Panel header="HTTP" key="http">
+          <FormGroup>
+            <Col sm={2} componentClass={ControlLabel}>
+              Url <Help contents="URL to send the requests to" />
+            </Col>
+            <Col sm={6}>
+              <Field id="url" value={eventsSettings.getIn(['http', 'url'], '')} onChange={onChange('http')} />
+            </Col>
+          </FormGroup>
+          <FormGroup >
+            <Col sm={2} componentClass={ControlLabel}>
+              Method <Help contents="HTTP method" />
+            </Col>
+            <Col sm={6}>
+              <Select
+                id="method"
+                value={eventsSettings.getIn(['http', 'method'], '')}
+                onChange={onChangeSelect('http', 'method')}
+                options={methodOptions}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col sm={2} componentClass={ControlLabel}>
+              Decoder <Help contents="Method to decode HTTP response" />
+            </Col>
+            <Col sm={6}>
+              <Select
+                id="decoder"
+                value={eventsSettings.getIn(['http', 'decoder'], '')}
+                onChange={onChangeSelect('http', 'decoder')}
+                options={decoderOptions}
+              />
+            </Col>
+          </FormGroup>
+        </Panel>
+        <Panel header="Mail" key="mail">
+          <FormGroup>
+            <Col sm={2} componentClass={ControlLabel}>
+              Mails <Help contents="Send events to the following email addresses (For supported events)" />
+            </Col>
+            <Col sm={6}>
+              <Field
+                fieldType="tags"
+                value={eventsSettings.getIn(['email', 'global_addresses'], Immutable.List()).toArray()}
+                onChange={onChangeGlobalMail}
+                addOnPaste
+                pasteSplit={pasteSplit}
+              />
+            </Col>
+          </FormGroup>
+        </Panel>
+      </Col>
+      <Col sm={12}>
+        <ActionButtons onClickSave={props.onSave} onClickCancel={props.onCancel} />
+      </Col>
+    </Form>
   );
+};
 
-  renderSettings = () => {
-    const { eventsSettings } = this.props;
-    return eventsSettings.map((eventSettings, eventNotifier) => (
-      <Panel header={eventNotifier} key={eventNotifier}>
-        <Form horizontal>
-          {this.renderEventSettingFields(eventSettings, eventNotifier)}
-        </Form>
-      </Panel>
-    )).toList();
-  }
+EventSettings.propTypes = {
+  eventsSettings: PropTypes.instanceOf(Immutable.Map),
+  methodOptions: PropTypes.array,
+  decoderOptions: PropTypes.array,
+  onSave: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};
 
-  renderSaveButton = () => (<ActionButtons onClickSave={this.onSave} hideCancel={true} />);
+EventSettings.defaultProps = {
+  eventsSettings: Immutable.Map(),
+  methodOptions: [{ value: 'post', label: 'POST' }, { value: 'get', label: 'GET' }],
+  decoderOptions: [{ value: 'json', label: 'JSON' }, { value: 'xml', label: 'XML' }],
+};
 
-  render() {
-    return (
-      <div>
-        <Col sm={12}>
-          { this.renderSettings() }
-        </Col>
-        <Col sm={12}>
-          { this.renderSaveButton() }
-        </Col>
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = (state, props) => ({
-  eventsSettings: eventsSettingsSelector(state, props),
-});
-
-export default connect(mapStateToProps)(EventSettings);
+export default EventSettings;

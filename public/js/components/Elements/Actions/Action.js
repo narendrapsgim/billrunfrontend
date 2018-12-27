@@ -18,16 +18,17 @@ const Action = (props) => {
     'fa-pencil': type === 'edit',
     'fa-files-o': type === 'clone',
     'fa-file-excel-o': type === 'export_csv',
-    'danger-red': type === 'remove' || type === 'enable',
+    'danger-red': ['enable', 'remove'].includes(type),
     'fa-trash-o': type === 'remove',
     'fa-toggle-off': type === 'enable',
     'fa-toggle-on': type === 'disable',
-    'fa-plus': type === 'add',
+    'fa-plus': ['add', 'expand'].includes(type),
     'fa-calendar': type === 'move',
     'fa-repeat': type === 'reopen',
     'fa-cloud-upload': type === 'import',
     'fa-refresh': type === 'refresh',
     'fa-arrow-left': type === 'back',
+    'fa-minus': type === 'collapse',
   });
 
   const onClick = () => {

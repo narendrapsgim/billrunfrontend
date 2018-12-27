@@ -1,32 +1,54 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
+import { connect } from 'react-redux';
 import { Tab, Panel } from 'react-bootstrap';
 import TabsWrapper from '../Elements/TabsWrapper';
-import EventSettings from './EventSettings';
-import EventsList from './EventsList';
+import EventSettings from './EventSettingsContainer';
+import EventsList from './EventsListContainer';
+import { getEvents } from '../../actions/eventActions';
 
 
-const Events = ({ location }) => (
-  <div>
-    <TabsWrapper id="EventsTab" location={location}>
+class Events extends Component {
 
-      <Tab title="Events" eventKey={1}>
-        <Panel style={{ borderTop: 'none' }}>
-          <EventsList />
-        </Panel>
-      </Tab>
+  static propTypes = {
+    location: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired,
+  };
 
-      <Tab title="Settings" eventKey={2}>
-        <Panel style={{ borderTop: 'none' }}>
-          <EventSettings />
-        </Panel>
-      </Tab>
+  static defaultProps = {
+  };
 
-    </TabsWrapper>
-  </div>
-);
+  componentWillMount() {
+    this.props.dispatch(getEvents());
+  }
 
-Events.propTypes = {
-  location: PropTypes.object.isRequired,
-};
+  render() {
+    const { location } = this.props;
+    return (
+      <div>
+        <TabsWrapper id="EventsTab" location={location}>
 
-export default Events;
+          <Tab title="Balance Events" eventKey={1}>
+            <Panel style={{ borderTop: 'none' }}>
+              <EventsList eventType="balance" />
+            </Panel>
+          </Tab>
+
+          <Tab title="Fraud Events" eventKey={2}>
+            <Panel style={{ borderTop: 'none' }}>
+              <EventsList eventType="fraud" />
+            </Panel>
+          </Tab>
+
+          <Tab title="Settings" eventKey={3}>
+            <Panel style={{ borderTop: 'none' }}>
+              <EventSettings />
+            </Panel>
+          </Tab>
+
+        </TabsWrapper>
+      </div>
+    );
+  }
+}
+
+export default connect(null)(Events);
