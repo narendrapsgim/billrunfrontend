@@ -212,8 +212,8 @@ export default {
     { id: 'last_hours', title: 'Last (hours)', include: ['fieldid:urt'], type: 'number', suffix: 'Hours' },
     { id: 'eq', title: 'Equals', include: ['date', 'boolean', 'fieldid:billrun_status', 'fieldid:logfile_status'] }, // 'Equals'
     { id: 'in', title: 'Equals', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
-    { id: 'ne', title: 'Does Not equal', include: ['boolean'], exclude: [] }, // 'Not equals'
-    { id: 'nin', title: 'Does Not equal', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
+    { id: 'ne', title: 'Does not equal', include: ['boolean'], exclude: [] }, // 'Not equals'
+    { id: 'nin', title: 'Does not equal', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
     { id: 'lt', title: '<', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Less than'
     { id: 'lte', title: '<=', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
     { id: 'gt', title: '>', include: ['number', 'date', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
@@ -221,9 +221,11 @@ export default {
     { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status'] },
     { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status'] },
     { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status'] },
+    { id: 'in_range', title: 'Include‎', include: ['ranges', 'range'] },
+    { id: 'nin_range', title: 'Does not include‎', include: ['ranges', 'range'] },
     { id: 'exists', title: 'Exists', type: 'boolean',
-      include: ['string', 'number', 'boolean', 'date'],
-      exclude: [ 'fieldid:billrun_status', 'fieldid:logfile_status'],
+      include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'],
+      exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'],
       options: ['yes', 'no'],
     },
   ],
@@ -231,12 +233,12 @@ export default {
     { id: 'group', title: 'Group', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group'] },
     { id: 'sum', title: 'Sum', include: ['number'], exclude: ['fieldid:count_group'] },
     { id: 'avg', title: 'Average', include: ['number'], exclude: ['fieldid:count_group'] },
-    { id: 'first', title: 'First', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group'] },
-    { id: 'last', title: 'Last', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group'] },
+    { id: 'first', title: 'First', include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'], exclude: ['fieldid:count_group'] },
+    { id: 'last', title: 'Last', include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'], exclude: ['fieldid:count_group'] },
     { id: 'max', title: 'Max', include: ['number', 'date'], exclude: ['fieldid:count_group'] },
     { id: 'min', title: 'Min', include: ['number', 'date'], exclude: ['fieldid:count_group'] },
     { id: 'push', title: 'List', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group'] },
-    { id: 'addToSet', title: 'Unique List', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group'] },
+    { id: 'addToSet', title: 'Unique List', include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'], exclude: ['fieldid:count_group'] },
     { id: 'count', title: 'Count', include: ['fieldid:count_group'] },
   ],
   outputFormats: [

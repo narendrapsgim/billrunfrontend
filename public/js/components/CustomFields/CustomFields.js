@@ -99,7 +99,11 @@ class CustomFields extends Component {
   }
 
   onChangeField = (entity, index, id, value) => {
-    this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', index, id]), value));
+    if (value === undefined) {
+      this.props.dispatch(removeSettingField(getSettingsKey(entity), getSettingsPath(entity, ['fields', index, id])));
+    } else {
+      this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', index, id]), value));
+    }
   };
 
   onRemoveField = (entity, index) => {
