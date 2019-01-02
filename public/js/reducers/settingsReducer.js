@@ -82,7 +82,7 @@ export default function (state = defaultState, action) {
       return state.deleteIn([category, name]);
     }
 
-    case action.SET_FIELD_POSITION: {
+    case actions.SET_FIELD_POSITION: {
       const curr = state.getIn([...action.path, action.oldIndex]);
       return state.updateIn(action.path, Immutable.List(), list =>
         list.delete(action.oldIndex).insert(action.newIndex, curr),
