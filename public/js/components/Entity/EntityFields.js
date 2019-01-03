@@ -88,8 +88,9 @@ class EntityFields extends Component {
       return false;
     }
     const play = entity.get('play', '');
+    const plays = Immutable.List(typeof play.split === 'function' ? play.split(',') : play);
     const fieldPlays = field.get('plays', 'all');
-    const isFieldOfPlay = fieldPlays === 'all' || fieldPlays.contains(play);
+    const isFieldOfPlay = fieldPlays === 'all' || plays.some(p => fieldPlays.indexOf(p) > -1);
     return isFieldOfPlay;
   }
 

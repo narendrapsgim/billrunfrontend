@@ -42,9 +42,11 @@ class PlaysSelector extends Component {
       return null;
     }
     const play = entity.get('play', '');
+    const label = multi ? 'Play/s' : 'Play';
+    const displayValue = typeof play.join === 'function' ? play.join(',') : play;
     return (
       <FormGroup key="play">
-        <Col componentClass={ControlLabel}sm={3} lg={2}>Play <span className="danger-red"> *</span></Col>
+        <Col componentClass={ControlLabel}sm={3} lg={2}>{label}</Col>
         <Col sm={8} lg={9}>
           { editable
             ? <Select
@@ -53,7 +55,7 @@ class PlaysSelector extends Component {
               onChange={onChange}
               multi={multi}
             />
-          : <Field value={play} editable={false} />
+          : <Field value={displayValue} editable={false} />
           }
         </Col>
       </FormGroup>
