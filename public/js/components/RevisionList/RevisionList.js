@@ -302,7 +302,7 @@ class RevisionList extends Component {
     const removeConfirmMessage = 'Are you sure you want to remove this revision?';
     return (
       <div>
-        <List items={items} fields={fields} edit={false} actions={actions} />
+        <List items={items} fields={fields} edit={false} actions={actions} className="scrollbox screen-height-70" />
         { activeItem &&
           <CloseActionBox
             itemName={itemName}

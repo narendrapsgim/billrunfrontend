@@ -68,6 +68,8 @@ export default class SubscriptionsList extends Component {
             return { id: fieldname, parser: this.addressParser };
           case 'sid':
             return { id: fieldname, title: 'ID', type: 'number', sort: true };
+          case 'play':
+            return { id: fieldname, sort: true };
           default: {
             let title = fieldname;
             if (fieldname === 'firstname') {

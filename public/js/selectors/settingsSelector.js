@@ -7,13 +7,15 @@ import {
   isLinkerField,
   setFieldTitle,
 } from '../common/Util';
-import { getEventConvertedConditions } from '../components/Events/EventsUtil';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
 
 const getSystemSettings = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['system']);
+
+const getPlaysSettings = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['plays']);
 
 const getPricing = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['pricing']);
@@ -34,6 +36,8 @@ const getEntityFields = (state, props) => {
   const entityName = Array.isArray(props.entityName) ? props.entityName : [props.entityName];
   return state.settings.getIn([...entityName, 'fields']);
 };
+
+const getEventType = (state, props) => props.eventType;
 
 const getMinEntityDate = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('minimum_entity_start_date');
@@ -148,7 +152,7 @@ const getUniqueUsageTypesFormInputProssesors = (inputProssesor) => {
 };
 
 const getInputProssesors = (state, props) =>  // eslint-disable-line no-unused-vars
-  state.settings.get('file_types', Immutable.Map());
+  state.settings.get('file_types', Immutable.List());
 
 const selectCsiOptions = (inputProssesors) => {
   let options = Immutable.List();
@@ -221,6 +225,17 @@ export const inputProssesorCsiOptionsSelector = createSelector(
   selectCsiOptions,
 );
 
+export const inputProssesorUsageTypesOptionsSelector = createSelector(
+  getInputProssesors,
+  (inputProssesors = Immutable.List()) => Immutable.Map()
+    .withMutations((nputProssesorUsageTypesWithMutations) => {
+      inputProssesors.forEach((inputProssesor) => {
+        const types = getUniqueUsageTypesFormInputProssesors(inputProssesor);
+        nputProssesorUsageTypesWithMutations.set(inputProssesor.get('file_type'), types);
+      });
+    }),
+);
+
 export const inputProssesorfilteredFieldsSelector = createSelector(
   getInputProssesors,
   selectFielteredFields,
@@ -249,6 +264,16 @@ export const pricingSelector = createSelector(
 export const systemSettingsSelector = createSelector(
   getSystemSettings,
   system => system,
+);
+
+export const playsSettingsSelector = createSelector(
+  getPlaysSettings,
+  plays => plays,
+);
+
+export const availablePlaysSettingsSelector = createSelector(
+  getPlaysSettings,
+  plays => (plays ? plays.filter(play => play.get('enabled', true)) : undefined),
 );
 
 export const closedCycleChangesSelector = createSelector(
@@ -391,19 +416,6 @@ export const planFieldsSelector = createSelector(
   (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'plan')),
 );
 
-const selectEvents = (events, usageTypesData, propertyTypes) => {
-  if (!events) {
-    return undefined;
-  }
-  return events
-    .filter((event, eventType) => eventType !== 'settings')
-    .map(eventsList =>
-      eventsList.map(event =>
-        event.set('conditions', getEventConvertedConditions(propertyTypes, usageTypesData, event, false)),
-      ),
-    );
-};
-
 export const templateTokenSettingsSelector = createSelector(
   getTemplateTokens,
   templateTokens => templateTokens,
@@ -440,13 +452,6 @@ export const collectionStepsSelectorForList = createSelector(
 export const eventsSettingsSelector = createSelector(
   getEvents,
   events => (events ? events.get('settings', Immutable.Map()) : undefined),
-);
-
-export const eventsSelector = createSelector(
-  getEvents,
-  usageTypesDataSelector,
-  propertyTypeSelector,
-  selectEvents,
 );
 
 export const formatFieldOptions = (fields, item = Immutable.Map()) => {
@@ -539,4 +544,10 @@ export const paymentGatewaysSelector = createSelector(
 export const emailTemplatesSelector = createSelector(
   getEmailTemplates,
   emailTemplates => emailTemplates,
+);
+
+export const eventsSelector = createSelector(
+  getEvents,
+  getEventType,
+  (events = Immutable.Map(), type) => events.get(type),
 );

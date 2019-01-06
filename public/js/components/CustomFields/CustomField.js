@@ -7,6 +7,13 @@ import { SortableElement } from 'react-sortable-hoc';
 import ModalWrapper from '../Elements/ModalWrapper';
 import DragHandle from '../Elements/DragHandle';
 import Field from '../Field';
+import {
+  availablePlaysSettingsSelector,
+} from '../../selectors/settingsSelector';
+import {
+  getConfig,
+  parseConfigSelectOptions,
+} from '../../common/Util';
 
 
 class CustomField extends Component {
@@ -20,6 +27,8 @@ class CustomField extends Component {
     existing: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
+    availablePlays: PropTypes.instanceOf(Immutable.List),
+    customFieldsConfig: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
@@ -27,6 +36,8 @@ class CustomField extends Component {
     editable: true,
     existing: false,
     sortable: true,
+    availablePlays: Immutable.List(),
+    customFieldsConfig: getConfig(['customFields'], Immutable.List()),
   };
 
   state = {
@@ -35,24 +46,38 @@ class CustomField extends Component {
   }
 
   onChangeType = (value) => {
-    const { entity, idx } = this.props;
+    const { entity, idx, field } = this.props;
     if (value === 'text') {
       this.props.onChange(entity, idx, 'type', '');
     } else {
       this.props.onChange(entity, idx, 'type', value);
     }
 
-    if (value === 'boolean') {
-      this.props.onChange(entity, idx, 'unique', false);
-      this.props.onChange(entity, idx, 'mandatory', false);
-      this.props.onChange(entity, idx, 'multiple', false);
-      this.props.onChange(entity, idx, 'select_list', false);
-      this.props.onChange(entity, idx, 'select_options', '');
-    }
-    if (value === 'textarea') {
-      this.props.onChange(entity, idx, 'multiple', false);
-      this.props.onChange(entity, idx, 'select_list', false);
-      this.props.onChange(entity, idx, 'select_options', '');
+    const oldFieldType = this.getFieldType(field);
+    const properties = Immutable.Map({
+      unique: ['unique'],
+      mandatory: ['mandatory'],
+      editable: ['editable'],
+      display: ['display'],
+      showInList: ['show_in_list'],
+      searchable: ['searchable'],
+      multiple: ['multiple'],
+      selectOptions: ['select_options', 'select_list'],
+    });
+
+    const textable = ['text', 'textarea', ''];
+
+    properties.forEach((fields, property) => {
+      if (!this.isAllowedForProperty(property, value)) {
+        fields.forEach((fieldName) => {
+          const resetValue = (fieldName === 'select_options') ? '' : false;
+          this.props.onChange(entity, idx, fieldName, resetValue);
+        });
+      }
+    });
+    const stillTextable = textable.includes(oldFieldType) && textable.includes(value);
+    if (!stillTextable) {
+      this.props.onChange(entity, idx, 'default_value');
     }
   }
 
@@ -73,6 +98,16 @@ class CustomField extends Component {
     }
   };
 
+  onChangeRange = (value, id) => {
+    const { entity, idx } = this.props;
+    this.props.onChange(entity, idx, id, value);
+  }
+
+  onChangePlay = (plays) => {
+    const { entity, idx } = this.props;
+    this.props.onChange(entity, idx, 'plays', Immutable.List(plays.split(',')));
+  }
+
   onRemove = () => {
     const { entity, idx } = this.props;
     this.props.onRemove(entity, idx);
@@ -87,30 +122,156 @@ class CustomField extends Component {
   };
 
   getFieldType = field => (field.get('type', '') === '' ? 'text' : field.get('type', ''));
-  isBoolean = field => this.getFieldType(field) === 'boolean';
+
+  getFieldTypeConfig = (type = null) => {
+    const { field, customFieldsConfig } = this.props;
+    const fieldtype = (type === null) ? this.getFieldType(field) : type;
+    return customFieldsConfig.find(config => config.get('id', '') === fieldtype, null, Immutable.Map());
+  }
+
+  getPlayOptions = () => (this.props.availablePlays.map(play => ({
+    value: play.get('name', ''),
+    label: play.get('label', play.get('name', '')),
+  })).toArray());
+
+  inBlackList = (option, entity) => {
+    const blackList = option.get('exclude', Immutable.List());
+    if (blackList.isEmpty()) {
+      return false;
+    }
+    return blackList.includes(entity);
+  }
+
+  inWhiteList = (option, entity) => {
+    const whiteList = option.get('include', Immutable.List());
+    if (whiteList.isEmpty()) {
+      return true;
+    }
+    return whiteList.includes(entity);
+  }
+
+  isAllowedForProperty = (propName, type = null) => {
+    const { field } = this.props;
+    const fieldType = (type === null) ? this.getFieldType(field) : type;
+    const fieldConfig = this.getFieldTypeConfig(fieldType);
+    return fieldConfig.get(propName, true);
+  }
+
+  isEditableProperty = (propName = '') => {
+    const { field, editable } = this.props;
+    if (!editable) {
+      return false;
+    }
+    const changeableProps = field.get('changeable_props', null);
+    if (changeableProps === null) {
+      return !field.get('system', false);
+    }
+    if (propName === '') {
+      return !changeableProps.isEmpty();
+    }
+    return changeableProps.includes(propName);
+  }
+
+
+  renderDefaultValueField = () => {
+    const { field } = this.props;
+    const fieldType = this.getFieldType(field);
+    const disabledDefaultValue = !this.isEditableProperty('default_value');
+    if (fieldType === 'boolean') {
+      return (
+        <Field
+          fieldType="checkbox"
+          id="default_value"
+          onChange={this.onChange}
+          value={field.get('default_value', '')}
+          disabled={disabledDefaultValue}
+          style={{ textAlign: 'center', marginTop: 10 }}
+        />
+      );
+    }
+    if (fieldType === 'ranges') {
+      return (
+        <Field
+          fieldType="ranges"
+          id="default_value"
+          onChange={(value) => { this.onChangeRange(value, 'default_value'); }}
+          value={field.get('default_value', Immutable.List())}
+          disabled={disabledDefaultValue}
+          compact={true}
+        />
+      );
+    }
+    return (
+      <Field
+        id="default_value"
+        onChange={this.onChange}
+        value={field.get('default_value', '')}
+        disabled={disabledDefaultValue}
+      />
+    );
+  }
 
   renderAdvancedEdit = () => {
-    const { field } = this.props;
+    const { field, entity, customFieldsConfig } = this.props;
     const { showAdvancedEdit } = this.state;
+    const fieldType = this.getFieldType(field);
+    const fieldConfig = this.getFieldTypeConfig(fieldType);
+    const fieldTypeLabel = fieldConfig.get('title', fieldType);
     const modalTitle = changeCase.titleCase(`Edit ${field.get('field_name', 'field')} Details`);
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
-    const isBoolean = this.isBoolean(field);
+    const helpTextStyle = { color: '#626262', verticalAlign: 'text-top' };
 
-    const disableUnique = isBoolean || !this.hasEditableField('unique');
-    const disableMandatory = isBoolean || field.get('unique', false) || !this.hasEditableField('mandatory');
-    const disableBoolean = field.get('select_list', false) || field.get('unique', false);
-    const disableMultiple = this.getFieldType(field) !== 'text' || !this.hasEditableField('multiple');
-    const disableSearchable = isBoolean || !this.hasEditableField('searchable');
-    const disableSelectList = this.getFieldType(field) !== 'text' || !this.hasEditableField('select_list');
-    const disableSelectOptions = !field.get('select_list', false) || !this.hasEditableField('select_options');
-    const fieldTypesOptions = [
-      { value: 'text', label: 'Text' }, // must be first because text is default option
-      { value: 'boolean', label: 'Boolean' },
-      { value: 'textarea', label: 'Text Area' },
-    ];
+    const playsOptions = this.getPlayOptions();
+    const showPlays = ['subscriber'].includes(entity) && playsOptions.length > 1;
+    const plays = field.get('plays', []).join(',');
+
+    const disableUnique = !this.isAllowedForProperty('unique') || !this.isEditableProperty('unique');
+    const disableMandatory = !this.isAllowedForProperty('mandatory') || !this.isEditableProperty('mandatory') || field.get('unique', false);
+    const disableMultiple = !this.isAllowedForProperty('multiple') || !this.isEditableProperty('multiple');
+    const disableSearchable = !this.isAllowedForProperty('searchable') || !this.isEditableProperty('searchable');
+    const disabledShowInList = !this.isAllowedForProperty('showInList') || !this.isEditableProperty('show_in_list');
+    const disabledDisplay = !this.isAllowedForProperty('display') || !this.isEditableProperty('display');
+    const disabledEditable = !this.isAllowedForProperty('editable') || !this.isEditableProperty('editable');
+    const disableSelectList = !this.isAllowedForProperty('selectOptions') || !this.isEditableProperty('select_list');
+    const disableSelectOptions = !field.get('select_list', false) || !this.isEditableProperty('select_options');
+    const disableFieldType = field.get('select_list', false) || field.get('unique', false);
+    const fieldTypesOptions = customFieldsConfig
+      .filter(option => (!this.inBlackList(option, entity) && this.inWhiteList(option, entity)))
+      .map(parseConfigSelectOptions)
+      .toArray();
     return (
       <ModalWrapper show={showAdvancedEdit} onOk={this.onCloseModal} title={modalTitle}>
         <Form horizontal>
+          {showPlays && (
+            <FormGroup>
+              <Col sm={3} componentClass={ControlLabel}>Play</Col>
+              <Col sm={9} style={checkboxStyle}>
+                <Field
+                  fieldType="select"
+                  options={playsOptions}
+                  onChange={this.onChangePlay}
+                  value={plays}
+                  multi={true}
+                  clearable={true}
+                />
+              </Col>
+            </FormGroup>
+          )}
+
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Field Type</Col>
+            <Col sm={9} style={checkboxStyle}>
+              <Field
+                fieldType="select"
+                options={fieldTypesOptions}
+                onChange={this.onChangeType}
+                value={fieldType}
+                disabled={disableFieldType}
+                clearable={false}
+              />
+            </Col>
+          </FormGroup>
+
           <FormGroup>
             <Col sm={3} componentClass={ControlLabel}>Unique</Col>
             <Col sm={9} style={checkboxStyle}>
@@ -123,7 +284,9 @@ class CustomField extends Component {
                 className="inline mr10"
               />
               {disableUnique && (
-                <small style={{ color: '#626262' }}>Unique field can not be boolean</small>
+                <small style={helpTextStyle}>
+                  {fieldTypeLabel} field type can't be unique
+                </small>
               )}
             </Col>
           </FormGroup>
@@ -132,11 +295,13 @@ class CustomField extends Component {
             <Col sm={3} componentClass={ControlLabel}>Mandatory</Col>
             <Col sm={9} style={checkboxStyle}>
               <Field id="mandatory" onChange={this.onChange} value={field.get('mandatory', '')} fieldType="checkbox" disabled={disableMandatory} className="inline mr10" />
-              {disableMandatory && (
-                <small style={{ color: '#626262' }}>{ field.get('mandatory', '')
-                  ? 'Unique field must be mandatory'
-                  : 'Mandatory field can not be boolean'
-                }</small>
+              {(disableMandatory || field.get('unique', '')) && (
+                <small style={helpTextStyle}>
+                  { field.get('unique', '')
+                    ? 'Unique field must be mandatory'
+                    : `${fieldTypeLabel} field type can't be mandatory`
+                  }
+                </small>
               )}
             </Col>
           </FormGroup>
@@ -149,8 +314,13 @@ class CustomField extends Component {
                 id="editable"
                 onChange={this.onChange}
                 value={field.get('editable', '')}
-                disabled={!this.hasEditableField('editable')}
+                disabled={disabledEditable}
               />
+              {disabledEditable && (
+                <small style={helpTextStyle}>
+                  {fieldTypeLabel} field type can't be editable
+                </small>
+              )}
             </Col>
           </FormGroup>
 
@@ -162,8 +332,13 @@ class CustomField extends Component {
                 id="display"
                 onChange={this.onChange}
                 value={field.get('display', '')}
-                disabled={!this.hasEditableField('display')}
+                disabled={disabledDisplay}
               />
+              {disabledDisplay && (
+                <small style={helpTextStyle}>
+                  {fieldTypeLabel} field type can't be display
+                </small>
+              )}
             </Col>
           </FormGroup>
 
@@ -175,8 +350,13 @@ class CustomField extends Component {
                 id="show_in_list"
                 onChange={this.onChange}
                 value={field.get('show_in_list', '')}
-                disabled={!this.hasEditableField('show_in_list')}
+                disabled={disabledShowInList}
               />
+              {disabledShowInList && (
+                <small style={helpTextStyle}>
+                  {fieldTypeLabel} field type can't be shown in list
+                </small>
+              )}
             </Col>
           </FormGroup>
 
@@ -192,22 +372,10 @@ class CustomField extends Component {
                 disabled={disableSearchable}
               />
               {disableSearchable && (
-                <small style={{ color: '#626262' }}>Boolean field can not be searchable</small>
+                <small style={helpTextStyle}>
+                  {fieldTypeLabel} field type can't be searchable
+                </small>
               )}
-            </Col>
-          </FormGroup>
-
-          <FormGroup>
-            <Col sm={3} componentClass={ControlLabel}>Field Type</Col>
-            <Col sm={9} style={checkboxStyle}>
-              <Field
-                fieldType="select"
-                options={fieldTypesOptions}
-                onChange={this.onChangeType}
-                value={this.getFieldType(field)}
-                disabled={disableBoolean}
-                clearable={false}
-              />
             </Col>
           </FormGroup>
 
@@ -223,7 +391,9 @@ class CustomField extends Component {
                 className="inline mr10"
               />
               {disableMultiple && (
-                <small style={{ color: '#626262' }}>Only field of type Text can be multiple</small>
+                <small style={helpTextStyle}>
+                  {fieldTypeLabel} field type can't be multiple
+                </small>
               )}
             </Col>
           </FormGroup>
@@ -248,7 +418,11 @@ class CustomField extends Component {
                   disabled={disableSelectOptions}
                 />
               </InputGroup>
-              { field.get('select_list', false) && <HelpBlock style={{ marginLeft: 40 }}>Select Options <small>(comma-separated list)</small></HelpBlock>}
+              { field.get('select_list', false) &&
+                <HelpBlock style={{ marginLeft: 40 }}>
+                  Select Options <small>(comma-separated list)</small>
+                </HelpBlock>
+              }
             </Col>
           </FormGroup>
 
@@ -257,50 +431,26 @@ class CustomField extends Component {
     );
   }
 
-  hasEditableField = (propName = '') => {
-    const { field, editable } = this.props;
-    if (!editable) {
-      return false;
-    }
-    const changeableProps = field.get('changeable_props', null);
-    if (changeableProps === null) {
-      return !field.get('system', false);
-    }
-    if (propName === '') {
-      return !changeableProps.isEmpty();
-    }
-    return changeableProps.includes(propName);
-  }
-
   render() {
     const { field, editable, existing, sortable } = this.props;
-    const isBoolean = this.isBoolean(field);
-    const checkboxStyle = { textAlign: 'center', marginTop: 10 };
     return (
       <FormGroup className="CustomField form-inner-edit-row">
         <Col sm={1} className="text-center">
           <DragHandle disabled={!sortable} />
         </Col>
         <Col sm={3}>
-          <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!this.hasEditableField('field_name') || existing} />
+          <Field id="field_name" onChange={this.onChange} value={field.get('field_name', '')} disabled={!this.isEditableProperty('field_name') || existing} />
         </Col>
         <Col sm={2}>
-          <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={!this.hasEditableField('title')} />
+          <Field id="title" onChange={this.onChange} value={field.get('title', '')} disabled={!this.isEditableProperty('title')} />
         </Col>
         <Col sm={2}>
-          <Field
-            id="default_value"
-            onChange={this.onChange}
-            value={field.get('default_value', '')}
-            disabled={!this.hasEditableField('default_value')}
-            fieldType={isBoolean ? 'checkbox' : 'text'}
-            style={isBoolean ? checkboxStyle : undefined}
-          />
+          {this.renderDefaultValueField()}
         </Col>
-        {editable && this.hasEditableField() && (
+        {editable && this.isEditableProperty() && (
           <Col sm={4} className="actions">
             <Button onClick={this.onOpenModal} bsSize="small"><i className="fa fa-pencil active-blue" /> Advanced </Button>
-            {this.hasEditableField('delete') && (
+            {this.isEditableProperty('delete') && (
             <Button onClick={this.onRemove} bsSize="small">
               <i className="fa fa-trash-o danger-red" /> Remove </Button>
             )}
@@ -313,4 +463,8 @@ class CustomField extends Component {
 
 }
 
-export default connect()(SortableElement(CustomField));
+const mapStateToProps = (state, props) => ({
+  availablePlays: availablePlaysSettingsSelector(state, props),
+});
+
+export default connect(mapStateToProps)(SortableElement(CustomField));

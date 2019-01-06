@@ -26,6 +26,7 @@ class EntityField extends Component {
     isFieldTags: this.props.field.get('multiple', false) && !this.props.field.get('select_list', false),
     isFieldSelect: this.props.field.get('select_list', false),
     isFieldBoolean: this.props.field.get('type', '') === 'boolean',
+    isFieldRanges: this.props.field.get('type', '') === 'ranges',
     fieldPath: this.props.field.get('field_name', '').split('.'),
     isRemoveField: ['params'].includes(this.props.field.get('field_name', '').split('.')[0]),
   }
@@ -41,16 +42,21 @@ class EntityField extends Component {
       const noDefaultValueVal = this.getNoDefaultValueVal();
       const defaultValue = field.get('default_value', noDefaultValueVal);
       if (defaultValue !== null) {
-      this.props.onChange(fieldPath, defaultValue);
+        this.props.onChange(fieldPath, defaultValue);
+      }
     }
-  }
   }
 
   getNoDefaultValueVal = (byConfig = true) => {
     const { field } = this.props;
-    const { isFieldBoolean, isFieldTags, isFieldSelect } = this.state;
+    const { isFieldBoolean, isFieldTags, isFieldSelect, isFieldRanges } = this.state;
     if (isFieldBoolean) {
       return false;
+    }
+    if (isFieldRanges) {
+      // const defaultRangValue = Immutable.Map({ from: '', to: '' });
+      // return Immutable.List([defaultRangValue]);
+      return Immutable.List();
     }
     if (!byConfig) {
       return null;
@@ -86,10 +92,15 @@ class EntityField extends Component {
     const { fieldPath } = this.state;
     const multi = field.get('multiple', false);
     if (multi) {
-    this.props.onChange(fieldPath, val.split(','));
+      this.props.onChange(fieldPath, val.split(','));
     } else {
       this.props.onChange(fieldPath, val);
     }
+  }
+
+  onChangeRange = (val) => {
+    const { fieldPath } = this.state;
+    this.props.onChange(fieldPath, val);
   }
 
   onChangeTags = (val) => {
@@ -98,10 +109,15 @@ class EntityField extends Component {
   }
 
   getFieldValue = () => {
-    const { fieldPath, isFieldTags, isFieldBoolean } = this.state;
+    const { fieldPath, isFieldTags, isFieldBoolean, isFieldRanges } = this.state;
     const { entity, editable } = this.props;
+    if (isFieldRanges) {
+      return entity.getIn(fieldPath, undefined);
+      // return entity.getIn(fieldPath, { from: '', to: '' });
+    }
     if (isFieldBoolean) {
-      return entity.getIn(fieldPath, '');
+      const booleanValue = entity.getIn(fieldPath, '');
+      return (booleanValue === '') ? booleanValue : [true, 1, 'true'].includes(booleanValue);
     }
     const fieldVal = entity.getIn(fieldPath, []);
     if (isFieldTags && editable) {
@@ -133,8 +149,21 @@ class EntityField extends Component {
 
   renderField = () => {
     const { editable, field } = this.props;
-    const { isFieldTags, isFieldSelect, isFieldBoolean } = this.state;
+    const { isFieldTags, isFieldSelect, isFieldBoolean, isFieldRanges } = this.state;
     const value = this.getFieldValue();
+    if (isFieldRanges) {
+      const multi = field.get('multiple', false);
+      return (
+        <Field
+          fieldType="ranges"
+          onChange={this.onChangeRange}
+          value={value}
+          multi={multi}
+          editable={editable}
+          label={field.get('title', field.get('field_name', ''))}
+        />
+      );
+    }
     if (isFieldBoolean) {
       const checkboxStyle = { height: 29, marginTop: 8 };
       return (

@@ -31,6 +31,7 @@ class List extends Component {
     onSort: () => {},
     sort: Immutable.Map(),
     removeText: 'Remove',
+    className: '',
     enableEnabled: false,
     onClickEnabled: () => {},
     actions: [],
