@@ -6,7 +6,13 @@ import classNames from 'classnames';
 import { titleCase } from 'change-case';
 import EntityField from './EntityField';
 import { getSettings } from '../../actions/settingsActions';
-import { entityFieldSelector } from '../../selectors/settingsSelector';
+import {
+  entityFieldSelector,
+  availablePlaysSettingsSelector,
+} from '../../selectors/settingsSelector';
+import {
+  shouldUsePlays,
+} from '../../common/Util';
 
 
 class EntityFields extends Component {
@@ -23,6 +29,7 @@ class EntityFields extends Component {
     editable: PropTypes.bool,
     onChangeField: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
+    availablePlays: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
@@ -32,6 +39,7 @@ class EntityFields extends Component {
     fieldsFilter: null,
     editable: true,
     onChangeField: () => {},
+    availablePlays: Immutable.List(),
   }
 
   componentDidMount() {
@@ -74,6 +82,18 @@ class EntityFields extends Component {
     return !(fieldPath[0] === 'params' && !entity.hasIn(fieldPath));
   }
 
+  filterPlayFields = (field) => {
+    const { availablePlays, entity } = this.props;
+    if (!shouldUsePlays(availablePlays)) {
+      return false;
+    }
+    const play = entity.get('play', '');
+    const plays = Immutable.List(typeof play.split === 'function' ? play.split(',') : play);
+    const fieldPlays = field.get('plays', 'all');
+    const isFieldOfPlay = fieldPlays === 'all' || plays.some(p => fieldPlays.indexOf(p) > -1);
+    return isFieldOfPlay;
+  }
+
   renderField = (field, key) => {
     const { entity, editable, onChangeField } = this.props;
     return (
@@ -91,6 +111,7 @@ class EntityFields extends Component {
     const { fields, fieldsFilter } = this.props;
     const fieldFilterFunction = fieldsFilter !== null ? fieldsFilter : this.filterPrintableFields;
     return fields
+      .filter(this.filterPlayFields)
       .filter(fieldFilterFunction)
       .filter(this.filterParamsFields)
       .map(this.renderField);
@@ -135,6 +156,7 @@ class EntityFields extends Component {
 
 const mapStateToProps = (state, props) => ({
   fields: entityFieldSelector(state, props),
+  availablePlays: availablePlaysSettingsSelector(state, props),
 });
 
 export default connect(mapStateToProps)(EntityFields);

@@ -539,3 +539,10 @@ export const sortFieldOption = (optionsA, optionB) => {
 export const onlyLineForeignFields = lineField => lineField.has('foreign');
 
 export const foreignFieldWithoutDates = foreignField => foreignField.getIn(['foreign', 'translate', 'type'], '') !== 'unixTimeToString';
+
+export const shouldUsePlays = availablePlays => (availablePlays.size > 1);
+
+export const getPlayOptions = availablePlays => availablePlays.map(play => ({
+  value: play.get('name', ''),
+  label: play.get('label', play.get('name', '')),
+})).toArray();

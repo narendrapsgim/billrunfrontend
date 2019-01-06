@@ -7,6 +7,7 @@ import { ServiceDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
 import EntityFields from '../Entity/EntityFields';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getFieldName,
   getFieldNameType,
@@ -70,6 +71,11 @@ export default class ServiceDetails extends Component {
     this.props.updateItem(['quantitative'], value);
   }
 
+  onChangePlays = (plays) => {
+    const playsToSave = plays === '' ? [] : plays.split(',');
+    this.props.updateItem(['play'], playsToSave);
+  }
+
   onChangeDescription = (e) => {
     const { value } = e.target;
     this.props.updateItem(['description'], value);
@@ -104,6 +110,13 @@ export default class ServiceDetails extends Component {
     const isByCycles = item.getIn(['balance_period', 'type'], 'default') === 'default';
     return (
       <Form horizontal>
+
+        <PlaysSelector
+          entity={item}
+          editable={editable}
+          multi={true}
+          onChange={this.onChangePlays}
+        />
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
