@@ -299,6 +299,7 @@ class Product extends Component {
                             onChangeUsaget={this.onChangeUsaget}
                             onChangeUnit={this.onChangeUnit}
                             showSelectTypes={false}
+                            enabled={mode !== 'view'}
                           />
                         </Col>
                       </div>)
