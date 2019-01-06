@@ -299,7 +299,7 @@ export default class DiscountDetails extends Component {
               { (!discount.getIn(['params', 'service'], Immutable.List()).isEmpty()) && <hr /> }
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('Overall Limit', 'discounts')}
+                  { getFieldName('Discount Overall Limit', 'discounts')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />

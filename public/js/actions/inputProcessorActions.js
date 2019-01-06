@@ -106,7 +106,7 @@ const convert = (settings) => {
           filters = []
         } = settings;
 
-  const connections = receiver ? (receiver.connections ? receiver.connections: {}) : {};
+  const connections = receiver ? (receiver.connections ? receiver.connections: []) : [];
   const field_widths = (parser.type === "fixed" && parser.structure) ? parser.structure.map(struct => struct.width) : [];
   const usaget_type = (!_.result(processor, 'usaget_mapping') || processor.usaget_mapping.length < 1) ?
                       "static" :
@@ -124,6 +124,7 @@ const convert = (settings) => {
       Immutable.List(parser.structure).map(struct => Immutable.Map({ name: struct.name, checked: typeof struct.checked !== 'undefined' ? struct.checked : true })) :
       Immutable.List(),
     field_widths,
+    line_types: parser.line_types,
     customer_identification_fields,
     rate_calculators,
     pricing,
@@ -469,10 +470,9 @@ export function removeRatingField(rateCategory, usaget, priority, index) {
   };
 }
 
-export function removeReceiver(receiver, index) {
+export function removeReceiver(index) {
   return {
     type: REMOVE_RECEIVER,
-    receiver,
     index,
   };
 }
@@ -548,6 +548,7 @@ export function saveInputProcessorSettings(state, parts = []) {
     "type": state.get('type'),
     "parser": {
       "type": state.get('delimiter_type'),
+      "line_types": state.get('line_types'),
       "separator": state.get('delimiter'),
       structure: state.get('unfiltered_fields').reduce((acc, field, idx) => {
         const struct = (state.get('delimiter_type') === 'fixed')

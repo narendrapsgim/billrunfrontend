@@ -9,6 +9,7 @@ import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
 import collectionsConfig from '../config/collections.json';
+import customFieldsConfig from '../config/customFields.json';
 
 /**
  * Get data from config files
@@ -39,6 +40,8 @@ export const getConfig = (key, defaultValue = null) => {
         break;
       case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
         break;
+      case 'customFields': configCache = configCache.set('customFields', Immutable.fromJS(customFieldsConfig));
+        break;
       default: console.log(`Config caregory not exists ${path}`);
     }
   }
@@ -61,6 +64,7 @@ export const getFieldNameType = (type) => {
     case 'subscriber':
       return 'subscription';
     case 'lines':
+    case 'line':
     case 'usage':
       return 'lines';
     case 'service':
@@ -497,9 +501,15 @@ export const escapeRegExp = text =>
 
 export const createRateListNameByArgs = (query = Immutable.Map()) => query.reduce((acc, value, key) => `${acc}.${key}.${value}`, 'rates');
 
-export const setFieldTitle = (field, entity) => (field.has('title')
-    ? field
-    : field.set('title', getFieldName(field.get('field_name', ''), getFieldNameType(entity), sentenceCase(field.get('field_name', '')))));
+export const setFieldTitle = (field, entity, keyProperty = 'field_name') => {
+  if (field.has('title')) {
+    return field;
+  }
+  const entityName = getFieldNameType(!entity && field.has('entity') ? field.get('entity') : entity);
+  const key = field.get(keyProperty, '');
+  const defaultLable = sentenceCase(field.get(keyProperty, ''));
+  return field.set('title', getFieldName(key, entityName, defaultLable));
+};
 
 export const toImmutableList = (value) => {
   if ([undefined, null].includes(value)) {
@@ -513,3 +523,19 @@ export const toImmutableList = (value) => {
   }
   return Immutable.List([value]);
 };
+
+export const sortFieldOption = (optionsA, optionB) => {
+  const a = optionsA.get('title', '').toUpperCase(); // ignore upper and lowercase
+  const b = optionB.get('title', '').toUpperCase(); // ignore upper and lowercase
+  if (a < b) {
+    return -1;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return 0;
+};
+
+export const onlyLineForeignFields = lineField => lineField.has('foreign');
+
+export const foreignFieldWithoutDates = foreignField => foreignField.getIn(['foreign', 'translate', 'type'], '') !== 'unixTimeToString';
