@@ -50,6 +50,7 @@ class ServiceDiscountValue extends Component {
     const { discount, name } = this.props;
     let { value } = e.target;
     value = isNumber(value) ? parseFloat(value) : value;
+    value = Number.isInteger(value) && value > 0 ? value : 1;
 
     const newParam = Immutable.Map({
       name: 'quantity',
@@ -141,7 +142,10 @@ class ServiceDiscountValue extends Component {
             <Col sm={12}>
               Apply discount value {discountValue} for every &nbsp;
               <Field
-                style={{ width: 50, display: 'inline-block' }}
+                fieldType="number"
+                min="1"
+                step="1"
+                style={{ width: 85, display: 'inline-block' }}
                 onChange={this.onChangeAmount}
                 value={discountAmount}
               />
