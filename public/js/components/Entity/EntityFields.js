@@ -74,6 +74,7 @@ class EntityFields extends Component {
     field.get('display', false) !== false
     && field.get('editable', false) !== false
     && field.get('field_name', '') !== 'tariff_category'
+    && field.get('field_name', '') !== 'play'
   );
 
   filterParamsFields = (field) => {
