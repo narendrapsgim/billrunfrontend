@@ -22,6 +22,7 @@ class PlaysSelector extends Component {
     entity: PropTypes.instanceOf(Immutable.Map).isRequired,
     editable: PropTypes.bool,
     multi: PropTypes.bool,
+    mandatory: PropTypes.bool,
     onChange: PropTypes.func,
   }
 
@@ -29,6 +30,7 @@ class PlaysSelector extends Component {
     availablePlays: Immutable.List(),
     editable: true,
     multi: false,
+    mandatory: false,
     onChange: () => {},
   }
 
@@ -37,7 +39,7 @@ class PlaysSelector extends Component {
   }
 
   render() {
-    const { availablePlays, entity, editable, multi, onChange } = this.props;
+    const { availablePlays, entity, editable, multi, mandatory, onChange } = this.props;
     if (!shouldUsePlays(availablePlays)) {
       return null;
     }
@@ -46,7 +48,10 @@ class PlaysSelector extends Component {
     const playValue = typeof play.join === 'function' ? play.join(',') : play;
     return (
       <FormGroup key="play">
-        <Col componentClass={ControlLabel}sm={3} lg={2}>{label}</Col>
+        <Col componentClass={ControlLabel}sm={3} lg={2}>
+          {label}
+          { mandatory && (<span className="danger-red"> *</span>)}
+        </Col>
         <Col sm={8} lg={9}>
           { editable
             ? <Select
