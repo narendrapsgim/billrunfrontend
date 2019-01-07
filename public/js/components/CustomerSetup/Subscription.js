@@ -268,6 +268,7 @@ class Subscription extends Component {
       (<PlaysSelector
         entity={subscription}
         editable={editable}
+        mandatory={true}
         onChange={this.onChangePlay}
       />),
       (<FormGroup key="plan">
