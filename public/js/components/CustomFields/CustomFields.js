@@ -49,10 +49,10 @@ class CustomFields extends Component {
     }),
     defaultHiddenFields: Immutable.Map({
       customer: Immutable.List(['aid', 'payment_gateway']),
-      subscriber: Immutable.List(['sid', 'aid', 'plan_activation']),
-      product: Immutable.List(['from', 'to']),
-      service: Immutable.List(['from', 'to', 'include']),
-      plan: Immutable.List(['from', 'to']),
+      subscriber: Immutable.List(['sid', 'aid', 'plan_activation', 'play']),
+      product: Immutable.List(['from', 'to', 'play']),
+      service: Immutable.List(['from', 'to', 'include', 'play']),
+      plan: Immutable.List(['from', 'to', 'play']),
     }),
     unReorderFields: Immutable.Map({
       product: Immutable.List(['key', 'description', 'rates']),
