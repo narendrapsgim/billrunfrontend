@@ -1,11 +1,12 @@
 import React, { PropTypes } from 'react';
-import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
+import { Form, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import Immutable from 'immutable';
 import Field from '../../Field';
 
 
 const PlayForm = ({
   item,
+  isNameAlreadyExists,
   isAllowedDisableAction,
   isAllowedEditName,
   isAllowedEditDefault,
@@ -16,7 +17,7 @@ const PlayForm = ({
 }) => (
   <Form horizontal>
     {isAllowedEditName && (
-      <FormGroup>
+      <FormGroup validationState={isNameAlreadyExists ? 'error' : null} >
         <Col componentClass={ControlLabel} sm={3}>
           Name
         </Col>
@@ -25,6 +26,9 @@ const PlayForm = ({
             onChange={onChangeName}
             value={item.get('name', '')}
           />
+          { isNameAlreadyExists && (
+            <HelpBlock>Name already exists</HelpBlock>
+          )}
         </Col>
       </FormGroup>
     )}
@@ -67,6 +71,7 @@ const PlayForm = ({
 
 PlayForm.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
+  isNameAlreadyExists: PropTypes.bool,
   isAllowedDisableAction: PropTypes.bool,
   isAllowedEditName: PropTypes.bool,
   isAllowedEditDefault: PropTypes.bool,
@@ -78,6 +83,7 @@ PlayForm.propTypes = {
 
 PlayForm.defaultProps = {
   item: Immutable.Map(),
+  isNameAlreadyExists: true,
   isAllowedDisableAction: true,
   isAllowedEditName: true,
   isAllowedEditDefault: true,

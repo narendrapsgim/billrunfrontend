@@ -3,6 +3,7 @@ import PlayForm from './PlayForm';
 
 
 const mapStateToProps = (state, props) => ({
+  isNameAlreadyExists: (props.existingNames) && props.existingNames.includes(props.item.get('name')),
   isAllowedDisableAction: !props.item.get('default', false),
   isAllowedEditName: props.mode === 'create',
   isAllowedEditDefault: props.mode === 'create',

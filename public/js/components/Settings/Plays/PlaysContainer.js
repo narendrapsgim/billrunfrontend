@@ -36,6 +36,7 @@ const mapDispatchToProps = (dispatch, props) => ({
       title: 'Create New Paly',
       onOk,
       mode: 'create',
+      existingNames: data.map(play => play.get('name', '')),
     };
     return dispatch(showFormModal(newPlay, PlayForm, config));
   },
