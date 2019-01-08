@@ -73,7 +73,7 @@ class PlaysSelector extends Component {
               value={playValue}
               onChange={onChange}
               multi={multi}
-              placeholder="Neutral"
+              placeholder=""
               clearable={!mandatory}
             />
           : <Field value={playValue} editable={false} />
