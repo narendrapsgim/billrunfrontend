@@ -6,7 +6,7 @@ import { Tabs, Tab, Panel } from 'react-bootstrap';
 import DateTime from './DateTime';
 import Currency from './Currency';
 import Invoicing from './Invoicing';
-import Plays from './Plays';
+import Plays from './Plays/PlaysContainer';
 import Tax from './Tax';
 import Tenant from './Tenant';
 import Security from './Security';
@@ -53,7 +53,7 @@ class Settings extends Component {
 
   state = {
     currencyOptions: [],
-    playsBeforeSave: Immutable.List(),
+    // playsBeforeSave: Immutable.List(),
   };
 
   componentWillMount() {
@@ -123,12 +123,6 @@ class Settings extends Component {
     if (settings.has('system')) {
       categoryToSave.push('system');
     }
-    if (settings.has('plays')) {
-      this.setState({ playsBeforeSave: settings.get('plays') });
-      const playsToSave = settings.get('plays').map(play => play.remove('can_edit_name'));
-      this.props.dispatch(updateSetting('plays', [], playsToSave));
-      categoryToSave.push('plays');
-    }
     if (categoryToSave.length) {
       this.props.dispatch(saveSettings(categoryToSave))
         .then((response) => {
@@ -148,10 +142,6 @@ class Settings extends Component {
         localStorage.removeItem('logo');
         this.props.dispatch(fetchFile({ filename: settings.getIn(['tenant', 'logo'], '') }, 'logo'));
       }
-    } else {
-      // reloads Plays in case error occured and Plays were not saved
-      const { playsBeforeSave } = this.state;
-      this.props.dispatch(updateSetting('plays', [], playsBeforeSave));
     }
   };
 
@@ -244,7 +234,11 @@ class Settings extends Component {
 
         </Tabs>
 
-        <ActionButtons onClickSave={this.onSave} hideCancel={true} hideSave={activeTab === 5} />
+        <ActionButtons
+          onClickSave={this.onSave}
+          hideCancel={true}
+          hideSave={[5, 7].includes(activeTab)}
+        />
 
       </div>
     );
