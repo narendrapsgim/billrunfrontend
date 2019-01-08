@@ -38,6 +38,20 @@ class PlaysSelector extends Component {
     this.props.dispatch(getSettings(['plays']));
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { availablePlays, mandatory, editable, onChange, entity } = this.props;
+    // Set default play in edit mode if it required and not set.
+    const playsLoadedComplete = !nextProps.availablePlays.isEmpty() && Immutable.is(availablePlays, nextProps.availablePlays);
+    const playNotSet = entity.get('play', null) === null;
+    if (playNotSet && mandatory && editable && playsLoadedComplete) {
+      const defaultPlay = nextProps.availablePlays.find(
+        availablePlay => availablePlay.get('enabled', true) && availablePlay.get('default', false),
+        null, nextProps.availablePlays.first(),
+      ).get('name', '');
+      onChange(defaultPlay);
+    }
+  }
+
   render() {
     const { availablePlays, entity, editable, multi, mandatory, onChange } = this.props;
     if (!shouldUsePlays(availablePlays)) {
@@ -59,6 +73,8 @@ class PlaysSelector extends Component {
               value={playValue}
               onChange={onChange}
               multi={multi}
+              placeholder="Neutral"
+              clearable={!mandatory}
             />
           : <Field value={playValue} editable={false} />
           }
