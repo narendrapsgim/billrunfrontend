@@ -63,6 +63,11 @@ export default class DiscountDetails extends Component {
     this.props.onFieldUpdate(['cycles'], newValue);
   }
 
+  onChangeProrated = (e) => {
+    const { value } = e.target;
+    this.props.onFieldUpdate(['prorated'], value);
+  }
+
   onChangeLimit = (value) => {
     const newValue = isNumber(value) ? parseFloat(value) : value;
     this.props.onFieldUpdate(['limit'], newValue);
@@ -202,6 +207,7 @@ export default class DiscountDetails extends Component {
     const plansOptions = this.createPlansOptions();
     const servicesOptions = this.createServicesOptions();
     const services = discount.getIn(['params', 'service'], Immutable.List()).join(',');
+    const proratedValue = discount.get('prorated', true);
     return (
       <Row>
         <Col lg={12}>
@@ -259,12 +265,24 @@ export default class DiscountDetails extends Component {
               </FormGroup>
             </Panel>
 
-            <EntityFields
-              entityName="discounts"
-              entity={discount}
-              onChangeField={this.onChangeAdditionalField}
-              editable={editable}
-            />
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
+                <Col sm={8} lg={9} style={{ paddingTop: 7 }}>
+                  <Field
+                    value={proratedValue}
+                    onChange={this.onChangeProrated}
+                    fieldType="checkbox"
+                    editable={editable}
+                  />
+                </Col>
+              </FormGroup>
+
+              <EntityFields
+                entityName="discounts"
+                entity={discount}
+                onChangeField={this.onChangeAdditionalField}
+                editable={editable}
+              />
 
             <Panel header={<h3>Discount Conditions</h3>}>
               <FormGroup>
