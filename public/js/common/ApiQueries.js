@@ -307,7 +307,7 @@ export const getEntityByIdQuery = (collection, id) => ({
   ],
 });
 
-export const getEntitesQuery = (collection, project = {}, query = {}) => {
+export const getEntitesQuery = (collection, project = {}, query = {}, sort = null) => {
   let action;
   switch (collection) {
     case 'users':
@@ -324,7 +324,7 @@ export const getEntitesQuery = (collection, project = {}, query = {}) => {
       { size: 9999 },
       { query: JSON.stringify(query) },
       { project: JSON.stringify(project) },
-      { sort: JSON.stringify(project) },
+      { sort: JSON.stringify(sort || project) },
     ],
   });
 };
@@ -353,7 +353,7 @@ export const getDeleteLineQuery = id => ({
 // List
 export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
-export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, quantitative: 1, balance_period: 1 });
+export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, play: 1, quantitative: 1, balance_period: 1 }, {}, { name: 1 	});
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
 export const getProductsKeysQuery = (project = { key: 1, description: 1 }, query = {}) => getEntitesQuery('rates', project, query);
 export const getRetailProductsKeysQuery = (project = { key: 1, description: 1 }) => {
@@ -369,7 +369,7 @@ export const getIncludedServicesKeysQuery = () => getEntitesQuery('services', { 
   quantitative: { $ne: true },
   balance_period: { $exists: false },
 });
-export const getPlansKeysQuery = (project = { name: 1, description: 1 }) => getEntitesQuery('plans', project);
+export const getPlansKeysQuery = (project = { name: 1, description: 1 }, query = {}, sort = { name: 1 }) => getEntitesQuery('plans', project, query, sort);
 export const getUserKeysQuery = () => getEntitesQuery('users', { username: 1 });
 export const getAllGroupsQuery = () => ([
   getGroupsQuery('plans'),
