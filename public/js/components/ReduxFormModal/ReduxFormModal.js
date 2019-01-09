@@ -2,11 +2,14 @@ import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { ModalWrapper } from '../Elements';
 
-const form = (WrappedComponent, item, setItem, updateField, removeField, otherProps = {}) => (
+const form = (WrappedComponent, {
+  item, setItem, updateField, removeField, setError, ...otherProps
+}) => (
   <WrappedComponent
     {...otherProps}
     item={item}
     setItem={setItem}
+    setError={setError}
     updateField={updateField}
     removeField={removeField}
   />
@@ -14,9 +17,8 @@ const form = (WrappedComponent, item, setItem, updateField, removeField, otherPr
 
 const ReduxFormModal = (props) => {
   const {
-    show, item, component, config, // variabls
-    hideModal, closeModal, setItem, updateField, removeField, // functions
-    ...otherProps // all othet to pass down
+    show, item, component, config, hideModal, closeModal, errors,
+    ...otherProps
   } = props;
   if (!show) {
     return null;
@@ -25,9 +27,16 @@ const ReduxFormModal = (props) => {
     throw new Error('ReduxFormModal require component parameter');
   }
   const {
-    title, labelOk = 'Save', onOk, labelCancel = 'Cancel', onCancel, modalSize = 'large', ...configOtherProps
+    title, labelOk = 'Save', onOk, labelCancel = 'Cancel', onCancel, modalSize = 'large',
+    allowSubmitWithError = false, ...configOtherProps
   } = config.toJS();
   const onOkWithHide = () => {
+    if (!allowSubmitWithError) {
+      const hasError = errors.some(error => !error || error.length > 0);
+      if (hasError) {
+        return false;
+      }
+    }
     const callback = hideModal(onOk);
     return callback(item);
   };
@@ -43,14 +52,12 @@ const ReduxFormModal = (props) => {
       onHide={closeModal}
       modalSize={modalSize}
     >
-      {form(
-        component,
+      { form(component, {
         item,
-        setItem,
-        updateField,
-        removeField,
-        { ...otherProps, ...configOtherProps },
-      )}
+        errors,
+        ...otherProps,
+        ...configOtherProps,
+      })}
     </ModalWrapper>
   );
 };
@@ -60,6 +67,7 @@ ReduxFormModal.defaultProps = {
   item: undefined,
   component: undefined,
   config: Immutable.Map(),
+  errors: Immutable.Map(),
 };
 
 ReduxFormModal.propTypes = {
@@ -70,9 +78,11 @@ ReduxFormModal.propTypes = {
     PropTypes.func,
   ]),
   config: PropTypes.instanceOf(Immutable.Map),
+  errors: PropTypes.instanceOf(Immutable.Map),
   hideModal: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
   setItem: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
   updateField: PropTypes.func.isRequired,
   removeField: PropTypes.func.isRequired,
 };
