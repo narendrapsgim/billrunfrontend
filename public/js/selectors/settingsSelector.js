@@ -271,6 +271,19 @@ export const playsSettingsSelector = createSelector(
   plays => plays,
 );
 
+export const playsEnabledSelector = createSelector(
+  playsSettingsSelector,
+  (plays = Immutable.List()) => (plays
+    ? plays.filter(play => play.get('enabled', true))
+    : Immutable.List()
+  ),
+);
+
+export const playsIsEnabledSelector = createSelector(
+  playsEnabledSelector,
+  (plays = Immutable.List()) => plays && plays.size > 1,
+);
+
 export const availablePlaysSettingsSelector = createSelector(
   getPlaysSettings,
   plays => (plays ? plays.filter(play => play.get('enabled', true)) : undefined),
