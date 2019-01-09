@@ -1,29 +1,40 @@
 import { connect } from 'react-redux';
+import { titleCase } from 'change-case';
 import PlayForm from './PlayForm';
 
-
 const mapStateToProps = (state, props) => ({
-  isNameAlreadyExists: (props.existingNames) && props.existingNames.includes(props.item.get('name')),
   isAllowedDisableAction: !props.item.get('default', false),
   isAllowedEditName: props.mode === 'create',
   isAllowedEditDefault: props.mode === 'create',
+  isNameHasError: (props.errors) && props.errors.get('name', false),
 });
 
 
-const mapDispatchToProps = (dispatch, { item, mode, updateField, ...otherProps }) => ({ // eslint-disable-line no-unused-vars
+const mapDispatchToProps = (dispatch, props) => ({
 
   onChangeName: (e) => {
+    const { item, updateField, setError, existingNames, errors } = props;
     const { value } = e.target;
     const cleanValue = value.toUpperCase().replace(globalSetting.keyUppercaseCleanRegex, '');
     updateField(['name'], cleanValue);
+    if (existingNames.includes(cleanValue)) {
+      setError('name', 'Name already exists');
+    } else if (errors.get('name', false)) {
+      setError('name');
+    }
+    if (item.get('label', '') === '' || item.get('label', '').toUpperCase() === item.get('name', '').toUpperCase()) {
+      updateField('label', titleCase(cleanValue));
+    }
   },
 
   onChangeLabel: (e) => {
+    const { updateField } = props;
     const { value } = e.target;
     updateField('label', value);
   },
 
   onChangeDefault: (e) => {
+    const { updateField } = props;
     const { value } = e.target;
     updateField('default', value);
     if (value) {
@@ -32,6 +43,7 @@ const mapDispatchToProps = (dispatch, { item, mode, updateField, ...otherProps }
   },
 
   onChangeEnabled: (e) => {
+    const { updateField } = props;
     const { value } = e.target;
     updateField('enabled', value);
   },

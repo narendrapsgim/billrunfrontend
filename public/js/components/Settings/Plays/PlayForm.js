@@ -6,7 +6,7 @@ import Field from '../../Field';
 
 const PlayForm = ({
   item,
-  isNameAlreadyExists,
+  isNameHasError,
   isAllowedDisableAction,
   isAllowedEditName,
   isAllowedEditDefault,
@@ -17,17 +17,17 @@ const PlayForm = ({
 }) => (
   <Form horizontal>
     {isAllowedEditName && (
-      <FormGroup validationState={isNameAlreadyExists ? 'error' : null} >
+      <FormGroup validationState={isNameHasError ? 'error' : null} >
         <Col componentClass={ControlLabel} sm={3}>
-          Name
+          Name <span className="danger-red"> *</span>
         </Col>
         <Col sm={7}>
           <Field
             onChange={onChangeName}
             value={item.get('name', '')}
           />
-          { isNameAlreadyExists && (
-            <HelpBlock>Name already exists</HelpBlock>
+          { isNameHasError && (
+            <HelpBlock>{isNameHasError}</HelpBlock>
           )}
         </Col>
       </FormGroup>
@@ -71,7 +71,10 @@ const PlayForm = ({
 
 PlayForm.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
-  isNameAlreadyExists: PropTypes.bool,
+  isNameHasError: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.bool,
+  ]),
   isAllowedDisableAction: PropTypes.bool,
   isAllowedEditName: PropTypes.bool,
   isAllowedEditDefault: PropTypes.bool,
@@ -83,7 +86,7 @@ PlayForm.propTypes = {
 
 PlayForm.defaultProps = {
   item: Immutable.Map(),
-  isNameAlreadyExists: true,
+  isNameHasError: false,
   isAllowedDisableAction: true,
   isAllowedEditName: true,
   isAllowedEditDefault: true,

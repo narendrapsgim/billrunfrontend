@@ -2,8 +2,9 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import Plays from './Plays';
 import PlayForm from './PlayFormContainer';
-import { showFormModal } from '../../../actions/guiStateActions/pageActions';
+import { showFormModal, setFormModalError } from '../../../actions/guiStateActions/pageActions';
 import { saveSettings, getSettings } from '../../../actions/settingsActions';
+
 
 const mapStateToProps = null; // eslint-disable-line no-unused-vars
 
@@ -18,6 +19,10 @@ const mapDispatchToProps = (dispatch, props) => ({
       default: data.isEmpty(),
     });
     const onOk = (newItem) => {
+      if (newItem.get('name', '') === '') {
+        dispatch(setFormModalError('name', 'Name is required'));
+        return false;
+      }
       if (newItem.get('default', false)) {
         data.forEach((p, index) => {
           props.onChange('plays', [index, 'default'], false);
