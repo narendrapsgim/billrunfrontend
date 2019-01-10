@@ -113,7 +113,7 @@ export default class ServiceDetails extends Component {
 
         <PlaysSelector
           entity={item}
-          editable={editable}
+          editable={editable && mode === 'create'}
           multi={true}
           onChange={this.onChangePlays}
         />

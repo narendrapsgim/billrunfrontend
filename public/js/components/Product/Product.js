@@ -236,7 +236,7 @@ class Product extends Component {
 
               <PlaysSelector
                 entity={product}
-                editable={editable}
+                editable={editable && mode === 'create'}
                 onChange={this.onChangePlay}
               />
 

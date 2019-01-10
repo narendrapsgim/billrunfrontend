@@ -307,6 +307,7 @@ class Subscription extends Component {
 
   renderSystemFields = (editable) => {
     const { subscription } = this.state;
+    const { mode } = this.props;
     const plansOptions = this.getAvailablePlans().toJS();
     const servicesOptions = this.getAvailableServices().toJS();
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
@@ -315,7 +316,7 @@ class Subscription extends Component {
     return ([
       (<PlaysSelector
         entity={subscription}
-        editable={editable}
+        editable={editable && mode === 'create'}
         mandatory={true}
         onChange={this.onChangePlay}
       />),

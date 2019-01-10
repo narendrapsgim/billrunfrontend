@@ -185,7 +185,7 @@ export default class Plan extends Component {
 
               <PlaysSelector
                 entity={plan}
-                editable={editable}
+                editable={editable && mode === 'create'}
                 multi={true}
                 onChange={this.onChangePlays}
               />
