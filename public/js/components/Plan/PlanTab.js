@@ -78,7 +78,7 @@ export default class Plan extends Component {
 
   onChangePlays = (plays) => {
     const playsToSave = plays === '' ? [] : plays.split(',');
-    this.props.onChangeFieldValue(['play'], playsToSave);
+    this.props.onChangeFieldValue(['play'], Immutable.List(playsToSave));
   }
 
   onChangePlanEach = (e) => {

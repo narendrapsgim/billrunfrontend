@@ -73,7 +73,7 @@ export default class ServiceDetails extends Component {
 
   onChangePlays = (plays) => {
     const playsToSave = plays === '' ? [] : plays.split(',');
-    this.props.updateItem(['play'], playsToSave);
+    this.props.updateItem(['play'], Immutable.List(playsToSave));
   }
 
   onChangeDescription = (e) => {

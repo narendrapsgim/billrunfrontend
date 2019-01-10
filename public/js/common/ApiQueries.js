@@ -3,7 +3,7 @@ import moment from 'moment';
 import { escapeRegExp } from './Util';
 
 // TODO: fix to uniqueget (for now billAoi can't search by 'rates')
-export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
+export const searchProductsByKeyAndUsagetQuery = (usages, notKeys, plays = '') => {
   const usagesToQuery = Array.isArray(usages) ? usages : [usages];
   const query = {
     key: {
@@ -11,9 +11,20 @@ export const searchProductsByKeyAndUsagetQuery = (usages, notKeys) => {
     },
     to: { $gt: moment().toISOString() }, // only active and future
     tariff_category: 'retail', // only retail products
+    $and: [], // for addition conditions
   };
   if (usagesToQuery[0] !== 'cost') {
-    query.$or = usagesToQuery.map(usage => ({ [`rates.${usage}`]: { $exists: true } }));
+    query.$and.push(
+      { $or: usagesToQuery.map(usage => ({ [`rates.${usage}`]: { $exists: true } })) },
+    );
+  }
+  if (plays !== '') {
+    query.$and.push(
+      { $or: [
+        { play: { $exists: true, $in: [...plays.split(','), '', null] } },
+        { play: { $exists: false } },
+      ] },
+    );
   }
 
   const formData = new FormData();
@@ -355,7 +366,8 @@ export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans',
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, play: 1, quantitative: 1, balance_period: 1 }, {}, { name: 1 	});
 export const getPrepaidIncludesQuery = () => getEntitesQuery('prepaidincludes');
-export const getProductsKeysQuery = (project = { key: 1, description: 1 }, query = {}) => getEntitesQuery('rates', project, query);
+export const getProductsKeysQuery = (project = { key: 1, description: 1, play: 1 }, query = {}, sort = { key: 1 }) =>
+  getEntitesQuery('rates', project, query, sort);
 export const getRetailProductsKeysQuery = (project = { key: 1, description: 1 }) => {
   const query = { tariff_category: 'retail' };
   return getEntitesQuery('rates', project, query);
@@ -365,7 +377,7 @@ export const getRetailProductsWithRatesQuery = () =>
 export const getProductsWithRatesQuery = () =>
   getProductsKeysQuery({ key: 1, description: 1, rates: 1 });
 export const getServicesKeysQuery = () => getEntitesQuery('services', { name: 1 });
-export const getIncludedServicesKeysQuery = () => getEntitesQuery('services', { name: 1 }, {
+export const getIncludedServicesKeysQuery = () => getEntitesQuery('services', { name: 1, play: 1 }, {
   quantitative: { $ne: true },
   balance_period: { $exists: false },
 });
