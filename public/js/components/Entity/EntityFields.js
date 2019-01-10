@@ -53,6 +53,26 @@ class EntityFields extends Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) { // eslint-disable-line no-unused-vars
+    const { fields, entity } = this.props;
+    const { entity: oldEntity } = prevProps;
+
+    const isMultiple = fields.find(field => field.get('field_name', '') === 'play',
+      null, Immutable.Map(),
+    ).get('multiple', false);
+    const shouldResetFields = isMultiple ?
+      !Immutable.is(entity.get('play', Immutable.List()), oldEntity.get('play', Immutable.List()))
+      : entity.get('play', '') !== oldEntity.get('play', '')
+    if (shouldResetFields) {
+      fields.forEach((field) => {
+        const shoudPlayBeDisplayd = this.filterPlayFields(field);
+        if (!shoudPlayBeDisplayd) {
+          this.props.onChangeField(field.get('field_name', '').split('.'), '');
+        }
+      });
+    }
+  }
+
   getParamsOptions = () => {
     const { fields, fieldsFilter, highlightPramas } = this.props;
     const fieldFilterFunction = fieldsFilter !== null ? fieldsFilter : this.filterPrintableFields;
