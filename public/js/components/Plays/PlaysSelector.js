@@ -80,7 +80,7 @@ class PlaysSelector extends Component {
       this.forceUpdate();
     };
     const onOk = () => {
-      this.props.onChange(plays);
+      this.props.onChange(plays, true);
     };
     const confirm = {
       message: 'Changing play value will remove all play related data',
