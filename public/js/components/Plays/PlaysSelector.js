@@ -83,12 +83,12 @@ class PlaysSelector extends Component {
       this.props.onChange(plays, true);
     };
     const confirm = {
-      message: 'Changing play value will remove all play related data',
-      children: 'Are you sure you want to change play?',
+      children: 'By removing play value all play related data will be removed',
+      message: 'Are you sure you want to change play?',
       onOk,
       onCancel,
       type: 'delete',
-      labelOk: 'Change',
+      labelOk: 'Yes',
     };
     return this.props.dispatch(showConfirmModal(confirm));
   }
