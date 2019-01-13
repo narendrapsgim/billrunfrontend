@@ -76,7 +76,6 @@ class PlaysSelector extends Component {
       return this.props.onChange(newPlays.join(','));
     }
     const onCancel = () => {
-      this.props.onChange(oldPlays.join(','));
       this.forceUpdate();
     };
     const onOk = () => {
