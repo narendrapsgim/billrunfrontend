@@ -5,6 +5,7 @@ import { FormGroup, ControlLabel, Col } from 'react-bootstrap';
 import Select from 'react-select';
 import Field from '../Field';
 import { getSettings } from '../../actions/settingsActions';
+import { showConfirmModal } from '../../actions/guiStateActions/pageActions';
 import {
   availablePlaysSettingsSelector,
 } from '../../selectors/settingsSelector';
@@ -52,14 +53,53 @@ class PlaysSelector extends Component {
     }
   }
 
+  playsValueToList = (plays) => {
+    if (plays === '') {
+      return Immutable.List();
+    }
+    if (Immutable.List.isList(plays)) {
+      return plays;
+    }
+    if (Array.isArray(plays)) {
+      return Immutable.List([...plays]);
+    }
+    return Immutable.List(plays.split(','));
+  }
+
+  onChange = (plays) => {
+    const { entity } = this.props;
+    const oldPlays = this.playsValueToList(entity.get('play', ''));
+    const newPlays = this.playsValueToList(plays);
+    // its ok to add play, only on remove play we need to remove all related data
+    const isNewPlayAdded = oldPlays.every(oldPlay => newPlays.includes(oldPlay));
+    if (isNewPlayAdded) {
+      return this.props.onChange(newPlays.join(','));
+    }
+    const onCancel = () => {
+      this.props.onChange(oldPlays.join(','));
+      this.forceUpdate();
+    };
+    const onOk = () => {
+      this.props.onChange(plays);
+    };
+    const confirm = {
+      message: 'Changing play value will remove all play related data',
+      children: 'Are you sure you want to change play?',
+      onOk,
+      onCancel,
+      type: 'delete',
+      labelOk: 'Change',
+    };
+    return this.props.dispatch(showConfirmModal(confirm));
+  }
+
   render() {
-    const { availablePlays, entity, editable, multi, mandatory, onChange } = this.props;
+    const { availablePlays, entity, editable, multi, mandatory } = this.props;
     if (!shouldUsePlays(availablePlays)) {
       return null;
     }
-    const play = entity.get('play', '');
     const label = multi ? 'Play/s' : 'Play';
-    const playValue = typeof play.join === 'function' ? play.join(',') : play;
+    const playValue = this.playsValueToList(entity.get('play', '')).join(',');
     return (
       <FormGroup key="play">
         <Col componentClass={ControlLabel}sm={3} lg={2}>
@@ -71,7 +111,7 @@ class PlaysSelector extends Component {
             ? <Select
               options={getPlayOptions(availablePlays)}
               value={playValue}
-              onChange={onChange}
+              onChange={this.onChange}
               multi={multi}
               placeholder=""
               clearable={!mandatory}
