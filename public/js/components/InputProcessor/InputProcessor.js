@@ -50,7 +50,13 @@ import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { usageTypeSelector, usageTypesDataSelector, propertyTypeSelector } from '../../selectors/settingsSelector';
+import {
+  usageTypeSelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
+  subscriberFieldsSelector,
+  productFieldsSelector,
+} from '../../selectors/settingsSelector';
 
 class InputProcessor extends Component {
 
@@ -583,8 +589,8 @@ const mapStateToProps = (state, props) => {
     usageTypes: usageTypeSelector(state, props),
     propertyTypes: propertyTypeSelector(state, props),
     usageTypesData: usageTypesDataSelector(state, props),
-    subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
-    customRatingFields: state.settings.getIn(['rates', 'fields'], Immutable.List()),
+    subscriberFields: subscriberFieldsSelector(state, props),
+    customRatingFields: productFieldsSelector(state, props),
     fileType,
     action,
     template,
