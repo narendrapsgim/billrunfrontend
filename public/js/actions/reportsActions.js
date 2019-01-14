@@ -119,6 +119,8 @@ export const getFileTypesOptions = () => dispatch => dispatch(getSettings('file_
 
 export const getEventCodeOptions = () => dispatch => dispatch(getSettings('events'));
 
+export const getPlayTypeOptions = () => dispatch => dispatch(getSettings('plays'));
+
 export const getGroupsOptions = () => dispatch => apiBillRun(getAllGroupsQuery())
   .then((success) => {
     try {

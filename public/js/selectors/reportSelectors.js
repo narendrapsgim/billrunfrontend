@@ -30,6 +30,7 @@ import {
   calcNameSelector,
   bucketsNamesSelector,
   bucketsExternalIdsSelector,
+  getPlayTypeOptions,
 } from './listSelectors';
 
 
@@ -278,6 +279,7 @@ const getOptionCallback = (state, props) => {
     case 'getBucketsOptions': return bucketsNamesSelector(state, props);
     case 'getBucketsExternalIdsOptions': return bucketsExternalIdsSelector(state, props);
     case 'getFileTypeOptions': return fileTypeSelector(state, props);
+    case 'getPlayTypeOptions': return getPlayTypeOptions(state, props);
     case 'getCalcNameOptions': return calcNameSelector(state, props);
     case 'getEventCodeOptions': return eventCodeSelector(state, props);
     default: return undefined;
