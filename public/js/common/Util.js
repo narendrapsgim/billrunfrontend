@@ -511,11 +511,11 @@ export const setFieldTitle = (field, entity, keyProperty = 'field_name') => {
   return field.set('title', getFieldName(key, entityName, defaultLable));
 };
 
-export const addPlayToFieldTitle = (field, plays) => {
+export const addPlayToFieldTitle = (field, plays = Immutable.Map()) => {
   const fieldPlays = field.get('plays', Immutable.List());
   if (!fieldPlays.isEmpty()) {
     const fieldPlayLabels = fieldPlays.reduce(
-      (result, playName) => result.push(plays.get(playName, '')),
+      (result, playName) => result.push(plays.get(playName, playName)),
       Immutable.List(),
     ).join(', ');
     return field.set('title', `${field.get('title', '')} (${fieldPlayLabels})`);
