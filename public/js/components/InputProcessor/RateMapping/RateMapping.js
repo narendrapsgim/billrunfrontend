@@ -58,6 +58,8 @@ class RateMapping extends Component {
     });
   };
 
+  sortFiledByPlay = field => (field.get('plays', Immutable.List()).isEmpty() ? 1 : -1)
+
   filterFiledByPlay = (field) => {
     const { plays } = this.props;
     const fieldPlays = field.get('plays', Immutable.List());
@@ -72,6 +74,7 @@ class RateMapping extends Component {
     return customRatingFields
       .filter(field => (field.get('field_name', '').startsWith('params.')))
       .filter(this.filterFiledByPlay)
+      .sort(this.sortFiledByPlay)
       .map(field => ({
         value: field.get('field_name', ''),
         label: field.get('title', ''),
