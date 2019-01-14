@@ -7,6 +7,7 @@ import {
   getConfig,
   createRateListNameByArgs,
   sortFieldOption,
+  addPlayToFieldTitle,
 } from '../common/Util';
 import {
   subscriberFieldsSelector,
@@ -17,6 +18,7 @@ import {
   usageTypeSelector,
   fileTypeSelector,
   eventCodeSelector,
+  availablePlaysLabelsSelector,
 } from './settingsSelector';
 import {
   listByNameSelector,
@@ -193,8 +195,14 @@ const reportLinesFieldsSelector = createSelector(
   selectReportLinesFields,
 );
 
-const reportSubscriberFieldsSelector = createSelector(
+const subscriberFieldsWithPlaySelector = createSelector(
   subscriberFieldsSelector,
+  availablePlaysLabelsSelector,
+  (fields, plays) => fields.map(field => addPlayToFieldTitle(field, plays)),
+);
+
+const reportSubscriberFieldsSelector = createSelector(
+  subscriberFieldsWithPlaySelector,
   () => 'subscribers',
   mergeEntityAndReportConfigFields,
 );
