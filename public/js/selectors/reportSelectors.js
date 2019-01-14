@@ -7,10 +7,9 @@ import {
   getConfig,
   createRateListNameByArgs,
   sortFieldOption,
-  addPlayToFieldTitle,
 } from '../common/Util';
 import {
-  subscriberFieldsSelector,
+  subscriberFieldsWithPlaySelector,
   inputProssesorfilteredFieldsSelector,
   accountFieldsSelector,
   linesFieldsSelector,
@@ -18,7 +17,7 @@ import {
   usageTypeSelector,
   fileTypeSelector,
   eventCodeSelector,
-  availablePlaysLabelsSelector,
+  isPlaysEnabledSelector,
 } from './settingsSelector';
 import {
   listByNameSelector,
@@ -114,7 +113,7 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
   })
 );
 
-const mergeEntityAndReportConfigFields = (billrunConfigFields, type) => {
+const mergeEntityAndReportConfigFields = (billrunConfigFields, type, isPlayEnabled = false) => {
   const entityFields = (type === 'queue') ? billrunConfigFields : formatReportFields(billrunConfigFields);
   const defaultField = Immutable.Map({
     searchable: true,
@@ -125,7 +124,7 @@ const mergeEntityAndReportConfigFields = (billrunConfigFields, type) => {
     entityFields.forEach((entityField) => {
       fieldsWithMutations.push(entityField);
     });
-    // Push report config fields or overide if exist
+    // Push report config fields or override if exist
     getReportEntityConfigFields(type).forEach((predefinedFiled) => {
       const index = fieldsWithMutations.findIndex(field => field.get('id', '') === predefinedFiled.get('id', ''));
       if (index === -1) {
@@ -143,6 +142,9 @@ const mergeEntityAndReportConfigFields = (billrunConfigFields, type) => {
       }
     });
   })
+  .filter(field => (
+    field.get('id') !== 'play' || (field.get('id') === 'play' && isPlayEnabled)
+  ))
   .sort(sortFieldOption);
 };
 
@@ -196,51 +198,52 @@ const reportLinesFieldsSelector = createSelector(
   selectReportLinesFields,
 );
 
-const subscriberFieldsWithPlaySelector = createSelector(
-  subscriberFieldsSelector,
-  availablePlaysLabelsSelector,
-  (fields, plays) => fields.map(field => addPlayToFieldTitle(field, plays)),
-);
-
 const reportSubscriberFieldsSelector = createSelector(
   subscriberFieldsWithPlaySelector,
   () => 'subscribers',
+  isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
 const reportAccountFieldsSelector = createSelector(
   accountFieldsSelector,
   () => 'account',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 const reportlogFileFieldsSelector = createSelector(
   () => Immutable.List(),
   () => 'logFile',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 const reportEventFileFieldsSelector = createSelector(
   () => Immutable.List(),
   () => 'event',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 export const reportUsageFieldsSelector = createSelector(
   reportLinesFieldsSelector,
   () => 'usage',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 const reportQueueFieldsSelector = createSelector(
   reportUsageFieldsSelector,
   () => 'queue',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 const reportBillsSelector = createSelector(
   () => Immutable.List(),
   () => 'bills',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 

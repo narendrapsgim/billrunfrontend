@@ -280,6 +280,11 @@ export const playsEnabledSelector = createSelector(
   ),
 );
 
+export const isPlaysEnabledSelector = createSelector(
+  playsEnabledSelector,
+  (playsEnabled = Immutable.List()) => playsEnabled.size > 1,
+);
+
 export const playsIsEnabledSelector = createSelector(
   playsEnabledSelector,
   (plays = Immutable.List()) => plays && plays.size > 1,
@@ -397,8 +402,9 @@ export const subscriberFieldsSelector = createSelector(
 export const subscriberFieldsWithPlaySelector = createSelector(
   subscriberFieldsSelector,
   availablePlaysLabelsSelector,
-  (fields = Immutable.List(), plays = Immutable.Map()) =>
-    fields.map(field => addPlayToFieldTitle(field, plays)),
+  isPlaysEnabledSelector,
+  (fields = Immutable.List(), plays = Immutable.Map(), isPlaysEnabled = false) =>
+    fields.map(field => (isPlaysEnabled ? addPlayToFieldTitle(field, plays) : field)),
 );
 
 export const linesFieldsSelector = createSelector(
