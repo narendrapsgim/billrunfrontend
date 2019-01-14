@@ -71,7 +71,7 @@ class CustomerMapping extends Component {
         .sort(field => (field.get('unique', false) ? -1 : 1))
         .map((field, key) => {
           const value = field.get('field_name', '');
-          const label = getFieldName(value, 'customerIdentification');
+          const label = getFieldName(value, 'customerIdentification', field.get('title', ''));
           const optionClass = classNames({
             'label-text': field.get('unique', false),
             disabled: !field.get('unique', false),
