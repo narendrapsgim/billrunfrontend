@@ -511,6 +511,18 @@ export const setFieldTitle = (field, entity, keyProperty = 'field_name') => {
   return field.set('title', getFieldName(key, entityName, defaultLable));
 };
 
+export const addPlayToFieldTitle = (field, plays) => {
+  const fieldPlays = field.get('plays', Immutable.List());
+  if (!fieldPlays.isEmpty()) {
+    const fieldPlayLabels = fieldPlays.reduce(
+      (result, playName) => result.push(plays.get(playName, '')),
+      Immutable.List(),
+    ).join(', ');
+    return field.set('title', `${field.get('title', '')} (${fieldPlayLabels})`);
+  }
+  return field;
+};
+
 export const toImmutableList = (value) => {
   if ([undefined, null].includes(value)) {
     return Immutable.List();

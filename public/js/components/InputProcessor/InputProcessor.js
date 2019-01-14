@@ -54,8 +54,8 @@ import {
   usageTypeSelector,
   usageTypesDataSelector,
   propertyTypeSelector,
-  subscriberFieldsSelector,
   productFieldsSelector,
+  subscriberFieldsWithPlaySelector,
 } from '../../selectors/settingsSelector';
 
 class InputProcessor extends Component {
@@ -589,7 +589,7 @@ const mapStateToProps = (state, props) => {
     usageTypes: usageTypeSelector(state, props),
     propertyTypes: propertyTypeSelector(state, props),
     usageTypesData: usageTypesDataSelector(state, props),
-    subscriberFields: subscriberFieldsSelector(state, props),
+    subscriberFields: subscriberFieldsWithPlaySelector(state, props),
     customRatingFields: productFieldsSelector(state, props),
     fileType,
     action,

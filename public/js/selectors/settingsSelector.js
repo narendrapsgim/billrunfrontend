@@ -6,6 +6,7 @@ import {
   getFieldNameType,
   isLinkerField,
   setFieldTitle,
+  addPlayToFieldTitle,
 } from '../common/Util';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
@@ -371,6 +372,14 @@ export const accountImportFieldsSelector = createSelector(
   selectAccountImportFields,
 );
 
+export const availablePlaysLabelsSelector = createSelector(
+  availablePlaysSettingsSelector,
+  (plays = Immutable.List()) => plays.reduce(
+    (labels, item) => labels.set(item.get('name'), item.get('label')),
+    Immutable.Map(),
+  ),
+);
+
 export const subscriberFieldsSelector = createSelector(
   getSubscriberFields,
   (fields) => {
@@ -383,6 +392,13 @@ export const subscriberFieldsSelector = createSelector(
     }
     return undefined;
   },
+);
+
+export const subscriberFieldsWithPlaySelector = createSelector(
+  subscriberFieldsSelector,
+  availablePlaysLabelsSelector,
+  (fields = Immutable.List(), plays = Immutable.Map()) =>
+    fields.map(field => addPlayToFieldTitle(field, plays)),
 );
 
 export const linesFieldsSelector = createSelector(
