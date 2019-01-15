@@ -129,6 +129,8 @@ class Subscription extends Component {
 
   onChangePlay = (play) => {
     this.updateSubscriptionField(['play'], play);
+    this.filterSubscriptionServicesByPlay(play);
+    this.filterSubscriptionPlanByPlay(play);
   }
 
   onChangeServiceDetails = (index, key, value) => {
@@ -140,6 +142,32 @@ class Subscription extends Component {
     const { subscription } = this.state;
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     const newServices = services.delete(index);
+    this.updateSubscriptionField(['services'], newServices);
+  }
+
+  filterSubscriptionPlanByPlay = (play) => {
+    const { subscription } = this.state;
+    const { allPlans } = this.props;
+    const selectedPlanPlays = allPlans.find(
+      plan => plan.get('name', '') === subscription.get('plan', ''),
+      null, Immutable.Map(),
+    ).get('play', Immutable.List());
+    if (!selectedPlanPlays.isEmpty() && !selectedPlanPlays.includes(play)) {
+      this.updateSubscriptionField(['plan'], '');
+    }
+  }
+
+  filterSubscriptionServicesByPlay = (play) => {
+    const { allServices } = this.props;
+    const { subscription } = this.state;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const newServices = services.filter((service) => {
+      const servicePlays = allServices.find(
+        option => option.get('name', '') === service.get('name', ''),
+        null, Immutable.Map(),
+      ).get('play', Immutable.List());
+      return servicePlays.isEmpty() || servicePlays.includes(play);
+    });
     this.updateSubscriptionField(['services'], newServices);
   }
 
@@ -226,7 +254,17 @@ class Subscription extends Component {
     label: item.get('description', item.get('name', '')),
   }));
 
-  getAvailablePlans = () => this.formatSelectOptions(this.props.allPlans);
+  getAvailablePlans = () => {
+    const { subscription } = this.state;
+    const { allPlans } = this.props;
+    const play = subscription.get('play', false);
+    if ([false, ''].includes(play)) {
+      return this.formatSelectOptions(allPlans);
+    }
+    return this.formatSelectOptions(allPlans
+      .filter(allPlan => allPlan.get('play', Immutable.List()).isEmpty() || allPlan.get('play', Immutable.List()).includes(play)),
+    );
+  }
 
   getPlanIncludedServices = (planName) => {
     if (planName === '') {
@@ -238,7 +276,17 @@ class Subscription extends Component {
     return includedServices.size ? includedServices.join(', ') : '-';
   }
 
-  getAvailableServices = () => this.formatSelectOptions(this.props.allServices);
+  getAvailableServices = () => {
+    const { subscription } = this.state;
+    const { allServices } = this.props;
+    const play = subscription.get('play', false);
+    if ([false, ''].includes(play)) {
+      return this.formatSelectOptions(allServices);
+    }
+    return this.formatSelectOptions(allServices
+      .filter(allService => allService.get('play', Immutable.List()).isEmpty() || allService.get('play', Immutable.List()).includes(play)),
+    );
+  }
 
   filterCustomFields = (field) => {
     const hiddenFields = ['plan', 'services', 'play'];
@@ -259,6 +307,7 @@ class Subscription extends Component {
 
   renderSystemFields = (editable) => {
     const { subscription } = this.state;
+    const { mode } = this.props;
     const plansOptions = this.getAvailablePlans().toJS();
     const servicesOptions = this.getAvailableServices().toJS();
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
@@ -267,7 +316,8 @@ class Subscription extends Component {
     return ([
       (<PlaysSelector
         entity={subscription}
-        editable={editable}
+        editable={editable && mode === 'create'}
+        mandatory={true}
         onChange={this.onChangePlay}
       />),
       (<FormGroup key="plan">

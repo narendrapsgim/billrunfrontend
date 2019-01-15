@@ -184,6 +184,7 @@ class ServiceSetup extends Component {
     const allowEdit = mode !== 'view';
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
     const planRates = item.get('rates', Immutable.Map());
+    const plays = item.get('play', Immutable.List());
     return (
       <div className="ServiceSetup">
         <Panel>
@@ -215,6 +216,7 @@ class ServiceSetup extends Component {
                 mode={mode}
                 planRates={planRates}
                 onChangeFieldValue={this.onUpdateItem}
+                plays={plays.join(',')}
               />
             </Panel>
           </Tab>
@@ -228,6 +230,7 @@ class ServiceSetup extends Component {
                 onGroupRemove={this.onGroupRemove}
                 mode={mode}
                 type={'service'}
+                plays={plays.join(',')}
               />
             </Panel>
           </Tab>

@@ -6,6 +6,7 @@ import {
   getFieldNameType,
   isLinkerField,
   setFieldTitle,
+  addPlayToFieldTitle,
 } from '../common/Util';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
@@ -271,6 +272,24 @@ export const playsSettingsSelector = createSelector(
   plays => plays,
 );
 
+export const playsEnabledSelector = createSelector(
+  playsSettingsSelector,
+  (plays = Immutable.List()) => (plays
+    ? plays.filter(play => play.get('enabled', true))
+    : Immutable.List()
+  ),
+);
+
+export const isPlaysEnabledSelector = createSelector(
+  playsEnabledSelector,
+  (playsEnabled = Immutable.List()) => playsEnabled.size > 1,
+);
+
+export const playsIsEnabledSelector = createSelector(
+  playsEnabledSelector,
+  (plays = Immutable.List()) => plays && plays.size > 1,
+);
+
 export const availablePlaysSettingsSelector = createSelector(
   getPlaysSettings,
   plays => (plays ? plays.filter(play => play.get('enabled', true)) : undefined),
@@ -358,6 +377,14 @@ export const accountImportFieldsSelector = createSelector(
   selectAccountImportFields,
 );
 
+export const availablePlaysLabelsSelector = createSelector(
+  availablePlaysSettingsSelector,
+  (plays = Immutable.List()) => plays.reduce(
+    (labels, item) => labels.set(item.get('name'), item.get('label')),
+    Immutable.Map(),
+  ),
+);
+
 export const subscriberFieldsSelector = createSelector(
   getSubscriberFields,
   (fields) => {
@@ -370,6 +397,14 @@ export const subscriberFieldsSelector = createSelector(
     }
     return undefined;
   },
+);
+
+export const subscriberFieldsWithPlaySelector = createSelector(
+  subscriberFieldsSelector,
+  availablePlaysLabelsSelector,
+  isPlaysEnabledSelector,
+  (fields = Immutable.List(), plays = Immutable.Map(), isPlaysEnabled = false) =>
+    fields.map(field => (isPlaysEnabled ? addPlayToFieldTitle(field, plays) : field)),
 );
 
 export const linesFieldsSelector = createSelector(

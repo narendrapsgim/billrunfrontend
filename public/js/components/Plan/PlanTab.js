@@ -76,9 +76,14 @@ export default class Plan extends Component {
     this.props.onChangeFieldValue(['description'], value);
   }
 
-  onChangePlays = (plays) => {
+  onChangePlays = (plays, playWasRemoved = false) => {
     const playsToSave = plays === '' ? [] : plays.split(',');
-    this.props.onChangeFieldValue(['play'], playsToSave);
+    this.props.onChangeFieldValue(['play'], Immutable.List(playsToSave));
+    if (playWasRemoved) {
+      this.props.onChangeFieldValue(['rates'], Immutable.Map());
+      this.props.onChangeFieldValue(['include', 'groups'], Immutable.Map());
+      this.props.onChangeFieldValue(['include', 'services'], Immutable.List());
+    }
   }
 
   onChangePlanEach = (e) => {
@@ -185,7 +190,7 @@ export default class Plan extends Component {
 
               <PlaysSelector
                 entity={plan}
-                editable={editable}
+                editable={editable && mode === 'create'}
                 multi={true}
                 onChange={this.onChangePlays}
               />

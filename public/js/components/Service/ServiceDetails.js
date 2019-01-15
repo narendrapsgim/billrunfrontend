@@ -71,9 +71,13 @@ export default class ServiceDetails extends Component {
     this.props.updateItem(['quantitative'], value);
   }
 
-  onChangePlays = (plays) => {
+  onChangePlays = (plays, playWasRemoved = false) => {
     const playsToSave = plays === '' ? [] : plays.split(',');
-    this.props.updateItem(['play'], playsToSave);
+    this.props.updateItem(['play'], Immutable.List(playsToSave));
+    if (playWasRemoved) {
+      this.props.updateItem(['rates'], Immutable.Map());
+      this.props.updateItem(['include', 'groups'], Immutable.Map());
+    }
   }
 
   onChangeDescription = (e) => {
@@ -113,7 +117,7 @@ export default class ServiceDetails extends Component {
 
         <PlaysSelector
           entity={item}
-          editable={editable}
+          editable={editable && mode === 'create'}
           multi={true}
           onChange={this.onChangePlays}
         />

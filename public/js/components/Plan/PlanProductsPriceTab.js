@@ -40,6 +40,7 @@ class PlanProductsPriceTab extends Component {
     planRates: PropTypes.instanceOf(Immutable.Map),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
+    plays: PropTypes.string,
     mode: PropTypes.string,
     originalRates: PropTypes.instanceOf(Immutable.Map),
     products: PropTypes.instanceOf(Immutable.List),
@@ -52,6 +53,7 @@ class PlanProductsPriceTab extends Component {
     planRates: Immutable.Map(),
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
+    plays: '',
     mode: 'create',
     originalRates: Immutable.Map(),
     products: Immutable.List(),
@@ -228,6 +230,14 @@ class PlanProductsPriceTab extends Component {
       .toArray();
   }
 
+  filterByPlay = (option) => {
+    const { plays } = this.props;
+    if (plays !== '' && option.play) {
+      return plays.split(',').includes(option.play);
+    }
+    return true;
+  }
+
   render() {
     const { planRates, mode } = this.props;
     const editable = (mode !== 'view');
@@ -243,7 +253,10 @@ class PlanProductsPriceTab extends Component {
               <Panel header={panelTitle}>
                 <ProductSearch
                   onSelectProduct={this.onSelectProduct}
-                  searchFunction={getProductsKeysQuery()}
+                  searchFunction={getProductsKeysQuery(
+                    { key: 1, description: 1, play: 1 },
+                  )}
+                  filterFunction={this.filterByPlay}
                 />
               </Panel>
             }

@@ -1,9 +1,12 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import classNames from 'classnames';
 import Field from '../../Field';
+import { showConfirmModal } from '../../../actions/guiStateActions/pageActions';
 import { getFieldName, getAvailableFields } from '../../../common/Util';
 
-export default class CustomerMapping extends Component {
+class CustomerMapping extends Component {
   static propTypes = {
     settings: PropTypes.instanceOf(Immutable.Map),
     usaget: PropTypes.string.isRequired,
@@ -11,6 +14,7 @@ export default class CustomerMapping extends Component {
     priority: PropTypes.number.isRequired,
     onSetCustomerMapping: PropTypes.func.isRequired,
     subscriberFields: PropTypes.instanceOf(Immutable.List),
+    dispatch: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -22,6 +26,30 @@ export default class CustomerMapping extends Component {
     const { usaget, priority } = this.props;
     const { value, id } = e.target;
     this.props.onSetCustomerMapping(id, value, usaget, priority);
+  }
+
+  onSetCustomerMappingTarget = (e) => {
+    const { value, id } = e.target;
+    const { subscriberFields } = this.props;
+    const event = { target: { id, value } };
+    const isUnique = subscriberFields.find(
+      subscriberField => subscriberField.get('field_name', '') === value,
+      null, Immutable.Map(),
+    ).get('unique', false);
+    // If new field is unique -> update, if not unique - show confirm
+    if (isUnique) {
+      return this.onSetCustomerMapping(event);
+    }
+    const onOk = () => {
+      this.onSetCustomerMapping(event);
+    };
+    const confirm = {
+      message: 'You selected a non-unique field for subscriber matching. Continue?',
+      onOk,
+      type: 'delete',
+      labelOk: 'Continue',
+    };
+    return this.props.dispatch(showConfirmModal(confirm));
   }
 
   onChangeClearRegex = (value) => {
@@ -37,14 +65,23 @@ export default class CustomerMapping extends Component {
 
   getAvailableTargetFields = () => {
     const { subscriberFields } = this.props;
-    const optionsKeys = subscriberFields
-      .filter(field => field.get('unique', false))
-      .map(field => field.get('field_name', ''));
-    const options = [
-      (<option disabled value="-1" key={-1}>Select Field...</option>),
-      ...optionsKeys.map((field, key) => <option value={field} key={key}>{getFieldName(field, 'customerIdentification')}</option>),
+    return [
+      (<option disabled value="-1" key="target-field-selecte">Select Field...</option>),
+      subscriberFields
+        .sort(field => (field.get('unique', false) ? -1 : 1))
+        .map((field, key) => {
+          const value = field.get('field_name', '');
+          const label = getFieldName(value, 'customerIdentification', field.get('title', ''));
+          const optionClass = classNames({
+            'label-text': field.get('unique', false),
+            disabled: !field.get('unique', false),
+          });
+          return (
+            <option value={value} key={`target-field-${key}`} className={optionClass}>{label}</option>
+          );
+        },
+      ),
     ];
-    return options;
   }
 
   render() {
@@ -72,7 +109,7 @@ export default class CustomerMapping extends Component {
           />
         </div>
         <div className="col-lg-4">
-          <select id="target_key" className="form-control" onChange={this.onSetCustomerMapping} value={targetKey}>
+          <select id="target_key" className="form-control" onChange={this.onSetCustomerMappingTarget} value={targetKey}>
             { availableTargetFields }
           </select>
         </div>
@@ -80,3 +117,5 @@ export default class CustomerMapping extends Component {
     );
   }
 }
+
+export default connect(null)(CustomerMapping);

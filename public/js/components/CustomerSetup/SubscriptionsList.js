@@ -1,14 +1,17 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
 import EntityList from '../EntityList';
 import { getItemDateValue, getConfig } from '../../common/Util';
+import { playsIsEnabledSelector } from '../../selectors/settingsSelector';
 
 
-export default class SubscriptionsList extends Component {
+class SubscriptionsList extends Component {
 
   static propTypes = {
     settings: PropTypes.instanceOf(Immutable.List),
+    isPlaysEnabled: PropTypes.bool,
     aid: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -21,6 +24,7 @@ export default class SubscriptionsList extends Component {
   static defaultProps = {
     settings: Immutable.List(),
     defaultListFields: [],
+    isPlaysEnabled: false,
     aid: '',
   };
 
@@ -53,9 +57,18 @@ export default class SubscriptionsList extends Component {
     this.props.onNew(aid, e);
   }
 
+  filterPlayField = (field) => {
+    const { isPlaysEnabled } = this.props;
+    if (field.get('field_name', '') !== 'play') {
+      return true;
+    }
+    return isPlaysEnabled;
+  }
+
   getFields = () => {
     const { settings, defaultListFields } = this.props;
     return settings
+      .filter(this.filterPlayField)
       .filter(field => (field.get('show_in_list', false) || defaultListFields.includes(field.get('field_name', ''))))
       .map((field) => {
         const fieldname = field.get('field_name');
@@ -154,3 +167,10 @@ export default class SubscriptionsList extends Component {
     );
   }
 }
+
+
+const mapStateToProps = (state, props) => ({
+  isPlaysEnabled: playsIsEnabledSelector(state, props),
+});
+
+export default connect(mapStateToProps)(SubscriptionsList);

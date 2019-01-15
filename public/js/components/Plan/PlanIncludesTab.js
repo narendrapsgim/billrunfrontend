@@ -36,6 +36,7 @@ class PlanIncludesTab extends Component {
     mode: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     type: PropTypes.string,
+    plays: PropTypes.string,
   }
 
   static defaultProps = {
@@ -45,6 +46,7 @@ class PlanIncludesTab extends Component {
     propertyTypes: Immutable.List(),
     mode: 'create',
     type: '',
+    plays: '',
   };
 
   constructor(props) {
@@ -117,6 +119,7 @@ class PlanIncludesTab extends Component {
     }
 
     return includeGroups.map((include, groupName) => {
+      const { plays } = this.props;
       const shared = include.get('account_shared', false);
       const pooled = include.get('account_pool', false);
       const quantityAffected = include.get('quantity_affected', false);
@@ -146,6 +149,7 @@ class PlanIncludesTab extends Component {
           usaget={usaget}
           usageTypes={usageTypes}
           type={this.props.type}
+          plays={plays}
         />
       );
     }).toArray();
@@ -166,7 +170,7 @@ class PlanIncludesTab extends Component {
   );
 
   render() {
-    const { mode } = this.props;
+    const { mode, plays } = this.props;
     const { existingGroups, usedProducts } = this.state;
     const allowCreate = mode !== 'view';
 
@@ -190,6 +194,7 @@ class PlanIncludesTab extends Component {
               usedProducts={usedProducts}
               addGroup={this.onGroupAdd}
               type={this.props.type}
+              plays={plays}
             />
           }
         </Col>
