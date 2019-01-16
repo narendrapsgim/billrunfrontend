@@ -99,7 +99,7 @@ class ProductsList extends Component {
   }, {
     type: 'import',
     label: 'Import',
-    actionStyle: 'default',
+    actionStyle: 'primary',
     showIcon: true,
     onClick: this.onClickImport,
     actionSize: 'xsmall',
