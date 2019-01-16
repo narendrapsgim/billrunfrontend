@@ -10,6 +10,7 @@ import { getConfig, getAvailableFields } from '../../../common/Util';
 import { updateSetting, saveSettings } from '../../../actions/settingsActions';
 import { showWarning } from '../../../actions/alertsActions';
 import { ModalWrapper } from '../../Elements';
+import RateMappingConfig from './Config';
 import {
   setRatingField,
   setLineKey,
@@ -91,7 +92,7 @@ class RateMapping extends Component {
   }
 
   getRateCalculatorFields = () =>
-    getAvailableFields(this.props.settings, [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'file', label: 'File name' }, { value: 'computed', label: 'Computed' }])
+    getAvailableFields(this.props.settings, RateMappingConfig.additionalFields.concat([{ value: 'computed', label: 'Computed' }]))
     .map((field, key) => (
       <option value={field.get('value', '')} key={key}>{field.get('label', '')}</option>
     ));
