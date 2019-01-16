@@ -1,4 +1,4 @@
-const RateMappingConfig = {
+export default {
   additionalFields: [
     { value: 'type', label: 'Type' },
     { value: 'usaget', label: 'Usage Type' },
@@ -6,5 +6,3 @@ const RateMappingConfig = {
     { value: 'file', label: 'File name' },
   ],
 };
-
-export default RateMappingConfig;

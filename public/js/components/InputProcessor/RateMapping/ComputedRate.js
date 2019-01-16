@@ -9,7 +9,7 @@ import Field from '../../Field';
 import { getConfig, formatSelectOptions, getAvailableFields } from '../../../common/Util';
 import { getSettings } from '../../../actions/settingsActions';
 import { linesFieldsSelector } from '../../../selectors/settingsSelector';
-import RateMappingConfig from './Config';
+import RateMappingConfig from '../../../config/rateMapping';
 
 class ComputedRate extends Component {
   static propTypes = {

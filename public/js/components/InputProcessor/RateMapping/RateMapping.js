@@ -10,7 +10,7 @@ import { getConfig, getAvailableFields } from '../../../common/Util';
 import { updateSetting, saveSettings } from '../../../actions/settingsActions';
 import { showWarning } from '../../../actions/alertsActions';
 import { ModalWrapper } from '../../Elements';
-import RateMappingConfig from './Config';
+import RateMappingConfig from '../../../config/rateMapping';
 import {
   setRatingField,
   setLineKey,
