@@ -10,7 +10,6 @@ import { getConfig, getAvailableFields } from '../../../common/Util';
 import { updateSetting, saveSettings } from '../../../actions/settingsActions';
 import { showWarning } from '../../../actions/alertsActions';
 import { ModalWrapper } from '../../Elements';
-import RateMappingConfig from '../../../config/rateMapping';
 import {
   setRatingField,
   setLineKey,
@@ -92,7 +91,7 @@ class RateMapping extends Component {
   }
 
   getRateCalculatorFields = () =>
-    getAvailableFields(this.props.settings, RateMappingConfig.additionalFields.concat([{ value: 'computed', label: 'Computed' }]))
+    getAvailableFields(this.props.settings, getConfig(['inputProcessor', 'RateMapping', 'additionalFields'], Immutable.List()).toJS().concat([{ value: 'computed', label: 'Computed' }]))
     .map((field, key) => (
       <option value={field.get('value', '')} key={key}>{field.get('label', '')}</option>
     ));

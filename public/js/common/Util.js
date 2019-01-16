@@ -4,6 +4,7 @@ import isNumber from 'is-number';
 import { titleCase, sentenceCase, upperCaseFirst } from 'change-case';
 import fieldNamesConfig from '../config/fieldNames.json';
 import reportConfig from '../config/report';
+import inputProcessorConfig from '../config/inputProcessor';
 import systemItemsConfig from '../config/entities.json';
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
@@ -41,6 +42,8 @@ export const getConfig = (key, defaultValue = null) => {
       case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
         break;
       case 'customFields': configCache = configCache.set('customFields', Immutable.fromJS(customFieldsConfig));
+        break;
+      case 'inputProcessor': configCache = configCache.set('inputProcessor', Immutable.fromJS(inputProcessorConfig));
         break;
       default: console.log(`Config caregory not exists ${path}`);
     }
