@@ -5,10 +5,12 @@ import {
   formModalItemSelector,
   formModalComponentSelector,
   formModalConfigSelector,
+  formModalErrosSelector,
 } from '../../selectors/guiSelectors';
 import {
   hideFormModal,
   setFormModalItem,
+  setFormModalError,
   updateFormModalItemField,
   removeFormModalItemField,
   showConfirmModal,
@@ -20,6 +22,7 @@ const mapStateToProps = state => ({
   item: formModalItemSelector(state),
   component: formModalComponentSelector(state),
   config: formModalConfigSelector(state),
+  errors: formModalErrosSelector(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -56,6 +59,9 @@ const mapDispatchToProps = dispatch => ({
   },
   removeField: (path) => {
     dispatch(removeFormModalItemField(path));
+  },
+  setError: (fieldId, message) => {
+    dispatch(setFormModalError(fieldId, message));
   },
 });
 

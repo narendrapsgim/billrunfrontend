@@ -9,6 +9,7 @@ import {
   EDIT_FORM_SHOW,
   EDIT_FORM_HIDE,
   EDIT_FORM_SET_ITEM,
+  EDIT_FORM_SET_ERROR,
   EDIT_FORM_UPDATE_ITEM_FIELD,
   EDIT_FORM_DELETE_ITEM_FIELD,
   onBoardingStates,
@@ -76,6 +77,14 @@ const pageReducer = (state = defaultState, action) => {
 
     case EDIT_FORM_SET_ITEM: {
       return state.setIn(['formModalData', 'item'], action.item);
+    }
+
+    case EDIT_FORM_SET_ERROR: {
+      const { fieldId, message = null } = action;
+      if (message === null) {
+        return state.deleteIn(['formModalData', 'errors', fieldId]);
+      }
+      return state.setIn(['formModalData', 'errors', fieldId], message);
     }
 
     case EDIT_FORM_UPDATE_ITEM_FIELD: {

@@ -511,6 +511,18 @@ export const setFieldTitle = (field, entity, keyProperty = 'field_name') => {
   return field.set('title', getFieldName(key, entityName, defaultLable));
 };
 
+export const addPlayToFieldTitle = (field, plays = Immutable.Map()) => {
+  const fieldPlays = field.get('plays', Immutable.List());
+  if (!fieldPlays.isEmpty()) {
+    const fieldPlayLabels = fieldPlays.reduce(
+      (result, playName) => result.push(plays.get(playName, playName)),
+      Immutable.List(),
+    ).join(', ');
+    return field.set('title', `${field.get('title', '')} (${fieldPlayLabels})`);
+  }
+  return field;
+};
+
 export const toImmutableList = (value) => {
   if ([undefined, null].includes(value)) {
     return Immutable.List();
@@ -539,3 +551,10 @@ export const sortFieldOption = (optionsA, optionB) => {
 export const onlyLineForeignFields = lineField => lineField.has('foreign');
 
 export const foreignFieldWithoutDates = foreignField => foreignField.getIn(['foreign', 'translate', 'type'], '') !== 'unixTimeToString';
+
+export const shouldUsePlays = availablePlays => (availablePlays.size > 1);
+
+export const getPlayOptions = availablePlays => availablePlays.map(play => ({
+  value: play.get('name', ''),
+  label: play.get('label', play.get('name', '')),
+})).toArray();

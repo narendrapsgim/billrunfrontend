@@ -9,6 +9,7 @@ import Field from '../Field';
 import CreateButton from '../Elements/CreateButton';
 import PlanPrice from './components/PlanPrice';
 import EntityFields from '../Entity/EntityFields';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getFieldName,
   getFieldNameType,
@@ -73,6 +74,16 @@ export default class Plan extends Component {
   onChangePlanDescription = (e) => {
     const { value } = e.target;
     this.props.onChangeFieldValue(['description'], value);
+  }
+
+  onChangePlays = (plays, playWasRemoved = false) => {
+    const playsToSave = plays === '' ? [] : plays.split(',');
+    this.props.onChangeFieldValue(['play'], Immutable.List(playsToSave));
+    if (playWasRemoved) {
+      this.props.onChangeFieldValue(['rates'], Immutable.Map());
+      this.props.onChangeFieldValue(['include', 'groups'], Immutable.Map());
+      this.props.onChangeFieldValue(['include', 'services'], Immutable.List());
+    }
   }
 
   onChangePlanEach = (e) => {
@@ -176,6 +187,13 @@ export default class Plan extends Component {
         <Col lg={12}>
           <Form horizontal>
             <Panel>
+
+              <PlaysSelector
+                entity={plan}
+                editable={editable && mode === 'create'}
+                multi={true}
+                onChange={this.onChangePlays}
+              />
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
