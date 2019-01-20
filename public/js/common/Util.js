@@ -362,6 +362,12 @@ const getItemConvertedRates = (propertyTypes, usageTypes, item, toBaseUnit, type
           ratesWithMutations.setIn([...ratePath, 'to'], newTo);
           ratesWithMutations.setIn([...ratePath, 'interval'], newInterval);
         });
+        const percentage = rate.get('percentage', null);
+        if (percentage !== null) {
+          const ratePath = (type === 'product' ? [usaget, plan] : [plan, usaget]);
+          const convertedPercentage = toBaseUnit ? percentage / 100 : percentage * 100;
+          ratesWithMutations.setIn([...ratePath, 'percentage'], convertedPercentage);
+        }
       });
     });
   });
