@@ -803,10 +803,10 @@ ul.revision-history-list li.active .cycle {
   min-height: 200px;
 }
 .Importer .StepMapper {
-  max-height: 258px;
+  max-height: 50vh;
 }
 .Importer .StepValidate .row-fields {
-  max-height: 300px;
+  max-height: 50vh;
   margin: 0;
 }
 .Importer .StepResult ol {
