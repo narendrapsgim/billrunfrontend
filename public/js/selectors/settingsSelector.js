@@ -465,6 +465,7 @@ export const formatFieldOptions = (fields, item = Immutable.Map()) => {
       unique: field.get('unique', false),
       mandatory: field.get('mandatory', false),
       linker: field.get('linker', false),
+      type: field.get('type', 'string'),
     }));
   }
   return undefined;

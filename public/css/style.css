@@ -786,6 +786,9 @@ ul.revision-history-list li.active .cycle {
   margin-left: 0;
   margin-right: 0;
 }
+.Importer .form-group.rangesField {
+    padding: 0;
+}
 .Importer .panel,
 .Importer .Select-control {
   /* set select input transparent to not hide wrapper div shadows */

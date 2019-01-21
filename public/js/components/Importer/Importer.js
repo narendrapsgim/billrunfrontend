@@ -141,7 +141,7 @@ class Importer extends Component {
   }
 
   getFormatedRows = (limit = -1) => {
-    const { item, predefinedValues, defaultValues } = this.props;
+    const { item, predefinedValues, defaultValues, importFields } = this.props;
     const { mapperPrefix } = this.state;
     const lines = item.get('fileContent', []);
     const linker = item.get('linker', null);
@@ -155,12 +155,26 @@ class Importer extends Component {
         for (let idx = 1; idx < linesToParse; idx++) {
           const row = Immutable.Map().withMutations((mapWithMutations) => {
             map.forEach((mapperValue, fieldName) => {
+              let columnValue = mapperValue;
               if (mapperValue.startsWith(mapperPrefix)) {
                 const csvIndex = mapperValue.substring(mapperPrefix.length);
-                mapWithMutations.set(fieldName, lines[idx][csvIndex]);
-              } else {
-                mapWithMutations.set(fieldName, mapperValue);
+                columnValue = lines[idx][csvIndex];
               }
+              const curField = importFields.find(field => field.value === fieldName);
+              const fieldType = curField ? curField.type : 'string';
+              if (fieldType === 'ranges') {
+                columnValue = Immutable.List().withMutations((rangewithMutations) => {
+                  const ranges = columnValue.split(',');
+                  ranges.forEach((range) => {
+                    const rangeValue = range.split('-');
+                    rangewithMutations.push(Immutable.Map({
+                      from: rangeValue[0],
+                      to: rangeValue[1],
+                    }));
+                  });
+                });
+              }
+              mapWithMutations.set(fieldName, columnValue);
             });
             // Set predefined values
             if (predefinedValues.hasOwnProperty(entity)) {

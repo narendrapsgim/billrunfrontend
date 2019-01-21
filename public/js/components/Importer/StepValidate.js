@@ -6,11 +6,10 @@ import Field from '../Field';
 const StepValidate = ({ fields, getFormatedRows }) => {
   const rows = getFormatedRows(1);
 
-
-  const renderLinker = (linker) => {
+  const renderLinker = (linker, fieldName) => {
     const curField = fields.find(field => field.value === linker.get('field', ''));
     return (
-      <Panel header="Linker" className="mb0">
+      <Panel header="Linker" className="mb0" key={`linker-${fieldName}`}>
         <FormGroup>
           <Col sm={3} componentClass={ControlLabel}>
             { curField ? curField.label : linker.get('field', '') }
@@ -23,6 +22,19 @@ const StepValidate = ({ fields, getFormatedRows }) => {
     );
   };
 
+  const renderValue = (value, field) => {
+    switch (field.type) {
+      case 'ranges':
+      case 'range':
+        return (
+          <Field value={value} disabled={true} fieldType={field.type} compact={true} removable={false} />
+        );
+      default: return (
+        <Field value={value} disabled={true} />
+      );
+    }
+  };
+
   const renderRow = (value, fieldName) => {
     const curField = fields.find(field => field.value === fieldName);
     return (
@@ -31,7 +43,7 @@ const StepValidate = ({ fields, getFormatedRows }) => {
           { curField ? curField.label : fieldName }
         </Col>
         <Col sm={9}>
-          <Field value={value} disabled={true} />
+          { renderValue(value, curField) }
         </Col>
       </FormGroup>
     );
@@ -39,8 +51,6 @@ const StepValidate = ({ fields, getFormatedRows }) => {
 
   return (
     <div className="StepValidate">
-      <h4>Example Import</h4>
-      <hr className="mt10 mb0" />
       <div className="row-fields scrollbox">
         { rows
           .get(0, Immutable.Map())
