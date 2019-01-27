@@ -38,7 +38,7 @@ const mapDispatchToProps = (dispatch, props) => ({
         });
     };
     const config = {
-      title: 'Create New Paly',
+      title: 'Create New Play',
       onOk,
       mode: 'create',
       existingNames: data.map(play => play.get('name', '')),

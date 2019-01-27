@@ -46,7 +46,7 @@ const mapDispatchToProps = (dispatch, { index, play, plays, onChange, ...otherPr
         });
     };
     const config = {
-      title: `Edit Paly ${item.get('name', '')}`,
+      title: `Edit Play ${item.get('name', '')}`,
       onOk,
       mode: 'edit',
     };
