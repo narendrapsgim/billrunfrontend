@@ -511,7 +511,7 @@ class PlanIncludeGroupCreate extends Component {
 
     return (
       <div>
-        <CreateButton onClick={this.handleToggleBoby} type="Group" />
+        <CreateButton onClick={this.handleToggleBoby} type="Group" label="Create New" />
         <Modal show={open} keyboard={false}>
 
           <Modal.Header closeButton onHide={this.handleCancel}>
