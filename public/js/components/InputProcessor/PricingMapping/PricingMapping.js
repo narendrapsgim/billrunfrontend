@@ -39,6 +39,18 @@ export default class PricingMapping extends Component {
   onChangeApriceExists = () => {
     this.onChangeApriceField(undefined);
     this.onChangeApriceMultExists();
+    this.onChangeTaxIncluded({ target: { value: undefined } });
+  }
+
+  onChangeTaxIncluded = (e) => {
+    const { value } = e.target;
+    const packet = {
+      target: {
+        value,
+        id: 'tax_included',
+      },
+    };
+    this.onSetPricingMapping(packet);
   }
 
   onChangeApriceMult = (e) => {
@@ -58,6 +70,7 @@ export default class PricingMapping extends Component {
   renderPrice = () => {
     const { mapping } = this.props;
     const aprice = mapping.getIn(['aprice_field'], null);
+    const taxIncluded = mapping.get('tax_included', false) && aprice !== null;
     const apriceInputProps = {
       fieldType: 'select',
       placeholder: 'Select price field...',
@@ -97,6 +110,15 @@ export default class PricingMapping extends Component {
             </div>
             <div className="col-lg-1">
               <Help contents="When checked, the price taken will be multiplied by the constant entered" />
+            </div>
+            <div className="col-lg-10 col-lg form-inner-edit-row">
+              <Field
+                fieldType="checkbox"
+                value={taxIncluded}
+                label="Tax is included"
+                disabled={!aprice}
+                onChange={this.onChangeTaxIncluded}
+              />
             </div>
           </div>
         </div>

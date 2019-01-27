@@ -418,6 +418,9 @@ fieldset[disabled] .btn {
 .List.invoices-list form {
     margin-bottom: 0;
 }
+.List .table td {
+    vertical-align: middle;
+}
 /* Global page + table */
 .page-header {
   border-bottom: none;
