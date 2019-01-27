@@ -179,7 +179,7 @@ class BalanceEvent extends Component {
               { this.renderConditions() }
             </Col>
             <Col sm={12}>
-              <CreateButton onClick={this.addCondition} label="Add New Condition" />
+              <CreateButton onClick={this.addCondition} label="Add Condition" />
             </Col>
           </FormGroup>
         </Panel>
