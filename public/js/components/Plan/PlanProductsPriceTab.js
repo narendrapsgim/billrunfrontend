@@ -204,6 +204,7 @@ class PlanProductsPriceTab extends Component {
       .map((productUsageTypes, productKey) => {
         const usaget = productUsageTypes.keySeq().first();
         const prices = productUsageTypes.getIn([usaget, 'rate'], Immutable.List());
+        const percentage = productUsageTypes.getIn([usaget, 'percentage'], null);
         const prod = products.find(planProduct => planProduct.get('key', '') === productKey,
           null,
           Immutable.Map({ key: productKey }),
@@ -213,6 +214,7 @@ class PlanProductsPriceTab extends Component {
             key={prod.getIn(['_id', '$id'], prod.get('key'))}
             item={prod}
             prices={prices}
+            percentage={percentage}
             usaget={usaget}
             mode={mode}
             onProductInitRate={this.onProductInitRate}
