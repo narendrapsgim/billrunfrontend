@@ -153,11 +153,8 @@ export default class PlanProduct extends Component {
 
     return (
       <Panel header={header}>
-        <FormGroup style={{ margin: 0 }}>
-          {<ControlLabel>{`${pricingMethod} Pricing`}</ControlLabel>}
-        </FormGroup>
-        <FormGroup className="mb0">
-          { editable && (
+        { editable && (
+          <FormGroup className="mb0">
             <span style={{ display: 'inline-block', marginRight: 20 }}>
               <Field
                 fieldType="radio"
@@ -168,9 +165,7 @@ export default class PlanProduct extends Component {
                 checked={!isPercentage}
               />
             </span>
-          )}
-          <span style={{ display: 'inline-block' }}>
-            { editable && (
+            <span style={{ display: 'inline-block' }}>
               <Field
                 style={{ display: 'inline-block', marginRight: 10 }}
                 fieldType="radio"
@@ -180,25 +175,39 @@ export default class PlanProduct extends Component {
                 label="Override by percentage of the original price"
                 checked={isPercentage}
               />
-            )}
-            {isPercentage && !editable && (
-              <span>Original price overridden by: </span>
-            )}
-            { isPercentage && (
-              <Field
-                style={{ display: 'inline-block', width: 115, verticalAlign: 'middle' }}
-                fieldType="number"
-                onChange={this.onChangePercentage}
-                value={percentage}
-                editable={editable}
-                suffix="%"
-                max={100}
-                min={0}
-                step={1}
-              />
-            )}
-          </span>
-        </FormGroup>
+              { isPercentage && (
+                <Field
+                  style={{ display: 'inline-block', width: 115, verticalAlign: 'middle' }}
+                  fieldType="number"
+                  onChange={this.onChangePercentage}
+                  value={percentage}
+                  editable={editable}
+                  suffix="%"
+                  max={100}
+                  min={0}
+                  step={1}
+                />
+              )}
+            </span>
+          </FormGroup>
+        )}
+        { isPercentage && !editable && (
+          <FormGroup className="mb0">
+            <span>Original price overridden by: </span>
+            <Field
+              style={{ display: 'inline-block', width: 115, verticalAlign: 'middle' }}
+              fieldType="number"
+              value={percentage}
+              editable={false}
+              suffix="%"
+            />
+          </FormGroup>
+        )}
+        { !isPercentage && (
+          <FormGroup style={{ margin: 3 }}>
+            {<ControlLabel>{`${pricingMethod} Pricing`}</ControlLabel>}
+          </FormGroup>
+        )}
         { !isPercentage && prices.map((price, i) => (
           <ProductPrice
             key={`${item.get('key')}_${i}`}
@@ -211,7 +220,11 @@ export default class PlanProduct extends Component {
             onProductRemoveRate={this.onProductRemoveRate}
           />
         ))}
-        { !isPercentage && editable && <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
+        { !isPercentage && editable && (
+          <FormGroup style={{ margin: 0 }}>
+            <CreateButton onClick={this.onProductAddRate} label="Add New" buttonStyle={{ marginTop: 0 }} />
+          </FormGroup>
+        )}
       </Panel>
     );
   }
