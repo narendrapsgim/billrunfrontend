@@ -157,32 +157,40 @@ export default class PlanProduct extends Component {
           {<ControlLabel>{`${pricingMethod} Pricing`}</ControlLabel>}
         </FormGroup>
         <FormGroup className="mb0">
-          <span style={{ display: 'inline-block', marginRight: 20 }}>
-            <Field
-              fieldType="radio"
-              value="no"
-              onChange={this.onChangeOverrideType}
-              name={`${item.get('key')}-override-type`}
-              label="Override with specific prices"
-              checked={!isPercentage}
-            />
-          </span>
+          { editable && (
+            <span style={{ display: 'inline-block', marginRight: 20 }}>
+              <Field
+                fieldType="radio"
+                value="no"
+                onChange={this.onChangeOverrideType}
+                name={`${item.get('key')}-override-type`}
+                label="Override with specific prices"
+                checked={!isPercentage}
+              />
+            </span>
+          )}
           <span style={{ display: 'inline-block' }}>
-            <Field
-              style={{ display: 'inline-block', marginRight: 10 }}
-              fieldType="radio"
-              value="percentage"
-              onChange={this.onChangeOverrideType}
-              name={`${item.get('key')}-override-type`}
-              label="Override by percentage of the original price"
-              checked={isPercentage}
-            />
+            { editable && (
+              <Field
+                style={{ display: 'inline-block', marginRight: 10 }}
+                fieldType="radio"
+                value="percentage"
+                onChange={this.onChangeOverrideType}
+                name={`${item.get('key')}-override-type`}
+                label="Override by percentage of the original price"
+                checked={isPercentage}
+              />
+            )}
+            {isPercentage && !editable && (
+              <span>Original price overridden by: </span>
+            )}
             { isPercentage && (
               <Field
                 style={{ display: 'inline-block', width: 115, verticalAlign: 'middle' }}
                 fieldType="number"
                 onChange={this.onChangePercentage}
                 value={percentage}
+                editable={editable}
                 suffix="%"
                 max={100}
                 min={0}
