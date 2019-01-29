@@ -7,7 +7,7 @@ import { LoadingItemPlaceholder } from '../Elements';
 import {
   getSettings,
 } from '../../actions/settingsActions';
-import { playsIsEnabledSelector } from '../../selectors/settingsSelector';
+import { isPlaysEnabledSelector } from '../../selectors/settingsSelector';
 
 
 class ProductsList extends Component {
@@ -106,7 +106,7 @@ class ProductsList extends Component {
 
 const mapStateToProps = (state, props) => ({
   fields: state.settings.getIn(['rates', 'fields']) || undefined,
-  isPlaysEnabled: playsIsEnabledSelector(state, props),
+  isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
 export default connect(mapStateToProps)(ProductsList);

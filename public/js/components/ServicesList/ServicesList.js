@@ -8,7 +8,7 @@ import {
   getConfig,
   convertServiceBalancePeriodToObject,
 } from '../../common/Util';
-import { playsIsEnabledSelector } from '../../selectors/settingsSelector';
+import { isPlaysEnabledSelector } from '../../selectors/settingsSelector';
 
 
 const ServicesList = (props) => {
@@ -79,7 +79,7 @@ ServicesList.defaultProps = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isPlaysEnabled: playsIsEnabledSelector(state, props),
+  isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
 export default connect(mapStateToProps)(ServicesList);

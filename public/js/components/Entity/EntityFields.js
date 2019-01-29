@@ -8,11 +8,8 @@ import EntityField from './EntityField';
 import { getSettings } from '../../actions/settingsActions';
 import {
   entityFieldSelector,
-  availablePlaysSettingsSelector,
+  isPlaysEnabledSelector,
 } from '../../selectors/settingsSelector';
-import {
-  shouldUsePlays,
-} from '../../common/Util';
 
 
 class EntityFields extends Component {
@@ -27,9 +24,9 @@ class EntityFields extends Component {
     highlightPramas: PropTypes.instanceOf(Immutable.List),
     fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
+    isPlaysEnabled: PropTypes.bool,
     onChangeField: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
-    availablePlays: PropTypes.instanceOf(Immutable.List),
   };
 
   static defaultProps = {
@@ -38,8 +35,8 @@ class EntityFields extends Component {
     highlightPramas: Immutable.List(),
     fieldsFilter: null,
     editable: true,
+    isPlaysEnabled: false,
     onChangeField: () => {},
-    availablePlays: Immutable.List(),
   }
 
   componentDidMount() {
@@ -104,8 +101,8 @@ class EntityFields extends Component {
   }
 
   filterPlayFields = (field) => {
-    const { availablePlays, entity } = this.props;
-    if (!shouldUsePlays(availablePlays)) {
+    const { entity, isPlaysEnabled } = this.props;
+    if (!isPlaysEnabled) {
       return true;
     }
     const play = entity.get('play', '');
@@ -177,7 +174,7 @@ class EntityFields extends Component {
 
 const mapStateToProps = (state, props) => ({
   fields: entityFieldSelector(state, props),
-  availablePlays: availablePlaysSettingsSelector(state, props),
+  isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
 export default connect(mapStateToProps)(EntityFields);
