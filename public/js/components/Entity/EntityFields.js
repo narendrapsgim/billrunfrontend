@@ -106,7 +106,7 @@ class EntityFields extends Component {
   filterPlayFields = (field) => {
     const { availablePlays, entity } = this.props;
     if (!shouldUsePlays(availablePlays)) {
-      return false;
+      return true;
     }
     const play = entity.get('play', '');
     const plays = Immutable.List(typeof play.split === 'function' ? play.split(',') : play);
