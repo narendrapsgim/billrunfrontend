@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import changeCase from 'change-case';
 import EntityList from '../EntityList';
 import { getItemDateValue, getConfig } from '../../common/Util';
-import { playsIsEnabledSelector } from '../../selectors/settingsSelector';
+import { isPlaysEnabledSelector } from '../../selectors/settingsSelector';
 
 
 class SubscriptionsList extends Component {
@@ -170,7 +170,7 @@ class SubscriptionsList extends Component {
 
 
 const mapStateToProps = (state, props) => ({
-  isPlaysEnabled: playsIsEnabledSelector(state, props),
+  isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
 export default connect(mapStateToProps)(SubscriptionsList);

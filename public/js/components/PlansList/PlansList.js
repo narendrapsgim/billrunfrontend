@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
 import EntityList from '../EntityList';
-import { playsIsEnabledSelector } from '../../selectors/settingsSelector';
+import { isPlaysEnabledSelector } from '../../selectors/settingsSelector';
 
 
 const PlansList = (props) => {
@@ -92,7 +92,7 @@ PlansList.defaultProps = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isPlaysEnabled: playsIsEnabledSelector(state, props),
+  isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
 export default connect(mapStateToProps)(PlansList);
