@@ -91,7 +91,7 @@ class RateMapping extends Component {
   }
 
   getRateCalculatorFields = () =>
-    getAvailableFields(this.props.settings, [{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'file', label: 'File name' }, { value: 'computed', label: 'Computed' }])
+    getAvailableFields(this.props.settings, getConfig(['inputProcessor', 'RateMapping', 'additionalFields'], Immutable.List()).toJS().concat([{ value: 'computed', label: 'Computed' }]))
     .map((field, key) => (
       <option value={field.get('value', '')} key={key}>{field.get('label', '')}</option>
     ));

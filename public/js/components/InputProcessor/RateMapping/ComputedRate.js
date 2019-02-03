@@ -64,7 +64,7 @@ class ComputedRate extends Component {
     const additionalFields = foreignFields.filter(field => field.get('available_from', '') === 'rate').map((filteredField) => {
       const fieldName = filteredField.getIn(['foreign', 'entity'], '');
       return { value: fieldName, label: `${titleCase(fieldName)} (foreign field)` };
-    }).toArray().concat([{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'file', label: 'File name' }]);
+    }).toArray().concat(getConfig(['inputProcessor', 'RateMapping', 'additionalFields'], Immutable.List()).toJS());
     const lineKeyOptions = getAvailableFields(settings, additionalFields).toJS();
     const computedTypeRegex = computedLineKey.get('type', 'regex') === 'regex';
     const operatorExists = computedLineKey.get('operator', '') === '$exists' || computedLineKey.get('operator', '') === '$existsFalse';
