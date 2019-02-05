@@ -29,7 +29,8 @@ const DateTime = (props) => {
   return (
     <DatePicker
       {...otherProps}
-      className="form-control"
+      calendarClassName="date-picker-with-time"
+      className="form-control DatePickerTime"
       showTimeSelect
       timeIntervals={timeIntervals}
       dateFormat={dateFormat}
