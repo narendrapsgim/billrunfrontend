@@ -49,10 +49,10 @@ class CustomFields extends Component {
     }),
     defaultHiddenFields: Immutable.Map({
       customer: Immutable.List(['aid', 'payment_gateway']),
-      subscriber: Immutable.List(['sid', 'aid', 'plan_activation']),
-      product: Immutable.List(['from', 'to']),
-      service: Immutable.List(['from', 'to', 'include']),
-      plan: Immutable.List(['from', 'to']),
+      subscriber: Immutable.List(['sid', 'aid', 'plan_activation', 'play']),
+      product: Immutable.List(['from', 'to', 'play']),
+      service: Immutable.List(['from', 'to', 'include', 'play']),
+      plan: Immutable.List(['from', 'to', 'play']),
     }),
     unReorderFields: Immutable.Map({
       product: Immutable.List(['key', 'description', 'rates']),
@@ -67,6 +67,7 @@ class CustomFields extends Component {
   };
 
   componentDidMount() {
+    this.props.dispatch(getSettings(['plays']));
     this.fetchFields();
   }
 
@@ -98,7 +99,11 @@ class CustomFields extends Component {
   }
 
   onChangeField = (entity, index, id, value) => {
-    this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', index, id]), value));
+    if (value === undefined) {
+      this.props.dispatch(removeSettingField(getSettingsKey(entity), getSettingsPath(entity, ['fields', index, id])));
+    } else {
+      this.props.dispatch(updateSetting(getSettingsKey(entity), getSettingsPath(entity, ['fields', index, id]), value));
+    }
   };
 
   onRemoveField = (entity, index) => {

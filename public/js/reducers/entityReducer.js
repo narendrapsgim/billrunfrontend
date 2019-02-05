@@ -1,5 +1,8 @@
 import Immutable from 'immutable';
+import { upperCaseFirst } from 'change-case';
 import { actions } from '../actions/entityActions';
+import { PLAN_CLEAR } from '../actions/planActions';
+import { CLEAR_SERVICE } from '../actions/serviceActions';
 
 const defaultState = Immutable.Map();
 
@@ -40,9 +43,18 @@ export default function (state = defaultState, action) {
       });
     }
 
+    case PLAN_CLEAR:
+    case CLEAR_SERVICE:
+      if (collection) {
+        return state.set(`source${upperCaseFirst(collection)}`, Immutable.Map());
+      }
+      return defaultState;
+
     case actions.CLEAR_ENTITY:
       if (collection) {
-        return state.set(collection, Immutable.Map());
+        return state
+          .set(collection, Immutable.Map())
+          .set(`source${upperCaseFirst(collection)}`, Immutable.Map());
       }
       return defaultState;
 

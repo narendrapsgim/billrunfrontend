@@ -3,7 +3,12 @@ import Immutable from 'immutable';
 import { sentenceCase } from 'change-case';
 import { getCycleName } from '../components/Cycle/CycleUtil';
 import { getConfig } from '../common/Util';
+import {
+  availablePlaysLabelsSelector,
+} from './settingsSelector';
 
+
+const getEventRates = state => state.list.get('event_products', null);
 
 const getCyclesOptions = state => state.list.get('cycles_list', null);
 
@@ -79,6 +84,13 @@ const selectPlansOptions = (options) => {
   }));
 };
 
+const selectPlayTypeOptions = (options) => {
+  if (options === null) {
+    return undefined;
+  }
+  return options.map((label, value) => Immutable.Map({ label, value }));
+};
+
 const getGroupsOptions = state => state.list.get('available_groups', null);
 
 const selectGroupsOptions = (options) => {
@@ -137,6 +149,11 @@ export const cyclesOptionsSelector = createSelector(
   selectCyclesOptions,
 );
 
+export const eventRatesSelector = createSelector(
+  getEventRates,
+  rates => (rates === null ? undefined : rates),
+);
+
 export const productsOptionsSelector = createSelector(
   getProductsOptions,
   selectProductsOptions,
@@ -155,6 +172,11 @@ export const servicesOptionsSelector = createSelector(
 export const plansOptionsSelector = createSelector(
   getPlansOptions,
   selectPlansOptions,
+);
+
+export const getPlayTypeOptions = createSelector(
+  availablePlaysLabelsSelector,
+  selectPlayTypeOptions,
 );
 
 export const groupsOptionsSelector = createSelector(

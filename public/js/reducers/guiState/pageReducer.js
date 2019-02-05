@@ -6,6 +6,12 @@ import {
   ONBOARDING_SET_STATE,
   CONFIRM_SHOW,
   CONFIRM_HIDE,
+  EDIT_FORM_SHOW,
+  EDIT_FORM_HIDE,
+  EDIT_FORM_SET_ITEM,
+  EDIT_FORM_SET_ERROR,
+  EDIT_FORM_UPDATE_ITEM_FIELD,
+  EDIT_FORM_DELETE_ITEM_FIELD,
   onBoardingStates,
 } from '../../actions/guiStateActions/pageActions';
 import { LOGIN } from '../../actions/userActions';
@@ -53,6 +59,44 @@ const pageReducer = (state = defaultState, action) => {
 
     case CONFIRM_HIDE: {
       return state.setIn(['confirm'], Immutable.Map());
+    }
+
+    case EDIT_FORM_SHOW: {
+      const { item, component, config } = action;
+      return state.setIn(['formModalData'], Immutable.Map({
+        item,
+        component,
+        config: Immutable.fromJS(config),
+        show: true,
+      }));
+    }
+
+    case EDIT_FORM_HIDE: {
+      return state.setIn(['formModalData'], Immutable.Map());
+    }
+
+    case EDIT_FORM_SET_ITEM: {
+      return state.setIn(['formModalData', 'item'], action.item);
+    }
+
+    case EDIT_FORM_SET_ERROR: {
+      const { fieldId, message = null } = action;
+      if (message === null) {
+        return state.deleteIn(['formModalData', 'errors', fieldId]);
+      }
+      return state.setIn(['formModalData', 'errors', fieldId], message);
+    }
+
+    case EDIT_FORM_UPDATE_ITEM_FIELD: {
+      const { path, value } = action;
+      const arrayPath = Array.isArray(path) ? path : [path];
+      return state.setIn(['formModalData', 'item', ...arrayPath], value);
+    }
+
+    case EDIT_FORM_DELETE_ITEM_FIELD: {
+      const { path } = action;
+      const arrayPath = Array.isArray(path) ? path : [path];
+      return state.deleteIn(['formModalData', 'item', ...arrayPath]);
     }
 
     default:

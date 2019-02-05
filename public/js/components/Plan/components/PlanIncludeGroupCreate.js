@@ -31,6 +31,8 @@ class PlanIncludeGroupCreate extends Component {
     currency: PropTypes.string,
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
+    type: PropTypes.string,
+    plays: PropTypes.string,
   }
 
   static defaultProps = {
@@ -41,6 +43,8 @@ class PlanIncludeGroupCreate extends Component {
     currency: 'USD',
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
+    type: '',
+    plays: '',
   };
 
   defaultState = {
@@ -52,6 +56,7 @@ class PlanIncludeGroupCreate extends Component {
     products: Immutable.List(),
     shared: false,
     pooled: false,
+    quantityAffected: false,
     error: '',
     stepIndex: 0,
     open: false,
@@ -182,7 +187,16 @@ class PlanIncludeGroupCreate extends Component {
 
   onChangePooled = (e) => {
     const { checked: pooled } = e.target;
-    this.setState({ pooled });
+    if (pooled) {
+      this.setState({ pooled });
+    } else {
+      this.setState({ pooled });
+    }
+  }
+
+  onChangeQuantityAffected = (e) => {
+    const { checked: quantityAffected } = e.target;
+    this.setState({ quantityAffected });
   }
 
   onChangeUnit = (newValue) => {
@@ -240,9 +254,10 @@ class PlanIncludeGroupCreate extends Component {
       products,
       shared,
       pooled,
+      quantityAffected,
     } = this.state;
     if (this.validateStep(stepIndex)) {
-      this.props.addGroup(name, usages, unit, include, shared, pooled, products);
+      this.props.addGroup(name, usages, unit, include, shared, pooled, quantityAffected, products);
       this.resetState(false);
     }
   };
@@ -319,7 +334,7 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
-    const { usedProducts, currency, propertyTypes, usageTypesData } = this.props;
+    const { usedProducts, currency, propertyTypes, usageTypesData, type, plays } = this.props;
     const {
       name,
       products,
@@ -328,6 +343,7 @@ class PlanIncludeGroupCreate extends Component {
       unit,
       shared,
       pooled,
+      quantityAffected,
       error,
       monetaryBased,
       steps,
@@ -438,6 +454,14 @@ class PlanIncludeGroupCreate extends Component {
                 <Help contents={GroupsInclude.pooled_desc} />
               </Checkbox>
             </Col>
+            {type === 'service' &&
+              <Col smOffset={3} sm={8}>
+                <Checkbox checked={quantityAffected} onChange={this.onChangeQuantityAffected}>
+                  {'Multiply by Service Quantity'}
+                  <Help contents={GroupsInclude.quantityAffected_desc} />
+                </Checkbox>
+              </Col>
+            }
           </FormGroup>,
         ]);
 
@@ -458,6 +482,7 @@ class PlanIncludeGroupCreate extends Component {
                   usages={usages}
                   onChangeGroupRates={this.onChangeGroupRates}
                   existingProducts={existingProductsKeys}
+                  plays={plays}
                 />
               </div>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
@@ -489,7 +514,7 @@ class PlanIncludeGroupCreate extends Component {
 
     return (
       <div>
-        <CreateButton onClick={this.handleToggleBoby} type="Group" />
+        <CreateButton onClick={this.handleToggleBoby} type="Group" label="Create New" />
         <Modal show={open} keyboard={false}>
 
           <Modal.Header closeButton onHide={this.handleCancel}>

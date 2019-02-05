@@ -2,7 +2,7 @@ import Immutable from 'immutable';
 import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { fetchPlanByIdQuery, getAllGroupsQuery, fetchPrepaidGroupByIdQuery } from '../common/ApiQueries';
-import { saveEntity, gotEntity, clearEntity } from '../actions/entityActions';
+import { saveEntity, gotEntitySource } from '../actions/entityActions';
 import {
   getPlanConvertedRates,
   getPlanConvertedPpIncludes,
@@ -14,7 +14,6 @@ import {
   usageTypesDataSelector,
   propertyTypeSelector,
 } from '../selectors/settingsSelector';
-import { PLAN_SOURCE } from '../reducers/planReducer';
 
 export const PLAN_GOT = 'PLAN_GOT';
 export const PLAN_CLEAR = 'PLAN_CLEAR';
@@ -46,14 +45,12 @@ export const clearPlan = () => ({
   type: PLAN_CLEAR,
 });
 
-export const clearSourcePlan = () => dispatch => dispatch(clearEntity(PLAN_SOURCE));
-
 export const onGroupRemove = groupName => ({
   type: REMOVE_GROUP_PLAN,
   groupName,
 });
 
-export const onGroupAdd = (groupName, usages, unit, value, shared, pooled, products) => ({
+export const onGroupAdd = (groupName, usages, unit, value, shared, pooled, quantityAffected, products) => ({
   type: ADD_GROUP_PLAN,
   groupName,
   usages,
@@ -61,6 +58,7 @@ export const onGroupAdd = (groupName, usages, unit, value, shared, pooled, produ
   value,
   shared,
   pooled,
+  quantityAffected,
   products,
 });
 
@@ -168,7 +166,7 @@ export const getPlan = (id, setSource = false) => (dispatch, getState) => {
       const convertedPlan = convertPlan(getState, plan, false).toJS();
       dispatch(gotItem(convertedPlan));
       if (setSource) {
-        dispatch(gotEntity(PLAN_SOURCE, convertedPlan));
+        dispatch(gotEntitySource('plan', convertedPlan));
       }
       return dispatch(apiBillRunSuccessHandler(response));
     })

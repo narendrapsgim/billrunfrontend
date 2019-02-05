@@ -3,15 +3,9 @@ import Immutable from 'immutable';
 import { upperCaseFirst } from 'change-case';
 import { getConfig, getItemId, getItemMode, getItemMinFromDate } from '../common/Util';
 import { minEntityDateSelector, closedCycleChangesSelector } from './settingsSelector';
-import { PLAN_SOURCE } from '../reducers/planReducer';
-import { SERVICE_SOURCE } from '../reducers/serviceReducer';
 
 
-const getSourcePlan = (state, props) => state.entity.get(PLAN_SOURCE);
-
-const getSourceService = (state, props) => state.entity.get(SERVICE_SOURCE);
-
-const getPropsItem = (state, props) => props.item;
+export const getPropsItem = (state, props) => props.item;
 
 const getUniqueFiled = (state, props, entityName) =>
   getConfig(['systemItems', entityName, 'uniqueField'], 'name');
@@ -237,23 +231,7 @@ export const actionSelector = createSelector(
   action => action || undefined
 );
 
-export const sourcePlanRatesSelector = createSelector(
-  getSourcePlan,
-  selectEntityRates,
-);
-
-export const sourceServiceRatesSelector = createSelector(
-  getSourceService,
-  selectEntityRates,
-);
-
 export const sourceEntityRatesSelector = createSelector(
-  (state, props) => props.itemName,
-  (itemName) => {
-    switch (itemName) {
-      case 'plan': return sourcePlanRatesSelector;
-      case 'service': return sourceServiceRatesSelector;
-      default: return () => {};
-    }
-  },
+  itemSourceSelector,
+  selectEntityRates,
 );

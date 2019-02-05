@@ -40,6 +40,34 @@ export const onBoardingIsStartingSelector = createSelector(
   state => state === onBoardingStates.STARTING,
 );
 
+const getFormModalItem = state => state.guiState.page.getIn(['formModalData', 'item']);
+export const formModalItemSelector = createSelector(
+  getFormModalItem,
+  item => item,
+);
+const getFormModalComponent = state => state.guiState.page.getIn(['formModalData', 'component']);
+export const formModalComponentSelector = createSelector(
+  getFormModalComponent,
+  component => component,
+);
+const getFormModalConfig = state => state.guiState.page.getIn(['formModalData', 'config']);
+export const formModalConfigSelector = createSelector(
+  getFormModalConfig,
+  config => config,
+);
+
+const getFormModalErrors = state => state.guiState.page.getIn(['formModalData', 'errors']);
+export const formModalErrosSelector = createSelector(
+  getFormModalErrors,
+  errors => errors,
+);
+
+const getFormModalShowState = state => state.guiState.page.getIn(['formModalData', 'show']);
+export const formModalShowStateSelector = createSelector(
+  getFormModalShowState,
+  show => show,
+);
+
 const getConfirm = state => state.guiState.page.getIn(['confirm']);
 export const confirmSelector = createSelector(
   getConfirm,

@@ -9,11 +9,13 @@ export default class Filter extends Component {
 
   static propTypes = {
     filter: PropTypes.instanceOf(Immutable.Map),
+    fields: PropTypes.array,
     children: PropTypes.element,
   };
 
   static defaultProps = {
     filter: Immutable.Map(),
+    fields: [],
     children: null,
   };
 
@@ -25,25 +27,12 @@ export default class Filter extends Component {
     this.onClickFilterBtn = this.onClickFilterBtn.bind(this);
     this.buildQueryString = this.buildQueryString.bind(this);
     this.filterCond = this.filterCond.bind(this);
-
-    let string;
-    let filter_by;
-    if (props.filter.isEmpty()) {
-      string = '';
-      filter_by = []
-    } else {
+    let string = '';
+    let filter_by = [];
+    if (!props.filter.isEmpty()) {
+      const firstFilterValue = props.filter.first();
       filter_by = props.filter.keySeq().toArray();
-      const firstFilter = props.filter.first();
-
-      if (firstFilter === null || isNaN(firstFilter)) {
-        string = '';
-      } else if (firstFilter && !Immutable.Map.isMap(firstFilter)) {
-        string = firstFilter;
-      } else if (firstFilter.get('$regex', '').length > 0) {
-        string = firstFilter.get('$regex', '');
-      } else {
-        string = '';
-      }
+      string = this.unfilterCond(firstFilterValue);
     }
     this.state = { string, filter_by };
   }
@@ -63,13 +52,23 @@ export default class Filter extends Component {
     if (!found) return {"$regex": value, "$options": "i"};
     switch (found.type) {
       case "number":
-        return parseInt(value, 10);
+        return parseFloat(value);
       case "datetime":
         return value;
       case "text":
       default:
         return {"$regex": value, "$options": "i"};
     }
+  }
+
+  unfilterCond = (value) => {
+    if (typeof value === 'undefined' || value === null) {
+      return '';
+    }
+    if (Immutable.Map.isMap(value)) {
+      return value.get('$regex', '');
+    }
+    return `${value}`;
   }
 
   buildQueryString() {

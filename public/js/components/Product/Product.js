@@ -10,6 +10,7 @@ import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
 import EntityFields from '../Entity/EntityFields';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getUnitLabel,
   getFieldName,
@@ -78,6 +79,10 @@ class Product extends Component {
     const newError = (!globalSetting.keyUppercaseRegex.test(value)) ? allowedCharacters : '';
     this.setState({ errors: Object.assign({}, errors, { name: newError }) });
     this.props.onFieldUpdate(['key'], value);
+  }
+
+  onChangePlay = (play) => {
+    this.props.onFieldUpdate(['play'], play);
   }
 
   onChangeDescription = (e) => {
@@ -229,6 +234,12 @@ class Product extends Component {
           <Form horizontal>
             <Panel>
 
+              <PlaysSelector
+                entity={product}
+                editable={editable && mode === 'create'}
+                onChange={this.onChangePlay}
+              />
+
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
@@ -288,7 +299,20 @@ class Product extends Component {
                         onChangeUnit={this.onChangeUnit}
                       />
                     )
-                    : <div className="non-editable-field">{ `${usaget} ${unitLabel}` }</div>
+                    : (
+                      <div>
+                        <Col sm={1} style={{ paddingTop: 7 }}>{usaget}</Col>
+                        <Col sm={2} componentClass={ControlLabel}>Units of Measure</Col>
+                        <Col sm={2}>
+                          <UsageTypesSelector
+                            usaget={usaget}
+                            unit={unit}
+                            onChangeUsaget={this.onChangeUsaget}
+                            onChangeUnit={this.onChangeUnit}
+                            showSelectTypes={false}
+                          />
+                        </Col>
+                      </div>)
                   }
                 </Col>
               </FormGroup>

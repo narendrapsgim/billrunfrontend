@@ -35,6 +35,8 @@ class PlanIncludesTab extends Component {
     onGroupRemove: PropTypes.func.isRequired,
     mode: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
+    type: PropTypes.string,
+    plays: PropTypes.string,
   }
 
   static defaultProps = {
@@ -43,6 +45,8 @@ class PlanIncludesTab extends Component {
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
     mode: 'create',
+    type: '',
+    plays: '',
   };
 
   constructor(props) {
@@ -79,13 +83,13 @@ class PlanIncludesTab extends Component {
     });
   }
 
-  onGroupAdd = (groupName, usages, unit, include, shared, pooled, products) => {
+  onGroupAdd = (groupName, usages, unit, include, shared, pooled, quantityAffected, products) => {
     const { usedProducts, existingGroups } = this.state;
     this.setState({
       usedProducts: usedProducts.push(...products),
       existingGroups: existingGroups.push(groupName),
     });
-    this.props.onGroupAdd(groupName, usages, unit, include, shared, pooled, products);
+    this.props.onGroupAdd(groupName, usages, unit, include, shared, pooled, quantityAffected, products);
   }
 
   onGroupRemove = (groupName, groupProducts) => {
@@ -115,8 +119,10 @@ class PlanIncludesTab extends Component {
     }
 
     return includeGroups.map((include, groupName) => {
+      const { plays } = this.props;
       const shared = include.get('account_shared', false);
       const pooled = include.get('account_pool', false);
+      const quantityAffected = include.get('quantity_affected', false);
       const products = include.get('rates', Immutable.List());
       const usages = getGroupUsages(include);
       const unit =
@@ -134,6 +140,7 @@ class PlanIncludesTab extends Component {
           unit={unit}
           shared={shared}
           pooled={pooled}
+          quantityAffected={quantityAffected}
           products={products}
           usedProducts={usedProducts.toList()}
           onChangeFieldValue={this.props.onChangeFieldValue}
@@ -141,6 +148,8 @@ class PlanIncludesTab extends Component {
           onChangeGroupProducts={this.onChangeGroupProducts}
           usaget={usaget}
           usageTypes={usageTypes}
+          type={this.props.type}
+          plays={plays}
         />
       );
     }).toArray();
@@ -155,12 +164,13 @@ class PlanIncludesTab extends Component {
       <th>Products</th>
       <th className="text-center" style={{ width: 80 }}>Shared</th>
       <th className="text-center" style={{ width: 80 }}>Pooled</th>
+      <th className="text-center" style={{ width: 80 }}>Quantitative</th>
       <th style={{ width: 60 }} />
     </tr>
   );
 
   render() {
-    const { mode } = this.props;
+    const { mode, plays } = this.props;
     const { existingGroups, usedProducts } = this.state;
     const allowCreate = mode !== 'view';
 
@@ -183,6 +193,8 @@ class PlanIncludesTab extends Component {
               existinGrousNames={existingGroups}
               usedProducts={usedProducts}
               addGroup={this.onGroupAdd}
+              type={this.props.type}
+              plays={plays}
             />
           }
         </Col>

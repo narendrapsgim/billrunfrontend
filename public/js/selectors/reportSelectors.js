@@ -6,9 +6,10 @@ import {
   getFieldNameType,
   getConfig,
   createRateListNameByArgs,
+  sortFieldOption,
 } from '../common/Util';
 import {
-  subscriberFieldsSelector,
+  subscriberFieldsWithPlaySelector,
   inputProssesorfilteredFieldsSelector,
   accountFieldsSelector,
   linesFieldsSelector,
@@ -16,6 +17,7 @@ import {
   usageTypeSelector,
   fileTypeSelector,
   eventCodeSelector,
+  isPlaysEnabledSelector,
 } from './settingsSelector';
 import {
   listByNameSelector,
@@ -27,20 +29,9 @@ import {
   calcNameSelector,
   bucketsNamesSelector,
   bucketsExternalIdsSelector,
+  getPlayTypeOptions,
 } from './listSelectors';
 
-
-const sortFieldOption = (optionsA, optionB) => {
-  const a = optionsA.get('title', '').toUpperCase(); // ignore upper and lowercase
-  const b = optionB.get('title', '').toUpperCase(); // ignore upper and lowercase
-  if (a < b) {
-    return -1;
-  }
-  if (a > b) {
-    return 1;
-  }
-  return 0;
-};
 
 const getReportEntityConfigFields = type => getConfig(['reports', 'fields', type], Immutable.List());
 
@@ -122,7 +113,7 @@ const concatJoinFields = (fields, joinFields = Immutable.Map(), excludeFields = 
   })
 );
 
-const mergeEntityAndReportConfigFields = (billrunConfigFields, type) => {
+const mergeEntityAndReportConfigFields = (billrunConfigFields, type, isPlayEnabled = false) => {
   const entityFields = (type === 'queue') ? billrunConfigFields : formatReportFields(billrunConfigFields);
   const defaultField = Immutable.Map({
     searchable: true,
@@ -133,7 +124,7 @@ const mergeEntityAndReportConfigFields = (billrunConfigFields, type) => {
     entityFields.forEach((entityField) => {
       fieldsWithMutations.push(entityField);
     });
-    // Push report config fields or overide if exist
+    // Push report config fields or override if exist
     getReportEntityConfigFields(type).forEach((predefinedFiled) => {
       const index = fieldsWithMutations.findIndex(field => field.get('id', '') === predefinedFiled.get('id', ''));
       if (index === -1) {
@@ -151,6 +142,9 @@ const mergeEntityAndReportConfigFields = (billrunConfigFields, type) => {
       }
     });
   })
+  .filter(field => (
+    field.get('id') !== 'play' || (field.get('id') === 'play' && isPlayEnabled)
+  ))
   .sort(sortFieldOption);
 };
 
@@ -205,44 +199,51 @@ const reportLinesFieldsSelector = createSelector(
 );
 
 const reportSubscriberFieldsSelector = createSelector(
-  subscriberFieldsSelector,
+  subscriberFieldsWithPlaySelector,
   () => 'subscribers',
+  isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
 const reportAccountFieldsSelector = createSelector(
   accountFieldsSelector,
   () => 'account',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 const reportlogFileFieldsSelector = createSelector(
   () => Immutable.List(),
   () => 'logFile',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 const reportEventFileFieldsSelector = createSelector(
   () => Immutable.List(),
   () => 'event',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 export const reportUsageFieldsSelector = createSelector(
   reportLinesFieldsSelector,
   () => 'usage',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 const reportQueueFieldsSelector = createSelector(
   reportUsageFieldsSelector,
   () => 'queue',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
 const reportBillsSelector = createSelector(
   () => Immutable.List(),
   () => 'bills',
+  () => true,
   mergeEntityAndReportConfigFields,
 );
 
@@ -281,6 +282,7 @@ const getOptionCallback = (state, props) => {
     case 'getBucketsOptions': return bucketsNamesSelector(state, props);
     case 'getBucketsExternalIdsOptions': return bucketsExternalIdsSelector(state, props);
     case 'getFileTypeOptions': return fileTypeSelector(state, props);
+    case 'getPlayTypeOptions': return getPlayTypeOptions(state, props);
     case 'getCalcNameOptions': return calcNameSelector(state, props);
     case 'getEventCodeOptions': return eventCodeSelector(state, props);
     default: return undefined;

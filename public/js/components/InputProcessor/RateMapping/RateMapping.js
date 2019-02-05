@@ -20,6 +20,10 @@ import {
   removeRatingPriorityField,
   removeRatingField,
 } from '../../../actions/inputProcessorActions';
+import {
+  customerIdentificationFieldsPlaySelector,
+} from '../../../selectors/inputProcessorSelector';
+
 
 class RateMapping extends Component {
   static propTypes = {
@@ -29,11 +33,13 @@ class RateMapping extends Component {
     settings: PropTypes.instanceOf(Immutable.Map),
     customRatingFields: PropTypes.instanceOf(Immutable.List),
     rateCalculators: PropTypes.instanceOf(Immutable.List),
+    plays: PropTypes.instanceOf(Immutable.Set),
   }
   static defaultProps = {
     settings: Immutable.Map(),
     customRatingFields: Immutable.List(),
     rateCalculators: Immutable.List(),
+    plays: Immutable.Set(),
   };
 
   state = {
@@ -52,10 +58,23 @@ class RateMapping extends Component {
     });
   };
 
+  sortFiledByPlay = field => (field.get('plays', Immutable.List()).isEmpty() ? 1 : -1)
+
+  filterFiledByPlay = (field) => {
+    const { plays } = this.props;
+    const fieldPlays = field.get('plays', Immutable.List());
+    if (fieldPlays.isEmpty()) {
+      return true;
+    }
+    return plays.intersect(Immutable.Set(fieldPlays)).size > 0;
+  }
+
   getCustomRatingFields = () => {
     const { customRatingFields } = this.props;
     return customRatingFields
       .filter(field => (field.get('field_name', '').startsWith('params.')))
+      .filter(this.filterFiledByPlay)
+      .sort(this.sortFiledByPlay)
       .map(field => ({
         value: field.get('field_name', ''),
         label: field.get('title', ''),
@@ -543,6 +562,7 @@ class RateMapping extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
+  plays: customerIdentificationFieldsPlaySelector(state, props),
   rateCalculators: props.settings.getIn(['rate_calculators', props.rateCategory, props.usaget]),
 });
 

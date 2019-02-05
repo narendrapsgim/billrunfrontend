@@ -234,11 +234,11 @@ class CycleData extends Component {
     return moment.unix(sentDate).format(globalSetting.datetimeFormat);
   };
 
-  downloadTaxURL = (billrunKey) =>
+  downloadTaxURL = billrunKey =>
     `${getConfig('serverUrl')}/api/report?action=taxationReport&report={"billrun_key":"${billrunKey}"}&type=csv`;
 
   parseTaxDownload = (entity) => {
-    const { billrunKey } =  this.props
+    const { billrunKey } = this.props;
     const downloadUrl = this.downloadTaxURL( billrunKey );
     return (
       <form method="post" action={downloadUrl} target="_blank">
@@ -258,16 +258,14 @@ class CycleData extends Component {
         showIcon: false,
         onClick: this.onClickConfirmAll,
         actionSize: 'xsmall',
-      },
-      {
+    }, {
         label: 'Download Taxation compliance report',
         actionStyle: 'primary',
         show : isCycleConfirmed,
         showIcon: false,
         renderFunc : this.parseTaxDownload,
         actionSize: 'xsmall',
-      }
-    ];
+    }];
   }
 
   onCloseConfirmationModal = () => {
@@ -312,7 +310,7 @@ class CycleData extends Component {
       { id: 'attributes.lastname', title: 'Customer Last Name', sort: true, parser: this.parseCycleDataLastName },
       { id: 'totals.after_vat_rounded', title: 'Invoice Total', sort: true, parser: this.parseCycleDataInvoiceTotal },
       { id: 'subss', title: '# of Subscribers', parser: this.parseCycleDataSubscriptionNum },
-      { id: 'invoice_id', title: 'Invoice ID', 'sort': true, parser: this.parseCycleDataInvoiceId },
+      { id: 'invoice_id', title: 'Invoice ID', sort: true, parser: this.parseCycleDataInvoiceId },
       { id: 'download', title: 'Invoice', parser: this.parseCycleDataDownload },
       { id: 'confirm', title: 'Confirm', parser: this.parseCycleDataConfirm },
       { id: 'email_sent', title: 'Email Sent', sort: true, parser: this.parseCycleDataEmailSent, display: displayEmailSent },

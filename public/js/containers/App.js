@@ -7,6 +7,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import BraasTheme from '../theme';
 import ProgressIndicator from '../components/ProgressIndicator';
 import ReduxConfirmModal from '../components/ReduxConfirmModal';
+import ReduxFormModal from '../components/ReduxFormModal';
 import Navigator from '../components/Navigator';
 import Alerts from '../components/Alerts';
 import { Tour, ExampleInvoice } from '../components/OnBoarding';
@@ -73,7 +74,7 @@ class App extends Component {
     }
     if (auth !== true && nextProps.auth === true) { // user did success login
       // get global system settings
-      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu', 'billrun', 'usage_types', 'property_types']))
+      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu', 'billrun', 'usage_types', 'property_types', 'plays']))
         .then(responce => ((responce) ? this.props.logoName : ''))
         .then((logoFileName) => {
           if (logoFileName && logoFileName.length > 0) {
@@ -143,6 +144,7 @@ class App extends Component {
       <div id="wrapper">
         <ProgressIndicator />
         <ReduxConfirmModal />
+        <ReduxFormModal />
         <Alerts />
         <Tour />
         <Navigator routes={routes} />

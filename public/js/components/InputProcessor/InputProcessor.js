@@ -50,7 +50,13 @@ import { getSettings } from '../../actions/settingsActions';
 import { showSuccess, showDanger } from '../../actions/alertsActions';
 import { getList, clearList } from '../../actions/listActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { usageTypeSelector, usageTypesDataSelector, propertyTypeSelector } from '../../selectors/settingsSelector';
+import {
+  usageTypeSelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
+  productFieldsSelector,
+  subscriberFieldsWithPlaySelector,
+} from '../../selectors/settingsSelector';
 
 class InputProcessor extends Component {
 
@@ -330,8 +336,8 @@ class InputProcessor extends Component {
     this.props.dispatch(setReceiverField(id, value, index));
   }
 
-  onCancelKeyAuth = () => {
-    this.props.dispatch(cancelKeyAuth('key'));
+  onCancelKeyAuth = (index) => {
+    this.props.dispatch(cancelKeyAuth('key', index));
   }
 
   onSetReceiverCheckboxField = (id, checked, index) => {
@@ -441,8 +447,6 @@ class InputProcessor extends Component {
   getStepContent = () => {
     const { settings, usageTypes, usageTypesData, propertyTypes, subscriberFields, customRatingFields, action, type, format, fileType } = this.props;
     const { stepIndex, errors, steps } = this.state;
-    const keyValue = settings.getIn(['receiver', 'key'], null);
-    const keyLabel = settings.getIn(['receiver', 'key_label'], settings.get('file_type'));
 
     switch (stepIndex) {
       case steps.get('parser', {}).idx: return (
@@ -524,8 +528,6 @@ class InputProcessor extends Component {
           onCancelKeyAuth={this.onCancelKeyAuth}
           fileType={fileType}
           OnChangeUploadingFile={this.changeUploadingFile}
-          keyValue={keyValue}
-          keyLabel={keyLabel}
         />
       );
 
@@ -587,8 +589,8 @@ const mapStateToProps = (state, props) => {
     usageTypes: usageTypeSelector(state, props),
     propertyTypes: propertyTypeSelector(state, props),
     usageTypesData: usageTypesDataSelector(state, props),
-    subscriberFields: state.settings.getIn(['subscribers', 'subscriber', 'fields'], Immutable.List()),
-    customRatingFields: state.settings.getIn(['rates', 'fields'], Immutable.List()),
+    subscriberFields: subscriberFieldsWithPlaySelector(state, props),
+    customRatingFields: productFieldsSelector(state, props),
     fileType,
     action,
     template,

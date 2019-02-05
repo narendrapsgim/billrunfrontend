@@ -68,8 +68,10 @@ fieldset[disabled] .btn {
   white-space:nowrap;
 }
 
-.pl0{ padding-left: 0!important; }
+.pt0{ padding-top: 0!important; }
 .pr0{ padding-right: 0!important; }
+.pb0{ padding-bottom: 0!important; }
+.pl0{ padding-left: 0!important; }
 .mt10{ margin-top: 10px!important; }
 .mr10{ margin-right: 10px!important; }
 .mb10{ margin-bottom: 10px!important; }
@@ -416,6 +418,9 @@ fieldset[disabled] .btn {
 .List.invoices-list form {
     margin-bottom: 0;
 }
+.List .table td {
+    vertical-align: middle;
+}
 /* Global page + table */
 .page-header {
   border-bottom: none;
@@ -751,6 +756,10 @@ ul.revision-history-list li.active .cycle {
   margin-bottom: 25px;
 }
 /* ~Chart */
+
+.screen-height-70 {
+  max-height: 70vh;
+}
 
 .scrollbox {
   overflow: auto;

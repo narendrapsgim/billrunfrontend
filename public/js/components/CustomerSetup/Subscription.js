@@ -11,6 +11,7 @@ import Actions from '../Elements/Actions';
 import Field from '../Field';
 import { EntityRevisionDetails } from '../Entity';
 import EntityFields from '../Entity/EntityFields';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getConfig,
   getItemId,
@@ -20,10 +21,10 @@ import {
   toImmutableList,
 } from '../../common/Util';
 
-
 class Subscription extends Component {
 
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     subscription: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     settings: PropTypes.instanceOf(Immutable.List), // Subscriptions Fields
@@ -126,6 +127,12 @@ class Subscription extends Component {
     this.updateSubscriptionField(['plan'], plan);
   }
 
+  onChangePlay = (play) => {
+    this.updateSubscriptionField(['play'], play);
+    this.filterSubscriptionServicesByPlay(play);
+    this.filterSubscriptionPlanByPlay(play);
+  }
+
   onChangeServiceDetails = (index, key, value) => {
     const path = Array.isArray(key) ? key : [key];
     this.updateSubscriptionField(['services', index, ...path], value);
@@ -135,6 +142,32 @@ class Subscription extends Component {
     const { subscription } = this.state;
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     const newServices = services.delete(index);
+    this.updateSubscriptionField(['services'], newServices);
+  }
+
+  filterSubscriptionPlanByPlay = (play) => {
+    const { subscription } = this.state;
+    const { allPlans } = this.props;
+    const selectedPlanPlays = allPlans.find(
+      plan => plan.get('name', '') === subscription.get('plan', ''),
+      null, Immutable.Map(),
+    ).get('play', Immutable.List());
+    if (!selectedPlanPlays.isEmpty() && !selectedPlanPlays.includes(play)) {
+      this.updateSubscriptionField(['plan'], '');
+    }
+  }
+
+  filterSubscriptionServicesByPlay = (play) => {
+    const { allServices } = this.props;
+    const { subscription } = this.state;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const newServices = services.filter((service) => {
+      const servicePlays = allServices.find(
+        option => option.get('name', '') === service.get('name', ''),
+        null, Immutable.Map(),
+      ).get('play', Immutable.List());
+      return servicePlays.isEmpty() || servicePlays.includes(play);
+    });
     this.updateSubscriptionField(['services'], newServices);
   }
 
@@ -221,7 +254,17 @@ class Subscription extends Component {
     label: item.get('description', item.get('name', '')),
   }));
 
-  getAvailablePlans = () => this.formatSelectOptions(this.props.allPlans);
+  getAvailablePlans = () => {
+    const { subscription } = this.state;
+    const { allPlans } = this.props;
+    const play = subscription.get('play', false);
+    if ([false, ''].includes(play)) {
+      return this.formatSelectOptions(allPlans);
+    }
+    return this.formatSelectOptions(allPlans
+      .filter(allPlan => allPlan.get('play', Immutable.List()).isEmpty() || allPlan.get('play', Immutable.List()).includes(play)),
+    );
+  }
 
   getPlanIncludedServices = (planName) => {
     if (planName === '') {
@@ -233,15 +276,28 @@ class Subscription extends Component {
     return includedServices.size ? includedServices.join(', ') : '-';
   }
 
-  getAvailableServices = () => this.formatSelectOptions(this.props.allServices);
+  getAvailableServices = () => {
+    const { subscription } = this.state;
+    const { allServices } = this.props;
+    const play = subscription.get('play', false);
+    if ([false, ''].includes(play)) {
+      return this.formatSelectOptions(allServices);
+    }
+    return this.formatSelectOptions(allServices
+      .filter(allService => allService.get('play', Immutable.List()).isEmpty() || allService.get('play', Immutable.List()).includes(play)),
+    );
+  }
 
   filterCustomFields = (field) => {
-    const hiddenFields = ['plan', 'services'];
+    const hiddenFields = ['plan', 'services', 'play'];
     const isCustomField = !hiddenFields.includes(field.get('field_name'));
     const isEditable = field.get('editable', false);
     const isMandatory = field.get('mandatory', false);
     const shouldDisplayed = field.get('display', true);
-    return isCustomField && (isEditable || isMandatory) && shouldDisplayed;
+
+    return isCustomField &&
+    (isEditable || isMandatory) &&
+    shouldDisplayed;
     // PHP .../application/views/internalpaypage/index.phtml condition
     // if ((empty($c['display']) && empty($c['mandatory']))
     //  || $c['field_name'] === 'plan'
@@ -251,13 +307,20 @@ class Subscription extends Component {
 
   renderSystemFields = (editable) => {
     const { subscription } = this.state;
+    const { mode } = this.props;
     const plansOptions = this.getAvailablePlans().toJS();
     const servicesOptions = this.getAvailableServices().toJS();
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     const servicesList = Immutable.Set(services.map(service => service.get('name', ''))).join(',');
     const plan = subscription.get('plan', '');
-    return ([(
-      <FormGroup key="plan">
+    return ([
+      (<PlaysSelector
+        entity={subscription}
+        editable={editable && mode === 'create'}
+        mandatory={true}
+        onChange={this.onChangePlay}
+      />),
+      (<FormGroup key="plan">
         <Col componentClass={ControlLabel}sm={3} lg={2}>Plan <span className="danger-red"> *</span></Col>
         <Col sm={8} lg={9}>
           { editable
