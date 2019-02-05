@@ -23,7 +23,7 @@ const StepValidate = ({ fields, getFormatedRows }) => {
   };
 
   const renderValue = (value, field) => {
-    switch (field.type) {
+    switch (field && field.type) {
       case 'ranges':
       case 'range':
         return (
