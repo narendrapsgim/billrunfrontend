@@ -7,17 +7,21 @@ import { LoadingItemPlaceholder } from '../Elements';
 import {
   getSettings,
 } from '../../actions/settingsActions';
+import { isPlaysEnabledSelector } from '../../selectors/settingsSelector';
+
 
 class ProductsList extends Component {
 
   static propTypes = {
     fields: PropTypes.instanceOf(Immutable.List),
     defaultListFields: PropTypes.arrayOf(PropTypes.string),
+    isPlaysEnabled: PropTypes.bool,
     dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     fields: null,
+    isPlaysEnabled: false,
     defaultListFields: ['description', 'key', 'rates'],
   }
 
@@ -36,6 +40,14 @@ class ProductsList extends Component {
     { id: 'key', placeholder: 'Key' },
   ]);
 
+  filterPlayField = (field) => {
+    const { isPlaysEnabled } = this.props;
+    if (field.get('field_name', '') !== 'play') {
+      return true;
+    }
+    return isPlaysEnabled;
+  }
+
   getProjectFields = () => {
     const { fields, defaultListFields } = this.props;
     return fields
@@ -51,6 +63,7 @@ class ProductsList extends Component {
   getFields = () => {
     const { fields, defaultListFields } = this.props;
     return fields
+      .filter(this.filterPlayField)
       .filter(field => (field.get('show_in_list', false) || defaultListFields.includes(field.get('field_name', ''))))
       .map((field) => {
         const fieldname = field.get('field_name');
@@ -93,6 +106,7 @@ class ProductsList extends Component {
 
 const mapStateToProps = (state, props) => ({
   fields: state.settings.getIn(['rates', 'fields']) || undefined,
+  isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
 export default connect(mapStateToProps)(ProductsList);

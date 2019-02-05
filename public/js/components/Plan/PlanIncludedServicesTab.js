@@ -17,12 +17,14 @@ class PlanIncludedServicesTab extends Component {
     services: PropTypes.instanceOf(List),
     dispatch: PropTypes.func.isRequired,
     onChangeFieldValue: PropTypes.func.isRequired,
+    plays: PropTypes.instanceOf(List),
   };
 
   static defaultProps = {
     includedServices: List(),
     mode: 'create',
     services: List(),
+    plays: List(),
   };
 
   componentWillMount() {
@@ -34,9 +36,19 @@ class PlanIncludedServicesTab extends Component {
     this.props.onChangeFieldValue(['include', 'services'], List(servicesList));
   }
 
+  filterByPlay = (option) => {
+    const { plays } = this.props;
+    const servicePlays = option.get('play', List());
+    if (plays && !plays.isEmpty() && !servicePlays.isEmpty()) {
+      return !plays.filter(entityPlay => servicePlays.includes(entityPlay)).isEmpty();
+    }
+    return true;
+  }
+
   getServicesOptions = () => {
     const { services } = this.props;
     return services
+      .filter(this.filterByPlay)
       .map(service => ({
         value: service.get('name', ''),
         label: service.get('name', ''),

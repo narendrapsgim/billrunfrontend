@@ -34,8 +34,12 @@ export const getLimitationFromBalanceConditionPath = (path) => {
   return 'none';
 };
 
-export const getOverGroupFromBalanceConditionPath = path =>
-  (path.indexOf('.over_group.') !== -1 ? 'over_group' : 'none');
+export const getOverGroupFromBalanceConditionPath = (path) => {
+  if (path.indexOf('.over_group.') !== -1) {
+    return 'over_group';
+  }
+  return 'none';
+};
 
 export const getActivityTypeFromBalanceConditionPath = (path, limitation) => {
   if (limitation !== 'activity_type') {

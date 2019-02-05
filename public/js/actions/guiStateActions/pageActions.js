@@ -11,6 +11,7 @@ export const CONFIRM_HIDE = 'CONFIRM_HIDE';
 export const EDIT_FORM_SHOW = 'EDIT_FORM_SHOW';
 export const EDIT_FORM_HIDE = 'EDIT_FORM_HIDE';
 export const EDIT_FORM_SET_ITEM = 'EDIT_FORM_SET_ITEM';
+export const EDIT_FORM_SET_ERROR = 'EDIT_FORM_SET_ERROR';
 export const EDIT_FORM_UPDATE_ITEM_FIELD = 'EDIT_FORM_UPDATE_ITEM_FIELD';
 export const EDIT_FORM_DELETE_ITEM_FIELD = 'EDIT_FORM_DELETE_ITEM_FIELD';
 
@@ -102,11 +103,18 @@ export const setFormModalItem = item => ({
   item,
 });
 
+export const setFormModalError = (fieldId, message = null) => ({
+  type: EDIT_FORM_SET_ERROR,
+  fieldId,
+  message,
+});
+
 export const updateFormModalItemField = (path, value) => ({
   type: EDIT_FORM_UPDATE_ITEM_FIELD,
   path,
   value,
 });
+
 export const removeFormModalItemField = path => ({
   type: EDIT_FORM_DELETE_ITEM_FIELD,
   path,

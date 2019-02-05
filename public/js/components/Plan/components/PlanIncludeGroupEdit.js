@@ -30,6 +30,7 @@ export default class PlanIncludeGroupEdit extends Component {
     onChangeFieldValue: PropTypes.func.isRequired,
     onChangeGroupProducts: PropTypes.func.isRequired,
     mode: PropTypes.string,
+    plays: PropTypes.string,
     onGroupRemove: PropTypes.func.isRequired,
     unit: PropTypes.string,
     usaget: PropTypes.string,
@@ -44,6 +45,7 @@ export default class PlanIncludeGroupEdit extends Component {
     pooled: false,
     quantityAffected: false,
     mode: 'create',
+    plays: '',
     unit: '',
     usaget: '',
     usageTypes: Immutable.List(),
@@ -171,7 +173,7 @@ export default class PlanIncludeGroupEdit extends Component {
   )
 
   renderEdit = () => {
-    const { name, value, usages, shared, pooled, quantityAffected, products, usedProducts, usaget, unit, type } = this.props;
+    const { name, value, usages, shared, pooled, quantityAffected, products, usedProducts, usaget, unit, type, plays } = this.props;
     const { isEditMode, errorInclude, errorUoM } = this.state;
     return (
       <Modal show={isEditMode}>
@@ -231,6 +233,7 @@ export default class PlanIncludeGroupEdit extends Component {
                     usages={usages}
                     existingProducts={usedProducts.toList()}
                     onChangeGroupRates={this.onChangeGroupRates}
+                    plays={plays}
                   />
                 </div>
               </Col>
