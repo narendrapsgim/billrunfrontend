@@ -14,6 +14,7 @@ class Ranges extends PureComponent {
     multi: PropTypes.bool,
     editable: PropTypes.bool,
     disabled: PropTypes.bool,
+    removable: PropTypes.bool,
     onChange: PropTypes.func,
   };
 
@@ -24,6 +25,7 @@ class Ranges extends PureComponent {
     inputProps: {},
     multi: false,
     editable: true,
+    removable: true,
     disabled: true,
     onChange: () => {},
   };
@@ -59,6 +61,7 @@ class Ranges extends PureComponent {
       disabled,
       label,
       multi,
+      removable,
       ...otherProps
     } = this.props;
     const { id } = this.state;
@@ -84,15 +87,15 @@ class Ranges extends PureComponent {
       };
       return (
         <FormGroup key={`range_${id}_${index}`} className="rangesField form-inner-edit-row">
-          <InputGroup>
+          <InputGroup style={{ width: '100%' }}>
             <Range
               {...otherProps}
               value={rangeValue}
               onChange={onChangeRange}
-              editable={editable}
+              editable={true}
               disabled={disabled}
             />
-            { editable && (
+            { removable && (
               <InputGroup.Button>
                 <Button onClick={onRemoveRange} disabled={disabled} >
                   <i className="fa fa-fw fa-trash-o danger-red" />
@@ -107,7 +110,7 @@ class Ranges extends PureComponent {
     return (
       <div>
         {ranges}
-        {editable && (multi || (!multi && value.size === 0)) && (
+        {(multi || (!multi && value.size === 0)) && (
           <CreateButton
             buttonStyle={{ marginTop: 5, marginBottom: 10 }}
             onClick={this.onAdd}

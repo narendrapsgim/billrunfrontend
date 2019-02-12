@@ -125,7 +125,7 @@ class CustomersList extends Component {
           listActions={listActions}
           refreshString={refreshString}
         />
-        <ModalWrapper show={showImport} title="Import" onHide={this.onClickAskCloseImport}>
+        <ModalWrapper show={showImport} title="Import" onHide={this.onClickAskCloseImport} modalSize="large">
           <Importer
             entityOptions={['customer', 'subscription']}
             onFinish={this.onCloseImport}
