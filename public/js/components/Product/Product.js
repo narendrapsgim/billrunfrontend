@@ -266,6 +266,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeTariffCategory}
+                onRemoveField={this.onChangeTariffCategory}
                 fieldsFilter={this.filterTariffCategory}
                 editable={editable}
               />
@@ -321,6 +322,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
+                onRemoveField={this.onChangeAdditionalField}
                 highlightPramas={ratingParams}
                 editable={editable}
               />

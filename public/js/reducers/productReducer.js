@@ -33,8 +33,13 @@ const DefaultRate = Immutable.Record({
 export default function (state = defaultState, action) {
   switch (action.type) {
 
-    case PRODUCT_UPDATE_FIELD_VALUE:
-      return state.setIn(action.path, action.value);
+    case PRODUCT_UPDATE_FIELD_VALUE: {
+      const { path, value } = action;
+      if (typeof value === 'undefined') {
+        return state.deleteIn(path);
+      }
+      return state.setIn(path, value);
+    }
 
     case PRODUCT_UPDATE_TO_VALUE: {
       return state.updateIn(action.path, Immutable.List(), (list) => {
