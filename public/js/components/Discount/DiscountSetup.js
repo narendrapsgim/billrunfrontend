@@ -142,6 +142,10 @@ class DiscountSetup extends Component {
     }
   }
 
+  onRemoveFieldValue = (path) => {
+    this.props.dispatch(deleteDiscountValue(path));
+  }
+
   onChangeFieldValue = (path, value) => {
     const stringPath = Array.isArray(path) ? path.join('.') : path;
     const deletePathOnEmptyValue = ['limit', 'cycles', 'params.plan'];
@@ -239,6 +243,7 @@ class DiscountSetup extends Component {
             mode={mode}
             currency={currency}
             onFieldUpdate={this.onChangeFieldValue}
+            onFieldRemove={this.onRemoveFieldValue}
             availablePlans={availablePlans}
             availableServices={availableServices}
           />
