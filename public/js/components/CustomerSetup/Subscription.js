@@ -249,6 +249,10 @@ class Subscription extends Component {
     this.setState(prevState => ({ subscription: prevState.subscription.setIn(path, value) }));
   }
 
+  removeSubscriptionField = (path, value) => {
+    this.setState(prevState => ({ subscription: prevState.subscription.deleteIn(path, value) }));
+  }
+
   formatSelectOptions = items => items.map(item => ({
     value: item.get('name', ''),
     label: item.get('description', item.get('name', '')),
@@ -438,6 +442,7 @@ class Subscription extends Component {
               entityName={['subscribers', 'subscriber']}
               entity={subscription}
               onChangeField={this.updateSubscriptionField}
+              onRemoveField={this.removeSubscriptionField}
               fieldsFilter={this.filterCustomFields}
               editable={allowEdit}
             />

@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import {
+  PRODUCT_DELETE_FIELD,
   PRODUCT_UPDATE_FIELD_VALUE,
   PRODUCT_UPDATE_USAGET_VALUE,
   PRODUCT_UPDATE_TO_VALUE,
@@ -33,13 +34,14 @@ const DefaultRate = Immutable.Record({
 export default function (state = defaultState, action) {
   switch (action.type) {
 
-    case PRODUCT_UPDATE_FIELD_VALUE: {
-      const { path, value } = action;
-      if (typeof value === 'undefined') {
-        return state.deleteIn(path);
+    case PRODUCT_UPDATE_FIELD_VALUE:
+      return state.setIn(action.path, action.value);
+
+    case PRODUCT_DELETE_FIELD:
+      if (Array.isArray(action.path)) {
+        return state.deleteIn(action.path);
       }
-      return state.setIn(path, value);
-    }
+      return state.deleteIn([action.path]);
 
     case PRODUCT_UPDATE_TO_VALUE: {
       return state.updateIn(action.path, Immutable.List(), (list) => {

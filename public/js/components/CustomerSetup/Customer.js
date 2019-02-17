@@ -26,6 +26,7 @@ class Customer extends Component {
     supportedGateways: PropTypes.instanceOf(Immutable.List),
     onChangePaymentGateway: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
+    onRemoveField: PropTypes.func.isRequired,
     action: PropTypes.string,
     currency: PropTypes.string,
     fields: PropTypes.instanceOf(Immutable.List),
@@ -78,6 +79,10 @@ class Customer extends Component {
   onChangeCustomField = (fieldPath, value) => {
     const e = { target: { id: fieldPath, value } };
     this.props.onChange(e);
+  };
+
+  onChangeCustomField = (fieldPath) => {
+    this.props.onRemoveField(fieldPath);
   };
 
   renderPaymentGatewayLabel = () => {
@@ -299,6 +304,7 @@ class Customer extends Component {
             entityName={['subscribers', 'account']}
             entity={customer}
             onChangeField={this.onChangeCustomField}
+            onRemoveField={this.onRemoveCustomField}
           />
           { (action !== 'create') && this.renderChangePaymentGateway() }
           { (action !== 'create') && this.renderDebt() }

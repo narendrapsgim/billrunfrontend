@@ -15,6 +15,7 @@ import {
   savePlan,
   clearPlan,
   onPlanFieldUpdate,
+  onPlanFieldRemove,
   onPlanCycleUpdate,
   onPlanTariffAdd,
   onPlanTariffRemove,
@@ -153,6 +154,10 @@ class PlanSetup extends Component {
     this.props.dispatch(onPlanFieldUpdate(path, value));
   }
 
+  onRemoveFieldValue = (path) => {
+    this.props.dispatch(onPlanFieldRemove(path));
+  }
+
   onDeleteField = (path, value) => {
     this.props.dispatch(onPlanFieldUpdate(path, value));
   }
@@ -242,6 +247,7 @@ class PlanSetup extends Component {
                 mode={mode}
                 plan={item}
                 onChangeFieldValue={this.onChangeFieldValue}
+                onRemoveField={this.onRemoveFieldValue}
                 onPlanCycleUpdate={this.onPlanCycleUpdate}
                 onPlanTariffAdd={this.onPlanTariffAdd}
                 onPlanTariffRemove={this.onPlanTariffRemove}
