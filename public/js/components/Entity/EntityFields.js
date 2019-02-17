@@ -26,6 +26,7 @@ class EntityFields extends Component {
     editable: PropTypes.bool,
     isPlaysEnabled: PropTypes.bool,
     onChangeField: PropTypes.func,
+    onRemoveField: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -37,6 +38,7 @@ class EntityFields extends Component {
     editable: true,
     isPlaysEnabled: false,
     onChangeField: () => {},
+    onRemoveField: () => { console.error('Please implement onRemoveField function for EntityFields'); },
   }
 
   componentDidMount() {
@@ -59,12 +61,12 @@ class EntityFields extends Component {
     ).get('multiple', false);
     const shouldResetFields = isMultiple ?
       !Immutable.is(entity.get('play', Immutable.List()), oldEntity.get('play', Immutable.List()))
-      : entity.get('play', '') !== oldEntity.get('play', '')
+      : entity.get('play', '') !== oldEntity.get('play', '');
     if (shouldResetFields) {
       fields.forEach((field) => {
         const shoudPlayBeDisplayd = this.filterPlayFields(field);
         if (!shoudPlayBeDisplayd) {
-          this.props.onChangeField(field.get('field_name', '').split('.'), '');
+          this.props.onRemoveField(field.get('field_name', '').split('.'));
         }
       });
     }

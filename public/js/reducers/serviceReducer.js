@@ -35,8 +35,13 @@ const serviceReducer = (state = DefaultState, action) => {
     case GOT_SERVICE:
       return Immutable.fromJS(action.item);
 
-    case UPDATE_SERVICE:
-      return state.setIn(action.path, action.value);
+    case UPDATE_SERVICE: {
+      const { path, value } = action;
+      if (value === null) {
+        return state.deleteIn(path);
+      }
+      return state.setIn(path, value);
+    }
 
     case CLONE_RESET_SERVICE: {
       const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', ...action.uniquefields];
