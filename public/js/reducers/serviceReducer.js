@@ -37,7 +37,7 @@ const serviceReducer = (state = DefaultState, action) => {
 
     case UPDATE_SERVICE: {
       const { path, value } = action;
-      if (value === null) {
+      if (typeof value === 'undefined') {
         return state.deleteIn(path);
       }
       return state.setIn(path, value);

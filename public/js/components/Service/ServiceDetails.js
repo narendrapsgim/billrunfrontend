@@ -89,10 +89,6 @@ export default class ServiceDetails extends Component {
     this.props.updateItem(field, value);
   }
 
-  onRemoveAdditionalField = (field) => {
-    this.props.updateItem(field, null);
-  }
-
   onChangeServicePeriodType = (e) => {
     const { value } = e.target;
     this.props.updateItem(['balance_period', 'type'], value);
@@ -283,7 +279,7 @@ export default class ServiceDetails extends Component {
           entityName="services"
           entity={item}
           onChangeField={this.onChangeAdditionalField}
-          onRemoveField={this.onRemoveAdditionalField}
+          onRemoveField={this.onChangeAdditionalField}
           editable={editable}
         />
 
