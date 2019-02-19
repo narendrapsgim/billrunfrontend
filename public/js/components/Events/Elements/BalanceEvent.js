@@ -1,11 +1,14 @@
 import React, { PropTypes, Component } from 'react';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
-import { Form, FormGroup, Col, ControlLabel, Panel } from 'react-bootstrap';
+import { Form, FormGroup, Col, ControlLabel, Panel, HelpBlock } from 'react-bootstrap';
 import { getConditionDescription } from './../EventsUtil';
 import Field from '../../Field';
 import { Actions, CreateButton } from '../../Elements';
 import BalanceEventCondition from './BalanceEventCondition';
+import {
+  validateFieldEventCode,
+} from '../../../actions/eventActions';
 import { usageTypesDataSelector, propertyTypeSelector, currencySelector } from '../../../selectors/settingsSelector';
 
 class BalanceEvent extends Component {
@@ -16,7 +19,9 @@ class BalanceEvent extends Component {
     conditionType: PropTypes.string,
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
+    errors: PropTypes.instanceOf(Immutable.Map),
     currency: PropTypes.string,
+    setError: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -24,11 +29,19 @@ class BalanceEvent extends Component {
     conditionType: 'balance',
     propertyTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
+    errors: Immutable.Map(),
     currency: '',
   };
 
   state = {
     editedConditionIndex: -1,
+  };
+
+  onChangeEventCode = (e) => {
+    const { value } = e.target;
+    const isValid = validateFieldEventCode(value);
+    this.props.setError('event_code', isValid === true ? null : isValid);
+    this.props.updateField(['event_code'], value);
   };
 
   onChangeField = path => (e) => {
@@ -124,16 +137,21 @@ class BalanceEvent extends Component {
   );
 
   render() {
-    const { item } = this.props;
+    const { item, errors } = this.props;
+    const isEventCodeError = errors.get('event_code', false);
     return (
       <Form horizontal>
         <Panel header={<span>Details</span>}>
-          <FormGroup>
+          <FormGroup validationState={isEventCodeError ? 'error' : null}>
             <Col componentClass={ControlLabel} sm={3}>
               Event Code
+              <span className="danger-red"> *</span>
             </Col>
             <Col sm={7}>
-              <Field id="label" onChange={this.onChangeField(['event_code'])} value={item.get('event_code', '')} />
+              <Field id="label" onChange={this.onChangeEventCode} value={item.get('event_code', '')} />
+              { isEventCodeError && (
+                <HelpBlock>{isEventCodeError}</HelpBlock>
+              )}
             </Col>
           </FormGroup>
           <FormGroup>

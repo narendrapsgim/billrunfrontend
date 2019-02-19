@@ -230,6 +230,9 @@ fieldset[disabled] .btn {
 .react-tagsinput-remove {
   padding-right: 6px;
 }
+.form-group.has-error .react-tagsinput {
+  border-color: red;
+}
 /* ~React-tags */
 
 /* React-Select */
@@ -245,6 +248,11 @@ fieldset[disabled] .btn {
 }
 .has-value > .Select-control > .Select-placeholder{
   color: #6f6f6f!important;
+}
+.form-group.has-error .Select-control {
+  border-color: #f04124;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 .Select-item{
   color: #6f6f6f!important;
@@ -272,6 +280,12 @@ fieldset[disabled] .btn {
   color: #222222!important;
 }
 /* ~React-Select */
+
+/* React-bootstrap */
+.form-group.has-error .dropdown.input-group-btn > button {
+  border-color: red;
+}
+/* ~React-bootstrap */
 
 /* Custom field input */
 .custom-field-input .Field {
