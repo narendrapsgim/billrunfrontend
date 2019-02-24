@@ -29,6 +29,7 @@ const Action = (props) => {
     'fa-refresh': type === 'refresh',
     'fa-arrow-left': type === 'back',
     'fa-minus': type === 'collapse',
+    'fa-cog': type === 'settings',
   });
 
   const onClick = () => {
