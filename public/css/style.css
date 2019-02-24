@@ -277,6 +277,18 @@ fieldset[disabled] .btn {
 .custom-field-input .Field {
   display: inline-block;
 }
+
+.Field.label-input input {
+  padding: 0 5px;
+  height: 18px;
+  width: 35px;
+  text-align: center;
+}
+
+.input-group-addon .action-button button {
+  padding: 0;
+}
+
 .custom-field-input .form-control{
   margin: 0 0 7px 0;
   padding: 3px 4px;
