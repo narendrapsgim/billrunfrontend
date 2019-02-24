@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock, Label } from 'react-bootstrap';
 import Select from 'react-select';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
@@ -128,9 +128,14 @@ export default class DiscountDetails extends Component {
     .map(this.createOption)
     .toArray();
 
-  createServicesOptions = () => this.props.availableServices
-    .map(this.createOption)
-    .toArray();
+  createServicesOptions = () => {
+    const { discount } = this.props;
+    const isPercentaget = (discount.get('discount_type', '') === 'percentage');
+    return this.props.availableServices
+      .filter(availableService => !(isPercentaget && availableService.get('quantitative', false)))
+      .map(this.createOption)
+      .toArray();
+  }
 
   createOption = item => ({
     value: item.get('name'),
@@ -142,10 +147,7 @@ export default class DiscountDetails extends Component {
     const discountSubject = discount.getIn(['params', 'service'], Immutable.List());
     return discountSubject.map((serviceName) => {
       const label = this.getLabel(availableServices, serviceName);
-      const isQuantitative = (availableServices.findIndex(service => (
-        service.get('name', '') === serviceName
-        && service.get('quantitative', false) === true
-      )) !== -1);
+      const isQuantitative = this.isServiceQuantitative(serviceName);
       return (
         <ServiceDiscountValue
           key={`${paramCase(serviceName)}-discount-value`}
@@ -199,6 +201,13 @@ export default class DiscountDetails extends Component {
     );
   }
 
+  isServiceQuantitative = (name) => {
+    const { availableServices } = this.props;
+    return availableServices.findIndex(service => (
+      service.get('name', '') === name && service.get('quantitative', false) === true
+    )) !== -1;
+  }
+
   render() {
     const { errors } = this.state;
     const { discount, mode, currency } = this.props;
@@ -208,6 +217,18 @@ export default class DiscountDetails extends Component {
     const servicesOptions = this.createServicesOptions();
     const services = discount.getIn(['params', 'service'], Immutable.List()).join(',');
     const proratedValue = discount.get('prorated', true);
+    const includesQuantitative = discount
+      .getIn(['params', 'service'], Immutable.List())
+      .reduce((acc, serviceName) => (this.isServiceQuantitative(serviceName) ? true : acc), false);
+    const percentageLabel = (!includesQuantitative) ? 'Percentage' : (
+      <span>
+        Percentage&nbsp;
+        <Label bsStyle="warning">
+          not compatible with quantitative service type.
+        </Label>
+      </span>
+    );
+
     return (
       <Row>
         <Col lg={12}>
@@ -243,10 +264,10 @@ export default class DiscountDetails extends Component {
                     ? (
                       <span>
                         <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="percentage" label="Percentage" checked={isPercentaget} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="monetary" label="Monetary" checked={!isPercentaget} />
                         </span>
                         <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="monetary" label="Monetary" checked={!isPercentaget} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
                         </span>
                       </span>
                     )
