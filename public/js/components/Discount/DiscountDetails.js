@@ -265,24 +265,24 @@ export default class DiscountDetails extends Component {
               </FormGroup>
             </Panel>
 
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-                <Col sm={8} lg={9} style={{ paddingTop: 7 }}>
-                  <Field
-                    value={proratedValue}
-                    onChange={this.onChangeProrated}
-                    fieldType="checkbox"
-                    editable={editable}
-                  />
-                </Col>
-              </FormGroup>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
+              <Col sm={8} lg={9} style={{ paddingTop: 7 }}>
+                <Field
+                  value={proratedValue}
+                  onChange={this.onChangeProrated}
+                  fieldType="checkbox"
+                  editable={editable}
+                />
+              </Col>
+            </FormGroup>
 
-              <EntityFields
-                entityName="discounts"
-                entity={discount}
-                onChangeField={this.onChangeAdditionalField}
-                editable={editable}
-              />
+            <EntityFields
+              entityName="discounts"
+              entity={discount}
+              onChangeField={this.onChangeAdditionalField}
+              editable={editable}
+            />
 
             <Panel header={<h3>Discount Conditions</h3>}>
               <FormGroup>
