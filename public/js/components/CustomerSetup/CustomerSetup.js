@@ -132,7 +132,7 @@ class CustomerSetup extends Component {
     this.props.dispatch(updateCustomerField(id, value));
   }
 
-  onChangeCustomerField = (path) => {
+  onRemoveCustomerField = (path) => {
     this.props.dispatch(removeCustomerField(path));
   }
 

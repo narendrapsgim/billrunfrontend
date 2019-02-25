@@ -81,7 +81,7 @@ class Customer extends Component {
     this.props.onChange(e);
   };
 
-  onChangeCustomField = (fieldPath) => {
+  onRemoveCustomField = (fieldPath) => {
     this.props.onRemoveField(fieldPath);
   };
 
