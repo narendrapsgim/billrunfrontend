@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import { Panel, Button, FormGroup, ControlLabel } from 'react-bootstrap';
 import Immutable from 'immutable';
+import isNumber from 'is-number';
+import { Panel, Button, FormGroup, ControlLabel, Row, Col } from 'react-bootstrap';
+import Field from '../../Field';
 import Help from '../../Help';
 import CreateButton from '../../Elements/CreateButton';
 import ProductPrice from '../../Product/components/ProductPrice';
@@ -22,6 +24,7 @@ export default class PlanProduct extends Component {
     prices: PropTypes.instanceOf(Immutable.List),
     usageTypes: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
+    percentage: PropTypes.number,
   }
 
   static defaultProps = {
@@ -30,29 +33,33 @@ export default class PlanProduct extends Component {
     usageTypes: Immutable.List(),
     propertyTypes: Immutable.List(),
     mode: 'create',
+    percentage: null,
   };
 
   componentWillMount() {
-    const { item, usaget, prices } = this.props;
-    this.addDefaultPriceIfNoPrice(item, usaget, prices);
+    const { item, usaget, prices, percentage } = this.props;
+    this.addDefaultPriceIfNoPrice(item, usaget, prices, percentage);
   }
 
   shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
-    const { prices, mode, usageTypes, propertyTypes } = this.props;
+    const { prices, mode, usageTypes, propertyTypes, percentage } = this.props;
     return !Immutable.is(prices, nextProps.prices)
       || mode !== nextProps.mode
+      || percentage !== nextProps.percentage
+      || !Immutable.is(prices, nextProps.prices)
       || !Immutable.is(usageTypes, nextProps.usageTypes)
       || !Immutable.is(propertyTypes, nextProps.propertyTypes);
   }
 
   componentWillUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
-    const { item, usaget, prices } = nextProps;
-    this.addDefaultPriceIfNoPrice(item, usaget, prices);
+    const { item, usaget, prices, percentage } = nextProps;
+    this.addDefaultPriceIfNoPrice(item, usaget, prices, percentage);
   }
 
-  addDefaultPriceIfNoPrice = (item, usaget, prices) => {
+  addDefaultPriceIfNoPrice = (item, usaget, prices, percentage) => {
     // if product don't have pricing for this plan, init with BASE price
-    if (prices.size === 0) {
+    const isPercentage = percentage !== null;
+    if (prices.size === 0 && !isPercentage) {
       const productKey = item.get('key', '');
       const productPath = ['rates', productKey, usaget, 'rate'];
       this.props.onProductInitRate(item, productPath);
@@ -104,11 +111,37 @@ export default class PlanProduct extends Component {
     this.props.onProductRestore(item, productPath);
   }
 
+  onChangeOverrideType = (e) => {
+    const { item, usaget } = this.props;
+    const productKey = item.get('key');
+    const { value } = e.target;
+    if (value === 'percentage') {
+      const initPercentage = Immutable.Map({ [usaget]: Immutable.Map({ percentage: 100 }) });
+      const fieldPath = ['rates', productKey];
+      this.props.onProductEditRate(fieldPath, initPercentage);
+    } else {
+      // Remove percentage if exists
+      const initPercentage = Immutable.Map({ [usaget]: Immutable.Map({ rate: Immutable.List() }) });
+      const fieldPath = ['rates', productKey];
+      this.props.onProductEditRate(fieldPath, initPercentage);
+    }
+  }
+
+  onChangePercentage = (e) => {
+    const { value } = e.target;
+    const { item, usaget } = this.props;
+    const newValue = isNumber(value) ? parseFloat(value) : value;
+    const productKey = item.get('key');
+    const fieldPath = ['rates', productKey, usaget, 'percentage'];
+    this.props.onProductEditRate(fieldPath, newValue);
+  }
+
   render() {
-    const { item, prices, usaget, mode, propertyTypes, usageTypes } = this.props;
+    const { item, prices, usaget, mode, propertyTypes, usageTypes, percentage } = this.props;
     const unit = prices.getIn([0, 'uom_display', 'range'], '');
     const editable = (mode !== 'view');
     const priceCount = prices.size;
+    const isPercentage = percentage !== null;
     const pricingMethod = (item.get('pricing_method', 'Tiered') === 'volume') ? 'Volume' : 'Tiered';
     const header = (
       <h3>
@@ -120,10 +153,62 @@ export default class PlanProduct extends Component {
 
     return (
       <Panel header={header}>
-        <FormGroup style={{ margin: 0 }}>
-          {<ControlLabel>{`${pricingMethod} Pricing`}</ControlLabel>}
-        </FormGroup>
-        { prices.map((price, i) => (
+        { editable && (
+          <FormGroup className="mb0">
+            <span style={{ display: 'inline-block', marginRight: 20 }}>
+              <Field
+                fieldType="radio"
+                value="no"
+                onChange={this.onChangeOverrideType}
+                name={`${item.get('key')}-override-type`}
+                label="Override with specific prices"
+                checked={!isPercentage}
+              />
+            </span>
+            <span style={{ display: 'inline-block' }}>
+              <Field
+                style={{ display: 'inline-block', marginRight: 10 }}
+                fieldType="radio"
+                value="percentage"
+                onChange={this.onChangeOverrideType}
+                name={`${item.get('key')}-override-type`}
+                label="Override by percentage of the original price"
+                checked={isPercentage}
+              />
+              { isPercentage && (
+                <Field
+                  style={{ display: 'inline-block', width: 115, verticalAlign: 'middle' }}
+                  fieldType="number"
+                  onChange={this.onChangePercentage}
+                  value={percentage}
+                  editable={editable}
+                  suffix="%"
+                  max={100}
+                  min={0}
+                  step={1}
+                />
+              )}
+            </span>
+          </FormGroup>
+        )}
+        { isPercentage && !editable && (
+          <FormGroup className="mb0">
+            <span>Original price overridden by: </span>
+            <Field
+              style={{ display: 'inline-block', width: 115, verticalAlign: 'middle' }}
+              fieldType="number"
+              value={percentage}
+              editable={false}
+              suffix="%"
+            />
+          </FormGroup>
+        )}
+        { !isPercentage && (
+          <FormGroup style={{ margin: 3 }}>
+            {<ControlLabel>{`${pricingMethod} Pricing`}</ControlLabel>}
+          </FormGroup>
+        )}
+        { !isPercentage && prices.map((price, i) => (
           <ProductPrice
             key={`${item.get('key')}_${i}`}
             item={price}
@@ -135,7 +220,11 @@ export default class PlanProduct extends Component {
             onProductRemoveRate={this.onProductRemoveRate}
           />
         ))}
-        { editable && <div><br /><CreateButton onClick={this.onProductAddRate} label="Add New" /></div> }
+        { !isPercentage && editable && (
+          <FormGroup style={{ margin: 0 }}>
+            <CreateButton onClick={this.onProductAddRate} label="Add New" buttonStyle={{ marginTop: 0 }} />
+          </FormGroup>
+        )}
       </Panel>
     );
   }

@@ -55,6 +55,13 @@ export const formModalConfigSelector = createSelector(
   getFormModalConfig,
   config => config,
 );
+
+const getFormModalErrors = state => state.guiState.page.getIn(['formModalData', 'errors']);
+export const formModalErrosSelector = createSelector(
+  getFormModalErrors,
+  errors => errors,
+);
+
 const getFormModalShowState = state => state.guiState.page.getIn(['formModalData', 'show']);
 export const formModalShowStateSelector = createSelector(
   getFormModalShowState,

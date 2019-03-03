@@ -72,7 +72,7 @@ const StepMapper = (props) => {
     return (
       <div>
         <FormGroup>
-          <Col sm={3} componentClass={ControlLabel}>Link to field</Col>
+          <Col sm={3} componentClass={ControlLabel}>Link to field<span className="danger-red"> *</span></Col>
           <Col sm={9}>
             <Select
               onChange={onChangeLinkerField}
@@ -83,7 +83,7 @@ const StepMapper = (props) => {
           </Col>
         </FormGroup>
         <FormGroup>
-          <Col sm={3} componentClass={ControlLabel}>Link by value from</Col>
+          <Col sm={3} componentClass={ControlLabel}>Link by value from<span className="danger-red"> *</span></Col>
           <Col sm={9}>
             <Select
               onChange={onChangeLinkerValue}

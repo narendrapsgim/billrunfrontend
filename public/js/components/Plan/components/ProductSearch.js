@@ -9,14 +9,19 @@ export default class ProductSearch extends Component {
   static propTypes = {
     onSelectProduct: PropTypes.func.isRequired,
     searchFunction: PropTypes.object,
+    filterFunction: PropTypes.func,
   }
 
   static defaultProps = {
     searchFunction: getProductsKeysQuery({ key: 1, description: 1 }),
+    filterFunction: () => true,
   };
 
 
-  state = { val: '' }
+  state = {
+    val: '',
+    rates: [],
+  }
 
   onSelectProduct = (productKey) => {
     if (productKey) {
@@ -25,24 +30,32 @@ export default class ProductSearch extends Component {
     this.setState({ val: '' });
   }
 
+  componentDidMount() {
+    this.getProducts();
+  }
+
   getProducts = () => apiBillRun(this.props.searchFunction)
-    .then(success => ({
-      options: success.data[0].data.details.map(option => ({
+    .then((success) => {
+      const options = success.data[0].data.details
+      .map(option => ({
         value: option.key,
         label: `${option.key} (${option.description})`,
-      })),
-      complete: true,
-    }))
-    .catch(() => ({ options: [] }));
+        play: option.play,
+      }));
+      this.setState({ rates: options });
+    })
+    .catch(() => {
+      this.setState({ options: [] });
+    });
 
   render() {
-    const { val } = this.state;
+    const { val, rates } = this.state;
+    const ratesOptions = rates.filter(this.props.filterFunction);
     return (
       <Select
         value={val}
+        options={ratesOptions}
         onChange={this.onSelectProduct}
-        asyncOptions={this.getProducts}
-        autoload={true}
         searchable={true}
         placeholder="Search by product key or title..."
         noResultsText="No products found, please try another key"

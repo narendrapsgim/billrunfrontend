@@ -13,6 +13,8 @@ import {
 import {
   getConfig,
   parseConfigSelectOptions,
+  shouldUsePlays,
+  getPlayOptions,
 } from '../../common/Util';
 
 
@@ -129,11 +131,6 @@ class CustomField extends Component {
     return customFieldsConfig.find(config => config.get('id', '') === fieldtype, null, Immutable.Map());
   }
 
-  getPlayOptions = () => (this.props.availablePlays.map(play => ({
-    value: play.get('name', ''),
-    label: play.get('label', play.get('name', '')),
-  })).toArray());
-
   inBlackList = (option, entity) => {
     const blackList = option.get('exclude', Immutable.List());
     if (blackList.isEmpty()) {
@@ -212,7 +209,7 @@ class CustomField extends Component {
   }
 
   renderAdvancedEdit = () => {
-    const { field, entity, customFieldsConfig } = this.props;
+    const { field, entity, customFieldsConfig, availablePlays } = this.props;
     const { showAdvancedEdit } = this.state;
     const fieldType = this.getFieldType(field);
     const fieldConfig = this.getFieldTypeConfig(fieldType);
@@ -221,8 +218,8 @@ class CustomField extends Component {
     const checkboxStyle = { marginTop: 10, paddingLeft: 26 };
     const helpTextStyle = { color: '#626262', verticalAlign: 'text-top' };
 
-    const playsOptions = this.getPlayOptions();
-    const showPlays = ['subscriber'].includes(entity) && playsOptions.length > 1;
+    const playsOptions = getPlayOptions(availablePlays);
+    const showPlays = ['subscriber', 'product', 'service', 'plan'].includes(entity) && shouldUsePlays(availablePlays);
     const plays = field.get('plays', []).join(',');
 
     const disableUnique = !this.isAllowedForProperty('unique') || !this.isEditableProperty('unique');

@@ -10,6 +10,7 @@ import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
 import EntityFields from '../Entity/EntityFields';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getUnitLabel,
   getFieldName,
@@ -78,6 +79,10 @@ class Product extends Component {
     const newError = (!globalSetting.keyUppercaseRegex.test(value)) ? allowedCharacters : '';
     this.setState({ errors: Object.assign({}, errors, { name: newError }) });
     this.props.onFieldUpdate(['key'], value);
+  }
+
+  onChangePlay = (play) => {
+    this.props.onFieldUpdate(['play'], play);
   }
 
   onChangeDescription = (e) => {
@@ -228,6 +233,12 @@ class Product extends Component {
         <Col lg={12}>
           <Form horizontal>
             <Panel>
+
+              <PlaysSelector
+                entity={product}
+                editable={editable && mode === 'create'}
+                onChange={this.onChangePlay}
+              />
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>

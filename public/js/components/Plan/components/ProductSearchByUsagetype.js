@@ -12,6 +12,7 @@ export default class ProductSearchByUsagetype extends Component {
     existingProducts: Immutable.List(),
     products: Immutable.List(),
     usages: Immutable.List(),
+    plays: '',
   }
 
   static propTypes = {
@@ -20,6 +21,7 @@ export default class ProductSearchByUsagetype extends Component {
     disabled: React.PropTypes.bool,
     existingProducts: React.PropTypes.instanceOf(Immutable.List),
     products: React.PropTypes.instanceOf(Immutable.List),
+    plays: React.PropTypes.string,
   }
 
   shouldComponentUpdate(nextProps) {
@@ -37,9 +39,9 @@ export default class ProductSearchByUsagetype extends Component {
   }
 
   findGroupRates = () => {
-    const { usages, existingProducts } = this.props;
+    const { usages, existingProducts, plays } = this.props;
     const notKeys = existingProducts.toArray();
-    const query = searchProductsByKeyAndUsagetQuery(usages.toArray(), notKeys);
+    const query = searchProductsByKeyAndUsagetQuery(usages.toArray(), notKeys, plays);
     return apiBillRun(query)
       .then((success) => {
         const uniqueKeys = [...new Set(success.data[0].data.details.map(option => option.key))];
