@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import isNumber from 'is-number';
-import { Form, FormGroup, ControlLabel, Col, HelpBlock, Button } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, HelpBlock, InputGroup } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
-import { ModalWrapper } from '../../Elements';
+import { ModalWrapper, Actions } from '../../Elements';
 import Field from '../../Field';
 
 class ServiceDiscountValue extends Component {
@@ -38,6 +38,10 @@ class ServiceDiscountValue extends Component {
 
   onChangeValue = (val) => {
     const { name, discount } = this.props;
+    if (val === null) { // delete
+      this.props.onChange(name, null);
+      return;
+    }
     const value = isNumber(val) ? parseFloat(val) : val;
     const serviceDiscoun = discount.getIn(['discount_subject', 'service', name], Immutable.Map());
     const newValue = this.isOldStructure()
@@ -46,15 +50,19 @@ class ServiceDiscountValue extends Component {
     this.props.onChange(name, newValue);
   }
 
-  onChangeAmount = (e) => {
+  onChangeAmount = (value) => {
     const { discount, name } = this.props;
-    let { value } = e.target;
-    value = isNumber(value) ? parseFloat(value) : value;
-    value = Number.isInteger(value) && value > 0 ? value : 1;
+    const currentDiscountValue = discount.getIn(['discount_subject', 'service', name], '');
+    if (value === null || value === '') { // delete
+      this.props.onChange(name, this.removeQuantity(currentDiscountValue));
+      return;
+    }
+    let newAmount = isNumber(value) ? parseFloat(value) : value;
+    newAmount = Number.isInteger(newAmount) ? newAmount : '';
 
     const newParam = Immutable.Map({
       name: 'quantity',
-      value,
+      value: newAmount,
     });
     const newOperation = Immutable.Map({
       name: 'recurring_by_quantity',
@@ -65,7 +73,6 @@ class ServiceDiscountValue extends Component {
       operations: Immutable.List([newOperation]),
     });
 
-    const currentDiscountValue = discount.getIn(['discount_subject', 'service', name], '');
     if (this.isOldStructure()) { // No value Or Old structure
       this.props.onChange(name, newServiceValue.set('value', currentDiscountValue));
       return;
@@ -95,7 +102,7 @@ class ServiceDiscountValue extends Component {
     const withQuantity = currentDiscountValue.updateIn(
       ['operations', recurringByQuantityIdx, 'params', quantityIdx],
       Immutable.Map(),
-      param => param.set('value', value),
+      param => param.set('value', newAmount),
     );
     this.props.onChange(name, withQuantity);
   }
@@ -107,6 +114,42 @@ class ServiceDiscountValue extends Component {
   onOpenModal = () => {
     this.setState({ showAdvancedEdit: true });
   };
+
+  removeQuantity = (currentDiscountValue) => {
+    const operationsPath = ['operations'];
+
+    const recurringByQuantityIndex = currentDiscountValue
+      .getIn(operationsPath, Immutable.List())
+      .findIndex(operation => operation.get('name', '') === 'recurring_by_quantity');
+
+    const paramsPath = [...operationsPath, recurringByQuantityIndex, 'params'];
+    const quantityIndex = recurringByQuantityIndex === -1
+      ? -1
+      : currentDiscountValue
+        .getIn(paramsPath)
+        .findIndex(param => param.get('name', '') === 'quantity');
+    const quantityPath = [...paramsPath, quantityIndex];
+
+    // remove quantity is exists
+    const discountWithoutQuantity = (quantityIndex !== -1)
+      ? currentDiscountValue.deleteIn(quantityPath)
+      : currentDiscountValue;
+    // remove params is empty
+    const isParamEmpty = discountWithoutQuantity.getIn(paramsPath, Immutable.Map()).isEmpty;
+    const discountWithoutParams = (recurringByQuantityIndex !== -1 && isParamEmpty)
+        ? discountWithoutQuantity.deleteIn(paramsPath)
+        : discountWithoutQuantity;
+    // remove recurring_by_quantity is empty
+    const recurringByQuantitySize = discountWithoutParams.getIn(paramsPath, Immutable.Map()).size; // can has {name:"recurring_by_quantity"} param
+    const discountWithoutRecurringByQuantity = (recurringByQuantityIndex !== -1 && recurringByQuantitySize < 2)
+        ? discountWithoutParams.deleteIn([...operationsPath, recurringByQuantityIndex])
+        : discountWithoutParams;
+    // remove operations is empty
+    const discountWithoutOperations = discountWithoutRecurringByQuantity.getIn(operationsPath, Immutable.Map()).isEmpty()
+      ? discountWithoutRecurringByQuantity.deleteIn(operationsPath)
+      : discountWithoutRecurringByQuantity;
+    return discountWithoutOperations;
+  }
 
   getDiscountValue = () => {
     const { name, discount } = this.props;
@@ -122,77 +165,88 @@ class ServiceDiscountValue extends Component {
       .find(operation => operation.get('name') === 'recurring_by_quantity', null, Immutable.Map())
       .get('params', Immutable.List())
       .find(param => param.get('name', '') === 'quantity', null, Immutable.Map())
-      .get('value', 1);
+      .get('value', '');
   }
 
   renderAdvancedEdit = () => {
     const { showAdvancedEdit } = this.state;
-    const { label } = this.props;
+    const { label, mode, isQuantitative } = this.props;
     if (!showAdvancedEdit) {
       return null;
     }
     const title = `Edit ${label} service value options`;
-    const discountValue = this.getDiscountValue();
-    const discountAmount = this.getDiscountAmount();
+    const editable = (mode !== 'view');
 
     return (
       <ModalWrapper show={true} onOk={this.onCloseModal} title={title}>
         <Form horizontal>
-          <FormGroup>
-            <Col sm={12}>
-              Apply discount value {discountValue} for every &nbsp;
-              <Field
-                fieldType="number"
-                min="1"
-                step="1"
-                style={{ width: 85, display: 'inline-block' }}
-                onChange={this.onChangeAmount}
-                value={discountAmount}
-              />
-             &nbsp;units
-            </Col>
-          </FormGroup>
+          {isQuantitative && (
+            <FormGroup>
+              <Col sm={11} smOffset={1}>
+                <Field
+                  fieldType="toggeledInput"
+                  value={this.getDiscountAmount()}
+                  disabledDisplayValue=""
+                  disabledValue=""
+                  onChange={this.onChangeAmount}
+                  label={`Apply discount value ${this.getDiscountValue()} for every`}
+                  editable={editable}
+                  suffix="units"
+                  style={{ width: 300 }}
+                  inputProps={{ fieldType: 'number', style: { width: 85 }, min: 1 }}
+                />
+              </Col>
+            </FormGroup>
+          )}
         </Form>
       </ModalWrapper>
     );
   }
 
   renderQuantitativeDescription = () => {
-    const { isQuantitative, mode } = this.props;
-    if (!isQuantitative) {
-      return null;
-    }
-    const editable = (mode !== 'view');
     const discountAmount = this.getDiscountAmount();
     const discountValue = this.getDiscountValue();
-
-    const details = ([1, '1'].includes(discountAmount))
-      ? 'Amount will be multiplied by the subscriber\'s service quantity'
-      : `Apply discount value ${discountValue} for every ${discountAmount} units`;
-
-    return (
-      <HelpBlock>
-        { editable && (
-          <Button onClick={this.onOpenModal} bsSize="xsmall" title="Advanced options" bsStyle="link">
-            <i className="fa fa-cog fa-fw active-blue" />
-          </Button>
-        )}
-        { details }
-      </HelpBlock>
-    );
+    if (['', null].includes(discountAmount) && discountValue) {
+      return (
+        <HelpBlock>
+          Amount will be multiplied by the subscriber&apos;s service quantity
+        </HelpBlock>
+      );
+    }
+    if (discountValue) {
+      return (
+        <HelpBlock>
+          Apply discount value {discountValue} for every {discountAmount} units
+        </HelpBlock>
+      );
+    }
+    return null;
   }
 
   renderSuffix = () => {
     const { discount, currency } = this.props;
     const isPercentaget = discount.get('discount_type', '') === 'percentage';
     if (isPercentaget) {
-      return (<i className="fa fa-percent" />);
+      return '%';
     }
     return getSymbolFromCurrency(currency);
   }
 
+  getActions = () => {
+    const { mode, isQuantitative } = this.props;
+    const value = this.getDiscountValue();
+    return ([{
+      type: 'settings',
+      onClick: this.onOpenModal,
+      show: mode !== 'view' && isQuantitative,
+      actionSize: 'small',
+      enable: ![null, ''].includes(value),
+      helpText: 'Advanced Options',
+    }]);
+  }
+
   render() {
-    const { name, label, mode } = this.props;
+    const { name, label, mode, discount, isQuantitative } = this.props;
     if (name === '') {
       return null;
     }
@@ -201,24 +255,34 @@ class ServiceDiscountValue extends Component {
     if (!editable && value === null) {
       return null;
     }
+    const actions = this.getActions();
+    const hasEnabledActions = actions
+      .reduce((acc, action) => (action.show !== false ? true : acc), false);
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} sm={3} lg={2}>
           { label }
         </Col>
         <Col sm={8} lg={9}>
-          <Field
-            value={value}
-            onChange={this.onChangeValue}
-            label="Discount by"
-            fieldType="toggeledInput"
-            editable={editable}
-            suffix={this.renderSuffix()}
-            inputProps={{ fieldType: 'number' }}
-          />
-          { this.renderQuantitativeDescription() }
+          <InputGroup style={{ width: '100%' }}>
+            <Field
+              value={value}
+              onChange={this.onChangeValue}
+              label="Discount by"
+              fieldType="toggeledInput"
+              editable={editable}
+              suffix={this.renderSuffix()}
+              inputProps={{ fieldType: 'number' }}
+            />
+            { hasEnabledActions && (
+              <InputGroup.Addon style={{ padind: 0 }}>
+                <Actions actions={actions} data={discount} />
+              </InputGroup.Addon>
+            )}
+          </InputGroup>
+          { isQuantitative && this.renderQuantitativeDescription() }
+          { this.renderAdvancedEdit() }
         </Col>
-        { this.renderAdvancedEdit() }
       </FormGroup>
     );
   }
