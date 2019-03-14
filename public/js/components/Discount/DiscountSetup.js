@@ -103,6 +103,11 @@ class DiscountSetup extends Component {
     if (item.get('discount_type', null) === null) {
       this.onChangeFieldValue(['discount_type'], 'monetary');
     }
+
+    if (item.get('prorated', null) === null) {
+      this.onChangeFieldValue(['prorated'], true);
+    }
+
     if (mode === 'clone') {
       this.props.dispatch(setCloneDiscount());
     }

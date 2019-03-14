@@ -1,14 +1,15 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock, Label } from 'react-bootstrap';
 import Select from 'react-select';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import isNumber from 'is-number';
-import { getFieldName, getConfig } from '../../common/Util';
+import ServiceDiscountValue from './Elements/ServiceDiscountValue';
 import Help from '../Help';
 import Field from '../Field';
 import EntityFields from '../Entity/EntityFields';
+import { getFieldName, getConfig } from '../../common/Util';
 import { DiscountDescription } from '../../FieldDescriptions';
 
 
@@ -61,6 +62,11 @@ export default class DiscountDetails extends Component {
   onChangeCycles = (value) => {
     const newValue = isNumber(value) ? parseFloat(value) : value;
     this.props.onFieldUpdate(['cycles'], newValue);
+  }
+
+  onChangeProrated = (e) => {
+    const { value } = e.target;
+    this.props.onFieldUpdate(['prorated'], value);
   }
 
   onChangeLimit = (value) => {
@@ -127,9 +133,14 @@ export default class DiscountDetails extends Component {
     .map(this.createOption)
     .toArray();
 
-  createServicesOptions = () => this.props.availableServices
+  createServicesOptions = () => {
+    const { discount } = this.props;
+    const isPercentaget = (discount.get('discount_type', '') === 'percentage');
+    return this.props.availableServices
+      .filter(availableService => !(isPercentaget && availableService.get('quantitative', false)))
     .map(this.createOption)
     .toArray();
+  }
 
   createOption = item => ({
     value: item.get('name'),
@@ -137,17 +148,23 @@ export default class DiscountDetails extends Component {
   })
 
   renderServivesDiscountValues = () => {
-    const { discount, availableServices } = this.props;
+    const { discount, availableServices, mode, currency } = this.props;
     const discountSubject = discount.getIn(['params', 'service'], Immutable.List());
-    return discountSubject.map((key) => {
-      const value = discount.getIn(['discount_subject', 'service', key], null);
-      const isQuantitative = availableServices.findIndex(service => (
-        service.get('name', '') === key
-        && service.get('quantitative', false) === true
-      ));
-      const info = isQuantitative !== -1 ? 'Amount will be multiplied by the subscriber\'s service quantity' : '';
-      const label = this.getLabel(availableServices, key);
-      return this.renderDiscountValue(key, value, label, this.onChangeServiceDiscountValue, info);
+    return discountSubject.map((serviceName) => {
+      const label = this.getLabel(availableServices, serviceName);
+      const isQuantitative = this.isServiceQuantitative(serviceName);
+      return (
+        <ServiceDiscountValue
+          key={`${paramCase(serviceName)}-discount-value`}
+          mode={mode}
+          discount={discount}
+          name={serviceName}
+          label={label}
+          isQuantitative={isQuantitative}
+          currency={currency}
+          onChange={this.onChangeServiceDiscountValue}
+        />
+      );
     });
   }
 
@@ -155,46 +172,45 @@ export default class DiscountDetails extends Component {
     .find(item => item.get('name') === key, null, Immutable.Map())
     .get('description', key);
 
-  renderPlanDiscountValues = () => {
-    const { discount, availablePlans } = this.props;
-    const key = discount.getIn(['params', 'plan'], '');
-    if (key && key.length) {
-      const label = this.getLabel(availablePlans, key);
-      const value = discount.getIn(['discount_subject', 'plan', key], null);
-      return this.renderDiscountValue(key, value, label, this.onChangePlanDiscountValue);
-    }
+  renderPlanDiscountValue = () => {
+    const { discount, availablePlans, mode, currency } = this.props;
+    const planName = discount.getIn(['params', 'plan'], '');
+    if (planName === '') {
     return null;
   }
-
-  renderDiscountValue = (key, value, label, onChange, info = '') => {
-    const { discount, mode, currency } = this.props;
     const editable = (mode !== 'view');
+    const value = discount.getIn(['discount_subject', 'plan', planName], null);
     if (!editable && value === null) {
       return null;
     }
-    const isPercentaget = discount.get('discount_type', '') === 'percentage';
+    const label = this.getLabel(availablePlans, planName);
+    const isPercentaget = (discount.get('discount_type', '') === 'percentage');
     const suffix = isPercentaget ? <i className="fa fa-percent" /> : getSymbolFromCurrency(currency);
-    const onChangeBind = (val) => { onChange(key, val); };
-    const showHelpText = info.length > 0 && editable;
     return (
-      <FormGroup key={`${paramCase(key)}-discount-value`}>
+      <FormGroup key={`${paramCase(planName)}-discount-value`}>
         <Col componentClass={ControlLabel} sm={3} lg={2}>
           { label }
         </Col>
         <Col sm={8} lg={9}>
           <Field
             value={value}
-            onChange={onChangeBind}
+            onChange={(val) => { this.onChangePlanDiscountValue(planName, val); }}
             label="Discount by"
             fieldType="toggeledInput"
             editable={editable}
             suffix={suffix}
             inputProps={{ fieldType: 'number' }}
           />
-          { showHelpText && <HelpBlock>{ info }</HelpBlock> }
         </Col>
       </FormGroup>
     );
+  }
+
+  isServiceQuantitative = (name) => {
+    const { availableServices } = this.props;
+    return availableServices.findIndex(service => (
+      service.get('name', '') === name && service.get('quantitative', false) === true
+    )) !== -1;
   }
 
   render() {
@@ -205,12 +221,24 @@ export default class DiscountDetails extends Component {
     const plansOptions = this.createPlansOptions();
     const servicesOptions = this.createServicesOptions();
     const services = discount.getIn(['params', 'service'], Immutable.List()).join(',');
+    const proratedValue = discount.get('prorated', true);
+    const includesQuantitative = discount
+      .getIn(['params', 'service'], Immutable.List())
+      .reduce((acc, serviceName) => (this.isServiceQuantitative(serviceName) ? true : acc), false);
+    const percentageLabel = (!includesQuantitative) ? 'Percentage' : (
+      <span>
+        Percentage&nbsp;
+        <Label bsStyle="warning">
+          not compatible with quantitative service type.
+        </Label>
+      </span>
+    );
+
     return (
       <Row>
         <Col lg={12}>
           <Form horizontal>
             <Panel>
-
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('Title', 'discounts')}<Help contents={DiscountDescription.description} />
@@ -241,10 +269,10 @@ export default class DiscountDetails extends Component {
                     ? (
                       <span>
                         <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="percentage" label="Percentage" checked={isPercentaget} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="monetary" label="Monetary" checked={!isPercentaget} />
                         </span>
                         <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="monetary" label="Monetary" checked={!isPercentaget} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
                         </span>
                       </span>
                     )
@@ -261,6 +289,19 @@ export default class DiscountDetails extends Component {
                   <Field value={discount.get('cycles', '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
                 </Col>
               </FormGroup>
+            </Panel>
+
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
+              <Col sm={8} lg={9} style={{ paddingTop: 7 }}>
+                <Field
+                  value={proratedValue}
+                  onChange={this.onChangeProrated}
+                  fieldType="checkbox"
+                  editable={editable}
+                />
+              </Col>
+            </FormGroup>
 
               <EntityFields
                 entityName="discounts"
@@ -297,7 +338,7 @@ export default class DiscountDetails extends Component {
               </Panel>
 
               <Panel header={<h3>Discount Values</h3>}>
-                { this.renderPlanDiscountValues() }
+                { this.renderPlanDiscountValue() }
                 { (discount.getIn(['params', 'plan'], '').length > 0) && <hr /> }
                 { this.renderServivesDiscountValues() }
                 { (!discount.getIn(['params', 'service'], Immutable.List()).isEmpty()) && <hr /> }
@@ -309,7 +350,6 @@ export default class DiscountDetails extends Component {
                     <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
                   </Col>
                 </FormGroup>
-              </Panel>
             </Panel>
           </Form>
         </Col>
