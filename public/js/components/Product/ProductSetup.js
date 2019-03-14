@@ -11,6 +11,7 @@ import {
   onRateAdd,
   onRateRemove,
   onFieldUpdate,
+  onFieldRemove,
   onToUpdate,
   onUsagetUpdate,
   getProduct,
@@ -156,6 +157,10 @@ class ProductSetup extends Component {
     this.props.dispatch(onFieldUpdate(path, value));
   }
 
+  onFieldRemove = (path) => {
+    this.props.dispatch(onFieldRemove(path));
+  }
+
   onToUpdate = (path, index, value) => {
     this.props.dispatch(onToUpdate(path, index, value));
   }
@@ -233,6 +238,7 @@ class ProductSetup extends Component {
           <Product
             mode={mode}
             onFieldUpdate={this.onFieldUpdate}
+            onFieldRemove={this.onFieldRemove}
             onToUpdate={this.onToUpdate}
             onProductRateAdd={this.onProductRateAdd}
             onProductRateRemove={this.onProductRateRemove}

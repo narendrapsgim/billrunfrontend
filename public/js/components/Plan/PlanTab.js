@@ -21,6 +21,7 @@ export default class Plan extends Component {
     plan: React.PropTypes.instanceOf(Immutable.Map).isRequired,
     mode: React.PropTypes.string.isRequired,
     onChangeFieldValue: React.PropTypes.func.isRequired,
+    onRemoveField: React.PropTypes.func.isRequired,
     onPlanCycleUpdate: React.PropTypes.func.isRequired,
     onPlanTariffAdd: React.PropTypes.func.isRequired,
     onPlanTariffRemove: React.PropTypes.func.isRequired,
@@ -114,6 +115,10 @@ export default class Plan extends Component {
 
   onChangeAdditionalField = (field, value) => {
     this.props.onChangeFieldValue(field, value);
+  }
+
+  onRemoveAdditionalField = (field) => {
+    this.props.onRemoveField(field);
   }
 
   getPeriodicityOptions = () => {
@@ -259,6 +264,7 @@ export default class Plan extends Component {
                 entityName="plans"
                 entity={plan}
                 onChangeField={this.onChangeAdditionalField}
+                onRemoveField={this.onRemoveAdditionalField}
                 editable={editable}
               />
 
