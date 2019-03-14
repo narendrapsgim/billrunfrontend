@@ -6,7 +6,10 @@ import classNames from 'classnames';
 import { titleCase } from 'change-case';
 import EntityField from './EntityField';
 import { getSettings } from '../../actions/settingsActions';
-import { entityFieldSelector } from '../../selectors/settingsSelector';
+import {
+  entityFieldSelector,
+  isPlaysEnabledSelector,
+} from '../../selectors/settingsSelector';
 
 
 class EntityFields extends Component {
@@ -21,7 +24,9 @@ class EntityFields extends Component {
     highlightPramas: PropTypes.instanceOf(Immutable.List),
     fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
+    isPlaysEnabled: PropTypes.bool,
     onChangeField: PropTypes.func,
+    onRemoveField: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -31,7 +36,9 @@ class EntityFields extends Component {
     highlightPramas: Immutable.List(),
     fieldsFilter: null,
     editable: true,
+    isPlaysEnabled: false,
     onChangeField: () => {},
+    onRemoveField: () => { console.error('Please implement onRemoveField function for EntityFields'); },
   }
 
   componentDidMount() {
@@ -42,6 +49,26 @@ class EntityFields extends Component {
     // fix problem when empty params object converted to array
     if (entity.has('params') && Immutable.is(entity.get('params', Immutable.List()), Immutable.List())) {
       this.props.onChangeField(['params'], Immutable.Map());
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) { // eslint-disable-line no-unused-vars
+    const { fields, entity } = this.props;
+    const { entity: oldEntity } = prevProps;
+
+    const isMultiple = fields.find(field => field.get('field_name', '') === 'play',
+      null, Immutable.Map(),
+    ).get('multiple', false);
+    const shouldResetFields = isMultiple ?
+      !Immutable.is(entity.get('play', Immutable.List()), oldEntity.get('play', Immutable.List()))
+      : entity.get('play', '') !== oldEntity.get('play', '');
+    if (shouldResetFields) {
+      fields.forEach((field) => {
+        const shoudPlayBeDisplayd = this.filterPlayFields(field);
+        if (!shoudPlayBeDisplayd) {
+          this.props.onRemoveField(field.get('field_name', '').split('.'));
+        }
+      });
     }
   }
 
@@ -66,12 +93,25 @@ class EntityFields extends Component {
     field.get('display', false) !== false
     && field.get('editable', false) !== false
     && field.get('field_name', '') !== 'tariff_category'
+    && field.get('field_name', '') !== 'play'
   );
 
   filterParamsFields = (field) => {
     const { entity } = this.props;
     const fieldPath = field.get('field_name', '').split('.');
     return !(fieldPath[0] === 'params' && !entity.hasIn(fieldPath));
+  }
+
+  filterPlayFields = (field) => {
+    const { entity, isPlaysEnabled } = this.props;
+    if (!isPlaysEnabled) {
+      return true;
+    }
+    const play = entity.get('play', '');
+    const plays = Immutable.List(typeof play.split === 'function' ? play.split(',') : play);
+    const fieldPlays = field.get('plays', 'all');
+    const isFieldOfPlay = fieldPlays === 'all' || plays.some(p => fieldPlays.indexOf(p) > -1);
+    return isFieldOfPlay;
   }
 
   renderField = (field, key) => {
@@ -91,6 +131,7 @@ class EntityFields extends Component {
     const { fields, fieldsFilter } = this.props;
     const fieldFilterFunction = fieldsFilter !== null ? fieldsFilter : this.filterPrintableFields;
     return fields
+      .filter(this.filterPlayFields)
       .filter(fieldFilterFunction)
       .filter(this.filterParamsFields)
       .map(this.renderField);
@@ -135,6 +176,7 @@ class EntityFields extends Component {
 
 const mapStateToProps = (state, props) => ({
   fields: entityFieldSelector(state, props),
+  isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
 export default connect(mapStateToProps)(EntityFields);

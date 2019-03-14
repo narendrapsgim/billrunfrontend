@@ -79,7 +79,8 @@ class CycleData extends Component {
   parseCycleDataFirstName = entity => entity.getIn(['attributes', 'firstname'], '');
   parseCycleDataLastName = entity => entity.getIn(['attributes', 'lastname'], '');
   parseCycleDataInvoiceTotal = entity => entity.getIn(['totals', 'after_vat_rounded'], '');
-  parseCycleDataSubscriptionNum = entity => entity.get('subs', List()).size;
+  parseCycleDataSubscriptionNum = entity => entity.get('subs', List())
+    .filter(subs => !['0', 0].includes(subs.get('sid', 0))).size;
   parseCycleDataInvoiceId = entity => entity.get('invoice_id');
 
   downloadURL = (aid, billrunKey, invoiceId) =>

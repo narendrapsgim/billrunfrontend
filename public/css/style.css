@@ -430,6 +430,9 @@ fieldset[disabled] .btn {
 .List.invoices-list form {
     margin-bottom: 0;
 }
+.List .table td {
+    vertical-align: middle;
+}
 /* Global page + table */
 .page-header {
   border-bottom: none;
@@ -798,6 +801,9 @@ ul.revision-history-list li.active .cycle {
   margin-left: 0;
   margin-right: 0;
 }
+.Importer .form-group.rangesField {
+    padding: 0;
+}
 .Importer .panel,
 .Importer .Select-control {
   /* set select input transparent to not hide wrapper div shadows */
@@ -815,10 +821,10 @@ ul.revision-history-list li.active .cycle {
   min-height: 200px;
 }
 .Importer .StepMapper {
-  max-height: 258px;
+  max-height: 50vh;
 }
 .Importer .StepValidate .row-fields {
-  max-height: 300px;
+  max-height: 50vh;
   margin: 0;
 }
 .Importer .StepResult ol {

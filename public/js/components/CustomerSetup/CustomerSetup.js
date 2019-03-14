@@ -18,6 +18,7 @@ import {
   saveSubscription,
   saveCustomer,
   updateCustomerField,
+  removeCustomerField,
   clearCustomer,
   getCustomer,
   getSubscription,
@@ -89,7 +90,7 @@ class CustomerSetup extends Component {
       this.props.dispatch(setPageTitle(pageTitle));
     } else {
       this.props.dispatch(getList('available_gateways', getPaymentGatewaysQuery()));
-      this.props.dispatch(getList('available_plans', getPlansKeysQuery({ name: 1, description: 1, 'include.services': 1 })));
+      this.props.dispatch(getList('available_plans', getPlansKeysQuery({ name: 1, play: 1, description: 1, 'include.services': 1 })));
       this.props.dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
     }
   }
@@ -129,6 +130,10 @@ class CustomerSetup extends Component {
   onChangeCustomerField = (e) => {
     const { value, id } = e.target;
     this.props.dispatch(updateCustomerField(id, value));
+  }
+
+  onRemoveCustomerField = (path) => {
+    this.props.dispatch(removeCustomerField(path));
   }
 
   afterSaveCustomer = (response) => {
@@ -248,6 +253,7 @@ class CustomerSetup extends Component {
                       fields={accountFields}
                       supportedGateways={gateways}
                       onChange={this.onChangeCustomerField}
+                      onRemoveField={this.onRemoveCustomerField}
                       onChangePaymentGateway={this.onClickChangePaymentGateway}
                     />
                   </Panel>

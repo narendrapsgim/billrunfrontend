@@ -11,7 +11,7 @@ import Actions from '../Elements/Actions';
 import Field from '../Field';
 import { EntityRevisionDetails } from '../Entity';
 import EntityFields from '../Entity/EntityFields';
-import { getSettings } from '../../actions/settingsActions';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getConfig,
   getItemId,
@@ -20,10 +20,6 @@ import {
   buildPageTitle,
   toImmutableList,
 } from '../../common/Util';
-import {
-  availablePlaysSettingsSelector,
-} from '../../selectors/settingsSelector';
-
 
 class Subscription extends Component {
 
@@ -34,7 +30,6 @@ class Subscription extends Component {
     settings: PropTypes.instanceOf(Immutable.List), // Subscriptions Fields
     allPlans: PropTypes.instanceOf(Immutable.List),
     allServices: PropTypes.instanceOf(Immutable.List),
-    availablePlays: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
@@ -50,7 +45,6 @@ class Subscription extends Component {
     settings: Immutable.List(),
     allPlans: Immutable.List(),
     allServices: Immutable.List(),
-    availablePlays: Immutable.List(),
   }
 
   constructor(props) {
@@ -59,10 +53,6 @@ class Subscription extends Component {
       subscription: props.subscription,
       progress: false,
     };
-  }
-
-  componentWillMount() {
-    this.props.dispatch(getSettings(['plays']));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -139,6 +129,8 @@ class Subscription extends Component {
 
   onChangePlay = (play) => {
     this.updateSubscriptionField(['play'], play);
+    this.filterSubscriptionServicesByPlay(play);
+    this.filterSubscriptionPlanByPlay(play);
   }
 
   onChangeServiceDetails = (index, key, value) => {
@@ -150,6 +142,32 @@ class Subscription extends Component {
     const { subscription } = this.state;
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     const newServices = services.delete(index);
+    this.updateSubscriptionField(['services'], newServices);
+  }
+
+  filterSubscriptionPlanByPlay = (play) => {
+    const { subscription } = this.state;
+    const { allPlans } = this.props;
+    const selectedPlanPlays = allPlans.find(
+      plan => plan.get('name', '') === subscription.get('plan', ''),
+      null, Immutable.Map(),
+    ).get('play', Immutable.List());
+    if (!selectedPlanPlays.isEmpty() && !selectedPlanPlays.includes(play)) {
+      this.updateSubscriptionField(['plan'], '');
+    }
+  }
+
+  filterSubscriptionServicesByPlay = (play) => {
+    const { allServices } = this.props;
+    const { subscription } = this.state;
+    const services = subscription.get('services', Immutable.List()) || Immutable.List();
+    const newServices = services.filter((service) => {
+      const servicePlays = allServices.find(
+        option => option.get('name', '') === service.get('name', ''),
+        null, Immutable.Map(),
+      ).get('play', Immutable.List());
+      return servicePlays.isEmpty() || servicePlays.includes(play);
+    });
     this.updateSubscriptionField(['services'], newServices);
   }
 
@@ -231,12 +249,26 @@ class Subscription extends Component {
     this.setState(prevState => ({ subscription: prevState.subscription.setIn(path, value) }));
   }
 
+  removeSubscriptionField = (path, value) => {
+    this.setState(prevState => ({ subscription: prevState.subscription.deleteIn(path, value) }));
+  }
+
   formatSelectOptions = items => items.map(item => ({
     value: item.get('name', ''),
     label: item.get('description', item.get('name', '')),
   }));
 
-  getAvailablePlans = () => this.formatSelectOptions(this.props.allPlans);
+  getAvailablePlans = () => {
+    const { subscription } = this.state;
+    const { allPlans } = this.props;
+    const play = subscription.get('play', false);
+    if ([false, ''].includes(play)) {
+      return this.formatSelectOptions(allPlans);
+    }
+    return this.formatSelectOptions(allPlans
+      .filter(allPlan => allPlan.get('play', Immutable.List()).isEmpty() || allPlan.get('play', Immutable.List()).includes(play)),
+    );
+  }
 
   getPlanIncludedServices = (planName) => {
     if (planName === '') {
@@ -248,23 +280,28 @@ class Subscription extends Component {
     return includedServices.size ? includedServices.join(', ') : '-';
   }
 
-  getAvailableServices = () => this.formatSelectOptions(this.props.allServices);
+  getAvailableServices = () => {
+    const { subscription } = this.state;
+    const { allServices } = this.props;
+    const play = subscription.get('play', false);
+    if ([false, ''].includes(play)) {
+      return this.formatSelectOptions(allServices);
+    }
+    return this.formatSelectOptions(allServices
+      .filter(allService => allService.get('play', Immutable.List()).isEmpty() || allService.get('play', Immutable.List()).includes(play)),
+    );
+  }
 
   filterCustomFields = (field) => {
-    const { subscription } = this.state;
     const hiddenFields = ['plan', 'services', 'play'];
     const isCustomField = !hiddenFields.includes(field.get('field_name'));
     const isEditable = field.get('editable', false);
     const isMandatory = field.get('mandatory', false);
     const shouldDisplayed = field.get('display', true);
-    const play = subscription.get('play', '');
-    const fieldPlays = field.get('plays', 'all');
-    const isFieldOfPlay = fieldPlays === 'all' || fieldPlays.contains(play);
 
     return isCustomField &&
     (isEditable || isMandatory) &&
-    shouldDisplayed &&
-    (!this.shouldUsePlays() || isFieldOfPlay);
+    shouldDisplayed;
     // PHP .../application/views/internalpaypage/index.phtml condition
     // if ((empty($c['display']) && empty($c['mandatory']))
     //  || $c['field_name'] === 'plan'
@@ -272,46 +309,21 @@ class Subscription extends Component {
     // ) continue;
   }
 
-  shouldUsePlays = () => (this.props.availablePlays.size > 1);
-
-  getPlayOptions = () => (this.props.availablePlays.map(play => ({
-    value: play.get('name', ''),
-    label: play.get('label', play.get('name', '')),
-  })).toArray());
-
-  renderPlays = (editable) => {
-    if (!this.shouldUsePlays()) {
-      return null;
-    }
-    const { subscription } = this.state;
-    const play = subscription.get('play', '');
-    return (
-      <FormGroup key="play">
-        <Col componentClass={ControlLabel}sm={3} lg={2}>Play <span className="danger-red"> *</span></Col>
-        <Col sm={8} lg={9}>
-          { editable
-            ? <Select
-              options={this.getPlayOptions()}
-              value={play}
-              onChange={this.onChangePlay}
-            />
-          : <Field value={play} editable={false} />
-          }
-        </Col>
-      </FormGroup>
-    );
-  }
-
   renderSystemFields = (editable) => {
     const { subscription } = this.state;
+    const { mode } = this.props;
     const plansOptions = this.getAvailablePlans().toJS();
     const servicesOptions = this.getAvailableServices().toJS();
     const services = subscription.get('services', Immutable.List()) || Immutable.List();
     const servicesList = Immutable.Set(services.map(service => service.get('name', ''))).join(',');
     const plan = subscription.get('plan', '');
-    const plays = this.renderPlays(editable);
     return ([
-      plays,
+      (<PlaysSelector
+        entity={subscription}
+        editable={editable && mode === 'create'}
+        mandatory={true}
+        onChange={this.onChangePlay}
+      />),
       (<FormGroup key="plan">
         <Col componentClass={ControlLabel}sm={3} lg={2}>Plan <span className="danger-red"> *</span></Col>
         <Col sm={8} lg={9}>
@@ -430,6 +442,7 @@ class Subscription extends Component {
               entityName={['subscribers', 'subscriber']}
               entity={subscription}
               onChangeField={this.updateSubscriptionField}
+              onRemoveField={this.removeSubscriptionField}
               fieldsFilter={this.filterCustomFields}
               editable={allowEdit}
             />
@@ -459,7 +472,6 @@ const mapStateToProps = (state, props) => {
   return ({
     revisions,
     mode,
-    availablePlays: availablePlaysSettingsSelector(state, props),
   });
 };
 export default connect(mapStateToProps)(Subscription);

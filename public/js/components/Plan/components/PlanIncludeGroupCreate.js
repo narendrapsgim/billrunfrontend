@@ -32,6 +32,7 @@ class PlanIncludeGroupCreate extends Component {
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     type: PropTypes.string,
+    plays: PropTypes.string,
   }
 
   static defaultProps = {
@@ -43,6 +44,7 @@ class PlanIncludeGroupCreate extends Component {
     usageTypesData: Immutable.List(),
     propertyTypes: Immutable.List(),
     type: '',
+    plays: '',
   };
 
   defaultState = {
@@ -332,7 +334,7 @@ class PlanIncludeGroupCreate extends Component {
   }
 
   getStepContent = (stepIndex) => {
-    const { usedProducts, currency, propertyTypes, usageTypesData, type } = this.props;
+    const { usedProducts, currency, propertyTypes, usageTypesData, type, plays } = this.props;
     const {
       name,
       products,
@@ -480,6 +482,7 @@ class PlanIncludeGroupCreate extends Component {
                   usages={usages}
                   onChangeGroupRates={this.onChangeGroupRates}
                   existingProducts={existingProductsKeys}
+                  plays={plays}
                 />
               </div>
               { error.length > 0 && <HelpBlock>{error}</HelpBlock>}
@@ -511,7 +514,7 @@ class PlanIncludeGroupCreate extends Component {
 
     return (
       <div>
-        <CreateButton onClick={this.handleToggleBoby} type="Group" />
+        <CreateButton onClick={this.handleToggleBoby} type="Group" label="Create New" />
         <Modal show={open} keyboard={false}>
 
           <Modal.Header closeButton onHide={this.handleCancel}>

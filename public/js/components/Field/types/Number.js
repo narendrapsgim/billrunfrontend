@@ -1,9 +1,11 @@
 import React, { PropTypes } from 'react';
+import { InputGroup } from 'react-bootstrap';
+
 
 const Number = (props) => {
-  const { onChange, value, editable, disabled, tooltip, ...otherProps } = props;
+  const { onChange, value, editable, disabled, tooltip, suffix, preffix, ...otherProps } = props;
   if (editable) {
-    return (
+    const input = (
       <input
         {...otherProps}
         type="number"
@@ -14,10 +16,26 @@ const Number = (props) => {
         title={tooltip}
       />
     );
+    if (suffix !== null || preffix !== null) {
+      return (
+        <InputGroup>
+          {preffix !== null && (<InputGroup.Addon>{preffix}</InputGroup.Addon>)}
+          {input}
+          {suffix !== null && (<InputGroup.Addon>{suffix}</InputGroup.Addon>)}
+        </InputGroup>
+      );
+    }
+    return input;
   }
 
   return (
-    <div className="non-editable-field"><span>{parseFloat(value)}</span></div>
+    <div className="non-editable-field">
+      <span>
+        {(preffix !== null) && preffix}
+        {parseFloat(value)}
+        {(suffix !== null) && suffix}
+      </span>
+    </div>
   );
 };
 
@@ -28,6 +46,8 @@ Number.defaultProps = {
   editable: true,
   placeholder: '',
   tooltip: '',
+  suffix: null,
+  preffix: null,
   onChange: () => {},
 };
 
@@ -41,6 +61,8 @@ Number.propTypes = {
   editable: PropTypes.bool,
   placeholder: PropTypes.string,
   tooltip: PropTypes.string,
+  suffix: PropTypes.node,
+  preffix: PropTypes.node,
   onChange: PropTypes.func,
 };
 

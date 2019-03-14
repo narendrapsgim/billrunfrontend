@@ -42,6 +42,11 @@ export const saveSubscription = (subscription, action) => dispatch =>
   dispatch(saveEntity('subscribers', subscription, action))
     .then(response => Object.assign(response, { subscription, action }));
 
+export const removeCustomerField = path => ({
+  type: actions.DELETE_ENTITY_FIELD,
+  collection: 'customer',
+  path,
+});
 
 export const updateCustomerField = (path, value) => ({
   type: actions.UPDATE_ENTITY_FIELD,

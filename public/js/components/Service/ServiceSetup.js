@@ -14,7 +14,16 @@ import {
   getConfig,
   getItemId,
 } from '../../common/Util';
-import { addGroup, removeGroup, getService, clearService, updateService, saveService, setCloneService } from '../../actions/serviceActions';
+import {
+  addGroup,
+  removeGroup,
+  getService,
+  clearService,
+  updateService,
+  deleteServiceField,
+  saveService,
+  setCloneService,
+} from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
@@ -145,6 +154,10 @@ class ServiceSetup extends Component {
     this.props.dispatch(updateService(path, value));
   }
 
+  onRemoveFieldValue = (path) => {
+    this.props.dispatch(deleteServiceField(path));
+  }
+
   afterSave = (response) => {
     const { mode } = this.props;
     this.setState({ progress: false });
@@ -184,6 +197,7 @@ class ServiceSetup extends Component {
     const allowEdit = mode !== 'view';
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
     const planRates = item.get('rates', Immutable.Map());
+    const plays = item.get('play', Immutable.List());
     return (
       <div className="ServiceSetup">
         <Panel>
@@ -204,7 +218,12 @@ class ServiceSetup extends Component {
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
-              <ServiceDetails item={item} mode={mode} updateItem={this.onUpdateItem} />
+              <ServiceDetails
+                item={item}
+                mode={mode}
+                updateItem={this.onUpdateItem}
+                onFieldRemove={this.onRemoveFieldValue}
+              />
             </Panel>
           </Tab>
 
@@ -215,6 +234,7 @@ class ServiceSetup extends Component {
                 mode={mode}
                 planRates={planRates}
                 onChangeFieldValue={this.onUpdateItem}
+                plays={plays.join(',')}
               />
             </Panel>
           </Tab>
@@ -228,6 +248,7 @@ class ServiceSetup extends Component {
                 onGroupRemove={this.onGroupRemove}
                 mode={mode}
                 type={'service'}
+                plays={plays.join(',')}
               />
             </Panel>
           </Tab>

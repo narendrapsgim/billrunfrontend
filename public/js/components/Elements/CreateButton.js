@@ -13,7 +13,7 @@ const CreateButton = ({ label, onClick, type, action, disabled, title, buttonSty
 
 CreateButton.defaultProps = {
   label: 'New',
-  action: 'Create',
+  action: '',
   type: '',
   title: '',
   disabled: false,

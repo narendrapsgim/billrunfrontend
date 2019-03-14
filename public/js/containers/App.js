@@ -74,7 +74,7 @@ class App extends Component {
     }
     if (auth !== true && nextProps.auth === true) { // user did success login
       // get global system settings
-      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu', 'billrun', 'usage_types', 'property_types']))
+      this.props.dispatch(getSettings(['pricing', 'tenant', 'menu', 'billrun', 'usage_types', 'property_types', 'plays']))
         .then(responce => ((responce) ? this.props.logoName : ''))
         .then((logoFileName) => {
           if (logoFileName && logoFileName.length > 0) {

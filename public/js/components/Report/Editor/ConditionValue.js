@@ -22,6 +22,7 @@ import {
   getBucketsOptions,
   getFileTypesOptions,
   getEventCodeOptions,
+  getPlayTypeOptions,
 } from '../../../actions/reportsActions';
 
 
@@ -92,6 +93,8 @@ class ConditionValue extends Component {
           this.props.dispatch(getBucketsOptions());
           break;
         case 'getFileTypeOptions': this.props.dispatch(getFileTypesOptions());
+          break;
+        case 'getPlayTypeOptions': this.props.dispatch(getPlayTypeOptions());
           break;
         case 'getEventCodeOptions': this.props.dispatch(getEventCodeOptions());
           break;

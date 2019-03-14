@@ -72,8 +72,12 @@ export default {
       { id: 'sid', type: 'number' },
       { id: 'plan', inputConfig: { inputType: 'select', callback: 'getPlansOptions' } },
       { id: 'services', inputConfig: { inputType: 'select', callback: 'getServicesOptions' } },
-      { id: 'plan_activation', type:'date' },
-      { id: 'deactivation_date', type:'date' },
+      { id: 'plan_activation', type: 'date' },
+      { id: 'deactivation_date', type: 'date' },
+      { id: 'play', inputConfig: {
+        inputType: 'select',
+        callback: 'getPlayTypeOptions',
+      } },
     ],
     account: [
       { id: 'aid', type: 'number' },

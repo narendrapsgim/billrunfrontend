@@ -10,6 +10,7 @@ import { ProductDescription } from '../../FieldDescriptions';
 import ProductPrice from './components/ProductPrice';
 import EntityFields from '../Entity/EntityFields';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getUnitLabel,
   getFieldName,
@@ -33,6 +34,7 @@ class Product extends Component {
     planName: PropTypes.string,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
+    onFieldRemove: PropTypes.func.isRequired,
     onProductRateAdd: PropTypes.func.isRequired,
     onProductRateRemove: PropTypes.func.isRequired,
     onToUpdate: PropTypes.func.isRequired,
@@ -78,6 +80,10 @@ class Product extends Component {
     const newError = (!globalSetting.keyUppercaseRegex.test(value)) ? allowedCharacters : '';
     this.setState({ errors: Object.assign({}, errors, { name: newError }) });
     this.props.onFieldUpdate(['key'], value);
+  }
+
+  onChangePlay = (play) => {
+    this.props.onFieldUpdate(['play'], play);
   }
 
   onChangeDescription = (e) => {
@@ -159,6 +165,10 @@ class Product extends Component {
     this.props.onFieldUpdate(field, value);
   }
 
+  onRemoveAdditionalField = (field) => {
+    this.props.onFieldRemove(field);
+  }
+
   isRetailRate = (tariffCategory = null) => {
     const { product } = this.props;
     const category = tariffCategory === null
@@ -229,6 +239,12 @@ class Product extends Component {
           <Form horizontal>
             <Panel>
 
+              <PlaysSelector
+                entity={product}
+                editable={editable && mode === 'create'}
+                onChange={this.onChangePlay}
+              />
+
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
@@ -255,6 +271,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeTariffCategory}
+                onRemoveField={this.onRemoveAdditionalField}
                 fieldsFilter={this.filterTariffCategory}
                 editable={editable}
               />
@@ -290,7 +307,7 @@ class Product extends Component {
                     )
                     : (
                       <div>
-                        <Col sm={1} style={{ paddingTop: 7 }}>{usaget}</Col>
+                        <Col sm={2} style={{ paddingTop: 7 }}>{usaget}</Col>
                         <Col sm={2} componentClass={ControlLabel}>Units of Measure</Col>
                         <Col sm={2}>
                           <UsageTypesSelector
@@ -299,6 +316,7 @@ class Product extends Component {
                             onChangeUsaget={this.onChangeUsaget}
                             onChangeUnit={this.onChangeUnit}
                             showSelectTypes={false}
+                            enabled={mode !== 'view'}
                           />
                         </Col>
                       </div>)
@@ -310,6 +328,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
+                onRemoveField={this.onRemoveAdditionalField}
                 highlightPramas={ratingParams}
                 editable={editable}
               />

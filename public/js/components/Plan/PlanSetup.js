@@ -15,6 +15,7 @@ import {
   savePlan,
   clearPlan,
   onPlanFieldUpdate,
+  onPlanFieldRemove,
   onPlanCycleUpdate,
   onPlanTariffAdd,
   onPlanTariffRemove,
@@ -153,6 +154,10 @@ class PlanSetup extends Component {
     this.props.dispatch(onPlanFieldUpdate(path, value));
   }
 
+  onRemoveFieldValue = (path) => {
+    this.props.dispatch(onPlanFieldRemove(path));
+  }
+
   onDeleteField = (path, value) => {
     this.props.dispatch(onPlanFieldUpdate(path, value));
   }
@@ -217,6 +222,7 @@ class PlanSetup extends Component {
     const planRates = item.get('rates', Immutable.Map());
     const includedServices = item.getIn(['include', 'services'], Immutable.List());
     const includeGroups = item.getIn(['include', 'groups'], Immutable.Map());
+    const plays = item.get('play', Immutable.List());
     return (
       <div className="PlanSetup">
 
@@ -241,6 +247,7 @@ class PlanSetup extends Component {
                 mode={mode}
                 plan={item}
                 onChangeFieldValue={this.onChangeFieldValue}
+                onRemoveField={this.onRemoveFieldValue}
                 onPlanCycleUpdate={this.onPlanCycleUpdate}
                 onPlanTariffAdd={this.onPlanTariffAdd}
                 onPlanTariffRemove={this.onPlanTariffRemove}
@@ -255,6 +262,7 @@ class PlanSetup extends Component {
                 mode={mode}
                 planRates={planRates}
                 onChangeFieldValue={this.onChangeFieldValue}
+                plays={plays.join(',')}
               />
             </Panel>
           </Tab>
@@ -263,6 +271,7 @@ class PlanSetup extends Component {
             <Panel style={{ borderTop: 'none' }}>
               <PlanIncludesTab
                 mode={mode}
+                plays={plays.join(',')}
                 includeGroups={includeGroups}
                 onChangeFieldValue={this.onChangeFieldValue}
                 onGroupAdd={this.onGroupAdd}
@@ -275,6 +284,7 @@ class PlanSetup extends Component {
             <Panel style={{ borderTop: 'none' }}>
               <PlanIncludedServicesTab
                 mode={mode}
+                plays={plays}
                 includedServices={includedServices}
                 onChangeFieldValue={this.onChangeFieldValue}
               />

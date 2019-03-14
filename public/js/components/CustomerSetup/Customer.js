@@ -11,11 +11,10 @@ import { ConfirmModal } from '../../components/Elements';
 import { currencySelector, paymentGatewaysSelector } from '../../selectors/settingsSelector';
 import OfflinePayment from '../Payments/OfflinePayment';
 import CyclesSelector from '../Cycle/CyclesSelector';
-import { getExpectedInvoiceQuery, getSettingsQuery } from '../../common/ApiQueries'
-import { buildRequestUrl, apiBillRun } from '../../common/Api'
+import { getExpectedInvoiceQuery } from '../../common/ApiQueries';
+import { buildRequestUrl } from '../../common/Api';
 import EntityFields from '../Entity/EntityFields';
 import { getSettings } from '../../actions/settingsActions';
-import { getList } from '../../actions/listActions';
 import Credit from '../Credit/Credit';
 
 class Customer extends Component {
@@ -26,6 +25,7 @@ class Customer extends Component {
     supportedGateways: PropTypes.instanceOf(Immutable.List),
     onChangePaymentGateway: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
+    onRemoveField: PropTypes.func.isRequired,
     action: PropTypes.string,
     currency: PropTypes.string,
     fields: PropTypes.instanceOf(Immutable.List),
@@ -78,6 +78,10 @@ class Customer extends Component {
   onChangeCustomField = (fieldPath, value) => {
     const e = { target: { id: fieldPath, value } };
     this.props.onChange(e);
+  };
+
+  onRemoveCustomField = (fieldPath) => {
+    this.props.onRemoveField(fieldPath);
   };
 
   renderPaymentGatewayLabel = () => {
@@ -178,8 +182,8 @@ class Customer extends Component {
   onClickExpectedInvoice = () => {
     const { customer } = this.props;
     const { expectedCyclesNames } = this.state;
-    let query = getExpectedInvoiceQuery(customer.get('aid'),expectedCyclesNames);
-    window.open(buildRequestUrl(query))
+    const query = getExpectedInvoiceQuery(customer.get('aid'), expectedCyclesNames);
+    window.open(buildRequestUrl(query));
   }
 
 
@@ -299,6 +303,7 @@ class Customer extends Component {
             entityName={['subscribers', 'account']}
             entity={customer}
             onChangeField={this.onChangeCustomField}
+            onRemoveField={this.onRemoveCustomField}
           />
           { (action !== 'create') && this.renderChangePaymentGateway() }
           { (action !== 'create') && this.renderDebt() }

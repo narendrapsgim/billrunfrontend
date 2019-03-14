@@ -7,6 +7,7 @@ import { ServiceDescription } from '../../FieldDescriptions';
 import Help from '../Help';
 import Field from '../Field';
 import EntityFields from '../Entity/EntityFields';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getFieldName,
   getFieldNameType,
@@ -19,6 +20,7 @@ export default class ServiceDetails extends Component {
     item: PropTypes.instanceOf(Immutable.Map).isRequired,
     mode: PropTypes.string.isRequired,
     updateItem: PropTypes.func.isRequired,
+    onFieldRemove: PropTypes.func.isRequired,
     errorMessages: PropTypes.object,
   }
 
@@ -70,6 +72,15 @@ export default class ServiceDetails extends Component {
     this.props.updateItem(['quantitative'], value);
   }
 
+  onChangePlays = (plays, playWasRemoved = false) => {
+    const playsToSave = plays === '' ? [] : plays.split(',');
+    this.props.updateItem(['play'], Immutable.List(playsToSave));
+    if (playWasRemoved) {
+      this.props.updateItem(['rates'], Immutable.Map());
+      this.props.updateItem(['include', 'groups'], Immutable.Map());
+    }
+  }
+
   onChangeDescription = (e) => {
     const { value } = e.target;
     this.props.updateItem(['description'], value);
@@ -77,6 +88,10 @@ export default class ServiceDetails extends Component {
 
   onChangeAdditionalField = (field, value) => {
     this.props.updateItem(field, value);
+  }
+
+  onRemoveAdditionalField = (field) => {
+    this.props.onFieldRemove(field);
   }
 
   onChangeServicePeriodType = (e) => {
@@ -104,6 +119,13 @@ export default class ServiceDetails extends Component {
     const isByCycles = item.getIn(['balance_period', 'type'], 'default') === 'default';
     return (
       <Form horizontal>
+
+        <PlaysSelector
+          entity={item}
+          editable={editable && mode === 'create'}
+          multi={true}
+          onChange={this.onChangePlays}
+        />
 
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
@@ -262,6 +284,7 @@ export default class ServiceDetails extends Component {
           entityName="services"
           entity={item}
           onChangeField={this.onChangeAdditionalField}
+          onRemoveField={this.onRemoveAdditionalField}
           editable={editable}
         />
 

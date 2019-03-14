@@ -9,6 +9,7 @@ import Field from '../Field';
 import CreateButton from '../Elements/CreateButton';
 import PlanPrice from './components/PlanPrice';
 import EntityFields from '../Entity/EntityFields';
+import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getFieldName,
   getFieldNameType,
@@ -20,6 +21,7 @@ export default class Plan extends Component {
     plan: React.PropTypes.instanceOf(Immutable.Map).isRequired,
     mode: React.PropTypes.string.isRequired,
     onChangeFieldValue: React.PropTypes.func.isRequired,
+    onRemoveField: React.PropTypes.func.isRequired,
     onPlanCycleUpdate: React.PropTypes.func.isRequired,
     onPlanTariffAdd: React.PropTypes.func.isRequired,
     onPlanTariffRemove: React.PropTypes.func.isRequired,
@@ -75,6 +77,16 @@ export default class Plan extends Component {
     this.props.onChangeFieldValue(['description'], value);
   }
 
+  onChangePlays = (plays, playWasRemoved = false) => {
+    const playsToSave = plays === '' ? [] : plays.split(',');
+    this.props.onChangeFieldValue(['play'], Immutable.List(playsToSave));
+    if (playWasRemoved) {
+      this.props.onChangeFieldValue(['rates'], Immutable.Map());
+      this.props.onChangeFieldValue(['include', 'groups'], Immutable.Map());
+      this.props.onChangeFieldValue(['include', 'services'], Immutable.List());
+    }
+  }
+
   onChangePlanEach = (e) => {
     let value = parseInt(e.target.value);
     value = isNaN(value) ? '' : value;
@@ -103,6 +115,10 @@ export default class Plan extends Component {
 
   onChangeAdditionalField = (field, value) => {
     this.props.onChangeFieldValue(field, value);
+  }
+
+  onRemoveAdditionalField = (field) => {
+    this.props.onRemoveField(field);
   }
 
   getPeriodicityOptions = () => {
@@ -177,6 +193,13 @@ export default class Plan extends Component {
           <Form horizontal>
             <Panel>
 
+              <PlaysSelector
+                entity={plan}
+                editable={editable && mode === 'create'}
+                multi={true}
+                onChange={this.onChangePlays}
+              />
+
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
@@ -241,6 +264,7 @@ export default class Plan extends Component {
                 entityName="plans"
                 entity={plan}
                 onChangeField={this.onChangeAdditionalField}
+                onRemoveField={this.onRemoveAdditionalField}
                 editable={editable}
               />
 
