@@ -18,6 +18,7 @@ export const PRODUCT_CLEAR = 'PRODUCT_CLEAR';
 export const PRODUCT_CLONE_RESET = 'PRODUCT_CLONE_RESET';
 export const PRODUCT_ADD_RATE = 'PRODUCT_ADD_RATE';
 export const PRODUCT_REMOVE_RATE = 'PRODUCT_REMOVE_RATE';
+export const PRODUCT_DELETE_FIELD = 'PRODUCT_DELETE_FIELD';
 export const PRODUCT_UPDATE_FIELD_VALUE = 'PRODUCT_UPDATE_FIELD_VALUE';
 export const PRODUCT_UPDATE_USAGET_VALUE = 'PRODUCT_UPDATE_USAGET_VALUE';
 export const PRODUCT_UPDATE_TO_VALUE = 'PRODUCT_UPDATE_TO_VALUE';
@@ -36,6 +37,11 @@ export const onFieldUpdate = (path, value) => ({
   type: PRODUCT_UPDATE_FIELD_VALUE,
   path,
   value,
+});
+
+export const onFieldRemove = path => ({
+  type: PRODUCT_DELETE_FIELD,
+  path,
 });
 
 export const onToUpdate = (path, index, value) => ({

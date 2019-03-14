@@ -14,7 +14,16 @@ import {
   getConfig,
   getItemId,
 } from '../../common/Util';
-import { addGroup, removeGroup, getService, clearService, updateService, saveService, setCloneService } from '../../actions/serviceActions';
+import {
+  addGroup,
+  removeGroup,
+  getService,
+  clearService,
+  updateService,
+  deleteServiceField,
+  saveService,
+  setCloneService,
+} from '../../actions/serviceActions';
 import { showSuccess } from '../../actions/alertsActions';
 import { setPageTitle } from '../../actions/guiStateActions/pageActions';
 import { clearItems, getRevisions, clearRevisions } from '../../actions/entityListActions';
@@ -145,6 +154,10 @@ class ServiceSetup extends Component {
     this.props.dispatch(updateService(path, value));
   }
 
+  onRemoveFieldValue = (path) => {
+    this.props.dispatch(deleteServiceField(path));
+  }
+
   afterSave = (response) => {
     const { mode } = this.props;
     this.setState({ progress: false });
@@ -205,7 +218,12 @@ class ServiceSetup extends Component {
 
           <Tab title="Details" eventKey={1}>
             <Panel style={{ borderTop: 'none' }}>
-              <ServiceDetails item={item} mode={mode} updateItem={this.onUpdateItem} />
+              <ServiceDetails
+                item={item}
+                mode={mode}
+                updateItem={this.onUpdateItem}
+                onFieldRemove={this.onRemoveFieldValue}
+              />
             </Panel>
           </Tab>
 

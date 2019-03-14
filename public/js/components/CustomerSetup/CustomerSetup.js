@@ -18,6 +18,7 @@ import {
   saveSubscription,
   saveCustomer,
   updateCustomerField,
+  removeCustomerField,
   clearCustomer,
   getCustomer,
   getSubscription,
@@ -129,6 +130,10 @@ class CustomerSetup extends Component {
   onChangeCustomerField = (e) => {
     const { value, id } = e.target;
     this.props.dispatch(updateCustomerField(id, value));
+  }
+
+  onRemoveCustomerField = (path) => {
+    this.props.dispatch(removeCustomerField(path));
   }
 
   afterSaveCustomer = (response) => {
@@ -248,6 +253,7 @@ class CustomerSetup extends Component {
                       fields={accountFields}
                       supportedGateways={gateways}
                       onChange={this.onChangeCustomerField}
+                      onRemoveField={this.onRemoveCustomerField}
                       onChangePaymentGateway={this.onClickChangePaymentGateway}
                     />
                   </Panel>

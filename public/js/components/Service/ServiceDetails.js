@@ -20,6 +20,7 @@ export default class ServiceDetails extends Component {
     item: PropTypes.instanceOf(Immutable.Map).isRequired,
     mode: PropTypes.string.isRequired,
     updateItem: PropTypes.func.isRequired,
+    onFieldRemove: PropTypes.func.isRequired,
     errorMessages: PropTypes.object,
   }
 
@@ -87,6 +88,10 @@ export default class ServiceDetails extends Component {
 
   onChangeAdditionalField = (field, value) => {
     this.props.updateItem(field, value);
+  }
+
+  onRemoveAdditionalField = (field) => {
+    this.props.onFieldRemove(field);
   }
 
   onChangeServicePeriodType = (e) => {
@@ -279,6 +284,7 @@ export default class ServiceDetails extends Component {
           entityName="services"
           entity={item}
           onChangeField={this.onChangeAdditionalField}
+          onRemoveField={this.onRemoveAdditionalField}
           editable={editable}
         />
 

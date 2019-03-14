@@ -12,6 +12,7 @@ import {
   CLONE_RESET_SERVICE,
   CLEAR_SERVICE,
   UPDATE_SERVICE,
+  DELETE_SERVICE_FIELD,
   ADD_GROUP_SERVICE,
   REMOVE_GROUP_SERVICE } from '../actions/serviceActions';
 
@@ -37,6 +38,12 @@ const serviceReducer = (state = DefaultState, action) => {
 
     case UPDATE_SERVICE:
       return state.setIn(action.path, action.value);
+
+    case DELETE_SERVICE_FIELD:
+      if (Array.isArray(action.path)) {
+        return state.deleteIn(action.path);
+      }
+      return state.deleteIn([action.path]);
 
     case CLONE_RESET_SERVICE: {
       const keysToDeleteOnClone = ['_id', 'from', 'to', 'originalValue', ...action.uniquefields];

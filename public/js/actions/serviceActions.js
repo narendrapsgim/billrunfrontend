@@ -16,6 +16,7 @@ import {
 
 export const GOT_SERVICE = 'GOT_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
+export const DELETE_SERVICE_FIELD = 'DELETE_SERVICE_FIELD';
 export const SAVE_SERVICE = 'SAVE_SERVICE';
 export const CLEAR_SERVICE = 'CLEAR_SERVICE';
 export const CLONE_RESET_SERVICE = 'CLONE_RESET_SERVICE';
@@ -42,6 +43,11 @@ export const updateService = (path, value) => ({
   type: UPDATE_SERVICE,
   path,
   value,
+});
+
+export const deleteServiceField = path => ({
+  type: DELETE_SERVICE_FIELD,
+  path,
 });
 
 export const addGroup = (groupName, usages, unit, value, shared, pooled, quantityAffected, products) => ({

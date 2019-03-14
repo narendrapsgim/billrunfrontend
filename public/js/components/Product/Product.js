@@ -34,6 +34,7 @@ class Product extends Component {
     planName: PropTypes.string,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
+    onFieldRemove: PropTypes.func.isRequired,
     onProductRateAdd: PropTypes.func.isRequired,
     onProductRateRemove: PropTypes.func.isRequired,
     onToUpdate: PropTypes.func.isRequired,
@@ -164,6 +165,10 @@ class Product extends Component {
     this.props.onFieldUpdate(field, value);
   }
 
+  onRemoveAdditionalField = (field) => {
+    this.props.onFieldRemove(field);
+  }
+
   isRetailRate = (tariffCategory = null) => {
     const { product } = this.props;
     const category = tariffCategory === null
@@ -266,6 +271,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeTariffCategory}
+                onRemoveField={this.onRemoveAdditionalField}
                 fieldsFilter={this.filterTariffCategory}
                 editable={editable}
               />
@@ -322,6 +328,7 @@ class Product extends Component {
                 entityName="rates"
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
+                onRemoveField={this.onRemoveAdditionalField}
                 highlightPramas={ratingParams}
                 editable={editable}
               />

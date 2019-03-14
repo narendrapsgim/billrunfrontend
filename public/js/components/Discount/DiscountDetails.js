@@ -20,6 +20,7 @@ export default class DiscountDetails extends Component {
     currency: PropTypes.string,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
+    onFieldRemove: PropTypes.func.isRequired,
     availablePlans: PropTypes.instanceOf(Immutable.List),
     availableServices: PropTypes.instanceOf(Immutable.List),
   }
@@ -69,6 +70,10 @@ export default class DiscountDetails extends Component {
 
   onChangeAdditionalField = (field, value) => {
     this.props.onFieldUpdate(field, value);
+  }
+
+  onRemoveAdditionalField = (field) => {
+    this.props.onFieldRemove(field);
   }
 
   onChangeDiscountType = (e) => {
@@ -261,6 +266,7 @@ export default class DiscountDetails extends Component {
                 entityName="discounts"
                 entity={discount}
                 onChangeField={this.onChangeAdditionalField}
+                onRemoveField={this.onRemoveAdditionalField}
                 editable={editable}
               />
 
