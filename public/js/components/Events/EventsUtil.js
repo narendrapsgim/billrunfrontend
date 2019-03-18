@@ -111,7 +111,7 @@ export const gitTimeOptions = (value) => {
     return [{ value: 15, label: '15' }, { value: 30, label: '30' }];
   }
   if (value === 'hourly') {
-    return Array.from(new Array(24), (v, k) => k + 1).map(v => ({ value: v, label: v }));
+    return Array.from(new Array(24), (v, k) => k + 1).map(v => ({ value: v, label: `${v}` }));
   }
   return [];
 };

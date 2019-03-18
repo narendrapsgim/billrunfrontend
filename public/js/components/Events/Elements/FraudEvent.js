@@ -24,6 +24,8 @@ class FraudEvent extends Component {
     eventPropertyType: PropTypes.instanceOf(Immutable.Set),
     thresholdFieldsSelectOptions: PropTypes.array,
     thresholdOperatorsSelectOptions: PropTypes.array,
+    errors: PropTypes.instanceOf(Immutable.Map),
+    setError: PropTypes.func.isRequired,
     updateField: PropTypes.func.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
@@ -35,6 +37,7 @@ class FraudEvent extends Component {
     eventPropertyType: Immutable.Set(),
     thresholdFieldsSelectOptions: [],
     thresholdOperatorsSelectOptions: [],
+    errors: Immutable.Map(),
   };
 
   state = {
@@ -161,16 +164,30 @@ class FraudEvent extends Component {
       eventPropertyType,
       thresholdFieldsSelectOptions,
       thresholdOperatorsSelectOptions,
+      errors,
     } = this.props;
     const index = 0;
     const threshold = item.getIn(['threshold_conditions', 0, index], Immutable.Map());
     return (
       <Col sm={12}>
         <FormGroup className="form-inner-edit-row">
-          <Col sm={3} xsHidden><label htmlFor="threshold_field">Field</label></Col>
-          <Col sm={3} xsHidden><label htmlFor="threshold_operator">Operator</label></Col>
-          <Col sm={4} xsHidden><label htmlFor="threshold_value">Value</label></Col>
-          {eventPropertyType.size === 1 && (<Col sm={2} xsHidden><label htmlFor="threshold_uof">Unit of measure</label></Col>)}
+          <Col sm={3} xsHidden><label htmlFor="threshold_field">
+            Field
+            <span className="danger-red"> *</span></label>
+          </Col>
+          <Col sm={3} xsHidden><label htmlFor="threshold_operator">
+            Operator
+            <span className="danger-red"> *</span></label>
+          </Col>
+          <Col sm={4} xsHidden><label htmlFor="threshold_value">
+            Value <span className="danger-red"> *</span></label>
+          </Col>
+          {eventPropertyType.size === 1 && !['aprice', 'final_charge'].includes(threshold.getIn(['field'], '')) && (
+            <Col sm={2} xsHidden><label htmlFor="threshold_uof">
+              Unit of measure
+              <span className="danger-red"> *</span></label>
+            </Col>
+          )}
         </FormGroup>
         <FraudEventThreshold
           threshold={threshold}
@@ -179,6 +196,8 @@ class FraudEvent extends Component {
           thresholdFieldsSelectOptions={thresholdFieldsSelectOptions}
           thresholdOperatorsSelectOptions={thresholdOperatorsSelectOptions}
           onUpdate={this.onChangeThreshold}
+          errors={errors}
+          setError={this.props.setError}
         />
       </Col>
     );
@@ -186,7 +205,7 @@ class FraudEvent extends Component {
 
   render() {
     const { status } = this.state;
-    const { mode, item, eventsSettings } = this.props;
+    const { mode, item, eventsSettings, errors } = this.props;
     if (status === 'loading') {
       return (<LoadingItemPlaceholder />);
     }
@@ -200,6 +219,8 @@ class FraudEvent extends Component {
             item={item}
             eventsSettings={eventsSettings}
             onUpdate={this.props.updateField}
+            setError={this.props.setError}
+            errors={errors}
           />
         </Panel>
         <Panel header={<span>Conditions</span>} collapsible defaultExpanded={['create', 'clone'].includes(mode)} className="collapsible">

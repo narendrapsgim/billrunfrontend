@@ -13,6 +13,7 @@ import {
   saveEvents,
   saveEvent,
   getEvents,
+  validateEvent,
 } from '../../actions/eventActions';
 import {
   showSuccess,
@@ -73,6 +74,9 @@ const mapDispatchToProps = (dispatch, props) => ({
 
   onEdit: (item) => {
     const onOk = (editedItem) => {
+      if (!dispatch(validateEvent(editedItem, props.eventType))) {
+        return false;
+      }
       dispatch(updateEvent(props.eventType, editedItem));
       return dispatch(saveEvents(props.eventType))
         .then(success => (success.status ? true : Promise.reject()))
@@ -95,11 +99,16 @@ const mapDispatchToProps = (dispatch, props) => ({
       itemWithMutations.deleteIn(['ui_flags', 'id']);
       itemWithMutations.set('active', false);
     });
-    const onOk = editedItem => dispatch(saveEvent(props.eventType, editedItem))
+    const onOk = (editedItem) => {
+      if (!dispatch(validateEvent(editedItem, props.eventType))) {
+        return false;
+      }
+      return dispatch(saveEvent(props.eventType, editedItem))
       .then(success => (success.status ? true : Promise.reject()))
       .then(() => dispatch(showSuccess(`New event ${editedItem.get('event_code', '')} saved successfuly`)))
       .then(() => dispatch(getEvents(props.eventType)))
       .catch(() => Promise.reject());
+    };
     const config = {
       title: `Clone "${item.get('event_code')}" event`,
       onOk,
@@ -110,11 +119,16 @@ const mapDispatchToProps = (dispatch, props) => ({
 
   onNew: () => {
     const eventType = getConfig(['events', 'entities', props.eventType, 'title'], props.eventType);
-    const onOk = editedItem => dispatch(saveEvent(props.eventType, editedItem))
+    const onOk = (editedItem) => {
+      if (!dispatch(validateEvent(editedItem, props.eventType))) {
+        return false;
+      }
+      return dispatch(saveEvent(props.eventType, editedItem))
       .then(success => (success.status ? true : Promise.reject()))
       .then(() => dispatch(showSuccess(`New event ${editedItem.get('event_code', '')} saved successfuly`)))
       .then(() => dispatch(getEvents(props.eventType)))
       .catch(() => Promise.reject());
+    };
     const config = {
       title: `Create new ${eventType} event`,
       onOk,

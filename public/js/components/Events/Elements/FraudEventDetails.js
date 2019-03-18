@@ -1,24 +1,32 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { FormGroup, Col, ControlLabel, InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import { FormGroup, Col, ControlLabel, InputGroup, DropdownButton, MenuItem, HelpBlock } from 'react-bootstrap';
 import Field from '../../Field';
 import {
   gitTimeOptions,
   gitPeriodLabel,
 } from '../EventsUtil';
+import {
+  validateFieldEventCode,
+  validateFieldRecurrenceValue,
+  validateFieldDateRangeValue,
+} from '../../../actions/eventActions';
 
 
-const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
+const FraudEventDetails = ({ item, eventsSettings, errors, onUpdate, setError }) => {
   const recurrenceUnit = item.getIn(['recurrence', 'type'], '');
   const recurrenceUnitTitle = gitPeriodLabel(recurrenceUnit);
   const recurrenceOptions = gitTimeOptions(recurrenceUnit);
   const dateRangeUnit = item.getIn(['date_range', 'type'], '');
   const dateRangeUnitTitle = gitPeriodLabel(dateRangeUnit);
   const dateRangeOptions = gitTimeOptions(dateRangeUnit);
+  const globalAddresses = eventsSettings.getIn(['email', 'global_addresses'], Immutable.List());
 
   const onChaneEventCode = (e) => {
     const { value } = e.target;
     onUpdate(['event_code'], value);
+    const isValid = validateFieldEventCode(value);
+    setError('event_code', isValid === true ? null : isValid);
   };
   const onChaneEventDescription = (e) => {
     const { value } = e.target;
@@ -30,6 +38,8 @@ const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
   };
   const onChangeRecurrenceValue = (value) => {
     onUpdate(['recurrence', 'value'], value);
+    const isValid = validateFieldRecurrenceValue(value);
+    setError('recurrence.value', isValid === true ? null : isValid);
   };
   const onChangeRecurrenceType = (value) => {
     onUpdate(['recurrence', 'type'], value);
@@ -41,6 +51,8 @@ const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
   };
   const onChangeDateRangeValue = (value) => {
     onUpdate(['date_range', 'value'], value);
+    const isValid = validateFieldDateRangeValue(value);
+    setError('date_range.value', isValid === true ? null : isValid);
   };
   const onChangeActive = (e) => {
     const { value } = e.target;
@@ -73,29 +85,31 @@ const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
   const prepareEmailAddressesValue = () => {
     const emails = item.getIn(['notify_by_email', 'additional_addresses'], Immutable.List());
     const useGlobalAddresses = item.getIn(['notify_by_email', 'use_global_addresses'], false);
-    if (useGlobalAddresses) {
+    if (useGlobalAddresses && !globalAddresses.isEmpty()) {
       return emails.insert(0, 'global').toArray();
     }
     return emails.toArray();
   };
-
-  const globalAddresses = eventsSettings.getIn(['email', 'global_addresses'], Immutable.List()).join(', ');
-  const emailAddressesSelectOptions = [
-    { value: 'global', label: `Global emails (${globalAddresses})` },
-  ];
+  const emailAddressesSelectOptions = globalAddresses.isEmpty() ? [] : [{ value: 'global', label: `Global emails (${globalAddresses.join(', ')})` }];
   const emailAdderssesValue = prepareEmailAddressesValue();
   const isNotifyByEmail = item.getIn(['notify_by_email', 'notify'], false);
+  const isEventCodeError = errors.get('event_code', false);
+  const isRecurrenceValueError = errors.get('recurrence.value', false);
+  const isDatRangeValueError = errors.get('date_range.value', false);
   return (
     <Col sm={12}>
-      <FormGroup>
+      <FormGroup validationState={isEventCodeError ? 'error' : null}>
         <Col componentClass={ControlLabel} sm={3}>
-          Event Code
+          Event Code <span className="danger-red"> *</span>
         </Col>
         <Col sm={7}>
           <Field
             onChange={onChaneEventCode}
             value={item.get('event_code', '')}
           />
+          { isEventCodeError && (
+            <HelpBlock>{isEventCodeError}</HelpBlock>
+          )}
         </Col>
       </FormGroup>
       <FormGroup>
@@ -140,9 +154,9 @@ const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
           </InputGroup>
         </Col>
       </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} sm={3}>
-          Run every
+      <FormGroup validationState={isRecurrenceValueError ? 'error' : null}>
+        <Col componentClass={ControlLabel} sm={3} >
+          Run every <span className="danger-red"> *</span>
         </Col>
         <Col sm={7}>
           <InputGroup>
@@ -161,11 +175,14 @@ const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
               <MenuItem eventKey="hourly" onSelect={onChangeRecurrenceType}>Hours</MenuItem>
             </DropdownButton>
           </InputGroup>
+          { isRecurrenceValueError && (
+            <HelpBlock>{isRecurrenceValueError}</HelpBlock>
+          )}
         </Col>
       </FormGroup>
-      <FormGroup>
-        <Col componentClass={ControlLabel} sm={3}>
-          For the previous
+      <FormGroup validationState={isDatRangeValueError ? 'error' : null}>
+        <Col componentClass={ControlLabel} sm={3} >
+          For the previous <span className="danger-red"> *</span>
         </Col>
         <Col sm={7}>
           <InputGroup>
@@ -184,6 +201,9 @@ const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
               <MenuItem eventKey="hourly" onSelect={onChangeDateRangeType}>Hourly</MenuItem>
             </DropdownButton>
           </InputGroup>
+          { isDatRangeValueError && (
+            <HelpBlock>{isDatRangeValueError}</HelpBlock>
+          )}
         </Col>
       </FormGroup>
       <FormGroup>
@@ -234,12 +254,15 @@ const FraudEventDetails = ({ item, eventsSettings, onUpdate }) => {
 FraudEventDetails.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
   eventsSettings: PropTypes.instanceOf(Immutable.Map),
+  errors: PropTypes.instanceOf(Immutable.Map),
   onUpdate: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
 };
 
 FraudEventDetails.defaultProps = {
   item: Immutable.Map(),
   eventsSettings: Immutable.Map(),
+  errors: Immutable.Map(),
 };
 
 
