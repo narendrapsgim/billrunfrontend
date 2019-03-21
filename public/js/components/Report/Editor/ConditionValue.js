@@ -146,13 +146,23 @@ class ConditionValue extends Component {
     }
   };
 
+  onChangeDateTime = (date) => {
+    if (moment.isMoment(date) && date.isValid()) {
+      const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+      this.props.onChange(date.format(apiDateTimeFormat));
+    } else {
+      this.props.onChange(null);
+    }
+  };
+
   getOptionsValues = (defaultOptions = Immutable.List()) => this.props.operator
     .get('options', defaultOptions)
     .map(formatSelectOptions)
     .toArray();
 
+  formatValueTagDateTime = value => moment(value).format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]'));
 
-  renderDateTag = value => moment(value).format(getConfig('dateFormat', 'DD/MM/YYYY'));
+  formatValueTagDate = value => moment(value).format(getConfig('dateFormat', 'DD/MM/YYYY'));
 
   renderCustomInputDate = ({ addTag, disabled }) => {
     const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD');
@@ -171,123 +181,162 @@ class ConditionValue extends Component {
     );
   }
 
+  renderCustomInputDateTime = ({ addTag, disabled }) => {
+    const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+    const onChange = (date) => {
+      addTag(date.format(apiDateTimeFormat));
+    };
+    return (
+      <span className="custom-field-input">
+        <Field
+          fieldType="datetime"
+          value={null}
+          onChange={onChange}
+          disabled={disabled}
+          utcOffset={0}
+        />
+      </span>
+    );
+  }
+
   renderCustomInputNumber =({ addTag, onChange, value, ...other }) => (
     <input type="number" onChange={onChange} value={value} {...other} />
   );
 
-  renderInput = () => {
+  renderInputBoolean = () => {
+    const { field, disabled } = this.props;
+    let value = '';
+    if (field.get('value', false) === true) {
+      value = 'yes';
+    } else if (field.get('value', true) === false) {
+      value = 'no';
+    }
+    const booleanOptions = this.getOptionsValues(Immutable.List(['yes', 'no']));
+    return (
+      <Select
+        clearable={false}
+        options={booleanOptions}
+        value={value}
+        onChange={this.onChangeBoolean}
+        disabled={disabled}
+      />
+    );
+  }
+
+  renderInputSelect = () => {
     const { field, disabled, config, selectOptions, operator } = this.props;
+    const options = Immutable.List()
+      .withMutations((optionsWithMutations) => {
+        if (config.hasIn(['inputConfig', 'callback'])) {
+          selectOptions.forEach((selectOption) => {
+            optionsWithMutations.push(selectOption);
+          });
+        }
+        if (config.hasIn(['inputConfig', 'options'])) {
+          config.getIn(['inputConfig', 'options'], Immutable.List()).forEach((selectOption) => {
+            optionsWithMutations.push(selectOption);
+          });
+        }
+        if (operator.has('options')) {
+          operator.get('options', Immutable.List()).forEach((selectOption) => {
+            optionsWithMutations.push(selectOption);
+          });
+        }
+      })
+      .map(formatSelectOptions)
+      .toArray();
 
-    //  Boolean + operator 'EXIST'
-    if ([config.get('type', ''), operator.get('type', '')].includes('boolean')) {
-      let value = '';
-      if (field.get('value', false) === true) {
-        value = 'yes';
-      } else if (field.get('value', true) === false) {
-        value = 'no';
-      }
-      const booleanOptions = this.getOptionsValues(Immutable.List(['yes', 'no']));
-      return (
-        <Select
-          clearable={false}
-          options={booleanOptions}
-          value={value}
-          onChange={this.onChangeBoolean}
-          disabled={disabled}
-        />
-      );
-    }
+    const multi = ['nin', 'in'].includes(field.get('op', ''));
+    return (
+      <Select
+        clearable={false}
+        multi={multi}
+        options={options}
+        value={field.get('value', '')}
+        onChange={this.onChangeSelect}
+        disabled={disabled}
+      />
+    );
+  }
 
-    // String-select
-    if ([config.get('type', 'string'), operator.get('type', '')].includes('string')
-      && (config.getIn(['inputConfig', 'inputType']) === 'select' || operator.has('options'))
-      && ['eq', 'ne', 'nin', 'in'].includes(field.get('op', ''))
-    ) {
-      const options = Immutable.List()
-        .withMutations((optionsWithMutations) => {
-          if (config.hasIn(['inputConfig', 'callback'])) {
-            selectOptions.forEach((selectOption) => {
-              optionsWithMutations.push(selectOption);
-            });
-          }
-          if (config.hasIn(['inputConfig', 'options'])) {
-            config.getIn(['inputConfig', 'options'], Immutable.List()).forEach((selectOption) => {
-              optionsWithMutations.push(selectOption);
-            });
-          }
-          if (operator.has('options')) {
-            operator.get('options', Immutable.List()).forEach((selectOption) => {
-              optionsWithMutations.push(selectOption);
-            });
-          }
-        })
-        .map(formatSelectOptions)
-        .toArray();
-
-      const multi = ['nin', 'in'].includes(field.get('op', ''));
-      return (
-        <Select
-          clearable={false}
-          multi={multi}
-          options={options}
-          value={field.get('value', '')}
-          onChange={this.onChangeSelect}
-          disabled={disabled}
-        />
-      );
-    }
-
-    // 'Number'
-    if ([config.get('type', ''), operator.get('type', '')].includes('number')) {
-      if (['nin', 'in'].includes(field.get('op', ''))) {
-        const value = field.get('value', '').split(',').filter(val => val !== '');
-        return (
-          <Field
-            fieldType="tags"
-            value={value}
-            onChange={this.onChangeMultiValues}
-            disabled={disabled}
-            renderInput={this.renderCustomInputNumber}
-          />
-        );
-      }
+  renderInputNumber = () => {
+    const { field, disabled } = this.props;
+    if (['nin', 'in'].includes(field.get('op', ''))) {
+      const value = field.get('value', '').split(',').filter(val => val !== '');
       return (
         <Field
-          fieldType="number"
-          value={field.get('value', '')}
-          onChange={this.onChangeNumber}
+          fieldType="tags"
+          value={value}
+          onChange={this.onChangeMultiValues}
           disabled={disabled}
+          renderInput={this.renderCustomInputNumber}
         />
       );
     }
+    return (
+      <Field
+        fieldType="number"
+        value={field.get('value', '')}
+        onChange={this.onChangeNumber}
+        disabled={disabled}
+      />
+    );
+  }
 
-    // 'Date'
-    if ([config.get('type', ''), operator.get('type', '')].includes('date')) {
-      if (['nin', 'in'].includes(field.get('op', ''))) {
-        const value = field.get('value', '').split(',').filter(val => val !== '');
-        return (
-          <Field
-            fieldType="tags"
-            value={value}
-            onChange={this.onChangeMultiValues}
-            disabled={disabled}
-            renderInput={this.renderCustomInputDate}
-            getTagDisplayValue={this.renderDateTag}
-          />
-        );
-      }
-      const value = moment(field.get('value', null));
+  renderInputDate = () => {
+    const { field, disabled } = this.props;
+    if (['nin', 'in'].includes(field.get('op', ''))) {
+      const value = field.get('value', '').split(',').filter(val => val !== '');
       return (
         <Field
-          fieldType="date"
+          fieldType="tags"
           value={value}
-          onChange={this.onChangeDate}
+          onChange={this.onChangeMultiValues}
           disabled={disabled}
+          renderInput={this.renderCustomInputDate}
+          getTagDisplayValue={this.formatValueTagDate}
         />
       );
     }
+    const value = moment(field.get('value', null));
+    return (
+      <Field
+        fieldType="date"
+        value={value}
+        onChange={this.onChangeDateTime}
+        disabled={disabled}
+      />
+    );
+  }
 
-    // 'String'
+  renderInputDateTime = () => {
+    const { field, disabled } = this.props;
+    if (['nin', 'in'].includes(field.get('op', ''))) {
+      const value = field.get('value', '').split(',').filter(val => val !== '');
+      return (
+        <Field
+          fieldType="tags"
+          value={value}
+          onChange={this.onChangeMultiValues}
+          disabled={disabled}
+          renderInput={this.renderCustomInputDateTime}
+          getTagDisplayValue={this.formatValueTagDateTime}
+        />
+      );
+    }
+    const value = moment(field.get('value', null)).utc();
+    return (
+      <Field
+        fieldType="datetime"
+        value={value}
+        onChange={this.onChangeDateTime}
+        disabled={disabled}
+      />
+    );
+  }
+
+  renderInputString = () => {
+    const { field, disabled } = this.props;
     if (['nin', 'in'].includes(field.get('op', ''))) {
       const value = field.get('value', '').split(',').filter(val => val !== '');
       return (
@@ -306,6 +355,41 @@ class ConditionValue extends Component {
         disabled={disabled}
       />
     );
+  }
+
+  renderInput = () => {
+    const { field, config, operator } = this.props;
+
+    //  Boolean + operator 'EXIST'
+    if ([config.get('type', ''), operator.get('type', '')].includes('boolean')) {
+      return this.renderInputBoolean();
+    }
+
+    // String-select
+    if ([config.get('type', 'string'), operator.get('type', '')].includes('string')
+      && (config.getIn(['inputConfig', 'inputType']) === 'select' || operator.has('options'))
+      && ['eq', 'ne', 'nin', 'in'].includes(field.get('op', ''))
+    ) {
+      return this.renderInputSelect();
+    }
+
+    // 'Number'
+    if ([config.get('type', ''), operator.get('type', '')].includes('number')) {
+      return this.renderInputNumber();
+    }
+
+    // 'Date'
+    if ([config.get('type', ''), operator.get('type', '')].includes('date')) {
+      return this.renderInputDate();
+    }
+
+    // 'DateTime'
+    if ([config.get('type', ''), operator.get('type', '')].includes('datetime')) {
+      return this.renderInputDateTime();
+    }
+
+    // 'String'
+    return this.renderInputString();
   }
 
   render() {
