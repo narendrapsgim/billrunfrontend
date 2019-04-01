@@ -55,6 +55,7 @@
     "moment-timezone": "^0.5.23",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "papaparse": "^4.6.3",
+    "pluralize": "^7.0.0",
     "pnp-webpack-plugin": "1.2.1",
     "postcss-flexbugs-fixes": "4.1.0",
     "postcss-loader": "3.0.0",

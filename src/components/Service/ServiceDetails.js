@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import { titleCase, sentenceCase } from 'change-case';
 import isNumber from 'is-number';
+import pluralize from 'pluralize';
 import { Form, FormGroup, ControlLabel, HelpBlock, Col, InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import { ServiceDescription } from '../../language/FieldDescriptions';
 import Help from '../Help';
@@ -117,7 +118,9 @@ export default class ServiceDetails extends Component {
     const serviceCycleUnlimitedValue = getConfig('serviceCycleUnlimitedValue', 'UNLIMITED');
     const editable = (mode !== 'view');
     const balancePeriodUnit = item.getIn(['balance_period', 'unit'], '');
-    const balancePeriodUnitTitle = (balancePeriodUnit === '') ? 'Select unit...' : titleCase(balancePeriodUnit);
+    const balancePeriodUnitTitle = (balancePeriodUnit === '')
+      ? 'Select unit...'
+      : titleCase(pluralize(balancePeriodUnit, Number(item.getIn(['balance_period', 'value'], 2))));
     const isByCycles = item.getIn(['balance_period', 'type'], 'default') === 'default';
     return (
       <Form horizontal>
@@ -217,18 +220,21 @@ export default class ServiceDetails extends Component {
                   value={item.getIn(['balance_period', 'value'], '')}
                   onChange={this.onChangeBalancePeriod}
                   editable={editable}
+                  suffix={!editable ? ` ${balancePeriodUnitTitle}` : null }
                 />
-                <DropdownButton
-                  id="balance-period-unit"
-                  componentClass={InputGroup.Button}
-                  title={balancePeriodUnitTitle}
-                  disabled={isByCycles}
-                >
-                  <MenuItem eventKey="days" onSelect={this.onSelectPeriodUnit}>Days</MenuItem>
-                  <MenuItem eventKey="weeks" onSelect={this.onSelectPeriodUnit}>Weeks</MenuItem>
-                  <MenuItem eventKey="months" onSelect={this.onSelectPeriodUnit}>Months</MenuItem>
-                  <MenuItem eventKey="years" onSelect={this.onSelectPeriodUnit}>Years</MenuItem>
-                </DropdownButton>
+                { editable && (
+                  <DropdownButton
+                    id="balance-period-unit"
+                    componentClass={InputGroup.Button}
+                    title={balancePeriodUnitTitle}
+                    disabled={isByCycles}
+                    >
+                    <MenuItem eventKey="days" onSelect={this.onSelectPeriodUnit}>Days</MenuItem>
+                    <MenuItem eventKey="weeks" onSelect={this.onSelectPeriodUnit}>Weeks</MenuItem>
+                    <MenuItem eventKey="months" onSelect={this.onSelectPeriodUnit}>Months</MenuItem>
+                    <MenuItem eventKey="years" onSelect={this.onSelectPeriodUnit}>Years</MenuItem>
+                  </DropdownButton>
+                )}
               </InputGroup>
             </Col>
           </FormGroup>
