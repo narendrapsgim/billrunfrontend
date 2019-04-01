@@ -15,6 +15,7 @@ import TextWithButton from './TextWithButton';
 import ProgressIndicator from './ProgressIndicator';
 import PlanSearch from './PlanSearch';
 import TabsWrapper from './TabsWrapper';
+import Stepper from './Stepper';
 
 export {
   WithEntityLink,
@@ -34,4 +35,5 @@ export {
   ProgressIndicator,
   PlanSearch,
   TabsWrapper,
+  Stepper,
 };

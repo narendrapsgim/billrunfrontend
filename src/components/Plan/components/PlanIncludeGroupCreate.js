@@ -5,12 +5,9 @@ import Immutable from 'immutable';
 import { Modal, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Button, Checkbox, Col } from 'react-bootstrap';
 import changeCase from 'change-case';
 import isNumber from 'is-number';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { GroupsInclude } from '@/language/FieldDescriptions';
-import { CreateButton } from '@/components/Elements'
+import { CreateButton, Stepper } from '@/components/Elements'
 import Help from '../../Help';
 import ProductSearchByUsagetype from './ProductSearchByUsagetype';
 import Field from '@/components/Field';
@@ -497,15 +494,12 @@ class PlanIncludeGroupCreate extends Component {
     }
   }
 
-  renderSteps = () => {
+  getSteps = () => {
     const { steps } = this.state;
     return steps
+      .sort(step => step.index)
+      .map(step => ({title: step.label}))
       .toList()
-      .map(step => (
-        <Step key={step.index}>
-          <StepLabel>{step.label}</StepLabel>
-        </Step>
-      ))
       .toArray();
   }
 
@@ -515,8 +509,6 @@ class PlanIncludeGroupCreate extends Component {
     if (name.length) {
       modalTitle += ` - ${name}`;
     }
-    const styleStepper = { height: 20 };
-
     return (
       <div>
         <CreateButton onClick={this.handleToggleBoby} type="Group" label="Create New" />
@@ -529,9 +521,7 @@ class PlanIncludeGroupCreate extends Component {
           </Modal.Header>
 
           <Modal.Body style={{ minHeight: 235 }}>
-            <Stepper activeStep={stepIndex} style={styleStepper}>
-              {this.renderSteps()}
-            </Stepper>
+            <Stepper activeIndex={stepIndex} steps={this.getSteps()}/>
             <hr style={{ margin: '20px -20px 35px -20px' }} />
             <Form horizontal className="mb0">
               {this.getStepContent(stepIndex)}

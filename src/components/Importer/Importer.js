@@ -3,14 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import { Form } from 'react-bootstrap';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
 import StepUpload from './StepUpload';
 import StepMapper from './StepMapper';
 import StepValidate from './StepValidate';
 import StepResult from './StepResult';
-import { ActionButtons } from '@/components/Elements';
+import { ActionButtons, Stepper } from '@/components/Elements';
 import { itemSelector } from '@/selectors/entitySelector';
 import {
   initImporter,
@@ -60,6 +57,13 @@ class Importer extends Component {
     ], // csv comuns that will not shown as option
     onFinish: () => {},
   };
+
+  static importerSteps = [
+    {title: 'Upload File'},
+    {title: 'Field Map'},
+    {title: 'Validate'},
+    {title: 'Finish'},
+  ];
 
   state = {
     status: 'create',
@@ -229,20 +233,7 @@ class Importer extends Component {
   renderStepper = () => {
     const { stepIndex } = this.state;
     return (
-      <Stepper activeStep={stepIndex} style={{ height: 20 }}>
-        <Step key={0}>
-          <StepLabel>Upload File</StepLabel>
-        </Step>
-        <Step key={1}>
-          <StepLabel>Field Map</StepLabel>
-        </Step>
-        <Step key={2}>
-          <StepLabel>Validate</StepLabel>
-        </Step>
-        <Step key={3}>
-          <StepLabel>Finish</StepLabel>
-        </Step>
-      </Stepper>
+      <Stepper activeStep={stepIndex} steps={Importer.importerSteps} />
     );
   }
 

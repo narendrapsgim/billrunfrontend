@@ -5,10 +5,8 @@ import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import flattenDeep from 'lodash.flattendeep';
 import Papa from 'papaparse';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import Templates from '../../config/Templates';
+import Templates from '@/config/Templates';
+import { Stepper } from '@/components/Elements';
 import SampleCSV from './SampleCSV';
 import FieldsMapping from './FieldsMapping';
 import CustomerMappings from './CustomerMapping/CustomerMappings';
@@ -551,19 +549,13 @@ class InputProcessor extends Component {
 
   renderStepper = () => {
     const { stepIndex, steps } = this.state;
+    const ipSteps = steps
+      .sortBy((step => step.idx))
+      .map((step, key) => ({title: step.label}))
+      .toList()
+      .toArray();
     return (
-      <Stepper activeStep={stepIndex}>
-        { steps
-          .sortBy((step => step.idx))
-          .map((step, key) => (
-            <Step key={key}>
-              <StepLabel>{step.label}</StepLabel>
-            </Step>
-          ))
-          .toList()
-          .toArray()
-        }
-      </Stepper>
+      <Stepper activeIndex={stepIndex} steps={ipSteps} />
     );
   }
 

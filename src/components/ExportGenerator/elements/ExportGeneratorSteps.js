@@ -1,23 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
+import { Stepper } from '@/components/Elements';
+
+const steps = [
+  {title: 'Choose Input'},
+  {title: 'Segmentation'},
+  {title: 'FTP Details'}
+];
 
 const ExportGeneratorSteps = ({ stepIndex }) => (
   <div className="br-stepper">
-    <Stepper activeStep={stepIndex}>
-      <Step>
-        <StepLabel>Choose Input</StepLabel>
-      </Step>
-      <Step>
-        <StepLabel>Segmentation</StepLabel>
-      </Step>
-
-      <Step>
-        <StepLabel>FTP Details</StepLabel>
-      </Step>
-    </Stepper>
+    <Stepper activeIndex={stepIndex} steps={steps} />
   </div>
 )
 
