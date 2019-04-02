@@ -4,7 +4,13 @@ import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router';
 import Immutable from 'immutable';
 import classNames from 'classnames';
-import { NavDropdown, Button, MenuItem as BootstrapMenuItem } from 'react-bootstrap';
+import {
+  NavDropdown,
+  Button,
+  MenuItem as BootstrapMenuItem,
+  OverlayTrigger,
+  Tooltip,
+} from 'react-bootstrap';
 import { toggleSideBar } from '@/actions/guiStateActions/menuActions';
 import { userDoLogout } from '@/actions/userActions';
 import MenuItem from './MenuItem';
@@ -137,7 +143,7 @@ class Navigator extends Component {
   }
 
   renderSubMenu = (item, key) => {
-    const { router } = this.props;
+    const { router, collapseSideBar } = this.props;
     const { openSubMenu } = this.state;
     const id = item.get('id', '');
     const icon = item.get('icon', '');
@@ -146,19 +152,22 @@ class Navigator extends Component {
       .get('subMenus', Immutable.List())
       .filter(this.filterEnabledMenu)
       .filter(this.filterPermission);
-    const isSubmenuActive = subMenus.reduce((acc, subMenu) => (acc || router.isActive(subMenu.get('route', ''))), false);
+    const activeSubMenus = subMenus.filter(subMenu => router.isActive(subMenu.get('route', '')));
+    const isOpen = openSubMenu.includes(id);
     return (
       <SubMenu
-        active={isSubmenuActive}
+        key={key}
+        active={activeSubMenus.get(0, false)}
         icon={`fa ${icon} fa-fw`}
         id={id}
-        key={key}
         onClick={this.onToggleSubMenu}
-        open={openSubMenu.includes(id)}
+        open={isOpen}
         title={title}
+        collapse={collapseSideBar}
       >
         {subMenus.map(this.renderMenu)}
       </SubMenu>
+
     );
   }
 
@@ -167,21 +176,35 @@ class Navigator extends Component {
   );
 
   renderMenuItem = (item, key) => {
-    const { router } = this.props;
+    const { router, collapseSideBar } = this.props;
     const id = item.get('id', '');
     const icon = item.get('icon', '');
     const title = item.get('title', '');
     const route = item.get('route', '');
+    const showTooltip = collapseSideBar;
+    const link = (
+      <li key={key}>
+        <MenuItem
+          active={router.isActive(route)}
+          icon={`fa ${icon} fa-fw`}
+          id={id}
+          onSetActive={this.onSetActive}
+          route={route}
+          title={title}
+        />
+      </li>
+    );
+    if (!showTooltip) {
+      return link;
+    }
+    const tooltip = icon === ''
+      ? (<Tooltip id={`${id}_${key}`}>{title}</Tooltip>)
+      : (<Tooltip id={`${id}_${key}`}><i className={`fa ${icon} fa-fw`} /> {title}</Tooltip>);
     return (
-      <MenuItem
-        active={router.isActive(route)}
-        icon={`fa ${icon} fa-fw`}
-        id={id}
-        key={key}
-        onSetActive={this.onSetActive}
-        route={route}
-        title={title}
-      />
+      <OverlayTrigger key={`${id}_${key}`} placement={collapseSideBar ? 'right' : 'top'} overlay={tooltip}>
+        {link}
+      </OverlayTrigger>
+
     );
   }
 
