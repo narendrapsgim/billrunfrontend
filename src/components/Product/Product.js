@@ -9,7 +9,7 @@ import Field from '@/components/Field';
 import { CreateButton } from '@/components/Elements';
 import ProductPrice from './components/ProductPrice';
 import { ProductDescription } from '@/language/FieldDescriptions';
-import EntityFields from '../Entity/EntityFields';
+import { EntityFields } from '../Entity';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
 import PlaysSelector from '../Plays/PlaysSelector';
 import {
@@ -383,7 +383,9 @@ class Product extends Component {
                 </Col>
               </FormGroup>
 
-              { this.renderPrices() }
+              <Col sm={12}>
+                { this.renderPrices() }
+              </Col>
               { editable && <CreateButton onClick={this.onProductRateAdd} label="Add New" />}
               <Col lg={12} md={12}>
                 <FormGroup>

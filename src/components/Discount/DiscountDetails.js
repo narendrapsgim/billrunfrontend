@@ -8,7 +8,7 @@ import isNumber from 'is-number';
 import ServiceDiscountValue from './Elements/ServiceDiscountValue';
 import Help from '../Help';
 import Field from '@/components/Field';
-import EntityFields from '../Entity/EntityFields';
+import { EntityFields } from '../Entity';
 import { getFieldName, getConfig } from '@/common/Util';
 import { DiscountDescription } from '../../language/FieldDescriptions';
 

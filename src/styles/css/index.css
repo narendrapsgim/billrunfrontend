@@ -80,6 +80,10 @@ fieldset[disabled] .btn {
 .mr0{ margin-right: 0!important; }
 .mb0{ margin-bottom: 0!important; }
 .ml0{ margin-left: 0!important; }
+.mt5{ margin-top: 5px!important; }
+.mr5{ margin-right: 5px!important; }
+.mb5{ margin-bottom: 5px!important; }
+.ml5{ margin-left: 5px!important; }
 
 .full-width{ width: 100%!important; }
 

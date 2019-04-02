@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
 import classNames from 'classnames';
 import { titleCase } from 'change-case';
-import EntityField from './EntityField';
+import { EntityField } from './index';
 import { getSettings } from '@/actions/settingsActions';
 import {
   entityFieldSelector,

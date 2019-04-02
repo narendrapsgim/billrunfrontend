@@ -8,7 +8,7 @@ import { Form, FormGroup, ControlLabel, HelpBlock, Col, InputGroup, DropdownButt
 import { ServiceDescription } from '../../language/FieldDescriptions';
 import Help from '../Help';
 import Field from '@/components/Field';
-import EntityFields from '../Entity/EntityFields';
+import { EntityFields } from '../Entity';
 import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getConfig,

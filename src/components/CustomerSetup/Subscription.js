@@ -8,8 +8,7 @@ import moment from 'moment';
 import SubscriptionServicesDetails from './SubscriptionServicesDetails';
 import { ActionButtons, Actions } from '@/components/Elements';
 import Field from '@/components/Field';
-import { EntityRevisionDetails } from '../Entity';
-import EntityFields from '../Entity/EntityFields';
+import { EntityRevisionDetails, EntityFields } from '../Entity';
 import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getConfig,

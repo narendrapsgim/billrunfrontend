@@ -9,7 +9,7 @@ import Help from '../Help';
 import Field from '@/components/Field';
 import { CreateButton } from '@/components/Elements';
 import PlanPrice from './components/PlanPrice';
-import EntityFields from '../Entity/EntityFields';
+import { EntityFields } from '../Entity';
 import PlaysSelector from '../Plays/PlaysSelector';
 import {
   getConfig,
