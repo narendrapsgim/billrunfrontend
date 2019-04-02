@@ -6,8 +6,10 @@ import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Customer from './Customer';
 import Subscriptions from './Subscriptions';
-import { ActionButtons } from '@/components/Elements';
-import { LoadingItemPlaceholder } from '@/components/Elements';
+import {
+  ActionButtons,
+  LoadingItemPlaceholder,
+} from '@/components/Elements';
 import PostpaidBalances from '../PostpaidBalances';
 import PrepaidBalances from '../PrepaidBalances';
 import {
@@ -25,12 +27,23 @@ import {
   getSubscription,
   setCloneSubscription,
 } from '@/actions/customerActions';
-import { clearItems, getRevisions, clearRevisions, clearList } from '@/actions/entityListActions';
+import {
+  clearItems,
+  getRevisions,
+  clearRevisions,
+  clearList,
+} from '@/actions/entityListActions';
 import { getList } from '@/actions/listActions';
 import { getSettings } from '@/actions/settingsActions';
 import { setPageTitle } from '@/actions/guiStateActions/pageActions';
 import { showSuccess, showAlert } from '@/actions/alertsActions';
-import { modeSelector, itemSelector, idSelector, tabSelector, messageSelector } from '@/selectors/entitySelector';
+import {
+  modeSelector,
+  itemSelector,
+  idSelector,
+  tabSelector,
+  messageSelector,
+} from '@/selectors/entitySelector';
 import { buildPageTitle, getConfig, getItemId } from '@/common/Util';
 
 
@@ -93,16 +106,28 @@ class CustomerSetup extends Component {
     }
   }
 
-
   componentWillReceiveProps(nextProps) {
     const { customer, mode, itemId } = nextProps;
     const { customer: oldCustomer, itemId: oldItemId, mode: oldMode } = this.props;
-    if (mode !== oldMode || getItemId(customer) !== getItemId(oldCustomer)) {
+    const modeChanged = mode !== oldMode;
+    const revisionChanged = getItemId(customer) !== getItemId(oldCustomer);
+    if (modeChanged || revisionChanged) {
       const pageTitle = buildPageTitle(mode, 'customer', customer);
       this.props.dispatch(setPageTitle(pageTitle));
     }
     if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
       this.fetchItem(itemId);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) { // eslint-disable-line no-unused-vars
+    const { customer } = this.props;
+    const { customer: oldCustomer } = prevProps;
+    const olgPg = oldCustomer.getIn(['payment_gateway', 'active'], Immutable.List());
+    const pg = customer.getIn(['payment_gateway', 'active'], Immutable.List());
+    // if payment gateway was removed, save customer
+    if (!olgPg.isEmpty() && pg.isEmpty()) {
+      this.onSaveCustomer();
     }
   }
 
@@ -135,11 +160,16 @@ class CustomerSetup extends Component {
   }
 
   afterSaveCustomer = (response) => {
-    const { mode } = this.props;
+    const { mode, customer } = this.props;
     if (response.status) {
+      this.props.dispatch(clearItems('customers')); // refetch items list because item was (changed in / added to) list
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
       this.props.dispatch(showSuccess(`The customer was ${action}`));
-      this.handleBack(true);
+      if (mode === 'create') {
+        this.handleBack();
+      }
+      const pageTitle = buildPageTitle(mode, 'customer', customer);
+      this.props.dispatch(setPageTitle(pageTitle));
     }
   }
 
@@ -148,7 +178,8 @@ class CustomerSetup extends Component {
     this.props.dispatch(saveCustomer(customer, mode)).then(this.afterSaveCustomer);
   }
 
-  onClickChangePaymentGateway = (aid) => {
+  onClickChangePaymentGateway = (customer) => {
+    const aid = customer.get('aid', null);
     const returnUrlParam = `return_url=${encodeURIComponent(this.getReturnUrl())}`;
     const aidParam = `aid=${encodeURIComponent(aid)}`;
     const action = `action=${encodeURIComponent('updatePaymentGateway')}`;
@@ -180,10 +211,7 @@ class CustomerSetup extends Component {
     this.props.dispatch(clearList('subscribers'));
   }
 
-  handleBack = (itemWasChanged = false) => {
-    if (itemWasChanged) {
-      this.props.dispatch(clearItems('customers')); // refetch items list because item was (changed in / added to) list
-    }
+  handleBack = () => {
     const listUrl = getConfig(['systemItems', 'customer', 'itemsType'], '');
     this.props.router.push(`/${listUrl}`);
   }
@@ -205,7 +233,7 @@ class CustomerSetup extends Component {
 
   getReturnUrl = () => {
     const { itemId } = this.props;
-    return `${window.location.origin}/#/customers/customer/${itemId}?tab=2`;
+    return `${window.location.origin}/#/customers/customer/${itemId}?tab=1`;
   }
 
   handleSelectTab = (tab) => {
@@ -248,7 +276,6 @@ class CustomerSetup extends Component {
                     <Customer
                       customer={customer}
                       action={mode}
-                      fields={accountFields}
                       supportedGateways={gateways}
                       onChange={this.onChangeCustomerField}
                       onRemoveField={this.onRemoveCustomerField}
