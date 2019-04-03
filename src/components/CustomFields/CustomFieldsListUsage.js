@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List, Map } from 'immutable';
 import { Col, ControlLabel } from 'react-bootstrap';
-import CustomFieldsListRowUsage from './CustomFieldsListRowUsage';
+import CustomFieldsListUsageRow from './CustomFieldsListUsageRow';
 import { Actions } from '../Elements';
 
 
@@ -20,7 +20,7 @@ const CustomFieldsListUsage = ({ fields, addAction, rowActions, entitiesFieldsCo
       <hr style={{ marginTop: 5, marginBottom: 15 }} />
     </Col>
     {!fields.isEmpty() && fields.map((field, idx) => (
-      <CustomFieldsListRowUsage
+      <CustomFieldsListUsageRow
         key={idx}
         field={field}
         actions={rowActions}
@@ -30,10 +30,7 @@ const CustomFieldsListUsage = ({ fields, addAction, rowActions, entitiesFieldsCo
     {fields.isEmpty() && (
       <Col sm={12} className="text-center mb10">No foreign field</Col>
     )}
-    <Col sm={12} xsHidden>
-      <hr style={{ marginTop: 5, marginBottom: 15 }} />
-    </Col>
-    <Col sm={12}>
+    <Col sm={12} className="mt10">
       <Actions actions={addAction} data="usage" />
     </Col>
   </div>

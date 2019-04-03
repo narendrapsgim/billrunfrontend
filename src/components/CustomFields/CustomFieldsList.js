@@ -77,7 +77,7 @@ class CustomFieldsList extends Component {
         </Row>
         <Row>
           <Col sm={12} xsHidden>
-            <hr style={{ marginTop: 5, marginBottom: 15 }} />
+            <hr style={{ marginTop: 5, marginBottom: 0 }} />
           </Col>
         </Row>
         {!fields.isEmpty() && (
@@ -92,15 +92,8 @@ class CustomFieldsList extends Component {
         {fields.isEmpty() && (
           <Col sm={12} className="text-center mb10">No custom field</Col>
         )}
-
-        <Row>
-          <Col sm={12} xsHidden>
-            <hr style={{ marginTop: 5, marginBottom: 15 }} />
-          </Col>
-        </Row>
-        <Col sm={12} className="visible-xs">&nbsp;</Col>
         { !reordering && (
-          <Col sm={12}>
+          <Col sm={12} className="mt10">
             <CreateButton onClick={onNew} type="Field" action="Add" buttonStyle={{ marginTop: 0 }} />
               {!fields.isEmpty() && (
                 <Button bsSize="xsmall" className="btn-primary" onClick={onReorederStart} title="Change fields order" style={{ float: 'right', minWidth: 90 }}>
@@ -110,7 +103,7 @@ class CustomFieldsList extends Component {
           </Col>
         )}
         { reordering && (
-          <Col sm={12} className="text-right">
+          <Col sm={12} className="text-right mt10">
             <Button bsSize="xsmall" onClick={onReorederSave} title="Save new order" bsStyle="primary" style={{ minWidth: 90, marginRight: 10 }}>
               Save order
             </Button>

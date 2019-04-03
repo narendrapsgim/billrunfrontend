@@ -53,7 +53,7 @@ const CustomFieldsListRow = ({
     <Col sm={2} className="actions">
       <Actions actions={actions} data={field} />
     </Col>
-    <Col smHidden mdHidden lgHidden>
+    <Col sm={12}>
       <hr style={{ marginTop: 0, marginBottom: 0 }} />
     </Col>
   </Row>

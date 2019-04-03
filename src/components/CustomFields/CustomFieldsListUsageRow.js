@@ -12,8 +12,8 @@ import {
 } from '../../selectors/customFieldsSelectors';
 
 
-const CustomFieldsListRowUsage = ({ field, actions, entitiesFieldsConfig }) => (
-  <Col sm={12} className="table-row row CustomFieldsListRow usage withHover">
+const CustomFieldsListUsageRow = ({ field, actions, entitiesFieldsConfig }) => (
+  <Col sm={12} className="table-row row CustomFieldsListRow CustomFieldsListRow usage withHover">
     <Col sm={2} style={{ wordBreak: 'break-all' }}>
       <Col smHidden mdHidden lgHidden className="inline">
         <ControlLabel>Title:&nbsp;</ControlLabel>
@@ -49,29 +49,29 @@ const CustomFieldsListRowUsage = ({ field, actions, entitiesFieldsConfig }) => (
       {field.get('conditions', List()).isEmpty() ? 'No' : 'Yes'}
     </Col>
 
-
     <Col sm={2} className="actions">
       <Actions actions={actions} data={field} />
     </Col>
-    <Col smHidden mdHidden lgHidden>
+
+    <Col sm={12}>
       <hr style={{ marginTop: 0, marginBottom: 0 }} />
     </Col>
   </Col>
 );
 
 
-CustomFieldsListRowUsage.propTypes = {
+CustomFieldsListUsageRow.propTypes = {
   field: PropTypes.instanceOf(Map),
   entitiesFieldsConfig: PropTypes.instanceOf(Map),
   actions: PropTypes.arrayOf(PropTypes.object),
 };
 
 
-CustomFieldsListRowUsage.defaultProps = {
+CustomFieldsListUsageRow.defaultProps = {
   field: Map(),
   entitiesFieldsConfig: Map(),
   actions: [],
 };
 
 
-export default CustomFieldsListRowUsage;
+export default CustomFieldsListUsageRow;
