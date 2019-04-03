@@ -1,7 +1,13 @@
 {
-  "entities": [
-    "customer", "subscription", "product", "service", "plan"
-  ],
+  "entities": {
+    "customer": "account",
+    "subscription":"subscriber",
+    "product": "product",
+    "service": "service",
+    "plan":"plan",
+    "usage": "usage"
+  },
+
   "defaultDisabledFields": {
     "customer": ["first_name", "last_name", "firstname", "lastname", "address"],
     "subscription": ["firstname", "lastname", "plan", "services"]
@@ -36,5 +42,29 @@
       "exclude": ["selectOptions"],
       "includeEntity": ["subscription"]
     }
-  ]
+  ],
+  "foreignFields": {
+    "entities": {
+      "usage": ["customer", "subscription", "product", "service", "plan", "account_subscribers"]
+    },
+    "translate": {
+      "unixTimeToString" : {
+        "title": "Unixtime To String",
+        "options": ["Y-m-d H:i:s"]
+      },
+      "unixTimeToMongoDate" : {
+        "title": "Unixtime To MongoDate"
+      }
+    },
+    "conditions": [
+      { "id": "$nin", "title": "Does Not Equal" },
+      { "id": "$in", "title": "Equal" },
+      { "id": "$lt", "title": "Is Less Than", "type": "number" },
+      { "id": "$lte", "title": "Is Less Than Or Equal", "type": "number" },
+      { "id": "$gt", "title": "Is Greater Than",  "type": "number" },
+      { "id": "$gte", "title": "Is Greater Than Or Equal", "type": "number" },
+      { "id": "$regex", "title": "Matches regular expression" }
+    ]
+  }
+
 }

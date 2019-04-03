@@ -7,7 +7,7 @@ import { EntityField } from '../Entity';
 
 
 const CustomFieldForm = ({
-  item, fieldTypeLabel, onChange, onChangePlay, onChangeType, onChangeTitle, onChangeFieldName,
+  item, onChange, onChangePlay, onChangeType, onChangeTitle, onChangeFieldName,
   onChangeEntityField,
   disableUnique, disableMandatory, disableFieldType, disabledEditable, disabledDisplay,
   disabledShowInList, disableSearchable, disableMultiple, disableSelectList, disableSelectOptions,
@@ -33,19 +33,21 @@ const CustomFieldForm = ({
       onChange={onChangeTitle}
       error={isErrorTitle}
     />
-    <FormGroup>
-      <Col sm={3} lg={2} componentClass={ControlLabel}>Field Type</Col>
-      <Col sm={8} lg={9}>
-        <Field
-          fieldType="select"
-          options={fieldTypesOptions}
-          onChange={onChangeType}
-          value={fieldType}
-          disabled={disableFieldType}
-          clearable={false}
-        />
-      </Col>
-    </FormGroup>
+    {!disableFieldType && (
+      <FormGroup>
+        <Col sm={3} lg={2} componentClass={ControlLabel}>Field Type</Col>
+        <Col sm={8} lg={9}>
+          <Field
+            fieldType="select"
+            options={fieldTypesOptions}
+            onChange={onChangeType}
+            value={fieldType}
+            disabled={disableFieldType}
+            clearable={false}
+          />
+        </Col>
+      </FormGroup>
+    )}
     {showPlays && (
       <FormGroup>
         <Col sm={3} lg={2} componentClass={ControlLabel}>Play</Col>
@@ -61,18 +63,23 @@ const CustomFieldForm = ({
         </Col>
       </FormGroup>
     )}
-    <EntityField
-      field={Map({ title: 'Description', field_name: 'description', description: 'Long text will appear in question mark after the field label' })}
-      entity={item}
-      onChange={onChangeEntityField}
-      disabled={disableDescription}
-    />
-    <EntityField
-      field={Map({ title: 'Help Text', field_name: 'help', description: 'Short text will appear below the field' })}
-      entity={item}
-      onChange={onChangeEntityField}
-      disabled={disableHelp}
-    />
+    {!disableDescription && (
+      <EntityField
+        field={Map({ title: 'Description', field_name: 'description', description: 'Long text will appear in question mark after the field label' })}
+        entity={item}
+        onChange={onChangeEntityField}
+        disabled={disableDescription}
+      />
+    )}
+    {!disableHelp && (
+      <EntityField
+        field={Map({ title: 'Help Text', field_name: 'help', description: 'Short text will appear below the field' })}
+        entity={item}
+        onChange={onChangeEntityField}
+        disabled={disableHelp}
+      />
+    )}
+
 
     <Panel header="Options">
       {!disableUnique && (
@@ -204,19 +211,22 @@ const CustomFieldForm = ({
         </FormGroup>
       )}
     </Panel>
-    <Panel header="Preview and Default Value">
-      <EntityField
-        field={item.set('field_name', 'default_value')}
-        entity={item}
-        onChange={onChangeEntityField}
-        disabled={disableDefaultValue || item.get('unique', false)}
-      />
-      {item.get('unique', false) && (
-        <HelpBlock className="text-center">
-          Default value can&apos;t be set for unique field
-        </HelpBlock>
-      )}
-    </Panel>
+    {(!disableDefaultValue || (disableDefaultValue && item.get('unique', false))) && (
+      <Panel header="Preview and Default Value">
+        <EntityField
+          field={item.set('field_name', 'default_value')}
+          entity={item}
+          onChange={onChangeEntityField}
+          disabled={disableDefaultValue || item.get('unique', false)}
+        />
+        {item.get('unique', false) && (
+          <HelpBlock className="text-center">
+            Default value can&apos;t be set for unique field
+          </HelpBlock>
+        )}
+      </Panel>
+    )}
+
 
   </Form>
 );

@@ -41,7 +41,7 @@ class ComputedRate extends Component {
     'hard_coded',
   ].map(formatSelectOptions);
 
-  getRateConditions = () => getConfig(['rates', 'conditions'], Immutable.Map())
+  getRateConditions = () => getConfig(['rates', 'conditions'], Immutable.List())
     .map(condType => ({
       value: condType.get('key', ''),
       label: condType.get('title', ''),

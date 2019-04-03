@@ -62,7 +62,8 @@ class CustomFieldsList extends Component {
 
   render() {
     const {
-      onReorder, onNew, onReorederStart, onReorederSave, onReorederCancel, reordering,
+      fields, reordering,
+      onReorder, onNew, onReorederStart, onReorederSave, onReorederCancel,
     } = this.props;
     return (
       <div className="CustomFieldsList">
@@ -79,13 +80,19 @@ class CustomFieldsList extends Component {
             <hr style={{ marginTop: 5, marginBottom: 15 }} />
           </Col>
         </Row>
-        <SortableFieldsContainer
-          lockAxis="y"
-          helperClass="draggable-row"
-          useDragHandle={true}
-          items={this.getprintableFields()}
-          onSortEnd={onReorder}
-        />
+        {!fields.isEmpty() && (
+          <SortableFieldsContainer
+            lockAxis="y"
+            helperClass="draggable-row"
+            useDragHandle={true}
+            items={this.getprintableFields()}
+            onSortEnd={onReorder}
+          />
+        )}
+        {fields.isEmpty() && (
+          <Col sm={12} className="text-center mb10">No custom field</Col>
+        )}
+
         <Row>
           <Col sm={12} xsHidden>
             <hr style={{ marginTop: 5, marginBottom: 15 }} />
@@ -95,9 +102,11 @@ class CustomFieldsList extends Component {
         { !reordering && (
           <Col sm={12}>
             <CreateButton onClick={onNew} type="Field" action="Add" buttonStyle={{ marginTop: 0 }} />
-            <Button bsSize="xsmall" className="btn-primary" onClick={onReorederStart} title="Change fields order" style={{ float: 'right', minWidth: 90 }}>
-              <i className="fa fa-arrows-alt" /> Reorder
-            </Button>
+              {!fields.isEmpty() && (
+                <Button bsSize="xsmall" className="btn-primary" onClick={onReorederStart} title="Change fields order" style={{ float: 'right', minWidth: 90 }}>
+                  <i className="fa fa-arrows-alt" /> Reorder
+                </Button>
+              )}
           </Col>
         )}
         { reordering && (

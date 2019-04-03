@@ -1,4 +1,5 @@
-import { List } from 'immutable';
+import { List, Map, is } from 'immutable';
+import { titleCase } from 'change-case';
 import {
   getSettings,
   saveSettings,
@@ -16,6 +17,8 @@ import {
 import {
   getSettingsPath,
   getConfig,
+  getFieldName,
+  getFieldNameType,
 } from '@/common/Util';
 
 
@@ -65,12 +68,14 @@ export const removeFlag = key => setPageFlag('customFields', key);
 
 export const removeFlags = () => setPageFlag('customFields');
 
-export const validateFieldTitle = (value = '') => {
-  if (value === '') {
-    return 'Title is required';
-  }
-  return true;
-};
+export const validateRequiredValue = (value = '', field = '') =>
+  ((value === '') ? `${field} is required` : true);
+
+export const validateFieldTitle = (value = '') => validateRequiredValue(value, 'Title');
+
+export const validateForeignFieldEntity = (value = '') => validateRequiredValue(value, 'Entity');
+
+export const validateForeignFieldField = (value = '') => validateRequiredValue(value, 'Entity Field');
 
 export const validateFieldKey = (value = '', existingFields = List()) => {
   if (!getConfig('keyRegex', '').test(value)) {
@@ -83,6 +88,34 @@ export const validateFieldKey = (value = '', existingFields = List()) => {
     return 'Key already exists';
   }
   return true;
+};
+
+export const validateCondition = (conditoin) => {
+  const emptyField = conditoin.has('field') && conditoin.get('field', '') === '';
+  const emptyOP = conditoin.has('op') && conditoin.get('op', '') === '';
+  const emptyValue = conditoin.has('value') && (conditoin.get('value', '') === '' || is(conditoin.get('value', List()), List()));
+  if (emptyField) {
+    return ('Conditions field can not be empty');
+  }
+  if (emptyOP) {
+    return ('Conditions operator can not be empty');
+  }
+  if (emptyValue) {
+    return ('Conditions value can not be empty');
+  }
+  return true;
+};
+
+export const validateConditions = (conditoins) => {
+  const errors = Map().withMutations((errorsWithMutations) => {
+    conditoins.forEach((cond, idx) => {
+      const isValid = validateCondition(cond);
+      if (isValid !== true) {
+        errorsWithMutations.set(idx, isValid);
+      }
+    });
+  });
+  return errors.isEmpty() ? true : errors;
 };
 
 export const validateField = (field, usedNames) => (dispatch) => {
@@ -100,3 +133,55 @@ export const validateField = (field, usedNames) => (dispatch) => {
   }
   return isValid;
 };
+
+export const validateForeignField = (field, existingFields = List()) => (dispatch) => {
+  let isValid = true;
+  const curEntity = field.getIn(['foreign', 'entity'], '');
+  const curField = field.getIn(['foreign', 'field'], '');
+  const curConditions = field.get('conditions', List());
+  // Validate for title
+  const titleValid = validateFieldTitle(field.get('title', ''));
+  if (titleValid !== true) {
+    isValid = false;
+    dispatch(setFormModalError('title', titleValid));
+  }
+  // Validate for field
+  const foreignEntityValid = validateForeignFieldEntity(curEntity);
+  if (foreignEntityValid !== true) {
+    isValid = false;
+    dispatch(setFormModalError('foreign.entity', foreignEntityValid));
+  }
+  // Validate for entity
+  const foreignFieldValid = validateForeignFieldField(curField);
+  if (foreignFieldValid !== true) {
+    isValid = false;
+    dispatch(setFormModalError('foreign.field', foreignFieldValid));
+  }
+  // Validate for same entity and field
+  if (!existingFields.isEmpty()) {
+    const isFieldNameExists = existingFields.reduce((acc, existingField) => {
+      const extEntity = existingField.getIn(['foreign', 'entity'], '');
+      const extField = existingField.getIn(['foreign', 'field'], '');
+      return (curEntity === extEntity && curField === extField) ? existingField : acc;
+    }, false);
+    if (isFieldNameExists) {
+      isValid = false;
+      const entityLabel = titleCase(getConfig(['systemItems', getFieldNameType(field.getIn(['foreign', 'entity'], '')), 'itemName'], field.getIn(['foreign', 'entity'], '')));
+      const fieldLabel = titleCase(getFieldName(field.getIn(['foreign', 'field'], ''), getFieldNameType(field.getIn(['foreign', 'entity'], ''))));
+      const fieldTitle = isFieldNameExists.get('title', isFieldNameExists.get('field_name', ''));
+      const meassge = `Foreign field ${fieldLabel} from entity ${entityLabel} already exists with title '${fieldTitle}'`;
+      dispatch(setFormModalError('foreign.field', meassge));
+    }
+  }
+  // Validate conditions
+  const conditionsValid = curConditions.isEmpty() ? true : validateConditions(curConditions);
+  if (conditionsValid !== true) {
+    isValid = false;
+    conditionsValid.forEach((error, idx) => {
+      dispatch(setFormModalError(`conditions.${idx}`, error));
+    });
+  }
+  return isValid;
+};
+
+export const createForeignFieldKey = (entity, field) => `foreign.${entity}.${field}`;

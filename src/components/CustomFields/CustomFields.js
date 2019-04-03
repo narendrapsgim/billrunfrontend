@@ -5,6 +5,7 @@ import { titleCase } from 'change-case';
 import { Tab, Panel } from 'react-bootstrap';
 import TabsWrapper from '../Elements/TabsWrapper';
 import CustomFieldsListContainer from './CustomFieldsListContainer';
+import CustomFieldsListUsageContainer from './CustomFieldsListUsageContainer';
 import { getConfig } from '../../common/Util';
 
 
@@ -41,6 +42,19 @@ class CustomFields extends Component {
     clearFlags();
   }
 
+  renderUsageTab = () => {
+    const { tabs } = this.props;
+    const entity = 'usage';
+    const label = titleCase(getConfig(['systemItems', entity, 'itemName'], entity));
+    return (
+      <Tab title={label} eventKey={tabs.size} key={`custom-fields-tab-${entity}`}>
+        <Panel style={{ borderTop: 'none' }}>
+          <CustomFieldsListUsageContainer />
+        </Panel>
+      </Tab>
+    );
+  }
+
   renderTab = (entity, index) => {
     const {
       fieldsSettings, onReorder, onNew, onRemove, onEdit, onSave, onCancel, orderChanged,
@@ -67,10 +81,14 @@ class CustomFields extends Component {
 
   render() {
     const { location, tabs } = this.props;
+    const entitiesTabs = tabs
+      .filter(tab => tab !== 'usage')
+      .map(this.renderTab)
+      .push(this.renderUsageTab());
     return (
       <div>
         <TabsWrapper id="CustomFieldsTabs" location={location}>
-          {tabs.map(this.renderTab)}
+          {entitiesTabs}
         </TabsWrapper>
       </div>
     );

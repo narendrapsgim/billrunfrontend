@@ -6,7 +6,11 @@ import CustomFieldFormContainer from './CustomFieldFormContainer';
 import {
   showConfirmModal,
   showFormModal,
-} from '../../actions/guiStateActions/pageActions';
+} from '@/actions/guiStateActions/pageActions';
+import {
+  showWarning,
+} from '@/actions/alertsActions';
+
 import {
   addField,
   updateField,
@@ -17,20 +21,22 @@ import {
   removeFlag,
   removeFlags,
   validateField,
-} from '../../actions/customFieldsActions';
-import {
-  customFieldsEntityFieldsSelector,
-} from '../../selectors/customFieldsSelectors';
+} from '@/actions/customFieldsActions';
 import {
   setFieldPosition,
-} from '../../actions/settingsActions';
+} from '@/actions/settingsActions';
+import {
+  customFieldsEntityFieldsSelector,
+} from '@/selectors/customFieldsSelectors';
+import {
+  pageFlagSelector,
+} from '@/selectors/guiSelectors';
 import {
   getConfig,
   getSettingsPath,
-} from '../../common/Util';
-import {
-  pageFlagSelector,
-} from '../../selectors/guiSelectors';
+  inConfigOptionBlackList,
+  inConfigOptionWhiteList,
+} from '@/common/Util';
 
 
 const defaultNewField = Map({
@@ -43,9 +49,9 @@ const defaultNewField = Map({
 
 
 const mapStateToProps = (state, props) => {
-  const tabs = getConfig(['customFields', 'entities'], List());
+  const tabs = getConfig(['customFields', 'entities'], Map()).keySeq().toList();
   const fieldsSettings = tabs.reduce((acc, entity) => acc.set(entity, Map({
-    fields: customFieldsEntityFieldsSelector(state, props, entity),
+    fields: customFieldsEntityFieldsSelector(state, props, entity) || List(),
     hiddenFields: getConfig(['customFields', 'defaultHiddenFields', entity], List()),
     disabledFields: getConfig(['customFields', 'defaultDisabledFields', entity], List()),
     unReorderFields: getConfig(['customFields', 'unReorderFields', entity], List()),
@@ -84,12 +90,21 @@ const mapDispatchToProps = (dispatch, props) => ({ // eslint-disable-line no-unu
     };
     const entityName = getConfig(['systemItems', entity, 'itemName'], entity);
     const mode = 'edit';
-    const title = `${titleCase(`${mode} ${entityName} field`)} ${item.get('title', '')}`;
+    const title = `${titleCase(`${mode} ${entityName} field`)} - ${item.get('title', '')}`;
     const config = { title, onOk, mode, entity };
     return dispatch(showFormModal(item, CustomFieldFormContainer, config));
   },
 
   onNew: (entity, existingFields = List()) => {
+    const fieldTypesOptions = getConfig(['customFields', 'fields'], List())
+      .filter(option => (
+        !inConfigOptionBlackList(option, entity, 'excludeEntity')
+        && inConfigOptionWhiteList(option, entity, 'includeEntity')
+      ))
+      .reduce((acc, option) => acc.push(option.get('id', '')), List());
+    if (fieldTypesOptions.isEmpty()) {
+      return dispatch(showWarning('No available field types '));
+    }
     const onOk = (newItem) => {
       if (!dispatch(validateField(newItem, existingFields))) {
         return false;
@@ -101,7 +116,8 @@ const mapDispatchToProps = (dispatch, props) => ({ // eslint-disable-line no-unu
     const mode = 'create';
     const title = titleCase(`${mode} new ${entityName} field`);
     const config = { title, onOk, mode, entity, existingFields };
-    return dispatch(showFormModal(defaultNewField, CustomFieldFormContainer, config));
+    const newField = fieldTypesOptions.includes('text') ? defaultNewField : defaultNewField.set('type', fieldTypesOptions.first());
+    return dispatch(showFormModal(newField, CustomFieldFormContainer, config));
   },
 
   onReorder: (entity, { oldIndex, newIndex }) => {

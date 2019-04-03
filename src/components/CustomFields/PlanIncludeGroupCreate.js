@@ -500,12 +500,12 @@ class PlanIncludeGroupCreate extends Component {
   renderSteps = () => {
     const { steps } = this.state;
     return steps
-      .toList()
       .map(step => (
         <Step key={step.index}>
           <StepLabel>{step.label}</StepLabel>
         </Step>
       ))
+      .toList()
       .toArray();
   }
 

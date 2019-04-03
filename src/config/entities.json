@@ -76,6 +76,7 @@
   },
   "usage": {
     "collection": "lines",
+    "settingsKey": "lines",
     "uniqueField": "stamp",
     "itemName": "usage",
     "itemType": "usage",

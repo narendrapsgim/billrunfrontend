@@ -73,9 +73,22 @@ export const getConfig = (key, defaultValue = null) => {
 
 export const titlize = str => upperCaseFirst(str);
 
-export const getFieldName = (field, category, defaultValue = null) =>
-  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], defaultValue !== null ? defaultValue : field));
+export const getFieldName = (field, category, defaultValue = null) => {
+  const categoryName = getConfig(['fieldNames', category, field], false);
+  if (typeof categoryName === 'string' && categoryName.length > 0) {
+    return categoryName;
+  }
+  const rootName = getConfig(['fieldNames', field], false);
+  if (typeof rootName === 'string' && rootName.length > 0) {
+    return rootName;
+  }
+  if (defaultValue !== null) {
+    return defaultValue;
+  }
+  return field;
+};
 
+/*  Map entity different names to fieldNames.json names */
 export const getFieldNameType = (type) => {
   switch (type) {
     case 'account':
@@ -96,11 +109,28 @@ export const getFieldNameType = (type) => {
     case 'plan':
     case 'plans':
       return 'plan';
+    case 'rate':
+    case 'rates':
     case 'product':
     case 'products':
       return 'product';
     default:
       return type;
+  }
+};
+
+/*  Map entity different names to entities.json names */
+export const getFieldEntityKey = (type) => {
+  switch (type) {
+    case 'account':
+    case 'customer':
+      return 'customer';
+    case 'lines':
+    case 'line':
+    case 'usage':
+      return 'usage';
+    default:
+      return getFieldNameType(type);
   }
 };
 

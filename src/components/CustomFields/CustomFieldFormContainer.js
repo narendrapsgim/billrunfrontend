@@ -24,7 +24,6 @@ const mapStateToProps = (state, props) => {
   const { item, mode, entity } = props;
   const fieldType = item.get('type', 'text');
   const customFieldsConfig = getConfig(['customFields', 'fields'], List());
-  const fieldTypeConfig = customFieldsConfig.find(config => config.get('id', '') === fieldType, null, Map());
   const fieldTypesOptions = customFieldsConfig
     .filter(option => (
       !inConfigOptionBlackList(option, entity, 'excludeEntity')
@@ -32,6 +31,7 @@ const mapStateToProps = (state, props) => {
     ))
     .map(parseConfigSelectOptions)
     .toArray();
+  const fieldTypeConfig = customFieldsConfig.find(config => config.get('id', '') === fieldType, null, Map());
   const editable = isFieldEditable(item, customFieldsConfig);
   const availablePlays = availablePlaysSettingsSelector(state, props) || List();
   const playsOptions = availablePlays.map(play => ({
@@ -53,7 +53,7 @@ const mapStateToProps = (state, props) => {
     disableFieldName: inConfigOptionBlackList(fieldTypeConfig, 'fieldName') || !isEditableFiledProperty(item, editable, 'field_name') || mode !== 'create',
     disableUnique: inConfigOptionBlackList(fieldTypeConfig, 'unique') || !isEditableFiledProperty(item, editable, 'unique'),
     disableMandatory: inConfigOptionBlackList(fieldTypeConfig, 'mandatory') || !isEditableFiledProperty(item, editable, 'mandatory') || item.get('unique', false),
-    disableFieldType: item.get('select_list', false) || item.get('unique', false),
+    disableFieldType: inConfigOptionBlackList(fieldTypeConfig, 'type') || !isEditableFiledProperty(item, editable, 'type'),
     disabledEditable: inConfigOptionBlackList(fieldTypeConfig, 'editable') || !isEditableFiledProperty(item, editable, 'editable'),
     disabledDisplay: inConfigOptionBlackList(fieldTypeConfig, 'display') || !isEditableFiledProperty(item, editable, 'display'),
     disabledShowInList: inConfigOptionBlackList(fieldTypeConfig, 'showInList') || !isEditableFiledProperty(item, editable, 'show_in_list'),

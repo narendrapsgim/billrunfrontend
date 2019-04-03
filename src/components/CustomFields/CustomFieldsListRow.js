@@ -9,7 +9,7 @@ import { EntityField } from '../Entity';
 const CustomFieldsListRow = ({
   field, entity, actions, fieldTypeLabel, isSortable, isReordable,
 }) => (
-  <Row className={`CustomFieldsListRow ${entity} withHover`}>
+  <Row className={`CustomFieldsListRow ${entity} table-row withHover`}>
     <Col sm={1} className="text-center">
       { isReordable && (
         <DragHandle disabled={!isSortable} />

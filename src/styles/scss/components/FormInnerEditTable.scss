@@ -55,3 +55,17 @@
   }
 
 }
+
+.table-row {
+  line-height: 30px;
+  > div.actions {
+    padding-left: 10px;
+    .actions-buttons {
+      .action-button {
+        button.btn {
+          padding: 0;
+        }
+      }
+    }
+  }
+}
