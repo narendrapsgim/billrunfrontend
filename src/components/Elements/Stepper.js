@@ -12,8 +12,8 @@ import ReactStepper from 'react-stepper-horizontal';
 const Stepper = ({steps, activeIndex}) => (
   <div className='stepper-container'>
     <ReactStepper
-      titleTop={0}
-      lineMarginOffset={15}
+      titleTop={5}
+      lineMarginOffset={10}
       circleTop={0}
       size={24}
       titleFontSize={12}
