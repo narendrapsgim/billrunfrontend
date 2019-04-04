@@ -1,9 +1,4 @@
-lib/*
-backup/*
-dist/*
-build/*
-**/build/*
-vendors/*
-**/vendors/*
+public/*
+scripts/*
 node_modules/*
-**/node_modules/*
+src/serviceWorker.js
