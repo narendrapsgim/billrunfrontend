@@ -1,12 +1,17 @@
 import React from 'react';
 import { getConfig } from '@/common/Util'
 
-const LogoImg = `${process.env.PUBLIC_URL}/assets/img/${process.env.REACT_APP_BILLRUNCLOUD_LOGO}`;
+
+const LogoImg = getConfig(['env', 'billrunCloudLogo'], getConfig(['env', 'billrunLogo'], ''));
+const LogoImgPath = `${process.env.PUBLIC_URL}/assets/img/${LogoImg}`;
 const serverApiVersion = getConfig(['env', 'serverApiVersion'],'');
+
 
 const About = () => (
   <div style={{ marginTop: 20, textAlign: 'left' }}>
-    <img alt="BillRun Cloud" title="BillRun Cloud" src={LogoImg} style={{ height: 25, marginBottom: 20 }} />
+    { LogoImg !== '' && (
+      <img alt="BillRun Cloud" title="BillRun Cloud" src={LogoImgPath} style={{ height: 25, marginBottom: 20 }} />
+    )}
     {serverApiVersion !== '' && (
       <h5>version <strong>{serverApiVersion}</strong></h5>
     )}

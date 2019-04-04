@@ -2,9 +2,9 @@ import React from 'react';
 import { PageHeader } from 'react-bootstrap';
 import { getConfig } from '@/common/Util'
 
+
 const LogoImg = getConfig(['env', 'billrunCloudLogo'], getConfig(['env', 'billrunLogo'], ''));
 const LogoImgPath = `${process.env.PUBLIC_URL}/assets/img/${LogoImg}`;
-// const LogoImg = require(`${process.env.PUBLIC_URL}/assets/img/{process.env.REACT_APP_BILLRUNCLOUD_LOGO}`);// eslint-disable-line  import/no-dynamic-require
 const supportMail = getConfig(['env', 'mailSupport'], '');
 
 
