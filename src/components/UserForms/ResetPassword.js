@@ -1,63 +1,71 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { Form, FormControl, FormGroup, Col, ControlLabel, HelpBlock, Button } from 'react-bootstrap';
 import { ModalWrapper } from '@/components/Elements';
 
 
-class ResetPassword extends Component {
+const ResetPassword = ({ show, sending, onCancel, updateSending, onResetPass }) => {
 
-  static propTypes = {
-    show: PropTypes.bool,
-    sending: PropTypes.bool,
-    onCancel: PropTypes.func.isRequired,
-    updateSending: PropTypes.func.isRequired,
-    onResetPass: PropTypes.func.isRequired,
-  };
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
 
-  static defaultProps = {
-    show: false,
-    sending: false,
-  };
-
-  state = {
-    email: null,
+  const onChangeEmail = (e) => {
+    setEmail(e.target.value);
+    setError('');
   }
 
-  onChangeEmail = (e) => {
-    this.setState({ email: e.target.value });
+  const onSubmit = () => {
+    if (email === '') {
+      setError('Email is required')
+      return false;
+    }
+    updateSending(true);
+    onResetPass(email);
   }
+  const label = sending ? 'Sending' : 'Reset';
 
-  onResetPass = () => {
-    const { email } = this.state;
-    this.props.updateSending(true);
-    this.props.onResetPass(email);
-  }
+  const actionClass = classNames('fa', {
+    'fa-envelope-o': !sending,
+    'fa-spinner fa-pulse': sending,
+  });
 
-  render() {
-    const { show, sending } = this.props;
-    const label = sending ? 'Sending' : 'Reset';
-
-    return (
-      <ModalWrapper title={'Reset Password'} show={show} closeButton onHide={this.props.onCancel}>
-        <Form horizontal>
-          <FormGroup controlId="username" key="username">
-            <Col componentClass={ControlLabel} md={2}>
-              Email
-            </Col>
-            <Col sm={6}>
-              <FormControl type="text" name="name" onChange={this.onChangeEmail} value={this.state.email} disabled={sending} />
-            </Col>
-            <HelpBlock>{'The email you registered as username' }</HelpBlock>
-          </FormGroup>
-          <Button type="submit" bsStyle="success" bsSize="lg" block onClick={this.onResetPass} disabled={sending}>
-            { !sending && (<span><i className="fa fa-envelope-o" /> &nbsp;</span>) }
-            { sending && (<span><i className="fa fa-spinner fa-pulse" /> &nbsp;</span>) }
-            {label}
-          </Button>
-        </Form>
-      </ModalWrapper>
-    );
-  }
+  return (
+    <ModalWrapper title={'Reset Password'} show={show} closeButton onHide={onCancel}>
+      <Form horizontal>
+        <FormGroup validationState={error !== '' ? 'error' : null}>
+          <Col componentClass={ControlLabel} sm={3} lg={2}>
+            Email
+          </Col>
+          <Col sm={8} lg={9}>
+            <FormControl type="text" name="mail" onChange={onChangeEmail} value={email} disabled={sending} />
+            <HelpBlock>The email you registered as username</HelpBlock>
+            {error !== '' && (
+              <HelpBlock>{error}</HelpBlock>
+            )}
+          </Col>
+        </FormGroup>
+        <Button bsStyle="success" bsSize="lg" block onClick={onSubmit} disabled={sending}>
+          <i className={actionClass} />&nbsp;
+          {label}
+        </Button>
+      </Form>
+    </ModalWrapper>
+  );
 }
+
+
+ResetPassword.defaultProps = {
+  show: true,
+  sending: false,
+};
+
+ResetPassword.propTypes = {
+  show: PropTypes.bool,
+  sending: PropTypes.bool,
+  onCancel: PropTypes.func.isRequired,
+  updateSending: PropTypes.func.isRequired,
+  onResetPass: PropTypes.func.isRequired,
+};
 
 export default ResetPassword;
