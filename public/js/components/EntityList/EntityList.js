@@ -248,7 +248,6 @@ class EntityList extends Component {
       showIcon: true,
       onClick: this.onClickRefresh,
       actionSize: 'xsmall',
-      actionClass: 'btn-primary',
     }, {
       type: 'add',
       label: 'Add New',
@@ -256,7 +255,6 @@ class EntityList extends Component {
       showIcon: true,
       onClick: this.onClickNew,
       actionSize: 'xsmall',
-      actionClass: 'btn-primary',
     }];
     if (listActions === null) {
       return defaultActions;

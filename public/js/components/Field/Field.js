@@ -4,6 +4,7 @@ import Select from 'react-select';
 import Number from './types/Number';
 import Price from './types/Price';
 import Date from './types/Date';
+import DateTime from './types/DateTime';
 import Tags from './types/Tags';
 import Address from './types/Address';
 import Text from './types/Text';
@@ -57,6 +58,8 @@ class Field extends PureComponent {
         return (<Price {...inputProps} />);
       case 'date':
         return (<Date {...inputProps} />);
+      case 'datetime':
+        return (<DateTime {...inputProps} />);
       case 'tags':
         return (<Tags {...inputProps} />);
       case 'address':

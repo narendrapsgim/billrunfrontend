@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { FormGroup, Col } from 'react-bootstrap';
+import { FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import isNumber from 'is-number';
 import Field from '../../Field';
 import ConditionValue from '../../Report/Editor/ConditionValue';
@@ -26,7 +26,9 @@ class FraudEventThreshold extends Component {
     currency: PropTypes.string,
     usaget: PropTypes.string,
     thresholdFields: PropTypes.instanceOf(Immutable.List),
+    errors: PropTypes.instanceOf(Immutable.Map),
     onUpdate: PropTypes.func.isRequired,
+    setError: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -37,6 +39,7 @@ class FraudEventThreshold extends Component {
     thresholdOperatorsSelectOptions: [],
     currency: '',
     usaget: '',
+    errors: Immutable.Map(),
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,6 +52,7 @@ class FraudEventThreshold extends Component {
   onChangeThresholdField = (value) => {
     const { index } = this.props;
     this.props.onUpdate([index, 'field'], value);
+    this.props.setError(`threshold_condition.${index}`, null);
   }
 
   onChangeThresholdOperator = (value) => {
@@ -60,6 +64,7 @@ class FraudEventThreshold extends Component {
     if (!['in', 'nin'].includes(value) && ['in', 'nin'].includes(threshold.getIn(['op'], ''))) {
       this.props.onUpdate([index, 'value'], '');
     }
+    this.props.setError(`threshold_condition.${index}`, null);
   }
 
   onChangeThresholdValue = (value) => {
@@ -72,16 +77,19 @@ class FraudEventThreshold extends Component {
     }
     const val = isNumber(value) ? parseFloat(value) : value;
     this.props.onUpdate([index, 'value'], val);
+    this.props.setError(`threshold_condition.${index}`, null);
   }
 
   onChangeThresholdUnit = (value) => {
     const { index, usaget } = this.props;
     this.props.onUpdate([index, 'unit'], value);
     this.props.onUpdate([index, 'usaget'], usaget);
+    this.props.setError(`threshold_condition.${index}`, null);
   }
 
   render() {
     const {
+      index,
       threshold,
       eventPropertyType,
       thresholdFields,
@@ -89,6 +97,7 @@ class FraudEventThreshold extends Component {
       thresholdOperatorsSelectOptions,
       usaget,
       currency,
+      errors,
     } = this.props;
     const value = threshold.get('value', Immutable.List());
     const thresholdForValue = Immutable.List.isList(value) || Array.isArray(value)
@@ -103,10 +112,11 @@ class FraudEventThreshold extends Component {
     const conditionValueOperator = ['aprice', 'final_charge'].includes(field)
       ? Immutable.Map({ suffix: currency })
       : Immutable.Map();
+    const isThresholdError = errors.get(`threshold_condition.${index}`, false);
     return (
-      <FormGroup className="form-inner-edit-row">
-        <Col smHidden mdHidden lgHidden>
-          <label htmlFor="field_field">Field</label>
+      <FormGroup className="form-inner-edit-row" validationState={isThresholdError ? 'error' : null}>
+        <Col componentClass={ControlLabel} smHidden mdHidden lgHidden>
+          Field <span className="danger-red"> *</span>
         </Col>
         <Col sm={3}>
           <Field
@@ -118,8 +128,8 @@ class FraudEventThreshold extends Component {
           />
         </Col>
 
-        <Col smHidden mdHidden lgHidden>
-          <label htmlFor="threshold_operator">Operator</label>
+        <Col componentClass={ControlLabel} smHidden mdHidden lgHidden>
+          Operator <span className="danger-red"> *</span>
         </Col>
         <Col sm={3}>
           <Field
@@ -132,8 +142,8 @@ class FraudEventThreshold extends Component {
           />
         </Col>
 
-        <Col smHidden mdHidden lgHidden>
-          <label htmlFor="threshold_value">Value</label>
+        <Col componentClass={ControlLabel} smHidden mdHidden lgHidden>
+          Value <span className="danger-red"> *</span>
         </Col>
         <Col sm={4}>
           <ConditionValue
@@ -145,10 +155,10 @@ class FraudEventThreshold extends Component {
           />
         </Col>
 
-        {eventPropertyType.size === 1 && (
+        {eventPropertyType.size === 1 && !['aprice', 'final_charge'].includes(field) && (
           <span>
-            <Col smHidden mdHidden lgHidden>
-              <label htmlFor="threshold_operator">Unit of measure</label>
+            <Col componentClass={ControlLabel} smHidden mdHidden lgHidden>
+              Unit of measure <span className="danger-red"> *</span>
             </Col>
             <Col sm={2}>
               <UsageTypesSelector
@@ -161,6 +171,9 @@ class FraudEventThreshold extends Component {
               />
             </Col>
           </span>
+        )}
+        { isThresholdError && (
+          <Col sm={12}><HelpBlock>{isThresholdError}</HelpBlock></Col>
         )}
       </FormGroup>
     );

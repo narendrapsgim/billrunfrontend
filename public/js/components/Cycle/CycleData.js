@@ -33,7 +33,7 @@ class CycleData extends Component {
     reloadCycleData: () => {},
     baseFilter: {},
     showConfirmAllButton: true,
-    isCycleConfirmed: false,
+    isCycleConfirmed:false,
     currency: '',
     invoicesNum: 0,
   };
@@ -240,11 +240,11 @@ class CycleData extends Component {
 
   parseTaxDownload = (entity) => {
     const { billrunKey } = this.props;
-    const downloadUrl = this.downloadTaxURL(billrunKey);
+    const downloadUrl = this.downloadTaxURL( billrunKey );
     return (
       <form method="post" action={downloadUrl} target="_blank">
         <Button className={entity.actionClass} bsStyle={entity.actionStyle} bsSize={entity.actionSize} type="submit">
-          {entity.label}
+            {entity.label}
         </Button>
       </form>
     );
@@ -253,21 +253,19 @@ class CycleData extends Component {
   getListActions = () => {
     const { showConfirmAllButton, isCycleConfirmed } = this.props;
     return [{
-      label: 'Confirm All',
-      actionStyle: 'primary',
-      show: showConfirmAllButton,
-      showIcon: false,
-      onClick: this.onClickConfirmAll,
-      actionSize: 'xsmall',
-      actionClass: 'btn-primary',
+        label: 'Confirm All',
+        actionStyle: 'primary',
+        show :showConfirmAllButton,
+        showIcon: false,
+        onClick: this.onClickConfirmAll,
+        actionSize: 'xsmall',
     }, {
-      label: 'Download Taxation compliance report',
-      actionStyle: 'primary',
-      show: isCycleConfirmed,
-      showIcn: false,
-      renderFunc: this.parseTaxDownload,
-      actionSize: 'xsmall',
-      actionClass: 'btn-primary',
+        label: 'Download Taxation compliance report',
+        actionStyle: 'primary',
+        show : isCycleConfirmed,
+        showIcon: false,
+        renderFunc : this.parseTaxDownload,
+        actionSize: 'xsmall',
     }];
   }
 

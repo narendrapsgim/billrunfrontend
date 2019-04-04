@@ -64,7 +64,6 @@ class CustomersList extends Component {
     showIcon: true,
     onClick: this.onClickImprt,
     actionSize: 'xsmall',
-    actionClass: 'btn-primary',
   }];
 
   getActions = () => [

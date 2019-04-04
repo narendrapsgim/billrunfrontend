@@ -10,6 +10,9 @@ import {
 } from './settingsActions';
 import { pushToList } from './listActions';
 import {
+  setFormModalError,
+} from './guiStateActions/pageActions';
+import {
   usageTypesDataSelector,
   propertyTypeSelector,
   eventsSelector,
@@ -187,3 +190,73 @@ export const getEventSettings = () => dispatch => dispatch(getSettings(['events.
 
 export const getEventRates = eventRatesKeys => dispatch =>
   dispatch(pushToList('event_products', getProductsByKeysQuery(eventRatesKeys.toArray(), { key: 1, rates: 1 })));
+
+export const validateFieldEventCode = (value = '') => {
+  if (value === '') {
+    return 'Event Code is required';
+  }
+  return true;
+};
+
+export const validateFieldRecurrenceValue = (value = '') => {
+  if (value === '') {
+    return 'Field is required';
+  }
+  return true;
+};
+
+export const validateFieldDateRangeValue = (value = '') => {
+  if (value === '') {
+    return 'Field is required';
+  }
+  return true;
+};
+
+export const validateThresholdField = (value = Immutable.Map()) => {
+  if (value.get('field', '') === '') {
+    return 'Threshold field is required';
+  }
+  if (value.get('op', '') === '') {
+    return 'Threshold Operator is required';
+  }
+  if (['', []].includes(value.get('value', '')) || Immutable.is(Immutable.List(), value.get('value', Immutable.List()))) {
+    return 'Threshold value is required';
+  }
+  return true;
+};
+
+export const validateEvent = (item, eventType) => (dispatch) => {
+  let isValid = true;
+  const eventCodeValid = validateFieldEventCode(item.get('event_code', ''));
+  if (eventCodeValid !== true) {
+    isValid = false;
+    dispatch(setFormModalError('event_code', eventCodeValid));
+  }
+  if (eventType === 'fraud') {
+    const recurrenceValueValid = validateFieldRecurrenceValue(item.getIn(['recurrence', 'value'], ''));
+    if (recurrenceValueValid !== true) {
+      isValid = false;
+      dispatch(setFormModalError('recurrence.value', recurrenceValueValid));
+    }
+    const dateRangeValueValueValid = validateFieldRecurrenceValue(item.getIn(['date_range', 'value'], ''));
+    if (dateRangeValueValueValid !== true) {
+      isValid = false;
+      dispatch(setFormModalError('date_range.value', dateRangeValueValueValid));
+    }
+    const thresholdConditions = item.getIn(['threshold_conditions', 0], Immutable.List());
+    if (thresholdConditions.isEmpty()) {
+      isValid = false;
+      dispatch(setFormModalError('threshold_condition.0', validateThresholdField()));
+    } else {
+      thresholdConditions.forEach((condition, idx) => {
+        const thresholdField = validateThresholdField(condition);
+        if (thresholdField !== true) {
+          isValid = false;
+          dispatch(setFormModalError(`threshold_condition.${idx}`, thresholdField));
+        }
+      });
+    }
+  }
+
+  return isValid;
+};
