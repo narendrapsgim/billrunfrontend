@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux'
 import Routes from './routes';
-import DevTools from './components/DevTools';
 import configureStore from './configureStore'
 import * as serviceWorker from './serviceWorker';
 /* Styles */
@@ -16,12 +15,18 @@ import './styles/css/yeti.css';
 import './styles/scss/index.scss';
 import './styles/css/index.css';
 
+const DevTools = lazy(() => import('./components/DevTools'));
+
 const store = configureStore()
 
 ReactDOM.render(
   <Provider store={store}>
     <Routes />
-    {process.env.NODE_ENV === "development" && <DevTools />}
+    {process.env.NODE_ENV === "development" && (
+      <Suspense fallback={<div>Loading...</div>}>
+        <DevTools />
+      </Suspense>
+    )}
   </Provider>,
   document.getElementById('root')
 );

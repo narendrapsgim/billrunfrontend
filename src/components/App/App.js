@@ -29,13 +29,13 @@ class App extends Component {
     children: PropTypes.element,
     title: PropTypes.string,
     logo: PropTypes.string,
-    dispatch: PropTypes.func.isRequired,
     mainMenuOverrides: PropTypes.oneOfType([
       PropTypes.instanceOf(Immutable.Iterable),
     ]),
     logoName: PropTypes.oneOfType([
       PropTypes.string,
     ]),
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
