@@ -2,19 +2,21 @@ import {
   apiBillRun,
   apiBillRunErrorHandler,
   apiBillRunSuccessHandler,
-} from '../common/Api';
-import {
-  saveEntity,
-  getEntityById,
-  gotEntity,
-  setCloneEntity,
-  actions,
-} from './entityActions';
+} from '@/common/Api';
 import {
   getEntityByIdQuery,
   getRebalanceAccountQuery,
   getCollectionDebtQuery,
-} from '../common/ApiQueries';
+} from '@/common/ApiQueries';
+import {
+  saveEntity,
+  getEntityById,
+  gotEntity,
+  clearEntity,
+  setCloneEntity,
+  updateEntityField,
+  deleteEntityField,
+} from './entityActions';
 import { startProgressIndicator } from './progressIndicatorActions';
 
 
@@ -41,23 +43,11 @@ export const saveSubscription = (subscription, action) => dispatch =>
   dispatch(saveEntity('subscribers', subscription, action))
     .then(response => Object.assign(response, { subscription, action }));
 
-export const removeCustomerField = path => ({
-  type: actions.DELETE_ENTITY_FIELD,
-  collection: 'customer',
-  path,
-});
+export const updateCustomerField = (path, value) => updateEntityField('customer', path, value);
 
-export const updateCustomerField = (path, value) => ({
-  type: actions.UPDATE_ENTITY_FIELD,
-  collection: 'customer',
-  path,
-  value,
-});
+export const removeCustomerField = path => deleteEntityField('customer', path);
 
-export const clearCustomer = () => ({
-  type: actions.CLEAR_ENTITY,
-  collection: 'customer',
-});
+export const clearCustomer = () => clearEntity('customer');
 
 export const rebalanceAccount = (aid, billrunKeys) => (dispatch) => {
   dispatch(startProgressIndicator());

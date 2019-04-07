@@ -11,12 +11,13 @@ import OfflinePayment from '../Payments/OfflinePayment';
 import CyclesSelector from '../Cycle/CyclesSelector';
 import EntityFields from '../Entity/EntityFields';
 import Credit from '../Credit/Credit';
-import { ConfirmModal } from '@/components/Elements';
+import { ConfirmModal, Actions } from '@/components/Elements';
 import { currencySelector, paymentGatewaysSelector } from '@/selectors/settingsSelector';
 import { getSettings } from '@/actions/settingsActions';
 import { rebalanceAccount, getCollectionDebt } from '@/actions/customerActions';
-import { getExpectedInvoiceQuery } from '../../common/ApiQueries';
-import { buildRequestUrl } from '../../common/Api';
+import { showConfirmModal } from '@/actions/guiStateActions/pageActions';
+import { buildRequestUrl } from '@/common/Api';
+import { getExpectedInvoiceQuery } from '@/common/ApiQueries';
 import { getConfig } from '@/common/Util';
 
 
@@ -31,7 +32,6 @@ class Customer extends Component {
     onRemoveField: PropTypes.func.isRequired,
     action: PropTypes.string,
     currency: PropTypes.string,
-    fields: PropTypes.instanceOf(Immutable.List),
     payment_gateways: PropTypes.object.isRequired,
   };
 
@@ -39,7 +39,6 @@ class Customer extends Component {
     action: 'create',
     currency: '',
     customer: Immutable.Map(),
-    fields: Immutable.List(),
     supportedGateways: Immutable.List(),
     payment_gateways: undefined,
   };
@@ -72,10 +71,8 @@ class Customer extends Component {
       });
   }
 
-  onChangePaymentGateway = () => {
-    const { customer } = this.props;
-    const aid = customer.get('aid', null);
-    this.props.onChangePaymentGateway(aid);
+  onRemovePaymentGateway = () => {
+    this.onChangeCustomField(['payment_gateway', 'active'], Immutable.Map());
   }
 
   onChangeCustomField = (fieldPath, value) => {
@@ -96,30 +93,60 @@ class Customer extends Component {
       : customerPgName;
   }
 
-  renderChangePaymentGateway = () => {
+  getPaymentGatewaysActions = () => {
     const { customer, payment_gateways } = this.props;
+    const hasPaymentGateway = !(customer.getIn(['payment_gateway', 'active'], Immutable.Map()).isEmpty());
+    return ([{
+      type: 'add',
+      label: 'Add ',
+      onClick: this.props.onChangePaymentGateway,
+      show: !hasPaymentGateway,
+      actionStyle: 'primary',
+      actionSize: 'xsmall',
+      enable: !payment_gateways.isEmpty(),
+    }, {
+      type: 'edit',
+      label: 'Change',
+      onClick: this.props.onChangePaymentGateway,
+      actionStyle: 'primary',
+      actionSize: 'xsmall',
+      show: hasPaymentGateway,
+    }, {
+      type: 'remove',
+      label: 'Remove',
+      onClick: this.onClickRemovePaymentGateway,
+      actionStyle: 'danger',
+      actionSize: 'xsmall',
+      show: hasPaymentGateway && false, // button hardcoded hidden - remove '&& false' to unhide from ui
+    }]);
+  }
+
+  onClickRemovePaymentGateway = (customer) => {
+    const paymentGatewayName = customer.getIn(['payment_gateway', 'active', 'name'], 'payment gateway');
+    const confirm = {
+      message: `Are you sure you want to remove ${paymentGatewayName}`,
+      onOk: this.onRemovePaymentGateway,
+      type: 'delete',
+      labelOk: 'Remove',
+    };
+    this.props.dispatch(showConfirmModal(confirm));
+  }
+
+  renderChangePaymentGateway = () => {
+    const { customer } = this.props;
     const hasPaymentGateway = !(customer.getIn(['payment_gateway', 'active'], Immutable.Map()).isEmpty());
     const label = hasPaymentGateway ? this.renderPaymentGatewayLabel() : 'None';
     return (
-      <FormGroup>
-        <Row>
-          <Col componentClass={ControlLabel} md={2}>
-            Payment Gateway
-          </Col>
-          <Col sm={7}>
-            {label}
-            <Button onClick={this.onChangePaymentGateway} disabled={payment_gateways.isEmpty() === true}bsSize="xsmall" style={{ marginLeft: 10, minWidth: 80 }}>
-              <i className="fa fa-pencil" />
-              &nbsp;{hasPaymentGateway ? 'Change' : 'Add'}
-            </Button>
-          </Col>
-        </Row>
-        <Row>
-          <Col componentClass={ControlLabel} md={2} />
-          <Col sm={7}>
-            { this.renderOfflinePaymentsButton() }
-          </Col>
-        </Row>
+      <FormGroup controlId="payment_gateway">
+        <Col componentClass={ControlLabel} sm={3} lg={2}>
+          Payment Gateway
+        </Col>
+        <Col sm={8} lg={9}>
+          {label}
+          <div className="inline ml10">
+            <Actions actions={this.getPaymentGatewaysActions()} data={customer} />
+          </div>
+        </Col>
       </FormGroup>
     );
   }
@@ -130,15 +157,16 @@ class Customer extends Component {
     const debtClass = classNames('non-editable-field', {
       'danger-red': debt > 0,
     });
-    return debt !== null &&
-      (<FormGroup>
-        <Col componentClass={ControlLabel} md={2}>
+    return debt !== null && (
+      <FormGroup controlId="total_debt">
+        <Col componentClass={ControlLabel} sm={3} lg={2}>
           Total Debt
         </Col>
-        <Col sm={7}>
+        <Col sm={8} lg={9}>
           <div className={debtClass}>{debt}{getSymbolFromCurrency(currency)}</div>
         </Col>
-      </FormGroup>);
+      </FormGroup>
+    );
   }
 
   renderInCollection = () => {
@@ -235,17 +263,20 @@ class Customer extends Component {
     const { showOfflinePayement, debt } = this.state;
     const payerName = `${customer.get('firstname', '')} ${customer.get('lastname', '')}`;
     return (
-      <div>
-        <Button bsSize="xsmall" className="btn-primary" style={{ marginTop: 12 }} onClick={this.onClickOfflinePayment}>Offline Payment</Button>
-        { showOfflinePayement &&
-          (<OfflinePayment
-            aid={customer.get('aid')}
-            payerName={payerName}
-            debt={debt}
-            onClose={this.onCloseOfflinePayment}
-          />)
-        }
-      </div>
+      <FormGroup>
+        <Col sm={8} lg={9} smOffset={3} lgOffset={2}>
+          <Button bsSize="xsmall" className="btn-primary" style={{ marginTop: 12 }} onClick={this.onClickOfflinePayment}>Offline Payment</Button>
+          { showOfflinePayement && (
+            <OfflinePayment
+              aid={customer.get('aid')}
+              payerName={payerName}
+              debt={debt}
+              onClose={this.onCloseOfflinePayment}
+            />
+          )}
+        </Col>
+      </FormGroup>
+
     );
   }
 
@@ -254,17 +285,19 @@ class Customer extends Component {
     const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
     return (
       <span className="inline">
-        , Or generate expected invoices for : <span className="inline" style={{ verticalAlign:"middle", minWidth:290, marginLeft: 5, marginRight: 5}} >
-        <CyclesSelector className="inline"
+        , Or generate expected invoices for :
+        <span className="inline" style={{ verticalAlign: 'middle', minWidth: 290, marginLeft: 5, marginRight: 5 }} >
+          <CyclesSelector
+            className="inline"
             onChange={this.onChangeExpectedCycle}
-            statusesToDisplay={Immutable.List(['current', 'to_run','future'])}
+            statusesToDisplay={Immutable.List(['current', 'to_run', 'future'])}
             selectedCycles={expectedCyclesNames}
             multi={false}
-            from={moment().subtract(6,'month').format(apiDateTimeFormat)}
-            to={moment().add(6,'month').format(apiDateTimeFormat)}
+            from={moment().subtract(6, 'month').format(apiDateTimeFormat)}
+            to={moment().add(6, 'month').format(apiDateTimeFormat)}
             newestFirst={false}
           />
-      </span>
+        </span>
         <Button bsSize="small" className="btn-primary inline" disabled={!expectedCyclesNames} onClick={this.onClickExpectedInvoice}>Generate expected invoice</Button>
       </span>
     );
@@ -274,7 +307,6 @@ class Customer extends Component {
     const { customer } = this.props;
     const { showCreditCharge } = this.state;
     const aid = customer.get('aid', null);
-
     return (
       <div>
         <Button bsSize="xsmall" className="btn-primary" onClick={this.onShowCreditCharge}>Manual charge / refund</Button>
@@ -309,6 +341,7 @@ class Customer extends Component {
             onRemoveField={this.onRemoveCustomField}
           />
           { (action !== 'create') && this.renderChangePaymentGateway() }
+          { (action !== 'create') && this.renderOfflinePaymentsButton() }
           { (action !== 'create') && this.renderDebt() }
         </Form>
         {(action !== 'create') &&
