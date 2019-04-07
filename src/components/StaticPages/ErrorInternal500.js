@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router';
-import { Col } from 'react-bootstrap';
+import { Col, Button } from 'react-bootstrap';
 
 const ErrorInternal500 = () => (
   <Col md={12} style={{ textAlign: 'center', marginTop: 50 }}>
@@ -8,7 +7,15 @@ const ErrorInternal500 = () => (
     <h3 style={{ color: '#777' }}>500</h3>
     <h5 style={{ color: 'red' }}>Something went wrong.</h5>
     <br />
-    <p><Link to="/">Return to home page</Link></p>
+    <p>
+      <Button bsStyle="link" onClick={() => window.location.reload()}>
+        Reload page
+      </Button>
+      or
+      <Button bsStyle="link" onClick={() => window.location = '/'}>
+        Return to home page
+      </Button>
+    </p>
   </Col>
 );
 
