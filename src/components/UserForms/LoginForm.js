@@ -124,13 +124,14 @@ class LoginForm extends Component {
             Forgot Your Password?
           </Button>
         </Panel>
-        <ResetPassword
-          show={resetPassword}
-          sending={sending}
-          updateSending={this.updateSending}
-          onCancel={this.onCancel}
-          onResetPass={this.onResetPass}
-        />
+        {resetPassword && (
+          <ResetPassword
+            sending={sending}
+            updateSending={this.updateSending}
+            onCancel={this.onCancel}
+            onResetPass={this.onResetPass}
+          />
+        )}
       </Col>
     );
   }
