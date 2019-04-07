@@ -1,6 +1,8 @@
 import Immutable from 'immutable';
 import { toImmutableList } from '@/common/Util';
 import { actions } from '@/actions/entityListActions';
+import { LOGOUT } from '@/actions/userActions';
+
 
 const defaultState = Immutable.Map();
 
@@ -27,6 +29,10 @@ const revisionsReducer = (state = defaultState, action) => {
         return state.setIn([collection, keys], items);
       }
       return state;
+    }
+
+    case LOGOUT: {
+      return defaultState;
     }
 
     default:

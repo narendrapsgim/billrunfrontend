@@ -141,6 +141,15 @@ export const getSettings = (categories = []) => (dispatch) => {
     });
 };
 
+export const clearAppStorage = (keys = null) => {
+  if (keys === null) {
+    localStorage.clear();
+  }
+  keys.forEach((key) => {
+    localStorage.removeItem(key);
+  })
+}
+
 export const getCurrencies = () => (dispatch) => {
   const now = moment();
   const cacheForMinutes = 60;

@@ -1,5 +1,7 @@
 import Immutable from 'immutable';
 import { actions } from '@/actions/entityListActions';
+import { LOGOUT } from '@/actions/userActions';
+
 
 const defaultState = Immutable.Map();
 
@@ -18,6 +20,10 @@ const pageReducer = (state = defaultState, action) => {
         return state.set(action.collection, action.page);
       }
       return state;
+    }
+
+    case LOGOUT: {
+      return defaultState;
     }
 
     default:

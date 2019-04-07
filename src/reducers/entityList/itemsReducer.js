@@ -1,5 +1,7 @@
 import Immutable from 'immutable';
 import { actions } from '@/actions/entityListActions';
+import { LOGOUT } from '@/actions/userActions';
+
 
 const defaultState = Immutable.Map();
 
@@ -19,6 +21,10 @@ const itemsReducer = (state = defaultState, action) => {
         return state.set(action.collection, Immutable.List());
       }
       return state;
+    }
+
+    case LOGOUT: {
+      return defaultState;
     }
 
     default:

@@ -7,6 +7,7 @@ import {
   sendResetMailQuery,
   changePasswordQuery,
 } from '../common/ApiQueries';
+import { clearAppStorage } from './settingsActions';
 import { startProgressIndicator, finishProgressIndicator } from './progressIndicatorActions';
 import { saveEntity, getEntity, actions, deleteEntity } from './entityActions';
 
@@ -100,10 +101,12 @@ export const userDoLogout = () => (dispatch) => {
     .then((success) => {
       dispatch(logoutSuccess());
       dispatch(finishProgressIndicator());
+      clearAppStorage();
       return success;
     })
     .catch((error) => {
       dispatch(finishProgressIndicator());
+      clearAppStorage();
       return error;
     });
 };
