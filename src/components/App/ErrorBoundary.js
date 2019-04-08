@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { showDanger } from '@/actions/alertsActions';
 import { ErrorInternal500 } from '../StaticPages';
 
 class ErrorBoundary extends Component {
@@ -21,8 +22,7 @@ class ErrorBoundary extends Component {
   }
 
   render() {
-    if (this.state.hasError) {
-      // You can render any custom fallback UI
+    if (this.state.hasError && process.env.NODE_ENV === "development") {
       return <ErrorInternal500 />;
     }
 
