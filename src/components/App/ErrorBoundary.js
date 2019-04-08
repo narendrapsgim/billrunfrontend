@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { showDanger } from '@/actions/alertsActions';
 import { ErrorInternal500 } from '../StaticPages';
 
 class ErrorBoundary extends Component {
