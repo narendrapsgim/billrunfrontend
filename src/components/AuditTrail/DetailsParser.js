@@ -43,8 +43,8 @@ const DetailsParser = ({ item }) => {
   const renderDiff = () => {
     const dataNew = item.get('new', null);
     const dataOld = item.get('old', null);
-    const itemNew = Immutable.Map.isMap(dataNew) ? dataNew.delete('_id').toJS() : {};
-    const itemOld = Immutable.Map.isMap(dataOld) ? dataOld.delete('_id').toJS() : {};
+    const itemNew = Immutable.Map.isMap(dataNew) ? dataNew.delete('_id').toJS() : '';
+    const itemOld = Immutable.Map.isMap(dataOld) ? dataOld.delete('_id').toJS() : '';
     return (
       <DiffModal show={showDiff} onClose={closeDiff} inputNew={itemNew} inputOld={itemOld} />
     );
