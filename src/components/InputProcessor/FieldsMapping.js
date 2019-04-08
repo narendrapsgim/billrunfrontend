@@ -339,7 +339,7 @@ export default class FieldsMapping extends Component {
     const defaultUsagetUnit = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_unit'], '');
 
     const defaultVolumeType = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_volume_type'], 'field');
-    const defaultVolumeSrc = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_volume_src'], []).join(',');
+    const defaultVolumeSrc = settings.get('usaget_type', '') !== 'static' ? '' : settings.getIn(['processor', 'default_volume_src'], []);
     const volumeOptions = this.getVolumeOptions();
     const mongoOps = [
       { value: '$eq', label: 'Equals' },
@@ -562,7 +562,7 @@ export default class FieldsMapping extends Component {
                       <Field
                         fieldType="select"
                         multi={true}
-                        value={defaultVolumeSrc}
+                        value={defaultVolumeSrc.join(',')}
                         options={volumeOptions}
                         onChange={this.onChangeStaticUsagetVolumeField}
                       />
