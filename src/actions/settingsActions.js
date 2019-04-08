@@ -144,10 +144,11 @@ export const getSettings = (categories = []) => (dispatch) => {
 export const clearAppStorage = (keys = null) => {
   if (keys === null) {
     localStorage.clear();
+  } else {
+    keys.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   }
-  keys.forEach((key) => {
-    localStorage.removeItem(key);
-  })
 }
 
 export const getCurrencies = () => (dispatch) => {
