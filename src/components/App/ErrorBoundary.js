@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { ErrorInternal500 } from '../StaticPages';
+import { ModalWrapper } from '@/components/Elements';
+
 
 class ErrorBoundary extends Component {
 
@@ -20,9 +22,22 @@ class ErrorBoundary extends Component {
     }
   }
 
+  onClickAskCloseImport = () => {
+    this.setState(() => ({ hasError: false }));
+  }
+
   render() {
     if (this.state.hasError && process.env.NODE_ENV === "development") {
-      return <ErrorInternal500 />;
+      return (
+        <div>
+          {this.props.children}
+          <ModalWrapper show={true} title="Error" onHide={this.onClickAskCloseImport} modalSize="large">
+            <div className="clearfix">
+              <ErrorInternal500 onIgnore={this.onClickAskCloseImport}/>
+            </div>
+          </ModalWrapper>
+        </div>
+      );
     }
 
     return this.props.children;
