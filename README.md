@@ -1,5 +1,19 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# Development
+
+### Aliases
+`@/components/...`<br>
+`@/selectors/...`<br>
+`@/actions/...`<br>
+`@/common/...`<br>
+
+# Configuration
+
+## Requirements
+Make sure you are on the last node LTS version, if not install it by `sudo n lts`
+To resolve problem with node-sass run `sudo npm install -g node-sass --unsafe-perm=true --allow-root`
+
 
 ## Available environment configuration
 
@@ -13,6 +27,7 @@ Example:
 ```
 const url = getConfig(['env', 'serverApiUrl'], ''));
 console.log(url);
+-> http://billrun
 ```
 Output in development environment: **_http://billrun_**<br>
 Output in production environment:<br>

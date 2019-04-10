@@ -78,7 +78,7 @@ const buildQueryString = (params = null) => {
     }, '?');
   }
   // Set server debug flag if it enabled in config file
-  if (getConfig(['env','serverApiDebug'], false) === true) {
+  if (process.env.NODE_ENV === "development" && window.serverApiDebug === true) {
     queryParams += (queryParams.length > 0) ? '&' : '?';
     queryParams += getConfig(['env','serverApiDebugQueryString'], '');
   }

@@ -1,6 +1,8 @@
 import Immutable from 'immutable';
 import isNumber from 'is-number';
 import { actions } from '@/actions/entityListActions';
+import { LOGOUT } from '@/actions/userActions';
+
 
 const defaultState = Immutable.Map();
 
@@ -19,6 +21,10 @@ const sizeReducer = (state = defaultState, action) => {
         return state.set(action.collection, parseInt(action.size));
       }
       return state;
+    }
+
+    case LOGOUT: {
+      return defaultState;
     }
 
     default:

@@ -11,14 +11,14 @@ class CollectionTypeMessage extends Component {
 
   static propTypes = {
     content: PropTypes.instanceOf(Immutable.Map),
-    templateToken: PropTypes.instanceOf(Immutable.Map),
+    templateToken: PropTypes.instanceOf(Immutable.List),
     editor: PropTypes.string,
     onChange: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     content: Immutable.Map(),
-    templateToken: Immutable.Map(),
+    templateToken: Immutable.List(),
     editor: 'mails',
   };
 

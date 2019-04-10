@@ -457,12 +457,17 @@ export const templateTokenSettingsSelector = createSelector(
 export const templateTokenSettingsSelectorForEditor = createSelector(
   templateTokenSettingsSelector,
   (state, props, types) => types,
-  (templateTokens, types) => templateTokens
-    .filter((tokens, type) => types.includes(type))
-    .reduce((acc, tokens, type) =>
-      Immutable.List([...acc, ...tokens.map(token => `${type}::${token}`)]),
-      Immutable.List(),
-    ),
+  (templateTokens, types) => {
+    if(!templateTokens) {
+      return Immutable.List();
+    }
+    return templateTokens
+      .filter((tokens, type) => types.includes(type))
+      .reduce((acc, tokens, type) =>
+        Immutable.List([...acc, ...tokens.map(token => `${type}::${token}`)]),
+        Immutable.List(),
+      )
+  }
 );
 
 export const collectionSettingsSelector = createSelector(
