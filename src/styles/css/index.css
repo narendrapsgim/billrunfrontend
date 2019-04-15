@@ -37,6 +37,8 @@ fieldset[disabled] .btn {
 .tooltip{
   z-index: 2001;
 }
+
+/* Props */
 .clickable {
   cursor: pointer;
 }
@@ -46,26 +48,16 @@ fieldset[disabled] .btn {
 .non-editable-field{
   line-height: 32px;
 }
-.actions button.btn-sm {
-  height: 39px;
-  padding: 9px 12px;
-}
 .inline {
   display: inline-block;;
+}
+.withHover:hover {
+  background-color: #e5e5e5;
 }
 .one-line {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.td-ellipsis{
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-.td-actions {
-  width:1%;
-  white-space:nowrap;
 }
 
 .pt0{ padding-top: 0!important; }
@@ -80,8 +72,13 @@ fieldset[disabled] .btn {
 .mr0{ margin-right: 0!important; }
 .mb0{ margin-bottom: 0!important; }
 .ml0{ margin-left: 0!important; }
+.mt5{ margin-top: 5px!important; }
+.mr5{ margin-right: 5px!important; }
+.mb5{ margin-bottom: 5px!important; }
+.ml5{ margin-left: 5px!important; }
 
 .full-width{ width: 100%!important; }
+/* ~Props */
 
 /* General colors */
 .danger-red { color: #d9534f; }
@@ -141,16 +138,12 @@ fieldset[disabled] .btn {
 }
 /* ~Custom field input */
 
-
-
-
-
 /* Mapping block */
 .separator {
-    margin-top: 0px;
-    margin-bottom: 20px;
-    border: 0;
-    border-top: 1px solid #c3c3c3;
+  margin-top: 0px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #c3c3c3;
 }
 
 /* Plan Edit screen*/
@@ -209,7 +202,6 @@ fieldset[disabled] .btn {
   color: #424242;
   text-align: center;
 }
-
 .pagination {
   margin: 0;
   padding: 0;
@@ -220,7 +212,6 @@ fieldset[disabled] .btn {
   font-size: 14px;
   float: left;
 }
-
 .draggable-row{
   background-color: #eee;
   opacity: .7;
@@ -228,11 +219,25 @@ fieldset[disabled] .btn {
   padding-top: 4px!important;
   padding-bottom: 4px!important;
 }
-
 .panel-no-border {
   border: 0;
   margin: 0;
 }
+.actions button.btn-sm {
+  height: 39px;
+  padding: 9px 12px;
+}
+.td-ellipsis{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.td-actions {
+  width:1%;
+  white-space:nowrap;
+}
+/* ~Global page + table */
+
 /* Entity Revision */
 .entity-revision-history-popover .popover-content{
   padding: 10px 0 0 0;
@@ -399,4 +404,8 @@ ul.revision-history-list li.active .cycle {
 
 #rate-mapping .nav-tabs>li {
   min-width: 150px;
+}
+
+.CustomFieldsListRow {
+  line-height: 40px;
 }

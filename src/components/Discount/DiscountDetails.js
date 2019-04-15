@@ -8,7 +8,7 @@ import isNumber from 'is-number';
 import ServiceDiscountValue from './Elements/ServiceDiscountValue';
 import Help from '../Help';
 import Field from '@/components/Field';
-import EntityFields from '../Entity/EntityFields';
+import { EntityFields } from '../Entity';
 import { getFieldName, getConfig } from '@/common/Util';
 import { DiscountDescription } from '../../language/FieldDescriptions';
 
@@ -134,12 +134,12 @@ export default class DiscountDetails extends Component {
     .toArray();
 
   createServicesOptions = () => {
-    const { discount } = this.props;
+    const { discount, availableServices } = this.props;
     const isPercentaget = (discount.get('discount_type', '') === 'percentage');
-    return this.props.availableServices
+    return availableServices
       .filter(availableService => !(isPercentaget && availableService.get('quantitative', false)))
-    .map(this.createOption)
-    .toArray();
+      .map(this.createOption)
+      .toArray();
   }
 
   createOption = item => ({

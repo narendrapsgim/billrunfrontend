@@ -111,7 +111,8 @@ class UsageTypesSelector extends Component {
     return uom
       .filter(unit => unit.get('unit', false) !== false || (showDisplayUnits && unit.get('convertFunction', false) !== false))
       .filter(unitFilter)
-      .map(unit => ({ value: unit.get('name', ''), label: unit.get('label', '') })).toArray();
+      .map(unit => ({ value: unit.get('name', ''), label: unit.get('label', '') }))
+      .toArray();
   }
 
   renderUsageTypeSelect = () => {

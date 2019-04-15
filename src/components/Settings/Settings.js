@@ -64,10 +64,12 @@ class Settings extends Component {
 
   initCurrencyOptions = (response) => {
     if (response.status) {
-      const currencyOptions = Immutable.fromJS(response.data).map(currency => ({
-        label: `${currency.get('code', '')} - ${currency.get('name', '')} ${currency.get('symbol', '')}`,
-        value: currency.get('code', ''),
-      })).toArray();
+      const currencyOptions = Immutable.fromJS(response.data)
+        .map(currency => ({
+          label: `${currency.get('code', '')} - ${currency.get('name', '')} ${currency.get('symbol', '')}`,
+          value: currency.get('code', ''),
+        }))
+        .toArray();
       this.setState({ currencyOptions });
     }
   }

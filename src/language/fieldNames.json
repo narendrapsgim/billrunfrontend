@@ -126,6 +126,9 @@
     "description": "Title",
     "key": "Key"
   },
+  "foreign": {
+    "account_subscribers": "Customer Members"
+  },
   "aid": "Customer ID",
   "sid": "Subscriber ID"
 }
