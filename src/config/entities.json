@@ -94,7 +94,8 @@
     "uniqueField": "key",
     "itemName": "tax",
     "itemType": "tax",
-    "itemsType": "taxes"
+    "itemsType": "taxes",
+    "settingsKey": "taxes"
   },
   "logFile": {
     "collection": "log",

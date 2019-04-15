@@ -48,7 +48,6 @@ const mapStateToProps = (state, props) => {
     }))
     .toList()
     .toArray();
-    console.log(translateTypes);
   const selectedTranslate = Map.isMap(item) ? item.getIn(['foreign', 'translate', 'type'], '') : '';
   const translateTypeFormats = getConfig(['customFields', 'foreignFields', 'translate', selectedTranslate, 'options'], List())
     .map(option => Map({

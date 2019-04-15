@@ -37,6 +37,8 @@ class TaxSetup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
+    deletePathOnEmptyValue: PropTypes.array,
+    deletePathOnNullValue: PropTypes.array,
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -46,18 +48,17 @@ class TaxSetup extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     revisions: Immutable.List(),
+    deletePathOnEmptyValue: [],
+    deletePathOnNullValue: [],
   }
 
   state = {
     progress: false,
   }
 
-  componentWillMount() {
-    this.fetchItem();
-  }
-
   componentDidMount() {
     const { mode } = this.props;
+    this.fetchItem();
     if (mode === 'create') {
       const pageTitle = buildPageTitle(mode, 'tax');
       this.props.dispatch(setPageTitle(pageTitle));
@@ -132,9 +133,8 @@ class TaxSetup extends Component {
   }
 
   onChangeFieldValue = (path, value) => {
+    const { deletePathOnEmptyValue, deletePathOnNullValue } = this.props;
     const stringPath = Array.isArray(path) ? path.join('.') : path;
-    const deletePathOnEmptyValue = [];
-    const deletePathOnNullValue = [];
     if (value === '' && deletePathOnEmptyValue.includes(stringPath)) {
       this.props.dispatch(deleteTaxValue(path));
     } else if (value === null && deletePathOnNullValue.includes(stringPath)) {
@@ -157,10 +157,8 @@ class TaxSetup extends Component {
 
   handleSave = () => {
     const { item, mode } = this.props;
-    if (this.validate()) {
-      this.setState({ progress: true });
-      this.props.dispatch(saveTax(item, mode)).then(this.afterSave);
-    }
+    this.setState({ progress: true });
+    this.props.dispatch(saveTax(item, mode)).then(this.afterSave);
   }
 
   handleBack = (itemWasChanged = false) => {
@@ -173,10 +171,6 @@ class TaxSetup extends Component {
 
   handleSelectTab = (key) => {
     this.setState({ activeTab: key });
-  }
-
-  validate = () => {
-    return true;
   }
 
   render() {

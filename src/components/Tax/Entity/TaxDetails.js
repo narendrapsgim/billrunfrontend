@@ -46,7 +46,7 @@ class TaxDetails extends Component {
     const { errors } = this.state;
     const value = e.target.value.toUpperCase();
     const newError = (!getConfig('keyUppercaseRegex', /./).test(value)) ? allowedCharacters : '';
-    this.setState({ errors: Object.assign({}, errors, { name: newError }) });
+    this.setState({ errors: Object.assign({}, errors, { key: newError }) });
     this.props.onFieldUpdate(['key'], value);
   }
 
@@ -54,7 +54,6 @@ class TaxDetails extends Component {
     const { value } = e.target;
     this.props.onFieldUpdate(['description'], value);
   }
-
 
   render () {
     const { errors } = this.state;
@@ -65,6 +64,7 @@ class TaxDetails extends Component {
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
             { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
+            <span className="danger-red"> *</span>
             <Help contents={TaxDescription.description} />
           </Col>
           <Col sm={8} lg={9}>
@@ -76,6 +76,7 @@ class TaxDetails extends Component {
           <FormGroup validationState={errors.key.length > 0 ? 'error' : null} >
             <Col componentClass={ControlLabel} sm={3} lg={2}>
               { getFieldName('key', getFieldNameType('service'), sentenceCase('key'))}
+              <span className="danger-red"> *</span>
               <Help contents={TaxDescription.key} />
             </Col>
             <Col sm={8} lg={9}>

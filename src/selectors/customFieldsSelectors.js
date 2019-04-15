@@ -42,7 +42,7 @@ export const customFieldsEntityFieldsSelector = createSelector(
       product: productFields,
       service: serviceFields,
       plan: planFields,
-      taxes: taxFields,
+      tax: taxFields,
       usage: usageField,
     });
     if (typeof entity === 'undefined' || entity === 'all') {
