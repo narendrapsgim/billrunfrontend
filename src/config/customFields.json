@@ -5,6 +5,7 @@
     "product": "product",
     "service": "service",
     "plan":"plan",
+    "taxes":"tax",
     "usage": "usage"
   },
 
@@ -17,11 +18,13 @@
     "subscription": ["sid", "aid", "plan_activation", "play"],
     "product": ["from", "to", "play"],
     "service": ["from", "to", "include", "play"],
+    "taxes": ["from", "to"],
     "plan": ["from", "to", "play"]
   },
   "unReorderFields": {
     "product": ["key", "description", "rates"],
     "service": ["name", "description", "price"],
+    "taxes": ["key", "description"],
     "plan": ["name", "description", "price", "upfront"]
   },
   "fields": [

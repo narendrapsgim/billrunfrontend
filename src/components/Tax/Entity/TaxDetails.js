@@ -87,8 +87,8 @@ class TaxDetails extends Component {
         <EntityFields
           entityName="taxes"
           entity={item}
-          onChangeField={this.onFieldUpdate}
-          onRemoveField={this.onFieldRemove}
+          onChangeField={this.props.onFieldUpdate}
+          onRemoveField={this.props.onFieldRemove}
           editable={editable}
         />
       </Form>
