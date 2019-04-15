@@ -108,6 +108,15 @@
     "order": 5,
     "parent": "root"
   },
+  "tax": {
+    "title": "Tax",
+    "icon": "fa-percent",
+    "route": "taxes",
+    "show": true,
+    "roles": [],
+    "order": 5.1,
+    "parent": "root"
+  },
   "cycle": {
     "title": "Billing Cycle",
     "icon": "fa-clock-o",

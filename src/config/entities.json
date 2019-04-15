@@ -88,6 +88,13 @@
     "itemType": "queue",
     "itemsType": "queues"
   },
+  "tax": {
+    "collection": "taxes",
+    "uniqueField": "key",
+    "itemName": "tax",
+    "itemType": "tax",
+    "itemsType": "taxes"
+  },
   "logFile": {
     "collection": "log",
     "uniqueField": "stamp",

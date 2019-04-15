@@ -76,6 +76,7 @@ const getItem = (state, props, entityName) => {
     case 'discount':
     case 'reports':
     case 'importer':
+    case 'tax':
       return state.entity.get(entityName);
     case 'charging_plan':
       return state.plan;

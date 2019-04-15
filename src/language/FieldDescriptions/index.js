@@ -5,6 +5,8 @@ import ProductDescription from './Product';
 import DiscountDescription from './Discount';
 import ReportDescription from './Report';
 import SettingsDescription from './Settings';
+import TaxDescription from './Tax';
+
 
 export {
   PlanDescription,
@@ -14,4 +16,5 @@ export {
   DiscountDescription,
   ReportDescription,
   SettingsDescription,
+  TaxDescription,
 };
