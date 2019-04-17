@@ -34,7 +34,7 @@
     }, {
       "id": "boolean",
       "title": "Boolean",
-      "exclude": ["unique", "mandatory", "mandatory", "searchable", "multiple", "selectOptions"]
+      "exclude": ["unique", "mandatory", "searchable", "multiple", "selectOptions"]
     }, {
       "id": "textarea",
       "title": "Text Area",
