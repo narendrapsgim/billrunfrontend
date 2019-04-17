@@ -63,7 +63,7 @@ class TaxDetails extends Component {
       <Form horizontal>
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
-            { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
+            { getFieldName('description', getFieldNameType('tax'), sentenceCase('title'))}
             <span className="danger-red"> *</span>
             <Help contents={TaxDescription.description} />
           </Col>
@@ -75,7 +75,7 @@ class TaxDetails extends Component {
         {['clone', 'create'].includes(mode) &&
           <FormGroup validationState={errors.key.length > 0 ? 'error' : null} >
             <Col componentClass={ControlLabel} sm={3} lg={2}>
-              { getFieldName('key', getFieldNameType('service'), sentenceCase('key'))}
+              { getFieldName('key', getFieldNameType('tax'), sentenceCase('key'))}
               <span className="danger-red"> *</span>
               <Help contents={TaxDescription.key} />
             </Col>
