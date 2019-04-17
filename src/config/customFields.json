@@ -40,6 +40,10 @@
       "title": "Text Area",
       "exclude": ["multiple", "selectOptions"]
     }, {
+      "id": "percentage",
+      "title": "Percentage",
+      "exclude": ["multiple", "selectOptions"]
+    }, {
       "id": "ranges",
       "title": "Range",
       "exclude": ["selectOptions"],
