@@ -44,7 +44,7 @@ import AutoRenewsList from '@/components/AutoRenew/AutoRenewsList';
 import AutoRenewSetup from '@/components/AutoRenew/AutoRenewSetup';
 import CustomFields from '@/components/CustomFields';
 import Events from '@/components/Events';
-import { TaxList, TaxSetup } from '@/components/Tax';
+import { TaxList, TaxSetup, TaxMapping } from '@/components/Tax';
 
 
 const routes = () => (
@@ -125,6 +125,8 @@ const routes = () => (
           <IndexRoute component={Authentication(TaxList)} title="Taxes" />
           <Route path="tax/:itemId" component={Authentication(TaxSetup)} />
           <Route path="tax" component={Authentication(TaxSetup)} />
+          <Route path="tax" component={Authentication(TaxSetup)} />
+          <Route path="mapping-rules" component={Authentication(TaxMapping)} />
         </Route>
 
         <Route path="/input_processor" component={Authentication(InputProcessor)} />
