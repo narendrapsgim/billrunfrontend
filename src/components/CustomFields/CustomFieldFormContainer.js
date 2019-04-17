@@ -46,11 +46,12 @@ const mapStateToProps = (state, props) => {
     fieldTypesOptions,
     playsOptions,
     showPlays,
+    isParams: item.get('field_name', '').startsWith('params.') || item.getIn(['uiFlags', 'isParam'], false),
     checkboxStyle: { marginTop: 10, paddingLeft: 26 },
     helpTextStyle: { color: '#626262', verticalAlign: 'text-top' },
     plays: item.get('plays', []).join(','),
     disableTitle: inConfigOptionBlackList(fieldTypeConfig, 'title') || !isEditableFiledProperty(item, editable, 'title'),
-    disableFieldName: inConfigOptionBlackList(fieldTypeConfig, 'fieldName') || !isEditableFiledProperty(item, editable, 'field_name') || mode !== 'create',
+    disableFieldName: mode !== 'create',
     disableUnique: inConfigOptionBlackList(fieldTypeConfig, 'unique') || !isEditableFiledProperty(item, editable, 'unique'),
     disableMandatory: inConfigOptionBlackList(fieldTypeConfig, 'mandatory') || !isEditableFiledProperty(item, editable, 'mandatory') || item.get('unique', false),
     disableFieldType: inConfigOptionBlackList(fieldTypeConfig, 'type') || !isEditableFiledProperty(item, editable, 'type'),
@@ -95,6 +96,15 @@ const mapDispatchToProps = (dispatch, {
 
   onChangeEntityField: (path, value) => {
     updateField(path, value);
+  },
+
+  onChangeIsParams: (e) => {
+    const { value } = e.target;
+    if (value) {
+      updateField(['uiFlags', 'isParam'], true);
+    } else if(!value) {
+      removeField(['uiFlags', 'isParam']);
+    }
   },
 
   onChange: (e) => {

@@ -220,6 +220,8 @@ class EntityField extends Component {
         value={value}
         editable={editable}
         disabled={disabled}
+        preffix={field.get('preffix')}
+        suffix={field.get('suffix')}
       />
     );
   }

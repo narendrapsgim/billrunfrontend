@@ -109,7 +109,18 @@ const mapDispatchToProps = (dispatch, props) => ({ // eslint-disable-line no-unu
       if (!dispatch(validateField(newItem, existingFields))) {
         return false;
       }
-      dispatch(addField(entity, newItem));
+      const newField = !newItem.has('uiFlags')
+        ? newItem
+        : newItem.withMutations((newItemWithMutations) => {
+          if (newItem.getIn(['uiFlags', 'isParam'], false)) {
+            const fieldName = newItem.get('field_name');
+            if (!fieldName.startsWith('params.')) {
+              newItemWithMutations.set('field_name', `params.${fieldName}`)
+            }
+          }
+          newItemWithMutations.delete('uiFlags');
+        });
+      dispatch(addField(entity, newField));
       return dispatch(saveAndReloadFields(entity));
     };
     const entityName = getConfig(['systemItems', entity, 'itemName'], entity);
