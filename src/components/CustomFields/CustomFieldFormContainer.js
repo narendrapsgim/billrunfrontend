@@ -46,7 +46,6 @@ const mapStateToProps = (state, props) => {
     fieldTypesOptions,
     playsOptions,
     showPlays,
-    isParams: item.get('field_name', '').startsWith('params.') || item.getIn(['uiFlags', 'isParam'], false),
     checkboxStyle: { marginTop: 10, paddingLeft: 26 },
     helpTextStyle: { color: '#626262', verticalAlign: 'text-top' },
     plays: item.get('plays', []).join(','),
@@ -96,15 +95,6 @@ const mapDispatchToProps = (dispatch, {
 
   onChangeEntityField: (path, value) => {
     updateField(path, value);
-  },
-
-  onChangeIsParams: (e) => {
-    const { value } = e.target;
-    if (value) {
-      updateField(['uiFlags', 'isParam'], true);
-    } else if(!value) {
-      removeField(['uiFlags', 'isParam']);
-    }
   },
 
   onChange: (e) => {

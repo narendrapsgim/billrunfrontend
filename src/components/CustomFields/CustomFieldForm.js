@@ -16,234 +16,217 @@ const CustomFieldForm = ({
   fieldTypesOptions, playsOptions,
   fieldType, showPlays, plays,
   checkboxStyle, helpTextStyle,
-  isParams, onChangeIsParams,
-}) => {
-  const fieldNameSuffix = (
-    <Field
-      fieldType="checkbox"
-      id="is-params"
-      onChange={onChangeIsParams}
-      value={isParams}
-      label="Is params"
+}) => (
+  <Form horizontal>
+    <EntityField
+      field={Map({ title: 'Key', field_name: 'field_name', mandatory: true })}
+      entity={item}
       disabled={disableFieldName}
+      onChange={onChangeFieldName}
+      error={isErrorFieldName}
     />
-  )
-  return (
-    <Form horizontal>
+    <EntityField
+      field={Map({ title: 'Title', field_name: 'title', mandatory: true })}
+      entity={item}
+      disabled={disableTitle}
+      onChange={onChangeTitle}
+      error={isErrorTitle}
+    />
+    {!disableFieldType && (
+      <FormGroup>
+        <Col sm={3} lg={2} componentClass={ControlLabel}>Field Type</Col>
+        <Col sm={8} lg={9}>
+          <Field
+            fieldType="select"
+            options={fieldTypesOptions}
+            onChange={onChangeType}
+            value={fieldType}
+            disabled={disableFieldType}
+            clearable={false}
+          />
+        </Col>
+      </FormGroup>
+    )}
+    {showPlays && (
+      <FormGroup>
+        <Col sm={3} lg={2} componentClass={ControlLabel}>Play</Col>
+        <Col sm={8} lg={9}>
+          <Field
+            fieldType="select"
+            options={playsOptions}
+            onChange={onChangePlay}
+            value={plays}
+            multi={true}
+            clearable={true}
+          />
+        </Col>
+      </FormGroup>
+    )}
+    {!disableDescription && (
       <EntityField
-        field={Map({
-          title: 'Key',
-          field_name: 'field_name',
-          mandatory: true,
-          suffix:fieldNameSuffix
-        })}
+        field={Map({ title: 'Description', field_name: 'description', description: 'Long text will appear in question mark after the field label' })}
         entity={item}
-        disabled={disableFieldName}
-        onChange={onChangeFieldName}
-        error={isErrorFieldName}
+        onChange={onChangeEntityField}
+        disabled={disableDescription}
       />
+    )}
+    {!disableHelp && (
       <EntityField
-        field={Map({ title: 'Title', field_name: 'title', mandatory: true })}
+        field={Map({ title: 'Help Text', field_name: 'help', description: 'Short text will appear below the field' })}
         entity={item}
-        disabled={disableTitle}
-        onChange={onChangeTitle}
-        error={isErrorTitle}
+        onChange={onChangeEntityField}
+        disabled={disableHelp}
       />
-      {!disableFieldType && (
-        <FormGroup>
-          <Col sm={3} lg={2} componentClass={ControlLabel}>Field Type</Col>
-          <Col sm={8} lg={9}>
-            <Field
-              fieldType="select"
-              options={fieldTypesOptions}
-              onChange={onChangeType}
-              value={fieldType}
-              disabled={disableFieldType}
-              clearable={false}
-            />
-          </Col>
-        </FormGroup>
-      )}
-      {showPlays && (
-        <FormGroup>
-          <Col sm={3} lg={2} componentClass={ControlLabel}>Play</Col>
-          <Col sm={8} lg={9}>
-            <Field
-              fieldType="select"
-              options={playsOptions}
-              onChange={onChangePlay}
-              value={plays}
-              multi={true}
-              clearable={true}
-            />
-          </Col>
-        </FormGroup>
-      )}
-      {!disableDescription && (
-        <EntityField
-          field={Map({ title: 'Description', field_name: 'description', description: 'Long text will appear in question mark after the field label' })}
-          entity={item}
-          onChange={onChangeEntityField}
-          disabled={disableDescription}
-        />
-      )}
-      {!disableHelp && (
-        <EntityField
-          field={Map({ title: 'Help Text', field_name: 'help', description: 'Short text will appear below the field' })}
-          entity={item}
-          onChange={onChangeEntityField}
-          disabled={disableHelp}
-        />
-      )}
+    )}
 
-      <Panel header="Options">
-        {!disableUnique && (
-          <FormGroup>
-            <Col sm={3} lg={2} componentClass={ControlLabel}>Unique</Col>
-            <Col sm={8} lg={9} style={checkboxStyle}>
-              <Field
-                id="unique"
-                onChange={onChange}
-                value={item.get('unique', '')}
-                fieldType="checkbox"
-                disabled={disableUnique}
-                className="inline mr10"
-              />
-            </Col>
-          </FormGroup>
-        )}
-        {(!disableMandatory || (disableMandatory && item.get('unique', false))) && (
-          <FormGroup>
-            <Col sm={3} lg={2} componentClass={ControlLabel}>Mandatory</Col>
-            <Col sm={8} lg={9} style={checkboxStyle}>
-              <Field id="mandatory" onChange={onChange} value={item.get('mandatory', '')} fieldType="checkbox" disabled={disableMandatory} className="inline mr10" />
-              { disableMandatory && item.get('unique', false) && (
-                <small style={helpTextStyle}>Unique field must be mandatory</small>
-              )}
-            </Col>
-          </FormGroup>
-        )}
-        {!disabledEditable && (
-          <FormGroup>
-            <Col sm={3} lg={2} componentClass={ControlLabel}>Editable</Col>
-            <Col sm={8} lg={9} style={checkboxStyle}>
-              <Field
-                fieldType="checkbox"
-                id="editable"
-                onChange={onChange}
-                value={item.get('editable', '')}
-                disabled={disabledEditable}
-                className="inline mr10"
-              />
-            </Col>
-          </FormGroup>
-        )}
-        {!disabledDisplay && (
-          <FormGroup>
-            <Col sm={3} lg={2} componentClass={ControlLabel}>Display</Col>
-            <Col sm={7} style={checkboxStyle}>
-              <Field
-                fieldType="checkbox"
-                id="display"
-                onChange={onChange}
-                value={item.get('display', '')}
-                disabled={disabledDisplay}
-                className="inline mr10"
-              />
-            </Col>
-          </FormGroup>
-        )}
-        {!disabledShowInList && (
-          <FormGroup>
-            <Col sm={3} lg={2} componentClass={ControlLabel}>Show in list</Col>
-            <Col sm={8} lg={9} style={checkboxStyle}>
-              <Field
-                fieldType="checkbox"
-                id="show_in_list"
-                onChange={onChange}
-                value={item.get('show_in_list', '')}
-                disabled={disabledShowInList}
-                className="inline mr10"
-              />
-            </Col>
-          </FormGroup>
-        )}
-        {!disableSearchable && (
-          <FormGroup>
-            <Col sm={3} lg={2} componentClass={ControlLabel}>Searchable</Col>
-            <Col sm={8} lg={9} style={checkboxStyle}>
-              <Field
-                fieldType="checkbox"
-                id="searchable"
-                className="inline mr10"
-                onChange={onChange}
-                value={item.get('searchable', '')}
-                disabled={disableSearchable}
-              />
-            </Col>
-          </FormGroup>
-        )}
-        {!disableMultiple && (
-          <FormGroup>
-            <Col sm={3} lg={2} componentClass={ControlLabel}>Multiple</Col>
-            <Col sm={8} lg={9} style={checkboxStyle}>
-              <Field
-                id="multiple"
-                onChange={onChange}
-                value={item.get('multiple', '')}
-                fieldType="checkbox"
-                disabled={disableMultiple}
-                className="inline mr10"
-              />
-            </Col>
-          </FormGroup>
-        )}
-        { !disableSelectList && (
-          <FormGroup>
-            <Col sm={3} lg={2} componentClass={ControlLabel}>Select list</Col>
-            <Col sm={8} lg={9}>
-              <InputGroup>
-                <InputGroup.Addon>
-                  <Field
-                    id="select_list"
-                    onChange={onChange}
-                    value={item.get('select_list', '')}
-                    fieldType="checkbox"
-                    disabled={disableSelectList}
-                  />
-                </InputGroup.Addon>
+    <Panel header="Options">
+      {!disableUnique && (
+        <FormGroup>
+          <Col sm={3} lg={2} componentClass={ControlLabel}>Unique</Col>
+          <Col sm={8} lg={9} style={checkboxStyle}>
+            <Field
+              id="unique"
+              onChange={onChange}
+              value={item.get('unique', '')}
+              fieldType="checkbox"
+              disabled={disableUnique}
+              className="inline mr10"
+            />
+          </Col>
+        </FormGroup>
+      )}
+      {(!disableMandatory || (disableMandatory && item.get('unique', false))) && (
+        <FormGroup>
+          <Col sm={3} lg={2} componentClass={ControlLabel}>Mandatory</Col>
+          <Col sm={8} lg={9} style={checkboxStyle}>
+            <Field id="mandatory" onChange={onChange} value={item.get('mandatory', '')} fieldType="checkbox" disabled={disableMandatory} className="inline mr10" />
+            { disableMandatory && item.get('unique', false) && (
+              <small style={helpTextStyle}>Unique field must be mandatory</small>
+            )}
+          </Col>
+        </FormGroup>
+      )}
+      {!disabledEditable && (
+        <FormGroup>
+          <Col sm={3} lg={2} componentClass={ControlLabel}>Editable</Col>
+          <Col sm={8} lg={9} style={checkboxStyle}>
+            <Field
+              fieldType="checkbox"
+              id="editable"
+              onChange={onChange}
+              value={item.get('editable', '')}
+              disabled={disabledEditable}
+              className="inline mr10"
+            />
+          </Col>
+        </FormGroup>
+      )}
+      {!disabledDisplay && (
+        <FormGroup>
+          <Col sm={3} lg={2} componentClass={ControlLabel}>Display</Col>
+          <Col sm={7} style={checkboxStyle}>
+            <Field
+              fieldType="checkbox"
+              id="display"
+              onChange={onChange}
+              value={item.get('display', '')}
+              disabled={disabledDisplay}
+              className="inline mr10"
+            />
+          </Col>
+        </FormGroup>
+      )}
+      {!disabledShowInList && (
+        <FormGroup>
+          <Col sm={3} lg={2} componentClass={ControlLabel}>Show in list</Col>
+          <Col sm={8} lg={9} style={checkboxStyle}>
+            <Field
+              fieldType="checkbox"
+              id="show_in_list"
+              onChange={onChange}
+              value={item.get('show_in_list', '')}
+              disabled={disabledShowInList}
+              className="inline mr10"
+            />
+          </Col>
+        </FormGroup>
+      )}
+      {!disableSearchable && (
+        <FormGroup>
+          <Col sm={3} lg={2} componentClass={ControlLabel}>Searchable</Col>
+          <Col sm={8} lg={9} style={checkboxStyle}>
+            <Field
+              fieldType="checkbox"
+              id="searchable"
+              className="inline mr10"
+              onChange={onChange}
+              value={item.get('searchable', '')}
+              disabled={disableSearchable}
+            />
+          </Col>
+        </FormGroup>
+      )}
+      {!disableMultiple && (
+        <FormGroup>
+          <Col sm={3} lg={2} componentClass={ControlLabel}>Multiple</Col>
+          <Col sm={8} lg={9} style={checkboxStyle}>
+            <Field
+              id="multiple"
+              onChange={onChange}
+              value={item.get('multiple', '')}
+              fieldType="checkbox"
+              disabled={disableMultiple}
+              className="inline mr10"
+            />
+          </Col>
+        </FormGroup>
+      )}
+      { !disableSelectList && (
+        <FormGroup>
+          <Col sm={3} lg={2} componentClass={ControlLabel}>Select list</Col>
+          <Col sm={8} lg={9}>
+            <InputGroup>
+              <InputGroup.Addon>
                 <Field
-                  id="select_options"
+                  id="select_list"
                   onChange={onChange}
-                  value={item.get('select_options', '')}
-                  disabled={disableSelectOptions}
+                  value={item.get('select_list', '')}
+                  fieldType="checkbox"
+                  disabled={disableSelectList}
                 />
-              </InputGroup>
-              <HelpBlock style={{ marginLeft: 40 }}>
-                Select Options <small>(comma-separated list)</small>
-              </HelpBlock>
-            </Col>
-          </FormGroup>
+              </InputGroup.Addon>
+              <Field
+                id="select_options"
+                onChange={onChange}
+                value={item.get('select_options', '')}
+                disabled={disableSelectOptions}
+              />
+            </InputGroup>
+            <HelpBlock style={{ marginLeft: 40 }}>
+              Select Options <small>(comma-separated list)</small>
+            </HelpBlock>
+          </Col>
+        </FormGroup>
+      )}
+    </Panel>
+    {(!disableDefaultValue || (disableDefaultValue && item.get('unique', false))) && (
+      <Panel header="Preview and Default Value">
+        <EntityField
+          field={item.set('field_name', 'default_value')}
+          entity={item}
+          onChange={onChangeEntityField}
+          disabled={disableDefaultValue || item.get('unique', false)}
+        />
+        {item.get('unique', false) && (
+          <HelpBlock className="text-center">
+            Default value can&apos;t be set for unique field
+          </HelpBlock>
         )}
       </Panel>
-      {(!disableDefaultValue || (disableDefaultValue && item.get('unique', false))) && (
-        <Panel header="Preview and Default Value">
-          <EntityField
-            field={item.set('field_name', 'default_value')}
-            entity={item}
-            onChange={onChangeEntityField}
-            disabled={disableDefaultValue || item.get('unique', false)}
-          />
-          {item.get('unique', false) && (
-            <HelpBlock className="text-center">
-              Default value can&apos;t be set for unique field
-            </HelpBlock>
-          )}
-        </Panel>
-      )}
-    </Form>
-  );
-}
+    )}
+  </Form>
+);
+
 
 CustomFieldForm.propTypes = {
   item: PropTypes.instanceOf(Map),
@@ -274,7 +257,6 @@ CustomFieldForm.propTypes = {
   disableDescription: PropTypes.bool,
   disableDefaultValue: PropTypes.bool,
 
-  isParams: PropTypes.bool,
   fieldTypesOptions: PropTypes.array,
   fieldType: PropTypes.string,
   showPlays: PropTypes.bool,
@@ -289,7 +271,6 @@ CustomFieldForm.propTypes = {
   onChangeTitle: PropTypes.func.isRequired,
   onChangeFieldName: PropTypes.func.isRequired,
   onChangeEntityField: PropTypes.func.isRequired,
-  onChangeIsParams: PropTypes.func.isRequired,
 };
 
 
@@ -320,7 +301,6 @@ CustomFieldForm.defaultProps = {
   playsOptions: [],
   checkboxStyle: {},
   helpTextStyle: {},
-  isParams: false,
 };
 
 

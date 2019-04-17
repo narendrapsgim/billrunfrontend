@@ -78,8 +78,8 @@ export const validateForeignFieldEntity = (value = '') => validateRequiredValue(
 export const validateForeignFieldField = (value = '') => validateRequiredValue(value, 'Entity Field');
 
 export const validateFieldKey = (value = '', existingFields = List()) => {
-  if (!getConfig('keyRegex', '').test(value)) {
-    return 'Key contains illegal characters, field name should contain only alphabets, numbers and underscores (A-Z, a-z, 0-9, _)';
+  if (!getConfig('fieldKeyRegex', '').test(value)) {
+    return 'Key contains illegal characters, field name should contain only alphabets, numbers and underscores (A-Z, a-z, 0-9, ., _)';
   }
   if (value === '') {
     return 'Key is required';
