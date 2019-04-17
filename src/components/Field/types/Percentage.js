@@ -15,7 +15,7 @@ const Percentage = ({
     onChange(convertedEvent);
   }
 
-  const displayValue = isNumber(value) ? parseFloat(value) * 100 : value;
+  const displayValue = isNumber(value) ? parseFloat((parseFloat(value) * 100).toFixed(3)) : value;
 
   if (editable) {
     return (
