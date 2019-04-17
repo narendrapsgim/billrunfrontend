@@ -144,8 +144,8 @@
     "order": 7.1,
     "parent": "root"
   },
-  "taxs": {
-    "title": "Taxes",
+  "taxes": {
+    "title": "Rates",
     "icon": "",
     "route": "taxes",
     "show": true,
