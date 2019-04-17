@@ -52,14 +52,34 @@ class Settings extends Component {
     dispatch: PropTypes.func.isRequired,
   };
 
+  static settingsToFetch = [
+    'pricing',
+    'billrun',
+    'tenant',
+    'shared_secret',
+    'menu',
+    'taxation',
+    'file_types',
+    'system',
+    'plays'
+  ];
+
   state = {
     currencyOptions: [],
+    dirty: false,
     // playsBeforeSave: Immutable.List(),
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['pricing', 'billrun', 'tenant', 'shared_secret', 'menu', 'taxation', 'file_types', 'system', 'plays']));
+    this.props.dispatch(getSettings(Settings.settingsToFetch));
     this.props.dispatch(getCurrencies()).then(this.initCurrencyOptions);
+  }
+
+  componentWillUnmount() {
+    const { dirty } = this.state;
+    if (dirty) {
+      this.props.dispatch(getSettings(Settings.settingsToFetch));
+    }
   }
 
   initCurrencyOptions = (response) => {
@@ -75,6 +95,7 @@ class Settings extends Component {
   }
 
   onChangeFieldValue = (category, id, value) => {
+    this.setState(() => ({ dirty: true }));
     this.props.dispatch(updateSetting(category, id, value));
   }
 
@@ -140,6 +161,7 @@ class Settings extends Component {
       // Reload Menu
       const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
       this.props.dispatch(initMainMenu(mainMenuOverrides));
+      this.setState(() => ({ dirty: false }));
       // Update logo
       if (categoryToSave.includes('tenant') && settings.getIn(['tenant', 'logo'], '').length > 0) {
         localStorage.removeItem('logo');
