@@ -64,8 +64,9 @@ class ComputedRate extends Component {
     const additionalFields = foreignFields
       .filter(field => field.get('available_from', '') === 'rate')
       .map((filteredField) => {
-        const fieldName = filteredField.getIn(['foreign', 'entity'], '');
-        return { value: fieldName, label: `${filteredField.get('title', titleCase(fieldName))} (foreign field)` };
+        const fieldName = filteredField.get('field_name', '');
+        const label = filteredField.get('title', titleCase(fieldName));
+        return { value: fieldName, label: `${label} (foreign field)` };
       })
       .push({ value: 'type', label: 'Type' })
       .push({ value: 'usaget', label: 'Usage Type' })
