@@ -507,7 +507,7 @@ class RateMapping extends Component {
     }
     const title = 'Computed Rate Key';
     return (
-      <ModalWrapper title={title} show={true} onOk={this.onSaveComputedLineKey} onHide={this.onHideComputedLineKey} labelOk="OK">
+      <ModalWrapper title={title} show={true} onOk={this.onSaveComputedLineKey} onHide={this.onHideComputedLineKey} labelOk="OK" modalSize="large">
         <ComputedRate
           computedLineKey={computedLineKey}
           settings={settings}
