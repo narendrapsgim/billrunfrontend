@@ -62,8 +62,9 @@ class ComputedRate extends Component {
     const regexHelper = 'In case you want to run a regular expression on the computed field before calculating the rate';
     const mustMetHelper = 'This means than in case the condition is not met - a rate will not be found';
     const additionalFields = foreignFields.filter(field => field.get('available_from', '') === 'rate').map((filteredField) => {
-      const fieldName = filteredField.getIn(['foreign', 'entity'], '');
-      return { value: fieldName, label: `${titleCase(fieldName)} (foreign field)` };
+      const fieldName = filteredField.get('field_name', '');
+      const label = filteredField.get('title', titleCase(fieldName));
+      return { value: fieldName, label: `${label} (foreign field)` };
     }).toArray().concat([{ value: 'type', label: 'Type' }, { value: 'usaget', label: 'Usage Type' }, { value: 'file', label: 'File name' }]);
     const lineKeyOptions = getAvailableFields(settings, additionalFields).toJS();
     const computedTypeRegex = computedLineKey.get('type', 'regex') === 'regex';
