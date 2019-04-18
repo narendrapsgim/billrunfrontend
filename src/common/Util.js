@@ -555,7 +555,10 @@ export const convertServiceBalancePeriodToString = (item) => {
 };
 
 export const getAvailableFields = (settings, additionalFields = []) => {
-  const fields = settings.get('fields', []).map(field => (Immutable.Map({ value: field, label: field }))).sortBy(field => field.get('value', ''));
+  const fields = settings
+    .get('fields', Immutable.List())
+    .map(field => (Immutable.Map({ value: field, label: field })))
+    .sortBy(field => field.get('value', ''));
   return fields.concat(Immutable.fromJS(additionalFields));
 };
 
