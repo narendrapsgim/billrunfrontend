@@ -42,7 +42,6 @@ import {
 const defaultNewField = Map({
   field_name: '',
   title: '',
-  default_value: '',
   editable: true,
   display: true,
 });

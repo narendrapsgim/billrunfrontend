@@ -7,7 +7,7 @@ import { EntityField } from '../Entity';
 
 
 const CustomFieldForm = ({
-  item, onChange, onChangePlay, onChangeType, onChangeTitle, onChangeFieldName,
+  item, onChangeOptions, onChangePlay, onChangeType, onChangeTitle, onChangeFieldName,
   onChangeEntityField,
   disableUnique, disableMandatory, disableFieldType, disabledEditable, disabledDisplay,
   disabledShowInList, disableSearchable, disableMultiple, disableSelectList, disableSelectOptions,
@@ -86,7 +86,7 @@ const CustomFieldForm = ({
           <Col sm={8} lg={9} style={checkboxStyle}>
             <Field
               id="unique"
-              onChange={onChange}
+              onChange={onChangeOptions}
               value={item.get('unique', '')}
               fieldType="checkbox"
               disabled={disableUnique}
@@ -99,7 +99,13 @@ const CustomFieldForm = ({
         <FormGroup>
           <Col sm={3} lg={2} componentClass={ControlLabel}>Mandatory</Col>
           <Col sm={8} lg={9} style={checkboxStyle}>
-            <Field id="mandatory" onChange={onChange} value={item.get('mandatory', '')} fieldType="checkbox" disabled={disableMandatory} className="inline mr10" />
+            <Field
+              id="mandatory"
+              onChange={onChangeOptions}
+              value={item.get('mandatory', '')}
+              fieldType="checkbox" disabled={disableMandatory}
+              className="inline mr10"
+            />
             { disableMandatory && item.get('unique', false) && (
               <small style={helpTextStyle}>Unique field must be mandatory</small>
             )}
@@ -113,7 +119,7 @@ const CustomFieldForm = ({
             <Field
               fieldType="checkbox"
               id="editable"
-              onChange={onChange}
+              onChange={onChangeOptions}
               value={item.get('editable', '')}
               disabled={disabledEditable}
               className="inline mr10"
@@ -128,7 +134,7 @@ const CustomFieldForm = ({
             <Field
               fieldType="checkbox"
               id="display"
-              onChange={onChange}
+              onChange={onChangeOptions}
               value={item.get('display', '')}
               disabled={disabledDisplay}
               className="inline mr10"
@@ -143,7 +149,7 @@ const CustomFieldForm = ({
             <Field
               fieldType="checkbox"
               id="show_in_list"
-              onChange={onChange}
+              onChange={onChangeOptions}
               value={item.get('show_in_list', '')}
               disabled={disabledShowInList}
               className="inline mr10"
@@ -159,7 +165,7 @@ const CustomFieldForm = ({
               fieldType="checkbox"
               id="searchable"
               className="inline mr10"
-              onChange={onChange}
+              onChange={onChangeOptions}
               value={item.get('searchable', '')}
               disabled={disableSearchable}
             />
@@ -172,7 +178,7 @@ const CustomFieldForm = ({
           <Col sm={8} lg={9} style={checkboxStyle}>
             <Field
               id="multiple"
-              onChange={onChange}
+              onChange={onChangeOptions}
               value={item.get('multiple', '')}
               fieldType="checkbox"
               disabled={disableMultiple}
@@ -189,7 +195,7 @@ const CustomFieldForm = ({
               <InputGroup.Addon>
                 <Field
                   id="select_list"
-                  onChange={onChange}
+                  onChange={onChangeOptions}
                   value={item.get('select_list', '')}
                   fieldType="checkbox"
                   disabled={disableSelectList}
@@ -197,7 +203,7 @@ const CustomFieldForm = ({
               </InputGroup.Addon>
               <Field
                 id="select_options"
-                onChange={onChange}
+                onChange={onChangeOptions}
                 value={item.get('select_options', '')}
                 disabled={disableSelectOptions}
               />
@@ -265,7 +271,7 @@ CustomFieldForm.propTypes = {
   checkboxStyle: PropTypes.object,
   helpTextStyle: PropTypes.object,
 
-  onChange: PropTypes.func.isRequired,
+  onChangeOptions: PropTypes.func.isRequired,
   onChangePlay: PropTypes.func.isRequired,
   onChangeType: PropTypes.func.isRequired,
   onChangeTitle: PropTypes.func.isRequired,

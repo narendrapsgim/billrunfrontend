@@ -30,23 +30,29 @@
   "fields": [
     {
       "id": "text",
+      "type": "string",
       "title": "Text"
     }, {
       "id": "boolean",
       "title": "Boolean",
-      "exclude": ["unique", "mandatory", "searchable", "multiple", "selectOptions"]
+      "type": "boolean",
+      "defaultValue": false,
+      "exclude": ["unique", "mandatory", "searchable", "multiple", "select_options", "select_list"]
     }, {
       "id": "textarea",
+      "type": "string",
       "title": "Text Area",
-      "exclude": ["multiple", "selectOptions"]
+      "exclude": ["multiple", "select_options", "select_list"]
     }, {
       "id": "percentage",
+      "type": "number",
       "title": "Percentage",
-      "exclude": ["multiple", "selectOptions"]
+      "exclude": ["multiple", "select_options", "select_list"]
     }, {
       "id": "ranges",
+      "type": "array",
       "title": "Range",
-      "exclude": ["selectOptions"],
+      "exclude": ["select_options", "select_list"],
       "includeEntity": ["subscription"]
     }
   ],

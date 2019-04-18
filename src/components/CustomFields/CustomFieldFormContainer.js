@@ -56,14 +56,14 @@ const mapStateToProps = (state, props) => {
     disableFieldType: inConfigOptionBlackList(fieldTypeConfig, 'type') || !isEditableFiledProperty(item, editable, 'type'),
     disabledEditable: inConfigOptionBlackList(fieldTypeConfig, 'editable') || !isEditableFiledProperty(item, editable, 'editable'),
     disabledDisplay: inConfigOptionBlackList(fieldTypeConfig, 'display') || !isEditableFiledProperty(item, editable, 'display'),
-    disabledShowInList: inConfigOptionBlackList(fieldTypeConfig, 'showInList') || !isEditableFiledProperty(item, editable, 'show_in_list'),
+    disabledShowInList: inConfigOptionBlackList(fieldTypeConfig, 'show_in_list') || !isEditableFiledProperty(item, editable, 'show_in_list'),
     disableSearchable: inConfigOptionBlackList(fieldTypeConfig, 'searchable') || !isEditableFiledProperty(item, editable, 'searchable'),
     disableMultiple: inConfigOptionBlackList(fieldTypeConfig, 'multiple') || !isEditableFiledProperty(item, editable, 'multiple'),
-    disableSelectList: inConfigOptionBlackList(fieldTypeConfig, 'selectOptions') || !isEditableFiledProperty(item, editable, 'select_list'),
+    disableSelectList: inConfigOptionBlackList(fieldTypeConfig, 'select_options') || !isEditableFiledProperty(item, editable, 'select_list'),
     disableSelectOptions: !item.get('select_list', false) || !isEditableFiledProperty(item, editable, 'select_options'),
     disableHelp: inConfigOptionBlackList(fieldTypeConfig, 'help') || !isEditableFiledProperty(item, editable, 'help'),
     disableDescription: inConfigOptionBlackList(fieldTypeConfig, 'description') || !isEditableFiledProperty(item, editable, 'description'),
-    disableDefaultValue: inConfigOptionBlackList(fieldTypeConfig, 'defaultValue') || !isEditableFiledProperty(item, editable, 'default_value'),
+    disableDefaultValue: inConfigOptionBlackList(fieldTypeConfig, 'default_value') || !isEditableFiledProperty(item, editable, 'default_value'),
     isErrorTitle: (props.errors) && props.errors.get('title', false),
     isErrorFieldName: (props.errors) && props.errors.get('fieldName', false),
   });
@@ -94,21 +94,48 @@ const mapDispatchToProps = (dispatch, {
   },
 
   onChangeEntityField: (path, value) => {
-    updateField(path, value);
+    // if change default value, remove property in defaultvalue removed
+    if (['description', 'help'].includes(path[0]) && value === '') {
+      removeField(path);
+    } else if (path[0] === 'default_value') {
+      if (item.get('type', 'text') === 'ranges' && value.isEmpty()) {
+        removeField('default_value');
+      } else if (value === '') {
+        removeField('default_value');
+      } else {
+        updateField(path, value);
+      }
+    } else {
+      updateField(path, value);
+    }
   },
 
-  onChange: (e) => {
+  onChangeOptions: (e) => {
     const { id, value } = e.target;
-    updateField(id, value);
-    if (id === 'unique' && value === true) {
-      updateField('mandatory', true);
-      removeField('default_value');
-    }
-    if (id === 'select_list' && value === false) {
-      removeField('select_options', '');
-    }
-    if (id === 'select_list' && value === true) {
-      updateField('select_options', item.get('select_options', ''));
+    if (id === 'unique') {
+      if (value === true) {
+        updateField('unique', true);
+        updateField('mandatory', true);
+        removeField('default_value');
+      } else {
+        removeField('unique');
+      }
+    } else if (id === 'select_list') {
+      if (value === true) {
+        updateField('select_list', true);
+        updateField('select_options', item.get('select_options', ''));
+      } else {
+        removeField('select_list');
+        removeField('select_options');
+      }
+    } else if (id === 'select_options') {
+        updateField('select_options', value);
+    } else {
+      if (value === true) {
+        updateField(id, true);
+      } else {
+        removeField(id);
+      }
     }
   },
 
@@ -116,41 +143,32 @@ const mapDispatchToProps = (dispatch, {
     updateField('plays', List(plays.split(',')));
   },
 
-  onChangeType: (value) => {
-    if (value === 'text') {
+  onChangeType: (type) => {
+    const oldFieldType = item.get('type', 'text');
+    const fieldTypeConfig = getConfig(['customFields', 'fields'], List())
+      .find(config => config.get('id', '') === type, null, Map());
+    const oldFieldTypeConfig = getConfig(['customFields', 'fields'], List())
+      .find(config => config.get('id', '') === oldFieldType, null, Map());
+    // update type
+    if (type === 'text') {
       removeField('type');
     } else {
-      updateField('type', value);
+      updateField('type', type);
     }
-
-    const oldFieldType = item.get('type', 'text');
-    const properties = Map({
-      unique: ['unique'],
-      mandatory: ['mandatory'],
-      editable: ['editable'],
-      display: ['display'],
-      showInList: ['show_in_list'],
-      searchable: ['searchable'],
-      multiple: ['multiple'],
-      selectOptions: ['select_options', 'select_list'],
-    });
-
-    const textable = ['text', 'textarea', ''];
-    const fieldTypeConfig = getConfig(['customFields', 'fields'], List())
-      .find(config => config.get('id', '') === value, null, Map());
-
-    properties.forEach((fields, property) => {
-      if (inConfigOptionBlackList(fieldTypeConfig, property)) {
-        fields.forEach((fieldName) => {
-          const resetValue = (fieldName === 'select_options') ? '' : false;
-          updateField(fieldName, resetValue);
-        });
+    // reset default value
+    if (fieldTypeConfig.get('type', '') !== oldFieldTypeConfig.get('type', '')) {
+      if (fieldTypeConfig.has('defaultValue')) {
+        updateField('default_value', fieldTypeConfig.get('defaultValue'));
+      } else {
+        removeField('default_value');
       }
-    });
-    const stillTextable = textable.includes(oldFieldType) && textable.includes(value);
-    if (!stillTextable) {
-      removeField('default_value');
     }
+    // reset properties by type
+    item.forEach((value, property) => {
+      if (inConfigOptionBlackList(fieldTypeConfig, property)) {
+        removeField(property);
+      }
+    })
   },
 });
 
