@@ -17,6 +17,8 @@ import System from './System';
 import { ActionButtons } from '@/components/Elements';
 import { getSettings, updateSetting, saveSettings, fetchFile, getCurrencies } from '@/actions/settingsActions';
 import { prossessMenuTree, combineMenuOverrides, initMainMenu } from '@/actions/guiStateActions/menuActions';
+import { getList, clearList } from '@/actions/listActions';
+import { getEntitesQuery } from '@/common/ApiQueries';
 import { tabSelector } from '@/selectors/entitySelector';
 import {
   inputProssesorCsiOptionsSelector,
@@ -52,34 +54,35 @@ class Settings extends Component {
     dispatch: PropTypes.func.isRequired,
   };
 
-  static settingsToFetch = [
-    'pricing',
-    'billrun',
-    'tenant',
-    'shared_secret',
-    'menu',
-    'taxation',
-    'file_types',
-    'system',
-    'plays'
-  ];
-
   state = {
     currencyOptions: [],
-    dirty: false,
+    changeCategories: Immutable.Set(),
     // playsBeforeSave: Immutable.List(),
   };
 
   componentWillMount() {
-    this.props.dispatch(getSettings(Settings.settingsToFetch));
+    const settingsToFetch = [
+      'pricing',
+      'billrun',
+      'tenant',
+      'shared_secret',
+      'menu',
+      'taxation',
+      'file_types',
+      'system',
+      'plays'
+    ];
+    this.props.dispatch(getSettings(settingsToFetch));
     this.props.dispatch(getCurrencies()).then(this.initCurrencyOptions);
+    this.props.dispatch(getList('available_taxRates', getEntitesQuery('taxes', { key: 1, description: 1 })));
   }
 
   componentWillUnmount() {
-    const { dirty } = this.state;
-    if (dirty) {
-      this.props.dispatch(getSettings(Settings.settingsToFetch));
+    const { changeCategories } = this.state;
+    if (!changeCategories.isEmpty()) {
+      this.props.dispatch(getSettings(changeCategories.toArray()));
     }
+    this.props.dispatch(clearList('available_taxRates'));
   }
 
   initCurrencyOptions = (response) => {
@@ -95,7 +98,7 @@ class Settings extends Component {
   }
 
   onChangeFieldValue = (category, id, value) => {
-    this.setState(() => ({ dirty: true }));
+    this.setState((prevState) => ({ changeCategories: prevState.changeCategories.add(category) }));
     this.props.dispatch(updateSetting(category, id, value));
   }
 
@@ -117,37 +120,9 @@ class Settings extends Component {
   }
 
   onSave = () => {
-    const { settings } = this.props;
-    const categoryToSave = [];
-    // save 'BillRun'
-    if (settings.has('billrun')) {
-      categoryToSave.push('billrun');
-    }
-    // save 'pricing'
-    if (settings.has('pricing')) {
-      categoryToSave.push('pricing');
-    }
-    // save 'tenant'
-    if (settings.has('tenant')) {
-      categoryToSave.push('tenant');
-    }
-    // save 'Menu'
-    if (settings.has('menu')) {
-      categoryToSave.push('menu');
-    }
-    if (settings.has('taxation')) {
-      categoryToSave.push('taxation');
-    }
-    if (settings.has('usage_types')) {
-      categoryToSave.push('usage_types');
-    }
-    if (settings.has('entity_config')) {
-      categoryToSave.push('usage_types');
-    }
-    if (settings.has('system')) {
-      categoryToSave.push('system');
-    }
-    if (categoryToSave.length) {
+    const { changeCategories } = this.state;
+    if (!changeCategories.isEmpty()) {
+      const categoryToSave = changeCategories.toArray();
       this.props.dispatch(saveSettings(categoryToSave))
         .then((response) => {
           this.afterSave(response, categoryToSave);
@@ -161,7 +136,7 @@ class Settings extends Component {
       // Reload Menu
       const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
       this.props.dispatch(initMainMenu(mainMenuOverrides));
-      this.setState(() => ({ dirty: false }));
+      this.setState(() => ({ changeCategories: Immutable.Set() }));
       // Update logo
       if (categoryToSave.includes('tenant') && settings.getIn(['tenant', 'logo'], '').length > 0) {
         localStorage.removeItem('logo');
@@ -180,7 +155,7 @@ class Settings extends Component {
   }
 
   render() {
-    const { settings, activeTab, csiOptions, taxation, system, plays } = this.props;
+    const { settings, activeTab, csiOptions, rasRatesOptions, taxation, system, plays } = this.props;
     const { currencyOptions } = this.state;
 
     const currency = settings.getIn(['pricing', 'currency'], '');
@@ -213,7 +188,12 @@ class Settings extends Component {
 
           <Tab title="Tax" eventKey={3}>
             <Panel style={{ borderTop: 'none' }}>
-              <Tax data={taxation} csiOptions={csiOptions} onChange={this.onChangeFieldValue} />
+              <Tax
+                data={taxation}
+                csiOptions={csiOptions}
+                taxRateOptions={rasRatesOptions}
+                onChange={this.onChangeFieldValue}
+              />
             </Panel>
           </Tab>
 
@@ -241,7 +221,7 @@ class Settings extends Component {
 
           <Tab title="Plays" eventKey={7}>
             <Panel style={{ borderTop: 'none' }}>
-              <Plays onChange={this.onChangeFieldValue} data={plays} />
+              <Plays data={plays} />
             </Panel>
           </Tab>
 
@@ -262,7 +242,7 @@ class Settings extends Component {
         <ActionButtons
           onClickSave={this.onSave}
           hideCancel={true}
-          hideSave={[5, 7].includes(activeTab)}
+          hideSave={[5, 7, 8].includes(activeTab)}
         />
 
       </div>
@@ -277,5 +257,6 @@ const mapStateToProps = (state, props) => ({
   taxation: taxationSelector(state, props),
   system: systemSettingsSelector(state, props),
   plays: playsSettingsSelector(state, props),
+  rasRatesOptions: state.list.get('available_taxRates'),
 });
 export default withRouter(connect(mapStateToProps)(Settings));
