@@ -1,6 +1,7 @@
 node_modules/*
 dist/*
 backup/*
+build/*
 public/build/*
 public/vendors/
 public/app.js
@@ -17,3 +18,4 @@ public/favicon.ico
 completions.json
 npm-debug.log.*
 npm-debug.log
+yarn-error.log
