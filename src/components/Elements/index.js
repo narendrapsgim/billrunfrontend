@@ -16,6 +16,7 @@ import ProgressIndicator from './ProgressIndicator';
 import PlanSearch from './PlanSearch';
 import TabsWrapper from './TabsWrapper';
 import Stepper from './Stepper';
+import PriorityMapping from './PriorityMapping';
 
 export {
   WithEntityLink,
@@ -36,4 +37,5 @@ export {
   PlanSearch,
   TabsWrapper,
   Stepper,
+  PriorityMapping,
 };

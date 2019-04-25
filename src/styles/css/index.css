@@ -78,6 +78,8 @@ fieldset[disabled] .btn {
 .ml5{ margin-left: 5px!important; }
 
 .full-width{ width: 100%!important; }
+
+.not-top-border { border-top: none!important; }
 /* ~Props */
 
 /* General colors */
