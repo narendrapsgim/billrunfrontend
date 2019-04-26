@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Map, List } from 'immutable';
+import { Map } from 'immutable';
 import { FormGroup, Col, Row, InputGroup } from 'react-bootstrap';
 import Field from '@/components/Field';
 import Help from '../../Help';
@@ -9,7 +9,7 @@ import { getConfig } from '@/common/Util';
 
 
 const PriorityCondition = ({
-  condition, index, type, updateCondition, removeCondition, count,
+  condition, index, type, onUpdate, onRemove, count,
   lineKeyOptions, paramsKeyOptions, paramsTypeOptions,
   onEditComputedLineKey,
 }) => {
@@ -21,23 +21,23 @@ const PriorityCondition = ({
   }
   const onSetRating = (e) => {
     const { value } = e.target;
-    updateCondition([index, 'rate_key'], value);
+    onUpdate([index, 'rate_key'], value);
   }
 
   const onChangeLineKey = (value) => {
-    updateCondition([index, 'line_key'], value);
+    onUpdate([index, 'line_key'], value);
   }
 
   const onChangeParamKey = (value) => {
-    updateCondition([index, 'rate_key'], value);
+    onUpdate([index, 'rate_key'], value);
   }
 
   const onChangeParamType = (value) => {
-    updateCondition([index, 'type'], value);
+    onUpdate([index, 'type'], value);
   }
 
   const conditionActions = [
-    { type: 'remove', onClick: removeCondition, show: count > 1 },
+    { type: 'remove', onClick: onRemove, show: count > 1 },
   ];
 
   const computedLineActions = [
@@ -50,7 +50,7 @@ const PriorityCondition = ({
         <FormGroup style={{ margin: 0 }}>
           <Field
             fieldType="select"
-            options={lineKeyOptions.toJS()}
+            options={lineKeyOptions}
             onChange={onChangeLineKey}
             value={condition.get('line_key', '')}
             clearable={false}
@@ -136,13 +136,13 @@ PriorityCondition.defaultProps = {
   condition: Map(),
   index: 0,
   count: 0,
-  lineKeyOptions: List(),
-  paramsKeyOptions: List(),
-  paramsTypeOptions: List([
+  lineKeyOptions: [],
+  paramsKeyOptions: [],
+  paramsTypeOptions: [
     { value: 'match', label: 'Equals' },
     { value: 'equalFalse', label: 'Does Not Equal' },
     { value: 'longestPrefix', label: 'Longest Prefix' },
-  ]),
+  ],
 };
 
 PriorityCondition.propTypes = {
@@ -150,11 +150,26 @@ PriorityCondition.propTypes = {
   type: PropTypes.string.isRequired,
   index: PropTypes.number,
   count: PropTypes.number,
-  lineKeyOptions: PropTypes.instanceOf(List),
-  paramsKeyOptions: PropTypes.instanceOf(List),
-  paramsTypeOptions: PropTypes.instanceOf(List),
-  updateCondition: PropTypes.func.isRequired,
-  removeCondition: PropTypes.func.isRequired,
+  lineKeyOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
+    }),
+  ),
+  paramsKeyOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
+    }),
+  ),
+  paramsTypeOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
+    }),
+  ),
+  onUpdate: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
 };
 
 export default PriorityCondition;

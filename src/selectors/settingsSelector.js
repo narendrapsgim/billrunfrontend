@@ -614,35 +614,38 @@ export const taxParamsKeyOptionsSelector = createSelector(
   (fields = Immutable.List()) => fields
     .filter(field => (field.get('field_name', '').startsWith('params.')))
     .map((field) => parseFieldSelectOptions(field))
+    .toArray()
 );
 
 export const taxlineKeyOptionsSelector = createSelector(
   accountFieldsSelector,
   subscriberFieldsSelector,
   productFieldsSelector,
-  (accountFields, subscriberFields, productFields) => Immutable.List()
-    .withMutations((outputFields) => {
-      // Add entities fields
-      const entitiesFields = {
-        customer: accountFields,
-        subscription: subscriberFields,
-        product: productFields,
-      };
-      Object.entries(entitiesFields).forEach(([entity, entityFields] ) => {
-        if (entityFields && Immutable.List.isList(entityFields)) {
-          const suffix = titleCase(getConfig(['systemItems', entity, 'itemName'], entity))
-          entityFields.forEach((field) => {
-            // remove duplicate fields (check in need to set option key by entity type)
-            if (-1 === outputFields.findIndex(entityField => entityField.value === field.get('field_name', ''))) {
-              outputFields.push(parseFieldSelectOptions(field, `(${suffix})`));
-            }
-          });
-        }
-      });
-      // add fixed fields
-      outputFields.push({ value: 'type', label: 'Type' });
-      outputFields.push({ value: 'usaget', label: 'Usage Type' });
-      outputFields.push({ value: 'file', label: 'File name' });
-      // outputFields.push({ value: 'computed', label: 'Computed' });
-    })
+  (accountFields, subscriberFields, productFields) => {
+    //fixed fields
+    let outputFields = [
+      { value: 'type', label: 'Type' },
+      { value: 'usaget', label: 'Usage Type' },
+      { value: 'file', label: 'File name' },
+      // { value: 'computed', label: 'Computed' },
+    ];
+    // Add entities fields
+    const entitiesFields = {
+      customer: accountFields,
+      subscription: subscriberFields,
+      product: productFields,
+    };
+    Object.entries(entitiesFields).forEach(([entity, entityFields] ) => {
+      if (entityFields && Immutable.List.isList(entityFields)) {
+        const suffix = titleCase(getConfig(['systemItems', entity, 'itemName'], entity))
+        entityFields.forEach((field) => {
+          // remove duplicate fields (check in need to set option key by entity type)
+          if (-1 === outputFields.findIndex(entityField => entityField.value === field.get('field_name', ''))) {
+            outputFields.push(parseFieldSelectOptions(field, `(${suffix})`));
+          }
+        });
+      }
+    });
+    return outputFields;
+  }
 );

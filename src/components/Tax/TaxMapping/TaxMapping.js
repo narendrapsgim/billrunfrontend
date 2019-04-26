@@ -4,7 +4,11 @@ import { connect } from 'react-redux';
 import { titleCase } from 'change-case';
 import { Map, List } from 'immutable';
 import { Tab } from 'react-bootstrap';
-import { PriorityMapping, TabsWrapper } from '@/components/Elements';
+import {
+  PriorityMapping,
+  TabsWrapper,
+  ActionButtons,
+} from '@/components/Elements';
 import {
   taxMappingSelector,
   taxlineKeyOptionsSelector,
@@ -14,6 +18,7 @@ import {
   getSettings,
   updateSetting,
   pushToSetting,
+  saveSettings,
   removeSettingField,
 } from '@/actions/settingsActions';
 import { setPageTitle } from '@/actions/guiStateActions/pageActions';
@@ -24,20 +29,26 @@ class TaxMapping extends Component {
   static propTypes = {
     type: PropTypes.string,
     taxMapping: PropTypes.instanceOf(Map),
-    lineKeyOptions: PropTypes.instanceOf(List),
+    lineKeyOptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        value: PropTypes.string,
+        label: PropTypes.string,
+      }),
+    ),
     location: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
     type: 'tax',
     taxMapping: Map(),
-    lineKeyOptions: List(),
+    lineKeyOptions: [],
   };
 
   static pageTitle = 'Tax Mapping';
 
   state = {
     dirty: false,
+    progress: false,
   };
 
   componentDidMount() {
@@ -75,15 +86,52 @@ class TaxMapping extends Component {
     }
   }
 
+  afterSave = (response) => {
+    if (response === true || [1,2].includes(response.status)) {
+      this.setState(() => ({ progress: false, dirty: false }));
+    } else {
+      this.setState(() => ({ progress: false }));
+    }
+  }
+
+  onSave = () => {
+    const { dirty } = this.state;
+    if (dirty) {
+      this.setState(() => ({ progress: true}));
+      this.props.dispatch(saveSettings('tax'))
+        .then(this.afterSave);
+    }
+  }
+
+  onCancel = () => {
+    const { dirty } = this.state;
+    if (dirty) {
+      this.setState(() => ({ progress: true, dirty: false }));
+      this.props.dispatch(getSettings('tax'))
+        .then(this.afterSave);
+    }
+  }
+
   onUpdate = (path, value) => {
     this.setState(() => ({ dirty: true }));
-    console.log("updatePriority:", path, value);
     this.props.dispatch(updateSetting('tax', ['mapping', ...path], value));
   }
+
   onAdd = (path, value) => {
     this.setState(() => ({ dirty: true }));
     this.props.dispatch(pushToSetting('tax', value, ['mapping', ...path]));
   }
+
+  onAddCondition = (path) => {
+    this.onAdd(path, Map({rate_key: 'key'}));
+  }
+
+  onAddPriority = (path) => {
+    this.onAdd(path, List());
+    // Add first condition to new Priority
+    this.onAddCondition([...path, 0]);
+  }
+
   onRemove = (path) => {
     this.setState(() => ({ dirty: true }));
     this.props.dispatch(removeSettingField('tax', ['mapping', ...path]));
@@ -98,17 +146,16 @@ class TaxMapping extends Component {
         priorities={priorities}
         lineKeyOptions={lineKeyOptions}
         paramsKeyOptions={taxParamsKeyOptions}
-        onAdd={this.onAdd}
+        onAddCondition={this.onAddCondition}
+        onAddPriority={this.onAddPriority}
         onRemove={this.onRemove}
         onUpdate={this.onUpdate}
       />
     );
   }
 
-
-
-  render() {
-    const { taxMapping, type, location } = this.props;
+  renderTabs = () => {
+    const { taxMapping, location } = this.props;
     if (taxMapping.size < 1) {
       return (
         <p>No Tax mapping categories</p>
@@ -130,6 +177,25 @@ class TaxMapping extends Component {
         }
       </TabsWrapper>
     )
+  }
+
+  render() {
+    const { dirty, progress } = this.state;
+    const tabs = this.renderTabs();
+    return (
+      <>
+        {tabs}
+        <hr />
+        <ActionButtons
+          onClickCancel={this.onCancel}
+          disableCancel={!dirty}
+          onClickSave={this.onSave}
+          disableSave={!dirty}
+          progress={progress}
+          disabled={!dirty}
+        />
+      </>
+    );
   }
 }
 

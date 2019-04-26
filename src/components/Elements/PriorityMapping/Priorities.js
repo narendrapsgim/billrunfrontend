@@ -6,7 +6,7 @@ import Priority from './Priority';
 
 
 const Priorities = ({
-  type, category, priorities, lineKeyOptions, paramsKeyOptions, onUpdate, onAdd, onRemove,
+  type, category, priorities, lineKeyOptions, paramsKeyOptions, onAddCondition, onAddPriority, onUpdate, onRemove,
 }) => (
   <div>
     { priorities.map((priority, index) => (
@@ -19,20 +19,25 @@ const Priorities = ({
         count={priorities.size}
         lineKeyOptions={lineKeyOptions}
         paramsKeyOptions={paramsKeyOptions}
-        onAdd={onAdd}
+        onAddCondition={onAddCondition}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />
     ))}
-    <CreateButton label="Add Next Priority" onClick={() => onAdd([category], List())} buttonStyle={{}} />
+    <CreateButton
+      label="Add Next Priority"
+      onClick={onAddPriority}
+      data={[category]}
+      buttonStyle={{}}
+    />
   </div>
 );
 
 
 Priorities.defaultProps = {
   priorities: List(),
-  lineKeyOptions: List(),
-  paramsKeyOptions: List(),
+  lineKeyOptions: [],
+  paramsKeyOptions: [],
 };
 
 
@@ -40,8 +45,20 @@ Priorities.propTypes = {
   type: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
   priorities: PropTypes.instanceOf(List),
-  lineKeyOptions: PropTypes.instanceOf(List),
-  paramsKeyOptions: PropTypes.instanceOf(List),
+  lineKeyOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
+    }),
+  ),
+  paramsKeyOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
+    }),
+  ),
+  onAddCondition: PropTypes.func.isRequired,
+  onAddPriority: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
 };
