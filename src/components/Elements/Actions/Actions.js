@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Action from './Action';
@@ -35,4 +35,4 @@ Actions.propTypes = {
   data: PropTypes.any,
 };
 
-export default Actions;
+export default memo(Actions);

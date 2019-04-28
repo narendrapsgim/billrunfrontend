@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 
@@ -45,4 +45,4 @@ CreateButton.propTypes = {
   onClick: PropTypes.func,
 };
 
-export default CreateButton;
+export default memo(CreateButton);
