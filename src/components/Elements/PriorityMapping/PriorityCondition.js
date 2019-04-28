@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types';
 import { Map } from 'immutable';
 import { FormGroup, Col, Row, InputGroup } from 'react-bootstrap';
@@ -7,47 +7,53 @@ import Help from '../../Help';
 import { Actions } from '@/components/Elements';
 import { getConfig } from '@/common/Util';
 
+const radioGroupStyle = { margin: 0, paddingLeft: 13 };
+const radioStyle = { paddingTop: 10, paddingLeft: 13};
 
 const PriorityCondition = ({
-  condition, index, type, onUpdate, onRemove, count,
+  condition, index, priorityIndex, type, onUpdate, onRemove, count,
   lineKeyOptions, paramsKeyOptions, paramsTypeOptions,
   onEditComputedLineKey,
 }) => {
-  let selectedRadio = 'byParam';
-  if (condition.get('rate_key', '') === 'key') {
-    selectedRadio = 'byKey';
-  } else if (condition.get('rate_key', '') === 'usaget') {
-    selectedRadio = 'byUsaget';
-  }
-  const onSetRating = (e) => {
+
+  const selectedRadio = useMemo(() => {
+    if (condition.get('rate_key', '') === 'key') {
+      return 'byKey';
+    } else if (condition.get('rate_key', '') === 'usaget') {
+      return 'byUsaget';
+    }
+    return 'byParam';
+  }, [condition]);
+
+  const onSetRating = useCallback((e) => {
     const { value } = e.target;
     onUpdate([index, 'rate_key'], value);
-  }
+  }, [onUpdate, index]);
 
-  const onChangeLineKey = (value) => {
+  const onChangeLineKey = useCallback((value) => {
     onUpdate([index, 'line_key'], value);
-  }
+  }, [onUpdate, index]);
 
-  const onChangeParamKey = (value) => {
+  const onChangeParamKey = useCallback((value) => {
     onUpdate([index, 'rate_key'], value);
-  }
+  }, [onUpdate, index]);
 
-  const onChangeParamType = (value) => {
+  const onChangeParamType = useCallback((value) => {
     onUpdate([index, 'type'], value);
-  }
+  }, [onUpdate, index]);
 
-  const conditionActions = [
-    { type: 'remove', onClick: onRemove, show: count > 1 },
-  ];
+  const conditionActions = useMemo(() => [
+    { type: 'remove', onClick: onRemove, show: count > 1, helpText: `Remove Condition ${index + 1} of Priority ${priorityIndex +1 }` },
+  ], [onRemove, count, priorityIndex, index]);
 
-  const computedLineActions = [
+  const computedLineActions = useMemo(() => [
     { type: 'edit', onClick: onEditComputedLineKey},
-  ];
+  ], [onEditComputedLineKey]);
 
   return (
     <Row>
-      <Col sm={4} style={{ paddingRight: 0 }}>
-        <FormGroup style={{ margin: 0 }}>
+      <Col sm={4} className="pr0">
+        <FormGroup className="mt0 mr0 mb0 ml0">
           <Field
             fieldType="select"
             options={lineKeyOptions}
@@ -72,14 +78,14 @@ const PriorityCondition = ({
         </FormGroup>
       </Col>
 
-      <Col sm={7} style={{ paddingRight: 0 }}>
-        <FormGroup style={{ margin: 0, paddingLeft: 13 }}>
+      <Col sm={7} className="pr0">
+        <FormGroup style={radioGroupStyle}>
           <Field
             fieldType="radio"
             checked={selectedRadio === 'byKey'}
             value="key"
             onChange={onSetRating}
-            labelStyle={{ paddingTop: 10, paddingLeft: 13}}
+            labelStyle={radioStyle}
             label={`By ${type} key`}
           />
           <Field
@@ -88,7 +94,7 @@ const PriorityCondition = ({
             value="usaget"
             onChange={onSetRating}
             label={`By ${type} unit type`}
-            labelStyle={{ paddingTop: 10, paddingLeft: 13}}
+            labelStyle={radioStyle}
           />
           <InputGroup>
             <InputGroup.Addon>
@@ -135,6 +141,7 @@ const PriorityCondition = ({
 PriorityCondition.defaultProps = {
   condition: Map(),
   index: 0,
+  priorityIndex: 0,
   count: 0,
   lineKeyOptions: [],
   paramsKeyOptions: [],
@@ -149,6 +156,7 @@ PriorityCondition.propTypes = {
   condition: PropTypes.instanceOf(Map),
   type: PropTypes.string.isRequired,
   index: PropTypes.number,
+  priorityIndex: PropTypes.number,
   count: PropTypes.number,
   lineKeyOptions: PropTypes.arrayOf(
     PropTypes.shape({
@@ -172,4 +180,4 @@ PriorityCondition.propTypes = {
   onRemove: PropTypes.func.isRequired,
 };
 
-export default PriorityCondition;
+export default memo(PriorityCondition);

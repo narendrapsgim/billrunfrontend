@@ -1,37 +1,48 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { List } from 'immutable';
 import { CreateButton } from '@/components/Elements';
 import Priority from './Priority';
 
+const createBtnStyle = {};
 
 const Priorities = ({
-  type, category, priorities, lineKeyOptions, paramsKeyOptions, onAddCondition, onAddPriority, onUpdate, onRemove,
-}) => (
-  <div>
-    { priorities.map((priority, index) => (
-      <Priority
-        key={index}
-        index={index}
-        category={category}
-        type={type}
-        priority={priority}
-        count={priorities.size}
-        lineKeyOptions={lineKeyOptions}
-        paramsKeyOptions={paramsKeyOptions}
-        onAddCondition={onAddCondition}
-        onUpdate={onUpdate}
-        onRemove={onRemove}
+  type,
+  category,
+  priorities,
+  lineKeyOptions,
+  paramsKeyOptions,
+  onAddCondition,
+  onAddPriority,
+  onUpdate,
+  onRemove,
+}) => {
+  const onCreate = useCallback(() => onAddPriority([category]), [onAddPriority, category]);
+  return (
+    <div>
+      { priorities.map((priority, index) => (
+        <Priority
+          key={index}
+          index={index}
+          category={category}
+          type={type}
+          priority={priority}
+          count={priorities.size}
+          lineKeyOptions={lineKeyOptions}
+          paramsKeyOptions={paramsKeyOptions}
+          onAddCondition={onAddCondition}
+          onUpdate={onUpdate}
+          onRemove={onRemove}
+        />
+      ))}
+      <CreateButton
+        label="Add Next Priority"
+        onClick={onCreate}
+        buttonStyle={createBtnStyle}
       />
-    ))}
-    <CreateButton
-      label="Add Next Priority"
-      onClick={onAddPriority}
-      data={[category]}
-      buttonStyle={{}}
-    />
-  </div>
-);
+    </div>
+  );
+}
 
 
 Priorities.defaultProps = {

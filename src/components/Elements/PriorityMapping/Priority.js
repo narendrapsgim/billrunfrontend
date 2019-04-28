@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import { Panel } from 'react-bootstrap';
 import PriorityCondition from './PriorityCondition';
 import { CreateButton, Actions } from '@/components/Elements';
+
+const actionsStyle = { marginTop: -5 };
+const createBtnStyle = {};
 
 const Priority = ({
   priority,
@@ -17,26 +20,22 @@ const Priority = ({
   onRemove,
   onAddCondition,
 }) => {
-
-  const updateCondition = (path, value) => {
+  const updateCondition = useCallback((path, value) => {
     onUpdate([category, index, ...path], value)
-  }
-
-  const removeCondition = (idx) => {
+  }, [onUpdate, category, index])
+  const removeCondition = useCallback((idx) => {
     onRemove([category, index, idx]);
-  }
-
-  const actions = [
-    { type: 'remove', onClick: onRemove, show: count > 1 },
-  ];
-
-  const isLast = index + 1 === count;
-
+  }, [onRemove, category, index])
+  const actions = useMemo(() => [
+    { type: 'remove', onClick: onRemove, show: count > 1, helpText: `Remove Priority ${index + 1}` },
+  ], [onRemove, count, index]);
+  const actionsData = useMemo(() => [category, index], [category, index]);
+  const isLast = useMemo(() => index + 1 === count, [index, count]);
   const header = (
     <div>
       {`Priority ${index + 1}`}
-      <div className="pull-right" style={{ marginTop: -5 }}>
-        <Actions actions={actions} data={[category, index]} />
+      <div className="pull-right" style={actionsStyle}>
+        <Actions actions={actions} data={actionsData} />
       </div>
     </div>
   );
@@ -46,6 +45,7 @@ const Priority = ({
         <PriorityCondition
           key={idx}
           index={idx}
+          priorityIndex={index}
           count={priority.size}
           type={type}
           lineKeyOptions={lineKeyOptions}
@@ -55,7 +55,7 @@ const Priority = ({
           onRemove={removeCondition}
         />
       )) }
-      <CreateButton onClick={onAddCondition} label="Add" data={[category, index]} buttonStyle={{}} />
+      <CreateButton onClick={onAddCondition} label="Add" data={actionsData} buttonStyle={createBtnStyle} />
     </Panel>
   )
 }
@@ -91,4 +91,4 @@ Priority.propTypes = {
   onAddCondition: PropTypes.func.isRequired,
 };
 
-export default Priority;
+export default memo(Priority);

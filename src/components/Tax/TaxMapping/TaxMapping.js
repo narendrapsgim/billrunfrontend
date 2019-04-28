@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { titleCase } from 'change-case';
@@ -24,7 +24,7 @@ import {
 import { setPageTitle } from '@/actions/guiStateActions/pageActions';
 
 
-class TaxMapping extends Component {
+class TaxMapping extends PureComponent {
 
   static propTypes = {
     type: PropTypes.string,
