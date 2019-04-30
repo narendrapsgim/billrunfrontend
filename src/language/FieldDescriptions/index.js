@@ -6,6 +6,7 @@ import DiscountDescription from './Discount';
 import ReportDescription from './Report';
 import SettingsDescription from './Settings';
 import TaxDescription from './Tax';
+import MappingRulesDescription from './MappingRules';
 
 
 export {
@@ -17,4 +18,5 @@ export {
   ReportDescription,
   SettingsDescription,
   TaxDescription,
+  MappingRulesDescription,
 };

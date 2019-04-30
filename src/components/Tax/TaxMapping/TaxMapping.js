@@ -11,8 +11,10 @@ import {
 } from '@/components/Elements';
 import {
   taxMappingSelector,
-  taxlineKeyOptionsSelector,
+  taxLineKeyOptionsSelector,
   taxParamsKeyOptionsSelector,
+  computedValueWhenOptionsSelector,
+  computedConditionFieldsOptionsSelector,
 } from '@/selectors/settingsSelector';
 import {
   getSettings,
@@ -35,6 +37,18 @@ class TaxMapping extends PureComponent {
         label: PropTypes.string,
       }),
     ),
+    conditionFieldsOptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        value: PropTypes.string,
+        label: PropTypes.string,
+      }),
+    ),
+    valueWhenOptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        value: PropTypes.string,
+        label: PropTypes.string,
+      }),
+    ),
     location: PropTypes.object.isRequired,
   };
 
@@ -42,6 +56,8 @@ class TaxMapping extends PureComponent {
     type: 'tax',
     taxMapping: Map(),
     lineKeyOptions: [],
+    conditionFieldsOptions: [],
+    valueWhenOptions: [],
   };
 
   static pageTitle = 'Tax Mapping';
@@ -56,9 +72,7 @@ class TaxMapping extends PureComponent {
     this.props.dispatch(getSettings([
       'tax',
       'taxes.fields',
-      'subscribers.account.fields',
-      'subscribers.subscriber.fields',
-      'rates.fields',
+      'lines.fields',
     ]));
     this.setPageTitle(taxMapping);
   }
@@ -123,13 +137,17 @@ class TaxMapping extends PureComponent {
   }
 
   onAddCondition = (path) => {
-    this.onAdd(path, Map({rate_key: 'key'}));
+    this.onAdd(path, Map());
   }
 
   onAddPriority = (path) => {
-    this.onAdd(path, List());
+    const { taxMapping } = this.props;
+    const priorities = taxMapping.getIn(path);
+    const count = priorities.size;
+    const newIndex = (count > 2) ? count - 2 : 0;
+    this.props.dispatch(updateSetting('tax', ['mapping', ...path], priorities.insert(newIndex, List())));
     // Add first condition to new Priority
-    this.onAddCondition([...path, 0]);
+    this.onAddCondition([...path, newIndex]);
   }
 
   onRemove = (path) => {
@@ -138,7 +156,7 @@ class TaxMapping extends PureComponent {
   }
 
   renderPriority = (category, priorities) => {
-    const { type, lineKeyOptions, taxParamsKeyOptions } = this.props;
+    const { type, lineKeyOptions, taxParamsKeyOptions, conditionFieldsOptions, valueWhenOptions } = this.props;
     return (
       <PriorityMapping
         type={type}
@@ -146,6 +164,8 @@ class TaxMapping extends PureComponent {
         priorities={priorities}
         lineKeyOptions={lineKeyOptions}
         paramsKeyOptions={taxParamsKeyOptions}
+        conditionFieldsOptions={conditionFieldsOptions}
+        valueWhenOptions={valueWhenOptions}
         onAddCondition={this.onAddCondition}
         onAddPriority={this.onAddPriority}
         onRemove={this.onRemove}
@@ -163,8 +183,8 @@ class TaxMapping extends PureComponent {
     }
     if (taxMapping.size === 1) {
       const category = taxMapping.keySeq().first();
-      const priorities = taxMapping.first();
-      return this.renderPriority(category, priorities);
+      const prioritiesCategory = taxMapping.first();
+      return this.renderPriority(category, prioritiesCategory);
     }
     return (
       <TabsWrapper id="TaxTabs" location={location}>
@@ -201,8 +221,10 @@ class TaxMapping extends PureComponent {
 
 
 const mapStateToProps = (state, props) => ({
-  lineKeyOptions: taxlineKeyOptionsSelector(state, props),
+  lineKeyOptions: taxLineKeyOptionsSelector(state, props),
   taxParamsKeyOptions: taxParamsKeyOptionsSelector(state, props),
+  conditionFieldsOptions: computedConditionFieldsOptionsSelector(state, props),
+  valueWhenOptions: computedValueWhenOptionsSelector(state, props),
   taxMapping: taxMappingSelector(state, props),
 });
 

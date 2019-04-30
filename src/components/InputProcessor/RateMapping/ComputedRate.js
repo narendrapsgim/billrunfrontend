@@ -6,7 +6,7 @@ import { Form, FormGroup, Col, ControlLabel } from 'react-bootstrap';
 import { titleCase } from 'change-case';
 import Help from '../../Help';
 import Field from '@/components/Field';
-import { getConfig, formatSelectOptions, getAvailableFields } from '@/common/Util';
+import { getConfig, formatSelectOptions, getAvailableFields, parseConfigSelectOptions } from '@/common/Util';
 import { getSettings } from '@/actions/settingsActions';
 import { linesFieldsSelector } from '@/selectors/settingsSelector';
 
@@ -42,10 +42,7 @@ class ComputedRate extends Component {
   ].map(formatSelectOptions);
 
   getRateConditions = () => getConfig(['rates', 'conditions'], Immutable.List())
-    .map(condType => ({
-      value: condType.get('key', ''),
-      label: condType.get('title', ''),
-    }))
+    .map(parseConfigSelectOptions)
     .toArray();
 
   onChangeComputedLineKeyHardCodedKey = (e) => {

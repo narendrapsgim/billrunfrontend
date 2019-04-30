@@ -2,15 +2,14 @@ import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import moment from 'moment';
 import isNumber from 'is-number';
-import { titleCase } from 'change-case';
 import {
   getFieldName,
   getFieldNameType,
   isLinkerField,
   setFieldTitle,
   addPlayToFieldTitle,
-  getConfig,
   parseFieldSelectOptions,
+  onlyLineForeignFields,
 } from '@/common/Util';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
@@ -614,38 +613,41 @@ export const taxParamsKeyOptionsSelector = createSelector(
   (fields = Immutable.List()) => fields
     .filter(field => (field.get('field_name', '').startsWith('params.')))
     .map((field) => parseFieldSelectOptions(field))
+    .insert(0, {value: 'key', label: 'Key'})
     .toArray()
 );
 
-export const taxlineKeyOptionsSelector = createSelector(
-  accountFieldsSelector,
-  subscriberFieldsSelector,
-  productFieldsSelector,
-  (accountFields, subscriberFields, productFields) => {
-    //fixed fields
-    let outputFields = [
-      { value: 'type', label: 'Type' },
-      { value: 'usaget', label: 'Usage Type' },
-      { value: 'file', label: 'File name' },
-      // { value: 'computed', label: 'Computed' },
-    ];
-    // Add entities fields
-    const entitiesFields = {
-      customer: accountFields,
-      subscription: subscriberFields,
-      product: productFields,
-    };
-    Object.entries(entitiesFields).forEach(([entity, entityFields] ) => {
-      if (entityFields && Immutable.List.isList(entityFields)) {
-        const suffix = titleCase(getConfig(['systemItems', entity, 'itemName'], entity))
-        entityFields.forEach((field) => {
-          // remove duplicate fields (check in need to set option key by entity type)
-          if (-1 === outputFields.findIndex(entityField => entityField.value === field.get('field_name', ''))) {
-            outputFields.push(parseFieldSelectOptions(field, `(${suffix})`));
-          }
-        });
-      }
-    });
-    return outputFields;
-  }
+export const computedConditionFieldsOptionsSelector = createSelector(
+    linesFieldsSelector,
+    (lineFields = Immutable.List()) => lineFields
+      .filter(onlyLineForeignFields)
+      .map(parseFieldSelectOptions)
+      .push({ value: 'type', label: 'Type' })
+      .push({ value: 'usaget', label: 'Usage Type' })
+      .push({ value: 'file', label: 'File name' })
+      .toArray());
+
+export const computedValueWhenOptionsSelector = createSelector(
+    linesFieldsSelector,
+    (lineFields = Immutable.List()) => lineFields
+      .filter(onlyLineForeignFields)
+      .map(parseFieldSelectOptions)
+      .push({ value: 'condition_result', label: 'Condition Result' })
+      .push({ value: 'hard_coded', label: 'Hard Coded' })
+      .push({ value: 'type', label: 'Type' })
+      .push({ value: 'usaget', label: 'Usage Type' })
+      .push({ value: 'file', label: 'File name' })
+      .toArray()
+);
+
+export const taxLineKeyOptionsSelector = createSelector(
+  linesFieldsSelector,
+  (lineFields = Immutable.List()) => lineFields
+    .filter(onlyLineForeignFields)
+    .map(parseFieldSelectOptions)
+    .push({ value: 'type', label: 'Type' })
+    .push({ value: 'usaget', label: 'Usage Type' })
+    .push({ value: 'file', label: 'File name' })
+    .push({ value: 'computed', label: 'Computed' })
+    .toArray()
 );

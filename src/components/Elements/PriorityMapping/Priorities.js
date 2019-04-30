@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { List } from 'immutable';
+import { Form } from 'react-bootstrap';
 import { CreateButton } from '@/components/Elements';
 import Priority from './Priority';
 
@@ -12,6 +13,8 @@ const Priorities = ({
   priorities,
   lineKeyOptions,
   paramsKeyOptions,
+  conditionFieldsOptions,
+  valueWhenOptions,
   onAddCondition,
   onAddPriority,
   onUpdate,
@@ -19,7 +22,7 @@ const Priorities = ({
 }) => {
   const onCreate = useCallback(() => onAddPriority([category]), [onAddPriority, category]);
   return (
-    <div>
+    <Form horizontal>
       { priorities.map((priority, index) => (
         <Priority
           key={index}
@@ -30,6 +33,8 @@ const Priorities = ({
           count={priorities.size}
           lineKeyOptions={lineKeyOptions}
           paramsKeyOptions={paramsKeyOptions}
+          conditionFieldsOptions={conditionFieldsOptions}
+          valueWhenOptions={valueWhenOptions}
           onAddCondition={onAddCondition}
           onUpdate={onUpdate}
           onRemove={onRemove}
@@ -40,7 +45,7 @@ const Priorities = ({
         onClick={onCreate}
         buttonStyle={createBtnStyle}
       />
-    </div>
+    </Form>
   );
 }
 
@@ -49,6 +54,8 @@ Priorities.defaultProps = {
   priorities: List(),
   lineKeyOptions: [],
   paramsKeyOptions: [],
+  conditionFieldsOptions: [],
+  valueWhenOptions: [],
 };
 
 
@@ -63,6 +70,18 @@ Priorities.propTypes = {
     }),
   ),
   paramsKeyOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
+    }),
+  ),
+  conditionFieldsOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.string,
+    }),
+  ),
+  valueWhenOptions: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string,
       label: PropTypes.string,

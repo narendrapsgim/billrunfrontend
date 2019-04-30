@@ -316,7 +316,9 @@ class RateMapping extends Component {
       return null;
     }
     const op = calc.getIn(['computed', 'operator'], '');
-    const opLabel = (getConfig(['rates', 'conditions'], Immutable.Map()).find(cond => cond.get('key', '') === op) || Immutable.Map()).get('title', '');
+    const opLabel = getConfig(['rates', 'conditions'], Immutable.Map())
+      .find(cond => cond.get('id', '') === op, null, Immutable.Map())
+      .get('title', '');
     return (
       <h4>
         <small>

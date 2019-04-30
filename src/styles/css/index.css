@@ -37,6 +37,9 @@ fieldset[disabled] .btn {
 .tooltip{
   z-index: 2001;
 }
+.input-min-line-height {
+  line-height: 39px
+}
 
 /* Props */
 .clickable {
@@ -228,6 +231,9 @@ fieldset[disabled] .btn {
 .actions button.btn-sm {
   height: 39px;
   padding: 9px 12px;
+}
+.actions-buttons button.btn-link {
+  text-decoration: none;
 }
 .td-ellipsis{
   white-space: nowrap;
