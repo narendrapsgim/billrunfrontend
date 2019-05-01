@@ -48,7 +48,6 @@ class EntityTaxDetails extends PureComponent {
 
   initDefaultValues = () => {
     const { tax } = this.props;
-    console.log("tax:", tax);
     if (tax.get('type', '') === '') {
       this.props.onFieldUpdate(['tax', 'type'], 'vat');
     }
@@ -61,7 +60,7 @@ class EntityTaxDetails extends PureComponent {
   }
 
   onChengeType = (value) => {
-    this.props.onFieldUpdate(['tax', 'type'], value)
+    this.props.onFieldUpdate(['tax', 'custom_tax'], value)
   }
 
   onChengeTaxation = (e) => {
@@ -142,7 +141,7 @@ class EntityTaxDetails extends PureComponent {
               />
               <Field
                 fieldType="select"
-                value={tax.get('type', '')}
+                value={tax.get('custom_tax', '')}
                 onChange={this.onChengeType}
                 options={taxRateSelectOptions}
                 disabled={disabled}
