@@ -16,10 +16,10 @@
   "defaultHiddenFields": {
     "customer": ["aid", "payment_gateway"],
     "subscription": ["sid", "aid", "plan_activation", "play"],
-    "product": ["from", "to", "play"],
-    "service": ["from", "to", "include", "play"],
+    "product": ["from", "to", "play", "tax"],
+    "service": ["from", "to", "include", "play", "tax"],
     "tax": ["from", "to"],
-    "plan": ["from", "to", "play"]
+    "plan": ["from", "to", "play", "tax"]
   },
   "unReorderFields": {
     "product": ["key", "description", "rates"],
