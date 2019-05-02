@@ -18,6 +18,7 @@ class UsageTypesSelector extends Component {
     unit: PropTypes.string,
     onChangeUsaget: PropTypes.func,
     onChangeUnit: PropTypes.func,
+    editable: PropTypes.bool,
     enabled: PropTypes.bool,
     showUnits: PropTypes.bool,
     showAddButton: PropTypes.bool,
@@ -34,6 +35,7 @@ class UsageTypesSelector extends Component {
     unit: '',
     onChangeUsaget: () => {},
     onChangeUnit: () => {},
+    editable: true,
     enabled: true,
     showUnits: true,
     showAddButton: true,
@@ -48,7 +50,17 @@ class UsageTypesSelector extends Component {
   }
 
   componentWillMount() {
-    this.props.dispatch(getSettings(['usage_types', 'property_types']));
+    const { usageTypesData, propertyTypes } = this.props;
+    const settingToFetch = [];
+    if (usageTypesData.isEmpty()) {
+      settingToFetch.push('usage_types');
+    }
+    if (propertyTypes.isEmpty()) {
+      settingToFetch.push('property_types');
+    }
+    if (settingToFetch.length > 0) {
+      this.props.dispatch(getSettings(['usage_types', 'property_types']));
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -116,13 +128,14 @@ class UsageTypesSelector extends Component {
   }
 
   renderUsageTypeSelect = () => {
-    const { enabled, usaget, showSelectTypes } = this.props;
+    const { enabled, editable, usaget, showSelectTypes } = this.props;
     return showSelectTypes && (
       <Field
         fieldType="select"
         options={this.getAvailableUsageTypes()}
         value={usaget}
         disabled={!enabled}
+        editable={editable}
         onChange={this.onChangeUsaget}
       />
     );
@@ -135,7 +148,7 @@ class UsageTypesSelector extends Component {
   );
 
   renderUnitSelect = () => {
-    const { enabled, unit, usaget } = this.props;
+    const { enabled, editable, unit, usaget } = this.props;
     return (
       <Field
         fieldType="select"
@@ -143,31 +156,32 @@ class UsageTypesSelector extends Component {
         value={unit}
         options={this.getAvailableUnits()}
         disabled={!enabled || !usaget}
+        editable={editable}
       />);
   }
 
   renderNewUsageTypeForm = () => {
     const { propertyTypes } = this.props;
     const { currentItem } = this.state;
-    return currentItem &&
-      (<UsageTypeForm
+    return currentItem && (
+      <UsageTypeForm
         item={currentItem}
         propertyTypes={propertyTypes}
         onUpdateItem={this.onUpdateUsageType}
         onSave={this.onSaveNewUsageType}
         onCancel={this.onCancelNewUsageType}
-      />);
+      />
+    );
   };
 
   render() {
-    const { showUnits, showAddButton, showSelectTypes } = this.props;
+    const { showUnits, showAddButton, showSelectTypes, editable } = this.props;
     if (showSelectTypes) {
       return (
         <span>
           <Col sm={7}>
             <FormGroup className="mb0">
-              {
-                showAddButton
+              { showAddButton && editable
                 ? (
                   <InputGroup>
                     <InputGroup.Button>
