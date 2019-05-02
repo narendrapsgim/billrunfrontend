@@ -57,8 +57,20 @@ class Radio extends PureComponent {
     const { id } = this.state;
     const { value, editable, label, disabled, labelStyle } = this.props;
 
+    if (!editable && label !== null) {
+      return (
+        <div className="non-editable-field">
+          {label}
+        </div>
+      );
+    }
+
     if (!editable) {
-      return (<span>{ value }</span>);
+      return (
+        <div className="non-editable-field">
+          {value}
+        </div>
+      );
     }
 
     const inputField = this.renderInput();
