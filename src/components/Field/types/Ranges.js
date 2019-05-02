@@ -87,7 +87,7 @@ class Ranges extends PureComponent {
         this.onRemove(index);
       };
       return (
-        <FormGroup key={`range_${id}_${index}`} className="rangesField form-inner-edit-row">
+        <FormGroup key={`range_${id}_${index}`} className="rangesField form-inner-edit-row mr0 ml0">
           <InputGroup style={{ width: '100%' }}>
             <Range
               {...otherProps}

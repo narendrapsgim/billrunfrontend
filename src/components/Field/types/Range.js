@@ -69,7 +69,9 @@ class Range extends PureComponent {
     const placeholderTo = typeof placeholder['to'] !== 'undefined' ? placeholder.to : '';
     if (!editable) {
       return (
-        <span className="non-editable-field">{`${valueFrom} - ${valueTo}`}</span>
+        <span className="non-editable-field">
+          {`${valueFrom} - ${valueTo}`}
+        </span>
       );
     }
     return (
