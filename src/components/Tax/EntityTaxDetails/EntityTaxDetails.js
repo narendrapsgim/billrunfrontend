@@ -144,8 +144,7 @@ class EntityTaxDetails extends PureComponent {
                 value={tax.get('custom_tax', '')}
                 onChange={this.onChengeType}
                 options={taxRateSelectOptions}
-                disabled={disabled}
-                editable={tax.get('taxation', '') === 'custom'}
+                editable={tax.get('taxation', '') === 'custom' && !disabled}
               />
             </div>
 

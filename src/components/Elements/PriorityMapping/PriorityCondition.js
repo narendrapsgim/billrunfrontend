@@ -62,7 +62,7 @@ const PriorityCondition = ({
   }, [onUpdate, index]);
 
   const conditionActions = useMemo(() => [
-    { type: 'remove', onClick: onRemove, show: count > 1, helpText: `Remove Condition ${index + 1} of Priority ${priorityIndex +1 }`, actionClass: 'input-min-line-height', },
+    { type: 'remove', onClick: onRemove, show: count > 1, helpText: `Remove Condition ${index + 1} of Priority ${priorityIndex +1 }`, actionStyle: 'default' },
   ], [onRemove, count, priorityIndex, index]);
 
   const computedLineActions = useMemo(() => {

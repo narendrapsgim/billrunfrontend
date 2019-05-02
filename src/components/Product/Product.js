@@ -308,7 +308,9 @@ class Product extends Component {
                     : (
                       <div>
                         <Col sm={3} style={{ paddingTop: 7 }}>{usaget}</Col>
-                        <Col sm={4} componentClass={ControlLabel} className="pr0 pl0">Units of Measure</Col>
+                        <Col sm={4} componentClass={ControlLabel} className="pr0 pl0">
+                          Units of Measure
+                        </Col>
                         <Col sm={5} className="pr0">
                           <UsageTypesSelector
                             usaget={usaget}
@@ -316,7 +318,7 @@ class Product extends Component {
                             onChangeUsaget={this.onChangeUsaget}
                             onChangeUnit={this.onChangeUnit}
                             showSelectTypes={false}
-                            enabled={mode !== 'view'}
+                            editable={mode !== 'view'}
                           />
                         </Col>
                       </div>)

@@ -144,10 +144,10 @@ class FraudEvent extends Component {
             </FormGroup>
           )}
         </Col>
-        <Col sm={12} className="pl0 pr0">
+        <Col sm={12}>
           { conditionsRows }
         </Col>
-        <Col sm={12}>
+        <Col sm={12} className="pl0 pr0">
           <CreateButton
             onClick={this.onAddCondition}
             label="Add Condition"
