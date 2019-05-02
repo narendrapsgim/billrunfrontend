@@ -37,13 +37,13 @@ const FraudEventCondition = (props) => {
   const disableVal = operator === '' || disableOp;
   const conditionForValue = condition.set('value', condition.get('value', Immutable.List()).join(','));
 
-  const updateEventUsageType = (types) => {
+  const updateEventUsageType = useCallback((types) => {
     if (effectOnUsagetField) {
       setEventUsageType(eventUsageTypes.set(field, types));
     }
-  }
+  }, [effectOnUsagetField, setEventUsageType, eventUsageTypes, field])
 
-  const onChangeConditionsField = (fieldId) => {
+  const onChangeConditionsField = useCallback((fieldId) => {
     const resetCondition = Immutable.Map({
       field: fieldId,
       op: '',
@@ -51,13 +51,13 @@ const FraudEventCondition = (props) => {
     });
     updateEventUsageType(Immutable.List());
     onUpdate([index], resetCondition);
-  };
+  }, [index, onUpdate, updateEventUsageType]);
 
-  const onChangeConditionsOperator = (value) => {
+  const onChangeConditionsOperator = useCallback((value) => {
     onUpdate([index, 'op'], value);
-  };
+  }, [index, onUpdate]);
 
-  const onChangeConditionsValue = (value) => {
+  const onChangeConditionsValue = useCallback((value) => {
     const values = Immutable.List((value.length) ? value.split(',') : []);
     onUpdate([index, 'value'], values);
     if (effectOnUsagetField) {
@@ -67,7 +67,7 @@ const FraudEventCondition = (props) => {
         getEventRates(newRates);
       }
     }
-  }
+  }, [index, onUpdate, getEventRates, effectOnUsagetField, updateEventUsageType, field, eventUsageTypes]);
 
   const actions = useMemo(() => {
     const onRemoveCondition = (index) => {
