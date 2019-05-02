@@ -30,6 +30,7 @@ import {
   bucketsNamesSelector,
   bucketsExternalIdsSelector,
   getPlayTypeOptions,
+  taxesOptionsSelector,
 } from './listSelectors';
 
 
@@ -297,6 +298,7 @@ const getOptionCallback = (state, props) => {
     case 'getPlayTypeOptions': return getPlayTypeOptions(state, props);
     case 'getCalcNameOptions': return calcNameSelector(state, props);
     case 'getEventCodeOptions': return eventCodeSelector(state, props);
+    case 'getTaxesOptions': return taxesOptionsSelector(state, props);
     default: return undefined;
   }
 };

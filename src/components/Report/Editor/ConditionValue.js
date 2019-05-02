@@ -23,6 +23,7 @@ import {
   getFileTypesOptions,
   getEventCodeOptions,
   getPlayTypeOptions,
+  getTaxesOptions,
 } from '@/actions/reportsActions';
 
 
@@ -97,6 +98,8 @@ class ConditionValue extends Component {
         case 'getPlayTypeOptions': this.props.dispatch(getPlayTypeOptions());
           break;
         case 'getEventCodeOptions': this.props.dispatch(getEventCodeOptions());
+          break;
+        case 'getTaxesOptions': this.props.dispatch(getTaxesOptions());
           break;
         default: console.log('unsuported select options callback');
           break;
