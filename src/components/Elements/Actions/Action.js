@@ -71,7 +71,7 @@ const Action = (props) => {
           : (
             <Button
               onClick={onClickActino}
-              bsStyle={actionStyle}
+              bsStyle={actionStyle === 'default' ? undefined : actionStyle}
               bsSize={actionSize}
               className={actionClass}
               disabled={!isEnable}
@@ -107,7 +107,7 @@ Action.propTypes = {
   data: PropTypes.any,
   label: PropTypes.string,
   showIcon: PropTypes.bool,
-  actionStyle: PropTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger', 'link']),
+  actionStyle: PropTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger', 'link', 'default']),
   actionSize: PropTypes.oneOf(['large', 'small', 'xsmall']),
   actionClass: PropTypes.string,
   helpText: PropTypes.oneOfType([
