@@ -248,6 +248,7 @@ class Product extends Component {
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('description', getFieldNameType('service'), sentenceCase('title'))}
+                  <span className="danger-red"> *</span>
                   <Help contents={ProductDescription.description} />
                 </Col>
                 <Col sm={8} lg={9}>
@@ -258,7 +259,9 @@ class Product extends Component {
               { ['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    { getFieldName('key', getFieldNameType('service'), sentenceCase('key'))}<Help contents={ProductDescription.key} />
+                    { getFieldName('key', getFieldNameType('service'), sentenceCase('key'))}
+                    <span className="danger-red"> *</span>
+                    <Help contents={ProductDescription.key} />
                   </Col>
                   <Col sm={8} lg={9}>
                     <Field onChange={this.onChangeName} value={product.get('key', '')} disabled={!['clone', 'create'].includes(mode)} editable={editable} />
@@ -294,7 +297,10 @@ class Product extends Component {
               }
 
               <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  Unit Type
+                  <span className="danger-red"> *</span>
+                </Col>
                 <Col sm={8} lg={9}>
                   { editable && ['clone', 'create'].includes(mode)
                     ? (
@@ -341,9 +347,9 @@ class Product extends Component {
               <FormGroup>
                 <Col sm={12}>
                   { editable
-                    ? [(
-                      <Col sm={3} key="pricing-method-1">
-                        <div className="inline">
+                    ? (
+                      <>
+                        <div className="inline mr10">
                           <Field
                             fieldType="radio"
                             name="pricing-method"
@@ -352,13 +358,12 @@ class Product extends Component {
                             checked={pricingMethod === 'tiered'}
                             onChange={this.onChangePricingMethod}
                             label="Tiered pricing"
+                            className="inline"
                           />
+                          &nbsp;
+                          <Help contents={ProductDescription.tieredPricing} />
                         </div>
-                        &nbsp;<Help contents={ProductDescription.tieredPricing} />
-                      </Col>
-                    ),
-                    (
-                      <Col sm={3} key="pricing-method-2">
+
                         <div className="inline">
                           <Field
                             fieldType="radio"
@@ -368,11 +373,13 @@ class Product extends Component {
                             checked={pricingMethod === 'volume'}
                             onChange={this.onChangePricingMethod}
                             label="Volume pricing"
+                            className="inline"
                           />
+                          &nbsp;
+                          <Help contents={ProductDescription.volumePricing} />
                         </div>
-                        &nbsp;<Help contents={ProductDescription.volumePricing} />
-                      </Col>
-                    )]
+                      </>
+                    )
                     : (
                       <div className="non-editble-field">
                         { pricingMethod === 'tiered'

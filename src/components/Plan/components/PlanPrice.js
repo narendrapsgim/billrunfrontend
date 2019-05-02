@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Button, FormGroup, Col, Row, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Button, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import Field from '@/components/Field';
 import { getConfig } from '@/common/Util';
 
