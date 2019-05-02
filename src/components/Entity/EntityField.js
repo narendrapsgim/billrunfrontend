@@ -239,8 +239,8 @@ class EntityField extends Component {
       <FormGroup controlId={fieldName} validationState={error ? 'error' : null}>
         <Col componentClass={ControlLabel} sm={3} lg={2}>
           { field.get('title', fieldName) }
-          { description !== '' && (<Help contents={description} />) }
           { field.get('mandatory', false) && (<span className="danger-red"> *</span>)}
+          { description !== '' && (<Help contents={description} />) }
         </Col>
         <Col sm={8} lg={9}>
           { isRemoveField && editable ? this.renderRemovableField(fieldInput) : fieldInput }
