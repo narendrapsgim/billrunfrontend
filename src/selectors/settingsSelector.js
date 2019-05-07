@@ -5,13 +5,15 @@ import isNumber from 'is-number';
 import {
   getFieldName,
   getFieldNameType,
-  isLinkerField,
   setFieldTitle,
   addPlayToFieldTitle,
 } from '@/common/Util';
 
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
+
+const getImport = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.get('import');
 
 const getSystemSettings = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['system']);
@@ -80,48 +82,9 @@ const getTemplateTokens = (state, props) => // eslint-disable-line no-unused-var
 const getPaymentGateways = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['payment_gateways']);
 
-const selectSubscriberImportFields = (fields, accountfields) => {
-  if (fields) {
-    const importLinkers = accountfields.filter(isLinkerField);
-    if (importLinkers.size > 0) {
-      return fields.withMutations((fieldsWithMutations) => {
-        importLinkers.forEach((importLinker) => {
-          fieldsWithMutations.push(Immutable.Map({
-            linker: true,
-            field_name: importLinker.get('field_name', 'linker'),
-            title: importLinker.get('title', importLinker.get('field_name', 'linker')),
-          }));
-        });
-      });
-    }
-    return fields.push(Immutable.Map({
-      linker: true,
-      field_name: 'account_import_id',
-      title: 'Customer Import ID',
-    }));
-  }
-  return fields;
-};
-
 const selectFieldNames = (fields) => {
   if (fields) {
     return fields.map(field => field.get('field_name', ''));
-  }
-  return fields;
-};
-
-const selectAccountImportFields = (fields) => {
-  if (fields) {
-    const existImportLinker = fields.findIndex(isLinkerField);
-    return (existImportLinker !== -1)
-      ? fields
-      : fields.push(Immutable.Map({
-        unique: true,
-        generated: false,
-        mandatory: true,
-        field_name: 'account_import_id',
-        title: 'Customer Import ID (for subscriber import)',
-      }));
   }
   return fields;
 };
@@ -249,6 +212,11 @@ export const inputProssesorRatingParamsSelector = createSelector(
   selectRatingParams,
 );
 
+export const importSelector = createSelector(
+  getImport,
+  importConfig => importConfig,
+);
+
 export const taxationSelector = createSelector(
   getTaxation,
   taxation => taxation,
@@ -370,11 +338,6 @@ export const accountFieldNamesSelector = createSelector(
   selectFieldNames,
 );
 
-export const accountImportFieldsSelector = createSelector(
-  accountFieldsSelector,
-  selectAccountImportFields,
-);
-
 export const availablePlaysLabelsSelector = createSelector(
   availablePlaysSettingsSelector,
   (plays = Immutable.List()) => plays.reduce(
@@ -421,12 +384,6 @@ export const linesFieldsSelector = createSelector(
     }
     return undefined;
   },
-);
-
-export const subscriberImportFieldsSelector = createSelector(
-  subscriberFieldsSelector,
-  accountImportFieldsSelector,
-  selectSubscriberImportFields,
 );
 
 export const productFieldsSelector = createSelector(
@@ -503,6 +460,11 @@ export const formatFieldOptions = (fields, item = Immutable.Map()) => {
       unique: field.get('unique', false),
       mandatory: field.get('mandatory', false),
       linker: field.get('linker', false),
+      updater: field.get('updater', false),
+      select_options: field.get('select_options', false),
+      multiple: field.get('multiple', false),
+      help: field.get('help', false),
+      show: field.get('show', true),
     }));
   }
   return undefined;

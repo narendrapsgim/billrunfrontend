@@ -174,9 +174,10 @@ export const saveEntity = (collection, item, action) => (dispatch) => {
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entity')));
 };
 
-export const importEntities = (collection, items) => (dispatch) => {
+export const importEntities = (collection, items, operation) => (dispatch) => {
   dispatch(startProgressIndicator());
   const body = requestDataBuilder(collection, items, 'import');
+  body.append('operation', operation);
   const query = apiEntityQuery(collection, 'import', body);
   return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })
     .then(success => dispatch(apiBillRunSuccessHandler(success)))

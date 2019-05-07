@@ -44,6 +44,7 @@ import AutoRenewsList from '@/components/AutoRenew/AutoRenewsList';
 import AutoRenewSetup from '@/components/AutoRenew/AutoRenewSetup';
 import CustomFields from '@/components/CustomFields';
 import Events from '@/components/Events';
+import { ImporterSetup } from '../components/Importer';
 
 
 const routes = () => (
@@ -141,6 +142,7 @@ const routes = () => (
         <Route path="/login" component={LoginPage} title="Login" />
         <Route path="/about" component={About} title="About" />
         <Route path="/changepassword(/:itemId)" component={ChangePassword} title="Change Password" />
+        <Route path="/import(/:itemType)" component={Authentication(ImporterSetup)} />
         <Route path="*" component={PageNotFound404} title=" " />
       </Route>
     </Router>

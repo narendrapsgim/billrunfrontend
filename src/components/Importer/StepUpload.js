@@ -6,12 +6,14 @@ import Papa from 'papaparse';
 import filesize from 'file-size';
 import { sentenceCase } from 'change-case';
 import Field from '@/components/Field';
-import { getConfig } from '@/common/Util';
+import { getConfig, formatSelectOptions, getFieldName } from '@/common/Util';
 
 class StepUpload extends Component {
 
   static propTypes = {
     item: PropTypes.instanceOf(Immutable.Map),
+    mapperOptions: PropTypes.instanceOf(Immutable.List),
+    mapperName: PropTypes.string,
     delimiterOptions: PropTypes.arrayOf(
       PropTypes.shape({
         value: PropTypes.string,
@@ -21,23 +23,56 @@ class StepUpload extends Component {
     entityOptions: PropTypes.arrayOf(PropTypes.string),
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
+    onSelectMapping: PropTypes.func,
   }
 
   static defaultProps = {
     item: Immutable.Map(),
+    mapperOptions: Immutable.List(),
     delimiterOptions: [
       { value: '	', label: 'Tab' }, // eslint-disable-line no-tabs
       { value: ' ', label: 'Space' },
       { value: ',', label: 'Comma' },
     ],
-    entityOptions: ['customer', 'subscription'],
+    entityOptions: [],
+    mapperName: '',
     onChange: () => {},
     onDelete: () => {},
+    onSelectMapping: () => {},
   }
 
   state = {
     fileError: null,
     delimiterError: null,
+    operations: Immutable.List(),
+  }
+
+  componentDidMount() {
+    const { item } = this.props;
+    this.setoperation(item.get('entity', ''), item.get('operation', ''));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { item } = nextProps;
+    if (this.props.item.get('entity', '') !== item.get('entity', '')) {
+      this.setoperation(item.get('entity', ''), item.get('operation', ''));
+    }
+  }
+
+  setoperation = (entity, curroperation) => {
+    const operationsConfig = getConfig(['import', 'allowed_entities_actions'], Immutable.List());
+    const operations = operationsConfig
+      .filter(entities => entities.includes(entity))
+      .keySeq()
+      .map(option => Immutable.Map({
+        value: option,
+        label: sentenceCase(getFieldName(option, 'import')),
+      }))
+      .toList();
+    if (operations.size > 0 && (curroperation === '' || operations.filter(op => op.get('value', '') === curroperation).size === 0)) {
+      this.props.onChange('operation', operations.getIn([0, 'value'], ''));
+    }
+    this.setState({ operations });
   }
 
   resetFile = () => {
@@ -45,7 +80,11 @@ class StepUpload extends Component {
     this.props.onChange('fileName', '');
   }
 
-  onParseScvComplete = (results, file) => {
+  onChangeOperation = (operation) => {
+    this.props.onChange('operation', operation);
+  }
+
+  onParseCsvComplete = (results, file) => {
     if (results.errors.length === 0) {
       this.props.onChange('fileContent', results.data);
       this.props.onChange('fileName', file.name);
@@ -69,7 +108,7 @@ class StepUpload extends Component {
         skipEmptyLines: true,
         delimiter,
         header: false,
-        complete: this.onParseScvComplete,
+        complete: this.onParseCsvComplete,
         error: this.onParseScvError,
       });
     } else {
@@ -97,11 +136,16 @@ class StepUpload extends Component {
 
   onChangeEntity = (value) => {
     this.props.onDelete('map');
+    this.props.onDelete('multiFieldAction');
     if (value.length) {
       this.props.onChange('entity', value);
     } else {
       this.props.onDelete('entity');
     }
+  }
+
+  onSelectExistingMapper = (mapperName) => {
+    this.props.onSelectMapping(mapperName);
   }
 
   isValidFile = (file) => {
@@ -114,16 +158,27 @@ class StepUpload extends Component {
     label: sentenceCase(getConfig(['systemItems', entityKey, 'itemName'], entityKey)),
   }));
 
+  createSavedMapperOptions = () => {
+    const { mapperOptions } = this.props;
+    return mapperOptions.map(mapper => ({
+      value: mapper.get('label', ''),
+      label: mapper.get('label', ''),
+    }))
+    .toList();
+  }
+
   render() {
-    const { delimiterError, fileError } = this.state;
-    const { item, delimiterOptions, entityOptions } = this.props;
+    const { delimiterError, fileError, operations } = this.state;
+    const { item, delimiterOptions, entityOptions, mapperName, mapperOptions } = this.props;
     const delimiter = item.get('fileDelimiter', '');
+    const operation = item.get('operation', '');
     const entity = item.get('entity', '');
     const fileName = item.get('fileName', '');
     const isSingleEntity = (entityOptions && entityOptions.length === 1);
-    const options = this.createEntityTypeOptions(entityOptions);
+    const entitySeletOptions = this.createEntityTypeOptions(entityOptions);
     const fileParsed = fileName !== '';
-
+    const operationSelectOptions = operations.map(formatSelectOptions).toJS();
+    const mapperSelectOptions = this.createSavedMapperOptions().toJS();
     return (
       <div className="StepUpload">
         { !isSingleEntity && (
@@ -133,7 +188,7 @@ class StepUpload extends Component {
               <Field
                 fieldType="select"
                 onChange={this.onChangeEntity}
-                options={options}
+                options={entitySeletOptions}
                 value={entity}
                 placeholder="Select entity to import...."
                 clearable={false}
@@ -181,6 +236,38 @@ class StepUpload extends Component {
             </div>
           </Col>
         </FormGroup>
+        {operations.size > 1 && (
+        <FormGroup validationState={delimiterError === null ? null : 'error'}>
+          <Col sm={3} componentClass={ControlLabel}>Import Action</Col>
+          <Col sm={9}>
+            <Field
+              fieldType="select"
+              onChange={this.onChangeOperation}
+              options={operationSelectOptions}
+              value={operation}
+              placeholder="Select import action"
+              addLabelText="{label}"
+              clearable={false}
+              disabled={operations.size === 1 || entity === ''}
+            />
+          </Col>
+        </FormGroup>
+        )}
+        {mapperOptions.size > 0 && (
+        <FormGroup>
+          <Col sm={3} componentClass={ControlLabel}>Saved Mapper</Col>
+          <Col sm={9}>
+            <Field
+              fieldType="select"
+              onChange={this.onSelectExistingMapper}
+              options={mapperSelectOptions}
+              value={mapperName}
+              placeholder="Select saved mapper"
+              clearable={true}
+            />
+          </Col>
+        </FormGroup>
+        )}
       </div>
     );
   }
