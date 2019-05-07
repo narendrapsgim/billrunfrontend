@@ -5,9 +5,7 @@ import {
   isLinkerField,
   isUpdaterField,
   setFieldTitle,
-} from '../common/Util';
-
-
+} from '@/common/Util';
 import {
   itemSelector,
   selectorFieldsByEntity,

@@ -25,5 +25,8 @@
       "subscription": [],
       "product": ["tariff_category", "key", "usage_type", "usage_type_value", "from"]
     }
-  }
+  },
+  "allowed_plays": [
+    "product"
+  ]
 }

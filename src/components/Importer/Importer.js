@@ -45,7 +45,7 @@ class Importer extends Component {
     hiddenActionFields: PropTypes.instanceOf(Immutable.Map),
     savedMappers: PropTypes.instanceOf(Immutable.List),
     entityOptions: PropTypes.arrayOf(PropTypes.string),
-    isPlaysEnabled: PropTypes.bool,
+    showPlay: PropTypes.bool,
     restartString: PropTypes.string,
     onFinish: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
@@ -78,7 +78,7 @@ class Importer extends Component {
     ], // csv comuns that will not shown as option
     savedMappers: Immutable.List(),
     restartString: '',
-    isPlaysEnabled: false,
+    showPlay: false,
     onFinish: null,
   };
 
@@ -553,7 +553,7 @@ class Importer extends Component {
   }
 
   renderStepContent = () => {
-    const { item, importFields, entityOptions, ignoredHeaders, defaultValues, savedMappers, isPlaysEnabled } = this.props;
+    const { item, importFields, entityOptions, ignoredHeaders, defaultValues, savedMappers, showPlay } = this.props;
     const { stepIndex, mapperPrefix } = this.state;
     const entity = item.get('entity', '');
     const mapperName = item.get('mapperName', '');
@@ -568,7 +568,7 @@ class Importer extends Component {
           onSelectMapping={this.onSelectMapping}
           mapperName={mapperName}
           mapperOptions={savedMappers}
-          isPlaysEnabled={isPlaysEnabled}
+          showPlay={showPlay}
         />
       );
       case 1: return (
@@ -640,11 +640,18 @@ class Importer extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  item: itemSelector(state, props, 'importer'),
-  importFields: importFieldsOptionsSelector(state, props, 'importer'),
-  savedMappers: importMapperSelector(state, props, 'importer'),
-  isPlaysEnabled: isPlaysEnabledSelector(state, props),
-});
+
+const mapStateToProps = (state, props) => {
+  const item = itemSelector(state, props, 'importer');
+  const entity = item ? item.get('entity', '') : '';
+  const allowedEntitiesForPlays = getConfig(['import', 'allowed_plays'], Immutable.List());
+  const isPlaysEnabled = isPlaysEnabledSelector(state, props);
+  return ({
+    item,
+    importFields: importFieldsOptionsSelector(state, props, 'importer'),
+    savedMappers: importMapperSelector(state, props, 'importer'),
+    showPlay: isPlaysEnabled && allowedEntitiesForPlays.includes(entity),
+  });
+};
 
 export default connect(mapStateToProps)(Importer);

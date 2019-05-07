@@ -23,7 +23,7 @@ class StepUpload extends Component {
       }),
     ),
     entityOptions: PropTypes.arrayOf(PropTypes.string),
-    isPlaysEnabled: PropTypes.bool,
+    showPlay: PropTypes.bool,
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
     onSelectMapping: PropTypes.func,
@@ -38,7 +38,7 @@ class StepUpload extends Component {
       { value: ',', label: 'Comma' },
     ],
     entityOptions: [],
-    isPlaysEnabled: false,
+    showPlay: false,
     mapperName: '',
     onChange: () => {},
     onDelete: () => {},
@@ -141,6 +141,7 @@ class StepUpload extends Component {
   onChangeEntity = (value) => {
     this.props.onDelete('map');
     this.props.onDelete('multiFieldAction');
+    this.props.onDelete('play');
     if (value.length) {
       this.props.onChange('entity', value);
     } else {
@@ -183,7 +184,7 @@ class StepUpload extends Component {
 
   render() {
     const { delimiterError, fileError, operations } = this.state;
-    const { item, delimiterOptions, entityOptions, mapperName, mapperOptions, isPlaysEnabled } = this.props;
+    const { item, delimiterOptions, entityOptions, mapperName, mapperOptions, showPlay } = this.props;
     const delimiter = item.get('fileDelimiter', '');
     const operation = item.get('operation', '');
     const entity = item.get('entity', '');
@@ -267,7 +268,7 @@ class StepUpload extends Component {
           </Col>
         </FormGroup>
         )}
-        {isPlaysEnabled && (
+        {showPlay && (
           <PlaysSelector
             entity={item}
             onChange={this.onChangePlay}
