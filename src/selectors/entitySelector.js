@@ -64,6 +64,13 @@ const getId = (state, props) => {
   return null;
 };
 
+const getEntityType = (state, props) => {
+  if (props.params && props.params.itemType) {
+    return props.params.itemType.length > 0 ? props.params.itemType : null;
+  }
+  return null;
+};
+
 const getItem = (state, props, entityName) => {
   if (entityName && entityName.startsWith('source')) {
     return state.entity.get(entityName);
@@ -88,12 +95,19 @@ const getItem = (state, props, entityName) => {
 
 const getItemSource = (state, props, entityName) => getItem(state, props, `source${upperCaseFirst(entityName)}`);
 
-export const selectorFieldsByEntity = (item = Immutable.Map(), accountFields, subscriberFields) => {
+export const selectorFieldsByEntity = (
+  item = Immutable.Map(),
+  accountFields,
+  subscriberFields,
+  productFields,
+) => {
   switch (item.get('entity')) {
     case 'customer':
       return accountFields;
     case 'subscription':
       return subscriberFields;
+    case 'product':
+      return productFields;
     default:
       return undefined;
   }
@@ -199,6 +213,11 @@ export const modeSelector = createSelector(
   idSelector,
   itemSelector,
   selectFormMode,
+);
+
+export const importItemTypeSelector = createSelector(
+  getEntityType,
+  itemType => (getConfig(['import', 'allowed_entities'], Immutable.List()).includes(itemType) ? itemType : undefined),
 );
 
 export const modeSimpleSelector = createSelector(

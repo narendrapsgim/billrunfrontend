@@ -44,6 +44,7 @@ import AutoRenewsList from '@/components/AutoRenew/AutoRenewsList';
 import AutoRenewSetup from '@/components/AutoRenew/AutoRenewSetup';
 import CustomFields from '@/components/CustomFields';
 import Events from '@/components/Events';
+import { ImporterSetup } from '../components/Importer';
 import { TaxList, TaxSetup, TaxMapping } from '@/components/Tax';
 
 
@@ -113,20 +114,18 @@ const routes = () => (
           <Route path="customer" component={Authentication(CustomerSetup)} />
         </Route>
 
-
-
-        <Route path="reports" >
-          <IndexRoute component={Authentication(ReportsList)} title="Reports" />
-          <Route path="report/:itemId" component={Authentication(Report)} />
-          <Route path="report" component={Authentication(Report)} />
-        </Route>
-
         <Route path="taxes" >
           <IndexRoute component={Authentication(TaxList)} title="Rates" />
           <Route path="tax/:itemId" component={Authentication(TaxSetup)} />
           <Route path="tax" component={Authentication(TaxSetup)} />
           <Route path="tax" component={Authentication(TaxSetup)} />
           <Route path="mapping-rules" component={Authentication(TaxMapping)} />
+        </Route>
+
+        <Route path="reports" >
+          <IndexRoute component={Authentication(ReportsList)} title="Reports" />
+          <Route path="report/:itemId" component={Authentication(Report)} />
+          <Route path="report" component={Authentication(Report)} />
         </Route>
 
         <Route path="/input_processor" component={Authentication(InputProcessor)} />
@@ -150,6 +149,7 @@ const routes = () => (
         <Route path="/login" component={LoginPage} title="Login" />
         <Route path="/about" component={About} title="About" />
         <Route path="/changepassword(/:itemId)" component={ChangePassword} title="Change Password" />
+        <Route path="/import(/:itemType)" component={Authentication(ImporterSetup)} />
         <Route path="*" component={PageNotFound404} title=" " />
       </Route>
     </Router>

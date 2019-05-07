@@ -9,6 +9,7 @@ import systemItemsConfig from '../config/entities.json';
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
+import importConfig from '../config/import.json';
 import collectionsConfig from '../config/collections.json';
 import customFieldsConfig from '../config/customFields.json';
 
@@ -60,6 +61,8 @@ export const getConfig = (key, defaultValue = null) => {
       case 'events': configCache = configCache.set('events', Immutable.fromJS(eventsConfig));
         break;
       case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
+        break;
+      case 'import': configCache = configCache.set('import', Immutable.fromJS(importConfig));
         break;
       case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
         break;
@@ -323,6 +326,12 @@ export const isLinkerField = (field = Immutable.Map()) => (
   field.get('unique', false) &&
   !field.get('generated', false) &&
   field.get('editable', true)
+);
+
+export const isUpdaterField = (field = Immutable.Map()) => (
+  field.get('unique', false) ||
+  (field.get('field_name','') === 'key' && field.get('mandatory', false) && field.get('system', false)) ||
+  (field.get('field_name','') === 'name' && field.get('mandatory', false) && field.get('system', false))
 );
 
 export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldField, oldOp, newField, newOp) => {

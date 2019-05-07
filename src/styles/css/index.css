@@ -51,6 +51,10 @@ fieldset[disabled] .btn {
 .non-editable-field{
   line-height: 32px;
 }
+.actions button.btn-sm {
+  height: 39px;
+  padding: 9px 12px;
+}
 .inline {
   display: inline-block;;
 }
@@ -61,6 +65,15 @@ fieldset[disabled] .btn {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.td-ellipsis{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.td-actions {
+  width:1%;
+  white-space:nowrap;
 }
 
 .pt0{ padding-top: 0!important; }
@@ -85,6 +98,10 @@ fieldset[disabled] .btn {
 .ml5{ margin-left: 5px!important; }
 
 .full-width{ width: 100%!important; }
+
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+.text-center { text-align: center !important; }
 
 .not-top-border { border-top: none!important; }
 /* ~Props */
@@ -211,6 +228,7 @@ fieldset[disabled] .btn {
   color: #424242;
   text-align: center;
 }
+
 .pagination {
   margin: 0;
   padding: 0;
@@ -221,6 +239,7 @@ fieldset[disabled] .btn {
   font-size: 14px;
   float: left;
 }
+
 .draggable-row{
   background-color: #eee;
   opacity: .7;
@@ -228,6 +247,7 @@ fieldset[disabled] .btn {
   padding-top: 4px!important;
   padding-bottom: 4px!important;
 }
+
 .panel-no-border {
   border: 0;
   margin: 0;

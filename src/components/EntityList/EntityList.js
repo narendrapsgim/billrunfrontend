@@ -13,6 +13,7 @@ import Filter from './Filter';
 import StateDetails from './StateDetails';
 import {
   getList,
+  clearRevisions,
   setListSort,
   setListFilter,
   setListPage,
@@ -139,7 +140,9 @@ class EntityList extends Component {
   }
 
   onClickRefresh = () => {
+    const { collection } = this.props;
     this.fetchItems(this.props);
+    this.props.dispatch(clearRevisions(collection));
   }
 
   onSort = (sort) => {

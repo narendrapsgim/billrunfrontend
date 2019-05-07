@@ -1,0 +1,32 @@
+{
+  "allowed_entities": [
+    "customer", "subscription", "product"
+  ],
+  "allowed_entities_actions": {
+    "create": ["customer", "subscription", "product"],
+    "permanentchange": ["product"]
+  },
+  "default_values_allowed_actions": {
+    "create": ["customer", "subscription", "product"],
+    "permanentchange": []
+  },
+  "predefined_values_allowed_actions": {
+    "create": ["customer", "subscription", "product"],
+    "permanentchange": []
+  },
+  "hidden_actions_fields": {
+    "create": {
+      "customer": [],
+      "subscription": [],
+      "product": ["effective_date"]
+    },
+    "permanentchange": {
+      "customer": [],
+      "subscription": [],
+      "product": ["tariff_category", "key", "usage_type", "usage_type_value", "from"]
+    }
+  },
+  "allowed_plays": [
+    "product"
+  ]
+}

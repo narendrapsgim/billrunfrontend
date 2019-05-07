@@ -123,12 +123,26 @@
     "upfront": "Charging Mode"
   },
   "product": {
+    "usage_type_value" : "Usage Type",
+    "usage_type_unit": "Usage Type Unit",
+    "pricing_method": "Pricing Method",
     "description": "Title",
-    "key": "Key"
+    "key": "Key",
+    "usage_type": "Unit Type",
+    "price_from": "Pricing From",
+    "price_to": "Pricing To",
+    "price_value": "Price Per Interval",
+    "price_interval": "Pricing Interval",
+    "price_plan": "Plan Price Override"
+  },
+  "import": {
+    "permanentchange": "Update",
+    "rates.percentage": "Plan Price Override by Percentage"
   },
   "foreign": {
     "account_subscribers": "Customer Members"
   },
   "aid": "Customer ID",
-  "sid": "Subscriber ID"
+  "sid": "Subscriber ID",
+  "effective_date": "Effective Date"
 }

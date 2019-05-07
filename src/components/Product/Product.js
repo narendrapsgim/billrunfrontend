@@ -298,7 +298,7 @@ class Product extends Component {
 
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Unit Type
+                  { getFieldName('usage_type', getFieldNameType('product'), 'Unit Type')}
                   <span className="danger-red"> *</span>
                 </Col>
                 <Col sm={8} lg={9}>

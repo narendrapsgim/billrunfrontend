@@ -116,7 +116,7 @@ class FraudEventThreshold extends Component {
     const isThresholdError = errors.get(`threshold_condition.${index}`, false);
     const showUOM = eventPropertyType.size === 1 && !['aprice', 'final_charge'].includes(field);
     return (
-      <FormGroup className="form-inner-edit-row" validationState={isThresholdError ? 'error' : null}>
+      <FormGroup className="form-inner-edit-row pl0 pr0" validationState={isThresholdError ? 'error' : null}>
         <Col componentClass={ControlLabel} smHidden mdHidden lgHidden>
           Field <span className="danger-red"> *</span>
         </Col>
