@@ -7,8 +7,8 @@ import { Form, FormGroup, ControlLabel, Col, Row, Panel, Checkbox, HelpBlock } f
 import Help from '../Help';
 import Field from '@/components/Field';
 import { CreateButton } from '@/components/Elements';
-import ProductPrice from './components/ProductPrice';
 import { ProductDescription } from '@/language/FieldDescriptions';
+import ProductPrice from './components/ProductPrice';
 import EntityFields from '../Entity/EntityFields';
 import UsageTypesSelector from '../UsageTypes/UsageTypesSelector';
 import PlaysSelector from '../Plays/PlaysSelector';
@@ -294,7 +294,9 @@ class Product extends Component {
               }
 
               <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>Unit Type</Col>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  { getFieldName('usage_type', getFieldNameType('product'), 'Unit Type')}
+                </Col>
                 <Col sm={8} lg={9}>
                   { editable && ['clone', 'create'].includes(mode)
                     ? (

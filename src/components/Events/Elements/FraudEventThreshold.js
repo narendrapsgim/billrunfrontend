@@ -115,7 +115,7 @@ class FraudEventThreshold extends Component {
       : Immutable.Map();
     const isThresholdError = errors.get(`threshold_condition.${index}`, false);
     return (
-      <FormGroup className="form-inner-edit-row" validationState={isThresholdError ? 'error' : null}>
+      <FormGroup className="form-inner-edit-row pl0 pr0" validationState={isThresholdError ? 'error' : null}>
         <Col componentClass={ControlLabel} smHidden mdHidden lgHidden>
           Field <span className="danger-red"> *</span>
         </Col>
@@ -157,7 +157,7 @@ class FraudEventThreshold extends Component {
         </Col>
 
         {eventPropertyType.size === 1 && !['aprice', 'final_charge'].includes(field) && (
-          <span>
+          <>
             <Col componentClass={ControlLabel} smHidden mdHidden lgHidden>
               Unit of measure <span className="danger-red"> *</span>
             </Col>
@@ -171,7 +171,7 @@ class FraudEventThreshold extends Component {
                 showSelectTypes={false}
               />
             </Col>
-          </span>
+          </>
         )}
         { isThresholdError && (
           <Col sm={12}><HelpBlock>{isThresholdError}</HelpBlock></Col>

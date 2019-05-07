@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
-import { Button, Col, FormGroup, InputGroup } from 'react-bootstrap';
+import { Button, Col, InputGroup } from 'react-bootstrap';
 import Field from '@/components/Field';
 import { getSettings, updateSetting, saveSettings } from '@/actions/settingsActions';
 import { usageTypesDataSelector, propertyTypeSelector } from '@/selectors/settingsSelector';
@@ -163,21 +163,19 @@ class UsageTypesSelector extends Component {
     if (showSelectTypes) {
       return (
         <span>
-          <Col sm={7}>
-            <FormGroup className="mb0">
-              {
-                showAddButton
-                ? (
-                  <InputGroup>
-                    <InputGroup.Button>
-                      {this.renderAddUsageTypeButton()}
-                    </InputGroup.Button>
-                    {this.renderUsageTypeSelect()}
-                  </InputGroup>
-                )
-                : this.renderUsageTypeSelect()
-              }
-            </FormGroup>
+          <Col sm={7} className="pr0 pl0">
+          {
+            showAddButton
+            ? (
+              <InputGroup>
+                <InputGroup.Button>
+                  {this.renderAddUsageTypeButton()}
+                </InputGroup.Button>
+                {this.renderUsageTypeSelect()}
+              </InputGroup>
+            )
+            : this.renderUsageTypeSelect()
+          }
           </Col>
           <Col sm={5} className="pr0">
             {showUnits && this.renderUnitSelect()}

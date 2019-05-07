@@ -76,7 +76,7 @@ const FraudEventCondition = (props) => {
       <Col smHidden mdHidden lgHidden>
         <label htmlFor="condition_filter">Filter</label>
       </Col>
-      <Col sm={4}>
+      <Col sm={4} className="pl0">
         <Field
           id="condition_field"
           fieldType="select"
