@@ -4,9 +4,9 @@ import ReactStepper from 'react-stepper-horizontal';
 
 /**
  * Important !
- * In fint size chnaged from 24, remember to update style fule that fiz bug
+ * The font size changed from 24, remember to update style file that fix bug
  * src/styles/scss/overrides/react-stepper-horizontal.scss
- * https://github.com/mu29/react-stepper/issues/21
+   * https://github.com/mu29/react-stepper/issues/21
  */
 
 const Stepper = ({steps, activeIndex}) => (
