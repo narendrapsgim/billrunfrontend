@@ -7,6 +7,8 @@ import filesize from 'file-size';
 import { sentenceCase } from 'change-case';
 import Field from '@/components/Field';
 import { getConfig, formatSelectOptions, getFieldName } from '@/common/Util';
+import PlaysSelector from '../Plays/PlaysSelector';
+
 
 class StepUpload extends Component {
 
@@ -21,6 +23,7 @@ class StepUpload extends Component {
       }),
     ),
     entityOptions: PropTypes.arrayOf(PropTypes.string),
+    isPlaysEnabled: PropTypes.bool,
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
     onSelectMapping: PropTypes.func,
@@ -35,6 +38,7 @@ class StepUpload extends Component {
       { value: ',', label: 'Comma' },
     ],
     entityOptions: [],
+    isPlaysEnabled: false,
     mapperName: '',
     onChange: () => {},
     onDelete: () => {},
@@ -148,6 +152,16 @@ class StepUpload extends Component {
     this.props.onSelectMapping(mapperName);
   }
 
+  onChangePlay = (play) => {
+    this.props.onDelete('map');
+    this.props.onDelete('multiFieldAction');
+    if (play.length) {
+      this.props.onChange('play', play);
+    } else {
+      this.props.onDelete('play');
+    }
+  }
+
   isValidFile = (file) => {
     const maxBytesSize = getConfig('importMaxSize', 8) * 1024 * 1024;
     return file.size <= maxBytesSize;
@@ -169,7 +183,7 @@ class StepUpload extends Component {
 
   render() {
     const { delimiterError, fileError, operations } = this.state;
-    const { item, delimiterOptions, entityOptions, mapperName, mapperOptions } = this.props;
+    const { item, delimiterOptions, entityOptions, mapperName, mapperOptions, isPlaysEnabled } = this.props;
     const delimiter = item.get('fileDelimiter', '');
     const operation = item.get('operation', '');
     const entity = item.get('entity', '');
@@ -252,6 +266,12 @@ class StepUpload extends Component {
             />
           </Col>
         </FormGroup>
+        )}
+        {isPlaysEnabled && (
+          <PlaysSelector
+            entity={item}
+            onChange={this.onChangePlay}
+          />
         )}
         {mapperOptions.size > 0 && (
         <FormGroup>

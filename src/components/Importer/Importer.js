@@ -26,6 +26,9 @@ import {
   importMapperSelector,
 } from '@/selectors/importSelectors';
 import { itemSelector } from '@/selectors/entitySelector';
+import {
+  isPlaysEnabledSelector,
+} from '@/selectors/settingsSelector';
 import { getConfig } from '@/common/Util';
 
 
@@ -42,6 +45,7 @@ class Importer extends Component {
     hiddenActionFields: PropTypes.instanceOf(Immutable.Map),
     savedMappers: PropTypes.instanceOf(Immutable.List),
     entityOptions: PropTypes.arrayOf(PropTypes.string),
+    isPlaysEnabled: PropTypes.bool,
     restartString: PropTypes.string,
     onFinish: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
@@ -74,6 +78,7 @@ class Importer extends Component {
     ], // csv comuns that will not shown as option
     savedMappers: Immutable.List(),
     restartString: '',
+    isPlaysEnabled: false,
     onFinish: null,
   };
 
@@ -526,6 +531,13 @@ class Importer extends Component {
   customFilterMapperFields = (field) => {
     const { item, hiddenActionFields } = this.props;
     const entity = item.get('entity', '');
+    const fieldPlays = field.plays || Immutable.List();
+    const itemPlay = item.get('play', '');
+    if (!fieldPlays.isEmpty() && itemPlay !== '') {
+      if (!fieldPlays.includes(itemPlay)) {
+        return false;
+      }
+    }
     const operation = item.get('operation', 'create');
     if (hiddenActionFields.getIn([operation, entity], Immutable.List()).includes(field.value)) {
       return false;
@@ -541,7 +553,7 @@ class Importer extends Component {
   }
 
   renderStepContent = () => {
-    const { item, importFields, entityOptions, ignoredHeaders, defaultValues, savedMappers } = this.props;
+    const { item, importFields, entityOptions, ignoredHeaders, defaultValues, savedMappers, isPlaysEnabled } = this.props;
     const { stepIndex, mapperPrefix } = this.state;
     const entity = item.get('entity', '');
     const mapperName = item.get('mapperName', '');
@@ -556,6 +568,7 @@ class Importer extends Component {
           onSelectMapping={this.onSelectMapping}
           mapperName={mapperName}
           mapperOptions={savedMappers}
+          isPlaysEnabled={isPlaysEnabled}
         />
       );
       case 1: return (
@@ -631,6 +644,7 @@ const mapStateToProps = (state, props) => ({
   item: itemSelector(state, props, 'importer'),
   importFields: importFieldsOptionsSelector(state, props, 'importer'),
   savedMappers: importMapperSelector(state, props, 'importer'),
+  isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
 export default connect(mapStateToProps)(Importer);

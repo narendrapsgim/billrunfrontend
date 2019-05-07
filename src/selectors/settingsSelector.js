@@ -465,6 +465,7 @@ export const formatFieldOptions = (fields, item = Immutable.Map()) => {
       multiple: field.get('multiple', false),
       help: field.get('help', false),
       show: field.get('show', true),
+      plays: field.get('plays', Immutable.List()),
     }));
   }
   return undefined;
