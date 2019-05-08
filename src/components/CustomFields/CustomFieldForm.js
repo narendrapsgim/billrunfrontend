@@ -187,7 +187,7 @@ const CustomFieldForm = ({
           </Col>
         </FormGroup>
       )}
-      { !disableSelectList && (
+      { (!disableSelectList || !disableSelectOptions) && (
         <FormGroup>
           <Col sm={3} lg={2} componentClass={ControlLabel}>Select list</Col>
           <Col sm={8} lg={9}>

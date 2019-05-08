@@ -59,7 +59,7 @@ const mapStateToProps = (state, props) => {
     disabledShowInList: inConfigOptionBlackList(fieldTypeConfig, 'show_in_list') || !isEditableFiledProperty(item, editable, 'show_in_list'),
     disableSearchable: inConfigOptionBlackList(fieldTypeConfig, 'searchable') || !isEditableFiledProperty(item, editable, 'searchable'),
     disableMultiple: inConfigOptionBlackList(fieldTypeConfig, 'multiple') || !isEditableFiledProperty(item, editable, 'multiple'),
-    disableSelectList: inConfigOptionBlackList(fieldTypeConfig, 'select_options') || !isEditableFiledProperty(item, editable, 'select_list'),
+    disableSelectList: inConfigOptionBlackList(fieldTypeConfig, 'select_list') || !isEditableFiledProperty(item, editable, 'select_list'),
     disableSelectOptions: !item.get('select_list', false) || !isEditableFiledProperty(item, editable, 'select_options'),
     disableHelp: inConfigOptionBlackList(fieldTypeConfig, 'help') || !isEditableFiledProperty(item, editable, 'help'),
     disableDescription: inConfigOptionBlackList(fieldTypeConfig, 'description') || !isEditableFiledProperty(item, editable, 'description'),
