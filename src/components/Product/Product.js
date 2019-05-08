@@ -117,11 +117,6 @@ class Product extends Component {
     });
   }
 
-  onChangeVatable = (e) => {
-    const { checked } = e.target;
-    this.props.onFieldUpdate(['vatable'], checked);
-  }
-
   onChangePricingMethod = (e) => {
     const { value } = e.target;
     this.props.onFieldUpdate(['pricing_method'], value);
@@ -229,7 +224,6 @@ class Product extends Component {
     const { errors } = this.state;
     const { product, usaget, mode, ratingParams } = this.props;
     const unit = this.getUnit();
-    const vatable = (product.get('vatable', true) === true);
     const pricingMethod = product.get('pricing_method', '');
     const editable = (mode !== 'view');
 
@@ -396,26 +390,6 @@ class Product extends Component {
                 { this.renderPrices() }
               </Col>
               { editable && <CreateButton onClick={this.onProductRateAdd} label="Add New" />}
-              <Col lg={12} md={12}>
-                <FormGroup>
-                  { editable
-                    ? (
-                      <Checkbox checked={vatable} onChange={this.onChangeVatable}>
-                        This product is taxable
-                      </Checkbox>
-                    )
-                    :
-                    (
-                      <div className="non-editable-field">
-                        { vatable
-                          ? 'This product is taxable'
-                          : 'This product is not taxable'
-                        }
-                      </div>
-                    )
-                }
-                </FormGroup>
-              </Col>
             </Panel>
 
           </Form>
