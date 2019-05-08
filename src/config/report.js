@@ -67,8 +67,8 @@ export default {
       { id: 'start', title: 'Proration start date', type: 'datetime' },
       { id: 'end', title: 'Proration end date', type: 'datetime' },
       { id: 'tax_data.taxes.key', title: 'Tax key', inputConfig: { inputType: 'select', callback: 'getTaxesOptions' } },
-      { id: 'tax_data.taxes.tax', type: 'number', title: 'Tax value' },
-      { id: 'tax_data.taxes.amount', type: 'number', title: 'Tax amount' },
+      { id: 'tax_data.taxes.tax', type: 'number', title: 'Tax rateF' },
+      { id: 'tax_data.taxes.amount', type: 'number', title: 'Total taxes' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
