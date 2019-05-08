@@ -135,7 +135,7 @@ class EntityTaxDetails extends PureComponent {
                 onChange={this.onChengeTaxation}
                 checked={tax.get('taxation', '') === 'custom'}
                 value="custom"
-                label={`${titleCase(entityLabel)} implies a specific tax rate:`}
+                label={`${titleCase(entityLabel)} implies a specific tax rate${tax.get('taxation', '') === 'custom' || tax.get('custom_tax', '') !== '' ? ': ' : ''}`}
                 className="pull-left mr5"
                 disabled={disabled}
               />
