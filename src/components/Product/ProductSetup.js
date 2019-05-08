@@ -251,16 +251,17 @@ class ProductSetup extends Component {
             usaget={usaget}
             ratingParams={ratingParams}
           />
-
-          <Panel header="Tax">
-            <EntityTaxDetails
-              tax={item.get('tax')}
-              mode={mode}
-              itemName={ProductSetup.entityName}
-              onFieldUpdate={this.onFieldUpdate}
-              onFieldRemove={this.onFieldRemove}
-              />
-          </Panel>
+          { item.get('tariff_category', '') === 'retail' && (
+            <Panel header="Tax">
+              <EntityTaxDetails
+                tax={item.get('tax')}
+                mode={mode}
+                itemName={ProductSetup.entityName}
+                onFieldUpdate={this.onFieldUpdate}
+                onFieldRemove={this.onFieldRemove}
+                />
+            </Panel>
+          )}
         </Panel>
 
         <ActionButtons
