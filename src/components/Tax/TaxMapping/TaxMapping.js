@@ -70,7 +70,7 @@ class TaxMapping extends PureComponent {
   componentDidMount() {
     const { taxMapping } = this.props;
     this.props.dispatch(getSettings([
-      'tax',
+      'taxation',
       'taxes.fields',
       'lines.fields',
     ]));
@@ -112,7 +112,7 @@ class TaxMapping extends PureComponent {
     const { dirty } = this.state;
     if (dirty) {
       this.setState(() => ({ progress: true}));
-      this.props.dispatch(saveSettings('tax'))
+      this.props.dispatch(saveSettings('taxation.mapping'))
         .then(this.afterSave);
     }
   }
@@ -121,19 +121,19 @@ class TaxMapping extends PureComponent {
     const { dirty } = this.state;
     if (dirty) {
       this.setState(() => ({ progress: true, dirty: false }));
-      this.props.dispatch(getSettings('tax'))
+      this.props.dispatch(getSettings('taxation.mapping'))
         .then(this.afterSave);
     }
   }
 
   onUpdate = (path, value) => {
     this.setState(() => ({ dirty: true }));
-    this.props.dispatch(updateSetting('tax', ['mapping', ...path], value));
+    this.props.dispatch(updateSetting('taxation', ['mapping', ...path], value));
   }
 
   onAdd = (path, value) => {
     this.setState(() => ({ dirty: true }));
-    this.props.dispatch(pushToSetting('tax', value, ['mapping', ...path]));
+    this.props.dispatch(pushToSetting('taxation', value, ['mapping', ...path]));
   }
 
   onAddCondition = (path) => {
@@ -145,14 +145,14 @@ class TaxMapping extends PureComponent {
     const priorities = taxMapping.getIn(path);
     const count = priorities.size;
     const newIndex = (count > 2) ? count - 2 : 0;
-    this.props.dispatch(updateSetting('tax', ['mapping', ...path], priorities.insert(newIndex, List())));
+    this.props.dispatch(updateSetting('taxation', ['mapping', ...path], priorities.insert(newIndex, List())));
     // Add first condition to new Priority
     this.onAddCondition([...path, newIndex]);
   }
 
   onRemove = (path) => {
     this.setState(() => ({ dirty: true }));
-    this.props.dispatch(removeSettingField('tax', ['mapping', ...path]));
+    this.props.dispatch(removeSettingField('taxation', ['mapping', ...path]));
   }
 
   renderPriority = (category, priorities) => {

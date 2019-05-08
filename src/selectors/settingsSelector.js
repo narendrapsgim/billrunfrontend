@@ -63,9 +63,6 @@ const getServiceFields = (state, props) => // eslint-disable-line no-unused-vars
 const getTaxFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxes', 'fields']);
 
-const getTax = (state, props) => // eslint-disable-line no-unused-vars
-  state.settings.getIn(['tax']);
-
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['rates', 'fields']);
 
@@ -221,7 +218,7 @@ export const inputProssesorRatingParamsSelector = createSelector(
 );
 
 export const taxMappingSelector = createSelector(
-  getTax,
+  getTaxation,
   (tax = Immutable.Map()) => tax.get('mapping'),
 );
 
