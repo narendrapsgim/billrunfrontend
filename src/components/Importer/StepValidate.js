@@ -89,16 +89,23 @@ const StepValidate = ({ fields, rows, selectedMapper, defaultMappedName, saveMap
     );
   };
 
-  const renderErrors = errors => (errors.isEmpty() ? null : (
-    <Panel header="Errors">
+  const renderErrors = (errors, index) => (errors.isEmpty() ? null : (
+    <Panel header="Errors" key={index}>
       <FormGroup>
         <Col sm={12}>
-          { errors.sortBy((messages, index) => parseInt(index)).map((messages, index) => (
-            <dl className="mb0">
-              <dt>row { index }</dt>
-              { messages.map(message => <dd>- {message}</dd>) }
-            </dl>
-          )).toList()}
+          { errors
+            .sortBy((messages, index) => parseInt(index))
+            .map((messages, index) => (
+              <dl className="mb0" key={index}>
+                <dt>row { index }</dt>
+                { messages.map((message, messageIdx) => (
+                  <dd key={`${index}-${messageIdx}`}>- {message}</dd>
+                )) }
+              </dl>
+            ))
+            .toList()
+            .toArray()
+          }
         </Col>
       </FormGroup>
     </Panel>
@@ -161,7 +168,6 @@ const StepValidate = ({ fields, rows, selectedMapper, defaultMappedName, saveMap
               <Actions actions={mapperActions} data={mapperName} isGroup={true}/>
             </InputGroup.Button>
           </InputGroup>
-
         </div>
         <div className="clearfix" />
       </div>
@@ -171,9 +177,9 @@ const StepValidate = ({ fields, rows, selectedMapper, defaultMappedName, saveMap
           .map(rowFields => rowFields
             .filter((value, fieldName) => fieldName === '__ERRORS__')
             .map(renderErrors)
+            .toList()
+            .toArray()
           )
-          .toList()
-          .toArray()
         }
         { mapper.size > 0 && (
           <Panel header="Map">

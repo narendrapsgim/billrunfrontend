@@ -197,6 +197,9 @@ const StepMapper = (props) => {
     .sort(soptFields)
     .map((field) => {
       const defaultValue = defaultFieldsValues.find((value, key) => key === field.value);
+      // fix PHP empty object to array
+      const multiFieldAction = item.get('multiFieldAction') === Immutable.List() ? Immutable.Map() : item.get('multiFieldAction');
+      const mapResult = item.get('map') === Immutable.List() ? Immutable.Map() : item.get('map');
       return (
         <MapField
           key={`header_${field.value}`}
@@ -206,8 +209,8 @@ const StepMapper = (props) => {
           operation={operation}
           entity={item.get('entity')}
           options={csvHeaders}
-          mapResult={item.get('map')}
-          multiFieldAction={item.get('multiFieldAction')}
+          mapResult={mapResult}
+          multiFieldAction={multiFieldAction}
           mapperPrefix={mapperPrefix}
           onChange={props.onChange}
           onDelete={props.onDelete}

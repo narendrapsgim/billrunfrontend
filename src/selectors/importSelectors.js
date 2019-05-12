@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import {
   isLinkerField,
   isUpdaterField,
-  setFieldTitle,  
+  setFieldTitle,
 } from '@/common/Util';
 import {
   itemSelector,
@@ -43,7 +43,7 @@ const selectSubscriberImportFields = (fields, accountfields) => {
 };
 
 const selectProductImportFields = (fields) => {
-  const hiddenFields = ['to', 'rates'];
+  const hiddenFields = ['to', 'rates', 'tax'];
   const uniqueFields = ['key'];
   const mandatory = ['tariff_category'];
   return Immutable.List().withMutations((fieldsWithMutations) => {
@@ -70,6 +70,23 @@ const selectProductImportFields = (fields) => {
       } else {
         fieldsWithMutations.push(productField.set('show', false));
       }
+      if (productField.get('field_name', '') === 'tax') {
+        // // type:"vat",
+        // const fieldTaxType = Immutable.Map({ field_name: 'tax__type' });
+        // fieldsWithMutations.push(setFieldTitle(fieldTaxType, 'product'));
+
+        // taxation: "no" / "global" / "custom" / "default",
+        const fieldTaxTaxation = Immutable.Map({ field_name: 'tax__taxation', title: 'Taxation' });
+        fieldsWithMutations.push(setFieldTitle(fieldTaxTaxation, 'product'));
+
+        // custom_tax "TAX_BULGARIA" // Tax doc key, relevant for "custom" only
+        const fieldTaxCustomTax = Immutable.Map({ field_name: 'tax__custom_tax', title: 'Tax custom rate' });
+        fieldsWithMutations.push(setFieldTitle(fieldTaxCustomTax, 'product'));
+
+        // custom_logic: "override" / "fallback" // relevant for "custom" only
+        const fieldTaxCustomLogic = Immutable.Map({ field_name: 'tax__custom_logic', title: 'Tax custom logic' });
+        fieldsWithMutations.push(setFieldTitle(fieldTaxCustomLogic, 'product'));
+      }
       if (productField.get('field_name', '') === 'rates') {
         const fieldPriceFrom = Immutable.Map({ field_name: 'price_from' });
         fieldsWithMutations.push(setFieldTitle(fieldPriceFrom, 'product'));
@@ -89,9 +106,6 @@ const selectProductImportFields = (fields) => {
         const helpPercentage = 'Field will effect only if \'Plan Price Override\' value is different from BASE';
         const fieldPricePercentage = Immutable.Map({ field_name: 'rates.percentage', help: helpPercentage });
         fieldsWithMutations.push(setFieldTitle(fieldPricePercentage, 'import'));
-
-        const fieldVatable = Immutable.Map({ field_name: 'vatable' });
-        fieldsWithMutations.push(setFieldTitle(fieldVatable, 'product'));
       }
     });
     const fieldPricePlan = Immutable.Map({

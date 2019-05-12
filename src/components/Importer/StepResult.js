@@ -31,23 +31,27 @@ const StepResult = (props) => {
   const rendeDetails = () => (
     <div className="scrollbox">
       { result
-          .sortBy((status, key) => parseInt(key))
-          .map((status, key) => (
-            <dl className="mb0" key={`status_${key}`}>
-              <dt>
-                {`row ${key} `}
-                {status === true && <Label bsStyle="success">Success</Label>}
-                {status === false && <Label bsStyle="info">No errors</Label>}
-                {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="warning">{status}</Label>}
-              </dt>
-              { Immutable.Iterable.isIterable(status) && status.map((message, index) => (
-                <dd key={`status_error_${key}_${index}`}>
-                  - <Label bsStyle="danger">{message}</Label>
-                </dd>)).toArray()
-              }
-            </dl>
-          ))
-          .toArray()}
+        .sortBy((status, key) => parseInt(key))
+        .map((status, key) => (
+          <dl className="mb0" key={`status_${key}`}>
+            <dt>
+              {`row ${key} `}
+              {status === true && <Label bsStyle="success">Success</Label>}
+              {status === false && <Label bsStyle="info">No errors</Label>}
+              {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="warning">{status}</Label>}
+            </dt>
+            { Immutable.Iterable.isIterable(status) && status.map((message, index) => (
+              <dd key={`status_error_${key}_${index}`}>
+                - <Label bsStyle="danger">{message}</Label>
+              </dd>
+              ))
+              .toArray()
+            }
+          </dl>
+        ))
+        .toList()
+        .toArray()
+      }
     </div>
   );
 

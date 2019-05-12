@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
+import { titleCase } from 'change-case';
 import { Form } from 'react-bootstrap';
 import StepUpload from './StepUpload';
 import StepMapper from './StepMapper';
@@ -183,6 +184,7 @@ class Importer extends Component {
       'usage_type_value',
       'usage_type_unit',
     ];
+    const taxFields = ['tax__type', 'tax__taxation','tax__custom_logic','tax__custom_tax'];
     return combinedRate.withMutations((combinedRateWithMutations) => {
       // Check price field, if we have pricing or percentage in import but missing pricing data -> return error
       if (rateLine.get('rates.percentage', '') !== '' && rateLine.get('price_plan', 'BASE') !== 'BASE') {
@@ -233,7 +235,7 @@ class Importer extends Component {
       }
       // Check all other fields field with same value
       rateLine.forEach((value, fieldName) => {
-        if (index !== 0 && !specicalField.includes(fieldName) && !multiValueFields.includes(fieldName) && value !== combinedRateWithMutations.get(fieldName, '')) {
+        if (index !== 0 && !specicalField.includes(fieldName) && !taxFields.includes(fieldName) && !multiValueFields.includes(fieldName) && value !== combinedRateWithMutations.get(fieldName, '')) {
           combinedRateWithMutations.update('__ERRORS__', Immutable.Map(), erros =>
             erros.update(rateLine.get('__CSVROW__', 'unknown'), Immutable.List(), messages =>
               messages.push(`different values for ${fieldName} field`),
@@ -251,6 +253,20 @@ class Importer extends Component {
           existing = existing.concat(value.split(',').map(v => v.trim()));
           combinedRateWithMutations.set(fieldName, existing.toList());
         }
+
+        // build tax object
+        if (taxFields.includes(fieldName) && rateLine.has(fieldName)) {
+          const taxFieldNameArray = fieldName.split("__");
+          if (index !== 0 && value !== combinedRateWithMutations.getIn(taxFieldNameArray, '')) {
+            combinedRateWithMutations.update('__ERRORS__', Immutable.Map(), erros =>
+              erros.update(rateLine.get('__CSVROW__', 'unknown'), Immutable.List(), messages =>
+                messages.push(`different values for ${titleCase(taxFieldNameArray[0])} ${titleCase(taxFieldNameArray[1])} field`),
+              ),
+            );
+          } else {
+            combinedRateWithMutations.setIn(taxFieldNameArray, rateLine.get(fieldName, ''));
+          }
+        }
       });
       // push all rows number that build combined revision
       let rowNumber = combinedRateWithMutations.get('__CSVROW__', Immutable.List());
@@ -263,6 +279,9 @@ class Importer extends Component {
       combinedRateWithMutations.set('__CSVROW__', rowNumber);
       // Delete all help fileds that was added by UI.
       combinedRateWithMutations
+        .delete('tax__custom_logic')
+        .delete('tax__custom_tax')
+        .delete('tax__taxation')
         .delete('rates.percentage')
         .delete('price_plan')
         .delete('price_from')
@@ -358,8 +377,6 @@ class Importer extends Component {
   onSaveMapping = (label) => {
     const { item, savedMappers } = this.props;
     const selectedMapperName = item.get('mapperName', '');
-    console.log("new label: ", label);
-
     const index = savedMappers.findIndex(savedMapper => savedMapper.get('label', '') === label);
     const map = item.get('map', Immutable.List());
     const linker = item.get('linker', Immutable.Map());
