@@ -38,7 +38,7 @@ const StepResult = (props) => {
               {`row ${key} `}
               {status === true && <Label bsStyle="success">Success</Label>}
               {status === false && <Label bsStyle="info">No errors</Label>}
-              {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="warning">{status}</Label>}
+              {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="danger">{status}</Label>}
             </dt>
             { Immutable.Iterable.isIterable(status) && status.map((message, index) => (
               <dd key={`status_error_${key}_${index}`}>

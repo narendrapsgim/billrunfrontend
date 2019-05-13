@@ -400,13 +400,15 @@ class Importer extends Component {
   onSelectMapping = (name = '') => {
     const { savedMappers } = this.props;
     const selectedMapper = savedMappers.find(mapper => mapper.get('label', '') === name, null, Immutable.Map());
-    const map = selectedMapper
-      .get('map', Immutable.Map())
-      .filter((value, fieldName) => this.customFilterMapperFields({ value: fieldName }) );
-    this.props.dispatch(updateImporterValue('map', map));
-    this.props.dispatch(updateImporterValue('linker', selectedMapper.get('linker', Immutable.Map())));
-    this.props.dispatch(updateImporterValue('updater', selectedMapper.get('updater', Immutable.Map())));
-    this.props.dispatch(updateImporterValue('multiFieldAction', selectedMapper.get('multiFieldAction', Immutable.Map())));
+    // fix PHP empty object to array
+    const map = selectedMapper.get('map', Immutable.Map()) === Immutable.List() ? Immutable.Map() : selectedMapper.get('map', Immutable.Map());
+    this.props.dispatch(updateImporterValue('map', map.filter((value, fieldName) => this.customFilterMapperFields({ value: fieldName }))));
+    const linker = selectedMapper.get('linker', Immutable.Map()) === Immutable.List() ? Immutable.Map() : selectedMapper.get('linker', Immutable.Map());
+    this.props.dispatch(updateImporterValue('linker', linker));
+    const updater = selectedMapper.get('updater', Immutable.Map()) === Immutable.List() ? Immutable.Map() : selectedMapper.get('updater', Immutable.Map())
+    this.props.dispatch(updateImporterValue('updater', updater));
+    const multiFieldAction = selectedMapper.get('multiFieldAction', Immutable.Map()) === Immutable.List() ? Immutable.Map() : selectedMapper.get('multiFieldAction', Immutable.Map())
+    this.props.dispatch(updateImporterValue('multiFieldAction', multiFieldAction));
     this.props.dispatch(updateImporterValue('mapperName', name));
   }
 
