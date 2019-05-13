@@ -62,7 +62,7 @@ const StepValidate = ({ fields, rows, selectedMapper, defaultMappedName, saveMap
     const fieldValue = (key === 'effective_date') ? updater : updater.get('value', '');
     const curField = fields.find(field => field.value === fieldKey);
     return (
-      <FormGroup>
+      <FormGroup key={key}>
         <Col sm={3} componentClass={ControlLabel}>
           { curField ? curField.label : fieldKey }
         </Col>
@@ -73,10 +73,10 @@ const StepValidate = ({ fields, rows, selectedMapper, defaultMappedName, saveMap
     );
   };
 
-  const renderLinker = (linker) => {
+  const renderLinker = (linker, inedx) => {
     const curField = fields.find(field => field.value === linker.get('field', ''));
     return (
-      <Panel header="Linker" className="mb0">
+      <Panel header="Linker" className="mb0" key={inedx}>
         <FormGroup>
           <Col sm={3} componentClass={ControlLabel}>
             { curField ? curField.label : linker.get('field', '') }
