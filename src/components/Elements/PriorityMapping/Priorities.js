@@ -1,11 +1,21 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-import { List } from 'immutable';
-import { Form } from 'react-bootstrap';
+import { List, Map } from 'immutable';
+import { Form, Panel } from 'react-bootstrap';
+import uuid from 'uuid';
 import { CreateButton } from '@/components/Elements';
+import Field from '@/components/Field';
 import Priority from './Priority';
 
 const createBtnStyle = {};
+const demmyTitleStyle = {marginLeft: 21};
+
+const newDefaultCondition = Map();
+const newDefaultPriority = Map({
+  filters: List([newDefaultCondition]),
+  cache_db_queries: true
+});
+
 
 const Priorities = ({
   type,
@@ -15,17 +25,44 @@ const Priorities = ({
   paramsKeyOptions,
   conditionFieldsOptions,
   valueWhenOptions,
-  onAddCondition,
-  onAddPriority,
+  onAdd,
   onUpdate,
   onRemove,
 }) => {
-  const onCreate = useCallback(() => onAddPriority([category]), [onAddPriority, category]);
+  const addCondition = useCallback((path) => {
+    onAdd([category, 'priorities', ...path], newDefaultCondition);
+  }, [onAdd, category]);
+  const addPriority = useCallback(() => {
+    const newPriority = newDefaultPriority.set('uiFlag', Map({id: uuid.v4()}))
+    onAdd([category, 'priorities'], newPriority);
+  }, [onAdd, category]);
+
+  const updateDefaultFallback = useCallback((e) => {
+    const { value } = e.target;
+    onUpdate([category, 'default_fallback'], value)
+  }, [onUpdate, category]);
+
+  const update = useCallback((path, value) => {
+    onUpdate([category, 'priorities', ...path], value);
+  }, [onUpdate, category]);
+
+  const remove = useCallback((path) => {
+    onRemove([category, 'priorities', ...path]);
+  }, [onRemove, category]);
+
   return (
     <Form horizontal>
-      { priorities.map((priority, index) => (
+      <Panel header={<div style={demmyTitleStyle}>Priority 1</div>}>
+        <Field
+          fieldType="checkbox"
+          value={true}
+          label="Use product/service/plan override tax rate if defined"
+          disabled={true}
+        />
+      </Panel>
+      { priorities.get('priorities', List()).map((priority, index) => (
         <Priority
-          key={index}
+          key={priority.getIn(['uiFlag', 'id'], index)}
           index={index}
           category={category}
           type={type}
@@ -35,14 +72,31 @@ const Priorities = ({
           paramsKeyOptions={paramsKeyOptions}
           conditionFieldsOptions={conditionFieldsOptions}
           valueWhenOptions={valueWhenOptions}
-          onAddCondition={onAddCondition}
-          onUpdate={onUpdate}
-          onRemove={onRemove}
+          onAdd={addCondition}
+          onUpdate={update}
+          onRemove={remove}
         />
       ))}
+
+      <Panel header={<div style={demmyTitleStyle}>Priority {priorities.get('priorities', List()).size + 2}</div>}>
+        <Field
+          fieldType="checkbox"
+          value={true}
+          label="Use tax rate referenced by product/service/plan"
+          disabled={true}
+        />
+      </Panel>
+      <Panel header={<div style={demmyTitleStyle}>Priority {priorities.get('priorities', List()).size + 3}</div>}>
+        <Field
+          fieldType="checkbox"
+          value={priorities.get('default_fallback', false)}
+          onChange={updateDefaultFallback}
+          label="Use default tax rate"
+        />
+      </Panel>
       <CreateButton
         label="Add Next Priority"
-        onClick={onCreate}
+        onClick={addPriority}
         buttonStyle={createBtnStyle}
       />
     </Form>
@@ -51,7 +105,7 @@ const Priorities = ({
 
 
 Priorities.defaultProps = {
-  priorities: List(),
+  priorities: Map(),
   lineKeyOptions: [],
   paramsKeyOptions: [],
   conditionFieldsOptions: [],
@@ -62,7 +116,7 @@ Priorities.defaultProps = {
 Priorities.propTypes = {
   type: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
-  priorities: PropTypes.instanceOf(List),
+  priorities: PropTypes.instanceOf(Map),
   lineKeyOptions: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string,
@@ -87,8 +141,7 @@ Priorities.propTypes = {
       label: PropTypes.string,
     }),
   ),
-  onAddCondition: PropTypes.func.isRequired,
-  onAddPriority: PropTypes.func.isRequired,
+  onAdd: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
 };

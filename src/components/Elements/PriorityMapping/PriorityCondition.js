@@ -10,7 +10,7 @@ import ComputedRate from './ComputedRate';
 
 
 const PriorityCondition = ({
-  condition, index, priorityIndex, type, onUpdate, onRemove, count,
+  condition, index, priorityIndex, type, onUpdate, onRemove, allowRemove,
   lineKeyOptions, paramsKeyOptions, paramsTypeOptions,
   conditionFieldsOptions, valueWhenOptions,
 }) => {
@@ -62,8 +62,8 @@ const PriorityCondition = ({
   }, [onUpdate, index]);
 
   const conditionActions = useMemo(() => [
-    { type: 'remove', onClick: onRemove, show: count > 1, helpText: `Remove Condition ${index + 1} of Priority ${priorityIndex +1 }`, actionStyle: 'default' },
-  ], [onRemove, count, priorityIndex, index]);
+    { type: 'remove', onClick: onRemove, show: allowRemove, helpText: `Remove Condition ${index + 1} of Priority ${priorityIndex + 1 }`, actionStyle: 'default' },
+  ], [onRemove, allowRemove, priorityIndex, index]);
 
   const computedLineActions = useMemo(() => {
     const onShowComputedLineKey = () => {
@@ -159,7 +159,7 @@ const PriorityCondition = ({
 PriorityCondition.defaultProps = {
   condition: Map(),
   index: 0,
-  count: 0,
+  allowRemove: true,
   priorityIndex: 0,
   lineKeyOptions: [],
   paramsKeyOptions: [],
@@ -173,7 +173,7 @@ PriorityCondition.propTypes = {
   type: PropTypes.string.isRequired,
   index: PropTypes.number,
   priorityIndex: PropTypes.number,
-  count: PropTypes.number,
+  allowRemove: PropTypes.bool,
   lineKeyOptions: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string,

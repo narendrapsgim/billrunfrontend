@@ -70,7 +70,7 @@ class TaxMapping extends PureComponent {
   componentDidMount() {
     const { taxMapping } = this.props;
     this.props.dispatch(getSettings([
-      'taxation',
+      'taxation.mapping',
       'taxes.fields',
       'lines.fields',
     ]));
@@ -91,9 +91,23 @@ class TaxMapping extends PureComponent {
     }
   }
 
+  removePriorityUIFlags = () => {
+    const { taxMapping } = this.props;
+    const taxMappingWithUiFlags = taxMapping.withMutations((taxMappingWithMutations) => {
+      taxMappingWithMutations.forEach((categoryMapping, category) => {
+        categoryMapping.get('priorities', List()).forEach((priority, index) => {
+          if (priority.has('uiFlag')) {
+            taxMappingWithMutations.deleteIn([category, 'priorities', index, 'uiFlag']);
+          }
+        })
+      })
+    });
+    this.props.dispatch(updateSetting('taxation', ['mapping'], taxMappingWithUiFlags));
+  }
+
   setPageTitle = (taxMapping) => {
     if (taxMapping.size === 1) {
-      const newTitle = `${TaxMapping.pageTitle} | ${titleCase(taxMapping.keySeq().first())}`;
+      const newTitle = `${TaxMapping.pageTitle} | ${titleCase(taxMapping.keySeq().first('Priorities'))}`;
       this.props.dispatch(setPageTitle(newTitle));
     } else {
       this.props.dispatch(setPageTitle(TaxMapping.pageTitle));
@@ -112,6 +126,7 @@ class TaxMapping extends PureComponent {
     const { dirty } = this.state;
     if (dirty) {
       this.setState(() => ({ progress: true}));
+      this.removePriorityUIFlags();
       this.props.dispatch(saveSettings('taxation.mapping'))
         .then(this.afterSave);
     }
@@ -136,20 +151,6 @@ class TaxMapping extends PureComponent {
     this.props.dispatch(pushToSetting('taxation', value, ['mapping', ...path]));
   }
 
-  onAddCondition = (path) => {
-    this.onAdd(path, Map());
-  }
-
-  onAddPriority = (path) => {
-    const { taxMapping } = this.props;
-    const priorities = taxMapping.getIn(path);
-    const count = priorities.size;
-    const newIndex = (count > 2) ? count - 2 : 0;
-    this.props.dispatch(updateSetting('taxation', ['mapping', ...path], priorities.insert(newIndex, List())));
-    // Add first condition to new Priority
-    this.onAddCondition([...path, newIndex]);
-  }
-
   onRemove = (path) => {
     this.setState(() => ({ dirty: true }));
     this.props.dispatch(removeSettingField('taxation', ['mapping', ...path]));
@@ -166,8 +167,7 @@ class TaxMapping extends PureComponent {
         paramsKeyOptions={taxParamsKeyOptions}
         conditionFieldsOptions={conditionFieldsOptions}
         valueWhenOptions={valueWhenOptions}
-        onAddCondition={this.onAddCondition}
-        onAddPriority={this.onAddPriority}
+        onAdd={this.onAdd}
         onRemove={this.onRemove}
         onUpdate={this.onUpdate}
       />
@@ -182,8 +182,8 @@ class TaxMapping extends PureComponent {
       );
     }
     if (taxMapping.size === 1) {
-      const category = taxMapping.keySeq().first();
-      const prioritiesCategory = taxMapping.first();
+      const category = taxMapping.keySeq().first('');
+      const prioritiesCategory = taxMapping.first(Map());
       return this.renderPriority(category, prioritiesCategory);
     }
     return (

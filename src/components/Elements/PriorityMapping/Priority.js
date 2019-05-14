@@ -1,11 +1,10 @@
 import React, { memo, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { titleCase } from 'change-case';
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import { Panel, Col, FormGroup } from 'react-bootstrap';
 import PriorityCondition from './PriorityCondition';
 import { CreateButton, Actions } from '@/components/Elements';
-import Field from '@/components/Field';
 
 const createBtnStyle = { marginTop: 5 };
 
@@ -13,77 +12,45 @@ const Priority = ({
   priority,
   index,
   type,
-  category,
-  count,
   paramsKeyOptions,
   lineKeyOptions,
   conditionFieldsOptions,
   valueWhenOptions,
   onUpdate,
   onRemove,
-  onAddCondition,
+  onAdd,
 }) => {
+
+  const priorityPath = useMemo(() => [index],[index]);
+
+  const conditionPath = useMemo(() => [...priorityPath, 'filters'], [priorityPath]);
+
+  const priorityConditions = useMemo(() => priority.get('filters', List()), [priority]);
+
   const updateCondition = useCallback((path, value) => {
     if (value === null) {
-      onUpdate([category, index], priority.deleteIn(path));
+      onUpdate(conditionPath, priorityConditions.deleteIn(path));
     } else {
-      onUpdate([category, index, ...path], value);
+      onUpdate([...conditionPath, ...path], value);
     }
-  }, [onUpdate, category, index, priority]);
+  }, [onUpdate, conditionPath, priorityConditions]);
 
   const removeCondition = useCallback((idx) => {
-    onRemove([category, index, idx]);
-  }, [onRemove, category, index]);
+    onRemove([...conditionPath, idx]);
+  }, [onRemove, conditionPath]);
 
-  const updateUseHintDoc = useCallback((e) => {
-    const { value } = e.target;
-    onUpdate([category, index, 0, 'use_hint_doc'], value)
-  }, [onUpdate, category, index]);
-
-  const updateDefaultFallback = useCallback((e) => {
-    const { value } = e.target;
-    onUpdate([category, index, 0, 'default_fallback'], value)
-  }, [onUpdate, category, index]);
-
-  const actionsData = useMemo(() => [category, index], [category, index]);
-
-  const allowRemove = useMemo(() => ![count, count - 1].includes(index + 1), [count, index]);
-
-  const actions = useMemo(() => [
-    { type: 'remove', onClick: onRemove, show: allowRemove, helpText: `Remove Priority ${index + 1}`, actionClass: 'pr0 pl0 pt0' },
-  ], [onRemove, index, allowRemove]);
-
-  if (priority.first().has('use_hint_doc')) {
-    return (
-      <Panel header={`Priority ${index + 1}`}>
-        <Field
-          fieldType="checkbox"
-          value={priority.first().get('use_hint_doc', false)}
-          onChange={updateUseHintDoc}
-          label="Use tax rate referenced by product/service/plan"
-          disabled={true}
-        />
-      </Panel>
-    );
-  }
-  if (priority.first().has('default_fallback')) {
-    return (
-      <Panel header={`Priority ${index + 1}`}>
-        <Field
-          fieldType="checkbox"
-          value={priority.first().get('default_fallback', false)}
-          onChange={updateDefaultFallback}
-          label="Use default tax rate"
-        />
-      </Panel>
-    );
-  }
+  const actions = useMemo(() => [{
+    type: 'remove',
+    onClick: onRemove,
+    helpText: `Remove Priority ${index + 2}`,
+    actionClass: 'pr0 pl0 pt0',
+  }], [onRemove, index]);
 
   const header = (
     <div>
-      {`Priority ${index + 1}`}
+      {`Priority ${index + 2}`}
       <div className="pull-right">
-        <Actions actions={actions} data={actionsData} />
+        <Actions actions={actions} data={priorityPath} />
       </div>
     </div>
   );
@@ -91,10 +58,10 @@ const Priority = ({
     <Panel header={header} collapsible={true} className="collapsible" defaultExpanded={true}>
       <div className="priority-conditions">
         <Col sm={12} className="form-inner-edit-rows">
-          {priority.isEmpty() && (
+          {priorityConditions.isEmpty() && (
             <small>No conditions found</small>
           )}
-          {!priority.isEmpty() && (
+          {!priorityConditions.isEmpty() && (
             <FormGroup className="form-inner-edit-row">
               <Col sm={4} xsHidden><label className="ml5 mb0">CDR Field</label></Col>
               <Col sm={3} xsHidden><label className="mb0">Operator</label></Col>
@@ -102,12 +69,12 @@ const Priority = ({
               <Col sm={1} xsHidden></Col>
             </FormGroup>
           )}
-          { priority.map((condition, idx) => (
+          { priorityConditions.map((condition, idx) => (
             <PriorityCondition
               key={idx}
               index={idx}
               priorityIndex={index}
-              count={priority.size}
+              allowRemove={priorityConditions.size > 1}
               type={type}
               lineKeyOptions={lineKeyOptions}
               paramsKeyOptions={paramsKeyOptions}
@@ -121,8 +88,8 @@ const Priority = ({
         </Col>
         <Col sm={12} className="ml5 pl0">
           <CreateButton
-            onClick={onAddCondition}
-            data={actionsData}
+            onClick={onAdd}
+            data={conditionPath}
             label="Add Condition"
             buttonStyle={createBtnStyle}
           />
@@ -130,21 +97,19 @@ const Priority = ({
       </div>
     </Panel>
   )
-
 }
 
 Priority.defaultProps = {
-  priority: List(),
+  priority: Map(),
   lineKeyOptions: [],
   paramsKeyOptions: [],
   conditionFieldsOptions: [],
   valueWhenOptions: [],
   index: 0,
-  count: 0,
 };
 
 Priority.propTypes = {
-  priority: PropTypes.instanceOf(List),
+  priority: PropTypes.instanceOf(Map),
   lineKeyOptions: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string,
@@ -170,12 +135,10 @@ Priority.propTypes = {
     }),
   ),
   index: PropTypes.number,
-  count: PropTypes.number,
   type: PropTypes.string.isRequired,
-  category: PropTypes.string.isRequired,
   onRemove: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
-  onAddCondition: PropTypes.func.isRequired,
+  onAdd: PropTypes.func.isRequired,
 };
 
 export default memo(Priority);
