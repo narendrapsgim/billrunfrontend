@@ -10,6 +10,7 @@ import {
   getSettings,
 } from '@/actions/settingsActions';
 import { isPlaysEnabledSelector } from '@/selectors/settingsSelector';
+import { getConfig } from '@/common/Util';
 
 
 class ProductsList extends Component {
@@ -57,6 +58,8 @@ class ProductsList extends Component {
     return isPlaysEnabled;
   }
 
+  isImportEnabled = () => getConfig(['import', 'allowed_entities'], Immutable.List()).includes('product');
+
   getProjectFields = () => {
     const { fields, defaultListFields } = this.props;
     return fields
@@ -99,11 +102,10 @@ class ProductsList extends Component {
   }, {
     type: 'import',
     label: 'Import',
-    actionStyle: 'primary',
-    showIcon: true,
     onClick: this.onClickImport,
+    show: this.isImportEnabled,
+    actionStyle: 'primary',
     actionSize: 'xsmall',
-    actionClass: 'btn-primary',
   }];
 
   render() {
