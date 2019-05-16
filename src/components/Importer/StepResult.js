@@ -10,7 +10,7 @@ const StepResult = (props) => {
   const fileDelimiter = item.get('fileDelimiter', ',');
   const fileContent = item.get('fileContent', []) || [];
   const fileName = item.get('fileName', 'errors');
-  const result = item.get('result', []) || [];
+  const result = item.get('result', Immutable.List()) || Immutable.List();
 
   const getErrorCsvHeaders = () => (
     [...fileContent[0], 'import_error_message', 'import_error_row']
@@ -18,12 +18,10 @@ const StepResult = (props) => {
 
   const getErrorCsvData = () => {
     const rows = [];
-    result.forEach((status, index) => {
+    result.forEach((status, rowIndex) => {
       if (status !== true) {
-        const csvIndex = index + 1; // first line is headers
-        const originalIndex = csvIndex + 1; // csv row start form 1
-        if (fileContent[csvIndex]) {
-          rows.push([...fileContent[csvIndex], status, originalIndex]);
+        if (fileContent[rowIndex - 1]) {
+          rows.push([...fileContent[rowIndex - 1], status, rowIndex]);
         }
       }
     });
@@ -31,18 +29,30 @@ const StepResult = (props) => {
   };
 
   const rendeDetails = () => (
-    <ol className="scrollbox">
-      { result.map((status, key) => {
-        const error = status !== true;
-        const label = error ? status : 'Success';
-        const bsStyle = error ? 'danger' : 'success';
-        return (
-          <li key={key}>
-            <Label bsStyle={bsStyle}>{label}</Label>
-          </li>
-        );
-      })}
-    </ol>
+    <div className="scrollbox">
+      { result
+        .sortBy((status, key) => parseInt(key))
+        .map((status, key) => (
+          <dl className="mb0" key={`status_${key}`}>
+            <dt>
+              {`row ${key} `}
+              {status === true && <Label bsStyle="success">Success</Label>}
+              {status === false && <Label bsStyle="info">No errors</Label>}
+              {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="danger">{status}</Label>}
+            </dt>
+            { Immutable.Iterable.isIterable(status) && status.map((message, index) => (
+              <dd key={`status_error_${key}_${index}`}>
+                - <Label bsStyle="danger">{message}</Label>
+              </dd>
+              ))
+              .toArray()
+            }
+          </dl>
+        ))
+        .toList()
+        .toArray()
+      }
+    </div>
   );
 
   const renderStatus = () => {
@@ -59,7 +69,7 @@ const StepResult = (props) => {
     if (allSuccess) {
       return (
         <div>
-          <Label bsStyle="success">{result.length} records were successfully imported</Label>
+          <Label bsStyle="success">{result.size} records were successfully imported</Label>
         </div>
       );
     }
@@ -83,7 +93,7 @@ const StepResult = (props) => {
       <div>
         <p>
           <Label bsStyle="success">{success.length}</Label> rows were successfully imported.<br />
-          <Label bsStyle="danger">{result.length - success.length}</Label> rows were faild import.<br />
+          <Label bsStyle="danger">{result.size - success.length}</Label> rows were faild import.<br />
           Please remove successfully imported rows from file, fix errors and try again.
         </p>
         <CSVLink

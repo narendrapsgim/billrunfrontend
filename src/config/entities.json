@@ -3,6 +3,7 @@
     "collection": "services",
     "uniqueField": "name",
     "itemName": "service",
+    "itemsName": "services",
     "itemType": "service",
     "itemsType": "services",
     "settingsKey": "services"
@@ -11,6 +12,7 @@
     "collection": "plans",
     "uniqueField": "name",
     "itemName": "plan",
+    "itemsName": "plans",
     "itemType": "plan",
     "itemsType": "plans",
     "settingsKey": "plans"
@@ -19,6 +21,7 @@
     "collection": "prepaidgroups",
     "uniqueField": "name",
     "itemName": "buckets group",
+    "itemsName": "plans",
     "itemType": "charging_plan",
     "itemsType": "charging_plans"
   },
@@ -26,6 +29,7 @@
     "collection": "plans",
     "uniqueField": "name",
     "itemName": "prepaid plan",
+    "itemsName": "prepaid plans",
     "itemType": "prepaid_plan",
     "itemsType": "prepaid_plans"
   },
@@ -33,6 +37,7 @@
     "collection": "prepaidincludes",
     "uniqueField": "name",
     "itemName": "prepaid bucket",
+    "itemsName": "prepaid buckets",
     "itemType": "prepaid_include",
     "itemsType": "prepaid_includes"
   },
@@ -40,6 +45,7 @@
     "collection": "rates",
     "uniqueField": "key",
     "itemName": "product",
+    "itemsName": "products",
     "itemType": "product",
     "itemsType": "products",
     "settingsKey": "rates"
@@ -48,6 +54,7 @@
     "collection": "discounts",
     "uniqueField": "key",
     "itemName": "discount",
+    "itemsName": "discounts",
     "itemType": "discount",
     "itemsType": "discounts"
   },
@@ -55,6 +62,7 @@
     "collection": "subscribers",
     "uniqueField": ["sid", "aid"],
     "itemName": "subscriber",
+    "itemsName": "subscribers",
     "itemType": "subscription",
     "itemsType": "subscriptions",
     "settingsKey": "subscribers.subscriber"
@@ -63,6 +71,7 @@
     "collection": "accounts",
     "uniqueField": "aid",
     "itemName": "customer",
+    "itemsName": "customers",
     "itemType": "customer",
     "itemsType": "customers",
     "settingsKey": "subscribers.account"
@@ -71,13 +80,16 @@
     "collection": "reports",
     "uniqueField": "key",
     "itemName": "report",
+    "itemsName": "reports",
     "itemType": "report",
     "itemsType": "reports"
   },
   "usage": {
     "collection": "lines",
+    "settingsKey": "lines",
     "uniqueField": "stamp",
     "itemName": "usage",
+    "itemsName": "usages",
     "itemType": "usage",
     "itemsType": "usages"
   },
@@ -85,13 +97,23 @@
     "collection": "queue",
     "uniqueField": "stamp",
     "itemName": "queue",
+    "itemsName": "queues",
     "itemType": "queue",
     "itemsType": "queues"
+  },
+  "tax": {
+    "collection": "taxes",
+    "uniqueField": "key",
+    "itemName": "tax",
+    "itemType": "tax",
+    "itemsType": "taxes",
+    "settingsKey": "taxes"
   },
   "logFile": {
     "collection": "log",
     "uniqueField": "stamp",
     "itemName": "received files",
+    "itemsName": "received files",
     "itemType": "logFile",
     "itemsType": "logFiles"
   },
@@ -99,12 +121,14 @@
     "collection": "events",
     "uniqueField": "stamp",
     "itemName": "events",
+    "itemsName": "events",
     "itemType": "event",
     "itemsType": "events"
   },
   "auto_renew": {
     "collection": "autorenew",
     "itemName": "recurring charge",
+    "itemsName": "recurring charges",
     "itemType": "auto_renew",
     "itemsType": "auto_renews"
   }

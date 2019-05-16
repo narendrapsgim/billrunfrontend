@@ -11,14 +11,17 @@ import SortableFieldsContainer from './SortableFieldsContainer';
 import DragHandle from './DragHandle';
 import ZoneDate from './ZoneDate';
 import WithEntityLink from './WithEntityLink';
+import WithTooltip from './WithTooltip';
 import TextWithButton from './TextWithButton';
 import ProgressIndicator from './ProgressIndicator';
 import PlanSearch from './PlanSearch';
 import TabsWrapper from './TabsWrapper';
 import Stepper from './Stepper';
+import PriorityMapping from './PriorityMapping';
 
 export {
   WithEntityLink,
+  WithTooltip,
   ActionButtons,
   DiffModal,
   LoadingItemPlaceholder,
@@ -36,4 +39,5 @@ export {
   PlanSearch,
   TabsWrapper,
   Stepper,
+  PriorityMapping,
 };

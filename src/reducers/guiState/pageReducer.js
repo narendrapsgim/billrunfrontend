@@ -12,6 +12,7 @@ import {
   EDIT_FORM_SET_ERROR,
   EDIT_FORM_UPDATE_ITEM_FIELD,
   EDIT_FORM_DELETE_ITEM_FIELD,
+  SET_PAGE_FLAG,
   onBoardingStates,
 } from '@/actions/guiStateActions/pageActions';
 import { LOGIN } from '@/actions/userActions';
@@ -97,6 +98,18 @@ const pageReducer = (state = defaultState, action) => {
       const { path } = action;
       const arrayPath = Array.isArray(path) ? path : [path];
       return state.deleteIn(['formModalData', 'item', ...arrayPath]);
+    }
+
+    case SET_PAGE_FLAG: {
+      const { page, flag, value } = action;
+      if (flag === null) {
+        return state.deleteIn(['flag', page]);
+      }
+      const arrayPath = Array.isArray(flag) ? flag : [flag];
+      if (value === null) {
+        return state.deleteIn(['flag', page, ...arrayPath]);
+      }
+      return state.setIn(['flag', page, ...arrayPath], value);
     }
 
     default:

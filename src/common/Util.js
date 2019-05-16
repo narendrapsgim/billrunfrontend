@@ -9,6 +9,7 @@ import systemItemsConfig from '../config/entities.json';
 import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
+import importConfig from '../config/import.json';
 import collectionsConfig from '../config/collections.json';
 import customFieldsConfig from '../config/customFields.json';
 
@@ -61,6 +62,8 @@ export const getConfig = (key, defaultValue = null) => {
         break;
       case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
         break;
+      case 'import': configCache = configCache.set('import', Immutable.fromJS(importConfig));
+        break;
       case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
         break;
       case 'customFields': configCache = configCache.set('customFields', Immutable.fromJS(customFieldsConfig));
@@ -73,9 +76,22 @@ export const getConfig = (key, defaultValue = null) => {
 
 export const titlize = str => upperCaseFirst(str);
 
-export const getFieldName = (field, category, defaultValue = null) =>
-  getConfig(['fieldNames', category, field], getConfig(['fieldNames', field], defaultValue !== null ? defaultValue : field));
+export const getFieldName = (field, category, defaultValue = null) => {
+  const categoryName = getConfig(['fieldNames', category, field], false);
+  if (typeof categoryName === 'string' && categoryName.length > 0) {
+    return categoryName;
+  }
+  const rootName = getConfig(['fieldNames', field], false);
+  if (typeof rootName === 'string' && rootName.length > 0) {
+    return rootName;
+  }
+  if (defaultValue !== null) {
+    return defaultValue;
+  }
+  return field;
+};
 
+/*  Map entity different names to fieldNames.json names */
 export const getFieldNameType = (type) => {
   switch (type) {
     case 'account':
@@ -96,11 +112,28 @@ export const getFieldNameType = (type) => {
     case 'plan':
     case 'plans':
       return 'plan';
+    case 'rate':
+    case 'rates':
     case 'product':
     case 'products':
       return 'product';
     default:
       return type;
+  }
+};
+
+/*  Map entity different names to entities.json names */
+export const getFieldEntityKey = (type) => {
+  switch (type) {
+    case 'account':
+    case 'customer':
+      return 'customer';
+    case 'lines':
+    case 'line':
+    case 'usage':
+      return 'usage';
+    default:
+      return getFieldNameType(type);
   }
 };
 
@@ -282,10 +315,23 @@ export const parseConfigSelectOptions = configOption => formatSelectOptions(
     : configOption.get('id')
 );
 
+export const parseFieldSelectOptions = (fieldOption, suffix = '') => formatSelectOptions(
+  Immutable.Map({
+    value: fieldOption.get('field_name'),
+    label: fieldOption.get('title', fieldOption.get('field_name'), '') + (suffix !== '' ? ` ${suffix}` : '')
+  })
+);
+
 export const isLinkerField = (field = Immutable.Map()) => (
   field.get('unique', false) &&
   !field.get('generated', false) &&
   field.get('editable', true)
+);
+
+export const isUpdaterField = (field = Immutable.Map()) => (
+  field.get('unique', false) ||
+  (field.get('field_name','') === 'key' && field.get('mandatory', false) && field.get('system', false)) ||
+  (field.get('field_name','') === 'name' && field.get('mandatory', false) && field.get('system', false))
 );
 
 export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldField, oldOp, newField, newOp) => {
@@ -320,22 +366,22 @@ export const getEntitySettingsName = (entityName) => {
   return entityName;
 };
 
-export const getSettingsKey = (entityName) => {
-  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey']);
-  return (key ? key.split('.')[0] : entityName);
+export const getSettingsKey = (entityName, asArray = false) => {
+  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey'], entityName);
+  if (asArray) {
+    return key.split('.');
+  }
+  return key;
+
 };
 
-export const getSettingsPath = (entityName, path) => {
-  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey']);
-  if (!key) {
+export const getSettingsPath = (entityName, asArray = false, extraPath = []) => {
+  const key = getSettingsKey(entityName, true);
+  const path = (extraPath.length > 0) ? [...key, ...extraPath] : key;
+  if (asArray) {
     return path;
   }
-
-  const keysArr = key.split('.');
-  if (typeof keysArr[1] !== 'undefined') {
-    path.unshift(keysArr[1]);
-  }
-  return path;
+  return path.join('.');
 };
 
 export const getRateByKey = (rates, rateKey) => rates.find(rate => rate.get('key', '') === rateKey) || Immutable.Map();
@@ -525,7 +571,10 @@ export const convertServiceBalancePeriodToString = (item) => {
 };
 
 export const getAvailableFields = (settings, additionalFields = []) => {
-  const fields = settings.get('fields', []).map(field => (Immutable.Map({ value: field, label: field }))).sortBy(field => field.get('value', ''));
+  const fields = settings
+    .get('fields', Immutable.List())
+    .map(field => (Immutable.Map({ value: field, label: field })))
+    .sortBy(field => field.get('value', ''));
   return fields.concat(Immutable.fromJS(additionalFields));
 };
 
@@ -581,9 +630,39 @@ export const sortFieldOption = (optionsA, optionB) => {
   return 0;
 };
 
+export const inConfigOptionBlackList = (config, value, configName = 'exclude') => {
+  const blackList = config.get(configName, Immutable.List());
+  if (blackList.isEmpty()) {
+    return false;
+  }
+  return blackList.includes(value);
+};
+
+export const inConfigOptionWhiteList = (config, value, configName = 'include') => {
+  const whiteList = config.get(configName, Immutable.List());
+  if (whiteList.isEmpty()) {
+    return true;
+  }
+  return whiteList.includes(value);
+};
+
 export const onlyLineForeignFields = lineField => lineField.has('foreign');
 
 export const foreignFieldWithoutDates = foreignField => foreignField.getIn(['foreign', 'translate', 'type'], '') !== 'unixTimeToString';
+
+export const isEditableFiledProperty = (field, editable, propName = '') => {
+  if (!editable) {
+    return false;
+  }
+  const changeableProps = field.get('changeable_props', null);
+  if (changeableProps === null) {
+    return !field.get('system', false);
+  }
+  if (propName === '') {
+    return !changeableProps.isEmpty();
+  }
+  return changeableProps.includes(propName);
+};
 
 export const shouldUsePlays = availablePlays => (availablePlays.size > 1);
 

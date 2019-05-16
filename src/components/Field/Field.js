@@ -18,6 +18,7 @@ import ToggeledInput from './types/ToggeledInput';
 import TextEditor from './types/TextEditor';
 import Ranges from './types/Ranges';
 import Range from './types/Range';
+import Percentage from './types/Percentage';
 
 
 class Field extends PureComponent {
@@ -85,6 +86,8 @@ class Field extends PureComponent {
         return (<Ranges {...inputProps} />);
       case 'range':
         return (<Range {...inputProps} />);
+      case 'percentage':
+        return (<Percentage {...inputProps} />);
       default:
         return (<Text {...inputProps} />);
     }

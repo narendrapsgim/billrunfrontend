@@ -113,6 +113,15 @@ class CustomersList extends Component {
     const defaultTo = moment().add(100, 'years').format(apiDateFormat);
     const closeImportConfirmMessage = 'Are you sure you want to close import ?';
 
+    const subscriptionDefaultValues = Immutable.Map({
+      from: defaultFrom,
+      to: defaultTo,
+    });
+    const customerDefaultValues = Immutable.Map({
+      from: defaultFrom,
+      to: defaultTo,
+    });
+
     return (
       <div>
         <EntityList
@@ -129,22 +138,12 @@ class CustomersList extends Component {
           <Importer
             entityOptions={['customer', 'subscription']}
             onFinish={this.onCloseImport}
-            defaultValues={{
-              customer: [{
-                key: 'from',
-                value: defaultFrom,
-              }, {
-                key: 'to',
-                value: defaultTo,
-              }],
-              subscription: [{
-                key: 'from',
-                value: defaultFrom,
-              }, {
-                key: 'to',
-                value: defaultTo,
-              }],
-            }}
+            defaultValues={
+              Immutable.Map({
+                subscription: subscriptionDefaultValues,
+                customer: customerDefaultValues,
+              },
+            )}
           />
         </ModalWrapper>
         <ConfirmModal onOk={this.onCloseImport} onCancel={this.onClickCancelCloseConfirm} show={showCloseImportConfirm} message={closeImportConfirmMessage} labelOk="Yes" />

@@ -1,20 +1,48 @@
-import React from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
+import { WithTooltip } from '@/components/Elements';
 
 
 const Action = (props) => {
-  const { type, label, data, actionStyle, showIcon, actionSize, actionClass } = props;
+  const {
+    type,
+    label,
+    data,
+    actionStyle,
+    showIcon,
+    actionSize,
+    actionClass,
+    show,
+    enable,
+    helpText,
+    renderFunc,
+    onClick,
+  } = props;
 
-  if ((typeof props.show === 'boolean' && !props.show)
-    || (typeof props.show === 'function' && !props.show(data, type))) {
-    return null;
-  }
+  const showAction = useMemo(() => (
+    (typeof show === 'boolean' && show)
+    || (typeof show === 'function' && show(data, type))
+  ), [show, data, type]);
 
-  const isEnable = (typeof props.enable === 'function') ? props.enable(data, type) : props.enable;
+  const isEnable = useMemo(() => (
+    typeof enable === 'function' ? enable(data, type) : enable
+  ), [enable, data, type]);
 
-  const iconClass = classNames('fa fa-fw', {
+  const isHelpText = useMemo(() => (
+    (typeof helpText === 'string') ? helpText : helpText(data, type)
+  ), [helpText, data, type]);
+
+  const isCustomRender = useMemo(() => (
+    renderFunc !== null && typeof renderFunc === 'function'
+  ), [renderFunc]);
+
+  const onClickActino = useCallback(() => {
+    onClick(data, type);
+  }, [onClick, data, type]);
+
+  const iconClass = useMemo(() => classNames('fa fa-fw', {
     'fa-eye': type === 'view',
     'fa-pencil': type === 'edit',
     'fa-files-o': type === 'clone',
@@ -31,43 +59,30 @@ const Action = (props) => {
     'fa-arrow-left': type === 'back',
     'fa-minus': type === 'collapse',
     'fa-cog': type === 'settings',
-  });
+  }), [type]);
 
-  const onClick = () => {
-    props.onClick(data, type);
-  };
-
-  const editTooltip = (
-    <Tooltip id="tooltip">
-      { (typeof props.helpText === 'string')
-        ? props.helpText
-        : props.helpText(data, type)
-      }
-    </Tooltip>
-  );
-
-  const button = props.renderFunc
-  ? props.renderFunc(props)
-  : (
-    <Button
-      onClick={onClick}
-      bsStyle={actionStyle}
-      bsSize={actionSize}
-      className={actionClass}
-      disabled={!isEnable}
-    >
-      { showIcon && <i className={iconClass} /> }
-      { showIcon && label.length > 0 && <span>&nbsp;</span> }
-      { label.length > 0 && label}
-    </Button>
-  );
-
+  if (!showAction) {
+    return null;
+  }
   return (
     <span className="action-button">
-      { (props.helpText !== '')
-        ? (<OverlayTrigger overlay={editTooltip} placement="top">{ button }</OverlayTrigger>)
-        : button
-      }
+      <WithTooltip helpText={isHelpText}>
+        { isCustomRender ? props.renderFunc(props)
+          : (
+            <Button
+              onClick={onClickActino}
+              bsStyle={actionStyle === 'default' ? undefined : actionStyle}
+              bsSize={actionSize}
+              className={actionClass}
+              disabled={!isEnable}
+            >
+              { showIcon && <i className={iconClass} /> }
+              { showIcon && label.length > 0 && <span>&nbsp;</span> }
+              { label.length > 0 && label}
+            </Button>
+          )
+        }
+      </WithTooltip>
     </span>
   );
 };
@@ -92,7 +107,7 @@ Action.propTypes = {
   data: PropTypes.any,
   label: PropTypes.string,
   showIcon: PropTypes.bool,
-  actionStyle: PropTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger', 'link']),
+  actionStyle: PropTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger', 'link', 'default']),
   actionSize: PropTypes.oneOf(['large', 'small', 'xsmall']),
   actionClass: PropTypes.string,
   helpText: PropTypes.oneOfType([
@@ -111,4 +126,4 @@ Action.propTypes = {
   onClick: PropTypes.func,
 };
 
-export default Action;
+export default memo(Action);

@@ -30,27 +30,19 @@ const selectCyclesOptions = (options) => {
 
 const getServicesOptions = state => state.list.get('available_services', null);
 
-const selectServicesOptions = (options) => {
-  if (options === null) {
-    return undefined;
-  }
-  return options.map(option => Immutable.Map({
-    label: `${option.get('description', '')} (${option.get('name', '')})`,
-    value: option.get('name', ''),
-  }));
-};
+const getTaxesOptions = state => state.list.get('available_taxRates', null);
 
 const getProductsOptions = state => state.list.get('all_rates', null);
 
 const getOptionsByListName = (state, props, listName = '') => state.list.get(listName, null);
 
-const selectProductsOptions = (options) => {
+const formatSelectOptions = (options, key) => {
   if (options === null) {
     return undefined;
   }
   return options.map(option => Immutable.Map({
-    label: `${option.get('description', '')} (${option.get('key', '')})`,
-    value: option.get('key', ''),
+    label: `${option.get('description', '')} (${option.get(key, '')})`,
+    value: option.get(key, ''),
   }));
 };
 
@@ -65,7 +57,6 @@ const selectEntityTypesOptions = (options) => {
   if (options === null) {
     return undefined;
   }
-
   return options.map(type => ({
     key: type.get('name', ''),
     val: sentenceCase(type.get('name', '')),
@@ -73,16 +64,6 @@ const selectEntityTypesOptions = (options) => {
 };
 
 const getPlansOptions = state => state.list.get('available_plans', null);
-
-const selectPlansOptions = (options) => {
-  if (options === null) {
-    return undefined;
-  }
-  return options.map(option => Immutable.Map({
-    label: `${option.get('description', '')} (${option.get('name', '')})`,
-    value: option.get('name', ''),
-  }));
-};
 
 const selectPlayTypeOptions = (options) => {
   if (options === null) {
@@ -156,22 +137,32 @@ export const eventRatesSelector = createSelector(
 
 export const productsOptionsSelector = createSelector(
   getProductsOptions,
-  selectProductsOptions,
+  () => 'key',
+  formatSelectOptions,
 );
 
 export const listByNameSelector = createSelector(
   getOptionsByListName,
-  selectProductsOptions,
+  () => 'key',
+  formatSelectOptions,
 );
 
 export const servicesOptionsSelector = createSelector(
   getServicesOptions,
-  selectServicesOptions,
+  () => 'name',
+  formatSelectOptions,
+);
+
+export const taxesOptionsSelector = createSelector(
+  getTaxesOptions,
+  () => 'key',
+  formatSelectOptions,
 );
 
 export const plansOptionsSelector = createSelector(
   getPlansOptions,
-  selectPlansOptions,
+  () => 'name',
+  formatSelectOptions,
 );
 
 export const getPlayTypeOptions = createSelector(

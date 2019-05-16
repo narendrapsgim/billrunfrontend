@@ -28,7 +28,11 @@ const Select = ({
       .filter(option => legacyValues.includes(option.value))
       .map(option => option.label)
       .join(', ');
-    return <div className="non-editable-field">{displayValue}</div>;
+    return (
+      <div className="non-editable-field">
+        {displayValue}
+      </div>
+    );
   }
 
   const onChangeValue = (option, { action, removedValue, name }) => {

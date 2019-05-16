@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import changeCase from 'change-case';
 import EntityList from '../EntityList';
@@ -9,6 +10,7 @@ import {
   getSettings,
 } from '@/actions/settingsActions';
 import { isPlaysEnabledSelector } from '@/selectors/settingsSelector';
+import { getConfig } from '@/common/Util';
 
 
 class ProductsList extends Component {
@@ -17,6 +19,9 @@ class ProductsList extends Component {
     fields: PropTypes.instanceOf(Immutable.List),
     defaultListFields: PropTypes.arrayOf(PropTypes.string),
     isPlaysEnabled: PropTypes.bool,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -28,6 +33,10 @@ class ProductsList extends Component {
 
   componentWillMount() {
     this.props.dispatch(getSettings('rates.fields'));
+  }
+
+  onClickImport = () => {
+    this.props.router.push('/import/product');
   }
 
   parserUsegt = (item) => {
@@ -48,6 +57,8 @@ class ProductsList extends Component {
     }
     return isPlaysEnabled;
   }
+
+  isImportEnabled = () => getConfig(['import', 'allowed_entities'], Immutable.List()).includes('product');
 
   getProjectFields = () => {
     const { fields, defaultListFields } = this.props;
@@ -84,6 +95,19 @@ class ProductsList extends Component {
       .toArray();
   };
 
+  getListActions = () => [{
+    type: 'add',
+  }, {
+    type: 'refresh',
+  }, {
+    type: 'import',
+    label: 'Import',
+    onClick: this.onClickImport,
+    show: this.isImportEnabled,
+    actionStyle: 'primary',
+    actionSize: 'xsmall',
+  }];
+
   render() {
     const { fields } = this.props;
     if (fields === null) {
@@ -99,6 +123,7 @@ class ProductsList extends Component {
         projectFields={this.getProjectFields()}
         showRevisionBy="key"
         actions={this.getActions()}
+        listActions={this.getListActions()}
       />
     );
   }
@@ -110,4 +135,4 @@ const mapStateToProps = (state, props) => ({
   isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
-export default connect(mapStateToProps)(ProductsList);
+export default withRouter(connect(mapStateToProps)(ProductsList));
