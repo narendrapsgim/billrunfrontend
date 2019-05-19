@@ -36,7 +36,7 @@ const Tax = ({ data, csiOptions, taxRateOptions, onChange }) => {
           </Col>
           <Col sm={8} lg={9}>
             <span style={{ display: 'inline-block', marginRight: 20 }}>
-              <Field fieldType="radio" onChange={onChangeTaxType} name="tax_type" value="custom" label="Custom" checked={!isCSI} />
+              <Field fieldType="radio" onChange={onChangeTaxType} name="tax_type" value="usage" label="Custom" checked={!isCSI} />
             </span>
             <span style={{ display: 'inline-block' }}>
                 <Field fieldType="radio" onChange={onChangeTaxType} name="tax_type" value="CSI" label="CSI" checked={isCSI} />
