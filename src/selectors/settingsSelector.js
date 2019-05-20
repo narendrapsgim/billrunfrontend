@@ -572,7 +572,7 @@ export const taxParamsKeyOptionsSelector = createSelector(
   taxFieldsSelector,
   (fields = Immutable.List()) => fields
     .filter(field => (field.get('field_name', '').startsWith('params.')))
-    .map((field) => parseFieldSelectOptions(field))
+    .map(parseFieldSelectOptions)
     .insert(0, {value: 'key', label: 'Key'})
     .toArray()
 );
