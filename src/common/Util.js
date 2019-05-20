@@ -315,10 +315,10 @@ export const parseConfigSelectOptions = configOption => formatSelectOptions(
     : configOption.get('id')
 );
 
-export const parseFieldSelectOptions = (fieldOption, suffix = '') => formatSelectOptions(
+export const parseFieldSelectOptions = (fieldOption) => formatSelectOptions(
   Immutable.Map({
     value: fieldOption.get('field_name'),
-    label: fieldOption.get('title', fieldOption.get('field_name'), '') + (suffix !== '' ? ` ${suffix}` : '')
+    label: fieldOption.get('title', fieldOption.get('field_name'), ''),
   })
 );
 
