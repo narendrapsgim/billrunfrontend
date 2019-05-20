@@ -67,8 +67,8 @@ export default {
       { id: 'start', title: 'Proration start date', type: 'datetime' },
       { id: 'end', title: 'Proration end date', type: 'datetime' },
       { id: 'tax_data.taxes.key', title: 'Tax key', inputConfig: { inputType: 'select', callback: 'getTaxesOptions' } },
-      { id: 'tax_data.taxes.tax', type: 'number', title: 'Tax rate' },
-      { id: 'tax_data.taxes.amount', type: 'number', title: 'Total taxes' },
+      { id: 'tax_data.total_tax', type: 'number', title: 'Tax rate' },
+      { id: 'tax_data.total_amount', type: 'number', title: 'Total taxes' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
@@ -237,9 +237,9 @@ export default {
     },
   ],
   aggregateOperators: [
-    { id: 'group', title: 'Group', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group', 'fieldid:tax_data.taxes.amount'] },
-    { id: 'sum', title: 'Sum', include: ['number'], exclude: ['fieldid:count_group'] },
-    { id: 'avg', title: 'Average', include: ['number'], exclude: ['fieldid:count_group'] },
+    { id: 'group', title: 'Group', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_amount'] },
+    { id: 'sum', title: 'Sum', include: ['number'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_tax'] },
+    { id: 'avg', title: 'Average', include: ['number'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_tax'] },
     { id: 'first', title: 'First', include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'], exclude: ['fieldid:count_group'] },
     { id: 'last', title: 'Last', include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'], exclude: ['fieldid:count_group'] },
     { id: 'max', title: 'Max', include: ['number', 'date'], exclude: ['fieldid:count_group'] },
