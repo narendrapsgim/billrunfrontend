@@ -52,7 +52,7 @@ const PriorityCondition = ({
   }, [onUpdate, index]);
 
   const onChangeParamKey = useCallback((value) => {
-    onUpdate([index, 'rate_key'], value);
+    onUpdate([index, 'entity_key'], value);
   }, [onUpdate, index]);
 
   const onSaveComputed = useCallback((computed) => {
@@ -133,7 +133,7 @@ const PriorityCondition = ({
           fieldType="select"
           options={paramsKeyOptions}
           onChange={onChangeParamKey}
-          value={condition.get('rate_key', '')}
+          value={condition.get('entity_key', '')}
           disabled={condition.get('type', '') === ''}
         />
       </Col>
