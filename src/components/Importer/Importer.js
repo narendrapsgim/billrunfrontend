@@ -257,14 +257,23 @@ class Importer extends Component {
         // build tax object
         if (taxFields.includes(fieldName) && rateLine.has(fieldName)) {
           const taxFieldNameArray = fieldName.split("__");
-          if (index !== 0 && value !== combinedRateWithMutations.getIn(taxFieldNameArray, '')) {
+          const taxFieldPath = [taxFieldNameArray[0], 0, taxFieldNameArray[1]];
+          if (index !== 0 && value !== combinedRateWithMutations.getIn(taxFieldPath, '')) {
             combinedRateWithMutations.update('__ERRORS__', Immutable.Map(), erros =>
               erros.update(rateLine.get('__CSVROW__', 'unknown'), Immutable.List(), messages =>
                 messages.push(`different values for ${titleCase(taxFieldNameArray[0])} ${titleCase(taxFieldNameArray[1])} field`),
               ),
             );
           } else {
-            combinedRateWithMutations.setIn(taxFieldNameArray, rateLine.get(fieldName, ''));
+            combinedRateWithMutations.update(
+              taxFieldNameArray[0],
+              Immutable.List(),
+              taxes => taxes.update(
+                0,
+                Immutable.Map(),
+                tax => tax.set(taxFieldNameArray[1], rateLine.get(fieldName, ''))
+              )
+            );
           }
         }
       });
