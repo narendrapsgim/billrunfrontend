@@ -226,9 +226,9 @@ export default {
     { id: 'lte', title: '<=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
     { id: 'gt', title: '>', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
     { id: 'gte', title: '>=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than or equals'
-    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status'] },
-    { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status'] },
-    { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status'] },
+    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status', 'fieldid:subscriber.play'] },
+    { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:subscriber.play'] },
+    { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:subscriber.play'] },
     { id: 'in_range', title: 'Include‎', include: ['ranges', 'range'] },
     { id: 'nin_range', title: 'Does not include‎', include: ['ranges', 'range'] },
     { id: 'exists', title: 'Exists', type: 'boolean',
