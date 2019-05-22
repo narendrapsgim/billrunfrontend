@@ -66,6 +66,10 @@ export default {
       { id: 'balance_normalized', type: 'number' },
       { id: 'start', title: 'Proration start date', type: 'datetime' },
       { id: 'end', title: 'Proration end date', type: 'datetime' },
+      { id: 'subscriber.play', title: 'Subscriber Play', inputConfig: {
+        inputType: 'select',
+        callback: 'getPlayTypeOptions',
+      } },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
@@ -229,7 +233,7 @@ export default {
     { id: 'nin_range', title: 'Does not include‎', include: ['ranges', 'range'] },
     { id: 'exists', title: 'Exists', type: 'boolean',
       include: ['string', 'number', 'boolean', 'date', 'datetime', 'ranges', 'range'],
-      exclude: [ 'fieldid:billrun_status', 'fieldid:logfile_status'],
+      exclude: [ 'fieldid:billrun_status', 'fieldid:logfile_status', 'fieldid:subscriber.play'],
       options: ['yes', 'no'],
     },
   ],
