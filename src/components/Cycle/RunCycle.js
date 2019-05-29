@@ -255,8 +255,9 @@ class RunCycle extends Component {
     return (
       <CyclesSelector
         onChange={this.onChangeSelectedCycle}
-        statusesToDisplay={List(['running', 'to_run', 'finished', 'confirmed', 'to_rerun'])}
+        statusesToDisplay={List(['past'])}
         selectedCycles={selectedCycleName}
+        timeStatus={true}
       />
     );
   };
@@ -394,9 +395,8 @@ class RunCycle extends Component {
       disabled = true;
       title = 'Processing...';
     } else if (chargeStatus.get('status', false)) {
-      const hasAmountTocharge = chargeStatus.get('owed_amount', 0) !== 0;
-      disabled = !hasAmountTocharge;
-      title = hasAmountTocharge ? 'Charge All' : 'Nothing to charge';
+      disabled = false;
+      title = 'Charge All';
     } else {
       disabled = true;
       title = 'Charge is running...';
