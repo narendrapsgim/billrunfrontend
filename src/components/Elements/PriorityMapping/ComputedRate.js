@@ -17,6 +17,7 @@ const ComputedRate = ({
   onHideComputedLineKey,
 }) => {
   const [ localItem, updateLocalItem] = useState(item);
+  const isSingleValueOperator = ['$exists', '$existsFalse', '$isTrue', '$isFalse'].includes(localItem.get('operator', ''));
 
   if (!localItem) {
     return null;
@@ -45,8 +46,7 @@ const ComputedRate = ({
       if (path[0] === 'operator') {
         const changeFromRegex = localItem.get('operator', '') === '$regex' && value !== '$regex';
         const changeToRegex = localItem.get('operator', '') !== '$regex' && value === '$regex';
-        const operatorExists = value === '$exists' || value === '$existsFalse';
-        if (changeFromRegex || changeToRegex || operatorExists) {
+        if (changeFromRegex || changeToRegex || isSingleValueOperator) {
           computedLineKeyWithMutations.deleteIn(['line_keys', 1]);
           computedLineKeyWithMutations.deleteIn(['line_keys', 0, 'regex']);
         }
@@ -89,8 +89,6 @@ const ComputedRate = ({
     .toArray();
 
   const isTypeRegex = localItem.get('type', 'regex') === 'regex';
-
-  const isOperatorExists = ['$exists', '$existsFalse'].includes(localItem.get('operator', ''));
 
   return (
     <ModalWrapper
@@ -148,9 +146,9 @@ const ComputedRate = ({
           <Col sm={5}>
             <Field
               value={localItem.getIn(['line_keys', 0, 'regex'], '')}
-              disabledValue={''}
+              disabledValue=''
               onChange={onChangeComputedLineKey(['line_keys', 0, 'regex'])}
-              disabled={localItem.getIn(['line_keys', 0, 'key'], '') === '' || isOperatorExists}
+              disabled={localItem.getIn(['line_keys', 0, 'key'], '') === '' || isSingleValueOperator}
               label={<span>Regex<Help contents={MappingRulesDescription.regexHelper} /></span>}
               fieldType="toggeledInput"
             />
@@ -184,7 +182,7 @@ const ComputedRate = ({
                     onChange={onChangeComputedLineKey(['line_keys', 1, 'key'])}
                     value={localItem.getIn(['line_keys', 1, 'key'], '')}
                     options={conditionFieldsOptions}
-                    disabled={isOperatorExists}
+                    disabled={isSingleValueOperator}
                   />
                 )}
               </Col>
