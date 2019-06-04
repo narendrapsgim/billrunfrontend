@@ -269,10 +269,11 @@ class EntityList extends Component {
   }
 
   renderPanelHeader = () => {
-    const { itemsType } = this.props;
+    const { itemType, itemsType } = this.props;
+    const itemsTypeName = getConfig(['systemItems', itemType, 'itemsName'], changeCase.noCase(itemsType));
     return (
       <div>
-        List of all available {changeCase.noCase(itemsType)}
+        List of all available {itemsTypeName}
         <div className="pull-right">
           <Actions actions={this.getListActions()} />
         </div>

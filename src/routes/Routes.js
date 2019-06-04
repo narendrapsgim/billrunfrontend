@@ -115,7 +115,7 @@ const routes = () => (
         </Route>
 
         <Route path="taxes" >
-          <IndexRoute component={Authentication(TaxList)} title="Rates" />
+          <IndexRoute component={Authentication(TaxList)} title="Tax Rates" />
           <Route path="tax/:itemId" component={Authentication(TaxSetup)} />
           <Route path="tax" component={Authentication(TaxSetup)} />
           <Route path="tax" component={Authentication(TaxSetup)} />

@@ -21,7 +21,7 @@
     "collection": "prepaidgroups",
     "uniqueField": "name",
     "itemName": "buckets group",
-    "itemsName": "plans",
+    "itemsName": "buckets groups",
     "itemType": "charging_plan",
     "itemsType": "charging_plans"
   },
@@ -105,6 +105,7 @@
     "collection": "taxes",
     "uniqueField": "key",
     "itemName": "tax",
+    "itemsName": "tax rates",
     "itemType": "tax",
     "itemsType": "taxes",
     "settingsKey": "taxes"
