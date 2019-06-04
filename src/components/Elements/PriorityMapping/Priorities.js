@@ -56,7 +56,7 @@ const Priorities = ({
         <Field
           fieldType="checkbox"
           value={true}
-          label="Use product/service/plan override tax rate if defined"
+          label="Use tax rate forced by product/service/plan"
           disabled={true}
         />
       </Panel>
