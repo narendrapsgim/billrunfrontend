@@ -60,7 +60,7 @@ class TaxMapping extends PureComponent {
     valueWhenOptions: [],
   };
 
-  static pageTitle = 'Tax Mapping';
+  static pageTitle = 'Global Tax Mapping Rules';
 
   state = {
     dirty: false,

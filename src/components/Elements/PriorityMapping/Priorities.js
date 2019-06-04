@@ -95,7 +95,7 @@ const Priorities = ({
         />
       </Panel>
       <CreateButton
-        label="Add Next Priority"
+        label="Add Priority"
         onClick={addPriority}
         buttonStyle={createBtnStyle}
       />
