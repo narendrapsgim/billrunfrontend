@@ -9,6 +9,8 @@
     { "id": "$gt", "title": "Is Greater Than" },
     { "id": "$gte", "title": "Is Greater Than Or Equal" },
     { "id": "$in", "title": "Is Included In" },
+    { "id": "$isTrue", "title": "Is True (Boolean)" },
+    { "id": "$isFalse", "title": "Is False (Boolean)" },
     { "id": "$regex", "title": "Matches regular expression" }
   ],
   "paramsConditions": [
