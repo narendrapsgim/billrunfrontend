@@ -9,8 +9,17 @@ const Select = ({
   multi, clearable, noResultsText, options, allowCreate, addLabelText, placeholder,
   ...otherProps
 }) => {
+  const fixBoolValues = (value) => {
+    if (value === 'false') {
+      return false;
+    }
+    if (value === 'true') {
+      return true;
+    }
+    return value;
+  }
   /* Support old existing Select fileds from v0.9.x*/
-  const legacyValues = ((multi) ? value.split(',') : [value]).filter(val => val !== '');
+  const legacyValues = ((multi) ? value.split(',').map(fixBoolValues) : [value]).filter(val => val !== '');
   const isDisabled = disabled;
   const isMulti = multi;
   const isClearable = clearable;
