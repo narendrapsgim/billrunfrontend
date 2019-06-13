@@ -49,6 +49,11 @@
       "title": "Percentage",
       "exclude": ["multiple", "select_options", "select_list"]
     }, {
+      "id": "date",
+      "type": "date",
+      "title": "Date",
+      "exclude": ["multiple", "select_options", "select_list"]
+    }, {
       "id": "ranges",
       "type": "array",
       "title": "Range",
