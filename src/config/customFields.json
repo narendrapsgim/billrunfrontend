@@ -54,6 +54,11 @@
       "title": "Date",
       "exclude": ["multiple", "select_options", "select_list"]
     }, {
+      "id": "daterange",
+      "type": "array",
+      "title": "Date Range",
+      "exclude": ["select_options", "select_list"]
+    }, {
       "id": "ranges",
       "type": "array",
       "title": "Range",
