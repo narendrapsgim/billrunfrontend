@@ -247,7 +247,6 @@ export default class DiscountDetails extends Component {
                   <Field onChange={this.onChangeDescription} value={discount.get('description', '')} editable={editable} />
                 </Col>
               </FormGroup>
-
               { ['clone', 'create'].includes(mode) &&
                 <FormGroup validationState={errors.name.length > 0 ? 'error' : null} >
                   <Col componentClass={ControlLabel} sm={3} lg={2}>
@@ -259,7 +258,6 @@ export default class DiscountDetails extends Component {
                   </Col>
                 </FormGroup>
               }
-
               <FormGroup >
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('Type', 'discounts')}
@@ -280,7 +278,6 @@ export default class DiscountDetails extends Component {
                   }
                 </Col>
               </FormGroup>
-
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('Cycles', 'discounts')}
@@ -289,20 +286,17 @@ export default class DiscountDetails extends Component {
                   <Field value={discount.get('cycles', '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
                 </Col>
               </FormGroup>
-            </Panel>
-
-            <FormGroup>
-              <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-              <Col sm={8} lg={9} style={{ paddingTop: 7 }}>
-                <Field
-                  value={proratedValue}
-                  onChange={this.onChangeProrated}
-                  fieldType="checkbox"
-                  editable={editable}
-                />
-              </Col>
-            </FormGroup>
-
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
+                <Col sm={8} lg={9} style={{ paddingTop: 7 }}>
+                  <Field
+                    value={proratedValue}
+                    onChange={this.onChangeProrated}
+                    fieldType="checkbox"
+                    editable={editable}
+                    />
+                </Col>
+              </FormGroup>
               <EntityFields
                 entityName="discounts"
                 entity={discount}
@@ -310,53 +304,51 @@ export default class DiscountDetails extends Component {
                 onRemoveField={this.onRemoveAdditionalField}
                 editable={editable}
               />
-
-              <Panel header={<h3>Discount Conditions</h3>}>
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    { getFieldName('Plan', 'discounts')}
-                  </Col>
-                  <Col sm={8} lg={9}>
-                    <Field
-                      fieldType="select"
-                      options={plansOptions}
-                      value={discount.getIn(['params', 'plan'], '')}
-                      onChange={this.onChangePlan}
-                      editable={editable}
-                    />
-                  </Col>
-                </FormGroup>
-
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    { getFieldName('Services', 'discounts')}
-                  </Col>
-                  <Col sm={8} lg={9}>
-                    <Field
-                      fieldType="select"
-                      multi={true}
-                      value={services}
-                      options={servicesOptions}
-                      onChange={this.onChangeService}
-                      editable={editable}
-                    />
-                  </Col>
-                </FormGroup>
-              </Panel>
-
-              <Panel header={<h3>Discount Values</h3>}>
-                { this.renderPlanDiscountValue() }
-                { (discount.getIn(['params', 'plan'], '').length > 0) && <hr /> }
-                { this.renderServivesDiscountValues() }
-                { (!discount.getIn(['params', 'service'], Immutable.List()).isEmpty()) && <hr /> }
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={3} lg={2}>
-                    { getFieldName('Discount Overall Limit', 'discounts')}
-                  </Col>
-                  <Col sm={8} lg={9}>
-                    <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
-                  </Col>
-                </FormGroup>
+            </Panel>
+            <Panel header={<h3>Discount Conditions</h3>}>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  { getFieldName('Plan', 'discounts')}
+                </Col>
+                <Col sm={8} lg={9}>
+                  <Field
+                    fieldType="select"
+                    options={plansOptions}
+                    value={discount.getIn(['params', 'plan'], '')}
+                    onChange={this.onChangePlan}
+                    editable={editable}
+                  />
+                </Col>
+              </FormGroup>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  { getFieldName('Services', 'discounts')}
+                </Col>
+                <Col sm={8} lg={9}>
+                  <Field
+                    fieldType="select"
+                    multi={true}
+                    value={services}
+                    options={servicesOptions}
+                    onChange={this.onChangeService}
+                    editable={editable}
+                  />
+                </Col>
+              </FormGroup>
+            </Panel>
+            <Panel header={<h3>Discount Values</h3>}>
+              { this.renderPlanDiscountValue() }
+              { (discount.getIn(['params', 'plan'], '').length > 0) && <hr /> }
+              { this.renderServivesDiscountValues() }
+              { (!discount.getIn(['params', 'service'], Immutable.List()).isEmpty()) && <hr /> }
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  { getFieldName('Discount Overall Limit', 'discounts')}
+                </Col>
+                <Col sm={8} lg={9}>
+                  <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
+                </Col>
+              </FormGroup>
             </Panel>
           </Form>
         </Col>

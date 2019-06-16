@@ -105,8 +105,9 @@ const mapDispatchToProps = (dispatch, props) => ({ // eslint-disable-line no-unu
       return dispatch(showWarning('No available field types '));
     }
     const onOk = (newItem) => {
-      // tor TAX hardcoded set new field as params
-      const newField = entity !== 'tax' ? newItem : newItem
+      // set new field as params for entities in saveAsParams list
+      const saveAsParams = getConfig(['customFields', 'saveAsParams'], List())
+      const newField = !saveAsParams.includes(entity) ? newItem : newItem
         .withMutations((newItemWithMutations) => {
           const fieldName = newItem.get('field_name');
           if (!fieldName.startsWith('params.')) {
