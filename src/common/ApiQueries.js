@@ -11,20 +11,24 @@ export const searchProductsByKeyAndUsagetQuery = (usages, notKeys, plays = '') =
     },
     to: { $gt: moment().toISOString() }, // only active and future
     tariff_category: 'retail', // only retail products
-    $and: [], // for addition conditions
   };
+
+  const additionConditions = []; // for addition conditions in $AND
   if (usagesToQuery[0] !== 'cost') {
-    query.$and.push(
+    additionConditions.push(
       { $or: usagesToQuery.map(usage => ({ [`rates.${usage}`]: { $exists: true } })) },
     );
   }
   if (plays !== '') {
-    query.$and.push(
+    additionConditions.push(
       { $or: [
         { play: { $exists: true, $in: [...plays.split(','), '', null] } },
         { play: { $exists: false } },
       ] },
     );
+  }
+  if (additionConditions.length !== 0) {
+    query.$and = additionConditions;
   }
 
   const formData = new FormData();
