@@ -527,6 +527,21 @@ export const addDefaultFieldOptions = (formatedFields, item = Immutable.Map()) =
         unique: false,
         mandatory: true,
       }],
+      customer: [{
+        value: 'from',
+        label: 'From',
+        editable: true,
+        generated: false,
+        unique: false,
+        mandatory: true,
+      }, {
+        value: 'to',
+        label: 'To',
+        editable: true,
+        generated: false,
+        unique: false,
+        mandatory: true,
+      }],
     };
     return formatedFields.withMutations((fieldsWithMutations) => {
       const defaultFields = defaultFieldsByEntity[entity] || [];
