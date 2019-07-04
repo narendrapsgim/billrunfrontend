@@ -8,6 +8,7 @@ import {
   planFieldsSelector,
   linesFieldsSelector,
   taxFieldsSelector,
+  discountFieldsSelector,
 } from './settingsSelector';
 import { titleCase } from 'change-case';
 import {
@@ -33,8 +34,9 @@ export const customFieldsEntityFieldsSelector = createSelector(
   seriveceFieldsSelector,
   planFieldsSelector,
   taxFieldsSelector,
+  discountFieldsSelector,
   foreignLinesFieldsSelector,
-  (entity, accountFields, subscriberFields, productFields, serviceFields, planFields, taxFields, usageField) => {
+  (entity, accountFields, subscriberFields, productFields, serviceFields, planFields, taxFields, discountFields, usageField) => {
     const fields = Map({
       customer: accountFields,
       account_subscribers: subscriberFields,
@@ -43,6 +45,7 @@ export const customFieldsEntityFieldsSelector = createSelector(
       service: serviceFields,
       plan: planFields,
       tax: taxFields,
+      discount: discountFields,
       usage: usageField,
     });
     if (typeof entity === 'undefined' || entity === 'all') {
