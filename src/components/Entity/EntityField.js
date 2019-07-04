@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import Immutable from 'immutable';
 import { FormGroup, Col, ControlLabel, InputGroup, Button, HelpBlock } from 'react-bootstrap';
 import Field from '../Field';
 import Help from '../Help';
-import { formatSelectOptions } from '@/common/Util';
+import { getConfig, formatSelectOptions } from '@/common/Util';
 
 
 class EntityField extends Component {
@@ -23,6 +24,8 @@ class EntityField extends Component {
     isFieldSelect: PropTypes.bool,
     isFieldBoolean: PropTypes.bool,
     isFieldRanges: PropTypes.bool,
+    isFieldDate: PropTypes.bool,
+    isFieldDateRange: PropTypes.bool,
     isRemoveField: PropTypes.bool,
     fieldPath: PropTypes.array,
     onChange: PropTypes.func,
@@ -38,7 +41,8 @@ class EntityField extends Component {
     isFieldSelect: false,
     isFieldBoolean: false,
     isFieldRanges: false,
-    isRemoveField: false,
+    isFieldDate: false,
+    isFieldDateRange: false,
     fieldPath: [],
     error: '',
     onChange: () => {},
@@ -60,11 +64,13 @@ class EntityField extends Component {
   }
 
   getNoDefaultValueVal = (byConfig = true) => {
-    const { field, isFieldBoolean, isFieldTags, isFieldSelect, isFieldRanges } = this.props;
+    const {
+      field, isFieldBoolean, isFieldTags, isFieldSelect, isFieldRanges, isFieldDateRange,
+    } = this.props;
     if (isFieldBoolean) {
       return false;
     }
-    if (isFieldRanges) {
+    if (isFieldRanges || isFieldDateRange) {
       // const defaultRangValue = Immutable.Map({ from: '', to: '' });
       // return Immutable.List([defaultRangValue]);
       return Immutable.List();
@@ -107,6 +113,13 @@ class EntityField extends Component {
     }
   }
 
+  onChangeDate = (date) => {
+    const { fieldPath } = this.props;
+    const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+    const value = (moment.isMoment(date) && date.isValid()) ? date.format(apiDateTimeFormat) : '';
+    this.props.onChange(fieldPath, value);
+  }
+
   onChangeRange = (val) => {
     const { fieldPath } = this.props;
     this.props.onChange(fieldPath, val);
@@ -118,7 +131,17 @@ class EntityField extends Component {
   }
 
   getFieldValue = () => {
-    const { entity, editable, fieldPath, isFieldTags, isFieldBoolean, isFieldRanges } = this.props;
+    const {
+      entity, editable, fieldPath, isFieldTags, isFieldBoolean, isFieldRanges, isFieldDate, isFieldDateRange,
+    } = this.props;
+    if (isFieldDate) {
+      const value = entity.getIn(fieldPath, '');
+      return (value === '') ? undefined : moment(value);
+    }
+    if (isFieldDateRange) {
+      const value = entity.getIn(fieldPath, undefined);
+      return ([undefined, null, ''].includes(value)) ? undefined : value;
+    }
     if (isFieldRanges) {
       return entity.getIn(fieldPath, undefined);
       // return entity.getIn(fieldPath, { from: '', to: '' });
@@ -156,7 +179,15 @@ class EntityField extends Component {
 
   renderField = () => {
     const {
-      editable, field, disabled, isFieldTags, isFieldSelect, isFieldBoolean, isFieldRanges,
+      editable,
+      field,
+      disabled,
+      isFieldTags,
+      isFieldSelect,
+      isFieldBoolean,
+      isFieldRanges,
+      isFieldDate,
+      isFieldDateRange
     } = this.props;
     const value = this.getFieldValue();
     if (isFieldRanges) {
@@ -183,6 +214,35 @@ class EntityField extends Component {
           editable={editable}
           style={checkboxStyle}
           disabled={disabled}
+        />
+      );
+    }
+    if (isFieldDateRange) {
+      const multi = field.get('multiple', false);
+      return (
+          <Field
+            fieldType="ranges"
+            onChange={this.onChangeRange}
+            value={value}
+            multi={multi}
+            editable={editable}
+            label={field.get('title', field.get('field_name', ''))}
+            disabled={disabled}
+            inputProps={{fieldType: 'date', isClearable: true}}
+            inputFromProps={{selectsStart: true, endDate:'@valueTo@'}}
+            inputToProps={{selectsEnd: true, startDate: '@valueFrom@', endDate: '@valueTo@', minDate: '@valueFrom@'}}
+          />
+      );
+    }
+    if (isFieldDate) {
+      const mandatory = field.get('mandatory', false);
+      return (
+        <Field
+          fieldType="date"
+          value={value}
+          onChange={this.onChangeDate}
+          editable={editable}
+          isClearable={!mandatory}
         />
       );
     }
