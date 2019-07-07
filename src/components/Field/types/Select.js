@@ -102,7 +102,7 @@ const Select = ({
 };
 
 Select.defaultProps = {
-  value: [],
+  value: '',
   disabled: false,
   editable: true,
   multi: false,
@@ -120,6 +120,7 @@ Select.propTypes = {
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
+    PropTypes.bool,
   ]),
   allowCreate: PropTypes.bool,
   disabled: PropTypes.bool,

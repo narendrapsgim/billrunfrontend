@@ -327,6 +327,7 @@ export const getEntitesQuery = (collection, project = {}, query = {}, sort = nul
     default:
       action = 'uniqueget';
   }
+  const sortBy = sort !== null ? sort : Immutable.fromJS(project).filter(prop => prop === 1);
   return ({
     action,
     entity: collection,
@@ -335,7 +336,7 @@ export const getEntitesQuery = (collection, project = {}, query = {}, sort = nul
       { size: 9999 },
       { query: JSON.stringify(query) },
       { project: JSON.stringify(project) },
-      { sort: JSON.stringify(sort || project) },
+      { sort: JSON.stringify(sortBy) },
     ],
   });
 };
@@ -394,6 +395,7 @@ export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);
 export const fetchPrepaidIncludeByIdQuery = id => getEntityByIdQuery('prepaidincludes', id);
 export const fetchDiscountByIdQuery = id => getEntityByIdQuery('discounts', id);
 export const fetchReportByIdQuery = id => getEntityByIdQuery('reports', id);
+export const fetchtaxeByIdQuery = id => getEntityByIdQuery('taxes', id);
 export const fetchPlanByIdQuery = id => getEntityByIdQuery('plans', id);
 export const fetchPrepaidGroupByIdQuery = id => getEntityByIdQuery('prepaidgroups', id);
 export const fetchUserByIdQuery = id => getEntityByIdQuery('users', id);

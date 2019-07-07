@@ -18,6 +18,7 @@ import PlanSearch from './PlanSearch';
 import TabsWrapper from './TabsWrapper';
 import Stepper from './Stepper';
 import PriorityMapping from './PriorityMapping';
+import Conditions from './Conditions';
 
 export {
   WithEntityLink,
@@ -40,4 +41,5 @@ export {
   TabsWrapper,
   Stepper,
   PriorityMapping,
+  Conditions,
 };

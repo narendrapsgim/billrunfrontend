@@ -1,0 +1,28 @@
+{
+  "conditionsOperators" : [
+    { "id": "eq", "title": "Equals", "include": ["date", "datetime", "boolean"] },
+    { "id": "ne", "title": "Does not equal", "include": ["boolean"], "exclude": [] },
+    { "id": "in", "title": "Equals", "include": ["string", "number"], "exclude": []  },
+    { "id": "nin", "title": "Does not equal", "include": ["string", "number"], "exclude": []  },
+    { "id": "lt", "title": "Is Less Than", "include": ["number", "date", "datetime", "fieldid:billrun"], "exclude": [] },
+    { "id": "lte", "title": "Is Less Than Or Equal", "include": ["number", "date", "datetime", "fieldid:billrun"], "exclude": [] },
+    { "id": "gt", "title": "Is Greater Than", "include": ["number", "date", "datetime", "fieldid:billrun"], "exclude": [] },
+    { "id": "gte", "title": "Is Greater Than Or Equal", "include": ["number", "date", "datetime", "fieldid:billrun"], "exclude": [] },
+    { "id": "regex", "title": "Contains", "include": ["string", "number"], "exclude": [] },
+    { "id": "exists", "title": "Exists", "type": "boolean",
+      "include": ["string", "number", "boolean", "date", "datetime", "ranges", "range"],
+      "exclude": [],
+      "options": ["yes", "no"]
+    },
+    { "id": "is", "title": "Is", "type": "boolean",
+      "include": ["string", "number", "boolean", "date", "datetime", "ranges", "range"],
+      "exclude": [],
+      "options": ["true", "false"]
+    },
+    { "id": "is", "title": "Is",
+      "include": ["daterange"],
+      "exclude": [],
+      "options": ["is active"]
+    }
+  ]
+}

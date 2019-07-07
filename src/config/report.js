@@ -8,6 +8,7 @@ export default {
       //    options: ['option1', 'option2'] | [{value: 'val', label: 'Label'}, ...] /* array of values or objects */
       //    callback: 'getExampleOptions', /* callback function + should be implementation */
       //    callbackArgument: { 'demo': true },
+      //    filter: [true/false] default is true, flag if show field in conditions options
       // } },
       { id: 'urt', type: 'datetime' },
       { id: 'lastname' },

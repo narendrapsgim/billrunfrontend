@@ -211,14 +211,14 @@ const reportLinesFieldsSelector = createSelector(
   selectReportLinesFields,
 );
 
-const reportSubscriberFieldsSelector = createSelector(
+export const reportSubscriberFieldsSelector = createSelector(
   subscriberFieldsWithPlaySelector,
   () => 'subscribers',
   isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
-const reportAccountFieldsSelector = createSelector(
+export const reportAccountFieldsSelector = createSelector(
   accountFieldsSelector,
   () => 'account',
   () => true,

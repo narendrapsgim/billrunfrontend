@@ -21,22 +21,17 @@ import {
 
 const getCustomFieldsConfig = () => getConfig('customFields', Map());
 
-export const foreignLinesFieldsSelector = createSelector(
-  linesFieldsSelector,
-  (lineFields = List()) => lineFields.filter(onlyLineForeignFields),
-);
-
-export const customFieldsEntityFieldsSelector = createSelector(
-  (state, props, entity) => entity,
-  accountFieldsSelector,
-  subscriberFieldsSelector,
-  productFieldsSelector,
-  seriveceFieldsSelector,
-  planFieldsSelector,
-  taxFieldsSelector,
-  discountFieldsSelector,
-  foreignLinesFieldsSelector,
-  (entity, accountFields, subscriberFields, productFields, serviceFields, planFields, taxFields, discountFields, usageField) => {
+const formatCustomFieldsEntityFields = (
+    entity,
+    accountFields,
+    subscriberFields,
+    productFields,
+    serviceFields,
+    planFields,
+    taxFields,
+    discountFields,
+    usageField,
+  ) => {
     const fields = Map({
       customer: accountFields,
       account_subscribers: subscriberFields,
@@ -52,7 +47,23 @@ export const customFieldsEntityFieldsSelector = createSelector(
       return fields;
     }
     return fields.get(entity);
-  },
+  }
+export const foreignLinesFieldsSelector = createSelector(
+  linesFieldsSelector,
+  (lineFields = List()) => lineFields.filter(onlyLineForeignFields),
+);
+
+export const customFieldsEntityFieldsSelector = createSelector(
+  (state, props, entity) => entity,
+  accountFieldsSelector,
+  subscriberFieldsSelector,
+  productFieldsSelector,
+  seriveceFieldsSelector,
+  planFieldsSelector,
+  taxFieldsSelector,
+  discountFieldsSelector,
+  foreignLinesFieldsSelector,
+  formatCustomFieldsEntityFields,
 );
 
 export const isFieldPrintable = createSelector(
