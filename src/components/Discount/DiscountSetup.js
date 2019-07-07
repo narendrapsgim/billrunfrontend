@@ -88,12 +88,8 @@ class DiscountSetup extends Component {
       const defaultFromValue = moment().add(1, 'days').toISOString();
       this.onChangeFieldValue(['from'], defaultFromValue);
     }
-    if (item.get('discount_type', null) === null) {
+    if (item.get('type', null) === null) {
       this.onChangeFieldValue(['discount_type'], 'monetary');
-    }
-
-    if (item.get('prorated', null) === null) {
-      this.onChangeFieldValue(['prorated'], true);
     }
 
     if (mode === 'clone') {

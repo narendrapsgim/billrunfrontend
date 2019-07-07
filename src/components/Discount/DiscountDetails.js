@@ -68,8 +68,8 @@ class DiscountDetails extends Component {
         title:  getFieldName('Prorated', 'discounts'),
         select_list: true,
         select_options: [
-            Immutable.Map({value: 'inherited', label: 'Inherited'}),
-          Immutable.Map({value: false, label: 'No'})
+          Immutable.Map({value: 'inherited', label: 'Inherited'}),
+          Immutable.Map({value: 'no', label: 'No'})
         ],
         default_value: 'inherited',
       }),
@@ -138,7 +138,7 @@ class DiscountDetails extends Component {
 
   onChangeDiscountType = (e) => {
     const { value } = e.target;
-    this.onChangeFiled(['discount_type'], value);
+    this.onChangeFiled(['type'], value);
   }
 
   onChangeAdditionalField = (field, value) => {
@@ -161,10 +161,10 @@ class DiscountDetails extends Component {
   onChangeService = (services) => {
     const { discount } = this.props;
     const newValuesArray = Immutable.List((services.length) ? services.split(',') : []);
-    const defaultNewValue = Immutable.Map({value:''});
+    const defaultNewValue = Immutable.Map({ value: '' });
     if (newValuesArray.isEmpty()) {
       this.props.onFieldRemove(['subject', 'service']);
-      this.props.onFieldRemove(['matched_services']);
+      this.props.onFieldRemove(['subject', 'matched_services']);
     } else {
       const existsServices = discount.getIn(['subject', 'service'], Immutable.Map());
       const updatedServicesList = Immutable.Map().withMutations((plansWithMutations) => {
@@ -180,9 +180,9 @@ class DiscountDetails extends Component {
         this.props.onFieldRemove(['subject', 'service']);
       }
       if (newValuesArray.includes('matched_services')) {
-        this.onChangeFiled(['matched_services'], discount.get('matched_services', defaultNewValue));
+        this.onChangeFiled(['subject', 'matched_services'], discount.getIn(['subject', 'matched_services'], defaultNewValue));
       } else {
-        this.props.onFieldRemove(['matched_services']);
+        this.props.onFieldRemove(['subject', 'matched_services']);
       }
     }
   }
@@ -190,11 +190,11 @@ class DiscountDetails extends Component {
   onChangePlan = (plans) => {
     const { discount } = this.props;
     const newValuesArray = Immutable.List((plans.length) ? plans.split(',') : []);
-    const defaultNewValue = Immutable.Map({value:''});
+    const defaultNewValue = Immutable.Map({ value: '' });
     if (newValuesArray.isEmpty()) {
       this.props.onFieldRemove(['subject', 'plan']);
-      this.props.onFieldRemove(['matched_plans']);
-      this.props.onFieldRemove(['monthly_fees']);
+      this.props.onFieldRemove(['subject', 'matched_plans']);
+      this.props.onFieldRemove(['subject', 'monthly_fees']);
     } else {
       const existsPlans = this.getSelectedPlans();
       const updatedPalsList = Immutable.Map().withMutations((plansWithMutations) => {
@@ -210,14 +210,14 @@ class DiscountDetails extends Component {
         this.props.onFieldRemove(['subject', 'plan']);
       }
       if (newValuesArray.includes('matched_plans')) {
-        this.onChangeFiled(['matched_plans'], discount.get('matched_plans', defaultNewValue));
+        this.onChangeFiled(['subject', 'matched_plans'], discount.getIn(['subject', 'matched_plans'], defaultNewValue));
       } else {
-        this.props.onFieldRemove(['matched_plans']);
+        this.props.onFieldRemove(['subject', 'matched_plans']);
       }
       if (newValuesArray.includes('monthly_fees')) {
-        this.onChangeFiled(['monthly_fees'], discount.get('monthly_fees', defaultNewValue));
+        this.onChangeFiled(['subject', 'monthly_fees'], discount.getIn(['subject', 'monthly_fees'], defaultNewValue));
       } else {
-        this.props.onFieldRemove(['monthly_fees']);
+        this.props.onFieldRemove(['subject', 'monthly_fees']);
       }
     }
   }
@@ -225,7 +225,7 @@ class DiscountDetails extends Component {
   onChangePlanDiscountValue = (e) => {
     const { value, id:planName } = e.target;
     if (['matched_plans', 'monthly_fees'].includes(planName)) {
-      this.onChangeFiled([planName], Immutable.Map({ value }));
+      this.onChangeFiled(['subject', planName], Immutable.Map({ value }));
     } else {
       this.onChangeFiled(['subject', 'plan', planName], Immutable.Map({ value }));
     }
@@ -233,7 +233,7 @@ class DiscountDetails extends Component {
 
   onChangeServiceDiscountValue = (serviceKey, newSubject) => {
     if ([serviceKey].includes('matched_services')) {
-      this.onChangeFiled([serviceKey], newSubject);
+      this.onChangeFiled(['subject', serviceKey], newSubject);
     } else {
       this.onChangeFiled(['subject', 'service', serviceKey], newSubject);
     }
@@ -312,22 +312,23 @@ class DiscountDetails extends Component {
 
   getSelectedServices = () => {
     const { discount } = this.props;
+    const defaultNewValue = Immutable.Map({ value: '' });
     let services = discount.getIn(['subject', 'service'], Immutable.Map());
-    if (discount.has('matched_services')) {
-
-      services = services.set('matched_services', discount.get('matched_services',Immutable.Map({value:''})));
+    if (discount.hasIn(['subject', 'matched_services'])) {
+      services = services.set('matched_services', discount.getIn(['subject', 'matched_services'], defaultNewValue));
     }
     return services;
   }
 
   getSelectedPlans = () => {
     const { discount } = this.props;
+    const defaultNewValue = Immutable.Map({ value: '' });
     let plans = discount.getIn(['subject', 'plan'], Immutable.Map());
-    if (discount.has('matched_plans')) {
-      plans = plans.set('matched_plans', discount.get('matched_plans', Immutable.Map({value:''})));
+    if (discount.hasIn(['subject', 'matched_plans'])) {
+      plans = plans.set('matched_plans', discount.getIn(['subject', 'matched_plans'], defaultNewValue));
     }
-    if (discount.has('monthly_fees')) {
-      plans = plans.set('monthly_fees', discount.get('monthly_fees', Immutable.Map({value:''})));
+    if (discount.hasIn(['subject', 'monthly_fees'])) {
+      plans = plans.set('monthly_fees', discount.getIn(['subject', 'monthly_fees'], defaultNewValue));
     }
     return plans;
   }
@@ -343,7 +344,7 @@ class DiscountDetails extends Component {
 
   isPercentaget = () => {
     const { discount } = this.props;
-    return discount.get('discount_type', '') === 'percentage'
+    return discount.get('type', '') === 'percentage'
   }
 
   renderServivesDiscountValues = () => {
@@ -462,14 +463,14 @@ class DiscountDetails extends Component {
                     ? (
                       <span>
                         <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="monetary" label="Monetary" checked={!isPercentaget} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label="Monetary" checked={!isPercentaget} />
                         </span>
                         <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="discount_type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
                         </span>
                       </span>
                     )
-                  : <div className="non-editable-field">{ titleCase(discount.get('discount_type', '')) }</div>
+                  : <div className="non-editable-field">{ titleCase(discount.get('type', '')) }</div>
                   }
                 </Col>
               </FormGroup>
