@@ -85,10 +85,13 @@ class Condition extends Component {
 
   getOperator = () => {
     const { item, operators } = this.props;
-    return operators.find(
-      operator => operator.get('id', '') === item.get('op', ''),
-      null, Immutable.Map(),
-    );
+    const config = this.getConfig();
+    return operators
+      .filter(option => (!this.isInBlackList(option, config) && this.isInWhiteList(option, config)))
+      .find(
+        operator => operator.get('id', '') === item.get('op', ''),
+        null, Immutable.Map(),
+      );
   }
 
   getFieldOptions = () => {

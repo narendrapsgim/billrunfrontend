@@ -389,6 +389,7 @@ export const getAllGroupsQuery = () => ([
   getGroupsQuery('services'),
 ]);
 export const getBucketGroupsQuery = () => getEntitesQuery('prepaidgroups');
+export const getTaxRatesQuery = getEntitesQuery('taxes', { key: 1, description: 1 });
 // By ID
 export const fetchServiceByIdQuery = id => getEntityByIdQuery('services', id);
 export const fetchProductByIdQuery = id => getEntityByIdQuery('rates', id);

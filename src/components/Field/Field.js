@@ -94,9 +94,9 @@ class Field extends PureComponent {
   }
 
   render() {
-    const { style, className } = this.props;
+    const { style, className, fieldType } = this.props;
     return (
-      <div className={classNames('Field', className)} style={style}>
+      <div className={classNames('Field', fieldType, className)} style={style}>
         { this.createInput() }
       </div>
     );

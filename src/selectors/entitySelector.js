@@ -255,22 +255,3 @@ export const sourceEntityRatesSelector = createSelector(
   itemSourceSelector,
   selectEntityRates,
 );
-
-export const discountsServicesFieldsSelector = createSelector(
-  () => {},
-  () => Immutable.List([Immutable.Map({
-    id: 'name',
-    title: 'Name',
-    type: 'string',
-    aggregatable: true,
-    searchable: true,
-    inputConfig: null,
-  }),Immutable.Map({
-    id: 'from',
-    title: 'From',
-    type: 'date',
-    aggregatable: true,
-    searchable: true,
-    inputConfig: null,
-  })]),
-);

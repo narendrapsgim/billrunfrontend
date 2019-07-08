@@ -98,6 +98,7 @@ export const getFieldName = (field, category, defaultValue = null) => {
 export const getFieldNameType = (type) => {
   switch (type) {
     case 'account':
+    case 'accounts':
     case 'customer':
       return 'account';
     case 'subscription':

@@ -11,7 +11,7 @@ import {
 } from '@/common/Util';
 import {
   selectOptionSelector,
-} from '@/selectors/reportSelectors';
+} from '@/selectors/conditionSelectors';
 import {
   getCyclesOptions,
   getProductsOptions,

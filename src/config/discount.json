@@ -1,28 +1,43 @@
 {
+  "fields": {
+    "subscriber": [],
+    "account": [],
+    "subscriber_services": [
+      { "id": "name", "title": "Name", "type": "string", "inputConfig": { "inputType": "select", "callback": "getServicesOptions" } },
+      { "id": "from", "title": "From", "type": "date" },
+      { "id": "to", "title": "To", "type": "date" },
+      { "id": "test_string" },
+      { "id": "test_bool", "type": "boolean" },
+      { "id": "test_number", "type": "number" },
+      { "id": "test_percentage", "type": "percentage" },
+      { "id": "test_textarea", "type": "textarea" },
+      { "id": "quantity", "title": "Quantity", "type": "number" }
+    ]
+  },
   "conditionsOperators" : [
-    { "id": "eq", "title": "Equals", "include": ["date", "datetime", "boolean"] },
-    { "id": "ne", "title": "Does not equal", "include": ["boolean"], "exclude": [] },
-    { "id": "in", "title": "Equals", "include": ["string", "number"], "exclude": []  },
-    { "id": "nin", "title": "Does not equal", "include": ["string", "number"], "exclude": []  },
-    { "id": "lt", "title": "Is Less Than", "include": ["number", "date", "datetime", "fieldid:billrun"], "exclude": [] },
-    { "id": "lte", "title": "Is Less Than Or Equal", "include": ["number", "date", "datetime", "fieldid:billrun"], "exclude": [] },
-    { "id": "gt", "title": "Is Greater Than", "include": ["number", "date", "datetime", "fieldid:billrun"], "exclude": [] },
-    { "id": "gte", "title": "Is Greater Than Or Equal", "include": ["number", "date", "datetime", "fieldid:billrun"], "exclude": [] },
-    { "id": "regex", "title": "Contains", "include": ["string", "number"], "exclude": [] },
+    { "id": "eq", "title": "Equals", "include": ["date", "datetime"] },
+    { "id": "ne", "title": "Does not equal", "include": [], "exclude": [] },
+    { "id": "in", "title": "Equals", "include": ["string", "textarea", "number", "percentage"], "exclude": []  },
+    { "id": "nin", "title": "Does not equal", "include": ["string", "textarea", "number", "percentage"], "exclude": []  },
+    { "id": "lt", "title": "Is Less Than", "include": ["number", "percentage", "date", "datetime"], "exclude": [] },
+    { "id": "lte", "title": "Is Less Than Or Equal", "include": ["number", "percentage", "date", "datetime"], "exclude": [] },
+    { "id": "gt", "title": "Is Greater Than", "include": ["number", "percentage", "date", "datetime"], "exclude": [] },
+    { "id": "gte", "title": "Is Greater Than Or Equal", "include": ["number", "percentage", "date", "datetime"], "exclude": [] },
+    { "id": "regex", "title": "Contains", "include": ["string", "textarea"], "exclude": [] },
     { "id": "exists", "title": "Exists", "type": "boolean",
-      "include": ["string", "number", "boolean", "date", "datetime", "ranges", "range"],
+      "include": ["string", "textarea", "number", "percentage", "boolean", "date", "datetime", "ranges", "range"],
       "exclude": [],
       "options": ["yes", "no"]
     },
     { "id": "is", "title": "Is", "type": "boolean",
-      "include": ["string", "number", "boolean", "date", "datetime", "ranges", "range"],
+      "include": ["boolean"],
       "exclude": [],
-      "options": ["true", "false"]
+      "options": ["yes", "no"]
     },
-    { "id": "is", "title": "Is",
+    { "id": "is", "title": "Is", "type": "string",
       "include": ["daterange"],
       "exclude": [],
-      "options": ["is active"]
+      "options": [{"value": "isActive", "label": "Is Active"}]
     }
   ]
 }

@@ -5,11 +5,11 @@ import Immutable from 'immutable';
 import { Panel } from 'react-bootstrap';
 import DiscountCondition from './DiscountCondition';
 import { getConfig } from '@/common/Util';
-import { discountsServicesFieldsSelector } from '@/selectors/entitySelector';
 import {
-  reportSubscriberFieldsSelector,
-  reportAccountFieldsSelector,
-} from '@/selectors/reportSelectors';
+  discountSubscriberFieldsSelector,
+  discountAccountFieldsSelector,
+  discountSubscriberServicesFieldsSelector,
+} from '@/selectors/discountSelectors';
 
 
 const DiscountConditions = ({
@@ -26,7 +26,7 @@ const DiscountConditions = ({
   servicesConditionsPath,
   subscriberConditionFields,
   accountConditionFields,
-  servicesConditionFields,
+  subscriberServicesConditionFields,
 }) => {
   return (
     <Panel header="Conditions">
@@ -63,7 +63,7 @@ const DiscountConditions = ({
           path={servicesConditionsPath}
           conditions={discount.getIn(servicesConditionsPath, Immutable.List())}
           disabled={!editable}
-          fields={servicesConditionFields}
+          fields={subscriberServicesConditionFields}
           operators={conditionsOperators}
           onChangeField={onChangeConditionField}
           onChangeOp={onChangeConditionOp}
@@ -83,7 +83,7 @@ DiscountConditions.propTypes = {
   accountConditionsPath: PropTypes.array,
   subscriberConditionFields: PropTypes.instanceOf(Immutable.List),
   accountConditionFields: PropTypes.instanceOf(Immutable.List),
-  servicesConditionFields: PropTypes.instanceOf(Immutable.List),
+  subscriberServicesConditionFields: PropTypes.instanceOf(Immutable.List),
   subscriberConditionsPath: PropTypes.array,
   servicesConditionsPath: PropTypes.array,
   onChangeConditionField: PropTypes.func.isRequired,
@@ -103,13 +103,13 @@ DiscountConditions.defaultProps = {
   conditionsOperators: getConfig(['discount', 'conditionsOperators'], Immutable.List()),
   subscriberConditionFields: Immutable.List(),
   accountConditionFields: Immutable.List(),
-  servicesConditionFields: Immutable.List(),
+  subscriberServicesConditionFields: Immutable.List(),
 };
 
 const mapStateToProps = (state, props) => ({
-  subscriberConditionFields: reportSubscriberFieldsSelector(state, props),
-  accountConditionFields: reportAccountFieldsSelector(state, props),
-  servicesConditionFields: discountsServicesFieldsSelector(state, props),
+  subscriberConditionFields: discountSubscriberFieldsSelector(state, props, 'subscriber'),
+  accountConditionFields: discountAccountFieldsSelector(state, props, 'account'),
+  subscriberServicesConditionFields: discountSubscriberServicesFieldsSelector(state, props, 'subscriber_services'),
 });
 
 export default connect(mapStateToProps)(DiscountConditions);
