@@ -63,6 +63,9 @@ const getServiceFields = (state, props) => // eslint-disable-line no-unused-vars
 const getTaxFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxes', 'fields']);
 
+const getDiscountFields = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['discounts', 'fields']);
+
 const getProductFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['rates', 'fields']);
 
@@ -414,6 +417,11 @@ export const seriveceFieldsSelector = createSelector(
 export const taxFieldsSelector = createSelector(
   getTaxFields,
   (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'tax')),
+);
+
+export const discountFieldsSelector = createSelector(
+  getDiscountFields,
+  (fields = Immutable.List()) => fields.map(field => setFieldTitle(field, 'discount')),
 );
 
 export const planFieldsSelector = createSelector(

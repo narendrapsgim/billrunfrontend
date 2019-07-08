@@ -56,7 +56,8 @@
     "itemName": "discount",
     "itemsName": "discounts",
     "itemType": "discount",
-    "itemsType": "discounts"
+    "itemsType": "discounts",
+    "settingsKey": "discounts"
   },
   "subscription": {
     "collection": "subscribers",

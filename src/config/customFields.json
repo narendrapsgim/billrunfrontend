@@ -6,10 +6,12 @@
     "service": "service",
     "plan":"plan",
     "tax":"tax",
+    "discount":"discount",
     "usage": "usage"
   },
 
   "defaultDisabledFields": {
+    "discount": ["key", "description"],
     "customer": ["first_name", "last_name", "firstname", "lastname", "address"],
     "subscription": ["firstname", "lastname", "plan", "services"]
   },
@@ -19,14 +21,20 @@
     "product": ["from", "to", "play", "tax"],
     "service": ["from", "to", "include", "play", "tax"],
     "tax": ["from", "to"],
+    "discount": ["from", "to"],
     "plan": ["from", "to", "play", "tax"]
   },
   "unReorderFields": {
     "product": ["key", "description", "rates"],
     "service": ["name", "description", "price"],
     "tax": ["key", "description"],
+    "discount": ["key", "description"],
     "plan": ["name", "description", "price", "upfront"]
   },
+  "saveAsParams": [
+    "discount",
+    "tax"
+  ],
   "fields": [
     {
       "id": "text",
