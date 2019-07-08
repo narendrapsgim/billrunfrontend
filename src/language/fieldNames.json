@@ -142,6 +142,29 @@
   "foreign": {
     "account_subscribers": "Customer Members"
   },
+  "discount": {
+    "description": "Title",
+    "key": "Key",
+    "priority": "Priority",
+    "type": "Type",
+    "cycles": "Cycles",
+    "select_plans": "Select Plans",
+    "select_services": "Select Services",
+    "discount_overall_limit": "Discount Overall Limit",
+    "type_monetary": "Monetary",
+    "type_percentage": "Percentage",
+    "min_subscribers": "Max Subscribers",
+    "max_subscribers": "Min Subscribers",
+    "proration": "Prorated",
+    "proration_inherited": "Inherited",
+    "proration_no": "No",
+    "matched_services": "Matched Services",
+    "monthly_fees": "Plans and included services",
+    "matched_plans": "Matched Plans",
+    "panle_plan_discount": "Plans Discount Values",
+    "panle_service_discount": "Services Discount Values",
+    "quantitative_not_compatible": "not compatible with quantitative service type."
+  },
   "aid": "Customer ID",
   "sid": "Subscriber ID",
   "effective_date": "Effective Date"

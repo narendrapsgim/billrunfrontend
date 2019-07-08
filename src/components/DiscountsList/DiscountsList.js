@@ -1,5 +1,6 @@
 import React from 'react';
 import EntityList from '../EntityList';
+import { getFieldName } from '@/common/Util';
 
 
 const DiscountsList = () => {
@@ -8,10 +9,16 @@ const DiscountsList = () => {
     { id: 'key', placeholder: 'Key' },
   ];
 
+  const parseType = (item) => {
+    return item.get('type', '') === 'percentage'
+      ? getFieldName('type_percentage', 'discount')
+      : getFieldName('type_monetary', 'discount');
+  }
+
   const tableFields = [
     { id: 'description', title: 'Title', sort: true },
     { id: 'key', title: 'Key', sort: true },
-    { id: 'type', title: 'Type', sort: true },
+    { id: 'type', title: 'Type', sort: true, parser: parseType },
   ];
 
   const projectFields = {

@@ -34,42 +34,42 @@ class DiscountDetails extends Component {
     discount: Immutable.Map(),
     fields: Immutable.Map({
       description: Immutable.Map({
-        title: getFieldName('Title', 'discounts'),
+        title: getFieldName('description', 'discount'),
         field_name: 'description',
         mandatory: true,
         description: DiscountDescription.description
       }),
       key: Immutable.Map({
-        title: getFieldName('Key', 'discounts'),
+        title: getFieldName('key', 'discount'),
         field_name: 'key',
         mandatory: true,
         description: DiscountDescription.key
       }),
       priority: Immutable.Map({
-        title: getFieldName('Priority', 'discounts'),
+        title: getFieldName('priority', 'discount'),
         field_name: 'priority',
         system: true,
         type: 'number'
       }),
       paramsMinSubscribers: Immutable.Map({
-        title: getFieldName('Max Subscribers', 'discounts'),
+        title: getFieldName('min_subscribers', 'discount'),
         field_name: 'params.min_subscribers',
         system: true,
         type: 'number'
       }),
       paramsMaxSubscribers: Immutable.Map({
-        title: getFieldName('Min Subscribers', 'discounts'),
+        title: getFieldName('max_subscribers', 'discount'),
         field_name: 'params.max_subscribers',
         system: true,
         type: 'number'
       }),
       proration: Immutable.Map({
         field_name: 'proration',
-        title:  getFieldName('Prorated', 'discounts'),
+        title:  getFieldName('proration', 'discount'),
         select_list: true,
         select_options: [
-          Immutable.Map({value: 'inherited', label: 'Inherited'}),
-          Immutable.Map({value: 'no', label: 'No'})
+          Immutable.Map({value: 'inherited', label: getFieldName('proration_inherited', 'discount')}),
+          Immutable.Map({value: 'no', label: getFieldName('proration_no', 'discount')})
         ],
         default_value: 'inherited',
       }),
@@ -265,8 +265,8 @@ class DiscountDetails extends Component {
 
   createPlansOptions = () => this.props.availableEntities
     .get('plan', Immutable.List())
-    .push(Immutable.Map({name: 'matched_plans', description: 'Matched Plans'}))
-    .push(Immutable.Map({name: 'monthly_fees', description: 'Plans and included services'}))
+    .push(Immutable.Map({name: 'matched_plans', description: getFieldName('matched_plans', 'discount')}))
+    .push(Immutable.Map({name: 'monthly_fees', description: getFieldName('monthly_fees', 'discount')}))
     .map(this.createOption)
     .toArray();
 
@@ -285,7 +285,7 @@ class DiscountDetails extends Component {
     return availableEntities
       .get('service', Immutable.List())
       .filter(availableService => !(isPercentaget && availableService.get('quantitative', false)))
-      .push(Immutable.Map({name: 'matched_services', description: 'Matched Services'}))
+      .push(Immutable.Map({name: 'matched_services', description: getFieldName('matched_services', 'discount')}))
       .map(this.createOption)
       .toArray();
   }
@@ -296,14 +296,8 @@ class DiscountDetails extends Component {
   })
 
   getLabel = (items, key) => {
-    if ('matched_services' === key) {
-      return 'Matched Services';
-    }
-    if ('matched_plans' === key) {
-      return 'Matched Plans';
-    }
-    if ('monthly_fees' === key) {
-      return 'Plans and included services';
+    if (['matched_services', 'matched_plans', 'monthly_fees'].includes(key)) {
+      return getFieldName(key, 'discount');
     }
     return items
       .find(item => item.get('name') === key, null, Immutable.Map())
@@ -424,11 +418,11 @@ class DiscountDetails extends Component {
       .getIn(['subject', 'service'], Immutable.Map())
       .keySeq().toList()
       .reduce((acc, serviceName) => (this.isServiceQuantitative(serviceName) ? true : acc), false);
-    const percentageLabel = (!includesQuantitative) ? 'Percentage' : (
+    const percentageLabel = (!includesQuantitative) ? getFieldName('type_percentage', 'discount') : (
       <span>
-        Percentage&nbsp;
+        {getFieldName('type_percentage', 'discount')}&nbsp;&nbsp;
         <Label bsStyle="warning">
-          not compatible with quantitative service type.
+          {getFieldName('quantitative_not_compatible', 'discount')}
         </Label>
       </span>
     );
@@ -456,14 +450,14 @@ class DiscountDetails extends Component {
               }
               <FormGroup >
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('Type', 'discounts')}
+                  { getFieldName('type', 'discount')}
                 </Col>
                 <Col sm={8} lg={9}>
                   { editable
                     ? (
                       <span>
                         <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label="Monetary" checked={!isPercentaget} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'discount')} checked={!isPercentaget} />
                         </span>
                         <span style={{ display: 'inline-block' }}>
                           <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
@@ -476,7 +470,7 @@ class DiscountDetails extends Component {
               </FormGroup>
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('Cycles', 'discounts')}
+                  { getFieldName('cycles', 'discount')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field value={discount.get('cycles', '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
@@ -496,7 +490,7 @@ class DiscountDetails extends Component {
               />
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('Discount Overall Limit', 'discounts')}
+                  { getFieldName('discount_overall_limit', 'discount')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
@@ -550,10 +544,10 @@ class DiscountDetails extends Component {
               removeCondition={this.onRemoveCondition}
             />
 
-            <Panel header={<h3>Plans Discount Values</h3>}>
+            <Panel header={<h3>{getFieldName('panle_plan_discount', 'discount')}</h3>}>
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Select Plans
+                  {getFieldName('select_plans', 'discount')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field
@@ -569,10 +563,10 @@ class DiscountDetails extends Component {
               { (!this.getSelectedPlans().isEmpty()) && <hr /> }
               { this.renderPlanDiscountValue() }
               </Panel>
-              <Panel header={<h3>Services Discount Values</h3>}>
+              <Panel header={<h3>{getFieldName('panle_service_discount', 'discount')}</h3>}>
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Select Services
+                  {getFieldName('select_services', 'discount')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field
