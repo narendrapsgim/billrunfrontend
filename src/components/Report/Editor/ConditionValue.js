@@ -383,7 +383,7 @@ class ConditionValue extends Component {
     }
 
     // 'Date'
-    if ([config.get('type', ''), operator.get('type', '')].includes('date')) {
+    if ([config.get('type', ''), operator.get('type', '')].includes('date') || [config.get('type', ''), operator.get('type', '')].includes('daterange')) {
       return this.renderInputDate();
     }
 

@@ -21,7 +21,7 @@ class Ranges extends PureComponent {
 
   static defaultProps = {
     id: undefined,
-    value: Immutable.List([]),
+    value: Immutable.List(),
     label: '',
     inputProps: {},
     multi: false,
@@ -73,7 +73,7 @@ class Ranges extends PureComponent {
           {value.map((rangeValue, index) => (
             <span key={`range_${id}_${index}`}>
               {index > 0 && ", "}
-              <Range value={rangeValue} editable={false} />
+              <Range {...otherProps} value={rangeValue} editable={false} />
             </span>
           ))}
         </span>
