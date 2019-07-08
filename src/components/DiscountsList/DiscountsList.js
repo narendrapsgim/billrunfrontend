@@ -11,13 +11,13 @@ const DiscountsList = () => {
   const tableFields = [
     { id: 'description', title: 'Title', sort: true },
     { id: 'key', title: 'Key', sort: true },
-    { id: 'discount_type', title: 'Type', sort: true },
+    { id: 'type', title: 'Type', sort: true },
   ];
 
   const projectFields = {
     key: 1,
     description: 1,
-    discount_type: 1,
+    type: 1,
   };
 
   const actions = [

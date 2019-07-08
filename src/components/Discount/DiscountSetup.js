@@ -89,7 +89,7 @@ class DiscountSetup extends Component {
       this.onChangeFieldValue(['from'], defaultFromValue);
     }
     if (item.get('type', null) === null) {
-      this.onChangeFieldValue(['discount_type'], 'monetary');
+      this.onChangeFieldValue(['type'], 'monetary');
     }
 
     if (mode === 'clone') {
