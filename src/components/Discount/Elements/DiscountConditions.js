@@ -27,54 +27,52 @@ const DiscountConditions = ({
   subscriberConditionFields,
   accountConditionFields,
   subscriberServicesConditionFields,
-}) => {
-  return (
-    <Panel header="Conditions">
-      <Panel header="Account">
-        <DiscountCondition
-          path={accountConditionsPath}
-          conditions={discount.getIn(accountConditionsPath, Immutable.List())}
-          disabled={!editable}
-          fields={accountConditionFields}
-          operators={conditionsOperators}
-          onChangeField={onChangeConditionField}
-          onChangeOp={onChangeConditionOp}
-          onChangeValue={onChangeConditionValue}
-          onAdd={addCondition}
-          onRemove={removeCondition}
-        />
-      </Panel>
-      <Panel header="Subscriber">
-        <DiscountCondition
-          path={subscriberConditionsPath}
-          conditions={discount.getIn(subscriberConditionsPath, Immutable.List())}
-          disabled={!editable}
-          fields={subscriberConditionFields}
-          operators={conditionsOperators}
-          onChangeField={onChangeConditionField}
-          onChangeOp={onChangeConditionOp}
-          onChangeValue={onChangeConditionValue}
-          onAdd={addCondition}
-          onRemove={removeCondition}
-        />
-      </Panel>
-      <Panel header="Services">
-        <DiscountCondition
-          path={servicesConditionsPath}
-          conditions={discount.getIn(servicesConditionsPath, Immutable.List())}
-          disabled={!editable}
-          fields={subscriberServicesConditionFields}
-          operators={conditionsOperators}
-          onChangeField={onChangeConditionField}
-          onChangeOp={onChangeConditionOp}
-          onChangeValue={onChangeConditionValue}
-          onAdd={addCondition}
-          onRemove={removeCondition}
-        />
-      </Panel>
+}) => (
+  <Panel header="Conditions">
+    <Panel header="Account">
+      <DiscountCondition
+        path={accountConditionsPath}
+        conditions={discount.getIn(accountConditionsPath, Immutable.List())}
+        disabled={!editable}
+        fields={accountConditionFields}
+        operators={conditionsOperators}
+        onChangeField={onChangeConditionField}
+        onChangeOp={onChangeConditionOp}
+        onChangeValue={onChangeConditionValue}
+        onAdd={addCondition}
+        onRemove={removeCondition}
+      />
     </Panel>
-  )
-}
+    <Panel header="Subscriber">
+      <DiscountCondition
+        path={subscriberConditionsPath}
+        conditions={discount.getIn(subscriberConditionsPath, Immutable.List())}
+        disabled={!editable}
+        fields={subscriberConditionFields}
+        operators={conditionsOperators}
+        onChangeField={onChangeConditionField}
+        onChangeOp={onChangeConditionOp}
+        onChangeValue={onChangeConditionValue}
+        onAdd={addCondition}
+        onRemove={removeCondition}
+      />
+    </Panel>
+    <Panel header="Services">
+      <DiscountCondition
+        path={servicesConditionsPath}
+        conditions={discount.getIn(servicesConditionsPath, Immutable.List())}
+        disabled={!editable}
+        fields={subscriberServicesConditionFields}
+        operators={conditionsOperators}
+        onChangeField={onChangeConditionField}
+        onChangeOp={onChangeConditionOp}
+        onChangeValue={onChangeConditionValue}
+        onAdd={addCondition}
+        onRemove={removeCondition}
+      />
+    </Panel>
+  </Panel>
+);
 
 DiscountConditions.propTypes = {
   discount: PropTypes.instanceOf(Immutable.Map),
