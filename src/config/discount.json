@@ -6,11 +6,6 @@
       { "id": "name", "title": "Name", "type": "string", "inputConfig": { "inputType": "select", "callback": "getServicesOptions" } },
       { "id": "from", "title": "From", "type": "date" },
       { "id": "to", "title": "To", "type": "date" },
-      { "id": "test_string" },
-      { "id": "test_bool", "type": "boolean" },
-      { "id": "test_number", "type": "number" },
-      { "id": "test_percentage", "type": "percentage" },
-      { "id": "test_textarea", "type": "textarea" },
       { "id": "quantity", "title": "Quantity", "type": "number" }
     ]
   },
