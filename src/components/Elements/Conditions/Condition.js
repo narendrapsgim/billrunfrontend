@@ -57,7 +57,11 @@ class Condition extends Component {
       this.props.onChangeOperator(index, fieldOps[0].value);
     }
     // if new field doesn't support old operator, reset selected operator
-    else if (item.get('op', '') !== '' && !fieldOps.map(op => op.value).includes(item.get('op', ''))) {
+    else if (
+      prevProps.item.get('field', '') !== item.get('field', '')
+      && item.get('op', '') !== ''
+      && !fieldOps.map(op => op.value).includes(item.get('op', ''))
+    ) {
       this.props.onChangeOperator(index, '');
     }
   }
