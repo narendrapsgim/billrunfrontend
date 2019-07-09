@@ -30,6 +30,28 @@
 }
 
 /* Overide fied inside tags */
+.Field.number.react-tagsinput-input {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+
+  input {
+    border: none;
+    height: 28px;
+    box-shadow: none;
+    padding: 4px 2px;
+    margin-bottom: 5px;
+  }
+
+  &:hover,
+  &:active,
+  &:focus {
+    input {
+      box-shadow: none;
+    }
+  }
+}
+
 .Field.percentage.react-tagsinput-input {
   display: inline-block;
   padding: 0;
