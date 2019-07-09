@@ -43,13 +43,6 @@ class ConditionValue extends Component {
     this.initFieldOptions(config, selectOptions);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { config } = this.props;
-    if (!Immutable.is(config, nextProps.config)) {
-      this.initFieldOptions(nextProps.config, nextProps.selectOptions);
-    }
-  }
-
   shouldComponentUpdate(nextProps) {
     const { field, config, operator, selectOptions, disabled } = this.props;
     return (
@@ -59,6 +52,17 @@ class ConditionValue extends Component {
       || !Immutable.is(operator, nextProps.operator)
       || disabled !== nextProps.disabled
     );
+  }
+
+  componentDidUpdate(prevProps) {
+    const { config, selectOptions } = this.props;
+    if (!Immutable.is(prevProps.config, config)) {
+      this.initFieldOptions(config, selectOptions);
+    }
+    // If type of value changed or select options, reset the value
+    if (prevProps.config.get('type', '') !== config.get('type', '') || !Immutable.is(selectOptions, prevProps.selectOptions)) {
+      this.props.onChange('');
+    }
   }
 
   initFieldOptions = (config, selectOptions) => {

@@ -52,9 +52,13 @@ class Condition extends Component {
   componentDidUpdate(prevProps, prevState) { // eslint-disable-line no-unused-vars
     const { item, index } = this.props;
     const fieldOps = this.getOpOptions() || [];
-    // If only one option avalibale, auto set it.
-    if (fieldOps.length === 1 && item.get('op', '') === '') {
+    // If only one option avalibale, auto select it.
+    if (item.get('op', '') === '' && fieldOps.length === 1) {
       this.props.onChangeOperator(index, fieldOps[0].value);
+    }
+    // if new field doesn't support old operator, reset selected operator
+    else if (item.get('op', '') !== '' && !fieldOps.map(op => op.value).includes(item.get('op', ''))) {
+      this.props.onChangeOperator(index, '');
     }
   }
 
