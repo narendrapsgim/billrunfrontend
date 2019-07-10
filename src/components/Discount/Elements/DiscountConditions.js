@@ -29,7 +29,7 @@ const DiscountConditions = ({
   subscriberServicesConditionFields,
 }) => (
   <Panel header="Conditions">
-    <Panel header="Account">
+    <Panel header="Customer">
       <DiscountCondition
         path={accountConditionsPath}
         conditions={discount.getIn(accountConditionsPath, Immutable.List())}
