@@ -370,14 +370,16 @@ class EntityList extends Component {
 const mapStateToProps = (state, props) => {
   let itemType = props.itemType;
   let itemsType = props.itemsType;
-  let collection = props.itemsType;
-  let showRevisionBy = props.itemsType;
+  let collection = props.collection || props.itemsType;
+  let showRevisionBy = props.showRevisionBy;
   if (typeof props.entityKey !== 'undefined') {
     const config = getConfig(['systemItems', props.entityKey], Immutable.Map());
     itemType = config.get('itemType', itemType);
     itemsType = config.get('itemsType', itemsType);
     collection = config.get('collection', itemsType);
-    showRevisionBy = config.get('uniqueField', itemsType);
+    if (props.showRevisionBy !== false) {
+      showRevisionBy = config.get('uniqueField', props.showRevisionBy);
+    }
   }
   return ({
     collection,
