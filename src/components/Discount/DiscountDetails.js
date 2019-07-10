@@ -23,6 +23,7 @@ class DiscountDetails extends Component {
     discount: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
     currency: PropTypes.string,
+    hideKey: PropTypes.bool,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
     onFieldRemove: PropTypes.func.isRequired,
@@ -75,6 +76,7 @@ class DiscountDetails extends Component {
       }),
     }),
     currency: '',
+    hideKey: false,
     availableEntities: Immutable.Map(),
     errorMessages: {
       name: {
@@ -405,7 +407,7 @@ class DiscountDetails extends Component {
 
   render() {
     const { errors } = this.state;
-    const { discount, mode, currency, fields } = this.props;
+    const { discount, mode, currency, fields, hideKey } = this.props;
     const editable = (mode !== 'view');
     const isPercentaget = this.isPercentaget();
     const plansOptions = this.createPlansOptions();
@@ -438,7 +440,7 @@ class DiscountDetails extends Component {
                 onChange={this.onChangeFiled}
                 editable={editable}
               />
-              { ['clone', 'create'].includes(mode) &&
+            { ['clone', 'create'].includes(mode) && !hideKey && (
                 <EntityField
                   field={fields.get('key')}
                   entity={discount}
@@ -447,7 +449,7 @@ class DiscountDetails extends Component {
                   disabled={!['clone', 'create'].includes(mode)}
                   error={errors.name}
                 />
-              }
+              )}
               <FormGroup >
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('type', 'discount')}

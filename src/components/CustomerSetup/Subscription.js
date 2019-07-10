@@ -3,13 +3,16 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Panel } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Panel, Table } from 'react-bootstrap';
+import uuid from 'uuid';
 import moment from 'moment';
 import SubscriptionServicesDetails from './SubscriptionServicesDetails';
-import { ActionButtons, Actions } from '@/components/Elements';
+import { ActionButtons, Actions, CreateButton } from '@/components/Elements';
 import Field from '@/components/Field';
 import { EntityRevisionDetails, EntityFields } from '../Entity';
+import { DiscountPopup } from '@/components/Discount';
 import PlaysSelector from '../Plays/PlaysSelector';
+import { showFormModal, setFormModalError, showConfirmModal } from '@/actions/guiStateActions/pageActions';
 import {
   getConfig,
   getItemId,
@@ -158,6 +161,68 @@ class Subscription extends Component {
       });
     }
   }
+
+  getDiscountActions = () => {
+    const { mode } = this.props;
+    const allowEdit = mode !== 'view';
+    return ([
+      { type: 'edit', helpText: 'Edit group', onClick: this.onDiscountEditForm, enable: allowEdit, actionClass: "pl0 pr0" },
+      { type: 'remove', helpText: 'Remove Group', onClick: this.onRemoveDiscount, enable: allowEdit, actionClass: "pl0 pr0" },
+    ]);
+  }
+
+  onDiscountEditForm = (idx) => {
+    const { dispatch } = this.props;
+    const { subscription } = this.state;
+    const discounts = subscription.get('discounts', Immutable.List()) || Immutable.List();
+
+    const newDiscount = discounts.get(idx, Immutable.Map({
+      key: `SUBSCRIBER_DISCOUNT_${uuid.v4().replace(/-/g, '')}`,
+    }))
+    const onOk = (newItem) => {
+      if (newItem.get('description', '') === '') {
+        this.props.dispatch(setFormModalError('description', 'Description is required'));
+        return false;
+      }
+      const newDiscounts = (idx === null)
+        ? discounts.push(newItem)
+        : discounts.set(idx, newItem);
+      this.updateSubscriptionField(['discounts'], newDiscounts);
+      return true;
+    };
+    const config = {
+      title: 'Create Descount',
+      onOk,
+      mode: 'create',
+      hideKey: true,
+    };
+    return dispatch(showFormModal(newDiscount, DiscountPopup, config));
+  }
+
+  onRemoveDiscount = (index) => {
+    const { dispatch } = this.props;
+    const { subscription } = this.state;
+    console.log('onRemoveDiscount index:', index);
+
+    const discounts = subscription.get('discounts', Immutable.List()) || Immutable.List();
+    const discount = discounts.get(index, null);
+    if (discount === null) {
+      return false;
+    }
+
+    const onOk = () => {
+      const newDiscounts = discounts.delete(index);
+      this.updateSubscriptionField(['discounts'], newDiscounts);
+    };
+    const confirm = {
+      message: `Are you sure you want to remove discount "${discount.get('description', '')}"?`,
+      onOk,
+      labelOk: 'Delete',
+      type: 'delete',
+    };
+    return dispatch(showConfirmModal(confirm));
+  }
+
 
   filterCustomFields = (field) => {
     const hiddenFields = ['plan', 'services', 'play'];
@@ -330,6 +395,15 @@ class Subscription extends Component {
     services => (services ? services.map(service => service.delete('ui_flags')) : Immutable.List()),
   );
 
+  renderDiscountRow = (discount, idx) => (
+    <tr className="List" key={discount.get('key', idx)}>
+      <td className="td-ellipsis">{discount.get('description', '')}</td>
+      <td className="text-right row pr0 pl0">
+        <Actions actions={this.getDiscountActions()} data={idx} />
+      </td>
+    </tr>
+  );
+
   renderSystemFields = (editable) => {
     const { subscription } = this.state;
     const { mode } = this.props;
@@ -444,6 +518,36 @@ class Subscription extends Component {
               editable={allowEdit}
             />
           </Form>
+
+          <Panel header={<h3>Discounts</h3>}>
+            {subscription.get('discounts', Immutable.List()).isEmpty() && (
+              <p><small>No Discounts</small></p>
+            )}
+            {!subscription.get('discounts', Immutable.List()).isEmpty() && (
+              <Table style={{ tableLayout: 'fixed' }}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  { subscription.get('discounts', Immutable.List())
+                    .map(this.renderDiscountRow)
+                    .toList()
+                    .toArray() }
+                  </tbody>
+                </Table>
+            )}
+            { allowEdit && (
+              <CreateButton
+                buttonStyle={{ marginTop: 5, marginBottom: 10 }}
+                onClick={this.onDiscountEditForm}
+                action="Add"
+                label=""
+                type="Discount"
+              />
+            )}
+          </Panel>
         </Panel>
 
         <ActionButtons
