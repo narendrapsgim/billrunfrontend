@@ -33,12 +33,10 @@ const DiscountsList = () => {
 
   return (
     <EntityList
-      itemsType="discounts"
-      itemType="discount"
+      entityKey="discount"
       filterFields={filterFields}
       tableFields={tableFields}
       projectFields={projectFields}
-      showRevisionBy="key"
       actions={actions}
     />
   );
