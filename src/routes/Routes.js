@@ -15,6 +15,8 @@ import PlansList from '@/components/PlansList';
 import Plan from '@/components/Plan';
 import DiscountsList from '@/components/DiscountsList';
 import Discount from '@/components/Discount';
+import ChargesList from '@/components/ChargesList';
+import Charge from '@/components/Charge';
 import ServicesList from '@/components/ServicesList';
 import Service from '@/components/Service';
 import InputProcessorsList from '@/components/InputProcessorsList';
@@ -76,6 +78,12 @@ const routes = () => (
           <IndexRoute component={Authentication(DiscountsList)} title="Discounts" />
           <Route path="discount/:itemId" component={Authentication(Discount)} />
           <Route path="discount" component={Authentication(Discount)} />
+        </Route>
+
+        <Route path="charges" >
+          <IndexRoute component={Authentication(ChargesList)} title="Charges" />
+          <Route path="charge/:itemId" component={Authentication(Charge)} />
+          <Route path="charge" component={Authentication(Charge)} />
         </Route>
 
         <Route path="products" >

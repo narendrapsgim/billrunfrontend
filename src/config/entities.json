@@ -59,6 +59,15 @@
     "itemsType": "discounts",
     "settingsKey": "discounts"
   },
+  "charge": {
+    "collection": "charges",
+    "uniqueField": "key",
+    "itemName": "charge",
+    "itemsName": "charges",
+    "itemType": "charge",
+    "itemsType": "charges",
+    "settingsKey": "charges"
+  },
   "subscription": {
     "collection": "subscribers",
     "uniqueField": ["sid", "aid"],
