@@ -62,8 +62,8 @@
   "charge": {
     "collection": "charges",
     "uniqueField": "key",
-    "itemName": "charge",
-    "itemsName": "charges",
+    "itemName": "Conditional Charge",
+    "itemsName": "Conditional Charges",
     "itemType": "charge",
     "itemsType": "charges",
     "settingsKey": "charges"

@@ -91,7 +91,7 @@
     "parent": "postpaid"
   },
   "charges": {
-    "title": "Charges",
+    "title": "Conditional Charges",
     "icon": "",
     "route": "charges",
     "show": true,

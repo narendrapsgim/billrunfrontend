@@ -81,7 +81,7 @@ const routes = () => (
         </Route>
 
         <Route path="charges" >
-          <IndexRoute component={Authentication(ChargesList)} title="Charges" />
+          <IndexRoute component={Authentication(ChargesList)} title="Conditional Charges" />
           <Route path="charge/:itemId" component={Authentication(Charge)} />
           <Route path="charge" component={Authentication(Charge)} />
         </Route>
