@@ -377,6 +377,7 @@ const mapStateToProps = (state, props) => {
     itemType = config.get('itemType', itemType);
     itemsType = config.get('itemsType', itemsType);
     collection = config.get('collection', itemsType);
+    // Allow to disable revisions by passing FALSE
     if (props.showRevisionBy !== false) {
       showRevisionBy = config.get('uniqueField', props.showRevisionBy);
     }
