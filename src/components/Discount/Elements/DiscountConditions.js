@@ -98,7 +98,7 @@ DiscountConditions.defaultProps = {
   accountConditionsPath: ['params', 'conditions', 0, 'account', 'fields'],
   subscriberConditionsPath: ['params', 'conditions', 0, 'subscriber', 0, 'fields'],
   servicesConditionsPath: ['params', 'conditions', 0, 'subscriber', 0, 'service', 'any', 0, 'fields'],
-  conditionsOperators: getConfig(['discount', 'conditionsOperators'], Immutable.List()),
+  conditionsOperators: getConfig(['discount', 'conditions', 'operators'], Immutable.List()),
   subscriberConditionFields: Immutable.List(),
   accountConditionFields: Immutable.List(),
   subscriberServicesConditionFields: Immutable.List(),

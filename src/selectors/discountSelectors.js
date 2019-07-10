@@ -14,7 +14,7 @@ import {
 } from './settingsSelector';
 
 
-const getDiscountsConditionsConfigFields = (state, props, type) => getConfig(['discount', 'fields', type], Immutable.List());
+const getDiscountsConditionsConfigFields = (state, props, type) => getConfig(['discount', 'conditions', 'fields', type], Immutable.List());
 
 const getType = (state, props, type) => type;
 
