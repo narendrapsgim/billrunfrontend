@@ -25,6 +25,7 @@ class ConditionValue extends Component {
     operator: PropTypes.instanceOf(Immutable.Map),
     selectOptions: PropTypes.instanceOf(Immutable.List),
     disabled: PropTypes.bool,
+    editable: PropTypes.bool,
     onChange: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   }
@@ -35,6 +36,7 @@ class ConditionValue extends Component {
     operator: Immutable.Map(),
     selectOptions: Immutable.List(),
     disabled: false,
+    editable: true,
     onChange: () => {},
   }
 
@@ -44,13 +46,14 @@ class ConditionValue extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { field, config, operator, selectOptions, disabled } = this.props;
+    const { field, config, operator, selectOptions, disabled, editable } = this.props;
     return (
       !Immutable.is(field, nextProps.field)
       || !Immutable.is(config, nextProps.config)
       || !Immutable.is(selectOptions, nextProps.selectOptions)
       || !Immutable.is(operator, nextProps.operator)
       || disabled !== nextProps.disabled
+      || editable !== nextProps.editable
     );
   }
 
@@ -59,8 +62,22 @@ class ConditionValue extends Component {
     if (!Immutable.is(prevProps.config, config)) {
       this.initFieldOptions(config, selectOptions);
     }
+
+    const isSelectOptionsChanged = !prevProps.selectOptions.isEmpty()
+      && !selectOptions
+        .map(selectOption => selectOption.get('value'))
+        .sort()
+        .equals(
+          prevProps.selectOptions
+          .map(selectOption => selectOption.get('value'))
+          .sort()
+        );
+
+    const isTypeChanged = prevProps.config.get('type', '') !== ''
+      && prevProps.config.get('type', '') !== config.get('type', '');
+
     // If type of value changed or select options, reset the value
-    if (prevProps.config.get('type', '') !== config.get('type', '') || !Immutable.is(selectOptions, prevProps.selectOptions)) {
+    if (isTypeChanged || isSelectOptionsChanged) {
       this.props.onChange('');
     }
   }
@@ -80,7 +97,7 @@ class ConditionValue extends Component {
   onChangeText = (e) => {
     const { value } = e.target;
     this.props.onChange(value);
-  };
+  }
 
   onChangeSelect = (value) => {
     const { field } = this.props;
@@ -92,13 +109,13 @@ class ConditionValue extends Component {
       const emptyValue = multi ? Immutable.List() : '';
       this.props.onChange(emptyValue);
     }
-  };
+  }
 
   onChangeBoolean = (value) => {
     const trueValues = [1, '1', 'true', true, 'yes', 'on'];
     const bool = value === '' ? '' : trueValues.includes(value);
     this.props.onChange(bool);
-  };
+  }
 
   onChangeNumber = (e) => {
     const { value } = e.target;
@@ -108,7 +125,7 @@ class ConditionValue extends Component {
     } else {
       this.props.onChange(value);
     }
-  };
+  }
 
   onChangePercentage = (e) => {
     const { value } = e.target;
@@ -118,7 +135,7 @@ class ConditionValue extends Component {
     } else {
       this.props.onChange(value);
     }
-  };
+  }
 
   onChangeMultiValues = (values) => {
     const { config, operator } = this.props;
@@ -133,7 +150,7 @@ class ConditionValue extends Component {
     } else {
       this.props.onChange(Immutable.List());
     }
-  };
+  }
 
   onChangeDate = (date) => {
     if (moment.isMoment(date) && date.isValid()) {
@@ -142,7 +159,7 @@ class ConditionValue extends Component {
     } else {
       this.props.onChange(null);
     }
-  };
+  }
 
   onChangeDateTime = (date) => {
     if (moment.isMoment(date) && date.isValid()) {
@@ -151,7 +168,7 @@ class ConditionValue extends Component {
     } else {
       this.props.onChange(null);
     }
-  };
+  }
 
   getOptionsValues = (defaultOptions = Immutable.List()) => this.props.operator
     .get('options', defaultOptions)
@@ -207,7 +224,7 @@ class ConditionValue extends Component {
   );
 
   renderInputBoolean = () => {
-    const { field, disabled } = this.props;
+    const { field, disabled, editable } = this.props;
     let value = '';
     if (field.get('value', false) === true) {
       value = 'yes';
@@ -223,12 +240,13 @@ class ConditionValue extends Component {
         value={value}
         onChange={this.onChangeBoolean}
         disabled={disabled}
+        editable={editable}
       />
     );
   }
 
   renderInputSelect = () => {
-    const { field, disabled, config, selectOptions, operator } = this.props;
+    const { field, disabled, editable, config, selectOptions, operator } = this.props;
     const options = Immutable.List()
       .withMutations((optionsWithMutations) => {
         if (config.hasIn(['inputConfig', 'callback'])) {
@@ -260,12 +278,13 @@ class ConditionValue extends Component {
         value={toImmutableList(field.get('value', [])).join(',')}
         onChange={this.onChangeSelect}
         disabled={disabled}
+        editable={editable}
       />
     );
   }
 
   renderInputNumber = () => {
-    const { field, disabled } = this.props;
+    const { field, disabled, editable } = this.props;
     if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
       const value = toImmutableList(field.get('value', [])).toArray();
       return (
@@ -274,6 +293,7 @@ class ConditionValue extends Component {
           value={value}
           onChange={this.onChangeMultiValues}
           disabled={disabled}
+          editable={editable}
           renderInput={this.renderCustomInputNumber}
         />
       );
@@ -284,12 +304,13 @@ class ConditionValue extends Component {
         value={field.get('value', '')}
         onChange={this.onChangeNumber}
         disabled={disabled}
+        editable={editable}
       />
     );
   }
 
   renderInputPercentage = () => {
-    const { field, disabled } = this.props;
+    const { field, disabled, editable } = this.props;
     if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
       const value = toImmutableList(field.get('value', [])).toArray();
       return (
@@ -298,6 +319,7 @@ class ConditionValue extends Component {
           value={value}
           onChange={this.onChangeMultiValues}
           disabled={disabled}
+          editable={editable}
           renderInput={this.renderCustomInputPercentage}
           getTagDisplayValue={this.formatValueTagPercentage}
         />
@@ -309,12 +331,13 @@ class ConditionValue extends Component {
         value={field.get('value', '')}
         onChange={this.onChangeNumber}
         disabled={disabled}
+        editable={editable}
       />
     );
   }
 
   renderInputDate = () => {
-    const { field, disabled } = this.props;
+    const { field, disabled, editable } = this.props;
     if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
       const value = toImmutableList(field.get('value', [])).toArray();
       return (
@@ -323,6 +346,7 @@ class ConditionValue extends Component {
           value={value}
           onChange={this.onChangeMultiValues}
           disabled={disabled}
+          editable={editable}
           renderInput={this.renderCustomInputDate}
           getTagDisplayValue={this.formatValueTagDate}
         />
@@ -335,12 +359,13 @@ class ConditionValue extends Component {
         value={value}
         onChange={this.onChangeDateTime}
         disabled={disabled}
+        editable={editable}
       />
     );
   }
 
   renderInputDateTime = () => {
-    const { field, disabled } = this.props;
+    const { field, disabled, editable } = this.props;
     if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
       const value = toImmutableList(field.get('value', [])).toArray();
       return (
@@ -349,6 +374,7 @@ class ConditionValue extends Component {
           value={value}
           onChange={this.onChangeMultiValues}
           disabled={disabled}
+          editable={editable}
           renderInput={this.renderCustomInputDateTime}
           getTagDisplayValue={this.formatValueTagDateTime}
         />
@@ -361,12 +387,13 @@ class ConditionValue extends Component {
         value={value}
         onChange={this.onChangeDateTime}
         disabled={disabled}
+        editable={editable}
       />
     );
   }
 
   renderInputString = () => {
-    const { field, disabled } = this.props;
+    const { field, disabled, editable } = this.props;
     if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
       const value = toImmutableList(field.get('value', [])).toArray();
       return (
@@ -375,6 +402,7 @@ class ConditionValue extends Component {
           value={value}
           onChange={this.onChangeMultiValues}
           disabled={disabled}
+          editable={editable}
         />
       );
     }

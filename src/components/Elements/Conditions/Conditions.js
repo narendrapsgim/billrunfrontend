@@ -13,6 +13,7 @@ class Conditions extends Component {
     fields: PropTypes.instanceOf(Immutable.List),
     operators: PropTypes.instanceOf(Immutable.List),
     disabled: PropTypes.bool,
+    editable: PropTypes.bool,
     addConditionLabel: PropTypes.string,
     noConditionsLabel: PropTypes.string,
     onRemove: PropTypes.func,
@@ -27,6 +28,7 @@ class Conditions extends Component {
     fields: Immutable.List(),
     operators: Immutable.List(),
     disabled: false,
+    editable: true,
     addConditionLabel: 'Add Condition',
     noConditionsLabel: 'No conditions found',
     onChangeField: () => {},
@@ -43,12 +45,15 @@ class Conditions extends Component {
   });
 
   shouldComponentUpdate(nextProps) {
-    const { conditions, fields, disabled, operators } = this.props;
+    const { conditions, fields, disabled, editable, operators, addConditionLabel, noConditionsLabel } = this.props;
     return (
       !Immutable.is(conditions, nextProps.conditions)
       || !Immutable.is(fields, nextProps.fields)
       || !Immutable.is(operators, nextProps.operators)
       || disabled !== nextProps.disabled
+      || editable !== nextProps.editable
+      || addConditionLabel !== nextProps.addConditionLabel
+      || noConditionsLabel !== nextProps.noConditionsLabel
     );
   }
 
@@ -57,7 +62,7 @@ class Conditions extends Component {
   }
 
   renderRow = (filter, index) => {
-    const { operators, fields, disabled } = this.props;
+    const { operators, fields, disabled, editable } = this.props;
     return (
       <Condition
         key={index}
@@ -66,6 +71,7 @@ class Conditions extends Component {
         fields={fields}
         operators={operators}
         disabled={disabled}
+        editable={editable}
         onChangeField={this.props.onChangeField}
         onChangeOperator={this.props.onChangeOperator}
         onChangeValue={this.props.onChangeValue}
@@ -75,9 +81,9 @@ class Conditions extends Component {
   }
 
   render() {
-    const { conditions, disabled, fields, addConditionLabel, noConditionsLabel } = this.props;
+    const { conditions, disabled, editable, fields, addConditionLabel, noConditionsLabel } = this.props;
     const conditionsRows = conditions.map(this.renderRow);
-    const disableAdd = fields.isEmpty();
+    const disableAdd = fields.isEmpty() || disabled;
     return (
       <div className="conditions-list">
         { !conditionsRows.isEmpty() && (
@@ -95,7 +101,7 @@ class Conditions extends Component {
           )}
           { conditionsRows }
         </Col>
-        { !disabled && (
+        { editable && (
           <Col sm={12} className="pl0 pr0">
             <CreateButton
               onClick={this.onAddCondition}
